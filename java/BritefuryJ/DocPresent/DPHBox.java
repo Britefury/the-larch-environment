@@ -39,7 +39,7 @@ public class DPHBox extends DPAbstractBox
 	{
 		refreshCollation();
 		
-		LReqBox[] childBoxes = new LReqBox[collationLeaves.length];
+		LReqBox childBoxes[] = new LReqBox[collationLeaves.length];
 		for (int i = 0; i < collationLeaves.length; i++)
 		{
 			childBoxes[i] = collationLeaves[i].refreshRequisitionX();
@@ -50,13 +50,15 @@ public class DPHBox extends DPAbstractBox
 
 	protected void updateRequisitionY()
 	{
-		LReqBox[] childBoxes = new LReqBox[collationLeaves.length];
+		LReqBox childBoxes[] = new LReqBox[collationLeaves.length];
+		int childAllocFlags[] = new int[collationLeaves.length];
 		for (int i = 0; i < collationLeaves.length; i++)
 		{
 			childBoxes[i] = collationLeaves[i].refreshRequisitionY();
+			childAllocFlags[i] = collationLeaves[i].getAlignmentFlags();
 		}
 
-		HorizontalLayout.computeRequisitionY( layoutReqBox, childBoxes );
+		HorizontalLayout.computeRequisitionY( layoutReqBox, childBoxes, childAllocFlags );
 	}
 	
 
@@ -68,9 +70,10 @@ public class DPHBox extends DPAbstractBox
 		
 		LReqBox childBoxes[] = getCollatedChildrenRequisitionBoxes();
 		LAllocBox childAllocBoxes[] = getCollatedChildrenAllocationBoxes();
+		int childAllocFlags[] = getCollatedChildrenAlignmentFlags();
 		double prevWidths[] = getCollatedChildrenAllocationX();
 		
-		HorizontalLayout.allocateX( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, getSpacing() );
+		HorizontalLayout.allocateX( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, childAllocFlags, getSpacing() );
 		
 		int i = 0;
 		for (DPWidget child: collationLeaves)
@@ -88,9 +91,10 @@ public class DPHBox extends DPAbstractBox
 		
 		LReqBox childBoxes[] = getCollatedChildrenRequisitionBoxes();
 		LAllocBox childAllocBoxes[] = getCollatedChildrenAllocationBoxes();
+		int childAllocFlags[] = getCollatedChildrenAlignmentFlags();
 		LAllocV prevAllocVs[] = getCollatedChildrenAllocV();
 		
-		HorizontalLayout.allocateY( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes );
+		HorizontalLayout.allocateY( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, childAllocFlags );
 		
 		int i = 0;
 		for (DPWidget child: collationLeaves)

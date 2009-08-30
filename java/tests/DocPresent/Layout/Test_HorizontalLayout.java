@@ -6,12 +6,10 @@
 //##************************
 package tests.DocPresent.Layout;
 
-import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.HorizontalLayout;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBox;
-import BritefuryJ.DocPresent.Layout.VAlignment;
 
 public class Test_HorizontalLayout extends Test_Layout_base
 {
@@ -92,37 +90,37 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// First, test the simple cases of no baseline alignment, or with baseline alignment with children that do not have baselines
 		
 		// Empty list should result in empty
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] {} );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] {}, new int[] {} );
 		assertEquals( result, new LReqBox() );
 
 		// List of one empty box should result in empty
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { new LReqBox() } );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { new LReqBox() }, new int[] { 0 } );
 		assertEquals( result, new LReqBox( 0.0, 0.0, 0.0, 0.0, 0.0 ) );
 
 		// 1 Box of height 1 should result in same
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( VAlignment.CENTRE, 1.0, 0.0 ) } );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 1.0, 0.0 ) }, new int[] { VCENTRE } );
 		assertEquals( result, ybox( 1.0, 0.0 ) );
 
 		// 1 Box of height 10, vspacing 1 should result in same
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( VAlignment.CENTRE, 10.0, 1.0 ) } );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 10.0, 1.0 ) }, new int[] { VCENTRE } );
 		assertEquals( result, ybox( 10.0, 1.0 ) );
 
 		// requisitionY( [ <10,1>, <20,1> ] )  ->  <20,1>
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( VAlignment.CENTRE, 10.0, 1.0 ),  ybox( VAlignment.CENTRE, 20.0, 1.0 ) } );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 10.0, 1.0 ),  ybox( 20.0, 1.0 ) }, new int[] { VCENTRE, VCENTRE } );
 		assertEquals( result, ybox( 20.0, 1.0 ) );
 
 		// requisitionY( [ <1,10>, <2,20> ] )  ->  <2,20>
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( VAlignment.CENTRE, 1.0, 10.0 ),  ybox( VAlignment.CENTRE, 2.0, 20.0 ) } );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 1.0, 10.0 ),  ybox( 2.0, 20.0 ) }, new int[] { VCENTRE, VCENTRE } );
 		assertEquals( result, ybox( 2.0, 20.0 ) );
 
 		// requisitionY( [ <10,3>, <11,1> ] )  ->  <11,2>
 		// The first box advances X the most overall, although the second has the greater height
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( VAlignment.CENTRE, 10.0, 3.0 ),  ybox( VAlignment.CENTRE, 11.0, 1.0 ) } );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 10.0, 3.0 ),  ybox( 11.0, 1.0 ) }, new int[] { VCENTRE, VCENTRE } );
 		assertEquals( result, ybox( 11.0, 2.0 ) );
 
 		// requisitionY( [ <10,5>, <5,10> ] )  ->  <10,5>
 		// Both advance X by the same amount (15 units), but the first has the greater height
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( VAlignment.CENTRE, 10.0, 5.0 ),  ybox( VAlignment.CENTRE, 5.0, 10.0 ) } );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 10.0, 5.0 ),  ybox( 5.0, 10.0 ) }, new int[] { VCENTRE, VCENTRE } );
 		assertEquals( result, ybox( 10.0, 5.0 ) );
 
 	
@@ -131,29 +129,29 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// Now, test the cases with baseline alignment, with children that do not have baselines
 		
 		// 1 Box of height 1 should result in same
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( VAlignment.BASELINES, 1.0, 0.0 ) } );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 1.0, 0.0 ) }, new int[] { VBASELINES } );
 		assertEquals( result, ybbox( 0.5, 0.5, 0.0 ) );
 
 		// 1 Box of height 10, vspacing 1 should result in same
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( VAlignment.BASELINES, 10.0, 1.0 ) } );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 10.0, 1.0 ) }, new int[] { VBASELINES } );
 		assertEquals( result, ybbox( 5.0, 5.0, 1.0 ) );
 
 		// requisitionY( [ <10,1>, <20,1> ] )  ->  <20,1>
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( VAlignment.BASELINES, 10.0, 1.0 ),  ybox( VAlignment.BASELINES, 20.0, 1.0 ) } );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 10.0, 1.0 ),  ybox( 20.0, 1.0 ) }, new int[] { VBASELINES, VBASELINES } );
 		assertEquals( result, ybbox( 10.0, 10.0, 1.0 ) );
 
 		// requisitionY( [ <1,10>, <2,20> ] )  ->  <2,20>
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( VAlignment.BASELINES, 1.0, 10.0 ),  ybox( VAlignment.BASELINES, 2.0, 20.0 ) } );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 1.0, 10.0 ),  ybox( 2.0, 20.0 ) }, new int[] { VBASELINES, VBASELINES } );
 		assertEquals( result, ybbox( 1.0, 1.0, 20.0 ) );
 
 		// requisitionY( [ <10,3>, <11,1> ] )  ->  <11,2>
 		// The first box advances X the most overall, although the second has the greater height
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( VAlignment.BASELINES, 10.0, 3.0 ),  ybox( VAlignment.BASELINES, 11.0, 1.0 ) } );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 10.0, 3.0 ),  ybox( 11.0, 1.0 ) }, new int[] { VBASELINES, VBASELINES } );
 		assertEquals( result, ybbox( 5.5, 5.5, 2.5 ) );
 
 		// requisitionY( [ <10,5>, <5,10> ] )  ->  <10,5>
 		// Both advance X by the same amount (15 units), but the first has the greater height
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( VAlignment.BASELINES, 10.0, 5.0 ),  ybox( VAlignment.BASELINES, 5.0, 10.0 ) } );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 10.0, 5.0 ),  ybox( 5.0, 10.0 ) }, new int[] { VBASELINES, VBASELINES } );
 		assertEquals( result, ybbox( 5.0, 5.0, 7.5 ) );
 
 
@@ -162,33 +160,33 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// Now test the cases where baselines are used
 		
 		// 1 Box of 3:2 should result in same
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( VAlignment.BASELINES, 3.0, 2.0, 0.0 ) } );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( 3.0, 2.0, 0.0 ) }, new int[] { VBASELINES } );
 		assertEquals( result, ybbox( 3.0, 2.0, 0.0 ) );
 
 		// 1 Box of height 3:2, vspacing 1 should result in same
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( VAlignment.BASELINES, 3.0, 2.0, 1.0 ) } );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox(  3.0, 2.0, 1.0 ) }, new int[] { VBASELINES } );
 		assertEquals( result, ybbox( 3.0, 2.0, 1.0 ) );
 
 		// requisitionY( [ <5:3,0>, <2:4,0> ] )  ->  <5:4,0>
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( VAlignment.BASELINES, 5.0, 3.0, 0.0 ),  ybbox( VAlignment.BASELINES, 2.0, 4.0, 0.0 ) } );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( 5.0, 3.0, 0.0 ),  ybbox( 2.0, 4.0, 0.0 ) }, new int[] { VBASELINES, VBASELINES } );
 		assertEquals( result, ybbox( 5.0, 4.0, 0.0 ) );
 
 		// requisitionY( [ <5:3,1>, <2:4,1> ] )  ->  <5:4,1>
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( VAlignment.BASELINES, 5.0, 3.0, 1.0 ),  ybbox( VAlignment.BASELINES, 2.0, 4.0, 1.0 ) } );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( 5.0, 3.0, 1.0 ),  ybbox( 2.0, 4.0, 1.0 ) }, new int[] { VBASELINES, VBASELINES } );
 		assertEquals( result, ybbox( 5.0, 4.0, 1.0 ) );
 
 		// requisitionY( [ <5:3,1>, <2:4,2> ] )  ->  <5:4,2>
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( VAlignment.BASELINES, 5.0, 3.0, 1.0 ),  ybbox( VAlignment.BASELINES, 2.0, 4.0, 2.0 ) } );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( 5.0, 3.0, 1.0 ),  ybbox( 2.0, 4.0, 2.0 ) }, new int[] { VBASELINES, VBASELINES } );
 		assertEquals( result, ybbox( 5.0, 4.0, 2.0 ) );
 
 		// requisitionY( [ <5:3,3>, <2:4,1> ] )  ->  <5:4,2>
 		// The first box advances Y (below baseline) the most overall, although the second has the greater descent
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( VAlignment.BASELINES, 5.0, 3.0, 3.0 ),  ybbox( VAlignment.BASELINES, 2.0, 4.0, 1.0 ) } );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( 5.0, 3.0, 3.0 ),  ybbox( 2.0, 4.0, 1.0 ) }, new int[] { VBASELINES, VBASELINES } );
 		assertEquals( result, ybbox( 5.0, 4.0, 2.0 ) );
 
 		// requisitionY( [ <2:4,2>, <5:2,4> ] )  ->  <5:4,2>
 		// Both advance T (below baseline) by the same amount (6 units), but the first has the greater descent
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( VAlignment.BASELINES, 2.0, 4.0, 2.0 ),  ybbox( 5.0, 2.0, 4.0 ) } );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( 2.0, 4.0, 2.0 ),  ybbox( 5.0, 2.0, 4.0 ) }, new int[] { VBASELINES, 0 } );
 		assertEquals( result, ybbox( 5.0, 4.0, 2.0 ) );
 		
 		
@@ -196,15 +194,15 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// Now test the situation where baseline alignment is used, but the some children do not have baselines
 
 		// requisitionY( [ <6:3,0>, <8,0> ] )  ->  requisitionY( [ <6:3,0>, <4:4,0> ] )  ->  <6:4,0>
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( VAlignment.BASELINES, 6.0, 3.0, 0.0 ),  ybox( VAlignment.BASELINES, 8.0, 0.0 ) } );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( 6.0, 3.0, 0.0 ),  ybox( 8.0, 0.0 ) }, new int[] { VBASELINES, VBASELINES } );
 		assertEquals( result, ybbox( 6.0, 4.0, 0.0 ) );
 
 		// requisitionY( [ <6:3,3>, <8,1> ] )  ->  requisitionY( [ <6:3,3>, <4:4,1> ] )  ->  <6:4,2>
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( VAlignment.BASELINES, 6.0, 3.0, 3.0 ),  ybox( VAlignment.BASELINES, 8.0, 1.0 ) } );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( 6.0, 3.0, 3.0 ),  ybox( 8.0, 1.0 ) }, new int[] { VBASELINES, VBASELINES } );
 		assertEquals( result, ybbox( 6.0, 4.0, 2.0 ) );
 
 		// requisitionY( [ <6:3,1>, <8,2> ] )  ->  requisitionY( [ <6:3,1>, <4:4,2> ] )  ->  <6:4,2>
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( VAlignment.BASELINES, 6.0, 3.0, 1.0 ),  ybox( VAlignment.BASELINES, 8.0, 2.0 ) } );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( 6.0, 3.0, 1.0 ),  ybox( 8.0, 2.0 ) }, new int[] { VBASELINES, VBASELINES } );
 		assertEquals( result, ybbox( 6.0, 4.0, 2.0 ) );
 	}
 
@@ -220,7 +218,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 	//
 	//
 
-	private void allocXSpaceTest(LReqBox children[], double spacing, LReqBox expectedBox, double boxAllocation, double expectedSpaceAllocation[])
+	private void allocXSpaceTest(LReqBox children[], int childAllocFlags[], double spacing, LReqBox expectedBox, double boxAllocation, double expectedSpaceAllocation[])
 	{ 
 		LReqBox box = new LReqBox();
 		LAllocBox boxAlloc = new LAllocBox( null );
@@ -235,7 +233,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		assertBoxesEqual( box, expectedBox, "PARENT BOX" );
 
 		boxAlloc.setAllocationX( boxAllocation );
-		HorizontalLayout.allocateSpaceX( box, children, boxAlloc, childrenAlloc );
+		HorizontalLayout.allocateSpaceX( box, children, boxAlloc, childrenAlloc, childAllocFlags );
 		for (int i = 0; i < children.length; i++)
 		{
 			if ( childrenAlloc[i].getAllocationX() != expectedSpaceAllocation[i] )
@@ -247,11 +245,11 @@ public class Test_HorizontalLayout extends Test_Layout_base
 	}
 
 	
-	private void allocXSpaceTests(LReqBox children[], double spacing, LReqBox expectedBox, double boxAllocations[], double expectedSpaceAllocations[][])
+	private void allocXSpaceTests(LReqBox children[], int childAllocFlags[], double spacing, LReqBox expectedBox, double boxAllocations[], double expectedSpaceAllocations[][])
 	{
 		for (int i = 0; i  < boxAllocations.length; i++)
 		{
-			allocXSpaceTest( children, spacing, expectedBox, boxAllocations[i], expectedSpaceAllocations[i] );
+			allocXSpaceTest( children, childAllocFlags, spacing, expectedBox, boxAllocations[i], expectedSpaceAllocations[i] );
 		}
 	}
 
@@ -284,7 +282,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=100   ->   [ 100 ]		- all allocated to 1 child
 		// 	boxAllocation=50   ->   [ 100 ]		- will not go below minimum
 		// No padding, no expand
-		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ) }, 0.0,
+		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ) }, new int[] { 0 }, 0.0,
 				xbox( 100.0, 200.0, 0.0, 0.0 ),
 				new double[] { 300.0, 200.0, 150.0, 100.0, 50.0 },
 				new double[][] {
@@ -302,7 +300,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=100   ->   [ 100 ]		- all allocated to 1 child
 		// 	boxAllocation=50   ->   [ 100 ]		- will not go below minimum
 		// No padding, expand
-		allocXSpaceTests( new LReqBox[] { xbox( HAlignment.EXPAND, 100.0, 200.0, 0.0, 0.0 ) }, 0.0,
+		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ) }, new int[] { HEXPAND }, 0.0,
 				xbox( 100.0, 200.0, 0.0, 0.0 ),
 				new double[] { 300.0, 200.0, 150.0, 100.0, 50.0 },
 				new double[][] {
@@ -320,7 +318,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=150   ->   [ 150 ]		- all allocated to 1 child
 		// 	boxAllocation=100   ->   [ 100 ]		- all allocated to 1 child
 		// 	boxAllocation=50   ->   [ 100 ]		- will not go below minimum
-		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 10.0, 10.0 ) }, 0.0,
+		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 10.0, 10.0 ) }, new int[] { 0 }, 0.0,
 				xbox( 100.0, 200.0, 10.0, 10.0 ),
 				new double[] { 300.0, 200.0, 150.0, 100.0, 50.0 },
 				new double[][] {
@@ -344,7 +342,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=210   ->   [ 150, 60 ]		- space above minimum distributed evenly
 		// 	boxAllocation=150   ->   [ 100, 50 ]		- minimum sizes
 		// 	boxAllocation=100   ->   [ 100, 50 ]		- will not go below minimum
-		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0,
+		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, new int[] { 0, 0 }, 0.0,
 				xbox( 150.0, 270.0, 0.0, 0.0 ),
 				new double[] { 300.0, 270.0, 210.0, 150.0, 100.0 },
 				new double[][] {
@@ -361,7 +359,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=210   ->   [ 150, 60 ]		- space above minimum distributed evenly
 		// 	boxAllocation=150   ->   [ 100, 50 ]		- minimum sizes
 		// 	boxAllocation=100   ->   [ 100, 50 ]		- will not go below minimum
-		allocXSpaceTests( new LReqBox[] { xbox( HAlignment.EXPAND, 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0,
+		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, new int[] { HEXPAND, 0 }, 0.0,
 				xbox( 150.0, 270.0, 0.0, 0.0 ),
 				new double[] { 300.0, 270.0, 210.0, 150.0, 100.0 },
 				new double[][] {
@@ -378,7 +376,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=210   ->   [ 150, 60 ]		- space above minimum distributed evenly
 		// 	boxAllocation=150   ->   [ 100, 50 ]		- minimum sizes
 		// 	boxAllocation=100   ->   [ 100, 50 ]		- will not go below minimum
-		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( HAlignment.EXPAND, 50.0, 70.0, 0.0, 0.0 ) }, 0.0,
+		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, new int[] { 0, HEXPAND }, 0.0,
 				xbox( 150.0, 270.0, 0.0, 0.0 ),
 				new double[] { 300.0, 270.0, 210.0, 150.0, 100.0 },
 				new double[][] {
@@ -395,7 +393,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=210   ->   [ 150, 60 ]		- space above minimum distributed evenly
 		// 	boxAllocation=150   ->   [ 100, 50 ]		- minimum sizes
 		// 	boxAllocation=100   ->   [ 100, 50 ]		- will not go below minimum
-		allocXSpaceTests( new LReqBox[] { xbox( HAlignment.EXPAND, 100.0, 200.0, 0.0, 0.0 ),  xbox( HAlignment.EXPAND, 50.0, 70.0, 0.0, 0.0 ) }, 0.0,
+		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, new int[] { HEXPAND, HEXPAND }, 0.0,
 				xbox( 150.0, 270.0, 0.0, 0.0 ),
 				new double[] { 300.0, 270.0, 210.0, 150.0, 100.0 },
 				new double[][] {
@@ -418,7 +416,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 	//
 	//
 
-	private void allocXTest(LReqBox children[], double spacing, LReqBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
+	private void allocXTest(LReqBox children[], int childAllocFlags[], double spacing, LReqBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
 	{ 
 		LReqBox box = new LReqBox();
 		LAllocBox boxAlloc = new LAllocBox( null );
@@ -433,7 +431,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		assertBoxesEqual( box, expectedBox, "PARENT BOX" );
 
 		boxAlloc.setAllocationX( boxAllocation );
-		HorizontalLayout.allocateX( box, children, boxAlloc, childrenAlloc, spacing );
+		HorizontalLayout.allocateX( box, children, boxAlloc, childrenAlloc, childAllocFlags, spacing );
 		for (int i = 0; i < children.length; i++)
 		{
 			if ( childrenAlloc[i].getAllocationX() != expectedSize[i] )
@@ -450,11 +448,11 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		}
 	}
 	
-	private void allocXTests(LReqBox children[], double spacing, LReqBox expectedBox, double boxAllocations[], double expectedSize[][], double expectedPosition[][])
+	private void allocXTests(LReqBox children[], int childAllocFlags[], double spacing, LReqBox expectedBox, double boxAllocations[], double expectedSize[][], double expectedPosition[][])
 	{
 		for (int i = 0; i  < boxAllocations.length; i++)
 		{
-			allocXTest( children, spacing, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
+			allocXTest( children, childAllocFlags, spacing, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
 		}
 	}
 
@@ -468,7 +466,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=210   ->   [ 150, 60 ] @ [ 0, 150 ]		- space above minimum distributed evenly
 		// 	boxAllocation=150   ->   [ 100, 50 ] @ [ 0, 100 ]		- minimum sizes
 		// 	boxAllocation=100   ->   [ 100, 50 ] @ [ 0, 100 ]		- will not go below minimum
-		allocXTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0,
+		allocXTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, new int[] { 0, 0 }, 0.0,
 				xbox( 150.0, 270.0, 0.0, 0.0 ),
 				new double[] { 300.0, 270.0, 210.0, 150.0, 100.0 },
 				new double[][] {
@@ -491,7 +489,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=220   ->   [ 150, 60 ] @ [ 0, 160 ]		- space above minimum distributed evenly
 		// 	boxAllocation=160   ->   [ 100, 50 ] @ [ 0, 110 ]		- minimum sizes
 		// 	boxAllocation=100   ->   [ 100, 50 ] @ [ 0, 110 ]		- will not go below minimum
-		allocXTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 10.0,
+		allocXTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, new int[] { 0, 0 }, 10.0,
 				xbox( 160.0, 280.0, 0.0, 0.0 ),
 				new double[] { 300.0, 280.0, 220.0, 160.0, 100.0 },
 				new double[][] {
@@ -515,7 +513,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=225   ->   [ 150, 60 ] @ [ 0, 165 ]		- space above minimum distributed evenly
 		// 	boxAllocation=165   ->   [ 100, 50 ] @ [ 0, 115 ]		- minimum sizes
 		// 	boxAllocation=100   ->   [ 100, 50 ] @ [ 0, 115 ]		- will not go below minimum
-		allocXTests( new LReqBox[] { xbox( 100.0, 200.0, 15.0, 15.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 0.0,
+		allocXTests( new LReqBox[] { xbox( 100.0, 200.0, 15.0, 15.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, new int[] { 0, 0 }, 0.0,
 				xbox( 165.0, 285.0, 0.0, 0.0 ),
 				new double[] { 400.0, 335.0, 225.0, 165.0, 100.0 },
 				new double[][] {
@@ -539,7 +537,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=235   ->   [ 150, 60 ] @ [ 0, 175 ]		- space above minimum distributed evenly
 		// 	boxAllocation=165   ->   [ 100, 50 ] @ [ 0, 125 ]		- minimum sizes
 		// 	boxAllocation=100   ->   [ 100, 50 ] @ [ 0, 125 ]		- will not go below minimum
-		allocXTests( new LReqBox[] { xbox( 100.0, 200.0, 15.0, 15.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, 10.0,
+		allocXTests( new LReqBox[] { xbox( 100.0, 200.0, 15.0, 15.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, new int[] { 0, 0 }, 10.0,
 				xbox( 175.0, 295.0, 0.0, 0.0 ),
 				new double[] { 400.0, 335.0, 235.0, 165.0, 100.0 },
 				new double[][] {
@@ -561,7 +559,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 
 
 	
-	private void allocYTest(LReqBox children[], LReqBox expectedBox, LAllocV boxAllocation, LAllocV expectedSize[], double expectedPosition[])
+	private void allocYTest(LReqBox children[], int childAllocFlags[], LReqBox expectedBox, LAllocV boxAllocation, LAllocV expectedSize[], double expectedPosition[])
 	{ 
 		LReqBox box = new LReqBox();
 		LAllocBox boxAlloc = new LAllocBox( null );
@@ -572,12 +570,12 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		}
 
 		
-		HorizontalLayout.computeRequisitionY( box, children );
+		HorizontalLayout.computeRequisitionY( box, children, childAllocFlags );
 
 		assertBoxesEqual( box, expectedBox, "PARENT BOX" );
 
 		boxAlloc.setAllocationY( boxAllocation );
-		HorizontalLayout.allocateY( box, children, boxAlloc, childrenAlloc );
+		HorizontalLayout.allocateY( box, children, boxAlloc, childrenAlloc, childAllocFlags );
 		for (int i = 0; i < children.length; i++)
 		{
 			if ( !childrenAlloc[i].getAllocV().equals( expectedSize[i] ) )
@@ -594,11 +592,11 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		}
 	}
 	
-	private void allocYTests(LReqBox children[], LReqBox expectedBox, LAllocV boxAllocations[], LAllocV expectedSize[][], double expectedPosition[][])
+	private void allocYTests(LReqBox children[], int childAllocFlags[], LReqBox expectedBox, LAllocV boxAllocations[], LAllocV expectedSize[][], double expectedPosition[][])
 	{
 		for (int i = 0; i  < boxAllocations.length; i++)
 		{
-			allocYTest( children, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
+			allocYTest( children, childAllocFlags, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
 		}
 	}
 
@@ -611,7 +609,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=300   ->   [ 300, 200 ] @ [ 0, 0 ]		- req size, no expansion
 		// 	boxAllocation=200   ->   [ 300, 200 ] @ [ 0, 0 ]		- below req size, req size
 		// 	boxAllocation=100   ->   [ 300, 200 ] @ [ 0, 0 ]		- below req size, below req size
-		allocYTests( new LReqBox[] { ybox( VAlignment.TOP, 300.0, 0.0 ),  ybox( VAlignment.TOP, 200.0, 0.0 ) }, 
+		allocYTests( new LReqBox[] { ybox( 300.0, 0.0 ),  ybox( 200.0, 0.0 ) }, new int[] { VTOP, VTOP },
 				ybox( 300.0, 0.0 ),
 				new LAllocV[] { new LAllocV( 400.0 ), new LAllocV( 300.0 ), new LAllocV( 200.0 ), new LAllocV( 100.0 ) },
 				new LAllocV[][] {
@@ -630,7 +628,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=150:150   ->   [ 300, 200 ] @ [ 0, 0 ]		- req size, no expansion
 		// 	boxAllocation=100:100   ->   [ 300, 200 ] @ [ 0, 0 ]		- below req size, req size
 		// 	boxAllocation=50:50       ->   [ 300, 200 ] @ [ 0, 0 ]		- below req size, below req size
-		allocYTests( new LReqBox[] { ybox( VAlignment.TOP, 300.0, 0.0 ),  ybox( VAlignment.TOP, 200.0, 0.0 ) }, 
+		allocYTests( new LReqBox[] { ybox( 300.0, 0.0 ),  ybox( 200.0, 0.0 ) },  new int[] { VTOP, VTOP },
 				ybox( 300.0, 0.0 ),
 				new LAllocV[] { new LAllocV( 200.0, 200.0 ), new LAllocV( 150.0, 150.0 ), new LAllocV( 100.0, 100.0 ), new LAllocV( 50.0, 50.0 ) },
 				new LAllocV[][] {
@@ -649,7 +647,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=150:150   ->   [ 300, 200 ] @ [ 0, 0 ]		- req size, no expansion
 		// 	boxAllocation=100:100   ->   [ 300, 200 ] @ [ 0, 0 ]		- below req size, req size
 		// 	boxAllocation=50:50       ->   [ 300, 200 ] @ [ 0, 0 ]		- below req size, below req size
-		allocYTests( new LReqBox[] { ybbox( VAlignment.TOP, 150.0, 150.0, 0.0 ),  ybbox( VAlignment.TOP, 100.0, 100.0, 0.0 ) }, 
+		allocYTests( new LReqBox[] { ybbox( 150.0, 150.0, 0.0 ),  ybbox( 100.0, 100.0, 0.0 ) }, new int[] { VTOP, VTOP },
 				ybox( 300.0, 0.0 ),
 				new LAllocV[] { new LAllocV( 200.0, 200.0 ), new LAllocV( 150.0, 150.0 ), new LAllocV( 100.0, 100.0 ), new LAllocV( 50.0, 50.0 ) },
 				new LAllocV[][] {
@@ -670,7 +668,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=300   ->   [ 300, 200 ] @ [ 0, 50 ]		- req size, no expansion
 		// 	boxAllocation=200   ->   [ 200, 200 ] @ [ 0, 50 ]		- below req size, req size  (parent box size of 300 results in second child being centred in a larger box)
 		// 	boxAllocation=100   ->   [ 200, 200 ] @ [ 0, 50 ]		- below req size, below req size  (parent box size of 300 results in second child being centred in a larger box)
-		allocYTests( new LReqBox[] { ybox( VAlignment.CENTRE, 300.0, 0.0 ),  ybox( VAlignment.CENTRE, 200.0, 0.0 ) },
+		allocYTests( new LReqBox[] { ybox( 300.0, 0.0 ),  ybox( 200.0, 0.0 ) }, new int[] { VCENTRE, VCENTRE },
 				ybox( 300.0, 0.0 ),
 				new LAllocV[] { new LAllocV( 400.0 ), new LAllocV( 300.0 ), new LAllocV( 200.0 ), new LAllocV( 100.0 ) },
 				new LAllocV[][] {
@@ -691,7 +689,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=300   ->   [ 300, 200 ] @ [ 0, 100 ]		- req size, no expansion
 		// 	boxAllocation=200   ->   [ 200, 200 ] @ [ 0, 0 ]		- below req size, req size  (parent box size of 300 results in second child being at the bottom of a larger box)
 		// 	boxAllocation=100   ->   [ 200, 200 ] @ [ 0, 0 ]		- below req size, below req size  (parent box size of 300 results in second child being at the bottom of a larger box)
-		allocYTests( new LReqBox[] { ybox( VAlignment.BOTTOM, 300.0, 0.0 ),  ybox( VAlignment.BOTTOM, 200.0, 0.0 ) },
+		allocYTests( new LReqBox[] { ybox( 300.0, 0.0 ),  ybox( 200.0, 0.0 ) }, new int[] { VBOTTOM, VBOTTOM },
 				ybox( 300.0, 0.0 ),
 				new LAllocV[] { new LAllocV( 400.0 ), new LAllocV( 300.0 ), new LAllocV( 200.0 ), new LAllocV( 100.0 ) },
 				new LAllocV[][] {
@@ -712,7 +710,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=300   ->   [ 300, 300 ] @ [ 0, 0 ]		- pref size, expansion
 		// 	boxAllocation=200   ->   [ 300, 200 ] @ [ 0, 0 ]		- below req size, req size
 		// 	boxAllocation=100   ->   [ 300, 200 ] @ [ 0, 0 ]		- below req size, below req size
-		allocYTests( new LReqBox[] { ybox( VAlignment.EXPAND, 300.0, 0.0 ),  ybox( VAlignment.EXPAND, 200.0, 0.0 ) },
+		allocYTests( new LReqBox[] { ybox( 300.0, 0.0 ),  ybox( 200.0, 0.0 ) }, new int[] { VEXPAND, VEXPAND },
 				ybox( 300.0, 0.0 ),
 				new LAllocV[] { new LAllocV( 400.0 ), new LAllocV( 300.0 ), new LAllocV( 200.0 ), new LAllocV( 100.0 ) },
 				new LAllocV[][] {
@@ -731,7 +729,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=150:150   ->   [ 300, 300 ] @ [ 0, 0 ]		- pref size, expansion
 		// 	boxAllocation=100:100   ->   [ 300, 200 ] @ [ 0, 0 ]		- below req size, req size
 		// 	boxAllocation=50:50       ->   [ 300, 200 ] @ [ 0, 0 ]		- below req size, below req size
-		allocYTests( new LReqBox[] { ybox( VAlignment.EXPAND, 300.0, 0.0 ),  ybox( VAlignment.EXPAND, 200.0, 0.0 ) },
+		allocYTests( new LReqBox[] { ybox( 300.0, 0.0 ),  ybox( 200.0, 0.0 ) }, new int[] { VEXPAND, VEXPAND },
 				ybox( 300.0, 0.0 ),
 				new LAllocV[] { new LAllocV( 200.0, 200.0 ), new LAllocV( 150.0, 150.0 ), new LAllocV( 100.0, 100.0 ), new LAllocV( 50.0, 50.0 ) },
 				new LAllocV[][] {
@@ -750,7 +748,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=150:150   ->   [ 300, 200 ] @ [ 0, 0 ]		- req size, no expansion
 		// 	boxAllocation=100:100   ->   [ 300, 200 ] @ [ 0, 0 ]		- below req size, req size
 		// 	boxAllocation=50:50       ->   [ 300, 200 ] @ [ 0, 0 ]		- below req size, below req size
-		allocYTests( new LReqBox[] { ybbox( VAlignment.EXPAND, 150.0, 150.0, 0.0 ),  ybbox( VAlignment.EXPAND, 100.0, 100.0, 0.0 ) }, 
+		allocYTests( new LReqBox[] { ybbox( 150.0, 150.0, 0.0 ),  ybbox( 100.0, 100.0, 0.0 ) },  new int[] { VEXPAND, VEXPAND },
 				ybox( 300.0, 0.0 ),
 				new LAllocV[] { new LAllocV( 200.0, 200.0 ), new LAllocV( 150.0, 150.0 ), new LAllocV( 100.0, 100.0 ), new LAllocV( 50.0, 50.0 ) },
 				new LAllocV[][] {
@@ -773,7 +771,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=300   ->   [ 300, 200 ] @ [ 0, 50 ]		- req size, no expansion
 		// 	boxAllocation=200   ->   [ 200, 200 ] @ [ 0, 50 ]		- below req size, req size  (parent box size of 300 results in second child being centred in a larger box)
 		// 	boxAllocation=100   ->   [ 200, 200 ] @ [ 0, 50 ]		- below req size, below req size  (parent box size of 300 results in second child being centred in a larger box)
-		allocYTests( new LReqBox[] { ybox( VAlignment.BASELINES, 300.0, 0.0 ),  ybox( VAlignment.BASELINES, 200.0, 0.0 ) },
+		allocYTests( new LReqBox[] { ybox( 300.0, 0.0 ),  ybox( 200.0, 0.0 ) }, new int[] { VBASELINES, VBASELINES },
 				ybbox( 150.0, 150.0, 0.0 ),
 				new LAllocV[] { new LAllocV( 400.0 ), new LAllocV( 300.0 ), new LAllocV( 200.0 ), new LAllocV( 100.0 ) },
 				new LAllocV[][] {
@@ -794,7 +792,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=600          ->   [ 300:200, 200:300 ] @ [ 0, 100 ]		- matches parent box req size
 		// 	boxAllocation=300          ->   [ 300:200, 200:300 ] @ [ 0, 100 ]		- below parent box req size
 		// 	boxAllocation=350:550   ->   [ 300:200, 200:300 ] @ [ 50, 150 ]		- centred around main baseline
-		allocYTests( new LReqBox[] { ybbox( VAlignment.BASELINES, 300.0, 200.0, 0.0 ),  ybbox( VAlignment.BASELINES, 200.0, 300.0, 0.0 ) },
+		allocYTests( new LReqBox[] { ybbox( 300.0, 200.0, 0.0 ),  ybbox( 200.0, 300.0, 0.0 ) }, new int[] { VBASELINES, VBASELINES },
 				ybbox( 300.0, 300.0, 0.0 ),
 				new LAllocV[] { new LAllocV( 800.0 ), new LAllocV( 600.0 ), new LAllocV( 300.0 ), new LAllocV( 350.0, 550.0 ) },
 				new LAllocV[][] {
@@ -814,7 +812,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=800   ->   [ 500, 500, 400 ] @ [ 100, 200, 200 ]		- centre, cetnre
 		// 	boxAllocation=600   ->   [ 500, 500, 400 ] @ [ 0, 100, 100 ]			- matches parent box req size
 		// 	boxAllocation=300   ->   [ 500, 500, 400 ] @ [ 0, 100, 100 ]			- below parent box req size
-		allocYTests( new LReqBox[] { ybbox( VAlignment.BASELINES, 300.0, 200.0, 0.0 ),  ybbox( VAlignment.BASELINES, 200.0, 300.0, 0.0 ),  ybox( VAlignment.BASELINES, 400.0, 0.0 ) },
+		allocYTests( new LReqBox[] { ybbox( 300.0, 200.0, 0.0 ),  ybbox( 200.0, 300.0, 0.0 ),  ybox( 400.0, 0.0 ) }, new int[] { VBASELINES, VBASELINES, VBASELINES },
 				ybbox( 300.0, 300.0, 0.0 ),
 				new LAllocV[] { new LAllocV( 800.0 ), new LAllocV( 600.0 ), new LAllocV( 300.0 ) },
 				new LAllocV[][] {
@@ -834,7 +832,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=600          ->   [ 300:300, 300:300 ] @ [ 0, 0 ]		- matches parent box req size
 		// 	boxAllocation=300          ->   [ 300:300, 300:300 ] @ [ 0, 0 ]		- below parent box req size
 		// 	boxAllocation=350:550   ->   [ 350:550, 350:550 ] @ [ 0, 0 ]		- expand, expand
-		allocYTests( new LReqBox[] { ybbox( VAlignment.BASELINES_EXPAND, 300.0, 200.0, 0.0 ),  ybbox( VAlignment.BASELINES_EXPAND, 200.0, 300.0, 0.0 ) },
+		allocYTests( new LReqBox[] { ybbox( 300.0, 200.0, 0.0 ),  ybbox( 200.0, 300.0, 0.0 ) }, new int[] { VBASELINES_EXPAND, VBASELINES_EXPAND },
 				ybbox( 300.0, 300.0, 0.0 ),
 				new LAllocV[] { new LAllocV( 800.0 ), new LAllocV( 600.0 ), new LAllocV( 300.0 ), new LAllocV( 350.0, 550.0 ) },
 				new LAllocV[][] {

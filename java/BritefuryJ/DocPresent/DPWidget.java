@@ -27,6 +27,7 @@ import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.DocPresent.Layout.ElementAlignment;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LAllocV;
@@ -165,7 +166,13 @@ abstract public class DPWidget extends PointerInputElement
 	protected static int FLAG_REALISED = 0x1;
 	protected static int FLAG_RESIZE_QUEUED = 0x2;
 	protected static int FLAG_SIZE_UP_TO_DATE = 0x4;
-	protected static int FLAGS_ELEMENT_END = 0x8;
+
+	protected static int _ALIGN_SHIFT = 3;
+	protected static int _ALIGN_MASK = ElementAlignment._ELEMENTALIGN_MASK  <<  _ALIGN_SHIFT;
+	protected static int _HALIGN_MASK = ElementAlignment._HALIGN_MASK  <<  _ALIGN_SHIFT;
+	protected static int _VALIGN_MASK = ElementAlignment._VALIGN_MASK  <<  _ALIGN_SHIFT;
+	protected static int FLAGS_ELEMENT_END = ElementAlignment._ELEMENTALIGN_END  <<  _ALIGN_SHIFT;
+	
 	
 	protected int flags;
 	
@@ -260,28 +267,19 @@ abstract public class DPWidget extends PointerInputElement
 	
 	public DPWidget align(HAlignment hAlign, VAlignment vAlign)
 	{
-		if ( layoutReqBox != null )
-		{
-			layoutReqBox.setAlignment( hAlign, vAlign );
-		}
+		setAlignmentFlags( ElementAlignment.flagValue( hAlign, vAlign ) );
 		return this;
 	}
 
 	public DPWidget alignH(HAlignment hAlign)
 	{
-		if ( layoutReqBox != null )
-		{
-			layoutReqBox.setHAlignment( hAlign );
-		}
+		setHAlignmentFlags( ElementAlignment.flagValue( hAlign ) );
 		return this;
 	}
 	
 	public DPWidget alignV(VAlignment vAlign)
 	{
-		if ( layoutReqBox != null )
-		{
-			layoutReqBox.setVAlignment( vAlign );
-		}
+		setVAlignmentFlags( ElementAlignment.flagValue( vAlign ) );
 		return this;
 	}
 	
@@ -335,6 +333,29 @@ abstract public class DPWidget extends PointerInputElement
 	public DPWidget alignVExpand()
 	{
 		return alignV( VAlignment.EXPAND );
+	}
+
+
+	
+	protected void setAlignmentFlags(int alignmentFlags)
+	{
+		flags = ( flags & ~_ALIGN_MASK )   |   ( alignmentFlags << _ALIGN_SHIFT );
+	}
+	
+	protected void setHAlignmentFlags(int alignmentFlags)
+	{
+		flags = ( flags & ~_HALIGN_MASK )   |   ( alignmentFlags << _ALIGN_SHIFT );
+	}
+	
+	protected void setVAlignmentFlags(int alignmentFlags)
+	{
+		flags = ( flags & ~_VALIGN_MASK )   |   ( alignmentFlags << _ALIGN_SHIFT );
+	}
+	
+	
+	protected int getAlignmentFlags()
+	{
+		return ( flags & _ALIGN_MASK )  >>  _ALIGN_SHIFT;
 	}
 	
 	

@@ -7,31 +7,33 @@
 package tests.DocPresent.Layout;
 
 import junit.framework.TestCase;
-import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.ElementAlignment;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LReqBox;
-import BritefuryJ.DocPresent.Layout.VAlignment;
 
 public class Test_Layout_base extends TestCase
 {
+	protected static int HLEFT = ElementAlignment.HALIGN_LEFT;
+	protected static int HCENTRE = ElementAlignment.HALIGN_CENTRE;
+	protected static int HRIGHT = ElementAlignment.HALIGN_RIGHT;
+	protected static int HEXPAND = ElementAlignment.HALIGN_EXPAND;
+
+	protected static int VBASELINES = ElementAlignment.VALIGN_BASELINES;
+	protected static int VBASELINES_EXPAND = ElementAlignment.VALIGN_BASELINES_EXPAND;
+	protected static int VTOP = ElementAlignment.VALIGN_TOP;
+	protected static int VCENTRE = ElementAlignment.VALIGN_CENTRE;
+	protected static int VBOTTOM = ElementAlignment.VALIGN_BOTTOM;
+	protected static int VEXPAND = ElementAlignment.VALIGN_EXPAND;
+	
+	
 	protected LReqBox xbox(double width, double hspacing)
 	{
 		return new LReqBox( width, hspacing, 0.0, 0.0 );
 	}
 	
-	protected LReqBox xbox(HAlignment hAlign, double width, double hspacing)
-	{
-		return new LReqBox( hAlign, VAlignment.BASELINES, width, hspacing, 0.0, 0.0 );
-	}
-	
 	protected LReqBox xbox(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing)
 	{
 		return new LReqBox( minWidth, prefWidth, minHSpacing, prefHSpacing, 0.0, 0.0 );
-	}
-	
-	protected LReqBox xbox(HAlignment hAlign, double minWidth, double prefWidth, double minHSpacing, double prefHSpacing)
-	{
-		return new LReqBox( hAlign, VAlignment.BASELINES, minWidth, prefWidth, minHSpacing, prefHSpacing, 0.0, 0.0 );
 	}
 	
 	
@@ -40,19 +42,9 @@ public class Test_Layout_base extends TestCase
 		return new LReqBox( 0.0, 0.0, height, vspacing );
 	}
 	
-	protected LReqBox ybox(VAlignment vAlign, double height, double vspacing)
-	{
-		return new LReqBox( HAlignment.LEFT, vAlign, 0.0, 0.0, height, vspacing );
-	}
-	
 	protected LReqBox ybbox(double ascent, double descent, double vspacing)
 	{
 		return new LReqBox( 0.0, 0.0, ascent, descent, vspacing );
-	}
-	
-	protected LReqBox ybbox(VAlignment vAlign, double ascent, double descent, double vspacing)
-	{
-		return new LReqBox( HAlignment.LEFT, vAlign, 0.0, 0.0, ascent, descent, vspacing );
 	}
 	
 	
@@ -74,69 +66,6 @@ public class Test_Layout_base extends TestCase
 	protected LReqBox box(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double ascent, double descent, double vspacing)
 	{
 		return new LReqBox( minWidth, prefWidth, minHSpacing, prefHSpacing, ascent, descent, vspacing );
-	}
-
-
-	protected LReqBox box(VAlignment vAlign, double width, double hspacing, double height, double vspacing)
-	{
-		return new LReqBox( HAlignment.LEFT, vAlign, width, hspacing, height, vspacing );
-	}
-
-	protected LReqBox box(VAlignment vAlign, double width, double hspacing, double ascent, double descent, double vspacing)
-	{
-		return new LReqBox( HAlignment.LEFT, vAlign, width, hspacing, ascent, descent, vspacing );
-	}
-
-	protected LReqBox box(VAlignment vAlign, double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double height, double vspacing)
-	{
-		return new LReqBox( HAlignment.LEFT, vAlign, minWidth, prefWidth, minHSpacing, prefHSpacing, height, vspacing );
-	}
-
-	protected LReqBox box(VAlignment vAlign, double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double ascent, double descent, double vspacing)
-	{
-		return new LReqBox( HAlignment.LEFT, vAlign, minWidth, prefWidth, minHSpacing, prefHSpacing, ascent, descent, vspacing );
-	}
-
-
-	protected LReqBox box(HAlignment hAlign, double width, double hspacing, double height, double vspacing)
-	{
-		return new LReqBox( hAlign, VAlignment.BASELINES, width, hspacing, height, vspacing );
-	}
-
-	protected LReqBox box(HAlignment hAlign, double width, double hspacing, double ascent, double descent, double vspacing)
-	{
-		return new LReqBox( hAlign, VAlignment.BASELINES, width, hspacing, ascent, descent, vspacing );
-	}
-
-	protected LReqBox box(HAlignment hAlign, double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double height, double vspacing)
-	{
-		return new LReqBox( hAlign, VAlignment.BASELINES, minWidth, prefWidth, minHSpacing, prefHSpacing, height, vspacing );
-	}
-
-	protected LReqBox box(HAlignment hAlign, double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double ascent, double descent, double vspacing)
-	{
-		return new LReqBox( hAlign, VAlignment.BASELINES, minWidth, prefWidth, minHSpacing, prefHSpacing, ascent, descent, vspacing );
-	}
-
-
-	protected LReqBox box(HAlignment hAlign, VAlignment vAlign, double width, double hspacing, double height, double vspacing)
-	{
-		return new LReqBox( hAlign, vAlign, width, hspacing, height, vspacing );
-	}
-
-	protected LReqBox box(HAlignment hAlign, VAlignment vAlign, double width, double hspacing, double ascent, double descent, double vspacing)
-	{
-		return new LReqBox( hAlign, vAlign, width, hspacing, ascent, descent, vspacing );
-	}
-
-	protected LReqBox box(HAlignment hAlign, VAlignment vAlign, double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double height, double vspacing)
-	{
-		return new LReqBox( hAlign, vAlign, minWidth, prefWidth, minHSpacing, prefHSpacing, height, vspacing );
-	}
-
-	protected LReqBox box(HAlignment hAlign, VAlignment vAlign, double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double ascent, double descent, double vspacing)
-	{
-		return new LReqBox( hAlign, vAlign, minWidth, prefWidth, minHSpacing, prefHSpacing, ascent, descent, vspacing );
 	}
 
 

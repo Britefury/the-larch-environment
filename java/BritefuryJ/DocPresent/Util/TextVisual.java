@@ -24,7 +24,6 @@ import java.awt.geom.Point2D;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.text.AttributedCharacterIterator;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -34,7 +33,6 @@ import javax.swing.JComponent;
 import javax.swing.text.Segment;
 
 import BritefuryJ.DocPresent.DPPresentationArea;
-import BritefuryJ.DocPresent.Layout.ElementAlignment;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Utils.HashUtils;
@@ -302,7 +300,7 @@ public class TextVisual
 	private Font font;
 	private boolean bMixedSizeCaps;
 	private boolean bRealised;
-	private LReqBox reqBox, reqBoxesByAlignment[];
+	private LReqBox reqBox;
 	
 
 	
@@ -313,7 +311,6 @@ public class TextVisual
 		this.font = font;
 		this.bMixedSizeCaps = bMixedSizeCaps;
 		reqBox = new LReqBox();
-		reqBoxesByAlignment = new LReqBox[ElementAlignment._ELEMENTALIGN_END];
 	}
 	
 	
@@ -324,17 +321,9 @@ public class TextVisual
 	}
 	
 	
-	public LReqBox getRequisition(int alignmentAsInteger)
+	public LReqBox getRequisition()
 	{
-		LReqBox r = reqBoxesByAlignment[alignmentAsInteger];
-		if ( r == null )
-		{
-			r = reqBox.copy();
-			r.setAlignmentIntValue( alignmentAsInteger );
-			reqBoxesByAlignment[alignmentAsInteger] = r;
-		}
-		
-		return r;
+		return reqBox;
 	}
 	
 	
@@ -395,8 +384,6 @@ public class TextVisual
 				squiggleUnderlineShape = null;
 			}
 			
-			Arrays.fill( reqBoxesByAlignment, null );
-
 			bRealised = true;
 		}
 	}

@@ -162,6 +162,11 @@ public abstract class DPContainerSequenceCollationRoot extends DPContainerSequen
 		return getChildrenAllocationBoxes( Arrays.asList( collationLeaves ) );
 	}
 
+	int[] getCollatedChildrenAlignmentFlags()
+	{
+		return getChildrenAlignmentFlags( Arrays.asList( collationLeaves ) );
+	}
+
 	<T extends PackingParams> T[] getCollatedChildrenPackingParams(T packingParams[])
 	{
 		return getChildrenPackingParams( Arrays.asList( collationLeaves ), packingParams );

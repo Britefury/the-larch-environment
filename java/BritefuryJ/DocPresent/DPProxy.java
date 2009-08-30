@@ -6,8 +6,6 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -29,44 +27,6 @@ public class DPProxy extends DPBin implements Collateable
 
 	
 
-
-	//
-	// Alignment methods
-	//
-	
-	public DPWidget align(HAlignment hAlign, VAlignment vAlign)
-	{
-		super.align( hAlign, vAlign );
-		DPWidget child = getChild();
-		if ( child != null )
-		{
-			child.align( hAlign, vAlign );
-		}
-		return this;
-	}
-
-	public DPWidget alignH(HAlignment hAlign)
-	{
-		super.alignH( hAlign );
-		DPWidget child = getChild();
-		if ( child != null )
-		{
-			child.alignH( hAlign );
-		}
-		return this;
-	}
-	
-	public DPWidget alignV(VAlignment vAlign)
-	{
-		super.alignV( vAlign );
-		DPWidget child = getChild();
-		if ( child != null )
-		{
-			child.alignV( vAlign );
-		}
-		return this;
-	}
-	
 
 
 	//

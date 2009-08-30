@@ -147,7 +147,7 @@ public class LAllocBox
 	}
 	
 	
-	public void allocateChildXAligned(LAllocBox child, LReqBox req, double localPosX, double localWidth)
+	public void allocateChildXAligned(LAllocBox child, LReqBox req, int allocationFlags, double localPosX, double localWidth)
 	{
 		double childWidth = req.getPrefWidth();
 		if ( localWidth <= childWidth )
@@ -157,7 +157,7 @@ public class LAllocBox
 		}
 		else
 		{
-			HAlignment alignment = req.getHAlignment();
+			HAlignment alignment = ElementAlignment.getHAlignment( allocationFlags );
 			if ( alignment == HAlignment.EXPAND )
 			{
 				child.allocationX = localWidth;
@@ -186,10 +186,10 @@ public class LAllocBox
 		}
 	}
 	
-	public void allocateChildYAligned(LAllocBox child, LReqBox childReq, double localPosY, double localHeight)
+	public void allocateChildYAligned(LAllocBox child, LReqBox childReq, int allocationFlags, double localPosY, double localHeight)
 	{
 		double childHeight = childReq.getReqHeight();
-		VAlignment alignment = childReq.getVAlignment();
+		VAlignment alignment = ElementAlignment.getVAlignment( allocationFlags );
 		if ( alignment == VAlignment.BASELINES_EXPAND )
 		{
 			double topMargin = localPosY;
@@ -270,8 +270,8 @@ public class LAllocBox
 	
 	public void allocateChildY(LAllocBox child, double localPosY, double localHeight)
 	{
-		child.allocationAscent = localHeight;
-		child.allocationDescent = 0.0;
+		child.allocationAscent = localHeight * 0.5;
+		child.allocationDescent = localHeight * 0.5;
 		child.bHasBaseline = false;
 		child.positionInParentSpaceY = localPosY;
 	}
@@ -313,8 +313,8 @@ public class LAllocBox
 	
 	protected void allocateChildSpaceY(LAllocBox child, double localHeight)
 	{
-		child.allocationAscent = localHeight;
-		child.allocationDescent = 0.0;
+		child.allocationAscent = localHeight * 0.5;
+		child.allocationDescent = localHeight * 0.5;
 		child.bHasBaseline = false;
 	}
 	

@@ -6,11 +6,9 @@
 //##************************
 package tests.DocPresent.Layout;
 
-import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.ParagraphLayout;
-import BritefuryJ.DocPresent.Layout.VAlignment;
 
 public class Test_ParagraphLayout extends Test_Layout_base
 {
@@ -29,54 +27,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		return new LReqBox( width, hSpacing, 0.0, 0.0 ).lineBreakBox( cost );
 	}
 	
-	
-	protected LReqBox lineBreakBox(HAlignment hAlign, int cost)
-	{
-		return lineBreakBox( hAlign, VAlignment.BASELINES, cost );
-	}
-	
-	protected LReqBox lineBreakBox(HAlignment hAlign, double width, int cost)
-	{
-		return lineBreakBox( hAlign, VAlignment.BASELINES, width, cost );
-	}
-	
-	protected LReqBox lineBreakBox(HAlignment hAlign, double width, double hSpacing, int cost)
-	{
-		return lineBreakBox( hAlign, VAlignment.BASELINES, width, hSpacing, cost );
-	}
-	
-	
-	protected LReqBox lineBreakBox(VAlignment vAlign, int cost)
-	{
-		return lineBreakBox( HAlignment.LEFT, vAlign, cost );
-	}
-	
-	protected LReqBox lineBreakBox(VAlignment vAlign, double width, int cost)
-	{
-		return lineBreakBox( HAlignment.LEFT, vAlign, width, cost );
-	}
-	
-	protected LReqBox lineBreakBox(VAlignment vAlign, double width, double hSpacing, int cost)
-	{
-		return lineBreakBox( HAlignment.LEFT, vAlign, width, hSpacing, cost );
-	}
-	
-	
-	protected LReqBox lineBreakBox(HAlignment hAlign, VAlignment vAlign, int cost)
-	{
-		return new LReqBox( hAlign, vAlign ).lineBreakBox( cost );
-	}
-	
-	protected LReqBox lineBreakBox(HAlignment hAlign, VAlignment vAlign, double width, int cost)
-	{
-		return new LReqBox( hAlign, vAlign, width, 0.0, 0.0, 0.0 ).lineBreakBox( cost );
-	}
-	
-	protected LReqBox lineBreakBox(HAlignment hAlign, VAlignment vAlign, double width, double hSpacing, int cost)
-	{
-		return new LReqBox( hAlign, vAlign, width, hSpacing, 0.0, 0.0 ).lineBreakBox( cost );
-	}
-	
+
 	
 	//
 	//
@@ -222,7 +173,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 	//
 	//
 
-	private void allocXTest(LReqBox children[], double indentation, double hSpacing, LReqBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
+	private void allocXTest(LReqBox children[], int childAllocFlags[], double indentation, double hSpacing, LReqBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
 	{ 
 		LReqBox box = new LReqBox();
 		LAllocBox boxAlloc = new LAllocBox( null );
@@ -237,7 +188,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		assertBoxesEqual( box, expectedBox, "PARENT BOX" );
 
 		boxAlloc.setAllocationX( boxAllocation );
-		ParagraphLayout.allocateX( box, children, boxAlloc, childrenAlloc, indentation, hSpacing );
+		ParagraphLayout.allocateX( box, children, boxAlloc, childrenAlloc, childAllocFlags, indentation, hSpacing );
 		for (int i = 0; i < children.length; i++)
 		{
 			if ( childrenAlloc[i].getAllocationX() != expectedSize[i] )
@@ -254,7 +205,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		}
 	}
 	
-	private void allocXTests(LReqBox children[], double indentation, double hSpacing, LReqBox expectedBox, double boxAllocations[], double expectedSize[][], double expectedPosition[][])
+	private void allocXTests(LReqBox children[], int childAllocFlags[], double indentation, double hSpacing, LReqBox expectedBox, double boxAllocations[], double expectedSize[][], double expectedPosition[][])
 	{
 		LReqBox childrenCopy[] = new LReqBox[children.length];
 		for (int i = 0; i  < boxAllocations.length; i++)
@@ -263,7 +214,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 			{
 				childrenCopy[j] = children[j].copy();
 			}
-			allocXTest( childrenCopy, indentation, hSpacing, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
+			allocXTest( childrenCopy, childAllocFlags, indentation, hSpacing, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
 		}
 	}
 
@@ -275,7 +226,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		// 	boxAllocation=65   ->     [ 25, 5, 15, 5, 15 ] @ [ 0, 25, 30, 45, 50 ]		- sufficient space - 1 line
 		// 	boxAllocation=55   ->     [ 25, 5, 15, 0, 15 ] @ [ 0, 25, 30, 0, 5 ]			- break at last line break
 		// 	boxAllocation=35   ->     [ 25, 0, 15, 0, 15 ] @ [ 0, 0, 5, 0, 5 ]			- break at both line breaks
-		allocXTests( new LReqBox[] { xbox( 25.0, 0.0 ), lineBreakBox( 5.0, 0 ), xbox( 15.0, 0.0 ), lineBreakBox( 5.0, 0 ), xbox( 15.0, 0.0 ) }, 5.0, 0.0,
+		allocXTests( new LReqBox[] { xbox( 25.0, 0.0 ), lineBreakBox( 5.0, 0 ), xbox( 15.0, 0.0 ), lineBreakBox( 5.0, 0 ), xbox( 15.0, 0.0 ) }, new int[] { 0, 0, 0, 0, 0 }, 5.0, 0.0,
 				xbox( 25.0, 65.0, 0.0, 0.0 ),
 				new double[] { 70.0, 55.0, 35.0 },
 				new double[][] {
@@ -292,7 +243,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		// hpackX( [ <25,0>, break(1:<5,0>), <15,0>, break(2:<5,0>), <15,0> ], indentation=5, spacing=0, padding=0 )
 		// 	boxAllocation=65   ->     [ 25, 5, 15, 5, 15 ] @ [ 0, 25, 30, 45, 50 ]		- sufficient space - 1 line
 		// 	boxAllocation=55   ->     [ 25, 0, 15, 5, 15 ] @ [ 0, 0, 5, 20, 25 ]			- break at first line break, due to lower cost
-		allocXTests( new LReqBox[] { xbox( 25.0, 0.0 ), lineBreakBox( 5.0, 1 ), xbox( 15.0, 0.0 ), lineBreakBox( 5.0, 2 ), xbox( 15.0, 0.0 ) }, 5.0, 0.0,
+		allocXTests( new LReqBox[] { xbox( 25.0, 0.0 ), lineBreakBox( 5.0, 1 ), xbox( 15.0, 0.0 ), lineBreakBox( 5.0, 2 ), xbox( 15.0, 0.0 ) }, new int[] { 0, 0, 0, 0, 0 }, 5.0, 0.0,
 				xbox( 25.0, 65.0, 0.0, 0.0 ),
 				new double[] { 70.0, 55.0 },
 				new double[][] {
@@ -310,7 +261,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		// line break should be used, despite having a higher cost.
 		// hpackX( [ <25,0>, break(1:<5,0>), <15,0>, break(2:<5,0>), <40,0> ], indentation=0, spacing=0, padding=0 )
 		// 	boxAllocation=55   ->     [ 25, 5, 15, 0, 40 ] @ [ 0, 25, 30, 0, 5 ]
-		allocXTests( new LReqBox[] { xbox( 25.0, 0.0 ), lineBreakBox( 5.0, 1 ), xbox( 15.0, 0.0 ), lineBreakBox( 5.0, 2 ), xbox( 40.0, 0.0 ) }, 5.0, 0.0,
+		allocXTests( new LReqBox[] { xbox( 25.0, 0.0 ), lineBreakBox( 5.0, 1 ), xbox( 15.0, 0.0 ), lineBreakBox( 5.0, 2 ), xbox( 40.0, 0.0 ) }, new int[] { 0, 0, 0, 0, 0 }, 5.0, 0.0,
 				xbox( 45.0, 90.0, 0.0, 0.0 ),
 				new double[] { 55.0 },
 				new double[][] {
@@ -327,7 +278,8 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		// 	boxAllocation=105   ->     [ 25, 20, 15, 20, 20, 0, 15 ] @ [ 0, 25, 45, 60, 80, 0, 0 ]			- end of line in last line break
 		// 	boxAllocation=85   ->     [ 25, 20, 15, 20, 0, 20, 15 ] @ [ 0, 25, 45, 60, 0, 0, 20 ]				- end of line in second last line break
 		// 	boxAllocation=65   ->     [ 25, 20, 15, 0, 20, 20, 15 ] @ [ 0, 25, 45, 0, 0, 20, 40 ]				- end of line in third last line break
-		allocXTests( new LReqBox[] { xbox( 25.0, 0.0 ), lineBreakBox( 20.0, 0 ), xbox( 15.0, 0.0 ), lineBreakBox( 20.0, 0 ), lineBreakBox( 20.0, 0 ), lineBreakBox( 20.0, 0 ), xbox( 15.0, 0.0 ) }, 0.0, 0.0,
+		allocXTests( new LReqBox[] { xbox( 25.0, 0.0 ), lineBreakBox( 20.0, 0 ), xbox( 15.0, 0.0 ), lineBreakBox( 20.0, 0 ), lineBreakBox( 20.0, 0 ), lineBreakBox( 20.0, 0 ), xbox( 15.0, 0.0 ) },
+				new int[] { 0, 0, 0, 0, 0, 0, 0 }, 0.0, 0.0,
 				xbox( 25.0, 135.0, 0.0, 0.0 ),
 				new double[] { 135.0, 105.0, 85.0, 65.0 },
 				new double[][] {
@@ -350,7 +302,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 	//
 	// REQUISITION Y TESTS
 
-	private void allocYTest(LReqBox children[], double indentation, double hSpacing, double vSpacing,
+	private void allocYTest(LReqBox children[], int childAllocFlags[], double indentation, double hSpacing, double vSpacing,
 			LReqBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
 	{ 
 		LReqBox box = new LReqBox();
@@ -364,7 +316,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		// X
 		ParagraphLayout.computeRequisitionX( box, children, indentation, hSpacing );
 		boxAlloc.setAllocationX( boxAllocation );
-		ParagraphLayout.Line lines[] = ParagraphLayout.allocateX( box, children, boxAlloc, childrenAlloc, indentation, hSpacing );
+		ParagraphLayout.Line lines[] = ParagraphLayout.allocateX( box, children, boxAlloc, childrenAlloc, childAllocFlags, indentation, hSpacing );
 		
 		// Y
 		ParagraphLayout.computeRequisitionY( box, lines, vSpacing );
@@ -409,7 +361,8 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		// hpackX( [ <25,0,15,0>, break(<5,0>), <15,0,20,0>, break(<5,0>), <15,0,10,0> ], indentation=5, spacing=0, padding=0 )
 		//	parentBox = <25, 65, 0, 0, 20, 0>
 		// 		boxAllocation=65   ->     [ 25,15,  5,0,  15,20,  5,0,  15,10 ]  @  [ 0,0,  25,0,  30,0,  45,0,  50,0 ]
-		allocYTest( new LReqBox[] { box( VAlignment.TOP, 25, 0, 15, 0 ), lineBreakBox( VAlignment.TOP, 5, 0 ), box( VAlignment.TOP, 15, 0, 20, 0 ), lineBreakBox( VAlignment.TOP, 5, 0 ), box( VAlignment.TOP, 15, 0, 10, 0 ) }, 5.0, 0.0, 0.0,
+		allocYTest( new LReqBox[] { box( 25, 0, 15, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 20, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 10, 0 ) },
+				new int[] { VTOP, VTOP, VTOP, VTOP, VTOP }, 5.0, 0.0, 0.0,
 				box( 25, 65, 0, 0, 20, 0 ),
 				65,
 				new double[] { 25,15,  5,0,  15,20,  5,0,  15,10 },
@@ -420,7 +373,8 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		// hpackX( [ <25,0,15,0>, break(<5,0>), <15,0,20,0>, break(<5,0>), <15,0,10,0> ], indentation=5, spacing=0, padding=0 )
 		//	parentBox = <25, 65, 0, 0, 30, 0>
 		// 		boxAllocation=55   ->     [ 25,15,  5,0,  15,20,  0,0,  15,10 ]  @  [ 0,0,  25,0,  30,0,  0,0,  5,20 ]
-		allocYTest( new LReqBox[] { box( VAlignment.TOP, 25, 0, 15, 0 ), lineBreakBox( VAlignment.TOP, 5, 0 ), box( VAlignment.TOP, 15, 0, 20, 0 ), lineBreakBox( VAlignment.TOP, 5, 0 ), box( VAlignment.TOP, 15, 0, 10, 0 ) }, 5.0, 0.0, 0.0,
+		allocYTest( new LReqBox[] { box( 25, 0, 15, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 20, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 10, 0 ) },
+				new int[] { VTOP, VTOP, VTOP, VTOP, VTOP }, 5.0, 0.0, 0.0,
 				box( 25, 65, 0, 0, 30, 0 ),
 				55,
 				new double[] { 25,15,  5,0,  15,20,  0,0,  15,10 },
@@ -431,7 +385,8 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		// hpackX( [ <25,0,15,0>, break(<5,0>), <15,0,20,0>, break(<5,0>), <15,0,10,0> ], indentation=5, spacing=0, padding=0 )
 		//	parentBox = <25, 65, 0, 0, 45, 0>
 		// 		boxAllocation=35   ->     [ 25,15,  0,0,  15,20,  0,0,  15,10 ]  @  [ 0,0,  0,0,  5,15,  0,0,  5,35 ]
-		allocYTest( new LReqBox[] { box( VAlignment.TOP, 25, 0, 15, 0 ), lineBreakBox( VAlignment.TOP, 5, 0 ), box( VAlignment.TOP, 15, 0, 20, 0 ), lineBreakBox( VAlignment.TOP, 5, 0 ), box( VAlignment.TOP, 15, 0, 10, 0 ) }, 5.0, 0.0, 0.0,
+		allocYTest( new LReqBox[] { box( 25, 0, 15, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 20, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 10, 0 ) },
+				new int[] { VTOP, VTOP, VTOP, VTOP, VTOP }, 5.0, 0.0, 0.0,
 				box( 25, 65, 0, 0, 45, 0 ),
 				35,
 				new double[] { 25,15,  0,0,  15,20,  0,0,  15,10 },
@@ -444,7 +399,8 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		// hpackX( [ <25,0,15,0>, break(<5,0>), <15,0,20,0>, break(<5,0>), <15,0,10,0> ], indentation=5, spacing=0, padding=0 )
 		//	parentBox = <25, 65, 0, 0, 45, 0>
 		// 		boxAllocation=35   ->     [ 25,15,  0,0,  15,20,  0,0,  15,10 ]  @  [ 0,0,  0,0,  5,0,  0,0,  5,0 ]
-		allocYTest( new LReqBox[] { box( VAlignment.TOP, 25, 0, 15, 0 ), lineBreakBox( VAlignment.TOP, 5, 0 ), box( VAlignment.TOP, 15, 0, 20, 0 ), lineBreakBox( VAlignment.TOP, 5, 0 ), box( VAlignment.TOP, 15, 0, 10, 0 ) }, 5.0, 0.0, 5.0,
+		allocYTest( new LReqBox[] { box( 25, 0, 15, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 20, 0 ), lineBreakBox( 5, 0 ), box( 15, 0, 10, 0 ) },
+				new int[] { VTOP, VTOP, VTOP, VTOP, VTOP }, 5.0, 0.0, 5.0,
 				box( 25, 65, 0, 0, 55, 0 ),
 				35,
 				new double[] { 25,15,  0,0,  15,20,  0,0,  15,10 },

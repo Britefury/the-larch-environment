@@ -6,11 +6,9 @@
 //##************************
 package tests.DocPresent.Layout;
 
-import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBox;
-import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.Layout.VerticalLayout;
 
@@ -163,7 +161,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 	//
 	//
 
-	private void allocYSpaceTest(LReqBox children[], VTypesetting typesetting, double spacing, LReqBox expectedBox, LAllocV boxAllocation, LAllocV expectedSpaceAllocation[])
+	private void allocYSpaceTest(LReqBox children[], int childAllocFlags[], VTypesetting typesetting, double spacing, LReqBox expectedBox, LAllocV boxAllocation, LAllocV expectedSpaceAllocation[])
 	{ 
 		LReqBox box = new LReqBox();
 		LAllocBox boxAlloc = new LAllocBox( null );
@@ -178,7 +176,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 		assertBoxesEqual( box, expectedBox, "PARENT BOX" );
 
 		boxAlloc.setAllocationY( boxAllocation );
-		VerticalLayout.allocateSpaceY( box, children, boxAlloc, childrenAlloc );
+		VerticalLayout.allocateSpaceY( box, children, boxAlloc, childrenAlloc, childAllocFlags );
 		for (int i = 0; i < children.length; i++)
 		{
 			if ( !childrenAlloc[i].getAllocV().equals( expectedSpaceAllocation[i] ) )
@@ -190,11 +188,11 @@ public class Test_VerticalLayout extends Test_Layout_base
 	}
 
 	
-	private void allocYSpaceTests(LReqBox children[], VTypesetting typesetting, double spacing, LReqBox expectedBox, LAllocV boxAllocations[], LAllocV expectedSpaceAllocations[][])
+	private void allocYSpaceTests(LReqBox children[], int childAllocFlags[], VTypesetting typesetting, double spacing, LReqBox expectedBox, LAllocV boxAllocations[], LAllocV expectedSpaceAllocations[][])
 	{
 		for (int i = 0; i  < boxAllocations.length; i++)
 		{
-			allocYSpaceTest( children, typesetting, spacing, expectedBox, boxAllocations[i], expectedSpaceAllocations[i] );
+			allocYSpaceTest( children, childAllocFlags, typesetting, spacing, expectedBox, boxAllocations[i], expectedSpaceAllocations[i] );
 		}
 	}
 
@@ -223,7 +221,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 		// 	boxAllocation=150   ->   [ 150 ]		- all allocated to 1 child
 		// 	boxAllocation=50   ->   [ 150 ]		- will not go below requirement
 		// No padding, no expand
-		allocYSpaceTests( new LReqBox[] { ybox( 150.0, 0.0 ) }, VTypesetting.NONE, 0.0,
+		allocYSpaceTests( new LReqBox[] { ybox( 150.0, 0.0 ) }, new int[] { 0 }, VTypesetting.NONE, 0.0,
 				ybox( 150.0, 0.0 ),
 				new LAllocV[] { new LAllocV( 300.0 ), new LAllocV( 150.0 ), new LAllocV( 50.0 ) },
 				new LAllocV[][] {
@@ -237,7 +235,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 		// 	boxAllocation=150   ->   [ 150 ]		- all allocated to 1 child
 		// 	boxAllocation=50   ->   [ 150 ]		- will not go below requirement
 		// No padding, no expand
-		allocYSpaceTests( new LReqBox[] { ybbox( 75.0, 75.0, 0.0 ) }, VTypesetting.NONE, 0.0,
+		allocYSpaceTests( new LReqBox[] { ybbox( 75.0, 75.0, 0.0 ) }, new int[] { 0 }, VTypesetting.NONE, 0.0,
 				ybox( 150.0, 0.0 ),
 				new LAllocV[] { new LAllocV( 300.0 ), new LAllocV( 150.0 ), new LAllocV( 50.0 ) },
 				new LAllocV[][] {
@@ -251,7 +249,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 		// 	boxAllocation=150   ->   [ 150 ]		- all allocated to 1 child
 		// 	boxAllocation=50   ->   [ 150 ]		- will not go below requirement
 		// No padding, expand
-		allocYSpaceTests( new LReqBox[] { ybox( VAlignment.EXPAND, 150.0, 0.0 ) }, VTypesetting.NONE, 0.0,
+		allocYSpaceTests( new LReqBox[] { ybox( 150.0, 0.0 ) }, new int[] { VEXPAND }, VTypesetting.NONE, 0.0,
 				ybox( 150.0, 0.0 ),
 				new LAllocV[] { new LAllocV( 300.0 ), new LAllocV( 150.0 ), new LAllocV( 50.0 ) },
 				new LAllocV[][] {
@@ -271,7 +269,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 		// 	boxAllocation=300   ->   [ 150, 100 ]		- no expansion
 		// 	boxAllocation=250   ->   [ 150, 100 ]		- required sizes
 		// 	boxAllocation=100   ->   [ 150, 100 ]		- will not go below requirement
-		allocYSpaceTests( new LReqBox[] { ybox( 150.0, 0.0 ), ybox( 100.0, 0.0 ) }, VTypesetting.NONE, 0.0,
+		allocYSpaceTests( new LReqBox[] { ybox( 150.0, 0.0 ), ybox( 100.0, 0.0 ) }, new int[] { 0, 0 }, VTypesetting.NONE, 0.0,
 				ybox( 250.0, 0.0 ),
 				new LAllocV[] { new LAllocV( 300.0 ), new LAllocV( 250.0 ), new LAllocV( 100.0 ) },
 				new LAllocV[][] {
@@ -284,7 +282,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 		// 	boxAllocation=300   ->   [ 200, 100 ]		- space above preferred goes to first child, none to second
 		// 	boxAllocation=250   ->   [ 150, 100 ]		- required sizes
 		// 	boxAllocation=100   ->   [ 150, 100 ]		- will not go below requirement
-		allocYSpaceTests( new LReqBox[] { ybox( VAlignment.EXPAND, 150.0, 0.0 ), ybox( 100.0, 0.0 ) }, VTypesetting.NONE, 0.0,
+		allocYSpaceTests( new LReqBox[] { ybox( 150.0, 0.0 ), ybox( 100.0, 0.0 ) }, new int[] { VEXPAND, 0 }, VTypesetting.NONE, 0.0,
 				ybox( 250.0, 0.0 ),
 				new LAllocV[] { new LAllocV( 300.0 ), new LAllocV( 250.0 ), new LAllocV( 100.0 ) },
 				new LAllocV[][] {
@@ -297,7 +295,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 		// 	boxAllocation=300   ->   [ 150, 150 ]		- space above preferred goes to second child, none to first
 		// 	boxAllocation=250   ->   [ 150, 100 ]		- required sizes
 		// 	boxAllocation=100   ->   [ 150, 100 ]		- will not go below requirement
-		allocYSpaceTests( new LReqBox[] { ybox( 150.0, 0.0 ), ybox( VAlignment.EXPAND, 100.0, 0.0 ) }, VTypesetting.NONE, 0.0,
+		allocYSpaceTests( new LReqBox[] { ybox( 150.0, 0.0 ), ybox( 100.0, 0.0 ) }, new int[] { 0, VEXPAND }, VTypesetting.NONE, 0.0,
 				ybox( 250.0, 0.0 ),
 				new LAllocV[] { new LAllocV( 300.0 ), new LAllocV( 250.0 ), new LAllocV( 100.0 ) },
 				new LAllocV[][] {
@@ -310,7 +308,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 		// 	boxAllocation=300   ->   [ 175, 125 ]		- space above preferred gets distributed between both children
 		// 	boxAllocation=250   ->   [ 150, 100 ]		- required sizes
 		// 	boxAllocation=100   ->   [ 150, 100 ]		- will not go below requirement
-		allocYSpaceTests( new LReqBox[] { ybox(  VAlignment.EXPAND, 150.0, 0.0 ), ybox(  VAlignment.EXPAND, 100.0, 0.0 ) }, VTypesetting.NONE, 0.0,
+		allocYSpaceTests( new LReqBox[] { ybox( 150.0, 0.0 ), ybox( 100.0, 0.0 ) }, new int[] { VEXPAND, VEXPAND }, VTypesetting.NONE, 0.0,
 				ybox( 250.0, 0.0 ),
 				new LAllocV[] { new LAllocV( 300.0 ), new LAllocV( 250.0 ), new LAllocV( 100.0 ) },
 				new LAllocV[][] {
@@ -331,7 +329,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 	//
 	//
 
-	private void allocYTest(LReqBox children[], VTypesetting typesetting, double spacing, LReqBox expectedBox, LAllocV boxAllocation, LAllocV expectedSize[], double expectedPosition[])
+	private void allocYTest(LReqBox children[], int childAllocFlags[], VTypesetting typesetting, double spacing, LReqBox expectedBox, LAllocV boxAllocation, LAllocV expectedSize[], double expectedPosition[])
 	{ 
 		LReqBox box = new LReqBox();
 		LAllocBox boxAlloc = new LAllocBox( null );
@@ -346,7 +344,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 		assertBoxesEqual( box, expectedBox, "PARENT BOX" );
 
 		boxAlloc.setAllocationY( boxAllocation );
-		VerticalLayout.allocateY( box, children, boxAlloc, childrenAlloc, spacing );
+		VerticalLayout.allocateY( box, children, boxAlloc, childrenAlloc, childAllocFlags, spacing );
 		for (int i = 0; i < children.length; i++)
 		{
 			if ( !childrenAlloc[i].getAllocV().equals( expectedSize[i] ) )
@@ -364,11 +362,11 @@ public class Test_VerticalLayout extends Test_Layout_base
 	}
 
 	
-	private void allocYTests(LReqBox children[], VTypesetting typesetting, double spacing, LReqBox expectedBox, LAllocV boxAllocations[], LAllocV expectedSize[][], double expectedPosition[][])
+	private void allocYTests(LReqBox children[], int childAllocFlags[], VTypesetting typesetting, double spacing, LReqBox expectedBox, LAllocV boxAllocations[], LAllocV expectedSize[][], double expectedPosition[][])
 	{
 		for (int i = 0; i  < boxAllocations.length; i++)
 		{
-			allocYTest( children, typesetting, spacing, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
+			allocYTest( children, childAllocFlags, typesetting, spacing, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
 		}
 	}
 
@@ -380,7 +378,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 		// 	boxAllocation=300   ->   [ 200 ] @ [ 0 ]		- no expansion
 		// 	boxAllocation=250   ->   [ 200 ] @ [ 0 ]		- required sizes
 		// 	boxAllocation=100   ->   [ 200 ] @ [ 0 ]		- will not go below requirement
-		allocYTests( new LReqBox[] { ybox( 200.0, 0.0 ) }, VTypesetting.NONE, 0.0,
+		allocYTests( new LReqBox[] { ybox( 200.0, 0.0 ) }, new int[] { 0 }, VTypesetting.NONE, 0.0,
 				ybox( 200.0, 0.0 ),
 				new LAllocV[] { new LAllocV( 300.0 ), new LAllocV( 250.0 ), new LAllocV( 100.0 ) },
 				new LAllocV[][] {
@@ -397,7 +395,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 		// 	boxAllocation=150:150   ->   [ 100:100 ] @ [ 50 ]		- no expansion
 		// 	boxAllocation=100:100   ->   [ 100:100 ] @ [ 0 ]		- required sizes
 		// 	boxAllocation=50:50       ->   [ 100:100 ] @ [ 0 ]		- will not go below requirement
-		allocYTests( new LReqBox[] { ybbox( 100.0, 100.0, 0.0 ) }, VTypesetting.NONE, 0.0,
+		allocYTests( new LReqBox[] { ybbox( 100.0, 100.0, 0.0 ) }, new int[] { 0 }, VTypesetting.NONE, 0.0,
 				ybox( 200.0, 0.0 ),
 				new LAllocV[] { new LAllocV( 150.0, 150.0 ), new LAllocV( 100.0, 100.0 ), new LAllocV( 50.0, 50.0 ) },
 				new LAllocV[][] {
@@ -414,7 +412,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 		// 	boxAllocation=300   ->   [ 200, 50 ] @ [ 0, 200 ]		- no expansion
 		// 	boxAllocation=250   ->   [ 200, 50 ] @ [ 0, 200 ]		- required sizes
 		// 	boxAllocation=100   ->   [ 200, 50 ] @ [ 0, 200 ]		- will not go below requirement
-		allocYTests( new LReqBox[] { ybox( 200.0, 0.0 ),  ybox( 50.0, 0.0 ) }, VTypesetting.NONE, 0.0,
+		allocYTests( new LReqBox[] { ybox( 200.0, 0.0 ),  ybox( 50.0, 0.0 ) }, new int[] { 0, 0 }, VTypesetting.NONE, 0.0,
 				ybox( 250.0, 0.0 ),
 				new LAllocV[] { new LAllocV( 300.0 ), new LAllocV( 250.0 ), new LAllocV( 100.0 ) },
 				new LAllocV[][] {
@@ -431,7 +429,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 		// 	boxAllocation=300   ->   [ 200, 50 ] @ [ 0, 210 ]		- no expansion
 		// 	boxAllocation=260   ->   [ 200, 50 ] @ [ 0, 210 ]		- required sizes
 		// 	boxAllocation=100   ->   [ 200, 50 ] @ [ 0, 210 ]		- will not go below requirement
-		allocYTests( new LReqBox[] { ybox( 200.0, 0.0 ),  ybox( 50.0, 0.0 ) }, VTypesetting.NONE, 10.0,
+		allocYTests( new LReqBox[] { ybox( 200.0, 0.0 ),  ybox( 50.0, 0.0 ) }, new int[] { 0, 0 }, VTypesetting.NONE, 10.0,
 				ybox( 260.0, 0.0 ),
 				new LAllocV[] { new LAllocV( 300.0 ), new LAllocV( 260.0 ), new LAllocV( 100.0 ) },
 				new LAllocV[][] {
@@ -449,7 +447,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 		// 	boxAllocation=400   ->   [ 200, 50 ] @ [ 0, 215 ]		- no expansion
 		// 	boxAllocation=315   ->   [ 200, 50 ] @ [ 0, 215 ]		- required sizes
 		// 	boxAllocation=100   ->   [ 200, 50 ] @ [ 0, 215 ]		- will not go below requirement
-		allocYTests( new LReqBox[] { ybox( 200.0, 15.0 ),  ybox( 50.0, 0.0 ) }, VTypesetting.NONE, 0.0,
+		allocYTests( new LReqBox[] { ybox( 200.0, 15.0 ),  ybox( 50.0, 0.0 ) }, new int[] { 0, 0 }, VTypesetting.NONE, 0.0,
 				ybox( 265.0, 0.0 ),
 				new LAllocV[] { new LAllocV( 400.0 ), new LAllocV( 315.0 ), new LAllocV( 100.0 ) },
 				new LAllocV[][] {
@@ -467,7 +465,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 
 
 
-	private void allocXTest(LReqBox children[], LReqBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
+	private void allocXTest(LReqBox children[], int childAllocFlags[], LReqBox expectedBox, double boxAllocation, double expectedSize[], double expectedPosition[])
 	{ 
 		LReqBox box = new LReqBox();
 		LAllocBox boxAlloc = new LAllocBox( null );
@@ -482,7 +480,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 		assertBoxesEqual( box, expectedBox, "PARENT BOX" );
 
 		boxAlloc.setAllocationX( boxAllocation );
-		VerticalLayout.allocateX( box, children, boxAlloc, childrenAlloc );
+		VerticalLayout.allocateX( box, children, boxAlloc, childrenAlloc, childAllocFlags );
 		for (int i = 0; i < children.length; i++)
 		{
 			if ( childrenAlloc[i].getAllocationX() != expectedSize[i] )
@@ -499,11 +497,11 @@ public class Test_VerticalLayout extends Test_Layout_base
 		}
 	}
 	
-	private void allocXTests(LReqBox children[], LReqBox expectedBox, double boxAllocations[], double expectedSize[][], double expectedPosition[][])
+	private void allocXTests(LReqBox children[], int childAllocFlags[], LReqBox expectedBox, double boxAllocations[], double expectedSize[][], double expectedPosition[][])
 	{
 		for (int i = 0; i  < boxAllocations.length; i++)
 		{
-			allocXTest( children, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
+			allocXTest( children, childAllocFlags, expectedBox, boxAllocations[i], expectedSize[i], expectedPosition[i] );
 		}
 	}
 
@@ -519,7 +517,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 		// 	boxAllocation=150   ->   [ 150, 150 ] @ [ 0, 0 ]		- below min size, between min and pref
 		// 	boxAllocation=100   ->   [ 100, 100 ] @ [ 0, 0 ]		- below min size, min size
 		// 	boxAllocation=50   ->     [ 50, 50 ] @ [ 0, 0 ]			- below min size, below min size
-		allocXTests( new LReqBox[] { xbox( HAlignment.LEFT, 200.0, 300.0, 0.0, 0.0 ),  xbox( HAlignment.LEFT, 100.0, 200.0, 0.0, 0.0 ) },
+		allocXTests( new LReqBox[] { xbox( 200.0, 300.0, 0.0, 0.0 ),  xbox( 100.0, 200.0, 0.0, 0.0 ) }, new int[] { HLEFT, HLEFT },
 				xbox( 200.0, 300.0, 0.0, 0.0 ),
 				new double[] { 400.0, 300.0, 250.0, 200.0, 150.0, 100.0, 50.0 },
 				new double[][] {
@@ -549,7 +547,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 		// 	boxAllocation=150   ->   [ 150, 150 ] @ [ 0, 0 ]		- below min size, between min and pref
 		// 	boxAllocation=100   ->   [ 100, 100 ] @ [ 0, 0 ]		- below min size, min size
 		// 	boxAllocation=50   ->     [ 50, 50 ] @ [ 0, 0 ]		- below min size, below min size
-		allocXTests( new LReqBox[] { xbox( HAlignment.CENTRE, 200.0, 300.0, 0.0, 0.0 ),  xbox( HAlignment.CENTRE, 100.0, 200.0, 0.0, 0.0 ) },
+		allocXTests( new LReqBox[] { xbox( 200.0, 300.0, 0.0, 0.0 ),  xbox( 100.0, 200.0, 0.0, 0.0 ) }, new int[] { HCENTRE, HCENTRE },
 				xbox( 200.0, 300.0, 0.0, 0.0 ),
 				new double[] { 400.0, 300.0, 250.0, 200.0, 150.0, 100.0, 50.0 },
 				new double[][] {
@@ -579,7 +577,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 		// 	boxAllocation=150   ->   [ 150, 150 ] @ [ 0, 0 ]		- below min size, between min and pref
 		// 	boxAllocation=100   ->   [ 100, 100 ] @ [ 0, 0 ]		- below min size, min size
 		// 	boxAllocation=50   ->     [ 50, 50 ] @ [ 0, 0 ]		- below min size, below min size
-		allocXTests( new LReqBox[] { xbox( HAlignment.RIGHT, 200.0, 300.0, 0.0, 0.0 ),  xbox( HAlignment.RIGHT, 100.0, 200.0, 0.0, 0.0 ) },
+		allocXTests( new LReqBox[] { xbox( 200.0, 300.0, 0.0, 0.0 ),  xbox( 100.0, 200.0, 0.0, 0.0 ) }, new int[] { HRIGHT, HRIGHT },
 				xbox( 200.0, 300.0, 0.0, 0.0 ),
 				new double[] { 400.0, 300.0, 250.0, 200.0, 150.0, 100.0, 50.0 },
 				new double[][] {
@@ -609,7 +607,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 		// 	boxAllocation=150   ->   [ 150, 150 ] @ [ 0, 0 ]		- below min size, between min and pref
 		// 	boxAllocation=100   ->   [ 100, 100 ] @ [ 0, 0 ]		- below min size, min size
 		// 	boxAllocation=50   ->     [ 50, 50 ] @ [ 0, 0 ]		- below min size, below min size
-		allocXTests( new LReqBox[] { xbox( HAlignment.EXPAND, 200.0, 300.0, 0.0, 0.0 ),  xbox( HAlignment.EXPAND, 100.0, 200.0, 0.0, 0.0 ) },
+		allocXTests( new LReqBox[] { xbox( 200.0, 300.0, 0.0, 0.0 ),  xbox( 100.0, 200.0, 0.0, 0.0 ) }, new int[] { HEXPAND, HEXPAND },
 				xbox( 200.0, 300.0, 0.0, 0.0 ),
 				new double[] { 400.0, 300.0, 250.0, 200.0, 150.0, 100.0, 50.0 },
 				new double[][] {
