@@ -9,7 +9,7 @@ from datetime import datetime
 
 from BritefuryJ.CommandHistory import CommandHistory, CommandHistoryListener
 
-from BritefuryJ.DocModel import DMNode, DMModule
+from BritefuryJ.DocModel import DMNode, DMModule, DMIOReader, DMIOWriter
 
 from Britefury.Kernel.Abstract import abstractmethod
 
@@ -112,25 +112,25 @@ class GSymDocument (CommandHistoryListener):
 		
 		
 	
-	def viewDocLocationAsPage(self, location, app):
-		return self.viewUnitLocationAsPage( self._unit, location, app )
+	def viewDocLocationAsPage(self, locationPrefix, location, app):
+		return self.viewUnitLocationAsPage( self._unit, locationPrefix, location, app )
 	
 	
-	def viewDocLocationAsLispPage(self, location, app):
-		return self.viewUnitLocationAsLispPage( self._unit, location, app )
+	def viewDocLocationAsLispPage(self, locationPrefix, location, app):
+		return self.viewUnitLocationAsLispPage( self._unit, locationPrefix, location, app )
 
 
 	
-	def viewUnitLocationAsPage(self, unit, location, app):
+	def viewUnitLocationAsPage(self, unit, locationPrefix, location, app):
 		language = self._world.getLanguage( gSymUnit_getLanguageModuleName( unit ) )
 		viewLocationAsPageFn = language.getViewLocationAsPageFn()
-		return viewLocationAsPageFn( self, gSymUnit_getContent( unit ), location, self._commandHistory, app )
+		return viewLocationAsPageFn( self, gSymUnit_getContent( unit ), locationPrefix, location, self._commandHistory, app )
 	
 	
-	def viewUnitLocationAsLispPage(self, unit, location, app):
+	def viewUnitLocationAsLispPage(self, unit, locationPrefix, location, app):
 		language = LISP.language
 		viewLocationAsPageFn = language.getViewLocationAsPageFn()
-		return viewLocationAsPageFn( self, gSymUnit_getContent( unit ), location, self._commandHistory, app )
+		return viewLocationAsPageFn( self, gSymUnit_getContent( unit ), locationPrefix, location, self._commandHistory, app )
 
 
 	
@@ -186,9 +186,9 @@ class GSymDocument (CommandHistoryListener):
 		f = open( filename, 'r' )
 		if f is not None:
 			try:
-				documentRoot = DMIOReader.readFromString( f.read(), self._world.resolver )
+				documentRoot = DMIOReader.readFromString( f.read(), world.resolver )
 				documentRoot = DMNode.coerce( documentRoot )
-				document = GSymDocument.read( self._world, documentRoot )
+				document = GSymDocument.read( world, documentRoot )
 				document._filename = filename
 				document._saveTime = datetime.now()
 				return document

@@ -104,7 +104,7 @@ class _AppLocationResolver (LocationResolver):
 	def resolveLocation(self, location):
 		document = self._app._document
 		if document is not None:
-			return document.viewDocLocationAsPage( location, self._app )
+			return document.viewDocLocationAsPage( '', location, self._app )
 		else:
 			return None
 				
@@ -117,7 +117,7 @@ class _AppLocationResolverLISP (LocationResolver):
 	def resolveLocation(self, location):
 		document = self._app._document
 		if document is not None:
-			return document.viewDocLocationAsLispPage( location, self._app )
+			return document.viewDocLocationAsLispPage( '', location, self._app )
 		else:
 			return None
 				

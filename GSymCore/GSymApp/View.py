@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
+import os
+
 from java.awt.event import KeyEvent
 
 from javax.swing import JPopupMenu
@@ -202,7 +204,7 @@ class AppView (GSymViewObjectNodeDispatch):
 
 
 class _AppViewPage (GSymViewPage):
-	def __init__(self, docRootNode, location, commandHistory, app):
+	def __init__(self, docRootNode, locationPrefix, location, commandHistory, app):
 		self._docRootNode = docRootNode
 		self._location = location
 		self._viewFn = AppView()
@@ -217,16 +219,16 @@ class _AppViewPage (GSymViewPage):
 		
 
 	
-def viewLocationAsPage(document, docRootNode, location, commandHistory, app):
+def viewLocationAsPage(document, docRootNode, locationPrefix, location, commandHistory, app):
 	if location == '':
-		return _AppViewPage( docRootNode, location, commandHistory, app )
+		return _AppViewPage( docRootNode, locationPrefix, location, commandHistory, app )
 	else:
 		documentLocation, dot, tail = location.partition( '.' )
 		
 		doc = app.getWorld().getDocument( documentLocation )
 		
 		if doc is not None:
-			return doc.viewDocLocationAsPage( tail, app )
+			return doc.viewDocLocationAsPage( documentLocation + locationPrefix, tail, app )
 		else:
 			return None
 
