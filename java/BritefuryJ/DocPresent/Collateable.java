@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-public interface Collateable
+interface Collateable
 {
-	public void setCollationRange(int start, int end);
-	public DPContainerSequenceCollationRoot getCollationRoot();
+	void setCollationRange(int start, int end);
+	DPContainerSequenceCollationRoot getCollationRoot();
 }
