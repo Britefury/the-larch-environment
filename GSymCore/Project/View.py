@@ -111,7 +111,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		controlsBox = ctx.hbox( prj_controlsBoxStyle, [ saveLink.padX( 10.0 ), saveAsLink.padX( 10.0 ) ] )
 		controlsBorder = ctx.border( prj_controlsBorder, controlsBox )
 		
-		root = ctx.vbox( prj_projectIndexBoxStyle, [ ctx.viewEval( rootPackage, _ProjectViewState( '' ) ).alignHExpand() ] )
+		root = ctx.viewEval( rootPackage, _ProjectViewState( '' ) ).alignHExpand()
 		indexBox = tabbedBox( ctx, 'Project Index', root )
 		
 		contentBox = ctx.vbox( prj_projectContentBoxStyle, [ linkHeader, title, controlsBorder.pad( 5.0, 10.0 ).alignHLeft(), indexBox.pad( 10.0, 10.0 ).alignHLeft() ] )
