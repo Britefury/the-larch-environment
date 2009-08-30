@@ -32,6 +32,11 @@ public class HBoxTestPage extends SystemPage
 		return "H-Box test";
 	}
 	
+	protected String getDescription()
+	{
+		return "The HBox element arranges its child elements in a horizontal box."; 
+	}
+
 	
 	private static SolidBorder outline = new SolidBorder( 1.0, 0.0, new Color( 0.0f, 0.3f, 0.7f ), null );
 

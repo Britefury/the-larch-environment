@@ -35,6 +35,11 @@ public class TableTestPage extends SystemPage
 		return "Table test";
 	}
 
+	protected String getDescription()
+	{
+		return "The table element arranges is children in a grid.";
+	}
+
 	private static TextStyleSheet t12 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
 	private static TextStyleSheet t18 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 18 ), Color.BLACK );
 	private static SolidBorder b = new SolidBorder( 2.0, 3.0, new Color( 0.0f, 0.3f, 0.7f ), new Color( 1.0f, 0.99f, 0.9f ) );

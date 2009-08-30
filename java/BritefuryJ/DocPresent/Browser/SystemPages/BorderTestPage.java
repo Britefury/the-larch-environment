@@ -34,6 +34,11 @@ public class BorderTestPage extends SystemPage
 	{
 		return "Border test";
 	}
+	
+	protected String getDescription()
+	{
+		return "The border element is used to provide the background colours, and the black boxes. Horizontal and vertical element alignments are demonstrated.";
+	}
 
 	protected static DPText[] makeTexts(String header)
 	{

@@ -27,6 +27,11 @@ public class TextTestPage extends SystemPage
 		return "Text test";
 	}
 
+	protected String getDescription()
+	{
+		return "The text element supports mixed-caps style, and a squiggle-underline.";
+	}
+
 	protected DPWidget createContents()
 	{
 		TextStyleSheet ts0 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK );

@@ -18,7 +18,6 @@ import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPStaticText;
 import BritefuryJ.DocPresent.DPTable;
-import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
@@ -28,10 +27,8 @@ import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
-import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TableStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
 public class DndTestPage extends SystemPage
 {
@@ -48,6 +45,11 @@ public class DndTestPage extends SystemPage
 	protected String getTitle()
 	{
 		return "Drag and Drop test";
+	}
+	
+	protected String getDescription()
+	{
+		return "Text can be dragged from the sources to the destinations.";
 	}
 	
 	
@@ -132,10 +134,6 @@ public class DndTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		StaticTextStyleSheet instructionsStyle = new StaticTextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK );
-		DPStaticText instructions = new DPStaticText( instructionsStyle, "Drag data from sources to destinations." );
-		
-		
 		StaticTextStyleSheet rowTitleStyle = new StaticTextStyleSheet( new Font( "Sans serif", Font.PLAIN, 14 ), Color.BLACK );
 		
 		
@@ -161,13 +159,8 @@ public class DndTestPage extends SystemPage
 
 
 		
-		VBoxStyleSheet vboxS = new VBoxStyleSheet( VTypesetting.NONE, 20.0 );
-		DPVBox vbox = new DPVBox( vboxS );
-		vbox.append( instructions );
-		vbox.append( table );
-		
 		DPHBox hbox = new DPHBox();
-		hbox.append( vbox.padY( 10.0 ) );
+		hbox.append( table.padY( 10.0 ) );
 
 		return hbox;
 	}
