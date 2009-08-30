@@ -8,13 +8,17 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.util.ArrayList;
 
+import BritefuryJ.DocPresent.DPLineBreak;
 import BritefuryJ.DocPresent.DPLink;
+import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPStaticText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Browser.Page;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
+import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
@@ -48,6 +52,8 @@ public abstract class SystemPage extends Page
 		
 		DPVBox headBox = new DPVBox();
 		
+		StaticTextStyleSheet descriptionStyle = new StaticTextStyleSheet( new Font( "Sans Serif", Font.PLAIN, 16 ), Color.BLACK );
+		
 		StaticTextStyleSheet titleStyle = new StaticTextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
 		DPStaticText title = new DPStaticText( titleStyle, "System page: " + getTitle() );
 		
@@ -55,6 +61,11 @@ public abstract class SystemPage extends Page
 		headBox.append( title.alignHCentre() );
 
 		pageBox.append( headBox.alignHExpand() );
+		String description = getDescription();
+		if ( description != null )
+		{
+			pageBox.append( createTextParagraph( descriptionStyle, description ) );
+		}
 		pageBox.append( createContents().alignHExpand() );
 		
 		return pageBox.alignHExpand();
@@ -65,8 +76,62 @@ public abstract class SystemPage extends Page
 	{
 		return new DPLink( getTitle(), getLocation() );
 	}
+	
+	
+	protected ArrayList<DPWidget> createTextNodes(StaticTextStyleSheet textStyle, String text)
+	{
+		String[] words = text.split( " " );
+		ArrayList<DPWidget> nodes = new ArrayList<DPWidget>();
+		boolean bFirst = true;
+		for (String word: words)
+		{
+			if ( !words.equals( "" ) )
+			{
+				if ( !bFirst )
+				{
+					DPStaticText space = new DPStaticText( textStyle, " " );
+					DPLineBreak b = new DPLineBreak();
+					b.setChild( space );
+					nodes.add( b );
+				}
+				nodes.add( new DPStaticText( textStyle, word ) );
+				bFirst = false;
+			}
+		}
+		
+		return nodes;
+	}
+
+	protected ArrayList<DPWidget> createTextNodes(String text)
+	{
+		return createTextNodes( StaticTextStyleSheet.defaultStyleSheet, text );
+	}
+	
+	protected DPParagraph createTextParagraph(ParagraphStyleSheet paraStyle, StaticTextStyleSheet textStyle, String text)
+	{
+		ArrayList<DPWidget> nodes = createTextNodes( textStyle, text );
+		DPParagraph para = new DPParagraph( paraStyle );
+		para.setChildren( nodes );
+		return para;
+	}
+
+	protected DPParagraph createTextParagraph(StaticTextStyleSheet textStyle, String text)
+	{
+		return createTextParagraph( ParagraphStyleSheet.defaultStyleSheet, textStyle, text );
+	}
+
+	protected DPParagraph createTextParagraph(String text)
+	{
+		return createTextParagraph( ParagraphStyleSheet.defaultStyleSheet, StaticTextStyleSheet.defaultStyleSheet, text );
+	}
 
 	
 	protected abstract String getTitle();
+	
+	protected String getDescription()
+	{
+		return null;
+	}
+	
 	protected abstract DPWidget createContents();
 }

@@ -32,6 +32,12 @@ public class ScriptTestPage extends SystemPage
 		return "Script test";
 	}
 
+	protected String getDescription()
+	{
+		return "The script element is used to produce super and subscript arrangements."; 
+	}
+
+
 	protected DPWidget makeText(String text, TextStyleSheet styleSheet)
 	{
 		if ( text != null )
@@ -76,8 +82,8 @@ public class ScriptTestPage extends SystemPage
 		
 		DPWidget script = makeScript( main, leftSuper, leftSub, rightSuper, rightSub );
 		
-		DPText labelA = new DPText( sPre, "Label A yYgGjJpPqQ" );
-		DPText labelB = new DPText( sPost, "Label B yYgGjJpPqQ" );
+		DPText labelA = new DPText( sPre, "<<Left<<" );
+		DPText labelB = new DPText( sPost, ">>Right>>" );
 		
 		DPHBox box = new DPHBox();
 		box.append( labelA );

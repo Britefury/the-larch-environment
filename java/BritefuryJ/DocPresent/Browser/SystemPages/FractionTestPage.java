@@ -32,6 +32,11 @@ public class FractionTestPage extends SystemPage
 	{
 		return "Fraction test";
 	}
+	
+	protected String getDescription()
+	{
+		return "The fraction element places its two child elements into a mathematical fraction arrangement."; 
+	}
 
 	protected DPWidget makeText(String text, TextStyleSheet styleSheet)
 	{
@@ -63,8 +68,8 @@ public class FractionTestPage extends SystemPage
 		
 		DPWidget frac = makeFraction( num, denom );
 		
-		DPText labelA = new DPText( s1, "Label A yYgGjJpPqQ" );
-		DPText labelB = new DPText( s2, "Label B yYgGjJpPqQ" );
+		DPText labelA = new DPText( s1, "<<Left<<" );
+		DPText labelB = new DPText( s2, ">>Right>>" );
 		
 		DPHBox box = new DPHBox();
 		box.append( labelA );

@@ -28,6 +28,11 @@ public class MathRootTestPage extends SystemPage
 	{
 		return "Math-root test";
 	}
+	
+	protected String getDescription()
+	{
+		return "The math-root element places its child within a mathematical square-root symbol."; 
+	}
 
 	protected DPWidget makeText(String text, TextStyleSheet styleSheet)
 	{

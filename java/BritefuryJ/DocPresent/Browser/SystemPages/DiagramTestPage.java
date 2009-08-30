@@ -52,6 +52,11 @@ public class DiagramTestPage extends SystemPage
 		return "Diagram test";
 	}
 	
+	protected String getDescription()
+	{
+		return "Drag clock ticks to the drop box below.";
+	}
+	
 	
 	protected DndHandler dndSource(int index)
 	{
@@ -184,9 +189,6 @@ public class DiagramTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		StaticTextStyleSheet instructionsStyle = new StaticTextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK );
-		DPStaticText instructions = new DPStaticText( instructionsStyle, "Drag clock ticks to the drop box below." );
-
 		DPDiagram diagramElement = new DPDiagram( createClockFace().translate( 320.0, 240.0 ), 640.0, 480.0, false, false );
 		Border b = new SolidBorder( 1.0, 3.0, 2.0, 2.0, Color.black, null );
 		DPBorder border = new DPBorder( b );
@@ -196,7 +198,6 @@ public class DiagramTestPage extends SystemPage
 
 		VBoxStyleSheet vboxS = new VBoxStyleSheet( VTypesetting.NONE, 20.0 );
 		DPVBox vbox = new DPVBox( vboxS );
-		vbox.append( instructions );
 		vbox.append( border );
 		vbox.append( dest0 );
 

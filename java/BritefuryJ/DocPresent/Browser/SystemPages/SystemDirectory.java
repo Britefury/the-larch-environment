@@ -22,10 +22,10 @@ public class SystemDirectory
 		testPages.add( new DndTestPage() );
 		testPages.add( new FractionTestPage() );
 		testPages.add( new HBoxTestPage() );
-		testPages.add( new HBoxTypesetTestPage() );
 		testPages.add( new MathRootTestPage() );
 		testPages.add( new ParagraphCollationTestPage() );
 		testPages.add( new ParagraphTestPage() );
+		testPages.add( new ProxyTestPage() );
 		testPages.add( new ScriptTestPage() );
 		testPages.add( new SegmentTestPage() );
 		testPages.add( new TableTestPage() );

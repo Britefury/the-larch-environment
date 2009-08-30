@@ -32,6 +32,12 @@ public class SegmentTestPage extends SystemPage
 		return "Segment test";
 	}
 
+	protected String getDescription()
+	{
+		return "The segment element is used to control caret movement; this is typically used in situations such as fraction elements; in the case of a nested fraction, " +
+		"the caret must stop after exiting the child fraction, before leaving the parent fraction; see the fraction test for an example.";
+	}
+
 	private static Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
 
 	

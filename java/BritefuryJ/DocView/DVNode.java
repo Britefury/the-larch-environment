@@ -6,13 +6,11 @@
 //##************************
 package BritefuryJ.DocView;
 
-import java.util.Arrays;
-
 import BritefuryJ.Cell.Cell;
 import BritefuryJ.Cell.CellEvaluator;
 import BritefuryJ.Cell.CellInterface;
 import BritefuryJ.Cell.CellListener;
-import BritefuryJ.DocPresent.DPSpan;
+import BritefuryJ.DocPresent.DPProxy;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementContext;
 import BritefuryJ.DocTree.DocTreeNode;
@@ -54,7 +52,7 @@ public class DVNode implements CellListener
 	private DocTreeNode treeNode;
 	
 	private Cell elementCell;
-	private DPSpan proxyElement;
+	private DPProxy proxyElement;
 	private DPWidget element;
 	private NodeElementFactory elementFactory;
 	
@@ -85,7 +83,7 @@ public class DVNode implements CellListener
 		bRefreshRequired = true;
 		
 		
-		proxyElement = new DPSpan();
+		proxyElement = new DPProxy();
 		element = null;
 
 		elementFactory = null;
@@ -321,12 +319,12 @@ public class DVNode implements CellListener
 			if ( e != null )
 			{
 				element = e;
-				proxyElement.setChildren( Arrays.asList( new DPWidget[] { element } ) );
+				proxyElement.setChild( element );
 			}
 			else
 			{
 				element = null;
-				proxyElement.setChildren( Arrays.asList( new DPWidget[] {} ) );
+				proxyElement.setChild( null );
 			}
 		}
 	}

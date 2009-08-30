@@ -32,7 +32,13 @@ public class ParagraphTestPage extends SystemPage
 	{
 		return "Paragraph test";
 	}
+	
+	protected String getDescription()
+	{
+		return "The paragraph element breaks lines at line break elements."; 
+	}
 
+	
 	static String textBlock = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 	
 	protected ArrayList<DPWidget> makeTextNodes(String text, TextStyleSheet style)
@@ -99,7 +105,6 @@ public class ParagraphTestPage extends SystemPage
 		TextStyleSheet blackText = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.black );
 		TextStyleSheet redText = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.red );
 		
-		DPWidget b1 = makeParagraph( "ONE-LINE", 0.0, 0.0, 0.0, 0, blackText );
 		DPWidget b2 = makeParagraph( "PER-WORD", 0.0, 0.0, 0.0, 1, blackText );
 		DPWidget b3 = makeParagraph( "EVERY-4-WORDS", 0.0, 0.0, 0.0, 4, blackText);
 		DPWidget b4 = makeParagraphWithNestedPara( "NESTED-1", 0.0, 0.0, 0.0, 1, blackText, redText );
@@ -107,7 +112,7 @@ public class ParagraphTestPage extends SystemPage
 		DPWidget b6 = makeParagraphWithNestedPara( "NESTED-4", 0.0, 0.0, 0.0, 4, blackText, redText );
 		DPWidget b7 = makeParagraph( "PER-WORD INDENTED", 0.0, 0.0, 50.0, 1, blackText );
 		DPWidget b8 = makeParagraphWithNestedPara( "NESTED-2-INDENTED", 0.0, 0.0, 50.0, 2, blackText, redText );
-		DPWidget[] children = { b1, b2, b3, b4, b5, b6, b7, b8 };
+		DPWidget[] children = { b2, b3, b4, b5, b6, b7, b8 };
 		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, 30.0 );
 		DPVBox box = new DPVBox( boxs );
 		box.extend( children );
