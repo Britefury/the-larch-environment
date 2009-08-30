@@ -69,13 +69,14 @@ def _ProjectViewState(location):
 
 
 
-def _joinLocation(x, y):
-	if x == '':
-		return y
-	elif y == '':
-		return x
-	else:
-		return x + '.' + y
+def _joinLocation(*xs):
+	loc = ''
+	for x in xs:
+		if x != '':
+			if loc != '':
+				loc += '.'
+			loc += x
+	return loc
 
 
 class ProjectView (GSymViewObjectNodeDispatch):
@@ -89,10 +90,20 @@ class ProjectView (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod
 	def Project(self, ctx, state, node, rootPackage):
 		def _onSave(link):
-			pass
+			if document._filename is None:
+				def handleSaveDocumentAsFn(filename):
+					document.saveAs( filename )
+				
+				ctx.getViewContext().getPage()._app.promptSaveDocumentAs( handleSaveDocumentAsFn )
+			else:
+				document.save()
+				
 		
 		def _onSaveAs(link):
-			pass
+			def handleSaveDocumentAsFn(filename):
+				document.saveAs( filename )
+			
+			ctx.getViewContext().getPage()._app.promptSaveDocumentAs( handleSaveDocumentAsFn )
 		
 		
 		
@@ -111,7 +122,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		controlsBox = ctx.hbox( prj_controlsBoxStyle, [ saveLink.padX( 10.0 ), saveAsLink.padX( 10.0 ) ] )
 		controlsBorder = ctx.border( prj_controlsBorder, controlsBox )
 		
-		root = ctx.viewEval( rootPackage, _ProjectViewState( '' ) ).alignHExpand()
+		root = ctx.viewEval( rootPackage, _ProjectViewState( ctx.getViewContext().getPage()._locationPrefix ) ).alignHExpand()
 		indexBox = tabbedBox( ctx, 'Project Index', root )
 		
 		contentBox = ctx.vbox( prj_projectContentBoxStyle, [ linkHeader, title, controlsBorder.pad( 5.0, 10.0 ).alignHLeft(), indexBox.pad( 10.0, 10.0 ).alignHLeft() ] )
@@ -171,9 +182,10 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 
 class _ProjectViewPage (GSymViewPage):
-	def __init__(self, document, docRootNode, location, commandHistory, app):
+	def __init__(self, document, docRootNode, locationPrefix, location, commandHistory, app):
 		self._document = document
 		self._docRootNode = docRootNode
+		self._locationPrefix = locationPrefix
 		self._location = location
 		self._commandHistory = commandHistory
 		self._app = app
@@ -195,9 +207,9 @@ class _ProjectViewPage (GSymViewPage):
 
 
 	
-def viewLocationAsPage(document, docRootNode, location, commandHistory, app):
+def viewLocationAsPage(document, docRootNode, locationPrefix, location, commandHistory, app):
 	if location == '':
-		return _ProjectViewPage( document, docRootNode, location, commandHistory, app )
+		return _ProjectViewPage( document, docRootNode, locationPrefix, location, commandHistory, app )
 	else:
 		loc = location
 		package = docRootNode['rootPackage']
@@ -205,6 +217,7 @@ def viewLocationAsPage(document, docRootNode, location, commandHistory, app):
 			dotPos = loc.index( '.' )
 			name = loc[:dotPos]
 			loc = loc[dotPos+1:]
+			locationPrefix += name + '.'
 			node = None
 			for n in package['contents']:
 				if n['name'] == name:
@@ -216,7 +229,7 @@ def viewLocationAsPage(document, docRootNode, location, commandHistory, app):
 				if n.isInstanceOf( Nodes.Package ):
 					package = n
 				elif n.isInstanceOf( Nodes.Page ):
-					return document.viewUnitLocationAsPage( n['unit'], loc, app )
+					return document.viewUnitLocationAsPage( n['unit'], locationPrefix,loc, app )
 				else:
 					return None
 			else:
