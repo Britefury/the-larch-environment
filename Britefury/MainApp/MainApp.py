@@ -148,6 +148,7 @@ class MainApp (AppControlInterface):
 		self._browser.setCommandHistoryListener( _CommandHistoryListener() )
 		
 		
+		
 		# NEW PAGE POPUP MENU
 		self._newPageFactories = []
 		self._pageImporters = []
@@ -168,21 +169,21 @@ class MainApp (AppControlInterface):
 		
 		editMenu = JMenu( 'Edit' )
 		
-		editUndoItem = JMenuItem( 'Undo' )
+		self._editUndoItem = JMenuItem( 'Undo' )
 		undoAction = _action( 'undo', self._onUndo )
-		editUndoItem.setActionCommand( undoAction.getValue( Action.NAME ) )
-		editUndoItem.addActionListener( undoAction )
-		editUndoItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_Z, ActionEvent.CTRL_MASK ) )
-		editUndoItem.setMnemonic( KeyEvent.VK_U )
-		editMenu.add( editUndoItem )
+		self._editUndoItem.setActionCommand( undoAction.getValue( Action.NAME ) )
+		self._editUndoItem.addActionListener( undoAction )
+		self._editUndoItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_Z, ActionEvent.CTRL_MASK ) )
+		self._editUndoItem.setMnemonic( KeyEvent.VK_U )
+		editMenu.add( self._editUndoItem )
 
-		editRedoItem = JMenuItem( 'Redo' )
+		self._editRedoItem = JMenuItem( 'Redo' )
 		redoAction = _action( 'redo', self._onRedo )
-		editRedoItem.setActionCommand( redoAction.getValue( Action.NAME ) )
-		editRedoItem.addActionListener( redoAction )
-		editRedoItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_Z, ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK ) )
-		editRedoItem.setMnemonic( KeyEvent.VK_R )
-		editMenu.add( editRedoItem )
+		self._editRedoItem.setActionCommand( redoAction.getValue( Action.NAME ) )
+		self._editRedoItem.addActionListener( redoAction )
+		self._editRedoItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_Z, ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK ) )
+		self._editRedoItem.setMnemonic( KeyEvent.VK_R )
+		editMenu.add( self._editRedoItem )
 
 		
 		editMenu.addSeparator()
@@ -282,7 +283,9 @@ class MainApp (AppControlInterface):
 		self.setDocument( document )
 		
 		
+		self._onCommandHistoryChanged( None )
 
+		
 		#
 		# Script window
 		#
@@ -342,8 +345,13 @@ class MainApp (AppControlInterface):
 			
 			
 	def _onCommandHistoryChanged(self, commandHistory):
-		print 'Not implemented; update date of undo and redo menu entries'
-
+		if commandHistory is not None:
+			self._editUndoItem.setEnabled( commandHistory.canUndo() )
+			self._editRedoItem.setEnabled( commandHistory.canRedo() )
+		else:
+			self._editUndoItem.setEnabled( False )
+			self._editRedoItem.setEnabled( False )
+			
 		
 		
 	def _onNewProject(self):
