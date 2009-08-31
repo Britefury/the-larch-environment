@@ -123,7 +123,7 @@ public class DPBin extends DPContainer
 		if ( child != null )
 		{
 			LAllocV prevAllocV = child.layoutAllocBox.getAllocV();
-			layoutAllocBox.allocateChildYAligned( child.layoutAllocBox, child.layoutReqBox, child.getAlignmentFlags(), 0.0, layoutAllocBox.getAllocationY() );
+			layoutAllocBox.allocateChildYAligned( child.layoutAllocBox, child.layoutReqBox, child.getAlignmentFlags(), 0.0, layoutAllocBox.getAllocV() );
 			child.refreshAllocationY( prevAllocV );
 		}
 	}

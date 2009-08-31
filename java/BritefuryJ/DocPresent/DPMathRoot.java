@@ -184,7 +184,7 @@ public class DPMathRoot extends DPContainer
 
 			double prevWidth = child.getAllocationX();
 			double offset = s.getGlyphWidth();
-			layoutAllocBox.allocateChildX( child.layoutAllocBox, offset, getAllocationX() - offset );
+			layoutAllocBox.allocateChildXAligned( child.layoutAllocBox, child.layoutReqBox, child.getAlignmentFlags(), offset, layoutAllocBox.getAllocationX() - offset );
 			child.refreshAllocationX( prevWidth );
 		}
 	}
@@ -197,7 +197,7 @@ public class DPMathRoot extends DPContainer
 
 			LAllocV prevAllocV = child.getAllocV();
 			double offset = s.getBarSpacing() + s.getThickness();
-			layoutAllocBox.allocateChildY( child.layoutAllocBox, offset, getAllocationY() - offset );
+			layoutAllocBox.allocateChildYAligned( child.layoutAllocBox, child.layoutReqBox, child.getAlignmentFlags(), offset, layoutAllocBox.getAllocV().borderY( offset, 0.0 ) );
 			child.refreshAllocationY( prevAllocV );
 		}
 	}

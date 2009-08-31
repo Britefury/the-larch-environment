@@ -59,7 +59,7 @@ public class HorizontalLayout
 		box.clearRequisitionY();
 		
 		double reqAscent = 0.0, reqDescent = 0.0, reqDescentAndSpacing = 0.0, reqHeight = 0.0, reqAdvance = 0.0;
-		int baselineCount = 0;
+		boolean bHasBaseline = false;
 		for (int i = 0; i < children.length; i++)
 		{
 			LReqBox child = children[i];
@@ -68,7 +68,7 @@ public class HorizontalLayout
 			boolean bBaseline = v == VAlignment.BASELINES  ||  v == VAlignment.BASELINES_EXPAND;
 			if ( bBaseline )
 			{
-				baselineCount++;
+				bHasBaseline = true;
 			}
 			
 			if ( bBaseline  &&  child.hasBaseline() )
@@ -84,22 +84,26 @@ public class HorizontalLayout
 				double childReqAdvance = childReqHeight + child.reqVSpacing;
 				reqHeight = Math.max( reqHeight, childReqHeight );
 				reqAdvance = Math.max( reqAdvance, childReqAdvance );
-
-				double childReqHalfHeight = childReqHeight * 0.5;
-				reqAscent = Math.max( reqAscent, childReqHalfHeight );
-				reqDescent = Math.max( reqDescent, childReqHalfHeight );
-				reqDescentAndSpacing = Math.max( reqDescentAndSpacing, childReqHalfHeight + child.reqVSpacing );
 			}
 		}
 		
-		if ( baselineCount == 0 )
+		if ( bHasBaseline )
 		{
-			// No children had baselines; result in a box that has no baseline
-			box.setRequisitionY( reqHeight, reqAdvance - reqHeight );
+			double advance = Math.max( reqAdvance, reqAscent + reqDescentAndSpacing );
+			if ( reqHeight  >  ( reqAscent + reqDescent ) )
+			{
+				double deltaY = ( reqHeight  -  ( reqAscent + reqDescent ) )  *  0.5;
+				box.setRequisitionY( reqAscent + deltaY, reqDescent + deltaY, advance - reqHeight );
+			}
+			else
+			{
+				box.setRequisitionY( reqAscent, reqDescent, advance - ( reqAscent + reqDescent ) );
+			}
 		}
 		else
 		{
-			box.setRequisitionY( reqAscent, reqDescent, reqDescentAndSpacing - reqDescent );
+			// No children had baseline alignment; result in a box that has no baseline
+			box.setRequisitionY( reqHeight, reqAdvance - reqHeight );
 		}
 	}
 
@@ -135,7 +139,7 @@ public class HorizontalLayout
 				// Allocate children their preferred width
 				for (int i = 0; i < children.length; i++)
 				{
-					allocBox.allocateChildSpaceX( childrenAlloc[i], children[i].getPrefWidth() );
+					allocBox.allocateChildWidth( childrenAlloc[i], children[i].getPrefWidth() );
 				}
 			}
 			else
@@ -149,11 +153,11 @@ public class HorizontalLayout
 					HAlignment h = ElementAlignment.getHAlignment( childAllocationFlags[i] );
 					if ( h == HAlignment.EXPAND )
 					{
-						allocBox.allocateChildSpaceX( childrenAlloc[i], children[i].getPrefWidth() + expandPerChild );
+						allocBox.allocateChildWidth( childrenAlloc[i], children[i].getPrefWidth() + expandPerChild );
 					}
 					else
 					{
-						allocBox.allocateChildSpaceX( childrenAlloc[i], children[i].getPrefWidth() );
+						allocBox.allocateChildWidth( childrenAlloc[i], children[i].getPrefWidth() );
 					}
 				}
 			}
@@ -165,7 +169,7 @@ public class HorizontalLayout
 			// Allocate children their preferred size
 			for (int i = 0; i < children.length; i++)
 			{
-				allocBox.allocateChildSpaceX( childrenAlloc[i], children[i].getMinWidth() );
+				allocBox.allocateChildWidth( childrenAlloc[i], children[i].getMinWidth() );
 			}
 		}
 		else
@@ -189,7 +193,7 @@ public class HorizontalLayout
 				for (int i = 0; i < children.length; i++)
 				{
 					double delta = children[i].getPrefWidth() - children[i].getMinWidth();
-					allocBox.allocateChildSpaceX( childrenAlloc[i], children[i].getMinWidth() + delta * fraction );
+					allocBox.allocateChildWidth( childrenAlloc[i], children[i].getMinWidth() + delta * fraction );
 				}
 			}
 		}
@@ -239,10 +243,12 @@ public class HorizontalLayout
 		
 		double ascent = 0.0, descent = 0.0;
 		
+		LAllocV h = null;
 		if ( allocBox.hasBaseline() )
 		{
 			ascent = Math.max( allocBox.getAllocationAscent(), box.getReqAscent() );
 			descent = Math.max( allocBox.getAllocationDescent(), box.getReqDescent() );
+			h = new LAllocV( ascent, descent );
 		}
 		else
 		{
@@ -254,69 +260,18 @@ public class HorizontalLayout
 			{
 				ascent = box.getReqAscent() + delta * 0.5;
 				descent = box.getReqDescent() + delta * 0.5;
+				h = new LAllocV( ascent, descent );
 			}
 			else
 			{
-				ascent = box.getReqHeight() * 0.5  +  delta * 0.5;
-				descent = ascent;
+				h = new LAllocV( allocationHeight );
 			}
 		}
 
 		
 		for (int i = 0; i < children.length; i++)
 		{
-			LReqBox child = children[i];
-			LAllocBox childAlloc = childrenAlloc[i];
-			
-			VAlignment alignment = ElementAlignment.getVAlignment( childAllocationFlags[i] );
-			
-			if ( alignment == VAlignment.BASELINES )
-			{
-				double childAscent, childDescent;
-				
-				if ( child.hasBaseline() )
-				{
-					childAscent = child.getReqAscent();
-					childDescent = child.getReqDescent();
-				}
-				else
-				{
-					double halfHeight = child.getReqHeight() * 0.5;
-					childAscent = halfHeight;
-					childDescent = halfHeight;
-				}
-				
-				allocBox.allocateChildY( childAlloc, ascent - childAscent, childAscent, childDescent );
-			}
-			else if ( alignment == VAlignment.BASELINES_EXPAND )
-			{
-				allocBox.allocateChildY( childAlloc, 0.0, ascent, descent );
-			}
-			else if ( alignment == VAlignment.EXPAND )
-			{
-				allocBox.allocateChildYByReq( childAlloc, 0.0, child, allocationHeight );
-			}
-			else
-			{
-				double childHeight = Math.min( allocationHeight, child.getReqHeight() );
-				
-				if ( alignment == VAlignment.TOP )
-				{
-					allocBox.allocateChildYByReq( childAlloc, 0.0, child );
-				}
-				else if ( alignment == VAlignment.CENTRE )
-				{
-					allocBox.allocateChildYByReq( childAlloc, ( allocationHeight - childHeight )  *  0.5, child );
-				}
-				else if ( alignment == VAlignment.BOTTOM )
-				{
-					allocBox.allocateChildYByReq( childAlloc, allocationHeight - childHeight, child );
-				}
-				else
-				{
-					throw new RuntimeException( "Invalid v-alignment" );
-				}
-			}
+			allocBox.allocateChildYAligned( childrenAlloc[i], children[i], childAllocationFlags[i], 0.0, h );
 		}
 	}
 
@@ -344,7 +299,7 @@ public class HorizontalLayout
 				// Allocate children their preferred width
 				for (int i = 0; i < children.length; i++)
 				{
-					allocBox.allocateChildSpaceX( childrenAlloc[i], children[i].getPrefWidth() );
+					allocBox.allocateChildWidth( childrenAlloc[i], children[i].getPrefWidth() );
 				}
 			}
 			else
@@ -355,7 +310,7 @@ public class HorizontalLayout
 				
 				for (int i = 0; i < children.length; i++)
 				{
-					allocBox.allocateChildSpaceX( childrenAlloc[i], children[i].getPrefWidth() + expandPerChild );
+					allocBox.allocateChildWidth( childrenAlloc[i], children[i].getPrefWidth() + expandPerChild );
 				}
 			}
 		}
@@ -366,7 +321,7 @@ public class HorizontalLayout
 			// Allocate children their preferred size
 			for (int i = 0; i < children.length; i++)
 			{
-				allocBox.allocateChildSpaceX( childrenAlloc[i], children[i].getMinWidth() );
+				allocBox.allocateChildWidth( childrenAlloc[i], children[i].getMinWidth() );
 			}
 		}
 		else
@@ -391,7 +346,7 @@ public class HorizontalLayout
 				{
 					LReqBox child = children[i];
 					double delta = child.getPrefWidth() - child.getMinWidth();
-					allocBox.allocateChildSpaceX( childrenAlloc[i], child.getMinWidth() + delta * fraction );
+					allocBox.allocateChildWidth( childrenAlloc[i], child.getMinWidth() + delta * fraction );
 				}
 			}
 		}

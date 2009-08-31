@@ -54,6 +54,13 @@ public class LAllocV
 	{
 		return bHasBaseline;
 	}
+	
+	
+	
+	public LAllocV borderY(double topMargin, double bottomMargin)
+	{
+		return new LAllocV( ascent - topMargin, descent - bottomMargin, bHasBaseline );
+	}
 
 
 

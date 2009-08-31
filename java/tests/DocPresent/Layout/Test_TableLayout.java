@@ -6,33 +6,20 @@
 //##************************
 package tests.DocPresent.Layout;
 
-import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.TableLayout;
 import BritefuryJ.DocPresent.Layout.TablePackingParams;
-import BritefuryJ.DocPresent.Layout.VAlignment;
 
 public class Test_TableLayout extends Test_Layout_base
 {
 	private TablePackingParams pack(int x, int y)
 	{
-		return new TablePackingParams( x, 1, 0.0, y, 1, 0.0 );
+		return new TablePackingParams( x, 1, y, 1 );
 	}
 	
 	private TablePackingParams pack(int x, int y, int colspan, int rowspan)
 	{
-		return new TablePackingParams( x, colspan, 0.0, y, rowspan, 0.0 );
-	}
-	
-	private TablePackingParams pack(int x, int y, double paddingX, double paddingY)
-	{
-		return new TablePackingParams( x, 1, paddingX, y, 1, paddingY );
-	}
-	
-	private TablePackingParams pack(int x, int y, int colspan, int rowspan, double paddingX, double paddingY)
-	{
-		return new TablePackingParams( x, colspan, paddingX, y, rowspan, paddingY );
+		return new TablePackingParams( x, colspan, y, rowspan );
 	}
 	
 	
@@ -44,12 +31,13 @@ public class Test_TableLayout extends Test_Layout_base
 	//
 	//
 	
-	private void reqTest(LReqBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingX, double spacingY, boolean bExpandX, boolean bExpandY,
-			HAlignment colAlignment, VAlignment rowAlignment, LReqBox expectedColumnBoxes[], LReqBox expectedRowBoxes[], LReqBox expectedParentBox)
+	private void reqTest(LReqBox children[], TablePackingParams packingParams[], int childAlignmentFlags[],
+			int numColumns, int numRows, double columnSpacing, double rowSpacing,
+			LReqBox expectedColumnBoxes[], LReqBox expectedRowBoxes[], LReqBox expectedParentBox)
 	{
 		LReqBox box = new LReqBox();
-		LReqBox columnBoxes[] = TableLayout.computeRequisitionX( box, children, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
-		LReqBox rowBoxes[] = TableLayout.computeRequisitionY( box, children, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
+		LReqBox columnBoxes[] = TableLayout.computeRequisitionX( box, children, packingParams, numColumns, numRows, columnSpacing, rowSpacing );
+		LReqBox rowBoxes[] = TableLayout.computeRequisitionY( box, children, packingParams, childAlignmentFlags, numColumns, numRows, columnSpacing, rowSpacing );
 		
 		for (int i = 0; i < numColumns; i++)
 		{
@@ -75,7 +63,10 @@ public class Test_TableLayout extends Test_Layout_base
 				new TablePackingParams[] {
 						pack( 0, 0 ),
 				},
-				1, 1, 0.0, 0.0, false, false, HAlignment.CENTRE, VAlignment.CENTRE,
+				new int[] {
+						HCENTRE | VCENTRE,
+				},
+				1, 1, 0.0, 0.0,
 				new LReqBox[] {
 						box( 10, 0, 0, 0 ),
 				},
@@ -96,7 +87,11 @@ public class Test_TableLayout extends Test_Layout_base
 						pack( 0, 0 ),			pack( 1, 0 ),
 						pack( 0, 1 ),			pack( 1, 1 ),
 				},
-				2, 2, 0.0, 0.0, false, false, HAlignment.CENTRE, VAlignment.CENTRE,
+				new int[] {
+						HCENTRE | VCENTRE,	HCENTRE | VCENTRE,
+						HCENTRE | VCENTRE,	HCENTRE | VCENTRE,
+				},
+				2, 2, 0.0, 0.0,
 				new LReqBox[] {
 						box( 15, 0, 0, 0 ),		box( 5, 0, 0, 0 ),
 				},
@@ -118,7 +113,11 @@ public class Test_TableLayout extends Test_Layout_base
 						pack( 0, 0 ),			pack( 1, 0 ),
 						pack( 0, 1 ),			pack( 1, 1 ),
 				},
-				2, 2, 1.0, 1.0, false, false, HAlignment.CENTRE, VAlignment.CENTRE,
+				new int[] {
+						HCENTRE | VCENTRE,	HCENTRE | VCENTRE,
+						HCENTRE | VCENTRE,	HCENTRE | VCENTRE,
+				},
+				2, 2, 1.0, 1.0,
 				new LReqBox[] {
 						box( 15, 0, 0, 0 ),		box( 5, 0, 0, 0 ),
 				},
@@ -144,7 +143,12 @@ public class Test_TableLayout extends Test_Layout_base
 						pack( 0, 1 ),			pack( 1, 1 ),			pack( 2, 1 ),
 						pack( 0, 2 ),			pack( 1, 2 ),			pack( 2, 2 ),
 				},
-				3, 3, 0.0, 0.0, false, false, HAlignment.CENTRE, VAlignment.CENTRE,
+				new int[] {
+						HCENTRE | VCENTRE,	HCENTRE | VCENTRE,	HCENTRE | VCENTRE,
+						HCENTRE | VCENTRE,	HCENTRE | VCENTRE,	HCENTRE | VCENTRE,
+						HCENTRE | VCENTRE,	HCENTRE | VCENTRE,	HCENTRE | VCENTRE,
+				},
+				3, 3, 0.0, 0.0,
 				new LReqBox[] {
 						box( 15, 0, 0, 0 ),		box( 8, 0, 0, 0 ),		box( 20, 0, 0, 0 ),
 				},
@@ -170,7 +174,12 @@ public class Test_TableLayout extends Test_Layout_base
 						pack( 0, 1 ),			pack( 1, 1 ),			pack( 2, 1 ),
 						pack( 0, 2 ),			pack( 1, 2 ),			pack( 2, 2 ),
 				},
-				3, 3, 1.0, 2.0, false, false, HAlignment.CENTRE, VAlignment.CENTRE,
+				new int[] {
+						HCENTRE | VCENTRE,	HCENTRE | VCENTRE,	HCENTRE | VCENTRE,
+						HCENTRE | VCENTRE,	HCENTRE | VCENTRE,	HCENTRE | VCENTRE,
+						HCENTRE | VCENTRE,	HCENTRE | VCENTRE,	HCENTRE | VCENTRE,
+				},
+				3, 3, 1.0, 2.0,
 				new LReqBox[] {
 						box( 15, 0, 0, 0 ),		box( 8, 0, 0, 0 ),		box( 20, 0, 0, 0 ),
 				},
@@ -197,7 +206,12 @@ public class Test_TableLayout extends Test_Layout_base
 						pack( 0, 1 ),								pack( 2, 1 ),
 						pack( 0, 2 ),			pack( 1, 2 ),			pack( 2, 2 ),
 				},
-				3, 3, 0.0, 0.0, false, false, HAlignment.CENTRE, VAlignment.CENTRE,
+				new int[] {
+						HCENTRE | VCENTRE,	HCENTRE | VCENTRE,	HCENTRE | VCENTRE,
+						HCENTRE | VCENTRE,						HCENTRE | VCENTRE,
+						HCENTRE | VCENTRE,	HCENTRE | VCENTRE,	HCENTRE | VCENTRE,
+				},
+				3, 3, 0.0, 0.0,
 				new LReqBox[] {
 						box( 15, 0, 0, 0 ),		box( 6, 0, 0, 0 ),		box( 20, 0, 0, 0 ),
 				},
@@ -224,7 +238,12 @@ public class Test_TableLayout extends Test_Layout_base
 						pack( 0, 1 ),			pack( 1, 1, 2, 1 ),
 						pack( 0, 2 ),			pack( 1, 2 ),			pack( 2, 2 ),
 				},
-				3, 3, 0.0, 0.0, false, false, HAlignment.CENTRE, VAlignment.CENTRE,
+				new int[] {
+						HCENTRE | VCENTRE,	HCENTRE | VCENTRE,	HCENTRE | VCENTRE,
+						HCENTRE | VCENTRE,	HCENTRE | VCENTRE,
+						HCENTRE | VCENTRE,	HCENTRE | VCENTRE,	HCENTRE | VCENTRE,
+				},
+				3, 3, 0.0, 0.0,
 				new LReqBox[] {
 						box( 15, 0, 0, 0 ),		box( 15, 0, 0, 0 ),		box( 25, 0, 0, 0 ),
 				},
@@ -251,7 +270,12 @@ public class Test_TableLayout extends Test_Layout_base
 						pack( 0, 1 ),			pack( 1, 1, 1, 2 ),		pack( 2, 1 ),
 						pack( 0, 2 ),								pack( 2, 2 ),
 				},
-				3, 3, 0.0, 0.0, false, false, HAlignment.CENTRE, VAlignment.CENTRE,
+				new int[] {
+						HCENTRE | VCENTRE,	HCENTRE | VCENTRE,	HCENTRE | VCENTRE,
+						HCENTRE | VCENTRE,	HCENTRE | VCENTRE,	HCENTRE | VCENTRE,
+						HCENTRE | VCENTRE,						HCENTRE | VCENTRE,
+				},
+				3, 3, 0.0, 0.0,
 				new LReqBox[] {
 						box( 15, 0, 0, 0 ),		box( 8, 0, 0, 0 ),		box( 20, 0, 0, 0 ),
 				},
@@ -278,7 +302,12 @@ public class Test_TableLayout extends Test_Layout_base
 						pack( 0, 1 ),			pack( 1, 1, 2, 2 ),		
 						pack( 0, 2 ),								
 				},
-				3, 3, 0.0, 0.0, false, false, HAlignment.CENTRE, VAlignment.CENTRE,
+				new int[] {
+						HCENTRE | VCENTRE,	HCENTRE | VCENTRE,	HCENTRE | VCENTRE,
+						HCENTRE | VCENTRE,	HCENTRE | VCENTRE,
+						HCENTRE | VCENTRE,
+				},
+				3, 3, 0.0, 0.0,
 				new LReqBox[] {
 						box( 15, 0, 0, 0 ),		box( 10, 0, 0, 0 ),		box( 25, 0, 0, 0 ),
 				},
@@ -305,7 +334,12 @@ public class Test_TableLayout extends Test_Layout_base
 						pack( 0, 1 ),			pack( 1, 1 ),			pack( 2, 1 ),
 						pack( 0, 2 ),			pack( 1, 2 ),			pack( 2, 2 ),
 				},
-				3, 3, 0.0, 0.0, false, false, HAlignment.CENTRE, VAlignment.BASELINES,
+				new int[] {
+						HCENTRE | VBASELINES,	HCENTRE | VBASELINES,	HCENTRE | VBASELINES,
+						HCENTRE | VBASELINES,	HCENTRE | VBASELINES,	HCENTRE | VBASELINES,
+						HCENTRE | VBASELINES,	HCENTRE | VBASELINES,	HCENTRE | VBASELINES,
+				},
+				3, 3, 0.0, 0.0,
 				new LReqBox[] {
 						box( 15, 0, 0, 0 ),		box( 8, 0, 0, 0 ),		box( 20, 0, 0, 0 ),
 				},
@@ -321,7 +355,7 @@ public class Test_TableLayout extends Test_Layout_base
 
 
 	
-
+/*
 	//
 	//
 	// ALLOCATION TESTS
@@ -683,5 +717,5 @@ public class Test_TableLayout extends Test_Layout_base
 						alloc( 0, 29, 0, 12 ),
 				}
 			);
-	}
+	}*/
 }

@@ -190,8 +190,8 @@ public class DPButton extends DPBin
 		DPWidget child = getChild();
 		if ( child != null )
 		{
-			double hborder = border.getLeftMargin() + border.getRightMargin();
 			double prevWidth = child.layoutAllocBox.getAllocationX();
+			double hborder = border.getLeftMargin() + border.getRightMargin();
 			layoutAllocBox.allocateChildXAligned( child.layoutAllocBox, child.layoutReqBox, child.getAlignmentFlags(), border.getLeftMargin(), layoutAllocBox.getAllocationX() - hborder );
 			child.refreshAllocationX( prevWidth );
 		}
@@ -205,9 +205,9 @@ public class DPButton extends DPBin
 		DPWidget child = getChild();
 		if ( child != null )
 		{
-			double vborder = border.getTopMargin() + border.getBottomMargin();
 			LAllocV prevAllocV = child.layoutAllocBox.getAllocV();
-			layoutAllocBox.allocateChildYAligned( child.layoutAllocBox, child.layoutReqBox, child.getAlignmentFlags(), border.getTopMargin(), layoutAllocBox.getAllocationY() - vborder );
+			layoutAllocBox.allocateChildYAligned( child.layoutAllocBox, child.layoutReqBox, child.getAlignmentFlags(),
+					border.getTopMargin(), layoutAllocBox.getAllocV().borderY( border.getTopMargin(), border.getBottomMargin() ) );
 			child.refreshAllocationY( prevAllocV );
 		}
 	}

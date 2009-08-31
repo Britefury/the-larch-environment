@@ -365,7 +365,7 @@ public class ParagraphLayout
 		
 		if ( lines.length == 1 )
 		{
-			allocBox.allocateChildY( lineAllocBoxes[0], 0.0, lineReqBoxes[0].getReqHeight() );
+			allocBox.allocateChildYAsRequisition( lineAllocBoxes[0], lineReqBoxes[0], 0.0 );
 		}
 		else
 		{

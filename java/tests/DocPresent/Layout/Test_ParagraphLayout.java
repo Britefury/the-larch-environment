@@ -187,7 +187,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		
 		assertBoxesEqual( box, expectedBox, "PARENT BOX" );
 
-		boxAlloc.setAllocationX( boxAllocation );
+		boxAlloc.allocateX( box, 0.0, boxAllocation );
 		ParagraphLayout.allocateX( box, children, boxAlloc, childrenAlloc, childAllocFlags, indentation, hSpacing );
 		for (int i = 0; i < children.length; i++)
 		{
@@ -315,7 +315,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		
 		// X
 		ParagraphLayout.computeRequisitionX( box, children, indentation, hSpacing );
-		boxAlloc.setAllocationX( boxAllocation );
+		boxAlloc.allocateX( box, 0.0, boxAllocation );
 		ParagraphLayout.Line lines[] = ParagraphLayout.allocateX( box, children, boxAlloc, childrenAlloc, childAllocFlags, indentation, hSpacing );
 		
 		// Y

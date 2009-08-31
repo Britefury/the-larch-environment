@@ -265,17 +265,9 @@ public class LReqBox
 	
 	public void borderY(double topMargin, double bottomMargin)
 	{
-		if ( hasBaseline() )
-		{
-			reqAscent += topMargin;
-			reqDescent += bottomMargin;
-			reqVSpacing = Math.max( reqVSpacing - bottomMargin, 0.0 );
-		}
-		else
-		{
-			reqAscent += topMargin + bottomMargin;
-			reqVSpacing = Math.max( reqVSpacing - bottomMargin, 0.0 );
-		}
+		reqAscent += topMargin;
+		reqDescent += bottomMargin;
+		reqVSpacing = Math.max( reqVSpacing - bottomMargin, 0.0 );
 	}
 	
 	public boolean equals(Object x)
