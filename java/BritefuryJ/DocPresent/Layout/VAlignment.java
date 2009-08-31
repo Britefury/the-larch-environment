@@ -13,5 +13,22 @@ public enum VAlignment
 	TOP,
 	CENTRE,
 	BOTTOM,
-	EXPAND
+	EXPAND;
+	
+	
+	public static VAlignment noBaselines(VAlignment vAlign)
+	{
+		if ( vAlign == VAlignment.BASELINES )
+		{
+			return CENTRE;
+		}
+		else if ( vAlign == VAlignment.BASELINES_EXPAND )
+		{
+			return EXPAND;
+		}
+		else
+		{
+			return vAlign;
+		}
+	}
 }

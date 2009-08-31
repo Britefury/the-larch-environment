@@ -15,8 +15,6 @@ import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.TableStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
@@ -71,7 +69,7 @@ public class TableTestPage extends SystemPage
 
 	protected static DPTable makeTable0()
 	{
-		TableStyleSheet tbls0 = new TableStyleSheet( VAlignment.BASELINES, HAlignment.CENTRE, 5.0, false, 0.0, 5.0, false, 0.0 );
+		TableStyleSheet tbls0 = new TableStyleSheet( 5.0, false, 5.0, false );
 		DPTable table = new DPTable( tbls0 );
 		for (int row = 0; row < 6; row++)
 		{
@@ -89,7 +87,7 @@ public class TableTestPage extends SystemPage
 		table.put( 2, 2, null );
 		table.put( 3, 2, null );
 		table.put( 4, 2, null );
-		table.put( 2, 2, 3, 1, wrapInOutline( text12( "<<wide>>" ) ) );
+		table.put( 2, 2, 3, 1, wrapInOutline( text12( "<<wide>>" ) ).alignHCentre() );
 		return table;
 	}
 	
@@ -99,7 +97,7 @@ public class TableTestPage extends SystemPage
 		table.put( 2, 2, null );
 		table.put( 2, 3, null );
 		table.put( 2, 4, null );
-		table.put( 2, 2, 1, 3, wrapInOutline( text18( "T" ) ) );
+		table.put( 2, 2, 1, 3, wrapInOutline( text18( "T" ) ).alignHCentre() );
 		return table;
 	}
 	
@@ -115,7 +113,7 @@ public class TableTestPage extends SystemPage
 		table.put( 4, 2, null );
 		table.put( 4, 3, null );
 		table.put( 4, 4, null );
-		table.put( 2, 2, 3, 3, wrapInOutline( text18( "T" ) ) );
+		table.put( 2, 2, 3, 3, wrapInOutline( text18( "T" ) ).alignHCentre() );
 		return table;
 	}
 	

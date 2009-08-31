@@ -13,14 +13,12 @@ import java.util.List;
 import org.python.core.Py;
 import org.python.core.PyTuple;
 
-import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.Layout.TableLayout;
 import BritefuryJ.DocPresent.Layout.TablePackingParams;
-import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.StyleSheets.TableStyleSheet;
 import BritefuryJ.Math.Point2;
 
@@ -97,7 +95,7 @@ public class DPTable extends DPContainer
 				{
 					if ( child != null )
 					{
-						registerChild( child, new TablePackingParams( x, 1, getPaddingX(), y, 1, getPaddingY() ) );
+						registerChild( child, new TablePackingParams( x, 1, y, 1 ) );
 					}
 					x++;
 				}
@@ -146,7 +144,7 @@ public class DPTable extends DPContainer
 					if ( child != null )
 					{
 						registeredChildren.add( child );
-						child.setParentPacking( new TablePackingParams( x, 1, getPaddingX(), y, 1, getPaddingY() ) );
+						child.setParentPacking( new TablePackingParams( x, 1, y, 1 ) );
 					}
 					x++;
 				}
@@ -337,7 +335,7 @@ public class DPTable extends DPContainer
 			// Register the child
 			if ( item != null )
 			{
-				registerChild( item, new TablePackingParams( x, colSpan, getPaddingX(), y, rowSpan, getPaddingY() ) );
+				registerChild( item, new TablePackingParams( x, colSpan, y, rowSpan ) );
 			}
 
 			onChildListModified();
@@ -347,7 +345,7 @@ public class DPTable extends DPContainer
 		{
 			if ( item != null )
 			{
-				item.setParentPacking( new TablePackingParams( x, colSpan, getPaddingX(), y, rowSpan, getPaddingY() ) );
+				item.setParentPacking( new TablePackingParams( x, colSpan, y, rowSpan ) );
 				// Queue a resize; width / height may have changed
 				queueResize();
 			}
@@ -472,15 +470,15 @@ public class DPTable extends DPContainer
 	{
 		refreshSize();
 		
-		LReqBox[] childBoxes = new LReqBox[registeredChildren.size()];
-		TablePackingParams[] packingParams = new TablePackingParams[registeredChildren.size()];
+		LReqBox childBoxes[] = new LReqBox[registeredChildren.size()];
+		TablePackingParams packingParams[] = new TablePackingParams[registeredChildren.size()];
 		for (int i = 0; i < registeredChildren.size(); i++)
 		{
 			childBoxes[i] = registeredChildren.get( i ).refreshRequisitionX();
 			packingParams[i] = (TablePackingParams)registeredChildren.get( i ).getParentPacking();
 		}
 
-		columnBoxes = TableLayout.computeRequisitionX( layoutReqBox, childBoxes, packingParams, numColumns, numRows, getSpacingX(), getSpacingY(), getExpandX(), getExpandY(), getColumnAlignment(), getRowAlignment() );
+		columnBoxes = TableLayout.computeRequisitionX( layoutReqBox, childBoxes, packingParams, numColumns, numRows, getColumnSpacing(), getRowSpacing() );
 		columnAllocBoxes = new LAllocBox[columnBoxes.length];
 		for (int i = 0; i < columnAllocBoxes.length; i++)
 		{
@@ -492,15 +490,17 @@ public class DPTable extends DPContainer
 	{
 		refreshSize();
 		
-		LReqBox[] childBoxes = new LReqBox[registeredChildren.size()];
-		TablePackingParams[] packingParams = new TablePackingParams[registeredChildren.size()];
+		LReqBox childBoxes[] = new LReqBox[registeredChildren.size()];
+		TablePackingParams packingParams[] = new TablePackingParams[registeredChildren.size()];
+		int childAlignmentFlags[] = new int[registeredChildren.size()];
 		for (int i = 0; i < registeredChildren.size(); i++)
 		{
 			childBoxes[i] = registeredChildren.get( i ).refreshRequisitionY();
 			packingParams[i] = (TablePackingParams)registeredChildren.get( i ).getParentPacking();
+			childAlignmentFlags[i] = registeredChildren.get( i ).getAlignmentFlags();
 		}
 
-		rowBoxes = TableLayout.computeRequisitionY( layoutReqBox, childBoxes, packingParams, numColumns, numRows, getSpacingX(), getSpacingY(), getExpandX(), getExpandY(), getColumnAlignment(), getRowAlignment() );
+		rowBoxes = TableLayout.computeRequisitionY( layoutReqBox, childBoxes, packingParams, childAlignmentFlags, numColumns, numRows, getColumnSpacing(), getRowSpacing() );
 		rowAllocBoxes = new LAllocBox[rowBoxes.length];
 		for (int i = 0; i < rowAllocBoxes.length; i++)
 		{
@@ -521,7 +521,8 @@ public class DPTable extends DPContainer
 		LReqBox childBoxes[] = new LReqBox[registeredChildren.size()];
 		LAllocBox childAllocBoxes[] = new LAllocBox[registeredChildren.size()];
 		double prevWidths[] = new double[registeredChildren.size()];
-		TablePackingParams[] packingParams = new TablePackingParams[registeredChildren.size()];
+		TablePackingParams packingParams[] = new TablePackingParams[registeredChildren.size()];
+		int childAllocationFlags[] = new int[registeredChildren.size()];
 		for (int i = 0; i < registeredChildren.size(); i++)
 		{
 			DPWidget child = registeredChildren.get( i );
@@ -529,9 +530,10 @@ public class DPTable extends DPContainer
 			childAllocBoxes[i] = child.layoutAllocBox;
 			prevWidths[i] = child.getAllocationX();
 			packingParams[i] = (TablePackingParams)child.getParentPacking();
+			childAllocationFlags[i] = child.getAlignmentFlags();
 		}
 		
-		TableLayout.allocateX( layoutReqBox, columnBoxes, childBoxes, layoutAllocBox, columnAllocBoxes, childAllocBoxes, packingParams, numColumns, numRows, getSpacingX(), getSpacingY(), getExpandX(), getExpandY(), getColumnAlignment(), getRowAlignment() );
+		TableLayout.allocateX( layoutReqBox, columnBoxes, childBoxes, layoutAllocBox, columnAllocBoxes, childAllocBoxes, packingParams, childAllocationFlags, numColumns, numRows, getColumnSpacing(), getRowSpacing(), getColumnExpand(), getRowExpand() );
 		
 		int i = 0;
 		for (DPWidget child: registeredChildren)
@@ -553,6 +555,7 @@ public class DPTable extends DPContainer
 		LAllocBox childAllocBoxes[] = new LAllocBox[registeredChildren.size()];
 		LAllocV prevAllocVs[] = new LAllocV[registeredChildren.size()];
 		TablePackingParams[] packingParams = new TablePackingParams[registeredChildren.size()];
+		int childAllocationFlags[] = new int[registeredChildren.size()];
 		for (int i = 0; i < registeredChildren.size(); i++)
 		{
 			DPWidget child = registeredChildren.get( i );
@@ -560,9 +563,10 @@ public class DPTable extends DPContainer
 			childAllocBoxes[i] = child.layoutAllocBox;
 			prevAllocVs[i] = child.getAllocV();
 			packingParams[i] = (TablePackingParams)child.getParentPacking();
+			childAllocationFlags[i] = child.getAlignmentFlags();
 		}
 		
-		TableLayout.allocateY( layoutReqBox, rowBoxes, childBoxes, layoutAllocBox, rowAllocBoxes, childAllocBoxes, packingParams, numColumns, numRows, getSpacingX(), getSpacingY(), getExpandX(), getExpandY(), getColumnAlignment(), getRowAlignment() );
+		TableLayout.allocateY( layoutReqBox, rowBoxes, childBoxes, layoutAllocBox, rowAllocBoxes, childAllocBoxes, packingParams, childAllocationFlags, numColumns, numRows, getColumnSpacing(), getRowSpacing(), getColumnExpand(), getRowExpand() );
 		
 		int i = 0;
 		for (DPWidget child: registeredChildren)
@@ -769,47 +773,24 @@ public class DPTable extends DPContainer
 	//
 	//
 	
-	protected VAlignment getRowAlignment()
+	protected double getColumnSpacing()
 	{
-		return ((TableStyleSheet)styleSheet).getRowAlignment();
+		return ((TableStyleSheet)styleSheet).getColumnSpacing();
 	}
 
-	protected HAlignment getColumnAlignment()
+	protected boolean getColumnExpand()
 	{
-		return ((TableStyleSheet)styleSheet).getColumnAlignment();
+		return ((TableStyleSheet)styleSheet).getColumnExpand();
 	}
 
 	
-	protected double getSpacingX()
+	protected double getRowSpacing()
 	{
-		return ((TableStyleSheet)styleSheet).getSpacingX();
+		return ((TableStyleSheet)styleSheet).getRowSpacing();
 	}
 
-	protected boolean getExpandX()
+	protected boolean getRowExpand()
 	{
-		return ((TableStyleSheet)styleSheet).getExpandX();
-	}
-	
-	
-	protected double getSpacingY()
-	{
-		return ((TableStyleSheet)styleSheet).getSpacingY();
-	}
-
-	protected boolean getExpandY()
-	{
-		return ((TableStyleSheet)styleSheet).getExpandY();
-	}
-
-
-
-	protected double getPaddingX()
-	{
-		return ((TableStyleSheet)styleSheet).getPaddingX();
-	}
-
-	protected double getPaddingY()
-	{
-		return ((TableStyleSheet)styleSheet).getPaddingY();
+		return ((TableStyleSheet)styleSheet).getRowExpand();
 	}
 }

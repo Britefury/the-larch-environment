@@ -9,15 +9,6 @@ package BritefuryJ.DocPresent.Layout;
 
 public class FractionLayout
 {
-	private static double BARHEIGHT = 1.5;
-	
-	
-	public static double getBarHeight()
-	{
-		return BARHEIGHT;
-	}
-	
-	
 	public static void computeRequisitionX(LReqBox box, LReqBox numerator, LReqBox bar, LReqBox denominator, double hPadding, double vSpacing, double baselinePos)
 	{
 		double minWidth = 0.0, prefWidth = 0.0;
@@ -40,11 +31,12 @@ public class FractionLayout
 	{
 		double numHeight = numerator != null  ?  numerator.getReqHeight()  :  0.0;
 		double numSpacing = numerator != null  ?  numerator.getReqVSpacing()  :  0.0;
+		double barHeight = bar != null  ?  bar.getReqHeight()  :  0.0;
 		double denomHeight = denominator != null  ?  denominator.getReqHeight()  :  0.0;
 		double denomSpacing = denominator != null  ?  denominator.getReqVSpacing()  :  0.0;
 		
 		
-		double halfBarHeight = bar != null  ?  BARHEIGHT * 0.5  :  0.0;
+		double halfBarHeight = barHeight * 0.5;
 		double ascent = numHeight + Math.max( numSpacing, vSpacing ) + halfBarHeight  +  baselineOffset;
 		double descent = halfBarHeight + vSpacing + denomHeight  -  baselineOffset;
 		
@@ -82,7 +74,6 @@ public class FractionLayout
 		{
 			boxAlloc.allocateChildX( barAlloc, 0.0, width );
 		}
-		
 	}
 
 	public static void allocateY(LReqBox box, LReqBox numerator, LReqBox bar, LReqBox denominator,
@@ -92,10 +83,9 @@ public class FractionLayout
 		
 		if ( numerator != null )
 		{
-			double childHeight = numerator.getReqHeight();
-			boxAlloc.allocateChildY( numeratorAlloc, y, childHeight );
+			boxAlloc.allocateChildYAsRequisition( numeratorAlloc, numerator, y );
 			
-			y += childHeight  +  Math.max( numerator.getReqVSpacing(), vSpacing );
+			y += numerator.getReqHeight()  +  Math.max( numerator.getReqVSpacing(), vSpacing );
 		}
 		else
 		{
@@ -104,10 +94,9 @@ public class FractionLayout
 		
 		if ( bar != null )
 		{
-			double childHeight = BARHEIGHT;
-			boxAlloc.allocateChildY( barAlloc, y, childHeight );
+			boxAlloc.allocateChildYAsRequisition( barAlloc, bar, y );
 			
-			y += childHeight  +  vSpacing;
+			y += bar.getReqHeight()  +  vSpacing;
 		}
 		else
 		{
@@ -116,8 +105,7 @@ public class FractionLayout
 		
 		if ( denominator != null )
 		{
-			double childHeight = denominator.getReqHeight();
-			boxAlloc.allocateChildY( denominatorAlloc, y, childHeight );
+			boxAlloc.allocateChildYAsRequisition( denominatorAlloc, denominator, y );
 		}
 	}
 }

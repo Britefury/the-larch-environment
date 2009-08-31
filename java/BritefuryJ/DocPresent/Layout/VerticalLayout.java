@@ -108,38 +108,9 @@ public class VerticalLayout
 
 	public static void allocateX(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], int childAllocationFlags[])
 	{
-		double allocation = allocBox.allocationX;
 		for (int i = 0; i < children.length; i++)
 		{
-			LReqBox child = children[i];
-			LAllocBox childAlloc = childrenAlloc[i];
-			
-			HAlignment alignment = ElementAlignment.getHAlignment( childAllocationFlags[i] );
-			if ( alignment == HAlignment.EXPAND )
-			{
-				allocBox.allocateChildX( childAlloc, 0.0, allocation );
-			}
-			else
-			{
-				double childWidth = Math.min( allocation, child.prefWidth );
-				
-				if ( alignment == HAlignment.LEFT )
-				{
-					allocBox.allocateChildX( childAlloc, 0.0, childWidth );
-				}
-				else if ( alignment == HAlignment.CENTRE )
-				{
-					allocBox.allocateChildX( childAlloc, ( allocation - childWidth )  *  0.5, childWidth );
-				}
-				else if ( alignment == HAlignment.RIGHT )
-				{
-					allocBox.allocateChildX( childAlloc, allocation - childWidth, childWidth );
-				}
-				else
-				{
-					throw new RuntimeException( "Invalid h-alignment" );
-				}
-			}
+			allocBox.allocateChildXAligned( childrenAlloc[i], children[i], childAllocationFlags[i], 0.0, allocBox.getAllocationX() );
 		}
 	}
 
@@ -170,7 +141,7 @@ public class VerticalLayout
 			{
 				LReqBox child = children[i];
 				LAllocBox childAlloc = childrenAlloc[i];
-				allocBox.allocateChildSpaceYByReq( childAlloc, child );
+				allocBox.allocateChildHeightAsRequisition( childAlloc, child );
 			}
 		}
 		else
@@ -186,11 +157,11 @@ public class VerticalLayout
 				VAlignment alignment = ElementAlignment.getVAlignment( childAllocationFlags[i] );
 				if ( alignment == VAlignment.EXPAND  ||  alignment == VAlignment.BASELINES_EXPAND )
 				{
-					allocBox.allocateChildSpaceYByReq( childAlloc, child, child.getReqHeight() + expandPerChild );
+					allocBox.allocateChildHeightPaddedRequisition( childAlloc, child, child.getReqHeight() + expandPerChild );
 				}
 				else
 				{
-					allocBox.allocateChildSpaceYByReq( childAlloc, child );
+					allocBox.allocateChildHeightAsRequisition( childAlloc, child );
 				}
 			}
 		}
@@ -249,7 +220,7 @@ public class VerticalLayout
 				{
 					LReqBox child = children[i];
 					LAllocBox childAlloc = childrenAlloc[i];
-					allocBox.allocateChildSpaceY( childAlloc, child.getReqHeight() );
+					allocBox.allocateChildHeightAsRequisition( childAlloc, child );
 				}
 			}
 			else
@@ -262,7 +233,7 @@ public class VerticalLayout
 				{
 					LReqBox child = children[i];
 					LAllocBox childAlloc = childrenAlloc[i];
-					allocBox.allocateChildSpaceY( childAlloc, child.getReqHeight() + expandPerChild );
+					allocBox.allocateChildHeightPaddedRequisition( childAlloc, child, child.getReqHeight() + expandPerChild );
 				}
 			}
 		}
@@ -275,7 +246,7 @@ public class VerticalLayout
 			{
 				LReqBox child = children[i];
 				LAllocBox childAlloc = childrenAlloc[i];
-				allocBox.allocateChildSpaceY( childAlloc, child.getReqHeight() );
+				allocBox.allocateChildHeightAsRequisition( childAlloc, child );
 			}
 		}
 	}

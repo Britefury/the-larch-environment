@@ -6,92 +6,55 @@
 //##************************
 package BritefuryJ.DocPresent.StyleSheets;
 
-import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.VAlignment;
 
 public class TableStyleSheet extends ContainerStyleSheet
 {
 	public static TableStyleSheet defaultStyleSheet = new TableStyleSheet();
 	
 	
-	protected VAlignment rowAlignment;
-	protected HAlignment columnAlignment;
+	protected double columnSpacing;
+	protected boolean columnExpand;
 
-	protected double spacingX;
-	protected boolean bExpandX;
-
-	protected double spacingY;
-	protected boolean bExpandY;
-
-	protected double paddingX;
-	protected double paddingY;
+	protected double rowSpacing;
+	protected boolean rowExpand;
 
 
 	public TableStyleSheet()
 	{
-		this( VAlignment.BASELINES, HAlignment.CENTRE, 0.0, false, 0.0, 0.0, false, 0.0 );
+		this( 0.0, false, 0.0, false );
 	}
 	
-	public TableStyleSheet(VAlignment rowAlignment, HAlignment columnAlignment,
-			double spacingX, boolean bExpandX, double paddingX, double spacingY, boolean bExpandY, double paddingY)
+	public TableStyleSheet(double columnSpacing, boolean columnExpand, double rowSpacing, boolean rowExpand)
 	{
 		super();
 		
-		this.rowAlignment = rowAlignment;
-		this.columnAlignment = columnAlignment;
+		this.columnSpacing = columnSpacing;
+		this.columnExpand = columnExpand;
 
-		this.spacingX = spacingX;
-		this.bExpandX = bExpandX;
-
-		this.spacingY = spacingY;
-		this.bExpandY = bExpandY;
-
-		this.paddingX = paddingX;
-		this.paddingY = paddingY;
+		this.rowSpacing = rowSpacing;
+		this.rowExpand = rowExpand;
 	}
 	
 	
 	
-	public VAlignment getRowAlignment()
+	public double getColumnSpacing()
 	{
-		return rowAlignment;
+		return columnSpacing;
 	}
 
-	public HAlignment getColumnAlignment()
+	public boolean getColumnExpand()
 	{
-		return columnAlignment;
-	}
-
-	
-	public double getSpacingX()
-	{
-		return spacingX;
-	}
-
-	public boolean getExpandX()
-	{
-		return bExpandX;
+		return columnExpand;
 	}
 
 
-	public double getSpacingY()
+	public double getRowSpacing()
 	{
-		return spacingY;
+		return rowSpacing;
 	}
 
-	public boolean getExpandY()
+	public boolean getRowExpand()
 	{
-		return bExpandY;
-	}
-
-	
-	public double getPaddingX()
-	{
-		return paddingX;
-	}
-
-	public double getPaddingY()
-	{
-		return paddingY;
+		return rowExpand;
 	}
 }

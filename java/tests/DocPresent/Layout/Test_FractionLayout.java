@@ -33,22 +33,22 @@ public class Test_FractionLayout extends Test_Layout_base
 		// max of numerator and denominator, add padding, ignore bar
 		reqTest( box( 20, 40, 0, 0, 10, 0 ), box( 50, 60, 0, 0, 10, 0 ), box( 10, 20, 0, 0, 20, 0 ),
 				5, 2, 5,
-				box( 30, 50, 0, 0, 10 + 2 + FractionLayout.getBarHeight() * 0.5  +  5, 20 + 2 + FractionLayout.getBarHeight() * 0.5  -  5, 0 ) );
+				box( 30, 50, 0, 0, 10 + 2 + 10 * 0.5  +  5, 20 + 2 + 10 * 0.5  -  5, 0 ) );
 
 		// max of numerator  and denominator, add padding, ignore bar, different v-spacing, different baseline position
 		reqTest( box( 10, 20, 0, 0, 20, 0 ), box( 50, 60, 0, 0, 10, 0 ), box( 20, 40, 0, 0, 10, 0 ),
 				6, 4, 7,
-				box( 32, 52, 0, 0, 20 + 4 + FractionLayout.getBarHeight() * 0.5  +  7, 10 + 4 + FractionLayout.getBarHeight() * 0.5  -  7, 0 ) );
+				box( 32, 52, 0, 0, 20 + 4 + 10 * 0.5  +  7, 10 + 4 + 10 * 0.5  -  7, 0 ) );
 
 		// no denominator
 		reqTest( box( 20, 40, 0, 0, 10, 0 ), box( 50, 60, 0, 0, 10, 0 ), null,
 				5, 2, 5,
-				box( 30, 50, 0, 0, 10 + 2 + FractionLayout.getBarHeight() * 0.5  +  5, 0 + 2 + FractionLayout.getBarHeight() * 0.5  -  5, 0 ) );
+				box( 30, 50, 0, 0, 10 + 2 + 10 * 0.5  +  5, 0 + 2 + 10 * 0.5  -  5, 0 ) );
 
 		// no numerator
 		reqTest( null, box( 50, 60, 0, 0, 10, 0 ), box( 10, 20, 0, 0, 20, 0 ),
 				5, 2, 5,
-				box( 20, 30, 0, 0, 0 + 2 + FractionLayout.getBarHeight() * 0.5  +  5, 20 + 2 + FractionLayout.getBarHeight() * 0.5  -  5, 0 ) );
+				box( 20, 30, 0, 0, 0 + 2 + 10 * 0.5  +  5, 20 + 2 + 10 * 0.5  -  5, 0 ) );
 
 		// no bar
 		reqTest( box( 20, 40, 0, 0, 10, 0 ), null, box( 10, 20, 0, 0, 20, 0 ),
@@ -73,11 +73,11 @@ public class Test_FractionLayout extends Test_Layout_base
 		LAllocBox allocBox = new LAllocBox( null );
 		LAllocBox numAlloc = new LAllocBox( null ), barAlloc = new LAllocBox( null ), denomAlloc = new LAllocBox( null );
 		FractionLayout.computeRequisitionX( box, numerator, bar, denominator, hPadding, vSpacing, baselinePos );
-		allocBox.setAllocationX( allocX );
+		allocBox.allocateX( box, 0.0, allocX );
 		FractionLayout.allocateX( box, numerator, bar, denominator, allocBox, numAlloc, barAlloc, denomAlloc, hPadding, vSpacing, baselinePos );
 
 		FractionLayout.computeRequisitionY( box, numerator, bar, denominator, hPadding, vSpacing, baselinePos );
-		allocBox.setAllocationY( allocY );
+		allocBox.allocateY( box, 0.0, allocY );
 		FractionLayout.allocateY( box, numerator, bar, denominator, allocBox, numAlloc, barAlloc, denomAlloc, hPadding, vSpacing, baselinePos );
 
 		
@@ -99,29 +99,31 @@ public class Test_FractionLayout extends Test_Layout_base
 
 	public void test_allocation()
 	{
+		double barHeight = 1.5;
+		
 		// numerator, bar, denominator
-		allocTest( box( 20, 40, 0, 0, 10, 0 ), box( 50, 60, 0, 0, 10, 0 ), box( 10, 20, 0, 0, 20, 0 ),
+		allocTest( box( 20, 40, 0, 0, 10, 0 ), box( 50, 60, 0, 0, barHeight, 0 ), box( 10, 20, 0, 0, 20, 0 ),
 				5, 2, 5,
 				100, 200,
-				alloc( 5, 0, 40, 10 ), alloc( 0, 12, 50, FractionLayout.getBarHeight() ), alloc( 15, 12 + FractionLayout.getBarHeight() + 2, 20, 20 ) );
+				alloc( 5, 0, 40, 10 ), alloc( 0, 12, 50, barHeight ), alloc( 15, 12 + barHeight + 2, 20, 20 ) );
 
 		// numerator and denominator swapped, different hpadding, vspacing, baseline offset
-		allocTest( box( 10, 20, 0, 0, 20, 0 ), box( 50, 60, 0, 0, 10, 0 ), box( 20, 40, 0, 0, 10, 0 ),
+		allocTest( box( 10, 20, 0, 0, 20, 0 ), box( 50, 60, 0, 0, barHeight, 0 ), box( 20, 40, 0, 0, 10, 0 ),
 				6, 4, 7,
 				100, 200,
-				alloc( 16, 0, 20, 20 ), alloc( 0, 24, 52, FractionLayout.getBarHeight() ), alloc( 6, 24 + FractionLayout.getBarHeight() + 4, 40, 10 ) );
+				alloc( 16, 0, 20, 20 ), alloc( 0, 24, 52, barHeight ), alloc( 6, 24 + barHeight + 4, 40, 10 ) );
 
 		// no denominator
-		allocTest( box( 20, 40, 0, 0, 10, 0 ), box( 50, 60, 0, 0, 10, 0 ), null,
+		allocTest( box( 20, 40, 0, 0, 10, 0 ), box( 50, 60, 0, 0, barHeight, 0 ), null,
 				5, 2, 5,
 				100, 200,
-				alloc( 5, 0, 40, 10 ), alloc( 0, 12, 50, FractionLayout.getBarHeight() ), null );
+				alloc( 5, 0, 40, 10 ), alloc( 0, 12, 50, barHeight ), null );
 
 		// no numerator
-		allocTest( null, box( 50, 60, 0, 0, 10, 0 ), box( 10, 20, 0, 0, 20, 0 ),
+		allocTest( null, box( 50, 60, 0, 0, barHeight, 0 ), box( 10, 20, 0, 0, 20, 0 ),
 				5, 2, 5,
 				100, 200,
-				null, alloc( 0, 2, 30, FractionLayout.getBarHeight() ), alloc( 5, 2 + FractionLayout.getBarHeight() + 2, 20, 20 ) );
+				null, alloc( 0, 2, 30, barHeight ), alloc( 5, 2 + barHeight + 2, 20, 20 ) );
 
 		// no bar
 		allocTest( box( 20, 40, 0, 0, 10, 0 ), null, box( 10, 20, 0, 0, 20, 0 ),

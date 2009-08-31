@@ -72,22 +72,12 @@ public class Test_Layout_base extends TestCase
 
 	protected LAllocBox alloc(double x, double y, double w, double h)
 	{
-		LAllocBox box = new LAllocBox( null );
-		box.setAllocationX( w );
-		box.setAllocationY( h );
-		box.setPositionInParentSpaceX( x );
-		box.setPositionInParentSpaceY( y );
-		return box;
+		return new LAllocBox( x, y, w, h * 0.5, h * 0.5, null, false );
 	}
 	
 	protected LAllocBox alloc(double x, double y, double w, double a, double d)
 	{
-		LAllocBox box = new LAllocBox( null );
-		box.setAllocationX( w );
-		box.setAllocationY( a, d );
-		box.setPositionInParentSpaceX( x );
-		box.setPositionInParentSpaceY( y );
-		return box;
+		return new LAllocBox( x, y, w, a, d, null, false );
 	}
 	
 	

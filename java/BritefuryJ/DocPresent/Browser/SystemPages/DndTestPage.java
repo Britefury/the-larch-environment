@@ -25,8 +25,6 @@ import BritefuryJ.DocPresent.Input.DndDrop;
 import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
-import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TableStyleSheet;
 
@@ -146,7 +144,7 @@ public class DndTestPage extends SystemPage
 		DPWidget dest1 = makeDestElement( "xyz" );
 		
 		
-		TableStyleSheet tableStyle = new TableStyleSheet( VAlignment.BASELINES, HAlignment.LEFT, 25.0, false, 0.0, 25.0, false, 0.0 );
+		TableStyleSheet tableStyle = new TableStyleSheet( 25.0, false, 25.0, false );
 		
 		
 		DPTable table = new DPTable( tableStyle );
