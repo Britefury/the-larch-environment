@@ -1422,6 +1422,17 @@ abstract public class DPWidget extends PointerInputElement
 	}
 	
 	
+	protected void onAllocationXRefreshed()
+	{
+		clearFlagSizeUpToDate();
+	}
+	
+	protected void onAllocationYRefreshed()
+	{
+		onSizeRefreshed();
+	}
+	
+
 	protected void onSizeRefreshed()
 	{
 		clearFlagResizeQueued();

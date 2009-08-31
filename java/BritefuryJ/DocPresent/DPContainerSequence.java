@@ -298,7 +298,7 @@ abstract public class DPContainerSequence extends DPContainer
 	}
 	
 	
-	protected void insert(int index, DPWidget child)
+	public void insert(int index, DPWidget child)
 	{
 		assert !hasChild( child );
 		
@@ -309,7 +309,7 @@ abstract public class DPContainerSequence extends DPContainer
 	}
 	
 	
-	protected void remove(DPWidget child)
+	public void remove(DPWidget child)
 	{
 		assert hasChild( child );
 		

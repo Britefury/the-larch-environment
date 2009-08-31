@@ -21,6 +21,7 @@ public class SystemDirectory
 		testPages.add( new DiagramTestPage() );
 		testPages.add( new DndTestPage() );
 		testPages.add( new FractionTestPage() );
+		testPages.add( new GridTestPage() );
 		testPages.add( new HBoxTestPage() );
 		testPages.add( new MathRootTestPage() );
 		testPages.add( new ParagraphCollationTestPage() );
