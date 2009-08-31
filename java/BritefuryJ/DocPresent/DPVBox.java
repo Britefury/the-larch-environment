@@ -49,7 +49,7 @@ public class DPVBox extends DPAbstractBox
 	{
 		refreshCollation();
 		
-		LReqBox[] childBoxes = new LReqBox[collationLeaves.length];
+		LReqBox childBoxes[] = new LReqBox[collationLeaves.length];
 		for (int i = 0; i < collationLeaves.length; i++)
 		{
 			childBoxes[i] = collationLeaves[i].refreshRequisitionX();
@@ -60,7 +60,7 @@ public class DPVBox extends DPAbstractBox
 
 	protected void updateRequisitionY()
 	{
-		LReqBox[] childBoxes = new LReqBox[collationLeaves.length];
+		LReqBox childBoxes[] = new LReqBox[collationLeaves.length];
 		for (int i = 0; i < collationLeaves.length; i++)
 		{
 			childBoxes[i] = collationLeaves[i].refreshRequisitionY();

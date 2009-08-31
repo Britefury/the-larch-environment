@@ -235,20 +235,18 @@ public class HorizontalLayout
 
 
 	
-	
-	public static void allocateY(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], int childAllocationFlags[])
+	public static LAllocV computeVerticalAllocationForRow(LReqBox box, LAllocBox allocBox)
 	{
 		// Compute the amount of space allocated (do not allow to fall below minimum requirement)
 		double allocationHeight = Math.max( allocBox.getAllocationY(), box.getReqHeight() );
 		
 		double ascent = 0.0, descent = 0.0;
 		
-		LAllocV h = null;
 		if ( allocBox.hasBaseline() )
 		{
 			ascent = Math.max( allocBox.getAllocationAscent(), box.getReqAscent() );
 			descent = Math.max( allocBox.getAllocationDescent(), box.getReqDescent() );
-			h = new LAllocV( ascent, descent );
+			return new LAllocV( ascent, descent );
 		}
 		else
 		{
@@ -260,14 +258,18 @@ public class HorizontalLayout
 			{
 				ascent = box.getReqAscent() + delta * 0.5;
 				descent = box.getReqDescent() + delta * 0.5;
-				h = new LAllocV( ascent, descent );
+				return new LAllocV( ascent, descent );
 			}
 			else
 			{
-				h = new LAllocV( allocationHeight );
+				return new LAllocV( allocationHeight );
 			}
 		}
-
+	}
+	
+	public static void allocateY(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], int childAllocationFlags[])
+	{
+		LAllocV h = computeVerticalAllocationForRow( box, allocBox );
 		
 		for (int i = 0; i < children.length; i++)
 		{

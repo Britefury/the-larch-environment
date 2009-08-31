@@ -268,10 +268,6 @@ public class TableLayout
 	}
 	
 
-
-	
-	
-	
 	
 	public static void allocateY(LReqBox box, LReqBox rowBoxes[], LReqBox children[],
 			LAllocBox allocBox, LAllocBox rowAllocBoxes[], LAllocBox childrenAlloc[],
@@ -280,6 +276,12 @@ public class TableLayout
 	{
 		// Allocate space to the columns
 		VerticalLayout.allocateY( box, rowBoxes, allocBox, rowAllocBoxes, rowSpacing, bRowExpand );
+		
+		LAllocV rowH[] = new LAllocV[numRows];
+		for (int r = 0; r < numRows; r++)
+		{
+			rowH[r] = HorizontalLayout.computeVerticalAllocationForRow( rowBoxes[r], rowAllocBoxes[r] );
+		}
 		
 		// Allocate children
 		for (int i = 0; i < children.length; i++)
@@ -292,16 +294,24 @@ public class TableLayout
 
 			int startRow = packing.y;
 			int endRow = packing.y + packing.rowSpan;
-			if ( packing.rowSpan != 1 )
-			{
-				vAlign = VAlignment.noBaselines( vAlign );
-			}
-			LAllocBox startRowAlloc = rowAllocBoxes[startRow], endRowAlloc = rowAllocBoxes[endRow-1];
+			LAllocBox startRowAlloc = rowAllocBoxes[startRow];
 			double yStart = startRowAlloc.positionInParentSpaceY;
-			double yEnd = endRowAlloc.positionInParentSpaceY + endRowAlloc.getAllocationY();
-			double heightAvailable = yEnd - yStart;
+
+			LAllocV height = null;
+			if ( packing.rowSpan == 1 )
+			{
+				height = rowH[packing.y];
+			}
+			else
+			{
+				LAllocBox endRowAlloc = rowAllocBoxes[endRow-1];
+				double yEnd = endRowAlloc.positionInParentSpaceY + endRowAlloc.getAllocationY();
+				double heightAvailable = yEnd - yStart;
+				vAlign = VAlignment.noBaselines( vAlign );
+				height = new LAllocV( heightAvailable );
+			}
 				
-			allocBox.allocateChildYAligned( childAlloc, childRequisition, vAlign, yStart, new LAllocV( heightAvailable ) );
+			allocBox.allocateChildYAligned( childAlloc, childRequisition, vAlign, yStart, height );
 		}
 	}
 }
