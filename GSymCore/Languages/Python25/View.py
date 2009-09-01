@@ -23,7 +23,7 @@ from Britefury.Util.NodeUtil import *
 from BritefuryJ.DocPresent.StyleSheets import *
 from BritefuryJ.DocPresent import *
 
-from BritefuryJ.GSym.View import GSymViewContext, GSymViewPage
+from BritefuryJ.GSym.View import GSymViewContext
 from BritefuryJ.GSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
 
@@ -1571,32 +1571,11 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 
 
-class _Python25ViewPage (GSymViewPage):
-	def __init__(self, docRootNode, locationPrefix, location, commandHistory, app):
-		self._docRootNode = docRootNode
-		self._location = location
-		self._commandHistory = commandHistory
-		self._app = app
-		self._viewFn = Python25View()
-		viewContext = GSymViewContext( docRootNode, self._viewFn, commandHistory, self )
-		self._frame = viewContext.getFrame()
-		self._frame.setEditHandler( Python25EditHandler( viewContext ) )
 
-
-	def getContentsElement(self):
-		return self._frame
-		
-		
-	def getCommandHistoryController(self):
-		return self._commandHistory
-	
-	def setCommandHistoryListener(self, listener):
-		self._commandHistory.setCommandHistoryListener( listener )
-
-
-
-
-def viewLocationAsPage(document, docRootNode, locationPrefix, location, commandHistory, app):
-	return _Python25ViewPage( docRootNode, locationPrefix, location, commandHistory, app )
+def viewLocationAsElement(document, docRootNode, locationPrefix, location, commandHistory, app):
+	viewContext = GSymViewContext( docRootNode, Python25View(), commandHistory )
+	editHandler = Python25EditHandler( viewContext )
+	viewContext.getFrame().setEditHandler( editHandler )
+	return viewContext.getFrame()
 
 
