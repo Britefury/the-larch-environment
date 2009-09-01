@@ -55,6 +55,7 @@ class GSymWorld (object):
 		self._plugins = GSymPlugin.loadPlugins( pluginOverrides )
 		self._languages = {}
 		self._locationToDocument = {}
+		self._documentIDCounter = 1
 		self.newPageFactories = []
 		self.newDocumentFactories = []
 		self.pageImporters = []
@@ -79,15 +80,19 @@ class GSymWorld (object):
 		
 	def registerPageImporter(self, plugin, pageImporter):
 		self.pageImporters.append( pageImporter )
-
 		
-	
-	def addDocument(self, location, document):
+		
+	def addNewDocument(self, document):
+		location = 'Doc%03d'  %  self._documentIDCounter
 		if location in self._locationToDocument:
 			raise KeyError
 		else:
 			self._locationToDocument[location] = document
+		return location
 		
+		
+	
+
 		
 	def getDocument(self, location):
 		try:

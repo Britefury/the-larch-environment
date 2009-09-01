@@ -138,14 +138,14 @@ class AppView (GSymViewObjectNodeDispatch):
 				world = ctx.getViewContext().getPage()._app.getWorld()
 				
 				name = _newDocumentName( openDocuments )
-				location = _uniqueDocumentLocation( openDocuments, name )
-				
-				appDoc = Nodes.AppDocument( name=name, location=location )
-				openDocuments.append( appDoc )
 				
 				doc = GSymDocument( world, unit )
 				doc.setDocumentName( name )
-				world.addDocument( location, doc )
+				location = world.addNewDocument( doc )
+
+				appDoc = Nodes.AppDocument( name=name, location=location )
+				openDocuments.append( appDoc )
+				
 				
 			ctx.getViewContext().getPage()._app.promptNewDocument( handleNewDocumentFn )
 		
@@ -157,14 +157,13 @@ class AppView (GSymViewObjectNodeDispatch):
 				
 				head, documentName = os.path.split( fullPath )
 				documentName, ext = os.path.splitext( documentName )
-				document.setDocumentName( documentName )
 				
-				location = _uniqueDocumentLocation( openDocuments, documentName )
+				document.setDocumentName( documentName )
+				location = world.addNewDocument( document )
 				
 				appDoc = Nodes.AppDocument( name=documentName, location=location )
 				openDocuments.append( appDoc )
-				
-				world.addDocument( location, document )
+
 				
 			ctx.getViewContext().getPage()._app.promptOpenDocument( handleOpenedDocumentFn )
 
@@ -179,8 +178,12 @@ class AppView (GSymViewObjectNodeDispatch):
 		openLink = ctx.link( app_linkStyle, 'OPEN', _onOpen )
 		controlsBox = ctx.hbox( app_openDocumentsControlsBoxStyle, [ newLink.padX( 5.0 ), openLink.padX( 5.0 ) ] )
 		controlsBorder = ctx.border( app_openDocumentsControlsBorder, controlsBox )
-		listBox = ctx.vbox( app_openDocumentsListBoxStyle, ctx.mapViewEval( openDocuments, _AppViewState( '' ) ) )
-		openDocumentsContentsBox = ctx.vbox( app_openDocumentsBoxStyle, [ controlsBorder.pad( 2.0, 2.0 ), ctx.line( app_openDocumentsLineStyle ).alignHExpand(), listBox.pad( 10.0, 2.0 ) ] )
+		
+		openDocumentsSeparatingLine = ctx.line( app_openDocumentsLineStyle )
+		
+		docListBox = ctx.rgrid( app_openDocumentsGridStyle, ctx.mapViewEval( openDocuments, _AppViewState( '' ) ) )
+
+		openDocumentsContentsBox = ctx.vbox( app_openDocumentsBoxStyle, [ controlsBorder.pad( 2.0, 2.0 ), openDocumentsSeparatingLine.alignHExpand(), docListBox.pad( 10.0, 2.0 ) ] )
 		openDocumentsBox = tabbedBox( ctx, 'Documents', openDocumentsContentsBox )
 		
 		contentBox = ctx.vbox( app_contentBoxStyle, [ linkHeader, title, openDocumentsBox.pad( 10.0, 10.0 ).alignHLeft() ] )
@@ -191,11 +194,37 @@ class AppView (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod
 	def AppDocument(self, ctx, state, node, name, location):
+		def _onSave(link):
+			world = ctx.getViewContext().getPage()._app.getWorld()
+			document = world.getDocument( location )
+			
+			if document._filename is None:
+				def handleSaveDocumentAsFn(filename):
+					document.saveAs( filename )
+				
+				ctx.getViewContext().getPage()._app.promptSaveDocumentAs( handleSaveDocumentAsFn )
+			else:
+				document.save()
+				
+		
+		def _onSaveAs(link):
+			world = ctx.getViewContext().getPage()._app.getWorld()
+			document = world.getDocument( location )
+			
+			def handleSaveDocumentAsFn(filename):
+				document.saveAs( filename )
+			
+			ctx.getViewContext().getPage()._app.promptSaveDocumentAs( handleSaveDocumentAsFn )
+
+			
+			
 		loc, = state
 		
-		docLink = ctx.link( app_docLinkStyle, name, location )
+		docLink = ctx.border( app_docLinkBorder, ctx.link( app_docLinkStyle, name, location ) )
+		saveLink = ctx.link( app_docLinkStyle, 'SAVE', _onSave )
+		saveAsLink = ctx.link( app_docLinkStyle, 'SAVE AS', _onSaveAs )
 
-		return docLink
+		return ctx.gridRow( app_docGridRowStyle, [ docLink, saveLink, saveAsLink ] )
 
 
 

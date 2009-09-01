@@ -167,6 +167,19 @@ public class LAllocBox
 		allocationDescent = Math.max( allocV.descent, requisition.getReqDescent() );
 		bHasBaseline = allocV.bHasBaseline;
 	}
+
+	
+	public void allocateX(LAllocBox box)
+	{
+		allocationX = box.allocationX;
+	}
+	
+	public void allocateY(LAllocBox box)
+	{
+		allocationAscent = box.allocationAscent;
+		allocationDescent = box.allocationDescent;
+		bHasBaseline = box.bHasBaseline;
+	}
 	
 	public void allocateSize(LAllocBox box)
 	{
