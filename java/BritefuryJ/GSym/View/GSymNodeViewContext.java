@@ -43,6 +43,7 @@ import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.StyleSheets.ButtonStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.FractionStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.GridRowStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.LineStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.LinkStyleSheet;
@@ -338,7 +339,7 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	}
 	
 
-	public DPWidget gridRow(ContainerStyleSheet styleSheet, List<DPWidget> children)
+	public DPWidget gridRow(GridRowStyleSheet styleSheet, List<DPWidget> children)
 	{
 		viewInstance.getView().profile_startElement();
 		DPGridRow element = new DPGridRow( styleSheet );

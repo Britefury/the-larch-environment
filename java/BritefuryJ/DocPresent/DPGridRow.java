@@ -15,7 +15,7 @@ import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.PackingParams;
-import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
+import BritefuryJ.DocPresent.StyleSheets.GridRowStyleSheet;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 
@@ -23,10 +23,10 @@ public class DPGridRow extends DPContainerSequenceCollationRoot
 {
 	public DPGridRow()
 	{
-		this( ContainerStyleSheet.defaultStyleSheet );
+		this( GridRowStyleSheet.defaultStyleSheet );
 	}
 	
-	public DPGridRow(ContainerStyleSheet syleSheet)
+	public DPGridRow(GridRowStyleSheet syleSheet)
 	{
 		super( syleSheet );
 	}
@@ -134,6 +134,12 @@ public class DPGridRow extends DPContainerSequenceCollationRoot
 	{
 		return getCollatedChildren();
 	}
+	
+	
+	
+	//
+	// Style methods
+	//
 
 
 	protected PackingParams getDefaultPackingParams()
