@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.Layout.GridLayout;
@@ -15,9 +16,10 @@ import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
+import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 
-public class DPGridRow extends DPContainerSequence
+public class DPGridRow extends DPContainerSequenceCollationRoot
 {
 	public DPGridRow()
 	{
@@ -34,10 +36,12 @@ public class DPGridRow extends DPContainerSequence
 	
 	protected void updateRequisitionX()
 	{
-		LReqBox childBoxes[] = new LReqBox[registeredChildren.size()];
-		for (int i = 0; i < registeredChildren.size(); i++)
+		refreshCollation();
+		
+		LReqBox childBoxes[] = new LReqBox[collationLeaves.length];
+		for (int i = 0; i < collationLeaves.length; i++)
 		{
-			childBoxes[i] = registeredChildren.get( i ).refreshRequisitionX();
+			childBoxes[i] = collationLeaves[i].refreshRequisitionX();
 		}
 
 		HorizontalLayout.computeRequisitionX( layoutReqBox, childBoxes, 0.0 );
@@ -45,12 +49,12 @@ public class DPGridRow extends DPContainerSequence
 
 	protected void updateRequisitionY()
 	{
-		LReqBox childBoxes[] = new LReqBox[registeredChildren.size()];
-		int childAllocFlags[] = new int[registeredChildren.size()];
-		for (int i = 0; i < registeredChildren.size(); i++)
+		LReqBox childBoxes[] = new LReqBox[collationLeaves.length];
+		int childAllocFlags[] = new int[collationLeaves.length];
+		for (int i = 0; i < collationLeaves.length; i++)
 		{
-			childBoxes[i] = registeredChildren.get( i ).refreshRequisitionY();
-			childAllocFlags[i] = registeredChildren.get( i ).getAlignmentFlags();
+			childBoxes[i] = collationLeaves[i].refreshRequisitionY();
+			childAllocFlags[i] = collationLeaves[i].getAlignmentFlags();
 		}
 
 		GridLayout.computeRowRequisitionY( layoutReqBox, childBoxes, childAllocFlags );
@@ -63,15 +67,15 @@ public class DPGridRow extends DPContainerSequence
 	{
 		super.updateAllocationX();
 		
-		LReqBox childBoxes[] = getChildrenRequisitionBoxes();
-		LAllocBox childAllocBoxes[] = getChildrenAllocationBoxes();
-		int childAllocFlags[] = getChildrenAlignmentFlags();
-		double prevWidths[] = getChildrenAllocationX();
+		LReqBox childBoxes[] = getCollatedChildrenRequisitionBoxes();
+		LAllocBox childAllocBoxes[] = getCollatedChildrenAllocationBoxes();
+		int childAllocFlags[] = getCollatedChildrenAlignmentFlags();
+		double prevWidths[] = getCollatedChildrenAllocationX();
 		
 		HorizontalLayout.allocateX( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, childAllocFlags, 0.0 );
 		
 		int i = 0;
-		for (DPWidget child: registeredChildren)
+		for (DPWidget child: collationLeaves)
 		{
 			child.refreshAllocationX( prevWidths[i] );
 			i++;
@@ -84,15 +88,15 @@ public class DPGridRow extends DPContainerSequence
 	{
 		super.updateAllocationY();
 		
-		LReqBox childBoxes[] = getChildrenRequisitionBoxes();
-		LAllocBox childAllocBoxes[] = getChildrenAllocationBoxes();
-		int childAlignmentFlags[] = getChildrenAlignmentFlags();
-		LAllocV prevAllocVs[] = getChildrenAllocV();
+		LReqBox childBoxes[] = getCollatedChildrenRequisitionBoxes();
+		LAllocBox childAllocBoxes[] = getCollatedChildrenAllocationBoxes();
+		int childAlignmentFlags[] = getCollatedChildrenAlignmentFlags();
+		LAllocV prevAllocVs[] = getCollatedChildrenAllocV();
 		
 		GridLayout.allocateRowY( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, childAlignmentFlags );
 		
 		int i = 0;
-		for (DPWidget child: registeredChildren)
+		for (DPWidget child: collationLeaves)
 		{
 			child.refreshAllocationY( prevAllocVs[i] );
 			i++;
@@ -103,18 +107,32 @@ public class DPGridRow extends DPContainerSequence
 	
 	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
 	{
-		return getChildLeafClosestToLocalPointHorizontal( registeredChildren, localPos, filter );
+		return getChildLeafClosestToLocalPointHorizontal( Arrays.asList( collationLeaves ), localPos, filter );
 	}
 
 
 
+	protected AABox2[] computeCollatedBranchBoundsBoxes(DPContainer collatedBranch, int rangeStart, int rangeEnd)
+	{
+		refreshCollation();
+		
+		DPWidget startLeaf = collationLeaves[rangeStart];
+		DPWidget endLeaf = collationLeaves[rangeEnd-1];
+		double xStart = startLeaf.getPositionInParentSpaceX();
+		double xEnd = endLeaf.getPositionInParentSpaceX()  +  endLeaf.getAllocationInParentSpaceX();
+		AABox2 box = new AABox2( xStart, 0.0, xEnd, getAllocationY() );
+		return new AABox2[] { box };
+	}
+
+	
+	
 	//
 	// Focus navigation methods
 	//
 	
 	protected List<DPWidget> horizontalNavigationList()
 	{
-		return getChildren();
+		return getCollatedChildren();
 	}
 
 

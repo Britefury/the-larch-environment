@@ -12,6 +12,7 @@ import java.awt.Font;
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPGridRow;
 import BritefuryJ.DocPresent.DPRGrid;
+import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
@@ -41,6 +42,7 @@ public class GridTestPage extends SystemPage
 
 	private static TextStyleSheet t12 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
 	private static TextStyleSheet t18 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 18 ), Color.BLACK );
+	private static VBoxStyleSheet sectionStyle = new VBoxStyleSheet( 5.0 );
 	private static SolidBorder b = new SolidBorder( 2.0, 3.0, new Color( 0.0f, 0.3f, 0.7f ), new Color( 1.0f, 0.99f, 0.9f ) );
 	private static SolidBorder outlineBorder = new SolidBorder( 1.0, 0.0, new Color( 0.0f, 0.3f, 0.7f ), null );
 
@@ -61,12 +63,27 @@ public class GridTestPage extends SystemPage
 		return border;
 	}
 	
-	protected static DPWidget wrapInBorder(DPWidget w)
+	protected static DPWidget section(String description, DPWidget w)
 	{
+		DPWidget descriptionParagraph = createTextParagraph( description );
 		DPBorder border = new DPBorder( b );
 		border.setChild( w );
-		return border;
+		DPVBox sectionBox = new DPVBox( sectionStyle );
+		sectionBox.setChildren( new DPWidget[] { descriptionParagraph, border } );
+		return sectionBox;
 	}
+	
+	
+	protected static DPWidget span(int row, int startCol, int endCol)
+	{
+		DPSpan span = new DPSpan();
+		for (int col = startCol; col < endCol; col++)
+		{
+			span.append( wrapInOutline( text12( "<" + col + "_" + row + ">" ) ) );
+		}
+		return span;
+	}
+	
 
 	protected static DPGridRow makeGridRow(int row)
 	{
@@ -75,6 +92,18 @@ public class GridTestPage extends SystemPage
 		{
 			table.append( wrapInOutline( text12( "<" + col + "_" + row + ">" ) ) );
 		}
+		return table;
+	}
+	
+	protected static DPGridRow makeGridRowCollated(int row)
+	{
+		DPGridRow table = new DPGridRow();
+		for (int col = 0; col < 2; col++)
+		{
+			table.append( wrapInOutline( text12( "<" + col + "_" + row + ">" ) ) );
+		}
+		table.append( span( row, 2, 5 ) );
+		table.append( wrapInOutline( text12( "<" + 5 + "_" + row + ">" ) ) );
 		return table;
 	}
 	
@@ -89,7 +118,7 @@ public class GridTestPage extends SystemPage
 		return grid;
 	}
 	
-	protected static DPRGrid makeGrid1()
+	protected static DPRGrid makeGridwithShorenedRow()
 	{
 		DPRGrid grid = makeGrid();
 		DPGridRow row2 = (DPGridRow)grid.get( 2 );
@@ -99,15 +128,67 @@ public class GridTestPage extends SystemPage
 		return grid;
 	}
 	
+	protected static DPRGrid makeGridWithCollatedRows()
+	{
+		TableStyleSheet tbls0 = new TableStyleSheet( 5.0, false, 5.0, false );
+		DPRGrid grid = new DPRGrid( tbls0 );
+		for (int row = 0; row < 6; row++)
+		{
+			grid.append( makeGridRowCollated( row ) );
+		}
+		return grid;
+	}
+	
+	protected static DPRGrid makeCollatedGridWithCollatedRows()
+	{
+		TableStyleSheet tbls0 = new TableStyleSheet( 5.0, false, 5.0, false );
+		DPRGrid grid = new DPRGrid( tbls0 );
+		for (int row = 0; row < 2; row++)
+		{
+			grid.append( makeGridRowCollated( row ) );
+		}
+		DPSpan span = new DPSpan();
+		for (int row = 2; row < 5; row++)
+		{
+			span.append( makeGridRowCollated( row ) );
+		}
+		grid.append( span );
+		grid.append( makeGridRowCollated( 5 ) );
+		return grid;
+	}
+	
+	protected static DPRGrid makeCollatedGridWithCollatedRowsAndNonRows()
+	{
+		TableStyleSheet tbls0 = new TableStyleSheet( 5.0, false, 5.0, false );
+		DPRGrid grid = new DPRGrid( tbls0 );
+		for (int row = 0; row < 2; row++)
+		{
+			grid.append( makeGridRowCollated( row ) );
+		}
+		DPSpan span = new DPSpan();
+		for (int row = 2; row < 5; row++)
+		{
+			span.append( makeGridRowCollated( row ) );
+		}
+		span.append( wrapInOutline( text12( "Non-row in a span" ) ) );
+		grid.append( span );
+		grid.append( makeGridRowCollated( 5 ) );
+		grid.append( wrapInOutline( text12( "Non-row in the grid" ) ) );
+		return grid;
+	}
+	
 	
 	
 	protected DPWidget createContents()
 	{
 		VBoxStyleSheet boxS = new VBoxStyleSheet( VTypesetting.NONE, 20.0 );
 		DPVBox box = new DPVBox( boxS );
-		box.append( wrapInBorder( makeGridRow( 0 ) ) );
-		box.append( wrapInBorder( makeGrid() ) );
-		box.append( wrapInBorder( makeGrid1() ) );
+		box.append( section( "Grid row", makeGridRow( 0 ) ) );
+		box.append( section( "Grid", makeGrid() ) );
+		box.append( section( "Grid with shortened row", makeGridwithShorenedRow() ) );
+		box.append( section( "Grid with collated rows", makeGridWithCollatedRows() ) );
+		box.append( section( "Collated grid with collated rows", makeCollatedGridWithCollatedRows() ) );
+		box.append( section( "Collated grid with collated rows and non-rows", makeCollatedGridWithCollatedRowsAndNonRows() ) );
 		
 		return box;
 	}

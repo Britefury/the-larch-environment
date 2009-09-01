@@ -142,7 +142,7 @@ public abstract class DPContainerSequenceCollationRoot extends DPContainerSequen
 	}
 
 
-	LReqBox[] getCollatedChildrenRefreshedRequistionXBoxes()
+	LReqBox[] getCollatedChildrenRefreshedRequisitonXBoxes()
 	{
 		return getChildrenRefreshedRequistionXBoxes( Arrays.asList( collationLeaves ) );
 	}
