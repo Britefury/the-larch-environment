@@ -18,11 +18,13 @@ import BritefuryJ.DocPresent.DPButton;
 import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPEmpty;
 import BritefuryJ.DocPresent.DPFraction;
+import BritefuryJ.DocPresent.DPGridRow;
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPLine;
 import BritefuryJ.DocPresent.DPLineBreak;
 import BritefuryJ.DocPresent.DPLink;
 import BritefuryJ.DocPresent.DPParagraph;
+import BritefuryJ.DocPresent.DPRGrid;
 import BritefuryJ.DocPresent.DPScript;
 import BritefuryJ.DocPresent.DPSegment;
 import BritefuryJ.DocPresent.DPSpan;
@@ -259,6 +261,18 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	
 
 
+	public DPWidget span(List<DPWidget> children)
+	{
+		viewInstance.getView().profile_startElement();
+		DPSpan element = new DPSpan();
+		element.setChildren( children );
+		element.setContext( this );
+		viewInstance.getView().profile_stopElement();
+		return element;
+	}
+	
+
+	
 	public DPWidget hbox(HBoxStyleSheet styleSheet, List<DPWidget> children)
 	{
 		viewInstance.getView().profile_startElement();
@@ -284,30 +298,11 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 		return element;
 	}
 	
-	public DPWidget table(TableStyleSheet styleSheet, List<List<DPWidget>> children)
-	{
-		viewInstance.getView().profile_startElement();
-		DPTable element = new DPTable( styleSheet );
-		element.setChildren( children );
-		element.setContext( this );
-		viewInstance.getView().profile_stopElement();
-		return element;
-	}
 	
 	public DPWidget paragraph(ParagraphStyleSheet styleSheet, List<DPWidget> children)
 	{
 		viewInstance.getView().profile_startElement();
 		DPParagraph element = new DPParagraph( styleSheet );
-		element.setChildren( children );
-		element.setContext( this );
-		viewInstance.getView().profile_stopElement();
-		return element;
-	}
-	
-	public DPWidget span(List<DPWidget> children)
-	{
-		viewInstance.getView().profile_startElement();
-		DPSpan element = new DPSpan();
 		element.setChildren( children );
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
@@ -342,6 +337,39 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 		return lineBreak( ContainerStyleSheet.defaultStyleSheet, lineBreakPriority, null );
 	}
 	
+
+	public DPWidget gridRow(ContainerStyleSheet styleSheet, List<DPWidget> children)
+	{
+		viewInstance.getView().profile_startElement();
+		DPGridRow element = new DPGridRow( styleSheet );
+		element.setChildren( children );
+		element.setContext( this );
+		viewInstance.getView().profile_stopElement();
+		return element;
+	}
+	
+	public DPWidget rgrid(TableStyleSheet styleSheet, List<DPWidget> children)
+	{
+		viewInstance.getView().profile_startElement();
+		DPRGrid element = new DPRGrid( styleSheet );
+		element.setChildren( children );
+		element.setContext( this );
+		viewInstance.getView().profile_stopElement();
+		return element;
+	}
+	
+	
+	public DPWidget table(TableStyleSheet styleSheet, List<List<DPWidget>> children)
+	{
+		viewInstance.getView().profile_startElement();
+		DPTable element = new DPTable( styleSheet );
+		element.setChildren( children );
+		element.setContext( this );
+		viewInstance.getView().profile_stopElement();
+		return element;
+	}
+	
+
 	public DPWidget segment(TextStyleSheet textStyleSheet, boolean bGuardBegin, boolean bGuardEnd, DPWidget child)
 	{
 		viewInstance.getView().profile_startElement();
