@@ -7,10 +7,10 @@
 ##-*************************
 from Britefury.gSym.gSymLanguage import GSymLanguage
 
-from GSymCore.Languages.LISP.View import viewLocationAsPage
+from GSymCore.Languages.LISP.View import viewLocationAsElement
 
 
 language = GSymLanguage()
-language.registerViewLocationAsPageFn( viewLocationAsPage )
+language.registerViewLocationAsElementFn( viewLocationAsElement )
 
 

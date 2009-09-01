@@ -25,7 +25,7 @@ from Britefury.Util.NodeUtil import *
 from BritefuryJ.DocPresent.StyleSheets import *
 from BritefuryJ.DocPresent import *
 
-from BritefuryJ.GSym.View import GSymViewContext, GSymViewPage
+from BritefuryJ.GSym.View import GSymViewContext
 from BritefuryJ.GSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
 
@@ -127,15 +127,16 @@ class AppView (GSymViewObjectNodeDispatch):
 	__dispatch_module__ = Nodes.module
 	
 	
-	def __init__(self):
-		pass
+	def __init__(self, document, app):
+		self._document = document
+		self._app = app
 		
 		
 	@ObjectNodeDispatchMethod
 	def AppState(self, ctx, state, node, openDocuments, configuration):
 		def _onNew(link):
 			def handleNewDocumentFn(unit):
-				world = ctx.getViewContext().getPage()._app.getWorld()
+				world = self._app.getWorld()
 				
 				name = _newDocumentName( openDocuments )
 				
@@ -147,13 +148,13 @@ class AppView (GSymViewObjectNodeDispatch):
 				openDocuments.append( appDoc )
 				
 				
-			ctx.getViewContext().getPage()._app.promptNewDocument( handleNewDocumentFn )
+			self._app.promptNewDocument( handleNewDocumentFn )
 		
 			
 			
 		def _onOpen(link):
 			def handleOpenedDocumentFn(fullPath, document):
-				world = ctx.getViewContext().getPage()._app.getWorld()
+				world = self._app.getWorld()
 				
 				head, documentName = os.path.split( fullPath )
 				documentName, ext = os.path.splitext( documentName )
@@ -165,7 +166,7 @@ class AppView (GSymViewObjectNodeDispatch):
 				openDocuments.append( appDoc )
 
 				
-			ctx.getViewContext().getPage()._app.promptOpenDocument( handleOpenedDocumentFn )
+			self._app.promptOpenDocument( handleOpenedDocumentFn )
 
 			
 			
@@ -195,26 +196,26 @@ class AppView (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod
 	def AppDocument(self, ctx, state, node, name, location):
 		def _onSave(link):
-			world = ctx.getViewContext().getPage()._app.getWorld()
+			world = self._app.getWorld()
 			document = world.getDocument( location )
 			
 			if document._filename is None:
 				def handleSaveDocumentAsFn(filename):
 					document.saveAs( filename )
 				
-				ctx.getViewContext().getPage()._app.promptSaveDocumentAs( handleSaveDocumentAsFn )
+				self._app.promptSaveDocumentAs( handleSaveDocumentAsFn )
 			else:
 				document.save()
 				
 		
 		def _onSaveAs(link):
-			world = ctx.getViewContext().getPage()._app.getWorld()
+			world = self._app.getWorld()
 			document = world.getDocument( location )
 			
 			def handleSaveDocumentAsFn(filename):
 				document.saveAs( filename )
 			
-			ctx.getViewContext().getPage()._app.promptSaveDocumentAs( handleSaveDocumentAsFn )
+			self._app.promptSaveDocumentAs( handleSaveDocumentAsFn )
 
 			
 			
@@ -232,32 +233,19 @@ class AppView (GSymViewObjectNodeDispatch):
 	
 
 
-class _AppViewPage (GSymViewPage):
-	def __init__(self, docRootNode, locationPrefix, location, commandHistory, app):
-		self._docRootNode = docRootNode
-		self._location = location
-		self._viewFn = AppView()
-		self._app = app
-		viewContext = GSymViewContext( docRootNode, self._viewFn, commandHistory, self )
-		self._frame = viewContext.getFrame()
-		#self._frame.setEditHandler( Python25EditHandler( viewContext ) )
-		
-		
-	def getContentsElement(self):
-		return self._frame
-		
 
 	
-def viewLocationAsPage(document, docRootNode, locationPrefix, location, commandHistory, app):
+def viewLocationAsElement(document, docRootNode, locationPrefix, location, commandHistory, app):
 	if location == '':
-		return _AppViewPage( docRootNode, locationPrefix, location, commandHistory, app )
+		viewContext = GSymViewContext( docRootNode, AppView( document, app ), commandHistory )
+		return viewContext.getFrame()
 	else:
 		documentLocation, dot, tail = location.partition( '.' )
 		
 		doc = app.getWorld().getDocument( documentLocation )
 		
 		if doc is not None:
-			return doc.viewDocLocationAsPage( documentLocation + locationPrefix, tail, app )
+			return doc.viewDocLocationAsElement( documentLocation + locationPrefix, tail, app )
 		else:
 			return None
 

@@ -140,18 +140,15 @@ public class GSymViewContext implements DocView.RefreshListener
 	private HashMap<Double, Border> indentationBorders;
 	private HashMap<NodeContentsFactoryKey, NodeContentsFactory> nodeContentsFactories;
 	
-	private GSymViewPage page;
-	
 	private CommandHistory commandHistory;
 	
 	
 	public GSymViewContext(Object docRootNode, GSymNodeViewFunction generalNodeViewFunction, GSymNodeViewFunction rootNodeViewFunction,
-			CommandHistory commandHistory, GSymViewPage page) throws CannotViewTerminalDocNode
+			CommandHistory commandHistory) throws CannotViewTerminalDocNode
 	{
 		this.docRootNode = docRootNode;
 		tree = new DocTree();
 		Object docTreeRoot = tree.treeNode( docRootNode );
-		this.page = page;
 		this.commandHistory = commandHistory;
 		
 		if ( docTreeRoot instanceof DocTreeNode )
@@ -176,31 +173,22 @@ public class GSymViewContext implements DocView.RefreshListener
 	}
 	
 	
-	public GSymViewContext(Object docRootNode, PyObject generalNodeViewFunction, PyObject rootNodeViewFunction,
-			CommandHistory commandHistory, GSymViewPage page) throws CannotViewTerminalDocNode
+	public GSymViewContext(Object docRootNode, PyObject generalNodeViewFunction, PyObject rootNodeViewFunction, CommandHistory commandHistory) throws CannotViewTerminalDocNode
 	{
-		this( docRootNode, new PyGSymNodeViewFunction( generalNodeViewFunction ), new PyGSymNodeViewFunction( generalNodeViewFunction ), commandHistory, page );
+		this( docRootNode, new PyGSymNodeViewFunction( generalNodeViewFunction ), new PyGSymNodeViewFunction( generalNodeViewFunction ), commandHistory );
 	}
 
 	
-	public GSymViewContext(Object docRootNode, GSymNodeViewFunction nodeViewFunction, CommandHistory commandHistory, GSymViewPage page) throws CannotViewTerminalDocNode
+	public GSymViewContext(Object docRootNode, GSymNodeViewFunction nodeViewFunction, CommandHistory commandHistory) throws CannotViewTerminalDocNode
 	{
-		this( docRootNode, nodeViewFunction, nodeViewFunction, commandHistory, page );
+		this( docRootNode, nodeViewFunction, nodeViewFunction, commandHistory );
 	}
 
-	public GSymViewContext(Object docRootNode, PyObject nodeViewFunction, CommandHistory commandHistory, GSymViewPage page) throws CannotViewTerminalDocNode
+	public GSymViewContext(Object docRootNode, PyObject nodeViewFunction, CommandHistory commandHistory) throws CannotViewTerminalDocNode
 	{
-		this( docRootNode, new PyGSymNodeViewFunction( nodeViewFunction ), commandHistory, page );
+		this( docRootNode, new PyGSymNodeViewFunction( nodeViewFunction ), commandHistory );
 	}
 
-	
-	
-	
-	public GSymViewPage getPage()
-	{
-		return page;
-	}
-	
 	
 	
 	protected Border indentationBorder(double indentation)

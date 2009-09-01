@@ -25,7 +25,7 @@ from Britefury.Util.NodeUtil import *
 from BritefuryJ.DocPresent.StyleSheets import *
 from BritefuryJ.DocPresent import *
 
-from BritefuryJ.GSym.View import GSymViewContext, GSymViewPage
+from BritefuryJ.GSym.View import GSymViewContext
 from BritefuryJ.GSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
 
@@ -83,8 +83,11 @@ class ProjectView (GSymViewObjectNodeDispatch):
 	__dispatch_module__ = Nodes.module
 	
 	
-	def __init__(self):
-		pass
+	def __init__(self, document, app, locationPrefix, location):
+		self._document = document
+		self._app = app
+		self._locationPrefix = locationPrefix
+		self._location = location
 		
 		
 	@ObjectNodeDispatchMethod
@@ -94,7 +97,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 				def handleSaveDocumentAsFn(filename):
 					document.saveAs( filename )
 				
-				ctx.getViewContext().getPage()._app.promptSaveDocumentAs( handleSaveDocumentAsFn )
+				self._app.promptSaveDocumentAs( handleSaveDocumentAsFn )
 			else:
 				document.save()
 				
@@ -103,11 +106,10 @@ class ProjectView (GSymViewObjectNodeDispatch):
 			def handleSaveDocumentAsFn(filename):
 				document.saveAs( filename )
 			
-			ctx.getViewContext().getPage()._app.promptSaveDocumentAs( handleSaveDocumentAsFn )
+			self._app.promptSaveDocumentAs( handleSaveDocumentAsFn )
 		
 		
-		
-		document = ctx.getViewContext().getPage()._document
+		document = self._document
 		
 		name = document.getDocumentName()
 		
@@ -122,7 +124,8 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		controlsBox = ctx.hbox( prj_controlsBoxStyle, [ saveLink.padX( 10.0 ), saveAsLink.padX( 10.0 ) ] )
 		controlsBorder = ctx.border( prj_controlsBorder, controlsBox )
 		
-		root = ctx.viewEval( rootPackage, _ProjectViewState( ctx.getViewContext().getPage()._locationPrefix ) ).alignHExpand()
+		state = _ProjectViewState( self._locationPrefix )
+		root = ctx.viewEval( rootPackage, state ).alignHExpand()
 		indexBox = tabbedBox( ctx, 'Project Index', root )
 		
 		contentBox = ctx.vbox( prj_projectContentBoxStyle, [ linkHeader, title, controlsBorder.pad( 5.0, 10.0 ).alignHLeft(), indexBox.pad( 10.0, 10.0 ).alignHLeft() ] )
@@ -140,12 +143,12 @@ class ProjectView (GSymViewObjectNodeDispatch):
 				#contents.append( Nodes.Page( name='New page', unit=pageUnit ) )
 				p = Nodes.Page( name='New page', unit=pageUnit )
 				contents.append( p )
-			ctx.getViewContext().getPage()._app.promptNewPage( _add )
+			self._app.promptNewPage( _add )
 		
 		def _onImportPage(button):
 			def _import(name, pageUnit):
 				contents.append( Nodes.Page( name=name, unit=pageUnit ) )
-			ctx.getViewContext().getPage()._app.promptImportPage( _import )
+			self._app.promptImportPage( _import )
 		
 		def _onAddPackage(button):
 			contents.append( Nodes.Package( name='New package', contents=[] ) )
@@ -181,35 +184,11 @@ class ProjectView (GSymViewObjectNodeDispatch):
 	
 
 
-class _ProjectViewPage (GSymViewPage):
-	def __init__(self, document, docRootNode, locationPrefix, location, commandHistory, app):
-		self._document = document
-		self._docRootNode = docRootNode
-		self._locationPrefix = locationPrefix
-		self._location = location
-		self._commandHistory = commandHistory
-		self._app = app
-		self._viewFn = ProjectView()
-		viewContext = GSymViewContext( docRootNode, self._viewFn, commandHistory, self )
-		self._frame = viewContext.getFrame()
-		#self._frame.setEditHandler( Python25EditHandler( viewContext ) )
-		
-		
-	def getContentsElement(self):
-		return self._frame
-		
-		
-	def getCommandHistoryController(self):
-		return self._commandHistory
-	
-	def setCommandHistoryListener(self, listener):
-		self._commandHistory.setCommandHistoryListener( listener )
-
-
-	
-def viewLocationAsPage(document, docRootNode, locationPrefix, location, commandHistory, app):
+def viewLocationAsElement(document, docRootNode, locationPrefix, location, commandHistory, app):
 	if location == '':
-		return _ProjectViewPage( document, docRootNode, locationPrefix, location, commandHistory, app )
+		viewFn = ProjectView( document, app, locationPrefix, location )
+		viewContext = GSymViewContext( docRootNode, viewFn, commandHistory )
+		return viewContext.getFrame()
 	else:
 		loc = location
 		package = docRootNode['rootPackage']
@@ -229,7 +208,7 @@ def viewLocationAsPage(document, docRootNode, locationPrefix, location, commandH
 				if n.isInstanceOf( Nodes.Package ):
 					package = n
 				elif n.isInstanceOf( Nodes.Page ):
-					return document.viewUnitLocationAsPage( n['unit'], locationPrefix,loc, app )
+					return document.viewUnitLocationAsElement( n['unit'], locationPrefix,loc, app )
 				else:
 					return None
 			else:

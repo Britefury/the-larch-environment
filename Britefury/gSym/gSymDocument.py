@@ -11,6 +11,8 @@ from BritefuryJ.CommandHistory import CommandHistory, CommandHistoryListener
 
 from BritefuryJ.DocModel import DMNode, DMModule, DMIOReader, DMIOWriter
 
+from BritefuryJ.DocPresent.Browser import Page
+
 from Britefury.Kernel.Abstract import abstractmethod
 
 from Britefury.Util.NodeUtil import isObjectNode
@@ -67,7 +69,23 @@ def gSymUnit_getContent(unit):
 	
 
 
+
+class _DocViewPage (Page):
+	def __init__(self, element, commandHistory):
+		self._element = element
+		self._commandHistory = commandHistory
+		
+		
+	def getContentsElement(self):
+		return self._element
 	
+	def getCommandHistoryController(self):
+		return self._commandHistory
+	
+	def setCommandHistoryListener(self, listener):
+		self._commandHistory.setCommandHistoryListener( listener )
+
+
 class GSymDocument (CommandHistoryListener):
 	def __init__(self, world, unit):
 		self._world = world
@@ -114,24 +132,35 @@ class GSymDocument (CommandHistoryListener):
 		
 	
 	def viewDocLocationAsPage(self, locationPrefix, location, app):
-		return self.viewUnitLocationAsPage( self._unit, locationPrefix, location, app )
+		element = self.viewUnitLocationAsElement( self._unit, locationPrefix, location, app )
+		return _DocViewPage( element, self._commandHistory )
 	
 	
 	def viewDocLocationAsLispPage(self, locationPrefix, location, app):
-		return self.viewUnitLocationAsLispPage( self._unit, locationPrefix, location, app )
+		element = self.viewDocLocationAsLispElement( self._unit, locationPrefix, location, app )
+		return _DocViewPage( element, self._commandHistory )
 
 
 	
-	def viewUnitLocationAsPage(self, unit, locationPrefix, location, app):
+	def viewDocLocationAsElement(self, locationPrefix, location, app):
+		return self.viewUnitLocationAsElement( self._unit, locationPrefix, location, app )
+	
+	
+	def viewDocLocationAsLispElement(self, locationPrefix, location, app):
+		return self.viewUnitLocationAsLispElement( self._unit, locationPrefix, location, app )
+
+
+	
+	def viewUnitLocationAsElement(self, unit, locationPrefix, location, app):
 		language = self._world.getLanguage( gSymUnit_getLanguageModuleName( unit ) )
-		viewLocationAsPageFn = language.getViewLocationAsPageFn()
-		return viewLocationAsPageFn( self, gSymUnit_getContent( unit ), locationPrefix, location, self._commandHistory, app )
+		viewLocationAsElementFn = language.getViewLocationAsElementFn()
+		return viewLocationAsElementFn( self, gSymUnit_getContent( unit ), locationPrefix, location, self._commandHistory, app )
 	
 	
-	def viewUnitLocationAsLispPage(self, unit, locationPrefix, location, app):
+	def viewUnitLocationAsLispElement(self, unit, locationPrefix, location, app):
 		language = LISP.language
-		viewLocationAsPageFn = language.getViewLocationAsPageFn()
-		return viewLocationAsPageFn( self, gSymUnit_getContent( unit ), locationPrefix, location, self._commandHistory, app )
+		viewLocationAsElementFn = language.getViewLocationAsElementFn()
+		return viewLocationAsElementFn( self, gSymUnit_getContent( unit ), locationPrefix, location, self._commandHistory, app )
 
 
 	
