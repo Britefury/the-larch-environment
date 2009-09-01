@@ -78,7 +78,7 @@ public abstract class SystemPage extends Page
 	}
 	
 	
-	protected ArrayList<DPWidget> createTextNodes(StaticTextStyleSheet textStyle, String text)
+	protected static ArrayList<DPWidget> createTextNodes(StaticTextStyleSheet textStyle, String text)
 	{
 		String[] words = text.split( " " );
 		ArrayList<DPWidget> nodes = new ArrayList<DPWidget>();
@@ -102,12 +102,12 @@ public abstract class SystemPage extends Page
 		return nodes;
 	}
 
-	protected ArrayList<DPWidget> createTextNodes(String text)
+	protected static ArrayList<DPWidget> createTextNodes(String text)
 	{
 		return createTextNodes( StaticTextStyleSheet.defaultStyleSheet, text );
 	}
 	
-	protected DPParagraph createTextParagraph(ParagraphStyleSheet paraStyle, StaticTextStyleSheet textStyle, String text)
+	protected static DPParagraph createTextParagraph(ParagraphStyleSheet paraStyle, StaticTextStyleSheet textStyle, String text)
 	{
 		ArrayList<DPWidget> nodes = createTextNodes( textStyle, text );
 		DPParagraph para = new DPParagraph( paraStyle );
@@ -115,12 +115,12 @@ public abstract class SystemPage extends Page
 		return para;
 	}
 
-	protected DPParagraph createTextParagraph(StaticTextStyleSheet textStyle, String text)
+	protected static DPParagraph createTextParagraph(StaticTextStyleSheet textStyle, String text)
 	{
 		return createTextParagraph( ParagraphStyleSheet.defaultStyleSheet, textStyle, text );
 	}
 
-	protected DPParagraph createTextParagraph(String text)
+	protected static DPParagraph createTextParagraph(String text)
 	{
 		return createTextParagraph( ParagraphStyleSheet.defaultStyleSheet, StaticTextStyleSheet.defaultStyleSheet, text );
 	}

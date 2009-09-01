@@ -22,6 +22,11 @@ public class VBoxStyleSheet extends AbstractBoxStyleSheet
 		this( VTypesetting.NONE, 0.0 );
 	}
 	
+	public VBoxStyleSheet(double spacing)
+	{
+		this( VTypesetting.NONE, spacing );
+	}
+	
 	public VBoxStyleSheet(VTypesetting typesetting, double spacing)
 	{
 		super( spacing );
