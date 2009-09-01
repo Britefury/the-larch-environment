@@ -79,6 +79,18 @@ public class DPRGrid extends DPContainerSequenceCollationRoot
 		}
 		
 		columnBoxes = GridLayout.computeRequisitionX( layoutReqBox, childBoxes, numColumns, numRows, getColumnSpacing(), getRowSpacing() );
+
+		// Copy the X-requisition to the child rows
+		for (int i = 0; i < collationLeaves.length; i++)
+		{
+			DPWidget child = collationLeaves[i];
+			if ( child instanceof DPGridRow )
+			{
+				DPGridRow row = (DPGridRow)child;
+				row.layoutReqBox.setRequisitionX( layoutReqBox );
+			}
+		}
+
 		columnAllocBoxes = new LAllocBox[columnBoxes.length];
 		for (int i = 0; i < columnAllocBoxes.length; i++)
 		{
@@ -126,6 +138,8 @@ public class DPRGrid extends DPContainerSequenceCollationRoot
 				childAllocBoxes[i] = row.getCollatedChildrenAllocationBoxes();
 				prevWidths[i] = row.getCollatedChildrenAllocationX();
 				childAlignmentFlags[i] = row.getCollatedChildrenAlignmentFlags();
+				// Copy grid x-allocation to row x-allocation
+				row.layoutAllocBox.allocateX( layoutAllocBox );
 			}
 			else
 			{

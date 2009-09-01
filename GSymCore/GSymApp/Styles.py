@@ -17,12 +17,12 @@ from BritefuryJ.DocPresent.Border import *
 
 app_linkStyle = LinkStyleSheet()
 
-app_openDocumentsLineStyle = LineStyleSheet( LineStyleSheet.Direction.HORIZONTAL, Color( 32, 87, 147 ), 1.0, 15.0, 3.0 )
-app_openDocumentsTitleStyle = StaticTextStyleSheet( Font( "SansSerif", Font.BOLD, 18 ), Color.BLACK )
 app_openDocumentsControlsBoxStyle = HBoxStyleSheet( 20.0 )
 app_openDocumentsControlsBorder = EmptyBorder( 5.0, 5.0, 5.0, 5.0, Color( 0.9, 0.9, 0.9 ) )
+
 app_openDocumentsBoxStyle = VBoxStyleSheet()
-app_openDocumentsListBoxStyle = VBoxStyleSheet()
+app_openDocumentsLineStyle = LineStyleSheet( LineStyleSheet.Direction.HORIZONTAL, Color( 32, 87, 147 ), 1.0, 15.0, 3.0 )
+app_openDocumentsGridStyle = TableStyleSheet( 15.0, False, 5.0, False )
 
 app_contentBoxStyle = VBoxStyleSheet()
 
@@ -30,3 +30,5 @@ app_contentBoxStyle = VBoxStyleSheet()
 
 
 app_docLinkStyle = LinkStyleSheet()
+app_docLinkBorder = EmptyBorder( 0.0, 30.0, 0.0, 0.0, None )
+app_docGridRowStyle = GridRowStyleSheet()
