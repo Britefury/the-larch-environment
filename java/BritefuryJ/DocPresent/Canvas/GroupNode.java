@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.Diagram;
+package BritefuryJ.DocPresent.Canvas;
 
 import java.awt.Graphics2D;
 import java.util.List;
@@ -13,23 +13,23 @@ import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 
-public class GroupNode extends DiagramNode
+public class GroupNode extends DrawingNode
 {
-	protected DiagramNode children[];
+	protected DrawingNode children[];
 	protected AABox2 parentSpaceBox;
 	
 	
-	public GroupNode(DiagramNode children[])
+	public GroupNode(DrawingNode children[])
 	{
 		super();
 		this.children = children;
 		parentSpaceBox = new AABox2();
 	}
 
-	public GroupNode(List<DiagramNode> children)
+	public GroupNode(List<DrawingNode> children)
 	{
 		super();
-		this.children = new DiagramNode[children.size()];
+		this.children = new DrawingNode[children.size()];
 		this.children = children.toArray( this.children );
 		parentSpaceBox = new AABox2();
 	}
@@ -37,17 +37,17 @@ public class GroupNode extends DiagramNode
 
 
 
-	public void realise(DiagramOwner owner)
+	public void realise(DrawingOwner owner)
 	{
 		super.realise( owner );
 		
-		for (DiagramNode child: children)
+		for (DrawingNode child: children)
 		{
 			child.realise( owner );
 		}
 
 		parentSpaceBox = new AABox2();
-		for (DiagramNode node: children)
+		for (DrawingNode node: children)
 		{
 			parentSpaceBox.addBox( node.getParentSpaceBoundingBox() );
 		}
@@ -57,7 +57,7 @@ public class GroupNode extends DiagramNode
 	{
 		parentSpaceBox = new AABox2();
 
-		for (DiagramNode child: children)
+		for (DrawingNode child: children)
 		{
 			child.unrealise();
 		}
@@ -68,7 +68,7 @@ public class GroupNode extends DiagramNode
 	
 	public void draw(Graphics2D graphics, DrawContext context)
 	{
-		for (DiagramNode child: children)
+		for (DrawingNode child: children)
 		{
 			child.draw( graphics, context );
 		}
@@ -85,7 +85,7 @@ public class GroupNode extends DiagramNode
 
 	protected PointerInputElement getFirstPointerChildAtLocalPoint(Point2 localPos)
 	{
-		for (DiagramNode child: children)
+		for (DrawingNode child: children)
 		{
 			if ( child.getParentSpaceBoundingBox().containsPoint( localPos ) )
 			{
@@ -102,7 +102,7 @@ public class GroupNode extends DiagramNode
 	{
 		for (int i = children.length - 1; i >= 0; i--)
 		{
-			DiagramNode child = children[i];
+			DrawingNode child = children[i];
 			if ( child.getParentSpaceBoundingBox().containsPoint( localPos ) )
 			{
 				if ( child.containsParentSpacePoint( localPos ) )
@@ -122,7 +122,7 @@ public class GroupNode extends DiagramNode
 	
 	public boolean containsLocalSpacePoint(Point2 localPos)
 	{
-		for (DiagramNode child: children)
+		for (DrawingNode child: children)
 		{
 			if ( child.getParentSpaceBoundingBox().containsPoint( localPos ) )
 			{
@@ -145,7 +145,7 @@ public class GroupNode extends DiagramNode
 	
 	public PointerInputElement getDndElement(Point2 localPos, Point2 targetPos[])
 	{
-		DiagramNode child = (DiagramNode)getFirstPointerChildAtLocalPoint( localPos );
+		DrawingNode child = (DrawingNode)getFirstPointerChildAtLocalPoint( localPos );
 		if ( child != null )
 		{
 			PointerInputElement element = child.getDndElement( localPos, targetPos );

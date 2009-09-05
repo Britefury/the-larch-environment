@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.Diagram;
+package BritefuryJ.DocPresent.Canvas;
 
 import java.awt.Graphics2D;
 
@@ -12,19 +12,19 @@ import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 
-public abstract class UnaryBranchNode extends DiagramNode
+public abstract class UnaryBranchNode extends DrawingNode
 {
 	// Child
-	protected DiagramNode child;
+	protected DrawingNode child;
 	
 	
-	public UnaryBranchNode(DiagramNode child)
+	public UnaryBranchNode(DrawingNode child)
 	{
 		this.child = child;
 	}
 	
 	
-	public void realise(DiagramOwner owner)
+	public void realise(DrawingOwner owner)
 	{
 		super.realise( owner );
 		child.realise( owner );

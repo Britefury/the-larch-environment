@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.Diagram;
+package BritefuryJ.DocPresent.Canvas;
 
 import java.awt.Graphics2D;
 import java.awt.Paint;
@@ -20,7 +20,7 @@ import java.awt.geom.RoundRectangle2D;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 
-public class ShapeNode extends DiagramNode
+public class ShapeNode extends DrawingNode
 {
 	protected Shape shape;
 	protected AABox2 parentSpaceBox;

@@ -11,18 +11,22 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.python.core.Py;
+import org.python.core.PyInteger;
+import org.python.core.PySlice;
+
 import BritefuryJ.Cell.Cell;
 import BritefuryJ.Cell.CellEvaluator;
 import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.DocModel.DMIOReader;
 import BritefuryJ.DocModel.DMList;
+import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocModel.DMIOReader.BadModuleNameException;
 import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
 import BritefuryJ.DocModel.DMModule.UnknownClassException;
 import BritefuryJ.DocModel.DMModuleResolver.CouldNotResolveModuleException;
 
-public class Test_DMList extends TestCase
+public class Test_DMList extends Test_DMNode_base
 {
 	CommandHistory history;
 	
@@ -169,11 +173,19 @@ public class Test_DMList extends TestCase
 	public void testAdd()
 	{
 		DMList xs = readTrackedDMListSX( "[a b c]" );
+		DMList ys = readDMListSX( "[x y z]" );
 		xs.add( "xyz" );
 		cmpListSX( xs, "[a b c xyz]" );
 		xs.add( null );
 		cmpListSX( xs, "[a b c xyz `null`]" );
+		cmpNodeParents( ys, new DMNode[] {} );
+		xs.add( ys );
+		cmpListSX( xs, "[a b c xyz `null` [x y z]]" );
+		cmpNodeParents( ys, new DMNode[] { xs } );
 		
+		history.undo();
+		cmpListSX( xs, "[a b c xyz `null`]" );
+		cmpNodeParents( ys, new DMNode[] {} );
 		history.undo();
 		cmpListSX( xs, "[a b c xyz]" );
 		history.undo();
@@ -182,6 +194,9 @@ public class Test_DMList extends TestCase
 		cmpListSX( xs, "[a b c xyz]" );
 		history.redo();
 		cmpListSX( xs, "[a b c xyz `null`]" );
+		history.redo();
+		cmpListSX( xs, "[a b c xyz `null` [x y z]]" );
+		cmpNodeParents( ys, new DMNode[] { xs } );
 	}
 
 
@@ -189,11 +204,19 @@ public class Test_DMList extends TestCase
 	public void testAdd_insert()
 	{
 		DMList xs = readTrackedDMListSX( "[a b c]" );
+		DMList ys = readDMListSX( "[x y z]" );
 		xs.add( 2, "xyz" );
 		cmpListSX( xs, "[a b xyz c]" );
 		xs.add( 2, null );
 		cmpListSX( xs, "[a b `null` xyz c]" );
+		cmpNodeParents( ys, new DMNode[] {} );
+		xs.add( 2, ys );
+		cmpListSX( xs, "[a b [x y z] `null` xyz c]" );
+		cmpNodeParents( ys, new DMNode[] { xs } );
 		
+		history.undo();
+		cmpListSX( xs, "[a b `null` xyz c]" );
+		cmpNodeParents( ys, new DMNode[] {} );
 		history.undo();
 		cmpListSX( xs, "[a b xyz c]" );
 		history.undo();
@@ -202,6 +225,9 @@ public class Test_DMList extends TestCase
 		cmpListSX( xs, "[a b xyz c]" );
 		history.redo();
 		cmpListSX( xs, "[a b `null` xyz c]" );
+		history.redo();
+		cmpListSX( xs, "[a b [x y z] `null` xyz c]" );
+		cmpNodeParents( ys, new DMNode[] { xs } );
 	}
 
 
@@ -210,13 +236,24 @@ public class Test_DMList extends TestCase
 	{
 		DMList xs = readTrackedDMListSX( "[a b c]" );
 		DMList ys = readDMListSX( "[x y z `null`]" );
+		DMList zs = readDMListSX( "[i j [k l] m n]" );
 		xs.addAll( ys );
 		cmpListSX( xs, "[a b c x y z `null`]" );
+		cmpNodeParents( (DMNode)zs.get( 2 ), new DMNode[] { zs } );
+		xs.addAll( zs );
+		cmpListSX( xs, "[a b c x y z `null` i j [k l] m n]" );
+		cmpNodeParents( (DMNode)zs.get( 2 ), new DMNode[] { xs, zs } );
 		
+		history.undo();
+		cmpListSX( xs, "[a b c x y z `null`]" );
+		cmpNodeParents( (DMNode)zs.get( 2 ), new DMNode[] { zs } );
 		history.undo();
 		cmpListSX( xs, "[a b c]" );
 		history.redo();
 		cmpListSX( xs, "[a b c x y z `null`]" );
+		history.redo();
+		cmpListSX( xs, "[a b c x y z `null` i j [k l] m n]" );
+		cmpNodeParents( (DMNode)zs.get( 2 ), new DMNode[] { xs, zs } );
 	}
 
 
@@ -224,26 +261,42 @@ public class Test_DMList extends TestCase
 	{
 		DMList xs = readTrackedDMListSX( "[a b c]" );
 		DMList ys = readDMListSX( "[x y z `null`]" );
+		DMList zs = readDMListSX( "[i j [k l] m n]" );
 		xs.addAll( 2, ys );
 		cmpListSX( xs, "[a b x y z `null` c]" );
+		cmpNodeParents( (DMNode)zs.get( 2 ), new DMNode[] { zs } );
+		xs.addAll( 2, zs );
+		cmpListSX( xs, "[a b i j [k l] m n x y z `null` c]" );
+		cmpNodeParents( (DMNode)zs.get( 2 ), new DMNode[] { xs, zs } );
 		
+		history.undo();
+		cmpListSX( xs, "[a b x y z `null` c]" );
+		cmpNodeParents( (DMNode)zs.get( 2 ), new DMNode[] { zs } );
 		history.undo();
 		cmpListSX( xs, "[a b c]" );
 		history.redo();
 		cmpListSX( xs, "[a b x y z `null` c]" );
+		history.redo();
+		cmpListSX( xs, "[a b i j [k l] m n x y z `null` c]" );
+		cmpNodeParents( (DMNode)zs.get( 2 ), new DMNode[] { xs, zs } );
 	}
 
 
 	public void testClear()
 	{
-		DMList xs = readTrackedDMListSX( "[a b c]" );
+		DMList xs = readTrackedDMListSX( "[a b c [x y]]" );
+		DMNode zs = (DMNode)xs.get( 3 );
+		cmpNodeParents( zs, new DMNode[] { xs } );
 		xs.clear();
 		cmpListSX( xs, "[]" );
+		cmpNodeParents( zs, new DMNode[] {} );
 		
 		history.undo();
-		cmpListSX( xs, "[a b c]" );
+		cmpListSX( xs, "[a b c [x y]]" );
+		cmpNodeParents( zs, new DMNode[] { xs } );
 		history.redo();
 		cmpListSX( xs, "[]" );
+		cmpNodeParents( zs, new DMNode[] {} );
 	}
 
 
@@ -346,45 +399,136 @@ public class Test_DMList extends TestCase
 
 	public void testRemove()
 	{
-		DMList xs = readTrackedDMListSX( "[a b c `null`]" );
+		DMList xs = readTrackedDMListSX( "[a b c `null` [x y]]" );
+		DMNode zs = (DMNode)xs.get( 4 );
+		cmpNodeParents( zs, new DMNode[] { xs } );
 		xs.remove( 1 );
+		cmpListSX( xs, "[a c `null` [x y]]" );
+		cmpNodeParents( zs, new DMNode[] { xs } );
+		xs.remove( 3 );
 		cmpListSX( xs, "[a c `null`]" );
+		cmpNodeParents( zs, new DMNode[] {} );
 		
 		history.undo();
-		cmpListSX( xs, "[a b c `null`]" );
+		cmpListSX( xs, "[a c `null` [x y]]" );
+		cmpNodeParents( zs, new DMNode[] { xs } );
+		history.undo();
+		cmpListSX( xs, "[a b c `null` [x y]]" );
+		cmpNodeParents( zs, new DMNode[] { xs } );
+		history.redo();
+		cmpListSX( xs, "[a c `null` [x y]]" );
+		cmpNodeParents( zs, new DMNode[] { xs } );
 		history.redo();
 		cmpListSX( xs, "[a c `null`]" );
+		cmpNodeParents( zs, new DMNode[] {} );
 	}
 
 	public void testRemoveObject()
 	{
-		DMList xs = readTrackedDMListSX( "[a b c `null`]" );
+		DMList xs = readTrackedDMListSX( "[a b c `null` [x y]]" );
+		DMNode zs = (DMNode)xs.get( 4 );
+		cmpNodeParents( zs, new DMNode[] { xs } );
 		xs.remove( "b" );
-		cmpListSX( xs, "[a c `null`]" );
+		cmpListSX( xs, "[a c `null` [x y]]" );
+		cmpNodeParents( zs, new DMNode[] { xs } );
 		xs.remove( null );
+		cmpListSX( xs, "[a c [x y]]" );
+		cmpNodeParents( zs, new DMNode[] { xs } );
+		xs.remove( zs );
 		cmpListSX( xs, "[a c]" );
+		cmpNodeParents( zs, new DMNode[] {} );
 		
 		history.undo();
-		cmpListSX( xs, "[a c `null`]" );
+		cmpListSX( xs, "[a c [x y]]" );
+		cmpNodeParents( zs, new DMNode[] { xs } );
 		history.undo();
-		cmpListSX( xs, "[a b c `null`]" );
+		cmpListSX( xs, "[a c `null` [x y]]" );
+		cmpNodeParents( zs, new DMNode[] { xs } );
+		history.undo();
+		cmpListSX( xs, "[a b c `null` [x y]]" );
+		cmpNodeParents( zs, new DMNode[] { xs } );
 		history.redo();
-		cmpListSX( xs, "[a c `null`]" );
+		cmpListSX( xs, "[a c `null` [x y]]" );
+		cmpNodeParents( zs, new DMNode[] { xs } );
+		history.redo();
+		cmpListSX( xs, "[a c [x y]]" );
+		cmpNodeParents( zs, new DMNode[] { xs } );
 		history.redo();
 		cmpListSX( xs, "[a c]" );
+		cmpNodeParents( zs, new DMNode[] {} );
 	}
 
 
 	public void testSet()
 	{
-		DMList xs = readTrackedDMListSX( "[a b c]" );
+		DMList xs = readTrackedDMListSX( "[a [i j] c]" );
+		DMNode ij = (DMNode)xs.get( 1 );
+		DMList pq = readTrackedDMListSX( "[p q]" );
+
+		cmpListSX( xs, "[a [i j] c]" );
+		cmpNodeParents( ij, new DMNode[] { xs } );
+		cmpNodeParents( pq, new DMNode[] {} );
 		xs.set( 1, null );
 		cmpListSX( xs, "[a `null` c]" );
+		cmpNodeParents( ij, new DMNode[] {} );
+		cmpNodeParents( pq, new DMNode[] {} );
+		xs.set( 1, pq );
+		cmpListSX( xs, "[a [p q] c]" );
+		cmpNodeParents( ij, new DMNode[] {} );
+		cmpNodeParents( pq, new DMNode[] { xs } );
 		
 		history.undo();
-		cmpListSX( xs, "[a b c]" );
+		cmpListSX( xs, "[a `null` c]" );
+		cmpNodeParents( ij, new DMNode[] {} );
+		cmpNodeParents( pq, new DMNode[] {} );
+		history.undo();
+		cmpListSX( xs, "[a [i j] c]" );
+		cmpNodeParents( ij, new DMNode[] { xs } );
+		cmpNodeParents( pq, new DMNode[] {} );
 		history.redo();
 		cmpListSX( xs, "[a `null` c]" );
+		cmpNodeParents( ij, new DMNode[] {} );
+		cmpNodeParents( pq, new DMNode[] {} );
+		history.redo();
+		cmpListSX( xs, "[a [p q] c]" );
+		cmpNodeParents( ij, new DMNode[] {} );
+		cmpNodeParents( pq, new DMNode[] { xs } );
+	}
+
+
+	public void test__setitem__slice()
+	{
+		DMList xs = readTrackedDMListSX( "[a b [i j] c]" );
+		DMNode ij = (DMNode)xs.get( 2 );
+		DMList pq = readTrackedDMListSX( "[p q]" );
+		cmpListSX( xs, "[a b [i j] c]" );
+		cmpNodeParents( ij, new DMNode[] { xs } );
+		cmpNodeParents( pq, new DMNode[] {} );
+		xs.__setitem__( new PySlice( new PyInteger( 1 ), new PyInteger( -1 ), Py.None ), Arrays.asList( new Object[] { null } ) );
+		cmpListSX( xs, "[a `null` c]" );
+		cmpNodeParents( ij, new DMNode[] {} );
+		cmpNodeParents( pq, new DMNode[] {} );
+		xs.__setitem__( new PySlice( new PyInteger( 1 ), new PyInteger( -1 ), Py.None ), Arrays.asList( new Object[] { pq } ) );
+		cmpListSX( xs, "[a [p q] c]" );
+		cmpNodeParents( ij, new DMNode[] {} );
+		cmpNodeParents( pq, new DMNode[] { xs } );
+		
+		history.undo();
+		cmpListSX( xs, "[a `null` c]" );
+		cmpNodeParents( ij, new DMNode[] {} );
+		cmpNodeParents( pq, new DMNode[] {} );
+		history.undo();
+		cmpListSX( xs, "[a b [i j] c]" );
+		cmpNodeParents( ij, new DMNode[] { xs } );
+		cmpNodeParents( pq, new DMNode[] {} );
+		history.redo();
+		cmpListSX( xs, "[a `null` c]" );
+		cmpNodeParents( ij, new DMNode[] {} );
+		cmpNodeParents( pq, new DMNode[] {} );
+		history.redo();
+		cmpListSX( xs, "[a [p q] c]" );
+		cmpNodeParents( ij, new DMNode[] {} );
+		cmpNodeParents( pq, new DMNode[] { xs } );
 	}
 
 

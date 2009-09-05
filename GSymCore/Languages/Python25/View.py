@@ -753,7 +753,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		xView = ctx.viewEvalFn( x, None, python25ViewState( xPrec, self._parser.expression(), MODE_EDITEXPRESSION ) )
 		yView = ctx.viewEvalFn( y, None, python25ViewState( yPrec, self._parser.expression(), MODE_EDITEXPRESSION ) )
 		element = ctx.fraction( div_fractionStyle, xView, yView, '/' )
-		element.setStructuralValueObject( node )
+		#element.setStructuralValueObject( node )
 		return expressionNodeEditor( ctx, node,
 					     element,
 					     PRECEDENCE_MULDIVMOD,

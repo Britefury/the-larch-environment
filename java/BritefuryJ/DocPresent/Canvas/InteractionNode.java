@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.Diagram;
+package BritefuryJ.DocPresent.Canvas;
 
 import java.awt.Graphics2D;
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ public class InteractionNode extends UnaryBranchNode
 {
 	// Hover
 	protected HoverMonitor hoverMonitor;
-	protected DiagramNode hoverHighlight;
+	protected DrawingNode hoverHighlight;
 	
 	// Interaction
 	protected InteractionListener interactionListener;
@@ -31,25 +31,25 @@ public class InteractionNode extends UnaryBranchNode
 	
 	
 	
-	public InteractionNode(DiagramNode child, HoverMonitor hoverMonitor)
+	public InteractionNode(DrawingNode child, HoverMonitor hoverMonitor)
 	{
 		super( child );
 		this.hoverMonitor = hoverMonitor;
 	}
 
-	public InteractionNode(DiagramNode child, DiagramNode hoverHighlight)
+	public InteractionNode(DrawingNode child, DrawingNode hoverHighlight)
 	{
 		super( child );
 		this.hoverHighlight = hoverHighlight;
 	}
 
-	public InteractionNode(DiagramNode child, InteractionListener interactionListener)
+	public InteractionNode(DrawingNode child, InteractionListener interactionListener)
 	{
 		super( child );
 		this.interactionListener = interactionListener;
 	}
 	
-	public InteractionNode(DiagramNode child, DndHandler dndHandler)
+	public InteractionNode(DrawingNode child, DndHandler dndHandler)
 	{
 		super( child );
 		this.dndHandler = dndHandler;
@@ -66,7 +66,7 @@ public class InteractionNode extends UnaryBranchNode
 
 	
 
-	public void realise(DiagramOwner owner)
+	public void realise(DrawingOwner owner)
 	{
 		super.realise( owner );
 		
@@ -89,7 +89,7 @@ public class InteractionNode extends UnaryBranchNode
 	
 
 	// User API
-	public DiagramNode hoverMonitor(HoverMonitor hoverMonitor)
+	public DrawingNode hoverMonitor(HoverMonitor hoverMonitor)
 	{
 		if ( this.hoverMonitor == null )
 		{
@@ -103,14 +103,14 @@ public class InteractionNode extends UnaryBranchNode
 		}
 	}
 	
-	public DiagramNode hoverHighlight(DiagramNode hoverHighlight)
+	public DrawingNode hoverHighlight(DrawingNode hoverHighlight)
 	{
 		InteractionNode i = new InteractionNode( this );
 		i.hoverHighlight = hoverHighlight;
 		return i;
 	}
 	
-	public DiagramNode onInteraction(InteractionListener interactionListener)
+	public DrawingNode onInteraction(InteractionListener interactionListener)
 	{
 		if ( this.interactionListener == null )
 		{
@@ -124,7 +124,7 @@ public class InteractionNode extends UnaryBranchNode
 		}
 	}
 	
-	public DiagramNode enableDnd(DndHandler dndHandler)
+	public DrawingNode enableDnd(DndHandler dndHandler)
 	{
 		if ( this.dndHandler == null )
 		{
@@ -143,7 +143,7 @@ public class InteractionNode extends UnaryBranchNode
 	{
 		if ( hoverHighlight != null )
 		{
-			ArrayList<PointerInterface> pointers = owner != null  ?  owner.getPointersWithinDiagramNodeBounds( this )  :  null;
+			ArrayList<PointerInterface> pointers = owner != null  ?  owner.getPointersWithinDrawingNodeBounds( this )  :  null;
 			if ( pointers != null  &&  pointers.size() > 0 )
 			{
 				hoverHighlight.draw( graphics, context );
@@ -289,10 +289,10 @@ public class InteractionNode extends UnaryBranchNode
 
 	public PointerInputElement getDndElement(Point2 localPos, Point2 targetPos[])				// targetPos is an output parameter
 	{
-		DiagramNode childNode = null;
+		DrawingNode childNode = null;
 		if ( hoverHighlight != null )
 		{
-			ArrayList<PointerInterface> pointers = owner != null  ?  owner.getPointersWithinDiagramNodeBounds( this )  :  null;
+			ArrayList<PointerInterface> pointers = owner != null  ?  owner.getPointersWithinDrawingNodeBounds( this )  :  null;
 			if ( pointers != null  &&  pointers.size() > 0 )
 			{
 				childNode = hoverHighlight;
