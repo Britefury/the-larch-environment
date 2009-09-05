@@ -9,44 +9,44 @@ package BritefuryJ.DocPresent;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.Diagram.DiagramNode;
-import BritefuryJ.DocPresent.Diagram.DiagramOwner;
+import BritefuryJ.DocPresent.Canvas.DrawingNode;
+import BritefuryJ.DocPresent.Canvas.DrawingOwner;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
 import BritefuryJ.Math.Point2;
 
-public class DPDiagram extends DPStatic implements DiagramOwner
+public class DPCanvas extends DPStatic implements DrawingOwner
 {
 	protected static int FLAG_DIAGRAM_SHRINK_X = FLAGS_ELEMENT_END * 0x1;
 	protected static int FLAG_DIAGRAM_SHRINK_Y = FLAGS_ELEMENT_END * 0x2;
 	
-	protected DiagramNode diagram;
-	protected double diagramWidth, diagramHeight;
+	protected DrawingNode drawing;
+	protected double drawingWidth, drawingHeight;
 	
 	
-	public DPDiagram(DiagramNode diagram)
+	public DPCanvas(DrawingNode drawing)
 	{
-		this( WidgetStyleSheet.defaultStyleSheet, diagram, -1.0, -1.0, false, false );
+		this( WidgetStyleSheet.defaultStyleSheet, drawing, -1.0, -1.0, false, false );
 	}
 	
-	public DPDiagram(WidgetStyleSheet styleSheet, DiagramNode diagram)
+	public DPCanvas(WidgetStyleSheet styleSheet, DrawingNode drawing)
 	{
-		this( styleSheet, diagram, -1.0, -1.0, false, false );
+		this( styleSheet, drawing, -1.0, -1.0, false, false );
 	}
 	
-	public DPDiagram(DiagramNode diagram, double width, double height, boolean bShrinkX, boolean bShrinkY)
+	public DPCanvas(DrawingNode drawing, double width, double height, boolean bShrinkX, boolean bShrinkY)
 	{
-		this( WidgetStyleSheet.defaultStyleSheet, diagram, width, height, bShrinkX, bShrinkY );
+		this( WidgetStyleSheet.defaultStyleSheet, drawing, width, height, bShrinkX, bShrinkY );
 	}
 	
-	public DPDiagram(WidgetStyleSheet styleSheet, DiagramNode diagram, double width, double height, boolean bShrinkX, boolean bShrinkY)
+	public DPCanvas(WidgetStyleSheet styleSheet, DrawingNode drawing, double width, double height, boolean bShrinkX, boolean bShrinkY)
 	{
 		super( styleSheet );
 		
-		this.diagram = diagram;
-		this.diagramWidth = width;
-		this.diagramHeight = height;
+		this.drawing = drawing;
+		this.drawingWidth = width;
+		this.drawingHeight = height;
 		setFlagValue( FLAG_DIAGRAM_SHRINK_X, bShrinkX );
 		setFlagValue( FLAG_DIAGRAM_SHRINK_Y, bShrinkY );
 	}
@@ -55,7 +55,7 @@ public class DPDiagram extends DPStatic implements DiagramOwner
 	
 	protected void draw(Graphics2D graphics)
 	{
-		diagram.draw( graphics );
+		drawing.draw( graphics );
 	}
 	
 	
@@ -65,12 +65,12 @@ public class DPDiagram extends DPStatic implements DiagramOwner
 	{
 		super.onRealise();
 		
-		diagram.realise( this );
+		drawing.realise( this );
 	}
 	
 	protected void onUnrealise(DPWidget unrealiseRoot)
 	{
-		diagram.unrealise();
+		drawing.unrealise();
 
 		super.onUnrealise( unrealiseRoot );
 	}
@@ -80,16 +80,16 @@ public class DPDiagram extends DPStatic implements DiagramOwner
 	
 	protected void updateRequisitionX()
 	{
-		double width = diagram.getParentSpaceBoundingBox().getUpperX();
-		if ( diagramWidth >= 0.0 )
+		double width = drawing.getParentSpaceBoundingBox().getUpperX();
+		if ( drawingWidth >= 0.0 )
 		{
 			if ( testFlag( FLAG_DIAGRAM_SHRINK_X ) )
 			{
-				width = Math.min( width, diagramWidth );
+				width = Math.min( width, drawingWidth );
 			}
 			else
 			{
-				width = diagramWidth;
+				width = drawingWidth;
 			}
 		}
 		layoutReqBox.setRequisitionX( width, 0.0 );
@@ -97,16 +97,16 @@ public class DPDiagram extends DPStatic implements DiagramOwner
 
 	protected void updateRequisitionY()
 	{
-		double height = diagram.getParentSpaceBoundingBox().getUpperY();
-		if ( diagramHeight >= 0.0 )
+		double height = drawing.getParentSpaceBoundingBox().getUpperY();
+		if ( drawingHeight >= 0.0 )
 		{
 			if ( testFlag( FLAG_DIAGRAM_SHRINK_Y ) )
 			{
-				height = Math.min( height, diagramHeight );
+				height = Math.min( height, drawingHeight );
 			}
 			else
 			{
-				height = diagramHeight;
+				height = drawingHeight;
 			}
 		}
 		layoutReqBox.setRequisitionY( height, 0.0 );
@@ -115,12 +115,12 @@ public class DPDiagram extends DPStatic implements DiagramOwner
 
 	protected PointerInputElement getFirstPointerChildAtLocalPoint(Point2 localPos)
 	{
-		return diagram;
+		return drawing;
 	}
 	
 	protected PointerInputElement getLastPointerChildAtLocalPoint(Point2 localPos)
 	{
-		return diagram;
+		return drawing;
 	}
 	
 
@@ -133,9 +133,9 @@ public class DPDiagram extends DPStatic implements DiagramOwner
 	
 	public PointerInputElement getDndElement(Point2 localPos, Point2 targetPos[])
 	{
-		if ( diagram != null )
+		if ( drawing != null )
 		{
-			PointerInputElement element = diagram.getDndElement( localPos, targetPos );
+			PointerInputElement element = drawing.getDndElement( localPos, targetPos );
 			if ( element != null )
 			{
 				if ( targetPos != null )
@@ -168,17 +168,17 @@ public class DPDiagram extends DPStatic implements DiagramOwner
 	//
 	//
 	
-	public void diagramQueueRedraw()
+	public void drawingQueueRedraw()
 	{
 		queueFullRedraw();
 	}
 
-	public DPPresentationArea getDiagramPresentationArea()
+	public DPPresentationArea getDrawingPresentationArea()
 	{
 		return presentationArea;
 	}
 
-	public ArrayList<PointerInterface> getPointersWithinDiagramNodeBounds(DiagramNode node)
+	public ArrayList<PointerInterface> getPointersWithinDrawingNodeBounds(DrawingNode node)
 	{
 		return presentationArea.getInputTable().getPointersWithinBoundsOfElement( node );
 	}

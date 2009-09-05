@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.Diagram;
+package BritefuryJ.DocPresent.Canvas;
 
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
@@ -24,7 +24,7 @@ public class TransformationNode extends UnaryBranchNode
 	protected AABox2 parentSpaceBox;
 	
 	
-	public TransformationNode(DiagramNode child, AffineTransform transform)
+	public TransformationNode(DrawingNode child, AffineTransform transform)
 	{
 		super( child );
 		
@@ -43,7 +43,7 @@ public class TransformationNode extends UnaryBranchNode
 	
 	
 	
-	public void realise(DiagramOwner owner)
+	public void realise(DrawingOwner owner)
 	{
 		super.realise( owner );
 
@@ -77,7 +77,7 @@ public class TransformationNode extends UnaryBranchNode
 
 	
 	// User API
-	public DiagramNode transform(AffineTransform t)
+	public DrawingNode transform(AffineTransform t)
 	{
 		AffineTransform x = (AffineTransform)t.clone();
 		x.concatenate( localToParent );

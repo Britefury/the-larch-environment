@@ -247,7 +247,12 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 			value.ensureCapacity(  xs.size() );
 			for (Object x: xs)
 			{
-				value.add( coerce( x ) );
+				x = coerce( x );
+				if ( x instanceof DMNode )
+				{
+					((DMNode)x).addParent( this );
+				}
+				value.add( x );
 			}
 		}
 		cell.setLiteralValue( value );
@@ -268,6 +273,10 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	{
 		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
 		x = coerce( x );
+		if ( x instanceof DMNode )
+		{
+			((DMNode)x).addParent( this );
+		}
 		boolean bResult = v.add( x );
 		cell.setLiteralValue( v );
 		if ( commandTracker != null )
@@ -282,6 +291,10 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	{
 		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
 		x = coerce( x );
+		if ( x instanceof DMNode )
+		{
+			((DMNode)x).addParent( this );
+		}
 		v.add( index, x );
 		cell.setLiteralValue( v );
 		if ( commandTracker != null )
@@ -299,7 +312,12 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		cxs.ensureCapacity( xs.size() );
 		for (Object x: xs)
 		{
-			cxs.add( coerce( x ) );
+			x = coerce( x );
+			cxs.add( x );
+			if ( x instanceof DMNode )
+			{
+				((DMNode)x).addParent( this );
+			}
 		}
 		
 		v.addAll( cxs );
@@ -320,7 +338,12 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		cxs.ensureCapacity( xs.size() );
 		for (Object x: xs)
 		{
-			cxs.add( coerce( x ) );
+			x = coerce( x );
+			cxs.add( x );
+			if ( x instanceof DMNode )
+			{
+				((DMNode)x).addParent( this );
+			}
 		}
 		
 		v.addAll( index, cxs );
@@ -341,6 +364,13 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		ArrayList<Object> copy = (ArrayList<Object>)v.clone();
 		v.clear();
 		cell.setLiteralValue( v );
+		for (Object x: copy)
+		{
+			if ( x instanceof DMNode )
+			{
+				((DMNode)x).removeParent( this );
+			}
+		}
 		if ( commandTracker != null )
 		{
 			commandTracker.onClear( this, copy );
@@ -458,6 +488,10 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	{
 		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
 		Object x = v.remove( i );
+		if ( x instanceof DMNode )
+		{
+			((DMNode)x).removeParent( this );
+		}
 		cell.setLiteralValue( v );
 		if ( commandTracker != null )
 		{
@@ -474,6 +508,10 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		if ( i != -1 )
 		{
 			v.remove( i );
+			if ( x instanceof DMNode )
+			{
+				((DMNode)x).removeParent( this );
+			}
 			cell.setLiteralValue( v );
 			if ( commandTracker != null )
 			{
@@ -499,6 +537,17 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
 		x = coerce( x );
 		Object oldX = v.set( index, x );
+		if ( oldX != x )
+		{
+			if ( oldX instanceof DMNode )
+			{
+				((DMNode)oldX).removeParent( this );
+			}
+			if ( x instanceof DMNode )
+			{
+				((DMNode)x).addParent( this );
+			}
+		}
 		cell.setLiteralValue( v );
 		if ( commandTracker != null )
 		{
@@ -608,8 +657,22 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		
 		Object[] result = JythonSlice.arraySetSlice( dest, i, src );
 
+		for (Object x: v)
+		{
+			if ( x instanceof DMNode )
+			{
+				((DMNode)x).removeParent( this );
+			}
+		}
 		v.clear();
 		v.addAll( Arrays.asList( result ) );
+		for (Object x: v)
+		{
+			if ( x instanceof DMNode )
+			{
+				((DMNode)x).addParent( this );
+			}
+		}
 		cell.setLiteralValue( v );
 		if ( commandTracker != null )
 		{
@@ -633,8 +696,22 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		
 		Object[] result = JythonSlice.arrayDelSlice( dest, i );
 
+		for (Object x: v)
+		{
+			if ( x instanceof DMNode )
+			{
+				((DMNode)x).removeParent( this );
+			}
+		}
 		v.clear();
 		v.addAll( Arrays.asList( result ) );
+		for (Object x: v)
+		{
+			if ( x instanceof DMNode )
+			{
+				((DMNode)x).addParent( this );
+			}
+		}
 		cell.setLiteralValue( v );
 		if ( commandTracker != null )
 		{
@@ -804,6 +881,11 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
 		for (int i = 0, j = v.size() - 1; i < numElements; i++, j--)
 		{
+			Object x = v.get( j );
+			if ( x instanceof DMNode )
+			{
+				((DMNode)x).removeParent( this );
+			}
 			v.remove( j );
 		}
 		cell.setLiteralValue( v );
@@ -819,6 +901,11 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
 		for (int i = 0; i < num; i++)
 		{
+			Object x = v.get( start );
+			if ( x instanceof DMNode )
+			{
+				((DMNode)x).removeParent( this );
+			}
 			v.remove( start );
 		}
 		cell.setLiteralValue( v );
@@ -832,8 +919,22 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	protected void setContents(List<Object> xs)
 	{
 		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
+		for (Object x: v)
+		{
+			if ( x instanceof DMNode )
+			{
+				((DMNode)x).removeParent( this );
+			}
+		}
 		v.clear();
 		v.addAll( xs );
+		for (Object x: v)
+		{
+			if ( x instanceof DMNode )
+			{
+				((DMNode)x).addParent( this );
+			}
+		}
 		cell.setLiteralValue( v );
 	}
 
@@ -874,6 +975,13 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	{
 		cell = new LiteralCell();
 		ArrayList<Object> value = (ArrayList<Object>)stream.readObject();
+		for (Object x: value)
+		{
+			if ( x instanceof DMNode )
+			{
+				((DMNode)x).addParent( this );
+			}
+		}
 		cell.setLiteralValue( value );
 		
 		commandTracker = null;

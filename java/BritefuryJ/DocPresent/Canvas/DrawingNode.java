@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.Diagram;
+package BritefuryJ.DocPresent.Canvas;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -24,7 +24,7 @@ import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 
-public abstract class DiagramNode extends PointerInputElement
+public abstract class DrawingNode extends PointerInputElement
 {
 	protected static class DrawContext
 	{
@@ -58,21 +58,21 @@ public abstract class DiagramNode extends PointerInputElement
 	}
 	
 	
-	protected DiagramOwner owner;
+	protected DrawingOwner owner;
 	
 	
 	
-	protected DiagramNode()
+	protected DrawingNode()
 	{
 	}
 	
-	protected DiagramNode(DiagramNode n)
+	protected DrawingNode(DrawingNode n)
 	{
 	}
 	
 	
 	
-	public void realise(DiagramOwner owner)
+	public void realise(DrawingOwner owner)
 	{
 		this.owner = owner;
 	}
@@ -88,86 +88,86 @@ public abstract class DiagramNode extends PointerInputElement
 	{
 		if ( owner != null )
 		{
-			owner.diagramQueueRedraw();
+			owner.drawingQueueRedraw();
 		}
 	}
 	
 	
 	// User API
-	public DiagramNode stroke(Stroke stroke)
+	public DrawingNode stroke(Stroke stroke)
 	{
 		return new StyleNode( this, stroke );
 	}
 	
-	public DiagramNode paint(Paint paint)
+	public DrawingNode paint(Paint paint)
 	{
 		return StyleNode.paintNode( this, paint );
 	}
 	
-	public DiagramNode fillPaint(Paint paint)
+	public DrawingNode fillPaint(Paint paint)
 	{
 		return StyleNode.fillPaintNode( this, paint );
 	}
 	
-	public DiagramNode hoverMonitor(HoverMonitor monitor)
+	public DrawingNode hoverMonitor(HoverMonitor monitor)
 	{
 		return new InteractionNode( this, monitor );
 	}
 	
-	public DiagramNode hoverHighlight(DiagramNode highlight)
+	public DrawingNode hoverHighlight(DrawingNode highlight)
 	{
 		return new InteractionNode( this, highlight );
 	}
 	
-	public DiagramNode onInteraction(InteractionListener listener)
+	public DrawingNode onInteraction(InteractionListener listener)
 	{
 		return new InteractionNode( this, listener );
 	}
 
-	public DiagramNode enableDnd(DndHandler dndHandler)
+	public DrawingNode enableDnd(DndHandler dndHandler)
 	{
 		return new InteractionNode( this, dndHandler );
 	}
 
-	public DiagramNode transform(AffineTransform t)
+	public DrawingNode transform(AffineTransform t)
 	{
 		return new TransformationNode( this, t );
 	}
 	
 	
-	public DiagramNode translate(double x, double y)
+	public DrawingNode translate(double x, double y)
 	{
 		return transform( AffineTransform.getTranslateInstance( x, y ) );
 	}
 
-	public DiagramNode translate(Vector2 x)
+	public DrawingNode translate(Vector2 x)
 	{
 		return transform( AffineTransform.getTranslateInstance( x.x, x.y ) );
 	}
 
 
-	public DiagramNode scale(double x, double y)
+	public DrawingNode scale(double x, double y)
 	{
 		return transform( AffineTransform.getScaleInstance( x, y ) );
 	}
 
-	public DiagramNode scale(Vector2 s)
+	public DrawingNode scale(Vector2 s)
 	{
 		return transform( AffineTransform.getScaleInstance( s.x, s.y ) );
 	}
 
-	public DiagramNode scale(double s)
+	public DrawingNode scale(double s)
 	{
 		return transform( AffineTransform.getScaleInstance( s, s ) );
 	}
 
 	
-	public DiagramNode rotate(double r)
+	public DrawingNode rotate(double r)
 	{
 		return transform( AffineTransform.getRotateInstance( r ) );
 	}
 
-	public DiagramNode rotateDegrees(double r)
+	public DrawingNode rotateDegrees(double r)
 	{
 		return transform( AffineTransform.getRotateInstance( Math.toRadians( r ) ) );
 	}

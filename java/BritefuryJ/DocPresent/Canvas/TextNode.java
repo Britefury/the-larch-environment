@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.Diagram;
+package BritefuryJ.DocPresent.Canvas;
 
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -17,7 +17,7 @@ import BritefuryJ.DocPresent.Util.TextVisual;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 
-public class TextNode extends DiagramNode
+public class TextNode extends DrawingNode
 {
 	protected static Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
 	
@@ -57,11 +57,11 @@ public class TextNode extends DiagramNode
 	}
 
 
-	public void realise(DiagramOwner owner)
+	public void realise(DrawingOwner owner)
 	{
 		super.realise( owner );
 
-		DPPresentationArea area = owner.getDiagramPresentationArea();
+		DPPresentationArea area = owner.getDrawingPresentationArea();
 		visual = TextVisual.getTextVisual( area, text, font, bMixedSizeCaps );
 		visual.realise( area );
 		LReqBox req = visual.getRequisition();

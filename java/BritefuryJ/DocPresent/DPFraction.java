@@ -34,6 +34,9 @@ public class DPFraction extends DPContainer
 	
 	public static class DPFractionBar extends DPContentLeafEditableEntry
 	{
+		public static double BAR_HEIGHT = 1.5;
+		
+		
 		public DPFractionBar(String textRepresentation)
 		{
 			this( FractionStyleSheet.BarStyleSheet.defaultStyleSheet, textRepresentation );
@@ -123,7 +126,7 @@ public class DPFraction extends DPContainer
 
 		protected void updateRequisitionY()
 		{
-			layoutReqBox.clearRequisitionY();
+			layoutReqBox.setRequisitionY( BAR_HEIGHT, 0.0 );
 		}
 		
 		

@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.Diagram;
+package BritefuryJ.DocPresent.Canvas;
 
 import java.awt.Graphics2D;
 import java.awt.Paint;
@@ -29,7 +29,7 @@ public class StyleNode extends UnaryBranchNode
 
 	
 	
-	protected StyleNode(DiagramNode child, Stroke stroke, Paint paint, Paint fillPaint, int flags)
+	protected StyleNode(DrawingNode child, Stroke stroke, Paint paint, Paint fillPaint, int flags)
 	{
 		super( child );
 		this.stroke = stroke;
@@ -38,7 +38,7 @@ public class StyleNode extends UnaryBranchNode
 		this.flags = flags;
 	}
 
-	public StyleNode(DiagramNode child, Stroke stroke)
+	public StyleNode(DrawingNode child, Stroke stroke)
 	{
 		super( child );
 		this.stroke = stroke;
@@ -56,7 +56,7 @@ public class StyleNode extends UnaryBranchNode
 	
 	
 	// User API
-	public DiagramNode stroke(Stroke stroke)
+	public DrawingNode stroke(Stroke stroke)
 	{
 		StyleNode s = new StyleNode( this );
 		s.stroke = stroke;
@@ -64,7 +64,7 @@ public class StyleNode extends UnaryBranchNode
 		return s;
 	}
 	
-	public DiagramNode paint(Paint paint)
+	public DrawingNode paint(Paint paint)
 	{
 		StyleNode s = new StyleNode( this );
 		s.paint = paint;
@@ -72,7 +72,7 @@ public class StyleNode extends UnaryBranchNode
 		return s;
 	}
 
-	public DiagramNode fillPaint(Paint fillPaint)
+	public DrawingNode fillPaint(Paint fillPaint)
 	{
 		StyleNode s = new StyleNode( this );
 		s.fillPaint = fillPaint;
@@ -129,12 +129,12 @@ public class StyleNode extends UnaryBranchNode
 	}
 	
 	
-	public static StyleNode paintNode(DiagramNode child, Paint paint)
+	public static StyleNode paintNode(DrawingNode child, Paint paint)
 	{
 		return new StyleNode( child, null, paint, null, BITMASK_PAINT );
 	}
 
-	public static StyleNode fillPaintNode(DiagramNode child, Paint fillPaint)
+	public static StyleNode fillPaintNode(DrawingNode child, Paint fillPaint)
 	{
 		return new StyleNode( child, null, null, fillPaint, BITMASK_FILLPAINT );
 	}

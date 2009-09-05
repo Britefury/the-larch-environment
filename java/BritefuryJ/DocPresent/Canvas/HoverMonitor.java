@@ -4,16 +4,15 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.Diagram;
+package BritefuryJ.DocPresent.Canvas;
 
-import java.util.ArrayList;
-
-import BritefuryJ.DocPresent.DPPresentationArea;
-import BritefuryJ.DocPresent.Input.PointerInterface;
-
-public interface DiagramOwner
+public abstract class HoverMonitor
 {
-	void diagramQueueRedraw();
-	DPPresentationArea getDiagramPresentationArea();
-	ArrayList<PointerInterface> getPointersWithinDiagramNodeBounds(DiagramNode node);
+	protected void onEnter()
+	{
+	}
+
+	protected void onLeave()
+	{
+	}
 }
