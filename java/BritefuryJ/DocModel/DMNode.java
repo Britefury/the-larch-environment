@@ -17,8 +17,6 @@ import org.python.core.PyJavaType;
 import org.python.core.PyObject;
 import org.python.core.PyObjectDerived;
 
-import BritefuryJ.DocTree.DocTreeNode;
-
 
 public abstract class DMNode
 {
@@ -100,7 +98,7 @@ public abstract class DMNode
 			}
 			return true;
 		}
-
+		
 		public boolean isEmpty()
 		{
 			return node.parents.isEmpty();
@@ -151,6 +149,22 @@ public abstract class DMNode
 		public int count(Object x)
 		{
 			return contains( x )  ?  1  :  0;
+		}
+		
+		
+		
+		public ArrayList<DMNode> getValidParents()
+		{
+			ArrayList<DMNode> p = new ArrayList<DMNode>();
+			for (WeakReference<DMNode> ref: node.parents)
+			{
+				DMNode node = ref.get();
+				if ( node != null )
+				{
+					p.add( node );
+				}
+			}
+			return p;
 		}
 		
 		
@@ -291,18 +305,6 @@ public abstract class DMNode
 		else if ( x instanceof DMNode )
 		{
 			return x;
-		}
-		else if ( x instanceof DocTreeNode )
-		{
-			// !!!!!!THIS MUST REMAIN HERE!!!!!!
-			// If not, attempting to convert a DocTree node to a DMNode, will result in the entire
-			// tree being rebuilt. This causes two problems:
-			// - Its wasteful; we can just extract the underlying DMNode
-			// - It accesses all elements in the subtree; every list item, every object field value. These accesses are tracked by the
-			// cell system; modifying a node in the tree will result in all document view nodes along the path from the node to
-			// the root node being updated.
-			return coerce( ((DocTreeNode)x).getNode() );
-			// !!!!!!THIS MUST REMAIN HERE!!!!!!
 		}
 		else if ( x instanceof String )
 		{

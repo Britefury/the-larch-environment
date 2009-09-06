@@ -10,19 +10,30 @@ import java.util.Arrays;
 
 import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMList;
-import BritefuryJ.DocTree.DocTree;
-import BritefuryJ.DocTree.DocTreeList;
 import BritefuryJ.DocView.DVNode;
 import BritefuryJ.DocView.DocView;
 import BritefuryJ.DocView.DocViewNodeTable;
 
 public class Test_DocViewNodeTable extends TestCase
 {
+	// Extend DocViewNodeTable so that the @refViewNode and @unrefViewNode methods are accessible
+	private static class TestTable extends DocViewNodeTable
+	{
+		protected void refViewNode(DVNode node)
+		{
+			super.refViewNode( node );
+		}
+
+		protected void unrefViewNode(DVNode node)
+		{
+			super.unrefViewNode( node );
+		}
+	}
+	
+	
 	private DMList da, db, dc, dd;
-	private DocTreeList ta, tb, tc, tbd, tcd;
-	private DocTree tree;
-	private DocViewNodeTable table;
-	private DVNode va, vb, vc, vbd, vcd;
+	private TestTable table;
+	private DVNode va, vb, vc, vd1, vd2;
 	private DocView view;
 	
 
@@ -35,43 +46,32 @@ public class Test_DocViewNodeTable extends TestCase
 		da = new DMList( Arrays.asList( new Object[] { db, dc } ) );
 		
 		
-		tree = new DocTree();
-		ta = (DocTreeList)tree.treeNode( da );
-		tb = (DocTreeList)ta.get( 0 );
-		tc = (DocTreeList)ta.get( 1 );
-		tbd = (DocTreeList)tb.get( 0 );
-		tcd = (DocTreeList)tc.get( 0 );
+		view = new DocView( da, null );
+		
+		va = new DVNode( view, da, null );
+		vb = new DVNode( view, db, null );
+		vc = new DVNode( view, dc, null );
+		vd1 = new DVNode( view, dd, null );
+		vd2 = new DVNode( view, dd, null );
 		
 		
-		view = new DocView( tree, ta, null );
-		
-		va = new DVNode( view, ta, null );
-		vb = new DVNode( view, tb, null );
-		vc = new DVNode( view, tc, null );
-		vbd = new DVNode( view, tbd, null );
-		vcd = new DVNode( view, tcd, null );
-		
-		
-		table = new DocViewNodeTable();
+		table = new TestTable();
 
-		table.put( ta, va );
-		table.put( tb, vb );
-		table.put( tc, vc );
-		table.put( tbd, vbd );
-		table.put( tcd, vcd );
+		table.put( da, va );
+		table.put( db, vb );
+		table.put( dc, vc );
+		table.put( dd, vd1 );
+		table.put( dd, vd2 );
 	}
 	
 	public void tearDown()
 	{
 		da = db = dc = dd = null;
 		
-		tree = null;
-		ta = tb = tc = tbd = tcd = null;
-		
 		table = null;
 
 		view = null;
-		va = vb = vc = vbd = vcd = null;
+		va = vb = vc = vd1 = vd2 = null;
 	}
 	
 	
@@ -82,70 +82,64 @@ public class Test_DocViewNodeTable extends TestCase
 		assertEquals( table.getNumDocNodes(), 4 );
 		assertEquals( table.getNumViewNodesForDocNode( dd ), 2 );
 		
-		assertTrue( table.containsKey( ta ) );
-		assertTrue( table.containsKey( tb ) );
-		assertTrue( table.containsKey( tc ) );
-		assertTrue( table.containsKey( tbd ) );
-		assertTrue( table.containsKey( tcd ) );
-
-		assertSame( table.get( ta ), va );
-		assertSame( table.get( tb ), vb );
-		assertSame( table.get( tc ), vc );
-		assertSame( table.get( tbd ), vbd );
-		assertSame( table.get( tcd ), vcd );
+		assertTrue( table.containsKey( da ) );
+		assertTrue( table.containsKey( db ) );
+		assertTrue( table.containsKey( dc ) );
+		assertTrue( table.containsKey( dd ) );
+		
+		assertEquals( Arrays.asList( new DVNode[] { va } ), table.get( da ) );
+		assertEquals( Arrays.asList( new DVNode[] { vb } ), table.get( db ) );
+		assertEquals( Arrays.asList( new DVNode[] { vc } ), table.get( dc ) );
+		assertEquals( Arrays.asList( new DVNode[] { vd1, vd2 } ), table.get( dd ) );
 	}
 	
 	public void testRemove()
 	{
-		table.remove( ta );
-		table.remove( tbd );
+		table.remove( va );
+		table.remove( vd1 );
 
 		assertEquals( table.size(), 3 );
 		assertEquals( table.getNumDocNodes(), 3 );
 		assertEquals( table.getNumViewNodesForDocNode( dd ), 1 );
 		
-		assertFalse( table.containsKey( ta ) );
-		assertTrue( table.containsKey( tb ) );
-		assertTrue( table.containsKey( tc ) );
-		assertFalse( table.containsKey( tbd ) );
-		assertTrue( table.containsKey( tcd ) );
+		assertFalse( table.containsKey( da ) );
+		assertTrue( table.containsKey( db ) );
+		assertTrue( table.containsKey( dc ) );
+		assertTrue( table.containsKey( dd ) );
 
-		assertSame( table.get( ta ), null );
-		assertSame( table.get( tb ), vb );
-		assertSame( table.get( tc ), vc );
-		assertSame( table.get( tbd ), null );
-		assertSame( table.get( tcd ), vcd );
+		assertEquals( Arrays.asList( new DVNode[] {} ), table.get( da ) );
+		assertEquals( Arrays.asList( new DVNode[] { vb } ), table.get( db ) );
+		assertEquals( Arrays.asList( new DVNode[] { vc } ), table.get( dc ) );
+		assertEquals( Arrays.asList( new DVNode[] { vd2 } ), table.get( dd ) );
 	}
 
 	public void testPut()
 	{
-		DVNode vx = new DVNode( view, ta, null  );
-		DVNode vy = new DVNode( view, tbd, null );
+		DVNode vx = new DVNode( view, da, null  );
+		DVNode vy = new DVNode( view, dd, null );
 		
-		table.put( ta, vx );
-		table.put( tbd, vy );
+		table.put( da, vx );
+		table.put( dd, vy );
 
-		assertEquals( table.size(), 5 );
+		assertEquals( table.size(), 7 );
 		assertEquals( table.getNumDocNodes(), 4 );
-		assertEquals( table.getNumViewNodesForDocNode( dd ), 2 );
+		assertEquals( table.getNumViewNodesForDocNode( dd ), 3 );
 		
-		assertTrue( table.containsKey( ta ) );
-		assertTrue( table.containsKey( tb ) );
-		assertTrue( table.containsKey( tc ) );
-		assertTrue( table.containsKey( tbd ) );
-		assertTrue( table.containsKey( tcd ) );
+		assertTrue( table.containsKey( da ) );
+		assertTrue( table.containsKey( db ) );
+		assertTrue( table.containsKey( dc ) );
+		assertTrue( table.containsKey( dd ) );
 
-		assertSame( table.get( ta ), vx );
-		assertSame( table.get( tb ), vb );
-		assertSame( table.get( tc ), vc );
-		assertSame( table.get( tbd ), vy );
-		assertSame( table.get( tcd ), vcd );
+		assertEquals( Arrays.asList( new DVNode[] { va, vx } ), table.get( da ) );
+		assertEquals( Arrays.asList( new DVNode[] { vb } ), table.get( db ) );
+		assertEquals( Arrays.asList( new DVNode[] { vc } ), table.get( dc ) );
+		assertEquals( Arrays.asList( new DVNode[] { vd1, vd2, vy } ), table.get( dd ) );
 	}
 
-	public void testGC()
+	public void testViewGC()
 	{
 		va = null;
-		vbd = null;
+		vd1 = null;
 		System.gc();
 		
 		// Need to call DocViewNodeTable.clean() in order to clean away all weak-refs, etc
@@ -155,24 +149,22 @@ public class Test_DocViewNodeTable extends TestCase
 		assertEquals( table.getNumDocNodes(), 3 );
 		assertEquals( table.getNumViewNodesForDocNode( dd ), 1 );
 		
-		assertFalse( table.containsKey( ta ) );
-		assertTrue( table.containsKey( tb ) );
-		assertTrue( table.containsKey( tc ) );
-		assertFalse( table.containsKey( tbd ) );
-		assertTrue( table.containsKey( tcd ) );
+		assertFalse( table.containsKey( da ) );
+		assertTrue( table.containsKey( db ) );
+		assertTrue( table.containsKey( dc ) );
+		assertTrue( table.containsKey( dd ) );
 
-		assertSame( table.get( ta ), null );
-		assertSame( table.get( tb ), vb );
-		assertSame( table.get( tc ), vc );
-		assertSame( table.get( tbd ), null );
-		assertSame( table.get( tcd ), vcd );
+		assertEquals( Arrays.asList( new DVNode[] {} ), table.get( da ) );
+		assertEquals( Arrays.asList( new DVNode[] { vb } ), table.get( db ) );
+		assertEquals( Arrays.asList( new DVNode[] { vc } ), table.get( dc ) );
+		assertEquals( Arrays.asList( new DVNode[] { vd2 } ), table.get( dd ) );
 	}
 	
 	
 	public void testUnref()
 	{
 		table.unrefViewNode( va );
-		table.unrefViewNode( vbd );
+		table.unrefViewNode( vd1 );
 
 		assertEquals( table.size(), 3 );
 		assertEquals( table.getNumDocNodes(), 4 );
@@ -181,19 +173,17 @@ public class Test_DocViewNodeTable extends TestCase
 		assertEquals( table.getNumUnrefedViewNodesForDocNode( da ), 1 );
 		assertEquals( table.getNumUnrefedViewNodesForDocNode( dd ), 1 );
 		
-		assertFalse( table.containsKey( ta ) );
-		assertTrue( table.containsKey( tb ) );
-		assertTrue( table.containsKey( tc ) );
-		assertFalse( table.containsKey( tbd ) );
-		assertTrue( table.containsKey( tcd ) );
+		assertFalse( table.containsKey( da ) );
+		assertTrue( table.containsKey( db ) );
+		assertTrue( table.containsKey( dc ) );
+		assertTrue( table.containsKey( dd ) );
 
-		assertSame( table.get( ta ), null );
-		assertSame( table.get( tb ), vb );
-		assertSame( table.get( tc ), vc );
-		assertSame( table.get( tbd ), null );
-		assertSame( table.get( tcd ), vcd );
+		assertEquals( Arrays.asList( new DVNode[] {} ), table.get( da ) );
+		assertEquals( Arrays.asList( new DVNode[] { vb } ), table.get( db ) );
+		assertEquals( Arrays.asList( new DVNode[] { vc } ), table.get( dc ) );
+		assertEquals( Arrays.asList( new DVNode[] { vd2 } ), table.get( dd ) );
 		
-		table.clearUnused();
+		table.clean();
 
 		assertEquals( table.size(), 3 );
 		assertEquals( table.getNumDocNodes(), 3 );
@@ -204,9 +194,9 @@ public class Test_DocViewNodeTable extends TestCase
 	public void testUnrefReref()
 	{
 		table.unrefViewNode( va );
-		table.unrefViewNode( vbd );
+		table.unrefViewNode( vd1 );
 		table.refViewNode( va );
-		table.refViewNode( vbd );
+		table.refViewNode( vd1 );
 
 		assertEquals( table.size(), 5 );
 		assertEquals( table.getNumDocNodes(), 4 );
@@ -215,19 +205,17 @@ public class Test_DocViewNodeTable extends TestCase
 		assertEquals( table.getNumUnrefedViewNodesForDocNode( da ), 0 );
 		assertEquals( table.getNumUnrefedViewNodesForDocNode( dd ), 0 );
 		
-		assertTrue( table.containsKey( ta ) );
-		assertTrue( table.containsKey( tb ) );
-		assertTrue( table.containsKey( tc ) );
-		assertTrue( table.containsKey( tbd ) );
-		assertTrue( table.containsKey( tcd ) );
+		assertTrue( table.containsKey( da ) );
+		assertTrue( table.containsKey( db ) );
+		assertTrue( table.containsKey( dc ) );
+		assertTrue( table.containsKey( dd ) );
 
-		assertSame( table.get( ta ), va );
-		assertSame( table.get( tb ), vb );
-		assertSame( table.get( tc ), vc );
-		assertSame( table.get( tbd ), vbd );
-		assertSame( table.get( tcd ), vcd );
+		assertEquals( Arrays.asList( new DVNode[] { va } ), table.get( da ) );
+		assertEquals( Arrays.asList( new DVNode[] { vb } ), table.get( db ) );
+		assertEquals( Arrays.asList( new DVNode[] { vc } ), table.get( dc ) );
+		assertEquals( Arrays.asList( new DVNode[] { vd2, vd1 } ), table.get( dd ) );
 		
-		table.clearUnused();
+		table.clean();
 
 		assertEquals( table.size(), 5 );
 		assertEquals( table.getNumDocNodes(), 4 );
@@ -239,58 +227,46 @@ public class Test_DocViewNodeTable extends TestCase
 
 	public void testReuseUnrefed()
 	{
-		table.remove( tbd );
-		table.unrefViewNode( vcd );
+		table.remove( vd1 );
+		table.unrefViewNode( vd2 );
 
 		assertEquals( table.size(), 3 );
 		assertEquals( table.getNumDocNodes(), 4 );
 		assertEquals( table.getNumViewNodesForDocNode( dd ), 0 );
 		assertEquals( table.getNumUnrefedViewNodesForDocNode( dd ), 1 );
 		
-		assertTrue( table.containsKey( ta ) );
-		assertTrue( table.containsKey( tb ) );
-		assertTrue( table.containsKey( tc ) );
-		assertFalse( table.containsKey( tbd ) );
-		assertFalse( table.containsKey( tcd ) );
+		assertTrue( table.containsKey( da ) );
+		assertTrue( table.containsKey( db ) );
+		assertTrue( table.containsKey( dc ) );
+		assertFalse( table.containsKey( dd ) );
 
-		assertSame( table.get( ta ), va );
-		assertSame( table.get( tb ), vb );
-		assertSame( table.get( tc ), vc );
-		assertSame( table.get( tbd ), null );
-		assertSame( table.get( tcd ), null );
+		assertEquals( Arrays.asList( new DVNode[] { va } ), table.get( da ) );
+		assertEquals( Arrays.asList( new DVNode[] { vb } ), table.get( db ) );
+		assertEquals( Arrays.asList( new DVNode[] { vc } ), table.get( dc ) );
+		assertEquals( Arrays.asList( new DVNode[] {} ), table.get( dd ) );
 		
 		
 		// Reuse
-		DVNode val = table.takeUnusedViewNodeFor( tcd );
-		assertSame( val, vcd );
+		DVNode val = table.takeUnusedViewNodeFor( dd, null );
+		assertSame( val, vd2 );
 		assertSame( val.getDocNode(), dd );
-		assertSame( val.getTreeNode(), tcd );
 		
-		assertSame( table.get( tcd ), vcd );
-		assertFalse( table.containsKey( tbd ) );
-		assertTrue( table.containsKey( tcd ) );
+		assertEquals( Arrays.asList( new DVNode[] { vd2 } ), table.get( dd ) );
+		assertTrue( table.containsKey( dd ) );
 		assertEquals( table.size(), 4 );
 		
 		
 		
 		// Unref again
-		table.unrefViewNode( vcd );
+		table.unrefViewNode( vd2 );
 		assertEquals( table.size(), 3 );
 		
-		
-		// Reuse for a different key this time
-		val = table.takeUnusedViewNodeFor( tbd );
-		assertSame( val, vcd );					// This is the DVNode vcd
-		assertSame( val.getDocNode(), dd );			// dd is the doc-node, (as previously)
-		assertSame( val.getTreeNode(), tbd );		// the tree-node is now tbd  (changed)
-		
-		assertSame( table.get( tbd ), vcd );
-		assertTrue( table.containsKey( tbd ) );		// contains tbd
-		assertFalse( table.containsKey( tcd ) );		// but not tcd
-		assertEquals( table.size(), 4 );
+		// Take an unused node again
+		val = table.takeUnusedViewNodeFor( dd, null );
+		assertSame( val, vd2 );
 		
 		
-		// Ensure that there is no unused node
-		assertSame( table.takeUnusedViewNodeFor( tbd ), null );
+		// Ensure that no unused nodes remain
+		assertSame( table.takeUnusedViewNodeFor( dd, null ), null );
 	}
 }

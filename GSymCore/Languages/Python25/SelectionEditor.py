@@ -18,11 +18,9 @@ from java.awt.datatransfer import UnsupportedFlavorException, DataFlavor, String
 
 from Britefury.Kernel.Abstract import abstractmethod
 
-from BritefuryJ.DocModel import DMList, DMObject, DMObjectInterface
+from BritefuryJ.DocModel import DMList, DMObject, DMObjectInterface, DMNode
 
 from BritefuryJ.Transformation import DefaultIdentityTransformationFunction
-
-from BritefuryJ.DocTree import DocTreeNode, DocTreeList, DocTreeObject
 
 from BritefuryJ.Parser.ItemStream import ItemStreamBuilder, ItemStream
 
@@ -181,8 +179,8 @@ class Python25EditHandler (EditHandler):
 	
 	
 	def _dedentLine(self, element, context, node):
-		suite = node.getParentTreeNode()
-		suiteParent = suite.getParentTreeNode()
+		suite = node.getParents().getValidParents()[0]
+		suiteParent = suite.getParents().getValidParents()[0]
 		if not suiteParent.isInstanceOf( Nodes.PythonModule ):
 			# This statement is not in the root node
 			element.setStructuralPrefixObject( Nodes.Dedent() )
@@ -384,7 +382,7 @@ class Python25EditHandler (EditHandler):
 			builder = ItemStreamBuilder()
 			for item in stream.getItems():
 				if isinstance( item, ItemStream.StructuralItem ):
-					builder.appendStructuralValue( _identity.apply( DocTreeNode.unwrap( item.getStructuralValue() ), _identity ) )
+					builder.appendStructuralValue( _identity.apply( item.getStructuralValue(), _identity ) )
 				elif isinstance( item, ItemStream.TextItem ):
 					builder.appendTextValue( item.getTextValue() )
 			

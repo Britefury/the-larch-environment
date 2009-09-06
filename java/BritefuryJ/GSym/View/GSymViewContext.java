@@ -11,6 +11,7 @@ import java.util.HashMap;
 import org.python.core.PyObject;
 
 import BritefuryJ.CommandHistory.CommandHistory;
+import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocPresent.DPFrame;
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPWidget;
@@ -19,8 +20,6 @@ import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Selection.Selection;
-import BritefuryJ.DocTree.DocTree;
-import BritefuryJ.DocTree.DocTreeNode;
 import BritefuryJ.DocView.DVNode;
 import BritefuryJ.DocView.DocView;
 import BritefuryJ.Utils.Profile.ProfileTimer;
@@ -35,12 +34,6 @@ public class GSymViewContext implements DocView.RefreshListener
 	
 	static boolean ENABLE_PROFILING = false;
 	
-	
-	public static class CannotViewTerminalDocNode extends Exception
-	{
-		private static final long serialVersionUID = 1L;
-	}
-
 	
 	protected static class NodeContentsFactory implements DVNode.NodeElementFactory
 	{
@@ -59,7 +52,7 @@ public class GSymViewContext implements DocView.RefreshListener
 		}
 
 
-		public DPWidget createNodeElement(DVNode viewNode, DocTreeNode treeNode)
+		public DPWidget createNodeElement(DVNode viewNode, DMNode treeNode)
 		{
 			// Create the node view instance
 			GSymNodeViewContext nodeViewInstance = new GSymNodeViewContext( viewInstance, viewNode );
@@ -127,9 +120,7 @@ public class GSymViewContext implements DocView.RefreshListener
 	
 	
 	
-	private Object docRootNode;
-	private DocTree tree;
-	private DocTreeNode treeRootNode;
+	private DMNode docRootNode;
 	
 	private GSymNodeViewFunction generalNodeViewFunction;
 	
@@ -143,48 +134,38 @@ public class GSymViewContext implements DocView.RefreshListener
 	private CommandHistory commandHistory;
 	
 	
-	public GSymViewContext(Object docRootNode, GSymNodeViewFunction generalNodeViewFunction, GSymNodeViewFunction rootNodeViewFunction,
-			CommandHistory commandHistory) throws CannotViewTerminalDocNode
+	public GSymViewContext(DMNode docRootNode, GSymNodeViewFunction generalNodeViewFunction, GSymNodeViewFunction rootNodeViewFunction,
+			CommandHistory commandHistory)
 	{
 		this.docRootNode = docRootNode;
-		tree = new DocTree();
-		Object docTreeRoot = tree.treeNode( docRootNode );
 		this.commandHistory = commandHistory;
 		
-		if ( docTreeRoot instanceof DocTreeNode )
-		{
-			treeRootNode = (DocTreeNode)docTreeRoot;
-			this.generalNodeViewFunction = generalNodeViewFunction; 
-			
-			frame = new DPFrame();
-			
-			indentationBorders = new HashMap<Double, Border>();
-			nodeContentsFactories = new HashMap<NodeContentsFactoryKey, NodeContentsFactory>();
-	
-			view = new DocView( tree, treeRootNode, makeNodeElementFactory( rootNodeViewFunction, null ) );
-			view.setElementChangeListener( new NodeElementChangeListenerDiff() );
-			view.setRefreshListener( this );
-			frame.setChild( view.getRootViewElement().alignHExpand() );
-		}
-		else
-		{
-			throw new CannotViewTerminalDocNode();
-		}
+		this.generalNodeViewFunction = generalNodeViewFunction; 
+		
+		frame = new DPFrame();
+		
+		indentationBorders = new HashMap<Double, Border>();
+		nodeContentsFactories = new HashMap<NodeContentsFactoryKey, NodeContentsFactory>();
+
+		view = new DocView( docRootNode, makeNodeElementFactory( rootNodeViewFunction, null ) );
+		view.setElementChangeListener( new NodeElementChangeListenerDiff() );
+		view.setRefreshListener( this );
+		frame.setChild( view.getRootViewElement().alignHExpand() );
 	}
 	
 	
-	public GSymViewContext(Object docRootNode, PyObject generalNodeViewFunction, PyObject rootNodeViewFunction, CommandHistory commandHistory) throws CannotViewTerminalDocNode
+	public GSymViewContext(DMNode docRootNode, PyObject generalNodeViewFunction, PyObject rootNodeViewFunction, CommandHistory commandHistory)
 	{
 		this( docRootNode, new PyGSymNodeViewFunction( generalNodeViewFunction ), new PyGSymNodeViewFunction( generalNodeViewFunction ), commandHistory );
 	}
 
 	
-	public GSymViewContext(Object docRootNode, GSymNodeViewFunction nodeViewFunction, CommandHistory commandHistory) throws CannotViewTerminalDocNode
+	public GSymViewContext(DMNode docRootNode, GSymNodeViewFunction nodeViewFunction, CommandHistory commandHistory)
 	{
 		this( docRootNode, nodeViewFunction, nodeViewFunction, commandHistory );
 	}
 
-	public GSymViewContext(Object docRootNode, PyObject nodeViewFunction, CommandHistory commandHistory) throws CannotViewTerminalDocNode
+	public GSymViewContext(DMNode docRootNode, PyObject nodeViewFunction, CommandHistory commandHistory)
 	{
 		this( docRootNode, new PyGSymNodeViewFunction( nodeViewFunction ), commandHistory );
 	}
@@ -266,21 +247,11 @@ public class GSymViewContext implements DocView.RefreshListener
 	
 	
 	
-	public Object getDocRootNode()
+	public DMNode getDocRootNode()
 	{
 		return docRootNode;
 	}
 	
-	public DocTree getTree()
-	{
-		return tree;
-	}
-	
-	public DocTreeNode getTreeRootNode()
-	{
-		return treeRootNode;
-	}
-
 	
 	
 	public CommandHistory getCommandHistory()

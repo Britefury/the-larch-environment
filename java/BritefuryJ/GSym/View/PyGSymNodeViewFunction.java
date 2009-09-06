@@ -9,8 +9,8 @@ package BritefuryJ.GSym.View;
 import org.python.core.Py;
 import org.python.core.PyObject;
 
+import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocTree.DocTreeNode;
 
 class PyGSymNodeViewFunction implements GSymNodeViewFunction
 {
@@ -23,7 +23,7 @@ class PyGSymNodeViewFunction implements GSymNodeViewFunction
 	}
 
 
-	public DPWidget createElement(DocTreeNode x, GSymNodeViewContext ctx, Object state)
+	public DPWidget createElement(DMNode x, GSymNodeViewContext ctx, Object state)
 	{
 		return (DPWidget)Py.tojava( callable.__call__( Py.java2py( x ), Py.java2py( ctx ), Py.java2py( state ) ), DPWidget.class );
 	}

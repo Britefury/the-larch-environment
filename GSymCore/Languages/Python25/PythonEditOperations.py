@@ -18,11 +18,9 @@ from java.awt.datatransfer import UnsupportedFlavorException, DataFlavor, String
 
 from Britefury.Kernel.Abstract import abstractmethod
 
-from BritefuryJ.DocModel import DMList, DMObject, DMObjectInterface
+from BritefuryJ.DocModel import DMList, DMObject, DMObjectInterface, DMNode
 
 from BritefuryJ.Transformation import DefaultIdentityTransformationFunction
-
-from BritefuryJ.DocTree import DocTreeNode, DocTreeList, DocTreeObject
 
 from BritefuryJ.ParserDebugViewer import ParseViewFrame
 
@@ -146,14 +144,14 @@ def pyReplaceExpression(ctx, data, replacement):
 
 	
 def pyReplaceStmt(ctx, target, replacement, bDontReplaceIfEqual=True):
-	if isinstance( target, DocTreeNode ):
+	if isinstance( target, DMNode ):
 		if target == replacement  and  bDontReplaceIfEqual:
 			# Same content; ignore
 			return target
 		else:
 			return EditOperations.replaceNodeContents( ctx, target, replacement )
 	else:
-		raise TypeError, 'PythonEditOperations:pyReplaceStmt(): @target must be a DocTreeNode'
+		raise TypeError, 'PythonEditOperations:pyReplaceStmt(): @target must be a DMNode'
 			
 def performSuiteEdits(target, modified):
 	commonPrefixLen = 0

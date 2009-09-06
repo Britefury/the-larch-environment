@@ -169,7 +169,7 @@ public class ParagraphLayout
 			prefWidth = prefX + child.prefWidth;
 			prefAdvance = prefWidth + child.prefHSpacing;
 			prefX = prefAdvance + hSpacing;
-
+			
 		
 			if ( child.isLineBreak() )
 			{
@@ -280,6 +280,7 @@ public class ParagraphLayout
 			
 			if ( lineWidth > allocBox.allocationX  &&  bestLineBreak != null  &&  i > lineStartIndex )
 			{
+				System.out.println( "ParagraphLayout.allocateX: using line break: lineWidth=" + lineWidth + ", allocationX=" + allocBox.allocationX + ", reqBox.prefWidth=" + box.getPrefWidth() );
 				// We need to start a new line
 				
 				// Pick a line break

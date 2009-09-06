@@ -8,11 +8,10 @@ package BritefuryJ.DocView;
 
 import java.util.Arrays;
 
+import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
-import BritefuryJ.DocTree.DocTree;
-import BritefuryJ.DocTree.DocTreeNode;
 import BritefuryJ.Utils.Profile.ProfileTimer;
 
 public class DocView implements DVNode.NodeRefreshListener
@@ -23,7 +22,7 @@ public class DocView implements DVNode.NodeRefreshListener
 	}
 	
 	
-	private DocTreeNode root;
+	private DMNode root;
 	private DVNode.NodeElementFactory rootElementFactory;
 	protected DocViewNodeTable nodeTable;
 	private DVNode rootView;
@@ -45,7 +44,7 @@ public class DocView implements DVNode.NodeRefreshListener
 	
 	
 	
-	public DocView(DocTree tree, DocTreeNode root, DVNode.NodeElementFactory rootElementFactory)
+	public DocView(DMNode root, DVNode.NodeElementFactory rootElementFactory)
 	{
 		this.root = root;
 		this.rootElementFactory = rootElementFactory;
@@ -105,30 +104,23 @@ public class DocView implements DVNode.NodeRefreshListener
 	
 	
 	
-	public DVNode buildNodeView(DocTreeNode treeNode, DVNode.NodeElementFactory elementFactory)
+	public DVNode buildNodeView(DMNode node, DVNode.NodeElementFactory elementFactory)
 	{
-		if ( treeNode == null )
+		if ( node == null )
 		{
 			return null;
 		}
 		else
 		{
-			// Try to get a view node for @treeNode from the node table; one will be returned if a view node exists, else null.
-			DVNode viewNode = nodeTable.get( treeNode );
+			// Try asking the table for an unused view node for the document node
+			DVNode viewNode = nodeTable.takeUnusedViewNodeFor( node, elementFactory );
 			
 			if ( viewNode == null )
 			{
-				// No view node in the table.
-				// Try asking the table for an unused one
-				viewNode = nodeTable.takeUnusedViewNodeFor( treeNode );
-				
-				if ( viewNode == null )
-				{
-					// No existing view node could be acquired.
-					// Create a new one
-					viewNode = new DVNode( this, treeNode, elementChangeListener );
-					nodeTable.put( treeNode, viewNode );
-				}
+				// No existing view node could be acquired.
+				// Create a new one and add it to the table
+				viewNode = new DVNode( this, node, elementChangeListener );
+				nodeTable.put( node, viewNode );
 			}
 			
 			viewNode.setNodeElementFactory( elementFactory );
@@ -138,18 +130,6 @@ public class DocView implements DVNode.NodeRefreshListener
 	}
 	
 	
-	public DVNode getViewNodeForDocTreeNode(DocTreeNode treeNode)
-	{
-		return nodeTable.get( treeNode );
-	}
-	
-	
-	public DVNode refreshAndGetViewNodeForDocTreeNode(DocTreeNode treeNode)
-	{
-		refresh();
-		return nodeTable.get( treeNode );
-	}
-	
 	
 	
 	private void performRefresh()
@@ -158,7 +138,7 @@ public class DocView implements DVNode.NodeRefreshListener
 		getRootView().refresh();
 		
 		// Clear unused entries from the node table
-		nodeTable.clearUnused();
+		nodeTable.clean();
 	}
 	
 	

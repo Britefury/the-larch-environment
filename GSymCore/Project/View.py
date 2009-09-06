@@ -46,7 +46,7 @@ class NameTextRepListener (ElementLinearRepresentationListener):
 	def textRepresentationModified(self, element, event):
 		value = element.getTextRepresentation()
 		ctx = element.getContext()
-		node = ctx.getTreeNode()
+		node = ctx.getDocNode()
 		node['name'] = value
 		return True
 
