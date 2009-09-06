@@ -6,10 +6,10 @@
 //##************************
 package BritefuryJ.GSym.View;
 
+import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocTree.DocTreeNode;
 
 public interface GSymNodeViewFunction
 {
-	public DPWidget createElement(DocTreeNode x, GSymNodeViewContext ctx, Object state);
+	public DPWidget createElement(DMNode x, GSymNodeViewContext ctx, Object state);
 }

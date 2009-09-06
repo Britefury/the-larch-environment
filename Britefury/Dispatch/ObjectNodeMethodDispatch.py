@@ -12,7 +12,6 @@ from Britefury.Util.NodeUtil import isObjectNode, nodeToSXString
 from Britefury.Dispatch.Dispatch import DispatchError, DispatchDataError
 
 from BritefuryJ.DocModel import DMModule
-from BritefuryJ.DocTree import DocTreeNode
 
 import inspect
 
@@ -206,10 +205,7 @@ def objectNodeMethodDispatch(target, node, *args):
 			raise DispatchError, 'objectNodeMethodDispatch(): could not find method for nodes of type %s in class %s'  %  ( node.getDMClass().getName(), type( target ).__name__ )
 		return method.call( node, target, args )
 	else:
-		if isinstance( node, DocTreeNode ):
-			raise DispatchDataError, 'objectNodeMethodDispatch(): can only dispatch on objects; not on %s:%s  (from %s)'  %  ( node.getClass().getName(), nodeToSXString( node ), nodeToSXString( node.getParentTreeNode().getParentTreeNode() ) )
-		else:
-			raise DispatchDataError, 'objectNodeMethodDispatch(): can only dispatch on objects; not on %s'  %  ( nodeToSXString( node ) )
+		raise DispatchDataError, 'objectNodeMethodDispatch(): can only dispatch on objects; not on %s'  %  ( nodeToSXString( node ) )
 
 
 		
@@ -220,7 +216,4 @@ def objectNodeMethodDispatchAndGetName(target, node, *args):
 			raise DispatchError, 'objectNodeMethodDispatchAndGetName(): could not find method for nodes of type %s in class %s'  %  ( node.getDMClass().getName(), type( target ).__name__ )
 		return method.call( node, target, args ), method.getName()
 	else:
-		if isinstance( node, DocTreeNode ):
-			raise DispatchDataError, 'objectNodeMethodDispatchAndGetName(): can only dispatch on objects; not on %s:%s  (from %s)'  %  ( node.getClass().getName(), nodeToSXString( node ), nodeToSXString( node.getParentTreeNode().getParentTreeNode() ) )
-		else:
-			raise DispatchDataError, 'objectNodeMethodDispatchAndGetName(): can only dispatch on objects; not on %s'  %  ( nodeToSXString( node ) )
+		raise DispatchDataError, 'objectNodeMethodDispatchAndGetName(): can only dispatch on objects; not on %s'  %  ( nodeToSXString( node ) )

@@ -8,82 +8,100 @@ package BritefuryJ.DocView;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.List;
 
-import BritefuryJ.DocTree.DocTreeNode;
-import BritefuryJ.DocView.DVNode.CannotChangeDocNodeException;
+import BritefuryJ.DocModel.DMNode;
 
 public class DocViewNodeTable
 {
+	private static class Key
+	{
+		private WeakReference<DMNode> node;
+		private int hash;
+		
+		
+		public Key(DMNode node)
+		{
+			this.node = new WeakReference<DMNode>( node );
+			hash = System.identityHashCode( node );
+		}
+		
+		
+		public int hashCode()
+		{
+			return hash;
+		}
+		
+		public boolean equals(Object x)
+		{
+			if ( x == this )
+			{
+				return true;
+			}
+			
+			if ( x instanceof Key )
+			{
+				Key kx = (Key)x;
+				return node.get() == kx.node.get();
+			}
+			
+			return false;
+		}
+	}
+	
+	
 	private static class ViewTableForDocNode
 	{
 		private DocViewNodeTable table;
-		private Object docNode;
+		private Key key;
 		
-		private WeakHashMap<DocTreeNode, WeakReference<DVNode>> refedNodes;
-		private WeakHashMap<DocTreeNode, DVNode> unrefedNodes;
+		private ArrayList<WeakReference<DVNode>> refedNodes;
+		private ArrayList<DVNode> unrefedNodes;
 		
 		
 		
-		public ViewTableForDocNode(DocViewNodeTable table, Object docNode)
+		public ViewTableForDocNode(DocViewNodeTable table, Key key)
 		{
 			this.table = table;
-			this.docNode = docNode;
+			this.key = key;
 			
-			refedNodes = new WeakHashMap<DocTreeNode, WeakReference<DVNode>>();
-			unrefedNodes = new WeakHashMap<DocTreeNode, DVNode>();
+			refedNodes = new ArrayList<WeakReference<DVNode>>();
+			unrefedNodes = new ArrayList<DVNode>();
 		}
 		
 		
 		
-		public DVNode takeUnusedNodeFor(DocTreeNode treeNode)
+		public DVNode takeUnusedNodeFor(DMNode node, DVNode.NodeElementFactory elementFactory)
 		{
-			if ( refedNodes.containsKey( treeNode ) )
-			{
-				return null;
-			}
-			
-			removeDeadEntriesFromTable( refedNodes );
+			removeDeadEntriesFromWeakList( refedNodes );
 			
 			
 			if ( !unrefedNodes.isEmpty() )
 			{
-				// Look in unrefed nodes to see if there is an existing node for @treeNode
-				DVNode viewNode = unrefedNodes.get( treeNode );
+				// Find a view node; prefer one with the same element factory, otherwise pick one from the end of the list
+				DVNode viewNode = null;
+				for (DVNode vn: unrefedNodes)
+				{
+					if ( vn.getNodeElementFactory() == elementFactory )
+					{
+						viewNode = vn;
+						break;
+					}
+				}
+				if ( viewNode == null )
+				{
+					viewNode = unrefedNodes.get( unrefedNodes.size() - 1 );
+				}
+				
+				
+				
 				if ( viewNode != null )
 				{
 					// Found an unused view node; move it into the ref'ed table
-					unrefedNodes.remove( treeNode );
-					refedNodes.put( treeNode, new WeakReference<DVNode>( viewNode ) );
-					return viewNode;
-				}
-			
-			
-				// Look for an unref'd node to re-use
-				// Take an entry
-				DocTreeNode key = unrefedNodes.keySet().iterator().next();
-				viewNode = unrefedNodes.get( key );
-				
-				assert viewNode != null;
-				
-				unrefedNodes.remove( key );
-				
-				refedNodes.put( treeNode, new WeakReference<DVNode>( viewNode ) );
-				try
-				{
-					viewNode.changeTreeNode( treeNode );
-				}
-				catch (CannotChangeDocNodeException e)
-				{
-					throw new RuntimeException();
-				}
-				
-				if ( unrefedNodes.size() == 0 )
-				{
-					table.removeViewTableFromUnrefedList( this );
+					unrefedNodes.remove( viewNode );
+					refedNodes.add( new WeakReference<DVNode>( viewNode ) );
 				}
 				
 				return viewNode;
@@ -93,26 +111,43 @@ public class DocViewNodeTable
 		}
 		
 		
-		public DVNode get(DocTreeNode treeNode)
+		public void addRefedViewNode(DVNode viewNode)
 		{
-			WeakReference<DVNode> r = refedNodes.get( treeNode );
-			return r != null  ?  r.get()  :  null;
+			refedNodes.add( new WeakReference<DVNode>( viewNode ) );
 		}
 		
-		public void put(DocTreeNode treeNode, DVNode viewNode)
+		public void removeViewNode(DVNode viewNode)
 		{
-			refedNodes.put( treeNode, new WeakReference<DVNode>( viewNode ) );
-		}
-		
-		public void remove(DocTreeNode treeNode)
-		{
-			refedNodes.remove( treeNode );
+			int i = 0;
+			for (WeakReference<DVNode> ref: refedNodes)
+			{
+				if ( ref.get() == viewNode )
+				{
+					refedNodes.remove( i );
+					destroyIfEmpty();
+					return;
+				}
+				i++;
+			}
+			
+			// If we fail to find @viewNode in @refedNodes, look in @unrefedNodes
+			unrefedNodes.remove( viewNode );
 			destroyIfEmpty();
 		}
 		
-		public boolean containsKey(DocTreeNode treeNode)
+		
+		public List<DVNode> getRefedNodes()
 		{
-			return refedNodes.containsKey( treeNode );
+			ArrayList<DVNode> nodes = new ArrayList<DVNode>();
+			for (WeakReference<DVNode> ref: refedNodes)
+			{
+				DVNode node = ref.get();
+				if ( node != null )
+				{
+					nodes.add( node );
+				}
+			}
+			return nodes;
 		}
 		
 		
@@ -130,57 +165,40 @@ public class DocViewNodeTable
 		
 		public void refViewNode(DVNode viewNode)
 		{
-			DocTreeNode treeNode = viewNode.getTreeNode();
-			unrefedNodes.remove( treeNode );
-			if ( unrefedNodes.size() == 0 )
-			{
-				table.removeViewTableFromUnrefedList( this );
-			}
-			refedNodes.put( treeNode, new WeakReference<DVNode>( viewNode ) );
+			unrefedNodes.remove( viewNode );
+			refedNodes.add( new WeakReference<DVNode>( viewNode ) );
 		}
 		
 		public void unrefViewNode(DVNode viewNode)
 		{
-			DocTreeNode treeNode = viewNode.getTreeNode();
-			refedNodes.remove( treeNode );
-			if ( unrefedNodes.size() == 0 )
+			for (int i = 0; i < refedNodes.size(); i++)
 			{
-				table.addViewTableFromUnrefedList( this );
+				if ( refedNodes.get( i ).get() == viewNode )
+				{
+					refedNodes.remove( i );
+				}
 			}
-			unrefedNodes.put( treeNode, viewNode );
+			unrefedNodes.add( viewNode );
 		}
 		
 		
 		
 		
-		private static void removeDeadEntriesFromTable(WeakHashMap<DocTreeNode, WeakReference<DVNode>> table)
+		private static void removeDeadEntriesFromWeakList(ArrayList<WeakReference<DVNode>> weakList)
 		{
-			if ( !table.isEmpty() )
+			if ( !weakList.isEmpty() )
 			{
-				HashSet<DocTreeNode> deadKeys = null;
-				for (Map.Entry<DocTreeNode, WeakReference<DVNode>> entry: table.entrySet())
+				for (int i = weakList.size() - 1; i >= 0; i--)
 				{
-					if ( entry.getValue().get() == null )
+					if ( weakList.get( i ).get() == null )
 					{
-						if ( deadKeys == null )
-						{
-							deadKeys = new HashSet<DocTreeNode>();
-						}
-						deadKeys.add( entry.getKey() );
-					}
-				}
-				
-				if ( deadKeys != null )
-				{
-					for (DocTreeNode key: deadKeys)
-					{
-						table.remove( key );
+						weakList.remove( i );
 					}
 				}
 			}
 		}
 		
-		private void clearUnrefedViewNodes()
+		private void clean()
 		{
 			unrefedNodes.clear();
 			destroyIfEmpty();
@@ -188,19 +206,18 @@ public class DocViewNodeTable
 		
 		private void destroyIfEmpty()
 		{
-			removeDeadEntriesFromTable( refedNodes );
+			removeDeadEntriesFromWeakList( refedNodes );
 			
 			if ( refedNodes.size() == 0  &&  unrefedNodes.size() == 0 )
 			{
-				table.removeViewTable( docNode );
+				table.removeViewTable( key );
 			}
 		}
 	}
 	
 	
 	
-	private HashMap<Object, ViewTableForDocNode> table;
-	private HashSet<ViewTableForDocNode> unrefedTables;
+	private HashMap<Key, ViewTableForDocNode> table;
 	
 	
 	
@@ -208,19 +225,19 @@ public class DocViewNodeTable
 	
 	public DocViewNodeTable()
 	{
-		table = new HashMap<Object, ViewTableForDocNode>();
-		unrefedTables = new HashSet<ViewTableForDocNode>();
+		table = new HashMap<Key, ViewTableForDocNode>();
 	}
 	
 	
 	
 
-	public DVNode takeUnusedViewNodeFor(DocTreeNode treeNode)
+	public DVNode takeUnusedViewNodeFor(DMNode docNode, DVNode.NodeElementFactory elementFactory)
 	{
-		ViewTableForDocNode subTable = table.get( treeNode.getNode() );
+		Key key = new Key( docNode );
+		ViewTableForDocNode subTable = table.get( key );
 		if ( subTable != null )
 		{
-			return subTable.takeUnusedNodeFor( treeNode );
+			return subTable.takeUnusedNodeFor( docNode, elementFactory );
 		}
 		else
 		{
@@ -229,52 +246,50 @@ public class DocViewNodeTable
 	}
 	
 	
-	
-	public DVNode get(DocTreeNode treeNode)
+	public List<DVNode> get(DMNode docNode)
 	{
-		ViewTableForDocNode subTable = table.get( treeNode.getNode() );
+		Key key = new Key( docNode );
+		ViewTableForDocNode subTable = table.get( key );
 		if ( subTable != null )
 		{
-			return subTable.get( treeNode );
+			return subTable.getRefedNodes();
 		}
 		else
 		{
-			return null;
+			return Arrays.asList( new DVNode[] {} );
 		}
 	}
 	
-	public void put(DocTreeNode treeNode, DVNode viewNode)
+	public void put(DMNode docNode, DVNode viewNode)
 	{
-		ViewTableForDocNode subTable = table.get( treeNode.getNode() );
+		Key key = new Key( docNode );
+		ViewTableForDocNode subTable = table.get( key );
 		if ( subTable == null )
 		{
-			subTable = new ViewTableForDocNode( this, treeNode.getNode() );
-			table.put( treeNode.getNode(), subTable );
+			subTable = new ViewTableForDocNode( this, key );
+			table.put( key, subTable );
 		}
-		subTable.put( treeNode, viewNode );
+		subTable.addRefedViewNode( viewNode );
 	}
 	
-	public void remove(DocTreeNode treeNode)
+	public void remove(DVNode viewNode)
 	{
-		ViewTableForDocNode subTable = table.get( treeNode.getNode() );
+		Key key = new Key( viewNode.getDocNode() );
+		ViewTableForDocNode subTable = table.get( key );
 		if ( subTable != null )
 		{
-			subTable.remove( treeNode );
-		}
-	}
-	
-	
-	public boolean containsKey(DocTreeNode treeNode)
-	{
-		ViewTableForDocNode subTable = table.get( treeNode.getNode() );
-		if ( subTable != null )
-		{
-			return subTable.containsKey( treeNode );
+			subTable.removeViewNode( viewNode );
 		}
 		else
 		{
-			return false;
+			throw new RuntimeException( "Could not get sub-table for doc-node" );
 		}
+	}
+	
+	
+	public boolean containsKey(DMNode docNode)
+	{
+		return getNumViewNodesForDocNode( docNode ) > 0;
 	}
 	
 	
@@ -293,9 +308,10 @@ public class DocViewNodeTable
 		return table.size();
 	}
 	
-	public int getNumViewNodesForDocNode(Object docNode)
+	public int getNumViewNodesForDocNode(DMNode docNode)
 	{
-		ViewTableForDocNode subTable = table.get( docNode );
+		Key key = new Key( docNode );
+		ViewTableForDocNode subTable = table.get( key );
 		if ( subTable != null )
 		{
 			return subTable.size();
@@ -306,9 +322,10 @@ public class DocViewNodeTable
 		}
 	}
 	
-	public int getNumUnrefedViewNodesForDocNode(Object docNode)
+	public int getNumUnrefedViewNodesForDocNode(DMNode docNode)
 	{
-		ViewTableForDocNode subTable = table.get( docNode );
+		Key key = new Key( docNode );
+		ViewTableForDocNode subTable = table.get( key );
 		if ( subTable != null )
 		{
 			return subTable.getNumUnrefedNodes();
@@ -320,56 +337,36 @@ public class DocViewNodeTable
 	}
 	
 	
-	public void clearUnused()
-	{
-		for (ViewTableForDocNode subTable: unrefedTables)
-		{
-			subTable.clearUnrefedViewNodes();
-		}
-		unrefedTables.clear();
-	}
-	
-	
 	public void clean()
 	{
 		ArrayList<ViewTableForDocNode> subTables = new ArrayList<ViewTableForDocNode>();
 		subTables.addAll( table.values() );
 		for (ViewTableForDocNode subTable: subTables)
 		{
-			subTable.destroyIfEmpty();
+			subTable.clean();
 		}
 	}
-
 	
-
-	public void refViewNode(DVNode node)
+	
+	protected void refViewNode(DVNode node)
 	{
-		ViewTableForDocNode subTable = table.get( node.getDocNode() );
+		Key key = new Key( node.getDocNode() );
+		ViewTableForDocNode subTable = table.get( key );
 		subTable.refViewNode( node );
 	}
 
-	public void unrefViewNode(DVNode node)
+	protected void unrefViewNode(DVNode node)
 	{
-		ViewTableForDocNode subTable = table.get( node.getDocNode() );
+		Key key = new Key( node.getDocNode() );
+		ViewTableForDocNode subTable = table.get( key );
 		subTable.unrefViewNode( node );
 	}
 
 
 	
 
-	private void removeViewTable(Object docNode)
+	private void removeViewTable(Key key)
 	{
-		table.remove( docNode );
-	}
-	
-	
-	private void addViewTableFromUnrefedList(ViewTableForDocNode viewTable)
-	{
-		unrefedTables.add( viewTable );
-	}
-
-	public void removeViewTableFromUnrefedList(ViewTableForDocNode viewTable)
-	{
-		unrefedTables.remove( viewTable );
+		table.remove( key );
 	}
 }

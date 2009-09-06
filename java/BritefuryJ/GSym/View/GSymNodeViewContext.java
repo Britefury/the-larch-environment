@@ -13,6 +13,7 @@ import java.util.WeakHashMap;
 import org.python.core.PyObject;
 
 import BritefuryJ.Cell.CellInterface;
+import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPButton;
 import BritefuryJ.DocPresent.DPContainer;
@@ -53,7 +54,6 @@ import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TableStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
-import BritefuryJ.DocTree.DocTreeNode;
 import BritefuryJ.DocView.DVNode;
 import BritefuryJ.GSym.View.ListView.ListViewLayout;
 import BritefuryJ.GSym.View.ListView.PySeparatorElementFactory;
@@ -544,22 +544,22 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	}
 	
 	
-	public DPWidget viewEval(DocTreeNode x)
+	public DPWidget viewEval(DMNode x)
 	{
 		return viewEvalFn( x, (GSymNodeViewFunction)null, null );
 	}
 
-	public DPWidget viewEval(DocTreeNode x, Object state)
+	public DPWidget viewEval(DMNode x, Object state)
 	{
 		return viewEvalFn( x, (GSymNodeViewFunction)null, state );
 	}
 
-	public DPWidget viewEvalFn(DocTreeNode x, GSymNodeViewFunction nodeViewFunction)
+	public DPWidget viewEvalFn(DMNode x, GSymNodeViewFunction nodeViewFunction)
 	{
 		return viewEvalFn( x, nodeViewFunction, null );
 	}
 
-	public DPWidget viewEvalFn(DocTreeNode x, GSymNodeViewFunction nodeViewFunction, Object state)
+	public DPWidget viewEvalFn(DMNode x, GSymNodeViewFunction nodeViewFunction, Object state)
 	{
 		viewInstance.getView().profile_startJava();
 		
@@ -588,12 +588,12 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 		return viewNode.getElementNoRefresh();
 	}
 	
-	public DPWidget viewEvalFn(DocTreeNode x, PyObject nodeViewFunction)
+	public DPWidget viewEvalFn(DMNode x, PyObject nodeViewFunction)
 	{
 		return viewEvalFn( x, new PyGSymNodeViewFunction( nodeViewFunction ), null );
 	}
 
-	public DPWidget viewEvalFn(DocTreeNode x, PyObject nodeViewFunction, Object state)
+	public DPWidget viewEvalFn(DMNode x, PyObject nodeViewFunction, Object state)
 	{
 		return viewEvalFn( x, new PyGSymNodeViewFunction( nodeViewFunction ), state );
 	}
@@ -601,48 +601,43 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	
 	
 	
-	public List<DPWidget> mapViewEval(List<DocTreeNode> xs)
+	public List<DPWidget> mapViewEval(List<DMNode> xs)
 	{
 		return mapViewEvalFn( xs, (GSymNodeViewFunction)null, null );
 	}
 
-	public List<DPWidget> mapViewEval(List<DocTreeNode> xs, Object state)
+	public List<DPWidget> mapViewEval(List<DMNode> xs, Object state)
 	{
 		return mapViewEvalFn( xs, (GSymNodeViewFunction)null, state );
 	}
 
-	public List<DPWidget> mapViewEvalFn(List<DocTreeNode> xs, GSymNodeViewFunction nodeViewFunction)
+	public List<DPWidget> mapViewEvalFn(List<DMNode> xs, GSymNodeViewFunction nodeViewFunction)
 	{
 		return mapViewEvalFn( xs, nodeViewFunction, null );
 	}
 
-	public List<DPWidget> mapViewEvalFn(List<DocTreeNode> xs, GSymNodeViewFunction nodeViewFunction, Object state)
+	public List<DPWidget> mapViewEvalFn(List<DMNode> xs, GSymNodeViewFunction nodeViewFunction, Object state)
 	{
 		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
 		children.ensureCapacity( xs.size() );
-		for (DocTreeNode x: xs)
+		for (DMNode x: xs)
 		{
 			children.add( viewEvalFn( x, nodeViewFunction, state ) );
 		}
 		return children;
 	}
 	
-	public List<DPWidget> mapViewEvalFn(List<DocTreeNode> xs, PyObject nodeViewFunction)
+	public List<DPWidget> mapViewEvalFn(List<DMNode> xs, PyObject nodeViewFunction)
 	{
 		return mapViewEvalFn( xs, new PyGSymNodeViewFunction( nodeViewFunction ), null );
 	}
 
-	public List<DPWidget> mapViewEvalFn(List<DocTreeNode> xs, PyObject nodeViewFunction, Object state)
+	public List<DPWidget> mapViewEvalFn(List<DMNode> xs, PyObject nodeViewFunction, Object state)
 	{
 		return mapViewEvalFn( xs, new PyGSymNodeViewFunction( nodeViewFunction ), state );
 	}
 	
 	
-	
-	public DocTreeNode getTreeNode()
-	{
-		return viewNode.getTreeNode();
-	}
 	
 	public Object getDocNode()
 	{

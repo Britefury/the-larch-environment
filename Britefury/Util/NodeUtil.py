@@ -9,24 +9,20 @@ from java.util import List
 
 from BritefuryJ.DocModel import DMListInterface, DMObjectInterface, DMNode
 
-from BritefuryJ.DocTree import DocTreeNode, DocTreeList, DocTreeObject
 
 
 def isStringNode(x):
 	return isinstance( x, str )  or  isinstance( x, unicode )
 
 def isListNode(xs):
-	return isinstance( xs, List )  or  isinstance( xs, list )  or isinstance( xs, DMListInterface )  or  isinstance( xs, DocTreeList )
+	return isinstance( xs, List )  or  isinstance( xs, list )  or isinstance( xs, DMListInterface )
 
 def isObjectNode(xs):
-	return isinstance( xs, DMObjectInterface )  or  isinstance( xs, DocTreeObject )
+	return isinstance( xs, DMObjectInterface )
 
 
 
 def nodeToSXString(x, level=3):
-	if isinstance( x, DocTreeNode ):
-		x = x.getNode()
-
 	if x is None:
 		return 'None'
 	elif isStringNode( x ):

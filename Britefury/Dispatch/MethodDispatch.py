@@ -6,8 +6,6 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 from Britefury.Util.NodeUtil import isListNode, nodeToSXString
-#from Britefury.DocTree.DocTreeNode import DocTreeNode
-from BritefuryJ.DocTree import DocTreeNode
 
 from Britefury.Dispatch.Dispatch import DispatchError, DispatchDataError
 
@@ -24,10 +22,7 @@ def methodDispatch(target, node, *args):
 			raise DispatchError, 'methodDispatch(): could not find method named %s in class %s'  %  ( name, type( target ).__name__ )
 		return method( *( args + ( node, ) + tuple( node[1:] ) ) )
 	else:
-		if isinstance( node, DocTreeNode ):
-			raise DispatchDataError, 'methodDispatch(): can only dispatch on lists; not on %s:%s  (from %s)'  %  ( node.getClass().getName(), nodeToSXString( node ), nodeToSXString( node.getParentTreeNode().getParentTreeNode() ) )
-		else:
-			raise DispatchDataError, 'methodDispatch(): can only dispatch on lists; not on %s'  %  ( nodeToSXString( node ) )
+		raise DispatchDataError, 'methodDispatch(): can only dispatch on lists; not on %s'  %  ( nodeToSXString( node ) )
 
 
 		
@@ -49,10 +44,7 @@ def methodDispatchAndGetName(target, node, *args):
 		methodArgs = args + ( node, ) + lastArgs
 		return method( *methodArgs ),   name
 	else:
-		if isinstance( node, DocTreeNode ):
-			raise DispatchDataError, 'methodDispatch(): can only dispatch on lists; not on %s:%s  (from %s)'  %  ( node.getClass().getName(), nodeToSXString( node ), nodeToSXString( node.getParentTreeNode().getParentTreeNode() ) )
-		else:
-			raise DispatchDataError, 'methodDispatch(): can only dispatch on lists; not on %s'  %  ( nodeToSXString( node ) )
+		raise DispatchDataError, 'methodDispatch(): can only dispatch on lists; not on %s'  %  ( nodeToSXString( node ) )
 
 
 		

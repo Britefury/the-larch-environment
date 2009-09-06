@@ -10,10 +10,10 @@ import BritefuryJ.Cell.Cell;
 import BritefuryJ.Cell.CellEvaluator;
 import BritefuryJ.Cell.CellInterface;
 import BritefuryJ.Cell.CellListener;
+import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocPresent.DPProxy;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementContext;
-import BritefuryJ.DocTree.DocTreeNode;
 
 public class DVNode implements CellListener 
 {
@@ -24,7 +24,7 @@ public class DVNode implements CellListener
 
 	public static interface NodeElementFactory
 	{
-		public DPWidget createNodeElement(DVNode viewNode, DocTreeNode treeNode);
+		public DPWidget createNodeElement(DVNode viewNode, DMNode docNode);
 	}
 	
 	public static interface NodeElementChangeListener
@@ -48,8 +48,7 @@ public class DVNode implements CellListener
 	
 	
 	private DocView view;
-	private Object docNode;
-	private DocTreeNode treeNode;
+	private DMNode docNode;
 	
 	private Cell elementCell;
 	private DPProxy proxyElement;
@@ -68,11 +67,10 @@ public class DVNode implements CellListener
 	
 	
 	
-	public DVNode(DocView view, DocTreeNode treeNode, NodeElementChangeListener elementChangeListener)
+	public DVNode(DocView view, DMNode docNode, NodeElementChangeListener elementChangeListener)
 	{
 		this.view = view;
-		this.treeNode = treeNode;
-		this.docNode = treeNode.getNode();
+		this.docNode = docNode;
 		
 		parent = null;
 		nextSibling = null;
@@ -108,24 +106,6 @@ public class DVNode implements CellListener
 	
 	
 	/*
-	 * Change the doc tree node that is views by this
-	 * 
-	 * The underlying document node MUST BE THE SAME NODE, or this function will fail
-	 */
-	protected void changeTreeNode(DocTreeNode treeNode) throws CannotChangeDocNodeException
-	{
-		// Ensure that the doc node is the same
-		if ( treeNode.getNode()  !=  docNode )
-		{
-			throw new CannotChangeDocNodeException();
-		}
-		
-		this.treeNode = treeNode;
-	}
-	
-	
-	
-	/*
 	 * Set the node element factory
 	 */
 	protected void setNodeElementFactory(NodeElementFactory factory)
@@ -135,6 +115,11 @@ public class DVNode implements CellListener
 			elementFactory = factory;
 			elementCell.setEvaluator( elementCell.getEvaluator() );
 		}
+	}
+	
+	protected NodeElementFactory getNodeElementFactory()
+	{
+		return elementFactory;
 	}
 	
 	
@@ -182,12 +167,7 @@ public class DVNode implements CellListener
 	}
 	
 
-	public DocTreeNode getTreeNode()
-	{
-		return treeNode;
-	}
-	
-	public Object getDocNode()
+	public DMNode getDocNode()
 	{
 		return docNode;
 	}
@@ -291,7 +271,7 @@ public class DVNode implements CellListener
 		
 		if ( elementFactory != null )
 		{
-			DPWidget e = elementFactory.createNodeElement( this, treeNode );
+			DPWidget e = elementFactory.createNodeElement( this, docNode );
 			
 			// Register new child relationships
 			child = childrenHead;

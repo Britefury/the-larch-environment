@@ -18,8 +18,6 @@ from BritefuryJ.DocModel import DMList, DMObject, DMObjectInterface
 
 from BritefuryJ.Transformation import DefaultIdentityTransformationFunction
 
-from BritefuryJ.DocTree import DocTreeNode, DocTreeList, DocTreeObject
-
 
 from BritefuryJ.DocPresent.StyleSheets import *
 from BritefuryJ.DocPresent import *
@@ -80,7 +78,7 @@ class ParsedExpressionLinearRepresentationListener (ElementLinearRepresentationL
 	def linearRepresentationModified(self, element, event):
 		value = element.getLinearRepresentation()
 		ctx = element.getContext()
-		node = ctx.getTreeNode()
+		node = ctx.getDocNode()
 		if '\n' not in value:
 			#parsed = parseText( self._parser, value, self._outerPrecedence )
 			parsed = parseStream( self._parser, value, self._outerPrecedence )
@@ -117,7 +115,7 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 		if not isinstance( event, SelectionLinearRepresentationEvent )  or  event.getSourceElement() is not element:
 			element.clearStructuralRepresentation()
 		ctx = element.getContext()
-		node = ctx.getTreeNode()
+		node = ctx.getDocNode()
 		# Get the content
 		value = element.getLinearRepresentation()
 		parsed = parseStream( self._parser, value )
@@ -225,7 +223,7 @@ class StatementKeyboardListener (ElementKeyboardListener):
 	def onKeyTyped(self, element, event):
 		if event.getKeyChar() == '\t':
 			context = element.getContext()
-			node = context.getTreeNode()
+			node = context.getDocNode()
 			
 			editHandler = context.getViewContext().getEditHandler()
 			if event.getModifiers() & KeyEvent.SHIFT_MASK  !=  0:
