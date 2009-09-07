@@ -318,7 +318,7 @@ public class DPScript extends DPContainer
 			}
 		}
 		
-		ScriptLayout.computeRequisitionX( layoutReqBox, columnBoxes, boxes[LEFTSUPER], boxes[LEFTSUB], boxes[MAIN], boxes[RIGHTSUPER], boxes[RIGHTSUB], getSpacing(), getScriptSpacing() );
+		ScriptLayout.computeRequisitionX( layoutReqBox, columnBoxes, boxes[LEFTSUPER], boxes[LEFTSUB], boxes[MAIN], boxes[RIGHTSUPER], boxes[RIGHTSUB], getColumnSpacing(), getRowSpacing() );
 	}
 
 	protected void updateRequisitionY()
@@ -336,7 +336,7 @@ public class DPScript extends DPContainer
 			}
 		}
 		
-		ScriptLayout.computeRequisitionY( layoutReqBox, rowBaselineY, boxes[LEFTSUPER], boxes[LEFTSUB], boxes[MAIN], boxes[RIGHTSUPER], boxes[RIGHTSUB], getSpacing(), getScriptSpacing() );
+		ScriptLayout.computeRequisitionY( layoutReqBox, rowBaselineY, boxes[LEFTSUPER], boxes[LEFTSUB], boxes[MAIN], boxes[RIGHTSUPER], boxes[RIGHTSUB], getColumnSpacing(), getRowSpacing() );
 	}
 	
 
@@ -366,7 +366,7 @@ public class DPScript extends DPContainer
 		
 		ScriptLayout.allocateX( layoutReqBox, reqBoxes[LEFTSUPER], reqBoxes[LEFTSUB], reqBoxes[MAIN], reqBoxes[RIGHTSUPER], reqBoxes[RIGHTSUB], columnBoxes,
 				layoutAllocBox, allocBoxes[LEFTSUPER], allocBoxes[LEFTSUB], allocBoxes[MAIN], allocBoxes[RIGHTSUPER], allocBoxes[RIGHTSUB],
-				getSpacing(), getScriptSpacing() );
+				getColumnSpacing(), getRowSpacing() );
 		
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
@@ -405,7 +405,7 @@ public class DPScript extends DPContainer
 		
 		ScriptLayout.allocateY( layoutReqBox, reqBoxes[LEFTSUPER], reqBoxes[LEFTSUB], reqBoxes[MAIN], reqBoxes[RIGHTSUPER], reqBoxes[RIGHTSUB], rowBaselineY,
 				layoutAllocBox, allocBoxes[LEFTSUPER], allocBoxes[LEFTSUB], allocBoxes[MAIN], allocBoxes[RIGHTSUPER], allocBoxes[RIGHTSUB],
-				getSpacing(), getScriptSpacing() );
+				getColumnSpacing(), getRowSpacing() );
 		
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
@@ -684,13 +684,13 @@ public class DPScript extends DPContainer
 	// STYLESHEET METHODS
 	//
 	
-	protected double getSpacing()
+	protected double getColumnSpacing()
 	{
-		return ((ScriptStyleSheet)styleSheet).getSpacing();
+		return ((ScriptStyleSheet)styleSheet).getColumnSpacing();
 	}
 
-	protected double getScriptSpacing()
+	protected double getRowSpacing()
 	{
-		return ((ScriptStyleSheet)styleSheet).getScriptSpacing();
+		return ((ScriptStyleSheet)styleSheet).getRowSpacing();
 	}
 }

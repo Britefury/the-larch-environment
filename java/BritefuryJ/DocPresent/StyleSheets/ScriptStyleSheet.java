@@ -12,7 +12,7 @@ public class ScriptStyleSheet extends ContainerStyleSheet
 	public static ScriptStyleSheet defaultStyleSheet = new ScriptStyleSheet();
 	
 	
-	private double spacing, scriptSpacing;
+	private double columnSpacing, rowSpacing;
 	
 	
 	public ScriptStyleSheet()
@@ -20,24 +20,24 @@ public class ScriptStyleSheet extends ContainerStyleSheet
 		this( 1.0, 1.0 );
 	}
 	
-	public ScriptStyleSheet(double spacing, double scriptSpacing)
+	public ScriptStyleSheet(double columnSpacing, double rowSpacing)
 	{
 		super();
 		
-		this.spacing = spacing;
-		this.scriptSpacing = scriptSpacing;
+		this.columnSpacing = columnSpacing;
+		this.rowSpacing = rowSpacing;
 	}
 	
 	
 	
-	public double getSpacing()
+	public double getColumnSpacing()
 	{
-		return this.spacing;
+		return this.columnSpacing;
 	}
 
 	
-	public double getScriptSpacing()
+	public double getRowSpacing()
 	{
-		return this.scriptSpacing;
+		return this.rowSpacing;
 	}
 }

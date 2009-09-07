@@ -85,7 +85,7 @@ public class DPLine extends DPStatic
 		else if ( direction == LineStyleSheet.Direction.VERTICAL )
 		{
 			double x = lineStyleSheet.getThickness()  +  lineStyleSheet.getPadding() * 2.0;
-			layoutReqBox.setRequisitionX( x, 0.0 );
+			layoutReqBox.setRequisitionX( x, x );
 		}
 		else
 		{

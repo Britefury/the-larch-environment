@@ -244,3 +244,12 @@ PROBLEM: Parsing text into AST, but keeping track of the range of characters tha
 involve mapping AST nodes to range, to allow the view system to map view node to text range.
 Cannot use IdentityHashMap since Java Strings are converted to Python str's automatically, resulting in key mismatches.
 Cannot use normal hash map, since Python lists are not hashable.
+
+
+03/09/2009
+Document model:
+DMTable: a database table style container which allows query-style access
+Computed table: a table resulting from projecting other structures
+Semantic analysis: why not access using queries? Use the table/query system to built tables describing the code from the AST,
+then query: 'SELECT v from Vars WHERE name=x AND scope=x'
+

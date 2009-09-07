@@ -37,46 +37,46 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { new LReqBox() },  0.0 );
 		assertEquals( result, new LReqBox() );
 
-		// requisitionX( [ <10,0> ] )  ->  <14,0>
-		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 0.0 ) },  0.0 );
-		assertEquals( result, xbox( 10.0, 0.0 ) );
+		// requisitionX( [ <10,10> ] )  ->  <10,10>
+		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 10.0 ) },  0.0 );
+		assertEquals( result, xbox( 10.0, 10.0 ) );
 
 		// Padding 'consumes' h-spacing
-		// requisitionX( [ <10,1> ] )  ->  <14,0>
-		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 1.0 ) },  0.0 );
-		assertEquals( result, xbox( 10.0, 1.0 ) );
+		// requisitionX( [ <10,11> ] )  ->  <10,11>
+		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 11.0 ) },  0.0 );
+		assertEquals( result, xbox( 10.0, 11.0 ) );
 
 		// requisitionX( [ <0,0>, <0,0> ] )  ->  <0,0>
 		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { new LReqBox(), new LReqBox() },  0.0 );
 		assertEquals( result, new LReqBox() );
 
 		// Width accumulates
-		// requisitionX( [ <10,0>, <5,0> ] )  ->  <15,0>
-		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 0.0 ), xbox( 5.0, 0.0 ) },  0.0 );
-		assertEquals( result, xbox( 15.0, 0.0 ) );
+		// requisitionX( [ <10,10>, <5,5> ] )  ->  <15,15>
+		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 10.0 ), xbox( 5.0, 5.0 ) },  0.0 );
+		assertEquals( result, xbox( 15.0, 15.0 ) );
 
 		// H-spacing of child puts space before next child
-		// requisitionX( [ <10,2>, <5,0> ] )  ->  <17,0>
-		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 2.0 ), xbox( 5.0, 0.0 ) },  0.0 );
-		assertEquals( result, xbox( 17.0, 0.0 ) );
+		// requisitionX( [ <10,12>, <5,5> ] )  ->  <17,17>
+		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 12.0 ), xbox( 5.0, 5.0 ) },  0.0 );
+		assertEquals( result, xbox( 17.0, 17.0 ) );
 
 		// H-spacing of last child gets put onto the result
-		// requisitionX( [ <10,2>, <5,1> ] )  ->  <17,1>
-		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 2.0 ), xbox( 5.0, 1.0 ) },  0.0 );
-		assertEquals( result, xbox( 17.0, 1.0 ) );
+		// requisitionX( [ <10,12>, <5,6> ] )  ->  <17,18>
+		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 12.0 ), xbox( 5.0, 6.0 ) },  0.0 );
+		assertEquals( result, xbox( 17.0, 18.0 ) );
 
 		// Spacing between children adds extra width
 		// requisitionX( [ <0,0>, <0,0> ], spacing=1 )  ->  <1,0>
 		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { new LReqBox(), new LReqBox() },  1.0 );
-		assertEquals( result, xbox( 1.0, 0.0 ) );
-		// requisitionX( [ <10,0>, <5,0> ], spacing=1 )  ->  <15,0>
-		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 0.0 ), xbox( 5.0, 0.0 ) },  1.0 );
-		assertEquals( result, xbox( 16.0, 0.0 ) );
+		assertEquals( result, xbox( 1.0, 1.0 ) );
+		// requisitionX( [ <10,10>, <5,5> ], spacing=1 )  ->  <16,16>
+		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 10.0 ), xbox( 5.0, 5.0 ) },  1.0 );
+		assertEquals( result, xbox( 16.0, 16.0 ) );
 
 		// Spacing between children is added to the child's own spacing
-		// requisitionX( [ <10,2>, <5,1> ], spacing=1 )  ->  <18,1>
-		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 2.0 ), xbox( 5.0, 1.0 ) },  1.0 );
-		assertEquals( result, xbox( 18.0, 1.0 ) );
+		// requisitionX( [ <10,12>, <5,6> ], spacing=1 )  ->  <18,19>
+		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 12.0 ), xbox( 5.0, 6.0 ) },  1.0 );
+		assertEquals( result, xbox( 18.0, 19.0 ) );
 	}
 
 
@@ -212,49 +212,6 @@ public class Test_HorizontalLayout extends Test_Layout_base
 
 
 
-	//
-	//
-	// SPACE ALLOCATION TESTS
-	//
-	//
-
-	private void allocXSpaceTest(LReqBox children[], int childAllocFlags[], double spacing, LReqBox expectedBox, double boxAllocation, double expectedSpaceAllocation[])
-	{ 
-		LReqBox box = new LReqBox();
-		LAllocBox boxAlloc = new LAllocBox( null );
-		LAllocBox childrenAlloc[] = new LAllocBox[children.length];
-		for (int i = 0; i < children.length; i++)
-		{
-			childrenAlloc[i] = new LAllocBox( null );
-		}
-		
-		HorizontalLayout.computeRequisitionX( box, children, spacing );
-		
-		assertBoxesEqual( box, expectedBox, "PARENT BOX" );
-
-		boxAlloc.allocateX( box, 0.0, boxAllocation );
-		HorizontalLayout.allocateSpaceX( box, children, boxAlloc, childrenAlloc, childAllocFlags );
-		for (int i = 0; i < children.length; i++)
-		{
-			if ( childrenAlloc[i].getAllocationX() != expectedSpaceAllocation[i] )
-			{
-				System.out.println( "Child allocation for " + i + " is not as expected; expected=" + expectedSpaceAllocation[i] + ", result=" + childrenAlloc[i].getAllocationX() + ", boxAllocation=" + boxAllocation );
-			}
-			assertEquals( childrenAlloc[i].getAllocationX(), expectedSpaceAllocation[i] );
-		}
-	}
-
-	
-	private void allocXSpaceTests(LReqBox children[], int childAllocFlags[], double spacing, LReqBox expectedBox, double boxAllocations[], double expectedSpaceAllocations[][])
-	{
-		for (int i = 0; i  < boxAllocations.length; i++)
-		{
-			allocXSpaceTest( children, childAllocFlags, spacing, expectedBox, boxAllocations[i], expectedSpaceAllocations[i] );
-		}
-	}
-
-
-
 	public void test_allocateWidth()
 	{
 		// We need to test for the following conditions:
@@ -275,133 +232,6 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		//		- expansion distributed among children		
 		
 		
-		// hpackXSpace( [ <100-200,0-0> ], spacing=0 )
-		// 	boxAllocation=300   ->   [ 200 ]		- no expansion
-		// 	boxAllocation=200   ->   [ 200 ]		- all allocated to 1 child
-		// 	boxAllocation=150   ->   [ 150 ]		- all allocated to 1 child
-		// 	boxAllocation=100   ->   [ 100 ]		- all allocated to 1 child
-		// 	boxAllocation=50   ->   [ 100 ]		- will not go below minimum
-		// No padding, no expand
-		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ) }, new int[] { 0 }, 0.0,
-				xbox( 100.0, 200.0, 0.0, 0.0 ),
-				new double[] { 300.0, 200.0, 150.0, 100.0, 50.0 },
-				new double[][] {
-					new double[] { 200.0 },
-					new double[] { 200.0 },
-					new double[] { 150.0 },
-					new double[] { 100.0 },
-					new double[] { 100.0 } } );
-		
-		
-		// hpackXSpace( [ <100-200,0-0,H.EXPAND> ], spacing=0 )
-		// 	boxAllocation=300   ->   [ 300 ]		- expansion; extra space allocated to child
-		// 	boxAllocation=200   ->   [ 200 ]		- all allocated to 1 child
-		// 	boxAllocation=150   ->   [ 150 ]		- all allocated to 1 child
-		// 	boxAllocation=100   ->   [ 100 ]		- all allocated to 1 child
-		// 	boxAllocation=50   ->   [ 100 ]		- will not go below minimum
-		// No padding, expand
-		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ) }, new int[] { HEXPAND }, 0.0,
-				xbox( 100.0, 200.0, 0.0, 0.0 ),
-				new double[] { 300.0, 200.0, 150.0, 100.0, 50.0 },
-				new double[][] {
-					new double[] { 300.0 },
-					new double[] { 200.0 },
-					new double[] { 150.0 },
-					new double[] { 100.0 },
-					new double[] { 100.0 } } );
-
-
-		// h-spacing applied to 1 child should not make a difference, since it is the last child
-		// hpackXSpace( [ <100-200,10-10> ], spacing=0 )
-		// 	boxAllocation=300   ->   [ 200 ]		- no expansion
-		// 	boxAllocation=200   ->   [ 200 ]		- all allocated to 1 child
-		// 	boxAllocation=150   ->   [ 150 ]		- all allocated to 1 child
-		// 	boxAllocation=100   ->   [ 100 ]		- all allocated to 1 child
-		// 	boxAllocation=50   ->   [ 100 ]		- will not go below minimum
-		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 10.0, 10.0 ) }, new int[] { 0 }, 0.0,
-				xbox( 100.0, 200.0, 10.0, 10.0 ),
-				new double[] { 300.0, 200.0, 150.0, 100.0, 50.0 },
-				new double[][] {
-					new double[] { 200.0 },
-					new double[] { 200.0 },
-					new double[] { 150.0 },
-					new double[] { 100.0 },
-					new double[] { 100.0 } } );
-		
-
-		
-		
-		
-
-		
-		
-		
-		// hpackXSpace( [ <100-200,0-0>, <50-70,0-0> ], spacing=0 )
-		// 	boxAllocation=300   ->   [ 200, 70 ]		- no expansion
-		// 	boxAllocation=270   ->   [ 200, 70 ]		- preferred sizes
-		// 	boxAllocation=210   ->   [ 150, 60 ]		- space above minimum distributed evenly
-		// 	boxAllocation=150   ->   [ 100, 50 ]		- minimum sizes
-		// 	boxAllocation=100   ->   [ 100, 50 ]		- will not go below minimum
-		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, new int[] { 0, 0 }, 0.0,
-				xbox( 150.0, 270.0, 0.0, 0.0 ),
-				new double[] { 300.0, 270.0, 210.0, 150.0, 100.0 },
-				new double[][] {
-					new double[] { 200.0, 70.0 },
-					new double[] { 200.0, 70.0 },
-					new double[] { 150.0, 60.0 },
-					new double[] { 100.0, 50.0 },
-					new double[] { 100.0, 50.0 } } );
-		
-		
-		// hpackXSpace( [ <100-200,0-0,H.EXPAND>, <50-70,0-0> ], spacing=0 )
-		// 	boxAllocation=300   ->   [ 230, 70 ]		- space above preferred goes to first child, none to second
-		// 	boxAllocation=270   ->   [ 200, 70 ]		- preferred sizes
-		// 	boxAllocation=210   ->   [ 150, 60 ]		- space above minimum distributed evenly
-		// 	boxAllocation=150   ->   [ 100, 50 ]		- minimum sizes
-		// 	boxAllocation=100   ->   [ 100, 50 ]		- will not go below minimum
-		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, new int[] { HEXPAND, 0 }, 0.0,
-				xbox( 150.0, 270.0, 0.0, 0.0 ),
-				new double[] { 300.0, 270.0, 210.0, 150.0, 100.0 },
-				new double[][] {
-					new double[] { 230.0, 70.0 },
-					new double[] { 200.0, 70.0 },
-					new double[] { 150.0, 60.0 },
-					new double[] { 100.0, 50.0 },
-					new double[] { 100.0, 50.0 } } );
-		
-
-		// hpackXSpace( [ <100-200,0-0>, <50-70,0-0,H.EXPAND> ], spacing=0 )
-		// 	boxAllocation=300   ->   [ 200, 100 ]		- space above preferred goes to secnd child, none to first
-		// 	boxAllocation=270   ->   [ 200, 70 ]		- preferred sizes
-		// 	boxAllocation=210   ->   [ 150, 60 ]		- space above minimum distributed evenly
-		// 	boxAllocation=150   ->   [ 100, 50 ]		- minimum sizes
-		// 	boxAllocation=100   ->   [ 100, 50 ]		- will not go below minimum
-		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, new int[] { 0, HEXPAND }, 0.0,
-				xbox( 150.0, 270.0, 0.0, 0.0 ),
-				new double[] { 300.0, 270.0, 210.0, 150.0, 100.0 },
-				new double[][] {
-					new double[] { 200.0, 100.0 },
-					new double[] { 200.0, 70.0 },
-					new double[] { 150.0, 60.0 },
-					new double[] { 100.0, 50.0 },
-					new double[] { 100.0, 50.0 } } );
-		
-
-		// hpackXSpace( [ <100-200,0-0,H.EXPAND>, <50-70,0-0,H.EXPAND> ], spacing=0 )
-		// 	boxAllocation=300   ->   [ 215, 85 ]		- space above preferred gets distributed between both children
-		// 	boxAllocation=270   ->   [ 200, 70 ]		- preferred sizes
-		// 	boxAllocation=210   ->   [ 150, 60 ]		- space above minimum distributed evenly
-		// 	boxAllocation=150   ->   [ 100, 50 ]		- minimum sizes
-		// 	boxAllocation=100   ->   [ 100, 50 ]		- will not go below minimum
-		allocXSpaceTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, new int[] { HEXPAND, HEXPAND }, 0.0,
-				xbox( 150.0, 270.0, 0.0, 0.0 ),
-				new double[] { 300.0, 270.0, 210.0, 150.0, 100.0 },
-				new double[][] {
-					new double[] { 215.0, 85.0 },
-					new double[] { 200.0, 70.0 },
-					new double[] { 150.0, 60.0 },
-					new double[] { 100.0, 50.0 },
-					new double[] { 100.0, 50.0 } } );
 	}
 
 
@@ -460,14 +290,95 @@ public class Test_HorizontalLayout extends Test_Layout_base
 
 	public void test_allocateX()
 	{
-		// hpackX( [ <100-200,0-0>, <50-70,0-0> ], spacing=0 )
+		// Test simple case; single child, simple advance
+		// hpackX( [ <100-200,100-200> ], spacing=0 )
+		// 	boxAllocation=300   ->   [ 200 ] @ [ 0 ]		- no expansion
+		// 	boxAllocation=200   ->   [ 200 ] @ [ 0 ]		- all allocated to 1 child
+		// 	boxAllocation=150   ->   [ 150 ] @ [ 0 ]		- all allocated to 1 child
+		// 	boxAllocation=100   ->   [ 100 ] @ [ 0 ]		- all allocated to 1 child
+		// 	boxAllocation=50   ->   [ 100 ] @ [ 0 ]			- will not go below minimum
+		// No padding, no expand
+		allocXTests( new LReqBox[] { xbox( 100.0, 200.0, 100.0, 200.0 ) }, new int[] { 0 }, 0.0,
+				xbox( 100.0, 200.0, 100.0, 200.0 ),
+				new double[] { 300.0, 200.0, 150.0, 100.0, 50.0 },
+				new double[][] {
+					new double[] { 200.0 },
+					new double[] { 200.0 },
+					new double[] { 150.0 },
+					new double[] { 100.0 },
+					new double[] { 100.0 } },
+				new double[][] {
+					new double[] { 0.0 },
+					new double[] { 0.0 },
+					new double[] { 0.0 },
+					new double[] { 0.0 },
+					new double[] { 0.0 } } );
+	
+		
+		// Single child, expand
+		// hpackX( [ <100-200,100-200,H.EXPAND> ], spacing=0 )
+		// 	boxAllocation=300   ->   [ 300 ] @ [ 0 ]		- expansion; extra space allocated to child
+		// 	boxAllocation=200   ->   [ 200 ] @ [ 0 ]		- all allocated to 1 child
+		// 	boxAllocation=150   ->   [ 150 ] @ [ 0 ]		- all allocated to 1 child
+		// 	boxAllocation=100   ->   [ 100 ] @ [ 0 ]		- all allocated to 1 child
+		// 	boxAllocation=50   ->   [ 100 ] @ [ 0 ]			- will not go below minimum
+		// No padding, expand
+		allocXTests( new LReqBox[] { xbox( 100.0, 200.0, 100.0, 200.0 ) }, new int[] { HEXPAND }, 0.0,
+				xbox( 100.0, 200.0, 100.0, 200.0 ),
+				new double[] { 300.0, 200.0, 150.0, 100.0, 50.0 },
+				new double[][] {
+					new double[] { 300.0 },
+					new double[] { 200.0 },
+					new double[] { 150.0 },
+					new double[] { 100.0 },
+					new double[] { 100.0 } },
+				new double[][] {
+					new double[] { 0.0 },
+					new double[] { 0.0 },
+					new double[] { 0.0 },
+					new double[] { 0.0 },
+					new double[] { 0.0 } } );
+
+
+		// Extra advance applied to 1 child should not make a difference, since it is the last child
+		// hpackX( [ <100-200,110-210> ], spacing=0 )
+		// 	boxAllocation=300   ->   [ 200 ] @ [ 0 ]		- no expansion
+		// 	boxAllocation=200   ->   [ 200 ] @ [ 0 ]		- all allocated to 1 child
+		// 	boxAllocation=150   ->   [ 150 ] @ [ 0 ]		- all allocated to 1 child
+		// 	boxAllocation=100   ->   [ 100 ] @ [ 0 ]		- all allocated to 1 child
+		// 	boxAllocation=50   ->   [ 100 ] @ [ 0 ]			- will not go below minimum
+		allocXTests( new LReqBox[] { xbox( 100.0, 200.0, 110.0, 210.0 ) }, new int[] { 0 }, 0.0,
+				xbox( 100.0, 200.0, 110.0, 210.0 ),
+				new double[] { 300.0, 200.0, 150.0, 100.0, 50.0 },
+				new double[][] {
+					new double[] { 200.0 },
+					new double[] { 200.0 },
+					new double[] { 150.0 },
+					new double[] { 100.0 },
+					new double[] { 100.0 } },
+				new double[][] {
+					new double[] { 0.0 },
+					new double[] { 0.0 },
+					new double[] { 0.0 },
+					new double[] { 0.0 },
+					new double[] { 0.0 } } );
+		
+
+		
+		
+		
+
+		
+		
+		// 2 children, packed one after another
+		// hpackX( [ <100-200,100-200>, <50-70,50-70> ], spacing=0 )
 		// 	boxAllocation=300   ->   [ 200, 70 ] @ [ 0, 200 ]		- no expansion
 		// 	boxAllocation=270   ->   [ 200, 70 ] @ [ 0, 200 ]		- preferred sizes
 		// 	boxAllocation=210   ->   [ 150, 60 ] @ [ 0, 150 ]		- space above minimum distributed evenly
 		// 	boxAllocation=150   ->   [ 100, 50 ] @ [ 0, 100 ]		- minimum sizes
 		// 	boxAllocation=100   ->   [ 100, 50 ] @ [ 0, 100 ]		- will not go below minimum
-		allocXTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, new int[] { 0, 0 }, 0.0,
-				xbox( 150.0, 270.0, 0.0, 0.0 ),
+		allocXTests( new LReqBox[] { xbox( 100.0, 200.0, 100.0, 200.0 ),  xbox( 50.0, 70.0, 50.0, 70.0 ) }, new int[] { 0, 0 }, 0.0,
+				xbox( 150.0, 270.0, 150.0, 270.0 ),
 				new double[] { 300.0, 270.0, 210.0, 150.0, 100.0 },
 				new double[][] {
 					new double[] { 200.0, 70.0 },
@@ -483,14 +394,15 @@ public class Test_HorizontalLayout extends Test_Layout_base
 					new double[] { 0.0, 100.0 } } );
 
 
+		// 2 children, packed one after another, 10 spacing units
 		// hpackX( [ <100-200,0-0>, <50-70,0-0> ], spacing=10 )
 		// 	boxAllocation=300   ->   [ 200, 70 ] @ [ 0, 210 ]		- no expansion
 		// 	boxAllocation=280   ->   [ 200, 70 ] @ [ 0, 210 ]		- preferred sizes
 		// 	boxAllocation=220   ->   [ 150, 60 ] @ [ 0, 160 ]		- space above minimum distributed evenly
 		// 	boxAllocation=160   ->   [ 100, 50 ] @ [ 0, 110 ]		- minimum sizes
 		// 	boxAllocation=100   ->   [ 100, 50 ] @ [ 0, 110 ]		- will not go below minimum
-		allocXTests( new LReqBox[] { xbox( 100.0, 200.0, 0.0, 0.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, new int[] { 0, 0 }, 10.0,
-				xbox( 160.0, 280.0, 0.0, 0.0 ),
+		allocXTests( new LReqBox[] { xbox( 100.0, 200.0, 100.0, 200.0 ),  xbox( 50.0, 70.0, 50.0, 70.0 ) }, new int[] { 0, 0 }, 10.0,
+				xbox( 160.0, 280.0, 160.0, 280.0 ),
 				new double[] { 300.0, 280.0, 220.0, 160.0, 100.0 },
 				new double[][] {
 					new double[] { 200.0, 70.0 },
@@ -507,14 +419,15 @@ public class Test_HorizontalLayout extends Test_Layout_base
 
 
 		
-		// hpackX( [ <100-200,15-15>, <50-70,0-0> ], spacing=0 )
+		// 2 children with extra advance on child 0, packed one after another
+		// hpackX( [ <100-200,115-215>, <50-70,50-70> ], spacing=0 )
 		// 	boxAllocation=400   ->   [ 200, 70 ] @ [ 0, 215 ]		- no expansion
 		// 	boxAllocation=335   ->   [ 200, 70 ] @ [ 0, 215 ]		- preferred sizes
 		// 	boxAllocation=225   ->   [ 150, 60 ] @ [ 0, 165 ]		- space above minimum distributed evenly
 		// 	boxAllocation=165   ->   [ 100, 50 ] @ [ 0, 115 ]		- minimum sizes
 		// 	boxAllocation=100   ->   [ 100, 50 ] @ [ 0, 115 ]		- will not go below minimum
-		allocXTests( new LReqBox[] { xbox( 100.0, 200.0, 15.0, 15.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, new int[] { 0, 0 }, 0.0,
-				xbox( 165.0, 285.0, 0.0, 0.0 ),
+		allocXTests( new LReqBox[] { xbox( 100.0, 200.0, 115.0, 215.0 ),  xbox( 50.0, 70.0, 50.0, 70.0 ) }, new int[] { 0, 0 }, 0.0,
+				xbox( 165.0, 285.0, 165.0, 285.0 ),
 				new double[] { 400.0, 335.0, 225.0, 165.0, 100.0 },
 				new double[][] {
 					new double[] { 200.0, 70.0 },
@@ -531,14 +444,40 @@ public class Test_HorizontalLayout extends Test_Layout_base
 
 
 		
-		// hpackX( [ <100-200,15-15>, <50-70,0-0> ], spacing=10 )
+		// 2 children with reduced advance on child 0, packed one after another
+		// hpackX( [ <100-200,85-185>, <50-70,50-70> ], spacing=0 )
+		// 	boxAllocation=300   ->   [ 200, 70 ] @ [ 0, 185 ]		- no expansion
+		// 	boxAllocation=255   ->   [ 200, 70 ] @ [ 0, 185 ]		- preferred sizes
+		// 	boxAllocation=195   ->   [ 150, 60 ] @ [ 0, 165 ]		- space above minimum distributed evenly
+		// 	boxAllocation=135   ->   [ 100, 50 ] @ [ 0, 85 ]		- minimum sizes
+		// 	boxAllocation=100   ->   [ 100, 50 ] @ [ 0, 115 ]		- will not go below minimum
+		allocXTests( new LReqBox[] { xbox( 100.0, 200.0, 85.0, 185.0 ),  xbox( 50.0, 70.0, 50.0, 70.0 ) }, new int[] { 0, 0 }, 0.0,
+				xbox( 135.0, 255.0, 135.0, 255.0 ),
+				new double[] { 300.0, 255.0, 195.0, 135.0, 100.0 },
+				new double[][] {
+					new double[] { 200.0, 70.0 },
+					new double[] { 200.0, 70.0 },
+					new double[] { 150.0, 60.0 },
+					new double[] { 100.0, 50.0 },
+					new double[] { 100.0, 50.0 } },
+				new double[][] {
+					new double[] { 0.0, 185.0 },
+					new double[] { 0.0, 185.0 },
+					new double[] { 0.0, 135.0 },
+					new double[] { 0.0, 85.0 },
+					new double[] { 0.0, 85.0 } } );
+
+
+		
+		// 2 children with extra advance on both, packed one after another, 10 units of spacing
+		// hpackX( [ <100-200,115-215>, <50-70,60-80> ], spacing=10 )
 		// 	boxAllocation=400   ->   [ 200, 70 ] @ [ 0, 215 ]		- no expansion
 		// 	boxAllocation=335   ->   [ 200, 70 ] @ [ 0, 215 ]		- preferred sizes
 		// 	boxAllocation=235   ->   [ 150, 60 ] @ [ 0, 175 ]		- space above minimum distributed evenly
 		// 	boxAllocation=165   ->   [ 100, 50 ] @ [ 0, 125 ]		- minimum sizes
 		// 	boxAllocation=100   ->   [ 100, 50 ] @ [ 0, 125 ]		- will not go below minimum
-		allocXTests( new LReqBox[] { xbox( 100.0, 200.0, 15.0, 15.0 ),  xbox( 50.0, 70.0, 0.0, 0.0 ) }, new int[] { 0, 0 }, 10.0,
-				xbox( 175.0, 295.0, 0.0, 0.0 ),
+		allocXTests( new LReqBox[] { xbox( 100.0, 200.0, 115.0, 215.0 ),  xbox( 50.0, 70.0, 70.0, 80.0 ) }, new int[] { 0, 0 }, 10.0,
+				xbox( 175.0, 295.0, 195.0, 305.0 ),
 				new double[] { 400.0, 335.0, 235.0, 165.0, 100.0 },
 				new double[][] {
 					new double[] { 200.0, 70.0 },
@@ -552,6 +491,79 @@ public class Test_HorizontalLayout extends Test_Layout_base
 					new double[] { 0.0, 175.0 },
 					new double[] { 0.0, 125.0 },
 					new double[] { 0.0, 125.0 } } );
+
+	
+	
+	
+		// hpackX( [ <100-200,115-215,H.EXPAND>, <50-70,60-80> ], spacing=0 )
+		// 	boxAllocation=300   ->   [ 215, 70 ] @ [ 0, 230 ]		- space above preferred goes to first child, none to second
+		// 	boxAllocation=285   ->   [ 200, 70 ] @ [ 0, 215 ]		- preferred sizes
+		// 	boxAllocation=225   ->   [ 150, 60 ] @ [ 0, 165 ]		- space above minimum distributed evenly
+		// 	boxAllocation=165   ->   [ 100, 50 ] @ [ 0, 115 ]		- minimum sizes
+		// 	boxAllocation=100   ->   [ 100, 50 ] @ [ 0, 115 ]		- will not go below minimum
+		allocXTests( new LReqBox[] { xbox( 100.0, 200.0, 115.0, 215.0 ),  xbox( 50.0, 70.0, 70.0, 80.0 ) }, new int[] { HEXPAND, 0 }, 0.0,
+				xbox( 165.0, 285.0, 185.0, 295.0 ),
+				new double[] { 300.0, 285.0, 225.0, 165.0, 100.0 },
+				new double[][] {
+					new double[] { 215.0, 70.0 },
+					new double[] { 200.0, 70.0 },
+					new double[] { 150.0, 60.0 },
+					new double[] { 100.0, 50.0 },
+					new double[] { 100.0, 50.0 } },
+				new double[][] {
+					new double[] { 0.0, 230.0 },
+					new double[] { 0.0, 215.0 },
+					new double[] { 0.0, 165.0 },
+					new double[] { 0.0, 115.0 },
+					new double[] { 0.0, 115.0 } } );
+					
+		
+
+		// hpackX( [ <100-200,115-215>, <50-70,60-80,H.EXPAND> ], spacing=0 )
+		// 	boxAllocation=300   ->   [ 200, 100 ] @ [ 0, 230 ]		- space above preferred goes to second child, none to first
+		// 	boxAllocation=285   ->   [ 200, 70 ] @ [ 0, 215 ]		- preferred sizes
+		// 	boxAllocation=225   ->   [ 150, 60 ] @ [ 0, 165 ]		- space above minimum distributed evenly
+		// 	boxAllocation=165   ->   [ 100, 50 ] @ [ 0, 115 ]		- minimum sizes
+		// 	boxAllocation=100   ->   [ 100, 50 ] @ [ 0, 115 ]		- will not go below minimum
+		allocXTests( new LReqBox[] { xbox( 100.0, 200.0, 115.0, 215.0 ),  xbox( 50.0, 70.0, 70.0, 80.0 ) }, new int[] { 0, HEXPAND }, 0.0,
+				xbox( 165.0, 285.0, 185.0, 295.0 ),
+				new double[] { 300.0, 285.0, 225.0, 165.0, 100.0 },
+				new double[][] {
+					new double[] { 200.0, 85.0 },
+					new double[] { 200.0, 70.0 },
+					new double[] { 150.0, 60.0 },
+					new double[] { 100.0, 50.0 },
+					new double[] { 100.0, 50.0 } },
+				new double[][] {
+					new double[] { 0.0, 215.0 },
+					new double[] { 0.0, 215.0 },
+					new double[] { 0.0, 165.0 },
+					new double[] { 0.0, 115.0 },
+					new double[] { 0.0, 115.0 } } );
+		
+
+
+		// hpackX( [ <100-200,115-215,H.EXPAND>, <50-70,60-80,H.EXPAND> ], spacing=0 )
+		// 	boxAllocation=315   ->   [ 215, 85 ] @ [ 0, 230 ]		- space above preferred goes to second child, none to first
+		// 	boxAllocation=285   ->   [ 200, 70 ] @ [ 0, 215 ]		- preferred sizes
+		// 	boxAllocation=225   ->   [ 150, 60 ] @ [ 0, 165 ]		- space above minimum distributed evenly
+		// 	boxAllocation=165   ->   [ 100, 50 ] @ [ 0, 115 ]		- minimum sizes
+		// 	boxAllocation=100   ->   [ 100, 50 ] @ [ 0, 115 ]		- will not go below minimum
+		allocXTests( new LReqBox[] { xbox( 100.0, 200.0, 115.0, 215.0 ),  xbox( 50.0, 70.0, 70.0, 80.0 ) }, new int[] { HEXPAND, HEXPAND }, 0.0,
+				xbox( 165.0, 285.0, 185.0, 295.0 ),
+				new double[] { 315.0, 285.0, 225.0, 165.0, 100.0 },
+				new double[][] {
+					new double[] { 215.0, 85.0 },
+					new double[] { 200.0, 70.0 },
+					new double[] { 150.0, 60.0 },
+					new double[] { 100.0, 50.0 },
+					new double[] { 100.0, 50.0 } },
+				new double[][] {
+					new double[] { 0.0, 230.0 },
+					new double[] { 0.0, 215.0 },
+					new double[] { 0.0, 165.0 },
+					new double[] { 0.0, 115.0 },
+					new double[] { 0.0, 115.0 } } );
 	}
 
 

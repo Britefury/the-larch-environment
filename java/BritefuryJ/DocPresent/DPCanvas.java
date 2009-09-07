@@ -92,7 +92,7 @@ public class DPCanvas extends DPStatic implements DrawingOwner
 				width = drawingWidth;
 			}
 		}
-		layoutReqBox.setRequisitionX( width, 0.0 );
+		layoutReqBox.setRequisitionX( width, width );
 	}
 
 	protected void updateRequisitionY()

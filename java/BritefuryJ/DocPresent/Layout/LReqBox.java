@@ -23,7 +23,7 @@ public class LReqBox
 	protected int flags = 0;
 	protected int lineBreakCost;
 	
-	protected double minWidth, prefWidth, minHSpacing, prefHSpacing;
+	protected double minWidth, prefWidth, minHAdvance, prefHAdvance;
 	protected double reqAscent, reqDescent, reqVSpacing;
 	
 	
@@ -34,10 +34,10 @@ public class LReqBox
 		lineBreakCost = -1;
 	}
 	
-	public LReqBox(double width, double hSpacing, double height, double vSpacing)
+	public LReqBox(double width, double hAdvance, double height, double vSpacing)
 	{
 		minWidth = prefWidth = width;
-		minHSpacing = prefHSpacing = hSpacing;
+		minHAdvance = prefHAdvance = hAdvance;
 		reqAscent = height * 0.5;
 		reqDescent = height * 0.5;
 		reqVSpacing = vSpacing;
@@ -45,10 +45,10 @@ public class LReqBox
 		lineBreakCost = -1;
 	}
 	
-	public LReqBox(double width, double hSpacing, double ascent, double descent, double vSpacing)
+	public LReqBox(double width, double hAdvance, double ascent, double descent, double vSpacing)
 	{
 		minWidth = prefWidth = width;
-		minHSpacing = prefHSpacing = hSpacing;
+		minHAdvance = prefHAdvance = hAdvance;
 		reqAscent = ascent;
 		reqDescent = descent;
 		reqVSpacing = vSpacing;
@@ -56,12 +56,12 @@ public class LReqBox
 		lineBreakCost = -1;
 	}
 
-	public LReqBox(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double height, double vSpacing)
+	public LReqBox(double minWidth, double prefWidth, double minHAdvance, double prefHAdvance, double height, double vSpacing)
 	{
 		this.minWidth = minWidth;
 		this.prefWidth = prefWidth;
-		this.minHSpacing = minHSpacing;
-		this.prefHSpacing = prefHSpacing;
+		this.minHAdvance = minHAdvance;
+		this.prefHAdvance = prefHAdvance;
 		reqAscent = height * 0.5;
 		reqDescent = height * 0.5;
 		this.reqVSpacing = vSpacing;
@@ -69,12 +69,12 @@ public class LReqBox
 		lineBreakCost = -1;
 	}
 
-	public LReqBox(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double ascent, double descent, double vSpacing)
+	public LReqBox(double minWidth, double prefWidth, double minHAdvance, double prefHAdvance, double ascent, double descent, double vSpacing)
 	{
 		this.minWidth = minWidth;
 		this.prefWidth = prefWidth;
-		this.minHSpacing = minHSpacing;
-		this.prefHSpacing = prefHSpacing;
+		this.minHAdvance = minHAdvance;
+		this.prefHAdvance = prefHAdvance;
 		this.reqAscent = ascent;
 		this.reqDescent = descent;
 		this.reqVSpacing = vSpacing;
@@ -87,8 +87,8 @@ public class LReqBox
 	{
 		minWidth = box.minWidth;
 		prefWidth = box.prefWidth;
-		minHSpacing = box.minHSpacing;
-		prefHSpacing = box.prefHSpacing;
+		minHAdvance = box.minHAdvance;
+		prefHAdvance = box.prefHAdvance;
 		reqAscent = box.reqAscent;
 		reqDescent = box.reqDescent;
 		reqVSpacing = box.reqVSpacing;
@@ -100,8 +100,8 @@ public class LReqBox
 	{
 		minWidth = box.minWidth * scale;
 		prefWidth = box.prefWidth * scale;
-		minHSpacing = box.minHSpacing * scale;
-		prefHSpacing = box.prefHSpacing * scale;
+		minHAdvance = box.minHAdvance * scale;
+		prefHAdvance = box.prefHAdvance * scale;
 		reqAscent = box.reqAscent * scale;
 		reqDescent = box.reqDescent * scale;
 		reqVSpacing = box.reqVSpacing * scale;
@@ -121,14 +121,14 @@ public class LReqBox
 		return prefWidth;
 	}
 	
-	public double getMinHSpacing()
+	public double getMinHAdvance()
 	{
-		return minHSpacing;
+		return minHAdvance;
 	}
 	
-	public double getPrefHSpacing()
+	public double getPrefHAdvance()
 	{
-		return minHSpacing;
+		return prefHAdvance;
 	}
 	
 
@@ -168,14 +168,14 @@ public class LReqBox
 	
 	public void clear()
 	{
-		minWidth = prefWidth = minHSpacing = prefHSpacing = 0.0;
+		minWidth = prefWidth = minHAdvance = prefHAdvance = 0.0;
 		reqAscent = reqDescent = reqVSpacing = 0.0;
 		flags = 0;
 	}
 	
 	public void clearRequisitionX()
 	{
-		minWidth = prefWidth = minHSpacing = prefHSpacing = 0.0;
+		minWidth = prefWidth = minHAdvance = prefHAdvance = 0.0;
 	}
 	
 	public void clearRequisitionY()
@@ -186,26 +186,26 @@ public class LReqBox
 	
 	
 	
-	public void setRequisitionX(double width, double hSpacing)
+	public void setRequisitionX(double width, double hAdvance)
 	{
 		minWidth = prefWidth = width;
-		minHSpacing = prefHSpacing = hSpacing;
+		minHAdvance = prefHAdvance = hAdvance;
 	}
 	
-	public void setRequisitionX(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing)
+	public void setRequisitionX(double minWidth, double prefWidth, double minHAdvance, double prefHSpacing)
 	{
 		this.minWidth = minWidth; 
 		this.prefWidth = prefWidth;
-		this.minHSpacing = minHSpacing; 
-		this.prefHSpacing = prefHSpacing;
+		this.minHAdvance = minHAdvance; 
+		this.prefHAdvance = prefHSpacing;
 	}
 	
 	public void setRequisitionX(LReqBox box)
 	{
 		this.minWidth = box.minWidth; 
 		this.prefWidth = box.prefWidth;
-		this.minHSpacing = box.minHSpacing; 
-		this.prefHSpacing = box.prefHSpacing;
+		this.minHAdvance = box.minHAdvance; 
+		this.prefHAdvance = box.prefHAdvance;
 	}
 	
 	
@@ -237,11 +237,8 @@ public class LReqBox
 	
 	public void maxRequisitionX(LReqBox box)
 	{
-		double minW = Math.max( minWidth, box.minWidth );
-		double minA = Math.max( minWidth + minHSpacing, box.minWidth + box.minHSpacing );
-		double prefW = Math.max( prefWidth, box.prefWidth );
-		double prefA = Math.max( prefWidth + prefHSpacing, box.prefWidth + box.prefHSpacing );
-		setRequisitionX( minW, prefW, minA - minW, prefA - prefW );
+		setRequisitionX( Math.max( minWidth, box.minWidth ), Math.max( prefWidth, box.prefWidth ),
+				Math.max( minHAdvance, box.minHAdvance ), Math.max( prefHAdvance, box.prefHAdvance ) );
 	}
 	
 	
@@ -257,10 +254,31 @@ public class LReqBox
 	
 	public void borderX(double leftMargin, double rightMargin)
 	{
-		minWidth += leftMargin + rightMargin;
-		prefWidth += leftMargin + rightMargin;
-		minHSpacing = Math.max( minHSpacing - rightMargin, 0.0 );
-		prefHSpacing = Math.max( prefHSpacing - rightMargin, 0.0 );
+		if ( minHAdvance <= minWidth )
+		{
+			minWidth += leftMargin + rightMargin;
+			minHAdvance = minWidth;
+		}
+		else
+		{
+			double hspacing = minHAdvance - minWidth;
+			hspacing = Math.max( hspacing - rightMargin, 0.0 );
+			minWidth += leftMargin + rightMargin;
+			minHAdvance = minWidth + hspacing;
+		}
+		
+		if ( prefHAdvance <= prefWidth )
+		{
+			prefWidth += leftMargin + rightMargin;
+			prefHAdvance = prefWidth;
+		}
+		else
+		{
+			double hspacing = prefHAdvance - prefWidth;
+			hspacing = Math.max( hspacing - rightMargin, 0.0 );
+			prefWidth += leftMargin + rightMargin;
+			prefHAdvance = prefWidth + hspacing;
+		}
 	}
 	
 	public void borderY(double topMargin, double bottomMargin)
@@ -281,7 +299,7 @@ public class LReqBox
 		{
 			LReqBox b = (LReqBox)x;
 			
-			return minWidth == b.minWidth  &&  prefWidth == b.prefWidth  &&  minHSpacing == b.minHSpacing  &&  prefHSpacing == b.prefHSpacing  &&
+			return minWidth == b.minWidth  &&  prefWidth == b.prefWidth  &&  minHAdvance == b.minHAdvance  &&  prefHAdvance == b.prefHAdvance  &&
 					reqAscent == b.reqAscent  &&  reqDescent == b.reqDescent  &&  reqVSpacing == b.reqVSpacing  &&  hasBaseline() == b.hasBaseline();
 		}
 		else
@@ -293,7 +311,7 @@ public class LReqBox
 	
 	public String toString()
 	{
-		return "LReqBox( minWidth=" + minWidth + ", prefWidth=" + prefWidth +  ", minHSpacing=" + minHSpacing + ", prefHSpacing=" + prefHSpacing +
+		return "LReqBox( minWidth=" + minWidth + ", prefWidth=" + prefWidth +  ", minHAdvance=" + minHAdvance + ", prefHAdvance=" + prefHAdvance +
 			", reqAscent=" + reqAscent + ", reqDescent=" + reqDescent + ", reqVSpacing=" + reqVSpacing +  ", bHasBaseline=" + hasBaseline() + ")";
 	}
 

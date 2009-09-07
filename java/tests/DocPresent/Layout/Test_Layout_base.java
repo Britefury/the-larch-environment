@@ -26,14 +26,14 @@ public class Test_Layout_base extends TestCase
 	protected static int VEXPAND = ElementAlignment.VALIGN_EXPAND;
 	
 	
-	protected LReqBox xbox(double width, double hspacing)
+	protected LReqBox xbox(double width, double hAdvance)
 	{
-		return new LReqBox( width, hspacing, 0.0, 0.0 );
+		return new LReqBox( width, hAdvance, 0.0, 0.0 );
 	}
 	
-	protected LReqBox xbox(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing)
+	protected LReqBox xbox(double minWidth, double prefWidth, double minHAdvance, double prefHAdvance)
 	{
-		return new LReqBox( minWidth, prefWidth, minHSpacing, prefHSpacing, 0.0, 0.0 );
+		return new LReqBox( minWidth, prefWidth, minHAdvance, prefHAdvance, 0.0, 0.0 );
 	}
 	
 	
@@ -48,24 +48,24 @@ public class Test_Layout_base extends TestCase
 	}
 	
 	
-	protected LReqBox box(double width, double hspacing, double height, double vspacing)
+	protected LReqBox box(double width, double hAdvance, double height, double vspacing)
 	{
-		return new LReqBox( width, hspacing, height, vspacing );
+		return new LReqBox( width, hAdvance, height, vspacing );
 	}
 
-	protected LReqBox box(double width, double hspacing, double ascent, double descent, double vspacing)
+	protected LReqBox box(double width, double hAdvance, double ascent, double descent, double vspacing)
 	{
-		return new LReqBox( width, hspacing, ascent, descent, vspacing );
+		return new LReqBox( width, hAdvance, ascent, descent, vspacing );
 	}
 
-	protected LReqBox box(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double height, double vspacing)
+	protected LReqBox box(double minWidth, double prefWidth, double minHAdvance, double prefHAdvance, double height, double vspacing)
 	{
-		return new LReqBox( minWidth, prefWidth, minHSpacing, prefHSpacing, height, vspacing );
+		return new LReqBox( minWidth, prefWidth, minHAdvance, prefHAdvance, height, vspacing );
 	}
 
-	protected LReqBox box(double minWidth, double prefWidth, double minHSpacing, double prefHSpacing, double ascent, double descent, double vspacing)
+	protected LReqBox box(double minWidth, double prefWidth, double minHAdvance, double prefHAdvance, double ascent, double descent, double vspacing)
 	{
-		return new LReqBox( minWidth, prefWidth, minHSpacing, prefHSpacing, ascent, descent, vspacing );
+		return new LReqBox( minWidth, prefWidth, minHAdvance, prefHAdvance, ascent, descent, vspacing );
 	}
 
 

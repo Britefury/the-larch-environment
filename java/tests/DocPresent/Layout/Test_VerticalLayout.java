@@ -33,30 +33,30 @@ public class Test_VerticalLayout extends Test_Layout_base
 		assertEquals( result, new LReqBox() );
 
 		// 1 Box of width 1 should result in same
-		VerticalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 1.0, 0.0 ) } );
-		assertEquals( result, xbox( 1.0, 0.0 ) );
+		VerticalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 1.0, 1.0 ) } );
+		assertEquals( result, xbox( 1.0, 1.0 ) );
 
-		// 1 Box of width 10, hspacing 10 should result in same
-		VerticalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 1.0 ) } );
-		assertEquals( result, xbox( 10.0, 1.0 ) );
+		// 1 Box of width 10, advance 11 should result in same
+		VerticalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 11.0 ) } );
+		assertEquals( result, xbox( 10.0, 11.0 ) );
 
-		// requisitionX( [ <10,1>, <20,1> ] )  ->  <20,1>
-		VerticalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 1.0 ),  xbox( 20.0, 1.0 ) } );
-		assertEquals( result, xbox( 20.0, 1.0 ) );
+		// requisitionX( [ <10,11>, <20,21> ] )  ->  <20,21>
+		VerticalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 11.0 ),  xbox( 20.0, 21.0 ) } );
+		assertEquals( result, xbox( 20.0, 21.0 ) );
 
-		// requisitionX( [ <1,10>, <2,20> ] )  ->  <2,20>
-		VerticalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 1.0, 10.0 ),  xbox( 2.0, 20.0 ) } );
-		assertEquals( result, xbox( 2.0, 20.0 ) );
+		// requisitionX( [ <1,11>, <2,22> ] )  ->  <2,20>
+		VerticalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 1.0, 11.0 ),  xbox( 2.0, 22.0 ) } );
+		assertEquals( result, xbox( 2.0, 22.0 ) );
 
-		// requisitionX( [ <10,3>, <11,1> ] )  ->  <11,2>
+		// requisitionX( [ <10,13>, <11,11> ] )  ->  <11,13>
 		// The first box advances X the most overall, although the second has the greater width
-		VerticalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 3.0 ),  xbox( 11.0, 1.0 ) } );
-		assertEquals( result, xbox( 11.0, 2.0 ) );
+		VerticalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 13.0 ),  xbox( 11.0, 12.0 ) } );
+		assertEquals( result, xbox( 11.0, 13.0 ) );
 
-		// requisitionX( [ <10,5>, <5,10> ] )  ->  <10,5>
+		// requisitionX( [ <10,15>, <5,15> ] )  ->  <10,15>
 		// Both advance X by the same amount (15 units), but the first has the greater width
-		VerticalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 5.0 ),  xbox( 5.0, 10.0 ) } );
-		assertEquals( result, xbox( 10.0, 5.0 ) );
+		VerticalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 15.0 ),  xbox( 5.0, 15.0 ) } );
+		assertEquals( result, xbox( 10.0, 15.0 ) );
 	}
 
 	

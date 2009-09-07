@@ -114,7 +114,7 @@ public class DPWhitespace extends DPContentLeafEditable
 	
 	protected void updateRequisitionX()
 	{
-		layoutReqBox.setRequisitionX( width, 0.0 );
+		layoutReqBox.setRequisitionX( width, width );
 	}
 
 	protected void updateRequisitionY()

@@ -58,15 +58,13 @@ public class VerticalLayout
 		double prefWidth = 0.0, prefAdvance = 0.0;
 		for (LReqBox child: children)
 		{
-			double childMinAdvance = child.minWidth + child.minHSpacing;
-			double childPrefAdvance = child.prefWidth + child.prefHSpacing;
 			minWidth = Math.max( minWidth, child.minWidth );
 			prefWidth = Math.max( prefWidth, child.prefWidth );
-			minAdvance = Math.max( minAdvance, childMinAdvance );
-			prefAdvance = Math.max( prefAdvance, childPrefAdvance );
+			minAdvance = Math.max( minAdvance, child.minHAdvance );
+			prefAdvance = Math.max( prefAdvance, child.prefHAdvance );
 		}
 		
-		box.setRequisitionX( minWidth, prefWidth, minAdvance - minWidth, prefAdvance - prefWidth );
+		box.setRequisitionX( minWidth, prefWidth, minAdvance, prefAdvance );
 	}
 
 	public static void computeRequisitionY(LReqBox box, LReqBox children[], VTypesetting typesetting, double spacing)

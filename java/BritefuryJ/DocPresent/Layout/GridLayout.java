@@ -34,6 +34,12 @@ public class GridLayout
 		}
 		
 		
+		for (LReqBox colBox: columnBoxes)
+		{
+			colBox.minHAdvance = colBox.minWidth;
+			colBox.prefHAdvance = colBox.prefWidth;
+		}
+		
 		return columnBoxes;
 	}
 
@@ -122,7 +128,7 @@ public class GridLayout
 		minWidth += spacing;
 		prefWidth += spacing;
 		
-		box.setRequisitionX( minWidth, prefWidth, 0.0, 0.0 );
+		box.setRequisitionX( minWidth, prefWidth, minWidth, prefWidth );
 		
 		return columnBoxes;
 	}

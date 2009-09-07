@@ -31,29 +31,29 @@ public class Test_FractionLayout extends Test_Layout_base
 	public void test_requisition()
 	{
 		// max of numerator and denominator, add padding, ignore bar
-		reqTest( box( 20, 40, 0, 0, 10, 0 ), box( 50, 60, 0, 0, 10, 0 ), box( 10, 20, 0, 0, 20, 0 ),
+		reqTest( box( 20, 40, 20, 40, 10, 0 ), box( 50, 60, 50, 60, 10, 0 ), box( 10, 20, 10, 20, 20, 0 ),
 				5, 2, 5,
-				box( 30, 50, 0, 0, 10 + 2 + 10 * 0.5  +  5, 20 + 2 + 10 * 0.5  -  5, 0 ) );
+				box( 30, 50, 30, 50, 10 + 2 + 10 * 0.5  +  5, 20 + 2 + 10 * 0.5  -  5, 0 ) );
 
 		// max of numerator  and denominator, add padding, ignore bar, different v-spacing, different baseline position
-		reqTest( box( 10, 20, 0, 0, 20, 0 ), box( 50, 60, 0, 0, 10, 0 ), box( 20, 40, 0, 0, 10, 0 ),
+		reqTest( box( 10, 20, 10, 20, 20, 0 ), box( 50, 60, 50, 60, 10, 0 ), box( 20, 40, 20, 40, 10, 0 ),
 				6, 4, 7,
-				box( 32, 52, 0, 0, 20 + 4 + 10 * 0.5  +  7, 10 + 4 + 10 * 0.5  -  7, 0 ) );
+				box( 32, 52, 32, 52, 20 + 4 + 10 * 0.5  +  7, 10 + 4 + 10 * 0.5  -  7, 0 ) );
 
 		// no denominator
-		reqTest( box( 20, 40, 0, 0, 10, 0 ), box( 50, 60, 0, 0, 10, 0 ), null,
+		reqTest( box( 20, 40, 20, 40, 10, 0 ), box( 50, 60, 50, 60, 10, 0 ), null,
 				5, 2, 5,
-				box( 30, 50, 0, 0, 10 + 2 + 10 * 0.5  +  5, 0 + 2 + 10 * 0.5  -  5, 0 ) );
+				box( 30, 50, 30, 50, 10 + 2 + 10 * 0.5  +  5, 0 + 2 + 10 * 0.5  -  5, 0 ) );
 
 		// no numerator
-		reqTest( null, box( 50, 60, 0, 0, 10, 0 ), box( 10, 20, 0, 0, 20, 0 ),
+		reqTest( null, box( 50, 60, 50, 60, 10, 0 ), box( 10, 20, 10, 20, 20, 0 ),
 				5, 2, 5,
-				box( 20, 30, 0, 0, 0 + 2 + 10 * 0.5  +  5, 20 + 2 + 10 * 0.5  -  5, 0 ) );
+				box( 20, 30, 20, 30, 0 + 2 + 10 * 0.5  +  5, 20 + 2 + 10 * 0.5  -  5, 0 ) );
 
 		// no bar
-		reqTest( box( 20, 40, 0, 0, 10, 0 ), null, box( 10, 20, 0, 0, 20, 0 ),
+		reqTest( box( 20, 40, 20, 40, 10, 0 ), null, box( 10, 20, 10, 20, 20, 0 ),
 				5, 2, 5,
-				box( 30, 50, 0, 0, 10 + 2  +  5, 20 + 2  -  5, 0 ) );
+				box( 30, 50, 30, 50, 10 + 2  +  5, 20 + 2  -  5, 0 ) );
 	}
 
 
