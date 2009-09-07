@@ -233,9 +233,7 @@ class AppView (GSymViewObjectNodeDispatch):
 	
 
 
-
-	
-def viewLocationAsElement(document, docRootNode, locationPrefix, location, commandHistory, app):
+def viewGSymAppLocationAsElement(document, docRootNode, locationPrefix, location, commandHistory, app):
 	if location == '':
 		viewContext = GSymViewContext( docRootNode, AppView( document, app ), commandHistory )
 		return viewContext.getFrame()
@@ -249,4 +247,18 @@ def viewLocationAsElement(document, docRootNode, locationPrefix, location, comma
 		else:
 			return None
 
+
+
+def getDocNodeForGSymAppLocation(document, docRootNode, locationPrefix, location, app):
+	if location == '':
+		return docRootNode
+	else:
+		documentLocation, dot, tail = location.partition( '.' )
+		
+		doc = app.getWorld().getDocument( documentLocation )
+		
+		if doc is not None:
+			return doc.getDocNodeAtLocation( documentLocation + locationPrefix, tail, app )
+		else:
+			return None
 

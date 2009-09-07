@@ -1572,10 +1572,12 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 
 
-def viewLocationAsElement(document, docRootNode, locationPrefix, location, commandHistory, app):
+def viewPython25LocationAsElement(document, docRootNode, locationPrefix, location, commandHistory, app):
 	viewContext = GSymViewContext( docRootNode, Python25View(), commandHistory )
 	editHandler = Python25EditHandler( viewContext )
 	viewContext.getFrame().setEditHandler( editHandler )
 	return viewContext.getFrame()
 
 
+def getDocNodeForPython25Location(document, docRootNode, locationPrefix, location, app):
+	return docRootNode

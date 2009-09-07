@@ -170,6 +170,11 @@ def viewLispNode(node, ctx, state):
 	
 
 
-def viewLocationAsElement(document, docRootNode, locationPrefix, location, commandHistory, app):
-	viewContext = GSymViewContext( docRootNode, viewLispNode, commandHistory )
+def viewLISPLocationAsElement(document, docRootNode, locationPrefix, location, commandHistory, app):
+	docNode = document.getDocNodeAtLocation( locationPrefix, location, app )
+	viewContext = GSymViewContext( docNode, viewLispNode, commandHistory )
 	return viewContext.getFrame()
+
+
+def getDocNodeForLISPLocation(document, docRootNode, locationPrefix, location, app):
+	return docRootNode
