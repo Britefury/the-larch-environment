@@ -137,7 +137,7 @@ class GSymDocument (CommandHistoryListener):
 	
 	
 	def viewDocLocationAsLispPage(self, locationPrefix, location, app):
-		element = self.viewDocLocationAsLispElement( self._unit, locationPrefix, location, app )
+		element = self.viewUnitLocationAsLispElement( self._unit, locationPrefix, location, app )
 		return _DocViewPage( element, self._commandHistory )
 
 
