@@ -8,7 +8,7 @@
 from Britefury.gSym.gSymLanguage import GSymLanguage
 from Britefury.gSym.gSymDocument import gSymUnit
 
-from GSymCore.GSymApp.View import viewLocationAsElement
+from GSymCore.GSymApp.View import viewGSymAppLocationAsElement, getDocNodeForGSymAppLocation
 from GSymCore.GSymApp import NodeClasses as Nodes
 
 
@@ -24,7 +24,7 @@ def initialiseModule(world):
 
 
 language = GSymLanguage()
-language.registerViewLocationAsElementFn( viewLocationAsElement )
-
+language.registerViewLocationAsElementFn( viewGSymAppLocationAsElement )
+language.registerGetDocNodeForLocationFn( getDocNodeForGSymAppLocation )
 
 

@@ -7,10 +7,11 @@
 ##-*************************
 from Britefury.gSym.gSymLanguage import GSymLanguage
 
-from GSymCore.Languages.LISP.View import viewLocationAsElement
+from GSymCore.Languages.LISP.View import viewLISPLocationAsElement, getDocNodeForLISPLocation
 
 
 language = GSymLanguage()
-language.registerViewLocationAsElementFn( viewLocationAsElement )
+language.registerViewLocationAsElementFn( viewLISPLocationAsElement )
+language.registerGetDocNodeForLocationFn( getDocNodeForLISPLocation )
 
 

@@ -164,6 +164,16 @@ class GSymDocument (CommandHistoryListener):
 
 
 	
+	def getDocNodeAtLocation(self, locationPrefix, location, app):
+		return self.getUnitDocNodeAtLocation( self._unit, locationPrefix, location, app )
+	
+	def getUnitDocNodeAtLocation(self, unit, locationPrefix, location, app):
+		language = self._world.getLanguage( gSymUnit_getLanguageModuleName( unit ) )
+		getDocNodeForLocationFn = language.getGetDocNodeForLocationFn()
+		return getDocNodeForLocationFn( self, gSymUnit_getContent( unit ), locationPrefix, location, app )
+		
+	
+	
 	def saveAs(self, filename):
 		self._filename = filename
 		self.save()
