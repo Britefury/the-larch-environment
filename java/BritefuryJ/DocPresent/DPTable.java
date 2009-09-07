@@ -522,7 +522,7 @@ public class DPTable extends DPContainer
 		LAllocBox childAllocBoxes[] = new LAllocBox[registeredChildren.size()];
 		double prevWidths[] = new double[registeredChildren.size()];
 		TablePackingParams packingParams[] = new TablePackingParams[registeredChildren.size()];
-		int childAllocationFlags[] = new int[registeredChildren.size()];
+		int childAlignmentFlags[] = new int[registeredChildren.size()];
 		for (int i = 0; i < registeredChildren.size(); i++)
 		{
 			DPWidget child = registeredChildren.get( i );
@@ -530,10 +530,10 @@ public class DPTable extends DPContainer
 			childAllocBoxes[i] = child.layoutAllocBox;
 			prevWidths[i] = child.getAllocationX();
 			packingParams[i] = (TablePackingParams)child.getParentPacking();
-			childAllocationFlags[i] = child.getAlignmentFlags();
+			childAlignmentFlags[i] = child.getAlignmentFlags();
 		}
 		
-		TableLayout.allocateX( layoutReqBox, columnBoxes, childBoxes, layoutAllocBox, columnAllocBoxes, childAllocBoxes, packingParams, childAllocationFlags, numColumns, numRows, getColumnSpacing(), getRowSpacing(), getColumnExpand(), getRowExpand() );
+		TableLayout.allocateX( layoutReqBox, columnBoxes, childBoxes, layoutAllocBox, columnAllocBoxes, childAllocBoxes, packingParams, childAlignmentFlags, numColumns, numRows, getColumnSpacing(), getRowSpacing(), getColumnExpand(), getRowExpand() );
 		
 		int i = 0;
 		for (DPWidget child: registeredChildren)
@@ -555,7 +555,7 @@ public class DPTable extends DPContainer
 		LAllocBox childAllocBoxes[] = new LAllocBox[registeredChildren.size()];
 		LAllocV prevAllocVs[] = new LAllocV[registeredChildren.size()];
 		TablePackingParams[] packingParams = new TablePackingParams[registeredChildren.size()];
-		int childAllocationFlags[] = new int[registeredChildren.size()];
+		int childAlignmentFlags[] = new int[registeredChildren.size()];
 		for (int i = 0; i < registeredChildren.size(); i++)
 		{
 			DPWidget child = registeredChildren.get( i );
@@ -563,10 +563,10 @@ public class DPTable extends DPContainer
 			childAllocBoxes[i] = child.layoutAllocBox;
 			prevAllocVs[i] = child.getAllocV();
 			packingParams[i] = (TablePackingParams)child.getParentPacking();
-			childAllocationFlags[i] = child.getAlignmentFlags();
+			childAlignmentFlags[i] = child.getAlignmentFlags();
 		}
 		
-		TableLayout.allocateY( layoutReqBox, rowBoxes, childBoxes, layoutAllocBox, rowAllocBoxes, childAllocBoxes, packingParams, childAllocationFlags, numColumns, numRows, getColumnSpacing(), getRowSpacing(), getColumnExpand(), getRowExpand() );
+		TableLayout.allocateY( layoutReqBox, rowBoxes, childBoxes, layoutAllocBox, rowAllocBoxes, childAllocBoxes, packingParams, childAlignmentFlags, numColumns, numRows, getColumnSpacing(), getRowSpacing(), getColumnExpand(), getRowExpand() );
 		
 		int i = 0;
 		for (DPWidget child: registeredChildren)

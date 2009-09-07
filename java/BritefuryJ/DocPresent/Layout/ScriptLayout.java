@@ -17,7 +17,8 @@ public class ScriptLayout
 
 	
 	
-	public static void computeRequisitionX(LReqBox box, LReqBox columnBoxes[], LReqBox leftSuper, LReqBox leftSub, LReqBox main, LReqBox rightSuper, LReqBox rightSub, double spacing, double scriptSpacing)
+	public static void computeRequisitionX(LReqBox box, LReqBox columnBoxes[], LReqBox leftSuper, LReqBox leftSub, LReqBox main, LReqBox rightSuper, LReqBox rightSub,
+			double columnSpacing, double rowSpacing)
 	{
 		// Compute boxes for the left, main, and right columns
 		columnBoxes[0].clearRequisitionX();
@@ -52,44 +53,46 @@ public class ScriptLayout
 		double leftSpacing = 0.0, mainSpacing = 0.0;
 		if ( ( leftSuper != null  ||  leftSub != null )   &&   ( main != null  ||  rightSuper != null  ||  rightSub != null ) )
 		{
-			leftSpacing = spacing;
+			leftSpacing = columnSpacing;
 		}
 		
 		if ( main != null   &&   ( rightSuper != null  ||  rightSub != null ) )
 		{
-			mainSpacing = spacing;
+			mainSpacing = columnSpacing;
 		}
 		
 		
 		// Compute the overall width and spacing
-		double minW = leftColumn.minWidth  +  Math.max( leftColumn.minHSpacing, leftSpacing )  +  main.minWidth  +  Math.max( main.minHSpacing, mainSpacing )  +  rightColumn.minWidth;
-		double prefW = leftColumn.prefWidth  +  Math.max( leftColumn.prefHSpacing, leftSpacing )  +  main.prefWidth  +  Math.max( main.prefHSpacing, mainSpacing )  +  rightColumn.prefWidth;
-		double minHSpacing = 0.0, prefHSpacing = 0.0;
-		
-		if ( rightSuper != null  ||  rightSub != null )
+		double minW = 0.0, prefW = 0.0, minAdv = 0.0, prefAdv = 0.0;
+		if ( main != null   &&   ( rightSuper == null  &&  rightSub == null ) )
 		{
-			minHSpacing = rightColumn.minHSpacing;
-			prefHSpacing = rightColumn.prefHSpacing;
+			// Has a main column, no right column
+			
+			double minX = Math.max( leftColumn.minWidth, leftColumn.minHAdvance )  +  leftSpacing  +  main.minWidth;
+			double prefX = Math.max( leftColumn.prefWidth, leftColumn.prefHAdvance )  +  leftSpacing  +  main.prefWidth;
+			minW = minX + main.minWidth;
+			prefW = prefX + main.prefWidth;
+			minAdv = minX + main.minHAdvance;
+			prefAdv = prefX + main.prefHAdvance;
 		}
-		else if ( main != null )
+		else
 		{
-			minHSpacing = main.minHSpacing;
-			prefHSpacing = main.prefHSpacing;
+			minAdv = minW = Math.max( leftColumn.minWidth, leftColumn.minHAdvance )  +  leftSpacing  +
+					Math.max( main.minWidth, main.minHAdvance )  +  mainSpacing  +
+					Math.max( rightColumn.minWidth, rightColumn.minHAdvance );
+			prefAdv = prefW = Math.max( leftColumn.prefWidth, leftColumn.prefHAdvance )  +  leftSpacing  +
+					Math.max( main.prefWidth, main.prefHAdvance )  +  mainSpacing  +
+					Math.max( rightColumn.prefWidth, rightColumn.prefHAdvance );
 		}
-		else if ( leftSuper != null  ||  leftSub != null )
-		{
-			minHSpacing = leftColumn.minHSpacing;
-			prefHSpacing = leftColumn.prefHSpacing;
-		}
-		
 		
 		// Set the requisition
-		box.setRequisitionX( minW, prefW, minHSpacing, prefHSpacing );
+		box.setRequisitionX( minW, prefW, minAdv, prefAdv );
 	}
 
 
 
-	public static void computeRequisitionY(LReqBox box, double rowBaselineY[], LReqBox leftSuper, LReqBox leftSub, LReqBox main, LReqBox rightSuper, LReqBox rightSub, double spacing, double scriptSpacing)
+	public static void computeRequisitionY(LReqBox box, double rowBaselineY[], LReqBox leftSuper, LReqBox leftSub, LReqBox main, LReqBox rightSuper, LReqBox rightSub,
+			double columnSpacing, double rowSpacing)
 	{
 		double superBaselineY = 0.0, mainBaselineY = 0.0, subBaselineY = 0.0;
 		
@@ -122,7 +125,7 @@ public class ScriptLayout
 		{
 			// We have both superscript and subscript children; either left or right
 			
-			q = scriptSpacing;
+			q = rowSpacing;
 			
 			// Start with main-baseline = 0
 			mainBaseline = 0.0;
@@ -236,7 +239,7 @@ public class ScriptLayout
 		
 		double descent = height - mainBaselineY;
 		
-		box.setRequisitionY( mainBaselineY, descent, spacing );
+		box.setRequisitionY( mainBaselineY, descent, columnSpacing );
 		
 		rowBaselineY[0] = superBaselineY;
 		rowBaselineY[1] = mainBaselineY;
@@ -247,7 +250,7 @@ public class ScriptLayout
 	
 	public static void allocateX(LReqBox box, LReqBox leftSuper, LReqBox leftSub, LReqBox main, LReqBox rightSuper, LReqBox rightSub, LReqBox columnBoxes[],
 			LAllocBox allocBox, LAllocBox leftSuperAlloc, LAllocBox leftSubAlloc, LAllocBox mainAlloc, LAllocBox rightSuperAlloc, LAllocBox rightSubAlloc,
-			double spacing, double scriptSpacing)
+			double columnSpacing, double rowSpacing)
 	{
 		double t;
 		if ( box.prefWidth > box.minWidth )
@@ -265,9 +268,9 @@ public class ScriptLayout
 		
 		double overallWidth = box.minWidth  +  ( box.prefWidth - box.minWidth ) * t;
 		double leftWidth = leftColumn.minWidth  +  ( leftColumn.prefWidth - leftColumn.minWidth ) * t;
-		double leftHSpacing = leftColumn.minHSpacing  +  ( leftColumn.prefHSpacing - leftColumn.minHSpacing ) * t;
+		double leftHAdvance = leftColumn.minHAdvance  +  ( leftColumn.prefHAdvance - leftColumn.minHAdvance ) * t;
 		double mainWidth = mainColumn.minWidth  +  ( mainColumn.prefWidth - mainColumn.minWidth ) * t;
-		double mainHSpacing = mainColumn.minHSpacing  +  ( mainColumn.prefHSpacing - mainColumn.minHSpacing ) * t;
+		double mainHAdvance = mainColumn.minHAdvance  +  ( mainColumn.prefHAdvance - mainColumn.minHAdvance ) * t;
 	
 		double padding = Math.max( ( allocBox.allocationX - overallWidth )  *  0.5, 0.0 );
 		double x = padding;
@@ -286,20 +289,16 @@ public class ScriptLayout
 		
 		if ( leftSuper != null  ||  leftSub != null )
 		{
-			leftHSpacing = Math.max( leftHSpacing, spacing );
+			x += Math.max( leftWidth, leftHAdvance )  +  columnSpacing;
 		}
-		
-		x += leftWidth + leftHSpacing;
 		
 		
 		// Allocate main child
 		if ( main != null )
 		{
 			allocBox.allocateChildX( mainAlloc, x, mainWidth );
-			mainHSpacing = Math.max( mainHSpacing, spacing );
+			x += Math.max( mainWidth, mainHAdvance )  +  columnSpacing;
 		}
-		
-		x += mainWidth + mainHSpacing;
 		
 		
 		// Allocate right children
@@ -318,7 +317,7 @@ public class ScriptLayout
 	
 	public static void allocateY(LReqBox box, LReqBox leftSuper, LReqBox leftSub, LReqBox main, LReqBox rightSuper, LReqBox rightSub, double rowBaselineY[],
 			LAllocBox allocBox, LAllocBox leftSuperAlloc, LAllocBox leftSubAlloc, LAllocBox mainAlloc, LAllocBox rightSuperAlloc, LAllocBox rightSubAlloc,
-			double spacing, double scriptSpacing)
+			double columnSpacing, double rowSpacing)
 	{
 		double padding = Math.max( ( allocBox.getAllocationY() - box.getReqHeight() ) * 0.5, 0.0 );
 		

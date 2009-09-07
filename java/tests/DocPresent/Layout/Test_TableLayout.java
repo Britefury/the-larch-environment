@@ -58,7 +58,7 @@ public class Test_TableLayout extends Test_Layout_base
 		// 1x1
 		reqTest(
 				new LReqBox[] {
-						box( 10, 0, 10, 0 ) ,
+						box( 10, 10, 10, 0 ) ,
 				},
 				new TablePackingParams[] {
 						pack( 0, 0 ),
@@ -68,20 +68,20 @@ public class Test_TableLayout extends Test_Layout_base
 				},
 				1, 1, 0.0, 0.0,
 				new LReqBox[] {
-						box( 10, 0, 0, 0 ),
+						box( 10, 10, 0, 0 ),
 				},
 				new LReqBox[] {
 						box( 0, 0, 10, 0 ),
 				},
-				box( 10, 0, 10, 0 )
+				box( 10, 10, 10, 0 )
 			);
 
 	
 		// 2x2
 		reqTest(
 				new LReqBox[] {
-						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),
-						box( 15, 0, 2, 0 ),		box( 4, 0, 4, 0 ),
+						box( 10, 10, 10, 0 ),		box( 5, 5, 5, 0 ),
+						box( 15, 15, 2, 0 ),		box( 4, 4, 4, 0 ),
 				},
 				new TablePackingParams[] {
 						pack( 0, 0 ),			pack( 1, 0 ),
@@ -93,21 +93,21 @@ public class Test_TableLayout extends Test_Layout_base
 				},
 				2, 2, 0.0, 0.0,
 				new LReqBox[] {
-						box( 15, 0, 0, 0 ),		box( 5, 0, 0, 0 ),
+						box( 15, 15, 0, 0 ),		box( 5, 5, 0, 0 ),
 				},
 				new LReqBox[] {
 						box( 0, 0, 10, 0 ),
 						box( 0, 0, 4, 0 ),
 				},
-				box( 20, 0, 14, 0 )
+				box( 20, 20, 14, 0 )
 			);
 
 	
 		// 2x2 with spacing
 		reqTest(
 				new LReqBox[] {
-						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),
-						box( 15, 0, 2, 0 ),		box( 4, 0, 4, 0 ),
+						box( 10, 10, 10, 0 ),		box( 5, 5, 5, 0 ),
+						box( 15, 15, 2, 0 ),		box( 4, 4, 4, 0 ),
 				},
 				new TablePackingParams[] {
 						pack( 0, 0 ),			pack( 1, 0 ),
@@ -119,13 +119,13 @@ public class Test_TableLayout extends Test_Layout_base
 				},
 				2, 2, 1.0, 1.0,
 				new LReqBox[] {
-						box( 15, 0, 0, 0 ),		box( 5, 0, 0, 0 ),
+						box( 15, 15, 0, 0 ),		box( 5, 5, 0, 0 ),
 				},
 				new LReqBox[] {
 						box( 0, 0, 10, 0 ),
 						box( 0, 0, 4, 0 ),
 				},
-				box( 21, 0, 15, 0 )
+				box( 21, 21, 15, 0 )
 			);
 
 	
@@ -134,9 +134,9 @@ public class Test_TableLayout extends Test_Layout_base
 		// 3x3
 		reqTest(
 				new LReqBox[] {
-						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 20, 0, 5, 0 ),
-						box( 15, 0, 2, 0 ),		box( 8, 0, 4, 0 ),		box( 10, 0, 4, 0 ),
-						box( 5, 0, 4, 0 ),		box( 6, 0, 8, 0 ),		box( 10, 0, 6, 0 ),
+						box( 10, 10, 10, 0 ),		box( 5, 5, 5, 0 ),		box( 20, 20, 5, 0 ),
+						box( 15, 10, 2, 0 ),		box( 8, 8, 4, 0 ),		box( 10, 10, 4, 0 ),
+						box( 5, 5, 4, 0 ),		box( 6, 6, 8, 0 ),		box( 10, 10, 6, 0 ),
 				},
 				new TablePackingParams[] {
 						pack( 0, 0 ),			pack( 1, 0 ),			pack( 2, 0 ),
@@ -150,14 +150,14 @@ public class Test_TableLayout extends Test_Layout_base
 				},
 				3, 3, 0.0, 0.0,
 				new LReqBox[] {
-						box( 15, 0, 0, 0 ),		box( 8, 0, 0, 0 ),		box( 20, 0, 0, 0 ),
+						box( 15, 15, 0, 0 ),		box( 8, 8, 0, 0 ),		box( 20, 20, 0, 0 ),
 				},
 				new LReqBox[] {
 						box( 0, 0, 10, 0 ),
 						box( 0, 0, 4, 0 ),
 						box( 0, 0, 8, 0 ),
 				},
-				box( 43, 0, 22, 0 )
+				box( 43, 43, 22, 0 )
 			);
 
 	
@@ -165,9 +165,9 @@ public class Test_TableLayout extends Test_Layout_base
 		// 3x3 with spacing
 		reqTest(
 				new LReqBox[] {
-						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 20, 0, 5, 0 ),
-						box( 15, 0, 2, 0 ),		box( 8, 0, 4, 0 ),		box( 10, 0, 4, 0 ),
-						box( 5, 0, 4, 0 ),		box( 6, 0, 8, 0 ),		box( 10, 0, 6, 0 ),
+						box( 10, 10, 10, 0 ),		box( 5, 5, 5, 0 ),		box( 20, 20, 5, 0 ),
+						box( 15, 15, 2, 0 ),		box( 8, 8, 4, 0 ),		box( 10, 10, 4, 0 ),
+						box( 5, 5, 4, 0 ),		box( 6, 6, 8, 0 ),		box( 10, 10, 6, 0 ),
 				},
 				new TablePackingParams[] {
 						pack( 0, 0 ),			pack( 1, 0 ),			pack( 2, 0 ),
@@ -181,14 +181,14 @@ public class Test_TableLayout extends Test_Layout_base
 				},
 				3, 3, 1.0, 2.0,
 				new LReqBox[] {
-						box( 15, 0, 0, 0 ),		box( 8, 0, 0, 0 ),		box( 20, 0, 0, 0 ),
+						box( 15, 15, 0, 0 ),		box( 8, 8, 0, 0 ),		box( 20, 20, 0, 0 ),
 				},
 				new LReqBox[] {
 						box( 0, 0, 10, 0 ),
 						box( 0, 0, 4, 0 ),
 						box( 0, 0, 8, 0 ),
 				},
-				box( 45, 0, 26, 0 )
+				box( 45, 45, 26, 0 )
 			);
 
 	
@@ -197,9 +197,9 @@ public class Test_TableLayout extends Test_Layout_base
 		// 3x3 with a gap
 		reqTest(
 				new LReqBox[] {
-						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 20, 0, 5, 0 ),
-						box( 15, 0, 2, 0 ),							box( 10, 0, 4, 0 ),
-						box( 5, 0, 4, 0 ),		box( 6, 0, 8, 0 ),		box( 10, 0, 6, 0 ),
+						box( 10, 10, 10, 0 ),		box( 5, 5, 5, 0 ),		box( 20, 20, 5, 0 ),
+						box( 15, 15, 2, 0 ),							box( 10, 10, 4, 0 ),
+						box( 5, 5, 4, 0 ),		box( 6, 6, 8, 0 ),		box( 10, 10, 6, 0 ),
 				},
 				new TablePackingParams[] {
 						pack( 0, 0 ),			pack( 1, 0 ),			pack( 2, 0 ),
@@ -213,14 +213,14 @@ public class Test_TableLayout extends Test_Layout_base
 				},
 				3, 3, 0.0, 0.0,
 				new LReqBox[] {
-						box( 15, 0, 0, 0 ),		box( 6, 0, 0, 0 ),		box( 20, 0, 0, 0 ),
+						box( 15, 15, 0, 0 ),		box( 6, 6, 0, 0 ),		box( 20, 20, 0, 0 ),
 				},
 				new LReqBox[] {
 						box( 0, 0, 10, 0 ),
 						box( 0, 0, 4, 0 ),
 						box( 0, 0, 8, 0 ),
 				},
-				box( 41, 0, 22, 0 )
+				box( 41, 41, 22, 0 )
 			);
 
 		
@@ -229,9 +229,9 @@ public class Test_TableLayout extends Test_Layout_base
 		// 3x3 with a gap and a child with colspan
 		reqTest(
 				new LReqBox[] {
-						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 20, 0, 5, 0 ),
-						box( 15, 0, 2, 0 ),		box( 40, 0, 6, 0 ),
-						box( 5, 0, 4, 0 ),		box( 10, 0, 8, 0 ),		box( 10, 0, 6, 0 ),
+						box( 10, 10, 10, 0 ),		box( 5, 5, 5, 0 ),		box( 20, 20, 5, 0 ),
+						box( 15, 15, 2, 0 ),		box( 40, 40, 6, 0 ),
+						box( 5, 5, 4, 0 ),		box( 10, 10, 8, 0 ),		box( 10, 10, 6, 0 ),
 				},
 				new TablePackingParams[] {
 						pack( 0, 0 ),			pack( 1, 0 ),			pack( 2, 0 ),
@@ -245,14 +245,14 @@ public class Test_TableLayout extends Test_Layout_base
 				},
 				3, 3, 0.0, 0.0,
 				new LReqBox[] {
-						box( 15, 0, 0, 0 ),		box( 15, 0, 0, 0 ),		box( 25, 0, 0, 0 ),
+						box( 15, 15, 0, 0 ),		box( 15, 15, 0, 0 ),		box( 25, 25, 0, 0 ),
 				},
 				new LReqBox[] {
 						box( 0, 0, 10, 0 ),
 						box( 0, 0, 6, 0 ),
 						box( 0, 0, 8, 0 ),
 				},
-				box( 55, 0, 24, 0 )
+				box( 55, 55, 24, 0 )
 			);
 
 		
@@ -261,9 +261,9 @@ public class Test_TableLayout extends Test_Layout_base
 		// 3x3 with a gap and a child with rowspan
 		reqTest(
 				new LReqBox[] {
-						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 20, 0, 5, 0 ),
-						box( 15, 0, 2, 0 ),		box( 8, 0, 20, 0 ),		box( 10, 0, 4, 0 ),
-						box( 5, 0, 4, 0 ),							box( 10, 0, 6, 0 ),
+						box( 10, 10, 10, 0 ),		box( 5, 5, 5, 0 ),		box( 20, 20, 5, 0 ),
+						box( 15, 15, 2, 0 ),		box( 8, 8, 20, 0 ),		box( 10, 10, 4, 0 ),
+						box( 5, 5, 4, 0 ),							box( 10, 10, 6, 0 ),
 				},
 				new TablePackingParams[] {
 						pack( 0, 0 ),			pack( 1, 0 ),			pack( 2, 0 ),
@@ -277,14 +277,14 @@ public class Test_TableLayout extends Test_Layout_base
 				},
 				3, 3, 0.0, 0.0,
 				new LReqBox[] {
-						box( 15, 0, 0, 0 ),		box( 8, 0, 0, 0 ),		box( 20, 0, 0, 0 ),
+						box( 15, 15, 0, 0 ),		box( 8, 8, 0, 0 ),		box( 20, 20, 0, 0 ),
 				},
 				new LReqBox[] {
 						box( 0, 0, 10, 0 ),
 						box( 0, 0, 9, 0 ),
 						box( 0, 0, 11, 0 ),
 				},
-				box( 43, 0, 30, 0 )
+				box( 43, 43, 30, 0 )
 			);
 
 		
@@ -293,9 +293,9 @@ public class Test_TableLayout extends Test_Layout_base
 		// 3x3 with caps and a child with colspan and rowspan
 		reqTest(
 				new LReqBox[] {
-						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 20, 0, 5, 0 ),
-						box( 15, 0, 2, 0 ),		box( 35, 0, 20, 0 ),		
-						box( 5, 0, 4, 0 ),							
+						box( 10, 10, 10, 0 ),		box( 5, 5, 5, 0 ),		box( 20, 20, 5, 0 ),
+						box( 15, 15, 2, 0 ),		box( 35, 35, 20, 0 ),		
+						box( 5, 5, 4, 0 ),							
 				},
 				new TablePackingParams[] {
 						pack( 0, 0 ),			pack( 1, 0 ),			pack( 2, 0 ),
@@ -309,14 +309,14 @@ public class Test_TableLayout extends Test_Layout_base
 				},
 				3, 3, 0.0, 0.0,
 				new LReqBox[] {
-						box( 15, 0, 0, 0 ),		box( 10, 0, 0, 0 ),		box( 25, 0, 0, 0 ),
+						box( 15, 15, 0, 0 ),		box( 10, 10, 0, 0 ),		box( 25, 25, 0, 0 ),
 				},
 				new LReqBox[] {
 						box( 0, 0, 10, 0 ),
 						box( 0, 0, 9, 0 ),
 						box( 0, 0, 11, 0 ),
 				},
-				box( 50, 0, 30, 0 )
+				box( 50, 50, 30, 0 )
 			);
 		
 		
@@ -325,9 +325,9 @@ public class Test_TableLayout extends Test_Layout_base
 		// 3x3 with baseline v-alignment
 		reqTest(
 				new LReqBox[] {
-						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 20, 0, 5, 0 ),
-						box( 15, 0, 4, 4, 0 ),		box( 8, 0, 2, 6, 0 ),		box( 10, 0, 5, 2, 0 ),
-						box( 5, 0, 4, 0 ),		box( 6, 0, 8, 0 ),		box( 10, 0, 6, 0 ),
+						box( 10, 10, 10, 0 ),		box( 5, 5, 5, 0 ),		box( 20, 20, 5, 0 ),
+						box( 15, 15, 4, 4, 0 ),	box( 8, 8, 2, 6, 0 ),		box( 10, 10, 5, 2, 0 ),
+						box( 5, 5, 4, 0 ),		box( 6, 6, 8, 0 ),		box( 10, 10, 6, 0 ),
 				},
 				new TablePackingParams[] {
 						pack( 0, 0 ),			pack( 1, 0 ),			pack( 2, 0 ),
@@ -341,14 +341,14 @@ public class Test_TableLayout extends Test_Layout_base
 				},
 				3, 3, 0.0, 0.0,
 				new LReqBox[] {
-						box( 15, 0, 0, 0 ),		box( 8, 0, 0, 0 ),		box( 20, 0, 0, 0 ),
+						box( 15, 15, 0, 0 ),		box( 8, 8, 0, 0 ),		box( 20, 20, 0, 0 ),
 				},
 				new LReqBox[] {
 						box( 0, 0, 5, 5, 0 ),
 						box( 0, 0, 5, 6, 0 ),
 						box( 0, 0, 4, 4, 0 ),
 				},
-				box( 43, 0, 29, 0 )
+				box( 43, 43, 29, 0 )
 			);
 	}
 

@@ -355,7 +355,7 @@ public class TextVisual
 				double width = layout.getBounds().getWidth();
 				double ascent = layout.getAscent(), descent = layout.getDescent();
 				
-				reqBox.setRequisitionX( width, layout.getAdvance() - width );
+				reqBox.setRequisitionX( width, layout.getAdvance() );
 				reqBox.setRequisitionY( layout.getAscent(), layout.getDescent(), layout.getLeading() );
 				
 				// Squiggle shape

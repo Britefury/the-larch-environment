@@ -167,7 +167,7 @@ public class ParagraphLayout
 			LReqBox child = children[i];
 			
 			prefWidth = prefX + child.prefWidth;
-			prefAdvance = prefWidth + child.prefHSpacing;
+			prefAdvance = prefX + child.prefHAdvance;
 			prefX = prefAdvance + hSpacing;
 			
 		
@@ -185,7 +185,7 @@ public class ParagraphLayout
 			else
 			{
 				lineWidth = lineX + child.minWidth;
-				lineAdvance = lineWidth + child.minHSpacing;
+				lineAdvance = lineX + child.minHAdvance;
 				lineX = lineAdvance + hSpacing;
 			}
 		}
@@ -195,7 +195,7 @@ public class ParagraphLayout
 		minAdvance = Math.max( minAdvance, lineAdvance );
 		minX = Math.max( minX, lineX );
 
-		box.setRequisitionX( minWidth, prefWidth, minAdvance - minWidth, prefAdvance - prefWidth );
+		box.setRequisitionX( minWidth, prefWidth, minAdvance, prefAdvance );
 	}
 
 	
@@ -263,7 +263,7 @@ public class ParagraphLayout
 			
 			// Accumulate width, advance, and x
 			lineWidth = lineX + child.prefWidth;
-			lineAdvance = lineWidth + child.prefHSpacing;
+			lineAdvance = lineX + child.prefHAdvance;
 			lineX = lineAdvance + spacing;
 			
 			// Note the x position after the best and most recent line breaks
@@ -278,9 +278,8 @@ public class ParagraphLayout
 			}
 			
 			
-			if ( lineWidth > allocBox.allocationX  &&  bestLineBreak != null  &&  i > lineStartIndex )
+			if ( lineAdvance > ( allocBox.allocationX * LReqBox.ONE_PLUS_EPSILON )   &&   bestLineBreak != null  &&  i > lineStartIndex )
 			{
-				System.out.println( "ParagraphLayout.allocateX: using line break: lineWidth=" + lineWidth + ", allocationX=" + allocBox.allocationX + ", reqBox.prefWidth=" + box.getPrefWidth() );
 				// We need to start a new line
 				
 				// Pick a line break

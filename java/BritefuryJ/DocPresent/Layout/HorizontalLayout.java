@@ -29,13 +29,13 @@ public class HorizontalLayout
 			
 			minWidth = minX + child.minWidth;
 			prefWidth = prefX + child.prefWidth;
-			minAdvance = minWidth + child.minHSpacing;
-			prefAdvance = prefWidth + child.prefHSpacing;
+			minAdvance = minX + child.minHAdvance;
+			prefAdvance = prefX + child.prefHAdvance;
 			minX = minAdvance + spacing;
 			prefX = prefAdvance + spacing;
 		}
 		
-		box.setRequisitionX( minWidth, prefWidth, minAdvance - minWidth, prefAdvance - prefWidth );
+		box.setRequisitionX( minWidth, prefWidth, minAdvance, prefAdvance );
 	}
 
 	
@@ -110,36 +110,33 @@ public class HorizontalLayout
 
 
 
-	public static void allocateSpaceX(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], int childAllocationFlags[])
+	public static void allocateX(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], int childAlignmentFlags[], double spacing)
 	{
 		int numExpand = 0;
 		
-		// Compute the amount of space required, and count the number of children that should expand to use additional space
-		double minSizeTotal = 0.0, prefSizeTotal = 0.0;
+		// Count the number of children that should expand to use additional space
 		if ( children.length > 0 )
 		{
 			for (int i = 0; i < children.length; i++)
 			{
-				LReqBox child = children[i];
-				HAlignment h = ElementAlignment.getHAlignment( childAllocationFlags[i] );
-				minSizeTotal += child.getMinWidth();
-				prefSizeTotal += child.getPrefWidth();
+				HAlignment h = ElementAlignment.getHAlignment( childAlignmentFlags[i] );
 				if ( h == HAlignment.EXPAND )
 				{
 					numExpand++;
 				}
 			}
 		}
-		double minSpacingTotal = box.getMinWidth() - minSizeTotal; 
 
 		if ( allocBox.allocationX >= box.getPrefWidth() * LReqBox.ONE_MINUS_EPSILON )		// if allocation >= prefferred
 		{
 			if ( allocBox.allocationX <= box.getPrefWidth() * LReqBox.ONE_PLUS_EPSILON  ||  numExpand == 0 )			// if allocation == preferred   or   numExpand == 0
 			{
 				// Allocate children their preferred width
+				double pos = 0.0;
 				for (int i = 0; i < children.length; i++)
 				{
-					allocBox.allocateChildWidth( childrenAlloc[i], children[i].getPrefWidth() );
+					allocBox.allocateChildX( childrenAlloc[i], pos, children[i].getPrefWidth() );
+					pos += ( children[i].prefHAdvance + spacing );
 				}
 			}
 			else
@@ -148,16 +145,19 @@ public class HorizontalLayout
 				double totalExpand = allocBox.allocationX - box.getPrefWidth();
 				double expandPerChild = totalExpand / (double)numExpand;
 				
+				double pos = 0.0;
 				for (int i = 0; i < children.length; i++)
 				{
-					HAlignment h = ElementAlignment.getHAlignment( childAllocationFlags[i] );
+					HAlignment h = ElementAlignment.getHAlignment( childAlignmentFlags[i] );
 					if ( h == HAlignment.EXPAND )
 					{
-						allocBox.allocateChildWidth( childrenAlloc[i], children[i].getPrefWidth() + expandPerChild );
+						allocBox.allocateChildX( childrenAlloc[i], pos, children[i].getPrefWidth() + expandPerChild );
+						pos += ( children[i].prefHAdvance + expandPerChild + spacing );
 					}
 					else
 					{
-						allocBox.allocateChildWidth( childrenAlloc[i], children[i].getPrefWidth() );
+						allocBox.allocateChildX( childrenAlloc[i], pos, children[i].getPrefWidth() );
+						pos += ( children[i].prefHAdvance + spacing );
 					}
 				}
 			}
@@ -166,74 +166,99 @@ public class HorizontalLayout
 		{
 			// Allocation is smaller than minimum size
 			
-			// Allocate children their preferred size
+			// Allocate children their minimum width
+			double pos = 0.0;
 			for (int i = 0; i < children.length; i++)
 			{
-				allocBox.allocateChildWidth( childrenAlloc[i], children[i].getMinWidth() );
+				allocBox.allocateChildX( childrenAlloc[i], pos, children[i].getMinWidth() );
+				pos += ( children[i].minHAdvance + spacing );
 			}
 		}
 		else
 		{
 			// Allocation is between minimum and preferred size
 			
-			// For spacing, use minimum spacing as opposed to preferred spacing
-			
-			// Compute the difference between the minimum and preferred sizes
-			double pref = box.getPrefWidth() - minSpacingTotal;
-			double deltaMinPref = pref - minSizeTotal;
-
-			// Compute the amount of space over the minimum that is available to share
-			double allocToShare = allocBox.allocationX - minSpacingTotal - minSizeTotal;
-			
-			// Compute the fraction that determines the interpolation factor used to blend the minimum and preferred sizes
-			double fraction = allocToShare / deltaMinPref;
-			
 			if ( children.length >= 1 )
 			{
+				// Allocate children their minimum size, distributing additional space equally
+				double delta = allocBox.allocationX - box.getMinWidth();
+				double fraction = delta / ( box.getPrefWidth() - box.getMinWidth() );
+				
+				double pos = 0.0;
 				for (int i = 0; i < children.length; i++)
 				{
-					double delta = children[i].getPrefWidth() - children[i].getMinWidth();
-					allocBox.allocateChildWidth( childrenAlloc[i], children[i].getMinWidth() + delta * fraction );
+					double expand = ( children[i].getPrefWidth() - children[i].getMinWidth() )  *  fraction;
+					allocBox.allocateChildX( childrenAlloc[i], pos, children[i].getMinWidth() + expand );
+					pos += ( children[i].minHAdvance + expand + spacing );
 				}
 			}
 		}
 	}
-	
-	
 
-	public static void allocateX(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], int childAllocationFlags[], double spacing)
+	
+	
+	public static void allocateX(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], double spacing, boolean bExpand)
 	{
-		// Each packed child consists of:
-		//	- start padding
-		//	- child width
-		//	- end padding
-		//	- any remaining spacing not 'consumed' by padding; spacing - padding  or  0 if padding > spacing
-		
-		// There should be at least the specified amount of spacing between each child, or the child's own h-spacing if it is greater
-
-		allocateSpaceX( box, children, allocBox, childrenAlloc, childAllocationFlags );
-		
-		double size = 0.0;
-		double pos = 0.0;
-		for (int i = 0; i < children.length; i++)
+		if ( allocBox.allocationX >= box.getPrefWidth() * LReqBox.ONE_MINUS_EPSILON )		// if allocation >= prefferred
 		{
-			LReqBox child = children[i];
-			LAllocBox childAlloc = childrenAlloc[i];
-
-			// Compute the spacing
-			// Use 'preferred' spacing, if the child was allocated its preferred amount of space, or more
-			double childSpacing = ( childAlloc.allocationX >= child.prefWidth * LReqBox.ONE_MINUS_EPSILON )  ?  child.prefHSpacing  :  child.minHSpacing;
-
-			// Allocate child position
-			allocBox.allocateChildPositionX( childAlloc, pos );
-
-			// Accumulate width and x
-			size = pos + childAlloc.allocationX;
-			pos = size + childSpacing + spacing;
+			if ( allocBox.allocationX <= box.getPrefWidth() * LReqBox.ONE_PLUS_EPSILON  ||  !bExpand )			// if allocation == preferred   or   not bExpand
+			{
+				// Allocate children their preferred width
+				double pos = 0.0;
+				for (int i = 0; i < children.length; i++)
+				{
+					allocBox.allocateChildX( childrenAlloc[i], pos, children[i].getPrefWidth() );
+					pos += ( children[i].prefHAdvance + spacing );
+				}
+			}
+			else
+			{
+				// Allocate children their preferred size, plus any extra to those for which the expand flag is set
+				double totalExpand = allocBox.allocationX - box.getPrefWidth();
+				double expandPerChild = totalExpand / (double)children.length;
+				
+				double pos = 0.0;
+				for (int i = 0; i < children.length; i++)
+				{
+					allocBox.allocateChildX( childrenAlloc[i], pos, children[i].getPrefWidth() + expandPerChild );
+					pos += ( children[i].prefHAdvance + expandPerChild + spacing );
+				}
+			}
+		}
+		else if ( allocBox.allocationX <= box.getMinWidth() * LReqBox.ONE_PLUS_EPSILON )		// if allocation <= minimum
+		{
+			// Allocation is smaller than minimum size
+			
+			// Allocate children their minimum width
+			double pos = 0.0;
+			for (int i = 0; i < children.length; i++)
+			{
+				allocBox.allocateChildX( childrenAlloc[i], pos, children[i].getMinWidth() );
+				pos += ( children[i].minHAdvance + spacing );
+			}
+		}
+		else
+		{
+			// Allocation is between minimum and preferred size
+			
+			if ( children.length >= 1 )
+			{
+				// Allocate children their minimum size, distributing additional space equally
+				double delta = allocBox.allocationX - box.getMinWidth();
+				double fraction = delta / ( box.getPrefWidth() - box.getMinWidth() );
+				
+				double pos = 0.0;
+				for (int i = 0; i < children.length; i++)
+				{
+					double expand = ( children[i].getPrefWidth() - children[i].getMinWidth() )  *  fraction;
+					allocBox.allocateChildX( childrenAlloc[i], pos, children[i].getMinWidth() + expand );
+					pos += ( children[i].minHAdvance + expand + spacing );
+				}
+			}
 		}
 	}
 
-
+	
 	
 	public static LAllocV computeVerticalAllocationForRow(LReqBox box, LAllocBox allocBox)
 	{
@@ -275,122 +300,5 @@ public class HorizontalLayout
 		{
 			allocBox.allocateChildYAligned( childrenAlloc[i], children[i], childAllocationFlags[i], 0.0, h );
 		}
-	}
-
-
-
-
-	public static void allocateSpaceX(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], boolean bExpand)
-	{
-		// Compute the amount of space required
-		double minSizeTotal = 0.0, prefSizeTotal = 0.0;
-		if ( children.length > 0 )
-		{
-			for (LReqBox child: children)
-			{
-				minSizeTotal += child.getMinWidth();
-				prefSizeTotal += child.getPrefWidth();
-			}
-		}
-		double minSpacingTotal = box.getMinWidth() - minSizeTotal; 
-
-		if ( allocBox.allocationX >= box.getPrefWidth() * LReqBox.ONE_MINUS_EPSILON )		// if allocation >= prefferred
-		{
-			if ( allocBox.allocationX <= box.getPrefWidth() * LReqBox.ONE_PLUS_EPSILON )			// if allocation == preferred
-			{
-				// Allocate children their preferred width
-				for (int i = 0; i < children.length; i++)
-				{
-					allocBox.allocateChildWidth( childrenAlloc[i], children[i].getPrefWidth() );
-				}
-			}
-			else
-			{
-				// Allocate children their preferred size, plus any extra to those for which the expand flag is set
-				double totalExpand = allocBox.allocationX - box.getPrefWidth();
-				double expandPerChild = bExpand  ?  totalExpand / (double)children.length  :  0.0;
-				
-				for (int i = 0; i < children.length; i++)
-				{
-					allocBox.allocateChildWidth( childrenAlloc[i], children[i].getPrefWidth() + expandPerChild );
-				}
-			}
-		}
-		else if ( allocBox.allocationX <= box.getMinWidth() * LReqBox.ONE_PLUS_EPSILON )		// if allocation <= minimum
-		{
-			// Allocation is smaller than minimum size
-			
-			// Allocate children their preferred size
-			for (int i = 0; i < children.length; i++)
-			{
-				allocBox.allocateChildWidth( childrenAlloc[i], children[i].getMinWidth() );
-			}
-		}
-		else
-		{
-			// Allocation is between minimum and preferred size
-			
-			// For spacing, use minimum spacing as opposed to preferred spacing
-			
-			// Compute the difference between the minimum and preferred sizes
-			double pref = box.getPrefWidth() - minSpacingTotal;
-			double deltaMinPref = pref - minSizeTotal;
-
-			// Compute the amount of space over the minimum that is available to share
-			double allocToShare = allocBox.allocationX - minSpacingTotal - minSizeTotal;
-			
-			// Compute the fraction that determines the interpolation factor used to blend the minimum and preferred sizes
-			double fraction = allocToShare / deltaMinPref;
-			
-			if ( children.length >= 1 )
-			{
-				for (int i = 0; i < children.length; i++)
-				{
-					LReqBox child = children[i];
-					double delta = child.getPrefWidth() - child.getMinWidth();
-					allocBox.allocateChildWidth( childrenAlloc[i], child.getMinWidth() + delta * fraction );
-				}
-			}
-		}
-	}
-	
-	
-
-	public static void allocateX(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], double spacing, boolean bExpand)
-	{
-		// Each packed child consists of:
-		//	- start padding
-		//	- child width
-		//	- end padding
-		//	- any remaining spacing not 'consumed' by padding; spacing - padding  or  0 if padding > spacing
-		
-		// There should be at least the specified amount of spacing between each child, or the child's own h-spacing if it is greater
-
-		allocateSpaceX( box, children, allocBox, childrenAlloc, bExpand );
-		
-		double size = 0.0;
-		double pos = 0.0;
-		for (int i = 0; i < children.length; i++)
-		{
-			LReqBox child = children[i];
-			LAllocBox childAlloc = childrenAlloc[i];
-
-			// Compute the spacing
-			// Use 'preferred' spacing, if the child was allocated its preferred amount of space, or more
-			double childSpacing = ( childAlloc.allocationX >= child.prefWidth * LReqBox.ONE_MINUS_EPSILON )  ?  child.prefHSpacing  :  child.minHSpacing;
-			// padding consumes child spacing
-			childSpacing = Math.max( childSpacing, 0.0 );
-
-			// Allocate child position
-			allocBox.allocateChildPositionX( childAlloc, pos );
-
-			// Accumulate width and x
-			size = pos + childAlloc.allocationX;
-			pos = size + childSpacing + spacing;
-		}
-	}
-
-
-	
-	
+	}	
 }

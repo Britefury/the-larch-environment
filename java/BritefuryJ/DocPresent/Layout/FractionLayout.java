@@ -24,7 +24,10 @@ public class FractionLayout
 		}
 
 		double padding = hPadding * 2.0;
-		box.setRequisitionX( minWidth + padding, prefWidth + padding, 0.0, 0.0 );
+		minWidth += padding;
+		prefWidth += padding;
+		
+		box.setRequisitionX( minWidth, prefWidth, minWidth, prefWidth );
 	}
 
 	public static void computeRequisitionY(LReqBox box, LReqBox numerator, LReqBox bar, LReqBox denominator, double hPadding, double vSpacing, double baselineOffset)
