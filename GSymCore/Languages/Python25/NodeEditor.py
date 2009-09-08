@@ -86,6 +86,10 @@ class ParsedExpressionLinearRepresentationListener (ElementLinearRepresentationL
 				if parsed != node:
 					pyReplaceExpression( ctx, node, parsed )
 			else:
+				items = value.getItemValues()
+				if len( items ) == 1  and  ( isinstance( items[0], str )  or  isinstance( items[0], unicode ) ):
+					if items[0].strip() == '':
+						return False
 				pyReplaceExpression( ctx, node, Nodes.UNPARSED( value=value.getItemValues() ) )
 			return True
 		else:
@@ -100,6 +104,22 @@ class ParsedExpressionLinearRepresentationListener (ElementLinearRepresentationL
 			ParsedExpressionLinearRepresentationListener._listenerTable = _ListenerTable( ParsedExpressionLinearRepresentationListener )
 		return ParsedExpressionLinearRepresentationListener._listenerTable.get( parser, outerPrecedence )
 		
+		
+
+
+class StructuralExpressionLinearRepresentationListener (ElementLinearRepresentationListener):
+	def linearRepresentationModified(self, element, event):
+		element.clearStructuralRepresentation()
+		return False
+		
+	
+	_listener = None
+		
+	@staticmethod
+	def newListener():
+		if StructuralExpressionLinearRepresentationListener._listener is None:
+			StructuralExpressionLinearRepresentationListener._listener = StructuralExpressionLinearRepresentationListener()
+		return StructuralExpressionLinearRepresentationListener._listener
 		
 
 

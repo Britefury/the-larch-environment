@@ -278,7 +278,7 @@ public class ParagraphLayout
 			}
 			
 			
-			if ( lineAdvance > ( allocBox.allocationX * LReqBox.ONE_PLUS_EPSILON )   &&   bestLineBreak != null  &&  i > lineStartIndex )
+			if ( Math.min( lineWidth, lineAdvance ) > ( allocBox.allocationX * LReqBox.ONE_PLUS_EPSILON )   &&   bestLineBreak != null  &&  i > lineStartIndex )
 			{
 				// We need to start a new line
 				
