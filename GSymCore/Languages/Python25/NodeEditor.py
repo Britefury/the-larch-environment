@@ -86,7 +86,7 @@ class ParsedExpressionLinearRepresentationListener (ElementLinearRepresentationL
 				if parsed != node:
 					pyReplaceExpression( ctx, node, parsed )
 			else:
-				pyReplaceExpression( ctx, node, Nodes.UNPARSED( value=value ) )
+				pyReplaceExpression( ctx, node, Nodes.UNPARSED( value=value.getItemValues() ) )
 			return True
 		else:
 			return False
