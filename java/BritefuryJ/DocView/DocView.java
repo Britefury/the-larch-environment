@@ -16,6 +16,15 @@ import BritefuryJ.Utils.Profile.ProfileTimer;
 
 public class DocView implements DVNode.NodeRefreshListener
 {
+	//
+	//
+	// PROFILING
+	//
+	//
+	
+	static boolean ENABLE_PROFILING = false;
+	
+	
 	public interface RefreshListener
 	{
 		public void onViewRequestRefresh(DocView view);
@@ -134,23 +143,53 @@ public class DocView implements DVNode.NodeRefreshListener
 	
 	private void performRefresh()
 	{
+		// >>> PROFILING
+		long t1 = 0;
+		if ( ENABLE_PROFILING )
+		{
+			t1 = System.nanoTime();
+			ProfileTimer.initProfiling();
+			beginProfiling();
+		}
+
+		
+		profile_startJava();
+		// <<< PROFILING
+		
+		
 		elementChangeListener.reset( this );
 		getRootView().refresh();
 		
 		// Clear unused entries from the node table
 		nodeTable.clean();
+
+	
+		// >>> PROFILING
+		profile_stopJava();
+	
+	
+		if ( ENABLE_PROFILING )
+		{
+			long t2 = System.nanoTime();
+			endProfiling();
+			ProfileTimer.shutdownProfiling();
+			double deltaT = ( t2 - t1 )  *  1.0e-9;
+			System.out.println( "DocView: REFRESH VIEW TIME = " + deltaT );
+			System.out.println( "DocView: REFRESH VIEW PROFILE: JAVA TIME = " + getJavaTime() + ", ELEMENT CREATE TIME = " + getElementTime() +
+					", PYTHON TIME = " + getPythonTime() + ", CONTENT CHANGE TIME = " + getContentChangeTime() +
+					", UPDATE NODE ELEMENT TIME = " + getUpdateNodeElementTime() );
+		}
+		// <<< PROFILING
 	}
 	
 	
 	public void refresh()
 	{
-		profile_startJava();
 		if ( bRefreshRequired )
 		{
 			bRefreshRequired = false;
 			performRefresh();
 		}
-		profile_stopJava();
 	}
 	
 

@@ -22,19 +22,9 @@ import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocView.DVNode;
 import BritefuryJ.DocView.DocView;
-import BritefuryJ.Utils.Profile.ProfileTimer;
 
 public class GSymViewContext implements DocView.RefreshListener
 {
-	//
-	//
-	// PROFILING
-	//
-	//
-	
-	static boolean ENABLE_PROFILING = false;
-	
-	
 	protected static class NodeContentsFactory implements DVNode.NodeElementFactory
 	{
 		private GSymViewContext viewInstance;
@@ -276,24 +266,6 @@ public class GSymViewContext implements DocView.RefreshListener
 	
 	private void refreshView()
 	{
-		long t1 = 0;
-		if ( ENABLE_PROFILING )
-		{
-			t1 = System.nanoTime();
-			ProfileTimer.initProfiling();
-			view.beginProfiling();
-		}
 		view.refresh();
-		if ( ENABLE_PROFILING )
-		{
-			long t2 = System.nanoTime();
-			view.endProfiling();
-			ProfileTimer.shutdownProfiling();
-			double deltaT = ( t2 - t1 )  *  1.0e-9;
-			System.out.println( "MainApp: REFRESH VIEW TIME = " + deltaT );
-			System.out.println( "MainApp: REFRESH VIEW PROFILE: JAVA TIME = " + view.getJavaTime() + ", ELEMENT CREATE TIME = " + view.getElementTime() +
-					", PYTHON TIME = " + view.getPythonTime() + ", CONTENT CHANGE TIME = " + view.getContentChangeTime() +
-					", UPDATE NODE ELEMENT TIME = " + view.getUpdateNodeElementTime() );
-		}
 	}
 }
