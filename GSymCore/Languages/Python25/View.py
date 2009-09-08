@@ -175,6 +175,16 @@ def expressionNodeEditor(ctx, node, contents, precedence, state):
 		raise ValueError, 'invalid mode %d'  %  mode
 
 
+def structuralExpressionNodeEditor(ctx, node, contents, precedence, state):
+	outerPrecedence, parser, mode = state
+
+	if mode == MODE_DISPLAYCONTENTS  or  mode == MODE_EDITEXPRESSION:
+		contents = _precedenceParen( ctx, node, contents, precedence, outerPrecedence )
+		return ctx.linearRepresentationListener( contents, StructuralExpressionLinearRepresentationListener.newListener() )
+	else:
+		raise ValueError, 'invalid mode %d'  %  mode
+
+
 def statementNodeEditor(ctx, node, contents, precedence, state):
 	outerPrecedence, parser, mode = state
 
@@ -754,7 +764,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		yView = ctx.viewEvalFn( y, None, python25ViewState( yPrec, self._parser.expression(), MODE_EDITEXPRESSION ) )
 		element = ctx.fraction( div_fractionStyle, xView, yView, '/' )
 		element.setStructuralValueObject( node )
-		return expressionNodeEditor( ctx, node,
+		return structuralExpressionNodeEditor( ctx, node,
 					     element,
 					     PRECEDENCE_MULDIVMOD,
 					     state )
