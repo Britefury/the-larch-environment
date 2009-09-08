@@ -179,8 +179,8 @@ class Python25EditHandler (EditHandler):
 	
 	
 	def _dedentLine(self, element, context, node):
-		suite = node.getParents().getValidParents()[0]
-		suiteParent = suite.getParents().getValidParents()[0]
+		suite = node.getValidParents()[0]
+		suiteParent = suite.getValidParents()[0]
 		if not suiteParent.isInstanceOf( Nodes.PythonModule ):
 			# This statement is not in the root node
 			element.setStructuralPrefixObject( Nodes.Dedent() )

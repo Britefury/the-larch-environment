@@ -24,12 +24,12 @@ public class Test_DMNode extends Test_DMNode_base
 		WeakReference<DMList> refXs = new WeakReference<DMList>( xs );
 
 		assertSame( refXs.get(), xs );
-		cmpNodeParents( ij, new DMNode[] { xs } );
+		cmpNodeParentsLive( ij, new DMNode[] { xs } );
 		
 		xs = null;
 		System.gc();
 
 		assertSame( refXs.get(), xs );
-		cmpNodeParents( ij, new DMNode[] { null } );
+		cmpNodeParentsLive( ij, new DMNode[] { null } );
 	}
 }

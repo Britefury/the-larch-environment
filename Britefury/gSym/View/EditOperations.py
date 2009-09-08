@@ -24,7 +24,7 @@ def _dataForStr(data):
 
 def replace(ctx, target, replacement):
 	if isinstance( target, DMNode ):
-		parent = target.getParents().getValidParents()[0]
+		parent = target.getValidParents()[0]
 		if parent is None:
 			print 'EditOperations:replace(): no parent ', target
 		index = parent.indexOfById( target )
@@ -50,7 +50,7 @@ def replaceNodeContents(ctx, node, replacement):
 	
 def replaceWithRange(ctx, target, replacement):
 	if isinstance( target, DMNode ):
-		parent = target.getParents().getValidParents()[0]
+		parent = target.getValidParents()[0]
 		if parent is None:
 			print 'EditOperations:replaceWithRange(): no parent ', target
 		index = parent.indexOfById( target )
@@ -98,7 +98,7 @@ def insertRange(ctx, target, index, data):
 	
 def insertBefore(ctx, target, data):
 	if isinstance( target, DMNode ):
-		parent = target.getParents().getValidParents()[0]
+		parent = target.getValidParents()[0]
 		index = parent.indexOfById( target )
 		if index == -1:
 			raise ValueError, 'could not insert before'
@@ -111,7 +111,7 @@ def insertBefore(ctx, target, data):
 
 def insertRangeBefore(ctx, target, data):
 	if isinstance( target, DMNode ):
-		parent = target.getParents().getValidParents()[0]
+		parent = target.getValidParents()[0]
 		index = parent.indexOfById( target )
 		if index == -1:
 			raise ValueError, 'could not insert range before'
@@ -123,7 +123,7 @@ def insertRangeBefore(ctx, target, data):
 
 def insertAfter(ctx, target, data):
 	if isinstance( target, DMNode ):
-		parent = target.getParents().getValidParents()[0]
+		parent = target.getValidParents()[0]
 		index = parent.indexOfById( target )
 		if index == -1:
 			raise ValueError, 'could not insert after'
@@ -137,7 +137,7 @@ def insertAfter(ctx, target, data):
 	
 def insertRangeAfter(ctx, target, data):
 	if isinstance( target, DMNode ):
-		parent = target.getParents().getValidParents()[0]
+		parent = target.getValidParents()[0]
 		index = parent.indexOfById( target )
 		if index == -1:
 			raise ValueError, 'could not insert range after'
@@ -150,7 +150,7 @@ def insertRangeAfter(ctx, target, data):
 
 def remove(ctx, target):
 	if isinstance( target, DMNode ):
-		parent = target.getParents().getValidParents()[0]
+		parent = target.getValidParents()[0]
 		parent.remove( target )
 		return None
 	else:
