@@ -13,8 +13,8 @@ import BritefuryJ.DocModel.DMNode;
 
 public class Test_DMNode_base extends TestCase
 {
-	public void cmpNodeParents(DMNode node, DMNode expectedParents[])
+	public void cmpNodeParentsLive(DMNode node, DMNode expectedParents[])
 	{
-		assertEquals( node.getParents(), Arrays.asList( expectedParents ) );
+		assertEquals( node.getParentsLive(), Arrays.asList( expectedParents ) );
 	}
 }

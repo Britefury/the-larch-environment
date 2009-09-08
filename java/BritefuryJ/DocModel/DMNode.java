@@ -279,7 +279,21 @@ public abstract class DMNode
 		}
 	}
 	
-	public ParentListAccessor getParents()
+	public ArrayList<DMNode> getValidParents()
+	{
+		ArrayList<DMNode> p = new ArrayList<DMNode>();
+		for (WeakReference<DMNode> ref: parents)
+		{
+			DMNode node = ref.get();
+			if ( node != null )
+			{
+				p.add( node );
+			}
+		}
+		return p;
+	}
+	
+	public ParentListAccessor getParentsLive()
 	{
 		return new ParentListAccessor( this );
 	}

@@ -117,60 +117,60 @@ public class Test_DMObject extends Test_DMNode_base
 		history.track( a );
 		
 		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { ij, "p" } ) );
-		cmpNodeParents( ij, new DMNode[] { a } );
-		cmpNodeParents( pq, new DMNode[] {} );
+		cmpNodeParentsLive( ij, new DMNode[] { a } );
+		cmpNodeParentsLive( pq, new DMNode[] {} );
 
 		a.set( 0, "b" );
 		a.set( 1, "q" );
 		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "b", "q" } ) );
-		cmpNodeParents( ij, new DMNode[] {} );
-		cmpNodeParents( pq, new DMNode[] {} );
+		cmpNodeParentsLive( ij, new DMNode[] {} );
+		cmpNodeParentsLive( pq, new DMNode[] {} );
 		
 		a.set( "x", pq );
 		a.set( "y", null );
 		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { pq, null } ) );
-		cmpNodeParents( ij, new DMNode[] {} );
-		cmpNodeParents( pq, new DMNode[] { a } );
+		cmpNodeParentsLive( ij, new DMNode[] {} );
+		cmpNodeParentsLive( pq, new DMNode[] { a } );
 
 		history.undo();
 		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { pq, "q" } ) );
-		cmpNodeParents( ij, new DMNode[] {} );
-		cmpNodeParents( pq, new DMNode[] { a } );
+		cmpNodeParentsLive( ij, new DMNode[] {} );
+		cmpNodeParentsLive( pq, new DMNode[] { a } );
 
 		history.undo();
 		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "b", "q" } ) );
-		cmpNodeParents( ij, new DMNode[] {} );
-		cmpNodeParents( pq, new DMNode[] {} );
+		cmpNodeParentsLive( ij, new DMNode[] {} );
+		cmpNodeParentsLive( pq, new DMNode[] {} );
 
 		history.undo();
 		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "b", "p" } ) );
-		cmpNodeParents( ij, new DMNode[] {} );
-		cmpNodeParents( pq, new DMNode[] {} );
+		cmpNodeParentsLive( ij, new DMNode[] {} );
+		cmpNodeParentsLive( pq, new DMNode[] {} );
 
 		history.undo();
 		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { ij, "p" } ) );
-		cmpNodeParents( ij, new DMNode[] { a } );
-		cmpNodeParents( pq, new DMNode[] {} );
+		cmpNodeParentsLive( ij, new DMNode[] { a } );
+		cmpNodeParentsLive( pq, new DMNode[] {} );
 		
 		history.redo();
 		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "b", "p" } ) );
-		cmpNodeParents( ij, new DMNode[] {} );
-		cmpNodeParents( pq, new DMNode[] {} );
+		cmpNodeParentsLive( ij, new DMNode[] {} );
+		cmpNodeParentsLive( pq, new DMNode[] {} );
 		
 		history.redo();
 		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "b", "q" } ) );
-		cmpNodeParents( ij, new DMNode[] {} );
-		cmpNodeParents( pq, new DMNode[] {} );
+		cmpNodeParentsLive( ij, new DMNode[] {} );
+		cmpNodeParentsLive( pq, new DMNode[] {} );
 		
 		history.redo();
 		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { pq, "q" } ) );
-		cmpNodeParents( ij, new DMNode[] {} );
-		cmpNodeParents( pq, new DMNode[] { a } );
+		cmpNodeParentsLive( ij, new DMNode[] {} );
+		cmpNodeParentsLive( pq, new DMNode[] { a } );
 		
 		history.redo();
 		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { pq, null } ) );
-		cmpNodeParents( ij, new DMNode[] {} );
-		cmpNodeParents( pq, new DMNode[] { a } );
+		cmpNodeParentsLive( ij, new DMNode[] {} );
+		cmpNodeParentsLive( pq, new DMNode[] { a } );
 	}
 
 
@@ -186,8 +186,8 @@ public class Test_DMObject extends Test_DMNode_base
 		history.track( a );
 		
 		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "a", ij } ) );
-		cmpNodeParents( ij, new DMNode[] { a } );
-		cmpNodeParents( pq, new DMNode[] {} );
+		cmpNodeParentsLive( ij, new DMNode[] { a } );
+		cmpNodeParentsLive( pq, new DMNode[] {} );
 
 		HashMap<String, Object> data = new HashMap<String, Object>();
 		data.put( "x", pq );
@@ -195,18 +195,18 @@ public class Test_DMObject extends Test_DMNode_base
 		a.update( data );
 
 		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { pq, null } ) );
-		cmpNodeParents( ij, new DMNode[] {} );
-		cmpNodeParents( pq, new DMNode[] { a } );
+		cmpNodeParentsLive( ij, new DMNode[] {} );
+		cmpNodeParentsLive( pq, new DMNode[] { a } );
 
 		history.undo();
 		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "a", ij } ) );
-		cmpNodeParents( ij, new DMNode[] { a } );
-		cmpNodeParents( pq, new DMNode[] {} );
+		cmpNodeParentsLive( ij, new DMNode[] { a } );
+		cmpNodeParentsLive( pq, new DMNode[] {} );
 
 		history.redo();
 		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { pq, null } ) );
-		cmpNodeParents( ij, new DMNode[] {} );
-		cmpNodeParents( pq, new DMNode[] { a } );
+		cmpNodeParentsLive( ij, new DMNode[] {} );
+		cmpNodeParentsLive( pq, new DMNode[] { a } );
 	}
 
 
@@ -225,27 +225,27 @@ public class Test_DMObject extends Test_DMNode_base
 		
 		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "a", ij } ) );
 		assertTrue( a.isInstanceOf( A ) );
-		cmpNodeParents( ij, new DMNode[] { a } );
-		cmpNodeParents( pq, new DMNode[] { b } );
+		cmpNodeParentsLive( ij, new DMNode[] { a } );
+		cmpNodeParentsLive( pq, new DMNode[] { b } );
 
 		a.become( b );
 
 		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "c", "d", pq } ) );
 		assertTrue( a.isInstanceOf( B ) );
-		cmpNodeParents( ij, new DMNode[] {} );
-		cmpNodeParents( pq, new DMNode[] { a, b } );
+		cmpNodeParentsLive( ij, new DMNode[] {} );
+		cmpNodeParentsLive( pq, new DMNode[] { a, b } );
 
 		history.undo();
 		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "a", ij } ) );
 		assertTrue( a.isInstanceOf( A ) );
-		cmpNodeParents( ij, new DMNode[] { a } );
-		cmpNodeParents( pq, new DMNode[] { b } );
+		cmpNodeParentsLive( ij, new DMNode[] { a } );
+		cmpNodeParentsLive( pq, new DMNode[] { b } );
 
 		history.redo();
 		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "c", "d", pq } ) );
 		assertTrue( a.isInstanceOf( B ) );
-		cmpNodeParents( ij, new DMNode[] {} );
-		cmpNodeParents( pq, new DMNode[] { a, b } );
+		cmpNodeParentsLive( ij, new DMNode[] {} );
+		cmpNodeParentsLive( pq, new DMNode[] { a, b } );
 	}
 
 
