@@ -631,7 +631,7 @@ class Python25Grammar (Grammar):
 
 	@Rule
 	def expression(self):
-		return ObjectNode( Nodes.Expr )  |  self.lambdaExpr()  |  self.conditionalExpression()  |  self.orTest()
+		return self.lambdaExpr()  |  self.conditionalExpression()  |  self.orTest()
 
 
 
@@ -2328,8 +2328,8 @@ class TestCase_Python25Parser (ParserTestCase):
 	def test_embeddedStructural(self):
 		g = Python25Grammar()
 		#s = self._pythonStream( 'x = ', Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), '\n' )
-		s = self._pythonStream( 'x = ', Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), '\n' )
-		self._parseStreamTest( g.suite(), s, [ Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='x' ) ], value=Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ) ] )
+		s = self._pythonStream( 'x = ', Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), ' + c\n' )
+		self._parseStreamTest( g.suite(), s, [ Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='x' ) ], value=Nodes.Add( x=Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Load( name='c' ) ) ) ] )
 		
 		
 

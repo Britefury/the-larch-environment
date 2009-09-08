@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.Parser.ItemStream;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -192,6 +193,28 @@ public class ItemStream
 		return Arrays.asList( items );
 	}
 	
+	public ArrayList<Object> getItemValues()
+	{
+		ArrayList<Object> itemValues = new ArrayList<Object>();
+		itemValues.ensureCapacity( items.length );
+		for (Item item: items)
+		{
+			if ( item instanceof TextItem )
+			{
+				itemValues.add( ((TextItem)item).textValue );
+			}
+			else if ( item instanceof StructuralItem )
+			{
+				itemValues.add( ((StructuralItem)item).structuralValue );
+			}
+			else
+			{
+				throw new RuntimeException( "Invalid item type" );
+			}
+		}
+		return itemValues;
+	}
+	
 	public int length()
 	{
 		return length;
@@ -245,6 +268,10 @@ public class ItemStream
 	
 	public Object __getitem__(int pos)
 	{
+		if ( pos >= length )
+		{
+			throw new IndexOutOfBoundsException( "ItemStream index out of range: pos=" + pos + "/" + length );
+		}
 		Item x = itemAt( pos );
 		if ( x instanceof StructuralItem )
 		{
