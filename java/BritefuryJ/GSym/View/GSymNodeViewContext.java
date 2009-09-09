@@ -25,6 +25,8 @@ import BritefuryJ.DocPresent.DPLine;
 import BritefuryJ.DocPresent.DPLineBreak;
 import BritefuryJ.DocPresent.DPLink;
 import BritefuryJ.DocPresent.DPParagraph;
+import BritefuryJ.DocPresent.DPParagraphDedentMarker;
+import BritefuryJ.DocPresent.DPParagraphIndentMarker;
 import BritefuryJ.DocPresent.DPRGrid;
 import BritefuryJ.DocPresent.DPScript;
 import BritefuryJ.DocPresent.DPSegment;
@@ -326,6 +328,24 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget lineBreak(DPWidget child)
 	{
 		return lineBreak( ContainerStyleSheet.defaultStyleSheet, child );
+	}
+	
+	public DPWidget paragraphIndentMarker()
+	{
+		viewInstance.getView().profile_startElement();
+		DPParagraphIndentMarker element = new DPParagraphIndentMarker();
+		element.setContext( this );
+		viewInstance.getView().profile_stopElement();
+		return element;
+	}
+	
+	public DPWidget paragraphDedentMarker()
+	{
+		viewInstance.getView().profile_startElement();
+		DPParagraphDedentMarker element = new DPParagraphDedentMarker();
+		element.setContext( this );
+		viewInstance.getView().profile_stopElement();
+		return element;
 	}
 	
 

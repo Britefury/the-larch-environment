@@ -13,6 +13,8 @@ import org.python.core.PyObject;
 
 import BritefuryJ.DocPresent.DPLineBreak;
 import BritefuryJ.DocPresent.DPParagraph;
+import BritefuryJ.DocPresent.DPParagraphDedentMarker;
+import BritefuryJ.DocPresent.DPParagraphIndentMarker;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.PyElementFactory;
@@ -22,19 +24,21 @@ public class ParagraphListViewLayout extends ListViewLayout
 {
 	private ParagraphStyleSheet styleSheet;
 	private ElementFactory spacingFactory;
+	boolean bAddParagraphIndentMarkers;
 	private TrailingSeparator trailingSeparator;
 	
 	
-	public ParagraphListViewLayout(ParagraphStyleSheet styleSheet, ElementFactory spacingFactory, TrailingSeparator trailingSeparator)
+	public ParagraphListViewLayout(ParagraphStyleSheet styleSheet, ElementFactory spacingFactory, boolean bAddParagraphIndentMarkers, TrailingSeparator trailingSeparator)
 	{
 		this.styleSheet = styleSheet;
 		this.spacingFactory = spacingFactory;
+		this.bAddParagraphIndentMarkers = bAddParagraphIndentMarkers;
 		this.trailingSeparator = trailingSeparator;
 	}
 	
-	public ParagraphListViewLayout(ParagraphStyleSheet styleSheet, PyObject spacingFactory, TrailingSeparator trailingSeparator)
+	public ParagraphListViewLayout(ParagraphStyleSheet styleSheet, PyObject spacingFactory, boolean bAddParagraphIndentMarkers, TrailingSeparator trailingSeparator)
 	{
-		this( styleSheet, PyElementFactory.pyToElementFactory( spacingFactory ), trailingSeparator );
+		this( styleSheet, PyElementFactory.pyToElementFactory( spacingFactory ), bAddParagraphIndentMarkers, trailingSeparator );
 	}
 	
 	
@@ -48,6 +52,11 @@ public class ParagraphListViewLayout extends ListViewLayout
 		if ( beginDelim != null )
 		{
 			childElems.add( beginDelim.createElement() );
+		}
+		
+		if ( bAddParagraphIndentMarkers )
+		{
+			childElems.add( new DPParagraphIndentMarker() );
 		}
 		
 		if ( children.size() > 0 )
@@ -80,6 +89,11 @@ public class ParagraphListViewLayout extends ListViewLayout
 			}
 		}
 
+		if ( bAddParagraphIndentMarkers )
+		{
+			childElems.add( new DPParagraphDedentMarker() );
+		}
+		
 		if ( endDelim != null )
 		{
 			childElems.add( endDelim.createElement() );
