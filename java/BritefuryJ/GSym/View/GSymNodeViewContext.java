@@ -310,10 +310,10 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 		return element;
 	}
 	
-	public DPWidget lineBreak(ContainerStyleSheet styleSheet, int lineBreakPriority, DPWidget child)
+	public DPWidget lineBreak(ContainerStyleSheet styleSheet, DPWidget child)
 	{
 		viewInstance.getView().profile_startElement();
-		DPLineBreak element = new DPLineBreak( styleSheet, lineBreakPriority );
+		DPLineBreak element = new DPLineBreak( styleSheet );
 		if ( child != null )
 		{
 			element.setChild( child );
@@ -323,19 +323,9 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 		return element;
 	}
 	
-	public DPWidget lineBreak(int lineBreakPriority, DPWidget child)
+	public DPWidget lineBreak(DPWidget child)
 	{
-		return lineBreak( ContainerStyleSheet.defaultStyleSheet, lineBreakPriority, child );
-	}
-	
-	public DPWidget lineBreak(ContainerStyleSheet styleSheet, int lineBreakPriority)
-	{
-		return lineBreak( styleSheet, lineBreakPriority, null );
-	}
-	
-	public DPWidget lineBreak(int lineBreakPriority)
-	{
-		return lineBreak( ContainerStyleSheet.defaultStyleSheet, lineBreakPriority, null );
+		return lineBreak( ContainerStyleSheet.defaultStyleSheet, child );
 	}
 	
 

@@ -25,28 +25,16 @@ public class SpanListViewLayout extends ListViewLayout
 	int lineBreakCost;
 	
 	
-	public SpanListViewLayout(ElementFactory spacingFactory, TrailingSeparator trailingSeparator)
+	public SpanListViewLayout(ElementFactory spacingFactory, boolean bAddLineBreaks, TrailingSeparator trailingSeparator)
 	{
 		this.spacingFactory = spacingFactory;
+		this.bAddLineBreaks = bAddLineBreaks;
 		this.trailingSeparator = trailingSeparator;
 	}
 	
-	public SpanListViewLayout(ElementFactory spacingFactory, int lineBreakCost, TrailingSeparator trailingSeparator)
+	public SpanListViewLayout(PyObject spacingFactory, boolean bAddLineBreaks, TrailingSeparator trailingSeparator)
 	{
-		this.spacingFactory = spacingFactory;
-		this.trailingSeparator = trailingSeparator;
-		this.bAddLineBreaks = true;
-		this.lineBreakCost = lineBreakCost;
-	}
-	
-	public SpanListViewLayout(PyObject spacingFactory, TrailingSeparator trailingSeparator)
-	{
-		this( PyElementFactory.pyToElementFactory( spacingFactory ), trailingSeparator );
-	}
-	
-	public SpanListViewLayout(PyObject spacingFactory, int lineBreakCost, TrailingSeparator trailingSeparator)
-	{
-		this( PyElementFactory.pyToElementFactory( spacingFactory ), lineBreakCost, trailingSeparator );
+		this( PyElementFactory.pyToElementFactory( spacingFactory ), bAddLineBreaks, trailingSeparator );
 	}
 	
 	
@@ -74,7 +62,7 @@ public class SpanListViewLayout extends ListViewLayout
 				}
 				if ( bAddLineBreaks )
 				{
-					DPLineBreak lineBreak = new DPLineBreak( lineBreakCost );
+					DPLineBreak lineBreak = new DPLineBreak();
 					if ( spacingFactory != null )
 					{
 						lineBreak.setChild( spacingFactory.createElement() );

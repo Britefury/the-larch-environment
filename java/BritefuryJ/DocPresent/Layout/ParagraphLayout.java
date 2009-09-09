@@ -10,6 +10,23 @@ import java.util.ArrayList;
 
 public class ParagraphLayout
 {
+	private static class BreakEntry
+	{
+		public LReqBox breakBox;
+		public int indexInChildList;
+		public double xAtBreak, xAfterBreak;
+		
+		
+		public BreakEntry(LReqBox breakBox, int indexInChildList, double xAtBreak)
+		{
+			this.breakBox = breakBox;
+			this.indexInChildList = indexInChildList;
+			this.xAtBreak = xAtBreak;
+			this.xAfterBreak = xAtBreak;
+		}
+	}
+	
+	
 	public static class Line
 	{
 		protected LReqBox lineReqBox;
@@ -225,6 +242,21 @@ public class ParagraphLayout
 
 	public static Line[] allocateX(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], int childAllocationFlags[], double indentation, double spacing)
 	{
+		// The paragraph-flow algorithm works as follows:
+		// Children are positioned left-to-right, sequentially. Their positions are accumulated.
+		// When the amount of horizontal space accumulated, exceeds the amount of width allocated to the paragraph, start a new line.
+		//
+		// A new line is started by choosing a line break, and breaking the current line at that point, and starting the next line
+		// from the next child onwards.
+		// As children are allocated/accumulated, any line breaks are picked out. Two line breaks are considered when breaking
+		// a line; the best line break (the line break which has the least cost, out of all encountered on the current line), and the
+		// most recent. In some cases, the children subsequent to the best line break would accumulate sufficient width to overflow
+		// the paragraph width allocation; we would need to break again. In this case, the most recent line break is chosen.
+		//
+		// This is accomplished by keeping a list of all line breaks encountered. When a line break is used (to break a line), the list
+		// is rescanned from that point onwards, so that a new best line break can be chosen.
+		
+		
 		boolean bFirstLine = true;
 		
 		ArrayList<Line> lines = new ArrayList<Line>();
@@ -234,13 +266,11 @@ public class ParagraphLayout
 		double lineAdvance = 0.0;
 		double lineX = 0.0;
 		
-		LReqBox bestLineBreak = null;
-		int bestLineBreakIndex = -1;
-		double xAtBestLineBreak = 0.0, xAfterBestLineBreak = 0.0;
-		
-		LReqBox lastLineBreak = null;
-		int lastLineBreakIndex = -1;
-		double xAfterLastLineBreak = 0.0;
+		// We keep a list of all line breaks, and the x position 
+		ArrayList<BreakEntry> lineBreaks = new ArrayList<BreakEntry>();
+		BreakEntry bestLineBreak = null, lastLineBreak = null;
+		int bestLineBreakEntryIndex = -1, lastLineBreakEntryIndex = -1;
+		int lineBreakEntryListOffset = 0;
 		
 		for (int i = 0; i < children.length; i++)
 		{
@@ -249,16 +279,18 @@ public class ParagraphLayout
 			// Keep track of the best and most recent line break boxes
 			if ( child.isLineBreak() )
 			{
-				if ( bestLineBreak == null  ||  child.lineBreakCost <= bestLineBreak.lineBreakCost )
+				BreakEntry entry = new BreakEntry( child, i, lineX );
+				if ( bestLineBreak == null  ||  child.lineBreakCost <= bestLineBreak.breakBox.lineBreakCost )
 				{
-					// Found a better line break
-					bestLineBreak = child;
-					bestLineBreakIndex = i;
-					xAtBestLineBreak = lineX;
+					bestLineBreak = entry;
+					bestLineBreakEntryIndex = lineBreaks.size();
 				}
 				
-				lastLineBreak = child;
-				lastLineBreakIndex = i;
+				lastLineBreak = entry;
+				lastLineBreakEntryIndex = lineBreaks.size();
+				
+				// Add afterwards so that size() will give the index of the entry to be added
+				lineBreaks.add( entry );
 			}
 			
 			// Accumulate width, advance, and x
@@ -266,37 +298,37 @@ public class ParagraphLayout
 			lineAdvance = lineX + child.prefHAdvance;
 			lineX = lineAdvance + spacing;
 			
-			// Note the x position after the best and most recent line breaks
-			if ( child == bestLineBreak )
+			// Note the x position after a line break
+			if ( lastLineBreak != null  &&  child == lastLineBreak.breakBox )
 			{
-				xAfterBestLineBreak = lineX;
-			}
-			
-			if ( child == lastLineBreak )
-			{
-				xAfterLastLineBreak = lineX;
+				lastLineBreak.xAfterBreak = lineX;
 			}
 			
 			
-			if ( Math.min( lineWidth, lineAdvance ) > ( allocBox.allocationX * LReqBox.ONE_PLUS_EPSILON )   &&   bestLineBreak != null  &&  i > lineStartIndex )
+			// Compute a line 'progress' value, as the minimum of the width and the advance; depending upon the content, the advance may be smaller or larger
+			// than the width. Use the smallest one, otherwise problems can arise in some circumstances.
+			double lineProgress = Math.min( lineWidth, lineAdvance );
+			if ( lineProgress > ( allocBox.allocationX * LReqBox.ONE_PLUS_EPSILON )   &&   bestLineBreak != null  &&  i > lineStartIndex )
 			{
 				// We need to start a new line
 				
 				// Pick a line break
 				int lineBreakIndex;
 				double xAfterLineBreak;
-				if ( ( lineWidth - xAtBestLineBreak )  >  allocBox.allocationX  &&  child != lastLineBreak  &&  lastLineBreak != null )
+				if ( lastLineBreak != null  &&  child != lastLineBreak.breakBox  &&  ( lineProgress - bestLineBreak.xAtBreak )  >  allocBox.allocationX )
 				{
 					// We still go over the allocation limit even if we do split at the best line break.
 					// In this case, choose the most recent line break instead
-					lineBreakIndex = lastLineBreakIndex;
-					xAfterLineBreak = xAfterLastLineBreak;
+					lineBreakIndex = lastLineBreak.indexInChildList;
+					xAfterLineBreak = lastLineBreak.xAfterBreak;
+					lineBreakEntryListOffset = lastLineBreakEntryIndex + 1;
 				}
 				else
 				{
 					// Go with the best line break (the one with the least cost)
-					lineBreakIndex = bestLineBreakIndex;
-					xAfterLineBreak = xAfterBestLineBreak;
+					lineBreakIndex = bestLineBreak.indexInChildList;
+					xAfterLineBreak = bestLineBreak.xAfterBreak;
+					lineBreakEntryListOffset = bestLineBreakEntryIndex + 1;
 				}
 				
 				// Build a list of child boxes for the line
@@ -320,11 +352,29 @@ public class ParagraphLayout
 				lineAdvance += indentation;
 				lineX += indentation;
 				
+				// Reset line break
 				bestLineBreak = null;
-				bestLineBreakIndex = -1;
-				xAtBestLineBreak = 0.0;
-				xAfterBestLineBreak = 0.0;
 
+				// Scan for new line break
+				for (int j = lineBreakEntryListOffset; j < lineBreaks.size(); j++)
+				{
+					BreakEntry entry = lineBreaks.get( j );
+					
+					entry.xAtBreak -= xAfterLineBreak;
+					entry.xAfterBreak -= xAfterLineBreak;
+					entry.xAtBreak += indentation;
+					entry.xAfterBreak += indentation;
+					
+					if ( bestLineBreak == null  ||  entry.breakBox.lineBreakCost <= bestLineBreak.breakBox.lineBreakCost )
+					{
+						// Found a better line break
+						bestLineBreak = entry;
+						bestLineBreakEntryIndex = j;
+					}
+					
+					lastLineBreak = entry;
+					lastLineBreakEntryIndex = j;
+				}
 				bFirstLine = false;
 			}
 		}

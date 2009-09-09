@@ -132,6 +132,8 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 
 		
 	def linearRepresentationModified(self, element, event):
+		# if @event is a @SelectionLinearRepresentationEvent, and its source element is @element, then @element has had its
+		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it
 		if not isinstance( event, SelectionLinearRepresentationEvent )  or  event.getSourceElement() is not element:
 			element.clearStructuralRepresentation()
 		ctx = element.getContext()
@@ -175,6 +177,8 @@ class CompoundHeaderLinearRepresentationListener (ElementLinearRepresentationLis
 
 		
 	def linearRepresentationModified(self, element, event):
+		# if @event is a @SelectionLinearRepresentationEvent, and its source element is @element, then @element has had its
+		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it
 		if not isinstance( event, SelectionLinearRepresentationEvent )  or  event.getSourceElement() is not element:
 			element.clearStructuralRepresentation()
 		ctx = element.getContext()
@@ -214,6 +218,8 @@ class SuiteLinearRepresentationListener (ElementLinearRepresentationListener):
 
 		
 	def linearRepresentationModified(self, element, event):
+		# if @event is a @SelectionLinearRepresentationEvent, and its source element is @element, then @element has had its
+		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it
 		if not isinstance( event, SelectionLinearRepresentationEvent )  or  event.getSourceElement() is not element:
 			element.clearStructuralRepresentation()
 		ctx = element.getContext()
