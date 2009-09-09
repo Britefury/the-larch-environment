@@ -1474,19 +1474,6 @@ abstract public class DPWidget extends PointerInputElement
 	
 	//
 	//
-	// PARAGRAPH METHODS
-	//
-	//
-	
-	public LineBreakInterface getLineBreakInterface()
-	{
-		return null;
-	}
-	
-	
-	
-	//
-	//
 	// CONTENT LEAF METHODS
 	//
 	//

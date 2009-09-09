@@ -289,7 +289,7 @@ def spanBinOpView(ctx, state, node, x, y, op, precedence, bRightAssociative, exp
 	yView = ctx.viewEvalFn( y, None, python25ViewState( yPrec, expressionParser ) )
 	opView = ctx.text( operator_textStyle, op )
 	return expressionNodeEditor( ctx, node,
-				     ctx.span( [ xView, ctx.text( default_textStyle, ' ' ), opView, ctx.lineBreak( precedence, ctx.text( default_textStyle, ' ' ) ), yView ] ),
+				     ctx.span( [ xView, ctx.text( default_textStyle, ' ' ), opView, ctx.lineBreak( ctx.text( default_textStyle, ' ' ) ), yView ] ),
 				     precedence,
 				     state )
 
@@ -297,7 +297,7 @@ def spanCmpOpView(ctx, state, node, op, y, precedence, expressionParser):
 	opView = ctx.text( operator_textStyle, op )
 	yView = ctx.viewEvalFn( y, None, python25ViewState( precedence, expressionParser ) )
 	return expressionNodeEditor( ctx, node,
-				     ctx.span( [ ctx.text( default_textStyle, ' ' ), opView, ctx.lineBreak( precedence, ctx.text( default_textStyle, ' ' ) ), yView ] ),
+				     ctx.span( [ ctx.text( default_textStyle, ' ' ), opView, ctx.lineBreak( ctx.text( default_textStyle, ' ' ) ), yView ] ),
 				     precedence,
 				     state )
 
@@ -549,7 +549,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		if len( itemViews ) > 0:
 			for x in itemViews[:-1]:
 				itemViewsSpaced.append( x )
-				itemViewsSpaced.append( ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.whitespace( ' ', 15.0 ) ) )
+				itemViewsSpaced.append( ctx.lineBreak( ctx.whitespace( ' ', 15.0 ) ) )
 			itemViewsSpaced.append( itemViews[-1] )
 		return expressionNodeEditor( ctx, node,
 					     ctx.span( [ ctx.text( punctuation_textStyle, '[' ),  exprView,  ctx.whitespace( ' ', 15.0 ) ] + itemViewsSpaced + [ ctx.text( punctuation_textStyle, ']' ) ] ),
@@ -565,7 +565,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		if len( itemViews ) > 0:
 			for x in itemViews[:-1]:
 				itemViewsSpaced.append( x )
-				itemViewsSpaced.append( ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.whitespace( ' ', 15.0 ) ) )
+				itemViewsSpaced.append( ctx.lineBreak( ctx.whitespace( ' ', 15.0 ) ) )
 			itemViewsSpaced.append( itemViews[-1] )
 		return expressionNodeEditor( ctx, node,
 					     ctx.span( [ ctx.text( punctuation_textStyle, '(' ),  exprView,  ctx.whitespace( ' ', 15.0 ) ] + itemViewsSpaced + [ ctx.text( punctuation_textStyle, ')' ) ] ),
@@ -628,7 +628,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		lowerView = _sliceIndex( lower )
 		upperView = _sliceIndex( upper )
 		return expressionNodeEditor( ctx, node,
-					     ctx.span( lowerView + [ ctx.text( punctuation_textStyle, ':' ), ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY ) ] + upperView ),
+					     ctx.span( lowerView + [ ctx.text( punctuation_textStyle, ':' ), ctx.lineBreak() ] + upperView ),
 					     PRECEDENCE_NONE,
 					     state )
 
@@ -643,8 +643,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 		upperView = _sliceIndex( upper )
 		strideView = _sliceIndex( stride )
 		return expressionNodeEditor( ctx, node,
-					     ctx.span( lowerView + [ ctx.text( punctuation_textStyle, ':' ), ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY ) ] +  upperView + \
-						       [ ctx.text( punctuation_textStyle, ':' ), ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY ) ] + strideView ),
+					     ctx.span( lowerView + [ ctx.text( punctuation_textStyle, ':' ), ctx.lineBreak() ] +  upperView + \
+						       [ ctx.text( punctuation_textStyle, ':' ), ctx.lineBreak() ] + strideView ),
 					     PRECEDENCE_NONE,
 					     state )
 
@@ -711,11 +711,11 @@ class Python25View (GSymViewObjectNodeDispatch):
 			for a in argViews[:-1]:
 				argElements.append( a )
 				argElements.append( ctx.text( punctuation_textStyle, ',' ) )
-				argElements.append( ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ) )
+				argElements.append( ctx.lineBreak( ctx.text( punctuation_textStyle, ' ' ) ) )
 			argElements.append( argViews[-1] )
 			if argsTrailingSeparator is not None:
 				argElements.append( ctx.text( punctuation_textStyle, ',' ) )
-				argElements.append( ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ) )
+				argElements.append( ctx.lineBreak( ctx.text( punctuation_textStyle, ' ' ) ) )
 			argElements.append( ctx.text( default_textStyle, ' ' ) )
 		return expressionNodeEditor( ctx, node,
 					     ctx.span( [ targetView, ctx.text( punctuation_textStyle, '(' ) ]  +  argElements  +  [ ctx.text( punctuation_textStyle, ')' ) ] ),
@@ -923,15 +923,15 @@ class Python25View (GSymViewObjectNodeDispatch):
 			for p in paramViews[:-1]:
 				paramElements.append( p )
 				paramElements.append( ctx.text( punctuation_textStyle, ',' ) )
-				paramElements.append( ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ) )
+				paramElements.append( ctx.lineBreak( ctx.text( punctuation_textStyle, ' ' ) ) )
 			paramElements.append( paramViews[-1] )
 			if paramsTrailingSeparator is not None:
 				paramElements.append( ctx.text( punctuation_textStyle, ',' ) )
-				paramElements.append( ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ) )
+				paramElements.append( ctx.lineBreak( ctx.text( punctuation_textStyle, ' ' ) ) )
 
 		return expressionNodeEditor( ctx, node,
 					     ctx.span( [ capitalisedKeywordText( ctx, lambdaKeyword ),  ctx.text( default_textStyle, ' ' ) ]  +  paramElements  +  \
-						       [ ctx.text( punctuation_textStyle, ':' ), ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ), exprView ] ),
+						       [ ctx.text( punctuation_textStyle, ':' ), ctx.lineBreak( ctx.text( punctuation_textStyle, ' ' ) ), exprView ] ),
 					     PRECEDENCE_LAMBDAEXPR,
 					     state )
 
@@ -944,8 +944,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 		exprView = ctx.viewEvalFn( expr, None, python25ViewState( PRECEDENCE_CONTAINER_CONDITIONALEXPR, self._parser.orTest() ) )
 		elseExprView = ctx.viewEvalFn( elseExpr, None, python25ViewState( PRECEDENCE_CONTAINER_CONDITIONALEXPR, self._parser.expression() ) )
 		return expressionNodeEditor( ctx, node,
-					     ctx.span( [ exprView,   ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.whitespace( '  ', 15.0 ) ),
-							 capitalisedKeywordText( ctx, ifKeyword ), ctx.text( default_textStyle, ' ' ), conditionView,   ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.whitespace( '  ', 15.0 ) ),
+					     ctx.span( [ exprView,   ctx.lineBreak( ctx.whitespace( '  ', 15.0 ) ),
+							 capitalisedKeywordText( ctx, ifKeyword ), ctx.text( default_textStyle, ' ' ), conditionView,   ctx.lineBreak( ctx.whitespace( '  ', 15.0 ) ),
 							 capitalisedKeywordText( ctx, elseKeyword ), ctx.text( default_textStyle, ' ' ), elseExprView ] ),
 					     PRECEDENCE_CONDITIONAL,
 					     state )
@@ -974,7 +974,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		elements = [ capitalisedKeywordText( ctx, assertKeyword ), ctx.text( default_textStyle, ' ' ), conditionView ]
 		if fail is not None:
 			failView = ctx.viewEvalFn( fail, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
-			elements.extend( [ ctx.text( punctuation_textStyle, ',' ), ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ), failView ] )
+			elements.extend( [ ctx.text( punctuation_textStyle, ',' ), ctx.lineBreak( ctx.text( punctuation_textStyle, ' ' ) ), failView ] )
 		return statementNodeEditor( ctx, node,
 					    ctx.span( elements ),
 					    PRECEDENCE_STMT,
@@ -988,7 +988,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		valueView = ctx.viewEvalFn( value, None, python25ViewState( PRECEDENCE_STMT, self._parser.tupleOrExpressionOrYieldExpression() ) )
 		targetElements = []
 		for t in targetViews:
-			targetElements.extend( [ t,  ctx.text( punctuation_textStyle, ' =' ),  ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ) ] )
+			targetElements.extend( [ t,  ctx.text( punctuation_textStyle, ' =' ),  ctx.lineBreak( ctx.text( punctuation_textStyle, ' ' ) ) ] )
 		return statementNodeEditor( ctx, node,
 					    ctx.span( targetElements  +  [ valueView ] ),
 					    PRECEDENCE_STMT,
@@ -1123,7 +1123,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		moduleElements = []
 		if len( modules ) > 0:
 			for mv in moduleViews[:-1]:
-				moduleElements.extend( [ mv,  ctx.text( punctuation_textStyle, ',' ),  ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ) ] )
+				moduleElements.extend( [ mv,  ctx.text( punctuation_textStyle, ',' ),  ctx.lineBreak( ctx.text( punctuation_textStyle, ' ' ) ) ] )
 			moduleElements.append( moduleViews[-1] )
 		return statementNodeEditor( ctx, node,
 					    ctx.span( [ capitalisedKeywordText( ctx, importKeyword ), ctx.text( default_textStyle, ' ' ) ]  +  moduleElements ),
@@ -1137,7 +1137,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		importElements = []
 		if len( imports ) > 0:
 			for iv in importViews[:-1]:
-				importElements.extend( [ iv,  ctx.text( punctuation_textStyle, ',' ),  ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ) ] )
+				importElements.extend( [ iv,  ctx.text( punctuation_textStyle, ',' ),  ctx.lineBreak( ctx.text( punctuation_textStyle, ' ' ) ) ] )
 			importElements.append( importViews[-1] )
 		return statementNodeEditor( ctx, node,
 					    ctx.span( [ capitalisedKeywordText( ctx, fromKeyword ), ctx.text( default_textStyle, ' ' ), moduleView, ctx.text( default_textStyle, ' ' ),
@@ -1169,7 +1169,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		varElements = []
 		if len( vars ) > 0:
 			for vv in varViews[:-1]:
-				varElements.extend( [ vv,  ctx.text( punctuation_textStyle, ',' ),  ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ) ] )
+				varElements.extend( [ vv,  ctx.text( punctuation_textStyle, ',' ),  ctx.lineBreak( ctx.text( punctuation_textStyle, ' ' ) ) ] )
 			varElements.append( varViews[-1] )
 		return statementNodeEditor( ctx, node,
 					    ctx.span( [ capitalisedKeywordText( ctx, globalKeyword ),  ctx.text( default_textStyle, ' ' ) ]  +  varElements ),
@@ -1185,10 +1185,10 @@ class Python25View (GSymViewObjectNodeDispatch):
 		elements = [ sourceView ]
 		if locals is not None:
 			localsView = ctx.viewEvalFn( locals, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
-			elements.extend( [ ctx.text( default_textStyle, ' ' ),  capitalisedKeywordText( ctx, inKeyword ),  ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ),  localsView ] )
+			elements.extend( [ ctx.text( default_textStyle, ' ' ),  capitalisedKeywordText( ctx, inKeyword ),  ctx.lineBreak( ctx.text( punctuation_textStyle, ' ' ) ),  localsView ] )
 		if globals is not None:
 			globalsView = ctx.viewEvalFn( globals, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
-			elements.extend( [ ctx.text( default_textStyle, ',' ),  ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ),  globalsView ] )
+			elements.extend( [ ctx.text( default_textStyle, ',' ),  ctx.lineBreak( ctx.text( punctuation_textStyle, ' ' ) ),  globalsView ] )
 		return statementNodeEditor( ctx, node,
 					    ctx.span( [ capitalisedKeywordText( ctx, execKeyword ),  ctx.text( default_textStyle, ' ' ) ]  +  elements ),
 					    PRECEDENCE_STMT,
@@ -1209,12 +1209,12 @@ class Python25View (GSymViewObjectNodeDispatch):
 			destView = ctx.viewEvalFn( destination, None, python25ViewState( PRECEDENCE_STMT, self._parser.orOp() ) )
 			elements.extend( [ ctx.text( punctuation_textStyle, '>>' ), ctx.text( default_textStyle, ' ' ), destView ] )
 			if len( values ) > 0:
-				elements.extend( [ ctx.text( punctuation_textStyle, ',' ), ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ) ] )
+				elements.extend( [ ctx.text( punctuation_textStyle, ',' ), ctx.lineBreak( ctx.text( punctuation_textStyle, ' ' ) ) ] )
 		bFirst = True
 		valueViews = ctx.mapViewEvalFn( values, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
 		for v in valueViews:
 			if not bFirst:
-				elements.extend( [ ctx.text( punctuation_textStyle, ',' ), ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ) ] )
+				elements.extend( [ ctx.text( punctuation_textStyle, ',' ), ctx.lineBreak( ctx.text( punctuation_textStyle, ' ' ) ) ] )
 			elements.append( v )
 			bFirst = False
 		return statementNodeEditor( ctx, node,
@@ -1288,7 +1288,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_STMT, self._parser.targetListOrTargetItem() ) )
 		sourceView = ctx.viewEvalFn( source, None, python25ViewState( PRECEDENCE_STMT, self._parser.tupleOrExpression() ) )
 		return ctx.span( [ capitalisedKeywordText( ctx, forKeyword ),  ctx.text( default_textStyle, ' ' ),  targetView,  ctx.text( default_textStyle, ' ' ),
-							    capitalisedKeywordText( ctx, inKeyword ),  ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ),
+							    capitalisedKeywordText( ctx, inKeyword ),  ctx.lineBreak( ctx.text( punctuation_textStyle, ' ' ) ),
 							    sourceView,  ctx.text( punctuation_textStyle, ':' ) ] )
 
 	@ObjectNodeDispatchMethod
@@ -1321,7 +1321,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			elements.extend( [ ctx.text( default_textStyle, ' ' ),  excView ] )
 		if target is not None:
 			targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
-			elements.extend( [ ctx.text( default_textStyle, ',' ),  ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ),  targetView ] )
+			elements.extend( [ ctx.text( default_textStyle, ',' ),  ctx.lineBreak( ctx.text( punctuation_textStyle, ' ' ) ),  targetView ] )
 		elements.append( ctx.text( punctuation_textStyle, ':' ) )
 		return ctx.span( [ capitalisedKeywordText( ctx, exceptKeyword ) ]  +  elements )
 
@@ -1353,7 +1353,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		elements = [ exprView ]
 		if target is not None:
 			targetView = ctx.viewEvalFn( target, None, python25ViewState( PRECEDENCE_STMT, self._parser.expression() ) )
-			elements.extend( [ ctx.text( default_textStyle, ' ' ),  capitalisedKeywordText( ctx, asKeyword ),  ctx.lineBreak( DEFAULT_LINE_BREAK_PRIORITY, ctx.text( punctuation_textStyle, ' ' ) ),  targetView ] )
+			elements.extend( [ ctx.text( default_textStyle, ' ' ),  capitalisedKeywordText( ctx, asKeyword ),  ctx.lineBreak( ctx.text( punctuation_textStyle, ' ' ) ),  targetView ] )
 		elements.append( ctx.text( punctuation_textStyle, ':' ) )
 		return ctx.span( [ capitalisedKeywordText( ctx, withKeyword ),  ctx.text( default_textStyle, ' ' ) ]  +  elements )
 

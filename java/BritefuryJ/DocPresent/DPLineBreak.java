@@ -9,45 +9,16 @@ package BritefuryJ.DocPresent;
 
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 
-public class DPLineBreak extends DPBin implements LineBreakInterface
+public class DPLineBreak extends DPBin
 {
-	private int lineBreakPriority;
-	
-	
 	public DPLineBreak()
 	{
-		this( 0 );
+		super();
 	}
 	
 	public DPLineBreak(ContainerStyleSheet styleSheet)
 	{
-		this( styleSheet, 0 );
-	}
-	
-	public DPLineBreak(int lineBreakPriority)
-	{
-		this( ContainerStyleSheet.defaultStyleSheet, lineBreakPriority );
-	}
-	
-	public DPLineBreak(ContainerStyleSheet styleSheet, int lineBreakPriority)
-	{
 		super( styleSheet );
-		this.lineBreakPriority = lineBreakPriority;
-		layoutReqBox.setLineBreakCost( lineBreakPriority );
-	}
-	
-	
-	void setLineBreakPriority(int lineBreakPriority)
-	{
-		this.lineBreakPriority = lineBreakPriority;
-		layoutReqBox.setLineBreakCost( lineBreakPriority );
-		queueResize();
-	}
-	
-	
-	public int getLineBreakPriority()
-	{
-		return lineBreakPriority;
 	}
 	
 	
@@ -56,20 +27,21 @@ public class DPLineBreak extends DPBin implements LineBreakInterface
 	{
 		super.updateRequisitionX();
 		
-		layoutReqBox.setLineBreakCost( lineBreakPriority );
+		layoutReqBox.setLineBreakCost( computeLineBreakCost() );
 	}
 
-	protected void updateRequisitionY()
+	
+	private int computeLineBreakCost()
 	{
-		super.updateRequisitionY();
+		int cost = 0;
+		DPWidget w = this;
 		
-		layoutReqBox.setLineBreakCost( lineBreakPriority );
-	}
-
-	
-	
-	public LineBreakInterface getLineBreakInterface()
-	{
-		return this;
+		while ( w != null  &&  !( w instanceof DPParagraph ) )
+		{
+			w = w.parent;
+			cost++;
+		}
+		
+		return cost;
 	}
 }

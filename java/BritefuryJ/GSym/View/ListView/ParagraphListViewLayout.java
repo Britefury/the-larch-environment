@@ -22,21 +22,19 @@ public class ParagraphListViewLayout extends ListViewLayout
 {
 	private ParagraphStyleSheet styleSheet;
 	private ElementFactory spacingFactory;
-	private int lineBreakPriority;
 	private TrailingSeparator trailingSeparator;
 	
 	
-	public ParagraphListViewLayout(ParagraphStyleSheet styleSheet, ElementFactory spacingFactory, int lineBreakPriority, TrailingSeparator trailingSeparator)
+	public ParagraphListViewLayout(ParagraphStyleSheet styleSheet, ElementFactory spacingFactory, TrailingSeparator trailingSeparator)
 	{
 		this.styleSheet = styleSheet;
 		this.spacingFactory = spacingFactory;
-		this.lineBreakPriority = lineBreakPriority;
 		this.trailingSeparator = trailingSeparator;
 	}
 	
-	public ParagraphListViewLayout(ParagraphStyleSheet styleSheet, PyObject spacingFactory, int lineBreakPriority, TrailingSeparator trailingSeparator)
+	public ParagraphListViewLayout(ParagraphStyleSheet styleSheet, PyObject spacingFactory, TrailingSeparator trailingSeparator)
 	{
-		this( styleSheet, PyElementFactory.pyToElementFactory( spacingFactory ), lineBreakPriority, trailingSeparator );
+		this( styleSheet, PyElementFactory.pyToElementFactory( spacingFactory ), trailingSeparator );
 	}
 	
 	
@@ -62,7 +60,7 @@ public class ParagraphListViewLayout extends ListViewLayout
 				{
 					childElems.add( separator.createElement( i, child ) );
 				}
-				DPLineBreak lineBreak = new DPLineBreak( lineBreakPriority );
+				DPLineBreak lineBreak = new DPLineBreak();
 				if ( spacingFactory != null )
 				{
 					lineBreak.setChild( spacingFactory.createElement() );
