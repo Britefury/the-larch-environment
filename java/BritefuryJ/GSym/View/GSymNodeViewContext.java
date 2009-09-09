@@ -330,6 +330,16 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 		return lineBreak( ContainerStyleSheet.defaultStyleSheet, child );
 	}
 	
+	public DPWidget lineBreak(ContainerStyleSheet styleSheet)
+	{
+		return lineBreak( styleSheet, null );
+	}
+	
+	public DPWidget lineBreak()
+	{
+		return lineBreak( ContainerStyleSheet.defaultStyleSheet );
+	}
+	
 	public DPWidget paragraphIndentMarker()
 	{
 		viewInstance.getView().profile_startElement();
