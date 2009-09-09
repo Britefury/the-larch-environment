@@ -7,22 +7,41 @@
 package BritefuryJ.DocPresent.Layout;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 public class ParagraphLayout
 {
+	private static class IndentationEntry
+	{
+		public int indexInChildList;
+		public double indentation;
+		public boolean bOnStack;
+		
+		
+		public IndentationEntry(int indexInChildList, double indentation)
+		{
+			this.indexInChildList = indexInChildList;
+			this.indentation = indentation;
+			this.bOnStack = true;
+		}
+	}
+	
+	
 	private static class BreakEntry
 	{
 		public LReqBox breakBox;
 		public int indexInChildList;
 		public double xAtBreak, xAfterBreak;
+		public IndentationEntry lineIndentation;
 		
 		
-		public BreakEntry(LReqBox breakBox, int indexInChildList, double xAtBreak)
+		public BreakEntry(LReqBox breakBox, int indexInChildList, double xAtBreak, double xAfterBreak, IndentationEntry lineIndentation)
 		{
 			this.breakBox = breakBox;
 			this.indexInChildList = indexInChildList;
 			this.xAtBreak = xAtBreak;
-			this.xAfterBreak = xAtBreak;
+			this.xAfterBreak = xAfterBreak;
+			this.lineIndentation = lineIndentation;
 		}
 	}
 	
@@ -35,9 +54,10 @@ public class ParagraphLayout
 		protected LAllocBox childrenAlloc[];
 		protected int childAllocationFlags[];
 		protected int startIndex, endIndex;
+		protected double lineIndentation;
 		
 		
-		private Line(LReqBox ch[], LAllocBox chAlloc[], int chAllocFlags[], double indentation, double spacing, double allocation, int startIndex, int endIndex)
+		private Line(LReqBox ch[], LAllocBox chAlloc[], int chAllocFlags[], double lineIndentation, double spacing, double allocation, int startIndex, int endIndex)
 		{
 			children = ch;
 			childrenAlloc = chAlloc;
@@ -45,16 +65,10 @@ public class ParagraphLayout
 			
 			lineReqBox = new LReqBox();
 			lineAllocBox = new LAllocBox( null );
-			HorizontalLayout.computeRequisitionX( lineReqBox, children, spacing );
-			lineAllocBox.allocationX = allocation - indentation;
-			HorizontalLayout.allocateX( lineReqBox, children, lineAllocBox, childrenAlloc, chAllocFlags, spacing );
-			for (LAllocBox childAlloc: childrenAlloc)
-			{
-				childAlloc.positionInParentSpaceX += indentation;
-			}
 			
 			this.startIndex = startIndex;
 			this.endIndex = endIndex;
+			this.lineIndentation = lineIndentation;
 		}
 		
 		
@@ -94,6 +108,17 @@ public class ParagraphLayout
 			HorizontalLayout.computeRequisitionY( lineReqBox, children, childAllocationFlags );
 		}
 
+		private void allocateX(double spacing, double allocation)
+		{
+			HorizontalLayout.computeRequisitionX( lineReqBox, children, spacing );
+			lineAllocBox.allocationX = allocation - lineIndentation;
+			HorizontalLayout.allocateX( lineReqBox, children, lineAllocBox, childrenAlloc, childAllocationFlags, spacing );
+			for (LAllocBox childAlloc: childrenAlloc)
+			{
+				childAlloc.positionInParentSpaceX += lineIndentation;
+			}
+		}
+		
 		private void allocateY()
 		{
 			HorizontalLayout.allocateY( lineReqBox, children, lineAllocBox, childrenAlloc, childAllocationFlags );
@@ -248,13 +273,13 @@ public class ParagraphLayout
 		//
 		// A new line is started by choosing a line break, and breaking the current line at that point, and starting the next line
 		// from the next child onwards.
-		// As children are allocated/accumulated, any line breaks are picked out. Two line breaks are considered when breaking
-		// a line; the best line break (the line break which has the least cost, out of all encountered on the current line), and the
-		// most recent. In some cases, the children subsequent to the best line break would accumulate sufficient width to overflow
-		// the paragraph width allocation; we would need to break again. In this case, the most recent line break is chosen.
+		// As children are allocated/accumulated, any line breaks that are encountered are recorded. A reference to the best line break
+		// is maintained (the line break with the minimum cost) by changing whenever a line break with a lower cost is encountered.
+		// In some cases, the children subsequent to the best line break would accumulate sufficient width to overflow
+		// the paragraph width allocation; this line break is not sufficient. In this case, the subset of all known line breaks that
+		// would not result in a subsequence line overflowing the paragraph width, are searched for the line break with the minimum cost.
 		//
-		// This is accomplished by keeping a list of all line breaks encountered. When a line break is used (to break a line), the list
-		// is rescanned from that point onwards, so that a new best line break can be chosen.
+		// When a line break is chosen, the list of all subsequent line breaks is searched in order to find a new 'best' line break.
 		
 		
 		boolean bFirstLine = true;
@@ -268,40 +293,50 @@ public class ParagraphLayout
 		
 		// We keep a list of all line breaks, and the x position 
 		ArrayList<BreakEntry> lineBreaks = new ArrayList<BreakEntry>();
-		BreakEntry bestLineBreak = null, lastLineBreak = null;
-		int bestLineBreakEntryIndex = -1, lastLineBreakEntryIndex = -1;
+		BreakEntry bestLineBreak = null;
+		int bestLineBreakEntryIndex = -1;
 		int lineBreakEntryListOffset = 0;
+		BreakEntry lineBreakAtLineStart = null;
+		
+		Stack<IndentationEntry> indentationStack = new Stack<IndentationEntry>();
+		indentationStack.add( new IndentationEntry( -1, indentation ) );
 		
 		for (int i = 0; i < children.length; i++)
 		{
 			LReqBox child = children[i];
 			
-			// Keep track of the best and most recent line break boxes
-			if ( child.isLineBreak() )
+			if ( child.isParagraphIndentMarker() )
 			{
-				BreakEntry entry = new BreakEntry( child, i, lineX );
-				if ( bestLineBreak == null  ||  child.lineBreakCost <= bestLineBreak.breakBox.lineBreakCost )
-				{
-					bestLineBreak = entry;
-					bestLineBreakEntryIndex = lineBreaks.size();
-				}
-				
-				lastLineBreak = entry;
-				lastLineBreakEntryIndex = lineBreaks.size();
-				
-				// Add afterwards so that size() will give the index of the entry to be added
-				lineBreaks.add( entry );
+				indentationStack.push( new IndentationEntry( i, lineX ) );
 			}
+			else if ( child.isParagraphDedentMarker() )
+			{
+				if ( indentationStack.size() > 1 )
+				{
+					indentationStack.lastElement().bOnStack = false;
+					indentationStack.pop();
+				}
+			}
+			
+			double lineXAtChildStart = lineX;
 			
 			// Accumulate width, advance, and x
 			lineWidth = lineX + child.prefWidth;
 			lineAdvance = lineX + child.prefHAdvance;
 			lineX = lineAdvance + spacing;
 			
-			// Note the x position after a line break
-			if ( lastLineBreak != null  &&  child == lastLineBreak.breakBox )
+			// Keep track of the best and most recent line break boxes
+			if ( child.isLineBreak() )
 			{
-				lastLineBreak.xAfterBreak = lineX;
+				BreakEntry entry = new BreakEntry( child, i, lineXAtChildStart, lineX, indentationStack.lastElement() );
+				if ( bestLineBreak == null  ||  child.lineBreakCost <= bestLineBreak.breakBox.lineBreakCost )
+				{
+					bestLineBreak = entry;
+					bestLineBreakEntryIndex = lineBreaks.size();
+				}
+				
+				// Add afterwards so that size() will give the index of the entry to be added
+				lineBreaks.add( entry );
 			}
 			
 			
@@ -313,23 +348,54 @@ public class ParagraphLayout
 				// We need to start a new line
 				
 				// Pick a line break
-				int lineBreakIndex;
-				double xAfterLineBreak;
-				if ( lastLineBreak != null  &&  child != lastLineBreak.breakBox  &&  ( lineProgress - bestLineBreak.xAtBreak )  >  allocBox.allocationX )
+				BreakEntry chosenLineBreak = null;
+				if ( ( lineProgress - bestLineBreak.xAfterBreak )  >  allocBox.allocationX )
 				{
 					// We still go over the allocation limit even if we do split at the best line break.
+					
+					// In this case, choose a more recent line break
+					BreakEntry newBestBreakEntry = null;
+					int newBestBreakEntryIndex = -1;
+					for (int j = lineBreaks.size() - 1; j > bestLineBreakEntryIndex; j--)
+					{
+						BreakEntry entry = lineBreaks.get( j );
+						
+						if ( ( lineProgress - entry.xAfterBreak )  >  allocBox.allocationX )
+						{
+							break;
+						}
+						
+						if ( newBestBreakEntry == null  ||  entry.breakBox.lineBreakCost <= newBestBreakEntry.breakBox.lineBreakCost )
+						{
+							newBestBreakEntry = entry;
+							newBestBreakEntryIndex = j;
+						}
+					}
+					
+					
+					if ( newBestBreakEntry == null )
+					{
+						newBestBreakEntryIndex = lineBreaks.size() - 1;
+						newBestBreakEntry = lineBreaks.get( newBestBreakEntryIndex );
+					}
+					
+					
 					// In this case, choose the most recent line break instead
-					lineBreakIndex = lastLineBreak.indexInChildList;
-					xAfterLineBreak = lastLineBreak.xAfterBreak;
-					lineBreakEntryListOffset = lastLineBreakEntryIndex + 1;
+					chosenLineBreak = newBestBreakEntry;
+					lineBreakEntryListOffset = newBestBreakEntryIndex + 1;
 				}
 				else
 				{
 					// Go with the best line break (the one with the least cost)
-					lineBreakIndex = bestLineBreak.indexInChildList;
-					xAfterLineBreak = bestLineBreak.xAfterBreak;
+					chosenLineBreak = bestLineBreak;
 					lineBreakEntryListOffset = bestLineBreakEntryIndex + 1;
 				}
+				
+				
+				int lineBreakIndex = chosenLineBreak.indexInChildList;
+				double xAfterLineBreak = chosenLineBreak.xAfterBreak;
+				double lineBreakIndentation = lineBreakAtLineStart != null  ?  lineBreakAtLineStart.lineIndentation.indentation  :  indentation;
+				
 				
 				// Build a list of child boxes for the line
 				int lineLength = lineBreakIndex - lineStartIndex;
@@ -339,21 +405,40 @@ public class ParagraphLayout
 				System.arraycopy( children, lineStartIndex, lineChildren, 0, lineLength );
 				System.arraycopy( childrenAlloc, lineStartIndex, lineChildrenAlloc, 0, lineLength );
 				System.arraycopy( childAllocationFlags, lineStartIndex, lineChildAllocFlags, 0, lineLength );
-				lines.add( new Line( lineChildren, lineChildrenAlloc, childAllocationFlags, bFirstLine  ?  0.0  :  indentation, spacing, allocBox.allocationX, lineStartIndex, lineBreakIndex ) );
+				lines.add( new Line( lineChildren, lineChildrenAlloc, childAllocationFlags, bFirstLine  ?  0.0  :  lineBreakIndentation, spacing, allocBox.allocationX, lineStartIndex, lineBreakIndex ) );
 				
 				// Next line
+				lineBreakAtLineStart = chosenLineBreak;
+
 				lineStartIndex = lineBreakIndex + 1;
 				
 				lineWidth -= xAfterLineBreak;
 				lineAdvance -= xAfterLineBreak;
 				lineX -= xAfterLineBreak;
 				
-				lineWidth += indentation;
-				lineAdvance += indentation;
-				lineX += indentation;
+				lineWidth += lineBreakIndentation;
+				lineAdvance += lineBreakIndentation;
+				lineX += lineBreakIndentation;
 				
 				// Reset line break
 				bestLineBreak = null;
+				bestLineBreakEntryIndex = -1;
+				
+				double nextLineIndentation = lineBreakAtLineStart.lineIndentation.indentation;
+
+				for (int j = indentationStack.size() - 1; j >= 1; j--)
+				{
+					IndentationEntry entry = indentationStack.get( j );
+					if ( entry.indexInChildList <= lineBreakIndex )
+					{
+						break;
+					}
+					else
+					{
+						entry.indentation -= xAfterLineBreak;
+						entry.indentation += nextLineIndentation;
+					}
+				}
 
 				// Scan for new line break
 				for (int j = lineBreakEntryListOffset; j < lineBreaks.size(); j++)
@@ -362,8 +447,15 @@ public class ParagraphLayout
 					
 					entry.xAtBreak -= xAfterLineBreak;
 					entry.xAfterBreak -= xAfterLineBreak;
-					entry.xAtBreak += indentation;
-					entry.xAfterBreak += indentation;
+					entry.xAtBreak += nextLineIndentation;
+					entry.xAfterBreak += nextLineIndentation;
+					
+					IndentationEntry breakIndentation = entry.lineIndentation;
+					if ( !breakIndentation.bOnStack )
+					{
+						breakIndentation.indentation -= xAfterLineBreak;
+						breakIndentation.indentation += nextLineIndentation;
+					}
 					
 					if ( bestLineBreak == null  ||  entry.breakBox.lineBreakCost <= bestLineBreak.breakBox.lineBreakCost )
 					{
@@ -371,10 +463,9 @@ public class ParagraphLayout
 						bestLineBreak = entry;
 						bestLineBreakEntryIndex = j;
 					}
-					
-					lastLineBreak = entry;
-					lastLineBreakEntryIndex = j;
 				}
+				
+				
 				bFirstLine = false;
 			}
 		}
@@ -389,9 +480,16 @@ public class ParagraphLayout
 			System.arraycopy( children, lineStartIndex, lineChildren, 0, lineLength );
 			System.arraycopy( childrenAlloc, lineStartIndex, lineChildrenAlloc, 0, lineLength );
 			System.arraycopy( childAllocationFlags, lineStartIndex, lineChildAllocFlags, 0, lineLength );
-			lines.add( new Line( lineChildren, lineChildrenAlloc, lineChildAllocFlags, bFirstLine  ?  0.0  :  indentation, spacing, allocBox.allocationX, lineStartIndex, children.length ) );
+			double lineIndentation = lineBreakAtLineStart != null  ?  lineBreakAtLineStart.lineIndentation.indentation  :  0.0;
+			lines.add( new Line( lineChildren, lineChildrenAlloc, lineChildAllocFlags, lineIndentation, spacing, allocBox.allocationX, lineStartIndex, children.length ) );
 		}
 		
+		
+		for (Line line: lines)
+		{
+			line.allocateX( spacing, allocBox.allocationX );
+		}
+
 		
 		Line[] lineArray = new Line[lines.size()];
 		return lines.toArray( lineArray );

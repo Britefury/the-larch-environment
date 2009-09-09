@@ -135,7 +135,7 @@ public class ListViewTest
 		
 		String[] txt = new String[] { "abcdef", "123456", "hello", "world", "this", "is", "a", "test", "of", "the", "list", "layout", "system" };
 		
-		ParagraphListViewLayout paraLayout = new ParagraphListViewLayout( paraStyle, new SpacingElementFactory( 5.0 ), ListViewLayout.TrailingSeparator.NEVER );
+		ParagraphListViewLayout paraLayout = new ParagraphListViewLayout( paraStyle, new SpacingElementFactory( 5.0 ), true, ListViewLayout.TrailingSeparator.NEVER );
 		HorizontalListViewLayout hLayout = new HorizontalListViewLayout( hboxStyle, new SpacingElementFactory( 5.0 ), ListViewLayout.TrailingSeparator.NEVER );
 		VerticalListViewLayout vLayout = new VerticalListViewLayout( vboxStyle, paraStyle, 30.0f, ListViewLayout.TrailingSeparator.NEVER );
 		VerticalInlineListViewLayout vInlineLayout = new VerticalInlineListViewLayout( vboxStyle, paraStyle, 30.0f, ListViewLayout.TrailingSeparator.NEVER );

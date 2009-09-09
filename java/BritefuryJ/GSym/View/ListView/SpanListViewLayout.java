@@ -12,6 +12,8 @@ import java.util.List;
 import org.python.core.PyObject;
 
 import BritefuryJ.DocPresent.DPLineBreak;
+import BritefuryJ.DocPresent.DPParagraphDedentMarker;
+import BritefuryJ.DocPresent.DPParagraphIndentMarker;
 import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementFactory;
@@ -21,20 +23,21 @@ public class SpanListViewLayout extends ListViewLayout
 {
 	private ElementFactory spacingFactory;
 	private TrailingSeparator trailingSeparator;
-	boolean bAddLineBreaks;
+	boolean bAddLineBreaks, bAddParagraphIndentMarkers;
 	int lineBreakCost;
 	
 	
-	public SpanListViewLayout(ElementFactory spacingFactory, boolean bAddLineBreaks, TrailingSeparator trailingSeparator)
+	public SpanListViewLayout(ElementFactory spacingFactory, boolean bAddLineBreaks, boolean bAddParagraphIndentMarkers, TrailingSeparator trailingSeparator)
 	{
 		this.spacingFactory = spacingFactory;
 		this.bAddLineBreaks = bAddLineBreaks;
+		this.bAddParagraphIndentMarkers = bAddParagraphIndentMarkers;
 		this.trailingSeparator = trailingSeparator;
 	}
 	
-	public SpanListViewLayout(PyObject spacingFactory, boolean bAddLineBreaks, TrailingSeparator trailingSeparator)
+	public SpanListViewLayout(PyObject spacingFactory, boolean bAddLineBreaks, boolean bAddParagraphIndentMarkers, TrailingSeparator trailingSeparator)
 	{
-		this( PyElementFactory.pyToElementFactory( spacingFactory ), bAddLineBreaks, trailingSeparator );
+		this( PyElementFactory.pyToElementFactory( spacingFactory ), bAddLineBreaks, bAddParagraphIndentMarkers, trailingSeparator );
 	}
 	
 	
@@ -48,6 +51,11 @@ public class SpanListViewLayout extends ListViewLayout
 		if ( beginDelim != null )
 		{
 			childElems.add( beginDelim.createElement() );
+		}
+		
+		if ( bAddParagraphIndentMarkers )
+		{
+			childElems.add( new DPParagraphIndentMarker() );
 		}
 		
 		if ( children.size() > 0 )
@@ -90,6 +98,11 @@ public class SpanListViewLayout extends ListViewLayout
 			}
 		}
 
+		if ( bAddParagraphIndentMarkers )
+		{
+			childElems.add( new DPParagraphDedentMarker() );
+		}
+		
 		if ( endDelim != null )
 		{
 			childElems.add( endDelim.createElement() );

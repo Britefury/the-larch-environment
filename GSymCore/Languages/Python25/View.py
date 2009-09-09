@@ -708,6 +708,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		argElements = []
 		if len( args ) > 0:
 			argElements.append( ctx.text( default_textStyle, ' ' ) )
+			argElements.append( ctx.paragraphIndentMarker() )
 			for a in argViews[:-1]:
 				argElements.append( a )
 				argElements.append( ctx.text( punctuation_textStyle, ',' ) )
@@ -716,6 +717,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			if argsTrailingSeparator is not None:
 				argElements.append( ctx.text( punctuation_textStyle, ',' ) )
 				argElements.append( ctx.lineBreak( ctx.text( punctuation_textStyle, ' ' ) ) )
+			argElements.append( ctx.paragraphDedentMarker() )
 			argElements.append( ctx.text( default_textStyle, ' ' ) )
 		return expressionNodeEditor( ctx, node,
 					     ctx.span( [ targetView, ctx.text( punctuation_textStyle, '(' ) ]  +  argElements  +  [ ctx.text( punctuation_textStyle, ')' ) ] ),
@@ -920,6 +922,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		paramViews = ctx.mapViewEvalFn( params, None, python25ViewState( PRECEDENCE_NONE, self._parser.param() ) )
 		paramElements = []
 		if len( params ) > 0:
+			paramElements.append( ctx.paragraphIndentMarker() )
 			for p in paramViews[:-1]:
 				paramElements.append( p )
 				paramElements.append( ctx.text( punctuation_textStyle, ',' ) )
@@ -928,6 +931,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			if paramsTrailingSeparator is not None:
 				paramElements.append( ctx.text( punctuation_textStyle, ',' ) )
 				paramElements.append( ctx.lineBreak( ctx.text( punctuation_textStyle, ' ' ) ) )
+			paramElements.append( ctx.paragraphDedentMarker() )
 
 		return expressionNodeEditor( ctx, node,
 					     ctx.span( [ capitalisedKeywordText( ctx, lambdaKeyword ),  ctx.text( default_textStyle, ' ' ) ]  +  paramElements  +  \
@@ -1396,11 +1400,13 @@ class Python25View (GSymViewObjectNodeDispatch):
 		paramViews = ctx.mapViewEvalFn( params, None, python25ViewState( PRECEDENCE_STMT, self._parser.param() ) )
 		paramElements = [ ctx.text( punctuation_textStyle, '(' ) ]
 		if len( params ) > 0:
+			paramElements.append( ctx.paragraphIndentMarker() )
 			for p in paramViews[:-1]:
 				paramElements.extend( [ p,  ctx.text( punctuation_textStyle, ', ' ) ] )
 			paramElements.append( paramViews[-1] )
 			if paramsTrailingSeparator is not None:
 				paramElements.append( ctx.text( punctuation_textStyle, ', ' ) )
+			paramElements.append( ctx.paragraphDedentMarker() )
 
 		paramElements.append( ctx.text( punctuation_textStyle, ')' ) )
 		return ctx.span( [ capitalisedKeywordText( ctx, defKeyword ),  ctx.text( default_textStyle, ' ' ),  ctx.text( default_textStyle, name ) ]  +  \

@@ -18,6 +18,8 @@ public class LReqBox
 	
 	private static int FLAG_HASBASELINE = 0x1  *  ElementAlignment._ELEMENTALIGN_END;
 	private static int FLAG_LINEBREAK = 0x2  *  ElementAlignment._ELEMENTALIGN_END;
+	private static int FLAG_PARAGRAPH_INDENT = 0x4  *  ElementAlignment._ELEMENTALIGN_END;
+	private static int FLAG_PARAGRAPH_DEDENT = 0x8  *  ElementAlignment._ELEMENTALIGN_END;
 	
 	
 	protected int flags = 0;
@@ -248,6 +250,29 @@ public class LReqBox
 	{
 		lineBreakCost = cost;
 		setFlag( FLAG_LINEBREAK, true );
+	}
+	
+	
+	
+	public void setParagraphIndentMarker()
+	{
+		setFlag( FLAG_PARAGRAPH_INDENT, true );
+	}
+	
+	public void setParagraphDedentMarker()
+	{
+		setFlag( FLAG_PARAGRAPH_DEDENT, true );
+	}
+	
+	
+	public boolean isParagraphIndentMarker()
+	{
+		return getFlag( FLAG_PARAGRAPH_INDENT );
+	}
+	
+	public boolean isParagraphDedentMarker()
+	{
+		return getFlag( FLAG_PARAGRAPH_DEDENT );
 	}
 	
 	

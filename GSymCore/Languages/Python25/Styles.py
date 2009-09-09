@@ -41,12 +41,12 @@ python_paragraphStyle = ParagraphStyleSheet( 0.0, 0.0, 30.0 )
 
 compoundStmt_vboxStyle = VBoxStyleSheet( VTypesetting.ALIGN_WITH_TOP, 0.0 )
 
-tuple_listViewLayout = SpanListViewLayout( lambda: DPText( default_textStyle, ' ' ), True, ListViewLayout.TrailingSeparator.NEVER )
-tuple_listViewLayoutSep = SpanListViewLayout( lambda: DPText( default_textStyle, ' ' ), True, ListViewLayout.TrailingSeparator.ALWAYS )
-list_listViewLayout = SpanListViewLayout( lambda: DPText( default_textStyle, ' ' ), True, ListViewLayout.TrailingSeparator.NEVER )
-list_listViewLayoutSep = SpanListViewLayout( lambda: DPText( default_textStyle, ' ' ), True, ListViewLayout.TrailingSeparator.ALWAYS )
-dict_listViewLayout = SpanListViewLayout( lambda: DPText( default_textStyle, ' ' ), True, ListViewLayout.TrailingSeparator.NEVER )
-dict_listViewLayoutSep = SpanListViewLayout( lambda: DPText( default_textStyle, ' ' ), True, ListViewLayout.TrailingSeparator.NEVER )
+tuple_listViewLayout = SpanListViewLayout( lambda: DPText( default_textStyle, ' ' ), True, True, ListViewLayout.TrailingSeparator.NEVER )
+tuple_listViewLayoutSep = SpanListViewLayout( lambda: DPText( default_textStyle, ' ' ), True, True, ListViewLayout.TrailingSeparator.ALWAYS )
+list_listViewLayout = SpanListViewLayout( lambda: DPText( default_textStyle, ' ' ), True, True, ListViewLayout.TrailingSeparator.NEVER )
+list_listViewLayoutSep = SpanListViewLayout( lambda: DPText( default_textStyle, ' ' ), True, True, ListViewLayout.TrailingSeparator.ALWAYS )
+dict_listViewLayout = SpanListViewLayout( lambda: DPText( default_textStyle, ' ' ), True, True, ListViewLayout.TrailingSeparator.NEVER )
+dict_listViewLayoutSep = SpanListViewLayout( lambda: DPText( default_textStyle, ' ' ), True, True, ListViewLayout.TrailingSeparator.NEVER )
 
 suite_vboxStyle = VBoxStyleSheet( VTypesetting.ALIGN_WITH_TOP, 0.0 )
 

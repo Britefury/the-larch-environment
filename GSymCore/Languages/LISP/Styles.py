@@ -26,7 +26,7 @@ fieldName_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 14 ),  Colo
 lisp_paragraphStyle = ParagraphStyleSheet( 0.0, 0.0, 60.0 )
 
 
-paragraph_listViewLayout = ParagraphListViewLayout( ParagraphStyleSheet(), lambda: DPText( default_textStyle, ' ' ), ListViewLayout.TrailingSeparator.NEVER )
+paragraph_listViewLayout = ParagraphListViewLayout( ParagraphStyleSheet(), lambda: DPText( default_textStyle, ' ' ), True, ListViewLayout.TrailingSeparator.NEVER )
 
 verticalInline_listViewLayout = VerticalInlineListViewLayout( VBoxStyleSheet( VTypesetting.ALIGN_WITH_TOP, 0.0 ), \
 						ParagraphStyleSheet(), 30.0, ListViewLayout.TrailingSeparator.NEVER )
