@@ -8,6 +8,7 @@ package BritefuryJ.GSym.View.ListView;
 
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.ElementContext;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 
@@ -30,11 +31,12 @@ abstract class IndentedListViewLayout extends ListViewLayout
 	}
 	
 	
-	protected DPWidget indent(DPWidget child)
+	protected DPWidget indent(ElementContext ctx, DPWidget child)
 	{
 		if ( indentationBorder != null )
 		{
 			DPBorder indent = new DPBorder( indentationBorder );
+			indent.setContext( ctx );
 			indent.setChild( child );
 			return indent;
 		}

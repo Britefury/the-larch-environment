@@ -13,6 +13,7 @@ import org.python.core.PyObject;
 
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.ElementContext;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.PyElementFactory;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
@@ -38,16 +39,17 @@ public class HorizontalListViewLayout extends ListViewLayout
 
 		
 		
-	public DPWidget createListElement(List<DPWidget> children, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator)
+	public DPWidget createListElement(ElementContext ctx, List<DPWidget> children, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator)
 	{
 		DPHBox hbox = new DPHBox( styleSheet );
+		hbox.setContext( ctx );
 		
 		ArrayList<DPWidget> childElems = new ArrayList<DPWidget>();
 		childElems.ensureCapacity( children.size() + 2 );
 		
 		if ( beginDelim != null )
 		{
-			childElems.add( beginDelim.createElement() );
+			childElems.add( beginDelim.createElement( ctx ) );
 		}
 		
 		if ( children.size() > 0 )
@@ -58,11 +60,11 @@ public class HorizontalListViewLayout extends ListViewLayout
 				childElems.add( child );
 				if ( separator != null )
 				{
-					childElems.add( separator.createElement( i, child ) );
+					childElems.add( separator.createElement( ctx, i, child ) );
 				}
 				if ( spacingFactory != null )
 				{
-					childElems.add( spacingFactory.createElement() );
+					childElems.add( spacingFactory.createElement( ctx ) );
 				}
 			}
 
@@ -73,14 +75,14 @@ public class HorizontalListViewLayout extends ListViewLayout
 			{
 				if ( separator != null )
 				{
-					childElems.add( separator.createElement( children.size() - 1, lastChild ) );
+					childElems.add( separator.createElement( ctx, children.size() - 1, lastChild ) );
 				}
 			}
 		}
 
 		if ( endDelim != null )
 		{
-			childElems.add( endDelim.createElement() );
+			childElems.add( endDelim.createElement( ctx ) );
 		}
 		
 		hbox.setChildren( childElems );

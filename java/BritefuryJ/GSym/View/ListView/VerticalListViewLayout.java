@@ -13,6 +13,7 @@ import java.util.List;
 import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.ElementContext;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
@@ -33,13 +34,14 @@ public class VerticalListViewLayout extends IndentedListViewLayout
 	}
 	
 	
-	private DPWidget createLineParagraph(int index, DPWidget child, SeparatorElementFactory separator)
+	private DPWidget createLineParagraph(ElementContext ctx, int index, DPWidget child, SeparatorElementFactory separator)
 	{
 		if ( separator != null )
 		{
 			DPParagraph paragraph = new DPParagraph( lineParagraphStyleSheet );
+			paragraph.setContext( ctx );
 			//paragraph.setChildren( Arrays.asList( new Element[] { child, separator.createElement(), new WhitespaceElement( "\n" ) } ) );
-			paragraph.setChildren( Arrays.asList( new DPWidget[] { child, separator.createElement( index, child ) } ) );
+			paragraph.setChildren( Arrays.asList( new DPWidget[] { child, separator.createElement( ctx, index, child ) } ) );
 			return paragraph;
 		}
 		else
@@ -49,9 +51,10 @@ public class VerticalListViewLayout extends IndentedListViewLayout
 	}
 	
 
-	public DPWidget createListElement(List<DPWidget> children, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator)
+	public DPWidget createListElement(ElementContext ctx, List<DPWidget> children, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator)
 	{
 		DPVBox vbox = new DPVBox( styleSheet );
+		vbox.setContext( ctx );
 		
 		ArrayList<DPWidget> childElems = new ArrayList<DPWidget>();
 		childElems.ensureCapacity( children.size() );
@@ -60,12 +63,12 @@ public class VerticalListViewLayout extends IndentedListViewLayout
 		{
 			for (int i = 0; i < children.size() - 1; i++)
 			{
-				childElems.add( createLineParagraph( i, children.get( i ), separator ) );
+				childElems.add( createLineParagraph( ctx, i, children.get( i ), separator ) );
 			}
 
 			if ( trailingSeparatorRequired( children, trailingSeparator ) )
 			{
-				childElems.add( createLineParagraph( children.size() - 1, children.get( children.size() - 1 ), separator ) );
+				childElems.add( createLineParagraph( ctx, children.size() - 1, children.get( children.size() - 1 ), separator ) );
 			}
 			else
 			{
@@ -75,26 +78,27 @@ public class VerticalListViewLayout extends IndentedListViewLayout
 
 		vbox.setChildren( childElems );
 		
-		DPWidget indented = indent( vbox );
+		DPWidget indented = indent( ctx, vbox );
 		
 		
 		if ( beginDelim != null  ||  endDelim != null )
 		{
 			DPVBox outerVBox = new DPVBox( styleSheet );
+			outerVBox.setContext( ctx );
 			
 			ArrayList<DPWidget> outerChildElems = new ArrayList<DPWidget>();
 			outerChildElems.ensureCapacity( 3 );
 			
 			if ( beginDelim != null )
 			{
-				outerChildElems.add( beginDelim.createElement() );
+				outerChildElems.add( beginDelim.createElement( ctx ) );
 			}
 			
 			outerChildElems.add( indented );
 			
 			if ( endDelim != null )
 			{
-				outerChildElems.add(  endDelim.createElement() );
+				outerChildElems.add(  endDelim.createElement( ctx ) );
 			}
 			
 			outerVBox.setChildren( outerChildElems );

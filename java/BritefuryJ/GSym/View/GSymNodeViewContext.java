@@ -507,7 +507,7 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget listView(ListViewLayout layout, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator, List<DPWidget> children)
 	{
 		viewInstance.getView().profile_startElement();
-		DPWidget element = layout.createListElement( children, beginDelim, endDelim, separator );
+		DPWidget element = layout.createListElement( this, children, beginDelim, endDelim, separator );
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
@@ -516,7 +516,7 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget listView(ListViewLayout layout, PyObject beginDelim, PyObject endDelim, PyObject separator, List<DPWidget> children)
 	{
 		viewInstance.getView().profile_startElement();
-		DPWidget element = layout.createListElement( children, PyElementFactory.pyToElementFactory( beginDelim ), PyElementFactory.pyToElementFactory( endDelim ), PySeparatorElementFactory.pyToSeparatorElementFactory( separator ) );
+		DPWidget element = layout.createListElement( this, children, PyElementFactory.pyToElementFactory( beginDelim ), PyElementFactory.pyToElementFactory( endDelim ), PySeparatorElementFactory.pyToSeparatorElementFactory( separator ) );
 		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
