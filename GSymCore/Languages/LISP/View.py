@@ -113,7 +113,7 @@ def viewLispNode(node, ctx, state):
 			raise ValueError
 		
 		# Create a list view
-		v = ctx.listView( layout, lambda: ctx.text( punctuation_textStyle, '[' ), lambda: ctx.text( punctuation_textStyle, ']' ), None, xViews )
+		v = ctx.listView( layout, lambda ctx: ctx.text( punctuation_textStyle, '[' ), lambda ctx: ctx.text( punctuation_textStyle, ']' ), None, xViews )
 		
 		return nodeEditor( ctx, node, v, state )
 	elif isObjectNode( node ):
@@ -160,7 +160,7 @@ def viewLispNode(node, ctx, state):
 			raise ValueError
 		
 		# Create a list view
-		v = ctx.listView( layout, lambda: ctx.text( punctuation_textStyle, '(' ), lambda: ctx.text( punctuation_textStyle, ')' ), None, itemViews )
+		v = ctx.listView( layout, lambda ctx: ctx.text( punctuation_textStyle, '(' ), lambda ctx: ctx.text( punctuation_textStyle, ')' ), None, itemViews )
 		return nodeEditor( ctx, node, v, state )
 	else:
 		raise TypeError, 'node is %s'  %  node

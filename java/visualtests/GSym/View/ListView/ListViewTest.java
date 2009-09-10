@@ -19,6 +19,7 @@ import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWhitespace;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.ElementContext;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
@@ -58,7 +59,7 @@ public class ListViewTest
 		}
 		
 		
-		public DPWidget createElement()
+		public DPWidget createElement(ElementContext ctx)
 		{
 			return new DPText( styleSheet, text );
 		}
@@ -76,7 +77,7 @@ public class ListViewTest
 		}
 		
 		
-		public DPWidget createElement(int index, DPWidget child)
+		public DPWidget createElement(ElementContext ctx, int index, DPWidget child)
 		{
 			return new DPText( styleSheet, text );
 		}
@@ -92,7 +93,7 @@ public class ListViewTest
 		}
 		
 		
-		public DPWidget createElement()
+		public DPWidget createElement(ElementContext ctx)
 		{
 			return new DPWhitespace( " ", spacing );
 		}
@@ -110,7 +111,7 @@ public class ListViewTest
 		{
 			children[i] = new DPText( s1, txt[i] );
 		}
-		DPWidget ls = layout.createListElement( Arrays.asList( children ), new TextElementFactory( beginDelim, s2 ), new TextElementFactory( endDelim, s2 ), new TextSeparatorElementFactory( separator, s2 ) );
+		DPWidget ls = layout.createListElement( null, Arrays.asList( children ), new TextElementFactory( beginDelim, s2 ), new TextElementFactory( endDelim, s2 ), new TextSeparatorElementFactory( separator, s2 ) );
 		
 		
 		DPWidget titleElem = new DPText( s0, title );

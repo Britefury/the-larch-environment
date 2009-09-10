@@ -7,8 +7,9 @@
 package BritefuryJ.GSym.View.ListView;
 
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.ElementContext;
 
 public interface SeparatorElementFactory
 {
-	public DPWidget createElement(int index, DPWidget child);
+	public DPWidget createElement(ElementContext ctx, int index, DPWidget child);
 }

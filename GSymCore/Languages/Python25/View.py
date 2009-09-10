@@ -44,64 +44,29 @@ DEFAULT_LINE_BREAK_PRIORITY = 100
 
 
 
-class _TextFactory (object):
-	__slots__ = [ 'ctx' ]
-
-	style = default_textStyle
-	text = ''
-
-	def __init__(self, ctx):
-		self.ctx = ctx
-
-	def __call__(self):
-		return self.ctx.text( self.style, self.text )
+def _commaSeparatorElementFactory(ctx, index, child):
+	return ctx.text( punctuation_textStyle, ',' )
 
 
+def _openBracketElementFactory(ctx):
+	return ctx.text( punctuation_textStyle, '[' )
+	
+def _closeBracketElementFactory(ctx):
+	return ctx.text( punctuation_textStyle, ']' )
+	
 
-class _TextSeparatorFactory (object):
-	__slots__ = [ 'ctx' ]
+def _openBraceElementFactory(ctx):
+	return ctx.text( punctuation_textStyle, '{' )
+	
+def _closeBraceElementFactory(ctx):
+	return ctx.text( punctuation_textStyle, '}' )
+	
 
-	style = default_textStyle
-	text = ''
-
-	def __init__(self, ctx):
-		self.ctx = ctx
-
-	def __call__(self, index, child):
-		return self.ctx.text( self.style, self.text )
-
-
-class _CommaFactory (_TextSeparatorFactory):
-	style = punctuation_textStyle
-	text = ','
-
-
-
-class _OpenBracketFactory (_TextFactory):
-	style = punctuation_textStyle
-	text = '['
-
-class _CloseBracketFactory (_TextFactory):
-	style = punctuation_textStyle
-	text = ']'
-
-
-class _OpenBraceFactory (_TextFactory):
-	style = punctuation_textStyle
-	text = '{'
-
-class _CloseBraceFactory (_TextFactory):
-	style = punctuation_textStyle
-	text = '}'
-
-
-class _OpenParenFactory (_TextFactory):
-	style = punctuation_textStyle
-	text = '('
-
-class _CloseParenFactory (_TextFactory):
-	style = punctuation_textStyle
-	text = ')'
+def _openParenElementFactory(ctx):
+	return ctx.text( punctuation_textStyle, '(' )
+	
+def _closeParenElementFactory(ctx):
+	return ctx.text( punctuation_textStyle, ')' )
 
 
 
@@ -216,12 +181,6 @@ def statementNodeEditor(ctx, node, contents, precedence, state):
 def compoundStatementHeaderEditor(ctx, node, headerContents, precedence, state, headerContainerFn=None):
 	outerPrecedence, parser, mode = state
 
-	# THE EDIT OPERATIONS RELY ON THE ELEMENT STRUCTURE USED HERE:
-	#	Paragraph - header
-	#		Segment - header
-	#			header content
-	#		NewLine - header
-
 	segment = ctx.segment( default_textStyle, True, True, headerContents )
 	newLine = ctx.whitespace( '\n' )
 
@@ -236,15 +195,6 @@ def compoundStatementHeaderEditor(ctx, node, headerContents, precedence, state, 
 
 def compoundStatementEditor(ctx, node, precedence, compoundBlocks, state, suiteParser, statementParser):
 	outerPrecedence, parser, mode = state
-
-	# THE EDIT OPERATIONS RELY ON THE ELEMENT STRUCTURE USED HERE:
-	#	VBox - compound stmt
-	#		Paragraph - header
-	#			Segment - header
-	#				header content
-	#			NewLine - header
-	#		Indent - suite
-	#			suite view
 
 	statementContents = []
 	for i, block in enumerate( compoundBlocks ):
@@ -315,25 +265,17 @@ def tupleView(ctx, state, node, xs, trailingSeparator, parser):
 	xViews = ctx.mapViewEvalFn( xs, None, python25ViewState( PRECEDENCE_CONTAINER_ELEMENT, parser ) )
 	layout = tuple_listViewLayout   if trailingSeparator is None   else tuple_listViewLayoutSep
 	return expressionNodeEditor( ctx, node,
-				     ctx.listView( layout, None, None, _CommaFactory( ctx ), xViews ),
+				     ctx.listView( layout, None, None, _commaSeparatorElementFactory, xViews ),
 				     PRECEDENCE_TUPLE,
 				     state )
 
 
 def suiteView(ctx, suite, parser):
-	# THE EDIT OPERATIONS RELY ON THE ELEMENT STRUCTURE USED HERE:
-	#	VBox - suite
-	#		children*
-
 	lineViews = ctx.mapViewEvalFn( suite, None, python25ViewState( PRECEDENCE_NONE, parser, MODE_EDITSTATEMENT ) )
 	return ctx.vbox( suite_vboxStyle, lineViews )
 
 
 def indentedSuiteView(ctx, suite, parser):
-	# THE EDIT OPERATIONS RELY ON THE ELEMENT STRUCTURE USED HERE:
-	#	VBox - suite
-	#		children*
-
 	indent = ctx.hiddenStructuralObject( Nodes.Indent() )
 	dedent = ctx.hiddenStructuralObject( Nodes.Dedent() )
 	lineViews = [ indent ]  + ctx.mapViewEvalFn( suite, None, python25ViewState( PRECEDENCE_NONE, parser, MODE_EDITSTATEMENT ) )  +  [ dedent ]
@@ -487,7 +429,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		targetViews = ctx.mapViewEvalFn( targets, None, python25ViewState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.targetItem() ) )
 		layout = list_listViewLayout   if trailingSeparator is None   else list_listViewLayoutSep		
 		return expressionNodeEditor( ctx, node,
-					     ctx.listView( layout, _OpenBracketFactory( ctx ), _CloseBracketFactory( ctx ), _CommaFactory( ctx ), targetViews ),
+					     ctx.listView( layout, _openBracketElementFactory, _closeBracketElementFactory, _commaSeparatorElementFactory, targetViews ),
 					     PRECEDENCE_TARGET,
 					     state )
 
@@ -517,7 +459,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		valueViews = ctx.mapViewEvalFn( values, None, python25ViewState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
 		layout = list_listViewLayout   if trailingSeparator is None   else list_listViewLayoutSep		
 		return expressionNodeEditor( ctx, node,
-					     ctx.listView( layout, _OpenBracketFactory( ctx ), _CloseBracketFactory( ctx ), _CommaFactory( ctx ), valueViews ),
+					     ctx.listView( layout, _openBracketElementFactory, _closeBracketElementFactory, _commaSeparatorElementFactory, valueViews ),
 					     PRECEDENCE_LISTDISPLAY,
 					     state )
 
@@ -590,7 +532,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		valueViews = ctx.mapViewEvalFn( values, None, python25ViewState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.keyValuePair() ) )
 		layout = dict_listViewLayout   if trailingSeparator is None   else dict_listViewLayoutSep		
 		return expressionNodeEditor( ctx, node,
-					     ctx.listView( layout, _OpenBraceFactory( ctx ), _CloseBraceFactory( ctx ), _CommaFactory( ctx ), valueViews ),
+					     ctx.listView( layout, _openBraceElementFactory, _closeBraceElementFactory, _commaSeparatorElementFactory, valueViews ),
 					     PRECEDENCE_DICTDISPLAY,
 					     state )
 
@@ -660,7 +602,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		valueViews = ctx.mapViewEvalFn( values, None, python25ViewState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.subscriptItem() ) )
 		layout = tuple_listViewLayout   if trailingSeparator is None   else tuple_listViewLayoutSep
 		return expressionNodeEditor( ctx, node,
-					     ctx.listView( layout, None, None, _CommaFactory( ctx ), valueViews ),
+					     ctx.listView( layout, None, None, _commaSeparatorElementFactory, valueViews ),
 					     PRECEDENCE_TUPLE,
 					     state )
 
@@ -1428,7 +1370,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		if bases is not None:
 			baseViews = ctx.mapViewEvalFn( bases, None, python25ViewState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
 			layout = tuple_listViewLayout   if basesTrailingSeparator is None   else tuple_listViewLayoutSep
-			baseElements = [ ctx.text( punctuation_textStyle, '(' ),  ctx.listView( layout, None, None, _CommaFactory( ctx ), baseViews ),  ctx.text( punctuation_textStyle, ')' ) ]
+			baseElements = [ ctx.text( punctuation_textStyle, '(' ),  ctx.listView( layout, None, None, _commaSeparatorElementFactory, baseViews ),  ctx.text( punctuation_textStyle, ')' ) ]
 		else:
 			baseElements = []
 		return ctx.span( [ capitalisedKeywordText( ctx, classKeyword ),  ctx.text( default_textStyle, ' ' ),  ctx.text( default_textStyle, name ) ]  +  \

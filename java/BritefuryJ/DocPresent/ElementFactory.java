@@ -8,5 +8,5 @@ package BritefuryJ.DocPresent;
 
 public interface ElementFactory
 {
-	public DPWidget createElement();
+	public DPWidget createElement(ElementContext ctx);
 }

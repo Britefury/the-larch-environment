@@ -16,6 +16,7 @@ import BritefuryJ.DocPresent.DPParagraphDedentMarker;
 import BritefuryJ.DocPresent.DPParagraphIndentMarker;
 import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.ElementContext;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.PyElementFactory;
 
@@ -41,21 +42,24 @@ public class SpanListViewLayout extends ListViewLayout
 	}
 	
 	
-	public DPWidget createListElement(List<DPWidget> children, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator)
+	public DPWidget createListElement(ElementContext ctx, List<DPWidget> children, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator)
 	{
 		DPSpan span = new DPSpan();
+		span.setContext( ctx );
 		
 		ArrayList<DPWidget> childElems = new ArrayList<DPWidget>();
 		childElems.ensureCapacity( children.size() + 2 );
 		
 		if ( beginDelim != null )
 		{
-			childElems.add( beginDelim.createElement() );
+			childElems.add( beginDelim.createElement( ctx ) );
 		}
 		
 		if ( bAddParagraphIndentMarkers )
 		{
-			childElems.add( new DPParagraphIndentMarker() );
+			DPParagraphIndentMarker indent = new DPParagraphIndentMarker();
+			indent.setContext( ctx );
+			childElems.add( indent );
 		}
 		
 		if ( children.size() > 0 )
@@ -66,22 +70,23 @@ public class SpanListViewLayout extends ListViewLayout
 				childElems.add( child );
 				if ( separator != null )
 				{
-					childElems.add( separator.createElement( i, child ) );
+					childElems.add( separator.createElement( ctx, i, child ) );
 				}
 				if ( bAddLineBreaks )
 				{
 					DPLineBreak lineBreak = new DPLineBreak();
 					if ( spacingFactory != null )
 					{
-						lineBreak.setChild( spacingFactory.createElement() );
+						lineBreak.setChild( spacingFactory.createElement( ctx ) );
 					}
+					lineBreak.setContext( ctx );
 					childElems.add( lineBreak );
 				}
 				else
 				{
 					if ( spacingFactory != null )
 					{
-						childElems.add( spacingFactory.createElement() );
+						childElems.add( spacingFactory.createElement( ctx ) );
 					}
 				}
 			}
@@ -93,19 +98,21 @@ public class SpanListViewLayout extends ListViewLayout
 			{
 				if ( separator != null )
 				{
-					childElems.add( separator.createElement( children.size() - 1, lastChild ) );
+					childElems.add( separator.createElement( ctx, children.size() - 1, lastChild ) );
 				}
 			}
 		}
 
 		if ( bAddParagraphIndentMarkers )
 		{
-			childElems.add( new DPParagraphDedentMarker() );
+			DPParagraphDedentMarker dedent = new DPParagraphDedentMarker();
+			dedent.setContext( ctx );
+			childElems.add( dedent );
 		}
 		
 		if ( endDelim != null )
 		{
-			childElems.add( endDelim.createElement() );
+			childElems.add( endDelim.createElement( ctx ) );
 		}
 		
 		span.setChildren( childElems );

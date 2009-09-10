@@ -10,6 +10,7 @@ import org.python.core.Py;
 import org.python.core.PyObject;
 
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.ElementContext;
 
 public class PySeparatorElementFactory implements SeparatorElementFactory
 {
@@ -21,9 +22,9 @@ public class PySeparatorElementFactory implements SeparatorElementFactory
 	}
 	
 	
-	public DPWidget createElement(int index, DPWidget child)
+	public DPWidget createElement(ElementContext ctx, int index, DPWidget child)
 	{
-		return (DPWidget)Py.tojava( callable.__call__( Py.java2py( index ), Py.java2py( child ) ), DPWidget.class );
+		return (DPWidget)Py.tojava( callable.__call__( Py.java2py( ctx ), Py.java2py( index ), Py.java2py( child ) ), DPWidget.class );
 	}
 	
 	
