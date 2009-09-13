@@ -133,12 +133,18 @@ class GSymDocument (CommandHistoryListener):
 	
 	def viewDocLocationAsPage(self, locationPrefix, location, app):
 		element = self.viewUnitLocationAsElement( self._unit, locationPrefix, location, app )
-		return _DocViewPage( element, self._commandHistory )
+		if element is not None:
+			return _DocViewPage( element, self._commandHistory )
+		else:
+			return None
 	
 	
 	def viewDocLocationAsLispPage(self, locationPrefix, location, app):
 		element = self.viewUnitLocationAsLispElement( self._unit, locationPrefix, location, app )
-		return _DocViewPage( element, self._commandHistory )
+		if element is not None:
+			return _DocViewPage( element, self._commandHistory )
+		else:
+			return None
 
 
 	
@@ -152,25 +158,31 @@ class GSymDocument (CommandHistoryListener):
 
 	
 	def viewUnitLocationAsElement(self, unit, locationPrefix, location, app):
-		language = self._world.getLanguage( gSymUnit_getLanguageModuleName( unit ) )
-		viewLocationAsElementFn = language.getViewLocationAsElementFn()
-		return viewLocationAsElementFn( self, gSymUnit_getContent( unit ), locationPrefix, location, self._commandHistory, app )
+		resolveResult = self.resolveUnitLocation( unit, locationPrefix, location, app )
+		if resolveResult is not None:
+			viewLocationAsElementFn = resolveResult.language.getViewDocNodeAsElementFn()
+			return viewLocationAsElementFn( self, resolveResult.docNode, resolveResult.locationPrefix, resolveResult.location, self._commandHistory, app )
+		else:
+			return None
 	
 	
 	def viewUnitLocationAsLispElement(self, unit, locationPrefix, location, app):
-		language = LISP.language
-		viewLocationAsElementFn = language.getViewLocationAsElementFn()
-		return viewLocationAsElementFn( self, gSymUnit_getContent( unit ), locationPrefix, location, self._commandHistory, app )
+		resolveResult = self.resolveUnitLocation( unit, locationPrefix, location, app )
+		if resolveResult is not None:
+			viewLocationAsElementFn = LISP.language.getViewDocNodeAsElementFn()
+			return viewLocationAsElementFn( self, resolveResult.docNode, resolveResult.locationPrefix, resolveResult.location, self._commandHistory, app )
+		else:
+			return None
 
 
 	
-	def getDocNodeAtLocation(self, locationPrefix, location, app):
-		return self.getUnitDocNodeAtLocation( self._unit, locationPrefix, location, app )
+	def resolveLocation(self, locationPrefix, location, app):
+		return self.resolveUnitLocation( self._unit, locationPrefix, location, app )
 	
-	def getUnitDocNodeAtLocation(self, unit, locationPrefix, location, app):
+	def resolveUnitLocation(self, unit, locationPrefix, location, app):
 		language = self._world.getLanguage( gSymUnit_getLanguageModuleName( unit ) )
-		getDocNodeForLocationFn = language.getGetDocNodeForLocationFn()
-		return getDocNodeForLocationFn( self, gSymUnit_getContent( unit ), locationPrefix, location, app )
+		resolveLocationFn = language.getResolveLocationFn()
+		return resolveLocationFn( language, self, gSymUnit_getContent( unit ), locationPrefix, location, app )
 		
 	
 	

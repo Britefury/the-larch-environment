@@ -8,11 +8,12 @@
 
 
 class GSymLanguage (object):
-	def __init__(self):
+	def __init__(self, name):
 		super( GSymLanguage, self ).__init__()
+		self.name = name
 		self._codeGeneratorFactories = {}
-		self._viewLocationAsElementFn = None
-		self._getDocNodeForLocationFn = None
+		self._viewDocNodeAsElementFn = None
+		self._resolveLocationFn = None
 		self._transformModifyFn = None
 		
 		
@@ -21,22 +22,22 @@ class GSymLanguage (object):
 
 
 
-	def registerViewLocationAsElementFn(self, viewLocationAsElementFn):
-		self._viewLocationAsElementFn = viewLocationAsElementFn
+	def registerViewDocNodeAsElementFn(self, viewDocNodeAsElementFn):
+		self._viewDocNodeAsElementFn = viewDocNodeAsElementFn
 
-	def registerGetDocNodeForLocationFn(self, getDocNodeForLocationFn):
-		self._getDocNodeForLocationFn = getDocNodeForLocationFn
+	def registerResolveLocationFn(self, resolveLocationFn):
+		self._resolveLocationFn = resolveLocationFn
 
 		
 		
 	def getCodeGeneratorFactory(self, format):
 		return self._codeGeneratorFactories[format]
 	
-	def getViewLocationAsElementFn(self):
-		return self._viewLocationAsElementFn
+	def getViewDocNodeAsElementFn(self):
+		return self._viewDocNodeAsElementFn
 
-	def getGetDocNodeForLocationFn(self):
-		return self._getDocNodeForLocationFn
+	def getResolveLocationFn(self):
+		return self._resolveLocationFn
 
 
 
