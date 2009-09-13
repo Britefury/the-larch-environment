@@ -154,15 +154,6 @@ class MainApp (AppControlInterface):
 		self._pageImporters = []
 		
 		
-		# FILE MENU
-		
-		fileMenu = JMenu( 'File' )
-		fileMenu.add( _action( 'New project', self._onNewProject ) )
-		fileMenu.add( _action( 'Open', self._onOpen ) )
-		fileMenu.add( _action( 'Save', self._onSave ) )
-
-
-		
 		# EDIT MENU
 		
 		transferActionListener = _GSymTransferActionListener()
@@ -212,14 +203,6 @@ class MainApp (AppControlInterface):
 
 		
 		
-		# ACTIONS MENU
-		
-		self._actionsMenu = JMenu( 'Actions' )
-		self._actionsMenu.add( _action( 'Transform...', self._onTransform ) )
-
-
-
-		
 		# VIEW MENU
 		
 		viewMenu = JMenu( 'View' )
@@ -237,9 +220,7 @@ class MainApp (AppControlInterface):
 		
 		
 		menuBar = JMenuBar();
-		menuBar.add( fileMenu )
 		menuBar.add( editMenu )
-		menuBar.add( self._actionsMenu )
 		menuBar.add( viewMenu )
 		menuBar.add( scriptMenu )
 
@@ -354,18 +335,6 @@ class MainApp (AppControlInterface):
 			
 		
 		
-	def _onNewProject(self):
-		bProceed = True
-		if self._bUnsavedData:
-			response = JOptionPane.showOptionDialog( self._frame, 'You have not saved your work. Proceed?', 'New Project', JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'New', 'Cancel' ], 'Cancel' )
-			bProceed = response == JOptionPane.YES_OPTION
-		if bProceed:
-			self.setDocument( GSymDocument( Project.newProject() ) )
-
-
-		
-			
-			
 	# handleNewPageFn(unit)
 	def promptNewPage(self, handleNewPageFn):
 		def _make_newPage(newPageFn):
@@ -488,64 +457,6 @@ class MainApp (AppControlInterface):
 	
 	
 	
-	def _onOpen(self):
-		bProceed = True
-		if self._bUnsavedData:
-			response = JOptionPane.showOptionDialog( self._frame, 'You have not saved your work. Proceed?', 'Open Project', JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'Open', 'Cancel' ], 'Cancel' )
-			bProceed = response == JOptionPane.YES_OPTION
-		if bProceed:
-			openDialog = JFileChooser()
-			openDialog.setFileFilter( FileNameExtensionFilter( 'gSym project (*.gsym)', [ 'gsym' ] ) )
-			response = openDialog.showOpenDialog( self._frame )
-			if response == JFileChooser.APPROVE_OPTION:
-				sf = openDialog.getSelectedFile()
-				if sf is not None:
-					filename = sf.getPath()
-					if filename is not None:
-						document = GSymDocument.readFile( self._world, filename )
-						if document is not None:
-							self.setDocument( document )
-
-
-	def _onSave(self):
-		filename = None
-		bFinished = False
-		while not bFinished:
-			openDialog = JFileChooser()
-			openDialog.setFileFilter( FileNameExtensionFilter( 'gSym project (*.gsym)', [ 'gsym' ] ) )
-			response = openDialog.showSaveDialog( self._frame )
-			if response == JFileChooser.APPROVE_OPTION:
-				sf = openDialog.getSelectedFile()
-				if sf is not None:
-					filenameFromDialog = sf.getPath()
-					if filenameFromDialog is not None:
-						if os.path.exists( filenameFromDialog ):
-							response = JOptionPane.showOptionDialog( self._frame, 'File already exists. Overwrite?', 'File already exists', JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'Overwrite', 'Cancel' ], 'Cancel' )
-							if response == JFileChooser.APPROVE_OPTION:
-								filename = filenameFromDialog
-								bFinished = True
-							else:
-								bFinished = False
-						else:
-							filename = filenameFromDialog
-							bFinished = True
-					else:
-						bFinished = True
-				else:
-					bFinished = True
-			else:
-				bFinished = True
-
-		if filename is not None:
-			if self._document is not None:
-				self._document.saveAs( filename )
-			return True
-		else:
-			return False
-
-
-		
-		
 	def _onUndo(self):
 		commandHistoryController = self._browser.getCommandHistoryController()
 		if commandHistoryController.canUndo():
@@ -559,24 +470,6 @@ class MainApp (AppControlInterface):
 
 		
 
-	def _onTransform(self):
-		openDialog = JFileChooser()
-		openDialog.setFileFilter( FileNameExtensionFilter( 'Python source (*.py)', [ 'py' ] ) )
-		response = openDialog.showOpenDialog( self._frame )
-		if response == JFileChooser.APPROVE_OPTION:
-			sf = openDialog.getSelectedFile()
-			if sf is not None:
-				filename = sf.getPath()
-				if filename is not None:
-					env = {}
-					execfile( filename, env )
-					xFn = env['xform']
-					
-					if self._document is not None:
-						transformUnit( self._document.unit, self._world, xFn )
-							
-
-					
 	def _onShowLisp(self):
 		self._bLispWindowVisible = not self._bLispWindowVisible
 		if self._bLispWindowVisible:
