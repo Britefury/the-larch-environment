@@ -7,6 +7,7 @@
 ##-*************************
 from Britefury.Util.NodeUtil import isListNode, isObjectNode, isStringNode
 
+from Britefury.gSym.gSymResolveResult import GSymResolveResult
 from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replaceNodeContents, append, prepend, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
 
 
@@ -170,11 +171,10 @@ def viewLispNode(node, ctx, state):
 	
 
 
-def viewLISPLocationAsElement(document, docRootNode, locationPrefix, location, commandHistory, app):
-	docNode = document.getDocNodeAtLocation( locationPrefix, location, app )
+def viewLISPDocNodeAsElement(document, docRootNode, locationPrefix, location, commandHistory, app):
 	viewContext = GSymViewContext( docNode, viewLispNode, commandHistory )
 	return viewContext.getFrame()
 
 
-def getDocNodeForLISPLocation(document, docRootNode, locationPrefix, location, app):
-	return docRootNode
+def resolveLISPLocation(currentLanguage, document, docRootNode, locationPrefix, location, app):
+	return GSymResolveResult( docRootNode, currentLanguage, locationPrefix, location )

@@ -13,6 +13,7 @@ from javax.swing import JPopupMenu
 
 from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeDispatchMethod
 
+from Britefury.gSym.gSymResolveResult import GSymResolveResult
 from Britefury.gSym.View.GSymView import GSymViewObjectNodeDispatch
 from Britefury.gSym import gSymDocument
 
@@ -182,44 +183,37 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 	
 	
-def _lookup(document, docRootNode, locationPrefix, location, app, innerFn):
-	loc = location
-	package = docRootNode['rootPackage']
-	while '.' in loc:
-		dotPos = loc.index( '.' )
-		name = loc[:dotPos]
-		loc = loc[dotPos+1:]
-		locationPrefix += name + '.'
-		node = None
-		for n in package['contents']:
-			if n['name'] == name:
-				node = n
-				break
-		if n is None:
-			return None
-		elif isinstance( n, DMObjectInterface ):
-			if n.isInstanceOf( Nodes.Package ):
-				package = n
-			elif n.isInstanceOf( Nodes.Page ):
-				return innerFn( n['unit'], locationPrefix,loc, app )
+def viewProjectDocNodeAsElement(document, docRootNode, locationPrefix, location, commandHistory, app):
+	viewFn = ProjectView( document, app, locationPrefix, location )
+	viewContext = GSymViewContext( docRootNode, viewFn, commandHistory )
+	return viewContext.getFrame()
+
+
+def resolveProjectLocation(currentLanguage, document, docRootNode, locationPrefix, location, app):
+	if location == '':
+		return GSymResolveResult( docRootNode, currentLanguage, locationPrefix, location )
+	else:
+		loc = location
+		package = docRootNode['rootPackage']
+		while '.' in loc:
+			dotPos = loc.index( '.' )
+			name = loc[:dotPos]
+			loc = loc[dotPos+1:]
+			locationPrefix += name + '.'
+			node = None
+			for n in package['contents']:
+				if n['name'] == name:
+					node = n
+					break
+			if n is None:
+				return None
+			elif isinstance( n, DMObjectInterface ):
+				if n.isInstanceOf( Nodes.Package ):
+					package = n
+				elif n.isInstanceOf( Nodes.Page ):
+					return document.resolveUnitLocation( n['unit'], locationPrefix,loc, app )
+				else:
+					return None
 			else:
 				return None
-		else:
-			return None
-	return None
-
-	
-def viewProjectLocationAsElement(document, docRootNode, locationPrefix, location, commandHistory, app):
-	if location == '':
-		viewFn = ProjectView( document, app, locationPrefix, location )
-		viewContext = GSymViewContext( docRootNode, viewFn, commandHistory )
-		return viewContext.getFrame()
-	else:
-		return _lookup( document, docRootNode, locationPrefix, location, app, document.viewUnitLocationAsElement )
-
-
-def getDocNodeForProjectLocation(document, docRootNode, locationPrefix, location, app):
-	if location == '':
-		return docRootNode
-	else:
-		return _lookup( document, docRootNode, locationPrefix, location, app, document.getUnitDocNodeAtLocation )
+		return None

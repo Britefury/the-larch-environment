@@ -15,6 +15,7 @@ from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeDispatchMethod
 
 from Britefury.gSym.View.GSymView import GSymViewObjectNodeDispatch
 from Britefury.gSym.gSymDocument import GSymDocument
+from Britefury.gSym.gSymResolveResult import GSymResolveResult
 
 from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replaceNodeContents, append, prepend, insertElement, insertRange, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
 
@@ -233,32 +234,22 @@ class AppView (GSymViewObjectNodeDispatch):
 	
 
 
-def viewGSymAppLocationAsElement(document, docRootNode, locationPrefix, location, commandHistory, app):
+def viewGSymAppDocNodeAsElement(document, docRootNode, locationPrefix, location, commandHistory, app):
+	viewContext = GSymViewContext( docRootNode, AppView( document, app ), commandHistory )
+	return viewContext.getFrame()
+
+
+
+def resolveGSymAppLocation(currentLanguage, document, docRootNode, locationPrefix, location, app):
 	if location == '':
-		viewContext = GSymViewContext( docRootNode, AppView( document, app ), commandHistory )
-		return viewContext.getFrame()
+		return GSymResolveResult( docRootNode, currentLanguage, locationPrefix, location )
 	else:
 		documentLocation, dot, tail = location.partition( '.' )
 		
 		doc = app.getWorld().getDocument( documentLocation )
 		
 		if doc is not None:
-			return doc.viewDocLocationAsElement( documentLocation + locationPrefix, tail, app )
-		else:
-			return None
-
-
-
-def getDocNodeForGSymAppLocation(document, docRootNode, locationPrefix, location, app):
-	if location == '':
-		return docRootNode
-	else:
-		documentLocation, dot, tail = location.partition( '.' )
-		
-		doc = app.getWorld().getDocument( documentLocation )
-		
-		if doc is not None:
-			return doc.getDocNodeAtLocation( documentLocation + locationPrefix, tail, app )
+			return doc.resolveLocation( documentLocation + locationPrefix, tail, app )
 		else:
 			return None
 

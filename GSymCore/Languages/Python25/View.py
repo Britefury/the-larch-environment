@@ -12,6 +12,7 @@ from BritefuryJ.Parser.ItemStream import ItemStreamBuilder
 
 from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeDispatchMethod
 
+from Britefury.gSym.gSymResolveResult import GSymResolveResult
 from Britefury.gSym.View.GSymView import GSymViewObjectNodeDispatch
 
 from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replaceNodeContents, append, prepend, insertElement, insertRange, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
@@ -1530,12 +1531,12 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 
 
-def viewPython25LocationAsElement(document, docRootNode, locationPrefix, location, commandHistory, app):
+def viewPython25DocNodeAsElement(document, docRootNode, locationPrefix, location, commandHistory, app):
 	viewContext = GSymViewContext( docRootNode, Python25View(), commandHistory )
 	editHandler = Python25EditHandler( viewContext )
 	viewContext.getFrame().setEditHandler( editHandler )
 	return viewContext.getFrame()
 
 
-def getDocNodeForPython25Location(document, docRootNode, locationPrefix, location, app):
-	return docRootNode
+def resolvePython25Location(currentLanguage, document, docRootNode, locationPrefix, location, app):
+	return GSymResolveResult( docRootNode, currentLanguage, locationPrefix, location )

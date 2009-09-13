@@ -5,13 +5,11 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from Britefury.gSym.gSymLanguage import GSymLanguage
-
-from GSymCore.Languages.LISP.View import viewLISPDocNodeAsElement, resolveLISPLocation
 
 
-language = GSymLanguage( 'LISP' )
-language.registerViewDocNodeAsElementFn( viewLISPDocNodeAsElement )
-language.registerResolveLocationFn( resolveLISPLocation )
-
-
+class GSymResolveResult (object):
+	def __init__(self, docNode, language, locationPrefix, location):
+		self.docNode = docNode
+		self.language = language
+		self.locationPrefix = locationPrefix
+		self.location = location
