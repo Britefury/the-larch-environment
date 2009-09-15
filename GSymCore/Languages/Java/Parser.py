@@ -32,33 +32,33 @@ class JavaGrammar (Grammar):
 	
 	@Rule
 	def qualifiedIdentifier(self):
-		return ( self.identifier()  +  ( '.'  +  self.identifier() ).zeroOrMore() ).action( lambda input, pos, x: [ x[0] ] + [ a[1]   for a in x[1] ] )
+		return ( self.identifier()  +  ( Literal( '.' )  +  self.identifier() ).zeroOrMore() ).action( lambda input, begin, end, x, bindings: [ x[0] ] + [ a[1]   for a in x[1] ] )
 	
 	
 	# Integer literal
 	@Rule
 	def decimalIntLiteral(self):
-		return Tokens.decimalIntegerNoOctal.action( lambda input, pos, xs: Nodes.IntLiteral( format='decimal', numType='int', value=xs ) )
+		return Tokens.decimalIntegerNoOctal.action( lambda input, begin, end, x, bindings: Nodes.IntLiteral( format='decimal', numType='int', value=x ) )
 
 	@Rule
 	def decimalLongLiteral(self):
-		return ( Tokens.decimalIntegerNoOctal + Suppress( Literal( 'l' )  |  Literal( 'L' ) ) ).action( lambda input, pos, xs: Nodes.IntLiteral( format='decimal', numType='long', value=xs[0] ) )
+		return ( Tokens.decimalIntegerNoOctal + Suppress( Literal( 'l' )  |  Literal( 'L' ) ) ).action( lambda input, begin, end, x, bindings: Nodes.IntLiteral( format='decimal', numType='long', value=x[0] ) )
 
 	@Rule
 	def hexIntLiteral(self):
-		return Tokens.hexInteger.action( lambda input, pos, xs: Nodes.IntLiteral( format='hex', numType='int', value=xs ) )
+		return Tokens.hexInteger.action( lambda input, begin, end, x, bindings: Nodes.IntLiteral( format='hex', numType='int', value=x ) )
 
 	@Rule
 	def hexLongLiteral(self):
-		return ( Tokens.hexInteger + Suppress( Literal( 'l' )  |  Literal( 'L' ) ) ).action( lambda input, pos, xs: Nodes.IntLiteral( format='hex', numType='long', value=xs[0] ) )
+		return ( Tokens.hexInteger + Suppress( Literal( 'l' )  |  Literal( 'L' ) ) ).action( lambda input, begin, end, x, bindings: Nodes.IntLiteral( format='hex', numType='long', value=x[0] ) )
 
 	@Rule
 	def octIntLiteral(self):
-		return Tokens.octalInteger.action( lambda input, pos, xs: Nodes.IntLiteral( format='oct', numType='int', value=xs ) )
+		return Tokens.octalInteger.action( lambda input, begin, end, x, bindings: Nodes.IntLiteral( format='oct', numType='int', value=x ) )
 
 	@Rule
 	def octLongLiteral(self):
-		return ( Tokens.octalInteger + Suppress( Literal( 'l' )  |  Literal( 'L' ) ) ).action( lambda input, pos, xs: Nodes.IntLiteral( format='oct', numType='long', value=xs[0] ) )
+		return ( Tokens.octalInteger + Suppress( Literal( 'l' )  |  Literal( 'L' ) ) ).action( lambda input, begin, end, x, bindings: Nodes.IntLiteral( format='oct', numType='long', value=x[0] ) )
 
 	@Rule
 	def integerLiteral(self):
@@ -71,35 +71,35 @@ class JavaGrammar (Grammar):
 	# Float literal
 	@Rule
 	def floatLiteral(self):
-		return Tokens.floatingPoint.action( lambda input, pos, xs: Nodes.FloatLiteral( value=xs ) )
+		return Tokens.floatingPoint.action( lambda input, begin, end, x, bindings: Nodes.FloatLiteral( value=x ) )
 
 	
 	
 	# Character literal
 	@Rule
 	def charLiteral(self):
-		return Tokens.javaCharacterLiteral.action( lambda input, pos, xs: Nodes.CharLiteral( value=xs[1:-1] ) )
+		return Tokens.javaCharacterLiteral.action( lambda input, begin, end, x, bindings: Nodes.CharLiteral( value=x[1:-1] ) )
 
 	
 	
 	# String literal
 	@Rule
 	def stringLiteral(self):
-		return Tokens.javaStringLiteral.action( lambda input, pos, xs: Nodes.StringLiteral( value=xs[1:-1] ) )
+		return Tokens.javaStringLiteral.action( lambda input, begin, end, x, bindings: Nodes.StringLiteral( value=x[1:-1] ) )
 	
 	
 
 	# Boolean Literal
 	@Rule
 	def booleanLiteral(self):
-		return ( Keyword( 'false' ) | Keyword( 'true' ) ).action( lambda input, pos, x: Nodes.BooleanLiteral( value=x ) )
+		return ( Keyword( 'false' ) | Keyword( 'true' ) ).action( lambda input, begin, end, x, bindings: Nodes.BooleanLiteral( value=x ) )
 	
 	
 	
 	# Null Literal
 	@Rule
 	def nullLiteral(self):
-		return Keyword( 'null' ).action( lambda input, pos, x: Nodes.NullLiteral() )
+		return Keyword( 'null' ).action( lambda input, begin, end, x, bindings: Nodes.NullLiteral() )
 	
 	
 	
@@ -120,3 +120,11 @@ class TestCase_JavaGrammar (ParserTestCase.ParserTestCase):
 		g = JavaGrammar()
 		self._parseStringTest( g.identifier(), 'abc', 'abc' )
 	
+	def test_qualifiedIdentifier(self):
+		g = JavaGrammar()
+		self._parseStringTestSX( g.qualifiedIdentifier(), 'abc', '[abc]' )
+		self._parseStringTestSX( g.qualifiedIdentifier(), 'abc.xyz', '[abc xyz]' )
+		self._parseStringTestSX( g.qualifiedIdentifier(), 'abc.xyz.pqr', '[abc xyz pqr]' )
+		self._parseStringFailTest( g.qualifiedIdentifier(), 'abc.xyz.pqr.' )
+		self._parseStringFailTest( g.qualifiedIdentifier(), '.abc.xyz.pqr' )
+		self._parseStringFailTest( g.qualifiedIdentifier(), 'abc..xyz.pqr' )

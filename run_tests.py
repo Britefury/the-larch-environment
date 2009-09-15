@@ -30,7 +30,7 @@ testModules = [ Britefury.Dispatch.Dispatch,
 		GSymCore.Languages.Python25.Parser,
 		GSymCore.Languages.Python25.Python25Importer,
 		GSymCore.Languages.Python25.Precedence,
-		#GSymCore.Languages.Java.Parser,
+		GSymCore.Languages.Java.Parser,
 		#GSymCore.Languages.LISP.Parser2 ]
 		]
 
