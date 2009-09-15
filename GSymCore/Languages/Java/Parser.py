@@ -15,6 +15,7 @@ from BritefuryJ.Parser.Utils.OperatorParser import PrefixLevel, SuffixLevel, Inf
 from Britefury.Grammar.Grammar import Grammar, Rule
 
 
+from GSymCore.Languages.Java import Keywords
 from GSymCore.Languages.Java import NodeClasses as Nodes
 
 
@@ -92,14 +93,109 @@ class JavaGrammar (Grammar):
 	# Boolean Literal
 	@Rule
 	def booleanLiteral(self):
-		return ( Keyword( 'false' ) | Keyword( 'true' ) ).action( lambda input, begin, end, x, bindings: Nodes.BooleanLiteral( value=x ) )
+		return ( Keyword( Keywords.falseKeyword ) | Keyword( Keywords.trueKeyword ) ).action( lambda input, begin, end, x, bindings: Nodes.BooleanLiteral( value=x ) )
 	
 	
 	
 	# Null Literal
 	@Rule
 	def nullLiteral(self):
-		return Keyword( 'null' ).action( lambda input, begin, end, x, bindings: Nodes.NullLiteral() )
+		return Keyword( Keywords.nullKeyword ).action( lambda input, begin, end, x, bindings: Nodes.NullLiteral() )
+	
+	
+	# Java literal
+	@Rule
+	def literal(self):
+		return self.floatLiteral() | self.integerLiteral() | self.charLiteral() | self.stringLiteral() | self.booleanLiteral() | self.nullLiteral()
+	
+	
+	
+	
+	
+	# Type reference
+	@Rule
+	def typeRef(self):
+		return self.arrayTypeRef()  |  self.classOrInterfaceTypeRef()  |  self.primitiveTypeRef()
+	
+	@Rule
+	def primitiveTypeRef(self):
+		return self.numericTypeRef()  |  self.booleanTypeRef()
+	
+	@Rule
+	def booleanTypeRef(self):
+		return Keyword( Keywords.booleanKeyword ).action( lambda input, begin, end, x, bindings: Nodes.BooleanTypeRef() )
+	
+	@Rule
+	def numericTypeRef(self):
+		return self.integralTypeRef() | self.floatingPointTypeRef()
+	
+	@Rule
+	def integralTypeRef(self):
+		return self.byteTypeRef() | self.shortTypeRef() | self.intTypeRef() | self.longTypeRef() | self.charTypeRef()
+	
+	@Rule
+	def byteTypeRef(self):
+		return Keyword( Keywords.byteKeyword ).action( lambda input, begin, end, x, bindings: Nodes.ByteTypeRef() )
+	
+	@Rule
+	def shortTypeRef(self):
+		return Keyword( Keywords.shortKeyword ).action( lambda input, begin, end, x, bindings: Nodes.ShortTypeRef() )
+	
+	@Rule
+	def intTypeRef(self):
+		return Keyword( Keywords.intKeyword ).action( lambda input, begin, end, x, bindings: Nodes.IntTypeRef() )
+	
+	@Rule
+	def longTypeRef(self):
+		return Keyword( Keywords.longKeyword ).action( lambda input, begin, end, x, bindings: Nodes.LongTypeRef() )
+	
+	@Rule
+	def charTypeRef(self):
+		return Keyword( Keywords.charKeyword ).action( lambda input, begin, end, x, bindings: Nodes.CharTypeRef() )
+	
+	@Rule
+	def floatingPointTypeRef(self):
+		return self.floatTypeRef() | self.doubleTypeRef()
+	
+	@Rule
+	def floatTypeRef(self):
+		return Keyword( Keywords.floatKeyword ).action( lambda input, begin, end, x, bindings: Nodes.FloatTypeRef() )
+	
+	@Rule
+	def doubleTypeRef(self):
+		return Keyword( Keywords.doubleKeyword ).action( lambda input, begin, end, x, bindings: Nodes.DoubleTypeRef() )
+	
+	@Rule
+	def classOrInterfaceTypeRef(self):
+		return self.name().action( lambda input, begin, end, x, bindings: Nodes.ClassOrInterfaceTypeRef( name=x ) )
+	
+	@Rule
+	def arrayTypeRef(self):
+		def _action(input, begin, end, x, bindings):
+			typeRef = x[0]
+			for a in x[1]:
+				typeRef = Nodes.ArrayTypeRef( itemTypeRef=typeRef )
+			return typeRef
+		
+		return ( ( self.primitiveTypeRef() | self.classOrInterfaceTypeRef() ) + ( Literal( '[' ) + Literal( ']' ) ).oneOrMore() ).action( _action )
+	
+	
+	
+	# Name
+	@Rule
+	def name(self):
+		return ( self.simpleName()  +  ( Literal( '.' )  +  self.simpleName() ).zeroOrMore() ).action( lambda input, begin, end, x, bindings: [ x[0] ] + [ a[1]   for a in x[1] ] )
+	
+	@Rule
+	def simpleName(self):
+		return Tokens.javaIdentifier  &  ( lambda input, begin, end, x, bindings: x not in Keywords.keywordsSet )
+	
+	
+	
+	# This
+	@Rule
+	def thisExp(self):
+		return Keyword( Keywords.thisKeyword ).action( lambda input, begin, end, x, bindings: Nodes.ThisExp() )
 	
 	
 	
@@ -122,9 +218,79 @@ class TestCase_JavaGrammar (ParserTestCase.ParserTestCase):
 	
 	def test_qualifiedIdentifier(self):
 		g = JavaGrammar()
-		self._parseStringTestSX( g.qualifiedIdentifier(), 'abc', '[abc]' )
-		self._parseStringTestSX( g.qualifiedIdentifier(), 'abc.xyz', '[abc xyz]' )
-		self._parseStringTestSX( g.qualifiedIdentifier(), 'abc.xyz.pqr', '[abc xyz pqr]' )
+		self._parseStringTest( g.qualifiedIdentifier(), 'abc', [ 'abc' ] )
+		self._parseStringTest( g.qualifiedIdentifier(), 'abc.xyz', [ 'abc', 'xyz' ] )
+		self._parseStringTest( g.qualifiedIdentifier(), 'abc.xyz.pqr', [ 'abc', 'xyz', 'pqr' ] )
 		self._parseStringFailTest( g.qualifiedIdentifier(), 'abc.xyz.pqr.' )
 		self._parseStringFailTest( g.qualifiedIdentifier(), '.abc.xyz.pqr' )
 		self._parseStringFailTest( g.qualifiedIdentifier(), 'abc..xyz.pqr' )
+		
+	def test_integerLiteral(self):
+		g = JavaGrammar()
+		self._parseStringTest( g.literal(), '123', Nodes.IntLiteral( format='decimal', numType='int', value='123' ) )
+		self._parseStringTest( g.literal(), '123l', Nodes.IntLiteral( format='decimal', numType='long', value='123' ) )
+		self._parseStringTest( g.literal(), '123L', Nodes.IntLiteral( format='decimal', numType='long', value='123' ) )
+		self._parseStringFailTest( g.literal(), '12a' )
+		self._parseStringTest( g.literal(), '0x123abc', Nodes.IntLiteral( format='hex', numType='int', value='0x123abc' ) )
+		self._parseStringTest( g.literal(), '0x123abcl', Nodes.IntLiteral( format='hex', numType='long', value='0x123abc' ) )
+		self._parseStringTest( g.literal(), '0x123ABCL', Nodes.IntLiteral( format='hex', numType='long', value='0x123ABC' ) )
+		self._parseStringFailTest( g.literal(), '0x12g' )
+		self._parseStringTest( g.literal(), '0123', Nodes.IntLiteral( format='oct', numType='int', value='0123' ) )
+		self._parseStringTest( g.literal(), '0123l', Nodes.IntLiteral( format='oct', numType='long', value='0123' ) )
+		self._parseStringTest( g.literal(), '0123L', Nodes.IntLiteral( format='oct', numType='long', value='0123' ) )
+		self._parseStringFailTest( g.literal(), '012a' )
+		self._parseStringFailTest( g.literal(), '0128' )
+
+	def test_floatLiteral(self):
+		g = JavaGrammar()
+		self._parseStringTest( g.literal(), '123.45', Nodes.FloatLiteral( value='123.45' ) )
+
+	def test_charLiteral(self):
+		g = JavaGrammar()
+		self._parseStringTest( g.literal(), '\'a\'', Nodes.CharLiteral( value='a' ) )
+		self._parseStringTest( g.literal(), '\'\\n\'', Nodes.CharLiteral( value='\\n' ) )
+
+	def test_stringLiteral(self):
+		g = JavaGrammar()
+		self._parseStringTest( g.literal(), '"x"', Nodes.StringLiteral( value='x' ) )
+
+	def test_booleanLiteral(self):
+		g = JavaGrammar()
+		self._parseStringTest( g.literal(), 'false', Nodes.BooleanLiteral( value='false' ) )
+
+	def test_nullLiteral(self):
+		g = JavaGrammar()
+		self._parseStringTest( g.literal(), 'null', Nodes.NullLiteral() )
+	
+		
+		
+	def test_primitiveTypeRef(self):
+		g = JavaGrammar()
+		self._parseStringTest( g.typeRef(), 'boolean', Nodes.BooleanTypeRef() )
+		self._parseStringTest( g.typeRef(), 'byte', Nodes.ByteTypeRef() )
+		self._parseStringTest( g.typeRef(), 'short', Nodes.ShortTypeRef() )
+		self._parseStringTest( g.typeRef(), 'int', Nodes.IntTypeRef() )
+		self._parseStringTest( g.typeRef(), 'long', Nodes.LongTypeRef() )
+		self._parseStringTest( g.typeRef(), 'char', Nodes.CharTypeRef() )
+		self._parseStringTest( g.typeRef(), 'float', Nodes.FloatTypeRef() )
+		self._parseStringTest( g.typeRef(), 'double', Nodes.DoubleTypeRef() )
+		
+	def test_classOrInterfaceTypeRef(self):
+		g = JavaGrammar()
+		self._parseStringTest( g.typeRef(), 'ArrayList', Nodes.ClassOrInterfaceTypeRef( name=[ 'ArrayList' ] ) )
+		self._parseStringTest( g.typeRef(), 'java.util.List', Nodes.ClassOrInterfaceTypeRef( name=[ 'java', 'util', 'List' ] ) )
+		
+	def test_arrayTypeRef(self):
+		g = JavaGrammar()
+		self._parseStringTest( g.typeRef(), 'float []', Nodes.ArrayTypeRef( itemTypeRef=Nodes.FloatTypeRef() ) )
+		self._parseStringTest( g.typeRef(), 'float [][]', Nodes.ArrayTypeRef( itemTypeRef=Nodes.ArrayTypeRef( itemTypeRef=Nodes.FloatTypeRef() ) ) )
+		self._parseStringTest( g.typeRef(), 'ArrayList []', Nodes.ArrayTypeRef( itemTypeRef=Nodes.ClassOrInterfaceTypeRef( name=[ 'ArrayList' ] ) ) )
+		self._parseStringTest( g.typeRef(), 'java.util.List []', Nodes.ArrayTypeRef( itemTypeRef=Nodes.ClassOrInterfaceTypeRef( name=[ 'java', 'util', 'List' ] ) ) )
+		
+		
+		
+
+	def test_thisExp(self):
+		g = JavaGrammar()
+		self._parseStringTest( g.thisExp(), 'this', Nodes.ThisExp() )
+		
