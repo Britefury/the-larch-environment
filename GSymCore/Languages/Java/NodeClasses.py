@@ -45,6 +45,30 @@ BooleanLiteral = module.newClass( 'BooleanLiteral', Literal, [ 'value' ] )
 NullLiteral = module.newClass( 'NullLiteral', Literal, [] )
 
 
+
+#
+# Types
+#
+TypeRef = module.newClass( 'TypeRef', Node, [] )
+PrimitiveTypeRef = module.newClass( 'PrimitiveTypeRef', TypeRef, [] )
+BooleanTypeRef = module.newClass( 'BooleanType', PrimitiveTypeRef, [] )
+ByteTypeRef = module.newClass( 'ByteTypeRef', PrimitiveTypeRef, [] )
+ShortTypeRef = module.newClass( 'ShortTypeRef', PrimitiveTypeRef, [] )
+IntTypeRef = module.newClass( 'IntTypeRef', PrimitiveTypeRef, [] )
+LongTypeRef = module.newClass( 'LongTypeRef', PrimitiveTypeRef, [] )
+CharTypeRef = module.newClass( 'CharTypeRef', PrimitiveTypeRef, [] )
+FloatTypeRef = module.newClass( 'FloatTypeRef', PrimitiveTypeRef, [] )
+DoubleTypeRef = module.newClass( 'DoubleTypeRef', PrimitiveTypeRef, [] )
+ClassOrInterfaceTypeRef = module.newClass( 'ClassOrInterfaceTypeRef', TypeRef, [ 'name' ] )
+ArrayTypeRef = module.newClass( 'ArrayTypeRef', TypeRef, [ 'itemTypeRef' ] )
+
+
+#
+# This
+#
+ThisExp = module.newClass( 'ThisExp', Expr, [] )
+
+
 #
 # Targets
 #
