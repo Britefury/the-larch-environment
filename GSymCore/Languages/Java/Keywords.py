@@ -24,15 +24,17 @@ ifKeyword = 'if'
 importKeyword = 'import'
 intKeyword = 'int'
 longKeyword = 'long'
+newKeyword = 'new'
 nullKeyword = 'null'
 returnKeyword = 'return'
 shortKeyword = 'short'
+superKeyword = 'super'
 thisKeyword = 'this'
 trueKeyword = 'true'
 tryKeyword = 'try'
 whileKeyword = 'while'
 
-keywords = [ 'assert', 'boolean', 'break', 'byte', 'char', 'class', 'continue', 'double', 'else', 'false', 'float', 'for', 'if', 'import', 'int', 'long', 'null', 'return', 'short', 'this', 'true', 'try', 'while' ]
+keywords = [ 'assert', 'boolean', 'break', 'byte', 'char', 'class', 'continue', 'double', 'else', 'false', 'float', 'for', 'if', 'import', 'int', 'long', 'new', 'null', 'return', 'short', 'super', 'this', 'true', 'try', 'while' ]
 keywordsSet = set( keywords )
 
 

@@ -64,9 +64,14 @@ ArrayTypeRef = module.newClass( 'ArrayTypeRef', TypeRef, [ 'itemTypeRef' ] )
 
 
 #
-# This
+# Primary expressions
 #
 ThisExp = module.newClass( 'ThisExp', Expr, [] )
+SuperExp = module.newClass( 'SuperExp', Expr, [] )
+ClassInstanceCreation = module.newClass( 'ClassInstanceCreation', Expr, [ 'classTypeRef', 'args' ] )
+ArrayCreation = module.newClass( 'ArrayCreation', Expr, [ 'itemTypeRef', 'fixedDimensions', 'numUnfixedDimensions' ] )
+FieldAccess = module.newClass( 'FieldAccess', Expr, [ 'target', 'fieldName' ] )
+
 
 
 #
