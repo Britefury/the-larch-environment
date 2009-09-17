@@ -192,18 +192,62 @@ class JavaGrammar (Grammar):
 	
 	
 	
+	
 	# This
 	@Rule
 	def thisExp(self):
 		return Keyword( Keywords.thisKeyword ).action( lambda input, begin, end, x, bindings: Nodes.ThisExp() )
 	
 	
+	# Super
+	@Rule
+	def superExp(self):
+		return Keyword( Keywords.superKeyword ).action( lambda input, begin, end, x, bindings: Nodes.SuperExp() )
+	
+	
+	# Parentheses
+	@Rule
+	def parenForm(self):
+		return ( Literal( '(' ) + self.expression() + ')' ).action( lambda input, begin, end, xs, bindings: _incrementParens( xs[1] ) )
 	
 	
 	
 	
+	# Primary
+	@Rule
+	def primary(self):
+		return self.primaryNoNewArray() | self.arrayCreationExpression()
 	
+	@Rule
+	def primaryNoNewArray(self):
+		return self.literal() | self.thisExp() | self.parenForm() | self.classInstanceCreationExpression() | self.fieldAccess() | self.methodInvocation() | self.arrayAccess()
+	
+	
+	
+	@Rule
+	def classInstanceCreationExpression(self):
+		return ( Keyword( Keywords.newKeyword ) + self.classOrInterfaceTypeRef() + Literal( '(' ) + SeparatedList( self.expression(), 0, -1, SeparatedList.TrailingSeparatorPolicy.NEVER ) + Literal( ')' ) ).action( \
+		        lambda input, begin, end, xs, bindings: Nodes.ClassInstanceCreation( classTypeRef=xs[1], args=xs[3] ) )
 
+
+	@Rule
+	def arrayCreationExpression(self):
+		return ( Keyword( Keywords.newKeyword ) + ( self.classOrInterfaceTypeRef() | self.primitiveTypeRef() ) + self.dimExpr().oneOrMore() ).action( \
+		        lambda input, begin, end, xs, bindings: Nodes.ClassInstanceCreation( classTypeRef=xs[1], args=xs[3] ) )
+
+	@Rule
+	def dimExpr(self):
+		return ( Literal( '[' ) + self.expression() + Literal( ']' ) ).action( lambda input, begin, end, xs, bindings: xs[1] )
+	
+	
+	@Rule
+	def fieldAccess(self):
+		return ( ( self.primary() | self.superExp() )  +  Literal( '.' )  +  self.simpleName() ).action( lambda input, begin, end, xs, bindings: Nodes.ClassInstanceCreation( target=xs[0], fieldName=xs[2] ) )
+	
+	
+	@Rule
+	def methodInvoation(self):
+		return ( ( self.name() | self.primary() | self.superExp() )  +  Literal( '.' )  +  self.simpleName() ).action( lambda input, begin, end, xs, bindings: Nodes.ClassInstanceCreation( target=xs[0], fieldName=xs[2] ) )
 
 
 
