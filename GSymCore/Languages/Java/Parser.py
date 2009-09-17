@@ -114,24 +114,55 @@ class JavaGrammar (Grammar):
 	
 	# Type reference
 	@Rule
-	def typeRef(self):
-		return self.arrayTypeRef()  |  self.classOrInterfaceTypeRef()  |  self.primitiveTypeRef()
+	def typeExpression(self):
+		return self.basicTypeRef() | self.complexTypeExp()
+	
 	
 	@Rule
-	def primitiveTypeRef(self):
-		return self.numericTypeRef()  |  self.booleanTypeRef()
+	def complexTypeExp(self):
+		def _action(input, begin, end, x, bindings):
+			typeExp = x[0]
+			for g in x[1]:
+				typeExp = Nodes.MemberTypeExp( target=typeExp, member=g[1]  )
+			for a in x[2]:
+				typeExp = Nodes.ArrayTypeExp( itemTypeExp=typeExp )
+			return typeExp
+		return ( self.simpleTypeExp()  +  ( Literal( '.' ) + self.simpleTypeExp() ).zeroOrMore() +  ( Literal( '[' ) + Literal( ']' ) ).zeroOrMore() ).action( _action )
+	
+	
+	@Rule
+	def simpleTypeExp(self):
+		return self.genericTypeExp()  |  self.classOrInterfaceTypeRef()
+	
+	
+	@Rule
+	def genericTypeExp(self):
+		return ( self.classOrInterfaceTypeRef() + Literal( '<' ) + SeparatedList( self.genericTypeArgument(), 0, -1, SeparatedList.TrailingSeparatorPolicy.NEVER ) + Literal( '>' ) ).action( \
+		        lambda input, begin, end, x, bindings: Nodes.GenericTypeExp( target=x[0], args=x[2] ) )
+	
+	@Rule
+	def genericTypeArgument(self):
+		return self.typeExpression()  |  self.genericWildcardArgument()
+	
+	@Rule
+	def genericWildcardArgument(self):
+		return ( Literal( '?' )  +  ( Keyword( Keywords.superKeyword ) | Keyword( Keywords.extendsKeyword ) )  +  self.typeExpression ).action(
+		        lambda input, begin, end, x, bindings: Nodes.WildCardTypeArgument( extendsOrSuper=( 'extends'   if x[1] == Keywords.extendsKeyword   else 'super' ), typeExp=x[2] ) )
+	
+	
+	
+	# Type reference
+	@Rule
+	def typeRef(self):
+		return self.arrayTypeRef()  |  self.classOrInterfaceTypeRef()  |  self.basicTypeRef()
+	
+	@Rule
+	def basicTypeRef(self):
+		return self.byteTypeRef() | self.shortTypeRef() | self.intTypeRef() | self.longTypeRef() | self.charTypeRef() | self.floatTypeRef() | self.doubleTypeRef()  |  self.booleanTypeRef()
 	
 	@Rule
 	def booleanTypeRef(self):
 		return Keyword( Keywords.booleanKeyword ).action( lambda input, begin, end, x, bindings: Nodes.BooleanTypeRef() )
-	
-	@Rule
-	def numericTypeRef(self):
-		return self.integralTypeRef() | self.floatingPointTypeRef()
-	
-	@Rule
-	def integralTypeRef(self):
-		return self.byteTypeRef() | self.shortTypeRef() | self.intTypeRef() | self.longTypeRef() | self.charTypeRef()
 	
 	@Rule
 	def byteTypeRef(self):
@@ -154,10 +185,6 @@ class JavaGrammar (Grammar):
 		return Keyword( Keywords.charKeyword ).action( lambda input, begin, end, x, bindings: Nodes.CharTypeRef() )
 	
 	@Rule
-	def floatingPointTypeRef(self):
-		return self.floatTypeRef() | self.doubleTypeRef()
-	
-	@Rule
 	def floatTypeRef(self):
 		return Keyword( Keywords.floatKeyword ).action( lambda input, begin, end, x, bindings: Nodes.FloatTypeRef() )
 	
@@ -167,17 +194,7 @@ class JavaGrammar (Grammar):
 	
 	@Rule
 	def classOrInterfaceTypeRef(self):
-		return self.name().action( lambda input, begin, end, x, bindings: Nodes.ClassOrInterfaceTypeRef( name=x ) )
-	
-	@Rule
-	def arrayTypeRef(self):
-		def _action(input, begin, end, x, bindings):
-			typeRef = x[0]
-			for a in x[1]:
-				typeRef = Nodes.ArrayTypeRef( itemTypeRef=typeRef )
-			return typeRef
-		
-		return ( ( self.primitiveTypeRef() | self.classOrInterfaceTypeRef() ) + ( Literal( '[' ) + Literal( ']' ) ).oneOrMore() ).action( _action )
+		return self.simpleName().action( lambda input, begin, end, x, bindings: Nodes.ClassOrInterfaceTypeRef( name=x ) )
 	
 	
 	

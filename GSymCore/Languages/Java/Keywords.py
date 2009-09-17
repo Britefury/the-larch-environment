@@ -17,6 +17,7 @@ classKeyword = 'class'
 continueKeyword = 'continue'
 doubleKeyword = 'double'
 elseKeyword = 'else'
+extendsKeyword = 'extends'
 falseKeyword = 'false'
 floatKeyword = 'float'
 forKeyword = 'for'
@@ -34,7 +35,7 @@ trueKeyword = 'true'
 tryKeyword = 'try'
 whileKeyword = 'while'
 
-keywords = [ 'assert', 'boolean', 'break', 'byte', 'char', 'class', 'continue', 'double', 'else', 'false', 'float', 'for', 'if', 'import', 'int', 'long', 'new', 'null', 'return', 'short', 'super', 'this', 'true', 'try', 'while' ]
+keywords = [ 'assert', 'boolean', 'break', 'byte', 'char', 'class', 'continue', 'double', 'else', 'extends', 'false', 'float', 'for', 'if', 'import', 'int', 'long', 'new', 'null', 'return', 'short', 'super', 'this', 'true', 'try', 'while' ]
 keywordsSet = set( keywords )
 
 
