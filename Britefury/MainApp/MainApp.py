@@ -41,6 +41,7 @@ from Britefury.Event.QueuedEvent import queueEvent
 
 from Britefury.gSym.gSymWorld import GSymWorld
 from Britefury.gSym.gSymDocument import GSymDocument
+from Britefury.gSym.gSymResolveContext import GSymResolveContext
 from Britefury.gSym.AppControlInterface import AppControlInterface
 
 from GSymCore.GSymApp import GSymApp
@@ -104,7 +105,7 @@ class _AppLocationResolver (LocationResolver):
 	def resolveLocation(self, location):
 		document = self._app._document
 		if document is not None:
-			return document.viewDocLocationAsPage( '', location, self._app )
+			return document.viewDocLocationAsPage( GSymResolveContext( None, '' ), location, self._app )
 		else:
 			return None
 				
@@ -117,7 +118,7 @@ class _AppLocationResolverLISP (LocationResolver):
 	def resolveLocation(self, location):
 		document = self._app._document
 		if document is not None:
-			return document.viewDocLocationAsLispPage( '', location, self._app )
+			return document.viewDocLocationAsLispPage( GSymResolveContext( None, '' ), location, self._app )
 		else:
 			return None
 				

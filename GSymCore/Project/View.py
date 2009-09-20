@@ -13,6 +13,7 @@ from javax.swing import JPopupMenu
 
 from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeDispatchMethod
 
+from Britefury.gSym.gSymResolveContext import GSymResolveContext
 from Britefury.gSym.gSymResolveResult import GSymResolveResult
 from Britefury.gSym.View.GSymView import GSymViewObjectNodeDispatch, GSymViewPage
 
@@ -83,10 +84,10 @@ class ProjectView (GSymViewObjectNodeDispatch):
 	__dispatch_module__ = Nodes.module
 	
 	
-	def __init__(self, document, app, locationPrefix, location):
+	def __init__(self, document, app, resolveContext, location):
 		self._document = document
 		self._app = app
-		self._locationPrefix = locationPrefix
+		self._resolveContext = resolveContext
 		self._location = location
 		
 		
@@ -124,7 +125,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		controlsBox = ctx.hbox( prj_controlsBoxStyle, [ saveLink.padX( 10.0 ), saveAsLink.padX( 10.0 ) ] )
 		controlsBorder = ctx.border( prj_controlsBorder, controlsBox )
 		
-		state = _ProjectViewState( self._locationPrefix )
+		state = _ProjectViewState( self._resolveContext.location )
 		root = ctx.viewEval( rootPackage, state ).alignHExpand()
 		indexBox = tabbedBox( ctx, 'Project Index', root )
 		
@@ -182,43 +183,71 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 	
 	
-def viewProjectDocNodeAsElement(document, docRootNode, locationPrefix, location, commandHistory, app):
-	viewFn = ProjectView( document, app, locationPrefix, location )
+def viewProjectDocNodeAsElement(document, docRootNode, resolveContext, location, commandHistory, app):
+	viewFn = ProjectView( document, app, resolveContext, location )
 	viewContext = GSymViewContext( docRootNode, viewFn, commandHistory )
 	return viewContext.getFrame()
 
 
 
-def viewProjectDocNodeAsPage(document, docRootNode, locationPrefix, location, commandHistory, app):
-	return GSymViewPage( document.getDocumentName(), viewProjectDocNodeAsElement( document, docRootNode, locationPrefix, location, commandHistory, app ), commandHistory )
+def viewProjectDocNodeAsPage(document, docRootNode, resolveContext, location, commandHistory, app):
+	return GSymViewPage( resolveContext.getTitle(), viewProjectDocNodeAsElement( document, docRootNode, resolveContext, location, commandHistory, app ), commandHistory )
 
 
 
-def resolveProjectLocation(currentLanguage, document, docRootNode, locationPrefix, location, app):
+def resolveProjectLocation(currentLanguage, document, docRootNode, resolveContext, location, app):
 	if location == '':
-		return GSymResolveResult( document, docRootNode, currentLanguage, locationPrefix, location )
+		return GSymResolveResult( document, docRootNode, currentLanguage, ProjectResolveContext( resolveContext, '', document ), location )
 	else:
-		loc = location
-		package = docRootNode['rootPackage']
-		while '.' in loc:
-			dotPos = loc.index( '.' )
-			name = loc[:dotPos]
-			loc = loc[dotPos+1:]
-			locationPrefix += name + '.'
+		# Attempt to enter the root package
+		rootPackagePrefix = docRootNode['rootPackage']['name'] + '.'
+		if location.startswith( rootPackagePrefix ):
+			locationPrefix = rootPackagePrefix
+			loc = location[len(rootPackagePrefix):]
+			package = docRootNode['rootPackage']
+		else:
+			return None
+		
+		while loc != '':
+			try:
+				separatorPos = loc.index( '.' )
+				name = loc[:separatorPos]
+				loc = loc[separatorPos+1:]
+				locationPrefix += name + '.'
+			except ValueError:
+				separatorPos = len( loc )
+				name = loc
+				loc = ''
+				locationPrefix += name
 			node = None
 			for n in package['contents']:
 				if n['name'] == name:
 					node = n
 					break
-			if n is None:
+			if node is None:
 				return None
-			elif isinstance( n, DMObjectInterface ):
-				if n.isInstanceOf( Nodes.Package ):
-					package = n
+			elif isinstance( node, DMObjectInterface ):
+				if node.isInstanceOf( Nodes.Package ):
+					package = node
 				elif n.isInstanceOf( Nodes.Page ):
-					return document.resolveUnitLocation( n['unit'], locationPrefix, loc, app )
+					return document.resolveUnitLocation( node['unit'], ProjectResolveContext( resolveContext, locationPrefix, document ), loc, app )
 				else:
 					return None
 			else:
 				return None
 		return None
+
+
+
+class ProjectResolveContext (GSymResolveContext):
+	def __init__(self, innerContext, location, document):
+		super( ProjectResolveContext, self ).__init__( innerContext, location )
+		if location == '':
+			self._title = document.getDocumentName()
+		else:
+			self._title = location + ' [' + document.getDocumentName() + ']'
+		
+	def getTitle(self):
+		return self._title
+
+

@@ -7,6 +7,7 @@
 ##-*************************
 from Britefury.Util.NodeUtil import isListNode, isObjectNode, isStringNode
 
+from Britefury.gSym.gSymResolveContext import GSymResolveContext
 from Britefury.gSym.gSymResolveResult import GSymResolveResult
 from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replaceNodeContents, append, prepend, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
 from Britefury.gSym.View.GSymView import GSymViewPage
@@ -172,15 +173,15 @@ def viewLispNode(node, ctx, state):
 	
 
 
-def viewLISPDocNodeAsElement(document, docNode, locationPrefix, location, commandHistory, app):
+def viewLISPDocNodeAsElement(document, docNode, resolveContext, location, commandHistory, app):
 	viewContext = GSymViewContext( docNode, viewLispNode, commandHistory )
 	return viewContext.getFrame()
 
 
 
-def viewLISPDocNodeAsPage(document, docNode, locationPrefix, location, commandHistory, app):
-	return GSymViewPage( 'Model: ' + locationPrefix, viewLISPDocNodeAsElement( document, docNode, locationPrefix, location, commandHistory, app ), commandHistory )
+def viewLISPDocNodeAsPage(document, docNode, resolveContext, location, commandHistory, app):
+	return GSymViewPage( 'Model: ' + resolveContext.getTitle(), viewLISPDocNodeAsElement( document, docNode, resolveContext, location, commandHistory, app ), commandHistory )
 
 
-def resolveLISPLocation(currentLanguage, document, docRootNode, locationPrefix, location, app):
-	return GSymResolveResult( document, docRootNode, currentLanguage, locationPrefix, location )
+def resolveLISPLocation(currentLanguage, document, docRootNode, resolveContext, location, app):
+	return GSymResolveResult( document, docRootNode, currentLanguage, resolveContext, location )

@@ -12,6 +12,7 @@ from BritefuryJ.Parser.ItemStream import ItemStreamBuilder
 
 from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeDispatchMethod
 
+from Britefury.gSym.gSymResolveContext import GSymResolveContext
 from Britefury.gSym.gSymResolveResult import GSymResolveResult
 from Britefury.gSym.View.GSymView import GSymViewObjectNodeDispatch, GSymViewPage
 
@@ -1531,16 +1532,16 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 
 
-def viewPython25DocNodeAsElement(document, docRootNode, locationPrefix, location, commandHistory, app):
+def viewPython25DocNodeAsElement(document, docRootNode, resolveContext, location, commandHistory, app):
 	viewContext = GSymViewContext( docRootNode, Python25View(), commandHistory )
 	editHandler = Python25EditHandler( viewContext )
 	viewContext.getFrame().setEditHandler( editHandler )
 	return viewContext.getFrame()
 
 
-def viewPython25DocNodeAsPage(document, docRootNode, locationPrefix, location, commandHistory, app):
-	return GSymViewPage( 'Python', viewPython25DocNodeAsElement( document, docRootNode, locationPrefix, location, commandHistory, app ), commandHistory )
+def viewPython25DocNodeAsPage(document, docRootNode, resolveContext, location, commandHistory, app):
+	return GSymViewPage( 'Python: ' + resolveContext.getTitle(), viewPython25DocNodeAsElement( document, docRootNode, resolveContext, location, commandHistory, app ), commandHistory )
 
 
-def resolvePython25Location(currentLanguage, document, docRootNode, locationPrefix, location, app):
-	return GSymResolveResult( document, docRootNode, currentLanguage, locationPrefix, location )
+def resolvePython25Location(currentLanguage, document, docRootNode, resolveContext, location, app):
+	return GSymResolveResult( document, docRootNode, currentLanguage, resolveContext, location )

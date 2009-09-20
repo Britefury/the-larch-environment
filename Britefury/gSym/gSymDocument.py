@@ -113,69 +113,69 @@ class GSymDocument (CommandHistoryListener):
 		
 		
 	
-	def viewDocLocationAsPage(self, locationPrefix, location, app):
-		return self.viewUnitLocationAsPage( self._unit, locationPrefix, location, app )
+	def viewDocLocationAsPage(self, resolveContext, location, app):
+		return self.viewUnitLocationAsPage( self._unit, resolveContext, location, app )
 	
 	
-	def viewDocLocationAsLispPage(self, locationPrefix, location, app):
-		return self.viewUnitLocationAsLispPage( self._unit, locationPrefix, location, app )
+	def viewDocLocationAsLispPage(self, resolveContext, location, app):
+		return self.viewUnitLocationAsLispPage( self._unit, resolveContext, location, app )
 
 
 	
-	def viewUnitLocationAsPage(self, unit, locationPrefix, location, app):
-		resolveResult = self.resolveUnitLocation( unit, locationPrefix, location, app )
+	def viewUnitLocationAsPage(self, unit, resolveContext, location, app):
+		resolveResult = self.resolveUnitLocation( unit, resolveContext, location, app )
 		if resolveResult is not None:
 			viewLocationAsPageFn = resolveResult.language.getViewDocNodeAsPageFn()
-			return viewLocationAsPageFn( resolveResult.document, resolveResult.docNode, resolveResult.locationPrefix, resolveResult.location, self._commandHistory, app )
+			return viewLocationAsPageFn( resolveResult.document, resolveResult.docNode, resolveResult.resolveContext, resolveResult.location, self._commandHistory, app )
 		else:
 			return None
 	
 	
-	def viewUnitLocationAsLispPage(self, unit, locationPrefix, location, app):
-		resolveResult = self.resolveUnitLocation( unit, locationPrefix, location, app )
+	def viewUnitLocationAsLispPage(self, unit, resolveContext, location, app):
+		resolveResult = self.resolveUnitLocation( unit, resolveContext, location, app )
 		if resolveResult is not None:
 			viewLocationAsPageFn = LISP.language.getViewDocNodeAsPageFn()
-			return viewLocationAsPageFn( resolveResult.document, resolveResult.docNode, resolveResult.locationPrefix, resolveResult.location, self._commandHistory, app )
+			return viewLocationAsPageFn( resolveResult.document, resolveResult.docNode, resolveResult.resolveContext, resolveResult.location, self._commandHistory, app )
 		else:
 			return None
 
 
 	
-	def viewDocLocationAsElement(self, locationPrefix, location, app):
-		return self.viewUnitLocationAsElement( self._unit, locationPrefix, location, app )
+	def viewDocLocationAsElement(self, resolveContext, location, app):
+		return self.viewUnitLocationAsElement( self._unit, resolveContext, location, app )
 	
 	
-	def viewDocLocationAsLispElement(self, locationPrefix, location, app):
-		return self.viewUnitLocationAsLispElement( self._unit, locationPrefix, location, app )
+	def viewDocLocationAsLispElement(self, resolveContext, location, app):
+		return self.viewUnitLocationAsLispElement( self._unit, resolveContext, location, app )
 
 
 	
-	def viewUnitLocationAsElement(self, unit, locationPrefix, location, app):
-		resolveResult = self.resolveUnitLocation( unit, locationPrefix, location, app )
+	def viewUnitLocationAsElement(self, unit, resolveContext, location, app):
+		resolveResult = self.resolveUnitLocation( unit, resolveContext, location, app )
 		if resolveResult is not None:
 			viewLocationAsElementFn = resolveResult.language.getViewDocNodeAsElementFn()
-			return viewLocationAsElementFn( resolveResult.document, resolveResult.docNode, resolveResult.locationPrefix, resolveResult.location, self._commandHistory, app )
+			return viewLocationAsElementFn( resolveResult.document, resolveResult.docNode, resolveResult.resolveContext, resolveResult.location, self._commandHistory, app )
 		else:
 			return None
 	
 	
-	def viewUnitLocationAsLispElement(self, unit, locationPrefix, location, app):
-		resolveResult = self.resolveUnitLocation( unit, locationPrefix, location, app )
+	def viewUnitLocationAsLispElement(self, unit, resolveContext, location, app):
+		resolveResult = self.resolveUnitLocation( unit, resolveContext, location, app )
 		if resolveResult is not None:
 			viewLocationAsElementFn = LISP.language.getViewDocNodeAsElementFn()
-			return viewLocationAsElementFn( resolveResult.document, resolveResult.docNode, resolveResult.locationPrefix, resolveResult.location, self._commandHistory, app )
+			return viewLocationAsElementFn( resolveResult.document, resolveResult.docNode, resolveResult.resolveContext, resolveResult.location, self._commandHistory, app )
 		else:
 			return None
 
 
 	
-	def resolveLocation(self, locationPrefix, location, app):
-		return self.resolveUnitLocation( self._unit, locationPrefix, location, app )
+	def resolveLocation(self, resolveContext, location, app):
+		return self.resolveUnitLocation( self._unit, resolveContext, location, app )
 	
-	def resolveUnitLocation(self, unit, locationPrefix, location, app):
+	def resolveUnitLocation(self, unit, resolveContext, location, app):
 		language = self._world.getLanguage( gSymUnit_getLanguageModuleName( unit ) )
 		resolveLocationFn = language.getResolveLocationFn()
-		return resolveLocationFn( language, self, gSymUnit_getContent( unit ), locationPrefix, location, app )
+		return resolveLocationFn( language, self, gSymUnit_getContent( unit ), resolveContext, location, app )
 		
 	
 	

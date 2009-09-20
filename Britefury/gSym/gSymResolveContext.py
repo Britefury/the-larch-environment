@@ -7,10 +7,10 @@
 ##-*************************
 
 
-class GSymResolveResult (object):
-	def __init__(self, document, docNode, language, resolveContext, location):
-		self.document = document
-		self.docNode = docNode
-		self.language = language
-		self.resolveContext = resolveContext
-		self.location = location
+class GSymResolveContext (object):
+	def __init__(self, innerContext, location):
+		innerLocation = innerContext.location   if innerContext is not None   else  ''
+		self.location = innerLocation + location
+		
+	def getTitle(self):
+		return self.location
