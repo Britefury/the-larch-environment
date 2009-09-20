@@ -28,7 +28,7 @@ public class TableTestPage extends SystemPage
 	}
 	
 	
-	protected String getTitle()
+	public String getTitle()
 	{
 		return "Table test";
 	}

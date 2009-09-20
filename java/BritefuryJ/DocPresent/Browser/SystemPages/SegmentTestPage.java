@@ -27,7 +27,7 @@ public class SegmentTestPage extends SystemPage
 	}
 	
 	
-	protected String getTitle()
+	public String getTitle()
 	{
 		return "Segment test";
 	}

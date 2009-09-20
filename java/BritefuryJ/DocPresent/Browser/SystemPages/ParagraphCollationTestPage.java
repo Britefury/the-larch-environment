@@ -29,7 +29,7 @@ public class ParagraphCollationTestPage extends SystemPage
 	}
 	
 	
-	protected String getTitle()
+	public String getTitle()
 	{
 		return "Paragraph collation test";
 	}

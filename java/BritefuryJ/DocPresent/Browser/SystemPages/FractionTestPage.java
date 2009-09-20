@@ -28,7 +28,7 @@ public class FractionTestPage extends SystemPage
 	}
 	
 	
-	protected String getTitle()
+	public String getTitle()
 	{
 		return "Fraction test";
 	}

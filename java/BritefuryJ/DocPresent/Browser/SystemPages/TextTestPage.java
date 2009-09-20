@@ -22,7 +22,7 @@ public class TextTestPage extends SystemPage
 	}
 	
 	
-	protected String getTitle()
+	public String getTitle()
 	{
 		return "Text test";
 	}

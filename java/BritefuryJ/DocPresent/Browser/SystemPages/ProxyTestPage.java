@@ -29,7 +29,7 @@ public class ProxyTestPage extends SystemPage
 	}
 	
 	
-	protected String getTitle()
+	public String getTitle()
 	{
 		return "Proxy test";
 	}

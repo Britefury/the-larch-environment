@@ -126,8 +126,6 @@ public abstract class SystemPage extends Page
 	}
 
 	
-	protected abstract String getTitle();
-	
 	protected String getDescription()
 	{
 		return null;

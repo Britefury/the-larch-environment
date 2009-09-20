@@ -27,7 +27,7 @@ public class HBoxTestPage extends SystemPage
 	}
 	
 	
-	protected String getTitle()
+	public String getTitle()
 	{
 		return "H-Box test";
 	}

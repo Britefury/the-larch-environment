@@ -40,7 +40,7 @@ public class DndTestPage extends SystemPage
 	}
 	
 	
-	protected String getTitle()
+	public String getTitle()
 	{
 		return "Drag and Drop test";
 	}
