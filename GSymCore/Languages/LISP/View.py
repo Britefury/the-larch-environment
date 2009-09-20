@@ -172,14 +172,14 @@ def viewLispNode(node, ctx, state):
 	
 
 
-def viewLISPDocNodeAsElement(document, docRootNode, locationPrefix, location, commandHistory, app):
+def viewLISPDocNodeAsElement(document, docNode, locationPrefix, location, commandHistory, app):
 	viewContext = GSymViewContext( docNode, viewLispNode, commandHistory )
 	return viewContext.getFrame()
 
 
 
-def viewLISPDocNodeAsPage(document, docRootNode, locationPrefix, location, commandHistory, app):
-	return GSymViewPage( locationPrefix, viewLISPDocNodeAsElement( document, docRootNode, locationPrefix, location, commandHistory, app ), commandHistory )
+def viewLISPDocNodeAsPage(document, docNode, locationPrefix, location, commandHistory, app):
+	return GSymViewPage( 'Model: ' + locationPrefix, viewLISPDocNodeAsElement( document, docNode, locationPrefix, location, commandHistory, app ), commandHistory )
 
 
 def resolveLISPLocation(currentLanguage, document, docRootNode, locationPrefix, location, app):
