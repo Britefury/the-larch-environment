@@ -11,8 +11,6 @@ from BritefuryJ.CommandHistory import CommandHistory, CommandHistoryListener
 
 from BritefuryJ.DocModel import DMNode, DMModule, DMIOReader, DMIOWriter
 
-from BritefuryJ.DocPresent.Browser import Page
-
 from Britefury.Kernel.Abstract import abstractmethod
 
 from Britefury.Util.NodeUtil import isObjectNode
@@ -70,22 +68,6 @@ def gSymUnit_getContent(unit):
 
 
 
-class _DocViewPage (Page):
-	def __init__(self, element, commandHistory):
-		self._element = element
-		self._commandHistory = commandHistory
-		
-		
-	def getContentsElement(self):
-		return self._element
-	
-	def getCommandHistoryController(self):
-		return self._commandHistory
-	
-	def setCommandHistoryListener(self, listener):
-		self._commandHistory.setCommandHistoryListener( listener )
-
-
 class GSymDocument (CommandHistoryListener):
 	def __init__(self, world, unit):
 		self._world = world
@@ -132,17 +114,28 @@ class GSymDocument (CommandHistoryListener):
 		
 	
 	def viewDocLocationAsPage(self, locationPrefix, location, app):
-		element = self.viewUnitLocationAsElement( self._unit, locationPrefix, location, app )
-		if element is not None:
-			return _DocViewPage( element, self._commandHistory )
+		return self.viewUnitLocationAsPage( self._unit, locationPrefix, location, app )
+	
+	
+	def viewDocLocationAsLispPage(self, locationPrefix, location, app):
+		return self.viewUnitLocationAsLispPage( self._unit, locationPrefix, location, app )
+
+
+	
+	def viewUnitLocationAsPage(self, unit, locationPrefix, location, app):
+		resolveResult = self.resolveUnitLocation( unit, locationPrefix, location, app )
+		if resolveResult is not None:
+			viewLocationAsPageFn = resolveResult.language.getViewDocNodeAsPageFn()
+			return viewLocationAsPageFn( resolveResult.document, resolveResult.docNode, resolveResult.locationPrefix, resolveResult.location, self._commandHistory, app )
 		else:
 			return None
 	
 	
-	def viewDocLocationAsLispPage(self, locationPrefix, location, app):
-		element = self.viewUnitLocationAsLispElement( self._unit, locationPrefix, location, app )
-		if element is not None:
-			return _DocViewPage( element, self._commandHistory )
+	def viewUnitLocationAsLispPage(self, unit, locationPrefix, location, app):
+		resolveResult = self.resolveUnitLocation( unit, locationPrefix, location, app )
+		if resolveResult is not None:
+			viewLocationAsPageFn = LISP.language.getViewDocNodeAsPageFn()
+			return viewLocationAsPageFn( resolveResult.document, resolveResult.docNode, resolveResult.locationPrefix, resolveResult.location, self._commandHistory, app )
 		else:
 			return None
 
@@ -161,7 +154,7 @@ class GSymDocument (CommandHistoryListener):
 		resolveResult = self.resolveUnitLocation( unit, locationPrefix, location, app )
 		if resolveResult is not None:
 			viewLocationAsElementFn = resolveResult.language.getViewDocNodeAsElementFn()
-			return viewLocationAsElementFn( self, resolveResult.docNode, resolveResult.locationPrefix, resolveResult.location, self._commandHistory, app )
+			return viewLocationAsElementFn( resolveResult.document, resolveResult.docNode, resolveResult.locationPrefix, resolveResult.location, self._commandHistory, app )
 		else:
 			return None
 	
@@ -170,7 +163,7 @@ class GSymDocument (CommandHistoryListener):
 		resolveResult = self.resolveUnitLocation( unit, locationPrefix, location, app )
 		if resolveResult is not None:
 			viewLocationAsElementFn = LISP.language.getViewDocNodeAsElementFn()
-			return viewLocationAsElementFn( self, resolveResult.docNode, resolveResult.locationPrefix, resolveResult.location, self._commandHistory, app )
+			return viewLocationAsElementFn( resolveResult.document, resolveResult.docNode, resolveResult.locationPrefix, resolveResult.location, self._commandHistory, app )
 		else:
 			return None
 

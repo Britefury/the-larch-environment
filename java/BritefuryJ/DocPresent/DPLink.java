@@ -17,7 +17,7 @@ public class DPLink extends DPStaticText
 {
 	public interface LinkListener
 	{
-		public void onLinkClicked(DPLink link);
+		public boolean onLinkClicked(DPLink link, PointerButtonEvent buttonEvent);
 	}
 	
 	
@@ -31,10 +31,23 @@ public class DPLink extends DPStaticText
 			this.targetLocation = targetLocation;
 		}
 		
-		public void onLinkClicked(DPLink link)
+		public boolean onLinkClicked(DPLink link, PointerButtonEvent buttonEvent)
 		{
 			PageController pageController = link.presentationArea.getPageController();
-			pageController.goToLocation( targetLocation );
+			if ( buttonEvent.getButton() == 1 )
+			{
+				pageController.openLocation( targetLocation, PageController.OpenOperation.OPEN_IN_CURRENT_TAB );
+				return true;
+			}
+			else if ( buttonEvent.getButton() == 2 )
+			{
+				pageController.openLocation( targetLocation, PageController.OpenOperation.OPEN_IN_NEW_TAB );
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 	}
 	
@@ -49,9 +62,9 @@ public class DPLink extends DPStaticText
 			this.callable = callable;
 		}
 		
-		public void onLinkClicked(DPLink link)
+		public boolean onLinkClicked(DPLink link, PointerButtonEvent buttonEvent)
 		{
-			callable.__call__( Py.java2py( link ) );
+			return Py.py2boolean( callable.__call__( Py.java2py( link ), Py.java2py( buttonEvent ) ) );
 		}
 	}
 	
@@ -122,7 +135,7 @@ public class DPLink extends DPStaticText
 	protected boolean onButtonDown(PointerButtonEvent event)
 	{
 		super.onButtonDown( event );
-		return event.button == 1;
+		return true;
 	}
 
 	protected boolean onButtonUp(PointerButtonEvent event)
@@ -131,11 +144,7 @@ public class DPLink extends DPStaticText
 		
 		if ( isRealised() )
 		{
-			if ( event.button == 1 )
-			{
-				listener.onLinkClicked( this );
-				return true;
-			}
+			return listener.onLinkClicked( this, event );
 		}
 		
 		return false;

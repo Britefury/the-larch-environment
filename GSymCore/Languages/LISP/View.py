@@ -9,6 +9,7 @@ from Britefury.Util.NodeUtil import isListNode, isObjectNode, isStringNode
 
 from Britefury.gSym.gSymResolveResult import GSymResolveResult
 from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replaceNodeContents, append, prepend, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
+from Britefury.gSym.View.GSymView import GSymViewPage
 
 
 from BritefuryJ.DocPresent import *
@@ -176,5 +177,10 @@ def viewLISPDocNodeAsElement(document, docRootNode, locationPrefix, location, co
 	return viewContext.getFrame()
 
 
+
+def viewLISPDocNodeAsPage(document, docRootNode, locationPrefix, location, commandHistory, app):
+	return GSymViewPage( locationPrefix, viewLISPDocNodeAsElement( document, docRootNode, locationPrefix, location, commandHistory, app ), commandHistory )
+
+
 def resolveLISPLocation(currentLanguage, document, docRootNode, locationPrefix, location, app):
-	return GSymResolveResult( docRootNode, currentLanguage, locationPrefix, location )
+	return GSymResolveResult( document, docRootNode, currentLanguage, locationPrefix, location )

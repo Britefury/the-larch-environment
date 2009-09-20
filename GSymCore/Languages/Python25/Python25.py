@@ -9,7 +9,7 @@ from Britefury.gSym.gSymLanguage import GSymLanguage, GSymPageFactory, GSymPageI
 from Britefury.gSym.gSymDocument import gSymUnit
 
 from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
-from GSymCore.Languages.Python25.View import viewPython25DocNodeAsElement, resolvePython25Location
+from GSymCore.Languages.Python25.View import viewPython25DocNodeAsElement, viewPython25DocNodeAsPage, resolvePython25Location
 from GSymCore.Languages.Python25 import NodeClasses as Nodes
 from GSymCore.Languages.Python25.Python25Importer import importPy25File
 
@@ -27,6 +27,7 @@ def _py25ImportFile(filename):
 language = GSymLanguage( 'Python25' )
 language.registerCodeGeneratorFactory( 'ascii', Python25CodeGenerator )
 language.registerViewDocNodeAsElementFn( viewPython25DocNodeAsElement )
+language.registerViewDocNodeAsPageFn( viewPython25DocNodeAsPage )
 language.registerResolveLocationFn( resolvePython25Location )
 
 

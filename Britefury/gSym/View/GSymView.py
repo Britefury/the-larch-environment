@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
+from BritefuryJ.DocPresent.Browser import Page
+
 from Britefury.Dispatch.Dispatch import DispatchError
 from Britefury.Dispatch.MethodDispatch import methodDispatch, methodDispatchAndGetName
 from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeMethodDispatchMetaClass, objectNodeMethodDispatch, objectNodeMethodDispatchAndGetName
@@ -49,5 +51,25 @@ class GSymViewObjectNodeDispatch (object):
 		
 
 	
+class GSymViewPage (Page):
+	def __init__(self, title, element, commandHistory):
+		self._title = title
+		self._element = element
+		self._commandHistory = commandHistory
+		
+		
+	def getTitle(self):
+		return self._title
+	
+	def getContentsElement(self):
+		return self._element
+	
+	def getCommandHistoryController(self):
+		return self._commandHistory
+	
+	def setCommandHistoryListener(self, listener):
+		self._commandHistory.setCommandHistoryListener( listener )
+
+
 
 

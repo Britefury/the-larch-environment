@@ -8,5 +8,12 @@ package BritefuryJ.DocPresent;
 
 public interface PageController
 {
-	public void goToLocation(String location);
+	public enum OpenOperation
+	{
+		OPEN_IN_CURRENT_TAB,
+		OPEN_IN_NEW_TAB,
+		OPEN_IN_NEW_WINDOW
+	}
+	
+	public void openLocation(String location, OpenOperation op);
 }

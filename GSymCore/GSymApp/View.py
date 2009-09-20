@@ -13,7 +13,7 @@ from javax.swing import JPopupMenu
 
 from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeDispatchMethod
 
-from Britefury.gSym.View.GSymView import GSymViewObjectNodeDispatch
+from Britefury.gSym.View.GSymView import GSymViewObjectNodeDispatch, GSymViewPage
 from Britefury.gSym.gSymDocument import GSymDocument
 from Britefury.gSym.gSymResolveResult import GSymResolveResult
 
@@ -135,7 +135,7 @@ class AppView (GSymViewObjectNodeDispatch):
 		
 	@ObjectNodeDispatchMethod
 	def AppState(self, ctx, state, node, openDocuments, configuration):
-		def _onNew(link):
+		def _onNew(link, buttonEvent):
 			def handleNewDocumentFn(unit):
 				world = self._app.getWorld()
 				
@@ -153,7 +153,7 @@ class AppView (GSymViewObjectNodeDispatch):
 		
 			
 			
-		def _onOpen(link):
+		def _onOpen(link, buttonEvent):
 			def handleOpenedDocumentFn(fullPath, document):
 				world = self._app.getWorld()
 				
@@ -196,7 +196,7 @@ class AppView (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod
 	def AppDocument(self, ctx, state, node, name, location):
-		def _onSave(link):
+		def _onSave(link, buttonEvent):
 			world = self._app.getWorld()
 			document = world.getDocument( location )
 			
@@ -209,7 +209,7 @@ class AppView (GSymViewObjectNodeDispatch):
 				document.save()
 				
 		
-		def _onSaveAs(link):
+		def _onSaveAs(link, buttonEvent):
 			world = self._app.getWorld()
 			document = world.getDocument( location )
 			
@@ -240,16 +240,21 @@ def viewGSymAppDocNodeAsElement(document, docRootNode, locationPrefix, location,
 
 
 
+def viewGSymAppDocNodeAsPage(document, docRootNode, locationPrefix, location, commandHistory, app):
+	return GSymViewPage( 'gSym', viewGSymAppDocNodeAsElement( document, docRootNode, locationPrefix, location, commandHistory, app ), commandHistory )
+
+
+
 def resolveGSymAppLocation(currentLanguage, document, docRootNode, locationPrefix, location, app):
 	if location == '':
-		return GSymResolveResult( docRootNode, currentLanguage, locationPrefix, location )
+		return GSymResolveResult( document, docRootNode, currentLanguage, locationPrefix, location )
 	else:
 		documentLocation, dot, tail = location.partition( '.' )
 		
 		doc = app.getWorld().getDocument( documentLocation )
 		
 		if doc is not None:
-			return doc.resolveLocation( documentLocation + locationPrefix, tail, app )
+			return doc.resolveLocation( locationPrefix + documentLocation, tail, app )
 		else:
 			return None
 

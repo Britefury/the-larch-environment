@@ -34,8 +34,9 @@ thisKeyword = 'this'
 trueKeyword = 'true'
 tryKeyword = 'try'
 whileKeyword = 'while'
+voidKeyword = 'void'
 
-keywords = [ 'assert', 'boolean', 'break', 'byte', 'char', 'class', 'continue', 'double', 'else', 'extends', 'false', 'float', 'for', 'if', 'import', 'int', 'long', 'new', 'null', 'return', 'short', 'super', 'this', 'true', 'try', 'while' ]
+keywords = [ 'assert', 'boolean', 'break', 'byte', 'char', 'class', 'continue', 'double', 'else', 'extends', 'false', 'float', 'for', 'if', 'import', 'int', 'long', 'new', 'null', 'return', 'short', 'super', 'this', 'true', 'try', 'while', 'void' ]
 keywordsSet = set( keywords )
 
 

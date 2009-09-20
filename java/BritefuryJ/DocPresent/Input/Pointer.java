@@ -346,9 +346,14 @@ public class Pointer extends PointerInterface
 	
 	
 	
-	public void setModifiers(int mods)
+	public void setButtonModifiers(int mods)
 	{
-		modifiers = mods;
+		modifiers = ( modifiers & ~Modifier._BUTTONS_MASK )  |  ( mods & Modifier._BUTTONS_MASK );
+	}
+	
+	public void setKeyModifiers(int mods)
+	{
+		modifiers = ( modifiers & ~Modifier._KEYS_MASK )  |  ( mods & Modifier._KEYS_MASK );
 	}
 	
 	
@@ -450,12 +455,7 @@ public class Pointer extends PointerInterface
 			
 			if ( sourceElement != null )
 			{
-				DndDropLocal drop = new DndDropLocal( sourceElement, event.button );
-				
-				if ( drop != null )
-				{
-					dndDrop = drop;
-				}
+				dndDrop = new DndDropLocal( sourceElement, event.button );
 			}
 		}
 	}
@@ -530,6 +530,7 @@ public class Pointer extends PointerInterface
 			}
 			else
 			{
+				dndDrop = null;
 				return false;
 			}
 		}

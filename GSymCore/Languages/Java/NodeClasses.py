@@ -50,7 +50,6 @@ NullLiteral = module.newClass( 'NullLiteral', Literal, [] )
 # Types
 #
 TypeExpression = module.newClass( 'TypeExpression', Node, [] )
-TypeRef = module.newClass( 'TypeRef', TypeExpression, [] )
 
 GenericTypeExp = module.newClass( 'GenericTypeExp', TypeExpression, [ 'target', 'args' ] )
 WildCardTypeArgument = module.newClass( 'WildCardTypeArgument', Node, [ 'extendsOrSuper', 'typeExp' ] )
@@ -58,27 +57,32 @@ WildCardTypeArgument = module.newClass( 'WildCardTypeArgument', Node, [ 'extends
 MemberTypeExp = module.newClass( 'MemberTypeExp', TypeExpression, [ 'target', 'member' ] )
 ArrayTypeExp = module.newClass( 'ArrayTypeExp', TypeExpression, [ 'itemTypeExp' ] )
 
-BasicTypeRef = module.newClass( 'BasicTypeRef', TypeRef, [] )
-BooleanTypeRef = module.newClass( 'BooleanType', BasicTypeRef, [] )
-ByteTypeRef = module.newClass( 'ByteTypeRef', BasicTypeRef, [] )
-ShortTypeRef = module.newClass( 'ShortTypeRef', BasicTypeRef, [] )
-IntTypeRef = module.newClass( 'IntTypeRef', BasicTypeRef, [] )
-LongTypeRef = module.newClass( 'LongTypeRef', BasicTypeRef, [] )
-CharTypeRef = module.newClass( 'CharTypeRef', BasicTypeRef, [] )
-FloatTypeRef = module.newClass( 'FloatTypeRef', BasicTypeRef, [] )
-DoubleTypeRef = module.newClass( 'DoubleTypeRef', BasicTypeRef, [] )
-
+TypeRef = module.newClass( 'TypeRef', TypeExpression, [] )
 ClassOrInterfaceTypeRef = module.newClass( 'ClassOrInterfaceTypeRef', TypeRef, [ 'name' ] )
+PrimitiveTypeRef = module.newClass( 'PrimitiveTypeRef', TypeRef, [] )
+BooleanTypeRef = module.newClass( 'BooleanType', PrimitiveTypeRef, [] )
+ByteTypeRef = module.newClass( 'ByteTypeRef', PrimitiveTypeRef, [] )
+ShortTypeRef = module.newClass( 'ShortTypeRef', PrimitiveTypeRef, [] )
+IntTypeRef = module.newClass( 'IntTypeRef', PrimitiveTypeRef, [] )
+LongTypeRef = module.newClass( 'LongTypeRef', PrimitiveTypeRef, [] )
+CharTypeRef = module.newClass( 'CharTypeRef', PrimitiveTypeRef, [] )
+FloatTypeRef = module.newClass( 'FloatTypeRef', PrimitiveTypeRef, [] )
+DoubleTypeRef = module.newClass( 'DoubleTypeRef', PrimitiveTypeRef, [] )
+
 
 
 #
 # Primary expressions
 #
+TypeClassExp = module.newClass( 'TypeClassExp', Expr, [ 'typeExp' ] )
+VoidClassExp = module.newClass( 'VoidClassExp', Expr, [] )
 ThisExp = module.newClass( 'ThisExp', Expr, [] )
 SuperExp = module.newClass( 'SuperExp', Expr, [] )
 ClassInstanceCreation = module.newClass( 'ClassInstanceCreation', Expr, [ 'classTypeRef', 'args' ] )
 ArrayCreation = module.newClass( 'ArrayCreation', Expr, [ 'itemTypeRef', 'fixedDimensions', 'numUnfixedDimensions' ] )
 FieldAccess = module.newClass( 'FieldAccess', Expr, [ 'target', 'fieldName' ] )
+MethodInvocation = module.newClass( 'MethodInvocation', Expr, [ 'target', 'methodName', 'args' ] )
+ArrayAccess = module.newClass( 'ArrayAccess', Expr, [ 'target', 'index' ] )
 
 
 

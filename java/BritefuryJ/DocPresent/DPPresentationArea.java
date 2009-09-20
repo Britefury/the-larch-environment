@@ -271,12 +271,12 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	
 		public void mousePressed(MouseEvent e)
 		{
-			area.mouseDownEvent( getButton( e ), new Point2( (double)e.getX(), (double)e.getY() ), getModifiers( e ) );
+			area.mouseDownEvent( getButton( e ), new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ) );
 		}
 
 		public void mouseReleased(MouseEvent e)
 		{
-			area.mouseUpEvent( getButton( e ), new Point2( (double)e.getX(), (double)e.getY() ), getModifiers( e ) );
+			area.mouseUpEvent( getButton( e ), new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ) );
 		}
 
 		
@@ -285,10 +285,10 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 			switch ( e.getClickCount() )
 			{
 			case 2:
-				area.mouseDown2Event( getButton( e ), new Point2( (double)e.getX(), (double)e.getY() ), getModifiers( e ) );
+				area.mouseDown2Event( getButton( e ), new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ) );
 				break;
 			case 3:
-				area.mouseDown3Event( getButton( e ), new Point2( (double)e.getX(), (double)e.getY() ), getModifiers( e ) );
+				area.mouseDown3Event( getButton( e ), new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ) );
 				break;
 			default:
 				break;
@@ -298,22 +298,22 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		
 		public void mouseMoved(MouseEvent e)
 		{
-			area.mouseMotionEvent( new Point2( (double)e.getX(), (double)e.getY() ), getModifiers( e ), e );
+			area.mouseMotionEvent( new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), e );
 		}
 
 		public void mouseDragged(MouseEvent e)
 		{
-			area.mouseDragEvent( new Point2( (double)e.getX(), (double)e.getY() ), getModifiers( e ), e );
+			area.mouseDragEvent( new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), e );
 		}
 
 		public void mouseEntered(MouseEvent e)
 		{
-			area.mouseEnterEvent( new Point2( (double)e.getX(), (double)e.getY() ), getModifiers( e ) );
+			area.mouseEnterEvent( new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ) );
 		}
 
 		public void mouseExited(MouseEvent e)
 		{
-			area.mouseLeaveEvent( new Point2( (double)e.getX(), (double)e.getY() ), getModifiers( e ) );
+			area.mouseLeaveEvent( new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ) );
 		}
 
 
@@ -322,7 +322,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 
 		public void mouseWheelMoved(MouseWheelEvent e)
 		{
-			area.mouseWheelEvent( new Point2( (double)e.getX(), (double)e.getY() ), e.getWheelRotation(), e.getUnitsToScroll(), getModifiers( e ) );
+			area.mouseWheelEvent( new Point2( (double)e.getX(), (double)e.getY() ), e.getWheelRotation(), e.getUnitsToScroll(), getButtonModifiers( e ) );
 		}
 		
 		
@@ -342,19 +342,19 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		
 		public void keyPressed(KeyEvent e)
 		{
-			area.keyPressEvent( e, getModifiers( e ) );
+			area.keyPressEvent( e, getKeyModifiers( e ) );
 		}
 
 
 		public void keyReleased(KeyEvent e)
 		{
-			area.keyReleaseEvent( e, getModifiers( e ) );
+			area.keyReleaseEvent( e, getKeyModifiers( e ) );
 		}
 
 
 		public void keyTyped(KeyEvent e)
 		{
-			area.keyTypedEvent( e, getModifiers( e ) );
+			area.keyTypedEvent( e, getKeyModifiers( e ) );
 		}
 		
 		
@@ -436,7 +436,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 			}
 		}
 		
-		private static int getModifiers(InputEvent e)
+		private static int getButtonModifiers(InputEvent e)
 		{
 			int modifiers = 0;
 			int m = e.getModifiersEx();
@@ -456,22 +456,29 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 				modifiers |= Modifier.BUTTON3;
 			}
 			
-			if ( ( m & InputEvent.CTRL_DOWN_MASK )  !=  0 )
+			return modifiers;
+		}
+
+		private static int getKeyModifiers(InputEvent e)
+		{
+			int modifiers = 0;
+			
+			if ( e.isControlDown() )
 			{
 				modifiers |= Modifier.CTRL;
 			}
 			
-			if ( ( m & InputEvent.SHIFT_DOWN_MASK )  !=  0 )
+			if ( e.isShiftDown() )
 			{
 				modifiers |= Modifier.SHIFT;
 			}
 			
-			if ( ( m & InputEvent.ALT_DOWN_MASK )  !=  0 )
+			if ( e.isAltDown() )
 			{
 				modifiers |= Modifier.ALT;
 			}
 			
-			if ( ( m & InputEvent.ALT_GRAPH_DOWN_MASK )  !=  0 )
+			if ( e.isAltGraphDown() )
 			{
 				modifiers |= Modifier.ALT_GRAPH;
 			}
@@ -1300,7 +1307,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		component.presentationComponent.grabFocus();
 		Point2 rootPos = windowSpaceToRootSpace( windowPos );
 		rootSpaceMouse.setLocalPos( rootPos );
-		rootSpaceMouse.setModifiers( modifiers );
+		rootSpaceMouse.setButtonModifiers( modifiers );
 		if ( button == 1  &&  ( modifiers & ( Modifier.ALT | Modifier.ALT_GRAPH | Modifier.CTRL | Modifier.SHIFT ) )  ==  0 )
 		{
 			DPContentLeafEditableEntry leaf = (DPContentLeafEditableEntry)getLeafClosestToLocalPoint( rootPos, new DPContentLeafEditableEntry.EditableEntryLeafElementFilter() );
@@ -1341,7 +1348,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	{
 		Point2 rootPos = windowSpaceToRootSpace( windowPos );
 		rootSpaceMouse.setLocalPos( rootPos );
-		rootSpaceMouse.setModifiers( modifiers );
+		rootSpaceMouse.setButtonModifiers( modifiers );
 		if ( ( modifiers & Modifier.ALT )  ==  0 )
 		{
 			rootSpaceMouse.buttonUp( rootPos, button );
@@ -1367,7 +1374,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	{
 		Point2 rootPos = windowSpaceToRootSpace( windowPos );
 		rootSpaceMouse.setLocalPos( rootPos );
-		rootSpaceMouse.setModifiers( modifiers );
+		rootSpaceMouse.setButtonModifiers( modifiers );
 		
 		rootSpaceMouse.motion( rootPos, mouseEvent );
 
@@ -1378,7 +1385,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	{
 		Point2 rootPos = windowSpaceToRootSpace( windowPos );
 		rootSpaceMouse.setLocalPos( rootPos );
-		rootSpaceMouse.setModifiers( modifiers );
+		rootSpaceMouse.setButtonModifiers( modifiers );
 		
 		if ( bMouseSelectionInProgress )
 		{
@@ -1426,7 +1433,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	{
 		Point2 rootPos = windowSpaceToRootSpace( windowPos );
 		rootSpaceMouse.setLocalPos( rootPos );
-		rootSpaceMouse.setModifiers( modifiers );
+		rootSpaceMouse.setButtonModifiers( modifiers );
 		
 		if ( dragButton == 0 )
 		{
@@ -1440,7 +1447,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	{
 		Point2 rootPos = windowSpaceToRootSpace( windowPos );
 		rootSpaceMouse.setLocalPos( rootPos );
-		rootSpaceMouse.setModifiers( modifiers );
+		rootSpaceMouse.setButtonModifiers( modifiers );
 		
 		if ( dragButton == 0 )
 		{
@@ -1455,7 +1462,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	{
 		Point2 rootPos = windowSpaceToRootSpace( windowPos );
 		rootSpaceMouse.setLocalPos( rootPos );
-		rootSpaceMouse.setModifiers( modifiers );
+		rootSpaceMouse.setButtonModifiers( modifiers );
 		rootSpaceMouse.buttonDown2( rootPos, button );
 	}
 
@@ -1464,7 +1471,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	{
 		Point2 rootPos = windowSpaceToRootSpace( windowPos );
 		rootSpaceMouse.setLocalPos( rootPos );
-		rootSpaceMouse.setModifiers( modifiers );
+		rootSpaceMouse.setButtonModifiers( modifiers );
 		rootSpaceMouse.buttonDown3( rootPos, button );
 	}
 	
@@ -1473,7 +1480,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	{
 		Point2 rootPos = windowSpaceToRootSpace( windowPos );
 		rootSpaceMouse.setLocalPos( rootPos );
-		rootSpaceMouse.setModifiers( modifiers );
+		rootSpaceMouse.setButtonModifiers( modifiers );
 		if ( ( modifiers & Modifier._KEYS_MASK )  ==  Modifier.ALT )
 		{
 			double delta = (double)-wheelClicks;
@@ -1498,7 +1505,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	
 	protected boolean keyPressEvent(KeyEvent event, int modifiers)
 	{
-		rootSpaceMouse.setModifiers( modifiers );
+		rootSpaceMouse.setKeyModifiers( modifiers );
 		
 		if ( handleNavigationKeyPress( event, modifiers ) )
 		{
@@ -1539,7 +1546,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	
 	protected boolean keyReleaseEvent(KeyEvent event, int modifiers)
 	{
-		rootSpaceMouse.setModifiers( modifiers );
+		rootSpaceMouse.setKeyModifiers( modifiers );
 		
 		if ( isNavigationKey( event ) )
 		{
@@ -1582,7 +1589,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	
 	protected boolean keyTypedEvent(KeyEvent event, int modifiers)
 	{
-		rootSpaceMouse.setModifiers( modifiers );
+		rootSpaceMouse.setKeyModifiers( modifiers );
 		
 		boolean bCtrl = ( modifiers & Modifier._KEYS_MASK )  ==  Modifier.CTRL;
 		boolean bAlt = ( modifiers & Modifier._KEYS_MASK )  ==  Modifier.ALT;
