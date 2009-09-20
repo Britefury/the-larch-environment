@@ -15,6 +15,7 @@ from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeDispatchMethod
 
 from Britefury.gSym.View.GSymView import GSymViewObjectNodeDispatch, GSymViewPage
 from Britefury.gSym.gSymDocument import GSymDocument
+from Britefury.gSym.gSymResolveContext import GSymResolveContext
 from Britefury.gSym.gSymResolveResult import GSymResolveResult
 
 from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replaceNodeContents, append, prepend, insertElement, insertRange, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
@@ -234,27 +235,31 @@ class AppView (GSymViewObjectNodeDispatch):
 	
 
 
-def viewGSymAppDocNodeAsElement(document, docRootNode, locationPrefix, location, commandHistory, app):
+def viewGSymAppDocNodeAsElement(document, docRootNode, resolveContext, location, commandHistory, app):
 	viewContext = GSymViewContext( docRootNode, AppView( document, app ), commandHistory )
 	return viewContext.getFrame()
 
 
 
-def viewGSymAppDocNodeAsPage(document, docRootNode, locationPrefix, location, commandHistory, app):
-	return GSymViewPage( 'gSym', viewGSymAppDocNodeAsElement( document, docRootNode, locationPrefix, location, commandHistory, app ), commandHistory )
+def viewGSymAppDocNodeAsPage(document, docRootNode, resolveContext, location, commandHistory, app):
+	return GSymViewPage( 'gSym', viewGSymAppDocNodeAsElement( document, docRootNode, resolveContext, location, commandHistory, app ), commandHistory )
 
 
 
-def resolveGSymAppLocation(currentLanguage, document, docRootNode, locationPrefix, location, app):
+def resolveGSymAppLocation(currentLanguage, document, docRootNode, resolveContext, location, app):
 	if location == '':
-		return GSymResolveResult( document, docRootNode, currentLanguage, locationPrefix, location )
+		return GSymResolveResult( document, docRootNode, currentLanguage, GSymAppResolveContext( resolveContext, '' ), location )
 	else:
 		documentLocation, dot, tail = location.partition( '.' )
 		
 		doc = app.getWorld().getDocument( documentLocation )
 		
 		if doc is not None:
-			return doc.resolveLocation( locationPrefix + documentLocation, tail, app )
+			return doc.resolveLocation( GSymAppResolveContext( resolveContext, documentLocation + dot ), tail, app )
 		else:
 			return None
 
+
+class GSymAppResolveContext (GSymResolveContext):
+	pass
+		
