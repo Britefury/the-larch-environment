@@ -144,6 +144,13 @@ class MainApp (AppControlInterface):
 		self._pageImporters = []
 		
 		
+		# NEW MENU
+		
+		newMenu = JMenu( 'New' )
+		newMenu.add( _action( 'New tab', self._onNewTab ) )
+		
+		
+		
 		# EDIT MENU
 		
 		transferActionListener = _GSymTransferActionListener()
@@ -210,6 +217,7 @@ class MainApp (AppControlInterface):
 		
 		
 		menuBar = JMenuBar();
+		menuBar.add( newMenu )
 		menuBar.add( editMenu )
 		menuBar.add( viewMenu )
 		menuBar.add( scriptMenu )
@@ -429,6 +437,11 @@ class MainApp (AppControlInterface):
 	
 	
 	
+	def _onNewTab(self):
+		self._browser.openLocationInNewTab( '' )
+	
+	
+	
 	def _onUndo(self):
 		commandHistoryController = self._browser.getCommandHistoryController()
 		if commandHistoryController.canUndo():
@@ -443,12 +456,12 @@ class MainApp (AppControlInterface):
 		
 
 	def _onViewDocModel(self):
-		currentLoc = self._browser.getCurrentBrowser().getLocation()
+		currentLoc = self._browser.getCurrentBrowserLocation()
 		if currentLoc.startswith( 'model:' ):
 			currentLoc = currentLoc[6:]
 		else:
 			currentLoc = 'model:' + currentLoc
-		self._browser.getCurrentBrowser().goToLocation( currentLoc )
+		self._browser.openLocationInCurrentTab( currentLoc )
 	
 	
 	def _onShowElementTreeExplorer(self):
