@@ -105,25 +105,15 @@ class _AppLocationResolver (LocationResolver):
 	def resolveLocation(self, location):
 		document = self._app._document
 		if document is not None:
-			return document.viewDocLocationAsPage( GSymResolveContext( None, '' ), location, self._app )
+			if location.startswith( 'model:' ):
+				location = location[6:]
+				return document.viewDocLocationAsLispPage( GSymResolveContext( None, '' ), location, self._app )
+			else:
+				return document.viewDocLocationAsPage( GSymResolveContext( None, '' ), location, self._app )
 		else:
 			return None
 				
 
-class _AppLocationResolverLISP (LocationResolver):
-	def __init__(self, app):
-		self._app = app
-		
-		
-	def resolveLocation(self, location):
-		document = self._app._document
-		if document is not None:
-			return document.viewDocLocationAsLispPage( GSymResolveContext( None, '' ), location, self._app )
-		else:
-			return None
-				
-
-				
 class MainApp (AppControlInterface):
 	def __init__(self, world, unit):
 		self._world = world
@@ -136,7 +126,6 @@ class MainApp (AppControlInterface):
 		self._document = None
 		
 		self._resolver = _AppLocationResolver( self )
-		self._lispResolver = _AppLocationResolverLISP( self )
 		
 		self._browser = TabbedBrowser( self._resolver, '' )
 		self._browser.getComponent().setPreferredSize( Dimension( 800, 600 ) )
@@ -207,7 +196,7 @@ class MainApp (AppControlInterface):
 		# VIEW MENU
 		
 		viewMenu = JMenu( 'View' )
-		viewMenu.add( _action( 'Show LISP window', self._onShowLisp ) )
+		viewMenu.add( _action( 'View document model', self._onViewDocModel ) )
 		viewMenu.add( _action( 'Show element tree explorer', self._onShowElementTreeExplorer ) )
 		viewMenu.add( _action( 'Reset', self._onReset ) )
 		viewMenu.add( _action( '1:1', self._onOneToOne ) )
@@ -252,14 +241,6 @@ class MainApp (AppControlInterface):
 		
 		
 		
-		
-		#
-		# LISP window
-		#
-		self._lispBrowser = None
-		self._lispFrame = None
-		self._bLispWindowVisible = False
-
 		
 		# Set the document
 		self.setDocument( document )
@@ -313,19 +294,9 @@ class MainApp (AppControlInterface):
 		#self._actionsMenu.removeAll()
 
 		self._browser.reset( '' )
-		
-		self._setLispDocument()
 			
 
 
-	def _setLispDocument(self):
-		if self._lispBrowser is not None:
-			self._lispBrowser.reset( '' )
-
-			
-			
-			
-			
 	def _onCommandHistoryChanged(self, commandHistory):
 		if commandHistory is not None:
 			self._editUndoItem.setEnabled( commandHistory.canUndo() )
@@ -471,46 +442,13 @@ class MainApp (AppControlInterface):
 
 		
 
-	def _onShowLisp(self):
-		self._bLispWindowVisible = not self._bLispWindowVisible
-		if self._bLispWindowVisible:
-			class _Listener (WindowListener):
-				def windowActivated(listener, event):
-					pass
-				
-				def windowClosed(listener, event):
-					self._lispDocView = None
-					self._lispFrame = None
-					self._bLispWindowVisible = False
-				
-				def windowClosing(listener, event):
-					pass
-				
-				def windowDeactivated(listener, event):
-					pass
-				
-				def windowDeiconified(listener, event):
-					pass
-				
-				def windowIconified(listener, event):
-					pass
-				
-				def windowOpened(listener, event):
-					pass
-			
-			
-			self._lispBrowser = TabbedBrowser( self._lispResolver, '' )
-			self._lispBrowser.getComponent().setPreferredSize( Dimension( 800, 600 ) )
-			self._lispFrame = JFrame( 'LISP View Window' )
-			self._lispFrame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
-			self._lispFrame.add( self._lispBrowser.getComponent() )
-			self._lispFrame.pack()
-			self._lispFrame.setVisible( True )
-			self._setLispDocument()
+	def _onViewDocModel(self):
+		currentLoc = self._browser.getCurrentBrowser().getLocation()
+		if currentLoc.startswith( 'model:' ):
+			currentLoc = currentLoc[6:]
 		else:
-			self._lispBrowser = None
-			self._lispFrame.dispose()
-			self._lispFrame = None
+			currentLoc = 'model:' + currentLoc
+		self._browser.getCurrentBrowser().goToLocation( currentLoc )
 	
 	
 	def _onShowElementTreeExplorer(self):
@@ -527,13 +465,9 @@ class MainApp (AppControlInterface):
 
 	def _onReset(self):
 		self._browser.viewportReset()
-		if self._lispBrowser is not None:
-			self._lispBrowser.viewportReset()
 
 	def _onOneToOne(self):
 		self._browser.viewportOneToOne()
-		if self._lispBrowser is not None:
-			self._lispBrowser.viewportOneToOne()
 			
 			
 			
