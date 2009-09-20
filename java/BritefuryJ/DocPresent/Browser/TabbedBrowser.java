@@ -136,7 +136,7 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 				}
 				
 				// Draw a cross
-				int delta = 6;
+				int delta = 5;
 				g2.drawLine( delta, delta, getWidth() - delta - 1, getHeight() - delta - 1 );
 				g2.drawLine( getWidth() - delta - 1, delta, delta, getHeight() - delta - 1 );
 				g2.dispose();
@@ -457,18 +457,33 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 
 
 
+	public String getCurrentBrowserLocation()
+	{
+		return currentBrowser.getLocation();
+	}
+	
 	public void openLocation(String location, OpenOperation op)
 	{
 		if ( op == PageController.OpenOperation.OPEN_IN_CURRENT_TAB )
 		{
-			currentBrowser.goToLocation( location );
+			openLocationInCurrentTab( location );
 		}
-		else
+		else if ( op == PageController.OpenOperation.OPEN_IN_NEW_TAB )
 		{
-			addNewBrowser( location );
-			int index = browsers.size() - 1;
-			tabs.setSelectedIndex( index );
+			openLocationInNewTab( location );
 		}
+	}
+	
+	public void openLocationInCurrentTab(String location)
+	{
+		currentBrowser.goToLocation( location );
+	}
+	
+	public void openLocationInNewTab(String location)
+	{
+		addNewBrowser( location );
+		int index = browsers.size() - 1;
+		tabs.setSelectedIndex( index );
 	}
 	
 	
