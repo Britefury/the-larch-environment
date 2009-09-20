@@ -115,13 +115,8 @@ class _AppLocationResolver (LocationResolver):
 				
 
 class MainApp (AppControlInterface):
-	def __init__(self, world, unit):
+	def __init__(self, world, document):
 		self._world = world
-		
-		if unit is None:
-			unit = GSymApp.newAppState()
-			#unit = Project.newProject()
-		document = GSymDocument( self._world, unit )
 		
 		self._document = None
 		
@@ -148,6 +143,7 @@ class MainApp (AppControlInterface):
 		
 		newMenu = JMenu( 'New' )
 		newMenu.add( _action( 'New tab', self._onNewTab ) )
+		newMenu.add( _action( 'New widnow', self._onNewWindow ) )
 		
 		
 		
@@ -224,10 +220,6 @@ class MainApp (AppControlInterface):
 
 		
 		
-		self._initialise()
-		
-		
-		
 		# WINDOW
 		
 		windowPanel = JPanel()
@@ -251,7 +243,8 @@ class MainApp (AppControlInterface):
 		
 		
 		# Set the document
-		self.setDocument( document )
+		self._document = document
+		self._browser.reset( '' )
 		
 		
 		self._onCommandHistoryChanged( None )
@@ -283,28 +276,13 @@ class MainApp (AppControlInterface):
 		
 
 	
-	def run(self):
+	def show(self):
 		self._frame.setVisible( True )
 
 		
 		
 		
 		
-	def _initialise(self):
-		pass
-	
-	
-
-
-	def setDocument(self, document):
-		self._document = document
-		
-		#self._actionsMenu.removeAll()
-
-		self._browser.reset( '' )
-			
-
-
 	def _onCommandHistoryChanged(self, commandHistory):
 		if commandHistory is not None:
 			self._editUndoItem.setEnabled( commandHistory.canUndo() )
@@ -441,6 +419,11 @@ class MainApp (AppControlInterface):
 		self._browser.openLocationInNewTab( '' )
 	
 	
+	def _onNewWindow(self):
+		newWindow = MainApp( self._world, self._document )
+		newWindow.show()
+	
+	
 	
 	def _onUndo(self):
 		commandHistoryController = self._browser.getCommandHistoryController()
@@ -481,18 +464,6 @@ class MainApp (AppControlInterface):
 
 	def _onOneToOne(self):
 		self._browser.viewportOneToOne()
-			
-			
-			
-
-		
-
-		
-	#def _p_onScriptPreCommand(self, console, code):
-		#self._document._commandHistory.freeze()
-
-	#def _p_onScriptPostCommand(self, console, code):
-		#self._document._commandHistory.thaw()
 
 
 

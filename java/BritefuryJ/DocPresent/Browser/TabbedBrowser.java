@@ -156,10 +156,11 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 			this.tabbedBrowser = tabbedBrowser;
 			
 			setOpaque( false );
+			setFocusable( false );
 			
 			
 			// Make the title label
-			titleLabel = new JLabel( "" );
+			titleLabel = new JLabel( "test" );
 			setTitle( title );
 			
 			// Add the label, with a 5-pixel border to the right
@@ -176,7 +177,6 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 		
 		public void setTitle(String title)
 		{
-			titleLabel.setToolTipText( title );
 			if ( title.length() > MAX_TITLE_LENGTH )
 			{
 				title = title.substring( 0, MAX_TITLE_LENGTH ) + "...";
@@ -438,8 +438,11 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 		{
 			throw new RuntimeException( "Could not find browser" );
 		}
+		
 		TabComponent tab = (TabComponent)tabs.getTabComponentAt( index );
 		tab.setTitle( title );
+		
+		tabs.setToolTipTextAt( index, title );
 	}
 
 
@@ -482,8 +485,6 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	public void openLocationInNewTab(String location)
 	{
 		addNewBrowser( location );
-		int index = browsers.size() - 1;
-		tabs.setSelectedIndex( index );
 	}
 	
 	
