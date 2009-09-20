@@ -27,7 +27,7 @@ public class VBoxTestPage extends SystemPage
 		register( "tests.vbox" );
 	}
 	
-	protected String getTitle()
+	public String getTitle()
 	{
 		return "V-Box test";
 	}

@@ -30,7 +30,7 @@ public class GridTestPage extends SystemPage
 	}
 	
 	
-	protected String getTitle()
+	public String getTitle()
 	{
 		return "Grid test";
 	}

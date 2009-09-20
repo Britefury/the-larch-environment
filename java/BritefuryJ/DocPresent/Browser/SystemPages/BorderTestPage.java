@@ -30,7 +30,7 @@ public class BorderTestPage extends SystemPage
 	}
 	
 	
-	protected String getTitle()
+	public String getTitle()
 	{
 		return "Border test";
 	}

@@ -27,6 +27,7 @@ public abstract class Page
 	}
 	
 	
+	public abstract String getTitle();
 	public abstract DPWidget getContentsElement();
 	
 	public CommandHistoryController getCommandHistoryController()

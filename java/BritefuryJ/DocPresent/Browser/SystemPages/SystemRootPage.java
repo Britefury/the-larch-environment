@@ -31,6 +31,11 @@ public class SystemRootPage extends Page
 	
 	
 	
+	public String getTitle()
+	{
+		return "System page";
+	}
+	
 	public DPWidget getContentsElement()
 	{
 		VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 40.0 );

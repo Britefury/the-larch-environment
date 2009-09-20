@@ -29,11 +29,12 @@ import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
-public class Browser implements PageController
+public class Browser
 {
 	protected interface BrowserListener
 	{
 		public void onBrowserGoToLocation(Browser browser, String location);
+		public void onBrowserChangeTitle(Browser browser, String title);
 	}
 	
 	
@@ -45,16 +46,18 @@ public class Browser implements PageController
 	private BrowserListener listener;
 	private CommandHistoryListener commandHistoryListener;
 	
+	private static DefaultRootPage defaultRootPage = new DefaultRootPage();
 	
 	
-	public Browser(LocationResolver resolver, String location, BrowserListener listener)
+	
+	
+	public Browser(LocationResolver resolver, String location, PageController pageController)
 	{
 		this.resolver = resolver;
 		history = new BrowserHistory( location );
-		this.listener = listener;
 		
 		area = new DPPresentationArea();
-		area.setPageController( this );
+		area.setPageController( pageController );
 		
 		ActionMap actionMap = area.getPresentationComponent().getActionMap();
 		actionMap.put( TransferHandler.getCutAction().getValue( Action.NAME ), TransferHandler.getCutAction() );
@@ -72,6 +75,11 @@ public class Browser implements PageController
 		return area.getComponent();
 	}
 	
+	public String getTitle()
+	{
+		return page.getTitle();
+	}
+	
 	
 	
 	public String getLocation()
@@ -83,6 +91,13 @@ public class Browser implements PageController
 	{
 		history.visit( location );
 		resolve();
+	}
+	
+	
+	
+	public void setListener(BrowserListener listener)
+	{
+		this.listener = listener;
 	}
 	
 	
@@ -145,7 +160,10 @@ public class Browser implements PageController
 		if ( history.canGoBack() )
 		{
 			history.back();
-			listener.onBrowserGoToLocation( this, history.getCurrentContext().getLocation() );
+			if ( listener != null )
+			{
+				listener.onBrowserGoToLocation( this, history.getCurrentContext().getLocation() );
+			}
 			resolve();
 		}
 	}
@@ -155,7 +173,10 @@ public class Browser implements PageController
 		if ( history.canGoForward() )
 		{
 			history.forward();
-			listener.onBrowserGoToLocation( this, history.getCurrentContext().getLocation() );
+			if ( listener != null )
+			{
+				listener.onBrowserGoToLocation( this, history.getCurrentContext().getLocation() );
+			}
 			resolve();
 		}
 	}
@@ -167,39 +188,45 @@ public class Browser implements PageController
 	{
 		Page p = page;
 		
+		// Remove this browser from existing page
 		if ( p != null )
 		{
 			p.removeBrowser( this );
 			p = null;
 		}
 		
+		// Get the location to resolve
 		String location = history.getCurrentContext().getLocation();
 		
+		// Look in the system pages first
 		p = SystemLocationResolver.getSystemResolver().resolveLocation( location );
 		
 		if ( p == null  &&  resolver != null )
 		{
+			// Could not find in system pages; try client supplied resolver
 			p = resolver.resolveLocation( location );
 		}
 
+		// Resolve error:
 		if ( p == null )
 		{
 			if ( location.equals( "" ) )
 			{
-				area.setChild( createDefaultRootElement() );
+				// Empty location - use default root page
+				p = defaultRootPage;
 			}
 			else
 			{
-				area.setChild( createResolveErrorElement( location ) );
+				// Resolve error
+				p = new ResolveErrorPage( location );
 			}
 		}
-		else
-		{
-			p.addBrowser( this );
-			area.setChild( p.getContentsElement().alignHExpand() );		
-		}
+
+		// Add browser, and add component
+		p.addBrowser( this );
+		area.setChild( p.getContentsElement().alignHExpand() );		
 		
-		
+		// Set the page
 		setPage( p );
 	}
 	
@@ -223,6 +250,12 @@ public class Browser implements PageController
 			{
 				commandHistoryListener.onCommandHistoryChanged( getCommandHistoryController() );
 			}
+			
+			
+			if ( listener != null )
+			{
+				listener.onBrowserChangeTitle( this, getTitle() );
+			}
 		}
 	}
 	
@@ -239,65 +272,96 @@ public class Browser implements PageController
 	
 	
 	
-	private DPWidget createResolveErrorElement(String location)
-	{
-		VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 40.0 );
-		DPVBox pageBox = new DPVBox( pageBoxStyle );
-		
-
-		TextStyleSheet titleStyle = new TextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
-		DPText title = new DPText( titleStyle, "Could Not Resolve Location" );
-		
-		VBoxStyleSheet errorBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 10.0 );
-		DPVBox errorBox = new DPVBox( errorBoxStyle );
-		
-		TextStyleSheet locationStyle = new TextStyleSheet( new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK );
-		TextStyleSheet errorStyle = new TextStyleSheet( new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK );
-
-		DPText loc = new DPText( locationStyle, location );
-		DPText error = new DPText( errorStyle, "could not be resolved" );
-		
-		errorBox.append( loc.alignHCentre() );
-		errorBox.append( error.alignHCentre() );
-
-		pageBox.append( SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE ) );
-		pageBox.append( title.padY( 10.0 ).alignHCentre() );
-		pageBox.append( errorBox.padY( 10.0 ).alignHCentre() );
-		
-		return pageBox.alignHExpand();
-	}
-	
-	
-	private DPWidget createDefaultRootElement()
-	{
-		DPVBox pageBox = new DPVBox();
-		
-		VBoxStyleSheet contentBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 40.0 );
-		DPVBox contentBox = new DPVBox( contentBoxStyle );
-		
-
-		
-		StaticTextStyleSheet titleStyle = new StaticTextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
-		DPStaticText title = new DPStaticText( titleStyle, "Default root page" );
-		
-		StaticTextStyleSheet contentsStyle = new StaticTextStyleSheet( new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK );
-		DPStaticText contents = new DPStaticText( contentsStyle, "Empty document" );
-
-		contentBox.append( title.alignHCentre() );
-		contentBox.append( contents.alignHExpand() );
-
-		pageBox.append( SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_SYSTEMPAGE ) );
-		pageBox.append( contentBox.alignHExpand() );
-
-		
-		return pageBox.alignHExpand();
-	}
-	
-	
 	public void goToLocation(String location)
 	{
 		history.visit( location );
 		listener.onBrowserGoToLocation( this, location );
 		resolve();
+	}
+	
+	
+	
+	
+	
+	
+	
+	private static class DefaultRootPage extends Page
+	{
+		public String getTitle()
+		{
+			return "Default";
+		}
+
+		
+		public DPWidget getContentsElement()
+		{
+			DPVBox pageBox = new DPVBox();
+			
+			VBoxStyleSheet contentBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 40.0 );
+			DPVBox contentBox = new DPVBox( contentBoxStyle );
+			
+
+			
+			StaticTextStyleSheet titleStyle = new StaticTextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
+			DPStaticText title = new DPStaticText( titleStyle, "Default root page" );
+			
+			StaticTextStyleSheet contentsStyle = new StaticTextStyleSheet( new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK );
+			DPStaticText contents = new DPStaticText( contentsStyle, "Empty document" );
+
+			contentBox.append( title.alignHCentre() );
+			contentBox.append( contents.alignHExpand() );
+
+			pageBox.append( SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_SYSTEMPAGE ) );
+			pageBox.append( contentBox.alignHExpand() );
+
+			
+			return pageBox.alignHExpand();
+		}
+	};
+	
+	
+	
+	private static class ResolveErrorPage extends Page
+	{
+		private String location;
+		
+		public ResolveErrorPage(String location)
+		{
+			this.location = location;
+		}
+		
+		
+		public String getTitle()
+		{
+			return "Error";
+		}
+
+		public DPWidget getContentsElement()
+		{
+			VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 40.0 );
+			DPVBox pageBox = new DPVBox( pageBoxStyle );
+			
+
+			TextStyleSheet titleStyle = new TextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
+			DPText title = new DPText( titleStyle, "Could Not Resolve Location" );
+			
+			VBoxStyleSheet errorBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 10.0 );
+			DPVBox errorBox = new DPVBox( errorBoxStyle );
+			
+			TextStyleSheet locationStyle = new TextStyleSheet( new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK );
+			TextStyleSheet errorStyle = new TextStyleSheet( new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK );
+
+			DPText loc = new DPText( locationStyle, location );
+			DPText error = new DPText( errorStyle, "could not be resolved" );
+			
+			errorBox.append( loc.alignHCentre() );
+			errorBox.append( error.alignHCentre() );
+
+			pageBox.append( SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE ) );
+			pageBox.append( title.padY( 10.0 ).alignHCentre() );
+			pageBox.append( errorBox.padY( 10.0 ).alignHCentre() );
+			
+			return pageBox.alignHExpand();
+		}
 	}
 }

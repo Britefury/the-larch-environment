@@ -28,7 +28,7 @@ public class ParagraphTestPage extends SystemPage
 	}
 	
 	
-	protected String getTitle()
+	public String getTitle()
 	{
 		return "Paragraph test";
 	}

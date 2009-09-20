@@ -47,7 +47,7 @@ public class CanvasTestPage extends SystemPage
 	}
 	
 	
-	protected String getTitle()
+	public String getTitle()
 	{
 		return "Canvas test";
 	}

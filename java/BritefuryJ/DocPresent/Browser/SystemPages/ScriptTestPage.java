@@ -27,7 +27,7 @@ public class ScriptTestPage extends SystemPage
 	}
 	
 	
-	protected String getTitle()
+	public String getTitle()
 	{
 		return "Script test";
 	}

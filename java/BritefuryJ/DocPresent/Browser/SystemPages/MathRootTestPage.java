@@ -24,7 +24,7 @@ public class MathRootTestPage extends SystemPage
 	}
 	
 	
-	protected String getTitle()
+	public String getTitle()
 	{
 		return "Math-root test";
 	}
