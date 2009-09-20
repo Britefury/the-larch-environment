@@ -8,7 +8,8 @@
 
 
 class GSymResolveResult (object):
-	def __init__(self, docNode, language, locationPrefix, location):
+	def __init__(self, document, docNode, language, locationPrefix, location):
+		self.document = document
 		self.docNode = docNode
 		self.language = language
 		self.locationPrefix = locationPrefix

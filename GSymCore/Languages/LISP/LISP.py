@@ -7,11 +7,12 @@
 ##-*************************
 from Britefury.gSym.gSymLanguage import GSymLanguage
 
-from GSymCore.Languages.LISP.View import viewLISPDocNodeAsElement, resolveLISPLocation
+from GSymCore.Languages.LISP.View import viewLISPDocNodeAsElement, viewLISPDocNodeAsPage, resolveLISPLocation
 
 
 language = GSymLanguage( 'LISP' )
 language.registerViewDocNodeAsElementFn( viewLISPDocNodeAsElement )
+language.registerViewDocNodeAsPageFn( viewLISPDocNodeAsPage )
 language.registerResolveLocationFn( resolveLISPLocation )
 
 

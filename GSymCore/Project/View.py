@@ -14,8 +14,7 @@ from javax.swing import JPopupMenu
 from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeDispatchMethod
 
 from Britefury.gSym.gSymResolveResult import GSymResolveResult
-from Britefury.gSym.View.GSymView import GSymViewObjectNodeDispatch
-from Britefury.gSym import gSymDocument
+from Britefury.gSym.View.GSymView import GSymViewObjectNodeDispatch, GSymViewPage
 
 from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replaceNodeContents, append, prepend, insertElement, insertRange, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
 
@@ -93,7 +92,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		
 	@ObjectNodeDispatchMethod
 	def Project(self, ctx, state, node, rootPackage):
-		def _onSave(link):
+		def _onSave(link, buttonEvent):
 			if document._filename is None:
 				def handleSaveDocumentAsFn(filename):
 					document.saveAs( filename )
@@ -103,7 +102,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 				document.save()
 				
 		
-		def _onSaveAs(link):
+		def _onSaveAs(link, buttonEvent):
 			def handleSaveDocumentAsFn(filename):
 				document.saveAs( filename )
 			
@@ -189,9 +188,15 @@ def viewProjectDocNodeAsElement(document, docRootNode, locationPrefix, location,
 	return viewContext.getFrame()
 
 
+
+def viewProjectDocNodeAsPage(document, docRootNode, locationPrefix, location, commandHistory, app):
+	return GSymViewPage( document.getDocumentName(), viewProjectDocNodeAsElement( document, docRootNode, locationPrefix, location, commandHistory, app ), commandHistory )
+
+
+
 def resolveProjectLocation(currentLanguage, document, docRootNode, locationPrefix, location, app):
 	if location == '':
-		return GSymResolveResult( docRootNode, currentLanguage, locationPrefix, location )
+		return GSymResolveResult( document, docRootNode, currentLanguage, locationPrefix, location )
 	else:
 		loc = location
 		package = docRootNode['rootPackage']
@@ -211,7 +216,7 @@ def resolveProjectLocation(currentLanguage, document, docRootNode, locationPrefi
 				if n.isInstanceOf( Nodes.Package ):
 					package = n
 				elif n.isInstanceOf( Nodes.Page ):
-					return document.resolveUnitLocation( n['unit'], locationPrefix,loc, app )
+					return document.resolveUnitLocation( n['unit'], locationPrefix, loc, app )
 				else:
 					return None
 			else:

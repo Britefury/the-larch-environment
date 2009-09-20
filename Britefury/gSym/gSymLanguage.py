@@ -13,6 +13,7 @@ class GSymLanguage (object):
 		self.name = name
 		self._codeGeneratorFactories = {}
 		self._viewDocNodeAsElementFn = None
+		self._viewDocNodeAsPageFn = None
 		self._resolveLocationFn = None
 		self._transformModifyFn = None
 		
@@ -25,6 +26,9 @@ class GSymLanguage (object):
 	def registerViewDocNodeAsElementFn(self, viewDocNodeAsElementFn):
 		self._viewDocNodeAsElementFn = viewDocNodeAsElementFn
 
+	def registerViewDocNodeAsPageFn(self, viewDocNodeAsPageFn):
+		self._viewDocNodeAsPageFn = viewDocNodeAsPageFn
+
 	def registerResolveLocationFn(self, resolveLocationFn):
 		self._resolveLocationFn = resolveLocationFn
 
@@ -35,6 +39,9 @@ class GSymLanguage (object):
 	
 	def getViewDocNodeAsElementFn(self):
 		return self._viewDocNodeAsElementFn
+
+	def getViewDocNodeAsPageFn(self):
+		return self._viewDocNodeAsPageFn
 
 	def getResolveLocationFn(self):
 		return self._resolveLocationFn

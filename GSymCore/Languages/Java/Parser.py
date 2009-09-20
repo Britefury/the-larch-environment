@@ -115,49 +115,54 @@ class JavaGrammar (Grammar):
 	# Type reference
 	@Rule
 	def typeExpression(self):
-		return self.basicTypeRef() | self.complexTypeExp()
+		return self.referenceTypeExp()  |  self.primitiveTypeRef()
 	
 	
 	@Rule
-	def complexTypeExp(self):
+	def referenceTypeExp(self):
+		def _action(input, begin, end, x, bindings):
+			typeExp = x[0]
+			for a in x[1]:
+				typeExp = Nodes.ArrayTypeExp( itemTypeExp=typeExp )
+			return typeExp
+		return ( self.classOrInterfaceTypeExp()  +  ( Literal( '[' ) + Literal( ']' ) ).zeroOrMore() ).action( _action )  |  \
+		       ( self.primitiveTypeRef()  +  ( Literal( '[' ) + Literal( ']' ) ).oneOrMore() ).action( _action )
+		
+	
+	
+	@Rule
+	def classOrInterfaceTypeExp(self):
 		def _action(input, begin, end, x, bindings):
 			typeExp = x[0]
 			for g in x[1]:
 				typeExp = Nodes.MemberTypeExp( target=typeExp, member=g[1]  )
-			for a in x[2]:
-				typeExp = Nodes.ArrayTypeExp( itemTypeExp=typeExp )
 			return typeExp
-		return ( self.simpleTypeExp()  +  ( Literal( '.' ) + self.simpleTypeExp() ).zeroOrMore() +  ( Literal( '[' ) + Literal( ']' ) ).zeroOrMore() ).action( _action )
+		return ( self.classOrInterfaceTypeExpComponent()  +  ( Literal( '.' ) + self.classOrInterfaceTypeExpComponent() ).zeroOrMore() ).action( _action )
 	
 	
 	@Rule
-	def simpleTypeExp(self):
-		return self.genericTypeExp()  |  self.classOrInterfaceTypeRef()
+	def classOrInterfaceTypeExpComponent(self):
+		return self.genericTypeCall()  |  self.classOrInterfaceTypeRef()
 	
 	
 	@Rule
-	def genericTypeExp(self):
-		return ( self.classOrInterfaceTypeRef() + Literal( '<' ) + SeparatedList( self.genericTypeArgument(), 0, -1, SeparatedList.TrailingSeparatorPolicy.NEVER ) + Literal( '>' ) ).action( \
+	def genericTypeCall(self):
+		return ( self.simpleName() + Literal( '<' ) + SeparatedList( self.genericTypeArgument(), 0, -1, SeparatedList.TrailingSeparatorPolicy.NEVER ) + Literal( '>' ) ).action( \
 		        lambda input, begin, end, x, bindings: Nodes.GenericTypeExp( target=x[0], args=x[2] ) )
 	
 	@Rule
 	def genericTypeArgument(self):
-		return self.typeExpression()  |  self.genericWildcardArgument()
+		return self.referenceTypeExp()  |  self.genericWildcardArgument()
 	
 	@Rule
 	def genericWildcardArgument(self):
-		return ( Literal( '?' )  +  ( Keyword( Keywords.superKeyword ) | Keyword( Keywords.extendsKeyword ) )  +  self.typeExpression ).action(
+		return ( Literal( '?' )  +  ( Keyword( Keywords.superKeyword ) | Keyword( Keywords.extendsKeyword ) )  +  self.referenceTypeExp() ).action(
 		        lambda input, begin, end, x, bindings: Nodes.WildCardTypeArgument( extendsOrSuper=( 'extends'   if x[1] == Keywords.extendsKeyword   else 'super' ), typeExp=x[2] ) )
 	
 	
 	
-	# Type reference
 	@Rule
-	def typeRef(self):
-		return self.arrayTypeRef()  |  self.classOrInterfaceTypeRef()  |  self.basicTypeRef()
-	
-	@Rule
-	def basicTypeRef(self):
+	def primitiveTypeRef(self):
 		return self.byteTypeRef() | self.shortTypeRef() | self.intTypeRef() | self.longTypeRef() | self.charTypeRef() | self.floatTypeRef() | self.doubleTypeRef()  |  self.booleanTypeRef()
 	
 	@Rule
@@ -237,8 +242,16 @@ class JavaGrammar (Grammar):
 	
 	@Rule
 	def primaryNoNewArray(self):
-		return self.literal() | self.thisExp() | self.parenForm() | self.classInstanceCreationExpression() | self.fieldAccess() | self.methodInvocation() | self.arrayAccess()
+		return self.literal() | self.typeClassExp() | self.voidClassExp() | self.thisExp() | self.parenForm() | self.classInstanceCreationExpression() | self.fieldAccess() | self.methodInvocation() | self.arrayAccess()
 	
+	
+	@Rule
+	def typeClassExp(self):
+		return ( self.typeExpression() + Literal( '.' ) + Keyword( Keywords.classKeyword ) ).action( lambda input, begin, end, xs, bindings: Nodes.TypeClassExp( typeExp=xs[0] ) )
+	
+	@Rule
+	def voidClassExp(self):
+		return ( Keyword( Keywords.voidKeyword ) + Literal( '.' ) + Keyword( Keywords.classKeyword ) ).action( lambda input, begin, end, xs, bindings: Nodes.VoidClassExp() )
 	
 	
 	@Rule
@@ -246,11 +259,6 @@ class JavaGrammar (Grammar):
 		return ( Keyword( Keywords.newKeyword ) + self.classOrInterfaceTypeRef() + Literal( '(' ) + SeparatedList( self.expression(), 0, -1, SeparatedList.TrailingSeparatorPolicy.NEVER ) + Literal( ')' ) ).action( \
 		        lambda input, begin, end, xs, bindings: Nodes.ClassInstanceCreation( classTypeRef=xs[1], args=xs[3] ) )
 
-
-	@Rule
-	def arrayCreationExpression(self):
-		return ( Keyword( Keywords.newKeyword ) + ( self.classOrInterfaceTypeRef() | self.primitiveTypeRef() ) + self.dimExpr().oneOrMore() ).action( \
-		        lambda input, begin, end, xs, bindings: Nodes.ClassInstanceCreation( classTypeRef=xs[1], args=xs[3] ) )
 
 	@Rule
 	def dimExpr(self):
@@ -263,11 +271,34 @@ class JavaGrammar (Grammar):
 	
 	
 	@Rule
-	def methodInvoation(self):
-		return ( ( self.name() | self.primary() | self.superExp() )  +  Literal( '.' )  +  self.simpleName() ).action( lambda input, begin, end, xs, bindings: Nodes.ClassInstanceCreation( target=xs[0], fieldName=xs[2] ) )
+	def methodInvocation(self):
+		return ( ( self.name() | self.primary() | self.superExp() )  +  Literal( '.' )  +  self.simpleName() ).action( lambda input, begin, end, xs, bindings: Nodes.MethodInvocation( target=xs[0], fieldName=xs[2] ) )
 
 
+	@Rule
+	def arrayAccess(self):
+		def _action(input, begin, end, x, bindings):
+			exp = x[0]
+			for i in x[1]:
+				exp = Nodes.ArrayAccess( target=exp, index=i[1] )
+			return exp
+		return ( self.primaryNoNewArray()  +  ( Literal( '[' ) + self.expression() + Literal( ']' ) ).oneOrMore() ).action( _action )
+	
+	
+	@Rule
+	def arrayCreationExpression(self):
+		return ( Keyword( Keywords.newKeyword ) + ( self.classOrInterfaceTypeRef() | self.primitiveTypeRef() ) + self.dimExpr().oneOrMore() ).action( \
+		        lambda input, begin, end, xs, bindings: Nodes.ClassInstanceCreation( classTypeRef=xs[1], args=xs[3] ) )
 
+
+	
+	
+	
+	@Rule
+	def expression(self):
+		return self.primary()
+	
+	
 import unittest
 from Britefury.Tests.BritefuryJ.Parser import ParserTestCase
 
@@ -277,6 +308,7 @@ class TestCase_JavaGrammar (ParserTestCase.ParserTestCase):
 		g = JavaGrammar()
 		self._parseStringTest( g.identifier(), 'abc', 'abc' )
 	
+	
 	def test_qualifiedIdentifier(self):
 		g = JavaGrammar()
 		self._parseStringTest( g.qualifiedIdentifier(), 'abc', [ 'abc' ] )
@@ -285,7 +317,8 @@ class TestCase_JavaGrammar (ParserTestCase.ParserTestCase):
 		self._parseStringFailTest( g.qualifiedIdentifier(), 'abc.xyz.pqr.' )
 		self._parseStringFailTest( g.qualifiedIdentifier(), '.abc.xyz.pqr' )
 		self._parseStringFailTest( g.qualifiedIdentifier(), 'abc..xyz.pqr' )
-		
+	
+	
 	def test_integerLiteral(self):
 		g = JavaGrammar()
 		self._parseStringTest( g.literal(), '123', Nodes.IntLiteral( format='decimal', numType='int', value='123' ) )
@@ -302,55 +335,82 @@ class TestCase_JavaGrammar (ParserTestCase.ParserTestCase):
 		self._parseStringFailTest( g.literal(), '012a' )
 		self._parseStringFailTest( g.literal(), '0128' )
 
+	
 	def test_floatLiteral(self):
 		g = JavaGrammar()
 		self._parseStringTest( g.literal(), '123.45', Nodes.FloatLiteral( value='123.45' ) )
 
+		
 	def test_charLiteral(self):
 		g = JavaGrammar()
 		self._parseStringTest( g.literal(), '\'a\'', Nodes.CharLiteral( value='a' ) )
 		self._parseStringTest( g.literal(), '\'\\n\'', Nodes.CharLiteral( value='\\n' ) )
 
+		
 	def test_stringLiteral(self):
 		g = JavaGrammar()
 		self._parseStringTest( g.literal(), '"x"', Nodes.StringLiteral( value='x' ) )
 
+		
 	def test_booleanLiteral(self):
 		g = JavaGrammar()
 		self._parseStringTest( g.literal(), 'false', Nodes.BooleanLiteral( value='false' ) )
 
+		
 	def test_nullLiteral(self):
 		g = JavaGrammar()
 		self._parseStringTest( g.literal(), 'null', Nodes.NullLiteral() )
 	
 		
 		
+		
 	def test_primitiveTypeRef(self):
 		g = JavaGrammar()
-		self._parseStringTest( g.typeRef(), 'boolean', Nodes.BooleanTypeRef() )
-		self._parseStringTest( g.typeRef(), 'byte', Nodes.ByteTypeRef() )
-		self._parseStringTest( g.typeRef(), 'short', Nodes.ShortTypeRef() )
-		self._parseStringTest( g.typeRef(), 'int', Nodes.IntTypeRef() )
-		self._parseStringTest( g.typeRef(), 'long', Nodes.LongTypeRef() )
-		self._parseStringTest( g.typeRef(), 'char', Nodes.CharTypeRef() )
-		self._parseStringTest( g.typeRef(), 'float', Nodes.FloatTypeRef() )
-		self._parseStringTest( g.typeRef(), 'double', Nodes.DoubleTypeRef() )
+		self._parseStringTest( g.typeExpression(), 'boolean', Nodes.BooleanTypeRef() )
+		self._parseStringTest( g.typeExpression(), 'byte', Nodes.ByteTypeRef() )
+		self._parseStringTest( g.typeExpression(), 'short', Nodes.ShortTypeRef() )
+		self._parseStringTest( g.typeExpression(), 'int', Nodes.IntTypeRef() )
+		self._parseStringTest( g.typeExpression(), 'long', Nodes.LongTypeRef() )
+		self._parseStringTest( g.typeExpression(), 'char', Nodes.CharTypeRef() )
+		self._parseStringTest( g.typeExpression(), 'float', Nodes.FloatTypeRef() )
+		self._parseStringTest( g.typeExpression(), 'double', Nodes.DoubleTypeRef() )
+		
 		
 	def test_classOrInterfaceTypeRef(self):
 		g = JavaGrammar()
-		self._parseStringTest( g.typeRef(), 'ArrayList', Nodes.ClassOrInterfaceTypeRef( name=[ 'ArrayList' ] ) )
-		self._parseStringTest( g.typeRef(), 'java.util.List', Nodes.ClassOrInterfaceTypeRef( name=[ 'java', 'util', 'List' ] ) )
+		self._parseStringTest( g.typeExpression(), 'ArrayList', Nodes.ClassOrInterfaceTypeRef( name='ArrayList' ) )
+		self._parseStringTest( g.typeExpression(), 'java.util.List', Nodes.MemberTypeExp( target=Nodes.MemberTypeExp( target=Nodes.ClassOrInterfaceTypeRef( name='java' ), member=Nodes.ClassOrInterfaceTypeRef( name='util' ) ), member=Nodes.ClassOrInterfaceTypeRef( name='List' ) ) )
 		
-	def test_arrayTypeRef(self):
+		
+	def test_genericTypeExp(self):
 		g = JavaGrammar()
-		self._parseStringTest( g.typeRef(), 'float []', Nodes.ArrayTypeRef( itemTypeRef=Nodes.FloatTypeRef() ) )
-		self._parseStringTest( g.typeRef(), 'float [][]', Nodes.ArrayTypeRef( itemTypeRef=Nodes.ArrayTypeRef( itemTypeRef=Nodes.FloatTypeRef() ) ) )
-		self._parseStringTest( g.typeRef(), 'ArrayList []', Nodes.ArrayTypeRef( itemTypeRef=Nodes.ClassOrInterfaceTypeRef( name=[ 'ArrayList' ] ) ) )
-		self._parseStringTest( g.typeRef(), 'java.util.List []', Nodes.ArrayTypeRef( itemTypeRef=Nodes.ClassOrInterfaceTypeRef( name=[ 'java', 'util', 'List' ] ) ) )
-		
-		
-		
+		self._parseStringTest( g.typeExpression(), 'ArrayList<Integer>', Nodes.GenericTypeExp( target='ArrayList', args=[ Nodes.ClassOrInterfaceTypeRef( name='Integer' ) ] ) )
+		self._parseStringTest( g.typeExpression(), 'ArrayList<Integer,Double>', Nodes.GenericTypeExp( target='ArrayList', args=[ Nodes.ClassOrInterfaceTypeRef( name='Integer' ), Nodes.ClassOrInterfaceTypeRef( name='Double' ) ] ) )
+		self._parseStringTest( g.typeExpression(), 'X.ArrayList<Integer>', Nodes.MemberTypeExp( target=Nodes.ClassOrInterfaceTypeRef( name='X' ), member=Nodes.GenericTypeExp( target='ArrayList', args=[ Nodes.ClassOrInterfaceTypeRef( name='Integer' ) ] ) ) )
+		self._parseStringTest( g.typeExpression(), 'ArrayList<Integer>.X', Nodes.MemberTypeExp( target=Nodes.GenericTypeExp( target='ArrayList', args=[ Nodes.ClassOrInterfaceTypeRef( name='Integer' ) ] ), member=Nodes.ClassOrInterfaceTypeRef( name='X' ) ) )
+		self._parseStringTest( g.typeExpression(), 'Vector<ArrayList<Integer>>', Nodes.GenericTypeExp( target='Vector', args=[ Nodes.GenericTypeExp( target='ArrayList', args=[ Nodes.ClassOrInterfaceTypeRef( name='Integer' ) ] ) ] ) )
+		self._parseStringTest( g.typeExpression(), 'ArrayList<Integer[]>', Nodes.GenericTypeExp( target='ArrayList', args=[ Nodes.ArrayTypeExp( itemTypeExp=Nodes.ClassOrInterfaceTypeRef( name='Integer' ) ) ] ) )
+		self._parseStringTest( g.typeExpression(), 'ArrayList<int[]>', Nodes.GenericTypeExp( target='ArrayList', args=[ Nodes.ArrayTypeExp( itemTypeExp=Nodes.IntTypeRef() ) ] ) )
+		self._parseStringFailTest( g.typeExpression(), 'ArrayList<int>' )
 
+		
+	def test_arrayTypeExp(self):
+		g = JavaGrammar()
+		self._parseStringTest( g.typeExpression(), 'float []', Nodes.ArrayTypeExp( itemTypeExp=Nodes.FloatTypeRef() ) )
+		self._parseStringTest( g.typeExpression(), 'float [][]', Nodes.ArrayTypeExp( itemTypeExp=Nodes.ArrayTypeExp( itemTypeExp=Nodes.FloatTypeRef() ) ) )
+		self._parseStringTest( g.typeExpression(), 'ArrayList []', Nodes.ArrayTypeExp( itemTypeExp=Nodes.ClassOrInterfaceTypeRef( name='ArrayList' ) ) )
+		self._parseStringTest( g.typeExpression(), 'java.util.List []', Nodes.ArrayTypeExp( itemTypeExp=Nodes.MemberTypeExp( target=Nodes.MemberTypeExp( target=Nodes.ClassOrInterfaceTypeRef( name='java' ), member=Nodes.ClassOrInterfaceTypeRef( name='util' ) ), member=Nodes.ClassOrInterfaceTypeRef( name='List' ) ) ) )
+		
+		
+		
+		
+	def test_typeClassExp(self):
+		g = JavaGrammar()
+		self._parseStringTest( g.primary(), 'float.class', Nodes.TypeClassExp( typeExp=Nodes.FloatTypeRef() ) )
+		self._parseStringTest( g.primary(), 'ArrayList<Integer>.class', Nodes.TypeClassExp( typeExp=Nodes.GenericTypeExp( target='ArrayList', args=[ Nodes.ClassOrInterfaceTypeRef( name='Integer' ) ] ) ) )
+		self._parseStringTest( g.primary(), 'void.class', Nodes.VoidClassExp() )
+
+		
 	def test_thisExp(self):
 		g = JavaGrammar()
 		self._parseStringTest( g.thisExp(), 'this', Nodes.ThisExp() )

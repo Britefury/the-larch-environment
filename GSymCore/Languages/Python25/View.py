@@ -13,7 +13,7 @@ from BritefuryJ.Parser.ItemStream import ItemStreamBuilder
 from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeDispatchMethod
 
 from Britefury.gSym.gSymResolveResult import GSymResolveResult
-from Britefury.gSym.View.GSymView import GSymViewObjectNodeDispatch
+from Britefury.gSym.View.GSymView import GSymViewObjectNodeDispatch, GSymViewPage
 
 from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replaceNodeContents, append, prepend, insertElement, insertRange, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
 
@@ -1538,5 +1538,9 @@ def viewPython25DocNodeAsElement(document, docRootNode, locationPrefix, location
 	return viewContext.getFrame()
 
 
+def viewPython25DocNodeAsPage(document, docRootNode, locationPrefix, location, commandHistory, app):
+	return GSymViewPage( 'Python', viewPython25DocNodeAsElement( document, docRootNode, locationPrefix, location, commandHistory, app ), commandHistory )
+
+
 def resolvePython25Location(currentLanguage, document, docRootNode, locationPrefix, location, app):
-	return GSymResolveResult( docRootNode, currentLanguage, locationPrefix, location )
+	return GSymResolveResult( document, docRootNode, currentLanguage, locationPrefix, location )
