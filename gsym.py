@@ -17,26 +17,29 @@ i18n.initialise()
 from BritefuryJ.DocModel import DMIOReader, DMNode
 
 from Britefury.gSym.gSymWorld import GSymWorld
+from Britefury.gSym.gSymDocument import GSymDocument
 
 from Britefury.MainApp.MainApp import MainApp
 
+
+from GSymCore.GSymApp import GSymApp
+
+
+
 def main():
+	UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+
 	world = GSymWorld()
 
 	if len( sys.argv ) == 2:
 		filename = sys.argv[1]
-		try:
-			documentRoot = DMIOReader.readFromString( file( filename, 'r' ).read(), world.resolver )
-			documentRoot = DMNode.coerce( documentRoot )
-			bEvaluate = True
-		except IOError:
-			pass
+		assert False, 'Load file from command line not implemented yet'
 		
-	UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+	unit = GSymApp.newAppState()
+	document = GSymDocument( world, unit )
+	app = MainApp( world, document )
 
-	app = MainApp( world, None )
-
-	app.run()
+	app.show()
 
 
 if __name__ == '__main__':
