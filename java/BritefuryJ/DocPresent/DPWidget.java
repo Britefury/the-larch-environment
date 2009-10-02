@@ -803,6 +803,7 @@ abstract public class DPWidget extends PointerInputElement
 		{
 			setPresentationArea( area );
 		}
+		onParentChanged();
 	}
 	
 	
@@ -1112,6 +1113,10 @@ abstract public class DPWidget extends PointerInputElement
 	{
 	}
 	
+	protected void onParentChanged()
+	{
+	}
+	
 	
 	protected void drawBackground(Graphics2D graphics)
 	{
@@ -1143,7 +1148,7 @@ abstract public class DPWidget extends PointerInputElement
 	
 	protected void handleQueueResize()
 	{
-		if ( !isResizeQueued()  &&  isRealised() )
+		if ( !isResizeQueued() )
 		{
 			if ( parent != null )
 			{
