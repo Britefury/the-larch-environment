@@ -281,8 +281,9 @@ public class DPProxy extends DPBin implements Collateable
 	
 	
 	
-	protected void onRealise()
+	protected void onParentChanged()
 	{
+		super.onParentChanged();
 		if ( parent instanceof Collateable )
 		{
 			setCollationRoot( ((Collateable)parent).getCollationRoot() );
@@ -295,12 +296,6 @@ public class DPProxy extends DPBin implements Collateable
 		{
 			setCollationRoot( null );
 		}
-	}
-	
-	protected void onUnrealise(DPWidget unrealiseRoot)
-	{
-		super.onUnrealise( unrealiseRoot );
-		setCollationRoot( null );
 	}
 	
 	

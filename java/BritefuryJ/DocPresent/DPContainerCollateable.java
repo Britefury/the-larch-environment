@@ -189,8 +189,9 @@ public abstract class DPContainerCollateable extends DPContainer implements Coll
 	
 	
 	
-	protected void onRealise()
+	protected void onParentChanged()
 	{
+		super.onParentChanged();
 		if ( parent instanceof Collateable )
 		{
 			setCollationRoot( ((Collateable)parent).getCollationRoot() );
@@ -199,12 +200,10 @@ public abstract class DPContainerCollateable extends DPContainer implements Coll
 		{
 			setCollationRoot( (DPContainerSequenceCollationRoot)parent );
 		}
-	}
-	
-	protected void onUnrealise(DPWidget unrealiseRoot)
-	{
-		super.onUnrealise( unrealiseRoot );
-		setCollationRoot( null );
+		else
+		{
+			setCollationRoot( null );
+		}
 	}
 	
 	
