@@ -114,14 +114,6 @@ class _AppLocationResolver (LocationResolver):
 			return None
 				
 
-class _BrowserListener (TabbedBrowser.TabbedBrowserListener):
-	def __init__(self, app):
-		self._app = app
-		
-	def createNewBrowserWindow(self, location):
-		self._app._createNewWindow( location )
-		
-		
 class MainApp (AppControlInterface):
 	def __init__(self, world, document, location=''):
 		self._world = world
@@ -131,7 +123,12 @@ class MainApp (AppControlInterface):
 		self._resolver = _AppLocationResolver( self )
 		
 		
-		self._browser = TabbedBrowser( self._resolver, _BrowserListener( self ), location )
+		class _BrowserListener (TabbedBrowser.TabbedBrowserListener):
+			def createNewBrowserWindow(_self, location):
+				self._createNewWindow( location )
+				
+				
+		self._browser = TabbedBrowser( self._resolver, _BrowserListener(), location )
 		self._browser.getComponent().setPreferredSize( Dimension( 800, 600 ) )
 
 		
@@ -143,11 +140,6 @@ class MainApp (AppControlInterface):
 		
 		
 		
-		# Set the document
-		#self._browser.reset( location )
-
-		
-
 		# NEW PAGE POPUP MENU
 		self._newPageFactories = []
 		self._pageImporters = []
