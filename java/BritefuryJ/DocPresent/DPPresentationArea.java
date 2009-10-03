@@ -85,6 +85,20 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	
 	
 	
+	public static class ViewTransformation
+	{
+		private Point2 windowTopLeftCornerInRootSpace;
+		private double rootScaleInWindowSpace;
+		
+		
+		public ViewTransformation()
+		{
+			windowTopLeftCornerInRootSpace = new Point2();
+			rootScaleInWindowSpace = 1.0;
+		}
+	}
+	
+	
 	
 	
 	static private class PresentationAreaComponent extends JComponent implements ComponentListener, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, HierarchyListener
@@ -591,10 +605,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	
 	
 	
-	//private HashMap<PointerInterface, DndDropLocal> dndTable;
-	
-	private Point2 windowTopLeftCornerInRootSpace;
-	private double rootScaleInWindowSpace;
+	private ViewTransformation viewXform;
 	private Point2 dragStartPosInWindowSpace;
 	private int dragButton;
 	
@@ -636,15 +647,18 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	
 	
 	
-	
 	public DPPresentationArea()
+	{
+		this( new ViewTransformation() );
+	}
+	
+	public DPPresentationArea(ViewTransformation viewXform)
 	{
 		super();
 		
 		presentationArea = this;
 		
-		windowTopLeftCornerInRootSpace = new Point2();
-		rootScaleInWindowSpace = 1.0;
+		this.viewXform = viewXform;
 		dragStartPosInWindowSpace = new Point2();
 		dragButton = 0;
 		
@@ -806,40 +820,54 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	
 	public Point2 windowSpaceToRootSpace(Point2 w)
 	{
-		return w.scale( 1.0 / rootScaleInWindowSpace ).add( windowTopLeftCornerInRootSpace.toVector2() );
+		return w.scale( 1.0 / viewXform.rootScaleInWindowSpace ).add( viewXform.windowTopLeftCornerInRootSpace.toVector2() );
 	}
 	
 	public Vector2 windowSpaceToRootSpace(Vector2 w)
 	{
-		return w.mul( 1.0 / rootScaleInWindowSpace );
+		return w.mul( 1.0 / viewXform.rootScaleInWindowSpace );
 	}
 	
 	public Point2 rootSpaceToWindowSpace(Point2 r)
 	{
-		return r.sub( windowTopLeftCornerInRootSpace.toVector2() ).scale( rootScaleInWindowSpace );
+		return r.sub( viewXform.windowTopLeftCornerInRootSpace.toVector2() ).scale( viewXform.rootScaleInWindowSpace );
 	}
 	
 	public Vector2 rootSpaceToWindowSpace(Vector2 r)
 	{
-		return r.mul( rootScaleInWindowSpace );
+		return r.mul( viewXform.rootScaleInWindowSpace );
 	}
 	
 	
 	public double windowSpaceSizeToRootSpace(double w)
 	{
-		return w / rootScaleInWindowSpace;
+		return w / viewXform.rootScaleInWindowSpace;
 	}
 	
 	public double rootSpaceSizeToWindowSpace(double r)
 	{
-		return r * rootScaleInWindowSpace;
+		return r * viewXform.rootScaleInWindowSpace;
 	}
 	
 	
 	
+	
+	public ViewTransformation getViewTransformation()
+	{
+		return viewXform;
+	}
+	
+	public void setViewTransformation(ViewTransformation viewXform)
+	{
+		this.viewXform = viewXform;
+		updateRange();
+		bAllocationRequired = true;
+		queueFullRedraw();
+	}
+	
 	public void oneToOne()
 	{
-		rootScaleInWindowSpace = 1.0;
+		viewXform.rootScaleInWindowSpace = 1.0;
 		updateRange();
 		
 		bAllocationRequired = true;
@@ -848,8 +876,8 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	
 	public void reset()
 	{
-		windowTopLeftCornerInRootSpace = new Point2();
-		rootScaleInWindowSpace = 1.0;
+		viewXform.windowTopLeftCornerInRootSpace = new Point2();
+		viewXform.rootScaleInWindowSpace = 1.0;
 		updateRange();
 		
 		bAllocationRequired = true;
@@ -858,11 +886,11 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	
 	public void focusOn(DPWidget widget)
 	{
-		rootScaleInWindowSpace = 1.0;
+		viewXform.rootScaleInWindowSpace = 1.0;
 		Point2 topLeft = widget.getLocalPointRelativeToRoot( new Point2( 0.0, 0.0 ) );
 		Point2 bottomRight = widget.getLocalPointRelativeToRoot( new Point2( widget.getAllocation() ) );
 		Point2 centre = Point2.average( topLeft, bottomRight );
-		windowTopLeftCornerInRootSpace = centre.sub( windowSize.mul( 0.5 ) );
+		viewXform.windowTopLeftCornerInRootSpace = centre.sub( windowSize.mul( 0.5 ) );
 		updateRange();
 		queueFullRedraw();
 	}
@@ -877,9 +905,9 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		double ax = allocationX == 0.0  ?  1.0  :  allocationX;
 		double ay = allocationY == 0.0  ?  1.0  :  allocationY;
 		
-		windowTopLeftCornerInRootSpace = new Point2();
-		rootScaleInWindowSpace = Math.min( windowSize.x / ax, windowSize.y / ay );
-		rootScaleInWindowSpace = rootScaleInWindowSpace == 0.0  ?  1.0  :  rootScaleInWindowSpace;
+		viewXform.windowTopLeftCornerInRootSpace = new Point2();
+		viewXform.rootScaleInWindowSpace = Math.min( windowSize.x / ax, windowSize.y / ay );
+		viewXform.rootScaleInWindowSpace = viewXform.rootScaleInWindowSpace == 0.0  ?  1.0  :  viewXform.rootScaleInWindowSpace;
 		
 		updateRange();
 		bAllocationRequired = true;
@@ -889,9 +917,9 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	public void zoom(double zoomFactor, Point2 centreInWindowSpace)
 	{
 		Point2 centreInRootSpace = windowSpaceToRootSpace( centreInWindowSpace );
-		rootScaleInWindowSpace *= zoomFactor;
+		viewXform.rootScaleInWindowSpace *= zoomFactor;
 		Point2 newCentreInRootSpace = windowSpaceToRootSpace( centreInWindowSpace );
-		windowTopLeftCornerInRootSpace = windowTopLeftCornerInRootSpace.sub( newCentreInRootSpace.sub( centreInRootSpace ) );
+		viewXform.windowTopLeftCornerInRootSpace = viewXform.windowTopLeftCornerInRootSpace.sub( newCentreInRootSpace.sub( centreInRootSpace ) );
 
 		updateRange();
 		bAllocationRequired = true;
@@ -906,7 +934,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	
 	public void panRootSpace(Vector2 pan)
 	{
-		windowTopLeftCornerInRootSpace = windowTopLeftCornerInRootSpace.add( pan );
+		viewXform.windowTopLeftCornerInRootSpace = viewXform.windowTopLeftCornerInRootSpace.add( pan );
 		updateRange();
 		queueFullRedraw();
 	}
@@ -916,27 +944,27 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 
 		if ( pan.x < 0.0 )
 		{
-			windowTopLeftCornerInRootSpace.x = Math.max( windowTopLeftCornerInRootSpace.x + pan.x,  Math.min( windowTopLeftCornerInRootSpace.x, 0.0 ) );
+			viewXform.windowTopLeftCornerInRootSpace.x = Math.max( viewXform.windowTopLeftCornerInRootSpace.x + pan.x,  Math.min( viewXform.windowTopLeftCornerInRootSpace.x, 0.0 ) );
 		}
 		else if ( pan.x > 0.0 )
 		{
-			double windowWidthInRootSpace = windowSize.x / rootScaleInWindowSpace;
+			double windowWidthInRootSpace = windowSize.x / viewXform.rootScaleInWindowSpace;
 			double allocationX = getAllocationX();
 			double ax = allocationX == 0.0  ?  1.0  :  allocationX;
 			double maxX = Math.max( ax - windowWidthInRootSpace, 0.0 );
-			windowTopLeftCornerInRootSpace.x = Math.min( windowTopLeftCornerInRootSpace.x + pan.x,  Math.max( windowTopLeftCornerInRootSpace.x, maxX ) );
+			viewXform.windowTopLeftCornerInRootSpace.x = Math.min( viewXform.windowTopLeftCornerInRootSpace.x + pan.x,  Math.max( viewXform.windowTopLeftCornerInRootSpace.x, maxX ) );
 		}
 		if ( pan.y < 0.0 )
 		{
-			windowTopLeftCornerInRootSpace.y = Math.max( windowTopLeftCornerInRootSpace.y + pan.y,  Math.min( windowTopLeftCornerInRootSpace.y, 0.0 ) );
+			viewXform.windowTopLeftCornerInRootSpace.y = Math.max( viewXform.windowTopLeftCornerInRootSpace.y + pan.y,  Math.min( viewXform.windowTopLeftCornerInRootSpace.y, 0.0 ) );
 		}
 		else if ( pan.y > 0.0 )
 		{
-			double windowHeightInRootSpace = windowSize.y / rootScaleInWindowSpace;
+			double windowHeightInRootSpace = windowSize.y / viewXform.rootScaleInWindowSpace;
 			double allocationY = getAllocationY();
 			double ay = allocationY == 0.0  ?  1.0  :  allocationY;
 			double maxY = Math.max( ay - windowHeightInRootSpace, 0.0 );
-			windowTopLeftCornerInRootSpace.y = Math.min( windowTopLeftCornerInRootSpace.y + pan.y,  Math.max( windowTopLeftCornerInRootSpace.y, maxY ) );
+			viewXform.windowTopLeftCornerInRootSpace.y = Math.min( viewXform.windowTopLeftCornerInRootSpace.y + pan.y,  Math.max( viewXform.windowTopLeftCornerInRootSpace.y, maxY ) );
 		}
 		updateRange();
 		queueFullRedraw();
@@ -961,19 +989,21 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		double ax = allocationX == 0.0  ?  1.0  :  allocationX;
 		double ay = allocationY == 0.0  ?  1.0  :  allocationY;
 
-		component.setRange( new Vector2( ax * rootScaleInWindowSpace, ay * rootScaleInWindowSpace ), windowSize, windowTopLeftCornerInRootSpace.scale( rootScaleInWindowSpace ) );
+		component.setRange( new Vector2( ax * viewXform.rootScaleInWindowSpace, ay * viewXform.rootScaleInWindowSpace ),
+				windowSize,
+				viewXform.windowTopLeftCornerInRootSpace.scale( viewXform.rootScaleInWindowSpace ) );
 		
 	}
 	
 	private void scrollBarX(double x)
 	{
-		windowTopLeftCornerInRootSpace.x = x / rootScaleInWindowSpace;
+		viewXform.windowTopLeftCornerInRootSpace.x = x / viewXform.rootScaleInWindowSpace;
 		queueFullRedraw();
 	}
 	
 	private void scrollBarY(double y)
 	{
-		windowTopLeftCornerInRootSpace.y = y / rootScaleInWindowSpace;
+		viewXform.windowTopLeftCornerInRootSpace.y = y / viewXform.rootScaleInWindowSpace;
 		queueFullRedraw();
 	}
 	
@@ -1240,8 +1270,8 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		AffineTransform transform = graphics.getTransform();
 		
 		// Apply the transformation
-		graphics.scale( rootScaleInWindowSpace, rootScaleInWindowSpace );
-		graphics.translate( -windowTopLeftCornerInRootSpace.x, -windowTopLeftCornerInRootSpace.y );
+		graphics.scale( viewXform.rootScaleInWindowSpace, viewXform.rootScaleInWindowSpace );
+		graphics.translate( -viewXform.windowTopLeftCornerInRootSpace.x, -viewXform.windowTopLeftCornerInRootSpace.y );
 		
 		// Draw
 		handleDrawBackground( graphics, new AABox2( topLeftRootSpace, bottomRightRootSpace) );
@@ -1413,7 +1443,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 			
 			if ( dragButton == 1  ||  dragButton == 2 )
 			{
-				windowTopLeftCornerInRootSpace = windowTopLeftCornerInRootSpace.sub( windowSpaceToRootSpace( delta ) );
+				viewXform.windowTopLeftCornerInRootSpace = viewXform.windowTopLeftCornerInRootSpace.sub( windowSpaceToRootSpace( delta ) );
 				updateRange();
 				queueFullRedraw();
 			}

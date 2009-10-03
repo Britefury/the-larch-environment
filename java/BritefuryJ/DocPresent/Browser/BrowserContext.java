@@ -6,18 +6,27 @@
 //##************************
 package BritefuryJ.DocPresent.Browser;
 
+import BritefuryJ.DocPresent.DPPresentationArea;
+
 class BrowserContext
 {
 	private String location;
+	private DPPresentationArea.ViewTransformation viewXform;
 	
 	
 	public BrowserContext(String location)
 	{
 		this.location = location;
+		this.viewXform = new DPPresentationArea.ViewTransformation();
 	}
 	
 	public String getLocation()
 	{
 		return location;
+	}
+
+	public DPPresentationArea.ViewTransformation getViewTransformation()
+	{
+		return viewXform;
 	}
 }
