@@ -15,18 +15,23 @@ import javax.swing.WindowConstants;
 
 import BritefuryJ.DocPresent.Browser.TabbedBrowser;
 
-public class BrowserTest
+public class BrowserTest implements TabbedBrowser.TabbedBrowserListener
 {
 	public static void main(final String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException
 	{
 		UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
-
 		
+		BrowserTest test = new BrowserTest();
+		test.createNewBrowserWindow( "" );
+	}
+
+	
+	public void createNewBrowserWindow(String location)
+	{
 		JFrame frame = new JFrame( "Browser test" );
 		frame.setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
 		
-		
-		TabbedBrowser browser = new TabbedBrowser( null, "" );
+		TabbedBrowser browser = new TabbedBrowser( null, this, location );
 		browser.getComponent().setPreferredSize( new Dimension( 800, 600 ) );
 		frame.add( browser.getComponent() );
 		frame.pack();

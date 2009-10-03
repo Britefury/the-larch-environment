@@ -188,6 +188,13 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	
 	
 	
+	public static interface TabbedBrowserListener
+	{
+		public void createNewBrowserWindow(String location);
+	}
+	
+	
+	
 	
 	
 	
@@ -196,15 +203,18 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	
 	private LocationResolver resolver;
 	
+	TabbedBrowserListener listener;
+	
 	private ArrayList<Browser> browsers;
 	private Browser currentBrowser;
 	private CommandHistoryListener commandHistoryListener;
 	
 	
 	
-	public TabbedBrowser(LocationResolver resolver, String location)
+	public TabbedBrowser(LocationResolver resolver, TabbedBrowserListener listener, String location)
 	{
 		this.resolver = resolver;
+		this.listener = listener;
 		
 		browsers = new ArrayList<Browser>();
 
@@ -349,6 +359,10 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 		{
 			openLocationInNewTab( location );
 		}
+		else if ( op == PageController.OpenOperation.OPEN_IN_NEW_WINDOW )
+		{
+			openLocationInNewWindow( location );
+		}
 	}
 	
 	public void openLocationInCurrentTab(String location)
@@ -359,6 +373,18 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	public void openLocationInNewTab(String location)
 	{
 		addNewBrowser( location );
+	}
+	
+	public void openLocationInNewWindow(String location)
+	{
+		if ( listener != null )
+		{
+			listener.createNewBrowserWindow( location );
+		}
+		else
+		{
+			openLocationInNewTab( location );
+		}
 	}
 	
 	

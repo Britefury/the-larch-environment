@@ -158,6 +158,22 @@ public abstract class DPContainerCollateable extends DPContainer implements Coll
 	{
 		collationRoot = root;
 		boundsBoxes = null;
+		
+		for (DPWidget child: getChildren())
+		{
+			if ( child instanceof Collateable )
+			{
+				((Collateable)child).onCollateableParentCollationRootChanged( root );
+			}
+		}
+	}
+	
+	public void onCollateableParentCollationRootChanged(DPContainerSequenceCollationRoot root)
+	{
+		if ( parent instanceof Collateable )
+		{
+			setCollationRoot( root );
+		}
 	}
 
 	public DPContainerSequenceCollationRoot getCollationRoot()
@@ -262,6 +278,7 @@ public abstract class DPContainerCollateable extends DPContainer implements Coll
 		}
 		else
 		{
+			System.out.println( "parent = " + parent );
 			return null;
 		}
 	}

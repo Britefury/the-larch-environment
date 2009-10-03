@@ -250,6 +250,20 @@ public class DPProxy extends DPBin implements Collateable
 	{
 		collationRoot = root;
 		boundsBoxes = null;
+		
+		DPWidget child = getChild();
+		if ( child instanceof Collateable )
+		{
+			((Collateable)child).onCollateableParentCollationRootChanged( root );
+		}
+	}
+	
+	public void onCollateableParentCollationRootChanged(DPContainerSequenceCollationRoot root)
+	{
+		if ( parent instanceof Collateable )
+		{
+			setCollationRoot( root );
+		}
 	}
 
 	public DPContainerSequenceCollationRoot getCollationRoot()

@@ -10,4 +10,5 @@ interface Collateable
 {
 	void setCollationRange(int start, int end);
 	DPContainerSequenceCollationRoot getCollationRoot();
+	void onCollateableParentCollationRootChanged(DPContainerSequenceCollationRoot root);
 }
