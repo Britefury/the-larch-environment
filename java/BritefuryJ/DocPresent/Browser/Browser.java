@@ -79,7 +79,7 @@ public class Browser
 		this.resolver = resolver;
 		history = new BrowserHistory( location );
 		
-		area = new DPPresentationArea();
+		area = new DPPresentationArea( history.getCurrentContext().getViewTransformation() );
 		area.setPageController( pageController );
 		
 		ActionMap actionMap = area.getPresentationComponent().getActionMap();
@@ -292,6 +292,8 @@ public class Browser
 		
 		// Set the page
 		setPage( p );
+
+		area.setViewTransformation( history.getCurrentContext().getViewTransformation() );
 	}
 	
 	private void setPage(Page p)
