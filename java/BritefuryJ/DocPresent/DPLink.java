@@ -11,6 +11,7 @@ import org.python.core.PyObject;
 
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
+import BritefuryJ.DocPresent.Input.Modifier;
 import BritefuryJ.DocPresent.StyleSheets.LinkStyleSheet;
 
 public class DPLink extends DPStaticText
@@ -34,20 +35,29 @@ public class DPLink extends DPStaticText
 		public boolean onLinkClicked(DPLink link, PointerButtonEvent buttonEvent)
 		{
 			PageController pageController = link.presentationArea.getPageController();
-			if ( buttonEvent.getButton() == 1 )
+			if ( ( buttonEvent.getPointer().getModifiers() & Modifier.CTRL ) != 0 )
 			{
-				pageController.openLocation( targetLocation, PageController.OpenOperation.OPEN_IN_CURRENT_TAB );
-				return true;
-			}
-			else if ( buttonEvent.getButton() == 2 )
-			{
-				pageController.openLocation( targetLocation, PageController.OpenOperation.OPEN_IN_NEW_TAB );
-				return true;
+				if ( buttonEvent.getButton() == 1  ||  buttonEvent.getButton() == 2 )
+				{
+					pageController.openLocation( targetLocation, PageController.OpenOperation.OPEN_IN_NEW_WINDOW );
+					return true;
+				}
 			}
 			else
 			{
-				return false;
+				if ( buttonEvent.getButton() == 1 )
+				{
+					pageController.openLocation( targetLocation, PageController.OpenOperation.OPEN_IN_CURRENT_TAB );
+					return true;
+				}
+				else if ( buttonEvent.getButton() == 2 )
+				{
+					pageController.openLocation( targetLocation, PageController.OpenOperation.OPEN_IN_NEW_TAB );
+					return true;
+				}
 			}
+
+			return false;
 		}
 	}
 	
