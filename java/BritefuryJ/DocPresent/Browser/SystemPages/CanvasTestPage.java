@@ -8,11 +8,6 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPBorder;
@@ -27,10 +22,9 @@ import BritefuryJ.DocPresent.Canvas.DrawingNode;
 import BritefuryJ.DocPresent.Canvas.GroupNode;
 import BritefuryJ.DocPresent.Canvas.ShapeNode;
 import BritefuryJ.DocPresent.Canvas.TextNode;
-import BritefuryJ.DocPresent.Input.DndDrop;
 import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.DocPresent.Input.SimpleDndHandler;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
@@ -61,23 +55,17 @@ public class CanvasTestPage extends SystemPage
 	protected DndHandler dndSource(int index)
 	{
 		final String dragData = new Integer( index ).toString();
-		DndHandler sourceHandler = new DndHandler()
+		SimpleDndHandler.SourceDataFn sourceDataFn = new SimpleDndHandler.SourceDataFn()
 		{
-			public int getSourceRequestedAction(PointerInputElement sourceElement, PointerInterface pointer, int button)
+			public Object createSourceData(PointerInputElement sourceElement)
 			{
-				return COPY;
-			}
-
-			public Transferable createTransferable(PointerInputElement sourceElement)
-			{
-				return new StringSelection( dragData );
-			}
-
-			public void exportDone(PointerInputElement sourceElement, Transferable data, int action)
-			{
+				return dragData;
 			}
 		};
-		return sourceHandler;
+		
+		SimpleDndHandler sourceDndHandler = new SimpleDndHandler();
+		sourceDndHandler.registerSource( "text", sourceDataFn );
+		return sourceDndHandler;
 	}
 	
 	
@@ -151,37 +139,20 @@ public class CanvasTestPage extends SystemPage
 		DPBorder destBorderElement = new DPBorder( destBorder );
 		destBorderElement.setChild( destText );
 		
-		DndHandler destHandler = new DndHandler()
+		SimpleDndHandler.DropFn dropFn = new SimpleDndHandler.DropFn()
 		{
-			public boolean canDrop(PointerInputElement destElement, DndDrop drop)
+			public boolean acceptDrop(PointerInputElement destElement, Object data)
 			{
-				return true;
-			}
-
-			public boolean acceptDrop(PointerInputElement destElement, DndDrop drop)
-			{
-				Transferable x = drop.getTransferable();
-				String text = null;
-				try
-				{
-					text = (String)x.getTransferData( DataFlavor.stringFlavor );
-				}
-				catch (UnsupportedFlavorException e)
-				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				catch (IOException e)
-				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				String text = (String)data;
 				((DPStaticText)((DPBorder)destElement).getChild()).setText( text );
 				return true;
 			}
 		};
 		
-		destBorderElement.enableDnd( destHandler );
+		SimpleDndHandler destDndHandler = new SimpleDndHandler();
+		destDndHandler.registerDest( "text", dropFn );
+
+		destBorderElement.enableDnd( destDndHandler );
 
 		return destBorderElement;
 	}

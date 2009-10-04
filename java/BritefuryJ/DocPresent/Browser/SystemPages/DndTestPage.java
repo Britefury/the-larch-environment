@@ -8,11 +8,6 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
 
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPHBox;
@@ -21,10 +16,8 @@ import BritefuryJ.DocPresent.DPTable;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
-import BritefuryJ.DocPresent.Input.DndDrop;
-import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.DocPresent.Input.SimpleDndHandler;
 import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TableStyleSheet;
 
@@ -33,7 +26,8 @@ public class DndTestPage extends SystemPage
 	private static StaticTextStyleSheet textStyle = new StaticTextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK );
 	private static Border sourceBorder = new EmptyBorder( 10.0, 10.0, 10.0, 10.0, new Color( 0.75f, 0.85f, 1.0f ) );
 	private static Border destBorder = new EmptyBorder( 10.0, 10.0, 10.0, 10.0, new Color( 1.0f, 0.9f, 0.75f ) );
-
+	
+	
 	protected DndTestPage()
 	{
 		register( "tests.dnd" );
@@ -58,24 +52,18 @@ public class DndTestPage extends SystemPage
 		DPBorder sourceBorderElement = new DPBorder( sourceBorder );
 		sourceBorderElement.setChild( sourceText );
 		
-		DndHandler sourceHandler = new DndHandler()
+		SimpleDndHandler.SourceDataFn sourceDataFn = new SimpleDndHandler.SourceDataFn()
 		{
-			public int getSourceRequestedAction(PointerInputElement sourceElement, PointerInterface pointer, int button)
+			public Object createSourceData(PointerInputElement sourceElement)
 			{
-				return COPY;
-			}
-
-			public Transferable createTransferable(PointerInputElement sourceElement)
-			{
-				return new StringSelection( dragData );
-			}
-
-			public void exportDone(PointerInputElement sourceElement, Transferable data, int action)
-			{
+				return dragData;
 			}
 		};
 		
-		sourceBorderElement.enableDnd( sourceHandler );
+		SimpleDndHandler sourceDndHandler = new SimpleDndHandler();
+		sourceDndHandler.registerSource( "text", sourceDataFn );
+
+		sourceBorderElement.enableDnd( sourceDndHandler );
 
 		return sourceBorderElement;
 	}
@@ -86,44 +74,21 @@ public class DndTestPage extends SystemPage
 		DPBorder destBorderElement = new DPBorder( destBorder );
 		destBorderElement.setChild( destText );
 		
-		DndHandler destHandler = new DndHandler()
+		SimpleDndHandler.DropFn dropFn = new SimpleDndHandler.DropFn()
 		{
-			public boolean canDrop(PointerInputElement destElement, DndDrop drop)
+			public boolean acceptDrop(PointerInputElement destElement, Object data)
 			{
-				return drop.getTransferable() != null;
-			}
-
-			public boolean acceptDrop(PointerInputElement destElement, DndDrop drop)
-			{
-				Transferable x = drop.getTransferable();
-				if ( x != null )
-				{
-					String text = null;
-					try
-					{
-						text = (String)x.getTransferData( DataFlavor.stringFlavor );
-					}
-					catch (UnsupportedFlavorException e)
-					{
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					catch (IOException e)
-					{
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					((DPStaticText)((DPBorder)destElement).getChild()).setText( text );
-					return true;
-				}
-				else
-				{
-					return false;
-				}
+				String text = (String)data;
+				((DPStaticText)((DPBorder)destElement).getChild()).setText( text );
+				return true;
 			}
 		};
 		
-		destBorderElement.enableDnd( destHandler );
+		SimpleDndHandler destDndHandler = new SimpleDndHandler();
+		destDndHandler.registerDest( "text", dropFn );
+
+
+		destBorderElement.enableDnd( destDndHandler );
 
 		return destBorderElement;
 	}
