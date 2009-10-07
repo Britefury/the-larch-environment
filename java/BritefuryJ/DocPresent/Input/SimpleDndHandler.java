@@ -81,6 +81,27 @@ public class SimpleDndHandler extends DndHandler
 	}
 	
 	
+	public static interface CanDropFn
+	{
+		public boolean canDrop(PointerInputElement destElement, Object data);
+	}
+	
+	public static class PyCanDropFn implements CanDropFn
+	{
+		private PyObject fn;
+		
+		public PyCanDropFn(PyObject fn)
+		{
+			this.fn = fn;
+		}
+		
+		public boolean canDrop(PointerInputElement destElement, Object data)
+		{
+			return Py.py2boolean( fn.__call__( Py.java2py( destElement ), Py.java2py( data ) ) );
+		}
+	}
+	
+	
 	
 	private static class SimpleDataFlavor extends DataFlavor
 	{
@@ -93,18 +114,42 @@ public class SimpleDndHandler extends DndHandler
 		}
 	}
 	
-	private static class SimpleDndData
+	private static class SimpleTransferData
 	{
 		private PointerInputElement sourceElement;
 		private SimpleDndHandler handler;
-		private SourceEntry sourceEntry;
-		private Object dragData;
+		private SourceEntry acceptedSourceEntry;
+		private Object acceptedDragData;
+		private HashMap<Object,Object> dragDataTable;
 		
 		
-		public SimpleDndData(PointerInputElement sourceElement, SimpleDndHandler handler)
+		public SimpleTransferData(PointerInputElement sourceElement, SimpleDndHandler handler)
 		{
 			this.sourceElement = sourceElement;
 			this.handler = handler;
+			dragDataTable = new HashMap<Object,Object>();
+		}
+		
+		
+		
+		public Object getDragDataForKey(Object key, SourceEntry sourceEntry)
+		{
+			if ( dragDataTable.containsKey( key ) )
+			{
+				return dragDataTable.get( key );
+			}
+			else
+			{
+				Object dragData = sourceEntry.sourceDataFn.createSourceData( sourceElement );
+				dragDataTable.put( key, dragData );
+				return dragData;
+			}
+		}
+		
+		public void acceptDrop(SourceEntry sourceEntry, Object dragData)
+		{
+			acceptedSourceEntry = sourceEntry;
+			acceptedDragData = dragData;
 		}
 	}
 	
@@ -125,7 +170,7 @@ public class SimpleDndHandler extends DndHandler
 		{
 			if ( flavor == SimpleDataFlavor.flavor )
 			{
-				return new SimpleDndData( sourceElement, handler );
+				return new SimpleTransferData( sourceElement, handler );
 			}
 			else
 			{
@@ -162,11 +207,13 @@ public class SimpleDndHandler extends DndHandler
 	{
 		private Object key;
 		private DropFn dropFn;
+		private CanDropFn canDropFn;
 		
-		public DestEntry(Object key, DropFn dropFn)
+		public DestEntry(Object key, DropFn dropFn, CanDropFn canDropFn)
 		{
 			this.key = key;
 			this.dropFn = dropFn;
+			this.canDropFn = canDropFn;
 		}
 	}
 	
@@ -208,12 +255,22 @@ public class SimpleDndHandler extends DndHandler
 	
 	public void registerDest(Object key, DropFn dropFn)
 	{
-		destTable.add( new DestEntry( key, dropFn ) );
+		destTable.add( new DestEntry( key, dropFn, null ) );
 	}
 	
 	public void registerDest(Object key, PyObject dropFn)
 	{
 		registerDest( key, new PyDropFn( dropFn ) );
+	}
+	
+	public void registerDest(Object key, DropFn dropFn, CanDropFn canDropFn)
+	{
+		destTable.add( new DestEntry( key, dropFn, canDropFn ) );
+	}
+	
+	public void registerDest(Object key, PyObject dropFn, PyObject canDropFn)
+	{
+		registerDest( key, new PyDropFn( dropFn ), new PyCanDropFn( canDropFn ) );
 	}
 	
 	
@@ -248,10 +305,10 @@ public class SimpleDndHandler extends DndHandler
 	
 	public void exportDone(PointerInputElement sourceElement, Transferable data, int action)
 	{
-		SimpleDndData sourceData = null;
+		SimpleTransferData sourceData = null;
 		try
 		{
-			sourceData = (SimpleDndData)data.getTransferData( SimpleDataFlavor.flavor );
+			sourceData = (SimpleTransferData)data.getTransferData( SimpleDataFlavor.flavor );
 		}
 		catch (UnsupportedFlavorException e)
 		{
@@ -262,8 +319,8 @@ public class SimpleDndHandler extends DndHandler
 			return;
 		}
 		
-		ExportDoneFn exportDoneFn = sourceData.sourceEntry.exportDoneFn;
-		exportDoneFn.exportDone( sourceElement, sourceData.dragData, action );
+		ExportDoneFn exportDoneFn = sourceData.acceptedSourceEntry.exportDoneFn;
+		exportDoneFn.exportDone( sourceElement, sourceData.acceptedDragData, action );
 	}
 
 	
@@ -271,10 +328,10 @@ public class SimpleDndHandler extends DndHandler
 	
 	public boolean canDrop(PointerInputElement destElement, DndDrop drop)
 	{
-		SimpleDndData sourceData = null;
+		SimpleTransferData transferData = null;
 		try
 		{
-			sourceData = (SimpleDndData)drop.getTransferable().getTransferData( SimpleDataFlavor.flavor );
+			transferData = (SimpleTransferData)drop.getTransferable().getTransferData( SimpleDataFlavor.flavor );
 		}
 		catch (UnsupportedFlavorException e)
 		{
@@ -288,10 +345,18 @@ public class SimpleDndHandler extends DndHandler
 		
 		for (DestEntry destEntry: destTable)
 		{
-			SourceEntry sourceEntry = sourceData.handler.sourceTable.get( destEntry.key );
+			SourceEntry sourceEntry = transferData.handler.sourceTable.get( destEntry.key );
 			if ( sourceEntry != null )
 			{
-				return true;
+				if ( destEntry.canDropFn != null )
+				{
+					Object dragData = transferData.getDragDataForKey( destEntry.key, sourceEntry );
+					return destEntry.canDropFn.canDrop( destElement, dragData );
+				}
+				else
+				{
+					return true;
+				}
 			}
 		}
 		return false;
@@ -299,10 +364,10 @@ public class SimpleDndHandler extends DndHandler
 	
 	public boolean acceptDrop(PointerInputElement destElement, DndDrop drop)
 	{
-		SimpleDndData sourceData = null;
+		SimpleTransferData transferData = null;
 		try
 		{
-			sourceData = (SimpleDndData)drop.getTransferable().getTransferData( SimpleDataFlavor.flavor );
+			transferData = (SimpleTransferData)drop.getTransferable().getTransferData( SimpleDataFlavor.flavor );
 		}
 		catch (UnsupportedFlavorException e)
 		{
@@ -318,13 +383,16 @@ public class SimpleDndHandler extends DndHandler
 		
 		for (DestEntry destEntry: destTable)
 		{
-			SourceEntry sourceEntry = sourceData.handler.sourceTable.get( destEntry.key );
+			SourceEntry sourceEntry = transferData.handler.sourceTable.get( destEntry.key );
 			if ( sourceEntry != null )
 			{
-				Object dragData = sourceEntry.sourceDataFn.createSourceData( sourceData.sourceElement );
-				sourceData.sourceEntry = sourceEntry;
-				sourceData.dragData = dragData;
-				return destEntry.dropFn.acceptDrop( destElement, dragData );
+				Object dragData = transferData.getDragDataForKey( destEntry.key, sourceEntry );
+				boolean bResult = destEntry.dropFn.acceptDrop( destElement, dragData );
+				if ( bResult )
+				{
+					transferData.acceptDrop( sourceEntry, dragData );
+					return true;
+				}
 			}
 		}
 		return false;

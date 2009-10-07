@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPCanvas;
+import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPStaticText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
@@ -26,6 +27,7 @@ import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.SimpleDndHandler;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
+import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
@@ -48,7 +50,7 @@ public class CanvasTestPage extends SystemPage
 	
 	protected String getDescription()
 	{
-		return "Drag clock ticks to the drop box below.";
+		return "Drag clock ticks to the drop box below. The second drop box will only accept drops of numbers greater than or equal to the number in the first box.";
 	}
 	
 	
@@ -158,6 +160,55 @@ public class CanvasTestPage extends SystemPage
 	}
 
 	
+	private static int textAsNumber(String text)
+	{
+		try
+		{
+			return new Integer( text ).intValue();
+		}
+		catch (NumberFormatException e)
+		{
+			return 0;
+		}
+	}
+	
+	protected DPWidget makeDestElement2(String title, final DPWidget firstElement)
+	{
+		DPStaticText destText = new DPStaticText( textStyle, title );
+		DPBorder destBorderElement = new DPBorder( destBorder );
+		destBorderElement.setChild( destText );
+		
+		SimpleDndHandler.DropFn dropFn = new SimpleDndHandler.DropFn()
+		{
+			public boolean acceptDrop(PointerInputElement destElement, Object data)
+			{
+				String text = (String)data;
+				((DPStaticText)((DPBorder)destElement).getChild()).setText( text );
+				return true;
+			}
+		};
+		
+		SimpleDndHandler.CanDropFn canDropFn = new SimpleDndHandler.CanDropFn()
+		{
+			public boolean canDrop(PointerInputElement destElement, Object data)
+			{
+				String text = (String)data;
+				String firstText = ((DPStaticText)((DPBorder)firstElement).getChild()).getText();
+				int firstNum = textAsNumber( firstText );
+				int secondNum = textAsNumber( text );
+				return secondNum >= firstNum;
+			}
+		};
+		
+		SimpleDndHandler destDndHandler = new SimpleDndHandler();
+		destDndHandler.registerDest( "text", dropFn, canDropFn );
+
+		destBorderElement.enableDnd( destDndHandler );
+
+		return destBorderElement;
+	}
+
+	
 	protected DPWidget createContents()
 	{
 		DPCanvas diagramElement = new DPCanvas( createClockFace().translate( 320.0, 240.0 ), 640.0, 480.0, false, false );
@@ -166,11 +217,17 @@ public class CanvasTestPage extends SystemPage
 		border.setChild( diagramElement );
 		
 		DPWidget dest0 = makeDestElement( "Number" );
+		DPWidget dest1 = makeDestElement2( "Number", dest0 );
+
+		HBoxStyleSheet hboxS = new HBoxStyleSheet( 20.0 );
+		DPHBox hbox = new DPHBox( hboxS );
+		hbox.append( dest0 );
+		hbox.append( dest1 );
 
 		VBoxStyleSheet vboxS = new VBoxStyleSheet( VTypesetting.NONE, 20.0 );
 		DPVBox vbox = new DPVBox( vboxS );
 		vbox.append( border );
-		vbox.append( dest0 );
+		vbox.append( hbox );
 
 		return vbox;
 	}
