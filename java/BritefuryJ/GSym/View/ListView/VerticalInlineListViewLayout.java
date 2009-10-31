@@ -38,8 +38,7 @@ public class VerticalInlineListViewLayout extends IndentedListViewLayout
 	{
 		if ( separator != null )
 		{
-			DPParagraph paragraph = new DPParagraph( lineParagraphStyleSheet );
-			paragraph.setContext( ctx );
+			DPParagraph paragraph = new DPParagraph( ctx, lineParagraphStyleSheet );
 
 			paragraph.setChildren( Arrays.asList( new DPWidget[] { child, separator.createElement( ctx, index, child ) } ) );
 			return paragraph;
@@ -56,8 +55,7 @@ public class VerticalInlineListViewLayout extends IndentedListViewLayout
 		if ( children.size() <= 1 )
 		{
 			// Paragraph with contents: [ beginDelim ] + children + [ endDelim ]
-			DPParagraph paragraph = new DPParagraph( lineParagraphStyleSheet );
-			paragraph.setContext( ctx );
+			DPParagraph paragraph = new DPParagraph( ctx, lineParagraphStyleSheet );
 			
 			ArrayList<DPWidget> childElems = new ArrayList<DPWidget>();
 			if ( beginDelim != null )
@@ -87,8 +85,7 @@ public class VerticalInlineListViewLayout extends IndentedListViewLayout
 			DPWidget first = null;
 			if ( beginDelim != null  ||  separator != null )
 			{
-				DPParagraph firstPara = new DPParagraph( lineParagraphStyleSheet );
-				firstPara.setContext( ctx );
+				DPParagraph firstPara = new DPParagraph( ctx, lineParagraphStyleSheet );
 				DPWidget child = children.get( 0 );
 				ArrayList<DPWidget> firstChildElems = new ArrayList<DPWidget>();
 				firstChildElems.ensureCapacity( 3 );
@@ -128,14 +125,12 @@ public class VerticalInlineListViewLayout extends IndentedListViewLayout
 				childElems.add( createLineParagraph( ctx, children.size() - 1, children.get( children.size() - 1 ), null ) );
 			}
 			
-			DPVBox middleVBox = new DPVBox( styleSheet );
-			middleVBox.setContext( ctx );
+			DPVBox middleVBox = new DPVBox( ctx, styleSheet );
 			middleVBox.setChildren( childElems );
 			DPWidget indent = indent( ctx, middleVBox );
 			
 			
-			DPVBox mainVBox = new DPVBox( styleSheet );
-			mainVBox.setContext( ctx );
+			DPVBox mainVBox = new DPVBox( ctx, styleSheet );
 			if ( endDelim != null )
 			{
 				mainVBox.setChildren( Arrays.asList( new DPWidget[] { first, indent, endDelim.createElement( ctx ) } ) );

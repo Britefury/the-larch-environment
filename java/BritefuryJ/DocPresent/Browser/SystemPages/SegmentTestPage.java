@@ -45,7 +45,7 @@ public class SegmentTestPage extends SystemPage
 	protected DPWidget text(String t, Color colour)
 	{
 		TextStyleSheet s0 = new TextStyleSheet( defaultFont, colour );
-		return new DPText( s0, t );
+		return new DPText( getContext(), s0, t );
 	}
 	
 	protected DPWidget text(String t)
@@ -56,7 +56,7 @@ public class SegmentTestPage extends SystemPage
 	
 	protected DPWidget segment(DPWidget x, boolean bGuardBegin, boolean bGuardEnd)
 	{
-		DPSegment e = new DPSegment( bGuardBegin, bGuardEnd );
+		DPSegment e = new DPSegment( getContext(), bGuardBegin, bGuardEnd );
 		e.setChild( x );
 		return e;
 	}
@@ -64,7 +64,7 @@ public class SegmentTestPage extends SystemPage
 	
 	protected DPWidget span(DPWidget... x)
 	{
-		DPSpan s = new DPSpan();
+		DPSpan s = new DPSpan( getContext() );
 		s.setChildren( Arrays.asList( x ) );
 		return s;
 	}
@@ -72,7 +72,7 @@ public class SegmentTestPage extends SystemPage
 	
 	protected DPWidget line(DPWidget... x)
 	{
-		DPParagraph para = new DPParagraph();
+		DPParagraph para = new DPParagraph( getContext() );
 		para.setChildren( Arrays.asList( x ) );
 		return para;
 	}
@@ -80,7 +80,7 @@ public class SegmentTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		DPVBox box = new DPVBox();
+		DPVBox box = new DPVBox( getContext() );
 		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
 		
 		

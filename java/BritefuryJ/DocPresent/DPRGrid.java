@@ -26,14 +26,14 @@ public class DPRGrid extends DPContainerSequenceCollationRoot
 
 	
 	
-	public DPRGrid()
+	public DPRGrid(ElementContext context)
 	{
-		this( TableStyleSheet.defaultStyleSheet );
+		this( context, TableStyleSheet.defaultStyleSheet );
 	}
 	
-	public DPRGrid(TableStyleSheet syleSheet)
+	public DPRGrid(ElementContext context, TableStyleSheet syleSheet)
 	{
-		super( syleSheet );
+		super( context, syleSheet );
 	}
 	
 	

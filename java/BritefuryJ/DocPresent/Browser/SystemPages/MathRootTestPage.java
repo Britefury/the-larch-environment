@@ -38,7 +38,7 @@ public class MathRootTestPage extends SystemPage
 	{
 		if ( text != null )
 		{
-			return new DPText( styleSheet, text );
+			return new DPText( getContext(), styleSheet, text );
 		}
 		else
 		{
@@ -51,10 +51,10 @@ public class MathRootTestPage extends SystemPage
 	{
 		Font f0 = new Font( "Sans serif", Font.PLAIN, 14 );
 		TextStyleSheet s0 = new TextStyleSheet( f0, new Color( 0.0f, 0.5f, 0.0f ) );
-		DPText num = new DPText( s0, numeratorText );
-		DPText denom = new DPText( s0, denominatorText );
+		DPText num = new DPText( getContext(), s0, numeratorText );
+		DPText denom = new DPText( getContext(), s0, denominatorText );
 		
-		DPFraction frac = new DPFraction();
+		DPFraction frac = new DPFraction( getContext() );
 		
 		frac.setNumeratorChild( num );
 		frac.setDenominatorChild( denom );
@@ -65,7 +65,7 @@ public class MathRootTestPage extends SystemPage
 	
 	protected DPWidget makeRoot(DPWidget child)
 	{
-		DPMathRoot root = new DPMathRoot();
+		DPMathRoot root = new DPMathRoot( getContext() );
 		root.setChild( child );
 		return root;
 	}
@@ -75,7 +75,7 @@ public class MathRootTestPage extends SystemPage
 	{
 		Font f0 = new Font( "Sans serif", Font.PLAIN, 14 );
 		TextStyleSheet s0 = new TextStyleSheet( f0, new Color( 0.0f, 0.5f, 0.0f ) );
-		DPText t = new DPText( s0, text );
+		DPText t = new DPText( getContext(), s0, text );
 		return makeRoot( t );
 	}
 
@@ -83,7 +83,7 @@ public class MathRootTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		DPVBox box = new DPVBox();
+		DPVBox box = new DPVBox( getContext() );
 		
 		box.append( makeRoot( "a" ) );
 		box.append( makeRoot( "a+p" ) );

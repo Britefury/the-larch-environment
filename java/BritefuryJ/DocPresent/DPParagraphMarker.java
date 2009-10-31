@@ -15,14 +15,14 @@ import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
 public abstract class DPParagraphMarker extends DPWidget
 {
-	public DPParagraphMarker()
+	public DPParagraphMarker(ElementContext context)
 	{
-		super();
+		super( context );
 	}
 	
-	public DPParagraphMarker(WidgetStyleSheet styleSheet)
+	public DPParagraphMarker(ElementContext context, WidgetStyleSheet styleSheet)
 	{
-		super( styleSheet );
+		super( context, styleSheet );
 	}
 
 	

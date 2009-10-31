@@ -42,46 +42,46 @@ public class VBoxTestPage extends SystemPage
 
 	protected DPWidget wrapInOutline(DPWidget w)
 	{
-		DPBorder border = new DPBorder( outline );
+		DPBorder border = new DPBorder( getContext(), outline );
 		border.setChild( w );
 		return border;
 	}
 	
 	
-	protected static DPWidget makeTextOnGrey(String text)
+	protected DPWidget makeTextOnGrey(String text)
 	{
-		DPStaticText t = new DPStaticText( text );
+		DPStaticText t = new DPStaticText( getContext(), text );
 		
 		EmptyBorder b = new EmptyBorder( new Color( 0.8f, 0.8f, 0.8f ) );
-		DPBorder border = new DPBorder( b );
+		DPBorder border = new DPBorder( getContext(), b );
 		border.setChild( t );
 		return border;
 	}
 
 	
 	
-	protected static DPStaticText[] makeTSTexts(String header)
+	protected DPStaticText[] makeTSTexts(String header)
 	{
-		DPStaticText t0 = new DPStaticText( "First item" );
-		DPStaticText t1 = new DPStaticText( "Second item" );
-		DPStaticText t2 = new DPStaticText( "Third item" );
-		DPStaticText t3 = new DPStaticText( "Fourth item" );
+		DPStaticText t0 = new DPStaticText( getContext(), "First item" );
+		DPStaticText t1 = new DPStaticText( getContext(), "Second item" );
+		DPStaticText t2 = new DPStaticText( getContext(), "Third item" );
+		DPStaticText t3 = new DPStaticText( getContext(), "Fourth item" );
 		
 		DPStaticText[] texts = { t0, t1, t2, t3 };
 		return texts;
 	}
 	
 	
-	protected static DPHBox makeTypesetHBox(VTypesetting typesetting, String header)
+	protected DPHBox makeTypesetHBox(VTypesetting typesetting, String header)
 	{
 		DPStaticText[] txt = makeTSTexts( header );
 		VBoxStyleSheet vs = new VBoxStyleSheet( typesetting, 0.0 );
-		DPVBox v = new DPVBox( vs );
+		DPVBox v = new DPVBox( getContext(), vs );
 		v.extend( txt );
 		StaticTextStyleSheet t18 = new StaticTextStyleSheet( new Font( "Sans serif", Font.PLAIN, 18 ), new Color( 0.0f, 0.3f, 0.6f ) );
-		DPStaticText before = new DPStaticText( t18, header );
-		DPStaticText after = new DPStaticText( t18, " After" );
-		DPHBox t = new DPHBox();
+		DPStaticText before = new DPStaticText( getContext(), t18, header );
+		DPStaticText after = new DPStaticText( getContext(), t18, " After" );
+		DPHBox t = new DPHBox( getContext() );
 		t.append( before );
 		t.append( v );
 		t.append( after );
@@ -96,17 +96,17 @@ public class VBoxTestPage extends SystemPage
 		StaticTextStyleSheet t18 = new StaticTextStyleSheet( new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK );
 		StaticTextStyleSheet t24 = new StaticTextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.BLACK );
 
-		DPStaticText h = new DPStaticText( t18, "VBox" );
-		DPStaticText t0 = new DPStaticText( t12, "First item" );
-		DPStaticText t1 = new DPStaticText( t12, "Second item" );
-		DPStaticText t2 = new DPStaticText( t12, "Third item" );
+		DPStaticText h = new DPStaticText( getContext(), t18, "VBox" );
+		DPStaticText t0 = new DPStaticText( getContext(), t12, "First item" );
+		DPStaticText t1 = new DPStaticText( getContext(), t12, "Second item" );
+		DPStaticText t2 = new DPStaticText( getContext(), t12, "Third item" );
 		
-		DPVBox vboxTest = new DPVBox();
+		DPVBox vboxTest = new DPVBox( getContext() );
 		vboxTest.extend( new DPWidget[] { h, t0, t1, t2 } );
 		
 		VBoxStyleSheet b1s = new VBoxStyleSheet( VTypesetting.NONE, 10.0 );
-		DPVBox hAlignTest = new DPVBox( b1s );
-		hAlignTest.append( new DPStaticText( t24, "Horizontal alignment" ) );
+		DPVBox hAlignTest = new DPVBox( getContext(), b1s );
+		hAlignTest.append( new DPStaticText( getContext(), t24, "Horizontal alignment" ) );
 		hAlignTest.append( makeTextOnGrey( "Left" ).alignHLeft() );
 		hAlignTest.append( makeTextOnGrey( "Centre" ).alignHCentre() );
 		hAlignTest.append( makeTextOnGrey( "Right" ).alignHRight() );
@@ -118,15 +118,15 @@ public class VBoxTestPage extends SystemPage
 		DPHBox ts2 = makeTypesetHBox( VTypesetting.ALIGN_WITH_BOTTOM, "ALIGN_WITH_BOTTOM" );
 		
 		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, 20.0 );
-		DPVBox typesettingTest = new DPVBox( boxs );
-		typesettingTest.append( new DPStaticText( t24, "VBox typesetting" ) );
+		DPVBox typesettingTest = new DPVBox( getContext(), boxs );
+		typesettingTest.append( new DPStaticText( getContext(), t24, "VBox typesetting" ) );
 		typesettingTest.append( ts0 );
 		typesettingTest.append( ts1 );
 		typesettingTest.append( ts2 );
 		
 		
 		VBoxStyleSheet boxS = new VBoxStyleSheet( VTypesetting.NONE, 20.0 );
-		DPVBox box = new DPVBox( boxS );
+		DPVBox box = new DPVBox( getContext(), boxS );
 		box.append( wrapInOutline( vboxTest ) );
 		box.append( wrapInOutline( hAlignTest ) );
 		box.append( wrapInOutline( typesettingTest ) );

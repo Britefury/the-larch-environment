@@ -25,14 +25,14 @@ import BritefuryJ.JythonInterface.JythonSlice;
 
 abstract public class DPContainerSequence extends DPContainer
 {
-	public DPContainerSequence()
+	public DPContainerSequence(ElementContext context)
 	{
-		this( ContainerStyleSheet.defaultStyleSheet );
+		this( context, ContainerStyleSheet.defaultStyleSheet );
 	}
 
-	public DPContainerSequence(ContainerStyleSheet styleSheet)
+	public DPContainerSequence(ElementContext context, ContainerStyleSheet styleSheet)
 	{
-		super( styleSheet );
+		super( context, styleSheet );
 	}
 
 	
@@ -325,7 +325,7 @@ abstract public class DPContainerSequence extends DPContainer
 	protected void replaceChildWithEmpty(DPWidget child)
 	{
 		int index = registeredChildren.indexOf( child );
-		set( index, new DPEmpty() );
+		set( index, new DPEmpty( null ) );
 	}
 		
 	

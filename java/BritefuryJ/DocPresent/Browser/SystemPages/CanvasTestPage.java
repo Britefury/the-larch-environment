@@ -137,8 +137,8 @@ public class CanvasTestPage extends SystemPage
 	
 	protected DPWidget makeDestElement(String title)
 	{
-		DPStaticText destText = new DPStaticText( textStyle, title );
-		DPBorder destBorderElement = new DPBorder( destBorder );
+		DPStaticText destText = new DPStaticText( getContext(), textStyle, title );
+		DPBorder destBorderElement = new DPBorder( getContext(), destBorder );
 		destBorderElement.setChild( destText );
 		
 		SimpleDndHandler.DropFn dropFn = new SimpleDndHandler.DropFn()
@@ -174,8 +174,8 @@ public class CanvasTestPage extends SystemPage
 	
 	protected DPWidget makeDestElement2(String title, final DPWidget firstElement)
 	{
-		DPStaticText destText = new DPStaticText( textStyle, title );
-		DPBorder destBorderElement = new DPBorder( destBorder );
+		DPStaticText destText = new DPStaticText( getContext(), textStyle, title );
+		DPBorder destBorderElement = new DPBorder( getContext(), destBorder );
 		destBorderElement.setChild( destText );
 		
 		SimpleDndHandler.DropFn dropFn = new SimpleDndHandler.DropFn()
@@ -211,21 +211,21 @@ public class CanvasTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		DPCanvas diagramElement = new DPCanvas( createClockFace().translate( 320.0, 240.0 ), 640.0, 480.0, false, false );
+		DPCanvas diagramElement = new DPCanvas( getContext(), createClockFace().translate( 320.0, 240.0 ), 640.0, 480.0, false, false );
 		Border b = new SolidBorder( 1.0, 3.0, 2.0, 2.0, Color.black, null );
-		DPBorder border = new DPBorder( b );
+		DPBorder border = new DPBorder( getContext(), b );
 		border.setChild( diagramElement );
 		
 		DPWidget dest0 = makeDestElement( "Number" );
 		DPWidget dest1 = makeDestElement2( "Number", dest0 );
 
 		HBoxStyleSheet hboxS = new HBoxStyleSheet( 20.0 );
-		DPHBox hbox = new DPHBox( hboxS );
+		DPHBox hbox = new DPHBox( getContext(), hboxS );
 		hbox.append( dest0 );
 		hbox.append( dest1 );
 
 		VBoxStyleSheet vboxS = new VBoxStyleSheet( VTypesetting.NONE, 20.0 );
-		DPVBox vbox = new DPVBox( vboxS );
+		DPVBox vbox = new DPVBox( getContext(), vboxS );
 		vbox.append( border );
 		vbox.append( hbox );
 

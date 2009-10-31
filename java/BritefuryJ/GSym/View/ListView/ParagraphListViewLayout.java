@@ -45,8 +45,7 @@ public class ParagraphListViewLayout extends ListViewLayout
 	
 	public DPWidget createListElement(ElementContext ctx, List<DPWidget> children, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator)
 	{
-		DPParagraph paragraph = new DPParagraph( styleSheet );
-		paragraph.setContext( ctx );
+		DPParagraph paragraph = new DPParagraph( ctx, styleSheet );
 		
 		ArrayList<DPWidget> childElems = new ArrayList<DPWidget>();
 		childElems.ensureCapacity( children.size() + 2 );
@@ -58,8 +57,7 @@ public class ParagraphListViewLayout extends ListViewLayout
 		
 		if ( bAddParagraphIndentMarkers )
 		{
-			DPParagraphIndentMarker indent = new DPParagraphIndentMarker();
-			indent.setContext( ctx );
+			DPParagraphIndentMarker indent = new DPParagraphIndentMarker( ctx );
 			childElems.add( indent );
 		}
 		
@@ -73,12 +71,11 @@ public class ParagraphListViewLayout extends ListViewLayout
 				{
 					childElems.add( separator.createElement( ctx, i, child ) );
 				}
-				DPLineBreak lineBreak = new DPLineBreak();
+				DPLineBreak lineBreak = new DPLineBreak( ctx );
 				if ( spacingFactory != null )
 				{
 					lineBreak.setChild( spacingFactory.createElement( ctx ) );
 				}
-				lineBreak.setContext( ctx );
 				childElems.add( lineBreak );
 			}
 
@@ -96,8 +93,7 @@ public class ParagraphListViewLayout extends ListViewLayout
 
 		if ( bAddParagraphIndentMarkers )
 		{
-			DPParagraphDedentMarker dedent = new DPParagraphDedentMarker();
-			dedent.setContext( ctx );
+			DPParagraphDedentMarker dedent = new DPParagraphDedentMarker( ctx );
 			childElems.add( dedent );
 		}
 		

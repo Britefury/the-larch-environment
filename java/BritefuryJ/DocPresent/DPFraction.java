@@ -37,14 +37,14 @@ public class DPFraction extends DPContainer
 		public static double BAR_HEIGHT = 1.5;
 		
 		
-		public DPFractionBar(String textRepresentation)
+		public DPFractionBar(ElementContext context, String textRepresentation)
 		{
-			this( FractionStyleSheet.BarStyleSheet.defaultStyleSheet, textRepresentation );
+			this( context, FractionStyleSheet.BarStyleSheet.defaultStyleSheet, textRepresentation );
 		}
 
-		public DPFractionBar(FractionStyleSheet.BarStyleSheet styleSheet, String textRepresentation)
+		public DPFractionBar(ElementContext context, FractionStyleSheet.BarStyleSheet styleSheet, String textRepresentation)
 		{
-			super( styleSheet, textRepresentation );
+			super( context, styleSheet, textRepresentation );
 		}
 
 	
@@ -180,24 +180,24 @@ public class DPFraction extends DPContainer
 	
 	
 	
-	public DPFraction()
+	public DPFraction(ElementContext context)
 	{
-		this( FractionStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, "/" );
+		this( context, FractionStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, "/" );
 	}
 	
-	public DPFraction(String barTextRepresentation)
+	public DPFraction(ElementContext context, String barTextRepresentation)
 	{
-		this( FractionStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, barTextRepresentation );
+		this( context, FractionStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, barTextRepresentation );
 	}
 	
-	public DPFraction(FractionStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet)
+	public DPFraction(ElementContext context, FractionStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet)
 	{
-		this( styleSheet, segmentTextStyleSheet, "/" );
+		this( context, styleSheet, segmentTextStyleSheet, "/" );
 	}
 	
-	public DPFraction(FractionStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, String barTextRepresentation)
+	public DPFraction(ElementContext context, FractionStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, String barTextRepresentation)
 	{
-		super( styleSheet );
+		super( context, styleSheet );
 		
 		this.segmentTextStyleSheet = segmentTextStyleSheet;
 		
@@ -205,7 +205,7 @@ public class DPFraction extends DPContainer
 		segs = new DPSegment[NUMCHILDREN];
 		paras = new DPParagraph[NUMCHILDREN];
 		
-		setChild( BAR, new DPFractionBar( styleSheet.getBarStyleSheet(), barTextRepresentation ) );
+		setChild( BAR, new DPFractionBar( context, styleSheet.getBarStyleSheet(), barTextRepresentation ) );
 	}
 
 	
@@ -249,9 +249,9 @@ public class DPFraction extends DPContainer
 
 				if ( bSegmentRequired  &&  !bSegmentPresent )
 				{
-					DPSegment seg = new DPSegment( segmentTextStyleSheet, true, true );
+					DPSegment seg = new DPSegment( context, segmentTextStyleSheet, true, true );
 					segs[slot] = seg;
-					DPParagraph para = new DPParagraph();
+					DPParagraph para = new DPParagraph( context );
 					para.setChildren( Arrays.asList( new DPWidget[] { seg } ) );
 					paras[slot] = para;
 					

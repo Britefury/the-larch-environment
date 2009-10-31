@@ -105,7 +105,7 @@ public class DocView implements DVNode.NodeRefreshListener
 			DVNode rootView = getRootView();
 			rootView.getElement().alignHExpand();
 			rootView.getElement().alignVExpand();
-			rootBox = new DPVBox( rootBoxStyle );
+			rootBox = new DPVBox( null, rootBoxStyle );
 			rootBox.setChildren( Arrays.asList( new DPWidget[] { rootView.getElement() } ) );
 		}
 		return rootBox;

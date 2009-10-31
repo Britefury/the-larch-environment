@@ -33,14 +33,14 @@ public class DPTable extends DPContainer
 	
 	
 	
-	public DPTable()
+	public DPTable(ElementContext context)
 	{
-		this( TableStyleSheet.defaultStyleSheet );
+		this( context, TableStyleSheet.defaultStyleSheet );
 	}
 
-	public DPTable(TableStyleSheet styleSheet)
+	public DPTable(ElementContext context, TableStyleSheet styleSheet)
 	{
-		super( styleSheet );
+		super( context, styleSheet );
 
 		children = new DPWidget[0][];
 		rowPositions = new int[0];
@@ -413,7 +413,7 @@ public class DPTable extends DPContainer
 			int index = Arrays.asList( row ).indexOf( child );
 			if ( index != -1 )
 			{
-				row[index] = new DPEmpty();
+				row[index] = new DPEmpty( context );
 				break;
 			}
 		}

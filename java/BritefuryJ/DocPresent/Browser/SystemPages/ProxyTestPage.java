@@ -49,40 +49,40 @@ public class ProxyTestPage extends SystemPage
 	
 	protected DPWidget greyBorder(DPWidget child)
 	{
-		DPBorder border = new DPBorder( _greyBorder );
+		DPBorder border = new DPBorder( getContext(), _greyBorder );
 		border.setChild( child );
 		return border;
 	}
 
 	protected DPWidget proxy(DPWidget child)
 	{
-		DPProxy proxy = new DPProxy();
+		DPProxy proxy = new DPProxy( getContext() );
 		proxy.setChild( child );
 		return proxy;
 	}
 	
 	protected DPWidget paragraph(DPWidget children[])
 	{
-		DPParagraph para = new DPParagraph();
+		DPParagraph para = new DPParagraph( getContext() );
 		para.setChildren( children );
 		return para;
 	}
 	
 	protected DPWidget span(DPWidget children[])
 	{
-		DPSpan span = new DPSpan();
+		DPSpan span = new DPSpan( getContext() );
 		span.setChildren( children );
 		return span;
 	}
 	
 	protected DPWidget staticText(String text)
 	{
-		return new DPStaticText( text );
+		return new DPStaticText( getContext(), text );
 	}
 	
 	protected DPWidget content(DPWidget header, DPWidget body)
 	{
-		DPVBox vbox = new DPVBox();
+		DPVBox vbox = new DPVBox( getContext() );
 		vbox.append( header );
 		vbox.append( body );
 		return vbox;
@@ -104,7 +104,7 @@ public class ProxyTestPage extends SystemPage
 		DPWidget content2 = content( header2, body2 );
 		
 		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, 30.0 );
-		DPVBox box = new DPVBox( boxs );
+		DPVBox box = new DPVBox( getContext(), boxs );
 		box.extend( new DPWidget[] { content0, content1, content2 } );
 
 		return box;

@@ -79,7 +79,7 @@ public class Browser
 		this.resolver = resolver;
 		history = new BrowserHistory( location );
 		
-		area = new DPPresentationArea( history.getCurrentContext().getViewTransformation() );
+		area = new DPPresentationArea( null, history.getCurrentContext().getViewTransformation() );
 		area.setPageController( pageController );
 		
 		ActionMap actionMap = area.getPresentationComponent().getActionMap();
@@ -419,23 +419,23 @@ public class Browser
 		
 		public DPWidget getContentsElement()
 		{
-			DPVBox pageBox = new DPVBox();
+			DPVBox pageBox = new DPVBox( null );
 			
 			VBoxStyleSheet contentBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 40.0 );
-			DPVBox contentBox = new DPVBox( contentBoxStyle );
+			DPVBox contentBox = new DPVBox( null, contentBoxStyle );
 			
 
 			
 			StaticTextStyleSheet titleStyle = new StaticTextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
-			DPStaticText title = new DPStaticText( titleStyle, "Default root page" );
+			DPStaticText title = new DPStaticText( null, titleStyle, "Default root page" );
 			
 			StaticTextStyleSheet contentsStyle = new StaticTextStyleSheet( new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK );
-			DPStaticText contents = new DPStaticText( contentsStyle, "Empty document" );
+			DPStaticText contents = new DPStaticText( null, contentsStyle, "Empty document" );
 
 			contentBox.append( title.alignHCentre() );
 			contentBox.append( contents.alignHExpand() );
 
-			pageBox.append( SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_SYSTEMPAGE ) );
+			pageBox.append( SystemRootPage.createLinkHeader( null, SystemRootPage.LINKHEADER_SYSTEMPAGE ) );
 			pageBox.append( contentBox.alignHExpand() );
 
 			
@@ -463,25 +463,25 @@ public class Browser
 		public DPWidget getContentsElement()
 		{
 			VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 40.0 );
-			DPVBox pageBox = new DPVBox( pageBoxStyle );
+			DPVBox pageBox = new DPVBox( null, pageBoxStyle );
 			
 
 			TextStyleSheet titleStyle = new TextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
-			DPText title = new DPText( titleStyle, "Could Not Resolve Location" );
+			DPText title = new DPText( null, titleStyle, "Could Not Resolve Location" );
 			
 			VBoxStyleSheet errorBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 10.0 );
-			DPVBox errorBox = new DPVBox( errorBoxStyle );
+			DPVBox errorBox = new DPVBox( null, errorBoxStyle );
 			
 			TextStyleSheet locationStyle = new TextStyleSheet( new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK );
 			TextStyleSheet errorStyle = new TextStyleSheet( new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK );
 
-			DPText loc = new DPText( locationStyle, location );
-			DPText error = new DPText( errorStyle, "could not be resolved" );
+			DPText loc = new DPText( null, locationStyle, location );
+			DPText error = new DPText( null, errorStyle, "could not be resolved" );
 			
 			errorBox.append( loc.alignHCentre() );
 			errorBox.append( error.alignHCentre() );
 
-			pageBox.append( SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE ) );
+			pageBox.append( SystemRootPage.createLinkHeader( null, SystemRootPage.LINKHEADER_ROOTPAGE ) );
 			pageBox.append( title.padY( 10.0 ).alignHCentre() );
 			pageBox.append( errorBox.padY( 10.0 ).alignHCentre() );
 			

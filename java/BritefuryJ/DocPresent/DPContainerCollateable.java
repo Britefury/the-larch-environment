@@ -17,9 +17,9 @@ public abstract class DPContainerCollateable extends DPContainer implements Coll
 	protected AABox2 boundsBoxes[];
 	
 	
-	public DPContainerCollateable()
+	public DPContainerCollateable(ElementContext context)
 	{
-		super();
+		super( context );
 		
 		layoutReqBox = null;
 		layoutAllocBox = null;

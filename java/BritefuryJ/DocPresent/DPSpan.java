@@ -10,9 +10,9 @@ import BritefuryJ.DocPresent.Layout.PackingParams;
 
 public class DPSpan extends DPContainerSequenceCollateable
 {
-	public DPSpan()
+	public DPSpan(ElementContext context)
 	{
-		super();
+		super( context );
 	}
 
 

@@ -10,14 +10,14 @@ import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
 
 public class DPParagraphIndentMarker extends DPParagraphMarker
 {
-	public DPParagraphIndentMarker()
+	public DPParagraphIndentMarker(ElementContext context)
 	{
-		super();
+		super( context );
 	}
 	
-	public DPParagraphIndentMarker(WidgetStyleSheet styleSheet)
+	public DPParagraphIndentMarker(ElementContext context, WidgetStyleSheet styleSheet)
 	{
-		super( styleSheet );
+		super( context, styleSheet );
 	}
 
 

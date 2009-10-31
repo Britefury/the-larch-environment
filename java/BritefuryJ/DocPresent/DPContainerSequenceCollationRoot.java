@@ -22,14 +22,14 @@ public abstract class DPContainerSequenceCollationRoot extends DPContainerSequen
 	
 	
 	
-	public DPContainerSequenceCollationRoot()
+	public DPContainerSequenceCollationRoot(ElementContext context)
 	{
-		this( ContainerStyleSheet.defaultStyleSheet );
+		this( context, ContainerStyleSheet.defaultStyleSheet );
 	}
 
-	public DPContainerSequenceCollationRoot(ContainerStyleSheet styleSheet)
+	public DPContainerSequenceCollationRoot(ElementContext context, ContainerStyleSheet styleSheet)
 	{
-		super( styleSheet );
+		super( context, styleSheet );
 	}
 	
 	

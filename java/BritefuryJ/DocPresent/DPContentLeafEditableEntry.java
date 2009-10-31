@@ -29,14 +29,14 @@ public abstract class DPContentLeafEditableEntry extends DPContentLeafEditable
 	//
 	
 	
-	protected DPContentLeafEditableEntry(String textRepresentation)
+	protected DPContentLeafEditableEntry(ElementContext context, String textRepresentation)
 	{
-		super( textRepresentation );
+		super( context, textRepresentation );
 	}
 	
-	protected DPContentLeafEditableEntry(ContentLeafStyleSheet styleSheet, String textRepresentation)
+	protected DPContentLeafEditableEntry(ElementContext context, ContentLeafStyleSheet styleSheet, String textRepresentation)
 	{
-		super( styleSheet, textRepresentation );
+		super( context, styleSheet, textRepresentation );
 	}
 	
 

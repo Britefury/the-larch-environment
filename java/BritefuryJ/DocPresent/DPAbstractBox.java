@@ -21,14 +21,14 @@ abstract public class DPAbstractBox extends DPContainerSequenceCollationRoot
 
 	
 	
-	public DPAbstractBox()
+	public DPAbstractBox(ElementContext context)
 	{
-		this( AbstractBoxStyleSheet.defaultStyleSheet );
+		this( context, AbstractBoxStyleSheet.defaultStyleSheet );
 	}
 
-	public DPAbstractBox(AbstractBoxStyleSheet styleSheet)
+	public DPAbstractBox(ElementContext context, AbstractBoxStyleSheet styleSheet)
 	{
-		super( styleSheet );
+		super( context, styleSheet );
 	}
 
 

@@ -69,6 +69,9 @@ def isCompoundStmtHeader(node):
 def isCompoundStmtOrCompoundHeader(node):
 	return isinstance( node, DMObjectInterface )  and  ( node.isInstanceOf( Nodes.CompoundStmt )  or  node.isInstanceOf( Nodes.CompountStmtHeader ) )
 
+def isUnparsed(node):
+	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Nodes.UNPARSED )
+
 def isPythonModule(node):
 	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Nodes.PythonModule )
 
@@ -137,6 +140,10 @@ def getStatementDepth(ctx):
 # DOCUMENT EDITING
 #
 #
+
+
+def pyReplaceNode(ctx, data, replacement):
+	return EditOperations.replaceNodeContents( ctx, data, replacement )
 
 def pyReplaceExpression(ctx, data, replacement):
 	return EditOperations.replaceNodeContents( ctx, data, replacement )

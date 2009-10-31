@@ -47,14 +47,14 @@ public class DPSegment extends DPContainerCollateable
 	// Constructor
 	//
 	
-	public DPSegment(boolean bGuardBegin, boolean bGuardEnd)
+	public DPSegment(ElementContext context, boolean bGuardBegin, boolean bGuardEnd)
 	{
-		this( TextStyleSheet.defaultStyleSheet, bGuardBegin, bGuardEnd );
+		this( context, TextStyleSheet.defaultStyleSheet, bGuardBegin, bGuardEnd );
 	}
 
-	public DPSegment(TextStyleSheet textStyleSheet, boolean bGuardBegin, boolean bGuardEnd)
+	public DPSegment(ElementContext context, TextStyleSheet textStyleSheet, boolean bGuardBegin, boolean bGuardEnd)
 	{
-		super();
+		super( context );
 		this.textStyleSheet = textStyleSheet;
 		this.bGuardBegin = bGuardBegin;
 		this.bGuardEnd = bGuardEnd;
@@ -157,14 +157,14 @@ public class DPSegment extends DPContainerCollateable
 			if ( bBegin  &&  !( beginGuard instanceof DPText ) )
 			{
 				unregisterBeginGuard();
-				beginGuard = new DPText( textStyleSheet, "" );
+				beginGuard = new DPText( context, textStyleSheet, "" );
 				registerBeginGuard();
 			}
 			
 			if ( !bBegin  &&  !( beginGuard instanceof DPWhitespace ) )
 			{
 				unregisterBeginGuard();
-				beginGuard = new DPWhitespace( "" );
+				beginGuard = new DPWhitespace( context, "" );
 				registerBeginGuard();
 			}
 		}
@@ -180,14 +180,14 @@ public class DPSegment extends DPContainerCollateable
 			if ( bEnd  &&  !( endGuard instanceof DPText ) )
 			{
 				unregisterEndGuard();
-				endGuard = new DPText( textStyleSheet, "" );
+				endGuard = new DPText( context, textStyleSheet, "" );
 				registerEndGuard();
 			}
 			
 			if ( !bEnd  &&  !( endGuard instanceof DPWhitespace ) )
 			{
 				unregisterEndGuard();
-				endGuard = new DPWhitespace( "" );
+				endGuard = new DPWhitespace( context, "" );
 				registerEndGuard();
 			}
 		}

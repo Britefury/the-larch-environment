@@ -48,7 +48,7 @@ public class ParagraphTestPage extends SystemPage
 		for (int i = 0; i < words.length; i++)
 		{
 			String word = words[i];
-			nodes.add( new DPText( style, word ) );
+			nodes.add( new DPText( getContext(), style, word ) );
 		}
 		return nodes;
 	}
@@ -61,14 +61,14 @@ public class ParagraphTestPage extends SystemPage
 			nodesOut.add( nodesIn.get( i ) );
 			if ( step <= 1  ||  i % step == (step-1) )
 			{
-				DPText space = new DPText( " " );
-				DPLineBreak b = new DPLineBreak();
+				DPText space = new DPText( getContext(), " " );
+				DPLineBreak b = new DPLineBreak( getContext() );
 				b.setChild( space );
 				nodesOut.add( b );
 			}
 			else
 			{
-				nodesOut.add( new DPText( " " ) );
+				nodesOut.add( new DPText( getContext(), " " ) );
 			}
 		}
 		return nodesOut;
@@ -83,7 +83,7 @@ public class ParagraphTestPage extends SystemPage
 			children = addLineBreaks( children, lineBreakStep );
 		}
 		ParagraphStyleSheet boxs = new ParagraphStyleSheet( spacing, vSpacing, indentation );
-		DPParagraph box = new DPParagraph( boxs );
+		DPParagraph box = new DPParagraph( getContext(), boxs );
 		box.extend( children );
 		return box;
 	}
@@ -94,7 +94,7 @@ public class ParagraphTestPage extends SystemPage
 		children = addLineBreaks( children, lineBreakStep );
 		children.add( children.size()/2, makeParagraph( title + " (inner)", spacing, vSpacing, indentation, lineBreakStep, nestedTextStyle ) );
 		ParagraphStyleSheet boxs = new ParagraphStyleSheet( spacing, vSpacing, indentation );
-		DPParagraph box = new DPParagraph( boxs );
+		DPParagraph box = new DPParagraph( getContext(), boxs );
 		box.extend( children );
 		return box;
 	}
@@ -114,7 +114,7 @@ public class ParagraphTestPage extends SystemPage
 		DPWidget b8 = makeParagraphWithNestedPara( "NESTED-2-INDENTED", 0.0, 0.0, 50.0, 2, blackText, redText );
 		DPWidget[] children = { b2, b3, b4, b5, b6, b7, b8 };
 		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, 30.0 );
-		DPVBox box = new DPVBox( boxs );
+		DPVBox box = new DPVBox( getContext(), boxs );
 		box.extend( children );
 		return box;
 	}

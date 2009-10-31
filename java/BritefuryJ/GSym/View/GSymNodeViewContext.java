@@ -90,9 +90,8 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget border(Border border, ContainerStyleSheet styleSheet, DPWidget child)
 	{
 		viewInstance.getView().profile_startElement();
-		DPBorder element = new DPBorder( border, styleSheet );
+		DPBorder element = new DPBorder( this, border, styleSheet );
 		element.setChild( child );
-		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -106,9 +105,8 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	{
 		viewInstance.getView().profile_startElement();
 		Border border = viewInstance.indentationBorder( indentation );
-		DPBorder element = new DPBorder( border );
+		DPBorder element = new DPBorder( this, border );
 		element.setChild( child );
-		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -117,8 +115,7 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget text(TextStyleSheet styleSheet, String txt)
 	{
 		viewInstance.getView().profile_startElement();
-		DPWidget element = new DPText( styleSheet, txt );
-		element.setContext( this );
+		DPWidget element = new DPText( this, styleSheet, txt );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -126,8 +123,7 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget textWithContent(TextStyleSheet styleSheet, String txt, String content)
 	{
 		viewInstance.getView().profile_startElement();
-		DPWidget element = new DPText( styleSheet, txt, content );
-		element.setContext( this );
+		DPWidget element = new DPText( this, styleSheet, txt, content );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -135,9 +131,8 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget hiddenStructuralObject(Object structuralRepresentation)
 	{
 		viewInstance.getView().profile_startElement();
-		DPWidget element = new DPEmpty();
+		DPWidget element = new DPEmpty( this );
 		element.setStructuralValueObject( structuralRepresentation );
-		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -145,9 +140,8 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget hiddenStructuralSequence(List<Object> structuralRepresentation)
 	{
 		viewInstance.getView().profile_startElement();
-		DPWidget element = new DPEmpty();
+		DPWidget element = new DPEmpty( this );
 		element.setStructuralValueSequence( structuralRepresentation );
-		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -156,9 +150,8 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget hiddenStructuralStream(ItemStream structuralRepresentation)
 	{
 		viewInstance.getView().profile_startElement();
-		DPWidget element = new DPEmpty();
+		DPWidget element = new DPEmpty( this );
 		element.setStructuralValueStream( structuralRepresentation );
-		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -166,8 +159,7 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget hiddenText(String txt)
 	{
 		viewInstance.getView().profile_startElement();
-		DPWidget element = new DPEmpty( txt );
-		element.setContext( this );
+		DPWidget element = new DPEmpty( this, txt );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -175,8 +167,7 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget whitespace(String txt, float width)
 	{
 		viewInstance.getView().profile_startElement();
-		DPWidget element = new DPWhitespace( txt, width );
-		element.setContext( this );
+		DPWidget element = new DPWhitespace( this, txt, width );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -184,8 +175,7 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget whitespace(String txt)
 	{
 		viewInstance.getView().profile_startElement();
-		DPWidget element = new DPWhitespace( txt, 0.0 );
-		element.setContext( this );
+		DPWidget element = new DPWhitespace( this, txt, 0.0 );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -195,8 +185,7 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget staticText(StaticTextStyleSheet styleSheet, String txt)
 	{
 		viewInstance.getView().profile_startElement();
-		DPWidget element = new DPStaticText( styleSheet, txt );
-		element.setContext( this );
+		DPWidget element = new DPStaticText( this, styleSheet, txt );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -205,8 +194,7 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget link(LinkStyleSheet styleSheet, String txt, String targetLocation)
 	{
 		viewInstance.getView().profile_startElement();
-		DPWidget element = new DPLink( styleSheet, txt, targetLocation );
-		element.setContext( this );
+		DPWidget element = new DPLink( this, styleSheet, txt, targetLocation );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -214,8 +202,7 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget link(LinkStyleSheet styleSheet, String txt, DPLink.LinkListener listener)
 	{
 		viewInstance.getView().profile_startElement();
-		DPWidget element = new DPLink( styleSheet, txt, listener );
-		element.setContext( this );
+		DPWidget element = new DPLink( this, styleSheet, txt, listener );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -223,8 +210,7 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget link(LinkStyleSheet styleSheet, String txt, PyObject listener)
 	{
 		viewInstance.getView().profile_startElement();
-		DPWidget element = new DPLink( styleSheet, txt, listener );
-		element.setContext( this );
+		DPWidget element = new DPLink( this, styleSheet, txt, listener );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -234,8 +220,7 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget line(LineStyleSheet styleSheet)
 	{
 		viewInstance.getView().profile_startElement();
-		DPWidget element = new DPLine( styleSheet );
-		element.setContext( this );
+		DPWidget element = new DPLine( this, styleSheet );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -245,9 +230,8 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget button(ButtonStyleSheet styleSheet, DPButton.ButtonListener listener, DPWidget child)
 	{
 		viewInstance.getView().profile_startElement();
-		DPButton element = new DPButton( styleSheet, listener );
+		DPButton element = new DPButton( this, styleSheet, listener );
 		element.setChild( child );
-		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -255,9 +239,8 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget button(ButtonStyleSheet styleSheet, PyObject listener, DPWidget child)
 	{
 		viewInstance.getView().profile_startElement();
-		DPButton element = new DPButton( styleSheet, listener );
+		DPButton element = new DPButton( this, styleSheet, listener );
 		element.setChild( child );
-		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -267,9 +250,8 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget span(List<DPWidget> children)
 	{
 		viewInstance.getView().profile_startElement();
-		DPSpan element = new DPSpan();
+		DPSpan element = new DPSpan( this );
 		element.setChildren( children );
-		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -279,9 +261,8 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget hbox(HBoxStyleSheet styleSheet, List<DPWidget> children)
 	{
 		viewInstance.getView().profile_startElement();
-		DPHBox element = new DPHBox( styleSheet );
+		DPHBox element = new DPHBox( this, styleSheet );
 		element.setChildren( children );
-		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -294,9 +275,8 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget vbox(VBoxStyleSheet styleSheet, List<DPWidget> children)
 	{
 		viewInstance.getView().profile_startElement();
-		DPVBox element = new DPVBox( styleSheet );
+		DPVBox element = new DPVBox( this, styleSheet );
 		element.setChildren( children );
-		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -305,9 +285,8 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget paragraph(ParagraphStyleSheet styleSheet, List<DPWidget> children)
 	{
 		viewInstance.getView().profile_startElement();
-		DPParagraph element = new DPParagraph( styleSheet );
+		DPParagraph element = new DPParagraph( this, styleSheet );
 		element.setChildren( children );
-		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -315,12 +294,11 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget lineBreak(ContainerStyleSheet styleSheet, DPWidget child)
 	{
 		viewInstance.getView().profile_startElement();
-		DPLineBreak element = new DPLineBreak( styleSheet );
+		DPLineBreak element = new DPLineBreak( this, styleSheet );
 		if ( child != null )
 		{
 			element.setChild( child );
 		}
-		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -343,8 +321,7 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget paragraphIndentMarker()
 	{
 		viewInstance.getView().profile_startElement();
-		DPParagraphIndentMarker element = new DPParagraphIndentMarker();
-		element.setContext( this );
+		DPParagraphIndentMarker element = new DPParagraphIndentMarker( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -352,8 +329,7 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget paragraphDedentMarker()
 	{
 		viewInstance.getView().profile_startElement();
-		DPParagraphDedentMarker element = new DPParagraphDedentMarker();
-		element.setContext( this );
+		DPParagraphDedentMarker element = new DPParagraphDedentMarker( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -362,9 +338,8 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget gridRow(GridRowStyleSheet styleSheet, List<DPWidget> children)
 	{
 		viewInstance.getView().profile_startElement();
-		DPGridRow element = new DPGridRow( styleSheet );
+		DPGridRow element = new DPGridRow( this, styleSheet );
 		element.setChildren( children );
-		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -372,9 +347,8 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget rgrid(TableStyleSheet styleSheet, List<DPWidget> children)
 	{
 		viewInstance.getView().profile_startElement();
-		DPRGrid element = new DPRGrid( styleSheet );
+		DPRGrid element = new DPRGrid( this, styleSheet );
 		element.setChildren( children );
-		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -383,9 +357,8 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget table(TableStyleSheet styleSheet, List<List<DPWidget>> children)
 	{
 		viewInstance.getView().profile_startElement();
-		DPTable element = new DPTable( styleSheet );
+		DPTable element = new DPTable( this, styleSheet );
 		element.setChildren( children );
-		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -394,9 +367,8 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget segment(TextStyleSheet textStyleSheet, boolean bGuardBegin, boolean bGuardEnd, DPWidget child)
 	{
 		viewInstance.getView().profile_startElement();
-		DPSegment element = new DPSegment( textStyleSheet, bGuardBegin, bGuardEnd );
+		DPSegment element = new DPSegment( this, textStyleSheet, bGuardBegin, bGuardEnd );
 		element.setChild( child );
-		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -404,9 +376,8 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget segment(boolean bGuardBegin, boolean bGuardEnd, DPWidget child)
 	{
 		viewInstance.getView().profile_startElement();
-		DPSegment element = new DPSegment( TextStyleSheet.defaultStyleSheet, bGuardBegin, bGuardEnd );
+		DPSegment element = new DPSegment( this, TextStyleSheet.defaultStyleSheet, bGuardBegin, bGuardEnd );
 		element.setChild( child );
-		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -415,7 +386,7 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget script(ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, DPWidget mainChild, DPWidget leftSuperChild, DPWidget leftSubChild, DPWidget rightSuperChild, DPWidget rightSubChild)
 	{
 		viewInstance.getView().profile_startElement();
-		DPScript element = new DPScript( styleSheet, segmentTextStyleSheet );
+		DPScript element = new DPScript( this, styleSheet, segmentTextStyleSheet );
 		element.setMainChild( mainChild );
 		if ( leftSuperChild != null )
 		{
@@ -433,7 +404,6 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 		{
 			element.setRightSubscriptChild( rightSubChild );
 		}
-		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}
@@ -490,10 +460,9 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	public DPWidget fraction(FractionStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, DPWidget numerator, DPWidget denominator, String barContent)
 	{
 		viewInstance.getView().profile_startElement();
-		DPFraction element = new DPFraction( styleSheet, segmentTextStyleSheet, barContent );
+		DPFraction element = new DPFraction( this, styleSheet, segmentTextStyleSheet, barContent );
 		element.setNumeratorChild( numerator );
 		element.setDenominatorChild( denominator );
-		element.setContext( this );
 		viewInstance.getView().profile_stopElement();
 		return element;
 	}

@@ -42,7 +42,7 @@ public class ScriptTestPage extends SystemPage
 	{
 		if ( text != null )
 		{
-			return new DPText( styleSheet, text );
+			return new DPText( getContext(), styleSheet, text );
 		}
 		else
 		{
@@ -53,7 +53,7 @@ public class ScriptTestPage extends SystemPage
 	
 	protected DPWidget makeFraction(DPWidget num, DPWidget denom)
 	{
-		DPFraction frac = new DPFraction();
+		DPFraction frac = new DPFraction( getContext() );
 		
 		frac.setNumeratorChild( num );
 		frac.setDenominatorChild( denom );
@@ -64,7 +64,7 @@ public class ScriptTestPage extends SystemPage
 	
 	protected DPWidget makeScript(DPWidget main, DPWidget leftSuper, DPWidget leftSub, DPWidget rightSuper, DPWidget rightSub)
 	{
-		DPScript script = new DPScript();
+		DPScript script = new DPScript( getContext() );
 		
 		script.setMainChild( main );
 		script.setLeftSuperscriptChild( leftSuper );
@@ -82,10 +82,10 @@ public class ScriptTestPage extends SystemPage
 		
 		DPWidget script = makeScript( main, leftSuper, leftSub, rightSuper, rightSub );
 		
-		DPText labelA = new DPText( sPre, "<<Left<<" );
-		DPText labelB = new DPText( sPost, ">>Right>>" );
+		DPText labelA = new DPText( getContext(), sPre, "<<Left<<" );
+		DPText labelB = new DPText( getContext(), sPost, ">>Right>>" );
 		
-		DPHBox box = new DPHBox();
+		DPHBox box = new DPHBox( getContext() );
 		box.append( labelA );
 		box.append( script );
 		box.append( labelB );
@@ -101,24 +101,24 @@ public class ScriptTestPage extends SystemPage
 		TextStyleSheet sScript = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
 		TextStyleSheet sPre = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.blue );
 		TextStyleSheet sPost = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.red );
-		DPText main = new DPText( sMain, mainText );
+		DPText main = new DPText( getContext(), sMain, mainText );
 		
-		DPFraction fraction = new DPFraction();
+		DPFraction fraction = new DPFraction( getContext() );
 		fraction.setNumeratorChild( makeText( numText, sScript ) );
 		fraction.setDenominatorChild( makeText( denomText, sScript ) );
 		
-		DPParagraph para = new DPParagraph();
+		DPParagraph para = new DPParagraph( getContext() );
 		para.setChildren( Arrays.asList( new DPWidget[] { fraction } ) );
 		
-		DPScript script = new DPScript();
+		DPScript script = new DPScript( getContext() );
 		
 		script.setMainChild( main );
 		script.setRightSuperscriptChild( para );
 
-		DPText labelA = new DPText( sPre, "Label A yYgGjJpPqQ" );
-		DPText labelB = new DPText( sPost, "Label B yYgGjJpPqQ" );
+		DPText labelA = new DPText( getContext(), sPre, "Label A yYgGjJpPqQ" );
+		DPText labelB = new DPText( getContext(), sPost, "Label B yYgGjJpPqQ" );
 		
-		DPHBox box = new DPHBox();
+		DPHBox box = new DPHBox( getContext() );
 		box.append( labelA );
 		box.append( script );
 		box.append( labelB );
@@ -134,7 +134,7 @@ public class ScriptTestPage extends SystemPage
 		TextStyleSheet sScript = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
 		TextStyleSheet blackStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.black );
 
-		DPVBox box = new DPVBox();
+		DPVBox box = new DPVBox( getContext() );
 		
 		for (int i = 0; i < 16; i++)
 		{

@@ -23,24 +23,24 @@ public class DPBorder extends DPBin
 	
 	
 	
-	public DPBorder()
+	public DPBorder(ElementContext context)
 	{
-		this( defaultBorder, ContainerStyleSheet.defaultStyleSheet );
+		this( context, defaultBorder, ContainerStyleSheet.defaultStyleSheet );
 	}
 
-	public DPBorder(Border border)
+	public DPBorder(ElementContext context, Border border)
 	{
-		this( border, ContainerStyleSheet.defaultStyleSheet );
+		this( context, border, ContainerStyleSheet.defaultStyleSheet );
 	}
 
-	public DPBorder(ContainerStyleSheet styleSheet)
+	public DPBorder(ElementContext context, ContainerStyleSheet styleSheet)
 	{
-		this( defaultBorder, styleSheet );
+		this( context, defaultBorder, styleSheet );
 	}
 	
-	public DPBorder(Border border, ContainerStyleSheet styleSheet)
+	public DPBorder(ElementContext context, Border border, ContainerStyleSheet styleSheet)
 	{
-		super( styleSheet );
+		super( context, styleSheet );
 		
 		this.border = border;
 	}

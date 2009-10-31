@@ -71,14 +71,14 @@ public abstract class DPContainer extends DPWidget
 	// Constructors
 	//
 	
-	public DPContainer()
+	public DPContainer(ElementContext context)
 	{
-		this( ContainerStyleSheet.defaultStyleSheet );
+		this( context, ContainerStyleSheet.defaultStyleSheet );
 	}
 
-	public DPContainer(ContainerStyleSheet styleSheet)
+	public DPContainer(ElementContext context, ContainerStyleSheet styleSheet)
 	{
-		super( styleSheet );
+		super( context, styleSheet );
 		
 		registeredChildren = new ArrayList<DPWidget>();
 		cachedTextRep = null;
@@ -1313,7 +1313,7 @@ public abstract class DPContainer extends DPWidget
 	
 	public DPWidget createMetaElement()
 	{
-		DPVBox metaChildrenVBox = new DPVBox( metaVBoxStyle );
+		DPVBox metaChildrenVBox = new DPVBox( null, metaVBoxStyle );
 		for (DPWidget child: getChildren())
 		{
 			if ( child != null )
@@ -1327,10 +1327,10 @@ public abstract class DPContainer extends DPWidget
 			}
 		}
 		
-		DPBorder indentMetaChildren = new DPBorder( metaIndentBorder );
+		DPBorder indentMetaChildren = new DPBorder( null, metaIndentBorder );
 		indentMetaChildren.setChild( metaChildrenVBox );
 		
-		DPVBox metaVBox = new DPVBox( metaVBoxStyle );
+		DPVBox metaVBox = new DPVBox( null, metaVBoxStyle );
 		metaVBox.append( createMetaHeader() );
 		metaVBox.append( indentMetaChildren );
 		

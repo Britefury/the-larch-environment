@@ -21,14 +21,14 @@ import BritefuryJ.Math.Point2;
 
 public class DPGridRow extends DPContainerSequenceCollationRoot
 {
-	public DPGridRow()
+	public DPGridRow(ElementContext context)
 	{
-		this( GridRowStyleSheet.defaultStyleSheet );
+		this( context, GridRowStyleSheet.defaultStyleSheet );
 	}
 	
-	public DPGridRow(GridRowStyleSheet syleSheet)
+	public DPGridRow(ElementContext context, GridRowStyleSheet syleSheet)
 	{
-		super( syleSheet );
+		super( context, syleSheet );
 	}
 	
 	

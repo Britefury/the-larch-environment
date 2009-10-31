@@ -19,14 +19,14 @@ public class DPStaticText extends DPStatic
 	protected String text;
 	
 	
-	public DPStaticText(String text)
+	public DPStaticText(ElementContext context, String text)
 	{
-		this( StaticTextStyleSheet.defaultStyleSheet, text );
+		this( context, StaticTextStyleSheet.defaultStyleSheet, text );
 	}
 	
-	public DPStaticText(StaticTextStyleSheet styleSheet, String text)
+	public DPStaticText(ElementContext context, StaticTextStyleSheet styleSheet, String text)
 	{
-		super( styleSheet );
+		super( context, styleSheet );
 		
 		this.text = text;
 		

@@ -48,14 +48,14 @@ public class DPScript extends DPContainer
 	
 	
 	
-	public DPScript()
+	public DPScript(ElementContext context)
 	{
-		this( ScriptStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet );
+		this( context, ScriptStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet );
 	}
 	
-	public DPScript(ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet)
+	public DPScript(ElementContext context, ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet)
 	{
-		super( styleSheet );
+		super( context, styleSheet );
 		
 		this.segmentTextStyleSheet = segmentTextStyleSheet;
 		
@@ -92,9 +92,9 @@ public class DPScript extends DPContainer
 
 			if ( bSegmentRequired  &&  !bSegmentPresent )
 			{
-				DPSegment seg = new DPSegment( segmentTextStyleSheet, isBeginGuardRequired( slot ), isEndGuardRequired( slot ) );
+				DPSegment seg = new DPSegment( context, segmentTextStyleSheet, isBeginGuardRequired( slot ), isEndGuardRequired( slot ) );
 				segs[slot] = seg;
-				DPParagraph para = new DPParagraph();
+				DPParagraph para = new DPParagraph( context );
 				para.setChildren( Arrays.asList( new DPWidget[] { seg } ) );
 				paras[slot] = para;
 				

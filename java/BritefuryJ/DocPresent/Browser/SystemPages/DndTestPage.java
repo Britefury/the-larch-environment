@@ -48,8 +48,8 @@ public class DndTestPage extends SystemPage
 	
 	protected DPWidget makeSourceElement(String title, final String dragData)
 	{
-		DPStaticText sourceText = new DPStaticText( textStyle, title );
-		DPBorder sourceBorderElement = new DPBorder( sourceBorder );
+		DPStaticText sourceText = new DPStaticText( getContext(), textStyle, title );
+		DPBorder sourceBorderElement = new DPBorder( getContext(), sourceBorder );
 		sourceBorderElement.setChild( sourceText );
 		
 		SimpleDndHandler.SourceDataFn sourceDataFn = new SimpleDndHandler.SourceDataFn()
@@ -70,8 +70,8 @@ public class DndTestPage extends SystemPage
 	
 	protected DPWidget makeDestElement(String title)
 	{
-		DPStaticText destText = new DPStaticText( textStyle, title );
-		DPBorder destBorderElement = new DPBorder( destBorder );
+		DPStaticText destText = new DPStaticText( getContext(), textStyle, title );
+		DPBorder destBorderElement = new DPBorder( getContext(), destBorder );
 		destBorderElement.setChild( destText );
 		
 		SimpleDndHandler.DropFn dropFn = new SimpleDndHandler.DropFn()
@@ -100,11 +100,11 @@ public class DndTestPage extends SystemPage
 		StaticTextStyleSheet rowTitleStyle = new StaticTextStyleSheet( new Font( "Sans serif", Font.PLAIN, 14 ), Color.BLACK );
 		
 		
-		DPStaticText sourceTitle = new DPStaticText( rowTitleStyle, "Source:" );
+		DPStaticText sourceTitle = new DPStaticText( getContext(), rowTitleStyle, "Source:" );
 		DPWidget source0 = makeSourceElement( "abc", "abc" );
 		DPWidget source1 = makeSourceElement( "xyz", "xyz" );
 
-		DPStaticText destTitle = new DPStaticText( rowTitleStyle, "Destination:" );
+		DPStaticText destTitle = new DPStaticText( getContext(), rowTitleStyle, "Destination:" );
 		DPWidget dest0 = makeDestElement( "abc" );
 		DPWidget dest1 = makeDestElement( "xyz" );
 		
@@ -112,7 +112,7 @@ public class DndTestPage extends SystemPage
 		TableStyleSheet tableStyle = new TableStyleSheet( 25.0, false, 25.0, false );
 		
 		
-		DPTable table = new DPTable( tableStyle );
+		DPTable table = new DPTable( getContext(), tableStyle );
 		table.put( 0, 0, sourceTitle );
 		table.put( 1, 0, source0 );
 		table.put( 2, 0, source1 );
@@ -122,7 +122,7 @@ public class DndTestPage extends SystemPage
 
 
 		
-		DPHBox hbox = new DPHBox();
+		DPHBox hbox = new DPHBox( getContext() );
 		hbox.append( table.padY( 10.0 ) );
 
 		return hbox;
