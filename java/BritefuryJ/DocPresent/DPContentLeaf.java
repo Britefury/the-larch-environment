@@ -43,14 +43,14 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	
 	
-	DPContentLeaf(String textRepresentation)
+	DPContentLeaf(ElementContext context, String textRepresentation)
 	{
-		this( ContentLeafStyleSheet.defaultStyleSheet, textRepresentation );
+		this( context, ContentLeafStyleSheet.defaultStyleSheet, textRepresentation );
 	}
 	
-	DPContentLeaf(ContentLeafStyleSheet styleSheet, String textRepresentation)
+	DPContentLeaf(ElementContext context, ContentLeafStyleSheet styleSheet, String textRepresentation)
 	{
-		super( styleSheet );
+		super( context, styleSheet );
 		
 		this.textRepresentation = textRepresentation;
 	}
@@ -893,7 +893,7 @@ public abstract class DPContentLeaf extends DPWidget
 
 	public DPWidget createMetaHeaderData()
 	{
-		return new DPText( headerTextRepTextStyle, "'" + textRepresentation.replace( "\n", "\\n" ) + "'" );
+		return new DPText( null, headerTextRepTextStyle, "'" + textRepresentation.replace( "\n", "\\n" ) + "'" );
 	}
 	
 	protected Border getMetaHeaderBorder()

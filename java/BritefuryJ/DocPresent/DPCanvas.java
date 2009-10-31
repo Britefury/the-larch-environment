@@ -25,24 +25,24 @@ public class DPCanvas extends DPStatic implements DrawingOwner
 	protected double drawingWidth, drawingHeight;
 	
 	
-	public DPCanvas(DrawingNode drawing)
+	public DPCanvas(ElementContext context, DrawingNode drawing)
 	{
-		this( WidgetStyleSheet.defaultStyleSheet, drawing, -1.0, -1.0, false, false );
+		this( context, WidgetStyleSheet.defaultStyleSheet, drawing, -1.0, -1.0, false, false );
 	}
 	
-	public DPCanvas(WidgetStyleSheet styleSheet, DrawingNode drawing)
+	public DPCanvas(ElementContext context, WidgetStyleSheet styleSheet, DrawingNode drawing)
 	{
-		this( styleSheet, drawing, -1.0, -1.0, false, false );
+		this( context, styleSheet, drawing, -1.0, -1.0, false, false );
 	}
 	
-	public DPCanvas(DrawingNode drawing, double width, double height, boolean bShrinkX, boolean bShrinkY)
+	public DPCanvas(ElementContext context, DrawingNode drawing, double width, double height, boolean bShrinkX, boolean bShrinkY)
 	{
-		this( WidgetStyleSheet.defaultStyleSheet, drawing, width, height, bShrinkX, bShrinkY );
+		this( context, WidgetStyleSheet.defaultStyleSheet, drawing, width, height, bShrinkX, bShrinkY );
 	}
 	
-	public DPCanvas(WidgetStyleSheet styleSheet, DrawingNode drawing, double width, double height, boolean bShrinkX, boolean bShrinkY)
+	public DPCanvas(ElementContext context, WidgetStyleSheet styleSheet, DrawingNode drawing, double width, double height, boolean bShrinkX, boolean bShrinkY)
 	{
-		super( styleSheet );
+		super( context, styleSheet );
 		
 		this.drawing = drawing;
 		this.drawingWidth = width;

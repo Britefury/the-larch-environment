@@ -37,11 +37,11 @@ public class TextTestPage extends SystemPage
 		TextStyleSheet ts0 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK );
 		TextStyleSheet ts1 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK, true );
 		TextStyleSheet ts2 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK, Color.RED );
-		DPText t0 = new DPText( ts0, "Hello World Abcdefghijklmnopqrstuvwxyz" );
-		DPText t1 = new DPText( ts1, "Hello World Abcdefghijklmnopqrstuvwxyz" );
-		DPText t2 = new DPText( ts2, "Hello World Abcdefghijklmnopqrstuvwxyz" );
+		DPText t0 = new DPText( getContext(), ts0, "Hello World Abcdefghijklmnopqrstuvwxyz" );
+		DPText t1 = new DPText( getContext(), ts1, "Hello World Abcdefghijklmnopqrstuvwxyz" );
+		DPText t2 = new DPText( getContext(), ts2, "Hello World Abcdefghijklmnopqrstuvwxyz" );
 
-		DPVBox b0 = new DPVBox();
+		DPVBox b0 = new DPVBox( getContext() );
 		b0.append( t0 );
 		b0.append( t1 );
 		b0.append( t2 );

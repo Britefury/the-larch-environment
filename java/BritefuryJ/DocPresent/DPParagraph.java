@@ -34,14 +34,14 @@ public class DPParagraph extends DPContainerSequenceCollationRoot
 
 	
 	
-	public DPParagraph()
+	public DPParagraph(ElementContext context)
 	{
-		this( ParagraphStyleSheet.defaultStyleSheet );
+		this( context, ParagraphStyleSheet.defaultStyleSheet );
 	}
 
-	public DPParagraph(ParagraphStyleSheet styleSheet)
+	public DPParagraph(ElementContext context, ParagraphStyleSheet styleSheet)
 	{
-		super( styleSheet );
+		super( context, styleSheet );
 		
 		lines = new ParagraphLayout.Line[0];
 	}

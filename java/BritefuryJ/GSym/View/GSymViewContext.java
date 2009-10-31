@@ -16,6 +16,7 @@ import BritefuryJ.DocPresent.DPFrame;
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.EditHandler;
+import BritefuryJ.DocPresent.ElementContext;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
@@ -23,7 +24,7 @@ import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocView.DVNode;
 import BritefuryJ.DocView.DocView;
 
-public class GSymViewContext implements DocView.RefreshListener
+public class GSymViewContext implements DocView.RefreshListener, ElementContext
 {
 	protected static class NodeContentsFactory implements DVNode.NodeElementFactory
 	{
@@ -132,7 +133,7 @@ public class GSymViewContext implements DocView.RefreshListener
 		
 		this.generalNodeViewFunction = generalNodeViewFunction; 
 		
-		frame = new DPFrame();
+		frame = new DPFrame( this );
 		
 		indentationBorders = new HashMap<Double, Border>();
 		nodeContentsFactories = new HashMap<NodeContentsFactoryKey, NodeContentsFactory>();

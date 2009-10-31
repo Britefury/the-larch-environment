@@ -647,14 +647,14 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	
 	
 	
-	public DPPresentationArea()
+	public DPPresentationArea(ElementContext context)
 	{
-		this( new ViewTransformation() );
+		this( context, new ViewTransformation() );
 	}
 	
-	public DPPresentationArea(ViewTransformation viewXform)
+	public DPPresentationArea(ElementContext context, ViewTransformation viewXform)
 	{
-		super();
+		super( context );
 		
 		presentationArea = this;
 		
@@ -2007,7 +2007,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	{
 		if ( metaArea == null )
 		{
-			metaArea = new DPPresentationArea();
+			metaArea = new DPPresentationArea( null );
 			metaArea.disableHorizontalClamping();
 			metaArea.setChild( initialiseMetaElement() );
 		}

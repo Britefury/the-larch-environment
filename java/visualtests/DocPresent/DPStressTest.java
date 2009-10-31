@@ -76,20 +76,20 @@ public class DPStressTest
 
 	public DPWidget name(String n)
 	{
-		return new DPText( nameStyle, n );
+		return new DPText( null, nameStyle, n );
 	}
 	
 	public DPWidget[] attr(DPWidget x, String a)
 	{
-		DPText dot = new DPText( puncStyle, "." );
-		DPText attrName = new DPText( nameStyle, a );
+		DPText dot = new DPText( null, puncStyle, "." );
+		DPText attrName = new DPText( null, nameStyle, a );
 		return new DPWidget[] { x, dot, attrName };
 	}
 	
 	public DPWidget call(DPWidget[] x, DPWidget... args)
 	{
-		DPText openParen = new DPText( puncStyle, "(" );
-		DPText closeParen = new DPText( puncStyle, ")" );
+		DPText openParen = new DPText( null, puncStyle, "(" );
+		DPText closeParen = new DPText( null, puncStyle, ")" );
 		ArrayList<DPWidget> elems = new ArrayList<DPWidget>();
 		elems.addAll( Arrays.asList( x ) );
 		elems.add( openParen );
@@ -97,13 +97,13 @@ public class DPStressTest
 		{
 			if ( i > 0 )
 			{
-				elems.add( new DPText( puncStyle, "," ) );
-				elems.add( new DPText( puncStyle, " " ) );
+				elems.add( new DPText( null, puncStyle, "," ) );
+				elems.add( new DPText( null, puncStyle, " " ) );
 			}
 			elems.add( args[i] );
 		}
 		elems.add( closeParen );
-		DPParagraph call = new DPParagraph( paraStyle );
+		DPParagraph call = new DPParagraph( null, paraStyle );
 		call.extend( elems );
 		return call;
 	}
@@ -117,7 +117,7 @@ public class DPStressTest
 	
 	protected DPWidget createContentNode()
 	{
-		DPVBox box = new DPVBox();
+		DPVBox box = new DPVBox( null );
 		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
 		
 		for (int i = 0; i < NUMLINES; i++)
@@ -139,7 +139,7 @@ public class DPStressTest
 		//This stops the app on window close.
 		frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
 
-		DPPresentationArea area = new DPPresentationArea();
+		DPPresentationArea area = new DPPresentationArea( null );
 	     
 		System.out.println( "Start memory usage = "  + ( Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() ) );
 	     

@@ -24,24 +24,24 @@ public class DPText extends DPContentLeafEditableEntry
 	protected String text;
 	
 	
-	public DPText(String text)
+	public DPText(ElementContext context, String text)
 	{
-		this( TextStyleSheet.defaultStyleSheet, text, text );
+		this( context, TextStyleSheet.defaultStyleSheet, text, text );
 	}
 	
-	public DPText(String text, String textRepresentation)
+	public DPText(ElementContext context, String text, String textRepresentation)
 	{
-		this( TextStyleSheet.defaultStyleSheet, text, textRepresentation );
+		this( context, TextStyleSheet.defaultStyleSheet, text, textRepresentation );
 	}
 	
-	public DPText(TextStyleSheet styleSheet, String text)
+	public DPText(ElementContext context, TextStyleSheet styleSheet, String text)
 	{
-		this( styleSheet, text, text );
+		this( context, styleSheet, text, text );
 	}
 
-	public DPText(TextStyleSheet styleSheet, String text, String textRepresentation)
+	public DPText(ElementContext context, TextStyleSheet styleSheet, String text, String textRepresentation)
 	{
-		super( styleSheet, textRepresentation );
+		super( context, styleSheet, textRepresentation );
 		
 		this.text = text;
 		

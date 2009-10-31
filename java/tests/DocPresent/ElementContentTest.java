@@ -21,7 +21,7 @@ public class ElementContentTest extends TestCase
 {
 	public void testEmpty()
 	{
-		DPEmpty empty = new DPEmpty();
+		DPEmpty empty = new DPEmpty( null );
 		
 		assertEquals( empty.getTextRepresentation(), "" );
 		assertEquals( empty.getTextRepresentationLength(), 0 );
@@ -29,7 +29,7 @@ public class ElementContentTest extends TestCase
 	
 	public void testText()
 	{
-		DPText text = new DPText( "Hello" );
+		DPText text = new DPText( null, "Hello" );
 		
 		assertEquals( text.getTextRepresentation(), "Hello" );
 		assertEquals( text.getTextRepresentationLength(), 5 );
@@ -38,9 +38,9 @@ public class ElementContentTest extends TestCase
 	
 	public void testBin()
 	{
-		DPText t0 = new DPText( "abc" );
+		DPText t0 = new DPText( null, "abc" );
 
-		DPBin b = new DPBin();
+		DPBin b = new DPBin( null );
 		
 		b.setChild( t0 );
 
@@ -51,12 +51,12 @@ public class ElementContentTest extends TestCase
 	
 	public void testPara()
 	{
-		DPText t0 = new DPText( "abc" );
-		DPText t1 = new DPText( "ghi" );
-		DPText t2 = new DPText( "mno" );
-		DPText t3 = new DPText( "stu" );
+		DPText t0 = new DPText( null, "abc" );
+		DPText t1 = new DPText( null, "ghi" );
+		DPText t2 = new DPText( null, "mno" );
+		DPText t3 = new DPText( null, "stu" );
 		
-		DPHBox p = new DPHBox();
+		DPHBox p = new DPHBox( null );
 		DPWidget[] t = { t0, t1, t2, t3 };
 		
 		p.setChildren( Arrays.asList( t ) );
@@ -70,37 +70,37 @@ public class ElementContentTest extends TestCase
 	
 	public void testStructure()
 	{
-		DPText ta0 = new DPText( "abc" );
-		DPText ta1 = new DPText( "ghi" );
-		DPText ta2 = new DPText( "mno" );
-		DPText ta3 = new DPText( "stu" );
+		DPText ta0 = new DPText( null, "abc" );
+		DPText ta1 = new DPText( null, "ghi" );
+		DPText ta2 = new DPText( null, "mno" );
+		DPText ta3 = new DPText( null, "stu" );
 
-		DPHBox pa = new DPHBox();
+		DPHBox pa = new DPHBox( null );
 		DPWidget[] ta = { ta0, ta1, ta2, ta3 };
 		pa.setChildren( Arrays.asList( ta ) );
 		
-		DPEmpty e = new DPEmpty();
+		DPEmpty e = new DPEmpty( null );
 		
 
 	
-		DPText tb0 = new DPText( "vw" );
-		DPText tb1 = new DPText( "xy" );
-		DPText tb2 = new DPText( "z" );
+		DPText tb0 = new DPText( null, "vw" );
+		DPText tb1 = new DPText( null, "xy" );
+		DPText tb2 = new DPText( null, "z" );
 
-		DPHBox pb = new DPHBox();
+		DPHBox pb = new DPHBox( null );
 		DPWidget[] tb = { tb0, tb1, tb2 };
 		pb.setChildren( Arrays.asList( tb ) );
 		
-		DPBin b = new DPBin();
+		DPBin b = new DPBin( null );
 		b.setChild( pb );
 
 		
 		
-		DPText tx = new DPText( "11" );
-		DPText ty = new DPText( "22" );
+		DPText tx = new DPText( null, "11" );
+		DPText ty = new DPText( null, "22" );
 		
 		
-		DPHBox root = new DPHBox();
+		DPHBox root = new DPHBox( null );
 		DPWidget[] rootChildren = { pa, e, b, tx, ty };
 		root.setChildren( Arrays.asList( rootChildren ) );
 		
@@ -212,33 +212,33 @@ public class ElementContentTest extends TestCase
 
 	public void testParagraphStructure()
 	{
-		DPText ta0 = new DPText( "abc" );
-		DPText ta1 = new DPText( "ghi" );
-		DPText ta2 = new DPText( "mno" );
-		DPText ta3 = new DPText( "stu" );
+		DPText ta0 = new DPText( null, "abc" );
+		DPText ta1 = new DPText( null, "ghi" );
+		DPText ta2 = new DPText( null, "mno" );
+		DPText ta3 = new DPText( null, "stu" );
 
-		DPParagraph pa = new DPParagraph();
+		DPParagraph pa = new DPParagraph( null );
 		DPWidget[] ta = { ta0, ta1, ta2, ta3 };
 		pa.setChildren( Arrays.asList( ta ) );
 		
-		DPEmpty e = new DPEmpty();
+		DPEmpty e = new DPEmpty( null );
 		
 
 	
-		DPText tb0 = new DPText( "vw" );
-		DPText tb1 = new DPText( "xy" );
-		DPText tb2 = new DPText( "z" );
+		DPText tb0 = new DPText( null, "vw" );
+		DPText tb1 = new DPText( null, "xy" );
+		DPText tb2 = new DPText( null, "z" );
 
-		DPParagraph pb = new DPParagraph();
+		DPParagraph pb = new DPParagraph( null );
 		DPWidget[] tb = { tb0, tb1, tb2 };
 		pb.setChildren( Arrays.asList( tb ) );
 		
 		
-		DPText tx = new DPText( "11" );
-		DPText ty = new DPText( "22" );
+		DPText tx = new DPText( null, "11" );
+		DPText ty = new DPText( null, "22" );
 		
 		
-		DPParagraph root = new DPParagraph();
+		DPParagraph root = new DPParagraph( null );
 		DPWidget[] rootChildren = { pa, e, pb, tx, ty };
 		root.setChildren( Arrays.asList( rootChildren ) );
 		

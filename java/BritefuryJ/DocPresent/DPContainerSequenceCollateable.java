@@ -17,9 +17,9 @@ public abstract class DPContainerSequenceCollateable extends DPContainerSequence
 	private AABox2 boundsBoxes[];
 	
 	
-	public DPContainerSequenceCollateable()
+	public DPContainerSequenceCollateable(ElementContext context)
 	{
-		super();
+		super( context );
 		
 		layoutReqBox = null;
 		layoutAllocBox = null;

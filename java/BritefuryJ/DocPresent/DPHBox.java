@@ -22,14 +22,14 @@ import BritefuryJ.Math.Point2;
 
 public class DPHBox extends DPAbstractBox
 {
-	public DPHBox()
+	public DPHBox(ElementContext context)
 	{
-		this( HBoxStyleSheet.defaultStyleSheet );
+		this( context, HBoxStyleSheet.defaultStyleSheet );
 	}
 	
-	public DPHBox(HBoxStyleSheet syleSheet)
+	public DPHBox(ElementContext context, HBoxStyleSheet syleSheet)
 	{
-		super( syleSheet );
+		super( context, syleSheet );
 	}
 	
 	

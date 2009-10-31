@@ -16,6 +16,7 @@ import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPStaticText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.ElementContext;
 import BritefuryJ.DocPresent.Browser.Page;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
@@ -42,22 +43,28 @@ public abstract class SystemPage extends Page
 	{
 		return SystemLocationResolver.systemLocationToLocation( systemLocation );
 	}
+	
+	
+	protected ElementContext getContext()
+	{
+		return null;
+	}
 
 
 
 	public DPWidget getContentsElement()
 	{
 		VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 40.0 );
-		DPVBox pageBox = new DPVBox( pageBoxStyle );
+		DPVBox pageBox = new DPVBox( getContext(), pageBoxStyle );
 		
-		DPVBox headBox = new DPVBox();
+		DPVBox headBox = new DPVBox( getContext() );
 		
 		StaticTextStyleSheet descriptionStyle = new StaticTextStyleSheet( new Font( "Sans Serif", Font.PLAIN, 16 ), Color.BLACK );
 		
 		StaticTextStyleSheet titleStyle = new StaticTextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
-		DPStaticText title = new DPStaticText( titleStyle, "System page: " + getTitle() );
+		DPStaticText title = new DPStaticText( getContext(), titleStyle, "System page: " + getTitle() );
 		
-		headBox.append( SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE | SystemRootPage.LINKHEADER_SYSTEMPAGE ) );
+		headBox.append( SystemRootPage.createLinkHeader( getContext(), SystemRootPage.LINKHEADER_ROOTPAGE | SystemRootPage.LINKHEADER_SYSTEMPAGE ) );
 		headBox.append( title.alignHCentre() );
 
 		pageBox.append( headBox.alignHExpand() );
@@ -74,11 +81,11 @@ public abstract class SystemPage extends Page
 
 	protected DPLink createLink()
 	{
-		return new DPLink( getTitle(), getLocation() );
+		return new DPLink( getContext(), getTitle(), getLocation() );
 	}
 	
 	
-	protected static ArrayList<DPWidget> createTextNodes(StaticTextStyleSheet textStyle, String text)
+	protected ArrayList<DPWidget> createTextNodes(StaticTextStyleSheet textStyle, String text)
 	{
 		String[] words = text.split( " " );
 		ArrayList<DPWidget> nodes = new ArrayList<DPWidget>();
@@ -89,12 +96,12 @@ public abstract class SystemPage extends Page
 			{
 				if ( !bFirst )
 				{
-					DPStaticText space = new DPStaticText( textStyle, " " );
-					DPLineBreak b = new DPLineBreak();
+					DPStaticText space = new DPStaticText( getContext(), textStyle, " " );
+					DPLineBreak b = new DPLineBreak( getContext() );
 					b.setChild( space );
 					nodes.add( b );
 				}
-				nodes.add( new DPStaticText( textStyle, word ) );
+				nodes.add( new DPStaticText( getContext(), textStyle, word ) );
 				bFirst = false;
 			}
 		}
@@ -102,25 +109,25 @@ public abstract class SystemPage extends Page
 		return nodes;
 	}
 
-	protected static ArrayList<DPWidget> createTextNodes(String text)
+	protected ArrayList<DPWidget> createTextNodes(String text)
 	{
 		return createTextNodes( StaticTextStyleSheet.defaultStyleSheet, text );
 	}
 	
-	protected static DPParagraph createTextParagraph(ParagraphStyleSheet paraStyle, StaticTextStyleSheet textStyle, String text)
+	protected DPParagraph createTextParagraph(ParagraphStyleSheet paraStyle, StaticTextStyleSheet textStyle, String text)
 	{
 		ArrayList<DPWidget> nodes = createTextNodes( textStyle, text );
-		DPParagraph para = new DPParagraph( paraStyle );
+		DPParagraph para = new DPParagraph( getContext(), paraStyle );
 		para.setChildren( nodes );
 		return para;
 	}
 
-	protected static DPParagraph createTextParagraph(StaticTextStyleSheet textStyle, String text)
+	protected DPParagraph createTextParagraph(StaticTextStyleSheet textStyle, String text)
 	{
 		return createTextParagraph( ParagraphStyleSheet.defaultStyleSheet, textStyle, text );
 	}
 
-	protected static DPParagraph createTextParagraph(String text)
+	protected DPParagraph createTextParagraph(String text)
 	{
 		return createTextParagraph( ParagraphStyleSheet.defaultStyleSheet, StaticTextStyleSheet.defaultStyleSheet, text );
 	}

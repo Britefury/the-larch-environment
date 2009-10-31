@@ -226,19 +226,19 @@ abstract public class DPWidget extends PointerInputElement
 	//
 	//
 	
-	public DPWidget()
+	public DPWidget(ElementContext context)
 	{
-		this( WidgetStyleSheet.defaultStyleSheet );
+		this( context, WidgetStyleSheet.defaultStyleSheet );
 	}
 	
-	public DPWidget(WidgetStyleSheet styleSheet)
+	public DPWidget(ElementContext context, WidgetStyleSheet styleSheet)
 	{
 		flags = 0;
 		this.styleSheet = styleSheet;
 		layoutReqBox = new LReqBox();
 		layoutAllocBox = new LAllocBox( this );
 		parentPacking = null;
-		context = null;
+		this.context = context;
 	}
 	
 	
@@ -376,7 +376,7 @@ abstract public class DPWidget extends PointerInputElement
 			paddingBorders.put( key, border );
 		}
 		
-		DPBorder padElement = new DPBorder( border );
+		DPBorder padElement = new DPBorder( context, border );
 		padElement.setChild( this );
 		padElement.setContext( context );
 		return padElement;
@@ -2106,7 +2106,7 @@ abstract public class DPWidget extends PointerInputElement
 	{
 		if ( debugName != null )
 		{
-			return new DPText( headerDebugTextStyle, "<" + debugName + ">" );
+			return new DPText( null, headerDebugTextStyle, "<" + debugName + ">" );
 		}
 		else
 		{
@@ -2118,7 +2118,7 @@ abstract public class DPWidget extends PointerInputElement
 	{
 		String description = toString();
 		description = description.replace( "BritefuryJ.DocPresent.", "" );
-		return new DPText( headerDescriptionTextStyle, description );
+		return new DPText( null, headerDescriptionTextStyle, description );
 	}
 	
 	protected Border getMetaHeaderBorder()
@@ -2128,7 +2128,7 @@ abstract public class DPWidget extends PointerInputElement
 	
 	public DPWidget createMetaHeader()
 	{
-		DPHBox hbox = new DPHBox( metaHeaderHBoxStyle );
+		DPHBox hbox = new DPHBox( null, metaHeaderHBoxStyle );
 		DPWidget data = createMetaHeaderData();
 		DPWidget debug = createMetaHeaderDebug();
 		DPWidget descr = createMetaDescription();
@@ -2143,7 +2143,7 @@ abstract public class DPWidget extends PointerInputElement
 		hbox.append( descr );
 		
 
-		DPBorder border = new DPBorder( getMetaHeaderBorder() );
+		DPBorder border = new DPBorder( null, getMetaHeaderBorder() );
 		border.setChild( hbox );
 		return border;
 	}
@@ -2187,7 +2187,7 @@ abstract public class DPWidget extends PointerInputElement
 
 	public DPWidget createMetaElement()
 	{
-		DPBin bin = new DPBin();
+		DPBin bin = new DPBin( null );
 		bin.setChild( createMetaHeader() );
 		return bin;
 	}

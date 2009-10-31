@@ -19,24 +19,24 @@ public class DPEmpty extends DPWidget
 	String textRepresentation;
 	
 	
-	public DPEmpty()
+	public DPEmpty(ElementContext context)
 	{
-		this( WidgetStyleSheet.defaultStyleSheet, "" );
+		this( context, WidgetStyleSheet.defaultStyleSheet, "" );
 	}
 	
-	public DPEmpty(String textRepresentation)
+	public DPEmpty(ElementContext context, String textRepresentation)
 	{
-		this( WidgetStyleSheet.defaultStyleSheet, textRepresentation );
+		this( context, WidgetStyleSheet.defaultStyleSheet, textRepresentation );
 	}
 	
-	public DPEmpty(WidgetStyleSheet styleSheet)
+	public DPEmpty(ElementContext context, WidgetStyleSheet styleSheet)
 	{
-		this( styleSheet, "" );
+		this( context, styleSheet, "" );
 	}
 
-	public DPEmpty(WidgetStyleSheet styleSheet, String textRepresentation)
+	public DPEmpty(ElementContext context, WidgetStyleSheet styleSheet, String textRepresentation)
 	{
-		super( styleSheet );
+		super( context, styleSheet );
 		
 		this.textRepresentation = textRepresentation;
 	}

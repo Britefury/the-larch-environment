@@ -16,14 +16,14 @@ import BritefuryJ.DocPresent.StyleSheets.LineStyleSheet.Direction;
 
 public class DPLine extends DPStatic
 {
-	public DPLine()
+	public DPLine(ElementContext context)
 	{
-		this( LineStyleSheet.defaultStyleSheet );
+		this( context, LineStyleSheet.defaultStyleSheet );
 	}
 	
-	public DPLine(LineStyleSheet styleSheet)
+	public DPLine(ElementContext context, LineStyleSheet styleSheet)
 	{
-		super( styleSheet );
+		super( context, styleSheet );
 	}
 	
 	

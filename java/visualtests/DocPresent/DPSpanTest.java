@@ -24,10 +24,10 @@ public class DPSpanTest extends DocPresentTestBase
 	
 	protected DPWidget createWidget()
 	{
-		span = new DPSpan();
-		span.append( new DPText( "first" ) );
+		span = new DPSpan( null );
+		span.append( new DPText( null, "first" ) );
 		
-		DPParagraph para = new DPParagraph();
+		DPParagraph para = new DPParagraph( null );
 		para.append( span );
 		
 		return para;
@@ -47,8 +47,8 @@ public class DPSpanTest extends DocPresentTestBase
 
 			public void actionPerformed(ActionEvent event)
 			{
-				DPSpan s2 = new DPSpan();
-				s2.append( new DPText( "second" ) );
+				DPSpan s2 = new DPSpan( null );
+				s2.append( new DPText( null, "second" ) );
 				span.append( s2 );
 			}
 		};

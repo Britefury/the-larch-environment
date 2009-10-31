@@ -32,14 +32,14 @@ public class DPVBox extends DPAbstractBox
 	
 
 	
-	public DPVBox()
+	public DPVBox(ElementContext context)
 	{
-		this( VBoxStyleSheet.defaultStyleSheet );
+		this( context, VBoxStyleSheet.defaultStyleSheet );
 	}
 	
-	public DPVBox(VBoxStyleSheet syleSheet)
+	public DPVBox(ElementContext context, VBoxStyleSheet syleSheet)
 	{
-		super( syleSheet );
+		super( context, syleSheet );
 	}
 	
 	

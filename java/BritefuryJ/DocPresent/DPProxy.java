@@ -17,9 +17,9 @@ public class DPProxy extends DPBin implements Collateable
 	protected AABox2 boundsBoxes[];
 	
 	
-	public DPProxy()
+	public DPProxy(ElementContext context)
 	{
-		super();
+		super( context );
 		
 		collationRangeStart = -1;
 		collationRangeEnd = -1;

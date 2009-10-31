@@ -17,14 +17,14 @@ import BritefuryJ.Math.Point2;
 
 public class DPBin extends DPContainer
 {
-	public DPBin()
+	public DPBin(ElementContext context)
 	{
-		this( ContainerStyleSheet.defaultStyleSheet );
+		this( context, ContainerStyleSheet.defaultStyleSheet );
 	}
 
-	public DPBin(ContainerStyleSheet styleSheet)
+	public DPBin(ElementContext context, ContainerStyleSheet styleSheet)
 	{
-		super( styleSheet );
+		super( context, styleSheet );
 	}
 	
 	

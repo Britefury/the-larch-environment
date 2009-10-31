@@ -25,14 +25,14 @@ public class DPMathRoot extends DPContainer
 	
 	
 	
-	public DPMathRoot()
+	public DPMathRoot(ElementContext context)
 	{
-		this( MathRootStyleSheet.defaultStyleSheet );
+		this( context, MathRootStyleSheet.defaultStyleSheet );
 	}
 
-	public DPMathRoot(MathRootStyleSheet styleSheet)
+	public DPMathRoot(ElementContext context, MathRootStyleSheet styleSheet)
 	{
-		super( styleSheet );
+		super( context, styleSheet );
 	}
 	
 	

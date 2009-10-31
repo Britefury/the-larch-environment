@@ -23,7 +23,7 @@ public abstract class DocPresentTestBase
 
 	public void initFrame(JFrame frame)
 	{
-		DPPresentationArea area = new DPPresentationArea();
+		DPPresentationArea area = new DPPresentationArea( null );
 		
 		
 		menuBar = new JMenuBar();

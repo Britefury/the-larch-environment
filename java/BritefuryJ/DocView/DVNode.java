@@ -81,7 +81,8 @@ public class DVNode implements CellListener
 		bRefreshRequired = true;
 		
 		
-		proxyElement = new DPProxy();
+		// Proxy element, with null context, initially; later set in @setContext method
+		proxyElement = new DPProxy( null );
 		element = null;
 
 		elementFactory = null;

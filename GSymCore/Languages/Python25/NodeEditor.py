@@ -144,14 +144,35 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 		if parsed is not None:
 			return self.handleParsed( element, ctx, node, value, parsed, event )
 		else:
-			pyReplaceStmt( ctx, node, node, False )
+			# Pass further up:
+			#pyReplaceStmt( ctx, node, node, False )
 			return element.sendLinearRepresentationModifiedEventToParent( event )
 
 		
 	def handleParsed(self, element, ctx, node, value, parsed, event):
 		if not isCompoundStmtOrCompoundHeader( node )  and  not isCompoundStmtOrCompoundHeader( parsed ):
-			pyReplaceStmt( ctx, node, parsed )
-			return True
+			if isUnparsed( parsed ):
+				# Statement has been replaced by unparsed content
+				# Only edit the innermost node around the element that is the source of the event
+				sourceElement = event.getSourceElement()
+				sourceCtx = sourceElement.getContext()
+				if sourceCtx is None:
+					print 'NULL SOURCE CONTEXT: ', sourceElement
+				sourceCtxElement = sourceCtx.getViewNodeContentElement()
+				sourceNode = sourceCtx.getDocNode()
+				sourceValue = sourceCtxElement.getLinearRepresentation()
+				
+				items = sourceValue.getItemValues()
+				if len( items ) == 1  and  ( isinstance( items[0], str )  or  isinstance( items[0], unicode ) ):
+					if items[0].strip() == '':
+						pyReplaceStmt( ctx, node, parsed )
+						return True
+					
+				pyReplaceNode( sourceCtx, sourceNode, Nodes.UNPARSED( value=sourceValue.getItemValues() ) )
+				return True
+			else:
+				pyReplaceStmt( ctx, node, parsed )
+				return True
 		else:
 			element.setStructuralValueObject( parsed )
 			return element.sendLinearRepresentationModifiedEventToParent( event )

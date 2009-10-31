@@ -21,6 +21,7 @@ import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.ElementContext;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
@@ -37,16 +38,16 @@ import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 import BritefuryJ.ParserHelpers.DebugNode;
 import BritefuryJ.ParserHelpers.ParseResultInterface;
 
-public class NodeView
+public class NodeView implements ElementContext
 {
 	private static class DPNodeBin extends DPBin
 	{
 		private NodeView nodeView;
 		private boolean bSelected, bHighlight;
 		
-		public DPNodeBin(NodeView nodeView)
+		public DPNodeBin(ElementContext context, NodeView nodeView)
 		{
-			super( ContainerStyleSheet.defaultStyleSheet );
+			super( context, ContainerStyleSheet.defaultStyleSheet );
 			
 			this.nodeView = nodeView;
 			bSelected = false;
@@ -161,10 +162,10 @@ public class NodeView
 			childWidgets.add( childView.getWidget().padY( 3.0 ) );
 		}
 		
-		DPVBox childrenVBox = new DPVBox( childrenVBoxStyle );
+		DPVBox childrenVBox = new DPVBox( this, childrenVBoxStyle );
 		childrenVBox.setChildren( childWidgets );
 		
-		DPHBox mainHBox = new DPHBox( mainHBoxStyle );
+		DPHBox mainHBox = new DPHBox( this, mainHBoxStyle );
 		mainHBox.setChildren( new DPWidget[] { nodeWidget.alignVCentre(), childrenVBox.alignVCentre() } );
 		
 		mainWidget = mainHBox;
@@ -242,11 +243,11 @@ public class NodeView
 		}
 		
 		
-		DPText classText = new DPText( classNameStyle, "[" + className + "]" );
+		DPText classText = new DPText( this, classNameStyle, "[" + className + "]" );
 		if ( exprName != null )
 		{
-			DPText exprText = new DPText( debugNameStyle, exprName );
-			DPHBox textBox = new DPHBox( titleTextHBoxStyle );
+			DPText exprText = new DPText( this, debugNameStyle, exprName );
+			DPHBox textBox = new DPHBox( this, titleTextHBoxStyle );
 			DPWidget[] children = { exprText, classText };
 			textBox.setChildren( Arrays.asList( children ) );
 			return textBox;
@@ -262,7 +263,7 @@ public class NodeView
 		DPWidget titleWidget = makeTitleWidget( data );
 		
 		Border b = data.getResult().isValid()  ?  titleSuccessBorder  :  titleFailBorder;
-		DPBorder border = new DPBorder( b );
+		DPBorder border = new DPBorder( this, b );
 		border.setChild( titleWidget.alignVCentre() );
 		
 		return border;
@@ -282,7 +283,7 @@ public class NodeView
 			rangeText = String.valueOf( data.getStart() ) + "   :   " + String.valueOf( result.getEnd() );
 		}
 
-		return new DPText( rangeStyle, rangeText );
+		return new DPText( this, rangeStyle, rangeText );
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -316,7 +317,7 @@ public class NodeView
 			inputString = inputString.substring( 0, MAX_STRING_LENGTH )  +  "...";
 		}
 
-		return new DPText( inputStyle, inputString );
+		return new DPText( this, inputStyle, inputString );
 	}
 
 	private DPWidget makeValueWidget(DebugNode data)
@@ -331,11 +332,11 @@ public class NodeView
 			{
 				valueString = valueString.substring( 0, MAX_STRING_LENGTH )  +  "...";
 			}
-			return new DPText( valueStyle, valueString );
+			return new DPText( this, valueStyle, valueString );
 		}
 		else
 		{
-			return new DPText( failStyle, "<fail>" );
+			return new DPText( this, failStyle, "<fail>" );
 		}
 	}
 	
@@ -345,7 +346,7 @@ public class NodeView
 		DPWidget inputWidget = makeInputWidget( data );
 		DPWidget valueWidget = makeValueWidget( data );
 		
-		DPVBox contentBoxWidget = new DPVBox();
+		DPVBox contentBoxWidget = new DPVBox( this );
 		DPWidget[] children = { rangeWidget, inputWidget, valueWidget };
 		contentBoxWidget.setChildren( Arrays.asList( children ) );
 		return contentBoxWidget;
@@ -356,13 +357,13 @@ public class NodeView
 		DPWidget titleBoxWidget = makeTitleBoxWidget( data );
 		DPWidget contentBoxWidget = makeContentBoxWidget( data );
 		
-		DPVBox nodeBoxWidget = new DPVBox();
+		DPVBox nodeBoxWidget = new DPVBox( this );
 		nodeBoxWidget.setChildren( new DPWidget[] { titleBoxWidget.alignHExpand(), contentBoxWidget.alignHExpand() } );
 		
-		nodeBinWidget = new DPNodeBin( this );
+		nodeBinWidget = new DPNodeBin( this, this );
 		nodeBinWidget.setChild( nodeBoxWidget );
 		
-		DPBorder nodeBorderWidget = new DPBorder( nodeBorder );
+		DPBorder nodeBorderWidget = new DPBorder( this, nodeBorder );
 		nodeBorderWidget.setChild( nodeBinWidget );
 		
 		return nodeBorderWidget;

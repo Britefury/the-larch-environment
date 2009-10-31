@@ -15,14 +15,14 @@ import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
 public abstract class DPStatic extends DPWidget
 {
-	public DPStatic()
+	public DPStatic(ElementContext context)
 	{
-		super();
+		super( context );
 	}
 	
-	public DPStatic(WidgetStyleSheet styleSheet)
+	public DPStatic(ElementContext context, WidgetStyleSheet styleSheet)
 	{
-		super( styleSheet );
+		super( context, styleSheet );
 	}
 
 	

@@ -41,8 +41,7 @@ public class HorizontalListViewLayout extends ListViewLayout
 		
 	public DPWidget createListElement(ElementContext ctx, List<DPWidget> children, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator)
 	{
-		DPHBox hbox = new DPHBox( styleSheet );
-		hbox.setContext( ctx );
+		DPHBox hbox = new DPHBox( ctx, styleSheet );
 		
 		ArrayList<DPWidget> childElems = new ArrayList<DPWidget>();
 		childElems.ensureCapacity( children.size() + 2 );

@@ -43,34 +43,34 @@ public class TableTestPage extends SystemPage
 	private static SolidBorder b = new SolidBorder( 2.0, 3.0, new Color( 0.0f, 0.3f, 0.7f ), new Color( 1.0f, 0.99f, 0.9f ) );
 	private static SolidBorder outlineBorder = new SolidBorder( 1.0, 0.0, new Color( 0.0f, 0.3f, 0.7f ), null );
 
-	protected static DPText text12(String s)
+	protected DPText text12(String s)
 	{
-		return new DPText( t12, s );
+		return new DPText( getContext(), t12, s );
 	}
 	
-	protected static DPText text18(String s)
+	protected DPText text18(String s)
 	{
-		return new DPText( t18, s );
+		return new DPText( getContext(), t18, s );
 	}
 	
-	protected static DPWidget wrapInOutline(DPWidget w)
+	protected DPWidget wrapInOutline(DPWidget w)
 	{
-		DPBorder border = new DPBorder( outlineBorder );
+		DPBorder border = new DPBorder( getContext(), outlineBorder );
 		border.setChild( w );
 		return border;
 	}
 	
-	protected static DPWidget wrapInBorder(DPWidget w)
+	protected DPWidget wrapInBorder(DPWidget w)
 	{
-		DPBorder border = new DPBorder( b );
+		DPBorder border = new DPBorder( getContext(), b );
 		border.setChild( w );
 		return border;
 	}
 
-	protected static DPTable makeTable0()
+	protected DPTable makeTable0()
 	{
 		TableStyleSheet tbls0 = new TableStyleSheet( 5.0, false, 5.0, false );
-		DPTable table = new DPTable( tbls0 );
+		DPTable table = new DPTable( getContext(), tbls0 );
 		for (int row = 0; row < 6; row++)
 		{
 			for (int col = 0; col < 6; col++)
@@ -81,7 +81,7 @@ public class TableTestPage extends SystemPage
 		return table;
 	}
 	
-	protected static DPTable makeTable1()
+	protected DPTable makeTable1()
 	{
 		DPTable table = makeTable0();
 		table.put( 2, 2, null );
@@ -91,7 +91,7 @@ public class TableTestPage extends SystemPage
 		return table;
 	}
 	
-	protected static DPTable makeTable2()
+	protected DPTable makeTable2()
 	{
 		DPTable table = makeTable0();
 		table.put( 2, 2, null );
@@ -101,7 +101,7 @@ public class TableTestPage extends SystemPage
 		return table;
 	}
 	
-	protected static DPTable makeTable3()
+	protected DPTable makeTable3()
 	{
 		DPTable table = makeTable0();
 		table.put( 2, 2, null );
@@ -122,7 +122,7 @@ public class TableTestPage extends SystemPage
 	protected DPWidget createContents()
 	{
 		VBoxStyleSheet boxS = new VBoxStyleSheet( VTypesetting.NONE, 20.0 );
-		DPVBox box = new DPVBox( boxS );
+		DPVBox box = new DPVBox( getContext(), boxS );
 		box.append( wrapInBorder( makeTable0() ) );
 		box.append( wrapInBorder( makeTable1() ) );
 		box.append( wrapInBorder( makeTable2() ) );
