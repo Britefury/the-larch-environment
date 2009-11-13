@@ -46,7 +46,6 @@ public class Browser
 {
 	protected interface BrowserListener
 	{
-		public void onBrowserGoToLocation(Browser browser, String location);
 		public void onBrowserChangeTitle(Browser browser, String title);
 	}
 	
@@ -151,11 +150,12 @@ public class Browser
 		return history.getCurrentContext().getLocation();
 	}
 	
-	public void setLocation(String location)
+	public void goToLocation(String location)
 	{
-		history.visit( location );
-		resolve();
+		locationField.setText( location );
+		setLocation( location );
 	}
+	
 	
 	
 	
@@ -193,6 +193,7 @@ public class Browser
 	{
 		history.visit( location );
 		history.clear();
+		locationField.setText( location );
 		viewportReset();
 		resolve();
 	}
@@ -224,10 +225,8 @@ public class Browser
 		if ( history.canGoBack() )
 		{
 			history.back();
-			if ( listener != null )
-			{
-				listener.onBrowserGoToLocation( this, history.getCurrentContext().getLocation() );
-			}
+			String location = history.getCurrentContext().getLocation();
+			locationField.setText( location );
 			resolve();
 		}
 	}
@@ -237,10 +236,8 @@ public class Browser
 		if ( history.canGoForward() )
 		{
 			history.forward();
-			if ( listener != null )
-			{
-				listener.onBrowserGoToLocation( this, history.getCurrentContext().getLocation() );
-			}
+			String location = history.getCurrentContext().getLocation();
+			locationField.setText( location );
 			resolve();
 		}
 	}
@@ -338,13 +335,11 @@ public class Browser
 	
 	
 	
-	public void goToLocation(String location)
+	private void setLocation(String location)
 	{
 		history.visit( location );
-		listener.onBrowserGoToLocation( this, location );
 		resolve();
 	}
-	
 	
 	
 	private void onLocationField(String location)

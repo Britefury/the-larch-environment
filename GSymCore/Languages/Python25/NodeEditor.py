@@ -145,7 +145,15 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 			return self.handleParsed( element, ctx, node, value, parsed, event )
 		else:
 			# Pass further up:
-			#pyReplaceStmt( ctx, node, node, False )
+
+			# Replacing the node with itself ensures that the view of this node will be rebuilt,
+			# due to the modification event being sent.
+			# It is necessary to do this, as the text of the statement has been edited;
+			# leaving the existing view intact will result in the parent node reparsing the
+			# modified text.
+			# This normally leads to blank lines doubling on each press of the return key
+			pyReplaceStmt( ctx, node, node, False )
+			
 			return element.sendLinearRepresentationModifiedEventToParent( event )
 
 		
@@ -247,6 +255,8 @@ class SuiteLinearRepresentationListener (ElementLinearRepresentationListener):
 		# Get the content
 		value = element.getLinearRepresentation()
 		parsed = parseStream( self._parser, value )
+		print str( value ).replace( '\n', '\\n' )
+		print parsed
 		if parsed is not None:
 			return self.handleParsed( value, parsed )
 		else:

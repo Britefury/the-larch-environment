@@ -311,10 +311,6 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	}
 	
 	
-	public void onBrowserGoToLocation(Browser browser, String location)
-	{
-	}
-	
 	public void onBrowserChangeTitle(Browser browser, String title)
 	{
 		int index = browsers.indexOf( browser );
