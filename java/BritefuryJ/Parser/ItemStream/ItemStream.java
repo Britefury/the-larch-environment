@@ -157,7 +157,7 @@ public class ItemStream
 		
 		public String toString()
 		{
-			return "\n<<--Structural: " + structuralValue.toString() + "-->>\n";
+			return "<<--Structural: " + structuralValue.toString() + "-->>";
 		}
 	}
 	
