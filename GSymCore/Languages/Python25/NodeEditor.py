@@ -255,8 +255,6 @@ class SuiteLinearRepresentationListener (ElementLinearRepresentationListener):
 		# Get the content
 		value = element.getLinearRepresentation()
 		parsed = parseStream( self._parser, value )
-		print str( value ).replace( '\n', '\\n' )
-		print parsed
 		if parsed is not None:
 			return self.handleParsed( value, parsed )
 		else:
