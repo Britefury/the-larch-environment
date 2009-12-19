@@ -28,7 +28,6 @@ public class Cell extends CellInterface
 	private Object valueCache;
 	private WeakHashMap<CellInterface, Object> dependencies;
 	private boolean cycleLock;
-	private CellOwner owner;
 	
 
 	
@@ -39,7 +38,6 @@ public class Cell extends CellInterface
 		valueCache = null;
 		dependencies = null;
 		cycleLock = false;
-		owner = null;
 	}
 	
 	
@@ -95,22 +93,11 @@ public class Cell extends CellInterface
 	
 	
 	
-	public boolean isValid()
-	{
-		return true;
-	}
-	
 
 
 	private void setEval(CellEvaluator eval)
 	{
-		CellEvaluator oldEval = evaluator;
 		evaluator = eval;
-		emitEvaluator( oldEval, evaluator );
-		if ( owner != null )
-		{
-			owner.onCellEvaluator( this, oldEval, evaluator );
-		}
 		onChanged();
 	}
 	
