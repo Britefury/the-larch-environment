@@ -10,7 +10,6 @@ package tests.Cell;
 import java.util.HashMap;
 
 import junit.framework.TestCase;
-import BritefuryJ.Cell.CellEvaluator;
 import BritefuryJ.Cell.CellInterface;
 import BritefuryJ.Cell.CellListener;
 
@@ -70,16 +69,6 @@ public class CellTest_base extends TestCase
 			public void onCellChanged(CellInterface cell)
 			{
 				tester.onSignal( prefix + "changed" );
-			}
-
-			public void onCellEvaluator(CellInterface cell, CellEvaluator oldEval, CellEvaluator newEval)
-			{
-				tester.onSignal( prefix + "evaluator" );
-			}
-
-			public void onCellValidity(CellInterface cell)
-			{
-				tester.onSignal( prefix + "validity" );
 			}
 		};
 		

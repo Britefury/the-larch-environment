@@ -50,7 +50,6 @@ public abstract class CellInterface
 	public abstract boolean isLiteral();
 	
 	public abstract Object getValue();
-	public abstract boolean isValid();
 	
 	
 	
@@ -79,22 +78,6 @@ public abstract class CellInterface
 		for (CellListener l: listeners)
 		{
 			l.onCellChanged( this );
-		}
-	}
-	
-	protected void emitEvaluator(CellEvaluator oldEval, CellEvaluator newEval)
-	{
-		for (CellListener l: listeners)
-		{
-			l.onCellEvaluator( this, oldEval, newEval );
-		}
-	}
-
-	protected void emitValidity()
-	{
-		for (CellListener l: listeners)
-		{
-			l.onCellValidity( this );
 		}
 	}
 	

@@ -11,7 +11,6 @@ package BritefuryJ.Cell;
 public class LiteralCell extends CellInterface
 {
 	private CellEvaluatorLiteral evaluator;
-	private CellOwner owner;
 	
 	
 	
@@ -24,7 +23,6 @@ public class LiteralCell extends CellInterface
 	{
 		super();
 		evaluator = new CellEvaluatorLiteral( value );
-		owner = null;
 	}
 	
 	
@@ -35,13 +33,7 @@ public class LiteralCell extends CellInterface
 
 	public void setEvaluator(CellEvaluator eval)
 	{
-		CellEvaluatorLiteral oldEval = evaluator;
 		evaluator = (CellEvaluatorLiteral)eval;
-		emitEvaluator( oldEval, evaluator );
-		if ( owner != null )
-		{
-			owner.onCellEvaluator( this, oldEval, evaluator );
-		}
 		onChanged();
 	}
 
@@ -69,10 +61,5 @@ public class LiteralCell extends CellInterface
 		onAccess();
 		
 		return evaluator.evaluate();
-	}
-
-	public boolean isValid()
-	{
-		return true;
 	}
 }

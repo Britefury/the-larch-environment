@@ -13,15 +13,6 @@ import BritefuryJ.Cell.CellListener;
 
 public class CellTest extends CellTest_base
 {
-	public void testValidity()
-	{
-		Cell cell = new Cell();
-		
-		assertTrue( cell.isValid() );
-	}
-
-
-
 	public void testLiteral()
 	{
 		Cell cell = new Cell();
@@ -39,7 +30,6 @@ public class CellTest extends CellTest_base
 
 	public void testListener()
 	{
-		assertEquals( getSignalCount( "evaluator" ), 0 );
 		assertEquals( getSignalCount( "changed" ), 0 );
 		
 		Cell cell = new Cell();
@@ -53,7 +43,6 @@ public class CellTest extends CellTest_base
 		cell.setLiteralValue( new Integer( 20 ) );
 		assertEquals( cell.getValue(), new Integer( 20 ) );
 		
-		assertEquals( getSignalCount( "evaluator" ), 1 );
 		assertEquals( getSignalCount( "changed" ), 1 );
 	}
 	
@@ -70,7 +59,6 @@ public class CellTest extends CellTest_base
 		};
 		
 		
-		assertEquals( getSignalCount( "evaluator" ), 0 );
 		assertEquals( getSignalCount( "changed" ), 0 );
 
 		Cell cell = new Cell();
@@ -84,7 +72,6 @@ public class CellTest extends CellTest_base
 		cell.setEvaluator( evaluator );
 		assertEquals( cell.getValue(), new Integer( 20 ) );
 		
-		assertEquals( getSignalCount( "evaluator" ), 1 );
 		assertEquals( getSignalCount( "changed" ), 1 );
 	}
 	
@@ -155,9 +142,7 @@ public class CellTest extends CellTest_base
 
 	public void testListenerWithChain()
 	{
-		assertEquals( getSignalCount( "1evaluator" ), 0 );
 		assertEquals( getSignalCount( "1changed" ), 0 );
-		assertEquals( getSignalCount( "3evaluator" ), 0 );
 		assertEquals( getSignalCount( "3changed" ), 0 );
 		
 		final Cell cell1 = new Cell();
@@ -196,9 +181,7 @@ public class CellTest extends CellTest_base
 		assertEquals( cell2.getValue(), new Integer( 3 ) );
 		assertEquals( cell3.getValue(), new Integer( 6 ) );
 
-		assertEquals( getSignalCount( "1evaluator" ), 0 );
 		assertEquals( getSignalCount( "1changed" ), 0 );
-		assertEquals( getSignalCount( "3evaluator" ), 0 );
 		assertEquals( getSignalCount( "3changed" ), 0 );
 
 		cell1.setLiteralValue( new Integer( 12 ) );
@@ -206,9 +189,7 @@ public class CellTest extends CellTest_base
 		assertEquals( cell1.getValue(), new Integer( 12 ) );
 		assertEquals( cell2.getValue(), new Integer( 36 ) );
 		assertEquals( cell3.getValue(), new Integer( 72 ) );
-		assertEquals( getSignalCount( "1evaluator" ), 1 );
 		assertEquals( getSignalCount( "1changed" ), 1 );
-		assertEquals( getSignalCount( "3evaluator" ), 0 );
 		assertEquals( getSignalCount( "3changed" ), 1 );
 
 		cell3.setEvaluator( evaluator3 );
@@ -216,9 +197,7 @@ public class CellTest extends CellTest_base
 		assertEquals( cell1.getValue(), new Integer( 12 ) );
 		assertEquals( cell2.getValue(), new Integer( 36 ) );
 		assertEquals( cell3.getValue(), new Integer( 72 ) );
-		assertEquals( getSignalCount( "1evaluator" ), 1 );
 		assertEquals( getSignalCount( "1changed" ), 1 );
-		assertEquals( getSignalCount( "3evaluator" ), 1 );
 		assertEquals( getSignalCount( "3changed" ), 2 );
 	}
 }
