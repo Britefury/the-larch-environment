@@ -4,27 +4,27 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package tests.DocView;
+package tests.IncrementalTree;
 
 import java.util.Arrays;
 
-import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMList;
-import BritefuryJ.DocView.DVNode;
-import BritefuryJ.DocView.DocView;
-import BritefuryJ.DocView.DocViewNodeTable;
+import BritefuryJ.IncrementalTree.IncrementalTree;
+import BritefuryJ.IncrementalTree.IncrementalTreeNode;
+import BritefuryJ.IncrementalTree.IncrementalTreeNodeTable;
+import junit.framework.TestCase;
 
-public class Test_DocViewNodeTable extends TestCase
+public class Test_IncrementalTreeNodeTable extends TestCase
 {
 	// Extend DocViewNodeTable so that the @refViewNode and @unrefViewNode methods are accessible
-	private static class TestTable extends DocViewNodeTable
+	private static class TestTable extends IncrementalTreeNodeTable
 	{
-		protected void refViewNode(DVNode node)
+		protected void refViewNode(IncrementalTreeNode node)
 		{
 			super.refViewNode( node );
 		}
 
-		protected void unrefViewNode(DVNode node)
+		protected void unrefViewNode(IncrementalTreeNode node)
 		{
 			super.unrefViewNode( node );
 		}
@@ -33,8 +33,8 @@ public class Test_DocViewNodeTable extends TestCase
 	
 	private DMList da, db, dc, dd;
 	private TestTable table;
-	private DVNode va, vb, vc, vd1, vd2;
-	private DocView view;
+	private IncrementalTreeNode va, vb, vc, vd1, vd2;
+	private IncrementalTree view;
 	
 
 	
@@ -46,13 +46,13 @@ public class Test_DocViewNodeTable extends TestCase
 		da = new DMList( Arrays.asList( new Object[] { db, dc } ) );
 		
 		
-		view = new DocView( da, null );
+		view = new IncrementalTree( da, null );
 		
-		va = new DVNode( view, da, null );
-		vb = new DVNode( view, db, null );
-		vc = new DVNode( view, dc, null );
-		vd1 = new DVNode( view, dd, null );
-		vd2 = new DVNode( view, dd, null );
+		va = new IncrementalTreeNode( view, da, null );
+		vb = new IncrementalTreeNode( view, db, null );
+		vc = new IncrementalTreeNode( view, dc, null );
+		vd1 = new IncrementalTreeNode( view, dd, null );
+		vd2 = new IncrementalTreeNode( view, dd, null );
 		
 		
 		table = new TestTable();
@@ -87,10 +87,10 @@ public class Test_DocViewNodeTable extends TestCase
 		assertTrue( table.containsKey( dc ) );
 		assertTrue( table.containsKey( dd ) );
 		
-		assertEquals( Arrays.asList( new DVNode[] { va } ), table.get( da ) );
-		assertEquals( Arrays.asList( new DVNode[] { vb } ), table.get( db ) );
-		assertEquals( Arrays.asList( new DVNode[] { vc } ), table.get( dc ) );
-		assertEquals( Arrays.asList( new DVNode[] { vd1, vd2 } ), table.get( dd ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] { va } ), table.get( da ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] { vb } ), table.get( db ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] { vc } ), table.get( dc ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] { vd1, vd2 } ), table.get( dd ) );
 	}
 	
 	public void testRemove()
@@ -107,16 +107,16 @@ public class Test_DocViewNodeTable extends TestCase
 		assertTrue( table.containsKey( dc ) );
 		assertTrue( table.containsKey( dd ) );
 
-		assertEquals( Arrays.asList( new DVNode[] {} ), table.get( da ) );
-		assertEquals( Arrays.asList( new DVNode[] { vb } ), table.get( db ) );
-		assertEquals( Arrays.asList( new DVNode[] { vc } ), table.get( dc ) );
-		assertEquals( Arrays.asList( new DVNode[] { vd2 } ), table.get( dd ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] {} ), table.get( da ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] { vb } ), table.get( db ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] { vc } ), table.get( dc ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] { vd2 } ), table.get( dd ) );
 	}
 
 	public void testPut()
 	{
-		DVNode vx = new DVNode( view, da, null  );
-		DVNode vy = new DVNode( view, dd, null );
+		IncrementalTreeNode vx = new IncrementalTreeNode( view, da, null  );
+		IncrementalTreeNode vy = new IncrementalTreeNode( view, dd, null );
 		
 		table.put( da, vx );
 		table.put( dd, vy );
@@ -130,10 +130,10 @@ public class Test_DocViewNodeTable extends TestCase
 		assertTrue( table.containsKey( dc ) );
 		assertTrue( table.containsKey( dd ) );
 
-		assertEquals( Arrays.asList( new DVNode[] { va, vx } ), table.get( da ) );
-		assertEquals( Arrays.asList( new DVNode[] { vb } ), table.get( db ) );
-		assertEquals( Arrays.asList( new DVNode[] { vc } ), table.get( dc ) );
-		assertEquals( Arrays.asList( new DVNode[] { vd1, vd2, vy } ), table.get( dd ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] { va, vx } ), table.get( da ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] { vb } ), table.get( db ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] { vc } ), table.get( dc ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] { vd1, vd2, vy } ), table.get( dd ) );
 	}
 
 	public void testViewGC()
@@ -154,10 +154,10 @@ public class Test_DocViewNodeTable extends TestCase
 		assertTrue( table.containsKey( dc ) );
 		assertTrue( table.containsKey( dd ) );
 
-		assertEquals( Arrays.asList( new DVNode[] {} ), table.get( da ) );
-		assertEquals( Arrays.asList( new DVNode[] { vb } ), table.get( db ) );
-		assertEquals( Arrays.asList( new DVNode[] { vc } ), table.get( dc ) );
-		assertEquals( Arrays.asList( new DVNode[] { vd2 } ), table.get( dd ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] {} ), table.get( da ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] { vb } ), table.get( db ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] { vc } ), table.get( dc ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] { vd2 } ), table.get( dd ) );
 	}
 	
 	
@@ -178,10 +178,10 @@ public class Test_DocViewNodeTable extends TestCase
 		assertTrue( table.containsKey( dc ) );
 		assertTrue( table.containsKey( dd ) );
 
-		assertEquals( Arrays.asList( new DVNode[] {} ), table.get( da ) );
-		assertEquals( Arrays.asList( new DVNode[] { vb } ), table.get( db ) );
-		assertEquals( Arrays.asList( new DVNode[] { vc } ), table.get( dc ) );
-		assertEquals( Arrays.asList( new DVNode[] { vd2 } ), table.get( dd ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] {} ), table.get( da ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] { vb } ), table.get( db ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] { vc } ), table.get( dc ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] { vd2 } ), table.get( dd ) );
 		
 		table.clean();
 
@@ -210,10 +210,10 @@ public class Test_DocViewNodeTable extends TestCase
 		assertTrue( table.containsKey( dc ) );
 		assertTrue( table.containsKey( dd ) );
 
-		assertEquals( Arrays.asList( new DVNode[] { va } ), table.get( da ) );
-		assertEquals( Arrays.asList( new DVNode[] { vb } ), table.get( db ) );
-		assertEquals( Arrays.asList( new DVNode[] { vc } ), table.get( dc ) );
-		assertEquals( Arrays.asList( new DVNode[] { vd2, vd1 } ), table.get( dd ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] { va } ), table.get( da ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] { vb } ), table.get( db ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] { vc } ), table.get( dc ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] { vd2, vd1 } ), table.get( dd ) );
 		
 		table.clean();
 
@@ -240,18 +240,18 @@ public class Test_DocViewNodeTable extends TestCase
 		assertTrue( table.containsKey( dc ) );
 		assertFalse( table.containsKey( dd ) );
 
-		assertEquals( Arrays.asList( new DVNode[] { va } ), table.get( da ) );
-		assertEquals( Arrays.asList( new DVNode[] { vb } ), table.get( db ) );
-		assertEquals( Arrays.asList( new DVNode[] { vc } ), table.get( dc ) );
-		assertEquals( Arrays.asList( new DVNode[] {} ), table.get( dd ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] { va } ), table.get( da ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] { vb } ), table.get( db ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] { vc } ), table.get( dc ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] {} ), table.get( dd ) );
 		
 		
 		// Reuse
-		DVNode val = table.takeUnusedViewNodeFor( dd, null );
+		IncrementalTreeNode val = table.takeUnusedViewNodeFor( dd, null );
 		assertSame( val, vd2 );
 		assertSame( val.getDocNode(), dd );
 		
-		assertEquals( Arrays.asList( new DVNode[] { vd2 } ), table.get( dd ) );
+		assertEquals( Arrays.asList( new IncrementalTreeNode[] { vd2 } ), table.get( dd ) );
 		assertTrue( table.containsKey( dd ) );
 		assertEquals( table.size(), 4 );
 		

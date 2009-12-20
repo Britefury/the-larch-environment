@@ -12,9 +12,11 @@ import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.IncrementalTree.IncrementalTree;
+import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 import BritefuryJ.Utils.Profile.ProfileTimer;
 
-public class DocView implements DVNode.NodeRefreshListener
+public class DocView extends IncrementalTree implements IncrementalTreeNode.NodeResultChangeListener
 {
 	//
 	//
@@ -25,19 +27,15 @@ public class DocView implements DVNode.NodeRefreshListener
 	static boolean ENABLE_PROFILING = false;
 	
 	
-	public interface RefreshListener
+	public interface NodeElementChangeListener
 	{
-		public void onViewRequestRefresh(DocView view);
+		public void reset(DocView view);
+		public void elementChangeFrom(DVNode node, DPWidget e);
+		public void elementChangeTo(DVNode node, DPWidget e);
 	}
 	
 	
-	private DMNode root;
-	private DVNode.NodeElementFactory rootElementFactory;
-	protected DocViewNodeTable nodeTable;
-	private DVNode rootView;
-	private DVNode.NodeElementChangeListener elementChangeListener;
-	private boolean bRefreshRequired;
-	private RefreshListener refreshListener;
+	private NodeElementChangeListener elementChangeListener;
 	private DPVBox rootBox;
 	
 	
@@ -53,16 +51,10 @@ public class DocView implements DVNode.NodeRefreshListener
 	
 	
 	
-	public DocView(DMNode root, DVNode.NodeElementFactory rootElementFactory)
+	public DocView(DMNode root, DVNode.NodeResultFactory rootElementFactory)
 	{
-		this.root = root;
-		this.rootElementFactory = rootElementFactory;
-		
-		nodeTable = new DocViewNodeTable();
-		
+		super( root, rootElementFactory );
 		elementChangeListener = null;
-		
-		bRefreshRequired = false;
 		
 		rootBox = null;
 		
@@ -75,25 +67,17 @@ public class DocView implements DVNode.NodeRefreshListener
 	}
 	
 	
-	public void setRefreshListener(RefreshListener listener)
-	{
-		refreshListener = listener;
-	}
-	
-	public void setElementChangeListener(DVNode.NodeElementChangeListener elementChangeListener)
+	public void setElementChangeListener(NodeElementChangeListener elementChangeListener)
 	{
 		this.elementChangeListener = elementChangeListener;
-	}
-	
-	
-	protected DVNode getRootView()
-	{
-		if ( rootView == null )
+		if ( elementChangeListener != null )
 		{
-			rootView = buildNodeView( root, rootElementFactory );
-			rootView.setRefreshListener( this );
+			setNodeResultChangeListener( this );
 		}
-		return rootView;
+		else
+		{
+			setNodeResultChangeListener( null );
+		}
 	}
 	
 	
@@ -102,7 +86,7 @@ public class DocView implements DVNode.NodeRefreshListener
 		if ( rootBox == null )
 		{
 			performRefresh();
-			DVNode rootView = getRootView();
+			DVNode rootView = (DVNode)getRootIncrementalTreeNode();
 			rootView.getElement().alignHExpand();
 			rootView.getElement().alignVExpand();
 			rootBox = new DPVBox( null, rootBoxStyle );
@@ -113,35 +97,7 @@ public class DocView implements DVNode.NodeRefreshListener
 	
 	
 	
-	public DVNode buildNodeView(DMNode node, DVNode.NodeElementFactory elementFactory)
-	{
-		if ( node == null )
-		{
-			return null;
-		}
-		else
-		{
-			// Try asking the table for an unused view node for the document node
-			DVNode viewNode = nodeTable.takeUnusedViewNodeFor( node, elementFactory );
-			
-			if ( viewNode == null )
-			{
-				// No existing view node could be acquired.
-				// Create a new one and add it to the table
-				viewNode = new DVNode( this, node, elementChangeListener );
-				nodeTable.put( node, viewNode );
-			}
-			
-			viewNode.setNodeElementFactory( elementFactory );
-			
-			return viewNode;
-		}
-	}
-	
-	
-	
-	
-	private void performRefresh()
+	protected void performRefresh()
 	{
 		// >>> PROFILING
 		long t1 = 0;
@@ -157,13 +113,8 @@ public class DocView implements DVNode.NodeRefreshListener
 		// <<< PROFILING
 		
 		
-		elementChangeListener.reset( this );
-		getRootView().refresh();
+		super.performRefresh();
 		
-		// Clear unused entries from the node table
-		nodeTable.clean();
-
-	
 		// >>> PROFILING
 		profile_stopJava();
 	
@@ -183,31 +134,12 @@ public class DocView implements DVNode.NodeRefreshListener
 	}
 	
 	
-	public void refresh()
-	{
-		if ( bRefreshRequired )
-		{
-			bRefreshRequired = false;
-			performRefresh();
-		}
-	}
 	
+	protected IncrementalTreeNode createIncrementalTreeNode(DMNode node, IncrementalTreeNode.NodeResultChangeListener changeListener)
+	{
+		return new DVNode( this, node, changeListener );
+	}
 
-	
-	public void onNodeRequestRefresh(DVNode node)
-	{
-		if ( !bRefreshRequired )
-		{
-			bRefreshRequired = true;
-			
-			if ( refreshListener != null )
-			{
-				refreshListener.onViewRequestRefresh( this );
-			}
-		}
-	}
-	
-	
 	
 	
 	
@@ -337,5 +269,27 @@ public class DocView implements DVNode.NodeRefreshListener
 	public double getUpdateNodeElementTime()
 	{
 		return updateNodeElementTimer.getTime();
+	}
+
+	
+	
+
+	public void reset(IncrementalTree view)
+	{
+		elementChangeListener.reset( this );
+	}
+
+	public void resultChangeFrom(IncrementalTreeNode node, Object result)
+	{
+		profile_startContentChange();
+		elementChangeListener.elementChangeFrom( (DVNode)node, (DPWidget)result );
+		profile_stopContentChange();
+	}
+
+	public void resultChangeTo(IncrementalTreeNode node, Object result)
+	{
+		profile_startContentChange();
+		elementChangeListener.elementChangeTo( (DVNode)node, (DPWidget)result );
+		profile_stopContentChange();
 	}
 }

@@ -20,7 +20,7 @@ import BritefuryJ.DocView.DVNode;
 import BritefuryJ.DocView.DocView;
 import BritefuryJ.Utils.StringDiff;
 
-public class NodeElementChangeListenerDiff implements DVNode.NodeElementChangeListener
+public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeListener
 {
 	private static int DIFF_THRESHHOLD = 65536;
 	

@@ -6,39 +6,19 @@
 //##************************
 package BritefuryJ.DocView;
 
-import BritefuryJ.Cell.Cell;
-import BritefuryJ.Cell.CellEvaluator;
-import BritefuryJ.Cell.CellInterface;
-import BritefuryJ.Cell.CellListener;
 import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocPresent.DPProxy;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementContext;
+import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 
-public class DVNode implements CellListener 
+public class DVNode extends IncrementalTreeNode
 {
 	public static class CannotChangeDocNodeException extends Exception
 	{
 		private static final long serialVersionUID = 1L;
 	}
 
-	public static interface NodeElementFactory
-	{
-		public DPWidget createNodeElement(DVNode viewNode, DMNode docNode);
-	}
-	
-	public static interface NodeElementChangeListener
-	{
-		public void reset(DocView view);
-		public void elementChangeFrom(DVNode node, DPWidget e);
-		public void elementChangeTo(DVNode node, DPWidget e);
-	}
-	
-	public static interface NodeRefreshListener
-	{
-		public void onNodeRequestRefresh(DVNode node);
-	}
-	
 	public static interface NodeContext
 	{
 	};
@@ -47,80 +27,22 @@ public class DVNode implements CellListener
 
 	
 	
-	private DocView view;
-	private DMNode docNode;
-	
-	private Cell elementCell;
 	private DPProxy proxyElement;
 	private DPWidget element;
-	private NodeElementFactory elementFactory;
-	
-	private NodeElementChangeListener elementChangeListener;
-	private NodeRefreshListener refreshListener;
-	
-	private boolean bRefreshRequired;
-	
-	private DVNode parent, nextSibling;
-	private DVNode childrenHead, childrenTail;
 	
 	private NodeContext nodeContext;
 	
 	
 	
-	public DVNode(DocView view, DMNode docNode, NodeElementChangeListener elementChangeListener)
+	public DVNode(DocView view, DMNode docNode, NodeResultChangeListener resultChangeListener)
 	{
-		this.view = view;
-		this.docNode = docNode;
-		
-		parent = null;
-		nextSibling = null;
-		childrenHead = childrenTail = null;
-		
-		
-		final DVNode self = this;
-		bRefreshRequired = true;
-		
+		super( view, docNode, resultChangeListener );
 		
 		// Proxy element, with null context, initially; later set in @setContext method
 		proxyElement = new DPProxy( null );
 		element = null;
 
-		elementFactory = null;
-
-		CellEvaluator elementEval = new CellEvaluator()
-		{
-			public Object evaluate()
-			{
-				return self.computeNodeElement();
-			}
-		};
-		elementCell = new Cell();
-		elementCell.setEvaluator( elementEval );
-		elementCell.addListener( this );
-		
-		
-		this.elementChangeListener = elementChangeListener;
-		
 		nodeContext = null;
-	}
-	
-	
-	
-	/*
-	 * Set the node element factory
-	 */
-	protected void setNodeElementFactory(NodeElementFactory factory)
-	{
-		if ( factory != elementFactory )
-		{
-			elementFactory = factory;
-			elementCell.setEvaluator( elementCell.getEvaluator() );
-		}
-	}
-	
-	protected NodeElementFactory getNodeElementFactory()
-	{
-		return elementFactory;
 	}
 	
 	
@@ -159,19 +81,9 @@ public class DVNode implements CellListener
 	
 	public DocView getDocView()
 	{
-		return view;
+		return (DocView)getIncrementalTree();
 	}
 	
-	public DVNode getParent()
-	{
-		return parent;
-	}
-	
-
-	public DMNode getDocNode()
-	{
-		return docNode;
-	}
 	
 	
 	
@@ -201,105 +113,23 @@ public class DVNode implements CellListener
 	//
 	//
 	
-	public void setRefreshListener(NodeRefreshListener listener)
+	protected Object computeNodeResult()
 	{
-		refreshListener = listener;
+		getDocView().profile_startJava();
+		Object result = super.computeNodeResult();
+		getDocView().profile_stopJava();
+		return result;
 	}
-	
-	private void refreshNode()
-	{
-		boolean bEmitChangeEvents = element != null;
-		
-		if ( elementChangeListener != null  &&  bEmitChangeEvents )
-		{
-			view.profile_startContentChange();
-			elementChangeListener.elementChangeFrom( this, element );
-			view.profile_stopContentChange();
-		}
 
-		// Compute the element for this node, and refresh all children
-		DPWidget e = (DPWidget)elementCell.getValue();
-		
-		// Refresh each child
-		DVNode child = childrenHead;
-		while ( child != null )
-		{
-			child.refresh();
-			child = child.nextSibling;
-		}
-		
-		// Set the node element
-		view.profile_startUpdateNodeElement();
-		updateNodeElement( e );
-		view.profile_stopUpdateNodeElement();
-		
-		
-		if ( elementChangeListener != null  &&  bEmitChangeEvents )
-		{
-			view.profile_startContentChange();
-			elementChangeListener.elementChangeTo( this, element );
-			view.profile_stopContentChange();
-		}
-	}
-	
-	
-	public void refresh()
+	protected void updateNodeResult(Object r)
 	{
-		if ( bRefreshRequired )
+		getDocView().profile_startUpdateNodeElement();
+		super.updateNodeResult( r );
+		if ( r != element )
 		{
-			refreshNode();
-			bRefreshRequired = false;
-		}
-	}
-	
-	
-	private DPWidget computeNodeElement()
-	{
-		view.profile_startJava();
-		// Unregister existing child relationships
-		DVNode child = childrenHead;
-		while ( child != null )
-		{
-			DVNode next = child.nextSibling;
-
-			view.nodeTable.unrefViewNode( child );
-			child.parent = null;
-			child.nextSibling = null;
-			
-			child = next;
-		}
-		childrenHead = childrenTail = null;
-		
-		if ( elementFactory != null )
-		{
-			DPWidget e = elementFactory.createNodeElement( this, docNode );
-			
-			// Register new child relationships
-			child = childrenHead;
-			while ( child != null )
+			if ( r != null )
 			{
-				view.nodeTable.refViewNode( child );
-				child = child.nextSibling;
-			}
-			
-			view.profile_stopJava();
-			return e;
-		}
-		else
-		{
-			view.profile_stopJava();
-			return null;
-		}
-	}
-
-	
-	private void updateNodeElement(DPWidget e)
-	{
-		if ( e != element )
-		{
-			if ( e != null )
-			{
-				element = e;
+				element = (DPWidget)r;
 				proxyElement.setChild( element );
 			}
 			else
@@ -308,96 +138,6 @@ public class DVNode implements CellListener
 				proxyElement.setChild( null );
 			}
 		}
-	}
-	
-	
-	
-	
-	//
-	//
-	// Child / parent relationship methods
-	//
-	//
-	
-	public void registerChild(DVNode child)
-	{
-		assert child.parent == null  ||  child.parent == this;
-
-		// Append child to the list of children
-		if ( childrenTail != null )
-		{
-			childrenTail.nextSibling = child;
-		}
-
-		if ( childrenHead == null )
-		{
-			childrenHead = child;
-		}
-		
-		childrenTail = child;
-
-		child.parent = this;
-	}
-	
-
-
-
-
-	//
-	//
-	// Cell notifications
-	//
-	//
-	
-	public void onCellChanged(CellInterface cell)
-	{
-		assert cell == elementCell;
-		requestRefresh();
-	}
-
-	public void onCellEvaluator(CellInterface cell, CellEvaluator oldEval, CellEvaluator newEval)
-	{
-	}
-	
-	public void onCellValidity(CellInterface cell)
-	{
-	}
-	
-	
-	
-	//
-	//
-	// Child notifications
-	//
-	//
-	
-	public void onChildRefreshRequired()
-	{
-		requestRefresh();
-	}
-	
-	
-	
-	//
-	//
-	// Refresh request
-	//
-	//
-	
-	private void requestRefresh()
-	{
-		if ( !bRefreshRequired )
-		{
-			bRefreshRequired = true;
-			if ( parent != null )
-			{
-				parent.onChildRefreshRequired();
-			}
-			
-			if ( refreshListener != null )
-			{
-				refreshListener.onNodeRequestRefresh( this );
-			}
-		}
+		getDocView().profile_stopUpdateNodeElement();
 	}
 }

@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocView;
+package BritefuryJ.IncrementalTree;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ import java.util.List;
 
 import BritefuryJ.DocModel.DMNode;
 
-public class DocViewNodeTable
+public class IncrementalTreeNodeTable
 {
 	private static class Key
 	{
@@ -54,26 +54,26 @@ public class DocViewNodeTable
 	
 	private static class ViewTableForDocNode
 	{
-		private DocViewNodeTable table;
+		private IncrementalTreeNodeTable table;
 		private Key key;
 		
-		private ArrayList<WeakReference<DVNode>> refedNodes;
-		private ArrayList<DVNode> unrefedNodes;
+		private ArrayList<WeakReference<IncrementalTreeNode>> refedNodes;
+		private ArrayList<IncrementalTreeNode> unrefedNodes;
 		
 		
 		
-		public ViewTableForDocNode(DocViewNodeTable table, Key key)
+		public ViewTableForDocNode(IncrementalTreeNodeTable table, Key key)
 		{
 			this.table = table;
 			this.key = key;
 			
-			refedNodes = new ArrayList<WeakReference<DVNode>>();
-			unrefedNodes = new ArrayList<DVNode>();
+			refedNodes = new ArrayList<WeakReference<IncrementalTreeNode>>();
+			unrefedNodes = new ArrayList<IncrementalTreeNode>();
 		}
 		
 		
 		
-		public DVNode takeUnusedNodeFor(DMNode node, DVNode.NodeElementFactory elementFactory)
+		public IncrementalTreeNode takeUnusedNodeFor(DMNode node, IncrementalTreeNode.NodeResultFactory resultFactory)
 		{
 			removeDeadEntriesFromWeakList( refedNodes );
 			
@@ -81,10 +81,10 @@ public class DocViewNodeTable
 			if ( !unrefedNodes.isEmpty() )
 			{
 				// Find a view node; prefer one with the same element factory, otherwise pick one from the end of the list
-				DVNode viewNode = null;
-				for (DVNode vn: unrefedNodes)
+				IncrementalTreeNode viewNode = null;
+				for (IncrementalTreeNode vn: unrefedNodes)
 				{
-					if ( vn.getNodeElementFactory() == elementFactory )
+					if ( vn.getNodeResultFactory() == resultFactory )
 					{
 						viewNode = vn;
 						break;
@@ -101,7 +101,7 @@ public class DocViewNodeTable
 				{
 					// Found an unused view node; move it into the ref'ed table
 					unrefedNodes.remove( viewNode );
-					refedNodes.add( new WeakReference<DVNode>( viewNode ) );
+					refedNodes.add( new WeakReference<IncrementalTreeNode>( viewNode ) );
 				}
 				
 				return viewNode;
@@ -111,15 +111,15 @@ public class DocViewNodeTable
 		}
 		
 		
-		public void addRefedViewNode(DVNode viewNode)
+		public void addRefedViewNode(IncrementalTreeNode viewNode)
 		{
-			refedNodes.add( new WeakReference<DVNode>( viewNode ) );
+			refedNodes.add( new WeakReference<IncrementalTreeNode>( viewNode ) );
 		}
 		
-		public void removeViewNode(DVNode viewNode)
+		public void removeViewNode(IncrementalTreeNode viewNode)
 		{
 			int i = 0;
-			for (WeakReference<DVNode> ref: refedNodes)
+			for (WeakReference<IncrementalTreeNode> ref: refedNodes)
 			{
 				if ( ref.get() == viewNode )
 				{
@@ -136,12 +136,12 @@ public class DocViewNodeTable
 		}
 		
 		
-		public List<DVNode> getRefedNodes()
+		public List<IncrementalTreeNode> getRefedNodes()
 		{
-			ArrayList<DVNode> nodes = new ArrayList<DVNode>();
-			for (WeakReference<DVNode> ref: refedNodes)
+			ArrayList<IncrementalTreeNode> nodes = new ArrayList<IncrementalTreeNode>();
+			for (WeakReference<IncrementalTreeNode> ref: refedNodes)
 			{
-				DVNode node = ref.get();
+				IncrementalTreeNode node = ref.get();
 				if ( node != null )
 				{
 					nodes.add( node );
@@ -163,13 +163,13 @@ public class DocViewNodeTable
 		
 		
 		
-		public void refViewNode(DVNode viewNode)
+		public void refViewNode(IncrementalTreeNode viewNode)
 		{
 			unrefedNodes.remove( viewNode );
-			refedNodes.add( new WeakReference<DVNode>( viewNode ) );
+			refedNodes.add( new WeakReference<IncrementalTreeNode>( viewNode ) );
 		}
 		
-		public void unrefViewNode(DVNode viewNode)
+		public void unrefViewNode(IncrementalTreeNode viewNode)
 		{
 			for (int i = 0; i < refedNodes.size(); i++)
 			{
@@ -184,7 +184,7 @@ public class DocViewNodeTable
 		
 		
 		
-		private static void removeDeadEntriesFromWeakList(ArrayList<WeakReference<DVNode>> weakList)
+		private static void removeDeadEntriesFromWeakList(ArrayList<WeakReference<IncrementalTreeNode>> weakList)
 		{
 			if ( !weakList.isEmpty() )
 			{
@@ -223,7 +223,7 @@ public class DocViewNodeTable
 	
 	
 	
-	public DocViewNodeTable()
+	public IncrementalTreeNodeTable()
 	{
 		table = new HashMap<Key, ViewTableForDocNode>();
 	}
@@ -231,13 +231,13 @@ public class DocViewNodeTable
 	
 	
 
-	public DVNode takeUnusedViewNodeFor(DMNode docNode, DVNode.NodeElementFactory elementFactory)
+	public IncrementalTreeNode takeUnusedViewNodeFor(DMNode docNode, IncrementalTreeNode.NodeResultFactory resultFactory)
 	{
 		Key key = new Key( docNode );
 		ViewTableForDocNode subTable = table.get( key );
 		if ( subTable != null )
 		{
-			return subTable.takeUnusedNodeFor( docNode, elementFactory );
+			return subTable.takeUnusedNodeFor( docNode, resultFactory );
 		}
 		else
 		{
@@ -246,7 +246,7 @@ public class DocViewNodeTable
 	}
 	
 	
-	public List<DVNode> get(DMNode docNode)
+	public List<IncrementalTreeNode> get(DMNode docNode)
 	{
 		Key key = new Key( docNode );
 		ViewTableForDocNode subTable = table.get( key );
@@ -256,11 +256,11 @@ public class DocViewNodeTable
 		}
 		else
 		{
-			return Arrays.asList( new DVNode[] {} );
+			return Arrays.asList( new IncrementalTreeNode[] {} );
 		}
 	}
 	
-	public void put(DMNode docNode, DVNode viewNode)
+	public void put(DMNode docNode, IncrementalTreeNode viewNode)
 	{
 		Key key = new Key( docNode );
 		ViewTableForDocNode subTable = table.get( key );
@@ -272,7 +272,7 @@ public class DocViewNodeTable
 		subTable.addRefedViewNode( viewNode );
 	}
 	
-	public void remove(DVNode viewNode)
+	public void remove(IncrementalTreeNode viewNode)
 	{
 		Key key = new Key( viewNode.getDocNode() );
 		ViewTableForDocNode subTable = table.get( key );
@@ -348,14 +348,14 @@ public class DocViewNodeTable
 	}
 	
 	
-	protected void refViewNode(DVNode node)
+	protected void refViewNode(IncrementalTreeNode node)
 	{
 		Key key = new Key( node.getDocNode() );
 		ViewTableForDocNode subTable = table.get( key );
 		subTable.refViewNode( node );
 	}
 
-	protected void unrefViewNode(DVNode node)
+	protected void unrefViewNode(IncrementalTreeNode node)
 	{
 		Key key = new Key( node.getDocNode() );
 		ViewTableForDocNode subTable = table.get( key );
