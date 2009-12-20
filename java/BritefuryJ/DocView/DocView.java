@@ -53,7 +53,7 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 	
 	public DocView(DMNode root, DVNode.NodeResultFactory rootElementFactory)
 	{
-		super( root, rootElementFactory );
+		super( root, rootElementFactory, DuplicatePolicy.ALLOW_DUPLICATES );
 		elementChangeListener = null;
 		
 		rootBox = null;

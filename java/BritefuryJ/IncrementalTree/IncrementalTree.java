@@ -10,6 +10,14 @@ import BritefuryJ.DocModel.DMNode;
 
 public class IncrementalTree
 {
+	public enum DuplicatePolicy
+	{
+		ALLOW_DUPLICATES,
+		REQUIRE_UNIQUES
+	}
+	
+	
+	
 	public interface RefreshListener
 	{
 		public void onIncrementalTreeRequestRefresh(IncrementalTree view);
@@ -32,12 +40,23 @@ public class IncrementalTree
 	
 	
 	
-	public IncrementalTree(DMNode root, IncrementalTreeNode.NodeResultFactory rootElementFactory)
+	public IncrementalTree(DMNode root, IncrementalTreeNode.NodeResultFactory rootElementFactory, DuplicatePolicy duplicatePolicy)
 	{
 		this.root = root;
 		this.rootElementFactory = rootElementFactory;
 		
-		nodeTable = new IncrementalTreeNodeTable();
+		if ( duplicatePolicy == DuplicatePolicy.ALLOW_DUPLICATES )
+		{
+			nodeTable = new IncrementalTreeNodeTableWithDuplicates();
+		}
+		else if ( duplicatePolicy == DuplicatePolicy.ALLOW_DUPLICATES )
+		{
+			nodeTable = new IncrementalTreeNodeTableWithUniques();
+		}
+		else
+		{
+			throw new RuntimeException( "Invalid duplicate policy" );
+		}
 		
 		resultChangeListener = null;
 		
@@ -74,12 +93,12 @@ public class IncrementalTree
 		}
 		else
 		{
-			// Try asking the table for an unused view node for the document node
-			IncrementalTreeNode viewNode = nodeTable.takeUnusedViewNodeFor( node, elementFactory );
+			// Try asking the table for an unused incremental tree node for the document node
+			IncrementalTreeNode viewNode = nodeTable.takeUnusedIncrementalNodeFor( node, elementFactory );
 			
 			if ( viewNode == null )
 			{
-				// No existing view node could be acquired.
+				// No existing incremental tree node could be acquired.
 				// Create a new one and add it to the table
 				viewNode = createIncrementalTreeNode( node, resultChangeListener );
 				nodeTable.put( node, viewNode );
