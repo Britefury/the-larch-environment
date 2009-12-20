@@ -23,10 +23,12 @@ import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocView.DVNode;
 import BritefuryJ.DocView.DocView;
+import BritefuryJ.IncrementalTree.IncrementalTree;
+import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 
 public class GSymViewContext implements DocView.RefreshListener, ElementContext
 {
-	protected static class NodeContentsFactory implements DVNode.NodeElementFactory
+	protected static class NodeContentsFactory implements DVNode.NodeResultFactory
 	{
 		private GSymViewContext viewInstance;
 		private GSymNodeViewFunction nodeViewFunction;
@@ -43,16 +45,16 @@ public class GSymViewContext implements DocView.RefreshListener, ElementContext
 		}
 
 
-		public DPWidget createNodeElement(DVNode viewNode, DMNode treeNode)
+		public Object createNodeResult(IncrementalTreeNode viewNode, DMNode docNode)
 		{
 			// Create the node view instance
-			GSymNodeViewContext nodeViewInstance = new GSymNodeViewContext( viewInstance, viewNode );
+			GSymNodeViewContext nodeViewInstance = new GSymNodeViewContext( viewInstance, (DVNode)viewNode );
 			
 			// Build the contents
 			//return nodeViewFunction.createElement( treeNode, nodeViewInstance, state );
 			
 			viewInstance.getView().profile_startPython();
-			DPWidget e = nodeViewFunction.createElement( treeNode, nodeViewInstance, state );
+			DPWidget e = nodeViewFunction.createElement( docNode, nodeViewInstance, state );
 			viewInstance.getView().profile_stopPython();
 			return e;
 		}
@@ -177,7 +179,7 @@ public class GSymViewContext implements DocView.RefreshListener, ElementContext
 	}
 	
 	
-	protected DVNode.NodeElementFactory makeNodeElementFactory(GSymNodeViewFunction nodeViewFunction, Object state)
+	protected DVNode.NodeResultFactory makeNodeElementFactory(GSymNodeViewFunction nodeViewFunction, Object state)
 	{
 		// Memoise the contents factory, keyed by  @nodeViewFunction and @state
 		if ( nodeViewFunction == null )
@@ -252,7 +254,7 @@ public class GSymViewContext implements DocView.RefreshListener, ElementContext
 
 
 
-	public void onViewRequestRefresh(DocView view)
+	public void onIncrementalTreeRequestRefresh(IncrementalTree tree)
 	{
 		Runnable r = new Runnable()
 		{

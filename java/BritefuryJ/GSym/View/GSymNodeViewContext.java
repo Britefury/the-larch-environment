@@ -558,7 +558,7 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 		}
 		
 		// A call to DocNode.buildNodeView builds the view, and puts it in the DocView's table
-		DVNode viewNode = viewInstance.getView().buildNodeView( x, viewInstance.makeNodeElementFactory( nodeViewFunction, state ) );
+		DVNode viewNode = (DVNode)viewInstance.getView().buildIncrementalTreeNodeResult( x, viewInstance.makeNodeElementFactory( nodeViewFunction, state ) );
 		
 		
 		// Block access tracking to prevent the contents of this node being dependent upon the child node being refreshed,
@@ -750,7 +750,7 @@ public class GSymNodeViewContext implements ElementContext, DVNode.NodeContext
 	
 	public GSymNodeViewContext getParent()
 	{
-		DVNode parentViewNode = viewNode.getParent();
+		DVNode parentViewNode = (DVNode)viewNode.getParent();
 		return parentViewNode != null  ?  (GSymNodeViewContext)parentViewNode.getContext()  :  null;
 	}
 	
