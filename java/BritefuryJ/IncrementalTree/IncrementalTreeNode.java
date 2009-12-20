@@ -88,9 +88,9 @@ public class IncrementalTreeNode implements CellListener
 	
 	
 	
-	/*
-	 * Set the node element factory
-	 */
+	//
+	// Set the node element factory
+	//
 	protected void setNodeResultFactory(NodeResultFactory factory)
 	{
 		if ( factory != resultFactory )
@@ -129,7 +129,7 @@ public class IncrementalTreeNode implements CellListener
 	
 	//
 	//
-	// Document view and node / tree methods
+	// Structure / doc node methods
 	//
 	//
 	
@@ -164,7 +164,7 @@ public class IncrementalTreeNode implements CellListener
 			resultChangeListener.resultChangeFrom( this, result );
 		}
 
-		// Compute the element for this node, and refresh all children
+		// Compute the result for this node, and refresh all children
 		Object r = resultCell.getValue();
 		
 		// Refresh each child
@@ -175,7 +175,7 @@ public class IncrementalTreeNode implements CellListener
 			child = child.nextSibling;
 		}
 		
-		// Set the node element
+		// Set the node result
 		updateNodeResult( r );
 		
 		
@@ -204,7 +204,7 @@ public class IncrementalTreeNode implements CellListener
 		{
 			IncrementalTreeNode next = child.nextSibling;
 
-			incrementalTree.nodeTable.unrefViewNode( child );
+			incrementalTree.nodeTable.unrefIncrementalNode( child );
 			child.parent = null;
 			child.nextSibling = null;
 			
@@ -220,7 +220,7 @@ public class IncrementalTreeNode implements CellListener
 			child = childrenHead;
 			while ( child != null )
 			{
-				incrementalTree.nodeTable.refViewNode( child );
+				incrementalTree.nodeTable.refIncrementalNode( child );
 				child = child.nextSibling;
 			}
 			return r;
