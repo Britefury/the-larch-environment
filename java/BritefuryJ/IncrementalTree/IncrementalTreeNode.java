@@ -53,12 +53,16 @@ public class IncrementalTreeNode implements CellListener
 	private IncrementalTreeNode parent, nextSibling;
 	private IncrementalTreeNode childrenHead, childrenTail;
 	
+	private NodeContext nodeContext;
+	
+	
 	
 	
 	public IncrementalTreeNode(IncrementalTree incrementalTree, DMNode docNode, NodeResultChangeListener elementChangeListener)
 	{
 		this.incrementalTree = incrementalTree;
 		this.docNode = docNode;
+		nodeContext = null;
 		
 		parent = null;
 		nextSibling = null;
@@ -109,7 +113,7 @@ public class IncrementalTreeNode implements CellListener
 	
 	//
 	//
-	// Content acquisition methods
+	// Result acquisition methods
 	//
 	//
 	
@@ -148,6 +152,25 @@ public class IncrementalTreeNode implements CellListener
 	{
 		return docNode;
 	}
+	
+	
+	
+	//
+	//
+	// Context methods
+	//
+	//
+	
+	public NodeContext getContext()
+	{
+		return nodeContext;
+	}
+	
+	public void setContext(NodeContext context)
+	{
+		nodeContext = context;
+	}
+	
 	
 	
 	
@@ -298,7 +321,7 @@ public class IncrementalTreeNode implements CellListener
 	//
 	//
 	
-	public void onChildRefreshRequired()
+	protected void onChildRefreshRequired()
 	{
 		requestRefresh();
 	}

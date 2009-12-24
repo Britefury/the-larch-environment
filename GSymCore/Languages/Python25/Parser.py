@@ -663,7 +663,7 @@ class Python25Grammar (Grammar):
 	
 	@Rule
 	def unparsed(self):
-		return ObjectNode( Nodes.UNPARSED )  |  ( ( RegEx( '[^\n]*' ) | ObjectNode( Nodes.Expr ) ).oneOrMore()  +  Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Nodes.UNPARSED( value=xs[0] ) )
+		return ObjectNode( Nodes.UNPARSED )  |  ( ( ( RegEx( '[^\n]*' ) | ObjectNode( Nodes.Expr ) ).oneOrMore()  +  Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Nodes.UNPARSED( value=xs[0] ) ) )
 	
 	
 	

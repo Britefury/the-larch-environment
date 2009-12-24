@@ -19,18 +19,12 @@ public class DVNode extends IncrementalTreeNode
 		private static final long serialVersionUID = 1L;
 	}
 
-	public static interface NodeContext
-	{
-	};
-	
 	
 
 	
 	
 	private DPProxy proxyElement;
 	private DPWidget element;
-	
-	private NodeContext nodeContext;
 	
 	
 	
@@ -41,15 +35,13 @@ public class DVNode extends IncrementalTreeNode
 		// Proxy element, with null context, initially; later set in @setContext method
 		proxyElement = new DPProxy( null );
 		element = null;
-
-		nodeContext = null;
 	}
 	
 	
 	
 	//
 	//
-	// Content acquisition methods
+	// Result acquisition methods
 	//
 	//
 	
@@ -71,6 +63,18 @@ public class DVNode extends IncrementalTreeNode
 	}
 	
 	
+	public Object getResultNoRefresh()
+	{
+		return proxyElement;
+	}
+	
+	public Object getResult()
+	{
+		refresh();
+		return proxyElement;
+	}
+	
+
 	
 	
 	//
@@ -93,14 +97,8 @@ public class DVNode extends IncrementalTreeNode
 	//
 	//
 	
-	public NodeContext getContext()
+	public void setElementContext(ElementContext elementContext)
 	{
-		return nodeContext;
-	}
-	
-	public void setContext(NodeContext context, ElementContext elementContext)
-	{
-		nodeContext = context;
 		proxyElement.setContext( elementContext );
 	}
 	

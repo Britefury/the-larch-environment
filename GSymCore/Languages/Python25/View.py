@@ -338,6 +338,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod
 	def UNPARSED(self, ctx, state, node, value):
 		def _viewItem(x):
+			if x is node:
+				raise ValueError, 'Python25View.UNPARSED: self-referential unparsed node'
 			if isinstance( x, str )  or  isinstance( x, unicode ):
 				return ctx.text( unparsed_textStyle, x )
 			elif isinstance( x, DMObjectInterface ):
