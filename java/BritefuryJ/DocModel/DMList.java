@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 import org.python.core.Py;
 import org.python.core.PySlice;
@@ -264,6 +265,29 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	public Object clone()
 	{
 		return new DMList( this );
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected Object createDeepCopy(Map<Object, Object> memo)
+	{
+		ArrayList<Object> xs = (ArrayList<Object>)cell.getLiteralValue();
+
+		ArrayList<Object> ys = new ArrayList<Object>();
+		ys.ensureCapacity( xs.size() );
+		
+		for (Object x: xs)
+		{
+			if ( x instanceof DMNode )
+			{
+				ys.add( ((DMNode)x).deepCopy( memo ) );
+			}
+			else
+			{
+				ys.add( x );
+			}
+		}
+		
+		return new DMList( ys );
 	}
 	
 	

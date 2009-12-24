@@ -9,8 +9,10 @@ package BritefuryJ.DocModel;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.python.core.Py;
 import org.python.core.PyJavaType;
@@ -225,6 +227,26 @@ public abstract class DMNode
 		parents = new ArrayList<WeakReference<DMNode>>();
 	}
 	
+	
+	
+	public Object deepCopy()
+	{
+		return deepCopy( new HashMap<Object,Object>() );
+	}
+
+	public Object deepCopy(Map<Object, Object> memo)
+	{
+		if ( memo.containsKey( this ) )
+		{
+			return memo.get( this );
+		}
+		else
+		{
+			return createDeepCopy( memo );
+		}
+	}
+
+	protected abstract Object createDeepCopy(Map<Object, Object> memo);
 	
 	
 	protected void addParent(DMNode p)

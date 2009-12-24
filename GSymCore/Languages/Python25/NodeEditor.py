@@ -90,7 +90,8 @@ class ParsedExpressionLinearRepresentationListener (ElementLinearRepresentationL
 				if len( items ) == 1  and  ( isinstance( items[0], str )  or  isinstance( items[0], unicode ) ):
 					if items[0].strip() == '':
 						return False
-				pyReplaceExpression( ctx, node, Nodes.UNPARSED( value=items ) )
+				unparsed = Nodes.UNPARSED( value=items )
+				pyReplaceExpression( ctx, node, unparsed )
 			return True
 		else:
 			return False
@@ -176,7 +177,8 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 						pyReplaceStmt( ctx, node, parsed )
 						return True
 					
-				pyReplaceNode( sourceCtx, sourceNode, Nodes.UNPARSED( value=items ) )
+				unparsed = Nodes.UNPARSED( value=items )
+				pyReplaceNode( sourceCtx, sourceNode, unparsed )
 				return True
 			else:
 				pyReplaceStmt( ctx, node, parsed )

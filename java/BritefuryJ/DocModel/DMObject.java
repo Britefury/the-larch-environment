@@ -300,6 +300,29 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	
 	
 	
+	protected Object createDeepCopy(Map<Object, Object> memo)
+	{
+		Object[] xs = (Object[])cell.getValue();
+		Object[] ys = new Object[xs.length];
+		
+		int i = 0;
+		for (Object x: xs)
+		{
+			if ( x instanceof DMNode )
+			{
+				ys[i++] = ((DMNode)x).deepCopy( memo );
+			}
+			else
+			{
+				ys[i++] = x;
+			}
+		}
+		
+		return new DMObject( objClass, ys );
+	}
+	
+
+	
 	public DMObjectClass getDMClass()
 	{
 		// Get the cell value, so that the access is tracked
