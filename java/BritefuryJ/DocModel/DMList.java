@@ -21,10 +21,10 @@ import java.util.Map;
 import org.python.core.Py;
 import org.python.core.PySlice;
 
-import BritefuryJ.Cell.LiteralCell;
 import BritefuryJ.CommandHistory.CommandTracker;
 import BritefuryJ.CommandHistory.CommandTrackerFactory;
 import BritefuryJ.CommandHistory.Trackable;
+import BritefuryJ.Incremental.IncrementalValue;
 import BritefuryJ.JythonInterface.JythonIndex;
 import BritefuryJ.JythonInterface.JythonSlice;
 
@@ -229,7 +229,8 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	
 	
 	
-	private LiteralCell cell;
+	ArrayList<Object> value;
+	private IncrementalValue incr;
 	private DMListCommandTracker commandTracker;
 	
 	
@@ -240,8 +241,8 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	
 	public DMList(List<Object> xs)
 	{
-		cell = new LiteralCell();
-		ArrayList<Object> value = new ArrayList<Object>();
+		incr = new IncrementalValue();
+		value = new ArrayList<Object>();
 
 		if ( xs != null )
 		{
@@ -256,7 +257,6 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 				value.add( x );
 			}
 		}
-		cell.setLiteralValue( value );
 		
 		commandTracker = null;
 	}
@@ -267,15 +267,14 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		return new DMList( this );
 	}
 	
-	@SuppressWarnings("unchecked")
 	protected Object createDeepCopy(Map<Object, Object> memo)
 	{
-		ArrayList<Object> xs = (ArrayList<Object>)cell.getLiteralValue();
+		onAccess();
 
 		ArrayList<Object> ys = new ArrayList<Object>();
-		ys.ensureCapacity( xs.size() );
+		ys.ensureCapacity( value.size() );
 		
-		for (Object x: xs)
+		for (Object x: value)
 		{
 			if ( x instanceof DMNode )
 			{
@@ -292,17 +291,15 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	
 	
 	
-	@SuppressWarnings("unchecked")
 	public boolean add(Object x)
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
 		x = coerce( x );
 		if ( x instanceof DMNode )
 		{
 			((DMNode)x).addParent( this );
 		}
-		boolean bResult = v.add( x );
-		cell.setLiteralValue( v );
+		boolean bResult = value.add( x );
+		incr.onChanged();
 		if ( commandTracker != null )
 		{
 			commandTracker.onAdd( this, x );
@@ -310,28 +307,23 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		return bResult;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void add(int index, Object x)
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
 		x = coerce( x );
 		if ( x instanceof DMNode )
 		{
 			((DMNode)x).addParent( this );
 		}
-		v.add( index, x );
-		cell.setLiteralValue( v );
+		value.add( index, x );
+		incr.onChanged();
 		if ( commandTracker != null )
 		{
 			commandTracker.onInsert( this, index, x );
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public boolean addAll(Collection<? extends Object> xs)
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
-		
 		ArrayList<Object> cxs = new ArrayList<Object>();
 		cxs.ensureCapacity( xs.size() );
 		for (Object x: xs)
@@ -344,8 +336,8 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 			}
 		}
 		
-		v.addAll( cxs );
-		cell.setLiteralValue( v );
+		value.addAll( cxs );
+		incr.onChanged();
 		if ( commandTracker != null )
 		{
 			commandTracker.onAddAll( this, cxs );
@@ -353,11 +345,8 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		return true;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public boolean addAll(int index, Collection<? extends Object> xs)
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
-		
 		ArrayList<Object> cxs = new ArrayList<Object>();
 		cxs.ensureCapacity( xs.size() );
 		for (Object x: xs)
@@ -370,8 +359,8 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 			}
 		}
 		
-		v.addAll( index, cxs );
-		cell.setLiteralValue( v );
+		value.addAll( index, cxs );
+		incr.onChanged();
 		if ( commandTracker != null )
 		{
 			commandTracker.onInsertAll( this, index, cxs );
@@ -384,10 +373,9 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	@SuppressWarnings("unchecked")
 	public void clear()
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
-		ArrayList<Object> copy = (ArrayList<Object>)v.clone();
-		v.clear();
-		cell.setLiteralValue( v );
+		ArrayList<Object> copy = (ArrayList<Object>)value.clone();
+		value.clear();
+		incr.onChanged();
 		for (Object x: copy)
 		{
 			if ( x instanceof DMNode )
@@ -402,20 +390,19 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	}
 	
 	
-	@SuppressWarnings("unchecked")
 	public boolean contains(Object x)
 	{
-		return ((ArrayList<Object>)cell.getValue()).contains( x );
+		onAccess();
+		return value.contains( x );
 	}
 	
 
-	@SuppressWarnings("unchecked")
 	public boolean containsAll(Collection<?> x)
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
+		onAccess();
 		for (Object a: x)
 		{
-			if ( !v.contains( a ) )
+			if ( !value.contains( a ) )
 			{
 				return false;
 			}
@@ -425,7 +412,6 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	}
 	
 	
-	@SuppressWarnings("unchecked")
 	public boolean equals(Object x)
 	{
 		if ( this == x )
@@ -433,34 +419,31 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 			return true;
 		}
 		
-		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
-		return v.equals( x );
+		onAccess();
+		return value.equals( x );
 	}
 	
 	
-	@SuppressWarnings("unchecked")
 	public Object get(int index)
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
-		return v.get( index );
+		onAccess();
+		return value.get( index );
 	}
 	
 	
-	@SuppressWarnings("unchecked")
 	public int indexOf(Object x)
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
-		return v.indexOf(  x );
+		onAccess();
+		return value.indexOf(  x );
 	}
 
 	
-	@SuppressWarnings("unchecked")
 	public int indexOfById(Object x)
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
-		for (int i = 0; i < v.size(); i++)
+		onAccess();
+		for (int i = 0; i < value.size(); i++)
 		{
-			if ( v.get( i ) == x )
+			if ( value.get( i ) == x )
 			{
 				return i;
 			}
@@ -469,54 +452,47 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	}
 
 	
-	@SuppressWarnings("unchecked")
 	public boolean isEmpty()
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
-		return v.isEmpty();
+		onAccess();
+		return value.isEmpty();
 	}
 	
 	
-	@SuppressWarnings("unchecked")
 	public Iterator<Object> iterator()
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
-		return v.iterator();
+		onAccess();
+		return value.iterator();
 	}
 	
 	
-	@SuppressWarnings("unchecked")
 	public int lastIndexOf(Object x)
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
-		return v.lastIndexOf(  x );
+		onAccess();
+		return value.lastIndexOf(  x );
 	}
 
 	
-	@SuppressWarnings("unchecked")
 	public ListIterator<Object> listIterator()
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
-		return v.listIterator();
+		onAccess();
+		return value.listIterator();
 	}
 	
-	@SuppressWarnings("unchecked")
 	public ListIterator<Object> listIterator(int i)
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
-		return v.listIterator( i );
+		onAccess();
+		return value.listIterator( i );
 	}
 	
-	@SuppressWarnings("unchecked")
 	public Object remove(int i)
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
-		Object x = v.remove( i );
+		Object x = value.remove( i );
 		if ( x instanceof DMNode )
 		{
 			((DMNode)x).removeParent( this );
 		}
-		cell.setLiteralValue( v );
+		incr.onChanged();
 		if ( commandTracker != null )
 		{
 			commandTracker.onRemove( this, i, x );
@@ -524,19 +500,17 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		return x;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public boolean remove(Object x)
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
-		int i = v.indexOf( x );
+		int i = value.indexOf( x );
 		if ( i != -1 )
 		{
-			v.remove( i );
+			value.remove( i );
 			if ( x instanceof DMNode )
 			{
 				((DMNode)x).removeParent( this );
 			}
-			cell.setLiteralValue( v );
+			incr.onChanged();
 			if ( commandTracker != null )
 			{
 				commandTracker.onRemove( this, i, x );
@@ -555,12 +529,10 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		throw new UnsupportedOperationException();
 	}
 	
-	@SuppressWarnings("unchecked")
 	public Object set(int index, Object x)
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
 		x = coerce( x );
-		Object oldX = v.set( index, x );
+		Object oldX = value.set( index, x );
 		if ( oldX != x )
 		{
 			if ( oldX instanceof DMNode )
@@ -572,7 +544,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 				((DMNode)x).addParent( this );
 			}
 		}
-		cell.setLiteralValue( v );
+		incr.onChanged();
 		if ( commandTracker != null )
 		{
 			commandTracker.onSet( this, index, oldX, x );
@@ -580,11 +552,10 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		return oldX;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public int size()
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
-		return v.size();
+		onAccess();
+		return value.size();
 	}
 	
 	
@@ -598,18 +569,16 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		return new ListView( this, fromIndex, toIndex );
 	}
 
-	@SuppressWarnings("unchecked")
 	public Object[] toArray()
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
-		return v.toArray();
+		onAccess();
+		return value.toArray();
 	}
 
-	@SuppressWarnings("unchecked")
 	public <T> T[] toArray(T[] a)
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
-		return v.toArray( a );
+		onAccess();
+		return value.toArray( a );
 	}
 
 	
@@ -649,11 +618,10 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		return get( i );
 	}
 	
-	@SuppressWarnings("unchecked")
 	public List<Object> __getitem__(PySlice i)
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
-		return Arrays.asList( JythonSlice.arrayGetSlice( v.toArray(), i ) );
+		onAccess();
+		return Arrays.asList( JythonSlice.arrayGetSlice( value.toArray(), i ) );
 	}
 	
 	public void __setitem__(int i, Object x)
@@ -665,9 +633,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	@SuppressWarnings("unchecked")
 	public void __setitem__(PySlice i, List<Object> xs)
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
-		
-		ArrayList<Object> oldContents = (ArrayList<Object>)v.clone();
+		ArrayList<Object> oldContents = (ArrayList<Object>)value.clone();
 		
 		ArrayList<Object> cxs = new ArrayList<Object>();
 		cxs.ensureCapacity( xs.size() );
@@ -677,27 +643,27 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		}
 		
 		Object[] src = cxs.toArray();
-		Object[] dest = v.toArray();
+		Object[] dest = value.toArray();
 		
 		Object[] result = JythonSlice.arraySetSlice( dest, i, src );
 
-		for (Object x: v)
+		for (Object x: value)
 		{
 			if ( x instanceof DMNode )
 			{
 				((DMNode)x).removeParent( this );
 			}
 		}
-		v.clear();
-		v.addAll( Arrays.asList( result ) );
-		for (Object x: v)
+		value.clear();
+		value.addAll( Arrays.asList( result ) );
+		for (Object x: value)
 		{
 			if ( x instanceof DMNode )
 			{
 				((DMNode)x).addParent( this );
 			}
 		}
-		cell.setLiteralValue( v );
+		incr.onChanged();
 		if ( commandTracker != null )
 		{
 			commandTracker.onSetContents( this, oldContents, result );
@@ -713,30 +679,29 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	@SuppressWarnings("unchecked")
 	public void __delitem__(PySlice i)
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
-		ArrayList<Object> oldContents = (ArrayList<Object>)v.clone();
+		ArrayList<Object> oldContents = (ArrayList<Object>)value.clone();
 		
-		Object[] dest = v.toArray();
+		Object[] dest = value.toArray();
 		
 		Object[] result = JythonSlice.arrayDelSlice( dest, i );
 
-		for (Object x: v)
+		for (Object x: value)
 		{
 			if ( x instanceof DMNode )
 			{
 				((DMNode)x).removeParent( this );
 			}
 		}
-		v.clear();
-		v.addAll( Arrays.asList( result ) );
-		for (Object x: v)
+		value.clear();
+		value.addAll( Arrays.asList( result ) );
+		for (Object x: value)
 		{
 			if ( x instanceof DMNode )
 			{
 				((DMNode)x).addParent( this );
 			}
 		}
-		cell.setLiteralValue( v );
+		incr.onChanged();
 		if ( commandTracker != null )
 		{
 			commandTracker.onSetContents( this, oldContents, result );
@@ -769,18 +734,17 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		return i;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public int index(Object x, int j)
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
+		onAccess();
 	
-		int s = v.size();
+		int s = value.size();
 		// Clamp to -s:s
 		j = Math.min( Math.max( j, -s ), s );
 		// Handle negative indexing
 		j = j < 0  ?  s + j  :  j;
 
-		int i = v.subList( j, v.size() ).indexOf( x );
+		int i = value.subList( j, value.size() ).indexOf( x );
 		if ( i == -1 )
 		{
 			throw Py.ValueError( "DMList.index(x,j): x not in list[j:]" );
@@ -788,12 +752,11 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		return i + j;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public int index(Object x, int j, int k)
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
+		onAccess();
 		
-		int s = v.size();
+		int s = value.size();
 		// Clamp to -s:s
 		j = Math.min( Math.max( j, -s ), s );
 		k = Math.min( Math.max( k, -s ), s );
@@ -801,7 +764,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		j = j < 0  ?  s + j  :  j;
 		k = k < 0  ?  s + k  :  k;
 
-		int i = v.subList( j, k ).indexOf( x );
+		int i = value.subList( j, k ).indexOf( x );
 		if ( i == -1 )
 		{
 			throw Py.ValueError( "DMList.index(x,j,k): x not in list[j:k]" );
@@ -809,13 +772,12 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		return i + j;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public int count(Object x)
 	{
 		int n = 0;
 		
-		ArrayList<Object> v = (ArrayList<Object>)cell.getValue();
-		for (Object a: v)
+		onAccess();
+		for (Object a: value)
 		{
 			if ( a.equals( x ) )
 			{
@@ -899,74 +861,81 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	/*
 	 * Only call from DMListCommandTracker
 	 */
-	@SuppressWarnings("unchecked")
 	protected void removeLast(int numElements)
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
-		for (int i = 0, j = v.size() - 1; i < numElements; i++, j--)
+		for (int i = 0, j = value.size() - 1; i < numElements; i++, j--)
 		{
-			Object x = v.get( j );
+			Object x = value.get( j );
 			if ( x instanceof DMNode )
 			{
 				((DMNode)x).removeParent( this );
 			}
-			v.remove( j );
+			value.remove( j );
 		}
-		cell.setLiteralValue( v );
+		incr.onChanged();
 	}
 
 
 	/*
 	 * Only call from DMListCommandTracker
 	 */
-	@SuppressWarnings("unchecked")
 	protected void removeRange(int start, int num)
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
 		for (int i = 0; i < num; i++)
 		{
-			Object x = v.get( start );
+			Object x = value.get( start );
 			if ( x instanceof DMNode )
 			{
 				((DMNode)x).removeParent( this );
 			}
-			v.remove( start );
+			value.remove( start );
 		}
-		cell.setLiteralValue( v );
+		incr.onChanged();
 	}
 
 
 	/*
 	 * Only call from DMListCommandTracker
 	 */
-	@SuppressWarnings("unchecked")
 	protected void setContents(List<Object> xs)
 	{
-		ArrayList<Object> v = (ArrayList<Object>)cell.getLiteralValue();
-		for (Object x: v)
+		for (Object x: value)
 		{
 			if ( x instanceof DMNode )
 			{
 				((DMNode)x).removeParent( this );
 			}
 		}
-		v.clear();
-		v.addAll( xs );
-		for (Object x: v)
+		value.clear();
+		value.addAll( xs );
+		for (Object x: value)
 		{
 			if ( x instanceof DMNode )
 			{
 				((DMNode)x).addParent( this );
 			}
 		}
-		cell.setLiteralValue( v );
+		incr.onChanged();
 	}
 
 
-	@SuppressWarnings("unchecked")
 	protected ArrayList<Object> getInternalContainer()
 	{
-		return (ArrayList<Object>)cell.getLiteralValue();
+		return value;
+	}
+	
+	
+	
+	
+	//
+	// Incremental computation
+	//
+	
+	private void onAccess()
+	{
+		Object refreshState = incr.onRefreshBegin();
+		incr.onRefreshEnd( refreshState );
+		incr.onAccess();
 	}
 
 
@@ -997,8 +966,8 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	@SuppressWarnings("unchecked")
 	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException
 	{
-		cell = new LiteralCell();
-		ArrayList<Object> value = (ArrayList<Object>)stream.readObject();
+		incr = new IncrementalValue();
+		value = (ArrayList<Object>)stream.readObject();
 		for (Object x: value)
 		{
 			if ( x instanceof DMNode )
@@ -1006,13 +975,13 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 				((DMNode)x).addParent( this );
 			}
 		}
-		cell.setLiteralValue( value );
+		incr.onChanged();
 		
 		commandTracker = null;
 	}
 	
 	private void writeObject(ObjectOutputStream stream) throws IOException
 	{
-		stream.writeObject( cell.getLiteralValue() );
+		stream.writeObject( value );
 	}
 }

@@ -20,9 +20,6 @@ public abstract class CellInterface implements IncrementalOwner
 	
 	
 	
-	public abstract CellEvaluator getEvaluator();
-	public abstract void setEvaluator(CellEvaluator eval);
-	
 	public abstract Object getLiteralValue();
 	public abstract void setLiteralValue(Object value);
 	public abstract boolean isLiteral();
