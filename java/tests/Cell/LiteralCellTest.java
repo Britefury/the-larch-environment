@@ -7,7 +7,6 @@
 //##************************
 package tests.Cell;
 
-import BritefuryJ.Cell.CellListener;
 import BritefuryJ.Cell.LiteralCell;
 
 
@@ -32,9 +31,7 @@ public class LiteralCellTest extends CellTest_base
 		
 		LiteralCell cell = new LiteralCell( new Integer( 1 ) );
 		
-		CellListener listener = makeListener( "" );
-		
-		cell.addListener( listener );
+		cell.addListener( makeListener( "" ) );
 		
 		cell.setLiteralValue( new Integer( 20 ) );
 		

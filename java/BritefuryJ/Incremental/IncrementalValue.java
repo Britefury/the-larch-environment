@@ -128,9 +128,12 @@ public class IncrementalValue
 	
 	protected void emitChanged()
 	{
-		for (IncrementalValueListener l: listeners)
+		if ( listeners != null )
 		{
-			l.onIncrementalValueChanged( this );
+			for (IncrementalValueListener l: listeners)
+			{
+				l.onIncrementalValueChanged( this );
+			}
 		}
 	}
 	
