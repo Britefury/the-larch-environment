@@ -24,11 +24,12 @@ import org.python.core.PySlice;
 import BritefuryJ.CommandHistory.CommandTracker;
 import BritefuryJ.CommandHistory.CommandTrackerFactory;
 import BritefuryJ.CommandHistory.Trackable;
+import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.Incremental.IncrementalValue;
 import BritefuryJ.JythonInterface.JythonIndex;
 import BritefuryJ.JythonInterface.JythonSlice;
 
-public class DMList extends DMNode implements DMListInterface, Trackable, Serializable
+public class DMList extends DMNode implements DMListInterface, Trackable, Serializable, IncrementalOwner
 {
 	private static final long serialVersionUID = 1L;
 
@@ -229,8 +230,8 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	
 	
 	
-	ArrayList<Object> value;
 	private IncrementalValue incr;
+	ArrayList<Object> value;
 	private DMListCommandTracker commandTracker;
 	
 	
@@ -241,7 +242,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	
 	public DMList(List<Object> xs)
 	{
-		incr = new IncrementalValue();
+		incr = new IncrementalValue( this );
 		value = new ArrayList<Object>();
 
 		if ( xs != null )
@@ -966,7 +967,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	@SuppressWarnings("unchecked")
 	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException
 	{
-		incr = new IncrementalValue();
+		incr = new IncrementalValue( this );
 		value = (ArrayList<Object>)stream.readObject();
 		for (Object x: value)
 		{
