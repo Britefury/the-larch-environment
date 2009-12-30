@@ -6,13 +6,13 @@
 //##************************
 package BritefuryJ.IncrementalTree;
 
-import BritefuryJ.Cell.Cell;
-import BritefuryJ.Cell.CellEvaluator;
 import BritefuryJ.DocModel.DMNode;
+import BritefuryJ.Incremental.IncrementalFunction;
+import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.Incremental.IncrementalValue;
 import BritefuryJ.Incremental.IncrementalValueListener;
 
-public class IncrementalTreeNode implements IncrementalValueListener
+public class IncrementalTreeNode implements IncrementalValueListener, IncrementalOwner
 {
 	public static class CannotChangeDocNodeException extends Exception
 	{
@@ -42,7 +42,7 @@ public class IncrementalTreeNode implements IncrementalValueListener
 	private IncrementalTree incrementalTree;
 	private DMNode docNode;
 	
-	private Cell resultCell;
+	private IncrementalFunction incr;
 	private NodeResultFactory resultFactory;
 	private Object result;
 	
@@ -69,22 +69,13 @@ public class IncrementalTreeNode implements IncrementalValueListener
 		childrenHead = childrenTail = null;
 		
 		
-		final IncrementalTreeNode self = this;
 		bRefreshRequired = true;
 		
 		
 		resultFactory = null;
 
-		CellEvaluator elementEval = new CellEvaluator()
-		{
-			public Object evaluate()
-			{
-				return self.computeNodeResult();
-			}
-		};
-		resultCell = new Cell();
-		resultCell.setEvaluator( elementEval );
-		resultCell.addListener( this );
+		incr = new IncrementalFunction( this );
+		incr.addListener( this );
 		
 		
 		this.resultChangeListener = elementChangeListener;
@@ -100,7 +91,7 @@ public class IncrementalTreeNode implements IncrementalValueListener
 		if ( factory != resultFactory )
 		{
 			resultFactory = factory;
-			resultCell.setEvaluator( resultCell.getEvaluator() );
+			incr.onChanged();
 		}
 	}
 	
@@ -188,7 +179,14 @@ public class IncrementalTreeNode implements IncrementalValueListener
 		}
 
 		// Compute the result for this node, and refresh all children
-		Object r = resultCell.getValue();
+		Object refreshState = incr.onRefreshBegin();
+		Object r = result;
+		if ( refreshState != null )
+		{
+			r = computeNodeResult();
+		}
+		incr.onRefreshEnd( refreshState );
+		incr.onAccess();
 		
 		// Refresh each child
 		IncrementalTreeNode child = childrenHead;
