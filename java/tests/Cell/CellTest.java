@@ -9,7 +9,6 @@ package tests.Cell;
 
 import BritefuryJ.Cell.Cell;
 import BritefuryJ.Cell.CellEvaluator;
-import BritefuryJ.Cell.CellListener;
 
 public class CellTest extends CellTest_base
 {
@@ -34,11 +33,10 @@ public class CellTest extends CellTest_base
 		
 		Cell cell = new Cell();
 		
-		CellListener listener = makeListener( "" );
 		cell.setLiteralValue( new Integer( 1 ) );
 		assertEquals( cell.getValue(), new Integer( 1 ) );
 		
-		cell.addListener( listener );
+		cell.addListener( makeListener( "" ) );
 		
 		cell.setLiteralValue( new Integer( 20 ) );
 		assertEquals( cell.getValue(), new Integer( 20 ) );
@@ -63,11 +61,10 @@ public class CellTest extends CellTest_base
 
 		Cell cell = new Cell();
 
-		CellListener listener = makeListener( "" );
 		cell.setLiteralValue( new Integer( 1 ) );
 		assertEquals( cell.getValue(), new Integer( 1 ) );
 		
-		cell.addListener( listener );
+		cell.addListener( makeListener( "" ) );
 		
 		cell.setEvaluator( evaluator );
 		assertEquals( cell.getValue(), new Integer( 20 ) );
@@ -166,16 +163,12 @@ public class CellTest extends CellTest_base
 		};
 		
 		
-		CellListener listener1 = makeListener( "1" );
-		CellListener listener3 = makeListener( "3" );
-
-		
 		cell1.setLiteralValue( new Integer( 1 ) );
 		cell2.setEvaluator( evaluator2 );
 		cell3.setEvaluator( evaluator3 );
 
-		cell1.addListener( listener1 );
-		cell3.addListener( listener3 );
+		cell1.addListener( makeListener( "1" ) );
+		cell3.addListener( makeListener( "3" ) );
 		
 		assertEquals( cell1.getValue(), new Integer( 1 ) );
 		assertEquals( cell2.getValue(), new Integer( 3 ) );

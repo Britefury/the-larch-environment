@@ -8,12 +8,12 @@ package BritefuryJ.GSym.IncrementalContext;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.WeakHashMap;
 
 import org.python.core.PyObject;
 
-import BritefuryJ.Cell.CellInterface;
 import BritefuryJ.DocModel.DMNode;
+import BritefuryJ.Incremental.IncrementalFunction;
+import BritefuryJ.Incremental.IncrementalValue;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 
 public class GSymIncrementalNodeContext implements IncrementalTreeNode.NodeContext
@@ -73,9 +73,9 @@ public class GSymIncrementalNodeContext implements IncrementalTreeNode.NodeConte
 		// is up to date and available.
 		// Blocking the access tracking prevents an inner node from causing all parent/grandparent/etc nodes from requiring a
 		// refresh.
-		WeakHashMap<CellInterface, Object> accessList = CellInterface.blockAccessTracking();
+		IncrementalFunction currentComputation = IncrementalValue.blockAccessTracking();
 		incrementalNode.refresh();
-		CellInterface.unblockAccessTracking( accessList );
+		IncrementalValue.unblockAccessTracking( currentComputation );
 		
 		registerIncrementalNodeRelationship( incrementalNode );
 		

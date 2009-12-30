@@ -8,11 +8,11 @@ package BritefuryJ.IncrementalTree;
 
 import BritefuryJ.Cell.Cell;
 import BritefuryJ.Cell.CellEvaluator;
-import BritefuryJ.Cell.CellInterface;
-import BritefuryJ.Cell.CellListener;
 import BritefuryJ.DocModel.DMNode;
+import BritefuryJ.Incremental.IncrementalValue;
+import BritefuryJ.Incremental.IncrementalValueListener;
 
-public class IncrementalTreeNode implements CellListener
+public class IncrementalTreeNode implements IncrementalValueListener
 {
 	public static class CannotChangeDocNodeException extends Exception
 	{
@@ -299,20 +299,12 @@ public class IncrementalTreeNode implements CellListener
 	//
 	//
 	
-	public void onCellChanged(CellInterface cell)
+	public void onIncrementalValueChanged(IncrementalValue inc)
 	{
-		assert cell == resultCell;
+		//assert cell == resultCell;
 		requestRefresh();
 	}
 
-	public void onCellEvaluator(CellInterface cell, CellEvaluator oldEval, CellEvaluator newEval)
-	{
-	}
-	
-	public void onCellValidity(CellInterface cell)
-	{
-	}
-	
 	
 	
 	//
