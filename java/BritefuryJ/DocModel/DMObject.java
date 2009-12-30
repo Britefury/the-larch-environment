@@ -18,15 +18,16 @@ import org.python.core.PyObject;
 import org.python.core.PyString;
 import org.python.core.PyUnicode;
 
-import BritefuryJ.Cell.LiteralCell;
 import BritefuryJ.CommandHistory.CommandTracker;
 import BritefuryJ.CommandHistory.CommandTrackerFactory;
 import BritefuryJ.CommandHistory.Trackable;
 import BritefuryJ.DocModel.DMModule.UnknownClassException;
 import BritefuryJ.DocModel.DMModuleResolver.CouldNotResolveModuleException;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
+import BritefuryJ.Incremental.IncrementalOwner;
+import BritefuryJ.Incremental.IncrementalValue;
 
-public class DMObject extends DMNode implements DMObjectInterface, Trackable, Serializable
+public class DMObject extends DMNode implements DMObjectInterface, Trackable, Serializable, IncrementalOwner
 {
 	public static class NotADMObjectStreamClassException extends RuntimeException
 	{
@@ -37,8 +38,9 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	private static final long serialVersionUID = 1L;
 
 	
+	private IncrementalValue incr;
 	private DMObjectClass objClass;
-	private LiteralCell cell;
+	private Object fieldData[];
 	private DMObjectCommandTracker commandTracker;
 	
 	
@@ -46,19 +48,17 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	
 	public DMObject(DMObjectClass objClass)
 	{
+		incr = new IncrementalValue( this );
 		this.objClass = objClass;
-
-		Object fieldData[] = new Object[objClass.getNumFields()];
-		
-		cell = new LiteralCell();
-		cell.setLiteralValue( fieldData );
+		fieldData = new Object[objClass.getNumFields()];
 		commandTracker = null;
 	}
 	
 	public DMObject(DMObjectClass objClass, Object values[])
 	{
+		incr = new IncrementalValue( this );
 		this.objClass = objClass;
-		Object fieldData[] = new Object[objClass.getNumFields()];
+		fieldData = new Object[objClass.getNumFields()];
 		
 		int numToCopy = Math.min( values.length, fieldData.length );
 		for (int i = 0; i < numToCopy; i++)
@@ -71,15 +71,14 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			fieldData[i] = coerce( x );
 		}
 
-		cell = new LiteralCell();
-		cell.setLiteralValue( fieldData );
 		commandTracker = null;
 	}
 	
 	public DMObject(DMObjectClass objClass, PyObject values[])
 	{
+		incr = new IncrementalValue( this );
 		this.objClass = objClass;
-		Object fieldData[] = new Object[objClass.getNumFields()];
+		fieldData = new Object[objClass.getNumFields()];
 		
 		int numToCopy = Math.min( values.length, fieldData.length );
 		for (int i = 0; i < numToCopy; i++)
@@ -92,8 +91,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			fieldData[i] = x;
 		}
 
-		cell = new LiteralCell();
-		cell.setLiteralValue( fieldData );
 		commandTracker = null;
 	}
 	
@@ -101,8 +98,9 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	{
 		assert keys.length == values.length;
 		
+		incr = new IncrementalValue( this );
 		this.objClass = objClass;
-		Object fieldData[] = new Object[objClass.getNumFields()];
+		fieldData = new Object[objClass.getNumFields()];
 	
 		for (int i = 0; i < keys.length; i++)
 		{
@@ -122,8 +120,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			}
 		}
 
-		cell = new LiteralCell();
-		cell.setLiteralValue( fieldData );
 		commandTracker = null;
 	}
 
@@ -131,8 +127,9 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	{
 		assert names.length == values.length;
 		
+		incr = new IncrementalValue( this );
 		this.objClass = objClass;
-		Object fieldData[] = new Object[objClass.getNumFields()];
+		fieldData = new Object[objClass.getNumFields()];
 	
 		for (int i = 0; i < names.length; i++)
 		{
@@ -152,15 +149,14 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			}
 		}
 
-		cell = new LiteralCell();
-		cell.setLiteralValue( fieldData );
 		commandTracker = null;
 	}
 	
 	public DMObject(DMObjectInterface obj)
 	{
+		incr = new IncrementalValue( this );
 		this.objClass = obj.getDMClass();
-		Object fieldData[] = new Object[objClass.getNumFields()];
+		fieldData = new Object[objClass.getNumFields()];
 		
 		for (int i = 0; i < fieldData.length; i++)
 		{
@@ -172,15 +168,14 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			fieldData[i] = x;
 		}
 
-		cell = new LiteralCell();
-		cell.setLiteralValue( fieldData );
 		commandTracker = null;
 	}
 
 	public DMObject(PyObject values[])
 	{
+		incr = new IncrementalValue( this );
 		objClass = Py.tojava( values[0], DMObjectClass.class );
-		Object fieldData[] = new Object[objClass.getNumFields()];
+		fieldData = new Object[objClass.getNumFields()];
 		
 		int numToCopy = Math.min( values.length - 1, fieldData.length );
 		for (int i = 0; i < numToCopy; i++)
@@ -193,8 +188,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			fieldData[i] = x;
 		}
 
-		cell = new LiteralCell();
-		cell.setLiteralValue( fieldData );
 		commandTracker = null;
 	}
 
@@ -202,8 +195,9 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	{
 		assert values.length == ( names.length + 1 );
 		
+		incr = new IncrementalValue( this );
 		objClass = Py.tojava( values[0], DMObjectClass.class );
-		Object fieldData[] = new Object[objClass.getNumFields()];
+		fieldData = new Object[objClass.getNumFields()];
 		
 		for (int i = 0; i < names.length; i++)
 		{
@@ -223,15 +217,14 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			}
 		}
 
-		cell = new LiteralCell();
-		cell.setLiteralValue( fieldData );
 		commandTracker = null;
 	}
 
 	public DMObject(DMObjectClass objClass, Map<String, Object> data) throws InvalidFieldNameException
 	{
+		incr = new IncrementalValue( this );
 		this.objClass = objClass;
-		Object fieldData[] = new Object[objClass.getNumFields()];
+		fieldData = new Object[objClass.getNumFields()];
 		
 		for (Map.Entry<String, Object> entry: data.entrySet())
 		{
@@ -251,16 +244,15 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			}
 		}
 
-		cell = new LiteralCell();
-		cell.setLiteralValue( fieldData );
 		commandTracker = null;
 	}
 	
 	@SuppressWarnings("unchecked")
 	public DMObject(DMObjectClass objClass, PyDictionary data) throws InvalidFieldNameException
 	{
+		incr = new IncrementalValue( this );
 		this.objClass = objClass;
-		Object fieldData[] = new Object[objClass.getNumFields()];
+		fieldData = new Object[objClass.getNumFields()];
 		
 		for (Object e: data.entrySet())
 		{
@@ -293,8 +285,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			}
 		}
 
-		cell = new LiteralCell();
-		cell.setLiteralValue( fieldData );
 		commandTracker = null;
 	}
 	
@@ -302,11 +292,11 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	
 	protected Object createDeepCopy(Map<Object, Object> memo)
 	{
-		Object[] xs = (Object[])cell.getValue();
-		Object[] ys = new Object[xs.length];
+		onAccess();
+		Object[] ys = new Object[fieldData.length];
 		
 		int i = 0;
-		for (Object x: xs)
+		for (Object x: fieldData)
 		{
 			if ( x instanceof DMNode )
 			{
@@ -326,21 +316,21 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	public DMObjectClass getDMClass()
 	{
 		// Get the cell value, so that the access is tracked
-		cell.getValue();
+		onAccess();
 		return objClass;
 	}
 	
 	public boolean isInstanceOf(DMObjectClass cls)
 	{
 		// Get the cell value, so that the access is tracked
-		cell.getValue();
+		onAccess();
 		return objClass.isSubclassOf( cls );
 	}
 
 	public int getFieldIndex(String key)
 	{
 		// Get the cell value, so that the access is tracked
-		cell.getValue();
+		onAccess();
 		return objClass.getFieldIndex( key );
 	}
 
@@ -348,7 +338,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	
 	public int indexOfById(Object x)
 	{
-		Object[] fieldData = (Object[])cell.getValue();
+		onAccess();
 		for (int i = 0; i < fieldData.length; i++)
 		{
 			if ( fieldData[i] == x )
@@ -361,13 +351,13 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 
 	public Object get(int value)
 	{
-		Object[] fieldData = (Object[])cell.getValue();
+		onAccess();
 		return fieldData[value];
 	}
 	
 	public Object get(String key) throws InvalidFieldNameException
 	{
-		Object[] fieldData = (Object[])cell.getValue();
+		onAccess();
 		int index = objClass.getFieldIndex( key );
 		if ( index == -1 )
 		{
@@ -382,7 +372,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	
 	public void set(int index, Object x)
 	{
-		Object[] fieldData = (Object[])cell.getLiteralValue();
 		x = coerce( x );
 		Object oldX = fieldData[index];
 		fieldData[index] = x;
@@ -397,7 +386,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 				((DMNode)x).addParent( this );
 			}
 		}
-		cell.setLiteralValue( fieldData );
+		incr.onChanged();
 		if ( commandTracker != null )
 		{
 			commandTracker.onSet( this, index, oldX, x );
@@ -422,13 +411,13 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	public String[] getFieldNames()
 	{
 		// Get the cell value, so that the access is tracked
-		cell.getValue();
+		onAccess();
 		return objClass.getFieldNames();
 	}
 	
 	public Object[] getFieldValuesImmutable()
 	{
-		Object[] fieldData = (Object[])cell.getValue();
+		onAccess();
 		return fieldData;
 	}
 	
@@ -436,7 +425,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	
 	public void update(Map<String, Object> table) throws InvalidFieldNameException
 	{
-		Object[] fieldData = (Object[])cell.getLiteralValue();
 		int indices[] = new int[table.size()];
 		Object oldContents[] = new Object[table.size()];
 		Object newContents[] = new Object[table.size()];
@@ -470,7 +458,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 				i++;
 			}
 		}
-		cell.setLiteralValue( fieldData );
+		incr.onChanged();
 		if ( commandTracker != null )
 		{
 			commandTracker.onUpdate( this, indices, oldContents, newContents );
@@ -481,7 +469,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	{
 		assert indices.length == xs.length;
 		
-		Object[] fieldData = (Object[])cell.getLiteralValue();
 		Object oldContents[] = new Object[indices.length];
 		Object newContents[] = new Object[indices.length];
 		for (int i = 0; i < indices.length; i++)
@@ -504,7 +491,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			newContents[i] = x;
 			fieldData[index] = x;
 		}
-		cell.setLiteralValue( fieldData );
+		incr.onChanged();
 		if ( commandTracker != null )
 		{
 			commandTracker.onUpdate( this, indices, oldContents, newContents );
@@ -515,13 +502,14 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	
 	public void become(DMObject obj)
 	{
-		become( obj.objClass, (Object[])obj.cell.getLiteralValue() );
+		obj.onAccess();
+		become( obj.objClass, obj.fieldData );
 	}
 
 	protected void become(DMObjectClass cls, Object[] data)
 	{
-		Object oldFieldData[] = (Object[])cell.getLiteralValue();
-		Object fieldData[] = new Object[data.length];
+		Object oldFieldData[] = fieldData;
+		fieldData = new Object[data.length];
 		System.arraycopy( data, 0, fieldData, 0, data.length );
 		for (Object x: oldFieldData)
 		{
@@ -539,7 +527,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 		}
 		DMObjectClass oldClass = objClass;
 		objClass = cls;
-		cell.setLiteralValue( fieldData );
+		incr.onChanged();
 		if ( commandTracker != null )
 		{
 			commandTracker.onBecome( this, oldClass, oldFieldData, cls, data );
@@ -600,7 +588,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 		if ( x instanceof DMObjectInterface )
 		{
 			// Get the cell value, so that the access is tracked
-			cell.getValue();
+			onAccess();
 			DMObjectInterface dx = (DMObjectInterface)x;
 			if ( dx.getDMClass() == objClass )
 			{
@@ -630,6 +618,20 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 		
 		return false;
 	}
+	
+	
+	
+	//
+	// Incremental computation
+	//
+	
+	private void onAccess()
+	{
+		Object refreshState = incr.onRefreshBegin();
+		incr.onRefreshEnd( refreshState );
+		incr.onAccess();
+	}
+
 	
 	
 	
@@ -717,9 +719,9 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 					fieldData[index] = coerce( values[i] );
 				}
 			}
-	
-			cell = new LiteralCell();
-			cell.setLiteralValue( fieldData );
+			
+			incr = new IncrementalValue( this );
+			incr.onChanged();
 			commandTracker = null;
 		}
 		else
@@ -735,7 +737,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			((DMObjectOutputStream)stream).writeDMObjectClass( objClass );
 			
 			String fieldNames[] = objClass.getFieldNames();
-			Object fieldData[] = (Object[])cell.getLiteralValue();
 			
 			stream.writeObject( fieldNames );
 			stream.writeObject( fieldData );
