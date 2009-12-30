@@ -14,7 +14,7 @@ import BritefuryJ.Incremental.IncrementalValueListener;
 public class LiteralCell extends CellInterface
 {
 	private IncrementalValue inc;
-	private CellEvaluatorLiteral evaluator;
+	private Object value;
 	
 	
 	
@@ -26,31 +26,20 @@ public class LiteralCell extends CellInterface
 	public LiteralCell(Object value)
 	{
 		super();
-		evaluator = new CellEvaluatorLiteral( value );
 		inc = new IncrementalValue( this );
+		this.value = value;
 	}
 	
 	
-	public CellEvaluator getEvaluator()
-	{
-		return evaluator;
-	}
-
-	public void setEvaluator(CellEvaluator eval)
-	{
-		evaluator = (CellEvaluatorLiteral)eval;
-		inc.onChanged();
-	}
-
-
 	public Object getLiteralValue()
 	{
-		return evaluator.evaluate();
+		return value;
 	}
 
 	public void setLiteralValue(Object value)
 	{
-		setEvaluator( new CellEvaluatorLiteral( value ) );
+		this.value = value;
+		inc.onChanged();
 	}
 
 	public boolean isLiteral()
@@ -66,7 +55,7 @@ public class LiteralCell extends CellInterface
 		
 		inc.onAccess();
 		
-		return evaluator.evaluate();
+		return value;
 	}
 
 
