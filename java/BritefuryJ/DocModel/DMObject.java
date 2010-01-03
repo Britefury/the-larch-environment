@@ -10,7 +10,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.python.core.Py;
 import org.python.core.PyDictionary;
@@ -33,6 +35,8 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	{
 		private static final long serialVersionUID = 1L;
 	};
+	
+
 	
 	
 	private static final long serialVersionUID = 1L;
@@ -617,6 +621,53 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 		}
 		
 		return false;
+	}
+	
+	
+	
+	//
+	// Children
+	//
+	
+	public Iterable<Object> getChildren()
+	{
+		Iterable<Object> iterable = new Iterable<Object>()
+		{
+			public Iterator<Object> iterator()
+			{
+				Iterator<Object> iter = new Iterator<Object>()
+				{
+					int index = 0;
+					
+					public boolean hasNext()
+					{
+						onAccess();
+						return index < fieldData.length;
+					}
+
+					public Object next()
+					{
+						onAccess();
+						if ( index < fieldData.length )
+						{
+							return fieldData[index++];
+						}
+						else
+						{
+							throw new NoSuchElementException();
+						}
+					}
+
+					public void remove()
+					{
+						throw new UnsupportedOperationException();
+					}
+				};
+				
+				return iter;
+			}
+		};
+		return iterable;
 	}
 	
 	

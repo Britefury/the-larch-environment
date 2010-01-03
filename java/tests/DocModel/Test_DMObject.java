@@ -6,8 +6,10 @@
 //##************************
 package tests.DocModel;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.DocModel.DMList;
@@ -259,6 +261,21 @@ public class Test_DMObject extends Test_DMNode_base
 		a.__setitem__( "y", null );
 
 		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "e", null } ) );
+	}
+
+	public void test_getChildren() throws InvalidFieldNameException, ClassAlreadyDefinedException
+	{
+		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
+		DMObject a = A.newInstance( new Object[] { "a", "p" } );
+		history.track( a );
+		
+		List<Object> ys = new ArrayList<Object>();
+		for (Object x: a.getChildren())
+		{
+			ys.add( x );
+		}
+		
+		assertEquals( ys, Arrays.asList( new Object[] { "a", "p" } ) );
 	}
 
 	

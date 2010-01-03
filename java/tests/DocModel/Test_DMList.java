@@ -545,6 +545,18 @@ public class Test_DMList extends Test_DMNode_base
 	}
 	
 	
+	public void testGetChildren()
+	{
+		DMList xs = readDMListSX( "[a b c d e f]" );
+		List<Object> ys = new ArrayList<Object>();
+		for (Object x: xs.getChildren())
+		{
+			ys.add( x );
+		}
+		cmpListSX( ys, "[a b c d e f]" );
+	}
+	
+	
 	public void testToArray()
 	{
 		String[] strs = { "a", "b", "c" };
