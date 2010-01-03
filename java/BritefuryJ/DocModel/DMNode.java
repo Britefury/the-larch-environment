@@ -329,6 +329,9 @@ public abstract class DMNode
 	}
 	
 	
+	public abstract Iterable<Object> getChildren();
+	
+	
 	
 	
 	@SuppressWarnings("unchecked")

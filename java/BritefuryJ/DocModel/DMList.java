@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.python.core.Py;
 import org.python.core.PySlice;
@@ -32,8 +33,130 @@ import BritefuryJ.JythonInterface.JythonSlice;
 public class DMList extends DMNode implements DMListInterface, Trackable, Serializable, IncrementalOwner
 {
 	private static final long serialVersionUID = 1L;
+	
+	
+	private static class DMListIterator implements Iterator<Object>
+	{
+		protected List<Object> src;
+		protected int index;
+		
+		public DMListIterator(List<Object> src)
+		{
+			this.src = src;
+			index = 0;
+		}
+		
+		public boolean hasNext()
+		{
+			return index < src.size();
+		}
 
-	public static class ListView implements List<Object>
+		public Object next()
+		{
+			if ( index < src.size() )
+			{
+				return src.get( index++ );
+			}
+			else
+			{
+				throw new NoSuchElementException();
+			}
+		}
+		
+		public void remove()
+		{
+			src.remove( index - 1 );
+		}
+	}
+	
+
+	private static class DMListListIterator implements ListIterator<Object>
+	{
+		private List<Object> src;
+		private int index, lastIndex;
+		
+		public DMListListIterator(List<Object> src)
+		{
+			this.src = src;
+			lastIndex = index = 0;
+			
+		}
+
+		public DMListListIterator(List<Object> src, int i)
+		{
+			this.src = src;
+			lastIndex = index = i;
+			
+		}
+
+		
+		public boolean hasNext()
+		{
+			return index < src.size();
+		}
+
+		public int nextIndex()
+		{
+			return index;
+		}
+
+		public Object next()
+		{
+			if ( index < src.size() )
+			{
+				lastIndex = index++;
+				return src.get( lastIndex );
+			}
+			else
+			{
+				throw new NoSuchElementException();
+			}
+		}
+		
+
+		public boolean hasPrevious()
+		{
+			return index > 0;
+		}
+
+		public int previousIndex()
+		{
+			return index - 1;
+		}
+
+		public Object previous()
+		{
+			if ( index > 0 )
+			{
+				lastIndex = --index;
+				return src.get( lastIndex );
+			}
+			else
+			{
+				throw new NoSuchElementException();
+			}
+		}
+
+		public void add(Object x)
+		{
+			src.add( lastIndex, x );
+		}
+
+		public void remove()
+		{
+			src.remove( lastIndex );
+		}
+
+		public void set(Object x)
+		{
+			src.set( lastIndex, x );
+		}
+	}
+	
+
+	
+	
+	private static class ListView implements List<Object>
 	{
 		private DMList src;
 		private int start, stop;
@@ -135,7 +258,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		
 		public Iterator<Object> iterator()
 		{
-			return src.getInternalContainer().subList( start, stop ).iterator();
+			return new DMListIterator( this );
 		}
 		
 		
@@ -155,12 +278,12 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		
 		public ListIterator<Object> listIterator()
 		{
-			return src.getInternalContainer().subList( start, stop ).listIterator();
+			return new DMListListIterator( this );
 		}
 		
 		public ListIterator<Object> listIterator(int i)
 		{
-			return src.getInternalContainer().subList( start, stop ).listIterator( i );
+			return new DMListListIterator( this, i );
 		}
 		
 		public Object remove(int i)
@@ -226,7 +349,6 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 			return src.getInternalContainer().subList( start, stop ).toArray( a );
 		}
 	}
-	
 	
 	
 	
@@ -816,6 +938,48 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	}
 	
 	
+	public Iterable<Object> getChildren()
+	{
+		Iterable<Object> iterable = new Iterable<Object>()
+		{
+			public Iterator<Object> iterator()
+			{
+				Iterator<Object> iter = new Iterator<Object>()
+				{
+					int index = 0;
+					
+					public boolean hasNext()
+					{
+						onAccess();
+						return index < value.size();
+					}
+
+					public Object next()
+					{
+						onAccess();
+						if ( index < value.size() )
+						{
+							return value.get( index++ );
+						}
+						else
+						{
+							throw new NoSuchElementException();
+						}
+					}
+
+					public void remove()
+					{
+						throw new UnsupportedOperationException();
+					}
+				};
+				
+				return iter;
+			}
+		};
+		return iterable;
+	}
+	
+	
 	
 	public String toString()
 	{
@@ -922,6 +1086,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 
 	protected ArrayList<Object> getInternalContainer()
 	{
+		onAccess();
 		return value;
 	}
 	
