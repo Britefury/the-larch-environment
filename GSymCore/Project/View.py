@@ -81,9 +81,6 @@ def _joinLocation(*xs):
 
 
 class ProjectView (GSymViewObjectNodeDispatch):
-	__dispatch_module__ = Nodes.module
-	
-	
 	def __init__(self, document, app, resolveContext, location):
 		self._document = document
 		self._app = app
@@ -91,7 +88,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		self._location = location
 		
 		
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.Project )
 	def Project(self, ctx, state, node, rootPackage):
 		def _onSave(link, buttonEvent):
 			if document._filename is None:
@@ -135,7 +132,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 
 
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.Package )
 	def Package(self, ctx, state, node, name, contents):
 		location, = state
 		
@@ -171,7 +168,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 
 
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.Page )
 	def Page(self, ctx, state, node, name, unit):
 		location, = state
 		
@@ -249,5 +246,4 @@ class ProjectResolveContext (GSymResolveContext):
 		
 	def getTitle(self):
 		return self._title
-
 

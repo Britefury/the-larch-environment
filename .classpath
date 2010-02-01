@@ -15,5 +15,6 @@
 	<classpathentry kind="lib" path="C:/code/jython/extlibs/mockrunner-0.4.1/jar/jdom.jar"/>
 	<classpathentry kind="lib" path="C:/code/jython/extlibs/mockrunner-0.4.1/lib/jdk1.5/j2ee1.3/mockrunner-servlet.jar"/>
 	<classpathentry kind="lib" path="C:/code/jython/dist/jython-dev.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Java/jdk1.6.0_17/lib/tools.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -10,6 +10,8 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.geom.AffineTransform;
 
+import BritefuryJ.DocPresent.LayoutTree.LayoutNode;
+import BritefuryJ.DocPresent.LayoutTree.LayoutNodeStaticText;
 import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
 import BritefuryJ.DocPresent.Util.TextVisual;
 
@@ -31,8 +33,8 @@ public class DPStaticText extends DPStatic
 		this.text = text;
 		
 		visual = TextVisual.getTextVisual( getPresentationArea(), text, styleSheet.getFont(), styleSheet.getMixedSizeCaps() );
-		
-		layoutReqBox = visual.getRequisition();
+
+		layoutNode = new LayoutNodeStaticText( this );
 	}
 	
 	
@@ -58,7 +60,8 @@ public class DPStaticText extends DPStatic
 		if ( v != visual )
 		{
 			visual = v;
-			layoutReqBox = visual.getRequisition();
+			LayoutNodeStaticText layout = (LayoutNodeStaticText)getLayoutNode();
+			layout.setVisual( visual );
 			if ( isRealised() )
 			{
 				visual.realise( getPresentationArea() );
@@ -85,7 +88,8 @@ public class DPStaticText extends DPStatic
 		Paint prevColour = graphics.getPaint();
 
 		AffineTransform prevTransform = null;
-		double deltaY = layoutAllocBox.getAllocationAscent()  -  layoutReqBox.getReqAscent();
+		LayoutNode layout = getLayoutNode();
+		double deltaY = layout.getAllocationBox().getAllocationAscent()  -  layout.getRequisitionBox().getReqAscent();
 		if ( deltaY != 0.0 )
 		{
 			prevTransform = graphics.getTransform();
@@ -107,15 +111,11 @@ public class DPStaticText extends DPStatic
 	
 	
 
+		
 	
-	protected void updateRequisitionX()
+	public TextVisual getVisual()
 	{
-		layoutReqBox = visual.getRequisition();
-	}
-
-	protected void updateRequisitionY()
-	{
-		layoutReqBox = visual.getRequisition();
+		return visual;
 	}
 	
 	

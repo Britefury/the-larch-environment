@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent.Layout;
 
 
 
-public class LReqBox
+public class LReqBox extends LReqBoxInterface
 {
 	protected static double EPSILON = 1.0e-9;
 	protected static double ONE_MINUS_EPSILON = 1.0 - EPSILON;
@@ -194,12 +194,12 @@ public class LReqBox
 		minHAdvance = prefHAdvance = hAdvance;
 	}
 	
-	public void setRequisitionX(double minWidth, double prefWidth, double minHAdvance, double prefHSpacing)
+	public void setRequisitionX(double minWidth, double prefWidth, double minHAdvance, double prefHAdvance)
 	{
 		this.minWidth = minWidth; 
 		this.prefWidth = prefWidth;
 		this.minHAdvance = minHAdvance; 
-		this.prefHAdvance = prefHSpacing;
+		this.prefHAdvance = prefHAdvance;
 	}
 	
 	public void setRequisitionX(LReqBox box)
@@ -208,6 +208,14 @@ public class LReqBox
 		this.prefWidth = box.prefWidth;
 		this.minHAdvance = box.minHAdvance; 
 		this.prefHAdvance = box.prefHAdvance;
+	}
+	
+	public void setRequisitionX(LReqBoxInterface box)
+	{
+		this.minWidth = box.getMinWidth(); 
+		this.prefWidth = box.getPrefWidth();
+		this.minHAdvance = box.getMinHAdvance(); 
+		this.prefHAdvance = box.getPrefHAdvance();
 	}
 	
 	
@@ -228,19 +236,19 @@ public class LReqBox
 		setFlag( FLAG_HASBASELINE, true );
 	}
 	
-	public void setRequisitionY(LReqBox box)
+	public void setRequisitionY(LReqBoxInterface reqBox)
 	{
-		reqAscent = box.reqAscent;
-		reqDescent = box.reqDescent;
-		reqVSpacing = box.reqVSpacing;
-		setFlag( FLAG_HASBASELINE, box.hasBaseline() );
+		reqAscent = reqBox.getReqAscent();
+		reqDescent = reqBox.getReqDescent();
+		reqVSpacing = reqBox.getReqVSpacing();
+		setFlag( FLAG_HASBASELINE, reqBox.hasBaseline() );
 	}
 	
 	
-	public void maxRequisitionX(LReqBox box)
+	public void maxRequisitionX(LReqBoxInterface box)
 	{
-		setRequisitionX( Math.max( minWidth, box.minWidth ), Math.max( prefWidth, box.prefWidth ),
-				Math.max( minHAdvance, box.minHAdvance ), Math.max( prefHAdvance, box.prefHAdvance ) );
+		setRequisitionX( Math.max( minWidth, box.getMinWidth() ), Math.max( prefWidth, box.getPrefWidth() ),
+				Math.max( minHAdvance, box.getMinHAdvance() ), Math.max( prefHAdvance, box.getPrefHAdvance() ) );
 	}
 	
 	
@@ -385,9 +393,14 @@ public class LReqBox
 		return b;
 	}
 	
-	protected boolean isLineBreak()
+	public boolean isLineBreak()
 	{
 		return getFlag( FLAG_LINEBREAK );
+	}
+	
+	public int getLineBreakCost()
+	{
+		return lineBreakCost;
 	}
 	
 	

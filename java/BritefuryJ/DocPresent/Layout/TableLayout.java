@@ -11,7 +11,7 @@ package BritefuryJ.DocPresent.Layout;
 
 public class TableLayout
 {
-	private static LReqBox[] computeColumnXBoxes(LReqBox children[], TablePackingParams packingParams[], int numColumns, double columnSpacing)
+	private static LReqBox[] computeColumnXBoxes(LReqBoxInterface children[], TablePackingParams packingParams[], int numColumns, double columnSpacing)
 	{
 		LReqBox columnBoxes[] = new LReqBox[numColumns];
 		for (int i = 0; i < numColumns; i++)
@@ -22,15 +22,15 @@ public class TableLayout
 		
 		// First phase; fill only with children who span 1 column
 		int i = 0;
-		for (LReqBox child: children)
+		for (LReqBoxInterface child: children)
 		{
 			TablePackingParams packing = packingParams[i];
 			
 			if ( packing.colSpan == 1 )
 			{
 				LReqBox b = columnBoxes[packing.x];
-				b.minWidth = Math.max( b.minWidth, child.minWidth );
-				b.prefWidth = Math.max( b.prefWidth, child.prefWidth );
+				b.minWidth = Math.max( b.minWidth, child.getMinWidth() );
+				b.prefWidth = Math.max( b.prefWidth, child.getPrefWidth() );
 			}
 			i++;
 		}
@@ -38,7 +38,7 @@ public class TableLayout
 		
 		// Second phase; fill with children who span >1 columns
 		i = 0;
-		for (LReqBox child: children)
+		for (LReqBoxInterface child: children)
 		{
 			TablePackingParams packing = packingParams[i];
 			
@@ -60,13 +60,13 @@ public class TableLayout
 				
 				
 				// Now compare with what is required
-				if ( minWidthAvailable  <  child.minWidth  ||  prefWidthAvailable  <  child.prefWidth )
+				if ( minWidthAvailable  <  child.getMinWidth()  ||  prefWidthAvailable  <  child.getPrefWidth() )
 				{
 					// Need more width; compute how much we need, and distribute among columns
 					double colSpanRecip = 1.0 / (double)packing.colSpan;
-					double additionalMinWidth = Math.max( child.minWidth - minWidthAvailable, 0.0 );
+					double additionalMinWidth = Math.max( child.getMinWidth() - minWidthAvailable, 0.0 );
 					double additionalMinWidthPerColumn = additionalMinWidth * colSpanRecip;
-					double additionalPrefWidth = Math.max( child.prefWidth - prefWidthAvailable, 0.0 );
+					double additionalPrefWidth = Math.max( child.getPrefWidth() - prefWidthAvailable, 0.0 );
 					double additionalPrefWidthPerColumn = additionalPrefWidth * colSpanRecip;
 					
 					for (int c = packing.x; c < endColumn; c++)
@@ -92,7 +92,7 @@ public class TableLayout
 
 
 
-	private static LReqBox[] computeRowYBoxes(LReqBox children[], TablePackingParams packingParams[], int childAllocationFlags[], int numRows, double rowSpacing)
+	private static LReqBox[] computeRowYBoxes(LReqBoxInterface children[], TablePackingParams packingParams[], int childAllocationFlags[], int numRows, double rowSpacing)
 	{
 		double rowAscent[] = new double[numRows];
 		double rowDescent[] = new double[numRows];
@@ -102,7 +102,7 @@ public class TableLayout
 		
 		// First phase; fill only with children who span 1 row
 		int i = 0;
-		for (LReqBox child: children)
+		for (LReqBoxInterface child: children)
 		{
 			TablePackingParams packing = packingParams[i];
 			
@@ -119,8 +119,8 @@ public class TableLayout
 				
 				if ( bBaseline  &&  child.hasBaseline() )
 				{
-					rowAscent[r] = Math.max( rowAscent[r], child.reqAscent );
-					rowDescent[r] = Math.max( rowDescent[r], child.reqDescent );
+					rowAscent[r] = Math.max( rowAscent[r], child.getReqAscent() );
+					rowDescent[r] = Math.max( rowDescent[r], child.getReqDescent() );
 				}
 				else
 				{
@@ -133,7 +133,7 @@ public class TableLayout
 		
 		// Second phase; fill with children who span >1 columns
 		i = 0;
-		for (LReqBox child: children)
+		for (LReqBoxInterface child: children)
 		{
 			TablePackingParams packing = packingParams[i];
 			
@@ -199,7 +199,7 @@ public class TableLayout
 	
 	
 	
-	public static LReqBox[] computeRequisitionX(LReqBox box, LReqBox children[], TablePackingParams packingParams[], int numColumns, int numRows,
+	public static LReqBox[] computeRequisitionX(LReqBox box, LReqBoxInterface children[], TablePackingParams packingParams[], int numColumns, int numRows,
 			double columnSpacing, double rowSpacing)
 	{
 		LReqBox columnBoxes[] = computeColumnXBoxes( children, packingParams, numColumns, columnSpacing );
@@ -221,7 +221,7 @@ public class TableLayout
 
 
 
-	public static LReqBox[] computeRequisitionY(LReqBox box, LReqBox children[], TablePackingParams packingParams[], int childAllocationFlags[], int numColumns, int numRows,
+	public static LReqBox[] computeRequisitionY(LReqBox box, LReqBoxInterface children[], TablePackingParams packingParams[], int childAllocationFlags[], int numColumns, int numRows,
 			double columnSpacing, double rowSpacing)
 	{
 		LReqBox rowBoxes[];
@@ -244,8 +244,8 @@ public class TableLayout
 	
 	
 	
-	public static void allocateX(LReqBox box, LReqBox columnBoxes[], LReqBox children[],
-			LAllocBox allocBox, LAllocBox columnAllocBoxes[], LAllocBox childrenAlloc[], 
+	public static void allocateX(LReqBox box, LReqBox columnBoxes[], LReqBoxInterface children[],
+			LAllocBox allocBox, LAllocBox columnAllocBoxes[], LAllocBoxInterface childrenAlloc[], 
 			TablePackingParams packingParams[], int childAlignmentFlags[], int numColumns, int numRows,
 			double columnSpacing, double rowSpacing, boolean bColumnExpand, boolean bRowExpand)
 	{
@@ -255,8 +255,8 @@ public class TableLayout
 		// Allocate children
 		for (int i = 0; i < children.length; i++)
 		{
-			LReqBox childRequisition = children[i];
-			LAllocBox childAlloc = childrenAlloc[i];
+			LReqBoxInterface childRequisition = children[i];
+			LAllocBoxInterface childAlloc = childrenAlloc[i];
 			TablePackingParams packing = (TablePackingParams)packingParams[i];
 			int alignmentFlags = childAlignmentFlags[i];
 			HAlignment hAlign = ElementAlignment.getHAlignment( alignmentFlags );
@@ -267,7 +267,7 @@ public class TableLayout
 			double xStart = startColAlloc.positionInParentSpaceX;
 			double xEnd = endColAlloc.positionInParentSpaceX  +  endColAlloc.allocationX;
 			double widthAvailable = xEnd - xStart;
-			double cellWidth = Math.max( widthAvailable, childRequisition.minWidth );
+			double cellWidth = Math.max( widthAvailable, childRequisition.getMinWidth() );
 
 			allocBox.allocateChildXAligned( childAlloc, childRequisition, hAlign, xStart, cellWidth );
 		}
@@ -275,8 +275,8 @@ public class TableLayout
 	
 
 	
-	public static void allocateY(LReqBox box, LReqBox rowBoxes[], LReqBox children[],
-			LAllocBox allocBox, LAllocBox rowAllocBoxes[], LAllocBox childrenAlloc[],
+	public static void allocateY(LReqBox box, LReqBox rowBoxes[], LReqBoxInterface children[],
+			LAllocBox allocBox, LAllocBox rowAllocBoxes[], LAllocBoxInterface childrenAlloc[],
 			TablePackingParams packingParams[], int childAlignmentFlags[], int numColumns, int numRows,
 			double columnSpacing, double rowSpacing, boolean bColumnExpand, boolean bRowExpand)
 	{
@@ -292,8 +292,8 @@ public class TableLayout
 		// Allocate children
 		for (int i = 0; i < children.length; i++)
 		{
-			LReqBox childRequisition = children[i];
-			LAllocBox childAlloc = childrenAlloc[i];
+			LReqBoxInterface childRequisition = children[i];
+			LAllocBoxInterface childAlloc = childrenAlloc[i];
 			TablePackingParams packing = (TablePackingParams)packingParams[i];
 			int alignmentFlags = childAlignmentFlags[i];
 			VAlignment vAlign = ElementAlignment.getVAlignment( alignmentFlags );

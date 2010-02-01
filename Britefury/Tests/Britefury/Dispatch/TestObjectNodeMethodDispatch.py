@@ -12,7 +12,7 @@ from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeDispatchMethod
 from BritefuryJ.DocModel import DMModule
 
 
-class TestCase_obejctNodeMethodDispatch (unittest.TestCase):
+class TestCase_objectNodeMethodDispatch (unittest.TestCase):
 	def setUp(self):
 		self.Module = DMModule( 'NodeMethodDispatch', 'dispatch', 'Tests.NodeMethodDispatch' )
 		self.A = self.Module.newClass( 'A', [ 'x', 'y' ] )
@@ -24,10 +24,9 @@ class TestCase_obejctNodeMethodDispatch (unittest.TestCase):
 	
 		class DispatchTest (object):
 			__metaclass__ = ObjectNodeMethodDispatchMetaClass
-			__dispatch_module__ = self.Module
 			__dispatch_num_args__ = 0
 			
-			@ObjectNodeDispatchMethod
+			@ObjectNodeDispatchMethod( self.A )
 			def A(self, node, x, y):
 				return x + y
 		

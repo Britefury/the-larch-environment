@@ -12,11 +12,10 @@ import java.util.ArrayList;
 import org.python.core.Py;
 import org.python.core.PyObject;
 
-import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.PointerInterface;
-import BritefuryJ.DocPresent.Layout.LAllocV;
+import BritefuryJ.DocPresent.LayoutTree.LayoutNodeButton;
 import BritefuryJ.DocPresent.StyleSheets.ButtonStyleSheet;
 
 public class DPButton extends DPBin
@@ -72,6 +71,7 @@ public class DPButton extends DPBin
 	{
 		super( context, styleSheet );
 		
+		layoutNode = new LayoutNodeButton( this );
 		this.listener = listener;
 	}
 	
@@ -141,74 +141,5 @@ public class DPButton extends DPBin
 			}
 		}
 		return false;
-	}
-
-	
-	
-	protected void updateRequisitionX()
-	{
-		ButtonStyleSheet buttonStyle = (ButtonStyleSheet)styleSheet;
-		SolidBorder border = buttonStyle.getBorder();
-		
-		DPWidget child = getChild();
-		if ( child != null )
-		{
-			layoutReqBox.setRequisitionX( child.refreshRequisitionX() );
-		}
-		else
-		{
-			layoutReqBox.clearRequisitionX();
-		}
-		layoutReqBox.borderX( border.getLeftMargin(), border.getRightMargin() );
-	}
-
-	protected void updateRequisitionY()
-	{
-		ButtonStyleSheet buttonStyle = (ButtonStyleSheet)styleSheet;
-		SolidBorder border = buttonStyle.getBorder();
-		
-		DPWidget child = getChild();
-		if ( child != null )
-		{
-			layoutReqBox.setRequisitionY( child.refreshRequisitionY() );
-		}
-		else
-		{
-			layoutReqBox.clearRequisitionY();
-		}
-		layoutReqBox.borderY( border.getTopMargin(), border.getBottomMargin() );
-	}
-
-	
-	
-	
-	protected void updateAllocationX()
-	{
-		ButtonStyleSheet buttonStyle = (ButtonStyleSheet)styleSheet;
-		SolidBorder border = buttonStyle.getBorder();
-		
-		DPWidget child = getChild();
-		if ( child != null )
-		{
-			double prevWidth = child.layoutAllocBox.getAllocationX();
-			double hborder = border.getLeftMargin() + border.getRightMargin();
-			layoutAllocBox.allocateChildXAligned( child.layoutAllocBox, child.layoutReqBox, child.getAlignmentFlags(), border.getLeftMargin(), layoutAllocBox.getAllocationX() - hborder );
-			child.refreshAllocationX( prevWidth );
-		}
-	}
-
-	protected void updateAllocationY()
-	{
-		ButtonStyleSheet buttonStyle = (ButtonStyleSheet)styleSheet;
-		SolidBorder border = buttonStyle.getBorder();
-		
-		DPWidget child = getChild();
-		if ( child != null )
-		{
-			LAllocV prevAllocV = child.layoutAllocBox.getAllocV();
-			layoutAllocBox.allocateChildYAligned( child.layoutAllocBox, child.layoutReqBox, child.getAlignmentFlags(),
-					border.getTopMargin(), layoutAllocBox.getAllocV().borderY( border.getTopMargin(), border.getBottomMargin() ) );
-			child.refreshAllocationY( prevAllocV );
-		}
 	}
 }

@@ -120,7 +120,7 @@ def viewLispNode(node, ctx, state):
 		
 		return nodeEditor( ctx, node, v, state )
 	elif isObjectNode( node ):
-		cls = node.getDMClass()
+		cls = node.getDMObjectClass()
 		
 		# Determine how this node is to be displayed
 		mode = MODE_HORIZONTAL

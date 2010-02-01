@@ -55,7 +55,8 @@ import BritefuryJ.DocPresent.Input.PointerDndController;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.Layout.LAllocV;
-import BritefuryJ.DocPresent.Layout.LReqBox;
+import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
+import BritefuryJ.DocPresent.LayoutTree.LayoutNodeRootElement;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Selection.SelectionListener;
@@ -656,6 +657,8 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	{
 		super( context );
 		
+		layoutNode = new LayoutNodeRootElement( this );
+		
 		presentationArea = this;
 		
 		this.viewXform = viewXform;
@@ -1126,12 +1129,11 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 
 	
 	//
-	// Queue resize
+	// Queue reallocation
 	//
 	
-	protected void handleQueueResize()
+	public void queueReallocation()
 	{
-		super.handleQueueResize();
 		bAllocationRequired = true;
 		queueFullRedraw();
 	}
@@ -1149,28 +1151,30 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		{
 			long t1 = System.nanoTime();
 			
+			LayoutNodeRootElement rootLayout = (LayoutNodeRootElement)getLayoutNode();
+
 			// Get X requisition
-			LReqBox reqX = refreshRequisitionX();
+			LReqBoxInterface reqX = rootLayout.refreshRequisitionX();
 			
 			// Allocate X
-			double prevWidth = layoutAllocBox.getAllocationX();
+			double prevWidth = rootLayout.getAllocationX();
 			if ( bHorizontalClamp )
 			{
-				layoutAllocBox.allocateX( reqX, 0.0, Math.max( reqX.getMinWidth(), windowSize.x ) );
+				rootLayout.allocateX( reqX, 0.0, Math.max( reqX.getMinWidth(), windowSize.x ) );
 			}
 			else
 			{
-				layoutAllocBox.allocateX( reqX, 0.0, Math.max( reqX.getPrefWidth(), windowSize.x ) );
+				rootLayout.allocateX( reqX, 0.0, Math.max( reqX.getPrefWidth(), windowSize.x ) );
 			}
-			refreshAllocationX( prevWidth );
+			rootLayout.refreshAllocationX( prevWidth );
 			
 			// Get Y requisition
-			LReqBox reqY = refreshRequisitionY();
+			LReqBoxInterface reqY = rootLayout.refreshRequisitionY();
 			
 			// Allocate Y
-			LAllocV prevAllocV = layoutAllocBox.getAllocV();
-			layoutAllocBox.allocateY( reqY, 0.0, reqY.getReqHeight() );
-			refreshAllocationY( prevAllocV );
+			LAllocV prevAllocV = rootLayout.getAllocV();
+			rootLayout.allocateY( reqY, 0.0, reqY.getReqHeight() );
+			rootLayout.refreshAllocationY( prevAllocV );
 			
 			updateRange();
 			bAllocationRequired = false;
@@ -1210,7 +1214,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 					{
 						if ( !caret.isValid() )
 						{
-							DPContentLeaf leaf = getLeftContentLeaf();
+							DPContentLeaf leaf = getLayoutNode().getLeftContentLeaf();
 							if ( leaf != null )
 							{
 								leaf.moveMarkerToStart( caret.getMarker() );

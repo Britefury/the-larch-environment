@@ -13,6 +13,7 @@ import BritefuryJ.DocPresent.Canvas.DrawingNode;
 import BritefuryJ.DocPresent.Canvas.DrawingOwner;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.DocPresent.LayoutTree.LayoutNodeCanvas;
 import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
 import BritefuryJ.Math.Point2;
 
@@ -44,11 +45,40 @@ public class DPCanvas extends DPStatic implements DrawingOwner
 	{
 		super( context, styleSheet );
 		
+		layoutNode = new LayoutNodeCanvas( this );
+		
 		this.drawing = drawing;
 		this.drawingWidth = width;
 		this.drawingHeight = height;
 		setFlagValue( FLAG_DIAGRAM_SHRINK_X, bShrinkX );
 		setFlagValue( FLAG_DIAGRAM_SHRINK_Y, bShrinkY );
+	}
+	
+	
+	
+	public DrawingNode getDrawing()
+	{
+		return drawing;
+	}
+	
+	public double getDrawingWidth()
+	{
+		return drawingWidth;
+	}
+	
+	public double getDrawingHeight()
+	{
+		return drawingHeight;
+	}
+	
+	public boolean isShinkXEnabled()
+	{
+		return testFlag( FLAG_DIAGRAM_SHRINK_X );
+	}
+	
+	public boolean isShinkYEnabled()
+	{
+		return testFlag( FLAG_DIAGRAM_SHRINK_Y );
 	}
 	
 	
@@ -78,41 +108,6 @@ public class DPCanvas extends DPStatic implements DrawingOwner
 	
 
 	
-	protected void updateRequisitionX()
-	{
-		double width = drawing.getParentSpaceBoundingBox().getUpperX();
-		if ( drawingWidth >= 0.0 )
-		{
-			if ( testFlag( FLAG_DIAGRAM_SHRINK_X ) )
-			{
-				width = Math.min( width, drawingWidth );
-			}
-			else
-			{
-				width = drawingWidth;
-			}
-		}
-		layoutReqBox.setRequisitionX( width, width );
-	}
-
-	protected void updateRequisitionY()
-	{
-		double height = drawing.getParentSpaceBoundingBox().getUpperY();
-		if ( drawingHeight >= 0.0 )
-		{
-			if ( testFlag( FLAG_DIAGRAM_SHRINK_Y ) )
-			{
-				height = Math.min( height, drawingHeight );
-			}
-			else
-			{
-				height = drawingHeight;
-			}
-		}
-		layoutReqBox.setRequisitionY( height, 0.0 );
-	}
-
-
 	protected PointerInputElement getFirstPointerChildAtLocalPoint(Point2 localPos)
 	{
 		return drawing;

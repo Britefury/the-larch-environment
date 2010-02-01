@@ -9,9 +9,9 @@ package BritefuryJ.DocPresent;
 
 import java.util.ArrayList;
 
+import BritefuryJ.DocPresent.LayoutTree.LayoutNodeEmpty;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
-import BritefuryJ.Math.Point2;
 import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
 public class DPEmpty extends DPWidget
@@ -38,36 +38,11 @@ public class DPEmpty extends DPWidget
 	{
 		super( context, styleSheet );
 		
+		layoutNode = new LayoutNodeEmpty( this );
+		
 		this.textRepresentation = textRepresentation;
 	}
 
-	
-	
-	protected void updateRequisitionX()
-	{
-		layoutReqBox.clearRequisitionX();
-	}
-
-	protected void updateRequisitionY()
-	{
-		layoutReqBox.clearRequisitionY();
-	}
-	
-
-
-
-	protected DPWidget getLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
-	{
-		if ( filter == null  ||  filter.testElement( this ) )
-		{
-			return this;
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
 	
 	
 	//

@@ -26,9 +26,12 @@ Rules of inheritance apply; names of superclasses will be used if that is all th
 
 Methods should have the form:
 
-def NodeClass(self, arg0, arg1, ... argM, node, fieldName0, fieldName1, ... fieldNameN):
+@ObjectNodeDispatchMethod( NodeClass )
+def methodFor_NodeClass(self, arg0, arg1, ... argM, node, fieldName0, fieldName1, ... fieldNameN):
 	pass
 	
+NodeClass
+	Reference to the node class
 arg0 ... argM
 	Additional arguments passed to method calls. They are passed in a tuple to
 	the 'args' parameter of the nodeMethodDispatch() function.
@@ -41,11 +44,8 @@ fieldName0 ... fieldNameN
 A dispatch class is declared like so:
 class MyDispatch (object):
 	__metaclass__ = ObjectNodeMethodDispatchMetaClass
-	__dispatch_module__ = MyModule
 	__dispatch_num_args__ = M
 	
-MyModule
-	a reference to the DMModule in which all the node classes are defined
 M
 	the number of additional arguments (arg0 ... argM  above)
 	
@@ -68,10 +68,6 @@ class BadFieldNameException (Exception):
 	def __init__(self, className, fieldName):
 		super( BadFieldNameException, self ).__init__( 'Could not get field named \'%s\' from class \'%s\''  %  ( fieldName, className ) )
 
-class BadClassNameException (Exception):
-	def __init__(self, className):
-		super( BadClassNameException, self ).__init__( 'Could not get class named \'%s\' from module'  %  className )
-
 class ObjectNodeDispatchMethodCannotHaveVarArgs (Exception):
 	def __init__(self, className):
 		super( ObjectNodeDispatchMethodCannotHaveVarArgs, self ).__init__( 'Object node dispatch method \'%s\' should not have varargs'  %  className )
@@ -79,23 +75,24 @@ class ObjectNodeDispatchMethodCannotHaveVarArgs (Exception):
 
 		
 		
-class ObjectNodeDispatchMethod (object):		
-	def __init__(self, function):
+class ObjectNodeDispatchMethodWrapper (object):		
+	def __init__(self, nodeClass, function):
 		self._function = function
+		self._nodeClass = nodeClass
 
 		
-	def _init(self, dmClass, numArgs):
+	def _init(self, numArgs):
 		args, varargs, varkw, defaults = inspect.getargspec( self._function )
 		if varargs is not None:
-			raise ObjectNodeDispatchMethodCannotHaveVarArgs( dmClass.getName() )
-		self._indices = [ self._getFieldIndex( dmClass, name )   for name in args[2+numArgs:] ]
+			raise ObjectNodeDispatchMethodCannotHaveVarArgs( self._nodeClass.getName() )
+		self._indices = [ self._getFieldIndex( name )   for name in args[2+numArgs:] ]
 		
 		self._varKWTable = None
 		if varkw is not None:
 			self._varKWTable = []
-			for i in xrange( 0, dmClass.getNumFields() ):
+			for i in xrange( 0, self._nodeClass.getNumFields() ):
 				if i not in self._indices:
-					self._varKWTable.append( ( dmClass.getField( i ).getName(), i ) )
+					self._varKWTable.append( ( self._nodeClass.getField( i ).getName(), i ) )
 					
 					
 	def call(self, object, dispatchSelf, args):
@@ -110,16 +107,34 @@ class ObjectNodeDispatchMethod (object):
 			return self._function( dispatchSelf, *callArgs, **kwargs )
 		
 		
+	def callNoArgs(self, object, dispatchSelf):
+		callArgs = tuple( [ object ] + [ object.get( index )   for index in self._indices ] )
+		
+		if self._varKWTable is None:
+			return self._function( dispatchSelf, *callArgs )
+		else:
+			kwargs = {}
+			for name, index in self._varKWTable:
+				kwargs[name] = object.get( index )
+			return self._function( dispatchSelf, *callArgs, **kwargs )
+		
+		
 	def getName(self):
 		return self._function.__name__
 		
 		
-	@staticmethod
-	def _getFieldIndex(dmClass, name):
-		index = dmClass.getFieldIndex( name )
+	def _getFieldIndex(self, name):
+		index = self._nodeClass.getFieldIndex( name )
 		if index == -1:
-			raise BadFieldNameException, ( dmClass.getName(), name )
+			raise BadFieldNameException, ( self._nodeClass.getName(), name )
 		return index
+	
+	
+	
+def ObjectNodeDispatchMethod(nodeClass):
+	def decorator(fn):
+		return ObjectNodeDispatchMethodWrapper( nodeClass, fn )
+	return decorator
 		
 	
 	
@@ -128,11 +143,6 @@ class ObjectNodeMethodDispatchMetaClass (type):
 	def __init__(cls, name, bases, clsDict):
 		super( ObjectNodeMethodDispatchMetaClass, cls ).__init__( name, bases, clsDict )
 		
-		try:
-			module = cls.__dispatch_module__
-		except AttributeError:
-			module = None
-			
 		try:
 			numArgs = cls.__dispatch_num_args__
 		except AttributeError:
@@ -153,16 +163,12 @@ class ObjectNodeMethodDispatchMetaClass (type):
 		clsDict['__method_table__'] = cls.__method_table__
 
 		# Add entries to the method table
-		if module is not None:
-			for k, v in clsDict.items():
-				if isinstance( v, ObjectNodeDispatchMethod ):
-					try:
-						dmClass = module.get( k )
-					except DMModule.UnknownClassException:
-						raise BadClassNameException, ( k, )
-					method = v
-					method._init( dmClass, numArgs )
-					cls.__method_table__[dmClass.getName()] = method
+		for k, v in clsDict.items():
+			if isinstance( v, ObjectNodeDispatchMethodWrapper ):
+				method = v
+				nodeClass = v._nodeClass
+				method._init( numArgs )
+				cls.__method_table__[nodeClass] = method
 
 				
 		# Initialise the dispatch table to a copy of the method table
@@ -175,25 +181,25 @@ class ObjectNodeMethodDispatchMetaClass (type):
 	def _getMethodForNode(cls, node):
 		# First, try to get a method for the class of @node
 		try:
-			return cls.__dispatch_table__[node.getDMClass().getName()]
+			return cls.__dispatch_table__[node.getDMNodeClass()]
 		except KeyError:
 			# Did not find a suitable method
 			# Try looking for one declared for a superclass
-			nodeClass = node.getDMClass()
+			nodeClass = node.getDMNodeClass()
 			
 			# Iterate over all superclasses of @nodeClass, until we hit one that has an entry
-			nodeClass = nodeClass.getSuperclass()
+			superClass = nodeClass.getSuperclass()
 			method = None
-			while nodeClass is not None:
+			while superClass is not None:
 				# Try to get a method for a superclass of @node
 				try:
-					method = cls.__dispatch_table__[nodeClass.getName()]
+					method = cls.__dispatch_table__[superClass]
 					break
 				except KeyError:
 					pass
-				nodeClass = nodeClass.getSuperclass()
+				superClass = superClass.getSuperclass()
 			# Cache the result so that any lookups in the future will be faster
-			cls.__dispatch_table__[node.getDMClass().getName()] = method
+			cls.__dispatch_table__[superClass] = method
 			return method
 
 		
@@ -202,7 +208,7 @@ def objectNodeMethodDispatch(target, node, *args):
 	if isObjectNode( node ):
 		method = type( target )._getMethodForNode( node )
 		if method is None:
-			raise DispatchError, 'objectNodeMethodDispatch(): could not find method for nodes of type %s in class %s'  %  ( node.getDMClass().getName(), type( target ).__name__ )
+			raise DispatchError, 'objectNodeMethodDispatch(): could not find method for nodes of type %s in class %s'  %  ( node.getDMNodeClass().getName(), type( target ).__name__ )
 		return method.call( node, target, args )
 	else:
 		raise DispatchDataError, 'objectNodeMethodDispatch(): can only dispatch on objects; not on %s'  %  ( nodeToSXString( node ) )
@@ -213,7 +219,7 @@ def objectNodeMethodDispatchAndGetName(target, node, *args):
 	if isObjectNode( node ):
 		method = type( target )._getMethodForNode( node )
 		if method is None:
-			raise DispatchError, 'objectNodeMethodDispatchAndGetName(): could not find method for nodes of type %s in class %s'  %  ( node.getDMClass().getName(), type( target ).__name__ )
+			raise DispatchError, 'objectNodeMethodDispatchAndGetName(): could not find method for nodes of type %s in class %s'  %  ( node.getDMNodeClass().getName(), type( target ).__name__ )
 		return method.call( node, target, args ), method.getName()
 	else:
 		raise DispatchDataError, 'objectNodeMethodDispatchAndGetName(): can only dispatch on objects; not on %s'  %  ( nodeToSXString( node ) )

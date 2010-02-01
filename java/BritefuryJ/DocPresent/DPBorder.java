@@ -11,7 +11,7 @@ import java.awt.Graphics2D;
 
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
-import BritefuryJ.DocPresent.Layout.LAllocV;
+import BritefuryJ.DocPresent.LayoutTree.LayoutNodeBorder;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 
 
@@ -42,6 +42,7 @@ public class DPBorder extends DPBin
 	{
 		super( context, styleSheet );
 		
+		layoutNode = new LayoutNodeBorder( this );
 		this.border = border;
 	}
 	
@@ -73,62 +74,5 @@ public class DPBorder extends DPBin
 	protected void drawBackground(Graphics2D graphics)
 	{
 		border.draw( graphics, 0.0, 0.0, getAllocationX(), getAllocationY() );
-	}
-	
-
-	
-	protected void updateRequisitionX()
-	{
-		DPWidget child = getChild();
-		if ( child != null )
-		{
-			layoutReqBox.setRequisitionX( child.refreshRequisitionX() );
-		}
-		else
-		{
-			layoutReqBox.clearRequisitionX();
-		}
-		layoutReqBox.borderX( border.getLeftMargin(), border.getRightMargin() );
-	}
-
-	protected void updateRequisitionY()
-	{
-		DPWidget child = getChild();
-		if ( child != null )
-		{
-			layoutReqBox.setRequisitionY( child.refreshRequisitionY() );
-		}
-		else
-		{
-			layoutReqBox.clearRequisitionY();
-		}
-		layoutReqBox.borderY( border.getTopMargin(), border.getBottomMargin() );
-	}
-
-	
-	
-	
-	protected void updateAllocationX()
-	{
-		DPWidget child = getChild();
-		if ( child != null )
-		{
-			double prevWidth = child.layoutAllocBox.getAllocationX();
-			double hborder = border.getLeftMargin() + border.getRightMargin();
-			layoutAllocBox.allocateChildXAligned( child.layoutAllocBox, child.layoutReqBox, child.getAlignmentFlags(), border.getLeftMargin(), layoutAllocBox.getAllocationX() - hborder );
-			child.refreshAllocationX( prevWidth );
-		}
-	}
-
-	protected void updateAllocationY()
-	{
-		DPWidget child = getChild();
-		if ( child != null )
-		{
-			LAllocV prevAllocV = child.layoutAllocBox.getAllocV();
-			layoutAllocBox.allocateChildYAligned( child.layoutAllocBox, child.layoutReqBox, child.getAlignmentFlags(),
-					border.getTopMargin(), layoutAllocBox.getAllocV().borderY( border.getTopMargin(), border.getBottomMargin() ) );
-			child.refreshAllocationY( prevAllocV );
-		}
 	}
 }

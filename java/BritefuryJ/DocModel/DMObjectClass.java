@@ -19,7 +19,7 @@ import BritefuryJ.Parser.ObjectNode;
 import BritefuryJ.Parser.ParserExpression.ParserCoerceException;
 
 
-public class DMObjectClass
+public class DMObjectClass extends DMNodeClass
 {
 	public static class InvalidFieldNameException extends Exception
 	{
@@ -35,7 +35,6 @@ public class DMObjectClass
 	
 	
 	private DMModule module;
-	private String name;
 	private DMObjectClass superclass, superclasses[];
 	private DMObjectField classFields[], allClassFields[];
 	private HashMap<String, Integer> fieldNameToIndex;
@@ -44,8 +43,8 @@ public class DMObjectClass
 	
 	public DMObjectClass(DMModule module, String name, DMObjectField fields[]) throws ClassAlreadyDefinedException
 	{
+		super( name );
 		this.module = module;
-		this.name = name.intern();
 		superclass = null;
 		superclasses = new DMObjectClass[0];
 		classFields = fields;
@@ -63,8 +62,9 @@ public class DMObjectClass
 	
 	public DMObjectClass(DMModule module, String name, DMObjectClass superclass, DMObjectField fields[]) throws ClassAlreadyDefinedException
 	{
+		super( name );
+		
 		this.module = module;
-		this.name = name.intern();
 		
 		this.superclass = superclass;
 		superclasses = new DMObjectClass[superclass.superclasses.length + 1];
@@ -104,18 +104,13 @@ public class DMObjectClass
 		return module;
 	}
 	
-	public String getName()
-	{
-		return name;
-	}
 	
-	
-	public DMObjectClass getSuperclass()
+	public DMNodeClass getSuperclass()
 	{
 		return superclass;
 	}
 	
-	public boolean isSubclassOf(DMObjectClass c)
+	public boolean isSubclassOf(DMNodeClass c)
 	{
 		return c == this  ||  Arrays.asList( superclasses ).contains( c );
 	}

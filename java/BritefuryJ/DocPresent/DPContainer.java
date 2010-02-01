@@ -17,6 +17,7 @@ import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.Layout.VTypesetting;
+import BritefuryJ.DocPresent.LayoutTree.BranchLayoutNode;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
@@ -37,32 +38,8 @@ public abstract class DPContainer extends DPWidget
 	}
 	
 	
-	protected static interface ClosestPointChildSearcher
-	{
-		DPWidget getLeafClosestToLocalPointFromChild(DPWidget child, Point2 localPos, WidgetFilter filter);
-	}
-	
-	protected static class ClosestPointChildContainerSearcher implements ClosestPointChildSearcher
-	{
-		private DPContainer container;
-		
-		
-		public ClosestPointChildContainerSearcher(DPContainer container)
-		{
-			this.container = container;
-		}
-
-		public DPWidget getLeafClosestToLocalPointFromChild(DPWidget child, Point2 localPos, WidgetFilter filter)
-		{
-			return container.getChildLeafClosestToLocalPoint( localPos, filter );
-		}
-	}
-	
-	
-	
-	
-	protected ArrayList<DPWidget> registeredChildren;
-	public String cachedTextRep;
+	protected ArrayList<DPWidget> registeredChildren;				// Replace with array; operations like insert etc are hardly used at all
+	public String cachedTextRep;								// Move to 'waypoint' element
 	
 	
 	
@@ -137,11 +114,12 @@ public abstract class DPContainer extends DPWidget
 	{
 		onSubtreeStructureChanged();
 		refreshMetaElement();
-	}
-	
-	
-	protected void onChildSizeRefreshed()
-	{
+		
+		BranchLayoutNode branchLayout = (BranchLayoutNode)getValidLayoutNodeOfClass( BranchLayoutNode.class );
+		if ( branchLayout != null )
+		{
+			branchLayout.onChildListModified();
+		}
 	}
 	
 	
@@ -172,6 +150,11 @@ public abstract class DPContainer extends DPWidget
 	
 	
 	protected List<DPWidget> getInternalChildren()
+	{
+		return registeredChildren;
+	}
+	
+	public List<DPWidget> getLayoutChildren()
 	{
 		return registeredChildren;
 	}
@@ -525,158 +508,16 @@ public abstract class DPContainer extends DPWidget
 	
 
 	
-
-	
-	public DPContentLeaf getLeftContentLeaf()
-	{
-		// Check the child nodes
-		List<DPWidget> navList = horizontalNavigationList();
-		if ( navList != null )
-		{
-			for (DPWidget w: navList)
-			{
-				DPContentLeaf l = w.getLeftContentLeaf();
-				if ( l != null )
-				{
-					return l;
-				}
-			}
-		}
-		
-		return null;
-	}
-	
-	public DPContentLeaf getRightContentLeaf()
-	{
-		// Check the child nodes
-		List<DPWidget> navList = horizontalNavigationList();
-		if ( navList != null )
-		{
-			for (int i = navList.size() - 1; i >= 0; i--)
-			{
-				DPWidget w = navList.get( i );
-				DPContentLeaf l = w.getRightContentLeaf();
-				if ( l != null )
-				{
-					return l;
-				}
-			}
-		}
-		
-		return null;
-	}
-
-	protected DPContentLeaf getTopOrBottomContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace, boolean bSkipWhitespace)
-	{
-		List<DPWidget> navList = verticalNavigationList();
-		if ( navList != null )
-		{
-			if ( bBottom )
-			{
-				for (int i = navList.size() - 1; i >= 0; i--)
-				{
-					DPWidget w = navList.get( i );
-					DPContentLeaf l = w.getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace, bSkipWhitespace );
-					if ( l != null )
-					{
-						return l;
-					}
-				}
-			}
-			else
-			{
-				for (DPWidget w: navList)
-				{
-					DPContentLeaf l = w.getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace, bSkipWhitespace );
-					if ( l != null )
-					{
-						return l;
-					}
-				}
-			}
-			
-			return null;
-		}
-		else
-		{
-			navList = horizontalNavigationList();
-			if ( navList != null )
-			{
-				double closestDistance = 0.0;
-				DPContentLeaf closestNode = null;
-				for (DPWidget item: navList)
-				{
-					AABox2 bounds = item.getLocalAABox();
-					double lower = item.getLocalPointRelativeToRoot( bounds.getLower() ).x;
-					double upper = item.getLocalPointRelativeToRoot( bounds.getUpper() ).x;
-					if ( cursorPosInRootSpace.x >=  lower  &&  cursorPosInRootSpace.x <= upper )
-					{
-						DPContentLeaf l = item.getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace, bSkipWhitespace );
-						if ( l != null )
-						{
-							return l;
-						}
-					}
-					else
-					{
-						double distance;
-						if ( cursorPosInRootSpace.x < lower )
-						{
-							// Cursor to the left of the box
-							distance = lower - cursorPosInRootSpace.x;
-						}
-						else // cursorPosInRootSpace.x > upper
-						{
-							// Cursor to the right of the box
-							distance = cursorPosInRootSpace.x - upper;
-						}
-						
-						if ( closestNode == null  ||  distance < closestDistance )
-						{
-							DPContentLeaf l = item.getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace, bSkipWhitespace );
-							if ( l != null )
-							{
-								closestDistance = distance;
-								closestNode = l;
-							}
-						}
-					}
-				}
-				
-				if ( closestNode != null )
-				{
-					return closestNode;
-				}
-			}
-			
-			return null;
-		}
-	}
-	
+	//
+	// CONTENT LEAF NAVIGATION METHODS
+	//
 	
 	protected DPContentLeaf getContentLeafToLeftFromChild(DPWidget child)
 	{
-		List<DPWidget> navList = horizontalNavigationList();
-		if ( navList != null )
+		BranchLayoutNode branchLayout = (BranchLayoutNode)getValidLayoutNodeOfClass( BranchLayoutNode.class );
+		if ( branchLayout != null )
 		{
-			int index = navList.indexOf( child );
-			if ( index != -1 )
-			{
-				for (int i = index - 1; i >= 0; i--)
-				{
-					DPWidget w = navList.get( i );
-					DPContentLeaf l = w.getRightContentLeaf();
-					if ( l != null )
-					{
-						return l;
-					}
-				}
-			}
-		}
-		
-		if ( parent != null )
-		{
-			return parent.getContentLeafToLeftFromChild( this );
+			return branchLayout.getContentLeafToLeftFromChild( child );
 		}
 		else
 		{
@@ -686,27 +527,10 @@ public abstract class DPContainer extends DPWidget
 	
 	protected DPContentLeaf getContentLeafToRightFromChild(DPWidget child)
 	{
-		List<DPWidget> navList = horizontalNavigationList();
-		if ( navList != null )
+		BranchLayoutNode branchLayout = (BranchLayoutNode)getValidLayoutNodeOfClass( BranchLayoutNode.class );
+		if ( branchLayout != null )
 		{
-			int index = navList.indexOf( child );
-			if ( index != -1 )
-			{
-				for (int i = index + 1; i < navList.size(); i++)
-				{
-					DPWidget w = navList.get( i );
-					DPContentLeaf l = w.getLeftContentLeaf();
-					if ( l != null )
-					{
-						return l;
-					}
-				}
-			}
-		}
-		
-		if ( parent != null )
-		{
-			return parent.getContentLeafToRightFromChild( this );
+			return branchLayout.getContentLeafToRightFromChild( child );
 		}
 		else
 		{
@@ -714,255 +538,18 @@ public abstract class DPContainer extends DPWidget
 		}
 	}
 	
-	protected DPContentLeaf getContentLeafAboveOrBelowFromChild(DPWidget child, boolean bBelow, Point2 localCursorPos, boolean bSkipWhitespace)
+	public DPContentLeaf getContentLeafAboveOrBelowFromChild(DPWidget child, boolean bBelow, Point2 localPos, boolean bSkipWhitespace)
 	{
-		List<DPWidget> navList = verticalNavigationList();
-		if ( navList != null )
+		BranchLayoutNode branchLayout = (BranchLayoutNode)getValidLayoutNodeOfClass( BranchLayoutNode.class );
+		if ( branchLayout != null )
 		{
-			int index = navList.indexOf( child );
-			if ( index != -1 )
-			{
-				Point2 cursorPosInRootSpace = getLocalPointRelativeToRoot( localCursorPos );
-				if ( bBelow )
-				{
-					for (int i = index + 1; i < navList.size(); i++)
-					{
-						DPWidget w = navList.get( i );
-						DPContentLeaf l = w.getTopOrBottomContentLeaf( false, cursorPosInRootSpace, bSkipWhitespace );
-						if ( l != null )
-						{
-							return l;
-						}
-					}
-				}
-				else
-				{
-					for (int i = index - 1; i >= 0; i--)
-					{
-						DPWidget w = navList.get( i );
-						DPContentLeaf l = w.getTopOrBottomContentLeaf( true, cursorPosInRootSpace, bSkipWhitespace );
-						if ( l != null )
-						{
-							return l;
-						}
-					}
-				}
-			}
-		}
-		
-		if ( parent != null )
-		{
-			return parent.getContentLeafAboveOrBelowFromChild( this, bBelow, getLocalPointRelativeToAncestor( parent, localCursorPos ), bSkipWhitespace );
+			return branchLayout.getContentLeafAboveOrBelowFromChild( this, bBelow, getLocalPointRelativeToAncestor( branchLayout.getElement(), localPos ), bSkipWhitespace );
 		}
 		else
 		{
 			return null;
 		}
 	}
-	
-	
-	
-	
-	protected DPWidget getLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
-	{
-		return getChildLeafClosestToLocalPoint( localPos, filter );
-	}
-
-	protected abstract DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter);
-	
-	protected DPWidget getLeafClosestToLocalPointFromChild(DPWidget child, Point2 localPos, WidgetFilter filter)
-	{
-		return child.getLeafClosestToLocalPoint( child.getParentToLocalXform().transform( localPos ), filter );
-	}
-	
-
-	
-	protected DPWidget getChildLeafClosestToLocalPointHorizontal(List<DPWidget> searchList, Point2 localPos, WidgetFilter filter)
-	{
-		if ( searchList.size() == 0 )
-		{
-			return null;
-		}
-		else if ( searchList.size() == 1 )
-		{
-			return getLeafClosestToLocalPointFromChild( searchList.get( 0 ), localPos, filter );
-		}
-		else
-		{
-			DPWidget start = null;
-			int startIndex = -1;
-			DPWidget childI = searchList.get( 0 );
-			for (int i = 0; i < searchList.size() - 1; i++)
-			{
-				DPWidget childJ = searchList.get( i + 1 );
-				double iUpperX = childI.getPositionInParentSpace().x + childI.getAllocationInParentSpace().x;
-				double jLowerX = childJ.getPositionInParentSpace().x;
-				
-				double midx = ( iUpperX + jLowerX ) * 0.5;
-				
-				if ( localPos.x < midx )
-				{
-					startIndex = i;
-					start = childI;
-					break;
-				}
-				
-				childI = childJ;
-			}
-			
-			if ( start == null )
-			{
-				startIndex = searchList.size() - 1;
-				start = searchList.get( startIndex );
-			}
-			
-			DPWidget c = getLeafClosestToLocalPointFromChild( start, localPos, filter );
-			if ( c != null )
-			{
-				return c;
-			}
-			else
-			{
-				DPWidget next = null;
-				DPWidget nextC = null;
-				for (int j = startIndex + 1; j < searchList.size(); j++)
-				{
-					nextC = getLeafClosestToLocalPointFromChild( searchList.get( j ), localPos, filter );
-					if ( nextC != null )
-					{
-						next = searchList.get( j );
-						break;
-					}
-				}
-
-				DPWidget prev = null;
-				DPWidget prevC = null;
-				for (int j = startIndex - 1; j >= 0; j--)
-				{
-					prevC = getLeafClosestToLocalPointFromChild( searchList.get( j ), localPos, filter );
-					if ( prevC != null )
-					{
-						prev = searchList.get( j );
-						break;
-					}
-				}
-				
-
-				if ( prev == null  &&  next == null )
-				{
-					return null;
-				}
-				else if ( prev == null  &&  next != null )
-				{
-					return nextC;
-				}
-				else if ( prev != null  &&  next == null )
-				{
-					return prevC;
-				}
-				else
-				{
-					double distToPrev = localPos.x - ( prev.getPositionInParentSpace().x + prev.getAllocationInParentSpace().x );
-					double distToNext = next.getPositionInParentSpace().x - localPos.x;
-					
-					return distToPrev > distToNext  ?  prevC  :  nextC;
-				}
-			}
-		}
-	}
-	
-	protected DPWidget getChildLeafClosestToLocalPointVertical(List<DPWidget> searchList, Point2 localPos, WidgetFilter filter)
-	{
-		if ( searchList.size() == 0 )
-		{
-			return null;
-		}
-		else if ( searchList.size() == 1 )
-		{
-			return getLeafClosestToLocalPointFromChild( searchList.get( 0 ), localPos, filter );
-		}
-		else
-		{
-			DPWidget start = null;
-			int startIndex = -1;
-			DPWidget childI = searchList.get( 0 );
-			for (int i = 0; i < searchList.size() - 1; i++)
-			{
-				DPWidget childJ = searchList.get( i + 1 );
-				double iUpperY = childI.getPositionInParentSpace().y + childI.getAllocationInParentSpace().y;
-				double jLowerY = childJ.getPositionInParentSpace().y;
-				
-				double midY = ( iUpperY + jLowerY ) * 0.5;
-				
-				if ( localPos.y < midY )
-				{
-					startIndex = i;
-					start = childI;
-					break;
-				}
-				
-				childI = childJ;
-			}
-			
-			if ( start == null )
-			{
-				startIndex = searchList.size() - 1;
-				start = searchList.get( startIndex );
-			}
-			
-			DPWidget c = getLeafClosestToLocalPointFromChild( start, localPos, filter );
-			if ( c != null )
-			{
-				return c;
-			}
-			else
-			{
-				DPWidget next = null;
-				for (int j = startIndex + 1; j < searchList.size(); j++)
-				{
-					next = getLeafClosestToLocalPointFromChild( searchList.get( j ), localPos, filter );
-					if ( next != null )
-					{
-						break;
-					}
-				}
-
-				DPWidget prev = null;
-				for (int j = startIndex - 1; j >= 0; j--)
-				{
-					prev = getLeafClosestToLocalPointFromChild( searchList.get( j ), localPos, filter );
-					if ( prev != null )
-					{
-						break;
-					}
-				}
-				
-				
-				if ( prev == null  &&  next == null )
-				{
-					return null;
-				}
-				else if ( prev == null  &&  next != null )
-				{
-					return next;
-				}
-				else if ( prev != null  &&  next == null )
-				{
-					return prev;
-				}
-				else
-				{
-					double distToPrev = localPos.y - ( prev.getPositionInParentSpace().y + prev.getAllocationInParentSpace().y );
-					double distToNext = next.getPositionInParentSpace().y - localPos.y;
-					
-					return distToPrev > distToNext  ?  prev  :  next;
-				}
-			}
-		}
-	}
-
-	
-	
 	
 	
 	//
@@ -1378,7 +965,7 @@ public abstract class DPContainer extends DPWidget
 	//
 	//
 	
-	protected ContainerStyleSheet getStyleSheet()
+	public ContainerStyleSheet getStyleSheet()
 	{
 		return (ContainerStyleSheet)styleSheet;
 	}

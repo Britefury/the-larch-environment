@@ -29,15 +29,15 @@ public class ParagraphLayout
 	
 	private static class BreakEntry
 	{
-		public LReqBox breakBox;
+		public LReqBoxInterface breakBox;
 		public int indexInChildList;
 		public double xAtBreak, xAfterBreak;
 		public IndentationEntry lineIndentation;
 		
 		
-		public BreakEntry(LReqBox breakBox, int indexInChildList, double xAtBreak, double xAfterBreak, IndentationEntry lineIndentation)
+		public BreakEntry(LReqBoxInterface child, int indexInChildList, double xAtBreak, double xAfterBreak, IndentationEntry lineIndentation)
 		{
-			this.breakBox = breakBox;
+			this.breakBox = child;
 			this.indexInChildList = indexInChildList;
 			this.xAtBreak = xAtBreak;
 			this.xAfterBreak = xAfterBreak;
@@ -50,14 +50,14 @@ public class ParagraphLayout
 	{
 		protected LReqBox lineReqBox;
 		protected LAllocBox lineAllocBox;
-		protected LReqBox children[];
-		protected LAllocBox childrenAlloc[];
+		protected LReqBoxInterface children[];
+		protected LAllocBoxInterface childrenAlloc[];
 		protected int childAllocationFlags[];
 		protected int startIndex, endIndex;
 		protected double lineIndentation;
 		
 		
-		private Line(LReqBox ch[], LAllocBox chAlloc[], int chAllocFlags[], double lineIndentation, double spacing, double allocation, int startIndex, int endIndex)
+		private Line(LReqBoxInterface ch[], LAllocBoxInterface chAlloc[], int chAllocFlags[], double lineIndentation, double spacing, double allocation, int startIndex, int endIndex)
 		{
 			children = ch;
 			childrenAlloc = chAlloc;
@@ -82,12 +82,12 @@ public class ParagraphLayout
 			return lineAllocBox;
 		}
 		
-		public LReqBox[] getChildBoxes()
+		public LReqBoxInterface[] getChildBoxes()
 		{
 			return children;
 		}
 		
-		public LAllocBox[] getChildAllocBoxes()
+		public LAllocBoxInterface[] getChildAllocBoxes()
 		{
 			return childrenAlloc;
 		}
@@ -113,9 +113,9 @@ public class ParagraphLayout
 			HorizontalLayout.computeRequisitionX( lineReqBox, children, spacing );
 			lineAllocBox.allocationX = allocation - lineIndentation;
 			HorizontalLayout.allocateX( lineReqBox, children, lineAllocBox, childrenAlloc, childAllocationFlags, spacing );
-			for (LAllocBox childAlloc: childrenAlloc)
+			for (LAllocBoxInterface childAlloc: childrenAlloc)
 			{
-				childAlloc.positionInParentSpaceX += lineIndentation;
+				childAlloc.setPositionInParentSpaceX( childAlloc.getPositionInParentSpaceX() + lineIndentation );
 			}
 		}
 		
@@ -123,9 +123,9 @@ public class ParagraphLayout
 		{
 			HorizontalLayout.allocateY( lineReqBox, children, lineAllocBox, childrenAlloc, childAllocationFlags );
 			
-			for (LAllocBox childAlloc: childrenAlloc)
+			for (LAllocBoxInterface childAlloc: childrenAlloc)
 			{
-				childAlloc.positionInParentSpaceY  +=  lineAllocBox.positionInParentSpaceY;
+				childAlloc.setPositionInParentSpaceY( childAlloc.getPositionInParentSpaceY() + lineAllocBox.positionInParentSpaceY );
 			}
 		}
 		
@@ -189,7 +189,7 @@ public class ParagraphLayout
 	
 	
 
-	public static void computeRequisitionX(LReqBox box, LReqBox children[], double indentation, double hSpacing)
+	public static void computeRequisitionX(LReqBox box, LReqBoxInterface children[], double indentation, double hSpacing)
 	{
 		// Accumulate the width required for all the children
 		
@@ -206,10 +206,10 @@ public class ParagraphLayout
 		double minX = 0.0, lineX = 0.0, prefX = 0.0;
 		for (int i = 0; i < children.length; i++)
 		{
-			LReqBox child = children[i];
+			LReqBoxInterface child = children[i];
 			
-			prefWidth = prefX + child.prefWidth;
-			prefAdvance = prefX + child.prefHAdvance;
+			prefWidth = prefX + child.getPrefWidth();
+			prefAdvance = prefX + child.getPrefHAdvance();
 			prefX = prefAdvance + hSpacing;
 			
 		
@@ -226,8 +226,8 @@ public class ParagraphLayout
 			}
 			else
 			{
-				lineWidth = lineX + child.minWidth;
-				lineAdvance = lineX + child.minHAdvance;
+				lineWidth = lineX + child.getMinWidth();
+				lineAdvance = lineX + child.getMinHAdvance();
 				lineX = lineAdvance + hSpacing;
 			}
 		}
@@ -265,7 +265,7 @@ public class ParagraphLayout
 
 
 
-	public static Line[] allocateX(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], int childAllocationFlags[], double indentation, double spacing)
+	public static Line[] allocateX(LReqBox box, LReqBoxInterface children[], LAllocBox allocBox, LAllocBoxInterface childrenAlloc[], int childAllocationFlags[], double indentation, double spacing)
 	{
 		// The paragraph-flow algorithm works as follows:
 		// Children are positioned left-to-right, sequentially. Their positions are accumulated.
@@ -303,7 +303,7 @@ public class ParagraphLayout
 		
 		for (int i = 0; i < children.length; i++)
 		{
-			LReqBox child = children[i];
+			LReqBoxInterface child = children[i];
 			
 			if ( child.isParagraphIndentMarker() )
 			{
@@ -321,15 +321,15 @@ public class ParagraphLayout
 			double lineXAtChildStart = lineX;
 			
 			// Accumulate width, advance, and x
-			lineWidth = lineX + child.prefWidth;
-			lineAdvance = lineX + child.prefHAdvance;
+			lineWidth = lineX + child.getPrefWidth();
+			lineAdvance = lineX + child.getPrefHAdvance();
 			lineX = lineAdvance + spacing;
 			
 			// Keep track of the best and most recent line break boxes
 			if ( child.isLineBreak() )
 			{
 				BreakEntry entry = new BreakEntry( child, i, lineXAtChildStart, lineX, indentationStack.lastElement() );
-				if ( bestLineBreak == null  ||  child.lineBreakCost <= bestLineBreak.breakBox.lineBreakCost )
+				if ( bestLineBreak == null  ||  child.getLineBreakCost() <= bestLineBreak.breakBox.getLineBreakCost() )
 				{
 					bestLineBreak = entry;
 					bestLineBreakEntryIndex = lineBreaks.size();
@@ -365,7 +365,7 @@ public class ParagraphLayout
 							break;
 						}
 						
-						if ( newBestBreakEntry == null  ||  entry.breakBox.lineBreakCost <= newBestBreakEntry.breakBox.lineBreakCost )
+						if ( newBestBreakEntry == null  ||  entry.breakBox.getLineBreakCost() <= newBestBreakEntry.breakBox.getLineBreakCost() )
 						{
 							newBestBreakEntry = entry;
 							newBestBreakEntryIndex = j;
@@ -399,8 +399,8 @@ public class ParagraphLayout
 				
 				// Build a list of child boxes for the line
 				int lineLength = lineBreakIndex - lineStartIndex;
-				LReqBox lineChildren[] = new LReqBox[lineLength];
-				LAllocBox lineChildrenAlloc[] = new LAllocBox[lineLength];
+				LReqBoxInterface lineChildren[] = new LReqBoxInterface[lineLength];
+				LAllocBoxInterface lineChildrenAlloc[] = new LAllocBoxInterface[lineLength];
 				int lineChildAllocFlags[] = new int[lineLength];
 				System.arraycopy( children, lineStartIndex, lineChildren, 0, lineLength );
 				System.arraycopy( childrenAlloc, lineStartIndex, lineChildrenAlloc, 0, lineLength );
@@ -457,7 +457,7 @@ public class ParagraphLayout
 						breakIndentation.indentation += nextLineIndentation;
 					}
 					
-					if ( bestLineBreak == null  ||  entry.breakBox.lineBreakCost <= bestLineBreak.breakBox.lineBreakCost )
+					if ( bestLineBreak == null  ||  entry.breakBox.getLineBreakCost() <= bestLineBreak.breakBox.getLineBreakCost() )
 					{
 						// Found a better line break
 						bestLineBreak = entry;
@@ -474,8 +474,8 @@ public class ParagraphLayout
 		{
 			// Create the last line
 			int lineLength = children.length - lineStartIndex;
-			LReqBox lineChildren[] = new LReqBox[lineLength];
-			LAllocBox lineChildrenAlloc[] = new LAllocBox[lineLength];
+			LReqBoxInterface lineChildren[] = new LReqBoxInterface[lineLength];
+			LAllocBoxInterface lineChildrenAlloc[] = new LAllocBoxInterface[lineLength];
 			int lineChildAllocFlags[] = new int[lineLength];
 			System.arraycopy( children, lineStartIndex, lineChildren, 0, lineLength );
 			System.arraycopy( childrenAlloc, lineStartIndex, lineChildrenAlloc, 0, lineLength );

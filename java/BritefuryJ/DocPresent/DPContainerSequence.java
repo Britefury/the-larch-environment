@@ -13,9 +13,7 @@ import java.util.List;
 
 import org.python.core.PySlice;
 
-import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LAllocV;
-import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.JythonInterface.JythonIndex;
@@ -341,92 +339,6 @@ abstract public class DPContainerSequence extends DPContainer
 
 
 
-	protected LReqBox[] getChildrenRefreshedRequistionXBoxes(List<DPWidget> nodes)
-	{
-		LReqBox[] boxes = new LReqBox[nodes.size()];
-		for (int i = 0; i < nodes.size(); i++)
-		{
-			boxes[i] = nodes.get( i ).refreshRequisitionX();
-		}
-		return boxes;
-	}
-
-	protected LReqBox[] getChildrenRefreshedRequistionXBoxes()
-	{
-		return getChildrenRefreshedRequistionXBoxes( registeredChildren );
-	}
-
-
-	protected LReqBox[] getChildrenRefreshedRequistionYBoxes(List<DPWidget> nodes)
-	{
-		LReqBox[] boxes = new LReqBox[nodes.size()];
-		for (int i = 0; i < nodes.size(); i++)
-		{
-			boxes[i] = nodes.get( i ).refreshRequisitionY();
-		}
-		return boxes;
-	}
-
-	protected LReqBox[] getChildrenRefreshedRequistionYBoxes()
-	{
-		return getChildrenRefreshedRequistionYBoxes( registeredChildren );
-	}
-	
-	
-	
-	
-	protected LReqBox[] getChildrenRequisitionBoxes(List<DPWidget> nodes)
-	{
-		LReqBox[] boxes = new LReqBox[nodes.size()];
-		for (int i = 0; i < nodes.size(); i++)
-		{
-			boxes[i] = nodes.get( i ).layoutReqBox;
-		}
-		return boxes;
-	}
-
-	protected LReqBox[] getChildrenRequisitionBoxes()
-	{
-		return getChildrenRequisitionBoxes( registeredChildren );
-	}
-	
-	
-	
-	protected LAllocBox[] getChildrenAllocationBoxes(List<DPWidget> nodes)
-	{
-		LAllocBox[] boxes = new LAllocBox[nodes.size()];
-		for (int i = 0; i < nodes.size(); i++)
-		{
-			boxes[i] = nodes.get( i ).layoutAllocBox;
-		}
-		return boxes;
-	}
-
-	protected LAllocBox[] getChildrenAllocationBoxes()
-	{
-		return getChildrenAllocationBoxes( registeredChildren );
-	}
-	
-	
-	
-	protected int[] getChildrenAlignmentFlags(List<DPWidget> nodes)
-	{
-		int alignmentFlags[] = new int[nodes.size()];
-		for (int i = 0; i < nodes.size(); i++)
-		{
-			alignmentFlags[i] = nodes.get( i ).getAlignmentFlags();
-		}
-		return alignmentFlags;
-	}
-
-	protected int[] getChildrenAlignmentFlags()
-	{
-		return getChildrenAlignmentFlags( registeredChildren );
-	}
-	
-	
-	
-	
 	@SuppressWarnings("unchecked")
 	protected <T extends PackingParams> T[] getChildrenPackingParams(List<DPWidget> nodes, T packingParams[])
 	{

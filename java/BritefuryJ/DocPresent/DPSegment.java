@@ -12,7 +12,7 @@ import java.util.List;
 import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 
-public class DPSegment extends DPContainerCollateable
+public class DPSegment extends DPContainer
 {
 	//
 	// Utility classes

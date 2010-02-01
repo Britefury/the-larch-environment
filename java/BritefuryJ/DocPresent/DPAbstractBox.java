@@ -12,7 +12,7 @@ import BritefuryJ.DocPresent.StyleSheets.AbstractBoxStyleSheet;
 
 
 
-abstract public class DPAbstractBox extends DPContainerSequenceCollationRoot
+abstract public class DPAbstractBox extends DPContainerSequence
 {
 	public static class CouldNotFindInsertionPointException extends RuntimeException
 	{

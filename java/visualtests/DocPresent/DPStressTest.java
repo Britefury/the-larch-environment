@@ -48,6 +48,7 @@ public class DPStressTest
 	// [6] Element tree functionality			A			10240	65.0MB				41.1MB				0.7MB				0.584s					0.496s
 	// [7] Minor optimisations				A			10240	64.4MB				38.7MB				0.9MB				0.600s					0.523s
 	// [8] Pointer refactor				A			10240	63.4MB				39.4MB				1.0MB				0.602s					0.321s
+	// [9] As of 2010-01-30				B			10240	86.6MB				42.5MB				1.9MB				0.505s					0.332s
 	//
 	//
 	// States:
@@ -59,12 +60,19 @@ public class DPStressTest
 	// [6] All ElementTree functionality merged into document presentation system
 	// [7] Minor optimisations - pointer containment (pointer within bounds of element) moved to root (DPPresentationArea)
 	// [8] Pointer refactor - moved all pointer containment state out of the widget tree and into the input system
+	// [9] As of 2010-01-30; no significant changes, different platform
 	//
 	// Platform A:
 	//	CPU: Intel Core Duo 1.86GHz
 	//	RAM: 2GB
 	//	OS: WinXP 32-bit
 	//	JVM: 1.6.0_14 32-bit
+	//
+	// Platform B:
+	//	CPU: Intel Core Duo 1.86GHz
+	//	RAM: 2GB
+	//	OS: Windows 7 32-bit
+	//	JVM: 1.6.0_18 32-bit
 	
 	private static int NUMLINES = 10240;
 	

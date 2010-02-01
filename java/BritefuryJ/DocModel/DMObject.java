@@ -159,7 +159,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	public DMObject(DMObjectInterface obj)
 	{
 		incr = new IncrementalValue( this );
-		this.objClass = obj.getDMClass();
+		this.objClass = obj.getDMObjectClass();
 		fieldData = new Object[objClass.getNumFields()];
 		
 		for (int i = 0; i < fieldData.length; i++)
@@ -317,7 +317,12 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	
 
 	
-	public DMObjectClass getDMClass()
+	public DMNodeClass getDMNodeClass()
+	{
+		return getDMObjectClass();
+	}
+
+	public DMObjectClass getDMObjectClass()
 	{
 		// Get the cell value, so that the access is tracked
 		onAccess();
@@ -594,7 +599,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			// Get the cell value, so that the access is tracked
 			onAccess();
 			DMObjectInterface dx = (DMObjectInterface)x;
-			if ( dx.getDMClass() == objClass )
+			if ( dx.getDMObjectClass() == objClass )
 			{
 				for (int i = 0; i < objClass.getNumFields(); i++)
 				{

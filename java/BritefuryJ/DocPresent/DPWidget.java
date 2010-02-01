@@ -29,11 +29,11 @@ import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.Layout.ElementAlignment;
 import BritefuryJ.DocPresent.Layout.HAlignment;
-import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LAllocV;
-import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.Layout.VAlignment;
+import BritefuryJ.DocPresent.LayoutTree.ArrangedSequenceLayoutNode;
+import BritefuryJ.DocPresent.LayoutTree.LayoutNode;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StructuralRepresentation.StructuralRepresentation;
 import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValue;
@@ -68,6 +68,12 @@ abstract public class DPWidget extends PointerInputElement
 	//
 	
 	public static class IsNotInSubtreeException extends RuntimeException
+	{
+		static final long serialVersionUID = 0L;
+	}
+	
+	
+	public static class ChildHasNoLayoutException extends RuntimeException
 	{
 		static final long serialVersionUID = 0L;
 	}
@@ -176,24 +182,25 @@ abstract public class DPWidget extends PointerInputElement
 	
 	protected int flags;
 	
-	protected WidgetStyleSheet styleSheet;
+	protected WidgetStyleSheet styleSheet;									// Not needed for all elements; consider factoring out
 	protected DPContainer parent;
 	protected DPPresentationArea presentationArea;
-	protected LReqBox layoutReqBox;
-	protected LAllocBox layoutAllocBox;
-	protected PackingParams parentPacking;
 	
-	protected DndHandler dndHandler;
+	protected LayoutNode layoutNode;
+
+	protected PackingParams parentPacking;									// Consider moving this into the Table container, as it is only used in this one instance.
+	
+	protected DndHandler dndHandler;										// Move this and the next two into an 'interactor' element
 	
 	protected ElementLinearRepresentationListener linearRepresentationListener;
 	protected ElementKeyboardListener keyboardListener;
 	
-	protected ElementContext context;
+	protected ElementContext context;										// Factor out into 'waypoint' element, have other elements delegate responsibility to parents
 
 	protected DPWidget metaElement;
-	protected String debugName;
+	protected String debugName;											// Move into 'waypoint' element; only used there 
 	
-	protected StructuralRepresentation structuralRepresentation;
+	protected StructuralRepresentation structuralRepresentation;					// Move into 'waypoint' element
 	
 	
 	
@@ -235,8 +242,6 @@ abstract public class DPWidget extends PointerInputElement
 	{
 		flags = 0;
 		this.styleSheet = styleSheet;
-		layoutReqBox = new LReqBox();
-		layoutAllocBox = new LAllocBox( this );
 		parentPacking = null;
 		this.context = context;
 	}
@@ -353,7 +358,7 @@ abstract public class DPWidget extends PointerInputElement
 	}
 	
 	
-	protected int getAlignmentFlags()
+	public int getAlignmentFlags()
 	{
 		return ( flags & _ALIGN_MASK )  >>  _ALIGN_SHIFT;
 	}
@@ -418,52 +423,52 @@ abstract public class DPWidget extends PointerInputElement
 	
 	public Point2 getPositionInParentSpace()
 	{
-		return layoutAllocBox.getPositionInParentSpace();
+		return layoutNode != null  ?  layoutNode.getPositionInParentSpace()  :  new Point2();
 	}
 	
 	public double getPositionInParentSpaceX()
 	{
-		return layoutAllocBox.getPositionInParentSpaceX();
+		return layoutNode != null  ?  layoutNode.getPositionInParentSpaceX()  :  0.0;
 	}
 	
 	public double getPositionInParentSpaceY()
 	{
-		return layoutAllocBox.getPositionInParentSpaceY();
+		return layoutNode != null  ?  layoutNode.getPositionInParentSpaceY()  :  0.0;
 	}
 	
 	public double getAllocationX()
 	{
-		return layoutAllocBox.getAllocationX();
+		return layoutNode != null  ?  layoutNode.getAllocationX()  :  parent.getAllocationX();
 	}
 	
 	public double getAllocationY()
 	{
-		return layoutAllocBox.getAllocationY();
+		return layoutNode != null  ?  layoutNode.getAllocationY()  :  parent.getAllocationY();
 	}
 	
 	public LAllocV getAllocV()
 	{
-		return layoutAllocBox.getAllocV();
+		return layoutNode != null  ?  layoutNode.getAllocV()  :  parent.getAllocV();
 	}
 	
 	public Vector2 getAllocation()
 	{
-		return layoutAllocBox.getAllocation();
+		return layoutNode != null  ?  layoutNode.getAllocation()  :  parent.getAllocation();
 	}
 	
 	public double getAllocationInParentSpaceX()
 	{
-		return layoutAllocBox.getAllocationX()  *  getScale();
+		return layoutNode != null  ?  layoutNode.getAllocationInParentSpaceX()  :  parent.getAllocationInParentSpaceX();
 	}
 	
 	public double getAllocationInParentSpaceY()
 	{
-		return layoutAllocBox.getAllocationY()  *  getScale();
+		return layoutNode != null  ?  layoutNode.getAllocationInParentSpaceY()  :  parent.getAllocationInParentSpaceY();
 	}
 	
 	public Vector2 getAllocationInParentSpace()
 	{
-		return layoutAllocBox.getAllocation().mul( getScale() );
+		return layoutNode != null  ?  layoutNode.getAllocationInParentSpace()  :  parent.getAllocationInParentSpace();
 	}
 	
 	
@@ -478,7 +483,7 @@ abstract public class DPWidget extends PointerInputElement
 	}
 
 	
-	protected double getScale()
+	public double getScale()
 	{
 		return parent != null  ?  parent.getInternalChildScale( this )  :  1.0;
 	}
@@ -679,12 +684,12 @@ abstract public class DPWidget extends PointerInputElement
 	//
 	//
 	
-	protected boolean isResizeQueued()
+	public boolean isResizeQueued()
 	{
 		return testFlag( FLAG_RESIZE_QUEUED );
 	}
 	
-	protected boolean isSizeUpToDate()
+	public boolean isSizeUpToDate()
 	{
 		return testFlag( FLAG_SIZE_UP_TO_DATE );
 	}
@@ -729,23 +734,23 @@ abstract public class DPWidget extends PointerInputElement
 	}
 	
 	
-	protected void clearFlagResizeQueued()
+	public void clearFlagResizeQueued()
 	{
 		clearFlag( FLAG_RESIZE_QUEUED );
 	}
 	
-	protected void setFlagResizeQueued()
+	public void setFlagResizeQueued()
 	{
 		setFlag( FLAG_RESIZE_QUEUED );
 	}
 	
 	
-	protected void clearFlagSizeUpToDate()
+	public void clearFlagSizeUpToDate()
 	{
 		clearFlag( FLAG_SIZE_UP_TO_DATE );
 	}
 	
-	protected void setFlagSizeUpToDate()
+	public void setFlagSizeUpToDate()
 	{
 		setFlag( FLAG_SIZE_UP_TO_DATE );
 	}
@@ -1137,32 +1142,14 @@ abstract public class DPWidget extends PointerInputElement
 		graphics.clip( new Rectangle2D.Double( 0.0, 0.0, getAllocationX(), getAllocationY() ) );
 	}
 
-	protected void clipIfAllocationInsufficient(Graphics2D graphics)
-	{
-		if ( getAllocationX()  <  layoutReqBox.getMinWidth()  ||  getAllocationY()  <  layoutReqBox.getReqHeight() )
-		{
-			clip( graphics );
-		}
-	}
-	
-	
-	protected void handleQueueResize()
-	{
-		if ( !isResizeQueued() )
-		{
-			if ( parent != null )
-			{
-				parent.queueResize();
-			}
-			setFlagResizeQueued();
-		}
-	}
-	
 	
 	protected void queueResize()
 	{
-		handleQueueResize();
-		clearFlagSizeUpToDate();
+		LayoutNode layout = getValidLayoutNode();
+		if ( layout != null )
+		{
+			layout.queueResize();
+		}
 	}
 	
 	
@@ -1375,79 +1362,62 @@ abstract public class DPWidget extends PointerInputElement
 	//
 	
 	
-	abstract protected void updateRequisitionX();
-	abstract protected void updateRequisitionY();
-
-	
-	protected void updateAllocationX()
+	public LayoutNode getLayoutNode()
 	{
+		return layoutNode;
 	}
 	
-	protected void updateAllocationY()
+	public LayoutNode getValidLayoutNode()
 	{
-	}
-	
-	
-	
-	protected LReqBox refreshRequisitionX()
-	{
-		if ( !isSizeUpToDate() )
+		if ( layoutNode != null )
 		{
-			updateRequisitionX();
+			return layoutNode;
 		}
-		return layoutReqBox;
-	}
-	
-	protected LReqBox refreshRequisitionY()
-	{
-		if ( !isSizeUpToDate() )
+		else
 		{
-			updateRequisitionY();
-		}
-		return layoutReqBox;
-	}
-	
-	
-	protected void refreshAllocationX(double prevWidth)
-	{
-		if ( !isSizeUpToDate()  ||  layoutAllocBox.getAllocationX() != prevWidth )
-		{
-			updateAllocationX();
-			clearFlagSizeUpToDate();
+			DPContainer c = parent;
+			while ( c != null  )
+			{
+				if ( c.layoutNode != null )
+				{
+					return c.layoutNode;
+				}
+				c = c.getParent();
+			}
+			
+			return null;
 		}
 	}
 	
-	protected void refreshAllocationY(LAllocV prevHeight)
+	public LayoutNode getValidLayoutNodeOfClass(Class<? extends LayoutNode> layoutNodeClass)
 	{
-		if ( !isSizeUpToDate()  ||  !layoutAllocBox.getAllocV().equals( prevHeight ) )
+		if ( layoutNode != null )
 		{
-			updateAllocationY();
+			return layoutNode;
 		}
-		onSizeRefreshed();
+		else
+		{
+			DPContainer c = parent;
+			while ( c != null  )
+			{
+				if ( c.layoutNode != null )
+				{
+					if ( layoutNodeClass.isInstance( c.layoutNode ) )
+					{
+						return c.layoutNode;
+					}
+				}
+				c = c.getParent();
+			}
+			
+			return null;
+		}
 	}
 	
 	
-	protected void onAllocationXRefreshed()
-	{
-		clearFlagSizeUpToDate();
-	}
 	
-	protected void onAllocationYRefreshed()
-	{
-		onSizeRefreshed();
-	}
 	
 
-	protected void onSizeRefreshed()
-	{
-		clearFlagResizeQueued();
-		setFlagSizeUpToDate();
-		if ( parent != null )
-		{
-			parent.onChildSizeRefreshed();
-		}
-	}
-	
 	
 	
 	//
@@ -1461,12 +1431,46 @@ abstract public class DPWidget extends PointerInputElement
 	
 	protected List<DPWidget> horizontalNavigationList()
 	{
-		return null;
+		if ( layoutNode != null )
+		{
+			return layoutNode.horizontalNavigationList();
+		}
+		else
+		{
+			DPContainer p = parent;
+			while ( p != null )
+			{
+				LayoutNode parentLayoutNode = p.getLayoutNode();
+				if ( parentLayoutNode != null )
+				{
+					return parentLayoutNode.horizontalNavigationList();
+				}
+				p = p.getParent();
+			}
+			return null;
+		}
 	}
 	
 	protected List<DPWidget> verticalNavigationList()
 	{
-		return null;
+		if ( layoutNode != null )
+		{
+			return layoutNode.verticalNavigationList();
+		}
+		else
+		{
+			DPContainer p = parent;
+			while ( p != null )
+			{
+				LayoutNode parentLayoutNode = p.getLayoutNode();
+				if ( parentLayoutNode != null )
+				{
+					return parentLayoutNode.verticalNavigationList();
+				}
+				p = p.getParent();
+			}
+			return null;
+		}
 	}
 	
 	protected Point2 getMarkerPosition(Marker marker)
@@ -1485,46 +1489,87 @@ abstract public class DPWidget extends PointerInputElement
 	
 	public DPContentLeaf getLeftContentLeaf()
 	{
-		return null;
+		if ( layoutNode != null )
+		{
+			return layoutNode.getLeftContentLeaf();
+		}
+		else
+		{
+			ArrangedSequenceLayoutNode branchLayout = (ArrangedSequenceLayoutNode)getValidLayoutNodeOfClass( ArrangedSequenceLayoutNode.class );
+			return branchLayout.getLeftContentLeafWithinElement( this );
+		}
 	}
 	
 	public DPContentLeaf getRightContentLeaf()
 	{
-		return null;
+		if ( layoutNode != null )
+		{
+			return layoutNode.getRightContentLeaf();
+		}
+		else
+		{
+			ArrangedSequenceLayoutNode branchLayout = (ArrangedSequenceLayoutNode)getValidLayoutNodeOfClass( ArrangedSequenceLayoutNode.class );
+			return branchLayout.getRightContentLeafWithinElement( this );
+		}
 	}
 	
 	public DPContentLeaf getContentLeafToLeft()
 	{
-		if ( parent != null )
+		if ( layoutNode != null )
 		{
-			return parent.getContentLeafToLeftFromChild( this );
+			return layoutNode.getContentLeafToLeft();
 		}
 		else
 		{
-			return null;
+			ArrangedSequenceLayoutNode branchLayout = (ArrangedSequenceLayoutNode)getValidLayoutNodeOfClass( ArrangedSequenceLayoutNode.class );
+			return branchLayout.getContentLeafToLeftOfElement( this );
 		}
 	}
 	
 	public DPContentLeaf getContentLeafToRight()
 	{
-		if ( parent != null )
+		if ( layoutNode != null )
 		{
-			return parent.getContentLeafToRightFromChild( this );
+			return layoutNode.getContentLeafToRight();
 		}
 		else
 		{
-			return null;
+			ArrangedSequenceLayoutNode branchLayout = (ArrangedSequenceLayoutNode)getValidLayoutNodeOfClass( ArrangedSequenceLayoutNode.class );
+			return branchLayout.getContentLeafToRightOfElement( this );
 		}
 	}
 	
-	protected DPContentLeaf getTopOrBottomContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace, boolean bSkipWhitespace)
+	public DPContentLeaf getTopOrBottomContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace, boolean bSkipWhitespace)
 	{
-		return null;
+		if ( layoutNode != null )
+		{
+			return layoutNode.getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace, bSkipWhitespace );
+		}
+		else
+		{
+			ArrangedSequenceLayoutNode branchLayout = (ArrangedSequenceLayoutNode)getValidLayoutNodeOfClass( ArrangedSequenceLayoutNode.class );
+			return branchLayout.getTopOrBottomContentLeafWithinElement( this, bBottom, cursorPosInRootSpace, bSkipWhitespace );
+		}
 	}
 
 
 
-	protected abstract DPWidget getLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter);
+	protected DPWidget getLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
+	{
+		if ( layoutNode != null )
+		{
+			return layoutNode.getLeafClosestToLocalPoint( localPos, filter );
+		}
+		else
+		{
+			ArrangedSequenceLayoutNode branchLayout = (ArrangedSequenceLayoutNode)getValidLayoutNodeOfClass( ArrangedSequenceLayoutNode.class );
+			return branchLayout.getLeafClosestToLocalPointWithinElement( this, localPos, filter );
+		}
+	}
+
+
+	
+	
 	
 	
 	
@@ -2218,7 +2263,19 @@ abstract public class DPWidget extends PointerInputElement
 	{
 		this.debugName = debugName;
 	}
+	
+	public String getDebugName()
+	{
+		return debugName;
+	}
 
+	
+	
+	
+	public WidgetStyleSheet getStyleSheet()
+	{
+		return styleSheet;
+	}
 	
 	
 	

@@ -6,22 +6,13 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import java.util.Arrays;
-import java.util.List;
-
-import BritefuryJ.DocPresent.Layout.GridLayout;
-import BritefuryJ.DocPresent.Layout.LAllocBox;
-import BritefuryJ.DocPresent.Layout.LAllocV;
-import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.PackingParams;
+import BritefuryJ.DocPresent.LayoutTree.LayoutNodeGridRow;
+import BritefuryJ.DocPresent.LayoutTree.LayoutNodeRGrid;
 import BritefuryJ.DocPresent.StyleSheets.TableStyleSheet;
-import BritefuryJ.Math.AABox2;
-import BritefuryJ.Math.Point2;
 
-public class DPRGrid extends DPContainerSequenceCollationRoot
+public class DPRGrid extends DPContainerSequence
 {
-	private LReqBox columnBoxes[], rowBoxes[];
-	private LAllocBox columnAllocBoxes[], rowAllocBoxes[];
 	private int numColumns;
 
 	
@@ -34,6 +25,8 @@ public class DPRGrid extends DPContainerSequenceCollationRoot
 	public DPRGrid(ElementContext context, TableStyleSheet syleSheet)
 	{
 		super( context, syleSheet );
+		
+		layoutNode = new LayoutNodeRGrid( this );
 	}
 	
 	
@@ -41,12 +34,14 @@ public class DPRGrid extends DPContainerSequenceCollationRoot
 	private void refreshSize()
 	{
 		numColumns = 0;
-		for (DPWidget child: collationLeaves)
+		LayoutNodeRGrid gridLayout = (LayoutNodeRGrid)getLayoutNode();
+		for (DPWidget child: gridLayout.getLeaves())
 		{
 			if ( child instanceof DPGridRow )
 			{
 				DPGridRow row = (DPGridRow)child;
-				numColumns = Math.max( numColumns, row.getCollatedChildren().size() );
+				LayoutNodeGridRow rowLayout = (LayoutNodeGridRow)row.getLayoutNode();
+				numColumns = Math.max( numColumns, rowLayout.getLeaves().size() );
 			}
 			else
 			{
@@ -56,185 +51,14 @@ public class DPRGrid extends DPContainerSequenceCollationRoot
 	}
 	
 	
-	protected void updateRequisitionX()
-	{
-		refreshCollation();
-		
-		refreshSize();
-		
-		int numRows = collationLeaves.length;
-		LReqBox childBoxes[][] = new LReqBox[numRows][];
-		for (int i = 0; i < collationLeaves.length; i++)
-		{
-			DPWidget child = collationLeaves[i];
-			if ( child instanceof DPGridRow )
-			{
-				DPGridRow row = (DPGridRow)child;
-				childBoxes[i] = row.getCollatedChildrenRefreshedRequisitonXBoxes();
-			}
-			else
-			{
-				childBoxes[i] = new LReqBox[] { child.refreshRequisitionX() };
-			}
-		}
-		
-		columnBoxes = GridLayout.computeRequisitionX( layoutReqBox, childBoxes, numColumns, numRows, getColumnSpacing(), getRowSpacing() );
-
-		// Copy the X-requisition to the child rows
-		for (int i = 0; i < collationLeaves.length; i++)
-		{
-			DPWidget child = collationLeaves[i];
-			if ( child instanceof DPGridRow )
-			{
-				DPGridRow row = (DPGridRow)child;
-				row.layoutReqBox.setRequisitionX( layoutReqBox );
-			}
-		}
-
-		columnAllocBoxes = new LAllocBox[columnBoxes.length];
-		for (int i = 0; i < columnAllocBoxes.length; i++)
-		{
-			columnAllocBoxes[i] = new LAllocBox( null );
-		}
-	}
-
-	protected void updateRequisitionY()
+	public int width()
 	{
 		refreshSize();
-		
-		rowBoxes = getCollatedChildrenRefreshedRequistionYBoxes();
-		
-		GridLayout.computeRequisitionY( layoutReqBox, rowBoxes, getRowSpacing() );
-
-		rowAllocBoxes = new LAllocBox[rowBoxes.length];
-		for (int i = 0; i < rowAllocBoxes.length; i++)
-		{
-			rowAllocBoxes[i] = collationLeaves[i].layoutAllocBox;
-		}
-	}
-
-	
-
-	
-	
-	protected void updateAllocationX()
-	{
-		super.updateAllocationX();
-		
-		refreshSize();
-		
-		int numRows = collationLeaves.length;
-		LReqBox childBoxes[][] = new LReqBox[numRows][];
-		LAllocBox childAllocBoxes[][] = new LAllocBox[numRows][];
-		double prevWidths[][] = new double[numRows][];
-		int childAlignmentFlags[][] = new int[numRows][];
-		for (int i = 0; i < collationLeaves.length; i++)
-		{
-			DPWidget child = collationLeaves[i];
-			if ( child instanceof DPGridRow )
-			{
-				DPGridRow row = (DPGridRow)child;
-				childBoxes[i] = row.getCollatedChildrenRequisitionBoxes();
-				childAllocBoxes[i] = row.getCollatedChildrenAllocationBoxes();
-				prevWidths[i] = row.getCollatedChildrenAllocationX();
-				childAlignmentFlags[i] = row.getCollatedChildrenAlignmentFlags();
-				// Copy grid x-allocation to row x-allocation
-				row.layoutAllocBox.allocateX( layoutAllocBox );
-			}
-			else
-			{
-				childBoxes[i] = new LReqBox[] { child.layoutReqBox };
-				childAllocBoxes[i] = new LAllocBox[] { child.layoutAllocBox };
-				prevWidths[i] = new double[] { child.getAllocationX() };
-				childAlignmentFlags[i] = new int[] { child.getAlignmentFlags() };
-			}
-		}
-
-		GridLayout.allocateX( layoutReqBox, columnBoxes, childBoxes, layoutAllocBox, columnAllocBoxes, childAllocBoxes, childAlignmentFlags, numColumns, numRows,
-				getColumnSpacing(), getRowSpacing(), getColumnExpand(), getRowExpand() );
-		
-		for (int r = 0; r < collationLeaves.length; r++)
-		{
-			double rowPrevWidths[] = prevWidths[r];
-
-			DPWidget child = collationLeaves[r];
-			if ( child instanceof DPGridRow )
-			{
-				DPGridRow row = (DPGridRow)child;
-				
-				child.onAllocationXRefreshed();
-				for (int c = 0; c < row.collationLeaves.length; c++)
-				{
-					row.collationLeaves[c].refreshAllocationX( rowPrevWidths[c] );
-				}
-			}
-			else
-			{
-				child.refreshAllocationX( rowPrevWidths[0] );
-			}
-		}
-	}
-
-	protected void updateAllocationY()
-	{
-		super.updateAllocationY( );
-		
-		refreshSize();
-		
-		LReqBox childBoxes[] = getCollatedChildrenRequisitionBoxes();
-		LAllocBox childAllocBoxes[] = getCollatedChildrenAllocationBoxes();
-		LAllocV prevAllocVs[] = getCollatedChildrenAllocV();
-		
-		GridLayout.allocateY( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, getRowSpacing(), getRowExpand() );
-		
-		int i = 0;
-		for (DPWidget child: collationLeaves)
-		{
-			child.refreshAllocationY( prevAllocVs[i] );
-			i++;
-		}
-		
-		columnBoxes = rowBoxes = null;
-		columnAllocBoxes = rowAllocBoxes = null;
+		return numColumns;
 	}
 	
 	
 	
-	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
-	{
-		return getChildLeafClosestToLocalPointVertical( Arrays.asList( collationLeaves ), localPos, filter );
-	}
-
-
-	
-	
-	protected AABox2[] computeCollatedBranchBoundsBoxes(DPContainer collatedBranch, int rangeStart, int rangeEnd)
-	{
-		refreshCollation();
-		
-		DPWidget startLeaf = collationLeaves[rangeStart];
-		DPWidget endLeaf = collationLeaves[rangeEnd-1];
-		double yStart = startLeaf.getPositionInParentSpaceY();
-		double yEnd = endLeaf.getPositionInParentSpaceY()  +  endLeaf.getAllocationInParentSpaceY();
-		AABox2 box = new AABox2( 0.0, yStart, getAllocationX(), yEnd );
-		return new AABox2[] { box };
-	}
-
-	
-	
-	//
-	// Focus navigation methods
-	//
-	
-	protected List<DPWidget> horizontalNavigationList()
-	{
-		return getCollatedChildren();
-	}
-	
-	protected List<DPWidget> verticalNavigationList()
-	{
-		return getCollatedChildren();
-	}
 
 
 

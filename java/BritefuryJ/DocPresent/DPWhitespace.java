@@ -12,6 +12,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
 import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.LayoutTree.LayoutNodeWhitespace;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.ContentLeafStyleSheet;
 import BritefuryJ.Math.Point2;
@@ -40,6 +41,15 @@ public class DPWhitespace extends DPContentLeafEditable
 	{
 		super( context, styleSheet, whitespace );
 		this.width = width;
+		
+		layoutNode = new LayoutNodeWhitespace( this );
+	}
+	
+	
+	
+	public double getWidth()
+	{
+		return width;
 	}
 
 	
@@ -67,7 +77,7 @@ public class DPWhitespace extends DPContentLeafEditable
 		DPContentLeaf leaf = this;
 		while ( leaf != null  &&  leaf.isWhitespace() )
 		{
-			leaf = leaf.getContentLeafToLeft();
+			leaf = leaf.getLayoutNode().getContentLeafToLeft();
 		}
 		
 		if ( leaf != null )
@@ -111,17 +121,6 @@ public class DPWhitespace extends DPContentLeafEditable
 		popGraphicsTransform( graphics, current );
 	}
 	
-	
-	protected void updateRequisitionX()
-	{
-		layoutReqBox.setRequisitionX( width, width );
-	}
-
-	protected void updateRequisitionY()
-	{
-		layoutReqBox.clearRequisitionY();
-	}
-
 	
 
 	//

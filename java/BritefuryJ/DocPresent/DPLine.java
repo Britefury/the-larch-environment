@@ -11,6 +11,7 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.geom.Line2D;
 
+import BritefuryJ.DocPresent.LayoutTree.LayoutNodeLine;
 import BritefuryJ.DocPresent.StyleSheets.LineStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.LineStyleSheet.Direction;
 
@@ -24,6 +25,8 @@ public class DPLine extends DPStatic
 	public DPLine(ElementContext context, LineStyleSheet styleSheet)
 	{
 		super( context, styleSheet );
+		
+		layoutNode = new LayoutNodeLine( this );
 	}
 	
 	
@@ -68,48 +71,5 @@ public class DPLine extends DPStatic
 		}
 
 		graphics.setPaint( prevPaint );
-	}
-	
-	
-
-	
-	protected void updateRequisitionX()
-	{
-		LineStyleSheet lineStyleSheet = (LineStyleSheet)styleSheet;
-
-		Direction direction = lineStyleSheet.getDirection();
-		if ( direction == LineStyleSheet.Direction.HORIZONTAL )
-		{
-			layoutReqBox.setRequisitionX( 0.0, 0.0 );
-		}
-		else if ( direction == LineStyleSheet.Direction.VERTICAL )
-		{
-			double x = lineStyleSheet.getThickness()  +  lineStyleSheet.getPadding() * 2.0;
-			layoutReqBox.setRequisitionX( x, x );
-		}
-		else
-		{
-			throw new RuntimeException( "Invalid direction" );
-		}
-	}
-
-	protected void updateRequisitionY()
-	{
-		LineStyleSheet lineStyleSheet = (LineStyleSheet)styleSheet;
-
-		Direction direction = lineStyleSheet.getDirection();
-		if ( direction == LineStyleSheet.Direction.HORIZONTAL )
-		{
-			double y = lineStyleSheet.getThickness()  +  lineStyleSheet.getPadding() * 2.0;
-			layoutReqBox.setRequisitionY( y, 0.0 );
-		}
-		else if ( direction == LineStyleSheet.Direction.VERTICAL )
-		{
-			layoutReqBox.setRequisitionY( 0.0, 0.0 );
-		}
-		else
-		{
-			throw new RuntimeException( "Invalid direction" );
-		}
 	}
 }

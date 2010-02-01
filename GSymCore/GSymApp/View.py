@@ -126,15 +126,12 @@ def _uniqueDocumentLocation(docs, location):
 
 
 class AppView (GSymViewObjectNodeDispatch):
-	__dispatch_module__ = Nodes.module
-	
-	
 	def __init__(self, document, app):
 		self._document = document
 		self._app = app
 		
 		
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.AppState )
 	def AppState(self, ctx, state, node, openDocuments, configuration):
 		def _onNew(link, buttonEvent):
 			def handleNewDocumentFn(unit):
@@ -151,6 +148,8 @@ class AppView (GSymViewObjectNodeDispatch):
 				
 				
 			self._app.promptNewDocument( handleNewDocumentFn )
+			
+			return True
 		
 			
 			
@@ -169,6 +168,8 @@ class AppView (GSymViewObjectNodeDispatch):
 
 				
 			self._app.promptOpenDocument( handleOpenedDocumentFn )
+			
+			return True
 
 			
 			
@@ -195,7 +196,7 @@ class AppView (GSymViewObjectNodeDispatch):
 
 
 
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.AppDocument )
 	def AppDocument(self, ctx, state, node, name, location):
 		def _onSave(link, buttonEvent):
 			world = self._app.getWorld()
@@ -208,6 +209,8 @@ class AppView (GSymViewObjectNodeDispatch):
 				self._app.promptSaveDocumentAs( handleSaveDocumentAsFn )
 			else:
 				document.save()
+			
+			return True
 				
 		
 		def _onSaveAs(link, buttonEvent):
@@ -218,6 +221,8 @@ class AppView (GSymViewObjectNodeDispatch):
 				document.saveAs( filename )
 			
 			self._app.promptSaveDocumentAs( handleSaveDocumentAsFn )
+			
+			return True
 
 			
 			
@@ -262,4 +267,3 @@ def resolveGSymAppLocation(currentLanguage, document, docRootNode, resolveContex
 
 class GSymAppResolveContext (GSymResolveContext):
 	pass
-		

@@ -14,10 +14,9 @@ import java.awt.geom.Path2D;
 import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.PackingParams;
+import BritefuryJ.DocPresent.LayoutTree.LayoutNodeMathRoot;
 import BritefuryJ.DocPresent.StyleSheets.MathRootStyleSheet;
-import BritefuryJ.Math.Point2;
 
 public class DPMathRoot extends DPContainer
 {
@@ -33,6 +32,8 @@ public class DPMathRoot extends DPContainer
 	public DPMathRoot(ElementContext context, MathRootStyleSheet styleSheet)
 	{
 		super( context, styleSheet );
+		
+		layoutNode = new LayoutNodeMathRoot( this );
 	}
 	
 	
@@ -46,6 +47,11 @@ public class DPMathRoot extends DPContainer
 	{
 		if ( child != this.child )
 		{
+			if ( child.getLayoutNode() == null )
+			{
+				throw new ChildHasNoLayoutException();
+			}
+
 			DPWidget prevChild = this.child;
 			
 			if ( prevChild != null )
@@ -56,7 +62,7 @@ public class DPMathRoot extends DPContainer
 			
 			this.child = child;
 			
-			if ( this.child != null )
+			if ( child != null )
 			{
 				registeredChildren.add( child );
 				registerChild( child, null );				
@@ -143,81 +149,6 @@ public class DPMathRoot extends DPContainer
 
 	
 	
-	protected void updateRequisitionX()
-	{
-		if ( child != null )
-		{
-			MathRootStyleSheet s = (MathRootStyleSheet)styleSheet;
-			
-			layoutReqBox.setRequisitionX( child.refreshRequisitionX() );
-			layoutReqBox.borderX( s.getGlyphWidth(), 0.0 );
-		}
-		else
-		{
-			layoutReqBox.clearRequisitionX();
-		}
-	}
-
-	protected void updateRequisitionY()
-	{
-		if ( child != null )
-		{
-			MathRootStyleSheet s = (MathRootStyleSheet)styleSheet;
-			
-			layoutReqBox.setRequisitionY( child.refreshRequisitionY() );
-			layoutReqBox.borderY( s.getBarSpacing() + s.getThickness(), 0.0 );
-		}
-		else
-		{
-			layoutReqBox.clearRequisitionY();
-		}
-	}
-	
-
-	
-	
-	protected void updateAllocationX()
-	{
-		if ( child != null )
-		{
-			MathRootStyleSheet s = (MathRootStyleSheet)styleSheet;
-
-			double prevWidth = child.getAllocationX();
-			double offset = s.getGlyphWidth();
-			layoutAllocBox.allocateChildXAligned( child.layoutAllocBox, child.layoutReqBox, child.getAlignmentFlags(), offset, layoutAllocBox.getAllocationX() - offset );
-			child.refreshAllocationX( prevWidth );
-		}
-	}
-
-	protected void updateAllocationY()
-	{
-		if ( child != null )
-		{
-			MathRootStyleSheet s = (MathRootStyleSheet)styleSheet;
-
-			LAllocV prevAllocV = child.getAllocV();
-			double offset = s.getBarSpacing() + s.getThickness();
-			layoutAllocBox.allocateChildYAligned( child.layoutAllocBox, child.layoutReqBox, child.getAlignmentFlags(), offset, layoutAllocBox.getAllocV().borderY( offset, 0.0 ) );
-			child.refreshAllocationY( prevAllocV );
-		}
-	}
-
-	
-	
-	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
-	{
-		if ( child == null )
-		{
-			return null;
-		}
-		else
-		{
-			return getLeafClosestToLocalPointFromChild( registeredChildren.get( 0 ), localPos, filter );
-		}
-	}
-
-
-	
 	//
 	// Packing parameters
 	//
@@ -237,25 +168,5 @@ public class DPMathRoot extends DPContainer
 	protected String computeSubtreeTextRepresentation()
 	{
 		return child != null  ?  child.getTextRepresentation()  :  "";
-	}
-
-	
-	
-	
-	//
-	// Focus navigation methods
-	//
-	
-	protected List<DPWidget> horizontalNavigationList()
-	{
-		if ( child != null )
-		{
-			DPWidget[] navList = { child };
-			return Arrays.asList( navList );
-		}
-		else
-		{
-			return null;
-		}
 	}
 }

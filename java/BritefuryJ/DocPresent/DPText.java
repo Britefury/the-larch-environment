@@ -13,6 +13,8 @@ import java.awt.font.TextHitInfo;
 import java.awt.geom.AffineTransform;
 
 import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.LayoutTree.LayoutNode;
+import BritefuryJ.DocPresent.LayoutTree.LayoutNodeText;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.Util.TextVisual;
@@ -47,7 +49,7 @@ public class DPText extends DPContentLeafEditableEntry
 		
 		visual = TextVisual.getTextVisual( getPresentationArea(), this.text, styleSheet.getFont(), styleSheet.getMixedSizeCaps() );
 		
-		layoutReqBox = visual.getRequisition();
+		layoutNode = new LayoutNodeText( this );
 	}
 	
 	
@@ -80,7 +82,8 @@ public class DPText extends DPContentLeafEditableEntry
 		if ( v != visual )
 		{
 			visual = v;
-			layoutReqBox = visual.getRequisition();
+			LayoutNodeText layout = (LayoutNodeText)getLayoutNode();
+			layout.setVisual( visual );
 			if ( isRealised() )
 			{
 				visual.realise( getPresentationArea() );
@@ -113,7 +116,8 @@ public class DPText extends DPContentLeafEditableEntry
 		Paint prevPaint = graphics.getPaint();
 
 		AffineTransform prevTransform = null;
-		double deltaY = layoutAllocBox.getAllocationAscent()  -  layoutReqBox.getReqAscent();
+		LayoutNode layout = getLayoutNode();
+		double deltaY = layout.getAllocationBox().getAllocationAscent()  -  layout.getRequisitionBox().getReqAscent();
 		if ( deltaY != 0.0 )
 		{
 			prevTransform = graphics.getTransform();
@@ -143,16 +147,10 @@ public class DPText extends DPContentLeafEditableEntry
 	
 
 	
-	protected void updateRequisitionX()
+	public TextVisual getVisual()
 	{
-		layoutReqBox = visual.getRequisition();
+		return visual;
 	}
-
-	protected void updateRequisitionY()
-	{
-		layoutReqBox = visual.getRequisition();
-	}
-
 	
 	
 	//

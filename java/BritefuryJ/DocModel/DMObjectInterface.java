@@ -12,7 +12,7 @@ import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 
 public interface DMObjectInterface extends DMNodeInterface
 {
-	public DMObjectClass getDMClass();
+	public DMObjectClass getDMObjectClass();
 	public boolean isInstanceOf(DMObjectClass cls);
 	
 	public int getFieldIndex(String key);

@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
 
 public class DPParagraphIndentMarker extends DPParagraphMarker
@@ -22,15 +23,8 @@ public class DPParagraphIndentMarker extends DPParagraphMarker
 
 
 
-	protected void updateRequisitionX()
+	public void initMarkerRequisition(LReqBox reqBox)
 	{
-		super.updateRequisitionX();
-		layoutReqBox.setParagraphIndentMarker();
-	}
-
-	protected void updateRequisitionY()
-	{
-		super.updateRequisitionY();
-		layoutReqBox.setParagraphIndentMarker();
+		reqBox.setParagraphIndentMarker();
 	}
 }

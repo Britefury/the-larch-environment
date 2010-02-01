@@ -42,7 +42,7 @@ public class Test_DefaultIdentityTransformationFunction extends TestCase
 			{
 				if ( x instanceof DMObject )
 				{
-					return ((DMObject)x).getDMClass().getName();
+					return ((DMObject)x).getDMObjectClass().getName();
 				}
 				else if ( x instanceof DMList )
 				{

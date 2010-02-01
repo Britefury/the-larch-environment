@@ -9,10 +9,9 @@ package BritefuryJ.DocPresent;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.PackingParams;
+import BritefuryJ.DocPresent.LayoutTree.LayoutNodeBin;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
-import BritefuryJ.Math.Point2;
 
 
 public class DPBin extends DPContainer
@@ -25,6 +24,8 @@ public class DPBin extends DPContainer
 	public DPBin(ElementContext context, ContainerStyleSheet styleSheet)
 	{
 		super( context, styleSheet );
+		
+		layoutNode = new LayoutNodeBin( this );
 	}
 	
 	
@@ -46,6 +47,11 @@ public class DPBin extends DPContainer
 		DPWidget prevChild = getChild();
 		if ( child != prevChild )
 		{
+			if ( child.getLayoutNode() == null )
+			{
+				throw new ChildHasNoLayoutException();
+			}
+
 			if ( prevChild != null )
 			{
 				unregisterChild( prevChild );
@@ -78,71 +84,6 @@ public class DPBin extends DPContainer
 	}
 
 	
-	protected void updateRequisitionX()
-	{
-		DPWidget child = getChild();
-		if ( child != null )
-		{
-			layoutReqBox.setRequisitionX( child.refreshRequisitionX() );
-		}
-		else
-		{
-			layoutReqBox.clearRequisitionX();
-		}
-	}
-
-	protected void updateRequisitionY()
-	{
-		DPWidget child = getChild();
-		if ( child != null )
-		{
-			layoutReqBox.setRequisitionY( child.refreshRequisitionY() );
-		}
-		else
-		{
-			layoutReqBox.clearRequisitionY();
-		}
-	}
-	
-	
-	
-	protected void updateAllocationX()
-	{
-		DPWidget child = getChild();
-		if ( child != null )
-		{
-			double prevWidth = child.layoutAllocBox.getAllocationX();
-			layoutAllocBox.allocateChildXAligned( child.layoutAllocBox, child.layoutReqBox, child.getAlignmentFlags(), 0.0, layoutAllocBox.getAllocationX() );
-			child.refreshAllocationX( prevWidth );
-		}
-	}
-
-	protected void updateAllocationY()
-	{
-		DPWidget child = getChild();
-		if ( child != null )
-		{
-			LAllocV prevAllocV = child.layoutAllocBox.getAllocV();
-			layoutAllocBox.allocateChildYAligned( child.layoutAllocBox, child.layoutReqBox, child.getAlignmentFlags(), 0.0, layoutAllocBox.getAllocV() );
-			child.refreshAllocationY( prevAllocV );
-		}
-	}
-	
-	
-	
-	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
-	{
-		DPWidget child = getChild();
-		if ( child == null )
-		{
-			return null;
-		}
-		else
-		{
-			return getLeafClosestToLocalPointFromChild( registeredChildren.get( 0 ), localPos, filter );
-		}
-	}
-
 	
 	
 	//
@@ -156,25 +97,6 @@ public class DPBin extends DPContainer
 
 
 
-	
-	//
-	// Focus navigation methods
-	//
-	
-	protected List<DPWidget> horizontalNavigationList()
-	{
-		DPWidget child = getChild();
-		if ( child != null )
-		{
-			return registeredChildren;
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	
 	
 	//
 	// Text representation methods
