@@ -8,7 +8,7 @@ package BritefuryJ.DocPresent.Layout;
 
 public class VerticalLayout
 {
-	private static void applyTypesettingToRequisitionY(LReqBox box, LReqBox children[], VTypesetting typesetting, double height, double vspacing)
+	private static void applyTypesettingToRequisitionY(LReqBox box, LReqBoxInterface children[], VTypesetting typesetting, double height, double vspacing)
 	{
 		if ( typesetting == VTypesetting.NONE )
 		{
@@ -16,10 +16,10 @@ public class VerticalLayout
 		}
 		else if ( typesetting == VTypesetting.ALIGN_WITH_TOP )
 		{
-			LReqBox top = children[0];
+			LReqBoxInterface top = children[0];
 			if ( top.hasBaseline() )
 			{
-				box.setRequisitionY( top.reqAscent, height - top.reqAscent, vspacing );
+				box.setRequisitionY( top.getReqAscent(), height - top.getReqAscent(), vspacing );
 			}
 			else
 			{
@@ -28,10 +28,10 @@ public class VerticalLayout
 		}
 		else if ( typesetting == VTypesetting.ALIGN_WITH_BOTTOM )
 		{
-			LReqBox bottom = children[children.length-1];
+			LReqBoxInterface bottom = children[children.length-1];
 			if ( bottom.hasBaseline() )
 			{
-				box.setRequisitionY( height - bottom.reqDescent, bottom.reqDescent, vspacing );
+				box.setRequisitionY( height - bottom.getReqDescent(), bottom.getReqDescent(), vspacing );
 			}
 			else
 			{
@@ -45,7 +45,7 @@ public class VerticalLayout
 	}
 
 
-	public static void computeRequisitionX(LReqBox box, LReqBox children[])
+	public static void computeRequisitionX(LReqBox box, LReqBoxInterface children[])
 	{
 		// The resulting box should have the following properties:
 		// - maximum width of all children
@@ -54,20 +54,27 @@ public class VerticalLayout
 		
 		box.clearRequisitionX();
 		
-		double minWidth = 0.0, minAdvance = 0.0;
-		double prefWidth = 0.0, prefAdvance = 0.0;
-		for (LReqBox child: children)
+		if ( children.length == 1 )
 		{
-			minWidth = Math.max( minWidth, child.minWidth );
-			prefWidth = Math.max( prefWidth, child.prefWidth );
-			minAdvance = Math.max( minAdvance, child.minHAdvance );
-			prefAdvance = Math.max( prefAdvance, child.prefHAdvance );
+			box.setRequisitionX( children[0] );
 		}
-		
-		box.setRequisitionX( minWidth, prefWidth, minAdvance, prefAdvance );
+		else if ( children.length > 1 )
+		{
+			double minWidth = 0.0, minHAdvance = 0.0;
+			double prefWidth = 0.0, prefHAdvance = 0.0;
+			for (LReqBoxInterface child: children)
+			{
+				minWidth = Math.max( minWidth, child.getMinWidth() );
+				prefWidth = Math.max( prefWidth, child.getPrefWidth() );
+				minHAdvance = Math.max( minHAdvance, child.getMinHAdvance() );
+				prefHAdvance = Math.max( prefHAdvance, child.getPrefHAdvance() );
+			}
+
+			box.setRequisitionX( minWidth, prefWidth, minHAdvance, prefHAdvance );
+		}
 	}
 
-	public static void computeRequisitionY(LReqBox box, LReqBox children[], VTypesetting typesetting, double spacing)
+	public static void computeRequisitionY(LReqBox box, LReqBoxInterface children[], VTypesetting typesetting, double spacing)
 	{
 		if ( children.length == 0 )
 		{
@@ -90,10 +97,10 @@ public class VerticalLayout
 			double reqY = 0.0;
 			for (int i = 0; i < children.length; i++)
 			{
-				LReqBox chBox = children[i];
+				LReqBoxInterface chBox = children[i];
 				
 				reqHeight = reqY + chBox.getReqHeight() ;
-				reqAdvance = reqHeight + chBox.reqVSpacing;
+				reqAdvance = reqHeight + chBox.getReqVSpacing();
 				reqY = reqAdvance + spacing;
 			}
 			
@@ -104,7 +111,7 @@ public class VerticalLayout
 
 
 
-	public static void allocateX(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], int childAllocationFlags[])
+	public static void allocateX(LReqBox box, LReqBoxInterface children[], LAllocBox allocBox, LAllocBoxInterface childrenAlloc[], int childAllocationFlags[])
 	{
 		for (int i = 0; i < children.length; i++)
 		{
@@ -115,7 +122,7 @@ public class VerticalLayout
 	
 	
 	
-	public static void allocateSpaceY(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], int childAllocationFlags[])
+	public static void allocateSpaceY(LReqBox box, LReqBoxInterface children[], LAllocBox allocBox, LAllocBoxInterface childrenAlloc[], int childAllocationFlags[])
 	{
 		int numExpand = 0;
 		
@@ -137,8 +144,8 @@ public class VerticalLayout
 			// Allocate children their preferred width
 			for (int i = 0; i < children.length; i++)
 			{
-				LReqBox child = children[i];
-				LAllocBox childAlloc = childrenAlloc[i];
+				LReqBoxInterface child = children[i];
+				LAllocBoxInterface childAlloc = childrenAlloc[i];
 				allocBox.allocateChildHeightAsRequisition( childAlloc, child );
 			}
 		}
@@ -150,8 +157,8 @@ public class VerticalLayout
 			
 			for (int i = 0; i < children.length; i++)
 			{
-				LReqBox child = children[i];
-				LAllocBox childAlloc = childrenAlloc[i];
+				LReqBoxInterface child = children[i];
+				LAllocBoxInterface childAlloc = childrenAlloc[i];
 				VAlignment alignment = ElementAlignment.getVAlignment( childAllocationFlags[i] );
 				if ( alignment == VAlignment.EXPAND  ||  alignment == VAlignment.BASELINES_EXPAND )
 				{
@@ -165,7 +172,7 @@ public class VerticalLayout
 		}
 	}
 	
-	public static void allocateY(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], int childAllocationFlags[], double spacing)
+	public static void allocateY(LReqBox box, LReqBoxInterface children[], LAllocBox allocBox, LAllocBoxInterface childrenAlloc[], int childAllocationFlags[], double spacing)
 	{
 		// Each packed child consists of:
 		//	- start padding
@@ -181,15 +188,15 @@ public class VerticalLayout
 		double pos = 0.0;
 		for (int i = 0; i < children.length; i++)
 		{
-			LReqBox child = children[i];
-			LAllocBox childAlloc = childrenAlloc[i];
+			LReqBoxInterface child = children[i];
+			LAllocBoxInterface childAlloc = childrenAlloc[i];
 
 			// Allocate child position
 			allocBox.allocateChildPositionY( childAlloc, pos );
 
 			// Accumulate width and x
 			size = pos + childAlloc.getAllocationY();
-			pos = size + child.reqVSpacing + spacing;
+			pos = size + child.getReqVSpacing() + spacing;
 		}
 	}
 
@@ -197,13 +204,13 @@ public class VerticalLayout
 
 
 
-	public static void allocateSpaceY(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], boolean bExpand)
+	public static void allocateSpaceY(LReqBox box, LReqBoxInterface children[], LAllocBox allocBox, LAllocBoxInterface childrenAlloc[], boolean bExpand)
 	{
 		// Compute the amount of space required
 		double reqSizeTotal = 0.0;
 		if ( children.length > 0 )
 		{
-			for (LReqBox child: children)
+			for (LReqBoxInterface child: children)
 			{
 				reqSizeTotal += child.getReqHeight();
 			}
@@ -216,8 +223,8 @@ public class VerticalLayout
 				// Allocate children their preferred height
 				for (int i = 0; i < children.length; i++)
 				{
-					LReqBox child = children[i];
-					LAllocBox childAlloc = childrenAlloc[i];
+					LReqBoxInterface child = children[i];
+					LAllocBoxInterface childAlloc = childrenAlloc[i];
 					allocBox.allocateChildHeightAsRequisition( childAlloc, child );
 				}
 			}
@@ -229,8 +236,8 @@ public class VerticalLayout
 				
 				for (int i = 0; i < children.length; i++)
 				{
-					LReqBox child = children[i];
-					LAllocBox childAlloc = childrenAlloc[i];
+					LReqBoxInterface child = children[i];
+					LAllocBoxInterface childAlloc = childrenAlloc[i];
 					allocBox.allocateChildHeightPaddedRequisition( childAlloc, child, child.getReqHeight() + expandPerChild );
 				}
 			}
@@ -242,14 +249,14 @@ public class VerticalLayout
 			// Allocate children their required size
 			for (int i = 0; i < children.length; i++)
 			{
-				LReqBox child = children[i];
-				LAllocBox childAlloc = childrenAlloc[i];
+				LReqBoxInterface child = children[i];
+				LAllocBoxInterface childAlloc = childrenAlloc[i];
 				allocBox.allocateChildHeightAsRequisition( childAlloc, child );
 			}
 		}
 	}
 	
-	public static void allocateY(LReqBox box, LReqBox children[], LAllocBox allocBox, LAllocBox childrenAlloc[], double spacing, boolean bExpand)
+	public static void allocateY(LReqBox box, LReqBoxInterface children[], LAllocBox allocBox, LAllocBoxInterface childrenAlloc[], double spacing, boolean bExpand)
 	{
 		// Each packed child consists of:
 		//	- start padding
@@ -265,11 +272,11 @@ public class VerticalLayout
 		double pos = 0.0;
 		for (int i = 0; i < children.length; i++)
 		{
-			LReqBox child = children[i];
-			LAllocBox childAlloc = childrenAlloc[i];
+			LReqBoxInterface child = children[i];
+			LAllocBoxInterface childAlloc = childrenAlloc[i];
 
 			// Compute the spacing; padding consumes child spacing
-			double childSpacing = Math.max( child.reqVSpacing, 0.0 );
+			double childSpacing = Math.max( child.getReqVSpacing(), 0.0 );
 
 			// Allocate child position
 			allocBox.allocateChildPositionY( childAlloc, pos );

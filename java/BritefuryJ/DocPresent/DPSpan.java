@@ -7,13 +7,67 @@
 package BritefuryJ.DocPresent;
 
 import BritefuryJ.DocPresent.Layout.PackingParams;
+import BritefuryJ.DocPresent.LayoutTree.ArrangedSequenceLayoutNode;
+import BritefuryJ.Math.AABox2;
+import BritefuryJ.Math.Point2;
 
-public class DPSpan extends DPContainerSequenceCollateable
+public class DPSpan extends DPContainerSequence
 {
 	public DPSpan(ElementContext context)
 	{
 		super( context );
 	}
+
+
+
+	private AABox2[] computeBoundingBoxes()
+	{
+		ArrangedSequenceLayoutNode arrangedLayout = (ArrangedSequenceLayoutNode)getValidLayoutNodeOfClass( ArrangedSequenceLayoutNode.class );
+		if ( arrangedLayout != null )
+		{
+			return arrangedLayout.computeBranchBoundsBoxes( this );
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	public boolean containsParentSpacePoint(Point2 p)
+	{
+		AABox2 boundsBoxes[] = computeBoundingBoxes();
+		if ( boundsBoxes != null )
+		{
+			for (AABox2 box: boundsBoxes)
+			{
+				if ( box.containsPoint( p ) )
+				{
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
+	public boolean containsLocalSpacePoint(Point2 p)
+	{
+		AABox2 boundsBoxes[] = computeBoundingBoxes();
+		if ( boundsBoxes != null )
+		{
+			for (AABox2 box: boundsBoxes)
+			{
+				if ( box.containsPoint( p ) )
+				{
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+
+
 
 
 	//

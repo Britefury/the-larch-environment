@@ -16,11 +16,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.DocPresent.Layout.FractionLayout;
-import BritefuryJ.DocPresent.Layout.LAllocBox;
-import BritefuryJ.DocPresent.Layout.LAllocV;
-import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.PackingParams;
+import BritefuryJ.DocPresent.LayoutTree.LayoutNodeFraction;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.FractionStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
@@ -29,14 +26,12 @@ import BritefuryJ.Math.Point2;
 public class DPFraction extends DPContainer
 {
 	private static double childScale = 0.85;
-
+	
+	
 	
 	
 	public static class DPFractionBar extends DPContentLeafEditableEntry
 	{
-		public static double BAR_HEIGHT = 1.5;
-		
-		
 		public DPFractionBar(ElementContext context, String textRepresentation)
 		{
 			this( context, FractionStyleSheet.BarStyleSheet.defaultStyleSheet, textRepresentation );
@@ -45,6 +40,8 @@ public class DPFraction extends DPContainer
 		public DPFractionBar(ElementContext context, FractionStyleSheet.BarStyleSheet styleSheet, String textRepresentation)
 		{
 			super( context, styleSheet, textRepresentation );
+			
+			layoutNode = new LayoutNodeFraction.LayoutNodeFractionBar( this );
 		}
 
 	
@@ -119,17 +116,6 @@ public class DPFraction extends DPContainer
 
 
 		
-		protected void updateRequisitionX()
-		{
-			layoutReqBox.clearRequisitionX();
-		}
-
-		protected void updateRequisitionY()
-		{
-			layoutReqBox.setRequisitionY( BAR_HEIGHT, 0.0 );
-		}
-		
-		
 		//
 		// Marker methods
 		//
@@ -166,11 +152,11 @@ public class DPFraction extends DPContainer
 	
 	
 	
-	public static int NUMERATOR = 0;
-	public static int BAR = 1;
-	public static int DENOMINATOR = 2;
+	public static int NUMERATOR = LayoutNodeFraction.NUMERATOR;
+	public static int BAR = LayoutNodeFraction.BAR;
+	public static int DENOMINATOR = LayoutNodeFraction.DENOMINATOR;
 
-	public static int NUMCHILDREN = 3;
+	public static int NUMCHILDREN = LayoutNodeFraction.NUMCHILDREN;
 	
 	protected DPWidget children[];
 	protected DPSegment segs[];
@@ -198,6 +184,8 @@ public class DPFraction extends DPContainer
 	public DPFraction(ElementContext context, FractionStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, String barTextRepresentation)
 	{
 		super( context, styleSheet );
+		
+		layoutNode = new LayoutNodeFraction( this );
 		
 		this.segmentTextStyleSheet = segmentTextStyleSheet;
 		
@@ -364,141 +352,6 @@ public class DPFraction extends DPContainer
 	
 	
 	
-	protected void updateRequisitionX()
-	{
-		LReqBox boxes[] = new LReqBox[NUMCHILDREN];
-		for (int i = 0; i < NUMCHILDREN; i++)
-		{
-			if ( i != BAR )
-			{
-				boxes[i] = paras[i] != null  ?  paras[i].refreshRequisitionX().scaled( childScale )  :  null;
-			}
-			else
-			{
-				boxes[i] = children[i] != null  ?  children[i].refreshRequisitionX()  :  null;
-			}
-		}
-		
-		FractionLayout.computeRequisitionX( layoutReqBox, boxes[NUMERATOR], boxes[BAR], boxes[DENOMINATOR], getHPadding(), getVSpacing(), getYOffset() );
-	}
-
-	protected void updateRequisitionY()
-	{
-		LReqBox boxes[] = new LReqBox[NUMCHILDREN];
-		for (int i = 0; i < NUMCHILDREN; i++)
-		{
-			if ( i != BAR )
-			{
-				boxes[i] = paras[i] != null  ?  paras[i].refreshRequisitionY().scaled( childScale )  :  null;
-			}
-			else
-			{
-				boxes[i] = children[i] != null  ?  children[i].refreshRequisitionY()  :  null;
-			}
-		}
-		
-		FractionLayout.computeRequisitionY( layoutReqBox, boxes[NUMERATOR], boxes[BAR], boxes[DENOMINATOR], getHPadding(), getVSpacing(), getYOffset() );
-	}
-	
-
-	
-	protected void updateAllocationX()
-	{
-		super.updateAllocationX( );
-		
-		LReqBox reqBoxes[] = new LReqBox[NUMCHILDREN];
-		LAllocBox allocBoxes[] = new LAllocBox[NUMCHILDREN];
-		double prevChildWidths[] = new double[NUMCHILDREN];
-		for (int i = 0; i < NUMCHILDREN; i++)
-		{
-			if ( i != BAR )
-			{
-				reqBoxes[i] = paras[i] != null  ?  paras[i].layoutReqBox.scaled( childScale )  :  null;
-				allocBoxes[i] = paras[i] != null  ?  paras[i].layoutAllocBox  :  null;
-				prevChildWidths[i] = paras[i] != null  ?  paras[i].layoutAllocBox.getAllocationX()  :  0.0;
-			}
-			else
-			{
-				reqBoxes[i] = children[i] != null  ?  children[i].layoutReqBox  :  null;
-				allocBoxes[i] = children[i] != null  ?  children[i].layoutAllocBox  :  null;
-				prevChildWidths[i] = children[i] != null  ?  children[i].layoutAllocBox.getAllocationX()  :  0.0;
-			}
-		}
-		
-		FractionLayout.allocateX( layoutReqBox, reqBoxes[NUMERATOR], reqBoxes[BAR], reqBoxes[DENOMINATOR],
-				layoutAllocBox, allocBoxes[NUMERATOR], allocBoxes[BAR], allocBoxes[DENOMINATOR], 
-				getHPadding(), getVSpacing(), getYOffset() );
-		
-		for (int i = 0; i < NUMCHILDREN; i++)
-		{
-			if ( paras[i] != null )
-			{
-				if ( i != BAR )
-				{
-					allocBoxes[i].scaleAllocationX( 1.0 / childScale );
-					paras[i].refreshAllocationX( prevChildWidths[i] );
-				}
-				else
-				{
-					children[i].refreshAllocationX( prevChildWidths[i] );
-				}
-			}
-		}
-	}
-
-	
-	protected void updateAllocationY()
-	{
-		super.updateAllocationY( );
-		
-		LReqBox reqBoxes[] = new LReqBox[NUMCHILDREN];
-		LAllocBox allocBoxes[] = new LAllocBox[NUMCHILDREN];
-		LAllocV prevChildAllocVs[] = new LAllocV[NUMCHILDREN];
-		for (int i = 0; i < NUMCHILDREN; i++)
-		{
-			if ( i != BAR )
-			{
-				reqBoxes[i] = paras[i] != null  ?  paras[i].layoutReqBox.scaled( childScale )  :  null;
-				allocBoxes[i] = paras[i] != null  ?  paras[i].layoutAllocBox  :  null;
-				prevChildAllocVs[i] = paras[i] != null  ?  paras[i].layoutAllocBox.getAllocV()  :  null;
-			}
-			else
-			{
-				reqBoxes[i] = children[i] != null  ?  children[i].layoutReqBox  :  null;
-				allocBoxes[i] = children[i] != null  ?  children[i].layoutAllocBox  :  null;
-				prevChildAllocVs[i] = children[i] != null  ?  children[i].layoutAllocBox.getAllocV()  :  null;
-			}
-		}
-		
-		FractionLayout.allocateY( layoutReqBox, reqBoxes[NUMERATOR], reqBoxes[BAR], reqBoxes[DENOMINATOR],
-				layoutAllocBox, allocBoxes[NUMERATOR], allocBoxes[BAR], allocBoxes[DENOMINATOR], 
-				getHPadding(), getVSpacing(), getYOffset() );
-		
-		for (int i = 0; i < NUMCHILDREN; i++)
-		{
-			if ( paras[i] != null )
-			{
-				if ( i != BAR )
-				{
-					allocBoxes[i].scaleAllocationY( 1.0 / childScale );
-					paras[i].refreshAllocationY( prevChildAllocVs[i] );
-				}
-				else
-				{
-					children[i].refreshAllocationY( prevChildAllocVs[i] );
-				}
-			}
-		}
-	}
-	
-	
-
-	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
-	{
-		return getChildLeafClosestToLocalPointVertical( registeredChildren, localPos, filter );
-	}
-
-
 	
 	//
 	// Packing parameters
@@ -511,23 +364,13 @@ public class DPFraction extends DPContainer
 
 
 	
-	//
-	// Focus navigation methods
-	//
-	
-	protected List<DPWidget> horizontalNavigationList()
+	public static double getChildScale()
 	{
-		return verticalNavigationList();
+		return childScale;
 	}
 
-	protected List<DPWidget> verticalNavigationList()
-	{
-		return registeredChildren;
-	}
 	
-	
-	
-	
+
 	//
 	// STYLESHEET METHODS
 	//

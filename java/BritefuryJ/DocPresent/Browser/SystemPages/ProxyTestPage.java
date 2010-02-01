@@ -91,10 +91,6 @@ public class ProxyTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		DPWidget header0 = createTextParagraph( "Border( Proxy( Border( \"Text\" )))" );
-		DPWidget body0 = greyBorder( proxy( greyBorder( staticText( "Text" ) ) ) );
-		DPWidget content0 = content( header0, body0 );
-		
 		DPWidget header1 = createTextParagraph( "Paragraph( \"Before\" Proxy( \"TEXT\" ) \"After\")" );
 		DPWidget body1 = paragraph( new DPWidget[] { staticText( "Before" ), proxy( staticText( "Text" ) ), staticText( "After" ) } );
 		DPWidget content1 = content( header1, body1 );
@@ -105,7 +101,7 @@ public class ProxyTestPage extends SystemPage
 		
 		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, 30.0 );
 		DPVBox box = new DPVBox( getContext(), boxs );
-		box.extend( new DPWidget[] { content0, content1, content2 } );
+		box.extend( new DPWidget[] { content1, content2 } );
 
 		return box;
 	}

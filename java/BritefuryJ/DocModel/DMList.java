@@ -34,6 +34,8 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 {
 	private static final long serialVersionUID = 1L;
 	
+	protected static DMNodeClass listNodeClass = new DMNodeClass( "DMList" );
+	
 	
 	private static class DMListIterator implements Iterator<Object>
 	{
@@ -411,6 +413,18 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		
 		return new DMList( ys );
 	}
+	
+	
+	public static DMNodeClass getListDMNodeClass()
+	{
+		return listNodeClass;
+	}
+	
+	public DMNodeClass getDMNodeClass()
+	{
+		return listNodeClass;
+	}
+	
 	
 	
 	

@@ -80,6 +80,6 @@ public class Test_DocModelSerialisation extends TestCase
 		
 		assertNotSame( obj, obj2 );
 		assertEquals( obj, obj2 );
-		assertSame( obj.getDMClass(), obj2.getDMClass() );
+		assertSame( obj.getDMObjectClass(), obj2.getDMObjectClass() );
 	}
 }

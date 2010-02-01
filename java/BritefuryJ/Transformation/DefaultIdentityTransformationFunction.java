@@ -32,7 +32,7 @@ public class DefaultIdentityTransformationFunction extends TransformationFunctio
 		{
 			newData[i] = applyToChild( fieldData[i], xform );
 		}
-		return new DMObject( dx.getDMClass(), newData );
+		return new DMObject( dx.getDMObjectClass(), newData );
 	}
 	
 	

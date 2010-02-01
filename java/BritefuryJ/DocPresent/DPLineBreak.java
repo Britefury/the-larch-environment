@@ -7,6 +7,8 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import BritefuryJ.DocPresent.Layout.LReqBox;
+import BritefuryJ.DocPresent.LayoutTree.LayoutNodeLineBreak;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 
 public class DPLineBreak extends DPBin
@@ -14,20 +16,22 @@ public class DPLineBreak extends DPBin
 	public DPLineBreak(ElementContext context)
 	{
 		super( context );
+		
+		layoutNode = new LayoutNodeLineBreak( this );
 	}
 	
 	public DPLineBreak(ElementContext context, ContainerStyleSheet styleSheet)
 	{
 		super( context, styleSheet );
+		
+		layoutNode = new LayoutNodeLineBreak( this );
 	}
 	
 	
 	
-	protected void updateRequisitionX()
+	public void initialiseLineBreakRequisition(LReqBox reqBox)
 	{
-		super.updateRequisitionX();
-		
-		layoutReqBox.setLineBreakCost( computeLineBreakCost() );
+		reqBox.setLineBreakCost( computeLineBreakCost() );
 	}
 
 	

@@ -184,7 +184,7 @@ public class ObjectNode extends ParserExpression
 	{
 		if ( input.isInstanceOf( objClass ) )
 		{
-			DMObjectClass inputClass = input.getDMClass();
+			DMObjectClass inputClass = input.getDMObjectClass();
 			DMObject value = inputClass.newInstance();
 			Map<String, Object> bindings = null;
 			

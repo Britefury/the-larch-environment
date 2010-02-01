@@ -20,7 +20,6 @@ class ScopeInterface (object):
 
 class ExpressionAnalyser (object):
 	__metaclass__ = ObjectNodeMethodDispatchMetaClass
-	__dispatch_module__ = Nodes.module
 	__dispatch_num_args__ = 1
 	
 	
@@ -28,7 +27,7 @@ class ExpressionAnalyser (object):
 		return objectNodeMethodDispatch( self, node, scope )
 	
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.Load )
 	def Load(self, scope, node, name):
 		return scope.getLocal( name )
 
@@ -56,7 +55,7 @@ class Python25ModuleInfo (ScopeInterface):
 			return NameError
 		
 	def assign(self, target, value):
-		targetClass = target.getDMClass()
+		targetClass = target.getDMObjectClass()
 		if targetClass == Nodes.SingleTarget:
 			self.table[target['name']] = _expressionAnalyser( value, getScope() )
 		elif targetClass == Nodes.TupleTarget:
@@ -71,7 +70,6 @@ class Python25ModuleInfo (ScopeInterface):
 		
 class ModuleAnalyser (object):
 	__metaclass__ = ObjectNodeMethodDispatchMetaClass
-	__dispatch_module__ = Nodes.module
 	__dispatch_num_args__ = 1
 	
 	
@@ -82,7 +80,7 @@ class ModuleAnalyser (object):
 			pass
 		
 		
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.AssignStmt )
 	def AssignStmt(self, moduleInfo, node, targets, value):
 		for target in targets:
 			moduleInfo.assign( target, value )
@@ -96,7 +94,6 @@ _moduleAnalyser = ModuleAnalyser()
 
 class DocAnalyser (object):
 	__metaclass__ = ObjectNodeMethodDispatchMetaClass
-	__dispatch_module__ = Nodes.module
 	__dispatch_num_args__ = 0
 	
 	
@@ -104,7 +101,7 @@ class DocAnalyser (object):
 		return objectNodeMethodDispatch( self, node )
 	
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.PythonModule )
 	def PythonModule(self, node, suite):
 		module = Python25ModuleInfo( node )
 		for x in suite:

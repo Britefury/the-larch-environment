@@ -13,20 +13,14 @@ import java.util.List;
 import org.python.core.Py;
 import org.python.core.PyTuple;
 
-import BritefuryJ.DocPresent.Layout.LAllocBox;
-import BritefuryJ.DocPresent.Layout.LAllocV;
-import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.PackingParams;
-import BritefuryJ.DocPresent.Layout.TableLayout;
 import BritefuryJ.DocPresent.Layout.TablePackingParams;
+import BritefuryJ.DocPresent.LayoutTree.LayoutNodeTable;
 import BritefuryJ.DocPresent.StyleSheets.TableStyleSheet;
-import BritefuryJ.Math.Point2;
 
 public class DPTable extends DPContainer
 {
 	private DPWidget[][] children;
-	private LReqBox columnBoxes[], rowBoxes[];
-	private LAllocBox columnAllocBoxes[], rowAllocBoxes[];
 	private int rowPositions[];
 	private int numColumns, numRows;		// Can be -1, indicating that these values must be refreshed
 
@@ -41,6 +35,8 @@ public class DPTable extends DPContainer
 	public DPTable(ElementContext context, TableStyleSheet styleSheet)
 	{
 		super( context, styleSheet );
+		
+		layoutNode = new LayoutNodeTable( this );
 
 		children = new DPWidget[0][];
 		rowPositions = new int[0];
@@ -53,6 +49,17 @@ public class DPTable extends DPContainer
 	
 	public void setChildren(DPWidget[][] itemTable)
 	{
+		for (DPWidget row[]: itemTable)
+		{
+			for (DPWidget item: row)
+			{
+				if ( item.getLayoutNode() == null )
+				{
+					throw new ChildHasNoLayoutException();
+				}
+			}
+		}
+		
 		if ( registeredChildren.isEmpty() )
 		{
 			// Empty; initialise from blank
@@ -259,6 +266,11 @@ public class DPTable extends DPContainer
 		
 		if ( item != oldChild )
 		{
+			if ( item.getLayoutNode() == null )
+			{
+				throw new ChildHasNoLayoutException();
+			}
+
 			// Get the index of the old child (in @registeredChildren), unregister the old child, and remove it from @registeredChildren
 			int oldChildIndex = -1;
 			if ( oldChild != null )
@@ -465,295 +477,6 @@ public class DPTable extends DPContainer
 		}
 	}
 	
-	
-	protected void updateRequisitionX()
-	{
-		refreshSize();
-		
-		LReqBox childBoxes[] = new LReqBox[registeredChildren.size()];
-		TablePackingParams packingParams[] = new TablePackingParams[registeredChildren.size()];
-		for (int i = 0; i < registeredChildren.size(); i++)
-		{
-			childBoxes[i] = registeredChildren.get( i ).refreshRequisitionX();
-			packingParams[i] = (TablePackingParams)registeredChildren.get( i ).getParentPacking();
-		}
-
-		columnBoxes = TableLayout.computeRequisitionX( layoutReqBox, childBoxes, packingParams, numColumns, numRows, getColumnSpacing(), getRowSpacing() );
-		columnAllocBoxes = new LAllocBox[columnBoxes.length];
-		for (int i = 0; i < columnAllocBoxes.length; i++)
-		{
-			columnAllocBoxes[i] = new LAllocBox( null );
-		}
-	}
-
-	protected void updateRequisitionY()
-	{
-		refreshSize();
-		
-		LReqBox childBoxes[] = new LReqBox[registeredChildren.size()];
-		TablePackingParams packingParams[] = new TablePackingParams[registeredChildren.size()];
-		int childAlignmentFlags[] = new int[registeredChildren.size()];
-		for (int i = 0; i < registeredChildren.size(); i++)
-		{
-			childBoxes[i] = registeredChildren.get( i ).refreshRequisitionY();
-			packingParams[i] = (TablePackingParams)registeredChildren.get( i ).getParentPacking();
-			childAlignmentFlags[i] = registeredChildren.get( i ).getAlignmentFlags();
-		}
-
-		rowBoxes = TableLayout.computeRequisitionY( layoutReqBox, childBoxes, packingParams, childAlignmentFlags, numColumns, numRows, getColumnSpacing(), getRowSpacing() );
-		rowAllocBoxes = new LAllocBox[rowBoxes.length];
-		for (int i = 0; i < rowAllocBoxes.length; i++)
-		{
-			rowAllocBoxes[i] = new LAllocBox( null );
-		}
-	}
-	
-
-
-	
-	
-	protected void updateAllocationX()
-	{
-		super.updateAllocationX();
-		
-		refreshSize();
-		
-		LReqBox childBoxes[] = new LReqBox[registeredChildren.size()];
-		LAllocBox childAllocBoxes[] = new LAllocBox[registeredChildren.size()];
-		double prevWidths[] = new double[registeredChildren.size()];
-		TablePackingParams packingParams[] = new TablePackingParams[registeredChildren.size()];
-		int childAlignmentFlags[] = new int[registeredChildren.size()];
-		for (int i = 0; i < registeredChildren.size(); i++)
-		{
-			DPWidget child = registeredChildren.get( i );
-			childBoxes[i] = child.layoutReqBox;
-			childAllocBoxes[i] = child.layoutAllocBox;
-			prevWidths[i] = child.getAllocationX();
-			packingParams[i] = (TablePackingParams)child.getParentPacking();
-			childAlignmentFlags[i] = child.getAlignmentFlags();
-		}
-		
-		TableLayout.allocateX( layoutReqBox, columnBoxes, childBoxes, layoutAllocBox, columnAllocBoxes, childAllocBoxes, packingParams, childAlignmentFlags, numColumns, numRows, getColumnSpacing(), getRowSpacing(), getColumnExpand(), getRowExpand() );
-		
-		int i = 0;
-		for (DPWidget child: registeredChildren)
-		{
-			child.refreshAllocationX( prevWidths[i] );
-			i++;
-		}
-	}
-	
-	
-	
-	protected void updateAllocationY()
-	{
-		super.updateAllocationY();
-		
-		refreshSize();
-		
-		LReqBox childBoxes[] = new LReqBox[registeredChildren.size()];
-		LAllocBox childAllocBoxes[] = new LAllocBox[registeredChildren.size()];
-		LAllocV prevAllocVs[] = new LAllocV[registeredChildren.size()];
-		TablePackingParams[] packingParams = new TablePackingParams[registeredChildren.size()];
-		int childAlignmentFlags[] = new int[registeredChildren.size()];
-		for (int i = 0; i < registeredChildren.size(); i++)
-		{
-			DPWidget child = registeredChildren.get( i );
-			childBoxes[i] = child.layoutReqBox;
-			childAllocBoxes[i] = child.layoutAllocBox;
-			prevAllocVs[i] = child.getAllocV();
-			packingParams[i] = (TablePackingParams)child.getParentPacking();
-			childAlignmentFlags[i] = child.getAlignmentFlags();
-		}
-		
-		TableLayout.allocateY( layoutReqBox, rowBoxes, childBoxes, layoutAllocBox, rowAllocBoxes, childAllocBoxes, packingParams, childAlignmentFlags, numColumns, numRows, getColumnSpacing(), getRowSpacing(), getColumnExpand(), getRowExpand() );
-		
-		int i = 0;
-		for (DPWidget child: registeredChildren)
-		{
-			child.refreshAllocationY( prevAllocVs[i] );
-			i++;
-		}
-	}
-	
-
-	
-	
-	
-	private boolean doesChildCoverCell(DPWidget child, int x, int y)
-	{
-		TablePackingParams packing = (TablePackingParams)child.getParentPacking();
-
-		return x <= ( packing.x + packing.colSpan )  &&  y <= ( packing.y + packing.rowSpan );
-	}
-	
-	private DPWidget getChildCoveringCell(int x, int y)
-	{
-		refreshSize();
-
-		DPWidget child = get( x, y );
-		
-		if ( child != null )
-		{
-			return child;
-		}
-		else
-		{
-			int maxRadius = Math.max( x, y );
-			for (int radius = 1; radius <= maxRadius; radius++)
-			{
-				// Column to left, going up
-				if ( radius <= x )		// Ensure that the column, that is @radius spaces to the left is within the bounds of the table
-				{
-					int colX = x - radius;
-					for (int i = 0; i < radius; i++)
-					{
-						int searchY = y - i;
-						if ( searchY >= 0 )
-						{
-							child = get( colX, searchY );
-							if ( child != null  &&  doesChildCoverCell( child, x, y ) )
-							{
-								return child;
-							}
-						}
-					}
-				}
-				
-				// Row above, going left
-				if ( radius <= y )		// Ensure that the row, that is @radius spaces above is within the bounds of the table
-				{
-					int rowY = y - radius;
-					for (int i = 0; i < radius; i++)
-					{
-						int searchX = x - i;
-						if ( searchX >= 0 )
-						{
-							child = get( searchX, rowY );
-							if ( child != null  &&  doesChildCoverCell( child, x, y ) )
-							{
-								return child;
-							}
-						}
-					}
-				}
-				
-				// Cell above and to left
-				if ( radius <= x  &&  radius <= y )
-				{
-					child = get( x - radius, y - radius );
-					if ( child != null  &&  doesChildCoverCell( child, x, y ) )
-					{
-						return child;
-					}
-				}
-			}
-			
-			return null;
-		}
-	}
-
-	
-	
-	private int getColumnForLocalPoint(Point2 localPos)
-	{
-		if ( columnBoxes.length == 0 )
-		{
-			return -1;
-		}
-		else if ( columnBoxes.length == 1 )
-		{
-			return 0;
-		}
-		else
-		{
-			LAllocBox columnI = columnAllocBoxes[0];
-			for (int i = 0; i < columnBoxes.length - 1; i++)
-			{
-				LAllocBox columnJ = columnAllocBoxes[i+1];
-				double iUpperX = columnI.getPositionInParentSpaceX() + columnI.getAllocationX();
-				double jLowerX = columnJ.getPositionInParentSpaceX();
-				
-				double midX = ( iUpperX + jLowerX ) * 0.5;
-				
-				if ( localPos.x < midX )
-				{
-					return i;
-				}
-				
-				columnI = columnJ;
-			}
-			
-			return columnBoxes.length-1;
-		}
-	}
-
-	
-	
-	private int getRowForLocalPoint(Point2 localPos)
-	{
-		if ( rowBoxes.length == 0 )
-		{
-			return -1;
-		}
-		else if ( rowBoxes.length == 1 )
-		{
-			return 0;
-		}
-		else
-		{
-			LAllocBox rowI = rowAllocBoxes[0];
-			for (int i = 0; i < rowBoxes.length - 1; i++)
-			{
-				LAllocBox rowJ = rowAllocBoxes[i+1];
-				double iUpperY = rowI.getPositionInParentSpaceY() + rowI.getAllocationY();
-				double jLowerY = rowJ.getPositionInParentSpaceY();
-				
-				double midY = ( iUpperY + jLowerY ) * 0.5;
-				
-				if ( localPos.y < midY )
-				{
-					return i;
-				}
-				
-				rowI = rowJ;
-			}
-			
-			return rowBoxes.length-1;
-		}
-	}
-
-	
-	
-	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
-	{
-		refreshSize();
-
-		int x = getColumnForLocalPoint( localPos );
-		int y = getRowForLocalPoint( localPos );
-		DPWidget child = getChildCoveringCell( x, y );
-		if ( child != null )
-		{
-			return getLeafClosestToLocalPointFromChild( child, localPos, filter );
-		}
-		else
-		{
-			return null;
-		}
-	}
-
-
-	
-	
-	
-	//
-	// Focus navigation methods
-	//
-	
-	protected List<DPWidget> horizontalNavigationList()
-	{
-		return getInternalChildren();
-	}
 	
 
 	//

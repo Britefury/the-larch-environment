@@ -17,6 +17,7 @@ import java.util.WeakHashMap;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.LayoutTree.ContentLeafLayoutNode;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.ContentLeafStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
@@ -619,24 +620,14 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	protected DPContentLeaf getContentLeafAbove(Point2 localPos, boolean bSkipWhitespace)
 	{
-		return getContentLeafAboveOrBelow( localPos, false, bSkipWhitespace );
+		ContentLeafLayoutNode leafLayout = (ContentLeafLayoutNode)getLayoutNode();
+		return leafLayout.getContentLeafAbove( localPos, bSkipWhitespace );
 	}
 	
 	protected DPContentLeaf getContentLeafBelow(Point2 localPos, boolean bSkipWhitespace)
 	{
-		return getContentLeafAboveOrBelow( localPos, true, bSkipWhitespace );
-	}
-	
-	protected DPContentLeaf getContentLeafAboveOrBelow(Point2 localPos, boolean bBelow, boolean bSkipWhitespace)
-	{
-		if ( parent != null )
-		{
-			return parent.getContentLeafAboveOrBelowFromChild( this, bBelow, getLocalPointRelativeToAncestor( parent, localPos ), bSkipWhitespace );
-		}
-		else
-		{
-			return null;
-		}
+		ContentLeafLayoutNode leafLayout = (ContentLeafLayoutNode)getLayoutNode();
+		return leafLayout.getContentLeafBelow( localPos, bSkipWhitespace );
 	}
 	
 	
@@ -650,7 +641,7 @@ public abstract class DPContentLeaf extends DPWidget
 		return this;
 	}
 
-	protected DPContentLeaf getTopOrBottomContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace, boolean bSkipWhitespace)
+	public DPContentLeaf getTopOrBottomContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace, boolean bSkipWhitespace)
 	{
 		if ( bSkipWhitespace && isWhitespace() )
 		{
@@ -663,19 +654,6 @@ public abstract class DPContentLeaf extends DPWidget
 	}
 	
 	
-	protected DPWidget getLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
-	{
-		if ( filter == null  ||  filter.testElement( this ) )
-		{
-			return this;
-		}
-		else
-		{
-			return null;
-		}
-	}
-
-
 	
 	
 	

@@ -6,31 +6,97 @@
 //##************************
 package visualtests.DocPresent;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
 import javax.swing.JFrame;
-import javax.swing.JMenu;
 
+import BritefuryJ.DocPresent.DPHBox;
+import BritefuryJ.DocPresent.DPLink;
 import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.DPText;
+import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.Event.PointerButtonEvent;
+import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 
 public class DPSpanTest extends DocPresentTestBase
 {
 	protected DPSpan span;
+	protected DPParagraph para;
+	protected DPVBox vbox;
 	
 	
 	protected DPWidget createWidget()
 	{
-		span = new DPSpan( null );
-		span.append( new DPText( null, "first" ) );
+		DPLink.LinkListener addSpanElementToSpanAction = new DPLink.LinkListener()
+		{
+			public boolean onLinkClicked(DPLink link, PointerButtonEvent buttonEvent)
+			{
+				System.out.println( "Adding span containing extra text element to outer span" );
+				DPSpan s2 = new DPSpan( null );
+				s2.append( new DPText( null, " text_in_innerspan_in_outerspan_in_para " ) );
+				span.append( s2 );
+				return false;
+			}
+		};
+
+		DPLink.LinkListener addTextElementToSpanAction = new DPLink.LinkListener()
+		{
+			public boolean onLinkClicked(DPLink link, PointerButtonEvent buttonEvent)
+			{
+				System.out.println( "Adding text element to outer span" );
+ 				span.append( new DPText( null, " text_in_outerspan_in_para " ) );
+				return false;
+			}
+		};
+
+		DPLink.LinkListener addSpanElementToParaAction = new DPLink.LinkListener()
+		{
+			public boolean onLinkClicked(DPLink link, PointerButtonEvent buttonEvent)
+			{
+				System.out.println( "Adding span containing extra text element to para" );
+				DPSpan s2 = new DPSpan( null );
+				s2.append( new DPText( null, " text_in_innerspan_in_para " ) );
+				para.append( s2 );
+				return false;
+			}
+		};
+
+		DPLink.LinkListener addTextElementToParaAction = new DPLink.LinkListener()
+		{
+			public boolean onLinkClicked(DPLink link, PointerButtonEvent buttonEvent)
+			{
+				System.out.println( "Adding text  element to para" );
+				para.append( new DPText( null, " text_in_para " ) );
+				return false;
+			}
+		};
+
 		
-		DPParagraph para = new DPParagraph( null );
+		DPLink addSpanElementToSpanLink = new DPLink( null, "Add span element to span", addSpanElementToSpanAction );
+		DPLink addTextElementToSpanLink = new DPLink( null, "Add text element to span", addTextElementToSpanAction );
+		DPLink addSpanElementToParaLink = new DPLink( null, "Add span element to paragraph", addSpanElementToParaAction );
+		DPLink addTextElementToParaLink = new DPLink( null, "Add text element to paragraph", addTextElementToParaAction );
+		
+		DPHBox linkBox = new DPHBox( null, new HBoxStyleSheet( 30.0 ) );
+		linkBox.append( addSpanElementToSpanLink );
+		linkBox.append( addTextElementToSpanLink );
+		linkBox.append( addSpanElementToParaLink );
+		linkBox.append( addTextElementToParaLink );
+
+		
+		
+		
+		span = new DPSpan( null );
+		span.append( new DPText( null, " text_in_span_in_para " ) );
+		
+		para = new DPParagraph( null );
 		para.append( span );
 		
-		return para;
+		vbox = new DPVBox( null );
+		vbox.append( linkBox );
+		vbox.append( para );
+		
+		return vbox;
 	}
 
 	
@@ -38,27 +104,6 @@ public class DPSpanTest extends DocPresentTestBase
 	{
 		JFrame frame = new JFrame( "Span test" );
 		initFrame( frame );
-		
-
-		
-		AbstractAction addElementAction = new AbstractAction( "Add element to span" )
-		{
-			private static final long serialVersionUID = 1L;
-
-			public void actionPerformed(ActionEvent event)
-			{
-				DPSpan s2 = new DPSpan( null );
-				s2.append( new DPText( null, "second" ) );
-				span.append( s2 );
-			}
-		};
-
-		
-		// Menu
-		JMenu actionMenu = new JMenu( "Action" );
-		actionMenu.add( addElementAction );
-		
-		menuBar.add( actionMenu );
 	}
 	
 	public static void main(String[] args)

@@ -14,13 +14,13 @@ from BritefuryJ.DocPresent.StyleSheets import *
 _tabTextStyle = StaticTextStyleSheet( Font( "SansSerif", Font.BOLD, 16 ), Color.BLACK )
 _tabBorder = EmptyBorder( 2.0, 2.0, 2.0, 2.0, Color( 161, 178, 160 ) )
 _tabBoxBorder = SolidBorder( 2.0, 2.0, Color( 161, 178, 160 ), None )
-_tabVBoxStyke = VBoxStyleSheet()
+_tabVBoxStyle = VBoxStyleSheet()
 
 
 def tabbedBox(ctx, tabTitle, contents):
 	tabLabel = ctx.staticText( _tabTextStyle, tabTitle )
 	tab = ctx.border( _tabBorder, tabLabel )
-	box = ctx.border( _tabBoxBorder, contents )
-	return ctx.vbox( _tabVBoxStyke, [ tab, box.alignHExpand() ] )
+	box = ctx.border( _tabBoxBorder, ctx.vbox( _tabVBoxStyle, [ contents ] ) )
+	return ctx.vbox( _tabVBoxStyle, [ tab, box.alignHExpand() ] )
 	
 

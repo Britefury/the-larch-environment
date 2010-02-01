@@ -10,7 +10,6 @@ import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
-import BritefuryJ.Math.Point2;
 import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
 public abstract class DPStatic extends DPWidget
@@ -27,11 +26,6 @@ public abstract class DPStatic extends DPWidget
 
 	
 	
-	protected DPWidget getLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
-	{
-		return null;
-	}
-
 	public String getTextRepresentation()
 	{
 		return "";

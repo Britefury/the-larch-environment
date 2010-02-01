@@ -10,7 +10,6 @@ import org.python.core.Py;
 import org.python.core.PyObject;
 
 import BritefuryJ.DocModel.DMNode;
-import BritefuryJ.DocPresent.DPWidget;
 
 public class PyGSymIncrementalNodeFunction implements GSymIncrementalNodeFunction
 {
@@ -25,6 +24,6 @@ public class PyGSymIncrementalNodeFunction implements GSymIncrementalNodeFunctio
 
 	public Object computeNodeResult(DMNode x, GSymIncrementalNodeContext ctx, Object state)
 	{
-		return (DPWidget)Py.tojava( callable.__call__( Py.java2py( x ), Py.java2py( ctx ), Py.java2py( state ) ), DPWidget.class );
+		return Py.tojava( callable.__call__( Py.java2py( x ), Py.java2py( ctx ), Py.java2py( state ) ), Object.class );
 	}
 }

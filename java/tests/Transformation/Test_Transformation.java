@@ -60,7 +60,7 @@ public class Test_Transformation extends TestCase
 			public Object apply(Object x, TransformationFunction innerNodeXform)
 			{
 				DMObject dx = (DMObject)x;
-				if ( dx.getDMClass() == StringNode )
+				if ( dx.getDMObjectClass() == StringNode )
 				{
 					try
 					{
@@ -83,7 +83,7 @@ public class Test_Transformation extends TestCase
 			public Object apply(Object x, TransformationFunction innerNodeXform)
 			{
 				DMObject dx = (DMObject)x;
-				if ( dx.getDMClass() == StringNode )
+				if ( dx.getDMObjectClass() == StringNode )
 				{
 					try
 					{
@@ -106,7 +106,7 @@ public class Test_Transformation extends TestCase
 			public Object apply(Object x, TransformationFunction innerNodeXform)
 			{
 				DMObject dx = (DMObject)x;
-				if ( dx.getDMClass() == StringNode )
+				if ( dx.getDMObjectClass() == StringNode )
 				{
 					try
 					{

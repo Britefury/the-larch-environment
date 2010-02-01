@@ -249,6 +249,9 @@ public abstract class DMNode
 	protected abstract Object createDeepCopy(Map<Object, Object> memo);
 	
 	
+	public abstract DMNodeClass getDMNodeClass();
+	
+	
 	protected void addParent(DMNode p)
 	{
 		boolean bCleaned = false;

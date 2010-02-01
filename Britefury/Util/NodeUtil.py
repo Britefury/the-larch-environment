@@ -36,7 +36,7 @@ def nodeToSXString(x, level=3):
 		if level == 0:
 			return '(...)'
 		else:
-			return '( ' + x.getDMClass().getName() + ' : ' + ' '.join( [ x.getDMClass().getField( i ).getName() + '=' + nodeToSXString( x.get( i ), level - 1 )  for i in xrange( 0, x.getDMClass().getNumFields() ) ] ) + ')'
+			return '( ' + x.getDMObjectClass().getName() + ' : ' + ' '.join( [ x.getDMObjectClass().getField( i ).getName() + '=' + nodeToSXString( x.get( i ), level - 1 )  for i in xrange( 0, x.getDMObjectClass().getNumFields() ) ] ) + ')'
 	else:
 		raise TypeError, '%s'  %  ( x.__class__, )
 

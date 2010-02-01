@@ -46,7 +46,7 @@ public class Test_DMObject extends Test_DMNode_base
 		DMObject a = A.newInstance( new Object[] { "a", "p" } );
 		history.track( a );
 		
-		assertSame( a.getDMClass(), A );
+		assertSame( a.getDMObjectClass(), A );
 	}
 
 		

@@ -7,10 +7,11 @@
 package BritefuryJ.DocPresent.Layout;
 
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.LayoutTree.LayoutNode;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 
-public class LAllocBox
+public class LAllocBox extends LAllocBoxInterface
 {
 	protected double positionInParentSpaceX, positionInParentSpaceY;
 	protected double allocationX, allocationAscent, allocationDescent;
@@ -38,6 +39,11 @@ public class LAllocBox
 	public DPWidget getElement()
 	{
 		return element;
+	}
+	
+	public LayoutNode getLayoutNode()
+	{
+		return element.getLayoutNode();
 	}
 	
 	
@@ -137,22 +143,22 @@ public class LAllocBox
 	
 	
 	
-	public void allocateX(LReqBox requisition, double x, double width)
+	public void allocateX(LReqBoxInterface requisition, double x, double width)
 	{
 		positionInParentSpaceX = x;
 		allocationX = Math.max( width, requisition.getMinWidth() );
 	}
 	
-	public void allocateY(LReqBox requisition, double y, double height)
+	public void allocateY(LReqBoxInterface requisition, double y, double height)
 	{
 		positionInParentSpaceY = y;
 		double delta = Math.max( ( height - requisition.getReqHeight() )  *  0.5,  0.0 );
-		allocationAscent = requisition.reqAscent  +  delta;
-		allocationDescent = requisition.reqDescent  +  delta;
+		allocationAscent = requisition.getReqAscent()  +  delta;
+		allocationDescent = requisition.getReqDescent()  +  delta;
 		bHasBaseline = false;
 	}
 	
-	public void allocateY(LReqBox requisition, double y, double ascent, double descent)
+	public void allocateY(LReqBoxInterface requisition, double y, double ascent, double descent)
 	{
 		positionInParentSpaceY = y;
 		allocationAscent = Math.max( ascent, requisition.getReqAscent() );
@@ -160,7 +166,7 @@ public class LAllocBox
 		bHasBaseline = true;
 	}
 	
-	public void allocateY(LReqBox requisition, double y, LAllocV allocV)
+	public void allocateY(LReqBoxInterface requisition, double y, LAllocV allocV)
 	{
 		positionInParentSpaceY = y;
 		allocationAscent = Math.max( allocV.ascent, requisition.getReqAscent() );
@@ -191,56 +197,52 @@ public class LAllocBox
 	
 
 	
-	protected void allocateChildPositionX(LAllocBox childAllocation, double localPosX)
+	protected void allocateChildPositionX(LAllocBoxInterface childAllocation, double localPosX)
 	{
-		childAllocation.positionInParentSpaceX = localPosX;
+		childAllocation.setPositionInParentSpaceX( localPosX );
 	}
 	
-	protected void allocateChildWidth(LAllocBox childAllocation, double localWidth)
+	protected void allocateChildWidth(LAllocBoxInterface childAllocation, double localWidth)
 	{
-		childAllocation.allocationX = localWidth;
+		childAllocation.setAllocationX( localWidth );
 	}
 	
-	protected void allocateChildX(LAllocBox childAllocation, double localPosX, double localWidth)
+	protected void allocateChildX(LAllocBoxInterface childAllocation, double localPosX, double localWidth)
 	{
-		childAllocation.allocationX = localWidth;
-		childAllocation.positionInParentSpaceX = localPosX;
+		childAllocation.setPositionInParentSpaceAndAllocationX( localPosX, localWidth );
 	}
 	
-	public void allocateChildXAligned(LAllocBox childAllocation, LReqBox childRequisition, int alignmentFlags, double regionX, double regionWidth)
+	public void allocateChildXAligned(LAllocBoxInterface childAllocation, LReqBoxInterface childRequisition, int alignmentFlags, double regionX, double regionWidth)
 	{
 		allocateChildXAligned( childAllocation, childRequisition, ElementAlignment.getHAlignment( alignmentFlags ), regionX, regionWidth );
 	}
 	
-	public void allocateChildXAligned(LAllocBox childAllocation, LReqBox childRequisition, HAlignment hAlign, double regionX, double regionWidth)
+	public void allocateChildXAligned(LAllocBoxInterface childAllocation, LReqBoxInterface childRequisition, HAlignment hAlign, double regionX, double regionWidth)
 	{
 		double childWidth = childRequisition.getPrefWidth();
 		if ( regionWidth <= childWidth )
 		{
-			childAllocation.allocationX = Math.max( regionWidth, childRequisition.getMinWidth() );
-			childAllocation.positionInParentSpaceX = regionX;
+			childAllocation.setPositionInParentSpaceAndAllocationX( regionX, Math.max( regionWidth, childRequisition.getMinWidth() ) );
 		}
 		else
 		{
 			if ( hAlign == HAlignment.EXPAND )
 			{
-				childAllocation.allocationX = regionWidth;
-				childAllocation.positionInParentSpaceX = regionX;
+				childAllocation.setPositionInParentSpaceAndAllocationX( regionX, regionWidth );
 			}
 			else
 			{
-				childAllocation.allocationX = childWidth;
 				if ( hAlign == HAlignment.LEFT )
 				{
-					childAllocation.positionInParentSpaceX = regionX;
+					childAllocation.setPositionInParentSpaceAndAllocationX( regionX, childWidth );
 				}
 				else if ( hAlign == HAlignment.CENTRE )
 				{
-					childAllocation.positionInParentSpaceX = regionX + ( regionWidth - childWidth ) * 0.5;
+					childAllocation.setPositionInParentSpaceAndAllocationX( regionX + ( regionWidth - childWidth ) * 0.5, childWidth );
 				}
 				else if ( hAlign == HAlignment.RIGHT )
 				{
-					childAllocation.positionInParentSpaceX = regionX + ( regionWidth - childWidth );
+					childAllocation.setPositionInParentSpaceAndAllocationX( regionX + ( regionWidth - childWidth ), childWidth );
 				}
 				else
 				{
@@ -255,89 +257,68 @@ public class LAllocBox
 	
 	
 	
-	protected void allocateChildPositionY(LAllocBox childAllocation, double localPosY)
+	protected void allocateChildPositionY(LAllocBoxInterface childAllocation, double localPosY)
 	{
-		childAllocation.positionInParentSpaceY = localPosY;
+		childAllocation.setPositionInParentSpaceY( localPosY );
 	}
 	
-	protected void allocateChildHeightAsRequisition(LAllocBox childAllocation, LReqBox childRequisition)
+	protected void allocateChildHeightAsRequisition(LAllocBoxInterface childAllocation, LReqBoxInterface childRequisition)
 	{
-		childAllocation.allocationAscent = childRequisition.reqAscent;
-		childAllocation.allocationDescent = childRequisition.reqDescent;
-		childAllocation.bHasBaseline = childRequisition.hasBaseline();
+		childAllocation.setAllocationY( childRequisition.getReqAscent(), childRequisition.getReqDescent(), childRequisition.hasBaseline() );
 	}
 	
-	protected void allocateChildHeightPaddedRequisition(LAllocBox childAllocation, LReqBox childRequisition, double totalHeight)
+	protected void allocateChildHeightPaddedRequisition(LAllocBoxInterface childAllocation, LReqBoxInterface childRequisition, double totalHeight)
 	{
 		if ( childRequisition.hasBaseline() )
 		{
 			double padding = Math.max( ( totalHeight - childRequisition.getReqHeight() )  *  0.5,  0.0 );
-			childAllocation.allocationAscent = childRequisition.reqAscent + padding;
-			childAllocation.allocationDescent = childRequisition.reqDescent + padding;
-			childAllocation.bHasBaseline = true;
+			childAllocation.setAllocationY( childRequisition.getReqAscent() + padding, childRequisition.getReqDescent() + padding );
 		}
 		else
 		{
-			childAllocation.allocationAscent = totalHeight * 0.5;
-			childAllocation.allocationDescent = totalHeight * 0.5;
-			childAllocation.bHasBaseline = false;
+			childAllocation.setAllocationY( totalHeight );
 		}
 	}
 	
 	
-	protected void allocateChildYAsRequisition(LAllocBox childAllocation, LReqBox childRequisition, double localPosY)
+	protected void allocateChildYAsRequisition(LAllocBoxInterface childAllocation, LReqBoxInterface childRequisition, double localPosY)
 	{
-		childAllocation.allocationAscent = childRequisition.reqAscent;
-		childAllocation.allocationDescent = childRequisition.reqDescent;
-		childAllocation.bHasBaseline = childRequisition.hasBaseline();
-		childAllocation.positionInParentSpaceY = localPosY;
+		childAllocation.setPositionInParentSpaceAndAllocationY( localPosY, childRequisition.getReqAscent(), childRequisition.getReqDescent(), childRequisition.hasBaseline() );
 	}
 	
-	protected void allocateChildYPaddedRequisition(LAllocBox childAllocation, LReqBox childRequisition, double localPosY, double localHeight)
+	protected void allocateChildYPaddedRequisition(LAllocBoxInterface childAllocation, LReqBoxInterface childRequisition, double localPosY, double localHeight)
 	{
 		if ( childRequisition.hasBaseline() )
 		{
 			double delta = Math.max( ( localHeight - childRequisition.getReqHeight() )  *  0.5,  0.0 );
-			childAllocation.allocationAscent = childRequisition.reqAscent + delta;
-			childAllocation.allocationDescent = childRequisition.reqDescent + delta;
-			childAllocation.bHasBaseline = true;
-			childAllocation.positionInParentSpaceY = localPosY;
+			childAllocation.setPositionInParentSpaceAndAllocationY( localPosY, childRequisition.getReqAscent() + delta, childRequisition.getReqDescent() + delta );
 		}
 		else
 		{
-			childAllocation.allocationAscent = localHeight * 0.5;
-			childAllocation.allocationDescent = localHeight * 0.5;
-			childAllocation.bHasBaseline = false;
-			childAllocation.positionInParentSpaceY = localPosY;
+			childAllocation.setPositionInParentSpaceAndAllocationY( localPosY, localHeight );
 		}
 	}
 	
-	protected void allocateChildYPaddedRequisition(LAllocBox childAllocation, LReqBox childRequisition, double localPosY, double localAscent, double localDescent)
+	protected void allocateChildYPaddedRequisition(LAllocBoxInterface childAllocation, LReqBoxInterface childRequisition, double localPosY, double localAscent, double localDescent)
 	{
 		if ( childRequisition.hasBaseline() )
 		{
-			childAllocation.allocationAscent = localAscent;
-			childAllocation.allocationDescent = localDescent;
-			childAllocation.bHasBaseline = true;
-			childAllocation.positionInParentSpaceY = localPosY;
+			childAllocation.setPositionInParentSpaceAndAllocationY( localPosY, localAscent, localDescent );
 		}
 		else
 		{
 			double localHeight = localAscent + localDescent;
-			childAllocation.allocationAscent = localHeight * 0.5;
-			childAllocation.allocationDescent = localHeight * 0.5;
-			childAllocation.bHasBaseline = false;
-			childAllocation.positionInParentSpaceY = localPosY;
+			childAllocation.setPositionInParentSpaceAndAllocationY( localPosY, localHeight );
 		}
 	}
 	
 	
-	public void allocateChildYAligned(LAllocBox childAllocation, LReqBox childRequisition, int alignmentFlags, double regionY, LAllocV regionAllocV)
+	public void allocateChildYAligned(LAllocBoxInterface childAllocation, LReqBoxInterface childRequisition, int alignmentFlags, double regionY, LAllocV regionAllocV)
 	{
 		allocateChildYAligned( childAllocation, childRequisition, ElementAlignment.getVAlignment( alignmentFlags ), regionY, regionAllocV );
 	}
 	
-	public void allocateChildYAligned(LAllocBox childAllocation, LReqBox childRequisition, VAlignment vAlign, double regionY, LAllocV regionAllocV)
+	public void allocateChildYAligned(LAllocBoxInterface childAllocation, LReqBoxInterface childRequisition, VAlignment vAlign, double regionY, LAllocV regionAllocV)
 	{
 		if ( vAlign == VAlignment.BASELINES_EXPAND )
 		{
@@ -392,7 +373,76 @@ public class LAllocBox
 		allocationAscent *= scale;
 		allocationDescent *= scale;
 	}
+	
+	
+	
+	//
+	// SETTERS
+	//
+	
+	protected void setPositionInParentSpaceX(double x)
+	{
+		positionInParentSpaceX = x;
+	}
+	
+	protected void setPositionInParentSpaceY(double y)
+	{
+		positionInParentSpaceY = y;
+	}
+	
+	protected void setAllocationX(double width)
+	{
+		allocationX = width;
+	}
 
+	protected void setAllocationY(double height)
+	{
+		allocationAscent = allocationDescent = height * 0.5;
+		bHasBaseline = false;
+	}
+
+	protected void setAllocationY(double ascent, double descent)
+	{
+		allocationAscent = ascent;
+		allocationDescent = descent;
+		bHasBaseline = true;
+	}
+
+	protected void setAllocationY(double ascent, double descent, boolean bHasBaseline)
+	{
+		allocationAscent = ascent;
+		allocationDescent = descent;
+		this.bHasBaseline = bHasBaseline;
+	}
+
+	protected void setPositionInParentSpaceAndAllocationX(double x, double width)
+	{
+		positionInParentSpaceX = x;
+		allocationX = width;
+	}
+	
+	protected void setPositionInParentSpaceAndAllocationY(double y, double height)
+	{
+		positionInParentSpaceY = y;
+		allocationAscent = allocationDescent = height * 0.5;
+		bHasBaseline = false;
+	}
+	
+	protected void setPositionInParentSpaceAndAllocationY(double y, double ascent, double descent)
+	{
+		positionInParentSpaceY = y;
+		allocationAscent = ascent;
+		allocationDescent = descent;
+		bHasBaseline = true;
+	}
+
+	protected void setPositionInParentSpaceAndAllocationY(double y, double ascent, double descent, boolean bHasBaseline)
+	{
+		positionInParentSpaceY = y;
+		allocationAscent = ascent;
+		allocationDescent = descent;
+		this.bHasBaseline = bHasBaseline;
+	}
 
 
 

@@ -88,113 +88,112 @@ PRECEDENCE_IMPORTCONTENT = 0
 
 class NodePrecedence (object):
 	__metaclass__ = ObjectNodeMethodDispatchMetaClass
-	__dispatch_module__ = Nodes.module
 	__dispatch_num_args__ = 0
 	
 	
 	def __call__(self, node):
 		return objectNodeMethodDispatch( self, node )
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.CommentStmt )
 	def CommentStmt(self, node):
 		return PRECEDENCE_COMMENT
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.BlankLine )
 	def BlankLine(self, node):
 		return PRECEDENCE_COMMENT
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.UNPARSED )
 	def UNPARSED(self, node):
 		return PRECEDENCE_UNPARSED
 	
 	
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.Stmt )
 	def Stmt(self, node):
 		return PRECEDENCE_STMT
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.Expr )
 	def Expr(self, node):
 		return PRECEDENCE_EXPR
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.Pow )
 	def Pow(self, node):
 		return PRECEDENCE_POW
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.Invert )
 	def Invert(self, node):
 		return PRECEDENCE_INVERT_NEGATE_POS
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.Negate )
 	def Negate(self, node):
 		return PRECEDENCE_INVERT_NEGATE_POS
 
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.Pos )
 	def Pos(self, node):
 		return PRECEDENCE_INVERT_NEGATE_POS
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.Mul )
 	def Mul(self, node):
 		return PRECEDENCE_MULDIVMOD
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.Div )
 	def Div(self, node):
 		return PRECEDENCE_MULDIVMOD
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.Mod )
 	def Mod(self, node):
 		return PRECEDENCE_MULDIVMOD
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.Add )
 	def Add(self, node):
 		return PRECEDENCE_ADDSUB
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.Sub )
 	def Sub(self, node):
 		return PRECEDENCE_ADDSUB
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.LShift )
 	def LShift(self, node):
 		return PRECEDENCE_SHIFT
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.RShift )
 	def RShift(self, node):
 		return PRECEDENCE_SHIFT
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.BitAnd )
 	def BitAnd(self, node):
 		return PRECEDENCE_BITAND
 
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.BitXor )
 	def BitXor(self, node):
 		return PRECEDENCE_BITXOR
 
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.BitOr )
 	def BitOr(self, node):
 		return PRECEDENCE_BITOR
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.Cmp )
 	def Cmp(self, node):
 		return PRECEDENCE_CMP
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.NotTest )
 	def NotTest(self, node):
 		return PRECEDENCE_NOT
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.AndTest )
 	def AndTest(self, node):
 		return PRECEDENCE_AND
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.OrTest )
 	def OrTest(self, node):
 		return PRECEDENCE_OR
 
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.LambdaExpr )
 	def LambdaExpr(self, node):
 		return PRECEDENCE_LAMBDAEXPR
 	
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.ConditionalExpr )
 	def ConditionalExpr(self, node):
 		return PRECEDENCE_CONDITIONAL
 
@@ -202,17 +201,16 @@ class NodePrecedence (object):
 	
 class NodeRightAssociativity (object):
 	__metaclass__ = ObjectNodeMethodDispatchMetaClass
-	__dispatch_module__ = Nodes.module
 	__dispatch_num_args__ = 0
 	
 	def __call__(self, node):
 		return objectNodeMethodDispatch( self, node )
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.BinOp )
 	def BinOp(self, node):
 		return False
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.Pow )
 	def Pow(self, node):
 		return True
 
@@ -327,7 +325,6 @@ def _transformCmp(node, xform):
 	
 class RemoveUnNeededParensXform (object):
 	__metaclass__ = ObjectNodeMethodDispatchMetaClass
-	__dispatch_module__ = Nodes.module
 	__dispatch_num_args__ = 1
 	
 	
@@ -337,47 +334,47 @@ class RemoveUnNeededParensXform (object):
 		except DispatchError:
 			return TransformationFunction.cannotApplyTransformationValue
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.ComprehensionFor )
 	def ComprehensionFor(self, xform, node):
 		return _transformOp( node, xform, PRECEDENCE_CONTAINER_COMPREHENSIONFOR, 'source' )
 		
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.ComprehensionIf )
 	def ComprehensionIf(self, xform, node):
 		return _transformOp( node, xform, PRECEDENCE_CONTAINER_COMPREHENSIONIF, 'condition' )
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.AttributeRef )
 	def AttributeRef(self, xform, node):
 		return _transformOp( node, xform, PRECEDENCE_CONTAINER_ATTRIBUTEREFTARGET, 'target' )
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.Subscript )
 	def Subscript(self, xform, node):
 		return _transformOp( node, xform, PRECEDENCE_CONTAINER_SUBSCRIPTTARGET, 'target' )
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.Call )
 	def Call(self, xform, node):
 		return _transformOp( node, xform, PRECEDENCE_CONTAINER_CALLTARGET, 'target' )
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.BinOp )
 	def BinOp(self, xform, node):
 		return _transformBinOp( node, xform )
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.UnaryOp )
 	def UnaryOp(self, xform, node):
 		return _transformUnaryOp( node, xform )
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.Cmp )
 	def Cmp(self, xform, node):
 		return _transformCmp( node, xform )
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.CmpOp )
 	def CmpOp(self, xform, node):
 		return _transformCmpOp( node, xform )
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.LambdaExpr )
 	def LambdaExpr(self, xform, node):
 		return _transformOp( node, xform, PRECEDENCE_CONTAINER_LAMBDAEXPR, 'expr' )
 	
-	@ObjectNodeDispatchMethod
+	@ObjectNodeDispatchMethod( Nodes.ConditionalExpr )
 	def ConditionalExpr(self, xform, node):
 		return _transformOpMulti( node, xform, PRECEDENCE_CONTAINER_CONDITIONALEXPR, [ 'expr', 'condition' ] )
 
@@ -484,4 +481,4 @@ class Test_Precedence (unittest.TestCase):
 		self._parseStringTest( self._parser.singleLineStatement(), 'y=(((a+b))/(a+b)+c)*x\n', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='y' ) ], value=Nodes.Mul( x=Nodes.Add( x=Nodes.Div( x=Nodes.Add( parens='1', x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ) ), y=Nodes.Load( name='c' ) ), y=Nodes.Load( name='x' ) ) ) )
 		self._parseStringTest( self._parser.singleLineStatement(), 'x=(a+b)/(c+d)+e\n', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='x' ) ], value=Nodes.Add( x=Nodes.Div( x=Nodes.Add( x=Nodes.Load( name='a' ), y=Nodes.Load( name='b' ) ), y=Nodes.Add( x=Nodes.Load( name='c' ), y=Nodes.Load( name='d' ) ) ), y=Nodes.Load( name='e' ) ) ) )
 		self._parseStringTest( self._parser.singleLineStatement(), 'x=a/(b+c+d)\n', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='x' ) ], value=Nodes.Div( x=Nodes.Load( name='a' ), y=Nodes.Add( x=Nodes.Add( x=Nodes.Load( name='b' ), y=Nodes.Load( name='c' ) ), y=Nodes.Load( name='d' ) ) ) ) )
-		
+

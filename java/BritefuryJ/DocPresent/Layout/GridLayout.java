@@ -8,7 +8,7 @@ package BritefuryJ.DocPresent.Layout;
 
 public class GridLayout
 {
-	private static LReqBox[] computeColumnXBoxes(LReqBox children[][], int numColumns, double columnSpacing)
+	private static LReqBox[] computeColumnXBoxes(LReqBoxInterface children[][], int numColumns, double columnSpacing)
 	{
 		LReqBox columnBoxes[] = new LReqBox[numColumns];
 		for (int i = 0; i < numColumns; i++)
@@ -18,16 +18,16 @@ public class GridLayout
 		
 		
 		// First phase; fill only with children who span 1 column
-		for (LReqBox row[]: children)
+		for (LReqBoxInterface row[]: children)
 		{
 			int c = 0;
-			for (LReqBox child: row)
+			for (LReqBoxInterface child: row)
 			{
 				if ( child != null )
 				{
 					LReqBox b = columnBoxes[c];
-					b.minWidth = Math.max( b.minWidth, child.minWidth );
-					b.prefWidth = Math.max( b.prefWidth, child.prefWidth );
+					b.minWidth = Math.max( b.minWidth, child.getMinWidth() );
+					b.prefWidth = Math.max( b.prefWidth, child.getPrefWidth() );
 				}
 				c++;
 			}
@@ -46,14 +46,14 @@ public class GridLayout
 
 
 
-	public static void computeRowRequisitionY(LReqBox rowBox, LReqBox children[], int childAlignmentFlags[])
+	public static void computeRowRequisitionY(LReqBox rowBox, LReqBoxInterface children[], int childAlignmentFlags[])
 	{
 		// First phase; fill only with children who span 1 row
 		double rowAscent = 0.0, rowDescent = 0.0, rowHeight = 0.0;
 		boolean bHasBaseline = false;
 
 		int c = 0;
-		for (LReqBox child: children)
+		for (LReqBoxInterface child: children)
 		{
 			if ( child != null )
 			{
@@ -67,8 +67,8 @@ public class GridLayout
 				
 				if ( bBaseline  &&  child.hasBaseline() )
 				{
-					rowAscent = Math.max( rowAscent, child.reqAscent );
-					rowDescent = Math.max( rowDescent, child.reqDescent );
+					rowAscent = Math.max( rowAscent, child.getReqAscent() );
+					rowDescent = Math.max( rowDescent, child.getReqDescent() );
 				}
 				else
 				{
@@ -99,7 +99,7 @@ public class GridLayout
 
 
 	
-	public static void allocateRowY(LReqBox reqBox, LReqBox children[],	LAllocBox allocBox, LAllocBox childrenAlloc[], int childAlignmentFlags[])
+	public static void allocateRowY(LReqBox reqBox, LReqBoxInterface children[], LAllocBox allocBox, LAllocBoxInterface childrenAlloc[], int childAlignmentFlags[])
 	{
 		LAllocV h = HorizontalLayout.computeVerticalAllocationForRow( reqBox, allocBox );
 		
@@ -114,7 +114,7 @@ public class GridLayout
 
 	
 	
-	public static LReqBox[] computeRequisitionX(LReqBox box, LReqBox children[][], int numColumns, int numRows, double columnSpacing, double rowSpacing)
+	public static LReqBox[] computeRequisitionX(LReqBox box, LReqBoxInterface children[][], int numColumns, int numRows, double columnSpacing, double rowSpacing)
 	{
 		LReqBox columnBoxes[] = computeColumnXBoxes( children, numColumns, columnSpacing );
 		
@@ -135,11 +135,11 @@ public class GridLayout
 
 
 
-	public static void computeRequisitionY(LReqBox box, LReqBox rowBoxes[], double rowSpacing)
+	public static void computeRequisitionY(LReqBox box, LReqBoxInterface rowBoxes[], double rowSpacing)
 	{
 		// Total space required by rows
 		double reqHeight = 0.0;
-		for (LReqBox rowBox: rowBoxes)
+		for (LReqBoxInterface rowBox: rowBoxes)
 		{
 			reqHeight += rowBox.getReqHeight();
 		}
@@ -152,8 +152,8 @@ public class GridLayout
 	
 	
 	
-	public static void allocateX(LReqBox box, LReqBox columnBoxes[], LReqBox children[][],
-			LAllocBox allocBox, LAllocBox columnAllocBoxes[], LAllocBox childrenAlloc[][], 
+	public static void allocateX(LReqBox box, LReqBoxInterface columnBoxes[], LReqBoxInterface children[][],
+			LAllocBox allocBox, LAllocBoxInterface columnAllocBoxes[], LAllocBoxInterface childrenAlloc[][], 
 			int childAlignmentFlags[][], int numColumns, int numRows,
 			double columnSpacing, double rowSpacing, boolean bColumnExpand, boolean bRowExpand)
 	{
@@ -163,23 +163,23 @@ public class GridLayout
 		// Allocate children
 		for (int r = 0; r < children.length; r++)
 		{
-			LReqBox rowRequisition[] = children[r];
-			LAllocBox rowAlloc[] = childrenAlloc[r];
+			LReqBoxInterface rowRequisition[] = children[r];
+			LAllocBoxInterface rowAlloc[] = childrenAlloc[r];
 			int rowAlignmentFlags[] = childAlignmentFlags[r];
 
 			for (int c = 0; c < rowRequisition.length; c++)
 			{
-				LReqBox childRequisition = rowRequisition[c];
+				LReqBoxInterface childRequisition = rowRequisition[c];
 				if ( childRequisition != null )
 				{
-					LAllocBox childAlloc = rowAlloc[c];
+					LAllocBoxInterface childAlloc = rowAlloc[c];
 					int alignmentFlags = rowAlignmentFlags[c];
 					HAlignment hAlign = ElementAlignment.getHAlignment( alignmentFlags );
 					
-					LAllocBox colAlloc = columnAllocBoxes[c];
-					double cellWidth = Math.max( colAlloc.allocationX, childRequisition.minWidth );
+					LAllocBoxInterface colAlloc = columnAllocBoxes[c];
+					double cellWidth = Math.max( colAlloc.getAllocationX(), childRequisition.getMinWidth() );
 		
-					allocBox.allocateChildXAligned( childAlloc, childRequisition, hAlign, colAlloc.positionInParentSpaceX, cellWidth );
+					allocBox.allocateChildXAligned( childAlloc, childRequisition, hAlign, colAlloc.getPositionInParentSpaceX(), cellWidth );
 				}
 			}
 		}
@@ -187,7 +187,7 @@ public class GridLayout
 	
 
 	
-	public static void allocateY(LReqBox box, LReqBox rowBoxes[], LAllocBox allocBox, LAllocBox rowAllocBoxes[], double rowSpacing, boolean bRowExpand)
+	public static void allocateY(LReqBox box, LReqBoxInterface rowBoxes[], LAllocBox allocBox, LAllocBoxInterface rowAllocBoxes[], double rowSpacing, boolean bRowExpand)
 	{
 		// Allocate space to the rows
 		VerticalLayout.allocateY( box, rowBoxes, allocBox, rowAllocBoxes, rowSpacing, bRowExpand );

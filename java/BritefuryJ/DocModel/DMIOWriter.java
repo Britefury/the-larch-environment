@@ -84,7 +84,7 @@ public class DMIOWriter
 	
 	private void writeObject(StringBuilder builder, DMObject obj) throws InvalidDataTypeException
 	{
-		DMObjectClass cls = obj.getDMClass();
+		DMObjectClass cls = obj.getDMObjectClass();
 		DMModule mod = cls.getModule();
 		
 		builder.append( "(" );
