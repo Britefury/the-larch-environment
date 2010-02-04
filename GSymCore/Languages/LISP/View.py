@@ -170,7 +170,6 @@ def viewLispNode(node, ctx, state):
 	
 	
 	
-	
 
 
 def viewLISPDocNodeAsElement(document, docNode, resolveContext, location, commandHistory, app):
