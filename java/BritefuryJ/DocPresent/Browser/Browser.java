@@ -37,7 +37,6 @@ import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.PageController;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemLocationResolver;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
-import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
@@ -416,7 +415,7 @@ public class Browser
 		{
 			DPVBox pageBox = new DPVBox( null );
 			
-			VBoxStyleSheet contentBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 40.0 );
+			VBoxStyleSheet contentBoxStyle = new VBoxStyleSheet( 40.0 );
 			DPVBox contentBox = new DPVBox( null, contentBoxStyle );
 			
 
@@ -457,14 +456,14 @@ public class Browser
 
 		public DPWidget getContentsElement()
 		{
-			VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 40.0 );
+			VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( 40.0 );
 			DPVBox pageBox = new DPVBox( null, pageBoxStyle );
 			
 
 			TextStyleSheet titleStyle = new TextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
 			DPText title = new DPText( null, titleStyle, "Could Not Resolve Location" );
 			
-			VBoxStyleSheet errorBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 10.0 );
+			VBoxStyleSheet errorBoxStyle = new VBoxStyleSheet( 10.0 );
 			DPVBox errorBox = new DPVBox( null, errorBoxStyle );
 			
 			TextStyleSheet locationStyle = new TextStyleSheet( new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK );

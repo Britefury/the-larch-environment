@@ -356,7 +356,7 @@ public class TextVisual
 				double ascent = layout.getAscent(), descent = layout.getDescent();
 				
 				reqBox.setRequisitionX( width, layout.getAdvance() );
-				reqBox.setRequisitionY( layout.getAscent(), layout.getDescent(), layout.getLeading() );
+				reqBox.setRequisitionY( layout.getAscent() + layout.getDescent(), layout.getLeading(), layout.getAscent() );
 				
 				// Squiggle shape
 				squiggleUnderlineShape = new Path2D.Double();

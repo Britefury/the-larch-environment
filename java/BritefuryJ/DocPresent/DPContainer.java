@@ -16,7 +16,6 @@ import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Layout.PackingParams;
-import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.LayoutTree.BranchLayoutNode;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
@@ -883,7 +882,7 @@ public abstract class DPContainer extends DPWidget
 	//
 	
 	static EmptyBorder metaIndentBorder = new EmptyBorder( 25.0, 0.0, 0.0, 0.0 );
-	static VBoxStyleSheet metaVBoxStyle = new VBoxStyleSheet( VTypesetting.ALIGN_WITH_BOTTOM, 0.0 );
+	static VBoxStyleSheet metaVBoxStyle = new VBoxStyleSheet( 0.0 );
 	
 	public DPBorder getMetaHeaderBorderWidget()
 	{
@@ -913,6 +912,7 @@ public abstract class DPContainer extends DPWidget
 				System.out.println( "DPContainer.createMetaElement(): null child in " + getClass().getName() );
 			}
 		}
+		metaChildrenVBox.setRefPointIndex( getChildren().size() - 1 );
 		
 		DPBorder indentMetaChildren = new DPBorder( null, metaIndentBorder );
 		indentMetaChildren.setChild( metaChildrenVBox );

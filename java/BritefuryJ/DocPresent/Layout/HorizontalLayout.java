@@ -58,52 +58,47 @@ public class HorizontalLayout
 		
 		box.clearRequisitionY();
 		
-		double reqAscent = 0.0, reqDescent = 0.0, reqDescentAndSpacing = 0.0, reqHeight = 0.0, reqAdvance = 0.0;
-		boolean bHasBaseline = false;
+		double rowHeight = 0.0, rowHeightAboveRef = 0.0,  rowHeightBelowRef = 0.0, rowHeightAndSpacing = 0.0, rowHeightBelowRefAndSpacing = 0.0;
+		boolean bRefYAligned = false;
 		for (int i = 0; i < children.length; i++)
 		{
 			LReqBoxInterface child = children[i];
 			VAlignment v = ElementAlignment.getVAlignment( childAllocationFlags[i] );
 			
-			boolean bBaseline = v == VAlignment.BASELINES  ||  v == VAlignment.BASELINES_EXPAND;
-			if ( bBaseline )
-			{
-				bHasBaseline = true;
-			}
+			double childHeight = child.getReqHeight();
 			
-			if ( bBaseline  &&  child.hasBaseline() )
+			if ( v == VAlignment.REFY  ||  v == VAlignment.REFY_EXPAND )
 			{
-				double childReqDescentAndSpacing = child.getReqDescent() + child.getReqVSpacing();
-				reqAscent = Math.max( reqAscent, child.getReqAscent() );
-				reqDescent = Math.max( reqDescent, child.getReqDescent() );
-				reqDescentAndSpacing = Math.max( reqDescentAndSpacing, childReqDescentAndSpacing );
+				double childRefY = child.getRefY();
+				double childHeightAboveRef = childRefY;
+				double childHeightBelowRef = childHeight - childRefY;
+				double childHeightBelowRefAndSpacing = childHeightBelowRef + child.getReqVSpacing();
+				
+				rowHeight = Math.max( rowHeight, childHeight );
+				rowHeightAboveRef = Math.max( rowHeightAboveRef, childHeightAboveRef );
+				rowHeightBelowRef = Math.max( rowHeightBelowRef, childHeightBelowRef );
+				rowHeightBelowRefAndSpacing = Math.max( rowHeightBelowRefAndSpacing, childHeightBelowRefAndSpacing );
+				
+				bRefYAligned = true;
 			}
 			else
 			{
-				double childReqHeight = child.getReqHeight();
-				double childReqAdvance = childReqHeight + child.getReqVSpacing();
-				reqHeight = Math.max( reqHeight, childReqHeight );
-				reqAdvance = Math.max( reqAdvance, childReqAdvance );
+				double childHeightAndSpacing = childHeight + child.getReqVSpacing();
+
+				rowHeight = Math.max( rowHeight, childHeight );
+				rowHeightAndSpacing = Math.max( rowHeightAndSpacing, childHeightAndSpacing );
 			}
 		}
+		rowHeight = Math.max( rowHeight, rowHeightAboveRef + rowHeightBelowRef );
+		rowHeightAndSpacing = Math.max( rowHeightAndSpacing, rowHeightAboveRef + rowHeightBelowRefAndSpacing );
 		
-		if ( bHasBaseline )
+		if ( bRefYAligned )
 		{
-			double advance = Math.max( reqAdvance, reqAscent + reqDescentAndSpacing );
-			if ( reqHeight  >  ( reqAscent + reqDescent ) )
-			{
-				double deltaY = ( reqHeight  -  ( reqAscent + reqDescent ) )  *  0.5;
-				box.setRequisitionY( reqAscent + deltaY, reqDescent + deltaY, advance - reqHeight );
-			}
-			else
-			{
-				box.setRequisitionY( reqAscent, reqDescent, advance - ( reqAscent + reqDescent ) );
-			}
+			box.setRequisitionY( rowHeight, rowHeightAndSpacing - rowHeight, rowHeightAboveRef );
 		}
 		else
 		{
-			// No children had baseline alignment; result in a box that has no baseline
-			box.setRequisitionY( reqHeight, reqAdvance - reqHeight );
+			box.setRequisitionY( rowHeight, rowHeightAndSpacing - rowHeight );
 		}
 	}
 
@@ -260,41 +255,34 @@ public class HorizontalLayout
 
 	
 	
-	public static LAllocV computeVerticalAllocationForRow(LReqBox box, LAllocBox allocBox)
+	public static LAllocV computeVerticalAllocationForRow(LReqBox reqBox, LAllocBox allocBox)
 	{
-		// Compute the amount of space allocated (do not allow to fall below minimum requirement)
-		double allocationHeight = Math.max( allocBox.getAllocationY(), box.getReqHeight() );
-		
-		double ascent = 0.0, descent = 0.0;
-		
-		if ( allocBox.hasBaseline() )
+		//return new LAllocV( Math.max( reqBox.getReqHeight(), allocBox.getAllocationY() ),  Math.max( reqBox.getRefY(), ))
+		if ( allocBox.getAllocationY() < reqBox.getReqHeight() )
 		{
-			ascent = Math.max( allocBox.getAllocationAscent(), box.getReqAscent() );
-			descent = Math.max( allocBox.getAllocationDescent(), box.getReqDescent() );
-			return new LAllocV( ascent, descent );
+			return new LAllocV( reqBox.getReqHeight(), reqBox.getRefY() );
 		}
 		else
 		{
-			// Compute the difference (clamped to >0) between the allocation and the preferred height 
-			double delta = Math.max( allocationHeight - box.getReqHeight(), 0.0 );
-		
-			// Compute the default ascent and descent (distribute the 'delta' around the contents)
-			if ( box.hasBaseline() )
-			{
-				ascent = box.getReqAscent() + delta * 0.5;
-				descent = box.getReqDescent() + delta * 0.5;
-				return new LAllocV( ascent, descent );
-			}
-			else
-			{
-				return new LAllocV( allocationHeight );
-			}
+			double reqHeight = reqBox.getReqHeight();
+			double reqHeightAboveBaseline = reqBox.getRefY();
+			double reqHeightBelowBaseline = reqHeight - reqHeightAboveBaseline;
+			
+			double allocHeight = allocBox.getAllocationY();
+			double minRefY = reqHeightAboveBaseline;
+			double maxRefY = allocHeight - reqHeightBelowBaseline;
+			
+			double refY = Math.min( Math.max( allocBox.getRefY(), minRefY ), maxRefY );
+
+			return new LAllocV( allocHeight, refY );
 		}
 	}
 	
 	public static void allocateY(LReqBox box, LReqBoxInterface children[], LAllocBox allocBox, LAllocBoxInterface childrenAlloc[], int childAllocationFlags[])
 	{
 		LAllocV h = computeVerticalAllocationForRow( box, allocBox );
+		
+		//System.out.println( "HorizontalLayout.allocatey(): box=" + box + ", allocBox=" + allocBox + ", h=" + h );
 		
 		for (int i = 0; i < children.length; i++)
 		{

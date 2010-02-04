@@ -14,12 +14,11 @@ public abstract class LReqBoxInterface
 	public abstract double getPrefHAdvance();
 	
 	public abstract double getReqHeight();
-	public abstract double getReqAscent();
-	public abstract double getReqDescent();
 	public abstract double getReqVSpacing();
+	public abstract double getRefY();
+	public abstract double getRefYAligned(VAlignment alignment);
+	public abstract double getReqHeightBelowRefPoint();
 	
-	public abstract boolean hasBaseline();
-
 	public abstract boolean isLineBreak();
 	public abstract boolean isParagraphIndentMarker();
 	public abstract boolean isParagraphDedentMarker();

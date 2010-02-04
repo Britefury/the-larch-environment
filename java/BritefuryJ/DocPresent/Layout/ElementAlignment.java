@@ -15,8 +15,8 @@ public class ElementAlignment
 	public static int HALIGN_EXPAND = 3;
 
 	public static int _VALIGN_MASK = 0x7  *  0x4;
-	public static int VALIGN_BASELINES = 0  *  0x4;
-	public static int VALIGN_BASELINES_EXPAND = 1  *  0x4;
+	public static int VALIGN_REFY = 0  *  0x4;
+	public static int VALIGN_REFY_EXPAND = 1  *  0x4;
 	public static int VALIGN_TOP = 2  *  0x4;
 	public static int VALIGN_CENTRE = 3  *  0x4;
 	public static int VALIGN_BOTTOM = 4  *  0x4;
@@ -54,13 +54,13 @@ public class ElementAlignment
 	
 	public static int flagValue(VAlignment vAlignment)
 	{
-		if ( vAlignment == VAlignment.BASELINES )
+		if ( vAlignment == VAlignment.REFY )
 		{
-			return VALIGN_BASELINES;
+			return VALIGN_REFY;
 		}
-		else if ( vAlignment == VAlignment.BASELINES_EXPAND )
+		else if ( vAlignment == VAlignment.REFY_EXPAND )
 		{
-			return VALIGN_BASELINES_EXPAND;
+			return VALIGN_REFY_EXPAND;
 		}
 		else if ( vAlignment == VAlignment.TOP )
 		{
@@ -110,13 +110,13 @@ public class ElementAlignment
 			throw new RuntimeException( "Unknown HAlignment value" );
 		}
 		
-		if ( vAlignment == VAlignment.BASELINES )
+		if ( vAlignment == VAlignment.REFY )
 		{
-			value |= VALIGN_BASELINES;
+			value |= VALIGN_REFY;
 		}
-		else if ( vAlignment == VAlignment.BASELINES_EXPAND )
+		else if ( vAlignment == VAlignment.REFY_EXPAND )
 		{
-			value |= VALIGN_BASELINES_EXPAND;
+			value |= VALIGN_REFY_EXPAND;
 		}
 		else if ( vAlignment == VAlignment.TOP )
 		{
@@ -174,13 +174,13 @@ public class ElementAlignment
 	public static VAlignment getVAlignment(int value)
 	{
 		value &= _VALIGN_MASK;
-		if ( value == VALIGN_BASELINES )
+		if ( value == VALIGN_REFY )
 		{
-			return VAlignment.BASELINES;
+			return VAlignment.REFY;
 		}
-		else if ( value == VALIGN_BASELINES_EXPAND )
+		else if ( value == VALIGN_REFY_EXPAND )
 		{
-			return VAlignment.BASELINES_EXPAND;
+			return VAlignment.REFY_EXPAND;
 		}
 		else if ( value == VALIGN_TOP )
 		{

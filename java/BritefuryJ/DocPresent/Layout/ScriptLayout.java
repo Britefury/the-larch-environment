@@ -99,16 +99,16 @@ public class ScriptLayout
 		double Ma = 0.0, Md = 0.0, Mh = 0.0;
 		if ( main != null )
 		{
-			Ma = main.getReqAscent();
-			Md = main.getReqDescent();
+			Ma = main.getRefY();
+			Md = main.getReqHeightBelowRefPoint();
 			Mh = main.getReqHeight();
 		}
 
-		double Pa = Math.max( leftSuper != null  ?  leftSuper.getReqAscent()  :  0.0, rightSuper != null  ?  rightSuper.getReqAscent()  :  0.0 );
-		double Pd = Math.max( leftSuper != null  ?  leftSuper.getReqDescent()  :  0.0, rightSuper != null  ?  rightSuper.getReqDescent()  :  0.0 );
+		double Pa = Math.max( leftSuper != null  ?  leftSuper.getRefY()  :  0.0, rightSuper != null  ?  rightSuper.getRefY()  :  0.0 );
+		double Pd = Math.max( leftSuper != null  ?  leftSuper.getReqHeightBelowRefPoint()  :  0.0, rightSuper != null  ?  rightSuper.getReqHeightBelowRefPoint()  :  0.0 );
 
-		double Ba = Math.max( leftSub != null  ?  leftSub.getReqAscent()  :  0.0, rightSub != null  ?  rightSub.getReqAscent()  :  0.0 );
-		double Bd = Math.max( leftSub != null  ?  leftSub.getReqDescent()  :  0.0, rightSub != null  ?  rightSub.getReqDescent()  :  0.0 );
+		double Ba = Math.max( leftSub != null  ?  leftSub.getRefY()  :  0.0, rightSub != null  ?  rightSub.getRefY()  :  0.0 );
+		double Bd = Math.max( leftSub != null  ?  leftSub.getReqHeightBelowRefPoint()  :  0.0, rightSub != null  ?  rightSub.getReqHeightBelowRefPoint()  :  0.0 );
 		
 		
 		// top: TOP
@@ -239,7 +239,7 @@ public class ScriptLayout
 		
 		double descent = height - mainBaselineY;
 		
-		box.setRequisitionY( mainBaselineY, descent, columnSpacing );
+		box.setRequisitionY( mainBaselineY + descent, columnSpacing, mainBaselineY );
 		
 		rowBaselineY[0] = superBaselineY;
 		rowBaselineY[1] = mainBaselineY;
@@ -328,11 +328,11 @@ public class ScriptLayout
 		double y = padding + superBaselineY;
 		if ( leftSuper != null )
 		{
-			allocBox.allocateChildYAsRequisition( leftSuperAlloc, leftSuper, y - leftSuper.getReqAscent() );
+			allocBox.allocateChildYAsRequisition( leftSuperAlloc, leftSuper, y - leftSuper.getRefY() );
 		}
 		if ( rightSuper != null )
 		{
-			allocBox.allocateChildYAsRequisition( rightSuperAlloc, rightSuper, y - rightSuper.getReqAscent() );
+			allocBox.allocateChildYAsRequisition( rightSuperAlloc, rightSuper, y - rightSuper.getRefY() );
 		}
 		
 		
@@ -340,7 +340,7 @@ public class ScriptLayout
 		y = padding + mainBaselineY;
 		if ( main != null )
 		{
-			allocBox.allocateChildYAsRequisition( mainAlloc, main, y - main.getReqAscent() );
+			allocBox.allocateChildYAsRequisition( mainAlloc, main, y - main.getRefY() );
 		}
 		
 
@@ -348,11 +348,11 @@ public class ScriptLayout
 		y = padding + subBaselineY;
 		if ( leftSub != null )
 		{
-			allocBox.allocateChildYAsRequisition( leftSubAlloc, leftSub, y - leftSub.getReqAscent() );
+			allocBox.allocateChildYAsRequisition( leftSubAlloc, leftSub, y - leftSub.getRefY() );
 		}
 		if ( rightSub != null )
 		{
-			allocBox.allocateChildYAsRequisition( rightSubAlloc, rightSub, y - rightSub.getReqAscent() );
+			allocBox.allocateChildYAsRequisition( rightSubAlloc, rightSub, y - rightSub.getRefY() );
 		}
 	}
 

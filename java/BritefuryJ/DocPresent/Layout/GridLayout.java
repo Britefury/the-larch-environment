@@ -48,48 +48,38 @@ public class GridLayout
 
 	public static void computeRowRequisitionY(LReqBox rowBox, LReqBoxInterface children[], int childAlignmentFlags[])
 	{
-		// First phase; fill only with children who span 1 row
-		double rowAscent = 0.0, rowDescent = 0.0, rowHeight = 0.0;
-		boolean bHasBaseline = false;
-
-		int c = 0;
-		for (LReqBoxInterface child: children)
+		rowBox.clearRequisitionY();
+		double rowHeight = 0.0, rowHeightAboveRef = 0.0,  rowHeightBelowRef = 0.0;
+		boolean bRefYAligned = false;
+		for (int i = 0; i < children.length; i++)
 		{
-			if ( child != null )
-			{
-				VAlignment v = ElementAlignment.getVAlignment( childAlignmentFlags[c] );
-				
-				boolean bBaseline = v == VAlignment.BASELINES  ||  v == VAlignment.BASELINES_EXPAND;
-				if ( bBaseline )
-				{
-					bHasBaseline = true;
-				}
-				
-				if ( bBaseline  &&  child.hasBaseline() )
-				{
-					rowAscent = Math.max( rowAscent, child.getReqAscent() );
-					rowDescent = Math.max( rowDescent, child.getReqDescent() );
-				}
-				else
-				{
-					rowHeight = Math.max( rowHeight, child.getReqHeight() );
-				}
-			}
+			LReqBoxInterface child = children[i];
+			VAlignment v = ElementAlignment.getVAlignment( childAlignmentFlags[i] );
 			
-			c++;
-		}
-		
-		if ( bHasBaseline )
-		{
-			if ( rowHeight  >  ( rowAscent + rowDescent ) )
+			double childHeight = child.getReqHeight();
+			
+			if ( v == VAlignment.REFY  ||  v == VAlignment.REFY_EXPAND )
 			{
-				double deltaY = ( rowHeight  -  ( rowAscent + rowDescent ) )  *  0.5;
-				rowBox.setRequisitionY( rowAscent + deltaY, rowDescent + deltaY, 0.0 );
+				double childRefY = child.getRefY();
+				double childHeightAboveRef = childRefY;
+				double childHeightBelowRef = childHeight - childRefY;
+				
+				rowHeight = Math.max( rowHeight, childHeight );
+				rowHeightAboveRef = Math.max( rowHeightAboveRef, childHeightAboveRef );
+				rowHeightBelowRef = Math.max( rowHeightBelowRef, childHeightBelowRef );
+				
+				bRefYAligned = true;
 			}
 			else
 			{
-				rowBox.setRequisitionY( rowAscent, rowDescent, 0.0 );
+				rowHeight = Math.max( rowHeight, childHeight );
 			}
+		}
+		rowHeight = Math.max( rowHeight, rowHeightAboveRef + rowHeightBelowRef );
+		
+		if ( bRefYAligned )
+		{
+			rowBox.setRequisitionY( rowHeight, 0.0, rowHeightAboveRef );
 		}
 		else
 		{

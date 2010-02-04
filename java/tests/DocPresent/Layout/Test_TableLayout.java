@@ -6,6 +6,7 @@
 //##************************
 package tests.DocPresent.Layout;
 
+import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.TableLayout;
 import BritefuryJ.DocPresent.Layout.TablePackingParams;
@@ -326,7 +327,7 @@ public class Test_TableLayout extends Test_Layout_base
 		reqTest(
 				new LReqBox[] {
 						box( 10, 10, 10, 0 ),		box( 5, 5, 5, 0 ),		box( 20, 20, 5, 0 ),
-						box( 15, 15, 4, 4, 0 ),	box( 8, 8, 2, 6, 0 ),		box( 10, 10, 5, 2, 0 ),
+						box( 15, 15, 8, 0, 4 ),	box( 8, 8, 8, 0, 2 ),		box( 10, 10, 7, 0, 5 ),
 						box( 5, 5, 4, 0 ),		box( 6, 6, 8, 0 ),		box( 10, 10, 6, 0 ),
 				},
 				new TablePackingParams[] {
@@ -335,18 +336,18 @@ public class Test_TableLayout extends Test_Layout_base
 						pack( 0, 2 ),			pack( 1, 2 ),			pack( 2, 2 ),
 				},
 				new int[] {
-						HCENTRE | VBASELINES,	HCENTRE | VBASELINES,	HCENTRE | VBASELINES,
-						HCENTRE | VBASELINES,	HCENTRE | VBASELINES,	HCENTRE | VBASELINES,
-						HCENTRE | VBASELINES,	HCENTRE | VBASELINES,	HCENTRE | VBASELINES,
+						HCENTRE | VREFY,	HCENTRE | VREFY,	HCENTRE | VREFY,
+						HCENTRE | VREFY,	HCENTRE | VREFY,	HCENTRE | VREFY,
+						HCENTRE | VREFY,	HCENTRE | VREFY,	HCENTRE | VREFY,
 				},
 				3, 3, 0.0, 0.0,
 				new LReqBox[] {
 						box( 15, 15, 0, 0 ),		box( 8, 8, 0, 0 ),		box( 20, 20, 0, 0 ),
 				},
 				new LReqBox[] {
-						box( 0, 0, 5, 5, 0 ),
-						box( 0, 0, 5, 6, 0 ),
-						box( 0, 0, 4, 4, 0 ),
+						box( 0, 0, 10, 0, 5 ),
+						box( 0, 0, 11, 0, 5 ),
+						box( 0, 0, 8, 0, 4 ),
 				},
 				box( 43, 43, 29, 0 )
 			);
@@ -355,16 +356,15 @@ public class Test_TableLayout extends Test_Layout_base
 
 
 	
-/*
+
 	//
 	//
 	// ALLOCATION TESTS
 	//
 	//
 	
-	private void allocTest(LReqBox children[], TablePackingParams packingParams[], int numColumns, int numRows, double spacingX, double spacingY, boolean bExpandX, boolean bExpandY,
-			HAlignment colAlignment, VAlignment rowAlignment,
-			double allocX, double allocY, LAllocBox expectedChildAllocations[], LAllocBox expectedColAllocations[], LAllocBox expectedRowAllocations[])
+	private void allocTest(LReqBox children[], TablePackingParams packingParams[], int childAlignmentFlags[], int numColumns, int numRows, double columnSpacing, double rowSpacing,
+			boolean bColumnExpand, boolean bRowExpand, double allocX, double allocY, LAllocBox expectedChildAllocations[], LAllocBox expectedColAllocations[], LAllocBox expectedRowAllocations[])
 	{
 		LReqBox box = new LReqBox();
 		LAllocBox boxAlloc = new LAllocBox( null );
@@ -376,7 +376,7 @@ public class Test_TableLayout extends Test_Layout_base
 		}
 		
 
-		LReqBox columnBoxes[] = TableLayout.computeRequisitionX( box, children, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
+		LReqBox columnBoxes[] = TableLayout.computeRequisitionX( box, children, packingParams, numColumns, numRows, columnSpacing, rowSpacing );
 		LAllocBox columnAllocs[] = new LAllocBox[columnBoxes.length];
 		for (int i = 0; i < columnAllocs.length; i++)
 		{
@@ -384,9 +384,9 @@ public class Test_TableLayout extends Test_Layout_base
 		}
 		
 		boxAlloc.setAllocationX( allocX );
-		TableLayout.allocateX( box, columnBoxes, children, boxAlloc, columnAllocs, childrenAllocs, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
+		TableLayout.allocateX( box, columnBoxes, children, boxAlloc, columnAllocs, childrenAllocs, packingParams, childAlignmentFlags, numColumns, numRows, columnSpacing, rowSpacing, bColumnExpand, bRowExpand );
 
-		LReqBox rowBoxes[] = TableLayout.computeRequisitionY( box, children, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment);
+		LReqBox rowBoxes[] = TableLayout.computeRequisitionY( box, children, packingParams, childAlignmentFlags, numColumns, numRows, columnSpacing, rowSpacing );
 		LAllocBox rowAllocs[] = new LAllocBox[rowBoxes.length];
 		for (int i = 0; i < rowAllocs.length; i++)
 		{
@@ -394,7 +394,7 @@ public class Test_TableLayout extends Test_Layout_base
 		}
 
 		boxAlloc.setAllocationY( allocY );
-		TableLayout.allocateY( box, rowBoxes, children, boxAlloc, rowAllocs, childrenAllocs, packingParams, numColumns, numRows, spacingX, spacingY, bExpandX, bExpandY, colAlignment, rowAlignment );
+		TableLayout.allocateY( box, rowBoxes, children, boxAlloc, rowAllocs, childrenAllocs, packingParams, childAlignmentFlags, numColumns, numRows, columnSpacing, rowSpacing, bColumnExpand, bRowExpand );
 		
 		
 		for (int i = 0; i < numColumns; i++)
@@ -425,7 +425,10 @@ public class Test_TableLayout extends Test_Layout_base
 				new TablePackingParams[] {
 						pack( 0, 0 ),
 				},
-				1, 1, 0.0, 0.0, false, false, HAlignment.LEFT, VAlignment.TOP,
+				new int[] {
+						HLEFT | VTOP,
+				},
+				1, 1, 0.0, 0.0, false, false,
 				10, 10,
 				new LAllocBox[] {
 						alloc( 0, 0, 10, 10 ),
@@ -446,7 +449,10 @@ public class Test_TableLayout extends Test_Layout_base
 				new TablePackingParams[] {
 						pack( 0, 0 ),
 				},
-				1, 1, 0.0, 0.0, true, true, HAlignment.LEFT, VAlignment.TOP,
+				new int[] {
+						HLEFT | VTOP,
+				},
+				1, 1, 0.0, 0.0, true, true,
 				20, 20,
 				new LAllocBox[] {
 						alloc( 0, 0, 10, 10 ),
@@ -467,7 +473,10 @@ public class Test_TableLayout extends Test_Layout_base
 				new TablePackingParams[] {
 						pack( 0, 0 ),
 				},
-				1, 1, 0.0, 0.0, true, true, HAlignment.CENTRE, VAlignment.CENTRE,
+				new int[] {
+						HCENTRE | VCENTRE,
+				},
+				1, 1, 0.0, 0.0, true, true,
 				20, 20,
 				new LAllocBox[] {
 						alloc( 5, 5, 10, 10 ),
@@ -488,7 +497,10 @@ public class Test_TableLayout extends Test_Layout_base
 				new TablePackingParams[] {
 						pack( 0, 0 ),
 				},
-				1, 1, 0.0, 0.0, true, true, HAlignment.RIGHT, VAlignment.BOTTOM,
+				new int[] {
+						HRIGHT | VBOTTOM,
+				},
+				1, 1, 0.0, 0.0, true, true,
 				20, 20,
 				new LAllocBox[] {
 						alloc( 10, 10, 10, 10 ),
@@ -509,7 +521,10 @@ public class Test_TableLayout extends Test_Layout_base
 				new TablePackingParams[] {
 						pack( 0, 0 ),
 				},
-				1, 1, 0.0, 0.0, true, true, HAlignment.EXPAND, VAlignment.EXPAND,
+				new int[] {
+						HEXPAND | VEXPAND,
+				},
+				1, 1, 0.0, 0.0, true, true,
 				20, 20,
 				new LAllocBox[] {
 						alloc( 0, 0, 20, 20 ),
@@ -536,12 +551,17 @@ public class Test_TableLayout extends Test_Layout_base
 						pack( 0, 1 ),			pack( 1, 1 ),			pack( 2, 1 ),
 						pack( 0, 2 ),			pack( 1, 2 ),			pack( 2, 2 ),
 				},
-				3, 3, 0.0, 0.0, false, false, HAlignment.LEFT, VAlignment.TOP,
+				new int[] {
+						HLEFT | VTOP,			HLEFT | VTOP,			HLEFT | VTOP,
+						HLEFT | VTOP,			HLEFT | VTOP,			HLEFT | VTOP,
+						HLEFT | VTOP,			HLEFT | VTOP,			HLEFT | VTOP,
+				},
+				3, 3, 0.0, 0.0, false, false,
 				40, 35,
 				new LAllocBox[] {
-						alloc( 0, 0, 10, 10 ),	alloc( 10, 0, 5, 5 ),		alloc( 15, 0, 5, 5 ),
-						alloc( 0, 10, 5, 2 ),		alloc( 10, 10, 4, 5 ),	alloc( 15, 10, 10, 4 ),
-						alloc( 0, 15, 5, 2 ),		alloc( 10, 15, 2, 2 ),	alloc( 15, 15, 10, 5 ),
+						alloc( 0, 0, 10, 10 ),		alloc( 10, 0, 5, 5 ),		alloc( 15, 0, 5, 5 ),
+						alloc( 0, 10, 5, 2 ),		alloc( 10, 10, 4, 5 ),		alloc( 15, 10, 10, 4 ),
+						alloc( 0, 15, 5, 2 ),		alloc( 10, 15, 2, 2 ),		alloc( 15, 15, 10, 5 ),
 				},
 				new LAllocBox[] {
 						alloc( 0, 0, 10, 0 ),		alloc( 10, 0, 5, 0 ),		alloc( 15, 0, 10, 0 ),
@@ -570,12 +590,17 @@ public class Test_TableLayout extends Test_Layout_base
 						pack( 0, 1 ),			pack( 1, 1 ),			pack( 2, 1 ),
 						pack( 0, 2 ),			pack( 1, 2 ),			pack( 2, 2 ),
 				},
-				3, 3, 0.0, 0.0, false, false, HAlignment.EXPAND, VAlignment.EXPAND,
+				new int[] {
+						HEXPAND | VEXPAND,		HEXPAND | VEXPAND,		HEXPAND | VEXPAND,
+						HEXPAND | VEXPAND,		HEXPAND | VEXPAND,		HEXPAND | VEXPAND,
+						HEXPAND | VEXPAND,		HEXPAND | VEXPAND,		HEXPAND | VEXPAND,
+				},
+				3, 3, 0.0, 0.0, false, false,
 				40, 35,
 				new LAllocBox[] {
-						alloc( 0, 0, 10, 10 ),	alloc( 10, 0, 5, 10 ),	alloc( 15, 0, 10, 10 ),
-						alloc( 0, 10, 10, 5 ),	alloc( 10, 10, 5, 5 ),	alloc( 15, 10, 10, 5 ),
-						alloc( 0, 15, 10, 5 ),	alloc( 10, 15, 5, 5 ),	alloc( 15, 15, 10, 5 ),
+						alloc( 0, 0, 10, 10 ),		alloc( 10, 0, 5, 10 ),		alloc( 15, 0, 10, 10 ),
+						alloc( 0, 10, 10, 5 ),		alloc( 10, 10, 5, 5 ),		alloc( 15, 10, 10, 5 ),
+						alloc( 0, 15, 10, 5 ),		alloc( 10, 15, 5, 5 ),		alloc( 15, 15, 10, 5 ),
 				},
 				new LAllocBox[] {
 						alloc( 0, 0, 10, 0 ),		alloc( 10, 0, 5, 0 ),		alloc( 15, 0, 10, 0 ),
@@ -604,15 +629,20 @@ public class Test_TableLayout extends Test_Layout_base
 						pack( 0, 1 ),			pack( 1, 1 ),			pack( 2, 1 ),
 						pack( 0, 2 ),			pack( 1, 2 ),			pack( 2, 2 ),
 				},
-				3, 3, 0.0, 0.0, true, true, HAlignment.LEFT, VAlignment.TOP,
+				new int[] {
+						HLEFT | VTOP,			HLEFT | VTOP,			HLEFT | VTOP,
+						HLEFT | VTOP,			HLEFT | VTOP,			HLEFT | VTOP,
+						HLEFT | VTOP,			HLEFT | VTOP,			HLEFT | VTOP,
+				},
+				3, 3, 0.0, 0.0, true, true,
 				40, 35,
 				new LAllocBox[] {
-						alloc( 0, 0, 10, 10 ),	alloc( 15, 0, 5, 5 ),		alloc( 25, 0, 5, 5 ),
-						alloc( 0, 15, 5, 2 ),		alloc( 15, 15, 4, 5 ),	alloc( 25, 15, 10, 4 ),
-						alloc( 0, 25, 5, 2 ),		alloc( 15, 25, 2, 2 ),	alloc( 25, 25, 10, 5 ),
+						alloc( 0, 0, 10, 10 ),		alloc( 15, 0, 5, 5 ),		alloc( 25, 0, 5, 5 ),
+						alloc( 0, 15, 5, 2 ),		alloc( 15, 15, 4, 5 ),		alloc( 25, 15, 10, 4 ),
+						alloc( 0, 25, 5, 2 ),		alloc( 15, 25, 2, 2 ),		alloc( 25, 25, 10, 5 ),
 				},
 				new LAllocBox[] {
-						alloc( 0, 0, 15, 0 ),		alloc( 15, 0, 10, 0 ),	alloc( 25, 0, 15, 0 ),
+						alloc( 0, 0, 15, 0 ),		alloc( 15, 0, 10, 0 ),		alloc( 25, 0, 15, 0 ),
 				},
 				new LAllocBox[] {
 						alloc( 0, 0, 0, 15 ),
@@ -637,15 +667,20 @@ public class Test_TableLayout extends Test_Layout_base
 						pack( 0, 1 ),			pack( 1, 1 ),			pack( 2, 1 ),
 						pack( 0, 2 ),			pack( 1, 2 ),			pack( 2, 2 ),
 				},
-				3, 3, 0.0, 0.0, true, true, HAlignment.EXPAND, VAlignment.EXPAND,
+				new int[] {
+						HEXPAND | VEXPAND,		HEXPAND | VEXPAND,		HEXPAND | VEXPAND,
+						HEXPAND | VEXPAND,		HEXPAND | VEXPAND,		HEXPAND | VEXPAND,
+						HEXPAND | VEXPAND,		HEXPAND | VEXPAND,		HEXPAND | VEXPAND,
+				},
+				3, 3, 0.0, 0.0, true, true,
 				40, 35,
 				new LAllocBox[] {
-						alloc( 0, 0, 15, 15 ),	alloc( 15, 0, 10, 15 ),	alloc( 25, 0, 15, 15 ),
-						alloc( 0, 15, 15, 10 ),	alloc( 15, 15, 10, 10 ),	alloc( 25, 15, 15, 10 ),
-						alloc( 0, 25, 15, 10 ),	alloc( 15, 25, 10, 10 ),	alloc( 25, 25, 15, 10 ),
+						alloc( 0, 0, 15, 15 ),		alloc( 15, 0, 10, 15 ),		alloc( 25, 0, 15, 15 ),
+						alloc( 0, 15, 15, 10 ),		alloc( 15, 15, 10, 10 ),	alloc( 25, 15, 15, 10 ),
+						alloc( 0, 25, 15, 10 ),		alloc( 15, 25, 10, 10 ),	alloc( 25, 25, 15, 10 ),
 				},
 				new LAllocBox[] {
-						alloc( 0, 0, 15, 0 ),		alloc( 15, 0, 10, 0 ),	alloc( 25, 0, 15, 0 ),
+						alloc( 0, 0, 15, 0 ),		alloc( 15, 0, 10, 0 ),		alloc( 25, 0, 15, 0 ),
 				},
 				new LAllocBox[] {
 						alloc( 0, 0, 0, 15 ),
@@ -669,15 +704,20 @@ public class Test_TableLayout extends Test_Layout_base
 						pack( 0, 1 ),			pack( 1, 1, 2, 2 ),
 						pack( 0, 2 ),			
 				},
-				3, 3, 0.0, 0.0, true, true, HAlignment.EXPAND, VAlignment.EXPAND,
+				new int[] {
+						HEXPAND | VEXPAND,		HEXPAND | VEXPAND,		HEXPAND | VEXPAND,
+						HEXPAND | VEXPAND,		HEXPAND | VEXPAND,
+						HEXPAND | VEXPAND,	
+				},
+				3, 3, 0.0, 0.0, true, true,
 				35, 35,
 				new LAllocBox[] {
-						alloc( 0, 0, 15, 15 ),	alloc( 15, 0, 10, 15 ),	alloc( 25, 0, 10, 15 ),
-						alloc( 0, 15, 15, 10 ),	alloc( 15, 15, 20, 20 ),
+						alloc( 0, 0, 15, 15 ),		alloc( 15, 0, 10, 15 ),		alloc( 25, 0, 10, 15 ),
+						alloc( 0, 15, 15, 10 ),		alloc( 15, 15, 20, 20 ),
 						alloc( 0, 25, 15, 10 ),
 				},
 				new LAllocBox[] {
-						alloc( 0, 0, 15, 0 ),		alloc( 15, 0, 10, 0 ),	alloc( 25, 0, 10, 0 ),
+						alloc( 0, 0, 15, 0 ),		alloc( 15, 0, 10, 0 ),		alloc( 25, 0, 10, 0 ),
 				},
 				new LAllocBox[] {
 						alloc( 0, 0, 0, 15 ),
@@ -685,37 +725,5 @@ public class Test_TableLayout extends Test_Layout_base
 						alloc( 0, 25, 0, 10 ),
 				}
 			);
-
-	
-
-		
-		// 3x3, gap, colspan and rowspan, padding, extra space, expand in x and y, expand-expand alignment
-		allocTest(
-				new LReqBox[] {
-						box( 10, 0, 10, 0 ),		box( 5, 0, 5, 0 ),		box( 5, 0, 5, 0 ),
-						box( 5, 0, 5, 0 ),		box( 5, 0, 5, 0 ),
-						box( 5, 0, 5, 0 ),		
-				},
-				new TablePackingParams[] {
-						pack( 0, 0, 1.0, 1.0 ),	pack( 1, 0, 1.0, 1.0 ),	pack( 2, 0, 1.0, 1.0 ),
-						pack( 0, 1, 1.0, 1.0 ),	pack( 1, 1, 2, 2, 1.0, 1.0 ),
-						pack( 0, 2, 1.0, 1.0 ),			
-				},
-				3, 3, 0.0, 0.0, true, true, HAlignment.EXPAND, VAlignment.EXPAND,
-				41, 41,
-				new LAllocBox[] {
-						alloc( 1, 1, 15, 15 ),	alloc( 18, 1, 10, 15 ),	alloc( 30, 1, 10, 15 ),
-						alloc( 1, 18, 15, 10 ),	alloc( 18, 18, 22, 22 ),
-						alloc( 1, 30, 15, 10 ),
-				},
-				new LAllocBox[] {
-						alloc( 0, 0, 17, 0 ),		alloc( 17, 0, 12, 0 ),	alloc( 29, 0, 12, 0 ),
-				},
-				new LAllocBox[] {
-						alloc( 0, 0, 0, 17 ),
-						alloc( 0, 17, 0, 12 ),
-						alloc( 0, 29, 0, 12 ),
-				}
-			);
-	}*/
+	}
 }

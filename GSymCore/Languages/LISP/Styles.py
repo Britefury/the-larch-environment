@@ -28,8 +28,8 @@ lisp_paragraphStyle = ParagraphStyleSheet( 0.0, 0.0, 60.0 )
 
 paragraph_listViewLayout = ParagraphListViewLayout( ParagraphStyleSheet(), lambda ctx: ctx.text( default_textStyle, ' ' ), True, ListViewLayout.TrailingSeparator.NEVER )
 
-verticalInline_listViewLayout = VerticalInlineListViewLayout( VBoxStyleSheet( VTypesetting.ALIGN_WITH_TOP, 0.0 ), \
+verticalInline_listViewLayout = VerticalInlineListViewLayout( VBoxStyleSheet( 0.0 ), \
 						ParagraphStyleSheet(), 30.0, ListViewLayout.TrailingSeparator.NEVER )
 
-vertical_listViewLayout = VerticalListViewLayout( VBoxStyleSheet( VTypesetting.ALIGN_WITH_TOP, 0.0 ), \
+vertical_listViewLayout = VerticalListViewLayout( VBoxStyleSheet( 0.0 ), \
 						ParagraphStyleSheet(), 30.0, ListViewLayout.TrailingSeparator.NEVER )

@@ -312,12 +312,12 @@ abstract public class DPWidget extends PointerInputElement
 	
 	public DPWidget alignVBaselines()
 	{
-		return alignV( VAlignment.BASELINES );
+		return alignV( VAlignment.REFY );
 	}
 
 	public DPWidget alignVBaselinesExpand()
 	{
-		return alignV( VAlignment.BASELINES_EXPAND );
+		return alignV( VAlignment.REFY_EXPAND );
 	}
 
 	public DPWidget alignVTop()

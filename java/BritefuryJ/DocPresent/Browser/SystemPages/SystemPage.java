@@ -18,7 +18,6 @@ import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementContext;
 import BritefuryJ.DocPresent.Browser.Page;
-import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
@@ -54,7 +53,7 @@ public abstract class SystemPage extends Page
 
 	public DPWidget getContentsElement()
 	{
-		VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 40.0 );
+		VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( 40.0 );
 		DPVBox pageBox = new DPVBox( getContext(), pageBoxStyle );
 		
 		DPVBox headBox = new DPVBox( getContext() );

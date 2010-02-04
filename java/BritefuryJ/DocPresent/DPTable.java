@@ -266,7 +266,7 @@ public class DPTable extends DPContainer
 		
 		if ( item != oldChild )
 		{
-			if ( item.getLayoutNode() == null )
+			if ( item != null  &&  item.getLayoutNode() == null )
 			{
 				throw new ChildHasNoLayoutException();
 			}

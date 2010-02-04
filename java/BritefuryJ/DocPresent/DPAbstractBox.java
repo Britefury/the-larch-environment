@@ -21,6 +21,10 @@ abstract public class DPAbstractBox extends DPContainerSequence
 
 	
 	
+	private int refPointIndex;
+	
+
+	
 	public DPAbstractBox(ElementContext context)
 	{
 		this( context, AbstractBoxStyleSheet.defaultStyleSheet );
@@ -29,12 +33,30 @@ abstract public class DPAbstractBox extends DPContainerSequence
 	public DPAbstractBox(ElementContext context, AbstractBoxStyleSheet styleSheet)
 	{
 		super( context, styleSheet );
+
+		refPointIndex = 0;
 	}
 
 
 	
 	
 
+	public void setRefPointIndex(int refPointIndex)
+	{
+		if ( refPointIndex >= getChildren().size() )
+		{
+			throw new IndexOutOfBoundsException( "Vertical box - reference index out of range" );
+		}
+		this.refPointIndex = refPointIndex;
+	}
+	
+	public int getRefPointIndex()
+	{
+		return refPointIndex;
+	}
+	
+	
+	
 	protected PackingParams getDefaultPackingParams()
 	{
 		return null;

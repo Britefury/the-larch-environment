@@ -26,7 +26,6 @@ import BritefuryJ.DocPresent.Canvas.TextNode;
 import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.SimpleDndHandler;
-import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
@@ -224,7 +223,7 @@ public class CanvasTestPage extends SystemPage
 		hbox.append( dest0 );
 		hbox.append( dest1 );
 
-		VBoxStyleSheet vboxS = new VBoxStyleSheet( VTypesetting.NONE, 20.0 );
+		VBoxStyleSheet vboxS = new VBoxStyleSheet( 20.0 );
 		DPVBox vbox = new DPVBox( getContext(), vboxS );
 		vbox.append( border );
 		vbox.append( hbox );

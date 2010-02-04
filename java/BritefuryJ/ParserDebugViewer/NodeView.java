@@ -27,7 +27,6 @@ import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
-import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
@@ -133,7 +132,7 @@ public class NodeView implements ElementContext
 	static Border titleFailBorder = new EmptyBorder( 0.0, 0.0, 0.0, 0.0, new Color( 1.0f, 0.85f, 0.85f ) );
 	static Border nodeBorder = new SolidBorder( 1.0, 1.0, Color.black, null );
 	
-	static VBoxStyleSheet childrenVBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 3.0 );
+	static VBoxStyleSheet childrenVBoxStyle = new VBoxStyleSheet( 3.0 );
 	static HBoxStyleSheet mainHBoxStyle = new HBoxStyleSheet( 80.0 );
 	
 	

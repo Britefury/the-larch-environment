@@ -89,7 +89,7 @@ public class DPStaticText extends DPStatic
 
 		AffineTransform prevTransform = null;
 		LayoutNode layout = getLayoutNode();
-		double deltaY = layout.getAllocationBox().getAllocationAscent()  -  layout.getRequisitionBox().getReqAscent();
+		double deltaY = layout.getAllocationBox().getRefY()  -  layout.getRequisitionBox().getRefY();
 		if ( deltaY != 0.0 )
 		{
 			prevTransform = graphics.getTransform();

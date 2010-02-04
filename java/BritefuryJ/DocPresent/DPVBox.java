@@ -7,11 +7,8 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeVBox;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
-
-
 
 
 public class DPVBox extends DPAbstractBox
@@ -21,8 +18,6 @@ public class DPVBox extends DPAbstractBox
 		private static final long serialVersionUID = 1L;
 	}
 	
-	
-
 	
 	public DPVBox(ElementContext context)
 	{
@@ -34,12 +29,5 @@ public class DPVBox extends DPAbstractBox
 		super( context, syleSheet );
 		
 		layoutNode = new LayoutNodeVBox( this );
-	}
-	
-	
-	
-	protected VTypesetting getTypesetting()
-	{
-		return ((VBoxStyleSheet)styleSheet).getTypesetting();
 	}
 }
