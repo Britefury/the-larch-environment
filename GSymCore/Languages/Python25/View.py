@@ -1551,8 +1551,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 def viewPython25DocNodeAsElement(document, docRootNode, resolveContext, location, commandHistory, app):
 	viewContext = GSymViewContext( docRootNode, Python25View(), commandHistory )
 	editHandler = Python25EditHandler( viewContext )
-	viewContext.getFrame().setEditHandler( editHandler )
-	return viewContext.getFrame()
+	frame = viewContext.getFrame()
+	frame.setEditHandler( editHandler )
+	return frame
 
 
 def viewPython25DocNodeAsPage(document, docRootNode, resolveContext, location, commandHistory, app):

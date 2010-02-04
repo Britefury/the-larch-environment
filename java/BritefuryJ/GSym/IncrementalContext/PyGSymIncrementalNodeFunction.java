@@ -20,6 +20,12 @@ public class PyGSymIncrementalNodeFunction implements GSymIncrementalNodeFunctio
 	{
 		this.callable = callable;
 	}
+	
+	
+	public int hashCode()
+	{
+		return callable.hashCode();
+	}
 
 
 	public Object computeNodeResult(DMNode x, GSymIncrementalNodeContext ctx, Object state)
