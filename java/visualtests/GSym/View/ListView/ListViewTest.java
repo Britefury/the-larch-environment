@@ -21,7 +21,6 @@ import BritefuryJ.DocPresent.DPWhitespace;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementContext;
 import BritefuryJ.DocPresent.ElementFactory;
-import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
@@ -124,7 +123,7 @@ public class ListViewTest
 	
 	protected DPWidget createContentNode()
 	{
-		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, 15.0 );
+		VBoxStyleSheet boxs = new VBoxStyleSheet( 15.0 );
 		DPVBox box = new DPVBox( null, boxs );
 		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
 		

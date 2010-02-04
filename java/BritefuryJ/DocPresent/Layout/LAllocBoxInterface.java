@@ -14,21 +14,18 @@ public abstract class LAllocBoxInterface
 	public abstract double getPositionInParentSpaceY();
 	public abstract double getAllocationX();
 	public abstract double getAllocationY();
-	public abstract double getAllocationAscent();
-	public abstract double getAllocationDescent();
+	public abstract double getRefY();
 	public abstract LAllocV getAllocV();
 	
-	protected abstract void setPositionInParentSpaceX(double x);
-	protected abstract void setPositionInParentSpaceY(double y);
-	protected abstract void setAllocationX(double width);
-	protected abstract void setAllocationY(double height);
-	protected abstract void setAllocationY(double ascent, double descent);
-	protected abstract void setAllocationY(double ascent, double descent, boolean bHasBaseline);
+	public abstract void setPositionInParentSpaceX(double x);
+	public abstract void setPositionInParentSpaceY(double y);
+	public abstract void setAllocationX(double width);
+	public abstract void setAllocationY(double height);
+	public abstract void setAllocationY(double height, double refY);
 	
 	protected abstract void setPositionInParentSpaceAndAllocationX(double x, double width);
 	protected abstract void setPositionInParentSpaceAndAllocationY(double y, double height);
-	protected abstract void setPositionInParentSpaceAndAllocationY(double y, double ascent, double descent);
-	protected abstract void setPositionInParentSpaceAndAllocationY(double y, double ascent, double descent, boolean bHasBaseline);
+	protected abstract void setPositionInParentSpaceAndAllocationY(double y, double height, double refY);
 	
 	public abstract void scaleAllocationX(double scale);
 	public abstract void scaleAllocationY(double scale);

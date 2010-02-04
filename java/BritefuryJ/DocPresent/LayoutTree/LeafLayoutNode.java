@@ -27,7 +27,7 @@ public abstract class LeafLayoutNode extends LayoutNode
 	{
 		this.element = element;
 		layoutReqBox = new LReqBox();
-		layoutAllocBox = new LAllocBox( element );
+		layoutAllocBox = new LAllocBox( this );
 	}
 
 

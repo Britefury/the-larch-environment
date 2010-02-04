@@ -8,21 +8,22 @@ package BritefuryJ.DocPresent.Layout;
 
 public enum VAlignment
 {
-	BASELINES,
-	BASELINES_EXPAND,
+	REFY,
+	REFY_EXPAND,
 	TOP,
 	CENTRE,
 	BOTTOM,
 	EXPAND;
 	
 	
+	
 	public static VAlignment noBaselines(VAlignment vAlign)
 	{
-		if ( vAlign == VAlignment.BASELINES )
+		if ( vAlign == VAlignment.REFY )
 		{
 			return CENTRE;
 		}
-		else if ( vAlign == VAlignment.BASELINES_EXPAND )
+		else if ( vAlign == VAlignment.REFY_EXPAND )
 		{
 			return EXPAND;
 		}

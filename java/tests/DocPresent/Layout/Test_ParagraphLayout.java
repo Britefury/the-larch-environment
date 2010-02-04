@@ -375,7 +375,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		// 		boxAllocation=55   ->     [ 25,15,  5,0,  15,20,  0,0,  15,10 ]  @  [ 0,0,  25,0,  30,0,  0,0,  5,20 ]
 		allocYTest( new LReqBox[] { box( 25, 25, 15, 0 ), lineBreakBox( 5, 0 ), box( 15, 15, 20, 0 ), lineBreakBox( 5, 0 ), box( 15, 15, 10, 0 ) },
 				new int[] { VTOP, VTOP, VTOP, VTOP, VTOP }, 5.0, 0.0, 0.0,
-				box( 25, 65, 25, 65, 30, 0 ),
+				box( 25, 65, 25, 65, 30, 0, 10 ),
 				55,
 				new double[] { 25,15,  5,0,  15,20,  0,0,  15,10 },
 				new double[] { 0,0,  25,0,  30,0,  0,0,  5,20 } );
@@ -387,7 +387,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		// 		boxAllocation=35   ->     [ 25,15,  0,0,  15,20,  0,0,  15,10 ]  @  [ 0,0,  0,0,  5,15,  0,0,  5,35 ]
 		allocYTest( new LReqBox[] { box( 25, 25, 15, 0 ), lineBreakBox( 5, 0 ), box( 15, 15, 20, 0 ), lineBreakBox( 5, 0 ), box( 15, 15, 10, 0 ) },
 				new int[] { VTOP, VTOP, VTOP, VTOP, VTOP }, 5.0, 0.0, 0.0,
-				box( 25, 65, 25, 65, 45, 0 ),
+				box( 25, 65, 25, 65, 45, 0, 7.5 ),
 				35,
 				new double[] { 25,15,  0,0,  15,20,  0,0,  15,10 },
 				new double[] { 0,0,  0,0,  5,15,  0,0,  5,35 } );
@@ -401,7 +401,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		// 		boxAllocation=35   ->     [ 25,15,  0,0,  15,20,  0,0,  15,10 ]  @  [ 0,0,  0,0,  5,0,  0,0,  5,0 ]
 		allocYTest( new LReqBox[] { box( 25, 25, 15, 0 ), lineBreakBox( 5, 0 ), box( 15, 15, 20, 0 ), lineBreakBox( 5, 0 ), box( 15, 15, 10, 0 ) },
 				new int[] { VTOP, VTOP, VTOP, VTOP, VTOP }, 5.0, 0.0, 5.0,
-				box( 25, 65, 25, 65, 55, 0 ),
+				box( 25, 65, 25, 65, 55, 0, 7.5 ),
 				35,
 				new double[] { 25,15,  0,0,  15,20,  0,0,  15,10 },
 				new double[] { 0,0,  0,0,  5,20,  0,0,  5,45 } );

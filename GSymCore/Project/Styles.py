@@ -19,7 +19,7 @@ prj_linkStyle = LinkStyleSheet()
 
 
 prj_projectIndexHeaderStyle = StaticTextStyleSheet( Font( "SansSerif", Font.PLAIN, 18 ), Color.BLACK )
-prj_projectIndexBoxStyle = VBoxStyleSheet( VTypesetting.NONE, 10.0 )
+prj_projectIndexBoxStyle = VBoxStyleSheet( 10.0 )
 
 prj_projectContentBoxStyle = VBoxStyleSheet()
 
@@ -38,7 +38,7 @@ prj_packageControlsBoxStyle = HBoxStyleSheet( 20.0 )
 prj_packageHeaderBoxStyle = HBoxStyleSheet( 20.0 )
 
 prj_packageContentsBoxStyle = VBoxStyleSheet.defaultStyleSheet
-prj_packageBoxStyle = VBoxStyleSheet( VTypesetting.NONE, 5.0 )
+prj_packageBoxStyle = VBoxStyleSheet( 5.0 )
 
 
 

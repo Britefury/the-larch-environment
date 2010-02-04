@@ -18,8 +18,8 @@ public class Test_Layout_base extends TestCase
 	protected static int HRIGHT = ElementAlignment.HALIGN_RIGHT;
 	protected static int HEXPAND = ElementAlignment.HALIGN_EXPAND;
 
-	protected static int VBASELINES = ElementAlignment.VALIGN_BASELINES;
-	protected static int VBASELINES_EXPAND = ElementAlignment.VALIGN_BASELINES_EXPAND;
+	protected static int VREFY = ElementAlignment.VALIGN_REFY;
+	protected static int VREFY_EXPAND = ElementAlignment.VALIGN_REFY_EXPAND;
 	protected static int VTOP = ElementAlignment.VALIGN_TOP;
 	protected static int VCENTRE = ElementAlignment.VALIGN_CENTRE;
 	protected static int VBOTTOM = ElementAlignment.VALIGN_BOTTOM;
@@ -42,9 +42,9 @@ public class Test_Layout_base extends TestCase
 		return new LReqBox( 0.0, 0.0, height, vspacing );
 	}
 	
-	protected LReqBox ybbox(double ascent, double descent, double vspacing)
+	protected LReqBox yrbox(double height, double vspacing, double refY)
 	{
-		return new LReqBox( 0.0, 0.0, ascent, descent, vspacing );
+		return new LReqBox( 0.0, 0.0, height, vspacing, refY );
 	}
 	
 	
@@ -53,9 +53,9 @@ public class Test_Layout_base extends TestCase
 		return new LReqBox( width, hAdvance, height, vspacing );
 	}
 
-	protected LReqBox box(double width, double hAdvance, double ascent, double descent, double vspacing)
+	protected LReqBox box(double width, double hAdvance, double height, double vspacing, double refY)
 	{
-		return new LReqBox( width, hAdvance, ascent, descent, vspacing );
+		return new LReqBox( width, hAdvance, height, vspacing, refY );
 	}
 
 	protected LReqBox box(double minWidth, double prefWidth, double minHAdvance, double prefHAdvance, double height, double vspacing)
@@ -63,25 +63,30 @@ public class Test_Layout_base extends TestCase
 		return new LReqBox( minWidth, prefWidth, minHAdvance, prefHAdvance, height, vspacing );
 	}
 
-	protected LReqBox box(double minWidth, double prefWidth, double minHAdvance, double prefHAdvance, double ascent, double descent, double vspacing)
+	protected LReqBox box(double minWidth, double prefWidth, double minHAdvance, double prefHAdvance, double height, double vspacing, double refY)
 	{
-		return new LReqBox( minWidth, prefWidth, minHAdvance, prefHAdvance, ascent, descent, vspacing );
+		return new LReqBox( minWidth, prefWidth, minHAdvance, prefHAdvance, height, vspacing, refY );
 	}
 
 
 
-	protected LAllocBox alloc(double x, double y, double w, double h)
+	protected LAllocBox alloc(double x, double y, double width, double height)
 	{
-		return new LAllocBox( x, y, w, h * 0.5, h * 0.5, null, false );
+		return new LAllocBox( x, y, width, height, height * 0.5, null );
 	}
 	
-	protected LAllocBox alloc(double x, double y, double w, double a, double d)
+	protected LAllocBox alloc(double x, double y, double width, double height, double refY)
 	{
-		return new LAllocBox( x, y, w, a, d, null, false );
+		return new LAllocBox( x, y, width, height, refY, null );
 	}
 	
 	
 	
+	protected void assertBoxesEqual(LReqBox result, LReqBox expected)
+	{
+		assertBoxesEqual( result, expected, "REQUISITION" );
+	}
+
 	protected void assertBoxesEqual(LReqBox result, LReqBox expected, String description)
 	{
 		if ( !result.equals( expected ) )
@@ -95,6 +100,11 @@ public class Test_Layout_base extends TestCase
 		assertEquals( result, expected );
 	}
 
+
+	protected void assertAllocsEqual(LAllocBox result, LAllocBox expected)
+	{
+		assertAllocsEqual( result, expected, "ALLOCATION" );
+	}
 
 	protected void assertAllocsEqual(LAllocBox result, LAllocBox expected, String description)
 	{

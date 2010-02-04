@@ -9,57 +9,37 @@ package BritefuryJ.DocPresent.Layout;
 
 public class LAllocV
 {
-	protected double ascent, descent;
-	protected boolean bHasBaseline;
+	protected double height, refY;
 
 	
 	public LAllocV(double height)
 	{
-		this.ascent = height * 0.5;
-		this.descent = height * 0.5;
-		bHasBaseline = false;
+		this.height = height;
+		refY = height * 0.5;
 	}
 	
-	public LAllocV(double ascent, double descent)
+	public LAllocV(double height, double refY)
 	{
-		this.ascent = ascent;
-		this.descent = descent;
-		bHasBaseline = true;
+		this.height = height;
+		this.refY = refY;
 	}
 	
-	public LAllocV(double ascent, double descent, boolean bHasBaseline)
-	{
-		this.ascent = ascent;
-		this.descent = descent;
-		this.bHasBaseline = bHasBaseline;
-	}
-	
-	
-	public double getAscent()
-	{
-		return ascent;
-	}
-	
-	public double getDescent()
-	{
-		return descent;
-	}
 	
 	public double getHeight()
 	{
-		return ascent + descent;
+		return height;
 	}
 	
-	public boolean hasBaseline()
+	public double getRefY()
 	{
-		return bHasBaseline;
+		return refY;
 	}
 	
 	
 	
 	public LAllocV borderY(double topMargin, double bottomMargin)
 	{
-		return new LAllocV( ascent - topMargin, descent - bottomMargin, bHasBaseline );
+		return new LAllocV( height - ( topMargin + bottomMargin ), refY );
 	}
 
 
@@ -75,7 +55,7 @@ public class LAllocV
 		{
 			LAllocV v = (LAllocV)x;
 			
-			return ascent == v.ascent  &&  descent == v.descent  &&  bHasBaseline == v.bHasBaseline;
+			return height == v.height  &&  refY == v.refY;
 		}
 		else
 		{
@@ -86,6 +66,6 @@ public class LAllocV
 	
 	public String toString()
 	{
-		return "LAllocV( ascent=" + ascent + ", descent=" + descent + ", bHasBaseline=" + bHasBaseline + ")";
+		return "LAllocV( height=" + height + ", refY=" + refY + " )";
 	}
 }

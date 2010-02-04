@@ -94,10 +94,10 @@ public class TableLayout
 
 	private static LReqBox[] computeRowYBoxes(LReqBoxInterface children[], TablePackingParams packingParams[], int childAllocationFlags[], int numRows, double rowSpacing)
 	{
-		double rowAscent[] = new double[numRows];
-		double rowDescent[] = new double[numRows];
 		double rowHeight[] = new double[numRows];
-		boolean rowHasBaseline[] = new boolean[numRows];
+		double rowHeightAboveRef[] = new double[numRows];
+		double rowHeightBelowRef[] = new double[numRows];
+		boolean rowRefYAligned[] = new boolean[numRows];
 		
 		
 		// First phase; fill only with children who span 1 row
@@ -109,25 +109,35 @@ public class TableLayout
 			if ( packing.rowSpan == 1 )
 			{
 				VAlignment v = ElementAlignment.getVAlignment( childAllocationFlags[i] );
-				
 				int r = packing.y;
-				boolean bBaseline = v == VAlignment.BASELINES  ||  v == VAlignment.BASELINES_EXPAND;
-				if ( bBaseline )
-				{
-					rowHasBaseline[r] = true;
-				}
 				
-				if ( bBaseline  &&  child.hasBaseline() )
+				double childReqHeight = child.getReqHeight();
+
+				if ( v == VAlignment.REFY  ||  v == VAlignment.REFY_EXPAND )
 				{
-					rowAscent[r] = Math.max( rowAscent[r], child.getReqAscent() );
-					rowDescent[r] = Math.max( rowDescent[r], child.getReqDescent() );
+					double childRefY = child.getRefY();
+					
+					double childHeightAboveRef = childRefY;
+					double childHeightBelowRef = childReqHeight - childRefY;
+
+					rowHeight[r] = Math.max( rowHeight[r], childReqHeight );
+					rowHeightAboveRef[r] = Math.max( rowHeightAboveRef[r], childHeightAboveRef );
+					rowHeightBelowRef[r] = Math.max( rowHeightBelowRef[r], childHeightBelowRef );
+					
+					rowRefYAligned[r] = true;
 				}
 				else
 				{
-					rowHeight[r] = Math.max( rowHeight[r], child.getReqHeight() );
+					rowHeight[r] = Math.max( rowHeight[r], childReqHeight );
 				}
 			}
 			i++;
+		}
+		
+		
+		for (int r = 0; r < numRows; r++)
+		{
+			rowHeight[r] = Math.max( rowHeight[r], rowHeightAboveRef[r] + rowHeightBelowRef[r] );
 		}
 		
 		
@@ -173,24 +183,16 @@ public class TableLayout
 		
 		for (int r = 0; r < numRows; r++)
 		{
-			if ( rowHasBaseline[r] )
+			double reqHeight = rowHeight[r];
+			double reqHeightAboveRef = rowHeightAboveRef[r];
+			
+			if ( rowRefYAligned[r] )
 			{
-				double reqHeight = rowHeight[r];
-				double reqAscent = rowAscent[r];
-				double reqDescent = rowDescent[r];
-				if ( reqHeight  >  ( reqAscent + reqDescent ) )
-				{
-					double deltaY = ( reqHeight  -  ( reqAscent + reqDescent ) )  *  0.5;
-					rowBoxes[r] = new LReqBox( 0.0, 0.0, reqAscent + deltaY, reqDescent + deltaY, 0.0 );
-				}
-				else
-				{
-					rowBoxes[r] = new LReqBox( 0.0, 0.0, reqAscent, reqDescent, 0.0 );
-				}
+				rowBoxes[r] = new LReqBox( 0.0, 0.0, reqHeight, 0.0, reqHeightAboveRef );
 			}
 			else
 			{
-				rowBoxes[r] = new LReqBox( 0.0, 0.0, rowHeight[r], 0.0 );
+				rowBoxes[r] = new LReqBox( 0.0, 0.0, reqHeight, 0.0 );
 			}
 		}
 

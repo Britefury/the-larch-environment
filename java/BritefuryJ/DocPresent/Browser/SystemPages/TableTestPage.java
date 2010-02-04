@@ -15,7 +15,6 @@ import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.TableStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
@@ -121,7 +120,7 @@ public class TableTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		VBoxStyleSheet boxS = new VBoxStyleSheet( VTypesetting.NONE, 20.0 );
+		VBoxStyleSheet boxS = new VBoxStyleSheet( 20.0 );
 		DPVBox box = new DPVBox( getContext(), boxS );
 		box.append( wrapInBorder( makeTable0() ) );
 		box.append( wrapInBorder( makeTable1() ) );

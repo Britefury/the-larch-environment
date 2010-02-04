@@ -16,7 +16,6 @@ import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
@@ -72,12 +71,13 @@ public class VBoxTestPage extends SystemPage
 	}
 	
 	
-	protected DPHBox makeTypesetHBox(VTypesetting typesetting, String header)
+	protected DPHBox makeRefAlignedHBox(int refPointIndex, String header)
 	{
 		DPStaticText[] txt = makeTSTexts( header );
-		VBoxStyleSheet vs = new VBoxStyleSheet( typesetting, 0.0 );
+		VBoxStyleSheet vs = new VBoxStyleSheet( 0.0 );
 		DPVBox v = new DPVBox( getContext(), vs );
 		v.extend( txt );
+		v.setRefPointIndex( refPointIndex );
 		StaticTextStyleSheet t18 = new StaticTextStyleSheet( new Font( "Sans serif", Font.PLAIN, 18 ), new Color( 0.0f, 0.3f, 0.6f ) );
 		DPStaticText before = new DPStaticText( getContext(), t18, header );
 		DPStaticText after = new DPStaticText( getContext(), t18, " After" );
@@ -104,7 +104,7 @@ public class VBoxTestPage extends SystemPage
 		DPVBox vboxTest = new DPVBox( getContext() );
 		vboxTest.extend( new DPWidget[] { h, t0, t1, t2 } );
 		
-		VBoxStyleSheet b1s = new VBoxStyleSheet( VTypesetting.NONE, 10.0 );
+		VBoxStyleSheet b1s = new VBoxStyleSheet( 10.0 );
 		DPVBox hAlignTest = new DPVBox( getContext(), b1s );
 		hAlignTest.append( new DPStaticText( getContext(), t24, "Horizontal alignment" ) );
 		hAlignTest.append( makeTextOnGrey( "Left" ).alignHLeft() );
@@ -113,23 +113,25 @@ public class VBoxTestPage extends SystemPage
 		hAlignTest.append( makeTextOnGrey( "Expand" ).alignHExpand() );
 				
 		
-		DPHBox ts0 = makeTypesetHBox( VTypesetting.NONE, "NONE" );
-		DPHBox ts1 = makeTypesetHBox( VTypesetting.ALIGN_WITH_TOP, "ALIGN_WITH_TOP" );
-		DPHBox ts2 = makeTypesetHBox( VTypesetting.ALIGN_WITH_BOTTOM, "ALIGN_WITH_BOTTOM" );
+		DPHBox ra0 = makeRefAlignedHBox( 0, "ALIGN_WITH_0" );
+		DPHBox ra1 = makeRefAlignedHBox( 1, "ALIGN_WITH_1" );
+		DPHBox ra2 = makeRefAlignedHBox( 2, "ALIGN_WITH_2" );
+		DPHBox ra3 = makeRefAlignedHBox( 3, "ALIGN_WITH_3" );
 		
-		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, 20.0 );
-		DPVBox typesettingTest = new DPVBox( getContext(), boxs );
-		typesettingTest.append( new DPStaticText( getContext(), t24, "VBox typesetting" ) );
-		typesettingTest.append( ts0 );
-		typesettingTest.append( ts1 );
-		typesettingTest.append( ts2 );
+		VBoxStyleSheet boxs = new VBoxStyleSheet( 20.0 );
+		DPVBox refPointAlignTest = new DPVBox( getContext(), boxs );
+		refPointAlignTest.append( new DPStaticText( getContext(), t24, "VBox reference point alignment" ) );
+		refPointAlignTest.append( ra0 );
+		refPointAlignTest.append( ra1 );
+		refPointAlignTest.append( ra2 );
+		refPointAlignTest.append( ra3 );
 		
 		
-		VBoxStyleSheet boxS = new VBoxStyleSheet( VTypesetting.NONE, 20.0 );
+		VBoxStyleSheet boxS = new VBoxStyleSheet( 20.0 );
 		DPVBox box = new DPVBox( getContext(), boxS );
 		box.append( wrapInOutline( vboxTest ) );
 		box.append( wrapInOutline( hAlignTest ) );
-		box.append( wrapInOutline( typesettingTest ) );
+		box.append( wrapInOutline( refPointAlignTest ) );
 		
 		return box;
 	}

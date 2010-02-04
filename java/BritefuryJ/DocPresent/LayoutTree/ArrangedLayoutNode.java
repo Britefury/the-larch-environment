@@ -32,7 +32,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode
 	{
 		this.element = element;
 		layoutReqBox = new LReqBox();
-		layoutAllocBox = new LAllocBox( element );
+		layoutAllocBox = new LAllocBox( this );
 	}
 
 

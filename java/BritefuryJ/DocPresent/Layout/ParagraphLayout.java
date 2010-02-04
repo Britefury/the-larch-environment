@@ -258,7 +258,7 @@ public class ParagraphLayout
 		}
 		else
 		{
-			VerticalLayout.computeRequisitionY( box, lineBoxes, VTypesetting.NONE, vSpacing );
+			VerticalLayout.computeRequisitionY( box, lineBoxes, 0, vSpacing );
 		}
 	}
 

@@ -32,18 +32,47 @@ public class FractionLayout
 
 	public static void computeRequisitionY(LReqBox box, LReqBoxInterface numerator, LReqBoxInterface bar, LReqBoxInterface denominator, double hPadding, double vSpacing, double baselineOffset)
 	{
-		double numHeight = numerator != null  ?  numerator.getReqHeight()  :  0.0;
-		double numSpacing = numerator != null  ?  numerator.getReqVSpacing()  :  0.0;
-		double barHeight = bar != null  ?  bar.getReqHeight()  :  0.0;
-		double denomHeight = denominator != null  ?  denominator.getReqHeight()  :  0.0;
-		double denomSpacing = denominator != null  ?  denominator.getReqVSpacing()  :  0.0;
+		double y = 0.0;
+		double height = 0.0, ascent = 0.0;
+		double heightAndSpacing = 0.0;
+		
+		if ( numerator != null )
+		{
+			height = y + numerator.getReqHeight();
+			heightAndSpacing = height + numerator.getReqVSpacing();
+			y = height + Math.max( numerator.getReqVSpacing(), vSpacing );
+		}
+		
+		if ( bar != null )
+		{
+			double barHeight = bar.getReqHeight();
+			ascent = y + barHeight * 0.5 + baselineOffset; 
+			
+			height = y + barHeight;
+			heightAndSpacing = height;
+			y = height + vSpacing;
+		}
+		else
+		{
+			if ( numerator != null  &&  denominator != null )
+			{
+				ascent = y + baselineOffset - vSpacing * 0.5;
+			}
+			else
+			{
+				ascent = y + baselineOffset;
+			}
+		}
+		
+		if ( denominator != null )
+		{
+			height = y + denominator.getReqHeight();
+			heightAndSpacing = height + denominator.getReqVSpacing();
+			y = heightAndSpacing;
+		}
 		
 		
-		double halfBarHeight = barHeight * 0.5;
-		double ascent = numHeight + Math.max( numSpacing, vSpacing ) + halfBarHeight  +  baselineOffset;
-		double descent = halfBarHeight + vSpacing + denomHeight  -  baselineOffset;
-		
-		box.setRequisitionY( ascent, descent, denomSpacing );
+		box.setRequisitionY( height, heightAndSpacing - height, ascent );
 	}
 
 

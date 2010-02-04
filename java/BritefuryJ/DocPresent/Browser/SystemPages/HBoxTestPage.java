@@ -15,7 +15,6 @@ import BritefuryJ.DocPresent.DPStaticText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
@@ -83,15 +82,15 @@ public class HBoxTestPage extends SystemPage
 		DPHBox b1 = new DPHBox( getContext() );
 		b1.append( makeText( "a", 24 ).alignVBaselines() );
 		b1.append( makeText( "g", 24 ).alignVBaselines() );
-		b1.append( makeText( "v_baselines", 18 ).alignVBaselines() );
-		b1.append( makeText( "v_baselines48", 48 ).alignVBaselines() );
-		b1.append( makeText( "v_baselines-expand", 18 ).alignVBaselinesExpand() );
+		b1.append( makeText( "v_ref_y", 18 ).alignVBaselines() );
+		b1.append( makeText( "v_ref_y48", 48 ).alignVBaselines() );
+		b1.append( makeText( "v_ref_y-expand", 18 ).alignVBaselinesExpand() );
 		b1.append( makeText( "v_top", 18 ).alignVTop() );
 		b1.append( makeText( "v_centre", 18 ).alignVCentre() );
 		b1.append( makeText( "v_bottom", 18 ).alignVBottom() );
 		b1.append( makeText( "v_expand", 18 ).alignVExpand() );
 		
-		VBoxStyleSheet boxS = new VBoxStyleSheet( VTypesetting.NONE, 20.0 );
+		VBoxStyleSheet boxS = new VBoxStyleSheet( 20.0 );
 		DPVBox box = new DPVBox( getContext(), boxS );
 		box.append( b0.alignHExpand() );
 		box.append( wrapInOutline( b1 ) );

@@ -16,7 +16,6 @@ import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
@@ -92,7 +91,7 @@ public class FractionTestPage extends SystemPage
 		TextStyleSheet s0 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), new Color( 0.0f, 0.5f, 0.0f ) );
 		TextStyleSheet blackStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.black );
 
-		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, 10.0 );
+		VBoxStyleSheet boxs = new VBoxStyleSheet( 10.0 );
 		DPVBox box = new DPVBox( getContext(), boxs );
 		
 		box.append( makeFractionLine( makeText( "a", s0 ), makeText( "p", s0 ) ) );

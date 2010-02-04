@@ -15,9 +15,7 @@ import BritefuryJ.DocPresent.WidgetFilter;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
-import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.Layout.VerticalLayout;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 
@@ -38,7 +36,7 @@ public class LayoutNodeVBox extends LayoutNodeAbstractBox
 
 	protected void updateRequisitionY()
 	{
-		VerticalLayout.computeRequisitionY( layoutReqBox, getLeavesRefreshedRequistionYBoxes(), getTypesetting(), getSpacing() );
+		VerticalLayout.computeRequisitionY( layoutReqBox, getLeavesRefreshedRequistionYBoxes(), getRefPointIndex(), getSpacing() );
 	}
 
 
@@ -67,7 +65,7 @@ public class LayoutNodeVBox extends LayoutNodeAbstractBox
 		int childAllocFlags[] = getLeavesAlignmentFlags();
 		LAllocV prevAllocV[] = getLeavesAllocV();
 		
-		VerticalLayout.allocateY( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, childAllocFlags, getSpacing() );
+		VerticalLayout.allocateY( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, childAllocFlags, getRefPointIndex(), getSpacing() );
 		
 		refreshLeavesAllocationY( prevAllocV );
 	}
@@ -107,16 +105,5 @@ public class LayoutNodeVBox extends LayoutNodeAbstractBox
 	public List<DPWidget> verticalNavigationList()
 	{
 		return getLeaves();
-	}
-
-
-
-	
-	
-	
-	
-	protected VTypesetting getTypesetting()
-	{
-		return ((VBoxStyleSheet)element.getStyleSheet()).getTypesetting();
 	}
 }

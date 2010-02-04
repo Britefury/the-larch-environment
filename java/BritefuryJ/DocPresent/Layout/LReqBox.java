@@ -16,23 +16,22 @@ public class LReqBox extends LReqBoxInterface
 	protected static double ONE_PLUS_EPSILON = 1.0 + EPSILON;
 	
 	
-	private static int FLAG_HASBASELINE = 0x1  *  ElementAlignment._ELEMENTALIGN_END;
-	private static int FLAG_LINEBREAK = 0x2  *  ElementAlignment._ELEMENTALIGN_END;
-	private static int FLAG_PARAGRAPH_INDENT = 0x4  *  ElementAlignment._ELEMENTALIGN_END;
-	private static int FLAG_PARAGRAPH_DEDENT = 0x8  *  ElementAlignment._ELEMENTALIGN_END;
+	private static int FLAG_LINEBREAK = 0x1  *  ElementAlignment._ELEMENTALIGN_END;
+	private static int FLAG_PARAGRAPH_INDENT = 0x2  *  ElementAlignment._ELEMENTALIGN_END;
+	private static int FLAG_PARAGRAPH_DEDENT = 0x4  *  ElementAlignment._ELEMENTALIGN_END;
 	
 	
 	protected int flags = 0;
 	protected int lineBreakCost;
 	
 	protected double minWidth, prefWidth, minHAdvance, prefHAdvance;
-	protected double reqAscent, reqDescent, reqVSpacing;
+	protected double reqHeight, reqVSpacing;
+	protected double refY;
 	
 	
 	
 	public LReqBox()
 	{
-		setFlag( FLAG_HASBASELINE, false );
 		lineBreakCost = -1;
 	}
 	
@@ -40,21 +39,19 @@ public class LReqBox extends LReqBoxInterface
 	{
 		minWidth = prefWidth = width;
 		minHAdvance = prefHAdvance = hAdvance;
-		reqAscent = height * 0.5;
-		reqDescent = height * 0.5;
+		reqHeight = height;
 		reqVSpacing = vSpacing;
-		setFlag( FLAG_HASBASELINE, false );
+		refY = height * 0.5;
 		lineBreakCost = -1;
 	}
 	
-	public LReqBox(double width, double hAdvance, double ascent, double descent, double vSpacing)
+	public LReqBox(double width, double hAdvance, double height, double vSpacing, double refY)
 	{
-		minWidth = prefWidth = width;
-		minHAdvance = prefHAdvance = hAdvance;
-		reqAscent = ascent;
-		reqDescent = descent;
-		reqVSpacing = vSpacing;
-		setFlag( FLAG_HASBASELINE, true );
+		this.minWidth = prefWidth = width;
+		this.minHAdvance = prefHAdvance = hAdvance;
+		this.reqHeight = height;
+		this.reqVSpacing = vSpacing;
+		this.refY = refY;
 		lineBreakCost = -1;
 	}
 
@@ -64,23 +61,21 @@ public class LReqBox extends LReqBoxInterface
 		this.prefWidth = prefWidth;
 		this.minHAdvance = minHAdvance;
 		this.prefHAdvance = prefHAdvance;
-		reqAscent = height * 0.5;
-		reqDescent = height * 0.5;
+		this.reqHeight = height;
 		this.reqVSpacing = vSpacing;
-		setFlag( FLAG_HASBASELINE, false );
+		this.refY = height * 0.5;
 		lineBreakCost = -1;
 	}
 
-	public LReqBox(double minWidth, double prefWidth, double minHAdvance, double prefHAdvance, double ascent, double descent, double vSpacing)
+	public LReqBox(double minWidth, double prefWidth, double minHAdvance, double prefHAdvance, double height, double vSpacing, double refY)
 	{
 		this.minWidth = minWidth;
 		this.prefWidth = prefWidth;
 		this.minHAdvance = minHAdvance;
 		this.prefHAdvance = prefHAdvance;
-		this.reqAscent = ascent;
-		this.reqDescent = descent;
+		this.reqHeight = height;
 		this.reqVSpacing = vSpacing;
-		setFlag( FLAG_HASBASELINE, true );
+		this.refY = refY;
 		lineBreakCost = -1;
 	}
 
@@ -91,9 +86,9 @@ public class LReqBox extends LReqBoxInterface
 		prefWidth = box.prefWidth;
 		minHAdvance = box.minHAdvance;
 		prefHAdvance = box.prefHAdvance;
-		reqAscent = box.reqAscent;
-		reqDescent = box.reqDescent;
+		reqHeight = box.reqHeight;
 		reqVSpacing = box.reqVSpacing;
+		refY = box.refY;
 		flags = box.flags;
 		lineBreakCost = box.lineBreakCost;
 	}
@@ -104,9 +99,9 @@ public class LReqBox extends LReqBoxInterface
 		prefWidth = box.prefWidth * scale;
 		minHAdvance = box.minHAdvance * scale;
 		prefHAdvance = box.prefHAdvance * scale;
-		reqAscent = box.reqAscent * scale;
-		reqDescent = box.reqDescent * scale;
+		reqHeight = box.reqHeight * scale;
 		reqVSpacing = box.reqVSpacing * scale;
+		refY = box.refY * scale;
 		flags = box.flags;
 		lineBreakCost = box.lineBreakCost;
 	}
@@ -134,19 +129,9 @@ public class LReqBox extends LReqBoxInterface
 	}
 	
 
-	public double getReqAscent()
-	{
-		return reqAscent;
-	}
-	
-	public double getReqDescent()
-	{
-		return reqDescent;
-	}
-	
 	public double getReqHeight()
 	{
-		return reqAscent + reqDescent;
+		return reqHeight;
 	}
 	
 	public double getReqVSpacing()
@@ -154,24 +139,41 @@ public class LReqBox extends LReqBoxInterface
 		return reqVSpacing;
 	}
 	
-	
-	
-	protected void setHasBaseline(boolean value)
+	public double getRefY()
 	{
-		setFlag( FLAG_HASBASELINE, value );
+		return refY;
 	}
 	
-	public boolean hasBaseline()
+	public double getRefYAligned(VAlignment alignment)
 	{
-		return getFlag( FLAG_HASBASELINE );
+		if ( alignment == VAlignment.TOP  ||  alignment == VAlignment.EXPAND )
+		{
+			return 0.0;
+		}
+		else if ( alignment == VAlignment.CENTRE )
+		{
+			return reqHeight * 0.5;
+		}
+		else if ( alignment == VAlignment.BOTTOM )
+		{
+			return reqHeight;
+		}
+		else
+		{
+			return refY;
+		}
 	}
 	
+	public double getReqHeightBelowRefPoint()
+	{
+		return reqHeight - refY;
+	}
 	
 	
 	public void clear()
 	{
 		minWidth = prefWidth = minHAdvance = prefHAdvance = 0.0;
-		reqAscent = reqDescent = reqVSpacing = 0.0;
+		reqHeight = reqVSpacing = refY = 0.0;
 		flags = 0;
 	}
 	
@@ -182,8 +184,7 @@ public class LReqBox extends LReqBoxInterface
 	
 	public void clearRequisitionY()
 	{
-		reqAscent = reqDescent = reqVSpacing = 0.0;
-		setFlag( FLAG_HASBASELINE, false );
+		reqHeight = reqVSpacing = refY = 0.0;
 	}
 	
 	
@@ -222,26 +223,23 @@ public class LReqBox extends LReqBoxInterface
 
 	public void setRequisitionY(double height, double vSpacing)
 	{
-		reqAscent = height * 0.5;
-		reqDescent = height * 0.5;
+		reqHeight = height;
 		reqVSpacing = vSpacing;
-		setFlag( FLAG_HASBASELINE, false );
+		refY = height * 0.5;
 	}
 	
-	public void setRequisitionY(double ascent, double descent, double vSpacing)
+	public void setRequisitionY(double height, double vSpacing, double refY)
 	{
-		reqAscent = ascent;
-		reqDescent = descent;
+		reqHeight = height;
 		reqVSpacing = vSpacing;
-		setFlag( FLAG_HASBASELINE, true );
+		this.refY = refY;
 	}
 	
 	public void setRequisitionY(LReqBoxInterface reqBox)
 	{
-		reqAscent = reqBox.getReqAscent();
-		reqDescent = reqBox.getReqDescent();
+		reqHeight = reqBox.getReqHeight();
 		reqVSpacing = reqBox.getReqVSpacing();
-		setFlag( FLAG_HASBASELINE, reqBox.hasBaseline() );
+		refY = reqBox.getRefY();
 	}
 	
 	
@@ -316,9 +314,9 @@ public class LReqBox extends LReqBoxInterface
 	
 	public void borderY(double topMargin, double bottomMargin)
 	{
-		reqAscent += topMargin;
-		reqDescent += bottomMargin;
+		reqHeight += ( topMargin + bottomMargin );
 		reqVSpacing = Math.max( reqVSpacing - bottomMargin, 0.0 );
+		//refY += topMargin;
 	}
 	
 	public boolean equals(Object x)
@@ -333,7 +331,7 @@ public class LReqBox extends LReqBoxInterface
 			LReqBox b = (LReqBox)x;
 			
 			return minWidth == b.minWidth  &&  prefWidth == b.prefWidth  &&  minHAdvance == b.minHAdvance  &&  prefHAdvance == b.prefHAdvance  &&
-					reqAscent == b.reqAscent  &&  reqDescent == b.reqDescent  &&  reqVSpacing == b.reqVSpacing  &&  hasBaseline() == b.hasBaseline();
+				reqHeight == b.reqHeight  &&  reqVSpacing == b.reqVSpacing  &&  refY == b.refY;
 		}
 		else
 		{
@@ -345,7 +343,7 @@ public class LReqBox extends LReqBoxInterface
 	public String toString()
 	{
 		return "LReqBox( minWidth=" + minWidth + ", prefWidth=" + prefWidth +  ", minHAdvance=" + minHAdvance + ", prefHAdvance=" + prefHAdvance +
-			", reqAscent=" + reqAscent + ", reqDescent=" + reqDescent + ", reqVSpacing=" + reqVSpacing +  ", bHasBaseline=" + hasBaseline() + ")";
+			", reqHeight=" + reqHeight + ", reqVSpacing=" + reqVSpacing +  ", refY=" + refY + ")";
 	}
 
 

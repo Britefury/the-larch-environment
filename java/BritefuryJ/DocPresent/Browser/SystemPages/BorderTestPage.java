@@ -17,7 +17,6 @@ import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
@@ -66,7 +65,7 @@ public class BorderTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		VBoxStyleSheet mainBoxStyle = new VBoxStyleSheet( VTypesetting.NONE, 10.0 );
+		VBoxStyleSheet mainBoxStyle = new VBoxStyleSheet( 10.0 );
 		DPVBox mainBox = new DPVBox( getContext(), mainBoxStyle );
 		
 		SolidBorder singlePixelBorder = new SolidBorder( 1.0, 2.0, Color.black, null );
@@ -97,8 +96,8 @@ public class BorderTestPage extends SystemPage
 		DPBorder valignExpand = new DPBorder( getContext(), singlePixelBorder );
 		
 		
-		valignBaselines.setChild( makeTextOnGrey( "vAlign=baselines" ).alignVBaselines() );
-		valignBaselinesExpand.setChild( makeTextOnGrey( "vAlign=b-expand" ).alignVBaselinesExpand() );
+		valignBaselines.setChild( makeTextOnGrey( "vAlign=ref_y" ).alignVBaselines() );
+		valignBaselinesExpand.setChild( makeTextOnGrey( "vAlign=ref_y-expand" ).alignVBaselinesExpand() );
 		valignTop.setChild( makeTextOnGrey( "vAlign=top" ).alignVTop() );
 		valignCentre.setChild( makeTextOnGrey( "vAlign=centre" ).alignVCentre() );
 		valignBottom.setChild( makeTextOnGrey( "vAlign=bottom" ).alignVBottom() );

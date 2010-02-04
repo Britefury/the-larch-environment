@@ -16,7 +16,6 @@ import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
@@ -126,7 +125,7 @@ public class ParagraphCollationTestPage extends SystemPage
 		DPWidget b7 = makeParagraph( "PER-WORD INDENTED", 0.0, 0.0, 50.0, 1, blackText );
 		DPWidget b8 = makeParagraphWithNestedSpan( "NESTED-2-INDENTED", 0.0, 0.0, 50.0, 2, blackText, redText );
 		DPWidget[] children = { b2, b3, b4, b5, b6, b7, b8 };
-		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, 30.0 );
+		VBoxStyleSheet boxs = new VBoxStyleSheet( 30.0 );
 		DPVBox box = new DPVBox( getContext(), boxs );
 		box.extend( children );
 		return box;

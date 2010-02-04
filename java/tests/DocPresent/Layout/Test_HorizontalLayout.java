@@ -31,52 +31,52 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		
 		// requisitionX()  ->  <0,0>
 		HorizontalLayout.computeRequisitionX( result, new LReqBox[] {},  0.0 );
-		assertEquals( result, new LReqBox() );
+		assertBoxesEqual( result, new LReqBox() );
 
 		// requisitionX( [ <0,0> ] )  ->  <0,0>
 		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { new LReqBox() },  0.0 );
-		assertEquals( result, new LReqBox() );
+		assertBoxesEqual( result, new LReqBox() );
 
 		// requisitionX( [ <10,10> ] )  ->  <10,10>
 		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 10.0 ) },  0.0 );
-		assertEquals( result, xbox( 10.0, 10.0 ) );
+		assertBoxesEqual( result, xbox( 10.0, 10.0 ) );
 
 		// Padding 'consumes' h-spacing
 		// requisitionX( [ <10,11> ] )  ->  <10,11>
 		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 11.0 ) },  0.0 );
-		assertEquals( result, xbox( 10.0, 11.0 ) );
+		assertBoxesEqual( result, xbox( 10.0, 11.0 ) );
 
 		// requisitionX( [ <0,0>, <0,0> ] )  ->  <0,0>
 		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { new LReqBox(), new LReqBox() },  0.0 );
-		assertEquals( result, new LReqBox() );
+		assertBoxesEqual( result, new LReqBox() );
 
 		// Width accumulates
 		// requisitionX( [ <10,10>, <5,5> ] )  ->  <15,15>
 		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 10.0 ), xbox( 5.0, 5.0 ) },  0.0 );
-		assertEquals( result, xbox( 15.0, 15.0 ) );
+		assertBoxesEqual( result, xbox( 15.0, 15.0 ) );
 
 		// H-spacing of child puts space before next child
 		// requisitionX( [ <10,12>, <5,5> ] )  ->  <17,17>
 		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 12.0 ), xbox( 5.0, 5.0 ) },  0.0 );
-		assertEquals( result, xbox( 17.0, 17.0 ) );
+		assertBoxesEqual( result, xbox( 17.0, 17.0 ) );
 
 		// H-spacing of last child gets put onto the result
 		// requisitionX( [ <10,12>, <5,6> ] )  ->  <17,18>
 		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 12.0 ), xbox( 5.0, 6.0 ) },  0.0 );
-		assertEquals( result, xbox( 17.0, 18.0 ) );
+		assertBoxesEqual( result, xbox( 17.0, 18.0 ) );
 
 		// Spacing between children adds extra width
 		// requisitionX( [ <0,0>, <0,0> ], spacing=1 )  ->  <1,0>
 		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { new LReqBox(), new LReqBox() },  1.0 );
-		assertEquals( result, xbox( 1.0, 1.0 ) );
+		assertBoxesEqual( result, xbox( 1.0, 1.0 ) );
 		// requisitionX( [ <10,10>, <5,5> ], spacing=1 )  ->  <16,16>
 		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 10.0 ), xbox( 5.0, 5.0 ) },  1.0 );
-		assertEquals( result, xbox( 16.0, 16.0 ) );
+		assertBoxesEqual( result, xbox( 16.0, 16.0 ) );
 
 		// Spacing between children is added to the child's own spacing
 		// requisitionX( [ <10,12>, <5,6> ], spacing=1 )  ->  <18,19>
 		HorizontalLayout.computeRequisitionX( result, new LReqBox[] { xbox( 10.0, 12.0 ), xbox( 5.0, 6.0 ) },  1.0 );
-		assertEquals( result, xbox( 18.0, 19.0 ) );
+		assertBoxesEqual( result, xbox( 18.0, 19.0 ) );
 	}
 
 
@@ -91,37 +91,37 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		
 		// Empty list should result in empty
 		HorizontalLayout.computeRequisitionY( result, new LReqBox[] {}, new int[] {} );
-		assertEquals( result, new LReqBox() );
+		assertBoxesEqual( result, new LReqBox() );
 
 		// List of one empty box should result in empty
 		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { new LReqBox() }, new int[] { 0 } );
-		assertEquals( result, new LReqBox( 0.0, 0.0, 0.0, 0.0, 0.0 ) );
+		assertBoxesEqual( result, new LReqBox( 0.0, 0.0, 0.0, 0.0, 0.0 ) );
 
 		// 1 Box of height 1 should result in same
 		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 1.0, 0.0 ) }, new int[] { VCENTRE } );
-		assertEquals( result, ybox( 1.0, 0.0 ) );
+		assertBoxesEqual( result, ybox( 1.0, 0.0 ) );
 
 		// 1 Box of height 10, vspacing 1 should result in same
 		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 10.0, 1.0 ) }, new int[] { VCENTRE } );
-		assertEquals( result, ybox( 10.0, 1.0 ) );
+		assertBoxesEqual( result, ybox( 10.0, 1.0 ) );
 
 		// requisitionY( [ <10,1>, <20,1> ] )  ->  <20,1>
 		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 10.0, 1.0 ),  ybox( 20.0, 1.0 ) }, new int[] { VCENTRE, VCENTRE } );
-		assertEquals( result, ybox( 20.0, 1.0 ) );
+		assertBoxesEqual( result, ybox( 20.0, 1.0 ) );
 
 		// requisitionY( [ <1,10>, <2,20> ] )  ->  <2,20>
 		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 1.0, 10.0 ),  ybox( 2.0, 20.0 ) }, new int[] { VCENTRE, VCENTRE } );
-		assertEquals( result, ybox( 2.0, 20.0 ) );
+		assertBoxesEqual( result, ybox( 2.0, 20.0 ) );
 
 		// requisitionY( [ <10,3>, <11,1> ] )  ->  <11,2>
 		// The first box advances X the most overall, although the second has the greater height
 		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 10.0, 3.0 ),  ybox( 11.0, 1.0 ) }, new int[] { VCENTRE, VCENTRE } );
-		assertEquals( result, ybox( 11.0, 2.0 ) );
+		assertBoxesEqual( result, ybox( 11.0, 2.0 ) );
 
 		// requisitionY( [ <10,5>, <5,10> ] )  ->  <10,5>
 		// Both advance X by the same amount (15 units), but the first has the greater height
 		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 10.0, 5.0 ),  ybox( 5.0, 10.0 ) }, new int[] { VCENTRE, VCENTRE } );
-		assertEquals( result, ybox( 10.0, 5.0 ) );
+		assertBoxesEqual( result, ybox( 10.0, 5.0 ) );
 
 	
 	
@@ -129,81 +129,81 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// Now, test the cases with baseline alignment, with children that do not have baselines
 		
 		// 1 Box of height 1 should result in same
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 1.0, 0.0 ) }, new int[] { VBASELINES } );
-		assertEquals( result, ybbox( 0.5, 0.5, 0.0 ) );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 1.0, 0.0 ) }, new int[] { VREFY } );
+		assertBoxesEqual( result, yrbox( 1.0, 0.0, 0.5 ) );
 
 		// 1 Box of height 10, vspacing 1 should result in same
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 10.0, 1.0 ) }, new int[] { VBASELINES } );
-		assertEquals( result, ybbox( 5.0, 5.0, 1.0 ) );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 10.0, 1.0 ) }, new int[] { VREFY } );
+		assertBoxesEqual( result, yrbox( 10.0, 1.0, 5.0 ) );
 
 		// requisitionY( [ <10,1>, <20,1> ] )  ->  <20,1>
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 10.0, 1.0 ),  ybox( 20.0, 1.0 ) }, new int[] { VBASELINES, VBASELINES } );
-		assertEquals( result, ybbox( 10.0, 10.0, 1.0 ) );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 10.0, 1.0 ),  ybox( 20.0, 1.0 ) }, new int[] { VREFY, VREFY } );
+		assertBoxesEqual( result, yrbox( 20.0, 1.0, 10.0 ) );
 
 		// requisitionY( [ <1,10>, <2,20> ] )  ->  <2,20>
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 1.0, 10.0 ),  ybox( 2.0, 20.0 ) }, new int[] { VBASELINES, VBASELINES } );
-		assertEquals( result, ybbox( 1.0, 1.0, 20.0 ) );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 1.0, 10.0 ),  ybox( 2.0, 20.0 ) }, new int[] { VREFY, VREFY } );
+		assertBoxesEqual( result, yrbox( 2.0, 20.0, 1.0 ) );
 
-		// requisitionY( [ <10,3>, <11,1> ] )  ->  <11,2>
+		// requisitionY( [ <10,3>, <11,1> ] )  ->  <11,2.5>
 		// The first box advances X the most overall, although the second has the greater height
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 10.0, 3.0 ),  ybox( 11.0, 1.0 ) }, new int[] { VBASELINES, VBASELINES } );
-		assertEquals( result, ybbox( 5.5, 5.5, 2.0 ) );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 10.0, 3.0 ),  ybox( 11.0, 1.0 ) }, new int[] { VREFY, VREFY } );
+		assertBoxesEqual( result, yrbox( 11.0, 2.5, 5.5 ) );
 
 		// requisitionY( [ <10,5>, <5,10> ] )  ->  <10,5>
 		// Both advance X by the same amount (15 units), but the first has the greater height
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 10.0, 5.0 ),  ybox( 5.0, 10.0 ) }, new int[] { VBASELINES, VBASELINES } );
-		assertEquals( result, ybbox( 5.0, 5.0, 5.0 ) );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybox( 10.0, 5.0 ),  ybox( 5.0, 10.0 ) }, new int[] { VREFY, VREFY } );
+		assertBoxesEqual( result, yrbox( 10.0, 7.5, 5.0 ) );
 
 
-		
+
 		
 		// Now test the cases where baselines are used
 		
 		// 1 Box of 3:2 should result in same
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( 3.0, 2.0, 0.0 ) }, new int[] { VBASELINES } );
-		assertEquals( result, ybbox( 3.0, 2.0, 0.0 ) );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { yrbox( 5.0, 0.0, 3.0 ) }, new int[] { VREFY } );
+		assertBoxesEqual( result, yrbox( 5.0, 0.0, 3.0 ) );
 
 		// 1 Box of height 3:2, vspacing 1 should result in same
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox(  3.0, 2.0, 1.0 ) }, new int[] { VBASELINES } );
-		assertEquals( result, ybbox( 3.0, 2.0, 1.0 ) );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { yrbox(  5.0, 1.0, 3.0 ) }, new int[] { VREFY } );
+		assertBoxesEqual( result, yrbox( 5.0, 1.0, 3.0 ) );
 
 		// requisitionY( [ <5:3,0>, <2:4,0> ] )  ->  <5:4,0>
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( 5.0, 3.0, 0.0 ),  ybbox( 2.0, 4.0, 0.0 ) }, new int[] { VBASELINES, VBASELINES } );
-		assertEquals( result, ybbox( 5.0, 4.0, 0.0 ) );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { yrbox( 8.0, 0.0, 5.0 ),  yrbox( 6.0, 0.0, 2.0 ) }, new int[] { VREFY, VREFY } );
+		assertBoxesEqual( result, yrbox( 9.0, 0.0, 5.0 ) );
 
 		// requisitionY( [ <5:3,1>, <2:4,1> ] )  ->  <5:4,1>
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( 5.0, 3.0, 1.0 ),  ybbox( 2.0, 4.0, 1.0 ) }, new int[] { VBASELINES, VBASELINES } );
-		assertEquals( result, ybbox( 5.0, 4.0, 1.0 ) );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { yrbox( 8.0, 1.0, 5.0 ),  yrbox( 6.0, 1.0, 2.0 ) }, new int[] { VREFY, VREFY } );
+		assertBoxesEqual( result, yrbox( 9.0, 1.0, 5.0 ) );
 
 		// requisitionY( [ <5:3,1>, <2:4,2> ] )  ->  <5:4,2>
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( 5.0, 3.0, 1.0 ),  ybbox( 2.0, 4.0, 2.0 ) }, new int[] { VBASELINES, VBASELINES } );
-		assertEquals( result, ybbox( 5.0, 4.0, 2.0 ) );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { yrbox( 8.0, 1.0, 5.0 ),  yrbox( 6.0, 2.0, 2.0 ) }, new int[] { VREFY, VREFY } );
+		assertBoxesEqual( result, yrbox( 9.0, 2.0, 5.0 ) );
 
 		// requisitionY( [ <5:3,3>, <2:4,1> ] )  ->  <5:4,2>
 		// The first box advances Y (below baseline) the most overall, although the second has the greater descent
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( 5.0, 3.0, 3.0 ),  ybbox( 2.0, 4.0, 1.0 ) }, new int[] { VBASELINES, VBASELINES } );
-		assertEquals( result, ybbox( 5.0, 4.0, 2.0 ) );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { yrbox( 8.0, 3.0, 5.0 ),  yrbox( 6.0, 1.0, 2.0 ) }, new int[] { VREFY, VREFY } );
+		assertBoxesEqual( result, yrbox( 9.0, 2.0, 5.0 ) );
 
 		// requisitionY( [ <2:4,2>, <5:2,4> ] )  ->  <5:4,2>
-		// Both advance T (below baseline) by the same amount (6 units), but the first has the greater descent
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( 2.0, 4.0, 2.0 ),  ybbox( 5.0, 2.0, 4.0 ) }, new int[] { VBASELINES, 0 } );
-		assertEquals( result, ybbox( 5.0, 4.0, 2.0 ) );
+		// Both advance Y (below baseline) by the same amount (6 units), but the first has the greater descent
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { yrbox( 6.0, 2.0, 2.0 ),  yrbox( 7.0, 4.0, 5.0 ) }, new int[] { VREFY, 0 } );
+		assertBoxesEqual( result, yrbox( 9.0, 2.0, 5.0 ) );
 		
 		
 		
 		// Now test the situation where baseline alignment is used, but the some children do not have baselines
 
 		// requisitionY( [ <6:3,0>, <8,0> ] )  ->  requisitionY( [ <6:3,0>, <4:4,0> ] )  ->  <6:4,0>
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( 6.0, 3.0, 0.0 ),  ybox( 8.0, 0.0 ) }, new int[] { VBASELINES, VBASELINES } );
-		assertEquals( result, ybbox( 6.0, 3.0, 0.0 ) );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { yrbox( 9.0, 0.0, 6.0 ),  ybox( 8.0, 0.0 ) }, new int[] { VREFY, VREFY } );
+		assertBoxesEqual( result, yrbox( 10.0, 0.0, 6.0 ) );
 
 		// requisitionY( [ <6:3,3>, <8,1> ] )  ->  requisitionY( [ <6:3,3>, <4:4,1> ] )  ->  <6:4,2>
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( 6.0, 3.0, 3.0 ),  ybox( 8.0, 1.0 ) }, new int[] { VBASELINES, VBASELINES } );
-		assertEquals( result, ybbox( 6.0, 3.0, 3.0 ) );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { yrbox( 9.0, 3.0, 6.0 ),  ybox( 8.0, 1.0 ) }, new int[] { VREFY, VREFY } );
+		assertBoxesEqual( result, yrbox( 10.0, 2.0, 6.0 ) );
 
 		// requisitionY( [ <6:3,1>, <8,2> ] )  ->  requisitionY( [ <6:3,1>, <4:4,2> ] )  ->  <6:4,2>
-		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { ybbox( 6.0, 3.0, 1.0 ),  ybox( 8.0, 2.0 ) }, new int[] { VBASELINES, VBASELINES } );
-		assertEquals( result, ybbox( 6.0, 3.0, 1.0 ) );
+		HorizontalLayout.computeRequisitionY( result, new LReqBox[] { yrbox( 9.0, 1.0, 6.0 ),  ybox( 8.0, 2.0 ) }, new int[] { VREFY, VREFY } );
+		assertBoxesEqual( result, yrbox( 10.0, 2.0, 6.0 ) );
 	}
 
 
@@ -659,22 +659,22 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=150:150   ->   [ 300, 200 ] @ [ 0, 0 ]		- req size, no expansion
 		// 	boxAllocation=100:100   ->   [ 300, 200 ] @ [ 0, 0 ]		- below req size, req size
 		// 	boxAllocation=50:50       ->   [ 300, 200 ] @ [ 0, 0 ]		- below req size, below req size
-		allocYTests( new LReqBox[] { ybbox( 150.0, 150.0, 0.0 ),  ybbox( 100.0, 100.0, 0.0 ) }, new int[] { VTOP, VTOP },
+		allocYTests( new LReqBox[] { yrbox( 300.0, 0.0, 150.0 ),  yrbox( 200.0, 0.0, 100.0 ) }, new int[] { VTOP, VTOP },
 				ybox( 300.0, 0.0 ),
 				new LAllocV[] { new LAllocV( 200.0, 200.0 ), new LAllocV( 150.0, 150.0 ), new LAllocV( 100.0, 100.0 ), new LAllocV( 50.0, 50.0 ) },
 				new LAllocV[][] {
-					new LAllocV[] { new LAllocV( 150.0, 150.0 ), new LAllocV( 100.0, 100.0 ) },
-					new LAllocV[] { new LAllocV( 150.0, 150.0 ), new LAllocV( 100.0, 100.0 ) },
-					new LAllocV[] { new LAllocV( 150.0, 150.0 ), new LAllocV( 100.0, 100.0 ) },
-					new LAllocV[] { new LAllocV( 150.0, 150.0 ), new LAllocV( 100.0, 100.0 ) } },
+					new LAllocV[] { new LAllocV( 300.0, 150.0 ), new LAllocV( 200.0, 100.0 ) },
+					new LAllocV[] { new LAllocV( 300.0, 150.0 ), new LAllocV( 200.0, 100.0 ) },
+					new LAllocV[] { new LAllocV( 300.0, 150.0 ), new LAllocV( 200.0, 100.0 ) },
+					new LAllocV[] { new LAllocV( 300.0, 150.0 ), new LAllocV( 200.0, 100.0 ) } },
 				new double[][] {
 					new double[] { 0.0, 0.0 },
 					new double[] { 0.0, 0.0 },
 					new double[] { 0.0, 0.0 },
 					new double[] { 0.0, 0.0 } } );
 
-	
-	
+
+
 		// vpackX( [ <300,0,V.CENTRE>, <200,0,V.CENTRE> ] )
 		// 	boxAllocation=400   ->   [ 300, 200 ] @ [ 50, 100 ]	- no expansion, no expansion
 		// 	boxAllocation=300   ->   [ 300, 200 ] @ [ 0, 50 ]		- req size, no expansion
@@ -694,8 +694,8 @@ public class Test_HorizontalLayout extends Test_Layout_base
 					new double[] { 0.0, 50.0 },
 					new double[] { 0.0, 50.0 } } );
 
-		
-		
+
+
 		// vpackX( [ <300,0,V.BOTTOM>, <200,0,V.BOTTOM> ] )
 		// 	boxAllocation=400   ->   [ 300, 200 ] @ [ 100, 200 ]	- no expansion, no expansion
 		// 	boxAllocation=300   ->   [ 300, 200 ] @ [ 0, 100 ]		- req size, no expansion
@@ -716,7 +716,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 					new double[] { 0.0, 100.0 } } );
 
 	
-	
+
 		// hpackY( [ <300,0,V.EXPAND>, <200,0,V.EXPAND> ] )
 		// 	boxAllocation=400   ->   [ 400, 400 ] @ [ 0, 0 ]		- expansion, expansion
 		// 	boxAllocation=300   ->   [ 300, 300 ] @ [ 0, 0 ]		- pref size, expansion
@@ -743,7 +743,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=50:50       ->   [ 300, 200 ] @ [ 0, 0 ]		- below req size, below req size
 		allocYTests( new LReqBox[] { ybox( 300.0, 0.0 ),  ybox( 200.0, 0.0 ) }, new int[] { VEXPAND, VEXPAND },
 				ybox( 300.0, 0.0 ),
-				new LAllocV[] { new LAllocV( 200.0, 200.0 ), new LAllocV( 150.0, 150.0 ), new LAllocV( 100.0, 100.0 ), new LAllocV( 50.0, 50.0 ) },
+				new LAllocV[] { new LAllocV( 400.0, 200.0 ), new LAllocV( 300.0, 150.0 ), new LAllocV( 200.0, 100.0 ), new LAllocV( 100.0, 50.0 ) },
 				new LAllocV[][] {
 					new LAllocV[] { new LAllocV( 400.0 ), new LAllocV( 400.0 ) },
 					new LAllocV[] { new LAllocV( 300.0 ), new LAllocV( 300.0 ) },
@@ -760,14 +760,14 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=150:150   ->   [ 300, 300 ] @ [ 0, 0 ]		- req size, no expansion
 		// 	boxAllocation=100:100   ->   [ 300, 300 ] @ [ 0, 0 ]		- below req size, req size
 		// 	boxAllocation=50:50       ->   [ 300, 300 ] @ [ 0, 0 ]		- below req size, below req size
-		allocYTests( new LReqBox[] { ybbox( 150.0, 150.0, 0.0 ),  ybbox( 100.0, 100.0, 0.0 ) },  new int[] { VEXPAND, VEXPAND },
+		allocYTests( new LReqBox[] { yrbox( 300.0, 0.0, 150.0 ),  yrbox( 200.0, 0.0, 100.0 ) },  new int[] { VEXPAND, VEXPAND },
 				ybox( 300.0, 0.0 ),
-				new LAllocV[] { new LAllocV( 200.0, 200.0 ), new LAllocV( 150.0, 150.0 ), new LAllocV( 100.0, 100.0 ), new LAllocV( 50.0, 50.0 ) },
+				new LAllocV[] { new LAllocV( 400.0, 200.0 ), new LAllocV( 300.0, 150.0 ), new LAllocV( 200.0, 100.0 ), new LAllocV( 100.0, 50.0 ) },
 				new LAllocV[][] {
-					new LAllocV[] { new LAllocV( 200.0, 200.0 ), new LAllocV( 200.0, 200.0 ) },
-					new LAllocV[] { new LAllocV( 150.0, 150.0 ), new LAllocV( 150.0, 150.0 ) },
-					new LAllocV[] { new LAllocV( 150.0, 150.0 ), new LAllocV( 150.0, 150.0 ) },
-					new LAllocV[] { new LAllocV( 150.0, 150.0 ), new LAllocV( 150.0, 150.0 ) } },
+					new LAllocV[] { new LAllocV( 400.0, 200.0 ), new LAllocV( 400.0, 200.0 ) },
+					new LAllocV[] { new LAllocV( 300.0, 150.0 ), new LAllocV( 300.0, 150.0 ) },
+					new LAllocV[] { new LAllocV( 300.0, 150.0 ), new LAllocV( 300.0, 150.0 ) },
+					new LAllocV[] { new LAllocV( 300.0, 150.0 ), new LAllocV( 300.0, 150.0 ) } },
 				new double[][] {
 					new double[] { 0.0, 0.0 },
 					new double[] { 0.0, 0.0 },
@@ -783,8 +783,8 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=300   ->   [ 300, 200 ] @ [ 0, 50 ]		- req size, no expansion
 		// 	boxAllocation=200   ->   [ 300, 200 ] @ [ 0, 50 ]		- below req size, req size  (parent box size of 300 results in second child being centred in a larger box)
 		// 	boxAllocation=100   ->   [ 300, 200 ] @ [ 0, 50 ]		- below req size, below req size  (parent box size of 300 results in second child being centred in a larger box)
-		allocYTests( new LReqBox[] { ybox( 300.0, 0.0 ),  ybox( 200.0, 0.0 ) }, new int[] { VBASELINES, VBASELINES },
-				ybbox( 150.0, 150.0, 0.0 ),
+		allocYTests( new LReqBox[] { ybox( 300.0, 0.0 ),  ybox( 200.0, 0.0 ) }, new int[] { VREFY, VREFY },
+				yrbox( 300.0, 0.0, 150.0 ),
 				new LAllocV[] { new LAllocV( 400.0 ), new LAllocV( 300.0 ), new LAllocV( 200.0 ), new LAllocV( 100.0 ) },
 				new LAllocV[][] {
 					new LAllocV[] { new LAllocV( 300.0 ), new LAllocV( 200.0 ) },
@@ -797,21 +797,21 @@ public class Test_HorizontalLayout extends Test_Layout_base
 					new double[] { 0.0, 50.0 },
 					new double[] { 0.0, 50.0 } } );
 
-		
+	
 		
 		// hpackY( [ <300:200,0,V.BASELINES>, <200:300,0,V.BASELINES> ] )
 		// 	boxAllocation=800          ->   [ 300:200, 200:300 ] @ [ 100, 200 ]		- centre, centre
 		// 	boxAllocation=600          ->   [ 300:200, 200:300 ] @ [ 0, 100 ]		- matches parent box req size
 		// 	boxAllocation=300          ->   [ 300:200, 200:300 ] @ [ 0, 100 ]		- below parent box req size
 		// 	boxAllocation=350:550   ->   [ 300:200, 200:300 ] @ [ 50, 150 ]		- centred around main baseline
-		allocYTests( new LReqBox[] { ybbox( 300.0, 200.0, 0.0 ),  ybbox( 200.0, 300.0, 0.0 ) }, new int[] { VBASELINES, VBASELINES },
-				ybbox( 300.0, 300.0, 0.0 ),
-				new LAllocV[] { new LAllocV( 800.0 ), new LAllocV( 600.0 ), new LAllocV( 300.0 ), new LAllocV( 350.0, 550.0 ) },
+		allocYTests( new LReqBox[] { yrbox( 500.0, 0.0, 300.0 ),  yrbox( 500.0, 0.0, 200.0 ) }, new int[] { VREFY, VREFY },
+				yrbox( 600.0, 0.0, 300.0 ),
+				new LAllocV[] { new LAllocV( 800.0 ), new LAllocV( 600.0 ), new LAllocV( 300.0 ), new LAllocV( 900.0, 350.0 ) },
 				new LAllocV[][] {
-					new LAllocV[] { new LAllocV( 300.0, 200.0 ), new LAllocV( 200.0, 300.0 ) },
-					new LAllocV[] { new LAllocV( 300.0, 200.0 ), new LAllocV( 200.0, 300.0 ) },
-					new LAllocV[] { new LAllocV( 300.0, 200.0 ), new LAllocV( 200.0, 300.0 ) },
-					new LAllocV[] { new LAllocV( 300.0, 200.0 ), new LAllocV( 200.0, 300.0 ) }},
+					new LAllocV[] { new LAllocV( 500.0, 300.0 ), new LAllocV( 500.0, 200.0 ) },
+					new LAllocV[] { new LAllocV( 500.0, 300.0 ), new LAllocV( 500.0, 200.0 ) },
+					new LAllocV[] { new LAllocV( 500.0, 300.0 ), new LAllocV( 500.0, 200.0 ) },
+					new LAllocV[] { new LAllocV( 500.0, 300.0 ), new LAllocV( 500.0, 200.0 ) }},
 				new double[][] {
 					new double[] { 100.0, 200.0 },
 					new double[] { 0.0, 100.0 },
@@ -824,13 +824,13 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=800   ->   [ 500, 500, 400 ] @ [ 100, 200, 200 ]		- centre, cetnre
 		// 	boxAllocation=600   ->   [ 500, 500, 400 ] @ [ 0, 100, 100 ]			- matches parent box req size
 		// 	boxAllocation=300   ->   [ 500, 500, 400 ] @ [ 0, 100, 100 ]			- below parent box req size
-		allocYTests( new LReqBox[] { ybbox( 300.0, 200.0, 0.0 ),  ybbox( 200.0, 300.0, 0.0 ),  ybox( 400.0, 0.0 ) }, new int[] { VBASELINES, VBASELINES, VBASELINES },
-				ybbox( 300.0, 300.0, 0.0 ),
+		allocYTests( new LReqBox[] { yrbox( 500.0, 0.0, 300.0 ),  yrbox( 500.0, 0.0, 200.0 ),  ybox( 400.0, 0.0 ) }, new int[] { VREFY, VREFY, VREFY },
+				yrbox( 600.0, 0.0, 300.0 ),
 				new LAllocV[] { new LAllocV( 800.0 ), new LAllocV( 600.0 ), new LAllocV( 300.0 ) },
 				new LAllocV[][] {
-					new LAllocV[] { new LAllocV( 300.0, 200.0 ), new LAllocV( 200.0, 300.0 ), new LAllocV( 400.0 ) },
-					new LAllocV[] { new LAllocV( 300.0, 200.0 ), new LAllocV( 200.0, 300.0 ), new LAllocV( 400.00 ) },
-					new LAllocV[] { new LAllocV( 300.0, 200.0 ), new LAllocV( 200.0, 300.0 ), new LAllocV( 400.0 ) } },
+					new LAllocV[] { new LAllocV( 500.0, 300.0 ), new LAllocV( 500.0, 200.0 ), new LAllocV( 400.0 ) },
+					new LAllocV[] { new LAllocV( 500.0, 300.0 ), new LAllocV( 500.0, 200.0 ), new LAllocV( 400.00 ) },
+					new LAllocV[] { new LAllocV( 500.0, 300.0 ), new LAllocV( 500.0, 200.0 ), new LAllocV( 400.0 ) } },
 				new double[][] {
 					new double[] { 100.0, 200.0, 200.0 },
 					new double[] { 0.0, 100.0, 100.0 },
@@ -844,14 +844,14 @@ public class Test_HorizontalLayout extends Test_Layout_base
 		// 	boxAllocation=600          ->   [ 300:300, 300:300 ] @ [ 0, 0 ]		- matches parent box req size
 		// 	boxAllocation=300          ->   [ 300:300, 300:300 ] @ [ 0, 0 ]		- below parent box req size
 		// 	boxAllocation=350:550   ->   [ 350:550, 350:550 ] @ [ 0, 0 ]		- expand, expand
-		allocYTests( new LReqBox[] { ybbox( 300.0, 200.0, 0.0 ),  ybbox( 200.0, 300.0, 0.0 ) }, new int[] { VBASELINES_EXPAND, VBASELINES_EXPAND },
-				ybbox( 300.0, 300.0, 0.0 ),
-				new LAllocV[] { new LAllocV( 800.0 ), new LAllocV( 600.0 ), new LAllocV( 300.0 ), new LAllocV( 350.0, 550.0 ) },
+		allocYTests( new LReqBox[] { yrbox( 500.0, 0.0, 300.0 ),  yrbox( 500.0, 0.0, 200.0 ) }, new int[] { VREFY_EXPAND, VREFY_EXPAND },
+				yrbox( 600.0, 0.0, 300.0 ),
+				new LAllocV[] { new LAllocV( 800.0 ), new LAllocV( 600.0 ), new LAllocV( 300.0 ), new LAllocV( 900.0, 350.0 ) },
 				new LAllocV[][] {
-					new LAllocV[] { new LAllocV( 400.0, 400.0 ), new LAllocV( 400.0, 400.0 ) },
-					new LAllocV[] { new LAllocV( 300.0, 300.0 ), new LAllocV( 300.0, 300.0 ) },
-					new LAllocV[] { new LAllocV( 300.0, 300.0 ), new LAllocV( 300.0, 300.0 ) },
-					new LAllocV[] { new LAllocV( 350.0, 550.0 ), new LAllocV( 350.0, 550.0 ) } },
+					new LAllocV[] { new LAllocV( 800.0, 400.0 ), new LAllocV( 800.0, 400.0 ) },
+					new LAllocV[] { new LAllocV( 600.0, 300.0 ), new LAllocV( 600.0, 300.0 ) },
+					new LAllocV[] { new LAllocV( 600.0, 300.0 ), new LAllocV( 600.0, 300.0 ) },
+					new LAllocV[] { new LAllocV( 900.0, 350.0 ), new LAllocV( 900.0, 350.0 ) } },
 				new double[][] {
 					new double[] { 0.0, 0.0 },
 					new double[] { 0.0, 0.0 },

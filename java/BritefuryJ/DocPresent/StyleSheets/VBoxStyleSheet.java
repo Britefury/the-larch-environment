@@ -7,37 +7,19 @@
 //##************************
 package BritefuryJ.DocPresent.StyleSheets;
 
-import BritefuryJ.DocPresent.Layout.VTypesetting;
 
 public class VBoxStyleSheet extends AbstractBoxStyleSheet
 {
 	public static VBoxStyleSheet defaultStyleSheet = new VBoxStyleSheet();
 	
 	
-	protected VTypesetting typesetting;
-
-
 	public VBoxStyleSheet()
 	{
-		this( VTypesetting.NONE, 0.0 );
+		this( 0.0 );
 	}
 	
 	public VBoxStyleSheet(double spacing)
 	{
-		this( VTypesetting.NONE, spacing );
-	}
-	
-	public VBoxStyleSheet(VTypesetting typesetting, double spacing)
-	{
 		super( spacing );
-		
-		this.typesetting = typesetting;
-	}
-
-	
-	
-	public VTypesetting getTypesetting()
-	{
-		return typesetting;
 	}
 }

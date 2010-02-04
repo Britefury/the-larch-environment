@@ -17,7 +17,6 @@ import BritefuryJ.DocPresent.DPStaticText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
 
@@ -99,7 +98,7 @@ public class ProxyTestPage extends SystemPage
 		DPWidget body2 = paragraph( new DPWidget[] { staticText( "Before" ), proxy( span( new DPWidget[] { staticText( "One" ), staticText( "Two" ), staticText( "Three" ) } ) ), staticText( "After" ) } );
 		DPWidget content2 = content( header2, body2 );
 		
-		VBoxStyleSheet boxs = new VBoxStyleSheet( VTypesetting.NONE, 30.0 );
+		VBoxStyleSheet boxs = new VBoxStyleSheet( 30.0 );
 		DPVBox box = new DPVBox( getContext(), boxs );
 		box.extend( new DPWidget[] { content1, content2 } );
 

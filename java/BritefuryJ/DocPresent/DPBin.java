@@ -47,7 +47,7 @@ public class DPBin extends DPContainer
 		DPWidget prevChild = getChild();
 		if ( child != prevChild )
 		{
-			if ( child.getLayoutNode() == null )
+			if ( child != null  &&  child.getLayoutNode() == null )
 			{
 				throw new ChildHasNoLayoutException();
 			}

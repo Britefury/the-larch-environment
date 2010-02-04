@@ -21,7 +21,6 @@ import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.Layout.VTypesetting;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
@@ -83,7 +82,7 @@ public class DPParagraphTest_simple
 		DPParagraph b1 = new DPParagraph( null, b1s );
 		b1.extend( c1 );
 		
-		VBoxStyleSheet boxS = new VBoxStyleSheet( VTypesetting.NONE, 20.0 );
+		VBoxStyleSheet boxS = new VBoxStyleSheet( 20.0 );
 		DPVBox box = new DPVBox( null, boxS );
 		box.append( b0.alignHExpand() );
 		box.append( b1.alignHExpand() );
