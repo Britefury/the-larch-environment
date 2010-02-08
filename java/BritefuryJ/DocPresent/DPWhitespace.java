@@ -47,7 +47,7 @@ public class DPWhitespace extends DPContentLeafEditable
 	
 	
 	
-	public double getWidth()
+	public double getWhitespaceWidth()
 	{
 		return width;
 	}

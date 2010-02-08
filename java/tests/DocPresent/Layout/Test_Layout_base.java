@@ -33,7 +33,7 @@ public class Test_Layout_base extends TestCase
 	
 	protected LReqBox xbox(double minWidth, double prefWidth, double minHAdvance, double prefHAdvance)
 	{
-		return new LReqBox( minWidth, prefWidth, minHAdvance, prefHAdvance, 0.0, 0.0 );
+		return new LReqBox( minWidth, prefWidth, minHAdvance, prefHAdvance, 0.0, 0.0, 0.0 );
 	}
 	
 	
@@ -53,17 +53,17 @@ public class Test_Layout_base extends TestCase
 		return new LReqBox( width, hAdvance, height, vspacing );
 	}
 
-	protected LReqBox box(double width, double hAdvance, double height, double vspacing, double refY)
+	protected LReqBox rbox(double width, double hAdvance, double height, double vspacing, double refY)
 	{
 		return new LReqBox( width, hAdvance, height, vspacing, refY );
 	}
 
 	protected LReqBox box(double minWidth, double prefWidth, double minHAdvance, double prefHAdvance, double height, double vspacing)
 	{
-		return new LReqBox( minWidth, prefWidth, minHAdvance, prefHAdvance, height, vspacing );
+		return new LReqBox( minWidth, prefWidth, minHAdvance, prefHAdvance, height, vspacing, height * 0.5 );
 	}
 
-	protected LReqBox box(double minWidth, double prefWidth, double minHAdvance, double prefHAdvance, double height, double vspacing, double refY)
+	protected LReqBox rbox(double minWidth, double prefWidth, double minHAdvance, double prefHAdvance, double height, double vspacing, double refY)
 	{
 		return new LReqBox( minWidth, prefWidth, minHAdvance, prefHAdvance, height, vspacing, refY );
 	}

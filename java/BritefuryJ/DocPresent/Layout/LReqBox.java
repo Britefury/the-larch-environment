@@ -55,18 +55,6 @@ public class LReqBox extends LReqBoxInterface
 		lineBreakCost = -1;
 	}
 
-	public LReqBox(double minWidth, double prefWidth, double minHAdvance, double prefHAdvance, double height, double vSpacing)
-	{
-		this.minWidth = minWidth;
-		this.prefWidth = prefWidth;
-		this.minHAdvance = minHAdvance;
-		this.prefHAdvance = prefHAdvance;
-		this.reqHeight = height;
-		this.reqVSpacing = vSpacing;
-		this.refY = height * 0.5;
-		lineBreakCost = -1;
-	}
-
 	public LReqBox(double minWidth, double prefWidth, double minHAdvance, double prefHAdvance, double height, double vSpacing, double refY)
 	{
 		this.minWidth = minWidth;
@@ -144,26 +132,6 @@ public class LReqBox extends LReqBoxInterface
 		return refY;
 	}
 	
-	public double getRefYAligned(VAlignment alignment)
-	{
-		if ( alignment == VAlignment.TOP  ||  alignment == VAlignment.EXPAND )
-		{
-			return 0.0;
-		}
-		else if ( alignment == VAlignment.CENTRE )
-		{
-			return reqHeight * 0.5;
-		}
-		else if ( alignment == VAlignment.BOTTOM )
-		{
-			return reqHeight;
-		}
-		else
-		{
-			return refY;
-		}
-	}
-	
 	public double getReqHeightBelowRefPoint()
 	{
 		return reqHeight - refY;
@@ -173,7 +141,8 @@ public class LReqBox extends LReqBoxInterface
 	public void clear()
 	{
 		minWidth = prefWidth = minHAdvance = prefHAdvance = 0.0;
-		reqHeight = reqVSpacing = refY = 0.0;
+		reqHeight = reqVSpacing = 0.0;
+		refY = 0.0;
 		flags = 0;
 	}
 	
@@ -316,7 +285,6 @@ public class LReqBox extends LReqBoxInterface
 	{
 		reqHeight += ( topMargin + bottomMargin );
 		reqVSpacing = Math.max( reqVSpacing - bottomMargin, 0.0 );
-		//refY += topMargin;
 	}
 	
 	public boolean equals(Object x)

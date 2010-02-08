@@ -20,7 +20,7 @@ public class LayoutNodeWhitespace extends ContentLeafLayoutNode
 	protected void updateRequisitionX()
 	{
 		DPWhitespace whitespace = (DPWhitespace)element;
-		double width = whitespace.getWidth();
+		double width = whitespace.getWhitespaceWidth();
 		layoutReqBox.setRequisitionX( width, width );
 	}
 

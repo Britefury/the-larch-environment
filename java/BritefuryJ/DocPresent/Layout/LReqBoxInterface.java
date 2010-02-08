@@ -15,8 +15,8 @@ public abstract class LReqBoxInterface
 	
 	public abstract double getReqHeight();
 	public abstract double getReqVSpacing();
+
 	public abstract double getRefY();
-	public abstract double getRefYAligned(VAlignment alignment);
 	public abstract double getReqHeightBelowRefPoint();
 	
 	public abstract boolean isLineBreak();

@@ -150,7 +150,7 @@ public class LAllocBox extends LAllocBoxInterface
 		positionInParentSpaceY = y;
 		allocationY = Math.max( height, requisition.getReqHeight() );
 		double delta = Math.max( ( height - requisition.getReqHeight() )  *  0.5,  0.0 );
-		refY = refY + delta;
+		this.refY = refY + delta;
 	}
 	
 	public void allocateY(LReqBoxInterface requisition, double y, LAllocV allocV)
@@ -345,7 +345,7 @@ public class LAllocBox extends LAllocBoxInterface
 	public void setAllocationY(double height)
 	{
 		allocationY = height;
-		refY = 0.0;
+		refY = height * 0.5;
 	}
 
 	public void setAllocationY(double height, double refY)
@@ -364,6 +364,7 @@ public class LAllocBox extends LAllocBoxInterface
 	{
 		positionInParentSpaceY = y;
 		allocationY = height;
+		refY = height * 0.5;
 	}
 	
 	protected void setPositionInParentSpaceAndAllocationY(double y, double height, double refY)
