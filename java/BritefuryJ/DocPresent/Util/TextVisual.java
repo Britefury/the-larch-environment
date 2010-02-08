@@ -379,7 +379,7 @@ public class TextVisual
 				LineMetrics lineMetrics = font.getLineMetrics( "", frc );
 				
 				reqBox.setRequisitionX( 0.0, 0.0 );
-				reqBox.setRequisitionY( lineMetrics.getAscent(), lineMetrics.getDescent(), lineMetrics.getLeading() );
+				reqBox.setRequisitionY( lineMetrics.getAscent() + lineMetrics.getDescent(), lineMetrics.getLeading(), lineMetrics.getAscent() );
 				
 				squiggleUnderlineShape = null;
 			}

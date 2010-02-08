@@ -17,7 +17,7 @@ public enum VAlignment
 	
 	
 	
-	public static VAlignment noBaselines(VAlignment vAlign)
+	public static VAlignment noRefPoint(VAlignment vAlign)
 	{
 		if ( vAlign == VAlignment.REFY )
 		{

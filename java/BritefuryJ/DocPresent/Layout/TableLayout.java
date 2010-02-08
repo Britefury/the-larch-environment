@@ -315,7 +315,7 @@ public class TableLayout
 				LAllocBox endRowAlloc = rowAllocBoxes[endRow-1];
 				double yEnd = endRowAlloc.positionInParentSpaceY + endRowAlloc.getAllocationY();
 				double heightAvailable = yEnd - yStart;
-				vAlign = VAlignment.noBaselines( vAlign );
+				vAlign = VAlignment.noRefPoint( vAlign );
 				height = new LAllocV( heightAvailable );
 			}
 				

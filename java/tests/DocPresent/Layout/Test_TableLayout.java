@@ -327,7 +327,7 @@ public class Test_TableLayout extends Test_Layout_base
 		reqTest(
 				new LReqBox[] {
 						box( 10, 10, 10, 0 ),		box( 5, 5, 5, 0 ),		box( 20, 20, 5, 0 ),
-						box( 15, 15, 8, 0, 4 ),	box( 8, 8, 8, 0, 2 ),		box( 10, 10, 7, 0, 5 ),
+						rbox( 15, 15, 8, 0, 4 ),	rbox( 8, 8, 8, 0, 2 ),		rbox( 10, 10, 7, 0, 5 ),
 						box( 5, 5, 4, 0 ),		box( 6, 6, 8, 0 ),		box( 10, 10, 6, 0 ),
 				},
 				new TablePackingParams[] {
@@ -345,9 +345,9 @@ public class Test_TableLayout extends Test_Layout_base
 						box( 15, 15, 0, 0 ),		box( 8, 8, 0, 0 ),		box( 20, 20, 0, 0 ),
 				},
 				new LReqBox[] {
-						box( 0, 0, 10, 0, 5 ),
-						box( 0, 0, 11, 0, 5 ),
-						box( 0, 0, 8, 0, 4 ),
+						rbox( 0, 0, 10, 0, 5 ),
+						rbox( 0, 0, 11, 0, 5 ),
+						rbox( 0, 0, 8, 0, 4 ),
 				},
 				box( 43, 43, 29, 0 )
 			);
