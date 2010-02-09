@@ -6,41 +6,21 @@
 //##************************
 package BritefuryJ.DocPresent.LayoutTree;
 
-import BritefuryJ.DocPresent.DPParagraphMarker;
+import BritefuryJ.DocPresent.DPStatic;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.WidgetFilter;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.Math.Point2;
 
-public abstract class LayoutNodeParagraphMarker extends LeafLayoutNodeSharedReq
+public abstract class StaticLayoutNodeSharedReq extends LeafLayoutNodeSharedReq
 {
-	public LayoutNodeParagraphMarker(DPParagraphMarker element, LReqBox reqBox)
+	public StaticLayoutNodeSharedReq(DPStatic element, LReqBox reqBox)
 	{
 		super( element, reqBox );
 	}
 
-
-
-	protected void updateRequisitionX()
-	{
-	}
-
-	protected void updateRequisitionY()
-	{
-	}
-	
-
-
-
 	public DPWidget getLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
 	{
-		if ( filter == null  ||  filter.testElement( element ) )
-		{
-			return element;
-		}
-		else
-		{
-			return null;
-		}
+		return null;
 	}
 }

@@ -7,7 +7,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import BritefuryJ.DocPresent.Layout.LReqBox;
+import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeLineBreak;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 
@@ -29,7 +29,7 @@ public class DPLineBreak extends DPBin
 	
 	
 	
-	public void initialiseLineBreakRequisition(LReqBox reqBox)
+	public void initialiseLineBreakRequisition(LReqBoxInterface reqBox)
 	{
 		reqBox.setLineBreakCost( computeLineBreakCost() );
 	}

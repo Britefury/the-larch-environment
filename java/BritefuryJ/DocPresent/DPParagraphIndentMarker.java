@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import BritefuryJ.DocPresent.Layout.LReqBox;
+import BritefuryJ.DocPresent.LayoutTree.LayoutNodeParagraphIndentMarker;
 import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
 
 public class DPParagraphIndentMarker extends DPParagraphMarker
@@ -14,17 +14,14 @@ public class DPParagraphIndentMarker extends DPParagraphMarker
 	public DPParagraphIndentMarker(ElementContext context)
 	{
 		super( context );
+		
+		layoutNode = new LayoutNodeParagraphIndentMarker( this );
 	}
 	
 	public DPParagraphIndentMarker(ElementContext context, WidgetStyleSheet styleSheet)
 	{
 		super( context, styleSheet );
-	}
-
-
-
-	public void initMarkerRequisition(LReqBox reqBox)
-	{
-		reqBox.setParagraphIndentMarker();
+		
+		layoutNode = new LayoutNodeParagraphIndentMarker( this );
 	}
 }

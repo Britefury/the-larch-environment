@@ -29,8 +29,8 @@ public class TableLayout
 			if ( packing.colSpan == 1 )
 			{
 				LReqBox b = columnBoxes[packing.x];
-				b.minWidth = Math.max( b.minWidth, child.getMinWidth() );
-				b.prefWidth = Math.max( b.prefWidth, child.getPrefWidth() );
+				b.minWidth = Math.max( b.minWidth, child.getReqMinWidth() );
+				b.prefWidth = Math.max( b.prefWidth, child.getReqPrefWidth() );
 			}
 			i++;
 		}
@@ -60,13 +60,13 @@ public class TableLayout
 				
 				
 				// Now compare with what is required
-				if ( minWidthAvailable  <  child.getMinWidth()  ||  prefWidthAvailable  <  child.getPrefWidth() )
+				if ( minWidthAvailable  <  child.getReqMinWidth()  ||  prefWidthAvailable  <  child.getReqPrefWidth() )
 				{
 					// Need more width; compute how much we need, and distribute among columns
 					double colSpanRecip = 1.0 / (double)packing.colSpan;
-					double additionalMinWidth = Math.max( child.getMinWidth() - minWidthAvailable, 0.0 );
+					double additionalMinWidth = Math.max( child.getReqMinWidth() - minWidthAvailable, 0.0 );
 					double additionalMinWidthPerColumn = additionalMinWidth * colSpanRecip;
-					double additionalPrefWidth = Math.max( child.getPrefWidth() - prefWidthAvailable, 0.0 );
+					double additionalPrefWidth = Math.max( child.getReqPrefWidth() - prefWidthAvailable, 0.0 );
 					double additionalPrefWidthPerColumn = additionalPrefWidth * colSpanRecip;
 					
 					for (int c = packing.x; c < endColumn; c++)
@@ -115,7 +115,7 @@ public class TableLayout
 
 				if ( v == VAlignment.REFY  ||  v == VAlignment.REFY_EXPAND )
 				{
-					double childRefY = child.getRefY();
+					double childRefY = child.getReqRefY();
 					
 					double childHeightAboveRef = childRefY;
 					double childHeightBelowRef = childReqHeight - childRefY;
@@ -201,7 +201,7 @@ public class TableLayout
 	
 	
 	
-	public static LReqBox[] computeRequisitionX(LReqBox box, LReqBoxInterface children[], TablePackingParams packingParams[], int numColumns, int numRows,
+	public static LReqBox[] computeRequisitionX(LReqBoxInterface box, LReqBoxInterface children[], TablePackingParams packingParams[], int numColumns, int numRows,
 			double columnSpacing, double rowSpacing)
 	{
 		LReqBox columnBoxes[] = computeColumnXBoxes( children, packingParams, numColumns, columnSpacing );
@@ -223,7 +223,7 @@ public class TableLayout
 
 
 
-	public static LReqBox[] computeRequisitionY(LReqBox box, LReqBoxInterface children[], TablePackingParams packingParams[], int childAllocationFlags[], int numColumns, int numRows,
+	public static LReqBox[] computeRequisitionY(LReqBoxInterface box, LReqBoxInterface children[], TablePackingParams packingParams[], int childAllocationFlags[], int numColumns, int numRows,
 			double columnSpacing, double rowSpacing)
 	{
 		LReqBox rowBoxes[];
@@ -246,8 +246,8 @@ public class TableLayout
 	
 	
 	
-	public static void allocateX(LReqBox box, LReqBox columnBoxes[], LReqBoxInterface children[],
-			LAllocBox allocBox, LAllocBox columnAllocBoxes[], LAllocBoxInterface childrenAlloc[], 
+	public static void allocateX(LReqBoxInterface box, LReqBox columnBoxes[], LReqBoxInterface children[],
+			LAllocBoxInterface allocBox, LAllocBox columnAllocBoxes[], LAllocBoxInterface childrenAlloc[], 
 			TablePackingParams packingParams[], int childAlignmentFlags[], int numColumns, int numRows,
 			double columnSpacing, double rowSpacing, boolean bColumnExpand, boolean bRowExpand)
 	{
@@ -269,16 +269,16 @@ public class TableLayout
 			double xStart = startColAlloc.positionInParentSpaceX;
 			double xEnd = endColAlloc.positionInParentSpaceX  +  endColAlloc.allocationX;
 			double widthAvailable = xEnd - xStart;
-			double cellWidth = Math.max( widthAvailable, childRequisition.getMinWidth() );
+			double cellWidth = Math.max( widthAvailable, childRequisition.getReqMinWidth() );
 
-			allocBox.allocateChildXAligned( childAlloc, childRequisition, hAlign, xStart, cellWidth );
+			LAllocHelper.allocateChildXAligned( childAlloc, childRequisition, hAlign, xStart, cellWidth );
 		}
 	}
 	
 
 	
-	public static void allocateY(LReqBox box, LReqBox rowBoxes[], LReqBoxInterface children[],
-			LAllocBox allocBox, LAllocBox rowAllocBoxes[], LAllocBoxInterface childrenAlloc[],
+	public static void allocateY(LReqBoxInterface box, LReqBox rowBoxes[], LReqBoxInterface children[],
+			LAllocBoxInterface allocBox, LAllocBox rowAllocBoxes[], LAllocBoxInterface childrenAlloc[],
 			TablePackingParams packingParams[], int childAlignmentFlags[], int numColumns, int numRows,
 			double columnSpacing, double rowSpacing, boolean bColumnExpand, boolean bRowExpand)
 	{
@@ -319,7 +319,7 @@ public class TableLayout
 				height = new LAllocV( heightAvailable );
 			}
 				
-			allocBox.allocateChildYAligned( childAlloc, childRequisition, vAlign, yStart, height );
+			LAllocHelper.allocateChildYAligned( childAlloc, childRequisition, vAlign, yStart, height );
 		}
 	}
 }

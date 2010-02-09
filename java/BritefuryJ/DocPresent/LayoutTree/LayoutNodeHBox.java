@@ -32,11 +32,13 @@ public class LayoutNodeHBox extends LayoutNodeAbstractBox
 	{
 		refreshSubtree();
 		
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		HorizontalLayout.computeRequisitionX( layoutReqBox, getLeavesRefreshedRequisitonXBoxes(), getSpacing() );
 	}
 
 	protected void updateRequisitionY()
 	{
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		HorizontalLayout.computeRequisitionY( layoutReqBox, getLeavesRefreshedRequistionYBoxes(), getLeavesAlignmentFlags() );
 	}
 	
@@ -47,12 +49,13 @@ public class LayoutNodeHBox extends LayoutNodeAbstractBox
 	{
 		super.updateAllocationX();
 		
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		LReqBoxInterface childBoxes[] = getLeavesRequisitionBoxes();
 		LAllocBoxInterface childAllocBoxes[] = getLeavesAllocationBoxes();
 		int childAllocFlags[] = getLeavesAlignmentFlags();
 		double prevWidth[] = getLeavesAllocationX();
 		
-		HorizontalLayout.allocateX( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, childAllocFlags, getSpacing() );
+		HorizontalLayout.allocateX( layoutReqBox, childBoxes, getAllocationBox(), childAllocBoxes, childAllocFlags, getSpacing() );
 		
 		refreshLeavesAllocationX( prevWidth );
 	}
@@ -63,12 +66,13 @@ public class LayoutNodeHBox extends LayoutNodeAbstractBox
 	{
 		super.updateAllocationY();
 		
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		LReqBoxInterface childBoxes[] = getLeavesRequisitionBoxes();
 		LAllocBoxInterface childAllocBoxes[] = getLeavesAllocationBoxes();
 		int childAllocFlags[] = getLeavesAlignmentFlags();
 		LAllocV prevAllocV[] = getLeavesAllocV();
 		
-		HorizontalLayout.allocateY( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, childAllocFlags );
+		HorizontalLayout.allocateY( layoutReqBox, childBoxes, getAllocationBox(), childAllocBoxes, childAllocFlags );
 		
 		refreshLeavesAllocationY( prevAllocV );
 	}

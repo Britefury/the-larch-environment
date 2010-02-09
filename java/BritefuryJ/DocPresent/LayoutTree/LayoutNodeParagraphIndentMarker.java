@@ -6,25 +6,22 @@
 //##************************
 package BritefuryJ.DocPresent.LayoutTree;
 
-import BritefuryJ.DocPresent.DPLineBreak;
-import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
+import BritefuryJ.DocPresent.DPParagraphIndentMarker;
+import BritefuryJ.DocPresent.Layout.LReqBox;
 
-public class LayoutNodeLineBreak extends LayoutNodeBin
+public class LayoutNodeParagraphIndentMarker extends LayoutNodeParagraphMarker
 {
-	public LayoutNodeLineBreak(DPLineBreak element)
+	protected static LReqBox indentReqBox = new LReqBox();
+	
+	static
 	{
-		super( element );
+		indentReqBox.setParagraphIndentMarker();
 	}
-
-
-
-	protected void updateRequisitionX()
+	
+	
+	
+	public LayoutNodeParagraphIndentMarker(DPParagraphIndentMarker element)
 	{
-		super.updateRequisitionX();
-		
-		LReqBoxInterface layoutReqBox = getRequisitionBox();
-		DPLineBreak lineBreak = (DPLineBreak)element;
-		
-		lineBreak.initialiseLineBreakRequisition( layoutReqBox );
+		super( element, indentReqBox );
 	}
 }

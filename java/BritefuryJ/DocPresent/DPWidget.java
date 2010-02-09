@@ -428,12 +428,12 @@ abstract public class DPWidget extends PointerInputElement
 	
 	public double getPositionInParentSpaceX()
 	{
-		return layoutNode != null  ?  layoutNode.getPositionInParentSpaceX()  :  0.0;
+		return layoutNode != null  ?  layoutNode.getAllocPositionInParentSpaceX()  :  0.0;
 	}
 	
 	public double getPositionInParentSpaceY()
 	{
-		return layoutNode != null  ?  layoutNode.getPositionInParentSpaceY()  :  0.0;
+		return layoutNode != null  ?  layoutNode.getAllocPositionInParentSpaceY()  :  0.0;
 	}
 	
 	public double getAllocationX()

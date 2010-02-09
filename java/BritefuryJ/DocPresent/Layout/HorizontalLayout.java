@@ -8,7 +8,7 @@ package BritefuryJ.DocPresent.Layout;
 
 public class HorizontalLayout
 {
-	public static void computeRequisitionX(LReqBox box, LReqBoxInterface children[], double spacing)
+	public static void computeRequisitionX(LReqBoxInterface box, LReqBoxInterface children[], double spacing)
 	{
 		// Accumulate the width required for all the children
 		
@@ -27,10 +27,10 @@ public class HorizontalLayout
 		{
 			LReqBoxInterface child = children[i];
 			
-			minWidth = minX + child.getMinWidth();
-			prefWidth = prefX + child.getPrefWidth();
-			minAdvance = minX + child.getMinHAdvance();
-			prefAdvance = prefX + child.getPrefHAdvance();
+			minWidth = minX + child.getReqMinWidth();
+			prefWidth = prefX + child.getReqPrefWidth();
+			minAdvance = minX + child.getReqMinHAdvance();
+			prefAdvance = prefX + child.getReqPrefHAdvance();
 			minX = minAdvance + spacing;
 			prefX = prefAdvance + spacing;
 		}
@@ -40,7 +40,7 @@ public class HorizontalLayout
 
 	
 	
-	public static void computeRequisitionY(LReqBox box, LReqBoxInterface children[], int childAllocationFlags[])
+	public static void computeRequisitionY(LReqBoxInterface box, LReqBoxInterface children[], int childAllocationFlags[])
 	{
 		// The resulting box should have the following properties:
 		// In the case where alignment is BASELINES:
@@ -69,7 +69,7 @@ public class HorizontalLayout
 			
 			if ( v == VAlignment.REFY  ||  v == VAlignment.REFY_EXPAND )
 			{
-				double childRefY = child.getRefY();
+				double childRefY = child.getReqRefY();
 				double childHeightAboveRef = childRefY;
 				double childHeightBelowRef = childHeight - childRefY;
 				double childHeightBelowRefAndSpacing = childHeightBelowRef + child.getReqVSpacing();
@@ -105,7 +105,7 @@ public class HorizontalLayout
 
 
 
-	public static void allocateX(LReqBox box, LReqBoxInterface children[], LAllocBox allocBox, LAllocBoxInterface childrenAlloc[], int childAlignmentFlags[], double spacing)
+	public static void allocateX(LReqBoxInterface box, LReqBoxInterface children[], LAllocBoxInterface allocBox, LAllocBoxInterface childrenAlloc[], int childAlignmentFlags[], double spacing)
 	{
 		int numExpand = 0;
 		
@@ -122,22 +122,24 @@ public class HorizontalLayout
 			}
 		}
 
-		if ( allocBox.allocationX >= box.getPrefWidth() * LReqBox.ONE_MINUS_EPSILON )		// if allocation >= prefferred
+		double allocBoxAllocationX = allocBox.getAllocationX();
+
+		if ( allocBoxAllocationX >= box.getReqPrefWidth() * LReqBox.ONE_MINUS_EPSILON )		// if allocation >= prefferred
 		{
-			if ( allocBox.allocationX <= box.getPrefWidth() * LReqBox.ONE_PLUS_EPSILON  ||  numExpand == 0 )			// if allocation == preferred   or   numExpand == 0
+			if ( allocBoxAllocationX <= box.getReqPrefWidth() * LReqBox.ONE_PLUS_EPSILON  ||  numExpand == 0 )			// if allocation == preferred   or   numExpand == 0
 			{
 				// Allocate children their preferred width
 				double pos = 0.0;
 				for (int i = 0; i < children.length; i++)
 				{
-					allocBox.allocateChildX( childrenAlloc[i], pos, children[i].getPrefWidth() );
-					pos += ( children[i].getPrefHAdvance() + spacing );
+					LAllocHelper.allocateChildX( childrenAlloc[i], pos, children[i].getReqPrefWidth() );
+					pos += ( children[i].getReqPrefHAdvance() + spacing );
 				}
 			}
 			else
 			{
 				// Allocate children their preferred size, plus any extra to those for which the expand flag is set
-				double totalExpand = allocBox.allocationX - box.getPrefWidth();
+				double totalExpand = allocBoxAllocationX - box.getReqPrefWidth();
 				double expandPerChild = totalExpand / (double)numExpand;
 				
 				double pos = 0.0;
@@ -146,18 +148,18 @@ public class HorizontalLayout
 					HAlignment h = ElementAlignment.getHAlignment( childAlignmentFlags[i] );
 					if ( h == HAlignment.EXPAND )
 					{
-						allocBox.allocateChildX( childrenAlloc[i], pos, children[i].getPrefWidth() + expandPerChild );
-						pos += ( children[i].getPrefHAdvance() + expandPerChild + spacing );
+						LAllocHelper.allocateChildX( childrenAlloc[i], pos, children[i].getReqPrefWidth() + expandPerChild );
+						pos += ( children[i].getReqPrefHAdvance() + expandPerChild + spacing );
 					}
 					else
 					{
-						allocBox.allocateChildX( childrenAlloc[i], pos, children[i].getPrefWidth() );
-						pos += ( children[i].getPrefHAdvance() + spacing );
+						LAllocHelper.allocateChildX( childrenAlloc[i], pos, children[i].getReqPrefWidth() );
+						pos += ( children[i].getReqPrefHAdvance() + spacing );
 					}
 				}
 			}
 		}
-		else if ( allocBox.allocationX <= box.getMinWidth() * LReqBox.ONE_PLUS_EPSILON )		// if allocation <= minimum
+		else if ( allocBoxAllocationX <= box.getReqMinWidth() * LReqBox.ONE_PLUS_EPSILON )		// if allocation <= minimum
 		{
 			// Allocation is smaller than minimum size
 			
@@ -165,8 +167,8 @@ public class HorizontalLayout
 			double pos = 0.0;
 			for (int i = 0; i < children.length; i++)
 			{
-				allocBox.allocateChildX( childrenAlloc[i], pos, children[i].getMinWidth() );
-				pos += ( children[i].getMinHAdvance() + spacing );
+				LAllocHelper.allocateChildX( childrenAlloc[i], pos, children[i].getReqMinWidth() );
+				pos += ( children[i].getReqMinHAdvance() + spacing );
 			}
 		}
 		else
@@ -176,15 +178,15 @@ public class HorizontalLayout
 			if ( children.length >= 1 )
 			{
 				// Allocate children their minimum size, distributing additional space equally
-				double delta = allocBox.allocationX - box.getMinWidth();
-				double fraction = delta / ( box.getPrefWidth() - box.getMinWidth() );
+				double delta = allocBoxAllocationX - box.getReqMinWidth();
+				double fraction = delta / ( box.getReqPrefWidth() - box.getReqMinWidth() );
 				
 				double pos = 0.0;
 				for (int i = 0; i < children.length; i++)
 				{
-					double expand = ( children[i].getPrefWidth() - children[i].getMinWidth() )  *  fraction;
-					allocBox.allocateChildX( childrenAlloc[i], pos, children[i].getMinWidth() + expand );
-					pos += ( children[i].getMinHAdvance() + expand + spacing );
+					double expand = ( children[i].getReqPrefWidth() - children[i].getReqMinWidth() )  *  fraction;
+					LAllocHelper.allocateChildX( childrenAlloc[i], pos, children[i].getReqMinWidth() + expand );
+					pos += ( children[i].getReqMinHAdvance() + expand + spacing );
 				}
 			}
 		}
@@ -192,35 +194,36 @@ public class HorizontalLayout
 
 	
 	
-	public static void allocateX(LReqBox box, LReqBoxInterface children[], LAllocBox allocBox, LAllocBoxInterface childrenAlloc[], double spacing, boolean bExpand)
+	public static void allocateX(LReqBoxInterface box, LReqBoxInterface children[], LAllocBoxInterface allocBox, LAllocBoxInterface childrenAlloc[], double spacing, boolean bExpand)
 	{
-		if ( allocBox.allocationX >= box.getPrefWidth() * LReqBox.ONE_MINUS_EPSILON )		// if allocation >= prefferred
+		double allocBoxAllocationX = allocBox.getAllocationX();
+		if ( allocBoxAllocationX >= box.getReqPrefWidth() * LReqBox.ONE_MINUS_EPSILON )		// if allocation >= prefferred
 		{
-			if ( allocBox.allocationX <= box.getPrefWidth() * LReqBox.ONE_PLUS_EPSILON  ||  !bExpand )			// if allocation == preferred   or   not bExpand
+			if ( allocBoxAllocationX <= box.getReqPrefWidth() * LReqBox.ONE_PLUS_EPSILON  ||  !bExpand )			// if allocation == preferred   or   not bExpand
 			{
 				// Allocate children their preferred width
 				double pos = 0.0;
 				for (int i = 0; i < children.length; i++)
 				{
-					allocBox.allocateChildX( childrenAlloc[i], pos, children[i].getPrefWidth() );
-					pos += ( children[i].getPrefHAdvance() + spacing );
+					LAllocHelper.allocateChildX( childrenAlloc[i], pos, children[i].getReqPrefWidth() );
+					pos += ( children[i].getReqPrefHAdvance() + spacing );
 				}
 			}
 			else
 			{
 				// Allocate children their preferred size, plus any extra to those for which the expand flag is set
-				double totalExpand = allocBox.allocationX - box.getPrefWidth();
+				double totalExpand = allocBoxAllocationX - box.getReqPrefWidth();
 				double expandPerChild = totalExpand / (double)children.length;
 				
 				double pos = 0.0;
 				for (int i = 0; i < children.length; i++)
 				{
-					allocBox.allocateChildX( childrenAlloc[i], pos, children[i].getPrefWidth() + expandPerChild );
-					pos += ( children[i].getPrefHAdvance() + expandPerChild + spacing );
+					LAllocHelper.allocateChildX( childrenAlloc[i], pos, children[i].getReqPrefWidth() + expandPerChild );
+					pos += ( children[i].getReqPrefHAdvance() + expandPerChild + spacing );
 				}
 			}
 		}
-		else if ( allocBox.allocationX <= box.getMinWidth() * LReqBox.ONE_PLUS_EPSILON )		// if allocation <= minimum
+		else if ( allocBoxAllocationX <= box.getReqMinWidth() * LReqBox.ONE_PLUS_EPSILON )		// if allocation <= minimum
 		{
 			// Allocation is smaller than minimum size
 			
@@ -228,8 +231,8 @@ public class HorizontalLayout
 			double pos = 0.0;
 			for (int i = 0; i < children.length; i++)
 			{
-				allocBox.allocateChildX( childrenAlloc[i], pos, children[i].getMinWidth() );
-				pos += ( children[i].getMinHAdvance() + spacing );
+				LAllocHelper.allocateChildX( childrenAlloc[i], pos, children[i].getReqMinWidth() );
+				pos += ( children[i].getReqMinHAdvance() + spacing );
 			}
 		}
 		else
@@ -239,15 +242,15 @@ public class HorizontalLayout
 			if ( children.length >= 1 )
 			{
 				// Allocate children their minimum size, distributing additional space equally
-				double delta = allocBox.allocationX - box.getMinWidth();
-				double fraction = delta / ( box.getPrefWidth() - box.getMinWidth() );
+				double delta = allocBoxAllocationX - box.getReqMinWidth();
+				double fraction = delta / ( box.getReqPrefWidth() - box.getReqMinWidth() );
 				
 				double pos = 0.0;
 				for (int i = 0; i < children.length; i++)
 				{
-					double expand = ( children[i].getPrefWidth() - children[i].getMinWidth() )  *  fraction;
-					allocBox.allocateChildX( childrenAlloc[i], pos, children[i].getMinWidth() + expand );
-					pos += ( children[i].getMinHAdvance() + expand + spacing );
+					double expand = ( children[i].getReqPrefWidth() - children[i].getReqMinWidth() )  *  fraction;
+					LAllocHelper.allocateChildX( childrenAlloc[i], pos, children[i].getReqMinWidth() + expand );
+					pos += ( children[i].getReqMinHAdvance() + expand + spacing );
 				}
 			}
 		}
@@ -255,30 +258,31 @@ public class HorizontalLayout
 
 	
 	
-	public static LAllocV computeVerticalAllocationForRow(LReqBox reqBox, LAllocBox allocBox)
+	public static LAllocV computeVerticalAllocationForRow(LReqBoxInterface reqBox, LAllocBoxInterface allocBox)
 	{
 		//return new LAllocV( Math.max( reqBox.getReqHeight(), allocBox.getAllocationY() ),  Math.max( reqBox.getRefY(), ))
-		if ( allocBox.getAllocationY() < reqBox.getReqHeight() )
+		double allocBoxAllocationY = allocBox.getAllocationY();
+		if ( allocBoxAllocationY < reqBox.getReqHeight() )
 		{
-			return new LAllocV( reqBox.getReqHeight(), reqBox.getRefY() );
+			return new LAllocV( reqBox.getReqHeight(), reqBox.getReqRefY() );
 		}
 		else
 		{
 			double reqHeight = reqBox.getReqHeight();
-			double reqHeightAboveBaseline = reqBox.getRefY();
+			double reqHeightAboveBaseline = reqBox.getReqRefY();
 			double reqHeightBelowBaseline = reqHeight - reqHeightAboveBaseline;
 			
-			double allocHeight = allocBox.getAllocationY();
+			double allocHeight = allocBoxAllocationY;
 			double minRefY = reqHeightAboveBaseline;
 			double maxRefY = allocHeight - reqHeightBelowBaseline;
 			
-			double refY = Math.min( Math.max( allocBox.getRefY(), minRefY ), maxRefY );
+			double refY = Math.min( Math.max( allocBox.getAllocRefY(), minRefY ), maxRefY );
 
 			return new LAllocV( allocHeight, refY );
 		}
 	}
 	
-	public static void allocateY(LReqBox box, LReqBoxInterface children[], LAllocBox allocBox, LAllocBoxInterface childrenAlloc[], int childAllocationFlags[])
+	public static void allocateY(LReqBoxInterface box, LReqBoxInterface children[], LAllocBoxInterface allocBox, LAllocBoxInterface childrenAlloc[], int childAllocationFlags[])
 	{
 		LAllocV h = computeVerticalAllocationForRow( box, allocBox );
 		
@@ -286,7 +290,7 @@ public class HorizontalLayout
 		
 		for (int i = 0; i < children.length; i++)
 		{
-			allocBox.allocateChildYAligned( childrenAlloc[i], children[i], childAllocationFlags[i], 0.0, h );
+			LAllocHelper.allocateChildYAligned( childrenAlloc[i], children[i], childAllocationFlags[i], 0.0, h );
 		}
 	}	
 }

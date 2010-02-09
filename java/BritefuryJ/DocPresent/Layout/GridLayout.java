@@ -26,8 +26,8 @@ public class GridLayout
 				if ( child != null )
 				{
 					LReqBox b = columnBoxes[c];
-					b.minWidth = Math.max( b.minWidth, child.getMinWidth() );
-					b.prefWidth = Math.max( b.prefWidth, child.getPrefWidth() );
+					b.minWidth = Math.max( b.minWidth, child.getReqMinWidth() );
+					b.prefWidth = Math.max( b.prefWidth, child.getReqPrefWidth() );
 				}
 				c++;
 			}
@@ -46,7 +46,7 @@ public class GridLayout
 
 
 
-	public static void computeRowRequisitionY(LReqBox rowBox, LReqBoxInterface children[], int childAlignmentFlags[])
+	public static void computeRowRequisitionY(LReqBoxInterface rowBox, LReqBoxInterface children[], int childAlignmentFlags[])
 	{
 		rowBox.clearRequisitionY();
 		double rowHeight = 0.0, rowHeightAboveRef = 0.0,  rowHeightBelowRef = 0.0;
@@ -60,7 +60,7 @@ public class GridLayout
 			
 			if ( v == VAlignment.REFY  ||  v == VAlignment.REFY_EXPAND )
 			{
-				double childRefY = child.getRefY();
+				double childRefY = child.getReqRefY();
 				double childHeightAboveRef = childRefY;
 				double childHeightBelowRef = childHeight - childRefY;
 				
@@ -89,7 +89,7 @@ public class GridLayout
 
 
 	
-	public static void allocateRowY(LReqBox reqBox, LReqBoxInterface children[], LAllocBox allocBox, LAllocBoxInterface childrenAlloc[], int childAlignmentFlags[])
+	public static void allocateRowY(LReqBoxInterface reqBox, LReqBoxInterface children[], LAllocBoxInterface allocBox, LAllocBoxInterface childrenAlloc[], int childAlignmentFlags[])
 	{
 		LAllocV h = HorizontalLayout.computeVerticalAllocationForRow( reqBox, allocBox );
 		
@@ -97,14 +97,14 @@ public class GridLayout
 		{
 			if ( children != null )
 			{
-				allocBox.allocateChildYAligned( childrenAlloc[i], children[i], childAlignmentFlags[i], 0.0, h );
+				LAllocHelper.allocateChildYAligned( childrenAlloc[i], children[i], childAlignmentFlags[i], 0.0, h );
 			}
 		}
 	}
 
 	
 	
-	public static LReqBox[] computeRequisitionX(LReqBox box, LReqBoxInterface children[][], int numColumns, int numRows, double columnSpacing, double rowSpacing)
+	public static LReqBox[] computeRequisitionX(LReqBoxInterface box, LReqBoxInterface children[][], int numColumns, int numRows, double columnSpacing, double rowSpacing)
 	{
 		LReqBox columnBoxes[] = computeColumnXBoxes( children, numColumns, columnSpacing );
 		
@@ -125,7 +125,7 @@ public class GridLayout
 
 
 
-	public static void computeRequisitionY(LReqBox box, LReqBoxInterface rowBoxes[], double rowSpacing)
+	public static void computeRequisitionY(LReqBoxInterface box, LReqBoxInterface rowBoxes[], double rowSpacing)
 	{
 		// Total space required by rows
 		double reqHeight = 0.0;
@@ -142,8 +142,8 @@ public class GridLayout
 	
 	
 	
-	public static void allocateX(LReqBox box, LReqBoxInterface columnBoxes[], LReqBoxInterface children[][],
-			LAllocBox allocBox, LAllocBoxInterface columnAllocBoxes[], LAllocBoxInterface childrenAlloc[][], 
+	public static void allocateX(LReqBoxInterface box, LReqBoxInterface columnBoxes[], LReqBoxInterface children[][],
+			LAllocBoxInterface allocBox, LAllocBoxInterface columnAllocBoxes[], LAllocBoxInterface childrenAlloc[][], 
 			int childAlignmentFlags[][], int numColumns, int numRows,
 			double columnSpacing, double rowSpacing, boolean bColumnExpand, boolean bRowExpand)
 	{
@@ -167,9 +167,9 @@ public class GridLayout
 					HAlignment hAlign = ElementAlignment.getHAlignment( alignmentFlags );
 					
 					LAllocBoxInterface colAlloc = columnAllocBoxes[c];
-					double cellWidth = Math.max( colAlloc.getAllocationX(), childRequisition.getMinWidth() );
+					double cellWidth = Math.max( colAlloc.getAllocationX(), childRequisition.getReqMinWidth() );
 		
-					allocBox.allocateChildXAligned( childAlloc, childRequisition, hAlign, colAlloc.getPositionInParentSpaceX(), cellWidth );
+					LAllocHelper.allocateChildXAligned( childAlloc, childRequisition, hAlign, colAlloc.getAllocPositionInParentSpaceX(), cellWidth );
 				}
 			}
 		}
@@ -177,7 +177,7 @@ public class GridLayout
 	
 
 	
-	public static void allocateY(LReqBox box, LReqBoxInterface rowBoxes[], LAllocBox allocBox, LAllocBoxInterface rowAllocBoxes[], double rowSpacing, boolean bRowExpand)
+	public static void allocateY(LReqBoxInterface box, LReqBoxInterface rowBoxes[], LAllocBoxInterface allocBox, LAllocBoxInterface rowAllocBoxes[], double rowSpacing, boolean bRowExpand)
 	{
 		// Allocate space to the rows
 		VerticalLayout.allocateY( box, rowBoxes, allocBox, rowAllocBoxes, rowSpacing, bRowExpand );

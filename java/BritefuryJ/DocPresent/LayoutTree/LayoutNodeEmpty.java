@@ -9,24 +9,25 @@ package BritefuryJ.DocPresent.LayoutTree;
 import BritefuryJ.DocPresent.DPEmpty;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.WidgetFilter;
+import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.Math.Point2;
 
-public class LayoutNodeEmpty extends LeafLayoutNode
+public class LayoutNodeEmpty extends LeafLayoutNodeSharedReq
 {
+	protected static LReqBox emptyReqBox = new LReqBox();
+	
 	public LayoutNodeEmpty(DPEmpty element)
 	{
-		super( element );
+		super( element, emptyReqBox );
 	}
 
 	
 	protected void updateRequisitionX()
 	{
-		layoutReqBox.clearRequisitionX();
 	}
 
 	protected void updateRequisitionY()
 	{
-		layoutReqBox.clearRequisitionY();
 	}
 
 	

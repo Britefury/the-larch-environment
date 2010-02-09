@@ -7,6 +7,7 @@
 package tests.DocPresent.Layout;
 
 import BritefuryJ.DocPresent.Layout.LAllocBox;
+import BritefuryJ.DocPresent.Layout.LAllocHelper;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.VerticalLayout;
@@ -174,7 +175,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 
 		assertBoxesEqual( box, expectedBox, "PARENT BOX" );
 
-		boxAlloc.allocateY( box, 0.0, boxAllocation );
+		LAllocHelper.allocateY( boxAlloc, box, 0.0, boxAllocation );
 		VerticalLayout.allocateSpaceY( box, children, boxAlloc, childrenAlloc, childAllocFlags, refPointIndex );
 		for (int i = 0; i < children.length; i++)
 		{
@@ -343,7 +344,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 
 		assertBoxesEqual( box, expectedBox, "PARENT BOX" );
 
-		boxAlloc.allocateY( box, 0.0, boxAllocation );
+		LAllocHelper.allocateY( boxAlloc, box, 0.0, boxAllocation );
 		VerticalLayout.allocateY( box, children, boxAlloc, childrenAlloc, childAllocFlags, refPointIndex, spacing );
 		for (int i = 0; i < children.length; i++)
 		{
@@ -353,11 +354,11 @@ public class Test_VerticalLayout extends Test_Layout_base
 			}
 			assertEquals( childrenAlloc[i].getAllocV(), expectedSize[i] );
 
-			if ( childrenAlloc[i].getPositionInParentSpaceY() != expectedPosition[i] )
+			if ( childrenAlloc[i].getAllocPositionInParentSpaceY() != expectedPosition[i] )
 			{
-				System.out.println( "Child position for " + i + " is not as expected; expected=" + expectedPosition[i] + ", result=" + childrenAlloc[i].getPositionInParentSpaceY() + ", boxAllocation=" + boxAllocation );
+				System.out.println( "Child position for " + i + " is not as expected; expected=" + expectedPosition[i] + ", result=" + childrenAlloc[i].getAllocPositionInParentSpaceY() + ", boxAllocation=" + boxAllocation );
 			}
-			assertEquals( childrenAlloc[i].getPositionInParentSpaceY(), expectedPosition[i] );
+			assertEquals( childrenAlloc[i].getAllocPositionInParentSpaceY(), expectedPosition[i] );
 		}
 	}
 
@@ -517,7 +518,7 @@ public class Test_VerticalLayout extends Test_Layout_base
 
 		assertBoxesEqual( box, expectedBox, "PARENT BOX" );
 
-		boxAlloc.allocateX( box, 0.0, boxAllocation );
+		LAllocHelper.allocateX( boxAlloc, box, 0.0, boxAllocation );
 		VerticalLayout.allocateX( box, children, boxAlloc, childrenAlloc, childAllocFlags );
 		for (int i = 0; i < children.length; i++)
 		{
@@ -527,11 +528,11 @@ public class Test_VerticalLayout extends Test_Layout_base
 			}
 			assertEquals( childrenAlloc[i].getAllocationX(), expectedSize[i] );
 
-			if ( childrenAlloc[i].getPositionInParentSpaceX() != expectedPosition[i] )
+			if ( childrenAlloc[i].getAllocPositionInParentSpaceX() != expectedPosition[i] )
 			{
-				System.out.println( "Child position for " + i + " is not as expected; expected=" + expectedPosition[i] + ", result=" + childrenAlloc[i].getPositionInParentSpaceX() + ", boxAllocation=" + boxAllocation );
+				System.out.println( "Child position for " + i + " is not as expected; expected=" + expectedPosition[i] + ", result=" + childrenAlloc[i].getAllocPositionInParentSpaceX() + ", boxAllocation=" + boxAllocation );
 			}
-			assertEquals( childrenAlloc[i].getPositionInParentSpaceX(), expectedPosition[i] );
+			assertEquals( childrenAlloc[i].getAllocPositionInParentSpaceX(), expectedPosition[i] );
 		}
 	}
 	

@@ -59,6 +59,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 
 	protected void updateRequisitionX()
 	{
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPScript script = (DPScript)element;
 		double childScale = getChildScale();
 		
@@ -68,7 +69,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 			DPWidget child = script.getWrappedChild( i );
 			if ( i != MAIN )
 			{
-				boxes[i] = child != null  ?  child.getLayoutNode().refreshRequisitionX().scaled( childScale )  :  null;
+				boxes[i] = child != null  ?  child.getLayoutNode().refreshRequisitionX().scaledRequisition( childScale )  :  null;
 			}
 			else
 			{
@@ -81,6 +82,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 
 	protected void updateRequisitionY()
 	{
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPScript script = (DPScript)element;
 		double childScale = getChildScale();
 		
@@ -90,7 +92,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 			DPWidget child = script.getWrappedChild( i );
 			if ( i != MAIN )
 			{
-				boxes[i] = child != null  ?  child.getLayoutNode().refreshRequisitionY().scaled( childScale )  :  null;
+				boxes[i] = child != null  ?  child.getLayoutNode().refreshRequisitionY().scaledRequisition( childScale )  :  null;
 			}
 			else
 			{
@@ -109,6 +111,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 	{
 		super.updateAllocationX( );
 		
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPScript script = (DPScript)element;
 		double childScale = getChildScale();
 		
@@ -120,7 +123,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 			DPWidget child = script.getWrappedChild( i );
 			if ( i != MAIN )
 			{
-				reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox().scaled( childScale )  :  null;
+				reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox().scaledRequisition( childScale )  :  null;
 			}
 			else
 			{
@@ -131,7 +134,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 		}
 		
 		ScriptLayout.allocateX( layoutReqBox, reqBoxes[LEFTSUPER], reqBoxes[LEFTSUB], reqBoxes[MAIN], reqBoxes[RIGHTSUPER], reqBoxes[RIGHTSUB], columnBoxes,
-				layoutAllocBox, allocBoxes[LEFTSUPER], allocBoxes[LEFTSUB], allocBoxes[MAIN], allocBoxes[RIGHTSUPER], allocBoxes[RIGHTSUB],
+				getAllocationBox(), allocBoxes[LEFTSUPER], allocBoxes[LEFTSUB], allocBoxes[MAIN], allocBoxes[RIGHTSUPER], allocBoxes[RIGHTSUB],
 				getColumnSpacing(), getRowSpacing() );
 		
 		for (int i = 0; i < NUMCHILDREN; i++)
@@ -153,6 +156,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 	{
 		super.updateAllocationY( );
 		
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPScript script = (DPScript)element;
 		double childScale = getChildScale();
 		
@@ -164,7 +168,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 			DPWidget child = script.getWrappedChild( i );
 			if ( i != MAIN )
 			{
-				reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox().scaled( childScale )  :  null;
+				reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox().scaledRequisition( childScale )  :  null;
 			}
 			else
 			{
@@ -175,7 +179,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 		}
 		
 		ScriptLayout.allocateY( layoutReqBox, reqBoxes[LEFTSUPER], reqBoxes[LEFTSUB], reqBoxes[MAIN], reqBoxes[RIGHTSUPER], reqBoxes[RIGHTSUB], rowBaselineY,
-				layoutAllocBox, allocBoxes[LEFTSUPER], allocBoxes[LEFTSUB], allocBoxes[MAIN], allocBoxes[RIGHTSUPER], allocBoxes[RIGHTSUB],
+				getAllocationBox(), allocBoxes[LEFTSUPER], allocBoxes[LEFTSUB], allocBoxes[MAIN], allocBoxes[RIGHTSUPER], allocBoxes[RIGHTSUB],
 				getColumnSpacing(), getRowSpacing() );
 		
 		for (int i = 0; i < NUMCHILDREN; i++)
@@ -247,11 +251,11 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 			double edgeX = 0.0;
 			if ( bRightEdge )
 			{
-				edgeX = childNode.getPositionInParentSpaceX() + childNode.getAllocationInParentSpaceX();
+				edgeX = childNode.getAllocPositionInParentSpaceX() + childNode.getAllocationInParentSpaceX();
 			}
 			else
 			{
-				edgeX = childNode.getPositionInParentSpaceX();
+				edgeX = childNode.getAllocPositionInParentSpaceX();
 			}
 			
 			if ( i > 0 )

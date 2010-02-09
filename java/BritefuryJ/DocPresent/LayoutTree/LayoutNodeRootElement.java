@@ -7,7 +7,7 @@
 package BritefuryJ.DocPresent.LayoutTree;
 
 import BritefuryJ.DocPresent.DPPresentationArea;
-import BritefuryJ.DocPresent.Layout.LAllocV;
+import BritefuryJ.DocPresent.Layout.LAllocHelper;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
 
 public class LayoutNodeRootElement extends LayoutNodeBin
@@ -31,18 +31,11 @@ public class LayoutNodeRootElement extends LayoutNodeBin
 	
 	public void allocateX(LReqBoxInterface requisition, double x, double width)
 	{
-		layoutAllocBox.allocateX( requisition, x, width );
+		LAllocHelper.allocateX( getAllocationBox(), requisition, x, width );
 	}
 	
 	public void allocateY(LReqBoxInterface requisition, double y, double height)
 	{
-		layoutAllocBox.allocateY( requisition, y, height );
-	}
-	
-	
-	
-	public LAllocV getAllocV()
-	{
-		return layoutAllocBox.getAllocV();
+		LAllocHelper.allocateY( getAllocationBox(), requisition, y, height );
 	}
 }

@@ -117,7 +117,7 @@ public class DPText extends DPContentLeafEditableEntry
 
 		AffineTransform prevTransform = null;
 		LayoutNode layout = getLayoutNode();
-		double deltaY = layout.getAllocationBox().getRefY()  -  layout.getRequisitionBox().getRefY();
+		double deltaY = layout.getAllocationBox().getAllocRefY()  -  layout.getRequisitionBox().getReqRefY();
 		if ( deltaY != 0.0 )
 		{
 			prevTransform = graphics.getTransform();

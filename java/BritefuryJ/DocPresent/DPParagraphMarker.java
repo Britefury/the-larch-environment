@@ -8,8 +8,6 @@ package BritefuryJ.DocPresent;
 
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.Layout.LReqBox;
-import BritefuryJ.DocPresent.LayoutTree.LayoutNodeParagraphMarker;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
 import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
@@ -19,21 +17,15 @@ public abstract class DPParagraphMarker extends DPWidget
 	public DPParagraphMarker(ElementContext context)
 	{
 		super( context );
-		
-		layoutNode = new LayoutNodeParagraphMarker( this );
 	}
 	
 	public DPParagraphMarker(ElementContext context, WidgetStyleSheet styleSheet)
 	{
 		super( context, styleSheet );
-
-		layoutNode = new LayoutNodeParagraphMarker( this );
 	}
 	
 	
 	
-	public abstract void initMarkerRequisition(LReqBox reqBox);
-
 	
 	
 	

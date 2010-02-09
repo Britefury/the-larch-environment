@@ -9,13 +9,11 @@ package BritefuryJ.DocPresent.LayoutTree;
 import BritefuryJ.DocPresent.DPStaticText;
 import BritefuryJ.DocPresent.Util.TextVisual;
 
-public class LayoutNodeStaticText extends StaticLayoutNode
+public class LayoutNodeStaticText extends StaticLayoutNodeSharedReq
 {
 	public LayoutNodeStaticText(DPStaticText element)
 	{
-		super( element );
-		
-		layoutReqBox = element.getVisual().getRequisition();
+		super( element, element.getVisual().getRequisition() );
 	}
 
 	protected void updateRequisitionX()

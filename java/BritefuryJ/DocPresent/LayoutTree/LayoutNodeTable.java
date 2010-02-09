@@ -37,10 +37,11 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 
 	protected void updateRequisitionX()
 	{
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPTable table = (DPTable)element;
 		List<DPWidget> layoutChildren = element.getLayoutChildren();
 		
-		LReqBoxInterface childBoxes[] = new LReqBox[layoutChildren.size()];
+		LReqBoxInterface childBoxes[] = new LReqBoxInterface[layoutChildren.size()];
 		TablePackingParams packingParams[] = new TablePackingParams[layoutChildren.size()];
 		for (int i = 0; i < layoutChildren.size(); i++)
 		{
@@ -59,10 +60,11 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 
 	protected void updateRequisitionY()
 	{
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPTable table = (DPTable)element;
 		List<DPWidget> layoutChildren = element.getLayoutChildren();
 		
-		LReqBoxInterface childBoxes[] = new LReqBox[layoutChildren.size()];
+		LReqBoxInterface childBoxes[] = new LReqBoxInterface[layoutChildren.size()];
 		TablePackingParams packingParams[] = new TablePackingParams[layoutChildren.size()];
 		int childAlignmentFlags[] = new int[layoutChildren.size()];
 		for (int i = 0; i < layoutChildren.size(); i++)
@@ -89,6 +91,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 	{
 		super.updateAllocationX();
 		
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPTable table = (DPTable)element;
 		List<DPWidget> layoutChildren = element.getLayoutChildren();
 		
@@ -108,7 +111,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 			childAlignmentFlags[i] = child.getAlignmentFlags();
 		}
 		
-		TableLayout.allocateX( layoutReqBox, columnBoxes, childBoxes, layoutAllocBox, columnAllocBoxes, childAllocBoxes, packingParams, childAlignmentFlags, table.width(), table.height(), getColumnSpacing(), getRowSpacing(), getColumnExpand(), getRowExpand() );
+		TableLayout.allocateX( layoutReqBox, columnBoxes, childBoxes, getAllocationBox(), columnAllocBoxes, childAllocBoxes, packingParams, childAlignmentFlags, table.width(), table.height(), getColumnSpacing(), getRowSpacing(), getColumnExpand(), getRowExpand() );
 		
 		int i = 0;
 		for (DPWidget child: layoutChildren)
@@ -124,10 +127,11 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 	{
 		super.updateAllocationY();
 		
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPTable table = (DPTable)element;
 		List<DPWidget> layoutChildren = element.getLayoutChildren();
 		
-		LReqBoxInterface childBoxes[] = new LReqBox[layoutChildren.size()];
+		LReqBoxInterface childBoxes[] = new LReqBoxInterface[layoutChildren.size()];
 		LAllocBoxInterface childAllocBoxes[] = new LAllocBox[layoutChildren.size()];
 		LAllocV prevAllocVs[] = new LAllocV[layoutChildren.size()];
 		TablePackingParams[] packingParams = new TablePackingParams[layoutChildren.size()];
@@ -143,7 +147,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 			childAlignmentFlags[i] = child.getAlignmentFlags();
 		}
 		
-		TableLayout.allocateY( layoutReqBox, rowBoxes, childBoxes, layoutAllocBox, rowAllocBoxes, childAllocBoxes, packingParams, childAlignmentFlags, table.width(), table.height(), getColumnSpacing(), getRowSpacing(), getColumnExpand(), getRowExpand() );
+		TableLayout.allocateY( layoutReqBox, rowBoxes, childBoxes, getAllocationBox(), rowAllocBoxes, childAllocBoxes, packingParams, childAlignmentFlags, table.width(), table.height(), getColumnSpacing(), getRowSpacing(), getColumnExpand(), getRowExpand() );
 		
 		int i = 0;
 		for (DPWidget child: layoutChildren)
@@ -248,8 +252,8 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 			for (int i = 0; i < columnBoxes.length - 1; i++)
 			{
 				LAllocBox columnJ = columnAllocBoxes[i+1];
-				double iUpperX = columnI.getPositionInParentSpaceX() + columnI.getAllocationX();
-				double jLowerX = columnJ.getPositionInParentSpaceX();
+				double iUpperX = columnI.getAllocPositionInParentSpaceX() + columnI.getAllocationX();
+				double jLowerX = columnJ.getAllocPositionInParentSpaceX();
 				
 				double midX = ( iUpperX + jLowerX ) * 0.5;
 				
@@ -283,8 +287,8 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 			for (int i = 0; i < rowBoxes.length - 1; i++)
 			{
 				LAllocBox rowJ = rowAllocBoxes[i+1];
-				double iUpperY = rowI.getPositionInParentSpaceY() + rowI.getAllocationY();
-				double jLowerY = rowJ.getPositionInParentSpaceY();
+				double iUpperY = rowI.getAllocPositionInParentSpaceY() + rowI.getAllocationY();
+				double jLowerY = rowJ.getAllocPositionInParentSpaceY();
 				
 				double midY = ( iUpperY + jLowerY ) * 0.5;
 				

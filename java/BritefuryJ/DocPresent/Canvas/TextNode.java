@@ -65,7 +65,7 @@ public class TextNode extends DrawingNode
 		visual = TextVisual.getTextVisual( area, text, font, bMixedSizeCaps );
 		visual.realise( area );
 		LReqBox req = visual.getRequisition();
-		parentSpaceBox = new AABox2( 0.0, 0.0, req.getPrefWidth(), req.getReqHeight() );
+		parentSpaceBox = new AABox2( 0.0, 0.0, req.getReqPrefWidth(), req.getReqHeight() );
 	}
 	
 	public void unrealise()

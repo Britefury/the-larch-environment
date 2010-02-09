@@ -17,7 +17,8 @@ public class ScriptLayout
 
 	
 	
-	public static void computeRequisitionX(LReqBox box, LReqBox columnBoxes[], LReqBoxInterface leftSuper, LReqBoxInterface leftSub, LReqBoxInterface main, LReqBoxInterface rightSuper, LReqBoxInterface rightSub,
+	public static void computeRequisitionX(LReqBoxInterface box, LReqBox columnBoxes[],
+			LReqBoxInterface leftSuper, LReqBoxInterface leftSub, LReqBoxInterface main, LReqBoxInterface rightSuper, LReqBoxInterface rightSub,
 			double columnSpacing, double rowSpacing)
 	{
 		// Compute boxes for the left, main, and right columns
@@ -68,20 +69,20 @@ public class ScriptLayout
 		{
 			// Has a main column, no right column
 			
-			double minX = Math.max( leftColumn.minWidth, leftColumn.minHAdvance )  +  leftSpacing  +  main.getMinWidth();
-			double prefX = Math.max( leftColumn.prefWidth, leftColumn.prefHAdvance )  +  leftSpacing  +  main.getPrefWidth();
-			minW = minX + main.getMinWidth();
-			prefW = prefX + main.getPrefWidth();
-			minAdv = minX + main.getMinHAdvance();
-			prefAdv = prefX + main.getPrefHAdvance();
+			double minX = Math.max( leftColumn.minWidth, leftColumn.minHAdvance )  +  leftSpacing  +  main.getReqMinWidth();
+			double prefX = Math.max( leftColumn.prefWidth, leftColumn.prefHAdvance )  +  leftSpacing  +  main.getReqPrefWidth();
+			minW = minX + main.getReqMinWidth();
+			prefW = prefX + main.getReqPrefWidth();
+			minAdv = minX + main.getReqMinHAdvance();
+			prefAdv = prefX + main.getReqPrefHAdvance();
 		}
 		else
 		{
 			minAdv = minW = Math.max( leftColumn.minWidth, leftColumn.minHAdvance )  +  leftSpacing  +
-					Math.max( main.getMinWidth(), main.getMinHAdvance() )  +  mainSpacing  +
+					Math.max( main.getReqMinWidth(), main.getReqMinHAdvance() )  +  mainSpacing  +
 					Math.max( rightColumn.minWidth, rightColumn.minHAdvance );
 			prefAdv = prefW = Math.max( leftColumn.prefWidth, leftColumn.prefHAdvance )  +  leftSpacing  +
-					Math.max( main.getPrefWidth(), main.getPrefHAdvance() )  +  mainSpacing  +
+					Math.max( main.getReqPrefWidth(), main.getReqPrefHAdvance() )  +  mainSpacing  +
 					Math.max( rightColumn.prefWidth, rightColumn.prefHAdvance );
 		}
 		
@@ -91,7 +92,8 @@ public class ScriptLayout
 
 
 
-	public static void computeRequisitionY(LReqBox box, double rowBaselineY[], LReqBoxInterface leftSuper, LReqBoxInterface leftSub, LReqBoxInterface main, LReqBoxInterface rightSuper, LReqBoxInterface rightSub,
+	public static void computeRequisitionY(LReqBoxInterface box, double rowBaselineY[],
+			LReqBoxInterface leftSuper, LReqBoxInterface leftSub, LReqBoxInterface main, LReqBoxInterface rightSuper, LReqBoxInterface rightSub,
 			double columnSpacing, double rowSpacing)
 	{
 		double superBaselineY = 0.0, mainBaselineY = 0.0, subBaselineY = 0.0;
@@ -99,15 +101,15 @@ public class ScriptLayout
 		double Ma = 0.0, Md = 0.0, Mh = 0.0;
 		if ( main != null )
 		{
-			Ma = main.getRefY();
+			Ma = main.getReqRefY();
 			Md = main.getReqHeightBelowRefPoint();
 			Mh = main.getReqHeight();
 		}
 
-		double Pa = Math.max( leftSuper != null  ?  leftSuper.getRefY()  :  0.0, rightSuper != null  ?  rightSuper.getRefY()  :  0.0 );
+		double Pa = Math.max( leftSuper != null  ?  leftSuper.getReqRefY()  :  0.0, rightSuper != null  ?  rightSuper.getReqRefY()  :  0.0 );
 		double Pd = Math.max( leftSuper != null  ?  leftSuper.getReqHeightBelowRefPoint()  :  0.0, rightSuper != null  ?  rightSuper.getReqHeightBelowRefPoint()  :  0.0 );
 
-		double Ba = Math.max( leftSub != null  ?  leftSub.getRefY()  :  0.0, rightSub != null  ?  rightSub.getRefY()  :  0.0 );
+		double Ba = Math.max( leftSub != null  ?  leftSub.getReqRefY()  :  0.0, rightSub != null  ?  rightSub.getReqRefY()  :  0.0 );
 		double Bd = Math.max( leftSub != null  ?  leftSub.getReqHeightBelowRefPoint()  :  0.0, rightSub != null  ?  rightSub.getReqHeightBelowRefPoint()  :  0.0 );
 		
 		
@@ -248,14 +250,17 @@ public class ScriptLayout
 
 
 	
-	public static void allocateX(LReqBox box, LReqBoxInterface leftSuper, LReqBoxInterface leftSub, LReqBoxInterface main, LReqBoxInterface rightSuper, LReqBoxInterface rightSub, LReqBox columnBoxes[],
-			LAllocBox allocBox, LAllocBoxInterface leftSuperAlloc, LAllocBoxInterface leftSubAlloc, LAllocBoxInterface mainAlloc, LAllocBoxInterface rightSuperAlloc, LAllocBoxInterface rightSubAlloc,
+	public static void allocateX(LReqBoxInterface box, LReqBoxInterface leftSuper, LReqBoxInterface leftSub, LReqBoxInterface main, LReqBoxInterface rightSuper, LReqBoxInterface rightSub, LReqBox columnBoxes[],
+			LAllocBoxInterface allocBox, LAllocBoxInterface leftSuperAlloc, LAllocBoxInterface leftSubAlloc, LAllocBoxInterface mainAlloc, LAllocBoxInterface rightSuperAlloc, LAllocBoxInterface rightSubAlloc,
 			double columnSpacing, double rowSpacing)
 	{
 		double t;
-		if ( box.prefWidth > box.minWidth )
+		double boxReqMinWidth = box.getReqMinWidth();
+		double boxReqPrefWidth = box.getReqPrefWidth();
+		double allocAllocationX = allocBox.getAllocationX();
+		if ( boxReqPrefWidth > boxReqMinWidth )
 		{
-			t = ( allocBox.allocationX - box.minWidth )  /  ( box.prefWidth - box.minWidth );
+			t = ( allocAllocationX - boxReqMinWidth )  /  ( boxReqPrefWidth - boxReqMinWidth );
 			t = Math.max( t, 0.0 );
 			t = Math.min( t, 1.0 );
 		}
@@ -266,25 +271,25 @@ public class ScriptLayout
 		
 		LReqBox leftColumn = columnBoxes[0], mainColumn = columnBoxes[1];
 		
-		double overallWidth = box.minWidth  +  ( box.prefWidth - box.minWidth ) * t;
+		double overallWidth = boxReqMinWidth  +  ( boxReqPrefWidth - boxReqMinWidth ) * t;
 		double leftWidth = leftColumn.minWidth  +  ( leftColumn.prefWidth - leftColumn.minWidth ) * t;
 		double leftHAdvance = leftColumn.minHAdvance  +  ( leftColumn.prefHAdvance - leftColumn.minHAdvance ) * t;
 		double mainWidth = mainColumn.minWidth  +  ( mainColumn.prefWidth - mainColumn.minWidth ) * t;
 		double mainHAdvance = mainColumn.minHAdvance  +  ( mainColumn.prefHAdvance - mainColumn.minHAdvance ) * t;
 	
-		double padding = Math.max( ( allocBox.allocationX - overallWidth )  *  0.5, 0.0 );
+		double padding = Math.max( ( allocAllocationX - overallWidth )  *  0.5, 0.0 );
 		double x = padding;
 		
 		// Allocate left children
 		if ( leftSuper != null )
 		{
-			double childWidth = leftSuper.getMinWidth()  +  ( leftSuper.getPrefWidth() - leftSuper.getMinWidth() ) * t;
-			allocBox.allocateChildX( leftSuperAlloc, x  +  ( leftWidth - childWidth ), childWidth );
+			double childWidth = leftSuper.getReqMinWidth()  +  ( leftSuper.getReqPrefWidth() - leftSuper.getReqMinWidth() ) * t;
+			LAllocHelper.allocateChildX( leftSuperAlloc, x  +  ( leftWidth - childWidth ), childWidth );
 		}
 		if ( leftSub != null )
 		{
-			double childWidth = leftSub.getMinWidth()  +  ( leftSub.getPrefWidth() - leftSub.getMinWidth() ) * t;
-			allocBox.allocateChildX( leftSubAlloc, x  +  ( leftWidth - childWidth ), childWidth ); 
+			double childWidth = leftSub.getReqMinWidth()  +  ( leftSub.getReqPrefWidth() - leftSub.getReqMinWidth() ) * t;
+			LAllocHelper.allocateChildX( leftSubAlloc, x  +  ( leftWidth - childWidth ), childWidth ); 
 		}
 		
 		if ( leftSuper != null  ||  leftSub != null )
@@ -296,7 +301,7 @@ public class ScriptLayout
 		// Allocate main child
 		if ( main != null )
 		{
-			allocBox.allocateChildX( mainAlloc, x, mainWidth );
+			LAllocHelper.allocateChildX( mainAlloc, x, mainWidth );
 			x += Math.max( mainWidth, mainHAdvance )  +  columnSpacing;
 		}
 		
@@ -304,19 +309,19 @@ public class ScriptLayout
 		// Allocate right children
 		if ( rightSuper != null )
 		{
-			double childWidth = rightSuper.getMinWidth()  +  ( rightSuper.getPrefWidth() - rightSuper.getMinWidth() ) * t;
-			allocBox.allocateChildX( rightSuperAlloc, x, childWidth );
+			double childWidth = rightSuper.getReqMinWidth()  +  ( rightSuper.getReqPrefWidth() - rightSuper.getReqMinWidth() ) * t;
+			LAllocHelper.allocateChildX( rightSuperAlloc, x, childWidth );
 		}
 		if ( rightSub != null )
 		{
-			double childWidth = rightSub.getMinWidth()  +  ( rightSub.getPrefWidth() - rightSub.getMinWidth() ) * t;
-			allocBox.allocateChildX( rightSubAlloc, x, childWidth ); 
+			double childWidth = rightSub.getReqMinWidth()  +  ( rightSub.getReqPrefWidth() - rightSub.getReqMinWidth() ) * t;
+			LAllocHelper.allocateChildX( rightSubAlloc, x, childWidth ); 
 		}
 	}
 
 	
-	public static void allocateY(LReqBox box, LReqBoxInterface leftSuper, LReqBoxInterface leftSub, LReqBoxInterface main, LReqBoxInterface rightSuper, LReqBoxInterface rightSub, double rowBaselineY[],
-			LAllocBox allocBox, LAllocBoxInterface leftSuperAlloc, LAllocBoxInterface leftSubAlloc, LAllocBoxInterface mainAlloc, LAllocBoxInterface rightSuperAlloc, LAllocBoxInterface rightSubAlloc,
+	public static void allocateY(LReqBoxInterface box, LReqBoxInterface leftSuper, LReqBoxInterface leftSub, LReqBoxInterface main, LReqBoxInterface rightSuper, LReqBoxInterface rightSub, double rowBaselineY[],
+			LAllocBoxInterface allocBox, LAllocBoxInterface leftSuperAlloc, LAllocBoxInterface leftSubAlloc, LAllocBoxInterface mainAlloc, LAllocBoxInterface rightSuperAlloc, LAllocBoxInterface rightSubAlloc,
 			double columnSpacing, double rowSpacing)
 	{
 		double padding = Math.max( ( allocBox.getAllocationY() - box.getReqHeight() ) * 0.5, 0.0 );
@@ -328,11 +333,11 @@ public class ScriptLayout
 		double y = padding + superBaselineY;
 		if ( leftSuper != null )
 		{
-			allocBox.allocateChildYAsRequisition( leftSuperAlloc, leftSuper, y - leftSuper.getRefY() );
+			LAllocHelper.allocateChildYAsRequisition( leftSuperAlloc, leftSuper, y - leftSuper.getReqRefY() );
 		}
 		if ( rightSuper != null )
 		{
-			allocBox.allocateChildYAsRequisition( rightSuperAlloc, rightSuper, y - rightSuper.getRefY() );
+			LAllocHelper.allocateChildYAsRequisition( rightSuperAlloc, rightSuper, y - rightSuper.getReqRefY() );
 		}
 		
 		
@@ -340,7 +345,7 @@ public class ScriptLayout
 		y = padding + mainBaselineY;
 		if ( main != null )
 		{
-			allocBox.allocateChildYAsRequisition( mainAlloc, main, y - main.getRefY() );
+			LAllocHelper.allocateChildYAsRequisition( mainAlloc, main, y - main.getReqRefY() );
 		}
 		
 
@@ -348,11 +353,11 @@ public class ScriptLayout
 		y = padding + subBaselineY;
 		if ( leftSub != null )
 		{
-			allocBox.allocateChildYAsRequisition( leftSubAlloc, leftSub, y - leftSub.getRefY() );
+			LAllocHelper.allocateChildYAsRequisition( leftSubAlloc, leftSub, y - leftSub.getReqRefY() );
 		}
 		if ( rightSub != null )
 		{
-			allocBox.allocateChildYAsRequisition( rightSubAlloc, rightSub, y - rightSub.getRefY() );
+			LAllocHelper.allocateChildYAsRequisition( rightSubAlloc, rightSub, y - rightSub.getReqRefY() );
 		}
 	}
 

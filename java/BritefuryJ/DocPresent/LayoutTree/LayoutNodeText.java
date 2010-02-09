@@ -9,13 +9,11 @@ package BritefuryJ.DocPresent.LayoutTree;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.Util.TextVisual;
 
-public class LayoutNodeText extends ContentLeafLayoutNode
+public class LayoutNodeText extends ContentLeafLayoutNodeSharedReq
 {
 	public LayoutNodeText(DPText element)
 	{
-		super( element );
-		
-		layoutReqBox = element.getVisual().getRequisition();
+		super( element, element.getVisual().getRequisition() );
 	}
 
 	protected void updateRequisitionX()

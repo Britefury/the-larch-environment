@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import BritefuryJ.DocPresent.Layout.LReqBox;
+import BritefuryJ.DocPresent.LayoutTree.LayoutNodeParagraphDedentMarker;
 import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
 
 public class DPParagraphDedentMarker extends DPParagraphMarker
@@ -14,17 +14,14 @@ public class DPParagraphDedentMarker extends DPParagraphMarker
 	public DPParagraphDedentMarker(ElementContext context)
 	{
 		super( context );
+		
+		layoutNode = new LayoutNodeParagraphDedentMarker( this );
 	}
 	
 	public DPParagraphDedentMarker(ElementContext context, WidgetStyleSheet styleSheet)
 	{
 		super( context, styleSheet );
-	}
-
-
-
-	public void initMarkerRequisition(LReqBox reqBox)
-	{
-		reqBox.setParagraphDedentMarker();
+		
+		layoutNode = new LayoutNodeParagraphDedentMarker( this );
 	}
 }

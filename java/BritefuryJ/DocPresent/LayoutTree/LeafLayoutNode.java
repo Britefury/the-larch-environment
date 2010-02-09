@@ -53,14 +53,14 @@ public abstract class LeafLayoutNode extends LayoutNode
 	
 	
 	
-	public double getPositionInParentSpaceX()
+	public double getAllocPositionInParentSpaceX()
 	{
-		return layoutAllocBox.getPositionInParentSpaceX();
+		return layoutAllocBox.getAllocPositionInParentSpaceX();
 	}
 	
-	public double getPositionInParentSpaceY()
+	public double getAllocPositionInParentSpaceY()
 	{
-		return layoutAllocBox.getPositionInParentSpaceY();
+		return layoutAllocBox.getAllocPositionInParentSpaceY();
 	}
 	
 	public Point2 getPositionInParentSpace()

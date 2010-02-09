@@ -9,18 +9,18 @@ package BritefuryJ.DocPresent.Layout;
 
 public class FractionLayout
 {
-	public static void computeRequisitionX(LReqBox box, LReqBoxInterface numerator, LReqBoxInterface bar, LReqBoxInterface denominator, double hPadding, double vSpacing, double baselinePos)
+	public static void computeRequisitionX(LReqBoxInterface box, LReqBoxInterface numerator, LReqBoxInterface bar, LReqBoxInterface denominator, double hPadding, double vSpacing, double baselinePos)
 	{
 		double minWidth = 0.0, prefWidth = 0.0;
 		if ( numerator != null )
 		{
-			minWidth = Math.max( minWidth, numerator.getMinWidth() );
-			prefWidth = Math.max( prefWidth, numerator.getPrefWidth() );
+			minWidth = Math.max( minWidth, numerator.getReqMinWidth() );
+			prefWidth = Math.max( prefWidth, numerator.getReqPrefWidth() );
 		}
 		if ( denominator != null )
 		{
-			minWidth = Math.max( minWidth, denominator.getMinWidth() );
-			prefWidth = Math.max( prefWidth, denominator.getPrefWidth() );
+			minWidth = Math.max( minWidth, denominator.getReqMinWidth() );
+			prefWidth = Math.max( prefWidth, denominator.getReqPrefWidth() );
 		}
 
 		double padding = hPadding * 2.0;
@@ -30,7 +30,7 @@ public class FractionLayout
 		box.setRequisitionX( minWidth, prefWidth, minWidth, prefWidth );
 	}
 
-	public static void computeRequisitionY(LReqBox box, LReqBoxInterface numerator, LReqBoxInterface bar, LReqBoxInterface denominator, double hPadding, double vSpacing, double baselineOffset)
+	public static void computeRequisitionY(LReqBoxInterface box, LReqBoxInterface numerator, LReqBoxInterface bar, LReqBoxInterface denominator, double hPadding, double vSpacing, double baselineOffset)
 	{
 		double y = 0.0;
 		double height = 0.0, ascent = 0.0;
@@ -78,44 +78,45 @@ public class FractionLayout
 
 
 
-	public static void allocateX(LReqBox box, LReqBoxInterface numerator, LReqBoxInterface bar, LReqBoxInterface denominator,
-			LAllocBox boxAlloc, LAllocBoxInterface numeratorAlloc, LAllocBoxInterface barAlloc, LAllocBoxInterface denominatorAlloc, double hPadding, double vSpacing, double baselineOffset)
+	public static void allocateX(LReqBoxInterface box, LReqBoxInterface numerator, LReqBoxInterface bar, LReqBoxInterface denominator,
+			LAllocBoxInterface boxAlloc, LAllocBoxInterface numeratorAlloc, LAllocBoxInterface barAlloc, LAllocBoxInterface denominatorAlloc, double hPadding, double vSpacing, double baselineOffset)
 	{
-		double width = Math.min( Math.max( boxAlloc.allocationX, box.minWidth ), box.prefWidth );
+		double boxAllocAllocationX = boxAlloc.getAllocationX();
+		double width = Math.min( Math.max( boxAllocAllocationX, box.getReqMinWidth() ), box.getReqPrefWidth() );
 		double childrenAlloc = width - hPadding * 2.0;
 		
 		
 		double numDenomAlloc = 0.0;
 		if ( numerator != null )
 		{
-			double childWidth = Math.min( Math.max( childrenAlloc, numerator.getMinWidth() ), numerator.getPrefWidth() );
+			double childWidth = Math.min( Math.max( childrenAlloc, numerator.getReqMinWidth() ), numerator.getReqPrefWidth() );
 			numDenomAlloc = Math.max( numDenomAlloc, childWidth );
 			double childPos = Math.max( hPadding  +  ( childrenAlloc - childWidth ) * 0.5, 0.0 );
-			boxAlloc.allocateChildX( numeratorAlloc, childPos, childWidth );
+			LAllocHelper.allocateChildX( numeratorAlloc, childPos, childWidth );
 		}
 		
 		if ( denominator != null )
 		{
-			double childWidth = Math.min( Math.max( childrenAlloc, denominator.getMinWidth() ), denominator.getPrefWidth() );
+			double childWidth = Math.min( Math.max( childrenAlloc, denominator.getReqMinWidth() ), denominator.getReqPrefWidth() );
 			numDenomAlloc = Math.max( numDenomAlloc, childWidth );
 			double childPos = Math.max( hPadding  +  ( childrenAlloc - childWidth ) * 0.5, 0.0 );
-			boxAlloc.allocateChildX( denominatorAlloc, childPos, childWidth );
+			LAllocHelper.allocateChildX( denominatorAlloc, childPos, childWidth );
 		}
 
 		if ( bar != null )
 		{
-			boxAlloc.allocateChildX( barAlloc, 0.0, width );
+			LAllocHelper.allocateChildX( barAlloc, 0.0, width );
 		}
 	}
 
-	public static void allocateY(LReqBox box, LReqBoxInterface numerator, LReqBoxInterface bar, LReqBoxInterface denominator,
-			LAllocBox boxAlloc, LAllocBoxInterface numeratorAlloc, LAllocBoxInterface barAlloc, LAllocBoxInterface denominatorAlloc, double hPadding, double vSpacing, double baselineOffset)
+	public static void allocateY(LReqBoxInterface box, LReqBoxInterface numerator, LReqBoxInterface bar, LReqBoxInterface denominator,
+			LAllocBoxInterface boxAlloc, LAllocBoxInterface numeratorAlloc, LAllocBoxInterface barAlloc, LAllocBoxInterface denominatorAlloc, double hPadding, double vSpacing, double baselineOffset)
 	{
 		double y = 0.0;
 		
 		if ( numerator != null )
 		{
-			boxAlloc.allocateChildYAsRequisition( numeratorAlloc, numerator, y );
+			LAllocHelper.allocateChildYAsRequisition( numeratorAlloc, numerator, y );
 			
 			y += numerator.getReqHeight()  +  Math.max( numerator.getReqVSpacing(), vSpacing );
 		}
@@ -126,7 +127,7 @@ public class FractionLayout
 		
 		if ( bar != null )
 		{
-			boxAlloc.allocateChildYAsRequisition( barAlloc, bar, y );
+			LAllocHelper.allocateChildYAsRequisition( barAlloc, bar, y );
 			
 			y += bar.getReqHeight()  +  vSpacing;
 		}
@@ -137,7 +138,7 @@ public class FractionLayout
 		
 		if ( denominator != null )
 		{
-			boxAlloc.allocateChildYAsRequisition( denominatorAlloc, denominator, y );
+			LAllocHelper.allocateChildYAsRequisition( denominatorAlloc, denominator, y );
 		}
 	}
 }
