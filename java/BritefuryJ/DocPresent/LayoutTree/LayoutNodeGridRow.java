@@ -32,11 +32,13 @@ public class LayoutNodeGridRow extends ArrangedSequenceLayoutNode
 	{
 		refreshSubtree();
 		
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		HorizontalLayout.computeRequisitionX( layoutReqBox, getLeavesRefreshedRequisitonXBoxes(), 0.0 );
 	}
 
 	protected void updateRequisitionY()
 	{
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		GridLayout.computeRowRequisitionY( layoutReqBox, getLeavesRefreshedRequistionYBoxes(), getLeavesAlignmentFlags() );
 	}
 	
@@ -47,12 +49,13 @@ public class LayoutNodeGridRow extends ArrangedSequenceLayoutNode
 	{
 		super.updateAllocationX();
 		
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		LReqBoxInterface childBoxes[] = getLeavesRequisitionBoxes();
 		LAllocBoxInterface childAllocBoxes[] = getLeavesAllocationBoxes();
 		int childAllocFlags[] = getLeavesAlignmentFlags();
 		double prevWidth[] = getLeavesAllocationX();
 		
-		HorizontalLayout.allocateX( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, childAllocFlags, 0.0 );
+		HorizontalLayout.allocateX( layoutReqBox, childBoxes, getAllocationBox(), childAllocBoxes, childAllocFlags, 0.0 );
 		
 		refreshLeavesAllocationX( prevWidth );
 	}
@@ -63,12 +66,13 @@ public class LayoutNodeGridRow extends ArrangedSequenceLayoutNode
 	{
 		super.updateAllocationY();
 		
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		LReqBoxInterface childBoxes[] = getLeavesRequisitionBoxes();
 		LAllocBoxInterface childAllocBoxes[] = getLeavesAllocationBoxes();
 		int childAlignmentFlags[] = getLeavesAlignmentFlags();
 		LAllocV prevAllocV[] = getLeavesAllocV();
 		
-		GridLayout.allocateRowY( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, childAlignmentFlags );
+		GridLayout.allocateRowY( layoutReqBox, childBoxes, getAllocationBox(), childAllocBoxes, childAlignmentFlags );
 		
 		refreshLeavesAllocationY( prevAllocV );
 	}

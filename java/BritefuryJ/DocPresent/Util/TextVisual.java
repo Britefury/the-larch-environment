@@ -541,7 +541,7 @@ public class TextVisual
 		}
 		else
 		{
-			return new Point2( reqBox.getMinWidth() * 0.5, reqBox.getReqHeight() * 0.5 );
+			return new Point2( reqBox.getReqMinWidth() * 0.5, reqBox.getReqHeight() * 0.5 );
 		}
 	}
 	

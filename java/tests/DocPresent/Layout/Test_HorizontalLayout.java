@@ -8,6 +8,7 @@ package tests.DocPresent.Layout;
 
 import BritefuryJ.DocPresent.Layout.HorizontalLayout;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
+import BritefuryJ.DocPresent.Layout.LAllocHelper;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 
@@ -260,7 +261,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 
 		assertBoxesEqual( box, expectedBox, "PARENT BOX" );
 
-		boxAlloc.allocateX( box, 0.0, boxAllocation );
+		LAllocHelper.allocateX( boxAlloc, box, 0.0, boxAllocation );
 		HorizontalLayout.allocateX( box, children, boxAlloc, childrenAlloc, childAllocFlags, spacing );
 		for (int i = 0; i < children.length; i++)
 		{
@@ -270,11 +271,11 @@ public class Test_HorizontalLayout extends Test_Layout_base
 			}
 			assertEquals( childrenAlloc[i].getAllocationX(), expectedSize[i] );
 
-			if ( childrenAlloc[i].getPositionInParentSpaceX() != expectedPosition[i] )
+			if ( childrenAlloc[i].getAllocPositionInParentSpaceX() != expectedPosition[i] )
 			{
-				System.out.println( "Child position for " + i + " is not as expected; expected=" + expectedPosition[i] + ", result=" + childrenAlloc[i].getPositionInParentSpaceX() + ", boxAllocation=" + boxAllocation );
+				System.out.println( "Child position for " + i + " is not as expected; expected=" + expectedPosition[i] + ", result=" + childrenAlloc[i].getAllocPositionInParentSpaceX() + ", boxAllocation=" + boxAllocation );
 			}
-			assertEquals( childrenAlloc[i].getPositionInParentSpaceX(), expectedPosition[i] );
+			assertEquals( childrenAlloc[i].getAllocPositionInParentSpaceX(), expectedPosition[i] );
 		}
 	}
 	
@@ -586,7 +587,7 @@ public class Test_HorizontalLayout extends Test_Layout_base
 
 		assertBoxesEqual( box, expectedBox, "PARENT BOX" );
 
-		boxAlloc.allocateY( box, 0.0, boxAllocation );
+		LAllocHelper.allocateY( boxAlloc, box, 0.0, boxAllocation );
 		HorizontalLayout.allocateY( box, children, boxAlloc, childrenAlloc, childAllocFlags );
 		for (int i = 0; i < children.length; i++)
 		{
@@ -596,11 +597,11 @@ public class Test_HorizontalLayout extends Test_Layout_base
 			}
 			assertEquals( childrenAlloc[i].getAllocV(), expectedSize[i] );
 
-			if ( childrenAlloc[i].getPositionInParentSpaceY() != expectedPosition[i] )
+			if ( childrenAlloc[i].getAllocPositionInParentSpaceY() != expectedPosition[i] )
 			{
-				System.out.println( "Child position for " + i + " is not as expected; expected=" + expectedPosition[i] + ", result=" + childrenAlloc[i].getPositionInParentSpaceY() + ", boxAllocation=" + boxAllocation );
+				System.out.println( "Child position for " + i + " is not as expected; expected=" + expectedPosition[i] + ", result=" + childrenAlloc[i].getAllocPositionInParentSpaceY() + ", boxAllocation=" + boxAllocation );
 			}
-			assertEquals( childrenAlloc[i].getPositionInParentSpaceY(), expectedPosition[i] );
+			assertEquals( childrenAlloc[i].getAllocPositionInParentSpaceY(), expectedPosition[i] );
 		}
 	}
 	

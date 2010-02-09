@@ -42,6 +42,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 	{
 		refreshSubtree();
 		
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		ParagraphLayout.computeRequisitionX( layoutReqBox, getLeavesRefreshedRequisitonXBoxes(), getIndentation(), getSpacing() );
 	}
 
@@ -52,6 +53,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 			child.getLayoutNode().refreshRequisitionY();
 		}
 
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		ParagraphLayout.computeRequisitionY( layoutReqBox, lines, getLineSpacing() );
 	}
 	
@@ -61,12 +63,13 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 	{
 		super.updateAllocationX();
 		
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		LReqBoxInterface childBoxes[] = getLeavesRequisitionBoxes();
 		LAllocBoxInterface childAllocBoxes[] = getLeavesAllocationBoxes();
 		int childAllocFlags[] = getLeavesAlignmentFlags();
 		double prevWidth[] = getLeavesAllocationX();
 		
-		lines = ParagraphLayout.allocateX( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, childAllocFlags, getIndentation(), getSpacing() );
+		lines = ParagraphLayout.allocateX( layoutReqBox, childBoxes, getAllocationBox(), childAllocBoxes, childAllocFlags, getIndentation(), getSpacing() );
 		
 		refreshLeavesAllocationX( prevWidth );
 	}
@@ -77,6 +80,8 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 	{
 		super.updateAllocationY();
 		
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
+
 		LAllocV prevAllocVs[][] = new LAllocV[lines.length][];
 		for (int y = 0; y < lines.length; y++)
 		{
@@ -88,14 +93,14 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 			}
 		}
 		
-		ParagraphLayout.allocateY( layoutReqBox, layoutAllocBox, lines, getSpacing() );
+		ParagraphLayout.allocateY( layoutReqBox, getAllocationBox(), lines, getSpacing() );
 		
 		for (int y = 0; y < lines.length; y++)
 		{
 			LAllocBoxInterface[] lineChildren = lines[y].getChildAllocBoxes();
 			for (int x = 0; x < lineChildren.length; x++)
 			{
-				lineChildren[x].getLayoutNode().refreshAllocationY( prevAllocVs[y][x] );
+				lineChildren[x].getAllocLayoutNode().refreshAllocationY( prevAllocVs[y][x] );
 			}
 		}
 	}
@@ -118,8 +123,8 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 			for (int i = 0; i < lines.length - 1; i++)
 			{
 				ParagraphLayout.Line lineJ = lines[i+1];
-				double iUpperY = lineI.getLineAllocBox().getPositionInParentSpaceY() + lineI.getLineAllocBox().getAllocationY();
-				double jLowerY = lineJ.getLineAllocBox().getPositionInParentSpaceY();
+				double iUpperY = lineI.getLineAllocBox().getAllocPositionInParentSpaceY() + lineI.getLineAllocBox().getAllocationY();
+				double jLowerY = lineJ.getLineAllocBox().getAllocPositionInParentSpaceY();
 				
 				double midY = ( iUpperY + jLowerY ) * 0.5;
 				
@@ -144,7 +149,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 		}
 		else if ( children.length == 1 )
 		{
-			return children[0].getLayoutNode().getElement();
+			return children[0].getAllocLayoutNode().getElement();
 		}
 		else
 		{
@@ -152,20 +157,20 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 			for (int i = 0; i < children.length - 1; i++)
 			{
 				LAllocBoxInterface childJ = children[i+1];
-				double iUpperX = childI.getPositionInParentSpaceX() + childI.getAllocationX();
-				double jLowerX = childJ.getPositionInParentSpaceX();
+				double iUpperX = childI.getAllocPositionInParentSpaceX() + childI.getAllocationX();
+				double jLowerX = childJ.getAllocPositionInParentSpaceX();
 				
 				double midX = ( iUpperX + jLowerX ) * 0.5;
 				
 				if ( localPos.x < midX )
 				{
-					return childI.getLayoutNode().getElement();
+					return childI.getAllocLayoutNode().getElement();
 				}
 				
 				childI = childJ;
 			}
 			
-			return children[children.length-1].getLayoutNode().getElement();
+			return children[children.length-1].getAllocLayoutNode().getElement();
 		}
 	}
 
@@ -266,9 +271,9 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 			LAllocBoxInterface startBox = lineChildAllocBoxes[startInLine];
 			LAllocBoxInterface endBox = lineChildAllocBoxes[endInLine];
 			LAllocBox lineBox = line.getLineAllocBox();
-			double xStart = startBox.getPositionInParentSpaceX();
-			double xEnd = endBox.getPositionInParentSpaceX()  +  endBox.getAllocationX();
-			double yStart = lineBox.getPositionInParentSpaceY();
+			double xStart = startBox.getAllocPositionInParentSpaceX();
+			double xEnd = endBox.getAllocPositionInParentSpaceX()  +  endBox.getAllocationX();
+			double yStart = lineBox.getAllocPositionInParentSpaceY();
 			double yEnd = yStart + lineBox.getAllocationY();
 			AABox2 box = new AABox2( xStart, yStart, xEnd, yEnd );
 			return new AABox2[] { box };
@@ -282,9 +287,9 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 			startInLine = Math.min( startInLine, startLine.getChildAllocBoxes().length - 1 );
 			LAllocBoxInterface startChildBox = startLine.getChildAllocBoxes()[startInLine];
 			LAllocBox startLineBox = startLine.getLineAllocBox();
-			double xStart = startChildBox.getPositionInParentSpaceX();
+			double xStart = startChildBox.getAllocPositionInParentSpaceX();
 			double xEnd = startLineBox.getAllocationX();
-			double yStart = startLineBox.getPositionInParentSpaceY();
+			double yStart = startLineBox.getAllocPositionInParentSpaceY();
 			double yEnd = yStart + startLineBox.getAllocationY();
 			AABox2 startBox = new AABox2( xStart, yStart, xEnd, yEnd );
 
@@ -294,8 +299,8 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 			LAllocBoxInterface endChildBox = endLine.getChildAllocBoxes()[endInLine];
 			LAllocBox endLineBox = endLine.getLineAllocBox();
 			xStart = 0.0;
-			xEnd = endChildBox.getPositionInParentSpaceX() + endChildBox.getAllocationX();
-			yStart = endLineBox.getPositionInParentSpaceY();
+			xEnd = endChildBox.getAllocPositionInParentSpaceX() + endChildBox.getAllocationX();
+			yStart = endLineBox.getAllocPositionInParentSpaceY();
 			yEnd = yStart + endLineBox.getAllocationY();
 			AABox2 endBox = new AABox2( xStart, yStart, xEnd, yEnd );
 			
@@ -308,7 +313,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 				LAllocBox lineBox = lines[i].getLineAllocBox();
 				xStart = 0.0;
 				xEnd = lineBox.getAllocationX();
-				yStart = lineBox.getPositionInParentSpaceY();
+				yStart = lineBox.getAllocPositionInParentSpaceY();
 				yEnd = yStart + lineBox.getAllocationY();
 				boxes[j++] = new AABox2( xStart, yStart, xEnd, yEnd );
 			}
@@ -376,7 +381,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 		DPContentLeaf closestNode = null;
 		for (LAllocBoxInterface allocBox: line.getChildAllocBoxes())
 		{
-			DPWidget item = allocBox.getLayoutNode().getElement();
+			DPWidget item = allocBox.getAllocLayoutNode().getElement();
 			
 			AABox2 bounds = item.getLocalAABox();
 			double lower = item.getLocalPointRelativeToRoot( bounds.getLower() ).x;

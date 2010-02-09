@@ -393,7 +393,7 @@ public class Test_TableLayout extends Test_Layout_base
 			rowAllocs[i] = new LAllocBox( null );
 		}
 
-		boxAlloc.setAllocationY( allocY );
+		boxAlloc.setAllocationY( allocY, allocY * 0.5 );
 		TableLayout.allocateY( box, rowBoxes, children, boxAlloc, rowAllocs, childrenAllocs, packingParams, childAlignmentFlags, numColumns, numRows, columnSpacing, rowSpacing, bColumnExpand, bRowExpand );
 		
 		

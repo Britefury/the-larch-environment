@@ -6,26 +6,45 @@
 //##************************
 package BritefuryJ.DocPresent.LayoutTree;
 
-import BritefuryJ.DocPresent.DPWhitespace;
+import java.util.HashMap;
 
-public class LayoutNodeWhitespace extends ContentLeafLayoutNode
+import BritefuryJ.DocPresent.DPWhitespace;
+import BritefuryJ.DocPresent.Layout.LReqBox;
+
+public class LayoutNodeWhitespace extends ContentLeafLayoutNodeSharedReq
 {
+	private static HashMap<Double, LReqBox> reqBoxes = new HashMap<Double, LReqBox>();
+	
+	
+	private static LReqBox getWhitespaceReqBox(double width)
+	{
+		LReqBox box = reqBoxes.get( width );
+		
+		if ( box == null )
+		{
+			box = new LReqBox();
+			box.setRequisitionX( width, width );
+			reqBoxes.put( width, box );
+		}
+
+		return box;
+	}
+
+
+
+
 	public LayoutNodeWhitespace(DPWhitespace element)
 	{
-		super( element );
+		super( element, getWhitespaceReqBox( element.getWhitespaceWidth() ) );
 	}
 
 	
 
 	protected void updateRequisitionX()
 	{
-		DPWhitespace whitespace = (DPWhitespace)element;
-		double width = whitespace.getWhitespaceWidth();
-		layoutReqBox.setRequisitionX( width, width );
 	}
 
 	protected void updateRequisitionY()
 	{
-		layoutReqBox.clearRequisitionY();
 	}
 }

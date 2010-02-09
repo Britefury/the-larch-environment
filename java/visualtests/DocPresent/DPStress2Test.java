@@ -33,6 +33,7 @@ public class DPStress2Test
 	// [4] Minor optimisations				A			10240	69.0MB				43.3MB				0.9MB				0.653s					0.566s
 	// [5] Pointer refactor				A			10240	68.8MB				43.9MB				1.0MB				0.639s					0.585s
 	// [6] As of 2010-01-30				B			10240	89.1MB				54.7MB				1.9MB				0.620s					0.334s
+	// [7] Layout tree refactor				B			10240	95.4MB				60.2MB				1.9MB				0.530s					0.563s
 	//
 	//
 	// States:
@@ -42,7 +43,8 @@ public class DPStress2Test
 	// [3] All ElementTree functionality merged into document presentation system
 	// [4] Minor optimisations - pointer containment (pointer within bounds of element) moved to root (DPPresentationArea)
 	// [5] Pointer refactor - moved all pointer containment state out of the widget tree and into the input system
-	// [9] As of 2010-01-30; no significant changes, different platform
+	// [6] As of 2010-01-30; no significant changes, different platform
+	// [7] Refactored layout system into separate layout tree
 	//
 	// Platform A:
 	//	CPU: Intel Core Duo 1.86GHz

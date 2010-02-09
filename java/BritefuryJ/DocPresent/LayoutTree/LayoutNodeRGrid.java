@@ -16,6 +16,7 @@ import BritefuryJ.DocPresent.WidgetFilter;
 import BritefuryJ.DocPresent.Layout.GridLayout;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
+import BritefuryJ.DocPresent.Layout.LAllocHelper;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
 import BritefuryJ.DocPresent.StyleSheets.TableStyleSheet;
@@ -40,6 +41,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 		
 		refreshSubtree();
 		
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		int numRows = leaves.length;
 		int numColumns = grid.width();
 		LReqBoxInterface childBoxes[][] = new LReqBoxInterface[numRows][];
@@ -66,7 +68,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 			if ( child instanceof DPGridRow )
 			{
 				DPGridRow row = (DPGridRow)child;
-				((LayoutNodeGridRow)row.getLayoutNode()).layoutReqBox.setRequisitionX( layoutReqBox );
+				((LayoutNodeGridRow)row.getLayoutNode()).getRequisitionBox().setRequisitionX( layoutReqBox );
 			}
 		}
 
@@ -79,6 +81,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 
 	protected void updateRequisitionY()
 	{
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		rowBoxes = getLeavesRefreshedRequistionYBoxes();
 		
 		GridLayout.computeRequisitionY( layoutReqBox, rowBoxes, getRowSpacing() );
@@ -98,6 +101,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 	{
 		super.updateAllocationX();
 		
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPRGrid grid = (DPRGrid)element;
 		
 		int numRows = leaves.length;
@@ -117,7 +121,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 				prevWidths[i] = rowLayoutNode.getLeavesAllocationX();
 				childAlignmentFlags[i] = rowLayoutNode.getLeavesAlignmentFlags();
 				// Copy grid x-allocation to row x-allocation
-				rowLayoutNode.layoutAllocBox.allocateX( layoutAllocBox );
+				LAllocHelper.allocateX( rowLayoutNode.getAllocationBox(), getAllocationBox() );
 			}
 			else
 			{
@@ -129,7 +133,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 			}
 		}
 
-		GridLayout.allocateX( layoutReqBox, columnBoxes, childBoxes, layoutAllocBox, columnAllocBoxes, childAllocBoxes, childAlignmentFlags, grid.width(), numRows,
+		GridLayout.allocateX( layoutReqBox, columnBoxes, childBoxes, getAllocationBox(), columnAllocBoxes, childAllocBoxes, childAlignmentFlags, grid.width(), numRows,
 				getColumnSpacing(), getRowSpacing(), getColumnExpand(), getRowExpand() );
 		
 		for (int r = 0; r < leaves.length; r++)
@@ -159,11 +163,12 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 	{
 		super.updateAllocationY( );
 		
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		LReqBoxInterface childBoxes[] = getLeavesRequisitionBoxes();
 		LAllocBoxInterface childAllocBoxes[] = getLeavesAllocationBoxes();
 		LAllocV prevAllocVs[] = getLeavesAllocV();
 		
-		GridLayout.allocateY( layoutReqBox, childBoxes, layoutAllocBox, childAllocBoxes, getRowSpacing(), getRowExpand() );
+		GridLayout.allocateY( layoutReqBox, childBoxes, getAllocationBox(), childAllocBoxes, getRowSpacing(), getRowExpand() );
 		
 		int i = 0;
 		for (DPWidget child: leaves)

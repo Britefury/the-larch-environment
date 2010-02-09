@@ -11,7 +11,9 @@ import java.util.List;
 import BritefuryJ.DocPresent.DPMathRoot;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.WidgetFilter;
+import BritefuryJ.DocPresent.Layout.LAllocHelper;
 import BritefuryJ.DocPresent.Layout.LAllocV;
+import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
 import BritefuryJ.DocPresent.StyleSheets.MathRootStyleSheet;
 import BritefuryJ.Math.Point2;
 
@@ -25,6 +27,7 @@ public class LayoutNodeMathRoot extends ArrangedLayoutNode
 	
 	protected void updateRequisitionX()
 	{
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPMathRoot mathRoot = (DPMathRoot)element;
 		DPWidget child = mathRoot.getChild();
 		if ( child != null )
@@ -42,6 +45,7 @@ public class LayoutNodeMathRoot extends ArrangedLayoutNode
 
 	protected void updateRequisitionY()
 	{
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPMathRoot mathRoot = (DPMathRoot)element;
 		DPWidget child = mathRoot.getChild();
 		if ( child != null )
@@ -70,7 +74,7 @@ public class LayoutNodeMathRoot extends ArrangedLayoutNode
 			LayoutNode childLayout = child.getLayoutNode();
 			double prevWidth = childLayout.getAllocationBox().getAllocationX();
 			double offset = s.getGlyphWidth();
-			layoutAllocBox.allocateChildXAligned( childLayout.getAllocationBox(), childLayout.getRequisitionBox(), child.getAlignmentFlags(), offset, layoutAllocBox.getAllocationX() - offset );
+			LAllocHelper.allocateChildXAligned( childLayout.getAllocationBox(), childLayout.getRequisitionBox(), child.getAlignmentFlags(), offset, getAllocationBox().getAllocationX() - offset );
 			childLayout.refreshAllocationX( prevWidth );
 		}
 	}
@@ -86,7 +90,7 @@ public class LayoutNodeMathRoot extends ArrangedLayoutNode
 			LayoutNode childLayout = child.getLayoutNode();
 			LAllocV prevAllocV = childLayout.getAllocationBox().getAllocV();
 			double offset = s.getBarSpacing() + s.getThickness();
-			layoutAllocBox.allocateChildYAligned( childLayout.getAllocationBox(), childLayout.getRequisitionBox(), child.getAlignmentFlags(), offset, layoutAllocBox.getAllocV().borderY( offset, 0.0 ) );
+			LAllocHelper.allocateChildYAligned( childLayout.getAllocationBox(), childLayout.getRequisitionBox(), child.getAlignmentFlags(), offset, getAllocationBox().getAllocV().borderY( offset, 0.0 ) );
 			childLayout.refreshAllocationY( prevAllocV );
 		}
 	}

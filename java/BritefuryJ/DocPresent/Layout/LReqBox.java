@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent.Layout;
 
 
 
-public class LReqBox extends LReqBoxInterface
+public class LReqBox implements LReqBoxInterface
 {
 	protected static double EPSILON = 1.0e-9;
 	protected static double ONE_MINUS_EPSILON = 1.0 - EPSILON;
@@ -68,50 +68,60 @@ public class LReqBox extends LReqBoxInterface
 	}
 
 	
-	private LReqBox(LReqBox box)
+	public LReqBox(LReqBoxInterface box)
 	{
-		minWidth = box.minWidth;
-		prefWidth = box.prefWidth;
-		minHAdvance = box.minHAdvance;
-		prefHAdvance = box.prefHAdvance;
-		reqHeight = box.reqHeight;
-		reqVSpacing = box.reqVSpacing;
-		refY = box.refY;
-		flags = box.flags;
-		lineBreakCost = box.lineBreakCost;
+		minWidth = box.getReqMinWidth();
+		prefWidth = box.getReqPrefWidth();
+		minHAdvance = box.getReqMinHAdvance();
+		prefHAdvance = box.getReqPrefHAdvance();
+		reqHeight = box.getReqHeight();
+		reqVSpacing = box.getReqVSpacing();
+		refY = box.getReqRefY();
+		
+		flags = 0;
+		setFlag( FLAG_LINEBREAK, box.isReqLineBreak() );
+		setFlag( FLAG_PARAGRAPH_INDENT, box.isReqParagraphIndentMarker() );
+		setFlag( FLAG_PARAGRAPH_DEDENT, box.isReqParagraphDedentMarker() );
+
+		lineBreakCost = box.getReqLineBreakCost();
 	}
 	
-	private LReqBox(LReqBox box, double scale)
+	public LReqBox(LReqBoxInterface box, double scale)
 	{
-		minWidth = box.minWidth * scale;
-		prefWidth = box.prefWidth * scale;
-		minHAdvance = box.minHAdvance * scale;
-		prefHAdvance = box.prefHAdvance * scale;
-		reqHeight = box.reqHeight * scale;
-		reqVSpacing = box.reqVSpacing * scale;
-		refY = box.refY * scale;
-		flags = box.flags;
-		lineBreakCost = box.lineBreakCost;
+		minWidth = box.getReqMinWidth() * scale;
+		prefWidth = box.getReqPrefWidth() * scale;
+		minHAdvance = box.getReqMinHAdvance() * scale;
+		prefHAdvance = box.getReqPrefHAdvance() * scale;
+		reqHeight = box.getReqHeight() * scale;
+		reqVSpacing = box.getReqVSpacing() * scale;
+		refY = box.getReqRefY() * scale;
+
+		flags = 0;
+		setFlag( FLAG_LINEBREAK, box.isReqLineBreak() );
+		setFlag( FLAG_PARAGRAPH_INDENT, box.isReqParagraphIndentMarker() );
+		setFlag( FLAG_PARAGRAPH_DEDENT, box.isReqParagraphDedentMarker() );
+
+		lineBreakCost = box.getReqLineBreakCost();
 	}
 	
 	
 	
-	public double getMinWidth()
+	public double getReqMinWidth()
 	{
 		return minWidth;
 	}
 	
-	public double getPrefWidth()
+	public double getReqPrefWidth()
 	{
 		return prefWidth;
 	}
 	
-	public double getMinHAdvance()
+	public double getReqMinHAdvance()
 	{
 		return minHAdvance;
 	}
 	
-	public double getPrefHAdvance()
+	public double getReqPrefHAdvance()
 	{
 		return prefHAdvance;
 	}
@@ -127,7 +137,7 @@ public class LReqBox extends LReqBoxInterface
 		return reqVSpacing;
 	}
 	
-	public double getRefY()
+	public double getReqRefY()
 	{
 		return refY;
 	}
@@ -182,10 +192,10 @@ public class LReqBox extends LReqBoxInterface
 	
 	public void setRequisitionX(LReqBoxInterface box)
 	{
-		this.minWidth = box.getMinWidth(); 
-		this.prefWidth = box.getPrefWidth();
-		this.minHAdvance = box.getMinHAdvance(); 
-		this.prefHAdvance = box.getPrefHAdvance();
+		this.minWidth = box.getReqMinWidth(); 
+		this.prefWidth = box.getReqPrefWidth();
+		this.minHAdvance = box.getReqMinHAdvance(); 
+		this.prefHAdvance = box.getReqPrefHAdvance();
 	}
 	
 	
@@ -208,14 +218,14 @@ public class LReqBox extends LReqBoxInterface
 	{
 		reqHeight = reqBox.getReqHeight();
 		reqVSpacing = reqBox.getReqVSpacing();
-		refY = reqBox.getRefY();
+		refY = reqBox.getReqRefY();
 	}
 	
 	
 	public void maxRequisitionX(LReqBoxInterface box)
 	{
-		setRequisitionX( Math.max( minWidth, box.getMinWidth() ), Math.max( prefWidth, box.getPrefWidth() ),
-				Math.max( minHAdvance, box.getMinHAdvance() ), Math.max( prefHAdvance, box.getPrefHAdvance() ) );
+		setRequisitionX( Math.max( minWidth, box.getReqMinWidth() ), Math.max( prefWidth, box.getReqPrefWidth() ),
+				Math.max( minHAdvance, box.getReqMinHAdvance() ), Math.max( prefHAdvance, box.getReqPrefHAdvance() ) );
 	}
 	
 	
@@ -240,12 +250,12 @@ public class LReqBox extends LReqBoxInterface
 	}
 	
 	
-	public boolean isParagraphIndentMarker()
+	public boolean isReqParagraphIndentMarker()
 	{
 		return getFlag( FLAG_PARAGRAPH_INDENT );
 	}
 	
-	public boolean isParagraphDedentMarker()
+	public boolean isReqParagraphDedentMarker()
 	{
 		return getFlag( FLAG_PARAGRAPH_DEDENT );
 	}
@@ -344,7 +354,7 @@ public class LReqBox extends LReqBoxInterface
 		return new LReqBox( this );
 	}
 	
-	public LReqBox scaled(double scale)
+	public LReqBox scaledRequisition(double scale)
 	{
 		return new LReqBox( this, scale );
 	}
@@ -359,12 +369,12 @@ public class LReqBox extends LReqBoxInterface
 		return b;
 	}
 	
-	public boolean isLineBreak()
+	public boolean isReqLineBreak()
 	{
 		return getFlag( FLAG_LINEBREAK );
 	}
 	
-	public int getLineBreakCost()
+	public int getReqLineBreakCost()
 	{
 		return lineBreakCost;
 	}

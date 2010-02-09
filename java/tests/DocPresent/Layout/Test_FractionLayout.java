@@ -8,6 +8,7 @@ package tests.DocPresent.Layout;
 
 import BritefuryJ.DocPresent.Layout.FractionLayout;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
+import BritefuryJ.DocPresent.Layout.LAllocHelper;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 
 public class Test_FractionLayout extends Test_Layout_base
@@ -73,11 +74,11 @@ public class Test_FractionLayout extends Test_Layout_base
 		LAllocBox allocBox = new LAllocBox( null );
 		LAllocBox numAlloc = new LAllocBox( null ), barAlloc = new LAllocBox( null ), denomAlloc = new LAllocBox( null );
 		FractionLayout.computeRequisitionX( box, numerator, bar, denominator, hPadding, vSpacing, baselinePos );
-		allocBox.allocateX( box, 0.0, allocX );
+		LAllocHelper.allocateX( allocBox, box, 0.0, allocX );
 		FractionLayout.allocateX( box, numerator, bar, denominator, allocBox, numAlloc, barAlloc, denomAlloc, hPadding, vSpacing, baselinePos );
 
 		FractionLayout.computeRequisitionY( box, numerator, bar, denominator, hPadding, vSpacing, baselinePos );
-		allocBox.allocateY( box, 0.0, allocY );
+		LAllocHelper.allocateY( allocBox, box, 0.0, allocY );
 		FractionLayout.allocateY( box, numerator, bar, denominator, allocBox, numAlloc, barAlloc, denomAlloc, hPadding, vSpacing, baselinePos );
 
 		

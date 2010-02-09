@@ -7,6 +7,7 @@
 package tests.DocPresent.Layout;
 
 import BritefuryJ.DocPresent.Layout.LAllocBox;
+import BritefuryJ.DocPresent.Layout.LAllocHelper;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.ParagraphLayout;
 
@@ -187,7 +188,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		
 		assertBoxesEqual( box, expectedBox, "PARENT BOX" );
 
-		boxAlloc.allocateX( box, 0.0, boxAllocation );
+		LAllocHelper.allocateX( boxAlloc, box, 0.0, boxAllocation );
 		ParagraphLayout.allocateX( box, children, boxAlloc, childrenAlloc, childAllocFlags, indentation, hSpacing );
 		for (int i = 0; i < children.length; i++)
 		{
@@ -197,11 +198,11 @@ public class Test_ParagraphLayout extends Test_Layout_base
 			}
 			assertEquals( childrenAlloc[i].getAllocationX(), expectedSize[i] );
 
-			if ( childrenAlloc[i].getPositionInParentSpaceX() != expectedPosition[i] )
+			if ( childrenAlloc[i].getAllocPositionInParentSpaceX() != expectedPosition[i] )
 			{
-				System.out.println( "Child position for " + i + " is not as expected; expected=" + expectedPosition[i] + ", result=" + childrenAlloc[i].getPositionInParentSpaceX() + ", boxAllocation=" + boxAllocation );
+				System.out.println( "Child position for " + i + " is not as expected; expected=" + expectedPosition[i] + ", result=" + childrenAlloc[i].getAllocPositionInParentSpaceX() + ", boxAllocation=" + boxAllocation );
 			}
-			assertEquals( childrenAlloc[i].getPositionInParentSpaceX(), expectedPosition[i] );
+			assertEquals( childrenAlloc[i].getAllocPositionInParentSpaceX(), expectedPosition[i] );
 		}
 	}
 	
@@ -315,7 +316,7 @@ public class Test_ParagraphLayout extends Test_Layout_base
 		
 		// X
 		ParagraphLayout.computeRequisitionX( box, children, indentation, hSpacing );
-		boxAlloc.allocateX( box, 0.0, boxAllocation );
+		LAllocHelper.allocateX( boxAlloc, box, 0.0, boxAllocation );
 		ParagraphLayout.Line lines[] = ParagraphLayout.allocateX( box, children, boxAlloc, childrenAlloc, childAllocFlags, indentation, hSpacing );
 		
 		// Y
@@ -339,17 +340,17 @@ public class Test_ParagraphLayout extends Test_Layout_base
 			assertEquals( childrenAlloc[i].getAllocationY(), expectedSize[i*2+1] );
 
 			
-			if ( childrenAlloc[i].getPositionInParentSpaceX() != expectedPosition[i*2] )
+			if ( childrenAlloc[i].getAllocPositionInParentSpaceX() != expectedPosition[i*2] )
 			{
-				System.out.println( "Child position X for " + i + " is not as expected; expected=" + expectedPosition[i*2] + ", result=" + childrenAlloc[i].getPositionInParentSpaceX() );
+				System.out.println( "Child position X for " + i + " is not as expected; expected=" + expectedPosition[i*2] + ", result=" + childrenAlloc[i].getAllocPositionInParentSpaceX() );
 			}
-			assertEquals( childrenAlloc[i].getPositionInParentSpaceX(), expectedPosition[i*2] );
+			assertEquals( childrenAlloc[i].getAllocPositionInParentSpaceX(), expectedPosition[i*2] );
 			
-			if ( childrenAlloc[i].getPositionInParentSpaceY() != expectedPosition[i*2+1] )
+			if ( childrenAlloc[i].getAllocPositionInParentSpaceY() != expectedPosition[i*2+1] )
 			{
-				System.out.println( "Child position Y for " + i + " is not as expected; expected=" + expectedPosition[i*2+1] + ", result=" + childrenAlloc[i].getPositionInParentSpaceY() );
+				System.out.println( "Child position Y for " + i + " is not as expected; expected=" + expectedPosition[i*2+1] + ", result=" + childrenAlloc[i].getAllocPositionInParentSpaceY() );
 			}
-			assertEquals( childrenAlloc[i].getPositionInParentSpaceY(), expectedPosition[i*2+1] );
+			assertEquals( childrenAlloc[i].getAllocPositionInParentSpaceY(), expectedPosition[i*2+1] );
 		}
 	}
 	

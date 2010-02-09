@@ -68,6 +68,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 
 	protected void updateRequisitionX()
 	{
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPFraction frac = (DPFraction)element;
 		double childScale = getChildScale();
 		
@@ -77,7 +78,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 			DPWidget child = frac.getWrappedChild( i );
 			if ( i != BAR )
 			{
-				boxes[i] = child != null  ?  child.getLayoutNode().refreshRequisitionX().scaled( childScale )  :  null;
+				boxes[i] = child != null  ?  child.getLayoutNode().refreshRequisitionX().scaledRequisition( childScale )  :  null;
 			}
 			else
 			{
@@ -90,6 +91,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 
 	protected void updateRequisitionY()
 	{
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPFraction frac = (DPFraction)element;
 		double childScale = getChildScale();
 		
@@ -99,7 +101,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 			DPWidget child = frac.getWrappedChild( i );
 			if ( i != BAR )
 			{
-				boxes[i] = child != null  ?  child.getLayoutNode().refreshRequisitionY().scaled( childScale )  :  null;
+				boxes[i] = child != null  ?  child.getLayoutNode().refreshRequisitionY().scaledRequisition( childScale )  :  null;
 			}
 			else
 			{
@@ -116,6 +118,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 	{
 		super.updateAllocationX( );
 		
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPFraction frac = (DPFraction)element;
 		double childScale = getChildScale();
 		
@@ -127,7 +130,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 			DPWidget child = frac.getWrappedChild( i );
 			if ( i != BAR )
 			{
-				reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox().scaled( childScale )  :  null;
+				reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox().scaledRequisition( childScale )  :  null;
 			}
 			else
 			{
@@ -139,7 +142,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 		
 
 		FractionLayout.allocateX( layoutReqBox, reqBoxes[NUMERATOR], reqBoxes[BAR], reqBoxes[DENOMINATOR],
-				layoutAllocBox, allocBoxes[NUMERATOR], allocBoxes[BAR], allocBoxes[DENOMINATOR], 
+				getAllocationBox(), allocBoxes[NUMERATOR], allocBoxes[BAR], allocBoxes[DENOMINATOR], 
 				getHPadding(), getVSpacing(), getYOffset() );
 		
 		for (int i = 0; i < NUMCHILDREN; i++)
@@ -161,6 +164,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 	{
 		super.updateAllocationY( );
 		
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPFraction frac = (DPFraction)element;
 		double childScale = getChildScale();
 		
@@ -172,7 +176,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 			DPWidget child = frac.getWrappedChild( i );
 			if ( i != BAR )
 			{
-				reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox().scaled( childScale )  :  null;
+				reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox().scaledRequisition( childScale )  :  null;
 			}
 			else
 			{
@@ -184,7 +188,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 
 
 		FractionLayout.allocateY( layoutReqBox, reqBoxes[NUMERATOR], reqBoxes[BAR], reqBoxes[DENOMINATOR],
-				layoutAllocBox, allocBoxes[NUMERATOR], allocBoxes[BAR], allocBoxes[DENOMINATOR], 
+				getAllocationBox(), allocBoxes[NUMERATOR], allocBoxes[BAR], allocBoxes[DENOMINATOR], 
 				getHPadding(), getVSpacing(), getYOffset() );
 		
 		for (int i = 0; i < NUMCHILDREN; i++)

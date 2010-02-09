@@ -11,7 +11,9 @@ import java.util.List;
 import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.WidgetFilter;
+import BritefuryJ.DocPresent.Layout.LAllocHelper;
 import BritefuryJ.DocPresent.Layout.LAllocV;
+import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
 import BritefuryJ.Math.Point2;
 
 public class LayoutNodeBin extends ArrangedLayoutNode
@@ -24,6 +26,7 @@ public class LayoutNodeBin extends ArrangedLayoutNode
 	
 	protected void updateRequisitionX()
 	{
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPBin bin = (DPBin)element;
 		DPWidget child = bin.getChild();
 		if ( child != null )
@@ -38,6 +41,7 @@ public class LayoutNodeBin extends ArrangedLayoutNode
 
 	protected void updateRequisitionY()
 	{
+		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPBin bin = (DPBin)element;
 		DPWidget child = bin.getChild();
 		if ( child != null )
@@ -60,7 +64,7 @@ public class LayoutNodeBin extends ArrangedLayoutNode
 		{
 			LayoutNode childLayout = child.getLayoutNode();
 			double prevWidth = childLayout.getAllocationBox().getAllocationX();
-			layoutAllocBox.allocateChildXAligned( childLayout.getAllocationBox(), childLayout.getRequisitionBox(), child.getAlignmentFlags(), 0.0, layoutAllocBox.getAllocationX() );
+			LAllocHelper.allocateChildXAligned( childLayout.getAllocationBox(), childLayout.getRequisitionBox(), child.getAlignmentFlags(), 0.0, getAllocationBox().getAllocationX() );
 			childLayout.refreshAllocationX( prevWidth );
 		}
 	}
@@ -73,7 +77,7 @@ public class LayoutNodeBin extends ArrangedLayoutNode
 		{
 			LayoutNode childLayout = child.getLayoutNode();
 			LAllocV prevAllocV = childLayout.getAllocationBox().getAllocV();
-			layoutAllocBox.allocateChildYAligned( childLayout.getAllocationBox(), childLayout.getRequisitionBox(), child.getAlignmentFlags(), 0.0, layoutAllocBox.getAllocV() );
+			LAllocHelper.allocateChildYAligned( childLayout.getAllocationBox(), childLayout.getRequisitionBox(), child.getAlignmentFlags(), 0.0, getAllocationBox().getAllocV() );
 			childLayout.refreshAllocationY( prevAllocV );
 		}
 	}

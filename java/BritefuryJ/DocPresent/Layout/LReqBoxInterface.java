@@ -6,23 +6,40 @@
 //##************************
 package BritefuryJ.DocPresent.Layout;
 
-public abstract class LReqBoxInterface
+public interface LReqBoxInterface
 {
-	public abstract double getMinWidth();
-	public abstract double getPrefWidth();
-	public abstract double getMinHAdvance();
-	public abstract double getPrefHAdvance();
+	public abstract double getReqMinWidth();
+	public abstract double getReqPrefWidth();
+	public abstract double getReqMinHAdvance();
+	public abstract double getReqPrefHAdvance();
 	
 	public abstract double getReqHeight();
 	public abstract double getReqVSpacing();
 
-	public abstract double getRefY();
+	public abstract double getReqRefY();
 	public abstract double getReqHeightBelowRefPoint();
 	
-	public abstract boolean isLineBreak();
-	public abstract boolean isParagraphIndentMarker();
-	public abstract boolean isParagraphDedentMarker();
-	public abstract int getLineBreakCost();
+	public abstract boolean isReqLineBreak();
+	public abstract boolean isReqParagraphIndentMarker();
+	public abstract boolean isReqParagraphDedentMarker();
+	public abstract int getReqLineBreakCost();
 	
-	public abstract LReqBoxInterface scaled(double scale);
+	public abstract LReqBoxInterface scaledRequisition(double scale);
+
+
+	public abstract void clearRequisitionX();
+	public abstract void clearRequisitionY();
+	
+	public abstract void setRequisitionX(double width, double hAdvance);
+	public abstract void setRequisitionX(double minWidth, double prefWidth, double minHAdvance, double prefHAdvance);
+	public abstract void setRequisitionX(LReqBoxInterface box);
+
+	public abstract void setRequisitionY(double height, double vSpacing);
+	public abstract void setRequisitionY(double height, double vSpacing, double refY);
+	public abstract void setRequisitionY(LReqBoxInterface reqBox);
+
+	public abstract void setLineBreakCost(int cost);
+
+	public abstract void borderX(double leftMargin, double rightMargin);
+	public abstract void borderY(double topMargin, double bottomMargin);
 }

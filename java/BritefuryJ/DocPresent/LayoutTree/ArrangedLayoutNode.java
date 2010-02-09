@@ -11,7 +11,7 @@ import java.util.List;
 import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.WidgetFilter;
-import BritefuryJ.DocPresent.Layout.LAllocBox;
+import BritefuryJ.DocPresent.Layout.ElementAlignment;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBox;
@@ -21,18 +21,15 @@ import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 
-public abstract class ArrangedLayoutNode extends BranchLayoutNode
+public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LReqBoxInterface, LAllocBoxInterface
 {
 	protected DPContainer element;
-	protected LReqBox layoutReqBox;
-	protected LAllocBox layoutAllocBox;
 	
 	
 	public ArrangedLayoutNode(DPContainer element)
 	{
 		this.element = element;
-		layoutReqBox = new LReqBox();
-		layoutAllocBox = new LAllocBox( this );
+		req_lineBreakCost = -1;
 	}
 
 
@@ -46,66 +43,31 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode
 	
 	public LReqBoxInterface getRequisitionBox()
 	{
-		return layoutReqBox;
+		return this;
 	}
 	
 	public LAllocBoxInterface getAllocationBox()
 	{
-		return layoutAllocBox;
+		return this;
 	}
 	
 	
 	
 	
 	
-	public double getPositionInParentSpaceX()
-	{
-		return layoutAllocBox.getPositionInParentSpaceX();
-	}
-	
-	public double getPositionInParentSpaceY()
-	{
-		return layoutAllocBox.getPositionInParentSpaceY();
-	}
-	
-	public Point2 getPositionInParentSpace()
-	{
-		return layoutAllocBox.getPositionInParentSpace();
-	}
-
-	public double getAllocationX()
-	{
-		return layoutAllocBox.getAllocationX();
-	}
-	
-	public double getAllocationY()
-	{
-		return layoutAllocBox.getAllocationY();
-	}
-
-	public Vector2 getAllocation()
-	{
-		return layoutAllocBox.getAllocation();
-	}
-
-	public LAllocV getAllocV()
-	{
-		return layoutAllocBox.getAllocV();
-	}
-
 	public double getAllocationInParentSpaceX()
 	{
-		return layoutAllocBox.getAllocationX()  *  getScale();
+		return getAllocationX()  *  getScale();
 	}
 	
 	public double getAllocationInParentSpaceY()
 	{
-		return layoutAllocBox.getAllocationY()  *  getScale();
+		return getAllocationY()  *  getScale();
 	}
 	
 	public Vector2 getAllocationInParentSpace()
 	{
-		return layoutAllocBox.getAllocation().mul( getScale() );
+		return getAllocation().mul( getScale() );
 	}
 	
 	
@@ -118,7 +80,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode
 		{
 			updateRequisitionX();
 		}
-		return layoutReqBox;
+		return this;
 	}
 	
 	public LReqBoxInterface refreshRequisitionY()
@@ -127,7 +89,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode
 		{
 			updateRequisitionY();
 		}
-		return layoutReqBox;
+		return this;
 	}
 	
 
@@ -141,7 +103,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode
 	
 	public void refreshAllocationX(double prevWidth)
 	{
-		if ( !element.isSizeUpToDate()  ||  layoutAllocBox.getAllocationX() != prevWidth )
+		if ( !element.isSizeUpToDate()  ||  getAllocationX() != prevWidth )
 		{
 			updateAllocationX();
 			element.clearFlagSizeUpToDate();
@@ -150,7 +112,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode
 	
 	public void refreshAllocationY(LAllocV prevHeight)
 	{
-		if ( !element.isSizeUpToDate()  ||  !layoutAllocBox.getAllocV().equals( prevHeight ) )
+		if ( !element.isSizeUpToDate()  ||  !getAllocV().equals( prevHeight ) )
 		{
 			updateAllocationY();
 		}
@@ -526,5 +488,390 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode
 	protected double getScale()
 	{
 		return element.getScale();
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//
+	//
+	//
+	//
+	//
+	// REQUISITION BOX IMPLEMENTATION
+	//
+	//
+	//
+	//
+	//
+	
+	private static int FLAG_LINEBREAK = 0x1  *  ElementAlignment._ELEMENTALIGN_END;
+	private static int FLAG_PARAGRAPH_INDENT = 0x2  *  ElementAlignment._ELEMENTALIGN_END;
+	private static int FLAG_PARAGRAPH_DEDENT = 0x4  *  ElementAlignment._ELEMENTALIGN_END;
+
+	protected int req_flags = 0;
+	protected int req_lineBreakCost;
+	
+	protected double req_minWidth, req_prefWidth, req_minHAdvance, req_prefHAdvance;
+	protected double req_height, req_vSpacing;
+	protected double req_refY;
+	
+	
+	
+	public double getReqMinWidth()
+	{
+		return req_minWidth;
+	}
+	
+	public double getReqPrefWidth()
+	{
+		return req_prefWidth;
+	}
+	
+	public double getReqMinHAdvance()
+	{
+		return req_minHAdvance;
+	}
+	
+	public double getReqPrefHAdvance()
+	{
+		return req_prefHAdvance;
+	}
+	
+
+	public double getReqHeight()
+	{
+		return req_height;
+	}
+	
+	public double getReqVSpacing()
+	{
+		return req_vSpacing;
+	}
+	
+	public double getReqRefY()
+	{
+		return req_refY;
+	}
+	
+	public double getReqHeightBelowRefPoint()
+	{
+		return req_height - req_refY;
+	}
+	
+	
+
+	public boolean isReqLineBreak()
+	{
+		return getFlag( FLAG_LINEBREAK );
+	}
+	
+	public boolean isReqParagraphIndentMarker()
+	{
+		return getFlag( FLAG_PARAGRAPH_INDENT );
+	}
+	
+	public boolean isReqParagraphDedentMarker()
+	{
+		return getFlag( FLAG_PARAGRAPH_DEDENT );
+	}
+	
+	public int getReqLineBreakCost()
+	{
+		return req_lineBreakCost;
+	}
+	
+	
+	public LReqBoxInterface scaledRequisition(double scale)
+	{
+		return new LReqBox( this, scale );
+	}
+	
+	
+	public void clearRequisitionX()
+	{
+		req_minWidth = req_prefWidth = req_minHAdvance = req_prefHAdvance = 0.0;
+	}
+	
+	public void clearRequisitionY()
+	{
+		req_height = req_vSpacing = req_refY = 0.0;
+	}
+	
+	
+	
+	public void setRequisitionX(double width, double hAdvance)
+	{
+		req_minWidth = req_prefWidth = width;
+		req_minHAdvance = req_prefHAdvance = hAdvance;
+	}
+	
+	public void setRequisitionX(double minWidth, double prefWidth, double minHAdvance, double prefHAdvance)
+	{
+		this.req_minWidth = minWidth; 
+		this.req_prefWidth = prefWidth;
+		this.req_minHAdvance = minHAdvance; 
+		this.req_prefHAdvance = prefHAdvance;
+	}
+	
+	public void setRequisitionX(LReqBoxInterface box)
+	{
+		this.req_minWidth = box.getReqMinWidth(); 
+		this.req_prefWidth = box.getReqPrefWidth();
+		this.req_minHAdvance = box.getReqMinHAdvance(); 
+		this.req_prefHAdvance = box.getReqPrefHAdvance();
+	}
+	
+	
+
+	public void setRequisitionY(double height, double vSpacing)
+	{
+		req_height = height;
+		req_vSpacing = vSpacing;
+		req_refY = height * 0.5;
+	}
+	
+	public void setRequisitionY(double height, double vSpacing, double refY)
+	{
+		req_height = height;
+		req_vSpacing = vSpacing;
+		this.req_refY = refY;
+	}
+	
+	public void setRequisitionY(LReqBoxInterface reqBox)
+	{
+		req_height = reqBox.getReqHeight();
+		req_vSpacing = reqBox.getReqVSpacing();
+		req_refY = reqBox.getReqRefY();
+	}
+	
+	
+	public void setLineBreakCost(int cost)
+	{
+		req_lineBreakCost = cost;
+		setFlag( FLAG_LINEBREAK, true );
+	}
+
+	
+	public void borderX(double leftMargin, double rightMargin)
+	{
+		if ( req_minHAdvance <= req_minWidth )
+		{
+			req_minWidth += leftMargin + rightMargin;
+			req_minHAdvance = req_minWidth;
+		}
+		else
+		{
+			double hspacing = req_minHAdvance - req_minWidth;
+			hspacing = Math.max( hspacing - rightMargin, 0.0 );
+			req_minWidth += leftMargin + rightMargin;
+			req_minHAdvance = req_minWidth + hspacing;
+		}
+		
+		if ( req_prefHAdvance <= req_prefWidth )
+		{
+			req_prefWidth += leftMargin + rightMargin;
+			req_prefHAdvance = req_prefWidth;
+		}
+		else
+		{
+			double hspacing = req_prefHAdvance - req_prefWidth;
+			hspacing = Math.max( hspacing - rightMargin, 0.0 );
+			req_prefWidth += leftMargin + rightMargin;
+			req_prefHAdvance = req_prefWidth + hspacing;
+		}
+	}
+	
+	public void borderY(double topMargin, double bottomMargin)
+	{
+		req_height += ( topMargin + bottomMargin );
+		req_vSpacing = Math.max( req_vSpacing - bottomMargin, 0.0 );
+	}
+	
+
+	
+	
+	private static int PACKFLAG_EXPAND = 1;
+	
+	
+	public static int packFlags(boolean bExpand)
+	{
+		return ( bExpand ? PACKFLAG_EXPAND : 0 );
+	}
+	
+	public static int combinePackFlags(int flags0, int flags1)
+	{
+		return flags0 | flags1;
+	}
+	
+	public static boolean testPackFlagExpand(int packFlags)
+	{
+		return ( packFlags & PACKFLAG_EXPAND )  !=  0;
+	}
+	
+	
+	private void setFlag(int f, boolean value)
+	{
+		if ( value )
+		{
+			req_flags |= f;
+		}
+		else
+		{
+			req_flags &= ~f;
+		}
+	}
+	
+	private boolean getFlag(int f)
+	{
+		return ( req_flags & f )  !=  0;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//
+	//
+	//
+	//
+	//
+	// ALLOCATION BOX IMPLEMENTATION
+	//
+	//
+	//
+	//
+	//
+
+	protected double alloc_positionInParentSpaceX, alloc_positionInParentSpaceY;
+	protected double alloc_allocationX, alloc_allocationY;
+	protected double alloc_refY;
+
+	
+	public LayoutNode getAllocLayoutNode()
+	{
+		return this;
+	}
+	
+	
+	
+	public double getAllocPositionInParentSpaceX()
+	{
+		return alloc_positionInParentSpaceX;
+	}
+	
+	public double getAllocPositionInParentSpaceY()
+	{
+		return alloc_positionInParentSpaceY;
+	}
+	
+	public Point2 getPositionInParentSpace()
+	{
+		return new Point2( alloc_positionInParentSpaceX, alloc_positionInParentSpaceY );
+	}
+	
+	public double getAllocationX()
+	{
+		return alloc_allocationX;
+	}
+	
+	public double getAllocationY()
+	{
+		return alloc_allocationY;
+	}
+	
+	public double getAllocRefY()
+	{
+		return alloc_refY;
+	}
+	
+	public LAllocV getAllocV()
+	{
+		return new LAllocV( alloc_allocationY, alloc_refY );
+	}
+	
+	public Vector2 getAllocation()
+	{
+		return new Vector2( alloc_allocationX, alloc_allocationY );
+	}
+
+
+	
+	
+	
+	//
+	// SETTERS
+	//
+	
+	public void setAllocPositionInParentSpaceX(double x)
+	{
+		alloc_positionInParentSpaceX = x;
+	}
+	
+	public void setAllocPositionInParentSpaceY(double y)
+	{
+		alloc_positionInParentSpaceY = y;
+	}
+	
+	public void setAllocationX(double width)
+	{
+		alloc_allocationX = width;
+	}
+
+	public void setAllocationY(double height, double refY)
+	{
+		alloc_allocationY = height;
+		this.alloc_refY = refY;
+	}
+
+	public void setAllocation(double width, double height, double refY)
+	{
+		alloc_allocationX = width;
+		alloc_allocationY = height;
+		this.alloc_refY = refY;
+	}
+
+	public void setPositionInParentSpaceAndAllocationX(double x, double width)
+	{
+		alloc_positionInParentSpaceX = x;
+		alloc_allocationX = width;
+	}
+	
+	public void setPositionInParentSpaceAndAllocationY(double y, double height)
+	{
+		alloc_positionInParentSpaceY = y;
+		alloc_allocationY = height;
+		alloc_refY = height * 0.5;
+	}
+	
+	public void setPositionInParentSpaceAndAllocationY(double y, double height, double refY)
+	{
+		alloc_positionInParentSpaceY = y;
+		alloc_allocationY = height;
+		this.alloc_refY = refY;
+	}
+
+
+
+	public void scaleAllocationX(double scale)
+	{
+		alloc_allocationX *= scale;
+	}
+
+	public void scaleAllocationY(double scale)
+	{
+		alloc_allocationY *= scale;
+		alloc_refY *= scale;
 	}
 }
