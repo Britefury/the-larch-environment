@@ -18,12 +18,12 @@ public class LineStyleSheet extends WidgetStyleSheet
 	}
 	
 	
-	public static LineStyleSheet defaultStyleSheet = new LineStyleSheet();
+	public static final LineStyleSheet defaultStyleSheet = new LineStyleSheet();
 	
 	
-	protected Direction direction;
-	protected Paint linePaint;
-	protected double thickness, inset, padding;
+	protected final Direction direction;
+	protected final Paint linePaint;
+	protected final double thickness, inset, padding;
 	
 	
 	public LineStyleSheet()

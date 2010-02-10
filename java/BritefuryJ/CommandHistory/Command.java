@@ -11,7 +11,7 @@ public abstract class Command
 	public static class CannotJoinCommandException extends RuntimeException
 	{
 		private static final long serialVersionUID = 1L;
-	};
+	}
 	
 	
 	protected abstract void execute();

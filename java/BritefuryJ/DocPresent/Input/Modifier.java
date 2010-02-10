@@ -9,23 +9,23 @@ package BritefuryJ.DocPresent.Input;
 
 public class Modifier
 {
-	public static int CTRL = 0x1;
-	public static int SHIFT = 0x2;
-	public static int ALT = 0x4;
-	public static int ALT_GRAPH = 0x8;
-	public static int BUTTON1 = 0x0100;
-	public static int BUTTON2 = 0x0200;
-	public static int BUTTON3 = 0x0400;
-	public static int BUTTON4 = 0x0800;
-	public static int BUTTON5 = 0x1000;
-	public static int BUTTON6 = 0x2000;
-	public static int BUTTON7 = 0x4000;
-	public static int BUTTON8 = 0x8000;
+	public static final int CTRL = 0x1;
+	public static final int SHIFT = 0x2;
+	public static final int ALT = 0x4;
+	public static final int ALT_GRAPH = 0x8;
+	public static final int BUTTON1 = 0x0100;
+	public static final int BUTTON2 = 0x0200;
+	public static final int BUTTON3 = 0x0400;
+	public static final int BUTTON4 = 0x0800;
+	public static final int BUTTON5 = 0x1000;
+	public static final int BUTTON6 = 0x2000;
+	public static final int BUTTON7 = 0x4000;
+	public static final int BUTTON8 = 0x8000;
 	
-	public static int _KEYS_MASK = CTRL | SHIFT | ALT | ALT_GRAPH;
+	public static final int _KEYS_MASK = CTRL | SHIFT | ALT | ALT_GRAPH;
 	
-	public static int _BUTTONS_SHIFT = 8;
-	public static int _BUTTONS_MASK = 0xff00;
+	public static final int _BUTTONS_SHIFT = 8;
+	public static final int _BUTTONS_MASK = 0xff00;
 	
 	
 	public static boolean getButton(int modifiers, int button)

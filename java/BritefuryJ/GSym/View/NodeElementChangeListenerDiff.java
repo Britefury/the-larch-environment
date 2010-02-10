@@ -192,8 +192,8 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 						}
 						else
 						{
-							String origChangeRegion = textRepresentation.substring( prefixLen, textRepresentation.length() - suffixLen ).toString();
-							String newChangeRegion = newTextRepresentation.substring( prefixLen, newTextRepresentation.length() - suffixLen ).toString();
+							String origChangeRegion = textRepresentation.substring( prefixLen, textRepresentation.length() - suffixLen );
+							String newChangeRegion = newTextRepresentation.substring( prefixLen, newTextRepresentation.length() - suffixLen );
 							
 							newPosition = position;
 							newBias = bias;

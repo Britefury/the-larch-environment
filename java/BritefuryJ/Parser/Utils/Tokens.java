@@ -359,26 +359,26 @@ public class Tokens
 	}
 	
 	
-	public static ParserExpression identifier = new RegEx( "[A-Za-z_][A-Za-z0-9_]*" );
-	public static ParserExpression javaIdentifier = new JavaIdentifier();
+	public static final ParserExpression identifier = new RegEx( "[A-Za-z_][A-Za-z0-9_]*" );
+	public static final ParserExpression javaIdentifier = new JavaIdentifier();
 	
-	public static ParserExpression decimalInteger = new RegEx( "[\\-]?[0-9]+" );
-	public static ParserExpression decimalIntegerNoOctal = new RegEx( "(?:[1-9][0-9]*)|0" );
+	public static final ParserExpression decimalInteger = new RegEx( "[\\-]?[0-9]+" );
+	public static final ParserExpression decimalIntegerNoOctal = new RegEx( "(?:[1-9][0-9]*)|0" );
 	
-	public static ParserExpression hexInteger = new RegEx( "0(x|X)[0-9A-Fa-f]+" );
+	public static final ParserExpression hexInteger = new RegEx( "0(x|X)[0-9A-Fa-f]+" );
 
-	public static ParserExpression octalInteger = new RegEx( "0[0-7]+" );
+	public static final ParserExpression octalInteger = new RegEx( "0[0-7]+" );
 
-	public static ParserExpression integer = decimalInteger.__or__( hexInteger );
+	public static final ParserExpression integer = decimalInteger.__or__( hexInteger );
 	
-	public static ParserExpression floatingPoint = new RegEx( "[\\-]?(([0-9]+\\.[0-9]*)|(\\.[0-9]+))(e[\\-]?[0-9]+)?" );
+	public static final ParserExpression floatingPoint = new RegEx( "[\\-]?(([0-9]+\\.[0-9]*)|(\\.[0-9]+))(e[\\-]?[0-9]+)?" );
 
-	public static ParserExpression javaCharacterLiteral = new JavaCharacterLiteral();
+	public static final ParserExpression javaCharacterLiteral = new JavaCharacterLiteral();
 
-	public static ParserExpression singleQuotedString = new RegEx( "\'(?:[^\'\\n\\r\\\\]|(?:\'\')|(?:\\\\x[0-9a-fA-F]+)|(?:\\\\.))*\'" );
-	public static ParserExpression doubleQuotedString = new RegEx( "\"(?:[^\"\\n\\r\\\\]|(?:\"\")|(?:\\\\x[0-9a-fA-F]+)|(?:\\\\.))*\"" );
-	public static ParserExpression quotedString = new RegEx( "(?:\"(?:[^\"\\n\\r\\\\]|(?:\"\")|(?:\\\\x[0-9a-fA-F]+)|(?:\\\\.))*\")|(?:\'(?:[^\'\\n\\r\\\\]|(?:\'\')|(?:\\\\x[0-9a-fA-F]+)|(?:\\\\.))*\')" );
-	public static ParserExpression unicodeString = new RegEx( "(u|U)((?:\"(?:[^\"\\n\\r\\\\]|(?:\"\")|(?:\\\\x[0-9a-fA-F]+)|(?:\\\\.))*\")|(?:\'(?:[^\'\\n\\r\\\\]|(?:\'\')|(?:\\\\x[0-9a-fA-F]+)|(?:\\\\.))*\'))" );
+	public static final ParserExpression singleQuotedString = new RegEx( "\'(?:[^\'\\n\\r\\\\]|(?:\'\')|(?:\\\\x[0-9a-fA-F]+)|(?:\\\\.))*\'" );
+	public static final ParserExpression doubleQuotedString = new RegEx( "\"(?:[^\"\\n\\r\\\\]|(?:\"\")|(?:\\\\x[0-9a-fA-F]+)|(?:\\\\.))*\"" );
+	public static final ParserExpression quotedString = new RegEx( "(?:\"(?:[^\"\\n\\r\\\\]|(?:\"\")|(?:\\\\x[0-9a-fA-F]+)|(?:\\\\.))*\")|(?:\'(?:[^\'\\n\\r\\\\]|(?:\'\')|(?:\\\\x[0-9a-fA-F]+)|(?:\\\\.))*\')" );
+	public static final ParserExpression unicodeString = new RegEx( "(u|U)((?:\"(?:[^\"\\n\\r\\\\]|(?:\"\")|(?:\\\\x[0-9a-fA-F]+)|(?:\\\\.))*\")|(?:\'(?:[^\'\\n\\r\\\\]|(?:\'\')|(?:\\\\x[0-9a-fA-F]+)|(?:\\\\.))*\'))" );
 	
-	public static ParserExpression javaStringLiteral = new JavaStringLiteral();
+	public static final ParserExpression javaStringLiteral = new JavaStringLiteral();
 }

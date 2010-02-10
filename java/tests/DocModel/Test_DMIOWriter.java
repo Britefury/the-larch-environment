@@ -127,9 +127,9 @@ public class Test_DMIOWriter extends TestCase
 		{
 			System.out.println( "VALUES ARE NOT THE SAME" );
 			System.out.println( "EXPECTED:" );
-			System.out.println( expected.toString() );
+			System.out.println( expected );
 			System.out.println( "RESULT:" );
-			System.out.println( res.toString() );
+			System.out.println( res );
 		}
 		
 		assertTrue( res.equals( expected ) );

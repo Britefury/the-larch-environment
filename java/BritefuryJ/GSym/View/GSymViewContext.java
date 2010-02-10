@@ -44,14 +44,15 @@ public class GSymViewContext extends GSymIncrementalTreeContext implements DocVi
 			return new GSymNodeViewContext( (GSymViewContext)treeContext, (DVNode)incrementalNode );
 		}
 
-		/*public Object createNodeResult(IncrementalTreeNode incrementalNode, DMNode docNode)
+		public Object createNodeResult(IncrementalTreeNode incrementalNode, DMNode docNode)
 		{
 			GSymViewContext viewContext = (GSymViewContext)treeContext;
-			viewContext.getView().profile_startPython();
+			DocView docView = viewContext.getView();
+			docView.profile_startPython();
 			Object r = super.createNodeResult( incrementalNode, docNode );
-			viewContext.getView().profile_stopPython();
+			docView.profile_stopPython();
 			return r;
-		}*/
+		}
 	}
 
 	

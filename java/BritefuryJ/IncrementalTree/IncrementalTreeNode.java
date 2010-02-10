@@ -33,7 +33,7 @@ public class IncrementalTreeNode implements IncrementalValueListener, Incrementa
 	
 	public static interface NodeContext
 	{
-	};
+	}
 	
 	
 

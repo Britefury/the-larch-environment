@@ -163,7 +163,7 @@ public class CanvasTestPage extends SystemPage
 	{
 		try
 		{
-			return new Integer( text ).intValue();
+			return Integer.parseInt( text );
 		}
 		catch (NumberFormatException e)
 		{

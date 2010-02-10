@@ -14,7 +14,7 @@ import BritefuryJ.Math.Point2;
 
 public class AffineTransformedPointer extends PointerInterface
 {
-	protected PointerInterface pointer;
+	protected final PointerInterface pointer;
 	protected AffineTransform globalToLocal, localToGlobal;
 	
 

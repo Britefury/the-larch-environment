@@ -26,7 +26,7 @@ public class Condition extends UnaryBranchExpression
 {
 	private static class PyCondition implements ParseCondition
 	{
-		private PyObject callable;
+		private final PyObject callable;
 		
 		
 		public PyCondition(PyObject callable)

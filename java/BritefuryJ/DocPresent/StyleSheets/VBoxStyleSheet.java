@@ -10,7 +10,7 @@ package BritefuryJ.DocPresent.StyleSheets;
 
 public class VBoxStyleSheet extends AbstractBoxStyleSheet
 {
-	public static VBoxStyleSheet defaultStyleSheet = new VBoxStyleSheet();
+	public static final VBoxStyleSheet defaultStyleSheet = new VBoxStyleSheet();
 	
 	
 	public VBoxStyleSheet()

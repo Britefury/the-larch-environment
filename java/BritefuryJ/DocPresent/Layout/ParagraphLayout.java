@@ -57,7 +57,7 @@ public class ParagraphLayout
 		protected double lineIndentation;
 		
 		
-		private Line(LReqBoxInterface ch[], LAllocBoxInterface chAlloc[], int chAllocFlags[], double lineIndentation, double spacing, double allocation, int startIndex, int endIndex)
+		private Line(LReqBoxInterface ch[], LAllocBoxInterface chAlloc[], int chAllocFlags[], double lineIndentation, int startIndex, int endIndex)
 		{
 			children = ch;
 			childrenAlloc = chAlloc;
@@ -132,7 +132,7 @@ public class ParagraphLayout
 		
 		public static Line createRangeTestLine(int startIndex, int endIndex)
 		{
-			return new Line( new LReqBox[] {}, new LAllocBox[] {}, new int[] {}, 0.0, 0.0, 0.0, startIndex, endIndex );
+			return new Line( new LReqBox[] {}, new LAllocBox[] {}, new int[] {}, 0.0, startIndex, endIndex );
 		}
 		
 		
@@ -201,13 +201,30 @@ public class ParagraphLayout
 		
 		// There should be at least the specified amount of spacing between each child, or the child's own h-spacing if it is greater
 		
+		Stack<IndentationEntry> indentationStack = new Stack<IndentationEntry>();
+		indentationStack.add( new IndentationEntry( -1, indentation ) );
+
 		double minWidth = 0.0, lineWidth = 0.0, prefWidth = 0.0;
 		double minAdvance = 0.0, lineAdvance = 0.0, prefAdvance = 0.0;
-		double minX = 0.0, lineX = 0.0, prefX = 0.0;
+		double lineX = 0.0, prefX = 0.0;
 		for (int i = 0; i < children.length; i++)
 		{
 			LReqBoxInterface child = children[i];
-			
+
+			// Handle indentation markers; maintain the indentation stack
+			if ( child.isReqParagraphIndentMarker() )
+			{
+				indentationStack.push( new IndentationEntry( i, lineX ) );
+			}
+			else if ( child.isReqParagraphDedentMarker() )
+			{
+				if ( indentationStack.size() > 1 )
+				{
+					indentationStack.lastElement().bOnStack = false;
+					indentationStack.pop();
+				}
+			}
+
 			prefWidth = prefX + child.getReqPrefWidth();
 			prefAdvance = prefX + child.getReqPrefHAdvance();
 			prefX = prefAdvance + hSpacing;
@@ -217,12 +234,11 @@ public class ParagraphLayout
 			{
 				minWidth = Math.max( minWidth, lineWidth );
 				minAdvance = Math.max( minAdvance, lineAdvance );
-				minX = Math.max( minX, lineX );
 				
 				// New line
 				lineWidth = 0.0;
 				lineAdvance = 0.0;
-				lineX = indentation;
+				lineX = indentationStack.lastElement().indentation;
 			}
 			else
 			{
@@ -235,7 +251,6 @@ public class ParagraphLayout
 		
 		minWidth = Math.max( minWidth, lineWidth );
 		minAdvance = Math.max( minAdvance, lineAdvance );
-		minX = Math.max( minX, lineX );
 
 		box.setRequisitionX( minWidth, prefWidth, minAdvance, prefAdvance );
 	}
@@ -407,7 +422,7 @@ public class ParagraphLayout
 				System.arraycopy( children, lineStartIndex, lineChildren, 0, lineLength );
 				System.arraycopy( childrenAlloc, lineStartIndex, lineChildrenAlloc, 0, lineLength );
 				System.arraycopy( childAllocationFlags, lineStartIndex, lineChildAllocFlags, 0, lineLength );
-				lines.add( new Line( lineChildren, lineChildrenAlloc, childAllocationFlags, bFirstLine  ?  0.0  :  lineBreakIndentation, spacing, allocBoxAllocationX, lineStartIndex, lineBreakIndex ) );
+				lines.add( new Line( lineChildren, lineChildrenAlloc, lineChildAllocFlags, bFirstLine  ?  0.0  :  lineBreakIndentation, lineStartIndex, lineBreakIndex ) );
 				
 				// Next line
 				lineBreakAtLineStart = chosenLineBreak;
@@ -455,6 +470,7 @@ public class ParagraphLayout
 					IndentationEntry breakIndentation = entry.lineIndentation;
 					if ( !breakIndentation.bOnStack )
 					{
+						// Indentation entry is not on the stack; it will not have been offset in the loop over the indentation stack
 						breakIndentation.indentation -= xAfterLineBreak;
 						breakIndentation.indentation += nextLineIndentation;
 					}
@@ -483,7 +499,7 @@ public class ParagraphLayout
 			System.arraycopy( childrenAlloc, lineStartIndex, lineChildrenAlloc, 0, lineLength );
 			System.arraycopy( childAllocationFlags, lineStartIndex, lineChildAllocFlags, 0, lineLength );
 			double lineIndentation = lineBreakAtLineStart != null  ?  lineBreakAtLineStart.lineIndentation.indentation  :  0.0;
-			lines.add( new Line( lineChildren, lineChildrenAlloc, lineChildAllocFlags, lineIndentation, spacing, allocBoxAllocationX, lineStartIndex, children.length ) );
+			lines.add( new Line( lineChildren, lineChildrenAlloc, lineChildAllocFlags, lineIndentation, lineStartIndex, children.length ) );
 		}
 		
 		

@@ -124,7 +124,7 @@ public class DMIOReader
 					String hexString = m.group();
 					hexString = hexString.substring( 2, hexString.length() - 1 );
 					char c = (char)Integer.valueOf( hexString, 16 ).intValue();
-					s = s.substring( 0, m.start() ) + new Character( c ).toString() + s.substring( m.end(), s.length() );
+					s = s.substring( 0, m.start() ) + Character.toString( c ) + s.substring( m.end(), s.length() );
 					bScanAgain = true;
 				}
 			}

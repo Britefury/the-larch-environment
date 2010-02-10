@@ -12,8 +12,8 @@ import java.awt.Paint;
 
 public class LinkStyleSheet extends StaticTextStyleSheet
 {
-	private static Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
-	public static LinkStyleSheet defaultStyleSheet = new LinkStyleSheet();
+	private static final Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
+	public static final LinkStyleSheet defaultStyleSheet = new LinkStyleSheet();
 	
 	
 	public LinkStyleSheet()

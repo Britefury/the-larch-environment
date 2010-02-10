@@ -20,7 +20,7 @@ public abstract class ParserExpression
 	public static class ParserCoerceException extends Exception
 	{
 		private static final long serialVersionUID = 1L;
-	};
+	}
 	
 	
 	

@@ -14,7 +14,7 @@ import BritefuryJ.DocPresent.ElementFactory;
 
 public abstract class ListViewLayout
 {
-	public enum TrailingSeparator { NEVER, ONE_ELEMENT, ALWAYS };
+	public enum TrailingSeparator { NEVER, ONE_ELEMENT, ALWAYS }
 	
 
 	public abstract DPWidget createListElement(ElementContext ctx, List<DPWidget> children, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator);

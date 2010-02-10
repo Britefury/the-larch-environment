@@ -34,7 +34,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	public static class NotADMObjectStreamClassException extends RuntimeException
 	{
 		private static final long serialVersionUID = 1L;
-	};
+	}
 	
 
 	
@@ -761,7 +761,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			assert keys.length == values.length;
 			
 			this.objClass = objClass;
-			Object fieldData[] = new Object[objClass.getNumFields()];
+			fieldData = new Object[objClass.getNumFields()];
 		
 			for (int i = 0; i < keys.length; i++)
 			{

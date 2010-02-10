@@ -133,12 +133,28 @@ public abstract class DMNode
 
 		public Object[] toArray()
 		{
-			return node.parents.toArray();
+			Object p[] = new Object[node.parents.size()];
+			int i = 0;
+			for (WeakReference<DMNode> ref: node.parents)
+			{
+				p[i++] = ref.get();
+			}
+			return p;
 		}
 
+		@SuppressWarnings("unchecked")
 		public <T> T[] toArray(T[] a)
 		{
-			return node.parents.toArray( a );
+			if ( a.length != node.parents.size() )
+			{
+				a = (T[])new Object[node.parents.size()];
+			}
+			int i = 0;
+			for (WeakReference<DMNode> ref: node.parents)
+			{
+				a[i++] = (T)ref.get();
+			}
+			return a;
 		}
 	
 	
@@ -210,12 +226,12 @@ public abstract class DMNode
 	public static class NodeAlreadyAChildException extends RuntimeException
 	{
 		private static final long serialVersionUID = 1L;
-	};
+	}
 
 	public static class NodeNotAChildException extends RuntimeException
 	{
 		private static final long serialVersionUID = 1L;
-	};
+	}
 
 	
 	

@@ -151,12 +151,7 @@ public abstract class DPContentLeafEditableEntry extends DPContentLeafEditable
 
 	protected boolean onKeyRelease(Caret caret, KeyEvent event)
 	{
-		if ( propagateKeyRelease( event ) )
-		{
-			return true;
-		}
-		
-		return false;
+		return propagateKeyRelease( event );
 	}
 
 	protected boolean onKeyTyped(Caret caret, KeyEvent event)

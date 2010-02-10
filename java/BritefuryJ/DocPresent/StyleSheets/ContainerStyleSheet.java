@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent.StyleSheets;
 
 public class ContainerStyleSheet extends WidgetStyleSheet
 {
-	public static ContainerStyleSheet defaultStyleSheet = new ContainerStyleSheet();
+	public static final ContainerStyleSheet defaultStyleSheet = new ContainerStyleSheet();
 	
 	
 	public ContainerStyleSheet()

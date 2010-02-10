@@ -9,5 +9,5 @@ package BritefuryJ.DocPresent.StyleSheets;
 
 public class WidgetStyleSheet
 {
-	public static WidgetStyleSheet defaultStyleSheet = new WidgetStyleSheet();
+	public static final WidgetStyleSheet defaultStyleSheet = new WidgetStyleSheet();
 }

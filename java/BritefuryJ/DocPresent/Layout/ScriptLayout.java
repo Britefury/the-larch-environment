@@ -65,12 +65,21 @@ public class ScriptLayout
 		
 		// Compute the overall width and spacing
 		double minW = 0.0, prefW = 0.0, minAdv = 0.0, prefAdv = 0.0;
+		if ( ( leftSuper != null  ||  leftSub != null )  &&  ( main == null  &&  rightSuper == null  &&  rightSub == null ) )
+		{
+			// Has a left column, no main or right columns
+			
+			minW = leftColumn.getReqMinWidth();
+			prefW = leftColumn.getReqPrefWidth();
+			minAdv = leftColumn.getReqMinHAdvance();
+			prefAdv = leftColumn.getReqPrefHAdvance();
+		}
 		if ( main != null   &&   ( rightSuper == null  &&  rightSub == null ) )
 		{
 			// Has a main column, no right column
 			
-			double minX = Math.max( leftColumn.minWidth, leftColumn.minHAdvance )  +  leftSpacing  +  main.getReqMinWidth();
-			double prefX = Math.max( leftColumn.prefWidth, leftColumn.prefHAdvance )  +  leftSpacing  +  main.getReqPrefWidth();
+			double minX = Math.max( leftColumn.minWidth, leftColumn.minHAdvance )  +  leftSpacing;
+			double prefX = Math.max( leftColumn.prefWidth, leftColumn.prefHAdvance )  +  leftSpacing;
 			minW = minX + main.getReqMinWidth();
 			prefW = prefX + main.getReqPrefWidth();
 			minAdv = minX + main.getReqMinHAdvance();
@@ -78,11 +87,13 @@ public class ScriptLayout
 		}
 		else
 		{
+			double mainMinW = main != null  ?  Math.max( main.getReqMinWidth(), main.getReqMinHAdvance() )  :  0.0;
+			double mainPrefW = main != null  ?  Math.max( main.getReqPrefWidth(), main.getReqPrefHAdvance() )  :  0.0;  
 			minAdv = minW = Math.max( leftColumn.minWidth, leftColumn.minHAdvance )  +  leftSpacing  +
-					Math.max( main.getReqMinWidth(), main.getReqMinHAdvance() )  +  mainSpacing  +
+					mainMinW  +  mainSpacing  +
 					Math.max( rightColumn.minWidth, rightColumn.minHAdvance );
 			prefAdv = prefW = Math.max( leftColumn.prefWidth, leftColumn.prefHAdvance )  +  leftSpacing  +
-					Math.max( main.getReqPrefWidth(), main.getReqPrefHAdvance() )  +  mainSpacing  +
+					mainPrefW  +  mainSpacing  +
 					Math.max( rightColumn.prefWidth, rightColumn.prefHAdvance );
 		}
 		

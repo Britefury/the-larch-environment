@@ -27,7 +27,7 @@ public class Action extends UnaryBranchExpression
 {
 	protected static class PyAction implements ParseAction
 	{
-		private PyObject callable;
+		private final PyObject callable;
 		
 		
 		public PyAction(PyObject callable)

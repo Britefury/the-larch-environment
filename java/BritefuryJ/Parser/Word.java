@@ -13,8 +13,8 @@ import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
 public class Word extends TerminalString
 {
-	protected String initChars, bodyChars;
-	protected Pattern pattern;
+	protected final String initChars, bodyChars;
+	protected final Pattern pattern;
 	
 	
 	public Word(String bodyChars)

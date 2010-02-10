@@ -18,7 +18,7 @@ public class ParseResult implements ParseResultInterface
 	protected static class NameAlreadyBoundException extends Exception
 	{
 		private static final long serialVersionUID = 1L;
-	};
+	}
 	
 	
 	protected Object value;

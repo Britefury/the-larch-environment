@@ -10,10 +10,10 @@ package BritefuryJ.DocPresent.StyleSheets;
 
 public class AbstractBoxStyleSheet extends ContainerStyleSheet
 {
-	public static AbstractBoxStyleSheet defaultStyleSheet = new AbstractBoxStyleSheet();
+	public static final AbstractBoxStyleSheet defaultStyleSheet = new AbstractBoxStyleSheet();
 	
 	
-	protected double spacing;
+	protected final double spacing;
 
 
 	public AbstractBoxStyleSheet()

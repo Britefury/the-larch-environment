@@ -13,10 +13,10 @@ public class FractionStyleSheet extends ContainerStyleSheet
 {
 	public static class BarStyleSheet extends ContentLeafStyleSheet
 	{
-		public static BarStyleSheet defaultStyleSheet = new BarStyleSheet( Color.black );
+		public static final BarStyleSheet defaultStyleSheet = new BarStyleSheet( Color.black );
 		
 		
-		protected Paint barPaint;
+		protected final Paint barPaint;
 		
 		
 		public BarStyleSheet(Paint barPaint)
@@ -34,11 +34,11 @@ public class FractionStyleSheet extends ContainerStyleSheet
 	}
 
 	
-	public static FractionStyleSheet defaultStyleSheet = new FractionStyleSheet();
+	public static final FractionStyleSheet defaultStyleSheet = new FractionStyleSheet();
 	
-	protected BarStyleSheet barStyleSheet;
+	protected final BarStyleSheet barStyleSheet;
 	
-	protected double vspacing, hpadding, yOffset;
+	protected final double vspacing, hpadding, yOffset;
 	
 	
 	
