@@ -55,19 +55,19 @@ public class Test_StringDiff extends TestCase
 			else if ( op.opcode == OpCode.REPLACE )
 			{
 				assertSame( op.bEnd - op.bBegin, op.aEnd - op.aBegin );
-				c = c.substring( 0, op.aBegin ).toString() +  b.substring( op.bBegin, op.bEnd ).toString()  +  c.substring( op.aEnd ).toString();
+				c = c.substring( 0, op.aBegin ) + b.substring( op.bBegin, op.bEnd )  + c.substring( op.aEnd );
 			}
 			else if ( op.opcode == OpCode.INSERT )
 			{
 				assertSame( op.aBegin, op.aEnd );
 				assertNotSame( op.bBegin, op.bEnd );
-				c = c.substring( 0, op.aBegin ).toString() +  b.substring( op.bBegin, op.bEnd ).toString()  +  c.substring( op.aEnd ).toString();
+				c = c.substring( 0, op.aBegin ) + b.substring( op.bBegin, op.bEnd )  + c.substring( op.aEnd );
 			}
 			else if ( op.opcode == OpCode.DELETE )
 			{
 				assertNotSame( op.aBegin, op.aEnd );
 				assertSame( op.bBegin, op.bEnd );
-				c = c.substring( 0, op.aBegin ).toString() +  c.substring( op.aEnd ).toString();
+				c = c.substring( 0, op.aBegin ) + c.substring( op.aEnd );
 			}
 		}
 		
@@ -91,19 +91,19 @@ public class Test_StringDiff extends TestCase
 			else if ( op.opcode == OpCode.REPLACE )
 			{
 				assertSame( op.bEnd - op.bBegin, op.aEnd - op.aBegin );
-				c = c.substring( 0, op.aBegin ).toString() +  b.substring( op.bBegin, op.bEnd ).toString()  +  c.substring( op.aEnd ).toString();
+				c = c.substring( 0, op.aBegin ) + b.substring( op.bBegin, op.bEnd )  + c.substring( op.aEnd );
 			}
 			else if ( op.opcode == OpCode.INSERT )
 			{
 				assertSame( op.aBegin, op.aEnd );
 				assertNotSame( op.bBegin, op.bEnd );
-				c = c.substring( 0, op.aBegin ).toString() +  b.substring( op.bBegin, op.bEnd ).toString()  +  c.substring( op.aEnd ).toString();
+				c = c.substring( 0, op.aBegin ) + b.substring( op.bBegin, op.bEnd )  + c.substring( op.aEnd );
 			}
 			else if ( op.opcode == OpCode.DELETE )
 			{
 				assertNotSame( op.aBegin, op.aEnd );
 				assertSame( op.bBegin, op.bEnd );
-				c = c.substring( 0, op.aBegin ).toString() +  c.substring( op.aEnd ).toString();
+				c = c.substring( 0, op.aBegin ) + c.substring( op.aEnd );
 			}
 		}
 		

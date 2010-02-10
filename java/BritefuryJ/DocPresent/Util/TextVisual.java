@@ -45,9 +45,9 @@ public class TextVisual
 	{
 		static HashSet<AttributedCharacterIterator.Attribute> attribKeys = null;
 		
-		protected String text;
-		protected Font lowerCaseFont, upperCaseFont;
-		protected HashMap<AttributedCharacterIterator.Attribute, Object> lowerCaseAttribs, upperCaseAttribs;
+		protected final String text;
+		protected final Font lowerCaseFont, upperCaseFont;
+		protected final HashMap<AttributedCharacterIterator.Attribute, Object> lowerCaseAttribs, upperCaseAttribs;
 		
 		
 		public MixedSizeCapsAttributedCharacterIterator(String text, Font lowerCaseFont, Font upperCaseFont)
@@ -175,10 +175,10 @@ public class TextVisual
 	
 	private static class Key
 	{
-		private String text;
-		private Font font;
-		private boolean bMixedSizeCaps;
-		private int hash;
+		private final String text;
+		private final Font font;
+		private final boolean bMixedSizeCaps;
+		private final int hash;
 		
 		
 		public Key(String text, Font font, boolean bMixedSizeCaps)
@@ -291,14 +291,14 @@ public class TextVisual
 	}
 	
 	
-	private static HashMap<DPPresentationArea, TextVisualTable> visualTables = new  HashMap<DPPresentationArea, TextVisualTable>();
+	private static final HashMap<DPPresentationArea, TextVisualTable> visualTables = new  HashMap<DPPresentationArea, TextVisualTable>();
 	
 	
 	private TextLayout layout;
 	private Path2D.Double squiggleUnderlineShape;
-	private String text;
-	private Font font;
-	private boolean bMixedSizeCaps;
+	private final String text;
+	private final Font font;
+	private final boolean bMixedSizeCaps;
 	private boolean bRealised;
 	private LReqBox reqBox;
 	

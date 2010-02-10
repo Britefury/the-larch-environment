@@ -18,7 +18,7 @@ import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
  */
 public class Literal extends TerminalString
 {
-	protected String matchString;
+	protected final String matchString;
 	
 	
 	public Literal(String matchString)

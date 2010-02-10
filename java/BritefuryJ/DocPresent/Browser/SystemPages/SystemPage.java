@@ -91,7 +91,7 @@ public abstract class SystemPage extends Page
 		boolean bFirst = true;
 		for (String word: words)
 		{
-			if ( !words.equals( "" ) )
+			if ( !word.equals( "" ) )
 			{
 				if ( !bFirst )
 				{

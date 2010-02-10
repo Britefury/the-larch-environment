@@ -27,7 +27,7 @@ public class Marker
 	}
 
 	
-	public enum Bias { START, END };
+	public enum Bias { START, END }
 	
 	
 	protected DPContentLeaf widget;

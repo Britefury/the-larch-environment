@@ -9,10 +9,10 @@ package BritefuryJ.DocPresent.StyleSheets;
 
 public class ScriptStyleSheet extends ContainerStyleSheet
 {
-	public static ScriptStyleSheet defaultStyleSheet = new ScriptStyleSheet();
+	public static final ScriptStyleSheet defaultStyleSheet = new ScriptStyleSheet();
 	
 	
-	private double columnSpacing, rowSpacing;
+	private final double columnSpacing, rowSpacing;
 	
 	
 	public ScriptStyleSheet()

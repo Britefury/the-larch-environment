@@ -8,7 +8,6 @@ package BritefuryJ.Incremental;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.WeakHashMap;
 
 
 
@@ -21,7 +20,7 @@ public class IncrementalFunction extends IncrementalValue
 	
 	
 	
-	private WeakHashMap<IncrementalValue, Object> incomingDependencies;
+	private HashSet<IncrementalValue> incomingDependencies;
 	private boolean cycleLock;
 	
 	
@@ -50,7 +49,7 @@ public class IncrementalFunction extends IncrementalValue
 		}
 		else
 		{
-			return incomingDependencies.keySet();
+			return incomingDependencies;
 		}
 	}
 
@@ -89,7 +88,7 @@ public class IncrementalFunction extends IncrementalValue
 		{
 			Object refreshStateArray[] = (Object[])refreshState;
 			IncrementalFunction oldCurrentComputation = (IncrementalFunction)refreshStateArray[0];
-			WeakHashMap<IncrementalValue, Object> prevIncomingDependencies = (WeakHashMap<IncrementalValue, Object>)refreshStateArray[1];
+			HashSet<IncrementalValue> prevIncomingDependencies = (HashSet<IncrementalValue>)refreshStateArray[1];
 			
 			// Restore the current computation
 			popCurrentComputation( oldCurrentComputation );
@@ -97,9 +96,9 @@ public class IncrementalFunction extends IncrementalValue
 			// Disconnect the dependencies that are being removed
 			if ( prevIncomingDependencies != null )
 			{
-				for (IncrementalValue inc: prevIncomingDependencies.keySet())
+				for (IncrementalValue inc: prevIncomingDependencies)
 				{
-					if ( incomingDependencies == null  ||  !incomingDependencies.containsKey( inc ) )
+					if ( incomingDependencies == null  ||  !incomingDependencies.contains( inc ) )
 					{
 						inc.removeOutgoingDependency( this );
 					}
@@ -109,9 +108,9 @@ public class IncrementalFunction extends IncrementalValue
 			// Connect new dependencies
 			if ( incomingDependencies != null )
 			{
-				for (IncrementalValue inc: incomingDependencies.keySet())
+				for (IncrementalValue inc: incomingDependencies)
 				{
-					if ( prevIncomingDependencies == null  ||  !prevIncomingDependencies.containsKey( inc ) )
+					if ( prevIncomingDependencies == null  ||  !prevIncomingDependencies.contains( inc ) )
 					{
 						inc.addOutgoingDependency( this );
 					}
@@ -136,17 +135,17 @@ public class IncrementalFunction extends IncrementalValue
 	{
 		if ( incomingDependencies == null )
 		{
-			incomingDependencies = new WeakHashMap<IncrementalValue, Object>();
+			incomingDependencies = new HashSet<IncrementalValue>();
 		}
-		incomingDependencies.put( dep, null );
+		incomingDependencies.add( dep );
 	}
 
 	protected void removeIncomingDependency(IncrementalValue dep)
 	{
-		incomingDependencies.put( dep, null );
-		if ( incomingDependencies == null )
+		incomingDependencies.remove( dep );
+		if ( incomingDependencies.isEmpty() )
 		{
-			incomingDependencies = new WeakHashMap<IncrementalValue, Object>();
+			incomingDependencies = null;
 		}
 	}
 }

@@ -29,7 +29,7 @@ public class DMObjectClass extends DMNodeClass
 		{
 			super( "Invalid field name: '" + fieldName + "'" );
 		}
-	};
+	}
 	
 
 	
@@ -199,11 +199,6 @@ public class DMObjectClass extends DMNodeClass
 		return new DMObject( this, data );
 	}
 	
-	public DMObject newInstance(PyDictionary data) throws InvalidFieldNameException
-	{
-		return new DMObject( this, data );
-	}
-	
 	
 	
 	public ObjectNode parser() throws InvalidFieldNameException
@@ -227,11 +222,6 @@ public class DMObjectClass extends DMNodeClass
 	}
 	
 	public ObjectNode parser(Map<String, Object> data) throws InvalidFieldNameException, ParserCoerceException
-	{
-		return new ObjectNode( this, data );
-	}
-	
-	public ObjectNode parser(PyDictionary data) throws InvalidFieldNameException, ParserCoerceException
 	{
 		return new ObjectNode( this, data );
 	}

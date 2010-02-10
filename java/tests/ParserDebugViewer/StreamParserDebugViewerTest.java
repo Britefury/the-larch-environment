@@ -6,7 +6,6 @@
 //##************************
 package tests.ParserDebugViewer;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +23,6 @@ public class StreamParserDebugViewerTest
 {
 	public static void main(final String[] args) throws ParserExpression.ParserCoerceException, Production.CannotOverwriteProductionExpressionException
 	{
-		ArrayList<Object> xs = new ArrayList<Object>();
-		xs.add( "5" );
 		ItemStreamBuilder builder1 = new ItemStreamBuilder();
 		builder1.appendTextValue( "this[" );
 		builder1.appendTextValue( "i" );

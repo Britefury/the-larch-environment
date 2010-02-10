@@ -13,16 +13,16 @@ import java.awt.Paint;
 
 public class TextStyleSheet extends ContentLeafStyleSheet
 {
-	private static Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
+	private static final Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
 
 	
-	public static TextStyleSheet defaultStyleSheet = new TextStyleSheet();
+	public static final TextStyleSheet defaultStyleSheet = new TextStyleSheet();
 	
 	
 	
-	protected Font font;
-	protected Paint textPaint, squiggleUnderlinePaint;
-	protected boolean bMixedSizeCaps;
+	protected final Font font;
+	protected final Paint textPaint, squiggleUnderlinePaint;
+	protected final boolean bMixedSizeCaps;
 	
 	
 	public TextStyleSheet()

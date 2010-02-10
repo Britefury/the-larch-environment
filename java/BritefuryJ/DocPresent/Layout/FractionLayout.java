@@ -86,11 +86,9 @@ public class FractionLayout
 		double childrenAlloc = width - hPadding * 2.0;
 		
 		
-		double numDenomAlloc = 0.0;
 		if ( numerator != null )
 		{
 			double childWidth = Math.min( Math.max( childrenAlloc, numerator.getReqMinWidth() ), numerator.getReqPrefWidth() );
-			numDenomAlloc = Math.max( numDenomAlloc, childWidth );
 			double childPos = Math.max( hPadding  +  ( childrenAlloc - childWidth ) * 0.5, 0.0 );
 			LAllocHelper.allocateChildX( numeratorAlloc, childPos, childWidth );
 		}
@@ -98,7 +96,6 @@ public class FractionLayout
 		if ( denominator != null )
 		{
 			double childWidth = Math.min( Math.max( childrenAlloc, denominator.getReqMinWidth() ), denominator.getReqPrefWidth() );
-			numDenomAlloc = Math.max( numDenomAlloc, childWidth );
 			double childPos = Math.max( hPadding  +  ( childrenAlloc - childWidth ) * 0.5, 0.0 );
 			LAllocHelper.allocateChildX( denominatorAlloc, childPos, childWidth );
 		}

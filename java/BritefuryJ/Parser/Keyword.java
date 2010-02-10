@@ -22,8 +22,8 @@ import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
  */
 public class Keyword extends TerminalString
 {
-	protected String keywordString, disallowedSubsequentChars;
-	private Pattern postPattern;
+	protected final String keywordString, disallowedSubsequentChars;
+	private final Pattern postPattern;
 	
 	
 	public Keyword(String keywordString)

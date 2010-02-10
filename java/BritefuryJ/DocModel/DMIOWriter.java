@@ -236,7 +236,9 @@ public class DMIOWriter
 			}
 			else
 			{
-				builder.append(  "\\x" + Integer.toString( (int)c, 16 ) + "x" );
+				builder.append(  "\\x" );
+                                builder.append(  Integer.toString( (int)c, 16 ) );
+                                builder.append(  "x" );
 			}
 		}
 	}

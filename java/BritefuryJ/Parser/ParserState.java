@@ -126,7 +126,7 @@ public class ParserState
 				dependents.add( dep );
 			}
 		}
-	};
+	}
 	
 	
 	private HashMap<SourceKey, HashMap<MemoKey, MemoEntry>> table;

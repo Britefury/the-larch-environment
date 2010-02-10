@@ -14,12 +14,12 @@ import BritefuryJ.DocPresent.Border.SolidBorder;
 
 public class ButtonStyleSheet extends ContainerStyleSheet
 {
-	public static ButtonStyleSheet defaultStyleSheet = new ButtonStyleSheet();
+	public static final ButtonStyleSheet defaultStyleSheet = new ButtonStyleSheet();
 	
 	
 	
-	protected Paint borderPaint, backgroundPaint, highlightBackgPaint;
-	protected SolidBorder border, highlightBorder;
+	protected final Paint borderPaint, backgroundPaint, highlightBackgPaint;
+	protected final SolidBorder border, highlightBorder;
 	
 	
 	public ButtonStyleSheet()

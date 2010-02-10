@@ -11,7 +11,7 @@ import java.util.List;
 
 public abstract class BranchExpression extends ParserExpression
 {
-	protected ParserExpression[] subexps;
+	protected final ParserExpression[] subexps;
 	
 
 	public BranchExpression(ParserExpression[] subexps)

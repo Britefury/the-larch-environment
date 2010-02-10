@@ -19,13 +19,13 @@ import BritefuryJ.DocPresent.DPPresentationArea;
 
 public class MathRootStyleSheet extends ContainerStyleSheet
 {
-	private static Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
+	private static final Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
 
-	public static MathRootStyleSheet defaultStyleSheet = new MathRootStyleSheet();
+	public static final MathRootStyleSheet defaultStyleSheet = new MathRootStyleSheet();
 	
-	protected Font font;
-	protected Paint symbolPaint;
-	protected double thickness;
+	protected final Font font;
+	protected final Paint symbolPaint;
+	protected final double thickness;
 	
 	protected double glyphLineWidths[], glyphWidth, barSpacing;
 	protected boolean bRealised;

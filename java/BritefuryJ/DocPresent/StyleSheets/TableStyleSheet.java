@@ -9,14 +9,14 @@ package BritefuryJ.DocPresent.StyleSheets;
 
 public class TableStyleSheet extends ContainerStyleSheet
 {
-	public static TableStyleSheet defaultStyleSheet = new TableStyleSheet();
+	public static final TableStyleSheet defaultStyleSheet = new TableStyleSheet();
 	
 	
-	protected double columnSpacing;
-	protected boolean columnExpand;
+	protected final double columnSpacing;
+	protected final boolean columnExpand;
 
-	protected double rowSpacing;
-	protected boolean rowExpand;
+	protected final double rowSpacing;
+	protected final boolean rowExpand;
 
 
 	public TableStyleSheet()

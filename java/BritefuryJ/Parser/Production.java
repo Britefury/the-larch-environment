@@ -26,7 +26,7 @@ public class Production extends ParserExpression
 	public static class CannotOverwriteProductionExpressionException extends Exception
 	{
 		private static final long serialVersionUID = 1L;
-	};
+	}
 	
 	
 	protected String expressionName;

@@ -49,8 +49,8 @@ public class Browser
 	}
 	
 	
-	private static String COMMAND_BACK = "back";
-	private static String COMMAND_FORWARD = "forward";
+	private static final String COMMAND_BACK = "back";
+	private static final String COMMAND_FORWARD = "forward";
 	
 
 	
@@ -435,7 +435,7 @@ public class Browser
 			
 			return pageBox.alignHExpand();
 		}
-	};
+	}
 	
 	
 	

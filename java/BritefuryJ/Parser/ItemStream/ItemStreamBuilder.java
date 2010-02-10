@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Parser.ItemStream;
 
-import java.util.ArrayList;
+import java.util.ArrayList;import java.util.Arrays;
 
 
 public class ItemStreamBuilder
@@ -88,11 +88,8 @@ public class ItemStreamBuilder
 	public ItemStreamBuilder(Item items[])
 	{
 		this.items = new ArrayList<Item>();
-		
-		for (Item i: items)
-		{
-			this.items.add( i );
-		}
+
+                this.items.addAll( Arrays.asList( items ) );
 	}
 	
 	

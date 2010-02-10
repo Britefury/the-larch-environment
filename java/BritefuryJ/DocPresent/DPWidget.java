@@ -106,7 +106,7 @@ abstract public class DPWidget extends PointerInputElement
 	
 	protected static class ParentPacking
 	{
-	};
+	}
 
 	
 	
@@ -953,7 +953,6 @@ abstract public class DPWidget extends PointerInputElement
 						presentationArea.queueImmediateEvent( event );
 					}
 					waitingImmediateEventsByWidget.remove( this );
-					waitingImmediateEvents = null;
 				}
 			}
 		}
@@ -1601,7 +1600,10 @@ abstract public class DPWidget extends PointerInputElement
 		}
 		else
 		{
-			leaf = parent.getContentLeafToLeftFromChild( this );
+                        if ( parent != null )
+                        {
+        			leaf = parent.getContentLeafToLeftFromChild( this );
+			}
 			if ( leaf != null )
 			{
 				return leaf.markerAtEnd();
@@ -1639,7 +1641,10 @@ abstract public class DPWidget extends PointerInputElement
 		}
 		else
 		{
-			leaf = parent.getContentLeafToLeftFromChild( this );
+			if ( parent != null )
+			{
+				leaf = parent.getContentLeafToLeftFromChild( this );
+			}
 			if ( leaf != null )
 			{
 				leaf.moveMarkerToEnd( m );

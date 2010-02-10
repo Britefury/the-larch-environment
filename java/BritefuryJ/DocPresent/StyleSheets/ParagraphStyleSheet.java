@@ -10,10 +10,10 @@ package BritefuryJ.DocPresent.StyleSheets;
 
 public class ParagraphStyleSheet extends ContainerStyleSheet
 {
-	public static ParagraphStyleSheet defaultStyleSheet = new ParagraphStyleSheet();
+	public static final ParagraphStyleSheet defaultStyleSheet = new ParagraphStyleSheet();
 	
 	
-	private double spacing, lineSpacing, indentation;
+	private final double spacing, lineSpacing, indentation;
 	
 	
 	public ParagraphStyleSheet()

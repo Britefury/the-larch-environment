@@ -8,7 +8,7 @@ package BritefuryJ.DocPresent.StyleSheets;
 
 public class GridRowStyleSheet extends ContainerStyleSheet
 {
-	public static GridRowStyleSheet defaultStyleSheet = new GridRowStyleSheet();
+	public static final GridRowStyleSheet defaultStyleSheet = new GridRowStyleSheet();
 	
 	
 	public GridRowStyleSheet()

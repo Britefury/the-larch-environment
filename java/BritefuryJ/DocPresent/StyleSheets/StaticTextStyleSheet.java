@@ -12,16 +12,16 @@ import java.awt.Paint;
 
 public class StaticTextStyleSheet extends WidgetStyleSheet
 {
-	private static Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
+	private static final Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
 
 	
-	public static StaticTextStyleSheet defaultStyleSheet = new StaticTextStyleSheet();
+	public static final StaticTextStyleSheet defaultStyleSheet = new StaticTextStyleSheet();
 	
 	
 	
-	protected Font font;
-	protected Paint textPaint;
-	protected boolean bMixedSizeCaps;
+	protected final Font font;
+	protected final Paint textPaint;
+	protected final boolean bMixedSizeCaps;
 	
 	
 	public StaticTextStyleSheet()

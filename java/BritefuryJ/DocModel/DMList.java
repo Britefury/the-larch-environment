@@ -187,14 +187,14 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 			stop++;
 		}
 		
-		public boolean addAll(Collection<? extends Object> xs)
+		public boolean addAll(Collection<?> xs)
 		{
 			boolean bResult = src.addAll( stop, xs );
 			stop += xs.size();
 			return bResult;
 		}
 		
-		public boolean addAll(int index, Collection<? extends Object> xs)
+		public boolean addAll(int index, Collection<?> xs)
 		{
 			boolean bResult = src.addAll( start + index, xs );
 			stop += xs.size();
@@ -459,7 +459,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		}
 	}
 	
-	public boolean addAll(Collection<? extends Object> xs)
+	public boolean addAll(Collection<?> xs)
 	{
 		ArrayList<Object> cxs = new ArrayList<Object>();
 		cxs.ensureCapacity( xs.size() );
@@ -482,7 +482,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		return true;
 	}
 	
-	public boolean addAll(int index, Collection<? extends Object> xs)
+	public boolean addAll(int index, Collection<?> xs)
 	{
 		ArrayList<Object> cxs = new ArrayList<Object>();
 		cxs.ensureCapacity( xs.size() );

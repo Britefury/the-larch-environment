@@ -10,7 +10,7 @@ package BritefuryJ.DocPresent.StyleSheets;
 
 public class HBoxStyleSheet extends AbstractBoxStyleSheet
 {
-	public static HBoxStyleSheet defaultStyleSheet = new HBoxStyleSheet();
+	public static final HBoxStyleSheet defaultStyleSheet = new HBoxStyleSheet();
 	
 	
 	public HBoxStyleSheet()

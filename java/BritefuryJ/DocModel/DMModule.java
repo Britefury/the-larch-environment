@@ -15,12 +15,12 @@ public class DMModule
 	public static class UnknownClassException extends Exception
 	{
 		private static final long serialVersionUID = 1L;
-	};
+	}
 
 	public static class ClassAlreadyDefinedException extends Exception
 	{
 		private static final long serialVersionUID = 1L;
-	};
+	}
 
 	
 	private String moduleName, shortName, moduleLocation;
