@@ -347,8 +347,8 @@ class MainApp (AppControlInterface):
 				handleNewDocumentFn( unit )
 			return newDoc
 		newDocumentMenu = JPopupMenu( 'New document' )
-		for newDocumentFactory in self._world.newDocumentFactories:
-			newDocumentMenu.add( _action( newDocumentFactory.menuLabelText, _make_newDocument( newDocumentFactory.newDocumentFn ) ) )
+		for newUnitFactory in self._world.newUnitFactories:
+			newDocumentMenu.add( _action( newUnitFactory.menuLabelText, _make_newDocument( newUnitFactory.newDocumentFn ) ) )
 		pos = self._frame.getMousePosition( True )
 		newDocumentMenu.show( self._frame, pos.x, pos.y )
 	

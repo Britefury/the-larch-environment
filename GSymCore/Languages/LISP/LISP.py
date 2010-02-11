@@ -7,7 +7,7 @@
 ##-*************************
 from BritefuryJ.DocModel import DMSchema
 
-from Britefury.gSym.gSymDocumentClass import GSymDocumentClass
+from Britefury.gSym.gSymUnitClass import GSymUnitClass
 
 from GSymCore.Languages.LISP.View import viewLISPDocNodeAsElement, viewLISPDocNodeAsPage, resolveLISPLocation
 
@@ -15,9 +15,9 @@ from GSymCore.Languages.LISP.View import viewLISPDocNodeAsElement, viewLISPDocNo
 schema = DMSchema( 'lisp', 'lisp', 'GSymCore.Languages.LISP' )
 
 
-documentClass = GSymDocumentClass( schema )
-documentClass.registerViewDocNodeAsElementFn( viewLISPDocNodeAsElement )
-documentClass.registerViewDocNodeAsPageFn( viewLISPDocNodeAsPage )
-documentClass.registerResolveLocationFn( resolveLISPLocation )
+unitClass = GSymUnitClass( schema )
+unitClass.registerViewDocNodeAsElementFn( viewLISPDocNodeAsElement )
+unitClass.registerViewDocNodeAsPageFn( viewLISPDocNodeAsPage )
+unitClass.registerResolveLocationFn( resolveLISPLocation )
 
 

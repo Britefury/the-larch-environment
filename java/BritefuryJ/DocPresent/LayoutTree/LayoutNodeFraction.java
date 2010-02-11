@@ -12,10 +12,8 @@ import BritefuryJ.DocPresent.DPFraction;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.WidgetFilter;
 import BritefuryJ.DocPresent.Layout.FractionLayout;
-import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
 import BritefuryJ.DocPresent.Layout.LAllocV;
-import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
 import BritefuryJ.DocPresent.StyleSheets.FractionStyleSheet;
 import BritefuryJ.Math.Point2;
@@ -122,8 +120,8 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 		DPFraction frac = (DPFraction)element;
 		double childScale = getChildScale();
 		
-		LReqBoxInterface reqBoxes[] = new LReqBox[NUMCHILDREN];
-		LAllocBoxInterface allocBoxes[] = new LAllocBox[NUMCHILDREN];
+		LReqBoxInterface reqBoxes[] = new LReqBoxInterface[NUMCHILDREN];
+		LAllocBoxInterface allocBoxes[] = new LAllocBoxInterface[NUMCHILDREN];
 		double prevChildWidths[] = new double[NUMCHILDREN];
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
@@ -168,8 +166,8 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 		DPFraction frac = (DPFraction)element;
 		double childScale = getChildScale();
 		
-		LReqBoxInterface reqBoxes[] = new LReqBox[NUMCHILDREN];
-		LAllocBoxInterface allocBoxes[] = new LAllocBox[NUMCHILDREN];
+		LReqBoxInterface reqBoxes[] = new LReqBoxInterface[NUMCHILDREN];
+		LAllocBoxInterface allocBoxes[] = new LAllocBoxInterface[NUMCHILDREN];
 		LAllocV prevChildAllocVs[] = new LAllocV[NUMCHILDREN];
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{

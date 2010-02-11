@@ -53,11 +53,11 @@ class GSymWorld (object):
 		super( GSymWorld, self ).__init__()
 		self.resolver = GSymDMSchemaResolver()
 		self._plugins = GSymPlugin.loadPlugins()
-		self._documentClasses = {}
+		self._unitClasses = {}
 		self._locationToDocument = {}
 		self._documentIDCounter = 1
 		self.newPageFactories = []
-		self.newDocumentFactories = []
+		self.newUnitFactories = []
 		self.pageImporters = []
 		
 		
@@ -66,16 +66,16 @@ class GSymWorld (object):
 	
 
 			
-	def registerDocumentClass(self, plugin, documentClass):
-		schema = documentClass.getSchema()
+	def registerUnitClass(self, plugin, unitClass):
+		schema = unitClass.getSchema()
 		self.resolver._registerDMSchema( schema )
-		self._documentClasses[schema.getLocation()] = documentClass
+		self._unitClasses[schema.getLocation()] = unitClass
 	
 	def registerNewPageFactory(self, plugin, newPageFactory):
 		self.newPageFactories.append( newPageFactory )
 		
-	def registerNewDocumentFactory(self, plugin, newDocumentFactory):
-		self.newDocumentFactories.append( newDocumentFactory )
+	def registerNewUnitFactory(self, plugin, newUnitFactory):
+		self.newUnitFactories.append( newUnitFactory )
 		
 	def registerPageImporter(self, plugin, pageImporter):
 		self.pageImporters.append( pageImporter )
@@ -102,11 +102,11 @@ class GSymWorld (object):
 		
 		
 	
-	def getDocumentClass(self, schemaLocation):
+	def getUnitClass(self, schemaLocation):
 		try:
-			return self._documentClasses[schemaLocation]
+			return self._unitClasses[schemaLocation]
 		except KeyError:
-			print 'Could not get document class %s; registered classes: %s'  %  ( schemaLocation, self._documentClasses.keys() )
+			print 'Could not get unit class %s; registered classes: %s'  %  ( schemaLocation, self._unitClasses.keys() )
 			return None
 		
 	

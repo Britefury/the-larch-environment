@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from Britefury.gSym.gSymDocumentClass import GSymDocumentClass, GSymPageFactory, GSymPageImporter
+from Britefury.gSym.gSymUnitClass import GSymUnitClass, GSymPageFactory, GSymPageImporter
 from Britefury.gSym.gSymDocument import gSymUnit
 
 from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
@@ -24,11 +24,11 @@ def _py25ImportFile(filename):
 
 
 
-documentClass = GSymDocumentClass( Nodes.schema )
-documentClass.registerCodeGeneratorFactory( 'ascii', Python25CodeGenerator )
-documentClass.registerViewDocNodeAsElementFn( viewPython25DocNodeAsElement )
-documentClass.registerViewDocNodeAsPageFn( viewPython25DocNodeAsPage )
-documentClass.registerResolveLocationFn( resolvePython25Location )
+unitClass = GSymUnitClass( Nodes.schema )
+unitClass.registerCodeGeneratorFactory( 'ascii', Python25CodeGenerator )
+unitClass.registerViewDocNodeAsElementFn( viewPython25DocNodeAsElement )
+unitClass.registerViewDocNodeAsPageFn( viewPython25DocNodeAsPage )
+unitClass.registerResolveLocationFn( resolvePython25Location )
 
 
 newPageFactory = GSymPageFactory( 'Python 2.5', _py25New )

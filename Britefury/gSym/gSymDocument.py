@@ -131,7 +131,7 @@ class GSymDocument (CommandHistoryListener):
 	def viewUnitLocationAsPage(self, unit, resolveContext, location, app):
 		resolveResult = self.resolveUnitLocation( unit, resolveContext, location, app )
 		if resolveResult is not None:
-			viewLocationAsPageFn = resolveResult.documentClass.getViewDocNodeAsPageFn()
+			viewLocationAsPageFn = resolveResult.unitClass.getViewDocNodeAsPageFn()
 			return viewLocationAsPageFn( resolveResult.document, resolveResult.docNode, resolveResult.resolveContext, resolveResult.location, self._commandHistory, app )
 		else:
 			return None
@@ -140,7 +140,7 @@ class GSymDocument (CommandHistoryListener):
 	def viewUnitLocationAsLispPage(self, unit, resolveContext, location, app):
 		resolveResult = self.resolveUnitLocation( unit, resolveContext, location, app )
 		if resolveResult is not None:
-			viewLocationAsPageFn = LISP.documentClass.getViewDocNodeAsPageFn()
+			viewLocationAsPageFn = LISP.unitClass.getViewDocNodeAsPageFn()
 			return viewLocationAsPageFn( resolveResult.document, resolveResult.docNode, resolveResult.resolveContext, resolveResult.location, self._commandHistory, app )
 		else:
 			return None
@@ -159,7 +159,7 @@ class GSymDocument (CommandHistoryListener):
 	def viewUnitLocationAsElement(self, unit, resolveContext, location, app):
 		resolveResult = self.resolveUnitLocation( unit, resolveContext, location, app )
 		if resolveResult is not None:
-			viewLocationAsElementFn = resolveResult.documentClass.getViewDocNodeAsElementFn()
+			viewLocationAsElementFn = resolveResult.unitClass.getViewDocNodeAsElementFn()
 			return viewLocationAsElementFn( resolveResult.document, resolveResult.docNode, resolveResult.resolveContext, resolveResult.location, self._commandHistory, app )
 		else:
 			return None
@@ -168,7 +168,7 @@ class GSymDocument (CommandHistoryListener):
 	def viewUnitLocationAsLispElement(self, unit, resolveContext, location, app):
 		resolveResult = self.resolveUnitLocation( unit, resolveContext, location, app )
 		if resolveResult is not None:
-			viewLocationAsElementFn = LISP.documentClass.getViewDocNodeAsElementFn()
+			viewLocationAsElementFn = LISP.unitClass.getViewDocNodeAsElementFn()
 			return viewLocationAsElementFn( resolveResult.document, resolveResult.docNode, resolveResult.resolveContext, resolveResult.location, self._commandHistory, app )
 		else:
 			return None
@@ -179,9 +179,9 @@ class GSymDocument (CommandHistoryListener):
 		return self.resolveUnitLocation( self._unit, resolveContext, location, app )
 	
 	def resolveUnitLocation(self, unit, resolveContext, location, app):
-		documentClass = self._world.getDocumentClass( gSymUnit_getSchemaLocation( unit ) )
-		resolveLocationFn = documentClass.getResolveLocationFn()
-		return resolveLocationFn( documentClass, self, gSymUnit_getContent( unit ), resolveContext, location, app )
+		unitClass = self._world.getUnitClass( gSymUnit_getSchemaLocation( unit ) )
+		resolveLocationFn = unitClass.getResolveLocationFn()
+		return resolveLocationFn( unitClass, self, gSymUnit_getContent( unit ), resolveContext, location, app )
 		
 	
 	
