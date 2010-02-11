@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import BritefuryJ.DocModel.DMSchemaResolver;
 import org.python.core.Py;
 import org.python.core.PyInteger;
 import org.python.core.PySlice;
@@ -23,8 +24,7 @@ import BritefuryJ.DocModel.DMList;
 import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocModel.DMIOReader.BadModuleNameException;
 import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
-import BritefuryJ.DocModel.DMModule.UnknownClassException;
-import BritefuryJ.DocModel.DMModuleResolver.CouldNotResolveModuleException;
+import BritefuryJ.DocModel.DMSchema.UnknownClassException;
 
 public class Test_DMList extends Test_DMNode_base
 {
@@ -64,7 +64,7 @@ public class Test_DMList extends Test_DMNode_base
 			System.out.println( "Unknown class while parsing expected SX" );
 			fail();
 		}
-		catch (CouldNotResolveModuleException e)
+		catch (DMSchemaResolver.CouldNotResolveSchemaException e)
 		{
 			System.out.println( "Could not resolve module while parsing expected SX" );
 			fail();
@@ -97,7 +97,7 @@ public class Test_DMList extends Test_DMNode_base
 			fail();
 			return null;
 		}
-		catch (CouldNotResolveModuleException e)
+		catch (DMSchemaResolver.CouldNotResolveSchemaException e)
 		{
 			System.out.println( "Could not resolve module while parsing" );
 			fail();

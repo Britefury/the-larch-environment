@@ -12,7 +12,7 @@ import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.WidgetFilter;
 import BritefuryJ.Math.Point2;
 
-public abstract class ContentLeafLayoutNode extends LeafLayoutNode
+public abstract class ContentLeafLayoutNode extends LeafLayoutNode implements ContentLeafLayoutNodeInterface
 {
 	public ContentLeafLayoutNode(DPContentLeaf element)
 	{
@@ -30,7 +30,7 @@ public abstract class ContentLeafLayoutNode extends LeafLayoutNode
 		return getContentLeafAboveOrBelow( localPos, true, bSkipWhitespace );
 	}
 	
-	protected DPContentLeaf getContentLeafAboveOrBelow(Point2 localPos, boolean bBelow, boolean bSkipWhitespace)
+	public DPContentLeaf getContentLeafAboveOrBelow(Point2 localPos, boolean bBelow, boolean bSkipWhitespace)
 	{
 		DPWidget element = getElement();
 		DPContainer parent = element.getParent();

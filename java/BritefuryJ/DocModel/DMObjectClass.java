@@ -11,10 +11,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.python.core.PyDictionary;
 import org.python.core.PyObject;
 
-import BritefuryJ.DocModel.DMModule.ClassAlreadyDefinedException;
+import BritefuryJ.DocModel.DMSchema.ClassAlreadyDefinedException;
 import BritefuryJ.Parser.ObjectNode;
 import BritefuryJ.Parser.ParserExpression.ParserCoerceException;
 
@@ -34,17 +33,17 @@ public class DMObjectClass extends DMNodeClass
 
 	
 	
-	private DMModule module;
+	private DMSchema schema;
 	private DMObjectClass superclass, superclasses[];
 	private DMObjectField classFields[], allClassFields[];
 	private HashMap<String, Integer> fieldNameToIndex;
 	
 	
 	
-	public DMObjectClass(DMModule module, String name, DMObjectField fields[]) throws ClassAlreadyDefinedException
+	public DMObjectClass(DMSchema schema, String name, DMObjectField fields[]) throws ClassAlreadyDefinedException
 	{
 		super( name );
-		this.module = module;
+		this.schema = schema;
 		superclass = null;
 		superclasses = new DMObjectClass[0];
 		classFields = fields;
@@ -53,18 +52,18 @@ public class DMObjectClass extends DMNodeClass
 		initialise();
 	}
 	
-	public DMObjectClass(DMModule module, String name, String fieldNames[]) throws ClassAlreadyDefinedException
+	public DMObjectClass(DMSchema schema, String name, String fieldNames[]) throws ClassAlreadyDefinedException
 	{
-		this( module, name, DMObjectField.nameArrayToFieldArray( fieldNames ) );
+		this(schema, name, DMObjectField.nameArrayToFieldArray( fieldNames ) );
 	}
 	
 	
 	
-	public DMObjectClass(DMModule module, String name, DMObjectClass superclass, DMObjectField fields[]) throws ClassAlreadyDefinedException
+	public DMObjectClass(DMSchema schema, String name, DMObjectClass superclass, DMObjectField fields[]) throws ClassAlreadyDefinedException
 	{
 		super( name );
 		
-		this.module = module;
+		this.schema = schema;
 		
 		this.superclass = superclass;
 		superclasses = new DMObjectClass[superclass.superclasses.length + 1];
@@ -79,9 +78,9 @@ public class DMObjectClass extends DMNodeClass
 		initialise();
 	}
 
-	public DMObjectClass(DMModule module, String name, DMObjectClass superclass, String fieldNames[]) throws ClassAlreadyDefinedException
+	public DMObjectClass(DMSchema schema, String name, DMObjectClass superclass, String fieldNames[]) throws ClassAlreadyDefinedException
 	{
-		this( module, name, superclass, DMObjectField.nameArrayToFieldArray( fieldNames ) );
+		this(schema, name, superclass, DMObjectField.nameArrayToFieldArray( fieldNames ) );
 	}
 	
 	
@@ -94,14 +93,14 @@ public class DMObjectClass extends DMNodeClass
 			fieldNameToIndex.put( allClassFields[i].getName(), new Integer( i ) );
 		}
 		
-		module.registerClass( name, this );
+		schema.registerClass( name, this );
 	}
 	
 	
 	
-	public DMModule getModule()
+	public DMSchema getModule()
 	{
-		return module;
+		return schema;
 	}
 	
 	

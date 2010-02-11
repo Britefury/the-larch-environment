@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 import org.python.core.Py;
 
-public class DMModule
+public class DMSchema
 {
 	public static class UnknownClassException extends Exception
 	{
@@ -23,14 +23,14 @@ public class DMModule
 	}
 
 	
-	private String moduleName, shortName, moduleLocation;
+	private String schemaName, shortName, moduleLocation;
 	private HashMap<String, DMObjectClass> classes;
 	
 	
 	
-	public DMModule(String name, String shortName, String location)
+	public DMSchema(String name, String shortName, String location)
 	{
-		this.moduleName = name;
+		this.schemaName = name;
 		this.shortName = shortName;
 		this.moduleLocation = location;
 		classes = new HashMap<String, DMObjectClass>();
@@ -40,7 +40,7 @@ public class DMModule
 	
 	public String getName()
 	{
-		return moduleName;
+		return schemaName;
 	}
 	
 	public String getShortName()
@@ -65,7 +65,7 @@ public class DMModule
 		return c;
 	}
 	
-	public void registerClass(String name, DMObjectClass c) throws ClassAlreadyDefinedException
+	protected void registerClass(String name, DMObjectClass c) throws ClassAlreadyDefinedException
 	{
 		if ( classes.containsKey( name ) )
 		{

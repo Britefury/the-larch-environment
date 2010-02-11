@@ -9,7 +9,7 @@ from datetime import datetime
 
 from BritefuryJ.CommandHistory import CommandHistory, CommandHistoryListener
 
-from BritefuryJ.DocModel import DMNode, DMModule, DMIOReader, DMIOWriter
+from BritefuryJ.DocModel import DMNode, DMSchema, DMIOReader, DMIOWriter
 
 from Britefury.Kernel.Abstract import abstractmethod
 
@@ -40,25 +40,31 @@ class GSymDocumentUnknownItemType (Exception):
 
 
 
-module = DMModule( 'GSymDocument', 'gsd', 'org.Britefury.gSym.Internal.GSymDocument' )
+schema = DMSchema( 'GSymDocument', 'gsd', 'org.Britefury.gSym.Internal.GSymDocument' )
 
-nodeClass_GSymUnit = module.newClass( 'GSymUnit', [ 'languageModuleName', 'content' ] )
-nodeClass_GSymDocument = module.newClass( 'GSymDocument', [ 'version', 'content' ] )
-
-
-GSymWorld.registerInternalDMModule( module )
+nodeClass_GSymUnit = schema.newClass( 'GSymUnit', [ 'schemaLocation', 'content' ] )
+nodeClass_GSymDocument = schema.newClass( 'GSymDocument', [ 'version', 'content' ] )
 
 
+GSymWorld.registerInternalDMSchema( schema )
 
 
 
-def gSymUnit(languageModuleName, content):
-	return nodeClass_GSymUnit( languageModuleName=languageModuleName, content=content )
 
-def gSymUnit_getLanguageModuleName(unit):
+
+def gSymUnit(schema, content):
+	if isinstance( schema, str )  or  isinstance( schema, unicode ):
+		schemaLocation = schema
+	elif isinstance( schema, DMSchema ):
+		schemaLocation = schema.getLocation()
+	else:
+		raise TypeError, 'gSymUnit(): schema must be a DMSchema or a schema location'
+	return nodeClass_GSymUnit( schemaLocation=schemaLocation, content=content )
+
+def gSymUnit_getSchemaLocation(unit):
 	if not unit.isInstanceOf( nodeClass_GSymUnit ):
 		raise GSymDocumentInvalidStructure
-	return unit['languageModuleName']
+	return unit['schemaLocation']
 	
 def gSymUnit_getContent(unit):
 	if not unit.isInstanceOf( nodeClass_GSymUnit ):
@@ -125,7 +131,7 @@ class GSymDocument (CommandHistoryListener):
 	def viewUnitLocationAsPage(self, unit, resolveContext, location, app):
 		resolveResult = self.resolveUnitLocation( unit, resolveContext, location, app )
 		if resolveResult is not None:
-			viewLocationAsPageFn = resolveResult.language.getViewDocNodeAsPageFn()
+			viewLocationAsPageFn = resolveResult.documentClass.getViewDocNodeAsPageFn()
 			return viewLocationAsPageFn( resolveResult.document, resolveResult.docNode, resolveResult.resolveContext, resolveResult.location, self._commandHistory, app )
 		else:
 			return None
@@ -134,7 +140,7 @@ class GSymDocument (CommandHistoryListener):
 	def viewUnitLocationAsLispPage(self, unit, resolveContext, location, app):
 		resolveResult = self.resolveUnitLocation( unit, resolveContext, location, app )
 		if resolveResult is not None:
-			viewLocationAsPageFn = LISP.language.getViewDocNodeAsPageFn()
+			viewLocationAsPageFn = LISP.documentClass.getViewDocNodeAsPageFn()
 			return viewLocationAsPageFn( resolveResult.document, resolveResult.docNode, resolveResult.resolveContext, resolveResult.location, self._commandHistory, app )
 		else:
 			return None
@@ -153,7 +159,7 @@ class GSymDocument (CommandHistoryListener):
 	def viewUnitLocationAsElement(self, unit, resolveContext, location, app):
 		resolveResult = self.resolveUnitLocation( unit, resolveContext, location, app )
 		if resolveResult is not None:
-			viewLocationAsElementFn = resolveResult.language.getViewDocNodeAsElementFn()
+			viewLocationAsElementFn = resolveResult.documentClass.getViewDocNodeAsElementFn()
 			return viewLocationAsElementFn( resolveResult.document, resolveResult.docNode, resolveResult.resolveContext, resolveResult.location, self._commandHistory, app )
 		else:
 			return None
@@ -162,7 +168,7 @@ class GSymDocument (CommandHistoryListener):
 	def viewUnitLocationAsLispElement(self, unit, resolveContext, location, app):
 		resolveResult = self.resolveUnitLocation( unit, resolveContext, location, app )
 		if resolveResult is not None:
-			viewLocationAsElementFn = LISP.language.getViewDocNodeAsElementFn()
+			viewLocationAsElementFn = LISP.documentClass.getViewDocNodeAsElementFn()
 			return viewLocationAsElementFn( resolveResult.document, resolveResult.docNode, resolveResult.resolveContext, resolveResult.location, self._commandHistory, app )
 		else:
 			return None
@@ -173,9 +179,9 @@ class GSymDocument (CommandHistoryListener):
 		return self.resolveUnitLocation( self._unit, resolveContext, location, app )
 	
 	def resolveUnitLocation(self, unit, resolveContext, location, app):
-		language = self._world.getLanguage( gSymUnit_getLanguageModuleName( unit ) )
-		resolveLocationFn = language.getResolveLocationFn()
-		return resolveLocationFn( language, self, gSymUnit_getContent( unit ), resolveContext, location, app )
+		documentClass = self._world.getDocumentClass( gSymUnit_getSchemaLocation( unit ) )
+		resolveLocationFn = documentClass.getResolveLocationFn()
+		return resolveLocationFn( documentClass, self, gSymUnit_getContent( unit ), resolveContext, location, app )
 		
 	
 	

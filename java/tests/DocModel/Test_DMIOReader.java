@@ -11,20 +11,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import BritefuryJ.DocModel.*;
 import junit.framework.TestCase;
-import BritefuryJ.DocModel.DMIOReader;
-import BritefuryJ.DocModel.DMIOWriter;
-import BritefuryJ.DocModel.DMModule;
-import BritefuryJ.DocModel.DMModuleResolver;
-import BritefuryJ.DocModel.DMObject;
-import BritefuryJ.DocModel.DMObjectClass;
+import BritefuryJ.DocModel.DMSchema;
 import BritefuryJ.DocModel.DMIOWriter.InvalidDataTypeException;
 
 public class Test_DMIOReader extends TestCase
 {
 	protected static class TestReader extends DMIOReader
 	{
-		protected TestReader(String source, DMModuleResolver resolver)
+		protected TestReader(String source, DMSchemaResolver resolver)
 		{
 			super( source, resolver );
 		}
@@ -36,31 +32,31 @@ public class Test_DMIOReader extends TestCase
 	}
 
 	
-	private DMModule module;
-	private DMModuleResolver resolver;
+	private DMSchema schema;
+	private DMSchemaResolver resolver;
 	private DMObjectClass A;
 	
 	
 	public void setUp()
 	{
-		module = new DMModule( "module", "m", "test.module" );
+		schema = new DMSchema( "schema", "m", "test.schema" );
 		try
 		{
-			A = module.newClass( "A", new String[] { "x", "y" } );
+			A = schema.newClass( "A", new String[] { "x", "y" } );
 		}
-		catch (DMModule.ClassAlreadyDefinedException e)
+		catch (DMSchema.ClassAlreadyDefinedException e)
 		{
 			throw new RuntimeException();
 		}
 		
 		
-		resolver = new DMModuleResolver()
+		resolver = new DMSchemaResolver()
 		{
-			public DMModule getModule(String location)
+			public DMSchema getSchema(String location)
 			{
-				if ( location.equals( "test.module" ) )
+				if ( location.equals( "test.schema" ) )
 				{
-					return module;
+					return schema;
 				}
 				else
 				{
@@ -73,7 +69,7 @@ public class Test_DMIOReader extends TestCase
 	
 	public void tearDown()
 	{
-		module = null;
+		schema = null;
 		resolver = null;
 		A = null;
 	}
@@ -134,12 +130,12 @@ public class Test_DMIOReader extends TestCase
 			System.out.println( "PARSE FAILURE: " + e.getMessage() );
 			fail();
 		}
-		catch (DMModuleResolver.CouldNotResolveModuleException e)
+		catch (DMSchemaResolver.CouldNotResolveSchemaException e)
 		{
 			System.out.println( "PARSE FAILURE: COULD NOT RESOLVE MODULE" );
 			fail();
 		}
-		catch (DMModule.UnknownClassException e)
+		catch (DMSchema.UnknownClassException e)
 		{
 			System.out.println( "PARSE FAILURE : UNKNOWN CLASS" );
 			fail();
@@ -293,14 +289,14 @@ public class Test_DMIOReader extends TestCase
 	public void testReadObject()
 	{
 		DMObject a = A.newInstance( new Object[] { "0", "1" } );
-		readTest( "{m=test.module : (m A x=0 y=1)}", a );
+		readTest( "{m=test.schema : (m A x=0 y=1)}", a );
 	}
 
 	public void testReadNestedObject()
 	{
 		DMObject a = A.newInstance( new Object[] { "0", "1" } );
 		DMObject b = A.newInstance( new Object[] { a, "1" } );
-		readTest( "{m=test.module : (m A x=(m A x=0 y=1) y=1)}", b );
+		readTest( "{m=test.schema : (m A x=(m A x=0 y=1) y=1)}", b );
 	}
 
 	public void testReadObjectInListInObject()
@@ -308,6 +304,6 @@ public class Test_DMIOReader extends TestCase
 		DMObject a = A.newInstance( new Object[] { "0", "1" } );
 		List<Object> b = Arrays.asList( new Object[] { a, "xyz" } );
 		DMObject c = A.newInstance( new Object[] { b, "1" } );
-		readTest( "{m=test.module : (m A x=[(m A x=0 y=1) xyz] y=1)}", c );
+		readTest( "{m=test.schema : (m A x=[(m A x=0 y=1) xyz] y=1)}", c );
 	}
 }

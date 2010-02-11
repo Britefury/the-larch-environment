@@ -31,18 +31,18 @@ public class DMIOWriter
 	
 	
 	
-	private HashMap<DMModule, String> moduleToName;
+	private HashMap<DMSchema, String> moduleToName;
 	private HashSet<String> names;
-	private ArrayList<DMModule> modulesInOrder;
+	private ArrayList<DMSchema> modulesInOrder;
 	
 	
 	
 	
 	protected DMIOWriter()
 	{
-		moduleToName = new HashMap<DMModule, String>();
+		moduleToName = new HashMap<DMSchema, String>();
 		names = new HashSet<String>();
-		modulesInOrder = new ArrayList<DMModule>();
+		modulesInOrder = new ArrayList<DMSchema>();
 	}
 	
 
@@ -85,7 +85,7 @@ public class DMIOWriter
 	private void writeObject(StringBuilder builder, DMObject obj) throws InvalidDataTypeException
 	{
 		DMObjectClass cls = obj.getDMObjectClass();
-		DMModule mod = cls.getModule();
+		DMSchema mod = cls.getModule();
 		
 		builder.append( "(" );
 		
@@ -170,7 +170,7 @@ public class DMIOWriter
 			StringBuilder docBuilder = new StringBuilder();
 			docBuilder.append( "{" );
 			
-			for (DMModule mod: modulesInOrder)
+			for (DMSchema mod: modulesInOrder)
 			{
 				String name = moduleToName.get( mod );
 				docBuilder.append( name );

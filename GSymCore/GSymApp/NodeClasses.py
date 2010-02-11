@@ -5,17 +5,17 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from BritefuryJ.DocModel import DMModule, DMObjectClass
+from BritefuryJ.DocModel import DMSchema, DMObjectClass
 
 
 
 
-module = DMModule( 'GSymApp', 'app', 'GSymCore.GSymApp.GSymApp' )
+schema = DMSchema( 'GSymApp', 'app', 'GSymCore.GSymApp' )
 
 
-AppState = module.newClass( 'AppState', [ 'openDocuments', 'configuration' ] )
+AppState = schema.newClass( 'AppState', [ 'openDocuments', 'configuration' ] )
 
-AppDocument = module.newClass( 'AppDocument', [ 'name', 'location' ] )
+AppDocument = schema.newClass( 'AppDocument', [ 'name', 'location' ] )
 
-AppConfiguration = module.newClass( 'AppConfiguration', [] )
+AppConfiguration = schema.newClass( 'AppConfiguration', [] )
 

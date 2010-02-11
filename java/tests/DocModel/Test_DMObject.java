@@ -12,24 +12,21 @@ import java.util.HashMap;
 import java.util.List;
 
 import BritefuryJ.CommandHistory.CommandHistory;
-import BritefuryJ.DocModel.DMList;
-import BritefuryJ.DocModel.DMModule;
-import BritefuryJ.DocModel.DMNode;
-import BritefuryJ.DocModel.DMObject;
-import BritefuryJ.DocModel.DMObjectClass;
-import BritefuryJ.DocModel.DMModule.ClassAlreadyDefinedException;
+import BritefuryJ.DocModel.*;
+import BritefuryJ.DocModel.DMSchema;
+import BritefuryJ.DocModel.DMSchema.ClassAlreadyDefinedException;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 
 public class Test_DMObject extends Test_DMNode_base
 {
 	private CommandHistory history;
-	private DMModule m;
+	private DMSchema m;
 	
 	
 	public void setUp()
 	{
 		history = new CommandHistory();
-		m = new DMModule( "m", "m", "test.m" );
+		m = new DMSchema( "m", "m", "test.m" );
 	}
 	
 	public void tearDown()

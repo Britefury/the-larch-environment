@@ -11,8 +11,6 @@ from Britefury.Util.NodeUtil import isObjectNode, nodeToSXString
 
 from Britefury.Dispatch.Dispatch import DispatchError, DispatchDataError
 
-from BritefuryJ.DocModel import DMModule
-
 import inspect
 
 

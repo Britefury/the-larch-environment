@@ -1560,5 +1560,5 @@ def viewPython25DocNodeAsPage(document, docRootNode, resolveContext, location, c
 	return GSymViewPage( 'Python: ' + resolveContext.getTitle(), viewPython25DocNodeAsElement( document, docRootNode, resolveContext, location, commandHistory, app ), commandHistory )
 
 
-def resolvePython25Location(currentLanguage, document, docRootNode, resolveContext, location, app):
-	return GSymResolveResult( document, docRootNode, currentLanguage, resolveContext, location )
+def resolvePython25Location(currentDocumentClass, document, docRootNode, resolveContext, location, app):
+	return GSymResolveResult( document, docRootNode, currentDocumentClass, resolveContext, location )

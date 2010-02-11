@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from Britefury.gSym.gSymLanguage import GSymLanguage
+from Britefury.gSym.gSymDocumentClass import GSymDocumentClass
 from Britefury.gSym.gSymDocument import gSymUnit
 
 from GSymCore.GSymApp.View import viewGSymAppDocNodeAsElement, viewGSymAppDocNodeAsPage, resolveGSymAppLocation
@@ -15,17 +15,13 @@ from GSymCore.GSymApp import NodeClasses as Nodes
 def newAppState():
 	configuration = Nodes.AppConfiguration()
 	appState = Nodes.AppState( openDocuments=[], configuration=configuration )
-	return gSymUnit( 'GSymCore.GSymApp', appState )
-
-
-def initialiseModule(world):
-	world.registerDMModule( Nodes.module )
+	return gSymUnit( Nodes.schema, appState )
 
 
 
-language = GSymLanguage( 'gSym Application control' )
-language.registerViewDocNodeAsElementFn( viewGSymAppDocNodeAsElement )
-language.registerViewDocNodeAsPageFn( viewGSymAppDocNodeAsPage )
-language.registerResolveLocationFn( resolveGSymAppLocation )
+documentClass = GSymDocumentClass( Nodes.schema )
+documentClass.registerViewDocNodeAsElementFn( viewGSymAppDocNodeAsElement )
+documentClass.registerViewDocNodeAsPageFn( viewGSymAppDocNodeAsPage )
+documentClass.registerResolveLocationFn( resolveGSymAppLocation )
 
 

@@ -23,8 +23,8 @@ import org.python.core.PyUnicode;
 import BritefuryJ.CommandHistory.CommandTracker;
 import BritefuryJ.CommandHistory.CommandTrackerFactory;
 import BritefuryJ.CommandHistory.Trackable;
-import BritefuryJ.DocModel.DMModule.UnknownClassException;
-import BritefuryJ.DocModel.DMModuleResolver.CouldNotResolveModuleException;
+import BritefuryJ.DocModel.DMSchema.UnknownClassException;
+import BritefuryJ.DocModel.DMSchemaResolver.CouldNotResolveSchemaException;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.Incremental.IncrementalValue;
@@ -748,7 +748,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	// Serialisation
 	//
 	
-	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException, CouldNotResolveModuleException, UnknownClassException, InvalidFieldNameException
+	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException, CouldNotResolveSchemaException, UnknownClassException, InvalidFieldNameException
 	{
 		if ( stream instanceof DMObjectInputStream )
 		{

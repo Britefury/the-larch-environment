@@ -5,14 +5,12 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from GSymCore.Languages.Python25 import NodeClasses as Nodes
 from GSymCore.Languages.Python25 import Python25
 
 
 
 def initPlugin(plugin, world):
-	world.registerDMModule( plugin, Nodes.module )
-	world.registerLanguage( plugin, Python25.language )
+	world.registerDocumentClass( plugin, Python25.documentClass )
 	world.registerNewPageFactory( plugin, Python25.newPageFactory )
 	world.registerPageImporter( plugin, Python25.pageImporter )
 

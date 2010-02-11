@@ -9,15 +9,15 @@ import unittest
 
 from Britefury.Dispatch.Dispatch import DispatchError
 from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeDispatchMethod, ObjectNodeMethodDispatchMetaClass, objectNodeMethodDispatch
-from BritefuryJ.DocModel import DMModule
+from BritefuryJ.DocModel import DMSchema
 
 
 class TestCase_objectNodeMethodDispatch (unittest.TestCase):
 	def setUp(self):
-		self.Module = DMModule( 'NodeMethodDispatch', 'dispatch', 'Tests.NodeMethodDispatch' )
-		self.A = self.Module.newClass( 'A', [ 'x', 'y' ] )
-		self.B = self.Module.newClass( 'B', self.A, [ 'p', 'q' ] )
-		self.C = self.Module.newClass( 'C', [ 's', 't' ] )
+		self.schema = DMSchema( 'NodeMethodDispatch', 'dispatch', 'Tests.NodeMethodDispatch' )
+		self.A = self.schema.newClass( 'A', [ 'x', 'y' ] )
+		self.B = self.schema.newClass( 'B', self.A, [ 'p', 'q' ] )
+		self.C = self.schema.newClass( 'C', [ 's', 't' ] )
 		self.a = self.A( x='a', y='b' )
 		self.b = self.B( x='a', y='b', p='c', q='d' )
 		self.c = self.C( s='a', t='b' )

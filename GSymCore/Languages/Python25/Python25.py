@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from Britefury.gSym.gSymLanguage import GSymLanguage, GSymPageFactory, GSymPageImporter
+from Britefury.gSym.gSymDocumentClass import GSymDocumentClass, GSymPageFactory, GSymPageImporter
 from Britefury.gSym.gSymDocument import gSymUnit
 
 from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
@@ -16,19 +16,19 @@ from GSymCore.Languages.Python25.Python25Importer import importPy25File
 
 
 def _py25New():
-	return gSymUnit( 'GSymCore.Languages.Python25', Nodes.PythonModule( suite=[ Nodes.BlankLine() ] ) )
+	return gSymUnit( Nodes.schema, Nodes.PythonModule( suite=[ Nodes.BlankLine() ] ) )
 
 def _py25ImportFile(filename):
 	content = importPy25File( filename )
-	return gSymUnit( 'GSymCore.Languages.Python25', content )
+	return gSymUnit( Nodes.schema, content )
 
 
 
-language = GSymLanguage( 'Python25' )
-language.registerCodeGeneratorFactory( 'ascii', Python25CodeGenerator )
-language.registerViewDocNodeAsElementFn( viewPython25DocNodeAsElement )
-language.registerViewDocNodeAsPageFn( viewPython25DocNodeAsPage )
-language.registerResolveLocationFn( resolvePython25Location )
+documentClass = GSymDocumentClass( Nodes.schema )
+documentClass.registerCodeGeneratorFactory( 'ascii', Python25CodeGenerator )
+documentClass.registerViewDocNodeAsElementFn( viewPython25DocNodeAsElement )
+documentClass.registerViewDocNodeAsPageFn( viewPython25DocNodeAsPage )
+documentClass.registerResolveLocationFn( resolvePython25Location )
 
 
 newPageFactory = GSymPageFactory( 'Python 2.5', _py25New )

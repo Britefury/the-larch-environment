@@ -6,11 +6,11 @@
 //##************************
 package tests.Transformation;
 
+import BritefuryJ.DocModel.DMSchema;
 import junit.framework.TestCase;
-import BritefuryJ.DocModel.DMModule;
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
-import BritefuryJ.DocModel.DMModule.ClassAlreadyDefinedException;
+import BritefuryJ.DocModel.DMSchema.ClassAlreadyDefinedException;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 import BritefuryJ.Transformation.DefaultIdentityTransformationFunction;
 import BritefuryJ.Transformation.Transformation;
@@ -18,7 +18,7 @@ import BritefuryJ.Transformation.TransformationFunction;
 
 public class Test_Transformation extends TestCase
 {
-	private DMModule m;
+	private DMSchema m;
 	private DMObjectClass TwoStrings, TwoNodes, StringNode;
 	private TransformationFunction x1, x2, x3;
 	private DMObject data_s, data_nss, data_bs, data_bs_x1, data_bs_x2, data_bs_x12, data_nbss, data_nbss_x1, data_nbss_x2, data_nbss_x12;
@@ -26,7 +26,7 @@ public class Test_Transformation extends TestCase
 
 	public void setUp()
 	{
-		m = new DMModule( "m", "m", "test.m" );
+		m = new DMSchema( "m", "m", "test.m" );
 		try
 		{
 			TwoStrings = m.newClass( "TwoStrings", new String[] { "s", "t" } );

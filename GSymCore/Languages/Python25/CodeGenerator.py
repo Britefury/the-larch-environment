@@ -646,12 +646,12 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 	
 import unittest
-from BritefuryJ.DocModel import DMIOReader, DMModuleResolver
+from BritefuryJ.DocModel import DMIOReader, DMSchemaResolver
 
 class TestCase_Python25CodeGenerator (unittest.TestCase):
-	class _Resolver (DMModuleResolver):
-		def getModule(self, location):
-			return Nodes.module
+	class _Resolver (DMSchemaResolver):
+		def getSchema(self, location):
+			return Nodes.schema
 		
 	_resolver = _Resolver()
 	

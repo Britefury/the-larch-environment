@@ -13,7 +13,7 @@ import BritefuryJ.DocPresent.WidgetFilter;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.Math.Point2;
 
-public abstract class ContentLeafLayoutNodeSharedReq extends LeafLayoutNodeSharedReq
+public abstract class ContentLeafLayoutNodeSharedReq extends LeafLayoutNodeSharedReq implements ContentLeafLayoutNodeInterface
 {
 	public ContentLeafLayoutNodeSharedReq(DPContentLeaf element, LReqBox reqBox)
 	{
@@ -31,7 +31,7 @@ public abstract class ContentLeafLayoutNodeSharedReq extends LeafLayoutNodeShare
 		return getContentLeafAboveOrBelow( localPos, true, bSkipWhitespace );
 	}
 	
-	protected DPContentLeaf getContentLeafAboveOrBelow(Point2 localPos, boolean bBelow, boolean bSkipWhitespace)
+	public DPContentLeaf getContentLeafAboveOrBelow(Point2 localPos, boolean bBelow, boolean bSkipWhitespace)
 	{
 		DPWidget element = getElement();
 		DPContainer parent = element.getParent();
