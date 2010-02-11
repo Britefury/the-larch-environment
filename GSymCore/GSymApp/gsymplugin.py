@@ -10,5 +10,5 @@ from GSymCore.GSymApp import GSymApp
 
 
 def initPlugin(plugin, world):
-	world.registerDocumentClass( plugin, GSymApp.documentClass )
+	world.registerUnitClass( plugin, GSymApp.unitClass )
 

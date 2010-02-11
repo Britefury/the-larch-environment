@@ -182,5 +182,5 @@ def viewLISPDocNodeAsPage(document, docNode, resolveContext, location, commandHi
 	return GSymViewPage( 'Model: ' + resolveContext.getTitle(), viewLISPDocNodeAsElement( document, docNode, resolveContext, location, commandHistory, app ), commandHistory )
 
 
-def resolveLISPLocation(currentDocumentClass, document, docRootNode, resolveContext, location, app):
-	return GSymResolveResult( document, docRootNode, currentDocumentClass, resolveContext, location )
+def resolveLISPLocation(currentUnitClass, document, docRootNode, resolveContext, location, app):
+	return GSymResolveResult( document, docRootNode, currentUnitClass, resolveContext, location )

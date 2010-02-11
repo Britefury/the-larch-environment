@@ -10,5 +10,5 @@ from GSymCore.Languages.LISP import LISP
 
 
 def initPlugin(plugin, world):
-	world.registerDocumentClass( plugin, LISP.documentClass )
+	world.registerUnitClass( plugin, LISP.unitClass )
 

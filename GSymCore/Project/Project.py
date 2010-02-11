@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from Britefury.gSym.gSymDocumentClass import GSymDocumentClass, GSymDocumentFactory
+from Britefury.gSym.gSymUnitClass import GSymUnitClass, GSymUnitFactory
 from Britefury.gSym.gSymDocument import gSymUnit
 
 from GSymCore.Project.View import viewProjectDocNodeAsElement, viewProjectDocNodeAsPage, resolveProjectLocation
@@ -19,11 +19,11 @@ def newProject():
 
 
 
-documentClass = GSymDocumentClass( Nodes.schema )
-documentClass.registerViewDocNodeAsElementFn( viewProjectDocNodeAsElement )
-documentClass.registerViewDocNodeAsPageFn( viewProjectDocNodeAsPage )
-documentClass.registerResolveLocationFn( resolveProjectLocation )
+unitClass = GSymUnitClass( Nodes.schema )
+unitClass.registerViewDocNodeAsElementFn( viewProjectDocNodeAsElement )
+unitClass.registerViewDocNodeAsPageFn( viewProjectDocNodeAsPage )
+unitClass.registerResolveLocationFn( resolveProjectLocation )
 
 
-newDocumentFactory = GSymDocumentFactory( 'gSym Document', newProject )
+newUnitFactory = GSymUnitFactory( 'gSym Document', newProject )
 

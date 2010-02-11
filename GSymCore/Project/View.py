@@ -192,9 +192,9 @@ def viewProjectDocNodeAsPage(document, docRootNode, resolveContext, location, co
 
 
 
-def resolveProjectLocation(currentDocumentClass, document, docRootNode, resolveContext, location, app):
+def resolveProjectLocation(currentUnitClass, document, docRootNode, resolveContext, location, app):
 	if location == '':
-		return GSymResolveResult( document, docRootNode, currentDocumentClass, ProjectResolveContext( resolveContext, '', document ), location )
+		return GSymResolveResult( document, docRootNode, currentUnitClass, ProjectResolveContext( resolveContext, '', document ), location )
 	else:
 		# Attempt to enter the root package
 		rootPackagePrefix = docRootNode['rootPackage']['name'] + '.'

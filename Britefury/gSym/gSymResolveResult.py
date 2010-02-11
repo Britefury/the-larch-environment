@@ -8,9 +8,9 @@
 
 
 class GSymResolveResult (object):
-	def __init__(self, document, docNode, documentClass, resolveContext, location):
+	def __init__(self, document, docNode, unitClass, resolveContext, location):
 		self.document = document
 		self.docNode = docNode
-		self.documentClass = documentClass
+		self.unitClass = unitClass
 		self.resolveContext = resolveContext
 		self.location = location
