@@ -11,8 +11,8 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import BritefuryJ.DocModel.DMModule.UnknownClassException;
-import BritefuryJ.DocModel.DMModuleResolver.CouldNotResolveModuleException;
+import BritefuryJ.DocModel.DMSchema.UnknownClassException;
+import BritefuryJ.DocModel.DMSchemaResolver.CouldNotResolveSchemaException;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 
 
@@ -187,18 +187,18 @@ public class DMIOReader
 	private ArrayList<Object> stack;
 	private ArrayList<String> nameStack;
 	private Object result;
-	private HashMap<String, DMModule> moduleTable;
+	private HashMap<String, DMSchema> moduleTable;
 	private String source;
 	private int pos;
-	DMModuleResolver resolver;
+	DMSchemaResolver resolver;
 	
 	
-	protected DMIOReader(String source, DMModuleResolver resolver)
+	protected DMIOReader(String source, DMSchemaResolver resolver)
 	{
 		stack = new ArrayList<Object>();
 		nameStack = new ArrayList<String>();
 		result = null;
-		moduleTable = new HashMap<String, DMModule>();
+		moduleTable = new HashMap<String, DMSchema>();
 		this.source = source;
 		pos = 0;
 		this.resolver = resolver;
@@ -330,12 +330,12 @@ public class DMIOReader
 	{
 		MatchResult res = null;
 		
-		// Get the module name
+		// Get the schema name
 		String moduleName = null;
 		res = match( identifier, source, pos );
 		if ( res == null )
 		{
-			throw new ParseErrorException( pos, "Expected module name for object" );
+			throw new ParseErrorException( pos, "Expected schema name for object" );
 		}
 		else
 		{
@@ -343,9 +343,9 @@ public class DMIOReader
 			moduleName = res.value;
 		}
 		
-		// Get the module
-		DMModule module = moduleTable.get( moduleName );
-		if ( module == null )
+		// Get the schema
+		DMSchema schema = moduleTable.get( moduleName );
+		if ( schema == null )
 		{
 			throw new BadModuleNameException();
 		}
@@ -354,7 +354,7 @@ public class DMIOReader
 		res = match( whitespace, source, pos );
 		if ( res == null )
 		{
-			throw new ParseErrorException( pos, "Expected whitespace after module name for object" );
+			throw new ParseErrorException( pos, "Expected whitespace after schema name for object" );
 		}
 		else
 		{
@@ -375,7 +375,7 @@ public class DMIOReader
 		}
 		
 		// Get the class
-		DMObjectClass cls = module.get( className );
+		DMObjectClass cls = schema.get( className );
 		
 		DMObject item = cls.newInstance( new Object[] {} );
 		
@@ -503,7 +503,7 @@ public class DMIOReader
 	}
 	
 	
-	private Object readDocument() throws ParseErrorException, BadModuleNameException, UnknownClassException, CouldNotResolveModuleException
+	private Object readDocument() throws ParseErrorException, BadModuleNameException, UnknownClassException, CouldNotResolveSchemaException
 	{
 		eatWhitespace();
 		
@@ -558,9 +558,9 @@ public class DMIOReader
 				}
 				
 				
-				// Get the module, and add to the module table
-				DMModule module = resolver.getModule( value );
-				moduleTable.put( key, module );
+				// Get the schema, and add to the schema table
+				DMSchema schema = resolver.getSchema( value );
+				moduleTable.put( key, schema);
 				
 				
 				eatWhitespace();
@@ -598,7 +598,7 @@ public class DMIOReader
 	}
 	
 	
-	public static Object readFromString(String source, DMModuleResolver resolver) throws ParseErrorException, BadModuleNameException, UnknownClassException, CouldNotResolveModuleException
+	public static Object readFromString(String source, DMSchemaResolver resolver) throws ParseErrorException, BadModuleNameException, UnknownClassException, CouldNotResolveSchemaException
 	{
 		DMIOReader reader = new DMIOReader( source, resolver );
 		return reader.readDocument();

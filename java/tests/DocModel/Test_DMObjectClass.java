@@ -8,20 +8,20 @@ package tests.DocModel;
 
 import java.util.Arrays;
 
+import BritefuryJ.DocModel.DMSchema;
 import junit.framework.TestCase;
-import BritefuryJ.DocModel.DMModule;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectField;
-import BritefuryJ.DocModel.DMModule.ClassAlreadyDefinedException;
+import BritefuryJ.DocModel.DMSchema.ClassAlreadyDefinedException;
 
 public class Test_DMObjectClass extends TestCase
 {
-	private DMModule m;
+	private DMSchema m;
 	
 	
 	public void setUp()
 	{
-		m = new DMModule( "m", "m", "test.m" );
+		m = new DMSchema( "m", "m", "test.m" );
 	}
 	
 	public void tearDown()

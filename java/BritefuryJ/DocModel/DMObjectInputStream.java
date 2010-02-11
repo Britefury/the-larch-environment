@@ -11,26 +11,25 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.HashMap;
 
-import BritefuryJ.DocModel.DMModule.UnknownClassException;
-import BritefuryJ.DocModel.DMModuleResolver.CouldNotResolveModuleException;
+import BritefuryJ.DocModel.DMSchema.UnknownClassException;
 
 public class DMObjectInputStream extends ObjectInputStream
 {
-	private DMModuleResolver resolver;
-	private HashMap<String, DMModule> moduleTable;
+	private DMSchemaResolver resolver;
+	private HashMap<String, DMSchema> moduleTable;
 	
 	
-	public DMObjectInputStream(InputStream stream, DMModuleResolver resolver) throws IOException
+	public DMObjectInputStream(InputStream stream, DMSchemaResolver resolver) throws IOException
 	{
 		super( stream );
 		
 		this.resolver = resolver;
-		moduleTable = new HashMap<String, DMModule>();
+		moduleTable = new HashMap<String, DMSchema>();
 	}
 	
 	
 	
-	protected DMModule readDMModule() throws IOException, ClassNotFoundException, CouldNotResolveModuleException
+	protected DMSchema readDMModule() throws IOException, ClassNotFoundException, DMSchemaResolver.CouldNotResolveSchemaException
 	{
 		boolean bNewModule = readBoolean();
 		
@@ -38,9 +37,9 @@ public class DMObjectInputStream extends ObjectInputStream
 		{
 			String shortName = (String)readObject();
 			String location = (String)readObject();
-			DMModule module = resolver.getModule( location );
-			moduleTable.put( shortName, module );
-			return module;
+			DMSchema schema = resolver.getSchema( location );
+			moduleTable.put( shortName, schema);
+			return schema;
 		}
 		else
 		{
@@ -49,12 +48,12 @@ public class DMObjectInputStream extends ObjectInputStream
 		}
 	}
 	
-	protected DMObjectClass readDMObjectClass() throws IOException, ClassNotFoundException, CouldNotResolveModuleException, UnknownClassException
+	protected DMObjectClass readDMObjectClass() throws IOException, ClassNotFoundException, DMSchemaResolver.CouldNotResolveSchemaException, UnknownClassException
 	{
-		DMModule module = readDMModule();
+		DMSchema schema = readDMModule();
 		
 		String className = (String)readObject();
 		
-		return module.get( className );
+		return schema.get( className );
 	}
 }

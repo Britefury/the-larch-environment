@@ -7,33 +7,33 @@
 ##-*************************
 import os
 
-from BritefuryJ.DocModel import DMModule, DMModuleResolver
+from BritefuryJ.DocModel import DMSchema, DMSchemaResolver
 
 from Britefury.gSym.gSymPlugin import GSymPlugin
 
 
 
-_internalModules = {}
+_internalSchemas = {}
 
 
-class GSymDMModuleResolver (DMModuleResolver):
+class GSymDMSchemaResolver (DMSchemaResolver):
 	def __init__(self):
-		self._locationToModule = {}
+		self._locationToSchema = {}
 		
 		
-	def getModule(self, location):
+	def getSchema(self, location):
 		try:
-			return _internalModules[location]
+			return _internalSchemas[location]
 		except KeyError:
 			try:
-				return self._locationToModule[location]
+				return self._locationToSchema[location]
 			except KeyError:
-				raise DMModuleResolver.CouldNotResolveModuleException( location )
+				raise DMSchemaResolver.CouldNotResolveSchemaException( location )
 			
 	
 	
-	def registerDMModule(self, mod):
-		self._locationToModule[mod.getLocation()] = mod
+	def _registerDMSchema(self, mod):
+		self._locationToSchema[mod.getLocation()] = mod
 		
 
 		
@@ -49,11 +49,11 @@ class GSymDMModuleResolver (DMModuleResolver):
 #
 
 class GSymWorld (object):
-	def __init__(self, pluginOverrides={}):
+	def __init__(self):
 		super( GSymWorld, self ).__init__()
-		self.resolver = GSymDMModuleResolver()
-		self._plugins = GSymPlugin.loadPlugins( pluginOverrides )
-		self._languages = {}
+		self.resolver = GSymDMSchemaResolver()
+		self._plugins = GSymPlugin.loadPlugins()
+		self._documentClasses = {}
 		self._locationToDocument = {}
 		self._documentIDCounter = 1
 		self.newPageFactories = []
@@ -66,11 +66,10 @@ class GSymWorld (object):
 	
 
 			
-	def registerDMModule(self, plugin, mod):
-		self.resolver.registerDMModule( mod )
-	
-	def registerLanguage(self, plugin, language):
-		self._languages[plugin.name] = language
+	def registerDocumentClass(self, plugin, documentClass):
+		schema = documentClass.getSchema()
+		self.resolver._registerDMSchema( schema )
+		self._documentClasses[schema.getLocation()] = documentClass
 	
 	def registerNewPageFactory(self, plugin, newPageFactory):
 		self.newPageFactories.append( newPageFactory )
@@ -103,18 +102,18 @@ class GSymWorld (object):
 		
 		
 	
-	def getLanguage(self, location):
+	def getDocumentClass(self, schemaLocation):
 		try:
-			return self._languages[location]
+			return self._documentClasses[schemaLocation]
 		except KeyError:
-			print 'Could not get language %s/%s'  %  ( location, self._languages.keys() )
+			print 'Could not get document class %s; registered classes: %s'  %  ( schemaLocation, self._documentClasses.keys() )
 			return None
 		
 	
 
 	@staticmethod
-	def registerInternalDMModule(mod):
-		_internalModules[mod.getLocation()] = mod
+	def registerInternalDMSchema(schema):
+		_internalSchemas[schema.getLocation()] = schema
 		
 		
 	@staticmethod
@@ -122,7 +121,7 @@ class GSymWorld (object):
 		return _internalResolver
 
 	
-_internalResolver = GSymDMModuleResolver()
+_internalResolver = GSymDMSchemaResolver()
 	
 
 

@@ -14,7 +14,7 @@ import java.util.HashSet;
 
 public class DMObjectOutputStream extends ObjectOutputStream
 {
-	private HashMap<DMModule, String> moduleToName;
+	private HashMap<DMSchema, String> moduleToName;
 	private HashSet<String> names;
 	
 	
@@ -23,12 +23,12 @@ public class DMObjectOutputStream extends ObjectOutputStream
 	{
 		super( out );
 		
-		moduleToName = new HashMap<DMModule, String>();
+		moduleToName = new HashMap<DMSchema, String>();
 		names = new HashSet<String>();
 	}
 	
 	
-	public void writeDMModule(DMModule mod) throws IOException
+	public void writeDMModule(DMSchema mod) throws IOException
 	{
 		String modName = moduleToName.get( mod );
 		if ( modName == null )

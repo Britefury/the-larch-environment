@@ -5,14 +5,19 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from Britefury.gSym.gSymLanguage import GSymLanguage
+from BritefuryJ.DocModel import DMSchema
+
+from Britefury.gSym.gSymDocumentClass import GSymDocumentClass
 
 from GSymCore.Languages.LISP.View import viewLISPDocNodeAsElement, viewLISPDocNodeAsPage, resolveLISPLocation
 
 
-language = GSymLanguage( 'LISP' )
-language.registerViewDocNodeAsElementFn( viewLISPDocNodeAsElement )
-language.registerViewDocNodeAsPageFn( viewLISPDocNodeAsPage )
-language.registerResolveLocationFn( resolveLISPLocation )
+schema = DMSchema( 'lisp', 'lisp', 'GSymCore.Languages.LISP' )
+
+
+documentClass = GSymDocumentClass( schema )
+documentClass.registerViewDocNodeAsElementFn( viewLISPDocNodeAsElement )
+documentClass.registerViewDocNodeAsPageFn( viewLISPDocNodeAsPage )
+documentClass.registerResolveLocationFn( resolveLISPLocation )
 
 

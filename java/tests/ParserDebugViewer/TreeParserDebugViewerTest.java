@@ -12,8 +12,8 @@ import java.util.Map;
 import BritefuryJ.DocModel.DMIOReader;
 import BritefuryJ.DocModel.DMIOReader.BadModuleNameException;
 import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
-import BritefuryJ.DocModel.DMModule.UnknownClassException;
-import BritefuryJ.DocModel.DMModuleResolver.CouldNotResolveModuleException;
+import BritefuryJ.DocModel.DMSchema.UnknownClassException;
+import BritefuryJ.DocModel.DMSchemaResolver.CouldNotResolveSchemaException;
 import BritefuryJ.Parser.AnyNode;
 import BritefuryJ.Parser.Choice;
 import BritefuryJ.Parser.DebugParseResult;
@@ -31,7 +31,7 @@ public class TreeParserDebugViewerTest
 	static ParserExpression identifier = new RegEx( "[A-Za-z_][A-Za-z0-9_]*" );
 
 	
-	public static void main(final String[] args) throws ParseErrorException, BadModuleNameException, UnknownClassException, CouldNotResolveModuleException, CannotOverwriteProductionExpressionException, ParserCoerceException
+	public static void main(final String[] args) throws ParseErrorException, BadModuleNameException, UnknownClassException, CouldNotResolveSchemaException, CannotOverwriteProductionExpressionException, ParserCoerceException
 	{
 		String inputSX = "[call [getAttr [getAttr [call [getAttr [load x] blah] [params]] foo] blah] [params]]";
 		Object input = DMIOReader.readFromString( inputSX, null );

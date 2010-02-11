@@ -6,17 +6,17 @@
 //##************************
 package BritefuryJ.DocModel;
 
-public interface DMModuleResolver
+public interface DMSchemaResolver
 {
-	public static class CouldNotResolveModuleException extends Exception
+	public static class CouldNotResolveSchemaException extends Exception
 	{
 		private static final long serialVersionUID = 1L;
 		
-		public CouldNotResolveModuleException(String moduleName)
+		public CouldNotResolveSchemaException(String schemaName)
 		{
-			super( "Could not resolve module: " + moduleName );
+			super( "Could not resolve schema: " + schemaName );
 		}
 	}
 	
-	public DMModule getModule(String location) throws CouldNotResolveModuleException;
+	public DMSchema getSchema(String location) throws CouldNotResolveSchemaException;
 }

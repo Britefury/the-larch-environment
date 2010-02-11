@@ -5,13 +5,11 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from GSymCore.Project import NodeClasses as Nodes
 from GSymCore.Project import Project
 
 
 
 def initPlugin(plugin, world):
-	world.registerDMModule( plugin, Nodes.module )
-	world.registerLanguage( plugin, Project.language )
+	world.registerDocumentClass( plugin, Project.documentClass )
 	world.registerNewDocumentFactory( plugin, Project.newDocumentFactory )
 

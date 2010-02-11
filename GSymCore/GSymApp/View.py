@@ -251,9 +251,9 @@ def viewGSymAppDocNodeAsPage(document, docRootNode, resolveContext, location, co
 
 
 
-def resolveGSymAppLocation(currentLanguage, document, docRootNode, resolveContext, location, app):
+def resolveGSymAppLocation(currentDocumentClass, document, docRootNode, resolveContext, location, app):
 	if location == '':
-		return GSymResolveResult( document, docRootNode, currentLanguage, GSymAppResolveContext( resolveContext, '' ), location )
+		return GSymResolveResult( document, docRootNode, currentDocumentClass, GSymAppResolveContext( resolveContext, '' ), location )
 	else:
 		documentLocation, dot, tail = location.partition( '.' )
 		

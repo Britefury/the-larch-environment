@@ -10,13 +10,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import BritefuryJ.DocModel.*;
 import junit.framework.TestCase;
-import BritefuryJ.DocModel.DMIOReader;
-import BritefuryJ.DocModel.DMIOWriter;
-import BritefuryJ.DocModel.DMModule;
-import BritefuryJ.DocModel.DMObject;
-import BritefuryJ.DocModel.DMObjectClass;
-import BritefuryJ.DocModel.DMModule.ClassAlreadyDefinedException;
+import BritefuryJ.DocModel.DMSchema;
+import BritefuryJ.DocModel.DMSchema.ClassAlreadyDefinedException;
 
 public class Test_DMIOWriter extends TestCase
 {
@@ -33,17 +30,17 @@ public class Test_DMIOWriter extends TestCase
 		}
 	}
 	
-	private DMModule module, module2;
+	private DMSchema schema, module2;
 	private DMObjectClass A, A2;
 	
 	
 	public void setUp()
 	{
-		module = new DMModule( "module", "m", "test.module" );
-		module2 = new DMModule( "module2", "m", "test.module2" );
+		schema = new DMSchema( "schema", "m", "test.schema" );
+		module2 = new DMSchema( "module2", "m", "test.module2" );
 		try
 		{
-			A = module.newClass( "A", new String[] { "x", "y" } );
+			A = schema.newClass( "A", new String[] { "x", "y" } );
 			A2 = module2.newClass( "A2", new String[] { "x", "y" } );
 		}
 		catch (ClassAlreadyDefinedException e)
@@ -54,7 +51,7 @@ public class Test_DMIOWriter extends TestCase
 	
 	public void tearDown()
 	{
-		module = null;
+		schema = null;
 		module2 = null;
 		A = null;
 		A2 = null;
@@ -254,9 +251,9 @@ public class Test_DMIOWriter extends TestCase
 	public void testWriteObject()
 	{
 		DMObject a = A.newInstance( new Object[] { "0", "1" } );
-		writeTest( a, "{m=test.module : (m A x=0 y=1)}" );
+		writeTest( a, "{m=test.schema : (m A x=0 y=1)}" );
 		DMObject a1 = A.newInstance( new Object[] { "0" } );
-		writeTest( a1, "{m=test.module : (m A x=0)}" );
+		writeTest( a1, "{m=test.schema : (m A x=0)}" );
 	}
 
 
@@ -264,7 +261,7 @@ public class Test_DMIOWriter extends TestCase
 	{
 		DMObject a = A.newInstance( new Object[] { "0", "1" } );
 		DMObject b = A.newInstance( new Object[] { a, "2" } );
-		writeTest( b, "{m=test.module : (m A x=(m A x=0 y=1) y=2)}" );
+		writeTest( b, "{m=test.schema : (m A x=(m A x=0 y=1) y=2)}" );
 	}
 
 	public void testWriteObjectInListInObject()
@@ -272,7 +269,7 @@ public class Test_DMIOWriter extends TestCase
 		DMObject a = A.newInstance( new Object[] { "0", "1" } );
 		List<Object> b = Arrays.asList( new Object[] { a, "abc" } );
 		DMObject c = A.newInstance( new Object[] { b, "2" } );
-		writeTest( c, "{m=test.module : (m A x=[(m A x=0 y=1) abc] y=2)}" );
+		writeTest( c, "{m=test.schema : (m A x=[(m A x=0 y=1) abc] y=2)}" );
 	}
 
 
@@ -281,6 +278,6 @@ public class Test_DMIOWriter extends TestCase
 		DMObject a = A.newInstance( new Object[] { "0", "1" } );
 		DMObject b = A2.newInstance( new Object[] { "0", "1" } );
 		List<Object> l = Arrays.asList( new Object[] { a, b } );
-		writeTest( l, "{m=test.module m2=test.module2 : [(m A x=0 y=1) (m2 A2 x=0 y=1)]}" );
+		writeTest( l, "{m=test.schema m2=test.module2 : [(m A x=0 y=1) (m2 A2 x=0 y=1)]}" );
 	}
 }

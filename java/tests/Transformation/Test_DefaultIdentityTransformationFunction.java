@@ -8,23 +8,23 @@ package tests.Transformation;
 
 import java.util.Arrays;
 
+import BritefuryJ.DocModel.DMSchema;
 import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMList;
-import BritefuryJ.DocModel.DMModule;
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
-import BritefuryJ.DocModel.DMModule.ClassAlreadyDefinedException;
+import BritefuryJ.DocModel.DMSchema.ClassAlreadyDefinedException;
 import BritefuryJ.Transformation.DefaultIdentityTransformationFunction;
 import BritefuryJ.Transformation.TransformationFunction;
 
 public class Test_DefaultIdentityTransformationFunction extends TestCase
 {
-	private DMModule m;
+	private DMSchema m;
 
 
 	public void setUp()
 	{
-		m = new DMModule( "m", "m", "test.m" );
+		m = new DMSchema( "m", "m", "test.m" );
 	}
 	
 	public void tearDown()

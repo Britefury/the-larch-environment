@@ -40,7 +40,7 @@ class GSymPlugin (object):
 		
 		
 	@staticmethod
-	def loadPlugins(overrides={}):
+	def loadPlugins():
 		plugins = []
 		for pluginDir in _pluginDirectories:
 			for dirpath, dirnames, filenames in os.walk( pluginDir ):
@@ -54,17 +54,14 @@ class GSymPlugin (object):
 						pathComponents.append( fn )
 						importName = '.'.join( pathComponents )
 						
-						if pluginName in overrides:
-							plugins.append( overrides[pluginName] )
-						else:
-							mod = __import__( importName )
-							components = importName.split( '.' )
-							for comp in components[1:]:
-								mod = getattr( mod, comp )
-								
-							initPluginFn = getattr( mod, 'initPlugin' )
-	
-							plugins.append( GSymPlugin( pluginName, initPluginFn ) )
+						mod = __import__( importName )
+						components = importName.split( '.' )
+						for comp in components[1:]:
+							mod = getattr( mod, comp )
+							
+						initPluginFn = getattr( mod, 'initPlugin' )
+
+						plugins.append( GSymPlugin( pluginName, initPluginFn ) )
 		
 		return plugins
 

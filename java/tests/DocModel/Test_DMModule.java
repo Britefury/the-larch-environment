@@ -7,17 +7,17 @@
 package tests.DocModel;
 
 import junit.framework.TestCase;
-import BritefuryJ.DocModel.DMModule;
+import BritefuryJ.DocModel.DMSchema;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectField;
-import BritefuryJ.DocModel.DMModule.ClassAlreadyDefinedException;
-import BritefuryJ.DocModel.DMModule.UnknownClassException;
+import BritefuryJ.DocModel.DMSchema.ClassAlreadyDefinedException;
+import BritefuryJ.DocModel.DMSchema.UnknownClassException;
 
 public class Test_DMModule extends TestCase
 {
 	public void test_get() throws UnknownClassException, ClassAlreadyDefinedException
 	{
-		DMModule m = new DMModule( "m", "m", "test.m" );
+		DMSchema m = new DMSchema( "m", "m", "test.m" );
 		
 		DMObjectClass c = new DMObjectClass( m, "c", new String[] {} );
 		
@@ -26,7 +26,7 @@ public class Test_DMModule extends TestCase
 
 	public void test_getitem() throws ClassAlreadyDefinedException
 	{
-		DMModule m = new DMModule( "m", "m", "test.m" );
+		DMSchema m = new DMSchema( "m", "m", "test.m" );
 		
 		DMObjectClass c = new DMObjectClass( m, "c", new String[] {} );
 		
@@ -37,7 +37,7 @@ public class Test_DMModule extends TestCase
 	{
 		DMObjectField f1[] = { new DMObjectField( "x" ) };
 
-		DMModule m = new DMModule( "m", "m", "test.m" );
+		DMSchema m = new DMSchema( "m", "m", "test.m" );
 		DMObjectClass A = m.newClass( "A", f1 );
 		DMObjectClass B = m.newClass( "B", new String[] { "x" } );
 		DMObjectClass C = m.newClass( "C", A, f1 );

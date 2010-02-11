@@ -5,17 +5,17 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from BritefuryJ.DocModel import DMModule, DMObjectClass
+from BritefuryJ.DocModel import DMSchema, DMObjectClass
 
 
 
 
-module = DMModule( 'GSymProject', 'prj', 'GSymCore.Project.Project' )
+schema = DMSchema( 'GSymProject', 'prj', 'GSymCore.Project' )
 
 
 
-Project = module.newClass( 'Project', [ 'rootPackage' ] )
+Project = schema.newClass( 'Project', [ 'rootPackage' ] )
 
-Package = module.newClass( 'Package', [ 'name', 'contents' ] )
-Page = module.newClass( 'Page', [ 'name', 'unit' ] )
+Package = schema.newClass( 'Package', [ 'name', 'contents' ] )
+Page = schema.newClass( 'Page', [ 'name', 'unit' ] )
 

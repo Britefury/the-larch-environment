@@ -5,208 +5,208 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from BritefuryJ.DocModel import DMModule, DMObjectClass
+from BritefuryJ.DocModel import DMSchema, DMObjectClass
 
 
 
 
-module = DMModule( 'Python25', 'py', 'GSymCore.Languages.Python25.Python25' )
+schema = DMSchema( 'Python25', 'py', 'GSymCore.Languages.Python25' )
 
 
 #
 # Node base classes
 #
-Node = module.newClass( 'Node', [] )
-Expr = module.newClass( 'Expr', Node, [ 'parens' ] )
-Stmt = module.newClass( 'Stmt', Node, [] )
+Node = schema.newClass( 'Node', [] )
+Expr = schema.newClass( 'Expr', Node, [ 'parens' ] )
+Stmt = schema.newClass( 'Stmt', Node, [] )
 
 
 #
 # Module
 #
-PythonModule = module.newClass( 'PythonModule', Node, [ 'suite' ] )
+PythonModule = schema.newClass( 'PythonModule', Node, [ 'suite' ] )
 
 
 #
 # Blank line, commentm unparsed
 #
-BlankLine = module.newClass( 'BlankLine', Node, [] )
-CommentStmt = module.newClass( 'CommentStmt', Stmt, [ 'comment' ] )
-UNPARSED = module.newClass( 'UNPARSED', Node, [ 'value' ] )
+BlankLine = schema.newClass( 'BlankLine', Node, [] )
+CommentStmt = schema.newClass( 'CommentStmt', Stmt, [ 'comment' ] )
+UNPARSED = schema.newClass( 'UNPARSED', Node, [ 'value' ] )
 
 
 #
 # Literals
 #
-Literal = module.newClass( 'Literal', Expr, [] )
-StringLiteral = module.newClass( 'StringLiteral', Literal, [ 'format', 'quotation', 'value' ] )
-IntLiteral = module.newClass( 'IntLiteral', Literal, [ 'format', 'numType', 'value' ] )
-FloatLiteral = module.newClass( 'FloatLiteral', Literal, [ 'value' ] )
-ImaginaryLiteral = module.newClass( 'ImaginaryLiteral', Literal, [ 'value' ] )
+Literal = schema.newClass( 'Literal', Expr, [] )
+StringLiteral = schema.newClass( 'StringLiteral', Literal, [ 'format', 'quotation', 'value' ] )
+IntLiteral = schema.newClass( 'IntLiteral', Literal, [ 'format', 'numType', 'value' ] )
+FloatLiteral = schema.newClass( 'FloatLiteral', Literal, [ 'value' ] )
+ImaginaryLiteral = schema.newClass( 'ImaginaryLiteral', Literal, [ 'value' ] )
 
 
 #
 # Targets
 #
-Target = module.newClass( 'Target', Node, [ 'parens' ] )
-SingleTarget = module.newClass( 'SingleTarget', Target, [ 'name' ] )
-TupleTarget = module.newClass( 'TupleTarget', Target, [ 'targets', 'trailingSeparator' ] )
-ListTarget = module.newClass( 'ListTarget', Target, [ 'targets', 'trailingSeparator' ] )
+Target = schema.newClass( 'Target', Node, [ 'parens' ] )
+SingleTarget = schema.newClass( 'SingleTarget', Target, [ 'name' ] )
+TupleTarget = schema.newClass( 'TupleTarget', Target, [ 'targets', 'trailingSeparator' ] )
+ListTarget = schema.newClass( 'ListTarget', Target, [ 'targets', 'trailingSeparator' ] )
 
 
 #
 # Expressions (various)
 #
-Load = module.newClass( 'Load', Expr, [ 'name' ] )
+Load = schema.newClass( 'Load', Expr, [ 'name' ] )
 # Tuple / list
-TupleLiteral = module.newClass( 'TupleLiteral', Expr, [ 'values', 'trailingSeparator' ] )
-ListLiteral = module.newClass( 'ListLiteral', Expr, [ 'values', 'trailingSeparator' ] )
+TupleLiteral = schema.newClass( 'TupleLiteral', Expr, [ 'values', 'trailingSeparator' ] )
+ListLiteral = schema.newClass( 'ListLiteral', Expr, [ 'values', 'trailingSeparator' ] )
 # List comprehension / generator expression
-ComprehensionFor = module.newClass( 'ComprehensionFor', Node, [ 'target', 'source' ] )
-ComprehensionIf = module.newClass( 'ComprehensionIf', Node, [ 'condition' ] )
-ListComp = module.newClass( 'ListComp', Expr, [ 'resultExpr', 'comprehensionItems' ] )
-GeneratorExpr = module.newClass( 'GeneratorExpr', Expr, [ 'resultExpr', 'comprehensionItems' ] )
+ComprehensionFor = schema.newClass( 'ComprehensionFor', Node, [ 'target', 'source' ] )
+ComprehensionIf = schema.newClass( 'ComprehensionIf', Node, [ 'condition' ] )
+ListComp = schema.newClass( 'ListComp', Expr, [ 'resultExpr', 'comprehensionItems' ] )
+GeneratorExpr = schema.newClass( 'GeneratorExpr', Expr, [ 'resultExpr', 'comprehensionItems' ] )
 # Dictionary
-DictKeyValuePair = module.newClass( 'DictKeyValuePair', Node, [ 'key', 'value' ] )
-DictLiteral = module.newClass( 'DictLiteral', Expr, [ 'values', 'trailingSeparator' ] )
+DictKeyValuePair = schema.newClass( 'DictKeyValuePair', Node, [ 'key', 'value' ] )
+DictLiteral = schema.newClass( 'DictLiteral', Expr, [ 'values', 'trailingSeparator' ] )
 # Yield
-YieldExpr = module.newClass( 'YieldExpr', Expr, [ 'value' ] )
+YieldExpr = schema.newClass( 'YieldExpr', Expr, [ 'value' ] )
 # Attribute reference
-AttributeRef = module.newClass( 'AttributeRef', Expr, [ 'target', 'name' ] )
+AttributeRef = schema.newClass( 'AttributeRef', Expr, [ 'target', 'name' ] )
 # Subscript
-SubscriptSlice = module.newClass( 'SubscriptSlice', Node, [ 'lower', 'upper' ] )
-SubscriptLongSlice = module.newClass( 'SubscriptLongSlice', Node, [ 'lower', 'upper', 'stride' ] )
-SubscriptEllipsis = module.newClass( 'SubscriptEllipsis', Node, [] )
-SubscriptTuple = module.newClass( 'SubscriptTuple', Node, [ 'values', 'trailingSeparator' ] )
-Subscript = module.newClass( 'Subscript', Expr, [ 'target', 'index' ] )
+SubscriptSlice = schema.newClass( 'SubscriptSlice', Node, [ 'lower', 'upper' ] )
+SubscriptLongSlice = schema.newClass( 'SubscriptLongSlice', Node, [ 'lower', 'upper', 'stride' ] )
+SubscriptEllipsis = schema.newClass( 'SubscriptEllipsis', Node, [] )
+SubscriptTuple = schema.newClass( 'SubscriptTuple', Node, [ 'values', 'trailingSeparator' ] )
+Subscript = schema.newClass( 'Subscript', Expr, [ 'target', 'index' ] )
 # Call
-CallKWArg = module.newClass( 'CallKWArg', Node, [ 'name', 'value' ] )
-CallArgList = module.newClass( 'CallArgList', Node, [ 'value' ] )
-CallKWArgList = module.newClass( 'CallKWArgList', Node, [ 'value' ] )
-Call = module.newClass( 'Call', Expr, [ 'target', 'args', 'argsTrailingSeparator' ] )
+CallKWArg = schema.newClass( 'CallKWArg', Node, [ 'name', 'value' ] )
+CallArgList = schema.newClass( 'CallArgList', Node, [ 'value' ] )
+CallKWArgList = schema.newClass( 'CallKWArgList', Node, [ 'value' ] )
+Call = schema.newClass( 'Call', Expr, [ 'target', 'args', 'argsTrailingSeparator' ] )
 # Mathematical / bitwise operators
-UnaryOp = module.newClass( 'UnaryOp', Expr, [ 'x' ] )
-BinOp = module.newClass( 'BinOp', Expr, [ 'x', 'y' ] )
-Pow = module.newClass( 'Pow', BinOp, [] )
-Invert = module.newClass( 'Invert', UnaryOp, [] )
-Negate = module.newClass( 'Negate', UnaryOp, [] )
-Pos = module.newClass( 'Pos', UnaryOp, [] )
-Mul = module.newClass( 'Mul', BinOp, [] )
-Div = module.newClass( 'Div', BinOp, [] )
-Mod = module.newClass( 'Mod', BinOp, [] )
-Add = module.newClass( 'Add', BinOp, [] )
-Sub = module.newClass( 'Sub', BinOp, [] )
-LShift = module.newClass( 'LShift', BinOp, [] )
-RShift = module.newClass( 'RShift', BinOp, [] )
-BitAnd = module.newClass( 'BitAnd', BinOp, [] )
-BitXor = module.newClass( 'BitXor', BinOp, [] )
-BitOr = module.newClass( 'BitOr', BinOp, [] )
+UnaryOp = schema.newClass( 'UnaryOp', Expr, [ 'x' ] )
+BinOp = schema.newClass( 'BinOp', Expr, [ 'x', 'y' ] )
+Pow = schema.newClass( 'Pow', BinOp, [] )
+Invert = schema.newClass( 'Invert', UnaryOp, [] )
+Negate = schema.newClass( 'Negate', UnaryOp, [] )
+Pos = schema.newClass( 'Pos', UnaryOp, [] )
+Mul = schema.newClass( 'Mul', BinOp, [] )
+Div = schema.newClass( 'Div', BinOp, [] )
+Mod = schema.newClass( 'Mod', BinOp, [] )
+Add = schema.newClass( 'Add', BinOp, [] )
+Sub = schema.newClass( 'Sub', BinOp, [] )
+LShift = schema.newClass( 'LShift', BinOp, [] )
+RShift = schema.newClass( 'RShift', BinOp, [] )
+BitAnd = schema.newClass( 'BitAnd', BinOp, [] )
+BitXor = schema.newClass( 'BitXor', BinOp, [] )
+BitOr = schema.newClass( 'BitOr', BinOp, [] )
 # Comparison
-Cmp = module.newClass( 'Cmp', Expr, [ 'x', 'ops' ] )
-CmpOp = module.newClass( 'CmpOp', Node, [ 'y' ] )
-CmpOpLte = module.newClass( 'CmpOpLte', CmpOp, [] )
-CmpOpLt = module.newClass( 'CmpOpLt', CmpOp, [] )
-CmpOpGte = module.newClass( 'CmpOpGte', CmpOp, [] )
-CmpOpGt = module.newClass( 'CmpOpGt', CmpOp, [] )
-CmpOpEq = module.newClass( 'CmpOpEq', CmpOp, [] )
-CmpOpNeq = module.newClass( 'CmpOpNeq', CmpOp, [] )
-CmpOpIsNot = module.newClass( 'CmpOpIsNot', CmpOp, [] )
-CmpOpIs = module.newClass( 'CmpOpIs', CmpOp, [] )
-CmpOpNotIn = module.newClass( 'CmpOpNotIn', CmpOp, [] )
-CmpOpIn = module.newClass( 'CmpOpIn', CmpOp, [] )
+Cmp = schema.newClass( 'Cmp', Expr, [ 'x', 'ops' ] )
+CmpOp = schema.newClass( 'CmpOp', Node, [ 'y' ] )
+CmpOpLte = schema.newClass( 'CmpOpLte', CmpOp, [] )
+CmpOpLt = schema.newClass( 'CmpOpLt', CmpOp, [] )
+CmpOpGte = schema.newClass( 'CmpOpGte', CmpOp, [] )
+CmpOpGt = schema.newClass( 'CmpOpGt', CmpOp, [] )
+CmpOpEq = schema.newClass( 'CmpOpEq', CmpOp, [] )
+CmpOpNeq = schema.newClass( 'CmpOpNeq', CmpOp, [] )
+CmpOpIsNot = schema.newClass( 'CmpOpIsNot', CmpOp, [] )
+CmpOpIs = schema.newClass( 'CmpOpIs', CmpOp, [] )
+CmpOpNotIn = schema.newClass( 'CmpOpNotIn', CmpOp, [] )
+CmpOpIn = schema.newClass( 'CmpOpIn', CmpOp, [] )
 # Tests
-NotTest = module.newClass( 'NotTest', UnaryOp, [] )
-AndTest = module.newClass( 'AndTest', BinOp, [] )
-OrTest = module.newClass( 'OrTest', BinOp, [] )
+NotTest = schema.newClass( 'NotTest', UnaryOp, [] )
+AndTest = schema.newClass( 'AndTest', BinOp, [] )
+OrTest = schema.newClass( 'OrTest', BinOp, [] )
 # Parameters for lambda / function definition
-SimpleParam = module.newClass( 'SimpleParam', Node, [ 'name' ] )
-DefaultValueParam = module.newClass( 'DefaultValueParam', Node, [ 'name', 'defaultValue' ] )
-ParamList = module.newClass( 'ParamList', Node, [ 'name' ] )
-KWParamList = module.newClass( 'KWParamList', Node, [ 'name' ] )
+SimpleParam = schema.newClass( 'SimpleParam', Node, [ 'name' ] )
+DefaultValueParam = schema.newClass( 'DefaultValueParam', Node, [ 'name', 'defaultValue' ] )
+ParamList = schema.newClass( 'ParamList', Node, [ 'name' ] )
+KWParamList = schema.newClass( 'KWParamList', Node, [ 'name' ] )
 # Lambda
-LambdaExpr = module.newClass( 'LambdaExpr', Expr, [ 'params', 'expr', 'paramsTrailingSeparator' ] )
+LambdaExpr = schema.newClass( 'LambdaExpr', Expr, [ 'params', 'expr', 'paramsTrailingSeparator' ] )
 # Conditional
-ConditionalExpr = module.newClass( 'ConditionalExpr', Expr, [ 'condition', 'expr', 'elseExpr' ] )
+ConditionalExpr = schema.newClass( 'ConditionalExpr', Expr, [ 'condition', 'expr', 'elseExpr' ] )
 
 
 #
 # Simple statements
 #
-SimpleStmt = module.newClass( 'SimpleStmt', Stmt, [] )
+SimpleStmt = schema.newClass( 'SimpleStmt', Stmt, [] )
 # Expression statement
-ExprStmt = module.newClass( 'ExprStmt', SimpleStmt, [ 'expr' ] )
+ExprStmt = schema.newClass( 'ExprStmt', SimpleStmt, [ 'expr' ] )
 # Other statements
-AssertStmt = module.newClass( 'AssertStmt', SimpleStmt, [ 'condition', 'fail' ] )
-AssignStmt = module.newClass( 'AssignStmt', SimpleStmt, [ 'targets', 'value' ] )
-AugAssignStmt = module.newClass( 'AugAssignStmt', SimpleStmt, [ 'op', 'target', 'value' ] )
-PassStmt = module.newClass( 'PassStmt', SimpleStmt, [] )
-DelStmt = module.newClass( 'DelStmt', SimpleStmt, [ 'target' ] )
-ReturnStmt = module.newClass( 'ReturnStmt', SimpleStmt, [ 'value' ] )
-YieldStmt = module.newClass( 'YieldStmt', SimpleStmt, [ 'value' ] )
-RaiseStmt = module.newClass( 'RaiseStmt', SimpleStmt, [ 'excType', 'excValue', 'traceback' ] )
-BreakStmt = module.newClass( 'BreakStmt', SimpleStmt, [] )
-ContinueStmt = module.newClass( 'ContinueStmt', SimpleStmt, [] )
-ExecStmt = module.newClass( 'ExecStmt', SimpleStmt, [ 'source', 'locals', 'globals' ] )
-PrintStmt = module.newClass( 'PrintStmt', SimpleStmt, [ 'destination', 'values' ] )
+AssertStmt = schema.newClass( 'AssertStmt', SimpleStmt, [ 'condition', 'fail' ] )
+AssignStmt = schema.newClass( 'AssignStmt', SimpleStmt, [ 'targets', 'value' ] )
+AugAssignStmt = schema.newClass( 'AugAssignStmt', SimpleStmt, [ 'op', 'target', 'value' ] )
+PassStmt = schema.newClass( 'PassStmt', SimpleStmt, [] )
+DelStmt = schema.newClass( 'DelStmt', SimpleStmt, [ 'target' ] )
+ReturnStmt = schema.newClass( 'ReturnStmt', SimpleStmt, [ 'value' ] )
+YieldStmt = schema.newClass( 'YieldStmt', SimpleStmt, [ 'value' ] )
+RaiseStmt = schema.newClass( 'RaiseStmt', SimpleStmt, [ 'excType', 'excValue', 'traceback' ] )
+BreakStmt = schema.newClass( 'BreakStmt', SimpleStmt, [] )
+ContinueStmt = schema.newClass( 'ContinueStmt', SimpleStmt, [] )
+ExecStmt = schema.newClass( 'ExecStmt', SimpleStmt, [ 'source', 'locals', 'globals' ] )
+PrintStmt = schema.newClass( 'PrintStmt', SimpleStmt, [ 'destination', 'values' ] )
 # Import
-RelativeModule = module.newClass( 'RelativeModule', Node, [ 'name' ] )
-ModuleImport = module.newClass( 'ModuleImport', Node, [ 'name' ] )
-ModuleImportAs = module.newClass( 'ModuleImportAs', Node, [ 'name', 'asName' ] )
-ModuleContentImport = module.newClass( 'ModuleContentImport', Node, [ 'name' ] )
-ModuleContentImportAs = module.newClass( 'ModuleContentImportAs', Node, [ 'name', 'asName' ] )
-ImportStmt = module.newClass( 'ImportStmt', SimpleStmt, [ 'modules' ] )
-FromImportStmt = module.newClass( 'FromImportStmt', SimpleStmt, [ 'module', 'imports' ] )
-FromImportAllStmt = module.newClass( 'FromImportAllStmt', SimpleStmt, [ 'module' ] )
+RelativeModule = schema.newClass( 'RelativeModule', Node, [ 'name' ] )
+ModuleImport = schema.newClass( 'ModuleImport', Node, [ 'name' ] )
+ModuleImportAs = schema.newClass( 'ModuleImportAs', Node, [ 'name', 'asName' ] )
+ModuleContentImport = schema.newClass( 'ModuleContentImport', Node, [ 'name' ] )
+ModuleContentImportAs = schema.newClass( 'ModuleContentImportAs', Node, [ 'name', 'asName' ] )
+ImportStmt = schema.newClass( 'ImportStmt', SimpleStmt, [ 'modules' ] )
+FromImportStmt = schema.newClass( 'FromImportStmt', SimpleStmt, [ 'module', 'imports' ] )
+FromImportAllStmt = schema.newClass( 'FromImportAllStmt', SimpleStmt, [ 'module' ] )
 # Global
-GlobalVar = module.newClass( 'GlobalVar', Node, [ 'name' ] )
-GlobalStmt = module.newClass( 'GlobalStmt', SimpleStmt, [ 'vars' ] )
+GlobalVar = schema.newClass( 'GlobalVar', Node, [ 'name' ] )
+GlobalStmt = schema.newClass( 'GlobalStmt', SimpleStmt, [ 'vars' ] )
 
 
 
 #
 # Compound statement headers
 #
-CompountStmtHeader = module.newClass( 'CompountStmtHeader', Stmt, [] )
-IfStmtHeader = module.newClass( 'IfStmtHeader', CompountStmtHeader, [ 'condition' ] )
-ElifStmtHeader = module.newClass( 'ElifStmtHeader', CompountStmtHeader, [ 'condition' ] )
-ElseStmtHeader = module.newClass( 'ElseStmtHeader', CompountStmtHeader, [] )
-WhileStmtHeader = module.newClass( 'WhileStmtHeader', CompountStmtHeader, [ 'condition' ] )
-ForStmtHeader = module.newClass( 'ForStmtHeader', CompountStmtHeader, [ 'target', 'source' ] )
-TryStmtHeader = module.newClass( 'TryStmtHeader', CompountStmtHeader, [] )
-ExceptStmtHeader = module.newClass( 'ExceptStmtHeader', CompountStmtHeader, [ 'exception', 'target' ] )
-FinallyStmtHeader = module.newClass( 'FinallyStmtHeader', CompountStmtHeader, [] )
-WithStmtHeader = module.newClass( 'WithStmtHeader', CompountStmtHeader, [ 'expr', 'target' ] )
-DecoStmtHeader = module.newClass( 'DecoStmtHeader', CompountStmtHeader, [ 'name', 'args', 'argsTrailingSeparator' ] )
-DefStmtHeader = module.newClass( 'DefStmtHeader', CompountStmtHeader, [ 'name', 'params', 'paramsTrailingSeparator' ] )
-ClassStmtHeader = module.newClass( 'ClassStmtHeader', CompountStmtHeader, [ 'name', 'bases', 'basesTrailingSeparator' ] )
+CompountStmtHeader = schema.newClass( 'CompountStmtHeader', Stmt, [] )
+IfStmtHeader = schema.newClass( 'IfStmtHeader', CompountStmtHeader, [ 'condition' ] )
+ElifStmtHeader = schema.newClass( 'ElifStmtHeader', CompountStmtHeader, [ 'condition' ] )
+ElseStmtHeader = schema.newClass( 'ElseStmtHeader', CompountStmtHeader, [] )
+WhileStmtHeader = schema.newClass( 'WhileStmtHeader', CompountStmtHeader, [ 'condition' ] )
+ForStmtHeader = schema.newClass( 'ForStmtHeader', CompountStmtHeader, [ 'target', 'source' ] )
+TryStmtHeader = schema.newClass( 'TryStmtHeader', CompountStmtHeader, [] )
+ExceptStmtHeader = schema.newClass( 'ExceptStmtHeader', CompountStmtHeader, [ 'exception', 'target' ] )
+FinallyStmtHeader = schema.newClass( 'FinallyStmtHeader', CompountStmtHeader, [] )
+WithStmtHeader = schema.newClass( 'WithStmtHeader', CompountStmtHeader, [ 'expr', 'target' ] )
+DecoStmtHeader = schema.newClass( 'DecoStmtHeader', CompountStmtHeader, [ 'name', 'args', 'argsTrailingSeparator' ] )
+DefStmtHeader = schema.newClass( 'DefStmtHeader', CompountStmtHeader, [ 'name', 'params', 'paramsTrailingSeparator' ] )
+ClassStmtHeader = schema.newClass( 'ClassStmtHeader', CompountStmtHeader, [ 'name', 'bases', 'basesTrailingSeparator' ] )
 
 
 
 #
 # Compound statements
 #
-CompoundStmt = module.newClass( 'CompoundStmt', Stmt, [] )
-CompoundComponent = module.newClass( 'CompoundComponent', Node, [] )
+CompoundStmt = schema.newClass( 'CompoundStmt', Stmt, [] )
+CompoundComponent = schema.newClass( 'CompoundComponent', Node, [] )
 
-IfStmt = module.newClass( 'IfStmt', CompoundStmt, [ 'condition', 'suite', 'elifBlocks', 'elseSuite' ] )
-ElifBlock = module.newClass( 'ElifBlock', CompoundComponent, [ 'condition', 'suite' ] )
-WhileStmt = module.newClass( 'WhileStmt', CompoundStmt, [ 'condition', 'suite', 'elseSuite' ] )
-ForStmt = module.newClass( 'ForStmt', CompoundStmt, [ 'target', 'source', 'suite', 'elseSuite' ] )
-TryStmt = module.newClass( 'TryStmt', CompoundStmt, [ 'suite', 'exceptBlocks', 'elseSuite', 'finallySuite' ] )
-ExceptBlock = module.newClass( 'ExceptBlock', CompoundComponent, [ 'exception', 'target', 'suite' ] )
-WithStmt = module.newClass( 'WithStmt', CompoundStmt, [ 'expr', 'target', 'suite' ] )
-Decorator = module.newClass( 'Decorator', CompoundComponent, [ 'name', 'args', 'argsTrailingSeparator' ] )
-DefStmt = module.newClass( 'DefStmt', CompoundStmt, [ 'decorators', 'name', 'params', 'paramsTrailingSeparator', 'suite' ] )
-ClassStmt = module.newClass( 'ClassStmt', CompoundStmt, [ 'name', 'bases', 'basesTrailingSeparator', 'suite' ] )
+IfStmt = schema.newClass( 'IfStmt', CompoundStmt, [ 'condition', 'suite', 'elifBlocks', 'elseSuite' ] )
+ElifBlock = schema.newClass( 'ElifBlock', CompoundComponent, [ 'condition', 'suite' ] )
+WhileStmt = schema.newClass( 'WhileStmt', CompoundStmt, [ 'condition', 'suite', 'elseSuite' ] )
+ForStmt = schema.newClass( 'ForStmt', CompoundStmt, [ 'target', 'source', 'suite', 'elseSuite' ] )
+TryStmt = schema.newClass( 'TryStmt', CompoundStmt, [ 'suite', 'exceptBlocks', 'elseSuite', 'finallySuite' ] )
+ExceptBlock = schema.newClass( 'ExceptBlock', CompoundComponent, [ 'exception', 'target', 'suite' ] )
+WithStmt = schema.newClass( 'WithStmt', CompoundStmt, [ 'expr', 'target', 'suite' ] )
+Decorator = schema.newClass( 'Decorator', CompoundComponent, [ 'name', 'args', 'argsTrailingSeparator' ] )
+DefStmt = schema.newClass( 'DefStmt', CompoundStmt, [ 'decorators', 'name', 'params', 'paramsTrailingSeparator', 'suite' ] )
+ClassStmt = schema.newClass( 'ClassStmt', CompoundStmt, [ 'name', 'bases', 'basesTrailingSeparator', 'suite' ] )
 
 
 
 #
 # Structure nodes
 #
-Indent = module.newClass( 'Indent', Node, [] )
-Dedent = module.newClass( 'Dedent', Node, [] )
+Indent = schema.newClass( 'Indent', Node, [] )
+Dedent = schema.newClass( 'Dedent', Node, [] )
 
-IndentedBlock = module.newClass( 'IndentedBlock', CompoundStmt, [ 'suite' ] )
+IndentedBlock = schema.newClass( 'IndentedBlock', CompoundStmt, [ 'suite' ] )
 
 

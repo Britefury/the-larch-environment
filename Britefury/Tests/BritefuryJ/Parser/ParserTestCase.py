@@ -6,7 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 from BritefuryJ.DocModel import DMNode
-from BritefuryJ.DocModel import DMIOReader, DMIOWriter, DMModuleResolver
+from BritefuryJ.DocModel import DMIOReader, DMIOWriter, DMSchemaResolver
 from BritefuryJ.ParserDebugViewer import ParseViewFrame
 
 import string
@@ -24,12 +24,12 @@ def _deepList(xs):
 		return xs
 
 class ParserTestCase (unittest.TestCase):
-	class Resolver (DMModuleResolver):
+	class Resolver (DMSchemaResolver):
 		def __init__(self):
-			self.modules = {}
+			self.schemas = {}
 			
-		def getModule(self, location):
-			return self.modules[location]
+		def getSchema(self, location):
+			return self.schemas[location]
 		
 	resolver = Resolver()
 	

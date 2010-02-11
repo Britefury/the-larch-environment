@@ -11,42 +11,37 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
+import BritefuryJ.DocModel.*;
 import junit.framework.TestCase;
-import BritefuryJ.DocModel.DMList;
-import BritefuryJ.DocModel.DMModule;
-import BritefuryJ.DocModel.DMModuleResolver;
-import BritefuryJ.DocModel.DMObject;
-import BritefuryJ.DocModel.DMObjectClass;
-import BritefuryJ.DocModel.DMObjectInputStream;
-import BritefuryJ.DocModel.DMObjectOutputStream;
+import BritefuryJ.DocModel.DMSchema;
 
 public class Test_DocModelSerialisation extends TestCase
 {
-	private DMModule module;
-	private DMModuleResolver resolver;
+	private DMSchema schema;
+	private DMSchemaResolver resolver;
 	private DMObjectClass A;
-	
-	
+
+
 	public void setUp()
 	{
-		module = new DMModule( "module", "m", "test.module" );
+		schema = new DMSchema( "schema", "m", "test.schema" );
 		try
 		{
-			A = module.newClass( "A", new String[] { "x", "y" } );
+			A = schema.newClass( "A", new String[] { "x", "y" } );
 		}
-		catch (DMModule.ClassAlreadyDefinedException e)
+		catch (DMSchema.ClassAlreadyDefinedException e)
 		{
 			throw new RuntimeException();
 		}
 		
 		
-		resolver = new DMModuleResolver()
+		resolver = new DMSchemaResolver()
 		{
-			public DMModule getModule(String location)
+			public DMSchema getSchema(String location)
 			{
-				if ( location.equals( "test.module" ) )
+				if ( location.equals( "test.schema" ) )
 				{
-					return module;
+					return schema;
 				}
 				else
 				{
@@ -59,7 +54,7 @@ public class Test_DocModelSerialisation extends TestCase
 	
 	public void tearDown()
 	{
-		module = null;
+		schema = null;
 		resolver = null;
 		A = null;
 	}
