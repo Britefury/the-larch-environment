@@ -19,14 +19,14 @@ public class DPVBox extends DPAbstractBox
 	}
 	
 	
-	public DPVBox(ElementContext context)
+	public DPVBox()
 	{
-		this( context, VBoxStyleSheet.defaultStyleSheet );
+		this( VBoxStyleSheet.defaultStyleSheet );
 	}
 	
-	public DPVBox(ElementContext context, VBoxStyleSheet syleSheet)
+	public DPVBox(VBoxStyleSheet syleSheet)
 	{
-		super( context, syleSheet );
+		super( syleSheet );
 		
 		layoutNode = new LayoutNodeVBox( this );
 	}

@@ -11,16 +11,16 @@ import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
 
 public class DPParagraphDedentMarker extends DPParagraphMarker
 {
-	public DPParagraphDedentMarker(ElementContext context)
+	public DPParagraphDedentMarker()
 	{
-		super( context );
+		super( );
 		
 		layoutNode = new LayoutNodeParagraphDedentMarker( this );
 	}
 	
-	public DPParagraphDedentMarker(ElementContext context, WidgetStyleSheet styleSheet)
+	public DPParagraphDedentMarker(WidgetStyleSheet styleSheet)
 	{
-		super( context, styleSheet );
+		super( styleSheet );
 		
 		layoutNode = new LayoutNodeParagraphDedentMarker( this );
 	}

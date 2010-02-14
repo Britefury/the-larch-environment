@@ -16,7 +16,6 @@ import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
-import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -232,19 +231,6 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 			alignmentFlags[i] = nodes.get( i ).getAlignmentFlags();
 		}
 		return alignmentFlags;
-	}
-	
-	
-	
-	
-	@SuppressWarnings("unchecked")
-	protected <T extends PackingParams> T[] getChildrenPackingParams(List<DPWidget> nodes, T packingParams[])
-	{
-		for (int i = 0; i < nodes.size(); i++)
-		{
-			packingParams[i] = (T)nodes.get( i ).getParentPacking();
-		}
-		return packingParams;
 	}
 	
 	

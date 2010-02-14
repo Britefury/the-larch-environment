@@ -7,7 +7,7 @@
 package BritefuryJ.DocView;
 
 import BritefuryJ.DocModel.DMNode;
-import BritefuryJ.DocPresent.DPProxy;
+import BritefuryJ.DocPresent.DPFragment;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementContext;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
@@ -23,7 +23,7 @@ public class DVNode extends IncrementalTreeNode
 
 	
 	
-	private DPProxy proxyElement;
+	private DPFragment fragmentElement;
 	private DPWidget element;
 	
 	
@@ -32,8 +32,8 @@ public class DVNode extends IncrementalTreeNode
 	{
 		super( view, docNode, resultChangeListener );
 		
-		// Proxy element, with null context, initially; later set in @setContext method
-		proxyElement = new DPProxy( null );
+		// Fragment element, with null context, initially; later set in @setContext method
+		fragmentElement = new DPFragment( null );
 		element = null;
 	}
 	
@@ -47,13 +47,13 @@ public class DVNode extends IncrementalTreeNode
 	
 	public DPWidget getElementNoRefresh()
 	{
-		return proxyElement;
+		return fragmentElement;
 	}
 	
 	public DPWidget getElement()
 	{
 		refresh();
-		return proxyElement;
+		return fragmentElement;
 	}
 	
 	
@@ -65,13 +65,13 @@ public class DVNode extends IncrementalTreeNode
 	
 	public Object getResultNoRefresh()
 	{
-		return proxyElement;
+		return fragmentElement;
 	}
 	
 	public Object getResult()
 	{
 		refresh();
-		return proxyElement;
+		return fragmentElement;
 	}
 	
 
@@ -99,7 +99,7 @@ public class DVNode extends IncrementalTreeNode
 	
 	public void setElementContext(ElementContext elementContext)
 	{
-		proxyElement.setContext( elementContext );
+		fragmentElement.setContext( elementContext );
 	}
 	
 	
@@ -128,12 +128,12 @@ public class DVNode extends IncrementalTreeNode
 			if ( r != null )
 			{
 				element = (DPWidget)r;
-				proxyElement.setChild( element );
+				fragmentElement.setChild( element );
 			}
 			else
 			{
 				element = null;
-				proxyElement.setChild( null );
+				fragmentElement.setChild( null );
 			}
 		}
 		getDocView().profile_stopUpdateNodeElement();

@@ -7,7 +7,6 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeParagraph;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 
@@ -23,29 +22,25 @@ public class DPParagraph extends DPContainerSequence
 
 
 	
-	public DPParagraph(ElementContext context)
+	public DPParagraph()
 	{
-		this( context, ParagraphStyleSheet.defaultStyleSheet );
+		this( ParagraphStyleSheet.defaultStyleSheet );
 	}
 
-	public DPParagraph(ElementContext context, ParagraphStyleSheet styleSheet)
+	public DPParagraph(ParagraphStyleSheet styleSheet)
 	{
-		super( context, styleSheet );
+		super( styleSheet );
 		
 		layoutNode = new LayoutNodeParagraph( this );
 	}
+
+	
 	
 	//
 	//
 	// STYLESHEET METHODS
 	//
 	//
-
-
-	protected PackingParams getDefaultPackingParams()
-	{
-		return null;
-	}
 
 	public double getSpacing()
 	{

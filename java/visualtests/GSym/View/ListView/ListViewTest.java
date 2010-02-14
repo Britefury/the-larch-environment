@@ -38,7 +38,7 @@ public class ListViewTest
 	{
 		if ( text != null )
 		{
-			return new DPText( null, styleSheet, text );
+			return new DPText( styleSheet, text );
 		}
 		else
 		{
@@ -60,7 +60,7 @@ public class ListViewTest
 		
 		public DPWidget createElement(ElementContext ctx)
 		{
-			return new DPText( null, styleSheet, text );
+			return new DPText( styleSheet, text );
 		}
 	}
 	
@@ -78,7 +78,7 @@ public class ListViewTest
 		
 		public DPWidget createElement(ElementContext ctx, int index, DPWidget child)
 		{
-			return new DPText( null, styleSheet, text );
+			return new DPText( styleSheet, text );
 		}
 	}
 	
@@ -94,7 +94,7 @@ public class ListViewTest
 		
 		public DPWidget createElement(ElementContext ctx)
 		{
-			return new DPWhitespace( null, " ", spacing );
+			return new DPWhitespace( " ", spacing );
 		}
 	}
 	
@@ -108,14 +108,14 @@ public class ListViewTest
 		DPWidget children[] = new DPText[txt.length];
 		for (int i = 0; i < txt.length; i++)
 		{
-			children[i] = new DPText( null, s1, txt[i] );
+			children[i] = new DPText( s1, txt[i] );
 		}
 		DPWidget ls = layout.createListElement( null, Arrays.asList( children ), new TextElementFactory( beginDelim, s2 ), new TextElementFactory( endDelim, s2 ), new TextSeparatorElementFactory( separator, s2 ) );
 		
 		
-		DPWidget titleElem = new DPText( null, s0, title );
+		DPWidget titleElem = new DPText( s0, title );
 		
-		DPVBox vbox = new DPVBox( null );
+		DPVBox vbox = new DPVBox( );
 		vbox.setChildren( Arrays.asList( new DPWidget[] { titleElem, ls } ) );
 		return vbox;
 	}
@@ -124,7 +124,7 @@ public class ListViewTest
 	protected DPWidget createContentNode()
 	{
 		VBoxStyleSheet boxs = new VBoxStyleSheet( 15.0 );
-		DPVBox box = new DPVBox( null, boxs );
+		DPVBox box = new DPVBox( boxs );
 		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
 		
 
@@ -159,7 +159,7 @@ public class ListViewTest
 		//This stops the app on window close.
 		frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
 		
-		DPPresentationArea area = new DPPresentationArea( null );
+		DPPresentationArea area = new DPPresentationArea( );
 
 		area.setChild( createContentNode() );
 	     

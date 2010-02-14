@@ -14,7 +14,6 @@ import java.util.List;
 import org.python.core.PySlice;
 
 import BritefuryJ.DocPresent.Layout.LAllocV;
-import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.JythonInterface.JythonIndex;
 import BritefuryJ.JythonInterface.JythonSlice;
@@ -23,14 +22,14 @@ import BritefuryJ.JythonInterface.JythonSlice;
 
 abstract public class DPContainerSequence extends DPContainer
 {
-	public DPContainerSequence(ElementContext context)
+	public DPContainerSequence()
 	{
-		this( context, ContainerStyleSheet.defaultStyleSheet );
+		this( ContainerStyleSheet.defaultStyleSheet );
 	}
 
-	public DPContainerSequence(ElementContext context, ContainerStyleSheet styleSheet)
+	public DPContainerSequence(ContainerStyleSheet styleSheet)
 	{
-		super( context, styleSheet );
+		super( styleSheet );
 	}
 
 	
@@ -52,7 +51,7 @@ abstract public class DPContainerSequence extends DPContainer
 				// Register added entries
 				for (DPWidget child: items)
 				{
-					registerChild( child, null );
+					registerChild( child );
 				}
 	
 				onChildListModified();
@@ -77,7 +76,7 @@ abstract public class DPContainerSequence extends DPContainer
 				{
 					unregisterChild( prevChild );
 					registeredChildren.set( 0, newChild );
-					registerChild( newChild, null );
+					registerChild( newChild );
 					onChildListModified();
 					queueResize();
 				}
@@ -106,7 +105,7 @@ abstract public class DPContainerSequence extends DPContainer
 			// Register added entries
 			for (DPWidget child: added)
 			{
-				registerChild( child, null );
+				registerChild( child );
 			}
 
 			onChildListModified();
@@ -176,7 +175,7 @@ abstract public class DPContainerSequence extends DPContainer
 		DPWidget oldChild = registeredChildren.get( index );
 		unregisterChild( oldChild );
 		registeredChildren.set( index, child );
-		registerChild( child, null );
+		registerChild( child );
 		onChildListModified();
 		queueResize();
 	}
@@ -215,7 +214,7 @@ abstract public class DPContainerSequence extends DPContainer
 		
 		for (DPWidget child: added)
 		{
-			registerChild( child, null );
+			registerChild( child );
 		}
 		
 		
@@ -264,7 +263,7 @@ abstract public class DPContainerSequence extends DPContainer
 		assert !hasChild( child );
 		
 		registeredChildren.add( child );
-		registerChild( child, null );
+		registerChild( child );
 		onChildListModified();
 		queueResize();
 	}
@@ -283,7 +282,7 @@ abstract public class DPContainerSequence extends DPContainer
 		{
 			DPWidget child = children.get( i );
 			registeredChildren.add( child );
-			registerChild( child, null );
+			registerChild( child );
 		}
 
 		onChildListModified();
@@ -301,7 +300,7 @@ abstract public class DPContainerSequence extends DPContainer
 		assert !hasChild( child );
 		
 		registeredChildren.add( index, child );
-		registerChild( child, null );
+		registerChild( child );
 		onChildListModified();
 		queueResize();
 	}
@@ -323,7 +322,7 @@ abstract public class DPContainerSequence extends DPContainer
 	protected void replaceChildWithEmpty(DPWidget child)
 	{
 		int index = registeredChildren.indexOf( child );
-		set( index, new DPEmpty( null ) );
+		set( index, new DPEmpty( ) );
 	}
 		
 	
@@ -339,24 +338,6 @@ abstract public class DPContainerSequence extends DPContainer
 
 
 
-	@SuppressWarnings("unchecked")
-	protected <T extends PackingParams> T[] getChildrenPackingParams(List<DPWidget> nodes, T packingParams[])
-	{
-		for (int i = 0; i < nodes.size(); i++)
-		{
-			packingParams[i] = (T)nodes.get( i ).getParentPacking();
-		}
-		return packingParams;
-	}
-
-	protected <T extends PackingParams> T[] getChildrenPackingParams(T packingParams[])
-	{
-		return getChildrenPackingParams( registeredChildren, packingParams );
-	}
-	
-	
-	
-	
 	protected double[] getChildrenAllocationX(List<DPWidget> nodes)
 	{
 		double[] values = new double[nodes.size()];

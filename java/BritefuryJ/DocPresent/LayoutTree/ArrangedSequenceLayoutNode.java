@@ -16,7 +16,6 @@ import BritefuryJ.DocPresent.WidgetFilter;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
-import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 
@@ -327,12 +326,6 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 		return getChildrenAlignmentFlags( Arrays.asList( leaves ) );
 	}
 
-	<T extends PackingParams> T[] getLeavesPackingParams(T packingParams[])
-	{
-		refreshSubtree();
-		return getChildrenPackingParams( Arrays.asList( leaves ), packingParams );
-	}
-	
 	
 	double[] getLeavesAllocationX()
 	{

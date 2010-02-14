@@ -31,15 +31,15 @@ public class DPParagraphTest_simple
 	{
 		TextStyleSheet t12 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
 		TextStyleSheet t18 = new TextStyleSheet( new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK );
-		DPText h = new DPText( null, t18, header );
-		DPText t0 = new DPText( null, t12, "Hello" );
-		DPText t1 = new DPText( null, t12, "World" );
-		DPText t2 = new DPText( null, t12, "Foo" );
-		DPText t3 = new DPText( null, t12, "j" );
-		DPText t4 = new DPText( null, t12, "q" );
-		DPText t5 = new DPText( null, t12, "'" );
-		DPText t6 = new DPText( null, t12, "." );
-		DPText t7 = new DPText( null, t12, "Bar" );
+		DPText h = new DPText( t18, header );
+		DPText t0 = new DPText( t12, "Hello" );
+		DPText t1 = new DPText( t12, "World" );
+		DPText t2 = new DPText( t12, "Foo" );
+		DPText t3 = new DPText( t12, "j" );
+		DPText t4 = new DPText( t12, "q" );
+		DPText t5 = new DPText( t12, "'" );
+		DPText t6 = new DPText( t12, "." );
+		DPText t7 = new DPText( t12, "Bar" );
 		
 		DPText[] texts = { h, t0, t1, t2, t3, t4, t5, t6, t7 };
 		return new ArrayList<DPWidget>( Arrays.asList( texts ) );
@@ -53,7 +53,7 @@ public class DPParagraphTest_simple
 			nodesOut.add( nodesIn.get( i ) );
 			if ( step <= 1  ||  i % step == (step-1) )
 			{
-				nodesOut.add( new DPLineBreak( null ) );
+				nodesOut.add( new DPLineBreak( ) );
 			}
 		}
 		return nodesOut;
@@ -66,7 +66,7 @@ public class DPParagraphTest_simple
 		//This stops the app on window close.
 		frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
 
-		DPPresentationArea area = new DPPresentationArea( null );
+		DPPresentationArea area = new DPPresentationArea( );
 	     
 	     
 		ArrayList<DPWidget> c0 = makeTexts( "UNINDENTED" );
@@ -75,15 +75,15 @@ public class DPParagraphTest_simple
 		c1 = addLineBreaks( c1, 1 );
 		
 		ParagraphStyleSheet b0s = new ParagraphStyleSheet( 10.0, 0.0, 0.0 );
-		DPParagraph b0 = new DPParagraph( null, b0s );
+		DPParagraph b0 = new DPParagraph( b0s );
 		b0.extend( c0 );
 		
 		ParagraphStyleSheet b1s = new ParagraphStyleSheet( 10.0, 0.0, 30.0 );
-		DPParagraph b1 = new DPParagraph( null, b1s );
+		DPParagraph b1 = new DPParagraph( b1s );
 		b1.extend( c1 );
 		
 		VBoxStyleSheet boxS = new VBoxStyleSheet( 20.0 );
-		DPVBox box = new DPVBox( null, boxS );
+		DPVBox box = new DPVBox( boxS );
 		box.append( b0.alignHExpand() );
 		box.append( b1.alignHExpand() );
 	     

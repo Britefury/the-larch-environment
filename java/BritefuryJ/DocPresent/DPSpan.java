@@ -6,16 +6,15 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.LayoutTree.ArrangedSequenceLayoutNode;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 
 public class DPSpan extends DPContainerSequence
 {
-	public DPSpan(ElementContext context)
+	public DPSpan()
 	{
-		super( context );
+		super( );
 	}
 
 
@@ -65,17 +64,5 @@ public class DPSpan extends DPContainerSequence
 		}
 		
 		return false;
-	}
-
-
-
-
-	//
-	// Packing parameters
-	//
-	
-	protected PackingParams getDefaultPackingParams()
-	{
-		return null;
 	}
 }

@@ -47,37 +47,37 @@ public class DPButton extends DPBin
 	
 	
 	
-	public DPButton(ElementContext context)
+	public DPButton()
 	{
-		this( context, ButtonStyleSheet.defaultStyleSheet, (ButtonListener)null );
+		this( ButtonStyleSheet.defaultStyleSheet, (ButtonListener)null );
 	}
 
-	public DPButton(ElementContext context, ButtonListener listener)
+	public DPButton(ButtonListener listener)
 	{
-		this( context, ButtonStyleSheet.defaultStyleSheet, listener );
+		this( ButtonStyleSheet.defaultStyleSheet, listener );
 	}
 
-	public DPButton(ElementContext context, PyObject listener)
+	public DPButton(PyObject listener)
 	{
-		this( context, ButtonStyleSheet.defaultStyleSheet, new PyButtonListener( listener ) );
+		this( ButtonStyleSheet.defaultStyleSheet, new PyButtonListener( listener ) );
 	}
 
-	public DPButton(ElementContext context, ButtonStyleSheet styleSheet)
+	public DPButton(ButtonStyleSheet styleSheet)
 	{
-		this( context, styleSheet, (ButtonListener)null );
+		this( styleSheet, (ButtonListener)null );
 	}
 
-	public DPButton(ElementContext context, ButtonStyleSheet styleSheet, ButtonListener listener)
+	public DPButton(ButtonStyleSheet styleSheet, ButtonListener listener)
 	{
-		super( context, styleSheet );
+		super( styleSheet );
 		
 		layoutNode = new LayoutNodeButton( this );
 		this.listener = listener;
 	}
 	
-	public DPButton(ElementContext context, ButtonStyleSheet styleSheet, PyObject listener)
+	public DPButton(ButtonStyleSheet styleSheet, PyObject listener)
 	{
-		this( context, styleSheet, new PyButtonListener( listener ) );
+		this( styleSheet, new PyButtonListener( listener ) );
 	}
 	
 	

@@ -44,9 +44,9 @@ public class NodeView implements ElementContext
 		private NodeView nodeView;
 		private boolean bSelected, bHighlight;
 		
-		public DPNodeBin(ElementContext context, NodeView nodeView)
+		public DPNodeBin(NodeView nodeView)
 		{
-			super( context, ContainerStyleSheet.defaultStyleSheet );
+			super( ContainerStyleSheet.defaultStyleSheet );
 			
 			this.nodeView = nodeView;
 			bSelected = false;
@@ -161,10 +161,10 @@ public class NodeView implements ElementContext
 			childWidgets.add( childView.getWidget().padY( 3.0 ) );
 		}
 		
-		DPVBox childrenVBox = new DPVBox( this, childrenVBoxStyle );
+		DPVBox childrenVBox = new DPVBox( childrenVBoxStyle );
 		childrenVBox.setChildren( childWidgets );
 		
-		DPHBox mainHBox = new DPHBox( this, mainHBoxStyle );
+		DPHBox mainHBox = new DPHBox( mainHBoxStyle );
 		mainHBox.setChildren( new DPWidget[] { nodeWidget.alignVCentre(), childrenVBox.alignVCentre() } );
 		
 		mainWidget = mainHBox;
@@ -242,11 +242,11 @@ public class NodeView implements ElementContext
 		}
 		
 		
-		DPText classText = new DPText( this, classNameStyle, "[" + className + "]" );
+		DPText classText = new DPText( classNameStyle, "[" + className + "]" );
 		if ( exprName != null )
 		{
-			DPText exprText = new DPText( this, debugNameStyle, exprName );
-			DPHBox textBox = new DPHBox( this, titleTextHBoxStyle );
+			DPText exprText = new DPText( debugNameStyle, exprName );
+			DPHBox textBox = new DPHBox( titleTextHBoxStyle );
 			DPWidget[] children = { exprText, classText };
 			textBox.setChildren( Arrays.asList( children ) );
 			return textBox;
@@ -262,7 +262,7 @@ public class NodeView implements ElementContext
 		DPWidget titleWidget = makeTitleWidget( data );
 		
 		Border b = data.getResult().isValid()  ?  titleSuccessBorder  :  titleFailBorder;
-		DPBorder border = new DPBorder( this, b );
+		DPBorder border = new DPBorder( b );
 		border.setChild( titleWidget.alignVCentre() );
 		
 		return border;
@@ -282,7 +282,7 @@ public class NodeView implements ElementContext
 			rangeText = String.valueOf( data.getStart() ) + "   :   " + String.valueOf( result.getEnd() );
 		}
 
-		return new DPText( this, rangeStyle, rangeText );
+		return new DPText( rangeStyle, rangeText );
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -316,7 +316,7 @@ public class NodeView implements ElementContext
 			inputString = inputString.substring( 0, MAX_STRING_LENGTH )  +  "...";
 		}
 
-		return new DPText( this, inputStyle, inputString );
+		return new DPText( inputStyle, inputString );
 	}
 
 	private DPWidget makeValueWidget(DebugNode data)
@@ -331,11 +331,11 @@ public class NodeView implements ElementContext
 			{
 				valueString = valueString.substring( 0, MAX_STRING_LENGTH )  +  "...";
 			}
-			return new DPText( this, valueStyle, valueString );
+			return new DPText( valueStyle, valueString );
 		}
 		else
 		{
-			return new DPText( this, failStyle, "<fail>" );
+			return new DPText( failStyle, "<fail>" );
 		}
 	}
 	
@@ -345,7 +345,7 @@ public class NodeView implements ElementContext
 		DPWidget inputWidget = makeInputWidget( data );
 		DPWidget valueWidget = makeValueWidget( data );
 		
-		DPVBox contentBoxWidget = new DPVBox( this );
+		DPVBox contentBoxWidget = new DPVBox( );
 		DPWidget[] children = { rangeWidget, inputWidget, valueWidget };
 		contentBoxWidget.setChildren( Arrays.asList( children ) );
 		return contentBoxWidget;
@@ -356,13 +356,13 @@ public class NodeView implements ElementContext
 		DPWidget titleBoxWidget = makeTitleBoxWidget( data );
 		DPWidget contentBoxWidget = makeContentBoxWidget( data );
 		
-		DPVBox nodeBoxWidget = new DPVBox( this );
+		DPVBox nodeBoxWidget = new DPVBox( );
 		nodeBoxWidget.setChildren( new DPWidget[] { titleBoxWidget.alignHExpand(), contentBoxWidget.alignHExpand() } );
 		
-		nodeBinWidget = new DPNodeBin( this, this );
+		nodeBinWidget = new DPNodeBin( this );
 		nodeBinWidget.setChild( nodeBoxWidget );
 		
-		DPBorder nodeBorderWidget = new DPBorder( this, nodeBorder );
+		DPBorder nodeBorderWidget = new DPBorder( nodeBorder );
 		nodeBorderWidget.setChild( nodeBinWidget );
 		
 		return nodeBorderWidget;

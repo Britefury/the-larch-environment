@@ -625,6 +625,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	
 	private boolean bAllocationRequired;
 	
+	protected WeakHashMap<DPContentLeaf, WeakHashMap<Marker, Object>> markersByLeaf = new WeakHashMap<DPContentLeaf, WeakHashMap<Marker, Object>>();
 	private Caret caret;
 	private DPContentLeaf currentCaretLeaf;
 	private Selection selection;
@@ -648,14 +649,14 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	
 	
 	
-	public DPPresentationArea(ElementContext context)
+	public DPPresentationArea()
 	{
-		this( context, new ViewTransformation() );
+		this( new ViewTransformation() );
 	}
 	
-	public DPPresentationArea(ElementContext context, ViewTransformation viewXform)
+	public DPPresentationArea(ViewTransformation viewXform)
 	{
-		super( context );
+		super( );
 		
 		layoutNode = new LayoutNodeRootElement( this );
 		
@@ -2011,7 +2012,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	{
 		if ( metaArea == null )
 		{
-			metaArea = new DPPresentationArea( null );
+			metaArea = new DPPresentationArea( );
 			metaArea.disableHorizontalClamping();
 			metaArea.setChild( initialiseMetaElement() );
 		}

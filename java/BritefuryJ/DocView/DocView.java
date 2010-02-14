@@ -25,6 +25,7 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 	//
 	
 	static boolean ENABLE_PROFILING = false;
+	static boolean ENABLE_DISPLAY_TREESIZES = false;
 	
 	
 	public interface NodeElementChangeListener
@@ -89,7 +90,7 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 			DVNode rootView = (DVNode)getRootIncrementalTreeNode();
 			rootView.getElement().alignHExpand();
 			rootView.getElement().alignVExpand();
-			rootBox = new DPVBox( null, rootBoxStyle );
+			rootBox = new DPVBox( rootBoxStyle );
 			rootBox.setChildren( Arrays.asList( new DPWidget[] { rootView.getElement() } ) );
 		}
 		return rootBox;
@@ -129,6 +130,14 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 			System.out.println( "DocView: REFRESH VIEW PROFILE: JAVA TIME = " + getJavaTime() + ", ELEMENT CREATE TIME = " + getElementTime() +
 					", PYTHON TIME = " + getPythonTime() + ", CONTENT CHANGE TIME = " + getContentChangeTime() +
 					", UPDATE NODE ELEMENT TIME = " + getUpdateNodeElementTime() );
+		}
+		
+		if ( ENABLE_DISPLAY_TREESIZES )
+		{
+			DVNode rootView = (DVNode)getRootIncrementalTreeNode();
+			int presTreeSize = rootView.getElement().computeSubtreeSize();
+			int numFragments = rootView.computeSubtreeSize();
+			System.out.println( "DocView.performRefresh(): presentation tree size=" + presTreeSize + ", # fragments=" + numFragments );
 		}
 		// <<< PROFILING
 	}

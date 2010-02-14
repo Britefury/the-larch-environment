@@ -6,33 +6,20 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeGridRow;
 import BritefuryJ.DocPresent.StyleSheets.GridRowStyleSheet;
 
 public class DPGridRow extends DPContainerSequence
 {
-	public DPGridRow(ElementContext context)
+	public DPGridRow()
 	{
-		this( context, GridRowStyleSheet.defaultStyleSheet );
+		this( GridRowStyleSheet.defaultStyleSheet );
 	}
 	
-	public DPGridRow(ElementContext context, GridRowStyleSheet syleSheet)
+	public DPGridRow(GridRowStyleSheet syleSheet)
 	{
-		super( context, syleSheet );
+		super( syleSheet );
 		
 		layoutNode = new LayoutNodeGridRow( this );
-	}
-	
-	
-	
-	//
-	// Style methods
-	//
-
-
-	protected PackingParams getDefaultPackingParams()
-	{
-		return null;
 	}
 }

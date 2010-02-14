@@ -87,35 +87,35 @@ public class DPLink extends DPStaticText
 
 
 
-	public DPLink(ElementContext context, String text, String targetLocation)
+	public DPLink(String text, String targetLocation)
 	{
-		this( context, LinkStyleSheet.defaultStyleSheet, text, new LinkTargetListener( targetLocation ) );
+		this( LinkStyleSheet.defaultStyleSheet, text, new LinkTargetListener( targetLocation ) );
 	}
 	
-	public DPLink(ElementContext context, LinkStyleSheet styleSheet, String text, String targetLocation)
+	public DPLink(LinkStyleSheet styleSheet, String text, String targetLocation)
 	{
-		this( context, styleSheet, text, new LinkTargetListener( targetLocation ) );
+		this( styleSheet, text, new LinkTargetListener( targetLocation ) );
 	}
 
-	public DPLink(ElementContext context, String text, LinkListener listener)
+	public DPLink(String text, LinkListener listener)
 	{
-		this( context, LinkStyleSheet.defaultStyleSheet, text, listener );
+		this( LinkStyleSheet.defaultStyleSheet, text, listener );
 	}
 	
-	public DPLink(ElementContext context, LinkStyleSheet styleSheet, String text, LinkListener listener)
+	public DPLink(LinkStyleSheet styleSheet, String text, LinkListener listener)
 	{
-		super( context, styleSheet, text );
+		super( styleSheet, text );
 		this.listener = listener;
 	}
 
-	public DPLink(ElementContext context, String text, PyObject listener)
+	public DPLink(String text, PyObject listener)
 	{
-		this( context, LinkStyleSheet.defaultStyleSheet, text, new PyLinkListener( listener ) );
+		this( LinkStyleSheet.defaultStyleSheet, text, new PyLinkListener( listener ) );
 	}
 	
-	public DPLink(ElementContext context, LinkStyleSheet styleSheet, String text, PyObject listener)
+	public DPLink(LinkStyleSheet styleSheet, String text, PyObject listener)
 	{
-		this( context, styleSheet, text, new PyLinkListener( listener ) );
+		this( styleSheet, text, new PyLinkListener( listener ) );
 	}
 
 

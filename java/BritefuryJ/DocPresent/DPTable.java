@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -13,32 +14,46 @@ import java.util.List;
 import org.python.core.Py;
 import org.python.core.PyTuple;
 
-import BritefuryJ.DocPresent.Layout.PackingParams;
-import BritefuryJ.DocPresent.Layout.TablePackingParams;
+import BritefuryJ.DocPresent.Layout.TableLayout;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeTable;
 import BritefuryJ.DocPresent.StyleSheets.TableStyleSheet;
 
 public class DPTable extends DPContainer
 {
-	private DPWidget[][] children;
+	private static class TableChildEntry extends TableLayout.TablePackingParams
+	{
+		private DPWidget child;
+
+		public TableChildEntry(DPWidget child, int x, int colSpan, int y, int rowSpan)
+		{
+			super( x, colSpan, y, rowSpan );
+			this.child = child;
+		}
+	}
+
+
+
+	private TableChildEntry[][] childEntryTable;
+	private ArrayList<TableChildEntry> childEntries;
 	private int rowPositions[];
 	private int numColumns, numRows;		// Can be -1, indicating that these values must be refreshed
 
 	
 	
 	
-	public DPTable(ElementContext context)
+	public DPTable()
 	{
-		this( context, TableStyleSheet.defaultStyleSheet );
+		this( TableStyleSheet.defaultStyleSheet );
 	}
 
-	public DPTable(ElementContext context, TableStyleSheet styleSheet)
+	public DPTable(TableStyleSheet styleSheet)
 	{
-		super( context, styleSheet );
+		super( styleSheet );
 		
 		layoutNode = new LayoutNodeTable( this );
 
-		children = new DPWidget[0][];
+		childEntryTable = new TableChildEntry[0][];
+		childEntries = new ArrayList<TableChildEntry>();
 		rowPositions = new int[0];
 		numColumns = 0;
 		numRows = 0;
@@ -66,47 +81,56 @@ public class DPTable extends DPContainer
 			numColumns = 0;
 			numRows = itemTable.length;
 
-			// Generate the list of registered children; an ordered list of all child widgets
+			// - Count children
+			// - Generate row positions
+			// - Compute number of columns
 			rowPositions = new int[itemTable.length];
+			int n = 0;
 			int rowI = 0;
 			for (DPWidget[] row: itemTable)
 			{
-				rowPositions[rowI++] = registeredChildren.size();
+				rowPositions[rowI] = n;
 				numColumns = Math.max( numColumns, row.length );
+				
 				for (DPWidget child: row)
 				{
 					if ( child != null )
 					{
-						registeredChildren.add( child );
+						n++;
 					}
 				}
+				rowI++;
 			}
+
 			
-			// Fill in child table
-			children = new DPWidget[itemTable.length][];
-			int n = 0;
-			for (rowI = 0; rowI < itemTable.length; rowI++)
-			{
-				DPWidget row[] = itemTable[rowI];
-				children[rowI] = new DPWidget[row.length];
-				System.arraycopy( row, 0, children[rowI], 0, row.length );
-				n += row.length;
-			}
-			
-			// Register added children
-			int y = 0;
+			// - Generate the list of registered children; an ordered list of all child widgets
+			// - Create a table child entry for each child
+			// - Register each child
+			rowI = 0;
+			registeredChildren.ensureCapacity( n );
+			childEntries.ensureCapacity( n );
 			for (DPWidget[] row: itemTable)
 			{
-				int x = 0;
+				TableChildEntry destRow[] = new TableChildEntry[row.length];
+				childEntryTable[rowI] = destRow;
+
+				rowPositions[rowI] = registeredChildren.size();
+				numColumns = Math.max( numColumns, row.length );
+				
+				int columnI = 0;
 				for (DPWidget child: row)
 				{
 					if ( child != null )
 					{
-						registerChild( child, new TablePackingParams( x, 1, y, 1 ) );
+						TableChildEntry entry = new TableChildEntry( child, columnI, 1, rowI, 1 );
+						registeredChildren.add( child );
+						childEntries.add( entry );
+						destRow[columnI] = entry;
+						registerChild( child );
 					}
-					x++;
+					columnI++;
 				}
-				y++;
+				rowI++;
 			}
 		}
 		else
@@ -138,41 +162,61 @@ public class DPTable extends DPContainer
 				unregisterChild( child );
 			}
 			
-			// Recompute @registeredChildren
-			registeredChildren.clear();
+			// - Count children
+			// - Generate row positions
+			// - Compute number of columns
 			rowPositions = new int[itemTable.length];
-			int y = 0;
+			int n = 0;
+			int rowI = 0;
 			for (DPWidget[] row: itemTable)
 			{
-				int x = 0;
-				rowPositions[y] = registeredChildren.size();
+				rowPositions[rowI] = n;
+				numColumns = Math.max( numColumns, row.length );
+				
 				for (DPWidget child: row)
 				{
 					if ( child != null )
 					{
-						registeredChildren.add( child );
-						child.setParentPacking( new TablePackingParams( x, 1, y, 1 ) );
+						n++;
 					}
-					x++;
 				}
-				y++;
+				rowI++;
 			}
-	
-			// Fill in child table
-			children = new DPWidget[itemTable.length][];
-			int n = 0;
-			for (int rowI = 0; rowI < itemTable.length; rowI++)
+
+			
+			// - Generate the list of registered children; an ordered list of all child widgets
+			// - Create a table child entry for each child
+			// - Register each child
+			rowI = 0;
+			registeredChildren.ensureCapacity( n );
+			childEntries.ensureCapacity( n );
+			for (DPWidget[] row: itemTable)
 			{
-				DPWidget row[] = itemTable[rowI];
-				children[rowI] = new DPWidget[row.length];
-				System.arraycopy( row, 0, children[rowI], 0, row.length );
-				n += row.length;
+				TableChildEntry destRow[] = new TableChildEntry[row.length];
+				childEntryTable[rowI] = destRow;
+
+				rowPositions[rowI] = registeredChildren.size();
+				numColumns = Math.max( numColumns, row.length );
+				
+				int columnI = 0;
+				for (DPWidget child: row)
+				{
+					if ( child != null )
+					{
+						TableChildEntry entry = new TableChildEntry( child, columnI, 1, rowI, 1 );
+						registeredChildren.add( child );
+						childEntries.add( entry );
+						destRow[columnI] = entry;
+					}
+					columnI++;
+				}
+				rowI++;
 			}
 			
 			// Register added children
 			for (DPWidget child: added)
 			{
-				registerChild( child, child.getParentPacking() );
+				registerChild( child );
 			}
 		}
 		
@@ -220,12 +264,12 @@ public class DPTable extends DPContainer
 		{
 			throw new IndexOutOfBoundsException();
 		}
-		DPWidget row[] = y >= children.length  ?  null  :  children[y];
+		TableChildEntry row[] = y >= childEntryTable.length  ?  null  :  childEntryTable[y];
 		if ( row != null )
 		{
 			if ( x < row.length )
 			{
-				return row[x];
+				return row[x].child;
 			}
 		}
 		
@@ -247,107 +291,119 @@ public class DPTable extends DPContainer
 	public void put(int x, int y, int colSpan, int rowSpan, DPWidget item)
 	{
 		// Get the child that is being replaced
+		TableChildEntry oldChildEntry = null, childEntry = null;
 		DPWidget oldChild = null;
-		TablePackingParams oldPacking = null;
 		int oldEndX = -1, oldEndY = -1;
-		if ( y < children.length )
+		if ( y < childEntryTable.length )
 		{
-			if ( x < children[y].length )
+			TableChildEntry row[] = childEntryTable[y];
+			if ( x < row.length )
 			{
-				oldChild = children[y][x];
-				if ( oldChild != null )
+				oldChildEntry = row[x];
+				if ( oldChildEntry != null )
 				{
-					oldPacking = (TablePackingParams)oldChild.getParentPacking();
-					oldEndX = x + oldPacking.colSpan;
-					oldEndY = y + oldPacking.rowSpan;
+					oldChild = oldChildEntry.child;
+					oldEndX = x + oldChildEntry.colSpan;
+					oldEndY = y + oldChildEntry.rowSpan;
 				}
 			}
 		}
 		
+		if ( item != null  &&  item.getLayoutNode() == null )
+		{
+			throw new ChildHasNoLayoutException();
+		}
+
 		if ( item != oldChild )
 		{
-			if ( item != null  &&  item.getLayoutNode() == null )
-			{
-				throw new ChildHasNoLayoutException();
-			}
-
 			// Get the index of the old child (in @registeredChildren), unregister the old child, and remove it from @registeredChildren
 			int oldChildIndex = -1;
-			if ( oldChild != null )
+			if ( oldChildEntry != null )
 			{
-				oldChildIndex = registeredChildren.indexOf( oldChild );
-				unregisterChild( oldChild );
+				oldChildIndex = childEntries.indexOf( oldChildEntry );
+				unregisterChild( oldChildEntry.child );
 			}
 			
 			// If y is outside the bounds of the number of rows, add as many new rows as necessary
-			if ( y >= children.length  &&  item != null )
+			if ( y >= childEntryTable.length  &&  item != null )
 			{
-				DPWidget ch[][] = new DPWidget[y+1][];
+				TableChildEntry ch[][] = new TableChildEntry[y+1][];
 				int rp[] = new int[y+1];
-				System.arraycopy( children, 0, ch, 0, children.length );
+				System.arraycopy( childEntryTable, 0, ch, 0, childEntryTable.length );
 				System.arraycopy( rowPositions, 0, rp, 0, rowPositions.length );
-				for (int i = children.length; i < ch.length; i++)
+				for (int i = childEntryTable.length; i < ch.length; i++)
 				{
-					ch[i] = new DPWidget[0];
+					ch[i] = new TableChildEntry[0];
 					rp[i] = registeredChildren.size();
 				}
-				children = ch;
+				childEntryTable = ch;
 				rowPositions = rp;
 			}
 			
 			// Get the row into which the child is being inserted
-			DPWidget[] row = children[y];
+			TableChildEntry[] row = childEntryTable[y];
 			// Enlarge the row if x is outside the bounds of the row
 			if ( x >= row.length  &&  item != null )
 			{
-				DPWidget r[] = new DPWidget[x+1];
+				TableChildEntry r[] = new TableChildEntry[x+1];
 				System.arraycopy( row, 0, r, 0, row.length );
-				children[y] = r;
+				childEntryTable[y] = r;
 				row = r;
 			}
 			
 			// Place the child into the row
-			row[x] = item;
+			childEntry = item != null  ?  new TableChildEntry( item, x, colSpan, y, rowSpan )  :  null;
+			row[x] = childEntry;
 			
 			// Add the child to @registeredChildren
 			if ( oldChildIndex == -1 )
 			{
-				// Don't need to worry about the possibility of @item being null;
-				// If it is null, then we can only get this far if it is replacing an existing non-null
-				// child, else we won't get this far, due to the if-statement which ensures
-				// that work is not done, if a child is being replaced by itself
-				int insertionIndex = rowPositions[y];
-				for (int i = 0; i < x; i++)
+				if ( item != null )
 				{
-					if ( row[i] != null )
+					// Don't need to worry about the possibility of @item being null;
+					// If it is null, then we can only get this far if it is replacing an existing non-null
+					// child, else we won't get this far, due to the if-statement which ensures
+					// that work is not done, if a child is being replaced by itself
+					int insertionIndex = rowPositions[y];
+					for (int i = 0; i < x; i++)
 					{
-						insertionIndex++;
+						if ( row[i] != null )
+						{
+							insertionIndex++;
+						}
 					}
-				}
-				registeredChildren.add( insertionIndex, item );
-				for (int i = y + 1; i < rowPositions.length; i++)
-				{
-					rowPositions[i]++;
+					registeredChildren.add( insertionIndex, item );
+					childEntries.add( insertionIndex, childEntry );
+					for (int i = y + 1; i < rowPositions.length; i++)
+					{
+						rowPositions[i]++;
+					}
 				}
 			}
 			else
 			{
-				if ( item == null )
+				if ( item == null   )
 				{
 					// Removing an existing child
 					registeredChildren.remove( oldChildIndex );
+					childEntries.remove( oldChildIndex );
+					for (int i = y + 1; i < rowPositions.length; i++)
+					{
+						rowPositions[i]--;
+					}
 				}
 				else
 				{
 					// Replacing an existing child
 					registeredChildren.set( oldChildIndex, item );
+					childEntries.set( oldChildIndex, childEntry );
 				}
 			}
 			
 			// Register the child
 			if ( item != null )
 			{
-				registerChild( item, new TablePackingParams( x, colSpan, y, rowSpan ) );
+				registerChild( item );
 			}
 
 			onChildListModified();
@@ -357,24 +413,20 @@ public class DPTable extends DPContainer
 		{
 			if ( item != null )
 			{
-				item.setParentPacking( new TablePackingParams( x, colSpan, y, rowSpan ) );
-				// Queue a resize; width / height may have changed
 				queueResize();
 			}
-
-			queueResize();
 		}
 		
 		
 		// Update numColumns and numRows
-		if ( ( item == null  &&  oldChild != null ) )
+		if ( ( item == null  &&  oldChildEntry != null ) )
 		{
 			// Removing a child; refresh later
 			numColumns = -1;
 			numRows = -1;
 		}
 		
-		if ( item != null  &&  oldChild != null )
+		if ( item != null  &&  oldChildEntry != null )
 		{
 			// Replacing a child; refresh later if 
 			if ( ( x + colSpan )  <  oldEndX )
@@ -418,19 +470,53 @@ public class DPTable extends DPContainer
 	
 	
 	
-	protected void replaceChildWithEmpty(DPWidget child)
+	private TableChildEntry getEntryForChild(DPWidget child)
 	{
-		for (DPWidget row[]: children)
+		for (TableChildEntry entry: childEntries)
 		{
-			int index = Arrays.asList( row ).indexOf( child );
-			if ( index != -1 )
+			if ( child == entry.child )
 			{
-				row[index] = new DPEmpty( context );
-				break;
+				return entry;
 			}
 		}
+		
+		return null;
 	}
 
+	
+	
+	protected void replaceChildWithEmpty(DPWidget child)
+	{
+		TableChildEntry entry = getEntryForChild( child );
+		if ( entry != null )
+		{
+			put( entry.x, entry.y, entry.colSpan, entry.rowSpan, new DPEmpty( ) );
+		}
+	}
+	
+	
+	
+	public List<DPWidget> getLayoutChildren()
+	{
+		return registeredChildren;
+	}
+
+	public List<? extends TableLayout.TablePackingParams> getTablePackingParams()
+	{
+		return childEntries;
+	}
+
+	public TableLayout.TablePackingParams[] getTablePackingParamsArray()
+	{
+		TableLayout.TablePackingParams a[] = new TableLayout.TablePackingParams[childEntries.size()];
+		a = childEntries.toArray( a );
+		return a;
+	}
+
+	public TableLayout.TablePackingParams getTablePackingParamsForChild(DPWidget child)
+	{
+		return getEntryForChild( child );
+	}
 	
 	
 	public List<DPWidget> getChildren()
@@ -441,22 +527,26 @@ public class DPTable extends DPContainer
 	
 	public int getChildX(DPWidget child)
 	{
-		return ((TablePackingParams)child.getParentPacking()).x;
+		TableChildEntry entry = getEntryForChild( child );
+		return entry.x;
 	}
 	
 	public int getChildY(DPWidget child)
 	{
-		return ((TablePackingParams)child.getParentPacking()).y;
+		TableChildEntry entry = getEntryForChild( child );
+		return entry.y;
 	}
 	
 	public int getChildColSpan(DPWidget child)
 	{
-		return ((TablePackingParams)child.getParentPacking()).colSpan;
+		TableChildEntry entry = getEntryForChild( child );
+		return entry.colSpan;
 	}
 	
 	public int getChildRowSpan(DPWidget child)
 	{
-		return ((TablePackingParams)child.getParentPacking()).rowSpan;
+		TableChildEntry entry = getEntryForChild( child );
+		return entry.rowSpan;
 	}
 	
 	
@@ -468,28 +558,22 @@ public class DPTable extends DPContainer
 			numColumns = 0;
 			numRows = 0;
 			
-			for (DPWidget child: registeredChildren)
+			for (TableChildEntry row[]: childEntryTable)
 			{
-				TablePackingParams packing = (TablePackingParams)child.getParentPacking();
-				numColumns = Math.max( numColumns, packing.x + packing.colSpan );
-				numRows = Math.max( numRows, packing.y + packing.rowSpan );
+				for (TableChildEntry child: row)
+				{
+					if ( child != null )
+					{
+						numColumns = Math.max( numColumns, child.x + child.colSpan );
+						numRows = Math.max( numRows, child.y + child.rowSpan );
+					}
+				}
 			}
 		}
 	}
 	
 	
 
-	//
-	// Packing parameters
-	//
-	
-	protected PackingParams getDefaultPackingParams()
-	{
-		// All child elements are given packing parameters at registration
-		throw new RuntimeException( "Default packing parameters cannot be created for table element" );
-	}
-	
-	
 	//
 	//
 	// STYLE METHODS

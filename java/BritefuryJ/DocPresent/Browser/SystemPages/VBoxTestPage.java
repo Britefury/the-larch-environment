@@ -41,7 +41,7 @@ public class VBoxTestPage extends SystemPage
 
 	protected DPWidget wrapInOutline(DPWidget w)
 	{
-		DPBorder border = new DPBorder( getContext(), outline );
+		DPBorder border = new DPBorder( outline );
 		border.setChild( w );
 		return border;
 	}
@@ -49,10 +49,10 @@ public class VBoxTestPage extends SystemPage
 	
 	protected DPWidget makeTextOnGrey(String text)
 	{
-		DPStaticText t = new DPStaticText( getContext(), text );
+		DPStaticText t = new DPStaticText( text );
 		
 		EmptyBorder b = new EmptyBorder( new Color( 0.8f, 0.8f, 0.8f ) );
-		DPBorder border = new DPBorder( getContext(), b );
+		DPBorder border = new DPBorder( b );
 		border.setChild( t );
 		return border;
 	}
@@ -61,10 +61,10 @@ public class VBoxTestPage extends SystemPage
 	
 	protected DPStaticText[] makeTSTexts(String header)
 	{
-		DPStaticText t0 = new DPStaticText( getContext(), "First item" );
-		DPStaticText t1 = new DPStaticText( getContext(), "Second item" );
-		DPStaticText t2 = new DPStaticText( getContext(), "Third item" );
-		DPStaticText t3 = new DPStaticText( getContext(), "Fourth item" );
+		DPStaticText t0 = new DPStaticText( "First item" );
+		DPStaticText t1 = new DPStaticText( "Second item" );
+		DPStaticText t2 = new DPStaticText( "Third item" );
+		DPStaticText t3 = new DPStaticText( "Fourth item" );
 		
 		DPStaticText[] texts = { t0, t1, t2, t3 };
 		return texts;
@@ -75,13 +75,13 @@ public class VBoxTestPage extends SystemPage
 	{
 		DPStaticText[] txt = makeTSTexts( header );
 		VBoxStyleSheet vs = new VBoxStyleSheet( 0.0 );
-		DPVBox v = new DPVBox( getContext(), vs );
+		DPVBox v = new DPVBox( vs );
 		v.extend( txt );
 		v.setRefPointIndex( refPointIndex );
 		StaticTextStyleSheet t18 = new StaticTextStyleSheet( new Font( "Sans serif", Font.PLAIN, 18 ), new Color( 0.0f, 0.3f, 0.6f ) );
-		DPStaticText before = new DPStaticText( getContext(), t18, header );
-		DPStaticText after = new DPStaticText( getContext(), t18, " After" );
-		DPHBox t = new DPHBox( getContext() );
+		DPStaticText before = new DPStaticText( t18, header );
+		DPStaticText after = new DPStaticText( t18, " After" );
+		DPHBox t = new DPHBox( );
 		t.append( before );
 		t.append( v );
 		t.append( after );
@@ -96,17 +96,17 @@ public class VBoxTestPage extends SystemPage
 		StaticTextStyleSheet t18 = new StaticTextStyleSheet( new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK );
 		StaticTextStyleSheet t24 = new StaticTextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.BLACK );
 
-		DPStaticText h = new DPStaticText( getContext(), t18, "VBox" );
-		DPStaticText t0 = new DPStaticText( getContext(), t12, "First item" );
-		DPStaticText t1 = new DPStaticText( getContext(), t12, "Second item" );
-		DPStaticText t2 = new DPStaticText( getContext(), t12, "Third item" );
+		DPStaticText h = new DPStaticText( t18, "VBox" );
+		DPStaticText t0 = new DPStaticText( t12, "First item" );
+		DPStaticText t1 = new DPStaticText( t12, "Second item" );
+		DPStaticText t2 = new DPStaticText( t12, "Third item" );
 		
-		DPVBox vboxTest = new DPVBox( getContext() );
+		DPVBox vboxTest = new DPVBox( );
 		vboxTest.extend( new DPWidget[] { h, t0, t1, t2 } );
 		
 		VBoxStyleSheet b1s = new VBoxStyleSheet( 10.0 );
-		DPVBox hAlignTest = new DPVBox( getContext(), b1s );
-		hAlignTest.append( new DPStaticText( getContext(), t24, "Horizontal alignment" ) );
+		DPVBox hAlignTest = new DPVBox( b1s );
+		hAlignTest.append( new DPStaticText( t24, "Horizontal alignment" ) );
 		hAlignTest.append( makeTextOnGrey( "Left" ).alignHLeft() );
 		hAlignTest.append( makeTextOnGrey( "Centre" ).alignHCentre() );
 		hAlignTest.append( makeTextOnGrey( "Right" ).alignHRight() );
@@ -119,8 +119,8 @@ public class VBoxTestPage extends SystemPage
 		DPHBox ra3 = makeRefAlignedHBox( 3, "ALIGN_WITH_3" );
 		
 		VBoxStyleSheet boxs = new VBoxStyleSheet( 20.0 );
-		DPVBox refPointAlignTest = new DPVBox( getContext(), boxs );
-		refPointAlignTest.append( new DPStaticText( getContext(), t24, "VBox reference point alignment" ) );
+		DPVBox refPointAlignTest = new DPVBox( boxs );
+		refPointAlignTest.append( new DPStaticText( t24, "VBox reference point alignment" ) );
 		refPointAlignTest.append( ra0 );
 		refPointAlignTest.append( ra1 );
 		refPointAlignTest.append( ra2 );
@@ -128,7 +128,7 @@ public class VBoxTestPage extends SystemPage
 		
 		
 		VBoxStyleSheet boxS = new VBoxStyleSheet( 20.0 );
-		DPVBox box = new DPVBox( getContext(), boxS );
+		DPVBox box = new DPVBox( boxS );
 		box.append( wrapInOutline( vboxTest ) );
 		box.append( wrapInOutline( hAlignTest ) );
 		box.append( wrapInOutline( refPointAlignTest ) );

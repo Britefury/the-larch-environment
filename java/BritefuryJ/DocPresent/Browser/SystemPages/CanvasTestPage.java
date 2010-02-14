@@ -136,8 +136,8 @@ public class CanvasTestPage extends SystemPage
 	
 	protected DPWidget makeDestElement(String title)
 	{
-		DPStaticText destText = new DPStaticText( getContext(), textStyle, title );
-		DPBorder destBorderElement = new DPBorder( getContext(), destBorder );
+		DPStaticText destText = new DPStaticText( textStyle, title );
+		DPBorder destBorderElement = new DPBorder( destBorder );
 		destBorderElement.setChild( destText );
 		
 		SimpleDndHandler.DropFn dropFn = new SimpleDndHandler.DropFn()
@@ -145,7 +145,9 @@ public class CanvasTestPage extends SystemPage
 			public boolean acceptDrop(PointerInputElement destElement, Object data)
 			{
 				String text = (String)data;
-				((DPStaticText)((DPBorder)destElement).getChild()).setText( text );
+				DPBorder borderElement = (DPBorder)destElement;
+				DPStaticText textElement = (DPStaticText)borderElement.getChild();
+				textElement.setText( text );
 				return true;
 			}
 		};
@@ -173,8 +175,8 @@ public class CanvasTestPage extends SystemPage
 	
 	protected DPWidget makeDestElement2(String title, final DPWidget firstElement)
 	{
-		DPStaticText destText = new DPStaticText( getContext(), textStyle, title );
-		DPBorder destBorderElement = new DPBorder( getContext(), destBorder );
+		DPStaticText destText = new DPStaticText( textStyle, title );
+		DPBorder destBorderElement = new DPBorder( destBorder );
 		destBorderElement.setChild( destText );
 		
 		SimpleDndHandler.DropFn dropFn = new SimpleDndHandler.DropFn()
@@ -182,7 +184,9 @@ public class CanvasTestPage extends SystemPage
 			public boolean acceptDrop(PointerInputElement destElement, Object data)
 			{
 				String text = (String)data;
-				((DPStaticText)((DPBorder)destElement).getChild()).setText( text );
+				DPBorder borderElement = (DPBorder)destElement;
+				DPStaticText textElement = (DPStaticText)borderElement.getChild();
+				textElement.setText( text );
 				return true;
 			}
 		};
@@ -192,7 +196,9 @@ public class CanvasTestPage extends SystemPage
 			public boolean canDrop(PointerInputElement destElement, Object data)
 			{
 				String text = (String)data;
-				String firstText = ((DPStaticText)((DPBorder)firstElement).getChild()).getText();
+				DPBorder borderElement = (DPBorder)firstElement;
+				DPStaticText textElement = (DPStaticText)borderElement.getChild();
+				String firstText = textElement.getText();
 				int firstNum = textAsNumber( firstText );
 				int secondNum = textAsNumber( text );
 				return secondNum >= firstNum;
@@ -210,21 +216,21 @@ public class CanvasTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		DPCanvas diagramElement = new DPCanvas( getContext(), createClockFace().translate( 320.0, 240.0 ), 640.0, 480.0, false, false );
+		DPCanvas diagramElement = new DPCanvas( createClockFace().translate( 320.0, 240.0 ), 640.0, 480.0, false, false );
 		Border b = new SolidBorder( 1.0, 3.0, 2.0, 2.0, Color.black, null );
-		DPBorder border = new DPBorder( getContext(), b );
+		DPBorder border = new DPBorder( b );
 		border.setChild( diagramElement );
 		
 		DPWidget dest0 = makeDestElement( "Number" );
 		DPWidget dest1 = makeDestElement2( "Number", dest0 );
 
 		HBoxStyleSheet hboxS = new HBoxStyleSheet( 20.0 );
-		DPHBox hbox = new DPHBox( getContext(), hboxS );
+		DPHBox hbox = new DPHBox( hboxS );
 		hbox.append( dest0 );
 		hbox.append( dest1 );
 
 		VBoxStyleSheet vboxS = new VBoxStyleSheet( 20.0 );
-		DPVBox vbox = new DPVBox( getContext(), vboxS );
+		DPVBox vbox = new DPVBox( vboxS );
 		vbox.append( border );
 		vbox.append( hbox );
 

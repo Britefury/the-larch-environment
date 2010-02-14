@@ -16,7 +16,6 @@ import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
-import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.Layout.ParagraphLayout;
 import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
 import BritefuryJ.Math.AABox2;
@@ -473,11 +472,6 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 	//
 	//
 
-
-	protected PackingParams getDefaultPackingParams()
-	{
-		return null;
-	}
 
 	public double getSpacing()
 	{

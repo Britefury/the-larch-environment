@@ -9,8 +9,24 @@ package BritefuryJ.DocPresent.Layout;
 
 
 
+
 public class TableLayout
 {
+	public static class TablePackingParams
+	{
+		public int x, y, colSpan, rowSpan;
+		
+		public TablePackingParams(int x, int colSpan, int y, int rowSpan)
+		{
+			this.x = x;
+			this.colSpan = colSpan;
+			this.y = y;
+			this.rowSpan = rowSpan;
+		}
+	}
+	
+	
+	
 	private static LReqBox[] computeColumnXBoxes(LReqBoxInterface children[], TablePackingParams packingParams[], int numColumns, double columnSpacing)
 	{
 		LReqBox columnBoxes[] = new LReqBox[numColumns];
@@ -201,8 +217,8 @@ public class TableLayout
 	
 	
 	
-	public static LReqBox[] computeRequisitionX(LReqBoxInterface box, LReqBoxInterface children[], TablePackingParams packingParams[], int numColumns, int numRows,
-			double columnSpacing, double rowSpacing)
+	public static LReqBox[] computeRequisitionX(LReqBoxInterface box, LReqBoxInterface children[], TablePackingParams packingParams[],
+			int numColumns, int numRows, double columnSpacing, double rowSpacing)
 	{
 		LReqBox columnBoxes[] = computeColumnXBoxes( children, packingParams, numColumns, columnSpacing );
 		
@@ -223,8 +239,8 @@ public class TableLayout
 
 
 
-	public static LReqBox[] computeRequisitionY(LReqBoxInterface box, LReqBoxInterface children[], TablePackingParams packingParams[], int childAllocationFlags[], int numColumns, int numRows,
-			double columnSpacing, double rowSpacing)
+	public static LReqBox[] computeRequisitionY(LReqBoxInterface box, LReqBoxInterface children[], TablePackingParams packingParams[], int childAllocationFlags[],
+			int numColumns, int numRows, double columnSpacing, double rowSpacing)
 	{
 		LReqBox rowBoxes[];
 		
@@ -259,7 +275,7 @@ public class TableLayout
 		{
 			LReqBoxInterface childRequisition = children[i];
 			LAllocBoxInterface childAlloc = childrenAlloc[i];
-			TablePackingParams packing = (TablePackingParams)packingParams[i];
+			TablePackingParams packing = packingParams[i];
 			int alignmentFlags = childAlignmentFlags[i];
 			HAlignment hAlign = ElementAlignment.getHAlignment( alignmentFlags );
 			
@@ -296,7 +312,7 @@ public class TableLayout
 		{
 			LReqBoxInterface childRequisition = children[i];
 			LAllocBoxInterface childAlloc = childrenAlloc[i];
-			TablePackingParams packing = (TablePackingParams)packingParams[i];
+			TablePackingParams packing = packingParams[i];
 			int alignmentFlags = childAlignmentFlags[i];
 			VAlignment vAlign = ElementAlignment.getVAlignment( alignmentFlags );
 

@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeFraction;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.FractionStyleSheet;
@@ -32,14 +31,14 @@ public class DPFraction extends DPContainer
 	
 	public static class DPFractionBar extends DPContentLeafEditableEntry
 	{
-		public DPFractionBar(ElementContext context, String textRepresentation)
+		public DPFractionBar(String textRepresentation)
 		{
-			this( context, FractionStyleSheet.BarStyleSheet.defaultStyleSheet, textRepresentation );
+			this( FractionStyleSheet.BarStyleSheet.defaultStyleSheet, textRepresentation );
 		}
 
-		public DPFractionBar(ElementContext context, FractionStyleSheet.BarStyleSheet styleSheet, String textRepresentation)
+		public DPFractionBar(FractionStyleSheet.BarStyleSheet styleSheet, String textRepresentation)
 		{
-			super( context, styleSheet, textRepresentation );
+			super( styleSheet, textRepresentation );
 			
 			layoutNode = new LayoutNodeFraction.LayoutNodeFractionBar( this );
 		}
@@ -166,24 +165,24 @@ public class DPFraction extends DPContainer
 	
 	
 	
-	public DPFraction(ElementContext context)
+	public DPFraction()
 	{
-		this( context, FractionStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, "/" );
+		this( FractionStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, "/" );
 	}
 	
-	public DPFraction(ElementContext context, String barTextRepresentation)
+	public DPFraction(String barTextRepresentation)
 	{
-		this( context, FractionStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, barTextRepresentation );
+		this( FractionStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, barTextRepresentation );
 	}
 	
-	public DPFraction(ElementContext context, FractionStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet)
+	public DPFraction(FractionStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet)
 	{
-		this( context, styleSheet, segmentTextStyleSheet, "/" );
+		this( styleSheet, segmentTextStyleSheet, "/" );
 	}
 	
-	public DPFraction(ElementContext context, FractionStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, String barTextRepresentation)
+	public DPFraction(FractionStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, String barTextRepresentation)
 	{
-		super( context, styleSheet );
+		super( styleSheet );
 		
 		layoutNode = new LayoutNodeFraction( this );
 		
@@ -193,7 +192,7 @@ public class DPFraction extends DPContainer
 		segs = new DPSegment[NUMCHILDREN];
 		paras = new DPParagraph[NUMCHILDREN];
 		
-		setChild( BAR, new DPFractionBar( context, styleSheet.getBarStyleSheet(), barTextRepresentation ) );
+		setChild( BAR, new DPFractionBar( styleSheet.getBarStyleSheet(), barTextRepresentation ) );
 	}
 
 	
@@ -227,7 +226,7 @@ public class DPFraction extends DPContainer
 				{
 					int insertIndex = children[0] != null  ?  1  :  0;
 					registeredChildren.add( insertIndex, child );
-					registerChild( child, null );
+					registerChild( child );
 				}
 			}
 			else
@@ -237,9 +236,9 @@ public class DPFraction extends DPContainer
 
 				if ( bSegmentRequired  &&  !bSegmentPresent )
 				{
-					DPSegment seg = new DPSegment( context, segmentTextStyleSheet, true, true );
+					DPSegment seg = new DPSegment( segmentTextStyleSheet, true, true );
 					segs[slot] = seg;
-					DPParagraph para = new DPParagraph( context );
+					DPParagraph para = new DPParagraph( );
 					para.setChildren( Arrays.asList( new DPWidget[] { seg } ) );
 					paras[slot] = para;
 					
@@ -253,7 +252,7 @@ public class DPFraction extends DPContainer
 					}
 					
 					registeredChildren.add( insertIndex, para );
-					registerChild( para, null );
+					registerChild( para );
 				}
 	
 				
@@ -352,17 +351,6 @@ public class DPFraction extends DPContainer
 	
 	
 	
-	
-	//
-	// Packing parameters
-	//
-	
-	protected PackingParams getDefaultPackingParams()
-	{
-		return null;
-	}
-
-
 	
 	public static double getChildScale()
 	{
