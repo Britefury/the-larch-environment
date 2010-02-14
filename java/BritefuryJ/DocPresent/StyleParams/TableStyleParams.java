@@ -4,12 +4,12 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.StyleSheets;
+package BritefuryJ.DocPresent.StyleParams;
 
 
-public class TableStyleSheet extends ContainerStyleSheet
+public class TableStyleParams extends ContainerStyleParams
 {
-	public static final TableStyleSheet defaultStyleSheet = new TableStyleSheet();
+	public static final TableStyleParams defaultStyleParams = new TableStyleParams();
 	
 	
 	protected final double columnSpacing;
@@ -19,12 +19,12 @@ public class TableStyleSheet extends ContainerStyleSheet
 	protected final boolean rowExpand;
 
 
-	public TableStyleSheet()
+	public TableStyleParams()
 	{
 		this( 0.0, false, 0.0, false );
 	}
 	
-	public TableStyleSheet(double columnSpacing, boolean columnExpand, double rowSpacing, boolean rowExpand)
+	public TableStyleParams(double columnSpacing, boolean columnExpand, double rowSpacing, boolean rowExpand)
 	{
 		super();
 		
@@ -34,9 +34,8 @@ public class TableStyleSheet extends ContainerStyleSheet
 		this.rowSpacing = rowSpacing;
 		this.rowExpand = rowExpand;
 	}
-	
-	
-	
+
+
 	public double getColumnSpacing()
 	{
 		return columnSpacing;

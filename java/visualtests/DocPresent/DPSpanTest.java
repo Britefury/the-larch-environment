@@ -16,7 +16,7 @@ import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.HBoxStyleParams;
 
 public class DPSpanTest extends DocPresentTestBase
 {
@@ -77,7 +77,7 @@ public class DPSpanTest extends DocPresentTestBase
 		DPLink addSpanElementToParaLink = new DPLink( "Add span element to paragraph", addSpanElementToParaAction );
 		DPLink addTextElementToParaLink = new DPLink( "Add text element to paragraph", addTextElementToParaAction );
 		
-		DPHBox linkBox = new DPHBox( new HBoxStyleSheet( 30.0 ) );
+		DPHBox linkBox = new DPHBox( new HBoxStyleParams( 30.0 ) );
 		linkBox.append( addSpanElementToSpanLink );
 		linkBox.append( addTextElementToSpanLink );
 		linkBox.append( addSpanElementToParaLink );

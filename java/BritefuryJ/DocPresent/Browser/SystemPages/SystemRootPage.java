@@ -17,9 +17,9 @@ import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Browser.Page;
-import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.HBoxStyleParams;
+import BritefuryJ.DocPresent.StyleParams.StaticTextStyleParams;
+import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
 
 public class SystemRootPage extends Page
 {
@@ -37,12 +37,12 @@ public class SystemRootPage extends Page
 	
 	public DPWidget getContentsElement()
 	{
-		VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( 40.0 );
+		VBoxStyleParams pageBoxStyle = new VBoxStyleParams( 40.0 );
 		DPVBox pageBox = new DPVBox( pageBoxStyle );
 		
 		DPVBox headBox = new DPVBox( );
 		
-		StaticTextStyleSheet titleStyle = new StaticTextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
+		StaticTextStyleParams titleStyle = new StaticTextStyleParams( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
 		DPStaticText title = new DPStaticText( titleStyle, "gSym System Page" );
 		
 		headBox.append( createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE ) );
@@ -59,7 +59,7 @@ public class SystemRootPage extends Page
 	{
 		DPVBox contentsBox = new DPVBox( );
 		
-		StaticTextStyleSheet titleStyle = new StaticTextStyleSheet( new Font( "Serif", Font.BOLD, 18 ), Color.BLACK );
+		StaticTextStyleParams titleStyle = new StaticTextStyleParams( new Font( "Serif", Font.BOLD, 18 ), Color.BLACK );
 		DPStaticText title = new DPStaticText( titleStyle, "Tests:" );
 		contentsBox.append( title );
 		
@@ -87,7 +87,7 @@ public class SystemRootPage extends Page
 	{
 		EmptyBorder inner = new EmptyBorder( 5.0, 5.0, 5.0, 5.0, new Color( 184, 206, 203 ) );
 		EmptyBorder outer = new EmptyBorder( 5.0, 5.0, 5.0, 5.0 );
-		HBoxStyleSheet linkHBoxStyle = new HBoxStyleSheet( 25.0 );
+		HBoxStyleParams linkHBoxStyle = new HBoxStyleParams( 25.0 );
 		
 		DPBorder innerBorder = new DPBorder( inner );
 		DPBorder outerBorder = new DPBorder( outer );

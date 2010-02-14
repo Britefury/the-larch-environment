@@ -16,7 +16,7 @@ import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNode;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeText;
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 import BritefuryJ.DocPresent.Util.TextVisual;
 import BritefuryJ.Math.Point2;
 
@@ -28,26 +28,26 @@ public class DPText extends DPContentLeafEditableEntry
 	
 	public DPText(String text)
 	{
-		this( TextStyleSheet.defaultStyleSheet, text, text );
+		this( TextStyleParams.defaultStyleParams, text, text );
 	}
 	
 	public DPText(String text, String textRepresentation)
 	{
-		this( TextStyleSheet.defaultStyleSheet, text, textRepresentation );
+		this( TextStyleParams.defaultStyleParams, text, textRepresentation );
 	}
 	
-	public DPText(TextStyleSheet styleSheet, String text)
+	public DPText(TextStyleParams styleParams, String text)
 	{
-		this( styleSheet, text, text );
+		this(styleParams, text, text );
 	}
 
-	public DPText(TextStyleSheet styleSheet, String text, String textRepresentation)
+	public DPText(TextStyleParams styleParams, String text, String textRepresentation)
 	{
-		super( styleSheet, textRepresentation );
+		super(styleParams, textRepresentation );
 		
 		this.text = text;
 		
-		visual = TextVisual.getTextVisual( getPresentationArea(), this.text, styleSheet.getFont(), styleSheet.getMixedSizeCaps() );
+		visual = TextVisual.getTextVisual( getPresentationArea(), this.text, styleParams.getFont(), styleParams.getMixedSizeCaps() );
 		
 		layoutNode = new LayoutNodeText( this );
 	}
@@ -76,9 +76,9 @@ public class DPText extends DPContentLeafEditableEntry
 	
 	private void onTextModified()
 	{
-		TextStyleSheet textStyleSheet = (TextStyleSheet)styleSheet;
+		TextStyleParams textStyleParams = (TextStyleParams) styleParams;
 
-		TextVisual v = TextVisual.getTextVisual( getPresentationArea(), text, textStyleSheet.getFont(), textStyleSheet.getMixedSizeCaps() );
+		TextVisual v = TextVisual.getTextVisual( getPresentationArea(), text, textStyleParams.getFont(), textStyleParams.getMixedSizeCaps() );
 		if ( v != visual )
 		{
 			visual = v;
@@ -111,7 +111,7 @@ public class DPText extends DPContentLeafEditableEntry
 	
 	protected void draw(Graphics2D graphics)
 	{
-		TextStyleSheet textStyleSheet = (TextStyleSheet)styleSheet;
+		TextStyleParams textStyleParams = (TextStyleParams) styleParams;
 
 		Paint prevPaint = graphics.getPaint();
 
@@ -125,14 +125,14 @@ public class DPText extends DPContentLeafEditableEntry
 		}
 
 		
-		Paint squiggleUnderlinePaint = textStyleSheet.getSquiggleUnderlinePaint();
+		Paint squiggleUnderlinePaint = textStyleParams.getSquiggleUnderlinePaint();
 		if ( squiggleUnderlinePaint != null )
 		{
 			graphics.setPaint( squiggleUnderlinePaint );
 			visual.drawSquiggleUnderline( graphics );
 		}
 
-		graphics.setPaint( textStyleSheet.getTextPaint() );
+		graphics.setPaint( textStyleParams.getTextPaint() );
 		visual.drawText( graphics );
 		
 		if ( deltaY != 0.0 )

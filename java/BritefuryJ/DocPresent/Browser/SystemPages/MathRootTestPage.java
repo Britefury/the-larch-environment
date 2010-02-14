@@ -14,7 +14,7 @@ import BritefuryJ.DocPresent.DPMathRoot;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 
 public class MathRootTestPage extends SystemPage
 {
@@ -34,11 +34,11 @@ public class MathRootTestPage extends SystemPage
 		return "The math-root element places its child within a mathematical square-root symbol."; 
 	}
 
-	protected DPWidget makeText(String text, TextStyleSheet styleSheet)
+	protected DPWidget makeText(String text, TextStyleParams styleParams)
 	{
 		if ( text != null )
 		{
-			return new DPText( styleSheet, text );
+			return new DPText(styleParams, text );
 		}
 		else
 		{
@@ -50,7 +50,7 @@ public class MathRootTestPage extends SystemPage
 	protected DPWidget makeFraction(String numeratorText, String denominatorText)
 	{
 		Font f0 = new Font( "Sans serif", Font.PLAIN, 14 );
-		TextStyleSheet s0 = new TextStyleSheet( f0, new Color( 0.0f, 0.5f, 0.0f ) );
+		TextStyleParams s0 = new TextStyleParams( f0, new Color( 0.0f, 0.5f, 0.0f ) );
 		DPText num = new DPText( s0, numeratorText );
 		DPText denom = new DPText( s0, denominatorText );
 		
@@ -74,7 +74,7 @@ public class MathRootTestPage extends SystemPage
 	protected DPWidget makeRoot(String text)
 	{
 		Font f0 = new Font( "Sans serif", Font.PLAIN, 14 );
-		TextStyleSheet s0 = new TextStyleSheet( f0, new Color( 0.0f, 0.5f, 0.0f ) );
+		TextStyleParams s0 = new TextStyleParams( f0, new Color( 0.0f, 0.5f, 0.0f ) );
 		DPText t = new DPText( s0, text );
 		return makeRoot( t );
 	}

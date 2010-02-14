@@ -16,7 +16,7 @@ from Britefury.gSym.View.EditOperations import replace, replaceWithRange, append
 from Britefury.gSym.View.UnparsedText import UnparsedText
 
 
-from BritefuryJ.DocPresent.StyleSheets import *
+from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent import *
 
 

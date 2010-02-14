@@ -16,8 +16,8 @@ import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
+import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
 
 public class FractionTestPage extends SystemPage
 {
@@ -37,11 +37,11 @@ public class FractionTestPage extends SystemPage
 		return "The fraction element places its two child elements into a mathematical fraction arrangement."; 
 	}
 
-	protected DPWidget makeText(String text, TextStyleSheet styleSheet)
+	protected DPWidget makeText(String text, TextStyleParams styleParams)
 	{
 		if ( text != null )
 		{
-			return new DPText( styleSheet, text );
+			return new DPText(styleParams, text );
 		}
 		else
 		{
@@ -62,8 +62,8 @@ public class FractionTestPage extends SystemPage
 
 	protected DPWidget makeFractionLine(DPWidget num, DPWidget denom)
 	{
-		TextStyleSheet s1 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 10 ), Color.blue );
-		TextStyleSheet s2 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.red );
+		TextStyleParams s1 = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 10 ), Color.blue );
+		TextStyleParams s2 = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 24 ), Color.red );
 		
 		DPWidget frac = makeFraction( num, denom );
 		
@@ -88,10 +88,10 @@ public class FractionTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		TextStyleSheet s0 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), new Color( 0.0f, 0.5f, 0.0f ) );
-		TextStyleSheet blackStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.black );
+		TextStyleParams s0 = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 16 ), new Color( 0.0f, 0.5f, 0.0f ) );
+		TextStyleParams blackStyle = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 24 ), Color.black );
 
-		VBoxStyleSheet boxs = new VBoxStyleSheet( 10.0 );
+		VBoxStyleParams boxs = new VBoxStyleParams( 10.0 );
 		DPVBox box = new DPVBox( boxs );
 		
 		box.append( makeFractionLine( makeText( "a", s0 ), makeText( "p", s0 ) ) );

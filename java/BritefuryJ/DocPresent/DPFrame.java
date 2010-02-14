@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 
 public class DPFrame extends DPBin
 {
@@ -17,12 +17,12 @@ public class DPFrame extends DPBin
 	
 	public DPFrame()
 	{
-		this( ContainerStyleSheet.defaultStyleSheet );
+		this( ContainerStyleParams.defaultStyleParams );
 	}
 
-	public DPFrame(ContainerStyleSheet styleSheet)
+	public DPFrame(ContainerStyleParams styleParams)
 	{
-		super( styleSheet );
+		super(styleParams);
 	}
 	
 	

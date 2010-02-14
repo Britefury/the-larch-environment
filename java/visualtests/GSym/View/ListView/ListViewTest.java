@@ -21,10 +21,10 @@ import BritefuryJ.DocPresent.DPWhitespace;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementContext;
 import BritefuryJ.DocPresent.ElementFactory;
-import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.HBoxStyleParams;
+import BritefuryJ.DocPresent.StyleParams.ParagraphStyleParams;
+import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
+import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
 import BritefuryJ.GSym.View.ListView.HorizontalListViewLayout;
 import BritefuryJ.GSym.View.ListView.ListViewLayout;
 import BritefuryJ.GSym.View.ListView.ParagraphListViewLayout;
@@ -34,11 +34,11 @@ import BritefuryJ.GSym.View.ListView.VerticalListViewLayout;
 
 public class ListViewTest
 {
-	protected DPWidget makeText(String text, TextStyleSheet styleSheet)
+	protected DPWidget makeText(String text, TextStyleParams styleParams)
 	{
 		if ( text != null )
 		{
-			return new DPText( styleSheet, text );
+			return new DPText(styleParams, text );
 		}
 		else
 		{
@@ -49,36 +49,36 @@ public class ListViewTest
 	static class TextElementFactory implements ElementFactory
 	{
 		String text;
-		TextStyleSheet styleSheet;
-		
-		public TextElementFactory(String text, TextStyleSheet styleSheet)
+		TextStyleParams styleParams;
+
+		public TextElementFactory(String text, TextStyleParams styleParams)
 		{
 			this.text = text;
-			this.styleSheet = styleSheet;
+			this.styleParams = styleParams;
 		}
 		
 		
 		public DPWidget createElement(ElementContext ctx)
 		{
-			return new DPText( styleSheet, text );
+			return new DPText(styleParams, text );
 		}
 	}
 	
 	static class TextSeparatorElementFactory implements SeparatorElementFactory
 	{
 		String text;
-		TextStyleSheet styleSheet;
-		
-		public TextSeparatorElementFactory(String text, TextStyleSheet styleSheet)
+		TextStyleParams styleParams;
+
+		public TextSeparatorElementFactory(String text, TextStyleParams styleParams)
 		{
 			this.text = text;
-			this.styleSheet = styleSheet;
+			this.styleParams = styleParams;
 		}
 		
 		
 		public DPWidget createElement(ElementContext ctx, int index, DPWidget child)
 		{
-			return new DPText( styleSheet, text );
+			return new DPText(styleParams, text );
 		}
 	}
 	
@@ -101,9 +101,9 @@ public class ListViewTest
 	
 	protected DPWidget makeListView(ListViewLayout layout, String[] txt, String title, String beginDelim, String endDelim, String separator)
 	{
-		TextStyleSheet s0 = new TextStyleSheet( new Font( "Sans serif", Font.BOLD, 16 ), Color.blue );
-		TextStyleSheet s1 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.black );
-		TextStyleSheet s2 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), new Color( 0.0f, 0.5f, 0.0f ) );
+		TextStyleParams s0 = new TextStyleParams( new Font( "Sans serif", Font.BOLD, 16 ), Color.blue );
+		TextStyleParams s1 = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 12 ), Color.black );
+		TextStyleParams s2 = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 12 ), new Color( 0.0f, 0.5f, 0.0f ) );
 
 		DPWidget children[] = new DPText[txt.length];
 		for (int i = 0; i < txt.length; i++)
@@ -123,15 +123,15 @@ public class ListViewTest
 	
 	protected DPWidget createContentNode()
 	{
-		VBoxStyleSheet boxs = new VBoxStyleSheet( 15.0 );
+		VBoxStyleParams boxs = new VBoxStyleParams( 15.0 );
 		DPVBox box = new DPVBox( boxs );
 		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
 		
 
 		
-		ParagraphStyleSheet paraStyle = new ParagraphStyleSheet();
-		HBoxStyleSheet hboxStyle = new HBoxStyleSheet();
-		VBoxStyleSheet vboxStyle = VBoxStyleSheet.defaultStyleSheet;
+		ParagraphStyleParams paraStyle = new ParagraphStyleParams();
+		HBoxStyleParams hboxStyle = new HBoxStyleParams();
+		VBoxStyleParams vboxStyle = VBoxStyleParams.defaultStyleParams;
 		
 		String[] txt = new String[] { "abcdef", "123456", "hello", "world", "this", "is", "a", "test", "of", "the", "list", "layout", "system" };
 		

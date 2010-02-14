@@ -5,15 +5,9 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 1999-2008.
 //##************************
-package BritefuryJ.DocPresent.StyleSheets;
+package BritefuryJ.DocPresent.StyleParams;
 
-public class ContainerStyleSheet extends WidgetStyleSheet
+public class ContentLeafStyleParams extends WidgetStyleParams
 {
-	public static final ContainerStyleSheet defaultStyleSheet = new ContainerStyleSheet();
-	
-	
-	public ContainerStyleSheet()
-	{
-		super();
-	}
+	public static final ContentLeafStyleParams defaultStyleParams = new ContentLeafStyleParams();
 }

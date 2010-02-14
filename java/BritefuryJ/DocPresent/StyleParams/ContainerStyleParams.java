@@ -5,21 +5,15 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 1999-2008.
 //##************************
-package BritefuryJ.DocPresent.StyleSheets;
+package BritefuryJ.DocPresent.StyleParams;
 
-
-public class HBoxStyleSheet extends AbstractBoxStyleSheet
+public class ContainerStyleParams extends WidgetStyleParams
 {
-	public static final HBoxStyleSheet defaultStyleSheet = new HBoxStyleSheet();
-	
-	
-	public HBoxStyleSheet()
+	public static final ContainerStyleParams defaultStyleParams = new ContainerStyleParams();
+
+
+	public ContainerStyleParams()
 	{
-		this( 0.0 );
-	}
-	
-	public HBoxStyleSheet(double spacing)
-	{
-		super( spacing );
+		super();
 	}
 }

@@ -27,10 +27,10 @@ import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
-import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
+import BritefuryJ.DocPresent.StyleParams.HBoxStyleParams;
+import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
+import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.ItemStream.ItemStream;
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
@@ -46,7 +46,7 @@ public class NodeView implements ElementContext
 		
 		public DPNodeBin(NodeView nodeView)
 		{
-			super( ContainerStyleSheet.defaultStyleSheet );
+			super( ContainerStyleParams.defaultStyleParams );
 			
 			this.nodeView = nodeView;
 			bSelected = false;
@@ -121,19 +121,19 @@ public class NodeView implements ElementContext
 	
 	static int MAX_STRING_LENGTH = 64;
 	
-	static TextStyleSheet debugNameStyle = new TextStyleSheet( new Font( "Sans serif", Font.BOLD, 24 ), Color.blue );
-	static TextStyleSheet classNameStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 18 ), new Color( 0.0f, 0.0f, 0.5f ) );
-	static TextStyleSheet rangeStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.black );
-	static TextStyleSheet inputStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.black );
-	static TextStyleSheet valueStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
-	static TextStyleSheet failStyle = new TextStyleSheet( new Font( "Sans serif", Font.ITALIC, 16 ), new Color( 0.5f, 0.0f, 0.0f ) );
-	static HBoxStyleSheet titleTextHBoxStyle = new HBoxStyleSheet( 10.0 );
+	static TextStyleParams debugNameStyle = new TextStyleParams( new Font( "Sans serif", Font.BOLD, 24 ), Color.blue );
+	static TextStyleParams classNameStyle = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 18 ), new Color( 0.0f, 0.0f, 0.5f ) );
+	static TextStyleParams rangeStyle = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 12 ), Color.black );
+	static TextStyleParams inputStyle = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 12 ), Color.black );
+	static TextStyleParams valueStyle = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
+	static TextStyleParams failStyle = new TextStyleParams( new Font( "Sans serif", Font.ITALIC, 16 ), new Color( 0.5f, 0.0f, 0.0f ) );
+	static HBoxStyleParams titleTextHBoxStyle = new HBoxStyleParams( 10.0 );
 	static Border titleSuccessBorder = new EmptyBorder( 0.0, 0.0, 0.0, 0.0, new Color( 0.85f, 0.95f, 0.85f ) );
 	static Border titleFailBorder = new EmptyBorder( 0.0, 0.0, 0.0, 0.0, new Color( 1.0f, 0.85f, 0.85f ) );
 	static Border nodeBorder = new SolidBorder( 1.0, 1.0, Color.black, null );
 	
-	static VBoxStyleSheet childrenVBoxStyle = new VBoxStyleSheet( 3.0 );
-	static HBoxStyleSheet mainHBoxStyle = new HBoxStyleSheet( 80.0 );
+	static VBoxStyleParams childrenVBoxStyle = new VBoxStyleParams( 3.0 );
+	static HBoxStyleParams mainHBoxStyle = new HBoxStyleParams( 80.0 );
 	
 	
 	

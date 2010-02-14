@@ -10,12 +10,12 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPFraction;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.StyleParams.FractionStyleParams;
 import BritefuryJ.DocPresent.WidgetFilter;
 import BritefuryJ.DocPresent.Layout.FractionLayout;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
-import BritefuryJ.DocPresent.StyleSheets.FractionStyleSheet;
 import BritefuryJ.Math.Point2;
 
 public class LayoutNodeFraction extends ArrangedLayoutNode
@@ -235,16 +235,16 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 	
 	protected double getVSpacing()
 	{
-		return ((FractionStyleSheet)element.getStyleSheet()).getVSpacing();
+		return ((FractionStyleParams)element.getStyleSheet()).getVSpacing();
 	}
 
 	protected double getHPadding()
 	{
-		return ((FractionStyleSheet)element.getStyleSheet()).getHPadding();
+		return ((FractionStyleParams)element.getStyleSheet()).getHPadding();
 	}
 
 	protected double getYOffset()
 	{
-		return ((FractionStyleSheet)element.getStyleSheet()).getYOffset();
+		return ((FractionStyleParams)element.getStyleSheet()).getYOffset();
 	}
 }

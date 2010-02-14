@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent;
 import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 
 public class DPSegment extends DPContainer
 {
@@ -35,7 +35,7 @@ public class DPSegment extends DPContainer
 
 	
 	
-	protected TextStyleSheet textStyleSheet;
+	protected TextStyleParams textStyleParams;
 	protected boolean bGuardBegin, bGuardEnd;
 	protected DPWidget beginGuard, endGuard;
 	protected DPWidget child;
@@ -48,13 +48,13 @@ public class DPSegment extends DPContainer
 	
 	public DPSegment(boolean bGuardBegin, boolean bGuardEnd)
 	{
-		this( TextStyleSheet.defaultStyleSheet, bGuardBegin, bGuardEnd );
+		this( TextStyleParams.defaultStyleParams, bGuardBegin, bGuardEnd );
 	}
 
-	public DPSegment(TextStyleSheet textStyleSheet, boolean bGuardBegin, boolean bGuardEnd)
+	public DPSegment(TextStyleParams textStyleParams, boolean bGuardBegin, boolean bGuardEnd)
 	{
 		super( );
-		this.textStyleSheet = textStyleSheet;
+		this.textStyleParams = textStyleParams;
 		this.bGuardBegin = bGuardBegin;
 		this.bGuardEnd = bGuardEnd;
 		bGuardsRefreshing = false;
@@ -156,7 +156,7 @@ public class DPSegment extends DPContainer
 			if ( bBegin  &&  !( beginGuard instanceof DPText ) )
 			{
 				unregisterBeginGuard();
-				beginGuard = new DPText( textStyleSheet, "" );
+				beginGuard = new DPText(textStyleParams, "" );
 				registerBeginGuard();
 			}
 			
@@ -179,7 +179,7 @@ public class DPSegment extends DPContainer
 			if ( bEnd  &&  !( endGuard instanceof DPText ) )
 			{
 				unregisterEndGuard();
-				endGuard = new DPText( textStyleSheet, "" );
+				endGuard = new DPText(textStyleParams, "" );
 				registerEndGuard();
 			}
 			

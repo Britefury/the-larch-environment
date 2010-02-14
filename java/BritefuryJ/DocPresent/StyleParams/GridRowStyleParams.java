@@ -4,14 +4,14 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.StyleSheets;
+package BritefuryJ.DocPresent.StyleParams;
 
-public class GridRowStyleSheet extends ContainerStyleSheet
+public class GridRowStyleParams extends ContainerStyleParams
 {
-	public static final GridRowStyleSheet defaultStyleSheet = new GridRowStyleSheet();
-	
-	
-	public GridRowStyleSheet()
+	public static final GridRowStyleParams defaultStyleParams = new GridRowStyleParams();
+
+
+	public GridRowStyleParams()
 	{
 		super();
 	}

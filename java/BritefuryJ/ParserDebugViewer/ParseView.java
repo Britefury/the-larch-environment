@@ -16,7 +16,7 @@ import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementContext;
-import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 import BritefuryJ.ParserHelpers.DebugNode;
@@ -28,9 +28,9 @@ public class ParseView implements ElementContext
 	{
 		private ParseView parseView;
 		
-		public DPViewBin(ContainerStyleSheet styleSheet, ParseView parseView)
+		public DPViewBin(ContainerStyleParams styleParams, ParseView parseView)
 		{
-			super( styleSheet );
+			super(styleParams);
 			
 			this.parseView = parseView;
 		}
@@ -139,7 +139,7 @@ public class ParseView implements ElementContext
 		
 		area = new DPPresentationArea( );
 		
-		bin = new DPViewBin( ContainerStyleSheet.defaultStyleSheet, this );
+		bin = new DPViewBin( ContainerStyleParams.defaultStyleParams, this );
 		
 		nodeTable = new HashMap<DebugNode, NodeView>();
 		callEdges = new ArrayList<Edge>();

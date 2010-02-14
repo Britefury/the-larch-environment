@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 
+import BritefuryJ.DocPresent.StyleParams.ButtonStyleParams;
 import org.python.core.Py;
 import org.python.core.PyObject;
 
@@ -16,7 +17,6 @@ import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeButton;
-import BritefuryJ.DocPresent.StyleSheets.ButtonStyleSheet;
 
 public class DPButton extends DPBin
 {
@@ -49,35 +49,35 @@ public class DPButton extends DPBin
 	
 	public DPButton()
 	{
-		this( ButtonStyleSheet.defaultStyleSheet, (ButtonListener)null );
+		this( ButtonStyleParams.defaultStyleParams, (ButtonListener)null );
 	}
 
 	public DPButton(ButtonListener listener)
 	{
-		this( ButtonStyleSheet.defaultStyleSheet, listener );
+		this( ButtonStyleParams.defaultStyleParams, listener );
 	}
 
 	public DPButton(PyObject listener)
 	{
-		this( ButtonStyleSheet.defaultStyleSheet, new PyButtonListener( listener ) );
+		this( ButtonStyleParams.defaultStyleParams, new PyButtonListener( listener ) );
 	}
 
-	public DPButton(ButtonStyleSheet styleSheet)
+	public DPButton(ButtonStyleParams styleParams)
 	{
-		this( styleSheet, (ButtonListener)null );
+		this(styleParams, (ButtonListener)null );
 	}
 
-	public DPButton(ButtonStyleSheet styleSheet, ButtonListener listener)
+	public DPButton(ButtonStyleParams styleParams, ButtonListener listener)
 	{
-		super( styleSheet );
+		super(styleParams);
 		
 		layoutNode = new LayoutNodeButton( this );
 		this.listener = listener;
 	}
 	
-	public DPButton(ButtonStyleSheet styleSheet, PyObject listener)
+	public DPButton(ButtonStyleParams styleParams, PyObject listener)
 	{
-		this( styleSheet, new PyButtonListener( listener ) );
+		this(styleParams, new PyButtonListener( listener ) );
 	}
 	
 	
@@ -92,7 +92,7 @@ public class DPButton extends DPBin
 	protected void drawBackground(Graphics2D graphics)
 	{
 		super.drawBackground( graphics );
-		ButtonStyleSheet buttonStyle = (ButtonStyleSheet)styleSheet;
+		ButtonStyleParams buttonStyle = (ButtonStyleParams) styleParams;
 		
 		ArrayList<PointerInterface> pointersWithinBounds = getPointersWithinBounds();
 		if ( pointersWithinBounds != null  &&  pointersWithinBounds.size() > 0 )

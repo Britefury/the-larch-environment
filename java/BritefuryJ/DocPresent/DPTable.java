@@ -11,12 +11,12 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
 import org.python.core.Py;
 import org.python.core.PyTuple;
 
 import BritefuryJ.DocPresent.Layout.TableLayout;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeTable;
-import BritefuryJ.DocPresent.StyleSheets.TableStyleSheet;
 
 public class DPTable extends DPContainer
 {
@@ -43,12 +43,12 @@ public class DPTable extends DPContainer
 	
 	public DPTable()
 	{
-		this( TableStyleSheet.defaultStyleSheet );
+		this( TableStyleParams.defaultStyleParams);
 	}
 
-	public DPTable(TableStyleSheet styleSheet)
+	public DPTable(TableStyleParams styleParams)
 	{
-		super( styleSheet );
+		super(styleParams);
 		
 		layoutNode = new LayoutNodeTable( this );
 
@@ -582,22 +582,22 @@ public class DPTable extends DPContainer
 	
 	protected double getColumnSpacing()
 	{
-		return ((TableStyleSheet)styleSheet).getColumnSpacing();
+		return ((TableStyleParams) styleParams).getColumnSpacing();
 	}
 
 	protected boolean getColumnExpand()
 	{
-		return ((TableStyleSheet)styleSheet).getColumnExpand();
+		return ((TableStyleParams) styleParams).getColumnExpand();
 	}
 
 	
 	protected double getRowSpacing()
 	{
-		return ((TableStyleSheet)styleSheet).getRowSpacing();
+		return ((TableStyleParams) styleParams).getRowSpacing();
 	}
 
 	protected boolean getRowExpand()
 	{
-		return ((TableStyleSheet)styleSheet).getRowExpand();
+		return ((TableStyleParams) styleParams).getRowExpand();
 	}
 }

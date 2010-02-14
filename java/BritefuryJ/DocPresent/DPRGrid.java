@@ -8,7 +8,7 @@ package BritefuryJ.DocPresent;
 
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeGridRow;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeRGrid;
-import BritefuryJ.DocPresent.StyleSheets.TableStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
 
 public class DPRGrid extends DPContainerSequence
 {
@@ -18,12 +18,12 @@ public class DPRGrid extends DPContainerSequence
 	
 	public DPRGrid()
 	{
-		this( TableStyleSheet.defaultStyleSheet );
+		this( TableStyleParams.defaultStyleParams);
 	}
 	
-	public DPRGrid(TableStyleSheet syleSheet)
+	public DPRGrid(TableStyleParams styleParams)
 	{
-		super( syleSheet );
+		super(styleParams);
 		
 		layoutNode = new LayoutNodeRGrid( this );
 	}
@@ -69,22 +69,22 @@ public class DPRGrid extends DPContainerSequence
 	
 	protected double getColumnSpacing()
 	{
-		return ((TableStyleSheet)styleSheet).getColumnSpacing();
+		return ((TableStyleParams) styleParams).getColumnSpacing();
 	}
 
 	protected boolean getColumnExpand()
 	{
-		return ((TableStyleSheet)styleSheet).getColumnExpand();
+		return ((TableStyleParams) styleParams).getColumnExpand();
 	}
 
 	
 	protected double getRowSpacing()
 	{
-		return ((TableStyleSheet)styleSheet).getRowSpacing();
+		return ((TableStyleParams) styleParams).getRowSpacing();
 	}
 
 	protected boolean getRowExpand()
 	{
-		return ((TableStyleSheet)styleSheet).getRowExpand();
+		return ((TableStyleParams) styleParams).getRowExpand();
 	}
 }

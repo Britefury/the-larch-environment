@@ -7,7 +7,7 @@
 package BritefuryJ.DocPresent;
 
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.StyleSheets.ContentLeafStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.ContentLeafStyleParams;
 
 
 public abstract class DPContentLeafEditable extends DPContentLeaf
@@ -32,9 +32,9 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		super( textRepresentation );
 	}
 	
-	protected DPContentLeafEditable(ContentLeafStyleSheet styleSheet, String textRepresentation)
+	protected DPContentLeafEditable(ContentLeafStyleParams styleParams, String textRepresentation)
 	{
-		super( styleSheet, textRepresentation );
+		super(styleParams, textRepresentation );
 	}
 
 

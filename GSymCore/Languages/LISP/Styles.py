@@ -10,26 +10,26 @@ from java.awt import Font, Color
 from BritefuryJ.GSym.View.ListView import ListViewLayout, SpanListViewLayout, ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
 from BritefuryJ.DocPresent import *
-from BritefuryJ.DocPresent.StyleSheets import *
+from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent.Layout import *
 
 
 
-default_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 14 ),  Color.black )
+default_textStyle = TextStyleParams( Font( 'SansSerif', Font.PLAIN, 14 ),  Color.black )
 
-string_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 14 ),  Color( 0.0, 0.5, 0.5 ) )
-punctuation_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 14 ),  Color( 0.0, 0.0, 1.0 ) )
-className_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 14 ),  Color( 0.0, 0.5, 0.0 ) )
-fieldName_textStyle = TextStyleSheet( Font( 'SansSerif', Font.PLAIN, 14 ),  Color( 0.5, 0.0, 0.5 ) )
-
-
-lisp_paragraphStyle = ParagraphStyleSheet( 0.0, 0.0, 60.0 )
+string_textStyle = TextStyleParams( Font( 'SansSerif', Font.PLAIN, 14 ),  Color( 0.0, 0.5, 0.5 ) )
+punctuation_textStyle = TextStyleParams( Font( 'SansSerif', Font.PLAIN, 14 ),  Color( 0.0, 0.0, 1.0 ) )
+className_textStyle = TextStyleParams( Font( 'SansSerif', Font.PLAIN, 14 ),  Color( 0.0, 0.5, 0.0 ) )
+fieldName_textStyle = TextStyleParams( Font( 'SansSerif', Font.PLAIN, 14 ),  Color( 0.5, 0.0, 0.5 ) )
 
 
-paragraph_listViewLayout = ParagraphListViewLayout( ParagraphStyleSheet(), lambda ctx: ctx.text( default_textStyle, ' ' ), True, ListViewLayout.TrailingSeparator.NEVER )
+lisp_paragraphStyle = ParagraphStyleParams( 0.0, 0.0, 60.0 )
 
-verticalInline_listViewLayout = VerticalInlineListViewLayout( VBoxStyleSheet( 0.0 ), \
-						ParagraphStyleSheet(), 30.0, ListViewLayout.TrailingSeparator.NEVER )
 
-vertical_listViewLayout = VerticalListViewLayout( VBoxStyleSheet( 0.0 ), \
-						ParagraphStyleSheet(), 30.0, ListViewLayout.TrailingSeparator.NEVER )
+paragraph_listViewLayout = ParagraphListViewLayout( ParagraphStyleParams(), lambda ctx: ctx.text( default_textStyle, ' ' ), True, ListViewLayout.TrailingSeparator.NEVER )
+
+verticalInline_listViewLayout = VerticalInlineListViewLayout( VBoxStyleParams( 0.0 ), \
+						ParagraphStyleParams(), 30.0, ListViewLayout.TrailingSeparator.NEVER )
+
+vertical_listViewLayout = VerticalListViewLayout( VBoxStyleParams( 0.0 ), \
+						ParagraphStyleParams(), 30.0, ListViewLayout.TrailingSeparator.NEVER )

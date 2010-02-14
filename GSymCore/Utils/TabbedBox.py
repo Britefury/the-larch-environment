@@ -8,13 +8,13 @@
 from java.awt import Font, Color
 
 from BritefuryJ.DocPresent.Border import *
-from BritefuryJ.DocPresent.StyleSheets import *
+from BritefuryJ.DocPresent.StyleParams import *
 
 
-_tabTextStyle = StaticTextStyleSheet( Font( "SansSerif", Font.BOLD, 16 ), Color.BLACK )
+_tabTextStyle = StaticTextStyleParams( Font( "SansSerif", Font.BOLD, 16 ), Color.BLACK )
 _tabBorder = EmptyBorder( 2.0, 2.0, 2.0, 2.0, Color( 161, 178, 160 ) )
 _tabBoxBorder = SolidBorder( 2.0, 2.0, Color( 161, 178, 160 ), None )
-_tabVBoxStyle = VBoxStyleSheet()
+_tabVBoxStyle = VBoxStyleParams()
 
 
 def tabbedBox(ctx, tabTitle, contents):

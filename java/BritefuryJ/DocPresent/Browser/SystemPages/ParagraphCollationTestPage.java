@@ -16,9 +16,9 @@ import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.ParagraphStyleParams;
+import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
+import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
 
 public class ParagraphCollationTestPage extends SystemPage
 {
@@ -41,7 +41,7 @@ public class ParagraphCollationTestPage extends SystemPage
 
 	static String textBlock = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 	
-	protected ArrayList<DPWidget> makeTextNodes(String text, TextStyleSheet style)
+	protected ArrayList<DPWidget> makeTextNodes(String text, TextStyleParams style)
 	{
 		String[] words = text.split( " " );
 		ArrayList<DPWidget> nodes = new ArrayList<DPWidget>();
@@ -75,20 +75,20 @@ public class ParagraphCollationTestPage extends SystemPage
 	}
 	
 	
-	protected DPParagraph makeParagraph(String title, double spacing, double vSpacing, double indentation, int lineBreakStep, TextStyleSheet textStyle)
+	protected DPParagraph makeParagraph(String title, double spacing, double vSpacing, double indentation, int lineBreakStep, TextStyleParams textStyle)
 	{
 		ArrayList<DPWidget> children = makeTextNodes( title + ": " + textBlock, textStyle );
 		if ( lineBreakStep > 0 )
 		{
 			children = addLineBreaks( children, lineBreakStep );
 		}
-		ParagraphStyleSheet boxs = new ParagraphStyleSheet( spacing, vSpacing, indentation );
+		ParagraphStyleParams boxs = new ParagraphStyleParams( spacing, vSpacing, indentation );
 		DPParagraph box = new DPParagraph( boxs );
 		box.extend( children );
 		return box;
 	}
 	
-	protected DPSpan makeSpan(String title, int lineBreakStep, TextStyleSheet textStyle)
+	protected DPSpan makeSpan(String title, int lineBreakStep, TextStyleParams textStyle)
 	{
 		ArrayList<DPWidget> children = makeTextNodes( title + ": " + textBlock, textStyle );
 		if ( lineBreakStep > 0 )
@@ -100,12 +100,12 @@ public class ParagraphCollationTestPage extends SystemPage
 		return span;
 	}
 	
-	protected DPParagraph makeParagraphWithNestedSpan(String title, double spacing, double vSpacing, double indentation, int lineBreakStep, TextStyleSheet textStyle, TextStyleSheet nestedTextStyle)
+	protected DPParagraph makeParagraphWithNestedSpan(String title, double spacing, double vSpacing, double indentation, int lineBreakStep, TextStyleParams textStyle, TextStyleParams nestedTextStyle)
 	{
 		ArrayList<DPWidget> children = makeTextNodes( title + ": " + textBlock, textStyle );
 		children = addLineBreaks( children, lineBreakStep );
 		children.add( children.size()/2, makeSpan( title + " (inner)", lineBreakStep, nestedTextStyle ) );
-		ParagraphStyleSheet boxs = new ParagraphStyleSheet( spacing, vSpacing, indentation );
+		ParagraphStyleParams boxs = new ParagraphStyleParams( spacing, vSpacing, indentation );
 		DPParagraph box = new DPParagraph( boxs );
 		box.extend( children );
 		return box;
@@ -114,8 +114,8 @@ public class ParagraphCollationTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		TextStyleSheet blackText = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.black );
-		TextStyleSheet redText = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.red );
+		TextStyleParams blackText = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 12 ), Color.black );
+		TextStyleParams redText = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 12 ), Color.red );
 		
 		DPWidget b2 = makeParagraph( "PER-WORD", 0.0, 0.0, 0.0, 1, blackText );
 		DPWidget b3 = makeParagraph( "EVERY-4-WORDS", 0.0, 0.0, 0.0, 4, blackText);
@@ -125,7 +125,7 @@ public class ParagraphCollationTestPage extends SystemPage
 		DPWidget b7 = makeParagraph( "PER-WORD INDENTED", 0.0, 0.0, 50.0, 1, blackText );
 		DPWidget b8 = makeParagraphWithNestedSpan( "NESTED-2-INDENTED", 0.0, 0.0, 50.0, 2, blackText, redText );
 		DPWidget[] children = { b2, b3, b4, b5, b6, b7, b8 };
-		VBoxStyleSheet boxs = new VBoxStyleSheet( 30.0 );
+		VBoxStyleParams boxs = new VBoxStyleParams( 30.0 );
 		DPVBox box = new DPVBox( boxs );
 		box.extend( children );
 		return box;

@@ -5,47 +5,47 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 1999-2008.
 //##************************
-package BritefuryJ.DocPresent.StyleSheets;
+package BritefuryJ.DocPresent.StyleParams;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Paint;
 
-public class TextStyleSheet extends ContentLeafStyleSheet
+public class TextStyleParams extends ContentLeafStyleParams
 {
 	private static final Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
 
 	
-	public static final TextStyleSheet defaultStyleSheet = new TextStyleSheet();
+	public static final TextStyleParams defaultStyleParams = new TextStyleParams();
 	
 	
 	
 	protected final Font font;
 	protected final Paint textPaint, squiggleUnderlinePaint;
 	protected final boolean bMixedSizeCaps;
-	
-	
-	public TextStyleSheet()
+
+
+	public TextStyleParams()
 	{
 		this( defaultFont, Color.black, null, false );
 	}
 	
-	public TextStyleSheet(Font font, Paint textPaint)
+	public TextStyleParams(Font font, Paint textPaint)
 	{
 		this( font, textPaint, null, false );
 	}
 	
-	public TextStyleSheet(Font font, Paint textPaint, boolean bMixedSizeCaps)
+	public TextStyleParams(Font font, Paint textPaint, boolean bMixedSizeCaps)
 	{
 		this( font, textPaint, null, bMixedSizeCaps );
 	}
 
-	public TextStyleSheet(Font font, Paint textPaint, Paint squiggleUnderlinePaint)
+	public TextStyleParams(Font font, Paint textPaint, Paint squiggleUnderlinePaint)
 	{
 		this( font, textPaint, squiggleUnderlinePaint, false );
 	}
 	
-	public TextStyleSheet(Font font, Paint textPaint, Paint squiggleUnderlinePaint, boolean bMixedSizeCaps)
+	public TextStyleParams(Font font, Paint textPaint, Paint squiggleUnderlinePaint, boolean bMixedSizeCaps)
 	{
 		super();
 		
@@ -54,9 +54,8 @@ public class TextStyleSheet extends ContentLeafStyleSheet
 		this.squiggleUnderlinePaint = squiggleUnderlinePaint;
 		this.bMixedSizeCaps = bMixedSizeCaps;
 	}
-	
-	
-	
+
+
 	public Font getFont()
 	{
 		return font;

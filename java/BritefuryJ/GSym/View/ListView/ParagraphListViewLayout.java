@@ -19,33 +19,33 @@ import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementContext;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.PyElementFactory;
-import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.ParagraphStyleParams;
 
 public class ParagraphListViewLayout extends ListViewLayout
 {
-	private ParagraphStyleSheet styleSheet;
+	private ParagraphStyleParams styleParams;
 	private ElementFactory spacingFactory;
 	boolean bAddParagraphIndentMarkers;
 	private TrailingSeparator trailingSeparator;
-	
-	
-	public ParagraphListViewLayout(ParagraphStyleSheet styleSheet, ElementFactory spacingFactory, boolean bAddParagraphIndentMarkers, TrailingSeparator trailingSeparator)
+
+
+	public ParagraphListViewLayout(ParagraphStyleParams styleParams, ElementFactory spacingFactory, boolean bAddParagraphIndentMarkers, TrailingSeparator trailingSeparator)
 	{
-		this.styleSheet = styleSheet;
+		this.styleParams = styleParams;
 		this.spacingFactory = spacingFactory;
 		this.bAddParagraphIndentMarkers = bAddParagraphIndentMarkers;
 		this.trailingSeparator = trailingSeparator;
 	}
 	
-	public ParagraphListViewLayout(ParagraphStyleSheet styleSheet, PyObject spacingFactory, boolean bAddParagraphIndentMarkers, TrailingSeparator trailingSeparator)
+	public ParagraphListViewLayout(ParagraphStyleParams styleParams, PyObject spacingFactory, boolean bAddParagraphIndentMarkers, TrailingSeparator trailingSeparator)
 	{
-		this( styleSheet, PyElementFactory.pyToElementFactory( spacingFactory ), bAddParagraphIndentMarkers, trailingSeparator );
+		this(styleParams, PyElementFactory.pyToElementFactory( spacingFactory ), bAddParagraphIndentMarkers, trailingSeparator );
 	}
 	
 	
 	public DPWidget createListElement(ElementContext ctx, List<DPWidget> children, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator)
 	{
-		DPParagraph paragraph = new DPParagraph( styleSheet );
+		DPParagraph paragraph = new DPParagraph(styleParams);
 		
 		ArrayList<DPWidget> childElems = new ArrayList<DPWidget>();
 		childElems.ensureCapacity( children.size() + 2 );

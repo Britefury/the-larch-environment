@@ -27,7 +27,7 @@ from BritefuryJ.ParserDebugViewer import ParseViewFrame
 from BritefuryJ.Parser.ItemStream import ItemStreamBuilder, ItemStream
 
 
-from BritefuryJ.DocPresent.StyleSheets import *
+from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent import *
 
 

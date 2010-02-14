@@ -14,7 +14,7 @@ import BritefuryJ.DocPresent.Canvas.DrawingOwner;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeCanvas;
-import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.WidgetStyleParams;
 import BritefuryJ.Math.Point2;
 
 public class DPCanvas extends DPStatic implements DrawingOwner
@@ -28,22 +28,22 @@ public class DPCanvas extends DPStatic implements DrawingOwner
 	
 	public DPCanvas(DrawingNode drawing)
 	{
-		this( WidgetStyleSheet.defaultStyleSheet, drawing, -1.0, -1.0, false, false );
+		this( WidgetStyleParams.defaultStyleParams, drawing, -1.0, -1.0, false, false );
 	}
 	
-	public DPCanvas(WidgetStyleSheet styleSheet, DrawingNode drawing)
+	public DPCanvas(WidgetStyleParams styleParams, DrawingNode drawing)
 	{
-		this( styleSheet, drawing, -1.0, -1.0, false, false );
+		this(styleParams, drawing, -1.0, -1.0, false, false );
 	}
 	
 	public DPCanvas(DrawingNode drawing, double width, double height, boolean bShrinkX, boolean bShrinkY)
 	{
-		this( WidgetStyleSheet.defaultStyleSheet, drawing, width, height, bShrinkX, bShrinkY );
+		this( WidgetStyleParams.defaultStyleParams, drawing, width, height, bShrinkX, bShrinkY );
 	}
 	
-	public DPCanvas(WidgetStyleSheet styleSheet, DrawingNode drawing, double width, double height, boolean bShrinkX, boolean bShrinkY)
+	public DPCanvas(WidgetStyleParams styleParams, DrawingNode drawing, double width, double height, boolean bShrinkX, boolean bShrinkY)
 	{
-		super( styleSheet );
+		super(styleParams);
 		
 		layoutNode = new LayoutNodeCanvas( this );
 		

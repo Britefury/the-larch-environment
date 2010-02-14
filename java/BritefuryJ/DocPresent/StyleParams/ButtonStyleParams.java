@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.StyleSheets;
+package BritefuryJ.DocPresent.StyleParams;
 
 import java.awt.Color;
 import java.awt.Paint;
@@ -12,17 +12,17 @@ import java.awt.RadialGradientPaint;
 
 import BritefuryJ.DocPresent.Border.SolidBorder;
 
-public class ButtonStyleSheet extends ContainerStyleSheet
+public class ButtonStyleParams extends ContainerStyleParams
 {
-	public static final ButtonStyleSheet defaultStyleSheet = new ButtonStyleSheet();
+	public static final ButtonStyleParams defaultStyleParams = new ButtonStyleParams();
 	
 	
 	
 	protected final Paint borderPaint, backgroundPaint, highlightBackgPaint;
 	protected final SolidBorder border, highlightBorder;
-	
-	
-	public ButtonStyleSheet()
+
+
+	public ButtonStyleParams()
 	{
 		//this( new Color( 0.55f, 0.75f, 1.0f ), new Color( 0.85f, 0.95f, 1.0f ), new Color( 0.75f, 0.85f, 1.0f ) );
 		
@@ -33,7 +33,7 @@ public class ButtonStyleSheet extends ContainerStyleSheet
 				new RadialGradientPaint( -10.0f, -10.0f, 100.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 1.0f, 1.0f, 1.0f ), new Color( 0.85f, 0.85f, 0.85f ) }, RadialGradientPaint.CycleMethod.NO_CYCLE ) );
 	}
 	
-	public ButtonStyleSheet(Paint borderPaint, Paint backgroundPaint, Paint highlightBackgPaint)
+	public ButtonStyleParams(Paint borderPaint, Paint backgroundPaint, Paint highlightBackgPaint)
 	{
 		this.borderPaint = borderPaint;
 		this.backgroundPaint = backgroundPaint;
@@ -42,9 +42,8 @@ public class ButtonStyleSheet extends ContainerStyleSheet
 		border = new SolidBorder( 1.0, 2.0, 10.0, 10.0, borderPaint, backgroundPaint );
 		highlightBorder = new SolidBorder( 1.0, 2.0, 10.0, 10.0, borderPaint, highlightBackgPaint );
 	}
-	
-	
-	
+
+
 	public Paint getBorderPaint()
 	{
 		return borderPaint;

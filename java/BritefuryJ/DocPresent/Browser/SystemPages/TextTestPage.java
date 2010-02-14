@@ -12,7 +12,7 @@ import java.awt.Font;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 
 public class TextTestPage extends SystemPage
 {
@@ -34,9 +34,9 @@ public class TextTestPage extends SystemPage
 
 	protected DPWidget createContents()
 	{
-		TextStyleSheet ts0 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK );
-		TextStyleSheet ts1 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK, true );
-		TextStyleSheet ts2 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK, Color.RED );
+		TextStyleParams ts0 = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK );
+		TextStyleParams ts1 = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK, true );
+		TextStyleParams ts2 = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK, Color.RED );
 		DPText t0 = new DPText( ts0, "Hello World Abcdefghijklmnopqrstuvwxyz" );
 		DPText t1 = new DPText( ts1, "Hello World Abcdefghijklmnopqrstuvwxyz" );
 		DPText t2 = new DPText( ts2, "Hello World Abcdefghijklmnopqrstuvwxyz" );

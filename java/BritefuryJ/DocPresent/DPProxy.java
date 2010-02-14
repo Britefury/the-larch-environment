@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent;
 import java.util.List;
 
 import BritefuryJ.DocPresent.LayoutTree.ArrangedSequenceLayoutNode;
-import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 
@@ -17,12 +17,12 @@ public class DPProxy extends DPContainer
 {
 	public DPProxy()
 	{
-		this( ContainerStyleSheet.defaultStyleSheet );
+		this( ContainerStyleParams.defaultStyleParams );
 	}
 
-	public DPProxy(ContainerStyleSheet styleSheet)
+	public DPProxy(ContainerStyleParams styleParams)
 	{
-		super( styleSheet );
+		super(styleParams);
 	}
 
 	

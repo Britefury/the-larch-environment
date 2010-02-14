@@ -25,7 +25,7 @@ from BritefuryJ.Transformation import DefaultIdentityTransformationFunction
 from BritefuryJ.Parser.ItemStream import ItemStreamBuilder, ItemStream
 
 
-from BritefuryJ.DocPresent.StyleSheets import *
+from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent import *
 
 from Britefury.Util.NodeUtil import *

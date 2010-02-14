@@ -12,7 +12,7 @@ import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Layout.LAllocHelper;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
-import BritefuryJ.DocPresent.StyleSheets.ButtonStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.ButtonStyleParams;
 
 public class LayoutNodeButton extends LayoutNodeBin
 {
@@ -28,7 +28,7 @@ public class LayoutNodeButton extends LayoutNodeBin
 	{
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPButton button = (DPButton)element;
-		ButtonStyleSheet buttonStyle = (ButtonStyleSheet)button.getStyleSheet();
+		ButtonStyleParams buttonStyle = (ButtonStyleParams)button.getStyleSheet();
 		SolidBorder border = buttonStyle.getBorder();
 		DPWidget child = button.getChild();
 
@@ -47,7 +47,7 @@ public class LayoutNodeButton extends LayoutNodeBin
 	{
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPButton button = (DPButton)element;
-		ButtonStyleSheet buttonStyle = (ButtonStyleSheet)button.getStyleSheet();
+		ButtonStyleParams buttonStyle = (ButtonStyleParams)button.getStyleSheet();
 		SolidBorder border = buttonStyle.getBorder();
 		DPWidget child = button.getChild();
 
@@ -68,7 +68,7 @@ public class LayoutNodeButton extends LayoutNodeBin
 	protected void updateAllocationX()
 	{
 		DPButton button = (DPButton)element;
-		ButtonStyleSheet buttonStyle = (ButtonStyleSheet)button.getStyleSheet();
+		ButtonStyleParams buttonStyle = (ButtonStyleParams)button.getStyleSheet();
 		SolidBorder border = buttonStyle.getBorder();
 		DPWidget child = button.getChild();
 
@@ -85,7 +85,7 @@ public class LayoutNodeButton extends LayoutNodeBin
 	protected void updateAllocationY()
 	{
 		DPButton button = (DPButton)element;
-		ButtonStyleSheet buttonStyle = (ButtonStyleSheet)button.getStyleSheet();
+		ButtonStyleParams buttonStyle = (ButtonStyleParams)button.getStyleSheet();
 		SolidBorder border = buttonStyle.getBorder();
 		DPWidget child = button.getChild();
 

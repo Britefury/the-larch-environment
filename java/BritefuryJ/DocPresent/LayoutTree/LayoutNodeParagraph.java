@@ -17,7 +17,7 @@ import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
 import BritefuryJ.DocPresent.Layout.ParagraphLayout;
-import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.ParagraphStyleParams;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 
@@ -475,16 +475,16 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 
 	public double getSpacing()
 	{
-		return ((ParagraphStyleSheet)element.getStyleSheet()).getSpacing();
+		return ((ParagraphStyleParams)element.getStyleSheet()).getSpacing();
 	}
 
 	public double getLineSpacing()
 	{
-		return ((ParagraphStyleSheet)element.getStyleSheet()).getLineSpacing();
+		return ((ParagraphStyleParams)element.getStyleSheet()).getLineSpacing();
 	}
 
 	public double getIndentation()
 	{
-		return ((ParagraphStyleSheet)element.getStyleSheet()).getIndentation();
+		return ((ParagraphStyleParams)element.getStyleSheet()).getIndentation();
 	}
 }

@@ -21,16 +21,16 @@ import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.ParagraphStyleParams;
+import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
+import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
 
 public class DPParagraphTest_simple
 {
 	protected static ArrayList<DPWidget> makeTexts(String header)
 	{
-		TextStyleSheet t12 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
-		TextStyleSheet t18 = new TextStyleSheet( new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK );
+		TextStyleParams t12 = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
+		TextStyleParams t18 = new TextStyleParams( new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK );
 		DPText h = new DPText( t18, header );
 		DPText t0 = new DPText( t12, "Hello" );
 		DPText t1 = new DPText( t12, "World" );
@@ -74,15 +74,15 @@ public class DPParagraphTest_simple
 		ArrayList<DPWidget> c1 = makeTexts( "INDENTED" );
 		c1 = addLineBreaks( c1, 1 );
 		
-		ParagraphStyleSheet b0s = new ParagraphStyleSheet( 10.0, 0.0, 0.0 );
+		ParagraphStyleParams b0s = new ParagraphStyleParams( 10.0, 0.0, 0.0 );
 		DPParagraph b0 = new DPParagraph( b0s );
 		b0.extend( c0 );
 		
-		ParagraphStyleSheet b1s = new ParagraphStyleSheet( 10.0, 0.0, 30.0 );
+		ParagraphStyleParams b1s = new ParagraphStyleParams( 10.0, 0.0, 30.0 );
 		DPParagraph b1 = new DPParagraph( b1s );
 		b1.extend( c1 );
 		
-		VBoxStyleSheet boxS = new VBoxStyleSheet( 20.0 );
+		VBoxStyleParams boxS = new VBoxStyleParams( 20.0 );
 		DPVBox box = new DPVBox( boxS );
 		box.append( b0.alignHExpand() );
 		box.append( b1.alignHExpand() );

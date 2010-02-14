@@ -11,10 +11,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import org.python.core.PySlice;
 
 import BritefuryJ.DocPresent.Layout.LAllocV;
-import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.JythonInterface.JythonIndex;
 import BritefuryJ.JythonInterface.JythonSlice;
 
@@ -24,12 +24,12 @@ abstract public class DPContainerSequence extends DPContainer
 {
 	public DPContainerSequence()
 	{
-		this( ContainerStyleSheet.defaultStyleSheet );
+		this( ContainerStyleParams.defaultStyleParams );
 	}
 
-	public DPContainerSequence(ContainerStyleSheet styleSheet)
+	public DPContainerSequence(ContainerStyleParams styleParams)
 	{
-		super( styleSheet );
+		super(styleParams);
 	}
 
 	

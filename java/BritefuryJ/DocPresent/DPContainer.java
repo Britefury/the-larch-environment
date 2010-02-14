@@ -17,8 +17,8 @@ import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.LayoutTree.BranchLayoutNode;
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
+import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -48,12 +48,12 @@ public abstract class DPContainer extends DPWidget
 	
 	public DPContainer()
 	{
-		this( ContainerStyleSheet.defaultStyleSheet );
+		this( ContainerStyleParams.defaultStyleParams );
 	}
 
-	public DPContainer(ContainerStyleSheet styleSheet)
+	public DPContainer(ContainerStyleParams styleParams)
 	{
-		super( styleSheet );
+		super(styleParams);
 		
 		registeredChildren = new ArrayList<DPWidget>();
 		cachedTextRep = null;
@@ -919,7 +919,7 @@ public abstract class DPContainer extends DPWidget
 	//
 	
 	static EmptyBorder metaIndentBorder = new EmptyBorder( 25.0, 0.0, 0.0, 0.0 );
-	static VBoxStyleSheet metaVBoxStyle = new VBoxStyleSheet( 0.0 );
+	static VBoxStyleParams metaVBoxStyle = new VBoxStyleParams( 0.0 );
 	
 	public DPBorder getMetaHeaderBorderWidget()
 	{
@@ -1002,8 +1002,8 @@ public abstract class DPContainer extends DPWidget
 	//
 	//
 	
-	public ContainerStyleSheet getStyleSheet()
+	public ContainerStyleParams getStyleSheet()
 	{
-		return (ContainerStyleSheet)styleSheet;
+		return (ContainerStyleParams) styleParams;
 	}
 }

@@ -18,27 +18,25 @@ import java.util.List;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeFraction;
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.StyleSheets.FractionStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.FractionStyleParams;
+import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 import BritefuryJ.Math.Point2;
 
 public class DPFraction extends DPContainer
 {
 	private static double childScale = 0.85;
-	
-	
-	
-	
+
+
 	public static class DPFractionBar extends DPContentLeafEditableEntry
 	{
 		public DPFractionBar(String textRepresentation)
 		{
-			this( FractionStyleSheet.BarStyleSheet.defaultStyleSheet, textRepresentation );
+			this( FractionStyleParams.BarStyleParams.defaultStyleParams, textRepresentation );
 		}
 
-		public DPFractionBar(FractionStyleSheet.BarStyleSheet styleSheet, String textRepresentation)
+		public DPFractionBar(FractionStyleParams.BarStyleParams styleParams, String textRepresentation)
 		{
-			super( styleSheet, textRepresentation );
+			super(styleParams, textRepresentation );
 			
 			layoutNode = new LayoutNodeFraction.LayoutNodeFractionBar( this );
 		}
@@ -144,7 +142,7 @@ public class DPFraction extends DPContainer
 		
 		protected Paint getBarPaint()
 		{
-			return ((FractionStyleSheet.BarStyleSheet)styleSheet).getBarPaint();
+			return ((FractionStyleParams.BarStyleParams) styleParams).getBarPaint();
 		}
 	}
 	
@@ -160,39 +158,39 @@ public class DPFraction extends DPContainer
 	protected DPWidget children[];
 	protected DPSegment segs[];
 	protected DPParagraph paras[];
-	TextStyleSheet segmentTextStyleSheet;
+	TextStyleParams segmentTextStyleParams;
 
 	
 	
 	
 	public DPFraction()
 	{
-		this( FractionStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, "/" );
+		this( FractionStyleParams.defaultStyleParams, TextStyleParams.defaultStyleParams, "/" );
 	}
 	
 	public DPFraction(String barTextRepresentation)
 	{
-		this( FractionStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet, barTextRepresentation );
+		this( FractionStyleParams.defaultStyleParams, TextStyleParams.defaultStyleParams, barTextRepresentation );
 	}
 	
-	public DPFraction(FractionStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet)
+	public DPFraction(FractionStyleParams styleParams, TextStyleParams segmentTextStyleParams)
 	{
-		this( styleSheet, segmentTextStyleSheet, "/" );
+		this(styleParams, segmentTextStyleParams, "/" );
 	}
 	
-	public DPFraction(FractionStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, String barTextRepresentation)
+	public DPFraction(FractionStyleParams styleParams, TextStyleParams segmentTextStyleParams, String barTextRepresentation)
 	{
-		super( styleSheet );
+		super(styleParams);
 		
 		layoutNode = new LayoutNodeFraction( this );
 		
-		this.segmentTextStyleSheet = segmentTextStyleSheet;
+		this.segmentTextStyleParams = segmentTextStyleParams;
 		
 		children = new DPWidget[NUMCHILDREN];
 		segs = new DPSegment[NUMCHILDREN];
 		paras = new DPParagraph[NUMCHILDREN];
 		
-		setChild( BAR, new DPFractionBar( styleSheet.getBarStyleSheet(), barTextRepresentation ) );
+		setChild( BAR, new DPFractionBar( styleParams.getBarStyleSheet(), barTextRepresentation ) );
 	}
 
 	
@@ -236,7 +234,7 @@ public class DPFraction extends DPContainer
 
 				if ( bSegmentRequired  &&  !bSegmentPresent )
 				{
-					DPSegment seg = new DPSegment( segmentTextStyleSheet, true, true );
+					DPSegment seg = new DPSegment(segmentTextStyleParams, true, true );
 					segs[slot] = seg;
 					DPParagraph para = new DPParagraph( );
 					para.setChildren( Arrays.asList( new DPWidget[] { seg } ) );
@@ -365,16 +363,16 @@ public class DPFraction extends DPContainer
 	
 	protected double getVSpacing()
 	{
-		return ((FractionStyleSheet)styleSheet).getVSpacing();
+		return ((FractionStyleParams) styleParams).getVSpacing();
 	}
 
 	protected double getHPadding()
 	{
-		return ((FractionStyleSheet)styleSheet).getHPadding();
+		return ((FractionStyleParams) styleParams).getHPadding();
 	}
 
 	protected double getYOffset()
 	{
-		return ((FractionStyleSheet)styleSheet).getYOffset();
+		return ((FractionStyleParams) styleParams).getYOffset();
 	}
 }

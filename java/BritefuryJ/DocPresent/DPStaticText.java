@@ -12,7 +12,7 @@ import java.awt.geom.AffineTransform;
 
 import BritefuryJ.DocPresent.LayoutTree.LayoutNode;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeStaticText;
-import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.StaticTextStyleParams;
 import BritefuryJ.DocPresent.Util.TextVisual;
 
 public class DPStaticText extends DPStatic
@@ -23,16 +23,16 @@ public class DPStaticText extends DPStatic
 	
 	public DPStaticText(String text)
 	{
-		this( StaticTextStyleSheet.defaultStyleSheet, text );
+		this( StaticTextStyleParams.defaultStyleParams, text );
 	}
 	
-	public DPStaticText(StaticTextStyleSheet styleSheet, String text)
+	public DPStaticText(StaticTextStyleParams styleParams, String text)
 	{
-		super( styleSheet );
+		super(styleParams);
 		
 		this.text = text;
 		
-		visual = TextVisual.getTextVisual( getPresentationArea(), text, styleSheet.getFont(), styleSheet.getMixedSizeCaps() );
+		visual = TextVisual.getTextVisual( getPresentationArea(), text, styleParams.getFont(), styleParams.getMixedSizeCaps() );
 
 		layoutNode = new LayoutNodeStaticText( this );
 	}
@@ -54,9 +54,9 @@ public class DPStaticText extends DPStatic
 	
 	private void onTextModified()
 	{
-		StaticTextStyleSheet textStyleSheet = (StaticTextStyleSheet)styleSheet;
+		StaticTextStyleParams textStyleParams = (StaticTextStyleParams) styleParams;
 
-		TextVisual v = TextVisual.getTextVisual( getPresentationArea(), text, textStyleSheet.getFont(), textStyleSheet.getMixedSizeCaps() );
+		TextVisual v = TextVisual.getTextVisual( getPresentationArea(), text, textStyleParams.getFont(), textStyleParams.getMixedSizeCaps() );
 		if ( v != visual )
 		{
 			visual = v;
@@ -83,7 +83,7 @@ public class DPStaticText extends DPStatic
 	
 	protected void draw(Graphics2D graphics)
 	{
-		StaticTextStyleSheet textStyleSheet = (StaticTextStyleSheet)styleSheet;
+		StaticTextStyleParams textStyleParams = (StaticTextStyleParams) styleParams;
 
 		Paint prevColour = graphics.getPaint();
 
@@ -97,7 +97,7 @@ public class DPStaticText extends DPStatic
 		}
 		
 		
-		graphics.setPaint( textStyleSheet.getTextPaint() );
+		graphics.setPaint( textStyleParams.getTextPaint() );
 		visual.drawText( graphics );
 		
 		

@@ -4,12 +4,12 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.StyleSheets;
+package BritefuryJ.DocPresent.StyleParams;
 
 import java.awt.Color;
 import java.awt.Paint;
 
-public class LineStyleSheet extends WidgetStyleSheet
+public class LineStyleParams extends WidgetStyleParams
 {
 	public enum Direction
 	{
@@ -18,7 +18,7 @@ public class LineStyleSheet extends WidgetStyleSheet
 	}
 	
 	
-	public static final LineStyleSheet defaultStyleSheet = new LineStyleSheet();
+	public static final LineStyleParams defaultStyleParams = new LineStyleParams();
 	
 	
 	protected final Direction direction;
@@ -26,17 +26,17 @@ public class LineStyleSheet extends WidgetStyleSheet
 	protected final double thickness, inset, padding;
 	
 	
-	public LineStyleSheet()
+	public LineStyleParams()
 	{
 		this( Direction.HORIZONTAL, Color.black, 1.0, 0.0, 0.0 );
 	}
 	
-	public LineStyleSheet(Direction direction, Paint linePaint)
+	public LineStyleParams(Direction direction, Paint linePaint)
 	{
 		this( direction, linePaint, 1.0, 0.0, 0.0 );
 	}
 	
-	public LineStyleSheet(Direction direction, Paint linePaint, double thickness, double inset, double padding)
+	public LineStyleParams(Direction direction, Paint linePaint, double thickness, double inset, double padding)
 	{
 		super();
 

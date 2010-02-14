@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.StyleSheets;
+package BritefuryJ.DocPresent.StyleParams;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -17,11 +17,11 @@ import javax.swing.JComponent;
 
 import BritefuryJ.DocPresent.DPPresentationArea;
 
-public class MathRootStyleSheet extends ContainerStyleSheet
+public class MathRootStyleParams extends ContainerStyleParams
 {
 	private static final Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
 
-	public static final MathRootStyleSheet defaultStyleSheet = new MathRootStyleSheet();
+	public static final MathRootStyleParams defaultStyleParams = new MathRootStyleParams();
 	
 	protected final Font font;
 	protected final Paint symbolPaint;
@@ -29,21 +29,19 @@ public class MathRootStyleSheet extends ContainerStyleSheet
 	
 	protected double glyphLineWidths[], glyphWidth, barSpacing;
 	protected boolean bRealised;
-	
-	
-	
-	
-	public MathRootStyleSheet()
+
+
+	public MathRootStyleParams()
 	{
 		this( defaultFont, Color.BLACK, 1.5 );
 	}
 	
-	public MathRootStyleSheet(Paint symbolPaint, double thickness)
+	public MathRootStyleParams(Paint symbolPaint, double thickness)
 	{
 		this( defaultFont, symbolPaint, thickness );
 	}
 	
-	public MathRootStyleSheet(Font font, Paint symbolPaint, double thickness)
+	public MathRootStyleParams(Font font, Paint symbolPaint, double thickness)
 	{
 		super();
 		
@@ -54,8 +52,8 @@ public class MathRootStyleSheet extends ContainerStyleSheet
 		this.barSpacing = 0.0;
 		bRealised = false;
 	}
-	
-	
+
+
 	public Font getFont()
 	{
 		return font;

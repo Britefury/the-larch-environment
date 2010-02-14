@@ -7,8 +7,8 @@
 package BritefuryJ.DocPresent.LayoutTree;
 
 import BritefuryJ.DocPresent.DPLine;
-import BritefuryJ.DocPresent.StyleSheets.LineStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.LineStyleSheet.Direction;
+import BritefuryJ.DocPresent.StyleParams.LineStyleParams;
+import BritefuryJ.DocPresent.StyleParams.LineStyleParams.Direction;
 
 public class LayoutNodeLine extends StaticLayoutNode
 {
@@ -23,16 +23,16 @@ public class LayoutNodeLine extends StaticLayoutNode
 	protected void updateRequisitionX()
 	{
 		DPLine line = (DPLine)element;
-		LineStyleSheet lineStyleSheet = (LineStyleSheet)line.getStyleSheet();
+		LineStyleParams lineStyleParams = (LineStyleParams)line.getStyleSheet();
 
-		Direction direction = lineStyleSheet.getDirection();
-		if ( direction == LineStyleSheet.Direction.HORIZONTAL )
+		Direction direction = lineStyleParams.getDirection();
+		if ( direction == LineStyleParams.Direction.HORIZONTAL )
 		{
 			layoutReqBox.setRequisitionX( 0.0, 0.0 );
 		}
-		else if ( direction == LineStyleSheet.Direction.VERTICAL )
+		else if ( direction == LineStyleParams.Direction.VERTICAL )
 		{
-			double x = lineStyleSheet.getThickness()  +  lineStyleSheet.getPadding() * 2.0;
+			double x = lineStyleParams.getThickness()  +  lineStyleParams.getPadding() * 2.0;
 			layoutReqBox.setRequisitionX( x, x );
 		}
 		else
@@ -44,15 +44,15 @@ public class LayoutNodeLine extends StaticLayoutNode
 	protected void updateRequisitionY()
 	{
 		DPLine line = (DPLine)element;
-		LineStyleSheet lineStyleSheet = (LineStyleSheet)line.getStyleSheet();
+		LineStyleParams lineStyleParams = (LineStyleParams)line.getStyleSheet();
 
-		Direction direction = lineStyleSheet.getDirection();
-		if ( direction == LineStyleSheet.Direction.HORIZONTAL )
+		Direction direction = lineStyleParams.getDirection();
+		if ( direction == LineStyleParams.Direction.HORIZONTAL )
 		{
-			double y = lineStyleSheet.getThickness()  +  lineStyleSheet.getPadding() * 2.0;
+			double y = lineStyleParams.getThickness()  +  lineStyleParams.getPadding() * 2.0;
 			layoutReqBox.setRequisitionY( y, 0.0 );
 		}
-		else if ( direction == LineStyleSheet.Direction.VERTICAL )
+		else if ( direction == LineStyleParams.Direction.VERTICAL )
 		{
 			layoutReqBox.setRequisitionY( 0.0, 0.0 );
 		}

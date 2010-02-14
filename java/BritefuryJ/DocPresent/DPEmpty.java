@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeEmpty;
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.WidgetStyleParams;
 import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
 public class DPEmpty extends DPWidget
@@ -21,22 +21,22 @@ public class DPEmpty extends DPWidget
 	
 	public DPEmpty()
 	{
-		this( WidgetStyleSheet.defaultStyleSheet, "" );
+		this( WidgetStyleParams.defaultStyleParams, "" );
 	}
 	
 	public DPEmpty(String textRepresentation)
 	{
-		this( WidgetStyleSheet.defaultStyleSheet, textRepresentation );
+		this( WidgetStyleParams.defaultStyleParams, textRepresentation );
 	}
 	
-	public DPEmpty(WidgetStyleSheet styleSheet)
+	public DPEmpty(WidgetStyleParams styleParams)
 	{
-		this( styleSheet, "" );
+		this(styleParams, "" );
 	}
 
-	public DPEmpty(WidgetStyleSheet styleSheet, String textRepresentation)
+	public DPEmpty(WidgetStyleParams styleParams, String textRepresentation)
 	{
-		super( styleSheet );
+		super(styleParams);
 		
 		layoutNode = new LayoutNodeEmpty( this );
 		

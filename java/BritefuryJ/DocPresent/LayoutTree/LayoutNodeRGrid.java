@@ -19,7 +19,7 @@ import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
 import BritefuryJ.DocPresent.Layout.LAllocHelper;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
-import BritefuryJ.DocPresent.StyleSheets.TableStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 
@@ -229,22 +229,22 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 	
 	protected double getColumnSpacing()
 	{
-		return ((TableStyleSheet)element.getStyleSheet()).getColumnSpacing();
+		return ((TableStyleParams)element.getStyleSheet()).getColumnSpacing();
 	}
 
 	protected boolean getColumnExpand()
 	{
-		return ((TableStyleSheet)element.getStyleSheet()).getColumnExpand();
+		return ((TableStyleParams)element.getStyleSheet()).getColumnExpand();
 	}
 
 	
 	protected double getRowSpacing()
 	{
-		return ((TableStyleSheet)element.getStyleSheet()).getRowSpacing();
+		return ((TableStyleParams)element.getStyleSheet()).getRowSpacing();
 	}
 
 	protected boolean getRowExpand()
 	{
-		return ((TableStyleSheet)element.getStyleSheet()).getRowExpand();
+		return ((TableStyleParams)element.getStyleSheet()).getRowExpand();
 	}
 }

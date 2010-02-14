@@ -4,37 +4,37 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.StyleSheets;
+package BritefuryJ.DocPresent.StyleParams;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Paint;
 
-public class StaticTextStyleSheet extends WidgetStyleSheet
+public class StaticTextStyleParams extends WidgetStyleParams
 {
 	private static final Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
 
 	
-	public static final StaticTextStyleSheet defaultStyleSheet = new StaticTextStyleSheet();
+	public static final StaticTextStyleParams defaultStyleParams = new StaticTextStyleParams();
 	
 	
 	
 	protected final Font font;
 	protected final Paint textPaint;
 	protected final boolean bMixedSizeCaps;
-	
-	
-	public StaticTextStyleSheet()
+
+
+	public StaticTextStyleParams()
 	{
 		this( defaultFont, Color.black, false );
 	}
 	
-	public StaticTextStyleSheet(Font font, Paint textPaint)
+	public StaticTextStyleParams(Font font, Paint textPaint)
 	{
 		this( font, textPaint, false );
 	}
 	
-	public StaticTextStyleSheet(Font font, Paint textPaint, boolean bMixedSizeCaps)
+	public StaticTextStyleParams(Font font, Paint textPaint, boolean bMixedSizeCaps)
 	{
 		super();
 		
@@ -42,9 +42,8 @@ public class StaticTextStyleSheet extends WidgetStyleSheet
 		this.textPaint = textPaint;
 		this.bMixedSizeCaps = bMixedSizeCaps;
 	}
-	
-	
-	
+
+
 	public Font getFont()
 	{
 		return font;

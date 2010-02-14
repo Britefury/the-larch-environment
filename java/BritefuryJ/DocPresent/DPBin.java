@@ -10,19 +10,19 @@ package BritefuryJ.DocPresent;
 import java.util.List;
 
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeBin;
-import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 
 
 public class DPBin extends DPContainer
 {
 	public DPBin()
 	{
-		this( ContainerStyleSheet.defaultStyleSheet );
+		this( ContainerStyleParams.defaultStyleParams );
 	}
 
-	public DPBin(ContainerStyleSheet styleSheet)
+	public DPBin(ContainerStyleParams styleParams)
 	{
-		super( styleSheet );
+		super(styleParams);
 		
 		layoutNode = new LayoutNodeBin( this );
 	}

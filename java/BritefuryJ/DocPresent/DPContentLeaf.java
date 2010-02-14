@@ -19,8 +19,8 @@ import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.LayoutTree.ContentLeafLayoutNodeInterface;
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.StyleSheets.ContentLeafStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.ContentLeafStyleParams;
+import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Parser.ItemStream.ItemStream;
 import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
@@ -45,12 +45,12 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	DPContentLeaf(String textRepresentation)
 	{
-		this( ContentLeafStyleSheet.defaultStyleSheet, textRepresentation );
+		this( ContentLeafStyleParams.defaultStyleParams, textRepresentation );
 	}
 	
-	DPContentLeaf(ContentLeafStyleSheet styleSheet, String textRepresentation)
+	DPContentLeaf(ContentLeafStyleParams styleParams, String textRepresentation)
 	{
-		super( styleSheet );
+		super(styleParams);
 		
 		this.textRepresentation = textRepresentation;
 	}
@@ -905,7 +905,7 @@ public abstract class DPContentLeaf extends DPWidget
 	// Meta element methods
 	//
 	
-	protected static TextStyleSheet headerTextRepTextStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 14 ), Color.BLACK );
+	protected static TextStyleParams headerTextRepTextStyle = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 14 ), Color.BLACK );
 	protected static SolidBorder metaHeaderHighlightBorder = new SolidBorder( 1.0, 1.0, 5.0, 5.0, new Color( 0.75f, 0.0f, 0.0f ), new Color( 1.0f, 0.9f, 0.8f ) );
 
 	public DPWidget createMetaHeaderData()

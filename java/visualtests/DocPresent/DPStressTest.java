@@ -19,8 +19,8 @@ import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.ParagraphStyleParams;
+import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 
 public class DPStressTest
 {
@@ -80,9 +80,9 @@ public class DPStressTest
 	
 	
 	Font f0 = new Font( "Sans serif", Font.PLAIN, 12 );
-	TextStyleSheet nameStyle = new TextStyleSheet( f0, Color.black );
-	TextStyleSheet puncStyle = new TextStyleSheet( f0, Color.blue );
-	ParagraphStyleSheet paraStyle = new ParagraphStyleSheet();
+	TextStyleParams nameStyle = new TextStyleParams( f0, Color.black );
+	TextStyleParams puncStyle = new TextStyleParams( f0, Color.blue );
+	ParagraphStyleParams paraStyle = new ParagraphStyleParams();
 
 	public DPWidget name(String n)
 	{

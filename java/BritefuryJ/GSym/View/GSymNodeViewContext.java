@@ -9,6 +9,7 @@ package BritefuryJ.GSym.View;
 import java.util.ArrayList;
 import java.util.List;
 
+import BritefuryJ.DocPresent.StyleParams.*;
 import org.python.core.PyObject;
 
 import BritefuryJ.DocModel.DMNode;
@@ -41,19 +42,7 @@ import BritefuryJ.DocPresent.ElementKeyboardListener;
 import BritefuryJ.DocPresent.ElementLinearRepresentationListener;
 import BritefuryJ.DocPresent.PyElementFactory;
 import BritefuryJ.DocPresent.Border.Border;
-import BritefuryJ.DocPresent.StyleSheets.ButtonStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.FractionStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.GridRowStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.LineStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.LinkStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.ScriptStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.TableStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.ButtonStyleParams;
 import BritefuryJ.DocView.DVNode;
 import BritefuryJ.GSym.IncrementalContext.GSymIncrementalNodeContext;
 import BritefuryJ.GSym.IncrementalContext.GSymIncrementalNodeFunction;
@@ -82,11 +71,11 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	
 	
 	
-	public DPWidget border(Border border, ContainerStyleSheet styleSheet, DPWidget child)
+	public DPWidget border(Border border, ContainerStyleParams styleParams, DPWidget child)
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPBorder element = new DPBorder( border, styleSheet );
+		DPBorder element = new DPBorder( border, styleParams);
 		element.setChild( child );
 		viewContext.getView().profile_stopElement();
 		return element;
@@ -94,7 +83,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	
 	public DPWidget border(Border border, DPWidget child)
 	{
-		return border( border, ContainerStyleSheet.defaultStyleSheet, child );
+		return border( border, ContainerStyleParams.defaultStyleParams, child );
 	}
 	
 	public DPWidget indent(double indentation, DPWidget child)
@@ -109,20 +98,20 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	}
 	
 	
-	public DPWidget text(TextStyleSheet styleSheet, String txt)
+	public DPWidget text(TextStyleParams styleParams, String txt)
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPWidget element = new DPText( styleSheet, txt );
+		DPWidget element = new DPText(styleParams, txt );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}
 	
-	public DPWidget textWithContent(TextStyleSheet styleSheet, String txt, String content)
+	public DPWidget textWithContent(TextStyleParams styleParams, String txt, String content)
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPWidget element = new DPText( styleSheet, txt, content );
+		DPWidget element = new DPText(styleParams, txt, content );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}
@@ -187,71 +176,71 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	
 	
 	
-	public DPWidget staticText(StaticTextStyleSheet styleSheet, String txt)
+	public DPWidget staticText(StaticTextStyleParams styleParams, String txt)
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPWidget element = new DPStaticText( styleSheet, txt );
+		DPWidget element = new DPStaticText(styleParams, txt );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}
 	
 
-	public DPWidget link(LinkStyleSheet styleSheet, String txt, String targetLocation)
+	public DPWidget link(LinkStyleParams styleParams, String txt, String targetLocation)
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPWidget element = new DPLink( styleSheet, txt, targetLocation );
+		DPWidget element = new DPLink(styleParams, txt, targetLocation );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}
 	
-	public DPWidget link(LinkStyleSheet styleSheet, String txt, DPLink.LinkListener listener)
+	public DPWidget link(LinkStyleParams styleParams, String txt, DPLink.LinkListener listener)
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPWidget element = new DPLink( styleSheet, txt, listener );
+		DPWidget element = new DPLink(styleParams, txt, listener );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}
 	
-	public DPWidget link(LinkStyleSheet styleSheet, String txt, PyObject listener)
+	public DPWidget link(LinkStyleParams styleParams, String txt, PyObject listener)
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPWidget element = new DPLink( styleSheet, txt, listener );
-		viewContext.getView().profile_stopElement();
-		return element;
-	}
-	
-
-	
-	public DPWidget line(LineStyleSheet styleSheet)
-	{
-		GSymViewContext viewContext = getViewContext();
-		viewContext.getView().profile_startElement();
-		DPWidget element = new DPLine( styleSheet );
+		DPWidget element = new DPLink(styleParams, txt, listener );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}
 	
 
 	
-	public DPWidget button(ButtonStyleSheet styleSheet, DPButton.ButtonListener listener, DPWidget child)
+	public DPWidget line(LineStyleParams styleParams)
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPButton element = new DPButton( styleSheet, listener );
+		DPWidget element = new DPLine(styleParams);
+		viewContext.getView().profile_stopElement();
+		return element;
+	}
+	
+
+	
+	public DPWidget button(ButtonStyleParams styleParams, DPButton.ButtonListener listener, DPWidget child)
+	{
+		GSymViewContext viewContext = getViewContext();
+		viewContext.getView().profile_startElement();
+		DPButton element = new DPButton(styleParams, listener );
 		element.setChild( child );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}
 	
-	public DPWidget button(ButtonStyleSheet styleSheet, PyObject listener, DPWidget child)
+	public DPWidget button(ButtonStyleParams styleParams, PyObject listener, DPWidget child)
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPButton element = new DPButton( styleSheet, listener );
+		DPButton element = new DPButton(styleParams, listener );
 		element.setChild( child );
 		viewContext.getView().profile_stopElement();
 		return element;
@@ -271,11 +260,11 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	
 
 	
-	public DPWidget hbox(HBoxStyleSheet styleSheet, List<DPWidget> children)
+	public DPWidget hbox(HBoxStyleParams styleParams, List<DPWidget> children)
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPHBox element = new DPHBox( styleSheet );
+		DPHBox element = new DPHBox(styleParams);
 		element.setChildren( children );
 		viewContext.getView().profile_stopElement();
 		return element;
@@ -283,35 +272,35 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	
 	public DPWidget ahbox(List<DPWidget> children)
 	{
-		return hbox( ahboxStyleSheet, children );
+		return hbox(ahboxStyleParams, children );
 	}
 	
-	public DPWidget vbox(VBoxStyleSheet styleSheet, List<DPWidget> children)
+	public DPWidget vbox(VBoxStyleParams styleParams, List<DPWidget> children)
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPVBox element = new DPVBox( styleSheet );
+		DPVBox element = new DPVBox(styleParams);
 		element.setChildren( children );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}
 	
 	
-	public DPWidget paragraph(ParagraphStyleSheet styleSheet, List<DPWidget> children)
+	public DPWidget paragraph(ParagraphStyleParams styleParams, List<DPWidget> children)
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPParagraph element = new DPParagraph( styleSheet );
+		DPParagraph element = new DPParagraph(styleParams);
 		element.setChildren( children );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}
 	
-	public DPWidget lineBreak(ContainerStyleSheet styleSheet, DPWidget child)
+	public DPWidget lineBreak(ContainerStyleParams styleParams, DPWidget child)
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPLineBreak element = new DPLineBreak( styleSheet );
+		DPLineBreak element = new DPLineBreak(styleParams);
 		if ( child != null )
 		{
 			element.setChild( child );
@@ -322,17 +311,17 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	
 	public DPWidget lineBreak(DPWidget child)
 	{
-		return lineBreak( ContainerStyleSheet.defaultStyleSheet, child );
+		return lineBreak( ContainerStyleParams.defaultStyleParams, child );
 	}
 	
-	public DPWidget lineBreak(ContainerStyleSheet styleSheet)
+	public DPWidget lineBreak(ContainerStyleParams styleParams)
 	{
-		return lineBreak( styleSheet, null );
+		return lineBreak(styleParams, null );
 	}
 	
 	public DPWidget lineBreak()
 	{
-		return lineBreak( ContainerStyleSheet.defaultStyleSheet );
+		return lineBreak( ContainerStyleParams.defaultStyleParams );
 	}
 	
 	public DPWidget paragraphIndentMarker()
@@ -354,43 +343,43 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	}
 	
 
-	public DPWidget gridRow(GridRowStyleSheet styleSheet, List<DPWidget> children)
+	public DPWidget gridRow(GridRowStyleParams styleParams, List<DPWidget> children)
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPGridRow element = new DPGridRow( styleSheet );
+		DPGridRow element = new DPGridRow(styleParams);
 		element.setChildren( children );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}
 	
-	public DPWidget rgrid(TableStyleSheet styleSheet, List<DPWidget> children)
+	public DPWidget rgrid(TableStyleParams styleParams, List<DPWidget> children)
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPRGrid element = new DPRGrid( styleSheet );
+		DPRGrid element = new DPRGrid(styleParams);
 		element.setChildren( children );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}
 	
 	
-	public DPWidget table(TableStyleSheet styleSheet, List<List<DPWidget>> children)
+	public DPWidget table(TableStyleParams styleParams, List<List<DPWidget>> children)
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPTable element = new DPTable( styleSheet );
+		DPTable element = new DPTable(styleParams);
 		element.setChildren( children );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}
 	
 
-	public DPWidget segment(TextStyleSheet textStyleSheet, boolean bGuardBegin, boolean bGuardEnd, DPWidget child)
+	public DPWidget segment(TextStyleParams textStyleParams, boolean bGuardBegin, boolean bGuardEnd, DPWidget child)
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPSegment element = new DPSegment( textStyleSheet, bGuardBegin, bGuardEnd );
+		DPSegment element = new DPSegment(textStyleParams, bGuardBegin, bGuardEnd );
 		element.setChild( child );
 		viewContext.getView().profile_stopElement();
 		return element;
@@ -400,18 +389,18 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPSegment element = new DPSegment( TextStyleSheet.defaultStyleSheet, bGuardBegin, bGuardEnd );
+		DPSegment element = new DPSegment( TextStyleParams.defaultStyleParams, bGuardBegin, bGuardEnd );
 		element.setChild( child );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}
 	
 	
-	public DPWidget script(ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, DPWidget mainChild, DPWidget leftSuperChild, DPWidget leftSubChild, DPWidget rightSuperChild, DPWidget rightSubChild)
+	public DPWidget script(ScriptStyleParams styleSheet, TextStyleParams segmentTextStyleParams, DPWidget mainChild, DPWidget leftSuperChild, DPWidget leftSubChild, DPWidget rightSuperChild, DPWidget rightSubChild)
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPScript element = new DPScript( styleSheet, segmentTextStyleSheet );
+		DPScript element = new DPScript( styleSheet, segmentTextStyleParams);
 		element.setMainChild( mainChild );
 		if ( leftSuperChild != null )
 		{
@@ -433,69 +422,69 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 		return element;
 	}
 	
-	public DPWidget script(ScriptStyleSheet styleSheet, DPWidget mainChild, DPWidget leftSuperChild, DPWidget leftSubChild, DPWidget rightSuperChild, DPWidget rightSubChild)
+	public DPWidget script(ScriptStyleParams styleSheet, DPWidget mainChild, DPWidget leftSuperChild, DPWidget leftSubChild, DPWidget rightSuperChild, DPWidget rightSubChild)
 	{
-		return script( styleSheet, TextStyleSheet.defaultStyleSheet, mainChild, leftSuperChild, leftSubChild, rightSuperChild, rightSubChild );
+		return script( styleSheet, TextStyleParams.defaultStyleParams, mainChild, leftSuperChild, leftSubChild, rightSuperChild, rightSubChild );
 	}
 	
 	
-	public DPWidget scriptLSuper(ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, DPWidget mainChild, DPWidget scriptChild)
+	public DPWidget scriptLSuper(ScriptStyleParams styleSheet, TextStyleParams segmentTextStyleParams, DPWidget mainChild, DPWidget scriptChild)
 	{
-		return script( styleSheet, segmentTextStyleSheet, mainChild, scriptChild, null, null, null );
+		return script( styleSheet, segmentTextStyleParams, mainChild, scriptChild, null, null, null );
 	}
 	
-	public DPWidget scriptLSub(ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, DPWidget mainChild, DPWidget scriptChild)
+	public DPWidget scriptLSub(ScriptStyleParams styleSheet, TextStyleParams segmentTextStyleParams, DPWidget mainChild, DPWidget scriptChild)
 	{
-		return script( styleSheet, segmentTextStyleSheet, mainChild, null, scriptChild, null, null );
+		return script( styleSheet, segmentTextStyleParams, mainChild, null, scriptChild, null, null );
 	}
 	
-	public DPWidget scriptRSuper(ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, DPWidget mainChild, DPWidget scriptChild)
+	public DPWidget scriptRSuper(ScriptStyleParams styleSheet, TextStyleParams segmentTextStyleParams, DPWidget mainChild, DPWidget scriptChild)
 	{
-		return script( styleSheet, segmentTextStyleSheet, mainChild, null, null, scriptChild, null );
+		return script( styleSheet, segmentTextStyleParams, mainChild, null, null, scriptChild, null );
 	}
 	
-	public DPWidget scriptRSub(ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, DPWidget mainChild, DPWidget scriptChild)
+	public DPWidget scriptRSub(ScriptStyleParams styleSheet, TextStyleParams segmentTextStyleParams, DPWidget mainChild, DPWidget scriptChild)
 	{
-		return script( styleSheet, segmentTextStyleSheet, mainChild, null, null, null, scriptChild );
+		return script( styleSheet, segmentTextStyleParams, mainChild, null, null, null, scriptChild );
 	}
 	
 	
-	public DPWidget scriptLSuper(ScriptStyleSheet styleSheet, DPWidget mainChild, DPWidget scriptChild)
+	public DPWidget scriptLSuper(ScriptStyleParams styleSheet, DPWidget mainChild, DPWidget scriptChild)
 	{
 		return script( styleSheet, mainChild, scriptChild, null, null, null );
 	}
 	
-	public DPWidget scriptLSub(ScriptStyleSheet styleSheet, DPWidget mainChild, DPWidget scriptChild)
+	public DPWidget scriptLSub(ScriptStyleParams styleSheet, DPWidget mainChild, DPWidget scriptChild)
 	{
 		return script( styleSheet, mainChild, null, scriptChild, null, null );
 	}
 	
-	public DPWidget scriptRSuper(ScriptStyleSheet styleSheet, DPWidget mainChild, DPWidget scriptChild)
+	public DPWidget scriptRSuper(ScriptStyleParams styleSheet, DPWidget mainChild, DPWidget scriptChild)
 	{
 		return script( styleSheet, mainChild, null, null, scriptChild, null );
 	}
 	
-	public DPWidget scriptRSub(ScriptStyleSheet styleSheet, DPWidget mainChild, DPWidget scriptChild)
+	public DPWidget scriptRSub(ScriptStyleParams styleSheet, DPWidget mainChild, DPWidget scriptChild)
 	{
 		return script( styleSheet, mainChild, null, null, null, scriptChild );
 	}
 	
 	
 	
-	public DPWidget fraction(FractionStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet, DPWidget numerator, DPWidget denominator, String barContent)
+	public DPWidget fraction(FractionStyleParams styleParams, TextStyleParams segmentTextStyleParams, DPWidget numerator, DPWidget denominator, String barContent)
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPFraction element = new DPFraction( styleSheet, segmentTextStyleSheet, barContent );
+		DPFraction element = new DPFraction(styleParams, segmentTextStyleParams, barContent );
 		element.setNumeratorChild( numerator );
 		element.setDenominatorChild( denominator );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}
 	
-	public DPWidget fraction(FractionStyleSheet styleSheet, DPWidget numerator, DPWidget denominator, String barContent)
+	public DPWidget fraction(FractionStyleParams styleParams, DPWidget numerator, DPWidget denominator, String barContent)
 	{
-		return fraction( styleSheet, TextStyleSheet.defaultStyleSheet, numerator, denominator, barContent );
+		return fraction(styleParams, TextStyleParams.defaultStyleParams, numerator, denominator, barContent );
 	}
 	
 
@@ -775,5 +764,5 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	
 
 	
-	private static HBoxStyleSheet ahboxStyleSheet = new HBoxStyleSheet( 0.0 ); 
+	private static HBoxStyleParams ahboxStyleParams = new HBoxStyleParams( 0.0 );
 }

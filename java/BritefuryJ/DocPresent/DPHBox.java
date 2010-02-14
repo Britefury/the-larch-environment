@@ -8,20 +8,19 @@
 package BritefuryJ.DocPresent;
 
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeHBox;
-import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
-
+import BritefuryJ.DocPresent.StyleParams.HBoxStyleParams;
 
 
 public class DPHBox extends DPAbstractBox
 {
 	public DPHBox()
 	{
-		this( HBoxStyleSheet.defaultStyleSheet );
+		this( HBoxStyleParams.defaultStyleParams);
 	}
 	
-	public DPHBox(HBoxStyleSheet syleSheet)
+	public DPHBox(HBoxStyleParams styleParams)
 	{
-		super( syleSheet );
+		super(styleParams);
 		
 		layoutNode = new LayoutNodeHBox( this );
 	}

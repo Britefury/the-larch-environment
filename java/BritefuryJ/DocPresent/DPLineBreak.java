@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent;
 
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeLineBreak;
-import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 
 public class DPLineBreak extends DPBin
 {
@@ -20,9 +20,9 @@ public class DPLineBreak extends DPBin
 		layoutNode = new LayoutNodeLineBreak( this );
 	}
 	
-	public DPLineBreak(ContainerStyleSheet styleSheet)
+	public DPLineBreak(ContainerStyleParams styleParams)
 	{
-		super( styleSheet );
+		super(styleParams);
 		
 		layoutNode = new LayoutNodeLineBreak( this );
 	}

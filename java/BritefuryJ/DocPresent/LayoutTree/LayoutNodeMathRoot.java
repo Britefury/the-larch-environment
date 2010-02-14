@@ -10,11 +10,11 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPMathRoot;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.StyleParams.MathRootStyleParams;
 import BritefuryJ.DocPresent.WidgetFilter;
 import BritefuryJ.DocPresent.Layout.LAllocHelper;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
-import BritefuryJ.DocPresent.StyleSheets.MathRootStyleSheet;
 import BritefuryJ.Math.Point2;
 
 public class LayoutNodeMathRoot extends ArrangedLayoutNode
@@ -32,7 +32,7 @@ public class LayoutNodeMathRoot extends ArrangedLayoutNode
 		DPWidget child = mathRoot.getChild();
 		if ( child != null )
 		{
-			MathRootStyleSheet s = (MathRootStyleSheet)mathRoot.getStyleSheet();
+			MathRootStyleParams s = (MathRootStyleParams)mathRoot.getStyleSheet();
 			
 			layoutReqBox.setRequisitionX( child.getLayoutNode().refreshRequisitionX() );
 			layoutReqBox.borderX( s.getGlyphWidth(), 0.0 );
@@ -50,7 +50,7 @@ public class LayoutNodeMathRoot extends ArrangedLayoutNode
 		DPWidget child = mathRoot.getChild();
 		if ( child != null )
 		{
-			MathRootStyleSheet s = (MathRootStyleSheet)mathRoot.getStyleSheet();
+			MathRootStyleParams s = (MathRootStyleParams)mathRoot.getStyleSheet();
 			
 			layoutReqBox.setRequisitionY( child.getLayoutNode().refreshRequisitionY() );
 			layoutReqBox.borderY( s.getBarSpacing() + s.getThickness(), 0.0 );
@@ -69,7 +69,7 @@ public class LayoutNodeMathRoot extends ArrangedLayoutNode
 		DPWidget child = mathRoot.getChild();
 		if ( child != null )
 		{
-			MathRootStyleSheet s = (MathRootStyleSheet)mathRoot.getStyleSheet();
+			MathRootStyleParams s = (MathRootStyleParams)mathRoot.getStyleSheet();
 
 			LayoutNode childLayout = child.getLayoutNode();
 			double prevWidth = childLayout.getAllocationBox().getAllocationX();
@@ -85,7 +85,7 @@ public class LayoutNodeMathRoot extends ArrangedLayoutNode
 		DPWidget child = mathRoot.getChild();
 		if ( child != null )
 		{
-			MathRootStyleSheet s = (MathRootStyleSheet)mathRoot.getStyleSheet();
+			MathRootStyleParams s = (MathRootStyleParams)mathRoot.getStyleSheet();
 
 			LayoutNode childLayout = child.getLayoutNode();
 			LAllocV prevAllocV = childLayout.getAllocationBox().getAllocV();

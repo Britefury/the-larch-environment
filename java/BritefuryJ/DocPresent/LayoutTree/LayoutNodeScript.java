@@ -11,13 +11,13 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPScript;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.StyleParams.ScriptStyleParams;
 import BritefuryJ.DocPresent.WidgetFilter;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
 import BritefuryJ.DocPresent.Layout.ScriptLayout;
-import BritefuryJ.DocPresent.StyleSheets.ScriptStyleSheet;
 import BritefuryJ.Math.Point2;
 
 public class LayoutNodeScript extends ArrangedLayoutNode
@@ -455,11 +455,11 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 	
 	protected double getColumnSpacing()
 	{
-		return ((ScriptStyleSheet)element.getStyleSheet()).getColumnSpacing();
+		return ((ScriptStyleParams)element.getStyleSheet()).getColumnSpacing();
 	}
 
 	protected double getRowSpacing()
 	{
-		return ((ScriptStyleSheet)element.getStyleSheet()).getRowSpacing();
+		return ((ScriptStyleParams)element.getStyleSheet()).getRowSpacing();
 	}
 }

@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 
 public class DPFragment extends DPProxy
 {
@@ -20,9 +20,9 @@ public class DPFragment extends DPProxy
 		this.context = context;
 	}
 
-	public DPFragment(ElementContext context, ContainerStyleSheet styleSheet)
+	public DPFragment(ElementContext context, ContainerStyleParams styleParams)
 	{
-		super( styleSheet );
+		super(styleParams);
 		
 		this.context = context;
 	}

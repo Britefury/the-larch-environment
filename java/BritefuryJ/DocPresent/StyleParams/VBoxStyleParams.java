@@ -5,20 +5,20 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 1999-2008.
 //##************************
-package BritefuryJ.DocPresent.StyleSheets;
+package BritefuryJ.DocPresent.StyleParams;
 
 
-public class VBoxStyleSheet extends AbstractBoxStyleSheet
+public class VBoxStyleParams extends AbstractBoxStyleParams
 {
-	public static final VBoxStyleSheet defaultStyleSheet = new VBoxStyleSheet();
-	
-	
-	public VBoxStyleSheet()
+	public static final VBoxStyleParams defaultStyleParams = new VBoxStyleParams();
+
+
+	public VBoxStyleParams()
 	{
 		this( 0.0 );
 	}
 	
-	public VBoxStyleSheet(double spacing)
+	public VBoxStyleParams(double spacing)
 	{
 		super( spacing );
 	}

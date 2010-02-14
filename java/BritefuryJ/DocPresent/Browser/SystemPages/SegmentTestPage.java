@@ -17,7 +17,7 @@ import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 
 public class SegmentTestPage extends SystemPage
 {
@@ -44,7 +44,7 @@ public class SegmentTestPage extends SystemPage
 	
 	protected DPWidget text(String t, Color colour)
 	{
-		TextStyleSheet s0 = new TextStyleSheet( defaultFont, colour );
+		TextStyleParams s0 = new TextStyleParams( defaultFont, colour );
 		return new DPText( s0, t );
 	}
 	

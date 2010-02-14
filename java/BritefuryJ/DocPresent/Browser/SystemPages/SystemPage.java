@@ -17,9 +17,9 @@ import BritefuryJ.DocPresent.DPStaticText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Browser.Page;
-import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.ParagraphStyleParams;
+import BritefuryJ.DocPresent.StyleParams.StaticTextStyleParams;
+import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
 
 public abstract class SystemPage extends Page
 {
@@ -47,14 +47,14 @@ public abstract class SystemPage extends Page
 
 	public DPWidget getContentsElement()
 	{
-		VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( 40.0 );
+		VBoxStyleParams pageBoxStyle = new VBoxStyleParams( 40.0 );
 		DPVBox pageBox = new DPVBox( pageBoxStyle );
 		
 		DPVBox headBox = new DPVBox( );
 		
-		StaticTextStyleSheet descriptionStyle = new StaticTextStyleSheet( new Font( "Sans Serif", Font.PLAIN, 16 ), Color.BLACK );
+		StaticTextStyleParams descriptionStyle = new StaticTextStyleParams( new Font( "Sans Serif", Font.PLAIN, 16 ), Color.BLACK );
 		
-		StaticTextStyleSheet titleStyle = new StaticTextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
+		StaticTextStyleParams titleStyle = new StaticTextStyleParams( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
 		DPStaticText title = new DPStaticText( titleStyle, "System page: " + getTitle() );
 		
 		headBox.append( SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE | SystemRootPage.LINKHEADER_SYSTEMPAGE ) );
@@ -78,7 +78,7 @@ public abstract class SystemPage extends Page
 	}
 	
 	
-	protected ArrayList<DPWidget> createTextNodes(StaticTextStyleSheet textStyle, String text)
+	protected ArrayList<DPWidget> createTextNodes(StaticTextStyleParams textStyle, String text)
 	{
 		String[] words = text.split( " " );
 		ArrayList<DPWidget> nodes = new ArrayList<DPWidget>();
@@ -104,10 +104,10 @@ public abstract class SystemPage extends Page
 
 	protected ArrayList<DPWidget> createTextNodes(String text)
 	{
-		return createTextNodes( StaticTextStyleSheet.defaultStyleSheet, text );
+		return createTextNodes( StaticTextStyleParams.defaultStyleParams, text );
 	}
 	
-	protected DPParagraph createTextParagraph(ParagraphStyleSheet paraStyle, StaticTextStyleSheet textStyle, String text)
+	protected DPParagraph createTextParagraph(ParagraphStyleParams paraStyle, StaticTextStyleParams textStyle, String text)
 	{
 		ArrayList<DPWidget> nodes = createTextNodes( textStyle, text );
 		DPParagraph para = new DPParagraph( paraStyle );
@@ -115,14 +115,14 @@ public abstract class SystemPage extends Page
 		return para;
 	}
 
-	protected DPParagraph createTextParagraph(StaticTextStyleSheet textStyle, String text)
+	protected DPParagraph createTextParagraph(StaticTextStyleParams textStyle, String text)
 	{
-		return createTextParagraph( ParagraphStyleSheet.defaultStyleSheet, textStyle, text );
+		return createTextParagraph( ParagraphStyleParams.defaultStyleParams, textStyle, text );
 	}
 
 	protected DPParagraph createTextParagraph(String text)
 	{
-		return createTextParagraph( ParagraphStyleSheet.defaultStyleSheet, StaticTextStyleSheet.defaultStyleSheet, text );
+		return createTextParagraph( ParagraphStyleParams.defaultStyleParams, StaticTextStyleParams.defaultStyleParams, text );
 	}
 
 	

@@ -8,8 +8,7 @@
 package BritefuryJ.DocPresent;
 
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeParagraph;
-import BritefuryJ.DocPresent.StyleSheets.ParagraphStyleSheet;
-
+import BritefuryJ.DocPresent.StyleParams.ParagraphStyleParams;
 
 
 public class DPParagraph extends DPContainerSequence
@@ -24,12 +23,12 @@ public class DPParagraph extends DPContainerSequence
 	
 	public DPParagraph()
 	{
-		this( ParagraphStyleSheet.defaultStyleSheet );
+		this( ParagraphStyleParams.defaultStyleParams);
 	}
 
-	public DPParagraph(ParagraphStyleSheet styleSheet)
+	public DPParagraph(ParagraphStyleParams styleParams)
 	{
-		super( styleSheet );
+		super(styleParams);
 		
 		layoutNode = new LayoutNodeParagraph( this );
 	}
@@ -44,16 +43,16 @@ public class DPParagraph extends DPContainerSequence
 
 	public double getSpacing()
 	{
-		return ((ParagraphStyleSheet)styleSheet).getSpacing();
+		return ((ParagraphStyleParams) styleParams).getSpacing();
 	}
 
 	public double getLineSpacing()
 	{
-		return ((ParagraphStyleSheet)styleSheet).getLineSpacing();
+		return ((ParagraphStyleParams) styleParams).getLineSpacing();
 	}
 
 	public double getIndentation()
 	{
-		return ((ParagraphStyleSheet)styleSheet).getIndentation();
+		return ((ParagraphStyleParams) styleParams).getIndentation();
 	}
 }
