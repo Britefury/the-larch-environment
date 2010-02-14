@@ -86,7 +86,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPBorder element = new DPBorder( this, border, styleSheet );
+		DPBorder element = new DPBorder( border, styleSheet );
 		element.setChild( child );
 		viewContext.getView().profile_stopElement();
 		return element;
@@ -102,7 +102,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
 		Border border = viewContext.indentationBorder( indentation );
-		DPBorder element = new DPBorder( this, border );
+		DPBorder element = new DPBorder( border );
 		element.setChild( child );
 		viewContext.getView().profile_stopElement();
 		return element;
@@ -113,7 +113,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPWidget element = new DPText( this, styleSheet, txt );
+		DPWidget element = new DPText( styleSheet, txt );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}
@@ -122,7 +122,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPWidget element = new DPText( this, styleSheet, txt, content );
+		DPWidget element = new DPText( styleSheet, txt, content );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}
@@ -131,7 +131,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPWidget element = new DPEmpty( this );
+		DPWidget element = new DPEmpty( );
 		element.setStructuralValueObject( structuralRepresentation );
 		viewContext.getView().profile_stopElement();
 		return element;
@@ -141,7 +141,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPWidget element = new DPEmpty( this );
+		DPWidget element = new DPEmpty( );
 		element.setStructuralValueSequence( structuralRepresentation );
 		viewContext.getView().profile_stopElement();
 		return element;
@@ -152,7 +152,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPWidget element = new DPEmpty( this );
+		DPWidget element = new DPEmpty( );
 		element.setStructuralValueStream( structuralRepresentation );
 		viewContext.getView().profile_stopElement();
 		return element;
@@ -162,7 +162,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPWidget element = new DPEmpty( this, txt );
+		DPWidget element = new DPEmpty( txt );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}
@@ -171,7 +171,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPWidget element = new DPWhitespace( this, txt, width );
+		DPWidget element = new DPWhitespace( txt, width );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}
@@ -180,7 +180,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPWidget element = new DPWhitespace( this, txt, 0.0 );
+		DPWidget element = new DPWhitespace( txt, 0.0 );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}
@@ -191,7 +191,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPWidget element = new DPStaticText( this, styleSheet, txt );
+		DPWidget element = new DPStaticText( styleSheet, txt );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}
@@ -201,7 +201,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPWidget element = new DPLink( this, styleSheet, txt, targetLocation );
+		DPWidget element = new DPLink( styleSheet, txt, targetLocation );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}
@@ -210,7 +210,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPWidget element = new DPLink( this, styleSheet, txt, listener );
+		DPWidget element = new DPLink( styleSheet, txt, listener );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}
@@ -219,7 +219,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPWidget element = new DPLink( this, styleSheet, txt, listener );
+		DPWidget element = new DPLink( styleSheet, txt, listener );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}
@@ -230,7 +230,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPWidget element = new DPLine( this, styleSheet );
+		DPWidget element = new DPLine( styleSheet );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}
@@ -241,7 +241,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPButton element = new DPButton( this, styleSheet, listener );
+		DPButton element = new DPButton( styleSheet, listener );
 		element.setChild( child );
 		viewContext.getView().profile_stopElement();
 		return element;
@@ -251,7 +251,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPButton element = new DPButton( this, styleSheet, listener );
+		DPButton element = new DPButton( styleSheet, listener );
 		element.setChild( child );
 		viewContext.getView().profile_stopElement();
 		return element;
@@ -263,7 +263,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPSpan element = new DPSpan( this );
+		DPSpan element = new DPSpan( );
 		element.setChildren( children );
 		viewContext.getView().profile_stopElement();
 		return element;
@@ -275,7 +275,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPHBox element = new DPHBox( this, styleSheet );
+		DPHBox element = new DPHBox( styleSheet );
 		element.setChildren( children );
 		viewContext.getView().profile_stopElement();
 		return element;
@@ -290,7 +290,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPVBox element = new DPVBox( this, styleSheet );
+		DPVBox element = new DPVBox( styleSheet );
 		element.setChildren( children );
 		viewContext.getView().profile_stopElement();
 		return element;
@@ -301,7 +301,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPParagraph element = new DPParagraph( this, styleSheet );
+		DPParagraph element = new DPParagraph( styleSheet );
 		element.setChildren( children );
 		viewContext.getView().profile_stopElement();
 		return element;
@@ -311,7 +311,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPLineBreak element = new DPLineBreak( this, styleSheet );
+		DPLineBreak element = new DPLineBreak( styleSheet );
 		if ( child != null )
 		{
 			element.setChild( child );
@@ -339,7 +339,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPParagraphIndentMarker element = new DPParagraphIndentMarker( this );
+		DPParagraphIndentMarker element = new DPParagraphIndentMarker( );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}
@@ -348,7 +348,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPParagraphDedentMarker element = new DPParagraphDedentMarker( this );
+		DPParagraphDedentMarker element = new DPParagraphDedentMarker( );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}
@@ -358,7 +358,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPGridRow element = new DPGridRow( this, styleSheet );
+		DPGridRow element = new DPGridRow( styleSheet );
 		element.setChildren( children );
 		viewContext.getView().profile_stopElement();
 		return element;
@@ -368,7 +368,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPRGrid element = new DPRGrid( this, styleSheet );
+		DPRGrid element = new DPRGrid( styleSheet );
 		element.setChildren( children );
 		viewContext.getView().profile_stopElement();
 		return element;
@@ -379,7 +379,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPTable element = new DPTable( this, styleSheet );
+		DPTable element = new DPTable( styleSheet );
 		element.setChildren( children );
 		viewContext.getView().profile_stopElement();
 		return element;
@@ -390,7 +390,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPSegment element = new DPSegment( this, textStyleSheet, bGuardBegin, bGuardEnd );
+		DPSegment element = new DPSegment( textStyleSheet, bGuardBegin, bGuardEnd );
 		element.setChild( child );
 		viewContext.getView().profile_stopElement();
 		return element;
@@ -400,7 +400,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPSegment element = new DPSegment( this, TextStyleSheet.defaultStyleSheet, bGuardBegin, bGuardEnd );
+		DPSegment element = new DPSegment( TextStyleSheet.defaultStyleSheet, bGuardBegin, bGuardEnd );
 		element.setChild( child );
 		viewContext.getView().profile_stopElement();
 		return element;
@@ -411,7 +411,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPScript element = new DPScript( this, styleSheet, segmentTextStyleSheet );
+		DPScript element = new DPScript( styleSheet, segmentTextStyleSheet );
 		element.setMainChild( mainChild );
 		if ( leftSuperChild != null )
 		{
@@ -486,7 +486,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
-		DPFraction element = new DPFraction( this, styleSheet, segmentTextStyleSheet, barContent );
+		DPFraction element = new DPFraction( styleSheet, segmentTextStyleSheet, barContent );
 		element.setNumeratorChild( numerator );
 		element.setDenominatorChild( denominator );
 		viewContext.getView().profile_stopElement();
@@ -504,7 +504,6 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
 		DPWidget element = layout.createListElement( this, children, beginDelim, endDelim, separator );
-		element.setContext( this );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}
@@ -514,7 +513,6 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
 		DPWidget element = layout.createListElement( this, children, PyElementFactory.pyToElementFactory( beginDelim ), PyElementFactory.pyToElementFactory( endDelim ), PySeparatorElementFactory.pyToSeparatorElementFactory( separator ) );
-		element.setContext( this );
 		viewContext.getView().profile_stopElement();
 		return element;
 	}

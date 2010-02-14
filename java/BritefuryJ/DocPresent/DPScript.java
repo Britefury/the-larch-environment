@@ -10,7 +10,6 @@ package BritefuryJ.DocPresent;
 import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeScript;
 import BritefuryJ.DocPresent.StyleSheets.ScriptStyleSheet;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
@@ -37,14 +36,14 @@ public class DPScript extends DPContainer
 	
 	
 	
-	public DPScript(ElementContext context)
+	public DPScript()
 	{
-		this( context, ScriptStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet );
+		this( ScriptStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet );
 	}
 	
-	public DPScript(ElementContext context, ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet)
+	public DPScript(ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet)
 	{
-		super( context, styleSheet );
+		super( styleSheet );
 		
 		layoutNode = new LayoutNodeScript( this );
 		
@@ -77,9 +76,9 @@ public class DPScript extends DPContainer
 
 			if ( bSegmentRequired  &&  !bSegmentPresent )
 			{
-				DPSegment seg = new DPSegment( context, segmentTextStyleSheet, isBeginGuardRequired( slot ), isEndGuardRequired( slot ) );
+				DPSegment seg = new DPSegment( segmentTextStyleSheet, isBeginGuardRequired( slot ), isEndGuardRequired( slot ) );
 				segs[slot] = seg;
-				DPParagraph para = new DPParagraph( context );
+				DPParagraph para = new DPParagraph( );
 				para.setChildren( Arrays.asList( new DPWidget[] { seg } ) );
 				paras[slot] = para;
 				
@@ -93,7 +92,7 @@ public class DPScript extends DPContainer
 				}
 				
 				registeredChildren.add( insertIndex, para );
-				registerChild( para, null );
+				registerChild( para );
 			}
 
 			
@@ -288,17 +287,6 @@ public class DPScript extends DPContainer
 	}
 	
 
-	
-	//
-	// Packing parameters
-	//
-	
-	protected PackingParams getDefaultPackingParams()
-	{
-		return null;
-	}
-
-	
 	
 	public static double getChildScale()
 	{

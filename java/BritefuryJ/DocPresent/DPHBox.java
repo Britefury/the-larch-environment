@@ -14,14 +14,14 @@ import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 
 public class DPHBox extends DPAbstractBox
 {
-	public DPHBox(ElementContext context)
+	public DPHBox()
 	{
-		this( context, HBoxStyleSheet.defaultStyleSheet );
+		this( HBoxStyleSheet.defaultStyleSheet );
 	}
 	
-	public DPHBox(ElementContext context, HBoxStyleSheet syleSheet)
+	public DPHBox(HBoxStyleSheet syleSheet)
 	{
-		super( context, syleSheet );
+		super( syleSheet );
 		
 		layoutNode = new LayoutNodeHBox( this );
 	}

@@ -68,22 +68,22 @@ public class DPStress2Test
 
 	public DPWidget name(String n)
 	{
-		return new DPText( null, nameStyle, n );
+		return new DPText( nameStyle, n );
 	}
 	
 	public DPWidget attr(DPWidget x, String a)
 	{
-		DPText dot = new DPText( null, puncStyle, "." );
-		DPText attrName = new DPText( null, nameStyle, a );
-		DPSpan span = new DPSpan( null );
+		DPText dot = new DPText( puncStyle, "." );
+		DPText attrName = new DPText( nameStyle, a );
+		DPSpan span = new DPSpan( );
 		span.setChildren( Arrays.asList( new DPWidget[] { x, dot, attrName } ) );
 		return span;
 	}
 	
 	public DPWidget call(DPWidget x, DPWidget... args)
 	{
-		DPText openParen = new DPText( null, puncStyle, "(" );
-		DPText closeParen = new DPText( null, puncStyle, ")" );
+		DPText openParen = new DPText( puncStyle, "(" );
+		DPText closeParen = new DPText( puncStyle, ")" );
 		ArrayList<DPWidget> elems = new ArrayList<DPWidget>();
 		elems.add( x );
 		elems.add( openParen );
@@ -91,13 +91,13 @@ public class DPStress2Test
 		{
 			if ( i > 0 )
 			{
-				elems.add( new DPText( null, puncStyle, "," ) );
-				elems.add( new DPText( null, puncStyle, " " ) );
+				elems.add( new DPText( puncStyle, "," ) );
+				elems.add( new DPText( puncStyle, " " ) );
 			}
 			elems.add( args[i] );
 		}
 		elems.add( closeParen );
-		DPSpan span = new DPSpan( null );
+		DPSpan span = new DPSpan( );
 		span.extend( elems );
 		return span;
 	}
@@ -111,13 +111,13 @@ public class DPStress2Test
 	
 	protected DPWidget createContentNode()
 	{
-		DPVBox box = new DPVBox( null );
+		DPVBox box = new DPVBox( );
 		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
 		
 		for (int i = 0; i < NUMLINES; i++)
 		{
 			DPWidget child = call( attr( name( "obj" ), "method" ), name( "a" ), name( "b" ), name( "c" ), name( "d" ), name( "e" ), name( "f" ) );
-			DPParagraph p = new DPParagraph( null, paraStyle );
+			DPParagraph p = new DPParagraph( paraStyle );
 			p.append( child );
 			children.add( p );
 		}
@@ -136,7 +136,7 @@ public class DPStress2Test
 		//This stops the app on window close.
 		frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
 
-		DPPresentationArea area = new DPPresentationArea( null );
+		DPPresentationArea area = new DPPresentationArea( );
 	     
 		System.out.println( "Start memory usage = "  + ( Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() ) );
 	     

@@ -35,7 +35,7 @@ abstract class IndentedListViewLayout extends ListViewLayout
 	{
 		if ( indentationBorder != null )
 		{
-			DPBorder indent = new DPBorder( ctx, indentationBorder );
+			DPBorder indent = new DPBorder( indentationBorder );
 			indent.setChild( child );
 			return indent;
 		}

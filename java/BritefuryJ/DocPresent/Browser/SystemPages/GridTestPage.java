@@ -47,17 +47,17 @@ public class GridTestPage extends SystemPage
 
 	protected DPText text12(String s)
 	{
-		return new DPText( getContext(), t12, s );
+		return new DPText( t12, s );
 	}
 	
 	protected DPText text18(String s)
 	{
-		return new DPText( getContext(), t18, s );
+		return new DPText( t18, s );
 	}
 	
 	protected DPWidget wrapInOutline(DPWidget w)
 	{
-		DPBorder border = new DPBorder( getContext(), outlineBorder );
+		DPBorder border = new DPBorder( outlineBorder );
 		border.setChild( w );
 		return border;
 	}
@@ -65,9 +65,9 @@ public class GridTestPage extends SystemPage
 	protected DPWidget section(String description, DPWidget w)
 	{
 		DPWidget descriptionParagraph = createTextParagraph( description );
-		DPBorder border = new DPBorder( getContext(), b );
+		DPBorder border = new DPBorder( b );
 		border.setChild( w );
-		DPVBox sectionBox = new DPVBox( getContext(), sectionStyle );
+		DPVBox sectionBox = new DPVBox( sectionStyle );
 		sectionBox.setChildren( new DPWidget[] { descriptionParagraph, border } );
 		return sectionBox;
 	}
@@ -75,7 +75,7 @@ public class GridTestPage extends SystemPage
 	
 	protected DPWidget span(int row, int startCol, int endCol)
 	{
-		DPSpan span = new DPSpan( getContext() );
+		DPSpan span = new DPSpan( );
 		for (int col = startCol; col < endCol; col++)
 		{
 			span.append( wrapInOutline( text12( "<" + col + "_" + row + ">" ) ) );
@@ -86,7 +86,7 @@ public class GridTestPage extends SystemPage
 
 	protected DPGridRow makeGridRow(int row)
 	{
-		DPGridRow table = new DPGridRow( getContext() );
+		DPGridRow table = new DPGridRow( );
 		for (int col = 0; col < 6; col++)
 		{
 			table.append( wrapInOutline( text12( "<" + col + "_" + row + ">" ) ) );
@@ -96,7 +96,7 @@ public class GridTestPage extends SystemPage
 	
 	protected DPGridRow makeGridRowCollated(int row)
 	{
-		DPGridRow table = new DPGridRow( getContext() );
+		DPGridRow table = new DPGridRow( );
 		for (int col = 0; col < 2; col++)
 		{
 			table.append( wrapInOutline( text12( "<" + col + "_" + row + ">" ) ) );
@@ -109,7 +109,7 @@ public class GridTestPage extends SystemPage
 	protected DPRGrid makeGrid()
 	{
 		TableStyleSheet tbls0 = new TableStyleSheet( 5.0, false, 5.0, false );
-		DPRGrid grid = new DPRGrid( getContext(), tbls0 );
+		DPRGrid grid = new DPRGrid( tbls0 );
 		for (int row = 0; row < 6; row++)
 		{
 			grid.append( makeGridRow( row ) );
@@ -130,7 +130,7 @@ public class GridTestPage extends SystemPage
 	protected DPRGrid makeGridWithCollatedRows()
 	{
 		TableStyleSheet tbls0 = new TableStyleSheet( 5.0, false, 5.0, false );
-		DPRGrid grid = new DPRGrid( getContext(), tbls0 );
+		DPRGrid grid = new DPRGrid( tbls0 );
 		for (int row = 0; row < 6; row++)
 		{
 			grid.append( makeGridRowCollated( row ) );
@@ -141,12 +141,12 @@ public class GridTestPage extends SystemPage
 	protected DPRGrid makeCollatedGridWithCollatedRows()
 	{
 		TableStyleSheet tbls0 = new TableStyleSheet( 5.0, false, 5.0, false );
-		DPRGrid grid = new DPRGrid( getContext(), tbls0 );
+		DPRGrid grid = new DPRGrid( tbls0 );
 		for (int row = 0; row < 2; row++)
 		{
 			grid.append( makeGridRowCollated( row ) );
 		}
-		DPSpan span = new DPSpan( getContext() );
+		DPSpan span = new DPSpan( );
 		for (int row = 2; row < 5; row++)
 		{
 			span.append( makeGridRowCollated( row ) );
@@ -159,12 +159,12 @@ public class GridTestPage extends SystemPage
 	protected DPRGrid makeCollatedGridWithCollatedRowsAndNonRows()
 	{
 		TableStyleSheet tbls0 = new TableStyleSheet( 5.0, false, 5.0, false );
-		DPRGrid grid = new DPRGrid( getContext(), tbls0 );
+		DPRGrid grid = new DPRGrid( tbls0 );
 		for (int row = 0; row < 2; row++)
 		{
 			grid.append( makeGridRowCollated( row ) );
 		}
-		DPSpan span = new DPSpan( getContext() );
+		DPSpan span = new DPSpan( );
 		for (int row = 2; row < 5; row++)
 		{
 			span.append( makeGridRowCollated( row ) );
@@ -181,7 +181,7 @@ public class GridTestPage extends SystemPage
 	protected DPWidget createContents()
 	{
 		VBoxStyleSheet boxS = new VBoxStyleSheet( 20.0 );
-		DPVBox box = new DPVBox( getContext(), boxS );
+		DPVBox box = new DPVBox( boxS );
 		box.append( section( "Grid row", makeGridRow( 0 ) ) );
 		box.append( section( "Grid", makeGrid() ) );
 		box.append( section( "Grid with shortened row", makeGridwithShorenedRow() ) );

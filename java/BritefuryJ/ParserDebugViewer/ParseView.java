@@ -28,9 +28,9 @@ public class ParseView implements ElementContext
 	{
 		private ParseView parseView;
 		
-		public DPViewBin(ElementContext context, ContainerStyleSheet styleSheet, ParseView parseView)
+		public DPViewBin(ContainerStyleSheet styleSheet, ParseView parseView)
 		{
-			super( context, styleSheet );
+			super( styleSheet );
 			
 			this.parseView = parseView;
 		}
@@ -137,9 +137,9 @@ public class ParseView implements ElementContext
 	{
 		selection = null;
 		
-		area = new DPPresentationArea( this );
+		area = new DPPresentationArea( );
 		
-		bin = new DPViewBin( this, ContainerStyleSheet.defaultStyleSheet, this );
+		bin = new DPViewBin( ContainerStyleSheet.defaultStyleSheet, this );
 		
 		nodeTable = new HashMap<DebugNode, NodeView>();
 		callEdges = new ArrayList<Edge>();

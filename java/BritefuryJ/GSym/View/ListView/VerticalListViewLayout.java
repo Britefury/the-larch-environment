@@ -38,7 +38,7 @@ public class VerticalListViewLayout extends IndentedListViewLayout
 	{
 		if ( separator != null )
 		{
-			DPParagraph paragraph = new DPParagraph( ctx, lineParagraphStyleSheet );
+			DPParagraph paragraph = new DPParagraph( lineParagraphStyleSheet );
 			//paragraph.setChildren( Arrays.asList( new Element[] { child, separator.createElement(), new WhitespaceElement( "\n" ) } ) );
 			paragraph.setChildren( Arrays.asList( new DPWidget[] { child, separator.createElement( ctx, index, child ) } ) );
 			return paragraph;
@@ -52,7 +52,7 @@ public class VerticalListViewLayout extends IndentedListViewLayout
 
 	public DPWidget createListElement(ElementContext ctx, List<DPWidget> children, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator)
 	{
-		DPVBox vbox = new DPVBox( ctx, styleSheet );
+		DPVBox vbox = new DPVBox( styleSheet );
 		
 		ArrayList<DPWidget> childElems = new ArrayList<DPWidget>();
 		childElems.ensureCapacity( children.size() );
@@ -81,7 +81,7 @@ public class VerticalListViewLayout extends IndentedListViewLayout
 		
 		if ( beginDelim != null  ||  endDelim != null )
 		{
-			DPVBox outerVBox = new DPVBox( ctx, styleSheet );
+			DPVBox outerVBox = new DPVBox( styleSheet );
 			
 			ArrayList<DPWidget> outerChildElems = new ArrayList<DPWidget>();
 			outerChildElems.ensureCapacity( 3 );

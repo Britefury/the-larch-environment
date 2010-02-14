@@ -39,19 +39,18 @@ public abstract class DPContentLeaf extends DPWidget
 	
 
 	
-	private WeakHashMap<Marker, Object> markers;
 	protected String textRepresentation;
 	
 	
 	
-	DPContentLeaf(ElementContext context, String textRepresentation)
+	DPContentLeaf(String textRepresentation)
 	{
-		this( context, ContentLeafStyleSheet.defaultStyleSheet, textRepresentation );
+		this( ContentLeafStyleSheet.defaultStyleSheet, textRepresentation );
 	}
 	
-	DPContentLeaf(ElementContext context, ContentLeafStyleSheet styleSheet, String textRepresentation)
+	DPContentLeaf(ContentLeafStyleSheet styleSheet, String textRepresentation)
 	{
-		super( context, styleSheet );
+		super( styleSheet );
 		
 		this.textRepresentation = textRepresentation;
 	}
@@ -236,24 +235,60 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	
 	
+	protected WeakHashMap<Marker, Object> getMarkersForLeaf()
+	{
+		if ( presentationArea != null )
+		{
+			return presentationArea.markersByLeaf.get( this );
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	protected WeakHashMap<Marker, Object> getValidMarkersForLeaf()
+	{
+		if ( presentationArea != null )
+		{
+			WeakHashMap<Marker, Object> markers = presentationArea.markersByLeaf.get( this );
+			
+			if ( markers == null )
+			{
+				markers = new WeakHashMap<Marker, Object>(); 
+				presentationArea.markersByLeaf.put( this, markers );
+			}
+			
+			return markers;
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	protected void removeMarkersForLeaf()
+	{
+		presentationArea.markersByLeaf.remove( this );
+	}
+	
+	
 	public void registerMarker(Marker m)
 	{
-		if ( markers == null )
-		{
-			markers = new WeakHashMap<Marker, Object>();
-		}
+		WeakHashMap<Marker, Object> markers = getValidMarkersForLeaf();
 		markers.put( m, null );
 	}
 	
 	public void unregisterMarker(Marker m)
 	{
+		WeakHashMap<Marker, Object> markers = getMarkersForLeaf();
 		if ( markers != null )
 		{
 			markers.remove( m );
 		
 			if ( markers.isEmpty() )
 			{
-				markers = null;
+				removeMarkersForLeaf();
 			}
 		}
 	}
@@ -263,6 +298,7 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	public void markerInsert(int position, int length)
 	{
+		WeakHashMap<Marker, Object> markers = getMarkersForLeaf();
 		if ( markers != null )
 		{
 			for (Marker m: markers.keySet())
@@ -281,6 +317,7 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	public void markerRemove(int position, int length)
 	{
+		WeakHashMap<Marker, Object> markers = getMarkersForLeaf();
 		if ( markers != null )
 		{
 			int end = position + length;
@@ -672,6 +709,8 @@ public abstract class DPContentLeaf extends DPWidget
 	{
 		super.onUnrealise( unrealiseRoot );
 		
+		WeakHashMap<Marker, Object> markers = getMarkersForLeaf();
+
 		if ( markers != null )
 		{
 			ArrayList<Marker> xs = new ArrayList<Marker>( markers.keySet() );
@@ -871,7 +910,7 @@ public abstract class DPContentLeaf extends DPWidget
 
 	public DPWidget createMetaHeaderData()
 	{
-		return new DPText( null, headerTextRepTextStyle, "'" + textRepresentation.replace( "\n", "\\n" ) + "'" );
+		return new DPText( headerTextRepTextStyle, "'" + textRepresentation.replace( "\n", "\\n" ) + "'" );
 	}
 	
 	protected Border getMetaHeaderBorder()

@@ -26,24 +26,24 @@ public class DPCanvas extends DPStatic implements DrawingOwner
 	protected double drawingWidth, drawingHeight;
 	
 	
-	public DPCanvas(ElementContext context, DrawingNode drawing)
+	public DPCanvas(DrawingNode drawing)
 	{
-		this( context, WidgetStyleSheet.defaultStyleSheet, drawing, -1.0, -1.0, false, false );
+		this( WidgetStyleSheet.defaultStyleSheet, drawing, -1.0, -1.0, false, false );
 	}
 	
-	public DPCanvas(ElementContext context, WidgetStyleSheet styleSheet, DrawingNode drawing)
+	public DPCanvas(WidgetStyleSheet styleSheet, DrawingNode drawing)
 	{
-		this( context, styleSheet, drawing, -1.0, -1.0, false, false );
+		this( styleSheet, drawing, -1.0, -1.0, false, false );
 	}
 	
-	public DPCanvas(ElementContext context, DrawingNode drawing, double width, double height, boolean bShrinkX, boolean bShrinkY)
+	public DPCanvas(DrawingNode drawing, double width, double height, boolean bShrinkX, boolean bShrinkY)
 	{
-		this( context, WidgetStyleSheet.defaultStyleSheet, drawing, width, height, bShrinkX, bShrinkY );
+		this( WidgetStyleSheet.defaultStyleSheet, drawing, width, height, bShrinkX, bShrinkY );
 	}
 	
-	public DPCanvas(ElementContext context, WidgetStyleSheet styleSheet, DrawingNode drawing, double width, double height, boolean bShrinkX, boolean bShrinkY)
+	public DPCanvas(WidgetStyleSheet styleSheet, DrawingNode drawing, double width, double height, boolean bShrinkX, boolean bShrinkY)
 	{
-		super( context, styleSheet );
+		super( styleSheet );
 		
 		layoutNode = new LayoutNodeCanvas( this );
 		
@@ -141,18 +141,7 @@ public class DPCanvas extends DPStatic implements DrawingOwner
 			}
 		}
 		
-		if ( dndHandler != null )
-		{
-			if ( targetPos != null )
-			{
-				targetPos[0] = localPos;
-			}
-			return this;
-		}
-		else
-		{
-			return null;
-		}
+		return null;
 	}
 
 	

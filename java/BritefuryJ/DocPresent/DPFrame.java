@@ -15,14 +15,14 @@ public class DPFrame extends DPBin
 	
 	
 	
-	public DPFrame(ElementContext context)
+	public DPFrame()
 	{
-		this( context, ContainerStyleSheet.defaultStyleSheet );
+		this( ContainerStyleSheet.defaultStyleSheet );
 	}
 
-	public DPFrame(ElementContext context, ContainerStyleSheet styleSheet)
+	public DPFrame(ContainerStyleSheet styleSheet)
 	{
-		super( context, styleSheet );
+		super( styleSheet );
 	}
 	
 	

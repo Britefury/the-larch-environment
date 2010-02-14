@@ -145,6 +145,19 @@ public class IncrementalTreeNode implements IncrementalValueListener, Incrementa
 	}
 	
 	
+	public int computeSubtreeSize()
+	{
+		int subtreeSize = 1;
+		IncrementalTreeNode child = childrenHead;
+		while ( child != null )
+		{
+			subtreeSize += child.computeSubtreeSize();
+			child = child.nextSibling;
+		}
+		return subtreeSize;
+	}
+	
+
 	
 	//
 	//

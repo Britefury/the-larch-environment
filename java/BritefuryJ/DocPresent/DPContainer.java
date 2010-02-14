@@ -15,7 +15,6 @@ import java.util.List;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.LayoutTree.BranchLayoutNode;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
@@ -47,14 +46,14 @@ public abstract class DPContainer extends DPWidget
 	// Constructors
 	//
 	
-	public DPContainer(ElementContext context)
+	public DPContainer()
 	{
-		this( context, ContainerStyleSheet.defaultStyleSheet );
+		this( ContainerStyleSheet.defaultStyleSheet );
 	}
 
-	public DPContainer(ElementContext context, ContainerStyleSheet styleSheet)
+	public DPContainer(ContainerStyleSheet styleSheet)
 	{
-		super( context, styleSheet );
+		super( styleSheet );
 		
 		registeredChildren = new ArrayList<DPWidget>();
 		cachedTextRep = null;
@@ -79,14 +78,11 @@ public abstract class DPContainer extends DPWidget
 	// Child registration methods
 	//
 	
-	protected DPWidget registerChild(DPWidget child, PackingParams packing)
+	protected DPWidget registerChild(DPWidget child)
 	{
 		child.unparent();
 		
 		child.setParent( this, presentationArea );
-		
-		packing = packing != null  ?  packing  :  getDefaultPackingParams();
-		child.setParentPacking( packing );
 		
 		if ( isRealised() )
 		{
@@ -102,8 +98,6 @@ public abstract class DPContainer extends DPWidget
 		{
 			child.handleUnrealise( child );
 		}
-		
-		child.setParentPacking( null );
 		
 		child.setParent( null, null );
 	}
@@ -122,14 +116,23 @@ public abstract class DPContainer extends DPWidget
 	}
 	
 	
-	protected abstract PackingParams getDefaultPackingParams();
-	
 	
 	
 	
 	//
 	// Tree structure methods
 	//
+	
+	
+	public int computeSubtreeSize()
+	{
+		int subtreeSize = 1;
+		for (DPWidget child: registeredChildren)
+		{
+			subtreeSize += child.computeSubtreeSize();
+		}
+		return subtreeSize;
+	}
 	
 	
 	protected abstract void replaceChildWithEmpty(DPWidget child);
@@ -281,6 +284,51 @@ public abstract class DPContainer extends DPWidget
 		return null;
 	}
 	
+
+	protected DPWidget getFirstLowestChildAtLocalPoint(Point2 localPos)
+	{
+		DPWidget x = this;
+		Point2 p = localPos;
+		
+		while ( true )
+		{
+			DPWidget child = x.getFirstChildAtLocalPoint( p );
+			if ( child != null )
+			{
+				p = child.getParentToLocalXform().transform( p );
+				x = child;
+			}
+			else
+			{
+				break;
+			}
+		}
+		
+		return x;
+	}
+	
+	protected DPWidget getLastLowestChildAtLocalPoint(Point2 localPos)
+	{
+		DPWidget x = this;
+		Point2 p = localPos;
+		
+		while ( true )
+		{
+			DPWidget child = x.getLastChildAtLocalPoint( p );
+			if ( child != null )
+			{
+				p = child.getParentToLocalXform().transform( p );
+				x = child;
+			}
+			else
+			{
+				break;
+			}
+		}
+		
+		return x;
+	}
+	
 	
 	
 	
@@ -306,18 +354,7 @@ public abstract class DPContainer extends DPWidget
 			}
 		}
 		
-		if ( dndHandler != null )
-		{
-			if ( targetPos != null )
-			{
-				targetPos[0] = localPos;
-			}
-			return this;
-		}
-		else
-		{
-			return null;
-		}
+		return super.getDndElement( localPos, targetPos );
 	}
 
 	
@@ -899,7 +936,7 @@ public abstract class DPContainer extends DPWidget
 	
 	public DPWidget createMetaElement()
 	{
-		DPVBox metaChildrenVBox = new DPVBox( null, metaVBoxStyle );
+		DPVBox metaChildrenVBox = new DPVBox( metaVBoxStyle );
 		for (DPWidget child: getChildren())
 		{
 			if ( child != null )
@@ -914,10 +951,10 @@ public abstract class DPContainer extends DPWidget
 		}
 		metaChildrenVBox.setRefPointIndex( getChildren().size() - 1 );
 		
-		DPBorder indentMetaChildren = new DPBorder( null, metaIndentBorder );
+		DPBorder indentMetaChildren = new DPBorder( metaIndentBorder );
 		indentMetaChildren.setChild( metaChildrenVBox );
 		
-		DPVBox metaVBox = new DPVBox( null, metaVBoxStyle );
+		DPVBox metaVBox = new DPVBox( metaVBoxStyle );
 		metaVBox.append( createMetaHeader() );
 		metaVBox.append( indentMetaChildren );
 		

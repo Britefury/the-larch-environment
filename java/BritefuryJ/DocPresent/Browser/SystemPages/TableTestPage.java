@@ -44,24 +44,24 @@ public class TableTestPage extends SystemPage
 
 	protected DPText text12(String s)
 	{
-		return new DPText( getContext(), t12, s );
+		return new DPText( t12, s );
 	}
 	
 	protected DPText text18(String s)
 	{
-		return new DPText( getContext(), t18, s );
+		return new DPText( t18, s );
 	}
 	
 	protected DPWidget wrapInOutline(DPWidget w)
 	{
-		DPBorder border = new DPBorder( getContext(), outlineBorder );
+		DPBorder border = new DPBorder( outlineBorder );
 		border.setChild( w );
 		return border;
 	}
 	
 	protected DPWidget wrapInBorder(DPWidget w)
 	{
-		DPBorder border = new DPBorder( getContext(), b );
+		DPBorder border = new DPBorder( b );
 		border.setChild( w );
 		return border;
 	}
@@ -69,7 +69,7 @@ public class TableTestPage extends SystemPage
 	protected DPTable makeTable0()
 	{
 		TableStyleSheet tbls0 = new TableStyleSheet( 5.0, false, 5.0, false );
-		DPTable table = new DPTable( getContext(), tbls0 );
+		DPTable table = new DPTable( tbls0 );
 		for (int row = 0; row < 6; row++)
 		{
 			for (int col = 0; col < 6; col++)
@@ -121,7 +121,7 @@ public class TableTestPage extends SystemPage
 	protected DPWidget createContents()
 	{
 		VBoxStyleSheet boxS = new VBoxStyleSheet( 20.0 );
-		DPVBox box = new DPVBox( getContext(), boxS );
+		DPVBox box = new DPVBox( boxS );
 		box.append( wrapInBorder( makeTable0() ) );
 		box.append( wrapInBorder( makeTable1() ) );
 		box.append( wrapInBorder( makeTable2() ) );

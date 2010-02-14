@@ -9,7 +9,6 @@ package BritefuryJ.DocPresent;
 import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
 
 public class DPSegment extends DPContainer
@@ -47,14 +46,14 @@ public class DPSegment extends DPContainer
 	// Constructor
 	//
 	
-	public DPSegment(ElementContext context, boolean bGuardBegin, boolean bGuardEnd)
+	public DPSegment(boolean bGuardBegin, boolean bGuardEnd)
 	{
-		this( context, TextStyleSheet.defaultStyleSheet, bGuardBegin, bGuardEnd );
+		this( TextStyleSheet.defaultStyleSheet, bGuardBegin, bGuardEnd );
 	}
 
-	public DPSegment(ElementContext context, TextStyleSheet textStyleSheet, boolean bGuardBegin, boolean bGuardEnd)
+	public DPSegment(TextStyleSheet textStyleSheet, boolean bGuardBegin, boolean bGuardEnd)
 	{
-		super( context );
+		super( );
 		this.textStyleSheet = textStyleSheet;
 		this.bGuardBegin = bGuardBegin;
 		this.bGuardEnd = bGuardEnd;
@@ -94,7 +93,7 @@ public class DPSegment extends DPContainer
 			{
 				int index = beginGuard != null  ?  1  :  0;
 				registeredChildren.add( index, child );
-				registerChild( child, null );
+				registerChild( child );
 			}
 			
 			queueResize();
@@ -157,14 +156,14 @@ public class DPSegment extends DPContainer
 			if ( bBegin  &&  !( beginGuard instanceof DPText ) )
 			{
 				unregisterBeginGuard();
-				beginGuard = new DPText( context, textStyleSheet, "" );
+				beginGuard = new DPText( textStyleSheet, "" );
 				registerBeginGuard();
 			}
 			
 			if ( !bBegin  &&  !( beginGuard instanceof DPWhitespace ) )
 			{
 				unregisterBeginGuard();
-				beginGuard = new DPWhitespace( context, "" );
+				beginGuard = new DPWhitespace( "" );
 				registerBeginGuard();
 			}
 		}
@@ -180,14 +179,14 @@ public class DPSegment extends DPContainer
 			if ( bEnd  &&  !( endGuard instanceof DPText ) )
 			{
 				unregisterEndGuard();
-				endGuard = new DPText( context, textStyleSheet, "" );
+				endGuard = new DPText( textStyleSheet, "" );
 				registerEndGuard();
 			}
 			
 			if ( !bEnd  &&  !( endGuard instanceof DPWhitespace ) )
 			{
 				unregisterEndGuard();
-				endGuard = new DPWhitespace( context, "" );
+				endGuard = new DPWhitespace( "" );
 				registerEndGuard();
 			}
 		}
@@ -206,7 +205,7 @@ public class DPSegment extends DPContainer
 		if ( beginGuard != null )
 		{
 			registeredChildren.add( 0, beginGuard );
-			registerChild( beginGuard, null );
+			registerChild( beginGuard );
 		}
 	}
 
@@ -225,7 +224,7 @@ public class DPSegment extends DPContainer
 		if ( endGuard != null )
 		{
 			registeredChildren.add( endGuard );
-			registerChild( endGuard, null );
+			registerChild( endGuard );
 		}
 	}
 
@@ -250,16 +249,6 @@ public class DPSegment extends DPContainer
 		}
 	}
 	
-	
-	//
-	// Packing parameters
-	//
-	
-	protected PackingParams getDefaultPackingParams()
-	{
-		return null;
-	}
-
 	
 	
 	public DPSegment getSegment()

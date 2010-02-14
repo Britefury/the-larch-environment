@@ -30,7 +30,6 @@ import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.Layout.ElementAlignment;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.LAllocV;
-import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.LayoutTree.ArrangedSequenceLayoutNode;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNode;
@@ -100,18 +99,6 @@ abstract public class DPWidget extends PointerInputElement
 	
 	//
 	//
-	// Parent packing
-	//
-	//
-	
-	protected static class ParentPacking
-	{
-	}
-
-	
-	
-	//
-	//
 	// Padding
 	//
 	//
@@ -159,6 +146,34 @@ abstract public class DPWidget extends PointerInputElement
 	
 
 	private static HashMap<PaddingKey, EmptyBorder> paddingBorders = new HashMap<PaddingKey, EmptyBorder>();
+	
+	
+	
+	//
+	//
+	// INTERACTOR
+	//
+	//
+	
+	private static class Interactor
+	{
+		private DndHandler dndHandler;
+
+		private ElementLinearRepresentationListener linearRepresentationListener;		// Move this and the next one into an 'interactor' element
+		private ElementKeyboardListener keyboardListener;
+		
+		
+		
+		public Interactor()
+		{
+		}
+		
+		
+		public boolean isIdentity()
+		{
+			return dndHandler == null  &&  linearRepresentationListener == null  &&    keyboardListener == null;
+		}
+	}
 
 	
 	
@@ -169,15 +184,15 @@ abstract public class DPWidget extends PointerInputElement
 	//
 	//
 	
-	protected static int FLAG_REALISED = 0x1;
-	protected static int FLAG_RESIZE_QUEUED = 0x2;
-	protected static int FLAG_SIZE_UP_TO_DATE = 0x4;
+	protected final static int FLAG_REALISED = 0x1;
+	protected final static int FLAG_RESIZE_QUEUED = 0x2;
+	protected final static int FLAG_SIZE_UP_TO_DATE = 0x4;
 
-	protected static int _ALIGN_SHIFT = 3;
-	protected static int _ALIGN_MASK = ElementAlignment._ELEMENTALIGN_MASK  <<  _ALIGN_SHIFT;
-	protected static int _HALIGN_MASK = ElementAlignment._HALIGN_MASK  <<  _ALIGN_SHIFT;
-	protected static int _VALIGN_MASK = ElementAlignment._VALIGN_MASK  <<  _ALIGN_SHIFT;
-	protected static int FLAGS_ELEMENT_END = ElementAlignment._ELEMENTALIGN_END  <<  _ALIGN_SHIFT;
+	protected final static int _ALIGN_SHIFT = 3;
+	protected final static int _ALIGN_MASK = ElementAlignment._ELEMENTALIGN_MASK  <<  _ALIGN_SHIFT;
+	protected final static int _HALIGN_MASK = ElementAlignment._HALIGN_MASK  <<  _ALIGN_SHIFT;
+	protected final static int _VALIGN_MASK = ElementAlignment._VALIGN_MASK  <<  _ALIGN_SHIFT;
+	protected final static int FLAGS_ELEMENT_END = ElementAlignment._ELEMENTALIGN_END  <<  _ALIGN_SHIFT;
 	
 	
 	protected int flags;
@@ -187,15 +202,8 @@ abstract public class DPWidget extends PointerInputElement
 	protected DPPresentationArea presentationArea;
 	
 	protected LayoutNode layoutNode;
-
-	protected PackingParams parentPacking;									// Consider moving this into the Table container, as it is only used in this one instance.
 	
-	protected DndHandler dndHandler;										// Move this and the next two into an 'interactor' element
-	
-	protected ElementLinearRepresentationListener linearRepresentationListener;
-	protected ElementKeyboardListener keyboardListener;
-	
-	protected ElementContext context;										// Factor out into 'waypoint' element, have other elements delegate responsibility to parents
+	private Interactor interactor;
 
 	protected DPWidget metaElement;
 	protected String debugName;											// Move into 'waypoint' element; only used there 
@@ -233,35 +241,52 @@ abstract public class DPWidget extends PointerInputElement
 	//
 	//
 	
-	public DPWidget(ElementContext context)
+	public DPWidget()
 	{
-		this( context, WidgetStyleSheet.defaultStyleSheet );
+		this( WidgetStyleSheet.defaultStyleSheet );
 	}
 	
-	public DPWidget(ElementContext context, WidgetStyleSheet styleSheet)
+	public DPWidget(WidgetStyleSheet styleSheet)
 	{
 		flags = 0;
 		this.styleSheet = styleSheet;
-		parentPacking = null;
-		this.context = context;
 	}
+	
 	
 	
 	
 	
 	//
-	// Owner
+	//
+	// Context
+	//
 	//
 	
 	public ElementContext getContext()
 	{
-		return context;
+		DPWidget w = this;
+		while ( w != null )
+		{
+			ElementContext c = w.getContext_helper();
+			if ( c != null )
+			{
+				return c;
+			}
+			
+			w = w.getParent();
+		}
+		
+		return null;
 	}
 	
-	public void setContext(ElementContext context)
+	protected ElementContext getContext_helper()
 	{
-		this.context = context;
+		return null;
 	}
+	
+	
+	
+	
 
 	
 	
@@ -381,9 +406,8 @@ abstract public class DPWidget extends PointerInputElement
 			paddingBorders.put( key, border );
 		}
 		
-		DPBorder padElement = new DPBorder( context, border );
+		DPBorder padElement = new DPBorder( border );
 		padElement.setChild( this );
-		padElement.setContext( context );
 		return padElement;
 	}
 	
@@ -402,21 +426,6 @@ abstract public class DPWidget extends PointerInputElement
 	
 	
 	
-	//
-	// Parent packing methods
-	//
-	
-	public PackingParams getParentPacking()
-	{
-		return parentPacking;
-	}
-	
-	public void setParentPacking(PackingParams parentPacking)
-	{
-		this.parentPacking = parentPacking;
-	}
-	
-
 	//
 	// Geometry methods
 	//
@@ -821,6 +830,11 @@ abstract public class DPWidget extends PointerInputElement
 	}
 	
 	
+	public int computeSubtreeSize()
+	{
+		return 1;
+	}
+	
 	
 	public boolean isInSubtreeRootedAt(DPContainer r)
 	{
@@ -973,31 +987,6 @@ abstract public class DPWidget extends PointerInputElement
 	{
 	}
 
-	
-	
-	
-	//
-	//
-	// DRAG AND DROP METHODS
-	//
-	//
-	
-	public void enableDnd(DndHandler handler)
-	{
-		dndHandler = handler;
-	}
-	
-	public void disableDnd()
-	{
-		dndHandler = null;
-	}
-	
-	public boolean isDndEnabled()
-	{
-		return dndHandler != null;
-	}
-	
-	
 	
 	
 	
@@ -1330,9 +1319,67 @@ abstract public class DPWidget extends PointerInputElement
 		return localPos.x >= 0.0  &&  localPos.y >= 0.0  &&  localPos.x < getAllocationX()  &&  localPos.y < getAllocationY();
 	}
 	
-	protected PointerInputElement getDndElement(Point2 localPos, Point2 targetPos[])				// targetPos is an output parameter
+
+	
+	
+	
+	//
+	//
+	// INTERACTOR METHODS
+	//
+	//
+	
+	private void ensureValidInteractor()
 	{
-		if ( dndHandler != null )
+		if ( interactor == null )
+		{
+			interactor = new Interactor();
+		}
+	}
+	
+	private void onInteractorModified()
+	{
+		if ( interactor != null  &&  interactor.isIdentity() )
+		{
+			interactor = null;
+		}
+	}
+	
+	
+	
+	
+	//
+	//
+	// DRAG AND DROP METHODS
+	//
+	//
+	
+	public void enableDnd(DndHandler handler)
+	{
+		ensureValidInteractor();
+		interactor.dndHandler = handler;
+		onInteractorModified();
+	}
+	
+	public void disableDnd()
+	{
+		if ( interactor != null )
+		{
+			interactor.dndHandler = null;
+		}
+		onInteractorModified();
+	}
+	
+	public boolean isDndEnabled()
+	{
+		return interactor != null  ?  interactor.dndHandler != null  :  false;
+	}
+	
+	
+	
+	public PointerInputElement getDndElement(Point2 localPos, Point2 targetPos[])
+	{
+		if ( getDndHandler() != null )
 		{
 			if ( targetPos != null )
 			{
@@ -1348,7 +1395,7 @@ abstract public class DPWidget extends PointerInputElement
 	
 	public DndHandler getDndHandler()
 	{
-		return dndHandler;
+		return interactor != null  ?  interactor.dndHandler  :  null;
 	}
 	
 	
@@ -1672,23 +1719,27 @@ abstract public class DPWidget extends PointerInputElement
 	
 	public ElementLinearRepresentationListener getLinearRepresentationListener()
 	{
-		return linearRepresentationListener;
+		return interactor != null  ?  interactor.linearRepresentationListener  :  null;
 	}
 	
 	public void setLinearRepresentationListener(ElementLinearRepresentationListener listener)
 	{
-		linearRepresentationListener = listener;
+		ensureValidInteractor();
+		interactor.linearRepresentationListener = listener;
+		onInteractorModified();
 	}
 	
 
 	public ElementKeyboardListener getKeyboardListener()
 	{
-		return keyboardListener;
+		return interactor != null  ?  interactor.keyboardListener  :  null;
 	}
 	
 	public void setKeyboardListener(ElementKeyboardListener listener)
 	{
-		keyboardListener = listener;
+		ensureValidInteractor();
+		interactor.keyboardListener = listener;
+		onInteractorModified();
 	}
 	
 	
@@ -1760,6 +1811,7 @@ abstract public class DPWidget extends PointerInputElement
 	
 	protected boolean onTextRepresentationModifiedEvent(LinearRepresentationEvent event)
 	{
+		ElementLinearRepresentationListener linearRepresentationListener = getLinearRepresentationListener();
 		if ( linearRepresentationListener != null )
 		{
 			if ( linearRepresentationListener.textRepresentationModified( this, event ) )
@@ -1836,6 +1888,7 @@ abstract public class DPWidget extends PointerInputElement
 	
 	protected boolean onLinearRepresentationModifiedEvent(LinearRepresentationEvent event)
 	{
+		ElementLinearRepresentationListener linearRepresentationListener = getLinearRepresentationListener();
 		if ( linearRepresentationListener != null )
 		{
 			if ( linearRepresentationListener.linearRepresentationModified( this, event ) )
@@ -2042,6 +2095,7 @@ abstract public class DPWidget extends PointerInputElement
 	
 	protected boolean propagateKeyPress(KeyEvent event)
 	{
+		ElementKeyboardListener keyboardListener = getKeyboardListener();
 		if ( keyboardListener != null )
 		{
 			if ( keyboardListener.onKeyPress( this, event ) )
@@ -2060,6 +2114,7 @@ abstract public class DPWidget extends PointerInputElement
 
 	protected boolean propagateKeyRelease(KeyEvent event)
 	{
+		ElementKeyboardListener keyboardListener = getKeyboardListener();
 		if ( keyboardListener != null )
 		{
 			if ( keyboardListener.onKeyRelease( this, event ) )
@@ -2078,6 +2133,7 @@ abstract public class DPWidget extends PointerInputElement
 
 	protected boolean propagateKeyTyped(KeyEvent event)
 	{
+		ElementKeyboardListener keyboardListener = getKeyboardListener();
 		if ( keyboardListener != null )
 		{
 			if ( keyboardListener.onKeyTyped( this, event ) )
@@ -2156,7 +2212,7 @@ abstract public class DPWidget extends PointerInputElement
 	{
 		if ( debugName != null )
 		{
-			return new DPText( null, headerDebugTextStyle, "<" + debugName + ">" );
+			return new DPText( headerDebugTextStyle, "<" + debugName + ">" );
 		}
 		else
 		{
@@ -2168,7 +2224,7 @@ abstract public class DPWidget extends PointerInputElement
 	{
 		String description = toString();
 		description = description.replace( "BritefuryJ.DocPresent.", "" );
-		return new DPText( null, headerDescriptionTextStyle, description );
+		return new DPText( headerDescriptionTextStyle, description );
 	}
 	
 	protected Border getMetaHeaderBorder()
@@ -2178,7 +2234,7 @@ abstract public class DPWidget extends PointerInputElement
 	
 	public DPWidget createMetaHeader()
 	{
-		DPHBox hbox = new DPHBox( null, metaHeaderHBoxStyle );
+		DPHBox hbox = new DPHBox( metaHeaderHBoxStyle );
 		DPWidget data = createMetaHeaderData();
 		DPWidget debug = createMetaHeaderDebug();
 		DPWidget descr = createMetaDescription();
@@ -2193,7 +2249,7 @@ abstract public class DPWidget extends PointerInputElement
 		hbox.append( descr );
 		
 
-		DPBorder border = new DPBorder( null, getMetaHeaderBorder() );
+		DPBorder border = new DPBorder( getMetaHeaderBorder() );
 		border.setChild( hbox );
 		return border;
 	}
@@ -2237,7 +2293,7 @@ abstract public class DPWidget extends PointerInputElement
 
 	public DPWidget createMetaElement()
 	{
-		DPBin bin = new DPBin( null );
+		DPBin bin = new DPBin( );
 		bin.setChild( createMetaHeader() );
 		return bin;
 	}

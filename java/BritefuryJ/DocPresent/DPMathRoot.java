@@ -14,7 +14,6 @@ import java.awt.geom.Path2D;
 import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeMathRoot;
 import BritefuryJ.DocPresent.StyleSheets.MathRootStyleSheet;
 
@@ -24,14 +23,14 @@ public class DPMathRoot extends DPContainer
 	
 	
 	
-	public DPMathRoot(ElementContext context)
+	public DPMathRoot()
 	{
-		this( context, MathRootStyleSheet.defaultStyleSheet );
+		this( MathRootStyleSheet.defaultStyleSheet );
 	}
 
-	public DPMathRoot(ElementContext context, MathRootStyleSheet styleSheet)
+	public DPMathRoot(MathRootStyleSheet styleSheet)
 	{
-		super( context, styleSheet );
+		super( styleSheet );
 		
 		layoutNode = new LayoutNodeMathRoot( this );
 	}
@@ -65,7 +64,7 @@ public class DPMathRoot extends DPContainer
 			if ( child != null )
 			{
 				registeredChildren.add( child );
-				registerChild( child, null );				
+				registerChild( child );				
 			}
 			
 			onChildListModified();
@@ -147,16 +146,6 @@ public class DPMathRoot extends DPContainer
 		}
 	}
 
-	
-	
-	//
-	// Packing parameters
-	//
-	
-	protected PackingParams getDefaultPackingParams()
-	{
-		return null;
-	}
 	
 	
 	//

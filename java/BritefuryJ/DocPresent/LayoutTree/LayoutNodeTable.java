@@ -17,7 +17,7 @@ import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
 import BritefuryJ.DocPresent.Layout.TableLayout;
-import BritefuryJ.DocPresent.Layout.TablePackingParams;
+import BritefuryJ.DocPresent.Layout.TableLayout.TablePackingParams;
 import BritefuryJ.DocPresent.StyleSheets.TableStyleSheet;
 import BritefuryJ.Math.Point2;
 
@@ -39,15 +39,14 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 	{
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPTable table = (DPTable)element;
-		List<DPWidget> layoutChildren = element.getLayoutChildren();
+		List<DPWidget> layoutChildren = table.getLayoutChildren();
+		TableLayout.TablePackingParams packingParams[] = table.getTablePackingParamsArray();
 		
 		LReqBoxInterface childBoxes[] = new LReqBoxInterface[layoutChildren.size()];
-		TablePackingParams packingParams[] = new TablePackingParams[layoutChildren.size()];
 		for (int i = 0; i < layoutChildren.size(); i++)
 		{
 			DPWidget child = layoutChildren.get( i );
 			childBoxes[i] = child.getLayoutNode().refreshRequisitionX();
-			packingParams[i] = (TablePackingParams)child.getParentPacking();
 		}
 
 		columnBoxes = TableLayout.computeRequisitionX( layoutReqBox, childBoxes, packingParams, table.width(), table.height(), getColumnSpacing(), getRowSpacing() );
@@ -63,15 +62,14 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPTable table = (DPTable)element;
 		List<DPWidget> layoutChildren = element.getLayoutChildren();
+		TableLayout.TablePackingParams packingParams[] = table.getTablePackingParamsArray();
 		
 		LReqBoxInterface childBoxes[] = new LReqBoxInterface[layoutChildren.size()];
-		TablePackingParams packingParams[] = new TablePackingParams[layoutChildren.size()];
 		int childAlignmentFlags[] = new int[layoutChildren.size()];
 		for (int i = 0; i < layoutChildren.size(); i++)
 		{
 			DPWidget child = layoutChildren.get( i );
 			childBoxes[i] = child.getLayoutNode().refreshRequisitionY();
-			packingParams[i] = (TablePackingParams)child.getParentPacking();
 			childAlignmentFlags[i] = child.getAlignmentFlags();
 		}
 
@@ -98,7 +96,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 		LReqBoxInterface childBoxes[] = new LReqBoxInterface[layoutChildren.size()];
 		LAllocBoxInterface childAllocBoxes[] = new LAllocBoxInterface[layoutChildren.size()];
 		double prevWidths[] = new double[layoutChildren.size()];
-		TablePackingParams packingParams[] = new TablePackingParams[layoutChildren.size()];
+		TableLayout.TablePackingParams packingParams[] = table.getTablePackingParamsArray();
 		int childAlignmentFlags[] = new int[layoutChildren.size()];
 		for (int i = 0; i < layoutChildren.size(); i++)
 		{
@@ -107,7 +105,6 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 			childBoxes[i] = layoutNode.getRequisitionBox();
 			childAllocBoxes[i] = layoutNode.getAllocationBox();
 			prevWidths[i] = layoutNode.getAllocationX();
-			packingParams[i] = (TablePackingParams)child.getParentPacking();
 			childAlignmentFlags[i] = child.getAlignmentFlags();
 		}
 		
@@ -132,9 +129,9 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 		List<DPWidget> layoutChildren = element.getLayoutChildren();
 		
 		LReqBoxInterface childBoxes[] = new LReqBoxInterface[layoutChildren.size()];
-		LAllocBoxInterface childAllocBoxes[] = new LAllocBox[layoutChildren.size()];
+		LAllocBoxInterface childAllocBoxes[] = new LAllocBoxInterface[layoutChildren.size()];
+		TableLayout.TablePackingParams packingParams[] = table.getTablePackingParamsArray();
 		LAllocV prevAllocVs[] = new LAllocV[layoutChildren.size()];
-		TablePackingParams[] packingParams = new TablePackingParams[layoutChildren.size()];
 		int childAlignmentFlags[] = new int[layoutChildren.size()];
 		for (int i = 0; i < layoutChildren.size(); i++)
 		{
@@ -143,7 +140,6 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 			childBoxes[i] = layoutNode.getRequisitionBox();
 			childAllocBoxes[i] = layoutNode.getAllocationBox();
 			prevAllocVs[i] = layoutNode.getAllocV();
-			packingParams[i] = (TablePackingParams)child.getParentPacking();
 			childAlignmentFlags[i] = child.getAlignmentFlags();
 		}
 		
@@ -163,7 +159,8 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 	
 	private boolean doesChildCoverCell(DPWidget child, int x, int y)
 	{
-		TablePackingParams packing = (TablePackingParams)child.getParentPacking();
+		DPTable table = (DPTable)element;
+		TablePackingParams packing = table.getTablePackingParamsForChild( child );
 
 		return x <= ( packing.x + packing.colSpan )  &&  y <= ( packing.y + packing.rowSpan );
 	}

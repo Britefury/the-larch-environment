@@ -8,7 +8,6 @@ package BritefuryJ.DocPresent;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.LayoutTree.ArrangedSequenceLayoutNode;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 import BritefuryJ.Math.AABox2;
@@ -16,14 +15,14 @@ import BritefuryJ.Math.Point2;
 
 public class DPProxy extends DPContainer
 {
-	public DPProxy(ElementContext context)
+	public DPProxy()
 	{
-		this( context, ContainerStyleSheet.defaultStyleSheet );
+		this( ContainerStyleSheet.defaultStyleSheet );
 	}
 
-	public DPProxy(ElementContext context, ContainerStyleSheet styleSheet)
+	public DPProxy(ContainerStyleSheet styleSheet)
 	{
-		super( context, styleSheet );
+		super( styleSheet );
 	}
 
 	
@@ -56,7 +55,7 @@ public class DPProxy extends DPContainer
 			if ( child != null )
 			{
 				registeredChildren.add( child );
-				registerChild( child, null );				
+				registerChild( child );				
 			}
 			
 			onChildListModified();
@@ -126,12 +125,5 @@ public class DPProxy extends DPContainer
 		}
 		
 		return false;
-	}
-
-
-
-	protected PackingParams getDefaultPackingParams()
-	{
-		return null;
 	}
 }

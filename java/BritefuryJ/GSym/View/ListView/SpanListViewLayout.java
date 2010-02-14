@@ -44,7 +44,7 @@ public class SpanListViewLayout extends ListViewLayout
 	
 	public DPWidget createListElement(ElementContext ctx, List<DPWidget> children, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator)
 	{
-		DPSpan span = new DPSpan( ctx );
+		DPSpan span = new DPSpan( );
 		
 		ArrayList<DPWidget> childElems = new ArrayList<DPWidget>();
 		childElems.ensureCapacity( children.size() + 2 );
@@ -56,7 +56,7 @@ public class SpanListViewLayout extends ListViewLayout
 		
 		if ( bAddParagraphIndentMarkers )
 		{
-			DPParagraphIndentMarker indent = new DPParagraphIndentMarker( ctx );
+			DPParagraphIndentMarker indent = new DPParagraphIndentMarker( );
 			childElems.add( indent );
 		}
 		
@@ -72,7 +72,7 @@ public class SpanListViewLayout extends ListViewLayout
 				}
 				if ( bAddLineBreaks )
 				{
-					DPLineBreak lineBreak = new DPLineBreak( ctx );
+					DPLineBreak lineBreak = new DPLineBreak( );
 					if ( spacingFactory != null )
 					{
 						lineBreak.setChild( spacingFactory.createElement( ctx ) );
@@ -102,7 +102,7 @@ public class SpanListViewLayout extends ListViewLayout
 
 		if ( bAddParagraphIndentMarkers )
 		{
-			DPParagraphDedentMarker dedent = new DPParagraphDedentMarker( ctx );
+			DPParagraphDedentMarker dedent = new DPParagraphDedentMarker( );
 			childElems.add( dedent );
 		}
 		

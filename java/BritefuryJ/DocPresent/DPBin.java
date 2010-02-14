@@ -9,21 +9,20 @@ package BritefuryJ.DocPresent;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeBin;
 import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 
 
 public class DPBin extends DPContainer
 {
-	public DPBin(ElementContext context)
+	public DPBin()
 	{
-		this( context, ContainerStyleSheet.defaultStyleSheet );
+		this( ContainerStyleSheet.defaultStyleSheet );
 	}
 
-	public DPBin(ElementContext context, ContainerStyleSheet styleSheet)
+	public DPBin(ContainerStyleSheet styleSheet)
 	{
-		super( context, styleSheet );
+		super( styleSheet );
 		
 		layoutNode = new LayoutNodeBin( this );
 	}
@@ -61,7 +60,7 @@ public class DPBin extends DPContainer
 			if ( child != null )
 			{
 				registeredChildren.add( child );
-				registerChild( child, null );				
+				registerChild( child );				
 			}
 			
 			onChildListModified();
@@ -85,18 +84,6 @@ public class DPBin extends DPContainer
 
 	
 	
-	
-	//
-	// Packing parameters
-	//
-	
-	protected PackingParams getDefaultPackingParams()
-	{
-		return null;
-	}
-
-
-
 	
 	//
 	// Text representation methods

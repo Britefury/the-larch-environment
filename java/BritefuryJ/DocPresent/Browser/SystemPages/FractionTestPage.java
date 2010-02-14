@@ -41,7 +41,7 @@ public class FractionTestPage extends SystemPage
 	{
 		if ( text != null )
 		{
-			return new DPText( getContext(), styleSheet, text );
+			return new DPText( styleSheet, text );
 		}
 		else
 		{
@@ -52,7 +52,7 @@ public class FractionTestPage extends SystemPage
 	
 	protected DPWidget makeFraction(DPWidget num, DPWidget denom)
 	{
-		DPFraction frac = new DPFraction( getContext() );
+		DPFraction frac = new DPFraction( );
 		
 		frac.setNumeratorChild( num );
 		frac.setDenominatorChild( denom );
@@ -67,10 +67,10 @@ public class FractionTestPage extends SystemPage
 		
 		DPWidget frac = makeFraction( num, denom );
 		
-		DPText labelA = new DPText( getContext(), s1, "<<Left<<" );
-		DPText labelB = new DPText( getContext(), s2, ">>Right>>" );
+		DPText labelA = new DPText( s1, "<<Left<<" );
+		DPText labelB = new DPText( s2, ">>Right>>" );
 		
-		DPHBox box = new DPHBox( getContext() );
+		DPHBox box = new DPHBox( );
 		box.append( labelA );
 		box.append( frac );
 		box.append( labelB );
@@ -80,7 +80,7 @@ public class FractionTestPage extends SystemPage
 
 	protected DPWidget span(DPWidget... x)
 	{
-		DPSpan s = new DPSpan( getContext() );
+		DPSpan s = new DPSpan( );
 		s.setChildren( Arrays.asList( x ) );
 		return s;
 	}
@@ -92,7 +92,7 @@ public class FractionTestPage extends SystemPage
 		TextStyleSheet blackStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.black );
 
 		VBoxStyleSheet boxs = new VBoxStyleSheet( 10.0 );
-		DPVBox box = new DPVBox( getContext(), boxs );
+		DPVBox box = new DPVBox( boxs );
 		
 		box.append( makeFractionLine( makeText( "a", s0 ), makeText( "p", s0 ) ) );
 		box.append( makeFractionLine( makeText( "a", s0 ), makeText( "p+q", s0 ) ) );

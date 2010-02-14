@@ -13,16 +13,16 @@ import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
 
 public class DPLineBreak extends DPBin
 {
-	public DPLineBreak(ElementContext context)
+	public DPLineBreak()
 	{
-		super( context );
+		super( );
 		
 		layoutNode = new LayoutNodeLineBreak( this );
 	}
 	
-	public DPLineBreak(ElementContext context, ContainerStyleSheet styleSheet)
+	public DPLineBreak(ContainerStyleSheet styleSheet)
 	{
-		super( context, styleSheet );
+		super( styleSheet );
 		
 		layoutNode = new LayoutNodeLineBreak( this );
 	}

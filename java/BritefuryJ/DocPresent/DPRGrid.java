@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import BritefuryJ.DocPresent.Layout.PackingParams;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeGridRow;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeRGrid;
 import BritefuryJ.DocPresent.StyleSheets.TableStyleSheet;
@@ -17,14 +16,14 @@ public class DPRGrid extends DPContainerSequence
 
 	
 	
-	public DPRGrid(ElementContext context)
+	public DPRGrid()
 	{
-		this( context, TableStyleSheet.defaultStyleSheet );
+		this( TableStyleSheet.defaultStyleSheet );
 	}
 	
-	public DPRGrid(ElementContext context, TableStyleSheet syleSheet)
+	public DPRGrid(TableStyleSheet syleSheet)
 	{
-		super( context, syleSheet );
+		super( syleSheet );
 		
 		layoutNode = new LayoutNodeRGrid( this );
 	}
@@ -87,11 +86,5 @@ public class DPRGrid extends DPContainerSequence
 	protected boolean getRowExpand()
 	{
 		return ((TableStyleSheet)styleSheet).getRowExpand();
-	}
-
-
-	protected PackingParams getDefaultPackingParams()
-	{
-		return null;
 	}
 }

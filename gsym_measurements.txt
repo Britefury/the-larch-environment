@@ -1,0 +1,11 @@
+gSym measurements
+============
+
+
+2010/02/12
+========
+
+Python source code: 'View_old.py'
+presentation tree size=31925, # fragments=5953  --  5.363 pres elements per fragment
+
+

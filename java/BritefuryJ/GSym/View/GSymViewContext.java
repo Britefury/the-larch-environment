@@ -15,7 +15,6 @@ import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocPresent.DPFrame;
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.EditHandler;
-import BritefuryJ.DocPresent.ElementContext;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
@@ -29,7 +28,7 @@ import BritefuryJ.GSym.IncrementalContext.PyGSymIncrementalNodeFunction;
 import BritefuryJ.IncrementalTree.IncrementalTree;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 
-public class GSymViewContext extends GSymIncrementalTreeContext implements DocView.RefreshListener, ElementContext
+public class GSymViewContext extends GSymIncrementalTreeContext implements DocView.RefreshListener
 {
 	protected static class NodeViewContextAndResultFactory extends GSymIncrementalTreeContext.NodeContextAndResultFactory
 	{
@@ -72,7 +71,7 @@ public class GSymViewContext extends GSymIncrementalTreeContext implements DocVi
 		super( docRootNode, generalNodeViewFunction, rootNodeViewFunction );
 		this.commandHistory = commandHistory;
 		
-		frame = new DPFrame( this );
+		frame = new DPFrame( );
 		
 		indentationBorders = new HashMap<Double, Border>();
 		

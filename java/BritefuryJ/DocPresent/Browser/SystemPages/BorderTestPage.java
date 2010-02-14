@@ -43,10 +43,10 @@ public class BorderTestPage extends SystemPage
 	{
 		TextStyleSheet t12 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
 		TextStyleSheet t18 = new TextStyleSheet( new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK );
-		DPText h = new DPText( getContext(), t18, header );
-		DPText t0 = new DPText( getContext(), t12, "Hello" );
-		DPText t1 = new DPText( getContext(), t12, "World" );
-		DPText t2 = new DPText( getContext(), t12, "Foo" );
+		DPText h = new DPText( t18, header );
+		DPText t0 = new DPText( t12, "Hello" );
+		DPText t1 = new DPText( t12, "World" );
+		DPText t2 = new DPText( t12, "Foo" );
 		
 		DPText[] texts = { h, t0, t1, t2 };
 		return texts;
@@ -54,10 +54,10 @@ public class BorderTestPage extends SystemPage
 	
 	protected DPWidget makeTextOnGrey(String text)
 	{
-		DPStaticText t = new DPStaticText( getContext(), text );
+		DPStaticText t = new DPStaticText( text );
 		
 		EmptyBorder b = new EmptyBorder( new Color( 0.8f, 0.8f, 0.8f ) );
-		DPBorder border = new DPBorder( getContext(), b );
+		DPBorder border = new DPBorder( b );
 		border.setChild( t );
 		return border;
 	}
@@ -66,14 +66,14 @@ public class BorderTestPage extends SystemPage
 	protected DPWidget createContents()
 	{
 		VBoxStyleSheet mainBoxStyle = new VBoxStyleSheet( 10.0 );
-		DPVBox mainBox = new DPVBox( getContext(), mainBoxStyle );
+		DPVBox mainBox = new DPVBox( mainBoxStyle );
 		
 		SolidBorder singlePixelBorder = new SolidBorder( 1.0, 2.0, Color.black, null );
 		
-		DPBorder halignLeft = new DPBorder( getContext(), singlePixelBorder );
-		DPBorder halignCentre = new DPBorder( getContext(), singlePixelBorder );
-		DPBorder halignRight = new DPBorder( getContext(), singlePixelBorder );
-		DPBorder halignExpand = new DPBorder( getContext(), singlePixelBorder );
+		DPBorder halignLeft = new DPBorder( singlePixelBorder );
+		DPBorder halignCentre = new DPBorder( singlePixelBorder );
+		DPBorder halignRight = new DPBorder( singlePixelBorder );
+		DPBorder halignExpand = new DPBorder( singlePixelBorder );
 		
 		halignLeft.setChild( makeTextOnGrey( "hAlign=left" ).alignHLeft() );
 		halignCentre.setChild( makeTextOnGrey( "hAlign=centre" ).alignHCentre() );
@@ -84,16 +84,16 @@ public class BorderTestPage extends SystemPage
 		
 		
 		EmptyBorder spacerBorder = new EmptyBorder( 5.0, 5.0, 200.0, 200.0, new Color( 0.7f, 0.8f, 0.9f ) );
-		DPBorder spacer = new DPBorder( getContext(), spacerBorder );
-		spacer.setChild( new DPStaticText( getContext(), "SPACER" ) );
+		DPBorder spacer = new DPBorder( spacerBorder );
+		spacer.setChild( new DPStaticText( "SPACER" ) );
 		
 		
-		DPBorder valignBaselines = new DPBorder( getContext(), singlePixelBorder );
-		DPBorder valignBaselinesExpand = new DPBorder( getContext(), singlePixelBorder );
-		DPBorder valignTop = new DPBorder( getContext(), singlePixelBorder );
-		DPBorder valignCentre = new DPBorder( getContext(), singlePixelBorder );
-		DPBorder valignBottom = new DPBorder( getContext(), singlePixelBorder );
-		DPBorder valignExpand = new DPBorder( getContext(), singlePixelBorder );
+		DPBorder valignBaselines = new DPBorder( singlePixelBorder );
+		DPBorder valignBaselinesExpand = new DPBorder( singlePixelBorder );
+		DPBorder valignTop = new DPBorder( singlePixelBorder );
+		DPBorder valignCentre = new DPBorder( singlePixelBorder );
+		DPBorder valignBottom = new DPBorder( singlePixelBorder );
+		DPBorder valignExpand = new DPBorder( singlePixelBorder );
 		
 		
 		valignBaselines.setChild( makeTextOnGrey( "vAlign=ref_y" ).alignVBaselines() );
@@ -105,7 +105,7 @@ public class BorderTestPage extends SystemPage
 
 		
 		HBoxStyleSheet vAlignBoxStyle = new HBoxStyleSheet( 10.0 );
-		DPHBox vAlignBox = new DPHBox( getContext(), vAlignBoxStyle );
+		DPHBox vAlignBox = new DPHBox( vAlignBoxStyle );
 		vAlignBox.append( valignBaselines.alignVExpand() );
 		vAlignBox.append( valignBaselinesExpand.alignVExpand() );
 		vAlignBox.append( valignTop.alignVExpand() );
@@ -115,7 +115,7 @@ public class BorderTestPage extends SystemPage
 		
 		
 		HBoxStyleSheet bottomBoxStyle = new HBoxStyleSheet( 50.0 );
-		DPHBox bottomBox = new DPHBox( getContext(), bottomBoxStyle );
+		DPHBox bottomBox = new DPHBox( bottomBoxStyle );
 		bottomBox.append( spacer );
 		bottomBox.append( vAlignBox.alignVExpand() );
 		
