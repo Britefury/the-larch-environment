@@ -10,39 +10,39 @@ from java.awt import Font, Color
 from BritefuryJ.GSym.View.ListView import ListViewLayout, ParagraphListViewLayout, SpanListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
 from BritefuryJ.DocPresent import *
-from BritefuryJ.DocPresent.StyleSheets import *
+from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent.Layout import *
 from BritefuryJ.DocPresent.Border import *
 
 
-prj_linkStyle = LinkStyleSheet()
+prj_linkStyle = LinkStyleParams()
 
 
-prj_projectIndexHeaderStyle = StaticTextStyleSheet( Font( "SansSerif", Font.PLAIN, 18 ), Color.BLACK )
-prj_projectIndexBoxStyle = VBoxStyleSheet( 10.0 )
+prj_projectIndexHeaderStyle = StaticTextStyleParams( Font( "SansSerif", Font.PLAIN, 18 ), Color.BLACK )
+prj_projectIndexBoxStyle = VBoxStyleParams( 10.0 )
 
-prj_projectContentBoxStyle = VBoxStyleSheet()
+prj_projectContentBoxStyle = VBoxStyleParams()
 
 
 prj_controlsBorder = SolidBorder( 2.0, 2.0, Color( 131, 149, 172 ), None )
-prj_controlsBoxStyle = HBoxStyleSheet( 30.0 )
+prj_controlsBoxStyle = HBoxStyleParams( 30.0 )
 
 
-prj_packageNameStyle = TextStyleSheet( Font( 'Sans serif', Font.BOLD, 14 ), Color( 0, 0, 128 ) )
+prj_packageNameStyle = TextStyleParams( Font( 'Sans serif', Font.BOLD, 14 ), Color( 0, 0, 128 ) )
 
-prj_packageButtonLabelStyle = StaticTextStyleSheet()
-prj_packageAddButtonStyle = ButtonStyleSheet()
-prj_packagePageControlsBoxStyle = HBoxStyleSheet( 10.0 )
-prj_packageControlsBoxStyle = HBoxStyleSheet( 20.0 )
+prj_packageButtonLabelStyle = StaticTextStyleParams()
+prj_packageAddButtonStyle = ButtonStyleParams()
+prj_packagePageControlsBoxStyle = HBoxStyleParams( 10.0 )
+prj_packageControlsBoxStyle = HBoxStyleParams( 20.0 )
 
-prj_packageHeaderBoxStyle = HBoxStyleSheet( 20.0 )
+prj_packageHeaderBoxStyle = HBoxStyleParams( 20.0 )
 
-prj_packageContentsBoxStyle = VBoxStyleSheet.defaultStyleSheet
-prj_packageBoxStyle = VBoxStyleSheet( 5.0 )
-
-
+prj_packageContentsBoxStyle = VBoxStyleParams.defaultStyleParams
+prj_packageBoxStyle = VBoxStyleParams( 5.0 )
 
 
-prj_pageNameStyle = TextStyleSheet( Font( 'Sans serif', Font.PLAIN, 14 ), Color.BLACK )
-prj_pageEditLinkStyle = LinkStyleSheet()
-prj_pageBoxStyle = HBoxStyleSheet( 15.0 )
+
+
+prj_pageNameStyle = TextStyleParams( Font( 'Sans serif', Font.PLAIN, 14 ), Color.BLACK )
+prj_pageEditLinkStyle = LinkStyleParams()
+prj_pageBoxStyle = HBoxStyleParams( 15.0 )

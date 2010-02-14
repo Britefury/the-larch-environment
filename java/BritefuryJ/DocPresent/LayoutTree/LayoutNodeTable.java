@@ -10,6 +10,7 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPTable;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
 import BritefuryJ.DocPresent.WidgetFilter;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
@@ -18,7 +19,6 @@ import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
 import BritefuryJ.DocPresent.Layout.TableLayout;
 import BritefuryJ.DocPresent.Layout.TableLayout.TablePackingParams;
-import BritefuryJ.DocPresent.StyleSheets.TableStyleSheet;
 import BritefuryJ.Math.Point2;
 
 public class LayoutNodeTable extends ArrangedLayoutNode
@@ -341,22 +341,22 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 	
 	protected double getColumnSpacing()
 	{
-		return ((TableStyleSheet)element.getStyleSheet()).getColumnSpacing();
+		return ((TableStyleParams)element.getStyleSheet()).getColumnSpacing();
 	}
 
 	protected boolean getColumnExpand()
 	{
-		return ((TableStyleSheet)element.getStyleSheet()).getColumnExpand();
+		return ((TableStyleParams)element.getStyleSheet()).getColumnExpand();
 	}
 
 	
 	protected double getRowSpacing()
 	{
-		return ((TableStyleSheet)element.getStyleSheet()).getRowSpacing();
+		return ((TableStyleParams)element.getStyleSheet()).getRowSpacing();
 	}
 
 	protected boolean getRowExpand()
 	{
-		return ((TableStyleSheet)element.getStyleSheet()).getRowExpand();
+		return ((TableStyleParams)element.getStyleSheet()).getRowExpand();
 	}
 }

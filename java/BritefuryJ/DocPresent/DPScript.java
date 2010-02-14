@@ -11,8 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeScript;
-import BritefuryJ.DocPresent.StyleSheets.ScriptStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.ScriptStyleParams;
+import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 
 
 public class DPScript extends DPContainer
@@ -32,22 +32,21 @@ public class DPScript extends DPContainer
 	protected DPWidget[] children;
 	protected DPSegment segs[];
 	protected DPParagraph paras[];
-	TextStyleSheet segmentTextStyleSheet;
-	
-	
-	
+	TextStyleParams segmentTextStyleParams;
+
+
 	public DPScript()
 	{
-		this( ScriptStyleSheet.defaultStyleSheet, TextStyleSheet.defaultStyleSheet );
+		this( ScriptStyleParams.defaultStyleSheet, TextStyleParams.defaultStyleParams);
 	}
 	
-	public DPScript(ScriptStyleSheet styleSheet, TextStyleSheet segmentTextStyleSheet)
+	public DPScript(ScriptStyleParams styleSheet, TextStyleParams segmentTextStyleParams)
 	{
 		super( styleSheet );
 		
 		layoutNode = new LayoutNodeScript( this );
 		
-		this.segmentTextStyleSheet = segmentTextStyleSheet;
+		this.segmentTextStyleParams = segmentTextStyleParams;
 		
 		children = new DPWidget[NUMCHILDREN];
 		segs = new DPSegment[NUMCHILDREN];
@@ -76,7 +75,7 @@ public class DPScript extends DPContainer
 
 			if ( bSegmentRequired  &&  !bSegmentPresent )
 			{
-				DPSegment seg = new DPSegment( segmentTextStyleSheet, isBeginGuardRequired( slot ), isEndGuardRequired( slot ) );
+				DPSegment seg = new DPSegment(segmentTextStyleParams, isBeginGuardRequired( slot ), isEndGuardRequired( slot ) );
 				segs[slot] = seg;
 				DPParagraph para = new DPParagraph( );
 				para.setChildren( Arrays.asList( new DPWidget[] { seg } ) );
@@ -301,11 +300,11 @@ public class DPScript extends DPContainer
 	
 	protected double getColumnSpacing()
 	{
-		return ((ScriptStyleSheet)styleSheet).getColumnSpacing();
+		return ((ScriptStyleParams) styleParams).getColumnSpacing();
 	}
 
 	protected double getRowSpacing()
 	{
-		return ((ScriptStyleSheet)styleSheet).getRowSpacing();
+		return ((ScriptStyleParams) styleParams).getRowSpacing();
 	}
 }

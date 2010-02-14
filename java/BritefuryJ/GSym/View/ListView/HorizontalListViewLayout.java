@@ -9,6 +9,7 @@ package BritefuryJ.GSym.View.ListView;
 import java.util.ArrayList;
 import java.util.List;
 
+import BritefuryJ.DocPresent.StyleParams.HBoxStyleParams;
 import org.python.core.PyObject;
 
 import BritefuryJ.DocPresent.DPHBox;
@@ -16,32 +17,31 @@ import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementContext;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.PyElementFactory;
-import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
 
 public class HorizontalListViewLayout extends ListViewLayout
 {
-	private HBoxStyleSheet styleSheet;
+	private HBoxStyleParams styleParams;
 	private ElementFactory spacingFactory;
 	private TrailingSeparator trailingSeparator;
-	
-	
-	public HorizontalListViewLayout(HBoxStyleSheet styleSheet, ElementFactory spacingFactory, TrailingSeparator trailingSeparator)
+
+
+	public HorizontalListViewLayout(HBoxStyleParams styleParams, ElementFactory spacingFactory, TrailingSeparator trailingSeparator)
 	{
-		this.styleSheet = styleSheet;
+		this.styleParams = styleParams;
 		this.spacingFactory = spacingFactory;
 		this.trailingSeparator = trailingSeparator;
 	}
 	
-	public HorizontalListViewLayout(HBoxStyleSheet styleSheet, PyObject spacingFactory, TrailingSeparator trailingSeparator)
+	public HorizontalListViewLayout(HBoxStyleParams styleParams, PyObject spacingFactory, TrailingSeparator trailingSeparator)
 	{
-		this( styleSheet, PyElementFactory.pyToElementFactory( spacingFactory ), trailingSeparator );
+		this(styleParams, PyElementFactory.pyToElementFactory( spacingFactory ), trailingSeparator );
 	}
 
 		
 		
 	public DPWidget createListElement(ElementContext ctx, List<DPWidget> children, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator)
 	{
-		DPHBox hbox = new DPHBox( styleSheet );
+		DPHBox hbox = new DPHBox(styleParams);
 		
 		ArrayList<DPWidget> childElems = new ArrayList<DPWidget>();
 		childElems.ensureCapacity( children.size() + 2 );

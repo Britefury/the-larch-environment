@@ -8,7 +8,7 @@
 package BritefuryJ.DocPresent;
 
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeVBox;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
 
 
 public class DPVBox extends DPAbstractBox
@@ -21,12 +21,12 @@ public class DPVBox extends DPAbstractBox
 	
 	public DPVBox()
 	{
-		this( VBoxStyleSheet.defaultStyleSheet );
+		this( VBoxStyleParams.defaultStyleParams);
 	}
 	
-	public DPVBox(VBoxStyleSheet syleSheet)
+	public DPVBox(VBoxStyleParams styleParams)
 	{
-		super( syleSheet );
+		super(styleParams);
 		
 		layoutNode = new LayoutNodeVBox( this );
 	}

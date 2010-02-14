@@ -5,23 +5,23 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 1999-2008.
 //##************************
-package BritefuryJ.DocPresent.StyleSheets;
+package BritefuryJ.DocPresent.StyleParams;
 
 
-public class ParagraphStyleSheet extends ContainerStyleSheet
+public class ParagraphStyleParams extends ContainerStyleParams
 {
-	public static final ParagraphStyleSheet defaultStyleSheet = new ParagraphStyleSheet();
+	public static final ParagraphStyleParams defaultStyleParams = new ParagraphStyleParams();
 	
 	
 	private final double spacing, lineSpacing, indentation;
-	
-	
-	public ParagraphStyleSheet()
+
+
+	public ParagraphStyleParams()
 	{
 		this( 0.0, 0.0, 0.0 );
 	}
 	
-	public ParagraphStyleSheet(double spacing, double lineSpacing, double indentation)
+	public ParagraphStyleParams(double spacing, double lineSpacing, double indentation)
 	{
 		super();
 		
@@ -29,9 +29,8 @@ public class ParagraphStyleSheet extends ContainerStyleSheet
 		this.lineSpacing = lineSpacing;
 		this.indentation = indentation;
 	}
-	
-	
-	
+
+
 	public double getSpacing()
 	{
 		return spacing;

@@ -7,8 +7,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import BritefuryJ.DocPresent.StyleSheets.AbstractBoxStyleSheet;
-
+import BritefuryJ.DocPresent.StyleParams.AbstractBoxStyleParams;
 
 
 abstract public class DPAbstractBox extends DPContainerSequence
@@ -26,12 +25,12 @@ abstract public class DPAbstractBox extends DPContainerSequence
 	
 	public DPAbstractBox()
 	{
-		this( AbstractBoxStyleSheet.defaultStyleSheet );
+		this( AbstractBoxStyleParams.defaultStyleParams );
 	}
 
-	public DPAbstractBox(AbstractBoxStyleSheet styleSheet)
+	public DPAbstractBox(AbstractBoxStyleParams styleParams)
 	{
-		super( styleSheet );
+		super(styleParams);
 
 		refPointIndex = 0;
 	}
@@ -58,6 +57,6 @@ abstract public class DPAbstractBox extends DPContainerSequence
 	
 	public double getSpacing()
 	{
-		return ((AbstractBoxStyleSheet)styleSheet).getSpacing();
+		return ((AbstractBoxStyleParams) styleParams).getSpacing();
 	}
 }

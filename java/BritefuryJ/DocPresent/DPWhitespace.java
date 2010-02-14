@@ -14,7 +14,7 @@ import java.awt.geom.Rectangle2D;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeWhitespace;
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.StyleSheets.ContentLeafStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.ContentLeafStyleParams;
 import BritefuryJ.Math.Point2;
 
 public class DPWhitespace extends DPContentLeafEditable
@@ -24,22 +24,22 @@ public class DPWhitespace extends DPContentLeafEditable
 	
 	public DPWhitespace(String whitespace)
 	{
-		this( ContentLeafStyleSheet.defaultStyleSheet, whitespace, 0.0 );
+		this( ContentLeafStyleParams.defaultStyleParams, whitespace, 0.0 );
 	}
 	
-	public DPWhitespace(ContentLeafStyleSheet styleSheet, String whitespace)
+	public DPWhitespace(ContentLeafStyleParams styleParams, String whitespace)
 	{
-		this( styleSheet, whitespace, 0.0 );
+		this(styleParams, whitespace, 0.0 );
 	}
 	
 	public DPWhitespace(String whitespace, double width)
 	{
-		this( ContentLeafStyleSheet.defaultStyleSheet, whitespace, width );
+		this( ContentLeafStyleParams.defaultStyleParams, whitespace, width );
 	}
 
-	public DPWhitespace(ContentLeafStyleSheet styleSheet, String whitespace, double width)
+	public DPWhitespace(ContentLeafStyleParams styleParams, String whitespace, double width)
 	{
-		super( styleSheet, whitespace );
+		super(styleParams, whitespace );
 		this.width = width;
 		
 		layoutNode = new LayoutNodeWhitespace( this );

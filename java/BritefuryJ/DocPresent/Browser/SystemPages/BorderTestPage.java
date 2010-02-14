@@ -17,9 +17,9 @@ import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.HBoxStyleParams;
+import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
+import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
 
 public class BorderTestPage extends SystemPage
 {
@@ -41,8 +41,8 @@ public class BorderTestPage extends SystemPage
 
 	protected DPText[] makeTexts(String header)
 	{
-		TextStyleSheet t12 = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
-		TextStyleSheet t18 = new TextStyleSheet( new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK );
+		TextStyleParams t12 = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
+		TextStyleParams t18 = new TextStyleParams( new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK );
 		DPText h = new DPText( t18, header );
 		DPText t0 = new DPText( t12, "Hello" );
 		DPText t1 = new DPText( t12, "World" );
@@ -65,7 +65,7 @@ public class BorderTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		VBoxStyleSheet mainBoxStyle = new VBoxStyleSheet( 10.0 );
+		VBoxStyleParams mainBoxStyle = new VBoxStyleParams( 10.0 );
 		DPVBox mainBox = new DPVBox( mainBoxStyle );
 		
 		SolidBorder singlePixelBorder = new SolidBorder( 1.0, 2.0, Color.black, null );
@@ -104,7 +104,7 @@ public class BorderTestPage extends SystemPage
 		valignExpand.setChild( makeTextOnGrey( "vAlign=expand" ).alignVExpand() );
 
 		
-		HBoxStyleSheet vAlignBoxStyle = new HBoxStyleSheet( 10.0 );
+		HBoxStyleParams vAlignBoxStyle = new HBoxStyleParams( 10.0 );
 		DPHBox vAlignBox = new DPHBox( vAlignBoxStyle );
 		vAlignBox.append( valignBaselines.alignVExpand() );
 		vAlignBox.append( valignBaselinesExpand.alignVExpand() );
@@ -114,7 +114,7 @@ public class BorderTestPage extends SystemPage
 		vAlignBox.append( valignExpand.alignVExpand() );
 		
 		
-		HBoxStyleSheet bottomBoxStyle = new HBoxStyleSheet( 50.0 );
+		HBoxStyleParams bottomBoxStyle = new HBoxStyleParams( 50.0 );
 		DPHBox bottomBox = new DPHBox( bottomBoxStyle );
 		bottomBox.append( spacer );
 		bottomBox.append( vAlignBox.alignVExpand() );

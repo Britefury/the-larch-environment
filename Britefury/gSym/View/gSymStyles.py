@@ -8,10 +8,10 @@
 from java.awt import Font, Color
 
 from BritefuryJ.DocPresent import *
-from BritefuryJ.DocPresent.StyleSheets import *
+from BritefuryJ.DocPresent.StyleParams import *
 
 
 
-viewError_textStyle = TextStyleSheet( Font( 'SansSerif', Font.BOLD, 12 ),  Color( 0.8, 0.0, 0.0 ) )
+viewError_textStyle = TextStyleParams( Font( 'SansSerif', Font.BOLD, 12 ),  Color( 0.8, 0.0, 0.0 ) )
 
 

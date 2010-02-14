@@ -28,7 +28,7 @@ from BritefuryJ.DocModel import DMIOReader, DMIOWriter, DMNode
 
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.Browser import *
-from BritefuryJ.DocPresent.StyleSheets import *
+from BritefuryJ.DocPresent.StyleParams import *
 
 from BritefuryJ.DocView import DocView
 

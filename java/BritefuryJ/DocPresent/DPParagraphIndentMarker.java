@@ -7,7 +7,7 @@
 package BritefuryJ.DocPresent;
 
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeParagraphIndentMarker;
-import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.WidgetStyleParams;
 
 public class DPParagraphIndentMarker extends DPParagraphMarker
 {
@@ -18,9 +18,9 @@ public class DPParagraphIndentMarker extends DPParagraphMarker
 		layoutNode = new LayoutNodeParagraphIndentMarker( this );
 	}
 	
-	public DPParagraphIndentMarker(WidgetStyleSheet styleSheet)
+	public DPParagraphIndentMarker(WidgetStyleParams styleParams)
 	{
-		super( styleSheet );
+		super(styleParams);
 		
 		layoutNode = new LayoutNodeParagraphIndentMarker( this );
 	}

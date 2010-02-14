@@ -6,13 +6,13 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import BritefuryJ.DocPresent.StyleParams.LinkStyleParams;
 import org.python.core.Py;
 import org.python.core.PyObject;
 
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.Modifier;
-import BritefuryJ.DocPresent.StyleSheets.LinkStyleSheet;
 
 public class DPLink extends DPStaticText
 {
@@ -89,33 +89,33 @@ public class DPLink extends DPStaticText
 
 	public DPLink(String text, String targetLocation)
 	{
-		this( LinkStyleSheet.defaultStyleSheet, text, new LinkTargetListener( targetLocation ) );
+		this( LinkStyleParams.defaultStyleParams, text, new LinkTargetListener( targetLocation ) );
 	}
 	
-	public DPLink(LinkStyleSheet styleSheet, String text, String targetLocation)
+	public DPLink(LinkStyleParams styleParams, String text, String targetLocation)
 	{
-		this( styleSheet, text, new LinkTargetListener( targetLocation ) );
+		this(styleParams, text, new LinkTargetListener( targetLocation ) );
 	}
 
 	public DPLink(String text, LinkListener listener)
 	{
-		this( LinkStyleSheet.defaultStyleSheet, text, listener );
+		this( LinkStyleParams.defaultStyleParams, text, listener );
 	}
 	
-	public DPLink(LinkStyleSheet styleSheet, String text, LinkListener listener)
+	public DPLink(LinkStyleParams styleParams, String text, LinkListener listener)
 	{
-		super( styleSheet, text );
+		super(styleParams, text );
 		this.listener = listener;
 	}
 
 	public DPLink(String text, PyObject listener)
 	{
-		this( LinkStyleSheet.defaultStyleSheet, text, new PyLinkListener( listener ) );
+		this( LinkStyleParams.defaultStyleParams, text, new PyLinkListener( listener ) );
 	}
 	
-	public DPLink(LinkStyleSheet styleSheet, String text, PyObject listener)
+	public DPLink(LinkStyleParams styleParams, String text, PyObject listener)
 	{
-		this( styleSheet, text, new PyLinkListener( listener ) );
+		this(styleParams, text, new PyLinkListener( listener ) );
 	}
 
 

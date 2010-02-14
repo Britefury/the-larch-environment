@@ -12,19 +12,19 @@ import java.awt.Paint;
 import java.awt.geom.Line2D;
 
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeLine;
-import BritefuryJ.DocPresent.StyleSheets.LineStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.LineStyleSheet.Direction;
+import BritefuryJ.DocPresent.StyleParams.LineStyleParams;
+import BritefuryJ.DocPresent.StyleParams.LineStyleParams.Direction;
 
 public class DPLine extends DPStatic
 {
 	public DPLine()
 	{
-		this( LineStyleSheet.defaultStyleSheet );
+		this( LineStyleParams.defaultStyleParams);
 	}
 	
-	public DPLine(LineStyleSheet styleSheet)
+	public DPLine(LineStyleParams styleParams)
 	{
-		super( styleSheet );
+		super(styleParams);
 		
 		layoutNode = new LayoutNodeLine( this );
 	}
@@ -33,15 +33,15 @@ public class DPLine extends DPStatic
 	
 	protected void draw(Graphics2D graphics)
 	{
-		LineStyleSheet lineStyleSheet = (LineStyleSheet)styleSheet;
+		LineStyleParams lineStyleParams = (LineStyleParams) styleParams;
 		
 		Paint prevPaint = graphics.getPaint();
 		
-		Direction direction = lineStyleSheet.getDirection();
-		double inset = lineStyleSheet.getInset(), thickness = lineStyleSheet.getThickness();
-		Paint paint = lineStyleSheet.getLinePaint();
+		Direction direction = lineStyleParams.getDirection();
+		double inset = lineStyleParams.getInset(), thickness = lineStyleParams.getThickness();
+		Paint paint = lineStyleParams.getLinePaint();
 		
-		if ( direction == LineStyleSheet.Direction.HORIZONTAL )
+		if ( direction == LineStyleParams.Direction.HORIZONTAL )
 		{
 			double y = getAllocationY() * 0.5;
 			double w = getAllocationX();
@@ -53,7 +53,7 @@ public class DPLine extends DPStatic
 				graphics.draw( new Line2D.Double( inset, y, w - inset, y ) );
 			}
 		}
-		else if ( direction == LineStyleSheet.Direction.VERTICAL )
+		else if ( direction == LineStyleParams.Direction.VERTICAL )
 		{
 			double x = getAllocationX() * 0.5;
 			double h = getAllocationY();

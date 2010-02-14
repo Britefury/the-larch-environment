@@ -13,7 +13,7 @@ from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replac
 
 
 from BritefuryJ.DocPresent import *
-from BritefuryJ.DocPresent.StyleSheets import *
+from BritefuryJ.DocPresent.StyleParams import *
 
 from BritefuryJ.GSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 

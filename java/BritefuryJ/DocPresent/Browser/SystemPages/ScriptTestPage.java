@@ -17,7 +17,7 @@ import BritefuryJ.DocPresent.DPScript;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 
 public class ScriptTestPage extends SystemPage
 {
@@ -38,11 +38,11 @@ public class ScriptTestPage extends SystemPage
 	}
 
 
-	protected DPWidget makeText(String text, TextStyleSheet styleSheet)
+	protected DPWidget makeText(String text, TextStyleParams styleParams)
 	{
 		if ( text != null )
 		{
-			return new DPText( styleSheet, text );
+			return new DPText(styleParams, text );
 		}
 		else
 		{
@@ -77,8 +77,8 @@ public class ScriptTestPage extends SystemPage
 
 	protected DPWidget makeScriptLine(DPWidget main, DPWidget leftSuper, DPWidget leftSub, DPWidget rightSuper, DPWidget rightSub)
 	{
-		TextStyleSheet sPre = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.blue );
-		TextStyleSheet sPost = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.red );
+		TextStyleParams sPre = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 12 ), Color.blue );
+		TextStyleParams sPost = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 24 ), Color.red );
 		
 		DPWidget script = makeScript( main, leftSuper, leftSub, rightSuper, rightSub );
 		
@@ -97,10 +97,10 @@ public class ScriptTestPage extends SystemPage
 	
 	protected DPWidget makeScriptFraction(String mainText, String numText, String denomText)
 	{
-		TextStyleSheet sMain = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
-		TextStyleSheet sScript = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
-		TextStyleSheet sPre = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.blue );
-		TextStyleSheet sPost = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.red );
+		TextStyleParams sMain = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
+		TextStyleParams sScript = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
+		TextStyleParams sPre = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 12 ), Color.blue );
+		TextStyleParams sPost = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 24 ), Color.red );
 		DPText main = new DPText( sMain, mainText );
 		
 		DPFraction fraction = new DPFraction( );
@@ -130,9 +130,9 @@ public class ScriptTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		TextStyleSheet sMain = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
-		TextStyleSheet sScript = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
-		TextStyleSheet blackStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.black );
+		TextStyleParams sMain = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
+		TextStyleParams sScript = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
+		TextStyleParams blackStyle = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 24 ), Color.black );
 
 		DPVBox box = new DPVBox( );
 		

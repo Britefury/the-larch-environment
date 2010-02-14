@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeMathRoot;
-import BritefuryJ.DocPresent.StyleSheets.MathRootStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.MathRootStyleParams;
 
 public class DPMathRoot extends DPContainer
 {
@@ -25,12 +25,12 @@ public class DPMathRoot extends DPContainer
 	
 	public DPMathRoot()
 	{
-		this( MathRootStyleSheet.defaultStyleSheet );
+		this( MathRootStyleParams.defaultStyleParams);
 	}
 
-	public DPMathRoot(MathRootStyleSheet styleSheet)
+	public DPMathRoot(MathRootStyleParams styleParams)
 	{
-		super( styleSheet );
+		super(styleParams);
 		
 		layoutNode = new LayoutNodeMathRoot( this );
 	}
@@ -101,7 +101,7 @@ public class DPMathRoot extends DPContainer
 	protected void onRealise()
 	{
 		super.onRealise();
-		MathRootStyleSheet s = (MathRootStyleSheet)styleSheet;
+		MathRootStyleParams s = (MathRootStyleParams) styleParams;
 		s.realise( presentationArea );
 	}
 
@@ -116,7 +116,7 @@ public class DPMathRoot extends DPContainer
 			double allocationX = getAllocationX();
 			double allocationY = getAllocationY();
 
-			MathRootStyleSheet s = (MathRootStyleSheet)styleSheet;
+			MathRootStyleParams s = (MathRootStyleParams) styleParams;
 			
 			Stroke curStroke = graphics.getStroke();
 			Paint curPaint = graphics.getPaint();

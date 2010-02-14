@@ -11,7 +11,7 @@ import java.util.Arrays;
 import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
 import BritefuryJ.IncrementalTree.IncrementalTree;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 import BritefuryJ.Utils.Profile.ProfileTimer;
@@ -43,7 +43,7 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 	private boolean bProfilingEnabled;
 	private ProfileTimer pythonTimer, javaTimer, elementTimer, contentChangeTimer, updateNodeElementTimer;
 	
-	private static VBoxStyleSheet rootBoxStyle = VBoxStyleSheet.defaultStyleSheet;
+	private static VBoxStyleParams rootBoxStyle = VBoxStyleParams.defaultStyleParams;
 	
 	
 	

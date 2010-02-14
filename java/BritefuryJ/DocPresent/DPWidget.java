@@ -39,9 +39,9 @@ import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValue;
 import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueObject;
 import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueSequence;
 import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueStream;
-import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.HBoxStyleParams;
+import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
+import BritefuryJ.DocPresent.StyleParams.WidgetStyleParams;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -57,9 +57,8 @@ import BritefuryJ.Utils.HashUtils;
 abstract public class DPWidget extends PointerInputElement
 {
 	protected static double NON_TYPESET_CHILD_BASELINE_OFFSET = -5.0;
-	
-	
-	
+
+
 	//
 	//
 	// EXCEPTIONS
@@ -197,7 +196,7 @@ abstract public class DPWidget extends PointerInputElement
 	
 	protected int flags;
 	
-	protected WidgetStyleSheet styleSheet;									// Not needed for all elements; consider factoring out
+	protected WidgetStyleParams styleParams;									// Not needed for all elements; consider factoring out
 	protected DPContainer parent;
 	protected DPPresentationArea presentationArea;
 	
@@ -243,13 +242,13 @@ abstract public class DPWidget extends PointerInputElement
 	
 	public DPWidget()
 	{
-		this( WidgetStyleSheet.defaultStyleSheet );
+		this( WidgetStyleParams.defaultStyleParams );
 	}
 	
-	public DPWidget(WidgetStyleSheet styleSheet)
+	public DPWidget(WidgetStyleParams styleParams)
 	{
 		flags = 0;
-		this.styleSheet = styleSheet;
+		this.styleParams = styleParams;
 	}
 	
 	
@@ -2197,9 +2196,9 @@ abstract public class DPWidget extends PointerInputElement
 	// Meta-element
 	//
 	
-	protected static TextStyleSheet headerDebugTextStyle = new TextStyleSheet( new Font( "Sans serif", Font.BOLD, 14 ), new Color( 0.0f, 0.5f, 0.5f ) );
-	protected static TextStyleSheet headerDescriptionTextStyle = new TextStyleSheet( new Font( "Sans serif", Font.PLAIN, 14 ), new Color( 0.0f, 0.0f, 0.75f ) );
-	protected static HBoxStyleSheet metaHeaderHBoxStyle = new HBoxStyleSheet( 10.0 );
+	protected static TextStyleParams headerDebugTextStyle = new TextStyleParams( new Font( "Sans serif", Font.BOLD, 14 ), new Color( 0.0f, 0.5f, 0.5f ) );
+	protected static TextStyleParams headerDescriptionTextStyle = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 14 ), new Color( 0.0f, 0.0f, 0.75f ) );
+	protected static HBoxStyleParams metaHeaderHBoxStyle = new HBoxStyleParams( 10.0 );
 	protected static EmptyBorder metaHeaderEmptyBorder = new EmptyBorder();
 
 
@@ -2333,9 +2332,9 @@ abstract public class DPWidget extends PointerInputElement
 	
 	
 	
-	public WidgetStyleSheet getStyleSheet()
+	public WidgetStyleParams getStyleSheet()
 	{
-		return styleSheet;
+		return styleParams;
 	}
 	
 	

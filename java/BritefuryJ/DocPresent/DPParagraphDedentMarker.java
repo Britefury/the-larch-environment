@@ -7,7 +7,7 @@
 package BritefuryJ.DocPresent;
 
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeParagraphDedentMarker;
-import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.WidgetStyleParams;
 
 public class DPParagraphDedentMarker extends DPParagraphMarker
 {
@@ -18,9 +18,9 @@ public class DPParagraphDedentMarker extends DPParagraphMarker
 		layoutNode = new LayoutNodeParagraphDedentMarker( this );
 	}
 	
-	public DPParagraphDedentMarker(WidgetStyleSheet styleSheet)
+	public DPParagraphDedentMarker(WidgetStyleParams styleParams)
 	{
-		super( styleSheet );
+		super(styleParams);
 		
 		layoutNode = new LayoutNodeParagraphDedentMarker( this );
 	}

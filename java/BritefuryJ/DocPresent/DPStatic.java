@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.StyleSheets.WidgetStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.WidgetStyleParams;
 import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
 public abstract class DPStatic extends DPWidget
@@ -19,9 +19,9 @@ public abstract class DPStatic extends DPWidget
 		super( );
 	}
 	
-	public DPStatic(WidgetStyleSheet styleSheet)
+	public DPStatic(WidgetStyleParams styleParams)
 	{
-		super( styleSheet );
+		super(styleParams);
 	}
 
 	

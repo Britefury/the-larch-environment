@@ -8,9 +8,9 @@
 from java.awt import Font, Color
 
 from BritefuryJ.DocPresent.Border import *
-from BritefuryJ.DocPresent.StyleSheets import *
+from BritefuryJ.DocPresent.StyleParams import *
 
-_linkHeaderBoxStyle = HBoxStyleSheet( 25.0 )
+_linkHeaderBoxStyle = HBoxStyleParams( 25.0 )
 _linkHeaderBorder = EmptyBorder( 10.0, 10.0, 5.0, 1.0, None )
 
 

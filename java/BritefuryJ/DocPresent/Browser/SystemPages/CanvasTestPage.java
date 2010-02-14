@@ -26,13 +26,13 @@ import BritefuryJ.DocPresent.Canvas.TextNode;
 import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.SimpleDndHandler;
-import BritefuryJ.DocPresent.StyleSheets.HBoxStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.HBoxStyleParams;
+import BritefuryJ.DocPresent.StyleParams.StaticTextStyleParams;
+import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
 
 public class CanvasTestPage extends SystemPage
 {
-	private static StaticTextStyleSheet textStyle = new StaticTextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
+	private static StaticTextStyleParams textStyle = new StaticTextStyleParams( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
 	private static Border destBorder = new EmptyBorder( 10.0, 10.0, 10.0, 10.0, new Color( 1.0f, 0.9f, 0.75f ) );
 
 
@@ -224,12 +224,12 @@ public class CanvasTestPage extends SystemPage
 		DPWidget dest0 = makeDestElement( "Number" );
 		DPWidget dest1 = makeDestElement2( "Number", dest0 );
 
-		HBoxStyleSheet hboxS = new HBoxStyleSheet( 20.0 );
+		HBoxStyleParams hboxS = new HBoxStyleParams( 20.0 );
 		DPHBox hbox = new DPHBox( hboxS );
 		hbox.append( dest0 );
 		hbox.append( dest1 );
 
-		VBoxStyleSheet vboxS = new VBoxStyleSheet( 20.0 );
+		VBoxStyleParams vboxS = new VBoxStyleParams( 20.0 );
 		DPVBox vbox = new DPVBox( vboxS );
 		vbox.append( border );
 		vbox.append( hbox );

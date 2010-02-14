@@ -8,11 +8,11 @@
 from java.awt import Font, Color
 
 from BritefuryJ.DocPresent.Border import *
-from BritefuryJ.DocPresent.StyleSheets import *
+from BritefuryJ.DocPresent.StyleParams import *
 
-_headerStyle = StaticTextStyleSheet( Font( 'Sans serif', Font.PLAIN, 14 ), Color( 0.0, 0.5, 0.0 ) )
-_titleStyle = StaticTextStyleSheet( Font( 'Serif', Font.BOLD, 32 ), Color.BLACK )
-_titleVBoxStyle = VBoxStyleSheet()
+_headerStyle = StaticTextStyleParams( Font( 'Sans serif', Font.PLAIN, 14 ), Color( 0.0, 0.5, 0.0 ) )
+_titleStyle = StaticTextStyleParams( Font( 'Serif', Font.BOLD, 32 ), Color.BLACK )
+_titleVBoxStyle = VBoxStyleParams()
 _titleBackgroundBorder = EmptyBorder( 5.0, 5.0, 5.0, 5.0, Color( 240, 240, 240 ) )
 
 

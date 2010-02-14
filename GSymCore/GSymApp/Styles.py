@@ -10,25 +10,25 @@ from java.awt import Font, Color
 from BritefuryJ.GSym.View.ListView import ListViewLayout, ParagraphListViewLayout, SpanListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
 from BritefuryJ.DocPresent import *
-from BritefuryJ.DocPresent.StyleSheets import *
+from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent.Layout import *
 from BritefuryJ.DocPresent.Border import *
 
 
-app_linkStyle = LinkStyleSheet()
+app_linkStyle = LinkStyleParams()
 
-app_openDocumentsControlsBoxStyle = HBoxStyleSheet( 20.0 )
+app_openDocumentsControlsBoxStyle = HBoxStyleParams( 20.0 )
 app_openDocumentsControlsBorder = EmptyBorder( 5.0, 5.0, 5.0, 5.0, Color( 0.9, 0.9, 0.9 ) )
 
-app_openDocumentsBoxStyle = VBoxStyleSheet()
-app_openDocumentsLineStyle = LineStyleSheet( LineStyleSheet.Direction.HORIZONTAL, Color( 32, 87, 147 ), 1.0, 15.0, 3.0 )
-app_openDocumentsGridStyle = TableStyleSheet( 15.0, False, 5.0, False )
+app_openDocumentsBoxStyle = VBoxStyleParams()
+app_openDocumentsLineStyle = LineStyleParams( LineStyleParams.Direction.HORIZONTAL, Color( 32, 87, 147 ), 1.0, 15.0, 3.0 )
+app_openDocumentsGridStyle = TableStyleParams( 15.0, False, 5.0, False )
 
-app_contentBoxStyle = VBoxStyleSheet()
-
-
+app_contentBoxStyle = VBoxStyleParams()
 
 
-app_docLinkStyle = LinkStyleSheet()
+
+
+app_docLinkStyle = LinkStyleParams()
 app_docLinkBorder = EmptyBorder( 0.0, 30.0, 0.0, 0.0, None )
-app_docGridRowStyle = GridRowStyleSheet()
+app_docGridRowStyle = GridRowStyleParams()

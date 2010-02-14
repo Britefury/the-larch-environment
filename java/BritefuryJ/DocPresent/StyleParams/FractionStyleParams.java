@@ -4,29 +4,29 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.StyleSheets;
+package BritefuryJ.DocPresent.StyleParams;
 
 import java.awt.Color;
 import java.awt.Paint;
 
-public class FractionStyleSheet extends ContainerStyleSheet
+public class FractionStyleParams extends ContainerStyleParams
 {
-	public static class BarStyleSheet extends ContentLeafStyleSheet
+	public static class BarStyleParams extends ContentLeafStyleParams
 	{
-		public static final BarStyleSheet defaultStyleSheet = new BarStyleSheet( Color.black );
+		public static final BarStyleParams defaultStyleParams = new BarStyleParams( Color.black );
 		
 		
 		protected final Paint barPaint;
-		
-		
-		public BarStyleSheet(Paint barPaint)
+
+
+		public BarStyleParams(Paint barPaint)
 		{
 			super();
 			
 			this.barPaint = barPaint;
 		}
-		
-		
+
+
 		public Paint getBarPaint()
 		{
 			return barPaint;
@@ -34,26 +34,26 @@ public class FractionStyleSheet extends ContainerStyleSheet
 	}
 
 	
-	public static final FractionStyleSheet defaultStyleSheet = new FractionStyleSheet();
+	public static final FractionStyleParams defaultStyleParams = new FractionStyleParams();
 	
-	protected final BarStyleSheet barStyleSheet;
+	protected final BarStyleParams barStyleParams;
 	
 	protected final double vspacing, hpadding, yOffset;
 	
 	
 	
 	
-	public FractionStyleSheet()
+	public FractionStyleParams()
 	{
 		this( 2.0, 3.0, 5.0, Color.black );
 	}
 	
-	public FractionStyleSheet(Paint barPaint)
+	public FractionStyleParams(Paint barPaint)
 	{
 		this( 2.0, 3.0, 5.0, barPaint );
 	}
 	
-	public FractionStyleSheet(double vspacing, double hpadding, double yOffset, Paint barPaint)
+	public FractionStyleParams(double vspacing, double hpadding, double yOffset, Paint barPaint)
 	{
 		super();
 		
@@ -61,13 +61,13 @@ public class FractionStyleSheet extends ContainerStyleSheet
 		this.hpadding = hpadding;
 		this.yOffset = yOffset;
 		
-		barStyleSheet = new BarStyleSheet( barPaint );
+		barStyleParams = new BarStyleParams( barPaint );
 	}
 	
 	
-	public BarStyleSheet getBarStyleSheet()
+	public BarStyleParams getBarStyleSheet()
 	{
-		return barStyleSheet;
+		return barStyleParams;
 	}
 	
 	

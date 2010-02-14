@@ -8,7 +8,7 @@ package BritefuryJ.DocPresent.LayoutTree;
 
 import BritefuryJ.DocPresent.DPAbstractBox;
 import BritefuryJ.DocPresent.DPContainer;
-import BritefuryJ.DocPresent.StyleSheets.AbstractBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.AbstractBoxStyleParams;
 
 public abstract class LayoutNodeAbstractBox extends ArrangedSequenceLayoutNode
 {
@@ -25,6 +25,6 @@ public abstract class LayoutNodeAbstractBox extends ArrangedSequenceLayoutNode
 	
 	protected double getSpacing()
 	{
-		return ((AbstractBoxStyleSheet)element.getStyleSheet()).getSpacing();
+		return ((AbstractBoxStyleParams)element.getStyleSheet()).getSpacing();
 	}
 }

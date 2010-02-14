@@ -4,29 +4,29 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.StyleSheets;
+package BritefuryJ.DocPresent.StyleParams;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Paint;
 
-public class LinkStyleSheet extends StaticTextStyleSheet
+public class LinkStyleParams extends StaticTextStyleParams
 {
 	private static final Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
-	public static final LinkStyleSheet defaultStyleSheet = new LinkStyleSheet();
-	
-	
-	public LinkStyleSheet()
+	public static final LinkStyleParams defaultStyleParams = new LinkStyleParams();
+
+
+	public LinkStyleParams()
 	{
 		super( defaultFont, Color.blue, false );
 	}
 	
-	public LinkStyleSheet(Font font, Paint textPaint)
+	public LinkStyleParams(Font font, Paint textPaint)
 	{
 		super( font, textPaint, false );
 	}
 	
-	public LinkStyleSheet(Font font, Paint textPaint, boolean bMixedSizeCaps)
+	public LinkStyleParams(Font font, Paint textPaint, boolean bMixedSizeCaps)
 	{
 		super( font, textPaint, bMixedSizeCaps );
 	}

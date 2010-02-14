@@ -5,9 +5,32 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 1999-2008.
 //##************************
-package BritefuryJ.DocPresent.StyleSheets;
+package BritefuryJ.DocPresent.StyleParams;
 
-public class ContentLeafStyleSheet extends WidgetStyleSheet
+
+public class AbstractBoxStyleParams extends ContainerStyleParams
 {
-	public static final ContentLeafStyleSheet defaultStyleSheet = new ContentLeafStyleSheet();
+	public static final AbstractBoxStyleParams defaultStyleParams = new AbstractBoxStyleParams();
+	
+	
+	protected final double spacing;
+
+
+	public AbstractBoxStyleParams()
+	{
+		this( 0.0 );
+	}
+	
+	public AbstractBoxStyleParams(double spacing)
+	{
+		super();
+		
+		this.spacing = spacing;
+	}
+
+
+	public double getSpacing()
+	{
+		return spacing;
+	}
 }

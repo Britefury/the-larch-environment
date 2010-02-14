@@ -16,8 +16,8 @@ import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.StaticTextStyleParams;
+import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
 
 public class VBoxTestPage extends SystemPage
 {
@@ -74,11 +74,11 @@ public class VBoxTestPage extends SystemPage
 	protected DPHBox makeRefAlignedHBox(int refPointIndex, String header)
 	{
 		DPStaticText[] txt = makeTSTexts( header );
-		VBoxStyleSheet vs = new VBoxStyleSheet( 0.0 );
+		VBoxStyleParams vs = new VBoxStyleParams( 0.0 );
 		DPVBox v = new DPVBox( vs );
 		v.extend( txt );
 		v.setRefPointIndex( refPointIndex );
-		StaticTextStyleSheet t18 = new StaticTextStyleSheet( new Font( "Sans serif", Font.PLAIN, 18 ), new Color( 0.0f, 0.3f, 0.6f ) );
+		StaticTextStyleParams t18 = new StaticTextStyleParams( new Font( "Sans serif", Font.PLAIN, 18 ), new Color( 0.0f, 0.3f, 0.6f ) );
 		DPStaticText before = new DPStaticText( t18, header );
 		DPStaticText after = new DPStaticText( t18, " After" );
 		DPHBox t = new DPHBox( );
@@ -92,9 +92,9 @@ public class VBoxTestPage extends SystemPage
 
 	protected DPWidget createContents()
 	{
-		StaticTextStyleSheet t12 = new StaticTextStyleSheet( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
-		StaticTextStyleSheet t18 = new StaticTextStyleSheet( new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK );
-		StaticTextStyleSheet t24 = new StaticTextStyleSheet( new Font( "Sans serif", Font.PLAIN, 24 ), Color.BLACK );
+		StaticTextStyleParams t12 = new StaticTextStyleParams( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
+		StaticTextStyleParams t18 = new StaticTextStyleParams( new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK );
+		StaticTextStyleParams t24 = new StaticTextStyleParams( new Font( "Sans serif", Font.PLAIN, 24 ), Color.BLACK );
 
 		DPStaticText h = new DPStaticText( t18, "VBox" );
 		DPStaticText t0 = new DPStaticText( t12, "First item" );
@@ -104,7 +104,7 @@ public class VBoxTestPage extends SystemPage
 		DPVBox vboxTest = new DPVBox( );
 		vboxTest.extend( new DPWidget[] { h, t0, t1, t2 } );
 		
-		VBoxStyleSheet b1s = new VBoxStyleSheet( 10.0 );
+		VBoxStyleParams b1s = new VBoxStyleParams( 10.0 );
 		DPVBox hAlignTest = new DPVBox( b1s );
 		hAlignTest.append( new DPStaticText( t24, "Horizontal alignment" ) );
 		hAlignTest.append( makeTextOnGrey( "Left" ).alignHLeft() );
@@ -118,7 +118,7 @@ public class VBoxTestPage extends SystemPage
 		DPHBox ra2 = makeRefAlignedHBox( 2, "ALIGN_WITH_2" );
 		DPHBox ra3 = makeRefAlignedHBox( 3, "ALIGN_WITH_3" );
 		
-		VBoxStyleSheet boxs = new VBoxStyleSheet( 20.0 );
+		VBoxStyleParams boxs = new VBoxStyleParams( 20.0 );
 		DPVBox refPointAlignTest = new DPVBox( boxs );
 		refPointAlignTest.append( new DPStaticText( t24, "VBox reference point alignment" ) );
 		refPointAlignTest.append( ra0 );
@@ -127,7 +127,7 @@ public class VBoxTestPage extends SystemPage
 		refPointAlignTest.append( ra3 );
 		
 		
-		VBoxStyleSheet boxS = new VBoxStyleSheet( 20.0 );
+		VBoxStyleParams boxS = new VBoxStyleParams( 20.0 );
 		DPVBox box = new DPVBox( boxS );
 		box.append( wrapInOutline( vboxTest ) );
 		box.append( wrapInOutline( hAlignTest ) );

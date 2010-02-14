@@ -7,8 +7,8 @@
 ##-*************************
 from java.awt import Color
 
-from Britefury.gSym.View.gSymStyleSheet import GSymStyleSheet
+from Britefury.gSym.View.gSymStyleParams import GSymStyleParams
 
 
-stringStyle = GSymStyleSheet( colour=Color( 0.0, 0.5, 0.5 ), font='Sans 11' )
-punctuationStyle = GSymStyleSheet( colour=Color( 0.0, 0.0, 1.0 ), font='Sans 11' )
+stringStyle = GSymStyleParams( colour=Color( 0.0, 0.5, 0.5 ), font='Sans 11' )
+punctuationStyle = GSymStyleParams( colour=Color( 0.0, 0.0, 1.0 ), font='Sans 11' )

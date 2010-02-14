@@ -7,18 +7,18 @@
 package BritefuryJ.DocPresent;
 
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeGridRow;
-import BritefuryJ.DocPresent.StyleSheets.GridRowStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.GridRowStyleParams;
 
 public class DPGridRow extends DPContainerSequence
 {
 	public DPGridRow()
 	{
-		this( GridRowStyleSheet.defaultStyleSheet );
+		this( GridRowStyleParams.defaultStyleParams);
 	}
 	
-	public DPGridRow(GridRowStyleSheet syleSheet)
+	public DPGridRow(GridRowStyleParams styleParams)
 	{
-		super( syleSheet );
+		super(styleParams);
 		
 		layoutNode = new LayoutNodeGridRow( this );
 	}

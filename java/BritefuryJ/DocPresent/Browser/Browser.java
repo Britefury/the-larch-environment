@@ -37,9 +37,9 @@ import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.PageController;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemLocationResolver;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
-import BritefuryJ.DocPresent.StyleSheets.StaticTextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.TextStyleSheet;
-import BritefuryJ.DocPresent.StyleSheets.VBoxStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.StaticTextStyleParams;
+import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
+import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
 
 public class Browser
 {
@@ -415,15 +415,15 @@ public class Browser
 		{
 			DPVBox pageBox = new DPVBox( );
 			
-			VBoxStyleSheet contentBoxStyle = new VBoxStyleSheet( 40.0 );
+			VBoxStyleParams contentBoxStyle = new VBoxStyleParams( 40.0 );
 			DPVBox contentBox = new DPVBox( contentBoxStyle );
 			
 
 			
-			StaticTextStyleSheet titleStyle = new StaticTextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
+			StaticTextStyleParams titleStyle = new StaticTextStyleParams( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
 			DPStaticText title = new DPStaticText( titleStyle, "Default root page" );
 			
-			StaticTextStyleSheet contentsStyle = new StaticTextStyleSheet( new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK );
+			StaticTextStyleParams contentsStyle = new StaticTextStyleParams( new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK );
 			DPStaticText contents = new DPStaticText( contentsStyle, "Empty document" );
 
 			contentBox.append( title.alignHCentre() );
@@ -456,18 +456,18 @@ public class Browser
 
 		public DPWidget getContentsElement()
 		{
-			VBoxStyleSheet pageBoxStyle = new VBoxStyleSheet( 40.0 );
+			VBoxStyleParams pageBoxStyle = new VBoxStyleParams( 40.0 );
 			DPVBox pageBox = new DPVBox( pageBoxStyle );
 			
 
-			TextStyleSheet titleStyle = new TextStyleSheet( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
+			TextStyleParams titleStyle = new TextStyleParams( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
 			DPText title = new DPText( titleStyle, "Could Not Resolve Location" );
 			
-			VBoxStyleSheet errorBoxStyle = new VBoxStyleSheet( 10.0 );
+			VBoxStyleParams errorBoxStyle = new VBoxStyleParams( 10.0 );
 			DPVBox errorBox = new DPVBox( errorBoxStyle );
 			
-			TextStyleSheet locationStyle = new TextStyleSheet( new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK );
-			TextStyleSheet errorStyle = new TextStyleSheet( new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK );
+			TextStyleParams locationStyle = new TextStyleParams( new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK );
+			TextStyleParams errorStyle = new TextStyleParams( new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK );
 
 			DPText loc = new DPText( locationStyle, location );
 			DPText error = new DPText( errorStyle, "could not be resolved" );

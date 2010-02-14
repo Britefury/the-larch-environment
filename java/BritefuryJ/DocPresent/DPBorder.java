@@ -12,7 +12,7 @@ import java.awt.Graphics2D;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeBorder;
-import BritefuryJ.DocPresent.StyleSheets.ContainerStyleSheet;
+import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 
 
 public class DPBorder extends DPBin
@@ -25,22 +25,22 @@ public class DPBorder extends DPBin
 	
 	public DPBorder()
 	{
-		this( defaultBorder, ContainerStyleSheet.defaultStyleSheet );
+		this( defaultBorder, ContainerStyleParams.defaultStyleParams );
 	}
 
 	public DPBorder(Border border)
 	{
-		this( border, ContainerStyleSheet.defaultStyleSheet );
+		this( border, ContainerStyleParams.defaultStyleParams );
 	}
 
-	public DPBorder(ContainerStyleSheet styleSheet)
+	public DPBorder(ContainerStyleParams styleParams)
 	{
-		this( defaultBorder, styleSheet );
+		this( defaultBorder, styleParams);
 	}
 	
-	public DPBorder(Border border, ContainerStyleSheet styleSheet)
+	public DPBorder(Border border, ContainerStyleParams styleParams)
 	{
-		super( styleSheet );
+		super(styleParams);
 		
 		layoutNode = new LayoutNodeBorder( this );
 		this.border = border;
