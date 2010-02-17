@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.python.core.PyObject;
 
+import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPButton;
 import BritefuryJ.DocPresent.DPFraction;
 import BritefuryJ.DocPresent.DPGridRow;
@@ -27,12 +28,15 @@ import BritefuryJ.DocPresent.DPParagraphDedentMarker;
 import BritefuryJ.DocPresent.DPParagraphIndentMarker;
 import BritefuryJ.DocPresent.DPRGrid;
 import BritefuryJ.DocPresent.DPScript;
+import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.DPStaticText;
 import BritefuryJ.DocPresent.DPTable;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWhitespace;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.Border.Border;
+import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.StyleParams.ButtonStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleParams.FractionStyleParams;
@@ -48,9 +52,11 @@ import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
 
-public class BasicStyleSheet extends StyleSheet
+public class PrimitiveStyleSheet extends StyleSheet
 {
 	private static final Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
+	
+	private static final Border default_border = new EmptyBorder();
 
 	private static final Paint default_buttonBorderPaint = new RadialGradientPaint( -10.0f, -10.0f, 100.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 0.2f, 0.3f, 0.5f ), new Color( 0.3f, 0.45f, 0.75f ) }, RadialGradientPaint.CycleMethod.NO_CYCLE );
 	private static final Paint default_buttonBackgroundPaint = new RadialGradientPaint( -10.0f, -10.0f, 100.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 0.9f, 0.92f, 1.0f ), new Color( 0.75f, 0.825f, 0.9f ) }, RadialGradientPaint.CycleMethod.NO_CYCLE );
@@ -60,17 +66,19 @@ public class BasicStyleSheet extends StyleSheet
 	
 
 	
-	public static final BasicStyleSheet defaultStyleSheet = new BasicStyleSheet();
+	public static final PrimitiveStyleSheet instance = new PrimitiveStyleSheet();
 
 	
 	
-	protected BasicStyleSheet()
+	protected PrimitiveStyleSheet()
 	{
 		super();
 		
 		initAttr( "font", defaultFont );
-		initAttr( "foregroundPaint", Color.black );
+		initAttr( "foreground", Color.black );
 
+		initAttr( "border", default_border );
+		
 		initAttr( "buttonBorderPaint", default_buttonBorderPaint );
 		initAttr( "buttonBackgroundPaint", default_buttonBackgroundPaint );
 		initAttr( "buttonHighlightBackgroundPaint", default_buttonHighlightBackgroundPaint );
@@ -110,7 +118,7 @@ public class BasicStyleSheet extends StyleSheet
 		initAttr( "vboxSpacing", 0.0 );
 	}
 	
-	protected BasicStyleSheet(StyleSheet prototype)
+	protected PrimitiveStyleSheet(StyleSheet prototype)
 	{
 		super( prototype );
 	}
@@ -118,7 +126,7 @@ public class BasicStyleSheet extends StyleSheet
 	
 	public Object clone()
 	{
-		return new BasicStyleSheet( this );
+		return new PrimitiveStyleSheet( this );
 	}
 	
 
@@ -128,14 +136,25 @@ public class BasicStyleSheet extends StyleSheet
 	// GENERAL
 	//
 	
-	public BasicStyleSheet withFont(Font font)
+	public PrimitiveStyleSheet withFont(Font font)
 	{
-		return (BasicStyleSheet)withAttr( "font", font );
+		return (PrimitiveStyleSheet)withAttr( "font", font );
 	}
 
-	public BasicStyleSheet withForegroundPaint(Paint paint)
+	public PrimitiveStyleSheet withForeground(Paint paint)
 	{
-		return (BasicStyleSheet)withAttr( "foregroundPaint", paint );
+		return (PrimitiveStyleSheet)withAttr( "foreground", paint );
+	}
+
+
+	
+	//
+	// BORDER
+	//
+	
+	public PrimitiveStyleSheet withBorder(Border border)
+	{
+		return (PrimitiveStyleSheet)withAttr( "border", border );
 	}
 
 
@@ -144,19 +163,19 @@ public class BasicStyleSheet extends StyleSheet
 	// BUTTON
 	//
 	
-	public BasicStyleSheet withButtonBorderPaint(Paint paint)
+	public PrimitiveStyleSheet withButtonBorderPaint(Paint paint)
 	{
-		return (BasicStyleSheet)withAttr( "buttonBorderPaint", paint );
+		return (PrimitiveStyleSheet)withAttr( "buttonBorderPaint", paint );
 	}
 
-	public BasicStyleSheet withButtonBackgroundPaint(Paint paint)
+	public PrimitiveStyleSheet withButtonBackgroundPaint(Paint paint)
 	{
-		return (BasicStyleSheet)withAttr( "buttonBackgroundPaint", paint );
+		return (PrimitiveStyleSheet)withAttr( "buttonBackgroundPaint", paint );
 	}
 
-	public BasicStyleSheet withButtonHighlightBackgroundPaint(Paint paint)
+	public PrimitiveStyleSheet withButtonHighlightBackgroundPaint(Paint paint)
 	{
-		return (BasicStyleSheet)withAttr( "buttonHighlightBackgroundPaint", paint );
+		return (PrimitiveStyleSheet)withAttr( "buttonHighlightBackgroundPaint", paint );
 	}
 	
 	
@@ -165,19 +184,19 @@ public class BasicStyleSheet extends StyleSheet
 	// FRACTION
 	//
 	
-	public BasicStyleSheet withFractionVSpacing(double vSpacing)
+	public PrimitiveStyleSheet withFractionVSpacing(double vSpacing)
 	{
-		return (BasicStyleSheet)withAttr( "fractionVSpacing", vSpacing );
+		return (PrimitiveStyleSheet)withAttr( "fractionVSpacing", vSpacing );
 	}
 
-	public BasicStyleSheet withFractionHPadding(double hPadding)
+	public PrimitiveStyleSheet withFractionHPadding(double hPadding)
 	{
-		return (BasicStyleSheet)withAttr( "fractionHPadding", hPadding );
+		return (PrimitiveStyleSheet)withAttr( "fractionHPadding", hPadding );
 	}
 
-	public BasicStyleSheet withFractionRefYOffset(double refYOffset)
+	public PrimitiveStyleSheet withFractionRefYOffset(double refYOffset)
 	{
-		return (BasicStyleSheet)withAttr( "fractionRefYOffset", refYOffset );
+		return (PrimitiveStyleSheet)withAttr( "fractionRefYOffset", refYOffset );
 	}
 	
 	
@@ -186,9 +205,9 @@ public class BasicStyleSheet extends StyleSheet
 	// HBOX
 	//
 	
-	public BasicStyleSheet withHBoxSpacing(double spacing)
+	public PrimitiveStyleSheet withHBoxSpacing(double spacing)
 	{
-		return (BasicStyleSheet)withAttr( "hboxSpacing", spacing );
+		return (PrimitiveStyleSheet)withAttr( "hboxSpacing", spacing );
 	}
 
 	
@@ -197,24 +216,24 @@ public class BasicStyleSheet extends StyleSheet
 	// LINE
 	//
 	
-	public BasicStyleSheet withLineDirection(LineStyleParams.Direction direction)
+	public PrimitiveStyleSheet withLineDirection(LineStyleParams.Direction direction)
 	{
-		return (BasicStyleSheet)withAttr( "lineDirection", direction );
+		return (PrimitiveStyleSheet)withAttr( "lineDirection", direction );
 	}
 
-	public BasicStyleSheet withLineThickness(double thickness)
+	public PrimitiveStyleSheet withLineThickness(double thickness)
 	{
-		return (BasicStyleSheet)withAttr( "lineThickness", thickness );
+		return (PrimitiveStyleSheet)withAttr( "lineThickness", thickness );
 	}
 
-	public BasicStyleSheet withLineInset(double inset)
+	public PrimitiveStyleSheet withLineInset(double inset)
 	{
-		return (BasicStyleSheet)withAttr( "lineInset", inset );
+		return (PrimitiveStyleSheet)withAttr( "lineInset", inset );
 	}
 
-	public BasicStyleSheet withLinePadding(double padding)
+	public PrimitiveStyleSheet withLinePadding(double padding)
 	{
-		return (BasicStyleSheet)withAttr( "linePadding", padding );
+		return (PrimitiveStyleSheet)withAttr( "linePadding", padding );
 	}
 
 	
@@ -223,19 +242,19 @@ public class BasicStyleSheet extends StyleSheet
 	// LINE
 	//
 	
-	public BasicStyleSheet withLinkFont(Font font)
+	public PrimitiveStyleSheet withLinkFont(Font font)
 	{
-		return (BasicStyleSheet)withAttr( "linkFont", font );
+		return (PrimitiveStyleSheet)withAttr( "linkFont", font );
 	}
 
-	public BasicStyleSheet withLinkPaint(Paint paint)
+	public PrimitiveStyleSheet withLinkPaint(Paint paint)
 	{
-		return (BasicStyleSheet)withAttr( "linkPaint", paint );
+		return (PrimitiveStyleSheet)withAttr( "linkPaint", paint );
 	}
 
-	public BasicStyleSheet withLinkSmallCaps(boolean smallCaps)
+	public PrimitiveStyleSheet withLinkSmallCaps(boolean smallCaps)
 	{
-		return (BasicStyleSheet)withAttr( "linkSmallCaps", smallCaps );
+		return (PrimitiveStyleSheet)withAttr( "linkSmallCaps", smallCaps );
 	}
 
 
@@ -244,9 +263,9 @@ public class BasicStyleSheet extends StyleSheet
 	// MATH ROOT
 	//
 	
-	public BasicStyleSheet withMathRootThickness(double thickness)
+	public PrimitiveStyleSheet withMathRootThickness(double thickness)
 	{
-		return (BasicStyleSheet)withAttr( "mathRootThickness", thickness );
+		return (PrimitiveStyleSheet)withAttr( "mathRootThickness", thickness );
 	}
 	
 	
@@ -255,19 +274,19 @@ public class BasicStyleSheet extends StyleSheet
 	// PARAGRAPH
 	//
 	
-	public BasicStyleSheet withParagraphSpacing(double spacing)
+	public PrimitiveStyleSheet withParagraphSpacing(double spacing)
 	{
-		return (BasicStyleSheet)withAttr( "paragraphSpacing", spacing );
+		return (PrimitiveStyleSheet)withAttr( "paragraphSpacing", spacing );
 	}
 
-	public BasicStyleSheet withParagraphLineSpacing(double lineSpacing)
+	public PrimitiveStyleSheet withParagraphLineSpacing(double lineSpacing)
 	{
-		return (BasicStyleSheet)withAttr( "paragraphLineSpacing", lineSpacing );
+		return (PrimitiveStyleSheet)withAttr( "paragraphLineSpacing", lineSpacing );
 	}
 
-	public BasicStyleSheet withParagraphIndentation(double indentation)
+	public PrimitiveStyleSheet withParagraphIndentation(double indentation)
 	{
-		return (BasicStyleSheet)withAttr( "paragraphIndentation", indentation );
+		return (PrimitiveStyleSheet)withAttr( "paragraphIndentation", indentation );
 	}
 
 
@@ -276,14 +295,14 @@ public class BasicStyleSheet extends StyleSheet
 	// SCRIPT
 	//
 	
-	public BasicStyleSheet withScriptColumnSpacing(double columnSpacing)
+	public PrimitiveStyleSheet withScriptColumnSpacing(double columnSpacing)
 	{
-		return (BasicStyleSheet)withAttr( "scriptColumnSpacing", columnSpacing );
+		return (PrimitiveStyleSheet)withAttr( "scriptColumnSpacing", columnSpacing );
 	}
 
-	public BasicStyleSheet withScriptRowSpacing(double rowSpacing)
+	public PrimitiveStyleSheet withScriptRowSpacing(double rowSpacing)
 	{
-		return (BasicStyleSheet)withAttr( "scriptRowSpacing", rowSpacing );
+		return (PrimitiveStyleSheet)withAttr( "scriptRowSpacing", rowSpacing );
 	}
 
 
@@ -292,24 +311,24 @@ public class BasicStyleSheet extends StyleSheet
 	// TABLE
 	//
 	
-	public BasicStyleSheet withTableColumnSpacing(double columnSpacing)
+	public PrimitiveStyleSheet withTableColumnSpacing(double columnSpacing)
 	{
-		return (BasicStyleSheet)withAttr( "tableColumnSpacing", columnSpacing );
+		return (PrimitiveStyleSheet)withAttr( "tableColumnSpacing", columnSpacing );
 	}
 
-	public BasicStyleSheet withTableColumnExpand(boolean columnExpand)
+	public PrimitiveStyleSheet withTableColumnExpand(boolean columnExpand)
 	{
-		return (BasicStyleSheet)withAttr( "tableColumnExpand", columnExpand );
+		return (PrimitiveStyleSheet)withAttr( "tableColumnExpand", columnExpand );
 	}
 
-	public BasicStyleSheet withTableRowSpacing(double rowSpacing)
+	public PrimitiveStyleSheet withTableRowSpacing(double rowSpacing)
 	{
-		return (BasicStyleSheet)withAttr( "tableRowSpacing", rowSpacing );
+		return (PrimitiveStyleSheet)withAttr( "tableRowSpacing", rowSpacing );
 	}
 
-	public BasicStyleSheet withTableRowExpand(boolean rowExpand)
+	public PrimitiveStyleSheet withTableRowExpand(boolean rowExpand)
 	{
-		return (BasicStyleSheet)withAttr( "tableRowExpand", rowExpand );
+		return (PrimitiveStyleSheet)withAttr( "tableRowExpand", rowExpand );
 	}
 
 
@@ -318,14 +337,14 @@ public class BasicStyleSheet extends StyleSheet
 	// TEXT
 	//
 	
-	public BasicStyleSheet withTextSquiggleUnderlinePaint(Paint paint)
+	public PrimitiveStyleSheet withTextSquiggleUnderlinePaint(Paint paint)
 	{
-		return (BasicStyleSheet)withAttr( "textSquiggleUnderlinePaint", paint );
+		return (PrimitiveStyleSheet)withAttr( "textSquiggleUnderlinePaint", paint );
 	}
 
-	public BasicStyleSheet withTextSmallCaps(boolean smallCaps)
+	public PrimitiveStyleSheet withTextSmallCaps(boolean smallCaps)
 	{
-		return (BasicStyleSheet)withAttr( "textSmallCaps", smallCaps );
+		return (PrimitiveStyleSheet)withAttr( "textSmallCaps", smallCaps );
 	}
 	
 	
@@ -334,13 +353,36 @@ public class BasicStyleSheet extends StyleSheet
 	// VBOX
 	//
 	
-	public BasicStyleSheet withVBoxSpacing(double spacing)
+	public PrimitiveStyleSheet withVBoxSpacing(double spacing)
 	{
-		return (BasicStyleSheet)withAttr( "vboxSpacing", spacing );
+		return (PrimitiveStyleSheet)withAttr( "vboxSpacing", spacing );
 	}
 
 
 	
+	
+	private static class BorderParams
+	{
+		public Border border;
+		
+		public BorderParams(Border border)
+		{
+			this.border = border;
+		}
+	}
+	
+	BorderParams borderParams = null;
+
+	private BorderParams getBorderParams()
+	{
+		if ( borderParams == null )
+		{
+			borderParams = new BorderParams(
+					get( "border", Border.class, default_border ) );
+		}
+		return borderParams;
+	}
+
 	
 	private ButtonStyleParams buttonParams = null;
 
@@ -379,7 +421,7 @@ public class BasicStyleSheet extends StyleSheet
 					get( "fractionVSpacing", Double.class, 2.0 ),
 					get( "fractionHPadding", Double.class, 3.0 ),
 					get( "fractionRefYOffset", Double.class, 5.0 ),
-					get( "foregroundPaint", Paint.class, Color.black ) );
+					get( "foreground", Paint.class, Color.black ) );
 		}
 		return fractionParams;
 	}
@@ -418,7 +460,7 @@ public class BasicStyleSheet extends StyleSheet
 		{
 			lineParams = new LineStyleParams(
 					get( "lineDirection", LineStyleParams.Direction.class, LineStyleParams.Direction.HORIZONTAL ),
-					get( "foregroundPaint", Paint.class, Color.black ),
+					get( "foreground", Paint.class, Color.black ),
 					get( "lineThickness", Double.class, 1.0 ),
 					get( "lineInset", Double.class, 0.0 ),
 					get( "linePadding", Double.class, 0.0 ) );
@@ -450,7 +492,7 @@ public class BasicStyleSheet extends StyleSheet
 		{
 			mathRootParams = new MathRootStyleParams(
 					get( "font", Font.class, defaultFont ),
-					get( "foregroundPaint", Paint.class, Color.black ),
+					get( "foreground", Paint.class, Color.black ),
 					get( "mathRootThickness", Double.class, 1.5 ) );
 		}
 		return mathRootParams;
@@ -494,7 +536,7 @@ public class BasicStyleSheet extends StyleSheet
 		{
 			staticTextParams = new StaticTextStyleParams(
 					get( "font", Font.class, defaultFont ),
-					get( "foregroundPaint", Paint.class, Color.black ),
+					get( "foreground", Paint.class, Color.black ),
 					getNonNull( "textSmallCaps", Boolean.class, false ) );
 		}
 		return staticTextParams;
@@ -525,7 +567,7 @@ public class BasicStyleSheet extends StyleSheet
 		{
 			textParams = new TextStyleParams(
 					get( "font", Font.class, defaultFont ),
-					get( "foregroundPaint", Paint.class, Color.black ),
+					get( "foreground", Paint.class, Color.black ),
 					get( "textSquiggleUnderlinePaint", Paint.class, null ),
 					getNonNull( "textSmallCaps", Boolean.class, false ) );
 		}
@@ -546,6 +588,13 @@ public class BasicStyleSheet extends StyleSheet
 	}
 
 	
+	
+	public DPBorder border(DPWidget child)
+	{
+		DPBorder border = new DPBorder( getBorderParams().border );
+		border.setChild( child );
+		return border;
+	}
 	
 	public DPButton button(DPButton.ButtonListener listener, DPWidget child)
 	{
@@ -612,6 +661,13 @@ public class BasicStyleSheet extends StyleSheet
 	public DPParagraph paragraph(List<DPWidget> children)
 	{
 		DPParagraph element = new DPParagraph( getParagraphParams() );
+		element.setChildren( children );
+		return element;
+	}
+	
+	public DPSpan span(List<DPWidget> children)
+	{
+		DPSpan element = new DPSpan();
 		element.setChildren( children );
 		return element;
 	}
@@ -736,7 +792,7 @@ public class BasicStyleSheet extends StyleSheet
 	}
 	
 	
-	public DPWhitespace whitespace(String txt, float width)
+	public DPWhitespace whitespace(String txt, double width)
 	{
 		return new DPWhitespace( txt, width );
 	}

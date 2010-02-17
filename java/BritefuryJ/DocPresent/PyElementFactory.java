@@ -9,6 +9,8 @@ package BritefuryJ.DocPresent;
 import org.python.core.Py;
 import org.python.core.PyObject;
 
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+
 public class PyElementFactory implements ElementFactory
 {
 	private PyObject callable;
@@ -19,9 +21,9 @@ public class PyElementFactory implements ElementFactory
 	}
 	
 	
-	public DPWidget createElement(ElementContext ctx)
+	public DPWidget createElement(StyleSheet styleSheet)
 	{
-		return (DPWidget)Py.tojava( callable.__call__( Py.java2py( ctx ) ), DPWidget.class );
+		return (DPWidget)Py.tojava( callable.__call__( Py.java2py( styleSheet ) ), DPWidget.class );
 	}
 	
 	

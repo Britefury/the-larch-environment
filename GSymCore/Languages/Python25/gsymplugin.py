@@ -10,7 +10,8 @@ from GSymCore.Languages.Python25 import Python25
 
 
 def initPlugin(plugin, world):
-	world.registerUnitClass( plugin, Python25.unitClass )
-	world.registerNewPageFactory( plugin, Python25.newPageFactory )
-	world.registerPageImporter( plugin, Python25.pageImporter )
+	pass
+	#world.registerUnitClass( plugin, Python25.unitClass )
+	#world.registerNewPageFactory( plugin, Python25.newPageFactory )
+	#world.registerPageImporter( plugin, Python25.pageImporter )
 

@@ -8,13 +8,29 @@
 from java.awt import Font, Color
 
 from BritefuryJ.DocPresent.Border import *
-from BritefuryJ.DocPresent.StyleParams import *
-
-_linkHeaderBoxStyle = HBoxStyleParams( 25.0 )
-_linkHeaderBorder = EmptyBorder( 10.0, 10.0, 5.0, 1.0, None )
+from BritefuryJ.DocPresent.StyleSheet import *
 
 
-def linkHeaderBar(ctx, links):
-	linkBox = ctx.hbox( _linkHeaderBoxStyle, links )
-	linkBorder = ctx.border( _linkHeaderBorder, linkBox.alignHRight() )
-	return linkBorder.alignHExpand()
+
+
+class LinkHeaderStyleSheet (StyleSheet):
+	def __init__(self, prototype=None):
+		if prototype is not None:
+			super( LinkHeaderStyleSheet, self ).__init__( prototype )
+		else:
+			super( LinkHeaderStyleSheet, self ).__init__()
+		
+		primtiveStyle = PrimitiveStyleSheet.instance.withHBoxSpacing( 25.0 ).withBorder( EmptyBorder( 10.0, 10.0, 5.0, 1.0, None ) )
+		self.initAttr( 'primitiveStyle', primtiveStyle )
+		
+		
+	def withPrimitiveStyle(self, primitiveStyle):
+		return self.withAttr( 'primitiveStyle', primitiveStyle )
+		
+		
+	def linkHeaderBar(self, links):
+		primitiveStyle = self['primitiveStyle']
+		return primitiveStyle.border( primitiveStyle.hbox( links ).alignHRight() ).alignHExpand()
+	
+	
+LinkHeaderStyleSheet.instance = LinkHeaderStyleSheet()

@@ -27,12 +27,7 @@ from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent import *
 
 from BritefuryJ.GSym.View import GSymViewContext
-from BritefuryJ.GSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
-
-from GSymCore.Utils.LinkHeader import linkHeaderBar
-from GSymCore.Utils.Title import titleBarWithHeader
-from GSymCore.Utils.TabbedBox import tabbedBox
 
 from GSymCore.Project.Styles import *
 from GSymCore.Project import NodeClasses as Nodes

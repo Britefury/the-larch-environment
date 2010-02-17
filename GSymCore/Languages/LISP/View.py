@@ -14,10 +14,9 @@ from Britefury.gSym.View.GSymView import GSymViewPage
 
 
 from BritefuryJ.DocPresent import *
-from BritefuryJ.DocPresent.StyleParams import *
+from BritefuryJ.DocPresent.StyleSheet import *
 
 from BritefuryJ.GSym.View import GSymViewContext
-from BritefuryJ.GSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
 
 from GSymCore.Languages.LISP.Parser2 import LispGrammar
@@ -107,16 +106,16 @@ def viewLispNode(node, ctx, state):
 					mode = MODE_VERTICAL
 					break
 		
-		# Create the layout
+		# Get the list view style sheet
 		if mode == MODE_HORIZONTAL:
-			layout = paragraph_listViewLayout
+			listViewStyleSheet = paragraph_listViewStyle
 		elif mode == MODE_VERTICAL:
-			layout = vertical_listViewLayout
+			listViewStyleSheet = vertical_listViewStyle
 		else:
 			raise ValueError
 		
 		# Create a list view
-		v = ctx.listView( layout, lambda ctx: ctx.text( punctuation_textStyle, '[' ), lambda ctx: ctx.text( punctuation_textStyle, ']' ), None, xViews )
+		v = listViewStyleSheet.createListElement( xViews ) 
 		
 		return nodeEditor( ctx, node, v, state )
 	elif isObjectNode( node ):
@@ -134,9 +133,9 @@ def viewLispNode(node, ctx, state):
 		
 		# Header
 		if mode == MODE_HORIZONTAL:
-			className = ctx.span( [ ctx.text( className_textStyle, cls.getName() ), ctx.text( string_textStyle, ' ' ), ctx.text( punctuation_textStyle, ':' ) ] )
+			className = defaultStyle.span( [ classNameStyle.text( cls.getName() ), stringStyle.text( ' ' ), punctuationStyle.text( ':' ) ] )
 		elif mode == MODE_VERTICALINLINE:
-			className = ctx.paragraph( lisp_paragraphStyle, [ ctx.text( className_textStyle, cls.getName() ), ctx.text( string_textStyle, ' ' ), ctx.text( punctuation_textStyle, ':' ) ] )
+			className = defaultStyle.paragraph( [ classNameStyle.text( cls.getName() ), stringStyle.text( ' ' ), punctuationStyle.text( ':' ) ] )
 		else:
 			raise ValueError, 'invalid mode'
 		
@@ -147,23 +146,23 @@ def viewLispNode(node, ctx, state):
 			fieldName = cls.getField( i ).getName()
 			if value is not None:
 				if mode == MODE_HORIZONTAL:
-					line = ctx.span( [ ctx.text( fieldName_textStyle, fieldName ), ctx.text( punctuation_textStyle, '=' ), lispViewEval( value, ctx, state ) ] )
+					line = defaultStyle.span( [ fieldNameStyle.text( fieldName ), punctuationStyle.text( '=' ), lispViewEval( value, ctx, state ) ] )
 				elif mode == MODE_VERTICALINLINE:
-					line = ctx.paragraph( lisp_paragraphStyle, [ ctx.text( fieldName_textStyle, fieldName ), ctx.text( punctuation_textStyle, '=' ), lispViewEval( value, ctx, state ) ] )
+					line = defaultStyle.paragraph( [ fieldNameStyle.text( fieldName ), punctuationStyle.text( '=' ), lispViewEval( value, ctx, state ) ] )
 				else:
 					raise ValueError, 'invalid mode'
 				itemViews.append( line )
 				
 		# Create the layout
 		if mode == MODE_HORIZONTAL:
-			layout = paragraph_listViewLayout
+			listViewStyleSheet = paragraph_objectViewStyle
 		elif mode == MODE_VERTICALINLINE:
-			layout = verticalInline_listViewLayout
+			listViewStyleSheet = verticalInline_objectViewStyle
 		else:
 			raise ValueError
 		
 		# Create a list view
-		v = ctx.listView( layout, lambda ctx: ctx.text( punctuation_textStyle, '(' ), lambda ctx: ctx.text( punctuation_textStyle, ')' ), None, itemViews )
+		v = listViewStyleSheet.createListElement( itemViews )
 		return nodeEditor( ctx, node, v, state )
 	else:
 		raise TypeError, 'node is %s'  %  node
@@ -173,7 +172,7 @@ def viewLispNode(node, ctx, state):
 
 
 def viewLISPDocNodeAsElement(document, docNode, resolveContext, location, commandHistory, app):
-	viewContext = GSymViewContext( docNode, viewLispNode, commandHistory )
+	viewContext = GSymViewContext( docNode, viewLispNode, defaultStyle, commandHistory )
 	return viewContext.getFrame()
 
 

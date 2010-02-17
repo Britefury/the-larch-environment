@@ -10,6 +10,7 @@ from GSymCore.Project import Project
 
 
 def initPlugin(plugin, world):
-	world.registerUnitClass( plugin, Project.unitClass )
-	world.registerNewUnitFactory( plugin, Project.newUnitFactory )
+	pass
+	#world.registerUnitClass( plugin, Project.unitClass )
+	#world.registerNewUnitFactory( plugin, Project.newUnitFactory )
 

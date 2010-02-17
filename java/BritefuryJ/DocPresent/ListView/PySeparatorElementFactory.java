@@ -4,13 +4,13 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.GSym.View.ListView;
+package BritefuryJ.DocPresent.ListView;
 
 import org.python.core.Py;
 import org.python.core.PyObject;
 
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.ElementContext;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class PySeparatorElementFactory implements SeparatorElementFactory
 {
@@ -22,9 +22,9 @@ public class PySeparatorElementFactory implements SeparatorElementFactory
 	}
 	
 	
-	public DPWidget createElement(ElementContext ctx, int index, DPWidget child)
+	public DPWidget createElement(StyleSheet styleSheet, int index, DPWidget child)
 	{
-		return (DPWidget)Py.tojava( callable.__call__( Py.java2py( ctx ), Py.java2py( index ), Py.java2py( child ) ), DPWidget.class );
+		return (DPWidget)Py.tojava( callable.__call__( Py.java2py( styleSheet ), Py.java2py( index ), Py.java2py( child ) ), DPWidget.class );
 	}
 	
 	

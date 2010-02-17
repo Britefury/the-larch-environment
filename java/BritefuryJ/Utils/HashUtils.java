@@ -31,4 +31,17 @@ public class HashUtils
 		x = ( x ^ a ) * mult;
 		return x + 97351;
 	}
+
+        public static int nHash(int n[])
+	{
+		int mult = 1000003;
+		int x = 0x345678;
+		int i = n.length;
+		while ( --i >= 0 )
+		{
+			x = ( x ^ n[i] ) * mult;
+			mult += 82520 + i + i;
+		}
+		return x + 97351;
+	}
 }

@@ -9,7 +9,6 @@ package BritefuryJ.GSym.View;
 import java.util.ArrayList;
 import java.util.List;
 
-import BritefuryJ.DocPresent.StyleParams.*;
 import org.python.core.PyObject;
 
 import BritefuryJ.DocModel.DMNode;
@@ -37,19 +36,26 @@ import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWhitespace;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementContext;
-import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.ElementKeyboardListener;
 import BritefuryJ.DocPresent.ElementLinearRepresentationListener;
-import BritefuryJ.DocPresent.PyElementFactory;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.StyleParams.ButtonStyleParams;
+import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
+import BritefuryJ.DocPresent.StyleParams.FractionStyleParams;
+import BritefuryJ.DocPresent.StyleParams.GridRowStyleParams;
+import BritefuryJ.DocPresent.StyleParams.HBoxStyleParams;
+import BritefuryJ.DocPresent.StyleParams.LineStyleParams;
+import BritefuryJ.DocPresent.StyleParams.LinkStyleParams;
+import BritefuryJ.DocPresent.StyleParams.ParagraphStyleParams;
+import BritefuryJ.DocPresent.StyleParams.ScriptStyleParams;
+import BritefuryJ.DocPresent.StyleParams.StaticTextStyleParams;
+import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
+import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
+import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocView.DVNode;
 import BritefuryJ.GSym.IncrementalContext.GSymIncrementalNodeContext;
 import BritefuryJ.GSym.IncrementalContext.GSymIncrementalNodeFunction;
-import BritefuryJ.GSym.IncrementalContext.PyGSymIncrementalNodeFunction;
-import BritefuryJ.GSym.View.ListView.ListViewLayout;
-import BritefuryJ.GSym.View.ListView.PySeparatorElementFactory;
-import BritefuryJ.GSym.View.ListView.SeparatorElementFactory;
 import BritefuryJ.Parser.ItemStream.ItemStream;
 
 public class GSymNodeViewContext extends GSymIncrementalNodeContext implements ElementContext
@@ -85,18 +91,6 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	{
 		return border( border, ContainerStyleParams.defaultStyleParams, child );
 	}
-	
-	public DPWidget indent(double indentation, DPWidget child)
-	{
-		GSymViewContext viewContext = getViewContext();
-		viewContext.getView().profile_startElement();
-		Border border = viewContext.indentationBorder( indentation );
-		DPBorder element = new DPBorder( border );
-		element.setChild( child );
-		viewContext.getView().profile_stopElement();
-		return element;
-	}
-	
 	
 	public DPWidget text(TextStyleParams styleParams, String txt)
 	{
@@ -488,7 +482,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	}
 	
 
-	public DPWidget listView(ListViewLayout layout, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator, List<DPWidget> children)
+	/*public DPWidget listView(ListViewLayout layout, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator, List<DPWidget> children)
 	{
 		GSymViewContext viewContext = getViewContext();
 		viewContext.getView().profile_startElement();
@@ -504,7 +498,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 		DPWidget element = layout.createListElement( this, children, PyElementFactory.pyToElementFactory( beginDelim ), PyElementFactory.pyToElementFactory( endDelim ), PySeparatorElementFactory.pyToSeparatorElementFactory( separator ) );
 		viewContext.getView().profile_stopElement();
 		return element;
-	}
+	}*/
 	
 	
 	
@@ -552,73 +546,73 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	}
 	
 	
-	public DPWidget viewEval(DMNode x)
+	public DPWidget viewEval(DMNode x, StyleSheet styleSheet)
 	{
-		return viewEvalFn( x, (GSymIncrementalNodeFunction)null, null );
+		return viewEvalFn( x, styleSheet, (GSymIncrementalNodeFunction)null, null );
 	}
 
-	public DPWidget viewEval(DMNode x, Object state)
+	public DPWidget viewEval(DMNode x, StyleSheet styleSheet, Object state)
 	{
-		return viewEvalFn( x, (GSymIncrementalNodeFunction)null, state );
+		return viewEvalFn( x, styleSheet, (GSymIncrementalNodeFunction)null, state );
 	}
 
-	public DPWidget viewEvalFn(DMNode x, GSymIncrementalNodeFunction nodeViewFunction)
+	public DPWidget viewEvalFn(DMNode x, StyleSheet styleSheet, GSymIncrementalNodeFunction nodeViewFunction)
 	{
-		return viewEvalFn( x, nodeViewFunction, null );
+		return viewEvalFn( x, styleSheet, nodeViewFunction, null );
 	}
 
-	public DPWidget viewEvalFn(DMNode x, GSymIncrementalNodeFunction nodeViewFunction, Object state)
+	public DPWidget viewEvalFn(DMNode x, StyleSheet styleSheet, GSymIncrementalNodeFunction nodeViewFunction, Object state)
 	{
-		return (DPWidget)evalFn( x, nodeViewFunction, state );
+		return (DPWidget)evalFn( x, nodeViewFunction, new GSymViewContext.ViewInheritedState( styleSheet, state ) );
 	}
 	
-	public DPWidget viewEvalFn(DMNode x, PyObject nodeViewFunction)
+	public DPWidget viewEvalFn(DMNode x, StyleSheet styleSheet, PyObject nodeViewFunction)
 	{
-		return viewEvalFn( x, new PyGSymIncrementalNodeFunction( nodeViewFunction ), null );
+		return viewEvalFn( x, styleSheet, new PyGSymViewFragmentFunction( nodeViewFunction ), null );
 	}
 
-	public DPWidget viewEvalFn(DMNode x, PyObject nodeViewFunction, Object state)
+	public DPWidget viewEvalFn(DMNode x, StyleSheet styleSheet, PyObject nodeViewFunction, Object state)
 	{
-		return viewEvalFn( x, new PyGSymIncrementalNodeFunction( nodeViewFunction ), state );
+		return viewEvalFn( x, styleSheet, new PyGSymViewFragmentFunction( nodeViewFunction ), state );
 	}
 	
 	
 	
 	
-	public List<DPWidget> mapViewEval(List<DMNode> xs)
+	public List<DPWidget> mapViewEval(List<DMNode> xs, StyleSheet styleSheet)
 	{
-		return mapViewEvalFn( xs, (GSymIncrementalNodeFunction)null, null );
+		return mapViewEvalFn( xs, styleSheet, (GSymIncrementalNodeFunction)null, null );
 	}
 
-	public List<DPWidget> mapViewEval(List<DMNode> xs, Object state)
+	public List<DPWidget> mapViewEval(List<DMNode> xs, StyleSheet styleSheet, Object state)
 	{
-		return mapViewEvalFn( xs, (GSymIncrementalNodeFunction)null, state );
+		return mapViewEvalFn( xs, styleSheet, (GSymIncrementalNodeFunction)null, state );
 	}
 
-	public List<DPWidget> mapViewEvalFn(List<DMNode> xs, GSymIncrementalNodeFunction nodeViewFunction)
+	public List<DPWidget> mapViewEvalFn(List<DMNode> xs, StyleSheet styleSheet, GSymIncrementalNodeFunction nodeViewFunction)
 	{
-		return mapViewEvalFn( xs, nodeViewFunction, null );
+		return mapViewEvalFn( xs, styleSheet, nodeViewFunction, null );
 	}
 
-	public List<DPWidget> mapViewEvalFn(List<DMNode> xs, GSymIncrementalNodeFunction nodeViewFunction, Object state)
+	public List<DPWidget> mapViewEvalFn(List<DMNode> xs, StyleSheet styleSheet, GSymIncrementalNodeFunction nodeViewFunction, Object state)
 	{
 		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
 		children.ensureCapacity( xs.size() );
 		for (DMNode x: xs)
 		{
-			children.add( viewEvalFn( x, nodeViewFunction, state ) );
+			children.add( viewEvalFn( x, styleSheet, nodeViewFunction, state ) );
 		}
 		return children;
 	}
 	
-	public List<DPWidget> mapViewEvalFn(List<DMNode> xs, PyObject nodeViewFunction)
+	public List<DPWidget> mapViewEvalFn(List<DMNode> xs, StyleSheet styleSheet, PyObject nodeViewFunction)
 	{
-		return mapViewEvalFn( xs, new PyGSymIncrementalNodeFunction( nodeViewFunction ), null );
+		return mapViewEvalFn( xs, styleSheet, new PyGSymViewFragmentFunction( nodeViewFunction ), null );
 	}
 
-	public List<DPWidget> mapViewEvalFn(List<DMNode> xs, PyObject nodeViewFunction, Object state)
+	public List<DPWidget> mapViewEvalFn(List<DMNode> xs, StyleSheet styleSheet, PyObject nodeViewFunction, Object state)
 	{
-		return mapViewEvalFn( xs, new PyGSymIncrementalNodeFunction( nodeViewFunction ), state );
+		return mapViewEvalFn( xs, styleSheet, new PyGSymViewFragmentFunction( nodeViewFunction ), state );
 	}
 	
 	

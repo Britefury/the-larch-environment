@@ -7,8 +7,6 @@
 ##-*************************
 from java.awt import Font, Color
 
-from BritefuryJ.GSym.View.ListView import ListViewLayout, ParagraphListViewLayout, SpanListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
-
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent.Layout import *
