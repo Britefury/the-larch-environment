@@ -23,6 +23,7 @@ public class SystemDirectory
 		testPages.add( new FractionTestPage() );
 		testPages.add( new GridTestPage() );
 		testPages.add( new HBoxTestPage() );
+		testPages.add( new ListViewTestPage() );
 		testPages.add( new MathRootTestPage() );
 		testPages.add( new ParagraphCollationTestPage() );
 		testPages.add( new ParagraphTestPage() );

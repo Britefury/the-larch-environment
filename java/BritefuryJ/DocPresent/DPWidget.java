@@ -104,15 +104,17 @@ abstract public class DPWidget extends PointerInputElement
 	
 	private static class PaddingKey
 	{
-		private double xPad, yPad;
+		private double leftPad, rightPad, topPad, bottomPad;
 		private int hash;
 		
 		
-		public PaddingKey(double xPad, double yPad)
+		public PaddingKey(double leftPad, double rightPad, double topPad, double bottomPad)
 		{
-			this.xPad = xPad;
-			this.yPad = yPad;
-			hash = HashUtils.doubleHash( new Double( xPad ).hashCode(), new Double( yPad ).hashCode() );
+			this.leftPad = leftPad;
+			this.rightPad = rightPad;
+			this.topPad = topPad;
+			this.bottomPad = bottomPad;
+			hash = HashUtils.nHash( new int[] { new Double( leftPad ).hashCode(), new Double( rightPad ).hashCode(), new Double( topPad ).hashCode(), new Double( bottomPad ).hashCode() } );
 		}
 		
 		
@@ -134,7 +136,7 @@ abstract public class DPWidget extends PointerInputElement
 			{
 				PaddingKey k = (PaddingKey)x;
 				
-				return xPad == k.xPad  &&  yPad == k.yPad;
+				return leftPad == k.leftPad  &&  rightPad == k.rightPad  &&  topPad == k.topPad  &&  bottomPad == k.bottomPad;
 			}
 			else
 			{
@@ -394,30 +396,52 @@ abstract public class DPWidget extends PointerInputElement
 	// Padding methods
 	//
 	
+	public DPWidget pad(double leftPad, double rightPad, double topPad, double bottomPad)
+	{
+		if ( leftPad == 0.0  &&  rightPad == 0.0  &&  topPad == 0.0  &&  bottomPad == 0.0 )
+		{
+			return this;
+		}
+		else
+		{
+			PaddingKey key = new PaddingKey( leftPad, rightPad, topPad, bottomPad );
+			EmptyBorder border = paddingBorders.get( key );
+			
+			if ( border == null )
+			{
+				border = new EmptyBorder( leftPad, rightPad, topPad, bottomPad );
+				paddingBorders.put( key, border );
+			}
+			
+			DPBorder padElement = new DPBorder( border );
+			padElement.setChild( this );
+			return padElement;
+		}
+	}
+	
 	public DPWidget pad(double xPad, double yPad)
 	{
-		PaddingKey key = new PaddingKey( xPad, yPad );
-		EmptyBorder border = paddingBorders.get( key );
-		
-		if ( border == null )
-		{
-			border = new EmptyBorder( xPad, xPad, yPad, yPad );
-			paddingBorders.put( key, border );
-		}
-		
-		DPBorder padElement = new DPBorder( border );
-		padElement.setChild( this );
-		return padElement;
+		return pad( xPad, xPad, yPad, yPad );
 	}
 	
 	public DPWidget padX(double xPad)
 	{
-		return pad( xPad, 0.0 );
+		return pad( xPad, xPad, 0.0, 0.0 );
+	}
+	
+	public DPWidget padX(double leftPad, double rightPad)
+	{
+		return pad( leftPad, rightPad, 0.0, 0.0 );
 	}
 	
 	public DPWidget padY(double yPad)
 	{
-		return pad( 0.0, yPad );
+		return pad( 0.0, 0.0, yPad, yPad );
+	}
+	
+	public DPWidget padY(double topPad, double bottomPad)
+	{
+		return pad( 0.0, 0.0, topPad, bottomPad );
 	}
 	
 

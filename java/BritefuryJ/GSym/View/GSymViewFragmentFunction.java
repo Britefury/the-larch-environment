@@ -4,11 +4,15 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent;
+package BritefuryJ.GSym.View;
 
+import BritefuryJ.DocModel.DMNode;
+import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.GSym.IncrementalContext.GSymIncrementalNodeContext;
+import BritefuryJ.GSym.IncrementalContext.GSymIncrementalNodeFunction;
 
-public interface ElementFactory
+public interface GSymViewFragmentFunction extends GSymIncrementalNodeFunction
 {
-	public DPWidget createElement(StyleSheet styleSheet);
+	public DPWidget createViewFragment(DMNode x, GSymIncrementalNodeContext ctx, StyleSheet styleSheet, Object state);
 }

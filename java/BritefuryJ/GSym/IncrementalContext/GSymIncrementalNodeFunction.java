@@ -6,9 +6,6 @@
 //##************************
 package BritefuryJ.GSym.IncrementalContext;
 
-import BritefuryJ.DocModel.DMNode;
-
 public interface GSymIncrementalNodeFunction
 {
-	public Object computeNodeResult(DMNode x, GSymIncrementalNodeContext ctx, Object state);
 }

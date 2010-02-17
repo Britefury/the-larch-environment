@@ -4,12 +4,12 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.GSym.View.ListView;
+package BritefuryJ.DocPresent.ListView;
 
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.ElementContext;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public interface SeparatorElementFactory
 {
-	public DPWidget createElement(ElementContext ctx, int index, DPWidget child);
+	public DPWidget createElement(StyleSheet styleSheet, int index, DPWidget child);
 }

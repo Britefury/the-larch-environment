@@ -43,7 +43,6 @@ from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent import *
 
 from BritefuryJ.GSym.View import GSymViewContext
-from BritefuryJ.GSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
 
 

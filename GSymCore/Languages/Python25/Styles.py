@@ -7,10 +7,10 @@
 ##-*************************
 from java.awt import Font, Color
 
-from BritefuryJ.GSym.View.ListView import ListViewLayout, ParagraphListViewLayout, SpanListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
-
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.StyleParams import *
+from BritefuryJ.DocPresent.StyleSheet import *
+from BritefuryJ.DocPresent.ListView import *
 from BritefuryJ.DocPresent.Layout import *
 from BritefuryJ.DocPresent.Border import *
 
@@ -41,12 +41,12 @@ python_paragraphStyle = ParagraphStyleParams( 0.0, 0.0, 30.0 )
 
 compoundStmt_vboxStyle = VBoxStyleParams( 0.0 )
 
-tuple_listViewLayout = SpanListViewLayout( lambda ctx: ctx.text( default_textStyle, ' ' ), True, True, ListViewLayout.TrailingSeparator.NEVER )
-tuple_listViewLayoutSep = SpanListViewLayout( lambda ctx: ctx.text( default_textStyle, ' ' ), True, True, ListViewLayout.TrailingSeparator.ALWAYS )
-list_listViewLayout = SpanListViewLayout( lambda ctx: ctx.text( default_textStyle, ' ' ), True, True, ListViewLayout.TrailingSeparator.NEVER )
-list_listViewLayoutSep = SpanListViewLayout( lambda ctx: ctx.text( default_textStyle, ' ' ), True, True, ListViewLayout.TrailingSeparator.ALWAYS )
-dict_listViewLayout = SpanListViewLayout( lambda ctx: ctx.text( default_textStyle, ' ' ), True, True, ListViewLayout.TrailingSeparator.NEVER )
-dict_listViewLayoutSep = SpanListViewLayout( lambda ctx: ctx.text( default_textStyle, ' ' ), True, True, ListViewLayout.TrailingSeparator.NEVER )
+#tuple_listViewLayout = SpanListViewLayout( lambda ctx: ctx.text( default_textStyle, ' ' ), True, True, ListViewLayout.TrailingSeparator.NEVER )
+#tuple_listViewLayoutSep = SpanListViewLayout( lambda ctx: ctx.text( default_textStyle, ' ' ), True, True, ListViewLayout.TrailingSeparator.ALWAYS )
+#list_listViewLayout = SpanListViewLayout( lambda ctx: ctx.text( default_textStyle, ' ' ), True, True, ListViewLayout.TrailingSeparator.NEVER )
+#list_listViewLayoutSep = SpanListViewLayout( lambda ctx: ctx.text( default_textStyle, ' ' ), True, True, ListViewLayout.TrailingSeparator.ALWAYS )
+#dict_listViewLayout = SpanListViewLayout( lambda ctx: ctx.text( default_textStyle, ' ' ), True, True, ListViewLayout.TrailingSeparator.NEVER )
+#dict_listViewLayoutSep = SpanListViewLayout( lambda ctx: ctx.text( default_textStyle, ' ' ), True, True, ListViewLayout.TrailingSeparator.NEVER )
 
 suite_vboxStyle = VBoxStyleParams( 0.0 )
 

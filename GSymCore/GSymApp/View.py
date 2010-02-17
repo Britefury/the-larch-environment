@@ -24,16 +24,10 @@ from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replac
 from Britefury.Util.NodeUtil import *
 
 
-from BritefuryJ.DocPresent.StyleParams import *
-from BritefuryJ.DocPresent import *
+from BritefuryJ.DocPresent.StyleSheet import *
 
 from BritefuryJ.GSym.View import GSymViewContext
-from BritefuryJ.GSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
-
-from GSymCore.Utils.LinkHeader import linkHeaderBar
-from GSymCore.Utils.Title import titleBar
-from GSymCore.Utils.TabbedBox import tabbedBox
 
 from GSymCore.GSymApp.Styles import *
 from GSymCore.GSymApp import NodeClasses as Nodes
@@ -56,11 +50,12 @@ _nameTextRepListener = NameTextRepListener()
 
 
 
-def nameEditor(ctx, node, state, style):
+def nameEditor(styleSheet, node, state, style):
 	name = node['name']
 	
-	text = ctx.text( style, name )
-	return ctx.linearRepresentationListener( text, _nameTextRepListener )
+	text = styleSheet.text( style, name )
+	text.setLinearRepresentationListener( _nameTextRepListener )
+	return text
 
 
 
@@ -132,7 +127,7 @@ class AppView (GSymViewObjectNodeDispatch):
 		
 		
 	@ObjectNodeDispatchMethod( Nodes.AppState )
-	def AppState(self, ctx, state, node, openDocuments, configuration):
+	def AppState(self, ctx, styleSheet, state, node, openDocuments, configuration):
 		def _onNew(link, buttonEvent):
 			def handleNewDocumentFn(unit):
 				world = self._app.getWorld()
@@ -172,32 +167,38 @@ class AppView (GSymViewObjectNodeDispatch):
 			return True
 
 			
-			
-		systemLink = ctx.link( app_linkStyle, 'SYSTEM PAGE', 'system' )
-		linkHeader = linkHeaderBar( ctx, [ systemLink ] )
 		
-		title = titleBar( ctx, 'gSym' )
+		linkStyle = app_linkStyle( styleSheet )
+		controlsStyle = app_openDocumentsControlsStyle( styleSheet )
+		openDocStyle = app_openDocumentsStyle( styleSheet )
+		contentsStyle = app_contentBoxStyle( styleSheet )
 		
-		newLink = ctx.link( app_linkStyle, 'NEW', _onNew )
-		openLink = ctx.link( app_linkStyle, 'OPEN', _onOpen )
-		controlsBox = ctx.hbox( app_openDocumentsControlsBoxStyle, [ newLink.padX( 5.0 ), openLink.padX( 5.0 ) ] )
-		controlsBorder = ctx.border( app_openDocumentsControlsBorder, controlsBox )
+		systemLink = linkStyle.link( 'SYSTEM PAGE', 'system' )
+		linkHeader = app_linkHeaderStyle.linkHeaderBar( [ systemLink ] )
 		
-		openDocumentsSeparatingLine = ctx.line( app_openDocumentsLineStyle )
+		title = app_titleStyle.titleBar( 'gSym' )
 		
-		docListBox = ctx.rgrid( app_openDocumentsGridStyle, ctx.mapViewEval( openDocuments, _AppViewState( '' ) ) )
+		newLink = linkStyle.link( 'NEW', _onNew )
+		openLink = linkStyle.link( 'OPEN', _onOpen )
+		controlsBox = controlsStyle.hbox( [ newLink.padX( 5.0 ), openLink.padX( 5.0 ) ] )
+		controlsBorder = controlsStyle.border( controlsBox )
+		
+		openDocumentsSeparatingLine = openDocStyle.line()
+		
+		docListBox = openDocStyle.rgrid( ctx.mapViewEval( openDocuments, styleSheet, _AppViewState( '' ) ) )
 
-		openDocumentsContentsBox = ctx.vbox( app_openDocumentsBoxStyle, [ controlsBorder.pad( 2.0, 2.0 ), openDocumentsSeparatingLine.alignHExpand(), docListBox.pad( 10.0, 2.0 ) ] )
-		openDocumentsBox = tabbedBox( ctx, 'Documents', openDocumentsContentsBox )
+		openDocumentsContentsBox = openDocStyle.vbox( [ controlsBorder.pad( 2.0, 2.0 ), openDocumentsSeparatingLine.alignHExpand(), docListBox.pad( 10.0, 2.0 ) ] )
 		
-		contentBox = ctx.vbox( app_contentBoxStyle, [ linkHeader, title, openDocumentsBox.pad( 10.0, 10.0 ).alignHLeft() ] )
+		openDocumentsBox = app_tabbedBoxStyle.tabbedBox( 'Documents', openDocumentsContentsBox )
+		
+		contentBox = contentsStyle.vbox( [ linkHeader, title, openDocumentsBox.pad( 10.0, 10.0 ).alignHLeft() ] )
 		
 		return contentBox.alignHExpand()
 
 
 
 	@ObjectNodeDispatchMethod( Nodes.AppDocument )
-	def AppDocument(self, ctx, state, node, name, location):
+	def AppDocument(self, ctx, styleSheet, state, node, name, location):
 		def _onSave(link, buttonEvent):
 			world = self._app.getWorld()
 			document = world.getDocument( location )
@@ -228,11 +229,14 @@ class AppView (GSymViewObjectNodeDispatch):
 			
 		loc, = state
 		
-		docLink = ctx.border( app_docLinkBorder, ctx.link( app_docLinkStyle, name, location ) )
-		saveLink = ctx.link( app_docLinkStyle, 'SAVE', _onSave )
-		saveAsLink = ctx.link( app_docLinkStyle, 'SAVE AS', _onSaveAs )
+		docStyle = app_docStyle( styleSheet )
+		
+		
+		docLink = docStyle.border( docStyle.link( name, location ) )
+		saveLink = docStyle.link( 'SAVE', _onSave )
+		saveAsLink = docStyle.link( 'SAVE AS', _onSaveAs )
 
-		return ctx.gridRow( app_docGridRowStyle, [ docLink, saveLink, saveAsLink ] )
+		return docStyle.gridRow( [ docLink, saveLink, saveAsLink ] )
 
 
 
@@ -241,7 +245,7 @@ class AppView (GSymViewObjectNodeDispatch):
 
 
 def viewGSymAppDocNodeAsElement(document, docRootNode, resolveContext, location, commandHistory, app):
-	viewContext = GSymViewContext( docRootNode, AppView( document, app ), commandHistory )
+	viewContext = GSymViewContext( docRootNode, AppView( document, app ), PrimitiveStyleSheet.instance, commandHistory )
 	return viewContext.getFrame()
 
 

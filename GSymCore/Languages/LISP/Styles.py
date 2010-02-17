@@ -7,29 +7,43 @@
 ##-*************************
 from java.awt import Font, Color
 
-from BritefuryJ.GSym.View.ListView import ListViewLayout, SpanListViewLayout, ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
-
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.StyleParams import *
+from BritefuryJ.DocPresent.StyleSheet import *
+from BritefuryJ.DocPresent.ListView import *
 from BritefuryJ.DocPresent.Layout import *
 
 
 
-default_textStyle = TextStyleParams( Font( 'SansSerif', Font.PLAIN, 14 ),  Color.black )
+defaultStyle = PrimitiveStyleSheet.instance.withFont( Font( 'SansSerif', Font.PLAIN, 14 ) ).withForeground( Color.black ).withParagraphIndentation( 60.0 )
 
-string_textStyle = TextStyleParams( Font( 'SansSerif', Font.PLAIN, 14 ),  Color( 0.0, 0.5, 0.5 ) )
-punctuation_textStyle = TextStyleParams( Font( 'SansSerif', Font.PLAIN, 14 ),  Color( 0.0, 0.0, 1.0 ) )
-className_textStyle = TextStyleParams( Font( 'SansSerif', Font.PLAIN, 14 ),  Color( 0.0, 0.5, 0.0 ) )
-fieldName_textStyle = TextStyleParams( Font( 'SansSerif', Font.PLAIN, 14 ),  Color( 0.5, 0.0, 0.5 ) )
+stringStyle = defaultStyle.withFont( Font( 'SansSerif', Font.PLAIN, 14 ) ).withForeground( Color( 0.0, 0.5, 0.5 ) )
+
+punctuationStyle = defaultStyle.withForeground( Color( 0.0, 0.0, 1.0 ) )
+
+classNameStyle = defaultStyle.withFont( Font( 'SansSerif', Font.PLAIN, 14 ) ).withForeground( Color( 0.0, 0.5, 0.0 ) )
+
+fieldNameStyle = defaultStyle.withFont( Font( 'SansSerif', Font.PLAIN, 14 ) ).withForeground( Color( 0.5, 0.0, 0.5 ) )
 
 
-lisp_paragraphStyle = ParagraphStyleParams( 0.0, 0.0, 60.0 )
 
 
-paragraph_listViewLayout = ParagraphListViewLayout( ParagraphStyleParams(), lambda ctx: ctx.text( default_textStyle, ' ' ), True, ListViewLayout.TrailingSeparator.NEVER )
+paragraph_listViewLayout = ParagraphListViewLayoutStyleSheet.instance.withAddParagraphIndentMarkers( True )
+verticalInline_listViewLayout = VerticalInlineListViewLayoutStyleSheet.instance.withIndentation( 30.0 )
+vertical_listViewLayout = VerticalListViewLayoutStyleSheet.instance.withIndentation( 30.0 )
 
-verticalInline_listViewLayout = VerticalInlineListViewLayout( VBoxStyleParams( 0.0 ), \
-						ParagraphStyleParams(), 30.0, ListViewLayout.TrailingSeparator.NEVER )
+_listviewStyle = ListViewStyleSheet.instance.withSeparatorFactory( lambda styleSheet: styleSheet.text( ' ' ) ).withBeginDelimFactory( lambda styleSheet: punctuationStyle.text( '[' ) )
+_listviewStyle = _listviewStyle.withEndDelimFactory( lambda styleSheet: punctuationStyle.text( ']' ) )
 
-vertical_listViewLayout = VerticalListViewLayout( VBoxStyleParams( 0.0 ), \
-						ParagraphStyleParams(), 30.0, ListViewLayout.TrailingSeparator.NEVER )
+_objectviewStyle = ListViewStyleSheet.instance.withSeparatorFactory( lambda styleSheet: styleSheet.text( ' ' ) ).withBeginDelimFactory( lambda styleSheet: punctuationStyle.text( '(' ) )
+_objectviewStyle = _listviewStyle.withEndDelimFactory( lambda styleSheet: punctuationStyle.text( ')' ) )
+
+paragraph_listViewStyle = _listviewStyle.withListLayout( paragraph_listViewLayout )
+paragraph_objectViewStyle = _objectviewStyle.withListLayout( paragraph_listViewLayout )
+
+verticalInline_listViewStyle = _listviewStyle.withListLayout( verticalInline_listViewLayout )
+verticalInline_objectViewStyle = _objectviewStyle.withListLayout( verticalInline_listViewLayout )
+
+vertical_listViewStyle = _listviewStyle.withListLayout( vertical_listViewLayout )
+vertical_objectViewStyle = _objectviewStyle.withListLayout( vertical_listViewLayout )
+

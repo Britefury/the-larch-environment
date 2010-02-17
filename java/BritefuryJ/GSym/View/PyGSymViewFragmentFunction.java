@@ -4,19 +4,22 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.GSym.IncrementalContext;
+package BritefuryJ.GSym.View;
 
 import org.python.core.Py;
 import org.python.core.PyObject;
 
 import BritefuryJ.DocModel.DMNode;
+import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.GSym.IncrementalContext.GSymIncrementalNodeContext;
 
-public class PyGSymIncrementalNodeFunction implements GSymIncrementalNodeFunction
+public class PyGSymViewFragmentFunction implements GSymViewFragmentFunction
 {
 	private PyObject callable;
 	
 	
-	public PyGSymIncrementalNodeFunction(PyObject callable)
+	public PyGSymViewFragmentFunction(PyObject callable)
 	{
 		this.callable = callable;
 	}
@@ -28,8 +31,8 @@ public class PyGSymIncrementalNodeFunction implements GSymIncrementalNodeFunctio
 	}
 
 
-	public Object computeNodeResult(DMNode x, GSymIncrementalNodeContext ctx, Object state)
+	public DPWidget createViewFragment(DMNode x, GSymIncrementalNodeContext ctx, StyleSheet styleSheet, Object state)
 	{
-		return Py.tojava( callable.__call__( Py.java2py( x ), Py.java2py( ctx ), Py.java2py( state ) ), Object.class );
+		return Py.tojava( callable.__call__( Py.java2py( x ), Py.java2py( ctx ), Py.java2py( styleSheet ), Py.java2py( state ) ), DPWidget.class );
 	}
 }

@@ -20,10 +20,10 @@ import time
 		
 		
 class GSymViewListNodeDispatch (object):
-	def __call__(self, xs, ctx, state):
+	def __call__(self, xs, ctx, styleSheet, state):
 		element = None
 		try:
-			element, name = methodDispatchAndGetName( self, xs, ctx, state )
+			element, name = methodDispatchAndGetName( self, xs, ctx, styleSheet, state )
 			element.setDebugName( name )
 		except DispatchError:
 			element = ctx.text( viewError_textStyle, '<<ERROR>>' )
@@ -37,12 +37,12 @@ class GSymViewListNodeDispatch (object):
 		
 class GSymViewObjectNodeDispatch (object):
 	__metaclass__ = ObjectNodeMethodDispatchMetaClass
-	__dispatch_num_args__ = 2
+	__dispatch_num_args__ = 3
 	
-	def __call__(self, xs, ctx, state):
+	def __call__(self, xs, ctx, styleSheet, state):
 		element = None
 		try:
-			element, name = objectNodeMethodDispatchAndGetName( self, xs, ctx, state )
+			element, name = objectNodeMethodDispatchAndGetName( self, xs, ctx, styleSheet, state )
 			element.setDebugName( name )
 		except DispatchError:
 			element = ctx.text( viewError_textStyle, '<<ERROR>>' )

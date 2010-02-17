@@ -9,8 +9,6 @@ package BritefuryJ.GSym.IncrementalContext;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.python.core.PyObject;
-
 import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.Incremental.IncrementalFunction;
 import BritefuryJ.Incremental.IncrementalValue;
@@ -41,22 +39,12 @@ public class GSymIncrementalNodeContext implements IncrementalTreeNode.NodeConte
 
 
 
-	public Object eval(DMNode x)
-	{
-		return evalFn( x, (GSymIncrementalNodeFunction)null, null );
-	}
-
-	public Object eval(DMNode x, Object state)
+	public Object eval(DMNode x, GSymIncrementalTreeContext.InheritedState state)
 	{
 		return evalFn( x, (GSymIncrementalNodeFunction)null, state );
 	}
 
-	public Object evalFn(DMNode x, GSymIncrementalNodeFunction nodeViewFunction)
-	{
-		return evalFn( x, nodeViewFunction, null );
-	}
-
-	public Object evalFn(DMNode x, GSymIncrementalNodeFunction nodeViewFunction, Object state)
+	public Object evalFn(DMNode x, GSymIncrementalNodeFunction nodeViewFunction, GSymIncrementalTreeContext.InheritedState state)
 	{
 		if ( x == null )
 		{
@@ -82,35 +70,15 @@ public class GSymIncrementalNodeContext implements IncrementalTreeNode.NodeConte
 		return incrementalNode.getResultNoRefresh();
 	}
 	
-	public Object evalFn(DMNode x, PyObject nodeViewFunction)
-	{
-		return evalFn( x, new PyGSymIncrementalNodeFunction( nodeViewFunction ), null );
-	}
-
-	public Object evalFn(DMNode x, PyObject nodeViewFunction, Object state)
-	{
-		return evalFn( x, new PyGSymIncrementalNodeFunction( nodeViewFunction ), state );
-	}
 	
 	
 	
-	
-	public List<Object> mapEval(List<DMNode> xs)
-	{
-		return mapEvalFn( xs, (GSymIncrementalNodeFunction)null, null );
-	}
-
-	public List<Object> mapEval(List<DMNode> xs, Object state)
+	public List<Object> mapEval(List<DMNode> xs, GSymIncrementalTreeContext.InheritedState state)
 	{
 		return mapEvalFn( xs, (GSymIncrementalNodeFunction)null, state );
 	}
 
-	public List<Object> mapEvalFn(List<DMNode> xs, GSymIncrementalNodeFunction nodeViewFunction)
-	{
-		return mapEvalFn( xs, nodeViewFunction, null );
-	}
-
-	public List<Object> mapEvalFn(List<DMNode> xs, GSymIncrementalNodeFunction nodeViewFunction, Object state)
+	public List<Object> mapEvalFn(List<DMNode> xs, GSymIncrementalNodeFunction nodeViewFunction, GSymIncrementalTreeContext.InheritedState state)
 	{
 		ArrayList<Object> children = new ArrayList<Object>();
 		children.ensureCapacity( xs.size() );
@@ -119,16 +87,6 @@ public class GSymIncrementalNodeContext implements IncrementalTreeNode.NodeConte
 			children.add( evalFn( x, nodeViewFunction, state ) );
 		}
 		return children;
-	}
-	
-	public List<Object> mapEvalFn(List<DMNode> xs, PyObject nodeViewFunction)
-	{
-		return mapEvalFn( xs, new PyGSymIncrementalNodeFunction( nodeViewFunction ), null );
-	}
-
-	public List<Object> mapEvalFn(List<DMNode> xs, PyObject nodeViewFunction, Object state)
-	{
-		return mapEvalFn( xs, new PyGSymIncrementalNodeFunction( nodeViewFunction ), state );
 	}
 	
 	

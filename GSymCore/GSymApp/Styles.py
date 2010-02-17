@@ -7,28 +7,36 @@
 ##-*************************
 from java.awt import Font, Color
 
-from BritefuryJ.GSym.View.ListView import ListViewLayout, ParagraphListViewLayout, SpanListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
-
 from BritefuryJ.DocPresent import *
+from BritefuryJ.DocPresent.StyleSheet import *
 from BritefuryJ.DocPresent.StyleParams import *
-from BritefuryJ.DocPresent.Layout import *
 from BritefuryJ.DocPresent.Border import *
 
-
-app_linkStyle = LinkStyleParams()
-
-app_openDocumentsControlsBoxStyle = HBoxStyleParams( 20.0 )
-app_openDocumentsControlsBorder = EmptyBorder( 5.0, 5.0, 5.0, 5.0, Color( 0.9, 0.9, 0.9 ) )
-
-app_openDocumentsBoxStyle = VBoxStyleParams()
-app_openDocumentsLineStyle = LineStyleParams( LineStyleParams.Direction.HORIZONTAL, Color( 32, 87, 147 ), 1.0, 15.0, 3.0 )
-app_openDocumentsGridStyle = TableStyleParams( 15.0, False, 5.0, False )
-
-app_contentBoxStyle = VBoxStyleParams()
+from GSymCore.Utils.LinkHeader import LinkHeaderStyleSheet
+from GSymCore.Utils.Title import TitleBarStyleSheet
+from GSymCore.Utils.TabbedBox import TabbedBoxStyleSheet
 
 
 
 
-app_docLinkStyle = LinkStyleParams()
-app_docLinkBorder = EmptyBorder( 0.0, 30.0, 0.0, 0.0, None )
-app_docGridRowStyle = GridRowStyleParams()
+def app_linkStyle(styleSheet):
+	return styleSheet
+
+def app_openDocumentsControlsStyle(styleSheet):
+	return styleSheet.withHBoxSpacing( 20.0 ).withBorder( EmptyBorder( 5.0, 5.0, 5.0, 5.0, Color( 0.9, 0.9, 0.9 ) ) )
+
+def app_openDocumentsStyle(styleSheet):
+	styleSheet = styleSheet.withLineDirection( LineStyleParams.Direction.HORIZONTAL ).withForeground( Color( 32, 87, 147 ) ).withLineThickness( 1.0 ).withLineInset( 15.0 ).withLinePadding( 3.0 )
+	return styleSheet.withTableColumnSpacing( 15.0 ).withTableColumnExpand( False ).withTableRowSpacing( 5.0 ).withTableRowExpand( False )
+
+def app_contentBoxStyle(styleSheet):
+	return styleSheet
+
+def app_docStyle(styleSheet):
+	return styleSheet.withBorder( EmptyBorder( 0.0, 30.0, 0.0, 0.0, None ) )
+
+
+
+app_linkHeaderStyle = LinkHeaderStyleSheet.instance
+app_titleStyle = TitleBarStyleSheet.instance
+app_tabbedBoxStyle = TabbedBoxStyleSheet.instance
