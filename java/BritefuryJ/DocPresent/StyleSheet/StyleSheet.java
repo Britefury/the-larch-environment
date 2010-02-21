@@ -7,6 +7,7 @@
 package BritefuryJ.DocPresent.StyleSheet;
 
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 
 import org.python.core.Py;
@@ -14,7 +15,7 @@ import org.python.core.PyObject;
 
 import BritefuryJ.Utils.HashUtils;
 
-public class StyleSheet implements Cloneable
+public class StyleSheet
 {
 	protected static class StyleSheetValuesMultiple
 	{
@@ -100,6 +101,8 @@ public class StyleSheet implements Cloneable
 	protected HashMap<String, Object> values = new HashMap<String, Object>();
 	protected HashMap<StyleSheetValueSingle, StyleSheet> singleValueDerivedStyleSheets = new HashMap<StyleSheetValueSingle, StyleSheet>();
 	protected HashMap<StyleSheetValuesMultiple, StyleSheet> multiValueDerivedStyleSheets = new HashMap<StyleSheetValuesMultiple, StyleSheet>();
+	protected IdentityHashMap<AttributeSet, StyleSheet> attribSetDerivedStyleSheets = new IdentityHashMap<AttributeSet, StyleSheet>();
+	protected IdentityHashMap<StyleSheetDerivedPyAttrFn, PyObject> derivedAttributes = new IdentityHashMap<StyleSheetDerivedPyAttrFn, PyObject>();
 	
 	
 	public static StyleSheet defaultStyleSheet = new StyleSheet();
@@ -109,15 +112,10 @@ public class StyleSheet implements Cloneable
 	{
 	}
 	
-	protected StyleSheet(StyleSheet prototype)
-	{
-		values.putAll( prototype.values );
-	}
 	
-	
-	public Object clone() throws CloneNotSupportedException
+	public Object newInstance()
 	{
-		return new StyleSheet( this );
+		return new StyleSheet();
 	}
 	
 	
@@ -126,7 +124,6 @@ public class StyleSheet implements Cloneable
 		return values.get( attrName );
 	}
 	
-	@SuppressWarnings("unchecked")
 	public <V extends Object> V get(String attrName, Class<V> valueClass, V defaultValue)
 	{
 		Object v = values.get( attrName );
@@ -135,18 +132,22 @@ public class StyleSheet implements Cloneable
 		{
 			return null;
 		}
-		else if ( valueClass.isAssignableFrom( v.getClass() ) )
-		{
-			return (V)v;
-		}
 		else
 		{
-			notifyBadAttributeType( attrName, v, valueClass );
-			return defaultValue;
+			V typedV;
+			try
+			{
+				typedV = valueClass.cast( v );
+			}
+			catch (ClassCastException e)
+			{
+				notifyBadAttributeType( attrName, v, valueClass );
+				return defaultValue;
+			}
+			return typedV;
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public <V extends Object> V getNonNull(String attrName, Class<V> valueClass, V defaultValue)
 	{
 		Object v = values.get( attrName );
@@ -156,14 +157,19 @@ public class StyleSheet implements Cloneable
 			notifyAttributeShouldNotBeNull( attrName, valueClass );
 			return defaultValue;
 		}
-		else if ( valueClass.isAssignableFrom( v.getClass() ) )
-		{
-			return (V)v;
-		}
 		else
 		{
-			notifyBadAttributeType( attrName, v, valueClass );
-			return defaultValue;
+			V typedV;
+			try
+			{
+				typedV = valueClass.cast( v );
+			}
+			catch (ClassCastException e)
+			{
+				notifyBadAttributeType( attrName, v, valueClass );
+				return defaultValue;
+			}
+			return typedV;
 		}
 	}
 	
@@ -186,15 +192,8 @@ public class StyleSheet implements Cloneable
 		StyleSheet derived = singleValueDerivedStyleSheets.get( v );
 		if ( derived == null )
 		{
-			try
-			{
-				derived = (StyleSheet)clone();
-			}
-			catch (CloneNotSupportedException e)
-			{
-				throw new RuntimeException( "Could not clone stylesheet" );
-			}
-			
+			derived = (StyleSheet)newInstance();
+			derived.values.putAll( values );
 			derived.values.put( fieldName, value );
 			derived = getUniqueStyleSheet( derived );
 			singleValueDerivedStyleSheets.put( v, derived );
@@ -215,15 +214,8 @@ public class StyleSheet implements Cloneable
 			StyleSheet derived = multiValueDerivedStyleSheets.get( v );
 			if ( derived == null )
 			{
-				try
-				{
-					derived = (StyleSheet)clone();
-				}
-				catch (CloneNotSupportedException e)
-				{
-					throw new RuntimeException( "Could not clone stylesheet" );
-				}
-				
+				derived = (StyleSheet)newInstance();
+				derived.values.putAll( values );
 				derived.values.putAll( valuesMap );
 				derived = getUniqueStyleSheet( derived );
 				multiValueDerivedStyleSheets.put( v, derived );
@@ -234,7 +226,10 @@ public class StyleSheet implements Cloneable
 		
 	public StyleSheet withAttrs(PyObject[] pyVals, String[] names)
 	{
-		assert names.length == pyVals.length;
+		if ( names.length != pyVals.length )
+		{
+			throw new RuntimeException( "All arguments must have keywords" );
+		}
 		
 		if ( names.length == 1 )
 		{
@@ -250,6 +245,18 @@ public class StyleSheet implements Cloneable
 			
 			return withAttrs( valuesMap );
 		}
+	}
+	
+	public StyleSheet withAttrSet(AttributeSet attribs)
+	{
+		StyleSheet derived = attribSetDerivedStyleSheets.get( attribs );
+		if ( derived == null )
+		{
+			derived = withAttrs( attribs.values );
+			
+			attribSetDerivedStyleSheets.put( attribs, derived );
+		}
+		return derived;
 	}
 	
 		
@@ -281,8 +288,8 @@ public class StyleSheet implements Cloneable
 		StyleSheet unique = table.styleSheets.get( vals );
 		if ( unique == null )
 		{
+			table.styleSheets.put( vals, styleSheet ); 
 			unique = styleSheet;
-			table.styleSheets.put( vals, unique ); 
 		}
 		
 		return unique;
@@ -298,7 +305,7 @@ public class StyleSheet implements Cloneable
 	
 	protected void notifyBadAttributeType(String attrName, Object value, Class<?> expectedType)
 	{
-		System.out.println( "WARNING: style sheet \"" + getClass().getName() + "\": attribute '" + attrName + "' should have value of type '" + expectedType.getName() + "', has value '" + value + "'" );
+		System.out.println( "WARNING: style sheet \"" + getClass().getName() + "\": attribute '" + attrName + "' should have value of type '" + expectedType.getName() + "', has value '" + value + "'; type '" + value.getClass().getName() + "'" );
 	}
 
 	protected void notifyAttributeShouldNotBeNull(String attrName, Class<?> expectedType)

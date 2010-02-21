@@ -18,26 +18,21 @@ import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class ListViewStyleSheet extends StyleSheet
 {
-	public enum TrailingSeparator { NEVER, ONE_ELEMENT, ALWAYS }
-
-	
 	private static class ListViewParams
 	{
 		private PrimitiveStyleSheet primitiveStyle;
 		private ElementFactory beginDelim, endDelim;
 		private SeparatorElementFactory separator;
-		private TrailingSeparator trailingSeparator;
 		private ElementFactory spacing;
 		private ListViewLayoutStyleSheet listLayout;
 		
 		private ListViewParams(PrimitiveStyleSheet primitiveStyle, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator,
-				TrailingSeparator trailingSeparator, ElementFactory spacing, ListViewLayoutStyleSheet listLayout)
+				ElementFactory spacing, ListViewLayoutStyleSheet listLayout)
 		{
 			this.primitiveStyle = primitiveStyle;
 			this.beginDelim = beginDelim;
 			this.endDelim = endDelim;
 			this.separator = separator;
-			this.trailingSeparator = trailingSeparator;
 			this.spacing = spacing;
 			this.listLayout = listLayout;
 		}
@@ -58,22 +53,15 @@ public class ListViewStyleSheet extends StyleSheet
 		initAttr( "beginDelimFactory", null );
 		initAttr( "endDelimFactory", null );
 		initAttr( "separatorFactory", null );
-		initAttr( "trailingSeparator", TrailingSeparator.NEVER );
 		initAttr( "spacingFactory", null );
 		initAttr( "listLayout", ParagraphListViewLayoutStyleSheet.instance );
 	}
-	
-	
+		
 
-	protected ListViewStyleSheet(StyleSheet prototype)
-	{
-		super( prototype );
-	}
 	
-	
-	public Object clone()
+	public Object newInstance()
 	{
-		return new ListViewStyleSheet( this );
+		return new ListViewStyleSheet();
 	}
 	
 
@@ -118,11 +106,6 @@ public class ListViewStyleSheet extends StyleSheet
 		return (ListViewStyleSheet)withAttr( "separatorFactory", new PySeparatorElementFactory( separatorFactory ) );
 	}
 
-	public ListViewStyleSheet withTrailingSeparator(TrailingSeparator trailingSeparator)
-	{
-		return (ListViewStyleSheet)withAttr( "trailingSeparator", trailingSeparator );
-	}
-
 	public ListViewStyleSheet withSpacingFactory(ElementFactory spacingFactory)
 	{
 		return (ListViewStyleSheet)withAttr( "spacingFactory", spacingFactory );
@@ -155,7 +138,6 @@ public class ListViewStyleSheet extends StyleSheet
 					get( "beginDelimFactory", ElementFactory.class, null ),
 					get( "endDelimFactory", ElementFactory.class, null ),
 					get( "separatorFactory", SeparatorElementFactory.class, null ),
-					get( "trailingSeparator", TrailingSeparator.class, TrailingSeparator.NEVER ),
 					get( "spacingFactory", ElementFactory.class, null ),
 					get( "listLayout", ListViewLayoutStyleSheet.class, ParagraphListViewLayoutStyleSheet.instance ) );
 		}
@@ -169,12 +151,12 @@ public class ListViewStyleSheet extends StyleSheet
 	// LIST VIEW
 	//
 	
-	public DPWidget createListElement(List<DPWidget> children)
+	public DPWidget createListElement(List<DPWidget> children, TrailingSeparator trailingSeparator)
 	{
 		ListViewParams params = getListViewParams();
 		
 		return params.listLayout.createListElement( children, params.primitiveStyle, params.beginDelim, params.endDelim, params.separator,
-				params.spacing, params.trailingSeparator );
+				params.spacing, trailingSeparator );
 	}
 
 

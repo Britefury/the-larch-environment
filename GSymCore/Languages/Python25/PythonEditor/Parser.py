@@ -24,8 +24,9 @@ from Britefury.Util.NodeUtil import isStringNode
 
 from Britefury.Grammar.Grammar import Grammar, Rule, RuleList
 
-from GSymCore.Languages.Python25.Keywords import *
 import GSymCore.Languages.Python25.NodeClasses as Nodes
+
+from GSymCore.Languages.Python25.PythonEditor.Keywords import *
 
 
 

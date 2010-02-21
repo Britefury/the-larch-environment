@@ -12,7 +12,6 @@ import java.util.List;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class HorizontalListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 {
@@ -24,20 +23,15 @@ public class HorizontalListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 		super();
 	}
 	
-	protected HorizontalListViewLayoutStyleSheet(StyleSheet prototype)
-	{
-		super( prototype );
-	}
 	
-	
-	public Object clone()
+	public Object newInstance()
 	{
-		return new HorizontalListViewLayoutStyleSheet( this );
+		return new HorizontalListViewLayoutStyleSheet();
 	}
 	
 	
 	public DPWidget createListElement(List<DPWidget> children, PrimitiveStyleSheet primitiveStyle, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator,
-			ElementFactory spacing, ListViewStyleSheet.TrailingSeparator trailingSeparator)
+			ElementFactory spacing, TrailingSeparator trailingSeparator)
 	{
 		ArrayList<DPWidget> childElems = new ArrayList<DPWidget>();
 		childElems.ensureCapacity( children.size() + 2 );

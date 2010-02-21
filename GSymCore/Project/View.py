@@ -23,7 +23,7 @@ from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replac
 from Britefury.Util.NodeUtil import *
 
 
-from BritefuryJ.DocPresent.StyleParams import *
+from BritefuryJ.DocPresent.StyleSheet import PrimitiveStyleSheet
 from BritefuryJ.DocPresent import *
 
 from BritefuryJ.GSym.View import GSymViewContext
@@ -50,11 +50,12 @@ _nameTextRepListener = NameTextRepListener()
 
 
 
-def nameEditor(ctx, node, state, style):
+def nameEditor(ctx, styleSheet, node, state):
 	name = node['name']
 	
-	text = ctx.text( style, name )
-	return ctx.linearRepresentationListener( text, _nameTextRepListener )
+	text = styleSheet.text( name )
+	text.setLinearRepresentationListener( _nameTextRepListener )
+	return text
 
 
 
@@ -84,7 +85,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		
 		
 	@ObjectNodeDispatchMethod( Nodes.Project )
-	def Project(self, ctx, state, node, rootPackage):
+	def Project(self, ctx, styleSheet, state, node, rootPackage):
 		def _onSave(link, buttonEvent):
 			if document._filename is None:
 				def handleSaveDocumentAsFn(filename):
@@ -106,29 +107,29 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		
 		name = document.getDocumentName()
 		
-		homeLink = ctx.link( prj_linkStyle, 'HOME PAGE', '' )
-		linkHeader = linkHeaderBar( ctx, [ homeLink ] )
+		homeLink = prj_linkStyle.link( 'HOME PAGE', '' )
+		linkHeader = prj_linkHeaderStyle.linkHeaderBar( [ homeLink ] )
 		
-		title = titleBarWithHeader( ctx, 'DOCUMENT', name )
+		title = prj_titleStyle.titleBarWithHeader( 'DOCUMENT', name )
 		
 		
-		saveLink = ctx.link( prj_linkStyle, 'SAVE', _onSave )
-		saveAsLink = ctx.link( prj_linkStyle, 'SAVE AS', _onSaveAs )
-		controlsBox = ctx.hbox( prj_controlsBoxStyle, [ saveLink.padX( 10.0 ), saveAsLink.padX( 10.0 ) ] )
-		controlsBorder = ctx.border( prj_controlsBorder, controlsBox )
+		saveLink = prj_controlsStyle.link( 'SAVE', _onSave )
+		saveAsLink = prj_controlsStyle.link( 'SAVE AS', _onSaveAs )
+		controlsBox = prj_controlsStyle.hbox( [ saveLink.padX( 10.0 ), saveAsLink.padX( 10.0 ) ] )
+		controlsBorder = prj_controlsStyle.border( controlsBox )
 		
 		state = _ProjectViewState( self._resolveContext.location )
-		root = ctx.viewEval( rootPackage, state ).alignHExpand()
-		indexBox = tabbedBox( ctx, 'Project Index', root )
+		root = ctx.viewEval( rootPackage, styleSheet, state ).alignHExpand()
+		indexBox = prj_tabbedBoxStyle.tabbedBox( 'Project Index', root )
 		
-		contentBox = ctx.vbox( prj_projectContentBoxStyle, [ linkHeader, title, controlsBorder.pad( 5.0, 10.0 ).alignHLeft(), indexBox.pad( 10.0, 10.0 ).alignHLeft() ] )
+		contentBox = prj_projectContentBoxStyle.vbox( [ linkHeader, title, controlsBorder.pad( 5.0, 10.0 ).alignHLeft(), indexBox.pad( 10.0, 10.0 ).alignHLeft() ] )
 		
 		return contentBox.alignHExpand()
 
 
 
 	@ObjectNodeDispatchMethod( Nodes.Package )
-	def Package(self, ctx, state, node, name, contents):
+	def Package(self, ctx, styleSheet, state, node, name, contents):
 		location, = state
 		
 		def _onAddPage(button):
@@ -146,38 +147,38 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		def _onAddPackage(button):
 			contents.append( Nodes.Package( name='New package', contents=[] ) )
 		
-		addPageButton = ctx.button( prj_packageAddButtonStyle, _onAddPage, ctx.staticText( prj_packageButtonLabelStyle, 'Add page' ) )
-		importPageButton = ctx.button( prj_packageAddButtonStyle, _onImportPage, ctx.staticText( prj_packageButtonLabelStyle, 'Import page' ) )
-		addPackageButton = ctx.button( prj_packageAddButtonStyle, _onAddPackage, ctx.staticText( prj_packageButtonLabelStyle, 'Add package' ) )
+		addPageButton = prj_packageButtonStyle.button( _onAddPage, prj_packageButtonStyle.staticText( 'Add page' ) )
+		importPageButton = prj_packageButtonStyle.button( _onImportPage, prj_packageButtonStyle.staticText( 'Import page' ) )
+		addPackageButton = prj_packageButtonStyle.button( _onAddPackage, prj_packageButtonStyle.staticText( 'Add package' ) )
 		
-		pageControlsBox = ctx.hbox( prj_packagePageControlsBoxStyle, [ addPageButton, importPageButton ] )
-		controlsBox = ctx.hbox( prj_packageControlsBoxStyle, [ pageControlsBox, addPackageButton ] )
+		pageControlsBox = prj_packagePageControlsStyle.hbox( [ addPageButton, importPageButton ] )
+		controlsBox = prj_packageControlsStyle.hbox( [ pageControlsBox, addPackageButton ] )
 
-		nameEntry = nameEditor( ctx, node, state, prj_packageNameStyle )
+		nameEntry = nameEditor( ctx, prj_packageNameStyle, node, state )
 		
-		headerBox = ctx.hbox( prj_packageHeaderBoxStyle, [ nameEntry, controlsBox ] )
+		headerBox = prj_packageHeaderStyle.hbox( [ nameEntry, controlsBox ] )
 		
-		contentsBox = ctx.vbox( prj_packageContentsBoxStyle, ctx.mapViewEval( contents, _ProjectViewState( _joinLocation( location, name ) ) ) )
+		contentsBox = prj_packageContentsStyle.vbox( ctx.mapViewEval( contents, styleSheet, _ProjectViewState( _joinLocation( location, name ) ) ) )
 
-		return ctx.vbox( prj_packageBoxStyle, [ headerBox.alignHExpand(), ctx.indent( 20.0, contentsBox ).alignHExpand() ] )
+		return prj_packageStyle.vbox( [ headerBox.alignHExpand(), contentsBox.padX( 20.0, 0.0 ).alignHExpand() ] )
 
 
 
 	@ObjectNodeDispatchMethod( Nodes.Page )
-	def Page(self, ctx, state, node, name, unit):
+	def Page(self, ctx, styleSheet, state, node, name, unit):
 		location, = state
 		
-		nameEntry = nameEditor( ctx, node, state, prj_pageNameStyle )
+		nameEntry = nameEditor( ctx, prj_pageStyle, node, state )
 		
-		editLink = ctx.link( prj_pageEditLinkStyle, 'Edit', _joinLocation( location, name ) )
+		editLink = prj_pageStyle.link( 'Edit', _joinLocation( location, name ) )
 
-		return ctx.hbox( prj_pageBoxStyle, [ nameEntry, editLink ] )
+		return prj_pageStyle.hbox( [ nameEntry, editLink ] )
 
 	
 	
 def viewProjectDocNodeAsElement(document, docRootNode, resolveContext, location, commandHistory, app):
 	viewFn = ProjectView( document, app, resolveContext, location )
-	viewContext = GSymViewContext( docRootNode, viewFn, commandHistory )
+	viewContext = GSymViewContext( docRootNode, viewFn, PrimitiveStyleSheet.instance, commandHistory )
 	return viewContext.getFrame()
 
 

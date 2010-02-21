@@ -97,6 +97,10 @@ public class GSymViewContext extends GSymIncrementalTreeContext implements DocVi
 		public int hashCode()
 		{
 			int stateHash = state != null  ?  state.hashCode()  :  0;
+			if ( nodeFunction == null  ||  styleSheet == null )
+			{
+				throw new RuntimeException( "null?nodeFunction=" + ( nodeFunction == null ) + ", null?styleSheet=" + ( styleSheet == null ) );
+			}
 			return HashUtils.tripleHash( nodeFunction.hashCode(), styleSheet.hashCode(), stateHash );
 		}
 		

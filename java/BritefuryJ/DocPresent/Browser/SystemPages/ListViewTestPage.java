@@ -20,6 +20,7 @@ import BritefuryJ.DocPresent.ListView.ParagraphListViewLayoutStyleSheet;
 import BritefuryJ.DocPresent.ListView.SeparatorElementFactory;
 import BritefuryJ.DocPresent.ListView.VerticalInlineListViewLayoutStyleSheet;
 import BritefuryJ.DocPresent.ListView.VerticalListViewLayoutStyleSheet;
+import BritefuryJ.DocPresent.ListView.TrailingSeparator;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
@@ -116,7 +117,7 @@ public class ListViewTestPage extends SystemPage
 		}
 		
 		listView = listView.withPrimitiveStyle( puncStyle ).withBeginDelimFactory( new TextElementFactory( beginDelim ) ).withEndDelimFactory( new TextElementFactory( endDelim ) ).withSeparatorFactory( new TextSeparatorElementFactory( separator ) );
-		DPWidget ls = listView.createListElement( Arrays.asList( children ) );
+		DPWidget ls = listView.createListElement( Arrays.asList( children ), TrailingSeparator.NEVER );
 		
 		
 		DPWidget titleElem = titleStyle.text( title );

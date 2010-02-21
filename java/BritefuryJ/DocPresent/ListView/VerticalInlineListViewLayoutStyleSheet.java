@@ -14,7 +14,6 @@ import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class VerticalInlineListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 {
@@ -43,15 +42,10 @@ public class VerticalInlineListViewLayoutStyleSheet extends ListViewLayoutStyleS
 		initAttr( "indentation", 0.0 );
 	}
 	
-	protected VerticalInlineListViewLayoutStyleSheet(StyleSheet prototype)
+
+	public Object newInstance()
 	{
-		super( prototype );
-	}
-	
-	
-	public Object clone()
-	{
-		return new VerticalInlineListViewLayoutStyleSheet( this );
+		return new VerticalInlineListViewLayoutStyleSheet();
 	}
 	
 	
@@ -94,7 +88,7 @@ public class VerticalInlineListViewLayoutStyleSheet extends ListViewLayoutStyleS
 	}
 	
 	public DPWidget createListElement(List<DPWidget> children, PrimitiveStyleSheet primitiveStyle, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator,
-			ElementFactory spacing, ListViewStyleSheet.TrailingSeparator trailingSeparator)
+			ElementFactory spacing, TrailingSeparator trailingSeparator)
 	{
 		VerticalInlineListViewLayoutParams params = getLayoutParams();
 		
