@@ -5,11 +5,3 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from GSymCore.Project import Project
-
-
-
-def initPlugin(plugin, world):
-	world.registerUnitClass( plugin, Project.unitClass )
-	world.registerNewUnitFactory( plugin, Project.newUnitFactory )
-

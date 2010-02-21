@@ -15,7 +15,6 @@ import BritefuryJ.DocPresent.DPParagraphIndentMarker;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class ParagraphListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 {
@@ -44,15 +43,10 @@ public class ParagraphListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 		initAttr( "addParagraphIndentMarkers", false );
 	}
 	
-	protected ParagraphListViewLayoutStyleSheet(StyleSheet prototype)
+
+	public Object newInstance()
 	{
-		super( prototype );
-	}
-	
-	
-	public Object clone()
-	{
-		return new ParagraphListViewLayoutStyleSheet( this );
+		return new ParagraphListViewLayoutStyleSheet();
 	}
 	
 	
@@ -83,7 +77,7 @@ public class ParagraphListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 
 	
 	public DPWidget createListElement(List<DPWidget> children, PrimitiveStyleSheet primitiveStyle, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator,
-			ElementFactory spacing, ListViewStyleSheet.TrailingSeparator trailingSeparator)
+			ElementFactory spacing, TrailingSeparator trailingSeparator)
 	{
 		ParagraphListViewLayoutParams params = getLayoutParams();
 		

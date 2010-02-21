@@ -32,11 +32,11 @@ paragraph_listViewLayout = ParagraphListViewLayoutStyleSheet.instance.withAddPar
 verticalInline_listViewLayout = VerticalInlineListViewLayoutStyleSheet.instance.withIndentation( 30.0 )
 vertical_listViewLayout = VerticalListViewLayoutStyleSheet.instance.withIndentation( 30.0 )
 
-_listviewStyle = ListViewStyleSheet.instance.withSeparatorFactory( lambda styleSheet: styleSheet.text( ' ' ) ).withBeginDelimFactory( lambda styleSheet: punctuationStyle.text( '[' ) )
+_listviewStyle = ListViewStyleSheet.instance.withSeparatorFactory( lambda styleSheet, index, child: styleSheet.text( ' ' ) ).withBeginDelimFactory( lambda styleSheet: punctuationStyle.text( '[' ) )
 _listviewStyle = _listviewStyle.withEndDelimFactory( lambda styleSheet: punctuationStyle.text( ']' ) )
 
-_objectviewStyle = ListViewStyleSheet.instance.withSeparatorFactory( lambda styleSheet: styleSheet.text( ' ' ) ).withBeginDelimFactory( lambda styleSheet: punctuationStyle.text( '(' ) )
-_objectviewStyle = _listviewStyle.withEndDelimFactory( lambda styleSheet: punctuationStyle.text( ')' ) )
+_objectviewStyle = ListViewStyleSheet.instance.withSeparatorFactory( lambda styleSheet, index, child: styleSheet.text( ' ' ) ).withBeginDelimFactory( lambda styleSheet: punctuationStyle.text( '(' ) )
+_objectviewStyle = _objectviewStyle.withEndDelimFactory( lambda styleSheet: punctuationStyle.text( ')' ) )
 
 paragraph_listViewStyle = _listviewStyle.withListLayout( paragraph_listViewLayout )
 paragraph_objectViewStyle = _objectviewStyle.withListLayout( paragraph_listViewLayout )

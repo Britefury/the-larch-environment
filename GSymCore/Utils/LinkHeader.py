@@ -14,14 +14,15 @@ from BritefuryJ.DocPresent.StyleSheet import *
 
 
 class LinkHeaderStyleSheet (StyleSheet):
-	def __init__(self, prototype=None):
-		if prototype is not None:
-			super( LinkHeaderStyleSheet, self ).__init__( prototype )
-		else:
-			super( LinkHeaderStyleSheet, self ).__init__()
+	def __init__(self):
+		super( LinkHeaderStyleSheet, self ).__init__()
 		
 		primtiveStyle = PrimitiveStyleSheet.instance.withHBoxSpacing( 25.0 ).withBorder( EmptyBorder( 10.0, 10.0, 5.0, 1.0, None ) )
 		self.initAttr( 'primitiveStyle', primtiveStyle )
+		
+	
+	def newInstance(self):
+		return LinkHeaderStyleSheet()
 		
 		
 	def withPrimitiveStyle(self, primitiveStyle):

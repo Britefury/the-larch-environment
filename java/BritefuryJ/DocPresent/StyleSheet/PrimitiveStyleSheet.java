@@ -16,6 +16,7 @@ import org.python.core.PyObject;
 
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPButton;
+import BritefuryJ.DocPresent.DPEmpty;
 import BritefuryJ.DocPresent.DPFraction;
 import BritefuryJ.DocPresent.DPGridRow;
 import BritefuryJ.DocPresent.DPHBox;
@@ -28,6 +29,7 @@ import BritefuryJ.DocPresent.DPParagraphDedentMarker;
 import BritefuryJ.DocPresent.DPParagraphIndentMarker;
 import BritefuryJ.DocPresent.DPRGrid;
 import BritefuryJ.DocPresent.DPScript;
+import BritefuryJ.DocPresent.DPSegment;
 import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.DPStaticText;
 import BritefuryJ.DocPresent.DPTable;
@@ -118,15 +120,10 @@ public class PrimitiveStyleSheet extends StyleSheet
 		initAttr( "vboxSpacing", 0.0 );
 	}
 	
-	protected PrimitiveStyleSheet(StyleSheet prototype)
-	{
-		super( prototype );
-	}
 	
-	
-	public Object clone()
+	public Object newInstance()
 	{
-		return new PrimitiveStyleSheet( this );
+		return new PrimitiveStyleSheet();
 	}
 	
 
@@ -609,6 +606,12 @@ public class PrimitiveStyleSheet extends StyleSheet
 		element.setChild( child );
 		return element;
 	}
+	
+	
+	public DPEmpty empty()
+	{
+		return new DPEmpty();
+	}
 
 	
 	public DPFraction fraction(DPWidget numerator, DPWidget denominator, String barContent)
@@ -741,6 +744,14 @@ public class PrimitiveStyleSheet extends StyleSheet
 	public DPScript scriptRSub(DPWidget mainChild, DPWidget scriptChild)
 	{
 		return script( mainChild, null, null, null, scriptChild );
+	}
+	
+	
+	public DPSegment segment(boolean bGuardBegin, boolean bGuardEnd, DPWidget child)
+	{
+		DPSegment seg = new DPSegment( getTextParams(), bGuardBegin, bGuardEnd );
+		seg.setChild( child );
+		return seg;
 	}
 	
 	

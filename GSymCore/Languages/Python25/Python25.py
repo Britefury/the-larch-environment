@@ -9,9 +9,9 @@ from Britefury.gSym.gSymUnitClass import GSymUnitClass, GSymPageFactory, GSymPag
 from Britefury.gSym.gSymDocument import gSymUnit
 
 from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
-from GSymCore.Languages.Python25.View import viewPython25DocNodeAsElement, viewPython25DocNodeAsPage, resolvePython25Location
 from GSymCore.Languages.Python25 import NodeClasses as Nodes
 from GSymCore.Languages.Python25.Python25Importer import importPy25File
+from GSymCore.Languages.Python25.PythonEditor.View import viewPython25DocNodeAsElement, viewPython25DocNodeAsPage, resolvePython25Location
 
 
 

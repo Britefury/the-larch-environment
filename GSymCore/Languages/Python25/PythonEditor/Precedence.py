@@ -230,7 +230,12 @@ def _areParensRequired(childNode, outerPrecedence):
 	return childPrec is not None   and   outerPrecedence is not None   and   childPrec > outerPrecedence
 	
 def getNumParens(node):
-	p = node['parens']
+	try:
+		p = node['parens']
+	except KeyError:
+		print 'Attempted to get number of parens for %s'  %  node
+		raise
+	
 	numParens = 0
 	if p is not None   and   isStringNode( p ):
 		p = str( p )
@@ -405,7 +410,7 @@ def removeUnNeededParens(node, outerPrecedence):
 	
 import unittest
 from BritefuryJ.DocModel import DMNode
-from GSymCore.Languages.Python25 import Parser
+from GSymCore.Languages.Python25.PythonEditor import Parser
 
 
 class Test_Precedence (unittest.TestCase):

@@ -17,11 +17,18 @@ class TabbedBoxStyleSheet (StyleSheet):
 			self.headerStyle = headerStyle
 			self.bodyStyle = bodyStyle
 	
-	def __init__(self, prototype=None):
-		if prototype is not None:
-			super( TabbedBoxStyleSheet, self ).__init__( prototype )
-		else:
-			super( TabbedBoxStyleSheet, self ).__init__()
+	@StyleSheetDerivedPyAttrFn
+	def _params(self):
+		hpad = self['headerPadding']
+		bpad = self['bodyPadding']
+		boxColour = self['boxColour']
+		primitiveStyle = self['primitiveStyle']
+		return self._Params( primitiveStyle.withFont( self['headerFont'] ).withForeground( self['headerForeground'] ).withBorder( EmptyBorder( hpad, hpad, hpad, hpad, boxColour ) ), \
+	                                     primitiveStyle.withBorder( SolidBorder( bpad, bpad, boxColour, None ) ) )
+
+	
+	def __init__(self):
+		super( TabbedBoxStyleSheet, self ).__init__()
 			
 		self.initAttr( 'primitiveStyle', PrimitiveStyleSheet.instance )
 
@@ -32,8 +39,10 @@ class TabbedBoxStyleSheet (StyleSheet):
 		self.initAttr( 'bodyPadding', 2.0 )
 		
 		self.initAttr( 'boxColour', Color( 161, 178, 160 ) )
-
-		self._params = None
+	
+	
+	def newInstance(self):
+		return TabbedBoxStyleSheet()
 		
 		
 	def withPrimitiveStyle(self, primitiveStyle):
@@ -59,20 +68,8 @@ class TabbedBoxStyleSheet (StyleSheet):
 	
 	
 	
-	def _getParams(self):
-		if self._params is None:
-			hpad = self['headerPadding']
-			bpad = self['bodyPadding']
-			boxColour = self['boxColour']
-			primitiveStyle = self['primitiveStyle']
-			self._params = self._Params( primitiveStyle.withFont( self['headerFont'] ).withForeground( self['headerForeground'] ).withBorder( EmptyBorder( hpad, hpad, hpad, hpad, boxColour ) ), \
-			                             primitiveStyle.withBorder( SolidBorder( bpad, bpad, boxColour, None ) ) )
-		return self._params
-		
-	
-	
 	def tabbedBox(self, tabTitle, contents):
-		params = self._getParams()
+		params = self._params()
 		headerStyle = params.headerStyle
 		bodyStyle = params.bodyStyle
 		

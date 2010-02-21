@@ -10,10 +10,8 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementFactory;
-import BritefuryJ.DocPresent.ListView.ListViewStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.DocPresent.ListView.SeparatorElementFactory;
 
 public abstract class ListViewLayoutStyleSheet extends StyleSheet
 {
@@ -22,13 +20,8 @@ public abstract class ListViewLayoutStyleSheet extends StyleSheet
 		super();
 	}
 
-	protected ListViewLayoutStyleSheet(StyleSheet prototype)
-	{
-		super( prototype );
-	}
-	
 	
 	
 	public abstract DPWidget createListElement(List<DPWidget> children, PrimitiveStyleSheet primitiveStyle, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator,
-			ElementFactory spacing, ListViewStyleSheet.TrailingSeparator trailingSeparator);
+			ElementFactory spacing, TrailingSeparator trailingSeparator);
 }

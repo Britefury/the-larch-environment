@@ -35,12 +35,14 @@ from Britefury.gSym.View import EditOperations
 
 
 
-
 from GSymCore.Languages.Python25 import NodeClasses as Nodes
-from GSymCore.Languages.Python25.Parser import Python25Grammar
-from GSymCore.Languages.Python25.Precedence import *
 from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
-from GSymCore.Languages.Python25.PythonEditOperations import *
+
+from GSymCore.Languages.Python25.PythonEditor.Parser import Python25Grammar
+from GSymCore.Languages.Python25.PythonEditor.Precedence import *
+from GSymCore.Languages.Python25.PythonEditor.PythonEditOperations import *
+
+
 
 
 class NotImplementedError (Exception):

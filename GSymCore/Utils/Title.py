@@ -20,11 +20,17 @@ class TitleBarStyleSheet (StyleSheet):
 			self.headerStyle = headerStyle
 			self.titleBorderWidth = titleBorderWidth
 	
-	def __init__(self, prototype=None):
-		if prototype is not None:
-			super( TitleBarStyleSheet, self ).__init__( prototype )
-		else:
-			super( TitleBarStyleSheet, self ).__init__()
+	@StyleSheetDerivedPyAttrFn
+	def _params(self):
+		primitiveStyle = self['primitiveStyle']
+		tpad = self['titlePadding']
+		return self._Params( primitiveStyle.withFont( self['titleFont'] ).withForeground( self['titleForeground'] ).withBorder( EmptyBorder( tpad, tpad, tpad, tpad, self['titleBackground'] ) ), \
+	                                     primitiveStyle.withFont( self['headerFont'] ).withForeground( self['headerForeground' ] ),
+	                                     self['titleBorderWidth'] )
+		
+	
+	def __init__(self):
+		super( TitleBarStyleSheet, self ).__init__()
 			
 		self.initAttr( 'primitiveStyle', PrimitiveStyleSheet.instance )
 
@@ -36,8 +42,10 @@ class TitleBarStyleSheet (StyleSheet):
 		
 		self.initAttr( 'headerFont', Font( 'Sans serif', Font.PLAIN, 14 ) )
 		self.initAttr( 'headerForeground', Color( 0.0, 0.5, 0.0 ) )
-		
-		self._params = None
+	
+	
+	def newInstance(self):
+		return TitleBarStyleSheet()
 		
 		
 	def withPrimitiveStyle(self, primitiveStyle):
@@ -68,18 +76,8 @@ class TitleBarStyleSheet (StyleSheet):
 	
 	
 
-	def _getParams(self):
-		if self._params is None:
-			primitiveStyle = self['primitiveStyle']
-			tpad = self['titlePadding']
-			self._params = self._Params( primitiveStyle.withFont( self['titleFont'] ).withForeground( self['titleForeground'] ).withBorder( EmptyBorder( tpad, tpad, tpad, tpad, self['titleBackground'] ) ), \
-			                             primitiveStyle.withFont( self['headerFont'] ).withForeground( self['headerForeground' ] ),
-			                             self['titleBorderWidth'] )
-		return self._params
-		
-	
 	def titleBar(self, text):
-		params = self._getParams()
+		params = self._params()
 		titleStyle = params.titleStyle
 		titleBorderWidth = params.titleBorderWidth
 		
@@ -89,7 +87,7 @@ class TitleBarStyleSheet (StyleSheet):
 	
 	
 	def titleBarWithHeader(self, headerText, text):
-		params = self._getParams()
+		params = self._params()
 		titleStyle = params.titleStyle
 		titleBorderWidth = params.titleBorderWidth
 		headerStyle = params.headerStyle

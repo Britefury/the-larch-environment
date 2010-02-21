@@ -62,17 +62,20 @@ class ParsedNodeTextRepresentationListener (ElementLinearRepresentationListener)
 		
 	
 	
-def nodeEditor(ctx, node, contents, state):
-	return ctx.linearRepresentationListener( contents, ParsedNodeTextRepresentationListener( ctx, node ) )
+def nodeEditor(ctx, node, contents, styleSheet, state):
+	contents.setLinearRepresentationListener( ParsedNodeTextRepresentationListener( ctx, node ) )
+	return contents
 
 
-def stringNodeEditor(ctx, node, metadata, state):
+def stringNodeEditor(ctx, node, styleSheet, metadata, state):
 	res = _parser.unquotedString().parseStringChars( node )
 	if res.isValid():
 		nodeText = node
 	else:
 		nodeText = repr( node )
-	return ctx.linearRepresentationListener( ctx.text( string_textStyle, nodeText ), ParsedNodeTextRepresentationListener( ctx, node ) )
+	text = styleSheet.text( nodeText )
+	text.setLinearRepresentationListener( ParsedNodeTextRepresentationListener( ctx, node ) )
+	return text
 
 
 
@@ -81,22 +84,22 @@ MODE_VERTICALINLINE = 1
 MODE_VERTICAL = 2
 
 
-def viewStringNode(node, ctx, state):
+def viewStringNode(node, ctx, styleSheet, state):
 	# String
-	return stringNodeEditor( ctx, node, None, state )
+	return stringNodeEditor( ctx, node, styleSheet, None, state )
 
 
-def lispViewEval(node, ctx, state):
+def lispViewEval(node, ctx, styleSheet, state):
 	if isStringNode( node ):
-		return viewStringNode( node, ctx, state )
+		return viewStringNode( node, ctx, styleSheet, state )
 	else:
-		return ctx.viewEval( node )
+		return ctx.viewEval( node, styleSheet )
 
 
-def viewLispNode(node, ctx, state):
+def viewLispNode(node, ctx, styleSheet, state):
 	if isListNode( node ):
 		# List
-		xViews = [ lispViewEval( x, ctx, state )   for x in node ]
+		xViews = [ lispViewEval( x, ctx, styleSheet, state )   for x in node ]
 		
 		# Check the contents, to determine the layout
 		mode = MODE_HORIZONTAL
@@ -115,9 +118,9 @@ def viewLispNode(node, ctx, state):
 			raise ValueError
 		
 		# Create a list view
-		v = listViewStyleSheet.createListElement( xViews ) 
+		v = listViewStyleSheet.createListElement( xViews, TrailingSeparator.NEVER ) 
 		
-		return nodeEditor( ctx, node, v, state )
+		return nodeEditor( ctx, node, v, styleSheet, state )
 	elif isObjectNode( node ):
 		cls = node.getDMObjectClass()
 		
@@ -146,9 +149,9 @@ def viewLispNode(node, ctx, state):
 			fieldName = cls.getField( i ).getName()
 			if value is not None:
 				if mode == MODE_HORIZONTAL:
-					line = defaultStyle.span( [ fieldNameStyle.text( fieldName ), punctuationStyle.text( '=' ), lispViewEval( value, ctx, state ) ] )
+					line = defaultStyle.span( [ fieldNameStyle.text( fieldName ), punctuationStyle.text( '=' ), lispViewEval( value, ctx, styleSheet, state ) ] )
 				elif mode == MODE_VERTICALINLINE:
-					line = defaultStyle.paragraph( [ fieldNameStyle.text( fieldName ), punctuationStyle.text( '=' ), lispViewEval( value, ctx, state ) ] )
+					line = defaultStyle.paragraph( [ fieldNameStyle.text( fieldName ), punctuationStyle.text( '=' ), lispViewEval( value, ctx, styleSheet, state ) ] )
 				else:
 					raise ValueError, 'invalid mode'
 				itemViews.append( line )
@@ -162,8 +165,8 @@ def viewLispNode(node, ctx, state):
 			raise ValueError
 		
 		# Create a list view
-		v = listViewStyleSheet.createListElement( itemViews )
-		return nodeEditor( ctx, node, v, state )
+		v = listViewStyleSheet.createListElement( itemViews, TrailingSeparator.NEVER )
+		return nodeEditor( ctx, node, v, styleSheet, state )
 	else:
 		raise TypeError, 'node is %s'  %  node
 	
