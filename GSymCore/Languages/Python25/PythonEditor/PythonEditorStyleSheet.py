@@ -499,7 +499,7 @@ class PythonEditorStyleSheet (StyleSheet):
 		return self._dictListViewLayout().createListElement( items, TrailingSeparator.ALWAYS   if bTrailingSeparator   else TrailingSeparator.NEVER )
 	
 	
-	def yeildExpr(self, value):
+	def yieldExpr(self, value):
 		primitiveStyle = self['primitiveStyle']
 		return primitiveStyle.span( [ self._keyword( 'yield' ),
 		                              primitiveStyle.text( ' ' ),

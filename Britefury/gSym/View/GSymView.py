@@ -37,12 +37,13 @@ class GSymViewObjectNodeDispatch (object):
 	__metaclass__ = ObjectNodeMethodDispatchMetaClass
 	__dispatch_num_args__ = 3
 	
-	def __call__(self, xs, ctx, styleSheet, state):
+	def __call__(self, node, ctx, styleSheet, state):
 		element = None
 		try:
-			element, name = objectNodeMethodDispatchAndGetName( self, xs, ctx, styleSheet, state )
+			element, name = objectNodeMethodDispatchAndGetName( self, node, ctx, styleSheet, state )
 			element.setDebugName( name )
 		except DispatchError:
+			print node
 			element = ctx.errorElement( '<<VIEW OBJECT NODE DISPATCH ERROR>>' )
 		return element
 	
