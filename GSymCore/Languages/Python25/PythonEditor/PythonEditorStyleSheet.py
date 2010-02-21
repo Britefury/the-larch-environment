@@ -7,6 +7,8 @@
 ##-*************************
 from java.awt import Font, Color
 
+from Britefury.Kernel.Lerp import lerp, lerpColour
+
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.StyleSheet import *
 from BritefuryJ.DocPresent.ListView import *
@@ -28,7 +30,7 @@ class PythonEditorStyleSheet (StyleSheet):
 		
 		self._keywordMap = {}
 
-		self.initAttr( 'primitiveStyle', PrimitiveStyleSheet.instance )
+		self.initAttr( 'primitiveStyle', PrimitiveStyleSheet.instance.withParagraphIndentation( 60.0 ) )
 		
 		self.initAttr( 'precedenceParens', PrecedenceStyleSheetText.instance )
 		self.initAttr( 'parser', None )
@@ -52,13 +54,20 @@ class PythonEditorStyleSheet (StyleSheet):
 		self.initAttr( 'commentAttrs', AttributeSet( font=Font( 'SansSerif', Font.PLAIN, 14 ), foreground=Color( 0.4, 0.4, 0.4 ) ) )
 		self.initAttr( 'unparseableAttrs', AttributeSet( font=Font( 'SansSerif', Font.PLAIN, 14 ), foreground=Color.black, textSquiggleUnderlinePaint=Color.red ) )
 		
-		self.initAttr( 'badIndentationAttrs', AttributeSet( border=SolidBorder( 2.0, 2.0, 5.0, 5.0, Color.red, None ) ) )
+		self.initAttr( 'solidHighlightRounding', 3.0 )
+		self.initAttr( 'outlineHighlightThickness', 2.0 )
+		self.initAttr( 'outlineHighlightInset', 2.0 )
+		self.initAttr( 'outlineHighlightRounding', 5.0 )
 		
+		self.initAttr( 'defStmtHighlightColour', Color( 0.420, 0.620, 0.522 ) )
+		self.initAttr( 'classStmtHighlightColour', Color( 0.522, 0.420, 0.620 ) )
+		self.initAttr( 'badIndentationHighlightColour', Color.red )
+
 		self.initAttr( 'comprehensionSpacing', 15.0 )
 		self.initAttr( 'conditionalSpacing', 15.0 )
 		self.initAttr( 'blockIndentation', 30.0 )
 		
-		self._initKeywordAttrs( [ 'as', 'assert', 'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'exec', 'finally', 'for', 'from', 'global', 'lambda', 'if', 'in', 'pass', 'print', 'raise', 'return', 'try', 'while', 'yield' ] )
+		self._initKeywordAttrs( [ 'as', 'assert', 'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'exec', 'finally', 'for', 'from', 'global', 'lambda', 'if', 'import', 'in', 'pass', 'print', 'raise', 'return', 'try', 'while', 'yield' ] )
 	
 	
 	
@@ -140,8 +149,27 @@ class PythonEditorStyleSheet (StyleSheet):
 		return self.withAttr( 'unparseableAttrs', attrs )
 	
 	
-	def withBadIndentationAttrs(self, attrs):
-		return self.withAttr( 'badIndentationAttrs', attrs )
+	def withSolidHighlightRounding(self, rounding):
+		return self.withAttr( 'solidHighlightRounding', rounding )
+	
+	def withOutlineHighlightThickness(self, thickness):
+		return self.withAttr( 'outlineHighlightThickness', thickness )
+	
+	def withOutlineHighlightInset(self, inset):
+		return self.withAttr( 'outlineHighlightInset', inset )
+	
+	def withOutlineHighlightRounding(self, rounding):
+		return self.withAttr( 'outlineHighlightRounding', rounding )
+	
+	
+	def withDefStmtHighlightColour(self, colour):
+		return self.withAttr( 'defStmtHighlightColour', colour )
+	
+	def withClassStmtHighlightColour(self, colour):
+		return self.withAttr( 'classStmtHighlightColour', colour )
+	
+	def withBadIndentationHighlightColour(self, colour):
+		return self.withAttr( 'badIndentationHighlightColour', colour )
 	
 	
 	def withComprehensionSpacing(self, spacing):
@@ -150,7 +178,6 @@ class PythonEditorStyleSheet (StyleSheet):
 	def withConditionalSpacing(self, spacing):
 		return self.withAttr( 'conditionalSpacing', spacing )
 
-	
 		
 	
 	
@@ -220,10 +247,43 @@ class PythonEditorStyleSheet (StyleSheet):
 
 	
 	
-	@StyleSheetDerivedPyAttrFn
-	def _badIndentationStyle(self):
-		return self['primitiveStyle'].withAttrSet( self['badIndentationAttrs'] )
 
+	def _solidHighlightBorder(self, colour):
+		solidHighlightRounding = self['solidHighlightRounding']
+		colour = lerpColour( colour, Color.white, 0.8 )
+		return EmptyBorder( 0.0, 0.0, 0.0, 0.0, solidHighlightRounding, solidHighlightRounding, colour )
+	
+	def _outlineHighlightBorder(self, colour):
+		thickness = self['outlineHighlightThickness']
+		inset = self['outlineHighlightInset']
+		rounding = self['outlineHighlightRounding']
+		return SolidBorder( thickness, inset, rounding, rounding, colour, None )
+	
+	
+	@StyleSheetDerivedPyAttrFn
+	def _defStmtHeaderHighlightStyle(self):
+		border = self._solidHighlightBorder( self['defStmtHighlightColour'] )
+		return self['primitiveStyle'].withAttrs( border=border )
+
+	@StyleSheetDerivedPyAttrFn
+	def _defStmtHighlightStyle(self):
+		border = self._outlineHighlightBorder( self['defStmtHighlightColour'] )
+		return self['primitiveStyle'].withAttrs( border=border )
+
+	@StyleSheetDerivedPyAttrFn
+	def _classStmtHeaderHighlightStyle(self):
+		border = self._solidHighlightBorder( self['classStmtHighlightColour'] )
+		return self['primitiveStyle'].withAttrs( border=border )
+
+	@StyleSheetDerivedPyAttrFn
+	def _classStmtHighlightStyle(self):
+		border = self._outlineHighlightBorder( self['classStmtHighlightColour'] )
+		return self['primitiveStyle'].withAttrs( border=border )
+
+	@StyleSheetDerivedPyAttrFn
+	def _badIndentationHighlightStyle(self):
+		border = self._outlineHighlightBorder( self['badIndentationHighlightColour'] )
+		return self['primitiveStyle'].withAttrs( border=border )
 
 	
 	@StyleSheetDerivedPyAttrFn
@@ -303,7 +363,7 @@ class PythonEditorStyleSheet (StyleSheet):
 	
 	def _keyword(self, keyword):
 		textAttr, contentAttr = self._keywordMap[keyword]
-		return self.keywordText( textAttr, contentAttr )
+		return self.keywordText( self[textAttr], self[contentAttr] )
 
 	
 	
@@ -367,7 +427,7 @@ class PythonEditorStyleSheet (StyleSheet):
 		return self._tupleListViewLayout().createListElement( items, TrailingSeparator.ALWAYS   if bTrailingSeparator   else TrailingSeparator.NEVER )
 
 	
-	def listTarget(self, items, trailingSeparator):
+	def listTarget(self, items, bTrailingSeparator):
 		return self._listListViewLayout().createListElement( items, TrailingSeparator.ALWAYS   if bTrailingSeparator   else TrailingSeparator.NEVER )
 	
 	
@@ -375,11 +435,11 @@ class PythonEditorStyleSheet (StyleSheet):
 		return self._varStyle().text( name )
 
 	
-	def tupleLiteral(self, items, trailingSeparator):
+	def tupleLiteral(self, items, bTrailingSeparator):
 		return self._tupleListViewLayout().createListElement( items, TrailingSeparator.ALWAYS   if bTrailingSeparator   else TrailingSeparator.NEVER )
 
 	
-	def listLiteral(self, items, trailingSeparator):
+	def listLiteral(self, items, bTrailingSeparator):
 		return self._listListViewLayout().createListElement( items, TrailingSeparator.ALWAYS   if bTrailingSeparator   else TrailingSeparator.NEVER )
 	
 	
@@ -435,7 +495,7 @@ class PythonEditorStyleSheet (StyleSheet):
 		return primitiveStyle.span( [ key, punctuationStyle.text( ':' ), value ] )
 	
 	
-	def dictLiteral(self, items, trailingSeparator):
+	def dictLiteral(self, items, bTrailingSeparator):
 		return self._dictListViewLayout().createListElement( items, TrailingSeparator.ALWAYS   if bTrailingSeparator   else TrailingSeparator.NEVER )
 	
 	
@@ -514,11 +574,11 @@ class PythonEditorStyleSheet (StyleSheet):
 		if len( args ) > 0:
 			argElements.append( primitiveStyle.text( ' ' ) )
 			argElements.append( primitiveStyle.paragraphIndentMarker() )
-			for a in argViews[:-1]:
+			for a in args[:-1]:
 				argElements.append( a )
 				argElements.append( punctuationStyle.text( ',' ) )
 				argElements.append( primitiveStyle.lineBreak( primitiveStyle.text( ' ' ) ) )
-			argElements.append( argViews[-1] )
+			argElements.append( args[-1] )
 			if bArgsTrailingSeparator:
 				argElements.append( punctuationStyle.text( ',' ) )
 			argElements.append( primitiveStyle.paragraphDedentMarker() )
@@ -725,11 +785,12 @@ class PythonEditorStyleSheet (StyleSheet):
 		primitiveStyle = self['primitiveStyle']
 		punctuationStyle = self._punctuationStyle()
 
-		moduleElements = []
+		moduleElements = [ primitiveStyle.paragraphIndentMarker() ]
 		if len( modules ) > 0:
 			for m in modules[:-1]:
 				moduleElements.extend( [ m,  punctuationStyle.text( ',' ),  primitiveStyle.lineBreak( punctuationStyle.text( ' ' ) ) ] )
 			moduleElements.append( modules[-1] )
+		moduleElements.append( primitiveStyle.paragraphDedentMarker() )
 		return primitiveStyle.span( [ self._keyword( 'import' ), primitiveStyle.text( ' ' ) ]  +  moduleElements )
 
 
@@ -737,11 +798,12 @@ class PythonEditorStyleSheet (StyleSheet):
 		primitiveStyle = self['primitiveStyle']
 		punctuationStyle = self._punctuationStyle()
 
-		importElements = []
+		importElements = [ primitiveStyle.paragraphIndentMarker() ]
 		if len( imports ) > 0:
 			for i in imports[:-1]:
 				importElements.extend( [ i,  punctuationStyle.text( ',' ),  primitiveStyle.lineBreak( primitiveStyle.text( ' ' ) ) ] )
 			importElements.append( imports[-1] )
+		importElements.append( primitiveStyle.paragraphDedentMarker() )
 		return primitiveStyle.span( [ self._keyword( 'from' ), primitiveStyle.text( ' ' ), module, primitiveStyle.text( ' ' ),
 							self._keyword( 'import' ), primitiveStyle.text( ' ' ) ]  +  importElements )
 
@@ -940,10 +1002,29 @@ class PythonEditorStyleSheet (StyleSheet):
 			basesListLayout = self._noParenTupleListViewLayout()
 
 			trailingSep = TrailingSeparator.ALWAYS   if bBasesTrailingSeparator   else TrailingSeparator.NEVER
-			layout = tuple_listViewLayout   if basesTrailingSeparator is None   else tuple_listViewLayoutSep
 			elements.extend( [ delimStyle.text( '(' ),  basesListLayout.createListElement( bases, trailingSep ),  delimStyle.text( ')' ) ] )
 		elements.append( punctuationStyle.text( ':' ) )
 		return primitiveStyle.span( elements )
+	
+	
+	
+	
+	def defStmtHeaderHighlight(self, header):
+		highlightStyle = self._defStmtHeaderHighlightStyle()
+		return highlightStyle.border( header )
+
+	def defStmtHighlight(self, header):
+		highlightStyle = self._defStmtHighlightStyle()
+		return highlightStyle.border( header )
+
+
+	def classStmtHeaderHighlight(self, header):
+		highlightStyle = self._classStmtHeaderHighlightStyle()
+		return highlightStyle.border( header )
+
+	def classStmtHighlight(self, header):
+		highlightStyle = self._classStmtHighlightStyle()
+		return highlightStyle.border( header )
 
 
 	
@@ -988,13 +1069,13 @@ class PythonEditorStyleSheet (StyleSheet):
 	
 	#
 	#
-	#
+	# MISC
 	#
 	#
 	
 	def badIndentation(self, child):
-		badIndentationStyle = self._badIndentationStyle()
-		return badIndentationStyle.boder( child )
+		badIndentationStyle = self._badIndentationHighlightStyle()
+		return badIndentationStyle.border( child )
 	
 	def statementLine(self, statement):
 		primitiveStyleSheet = self['primitiveStyle']
