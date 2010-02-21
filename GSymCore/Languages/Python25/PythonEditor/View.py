@@ -158,7 +158,7 @@ def compoundStatementEditor(ctx, styleSheet, node, precedence, compoundBlocks, s
 		elif len( block ) == 4:
 			headerNode, headerContents, suite, headerContainerFn = block
 		else:
-			raise TypeError, 'Compound block should be of the form (headerContents, suite)  or  (headerContents, suite, headerContainerFn)'
+			raise TypeError, 'Compound block should be of the form (headerNode, headerContents, suite)  or  (headerNode, headerContents, suite, headerContainerFn)'
 		
 		headerStatementLine = styleSheet.statementLine( headerContents )
 		headerStatementLine.setStructuralValueObject( headerNode )
@@ -192,7 +192,7 @@ def compoundStatementEditor(ctx, styleSheet, node, precedence, compoundBlocks, s
 
 
 def spanPrefixOpView(ctx, styleSheet, node, x, op, precedence, parser):
-	xView = ctc.viewEval( x, styleSheet.withPythonState( precedence, parser, PythonEditorStyleSheet.MODE_DISPLAYCONTENTS ) )
+	xView = ctx.viewEval( x, styleSheet.withPythonState( precedence, parser, PythonEditorStyleSheet.MODE_DISPLAYCONTENTS ) )
 	view = styleSheet.spanPrefixOp( xView, op )
 	return expressionNodeEditor( styleSheet, node, precedence,
 	                             view )
@@ -438,7 +438,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def DictKeyValuePair(self, ctx, styleSheet, state, node, key, value):
 		keyView = ctx.viewEval( key, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
 		valueView = ctx.viewEval( value, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
-		view = styleSheet.dictKeyValurPair( keyView, valueView )
+		view = styleSheet.dictKeyValuePair( keyView, valueView )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_NONE,
 		                             view )
@@ -503,7 +503,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.SubscriptTuple )
 	def SubscriptTuple(self, ctx, styleSheet, state, node, values, trailingSeparator):
-		elementViews = ctx.mapViewEval( values, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
+		elementViews = ctx.mapViewEval( values, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.subscriptItem() ) )
 		view = styleSheet.subscriptTuple( elementViews, trailingSeparator is not None )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_TUPLE,
@@ -953,7 +953,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def ExecStmt(self, ctx, styleSheet, state, node, source, locals, globals):
 		sourceView = ctx.viewEval( source, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.orOp() ) )
 		localsView = ctx.viewEval( locals, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )   if locals is not None   else None
-		globalsView = ctx.viewEval( globals, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )    if globals is not none   else None
+		globalsView = ctx.viewEval( globals, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )    if globals is not None   else None
 		view = styleSheet.execStmt( sourceView, localsView, globalsView )
 		return statementNodeEditor( styleSheet, node,
 		                            view )
@@ -1017,7 +1017,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# While statement
 	def _whileStmtHeaderElement(self, ctx, styleSheet, state, condition):
 		conditionView = ctx.viewEval( condition, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )
-		return styleSheet.withStmtHeader( conditionView )
+		return styleSheet.whileStmtHeader( conditionView )
 
 	@ObjectNodeDispatchMethod( Nodes.WhileStmtHeader )
 	def WhileStmtHeader(self, ctx, styleSheet, state, node, condition):
@@ -1194,7 +1194,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def ForStmt(self, ctx, styleSheet, state, node, target, source, suite, elseSuite):
 		compoundBlocks = [ ( Nodes.ForStmtHeader( target=target, source=source ), self._forStmtHeaderElement( ctx, styleSheet, state, target, source ), suite ) ]
 		if elseSuite is not None:
-			compoundBlocks.append( ( self._elseStmtHeaderElement( ctx, styleSheet, state ),  elseSuite ) )
+			compoundBlocks.append( ( Nodes.ElseStmtHeader(), self._elseStmtHeaderElement( ctx, styleSheet, state ),  elseSuite ) )
 		return compoundStatementEditor( ctx, styleSheet, node, PRECEDENCE_STMT,
 						compoundBlocks,
 						state,

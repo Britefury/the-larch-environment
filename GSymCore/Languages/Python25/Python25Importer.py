@@ -265,13 +265,13 @@ class _ExprImporter (_Importer):
 	
 	# Dictionary literal
 	def Dict(self, node):
-		return Nodes.DictLiteral( values=[ Nodes.DictKeyValuePair( key=_expr( k ), value=[ _expr( v ) ] )   for k, v in zip( node.keys, node.values ) ] )
+		return Nodes.DictLiteral( values=[ Nodes.DictKeyValuePair( key=_expr( k ), value=_expr( v ) )   for k, v in zip( node.keys, node.values ) ] )
 	
 	
 	
 	# Yield expresion
 	def Yield(self, node):
-		return Nodes.YieldExpr( value=[ _expr( node.value ) ] )
+		return Nodes.YieldExpr( value=_expr( node.value ) )
 	
 	
 	
@@ -537,9 +537,15 @@ class _CompoundStmtImporter (_Importer):
 
 	def TryFinally(self, structTab, node):
 		body = node.body[0]
-		suite=_flattenedCompound( structTab, body.body )
-		exceptBlocks = [ _except( structTab, h )   for h in body.handlers ]
-		elseSuite = _flattenedCompound( structTab, body.orelse )   if len( body.orelse ) > 0   else   None
+		if isinstance( node.body[0], _ast.TryExcept ):
+			body = node.body[0]
+			suite=_flattenedCompound( structTab, body.body )
+			exceptBlocks = [ _except( structTab, h )   for h in body.handlers ]
+			elseSuite = _flattenedCompound( structTab, body.orelse )   if len( body.orelse ) > 0   else   None
+		else:
+			suite=_flattenedCompound( structTab, node.body )
+			finallySuite = _flattenedCompound( structTab, node.finalbody )   if len( node.finalbody ) > 0   else   None
+			return [ Nodes.TryStmt( suite=suite, exceptBlocks=[], elseSuite=None, finallySuite=finallySuite ) ]
 		finallySuite = _flattenedCompound( structTab, node.finalbody )   if len( node.finalbody ) > 0   else   None
 		return [ Nodes.TryStmt( suite=suite, exceptBlocks=exceptBlocks, elseSuite=elseSuite, finallySuite=finallySuite ) ]
 	
@@ -936,11 +942,11 @@ class ImporterTestCase (unittest.TestCase):
 		
 	
 	def testDict(self):
-		self._exprTest( '{a:b, c:d}',  Nodes.DictLiteral( values=[ Nodes.DictKeyValuePair( key=Nodes.Load( name='a' ), value=[ Nodes.Load( name='b' ) ] ), Nodes.DictKeyValuePair( key=Nodes.Load( name='c' ), value=[ Nodes.Load( name='d' ) ] ) ] ) )
+		self._exprTest( '{a:b, c:d}',  Nodes.DictLiteral( values=[ Nodes.DictKeyValuePair( key=Nodes.Load( name='a' ), value=Nodes.Load( name='b' ) ), Nodes.DictKeyValuePair( key=Nodes.Load( name='c' ), value=Nodes.Load( name='d' ) ) ] ) )
 		
 		
 	def testYieldExpr(self):
-		self._exprTest( '(yield a)', Nodes.YieldExpr( value=[ Nodes.Load( name='a' ) ] ) )
+		self._exprTest( '(yield a)', Nodes.YieldExpr( value=Nodes.Load( name='a' ) ) )
 		
 		
 	def testAttribute(self):
@@ -1054,7 +1060,7 @@ class ImporterTestCase (unittest.TestCase):
 	def testAssign(self):
 		self._stmtTest( 'a=x', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='a' ) ], value=Nodes.Load( name='x' ) ) )
 		self._stmtTest( 'a,b=c,d=x', Nodes.AssignStmt( targets=[ Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='a' ), Nodes.SingleTarget( name='b' ) ] ),  Nodes.TupleTarget( targets=[ Nodes.SingleTarget( name='c' ), Nodes.SingleTarget( name='d' ) ] ) ], value=Nodes.Load( name='x' ) ) )
-		self._stmtTest( 'a=yield x', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='a' ) ], value=Nodes.YieldExpr( value=[ Nodes.Load( name='x' ) ] ) ) )
+		self._stmtTest( 'a=yield x', Nodes.AssignStmt( targets=[ Nodes.SingleTarget( name='a' ) ], value=Nodes.YieldExpr( value=Nodes.Load( name='x' ) ) ) )
 	
 		
 	def testAugAssignStmt(self):
@@ -1085,7 +1091,7 @@ class ImporterTestCase (unittest.TestCase):
 		
 	
 	def testYieldStmt(self):
-		self._stmtTest( 'yield x', Nodes.ExprStmt( expr=Nodes.YieldExpr( value=[ Nodes.Load( name='x' ) ] ) ) )
+		self._stmtTest( 'yield x', Nodes.ExprStmt( expr=Nodes.YieldExpr( value=Nodes.Load( name='x' ) ) ) )
 		
 		
 	def testRaiseStmt(self):
@@ -1240,9 +1246,27 @@ except:
 	p
 finally:
 	z"""
+		src4 = \
+"""
+try:
+	pass
+except:
+	pass
+else:
+	pass
+finally:
+	pass"""
+		src5 = \
+"""
+try:
+	pass
+finally:
+	pass"""
 		self._compStmtTest( src1, [ Nodes.BlankLine(), Nodes.TryStmt( suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ], exceptBlocks=[ Nodes.ExceptBlock( exception=None, target=None, suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='p' ) ) ] ),   Nodes.ExceptBlock( exception=Nodes.Load( name='a' ), target=None, suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='q' ) ) ] ),    Nodes.ExceptBlock( exception=Nodes.Load( name='a' ), target=Nodes.SingleTarget( name='b' ), suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='r' ) ) ] ) ], elseSuite=None, finallySuite=None ) ] )
 		self._compStmtTest( src2, [ Nodes.BlankLine(), Nodes.TryStmt( suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ], exceptBlocks=[ Nodes.ExceptBlock( exception=None, target=None, suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='p' ) ) ] ) ], elseSuite=[ Nodes.ExprStmt( expr=Nodes.Load( name='z' ) ) ], finallySuite=None ) ] )
 		self._compStmtTest( src3, [ Nodes.BlankLine(), Nodes.TryStmt( suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='x' ) ) ],  exceptBlocks=[ Nodes.ExceptBlock( exception=None, target=None, suite=[ Nodes.ExprStmt( expr=Nodes.Load( name='p' ) ) ] ) ],   elseSuite=None, finallySuite=[ Nodes.ExprStmt( expr=Nodes.Load( name='z' ) ) ] ) ] )
+		self._compStmtTest( src4, [ Nodes.BlankLine(), Nodes.TryStmt( suite=[ Nodes.PassStmt() ],  exceptBlocks=[ Nodes.ExceptBlock( exception=None, target=None, suite=[ Nodes.PassStmt() ] ) ],   elseSuite=[ Nodes.PassStmt() ], finallySuite=[ Nodes.PassStmt() ] ) ] )
+		self._compStmtTest( src5, [ Nodes.BlankLine(), Nodes.TryStmt( suite=[ Nodes.PassStmt() ],  exceptBlocks=[],   elseSuite=None, finallySuite=[ Nodes.PassStmt() ] ) ] )
 
 		
 		
