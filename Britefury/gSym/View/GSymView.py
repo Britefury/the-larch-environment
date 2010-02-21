@@ -11,8 +11,6 @@ from Britefury.Dispatch.Dispatch import DispatchError
 from Britefury.Dispatch.MethodDispatch import methodDispatch, methodDispatchAndGetName
 from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeMethodDispatchMetaClass, objectNodeMethodDispatch, objectNodeMethodDispatchAndGetName
 
-from Britefury.gSym.View.gSymStyles import viewError_textStyle
-
 import time
 
 
@@ -26,7 +24,7 @@ class GSymViewListNodeDispatch (object):
 			element, name = methodDispatchAndGetName( self, xs, ctx, styleSheet, state )
 			element.setDebugName( name )
 		except DispatchError:
-			element = ctx.text( viewError_textStyle, '<<ERROR>>' )
+			element = ctx.errorElement( '<<VIEW LIST NODE DISPATCH ERROR>>' )
 		return element
 	
 		
@@ -45,7 +43,7 @@ class GSymViewObjectNodeDispatch (object):
 			element, name = objectNodeMethodDispatchAndGetName( self, xs, ctx, styleSheet, state )
 			element.setDebugName( name )
 		except DispatchError:
-			element = ctx.text( viewError_textStyle, '<<ERROR>>' )
+			element = ctx.errorElement( '<<VIEW OBJECT NODE DISPATCH ERROR>>' )
 		return element
 	
 		

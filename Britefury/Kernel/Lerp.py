@@ -5,13 +5,21 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from java.awt import Font, Color
-
-from BritefuryJ.DocPresent import *
-from BritefuryJ.DocPresent.StyleParams import *
+from java.awt import Color
 
 
+def lerp(x, y, t):
+	return x +  ( y - x ) * t
 
-viewError_textStyle = TextStyleParams( Font( 'SansSerif', Font.BOLD, 12 ),  Color( 0.8, 0.0, 0.0 ) )
+
+def lerpColour(x, y, t):
+	r = x.getRed()  +  float( y.getRed() - x.getRed() )  *  t
+	g = x.getGreen()  +  float( y.getGreen() - x.getGreen() )  *  t
+	b = x.getBlue()  +  float( y.getBlue() - x.getBlue() )  *  t
+	a = x.getAlpha()  +  float( y.getAlpha() - x.getAlpha() )  *  t
+	return Color( int(r), int(g), int(b), int(a) )
+
+
+
 
 

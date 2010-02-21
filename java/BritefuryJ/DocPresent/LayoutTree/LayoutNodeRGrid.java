@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.DocPresent.LayoutTree;
 
-import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPGridRow;
@@ -81,6 +80,8 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 
 	protected void updateRequisitionY()
 	{
+		//refreshSubtree();   -- unnecessary since this is done in updateRequisitionX()
+
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		rowBoxes = getLeavesRefreshedRequistionYBoxes();
 		
@@ -100,6 +101,8 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 	protected void updateAllocationX()
 	{
 		super.updateAllocationX();
+
+		//refreshSubtree();   -- unnecessary since this is done in updateRequisitionX()
 		
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPRGrid grid = (DPRGrid)element;
@@ -163,6 +166,8 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 	{
 		super.updateAllocationY( );
 		
+		//refreshSubtree();   -- unnecessary since this is done in updateRequisitionX()
+
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		LReqBoxInterface childBoxes[] = getLeavesRequisitionBoxes();
 		LAllocBoxInterface childAllocBoxes[] = getLeavesAllocationBoxes();
@@ -185,7 +190,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 	
 	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
 	{
-		return getChildLeafClosestToLocalPointVertical( Arrays.asList( leaves ), localPos, filter );
+		return getChildLeafClosestToLocalPointVertical( getLeaves(), localPos, filter );
 	}
 
 

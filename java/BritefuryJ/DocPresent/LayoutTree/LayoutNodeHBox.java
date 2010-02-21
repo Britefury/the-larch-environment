@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.DocPresent.LayoutTree;
 
-import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPHBox;
@@ -81,7 +80,7 @@ public class LayoutNodeHBox extends LayoutNodeAbstractBox
 	
 	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
 	{
-		return getChildLeafClosestToLocalPointHorizontal( Arrays.asList( leaves ), localPos, filter );
+		return getChildLeafClosestToLocalPointHorizontal( getLeaves(), localPos, filter );
 	}
 
 

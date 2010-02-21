@@ -49,7 +49,6 @@ from BritefuryJ.GSym.View import GSymViewContext
 from GSymCore.Languages.Python25 import NodeClasses as Nodes
 
 from GSymCore.Languages.Python25.PythonEditor.Parser import Python25Grammar
-from GSymCore.Languages.Python25.PythonEditor.Styles import *
 from GSymCore.Languages.Python25.PythonEditor.PythonEditOperations import *
 from GSymCore.Languages.Python25.PythonEditor.NodeEditor import *
 from GSymCore.Languages.Python25.PythonEditor.SelectionEditor import *
@@ -150,9 +149,7 @@ def compoundStatementHeaderEditor(styleSheet, node, headerContents, headerContai
 	return headerStatementLine
 
 
-def compoundStatementEditor(ctx, node, precedence, compoundBlocks, state, suiteParser, statementParser):
-	outerPrecedence, parser, mode = state
-
+def compoundStatementEditor(ctx, styleSheet, node, precedence, compoundBlocks, state, suiteParser, statementParser):
 	statementContents = []
 	for i, block in enumerate( compoundBlocks ):
 		if len( block ) == 3:
@@ -163,42 +160,7 @@ def compoundStatementEditor(ctx, node, precedence, compoundBlocks, state, suiteP
 		else:
 			raise TypeError, 'Compound block should be of the form (headerContents, suite)  or  (headerContents, suite, headerContainerFn)'
 		
-		statementLine = styleSheet.statementLine( headerContents )
-		
-		statementLine.setStructuralValueObject( headerNode )
-		statementLine.setLinearRepresentationListener( CompoundHeaderLinearRepresentationListener.newListener( statementParser ) )
-		statementLine.setKeyboardListener( _statementKeyboardListener )
-		
-		if headerContainerFn is not None:
-			statementLine = headerContainerFn( statementLine )
-
-
-
-		if suite is not None:
-			suiteElement = indentedSuiteView( ctx, suite, statementParser )
-			suiteElement.setStructuralValueObject( Nodes.IndentedBlock( suite=suite ) )
-			suiteElement = ctx.linearRepresentationListener( suiteElement, SuiteLinearRepresentationListener( suiteParser, suite ) )
-			
-			statementContents.extend( [ headerParagraph.alignHExpand(), ctx.indent( 30.0, suiteElement ).alignHExpand() ] )
-		else:
-			statementContents.append( headerParagraph.alignHExpand() )
-			
-	statementElement = ctx.vbox( compoundStmt_vboxStyle, statementContents )
-	return statementElement
-
-
-def compoundStatementEditor(styleSheet, node, precedence, compoundBlocks, state, suiteParser, statementParser):
-	statementContents = []
-	for i, block in enumerate( compoundBlocks ):
-		if len( block ) == 3:
-			headerNode, headerContents, suite = block
-			headerContainerFn = None
-		elif len( block ) == 4:
-			headerNode, headerContents, suite, headerContainerFn = block
-		else:
-			raise TypeError, 'Compound block should be of the form (headerContents, suite)  or  (headerContents, suite, headerContainerFn)'
-		
-		headerStatementLine = styleSheet.statementLine( True, True, headerContents )
+		headerStatementLine = styleSheet.statementLine( headerContents )
 		headerStatementLine.setStructuralValueObject( headerNode )
 		headerStatementLine.setLinearRepresentationListener( CompoundHeaderLinearRepresentationListener.newListener( statementParser ) )
 		headerStatementLine.setKeyboardListener( _statementKeyboardListener )
@@ -246,8 +208,8 @@ def spanBinOpView(ctx, styleSheet, node, x, y, op, precedence, bRightAssociative
 
 
 def spanCmpOpView(ctx, styleSheet, node, op, y, precedence, parser):
-	yView = ctx.viewEval( y, styleSheet.withPythonState( yPrec, parser, PythonEditorStyleSheet.MODE_DISPLAYCONTENTS ) )
-	view = styleSheet.spanBinOp( op, yView )
+	yView = ctx.viewEval( y, styleSheet.withPythonState( precedence, parser, PythonEditorStyleSheet.MODE_DISPLAYCONTENTS ) )
+	view = styleSheet.spanCmpOp( op, yView )
 	return expressionNodeEditor( styleSheet, node, precedence,
 	                             view )
 	
@@ -321,7 +283,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	
 	@ObjectNodeDispatchMethod( Nodes.StringLiteral )
 	def StringLiteral(self, ctx, styleSheet, state, node, format, quotation, value):
-		fmt = __strLit_fmtTable[format]
+		fmt = self.__strLit_fmtTable[format]
 		
 		quote = "'"   if quotation == 'single'   else   '"'
 		
@@ -476,10 +438,10 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def DictKeyValuePair(self, ctx, styleSheet, state, node, key, value):
 		keyView = ctx.viewEval( key, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
 		valueView = ctx.viewEval( value, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
-		return expressionNodeEditor( ctx, node,
-					     ctx.span( [ keyView, ctx.text( punctuation_textStyle, ' : ' ), valueView ] ),
-					     PRECEDENCE_NONE,
-					     state )
+		view = styleSheet.dictKeyValurPair( keyView, valueView )
+		return expressionNodeEditor( styleSheet, node,
+			                     PRECEDENCE_NONE,
+		                             view )
 
 	@ObjectNodeDispatchMethod( Nodes.DictLiteral )
 	def DictLiteral(self, ctx, styleSheet, state, node, values, trailingSeparator):
@@ -517,7 +479,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def SubscriptSlice(self, ctx, styleSheet, state, node, lower, upper):
 		lowerView = ctx.viewEval( lower, styleSheet.withPythonState( PRECEDENCE_CONTAINER_SUBSCRIPTINDEX, self._parser.expression() ) )   if lower is not None   else None
 		upperView = ctx.viewEval( upper, styleSheet.withPythonState( PRECEDENCE_CONTAINER_SUBSCRIPTINDEX, self._parser.expression() ) )   if upper is not None   else None
-		view = styleSheet.subscriptSlice( lower, upper )
+		view = styleSheet.subscriptSlice( lowerView, upperView )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_NONE,
 		                             view )
@@ -527,17 +489,17 @@ class Python25View (GSymViewObjectNodeDispatch):
 		lowerView = ctx.viewEval( lower, styleSheet.withPythonState( PRECEDENCE_CONTAINER_SUBSCRIPTINDEX, self._parser.expression() ) )   if lower is not None   else None
 		upperView = ctx.viewEval( upper, styleSheet.withPythonState( PRECEDENCE_CONTAINER_SUBSCRIPTINDEX, self._parser.expression() ) )   if upper is not None   else None
 		strideView = ctx.viewEval( stride, styleSheet.withPythonState( PRECEDENCE_CONTAINER_SUBSCRIPTINDEX, self._parser.expression() ) )   if stride is not None   else None
-		view = styleSheet.subscriptLongSlice( lower, upper, stride )
+		view = styleSheet.subscriptLongSlice( lowerView, upperView, strideView )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_NONE,
 		                             view )
 
 	@ObjectNodeDispatchMethod( Nodes.SubscriptEllipsis )
 	def SubscriptEllipsis(self, ctx, styleSheet, state, node):
-		return expressionNodeEditor( ctx, node,
-					     ctx.text( punctuation_textStyle, '...' ),
-					     PRECEDENCE_NONE,
-					     state )
+		view = styleSheet.subscriptEllipsis()
+		return expressionNodeEditor( styleSheet, node,
+			                     PRECEDENCE_NONE,
+		                             view )
 
 	@ObjectNodeDispatchMethod( Nodes.SubscriptTuple )
 	def SubscriptTuple(self, ctx, styleSheet, state, node, values, trailingSeparator):
@@ -1026,10 +988,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.IfStmtHeader )
 	def IfStmtHeader(self, ctx, styleSheet, state, node, condition):
-		return compoundStatementHeaderEditor( ctx, node,
-					    self._ifStmtHeaderElement( ctx, styleSheet, state, condition ),
-					    PRECEDENCE_STMT,
-					    state )
+		return compoundStatementHeaderEditor( styleSheet, node,
+					    self._ifStmtHeaderElement( ctx, styleSheet, state, condition ) )
 
 
 	# Elif statement
@@ -1039,10 +999,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.ElifStmtHeader )
 	def ElifStmtHeader(self, ctx, styleSheet, state, node, condition):
-		return compoundStatementHeaderEditor( ctx, node,
-					    self._elifStmtHeaderElement( ctx, styleSheet, state, condition ),
-					    PRECEDENCE_STMT,
-					    state )
+		return compoundStatementHeaderEditor( styleSheet, node,
+					    self._elifStmtHeaderElement( ctx, styleSheet, state, condition ) )
 
 
 
@@ -1052,10 +1010,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.ElseStmtHeader )
 	def ElseStmtHeader(self, ctx, styleSheet, state, node):
-		return compoundStatementHeaderEditor( ctx, node,
-					    self._elseStmtHeaderElement( ctx, styleSheet, state ),
-					    PRECEDENCE_STMT,
-					    state )
+		return compoundStatementHeaderEditor( styleSheet, node,
+					    self._elseStmtHeaderElement( ctx, styleSheet, state ) )
 
 
 	# While statement
@@ -1065,10 +1021,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.WhileStmtHeader )
 	def WhileStmtHeader(self, ctx, styleSheet, state, node, condition):
-		return compoundStatementHeaderEditor( ctx, node,
-					    self._whileStmtHeaderElement( ctx, styleSheet, state, condition ),
-					    PRECEDENCE_STMT,
-					    state )
+		return compoundStatementHeaderEditor( styleSheet, node,
+					    self._whileStmtHeaderElement( ctx, styleSheet, state, condition ) )
 
 
 	# For statement
@@ -1079,10 +1033,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.ForStmtHeader )
 	def ForStmtHeader(self, ctx, styleSheet, state, node, target, source):
-		return compoundStatementHeaderEditor( ctx, node,
-						self._forStmtHeaderElement( ctx, styleSheet, state, target, source ),
-						PRECEDENCE_STMT,
-						state )
+		return compoundStatementHeaderEditor( styleSheet, node,
+						self._forStmtHeaderElement( ctx, styleSheet, state, target, source ) )
 
 
 
@@ -1092,10 +1044,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.TryStmtHeader )
 	def TryStmtHeader(self, ctx, styleSheet, state, node):
-		return compoundStatementHeaderEditor( ctx, node,
-					    self._tryStmtHeaderElement( ctx, styleSheet, state ),
-					    PRECEDENCE_STMT,
-					    state )
+		return compoundStatementHeaderEditor( styleSheet, node,
+					    self._tryStmtHeaderElement( ctx, styleSheet, state ) )
 
 
 
@@ -1107,10 +1057,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.ExceptStmtHeader )
 	def ExceptStmtHeader(self, ctx, styleSheet, state, node, exception, target):
-		return compoundStatementHeaderEditor( ctx, node,
-					    self._exceptStmtHeaderElement( ctx, styleSheet, state, exception, target ),
-					    PRECEDENCE_STMT,
-					    state )
+		return compoundStatementHeaderEditor( styleSheet, node,
+					    self._exceptStmtHeaderElement( ctx, styleSheet, state, exception, target ) )
 
 
 
@@ -1120,10 +1068,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.FinallyStmtHeader )
 	def FinallyStmtHeader(self, ctx, styleSheet, state, node):
-		return compoundStatementHeaderEditor( ctx, node,
-					    self._finallyStmtHeaderElement( ctx, styleSheet, state ),
-					    PRECEDENCE_STMT,
-					    state )
+		return compoundStatementHeaderEditor( styleSheet, node,
+					    self._finallyStmtHeaderElement( ctx, styleSheet, state ) )
 
 
 
@@ -1135,10 +1081,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.WithStmtHeader )
 	def WithStmtHeader(self, ctx, styleSheet, state, node, expr, target):
-		return compoundStatementHeaderEditor( ctx, node,
-					    self._withStmtHeaderElement( ctx, styleSheet, state, expr, target ),
-					    PRECEDENCE_STMT,
-					    state )
+		return compoundStatementHeaderEditor( styleSheet, node,
+					    self._withStmtHeaderElement( ctx, styleSheet, state, expr, target ) )
 
 
 
@@ -1149,10 +1093,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.DecoStmtHeader )
 	def DecoStmtHeader(self, ctx, styleSheet, state, node, name, args, argsTrailingSeparator):
-		return compoundStatementHeaderEditor( ctx, node,
-					    self._decoStmtHeaderElement( ctx, styleSheet, state, name, args, argsTrailingSeparator ),
-					    PRECEDENCE_STMT,
-					    state )
+		return compoundStatementHeaderEditor( styleSheet, node,
+					    self._decoStmtHeaderElement( ctx, styleSheet, state, name, args, argsTrailingSeparator ) )
 
 
 
@@ -1163,13 +1105,10 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.DefStmtHeader )
 	def DefStmtHeader(self, ctx, styleSheet, state, node, name, params, paramsTrailingSeparator):
-		editor = compoundStatementHeaderEditor( ctx, node,
+		editor = compoundStatementHeaderEditor( styleSheet, node,
 					    self._defStmtHeaderElement( ctx, styleSheet, state, name, params, paramsTrailingSeparator ),
-					    PRECEDENCE_STMT,
-					    state,
-					    lambda header: ctx.border( defHeader_border, ContainerStyleParams.defaultStyleParams, header ) )
-		#return ctx.border( defBackground_border, ContainerStyleParams.defaultStyleParams, editor )
-		return editor
+					    lambda header: styleSheet.defStmtHeaderHighlight( header ) )
+		return styleSheet.defStmtHighlight( editor )
 
 
 	# Def statement
@@ -1179,13 +1118,10 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.ClassStmtHeader )
 	def ClassStmtHeader(self, ctx, styleSheet, state, node, name, bases, basesTrailingSeparator):
-		editor = compoundStatementHeaderEditor( ctx, node,
+		editor = compoundStatementHeaderEditor( styleSheet, node,
 						  self._classStmtHeaderElement( ctx, styleSheet, state, name, bases, basesTrailingSeparator ),
-						  PRECEDENCE_STMT,
-						  state,
-						  lambda header: ctx.border( classHeader_border, ContainerStyleParams.defaultStyleParams, header ) )
-		#return ctx.border( classBackground_border, ContainerStyleParams.defaultStyleParams, editor )
-		return editor
+		                                  lambda header: styleSheet.classStmtHeaderHighlight( header ) )
+		return styleSheet.classStmtHighlight( editor )
 
 
 	
@@ -1211,7 +1147,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		suiteElement.setStructuralValueObject( node )
 		suiteElement.setLinearRepresentationListener( SuiteLinearRepresentationListener( self._parser.compoundSuite(), suite ) )
 		
-		return styleSheet.badIndentation( styleSheet )
+		return styleSheet.badIndentation( suiteElement )
 
 
 
@@ -1233,7 +1169,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			compoundBlocks.append( ( Nodes.ElifStmtHeader( condition=b['condition'] ), self._elifStmtHeaderElement( ctx, styleSheet, state, b['condition'] ),  b['suite'] ) )
 		if elseSuite is not None:
 			compoundBlocks.append( ( Nodes.ElseStmtHeader(), self._elseStmtHeaderElement( ctx, styleSheet, state ),  elseSuite ) )
-		return compoundStatementEditor( ctx, node, PRECEDENCE_STMT,
+		return compoundStatementEditor( ctx, styleSheet, node, PRECEDENCE_STMT,
 						compoundBlocks,
 						state,
 						self._parser.compoundSuite(), self._parser.singleLineStatement() )
@@ -1246,7 +1182,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		compoundBlocks = [ ( Nodes.WhileStmtHeader( condition=condition ), self._whileStmtHeaderElement( ctx, styleSheet, state, condition ), suite ) ]
 		if elseSuite is not None:
 			compoundBlocks.append( ( Nodes.ElseStmtHeader(), self._elseStmtHeaderElement( ctx, styleSheet, state ),  elseSuite ) )
-		return compoundStatementEditor( ctx, node, PRECEDENCE_STMT,
+		return compoundStatementEditor( ctx, styleSheet, node, PRECEDENCE_STMT,
 						compoundBlocks,
 						state,
 						self._parser.compoundSuite(), self._parser.singleLineStatement() )
@@ -1259,7 +1195,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		compoundBlocks = [ ( Nodes.ForStmtHeader( target=target, source=source ), self._forStmtHeaderElement( ctx, styleSheet, state, target, source ), suite ) ]
 		if elseSuite is not None:
 			compoundBlocks.append( ( self._elseStmtHeaderElement( ctx, styleSheet, state ),  elseSuite ) )
-		return compoundStatementEditor( ctx, node, PRECEDENCE_STMT,
+		return compoundStatementEditor( ctx, styleSheet, node, PRECEDENCE_STMT,
 						compoundBlocks,
 						state,
 						self._parser.compoundSuite(), self._parser.singleLineStatement() )
@@ -1278,7 +1214,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			compoundBlocks.append( ( Nodes.ElseStmtHeader(), self._elseStmtHeaderElement( ctx, styleSheet, state ),  elseSuite ) )
 		if finallySuite is not None:
 			compoundBlocks.append( ( Nodes.FinallyStmtHeader(), self._finallyStmtHeaderElement( ctx, styleSheet, state ),  finallySuite ) )
-		return compoundStatementEditor( ctx, node, PRECEDENCE_STMT,
+		return compoundStatementEditor( ctx, styleSheet, node, PRECEDENCE_STMT,
 						compoundBlocks,
 						state,
 						self._parser.compoundSuite(), self._parser.singleLineStatement() )
@@ -1290,7 +1226,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod( Nodes.WithStmt )
 	def WithStmt(self, ctx, styleSheet, state, node, expr, target, suite):
 		compoundBlocks = [ ( Nodes.WithStmtHeader( expr=expr, target=target ), self._withStmtHeaderElement( ctx, styleSheet, state, expr, target ), suite ) ]
-		return compoundStatementEditor( ctx, node, PRECEDENCE_STMT,
+		return compoundStatementEditor( ctx, styleSheet, node, PRECEDENCE_STMT,
 						compoundBlocks,
 						state,
 						self._parser.compoundSuite(), self._parser.singleLineStatement() )
@@ -1308,24 +1244,26 @@ class Python25View (GSymViewObjectNodeDispatch):
 						 self._decoStmtHeaderElement( ctx, styleSheet, state, d['name'], d['args'], d['argsTrailingSeparator'] ),  None ) )
 			
 		compoundBlocks.append( ( Nodes.DefStmtHeader( name=name, params=params, paramsTrailingSeparator=paramsTrailingSeparator ),
-					 self._defStmtHeaderElement( ctx, styleSheet, state, name, params, paramsTrailingSeparator ), suite, lambda header: ctx.border( defHeader_border, ContainerStyleParams.defaultStyleParams, header ) ) )
-		editor = compoundStatementEditor( ctx, node, PRECEDENCE_STMT,
+					 self._defStmtHeaderElement( ctx, styleSheet, state, name, params, paramsTrailingSeparator ), suite,
+		                         lambda header: styleSheet.defStmtHeaderHighlight( header ) ) )
+		editor = compoundStatementEditor( ctx, styleSheet, node, PRECEDENCE_STMT,
 						compoundBlocks,
 						state,
 						self._parser.compoundSuite(), self._parser.singleLineStatement() )
-		return ctx.border( defBackground_border, ContainerStyleParams.defaultStyleParams, editor )
+		return styleSheet.defStmtHighlight( editor )
 
 
 	# Class statement
 	@ObjectNodeDispatchMethod( Nodes.ClassStmt )
 	def ClassStmt(self, ctx, styleSheet, state, node, name, bases, basesTrailingSeparator, suite):
 		compoundBlocks = [ ( Nodes.ClassStmtHeader( name=name, bases=bases, basesTrailingSeparator=basesTrailingSeparator ),
-				     self._classStmtHeaderElement( ctx, styleSheet, state, name, bases, basesTrailingSeparator ), suite, lambda header: ctx.border( classHeader_border, ContainerStyleParams.defaultStyleParams, header ) ) ]
-		editor = compoundStatementEditor( ctx, node, PRECEDENCE_STMT,
+				     self._classStmtHeaderElement( ctx, styleSheet, state, name, bases, basesTrailingSeparator ), suite,
+		                     lambda header: styleSheet.classStmtHeaderHighlight( header ) ) ]
+		editor = compoundStatementEditor( ctx, styleSheet, node, PRECEDENCE_STMT,
 						compoundBlocks,
 						state,
 						self._parser.compoundSuite(), self._parser.singleLineStatement() )
-		return ctx.border( classBackground_border, ContainerStyleParams.defaultStyleParams, editor )
+		return styleSheet.classStmtHighlight( editor )
 
 
 

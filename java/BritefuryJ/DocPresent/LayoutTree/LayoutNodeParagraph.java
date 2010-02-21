@@ -175,6 +175,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 
 	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
 	{
+		refreshSubtree();
 		ParagraphLayout.Line line = getLineClosestToLocalPoint( localPos );
 		
 		if ( line != null )
