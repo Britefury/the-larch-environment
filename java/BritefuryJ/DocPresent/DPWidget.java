@@ -10,6 +10,8 @@ package BritefuryJ.DocPresent;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Shape;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -35,6 +37,7 @@ import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.LayoutTree.ArrangedSequenceLayoutNode;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNode;
 import BritefuryJ.DocPresent.Marker.Marker;
+import BritefuryJ.DocPresent.Painter.Painter;
 import BritefuryJ.DocPresent.StructuralRepresentation.StructuralRepresentation;
 import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValue;
 import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueObject;
@@ -515,6 +518,13 @@ abstract public class DPWidget extends PointerInputElement
 	public AABox2 getAABoxInParentSpace()
 	{
 		return new AABox2( getPositionInParentSpace(), getAllocationInParentSpace() );
+	}
+	
+	
+	protected Shape[] getShapes()
+	{
+		Vector2 alloc = getAllocation();
+		return new Shape[] { new Rectangle2D.Double( 0.0, 0.0, alloc.x, alloc.y ) };
 	}
 
 	
@@ -1171,6 +1181,14 @@ abstract public class DPWidget extends PointerInputElement
 	
 	protected void drawBackground(Graphics2D graphics)
 	{
+		WidgetStyleParams styleParams = getStyleParams();
+		
+		Painter b = styleParams.getBackground();
+		if ( b != null )
+		{
+			System.out.println( "Drawing background for " + this );
+			b.drawShapes( graphics, getShapes() );
+		}
 	}
 	
 	protected void draw(Graphics2D graphics)
@@ -2280,9 +2298,9 @@ abstract public class DPWidget extends PointerInputElement
 	// Meta-element
 	//
 	
-	protected static TextStyleParams headerDebugTextStyle = new TextStyleParams( new Font( "Sans serif", Font.BOLD, 14 ), new Color( 0.0f, 0.5f, 0.5f ) );
-	protected static TextStyleParams headerDescriptionTextStyle = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 14 ), new Color( 0.0f, 0.0f, 0.75f ) );
-	protected static HBoxStyleParams metaHeaderHBoxStyle = new HBoxStyleParams( 10.0 );
+	protected static TextStyleParams headerDebugTextStyle = new TextStyleParams( null, new Font( "Sans serif", Font.BOLD, 14 ), new Color( 0.0f, 0.5f, 0.5f ), null, false );
+	protected static TextStyleParams headerDescriptionTextStyle = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 14 ), new Color( 0.0f, 0.0f, 0.75f ), null, false );
+	protected static HBoxStyleParams metaHeaderHBoxStyle = new HBoxStyleParams( null, 10.0 );
 	protected static EmptyBorder metaHeaderEmptyBorder = new EmptyBorder();
 
 
@@ -2416,7 +2434,7 @@ abstract public class DPWidget extends PointerInputElement
 	
 	
 	
-	public WidgetStyleParams getStyleSheet()
+	public WidgetStyleParams getStyleParams()
 	{
 		return styleParams;
 	}

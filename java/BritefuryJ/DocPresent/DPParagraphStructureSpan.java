@@ -4,17 +4,29 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.StyleParams;
+package BritefuryJ.DocPresent;
 
-import BritefuryJ.DocPresent.Painter.Painter;
+import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 
-public class GridRowStyleParams extends ContainerStyleParams
+public class DPParagraphStructureSpan extends DPSpan
 {
-	public static final GridRowStyleParams defaultStyleParams = new GridRowStyleParams( null );
-
-
-	public GridRowStyleParams(Painter background)
+	public DPParagraphStructureSpan(ContainerStyleParams styleParams)
 	{
-		super( background );
+		super( styleParams );
+	}
+
+
+	
+	
+	
+	//
+	//
+	// LAYOUT METHODS
+	//
+	//
+	
+	public int getParagraphLinebreakCostModifier()
+	{
+		return 1;
 	}
 }

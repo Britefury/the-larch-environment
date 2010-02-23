@@ -11,10 +11,14 @@ import java.awt.Paint;
 import java.awt.RadialGradientPaint;
 
 import BritefuryJ.DocPresent.Border.SolidBorder;
+import BritefuryJ.DocPresent.Painter.Painter;
 
 public class ButtonStyleParams extends ContainerStyleParams
 {
-	public static final ButtonStyleParams defaultStyleParams = new ButtonStyleParams();
+	public static final ButtonStyleParams defaultStyleParams = new ButtonStyleParams( null, 
+			new RadialGradientPaint( -10.0f, -10.0f, 100.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 0.2f, 0.3f, 0.5f ), new Color( 0.3f, 0.45f, 0.75f ) }, RadialGradientPaint.CycleMethod.NO_CYCLE ),
+			new RadialGradientPaint( -10.0f, -10.0f, 100.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 0.9f, 0.92f, 1.0f ), new Color( 0.75f, 0.825f, 0.9f ) }, RadialGradientPaint.CycleMethod.NO_CYCLE ),
+			new RadialGradientPaint( -10.0f, -10.0f, 100.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 1.0f, 1.0f, 1.0f ), new Color( 0.85f, 0.85f, 0.85f ) }, RadialGradientPaint.CycleMethod.NO_CYCLE ) );
 	
 	
 	
@@ -22,19 +26,10 @@ public class ButtonStyleParams extends ContainerStyleParams
 	protected final SolidBorder border, highlightBorder;
 
 
-	public ButtonStyleParams()
+	public ButtonStyleParams(Painter background, Paint borderPaint, Paint backgroundPaint, Paint highlightBackgPaint)
 	{
-		//this( new Color( 0.55f, 0.75f, 1.0f ), new Color( 0.85f, 0.95f, 1.0f ), new Color( 0.75f, 0.85f, 1.0f ) );
+		super( background );
 		
-		//this( new Color( 0.4f, 0.7f, 1.0f ), new Color( 0.9f, 0.92f, 1.0f ), null );
-		
-		this( new RadialGradientPaint( -10.0f, -10.0f, 100.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 0.2f, 0.3f, 0.5f ), new Color( 0.3f, 0.45f, 0.75f ) }, RadialGradientPaint.CycleMethod.NO_CYCLE ),
-				new RadialGradientPaint( -10.0f, -10.0f, 100.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 0.9f, 0.92f, 1.0f ), new Color( 0.75f, 0.825f, 0.9f ) }, RadialGradientPaint.CycleMethod.NO_CYCLE ),
-				new RadialGradientPaint( -10.0f, -10.0f, 100.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 1.0f, 1.0f, 1.0f ), new Color( 0.85f, 0.85f, 0.85f ) }, RadialGradientPaint.CycleMethod.NO_CYCLE ) );
-	}
-	
-	public ButtonStyleParams(Paint borderPaint, Paint backgroundPaint, Paint highlightBackgPaint)
-	{
 		this.borderPaint = borderPaint;
 		this.backgroundPaint = backgroundPaint;
 		this.highlightBackgPaint = highlightBackgPaint;

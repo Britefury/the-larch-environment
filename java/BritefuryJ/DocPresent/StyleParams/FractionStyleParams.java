@@ -9,19 +9,21 @@ package BritefuryJ.DocPresent.StyleParams;
 import java.awt.Color;
 import java.awt.Paint;
 
+import BritefuryJ.DocPresent.Painter.Painter;
+
 public class FractionStyleParams extends ContainerStyleParams
 {
 	public static class BarStyleParams extends ContentLeafStyleParams
 	{
-		public static final BarStyleParams defaultStyleParams = new BarStyleParams( Color.black );
+		public static final BarStyleParams defaultStyleParams = new BarStyleParams( null, Color.black );
 		
 		
 		protected final Paint barPaint;
 
 
-		public BarStyleParams(Paint barPaint)
+		public BarStyleParams(Painter background, Paint barPaint)
 		{
-			super();
+			super( background );
 			
 			this.barPaint = barPaint;
 		}
@@ -34,7 +36,7 @@ public class FractionStyleParams extends ContainerStyleParams
 	}
 
 	
-	public static final FractionStyleParams defaultStyleParams = new FractionStyleParams();
+	public static final FractionStyleParams defaultStyleParams = new FractionStyleParams( null, 2.0, 3.0, 5.0, null, Color.black );
 	
 	protected final BarStyleParams barStyleParams;
 	
@@ -43,25 +45,15 @@ public class FractionStyleParams extends ContainerStyleParams
 	
 	
 	
-	public FractionStyleParams()
+	public FractionStyleParams(Painter background, double vspacing, double hpadding, double yOffset, Painter barBackground, Paint barPaint)
 	{
-		this( 2.0, 3.0, 5.0, Color.black );
-	}
-	
-	public FractionStyleParams(Paint barPaint)
-	{
-		this( 2.0, 3.0, 5.0, barPaint );
-	}
-	
-	public FractionStyleParams(double vspacing, double hpadding, double yOffset, Paint barPaint)
-	{
-		super();
+		super( background );
 		
 		this.vspacing = vspacing;
 		this.hpadding = hpadding;
 		this.yOffset = yOffset;
 		
-		barStyleParams = new BarStyleParams( barPaint );
+		barStyleParams = new BarStyleParams( barBackground, barPaint );
 	}
 	
 	

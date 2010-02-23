@@ -81,7 +81,7 @@ public class ParagraphTestPage extends SystemPage
 		{
 			children = addLineBreaks( children, lineBreakStep );
 		}
-		ParagraphStyleParams boxs = new ParagraphStyleParams( spacing, vSpacing, indentation );
+		ParagraphStyleParams boxs = new ParagraphStyleParams( null, spacing, vSpacing, indentation );
 		DPParagraph box = new DPParagraph( boxs );
 		box.extend( children );
 		return box;
@@ -92,7 +92,7 @@ public class ParagraphTestPage extends SystemPage
 		ArrayList<DPWidget> children = makeTextNodes( title + ": " + textBlock, textStyle );
 		children = addLineBreaks( children, lineBreakStep );
 		children.add( children.size()/2, makeParagraph( title + " (inner)", spacing, vSpacing, indentation, lineBreakStep, nestedTextStyle ) );
-		ParagraphStyleParams boxs = new ParagraphStyleParams( spacing, vSpacing, indentation );
+		ParagraphStyleParams boxs = new ParagraphStyleParams( null, spacing, vSpacing, indentation );
 		DPParagraph box = new DPParagraph( boxs );
 		box.extend( children );
 		return box;
@@ -101,8 +101,8 @@ public class ParagraphTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		TextStyleParams blackText = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 12 ), Color.black );
-		TextStyleParams redText = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 12 ), Color.red );
+		TextStyleParams blackText = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 12 ), Color.black, null, false );
+		TextStyleParams redText = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 12 ), Color.red, null, false );
 		
 		DPWidget b2 = makeParagraph( "PER-WORD", 0.0, 0.0, 0.0, 1, blackText );
 		DPWidget b3 = makeParagraph( "EVERY-4-WORDS", 0.0, 0.0, 0.0, 4, blackText);
@@ -112,7 +112,7 @@ public class ParagraphTestPage extends SystemPage
 		DPWidget b7 = makeParagraph( "PER-WORD INDENTED", 0.0, 0.0, 50.0, 1, blackText );
 		DPWidget b8 = makeParagraphWithNestedPara( "NESTED-2-INDENTED", 0.0, 0.0, 50.0, 2, blackText, redText );
 		DPWidget[] children = { b2, b3, b4, b5, b6, b7, b8 };
-		VBoxStyleParams boxs = new VBoxStyleParams( 30.0 );
+		VBoxStyleParams boxs = new VBoxStyleParams( null, 30.0 );
 		DPVBox box = new DPVBox( boxs );
 		box.extend( children );
 		return box;

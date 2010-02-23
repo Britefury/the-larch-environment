@@ -14,6 +14,10 @@ import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
 public abstract class DPStatic extends DPWidget
 {
+	protected final static int FLAGS_STATIC_END = FLAGS_ELEMENT_END;
+
+	
+	
 	public DPStatic()
 	{
 		super( );

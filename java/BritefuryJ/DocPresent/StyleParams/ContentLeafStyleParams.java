@@ -7,7 +7,15 @@
 //##************************
 package BritefuryJ.DocPresent.StyleParams;
 
+import BritefuryJ.DocPresent.Painter.Painter;
+
 public class ContentLeafStyleParams extends WidgetStyleParams
 {
-	public static final ContentLeafStyleParams defaultStyleParams = new ContentLeafStyleParams();
+	public static final ContentLeafStyleParams defaultStyleParams = new ContentLeafStyleParams( null );
+	
+	
+	public ContentLeafStyleParams(Painter background)
+	{
+		super( background );
+	}
 }

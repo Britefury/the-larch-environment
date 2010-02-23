@@ -7,13 +7,15 @@
 //##************************
 package BritefuryJ.DocPresent.StyleParams;
 
+import BritefuryJ.DocPresent.Painter.Painter;
+
 public class ContainerStyleParams extends WidgetStyleParams
 {
-	public static final ContainerStyleParams defaultStyleParams = new ContainerStyleParams();
+	public static final ContainerStyleParams defaultStyleParams = new ContainerStyleParams( null );
 
 
-	public ContainerStyleParams()
+	public ContainerStyleParams(Painter background)
 	{
-		super();
+		super( background );
 	}
 }

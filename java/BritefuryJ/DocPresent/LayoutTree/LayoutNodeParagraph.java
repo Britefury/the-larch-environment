@@ -476,16 +476,16 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 
 	public double getSpacing()
 	{
-		return ((ParagraphStyleParams)element.getStyleSheet()).getSpacing();
+		return ((ParagraphStyleParams)element.getStyleParams()).getSpacing();
 	}
 
 	public double getLineSpacing()
 	{
-		return ((ParagraphStyleParams)element.getStyleSheet()).getLineSpacing();
+		return ((ParagraphStyleParams)element.getStyleParams()).getLineSpacing();
 	}
 
 	public double getIndentation()
 	{
-		return ((ParagraphStyleParams)element.getStyleSheet()).getIndentation();
+		return ((ParagraphStyleParams)element.getStyleParams()).getIndentation();
 	}
 }

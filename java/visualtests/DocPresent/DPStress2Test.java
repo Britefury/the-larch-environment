@@ -20,6 +20,7 @@ import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ParagraphStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 
@@ -62,9 +63,9 @@ public class DPStress2Test
 	
 	
 	Font f0 = new Font( "Sans serif", Font.PLAIN, 12 );
-	TextStyleParams nameStyle = new TextStyleParams( f0, Color.black );
-	TextStyleParams puncStyle = new TextStyleParams( f0, Color.blue );
-	ParagraphStyleParams paraStyle = new ParagraphStyleParams();
+	TextStyleParams nameStyle = new TextStyleParams( null, f0, Color.black, null, false );
+	TextStyleParams puncStyle = new TextStyleParams( null, f0, Color.blue, null, false );
+	ParagraphStyleParams paraStyle = new ParagraphStyleParams( null, 0.0, 0.0, 0.0 );
 
 	public DPWidget name(String n)
 	{
@@ -75,7 +76,7 @@ public class DPStress2Test
 	{
 		DPText dot = new DPText( puncStyle, "." );
 		DPText attrName = new DPText( nameStyle, a );
-		DPSpan span = new DPSpan( );
+		DPSpan span = new DPSpan( ContainerStyleParams.defaultStyleParams );
 		span.setChildren( Arrays.asList( new DPWidget[] { x, dot, attrName } ) );
 		return span;
 	}
@@ -97,7 +98,7 @@ public class DPStress2Test
 			elems.add( args[i] );
 		}
 		elems.add( closeParen );
-		DPSpan span = new DPSpan( );
+		DPSpan span = new DPSpan( ContainerStyleParams.defaultStyleParams );
 		span.extend( elems );
 		return span;
 	}

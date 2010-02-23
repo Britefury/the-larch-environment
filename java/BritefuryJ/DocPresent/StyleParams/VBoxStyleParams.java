@@ -7,19 +7,16 @@
 //##************************
 package BritefuryJ.DocPresent.StyleParams;
 
+import BritefuryJ.DocPresent.Painter.Painter;
+
 
 public class VBoxStyleParams extends AbstractBoxStyleParams
 {
-	public static final VBoxStyleParams defaultStyleParams = new VBoxStyleParams();
+	public static final VBoxStyleParams defaultStyleParams = new VBoxStyleParams( null, 0.0 );
 
 
-	public VBoxStyleParams()
+	public VBoxStyleParams(Painter background, double spacing)
 	{
-		this( 0.0 );
-	}
-	
-	public VBoxStyleParams(double spacing)
-	{
-		super( spacing );
+		super( background, spacing );
 	}
 }

@@ -26,6 +26,19 @@ public class AttributeSet
 		values.putAll( vals );
 	}
 	
+	public AttributeSet(String names[], Object values[])
+	{
+		if ( values.length != names.length )
+		{
+			throw new RuntimeException( "All arguments must have keywords" );
+		}
+		
+		for (int i = 0; i < values.length; i++)
+		{
+			this.values.put( names[i], values[i] );
+		}
+	}
+	
 	public AttributeSet(PyObject values[], String names[])
 	{
 		if ( values.length != names.length )

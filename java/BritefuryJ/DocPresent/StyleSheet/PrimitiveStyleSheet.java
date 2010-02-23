@@ -27,6 +27,7 @@ import BritefuryJ.DocPresent.DPMathRoot;
 import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPParagraphDedentMarker;
 import BritefuryJ.DocPresent.DPParagraphIndentMarker;
+import BritefuryJ.DocPresent.DPParagraphStructureSpan;
 import BritefuryJ.DocPresent.DPRGrid;
 import BritefuryJ.DocPresent.DPScript;
 import BritefuryJ.DocPresent.DPSegment;
@@ -39,8 +40,10 @@ import BritefuryJ.DocPresent.DPWhitespace;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
+import BritefuryJ.DocPresent.Painter.Painter;
 import BritefuryJ.DocPresent.StyleParams.ButtonStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
+import BritefuryJ.DocPresent.StyleParams.ContentLeafStyleParams;
 import BritefuryJ.DocPresent.StyleParams.FractionStyleParams;
 import BritefuryJ.DocPresent.StyleParams.GridRowStyleParams;
 import BritefuryJ.DocPresent.StyleParams.HBoxStyleParams;
@@ -53,6 +56,7 @@ import BritefuryJ.DocPresent.StyleParams.StaticTextStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
+import BritefuryJ.DocPresent.StyleParams.WidgetStyleParams;
 
 public class PrimitiveStyleSheet extends StyleSheet
 {
@@ -78,6 +82,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 		
 		initAttr( "font", defaultFont );
 		initAttr( "foreground", Color.black );
+		initAttr( "background", null );
 
 		initAttr( "border", default_border );
 		
@@ -141,6 +146,11 @@ public class PrimitiveStyleSheet extends StyleSheet
 	public PrimitiveStyleSheet withForeground(Paint paint)
 	{
 		return (PrimitiveStyleSheet)withAttr( "foreground", paint );
+	}
+
+	public PrimitiveStyleSheet withBackground(Painter background)
+	{
+		return (PrimitiveStyleSheet)withAttr( "background", background );
 	}
 
 
@@ -388,9 +398,9 @@ public class PrimitiveStyleSheet extends StyleSheet
 		if ( buttonParams == null )
 		{
 			buttonParams = new ButtonStyleParams(
+					get( "background", Painter.class, null ),
 					get( "buttonBorderPaint", Paint.class, default_buttonBorderPaint ),
-					get( "buttonBackgroundPaint", Paint.class, default_buttonBackgroundPaint ),
-					get( "buttonHighlightBackgroundPaint", Paint.class, default_buttonHighlightBackgroundPaint ) );
+					get( "buttonBackgroundPaint", Paint.class, default_buttonBackgroundPaint ), get( "buttonHighlightBackgroundPaint", Paint.class, default_buttonHighlightBackgroundPaint ) );
 		}
 		return buttonParams;
 	}
@@ -402,9 +412,23 @@ public class PrimitiveStyleSheet extends StyleSheet
 	{
 		if ( containerParams == null )
 		{
-			containerParams = new ContainerStyleParams();
+			containerParams = new ContainerStyleParams(
+					get( "background", Painter.class, null ) );
 		}
 		return containerParams;
+	}
+
+	
+	private ContentLeafStyleParams contentLeafParams = null;
+
+	private ContentLeafStyleParams getContentLeafStyleParams()
+	{
+		if ( contentLeafParams == null )
+		{
+			contentLeafParams = new ContentLeafStyleParams(
+					get( "background", Painter.class, null ) );
+		}
+		return contentLeafParams;
 	}
 
 	
@@ -415,9 +439,11 @@ public class PrimitiveStyleSheet extends StyleSheet
 		if ( fractionParams == null )
 		{
 			fractionParams = new FractionStyleParams(
+					get( "background", Painter.class, null ),
 					get( "fractionVSpacing", Double.class, 2.0 ),
 					get( "fractionHPadding", Double.class, 3.0 ),
 					get( "fractionRefYOffset", Double.class, 5.0 ),
+					get( "background", Painter.class, null ),
 					get( "foreground", Paint.class, Color.black ) );
 		}
 		return fractionParams;
@@ -430,7 +456,8 @@ public class PrimitiveStyleSheet extends StyleSheet
 	{
 		if ( gridRowParams == null )
 		{
-			gridRowParams = new GridRowStyleParams();
+			gridRowParams = new GridRowStyleParams(
+					get( "background", Painter.class, null ) );
 		}
 		return gridRowParams;
 	}
@@ -443,6 +470,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 		if ( hboxParams == null )
 		{
 			hboxParams = new HBoxStyleParams(
+					get( "background", Painter.class, null ),
 					get( "hboxSpacing", Double.class, 0.0 ) );
 		}
 		return hboxParams;
@@ -456,11 +484,11 @@ public class PrimitiveStyleSheet extends StyleSheet
 		if ( lineParams == null )
 		{
 			lineParams = new LineStyleParams(
+					get( "background", Painter.class, null ),
 					get( "lineDirection", LineStyleParams.Direction.class, LineStyleParams.Direction.HORIZONTAL ),
 					get( "foreground", Paint.class, Color.black ),
 					get( "lineThickness", Double.class, 1.0 ),
-					get( "lineInset", Double.class, 0.0 ),
-					get( "linePadding", Double.class, 0.0 ) );
+					get( "lineInset", Double.class, 0.0 ), get( "linePadding", Double.class, 0.0 ) );
 		}
 		return lineParams;
 	}
@@ -473,6 +501,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 		if ( linkParams == null )
 		{
 			linkParams = new LinkStyleParams(
+					get( "background", Painter.class, null ),
 					get( "linkFont", Font.class, defaultLinkFont ),
 					get( "linkPaint", Paint.class, Color.black ),
 					get( "linkSmallCaps", Boolean.class, false ) );
@@ -488,6 +517,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 		if ( mathRootParams == null )
 		{
 			mathRootParams = new MathRootStyleParams(
+					get( "background", Painter.class, null ),
 					get( "font", Font.class, defaultFont ),
 					get( "foreground", Paint.class, Color.black ),
 					get( "mathRootThickness", Double.class, 1.5 ) );
@@ -503,6 +533,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 		if ( paragraphParams == null )
 		{
 			paragraphParams = new ParagraphStyleParams(
+					get( "background", Painter.class, null ),
 					get( "paragraphSpacing", Double.class, 0.0 ),
 					get( "paragraphLineSpacing", Double.class, 0.0 ),
 					get( "paragraphIndentation", Double.class, 0.0 ) );
@@ -518,6 +549,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 		if ( scriptParams == null )
 		{
 			scriptParams = new ScriptStyleParams(
+					get( "background", Painter.class, null ),
 					get( "scriptColumnSpacing", Double.class, 1.0 ),
 					get( "scriptRowSpacing", Double.class, 1.0 ) );
 		}
@@ -532,6 +564,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 		if ( staticTextParams == null )
 		{
 			staticTextParams = new StaticTextStyleParams(
+					get( "background", Painter.class, null ),
 					get( "font", Font.class, defaultFont ),
 					get( "foreground", Paint.class, Color.black ),
 					getNonNull( "textSmallCaps", Boolean.class, false ) );
@@ -547,6 +580,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 		if ( tableParams == null )
 		{
 			tableParams = new TableStyleParams(
+					get( "background", Painter.class, null ),
 					get( "tableColumnSpacing", Double.class, 0.0 ),
 					get( "tableColumnExpand", Boolean.class, false ),
 					get( "tableRowSpacing", Double.class, 0.0 ),
@@ -563,14 +597,27 @@ public class PrimitiveStyleSheet extends StyleSheet
 		if ( textParams == null )
 		{
 			textParams = new TextStyleParams(
+					get( "background", Painter.class, null ),
 					get( "font", Font.class, defaultFont ),
 					get( "foreground", Paint.class, Color.black ),
-					get( "textSquiggleUnderlinePaint", Paint.class, null ),
-					getNonNull( "textSmallCaps", Boolean.class, false ) );
+					get( "textSquiggleUnderlinePaint", Paint.class, null ), getNonNull( "textSmallCaps", Boolean.class, false ) );
 		}
 		return textParams;
 	}
 	
+	
+	private WidgetStyleParams widgetParams = null;
+
+	private WidgetStyleParams getWidgetParams()
+	{
+		if ( widgetParams == null )
+		{
+			widgetParams = new WidgetStyleParams(
+					get( "background", Painter.class, null ) );
+		}
+		return widgetParams;
+	}
+
 	
 	private VBoxStyleParams vboxParams = null;
 
@@ -579,6 +626,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 		if ( vboxParams == null )
 		{
 			vboxParams = new VBoxStyleParams(
+					get( "background", Painter.class, null ),
 					get( "vboxSpacing", Double.class, 0.0 ) );
 		}
 		return vboxParams;
@@ -670,7 +718,14 @@ public class PrimitiveStyleSheet extends StyleSheet
 	
 	public DPSpan span(List<DPWidget> children)
 	{
-		DPSpan element = new DPSpan();
+		DPSpan element = new DPSpan( getContainerParams() );
+		element.setChildren( children );
+		return element;
+	}
+	
+	public DPParagraphStructureSpan paragraphStructureSpan(List<DPWidget> children)
+	{
+		DPParagraphStructureSpan element = new DPParagraphStructureSpan( getContainerParams() );
 		element.setChildren( children );
 		return element;
 	}
@@ -693,12 +748,12 @@ public class PrimitiveStyleSheet extends StyleSheet
 	
 	public DPParagraphIndentMarker paragraphIndentMarker()
 	{
-		return new DPParagraphIndentMarker( );
+		return new DPParagraphIndentMarker();
 	}
 	
 	public DPParagraphDedentMarker paragraphDedentMarker()
 	{
-		return new DPParagraphDedentMarker( );
+		return new DPParagraphDedentMarker();
 	}
 
 	
@@ -749,7 +804,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 	
 	public DPSegment segment(boolean bGuardBegin, boolean bGuardEnd, DPWidget child)
 	{
-		DPSegment seg = new DPSegment( getTextParams(), bGuardBegin, bGuardEnd );
+		DPSegment seg = new DPSegment( getContainerParams(), getTextParams(), bGuardBegin, bGuardEnd );
 		seg.setChild( child );
 		return seg;
 	}
@@ -805,11 +860,11 @@ public class PrimitiveStyleSheet extends StyleSheet
 	
 	public DPWhitespace whitespace(String txt, double width)
 	{
-		return new DPWhitespace( txt, width );
+		return new DPWhitespace( getContentLeafStyleParams(), txt, width );
 	}
 
 	public DPWhitespace whitespace(String txt)
 	{
-		return new DPWhitespace( txt, 0.0 );
+		return new DPWhitespace( getContentLeafStyleParams(), txt, 0.0 );
 	}
 }

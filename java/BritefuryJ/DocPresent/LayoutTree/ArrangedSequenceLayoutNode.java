@@ -7,6 +7,7 @@
 package BritefuryJ.DocPresent.LayoutTree;
 
 import java.util.Arrays;
+import java.util.IdentityHashMap;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPContainer;
@@ -23,6 +24,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 {
 	protected DPWidget leaves[], branches[];
 	protected int branchRanges[];				// Stored as an array of pairs; each pair is of the form (start_index, end_index)
+	protected IdentityHashMap<DPContainer, AABox2[]> branchBoundsCache;
 	
 	
 	
@@ -91,6 +93,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 			counts[0] = 0;
 			counts[1] = 0;
 			gatherItems( element, counts );
+			branchBoundsCache = null;
 		}
 	}
 	
@@ -107,6 +110,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 		leaves = null;
 		branches = null;
 		branchRanges = null;
+		branchBoundsCache = null;
 	}
 	
 	
@@ -127,6 +131,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 	protected void onChildSizeRefreshed()
 	{
 		super.onChildSizeRefreshed();
+		branchBoundsCache = null;
 	}
 
 	
@@ -277,13 +282,30 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 	{
 		refreshSubtree();
 		
-		int index = indexOfBranch( branch );
-		if ( index == -1 )
+		AABox2 bounds[];
+		if ( branchBoundsCache == null )
 		{
-			throw new RuntimeException( "Could not find branch" );
+			branchBoundsCache = new IdentityHashMap<DPContainer, AABox2[]>();
+			bounds = null;
+		}
+		else
+		{
+			bounds = branchBoundsCache.get( branch );
 		}
 		
-		return computeCollatedBranchBoundsBoxes( branchRanges[index*2], branchRanges[index*2+1] );
+		if ( bounds == null )
+		{
+			int index = indexOfBranch( branch );
+			if ( index == -1 )
+			{
+				throw new RuntimeException( "Could not find branch" );
+			}
+			
+			bounds = computeCollatedBranchBoundsBoxes( branchRanges[index*2], branchRanges[index*2+1] );
+			branchBoundsCache.put( branch, bounds );
+		}
+		
+		return bounds;
 	}
 
 

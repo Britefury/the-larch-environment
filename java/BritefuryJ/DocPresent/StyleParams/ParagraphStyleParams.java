@@ -7,23 +7,20 @@
 //##************************
 package BritefuryJ.DocPresent.StyleParams;
 
+import BritefuryJ.DocPresent.Painter.Painter;
+
 
 public class ParagraphStyleParams extends ContainerStyleParams
 {
-	public static final ParagraphStyleParams defaultStyleParams = new ParagraphStyleParams();
+	public static final ParagraphStyleParams defaultStyleParams = new ParagraphStyleParams( null, 0.0, 0.0, 0.0 );
 	
 	
 	private final double spacing, lineSpacing, indentation;
 
 
-	public ParagraphStyleParams()
+	public ParagraphStyleParams(Painter background, double spacing, double lineSpacing, double indentation)
 	{
-		this( 0.0, 0.0, 0.0 );
-	}
-	
-	public ParagraphStyleParams(double spacing, double lineSpacing, double indentation)
-	{
-		super();
+		super( background );
 		
 		this.spacing = spacing;
 		this.lineSpacing = lineSpacing;

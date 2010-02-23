@@ -32,7 +32,7 @@ import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
 
 public class CanvasTestPage extends SystemPage
 {
-	private static StaticTextStyleParams textStyle = new StaticTextStyleParams( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
+	private static StaticTextStyleParams textStyle = new StaticTextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK, false );
 	private static Border destBorder = new EmptyBorder( 10.0, 10.0, 10.0, 10.0, new Color( 1.0f, 0.9f, 0.75f ) );
 
 
@@ -224,12 +224,12 @@ public class CanvasTestPage extends SystemPage
 		DPWidget dest0 = makeDestElement( "Number" );
 		DPWidget dest1 = makeDestElement2( "Number", dest0 );
 
-		HBoxStyleParams hboxS = new HBoxStyleParams( 20.0 );
+		HBoxStyleParams hboxS = new HBoxStyleParams( null, 20.0 );
 		DPHBox hbox = new DPHBox( hboxS );
 		hbox.append( dest0 );
 		hbox.append( dest1 );
 
-		VBoxStyleParams vboxS = new VBoxStyleParams( 20.0 );
+		VBoxStyleParams vboxS = new VBoxStyleParams( null, 20.0 );
 		DPVBox vbox = new DPVBox( vboxS );
 		vbox.append( border );
 		vbox.append( hbox );

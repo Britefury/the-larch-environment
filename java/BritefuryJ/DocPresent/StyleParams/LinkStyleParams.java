@@ -10,24 +10,16 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Paint;
 
+import BritefuryJ.DocPresent.Painter.Painter;
+
 public class LinkStyleParams extends StaticTextStyleParams
 {
 	private static final Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
-	public static final LinkStyleParams defaultStyleParams = new LinkStyleParams();
+	public static final LinkStyleParams defaultStyleParams = new LinkStyleParams( null, defaultFont, Color.blue, false );
 
 
-	public LinkStyleParams()
+	public LinkStyleParams(Painter background, Font font, Paint textPaint, boolean bMixedSizeCaps)
 	{
-		super( defaultFont, Color.blue, false );
-	}
-	
-	public LinkStyleParams(Font font, Paint textPaint)
-	{
-		super( font, textPaint, false );
-	}
-	
-	public LinkStyleParams(Font font, Paint textPaint, boolean bMixedSizeCaps)
-	{
-		super( font, textPaint, bMixedSizeCaps );
+		super( background, font, textPaint, bMixedSizeCaps );
 	}
 }

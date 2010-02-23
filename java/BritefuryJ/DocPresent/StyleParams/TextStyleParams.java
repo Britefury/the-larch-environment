@@ -11,12 +11,14 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Paint;
 
+import BritefuryJ.DocPresent.Painter.Painter;
+
 public class TextStyleParams extends ContentLeafStyleParams
 {
-	private static final Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
+	public static final Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
 
 	
-	public static final TextStyleParams defaultStyleParams = new TextStyleParams();
+	public static final TextStyleParams defaultStyleParams = new TextStyleParams( null, defaultFont, Color.black, null, false );
 	
 	
 	
@@ -25,29 +27,9 @@ public class TextStyleParams extends ContentLeafStyleParams
 	protected final boolean bMixedSizeCaps;
 
 
-	public TextStyleParams()
+	public TextStyleParams(Painter background, Font font, Paint textPaint, Paint squiggleUnderlinePaint, boolean bMixedSizeCaps)
 	{
-		this( defaultFont, Color.black, null, false );
-	}
-	
-	public TextStyleParams(Font font, Paint textPaint)
-	{
-		this( font, textPaint, null, false );
-	}
-	
-	public TextStyleParams(Font font, Paint textPaint, boolean bMixedSizeCaps)
-	{
-		this( font, textPaint, null, bMixedSizeCaps );
-	}
-
-	public TextStyleParams(Font font, Paint textPaint, Paint squiggleUnderlinePaint)
-	{
-		this( font, textPaint, squiggleUnderlinePaint, false );
-	}
-	
-	public TextStyleParams(Font font, Paint textPaint, Paint squiggleUnderlinePaint, boolean bMixedSizeCaps)
-	{
-		super();
+		super( background );
 		
 		this.font = font;
 		this.textPaint = textPaint;

@@ -6,18 +6,43 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.geom.Rectangle2D;
+
 import BritefuryJ.DocPresent.LayoutTree.ArrangedSequenceLayoutNode;
+import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 
 public class DPSpan extends DPContainerSequence
 {
-	public DPSpan()
+	public DPSpan(ContainerStyleParams styleParams)
 	{
-		super( );
+		super( styleParams );
 	}
 
 
+
+	protected void drawBackground(Graphics2D graphics)
+	{
+		super.drawBackground( graphics );
+	}
+
+	
+	protected Shape[] getShapes()
+	{
+		AABox2 bounds[] = computeBoundingBoxes();
+		Shape shapes[] = new Shape[bounds.length];
+		for (int i = 0; i < bounds.length; i++)
+		{
+			AABox2 box = bounds[i];
+			shapes[i] = new Rectangle2D.Double( box.getLowerX(), box.getLowerY(), box.getWidth(), box.getHeight() );
+		}
+		return shapes;
+	}
+
+	
 
 	private AABox2[] computeBoundingBoxes()
 	{

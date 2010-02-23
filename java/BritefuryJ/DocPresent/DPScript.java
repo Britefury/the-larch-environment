@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeScript;
+import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ScriptStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 
@@ -75,7 +76,7 @@ public class DPScript extends DPContainer
 
 			if ( bSegmentRequired  &&  !bSegmentPresent )
 			{
-				DPSegment seg = new DPSegment(segmentTextStyleParams, isBeginGuardRequired( slot ), isEndGuardRequired( slot ) );
+				DPSegment seg = new DPSegment( (ContainerStyleParams)getStyleParams(), segmentTextStyleParams, isBeginGuardRequired( slot ), isEndGuardRequired( slot ) );
 				segs[slot] = seg;
 				DPParagraph para = new DPParagraph( );
 				para.setChildren( Arrays.asList( new DPWidget[] { seg } ) );

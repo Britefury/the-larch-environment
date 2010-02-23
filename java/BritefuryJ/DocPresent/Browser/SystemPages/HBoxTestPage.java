@@ -42,8 +42,8 @@ public class HBoxTestPage extends SystemPage
 	
 	protected DPStaticText[] makeTexts(String header)
 	{
-		StaticTextStyleParams t12 = new StaticTextStyleParams( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
-		StaticTextStyleParams t18 = new StaticTextStyleParams( new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK );
+		StaticTextStyleParams t12 = new StaticTextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK, false );
+		StaticTextStyleParams t18 = new StaticTextStyleParams( null, new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK, false );
 		DPStaticText h = new DPStaticText( t18, header );
 		DPStaticText t0 = new DPStaticText( t12, "Hello" );
 		DPStaticText t1 = new DPStaticText( t12, "World" );
@@ -67,7 +67,7 @@ public class HBoxTestPage extends SystemPage
 	
 	protected DPWidget makeText(String text, int size)
 	{
-		StaticTextStyleParams ts = new StaticTextStyleParams( new Font( "Sans serif", Font.BOLD, size ), Color.BLACK );
+		StaticTextStyleParams ts = new StaticTextStyleParams( null, new Font( "Sans serif", Font.BOLD, size ), Color.BLACK, false );
 
 		DPStaticText t = new DPStaticText( ts, text );
 		return wrapInOutline( t );
@@ -90,7 +90,7 @@ public class HBoxTestPage extends SystemPage
 		b1.append( makeText( "v_bottom", 18 ).alignVBottom() );
 		b1.append( makeText( "v_expand", 18 ).alignVExpand() );
 		
-		VBoxStyleParams boxS = new VBoxStyleParams( 20.0 );
+		VBoxStyleParams boxS = new VBoxStyleParams( null, 20.0 );
 		DPVBox box = new DPVBox( boxS );
 		box.append( b0.alignHExpand() );
 		box.append( wrapInOutline( b1 ) );

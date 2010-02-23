@@ -341,22 +341,22 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 	
 	protected double getColumnSpacing()
 	{
-		return ((TableStyleParams)element.getStyleSheet()).getColumnSpacing();
+		return ((TableStyleParams)element.getStyleParams()).getColumnSpacing();
 	}
 
 	protected boolean getColumnExpand()
 	{
-		return ((TableStyleParams)element.getStyleSheet()).getColumnExpand();
+		return ((TableStyleParams)element.getStyleParams()).getColumnExpand();
 	}
 
 	
 	protected double getRowSpacing()
 	{
-		return ((TableStyleParams)element.getStyleSheet()).getRowSpacing();
+		return ((TableStyleParams)element.getStyleParams()).getRowSpacing();
 	}
 
 	protected boolean getRowExpand()
 	{
-		return ((TableStyleParams)element.getStyleSheet()).getRowExpand();
+		return ((TableStyleParams)element.getStyleParams()).getRowExpand();
 	}
 }

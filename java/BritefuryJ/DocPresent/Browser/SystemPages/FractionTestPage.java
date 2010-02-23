@@ -16,6 +16,7 @@ import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
 
@@ -62,8 +63,8 @@ public class FractionTestPage extends SystemPage
 
 	protected DPWidget makeFractionLine(DPWidget num, DPWidget denom)
 	{
-		TextStyleParams s1 = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 10 ), Color.blue );
-		TextStyleParams s2 = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 24 ), Color.red );
+		TextStyleParams s1 = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 10 ), Color.blue, null, false );
+		TextStyleParams s2 = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 24 ), Color.red, null, false );
 		
 		DPWidget frac = makeFraction( num, denom );
 		
@@ -80,7 +81,7 @@ public class FractionTestPage extends SystemPage
 
 	protected DPWidget span(DPWidget... x)
 	{
-		DPSpan s = new DPSpan( );
+		DPSpan s = new DPSpan( ContainerStyleParams.defaultStyleParams );
 		s.setChildren( Arrays.asList( x ) );
 		return s;
 	}
@@ -88,10 +89,10 @@ public class FractionTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		TextStyleParams s0 = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 16 ), new Color( 0.0f, 0.5f, 0.0f ) );
-		TextStyleParams blackStyle = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 24 ), Color.black );
+		TextStyleParams s0 = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 16 ), new Color( 0.0f, 0.5f, 0.0f ), null, false );
+		TextStyleParams blackStyle = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 24 ), Color.black, null, false );
 
-		VBoxStyleParams boxs = new VBoxStyleParams( 10.0 );
+		VBoxStyleParams boxs = new VBoxStyleParams( null, 10.0 );
 		DPVBox box = new DPVBox( boxs );
 		
 		box.append( makeFractionLine( makeText( "a", s0 ), makeText( "p", s0 ) ) );

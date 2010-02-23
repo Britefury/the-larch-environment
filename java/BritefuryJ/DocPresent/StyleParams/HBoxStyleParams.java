@@ -7,19 +7,16 @@
 //##************************
 package BritefuryJ.DocPresent.StyleParams;
 
+import BritefuryJ.DocPresent.Painter.Painter;
+
 
 public class HBoxStyleParams extends AbstractBoxStyleParams
 {
-	public static final HBoxStyleParams defaultStyleParams = new HBoxStyleParams();
+	public static final HBoxStyleParams defaultStyleParams = new HBoxStyleParams( null, 0.0 );
 
 
-	public HBoxStyleParams()
+	public HBoxStyleParams(Painter background, double spacing)
 	{
-		this( 0.0 );
-	}
-	
-	public HBoxStyleParams(double spacing)
-	{
-		super( spacing );
+		super( background, spacing );
 	}
 }

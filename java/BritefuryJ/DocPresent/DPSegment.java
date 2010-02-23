@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent;
 import java.util.Arrays;
 import java.util.List;
 
+import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 
 public class DPSegment extends DPContainer
@@ -48,12 +49,12 @@ public class DPSegment extends DPContainer
 	
 	public DPSegment(boolean bGuardBegin, boolean bGuardEnd)
 	{
-		this( TextStyleParams.defaultStyleParams, bGuardBegin, bGuardEnd );
+		this( ContainerStyleParams.defaultStyleParams, TextStyleParams.defaultStyleParams, bGuardBegin, bGuardEnd );
 	}
 
-	public DPSegment(TextStyleParams textStyleParams, boolean bGuardBegin, boolean bGuardEnd)
+	public DPSegment(ContainerStyleParams styleParams, TextStyleParams textStyleParams, boolean bGuardBegin, boolean bGuardEnd)
 	{
-		super( );
+		super( styleParams );
 		this.textStyleParams = textStyleParams;
 		this.bGuardBegin = bGuardBegin;
 		this.bGuardEnd = bGuardEnd;
