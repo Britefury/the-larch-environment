@@ -1881,16 +1881,52 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		
 		if ( caretLeaf != currentCaretLeaf )
 		{
+			ArrayList<DPWidget> prevPath = null, curPath = null;
 			if ( currentCaretLeaf != null )
 			{
-				currentCaretLeaf.handleCaretLeave( caret );
+				prevPath = currentCaretLeaf.getElementPathToRoot();
+			}
+			else
+			{
+				prevPath = new ArrayList<DPWidget>();
+			}
+			
+			if ( caretLeaf != null )
+			{
+				curPath = caretLeaf.getElementPathToRoot();
+			}
+			else
+			{
+				curPath = new ArrayList<DPWidget>();
+			}
+			
+
+			int prevPathDivergeIndex = prevPath.size() - 1, curPathDivergeIndex = curPath.size() - 1;
+			for (int i = prevPath.size() - 1, j = curPath.size() - 1; i >= 0  &&  j >= 0;  i--, j--)
+			{
+				DPWidget prev = prevPath.get( i ), cur = curPath.get( j );
+				if ( prev != cur )
+				{
+					// Found indices where paths diverge
+					prevPathDivergeIndex = i;
+					curPathDivergeIndex = j;
+					
+					break;
+				}
+			}
+			
+			
+			// Send leave events
+			for (int x = 0; x <= prevPathDivergeIndex; x++)
+			{
+				prevPath.get( x ).handleCaretLeave( c );
 			}
 			
 			currentCaretLeaf = caretLeaf;
-			
-			if ( currentCaretLeaf != null )
+
+			for (int x = curPathDivergeIndex; x >= 0; x--)
 			{
-				currentCaretLeaf.handleCaretEnter( caret );
+				curPath.get( x ).handleCaretEnter( c );
 			}
 		}
 		

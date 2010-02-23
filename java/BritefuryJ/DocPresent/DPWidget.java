@@ -20,6 +20,7 @@ import java.util.WeakHashMap;
 
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
+import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
@@ -156,16 +157,18 @@ abstract public class DPWidget extends PointerInputElement
 	//
 	//
 	
-	private static class Interactor
+	private static class InteractionFields
 	{
 		private DndHandler dndHandler;
 
 		private ElementLinearRepresentationListener linearRepresentationListener;		// Move this and the next one into an 'interactor' element
 		private ElementKeyboardListener keyboardListener;
 		
+		private ElementInteractor interactor;
 		
 		
-		public Interactor()
+		
+		public InteractionFields()
 		{
 		}
 		
@@ -204,7 +207,7 @@ abstract public class DPWidget extends PointerInputElement
 	
 	protected LayoutNode layoutNode;
 	
-	private Interactor interactor;
+	private InteractionFields interactionFields;
 
 	protected DPWidget metaElement;
 	protected String debugName;											// Move into 'waypoint' element; only used there 
@@ -886,6 +889,20 @@ abstract public class DPWidget extends PointerInputElement
 		return path;
 	}
 	
+	public ArrayList<DPWidget> getElementPathToRoot()
+	{
+		ArrayList<DPWidget> path = new ArrayList<DPWidget>();
+		
+		DPWidget widget = this;
+		while ( widget != null )
+		{
+			path.add( widget );
+			widget = widget.getParent();
+		}
+		
+		return path;
+	}
+	
 	public ArrayList<DPWidget> getElementPathFromSubtreeRoot(DPContainer subtreeRoot)
 	{
 		ArrayList<DPWidget> path = new ArrayList<DPWidget>();
@@ -894,6 +911,24 @@ abstract public class DPWidget extends PointerInputElement
 		while ( widget != null )
 		{
 			path.add( 0, widget );
+			if ( widget == subtreeRoot )
+			{
+				return path;
+			}
+			widget = widget.getParent();
+		}
+
+		return null;
+	}
+	
+	public ArrayList<DPWidget> getElementPathToSubtreeRoot(DPContainer subtreeRoot)
+	{
+		ArrayList<DPWidget> path = new ArrayList<DPWidget>();
+		
+		DPWidget widget = this;
+		while ( widget != null )
+		{
+			path.add( widget );
 			if ( widget == subtreeRoot )
 			{
 				return path;
@@ -1345,6 +1380,32 @@ abstract public class DPWidget extends PointerInputElement
 
 	
 	
+	//
+	//
+	// CARET EVENT METHODS
+	//
+	//
+	
+	protected void onCaretEnter(Caret c)
+	{
+	}
+	
+	protected void onCaretLeave(Caret c)
+	{
+	}
+	
+	
+	protected void handleCaretEnter(Caret c)
+	{
+		onCaretEnter( c );
+	}
+	
+	protected void handleCaretLeave(Caret c)
+	{
+		onCaretLeave( c );
+	}
+
+	
 	
 	//
 	//
@@ -1354,17 +1415,17 @@ abstract public class DPWidget extends PointerInputElement
 	
 	private void ensureValidInteractor()
 	{
-		if ( interactor == null )
+		if ( interactionFields == null )
 		{
-			interactor = new Interactor();
+			interactionFields = new InteractionFields();
 		}
 	}
 	
 	private void onInteractorModified()
 	{
-		if ( interactor != null  &&  interactor.isIdentity() )
+		if ( interactionFields != null  &&  interactionFields.isIdentity() )
 		{
-			interactor = null;
+			interactionFields = null;
 		}
 	}
 	
@@ -1380,22 +1441,22 @@ abstract public class DPWidget extends PointerInputElement
 	public void enableDnd(DndHandler handler)
 	{
 		ensureValidInteractor();
-		interactor.dndHandler = handler;
+		interactionFields.dndHandler = handler;
 		onInteractorModified();
 	}
 	
 	public void disableDnd()
 	{
-		if ( interactor != null )
+		if ( interactionFields != null )
 		{
-			interactor.dndHandler = null;
+			interactionFields.dndHandler = null;
 		}
 		onInteractorModified();
 	}
 	
 	public boolean isDndEnabled()
 	{
-		return interactor != null  ?  interactor.dndHandler != null  :  false;
+		return interactionFields != null  ?  interactionFields.dndHandler != null  :  false;
 	}
 	
 	
@@ -1418,7 +1479,7 @@ abstract public class DPWidget extends PointerInputElement
 	
 	public DndHandler getDndHandler()
 	{
-		return interactor != null  ?  interactor.dndHandler  :  null;
+		return interactionFields != null  ?  interactionFields.dndHandler  :  null;
 	}
 	
 	
@@ -1484,7 +1545,7 @@ abstract public class DPWidget extends PointerInputElement
 	}
 	
 	
-	
+
 	
 
 	
@@ -1636,7 +1697,6 @@ abstract public class DPWidget extends PointerInputElement
 		}
 	}
 
-
 	
 	
 	
@@ -1742,26 +1802,26 @@ abstract public class DPWidget extends PointerInputElement
 	
 	public ElementLinearRepresentationListener getLinearRepresentationListener()
 	{
-		return interactor != null  ?  interactor.linearRepresentationListener  :  null;
+		return interactionFields != null  ?  interactionFields.linearRepresentationListener  :  null;
 	}
 	
 	public void setLinearRepresentationListener(ElementLinearRepresentationListener listener)
 	{
 		ensureValidInteractor();
-		interactor.linearRepresentationListener = listener;
+		interactionFields.linearRepresentationListener = listener;
 		onInteractorModified();
 	}
 	
 
 	public ElementKeyboardListener getKeyboardListener()
 	{
-		return interactor != null  ?  interactor.keyboardListener  :  null;
+		return interactionFields != null  ?  interactionFields.keyboardListener  :  null;
 	}
 	
 	public void setKeyboardListener(ElementKeyboardListener listener)
 	{
 		ensureValidInteractor();
-		interactor.keyboardListener = listener;
+		interactionFields.keyboardListener = listener;
 		onInteractorModified();
 	}
 	
