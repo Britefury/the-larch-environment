@@ -455,11 +455,11 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 	
 	protected double getColumnSpacing()
 	{
-		return ((ScriptStyleParams)element.getStyleSheet()).getColumnSpacing();
+		return ((ScriptStyleParams)element.getStyleParams()).getColumnSpacing();
 	}
 
 	protected double getRowSpacing()
 	{
-		return ((ScriptStyleParams)element.getStyleSheet()).getRowSpacing();
+		return ((ScriptStyleParams)element.getStyleParams()).getRowSpacing();
 	}
 }

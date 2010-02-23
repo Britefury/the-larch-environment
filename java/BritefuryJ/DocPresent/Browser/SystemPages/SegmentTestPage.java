@@ -17,6 +17,7 @@ import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 
 public class SegmentTestPage extends SystemPage
@@ -44,7 +45,7 @@ public class SegmentTestPage extends SystemPage
 	
 	protected DPWidget text(String t, Color colour)
 	{
-		TextStyleParams s0 = new TextStyleParams( defaultFont, colour );
+		TextStyleParams s0 = new TextStyleParams( null, defaultFont, colour, null, false );
 		return new DPText( s0, t );
 	}
 	
@@ -64,7 +65,7 @@ public class SegmentTestPage extends SystemPage
 	
 	protected DPWidget span(DPWidget... x)
 	{
-		DPSpan s = new DPSpan( );
+		DPSpan s = new DPSpan( ContainerStyleParams.defaultStyleParams );
 		s.setChildren( Arrays.asList( x ) );
 		return s;
 	}

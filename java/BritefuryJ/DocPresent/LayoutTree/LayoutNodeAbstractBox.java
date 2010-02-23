@@ -25,6 +25,6 @@ public abstract class LayoutNodeAbstractBox extends ArrangedSequenceLayoutNode
 	
 	protected double getSpacing()
 	{
-		return ((AbstractBoxStyleParams)element.getStyleSheet()).getSpacing();
+		return ((AbstractBoxStyleParams)element.getStyleParams()).getSpacing();
 	}
 }

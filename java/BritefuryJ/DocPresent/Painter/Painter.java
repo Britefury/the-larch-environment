@@ -4,17 +4,13 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.StyleParams;
+package BritefuryJ.DocPresent.Painter;
 
-import BritefuryJ.DocPresent.Painter.Painter;
+import java.awt.Graphics2D;
+import java.awt.Shape;
 
-public class GridRowStyleParams extends ContainerStyleParams
+public interface Painter
 {
-	public static final GridRowStyleParams defaultStyleParams = new GridRowStyleParams( null );
-
-
-	public GridRowStyleParams(Painter background)
-	{
-		super( background );
-	}
+	public void drawShape(Graphics2D graphics, Shape shape);
+	public void drawShapes(Graphics2D graphics, Shape shapes[]);
 }

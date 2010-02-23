@@ -37,12 +37,12 @@ public class SystemRootPage extends Page
 	
 	public DPWidget getContentsElement()
 	{
-		VBoxStyleParams pageBoxStyle = new VBoxStyleParams( 40.0 );
+		VBoxStyleParams pageBoxStyle = new VBoxStyleParams( null, 40.0 );
 		DPVBox pageBox = new DPVBox( pageBoxStyle );
 		
 		DPVBox headBox = new DPVBox( );
 		
-		StaticTextStyleParams titleStyle = new StaticTextStyleParams( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
+		StaticTextStyleParams titleStyle = new StaticTextStyleParams( null, new Font( "Serif", Font.BOLD, 32 ), Color.BLACK, false );
 		DPStaticText title = new DPStaticText( titleStyle, "gSym System Page" );
 		
 		headBox.append( createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE ) );
@@ -59,7 +59,7 @@ public class SystemRootPage extends Page
 	{
 		DPVBox contentsBox = new DPVBox( );
 		
-		StaticTextStyleParams titleStyle = new StaticTextStyleParams( new Font( "Serif", Font.BOLD, 18 ), Color.BLACK );
+		StaticTextStyleParams titleStyle = new StaticTextStyleParams( null, new Font( "Serif", Font.BOLD, 18 ), Color.BLACK, false );
 		DPStaticText title = new DPStaticText( titleStyle, "Tests:" );
 		contentsBox.append( title );
 		
@@ -87,7 +87,7 @@ public class SystemRootPage extends Page
 	{
 		EmptyBorder inner = new EmptyBorder( 5.0, 5.0, 5.0, 5.0, new Color( 184, 206, 203 ) );
 		EmptyBorder outer = new EmptyBorder( 5.0, 5.0, 5.0, 5.0 );
-		HBoxStyleParams linkHBoxStyle = new HBoxStyleParams( 25.0 );
+		HBoxStyleParams linkHBoxStyle = new HBoxStyleParams( null, 25.0 );
 		
 		DPBorder innerBorder = new DPBorder( inner );
 		DPBorder outerBorder = new DPBorder( outer );

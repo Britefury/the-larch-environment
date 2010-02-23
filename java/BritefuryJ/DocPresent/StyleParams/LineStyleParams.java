@@ -9,6 +9,8 @@ package BritefuryJ.DocPresent.StyleParams;
 import java.awt.Color;
 import java.awt.Paint;
 
+import BritefuryJ.DocPresent.Painter.Painter;
+
 public class LineStyleParams extends WidgetStyleParams
 {
 	public enum Direction
@@ -18,7 +20,7 @@ public class LineStyleParams extends WidgetStyleParams
 	}
 	
 	
-	public static final LineStyleParams defaultStyleParams = new LineStyleParams();
+	public static final LineStyleParams defaultStyleParams = new LineStyleParams( null, Direction.HORIZONTAL, Color.BLACK, 1.0, 0.0, 0.0 );
 	
 	
 	protected final Direction direction;
@@ -26,19 +28,9 @@ public class LineStyleParams extends WidgetStyleParams
 	protected final double thickness, inset, padding;
 	
 	
-	public LineStyleParams()
+	public LineStyleParams(Painter background, Direction direction, Paint linePaint, double thickness, double inset, double padding)
 	{
-		this( Direction.HORIZONTAL, Color.black, 1.0, 0.0, 0.0 );
-	}
-	
-	public LineStyleParams(Direction direction, Paint linePaint)
-	{
-		this( direction, linePaint, 1.0, 0.0, 0.0 );
-	}
-	
-	public LineStyleParams(Direction direction, Paint linePaint, double thickness, double inset, double padding)
-	{
-		super();
+		super( background );
 
 		this.direction = direction;
 		this.linePaint = linePaint;

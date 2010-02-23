@@ -7,7 +7,24 @@
 //##************************
 package BritefuryJ.DocPresent.StyleParams;
 
+import BritefuryJ.DocPresent.Painter.Painter;
+
 public class WidgetStyleParams
 {
-	public static final WidgetStyleParams defaultStyleParams = new WidgetStyleParams();
+	public static final WidgetStyleParams defaultStyleParams = new WidgetStyleParams( null );
+	
+	
+	private final Painter background;
+	
+	
+	public WidgetStyleParams(Painter background)
+	{
+		this.background = background;
+	}
+	
+	
+	public Painter getBackground()
+	{
+		return background;
+	}
 }

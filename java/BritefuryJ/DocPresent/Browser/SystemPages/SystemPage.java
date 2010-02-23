@@ -47,14 +47,14 @@ public abstract class SystemPage extends Page
 
 	public DPWidget getContentsElement()
 	{
-		VBoxStyleParams pageBoxStyle = new VBoxStyleParams( 40.0 );
+		VBoxStyleParams pageBoxStyle = new VBoxStyleParams( null, 40.0 );
 		DPVBox pageBox = new DPVBox( pageBoxStyle );
 		
 		DPVBox headBox = new DPVBox( );
 		
-		StaticTextStyleParams descriptionStyle = new StaticTextStyleParams( new Font( "Sans Serif", Font.PLAIN, 16 ), Color.BLACK );
+		StaticTextStyleParams descriptionStyle = new StaticTextStyleParams( null, new Font( "Sans Serif", Font.PLAIN, 16 ), Color.BLACK, false );
 		
-		StaticTextStyleParams titleStyle = new StaticTextStyleParams( new Font( "Serif", Font.BOLD, 32 ), Color.BLACK );
+		StaticTextStyleParams titleStyle = new StaticTextStyleParams( null, new Font( "Serif", Font.BOLD, 32 ), Color.BLACK, false );
 		DPStaticText title = new DPStaticText( titleStyle, "System page: " + getTitle() );
 		
 		headBox.append( SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE | SystemRootPage.LINKHEADER_SYSTEMPAGE ) );

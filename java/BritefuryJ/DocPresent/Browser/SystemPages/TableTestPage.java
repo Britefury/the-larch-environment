@@ -37,8 +37,8 @@ public class TableTestPage extends SystemPage
 		return "The table element arranges is children in a table layout. Holes can be present. Child elements may span multiple columns and rows.";
 	}
 
-	private static TextStyleParams t12 = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
-	private static TextStyleParams t18 = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 18 ), Color.BLACK );
+	private static TextStyleParams t12 = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK, null, false );
+	private static TextStyleParams t18 = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 18 ), Color.BLACK, null, false );
 	private static SolidBorder b = new SolidBorder( 2.0, 3.0, new Color( 0.0f, 0.3f, 0.7f ), new Color( 1.0f, 0.99f, 0.9f ) );
 	private static SolidBorder outlineBorder = new SolidBorder( 1.0, 0.0, new Color( 0.0f, 0.3f, 0.7f ), null );
 
@@ -68,7 +68,7 @@ public class TableTestPage extends SystemPage
 
 	protected DPTable makeTable0()
 	{
-		TableStyleParams tbls0 = new TableStyleParams( 5.0, false, 5.0, false );
+		TableStyleParams tbls0 = new TableStyleParams( null, 5.0, false, 5.0, false );
 		DPTable table = new DPTable( tbls0 );
 		for (int row = 0; row < 6; row++)
 		{
@@ -120,7 +120,7 @@ public class TableTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		VBoxStyleParams boxS = new VBoxStyleParams( 20.0 );
+		VBoxStyleParams boxS = new VBoxStyleParams( null, 20.0 );
 		DPVBox box = new DPVBox( boxS );
 		box.append( wrapInBorder( makeTable0() ) );
 		box.append( wrapInBorder( makeTable1() ) );

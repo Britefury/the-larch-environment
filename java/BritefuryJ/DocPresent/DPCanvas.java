@@ -19,8 +19,8 @@ import BritefuryJ.Math.Point2;
 
 public class DPCanvas extends DPStatic implements DrawingOwner
 {
-	protected static int FLAG_DIAGRAM_SHRINK_X = FLAGS_ELEMENT_END * 0x1;
-	protected static int FLAG_DIAGRAM_SHRINK_Y = FLAGS_ELEMENT_END * 0x2;
+	protected static int FLAG_DIAGRAM_SHRINK_X = FLAGS_STATIC_END * 0x1;
+	protected static int FLAG_DIAGRAM_SHRINK_Y = FLAGS_STATIC_END * 0x2;
 	
 	protected DrawingNode drawing;
 	protected double drawingWidth, drawingHeight;

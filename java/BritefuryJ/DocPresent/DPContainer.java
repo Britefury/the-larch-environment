@@ -36,6 +36,10 @@ public abstract class DPContainer extends DPWidget
 	}
 	
 	
+	protected final static int FLAGS_CONTAINER_END = FLAGS_ELEMENT_END;
+
+	
+	
 	protected ArrayList<DPWidget> registeredChildren;				// Replace with array; operations like insert etc are hardly used at all
 	public String cachedTextRep;								// Move to 'waypoint' element
 	
@@ -192,6 +196,20 @@ public abstract class DPContainer extends DPWidget
 		{
 			parent.onSubtreeStructureChanged();
 		}
+	}
+	
+	
+	
+	
+	//
+	//
+	// LAYOUT METHODS
+	//
+	//
+	
+	public int getParagraphLinebreakCostModifier()
+	{
+		return 0;
 	}
 	
 	
@@ -919,7 +937,7 @@ public abstract class DPContainer extends DPWidget
 	//
 	
 	static EmptyBorder metaIndentBorder = new EmptyBorder( 25.0, 0.0, 0.0, 0.0 );
-	static VBoxStyleParams metaVBoxStyle = new VBoxStyleParams( 0.0 );
+	static VBoxStyleParams metaVBoxStyle = new VBoxStyleParams( null, 0.0 );
 	
 	public DPBorder getMetaHeaderBorderWidget()
 	{
@@ -990,20 +1008,5 @@ public abstract class DPContainer extends DPWidget
 			}
 		}
 		super.shutdownMetaElement();
-	}
-
-	
-	
-	
-	
-	//
-	//
-	// STYLESHEET METHODS
-	//
-	//
-	
-	public ContainerStyleParams getStyleSheet()
-	{
-		return (ContainerStyleParams) styleParams;
 	}
 }

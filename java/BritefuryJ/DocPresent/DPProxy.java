@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.awt.Shape;
+import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import BritefuryJ.DocPresent.LayoutTree.ArrangedSequenceLayoutNode;
@@ -80,6 +82,20 @@ public class DPProxy extends DPContainer
 	
 	
 	
+	protected Shape[] getShapes()
+	{
+		AABox2 bounds[] = computeBoundingBoxes();
+		Shape shapes[] = new Shape[bounds.length];
+		for (int i = 0; i < bounds.length; i++)
+		{
+			AABox2 box = bounds[i];
+			shapes[i] = new Rectangle2D.Double( box.getLowerX(), box.getLowerY(), box.getWidth(), box.getHeight() );
+		}
+		return shapes;
+	}
+
+	
+
 	private AABox2[] computeBoundingBoxes()
 	{
 		ArrangedSequenceLayoutNode arrangedLayout = (ArrangedSequenceLayoutNode)getValidLayoutNodeOfClass( ArrangedSequenceLayoutNode.class );

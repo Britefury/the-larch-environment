@@ -17,6 +17,7 @@ import BritefuryJ.DocPresent.DPStaticText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.SolidBorder;
+import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleParams.StaticTextStyleParams;
 import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
 
@@ -40,8 +41,8 @@ public class ProxyTestPage extends SystemPage
 
 	
 	
-	StaticTextStyleParams blackText = new StaticTextStyleParams( new Font( "Sans serif", Font.PLAIN, 14 ), Color.black );
-	StaticTextStyleParams redText = new StaticTextStyleParams( new Font( "Sans serif", Font.PLAIN, 14 ), Color.red );
+	StaticTextStyleParams blackText = new StaticTextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 14 ), Color.black, false );
+	StaticTextStyleParams redText = new StaticTextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 14 ), Color.red, false );
 	
 	SolidBorder _greyBorder = new SolidBorder( 2.0, 3.0, new Color( 0.5f, 0.5f, 0.5f ), null );
 	
@@ -69,7 +70,7 @@ public class ProxyTestPage extends SystemPage
 	
 	protected DPWidget span(DPWidget children[])
 	{
-		DPSpan span = new DPSpan( );
+		DPSpan span = new DPSpan( ContainerStyleParams.defaultStyleParams );
 		span.setChildren( children );
 		return span;
 	}
@@ -98,7 +99,7 @@ public class ProxyTestPage extends SystemPage
 		DPWidget body2 = paragraph( new DPWidget[] { staticText( "Before" ), proxy( span( new DPWidget[] { staticText( "One" ), staticText( "Two" ), staticText( "Three" ) } ) ), staticText( "After" ) } );
 		DPWidget content2 = content( header2, body2 );
 		
-		VBoxStyleParams boxs = new VBoxStyleParams( 30.0 );
+		VBoxStyleParams boxs = new VBoxStyleParams( null, 30.0 );
 		DPVBox box = new DPVBox( boxs );
 		box.extend( new DPWidget[] { content1, content2 } );
 

@@ -16,6 +16,7 @@ import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
+import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleParams.HBoxStyleParams;
 
 public class DPSpanTest extends DocPresentTestBase
@@ -32,7 +33,7 @@ public class DPSpanTest extends DocPresentTestBase
 			public boolean onLinkClicked(DPLink link, PointerButtonEvent buttonEvent)
 			{
 				System.out.println( "Adding span containing extra text element to outer span" );
-				DPSpan s2 = new DPSpan( );
+				DPSpan s2 = new DPSpan( ContainerStyleParams.defaultStyleParams );
 				s2.append( new DPText( " text_in_innerspan_in_outerspan_in_para " ) );
 				span.append( s2 );
 				return false;
@@ -54,7 +55,7 @@ public class DPSpanTest extends DocPresentTestBase
 			public boolean onLinkClicked(DPLink link, PointerButtonEvent buttonEvent)
 			{
 				System.out.println( "Adding span containing extra text element to para" );
-				DPSpan s2 = new DPSpan( );
+				DPSpan s2 = new DPSpan( ContainerStyleParams.defaultStyleParams );
 				s2.append( new DPText( " text_in_innerspan_in_para " ) );
 				para.append( s2 );
 				return false;
@@ -77,7 +78,7 @@ public class DPSpanTest extends DocPresentTestBase
 		DPLink addSpanElementToParaLink = new DPLink( "Add span element to paragraph", addSpanElementToParaAction );
 		DPLink addTextElementToParaLink = new DPLink( "Add text element to paragraph", addTextElementToParaAction );
 		
-		DPHBox linkBox = new DPHBox( new HBoxStyleParams( 30.0 ) );
+		DPHBox linkBox = new DPHBox( new HBoxStyleParams( null, 30.0 ) );
 		linkBox.append( addSpanElementToSpanLink );
 		linkBox.append( addTextElementToSpanLink );
 		linkBox.append( addSpanElementToParaLink );
@@ -86,7 +87,7 @@ public class DPSpanTest extends DocPresentTestBase
 		
 		
 		
-		span = new DPSpan( );
+		span = new DPSpan( ContainerStyleParams.defaultStyleParams );
 		span.append( new DPText( " text_in_span_in_para " ) );
 		
 		para = new DPParagraph( );

@@ -23,7 +23,7 @@ public class LayoutNodeLine extends StaticLayoutNode
 	protected void updateRequisitionX()
 	{
 		DPLine line = (DPLine)element;
-		LineStyleParams lineStyleParams = (LineStyleParams)line.getStyleSheet();
+		LineStyleParams lineStyleParams = (LineStyleParams)line.getStyleParams();
 
 		Direction direction = lineStyleParams.getDirection();
 		if ( direction == LineStyleParams.Direction.HORIZONTAL )
@@ -44,7 +44,7 @@ public class LayoutNodeLine extends StaticLayoutNode
 	protected void updateRequisitionY()
 	{
 		DPLine line = (DPLine)element;
-		LineStyleParams lineStyleParams = (LineStyleParams)line.getStyleSheet();
+		LineStyleParams lineStyleParams = (LineStyleParams)line.getStyleParams();
 
 		Direction direction = lineStyleParams.getDirection();
 		if ( direction == LineStyleParams.Direction.HORIZONTAL )

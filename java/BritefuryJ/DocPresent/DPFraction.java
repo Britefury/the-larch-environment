@@ -18,6 +18,7 @@ import java.util.List;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeFraction;
 import BritefuryJ.DocPresent.Marker.Marker;
+import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleParams.FractionStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 import BritefuryJ.Math.Point2;
@@ -234,7 +235,7 @@ public class DPFraction extends DPContainer
 
 				if ( bSegmentRequired  &&  !bSegmentPresent )
 				{
-					DPSegment seg = new DPSegment(segmentTextStyleParams, true, true );
+					DPSegment seg = new DPSegment( (ContainerStyleParams)getStyleParams(), segmentTextStyleParams, true, true );
 					segs[slot] = seg;
 					DPParagraph para = new DPParagraph( );
 					para.setChildren( Arrays.asList( new DPWidget[] { seg } ) );

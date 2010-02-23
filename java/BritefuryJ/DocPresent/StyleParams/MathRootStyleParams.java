@@ -16,12 +16,13 @@ import java.awt.font.LineMetrics;
 import javax.swing.JComponent;
 
 import BritefuryJ.DocPresent.DPPresentationArea;
+import BritefuryJ.DocPresent.Painter.Painter;
 
 public class MathRootStyleParams extends ContainerStyleParams
 {
 	private static final Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
 
-	public static final MathRootStyleParams defaultStyleParams = new MathRootStyleParams();
+	public static final MathRootStyleParams defaultStyleParams = new MathRootStyleParams( null, defaultFont, Color.BLACK, 1.5 );
 	
 	protected final Font font;
 	protected final Paint symbolPaint;
@@ -31,19 +32,9 @@ public class MathRootStyleParams extends ContainerStyleParams
 	protected boolean bRealised;
 
 
-	public MathRootStyleParams()
+	public MathRootStyleParams(Painter background, Font font, Paint symbolPaint, double thickness)
 	{
-		this( defaultFont, Color.BLACK, 1.5 );
-	}
-	
-	public MathRootStyleParams(Paint symbolPaint, double thickness)
-	{
-		this( defaultFont, symbolPaint, thickness );
-	}
-	
-	public MathRootStyleParams(Font font, Paint symbolPaint, double thickness)
-	{
-		super();
+		super( background );
 		
 		this.font = font;
 		this.symbolPaint = symbolPaint;

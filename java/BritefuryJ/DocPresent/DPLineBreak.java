@@ -38,12 +38,12 @@ public class DPLineBreak extends DPBin
 	private int computeLineBreakCost()
 	{
 		int cost = 0;
-		DPWidget w = this;
+		DPContainer w = getParent();
 		
 		while ( w != null  &&  !( w instanceof DPParagraph ) )
 		{
-			w = w.parent;
-			cost++;
+			cost += w.getParagraphLinebreakCostModifier();
+			w = w.getParent();
 		}
 		
 		return cost;

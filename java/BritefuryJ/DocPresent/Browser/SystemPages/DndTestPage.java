@@ -23,7 +23,7 @@ import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
 
 public class DndTestPage extends SystemPage
 {
-	private static StaticTextStyleParams textStyle = new StaticTextStyleParams( new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK );
+	private static StaticTextStyleParams textStyle = new StaticTextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK, false );
 	private static Border sourceBorder = new EmptyBorder( 10.0, 10.0, 10.0, 10.0, new Color( 0.75f, 0.85f, 1.0f ) );
 	private static Border destBorder = new EmptyBorder( 10.0, 10.0, 10.0, 10.0, new Color( 1.0f, 0.9f, 0.75f ) );
 	
@@ -99,7 +99,7 @@ public class DndTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		StaticTextStyleParams rowTitleStyle = new StaticTextStyleParams( new Font( "Sans serif", Font.PLAIN, 14 ), Color.BLACK );
+		StaticTextStyleParams rowTitleStyle = new StaticTextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 14 ), Color.BLACK, false );
 		
 		
 		DPStaticText sourceTitle = new DPStaticText( rowTitleStyle, "Source:" );
@@ -111,7 +111,7 @@ public class DndTestPage extends SystemPage
 		DPWidget dest1 = makeDestElement( "xyz" );
 		
 		
-		TableStyleParams tableStyle = new TableStyleParams( 25.0, false, 25.0, false );
+		TableStyleParams tableStyle = new TableStyleParams( null, 25.0, false, 25.0, false );
 		
 		
 		DPTable table = new DPTable( tableStyle );

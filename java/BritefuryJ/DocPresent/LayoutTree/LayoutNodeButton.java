@@ -28,7 +28,7 @@ public class LayoutNodeButton extends LayoutNodeBin
 	{
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPButton button = (DPButton)element;
-		ButtonStyleParams buttonStyle = (ButtonStyleParams)button.getStyleSheet();
+		ButtonStyleParams buttonStyle = (ButtonStyleParams)button.getStyleParams();
 		SolidBorder border = buttonStyle.getBorder();
 		DPWidget child = button.getChild();
 
@@ -47,7 +47,7 @@ public class LayoutNodeButton extends LayoutNodeBin
 	{
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPButton button = (DPButton)element;
-		ButtonStyleParams buttonStyle = (ButtonStyleParams)button.getStyleSheet();
+		ButtonStyleParams buttonStyle = (ButtonStyleParams)button.getStyleParams();
 		SolidBorder border = buttonStyle.getBorder();
 		DPWidget child = button.getChild();
 
@@ -68,7 +68,7 @@ public class LayoutNodeButton extends LayoutNodeBin
 	protected void updateAllocationX()
 	{
 		DPButton button = (DPButton)element;
-		ButtonStyleParams buttonStyle = (ButtonStyleParams)button.getStyleSheet();
+		ButtonStyleParams buttonStyle = (ButtonStyleParams)button.getStyleParams();
 		SolidBorder border = buttonStyle.getBorder();
 		DPWidget child = button.getChild();
 
@@ -85,7 +85,7 @@ public class LayoutNodeButton extends LayoutNodeBin
 	protected void updateAllocationY()
 	{
 		DPButton button = (DPButton)element;
-		ButtonStyleParams buttonStyle = (ButtonStyleParams)button.getStyleSheet();
+		ButtonStyleParams buttonStyle = (ButtonStyleParams)button.getStyleParams();
 		SolidBorder border = buttonStyle.getBorder();
 		DPWidget child = button.getChild();
 

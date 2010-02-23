@@ -41,8 +41,8 @@ public class BorderTestPage extends SystemPage
 
 	protected DPText[] makeTexts(String header)
 	{
-		TextStyleParams t12 = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK );
-		TextStyleParams t18 = new TextStyleParams( new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK );
+		TextStyleParams t12 = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK, null, false );
+		TextStyleParams t18 = new TextStyleParams( null, new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK, null, false );
 		DPText h = new DPText( t18, header );
 		DPText t0 = new DPText( t12, "Hello" );
 		DPText t1 = new DPText( t12, "World" );
@@ -65,7 +65,7 @@ public class BorderTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		VBoxStyleParams mainBoxStyle = new VBoxStyleParams( 10.0 );
+		VBoxStyleParams mainBoxStyle = new VBoxStyleParams( null, 10.0 );
 		DPVBox mainBox = new DPVBox( mainBoxStyle );
 		
 		SolidBorder singlePixelBorder = new SolidBorder( 1.0, 2.0, Color.black, null );
@@ -104,7 +104,7 @@ public class BorderTestPage extends SystemPage
 		valignExpand.setChild( makeTextOnGrey( "vAlign=expand" ).alignVExpand() );
 
 		
-		HBoxStyleParams vAlignBoxStyle = new HBoxStyleParams( 10.0 );
+		HBoxStyleParams vAlignBoxStyle = new HBoxStyleParams( null, 10.0 );
 		DPHBox vAlignBox = new DPHBox( vAlignBoxStyle );
 		vAlignBox.append( valignBaselines.alignVExpand() );
 		vAlignBox.append( valignBaselinesExpand.alignVExpand() );
@@ -114,7 +114,7 @@ public class BorderTestPage extends SystemPage
 		vAlignBox.append( valignExpand.alignVExpand() );
 		
 		
-		HBoxStyleParams bottomBoxStyle = new HBoxStyleParams( 50.0 );
+		HBoxStyleParams bottomBoxStyle = new HBoxStyleParams( null, 50.0 );
 		DPHBox bottomBox = new DPHBox( bottomBoxStyle );
 		bottomBox.append( spacer );
 		bottomBox.append( vAlignBox.alignVExpand() );

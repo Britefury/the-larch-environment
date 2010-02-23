@@ -32,7 +32,7 @@ public class LayoutNodeMathRoot extends ArrangedLayoutNode
 		DPWidget child = mathRoot.getChild();
 		if ( child != null )
 		{
-			MathRootStyleParams s = (MathRootStyleParams)mathRoot.getStyleSheet();
+			MathRootStyleParams s = (MathRootStyleParams)mathRoot.getStyleParams();
 			
 			layoutReqBox.setRequisitionX( child.getLayoutNode().refreshRequisitionX() );
 			layoutReqBox.borderX( s.getGlyphWidth(), 0.0 );
@@ -50,7 +50,7 @@ public class LayoutNodeMathRoot extends ArrangedLayoutNode
 		DPWidget child = mathRoot.getChild();
 		if ( child != null )
 		{
-			MathRootStyleParams s = (MathRootStyleParams)mathRoot.getStyleSheet();
+			MathRootStyleParams s = (MathRootStyleParams)mathRoot.getStyleParams();
 			
 			layoutReqBox.setRequisitionY( child.getLayoutNode().refreshRequisitionY() );
 			layoutReqBox.borderY( s.getBarSpacing() + s.getThickness(), 0.0 );
@@ -69,7 +69,7 @@ public class LayoutNodeMathRoot extends ArrangedLayoutNode
 		DPWidget child = mathRoot.getChild();
 		if ( child != null )
 		{
-			MathRootStyleParams s = (MathRootStyleParams)mathRoot.getStyleSheet();
+			MathRootStyleParams s = (MathRootStyleParams)mathRoot.getStyleParams();
 
 			LayoutNode childLayout = child.getLayoutNode();
 			double prevWidth = childLayout.getAllocationBox().getAllocationX();
@@ -85,7 +85,7 @@ public class LayoutNodeMathRoot extends ArrangedLayoutNode
 		DPWidget child = mathRoot.getChild();
 		if ( child != null )
 		{
-			MathRootStyleParams s = (MathRootStyleParams)mathRoot.getStyleSheet();
+			MathRootStyleParams s = (MathRootStyleParams)mathRoot.getStyleParams();
 
 			LayoutNode childLayout = child.getLayoutNode();
 			LAllocV prevAllocV = childLayout.getAllocationBox().getAllocV();

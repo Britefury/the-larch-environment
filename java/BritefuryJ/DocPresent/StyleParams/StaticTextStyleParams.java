@@ -10,12 +10,14 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Paint;
 
+import BritefuryJ.DocPresent.Painter.Painter;
+
 public class StaticTextStyleParams extends WidgetStyleParams
 {
 	private static final Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
 
 	
-	public static final StaticTextStyleParams defaultStyleParams = new StaticTextStyleParams();
+	public static final StaticTextStyleParams defaultStyleParams = new StaticTextStyleParams( null, defaultFont, Color.black, false );
 	
 	
 	
@@ -24,19 +26,9 @@ public class StaticTextStyleParams extends WidgetStyleParams
 	protected final boolean bMixedSizeCaps;
 
 
-	public StaticTextStyleParams()
+	public StaticTextStyleParams(Painter background, Font font, Paint textPaint, boolean bMixedSizeCaps)
 	{
-		this( defaultFont, Color.black, false );
-	}
-	
-	public StaticTextStyleParams(Font font, Paint textPaint)
-	{
-		this( font, textPaint, false );
-	}
-	
-	public StaticTextStyleParams(Font font, Paint textPaint, boolean bMixedSizeCaps)
-	{
-		super();
+		super( background );
 		
 		this.font = font;
 		this.textPaint = textPaint;

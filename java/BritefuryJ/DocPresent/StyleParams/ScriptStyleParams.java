@@ -7,22 +7,19 @@
 //##************************
 package BritefuryJ.DocPresent.StyleParams;
 
+import BritefuryJ.DocPresent.Painter.Painter;
+
 public class ScriptStyleParams extends ContainerStyleParams
 {
-	public static final ScriptStyleParams defaultStyleSheet = new ScriptStyleParams();
+	public static final ScriptStyleParams defaultStyleSheet = new ScriptStyleParams( null, 1.0, 1.0 );
 	
 	
 	private final double columnSpacing, rowSpacing;
 	
 	
-	public ScriptStyleParams()
+	public ScriptStyleParams(Painter background, double columnSpacing, double rowSpacing)
 	{
-		this( 1.0, 1.0 );
-	}
-	
-	public ScriptStyleParams(double columnSpacing, double rowSpacing)
-	{
-		super();
+		super( background );
 		
 		this.columnSpacing = columnSpacing;
 		this.rowSpacing = rowSpacing;

@@ -121,19 +121,19 @@ public class NodeView implements ElementContext
 	
 	static int MAX_STRING_LENGTH = 64;
 	
-	static TextStyleParams debugNameStyle = new TextStyleParams( new Font( "Sans serif", Font.BOLD, 24 ), Color.blue );
-	static TextStyleParams classNameStyle = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 18 ), new Color( 0.0f, 0.0f, 0.5f ) );
-	static TextStyleParams rangeStyle = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 12 ), Color.black );
-	static TextStyleParams inputStyle = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 12 ), Color.black );
-	static TextStyleParams valueStyle = new TextStyleParams( new Font( "Sans serif", Font.PLAIN, 16 ), Color.black );
-	static TextStyleParams failStyle = new TextStyleParams( new Font( "Sans serif", Font.ITALIC, 16 ), new Color( 0.5f, 0.0f, 0.0f ) );
-	static HBoxStyleParams titleTextHBoxStyle = new HBoxStyleParams( 10.0 );
+	static TextStyleParams debugNameStyle = new TextStyleParams( null, new Font( "Sans serif", Font.BOLD, 24 ), Color.blue, null, false );
+	static TextStyleParams classNameStyle = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 18 ), new Color( 0.0f, 0.0f, 0.5f ), null, false );
+	static TextStyleParams rangeStyle = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 12 ), Color.black, null, false );
+	static TextStyleParams inputStyle = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 12 ), Color.black, null, false );
+	static TextStyleParams valueStyle = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 16 ), Color.black, null, false );
+	static TextStyleParams failStyle = new TextStyleParams( null, new Font( "Sans serif", Font.ITALIC, 16 ), new Color( 0.5f, 0.0f, 0.0f ), null, false );
+	static HBoxStyleParams titleTextHBoxStyle = new HBoxStyleParams( null, 10.0 );
 	static Border titleSuccessBorder = new EmptyBorder( 0.0, 0.0, 0.0, 0.0, new Color( 0.85f, 0.95f, 0.85f ) );
 	static Border titleFailBorder = new EmptyBorder( 0.0, 0.0, 0.0, 0.0, new Color( 1.0f, 0.85f, 0.85f ) );
 	static Border nodeBorder = new SolidBorder( 1.0, 1.0, Color.black, null );
 	
-	static VBoxStyleParams childrenVBoxStyle = new VBoxStyleParams( 3.0 );
-	static HBoxStyleParams mainHBoxStyle = new HBoxStyleParams( 80.0 );
+	static VBoxStyleParams childrenVBoxStyle = new VBoxStyleParams( null, 3.0 );
+	static HBoxStyleParams mainHBoxStyle = new HBoxStyleParams( null, 80.0 );
 	
 	
 	

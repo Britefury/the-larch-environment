@@ -235,16 +235,16 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 	
 	protected double getVSpacing()
 	{
-		return ((FractionStyleParams)element.getStyleSheet()).getVSpacing();
+		return ((FractionStyleParams)element.getStyleParams()).getVSpacing();
 	}
 
 	protected double getHPadding()
 	{
-		return ((FractionStyleParams)element.getStyleSheet()).getHPadding();
+		return ((FractionStyleParams)element.getStyleParams()).getHPadding();
 	}
 
 	protected double getYOffset()
 	{
-		return ((FractionStyleParams)element.getStyleSheet()).getYOffset();
+		return ((FractionStyleParams)element.getStyleParams()).getYOffset();
 	}
 }

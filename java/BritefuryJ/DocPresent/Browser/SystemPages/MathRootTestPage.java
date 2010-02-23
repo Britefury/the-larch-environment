@@ -50,7 +50,7 @@ public class MathRootTestPage extends SystemPage
 	protected DPWidget makeFraction(String numeratorText, String denominatorText)
 	{
 		Font f0 = new Font( "Sans serif", Font.PLAIN, 14 );
-		TextStyleParams s0 = new TextStyleParams( f0, new Color( 0.0f, 0.5f, 0.0f ) );
+		TextStyleParams s0 = new TextStyleParams( null, f0, new Color( 0.0f, 0.5f, 0.0f ), null, false );
 		DPText num = new DPText( s0, numeratorText );
 		DPText denom = new DPText( s0, denominatorText );
 		
@@ -74,7 +74,7 @@ public class MathRootTestPage extends SystemPage
 	protected DPWidget makeRoot(String text)
 	{
 		Font f0 = new Font( "Sans serif", Font.PLAIN, 14 );
-		TextStyleParams s0 = new TextStyleParams( f0, new Color( 0.0f, 0.5f, 0.0f ) );
+		TextStyleParams s0 = new TextStyleParams( null, f0, new Color( 0.0f, 0.5f, 0.0f ), null, false );
 		DPText t = new DPText( s0, text );
 		return makeRoot( t );
 	}
