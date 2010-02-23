@@ -83,6 +83,8 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	protected void onCaretEnter(Caret c)
 	{
+		super.onCaretEnter( c );
+		
 		DPBorder border = getMetaHeaderBorderWidget(); 
 		if ( border != null )
 		{
@@ -92,22 +94,13 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	protected void onCaretLeave(Caret c)
 	{
+		super.onCaretLeave( c );
+		
 		DPBorder border = getMetaHeaderBorderWidget(); 
 		if ( border != null )
 		{
 			border.setBorder( metaHeaderEmptyBorder );
 		}
-	}
-	
-	
-	protected void handleCaretEnter(Caret c)
-	{
-		onCaretEnter( c );
-	}
-	
-	protected void handleCaretLeave(Caret c)
-	{
-		onCaretLeave( c );
 	}
 	
 	
