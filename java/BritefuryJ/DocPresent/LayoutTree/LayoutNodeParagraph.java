@@ -293,7 +293,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 			double yEnd = yStart + startLineBox.getAllocationY();
 			AABox2 startBox = new AABox2( xStart, yStart, xEnd, yEnd );
 
-			ParagraphLayout.Line endLine = lines[startLineIndex];
+			ParagraphLayout.Line endLine = lines[endLineIndex];
 			int endInLine = ( rangeEnd - 1 ) - endLine.getRangeStart();
 			endInLine = Math.min( endInLine, endLine.getChildAllocBoxes().length - 1 );
 			LAllocBoxInterface endChildBox = endLine.getChildAllocBoxes()[endInLine];
