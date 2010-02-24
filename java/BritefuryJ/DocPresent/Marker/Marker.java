@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPContentLeaf;
+import BritefuryJ.DocPresent.DPContentLeafEditable;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.DPWidget.IsNotInSubtreeException;
 
@@ -30,7 +31,7 @@ public class Marker
 	public enum Bias { START, END }
 	
 	
-	protected DPContentLeaf widget;
+	protected DPContentLeafEditable element;
 	protected int position;
 	protected Bias bias;
 	protected ArrayList<MarkerListener> listeners;
@@ -39,20 +40,20 @@ public class Marker
 	
 	public Marker()
 	{
-		this.widget = null;
+		this.element = null;
 		this.position = 0;
 		this.bias = Bias.START;
 	}
 	
-	public Marker(DPContentLeaf widget, int position, Bias bias)
+	public Marker(DPContentLeafEditable widget, int position, Bias bias)
 	{
 		checkPositionAndBias( widget, position, bias );
 		
-		this.widget = widget;
+		this.element = widget;
 		this.position = position;
 		this.bias = bias;
 		
-		this.widget.registerMarker( this );
+		this.element.registerMarker( this );
 	}
 	
 	
@@ -79,9 +80,16 @@ public class Marker
 	
 	
 	
-	public DPContentLeaf getElement()
+	public boolean isValid()
 	{
-		return widget;
+		return element != null  &&  element.isRealised();
+	}
+	
+
+	
+	public DPContentLeafEditable getElement()
+	{
+		return element;
 	}
 	
 	public int getPosition()
@@ -91,7 +99,6 @@ public class Marker
 	
 	public int getPositionInSubtree(DPWidget subtreeRoot) throws IsNotInSubtreeException
 	{
-		DPWidget element = getElement();
 		if ( subtreeRoot == element )
 		{
 			return getPosition();
@@ -141,7 +148,7 @@ public class Marker
 	
 	public int getClampedIndex()
 	{
-		return Math.min( bias == Bias.END  ?  position + 1  :  position,  widget.getMarkerRange() );
+		return Math.min( bias == Bias.END  ?  position + 1  :  position,  element.getMarkerRange() );
 	}
 	
 	public int getIndexInSubtree(DPWidget subtreeRoot) throws IsNotInSubtreeException
@@ -164,37 +171,43 @@ public class Marker
 		changed();
 	}
 	
-	public void set(DPContentLeaf widget, int position, Bias bias)
+	public void set(DPContentLeafEditable widget, int position, Bias bias)
 	{
 		if ( widget != null )
 		{
 			checkPositionAndBias( widget, position, bias );
 		}
 		
-		if ( this.widget != null )
+		if ( this.element != null )
 		{
-			this.widget.unregisterMarker( this );
+			this.element.unregisterMarker( this );
 		}
 		
-		this.widget = widget;
+		this.element = widget;
 		this.position = position;
 		this.bias = bias;
 		
-		if ( this.widget != null )
+		if ( this.element != null )
 		{
-			this.widget.registerMarker( this );
+			this.element.registerMarker( this );
 		}
 		
 		changed();
 	}
 	
 	
+	public void moveTo(Marker marker)
+	{
+		set( marker.element, marker.position, marker.bias );
+	}
+	
+
 	public void clear()
 	{
-		if ( widget != null )
+		if ( element != null )
 		{
-			widget.unregisterMarker( this );
-			widget = null;
+			element.unregisterMarker( this );
+			element = null;
 			position = 0;
 			bias = Bias.START;
 			changed();
@@ -214,9 +227,9 @@ public class Marker
 	
 	public Marker copy()
 	{
-		if ( widget != null )
+		if ( element != null )
 		{
-			return widget.marker( position, bias );
+			return element.marker( position, bias );
 		}
 		else
 		{
@@ -224,24 +237,8 @@ public class Marker
 		}
 	}
 	
-	public void moveTo(Marker marker)
-	{
-		set( marker.widget, marker.position, marker.bias );
-	}
 	
-	
-	public static int getIndex(int position, Bias bias)
-	{
-		return bias == Bias.END  ?  position + 1  :  position;
-	}
-	
-	
-	
-	public boolean isValid()
-	{
-		return widget != null  &&  widget.isRealised();
-	}
-	
+		
 	
 	
 	protected void changed()
@@ -266,13 +263,13 @@ public class Marker
 		}
 		else
 		{
-			return widget == m.widget  &&  position == m.position  &&  bias == m.bias;
+			return element == m.element  &&  position == m.position  &&  bias == m.bias;
 		}
 	}
 	
 	
 	
-	private static void checkPositionAndBias(DPContentLeaf w, int position, Bias bias)
+	private static void checkPositionAndBias(DPContentLeafEditable w, int position, Bias bias)
 	{
 		int markerRange = w.getMarkerRange();
 		if ( position > markerRange )
@@ -289,5 +286,13 @@ public class Marker
 		{
 			throw new InvalidMarkerPosition( "Cannot place marker at " + position + ":" + bias + " - range is " + markerRange );
 		}
+	}
+	
+	
+	
+	
+	public static int getIndex(int position, Bias bias)
+	{
+		return bias == Bias.END  ?  position + 1  :  position;
 	}
 }

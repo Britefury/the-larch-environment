@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent.LayoutTree;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPContainer;
-import BritefuryJ.DocPresent.DPContentLeaf;
+import BritefuryJ.DocPresent.DPContentLeafEditable;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.WidgetFilter;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
@@ -329,7 +329,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 	// Focus navigation methods
 	//
 	
-	public DPContentLeaf getContentLeafAboveOrBelowFromChild(DPWidget child, boolean bBelow, Point2 localCursorPos, boolean bSkipWhitespace)
+	public DPContentLeafEditable getEditableContentLeafAboveOrBelowFromChild(DPWidget child, boolean bBelow, Point2 localCursorPos)
 	{
 		int childIndex = getLeaves().indexOf( child );
 		int lineIndex = ParagraphLayout.Line.searchForEndLine( lines, childIndex );
@@ -339,7 +339,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 			for (int i = lineIndex + 1; i < lines.length; i++)
 			{
 				ParagraphLayout.Line line = lines[i];
-				DPContentLeaf l = getTopOrBottomContentLeafFromLine( line, false, cursorPosInRootSpace, bSkipWhitespace );
+				DPContentLeafEditable l = getTopOrBottomEditableContentLeafFromLine( line, false, cursorPosInRootSpace );
 				if ( l != null )
 				{
 					return l;
@@ -351,7 +351,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 			for (int i = lineIndex - 1; i >= 0; i--)
 			{
 				ParagraphLayout.Line line = lines[i];
-				DPContentLeaf l = getTopOrBottomContentLeafFromLine( line, true, cursorPosInRootSpace, bSkipWhitespace );
+				DPContentLeafEditable l = getTopOrBottomEditableContentLeafFromLine( line, true, cursorPosInRootSpace );
 				if ( l != null )
 				{
 					return l;
@@ -365,7 +365,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 		
 		if ( branchLayout != null )
 		{
-			return branchLayout.getContentLeafAboveOrBelowFromChild( element, bBelow, element.getLocalPointRelativeToAncestor( branchLayout.getElement(), localCursorPos ), bSkipWhitespace );
+			return branchLayout.getEditableContentLeafAboveOrBelowFromChild( element, bBelow, element.getLocalPointRelativeToAncestor( branchLayout.getElement(), localCursorPos ) );
 		}
 		else
 		{
@@ -375,10 +375,10 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 
 	
 	
-	protected DPContentLeaf getTopOrBottomContentLeafFromLine(ParagraphLayout.Line line, boolean bBottom, Point2 cursorPosInRootSpace, boolean bSkipWhitespace)
+	protected DPContentLeafEditable getTopOrBottomEditableContentLeafFromLine(ParagraphLayout.Line line, boolean bBottom, Point2 cursorPosInRootSpace)
 	{
 		double closestDistance = 0.0;
-		DPContentLeaf closestNode = null;
+		DPContentLeafEditable closestNode = null;
 		for (LAllocBoxInterface allocBox: line.getChildAllocBoxes())
 		{
 			DPWidget item = allocBox.getAllocLayoutNode().getElement();
@@ -388,7 +388,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 			double upper = item.getLocalPointRelativeToRoot( bounds.getUpper() ).x;
 			if ( cursorPosInRootSpace.x >=  lower  &&  cursorPosInRootSpace.x <= upper )
 			{
-				DPContentLeaf l = item.getLayoutNode().getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace, bSkipWhitespace );
+				DPContentLeafEditable l = item.getLayoutNode().getTopOrBottomEditableContentLeaf( bBottom, cursorPosInRootSpace );
 				if ( l != null )
 				{
 					return l;
@@ -410,7 +410,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 				
 				if ( closestNode == null  ||  distance < closestDistance )
 				{
-					DPContentLeaf l = item.getLayoutNode().getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace, bSkipWhitespace );
+					DPContentLeafEditable l = item.getLayoutNode().getTopOrBottomEditableContentLeaf( bBottom, cursorPosInRootSpace );
 					if ( l != null )
 					{
 						closestDistance = distance;
@@ -429,14 +429,14 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 	}
 
 	
-	public DPContentLeaf getTopOrBottomContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace, boolean bSkipWhitespace)
+	public DPContentLeafEditable getTopOrBottomEditableContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace)
 	{
 		if ( bBottom )
 		{
 			for (int i = lines.length - 1; i >= 0; i--)
 			{
 				ParagraphLayout.Line line = lines[i];
-				DPContentLeaf l = getTopOrBottomContentLeafFromLine( line, bBottom, cursorPosInRootSpace, bSkipWhitespace );
+				DPContentLeafEditable l = getTopOrBottomEditableContentLeafFromLine( line, bBottom, cursorPosInRootSpace );
 				if ( l != null )
 				{
 					return l;
@@ -447,7 +447,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 		{
 			for (ParagraphLayout.Line line: lines)
 			{
-				DPContentLeaf l = getTopOrBottomContentLeafFromLine( line, bBottom, cursorPosInRootSpace, bSkipWhitespace );
+				DPContentLeafEditable l = getTopOrBottomEditableContentLeafFromLine( line, bBottom, cursorPosInRootSpace );
 				if ( l != null )
 				{
 					return l;

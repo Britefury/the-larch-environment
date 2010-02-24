@@ -9,10 +9,7 @@ package BritefuryJ.DocPresent;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics2D;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.WeakHashMap;
 
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.SolidBorder;
@@ -37,6 +34,9 @@ public abstract class DPContentLeaf extends DPWidget
 	}
 	
 	
+	
+	protected final static int FLAGS_CONTENTLEAF_END = FLAGS_ELEMENT_END;
+	
 
 	
 	protected String textRepresentation;
@@ -56,422 +56,6 @@ public abstract class DPContentLeaf extends DPWidget
 	}
 	
 	
-	
-	
-	//
-	// Marker range methods
-	//
-	
-	public abstract int getMarkerRange();
-	
-	public abstract int getMarkerPositonForPoint(Point2 localPos);
-	
-	
-	
-	
-	
-	//
-	//
-	// CARET METHODS
-	//
-	//
-	
-	public abstract void drawCaret(Graphics2D graphics, Caret c);
-	public abstract void drawCaretAtStart(Graphics2D graphics);
-	public abstract void drawCaretAtEnd(Graphics2D graphics);
-	
-	
-	protected void onCaretEnter(Caret c)
-	{
-		super.onCaretEnter( c );
-		
-		DPBorder border = getMetaHeaderBorderWidget(); 
-		if ( border != null )
-		{
-			border.setBorder( metaHeaderHighlightBorder );
-		}
-	}
-	
-	protected void onCaretLeave(Caret c)
-	{
-		super.onCaretLeave( c );
-		
-		DPBorder border = getMetaHeaderBorderWidget(); 
-		if ( border != null )
-		{
-			border.setBorder( metaHeaderEmptyBorder );
-		}
-	}
-	
-	
-	
-	
-	//
-	//
-	// SELECTION METHODS
-	//
-	//
-	
-	public abstract void drawSelection(Graphics2D graphics, Marker from, Marker to);
-	
-
-	protected void drawSubtreeSelection(Graphics2D graphics, Marker startMarker, List<DPWidget> startPath, Marker endMarker, List<DPWidget> endPath)
-	{
-		drawSelection( graphics, startMarker, endMarker );
-	}
-	
-	
-
-	
-	
-	//
-	//
-	// MARKER METHODS
-	//
-	//	
-	
-	public Marker marker(int position, Marker.Bias bias)
-	{
-		return new Marker( this, position, bias );
-	}
-	
-	public Marker markerAtStart()
-	{
-		return marker( 0, Marker.Bias.START );
-	}
-	
-	public Marker markerAtStartPlusOne()
-	{
-		return marker( Math.min( 1, getMarkerRange() ), Marker.Bias.START );
-	}
-	
-	public Marker markerAtEnd()
-	{
-		return marker( Math.max( getMarkerRange() - 1, 0 ), Marker.Bias.END );
-	}
-	
-	public Marker markerAtEndMinusOne()
-	{
-		return marker( Math.max( getMarkerRange() - 1, 0 ), Marker.Bias.START );
-	}
-	
-	
-	public Marker markerAtPoint(Point2 localPos)
-	{
-		int markerPos = getMarkerPositonForPoint( localPos );
-		return marker( markerPos, Marker.Bias.START );
-	}
-
-
-
-	public void moveMarker(Marker m, int position, Marker.Bias bias)
-	{
-		m.set( this, position, bias );
-	}
-	
-	public void moveMarkerToStart(Marker m)
-	{
-		moveMarker( m, 0, Marker.Bias.START );
-	}
-	
-	public void moveMarkerToStartPlusOne(Marker m)
-	{
-		moveMarker( m, Math.min( 1, getMarkerRange() ), Marker.Bias.START );
-	}
-	
-	public void moveMarkerToEnd(Marker m)
-	{
-		moveMarker( m, Math.max( getMarkerRange() - 1, 0 ), Marker.Bias.END );
-	}
-	
-	public void moveMarkerToEndMinusOne(Marker m)
-	{
-		moveMarker( m, Math.max( getMarkerRange() - 1, 0 ), Marker.Bias.START );
-	}
-	
-	public void moveMarkerToPoint(Marker m, Point2 localPos)
-	{
-		int markerPos = getMarkerPositonForPoint( localPos );
-		moveMarker( m, markerPos, Marker.Bias.START );
-	}
-
-	
-	
-	public boolean isMarkerAtStart(Marker m)
-	{
-		if ( m.getElement() == this )
-		{
-			return m.getIndex() == 0;
-		}
-		else
-		{
-			return false;
-		}
-	}
-	
-	public boolean isMarkerAtEnd(Marker m)
-	{
-		if ( m.getElement() == this )
-		{
-			// The index (position and bias) is at the last position,
-			// OR
-			// range is 0, and position is 0, bias is 1, which would make index 1
-			return m.getIndex() == getMarkerRange()  ||  m.getPosition() == getMarkerRange();
-		}
-		else
-		{
-			return false;
-		}
-	}
-	
-	
-	
-	
-	
-	protected WeakHashMap<Marker, Object> getMarkersForLeaf()
-	{
-		if ( presentationArea != null )
-		{
-			return presentationArea.markersByLeaf.get( this );
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	protected WeakHashMap<Marker, Object> getValidMarkersForLeaf()
-	{
-		if ( presentationArea != null )
-		{
-			WeakHashMap<Marker, Object> markers = presentationArea.markersByLeaf.get( this );
-			
-			if ( markers == null )
-			{
-				markers = new WeakHashMap<Marker, Object>(); 
-				presentationArea.markersByLeaf.put( this, markers );
-			}
-			
-			return markers;
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	protected void removeMarkersForLeaf()
-	{
-		presentationArea.markersByLeaf.remove( this );
-	}
-	
-	
-	public void registerMarker(Marker m)
-	{
-		WeakHashMap<Marker, Object> markers = getValidMarkersForLeaf();
-		markers.put( m, null );
-	}
-	
-	public void unregisterMarker(Marker m)
-	{
-		WeakHashMap<Marker, Object> markers = getMarkersForLeaf();
-		if ( markers != null )
-		{
-			markers.remove( m );
-		
-			if ( markers.isEmpty() )
-			{
-				removeMarkersForLeaf();
-			}
-		}
-	}
-	
-	
-	
-	
-	public void markerInsert(int position, int length)
-	{
-		WeakHashMap<Marker, Object> markers = getMarkersForLeaf();
-		if ( markers != null )
-		{
-			for (Marker m: markers.keySet())
-			{
-				if ( m.getClampedIndex() > position )
-				{
-					m.setPosition( m.getPosition() + length );
-				}
-				else if ( m.getClampedIndex() == position )
-				{
-					m.setPositionAndBias( position + length - 1, Marker.Bias.END );
-				}
-			}
-		}
-	}
-	
-	public void markerRemove(int position, int length)
-	{
-		WeakHashMap<Marker, Object> markers = getMarkersForLeaf();
-		if ( markers != null )
-		{
-			int end = position + length;
-	
-			for (Marker m: markers.keySet())
-			{
-				if ( m.getClampedIndex() >= position )
-				{
-					if ( m.getClampedIndex() > end )
-					{
-						m.setPosition( m.getPosition() - length );
-					}
-					else
-					{
-						m.setPositionAndBias( position, Marker.Bias.START );
-					}
-				}
-			}
-		}
-	}
-
-	
-	
-
-	// MARKER MOVEMENT METHODS
-	
-	protected void moveMarkerLeft(Marker marker, boolean bSkipWhitespace)
-	{
-		if ( isMarkerAtStart( marker ) )
-		{
-			DPContentLeaf left = getContentLeafToLeft();
-			boolean bSkippedWhitespace = false;
-			
-
-			if ( bSkipWhitespace )
-			{
-				while ( left != null  &&  left.isWhitespace() )
-				{
-					left = left.getContentLeafToLeft();
-					bSkippedWhitespace = true;
-				}
-			}
-
-			if ( left != null )
-			{
-				if ( bSkippedWhitespace )
-				{
-					left.moveMarkerToEnd( marker );
-				}
-				else
-				{
-					left.moveMarkerToEndMinusOne( marker );
-				}
-			}
-		}
-		else
-		{
-			moveMarker( marker, marker.getIndex() - 1, Marker.Bias.START );
-		}
-	}
-
-
-
-	protected void moveMarkerRight(Marker marker, boolean bSkipWhitespace)
-	{
-		if ( isMarkerAtEnd( marker ) )
-		{
-			DPContentLeaf right = getContentLeafToRight();
-			boolean bSkippedWhitespace = false;
-			
-
-			if ( bSkipWhitespace )
-			{
-				while ( right != null  &&  right.isWhitespace() )
-				{
-					right = right.getContentLeafToRight();
-					bSkippedWhitespace = true;
-				}
-			}
-
-			if ( right != null )
-			{
-				if ( bSkippedWhitespace )
-				{
-					right.moveMarkerToStart( marker );
-				}
-				else
-				{
-					right.moveMarkerToStartPlusOne( marker );
-				}
-			}
-		}
-		else
-		{
-			moveMarker( marker, marker.getIndex(), Marker.Bias.END );
-		}
-	}
-	
-	protected void moveMarkerUp(Marker marker, boolean bSkipWhitespace)
-	{
-		Point2 cursorPos = getMarkerPosition( marker );
-		DPContentLeaf above = getContentLeafAbove( cursorPos, bSkipWhitespace );
-		if ( above != null )
-		{
-			Point2 cursorPosInAbove = getLocalPointRelativeTo( above, cursorPos );
-			int contentPos = above.getMarkerPositonForPoint( cursorPosInAbove );
-			above.moveMarker( marker, contentPos, Marker.Bias.START );
-		}
-	}
-	
-	protected void moveMarkerDown(Marker marker, boolean bSkipWhitespace)
-	{
-		Point2 cursorPos = getMarkerPosition( marker );
-		DPContentLeaf below = getContentLeafBelow( cursorPos, bSkipWhitespace );
-		if ( below != null )
-		{
-			Point2 cursorPosInBelow = getLocalPointRelativeTo( below, cursorPos );
-			int contentPos = below.getMarkerPositonForPoint( cursorPosInBelow );
-			below.moveMarker( marker, contentPos, Marker.Bias.START );
-		}
-	}
-	
-	protected void moveMarkerHome(Marker marker)
-	{
-		DPSegment segment = null;
-		DPContentLeaf homeElement = null;
-		segment = getSegment();
-		homeElement = segment != null  ?  segment.getFirstEditableEntryLeafInSubtree()  :  null;
-		if ( segment != null  &&  this == homeElement  &&  isMarkerAtStart( marker ) )
-		{
-			segment = segment.getParent().getSegment();
-			homeElement = segment != null  ?  segment.getFirstEditableEntryLeafInSubtree()  :  null;
-		}
-		
-		if ( homeElement != null )
-		{
-			homeElement.moveMarkerToStart( marker );
-		}
-	}
-	
-	protected void moveMarkerEnd(Marker marker)
-	{
-		DPSegment segment = null;
-		DPContentLeaf endElement = null;
-		segment = getSegment();
-		endElement = segment != null  ?  segment.getLastEditableEntryLeafInSubtree()  :  null;
-		if ( segment != null  &&  this == endElement  &&  isMarkerAtEnd( marker ) )
-		{
-			segment = segment.getParent().getSegment();
-			endElement = segment != null  ?  segment.getLastEditableEntryLeafInSubtree()  :  null;
-		}
-		
-		if ( endElement != null )
-		{
-			endElement.moveMarkerToEnd( marker );
-		}
-	}
-	
-	
-	
-
 	
 	
 	//
@@ -563,28 +147,6 @@ public abstract class DPContentLeaf extends DPWidget
 		return getNextEditableLeaf( null, null );
 	}
 
-
-	public DPContentLeaf getPreviousEditableEntryLeaf(WidgetFilter subtreeRootFilter, WidgetFilter branchFilter)
-	{
-		return getPreviousLeaf( subtreeRootFilter, branchFilter, new DPContentLeafEditableEntry.EditableEntryLeafElementFilter() );
-	}
-
-	public DPContentLeaf getNextEditableEntryLeaf(WidgetFilter subtreeRootFilter, WidgetFilter branchFilter)
-	{
-		return getNextLeaf( subtreeRootFilter, branchFilter, new DPContentLeafEditableEntry.EditableEntryLeafElementFilter() );
-	}
-
-
-	public DPContentLeaf getPreviousEditableEntryLeaf()
-	{
-		return getPreviousEditableEntryLeaf( null, null );
-	}
-
-	public DPContentLeaf getNextEditableEntryLeaf()
-	{
-		return getNextEditableEntryLeaf( null, null );
-	}
-
 	
 	
 	
@@ -596,68 +158,16 @@ public abstract class DPContentLeaf extends DPWidget
 	//
 	//
 	
-	public DPContentLeafEditable getEditableContentLeafToLeft()
-	{
-		DPContentLeaf leaf = getContentLeafToLeft();
-		
-		while ( leaf != null  &&  !leaf.isEditable() )
-		{
-			leaf = leaf.getContentLeafToLeft();
-		}
-		
-		return (DPContentLeafEditable)leaf;
-	}
-	
-	public DPContentLeafEditable getEditableContentLeafToRight()
-	{
-		DPContentLeaf leaf = getContentLeafToRight();
-		
-		while ( leaf != null  &&  !leaf.isEditable() )
-		{
-			leaf = leaf.getContentLeafToRight();
-		}
-		
-		return (DPContentLeafEditable)leaf;
-	}
-	
-
-	
-	public DPContentLeafEditableEntry getEditableEntryContentLeafToLeft()
-	{
-		DPContentLeaf leaf = getContentLeafToLeft();
-		
-		while ( leaf != null  &&  !leaf.isEditableEntry() )
-		{
-			leaf = leaf.getContentLeafToLeft();
-		}
-		
-		return (DPContentLeafEditableEntry)leaf;
-	}
-	
-	public DPContentLeafEditableEntry getEditableEntryContentLeafToRight()
-	{
-		DPContentLeaf leaf = getContentLeafToRight();
-		
-		while ( leaf != null  &&  !leaf.isEditableEntry() )
-		{
-			leaf = leaf.getContentLeafToRight();
-		}
-		
-		return (DPContentLeafEditableEntry)leaf;
-	}
-	
-	
-	
-	protected DPContentLeaf getContentLeafAbove(Point2 localPos, boolean bSkipWhitespace)
+	public DPContentLeafEditable getEditableContentLeafAbove(Point2 localPos)
 	{
 		ContentLeafLayoutNodeInterface leafLayout = (ContentLeafLayoutNodeInterface)getLayoutNode();
-		return leafLayout.getContentLeafAbove( localPos, bSkipWhitespace );
+		return leafLayout.getEditableContentLeafAbove( localPos );
 	}
 	
-	protected DPContentLeaf getContentLeafBelow(Point2 localPos, boolean bSkipWhitespace)
+	public DPContentLeafEditable getEditableContentLeafBelow(Point2 localPos)
 	{
 		ContentLeafLayoutNodeInterface leafLayout = (ContentLeafLayoutNodeInterface)getLayoutNode();
-		return leafLayout.getContentLeafBelow( localPos, bSkipWhitespace );
+		return leafLayout.getEditableContentLeafBelow( localPos );
 	}
 	
 	
@@ -670,100 +180,8 @@ public abstract class DPContentLeaf extends DPWidget
 	{
 		return this;
 	}
-
-	public DPContentLeaf getTopOrBottomContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace, boolean bSkipWhitespace)
-	{
-		if ( bSkipWhitespace && isWhitespace() )
-		{
-			return null;
-		}
-		else
-		{
-			return this;
-		}
-	}
 	
 	
-	
-	
-	
-	//
-	//
-	// REALISE / UNREALISE
-	//
-	//
-
-	protected void onRealise()
-	{
-		super.onRealise();
-	}
-	
-	protected void onUnrealise(DPWidget unrealiseRoot)
-	{
-		super.onUnrealise( unrealiseRoot );
-		
-		WeakHashMap<Marker, Object> markers = getMarkersForLeaf();
-
-		if ( markers != null )
-		{
-			ArrayList<Marker> xs = new ArrayList<Marker>( markers.keySet() );
-			
-			if ( xs.size() > 0 )
-			{
-				DPContentLeaf left = unrealiseRoot.getContentLeafToLeft();
-				
-				while ( left != null  &&  !left.isRealised() )
-				{
-					left = left.getContentLeafToLeft();
-				}
-				
-				if ( left != null )
-				{
-					for (Marker x: xs)
-					{
-						try
-						{
-							left.moveMarkerToEnd( x );
-						}
-						catch (Marker.InvalidMarkerPosition e)
-						{
-						}
-					}
-				}
-				else
-				{
-					DPContentLeaf right = unrealiseRoot.getContentLeafToRight();
-					
-					while ( right != null  &&  !right.isRealised() )
-					{
-						right = right.getContentLeafToRight();
-					}
-					
-					if ( right != null )
-					{
-						for (Marker x: xs)
-						{
-							try
-							{
-								right.moveMarkerToStart( x );
-							}
-							catch (Marker.InvalidMarkerPosition e)
-							{
-							}
-						}
-					}
-					else
-					{
-						for (Marker x: xs)
-						{
-							unregisterMarker( x );
-							x.clear();
-						}
-					}
-				}
-			}
-		}
-	}
 	
 	
 	
@@ -891,6 +309,54 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	
 	
+	//
+	//
+	// TEXT REPRESENTATION MODIFICATION METHODS
+	//
+	//
+	
+	public void removeText(int index, int length)
+	{
+		index = Math.min( Math.max( index, 0 ), textRepresentation.length() );
+		length = Math.min( length, getTextRepresentationLength() - index );
+		textRepresentation = textRepresentation.substring( 0, index ) + textRepresentation.substring( index + length );
+		notifyTextRemoved( index, length );
+		textRepresentationChanged( new LinearRepresentationEventTextRemove( this, index, length ) );
+	}
+	
+	public void removeTextFromStart(int length)
+	{
+		removeText( 0, length );
+	}
+	
+	public void removeTextFromEnd(int length)
+	{
+		length = Math.min( length, getTextRepresentationLength() );
+		removeText( getTextRepresentationLength() - length, length );
+	}
+
+	
+	public boolean clearText()
+	{
+		int length = textRepresentation.length();
+		if ( length > 0 )
+		{
+			textRepresentation = "";
+			notifyTextRemoved( 9, length );
+			textRepresentationChanged( new LinearRepresentationEventTextRemove( this, 0, length ) );
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	
+	protected void notifyTextRemoved(int index, int length)
+	{
+	}
+
 	
 	
 	
@@ -928,22 +394,7 @@ public abstract class DPContentLeaf extends DPWidget
 	// TYPE METHODS
 	//
 
-	public boolean isContentLeaf()
-	{
-		return true;
-	}
-	
-	public boolean isWhitespace()
-	{
-		return false;
-	}
-	
 	public boolean isEditable()
-	{
-		return false;
-	}
-	
-	public boolean isEditableEntry()
 	{
 		return false;
 	}

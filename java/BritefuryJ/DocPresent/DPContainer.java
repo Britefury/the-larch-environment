@@ -592,12 +592,12 @@ public abstract class DPContainer extends DPWidget
 		}
 	}
 	
-	public DPContentLeaf getContentLeafAboveOrBelowFromChild(DPWidget child, boolean bBelow, Point2 localPos, boolean bSkipWhitespace)
+	public DPContentLeafEditable getEditableContentLeafAboveOrBelowFromChild(DPWidget child, boolean bBelow, Point2 localPos)
 	{
 		BranchLayoutNode branchLayout = (BranchLayoutNode)getValidLayoutNodeOfClass( BranchLayoutNode.class );
 		if ( branchLayout != null )
 		{
-			return branchLayout.getContentLeafAboveOrBelowFromChild( this, bBelow, getLocalPointRelativeToAncestor( branchLayout.getElement(), localPos ), bSkipWhitespace );
+			return branchLayout.getEditableContentLeafAboveOrBelowFromChild( this, bBelow, getLocalPointRelativeToAncestor( branchLayout.getElement(), localPos ) );
 		}
 		else
 		{

@@ -11,13 +11,11 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
-import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeWhitespace;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleParams.ContentLeafStyleParams;
-import BritefuryJ.Math.Point2;
 
-public class DPWhitespace extends DPContentLeafEditable
+public class DPWhitespace extends DPContentLeaf
 {
 	protected double width;
 	
@@ -56,53 +54,6 @@ public class DPWhitespace extends DPContentLeafEditable
 	
 	//
 	//
-	// CARET METHODS
-	//
-	//
-	
-	public void drawCaret(Graphics2D graphics, Caret c)
-	{
-		if ( c.getMarker().getIndex() == 0 )
-		{
-			drawCaretAtStart( graphics );
-		}
-		else
-		{
-			drawCaretAtEnd( graphics );
-		}
-	}
-
-	public void drawCaretAtStart(Graphics2D graphics)
-	{
-		DPContentLeaf leaf = this;
-		while ( leaf != null  &&  leaf.isWhitespace() )
-		{
-			leaf = leaf.getLayoutNode().getContentLeafToLeft();
-		}
-		
-		if ( leaf != null )
-		{
-			leaf.drawCaretAtEnd( graphics );
-		}
-	}
-	
-	public void drawCaretAtEnd(Graphics2D graphics)
-	{
-		DPContentLeaf leaf = this;
-		while ( leaf != null  &&  leaf.isWhitespace() )
-		{
-			leaf = leaf.getContentLeafToRight();
-		}
-		
-		if ( leaf != null )
-		{
-			leaf.drawCaretAtStart( graphics );
-		}
-	}
-
-	
-	//
-	//
 	// SELECTION METHODS
 	//
 	//
@@ -119,34 +70,5 @@ public class DPWhitespace extends DPContentLeafEditable
 		Rectangle2D.Double shape = new Rectangle2D.Double( startX, 0.0, endX - startX, allocationY);
 		graphics.fill( shape );
 		popGraphicsTransform( graphics, current );
-	}
-	
-	
-
-	//
-	// Marker methods
-	//
-	
-	public int getMarkerPositonForPoint(Point2 localPos)
-	{
-		if ( localPos.x >= width * 0.5 )
-		{
-			return 1;
-		}
-		else
-		{
-			return 0;
-		}
-	}
-
-	public int getMarkerRange()
-	{
-		return 1;
-	}
-
-	
-	public boolean isWhitespace()
-	{
-		return true;
 	}
 }

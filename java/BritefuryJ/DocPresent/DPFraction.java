@@ -28,7 +28,7 @@ public class DPFraction extends DPContainer
 	private static double childScale = 0.85;
 
 
-	public static class DPFractionBar extends DPContentLeafEditableEntry
+	public static class DPFractionBar extends DPContentLeafEditable
 	{
 		public DPFractionBar(String textRepresentation)
 		{
