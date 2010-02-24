@@ -1,48 +1,32 @@
-//##************************
 //##* This program is free software; you can use it, redistribute it and/or modify it
 //##* under the terms of the GNU General Public License version 2 as published by the
 //##* Free Software Foundation. The full text of the GNU General Public License
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
-//##* program. This source code is (C)copyright Geoffrey French 1999-2008.
+//##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
 package BritefuryJ.DocPresent;
 
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.LayoutTree.LayoutNodeEmpty;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleParams.WidgetStyleParams;
 import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
-public class DPEmpty extends DPWidget
+public abstract class DPEmpty extends DPWidget
 {
-	String textRepresentation;
-	
-	
 	public DPEmpty()
 	{
-		this( WidgetStyleParams.defaultStyleParams, "" );
-	}
-	
-	public DPEmpty(String textRepresentation)
-	{
-		this( WidgetStyleParams.defaultStyleParams, textRepresentation );
+		super();
 	}
 	
 	public DPEmpty(WidgetStyleParams styleParams)
 	{
-		this(styleParams, "" );
-	}
-
-	public DPEmpty(WidgetStyleParams styleParams, String textRepresentation)
-	{
 		super(styleParams);
-		
-		layoutNode = new LayoutNodeEmpty( this );
-		
-		this.textRepresentation = textRepresentation;
 	}
-
+	
+	
+	
+	
 	
 	
 	//
@@ -54,12 +38,12 @@ public class DPEmpty extends DPWidget
 	
 	public String getTextRepresentation()
 	{
-		return textRepresentation;
+		return "";
 	}
 	
 	public int getTextRepresentationLength()
 	{
-		return textRepresentation.length();
+		return 0;
 	}
 
 	protected void getTextRepresentationFromPathToEnd(StringBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
