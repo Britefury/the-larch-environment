@@ -56,7 +56,6 @@ import BritefuryJ.DocPresent.StyleParams.StaticTextStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
-import BritefuryJ.DocPresent.StyleParams.WidgetStyleParams;
 
 public class PrimitiveStyleSheet extends StyleSheet
 {
@@ -605,19 +604,6 @@ public class PrimitiveStyleSheet extends StyleSheet
 		return textParams;
 	}
 	
-	
-	private WidgetStyleParams widgetParams = null;
-
-	private WidgetStyleParams getWidgetParams()
-	{
-		if ( widgetParams == null )
-		{
-			widgetParams = new WidgetStyleParams(
-					get( "background", Painter.class, null ) );
-		}
-		return widgetParams;
-	}
-
 	
 	private VBoxStyleParams vboxParams = null;
 

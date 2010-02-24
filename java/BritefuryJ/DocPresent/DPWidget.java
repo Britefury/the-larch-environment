@@ -10,7 +10,6 @@ package BritefuryJ.DocPresent;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Paint;
 import java.awt.Shape;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
@@ -178,7 +177,7 @@ abstract public class DPWidget extends PointerInputElement
 		
 		public boolean isIdentity()
 		{
-			return dndHandler == null  &&  linearRepresentationListener == null  &&    keyboardListener == null;
+			return dndHandler == null  &&  linearRepresentationListener == null  &&    keyboardListener == null  &&  interactor == null;
 		}
 	}
 
@@ -194,8 +193,10 @@ abstract public class DPWidget extends PointerInputElement
 	protected final static int FLAG_REALISED = 0x1;
 	protected final static int FLAG_RESIZE_QUEUED = 0x2;
 	protected final static int FLAG_SIZE_UP_TO_DATE = 0x4;
+	protected final static int FLAG_SELECTABLE_MASK = 0x8;
+	protected final static int FLAG_SELECTABLE = 0x10;
 
-	protected final static int _ALIGN_SHIFT = 3;
+	protected final static int _ALIGN_SHIFT = 5;
 	protected final static int _ALIGN_MASK = ElementAlignment._ELEMENTALIGN_MASK  <<  _ALIGN_SHIFT;
 	protected final static int _HALIGN_MASK = ElementAlignment._HALIGN_MASK  <<  _ALIGN_SHIFT;
 	protected final static int _VALIGN_MASK = ElementAlignment._VALIGN_MASK  <<  _ALIGN_SHIFT;
@@ -729,17 +730,6 @@ abstract public class DPWidget extends PointerInputElement
 	//
 	//
 	
-	public boolean isResizeQueued()
-	{
-		return testFlag( FLAG_RESIZE_QUEUED );
-	}
-	
-	public boolean isSizeUpToDate()
-	{
-		return testFlag( FLAG_SIZE_UP_TO_DATE );
-	}
-	
-	
 	protected void clearFlag(int flag)
 	{
 		flags &= ~flag;
@@ -779,6 +769,11 @@ abstract public class DPWidget extends PointerInputElement
 	}
 	
 	
+	public boolean isResizeQueued()
+	{
+		return testFlag( FLAG_RESIZE_QUEUED );
+	}
+	
 	public void clearFlagResizeQueued()
 	{
 		clearFlag( FLAG_RESIZE_QUEUED );
@@ -789,6 +784,11 @@ abstract public class DPWidget extends PointerInputElement
 		setFlag( FLAG_RESIZE_QUEUED );
 	}
 	
+	
+	public boolean isSizeUpToDate()
+	{
+		return testFlag( FLAG_SIZE_UP_TO_DATE );
+	}
 	
 	public void clearFlagSizeUpToDate()
 	{
@@ -801,6 +801,7 @@ abstract public class DPWidget extends PointerInputElement
 	}
 	
 	
+
 	
 	
 	//
@@ -1300,42 +1301,98 @@ abstract public class DPWidget extends PointerInputElement
 
 	protected boolean handlePointerButtonDown(PointerButtonEvent event)
 	{
-		return onButtonDown( event );
+		if ( onButtonDown( event ) )
+		{
+			return true;
+		}
+		ElementInteractor interactor = getInteractor();
+		if ( interactor != null )
+		{
+			return interactor.onButtonDown( this, event );
+		}
+		return false;
 	}
 	
 	protected boolean handlePointerButtonDown2(PointerButtonEvent event)
 	{
-		return onButtonDown2( event );
+		if ( onButtonDown2( event ) )
+		{
+			return true;
+		}
+		ElementInteractor interactor = getInteractor();
+		if ( interactor != null )
+		{
+			return interactor.onButtonDown( this, event );
+		}
+		return false;
 	}
 	
 	protected boolean handlePointerButtonDown3(PointerButtonEvent event)
 	{
-		return onButtonDown3( event );
+		if ( onButtonDown3( event ) )
+		{
+			return true;
+		}
+		ElementInteractor interactor = getInteractor();
+		if ( interactor != null )
+		{
+			return interactor.onButtonDown( this, event );
+		}
+		return false;
 	}
 	
 	protected boolean handlePointerButtonUp(PointerButtonEvent event)
 	{
-		return onButtonUp( event );
+		if ( onButtonUp( event ) )
+		{
+			return true;
+		}
+		ElementInteractor interactor = getInteractor();
+		if ( interactor != null )
+		{
+			return interactor.onButtonDown( this, event );
+		}
+		return false;
 	}
 	
 	protected void handlePointerMotion(PointerMotionEvent event)
 	{
 		onMotion( event );
+		ElementInteractor interactor = getInteractor();
+		if ( interactor != null )
+		{
+			interactor.onMotion( this, event );
+		}
 	}
 	
 	protected void handlePointerDrag(PointerMotionEvent event)
 	{
 		onDrag( event );
+		ElementInteractor interactor = getInteractor();
+		if ( interactor != null )
+		{
+			interactor.onDrag( this, event );
+		}
 	}
 	
 	protected void handlePointerEnter(PointerMotionEvent event)
 	{
 		onEnter( event );
+		ElementInteractor interactor = getInteractor();
+		if ( interactor != null )
+		{
+			interactor.onEnter( this, event );
+		}
 	}
 	
 	protected void handlePointerLeave(PointerMotionEvent event)
 	{
 		onLeave( event );
+		ElementInteractor interactor = getInteractor();
+		if ( interactor != null )
+		{
+			interactor.onLeave( this, event );
+		}
 	}
 	
 
@@ -1351,7 +1408,16 @@ abstract public class DPWidget extends PointerInputElement
 	
 	protected boolean handlePointerScroll(PointerScrollEvent event)
 	{
-		return onScroll( event );
+		if ( onScroll( event ) )
+		{
+			return true;
+		}
+		ElementInteractor interactor = getInteractor();
+		if ( interactor != null )
+		{
+			return interactor.onScroll( this, event );
+		}
+		return false;
 	}
 	
 	
@@ -1416,22 +1482,32 @@ abstract public class DPWidget extends PointerInputElement
 	protected void handleCaretEnter(Caret c)
 	{
 		onCaretEnter( c );
+		ElementInteractor interactor = getInteractor();
+		if ( interactor != null )
+		{
+			interactor.onCaretEnter( this, c );
+		}
 	}
 	
 	protected void handleCaretLeave(Caret c)
 	{
 		onCaretLeave( c );
+		ElementInteractor interactor = getInteractor();
+		if ( interactor != null )
+		{
+			interactor.onCaretLeave( this, c );
+		}
 	}
 
 	
 	
 	//
 	//
-	// INTERACTOR METHODS
+	// INTERACTION FIELDS METHODS
 	//
 	//
 	
-	private void ensureValidInteractor()
+	private void ensureValidInteractionFields()
 	{
 		if ( interactionFields == null )
 		{
@@ -1439,7 +1515,7 @@ abstract public class DPWidget extends PointerInputElement
 		}
 	}
 	
-	private void onInteractorModified()
+	private void notifyInteractionFieldsModified()
 	{
 		if ( interactionFields != null  &&  interactionFields.isIdentity() )
 		{
@@ -1458,9 +1534,9 @@ abstract public class DPWidget extends PointerInputElement
 	
 	public void enableDnd(DndHandler handler)
 	{
-		ensureValidInteractor();
+		ensureValidInteractionFields();
 		interactionFields.dndHandler = handler;
-		onInteractorModified();
+		notifyInteractionFieldsModified();
 	}
 	
 	public void disableDnd()
@@ -1469,7 +1545,7 @@ abstract public class DPWidget extends PointerInputElement
 		{
 			interactionFields.dndHandler = null;
 		}
-		onInteractorModified();
+		notifyInteractionFieldsModified();
 	}
 	
 	public boolean isDndEnabled()
@@ -1498,6 +1574,27 @@ abstract public class DPWidget extends PointerInputElement
 	public DndHandler getDndHandler()
 	{
 		return interactionFields != null  ?  interactionFields.dndHandler  :  null;
+	}
+	
+	
+	
+	
+	//
+	//
+	// INTERACTOR METHODS
+	//
+	//
+	
+	public void setInteractor(ElementInteractor interactor)
+	{
+		ensureValidInteractionFields();
+		interactionFields.interactor = interactor;
+		notifyInteractionFieldsModified();
+	}
+	
+	public ElementInteractor getInteractor()
+	{
+		return interactionFields != null  ?  interactionFields.interactor  :  null;
 	}
 	
 	
@@ -1825,9 +1922,9 @@ abstract public class DPWidget extends PointerInputElement
 	
 	public void setLinearRepresentationListener(ElementLinearRepresentationListener listener)
 	{
-		ensureValidInteractor();
+		ensureValidInteractionFields();
 		interactionFields.linearRepresentationListener = listener;
-		onInteractorModified();
+		notifyInteractionFieldsModified();
 	}
 	
 
@@ -1838,9 +1935,9 @@ abstract public class DPWidget extends PointerInputElement
 	
 	public void setKeyboardListener(ElementKeyboardListener listener)
 	{
-		ensureValidInteractor();
+		ensureValidInteractionFields();
 		interactionFields.keyboardListener = listener;
-		onInteractorModified();
+		notifyInteractionFieldsModified();
 	}
 	
 	
@@ -2291,6 +2388,57 @@ abstract public class DPWidget extends PointerInputElement
 			return null;
 		}
 	}
+	
+	
+	
+	
+	
+	
+	//
+	//
+	// SELECTABILITY METHODS
+	//
+	//
+	
+	public void setSelectable()
+	{
+		setFlag( FLAG_SELECTABLE_MASK );
+		setFlag( FLAG_SELECTABLE );
+	}
+	
+	public void setUnSelectable()
+	{
+		setFlag( FLAG_SELECTABLE_MASK );
+		clearFlag( FLAG_SELECTABLE );
+	}
+	
+	public void clearSelectable()
+	{
+		clearFlag( FLAG_SELECTABLE_MASK );
+		clearFlag( FLAG_SELECTABLE );
+	}
+	
+	public boolean isSelectable()
+	{
+		DPWidget w = this;
+		
+		while ( w != null )
+		{
+			if ( w.testFlag( FLAG_SELECTABLE_MASK ) )
+			{
+				return w.testFlag( FLAG_SELECTABLE );
+			}
+			
+			w = w.getParent();
+		}
+		
+		return true;
+	}
+	
+	
+	
+	
+	
 	
 	
 	

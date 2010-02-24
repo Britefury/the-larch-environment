@@ -23,9 +23,13 @@ public class Selection implements MarkerListener
 	private DPContainer commonRoot;
 	protected ArrayList<SelectionListener> listeners;
 	
+	private boolean  bRefreshRequired;
+	
 	
 	public Selection()
 	{
+		bRefreshRequired = false;
+		
 		marker0 = new Marker();
 		marker1 = new Marker();
 		
@@ -37,20 +41,17 @@ public class Selection implements MarkerListener
 	
 	public boolean isEmpty()
 	{
-		return marker0.equals( marker1 )  ||  !marker0.isValid()  ||  !marker1.isValid();
+		refresh();
+		return startMarker == null;
 	}
 	
 	
-	
-	public Marker getMarker0()
+	public void setRegion(Marker m0, Marker m1)
 	{
-		return marker0;
+		marker0.moveTo( m0 );
+		marker1.moveTo( m1 );
 	}
 	
-	public Marker getMarker1()
-	{
-		return marker1;
-	}
 	
 	
 	public void clear()
@@ -147,8 +148,9 @@ public class Selection implements MarkerListener
 	
 	private void modified()
 	{
-		if ( startMarker != null )
+		if ( !bRefreshRequired )
 		{
+			bRefreshRequired = true;
 			startMarker = endMarker = null;
 			startPathFromCommonRoot = endPathFromCommonRoot = null;
 			commonRoot = null;
@@ -165,9 +167,9 @@ public class Selection implements MarkerListener
 	
 	private void refresh()
 	{
-		if ( startMarker == null )
+		if ( bRefreshRequired )
 		{
-			if ( !isEmpty() )
+			if ( !marker0.equals( marker1 )  &&  marker0.isValid()  &&  marker1.isValid())
 			{
 				DPWidget w0 = marker0.getElement();
 				ArrayList<DPWidget> path0 = new ArrayList<DPWidget>();
@@ -202,6 +204,8 @@ public class Selection implements MarkerListener
 				startPathFromCommonRoot = bInOrder  ?  path0  :  path1;
 				endPathFromCommonRoot = bInOrder  ?  path1  :  path0;
 			}
+			
+			bRefreshRequired = false;
 		}
 	}
 

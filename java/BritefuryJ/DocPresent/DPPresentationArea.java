@@ -60,6 +60,7 @@ import BritefuryJ.DocPresent.LayoutTree.LayoutNodeRootElement;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Selection.SelectionListener;
+import BritefuryJ.DocPresent.Selection.SelectionManager;
 import BritefuryJ.DocPresent.TreeExplorer.ElementTreeExplorer;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
@@ -610,7 +611,6 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	private Point2 dragStartPosInWindowSpace;
 	private int dragButton;
 	
-	private boolean bMouseSelectionInProgress;
 	
 	private Vector2 windowSize;
 	
@@ -628,6 +628,8 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	protected WeakHashMap<DPContentLeaf, WeakHashMap<Marker, Object>> markersByLeaf = new WeakHashMap<DPContentLeaf, WeakHashMap<Marker, Object>>();
 	private Caret caret;
 	private DPContentLeaf currentCaretLeaf;
+	
+	private SelectionManager selectionManager;
 	private Selection selection;
 	
 	
@@ -685,10 +687,9 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		currentCaretLeaf = null;
 
 		selection = new Selection();
+		selectionManager = new SelectionManager( selection );
 		
 		bStructureRefreshQueued = false;
-		
-		bMouseSelectionInProgress = false;
 	}
 	
 	
@@ -1338,7 +1339,8 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	
 	protected void mouseDownEvent(int button, Point2 windowPos, int buttonModifiers)
 	{
-		bMouseSelectionInProgress = false;
+		selectionManager.mouseSelectionClear();
+		
 		component.presentationComponent.grabFocus();
 		Point2 rootPos = windowSpaceToRootSpace( windowPos );
 		rootSpaceMouse.setLocalPos( rootPos );
@@ -1352,18 +1354,9 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 				Xform2 x = leaf.getLocalToRootXform();
 				x = x.inverse();
 				
-				if ( caret.isValid() )
-				{
-					Marker prevPos = caret.getMarker().copy();
-					leaf.moveMarkerToPoint( caret.getMarker(), x.transform( rootPos ) );
-				
-					onCaretMove( prevPos, true );
-					bMouseSelectionInProgress = true;
-				}
-				else
-				{
-					leaf.moveMarkerToPoint( caret.getMarker(), x.transform( rootPos ) );
-				}
+				Marker marker = leaf.markerAtPoint( x.transform( rootPos ) );
+				caret.getMarker().moveTo( marker );
+				selectionManager.mouseSelectionBegin( marker );
 			}
 		}
 
@@ -1373,7 +1366,6 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		}
 		else
 		{
-			System.out.println( "Initiating drag" );
 			dragButton = button;
 			dragStartPosInWindowSpace = windowPos;
 		}
@@ -1400,7 +1392,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		
 		if ( button == 1 )
 		{
-			bMouseSelectionInProgress = false;
+			selectionManager.mouseSelectionEnd();
 		}
 		
 		emitImmediateEvents();
@@ -1425,16 +1417,17 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		rootSpaceMouse.setLocalPos( rootPos );
 		rootSpaceMouse.setButtonModifiers( buttonModifiers );
 		
-		if ( bMouseSelectionInProgress )
+		if ( selectionManager.isMouseDragInProgress() )
 		{
 			DPContentLeafEditableEntry leaf = (DPContentLeafEditableEntry)getLeafClosestToLocalPoint( rootPos, new DPContentLeafEditableEntry.EditableEntryLeafElementFilter() );
 			Xform2 x = leaf.getLocalToRootXform();
 			x = x.inverse();
 
-			Marker prevPos = caret.getMarker().copy();
-			leaf.moveMarkerToPoint( caret.getMarker(), x.transform( rootPos ) );
+			Marker marker = leaf.markerAtPoint( x.transform( rootPos ) );
 			
-			onCaretMove( prevPos, false );
+			caret.getMarker().moveTo( marker );
+			
+			selectionManager.mouseSelectionDrag( marker );
 		}
 		
 		if ( dragButton == 0 )
@@ -1723,7 +1716,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 				
 				if ( !caret.getMarker().equals( prevPos ) )
 				{
-					onCaretMove( prevPos, ( modifiers & Modifier.SHIFT ) == 0 );
+					selectionManager.onCaretMove( caret, prevPos, ( modifiers & Modifier.SHIFT ) != 0 );
 				}
 			}
 			return true;
@@ -1931,19 +1924,6 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		}
 		
 		queueFullRedraw();
-	}
-	
-	private void onCaretMove(Marker prevPos, boolean bClearSelection)
-	{
-		if ( bClearSelection )
-		{
-			selection.getMarker0().moveTo( caret.getMarker() );
-			selection.getMarker1().moveTo( caret.getMarker() );
-		}
-		else
-		{
-			selection.getMarker1().moveTo( caret.getMarker() );
-		}
 	}
 	
 	
