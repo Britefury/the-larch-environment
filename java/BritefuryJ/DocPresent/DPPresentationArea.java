@@ -625,7 +625,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	
 	private boolean bAllocationRequired;
 	
-	protected WeakHashMap<DPContentLeaf, WeakHashMap<Marker, Object>> markersByLeaf = new WeakHashMap<DPContentLeaf, WeakHashMap<Marker, Object>>();
+	protected WeakHashMap<DPContentLeafEditable, WeakHashMap<Marker, Object>> markersByLeaf = new WeakHashMap<DPContentLeafEditable, WeakHashMap<Marker, Object>>();
 	private Caret caret;
 	private DPContentLeaf currentCaretLeaf;
 	
@@ -1298,7 +1298,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	{
 		if ( caret.isValid() )
 		{
-			DPContentLeaf widget = caret.getWidget();
+			DPContentLeafEditable widget = caret.getWidget();
 			
 			if ( widget != null )
 			{
@@ -1348,7 +1348,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		int modifiers = rootSpaceMouse.getModifiers();
 		if ( button == 1  &&  ( modifiers & ( Modifier.ALT | Modifier.ALT_GRAPH | Modifier.CTRL | Modifier.SHIFT ) )  ==  0 )
 		{
-			DPContentLeafEditableEntry leaf = (DPContentLeafEditableEntry)getLeafClosestToLocalPoint( rootPos, new DPContentLeafEditableEntry.EditableEntryLeafElementFilter() );
+			DPContentLeafEditable leaf = (DPContentLeafEditable)getLeafClosestToLocalPoint( rootPos, new DPContentLeafEditable.EditableLeafElementFilter() );
 			if ( leaf != null )
 			{
 				Xform2 x = leaf.getLocalToRootXform();
@@ -1419,7 +1419,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		
 		if ( selectionManager.isMouseDragInProgress() )
 		{
-			DPContentLeafEditableEntry leaf = (DPContentLeafEditableEntry)getLeafClosestToLocalPoint( rootPos, new DPContentLeafEditableEntry.EditableEntryLeafElementFilter() );
+			DPContentLeafEditable leaf = (DPContentLeafEditable)getLeafClosestToLocalPoint( rootPos, new DPContentLeafEditable.EditableLeafElementFilter() );
 			Xform2 x = leaf.getLocalToRootXform();
 			x = x.inverse();
 
@@ -1559,9 +1559,9 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 				if ( caret.isValid() )
 				{
 					DPContentLeaf leaf = caret.getMarker().getElement();
-					if ( leaf.isEditableEntry() )
+					if ( leaf.isEditable() )
 					{
-						DPContentLeafEditableEntry editable = (DPContentLeafEditableEntry)leaf;
+						DPContentLeafEditable editable = (DPContentLeafEditable)leaf;
 						editable.onKeyPress( caret, event );
 					}
 					emitImmediateEvents();
@@ -1600,9 +1600,9 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 				if ( caret.isValid() )
 				{
 					DPContentLeaf leaf = caret.getMarker().getElement();
-					if ( leaf.isEditableEntry() )
+					if ( leaf.isEditable() )
 					{
-						DPContentLeafEditableEntry editable = (DPContentLeafEditableEntry)leaf;
+						DPContentLeafEditable editable = (DPContentLeafEditable)leaf;
 						editable.onKeyRelease( caret, event );
 					}
 					emitImmediateEvents();
@@ -1647,9 +1647,9 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 				if ( caret.isValid()  &&  !bCtrl  &&  !bAlt )
 				{
 					DPContentLeaf leaf = caret.getMarker().getElement();
-					if ( leaf.isEditableEntry() )
+					if ( leaf.isEditable() )
 					{
-						DPContentLeafEditableEntry editable = (DPContentLeafEditableEntry)leaf;
+						DPContentLeafEditable editable = (DPContentLeafEditable)leaf;
 						editable.onKeyTyped( caret, event );
 					}
 					emitImmediateEvents();
@@ -1687,31 +1687,30 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 			int modifiers = rootSpaceMouse.getModifiers();
 			if ( caret.isValid() )
 			{
-				DPContentLeaf leaf = caret.getMarker().getElement();
 				Marker prevPos = caret.getMarker().copy();
 				if ( event.getKeyCode() == KeyEvent.VK_LEFT )
 				{
-					leaf.moveMarkerLeft( caret.getMarker(), true );
+					caret.moveLeft();
 				}
 				else if ( event.getKeyCode() == KeyEvent.VK_RIGHT )
 				{
-					leaf.moveMarkerRight( caret.getMarker(), true );
+					caret.moveRight();
 				}
 				else if ( event.getKeyCode() == KeyEvent.VK_UP )
 				{
-					leaf.moveMarkerUp( caret.getMarker(), true );
+					caret.moveUp();
 				}
 				else if ( event.getKeyCode() == KeyEvent.VK_DOWN )
 				{
-					leaf.moveMarkerDown( caret.getMarker(), true );
+					caret.moveDown();
 				}
 				else if ( event.getKeyCode() == KeyEvent.VK_HOME )
 				{
-					leaf.moveMarkerHome( caret.getMarker() );
+					caret.moveToHome();
 				}
 				else if ( event.getKeyCode() == KeyEvent.VK_END )
 				{
-					leaf.moveMarkerEnd( caret.getMarker() );
+					caret.moveToEnd();
 				}
 				
 				if ( !caret.getMarker().equals( prevPos ) )

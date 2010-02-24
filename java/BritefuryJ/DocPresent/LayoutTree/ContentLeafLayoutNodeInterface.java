@@ -7,19 +7,20 @@
 package BritefuryJ.DocPresent.LayoutTree;
 
 import BritefuryJ.DocPresent.DPContentLeaf;
+import BritefuryJ.DocPresent.DPContentLeafEditable;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.WidgetFilter;
 import BritefuryJ.Math.Point2;
 
 public interface ContentLeafLayoutNodeInterface
 {
-	DPContentLeaf getContentLeafAbove(Point2 localPos, boolean bSkipWhitespace);
-	DPContentLeaf getContentLeafBelow(Point2 localPos, boolean bSkipWhitespace);
-	DPContentLeaf getContentLeafAboveOrBelow(Point2 localPos, boolean bBelow, boolean bSkipWhitespace);
+	DPContentLeafEditable getEditableContentLeafAbove(Point2 localPos);
+	DPContentLeafEditable getEditableContentLeafBelow(Point2 localPos);
+	DPContentLeafEditable getEditableContentLeafAboveOrBelow(Point2 localPos, boolean bBelow);
 	
 	
 	DPContentLeaf getLeftContentLeaf();
 	DPContentLeaf getRightContentLeaf();
-	DPContentLeaf getTopOrBottomContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace, boolean bSkipWhitespace);
+	DPContentLeafEditable getTopOrBottomEditableContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace);
 	DPWidget getLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter);
 }

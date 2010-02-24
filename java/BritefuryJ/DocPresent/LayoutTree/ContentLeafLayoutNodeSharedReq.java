@@ -8,6 +8,7 @@ package BritefuryJ.DocPresent.LayoutTree;
 
 import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPContentLeaf;
+import BritefuryJ.DocPresent.DPContentLeafEditable;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.WidgetFilter;
 import BritefuryJ.DocPresent.Layout.LReqBox;
@@ -21,17 +22,17 @@ public abstract class ContentLeafLayoutNodeSharedReq extends LeafLayoutNodeShare
 	}
 
 	
-	public DPContentLeaf getContentLeafAbove(Point2 localPos, boolean bSkipWhitespace)
+	public DPContentLeafEditable getEditableContentLeafAbove(Point2 localPos)
 	{
-		return getContentLeafAboveOrBelow( localPos, false, bSkipWhitespace );
+		return getEditableContentLeafAboveOrBelow( localPos, false );
 	}
 	
-	public DPContentLeaf getContentLeafBelow(Point2 localPos, boolean bSkipWhitespace)
+	public DPContentLeafEditable getEditableContentLeafBelow(Point2 localPos)
 	{
-		return getContentLeafAboveOrBelow( localPos, true, bSkipWhitespace );
+		return getEditableContentLeafAboveOrBelow( localPos, true );
 	}
 	
-	public DPContentLeaf getContentLeafAboveOrBelow(Point2 localPos, boolean bBelow, boolean bSkipWhitespace)
+	public DPContentLeafEditable getEditableContentLeafAboveOrBelow(Point2 localPos, boolean bBelow)
 	{
 		DPWidget element = getElement();
 		DPContainer parent = element.getParent();
@@ -39,7 +40,7 @@ public abstract class ContentLeafLayoutNodeSharedReq extends LeafLayoutNodeShare
 		
 		if ( branchLayout != null )
 		{
-			return branchLayout.getContentLeafAboveOrBelowFromChild( element, bBelow, element.getLocalPointRelativeToAncestor( branchLayout.getElement(), localPos ), bSkipWhitespace );
+			return branchLayout.getEditableContentLeafAboveOrBelowFromChild( element, bBelow, element.getLocalPointRelativeToAncestor( branchLayout.getElement(), localPos ) );
 		}
 		else
 		{
@@ -59,16 +60,16 @@ public abstract class ContentLeafLayoutNodeSharedReq extends LeafLayoutNodeShare
 		return (DPContentLeaf)getElement();
 	}
 
-	public DPContentLeaf getTopOrBottomContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace, boolean bSkipWhitespace)
+	public DPContentLeafEditable getTopOrBottomEditableContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace)
 	{
 		DPContentLeaf element = (DPContentLeaf)getElement();
-		if ( bSkipWhitespace && element.isWhitespace() )
+		if ( element.isEditable() )
 		{
-			return null;
+			return (DPContentLeafEditable)element;
 		}
 		else
 		{
-			return element;
+			return null;
 		}
 	}
 	

@@ -20,7 +20,7 @@ import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 import BritefuryJ.DocPresent.Util.TextVisual;
 import BritefuryJ.Math.Point2;
 
-public class DPText extends DPContentLeafEditableEntry
+public class DPText extends DPContentLeafEditable
 {
 	protected TextVisual visual;
 	protected String text;
@@ -224,8 +224,12 @@ public class DPText extends DPContentLeafEditableEntry
 	}
 
 
-	protected Point2 getMarkerPosition(Marker marker)
+	public Point2 getMarkerPosition(Marker marker)
 	{
+		if ( marker.getElement() != this )
+		{
+			throw new RuntimeException( "Marker is not within the bounds of this element" );
+		}
 		int index = marker.getClampedIndex();
 		return visual.getCharacterBoundaryPosition( index );
 	}

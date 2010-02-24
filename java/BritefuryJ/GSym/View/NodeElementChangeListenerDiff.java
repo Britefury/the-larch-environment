@@ -297,7 +297,7 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 					int leafPosition = newPosition - leafOffset;
 					
 					
-					if ( leaf.isEditableEntry() )
+					if ( leaf.isEditable() )
 					{
 						leaf.moveMarker( caret.getMarker(), leafPosition, newBias );
 					}
@@ -346,7 +346,7 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 						if ( direction == Direction.BACKWARD )
 						{
 							// Search backwards
-							DPContentLeaf left = leaf.getPreviousEditableEntryLeaf( segFilter, null );
+							DPContentLeaf left = leaf.getPreviousEditableLeaf( segFilter, null );
 							if ( left != null )
 							{
 								left.moveMarkerToEnd( caret.getMarker() );
@@ -354,7 +354,7 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 							else
 							{
 								// Searching backwards failed; search forwards
-								DPContentLeaf right = leaf.getNextEditableEntryLeaf( segFilter, null );
+								DPContentLeaf right = leaf.getNextEditableLeaf( segFilter, null );
 								if ( right != null )
 								{
 									right.moveMarkerToStart( caret.getMarker() );
@@ -369,7 +369,7 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 						else if ( direction == Direction.FORWARD )
 						{
 							// Search forwards
-							DPContentLeaf right = leaf.getNextEditableEntryLeaf( segFilter, null );
+							DPContentLeaf right = leaf.getNextEditableLeaf( segFilter, null );
 							if ( right != null )
 							{
 								right.moveMarkerToStart( caret.getMarker() );
@@ -377,7 +377,7 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 							else
 							{
 								// Searching forwards failed; search backwards
-								DPContentLeaf left = leaf.getPreviousEditableEntryLeaf( segFilter, null );
+								DPContentLeaf left = leaf.getPreviousEditableLeaf( segFilter, null );
 								if ( left != null )
 								{
 									left.moveMarkerToEnd( caret.getMarker() );

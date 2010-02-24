@@ -10,6 +10,7 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPContentLeaf;
+import BritefuryJ.DocPresent.DPContentLeafEditable;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
@@ -63,7 +64,7 @@ public abstract class BranchLayoutNode extends LayoutNode
 		return null;
 	}
 
-	public DPContentLeaf getTopOrBottomContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace, boolean bSkipWhitespace)
+	public DPContentLeafEditable getTopOrBottomEditableContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace)
 	{
 		List<DPWidget> navList = verticalNavigationList();
 		if ( navList != null )
@@ -73,7 +74,7 @@ public abstract class BranchLayoutNode extends LayoutNode
 				for (int i = navList.size() - 1; i >= 0; i--)
 				{
 					DPWidget w = navList.get( i );
-					DPContentLeaf l = w.getLayoutNode().getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace, bSkipWhitespace );
+					DPContentLeafEditable l = w.getLayoutNode().getTopOrBottomEditableContentLeaf( bBottom, cursorPosInRootSpace );
 					if ( l != null )
 					{
 						return l;
@@ -84,7 +85,7 @@ public abstract class BranchLayoutNode extends LayoutNode
 			{
 				for (DPWidget w: navList)
 				{
-					DPContentLeaf l = w.getLayoutNode().getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace, bSkipWhitespace );
+					DPContentLeafEditable l = w.getLayoutNode().getTopOrBottomEditableContentLeaf( bBottom, cursorPosInRootSpace );
 					if ( l != null )
 					{
 						return l;
@@ -100,7 +101,7 @@ public abstract class BranchLayoutNode extends LayoutNode
 			if ( navList != null )
 			{
 				double closestDistance = 0.0;
-				DPContentLeaf closestNode = null;
+				DPContentLeafEditable closestNode = null;
 				for (DPWidget item: navList)
 				{
 					AABox2 bounds = item.getLocalAABox();
@@ -108,7 +109,7 @@ public abstract class BranchLayoutNode extends LayoutNode
 					double upper = item.getLocalPointRelativeToRoot( bounds.getUpper() ).x;
 					if ( cursorPosInRootSpace.x >=  lower  &&  cursorPosInRootSpace.x <= upper )
 					{
-						DPContentLeaf l = item.getLayoutNode().getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace, bSkipWhitespace );
+						DPContentLeafEditable l = item.getLayoutNode().getTopOrBottomEditableContentLeaf( bBottom, cursorPosInRootSpace );
 						if ( l != null )
 						{
 							return l;
@@ -130,7 +131,7 @@ public abstract class BranchLayoutNode extends LayoutNode
 						
 						if ( closestNode == null  ||  distance < closestDistance )
 						{
-							DPContentLeaf l = item.getLayoutNode().getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace, bSkipWhitespace );
+							DPContentLeafEditable l = item.getLayoutNode().getTopOrBottomEditableContentLeaf( bBottom, cursorPosInRootSpace );
 							if ( l != null )
 							{
 								closestDistance = distance;
@@ -219,7 +220,7 @@ public abstract class BranchLayoutNode extends LayoutNode
 		}
 	}
 	
-	public DPContentLeaf getContentLeafAboveOrBelowFromChild(DPWidget child, boolean bBelow, Point2 localPos, boolean bSkipWhitespace)
+	public DPContentLeafEditable getEditableContentLeafAboveOrBelowFromChild(DPWidget child, boolean bBelow, Point2 localPos)
 	{
 		List<DPWidget> navList = verticalNavigationList();
 		if ( navList != null )
@@ -233,7 +234,7 @@ public abstract class BranchLayoutNode extends LayoutNode
 					for (int i = index + 1; i < navList.size(); i++)
 					{
 						DPWidget w = navList.get( i );
-						DPContentLeaf l = w.getLayoutNode().getTopOrBottomContentLeaf( false, posInRootSpace, bSkipWhitespace );
+						DPContentLeafEditable l = w.getLayoutNode().getTopOrBottomEditableContentLeaf( false, posInRootSpace );
 						if ( l != null )
 						{
 							return l;
@@ -245,7 +246,7 @@ public abstract class BranchLayoutNode extends LayoutNode
 					for (int i = index - 1; i >= 0; i--)
 					{
 						DPWidget w = navList.get( i );
-						DPContentLeaf l = w.getLayoutNode().getTopOrBottomContentLeaf( true, posInRootSpace, bSkipWhitespace );
+						DPContentLeafEditable l = w.getLayoutNode().getTopOrBottomEditableContentLeaf( true, posInRootSpace );
 						if ( l != null )
 						{
 							return l;
@@ -261,7 +262,7 @@ public abstract class BranchLayoutNode extends LayoutNode
 		
 		if ( branchLayout != null )
 		{
-			return branchLayout.getContentLeafAboveOrBelowFromChild( element, bBelow, element.getLocalPointRelativeToAncestor( branchLayout.getElement(), localPos ), bSkipWhitespace );
+			return branchLayout.getEditableContentLeafAboveOrBelowFromChild( element, bBelow, element.getLocalPointRelativeToAncestor( branchLayout.getElement(), localPos ) );
 		}
 		else
 		{

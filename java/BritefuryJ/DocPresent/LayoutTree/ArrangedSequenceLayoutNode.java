@@ -12,6 +12,7 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPContentLeaf;
+import BritefuryJ.DocPresent.DPContentLeafEditable;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.WidgetFilter;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
@@ -218,7 +219,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 		return null;
 	}
 	
-	public DPContentLeaf getTopOrBottomContentLeafWithinElement(DPWidget withinElement, boolean bBottom, Point2 cursorPosInRootSpace, boolean bSkipWhitespace)
+	public DPContentLeafEditable getTopOrBottomEditableContentLeafWithinElement(DPWidget withinElement, boolean bBottom, Point2 cursorPosInRootSpace)
 	{
 		refreshSubtree();
 		int branchIndex = indexOfBranch( withinElement );
@@ -231,7 +232,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 		{
 			for (int i = start; i < end; i++)
 			{
-				DPContentLeaf leaf = leaves[i].getLayoutNode().getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace, bSkipWhitespace );
+				DPContentLeafEditable leaf = leaves[i].getLayoutNode().getTopOrBottomEditableContentLeaf( bBottom, cursorPosInRootSpace );
 				if ( leaf != null )
 				{
 					return leaf;
@@ -242,7 +243,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 		{
 			for (int i = end - 1; i >= start; i--)
 			{
-				DPContentLeaf leaf = leaves[i].getLayoutNode().getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace, bSkipWhitespace );
+				DPContentLeafEditable leaf = leaves[i].getLayoutNode().getTopOrBottomEditableContentLeaf( bBottom, cursorPosInRootSpace );
 				if ( leaf != null )
 				{
 					return leaf;

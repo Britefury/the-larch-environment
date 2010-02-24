@@ -193,10 +193,8 @@ abstract public class DPWidget extends PointerInputElement
 	protected final static int FLAG_REALISED = 0x1;
 	protected final static int FLAG_RESIZE_QUEUED = 0x2;
 	protected final static int FLAG_SIZE_UP_TO_DATE = 0x4;
-	protected final static int FLAG_SELECTABLE_MASK = 0x8;
-	protected final static int FLAG_SELECTABLE = 0x10;
 
-	protected final static int _ALIGN_SHIFT = 5;
+	protected final static int _ALIGN_SHIFT = 3;
 	protected final static int _ALIGN_MASK = ElementAlignment._ELEMENTALIGN_MASK  <<  _ALIGN_SHIFT;
 	protected final static int _HALIGN_MASK = ElementAlignment._HALIGN_MASK  <<  _ALIGN_SHIFT;
 	protected final static int _VALIGN_MASK = ElementAlignment._VALIGN_MASK  <<  _ALIGN_SHIFT;
@@ -962,9 +960,9 @@ abstract public class DPWidget extends PointerInputElement
 		return getFirstLeafInSubtree( null, null );
 	}
 
-	public DPContentLeaf getFirstEditableEntryLeafInSubtree()
+	public DPContentLeaf getFirstEditableLeafInSubtree()
 	{
-		return getFirstLeafInSubtree( null, new DPContentLeafEditableEntry.EditableEntryLeafElementFilter() );
+		return getFirstLeafInSubtree( null, new DPContentLeafEditable.EditableLeafElementFilter() );
 	}
 
 	public DPContentLeaf getLastLeafInSubtree(WidgetFilter branchFilter, WidgetFilter leafFilter)
@@ -977,9 +975,9 @@ abstract public class DPWidget extends PointerInputElement
 		return getLastLeafInSubtree( null, null );
 	}
 
-	public DPContentLeaf getLastEditableEntryLeafInSubtree()
+	public DPContentLeaf getLastEditableLeafInSubtree()
 	{
-		return getLastLeafInSubtree( null, new DPContentLeafEditableEntry.EditableEntryLeafElementFilter() );
+		return getLastLeafInSubtree( null, new DPContentLeafEditable.EditableLeafElementFilter() );
 	}
 
 	
@@ -1718,8 +1716,12 @@ abstract public class DPWidget extends PointerInputElement
 		}
 	}
 	
-	protected Point2 getMarkerPosition(Marker marker)
+	public Point2 getMarkerPosition(Marker marker)
 	{
+		if ( marker.getElement() != this )
+		{
+			throw new RuntimeException( "Marker is not within the bounds of this element" );
+		}
 		return new Point2( getAllocationX() * 0.5, getAllocationY() * 0.5 );
 	}
 	
@@ -1784,16 +1786,16 @@ abstract public class DPWidget extends PointerInputElement
 		}
 	}
 	
-	public DPContentLeaf getTopOrBottomContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace, boolean bSkipWhitespace)
+	public DPContentLeafEditable getTopOrBottomEditableContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace)
 	{
 		if ( layoutNode != null )
 		{
-			return layoutNode.getTopOrBottomContentLeaf( bBottom, cursorPosInRootSpace, bSkipWhitespace );
+			return layoutNode.getTopOrBottomEditableContentLeaf( bBottom, cursorPosInRootSpace );
 		}
 		else
 		{
 			ArrangedSequenceLayoutNode branchLayout = (ArrangedSequenceLayoutNode)getValidLayoutNodeOfClass( ArrangedSequenceLayoutNode.class );
-			return branchLayout.getTopOrBottomContentLeafWithinElement( this, bBottom, cursorPosInRootSpace, bSkipWhitespace );
+			return branchLayout.getTopOrBottomEditableContentLeafWithinElement( this, bBottom, cursorPosInRootSpace );
 		}
 	}
 
@@ -2395,54 +2397,6 @@ abstract public class DPWidget extends PointerInputElement
 	
 	
 	//
-	//
-	// SELECTABILITY METHODS
-	//
-	//
-	
-	public void setSelectable()
-	{
-		setFlag( FLAG_SELECTABLE_MASK );
-		setFlag( FLAG_SELECTABLE );
-	}
-	
-	public void setUnSelectable()
-	{
-		setFlag( FLAG_SELECTABLE_MASK );
-		clearFlag( FLAG_SELECTABLE );
-	}
-	
-	public void clearSelectable()
-	{
-		clearFlag( FLAG_SELECTABLE_MASK );
-		clearFlag( FLAG_SELECTABLE );
-	}
-	
-	public boolean isSelectable()
-	{
-		DPWidget w = this;
-		
-		while ( w != null )
-		{
-			if ( w.testFlag( FLAG_SELECTABLE_MASK ) )
-			{
-				return w.testFlag( FLAG_SELECTABLE );
-			}
-			
-			w = w.getParent();
-		}
-		
-		return true;
-	}
-	
-	
-	
-	
-	
-	
-	
-	
-	//
 	// Meta-element
 	//
 	
@@ -2585,16 +2539,5 @@ abstract public class DPWidget extends PointerInputElement
 	public WidgetStyleParams getStyleParams()
 	{
 		return styleParams;
-	}
-	
-	
-	
-	//
-	// TYPE METHODS
-	//
-
-	public boolean isContentLeaf()
-	{
-		return false;
 	}
 }
