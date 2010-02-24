@@ -12,16 +12,15 @@ import BritefuryJ.DocPresent.WidgetFilter;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.Math.Point2;
 
-public class LayoutNodeEmpty extends LeafLayoutNodeSharedReq
+public abstract class LayoutNodeEmpty extends LeafLayoutNodeSharedReq
 {
-	protected static LReqBox emptyReqBox = new LReqBox();
-	
-	public LayoutNodeEmpty(DPEmpty element)
+	public LayoutNodeEmpty(DPEmpty element, LReqBox reqBox)
 	{
-		super( element, emptyReqBox );
+		super( element, reqBox );
 	}
 
-	
+
+
 	protected void updateRequisitionX()
 	{
 	}
@@ -29,8 +28,10 @@ public class LayoutNodeEmpty extends LeafLayoutNodeSharedReq
 	protected void updateRequisitionY()
 	{
 	}
-
 	
+
+
+
 	public DPWidget getLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
 	{
 		if ( filter == null  ||  filter.testElement( element ) )

@@ -490,7 +490,7 @@ public class DPTable extends DPContainer
 		TableChildEntry entry = getEntryForChild( child );
 		if ( entry != null )
 		{
-			put( entry.x, entry.y, entry.colSpan, entry.rowSpan, new DPEmpty( ) );
+			put( entry.x, entry.y, entry.colSpan, entry.rowSpan, null );
 		}
 	}
 	

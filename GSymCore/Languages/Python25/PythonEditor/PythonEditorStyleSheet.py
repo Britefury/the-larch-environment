@@ -1051,10 +1051,10 @@ class PythonEditorStyleSheet (StyleSheet):
 	#
 	
 	def indentElement(self):
-		return self['primitiveStyle'].empty()
+		return self['primitiveStyle'].hiddenContent( '' )
 	
 	def dedentElement(self):
-		return self['primitiveStyle'].empty()
+		return self['primitiveStyle'].hiddenContent( '' )
 	
 	def indentedBlock(self, indentElement, lines, dedentElement):
 		primitiveStyleSheet = self['primitiveStyle']

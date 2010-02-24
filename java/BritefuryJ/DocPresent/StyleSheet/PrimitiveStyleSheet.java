@@ -16,7 +16,7 @@ import org.python.core.PyObject;
 
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPButton;
-import BritefuryJ.DocPresent.DPEmpty;
+import BritefuryJ.DocPresent.DPHiddenContent;
 import BritefuryJ.DocPresent.DPFraction;
 import BritefuryJ.DocPresent.DPGridRow;
 import BritefuryJ.DocPresent.DPHBox;
@@ -642,9 +642,9 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 	
 	
-	public DPEmpty empty()
+	public DPHiddenContent hiddenContent(String textRepresentation)
 	{
-		return new DPEmpty();
+		return new DPHiddenContent( textRepresentation );
 	}
 
 	

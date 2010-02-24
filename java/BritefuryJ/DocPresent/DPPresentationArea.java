@@ -783,7 +783,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 			}
 			else
 			{
-				return ((DPContentLeaf)startPath.get( 0 )).getTextRepresentationBetweenMarkers( s.getStartMarker(), s.getEndMarker() );
+				return ((DPContentLeafEditable)startPath.get( 0 )).getTextRepresentationBetweenMarkers( s.getStartMarker(), s.getEndMarker() );
 			}
 		}
 	}
@@ -811,7 +811,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 			}
 			else
 			{
-				return ((DPContentLeaf)startPath.get( 0 )).getLinearRepresentationBetweenMarkers( s.getStartMarker(), s.getEndMarker() );
+				return ((DPContentLeafEditable)startPath.get( 0 )).getLinearRepresentationBetweenMarkers( s.getStartMarker(), s.getEndMarker() );
 			}
 		}
 	}

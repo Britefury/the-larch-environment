@@ -322,7 +322,7 @@ abstract public class DPContainerSequence extends DPContainer
 	protected void replaceChildWithEmpty(DPWidget child)
 	{
 		int index = registeredChildren.indexOf( child );
-		set( index, new DPEmpty( ) );
+		set( index, new DPHiddenContent() );
 	}
 		
 	

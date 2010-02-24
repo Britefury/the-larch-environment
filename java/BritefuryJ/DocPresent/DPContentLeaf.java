@@ -19,7 +19,6 @@ import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleParams.ContentLeafStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 import BritefuryJ.Math.Point2;
-import BritefuryJ.Parser.ItemStream.ItemStream;
 import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
 public abstract class DPContentLeaf extends DPWidget
@@ -203,41 +202,12 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	protected void getTextRepresentationFromStartToPath(StringBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
 	{
-		builder.append( textRepresentation.substring( 0, marker.getClampedIndex() ) );
 	}
 
 	protected void getTextRepresentationFromPathToEnd(StringBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
 	{
-		builder.append( textRepresentation.substring( marker.getClampedIndex() ) );
 	}
 
-	public String getTextRepresentationBetweenMarkers(Marker startMarker, Marker endMarker)
-	{
-		if ( startMarker.getElement() != this  ||  endMarker.getElement() != this )
-		{
-			throw new RuntimeException();
-		}
-		return textRepresentation.substring( startMarker.getClampedIndex(), endMarker.getClampedIndex() );
-	}
-
-	protected void getTextRepresentationFromStartOfRootToMarker(StringBuilder builder, Marker marker, DPWidget root)
-	{
-		if ( this != root  &&  parent != null )
-		{
-			parent.getTextRepresentationFromStartOfRootToMarkerFromChild( builder, marker, root, this );
-		}
-		builder.append( textRepresentation.substring( 0, marker.getClampedIndex() ) );
-	}
-	
-	protected void getTextRepresentationFromMarkerToEndOfRoot(StringBuilder builder, Marker marker, DPWidget root)
-	{
-		builder.append( textRepresentation.substring( marker.getClampedIndex() ) );
-		if ( this != root  &&  parent != null )
-		{
-			parent.getTextRepresentationFromMarkerToEndOfRootFromChild( builder, marker, root, this );
-		}
-	}
-	
 	public DPContentLeaf getLeafAtTextRepresentationPosition(int position)
 	{
 		return this;
@@ -269,41 +239,10 @@ public abstract class DPContentLeaf extends DPWidget
 	
 	protected void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
 	{
-		builder.appendTextValue( textRepresentation.substring( 0, marker.getClampedIndex() ) );
 	}
 
 	protected void getLinearRepresentationFromPathToEnd(ItemStreamBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
 	{
-		builder.appendTextValue( textRepresentation.substring( marker.getClampedIndex() ) );
-	}
-
-	public ItemStream getLinearRepresentationBetweenMarkers(Marker startMarker, Marker endMarker)
-	{
-		if ( startMarker.getElement() != this  ||  endMarker.getElement() != this )
-		{
-			throw new RuntimeException();
-		}
-		ItemStreamBuilder builder = new ItemStreamBuilder();
-		builder.appendTextValue( textRepresentation.substring( startMarker.getClampedIndex(), endMarker.getClampedIndex() ) );
-		return builder.stream();
-	}
-
-	protected void getLinearRepresentationFromStartOfRootToMarker(ItemStreamBuilder builder, Marker marker, DPWidget root)
-	{
-		if ( this != root  &&  parent != null )
-		{
-			parent.getLinearRepresentationFromStartOfRootToMarkerFromChild( builder, marker, root, this );
-		}
-		builder.appendTextValue( textRepresentation.substring( 0, marker.getClampedIndex() ) );
-	}
-	
-	protected void getLinearRepresentationFromMarkerToEndOfRoot(ItemStreamBuilder builder, Marker marker, DPWidget root)
-	{
-		builder.appendTextValue( textRepresentation.substring( marker.getClampedIndex() ) );
-		if ( this != root  &&  parent != null )
-		{
-			parent.getLinearRepresentationFromMarkerToEndOfRootFromChild( builder, marker, root, this );
-		}
 	}
 	
 	

@@ -11,7 +11,7 @@ import java.util.Arrays;
 
 import junit.framework.TestCase;
 import BritefuryJ.DocPresent.DPBin;
-import BritefuryJ.DocPresent.DPEmpty;
+import BritefuryJ.DocPresent.DPHiddenContent;
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPText;
@@ -21,7 +21,7 @@ public class ElementContentTest extends TestCase
 {
 	public void testEmpty()
 	{
-		DPEmpty empty = new DPEmpty( );
+		DPHiddenContent empty = new DPHiddenContent( );
 		
 		assertEquals( empty.getTextRepresentation(), "" );
 		assertEquals( empty.getTextRepresentationLength(), 0 );
@@ -79,7 +79,7 @@ public class ElementContentTest extends TestCase
 		DPWidget[] ta = { ta0, ta1, ta2, ta3 };
 		pa.setChildren( Arrays.asList( ta ) );
 		
-		DPEmpty e = new DPEmpty( );
+		DPHiddenContent e = new DPHiddenContent( );
 		
 
 	
@@ -221,7 +221,7 @@ public class ElementContentTest extends TestCase
 		DPWidget[] ta = { ta0, ta1, ta2, ta3 };
 		pa.setChildren( Arrays.asList( ta ) );
 		
-		DPEmpty e = new DPEmpty( );
+		DPHiddenContent e = new DPHiddenContent( );
 		
 
 	
