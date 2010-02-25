@@ -460,14 +460,14 @@ public class Browser
 			DPVBox pageBox = new DPVBox( pageBoxStyle );
 			
 
-			TextStyleParams titleStyle = new TextStyleParams( null, new Font( "Serif", Font.BOLD, 32 ), Color.BLACK, null, false );
+			TextStyleParams titleStyle = new TextStyleParams( null, true, new Font( "Serif", Font.BOLD, 32 ), Color.BLACK, null, false );
 			DPText title = new DPText( titleStyle, "Could Not Resolve Location" );
 			
 			VBoxStyleParams errorBoxStyle = new VBoxStyleParams( null, 10.0 );
 			DPVBox errorBox = new DPVBox( errorBoxStyle );
 			
-			TextStyleParams locationStyle = new TextStyleParams( null, new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK, null, false );
-			TextStyleParams errorStyle = new TextStyleParams( null, new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK, null, false );
+			TextStyleParams locationStyle = new TextStyleParams( null, true, new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK, null, false );
+			TextStyleParams errorStyle = new TextStyleParams( null, true, new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK, null, false );
 
 			DPText loc = new DPText( locationStyle, location );
 			DPText error = new DPText( errorStyle, "could not be resolved" );

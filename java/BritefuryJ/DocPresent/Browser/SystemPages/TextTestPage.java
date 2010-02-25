@@ -34,9 +34,9 @@ public class TextTestPage extends SystemPage
 
 	protected DPWidget createContents()
 	{
-		TextStyleParams ts0 = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK, null, false );
-		TextStyleParams ts1 = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK, null, true );
-		TextStyleParams ts2 = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK, Color.RED, false );
+		TextStyleParams ts0 = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK, null, false );
+		TextStyleParams ts1 = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK, null, true );
+		TextStyleParams ts2 = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK, Color.RED, false );
 		DPText t0 = new DPText( ts0, "Hello World Abcdefghijklmnopqrstuvwxyz" );
 		DPText t1 = new DPText( ts1, "Hello World Abcdefghijklmnopqrstuvwxyz" );
 		DPText t2 = new DPText( ts2, "Hello World Abcdefghijklmnopqrstuvwxyz" );

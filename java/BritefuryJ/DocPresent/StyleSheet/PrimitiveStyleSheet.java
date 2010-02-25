@@ -122,6 +122,9 @@ public class PrimitiveStyleSheet extends StyleSheet
 		initAttr( "textSmallCaps", false );
 		
 		initAttr( "vboxSpacing", 0.0 );
+		
+		
+		initAttr( "editable", true );
 	}
 	
 	
@@ -363,6 +366,28 @@ public class PrimitiveStyleSheet extends StyleSheet
 	{
 		return (PrimitiveStyleSheet)withAttr( "vboxSpacing", spacing );
 	}
+	
+	
+	
+	//
+	// GENERIC CONTROL
+	//
+	
+	public PrimitiveStyleSheet withEditability(boolean bEditable)
+	{
+		return (PrimitiveStyleSheet)withAttr( "editable", bEditable );
+	}
+	
+	public PrimitiveStyleSheet withEditable()
+	{
+		return withEditability( true );
+	}
+	
+	public PrimitiveStyleSheet withNonEditable()
+	{
+		return withEditability( false );
+	}
+	
 
 
 	
@@ -443,6 +468,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 					get( "fractionHPadding", Double.class, 3.0 ),
 					get( "fractionRefYOffset", Double.class, 5.0 ),
 					get( "background", Painter.class, null ),
+					get( "editable", Boolean.class, true ),
 					get( "foreground", Paint.class, Color.black ) );
 		}
 		return fractionParams;
@@ -597,9 +623,9 @@ public class PrimitiveStyleSheet extends StyleSheet
 		{
 			textParams = new TextStyleParams(
 					get( "background", Painter.class, null ),
+					get( "editable", Boolean.class, true ),
 					get( "font", Font.class, defaultFont ),
-					get( "foreground", Paint.class, Color.black ),
-					get( "textSquiggleUnderlinePaint", Paint.class, null ), getNonNull( "textSmallCaps", Boolean.class, false ) );
+					get( "foreground", Paint.class, Color.black ), get( "textSquiggleUnderlinePaint", Paint.class, null ), getNonNull( "textSmallCaps", Boolean.class, false ) );
 		}
 		return textParams;
 	}

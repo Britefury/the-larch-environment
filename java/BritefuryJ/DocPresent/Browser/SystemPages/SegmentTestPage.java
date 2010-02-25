@@ -45,7 +45,7 @@ public class SegmentTestPage extends SystemPage
 	
 	protected DPWidget text(String t, Color colour)
 	{
-		TextStyleParams s0 = new TextStyleParams( null, defaultFont, colour, null, false );
+		TextStyleParams s0 = new TextStyleParams( null, true, defaultFont, colour, null, false );
 		return new DPText( s0, t );
 	}
 	

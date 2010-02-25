@@ -13,17 +13,17 @@ import BritefuryJ.DocPresent.Painter.Painter;
 
 public class FractionStyleParams extends ContainerStyleParams
 {
-	public static class BarStyleParams extends ContentLeafStyleParams
+	public static class BarStyleParams extends ContentLeafEditableStyleParams
 	{
-		public static final BarStyleParams defaultStyleParams = new BarStyleParams( null, Color.black );
+		public static final BarStyleParams defaultStyleParams = new BarStyleParams( null, true, Color.black );
 		
 		
 		protected final Paint barPaint;
 
 
-		public BarStyleParams(Painter background, Paint barPaint)
+		public BarStyleParams(Painter background, boolean bEditable, Paint barPaint)
 		{
-			super( background );
+			super( background, bEditable );
 			
 			this.barPaint = barPaint;
 		}
@@ -36,7 +36,7 @@ public class FractionStyleParams extends ContainerStyleParams
 	}
 
 	
-	public static final FractionStyleParams defaultStyleParams = new FractionStyleParams( null, 2.0, 3.0, 5.0, null, Color.black );
+	public static final FractionStyleParams defaultStyleParams = new FractionStyleParams( null, 2.0, 3.0, 5.0, null, true, Color.black );
 	
 	protected final BarStyleParams barStyleParams;
 	
@@ -45,7 +45,7 @@ public class FractionStyleParams extends ContainerStyleParams
 	
 	
 	
-	public FractionStyleParams(Painter background, double vspacing, double hpadding, double yOffset, Painter barBackground, Paint barPaint)
+	public FractionStyleParams(Painter background, double vspacing, double hpadding, double yOffset, Painter barBackground, boolean bBarEditable, Paint barPaint)
 	{
 		super( background );
 		
@@ -53,7 +53,7 @@ public class FractionStyleParams extends ContainerStyleParams
 		this.hpadding = hpadding;
 		this.yOffset = yOffset;
 		
-		barStyleParams = new BarStyleParams( barBackground, barPaint );
+		barStyleParams = new BarStyleParams( barBackground, bBarEditable, barPaint );
 	}
 	
 	

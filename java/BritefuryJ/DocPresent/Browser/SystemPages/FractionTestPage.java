@@ -63,8 +63,8 @@ public class FractionTestPage extends SystemPage
 
 	protected DPWidget makeFractionLine(DPWidget num, DPWidget denom)
 	{
-		TextStyleParams s1 = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 10 ), Color.blue, null, false );
-		TextStyleParams s2 = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 24 ), Color.red, null, false );
+		TextStyleParams s1 = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 10 ), Color.blue, null, false );
+		TextStyleParams s2 = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 24 ), Color.red, null, false );
 		
 		DPWidget frac = makeFraction( num, denom );
 		
@@ -89,8 +89,8 @@ public class FractionTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		TextStyleParams s0 = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 16 ), new Color( 0.0f, 0.5f, 0.0f ), null, false );
-		TextStyleParams blackStyle = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 24 ), Color.black, null, false );
+		TextStyleParams s0 = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 16 ), new Color( 0.0f, 0.5f, 0.0f ), null, false );
+		TextStyleParams blackStyle = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 24 ), Color.black, null, false );
 
 		VBoxStyleParams boxs = new VBoxStyleParams( null, 10.0 );
 		DPVBox box = new DPVBox( boxs );

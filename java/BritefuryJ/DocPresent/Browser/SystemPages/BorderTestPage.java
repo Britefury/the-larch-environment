@@ -41,8 +41,8 @@ public class BorderTestPage extends SystemPage
 
 	protected DPText[] makeTexts(String header)
 	{
-		TextStyleParams t12 = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK, null, false );
-		TextStyleParams t18 = new TextStyleParams( null, new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK, null, false );
+		TextStyleParams t12 = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK, null, false );
+		TextStyleParams t18 = new TextStyleParams( null, true, new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK, null, false );
 		DPText h = new DPText( t18, header );
 		DPText t0 = new DPText( t12, "Hello" );
 		DPText t1 = new DPText( t12, "World" );
