@@ -1819,12 +1819,12 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		component.setCursor( new Cursor( Cursor.HAND_CURSOR ) );
 	}
 	
-	protected void setCursorHand(PointerInterface pointer)
+	public void setCursorHand(PointerInterface pointer)
 	{
 		component.setCursor( new Cursor( Cursor.HAND_CURSOR ) );
 	}
 	
-	protected void setCursorArrow(PointerInterface pointer)
+	public void setCursorArrow(PointerInterface pointer)
 	{
 		component.setCursor( new Cursor( Cursor.DEFAULT_CURSOR ) );
 	}

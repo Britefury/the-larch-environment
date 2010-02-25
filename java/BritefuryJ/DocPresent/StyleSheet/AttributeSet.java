@@ -14,6 +14,8 @@ import org.python.core.PyObject;
 
 public class AttributeSet
 {
+	public static final AttributeSet identity = new AttributeSet();
+	
 	protected HashMap<String, Object> values = new HashMap<String, Object>();
 
 	
