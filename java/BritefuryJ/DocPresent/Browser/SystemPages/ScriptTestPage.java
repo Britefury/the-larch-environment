@@ -77,8 +77,8 @@ public class ScriptTestPage extends SystemPage
 
 	protected DPWidget makeScriptLine(DPWidget main, DPWidget leftSuper, DPWidget leftSub, DPWidget rightSuper, DPWidget rightSub)
 	{
-		TextStyleParams sPre = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 12 ), Color.blue, null, false );
-		TextStyleParams sPost = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 24 ), Color.red, null, false );
+		TextStyleParams sPre = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 12 ), Color.blue, null, false );
+		TextStyleParams sPost = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 24 ), Color.red, null, false );
 		
 		DPWidget script = makeScript( main, leftSuper, leftSub, rightSuper, rightSub );
 		
@@ -97,10 +97,10 @@ public class ScriptTestPage extends SystemPage
 	
 	protected DPWidget makeScriptFraction(String mainText, String numText, String denomText)
 	{
-		TextStyleParams sMain = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 16 ), Color.black, null, false );
-		TextStyleParams sScript = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 16 ), Color.black, null, false );
-		TextStyleParams sPre = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 12 ), Color.blue, null, false );
-		TextStyleParams sPost = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 24 ), Color.red, null, false );
+		TextStyleParams sMain = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 16 ), Color.black, null, false );
+		TextStyleParams sScript = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 16 ), Color.black, null, false );
+		TextStyleParams sPre = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 12 ), Color.blue, null, false );
+		TextStyleParams sPost = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 24 ), Color.red, null, false );
 		DPText main = new DPText( sMain, mainText );
 		
 		DPFraction fraction = new DPFraction( );
@@ -130,9 +130,9 @@ public class ScriptTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		TextStyleParams sMain = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 16 ), Color.black, null, false );
-		TextStyleParams sScript = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 16 ), Color.black, null, false );
-		TextStyleParams blackStyle = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 24 ), Color.black, null, false );
+		TextStyleParams sMain = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 16 ), Color.black, null, false );
+		TextStyleParams sScript = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 16 ), Color.black, null, false );
+		TextStyleParams blackStyle = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 24 ), Color.black, null, false );
 
 		DPVBox box = new DPVBox( );
 		

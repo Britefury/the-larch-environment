@@ -2400,8 +2400,8 @@ abstract public class DPWidget extends PointerInputElement
 	// Meta-element
 	//
 	
-	protected static TextStyleParams headerDebugTextStyle = new TextStyleParams( null, new Font( "Sans serif", Font.BOLD, 14 ), new Color( 0.0f, 0.5f, 0.5f ), null, false );
-	protected static TextStyleParams headerDescriptionTextStyle = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 14 ), new Color( 0.0f, 0.0f, 0.75f ), null, false );
+	protected static TextStyleParams headerDebugTextStyle = new TextStyleParams( null, true, new Font( "Sans serif", Font.BOLD, 14 ), new Color( 0.0f, 0.5f, 0.5f ), null, false );
+	protected static TextStyleParams headerDescriptionTextStyle = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 14 ), new Color( 0.0f, 0.0f, 0.75f ), null, false );
 	protected static HBoxStyleParams metaHeaderHBoxStyle = new HBoxStyleParams( null, 10.0 );
 	protected static EmptyBorder metaHeaderEmptyBorder = new EmptyBorder();
 

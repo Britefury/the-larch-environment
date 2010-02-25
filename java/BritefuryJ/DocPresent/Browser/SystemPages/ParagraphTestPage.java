@@ -101,8 +101,8 @@ public class ParagraphTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		TextStyleParams blackText = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 12 ), Color.black, null, false );
-		TextStyleParams redText = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 12 ), Color.red, null, false );
+		TextStyleParams blackText = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 12 ), Color.black, null, false );
+		TextStyleParams redText = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 12 ), Color.red, null, false );
 		
 		DPWidget b2 = makeParagraph( "PER-WORD", 0.0, 0.0, 0.0, 1, blackText );
 		DPWidget b3 = makeParagraph( "EVERY-4-WORDS", 0.0, 0.0, 0.0, 4, blackText);

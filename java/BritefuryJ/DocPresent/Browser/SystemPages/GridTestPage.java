@@ -40,8 +40,8 @@ public class GridTestPage extends SystemPage
 		return "The grid element arranges is children in a grid.";
 	}
 
-	private static TextStyleParams t12 = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK, null, false );
-	private static TextStyleParams t18 = new TextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 18 ), Color.BLACK, null, false );
+	private static TextStyleParams t12 = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK, null, false );
+	private static TextStyleParams t18 = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 18 ), Color.BLACK, null, false );
 	private static VBoxStyleParams sectionStyle = new VBoxStyleParams( null, 5.0 );
 	private static SolidBorder b = new SolidBorder( 2.0, 3.0, new Color( 0.0f, 0.3f, 0.7f ), new Color( 1.0f, 0.99f, 0.9f ) );
 	private static SolidBorder outlineBorder = new SolidBorder( 1.0, 0.0, new Color( 0.0f, 0.3f, 0.7f ), null );

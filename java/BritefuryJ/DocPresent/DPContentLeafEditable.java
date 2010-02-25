@@ -26,16 +26,23 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	{
 		public boolean testElement(DPWidget element)
 		{
-			return element instanceof DPContentLeafEditable;
+			if ( element instanceof DPContentLeafEditable )
+			{
+				return ((DPContentLeafEditable)element).isEditable();
+			}
+			else
+			{
+				return false;
+			}
 		}
 	}
 	
 	
 	
-	public static final int FLAG_SELECTABLE = FLAGS_CONTENTLEAF_END * 0x1;
+	public static final int FLAG_EDITABLE = FLAGS_CONTENTLEAF_END * 0x1;
 	
 	
-	protected final static int FLAGS_CONTENTLEAFEDITABLE_END = FLAGS_CONTENTLEAF_END * 0x2;
+	protected final static int FLAGS_CONTENTLEAFEDITABLE_END = FLAGS_CONTENTLEAF_END;
 
 	
 	
@@ -46,12 +53,14 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	protected DPContentLeafEditable(String textRepresentation)
 	{
-		super( textRepresentation );
+		this( ContentLeafStyleParams.defaultStyleParams, textRepresentation );
 	}
 	
 	protected DPContentLeafEditable(ContentLeafStyleParams styleParams, String textRepresentation)
 	{
 		super(styleParams, textRepresentation );
+		
+		setFlag( FLAG_EDITABLE );
 	}
 	
 
@@ -646,7 +655,10 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		}
 		else
 		{
-			removeText( caret.getMarker().getClampedIndex() - 1, 1 );
+			if ( isEditable() )
+			{
+				removeText( caret.getMarker().getClampedIndex() - 1, 1 );
+			}
 			return true;
 		}
 	}
@@ -687,7 +699,10 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		}
 		else
 		{
-			removeText( caret.getMarker(), 1 );
+			if ( isEditable() )
+			{
+				removeText( caret.getMarker(), 1 );
+			}
 			return true;
 		}
 	}
@@ -733,7 +748,10 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 				}
 				else
 				{
-					insertText( caret.getMarker(), String.valueOf( event.getKeyChar() ) );
+					if ( isEditable() )
+					{
+						insertText( caret.getMarker(), String.valueOf( event.getKeyChar() ) );
+					}
 				}
 				return true;
 			}
@@ -748,37 +766,22 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 
 	//
 	//
-	// SELECTABILITY METHODS
+	// EDITABILITY METHODS
 	//
 	//
 	
-	public void setSelectable()
+	public void setEditable()
 	{
-		setFlag( FLAG_SELECTABLE );
+		setFlag( FLAG_EDITABLE );
 	}
 	
-	public void setUnselectable()
+	public void setNonEditable()
 	{
-		clearFlag( FLAG_SELECTABLE );
+		clearFlag( FLAG_EDITABLE );
 	}
-	
-	public boolean isSelectable()
-	{
-		return testFlag( FLAG_SELECTABLE );
-	}
-	
-	
-	
-	
-	
-	
-	
-	//
-	// TYPE METHODS
-	//
 	
 	public boolean isEditable()
 	{
-		return true;
+		return testFlag( FLAG_EDITABLE );
 	}
 }
