@@ -7,6 +7,7 @@
 package BritefuryJ.DocPresent.StyleParams;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Paint;
 
 import BritefuryJ.DocPresent.Painter.Painter;
@@ -15,15 +16,15 @@ public class FractionStyleParams extends ContainerStyleParams
 {
 	public static class BarStyleParams extends ContentLeafEditableStyleParams
 	{
-		public static final BarStyleParams defaultStyleParams = new BarStyleParams( null, true, Color.black );
+		public static final BarStyleParams defaultStyleParams = new BarStyleParams( null, null, true, Color.black );
 		
 		
 		protected final Paint barPaint;
 
 
-		public BarStyleParams(Painter background, boolean bEditable, Paint barPaint)
+		public BarStyleParams(Painter background, Cursor pointerCursor, boolean bEditable, Paint barPaint)
 		{
-			super( background, bEditable );
+			super( background, pointerCursor, bEditable );
 			
 			this.barPaint = barPaint;
 		}
@@ -36,7 +37,7 @@ public class FractionStyleParams extends ContainerStyleParams
 	}
 
 	
-	public static final FractionStyleParams defaultStyleParams = new FractionStyleParams( null, 2.0, 3.0, 5.0, null, true, Color.black );
+	public static final FractionStyleParams defaultStyleParams = new FractionStyleParams( null, null, 2.0, 3.0, 5.0, BarStyleParams.defaultStyleParams );
 	
 	protected final BarStyleParams barStyleParams;
 	
@@ -45,15 +46,14 @@ public class FractionStyleParams extends ContainerStyleParams
 	
 	
 	
-	public FractionStyleParams(Painter background, double vspacing, double hpadding, double yOffset, Painter barBackground, boolean bBarEditable, Paint barPaint)
+	public FractionStyleParams(Painter background, Cursor pointerCursor, double vspacing, double hpadding, double yOffset, BarStyleParams barStyleParams)
 	{
-		super( background );
+		super( background, pointerCursor );
 		
 		this.vspacing = vspacing;
 		this.hpadding = hpadding;
 		this.yOffset = yOffset;
-		
-		barStyleParams = new BarStyleParams( barBackground, bBarEditable, barPaint );
+		this.barStyleParams = barStyleParams;
 	}
 	
 	

@@ -6,20 +6,14 @@
 //##************************
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
-import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.DPLineBreak;
 import BritefuryJ.DocPresent.DPLink;
 import BritefuryJ.DocPresent.DPParagraph;
-import BritefuryJ.DocPresent.DPStaticText;
-import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Browser.Page;
-import BritefuryJ.DocPresent.StyleParams.ParagraphStyleParams;
-import BritefuryJ.DocPresent.StyleParams.StaticTextStyleParams;
-import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public abstract class SystemPage extends Page
 {
@@ -44,31 +38,29 @@ public abstract class SystemPage extends Page
 	
 	
 
+	private static final PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
 
+	
+	
 	public DPWidget getContentsElement()
 	{
-		VBoxStyleParams pageBoxStyle = new VBoxStyleParams( null, 40.0 );
-		DPVBox pageBox = new DPVBox( pageBoxStyle );
 		
-		DPVBox headBox = new DPVBox( );
+		DPWidget title = styleSheet.withFont( new Font( "Serif", Font.BOLD, 32 ) ).staticText( "System page: " + getTitle() );
 		
-		StaticTextStyleParams descriptionStyle = new StaticTextStyleParams( null, new Font( "Sans Serif", Font.PLAIN, 16 ), Color.BLACK, false );
+		ArrayList<DPWidget> headChildren = new ArrayList<DPWidget>();
+		headChildren.add( SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE | SystemRootPage.LINKHEADER_SYSTEMPAGE ) );
+		headChildren.add( title.alignHCentre() );
 		
-		StaticTextStyleParams titleStyle = new StaticTextStyleParams( null, new Font( "Serif", Font.BOLD, 32 ), Color.BLACK, false );
-		DPStaticText title = new DPStaticText( titleStyle, "System page: " + getTitle() );
-		
-		headBox.append( SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE | SystemRootPage.LINKHEADER_SYSTEMPAGE ) );
-		headBox.append( title.alignHCentre() );
-
-		pageBox.append( headBox.alignHExpand() );
+		ArrayList<DPWidget> pageChildren = new ArrayList<DPWidget>();
+		pageChildren.add( styleSheet.vbox( headChildren ).alignHExpand() );
 		String description = getDescription();
 		if ( description != null )
 		{
-			pageBox.append( createTextParagraph( descriptionStyle, description ) );
+			pageChildren.add( createTextParagraph( styleSheet.withFont( new Font( "Sans Serif", Font.PLAIN, 16 ) ), description ) );
 		}
-		pageBox.append( createContents().alignHExpand() );
+		pageChildren.add( createContents().alignHExpand() );
 		
-		return pageBox.alignHExpand();
+		return styleSheet.withVBoxSpacing( 40.0 ).vbox( pageChildren );
 	}
 
 
@@ -78,7 +70,7 @@ public abstract class SystemPage extends Page
 	}
 	
 	
-	protected ArrayList<DPWidget> createTextNodes(StaticTextStyleParams textStyle, String text)
+	protected ArrayList<DPWidget> createTextNodes(PrimitiveStyleSheet style, String text)
 	{
 		String[] words = text.split( " " );
 		ArrayList<DPWidget> nodes = new ArrayList<DPWidget>();
@@ -89,12 +81,9 @@ public abstract class SystemPage extends Page
 			{
 				if ( !bFirst )
 				{
-					DPStaticText space = new DPStaticText( textStyle, " " );
-					DPLineBreak b = new DPLineBreak( );
-					b.setChild( space );
-					nodes.add( b );
+					nodes.add( style.lineBreak( style.staticText( " " ) ) );
 				}
-				nodes.add( new DPStaticText( textStyle, word ) );
+				nodes.add( style.staticText( word ) );
 				bFirst = false;
 			}
 		}
@@ -104,26 +93,19 @@ public abstract class SystemPage extends Page
 
 	protected ArrayList<DPWidget> createTextNodes(String text)
 	{
-		return createTextNodes( StaticTextStyleParams.defaultStyleParams, text );
+		return createTextNodes( styleSheet, text );
 	}
 	
-	protected DPParagraph createTextParagraph(ParagraphStyleParams paraStyle, StaticTextStyleParams textStyle, String text)
+	protected DPParagraph createTextParagraph(PrimitiveStyleSheet style, String text)
 	{
-		ArrayList<DPWidget> nodes = createTextNodes( textStyle, text );
-		DPParagraph para = new DPParagraph( paraStyle );
-		para.setChildren( nodes );
-		return para;
-	}
-
-	protected DPParagraph createTextParagraph(StaticTextStyleParams textStyle, String text)
-	{
-		return createTextParagraph( ParagraphStyleParams.defaultStyleParams, textStyle, text );
+		return style.paragraph( createTextNodes( style, text ) );
 	}
 
 	protected DPParagraph createTextParagraph(String text)
 	{
-		return createTextParagraph( ParagraphStyleParams.defaultStyleParams, StaticTextStyleParams.defaultStyleParams, text );
+		return createTextParagraph( styleSheet, text );
 	}
+
 
 	
 	protected String getDescription()

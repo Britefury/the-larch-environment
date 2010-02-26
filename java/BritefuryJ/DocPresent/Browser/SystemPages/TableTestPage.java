@@ -8,16 +8,12 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPTable;
-import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
-import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
-import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class TableTestPage extends SystemPage
 {
@@ -37,70 +33,47 @@ public class TableTestPage extends SystemPage
 		return "The table element arranges is children in a table layout. Holes can be present. Child elements may span multiple columns and rows.";
 	}
 
-	private static TextStyleParams t12 = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK, null, false );
-	private static TextStyleParams t18 = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 18 ), Color.BLACK, null, false );
-	private static SolidBorder b = new SolidBorder( 2.0, 3.0, new Color( 0.0f, 0.3f, 0.7f ), new Color( 1.0f, 0.99f, 0.9f ) );
-	private static SolidBorder outlineBorder = new SolidBorder( 1.0, 0.0, new Color( 0.0f, 0.3f, 0.7f ), null );
+	private static final PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
+	private static PrimitiveStyleSheet t12 = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 12 ) );
+	private static PrimitiveStyleSheet t18 = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 18 ) );
+	private static PrimitiveStyleSheet sectionStyle = styleSheet.withVBoxSpacing( 5.0 ).withBorder( new SolidBorder( 2.0, 3.0, new Color( 0.0f, 0.3f, 0.7f ), new Color( 0.95f, 0.975f, 1.0f  ) ) );
+	private static PrimitiveStyleSheet outlineStyle = styleSheet.withBorder( new SolidBorder( 1.0, 0.0, new Color( 0.5f, 0.5f, 0.5f ), new Color( 0.9f, 0.9f, 0.9f ) ) );
+	private static PrimitiveStyleSheet tableStyle = styleSheet.withTableColumnSpacing( 5.0 ).withTableRowSpacing( 5.0 );
 
-	protected DPText text12(String s)
+	private DPTable makeTable0()
 	{
-		return new DPText( t12, s );
-	}
-	
-	protected DPText text18(String s)
-	{
-		return new DPText( t18, s );
-	}
-	
-	protected DPWidget wrapInOutline(DPWidget w)
-	{
-		DPBorder border = new DPBorder( outlineBorder );
-		border.setChild( w );
-		return border;
-	}
-	
-	protected DPWidget wrapInBorder(DPWidget w)
-	{
-		DPBorder border = new DPBorder( b );
-		border.setChild( w );
-		return border;
-	}
-
-	protected DPTable makeTable0()
-	{
-		TableStyleParams tbls0 = new TableStyleParams( null, 5.0, false, 5.0, false );
-		DPTable table = new DPTable( tbls0 );
+		DPTable table = tableStyle.table();
 		for (int row = 0; row < 6; row++)
 		{
 			for (int col = 0; col < 6; col++)
 			{
-				table.put( col, row, wrapInOutline( text12( "<" + col + "_" + row + ">" ) ) );
+				table.put( col, row, outlineStyle.border( t12.text( ("<" + col + "_" + row + ">") ) ) );
 			}
 		}
 		return table;
 	}
 	
-	protected DPTable makeTable1()
+	private DPTable makeTable1()
 	{
 		DPTable table = makeTable0();
 		table.put( 2, 2, null );
 		table.put( 3, 2, null );
 		table.put( 4, 2, null );
-		table.put( 2, 2, 3, 1, wrapInOutline( text12( "<<wide>>" ) ).alignHCentre() );
+		table.put( 2, 2, 3, 1, outlineStyle.border( t12.text( "<<wide>>" ) ).alignHCentre() );
 		return table;
 	}
 	
-	protected DPTable makeTable2()
+	private DPTable makeTable2()
 	{
 		DPTable table = makeTable0();
 		table.put( 2, 2, null );
 		table.put( 2, 3, null );
 		table.put( 2, 4, null );
-		table.put( 2, 2, 1, 3, wrapInOutline( text18( "T" ) ).alignHCentre() );
+		table.put( 2, 2, 1, 3, outlineStyle.border( t18.text( "T" ) ).alignHCentre() );
 		return table;
 	}
 	
-	protected DPTable makeTable3()
+	private DPTable makeTable3()
 	{
 		DPTable table = makeTable0();
 		table.put( 2, 2, null );
@@ -112,7 +85,7 @@ public class TableTestPage extends SystemPage
 		table.put( 4, 2, null );
 		table.put( 4, 3, null );
 		table.put( 4, 4, null );
-		table.put( 2, 2, 3, 3, wrapInOutline( text18( "T" ) ).alignHCentre() );
+		table.put( 2, 2, 3, 3, outlineStyle.border( t18.text( "T" ) ).alignHCentre() );
 		return table;
 	}
 	
@@ -120,13 +93,12 @@ public class TableTestPage extends SystemPage
 	
 	protected DPWidget createContents()
 	{
-		VBoxStyleParams boxS = new VBoxStyleParams( null, 20.0 );
-		DPVBox box = new DPVBox( boxS );
-		box.append( wrapInBorder( makeTable0() ) );
-		box.append( wrapInBorder( makeTable1() ) );
-		box.append( wrapInBorder( makeTable2() ) );
-		box.append( wrapInBorder( makeTable3() ) );
+		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
+		children.add( sectionStyle.border( makeTable0() ) );
+		children.add( sectionStyle.border( makeTable1() ) );
+		children.add( sectionStyle.border( makeTable2() ) );
+		children.add( sectionStyle.border( makeTable3() ) );
 		
-		return box;
+		return styleSheet.withVBoxSpacing( 20.0 ).vbox( children );
 	}
 }

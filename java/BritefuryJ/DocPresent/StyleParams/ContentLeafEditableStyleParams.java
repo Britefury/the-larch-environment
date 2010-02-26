@@ -6,19 +6,21 @@
 //##************************
 package BritefuryJ.DocPresent.StyleParams;
 
+import java.awt.Cursor;
+
 import BritefuryJ.DocPresent.Painter.Painter;
 
 public class ContentLeafEditableStyleParams extends ContentLeafStyleParams
 {
-	public static final ContentLeafEditableStyleParams defaultStyleParams = new ContentLeafEditableStyleParams( null, true );
+	public static final ContentLeafEditableStyleParams defaultStyleParams = new ContentLeafEditableStyleParams( null, null, true );
 	
 	private final boolean bEditable;
 	
 	
 	
-	public ContentLeafEditableStyleParams(Painter background, boolean bEditable)
+	public ContentLeafEditableStyleParams(Painter background, Cursor pointerCursor, boolean bEditable)
 	{
-		super( background );
+		super( background, pointerCursor );
 		
 		this.bEditable = bEditable;
 	}

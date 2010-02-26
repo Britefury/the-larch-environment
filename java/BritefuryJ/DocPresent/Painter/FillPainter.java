@@ -10,7 +10,7 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Shape;
 
-public class FillPainter
+public class FillPainter implements Painter
 {
 	private final Paint fillPaint;
 	
@@ -23,18 +23,20 @@ public class FillPainter
 	
 	public void drawShape(Graphics2D graphics, Shape shape)
 	{
+		Paint paint = graphics.getPaint();
 		graphics.setPaint( fillPaint );
 		graphics.fill( shape );
-		graphics.setPaint( null );
+		graphics.setPaint( paint );
 	}
 	
 	public void drawShapes(Graphics2D graphics, Shape shapes[])
 	{
+		Paint paint = graphics.getPaint();
 		graphics.setPaint( fillPaint );
 		for (Shape shape: shapes)
 		{
 			graphics.fill( shape );
 		}
-		graphics.setPaint( null );
+		graphics.setPaint( paint );
 	}
 }

@@ -9,23 +9,20 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.awt.Font;
 
-import BritefuryJ.DocPresent.DPBorder;
-import BritefuryJ.DocPresent.DPHBox;
-import BritefuryJ.DocPresent.DPStaticText;
-import BritefuryJ.DocPresent.DPTable;
+import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.Border.Border;
-import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.SimpleDndHandler;
-import BritefuryJ.DocPresent.StyleParams.StaticTextStyleParams;
-import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
+import BritefuryJ.DocPresent.Painter.FillPainter;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class DndTestPage extends SystemPage
 {
-	private static StaticTextStyleParams textStyle = new StaticTextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK, false );
-	private static Border sourceBorder = new EmptyBorder( 10.0, 10.0, 10.0, 10.0, new Color( 0.75f, 0.85f, 1.0f ) );
-	private static Border destBorder = new EmptyBorder( 10.0, 10.0, 10.0, 10.0, new Color( 1.0f, 0.9f, 0.75f ) );
+	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
+	private static PrimitiveStyleSheet textStyle = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 16 ) );
+	private static PrimitiveStyleSheet sourceStyle = styleSheet.withBackground( new FillPainter( new Color( 0.75f, 0.85f, 1.0f ) ) );
+	private static PrimitiveStyleSheet destStyle = styleSheet.withBackground( new FillPainter( new Color( 1.0f, 0.9f, 0.75f  ) ) );
+	private static PrimitiveStyleSheet tableStyle = styleSheet.withTableColumnSpacing( 25.0 ).withTableRowSpacing( 25.0 );
 	
 	
 	protected DndTestPage()
@@ -48,9 +45,8 @@ public class DndTestPage extends SystemPage
 	
 	protected DPWidget makeSourceElement(String title, final String dragData)
 	{
-		DPStaticText sourceText = new DPStaticText( textStyle, title );
-		DPBorder sourceBorderElement = new DPBorder( sourceBorder );
-		sourceBorderElement.setChild( sourceText );
+		final DPText textElement = textStyle.text( title );
+		DPWidget source = sourceStyle.box( textElement.pad( 10.0, 10.0 ) );
 		
 		SimpleDndHandler.SourceDataFn sourceDataFn = new SimpleDndHandler.SourceDataFn()
 		{
@@ -63,24 +59,21 @@ public class DndTestPage extends SystemPage
 		SimpleDndHandler sourceDndHandler = new SimpleDndHandler();
 		sourceDndHandler.registerSource( "text", sourceDataFn );
 
-		sourceBorderElement.enableDnd( sourceDndHandler );
+		source.enableDnd( sourceDndHandler );
 
-		return sourceBorderElement;
+		return source;
 	}
 	
 	protected DPWidget makeDestElement(String title)
 	{
-		DPStaticText destText = new DPStaticText( textStyle, title );
-		DPBorder destBorderElement = new DPBorder( destBorder );
-		destBorderElement.setChild( destText );
-	
+		final DPText textElement = textStyle.text( title );
+		DPWidget dest = destStyle.box( textElement.pad( 10.0, 10.0 ) );
+
 		SimpleDndHandler.DropFn dropFn = new SimpleDndHandler.DropFn()
 		{
 			public boolean acceptDrop(PointerInputElement destElement, Object data)
 			{
 				String text = (String)data;
-				DPBorder borderElement = (DPBorder)destElement;
-				DPStaticText textElement = (DPStaticText)borderElement.getChild();
 				textElement.setText( text );
 				return true;
 			}
@@ -90,43 +83,22 @@ public class DndTestPage extends SystemPage
 		destDndHandler.registerDest( "text", dropFn );
 
 
-		destBorderElement.enableDnd( destDndHandler );
+		dest.enableDnd( destDndHandler );
 
-		return destBorderElement;
+		return dest;
 	}
 	
 
 	
 	protected DPWidget createContents()
 	{
-		StaticTextStyleParams rowTitleStyle = new StaticTextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 14 ), Color.BLACK, false );
-		
-		
-		DPStaticText sourceTitle = new DPStaticText( rowTitleStyle, "Source:" );
 		DPWidget source0 = makeSourceElement( "abc", "abc" );
 		DPWidget source1 = makeSourceElement( "xyz", "xyz" );
 
-		DPStaticText destTitle = new DPStaticText( rowTitleStyle, "Destination:" );
 		DPWidget dest0 = makeDestElement( "abc" );
 		DPWidget dest1 = makeDestElement( "xyz" );
 		
-		
-		TableStyleParams tableStyle = new TableStyleParams( null, 25.0, false, 25.0, false );
-		
-		
-		DPTable table = new DPTable( tableStyle );
-		table.put( 0, 0, sourceTitle );
-		table.put( 1, 0, source0 );
-		table.put( 2, 0, source1 );
-		table.put( 0, 1, destTitle );
-		table.put( 1, 1, dest0 );
-		table.put( 2, 1, dest1 );
-
-
-		
-		DPHBox hbox = new DPHBox( );
-		hbox.append( table.padY( 10.0 ) );
-
-		return hbox;
+		return tableStyle.table( new DPWidget[][] { { styleSheet.text( "Source:" ), source0, source1 },
+				{ styleSheet.text( "Destination:" ), dest0, dest1 } } ).padY( 10.0 );
 	}
 }

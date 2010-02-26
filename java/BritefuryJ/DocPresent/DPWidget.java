@@ -1185,7 +1185,6 @@ abstract public class DPWidget extends PointerInputElement
 		Painter b = styleParams.getBackground();
 		if ( b != null )
 		{
-			System.out.println( "Drawing background for " + this );
 			b.drawShapes( graphics, getShapes() );
 		}
 	}
@@ -1224,7 +1223,7 @@ abstract public class DPWidget extends PointerInputElement
 		}
 	}
 	
-	protected void queueFullRedraw()
+	public void queueFullRedraw()
 	{
 		queueRedraw( new Point2(), getAllocation() );
 	}
@@ -1256,16 +1255,22 @@ abstract public class DPWidget extends PointerInputElement
 	
 	protected void handleDrawBackground(Graphics2D graphics, AABox2 areaBox)
 	{
-		/*Stroke s = new BasicStroke( 1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL );
-		graphics.setStroke( s );
-		graphics.setPaint( new Color( 0.0f, 0.0f, 0.0f, 0.1f ) );
-		graphics.draw( new Rectangle2D.Double( 0.0, 0.0, getAllocationX(), getAllocationY() ) );*/
 		drawBackground( graphics );
+		ElementInteractor interactor = getInteractor();
+		if ( interactor != null )
+		{
+			interactor.drawBackground( this, graphics );
+		}
 	}
 	
 	protected void handleDraw(Graphics2D graphics, AABox2 areaBox)
 	{
 		draw( graphics );
+		ElementInteractor interactor = getInteractor();
+		if ( interactor != null )
+		{
+			interactor.draw( this, graphics );
+		}
 	}
 	
 
@@ -2400,9 +2405,9 @@ abstract public class DPWidget extends PointerInputElement
 	// Meta-element
 	//
 	
-	protected static TextStyleParams headerDebugTextStyle = new TextStyleParams( null, true, new Font( "Sans serif", Font.BOLD, 14 ), new Color( 0.0f, 0.5f, 0.5f ), null, false );
-	protected static TextStyleParams headerDescriptionTextStyle = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 14 ), new Color( 0.0f, 0.0f, 0.75f ), null, false );
-	protected static HBoxStyleParams metaHeaderHBoxStyle = new HBoxStyleParams( null, 10.0 );
+	protected static TextStyleParams headerDebugTextStyle = new TextStyleParams( null, null, true, new Font( "Sans serif", Font.BOLD, 14 ), new Color( 0.0f, 0.5f, 0.5f ), null, false );
+	protected static TextStyleParams headerDescriptionTextStyle = new TextStyleParams( null, null, true, new Font( "Sans serif", Font.PLAIN, 14 ), new Color( 0.0f, 0.0f, 0.75f ), null, false );
+	protected static HBoxStyleParams metaHeaderHBoxStyle = new HBoxStyleParams( null, null, 10.0 );
 	protected static EmptyBorder metaHeaderEmptyBorder = new EmptyBorder();
 
 

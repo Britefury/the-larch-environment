@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.DocPresent.LayoutTree;
 
-import BritefuryJ.DocPresent.DPAbstractBox;
 import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.StyleParams.AbstractBoxStyleParams;
 
@@ -17,11 +16,6 @@ public abstract class LayoutNodeAbstractBox extends ArrangedSequenceLayoutNode
 		super( element );
 	}
 
-	
-	protected int getRefPointIndex()
-	{
-		return ((DPAbstractBox)element).getRefPointIndex();
-	}
 	
 	protected double getSpacing()
 	{

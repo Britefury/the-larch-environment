@@ -7,6 +7,7 @@
 package BritefuryJ.DocPresent.StyleParams;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Paint;
 
@@ -15,11 +16,11 @@ import BritefuryJ.DocPresent.Painter.Painter;
 public class LinkStyleParams extends StaticTextStyleParams
 {
 	private static final Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
-	public static final LinkStyleParams defaultStyleParams = new LinkStyleParams( null, defaultFont, Color.blue, false );
+	public static final LinkStyleParams defaultStyleParams = new LinkStyleParams( null, null, defaultFont, Color.blue, false );
 
 
-	public LinkStyleParams(Painter background, Font font, Paint textPaint, boolean bMixedSizeCaps)
+	public LinkStyleParams(Painter background, Cursor pointerCursor, Font font, Paint textPaint, boolean bMixedSizeCaps)
 	{
-		super( background, font, textPaint, bMixedSizeCaps );
+		super( background, pointerCursor, font, textPaint, bMixedSizeCaps );
 	}
 }

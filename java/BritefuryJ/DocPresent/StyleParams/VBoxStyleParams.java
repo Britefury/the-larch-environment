@@ -7,16 +7,18 @@
 //##************************
 package BritefuryJ.DocPresent.StyleParams;
 
+import java.awt.Cursor;
+
 import BritefuryJ.DocPresent.Painter.Painter;
 
 
 public class VBoxStyleParams extends AbstractBoxStyleParams
 {
-	public static final VBoxStyleParams defaultStyleParams = new VBoxStyleParams( null, 0.0 );
+	public static final VBoxStyleParams defaultStyleParams = new VBoxStyleParams( null, null, 0.0 );
 
 
-	public VBoxStyleParams(Painter background, double spacing)
+	public VBoxStyleParams(Painter background, Cursor pointerCursor, double spacing)
 	{
-		super( background, spacing );
+		super( background, pointerCursor, spacing );
 	}
 }

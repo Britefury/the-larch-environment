@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.awt.Graphics2D;
+
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
@@ -62,6 +64,15 @@ public abstract class ElementInteractor
 	}
 
 	public void onCaretLeave(DPWidget element, Caret c)
+	{
+	}
+	
+	
+	public void drawBackground(DPWidget element, Graphics2D graphics)
+	{
+	}
+
+	public void draw(DPWidget element, Graphics2D graphics)
 	{
 	}
 }

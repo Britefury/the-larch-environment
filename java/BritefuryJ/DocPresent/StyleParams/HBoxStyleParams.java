@@ -7,16 +7,18 @@
 //##************************
 package BritefuryJ.DocPresent.StyleParams;
 
+import java.awt.Cursor;
+
 import BritefuryJ.DocPresent.Painter.Painter;
 
 
 public class HBoxStyleParams extends AbstractBoxStyleParams
 {
-	public static final HBoxStyleParams defaultStyleParams = new HBoxStyleParams( null, 0.0 );
+	public static final HBoxStyleParams defaultStyleParams = new HBoxStyleParams( null, null, 0.0 );
 
 
-	public HBoxStyleParams(Painter background, double spacing)
+	public HBoxStyleParams(Painter background, Cursor pointerCursor, double spacing)
 	{
-		super( background, spacing );
+		super( background, pointerCursor, spacing );
 	}
 }

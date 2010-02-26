@@ -7,19 +7,12 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
-import java.awt.Font;
+import java.util.Arrays;
 
-import BritefuryJ.DocPresent.DPBorder;
-import BritefuryJ.DocPresent.DPHBox;
-import BritefuryJ.DocPresent.DPStaticText;
-import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.StyleParams.HBoxStyleParams;
-import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
-import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class BorderTestPage extends SystemPage
 {
@@ -36,97 +29,25 @@ public class BorderTestPage extends SystemPage
 	
 	protected String getDescription()
 	{
-		return "The border element is used to provide the background colours, and the black boxes. Horizontal and vertical element alignments are demonstrated.";
+		return "The border element is used to provide additional space around elements. Different border styles are available.";
 	}
 
-	protected DPText[] makeTexts(String header)
-	{
-		TextStyleParams t12 = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK, null, false );
-		TextStyleParams t18 = new TextStyleParams( null, true, new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK, null, false );
-		DPText h = new DPText( t18, header );
-		DPText t0 = new DPText( t12, "Hello" );
-		DPText t1 = new DPText( t12, "World" );
-		DPText t2 = new DPText( t12, "Foo" );
-		
-		DPText[] texts = { h, t0, t1, t2 };
-		return texts;
-	}
-	
-	protected DPWidget makeTextOnGrey(String text)
-	{
-		DPStaticText t = new DPStaticText( text );
-		
-		EmptyBorder b = new EmptyBorder( new Color( 0.8f, 0.8f, 0.8f ) );
-		DPBorder border = new DPBorder( b );
-		border.setChild( t );
-		return border;
-	}
-	
-	
+
 	protected DPWidget createContents()
 	{
-		VBoxStyleParams mainBoxStyle = new VBoxStyleParams( null, 10.0 );
-		DPVBox mainBox = new DPVBox( mainBoxStyle );
+		PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
 		
-		SolidBorder singlePixelBorder = new SolidBorder( 1.0, 2.0, Color.black, null );
+		DPWidget onePixelBorder = styleSheet.border( styleSheet.text( "Normal 1-pixel border" ) );
 		
-		DPBorder halignLeft = new DPBorder( singlePixelBorder );
-		DPBorder halignCentre = new DPBorder( singlePixelBorder );
-		DPBorder halignRight = new DPBorder( singlePixelBorder );
-		DPBorder halignExpand = new DPBorder( singlePixelBorder );
+		DPWidget padded = styleSheet.border( styleSheet.text( "Padding: 30 pixels of padding all round, via the pad() method" ).pad( 30.0, 30.0 ) );
 		
-		halignLeft.setChild( makeTextOnGrey( "hAlign=left" ).alignHLeft() );
-		halignCentre.setChild( makeTextOnGrey( "hAlign=centre" ).alignHCentre() );
-		halignRight.setChild( makeTextOnGrey( "hAlign=right" ).alignHRight() );
-		halignExpand.setChild( makeTextOnGrey( "hAlign=expand" ).alignHExpand() );
+		DPWidget emptyBorder = styleSheet.withBorder( new EmptyBorder( 50.0, 50.0, 20.0, 20.0, 20.0, 20.0, new Color( 0.8f, 0.8f, 0.8f ) ) ).border(
+				styleSheet.text( "Empty border: 50 pixel h-margins, 20 pixel v-margins, 20 pixel rounding, light-grey background"  ) );
+		
+		DPWidget solidBorder = styleSheet.withBorder( new SolidBorder( 3.0f, 10.0, 20.0, 20.0, new Color( 0.6f, 0.6f, 0.6f ), new Color( 0.8f, 0.8f, 0.8f ) ) ).border(
+				styleSheet.text( "Solid border: 3 pixel thickness, 10 pixel inset (margin), 20 pixel rounding, grey border, light-grey background" ) );
 		
 		
-		
-		
-		EmptyBorder spacerBorder = new EmptyBorder( 5.0, 5.0, 200.0, 200.0, new Color( 0.7f, 0.8f, 0.9f ) );
-		DPBorder spacer = new DPBorder( spacerBorder );
-		spacer.setChild( new DPStaticText( "SPACER" ) );
-		
-		
-		DPBorder valignBaselines = new DPBorder( singlePixelBorder );
-		DPBorder valignBaselinesExpand = new DPBorder( singlePixelBorder );
-		DPBorder valignTop = new DPBorder( singlePixelBorder );
-		DPBorder valignCentre = new DPBorder( singlePixelBorder );
-		DPBorder valignBottom = new DPBorder( singlePixelBorder );
-		DPBorder valignExpand = new DPBorder( singlePixelBorder );
-		
-		
-		valignBaselines.setChild( makeTextOnGrey( "vAlign=ref_y" ).alignVBaselines() );
-		valignBaselinesExpand.setChild( makeTextOnGrey( "vAlign=ref_y-expand" ).alignVBaselinesExpand() );
-		valignTop.setChild( makeTextOnGrey( "vAlign=top" ).alignVTop() );
-		valignCentre.setChild( makeTextOnGrey( "vAlign=centre" ).alignVCentre() );
-		valignBottom.setChild( makeTextOnGrey( "vAlign=bottom" ).alignVBottom() );
-		valignExpand.setChild( makeTextOnGrey( "vAlign=expand" ).alignVExpand() );
-
-		
-		HBoxStyleParams vAlignBoxStyle = new HBoxStyleParams( null, 10.0 );
-		DPHBox vAlignBox = new DPHBox( vAlignBoxStyle );
-		vAlignBox.append( valignBaselines.alignVExpand() );
-		vAlignBox.append( valignBaselinesExpand.alignVExpand() );
-		vAlignBox.append( valignTop.alignVExpand() );
-		vAlignBox.append( valignCentre.alignVExpand() );
-		vAlignBox.append( valignBottom.alignVExpand() );
-		vAlignBox.append( valignExpand.alignVExpand() );
-		
-		
-		HBoxStyleParams bottomBoxStyle = new HBoxStyleParams( null, 50.0 );
-		DPHBox bottomBox = new DPHBox( bottomBoxStyle );
-		bottomBox.append( spacer );
-		bottomBox.append( vAlignBox.alignVExpand() );
-		
-		
-		mainBox.append( halignLeft.alignHExpand() );
-		mainBox.append( halignCentre.alignHExpand() );
-		mainBox.append( halignRight.alignHExpand() );
-		mainBox.append( halignExpand.alignHExpand() );
-		mainBox.append( bottomBox );
-		
-		
-		return mainBox;
+		return styleSheet.withVBoxSpacing( 10.0 ).vbox( Arrays.asList( new DPWidget[] { onePixelBorder, padded, emptyBorder, solidBorder } ) );
 	}
 }

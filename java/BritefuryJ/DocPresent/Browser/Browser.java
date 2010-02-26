@@ -415,15 +415,15 @@ public class Browser
 		{
 			DPVBox pageBox = new DPVBox( );
 			
-			VBoxStyleParams contentBoxStyle = new VBoxStyleParams( null, 40.0 );
+			VBoxStyleParams contentBoxStyle = new VBoxStyleParams( null, null, 40.0 );
 			DPVBox contentBox = new DPVBox( contentBoxStyle );
 			
 
 			
-			StaticTextStyleParams titleStyle = new StaticTextStyleParams( null, new Font( "Serif", Font.BOLD, 32 ), Color.BLACK, false );
+			StaticTextStyleParams titleStyle = new StaticTextStyleParams( null, null, new Font( "Serif", Font.BOLD, 32 ), Color.BLACK, false );
 			DPStaticText title = new DPStaticText( titleStyle, "Default root page" );
 			
-			StaticTextStyleParams contentsStyle = new StaticTextStyleParams( null, new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK, false );
+			StaticTextStyleParams contentsStyle = new StaticTextStyleParams( null, null, new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK, false );
 			DPStaticText contents = new DPStaticText( contentsStyle, "Empty document" );
 
 			contentBox.append( title.alignHCentre() );
@@ -456,18 +456,18 @@ public class Browser
 
 		public DPWidget getContentsElement()
 		{
-			VBoxStyleParams pageBoxStyle = new VBoxStyleParams( null, 40.0 );
+			VBoxStyleParams pageBoxStyle = new VBoxStyleParams( null, null, 40.0 );
 			DPVBox pageBox = new DPVBox( pageBoxStyle );
 			
 
-			TextStyleParams titleStyle = new TextStyleParams( null, true, new Font( "Serif", Font.BOLD, 32 ), Color.BLACK, null, false );
+			TextStyleParams titleStyle = new TextStyleParams( null,null, true, new Font( "Serif", Font.BOLD, 32 ), Color.BLACK, null, false );
 			DPText title = new DPText( titleStyle, "Could Not Resolve Location" );
 			
-			VBoxStyleParams errorBoxStyle = new VBoxStyleParams( null, 10.0 );
+			VBoxStyleParams errorBoxStyle = new VBoxStyleParams( null, null, 10.0 );
 			DPVBox errorBox = new DPVBox( errorBoxStyle );
 			
-			TextStyleParams locationStyle = new TextStyleParams( null, true, new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK, null, false );
-			TextStyleParams errorStyle = new TextStyleParams( null, true, new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK, null, false );
+			TextStyleParams locationStyle = new TextStyleParams( null, null, true, new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK, null, false );
+			TextStyleParams errorStyle = new TextStyleParams( null, null, true, new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK, null, false );
 
 			DPText loc = new DPText( locationStyle, location );
 			DPText error = new DPText( errorStyle, "could not be resolved" );

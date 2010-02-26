@@ -6,12 +6,14 @@
 //##************************
 package BritefuryJ.DocPresent.StyleParams;
 
+import java.awt.Cursor;
+
 import BritefuryJ.DocPresent.Painter.Painter;
 
 
 public class TableStyleParams extends ContainerStyleParams
 {
-	public static final TableStyleParams defaultStyleParams = new TableStyleParams( null, 0.0, false, 0.0, false );
+	public static final TableStyleParams defaultStyleParams = new TableStyleParams( null, null, 0.0, false, 0.0, false );
 	
 	
 	protected final double columnSpacing;
@@ -21,9 +23,9 @@ public class TableStyleParams extends ContainerStyleParams
 	protected final boolean rowExpand;
 
 
-	public TableStyleParams(Painter background, double columnSpacing, boolean columnExpand, double rowSpacing, boolean rowExpand)
+	public TableStyleParams(Painter background, Cursor pointerCursor, double columnSpacing, boolean columnExpand, double rowSpacing, boolean rowExpand)
 	{
-		super( background );
+		super( background, pointerCursor );
 		
 		this.columnSpacing = columnSpacing;
 		this.columnExpand = columnExpand;

@@ -19,6 +19,10 @@ public class DPVBox extends DPAbstractBox
 	}
 	
 	
+	private int refPointIndex;
+	
+
+	
 	public DPVBox()
 	{
 		this( VBoxStyleParams.defaultStyleParams);
@@ -29,5 +33,21 @@ public class DPVBox extends DPAbstractBox
 		super(styleParams);
 		
 		layoutNode = new LayoutNodeVBox( this );
+	}
+
+
+
+	public void setRefPointIndex(int refPointIndex)
+	{
+		if ( refPointIndex >= getChildren().size() )
+		{
+			throw new IndexOutOfBoundsException( "Vertical box - reference index out of range" );
+		}
+		this.refPointIndex = refPointIndex;
+	}
+	
+	public int getRefPointIndex()
+	{
+		return refPointIndex;
 	}
 }

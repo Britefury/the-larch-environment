@@ -7,15 +7,17 @@
 //##************************
 package BritefuryJ.DocPresent.StyleParams;
 
+import java.awt.Cursor;
+
 import BritefuryJ.DocPresent.Painter.Painter;
 
 public class ContentLeafStyleParams extends WidgetStyleParams
 {
-	public static final ContentLeafStyleParams defaultStyleParams = new ContentLeafStyleParams( null );
+	public static final ContentLeafStyleParams defaultStyleParams = new ContentLeafStyleParams( null, null );
 	
 	
-	public ContentLeafStyleParams(Painter background)
+	public ContentLeafStyleParams(Painter background, Cursor pointerCursor)
 	{
-		super( background );
+		super( background, pointerCursor );
 	}
 }

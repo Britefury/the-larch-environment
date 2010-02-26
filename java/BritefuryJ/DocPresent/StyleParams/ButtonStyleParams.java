@@ -7,6 +7,7 @@
 package BritefuryJ.DocPresent.StyleParams;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Paint;
 import java.awt.RadialGradientPaint;
 
@@ -15,7 +16,7 @@ import BritefuryJ.DocPresent.Painter.Painter;
 
 public class ButtonStyleParams extends ContainerStyleParams
 {
-	public static final ButtonStyleParams defaultStyleParams = new ButtonStyleParams( null, 
+	public static final ButtonStyleParams defaultStyleParams = new ButtonStyleParams( null, null,
 			new RadialGradientPaint( -10.0f, -10.0f, 100.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 0.2f, 0.3f, 0.5f ), new Color( 0.3f, 0.45f, 0.75f ) }, RadialGradientPaint.CycleMethod.NO_CYCLE ),
 			new RadialGradientPaint( -10.0f, -10.0f, 100.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 0.9f, 0.92f, 1.0f ), new Color( 0.75f, 0.825f, 0.9f ) }, RadialGradientPaint.CycleMethod.NO_CYCLE ),
 			new RadialGradientPaint( -10.0f, -10.0f, 100.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 1.0f, 1.0f, 1.0f ), new Color( 0.85f, 0.85f, 0.85f ) }, RadialGradientPaint.CycleMethod.NO_CYCLE ) );
@@ -26,9 +27,9 @@ public class ButtonStyleParams extends ContainerStyleParams
 	protected final SolidBorder border, highlightBorder;
 
 
-	public ButtonStyleParams(Painter background, Paint borderPaint, Paint backgroundPaint, Paint highlightBackgPaint)
+	public ButtonStyleParams(Painter background, Cursor pointerCursor, Paint borderPaint, Paint backgroundPaint, Paint highlightBackgPaint)
 	{
-		super( background );
+		super( background, pointerCursor );
 		
 		this.borderPaint = borderPaint;
 		this.backgroundPaint = backgroundPaint;

@@ -8,6 +8,7 @@
 package BritefuryJ.DocPresent.StyleParams;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Paint;
 
@@ -18,7 +19,7 @@ public class TextStyleParams extends ContentLeafEditableStyleParams
 	public static final Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
 
 	
-	public static final TextStyleParams defaultStyleParams = new TextStyleParams( null, true, defaultFont, Color.black, null, false );
+	public static final TextStyleParams defaultStyleParams = new TextStyleParams( null, null, true, defaultFont, Color.black, null, false );
 	
 	
 	
@@ -27,9 +28,9 @@ public class TextStyleParams extends ContentLeafEditableStyleParams
 	protected final boolean bMixedSizeCaps;
 
 
-	public TextStyleParams(Painter background, boolean bEditable, Font font, Paint textPaint, Paint squiggleUnderlinePaint, boolean bMixedSizeCaps)
+	public TextStyleParams(Painter background, Cursor pointerCursor, boolean bEditable, Font font, Paint textPaint, Paint squiggleUnderlinePaint, boolean bMixedSizeCaps)
 	{
-		super( background, bEditable );
+		super( background, pointerCursor, bEditable );
 		
 		this.font = font;
 		this.textPaint = textPaint;
