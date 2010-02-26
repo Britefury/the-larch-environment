@@ -9,15 +9,13 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPCanvas;
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPStaticText;
-import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.Border.Border;
-import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Canvas.DrawingNode;
 import BritefuryJ.DocPresent.Canvas.GroupNode;
@@ -26,14 +24,14 @@ import BritefuryJ.DocPresent.Canvas.TextNode;
 import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.SimpleDndHandler;
-import BritefuryJ.DocPresent.StyleParams.HBoxStyleParams;
-import BritefuryJ.DocPresent.StyleParams.StaticTextStyleParams;
-import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
+import BritefuryJ.DocPresent.Painter.FillPainter;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class CanvasTestPage extends SystemPage
 {
-	private static StaticTextStyleParams textStyle = new StaticTextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK, false );
-	private static Border destBorder = new EmptyBorder( 10.0, 10.0, 10.0, 10.0, new Color( 1.0f, 0.9f, 0.75f ) );
+	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
+	private static PrimitiveStyleSheet textStyle = PrimitiveStyleSheet.instance.withFont( new Font( "Sans serif", Font.PLAIN, 12 ) );
+	private static Color backgroundColour = new Color( 1.0f, 0.9f, 0.75f );
 
 
 	protected CanvasTestPage()
@@ -136,9 +134,7 @@ public class CanvasTestPage extends SystemPage
 	
 	protected DPWidget makeDestElement(String title)
 	{
-		DPStaticText destText = new DPStaticText( textStyle, title );
-		DPBorder destBorderElement = new DPBorder( destBorder );
-		destBorderElement.setChild( destText );
+		DPWidget destText = styleSheet.withBackground( new FillPainter( backgroundColour ) ).box( textStyle.text( title ).pad( 10.0, 10.0 ) );
 		
 		SimpleDndHandler.DropFn dropFn = new SimpleDndHandler.DropFn()
 		{
@@ -155,9 +151,9 @@ public class CanvasTestPage extends SystemPage
 		SimpleDndHandler destDndHandler = new SimpleDndHandler();
 		destDndHandler.registerDest( "text", dropFn );
 
-		destBorderElement.enableDnd( destDndHandler );
+		destText.enableDnd( destDndHandler );
 
-		return destBorderElement;
+		return destText;
 	}
 
 	
@@ -175,9 +171,7 @@ public class CanvasTestPage extends SystemPage
 	
 	protected DPWidget makeDestElement2(String title, final DPWidget firstElement)
 	{
-		DPStaticText destText = new DPStaticText( textStyle, title );
-		DPBorder destBorderElement = new DPBorder( destBorder );
-		destBorderElement.setChild( destText );
+		DPWidget destText = styleSheet.withBackground( new FillPainter( backgroundColour ) ).box( textStyle.text( title ).pad( 10.0, 10.0 ) );
 		
 		SimpleDndHandler.DropFn dropFn = new SimpleDndHandler.DropFn()
 		{
@@ -208,32 +202,22 @@ public class CanvasTestPage extends SystemPage
 		SimpleDndHandler destDndHandler = new SimpleDndHandler();
 		destDndHandler.registerDest( "text", dropFn, canDropFn );
 
-		destBorderElement.enableDnd( destDndHandler );
+		destText.enableDnd( destDndHandler );
 
-		return destBorderElement;
+		return destText;
 	}
 
 	
 	protected DPWidget createContents()
 	{
-		DPCanvas diagramElement = new DPCanvas( createClockFace().translate( 320.0, 240.0 ), 640.0, 480.0, false, false );
-		Border b = new SolidBorder( 1.0, 3.0, 2.0, 2.0, Color.black, null );
-		DPBorder border = new DPBorder( b );
-		border.setChild( diagramElement );
+		DPCanvas canvas = styleSheet.canvas( createClockFace().translate( 320.0, 240.0 ), 640.0, 480.0, false, false );
+		DPWidget diagram = styleSheet.withBorder( new SolidBorder( 1.0, 3.0, 2.0, 2.0, Color.black, null ) ).border( canvas );
 		
 		DPWidget dest0 = makeDestElement( "Number" );
 		DPWidget dest1 = makeDestElement2( "Number", dest0 );
 
-		HBoxStyleParams hboxS = new HBoxStyleParams( null, 20.0 );
-		DPHBox hbox = new DPHBox( hboxS );
-		hbox.append( dest0 );
-		hbox.append( dest1 );
+		DPHBox hbox = styleSheet.withHBoxSpacing( 20.0 ).hbox( Arrays.asList( new DPWidget[] { dest0, dest1 } ) );
 
-		VBoxStyleParams vboxS = new VBoxStyleParams( null, 20.0 );
-		DPVBox vbox = new DPVBox( vboxS );
-		vbox.append( border );
-		vbox.append( hbox );
-
-		return vbox;
+		return styleSheet.withVBoxSpacing( 20.0 ).vbox( Arrays.asList( new DPWidget[] { diagram, hbox } ) );
 	}
 }

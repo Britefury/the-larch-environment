@@ -1108,7 +1108,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	// Queue redraw
 	//
 	
-	protected void queueFullRedraw()
+	public void queueFullRedraw()
 	{
 		component.presentationComponent.repaint( component.presentationComponent.getVisibleRect() );
 	}

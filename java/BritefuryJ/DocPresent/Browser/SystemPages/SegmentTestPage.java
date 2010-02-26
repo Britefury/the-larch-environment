@@ -7,18 +7,11 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import BritefuryJ.DocPresent.DPParagraph;
-import BritefuryJ.DocPresent.DPSegment;
-import BritefuryJ.DocPresent.DPSpan;
-import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
-import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class SegmentTestPage extends SystemPage
 {
@@ -39,14 +32,14 @@ public class SegmentTestPage extends SystemPage
 		"the caret must stop after exiting the child fraction, before leaving the parent fraction; see the fraction test for an example.";
 	}
 
-	private static Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
 
+	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
+	
 	
 	
 	protected DPWidget text(String t, Color colour)
 	{
-		TextStyleParams s0 = new TextStyleParams( null, true, defaultFont, colour, null, false );
-		return new DPText( s0, t );
+		return styleSheet.withForeground( colour ).text( t );
 	}
 	
 	protected DPWidget text(String t)
@@ -57,34 +50,25 @@ public class SegmentTestPage extends SystemPage
 	
 	protected DPWidget segment(DPWidget x, boolean bGuardBegin, boolean bGuardEnd)
 	{
-		DPSegment e = new DPSegment( bGuardBegin, bGuardEnd );
-		e.setChild( x );
-		return e;
+		return styleSheet.segment( bGuardBegin, bGuardEnd, x );
 	}
 	
 	
 	protected DPWidget span(DPWidget... x)
 	{
-		DPSpan s = new DPSpan( ContainerStyleParams.defaultStyleParams );
-		s.setChildren( Arrays.asList( x ) );
-		return s;
+		return styleSheet.span( Arrays.asList( x ) );
 	}
 	
 	
 	protected DPWidget line(DPWidget... x)
 	{
-		DPParagraph para = new DPParagraph( );
-		para.setChildren( Arrays.asList( x ) );
-		return para;
+		return styleSheet.paragraph( Arrays.asList( x ) );
 	}
 	
 	
 	protected DPWidget createContents()
 	{
-		DPVBox box = new DPVBox( );
 		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
-		
-		
 		
 		children.add( line( text( "Bars (|) indicate segment boundaries" ) ) );
 		children.add( line( text( "One segment in middle of text |" ), segment( text( "no guards", Color.red ), false, false ), text( "| finish." ) ) );
@@ -95,8 +79,6 @@ public class SegmentTestPage extends SystemPage
 		children.add( line( text( "Nested segment at beginning outer seg |" ), segment( span( segment( text( "both guards", Color.blue ), true, true ), text( "....", Color.red ) ), true, true ), text( "| finish." ) ) );
 		children.add( line( text( "Nested segment at end outer seg |" ), segment( span( text( "....", Color.red ), segment( text( "both guards", Color.blue ), true, true ) ), true, true ), text( "| finish." ) ) );
 		
-		box.setChildren( children );
-		
-		return box;
+		return styleSheet.vbox( children );
 	}
 }

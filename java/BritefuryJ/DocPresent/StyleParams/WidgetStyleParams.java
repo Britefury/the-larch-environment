@@ -7,24 +7,33 @@
 //##************************
 package BritefuryJ.DocPresent.StyleParams;
 
+import java.awt.Cursor;
+
 import BritefuryJ.DocPresent.Painter.Painter;
 
 public class WidgetStyleParams
 {
-	public static final WidgetStyleParams defaultStyleParams = new WidgetStyleParams( null );
+	public static final WidgetStyleParams defaultStyleParams = new WidgetStyleParams( null, null );
 	
 	
 	private final Painter background;
+	private final Cursor pointerCursor;
 	
 	
-	public WidgetStyleParams(Painter background)
+	public WidgetStyleParams(Painter background, Cursor pointerCursor)
 	{
 		this.background = background;
+		this.pointerCursor = pointerCursor;
 	}
 	
 	
 	public Painter getBackground()
 	{
 		return background;
+	}
+	
+	public Cursor getPointerCursor()
+	{
+		return pointerCursor;
 	}
 }

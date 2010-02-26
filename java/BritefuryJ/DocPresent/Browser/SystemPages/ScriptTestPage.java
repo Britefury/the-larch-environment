@@ -8,16 +8,13 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPFraction;
-import BritefuryJ.DocPresent.DPHBox;
-import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPScript;
-import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class ScriptTestPage extends SystemPage
 {
@@ -36,136 +33,63 @@ public class ScriptTestPage extends SystemPage
 	{
 		return "The script element is used to produce super and subscript arrangements."; 
 	}
+	
+	
+	
+	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
+	private static PrimitiveStyleSheet scriptPreStyleSheet = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 12 ) ).withForeground( Color.blue );
+	private static PrimitiveStyleSheet scriptPostStyleSheet = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 24 ) ).withForeground( Color.red );
+	private static PrimitiveStyleSheet dividerStyleSheet = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 24 ) );
 
-
-	protected DPWidget makeText(String text, TextStyleParams styleParams)
-	{
-		if ( text != null )
-		{
-			return new DPText(styleParams, text );
-		}
-		else
-		{
-			return null;
-		}
-	}
+	private static PrimitiveStyleSheet sMainStyleSheet = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 16 ) ).withForeground( Color.black );
+	private static PrimitiveStyleSheet sScriptStyleSheet = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 16 ) ).withForeground( Color.black );
 
 	
-	protected DPWidget makeFraction(DPWidget num, DPWidget denom)
-	{
-		DPFraction frac = new DPFraction( );
-		
-		frac.setNumeratorChild( num );
-		frac.setDenominatorChild( denom );
-
-		return frac;
-	}
-
-	
-	protected DPWidget makeScript(DPWidget main, DPWidget leftSuper, DPWidget leftSub, DPWidget rightSuper, DPWidget rightSub)
-	{
-		DPScript script = new DPScript( );
-		
-		script.setMainChild( main );
-		script.setLeftSuperscriptChild( leftSuper );
-		script.setLeftSubscriptChild( leftSub );
-		script.setRightSuperscriptChild( rightSuper );
-		script.setRightSubscriptChild( rightSub );
-		
-		return script;
-	}
-
 	protected DPWidget makeScriptLine(DPWidget main, DPWidget leftSuper, DPWidget leftSub, DPWidget rightSuper, DPWidget rightSub)
 	{
-		TextStyleParams sPre = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 12 ), Color.blue, null, false );
-		TextStyleParams sPost = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 24 ), Color.red, null, false );
-		
-		DPWidget script = makeScript( main, leftSuper, leftSub, rightSuper, rightSub );
-		
-		DPText labelA = new DPText( sPre, "<<Left<<" );
-		DPText labelB = new DPText( sPost, ">>Right>>" );
-		
-		DPHBox box = new DPHBox( );
-		box.append( labelA );
-		box.append( script );
-		box.append( labelB );
-		
-		return box;
+		return styleSheet.hbox( Arrays.asList( new DPWidget[] { scriptPreStyleSheet.text( "<<Left<<" ), styleSheet.script( main, leftSuper, leftSub, rightSuper, rightSub ),
+				scriptPostStyleSheet.text( ">>Right>>" ) } ) );
 	}
 
 	
 	
 	protected DPWidget makeScriptFraction(String mainText, String numText, String denomText)
 	{
-		TextStyleParams sMain = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 16 ), Color.black, null, false );
-		TextStyleParams sScript = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 16 ), Color.black, null, false );
-		TextStyleParams sPre = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 12 ), Color.blue, null, false );
-		TextStyleParams sPost = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 24 ), Color.red, null, false );
-		DPText main = new DPText( sMain, mainText );
+		DPFraction fraction = styleSheet.fraction( sScriptStyleSheet.text( numText ), sScriptStyleSheet.text( denomText ), "/" );
 		
-		DPFraction fraction = new DPFraction( );
-		fraction.setNumeratorChild( makeText( numText, sScript ) );
-		fraction.setDenominatorChild( makeText( denomText, sScript ) );
+		DPScript script = styleSheet.scriptRSuper( sMainStyleSheet.text( mainText ), styleSheet.paragraph( Arrays.asList( new DPWidget[] { fraction } ) ) );
 		
-		DPParagraph para = new DPParagraph( );
-		para.setChildren( Arrays.asList( new DPWidget[] { fraction } ) );
-		
-		DPScript script = new DPScript( );
-		
-		script.setMainChild( main );
-		script.setRightSuperscriptChild( para );
-
-		DPText labelA = new DPText( sPre, "Label A yYgGjJpPqQ" );
-		DPText labelB = new DPText( sPost, "Label B yYgGjJpPqQ" );
-		
-		DPHBox box = new DPHBox( );
-		box.append( labelA );
-		box.append( script );
-		box.append( labelB );
-		
-		return box;
+		return styleSheet.hbox( Arrays.asList( new DPWidget[] { scriptPreStyleSheet.text( "Label A yYgGjJpPqQ" ), script, scriptPostStyleSheet.text( "Label B yYgGjJpPqQ" ) } ) );
 	}
 
 	
 	
 	protected DPWidget createContents()
 	{
-		TextStyleParams sMain = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 16 ), Color.black, null, false );
-		TextStyleParams sScript = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 16 ), Color.black, null, false );
-		TextStyleParams blackStyle = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 24 ), Color.black, null, false );
-
-		DPVBox box = new DPVBox( );
+		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
 		
 		for (int i = 0; i < 16; i++)
 		{
-			DPWidget leftSuperText, leftSubText, rightSuperText, rightSubText;
+			DPWidget leftSuperText = ( i & 1 ) != 0   ?   sScriptStyleSheet.text( "left super" )  :  null; 
+			DPWidget leftSubText = ( i & 2 ) != 0   ?   sScriptStyleSheet.text( "left sub" )  :  null; 
+			DPWidget rightSuperText = ( i & 4 ) != 0   ?   sScriptStyleSheet.text( "right super" )  :  null; 
+			DPWidget rightSubText = ( i & 8 ) != 0   ?   sScriptStyleSheet.text( "right sub" )  :  null;
 			
-			leftSuperText = ( i & 1 ) != 0   ?   makeText( "left super", sScript )  :  null; 
-			leftSubText = ( i & 2 ) != 0   ?   makeText( "left sub", sScript )  :  null; 
-			rightSuperText = ( i & 4 ) != 0   ?   makeText( "right super", sScript )  :  null; 
-			rightSubText = ( i & 8 ) != 0   ?   makeText( "right sub", sScript )  :  null;
-			
-			DPWidget script = makeScriptLine( makeText( "MAIN" + String.valueOf( i ), sMain ), leftSuperText, leftSubText, rightSuperText, rightSubText );
-			
-			box.append( script );
+			children.add( makeScriptLine( sMainStyleSheet.text( "MAIN" + String.valueOf( i ) ), leftSuperText, leftSubText, rightSuperText, rightSubText ) );
 		}
 		
-		box.append( makeText( "---", blackStyle ) );
+		children.add( dividerStyleSheet.text( "---" ) );
 
 		for (int i = 0; i < 16; i++)
 		{
-			DPWidget leftSuperText, leftSubText, rightSuperText, rightSubText;
+			DPWidget leftSuperText = ( i & 1 ) != 0   ?   styleSheet.fraction( sScriptStyleSheet.text( "a" ), sScriptStyleSheet.text( "x" ), "/" )  :  sScriptStyleSheet.text( "a" ); 
+			DPWidget leftSubText = ( i & 2 ) != 0   ?   styleSheet.fraction( sScriptStyleSheet.text( "b" ), sScriptStyleSheet.text( "x" ), "/" )  :  sScriptStyleSheet.text( "b" ); 
+			DPWidget rightSuperText = ( i & 4 ) != 0   ?   styleSheet.fraction( sScriptStyleSheet.text( "c" ), sScriptStyleSheet.text( "x" ), "/" )  :  sScriptStyleSheet.text( "c" ); 
+			DPWidget rightSubText = ( i & 8 ) != 0   ?   styleSheet.fraction( sScriptStyleSheet.text( "d" ), sScriptStyleSheet.text( "x" ), "/" )  :  sScriptStyleSheet.text( "d" );
 			
-			leftSuperText = ( i & 1 ) != 0   ?   makeFraction( makeText( "a", sScript ), makeText( "x", sScript ) )  :  makeText( "a", sScript ); 
-			leftSubText = ( i & 2 ) != 0   ?   makeFraction( makeText( "b", sScript ), makeText( "x", sScript ) )  :  makeText( "b", sScript ); 
-			rightSuperText = ( i & 4 ) != 0   ?   makeFraction( makeText( "c", sScript ), makeText( "x", sScript ) )  :  makeText( "c", sScript ); 
-			rightSubText = ( i & 8 ) != 0   ?   makeFraction( makeText( "d", sScript ), makeText( "x", sScript ) )  :  makeText( "d", sScript );
-			
-			DPWidget script = makeScriptLine( makeText( "MAIN" + String.valueOf( i ), sMain ), leftSuperText, leftSubText, rightSuperText, rightSubText );
-			
-			box.append( script );
+			children.add( makeScriptLine( sMainStyleSheet.text( "MAIN" + String.valueOf( i ) ), leftSuperText, leftSubText, rightSuperText, rightSubText ) );
 		}
 		
-		return box;
+		return styleSheet.withVBoxSpacing( 10.0 ).vbox( children );
 	}
 }

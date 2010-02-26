@@ -12,21 +12,22 @@ import java.awt.Paint;
 import java.awt.Shape;
 import java.awt.Stroke;
 
-public class OutlinePainter implements Painter
+public class FilledOutlinePainter implements Painter
 {
-	private final Paint outlinePaint;
+	private final Paint fillPaint, outlinePaint;
 	private final Stroke outlineStroke;
 	
 
-	public OutlinePainter(Paint outlinePaint, Stroke outlineStroke)
+	public FilledOutlinePainter(Paint fillPaint, Paint outlinePaint, Stroke outlineStroke)
 	{
+		this.fillPaint = fillPaint;
 		this.outlinePaint = outlinePaint;
 		this.outlineStroke = outlineStroke;
 	}
 	
-	public OutlinePainter(Paint outlinePaint)
+	public FilledOutlinePainter(Paint fillPaint, Paint outlinePaint)
 	{
-		this( outlinePaint, new BasicStroke( 1.0f ) );
+		this( fillPaint, outlinePaint, new BasicStroke( 1.0f ) );
 	}
 	
 	
@@ -34,9 +35,14 @@ public class OutlinePainter implements Painter
 	{
 		Paint paint = graphics.getPaint();
 		Stroke stroke = graphics.getStroke();
+		
+		graphics.setPaint( fillPaint );
+		graphics.fill( shape );
+		
 		graphics.setPaint( outlinePaint );
 		graphics.setStroke( outlineStroke );
 		graphics.draw( shape );
+		
 		graphics.setPaint( paint );
 		graphics.setStroke( stroke );
 	}
@@ -45,12 +51,20 @@ public class OutlinePainter implements Painter
 	{
 		Paint paint = graphics.getPaint();
 		Stroke stroke = graphics.getStroke();
+		
+		graphics.setPaint( fillPaint );
+		for (Shape shape: shapes)
+		{
+			graphics.fill( shape );
+		}
+
 		graphics.setPaint( outlinePaint );
 		graphics.setStroke( outlineStroke );
 		for (Shape shape: shapes)
 		{
 			graphics.draw( shape );
 		}
+		
 		graphics.setPaint( paint );
 		graphics.setStroke( stroke );
 	}

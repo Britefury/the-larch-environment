@@ -8,18 +8,14 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.DPBorder;
-import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPLink;
-import BritefuryJ.DocPresent.DPStaticText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Browser.Page;
-import BritefuryJ.DocPresent.StyleParams.HBoxStyleParams;
-import BritefuryJ.DocPresent.StyleParams.StaticTextStyleParams;
-import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class SystemRootPage extends Page
 {
@@ -35,47 +31,49 @@ public class SystemRootPage extends Page
 		return "System page";
 	}
 	
+
+	
+	private static final PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
+
+	
+	
 	public DPWidget getContentsElement()
 	{
-		VBoxStyleParams pageBoxStyle = new VBoxStyleParams( null, 40.0 );
-		DPVBox pageBox = new DPVBox( pageBoxStyle );
+		DPWidget title = styleSheet.withFont( new Font( "Serif", Font.BOLD, 32 ) ).staticText( "gSym System page" );
 		
-		DPVBox headBox = new DPVBox( );
+		ArrayList<DPWidget> headChildren = new ArrayList<DPWidget>();
+		headChildren.add( createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE ) );
+		headChildren.add( title.alignHCentre() );
+		DPVBox headBox = styleSheet.vbox( headChildren );
 		
-		StaticTextStyleParams titleStyle = new StaticTextStyleParams( null, new Font( "Serif", Font.BOLD, 32 ), Color.BLACK, false );
-		DPStaticText title = new DPStaticText( titleStyle, "gSym System Page" );
+		ArrayList<DPWidget> pageChildren = new ArrayList<DPWidget>();
+		pageChildren.add( headBox.alignHExpand() );
+		pageChildren.add( createContents().alignHExpand() );
 		
-		headBox.append( createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE ) );
-		headBox.append( title.alignHCentre() );
-		
-		pageBox.append( headBox.alignHExpand() );
-		pageBox.append( createContents().alignHExpand() );
-		
-		return pageBox.alignHExpand();
+		return styleSheet.withVBoxSpacing( 40.0 ).vbox( pageChildren ).alignHExpand();
 	}
 
 	
 	protected DPWidget createContents()
 	{
-		DPVBox contentsBox = new DPVBox( );
+		ArrayList<DPWidget> contentsBoxChildren = new ArrayList<DPWidget>();
 		
-		StaticTextStyleParams titleStyle = new StaticTextStyleParams( null, new Font( "Serif", Font.BOLD, 18 ), Color.BLACK, false );
-		DPStaticText title = new DPStaticText( titleStyle, "Tests:" );
-		contentsBox.append( title );
+		DPWidget title = styleSheet.withFont( new Font( "Serif", Font.BOLD, 18 ) ).staticText( "Tests:" );
+		contentsBoxChildren.add( title );
 		
 		for (SystemPage page: SystemDirectory.getTestPages())
 		{
-			contentsBox.append( page.createLink() );
+			contentsBoxChildren.add( page.createLink() );
 		}
 		
-		return contentsBox;
+		return styleSheet.vbox( contentsBoxChildren );
 	}
 
 
 
 	protected DPLink createLink(String linkText)
 	{
-		return new DPLink( linkText, "system" );
+		return styleSheet.link( linkText, "system" );
 	}
 	
 	
@@ -85,27 +83,23 @@ public class SystemRootPage extends Page
 	
 	public static DPWidget createLinkHeader(int linkHeaderFlags)
 	{
-		EmptyBorder inner = new EmptyBorder( 5.0, 5.0, 5.0, 5.0, new Color( 184, 206, 203 ) );
-		EmptyBorder outer = new EmptyBorder( 5.0, 5.0, 5.0, 5.0 );
-		HBoxStyleParams linkHBoxStyle = new HBoxStyleParams( null, 25.0 );
-		
-		DPBorder innerBorder = new DPBorder( inner );
-		DPBorder outerBorder = new DPBorder( outer );
-		DPHBox linkHBox = new DPHBox( linkHBoxStyle );
+		ArrayList<DPWidget> linkElements = new ArrayList<DPWidget>();
 		
 		if ( ( linkHeaderFlags & LINKHEADER_ROOTPAGE )  !=  0 )
 		{
-			linkHBox.append( new DPLink( "GSYM ROOT PAGE", "" ) );
+			linkElements.add( styleSheet.link( "GSYM ROOT PAGE", "" ) );
 		}
 		
 		if ( ( linkHeaderFlags & LINKHEADER_SYSTEMPAGE )  !=  0 )
 		{
-			linkHBox.append( new DPLink( "SYSTEM PAGE", "system" ) );
+			linkElements.add( styleSheet.link( "SYSTEM PAGE", "system" ) );
 		}
 
-		innerBorder.setChild( linkHBox.alignHRight() );
-		outerBorder.setChild( innerBorder.alignHExpand() );
+		DPWidget links = styleSheet.withHBoxSpacing( 25.0 ).hbox( linkElements );
 		
-		return outerBorder.alignHExpand();
+		DPWidget linksBackground = styleSheet.withBorder( new EmptyBorder( 5.0, 5.0, 5.0, 5.0, new Color( 184, 206, 203 ) ) ).border( links.alignHRight() );
+		DPWidget linksHeader = styleSheet.withBorder( new EmptyBorder( 5.0, 5.0, 5.0, 5.0 ) ).border( linksBackground.alignHExpand() );
+		
+		return linksHeader.alignHExpand();
 	}
 }

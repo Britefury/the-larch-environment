@@ -7,6 +7,7 @@
 package BritefuryJ.DocPresent.StyleParams;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Paint;
@@ -22,7 +23,7 @@ public class MathRootStyleParams extends ContainerStyleParams
 {
 	private static final Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
 
-	public static final MathRootStyleParams defaultStyleParams = new MathRootStyleParams( null, defaultFont, Color.BLACK, 1.5 );
+	public static final MathRootStyleParams defaultStyleParams = new MathRootStyleParams( null, null, defaultFont, Color.BLACK, 1.5 );
 	
 	protected final Font font;
 	protected final Paint symbolPaint;
@@ -32,9 +33,9 @@ public class MathRootStyleParams extends ContainerStyleParams
 	protected boolean bRealised;
 
 
-	public MathRootStyleParams(Painter background, Font font, Paint symbolPaint, double thickness)
+	public MathRootStyleParams(Painter background, Cursor pointerCursor, Font font, Paint symbolPaint, double thickness)
 	{
-		super( background );
+		super( background, pointerCursor );
 		
 		this.font = font;
 		this.symbolPaint = symbolPaint;

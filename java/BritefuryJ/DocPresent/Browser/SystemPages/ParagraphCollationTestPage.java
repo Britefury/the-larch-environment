@@ -41,8 +41,7 @@ public class ParagraphCollationTestPage extends SystemPage
 		ArrayList<DPWidget> nodes = new ArrayList<DPWidget>();
 		for (int i = 0; i < words.length; i++)
 		{
-			String word = words[i];
-			nodes.add( style.text( word ) );
+			nodes.add( style.text( words[i] ) );
 		}
 		return nodes;
 	}

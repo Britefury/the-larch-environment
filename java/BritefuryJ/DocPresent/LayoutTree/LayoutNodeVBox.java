@@ -26,6 +26,13 @@ public class LayoutNodeVBox extends LayoutNodeAbstractBox
 	}
 
 	
+	protected int getRefPointIndex()
+	{
+		return ((DPVBox)element).getRefPointIndex();
+	}
+	
+
+	
 	protected void updateRequisitionX()
 	{
 		refreshSubtree();

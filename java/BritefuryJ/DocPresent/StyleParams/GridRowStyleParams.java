@@ -6,15 +6,17 @@
 //##************************
 package BritefuryJ.DocPresent.StyleParams;
 
+import java.awt.Cursor;
+
 import BritefuryJ.DocPresent.Painter.Painter;
 
 public class GridRowStyleParams extends ContainerStyleParams
 {
-	public static final GridRowStyleParams defaultStyleParams = new GridRowStyleParams( null );
+	public static final GridRowStyleParams defaultStyleParams = new GridRowStyleParams( null, null );
 
 
-	public GridRowStyleParams(Painter background)
+	public GridRowStyleParams(Painter background, Cursor pointerCursor)
 	{
-		super( background );
+		super( background, pointerCursor );
 	}
 }

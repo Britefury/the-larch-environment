@@ -7,12 +7,11 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
-import java.awt.Font;
+import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class TextTestPage extends SystemPage
 {
@@ -31,21 +30,21 @@ public class TextTestPage extends SystemPage
 	{
 		return "The text element supports mixed-caps style, and a squiggle-underline.";
 	}
+	
+	
+	
+	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
+	private static PrimitiveStyleSheet smallCapsStyle = styleSheet.withTextSmallCaps( true );
+	private static PrimitiveStyleSheet redUnderlineStyle = styleSheet.withTextSquiggleUnderlinePaint( Color.red );
 
+	
+	
 	protected DPWidget createContents()
 	{
-		TextStyleParams ts0 = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK, null, false );
-		TextStyleParams ts1 = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK, null, true );
-		TextStyleParams ts2 = new TextStyleParams( null, true, new Font( "Sans serif", Font.PLAIN, 16 ), Color.BLACK, Color.RED, false );
-		DPText t0 = new DPText( ts0, "Hello World Abcdefghijklmnopqrstuvwxyz" );
-		DPText t1 = new DPText( ts1, "Hello World Abcdefghijklmnopqrstuvwxyz" );
-		DPText t2 = new DPText( ts2, "Hello World Abcdefghijklmnopqrstuvwxyz" );
-
-		DPVBox b0 = new DPVBox( );
-		b0.append( t0 );
-		b0.append( t1 );
-		b0.append( t2 );
+		DPText t0 = styleSheet.text( "Normal text; with characters that go above and below the basline" );
+		DPText t1 = smallCapsStyle.text( "Small caps text; with characters that go above and below the basline" );
+		DPText t2 = redUnderlineStyle.text( "Normal text with squiggle-underline; with characters that go above and below the basline" );
 		
-		return b0;
+		return styleSheet.vbox( Arrays.asList( new DPWidget[] { t0, t1, t2 } ) );
 	}
 }

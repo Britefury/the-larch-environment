@@ -7,6 +7,7 @@
 package BritefuryJ.DocPresent.StyleParams;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Paint;
 
@@ -17,7 +18,7 @@ public class StaticTextStyleParams extends WidgetStyleParams
 	private static final Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
 
 	
-	public static final StaticTextStyleParams defaultStyleParams = new StaticTextStyleParams( null, defaultFont, Color.black, false );
+	public static final StaticTextStyleParams defaultStyleParams = new StaticTextStyleParams( null, null, defaultFont, Color.black, false );
 	
 	
 	
@@ -26,9 +27,9 @@ public class StaticTextStyleParams extends WidgetStyleParams
 	protected final boolean bMixedSizeCaps;
 
 
-	public StaticTextStyleParams(Painter background, Font font, Paint textPaint, boolean bMixedSizeCaps)
+	public StaticTextStyleParams(Painter background, Cursor pointerCursor, Font font, Paint textPaint, boolean bMixedSizeCaps)
 	{
-		super( background );
+		super( background, pointerCursor );
 		
 		this.font = font;
 		this.textPaint = textPaint;

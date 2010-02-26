@@ -84,6 +84,7 @@ public class DPTable extends DPContainer
 			// - Count children
 			// - Generate row positions
 			// - Compute number of columns
+			childEntryTable = new TableChildEntry[itemTable.length][];
 			rowPositions = new int[itemTable.length];
 			int n = 0;
 			int rowI = 0;
@@ -165,6 +166,7 @@ public class DPTable extends DPContainer
 			// - Count children
 			// - Generate row positions
 			// - Compute number of columns
+			childEntryTable = new TableChildEntry[itemTable.length][];
 			rowPositions = new int[itemTable.length];
 			int n = 0;
 			int rowI = 0;
@@ -324,6 +326,7 @@ public class DPTable extends DPContainer
 				unregisterChild( oldChildEntry.child );
 			}
 			
+			//
 			// If y is outside the bounds of the number of rows, add as many new rows as necessary
 			if ( y >= childEntryTable.length  &&  item != null )
 			{
@@ -469,7 +472,7 @@ public class DPTable extends DPContainer
 	}
 	
 	
-	
+
 	private TableChildEntry getEntryForChild(DPWidget child)
 	{
 		for (TableChildEntry entry: childEntries)

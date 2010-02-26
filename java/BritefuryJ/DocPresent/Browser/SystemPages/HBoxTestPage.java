@@ -8,15 +8,11 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.DPBorder;
-import BritefuryJ.DocPresent.DPHBox;
-import BritefuryJ.DocPresent.DPStaticText;
-import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.StyleParams.StaticTextStyleParams;
-import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class HBoxTestPage extends SystemPage
 {
@@ -37,64 +33,30 @@ public class HBoxTestPage extends SystemPage
 	}
 
 	
-	private static SolidBorder outline = new SolidBorder( 1.0, 0.0, new Color( 0.0f, 0.3f, 0.7f ), null );
+	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
+	private static PrimitiveStyleSheet outlineStyleSheet =styleSheet.withBorder( new SolidBorder( 1.0, 0.0, new Color( 0.0f, 0.3f, 0.7f ), null ) );
 
-	
-	protected DPStaticText[] makeTexts(String header)
-	{
-		StaticTextStyleParams t12 = new StaticTextStyleParams( null, new Font( "Sans serif", Font.PLAIN, 12 ), Color.BLACK, false );
-		StaticTextStyleParams t18 = new StaticTextStyleParams( null, new Font( "Sans serif", Font.BOLD, 18 ), Color.BLACK, false );
-		DPStaticText h = new DPStaticText( t18, header );
-		DPStaticText t0 = new DPStaticText( t12, "Hello" );
-		DPStaticText t1 = new DPStaticText( t12, "World" );
-		DPStaticText t2 = new DPStaticText( t12, "Foo" );
-		DPStaticText t3 = new DPStaticText( t12, "j" );
-		DPStaticText t4 = new DPStaticText( t12, "q" );
-		DPStaticText t5 = new DPStaticText( t12, "'" );
-		DPStaticText t6 = new DPStaticText( t12, "." );
-		DPStaticText t7 = new DPStaticText( t12, "Bar" );
-		
-		DPStaticText[] texts = { h, t0, t1, t2, t3, t4, t5, t6, t7 };
-		return texts;
-	}
-	
-	protected DPWidget wrapInOutline(DPWidget w)
-	{
-		DPBorder border = new DPBorder( outline );
-		border.setChild( w );
-		return border;
-	}
 	
 	protected DPWidget makeText(String text, int size)
 	{
-		StaticTextStyleParams ts = new StaticTextStyleParams( null, new Font( "Sans serif", Font.BOLD, size ), Color.BLACK, false );
-
-		DPStaticText t = new DPStaticText( ts, text );
-		return wrapInOutline( t );
+		PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance.withFont( new Font( "Sans serif", Font.BOLD, size ) );
+		return outlineStyleSheet.border( styleSheet.text( text ) );
 	}
 	
 	
 	protected DPWidget createContents()
 	{
-		DPHBox b0 = new DPHBox( );
-		b0.extend( makeTexts( "HBOX-TEST" ) );
+		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
+		children.add( makeText( "a", 24 ).alignVBaselines() );
+		children.add( makeText( "g", 24 ).alignVBaselines() );
+		children.add( makeText( "v_ref_y", 18 ).alignVBaselines() );
+		children.add( makeText( "v_ref_y48", 48 ).alignVBaselines() );
+		children.add( makeText( "v_ref_y-expand", 18 ).alignVBaselinesExpand() );
+		children.add( makeText( "v_top", 18 ).alignVTop() );
+		children.add( makeText( "v_centre", 18 ).alignVCentre() );
+		children.add( makeText( "v_bottom", 18 ).alignVBottom() );
+		children.add( makeText( "v_expand", 18 ).alignVExpand() );
 		
-		DPHBox b1 = new DPHBox( );
-		b1.append( makeText( "a", 24 ).alignVBaselines() );
-		b1.append( makeText( "g", 24 ).alignVBaselines() );
-		b1.append( makeText( "v_ref_y", 18 ).alignVBaselines() );
-		b1.append( makeText( "v_ref_y48", 48 ).alignVBaselines() );
-		b1.append( makeText( "v_ref_y-expand", 18 ).alignVBaselinesExpand() );
-		b1.append( makeText( "v_top", 18 ).alignVTop() );
-		b1.append( makeText( "v_centre", 18 ).alignVCentre() );
-		b1.append( makeText( "v_bottom", 18 ).alignVBottom() );
-		b1.append( makeText( "v_expand", 18 ).alignVExpand() );
-		
-		VBoxStyleParams boxS = new VBoxStyleParams( null, 20.0 );
-		DPVBox box = new DPVBox( boxS );
-		box.append( b0.alignHExpand() );
-		box.append( wrapInOutline( b1 ) );
-		
-		return box;
+		return outlineStyleSheet.border( styleSheet.hbox( children ) ).pad( 10.0, 20.0 );
 	}
 }

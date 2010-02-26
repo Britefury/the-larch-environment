@@ -26,7 +26,7 @@ import BritefuryJ.GSym.IncrementalContext.GSymIncrementalNodeFunction;
 
 public class GSymNodeViewContext extends GSymIncrementalNodeContext implements ElementContext
 {
-	StaticTextStyleParams viewError_textStyle = new StaticTextStyleParams( null, new Font( "SansSerif", Font.BOLD, 12 ),  new Color( 0.8f, 0.0f, 0.0f ),  false );
+	StaticTextStyleParams viewError_textStyle = new StaticTextStyleParams( null, null, new Font( "SansSerif", Font.BOLD, 12 ),  new Color( 0.8f, 0.0f, 0.0f ),  false );
 
 	
 	public GSymNodeViewContext(GSymViewContext viewContext, DVNode viewNode)

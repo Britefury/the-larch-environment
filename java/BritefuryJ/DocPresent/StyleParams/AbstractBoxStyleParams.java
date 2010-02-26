@@ -7,20 +7,22 @@
 //##************************
 package BritefuryJ.DocPresent.StyleParams;
 
+import java.awt.Cursor;
+
 import BritefuryJ.DocPresent.Painter.Painter;
 
 
 public class AbstractBoxStyleParams extends ContainerStyleParams
 {
-	public static final AbstractBoxStyleParams defaultStyleParams = new AbstractBoxStyleParams( null, 0.0 );
+	public static final AbstractBoxStyleParams defaultStyleParams = new AbstractBoxStyleParams( null, null, 0.0 );
 	
 	
 	protected final double spacing;
 
 
-	public AbstractBoxStyleParams(Painter background, double spacing)
+	public AbstractBoxStyleParams(Painter background, Cursor pointerCursor, double spacing)
 	{
-		super( background );
+		super( background, pointerCursor );
 		
 		this.spacing = spacing;
 	}

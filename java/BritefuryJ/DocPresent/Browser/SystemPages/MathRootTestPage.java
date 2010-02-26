@@ -7,14 +7,10 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
-import java.awt.Font;
+import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.DPFraction;
-import BritefuryJ.DocPresent.DPMathRoot;
-import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class MathRootTestPage extends SystemPage
 {
@@ -34,62 +30,25 @@ public class MathRootTestPage extends SystemPage
 		return "The math-root element places its child within a mathematical square-root symbol."; 
 	}
 
-	protected DPWidget makeText(String text, TextStyleParams styleParams)
-	{
-		if ( text != null )
-		{
-			return new DPText(styleParams, text );
-		}
-		else
-		{
-			return null;
-		}
-	}
+	
+	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
+	private static PrimitiveStyleSheet textStyleSheet = styleSheet.withForeground( new Color( 0.0f, 0.5f, 0.0f ) );
 
 	
-	protected DPWidget makeFraction(String numeratorText, String denominatorText)
+	private DPWidget makeFraction(String numeratorText, String denominatorText)
 	{
-		Font f0 = new Font( "Sans serif", Font.PLAIN, 14 );
-		TextStyleParams s0 = new TextStyleParams( null, true, f0, new Color( 0.0f, 0.5f, 0.0f ), null, false );
-		DPText num = new DPText( s0, numeratorText );
-		DPText denom = new DPText( s0, denominatorText );
-		
-		DPFraction frac = new DPFraction( );
-		
-		frac.setNumeratorChild( num );
-		frac.setDenominatorChild( denom );
-
-		return frac;
+		return styleSheet.fraction( textStyleSheet.text( numeratorText ), textStyleSheet.text( denominatorText ), "/" );
 	}
 
-	
-	protected DPWidget makeRoot(DPWidget child)
-	{
-		DPMathRoot root = new DPMathRoot( );
-		root.setChild( child );
-		return root;
-	}
-
-	
-	protected DPWidget makeRoot(String text)
-	{
-		Font f0 = new Font( "Sans serif", Font.PLAIN, 14 );
-		TextStyleParams s0 = new TextStyleParams( null, true, f0, new Color( 0.0f, 0.5f, 0.0f ), null, false );
-		DPText t = new DPText( s0, text );
-		return makeRoot( t );
-	}
-
-	
 	
 	protected DPWidget createContents()
 	{
-		DPVBox box = new DPVBox( );
+		ArrayList<DPWidget> children = new ArrayList<DPWidget>( );
 		
-		box.append( makeRoot( "a" ) );
-		box.append( makeRoot( "a+p" ) );
-		box.append( makeRoot( makeFraction( "a", "p+q" ) ) );
+		children.add( styleSheet.mathRoot( textStyleSheet.text( "a" ) ) );
+		children.add( styleSheet.mathRoot( textStyleSheet.text( "a+p" ) ) );
+		children.add( styleSheet.mathRoot( makeFraction( "a", "p+q" ) ) );
 		
-		
-		return box;
+		return styleSheet.vbox( children );
 	}
 }

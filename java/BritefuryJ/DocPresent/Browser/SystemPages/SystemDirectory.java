@@ -17,6 +17,7 @@ public class SystemDirectory
 	
 	protected static void initialise()
 	{
+		testPages.add( new AlignmentTestPage() );
 		testPages.add( new BorderTestPage() );
 		testPages.add( new CanvasTestPage() );
 		testPages.add( new DndTestPage() );
@@ -27,7 +28,7 @@ public class SystemDirectory
 		testPages.add( new MathRootTestPage() );
 		testPages.add( new ParagraphCollationTestPage() );
 		testPages.add( new ParagraphTestPage() );
-		testPages.add( new ProxyTestPage() );
+		testPages.add( new ProxyAndSpanTestPage() );
 		testPages.add( new ScriptTestPage() );
 		testPages.add( new SegmentTestPage() );
 		testPages.add( new TableTestPage() );
