@@ -13,8 +13,9 @@ import java.util.Arrays;
 import BritefuryJ.DocPresent.DPProxy;
 import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
+import BritefuryJ.DocPresent.Controls.Hyperlink;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.StyleSheet.ControlsStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class ProxyAndSpanTestPage extends SystemPage
@@ -95,17 +96,17 @@ public class ProxyAndSpanTestPage extends SystemPage
 		paragraph2Contents.addAll( makeTextNodes( spanParaPostText, blackText ) );
 		DPWidget paragraph = styleSheet.paragraph( paragraph2Contents );
 		
-		ControlsStyleSheet.LinkListener onModifySpanLink = new ControlsStyleSheet.LinkListener()
+		Hyperlink.LinkListener onModifySpanLink = new Hyperlink.LinkListener()
 		{
-			public boolean onLinkClicked(DPWidget link, PointerButtonEvent buttonEvent)
+			public boolean onLinkClicked(Hyperlink link, PointerButtonEvent buttonEvent)
 			{
 				span.setChildren( makeTextNodes( spanSecondaryText, greenText ) );
 				return true;
 			}
 		};
-		DPWidget modifySpanLink = controlsStyleSheet.link( "Place secondary text into span", onModifySpanLink );
+		Hyperlink modifySpanLink = controlsStyleSheet.link( "Place secondary text into span", onModifySpanLink );
 		
-		return styleSheet.withVBoxSpacing( 5.0 ).vbox( Arrays.asList( new DPWidget[] { paragraph, modifySpanLink } ) );
+		return styleSheet.withVBoxSpacing( 5.0 ).vbox( Arrays.asList( new DPWidget[] { paragraph, modifySpanLink.getElement() } ) );
 	}
 	
 	protected DPWidget createParagraph3()
@@ -120,29 +121,29 @@ public class ProxyAndSpanTestPage extends SystemPage
 		paragraph2Contents.addAll( makeTextNodes( spanParaPostText, blackText ) );
 		DPWidget paragraph = styleSheet.paragraph( paragraph2Contents );
 		
-		ControlsStyleSheet.LinkListener onModifySpanLink = new ControlsStyleSheet.LinkListener()
+		Hyperlink.LinkListener onModifySpanLink = new Hyperlink.LinkListener()
 		{
-			public boolean onLinkClicked(DPWidget link, PointerButtonEvent buttonEvent)
+			public boolean onLinkClicked(Hyperlink link, PointerButtonEvent buttonEvent)
 			{
 				DPSpan span = (DPSpan)proxy.getChild();
 				span.setChildren( makeTextNodes( spanSecondaryText, greenText ) );
 				return true;
 			}
 		};
-		DPWidget modifySpanLink = controlsStyleSheet.link( "Place secondary text into span", onModifySpanLink );
+		Hyperlink modifySpanLink = controlsStyleSheet.link( "Place secondary text into span", onModifySpanLink );
 		
-		ControlsStyleSheet.LinkListener onModifyProxyLink = new ControlsStyleSheet.LinkListener()
+		Hyperlink.LinkListener onModifyProxyLink = new Hyperlink.LinkListener()
 		{
-			public boolean onLinkClicked(DPWidget link, PointerButtonEvent buttonEvent)
+			public boolean onLinkClicked(Hyperlink link, PointerButtonEvent buttonEvent)
 			{
 				proxy.setChild( styleSheet.span( makeTextNodes( proxySecondaryText, seaGreenText ) ) );
 				return true;
 			}
 		};
-		DPWidget modifyProxyLink = controlsStyleSheet.link( "Place new span into proxy", onModifyProxyLink );
+		Hyperlink modifyProxyLink = controlsStyleSheet.link( "Place new span into proxy", onModifyProxyLink );
 
 		return styleSheet.withVBoxSpacing( 5.0 ).vbox( Arrays.asList( new DPWidget[] { paragraph,
-				styleSheet.withHBoxSpacing( 15.0 ).hbox( Arrays.asList( new DPWidget[] { modifySpanLink, modifyProxyLink } ) ) } ) );
+				styleSheet.withHBoxSpacing( 15.0 ).hbox( Arrays.asList( new DPWidget[] { modifySpanLink.getElement(), modifyProxyLink.getElement() } ) ) } ) );
 	}
 	
 	protected DPWidget createContents()

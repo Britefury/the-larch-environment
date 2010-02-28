@@ -12,8 +12,9 @@ import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPProxy;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.Controls.Button;
+import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.StyleSheet.ControlsStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class ButtonTestPage extends SystemPage
@@ -35,7 +36,7 @@ public class ButtonTestPage extends SystemPage
 	}
 	
 	
-	private class ButtonColourChanger implements ControlsStyleSheet.ButtonListener
+	private class ButtonColourChanger implements Button.ButtonListener
 	{
 		private DPProxy parentElement;
 		private PrimitiveStyleSheet style;
@@ -48,7 +49,7 @@ public class ButtonTestPage extends SystemPage
 		}
 
 
-		public boolean onButtonClicked(DPWidget element, PointerButtonEvent event)
+		public boolean onButtonClicked(Button button, PointerButtonEvent event)
 		{
 			parentElement.setChild( colouredText( style ) );
 			return true;
@@ -82,10 +83,10 @@ public class ButtonTestPage extends SystemPage
 	protected DPWidget createContents()
 	{
 		DPProxy colouredTextProxy = styleSheet.proxy( colouredText( blackText ) );
-		DPWidget blackLink = controlsStyleSheet.button( styleSheet.staticText( "Black" ), new ButtonColourChanger( colouredTextProxy, blackText ) );
-		DPWidget redLink = controlsStyleSheet.button( styleSheet.staticText( "Red" ), new ButtonColourChanger( colouredTextProxy, redText ) );
-		DPWidget greenLink = controlsStyleSheet.button( styleSheet.staticText( "Green" ), new ButtonColourChanger( colouredTextProxy, greenText ) );
-		DPWidget colourLinks = styleSheet.withHBoxSpacing( 20.0 ).hbox( Arrays.asList( new DPWidget[] { blackLink, redLink, greenLink } ) ).padX( 5.0 );
+		Button blackButton = controlsStyleSheet.button( styleSheet.staticText( "Black" ), new ButtonColourChanger( colouredTextProxy, blackText ) );
+		Button redButton = controlsStyleSheet.button( styleSheet.staticText( "Red" ), new ButtonColourChanger( colouredTextProxy, redText ) );
+		Button greenButton = controlsStyleSheet.button( styleSheet.staticText( "Green" ), new ButtonColourChanger( colouredTextProxy, greenText ) );
+		DPWidget colourLinks = styleSheet.withHBoxSpacing( 20.0 ).hbox( Arrays.asList( new DPWidget[] { blackButton.getElement(), redButton.getElement(), greenButton.getElement() } ) ).padX( 5.0 );
 		DPWidget colourBox = styleSheet.vbox( Arrays.asList( new DPWidget[] { colouredTextProxy, colourLinks } ) );
 		DPWidget colourSection = section( "Action buttons", colourBox );
 		

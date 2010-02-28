@@ -100,7 +100,8 @@ public class Caret implements MarkerListener
 			
 			if ( grabElement != null )
 			{
-				if ( getElement().isInSubtreeRootedAt( grabElement ) )
+				DPContentLeafEditable current = getElement(); 
+				if ( current == null  ||  !current.isInSubtreeRootedAt( grabElement ) )
 				{
 					grabElement.moveMarkerToStart( marker );
 				}
