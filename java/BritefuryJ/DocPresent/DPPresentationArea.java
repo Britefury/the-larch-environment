@@ -1557,11 +1557,15 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 			{
 				if ( caret.isValid() )
 				{
-					DPContentLeaf leaf = caret.getMarker().getElement();
+					DPContentLeafEditable leaf = caret.getMarker().getElement();
+					if ( leaf.onKeyPress( event ) )
+					{
+						return true;
+					}
+					
 					if ( leaf.isEditable() )
 					{
-						DPContentLeafEditable editable = (DPContentLeafEditable)leaf;
-						editable.onKeyPress( caret, event );
+						leaf.onContentKeyPress( caret, event );
 					}
 					emitImmediateEvents();
 					return true;
@@ -1598,11 +1602,15 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 			{
 				if ( caret.isValid() )
 				{
-					DPContentLeaf leaf = caret.getMarker().getElement();
+					DPContentLeafEditable leaf = caret.getMarker().getElement();
+					if ( leaf.onKeyRelease( event ) )
+					{
+						return true;
+					}
+					
 					if ( leaf.isEditable() )
 					{
-						DPContentLeafEditable editable = (DPContentLeafEditable)leaf;
-						editable.onKeyRelease( caret, event );
+						leaf.onContentKeyRelease( caret, event );
 					}
 					emitImmediateEvents();
 					return true;
@@ -1645,11 +1653,15 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 			{
 				if ( caret.isValid()  &&  !bCtrl  &&  !bAlt )
 				{
-					DPContentLeaf leaf = caret.getMarker().getElement();
+					DPContentLeafEditable leaf = caret.getMarker().getElement();
+					if ( leaf.onKeyTyped( event ) )
+					{
+						return true;
+					}
+					
 					if ( leaf.isEditable() )
 					{
-						DPContentLeafEditable editable = (DPContentLeafEditable)leaf;
-						editable.onKeyTyped( caret, event );
+						leaf.onContentKeyTyped( caret, event );
 					}
 					emitImmediateEvents();
 					return true;

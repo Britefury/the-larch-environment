@@ -721,13 +721,8 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		}
 	}
 	
-	protected boolean onKeyPress(Caret caret, KeyEvent event)
+	protected boolean onContentKeyPress(Caret caret, KeyEvent event)
 	{
-		if ( propagateKeyPress( event ) )
-		{
-			return true;
-		}
-		
 		if ( event.getKeyCode() == KeyEvent.VK_BACK_SPACE )
 		{
 			return handleBackspace( caret );
@@ -739,18 +734,13 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		return false;
 	}
 
-	protected boolean onKeyRelease(Caret caret, KeyEvent event)
+	protected boolean onContentKeyRelease(Caret caret, KeyEvent event)
 	{
-		return propagateKeyRelease( event );
+		return false;
 	}
 
-	protected boolean onKeyTyped(Caret caret, KeyEvent event)
+	protected boolean onContentKeyTyped(Caret caret, KeyEvent event)
 	{
-		if ( propagateKeyTyped( event ) )
-		{
-			return true;
-		}
-		
 		if ( event.getKeyChar() != KeyEvent.VK_BACK_SPACE  &&  event.getKeyChar() != KeyEvent.VK_DELETE )
 		{
 			String str = String.valueOf( event.getKeyChar() );

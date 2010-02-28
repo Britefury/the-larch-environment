@@ -7,6 +7,7 @@
 package BritefuryJ.DocPresent;
 
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
 
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.ContextMenu.ContextMenu;
@@ -73,6 +74,22 @@ public abstract class ElementInteractor
 	{
 	}
 	
+	
+	public boolean onKeyPress(DPWidget element, KeyEvent event)
+	{
+		return false;
+	}
+	
+	public boolean onKeyRelease(DPWidget element, KeyEvent event)
+	{
+		return false;
+	}
+	
+	public boolean onKeyTyped(DPWidget element, KeyEvent event)
+	{
+		return false;
+	}
+
 	
 	public void drawBackground(DPWidget element, Graphics2D graphics)
 	{

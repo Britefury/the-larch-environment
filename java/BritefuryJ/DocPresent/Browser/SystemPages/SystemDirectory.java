@@ -38,6 +38,7 @@ public class SystemDirectory
 
 		controlTestPages.add( new ButtonTestPage() );
 		controlTestPages.add( new HyperlinkTestPage() );
+		controlTestPages.add( new TextEntryTestPage() );
 	}
 	
 	

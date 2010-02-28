@@ -16,7 +16,7 @@ import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Browser.Page;
-import BritefuryJ.DocPresent.StyleSheet.ControlsStyleSheet;
+import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class SystemRootPage extends Page
@@ -97,13 +97,6 @@ public class SystemRootPage extends Page
 
 
 
-	protected DPWidget createLink(String linkText)
-	{
-		return controlsStyleSheet.link( linkText, "system" );
-	}
-	
-	
-	
 	public static int LINKHEADER_ROOTPAGE = 0x1;
 	public static int LINKHEADER_SYSTEMPAGE = 0x2;
 	
@@ -113,12 +106,12 @@ public class SystemRootPage extends Page
 		
 		if ( ( linkHeaderFlags & LINKHEADER_ROOTPAGE )  !=  0 )
 		{
-			linkElements.add( controlsStyleSheet.link( "GSYM ROOT PAGE", "" ) );
+			linkElements.add( controlsStyleSheet.link( "GSYM ROOT PAGE", "" ).getElement() );
 		}
 		
 		if ( ( linkHeaderFlags & LINKHEADER_SYSTEMPAGE )  !=  0 )
 		{
-			linkElements.add( controlsStyleSheet.link( "SYSTEM PAGE", "system" ) );
+			linkElements.add( controlsStyleSheet.link( "SYSTEM PAGE", "system" ).getElement() );
 		}
 
 		DPWidget links = styleSheet.withHBoxSpacing( 25.0 ).hbox( linkElements );
