@@ -158,6 +158,16 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	//
 	
 
+	public DPContentLeafEditable getLeftEditableContentLeaf()
+	{
+		return this;
+	}
+
+	public DPContentLeafEditable getRightEditableContentLeaf()
+	{
+		return this;
+	}
+	
 	public DPContentLeafEditable getTopOrBottomEditableContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace)
 	{
 		if ( isEditable() )

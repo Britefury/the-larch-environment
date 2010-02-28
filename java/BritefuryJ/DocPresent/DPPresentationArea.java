@@ -1215,7 +1215,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 					{
 						if ( !caret.isValid() )
 						{
-							DPContentLeaf leaf = getLayoutNode().getLeftContentLeaf();
+							DPContentLeafEditable leaf = getLayoutNode().getLeftEditableContentLeaf();
 							if ( leaf != null )
 							{
 								leaf.moveMarkerToStart( caret.getMarker() );

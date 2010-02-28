@@ -179,6 +179,46 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 		return null;
 	}
 	
+	public DPContentLeafEditable getLeftEditableContentLeafWithinElement(DPWidget withinElement)
+	{
+		refreshSubtree();
+		int branchIndex = indexOfBranch( withinElement );
+		if ( branchIndex == -1 )
+		{
+			throw new RuntimeException( "Could not find branch" );
+		}
+		int start = branchRanges[branchIndex*2], end = branchRanges[branchIndex*2+1];
+		for (int i = start; i < end; i++)
+		{
+			DPContentLeafEditable leaf = leaves[i].getLayoutNode().getLeftEditableContentLeaf();
+			if ( leaf != null )
+			{
+				return leaf;
+			}
+		}
+		return null;
+	}
+	
+	public DPContentLeafEditable getRightEditableContentLeafWithinElement(DPWidget withinElement)
+	{
+		refreshSubtree();
+		int branchIndex = indexOfBranch( withinElement );
+		if ( branchIndex == -1 )
+		{
+			throw new RuntimeException( "Could not find branch" );
+		}
+		int start = branchRanges[branchIndex*2], end = branchRanges[branchIndex*2+1];
+		for (int i = end - 1; i >= start; i--)
+		{
+			DPContentLeafEditable leaf = leaves[i].getLayoutNode().getRightEditableContentLeaf();
+			if ( leaf != null )
+			{
+				return leaf;
+			}
+		}
+		return null;
+	}
+	
 	public DPContentLeaf getContentLeafToLeftOfElement(DPWidget inElement)
 	{
 		refreshSubtree();
