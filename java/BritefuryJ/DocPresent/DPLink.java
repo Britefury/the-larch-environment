@@ -6,13 +6,12 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import BritefuryJ.DocPresent.StyleParams.LinkStyleParams;
 import org.python.core.Py;
 import org.python.core.PyObject;
 
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.Modifier;
+import BritefuryJ.DocPresent.StyleParams.LinkStyleParams;
 
 public class DPLink extends DPStaticText
 {
@@ -120,27 +119,6 @@ public class DPLink extends DPStaticText
 
 
 	
-	
-	
-	protected void onEnter(PointerMotionEvent event)
-	{
-		super.onEnter( event );
-		if ( isRealised() )
-		{
-			presentationArea.setCursorHand( event.getPointer() );
-		}
-	}
-
-	protected void onLeave(PointerMotionEvent event)
-	{
-		if ( isRealised() )
-		{
-			presentationArea.setCursorArrow( event.getPointer() );
-		}
-		super.onLeave( event );
-	}
-
-
 
 	protected boolean onButtonDown(PointerButtonEvent event)
 	{

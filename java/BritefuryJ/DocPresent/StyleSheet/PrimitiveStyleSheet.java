@@ -73,6 +73,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 	private static final Paint default_buttonHighlightBackgroundPaint = new RadialGradientPaint( -10.0f, -10.0f, 100.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 1.0f, 1.0f, 1.0f ), new Color( 0.85f, 0.85f, 0.85f ) }, RadialGradientPaint.CycleMethod.NO_CYCLE );
 	
 	private static final Font defaultLinkFont = new Font( "Sans serif", Font.PLAIN, 14 );
+	private static final Cursor defaultLinkCursor = new Cursor( Cursor.HAND_CURSOR );
 	
 
 	
@@ -109,6 +110,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 		initAttr( "linkFont", defaultLinkFont );
 		initAttr( "linkPaint", Color.blue );
 		initAttr( "linkSmallCaps", false );
+		initAttr( "linkCursor", defaultLinkCursor );
 		
 		initAttr( "mathRootThickness", 1.5 );
 		
@@ -134,7 +136,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 	
 	
-	public Object newInstance()
+	protected StyleSheet newInstance()
 	{
 		return new PrimitiveStyleSheet();
 	}
@@ -161,7 +163,12 @@ public class PrimitiveStyleSheet extends StyleSheet
 		return (PrimitiveStyleSheet)withAttr( "background", background );
 	}
 
+	public PrimitiveStyleSheet withCursor(Cursor cursor)
+	{
+		return (PrimitiveStyleSheet)withAttr( "cursor", cursor );
+	}
 
+	
 	
 	//
 	// BORDER
@@ -270,6 +277,11 @@ public class PrimitiveStyleSheet extends StyleSheet
 	public PrimitiveStyleSheet withLinkSmallCaps(boolean smallCaps)
 	{
 		return (PrimitiveStyleSheet)withAttr( "linkSmallCaps", smallCaps );
+	}
+
+	public PrimitiveStyleSheet withLinkCursor(Cursor cursor)
+	{
+		return (PrimitiveStyleSheet)withAttr( "linkCursor", cursor );
 	}
 
 
@@ -474,9 +486,9 @@ public class PrimitiveStyleSheet extends StyleSheet
 			fractionParams = new FractionStyleParams(
 					get( "background", Painter.class, null ),
 					get( "cursor", Cursor.class, null ),
-					get( "fractionVSpacing", Double.class, 2.0 ),
-					get( "fractionHPadding", Double.class, 3.0 ),
-					get( "fractionRefYOffset", Double.class, 5.0 ),
+					getNonNull( "fractionVSpacing", Double.class, 2.0 ),
+					getNonNull( "fractionHPadding", Double.class, 3.0 ),
+					getNonNull( "fractionRefYOffset", Double.class, 5.0 ),
 					getFractionBarParams() );
 		}
 		return fractionParams;
@@ -492,8 +504,8 @@ public class PrimitiveStyleSheet extends StyleSheet
 			fractionBarParams = new FractionStyleParams.BarStyleParams(
 					get( "background", Painter.class, null ),
 					get( "cursor", Cursor.class, null ),
-					get( "editable", Boolean.class, true ),
-					get( "foreground", Paint.class, Color.black ) );
+					getNonNull( "editable", Boolean.class, true ),
+					getNonNull( "foreground", Paint.class, Color.black ) );
 		}
 		return fractionBarParams;
 	}
@@ -522,7 +534,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 			hboxParams = new HBoxStyleParams(
 					get( "background", Painter.class, null ),
 					get( "cursor", Cursor.class, null ),
-					get( "hboxSpacing", Double.class, 0.0 ) );
+					getNonNull( "hboxSpacing", Double.class, 0.0 ) );
 		}
 		return hboxParams;
 	}
@@ -537,10 +549,10 @@ public class PrimitiveStyleSheet extends StyleSheet
 			lineParams = new LineStyleParams(
 					get( "background", Painter.class, null ),
 					get( "cursor", Cursor.class, null ),
-					get( "lineDirection", LineStyleParams.Direction.class, LineStyleParams.Direction.HORIZONTAL ),
-					get( "foreground", Paint.class, Color.black ),
-					get( "lineThickness", Double.class, 1.0 ),
-					get( "lineInset", Double.class, 0.0 ), get( "linePadding", Double.class, 0.0 ) );
+					getNonNull( "lineDirection", LineStyleParams.Direction.class, LineStyleParams.Direction.HORIZONTAL ),
+					getNonNull( "foreground", Paint.class, Color.black ),
+					getNonNull( "lineThickness", Double.class, 1.0 ),
+					getNonNull( "lineInset", Double.class, 0.0 ), get( "linePadding", Double.class, 0.0 ) );
 		}
 		return lineParams;
 	}
@@ -554,10 +566,10 @@ public class PrimitiveStyleSheet extends StyleSheet
 		{
 			linkParams = new LinkStyleParams(
 					get( "background", Painter.class, null ),
-					get( "cursor", Cursor.class, null ),
-					get( "linkFont", Font.class, defaultLinkFont ),
-					get( "linkPaint", Paint.class, Color.black ),
-					get( "linkSmallCaps", Boolean.class, false ) );
+					get( "linkCursor", Cursor.class, null ),
+					getNonNull( "linkFont", Font.class, defaultLinkFont ),
+					getNonNull( "linkPaint", Paint.class, Color.black ),
+					getNonNull( "linkSmallCaps", Boolean.class, false ) );
 		}
 		return linkParams;
 	}
@@ -572,9 +584,9 @@ public class PrimitiveStyleSheet extends StyleSheet
 			mathRootParams = new MathRootStyleParams(
 					get( "background", Painter.class, null ),
 					get( "cursor", Cursor.class, null ),
-					get( "font", Font.class, defaultFont ),
-					get( "foreground", Paint.class, Color.black ),
-					get( "mathRootThickness", Double.class, 1.5 ) );
+					getNonNull( "font", Font.class, defaultFont ),
+					getNonNull( "foreground", Paint.class, Color.black ),
+					getNonNull( "mathRootThickness", Double.class, 1.5 ) );
 		}
 		return mathRootParams;
 	}
@@ -589,9 +601,9 @@ public class PrimitiveStyleSheet extends StyleSheet
 			paragraphParams = new ParagraphStyleParams(
 					get( "background", Painter.class, null ),
 					get( "cursor", Cursor.class, null ),
-					get( "paragraphSpacing", Double.class, 0.0 ),
-					get( "paragraphLineSpacing", Double.class, 0.0 ),
-					get( "paragraphIndentation", Double.class, 0.0 ) );
+					getNonNull( "paragraphSpacing", Double.class, 0.0 ),
+					getNonNull( "paragraphLineSpacing", Double.class, 0.0 ),
+					getNonNull( "paragraphIndentation", Double.class, 0.0 ) );
 		}
 		return paragraphParams;
 	}
@@ -606,8 +618,8 @@ public class PrimitiveStyleSheet extends StyleSheet
 			scriptParams = new ScriptStyleParams(
 					get( "background", Painter.class, null ),
 					get( "cursor", Cursor.class, null ),
-					get( "scriptColumnSpacing", Double.class, 1.0 ),
-					get( "scriptRowSpacing", Double.class, 1.0 ) );
+					getNonNull( "scriptColumnSpacing", Double.class, 1.0 ),
+					getNonNull( "scriptRowSpacing", Double.class, 1.0 ) );
 		}
 		return scriptParams;
 	}
@@ -622,8 +634,8 @@ public class PrimitiveStyleSheet extends StyleSheet
 			staticTextParams = new StaticTextStyleParams(
 					get( "background", Painter.class, null ),
 					get( "cursor", Cursor.class, null ),
-					get( "font", Font.class, defaultFont ),
-					get( "foreground", Paint.class, Color.black ),
+					getNonNull( "font", Font.class, defaultFont ),
+					getNonNull( "foreground", Paint.class, Color.black ),
 					getNonNull( "textSmallCaps", Boolean.class, false ) );
 		}
 		return staticTextParams;
@@ -639,10 +651,10 @@ public class PrimitiveStyleSheet extends StyleSheet
 			tableParams = new TableStyleParams(
 					get( "background", Painter.class, null ),
 					get( "cursor", Cursor.class, null ),
-					get( "tableColumnSpacing", Double.class, 0.0 ),
-					get( "tableColumnExpand", Boolean.class, false ),
-					get( "tableRowSpacing", Double.class, 0.0 ),
-					get( "tableRowExpand", Boolean.class, false ) );
+					getNonNull( "tableColumnSpacing", Double.class, 0.0 ),
+					getNonNull( "tableColumnExpand", Boolean.class, false ),
+					getNonNull( "tableRowSpacing", Double.class, 0.0 ),
+					getNonNull( "tableRowExpand", Boolean.class, false ) );
 		}
 		return tableParams;
 	}
@@ -657,9 +669,11 @@ public class PrimitiveStyleSheet extends StyleSheet
 			textParams = new TextStyleParams(
 					get( "background", Painter.class, null ),
 					get( "cursor", Cursor.class, null ),
-					get( "editable", Boolean.class, true ),
-					get( "font", Font.class, defaultFont ),
-					get( "foreground", Paint.class, Color.black ), get( "textSquiggleUnderlinePaint", Paint.class, null ), getNonNull( "textSmallCaps", Boolean.class, false ) );
+					getNonNull( "editable", Boolean.class, true ),
+					getNonNull( "font", Font.class, defaultFont ),
+					getNonNull( "foreground", Paint.class, Color.black ),
+					get( "textSquiggleUnderlinePaint", Paint.class, null ),
+					getNonNull( "textSmallCaps", Boolean.class, false ) );
 		}
 		return textParams;
 	}
@@ -674,7 +688,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 			vboxParams = new VBoxStyleParams(
 					get( "background", Painter.class, null ),
 					get( "cursor", Cursor.class, null ),
-					get( "vboxSpacing", Double.class, 0.0 ) );
+					getNonNull( "vboxSpacing", Double.class, 0.0 ) );
 		}
 		return vboxParams;
 	}

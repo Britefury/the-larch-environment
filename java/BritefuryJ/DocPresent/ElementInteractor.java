@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent;
 import java.awt.Graphics2D;
 
 import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.ContextMenu.ContextMenu;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
@@ -31,6 +32,11 @@ public abstract class ElementInteractor
 	}
 	
 	public boolean onButtonUp(DPWidget element, PointerButtonEvent event)
+	{
+		return false;
+	}
+	
+	public boolean onContextButton(DPWidget element, ContextMenu menu)
 	{
 		return false;
 	}

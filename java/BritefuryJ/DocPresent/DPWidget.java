@@ -8,6 +8,7 @@
 package BritefuryJ.DocPresent;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Shape;
@@ -22,6 +23,7 @@ import java.util.WeakHashMap;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.ContextMenu.ContextMenu;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
@@ -60,6 +62,15 @@ import BritefuryJ.Utils.HashUtils;
 abstract public class DPWidget extends PointerInputElement
 {
 	protected static double NON_TYPESET_CHILD_BASELINE_OFFSET = -5.0;
+	
+	
+	public static class ContextMenuFactory
+	{
+		public boolean buildContextMenu(ContextMenu menu)
+		{
+			return false;
+		}
+	}
 
 
 	//
@@ -166,7 +177,8 @@ abstract public class DPWidget extends PointerInputElement
 		private ElementLinearRepresentationListener linearRepresentationListener;		// Move this and the next one into an 'interactor' element
 		private ElementKeyboardListener keyboardListener;
 		
-		private ElementInteractor interactor;
+		private ArrayList<ElementInteractor> interactors;
+		private ArrayList<ContextMenuFactory> contextFactories;
 		
 		
 		
@@ -175,9 +187,53 @@ abstract public class DPWidget extends PointerInputElement
 		}
 		
 		
+		public void addInteractor(ElementInteractor interactor)
+		{
+			if ( interactors == null )
+			{
+				interactors = new ArrayList<ElementInteractor>();
+			}
+			interactors.add( interactor );
+		}
+		
+		public void removeInteractor(ElementInteractor interactor)
+		{
+			if ( interactors != null )
+			{
+				interactors.remove( interactor );
+				if ( interactors.isEmpty() )
+				{
+					interactors = null;
+				}
+			}
+		}
+		
+		
+		public void addContextMenuFactory(ContextMenuFactory contextFactory)
+		{
+			if ( contextFactories == null )
+			{
+				contextFactories = new ArrayList<ContextMenuFactory>();
+			}
+			contextFactories.add( contextFactory );
+		}
+		
+		public void removeContextMenuFactory(ContextMenuFactory contextFactory)
+		{
+			if ( contextFactories != null )
+			{
+				contextFactories.remove( contextFactory );
+				if ( contextFactories.isEmpty() )
+				{
+					contextFactories = null;
+				}
+			}
+		}
+		
+		
 		public boolean isIdentity()
 		{
-			return dndHandler == null  &&  linearRepresentationListener == null  &&    keyboardListener == null  &&  interactor == null;
+			return dndHandler == null  &&  linearRepresentationListener == null  &&    keyboardListener == null  &&  interactors == null  &&  contextFactories == null;
 		}
 	}
 
@@ -193,8 +249,9 @@ abstract public class DPWidget extends PointerInputElement
 	protected final static int FLAG_REALISED = 0x1;
 	protected final static int FLAG_RESIZE_QUEUED = 0x2;
 	protected final static int FLAG_SIZE_UP_TO_DATE = 0x4;
+	protected final static int FLAG_CARET_GRABBED = 0x8;
 
-	protected final static int _ALIGN_SHIFT = 3;
+	protected final static int _ALIGN_SHIFT = 4;
 	protected final static int _ALIGN_MASK = ElementAlignment._ELEMENTALIGN_MASK  <<  _ALIGN_SHIFT;
 	protected final static int _HALIGN_MASK = ElementAlignment._HALIGN_MASK  <<  _ALIGN_SHIFT;
 	protected final static int _VALIGN_MASK = ElementAlignment._VALIGN_MASK  <<  _ALIGN_SHIFT;
@@ -203,7 +260,7 @@ abstract public class DPWidget extends PointerInputElement
 	
 	protected int flags;
 	
-	protected WidgetStyleParams styleParams;									// Not needed for all elements; consider factoring out
+	protected WidgetStyleParams styleParams;
 	protected DPContainer parent;
 	protected DPPresentationArea presentationArea;
 	
@@ -212,9 +269,9 @@ abstract public class DPWidget extends PointerInputElement
 	private InteractionFields interactionFields;
 
 	protected DPWidget metaElement;
-	protected String debugName;											// Move into 'waypoint' element; only used there 
+	protected String debugName; 
 	
-	protected StructuralRepresentation structuralRepresentation;					// Move into 'waypoint' element
+	protected StructuralRepresentation structuralRepresentation;
 	
 	
 	
@@ -871,16 +928,21 @@ abstract public class DPWidget extends PointerInputElement
 	}
 	
 	
-	public boolean isInSubtreeRootedAt(DPContainer r)
+	public boolean isInSubtreeRootedAt(DPWidget r)
 	{
-		DPWidget w = this;
+		DPWidget e = this;
 		
-		while ( w != null  &&  w != r )
+		while ( e != null )
 		{
-			w = w.getParent();
+			if ( e == r )
+			{
+				return true;
+			}
+			
+			e = e.getParent();
 		}
 		
-		return w == r;
+		return false;
 	}
 	
 	
@@ -1245,6 +1307,15 @@ abstract public class DPWidget extends PointerInputElement
 	
 	protected void handleUnrealise(DPWidget unrealiseRoot)
 	{
+		if ( testFlag( FLAG_CARET_GRABBED ) )
+		{
+			if ( presentationArea != null )
+			{
+				presentationArea.caretUngrab( this );
+			}
+			clearFlag( FLAG_CARET_GRABBED );
+		}
+		
 		if ( presentationArea != null )
 		{
 			presentationArea.elementUnrealised( this );
@@ -1256,20 +1327,26 @@ abstract public class DPWidget extends PointerInputElement
 	protected void handleDrawBackground(Graphics2D graphics, AABox2 areaBox)
 	{
 		drawBackground( graphics );
-		ElementInteractor interactor = getInteractor();
-		if ( interactor != null )
+		List<ElementInteractor> interactors = getInteractors();
+		if ( interactors != null )
 		{
-			interactor.drawBackground( this, graphics );
+			for (ElementInteractor interactor: interactors)
+			{
+				interactor.drawBackground( this, graphics );
+			}
 		}
 	}
 	
 	protected void handleDraw(Graphics2D graphics, AABox2 areaBox)
 	{
 		draw( graphics );
-		ElementInteractor interactor = getInteractor();
-		if ( interactor != null )
+		List<ElementInteractor> interactors = getInteractors();
+		if ( interactors != null )
 		{
-			interactor.draw( this, graphics );
+			for (ElementInteractor interactor: interactors)
+			{
+				interactor.draw( this, graphics );
+			}
 		}
 	}
 	
@@ -1301,6 +1378,30 @@ abstract public class DPWidget extends PointerInputElement
 	// POINTER INPUT ELEMENT METHODS
 	//
 	//
+	
+	
+	protected Cursor getCursor()
+	{
+		return styleParams.getCursor();
+	}
+	
+	protected Cursor getAncestorCursor()
+	{
+		DPWidget w = getParent();
+		while ( w != null )
+		{
+			Cursor cursor = w.getCursor();
+			if ( cursor != null )
+			{
+				return cursor;
+			}
+			
+			w = w.getParent();
+		}
+		
+		return null;
+	}
+	
 
 	protected boolean handlePointerButtonDown(PointerButtonEvent event)
 	{
@@ -1308,12 +1409,16 @@ abstract public class DPWidget extends PointerInputElement
 		{
 			return true;
 		}
-		ElementInteractor interactor = getInteractor();
-		if ( interactor != null )
+		List<ElementInteractor> interactors = getInteractors();
+		boolean bResult = false;
+		if ( interactors != null )
 		{
-			return interactor.onButtonDown( this, event );
+			for (ElementInteractor interactor: interactors)
+			{
+				bResult = bResult || interactor.onButtonDown( this, event );
+			}
 		}
-		return false;
+		return bResult;
 	}
 	
 	protected boolean handlePointerButtonDown2(PointerButtonEvent event)
@@ -1322,12 +1427,16 @@ abstract public class DPWidget extends PointerInputElement
 		{
 			return true;
 		}
-		ElementInteractor interactor = getInteractor();
-		if ( interactor != null )
+		List<ElementInteractor> interactors = getInteractors();
+		boolean bResult = false;
+		if ( interactors != null )
 		{
-			return interactor.onButtonDown( this, event );
+			for (ElementInteractor interactor: interactors)
+			{
+				bResult = bResult || interactor.onButtonDown2( this, event );
+			}
 		}
-		return false;
+		return bResult;
 	}
 	
 	protected boolean handlePointerButtonDown3(PointerButtonEvent event)
@@ -1336,12 +1445,16 @@ abstract public class DPWidget extends PointerInputElement
 		{
 			return true;
 		}
-		ElementInteractor interactor = getInteractor();
-		if ( interactor != null )
+		List<ElementInteractor> interactors = getInteractors();
+		boolean bResult = false;
+		if ( interactors != null )
 		{
-			return interactor.onButtonDown( this, event );
+			for (ElementInteractor interactor: interactors)
+			{
+				bResult = bResult || interactor.onButtonDown3( this, event );
+			}
 		}
-		return false;
+		return bResult;
 	}
 	
 	protected boolean handlePointerButtonUp(PointerButtonEvent event)
@@ -1350,51 +1463,99 @@ abstract public class DPWidget extends PointerInputElement
 		{
 			return true;
 		}
-		ElementInteractor interactor = getInteractor();
-		if ( interactor != null )
+		List<ElementInteractor> interactors = getInteractors();
+		boolean bResult = false;
+		if ( interactors != null )
 		{
-			return interactor.onButtonDown( this, event );
+			for (ElementInteractor interactor: interactors)
+			{
+				bResult = bResult || interactor.onButtonUp( this, event );
+			}
 		}
-		return false;
+		return bResult;
+	}
+	
+	protected boolean handlePointerContextButton(ContextMenu menu)
+	{
+		List<ContextMenuFactory> contextFactories = getContextMenuFactories();
+		boolean bResult = false;
+		if ( contextFactories != null )
+		{
+			for (ContextMenuFactory contextFactory: contextFactories)
+			{
+				bResult = bResult || contextFactory.buildContextMenu( menu );
+			}
+		}
+		return bResult;
 	}
 	
 	protected void handlePointerMotion(PointerMotionEvent event)
 	{
 		onMotion( event );
-		ElementInteractor interactor = getInteractor();
-		if ( interactor != null )
+		List<ElementInteractor> interactors = getInteractors();
+		if ( interactors != null )
 		{
-			interactor.onMotion( this, event );
+			for (ElementInteractor interactor: interactors)
+			{
+				interactor.onMotion( this, event );
+			}
 		}
 	}
 	
 	protected void handlePointerDrag(PointerMotionEvent event)
 	{
 		onDrag( event );
-		ElementInteractor interactor = getInteractor();
-		if ( interactor != null )
+		List<ElementInteractor> interactors = getInteractors();
+		if ( interactors != null )
 		{
-			interactor.onDrag( this, event );
+			for (ElementInteractor interactor: interactors)
+			{
+				interactor.onDrag( this, event );
+			}
 		}
 	}
 	
 	protected void handlePointerEnter(PointerMotionEvent event)
 	{
-		onEnter( event );
-		ElementInteractor interactor = getInteractor();
-		if ( interactor != null )
+		Cursor cursor = getCursor();
+		if ( cursor != null )
 		{
-			interactor.onEnter( this, event );
+			getPresentationArea().setPointerCursor( cursor );
+		}
+		onEnter( event );
+		List<ElementInteractor> interactors = getInteractors();
+		if ( interactors != null )
+		{
+			for (ElementInteractor interactor: interactors)
+			{
+				interactor.onEnter( this, event );
+			}
 		}
 	}
 	
 	protected void handlePointerLeave(PointerMotionEvent event)
 	{
-		onLeave( event );
-		ElementInteractor interactor = getInteractor();
-		if ( interactor != null )
+		Cursor cursor = getCursor();
+		if ( cursor != null )
 		{
-			interactor.onLeave( this, event );
+			Cursor ancestorCursor = getAncestorCursor();
+			if ( ancestorCursor != null )
+			{
+				getPresentationArea().setPointerCursor( ancestorCursor );
+			}
+			else
+			{
+				getPresentationArea().setPointerCursorDefault();
+			}
+		}
+		onLeave( event );
+		List<ElementInteractor> interactors = getInteractors();
+		if ( interactors != null )
+		{
+			for (ElementInteractor interactor: interactors)
+			{
+				interactor.onLeave( this, event );
+			}
 		}
 	}
 	
@@ -1415,12 +1576,16 @@ abstract public class DPWidget extends PointerInputElement
 		{
 			return true;
 		}
-		ElementInteractor interactor = getInteractor();
-		if ( interactor != null )
+		List<ElementInteractor> interactors = getInteractors();
+		boolean bResult = false;
+		if ( interactors != null )
 		{
-			return interactor.onScroll( this, event );
+			for (ElementInteractor interactor: interactors)
+			{
+				bResult = bResult || interactor.onScroll( this, event );
+			}
 		}
-		return false;
+		return bResult;
 	}
 	
 	
@@ -1469,7 +1634,7 @@ abstract public class DPWidget extends PointerInputElement
 	
 	//
 	//
-	// CARET EVENT METHODS
+	// CARET METHODS
 	//
 	//
 	
@@ -1485,20 +1650,46 @@ abstract public class DPWidget extends PointerInputElement
 	protected void handleCaretEnter(Caret c)
 	{
 		onCaretEnter( c );
-		ElementInteractor interactor = getInteractor();
-		if ( interactor != null )
+		List<ElementInteractor> interactors = getInteractors();
+		if ( interactors != null )
 		{
-			interactor.onCaretEnter( this, c );
+			for (ElementInteractor interactor: interactors)
+			{
+				interactor.onCaretEnter( this, c );
+			}
 		}
 	}
 	
 	protected void handleCaretLeave(Caret c)
 	{
 		onCaretLeave( c );
-		ElementInteractor interactor = getInteractor();
-		if ( interactor != null )
+		List<ElementInteractor> interactors = getInteractors();
+		if ( interactors != null )
 		{
-			interactor.onCaretLeave( this, c );
+			for (ElementInteractor interactor: interactors)
+			{
+				interactor.onCaretLeave( this, c );
+			}
+		}
+	}
+	
+	
+	
+	public void grabCaret()
+	{
+		if ( isRealised() )
+		{
+			setFlag( FLAG_CARET_GRABBED );
+			getPresentationArea().caretGrab( this );
+		}
+	}
+	
+	public void ungrabCaret()
+	{
+		if ( isRealised()  &&  testFlag( FLAG_CARET_GRABBED ) )
+		{
+			getPresentationArea().caretUngrab( this );
+			clearFlag( FLAG_CARET_GRABBED );
 		}
 	}
 
@@ -1588,16 +1779,55 @@ abstract public class DPWidget extends PointerInputElement
 	//
 	//
 	
-	public void setInteractor(ElementInteractor interactor)
+	public void addInteractor(ElementInteractor interactor)
 	{
 		ensureValidInteractionFields();
-		interactionFields.interactor = interactor;
+		interactionFields.addInteractor( interactor );
 		notifyInteractionFieldsModified();
 	}
 	
-	public ElementInteractor getInteractor()
+	public void removeInteractor(ElementInteractor interactor)
 	{
-		return interactionFields != null  ?  interactionFields.interactor  :  null;
+		if ( interactionFields != null )
+		{
+			interactionFields.removeInteractor( interactor );
+			notifyInteractionFieldsModified();
+		}
+	}
+	
+	public ArrayList<ElementInteractor> getInteractors()
+	{
+		return interactionFields != null  ?  interactionFields.interactors  :  null;
+	}
+	
+	
+	
+	
+	//
+	//
+	// CONTEXT MENU FACTORY METHODS
+	//
+	//
+	
+	public void addContextMenuFactory(ContextMenuFactory contextFactory)
+	{
+		ensureValidInteractionFields();
+		interactionFields.addContextMenuFactory( contextFactory );
+		notifyInteractionFieldsModified();
+	}
+	
+	public void removeContextMenuFactory(ContextMenuFactory contextFactory)
+	{
+		if ( interactionFields != null )
+		{
+			interactionFields.removeContextMenuFactory( contextFactory );
+			notifyInteractionFieldsModified();
+		}
+	}
+	
+	public ArrayList<ContextMenuFactory> getContextMenuFactories()
+	{
+		return interactionFields != null  ?  interactionFields.contextFactories  :  null;
 	}
 	
 	

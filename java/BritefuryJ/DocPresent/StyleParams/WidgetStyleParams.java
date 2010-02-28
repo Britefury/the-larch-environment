@@ -17,13 +17,13 @@ public class WidgetStyleParams
 	
 	
 	private final Painter background;
-	private final Cursor pointerCursor;
+	private final Cursor cursor;
 	
 	
 	public WidgetStyleParams(Painter background, Cursor pointerCursor)
 	{
 		this.background = background;
-		this.pointerCursor = pointerCursor;
+		this.cursor = pointerCursor;
 	}
 	
 	
@@ -32,8 +32,8 @@ public class WidgetStyleParams
 		return background;
 	}
 	
-	public Cursor getPointerCursor()
+	public Cursor getCursor()
 	{
-		return pointerCursor;
+		return cursor;
 	}
 }

@@ -16,7 +16,7 @@ import BritefuryJ.DocPresent.Painter.Painter;
 public class LinkStyleParams extends StaticTextStyleParams
 {
 	private static final Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
-	public static final LinkStyleParams defaultStyleParams = new LinkStyleParams( null, null, defaultFont, Color.blue, false );
+	public static final LinkStyleParams defaultStyleParams = new LinkStyleParams( null, new Cursor( Cursor.HAND_CURSOR ), defaultFont, Color.blue, false );
 
 
 	public LinkStyleParams(Painter background, Cursor pointerCursor, Font font, Paint textPaint, boolean bMixedSizeCaps)

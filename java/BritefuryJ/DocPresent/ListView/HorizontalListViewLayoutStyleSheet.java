@@ -12,6 +12,7 @@ import java.util.List;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class HorizontalListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 {
@@ -24,7 +25,7 @@ public class HorizontalListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 	}
 	
 	
-	public Object newInstance()
+	protected StyleSheet newInstance()
 	{
 		return new HorizontalListViewLayoutStyleSheet();
 	}

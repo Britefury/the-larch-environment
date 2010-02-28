@@ -340,7 +340,7 @@ public class NodeView implements ElementContext
 		nodeBinWidget = styleSheet.box( nodeBoxWidget );
 		
 		nodeInteractor = new NodeInteractor( this, nodeBinWidget );
-		nodeBinWidget.setInteractor( nodeInteractor );
+		nodeBinWidget.addInteractor( nodeInteractor );
 		
 		return styleSheet.withBorder( nodeBorder ).border( nodeBinWidget );
 	}

@@ -17,6 +17,7 @@ import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
+import BritefuryJ.DocPresent.ContextMenu.ContextMenu;
 import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
@@ -217,6 +218,11 @@ public abstract class DrawingNode extends PointerInputElement
 	}
 	
 	protected boolean handlePointerButtonUp(PointerButtonEvent event)
+	{
+		return false;
+	}
+	
+	protected boolean handlePointerContextButton(ContextMenu menu)
 	{
 		return false;
 	}

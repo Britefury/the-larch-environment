@@ -342,7 +342,7 @@ public class TextVisual
 				if ( bMixedSizeCaps )
 				{
 					Font upperCaseFont = font;
-					Font lowerCaseFont = upperCaseFont.deriveFont( upperCaseFont.getSize2D() * 0.75f );
+					Font lowerCaseFont = upperCaseFont.deriveFont( upperCaseFont.getSize2D() * 0.8f );
 
 					MixedSizeCapsAttributedCharacterIterator charIter = new MixedSizeCapsAttributedCharacterIterator( text, lowerCaseFont, upperCaseFont );
 					layout = new TextLayout( charIter, frc );
