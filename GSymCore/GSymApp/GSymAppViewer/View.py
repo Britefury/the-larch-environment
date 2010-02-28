@@ -29,34 +29,8 @@ from BritefuryJ.DocPresent.StyleSheet import *
 from BritefuryJ.GSym.View import GSymViewContext
 
 
-from GSymCore.GSymApp.Styles import *
 from GSymCore.GSymApp import NodeClasses as Nodes
-
-
-
-class NameTextRepListener (ElementLinearRepresentationListener):
-	
-	def __init__(self):
-		pass
-
-	def textRepresentationModified(self, element, event):
-		value = element.getTextRepresentation()
-		ctx = element.getContext()
-		node = ctx.getDocNode()
-		node['name'] = value
-		return True
-
-_nameTextRepListener = NameTextRepListener()	
-
-
-
-def nameEditor(styleSheet, node, state, style):
-	name = node['name']
-	
-	text = styleSheet.text( style, name )
-	text.setLinearRepresentationListener( _nameTextRepListener )
-	return text
-
+from GSymCore.GSymApp.GSymAppViewer.GSymAppViewerStyleSheet import GSymAppViewerStyleSheet
 
 
 
@@ -128,7 +102,7 @@ class AppView (GSymViewObjectNodeDispatch):
 		
 	@ObjectNodeDispatchMethod( Nodes.AppState )
 	def AppState(self, ctx, styleSheet, state, node, openDocuments, configuration):
-		def _onNew(link, buttonEvent):
+		def _onNew():
 			def handleNewDocumentFn(unit):
 				world = self._app.getWorld()
 				
@@ -148,7 +122,7 @@ class AppView (GSymViewObjectNodeDispatch):
 		
 			
 			
-		def _onOpen(link, buttonEvent):
+		def _onOpen():
 			def handleOpenedDocumentFn(fullPath, document):
 				world = self._app.getWorld()
 				
@@ -166,40 +140,16 @@ class AppView (GSymViewObjectNodeDispatch):
 			
 			return True
 
-			
 		
-		linkStyle = app_linkStyle( styleSheet )
-		controlsStyle = app_openDocumentsControlsStyle( styleSheet )
-		openDocStyle = app_openDocumentsStyle( styleSheet )
-		contentsStyle = app_contentBoxStyle( styleSheet )
+		openDocViews = ctx.mapViewEval( openDocuments, styleSheet, _AppViewState( '' ) )
 		
-		systemLink = linkStyle.link( 'SYSTEM PAGE', 'system' )
-		linkHeader = app_linkHeaderStyle.linkHeaderBar( [ systemLink ] )
-		
-		title = app_titleStyle.titleBar( 'gSym' )
-		
-		newLink = linkStyle.link( 'NEW', _onNew )
-		openLink = linkStyle.link( 'OPEN', _onOpen )
-		controlsBox = controlsStyle.hbox( [ newLink.padX( 5.0 ), openLink.padX( 5.0 ) ] )
-		controlsBorder = controlsStyle.border( controlsBox )
-		
-		openDocumentsSeparatingLine = openDocStyle.line()
-		
-		docListBox = openDocStyle.rgrid( ctx.mapViewEval( openDocuments, styleSheet, _AppViewState( '' ) ) )
-
-		openDocumentsContentsBox = openDocStyle.vbox( [ controlsBorder.pad( 2.0, 2.0 ), openDocumentsSeparatingLine.alignHExpand(), docListBox.pad( 10.0, 2.0 ) ] )
-		
-		openDocumentsBox = app_tabbedBoxStyle.tabbedBox( 'Documents', openDocumentsContentsBox )
-		
-		contentBox = contentsStyle.vbox( [ linkHeader, title, openDocumentsBox.pad( 10.0, 10.0 ).alignHLeft() ] )
-		
-		return contentBox.alignHExpand()
+		return styleSheet.appState( openDocViews, _onNew, _onOpen )
 
 
 
 	@ObjectNodeDispatchMethod( Nodes.AppDocument )
 	def AppDocument(self, ctx, styleSheet, state, node, name, location):
-		def _onSave(link, buttonEvent):
+		def _onSave():
 			world = self._app.getWorld()
 			document = world.getDocument( location )
 			
@@ -210,11 +160,9 @@ class AppView (GSymViewObjectNodeDispatch):
 				self._app.promptSaveDocumentAs( handleSaveDocumentAsFn )
 			else:
 				document.save()
-			
-			return True
 				
 		
-		def _onSaveAs(link, buttonEvent):
+		def _onSaveAs():
 			world = self._app.getWorld()
 			document = world.getDocument( location )
 			
@@ -222,21 +170,12 @@ class AppView (GSymViewObjectNodeDispatch):
 				document.saveAs( filename )
 			
 			self._app.promptSaveDocumentAs( handleSaveDocumentAsFn )
-			
-			return True
 
 			
 			
 		loc, = state
 		
-		docStyle = app_docStyle( styleSheet )
-		
-		
-		docLink = docStyle.border( docStyle.link( name, location ) )
-		saveLink = docStyle.link( 'SAVE', _onSave )
-		saveAsLink = docStyle.link( 'SAVE AS', _onSaveAs )
-
-		return docStyle.gridRow( [ docLink, saveLink, saveAsLink ] )
+		return styleSheet.appDocument( name, location, _onSave, _onSaveAs )
 
 
 
@@ -245,7 +184,7 @@ class AppView (GSymViewObjectNodeDispatch):
 
 
 def viewGSymAppDocNodeAsElement(document, docRootNode, resolveContext, location, commandHistory, app):
-	viewContext = GSymViewContext( docRootNode, AppView( document, app ), PrimitiveStyleSheet.instance, commandHistory )
+	viewContext = GSymViewContext( docRootNode, AppView( document, app ), GSymAppViewerStyleSheet.instance, commandHistory )
 	return viewContext.getFrame()
 
 

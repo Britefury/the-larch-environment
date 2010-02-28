@@ -8,7 +8,7 @@
 from Britefury.gSym.gSymUnitClass import GSymUnitClass
 from Britefury.gSym.gSymDocument import gSymUnit
 
-from GSymCore.GSymApp.View import viewGSymAppDocNodeAsElement, viewGSymAppDocNodeAsPage, resolveGSymAppLocation
+from GSymCore.GSymApp.GSymAppViewer.View import viewGSymAppDocNodeAsElement, viewGSymAppDocNodeAsPage, resolveGSymAppLocation
 from GSymCore.GSymApp import NodeClasses as Nodes
 
 

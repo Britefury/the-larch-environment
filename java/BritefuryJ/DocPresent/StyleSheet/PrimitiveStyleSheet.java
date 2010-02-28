@@ -34,6 +34,7 @@ import BritefuryJ.DocPresent.DPParagraphIndentMarker;
 import BritefuryJ.DocPresent.DPParagraphStructureSpan;
 import BritefuryJ.DocPresent.DPProxy;
 import BritefuryJ.DocPresent.DPRGrid;
+import BritefuryJ.DocPresent.DPRectangle;
 import BritefuryJ.DocPresent.DPScript;
 import BritefuryJ.DocPresent.DPSegment;
 import BritefuryJ.DocPresent.DPSpan;
@@ -47,6 +48,7 @@ import BritefuryJ.DocPresent.EditHandler;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Canvas.DrawingNode;
+import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.Painter.Painter;
 import BritefuryJ.DocPresent.StyleParams.ButtonStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
@@ -59,6 +61,7 @@ import BritefuryJ.DocPresent.StyleParams.LinkStyleParams;
 import BritefuryJ.DocPresent.StyleParams.MathRootStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ParagraphStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ScriptStyleParams;
+import BritefuryJ.DocPresent.StyleParams.ShapeStyleParams;
 import BritefuryJ.DocPresent.StyleParams.StaticTextStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
@@ -67,6 +70,8 @@ import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
 public class PrimitiveStyleSheet extends StyleSheet
 {
 	private static final Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
+	
+	private static final Painter default_shapePainter = new FillPainter( Color.black );
 	
 	private static final Border default_border = new SolidBorder( 1.0, 2.0, Color.black, null );
 
@@ -90,6 +95,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 		initAttr( "font", defaultFont );
 		initAttr( "foreground", Color.black );
 		initAttr( "background", null );
+		initAttr( "shapePainter", default_shapePainter );
 		initAttr( "cursor", null );
 
 		initAttr( "border", default_border );
@@ -163,6 +169,11 @@ public class PrimitiveStyleSheet extends StyleSheet
 	public PrimitiveStyleSheet withBackground(Painter background)
 	{
 		return (PrimitiveStyleSheet)withAttr( "background", background );
+	}
+
+	public PrimitiveStyleSheet withShapePainter(Painter shapePainter)
+	{
+		return (PrimitiveStyleSheet)withAttr( "shapePainter", shapePainter );
 	}
 
 	public PrimitiveStyleSheet withCursor(Cursor cursor)
@@ -611,6 +622,21 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 	
 	
+	private ShapeStyleParams rectangleParams = null;
+
+	private ShapeStyleParams getShapeParams()
+	{
+		if ( rectangleParams == null )
+		{
+			rectangleParams = new ShapeStyleParams(
+					get( "background", Painter.class, null ),
+					get( "cursor", Cursor.class, null ),
+					getNonNull( "shapePainter", Painter.class, default_shapePainter ) );
+		}
+		return rectangleParams;
+	}
+	
+	
 	private ScriptStyleParams scriptParams = null;
 
 	private ScriptStyleParams getScriptParams()
@@ -855,6 +881,12 @@ public class PrimitiveStyleSheet extends StyleSheet
 	public DPParagraphDedentMarker paragraphDedentMarker()
 	{
 		return new DPParagraphDedentMarker();
+	}
+	
+	
+	public DPRectangle rectangle(double minWidth, double minHeight)
+	{
+		return new DPRectangle( getShapeParams(), "", minWidth, minHeight );
 	}
 
 	
