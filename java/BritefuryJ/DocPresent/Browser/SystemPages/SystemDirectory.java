@@ -30,6 +30,7 @@ public class SystemDirectory
 		primitiveTestPages.add( new ParagraphCollationTestPage() );
 		primitiveTestPages.add( new ParagraphTestPage() );
 		primitiveTestPages.add( new ProxyAndSpanTestPage() );
+		primitiveTestPages.add( new RectangleTestPage() );
 		primitiveTestPages.add( new ScriptTestPage() );
 		primitiveTestPages.add( new SegmentTestPage() );
 		primitiveTestPages.add( new TableTestPage() );

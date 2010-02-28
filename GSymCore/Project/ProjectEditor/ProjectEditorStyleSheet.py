@@ -23,7 +23,7 @@ class ProjectEditorStyleSheet (StyleSheet):
 	def __init__(self):
 		super( ProjectEditorStyleSheet, self ).__init__()
 		
-		self.initAttr( 'primitiveStyle', PrimitiveStyleSheet.instance.withParagraphIndentation( 60.0 ) )
+		self.initAttr( 'primitiveStyle', PrimitiveStyleSheet.instance )
 		self.initAttr( 'controlsStyle', ControlsStyleSheet.instance )
 		self.initAttr( 'linkHeaderStyle', LinkHeaderStyleSheet.instance )
 		self.initAttr( 'titleBarStyle', TitleBarStyleSheet.instance )
