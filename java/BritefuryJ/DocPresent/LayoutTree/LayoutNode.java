@@ -93,6 +93,16 @@ public abstract class LayoutNode
 		return null;
 	}
 	
+	public DPContentLeafEditable getLeftEditableContentLeaf()
+	{
+		return null;
+	}
+	
+	public DPContentLeafEditable getRightEditableContentLeaf()
+	{
+		return null;
+	}
+	
 	public DPContentLeaf getContentLeafToLeft()
 	{
 		DPWidget element = getElement();

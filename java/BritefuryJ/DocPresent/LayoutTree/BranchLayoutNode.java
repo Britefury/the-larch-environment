@@ -64,6 +64,45 @@ public abstract class BranchLayoutNode extends LayoutNode
 		return null;
 	}
 
+	public DPContentLeafEditable getLeftEditableContentLeaf()
+	{
+		// Check the child nodes
+		List<DPWidget> navList = horizontalNavigationList();
+		if ( navList != null )
+		{
+			for (DPWidget w: navList)
+			{
+				DPContentLeafEditable l = w.getLayoutNode().getLeftEditableContentLeaf();
+				if ( l != null )
+				{
+					return l;
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	public DPContentLeafEditable getRightEditableContentLeaf()
+	{
+		// Check the child nodes
+		List<DPWidget> navList = horizontalNavigationList();
+		if ( navList != null )
+		{
+			for (int i = navList.size() - 1; i >= 0; i--)
+			{
+				DPWidget w = navList.get( i );
+				DPContentLeafEditable l = w.getLayoutNode().getRightEditableContentLeaf();
+				if ( l != null )
+				{
+					return l;
+				}
+			}
+		}
+		
+		return null;
+	}
+
 	public DPContentLeafEditable getTopOrBottomEditableContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace)
 	{
 		List<DPWidget> navList = verticalNavigationList();

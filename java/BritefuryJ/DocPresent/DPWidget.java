@@ -1993,6 +1993,32 @@ abstract public class DPWidget extends PointerInputElement
 		}
 	}
 	
+	public DPContentLeafEditable getLeftEditableContentLeaf()
+	{
+		if ( layoutNode != null )
+		{
+			return layoutNode.getLeftEditableContentLeaf();
+		}
+		else
+		{
+			ArrangedSequenceLayoutNode branchLayout = (ArrangedSequenceLayoutNode)getValidLayoutNodeOfClass( ArrangedSequenceLayoutNode.class );
+			return branchLayout.getLeftEditableContentLeafWithinElement( this );
+		}
+	}
+	
+	public DPContentLeafEditable getRightEditableContentLeaf()
+	{
+		if ( layoutNode != null )
+		{
+			return layoutNode.getRightEditableContentLeaf();
+		}
+		else
+		{
+			ArrangedSequenceLayoutNode branchLayout = (ArrangedSequenceLayoutNode)getValidLayoutNodeOfClass( ArrangedSequenceLayoutNode.class );
+			return branchLayout.getRightEditableContentLeafWithinElement( this );
+		}
+	}
+	
 	public DPContentLeaf getContentLeafToLeft()
 	{
 		if ( layoutNode != null )
