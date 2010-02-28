@@ -8,11 +8,11 @@ package tests.Transformation;
 
 import java.util.Arrays;
 
-import BritefuryJ.DocModel.DMSchema;
 import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMList;
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
+import BritefuryJ.DocModel.DMSchema;
 import BritefuryJ.DocModel.DMSchema.ClassAlreadyDefinedException;
 import BritefuryJ.Transformation.DefaultIdentityTransformationFunction;
 import BritefuryJ.Transformation.TransformationFunction;

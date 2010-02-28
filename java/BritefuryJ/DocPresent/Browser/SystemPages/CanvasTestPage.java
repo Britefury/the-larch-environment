@@ -11,10 +11,9 @@ import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPCanvas;
 import BritefuryJ.DocPresent.DPHBox;
-import BritefuryJ.DocPresent.DPStaticText;
+import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Canvas.DrawingNode;
@@ -134,15 +133,14 @@ public class CanvasTestPage extends SystemPage
 	
 	protected DPWidget makeDestElement(String title)
 	{
-		DPWidget destText = styleSheet.withBackground( new FillPainter( backgroundColour ) ).box( textStyle.text( title ).pad( 10.0, 10.0 ) );
+		final DPText textElement = textStyle.text( title );
+		DPWidget destText = styleSheet.withBackground( new FillPainter( backgroundColour ) ).box( textElement.pad( 10.0, 10.0 ) );
 		
 		SimpleDndHandler.DropFn dropFn = new SimpleDndHandler.DropFn()
 		{
 			public boolean acceptDrop(PointerInputElement destElement, Object data)
 			{
 				String text = (String)data;
-				DPBorder borderElement = (DPBorder)destElement;
-				DPStaticText textElement = (DPStaticText)borderElement.getChild();
 				textElement.setText( text );
 				return true;
 			}
@@ -171,15 +169,14 @@ public class CanvasTestPage extends SystemPage
 	
 	protected DPWidget makeDestElement2(String title, final DPWidget firstElement)
 	{
-		DPWidget destText = styleSheet.withBackground( new FillPainter( backgroundColour ) ).box( textStyle.text( title ).pad( 10.0, 10.0 ) );
+		final DPText textElement = textStyle.text( title );
+		DPWidget destText = styleSheet.withBackground( new FillPainter( backgroundColour ) ).box( textElement.pad( 10.0, 10.0 ) );
 		
 		SimpleDndHandler.DropFn dropFn = new SimpleDndHandler.DropFn()
 		{
 			public boolean acceptDrop(PointerInputElement destElement, Object data)
 			{
 				String text = (String)data;
-				DPBorder borderElement = (DPBorder)destElement;
-				DPStaticText textElement = (DPStaticText)borderElement.getChild();
 				textElement.setText( text );
 				return true;
 			}
@@ -190,8 +187,6 @@ public class CanvasTestPage extends SystemPage
 			public boolean canDrop(PointerInputElement destElement, Object data)
 			{
 				String text = (String)data;
-				DPBorder borderElement = (DPBorder)firstElement;
-				DPStaticText textElement = (DPStaticText)borderElement.getChild();
 				String firstText = textElement.getText();
 				int firstNum = textAsNumber( firstText );
 				int secondNum = textAsNumber( text );

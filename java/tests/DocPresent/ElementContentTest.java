@@ -11,8 +11,8 @@ import java.util.Arrays;
 
 import junit.framework.TestCase;
 import BritefuryJ.DocPresent.DPBin;
-import BritefuryJ.DocPresent.DPHiddenContent;
 import BritefuryJ.DocPresent.DPHBox;
+import BritefuryJ.DocPresent.DPHiddenContent;
 import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPWidget;

@@ -7,9 +7,9 @@
 package tests.DocModel;
 
 import junit.framework.TestCase;
-import BritefuryJ.DocModel.DMSchema;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectField;
+import BritefuryJ.DocModel.DMSchema;
 import BritefuryJ.DocModel.DMSchema.ClassAlreadyDefinedException;
 import BritefuryJ.DocModel.DMSchema.UnknownClassException;
 

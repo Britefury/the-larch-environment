@@ -13,20 +13,15 @@ import java.awt.Paint;
 import java.awt.RadialGradientPaint;
 import java.util.List;
 
-import org.python.core.PyObject;
-
 import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPBorder;
-import BritefuryJ.DocPresent.DPButton;
 import BritefuryJ.DocPresent.DPCanvas;
 import BritefuryJ.DocPresent.DPFraction;
 import BritefuryJ.DocPresent.DPFrame;
 import BritefuryJ.DocPresent.DPGridRow;
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPHiddenContent;
-import BritefuryJ.DocPresent.DPLine;
 import BritefuryJ.DocPresent.DPLineBreak;
-import BritefuryJ.DocPresent.DPLink;
 import BritefuryJ.DocPresent.DPMathRoot;
 import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPParagraphDedentMarker;
@@ -38,7 +33,6 @@ import BritefuryJ.DocPresent.DPRectangle;
 import BritefuryJ.DocPresent.DPScript;
 import BritefuryJ.DocPresent.DPSegment;
 import BritefuryJ.DocPresent.DPSpan;
-import BritefuryJ.DocPresent.DPStaticText;
 import BritefuryJ.DocPresent.DPTable;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
@@ -50,19 +44,15 @@ import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Canvas.DrawingNode;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.Painter.Painter;
-import BritefuryJ.DocPresent.StyleParams.ButtonStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ContentLeafStyleParams;
 import BritefuryJ.DocPresent.StyleParams.FractionStyleParams;
 import BritefuryJ.DocPresent.StyleParams.GridRowStyleParams;
 import BritefuryJ.DocPresent.StyleParams.HBoxStyleParams;
-import BritefuryJ.DocPresent.StyleParams.LineStyleParams;
-import BritefuryJ.DocPresent.StyleParams.LinkStyleParams;
 import BritefuryJ.DocPresent.StyleParams.MathRootStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ParagraphStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ScriptStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ShapeStyleParams;
-import BritefuryJ.DocPresent.StyleParams.StaticTextStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
@@ -78,9 +68,6 @@ public class PrimitiveStyleSheet extends StyleSheet
 	private static final Paint default_buttonBorderPaint = new RadialGradientPaint( -10.0f, -10.0f, 100.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 0.2f, 0.3f, 0.5f ), new Color( 0.3f, 0.45f, 0.75f ) }, RadialGradientPaint.CycleMethod.NO_CYCLE );
 	private static final Paint default_buttonBackgroundPaint = new RadialGradientPaint( -10.0f, -10.0f, 100.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 0.9f, 0.92f, 1.0f ), new Color( 0.75f, 0.825f, 0.9f ) }, RadialGradientPaint.CycleMethod.NO_CYCLE );
 	private static final Paint default_buttonHighlightBackgroundPaint = new RadialGradientPaint( -10.0f, -10.0f, 100.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 1.0f, 1.0f, 1.0f ), new Color( 0.85f, 0.85f, 0.85f ) }, RadialGradientPaint.CycleMethod.NO_CYCLE );
-	
-	private static final Font defaultLinkFont = new Font( "Sans serif", Font.PLAIN, 14 );
-	private static final Cursor defaultLinkCursor = new Cursor( Cursor.HAND_CURSOR );
 	
 
 	
@@ -109,16 +96,6 @@ public class PrimitiveStyleSheet extends StyleSheet
 		initAttr( "fractionRefYOffset", 5.0 );
 		
 		initAttr( "hboxSpacing", 0.0 );
-		
-		initAttr( "lineDirection", LineStyleParams.Direction.HORIZONTAL );
-		initAttr( "lineThickness", 1.0 );
-		initAttr( "lineInset", 0.0 );
-		initAttr( "linePadding", 0.0 );
-		
-		initAttr( "linkFont", defaultLinkFont );
-		initAttr( "linkPaint", Color.blue );
-		initAttr( "linkSmallCaps", false );
-		initAttr( "linkCursor", defaultLinkCursor );
 		
 		initAttr( "mathRootThickness", 1.5 );
 		
@@ -247,58 +224,6 @@ public class PrimitiveStyleSheet extends StyleSheet
 
 	
 
-	//
-	// LINE
-	//
-	
-	public PrimitiveStyleSheet withLineDirection(LineStyleParams.Direction direction)
-	{
-		return (PrimitiveStyleSheet)withAttr( "lineDirection", direction );
-	}
-
-	public PrimitiveStyleSheet withLineThickness(double thickness)
-	{
-		return (PrimitiveStyleSheet)withAttr( "lineThickness", thickness );
-	}
-
-	public PrimitiveStyleSheet withLineInset(double inset)
-	{
-		return (PrimitiveStyleSheet)withAttr( "lineInset", inset );
-	}
-
-	public PrimitiveStyleSheet withLinePadding(double padding)
-	{
-		return (PrimitiveStyleSheet)withAttr( "linePadding", padding );
-	}
-
-	
-
-	//
-	// LINE
-	//
-	
-	public PrimitiveStyleSheet withLinkFont(Font font)
-	{
-		return (PrimitiveStyleSheet)withAttr( "linkFont", font );
-	}
-
-	public PrimitiveStyleSheet withLinkPaint(Paint paint)
-	{
-		return (PrimitiveStyleSheet)withAttr( "linkPaint", paint );
-	}
-
-	public PrimitiveStyleSheet withLinkSmallCaps(boolean smallCaps)
-	{
-		return (PrimitiveStyleSheet)withAttr( "linkSmallCaps", smallCaps );
-	}
-
-	public PrimitiveStyleSheet withLinkCursor(Cursor cursor)
-	{
-		return (PrimitiveStyleSheet)withAttr( "linkCursor", cursor );
-	}
-
-
-	
 	//
 	// MATH ROOT
 	//
@@ -446,22 +371,6 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 
 	
-	private ButtonStyleParams buttonParams = null;
-
-	private ButtonStyleParams getButtonParams()
-	{
-		if ( buttonParams == null )
-		{
-			buttonParams = new ButtonStyleParams(
-					get( "background", Painter.class, null ),
-					get( "cursor", Cursor.class, null ),
-					get( "buttonBorderPaint", Paint.class, default_buttonBorderPaint ),
-					get( "buttonBackgroundPaint", Paint.class, default_buttonBackgroundPaint ), get( "buttonHighlightBackgroundPaint", Paint.class, default_buttonHighlightBackgroundPaint ) );
-		}
-		return buttonParams;
-	}
-
-	
 	private ContainerStyleParams containerParams = null;
 
 	private ContainerStyleParams getContainerParams()
@@ -553,41 +462,6 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 
 	
-	private LineStyleParams lineParams = null;
-
-	private LineStyleParams getLineParams()
-	{
-		if ( lineParams == null )
-		{
-			lineParams = new LineStyleParams(
-					get( "background", Painter.class, null ),
-					get( "cursor", Cursor.class, null ),
-					getNonNull( "lineDirection", LineStyleParams.Direction.class, LineStyleParams.Direction.HORIZONTAL ),
-					getNonNull( "foreground", Paint.class, Color.black ),
-					getNonNull( "lineThickness", Double.class, 1.0 ),
-					getNonNull( "lineInset", Double.class, 0.0 ), get( "linePadding", Double.class, 0.0 ) );
-		}
-		return lineParams;
-	}
-	
-	
-	private LinkStyleParams linkParams = null;
-
-	private LinkStyleParams getLinkParams()
-	{
-		if ( linkParams == null )
-		{
-			linkParams = new LinkStyleParams(
-					get( "background", Painter.class, null ),
-					get( "linkCursor", Cursor.class, null ),
-					getNonNull( "linkFont", Font.class, defaultLinkFont ),
-					getNonNull( "linkPaint", Paint.class, Color.black ),
-					getNonNull( "linkSmallCaps", Boolean.class, false ) );
-		}
-		return linkParams;
-	}
-	
-	
 	private MathRootStyleParams mathRootParams = null;
 
 	private MathRootStyleParams getMathRootParams()
@@ -653,17 +527,19 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 	
 	
-	private StaticTextStyleParams staticTextParams = null;
+	private TextStyleParams staticTextParams = null;
 
-	private StaticTextStyleParams getStaticTextParams()
+	private TextStyleParams getStaticTextParams()
 	{
 		if ( staticTextParams == null )
 		{
-			staticTextParams = new StaticTextStyleParams(
+			staticTextParams = new TextStyleParams(
 					get( "background", Painter.class, null ),
 					get( "cursor", Cursor.class, null ),
+					false,
 					getNonNull( "font", Font.class, defaultFont ),
 					getNonNull( "foreground", Paint.class, Color.black ),
+					get( "textSquiggleUnderlinePaint", Paint.class, null ),
 					getNonNull( "textSmallCaps", Boolean.class, false ) );
 		}
 		return staticTextParams;
@@ -737,24 +613,15 @@ public class PrimitiveStyleSheet extends StyleSheet
 		return border;
 	}
 	
-	public DPButton button(DPButton.ButtonListener listener, DPWidget child)
-	{
-		DPButton element = new DPButton( getButtonParams(), listener );
-		element.setChild( child );
-		return element;
-	}
-	
-	public DPButton button(PyObject listener, DPWidget child)
-	{
-		DPButton element = new DPButton( getButtonParams(), listener );
-		element.setChild( child );
-		return element;
-	}
-	
 	
 	public DPCanvas canvas(DrawingNode drawing, double width, double height, boolean bShrinkX, boolean bShrinkY)
 	{
-		return new DPCanvas( drawing, width, height, bShrinkX, bShrinkY );
+		return canvas( drawing, width, height, bShrinkX, bShrinkY, "" );
+	}
+	
+	public DPCanvas canvas(DrawingNode drawing, double width, double height, boolean bShrinkX, boolean bShrinkY, String textRepresentation)
+	{
+		return new DPCanvas( textRepresentation, drawing, width, height, bShrinkX, bShrinkY );
 	}
 	
 	
@@ -796,28 +663,6 @@ public class PrimitiveStyleSheet extends StyleSheet
 		return element;
 	}
 
-	
-	public DPLine line()
-	{
-		return new DPLine( getLineParams() );
-	}
-	
-
-	public DPLink link(String txt, String targetLocation)
-	{
-		return new DPLink( getLinkParams(), txt, targetLocation );
-	}
-	
-	public DPLink link(String txt, DPLink.LinkListener listener)
-	{
-		return new DPLink( getLinkParams(), txt, listener );
-	}
-	
-	public DPLink link(String txt, PyObject listener)
-	{
-		return new DPLink( getLinkParams(), txt, listener );
-	}
-	
 	
 	public DPMathRoot mathRoot(DPWidget child)
 	{
@@ -943,9 +788,9 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 	
 	
-	public DPStaticText staticText(String txt)
+	public DPText staticText(String txt)
 	{
-		return new DPStaticText( getStaticTextParams(), txt );
+		return new DPText( getStaticTextParams(), txt );
 	}
 	
 	

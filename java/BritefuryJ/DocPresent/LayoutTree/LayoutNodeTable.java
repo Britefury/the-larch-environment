@@ -10,7 +10,6 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPTable;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
 import BritefuryJ.DocPresent.WidgetFilter;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
@@ -19,6 +18,7 @@ import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
 import BritefuryJ.DocPresent.Layout.TableLayout;
 import BritefuryJ.DocPresent.Layout.TableLayout.TablePackingParams;
+import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
 import BritefuryJ.Math.Point2;
 
 public class LayoutNodeTable extends ArrangedLayoutNode

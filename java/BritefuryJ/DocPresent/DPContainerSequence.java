@@ -11,10 +11,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import org.python.core.PySlice;
 
 import BritefuryJ.DocPresent.Layout.LAllocV;
+import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.JythonInterface.JythonIndex;
 import BritefuryJ.JythonInterface.JythonSlice;
 

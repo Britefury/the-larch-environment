@@ -9,10 +9,10 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Font;
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.DPLink;
 import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Browser.Page;
+import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public abstract class SystemPage extends Page
@@ -39,6 +39,7 @@ public abstract class SystemPage extends Page
 	
 
 	private static final PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
+	private static final ControlsStyleSheet controlsStyleSheet = ControlsStyleSheet.instance;
 
 	
 	
@@ -64,9 +65,9 @@ public abstract class SystemPage extends Page
 	}
 
 
-	protected DPLink createLink()
+	protected DPWidget createLink()
 	{
-		return new DPLink( getTitle(), getLocation() );
+		return controlsStyleSheet.link( getTitle(), getLocation() ).getElement();
 	}
 	
 	

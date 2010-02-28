@@ -6,12 +6,12 @@
 //##************************
 package tests.Transformation;
 
-import BritefuryJ.DocModel.DMSchema;
 import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
-import BritefuryJ.DocModel.DMSchema.ClassAlreadyDefinedException;
+import BritefuryJ.DocModel.DMSchema;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
+import BritefuryJ.DocModel.DMSchema.ClassAlreadyDefinedException;
 import BritefuryJ.Transformation.DefaultIdentityTransformationFunction;
 import BritefuryJ.Transformation.Transformation;
 import BritefuryJ.Transformation.TransformationFunction;

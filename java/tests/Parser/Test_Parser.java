@@ -11,11 +11,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMSchema;
 import BritefuryJ.DocModel.DMSchemaResolver;
-import BritefuryJ.DocModel.DMObjectClass;
-import BritefuryJ.DocModel.DMSchema.ClassAlreadyDefinedException;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
+import BritefuryJ.DocModel.DMSchema.ClassAlreadyDefinedException;
 import BritefuryJ.Parser.Action;
 import BritefuryJ.Parser.AnyList;
 import BritefuryJ.Parser.AnyNode;

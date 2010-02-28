@@ -10,9 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import BritefuryJ.DocModel.DMSchemaResolver;
 import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMIOReader;
+import BritefuryJ.DocModel.DMSchemaResolver;
 import BritefuryJ.DocModel.DMIOReader.BadModuleNameException;
 import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
 import BritefuryJ.DocModel.DMSchema.UnknownClassException;

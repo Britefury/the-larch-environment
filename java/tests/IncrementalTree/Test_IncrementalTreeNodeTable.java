@@ -8,12 +8,12 @@ package tests.IncrementalTree;
 
 import java.util.Arrays;
 
+import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMList;
 import BritefuryJ.IncrementalTree.IncrementalTree;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 import BritefuryJ.IncrementalTree.IncrementalTreeNodeTable;
 import BritefuryJ.IncrementalTree.IncrementalTree.DuplicatePolicy;
-import junit.framework.TestCase;
 
 public abstract class Test_IncrementalTreeNodeTable extends TestCase
 {

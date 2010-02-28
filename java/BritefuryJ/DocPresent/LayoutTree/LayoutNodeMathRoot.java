@@ -10,11 +10,11 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPMathRoot;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.StyleParams.MathRootStyleParams;
 import BritefuryJ.DocPresent.WidgetFilter;
 import BritefuryJ.DocPresent.Layout.LAllocHelper;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
+import BritefuryJ.DocPresent.StyleParams.MathRootStyleParams;
 import BritefuryJ.Math.Point2;
 
 public class LayoutNodeMathRoot extends ArrangedLayoutNode

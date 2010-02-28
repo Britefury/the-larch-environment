@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import BritefuryJ.DocModel.DMSchemaResolver;
 import org.python.core.Py;
 import org.python.core.PyInteger;
 import org.python.core.PySlice;
@@ -22,6 +21,7 @@ import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.DocModel.DMIOReader;
 import BritefuryJ.DocModel.DMList;
 import BritefuryJ.DocModel.DMNode;
+import BritefuryJ.DocModel.DMSchemaResolver;
 import BritefuryJ.DocModel.DMIOReader.BadModuleNameException;
 import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
 import BritefuryJ.DocModel.DMSchema.UnknownClassException;

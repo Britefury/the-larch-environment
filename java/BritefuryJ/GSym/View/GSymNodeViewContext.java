@@ -15,10 +15,10 @@ import org.python.core.PyObject;
 
 import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocPresent.DPContainer;
-import BritefuryJ.DocPresent.DPStaticText;
+import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementContext;
-import BritefuryJ.DocPresent.StyleParams.StaticTextStyleParams;
+import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocView.DVNode;
 import BritefuryJ.GSym.IncrementalContext.GSymIncrementalNodeContext;
@@ -26,7 +26,7 @@ import BritefuryJ.GSym.IncrementalContext.GSymIncrementalNodeFunction;
 
 public class GSymNodeViewContext extends GSymIncrementalNodeContext implements ElementContext
 {
-	StaticTextStyleParams viewError_textStyle = new StaticTextStyleParams( null, null, new Font( "SansSerif", Font.BOLD, 12 ),  new Color( 0.8f, 0.0f, 0.0f ),  false );
+	TextStyleParams viewError_textStyle = new TextStyleParams( null, null, false, new Font( "SansSerif", Font.BOLD, 12 ),  new Color( 0.8f, 0.0f, 0.0f ),  null,  false );
 
 	
 	public GSymNodeViewContext(GSymViewContext viewContext, DVNode viewNode)
@@ -47,7 +47,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	
 	public DPWidget errorElement(String errorText)
 	{
-		return new DPStaticText( viewError_textStyle, errorText );
+		return new DPText( viewError_textStyle, errorText );
 	}
 	
 	

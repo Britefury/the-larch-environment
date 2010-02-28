@@ -10,8 +10,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import BritefuryJ.DocModel.*;
 import junit.framework.TestCase;
+import BritefuryJ.DocModel.DMIOReader;
+import BritefuryJ.DocModel.DMIOWriter;
+import BritefuryJ.DocModel.DMObject;
+import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMSchema;
 import BritefuryJ.DocModel.DMSchema.ClassAlreadyDefinedException;
 

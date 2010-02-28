@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent.LayoutTree;
 import BritefuryJ.DocPresent.DPCanvas;
 import BritefuryJ.DocPresent.Canvas.DrawingNode;
 
-public class LayoutNodeCanvas extends StaticLayoutNode
+public class LayoutNodeCanvas extends ContentLeafLayoutNode
 {
 	public LayoutNodeCanvas(DPCanvas element)
 	{

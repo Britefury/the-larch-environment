@@ -14,36 +14,36 @@ import BritefuryJ.DocPresent.Canvas.DrawingOwner;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeCanvas;
-import BritefuryJ.DocPresent.StyleParams.WidgetStyleParams;
+import BritefuryJ.DocPresent.StyleParams.ContentLeafStyleParams;
 import BritefuryJ.Math.Point2;
 
-public class DPCanvas extends DPStatic implements DrawingOwner
+public class DPCanvas extends DPContentLeaf implements DrawingOwner
 {
-	protected static int FLAG_DIAGRAM_SHRINK_X = FLAGS_STATIC_END * 0x1;
-	protected static int FLAG_DIAGRAM_SHRINK_Y = FLAGS_STATIC_END * 0x2;
+	protected static int FLAG_DIAGRAM_SHRINK_X = FLAGS_CONTENTLEAF_END * 0x1;
+	protected static int FLAG_DIAGRAM_SHRINK_Y = FLAGS_CONTENTLEAF_END * 0x2;
 	
 	protected DrawingNode drawing;
 	protected double drawingWidth, drawingHeight;
 	
 	
-	public DPCanvas(DrawingNode drawing)
+	public DPCanvas(String textRepresentation, DrawingNode drawing)
 	{
-		this( WidgetStyleParams.defaultStyleParams, drawing, -1.0, -1.0, false, false );
+		this( ContentLeafStyleParams.defaultStyleParams, textRepresentation, drawing, -1.0, -1.0, false, false );
 	}
 	
-	public DPCanvas(WidgetStyleParams styleParams, DrawingNode drawing)
+	public DPCanvas(ContentLeafStyleParams styleParams, String textRepresentation, DrawingNode drawing)
 	{
-		this(styleParams, drawing, -1.0, -1.0, false, false );
+		this(styleParams, textRepresentation, drawing, -1.0, -1.0, false, false );
 	}
 	
-	public DPCanvas(DrawingNode drawing, double width, double height, boolean bShrinkX, boolean bShrinkY)
+	public DPCanvas(String textRepresentation, DrawingNode drawing, double width, double height, boolean bShrinkX, boolean bShrinkY)
 	{
-		this( WidgetStyleParams.defaultStyleParams, drawing, width, height, bShrinkX, bShrinkY );
+		this( ContentLeafStyleParams.defaultStyleParams, textRepresentation, drawing, width, height, bShrinkX, bShrinkY );
 	}
 	
-	public DPCanvas(WidgetStyleParams styleParams, DrawingNode drawing, double width, double height, boolean bShrinkX, boolean bShrinkY)
+	public DPCanvas(ContentLeafStyleParams styleParams, String textRepresentation, DrawingNode drawing, double width, double height, boolean bShrinkX, boolean bShrinkY)
 	{
-		super(styleParams);
+		super( styleParams, textRepresentation );
 		
 		layoutNode = new LayoutNodeCanvas( this );
 		

@@ -6,9 +6,9 @@
 //##************************
 package tests.Parser.Utils;
 
+import tests.Parser.ParserTestCase;
 import BritefuryJ.DocModel.DMSchema;
 import BritefuryJ.DocModel.DMSchemaResolver;
-import tests.Parser.ParserTestCase;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.Utils.Tokens;
 

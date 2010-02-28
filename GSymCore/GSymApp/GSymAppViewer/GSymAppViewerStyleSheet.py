@@ -12,6 +12,7 @@ from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent.StyleSheet import *
 from BritefuryJ.DocPresent.Controls import *
 from BritefuryJ.DocPresent.Border import *
+from BritefuryJ.DocPresent.Painter import *
 
 from GSymCore.Utils.LinkHeader import LinkHeaderStyleSheet
 from GSymCore.Utils.Title import TitleBarStyleSheet
@@ -114,7 +115,8 @@ class GSymAppViewerStyleSheet (StyleSheet):
 		controlsBorder = appDocumentControlsStyle.border( controlsBox )
 
 		
-		openDocumentsSeparator = primitiveStyle.rectangle( 0.0, 1.0 ).alignHExpand().pad( self['separatingLinePaddingX'], self['separatingLinePaddingY'] ).alignHExpand()
+		lineStyle = primitiveStyle.withShapePainter( FillPainter( Color( 32, 87, 147 ) ) )
+		openDocumentsSeparator = lineStyle.rectangle( 0.0, 1.0 ).alignHExpand().pad( self['separatingLinePaddingX'], self['separatingLinePaddingY'] ).alignHExpand()
 		
 		docListBox = documentListTableStyle.rgrid( openDocuments )
 
