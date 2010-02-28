@@ -59,7 +59,7 @@ public class ListViewStyleSheet extends StyleSheet
 		
 
 	
-	public Object newInstance()
+	protected StyleSheet newInstance()
 	{
 		return new ListViewStyleSheet();
 	}

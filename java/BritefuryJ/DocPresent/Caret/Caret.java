@@ -10,6 +10,7 @@ package BritefuryJ.DocPresent.Caret;
 import BritefuryJ.DocPresent.DPContentLeaf;
 import BritefuryJ.DocPresent.DPContentLeafEditable;
 import BritefuryJ.DocPresent.DPSegment;
+import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Marker.MarkerListener;
 import BritefuryJ.Math.Point2;
@@ -18,6 +19,7 @@ public class Caret implements MarkerListener
 {
 	protected Marker marker;
 	protected CaretListener listener;
+	protected DPWidget grabElement = null;
 	
 	
 	
@@ -40,7 +42,7 @@ public class Caret implements MarkerListener
 	}
 	
 	
-	public DPContentLeafEditable getWidget()
+	public DPContentLeafEditable getElement()
 	{
 		if ( marker != null )
 		{
@@ -84,6 +86,50 @@ public class Caret implements MarkerListener
 	
 	
 	
+	//
+	//
+	// CARET GRAB METHODS
+	//
+	//
+	
+	public void grab(DPWidget element)
+	{
+		if ( element != grabElement )
+		{
+			grabElement = element;
+			
+			if ( grabElement != null )
+			{
+				if ( getElement().isInSubtreeRootedAt( grabElement ) )
+				{
+					grabElement.moveMarkerToStart( marker );
+				}
+			}
+		}
+	}
+	
+	public void ungrab(DPWidget element)
+	{
+		if ( element == grabElement )
+		{
+			grabElement = null;
+		}
+	}
+	
+	private boolean isElementWithinGrabSubtree(DPWidget element)
+	{
+		if ( grabElement == null )
+		{
+			return true;
+		}
+		else
+		{
+			return element.isInSubtreeRootedAt( grabElement );
+		}
+	}
+	
+	
+	
 	
 	
 	//
@@ -108,7 +154,7 @@ public class Caret implements MarkerListener
 				bSkippedLeaves = true;
 			}
 
-			if ( left != null )
+			if ( left != null  &&  isElementWithinGrabSubtree( left ) )
 			{
 				DPContentLeafEditable editableLeft = (DPContentLeafEditable)left;
 				if ( bSkippedLeaves )
@@ -145,7 +191,7 @@ public class Caret implements MarkerListener
 				bSkippedLeaves = true;
 			}
 
-			if ( right != null )
+			if ( right != null  &&  isElementWithinGrabSubtree( right ) )
 			{
 				DPContentLeafEditable editableRight = (DPContentLeafEditable)right;
 				if ( bSkippedLeaves )
@@ -170,7 +216,7 @@ public class Caret implements MarkerListener
 		
 		Point2 cursorPos = leaf.getMarkerPosition( marker );
 		DPContentLeafEditable above = leaf.getEditableContentLeafAbove( cursorPos );
-		if ( above != null )
+		if ( above != null  &&  isElementWithinGrabSubtree( above ) )
 		{
 			Point2 cursorPosInAbove = leaf.getLocalPointRelativeTo( above, cursorPos );
 			int contentPos = above.getMarkerPositonForPoint( cursorPosInAbove );
@@ -184,7 +230,7 @@ public class Caret implements MarkerListener
 		
 		Point2 cursorPos = leaf.getMarkerPosition( marker );
 		DPContentLeafEditable below = leaf.getEditableContentLeafBelow( cursorPos );
-		if ( below != null )
+		if ( below != null  &&  isElementWithinGrabSubtree( below ) )
 		{
 			Point2 cursorPosInBelow = leaf.getLocalPointRelativeTo( below, cursorPos );
 			int contentPos = below.getMarkerPositonForPoint( cursorPosInBelow );
@@ -209,7 +255,14 @@ public class Caret implements MarkerListener
 		
 		if ( homeElement != null )
 		{
-			homeElement.moveMarkerToStart( marker );
+			if ( isElementWithinGrabSubtree( homeElement ) )
+			{
+				homeElement.moveMarkerToStart( marker );
+			}
+			else
+			{
+				grabElement.moveMarkerToStart( marker );
+			}
 		}
 	}
 	
@@ -229,7 +282,14 @@ public class Caret implements MarkerListener
 		
 		if ( endElement != null )
 		{
-			endElement.moveMarkerToEnd( marker );
+			if ( isElementWithinGrabSubtree( endElement ) )
+			{
+				endElement.moveMarkerToEnd( marker );
+			}
+			else
+			{
+				grabElement.moveMarkerToEnd( marker );
+			}
 		}
 	}
 }

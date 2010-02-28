@@ -113,6 +113,25 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	}
 	
 	
+	public void grabCaret()
+	{
+		if ( isRealised() )
+		{
+			getPresentationArea().caretGrab( this );
+		}
+	}
+	
+	public void ungrabCaret()
+	{
+		if ( isRealised() )
+		{
+			getPresentationArea().caretUngrab( this );
+		}
+	}
+	
+	
+	
+	
 	
 	
 	//
@@ -374,11 +393,6 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	//
 	//
 
-	protected void onRealise()
-	{
-		super.onRealise();
-	}
-	
 	protected void onUnrealise(DPWidget unrealiseRoot)
 	{
 		super.onUnrealise( unrealiseRoot );

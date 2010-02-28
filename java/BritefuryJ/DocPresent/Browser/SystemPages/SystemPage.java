@@ -45,7 +45,7 @@ public abstract class SystemPage extends Page
 	public DPWidget getContentsElement()
 	{
 		
-		DPWidget title = styleSheet.withFont( new Font( "Serif", Font.BOLD, 32 ) ).staticText( "System page: " + getTitle() );
+		DPWidget title = styleSheet.withFont( new Font( "Serif", Font.BOLD, 32 ) ).withTextSmallCaps( true ).staticText( "System page: " + getTitle() );
 		
 		ArrayList<DPWidget> headChildren = new ArrayList<DPWidget>();
 		headChildren.add( SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE | SystemRootPage.LINKHEADER_SYSTEMPAGE ) );

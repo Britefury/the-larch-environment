@@ -15,6 +15,7 @@ import BritefuryJ.DocPresent.DPParagraphIndentMarker;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class ParagraphListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 {
@@ -44,7 +45,7 @@ public class ParagraphListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 	}
 	
 
-	public Object newInstance()
+	protected StyleSheet newInstance()
 	{
 		return new ParagraphListViewLayoutStyleSheet();
 	}

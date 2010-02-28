@@ -10,6 +10,8 @@ package BritefuryJ.DocPresent.Input;
 import java.util.ArrayList;
 import java.util.WeakHashMap;
 
+import javax.swing.JComponent;
+
 
 
 
@@ -19,13 +21,15 @@ public class InputTable
 
 	protected Pointer mouse;
 	protected PointerInputElement rootElement;
+	protected JComponent component;
 	
 	
-	public InputTable(PointerInputElement rootElement, PointerDndController dndController)
+	public InputTable(PointerInputElement rootElement, PointerDndController dndController, JComponent component)
 	{
 		pointersWithinBoundsByElement = new WeakHashMap<PointerInputElement, ArrayList<PointerInterface>>();
 		this.rootElement = rootElement;
-		mouse = new Pointer( this, rootElement, dndController );
+		this.component = component;
+		mouse = new Pointer( this, rootElement, dndController, component );
 	}
 	
 	

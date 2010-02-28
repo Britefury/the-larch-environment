@@ -11,34 +11,43 @@ import java.util.List;
 
 public class SystemDirectory
 {
-	private static ArrayList<SystemPage> testPages = new ArrayList<SystemPage>();
+	private static ArrayList<SystemPage> primitiveTestPages = new ArrayList<SystemPage>();
+	private static ArrayList<SystemPage> controlTestPages = new ArrayList<SystemPage>();
 	
 	
 	
 	protected static void initialise()
 	{
-		testPages.add( new AlignmentTestPage() );
-		testPages.add( new BorderTestPage() );
-		testPages.add( new CanvasTestPage() );
-		testPages.add( new DndTestPage() );
-		testPages.add( new FractionTestPage() );
-		testPages.add( new GridTestPage() );
-		testPages.add( new HBoxTestPage() );
-		testPages.add( new ListViewTestPage() );
-		testPages.add( new MathRootTestPage() );
-		testPages.add( new ParagraphCollationTestPage() );
-		testPages.add( new ParagraphTestPage() );
-		testPages.add( new ProxyAndSpanTestPage() );
-		testPages.add( new ScriptTestPage() );
-		testPages.add( new SegmentTestPage() );
-		testPages.add( new TableTestPage() );
-		testPages.add( new TextTestPage() );
-		testPages.add( new VBoxTestPage() );
+		primitiveTestPages.add( new AlignmentTestPage() );
+		primitiveTestPages.add( new BorderTestPage() );
+		primitiveTestPages.add( new CanvasTestPage() );
+		primitiveTestPages.add( new DndTestPage() );
+		primitiveTestPages.add( new FractionTestPage() );
+		primitiveTestPages.add( new GridTestPage() );
+		primitiveTestPages.add( new HBoxTestPage() );
+		primitiveTestPages.add( new ListViewTestPage() );
+		primitiveTestPages.add( new MathRootTestPage() );
+		primitiveTestPages.add( new ParagraphCollationTestPage() );
+		primitiveTestPages.add( new ParagraphTestPage() );
+		primitiveTestPages.add( new ProxyAndSpanTestPage() );
+		primitiveTestPages.add( new ScriptTestPage() );
+		primitiveTestPages.add( new SegmentTestPage() );
+		primitiveTestPages.add( new TableTestPage() );
+		primitiveTestPages.add( new TextTestPage() );
+		primitiveTestPages.add( new VBoxTestPage() );
+
+		controlTestPages.add( new ButtonTestPage() );
+		controlTestPages.add( new HyperlinkTestPage() );
 	}
 	
 	
-	protected static List<SystemPage> getTestPages()
+	protected static List<SystemPage> getPrimitiveTestPages()
 	{
-		return testPages;
+		return primitiveTestPages;
+	}
+
+	protected static List<SystemPage> getControlTestPages()
+	{
+		return controlTestPages;
 	}
 }

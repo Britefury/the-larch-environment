@@ -17,6 +17,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import javax.swing.JComponent;
+
+import BritefuryJ.DocPresent.ContextMenu.ContextMenu;
+import BritefuryJ.DocPresent.ContextMenu.ContextPopupMenu;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
@@ -143,6 +147,22 @@ public class Pointer extends PointerInterface
 			}
 		}
 
+		protected boolean handleContextButton(Pointer pointer, PointerButtonEvent event, ContextMenu menu)
+		{
+			PointerInputElement childElement = element.getFirstPointerChildAtLocalPoint( event.pointer.getLocalPos() );
+			if ( childElement != null )
+			{
+				ElementEntry childEntry = pointer.getEntryForElement( childElement );
+				boolean bHandled = childEntry.handleContextButton( pointer, (PointerButtonEvent)childElement.transformParentToLocalEvent( event ), menu );
+				if ( bHandled  &&  element.isPointerInputElementRealised() )
+				{
+					return true;
+				}
+			}
+			
+			return element.handlePointerContextButton( menu );
+		}
+		
 
 
 	
@@ -303,17 +323,19 @@ public class Pointer extends PointerInterface
 	protected InputTable inputTable;
 	protected DndDropLocal dndDrop;
 	protected PointerDndController dndController;
+	protected JComponent component;
 	
 	protected ReferenceQueue<ElementEntry> refQueue;
 	protected HashMap<PointerInputElement, WeakReference<ElementEntry> > elementToEntryTable;
 	
 	
-	public Pointer(InputTable inputTable, PointerInputElement rootElement, PointerDndController dndController)
+	public Pointer(InputTable inputTable, PointerInputElement rootElement, PointerDndController dndController, JComponent component)
 	{
 		this.inputTable = inputTable;
 		localPos = new Point2();
 		modifiers = 0;
 		this.dndController = dndController;
+		this.component = component;
 		
 		refQueue = new ReferenceQueue<ElementEntry>();
 		elementToEntryTable = new HashMap<PointerInputElement, WeakReference<ElementEntry> >();
@@ -388,8 +410,20 @@ public class Pointer extends PointerInterface
 	public void buttonDown(Point2 pos, int button)
 	{
 		PointerButtonEvent event = new PointerButtonEvent( this, button, PointerButtonEvent.Action.DOWN );
-		dndButtonDownEvent( event );
-		rootEntry.handleButtonDown( this, event );
+		if ( button == 3  &&  getModifiers() == Modifier.BUTTON3 )
+		{
+			ContextPopupMenu menu = new ContextPopupMenu( "" );
+			rootEntry.handleContextButton( this, event, menu );
+			if ( !menu.isEmpty() )
+			{
+				menu.show( component );
+			}
+		}
+		else
+		{
+			dndButtonDownEvent( event );
+			rootEntry.handleButtonDown( this, event );
+		}
 	}
 	
 	public void buttonDown2(Point2 pos, int button)

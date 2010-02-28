@@ -17,6 +17,12 @@ import BritefuryJ.Utils.HashUtils;
 
 public class StyleSheet
 {
+	public static class AttributeDoesNotExistException extends RuntimeException
+	{
+		private static final long serialVersionUID = 1L;
+	}
+	
+	
 	protected static class StyleSheetValuesMultiple
 	{
 		protected HashMap<String, Object> values;
@@ -113,7 +119,7 @@ public class StyleSheet
 	}
 	
 	
-	public Object newInstance()
+	protected StyleSheet newInstance()
 	{
 		return new StyleSheet();
 	}
@@ -121,11 +127,21 @@ public class StyleSheet
 	
 	public Object get(String attrName)
 	{
+		if ( !values.containsKey( attrName ) )
+		{
+			throw new AttributeDoesNotExistException();
+		}
+		
 		return values.get( attrName );
 	}
 	
 	public <V extends Object> V get(String attrName, Class<V> valueClass, V defaultValue)
 	{
+		if ( !values.containsKey( attrName ) )
+		{
+			throw new AttributeDoesNotExistException();
+		}
+		
 		Object v = values.get( attrName );
 		
 		if ( v == null )
@@ -150,6 +166,11 @@ public class StyleSheet
 	
 	public <V extends Object> V getNonNull(String attrName, Class<V> valueClass, V defaultValue)
 	{
+		if ( !values.containsKey( attrName ) )
+		{
+			throw new AttributeDoesNotExistException();
+		}
+		
 		Object v = values.get( attrName );
 		
 		if ( v == null )
@@ -305,11 +326,11 @@ public class StyleSheet
 	
 	protected void notifyBadAttributeType(String attrName, Object value, Class<?> expectedType)
 	{
-		System.out.println( "WARNING: style sheet \"" + getClass().getName() + "\": attribute '" + attrName + "' should have value of type '" + expectedType.getName() + "', has value '" + value + "'; type '" + value.getClass().getName() + "'" );
+		System.err.println( "WARNING: style sheet \"" + getClass().getName() + "\": attribute '" + attrName + "' should have value of type '" + expectedType.getName() + "', has value '" + value + "'; type '" + value.getClass().getName() + "'" );
 	}
 
 	protected void notifyAttributeShouldNotBeNull(String attrName, Class<?> expectedType)
 	{
-		System.out.println( "WARNING: style sheet \"" + getClass().getName() + "\": attribute '" + attrName + "' should not have a null value; type='" + expectedType.getName() + "'" );
+		System.err.println( "WARNING: style sheet \"" + getClass().getName() + "\": attribute '" + attrName + "' should not have a null value; type='" + expectedType.getName() + "'" );
 	}
 }

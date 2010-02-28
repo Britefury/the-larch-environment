@@ -293,7 +293,7 @@ class MainApp (AppControlInterface):
 		
 		
 	# handleNewPageFn(unit)
-	def promptNewPage(self, handleNewPageFn):
+	def promptNewPage(self, menu, handleNewPageFn):
 		def _make_newPage(newPageFn):
 			def newPage():
 				unit = newPageFn()

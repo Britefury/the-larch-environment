@@ -14,6 +14,7 @@ import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class VerticalInlineListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 {
@@ -43,7 +44,7 @@ public class VerticalInlineListViewLayoutStyleSheet extends ListViewLayoutStyleS
 	}
 	
 
-	public Object newInstance()
+	protected StyleSheet newInstance()
 	{
 		return new VerticalInlineListViewLayoutStyleSheet();
 	}

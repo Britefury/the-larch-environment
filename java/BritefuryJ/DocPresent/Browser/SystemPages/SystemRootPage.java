@@ -9,19 +9,27 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
+import java.util.List;
 
-import BritefuryJ.DocPresent.DPLink;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
+import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Browser.Page;
+import BritefuryJ.DocPresent.StyleSheet.ControlsStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class SystemRootPage extends Page
 {
+	public static String getLocation()
+	{
+		return "system";
+	}
+	
+	
 	protected SystemRootPage()
 	{
-		SystemLocationResolver.getSystemResolver().registerPage( "system", this );
+		SystemLocationResolver.getSystemResolver().registerPage( getLocation(), this );
 	}
 	
 	
@@ -34,12 +42,15 @@ public class SystemRootPage extends Page
 
 	
 	private static final PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
+	private static PrimitiveStyleSheet outlineStyle = styleSheet.withBorder( new SolidBorder( 2.0, 10.0, new Color( 0.6f, 0.7f, 0.8f ), null ) );
+
+	private static final ControlsStyleSheet controlsStyleSheet = ControlsStyleSheet.instance;
 
 	
 	
 	public DPWidget getContentsElement()
 	{
-		DPWidget title = styleSheet.withFont( new Font( "Serif", Font.BOLD, 32 ) ).staticText( "gSym System page" );
+		DPWidget title = styleSheet.withFont( new Font( "Serif", Font.BOLD, 32 ) ).withTextSmallCaps( true ).staticText( "GSym System Page" );
 		
 		ArrayList<DPWidget> headChildren = new ArrayList<DPWidget>();
 		headChildren.add( createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE ) );
@@ -54,26 +65,41 @@ public class SystemRootPage extends Page
 	}
 
 	
-	protected DPWidget createContents()
+	protected DPWidget createTestsBox(String title, List<SystemPage> pages)
 	{
-		ArrayList<DPWidget> contentsBoxChildren = new ArrayList<DPWidget>();
+		ArrayList<DPWidget> testBoxChildren = new ArrayList<DPWidget>();
 		
-		DPWidget title = styleSheet.withFont( new Font( "Serif", Font.BOLD, 18 ) ).staticText( "Tests:" );
-		contentsBoxChildren.add( title );
+		DPWidget titleElement = styleSheet.withFont( new Font( "Serif", Font.BOLD, 18 ) ).staticText( title ).pad( 30.0, 30.0, 5.0, 15.0 );
+		testBoxChildren.add( titleElement );
 		
-		for (SystemPage page: SystemDirectory.getTestPages())
+		for (SystemPage page: pages)
 		{
-			contentsBoxChildren.add( page.createLink() );
+			testBoxChildren.add( page.createLink() );
 		}
 		
-		return styleSheet.vbox( contentsBoxChildren );
+		return outlineStyle.border( styleSheet.vbox( testBoxChildren ) );
+	}
+	
+	protected DPWidget createContents()
+	{
+		DPWidget titleElement = styleSheet.withFont( new Font( "Serif", Font.BOLD, 24 ) ).staticText( "Tests:" ).pad( 0.0, 5.0 ).alignHCentre();
+		
+		ArrayList<DPWidget> testBoxes = new ArrayList<DPWidget>();
+		testBoxes.add( createTestsBox( "Primitive elements:", SystemDirectory.getPrimitiveTestPages() ).pad( 25.0, 5.0 ) );
+		testBoxes.add( createTestsBox( "Controls:", SystemDirectory.getControlTestPages() ).pad( 25.0, 5.0 ) );
+
+		ArrayList<DPWidget> contents = new ArrayList<DPWidget>();
+		contents.add( titleElement );
+		contents.add( styleSheet.hbox( testBoxes ) );
+		
+		return styleSheet.vbox( contents ).alignHExpand();
 	}
 
 
 
-	protected DPLink createLink(String linkText)
+	protected DPWidget createLink(String linkText)
 	{
-		return styleSheet.link( linkText, "system" );
+		return controlsStyleSheet.link( linkText, "system" );
 	}
 	
 	
@@ -87,12 +113,12 @@ public class SystemRootPage extends Page
 		
 		if ( ( linkHeaderFlags & LINKHEADER_ROOTPAGE )  !=  0 )
 		{
-			linkElements.add( styleSheet.link( "GSYM ROOT PAGE", "" ) );
+			linkElements.add( controlsStyleSheet.link( "GSYM ROOT PAGE", "" ) );
 		}
 		
 		if ( ( linkHeaderFlags & LINKHEADER_SYSTEMPAGE )  !=  0 )
 		{
-			linkElements.add( styleSheet.link( "SYSTEM PAGE", "system" ) );
+			linkElements.add( controlsStyleSheet.link( "SYSTEM PAGE", "system" ) );
 		}
 
 		DPWidget links = styleSheet.withHBoxSpacing( 25.0 ).hbox( linkElements );

@@ -53,7 +53,6 @@ import BritefuryJ.DocPresent.Input.Modifier;
 import BritefuryJ.DocPresent.Input.Pointer;
 import BritefuryJ.DocPresent.Input.PointerDndController;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeRootElement;
@@ -627,7 +626,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	
 	protected WeakHashMap<DPContentLeafEditable, WeakHashMap<Marker, Object>> markersByLeaf = new WeakHashMap<DPContentLeafEditable, WeakHashMap<Marker, Object>>();
 	private Caret caret;
-	private DPContentLeaf currentCaretLeaf;
+	private DPContentLeafEditable currentCaretLeaf;
 	
 	private SelectionManager selectionManager;
 	private Selection selection;
@@ -672,7 +671,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		
 		component = new ScrollablePresentationAreaComponent( this );
 
-		inputTable = new InputTable( this, this );
+		inputTable = new InputTable( this, this, component );
 		rootSpaceMouse = inputTable.getMouse();
 		
 		stateKeyListeners = new WeakHashMap<StateKeyListener, Object>();
@@ -1298,7 +1297,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	{
 		if ( caret.isValid() )
 		{
-			DPContentLeafEditable widget = caret.getWidget();
+			DPContentLeafEditable widget = caret.getElement();
 			
 			if ( widget != null )
 			{
@@ -1814,17 +1813,12 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	
 	
 	
-	protected void setCursorDrag(PointerInterface pointer)
+	protected void setPointerCursor(Cursor cursor)
 	{
-		component.setCursor( new Cursor( Cursor.HAND_CURSOR ) );
+		component.setCursor( cursor );
 	}
 	
-	public void setCursorHand(PointerInterface pointer)
-	{
-		component.setCursor( new Cursor( Cursor.HAND_CURSOR ) );
-	}
-	
-	public void setCursorArrow(PointerInterface pointer)
+	protected void setPointerCursorDefault()
 	{
 		component.setCursor( new Cursor( Cursor.DEFAULT_CURSOR ) );
 	}
@@ -1869,7 +1863,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	{
 		assert c == caret;
 		
-		DPContentLeaf caretLeaf = c.getWidget();
+		DPContentLeafEditable caretLeaf = c.getElement();
 		
 		if ( caretLeaf != currentCaretLeaf )
 		{
@@ -1924,6 +1918,18 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		
 		queueFullRedraw();
 	}
+	
+	
+	protected void caretGrab(DPWidget element)
+	{
+		caret.grab( element );
+	}
+	
+	protected void caretUngrab(DPWidget element)
+	{
+		caret.ungrab( element );
+	}
+	
 	
 	
 	
