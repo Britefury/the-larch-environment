@@ -12,7 +12,7 @@ import BritefuryJ.DocPresent.Marker.Marker;
 public class SelectionManager
 {
 	private boolean bMouseDragInProgress;
-	private Marker initialMarker;
+	private Marker initialMarkerMouse = null, initialMarkerCaret = null;
 	private Selection selection;
 	
 	
@@ -30,22 +30,24 @@ public class SelectionManager
 			if ( !bDragSelection )
 			{
 				selection.clear();
+				initialMarkerCaret = null;
 			}
 			else
 			{
-				if ( initialMarker == null )
+				if ( selection.isEmpty() )
 				{
-					initialMarker = prevPos.copy();
+					initialMarkerCaret = prevPos.copy();
 				}
 				
-				selection.setRegion( initialMarker, c.getMarker().copy() );
+				selection.setRegion( initialMarkerCaret, c.getMarker().copy() );
 			}
 		}
 	}
 	
 	
-	public void mouseSelectionClear()
+	public void mouseSelectionReset()
 	{
+		initialMarkerMouse = null;
 		bMouseDragInProgress = false;
 	}
 	
@@ -53,24 +55,15 @@ public class SelectionManager
 	{
 		selection.clear();
 		bMouseDragInProgress = true;
-		initialMarker = pos.copy();
+		initialMarkerMouse = pos.copy();
 	}
 	
 	public void mouseSelectionDrag(Marker pos)
 	{
 		if ( bMouseDragInProgress )
 		{
-			selection.setRegion( initialMarker, pos.copy() );
+			selection.setRegion( initialMarkerMouse, pos.copy() );
 		}
-	}
-	
-	public void mouseSelectionEnd()
-	{
-		if ( bMouseDragInProgress )
-		{
-			initialMarker = null;
-		}
-		bMouseDragInProgress = false;
 	}
 	
 	

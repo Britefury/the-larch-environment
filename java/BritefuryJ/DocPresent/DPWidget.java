@@ -64,12 +64,9 @@ abstract public class DPWidget extends PointerInputElement
 	protected static double NON_TYPESET_CHILD_BASELINE_OFFSET = -5.0;
 	
 	
-	public static class ContextMenuFactory
+	public static interface ContextMenuFactory
 	{
-		public boolean buildContextMenu(ContextMenu menu)
-		{
-			return false;
-		}
+		public void buildContextMenu(ContextMenu menu);
 	}
 
 
@@ -1483,7 +1480,8 @@ abstract public class DPWidget extends PointerInputElement
 		{
 			for (ContextMenuFactory contextFactory: contextFactories)
 			{
-				bResult = bResult || contextFactory.buildContextMenu( menu );
+				contextFactory.buildContextMenu( menu );
+				bResult = true;
 			}
 		}
 		return bResult;
@@ -1518,9 +1516,9 @@ abstract public class DPWidget extends PointerInputElement
 	protected void handlePointerEnter(PointerMotionEvent event)
 	{
 		Cursor cursor = getCursor();
-		if ( cursor != null )
+		if ( cursor != null  &&  presentationArea != null )
 		{
-			getPresentationArea().setPointerCursor( cursor );
+			presentationArea.setPointerCursor( cursor );
 		}
 		onEnter( event );
 		List<ElementInteractor> interactors = getInteractors();
@@ -1536,7 +1534,7 @@ abstract public class DPWidget extends PointerInputElement
 	protected void handlePointerLeave(PointerMotionEvent event)
 	{
 		Cursor cursor = getCursor();
-		if ( cursor != null )
+		if ( cursor != null  &&  presentationArea != null )
 		{
 			Cursor ancestorCursor = getAncestorCursor();
 			if ( ancestorCursor != null )

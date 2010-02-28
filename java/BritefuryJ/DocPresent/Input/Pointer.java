@@ -370,12 +370,12 @@ public class Pointer extends PointerInterface
 	
 	public void setButtonModifiers(int mods)
 	{
-		modifiers = ( modifiers & ~Modifier._BUTTONS_MASK )  |  ( mods & Modifier._BUTTONS_MASK );
+		modifiers = ( modifiers & ~Modifier.BUTTONS_MASK )  |  ( mods & Modifier.BUTTONS_MASK );
 	}
 	
 	public void setKeyModifiers(int mods)
 	{
-		modifiers = ( modifiers & ~Modifier._KEYS_MASK )  |  ( mods & Modifier._KEYS_MASK );
+		modifiers = ( modifiers & ~Modifier.KEYS_MASK )  |  ( mods & Modifier.KEYS_MASK );
 	}
 	
 	

@@ -6,15 +6,22 @@
 //##************************
 package BritefuryJ.DocPresent.Controls;
 
+import java.awt.datatransfer.Transferable;
 import java.awt.event.KeyEvent;
+
+import javax.swing.TransferHandler.TransferSupport;
 
 import org.python.core.Py;
 import org.python.core.PyObject;
 
 import BritefuryJ.DocPresent.DPBorder;
+import BritefuryJ.DocPresent.DPFrame;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.EditHandler;
 import BritefuryJ.DocPresent.ElementInteractor;
+import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.Selection.Selection;
 
 public class TextEntry extends Control
 {
@@ -88,6 +95,63 @@ public class TextEntry extends Control
 	}
 	
 	
+	private class TextEntryEditHandler implements EditHandler
+	{
+		public void deleteSelection()
+		{
+			Selection selection = textElement.getPresentationArea().getSelection();
+			if ( !selection.isEmpty() )
+			{
+				textElement.removeText( selection.getStartMarker(), selection.getEndMarker() );
+			}
+		}
+
+		public void replaceSelection(String replacement)
+		{
+			Selection selection = textElement.getPresentationArea().getSelection();
+			if ( !selection.isEmpty() )
+			{
+				textElement.removeText( selection.getStartMarker(), selection.getEndMarker() );
+			}
+			Caret caret = textElement.getPresentationArea().getCaret();
+			textElement.insertText( caret.getMarker(), replacement );
+		}
+
+		public boolean canImport(TransferSupport support)
+		{
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		public Transferable createTransferable()
+		{
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void exportDone(Transferable data, int action)
+		{
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public int getSourceActions()
+		{
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public boolean importData(TransferSupport info)
+		{
+			// TODO Auto-generated method stub
+			return false;
+		}
+	}
+	
+	
 	
 	private DPBorder outerElement;
 	private DPText textElement;
@@ -96,18 +160,19 @@ public class TextEntry extends Control
 
 
 	
-	protected TextEntry(DPBorder outerElement, DPText textElement, TextEntryListener listener)
+	protected TextEntry(DPBorder outerElement, DPFrame frame, DPText textElement, TextEntryListener listener)
 	{
 		this.outerElement = outerElement;
 		this.textElement = textElement;
 		this.listener = listener;
 		this.textElement.addInteractor( new TextEntryInteractor() );
 		originalText = textElement.getText();
+		frame.setEditHandler( new TextEntryEditHandler() );
 	}
 	
-	protected TextEntry(DPBorder outerElement, DPText textElement, PyObject acceptListener, PyObject cancelListener)
+	protected TextEntry(DPBorder outerElement, DPFrame frame, DPText textElement, PyObject acceptListener, PyObject cancelListener)
 	{
-		this( outerElement, textElement, new PyTextEntryListener( acceptListener, cancelListener ) );
+		this( outerElement, frame, textElement, new PyTextEntryListener( acceptListener, cancelListener ) );
 	}
 	
 	

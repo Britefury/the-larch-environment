@@ -20,6 +20,7 @@ import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPButton;
 import BritefuryJ.DocPresent.DPCanvas;
 import BritefuryJ.DocPresent.DPFraction;
+import BritefuryJ.DocPresent.DPFrame;
 import BritefuryJ.DocPresent.DPGridRow;
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPHiddenContent;
@@ -42,6 +43,7 @@ import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWhitespace;
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.EditHandler;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Canvas.DrawingNode;
@@ -741,6 +743,22 @@ public class PrimitiveStyleSheet extends StyleSheet
 		DPFraction element = new DPFraction( getFractionParams(), getTextParams(), barContent );
 		element.setNumeratorChild( numerator );
 		element.setDenominatorChild( denominator );
+		return element;
+	}
+	
+	
+	public DPFrame frame(DPWidget child)
+	{
+		DPFrame element = new DPFrame();
+		element.setChild( child );
+		return element;
+	}
+
+	public DPFrame frame(DPWidget child, EditHandler editHandler)
+	{
+		DPFrame element = new DPFrame();
+		element.setChild( child );
+		element.setEditHandler( editHandler );
 		return element;
 	}
 
