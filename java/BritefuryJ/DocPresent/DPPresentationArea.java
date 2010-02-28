@@ -1338,7 +1338,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	
 	protected void mouseDownEvent(int button, Point2 windowPos, int buttonModifiers)
 	{
-		selectionManager.mouseSelectionClear();
+		selectionManager.mouseSelectionReset();
 		
 		component.presentationComponent.grabFocus();
 		Point2 rootPos = windowSpaceToRootSpace( windowPos );
@@ -1391,7 +1391,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		
 		if ( button == 1 )
 		{
-			selectionManager.mouseSelectionEnd();
+			selectionManager.mouseSelectionReset();
 		}
 		
 		emitImmediateEvents();
@@ -1512,14 +1512,14 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		rootSpaceMouse.setLocalPos( rootPos );
 		rootSpaceMouse.setButtonModifiers( buttonModifiers );
 		int modifiers = rootSpaceMouse.getModifiers();
-		if ( ( modifiers & Modifier._KEYS_MASK )  ==  Modifier.ALT )
+		if ( ( modifiers & Modifier.KEYS_MASK )  ==  Modifier.ALT )
 		{
 			double delta = (double)-wheelClicks;
 			double scaleDelta = Math.pow( 2.0,  ( delta / 1.5 ) );
 			
 			zoom( scaleDelta, windowPos );
 		}
-		else if ( ( modifiers & Modifier._KEYS_MASK )  !=  0 )
+		else if ( ( modifiers & Modifier.KEYS_MASK )  !=  0 )
 		{
 			rootSpaceMouse.scroll( 0, -wheelClicks );
 			emitImmediateEvents();
@@ -1631,8 +1631,8 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		rootSpaceMouse.setKeyModifiers( keyModifiers );
 		int modifiers = rootSpaceMouse.getModifiers();
 		
-		boolean bCtrl = ( modifiers & Modifier._KEYS_MASK )  ==  Modifier.CTRL;
-		boolean bAlt = ( modifiers & Modifier._KEYS_MASK )  ==  Modifier.ALT;
+		boolean bCtrl = ( modifiers & Modifier.KEYS_MASK )  ==  Modifier.CTRL;
+		boolean bAlt = ( modifiers & Modifier.KEYS_MASK )  ==  Modifier.ALT;
 
 		if ( isNavigationKey( event ) )
 		{

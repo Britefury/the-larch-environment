@@ -29,34 +29,8 @@ from BritefuryJ.DocPresent import *
 from BritefuryJ.GSym.View import GSymViewContext
 
 
-from GSymCore.Project.Styles import *
 from GSymCore.Project import NodeClasses as Nodes
-
-
-
-class NameTextRepListener (ElementLinearRepresentationListener):
-	
-	def __init__(self):
-		pass
-
-	def textRepresentationModified(self, element, event):
-		value = element.getTextRepresentation()
-		ctx = element.getContext()
-		node = ctx.getDocNode()
-		node['name'] = value
-		return True
-
-_nameTextRepListener = NameTextRepListener()	
-
-
-
-def nameEditor(ctx, styleSheet, node, state):
-	name = node['name']
-	
-	text = styleSheet.text( name )
-	text.setLinearRepresentationListener( _nameTextRepListener )
-	return text
-
+from GSymCore.Project.ProjectEditor.ProjectEditorStyleSheet import ProjectEditorStyleSheet
 
 
 
@@ -94,6 +68,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 				self._app.promptSaveDocumentAs( handleSaveDocumentAsFn )
 			else:
 				document.save()
+			return True
 				
 		
 		def _onSaveAs(link, buttonEvent):
@@ -101,84 +76,61 @@ class ProjectView (GSymViewObjectNodeDispatch):
 				document.saveAs( filename )
 			
 			self._app.promptSaveDocumentAs( handleSaveDocumentAsFn )
+			return  True
 		
 		
 		document = self._document
 		
 		name = document.getDocumentName()
 		
-		homeLink = prj_linkStyle.link( 'HOME PAGE', '' )
-		linkHeader = prj_linkHeaderStyle.linkHeaderBar( [ homeLink ] )
-		
-		title = prj_titleStyle.titleBarWithHeader( 'DOCUMENT', name )
-		
-		
-		saveLink = prj_controlsStyle.link( 'SAVE', _onSave )
-		saveAsLink = prj_controlsStyle.link( 'SAVE AS', _onSaveAs )
-		controlsBox = prj_controlsStyle.hbox( [ saveLink.padX( 10.0 ), saveAsLink.padX( 10.0 ) ] )
-		controlsBorder = prj_controlsStyle.border( controlsBox )
-		
 		state = _ProjectViewState( self._resolveContext.location )
-		root = ctx.viewEval( rootPackage, styleSheet, state ).alignHExpand()
-		indexBox = prj_tabbedBoxStyle.tabbedBox( 'Project Index', root )
-		
-		contentBox = prj_projectContentBoxStyle.vbox( [ linkHeader, title, controlsBorder.pad( 5.0, 10.0 ).alignHLeft(), indexBox.pad( 10.0, 10.0 ).alignHLeft() ] )
-		
-		return contentBox.alignHExpand()
+		rootView = ctx.viewEval( rootPackage, styleSheet, state ).alignHExpand()
+
+		return styleSheet.project( name, rootView, _onSave, _onSaveAs )
 
 
 
 	@ObjectNodeDispatchMethod( Nodes.Package )
 	def Package(self, ctx, styleSheet, state, node, name, contents):
-		location, = state
+		def _packageRename(newName):
+			node['name'] = newName
+			
+		def _addPage(pageUnit):
+			#contents.append( Nodes.Page( name='New page', unit=pageUnit ) )
+			p = Nodes.Page( name='New page', unit=pageUnit )
+			contents.append( p )
 		
-		def _onAddPage(button):
-			def _add(pageUnit):
-				#contents.append( Nodes.Page( name='New page', unit=pageUnit ) )
-				p = Nodes.Page( name='New page', unit=pageUnit )
-				contents.append( p )
-			self._app.promptNewPage( _add )
-		
-		def _onImportPage(button):
-			def _import(name, pageUnit):
-				contents.append( Nodes.Page( name=name, unit=pageUnit ) )
-			self._app.promptImportPage( _import )
-		
-		def _onAddPackage(button):
+		def _importPage(name, pageUnit):
+			contents.append( Nodes.Page( name=name, unit=pageUnit ) )
+
+		def _addPackage():
 			contents.append( Nodes.Package( name='New package', contents=[] ) )
-		
-		addPageButton = prj_packageButtonStyle.button( _onAddPage, prj_packageButtonStyle.staticText( 'Add page' ) )
-		importPageButton = prj_packageButtonStyle.button( _onImportPage, prj_packageButtonStyle.staticText( 'Import page' ) )
-		addPackageButton = prj_packageButtonStyle.button( _onAddPackage, prj_packageButtonStyle.staticText( 'Add package' ) )
-		
-		pageControlsBox = prj_packagePageControlsStyle.hbox( [ addPageButton, importPageButton ] )
-		controlsBox = prj_packageControlsStyle.hbox( [ pageControlsBox, addPackageButton ] )
 
-		nameEntry = nameEditor( ctx, prj_packageNameStyle, node, state )
+		location, = state
+		packageLocation = _joinLocation( location, name )
 		
-		headerBox = prj_packageHeaderStyle.hbox( [ nameEntry, controlsBox ] )
-		
-		contentsBox = prj_packageContentsStyle.vbox( ctx.mapViewEval( contents, styleSheet, _ProjectViewState( _joinLocation( location, name ) ) ) )
-
-		return prj_packageStyle.vbox( [ headerBox.alignHExpand(), contentsBox.padX( 20.0, 0.0 ).alignHExpand() ] )
+		items = ctx.mapViewEval( contents, styleSheet, _ProjectViewState( packageLocation ) )
+			
+		return styleSheet.package( name, packageLocation, items, _packageRename, self._app, _addPage, _importPage, _addPackage )
+	
 
 
 
 	@ObjectNodeDispatchMethod( Nodes.Page )
 	def Page(self, ctx, styleSheet, state, node, name, unit):
+		def _pageRename(newName):
+			node['name'] = newName
+		
 		location, = state
+		pageLocation = _joinLocation( location, name )
 		
-		nameEntry = nameEditor( ctx, prj_pageStyle, node, state )
-		
-		editLink = prj_pageStyle.link( 'Edit', _joinLocation( location, name ) )
-
-		return prj_pageStyle.hbox( [ nameEntry, editLink ] )
+		return styleSheet.page( name, pageLocation, _pageRename )
 
 	
 	
 def viewProjectDocNodeAsElement(document, docRootNode, resolveContext, location, commandHistory, app):
 	viewFn = ProjectView( document, app, resolveContext, location )
-	viewContext = GSymViewContext( docRootNode, viewFn, PrimitiveStyleSheet.instance, commandHistory )
+	viewContext = GSymViewContext( docRootNode, viewFn, ProjectEditorStyleSheet.instance, commandHistory )
 	return viewContext.getFrame()
 
 

@@ -293,24 +293,21 @@ class MainApp (AppControlInterface):
 		
 		
 	# handleNewPageFn(unit)
-	def promptNewPage(self, menu, handleNewPageFn):
+	def populateNewPageMenu(self, menu, handleNewPageFn):
 		def _make_newPage(newPageFn):
-			def newPage():
+			def newPage(actionEvent):
 				unit = newPageFn()
 				handleNewPageFn( unit )
 			return newPage
-		newPageMenu = JPopupMenu( 'New page' )
 		for newPageFactory in self._world.newPageFactories:
-			newPageMenu.add( _action( newPageFactory.menuLabelText, _make_newPage( newPageFactory.newPageFn ) ) )
-		pos = self._frame.getMousePosition( True )
-		newPageMenu.show( self._frame, pos.x, pos.y )
+			menu.addItem( newPageFactory.menuLabelText, _make_newPage( newPageFactory.newPageFn ) )
 		
 		
 		
 	# handleImportedPageFn(name, unit)
-	def promptImportPage(self, handleImportedPageFn):
+	def populateImportPageMenu(self, menu, handleImportedPageFn):
 		def _make_importPage(fileType, filePattern, importUnitFn):
-			def _import():
+			def _import(actionEvent):
 				openDialog = JFileChooser()
 				openDialog.setFileFilter( FileNameExtensionFilter( fileType, [ filePattern ] ) )
 				response = openDialog.showDialog( self._frame, 'Import' )
@@ -329,12 +326,8 @@ class MainApp (AppControlInterface):
 								handleImportedPageFn( unitName, unit )
 			return _import
 
-		importPageMenu = JPopupMenu( 'Import page' )
 		for pageImporter in self._world.pageImporters:
-			importPageMenu.add( _action( pageImporter.menuLabelText, _make_importPage( pageImporter.fileType, pageImporter.filePattern, pageImporter.importFn ) ) )
-
-		pos = self._frame.getMousePosition( True )
-		importPageMenu.show( self._frame, pos.x, pos.y )
+			menu.addItem( pageImporter.menuLabelText, _make_importPage( pageImporter.fileType, pageImporter.filePattern, pageImporter.importFn ) )
 			
 			
 		

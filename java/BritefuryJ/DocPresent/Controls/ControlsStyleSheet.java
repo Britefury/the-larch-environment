@@ -10,10 +10,12 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Paint;
+import java.util.Arrays;
 
 import org.python.core.PyObject;
 
 import BritefuryJ.DocPresent.DPBorder;
+import BritefuryJ.DocPresent.DPFrame;
 import BritefuryJ.DocPresent.DPStaticText;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPWidget;
@@ -311,15 +313,19 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		PrimitiveStyleSheet textEntryStyle = getTextEntryStyleSheet();
 		DPText textElement = textEntryStyle.text( text );
-		DPBorder outerElement = textEntryStyle.border( textElement );
-		return new TextEntry( outerElement, textElement, listener );
+		DPWidget line = textEntryStyle.hbox( Arrays.asList( new DPWidget[] { textEntryStyle.segment( false, false, textElement ) } ) );
+		DPFrame frame = textEntryStyle.frame( line );
+		DPBorder outerElement = textEntryStyle.border( frame );
+		return new TextEntry( outerElement, frame, textElement, listener );
 	}
 
 	public TextEntry textEntry(String text, PyObject accept, PyObject cancel)
 	{
 		PrimitiveStyleSheet textEntryStyle = getTextEntryStyleSheet();
 		DPText textElement = textEntryStyle.text( text );
-		DPBorder outerElement = textEntryStyle.border( textElement );
-		return new TextEntry( outerElement, textElement, accept, cancel );
+		DPWidget line = textEntryStyle.hbox( Arrays.asList( new DPWidget[] { textEntryStyle.segment( false, false, textElement ) } ) );
+		DPFrame frame = textEntryStyle.frame( line );
+		DPBorder outerElement = textEntryStyle.border( frame );
+		return new TextEntry( outerElement, frame, textElement, accept, cancel );
 	}
 }

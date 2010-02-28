@@ -22,15 +22,15 @@ public class Modifier
 	public static final int BUTTON7 = 0x4000;
 	public static final int BUTTON8 = 0x8000;
 	
-	public static final int _KEYS_MASK = CTRL | SHIFT | ALT | ALT_GRAPH;
+	public static final int KEYS_MASK = CTRL | SHIFT | ALT | ALT_GRAPH;
 	
 	public static final int _BUTTONS_SHIFT = 8;
-	public static final int _BUTTONS_MASK = 0xff00;
+	public static final int BUTTONS_MASK = 0xff00;
 	
 	
 	public static boolean getButton(int modifiers, int button)
 	{
-		return ( ( ( modifiers & _BUTTONS_MASK )  >>  _BUTTONS_SHIFT )  >>  button ) != 0;
+		return ( ( ( modifiers & BUTTONS_MASK )  >>  _BUTTONS_SHIFT )  >>  button ) != 0;
 	}
 
 	public static int setButton(int modifiers, int button, boolean value)
@@ -49,6 +49,6 @@ public class Modifier
 
 	public static boolean isAButtonPressed(int modifiers)
 	{
-		return ( modifiers & _BUTTONS_MASK ) != 0;
+		return ( modifiers & BUTTONS_MASK ) != 0;
 	}
 }

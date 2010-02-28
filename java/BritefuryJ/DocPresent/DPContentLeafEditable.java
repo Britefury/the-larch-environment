@@ -602,6 +602,11 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		removeText( marker.getIndex(), length );
 	}
 	
+	public void removeText(Marker start, Marker end)
+	{
+		removeText( start.getIndex(), end.getIndex() - start.getIndex() );
+	}
+	
 	public void replaceText(Marker marker, int length, String x)
 	{
 		int index = marker.getClampedIndex();

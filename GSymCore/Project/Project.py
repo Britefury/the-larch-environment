@@ -8,7 +8,7 @@
 from Britefury.gSym.gSymUnitClass import GSymUnitClass, GSymUnitFactory
 from Britefury.gSym.gSymDocument import gSymUnit
 
-from GSymCore.Project.View import viewProjectDocNodeAsElement, viewProjectDocNodeAsPage, resolveProjectLocation
+from GSymCore.Project.ProjectEditor.View import viewProjectDocNodeAsElement, viewProjectDocNodeAsPage, resolveProjectLocation
 from GSymCore.Project import NodeClasses as Nodes
 
 
