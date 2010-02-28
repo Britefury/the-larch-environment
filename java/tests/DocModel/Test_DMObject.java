@@ -12,10 +12,13 @@ import java.util.HashMap;
 import java.util.List;
 
 import BritefuryJ.CommandHistory.CommandHistory;
-import BritefuryJ.DocModel.*;
+import BritefuryJ.DocModel.DMList;
+import BritefuryJ.DocModel.DMNode;
+import BritefuryJ.DocModel.DMObject;
+import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMSchema;
-import BritefuryJ.DocModel.DMSchema.ClassAlreadyDefinedException;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
+import BritefuryJ.DocModel.DMSchema.ClassAlreadyDefinedException;
 
 public class Test_DMObject extends Test_DMNode_base
 {

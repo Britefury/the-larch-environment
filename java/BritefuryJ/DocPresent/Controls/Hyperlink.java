@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent.Controls;
 import org.python.core.Py;
 import org.python.core.PyObject;
 
-import BritefuryJ.DocPresent.DPStaticText;
+import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.PageController;
@@ -106,23 +106,23 @@ public class Hyperlink extends Control
 
 	
 	
-	private DPStaticText element;
+	private DPText element;
 	private LinkListener listener;
 	
 	
-	protected Hyperlink(DPStaticText element, LinkListener listener)
+	protected Hyperlink(DPText element, LinkListener listener)
 	{
 		this.element = element;
 		this.listener = listener;
 		this.element.addInteractor( new LinkInteractor() );
 	}
 	
-	protected Hyperlink(DPStaticText element, String targetLocation)
+	protected Hyperlink(DPText element, String targetLocation)
 	{
 		this( element, new LinkTargetListener( targetLocation ) );
 	}
 	
-	protected Hyperlink(DPStaticText element, PyObject listener)
+	protected Hyperlink(DPText element, PyObject listener)
 	{
 		this( element, new PyLinkListener( listener ) );
 	}

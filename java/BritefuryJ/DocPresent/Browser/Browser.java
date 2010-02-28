@@ -13,6 +13,7 @@ import java.awt.Font;
 import java.awt.MediaTracker;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -30,16 +31,13 @@ import javax.swing.TransferHandler;
 import BritefuryJ.CommandHistory.CommandHistoryController;
 import BritefuryJ.CommandHistory.CommandHistoryListener;
 import BritefuryJ.DocPresent.DPPresentationArea;
-import BritefuryJ.DocPresent.DPStaticText;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.PageController;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemLocationResolver;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
-import BritefuryJ.DocPresent.StyleParams.StaticTextStyleParams;
-import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
-import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class Browser
 {
@@ -399,7 +397,7 @@ public class Browser
 	
 	
 	
-	
+	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
 	
 	
 	
@@ -413,25 +411,12 @@ public class Browser
 		
 		public DPWidget getContentsElement()
 		{
-			DPVBox pageBox = new DPVBox( );
+			DPText title = styleSheet.withFont( new Font( "Serif", Font.BOLD, 32 ) ).withTextSmallCaps( true ).staticText( "Default Root Page" );
 			
-			VBoxStyleParams contentBoxStyle = new VBoxStyleParams( null, null, 40.0 );
-			DPVBox contentBox = new DPVBox( contentBoxStyle );
-			
+			DPText contents = styleSheet.withFont( new Font( "SansSerif", Font.PLAIN, 16 ) ).staticText( "Empty document" );
+			DPVBox contentBox = styleSheet.withVBoxSpacing( 40.0 ).vbox( Arrays.asList( new DPWidget[] { title.alignHCentre(), contents.alignHExpand() } ) );
 
-			
-			StaticTextStyleParams titleStyle = new StaticTextStyleParams( null, null, new Font( "Serif", Font.BOLD, 32 ), Color.BLACK, false );
-			DPStaticText title = new DPStaticText( titleStyle, "Default root page" );
-			
-			StaticTextStyleParams contentsStyle = new StaticTextStyleParams( null, null, new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK, false );
-			DPStaticText contents = new DPStaticText( contentsStyle, "Empty document" );
-
-			contentBox.append( title.alignHCentre() );
-			contentBox.append( contents.alignHExpand() );
-
-			pageBox.append( SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_SYSTEMPAGE ) );
-			pageBox.append( contentBox.alignHExpand() );
-
+			DPVBox pageBox = styleSheet.vbox( Arrays.asList( new DPWidget[] { SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_SYSTEMPAGE ),  contentBox.alignHExpand() } ) );
 			
 			return pageBox.alignHExpand();
 		}
@@ -456,29 +441,15 @@ public class Browser
 
 		public DPWidget getContentsElement()
 		{
-			VBoxStyleParams pageBoxStyle = new VBoxStyleParams( null, null, 40.0 );
-			DPVBox pageBox = new DPVBox( pageBoxStyle );
+			DPText title = styleSheet.withFont( new Font( "Serif", Font.BOLD, 32 ) ).withTextSmallCaps( true ).staticText( "Could Not Resolve Location" );
 			
+			DPText loc = styleSheet.withFont( new Font( "SansSerif", Font.PLAIN, 16 ) ).staticText( location );
+			DPText error = styleSheet.withFont( new Font( "SansSerif", Font.PLAIN, 16 ) ).staticText( "could not be resolved" );
+			DPVBox errorBox = styleSheet.withVBoxSpacing( 10.0 ).vbox( Arrays.asList( new DPWidget[] { loc.alignHCentre(), error.alignHCentre() } ) );
+			
+			DPVBox pageBox = styleSheet.withVBoxSpacing( 40.0 ).vbox( Arrays.asList( new DPWidget[] { SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE ),
+					title.padY( 10.0 ).alignHCentre(), errorBox.padY( 10.0 ).alignHCentre() } ) );
 
-			TextStyleParams titleStyle = new TextStyleParams( null,null, true, new Font( "Serif", Font.BOLD, 32 ), Color.BLACK, null, false );
-			DPText title = new DPText( titleStyle, "Could Not Resolve Location" );
-			
-			VBoxStyleParams errorBoxStyle = new VBoxStyleParams( null, null, 10.0 );
-			DPVBox errorBox = new DPVBox( errorBoxStyle );
-			
-			TextStyleParams locationStyle = new TextStyleParams( null, null, true, new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK, null, false );
-			TextStyleParams errorStyle = new TextStyleParams( null, null, true, new Font( "SansSerif", Font.PLAIN, 16 ), Color.BLACK, null, false );
-
-			DPText loc = new DPText( locationStyle, location );
-			DPText error = new DPText( errorStyle, "could not be resolved" );
-			
-			errorBox.append( loc.alignHCentre() );
-			errorBox.append( error.alignHCentre() );
-
-			pageBox.append( SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE ) );
-			pageBox.append( title.padY( 10.0 ).alignHCentre() );
-			pageBox.append( errorBox.padY( 10.0 ).alignHCentre() );
-			
 			return pageBox.alignHExpand();
 		}
 	}

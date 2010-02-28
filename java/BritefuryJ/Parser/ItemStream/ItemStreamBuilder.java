@@ -6,7 +6,8 @@
 //##************************
 package BritefuryJ.Parser.ItemStream;
 
-import java.util.ArrayList;import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public class ItemStreamBuilder

@@ -11,12 +11,12 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
 import org.python.core.Py;
 import org.python.core.PyTuple;
 
 import BritefuryJ.DocPresent.Layout.TableLayout;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeTable;
+import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
 
 public class DPTable extends DPContainer
 {

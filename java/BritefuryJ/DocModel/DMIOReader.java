@@ -11,9 +11,9 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 import BritefuryJ.DocModel.DMSchema.UnknownClassException;
 import BritefuryJ.DocModel.DMSchemaResolver.CouldNotResolveSchemaException;
-import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 
 
 public class DMIOReader

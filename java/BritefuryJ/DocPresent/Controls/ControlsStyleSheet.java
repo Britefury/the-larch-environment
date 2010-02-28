@@ -16,7 +16,6 @@ import org.python.core.PyObject;
 
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPFrame;
-import BritefuryJ.DocPresent.DPStaticText;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPWidget;
 import BritefuryJ.DocPresent.Border.Border;
@@ -261,19 +260,19 @@ public class ControlsStyleSheet extends StyleSheet
 	
 	public Hyperlink link(String txt, String targetLocation)
 	{
-		DPStaticText element = getLinkStyleSheet().staticText( txt );
+		DPText element = getLinkStyleSheet().staticText( txt );
 		return new Hyperlink( element, targetLocation );
 	}
 	
 	public Hyperlink link(String txt, Hyperlink.LinkListener listener)
 	{
-		DPStaticText element = getLinkStyleSheet().staticText( txt );
+		DPText element = getLinkStyleSheet().staticText( txt );
 		return new Hyperlink( element, listener );
 	}
 	
 	public Hyperlink link(String txt, PyObject listener)
 	{
-		DPStaticText element = getLinkStyleSheet().staticText( txt );
+		DPText element = getLinkStyleSheet().staticText( txt );
 		return new Hyperlink( element, listener );
 	}
 	

@@ -18,9 +18,9 @@ import BritefuryJ.DocPresent.ListView.HorizontalListViewLayoutStyleSheet;
 import BritefuryJ.DocPresent.ListView.ListViewStyleSheet;
 import BritefuryJ.DocPresent.ListView.ParagraphListViewLayoutStyleSheet;
 import BritefuryJ.DocPresent.ListView.SeparatorElementFactory;
+import BritefuryJ.DocPresent.ListView.TrailingSeparator;
 import BritefuryJ.DocPresent.ListView.VerticalInlineListViewLayoutStyleSheet;
 import BritefuryJ.DocPresent.ListView.VerticalListViewLayoutStyleSheet;
-import BritefuryJ.DocPresent.ListView.TrailingSeparator;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 

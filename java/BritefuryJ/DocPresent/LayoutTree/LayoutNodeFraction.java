@@ -10,12 +10,12 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPFraction;
 import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.StyleParams.FractionStyleParams;
 import BritefuryJ.DocPresent.WidgetFilter;
 import BritefuryJ.DocPresent.Layout.FractionLayout;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
+import BritefuryJ.DocPresent.StyleParams.FractionStyleParams;
 import BritefuryJ.Math.Point2;
 
 public class LayoutNodeFraction extends ArrangedLayoutNode

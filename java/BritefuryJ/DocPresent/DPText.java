@@ -56,8 +56,7 @@ public class DPText extends DPContentLeafEditable
 	
 	public void setText(String text)
 	{
-		this.text = text;
-		onTextModified();
+		setText( text, text );
 	}
 	
 	public void setText(String text, String textRepresentation)

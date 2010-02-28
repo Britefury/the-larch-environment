@@ -8,10 +8,10 @@ package tests.DocModel;
 
 import java.util.Arrays;
 
-import BritefuryJ.DocModel.DMSchema;
 import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectField;
+import BritefuryJ.DocModel.DMSchema;
 import BritefuryJ.DocModel.DMSchema.ClassAlreadyDefinedException;
 
 public class Test_DMObjectClass extends TestCase
