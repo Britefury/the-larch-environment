@@ -63,7 +63,7 @@ DEFAULT_LINE_BREAK_PRIORITY = 100
 
 
 
-_statementKeyboardListener = StatementKeyboardListener()
+_statementIndentationInteractor = StatementIndentationInteractor()
 
 
 
@@ -130,7 +130,7 @@ def statementNodeEditor(styleSheet, node, contents):
 		else:
 			statementLine.setStructuralValueObject( node )
 		statementLine.setLinearRepresentationListener( StatementLinearRepresentationListener.newListener( parser ) )
-		statementLine.setKeyboardListener( _statementKeyboardListener )
+		statementLine.addInteractor( _statementIndentationInteractor )
 		return statementLine
 	else:
 		raise ValueError, 'invalid mode %d'  %  mode
@@ -143,7 +143,7 @@ def compoundStatementHeaderEditor(styleSheet, node, headerContents, headerContai
 	
 	headerStatementLine.setStructuralValueObject( node )
 	headerStatementLine.setLinearRepresentationListener( StatementLinearRepresentationListener.newListener( parser ) )
-	headerStatementLine.setKeyboardListener( _statementKeyboardListener )
+	headerStatementLine.addInteractor( _statementIndentationInteractor )
 	if headerContainerFn is not None:
 		headerStatementLine = headerContainerFn( headerStatementLine )
 	return headerStatementLine
@@ -163,7 +163,7 @@ def compoundStatementEditor(ctx, styleSheet, node, precedence, compoundBlocks, s
 		headerStatementLine = styleSheet.statementLine( headerContents )
 		headerStatementLine.setStructuralValueObject( headerNode )
 		headerStatementLine.setLinearRepresentationListener( CompoundHeaderLinearRepresentationListener.newListener( statementParser ) )
-		headerStatementLine.setKeyboardListener( _statementKeyboardListener )
+		headerStatementLine.addInteractor( _statementIndentationInteractor )
 		
 		if headerContainerFn is not None:
 			headerStatementLine = headerContainerFn( headerStatementLine )
