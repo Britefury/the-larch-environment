@@ -31,6 +31,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.ImageObserver;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
@@ -721,6 +722,11 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	{
 		return component;
 	}
+	
+	public ImageObserver getImageObserver()
+	{
+		return component;
+	}
 
 	public JComponent getPresentationComponent()
 	{
@@ -1259,6 +1265,10 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	{
 		// Perform allocation if necessary
 		performAllocation();
+		
+		// Enable anti-aliasing
+		//graphics.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
+		//graphics.setRenderingHint( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON );
 		
 		// Clip to the exposed area
 		graphics.clip( exposeArea );

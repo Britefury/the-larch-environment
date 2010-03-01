@@ -11,6 +11,8 @@ import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Paint;
 import java.awt.RadialGradientPaint;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPBin;
@@ -21,6 +23,7 @@ import BritefuryJ.DocPresent.DPFrame;
 import BritefuryJ.DocPresent.DPGridRow;
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPHiddenContent;
+import BritefuryJ.DocPresent.DPImage;
 import BritefuryJ.DocPresent.DPLineBreak;
 import BritefuryJ.DocPresent.DPMathRoot;
 import BritefuryJ.DocPresent.DPParagraph;
@@ -625,12 +628,6 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 	
 	
-	public DPHiddenContent hiddenContent(String textRepresentation)
-	{
-		return new DPHiddenContent( textRepresentation );
-	}
-
-	
 	public DPFraction fraction(DPWidget numerator, DPWidget denominator, String barContent)
 	{
 		DPFraction element = new DPFraction( getFractionParams(), getTextParams(), barContent );
@@ -663,6 +660,45 @@ public class PrimitiveStyleSheet extends StyleSheet
 		return element;
 	}
 
+	
+	public DPHiddenContent hiddenContent(String textRepresentation)
+	{
+		return new DPHiddenContent( textRepresentation );
+	}
+
+	
+	
+	public DPImage image(BufferedImage image, double imageWidth, double imageHeight)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", image, imageWidth, imageHeight );
+	}
+	
+	public DPImage image(BufferedImage image)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", image );
+	}
+	
+	public DPImage image(File imageFile, double imageWidth, double imageHeight)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", imageFile, imageWidth, imageHeight );
+	}
+	
+	public DPImage image(File imageFile)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", imageFile );
+	}
+	
+	public DPImage image(String imageFilename, double imageWidth, double imageHeight)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", imageFilename, imageWidth, imageHeight );
+	}
+	
+	public DPImage image(String imageFilename)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", imageFilename );
+	}
+	
+	
 	
 	public DPMathRoot mathRoot(DPWidget child)
 	{

@@ -1,0 +1,63 @@
+//##* This program is free software; you can use it, redistribute it and/or modify it
+//##* under the terms of the GNU General Public License version 2 as published by the
+//##* Free Software Foundation. The full text of the GNU General Public License
+//##* version 2 can be found in the file named 'COPYING' that accompanies this
+//##* program. This source code is (C)copyright Geoffrey French 2008.
+//##************************
+package BritefuryJ.DocPresent.Browser.SystemPages;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.Arrays;
+
+import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+
+public class ImageTestPage extends SystemPage
+{
+	protected ImageTestPage()
+	{
+		register( "tests.image" );
+	}
+	
+	
+	public String getTitle()
+	{
+		return "Image test";
+	}
+
+	protected String getDescription()
+	{
+		return "The image element displays an image (in the form of a java.awt.image.BufferedImage), or an image file.";
+	}
+	
+	
+	
+	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
+
+	
+	
+	protected DPWidget createContents()
+	{
+		BufferedImage ellipseImage = new BufferedImage( 64, 32, BufferedImage.TYPE_4BYTE_ABGR );
+		Graphics2D graphics = (Graphics2D)ellipseImage.getGraphics();
+		graphics.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
+		graphics.setPaint( new Color( 0.0f, 0.5f, 0.0f ) );
+		graphics.fillOval( 4, 4, 56, 24 );
+		
+		return styleSheet.vbox( Arrays.asList( new DPWidget[] {
+				styleSheet.text( "A 64x32 image with a green oval" ),
+				styleSheet.image( ellipseImage ),
+				styleSheet.text( "A 64x32 image with a green oval, scaled to 256x128" ),
+				styleSheet.image( ellipseImage, 256.0, 128.0 ),
+				styleSheet.text( "Image from 'back arrow' icon file, as file object" ),
+				styleSheet.image( new File( "icons/back arrow.png" ) ),
+				styleSheet.text( "Image from 'forward arrow' icon file, as file name string" ),
+				styleSheet.image( "icons/forward arrow.png" ),
+				styleSheet.text( "Invalid image filename" ),
+				styleSheet.image( "" ) } ) );
+	}
+}

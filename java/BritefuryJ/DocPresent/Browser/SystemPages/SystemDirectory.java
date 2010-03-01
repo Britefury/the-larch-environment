@@ -25,6 +25,7 @@ public class SystemDirectory
 		primitiveTestPages.add( new FractionTestPage() );
 		primitiveTestPages.add( new GridTestPage() );
 		primitiveTestPages.add( new HBoxTestPage() );
+		primitiveTestPages.add( new ImageTestPage() );
 		primitiveTestPages.add( new ListViewTestPage() );
 		primitiveTestPages.add( new MathRootTestPage() );
 		primitiveTestPages.add( new ParagraphCollationTestPage() );
