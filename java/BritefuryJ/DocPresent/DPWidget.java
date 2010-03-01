@@ -172,7 +172,6 @@ abstract public class DPWidget extends PointerInputElement
 		private DndHandler dndHandler;
 
 		private ElementLinearRepresentationListener linearRepresentationListener;		// Move this and the next one into an 'interactor' element
-		private ElementKeyboardListener keyboardListener;
 		
 		private ArrayList<ElementInteractor> interactors;
 		private ArrayList<ContextMenuFactory> contextFactories;
@@ -230,7 +229,7 @@ abstract public class DPWidget extends PointerInputElement
 		
 		public boolean isIdentity()
 		{
-			return dndHandler == null  &&  linearRepresentationListener == null  &&    keyboardListener == null  &&  interactors == null  &&  contextFactories == null;
+			return dndHandler == null  &&  linearRepresentationListener == null  &&  interactors == null  &&  contextFactories == null;
 		}
 	}
 
@@ -2188,19 +2187,6 @@ abstract public class DPWidget extends PointerInputElement
 		notifyInteractionFieldsModified();
 	}
 	
-
-	public ElementKeyboardListener getKeyboardListener()
-	{
-		return interactionFields != null  ?  interactionFields.keyboardListener  :  null;
-	}
-	
-	public void setKeyboardListener(ElementKeyboardListener listener)
-	{
-		ensureValidInteractionFields();
-		interactionFields.keyboardListener = listener;
-		notifyInteractionFieldsModified();
-	}
-	
 	
 
 	
@@ -2555,15 +2541,6 @@ abstract public class DPWidget extends PointerInputElement
 	// Sent directly to caret leaf, from root element, hence pass on to parent
 	protected boolean onKeyPress(KeyEvent event)
 	{
-		ElementKeyboardListener keyboardListener = getKeyboardListener();
-		if ( keyboardListener != null )
-		{
-			if ( keyboardListener.onKeyPress( this, event ) )
-			{
-				return true;
-			}
-		}
-		
 		boolean bHandled = false;
 		List<ElementInteractor> interactors = getInteractors();
 		if ( interactors != null )
@@ -2590,15 +2567,6 @@ abstract public class DPWidget extends PointerInputElement
 	// Sent directly to caret leaf, from root element, hence pass on to parent
 	protected boolean onKeyRelease(KeyEvent event)
 	{
-		ElementKeyboardListener keyboardListener = getKeyboardListener();
-		if ( keyboardListener != null )
-		{
-			if ( keyboardListener.onKeyRelease( this, event ) )
-			{
-				return true;
-			}
-		}
-
 		boolean bHandled = false;
 		List<ElementInteractor> interactors = getInteractors();
 		if ( interactors != null )
@@ -2625,15 +2593,6 @@ abstract public class DPWidget extends PointerInputElement
 	// Sent directly to caret leaf, from root element, hence pass on to parent
 	protected boolean onKeyTyped(KeyEvent event)
 	{
-		ElementKeyboardListener keyboardListener = getKeyboardListener();
-		if ( keyboardListener != null )
-		{
-			if ( keyboardListener.onKeyTyped( this, event ) )
-			{
-				return true;
-			}
-		}
-
 		boolean bHandled = false;
 		List<ElementInteractor> interactors = getInteractors();
 		if ( interactors != null )
