@@ -32,6 +32,7 @@ public class MathRootTestPage extends SystemPage
 
 	
 	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
+	private static PrimitiveStyleSheet rootStyleSheet = styleSheet.withForeground( Color.black ).withHoverForeground( new Color( 0.0f, 0.5f, 0.5f ) );
 	private static PrimitiveStyleSheet textStyleSheet = styleSheet.withForeground( new Color( 0.0f, 0.5f, 0.0f ) );
 
 	
@@ -45,9 +46,9 @@ public class MathRootTestPage extends SystemPage
 	{
 		ArrayList<DPWidget> children = new ArrayList<DPWidget>( );
 		
-		children.add( styleSheet.mathRoot( textStyleSheet.text( "a" ) ) );
-		children.add( styleSheet.mathRoot( textStyleSheet.text( "a+p" ) ) );
-		children.add( styleSheet.mathRoot( makeFraction( "a", "p+q" ) ) );
+		children.add( rootStyleSheet.mathRoot( textStyleSheet.text( "a" ) ) );
+		children.add( rootStyleSheet.mathRoot( textStyleSheet.text( "a+p" ) ) );
+		children.add( rootStyleSheet.mathRoot( makeFraction( "a", "p+q" ) ) );
 		
 		return styleSheet.vbox( children );
 	}

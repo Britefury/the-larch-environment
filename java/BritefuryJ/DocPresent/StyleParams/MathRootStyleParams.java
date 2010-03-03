@@ -23,22 +23,23 @@ public class MathRootStyleParams extends ContainerStyleParams
 {
 	private static final Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
 
-	public static final MathRootStyleParams defaultStyleParams = new MathRootStyleParams( null, null, defaultFont, Color.BLACK, 1.5 );
+	public static final MathRootStyleParams defaultStyleParams = new MathRootStyleParams( null, null, null, defaultFont, Color.BLACK, null, 1.5 );
 	
 	protected final Font font;
-	protected final Paint symbolPaint;
+	protected final Paint symbolPaint, hoverSymbolPaint;
 	protected final double thickness;
 	
 	protected double glyphLineWidths[], glyphWidth, barSpacing;
 	protected boolean bRealised;
 
 
-	public MathRootStyleParams(Painter background, Cursor pointerCursor, Font font, Paint symbolPaint, double thickness)
+	public MathRootStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, Font font, Paint symbolPaint, Paint hoverSymbolPaint, double thickness)
 	{
-		super( background, pointerCursor );
+		super( background, hoverBackground, pointerCursor );
 		
 		this.font = font;
 		this.symbolPaint = symbolPaint;
+		this.hoverSymbolPaint = hoverSymbolPaint;
 		this.thickness = thickness;
 		glyphLineWidths = new double[3];
 		this.barSpacing = 0.0;
@@ -54,6 +55,11 @@ public class MathRootStyleParams extends ContainerStyleParams
 	public Paint getSymbolPaint()
 	{
 		return symbolPaint;
+	}
+	
+	public Paint getHoverSymbolPaint()
+	{
+		return hoverSymbolPaint;
 	}
 
 	public double getThickness()

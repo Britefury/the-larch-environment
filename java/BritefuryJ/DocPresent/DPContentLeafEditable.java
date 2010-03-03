@@ -15,7 +15,7 @@ import java.util.WeakHashMap;
 
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.StyleParams.ContentLeafStyleParams;
+import BritefuryJ.DocPresent.StyleParams.ContentLeafEditableStyleParams;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Parser.ItemStream.ItemStream;
 import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
@@ -53,14 +53,14 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	protected DPContentLeafEditable(String textRepresentation)
 	{
-		this( ContentLeafStyleParams.defaultStyleParams, textRepresentation );
+		this( ContentLeafEditableStyleParams.defaultStyleParams, textRepresentation );
 	}
 	
-	protected DPContentLeafEditable(ContentLeafStyleParams styleParams, String textRepresentation)
+	protected DPContentLeafEditable(ContentLeafEditableStyleParams styleParams, String textRepresentation)
 	{
 		super(styleParams, textRepresentation );
 		
-		setFlag( FLAG_EDITABLE );
+		setFlagValue( FLAG_EDITABLE, styleParams.getEditable() );
 	}
 	
 

@@ -108,9 +108,16 @@ public class DPText extends DPContentLeafEditable
 	
 	
 	
+	public boolean isRedrawRequiredOnHover()
+	{
+		TextStyleParams s = (TextStyleParams)styleParams;
+		return super.isRedrawRequiredOnHover()  ||  s.getHoverTextPaint() != null;
+	}
+	
+
 	protected void draw(Graphics2D graphics)
 	{
-		TextStyleParams textStyleParams = (TextStyleParams) styleParams;
+		TextStyleParams textStyleParams = (TextStyleParams)styleParams;
 
 		Paint prevPaint = graphics.getPaint();
 
@@ -131,7 +138,19 @@ public class DPText extends DPContentLeafEditable
 			visual.drawSquiggleUnderline( graphics );
 		}
 
-		graphics.setPaint( textStyleParams.getTextPaint() );
+
+		Paint textPaint;
+		if ( testFlag( FLAG_HOVER ) )
+		{
+			Paint hoverSymbolPaint = textStyleParams.getHoverTextPaint();
+			textPaint = hoverSymbolPaint != null  ?  hoverSymbolPaint  :  textStyleParams.getTextPaint();
+		}
+		else
+		{
+			textPaint = textStyleParams.getTextPaint();
+		}
+
+		graphics.setPaint( textPaint );
 		visual.drawText( graphics );
 		
 		if ( deltaY != 0.0 )

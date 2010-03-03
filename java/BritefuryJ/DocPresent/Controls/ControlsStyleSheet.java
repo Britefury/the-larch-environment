@@ -48,7 +48,7 @@ public class ControlsStyleSheet extends StyleSheet
 		
 		initAttr( "primitiveStyleSheet", PrimitiveStyleSheet.instance );
 
-		initAttr( "linkAttrs", new AttributeSet( new String[] { "font", "foreground", "cursor" }, new Object[] { defaultLinkFont, Color.blue, defaultLinkCursor } ) );
+		initAttr( "linkAttrs", new AttributeSet( new String[] { "editable", "font", "foreground", "hoverForeground", "cursor" }, new Object[] { false, defaultLinkFont, Color.blue, Color.red, defaultLinkCursor } ) );
 		
 		initAttr( "buttonBorderThickness", 1.0 );
 		initAttr( "buttonMargin", 3.0 );

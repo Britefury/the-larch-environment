@@ -6,11 +6,13 @@
 //##************************
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.Painter.FilledOutlinePainter;
 import BritefuryJ.DocPresent.Painter.OutlinePainter;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
@@ -30,7 +32,8 @@ public class ParagraphCollationTestPage extends SystemPage
 	protected String getDescription()
 	{
 		return "Collateable elements such as proxy, span, and segment will place their children into a collation root element, such as a paragraph. " +
-		"The red text is within a span, which is within a paragraph, which contains black text on either side. Note that it flows as if it is all part of one paragraph."; 
+		"The red text is within a span, which is within a paragraph, which contains black text on either side. Note that it flows as if it is all part of one paragraph. " +
+		"Also demonstrates background painting, with hover enabled."; 
 	}
 
 	static String textBlock = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
@@ -98,7 +101,8 @@ public class ParagraphCollationTestPage extends SystemPage
 	{
 		PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
 		PrimitiveStyleSheet nestedTextStyleSheet = styleSheet.withForeground( Color.red );
-		PrimitiveStyleSheet spanStyleSheet = styleSheet.withBackground( new OutlinePainter( new Color( 1.0f, 0.7f, 0.3f ) ) );
+		PrimitiveStyleSheet spanStyleSheet = styleSheet.withBackground( new OutlinePainter( new Color( 1.0f, 0.7f, 0.3f ) ) ).withHoverBackground( 
+				new FilledOutlinePainter( new Color( 1.0f, 1.0f, 0.7f ), new Color( 1.0f, 1.0f, 0.0f ), new BasicStroke( 1.0f ) ) );
 		
 		DPWidget b2 = makeParagraph( "PER-WORD", 0.0, 1, styleSheet );
 		DPWidget b3 = makeParagraph( "EVERY-4-WORDS", 0.0, 4, styleSheet);

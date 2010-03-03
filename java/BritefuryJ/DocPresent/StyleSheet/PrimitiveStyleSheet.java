@@ -10,7 +10,6 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Paint;
-import java.awt.RadialGradientPaint;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
@@ -68,10 +67,6 @@ public class PrimitiveStyleSheet extends StyleSheet
 	
 	private static final Border default_border = new SolidBorder( 1.0, 2.0, Color.black, null );
 
-	private static final Paint default_buttonBorderPaint = new RadialGradientPaint( -10.0f, -10.0f, 100.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 0.2f, 0.3f, 0.5f ), new Color( 0.3f, 0.45f, 0.75f ) }, RadialGradientPaint.CycleMethod.NO_CYCLE );
-	private static final Paint default_buttonBackgroundPaint = new RadialGradientPaint( -10.0f, -10.0f, 100.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 0.9f, 0.92f, 1.0f ), new Color( 0.75f, 0.825f, 0.9f ) }, RadialGradientPaint.CycleMethod.NO_CYCLE );
-	private static final Paint default_buttonHighlightBackgroundPaint = new RadialGradientPaint( -10.0f, -10.0f, 100.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 1.0f, 1.0f, 1.0f ), new Color( 0.85f, 0.85f, 0.85f ) }, RadialGradientPaint.CycleMethod.NO_CYCLE );
-	
 
 	
 	public static final PrimitiveStyleSheet instance = new PrimitiveStyleSheet();
@@ -84,16 +79,15 @@ public class PrimitiveStyleSheet extends StyleSheet
 		
 		initAttr( "font", defaultFont );
 		initAttr( "foreground", Color.black );
+		initAttr( "hoverForeground", null );
 		initAttr( "background", null );
+		initAttr( "hoverBackground", null );
 		initAttr( "shapePainter", default_shapePainter );
+		initAttr( "hoverShapePainter", null );
 		initAttr( "cursor", null );
 
 		initAttr( "border", default_border );
 		
-		initAttr( "buttonBorderPaint", default_buttonBorderPaint );
-		initAttr( "buttonBackgroundPaint", default_buttonBackgroundPaint );
-		initAttr( "buttonHighlightBackgroundPaint", default_buttonHighlightBackgroundPaint );
-
 		initAttr( "fractionVSpacing", 2.0 );
 		initAttr( "fractionHPadding", 3.0 );
 		initAttr( "fractionRefYOffset", 5.0 );
@@ -146,14 +140,29 @@ public class PrimitiveStyleSheet extends StyleSheet
 		return (PrimitiveStyleSheet)withAttr( "foreground", paint );
 	}
 
+	public PrimitiveStyleSheet withHoverForeground(Paint paint)
+	{
+		return (PrimitiveStyleSheet)withAttr( "hoverForeground", paint );
+	}
+
 	public PrimitiveStyleSheet withBackground(Painter background)
 	{
 		return (PrimitiveStyleSheet)withAttr( "background", background );
 	}
 
+	public PrimitiveStyleSheet withHoverBackground(Painter hoverBackground)
+	{
+		return (PrimitiveStyleSheet)withAttr( "hoverBackground", hoverBackground );
+	}
+
 	public PrimitiveStyleSheet withShapePainter(Painter shapePainter)
 	{
 		return (PrimitiveStyleSheet)withAttr( "shapePainter", shapePainter );
+	}
+
+	public PrimitiveStyleSheet withHoverShapePainter(Painter shapePainter)
+	{
+		return (PrimitiveStyleSheet)withAttr( "hoverShapePainter", shapePainter );
 	}
 
 	public PrimitiveStyleSheet withCursor(Cursor cursor)
@@ -173,27 +182,6 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 
 
-	
-	//
-	// BUTTON
-	//
-	
-	public PrimitiveStyleSheet withButtonBorderPaint(Paint paint)
-	{
-		return (PrimitiveStyleSheet)withAttr( "buttonBorderPaint", paint );
-	}
-
-	public PrimitiveStyleSheet withButtonBackgroundPaint(Paint paint)
-	{
-		return (PrimitiveStyleSheet)withAttr( "buttonBackgroundPaint", paint );
-	}
-
-	public PrimitiveStyleSheet withButtonHighlightBackgroundPaint(Paint paint)
-	{
-		return (PrimitiveStyleSheet)withAttr( "buttonHighlightBackgroundPaint", paint );
-	}
-	
-	
 	
 	//
 	// FRACTION
@@ -382,6 +370,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 		{
 			containerParams = new ContainerStyleParams(
 					get( "background", Painter.class, null ),
+					get( "hoverBackground", Painter.class, null ),
 					get( "cursor", Cursor.class, null ) );
 		}
 		return containerParams;
@@ -396,6 +385,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 		{
 			contentLeafParams = new ContentLeafStyleParams(
 					get( "background", Painter.class, null ),
+					get( "hoverBackground", Painter.class, null ),
 					get( "cursor", Cursor.class, null ) );
 		}
 		return contentLeafParams;
@@ -410,6 +400,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 		{
 			fractionParams = new FractionStyleParams(
 					get( "background", Painter.class, null ),
+					get( "hoverBackground", Painter.class, null ),
 					get( "cursor", Cursor.class, null ),
 					getNonNull( "fractionVSpacing", Double.class, 2.0 ),
 					getNonNull( "fractionHPadding", Double.class, 3.0 ),
@@ -428,9 +419,11 @@ public class PrimitiveStyleSheet extends StyleSheet
 		{
 			fractionBarParams = new FractionStyleParams.BarStyleParams(
 					get( "background", Painter.class, null ),
+					get( "hoverBackground", Painter.class, null ),
 					get( "cursor", Cursor.class, null ),
 					getNonNull( "editable", Boolean.class, true ),
-					getNonNull( "foreground", Paint.class, Color.black ) );
+					getNonNull( "foreground", Paint.class, Color.black ),
+					get( "hoverForeground", Paint.class, null ) );
 		}
 		return fractionBarParams;
 	}
@@ -444,6 +437,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 		{
 			gridRowParams = new GridRowStyleParams(
 					get( "background", Painter.class, null ),
+					get( "hoverBackground", Painter.class, null ),
 					get( "cursor", Cursor.class, null ) );
 		}
 		return gridRowParams;
@@ -458,6 +452,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 		{
 			hboxParams = new HBoxStyleParams(
 					get( "background", Painter.class, null ),
+					get( "hoverBackground", Painter.class, null ),
 					get( "cursor", Cursor.class, null ),
 					getNonNull( "hboxSpacing", Double.class, 0.0 ) );
 		}
@@ -473,9 +468,11 @@ public class PrimitiveStyleSheet extends StyleSheet
 		{
 			mathRootParams = new MathRootStyleParams(
 					get( "background", Painter.class, null ),
+					get( "hoverBackground", Painter.class, null ),
 					get( "cursor", Cursor.class, null ),
 					getNonNull( "font", Font.class, defaultFont ),
 					getNonNull( "foreground", Paint.class, Color.black ),
+					get( "hoverForeground", Paint.class, null ),
 					getNonNull( "mathRootThickness", Double.class, 1.5 ) );
 		}
 		return mathRootParams;
@@ -490,6 +487,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 		{
 			paragraphParams = new ParagraphStyleParams(
 					get( "background", Painter.class, null ),
+					get( "hoverBackground", Painter.class, null ),
 					get( "cursor", Cursor.class, null ),
 					getNonNull( "paragraphSpacing", Double.class, 0.0 ),
 					getNonNull( "paragraphLineSpacing", Double.class, 0.0 ),
@@ -499,18 +497,20 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 	
 	
-	private ShapeStyleParams rectangleParams = null;
+	private ShapeStyleParams shapeParams = null;
 
 	private ShapeStyleParams getShapeParams()
 	{
-		if ( rectangleParams == null )
+		if ( shapeParams == null )
 		{
-			rectangleParams = new ShapeStyleParams(
+			shapeParams = new ShapeStyleParams(
 					get( "background", Painter.class, null ),
+					get( "hoverBackground", Painter.class, null ),
 					get( "cursor", Cursor.class, null ),
-					getNonNull( "shapePainter", Painter.class, default_shapePainter ) );
+					getNonNull( "shapePainter", Painter.class, default_shapePainter ),
+					get( "hoverShapePainter", Painter.class, null ) );
 		}
-		return rectangleParams;
+		return shapeParams;
 	}
 	
 	
@@ -522,6 +522,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 		{
 			scriptParams = new ScriptStyleParams(
 					get( "background", Painter.class, null ),
+					get( "hoverBackground", Painter.class, null ),
 					get( "cursor", Cursor.class, null ),
 					getNonNull( "scriptColumnSpacing", Double.class, 1.0 ),
 					getNonNull( "scriptRowSpacing", Double.class, 1.0 ) );
@@ -538,10 +539,12 @@ public class PrimitiveStyleSheet extends StyleSheet
 		{
 			staticTextParams = new TextStyleParams(
 					get( "background", Painter.class, null ),
+					get( "hoverBackground", Painter.class, null ),
 					get( "cursor", Cursor.class, null ),
 					false,
 					getNonNull( "font", Font.class, defaultFont ),
 					getNonNull( "foreground", Paint.class, Color.black ),
+					get( "hoverForeground", Paint.class, null ),
 					get( "textSquiggleUnderlinePaint", Paint.class, null ),
 					getNonNull( "textSmallCaps", Boolean.class, false ) );
 		}
@@ -557,6 +560,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 		{
 			tableParams = new TableStyleParams(
 					get( "background", Painter.class, null ),
+					get( "hoverBackground", Painter.class, null ),
 					get( "cursor", Cursor.class, null ),
 					getNonNull( "tableColumnSpacing", Double.class, 0.0 ),
 					getNonNull( "tableColumnExpand", Boolean.class, false ),
@@ -575,10 +579,12 @@ public class PrimitiveStyleSheet extends StyleSheet
 		{
 			textParams = new TextStyleParams(
 					get( "background", Painter.class, null ),
+					get( "hoverBackground", Painter.class, null ),
 					get( "cursor", Cursor.class, null ),
 					getNonNull( "editable", Boolean.class, true ),
 					getNonNull( "font", Font.class, defaultFont ),
 					getNonNull( "foreground", Paint.class, Color.black ),
+					get( "hoverForeground", Paint.class, null ),
 					get( "textSquiggleUnderlinePaint", Paint.class, null ),
 					getNonNull( "textSmallCaps", Boolean.class, false ) );
 		}
@@ -594,6 +600,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 		{
 			vboxParams = new VBoxStyleParams(
 					get( "background", Painter.class, null ),
+					get( "hoverBackground", Painter.class, null ),
 					get( "cursor", Cursor.class, null ),
 					getNonNull( "vboxSpacing", Double.class, 0.0 ) );
 		}

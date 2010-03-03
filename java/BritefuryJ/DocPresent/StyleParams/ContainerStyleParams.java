@@ -13,11 +13,11 @@ import BritefuryJ.DocPresent.Painter.Painter;
 
 public class ContainerStyleParams extends WidgetStyleParams
 {
-	public static final ContainerStyleParams defaultStyleParams = new ContainerStyleParams( null, null );
+	public static final ContainerStyleParams defaultStyleParams = new ContainerStyleParams( null, null, null );
 
 
-	public ContainerStyleParams(Painter background, Cursor pointerCursor)
+	public ContainerStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor)
 	{
-		super( background, pointerCursor );
+		super( background, hoverBackground, pointerCursor );
 	}
 }

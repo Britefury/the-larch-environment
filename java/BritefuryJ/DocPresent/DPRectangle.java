@@ -10,6 +10,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeRectangle;
+import BritefuryJ.DocPresent.Painter.Painter;
 import BritefuryJ.DocPresent.StyleParams.ShapeStyleParams;
 
 public class DPRectangle extends DPContentLeaf
@@ -46,10 +47,28 @@ public class DPRectangle extends DPContentLeaf
 
 
 
+	public boolean isRedrawRequiredOnHover()
+	{
+		ShapeStyleParams s = (ShapeStyleParams)styleParams;
+		return super.isRedrawRequiredOnHover()  ||  s.getHoverPainter() != null;
+	}
+	
+
 	protected void draw(Graphics2D graphics)
 	{
 		ShapeStyleParams p = (ShapeStyleParams)styleParams;
 		
-		p.getPainter().drawShape( graphics, new Rectangle2D.Double( 0.0, 0.0, getAllocationX(), getAllocationY() ) );
+		Painter painter;
+		if ( testFlag( FLAG_HOVER ) )
+		{
+			Painter hoverPainter = p.getHoverPainter();
+			painter = hoverPainter != null  ?  hoverPainter  :  p.getPainter();
+		}
+		else
+		{
+			painter = p.getPainter();
+		}
+
+		painter.drawShape( graphics, new Rectangle2D.Double( 0.0, 0.0, getAllocationX(), getAllocationY() ) );
 	}
 }

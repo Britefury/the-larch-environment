@@ -14,20 +14,26 @@ import BritefuryJ.DocPresent.Painter.Painter;
 
 public class ShapeStyleParams extends ContentLeafStyleParams
 {
-	public static final ShapeStyleParams defaultStyleParams = new ShapeStyleParams( null, null, new FillPainter( Color.black ) );
-	private Painter painter;
+	public static final ShapeStyleParams defaultStyleParams = new ShapeStyleParams( null, null, null, new FillPainter( Color.black ), null );
+	private Painter painter, hoverPainter;
 	
 	
-	public ShapeStyleParams(Painter background, Cursor pointerCursor, Painter painter)
+	public ShapeStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, Painter painter, Painter hoverPainter)
 	{
-		super( background, pointerCursor );
+		super( background, hoverBackground, pointerCursor );
 		
 		this.painter = painter;
+		this.hoverPainter = hoverPainter;
 	}
 	
 	
 	public Painter getPainter()
 	{
 		return painter;
+	}
+
+	public Painter getHoverPainter()
+	{
+		return hoverPainter;
 	}
 }

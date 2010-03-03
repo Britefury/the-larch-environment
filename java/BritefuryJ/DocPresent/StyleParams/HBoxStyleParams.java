@@ -14,11 +14,11 @@ import BritefuryJ.DocPresent.Painter.Painter;
 
 public class HBoxStyleParams extends AbstractBoxStyleParams
 {
-	public static final HBoxStyleParams defaultStyleParams = new HBoxStyleParams( null, null, 0.0 );
+	public static final HBoxStyleParams defaultStyleParams = new HBoxStyleParams( null, null, null, 0.0 );
 
 
-	public HBoxStyleParams(Painter background, Cursor pointerCursor, double spacing)
+	public HBoxStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, double spacing)
 	{
-		super( background, pointerCursor, spacing );
+		super( background, hoverBackground, pointerCursor, spacing );
 	}
 }

@@ -50,6 +50,12 @@ public class InputTable
 		mouse.onRootElementReallocate();
 	}
 	
+	
+	public boolean arePointersWithinBoundsOfElement(PointerInputElement element)
+	{
+		return pointersWithinBoundsByElement.containsKey( element );
+	}
+	
 	public ArrayList<PointerInterface> getPointersWithinBoundsOfElement(PointerInputElement element)
 	{
 		return pointersWithinBoundsByElement.get( element );

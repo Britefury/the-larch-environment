@@ -246,8 +246,9 @@ abstract public class DPWidget extends PointerInputElement
 	protected final static int FLAG_RESIZE_QUEUED = 0x2;
 	protected final static int FLAG_SIZE_UP_TO_DATE = 0x4;
 	protected final static int FLAG_CARET_GRABBED = 0x8;
+	protected final static int FLAG_HOVER = 0x10;
 
-	protected final static int _ALIGN_SHIFT = 4;
+	protected final static int _ALIGN_SHIFT = 5;
 	protected final static int _ALIGN_MASK = ElementAlignment._ELEMENTALIGN_MASK  <<  _ALIGN_SHIFT;
 	protected final static int _HALIGN_MASK = ElementAlignment._HALIGN_MASK  <<  _ALIGN_SHIFT;
 	protected final static int _VALIGN_MASK = ElementAlignment._VALIGN_MASK  <<  _ALIGN_SHIFT;
@@ -861,6 +862,18 @@ abstract public class DPWidget extends PointerInputElement
 	//
 	//
 	
+	protected boolean arePointersWithinBounds()
+	{
+		if ( presentationArea != null )
+		{
+			return presentationArea.getInputTable().arePointersWithinBoundsOfElement( this );
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
 	protected ArrayList<PointerInterface> getPointersWithinBounds()
 	{
 		if ( presentationArea != null )
@@ -1240,10 +1253,19 @@ abstract public class DPWidget extends PointerInputElement
 	{
 		WidgetStyleParams styleParams = getStyleParams();
 		
-		Painter b = styleParams.getBackground();
-		if ( b != null )
+		Painter backgroundPainter;
+		if ( testFlag( FLAG_HOVER ) )
 		{
-			b.drawShapes( graphics, getShapes() );
+			Painter hoverBackground = styleParams.getHoverBackground();
+			backgroundPainter = hoverBackground != null  ?  hoverBackground  :  styleParams.getBackground();
+		}
+		else
+		{
+			backgroundPainter = styleParams.getBackground();
+		}
+		if ( backgroundPainter != null )
+		{
+			backgroundPainter.drawShapes( graphics, getShapes() );
 		}
 	}
 	
@@ -1284,6 +1306,17 @@ abstract public class DPWidget extends PointerInputElement
 	public void queueFullRedraw()
 	{
 		queueRedraw( new Point2(), getAllocation() );
+	}
+	
+	
+	public boolean isRedrawRequiredOnHover()
+	{
+		return styleParams.getHoverBackground() != null;
+	}
+	
+	public boolean isResizeRequiredOnHover()
+	{
+		return false;
 	}
 	
 	
@@ -1514,6 +1547,8 @@ abstract public class DPWidget extends PointerInputElement
 	
 	protected void handlePointerEnter(PointerMotionEvent event)
 	{
+		handleHover();
+			
 		Cursor cursor = getCursor();
 		if ( cursor != null  &&  presentationArea != null )
 		{
@@ -1532,6 +1567,8 @@ abstract public class DPWidget extends PointerInputElement
 	
 	protected void handlePointerLeave(PointerMotionEvent event)
 	{
+		handleHover();
+		
 		Cursor cursor = getCursor();
 		if ( cursor != null  &&  presentationArea != null )
 		{
@@ -1552,6 +1589,24 @@ abstract public class DPWidget extends PointerInputElement
 			for (ElementInteractor interactor: interactors)
 			{
 				interactor.onLeave( this, event );
+			}
+		}
+	}
+	
+	private void handleHover()
+	{
+		boolean bPrevHover = testFlag( FLAG_HOVER );
+		boolean bHover = arePointersWithinBounds();
+		if ( bHover != bPrevHover )
+		{
+			setFlagValue( FLAG_HOVER, bHover );
+			if ( isResizeRequiredOnHover() )
+			{
+				queueResize();
+			}
+			else if ( isRedrawRequiredOnHover() )
+			{
+				queueFullRedraw();
 			}
 		}
 	}
@@ -2666,9 +2721,9 @@ abstract public class DPWidget extends PointerInputElement
 	// Meta-element
 	//
 	
-	protected static TextStyleParams headerDebugTextStyle = new TextStyleParams( null, null, true, new Font( "Sans serif", Font.BOLD, 14 ), new Color( 0.0f, 0.5f, 0.5f ), null, false );
-	protected static TextStyleParams headerDescriptionTextStyle = new TextStyleParams( null, null, true, new Font( "Sans serif", Font.PLAIN, 14 ), new Color( 0.0f, 0.0f, 0.75f ), null, false );
-	protected static HBoxStyleParams metaHeaderHBoxStyle = new HBoxStyleParams( null, null, 10.0 );
+	protected static TextStyleParams headerDebugTextStyle = new TextStyleParams( null, null, null, true, new Font( "Sans serif", Font.BOLD, 14 ), new Color( 0.0f, 0.5f, 0.5f ), null, null, false );
+	protected static TextStyleParams headerDescriptionTextStyle = new TextStyleParams( null, null, null, true, new Font( "Sans serif", Font.PLAIN, 14 ), new Color( 0.0f, 0.0f, 0.75f ), null, null, false );
+	protected static HBoxStyleParams metaHeaderHBoxStyle = new HBoxStyleParams( null, null, null, 10.0 );
 	protected static EmptyBorder metaHeaderEmptyBorder = new EmptyBorder();
 
 

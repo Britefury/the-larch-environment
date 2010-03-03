@@ -13,15 +13,15 @@ import BritefuryJ.DocPresent.Painter.Painter;
 
 public class ScriptStyleParams extends ContainerStyleParams
 {
-	public static final ScriptStyleParams defaultStyleSheet = new ScriptStyleParams( null, null, 1.0, 1.0 );
+	public static final ScriptStyleParams defaultStyleSheet = new ScriptStyleParams( null, null, null, 1.0, 1.0 );
 	
 	
 	private final double columnSpacing, rowSpacing;
 	
 	
-	public ScriptStyleParams(Painter background, Cursor pointerCursor, double columnSpacing, double rowSpacing)
+	public ScriptStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, double columnSpacing, double rowSpacing)
 	{
-		super( background, pointerCursor );
+		super( background, hoverBackground, pointerCursor );
 		
 		this.columnSpacing = columnSpacing;
 		this.rowSpacing = rowSpacing;

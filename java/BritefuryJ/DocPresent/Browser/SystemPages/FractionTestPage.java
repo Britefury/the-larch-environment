@@ -17,6 +17,7 @@ import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 public class FractionTestPage extends SystemPage
 {
 	private static final PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
+	private static final PrimitiveStyleSheet fractionStyle = styleSheet.withForeground( Color.black ).withHoverForeground( new Color( 0.0f, 0.5f, 0.5f ) );
 	private static final PrimitiveStyleSheet smallStyle = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 10 ) ).withForeground( new Color( 0.0f, 0.5f, 0.0f) );
 	private static final PrimitiveStyleSheet largeStyle = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 24 ) ).withForeground( new Color( 0.0f, 0.5f, 0.0f) );
 	
@@ -40,7 +41,7 @@ public class FractionTestPage extends SystemPage
 
 	private DPWidget makeFractionLine(DPWidget num, DPWidget denom)
 	{
-		return styleSheet.hbox( Arrays.asList( new DPWidget[] { smallStyle.text( "<<Left<<" ), styleSheet.fraction( num, denom, "/" ), largeStyle.text( ">>Right>>" ) } ) );
+		return styleSheet.hbox( Arrays.asList( new DPWidget[] { smallStyle.text( "<<Left<<" ), fractionStyle.fraction( num, denom, "/" ), largeStyle.text( ">>Right>>" ) } ) );
 	}
 	
 	private DPWidget span(DPWidget... children)
@@ -59,14 +60,14 @@ public class FractionTestPage extends SystemPage
 
 		lines.add( styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 24 ) ).text( "---" ) );
 		
-		lines.add( makeFractionLine( span( styleSheet.text( "a+" ), styleSheet.fraction( styleSheet.text( "x" ), styleSheet.text( "y" ), "/" ) ),
+		lines.add( makeFractionLine( span( styleSheet.text( "a+" ), fractionStyle.fraction( styleSheet.text( "x" ), styleSheet.text( "y" ), "/" ) ),
 				styleSheet.text( "p+q" ) ) );
-		lines.add( makeFractionLine( span( styleSheet.fraction( styleSheet.text( "x" ), styleSheet.text( "y" ), "/" ),  styleSheet.text( "+b" ) ),
+		lines.add( makeFractionLine( span( fractionStyle.fraction( styleSheet.text( "x" ), styleSheet.text( "y" ), "/" ),  styleSheet.text( "+b" ) ),
 				styleSheet.text( "p+q" ) ) );
 		lines.add( makeFractionLine( styleSheet.text( "a+b" ),
-				span( styleSheet.text( "p+" ), styleSheet.fraction( styleSheet.text( "x" ), styleSheet.text( "y" ), "/" ) ) ) );
+				span( styleSheet.text( "p+" ), fractionStyle.fraction( styleSheet.text( "x" ), styleSheet.text( "y" ), "/" ) ) ) );
 		lines.add( makeFractionLine( styleSheet.text( "a+b" ),
-				span( styleSheet.fraction( styleSheet.text( "x" ), styleSheet.text( "y" ), "/" ),  styleSheet.text( "+q" ) ) ) );
+				span( fractionStyle.fraction( styleSheet.text( "x" ), styleSheet.text( "y" ), "/" ),  styleSheet.text( "+q" ) ) ) );
 		
 		return styleSheet.withVBoxSpacing( 10.0 ).vbox( lines  );
 	}

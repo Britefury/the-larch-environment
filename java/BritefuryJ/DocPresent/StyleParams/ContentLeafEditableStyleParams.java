@@ -12,21 +12,21 @@ import BritefuryJ.DocPresent.Painter.Painter;
 
 public class ContentLeafEditableStyleParams extends ContentLeafStyleParams
 {
-	public static final ContentLeafEditableStyleParams defaultStyleParams = new ContentLeafEditableStyleParams( null, null, true );
+	public static final ContentLeafEditableStyleParams defaultStyleParams = new ContentLeafEditableStyleParams( null, null, null, true );
 	
 	private final boolean bEditable;
 	
 	
 	
-	public ContentLeafEditableStyleParams(Painter background, Cursor pointerCursor, boolean bEditable)
+	public ContentLeafEditableStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, boolean bEditable)
 	{
-		super( background, pointerCursor );
+		super( background, hoverBackground, pointerCursor );
 		
 		this.bEditable = bEditable;
 	}
 	
 	
-	public boolean isEditable()
+	public boolean getEditable()
 	{
 		return bEditable;
 	}

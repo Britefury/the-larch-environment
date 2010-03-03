@@ -12,11 +12,11 @@ import BritefuryJ.DocPresent.Painter.Painter;
 
 public class GridRowStyleParams extends ContainerStyleParams
 {
-	public static final GridRowStyleParams defaultStyleParams = new GridRowStyleParams( null, null );
+	public static final GridRowStyleParams defaultStyleParams = new GridRowStyleParams( null, null, null );
 
 
-	public GridRowStyleParams(Painter background, Cursor pointerCursor)
+	public GridRowStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor)
 	{
-		super( background, pointerCursor );
+		super( background, hoverBackground, pointerCursor );
 	}
 }
