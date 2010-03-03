@@ -25,63 +25,78 @@ import BritefuryJ.DocPresent.StyleParams.ContentLeafStyleParams;
 public class DPImage extends DPContentLeaf
 {
 	private double imageScaleX, imageScaleY;
-	private BufferedImage image;
+	private double hoverImageScaleX, hoverImageScaleY;
+	private BufferedImage image, hoverImage;
 	
 	
-	public DPImage(ContentLeafStyleParams styleParams, String textRepresentation, BufferedImage image, double imageWidth, double imageHeight)
+	public DPImage(ContentLeafStyleParams styleParams, String textRepresentation, BufferedImage image, BufferedImage hoverImage, double imageWidth, double imageHeight)
 	{
 		super( styleParams, textRepresentation );
 		
-		initImage( image, imageWidth, imageHeight );
+		initImage( image, hoverImage, imageWidth, imageHeight );
 	}
 	
-	public DPImage(ContentLeafStyleParams styleParams, String textRepresentation, BufferedImage image)
+	public DPImage(ContentLeafStyleParams styleParams, String textRepresentation, BufferedImage image, BufferedImage hoverImage)
 	{
 		super( styleParams, textRepresentation );
 		
-		initImage( image );
+		initImage( image, hoverImage );
 	}
 	
-	public DPImage(ContentLeafStyleParams styleParams, String textRepresentation, File imageFile, double imageWidth, double imageHeight)
+	public DPImage(ContentLeafStyleParams styleParams, String textRepresentation, File imageFile, File hoverImageFile, double imageWidth, double imageHeight)
 	{
 		super( styleParams, textRepresentation );
 		
-		initImage( readImageFile( imageFile ),  imageWidth, imageHeight );
+		initImage( readImageFile( imageFile ), hoverImageFile != null  ?  readImageFile( hoverImageFile )  :  null,  imageWidth, imageHeight );
 	}
 	
-	public DPImage(ContentLeafStyleParams styleParams, String textRepresentation, File imageFile)
+	public DPImage(ContentLeafStyleParams styleParams, String textRepresentation, File imageFile, File hoverImageFile)
 	{
 		super( styleParams, textRepresentation );
 		
-		initImage( readImageFile( imageFile ) );
+		initImage( readImageFile( imageFile ), hoverImageFile != null  ?  readImageFile( hoverImageFile )  :  null );
 	}
 	
-	public DPImage(ContentLeafStyleParams styleParams, String textRepresentation, String imageFilename, double imageWidth, double imageHeight)
+	public DPImage(ContentLeafStyleParams styleParams, String textRepresentation, String imageFilename, String hoverImageFilename, double imageWidth, double imageHeight)
 	{
-		this( styleParams, textRepresentation, new File( imageFilename ), imageWidth, imageHeight );
+		this( styleParams, textRepresentation, new File( imageFilename ), hoverImageFilename != null  ?  new File( hoverImageFilename )  :  null,  imageWidth, imageHeight );
 	}
 	
-	public DPImage(ContentLeafStyleParams styleParams, String textRepresentation, String imageFilename)
+	public DPImage(ContentLeafStyleParams styleParams, String textRepresentation, String imageFilename, String hoverImageFilename)
 	{
-		this( styleParams, textRepresentation, new File( imageFilename ) );
+		this( styleParams, textRepresentation, new File( imageFilename ), hoverImageFilename != null  ?  new File( hoverImageFilename )  :  null );
 	}
 	
 	
 	
-	private void initImage(BufferedImage image, double imageWidth, double imageHeight)
+	private void initImage(BufferedImage image, BufferedImage hoverImage, double imageWidth, double imageHeight)
 	{
 		this.image = image;
 		imageScaleX = imageWidth / (double)image.getWidth();
 		imageScaleY = imageHeight / (double)image.getHeight();
 		
+		this.hoverImage = hoverImage;
+		if ( hoverImage != null )
+		{
+			hoverImageScaleX = imageWidth / (double)hoverImage.getWidth();
+			hoverImageScaleY = imageHeight / (double)hoverImage.getHeight();
+		}
+		
 		layoutNode = new LayoutNodeImage( this );
 	}
 	
-	private void initImage(BufferedImage image)
+	private void initImage(BufferedImage image, BufferedImage hoverImage)
 	{
 		this.image = image;
 		imageScaleX = imageScaleY = 1.0;
 		
+		this.hoverImage = hoverImage;
+		if ( hoverImage != null )
+		{
+			hoverImageScaleX = (double)image.getWidth() / (double)hoverImage.getWidth();
+			hoverImageScaleY = (double)image.getHeight() / (double)hoverImage.getHeight();
+		}
+
 		layoutNode = new LayoutNodeImage( this );
 	}
 	
@@ -121,21 +136,34 @@ public class DPImage extends DPContentLeaf
 	
 	
 	
+	public boolean isRedrawRequiredOnHover()
+	{
+		return super.isRedrawRequiredOnHover()  ||  hoverImage != null;
+	}
+	
+
 	protected void draw(Graphics2D graphics)
 	{
 		DPPresentationArea presArea = getPresentationArea();
 		
 		if ( presArea != null )
 		{
-			if ( imageScaleX == 1.0  &&  imageScaleY == 1.0 )
+			boolean bUseHover = testFlag( FLAG_HOVER )  ?  hoverImage != null  :  false;
+			
+			BufferedImage img = bUseHover  ?  hoverImage  :  image;
+			double sX = bUseHover  ?  hoverImageScaleX  :  imageScaleX;
+			double sY = bUseHover  ?  hoverImageScaleY  :  imageScaleY;
+
+			
+			if ( sX == 1.0  &&  sY == 1.0 )
 			{
-				graphics.drawImage( image, 0, 0, presArea.getImageObserver() );
+				graphics.drawImage( img, 0, 0, presArea.getImageObserver() );
 			}
 			else
 			{
 				AffineTransform xform = new AffineTransform();
-				xform.setToScale( imageScaleX, imageScaleY );
-				graphics.drawImage( image, xform, presArea.getImageObserver() );
+				xform.setToScale( sX, sY );
+				graphics.drawImage( img, xform, presArea.getImageObserver() );
 			}
 		}
 	}
