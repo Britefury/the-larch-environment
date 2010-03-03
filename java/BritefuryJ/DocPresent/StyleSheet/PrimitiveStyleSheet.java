@@ -677,32 +677,62 @@ public class PrimitiveStyleSheet extends StyleSheet
 	
 	public DPImage image(BufferedImage image, double imageWidth, double imageHeight)
 	{
-		return new DPImage( getContentLeafStyleParams(), "", image, imageWidth, imageHeight );
+		return new DPImage( getContentLeafStyleParams(), "", image, null, imageWidth, imageHeight );
+	}
+	
+	public DPImage image(BufferedImage image, BufferedImage hoverImage, double imageWidth, double imageHeight)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", image, hoverImage, imageWidth, imageHeight );
 	}
 	
 	public DPImage image(BufferedImage image)
 	{
-		return new DPImage( getContentLeafStyleParams(), "", image );
+		return new DPImage( getContentLeafStyleParams(), "", image, null );
+	}
+	
+	public DPImage image(BufferedImage image, BufferedImage hoverImage)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", image, hoverImage );
 	}
 	
 	public DPImage image(File imageFile, double imageWidth, double imageHeight)
 	{
-		return new DPImage( getContentLeafStyleParams(), "", imageFile, imageWidth, imageHeight );
+		return new DPImage( getContentLeafStyleParams(), "", imageFile, null, imageWidth, imageHeight );
+	}
+	
+	public DPImage image(File imageFile, File hoverImageFile, double imageWidth, double imageHeight)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", imageFile, hoverImageFile, imageWidth, imageHeight );
 	}
 	
 	public DPImage image(File imageFile)
 	{
-		return new DPImage( getContentLeafStyleParams(), "", imageFile );
+		return new DPImage( getContentLeafStyleParams(), "", imageFile, null );
+	}
+	
+	public DPImage image(File imageFile, File hoverImageFile)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", imageFile, hoverImageFile );
 	}
 	
 	public DPImage image(String imageFilename, double imageWidth, double imageHeight)
 	{
-		return new DPImage( getContentLeafStyleParams(), "", imageFilename, imageWidth, imageHeight );
+		return new DPImage( getContentLeafStyleParams(), "", imageFilename, null, imageWidth, imageHeight );
+	}
+	
+	public DPImage image(String imageFilename, String hoverImageFilename, double imageWidth, double imageHeight)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", imageFilename, hoverImageFilename, imageWidth, imageHeight );
 	}
 	
 	public DPImage image(String imageFilename)
 	{
-		return new DPImage( getContentLeafStyleParams(), "", imageFilename );
+		return new DPImage( getContentLeafStyleParams(), "", imageFilename, null );
+	}
+	
+	public DPImage image(String imageFilename, String hoverImageFilename)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", imageFilename, hoverImageFilename );
 	}
 	
 	

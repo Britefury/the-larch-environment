@@ -48,16 +48,26 @@ public class ImageTestPage extends SystemPage
 		graphics.setPaint( new Color( 0.0f, 0.5f, 0.0f ) );
 		graphics.fillOval( 4, 4, 56, 24 );
 		
+		BufferedImage blueEllipseImage = new BufferedImage( 64, 32, BufferedImage.TYPE_4BYTE_ABGR );
+		graphics = (Graphics2D)blueEllipseImage.getGraphics();
+		graphics.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
+		graphics.setPaint( new Color( 0.1f, 0.25f, 0.5f ) );
+		graphics.fillOval( 4, 4, 56, 24 );
+		
 		return styleSheet.vbox( Arrays.asList( new DPWidget[] {
 				styleSheet.text( "A 64x32 image with a green oval" ),
 				styleSheet.image( ellipseImage ),
 				styleSheet.text( "A 64x32 image with a green oval, scaled to 256x128" ),
 				styleSheet.image( ellipseImage, 256.0, 128.0 ),
-				styleSheet.text( "Image from 'back arrow' icon file, as file object" ),
+				styleSheet.text( "Image from 'back arrow' image file, as file object" ),
 				styleSheet.image( new File( "icons/back arrow.png" ) ),
-				styleSheet.text( "Image from 'forward arrow' icon file, as file name string" ),
+				styleSheet.text( "Image from 'forward arrow' image file, as file name string" ),
 				styleSheet.image( "icons/forward arrow.png" ),
 				styleSheet.text( "Invalid image filename" ),
-				styleSheet.image( "" ) } ) );
+				styleSheet.image( "" ),
+				styleSheet.text( "A 64x32 image with a green oval, with a blue oval displayed on hover" ),
+				styleSheet.image( ellipseImage, blueEllipseImage ),
+				styleSheet.text( "Image from 'back arrow' image file, as file object, with 'forward arrow' image file on hover" ),
+				styleSheet.image( new File( "icons/back arrow.png" ), new File( "icons/forward arrow.png" ) ) } ) );
 	}
 }
