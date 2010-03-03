@@ -14,15 +14,15 @@ import BritefuryJ.DocPresent.Painter.Painter;
 
 public class ParagraphStyleParams extends ContainerStyleParams
 {
-	public static final ParagraphStyleParams defaultStyleParams = new ParagraphStyleParams( null, null, 0.0, 0.0, 0.0 );
+	public static final ParagraphStyleParams defaultStyleParams = new ParagraphStyleParams( null, null, null, 0.0, 0.0, 0.0 );
 	
 	
 	private final double spacing, lineSpacing, indentation;
 
 
-	public ParagraphStyleParams(Painter background, Cursor pointerCursor, double spacing, double lineSpacing, double indentation)
+	public ParagraphStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, double spacing, double lineSpacing, double indentation)
 	{
-		super( background, pointerCursor );
+		super( background, hoverBackground, pointerCursor );
 		
 		this.spacing = spacing;
 		this.lineSpacing = lineSpacing;

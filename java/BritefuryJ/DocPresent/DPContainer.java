@@ -937,7 +937,7 @@ public abstract class DPContainer extends DPWidget
 	//
 	
 	static EmptyBorder metaIndentBorder = new EmptyBorder( 25.0, 0.0, 0.0, 0.0 );
-	static VBoxStyleParams metaVBoxStyle = new VBoxStyleParams( null, null, 0.0 );
+	static VBoxStyleParams metaVBoxStyle = new VBoxStyleParams( null, null, null, 0.0 );
 	
 	public DPBorder getMetaHeaderBorderWidget()
 	{

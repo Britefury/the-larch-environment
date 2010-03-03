@@ -6,9 +6,11 @@
 //##************************
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
+import java.awt.Color;
 import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class RectangleTestPage extends SystemPage
@@ -32,17 +34,18 @@ public class RectangleTestPage extends SystemPage
 	
 	
 	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
+	private static PrimitiveStyleSheet shapeStyle = styleSheet.withShapePainter( new FillPainter( Color.black ) ).withHoverShapePainter( new FillPainter( new Color( 0.0f, 0.5f, 0.5f ) ) );
 
 	
 	
 	protected DPWidget createContents()
 	{
 		return styleSheet.vbox( Arrays.asList( new DPWidget[] {
-				styleSheet.text( "Rectangle 50x2; 1 pixel padding" ),
-				styleSheet.rectangle( 50.0, 2.0 ).pad( 1.0, 1.0 ),
-				styleSheet.text( "Rectangle 50x2; 10 pixel padding" ),
-				styleSheet.rectangle( 50.0, 2.0 ).pad( 10.0, 10.0 ),
-				styleSheet.text( "Rectangle 50x2; 10 pixel padding, h-expand" ),
-				styleSheet.rectangle( 50.0, 2.0 ).alignHExpand().pad( 10.0, 10.0 ).alignHExpand() } ) );
+				styleSheet.text( "Rectangle 50x10; 1 pixel padding" ),
+				shapeStyle.rectangle( 50.0, 10.0 ).pad( 1.0, 1.0 ),
+				styleSheet.text( "Rectangle 50x10; 10 pixel padding" ),
+				shapeStyle.rectangle( 50.0, 10.0 ).pad( 10.0, 10.0 ),
+				styleSheet.text( "Rectangle 50x10; 10 pixel padding, h-expand" ),
+				shapeStyle.rectangle( 50.0, 10.0 ).alignHExpand().pad( 10.0, 10.0 ).alignHExpand() } ) );
 	}
 }

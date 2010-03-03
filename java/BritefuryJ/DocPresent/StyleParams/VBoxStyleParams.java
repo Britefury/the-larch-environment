@@ -14,11 +14,11 @@ import BritefuryJ.DocPresent.Painter.Painter;
 
 public class VBoxStyleParams extends AbstractBoxStyleParams
 {
-	public static final VBoxStyleParams defaultStyleParams = new VBoxStyleParams( null, null, 0.0 );
+	public static final VBoxStyleParams defaultStyleParams = new VBoxStyleParams( null, null, null, 0.0 );
 
 
-	public VBoxStyleParams(Painter background, Cursor pointerCursor, double spacing)
+	public VBoxStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, double spacing)
 	{
-		super( background, pointerCursor, spacing );
+		super( background, hoverBackground, pointerCursor, spacing );
 	}
 }

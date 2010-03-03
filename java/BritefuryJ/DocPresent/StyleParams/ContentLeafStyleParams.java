@@ -13,11 +13,11 @@ import BritefuryJ.DocPresent.Painter.Painter;
 
 public class ContentLeafStyleParams extends WidgetStyleParams
 {
-	public static final ContentLeafStyleParams defaultStyleParams = new ContentLeafStyleParams( null, null );
+	public static final ContentLeafStyleParams defaultStyleParams = new ContentLeafStyleParams( null, null, null );
 	
 	
-	public ContentLeafStyleParams(Painter background, Cursor pointerCursor)
+	public ContentLeafStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor)
 	{
-		super( background, pointerCursor );
+		super( background, hoverBackground, pointerCursor );
 	}
 }

@@ -43,11 +43,30 @@ public class DPFraction extends DPContainer
 		}
 
 	
+
+		public boolean isRedrawRequiredOnHover()
+		{
+			return super.isRedrawRequiredOnHover()  ||  getHoverBarPaint() != null;
+		}
+		
+
 		protected void draw(Graphics2D graphics)
 		{
 			Shape s = new Rectangle2D.Double( 0.0, 0.0, getAllocationX(), getAllocationY() );
 			Paint curPaint = graphics.getPaint();
-			graphics.setPaint( getBarPaint() );
+
+			Paint barPaint;
+			if ( testFlag( FLAG_HOVER ) )
+			{
+				Paint hoverBarPaint = getHoverBarPaint();
+				barPaint = hoverBarPaint != null  ?  hoverBarPaint  :  getBarPaint();
+			}
+			else
+			{
+				barPaint = getBarPaint();
+			}
+
+			graphics.setPaint( barPaint );
 			graphics.fill( s );
 			graphics.setPaint( curPaint );
 		}
@@ -144,6 +163,11 @@ public class DPFraction extends DPContainer
 		protected Paint getBarPaint()
 		{
 			return ((FractionStyleParams.BarStyleParams) styleParams).getBarPaint();
+		}
+		
+		protected Paint getHoverBarPaint()
+		{
+			return ((FractionStyleParams.BarStyleParams) styleParams).getHoverBarPaint();
 		}
 	}
 	

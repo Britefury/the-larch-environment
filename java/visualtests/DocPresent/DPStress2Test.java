@@ -63,9 +63,9 @@ public class DPStress2Test
 	
 	
 	Font f0 = new Font( "Sans serif", Font.PLAIN, 12 );
-	TextStyleParams nameStyle = new TextStyleParams( null, null, true, f0, Color.black, null, false );
-	TextStyleParams puncStyle = new TextStyleParams( null, null, true, f0, Color.blue, null, false );
-	ParagraphStyleParams paraStyle = new ParagraphStyleParams( null, null, 0.0, 0.0, 0.0 );
+	TextStyleParams nameStyle = new TextStyleParams( null, null, null, true, f0, Color.black, null, null, false );
+	TextStyleParams puncStyle = new TextStyleParams( null, null, null, true, f0, Color.blue, null, null, false );
+	ParagraphStyleParams paraStyle = new ParagraphStyleParams( null, null, null, 0.0, 0.0, 0.0 );
 
 	public DPWidget name(String n)
 	{

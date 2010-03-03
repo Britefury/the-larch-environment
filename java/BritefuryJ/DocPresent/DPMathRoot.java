@@ -107,6 +107,13 @@ public class DPMathRoot extends DPContainer
 
 	
 	
+	public boolean isRedrawRequiredOnHover()
+	{
+		MathRootStyleParams s = (MathRootStyleParams)styleParams;
+		return super.isRedrawRequiredOnHover()  ||  s.getHoverSymbolPaint() != null;
+	}
+	
+
 	protected void draw(Graphics2D graphics)
 	{
 		super.draw( graphics );
@@ -116,7 +123,17 @@ public class DPMathRoot extends DPContainer
 			double allocationX = getAllocationX();
 			double allocationY = getAllocationY();
 
-			MathRootStyleParams s = (MathRootStyleParams) styleParams;
+			MathRootStyleParams s = (MathRootStyleParams)styleParams;
+			Paint symbolPaint;
+			if ( testFlag( FLAG_HOVER ) )
+			{
+				Paint hoverSymbolPaint = s.getHoverSymbolPaint();
+				symbolPaint = hoverSymbolPaint != null  ?  hoverSymbolPaint  :  s.getSymbolPaint();
+			}
+			else
+			{
+				symbolPaint = s.getSymbolPaint();
+			}
 			
 			Stroke curStroke = graphics.getStroke();
 			Paint curPaint = graphics.getPaint();
@@ -125,7 +142,7 @@ public class DPMathRoot extends DPContainer
 			
 			Stroke stroke = new BasicStroke( (float)thickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL );
 			graphics.setStroke( stroke );
-			graphics.setPaint( s.getSymbolPaint() );
+			graphics.setPaint( symbolPaint);
 			
 			double yOffset = thickness * 0.5;
 			double glyphWidth = s.getGlyphWidth();

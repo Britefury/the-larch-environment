@@ -16,17 +16,18 @@ public class FractionStyleParams extends ContainerStyleParams
 {
 	public static class BarStyleParams extends ContentLeafEditableStyleParams
 	{
-		public static final BarStyleParams defaultStyleParams = new BarStyleParams( null, null, true, Color.black );
+		public static final BarStyleParams defaultStyleParams = new BarStyleParams( null, null, null, true, Color.black, null );
 		
 		
-		protected final Paint barPaint;
+		protected final Paint barPaint, hoverBarPaint;
 
 
-		public BarStyleParams(Painter background, Cursor pointerCursor, boolean bEditable, Paint barPaint)
+		public BarStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, boolean bEditable, Paint barPaint, Paint hoverBarPaint)
 		{
-			super( background, pointerCursor, bEditable );
+			super( background, hoverBackground, pointerCursor, bEditable );
 			
 			this.barPaint = barPaint;
+			this.hoverBarPaint = hoverBarPaint;
 		}
 
 
@@ -34,10 +35,15 @@ public class FractionStyleParams extends ContainerStyleParams
 		{
 			return barPaint;
 		}
+		
+		public Paint getHoverBarPaint()
+		{
+			return hoverBarPaint;
+		}
 	}
 
 	
-	public static final FractionStyleParams defaultStyleParams = new FractionStyleParams( null, null, 2.0, 3.0, 5.0, BarStyleParams.defaultStyleParams );
+	public static final FractionStyleParams defaultStyleParams = new FractionStyleParams( null, null, null, 2.0, 3.0, 5.0, BarStyleParams.defaultStyleParams );
 	
 	protected final BarStyleParams barStyleParams;
 	
@@ -46,9 +52,9 @@ public class FractionStyleParams extends ContainerStyleParams
 	
 	
 	
-	public FractionStyleParams(Painter background, Cursor pointerCursor, double vspacing, double hpadding, double yOffset, BarStyleParams barStyleParams)
+	public FractionStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, double vspacing, double hpadding, double yOffset, BarStyleParams barStyleParams)
 	{
-		super( background, pointerCursor );
+		super( background, hoverBackground, pointerCursor );
 		
 		this.vspacing = vspacing;
 		this.hpadding = hpadding;
