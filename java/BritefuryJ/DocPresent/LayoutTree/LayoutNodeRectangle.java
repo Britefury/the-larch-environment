@@ -20,7 +20,8 @@ public class LayoutNodeRectangle extends ContentLeafLayoutNode
 	{
 		DPRectangle rectangle = (DPRectangle)element;
 		
-		layoutReqBox.setRequisitionX( rectangle.getMinWidth(), 0.0 );
+		double w = rectangle.getMinWidth();
+		layoutReqBox.setRequisitionX( w, w );
 	}
 
 	protected void updateRequisitionY()

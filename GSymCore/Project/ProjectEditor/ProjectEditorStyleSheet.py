@@ -5,13 +5,14 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from java.awt import Font, Color
+from java.awt import Font, Color, BasicStroke
 
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent.StyleSheet import *
 from BritefuryJ.DocPresent.Controls import *
 from BritefuryJ.DocPresent.Border import *
+from BritefuryJ.DocPresent.Painter import *
 
 from GSymCore.Utils.LinkHeader import LinkHeaderStyleSheet
 from GSymCore.Utils.Title import TitleBarStyleSheet
@@ -31,6 +32,7 @@ class ProjectEditorStyleSheet (StyleSheet):
 		
 		self.initAttr( 'projectControlsAttrs', AttributeSet( border=SolidBorder( 2.0, 2.0, Color( 131, 149, 172 ), None ), hBoxSpacing=30.0 ) )
 		self.initAttr( 'packageNameAttrs', AttributeSet( foreground=Color( 0.0, 0.0, 0.5 ), font=Font( 'Sans serif', Font.BOLD, 14 ) ) )
+		self.initAttr( 'itemHoverHighlightAttrs', AttributeSet( hoverBackground=FilledOutlinePainter( Color( 0.8, 0.825, 0.9 ), Color( 0.125, 0.341, 0.574 ), BasicStroke( 1.0 ) ) ) )
 		
 		self.initAttr( 'packageContentsIndentation', 20.0 )
 	
@@ -59,8 +61,11 @@ class ProjectEditorStyleSheet (StyleSheet):
 	def withProjectControlsAttrs(self, projectControlsAttrs):
 		return self.withAttrs( projectControlsAttrs=projectControlsAttrs )
 	
-	def withPackageNameAttrs(self, attrs):
+	def withPackageNameAttrs(self, packageNameAttrs):
 		return self.withAttrs( packageNameAttrs=packageNameAttrs )
+	
+	def withItemHoverHighlightAttrs(self, itemHoverHighlightAttrs):
+		return self.withAttrs( itemHoverHighlightAttrs=itemHoverHighlightAttrs )
 	
 	def withPackageContentsIndentation(self, packageContentsIndentation):
 		return self.withAttrs( packageContentsIndentation=packageContentsIndentation )
@@ -74,6 +79,10 @@ class ProjectEditorStyleSheet (StyleSheet):
 	@StyleSheetDerivedPyAttrFn
 	def packageNameStyle(self):
 		return self['primitiveStyle'].withAttrSet( self['packageNameAttrs'] )
+	
+	@StyleSheetDerivedPyAttrFn
+	def itemHoverHighlightStyle(self):
+		return self['primitiveStyle'].withAttrSet( self['itemHoverHighlightAttrs'] )
 	
 	
 	
@@ -127,12 +136,14 @@ class ProjectEditorStyleSheet (StyleSheet):
 			return True
 		
 		packageNameStyle = self.packageNameStyle()
+		itemHoverHighlightStyle = self.itemHoverHighlightStyle()
 		primitiveStyle = self['primitiveStyle']
 		controlsStyle = self['controlsStyle']
 		
+		icon = primitiveStyle.image( 'GSymCore/Project/icons/Package.png' )
 		nameElement = packageNameStyle.staticText( packageName )
-		nameElement.addContextMenuFactory( _packageContextMenuFactory )
-		nameBox = primitiveStyle.box( nameElement )
+		nameBox = itemHoverHighlightStyle.hbox( [ icon.padX( 5.0 ).alignVCentre(), nameElement.alignVCentre() ] )
+		nameBox.addContextMenuFactory( _packageContextMenuFactory )
 		
 		itemsBox = primitiveStyle.vbox( items )
 		
@@ -158,9 +169,12 @@ class ProjectEditorStyleSheet (StyleSheet):
 		
 		primitiveStyle = self['primitiveStyle']
 		controlsStyle = self['controlsStyle']
+		itemHoverHighlightStyle = self.itemHoverHighlightStyle()
+
 		link = controlsStyle.link( pageName, pageLocation ).getElement()
 		link.addContextMenuFactory( _pageContextMenuFactory )
-		box = primitiveStyle.box( link )
+		box = itemHoverHighlightStyle.hbox( [ link ] )
+
 		return box
 	
 	

@@ -1125,9 +1125,9 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	
 	protected void queueRedrawWindowSpace(Point2 pos, Vector2 size)
 	{
-		int x = (int)pos.x, y = (int)pos.y;
-		int w = (int)(pos.x + size.x + 0.5) - x;
-		int h = (int)(pos.y + size.y + 0.5) - y;
+		int x = (int)( pos.x - 1.0 ), y = (int)( pos.y - 1.0 );
+		int w = (int)(pos.x + size.x + 1.0) - x;
+		int h = (int)(pos.y + size.y + 1.0) - y;
 		component.presentationComponent.repaint( new Rectangle( x, y, w, h ) ); 
 	}
 	
