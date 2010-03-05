@@ -20,7 +20,8 @@ public class LayoutNodeImage extends ContentLeafLayoutNode
 	{
 		DPImage image = (DPImage)element;
 		
-		layoutReqBox.setRequisitionX( image.getImageWidth(), 0.0 );
+		double w = image.getImageWidth();
+		layoutReqBox.setRequisitionX( w, w );
 	}
 
 	protected void updateRequisitionY()
