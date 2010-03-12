@@ -37,21 +37,21 @@ public class AlignmentTestPage extends SystemPage
 		PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
 		PrimitiveStyleSheet textStyleSheet = styleSheet.withBackground( new FilledOutlinePainter( new Color( 1.0f, 1.0f, 0.7f ), new Color( 1.0f, 1.0f, 0.0f ) ) );
 		
-		DPBorder halignLeft = styleSheet.border( textStyleSheet.text( "hAlign=left" ).alignHLeft() );
-		DPBorder halignCentre = styleSheet.border( textStyleSheet.text( "hAlign=centre" ).alignHCentre() );
-		DPBorder halignRight = styleSheet.border( textStyleSheet.text( "hAlign=right" ).alignHRight() );
-		DPBorder halignExpand = styleSheet.border( textStyleSheet.text( "hAlign=expand" ).alignHExpand() );
+		DPBorder halignLeft = styleSheet.border( textStyleSheet.text( "hAlign=LEFT" ).alignHLeft() );
+		DPBorder halignCentre = styleSheet.border( textStyleSheet.text( "hAlign=CENTRE" ).alignHCentre() );
+		DPBorder halignRight = styleSheet.border( textStyleSheet.text( "hAlign=RIGHT" ).alignHRight() );
+		DPBorder halignExpand = styleSheet.border( textStyleSheet.text( "hAlign=EXPAND" ).alignHExpand() );
 		
 		
 		DPWidget spacer = styleSheet.withBackground( new FilledOutlinePainter( new Color( 0.8f, 0.85f, 1.0f ), new Color( 0.0f, 0.25f, 1.0f ) ) ).box( styleSheet.text( "SPACER" ).pad( 5.0, 50.0 ) );
 		
 
-		DPBorder valignBaselines = styleSheet.border( textStyleSheet.text( "vAlign=ref_y" ).alignVBaselines() );
-		DPBorder valignBaselinesExpand = styleSheet.border( textStyleSheet.text( "vAlign=ref_y-expand" ).alignVBaselinesExpand() );
-		DPBorder valignTop = styleSheet.border( textStyleSheet.text( "vAlign=top" ).alignVTop() );
-		DPBorder valignCentre = styleSheet.border( textStyleSheet.text( "vAlign=centre" ).alignVCentre() );
-		DPBorder valignBottom = styleSheet.border( textStyleSheet.text( "vAlign=bottom" ).alignVBottom() );
-		DPBorder valignExpand = styleSheet.border( textStyleSheet.text( "vAlign=expand" ).alignVExpand() );
+		DPBorder valignBaselines = styleSheet.border( textStyleSheet.text( "vAlign=REFY" ).alignVBaselines() );
+		DPBorder valignBaselinesExpand = styleSheet.border( textStyleSheet.text( "vAlign=REFY_EXPAND" ).alignVBaselinesExpand() );
+		DPBorder valignTop = styleSheet.border( textStyleSheet.text( "vAlign=TOP" ).alignVTop() );
+		DPBorder valignCentre = styleSheet.border( textStyleSheet.text( "vAlign=CENTRE" ).alignVCentre() );
+		DPBorder valignBottom = styleSheet.border( textStyleSheet.text( "vAlign=BOTTOM" ).alignVBottom() );
+		DPBorder valignExpand = styleSheet.border( textStyleSheet.text( "vAlign=EXPAND" ).alignVExpand() );
 
 		
 		DPWidget vAlignBox = styleSheet.withHBoxSpacing( 10.0 ).hbox( Arrays.asList( new DPWidget[] { valignBaselines.alignVExpand(), valignBaselinesExpand.alignVExpand(), valignTop.alignVExpand(),
