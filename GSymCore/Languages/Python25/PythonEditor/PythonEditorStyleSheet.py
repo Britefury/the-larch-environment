@@ -292,7 +292,7 @@ class PythonEditorStyleSheet (StyleSheet):
 		punctuationStyle = self._punctuationStyle()
 		delimStyle = self._delimStyle()
 		
-		span_listViewLayout = SpanListViewLayoutStyleSheet.instance.withAddLineBreaks( True ).withAddParagraphIndentMarkers( True )
+		span_listViewLayout = SpanListViewLayoutStyleSheet.instance.withAddLineBreaks( True ).withAddParagraphIndentMarkers( True ).withAddLineBreakCost( True )
 		
 		tupleListViewStyle = ListViewStyleSheet.instance.withSeparatorFactory( lambda styleSheet, index, child: punctuationStyle.text( ',' ) ).withSpacingFactory( lambda styleSheet: primitiveStyle.text( ' ' ) )
 		tupleListViewStyle = tupleListViewStyle.withBeginDelimFactory( lambda styleSheet: delimStyle.text( '(' ) ).withEndDelimFactory( lambda styleSheet: delimStyle.text( ')' ) )
@@ -307,7 +307,7 @@ class PythonEditorStyleSheet (StyleSheet):
 		punctuationStyle = self._punctuationStyle()
 		delimStyle = self._delimStyle()
 		
-		span_listViewLayout = SpanListViewLayoutStyleSheet.instance.withAddLineBreaks( True ).withAddParagraphIndentMarkers( True )
+		span_listViewLayout = SpanListViewLayoutStyleSheet.instance.withAddLineBreaks( True ).withAddParagraphIndentMarkers( True ).withAddLineBreakCost( True )
 		
 		listListViewStyle = ListViewStyleSheet.instance.withSeparatorFactory( lambda styleSheet, index, child: punctuationStyle.text( ',' ) ).withSpacingFactory( lambda styleSheet: primitiveStyle.text( ' ' ) )
 		listListViewStyle = listListViewStyle.withBeginDelimFactory( lambda styleSheet: delimStyle.text( '[' ) ).withEndDelimFactory( lambda styleSheet: delimStyle.text( ']' ) )
@@ -322,7 +322,7 @@ class PythonEditorStyleSheet (StyleSheet):
 		punctuationStyle = self._punctuationStyle()
 		delimStyle = self._delimStyle()
 		
-		span_listViewLayout = SpanListViewLayoutStyleSheet.instance.withAddLineBreaks( True ).withAddParagraphIndentMarkers( True )
+		span_listViewLayout = SpanListViewLayoutStyleSheet.instance.withAddLineBreaks( True ).withAddParagraphIndentMarkers( True ).withAddLineBreakCost( True )
 		
 		dictListViewStyle = ListViewStyleSheet.instance.withSeparatorFactory( lambda styleSheet, index, child: punctuationStyle.text( ',' ) ).withSpacingFactory( lambda styleSheet: primitiveStyle.text( ' ' ) )
 		dictListViewStyle = dictListViewStyle.withBeginDelimFactory( lambda styleSheet: delimStyle.text( '{' ) ).withEndDelimFactory( lambda styleSheet: delimStyle.text( '}' ) )
@@ -337,7 +337,7 @@ class PythonEditorStyleSheet (StyleSheet):
 		punctuationStyle = self._punctuationStyle()
 		delimStyle = self._delimStyle()
 		
-		span_listViewLayout = SpanListViewLayoutStyleSheet.instance.withAddLineBreaks( True ).withAddParagraphIndentMarkers( True )
+		span_listViewLayout = SpanListViewLayoutStyleSheet.instance.withAddLineBreaks( True ).withAddParagraphIndentMarkers( True ).withAddLineBreakCost( True )
 		
 		tupleListViewStyle = ListViewStyleSheet.instance.withSeparatorFactory( lambda styleSheet, index, child: punctuationStyle.text( ',' ) ).withSpacingFactory( lambda styleSheet: primitiveStyle.text( ' ' ) )
 		tupleListViewStyle = tupleListViewStyle.withListLayout( span_listViewLayout )
@@ -472,7 +472,7 @@ class PythonEditorStyleSheet (StyleSheet):
 				itemViewsSpaced.append( x )
 				itemViewsSpaced.append( primitiveStyle.lineBreak( primitiveStyle.whitespace( ' ', comprehensionSpacing ) ) )
 			itemViewsSpaced.append( comprehensionItems[-1] )
-		return primitiveStyle.span( [ delimStyle.text( '[' ),  resultExpr,  primitiveStyle.whitespace( ' ', comprehensionSpacing ) ]  +  itemViewsSpaced  +  [ delimStyle.text( ']' ) ] )
+		return primitiveStyle.paragraphBreakCostSpan( [ delimStyle.text( '[' ),  resultExpr,  primitiveStyle.whitespace( ' ', comprehensionSpacing ) ]  +  itemViewsSpaced  +  [ delimStyle.text( ']' ) ] )
 
 	
 	def genExpr(self, resultExpr, comprehensionItems):
@@ -486,7 +486,7 @@ class PythonEditorStyleSheet (StyleSheet):
 				itemViewsSpaced.append( x )
 				itemViewsSpaced.append( primitiveStyle.lineBreak( primitiveStyle.whitespace( ' ', comprehensionSpacing ) ) )
 			itemViewsSpaced.append( comprehensionItems[-1] )
-		return primitiveStyle.span( [ delimStyle.text( '(' ),  resultExpr,  primitiveStyle.whitespace( ' ', comprehensionSpacing ) ]  +  itemViewsSpaced  +  [ delimStyle.text( ')' ) ] )
+		return primitiveStyle.paragraphBreakCostSpan( [ delimStyle.text( '(' ),  resultExpr,  primitiveStyle.whitespace( ' ', comprehensionSpacing ) ]  +  itemViewsSpaced  +  [ delimStyle.text( ')' ) ] )
 	
 	
 	def dictKeyValuePair(self, key, value):
@@ -583,7 +583,7 @@ class PythonEditorStyleSheet (StyleSheet):
 				argElements.append( punctuationStyle.text( ',' ) )
 			argElements.append( primitiveStyle.paragraphDedentMarker() )
 			argElements.append( primitiveStyle.text( ' ' ) )
-		return primitiveStyle.span( [ target, delimStyle.text( '(' ) ]  +  argElements  +  [ delimStyle.text( ')' ) ] )
+		return primitiveStyle.paragraphBreakCostSpan( [ target, delimStyle.text( '(' ) ]  +  argElements  +  [ delimStyle.text( ')' ) ] )
 
 	
 	
@@ -598,13 +598,13 @@ class PythonEditorStyleSheet (StyleSheet):
 	def spanPrefixOp(self, x, op):
 		primitiveStyle = self['primitiveStyle']
 		opView = self._operatorStyle().text( op )
-		return primitiveStyle.span( [ opView, x ] )
+		return primitiveStyle.paragraphBreakCostSpan( [ opView, x ] )
 
 	
 	def spanBinOp(self, x, y, op):
 		primitiveStyle = self['primitiveStyle']
 		opView = self._operatorStyle().text( op )
-		return primitiveStyle.span( [ x, primitiveStyle.text( ' ' ), opView, primitiveStyle.text( ' ' ), y ] )
+		return primitiveStyle.paragraphBreakCostSpan( [ x, primitiveStyle.text( ' ' ), opView, primitiveStyle.text( ' ' ), y ] )
 	
 	
 	def spanCmpOp(self, op, y):
@@ -619,7 +619,7 @@ class PythonEditorStyleSheet (StyleSheet):
 	
 	def compare(self, x, cmpOps):
 		primitiveStyle = self['primitiveStyle']
-		return primitiveStyle.span( [ x ]  +  cmpOps )
+		return primitiveStyle.paragraphBreakCostSpan( [ x ]  +  cmpOps )
 		
 		
 	def simpleParam(self, name):
@@ -664,7 +664,7 @@ class PythonEditorStyleSheet (StyleSheet):
 				elements.append( primitiveStyle.lineBreak( primitiveStyle.text( ' ' ) ) )
 			elements.append( primitiveStyle.paragraphDedentMarker() )
 		
-		return primitiveStyle.span( [ self._keyword( 'lambda' ),  primitiveStyle.text( ' ' ) ]  +  elements  +  \
+		return primitiveStyle.paragraphBreakCostSpan( [ self._keyword( 'lambda' ),  primitiveStyle.text( ' ' ) ]  +  elements  +  \
 		                            [ punctuationStyle.text( ':' ),  primitiveStyle.lineBreak( primitiveStyle.text( ' ' ) ), expr ] )
 
 
@@ -673,7 +673,7 @@ class PythonEditorStyleSheet (StyleSheet):
 		punctuationStyle = self._punctuationStyle()
 		conditionalSpacing = self['conditionalSpacing']
 		
-		return primitiveStyle.span( [ expr,   primitiveStyle.lineBreak( primitiveStyle.whitespace( '  ', conditionalSpacing ) ),
+		return primitiveStyle.paragraphBreakCostSpan( [ expr,   primitiveStyle.lineBreak( primitiveStyle.whitespace( '  ', conditionalSpacing ) ),
 							 self._keyword( 'if' ), primitiveStyle.text( ' ' ), condition,   primitiveStyle.lineBreak( primitiveStyle.whitespace( '  ', conditionalSpacing ) ),
 							 self._keyword( 'else' ), primitiveStyle.text( ' ' ), elseExpr ] )
 

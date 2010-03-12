@@ -28,7 +28,7 @@ import BritefuryJ.DocPresent.DPMathRoot;
 import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPParagraphDedentMarker;
 import BritefuryJ.DocPresent.DPParagraphIndentMarker;
-import BritefuryJ.DocPresent.DPParagraphStructureSpan;
+import BritefuryJ.DocPresent.DPParagraphBreakCostSpan;
 import BritefuryJ.DocPresent.DPProxy;
 import BritefuryJ.DocPresent.DPRGrid;
 import BritefuryJ.DocPresent.DPRectangle;
@@ -768,9 +768,9 @@ public class PrimitiveStyleSheet extends StyleSheet
 		return element;
 	}
 	
-	public DPParagraphStructureSpan paragraphStructureSpan(List<DPElement> children)
+	public DPParagraphBreakCostSpan paragraphBreakCostSpan(List<DPElement> children)
 	{
-		DPParagraphStructureSpan element = new DPParagraphStructureSpan( getContainerParams() );
+		DPParagraphBreakCostSpan element = new DPParagraphBreakCostSpan( getContainerParams() );
 		element.setChildren( children );
 		return element;
 	}
