@@ -11,43 +11,43 @@ import java.awt.Paint;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 
-public class EmptyBorder extends Border
+public class FilledBorder extends Border
 {
 	private double leftMargin, rightMargin, topMargin, bottomMargin, roundingX, roundingY;
 	private Paint backgroundPaint;
 	
 	
-	public EmptyBorder()
+	public FilledBorder()
 	{
 		this( 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, null );
 	}
 	
-	public EmptyBorder(Paint backgroundPaint)
+	public FilledBorder(Paint backgroundPaint)
 	{
 		this( 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, backgroundPaint );
 	}
 	
-	public EmptyBorder(double roundingX, double roundingY, Paint backgroundPaint)
+	public FilledBorder(double roundingX, double roundingY, Paint backgroundPaint)
 	{
 		this( 0.0, 0.0, 0.0, 0.0, roundingX, roundingY, backgroundPaint );
 	}
 	
-	public EmptyBorder(double leftMargin, double rightMargin, double topMargin, double bottomMargin)
+	public FilledBorder(double leftMargin, double rightMargin, double topMargin, double bottomMargin)
 	{
 		this( leftMargin, rightMargin, topMargin, bottomMargin, 0.0, 0.0, null );
 	}
 	
-	public EmptyBorder(double leftMargin, double rightMargin, double topMargin, double bottomMargin, double roundingX, double roundingY)
+	public FilledBorder(double leftMargin, double rightMargin, double topMargin, double bottomMargin, double roundingX, double roundingY)
 	{
 		this( leftMargin, rightMargin, topMargin, bottomMargin, roundingX, roundingY, null );
 	}
 	
-	public EmptyBorder(double leftMargin, double rightMargin, double topMargin, double bottomMargin, Paint backgroundPaint)
+	public FilledBorder(double leftMargin, double rightMargin, double topMargin, double bottomMargin, Paint backgroundPaint)
 	{
 		this( leftMargin, rightMargin, topMargin, bottomMargin, 0.0, 0.0, backgroundPaint );
 	}
 	
-	public EmptyBorder(double leftMargin, double rightMargin, double topMargin, double bottomMargin, double roundingX, double roundingY, Paint backgroundPaint)
+	public FilledBorder(double leftMargin, double rightMargin, double topMargin, double bottomMargin, double roundingX, double roundingY, Paint backgroundPaint)
 	{
 		this.leftMargin = leftMargin;
 		this.rightMargin = rightMargin;
