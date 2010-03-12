@@ -43,7 +43,7 @@ public class AlignmentTestPage extends SystemPage
 		DPBorder halignExpand = styleSheet.border( textStyleSheet.text( "hAlign=expand" ).alignHExpand() );
 		
 		
-		DPWidget spacer = styleSheet.withBackground( new FilledOutlinePainter( new Color( 0.8f, 0.85f, 1.0f ), new Color( 0.0f, 0.25f, 1.0f ) ) ).box( styleSheet.text( "SPACER" ).pad( 5.0, 200.0 ) );
+		DPWidget spacer = styleSheet.withBackground( new FilledOutlinePainter( new Color( 0.8f, 0.85f, 1.0f ), new Color( 0.0f, 0.25f, 1.0f ) ) ).box( styleSheet.text( "SPACER" ).pad( 5.0, 50.0 ) );
 		
 
 		DPBorder valignBaselines = styleSheet.border( textStyleSheet.text( "vAlign=ref_y" ).alignVBaselines() );

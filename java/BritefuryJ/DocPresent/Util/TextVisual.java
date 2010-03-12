@@ -41,6 +41,8 @@ import BritefuryJ.Utils.HashUtils;
 
 public class TextVisual
 {
+	private static final float SMALL_CAPS_FONT_SCALE = 0.77f;
+	
 	private static class MixedSizeCapsAttributedCharacterIterator extends Segment implements AttributedCharacterIterator
 	{
 		static HashSet<AttributedCharacterIterator.Attribute> attribKeys = null;
@@ -342,7 +344,7 @@ public class TextVisual
 				if ( bMixedSizeCaps )
 				{
 					Font upperCaseFont = font;
-					Font lowerCaseFont = upperCaseFont.deriveFont( upperCaseFont.getSize2D() * 0.8f );
+					Font lowerCaseFont = upperCaseFont.deriveFont( upperCaseFont.getSize2D() * SMALL_CAPS_FONT_SCALE );
 
 					MixedSizeCapsAttributedCharacterIterator charIter = new MixedSizeCapsAttributedCharacterIterator( text, lowerCaseFont, upperCaseFont );
 					layout = new TextLayout( charIter, frc );
