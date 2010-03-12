@@ -13,8 +13,8 @@ import java.util.List;
 import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPContentLeaf;
 import BritefuryJ.DocPresent.DPContentLeafEditable;
-import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.WidgetFilter;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.ElementFilter;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
@@ -23,7 +23,7 @@ import BritefuryJ.Math.Point2;
 
 public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 {
-	protected DPWidget leaves[], branches[];
+	protected DPElement leaves[], branches[];
 	protected int branchRanges[];				// Stored as an array of pairs; each pair is of the form (start_index, end_index)
 	protected IdentityHashMap<DPContainer, AABox2[]> branchBoundsCache;
 	
@@ -44,7 +44,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 	
 	protected void gatherCount(DPContainer branch, int counts[])
 	{
-		for (DPWidget e: branch.getLayoutChildren())
+		for (DPElement e: branch.getLayoutChildren())
 		{
 			if ( hasLayoutForElement( e ) )
 			{
@@ -60,7 +60,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 	
 	protected void gatherItems(DPContainer branch, int indices[])
 	{
-		for (DPWidget e: branch.getLayoutChildren())
+		for (DPElement e: branch.getLayoutChildren())
 		{
 			if ( hasLayoutForElement( e ) )
 			{
@@ -87,8 +87,8 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 			int counts[] = new int [2];
 			gatherCount( element, counts );
 			
-			leaves = new DPWidget[counts[0]];
-			branches = new DPWidget[counts[1]];
+			leaves = new DPElement[counts[0]];
+			branches = new DPElement[counts[1]];
 			branchRanges = new int[counts[1]*2];
 			
 			counts[0] = 0;
@@ -119,7 +119,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 	{
 		super.onSizeRefreshed();
 		refreshSubtree();
-		for (DPWidget c: branches)
+		for (DPElement c: branches)
 		{
 			LayoutNode branchLayout = c.getLayoutNode();
 			if ( branchLayout != null )
@@ -139,7 +139,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 	
 	
 	
-	public DPContentLeaf getLeftContentLeafWithinElement(DPWidget withinElement)
+	public DPContentLeaf getLeftContentLeafWithinElement(DPElement withinElement)
 	{
 		refreshSubtree();
 		int branchIndex = indexOfBranch( withinElement );
@@ -159,7 +159,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 		return null;
 	}
 	
-	public DPContentLeaf getRightContentLeafWithinElement(DPWidget withinElement)
+	public DPContentLeaf getRightContentLeafWithinElement(DPElement withinElement)
 	{
 		refreshSubtree();
 		int branchIndex = indexOfBranch( withinElement );
@@ -179,7 +179,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 		return null;
 	}
 	
-	public DPContentLeafEditable getLeftEditableContentLeafWithinElement(DPWidget withinElement)
+	public DPContentLeafEditable getLeftEditableContentLeafWithinElement(DPElement withinElement)
 	{
 		refreshSubtree();
 		int branchIndex = indexOfBranch( withinElement );
@@ -199,7 +199,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 		return null;
 	}
 	
-	public DPContentLeafEditable getRightEditableContentLeafWithinElement(DPWidget withinElement)
+	public DPContentLeafEditable getRightEditableContentLeafWithinElement(DPElement withinElement)
 	{
 		refreshSubtree();
 		int branchIndex = indexOfBranch( withinElement );
@@ -219,7 +219,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 		return null;
 	}
 	
-	public DPContentLeaf getContentLeafToLeftOfElement(DPWidget inElement)
+	public DPContentLeaf getContentLeafToLeftOfElement(DPElement inElement)
 	{
 		refreshSubtree();
 		int branchIndex = indexOfBranch( inElement );
@@ -239,7 +239,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 		return null;
 	}
 	
-	public DPContentLeaf getContentLeafToRightOfElement(DPWidget inElement)
+	public DPContentLeaf getContentLeafToRightOfElement(DPElement inElement)
 	{
 		refreshSubtree();
 		int branchIndex = indexOfBranch( inElement );
@@ -259,7 +259,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 		return null;
 	}
 	
-	public DPContentLeafEditable getTopOrBottomEditableContentLeafWithinElement(DPWidget withinElement, boolean bBottom, Point2 cursorPosInRootSpace)
+	public DPContentLeafEditable getTopOrBottomEditableContentLeafWithinElement(DPElement withinElement, boolean bBottom, Point2 cursorPosInRootSpace)
 	{
 		refreshSubtree();
 		int branchIndex = indexOfBranch( withinElement );
@@ -293,7 +293,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 		return null;
 	}
 
-	public DPWidget getLeafClosestToLocalPointWithinElement(DPWidget withinElement, Point2 localPos, WidgetFilter filter)
+	public DPElement getLeafClosestToLocalPointWithinElement(DPElement withinElement, Point2 localPos, ElementFilter filter)
 	{
 		return null;
 	}
@@ -304,10 +304,10 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 	protected abstract AABox2[] computeCollatedBranchBoundsBoxes(int rangeStart, int rangeEnd);
 
 
-	protected int indexOfBranch(DPWidget branch)
+	protected int indexOfBranch(DPElement branch)
 	{
 		int index = 0;
-		for (DPWidget b: branches)
+		for (DPElement b: branches)
 		{
 			if ( b == branch )
 			{
@@ -352,7 +352,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 
 
 
-	public List<DPWidget> getLeaves()
+	public List<DPElement> getLeaves()
 	{
 		refreshSubtree();
 		return Arrays.asList( leaves );
@@ -413,7 +413,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 	{
 		refreshSubtree();
 		int i = 0;
-		for (DPWidget child: leaves)
+		for (DPElement child: leaves)
 		{
 			child.getLayoutNode().refreshAllocationX( prevWidth[i] );
 			i++;
@@ -424,7 +424,7 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 	{
 		refreshSubtree();
 		int i = 0;
-		for (DPWidget child: leaves)
+		for (DPElement child: leaves)
 		{
 			child.getLayoutNode().refreshAllocationY( prevAllocV[i] );
 			i++;

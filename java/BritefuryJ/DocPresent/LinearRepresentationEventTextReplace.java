@@ -11,7 +11,7 @@ public class LinearRepresentationEventTextReplace extends LinearRepresentationEv
 	protected int position, length;
 	protected String replacement;
 	
-	public LinearRepresentationEventTextReplace(DPWidget sourceElement, int position, int length, String replacement)
+	public LinearRepresentationEventTextReplace(DPElement sourceElement, int position, int length, String replacement)
 	{
 		super( sourceElement );
 		

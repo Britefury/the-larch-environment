@@ -11,7 +11,7 @@ import java.awt.Font;
 import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPProxy;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
 import BritefuryJ.DocPresent.Controls.Hyperlink;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
@@ -68,31 +68,31 @@ public class HyperlinkTestPage extends SystemPage
 
 	
 	
-	protected DPWidget section(String title, DPWidget contents)
+	protected DPElement section(String title, DPElement contents)
 	{
-		DPWidget heading = headingStyleSheet.staticText( title );
+		DPElement heading = headingStyleSheet.staticText( title );
 		
-		return styleSheet.vbox( Arrays.asList( new DPWidget[] { heading.padY( 10.0 ), contents } ) );
+		return styleSheet.vbox( Arrays.asList( new DPElement[] { heading.padY( 10.0 ), contents } ) );
 	}
 	
-	protected DPWidget colouredText(PrimitiveStyleSheet style)
+	protected DPElement colouredText(PrimitiveStyleSheet style)
 	{
 		return style.staticText( "Change the colour of this text using the hyperlinks below." );
 	}
 	
-	protected DPWidget createContents()
+	protected DPElement createContents()
 	{
 		DPProxy colouredTextProxy = styleSheet.proxy( colouredText( blackText ) );
 		Hyperlink blackLink = controlsStyleSheet.link( "Black", new LinkColourChanger( colouredTextProxy, blackText ) );
 		Hyperlink redLink = controlsStyleSheet.link( "Red", new LinkColourChanger( colouredTextProxy, redText ) );
 		Hyperlink greenLink = controlsStyleSheet.link( "Green", new LinkColourChanger( colouredTextProxy, greenText ) );
-		DPWidget colourLinks = styleSheet.withHBoxSpacing( 20.0 ).hbox( Arrays.asList( new DPWidget[] { blackLink.getElement(), redLink.getElement(), greenLink.getElement() } ) ).padX( 5.0 );
-		DPWidget colourBox = styleSheet.vbox( Arrays.asList( new DPWidget[] { colouredTextProxy, colourLinks } ) );
-		DPWidget colourSection = section( "Action hyperlinks", colourBox );
+		DPElement colourLinks = styleSheet.withHBoxSpacing( 20.0 ).hbox( Arrays.asList( new DPElement[] { blackLink.getElement(), redLink.getElement(), greenLink.getElement() } ) ).padX( 5.0 );
+		DPElement colourBox = styleSheet.vbox( Arrays.asList( new DPElement[] { colouredTextProxy, colourLinks } ) );
+		DPElement colourSection = section( "Action hyperlinks", colourBox );
 		
 		Hyperlink locationLink = controlsStyleSheet.link( "To system page", SystemRootPage.getLocation() );
-		DPWidget locationSection = section( "Location hyperlinks", locationLink.getElement() );
+		DPElement locationSection = section( "Location hyperlinks", locationLink.getElement() );
 		
-		return styleSheet.withVBoxSpacing( 30.0 ).vbox( Arrays.asList( new DPWidget[] { colourSection, locationSection } ) );
+		return styleSheet.withVBoxSpacing( 30.0 ).vbox( Arrays.asList( new DPElement[] { colourSection, locationSection } ) );
 	}
 }

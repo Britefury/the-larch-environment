@@ -11,7 +11,7 @@ import java.awt.Font;
 import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPProxy;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Controls.Button;
 import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
@@ -68,27 +68,27 @@ public class ButtonTestPage extends SystemPage
 
 	
 	
-	protected DPWidget section(String title, DPWidget contents)
+	protected DPElement section(String title, DPElement contents)
 	{
-		DPWidget heading = headingStyleSheet.staticText( title );
+		DPElement heading = headingStyleSheet.staticText( title );
 		
-		return styleSheet.vbox( Arrays.asList( new DPWidget[] { heading.padY( 10.0 ), contents } ) );
+		return styleSheet.vbox( Arrays.asList( new DPElement[] { heading.padY( 10.0 ), contents } ) );
 	}
 	
-	protected DPWidget colouredText(PrimitiveStyleSheet style)
+	protected DPElement colouredText(PrimitiveStyleSheet style)
 	{
 		return style.staticText( "Change the colour of this text using the buttons below." );
 	}
 	
-	protected DPWidget createContents()
+	protected DPElement createContents()
 	{
 		DPProxy colouredTextProxy = styleSheet.proxy( colouredText( blackText ) );
 		Button blackButton = controlsStyleSheet.button( styleSheet.staticText( "Black" ), new ButtonColourChanger( colouredTextProxy, blackText ) );
 		Button redButton = controlsStyleSheet.button( styleSheet.staticText( "Red" ), new ButtonColourChanger( colouredTextProxy, redText ) );
 		Button greenButton = controlsStyleSheet.button( styleSheet.staticText( "Green" ), new ButtonColourChanger( colouredTextProxy, greenText ) );
-		DPWidget colourLinks = styleSheet.withHBoxSpacing( 20.0 ).hbox( Arrays.asList( new DPWidget[] { blackButton.getElement(), redButton.getElement(), greenButton.getElement() } ) ).padX( 5.0 );
-		DPWidget colourBox = styleSheet.vbox( Arrays.asList( new DPWidget[] { colouredTextProxy, colourLinks } ) );
-		DPWidget colourSection = section( "Action buttons", colourBox );
+		DPElement colourLinks = styleSheet.withHBoxSpacing( 20.0 ).hbox( Arrays.asList( new DPElement[] { blackButton.getElement(), redButton.getElement(), greenButton.getElement() } ) ).padX( 5.0 );
+		DPElement colourBox = styleSheet.vbox( Arrays.asList( new DPElement[] { colouredTextProxy, colourLinks } ) );
+		DPElement colourSection = section( "Action buttons", colourBox );
 		
 		return colourSection;
 	}

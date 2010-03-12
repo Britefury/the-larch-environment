@@ -13,7 +13,7 @@ import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPGridRow;
 import BritefuryJ.DocPresent.DPRGrid;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
@@ -41,15 +41,15 @@ public class GridTestPage extends SystemPage
 	private static PrimitiveStyleSheet outlineStyle = styleSheet.withBorder( new SolidBorder( 1.0, 0.0, new Color( 0.5f, 0.5f, 0.5f ), new Color( 0.9f, 0.9f, 0.9f ) ) );
 	private static PrimitiveStyleSheet tableStyle = styleSheet.withTableColumnSpacing( 5.0 ).withTableRowSpacing( 5.0 );
 
-	private DPWidget section(String description, DPWidget w)
+	private DPElement section(String description, DPElement w)
 	{
-		return sectionStyle.vbox( Arrays.asList( new DPWidget[] { createTextParagraph( description ), sectionStyle.border( w ) } ) );
+		return sectionStyle.vbox( Arrays.asList( new DPElement[] { createTextParagraph( description ), sectionStyle.border( w ) } ) );
 	}
 	
 	
-	private DPWidget span(int row, int startCol, int endCol)
+	private DPElement span(int row, int startCol, int endCol)
 	{
-		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
+		ArrayList<DPElement> children = new ArrayList<DPElement>();
 		for (int col = startCol; col < endCol; col++)
 		{
 			children.add( outlineStyle.border( t12.text( "<" + col + "_" + row + ">" ) ) );
@@ -60,7 +60,7 @@ public class GridTestPage extends SystemPage
 
 	private DPGridRow makeGridRow(int row)
 	{
-		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
+		ArrayList<DPElement> children = new ArrayList<DPElement>();
 		for (int col = 0; col < 6; col++)
 		{
 			children.add( outlineStyle.border( t12.text( "<" + col + "_" + row + ">" ) ) );
@@ -70,7 +70,7 @@ public class GridTestPage extends SystemPage
 	
 	private DPGridRow makeGridRowCollated(int row)
 	{
-		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
+		ArrayList<DPElement> children = new ArrayList<DPElement>();
 		for (int col = 0; col < 2; col++)
 		{
 			children.add( outlineStyle.border( t12.text( "<" + col + "_" + row + ">" ) ) );
@@ -82,7 +82,7 @@ public class GridTestPage extends SystemPage
 	
 	private DPRGrid makeGrid()
 	{
-		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
+		ArrayList<DPElement> children = new ArrayList<DPElement>();
 		for (int row = 0; row < 6; row++)
 		{
 			children.add( makeGridRow( row ) );
@@ -102,7 +102,7 @@ public class GridTestPage extends SystemPage
 	
 	private DPRGrid makeGridWithCollatedRows()
 	{
-		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
+		ArrayList<DPElement> children = new ArrayList<DPElement>();
 		for (int row = 0; row < 6; row++)
 		{
 			children.add( makeGridRowCollated( row ) );
@@ -112,13 +112,13 @@ public class GridTestPage extends SystemPage
 	
 	private DPRGrid makeCollatedGridWithCollatedRows()
 	{
-		ArrayList<DPWidget> rows = new ArrayList<DPWidget>();
+		ArrayList<DPElement> rows = new ArrayList<DPElement>();
 		for (int row = 0; row < 2; row++)
 		{
 			rows.add( makeGridRowCollated( row ) );
 		}
 
-		ArrayList<DPWidget> columns = new ArrayList<DPWidget>();
+		ArrayList<DPElement> columns = new ArrayList<DPElement>();
 		for (int row = 2; row < 5; row++)
 		{
 			columns.add( makeGridRowCollated( row ) );
@@ -130,13 +130,13 @@ public class GridTestPage extends SystemPage
 	
 	private DPRGrid makeCollatedGridWithCollatedRowsAndNonRows()
 	{
-		ArrayList<DPWidget> rows = new ArrayList<DPWidget>();
+		ArrayList<DPElement> rows = new ArrayList<DPElement>();
 		for (int row = 0; row < 2; row++)
 		{
 			rows.add( makeGridRowCollated( row ) );
 		}
 		
-		ArrayList<DPWidget> columns = new ArrayList<DPWidget>();
+		ArrayList<DPElement> columns = new ArrayList<DPElement>();
 		for (int row = 2; row < 5; row++)
 		{
 			columns.add( makeGridRowCollated( row ) );
@@ -151,9 +151,9 @@ public class GridTestPage extends SystemPage
 	
 	
 	
-	protected DPWidget createContents()
+	protected DPElement createContents()
 	{
-		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
+		ArrayList<DPElement> children = new ArrayList<DPElement>();
 		children.add( section( "Grid row", makeGridRow( 0 ) ) );
 		children.add( section( "Grid", makeGrid() ) );
 		children.add( section( "Grid with shortened row", makeGridwithShortenedRow() ) );

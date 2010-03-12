@@ -10,7 +10,7 @@ import java.awt.Font;
 import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPProxy;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
 import BritefuryJ.DocPresent.Controls.Hyperlink;
 import BritefuryJ.DocPresent.Controls.TextEntry;
@@ -51,7 +51,7 @@ public class TextEntryTestPage extends SystemPage
 		}
 		
 		
-		public DPWidget getElement()
+		public DPElement getElement()
 		{
 			return proxy;
 		}
@@ -85,19 +85,19 @@ public class TextEntryTestPage extends SystemPage
 
 	
 	
-	protected DPWidget section(String title, DPWidget contents)
+	protected DPElement section(String title, DPElement contents)
 	{
-		DPWidget heading = headingStyleSheet.staticText( title );
+		DPElement heading = headingStyleSheet.staticText( title );
 		
-		return styleSheet.vbox( Arrays.asList( new DPWidget[] { heading.padY( 10.0 ), contents } ) );
+		return styleSheet.vbox( Arrays.asList( new DPElement[] { heading.padY( 10.0 ), contents } ) );
 	}
 	
-	protected DPWidget createContents()
+	protected DPElement createContents()
 	{
 		EditableLink hello = new EditableLink( styleSheet, controlsStyleSheet, "Hello" );
 		EditableLink world = new EditableLink( styleSheet, controlsStyleSheet, "World" );
-		DPWidget entriesBox = styleSheet.vbox( Arrays.asList( new DPWidget[] { hello.getElement(), world.getElement() } ) );
-		DPWidget entriesSection = section( "Text entries", entriesBox );
+		DPElement entriesBox = styleSheet.vbox( Arrays.asList( new DPElement[] { hello.getElement(), world.getElement() } ) );
+		DPElement entriesSection = section( "Text entries", entriesBox );
 		
 		return entriesSection;
 	}

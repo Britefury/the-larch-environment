@@ -17,8 +17,8 @@ import java.util.regex.Pattern;
 
 import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPVBox;
-import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.ElementContext;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
@@ -32,15 +32,15 @@ import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 import BritefuryJ.ParserHelpers.DebugNode;
 import BritefuryJ.ParserHelpers.ParseResultInterface;
 
-public class NodeView implements ElementContext
+public class NodeView implements FragmentContext
 {
 	private static class NodeInteractor extends ElementInteractor
 	{
 		private NodeView nodeView;
-		private DPWidget element;
+		private DPElement element;
 		private boolean bSelected, bHighlight;
 		
-		public NodeInteractor(NodeView nodeView, DPWidget element)
+		public NodeInteractor(NodeView nodeView, DPElement element)
 		{
 			super();
 			
@@ -72,7 +72,7 @@ public class NodeView implements ElementContext
 		
 		
 		
-		public boolean onButtonDown(DPWidget element, PointerButtonEvent event)
+		public boolean onButtonDown(DPElement element, PointerButtonEvent event)
 		{
 			if ( event.getButton() == 1 )
 			{
@@ -85,13 +85,13 @@ public class NodeView implements ElementContext
 			}
 		}
 		
-		public void onEnter(DPWidget element, PointerMotionEvent event)
+		public void onEnter(DPElement element, PointerMotionEvent event)
 		{
 			bHighlight = true;
 			element.queueFullRedraw();
 		}
 
-		public void onLeave(DPWidget element, PointerMotionEvent event)
+		public void onLeave(DPElement element, PointerMotionEvent event)
 		{
 			bHighlight = false;
 			element.queueFullRedraw();
@@ -99,7 +99,7 @@ public class NodeView implements ElementContext
 
 
 		
-		public void drawBackground(DPWidget element, Graphics2D graphics)
+		public void drawBackground(DPElement element, Graphics2D graphics)
 		{
 			Color backgroundColour = bHighlight  ?  new Color( 0.7f, 0.85f, 1.0f )  :  Color.white;
 			backgroundColour = bSelected  ?  new Color( 1.0f, 1.0f, 0.6f )  :  backgroundColour;
@@ -127,8 +127,8 @@ public class NodeView implements ElementContext
 	
 	
 	
-	private DPWidget nodeWidget, mainWidget;
-	private DPBin nodeBinWidget;
+	private DPElement nodeElement, mainElement;
+	private DPBin nodeBinElement;
 	private NodeInteractor nodeInteractor;
 	private ParseView parseView;
 	private ArrayList<NodeView> children;
@@ -141,31 +141,31 @@ public class NodeView implements ElementContext
 		this.parseView = parseView;
 		this.data = data;
 		
-		nodeWidget = makeNodeWidget( data );
+		nodeElement = makeNodeElement( data );
 		
-		ArrayList<DPWidget> childWidgets = new ArrayList<DPWidget>();
+		ArrayList<DPElement> childElements = new ArrayList<DPElement>();
 		children = new ArrayList<NodeView>();
 		for (DebugNode child: data.getCallChildren())
 		{
 			NodeView childView = parseView.buildNodeView( child );
 			children.add( childView );
-			childWidgets.add( childView.getWidget().padY( 3.0 ) );
+			childElements.add( childView.getElement().padY( 3.0 ) );
 		}
 		
-		DPWidget childrenVBox = styleSheet.withVBoxSpacing( 3.0 ).vbox( childWidgets );
+		DPElement childrenVBox = styleSheet.withVBoxSpacing( 3.0 ).vbox( childElements );
 		
-		mainWidget = styleSheet.withHBoxSpacing( 80.0 ).hbox( Arrays.asList( new DPWidget[] { nodeWidget.alignVCentre(), childrenVBox.alignVCentre() } ) );
+		mainElement = styleSheet.withHBoxSpacing( 80.0 ).hbox( Arrays.asList( new DPElement[] { nodeElement.alignVCentre(), childrenVBox.alignVCentre() } ) );
 	}
 	
 	
-	public DPWidget getWidget()
+	public DPElement getElement()
 	{
-		return mainWidget;
+		return mainElement;
 	}
 	
-	protected DPWidget getNodeWidget()
+	protected DPElement getNodeElement()
 	{
-		return nodeWidget;
+		return nodeElement;
 	}
 	
 	
@@ -216,7 +216,7 @@ public class NodeView implements ElementContext
 	
 	
 	
-	private DPWidget makeTitleWidget(DebugNode data)
+	private DPElement makeTitleElement(DebugNode data)
 	{
 		ParserExpression expr = data.getExpression();
 		String exprName = expr.getExpressionName();
@@ -229,11 +229,11 @@ public class NodeView implements ElementContext
 		}
 		
 		
-		DPWidget classText = classNameStyle.staticText( "[" + className + "]" );
+		DPElement classText = classNameStyle.staticText( "[" + className + "]" );
 		if ( exprName != null )
 		{
-			DPWidget exprText = debugNameStyle.staticText( exprName );
-			return styleSheet.withHBoxSpacing( 10.0 ).hbox( Arrays.asList( new DPWidget[] { exprText, classText } ) );
+			DPElement exprText = debugNameStyle.staticText( exprName );
+			return styleSheet.withHBoxSpacing( 10.0 ).hbox( Arrays.asList( new DPElement[] { exprText, classText } ) );
 		}
 		else
 		{
@@ -241,16 +241,16 @@ public class NodeView implements ElementContext
 		}
 	}
 	
-	private DPWidget makeTitleBoxWidget(DebugNode data)
+	private DPElement makeTitleBoxElement(DebugNode data)
 	{
-		DPWidget titleWidget = makeTitleWidget( data );
+		DPElement titleElement = makeTitleElement( data );
 		
 		Border b = data.getResult().isValid()  ?  titleSuccessBorder  :  titleFailBorder;
 		
-		return styleSheet.withBorder( b ).border( titleWidget.alignVCentre() );
+		return styleSheet.withBorder( b ).border( titleElement.alignVCentre() );
 	}
 	
-	private DPWidget makeRangeWidget(DebugNode data)
+	private DPElement makeRangeElement(DebugNode data)
 	{
 		ParseResultInterface result = data.getResult();
 		String rangeText = "";
@@ -268,7 +268,7 @@ public class NodeView implements ElementContext
 	}
 	
 	@SuppressWarnings("unchecked")
-	private DPWidget makeInputWidget(DebugNode data)
+	private DPElement makeInputElement(DebugNode data)
 	{
 		Object inputObject = data.getInput();
 		String inputString;
@@ -301,7 +301,7 @@ public class NodeView implements ElementContext
 		return inputStyle.staticText( inputString );
 	}
 
-	private DPWidget makeValueWidget(DebugNode data)
+	private DPElement makeValueElement(DebugNode data)
 	{
 		ParseResultInterface result = data.getResult();
 		
@@ -321,27 +321,27 @@ public class NodeView implements ElementContext
 		}
 	}
 	
-	private DPWidget makeContentBoxWidget(DebugNode data)
+	private DPElement makeContentBoxElement(DebugNode data)
 	{
-		DPWidget rangeWidget = makeRangeWidget( data );
-		DPWidget inputWidget = makeInputWidget( data );
-		DPWidget valueWidget = makeValueWidget( data );
+		DPElement rangeElement = makeRangeElement( data );
+		DPElement inputElement = makeInputElement( data );
+		DPElement valueElement = makeValueElement( data );
 		
-		return styleSheet.vbox( Arrays.asList( new DPWidget[] { rangeWidget, inputWidget, valueWidget } ) );
+		return styleSheet.vbox( Arrays.asList( new DPElement[] { rangeElement, inputElement, valueElement } ) );
 	}
 	
-	private DPWidget makeNodeWidget(DebugNode data)
+	private DPElement makeNodeElement(DebugNode data)
 	{
-		DPWidget titleBoxWidget = makeTitleBoxWidget( data );
-		DPWidget contentBoxWidget = makeContentBoxWidget( data );
+		DPElement titleBoxElement = makeTitleBoxElement( data );
+		DPElement contentBoxElement = makeContentBoxElement( data );
 		
-		DPVBox nodeBoxWidget = styleSheet.vbox( Arrays.asList( new DPWidget[] { titleBoxWidget.alignHExpand(), contentBoxWidget.alignHExpand() } ) );
+		DPVBox nodeBoxElement = styleSheet.vbox( Arrays.asList( new DPElement[] { titleBoxElement.alignHExpand(), contentBoxElement.alignHExpand() } ) );
 		
-		nodeBinWidget = styleSheet.box( nodeBoxWidget );
+		nodeBinElement = styleSheet.box( nodeBoxElement );
 		
-		nodeInteractor = new NodeInteractor( this, nodeBinWidget );
-		nodeBinWidget.addInteractor( nodeInteractor );
+		nodeInteractor = new NodeInteractor( this, nodeBinElement );
+		nodeBinElement.addInteractor( nodeInteractor );
 		
-		return styleSheet.withBorder( nodeBorder ).border( nodeBinWidget );
+		return styleSheet.withBorder( nodeBorder ).border( nodeBinElement );
 	}
 }

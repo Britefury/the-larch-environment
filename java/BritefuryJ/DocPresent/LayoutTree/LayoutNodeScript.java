@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPScript;
-import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.WidgetFilter;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.ElementFilter;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBox;
@@ -66,7 +66,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 		LReqBoxInterface boxes[] = new LReqBoxInterface[NUMCHILDREN];
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			DPWidget child = script.getWrappedChild( i );
+			DPElement child = script.getWrappedChild( i );
 			if ( i != MAIN )
 			{
 				boxes[i] = child != null  ?  child.getLayoutNode().refreshRequisitionX().scaledRequisition( childScale )  :  null;
@@ -89,7 +89,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 		LReqBoxInterface boxes[] = new LReqBoxInterface[NUMCHILDREN];
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			DPWidget child = script.getWrappedChild( i );
+			DPElement child = script.getWrappedChild( i );
 			if ( i != MAIN )
 			{
 				boxes[i] = child != null  ?  child.getLayoutNode().refreshRequisitionY().scaledRequisition( childScale )  :  null;
@@ -120,7 +120,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 		double prevChildWidths[] = new double[NUMCHILDREN];
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			DPWidget child = script.getWrappedChild( i );
+			DPElement child = script.getWrappedChild( i );
 			if ( i != MAIN )
 			{
 				reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox().scaledRequisition( childScale )  :  null;
@@ -139,7 +139,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 		
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			DPWidget child = script.getWrappedChild( i );
+			DPElement child = script.getWrappedChild( i );
 			if ( child != null )
 			{
 				if ( i != MAIN )
@@ -165,7 +165,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 		LAllocV prevChildAllocVs[] = new LAllocV[NUMCHILDREN];
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			DPWidget child = script.getWrappedChild( i );
+			DPElement child = script.getWrappedChild( i );
 			if ( i != MAIN )
 			{
 				reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox().scaledRequisition( childScale )  :  null;
@@ -184,7 +184,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 		
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			DPWidget child = script.getWrappedChild( i );
+			DPElement child = script.getWrappedChild( i );
 			if ( child != null )
 			{
 				if ( i != MAIN )
@@ -200,14 +200,14 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 	
 	
 	
-	private ArrayList<DPWidget> getChildrenInSlots(int[] slots)
+	private ArrayList<DPElement> getChildrenInSlots(int[] slots)
 	{
 		DPScript script = (DPScript)element;
 
-		ArrayList<DPWidget> entries = new ArrayList<DPWidget>();
+		ArrayList<DPElement> entries = new ArrayList<DPElement>();
 		for (int slot: slots)
 		{
-			DPWidget child = script.getWrappedChild( slot );
+			DPElement child = script.getWrappedChild( slot );
 			if ( child != null )
 			{
 				entries.add( child );
@@ -217,7 +217,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 		return entries;
 	}
 	
-	private ArrayList<DPWidget> getChildrenInColumn(int column)
+	private ArrayList<DPElement> getChildrenInColumn(int column)
 	{
 		if ( column == LEFTCOLUMN )
 		{
@@ -241,7 +241,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 	}
 	
 	
-	private double getColumnXEdge(ArrayList<DPWidget> column, boolean bRightEdge)
+	private double getColumnXEdge(ArrayList<DPElement> column, boolean bRightEdge)
 	{
 		double columnEdgeX = 0.0;
 		for (int i = 0; i < column.size(); i++)
@@ -280,7 +280,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 	
 	
 	
-	private DPWidget getLeafClosestToLocalPointInColumn(ArrayList<DPWidget> column, Point2 localPos, WidgetFilter filter)
+	private DPElement getLeafClosestToLocalPointInColumn(ArrayList<DPElement> column, Point2 localPos, ElementFilter filter)
 	{
 		// Now determine which child entry is the closest
 		if ( column.size() == 1 )
@@ -290,21 +290,21 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 		}
 		else if ( column.size() == 2 )
 		{
-			DPWidget childI = column.get( 0 );
-			DPWidget childJ = column.get( 1 );
+			DPElement childI = column.get( 0 );
+			DPElement childJ = column.get( 1 );
 			double iUpperY = childI.getPositionInParentSpace().y + childI.getAllocationInParentSpace().y;
 			double jLowerY = childJ.getPositionInParentSpace().y;
 				
 			double midY = ( iUpperY + jLowerY ) * 0.5;
 			
-			DPWidget childA = localPos.y < midY  ?  childI  :  childJ;
-			DPWidget c = getLeafClosestToLocalPointFromChild( childA, localPos, filter );
+			DPElement childA = localPos.y < midY  ?  childI  :  childJ;
+			DPElement c = getLeafClosestToLocalPointFromChild( childA, localPos, filter );
 			if ( c != null )
 			{
 				return c;
 			}
 
-			DPWidget childB = childA == childI  ?  childJ  :  childI;
+			DPElement childB = childA == childI  ?  childJ  :  childI;
 			return getLeafClosestToLocalPointFromChild( childB, localPos, filter );
 		}
 		else
@@ -313,9 +313,9 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 		}
 	}
 	
-	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
+	protected DPElement getChildLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
 	{
-		List<DPWidget> layoutChildren = element.getLayoutChildren();
+		List<DPElement> layoutChildren = element.getLayoutChildren();
 		if ( layoutChildren.size() == 0 )
 		{
 			// No children
@@ -329,13 +329,13 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 		else
 		{
 			// Group children by column
-			ArrayList< ArrayList<DPWidget> > childrenByColumn = new ArrayList< ArrayList<DPWidget> >();
+			ArrayList< ArrayList<DPElement> > childrenByColumn = new ArrayList< ArrayList<DPElement> >();
 			
 			int[] columns = { LEFTCOLUMN, MAINCOLUMN, RIGHTCOLUMN };
 			
 			for (int col: columns)
 			{
-				ArrayList<DPWidget> childEntries = getChildrenInColumn( col );
+				ArrayList<DPElement> childEntries = getChildrenInColumn( col );
 				
 				if ( childEntries.size() > 0 )
 				{
@@ -345,7 +345,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 			
 			
 			// Determine which column is closest
-			ArrayList<DPWidget> closestColumn = null;
+			ArrayList<DPElement> closestColumn = null;
 			int columnIndex = -1;
 			
 			if ( childrenByColumn.size() == 1 )
@@ -355,10 +355,10 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 			}
 			else
 			{
-				ArrayList<DPWidget> colI = childrenByColumn.get( 0 );
+				ArrayList<DPElement> colI = childrenByColumn.get( 0 );
 				for (int i = 0; i < childrenByColumn.size() - 1; i++)
 				{
-					ArrayList<DPWidget> colJ = childrenByColumn.get( i + 1 );
+					ArrayList<DPElement> colJ = childrenByColumn.get( i + 1 );
 					double rightEdgeI = getColumnXEdge( colI, true );
 					double leftEdgeJ = getColumnXEdge( colJ, false );
 					
@@ -383,7 +383,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 			
 			
 			
-			DPWidget c = getLeafClosestToLocalPointInColumn( closestColumn, localPos, filter );
+			DPElement c = getLeafClosestToLocalPointInColumn( closestColumn, localPos, filter );
 			
 			if ( c != null )
 			{
@@ -391,7 +391,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 			}
 			else
 			{
-				DPWidget next = null;
+				DPElement next = null;
 				for (int j = columnIndex + 1; j < childrenByColumn.size(); j++)
 				{
 					next = getLeafClosestToLocalPointInColumn( childrenByColumn.get( j ), localPos, filter );
@@ -401,7 +401,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 					}
 				}
 
-				DPWidget prev = null;
+				DPElement prev = null;
 				for (int j = columnIndex - 1; j >= 0; j--)
 				{
 					prev = getLeafClosestToLocalPointInColumn( childrenByColumn.get( j ), localPos, filter );
@@ -441,7 +441,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 	// Focus navigation methods
 	//
 	
-	public List<DPWidget> horizontalNavigationList()
+	public List<DPElement> horizontalNavigationList()
 	{
 		return element.getLayoutChildren();
 	}

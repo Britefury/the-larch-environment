@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPVBox;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
@@ -76,11 +76,11 @@ public class VerticalListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 	}
 
 	
-	private DPWidget createLineParagraph(PrimitiveStyleSheet basicStyle, int index, DPWidget child, SeparatorElementFactory separator)
+	private DPElement createLineParagraph(PrimitiveStyleSheet basicStyle, int index, DPElement child, SeparatorElementFactory separator)
 	{
 		if ( separator != null )
 		{
-			return basicStyle.paragraph( Arrays.asList( new DPWidget[] { child, separator.createElement( basicStyle, index, child ) } ) );
+			return basicStyle.paragraph( Arrays.asList( new DPElement[] { child, separator.createElement( basicStyle, index, child ) } ) );
 		}
 		else
 		{
@@ -88,12 +88,12 @@ public class VerticalListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 		}
 	}
 	
-	public DPWidget createListElement(List<DPWidget> children, PrimitiveStyleSheet primitiveStyle, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator,
+	public DPElement createListElement(List<DPElement> children, PrimitiveStyleSheet primitiveStyle, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator,
 			ElementFactory spacing, TrailingSeparator trailingSeparator)
 	{
 		VerticalListViewLayoutParams params = getLayoutParams();
 		
-		ArrayList<DPWidget> childElems = new ArrayList<DPWidget>();
+		ArrayList<DPElement> childElems = new ArrayList<DPElement>();
 		childElems.ensureCapacity( children.size() );
 		
 		if ( children.size() > 0 )
@@ -114,12 +114,12 @@ public class VerticalListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 		}
 
 		DPVBox vbox = primitiveStyle.vbox( childElems );
-		DPWidget indented = vbox.padX( params.indentation, 0.0 );
+		DPElement indented = vbox.padX( params.indentation, 0.0 );
 		
 		
 		if ( beginDelim != null  ||  endDelim != null )
 		{
-			ArrayList<DPWidget> outerChildElems = new ArrayList<DPWidget>();
+			ArrayList<DPElement> outerChildElems = new ArrayList<DPElement>();
 			outerChildElems.ensureCapacity( 3 );
 			
 			if ( beginDelim != null )

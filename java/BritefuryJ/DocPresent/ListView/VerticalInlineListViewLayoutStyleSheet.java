@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPVBox;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
@@ -76,11 +76,11 @@ public class VerticalInlineListViewLayoutStyleSheet extends ListViewLayoutStyleS
 	}
 
 	
-	private DPWidget createLineParagraph(PrimitiveStyleSheet basicStyle, int index, DPWidget child, SeparatorElementFactory separator)
+	private DPElement createLineParagraph(PrimitiveStyleSheet basicStyle, int index, DPElement child, SeparatorElementFactory separator)
 	{
 		if ( separator != null )
 		{
-			return basicStyle.paragraph( Arrays.asList( new DPWidget[] { child, separator.createElement( basicStyle, index, child ) } ) );
+			return basicStyle.paragraph( Arrays.asList( new DPElement[] { child, separator.createElement( basicStyle, index, child ) } ) );
 		}
 		else
 		{
@@ -88,7 +88,7 @@ public class VerticalInlineListViewLayoutStyleSheet extends ListViewLayoutStyleS
 		}
 	}
 	
-	public DPWidget createListElement(List<DPWidget> children, PrimitiveStyleSheet primitiveStyle, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator,
+	public DPElement createListElement(List<DPElement> children, PrimitiveStyleSheet primitiveStyle, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator,
 			ElementFactory spacing, TrailingSeparator trailingSeparator)
 	{
 		VerticalInlineListViewLayoutParams params = getLayoutParams();
@@ -96,7 +96,7 @@ public class VerticalInlineListViewLayoutStyleSheet extends ListViewLayoutStyleS
 		if ( children.size() <= 1 )
 		{
 			// Paragraph with contents: [ beginDelim ] + children + [ endDelim ]
-			ArrayList<DPWidget> childElems = new ArrayList<DPWidget>();
+			ArrayList<DPElement> childElems = new ArrayList<DPElement>();
 			if ( beginDelim != null )
 			{
 				childElems.add( beginDelim.createElement( primitiveStyle ) );
@@ -119,11 +119,11 @@ public class VerticalInlineListViewLayoutStyleSheet extends ListViewLayoutStyleS
 		else
 		{
 			// First line
-			DPWidget first = null;
+			DPElement first = null;
 			if ( beginDelim != null  ||  separator != null )
 			{
-				DPWidget child = children.get( 0 );
-				ArrayList<DPWidget> firstChildElems = new ArrayList<DPWidget>();
+				DPElement child = children.get( 0 );
+				ArrayList<DPElement> firstChildElems = new ArrayList<DPElement>();
 				firstChildElems.ensureCapacity( 3 );
 				if ( beginDelim != null )
 				{
@@ -143,7 +143,7 @@ public class VerticalInlineListViewLayoutStyleSheet extends ListViewLayoutStyleS
 			
 			
 			// Middle lines
-			ArrayList<DPWidget> childElems = new ArrayList<DPWidget>();
+			ArrayList<DPElement> childElems = new ArrayList<DPElement>();
 			childElems.ensureCapacity( children.size() );
 			for (int i = 1; i < children.size() - 1; i++)
 			{
@@ -161,16 +161,16 @@ public class VerticalInlineListViewLayoutStyleSheet extends ListViewLayoutStyleS
 			}
 			
 			DPVBox middleVBox = primitiveStyle.vbox( childElems );
-			DPWidget indent = middleVBox.padX( params.indentation );
+			DPElement indent = middleVBox.padX( params.indentation );
 			
 			
 			if ( endDelim != null )
 			{
-				return primitiveStyle.vbox( Arrays.asList( new DPWidget[] { first, indent, endDelim.createElement( primitiveStyle ) } ) );
+				return primitiveStyle.vbox( Arrays.asList( new DPElement[] { first, indent, endDelim.createElement( primitiveStyle ) } ) );
 			}
 			else
 			{
-				return primitiveStyle.vbox( Arrays.asList( new DPWidget[] { first, indent } ) );
+				return primitiveStyle.vbox( Arrays.asList( new DPElement[] { first, indent } ) );
 			}
 		}
 	}

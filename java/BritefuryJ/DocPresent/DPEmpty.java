@@ -9,17 +9,17 @@ package BritefuryJ.DocPresent;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.StyleParams.WidgetStyleParams;
+import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
 import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
-public abstract class DPEmpty extends DPWidget
+public abstract class DPEmpty extends DPElement
 {
 	public DPEmpty()
 	{
 		super();
 	}
 	
-	public DPEmpty(WidgetStyleParams styleParams)
+	public DPEmpty(ElementStyleParams styleParams)
 	{
 		super(styleParams);
 	}
@@ -46,11 +46,11 @@ public abstract class DPEmpty extends DPWidget
 		return 0;
 	}
 
-	protected void getTextRepresentationFromPathToEnd(StringBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	protected void getTextRepresentationFromPathToEnd(StringBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
 	}
 
-	protected void getTextRepresentationFromStartToPath(StringBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	protected void getTextRepresentationFromStartToPath(StringBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
 	}
 
@@ -68,11 +68,11 @@ public abstract class DPEmpty extends DPWidget
 	{
 	}
 	
-	protected void getLinearRepresentationFromPathToEnd(ItemStreamBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	protected void getLinearRepresentationFromPathToEnd(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
 	}
 
-	protected void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	protected void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
 	}
 }

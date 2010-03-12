@@ -16,15 +16,15 @@ import org.python.core.PyObject;
 import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.ElementContext;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocView.DVNode;
 import BritefuryJ.GSym.IncrementalContext.GSymIncrementalNodeContext;
 import BritefuryJ.GSym.IncrementalContext.GSymIncrementalNodeFunction;
 
-public class GSymNodeViewContext extends GSymIncrementalNodeContext implements ElementContext
+public class GSymNodeViewContext extends GSymIncrementalNodeContext implements FragmentContext
 {
 	TextStyleParams viewError_textStyle = new TextStyleParams( null, null, null, false, new Font( "SansSerif", Font.BOLD, 12 ),  new Color( 0.8f, 0.0f, 0.0f ),  null,  null,  false );
 
@@ -45,39 +45,39 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	
 	
 	
-	public DPWidget errorElement(String errorText)
+	public DPElement errorElement(String errorText)
 	{
 		return new DPText( viewError_textStyle, errorText );
 	}
 	
 	
 	
-	public DPWidget viewEval(DMNode x, StyleSheet styleSheet)
+	public DPElement viewEval(DMNode x, StyleSheet styleSheet)
 	{
 		return viewEvalFn( x, styleSheet, (GSymIncrementalNodeFunction)null, null );
 	}
 
-	public DPWidget viewEval(DMNode x, StyleSheet styleSheet, Object state)
+	public DPElement viewEval(DMNode x, StyleSheet styleSheet, Object state)
 	{
 		return viewEvalFn( x, styleSheet, (GSymIncrementalNodeFunction)null, state );
 	}
 
-	public DPWidget viewEvalFn(DMNode x, StyleSheet styleSheet, GSymIncrementalNodeFunction nodeViewFunction)
+	public DPElement viewEvalFn(DMNode x, StyleSheet styleSheet, GSymIncrementalNodeFunction nodeViewFunction)
 	{
 		return viewEvalFn( x, styleSheet, nodeViewFunction, null );
 	}
 
-	public DPWidget viewEvalFn(DMNode x, StyleSheet styleSheet, GSymIncrementalNodeFunction nodeViewFunction, Object state)
+	public DPElement viewEvalFn(DMNode x, StyleSheet styleSheet, GSymIncrementalNodeFunction nodeViewFunction, Object state)
 	{
-		return (DPWidget)evalFn( x, nodeViewFunction, new GSymViewContext.ViewInheritedState( styleSheet, state ) );
+		return (DPElement)evalFn( x, nodeViewFunction, new GSymViewContext.ViewInheritedState( styleSheet, state ) );
 	}
 	
-	public DPWidget viewEvalFn(DMNode x, StyleSheet styleSheet, PyObject nodeViewFunction)
+	public DPElement viewEvalFn(DMNode x, StyleSheet styleSheet, PyObject nodeViewFunction)
 	{
 		return viewEvalFn( x, styleSheet, new PyGSymViewFragmentFunction( nodeViewFunction ), null );
 	}
 
-	public DPWidget viewEvalFn(DMNode x, StyleSheet styleSheet, PyObject nodeViewFunction, Object state)
+	public DPElement viewEvalFn(DMNode x, StyleSheet styleSheet, PyObject nodeViewFunction, Object state)
 	{
 		return viewEvalFn( x, styleSheet, new PyGSymViewFragmentFunction( nodeViewFunction ), state );
 	}
@@ -85,24 +85,24 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	
 	
 	
-	public List<DPWidget> mapViewEval(List<DMNode> xs, StyleSheet styleSheet)
+	public List<DPElement> mapViewEval(List<DMNode> xs, StyleSheet styleSheet)
 	{
 		return mapViewEvalFn( xs, styleSheet, (GSymIncrementalNodeFunction)null, null );
 	}
 
-	public List<DPWidget> mapViewEval(List<DMNode> xs, StyleSheet styleSheet, Object state)
+	public List<DPElement> mapViewEval(List<DMNode> xs, StyleSheet styleSheet, Object state)
 	{
 		return mapViewEvalFn( xs, styleSheet, (GSymIncrementalNodeFunction)null, state );
 	}
 
-	public List<DPWidget> mapViewEvalFn(List<DMNode> xs, StyleSheet styleSheet, GSymIncrementalNodeFunction nodeViewFunction)
+	public List<DPElement> mapViewEvalFn(List<DMNode> xs, StyleSheet styleSheet, GSymIncrementalNodeFunction nodeViewFunction)
 	{
 		return mapViewEvalFn( xs, styleSheet, nodeViewFunction, null );
 	}
 
-	public List<DPWidget> mapViewEvalFn(List<DMNode> xs, StyleSheet styleSheet, GSymIncrementalNodeFunction nodeViewFunction, Object state)
+	public List<DPElement> mapViewEvalFn(List<DMNode> xs, StyleSheet styleSheet, GSymIncrementalNodeFunction nodeViewFunction, Object state)
 	{
-		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
+		ArrayList<DPElement> children = new ArrayList<DPElement>();
 		children.ensureCapacity( xs.size() );
 		for (DMNode x: xs)
 		{
@@ -111,25 +111,25 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 		return children;
 	}
 	
-	public List<DPWidget> mapViewEvalFn(List<DMNode> xs, StyleSheet styleSheet, PyObject nodeViewFunction)
+	public List<DPElement> mapViewEvalFn(List<DMNode> xs, StyleSheet styleSheet, PyObject nodeViewFunction)
 	{
 		return mapViewEvalFn( xs, styleSheet, new PyGSymViewFragmentFunction( nodeViewFunction ), null );
 	}
 
-	public List<DPWidget> mapViewEvalFn(List<DMNode> xs, StyleSheet styleSheet, PyObject nodeViewFunction, Object state)
+	public List<DPElement> mapViewEvalFn(List<DMNode> xs, StyleSheet styleSheet, PyObject nodeViewFunction, Object state)
 	{
 		return mapViewEvalFn( xs, styleSheet, new PyGSymViewFragmentFunction( nodeViewFunction ), state );
 	}
 	
 	
 	
-	public DPWidget getViewNodeElement()
+	public DPElement getViewNodeElement()
 	{
 		DVNode viewNode = (DVNode)treeNode;
 		return viewNode.getElementNoRefresh();
 	}
 	
-	public DPWidget getViewNodeContentElement()
+	public DPElement getViewNodeContentElement()
 	{
 		DVNode viewNode = (DVNode)treeNode;
 		return viewNode.getInnerElementNoRefresh();
@@ -137,7 +137,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	
 	
 	
-	private GSymNodeViewContext getPreviousSiblingFromChildElement(GSymNodeViewContext parent, DPWidget fromChild)
+	private GSymNodeViewContext getPreviousSiblingFromChildElement(GSymNodeViewContext parent, DPElement fromChild)
 	{
 		if ( fromChild == null )
 		{
@@ -149,7 +149,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 			return null;
 		}
 		
-		List<DPWidget> children = parentElement.getChildren();
+		List<DPElement> children = parentElement.getChildren();
 		int index = children.indexOf( fromChild );
 		for (int i = index - 1; i >= 0; i--)
 		{
@@ -163,17 +163,17 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 		return getNextSiblingFromChildElement( parent, parentElement.getParent() );
 	}
 	
-	private GSymNodeViewContext getLastChildFromParentElement(GSymNodeViewContext parent, DPWidget element)
+	private GSymNodeViewContext getLastChildFromParentElement(GSymNodeViewContext parent, DPElement element)
 	{
-		if ( element.getContext() != parent )
+		if ( element.getFragmentContext() != parent )
 		{
 			// We have recursed down the element tree far enough when we encounter an element with a different context
-			return (GSymNodeViewContext)element.getContext();
+			return (GSymNodeViewContext)element.getFragmentContext();
 		}
 		else if ( element instanceof DPContainer )
 		{
 			DPContainer branch = (DPContainer)element;
-			List<DPWidget> children = branch.getChildren();
+			List<DPElement> children = branch.getChildren();
 			for (int i = children.size() - 1; i >= 0; i--)
 			{
 				GSymNodeViewContext sibling = getLastChildFromParentElement( parent, children.get( i ) );
@@ -188,7 +188,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 	
 
 	
-	private GSymNodeViewContext getNextSiblingFromChildElement(GSymNodeViewContext parent, DPWidget fromChild)
+	private GSymNodeViewContext getNextSiblingFromChildElement(GSymNodeViewContext parent, DPElement fromChild)
 	{
 		if ( fromChild == null )
 		{
@@ -200,7 +200,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 			return null;
 		}
 		
-		List<DPWidget> children = parentElement.getChildren();
+		List<DPElement> children = parentElement.getChildren();
 		int index = children.indexOf( fromChild );
 		for (int i = index + 1; i < children.size(); i++)
 		{
@@ -214,17 +214,17 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements E
 		return getNextSiblingFromChildElement( parent, parentElement.getParent() );
 	}
 	
-	private GSymNodeViewContext getFirstChildFromParentElement(GSymNodeViewContext parent, DPWidget element)
+	private GSymNodeViewContext getFirstChildFromParentElement(GSymNodeViewContext parent, DPElement element)
 	{
-		if ( element.getContext() != parent )
+		if ( element.getFragmentContext() != parent )
 		{
 			// We have recursed down the element tree far enough when we encounter an element with a different context
-			return (GSymNodeViewContext)element.getContext();
+			return (GSymNodeViewContext)element.getFragmentContext();
 		}
 		else if ( element instanceof DPContainer )
 		{
 			DPContainer branch = (DPContainer)element;
-			for (DPWidget child: branch.getChildren())
+			for (DPElement child: branch.getChildren())
 			{
 				GSymNodeViewContext sibling = getFirstChildFromParentElement( parent, child );
 				if ( sibling != null )

@@ -98,7 +98,7 @@ public class DPCanvas extends DPContentLeaf implements DrawingOwner
 		drawing.realise( this );
 	}
 	
-	protected void onUnrealise(DPWidget unrealiseRoot)
+	protected void onUnrealise(DPElement unrealiseRoot)
 	{
 		drawing.unrealise();
 

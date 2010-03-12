@@ -11,30 +11,30 @@ import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeHiddenContent;
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.StyleParams.WidgetStyleParams;
+import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
 import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
-public class DPHiddenContent extends DPWidget
+public class DPHiddenContent extends DPElement
 {
 	String textRepresentation;
 	
 	
 	public DPHiddenContent()
 	{
-		this( WidgetStyleParams.defaultStyleParams, "" );
+		this( ElementStyleParams.defaultStyleParams, "" );
 	}
 	
 	public DPHiddenContent(String textRepresentation)
 	{
-		this( WidgetStyleParams.defaultStyleParams, textRepresentation );
+		this( ElementStyleParams.defaultStyleParams, textRepresentation );
 	}
 	
-	public DPHiddenContent(WidgetStyleParams styleParams)
+	public DPHiddenContent(ElementStyleParams styleParams)
 	{
 		this(styleParams, "" );
 	}
 
-	public DPHiddenContent(WidgetStyleParams styleParams, String textRepresentation)
+	public DPHiddenContent(ElementStyleParams styleParams, String textRepresentation)
 	{
 		super(styleParams);
 		
@@ -62,11 +62,11 @@ public class DPHiddenContent extends DPWidget
 		return textRepresentation.length();
 	}
 
-	protected void getTextRepresentationFromPathToEnd(StringBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	protected void getTextRepresentationFromPathToEnd(StringBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
 	}
 
-	protected void getTextRepresentationFromStartToPath(StringBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	protected void getTextRepresentationFromStartToPath(StringBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
 	}
 
@@ -85,11 +85,11 @@ public class DPHiddenContent extends DPWidget
 		builder.appendTextValue( textRepresentation );
 	}
 	
-	protected void getLinearRepresentationFromPathToEnd(ItemStreamBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	protected void getLinearRepresentationFromPathToEnd(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
 	}
 
-	protected void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	protected void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
 	}
 }

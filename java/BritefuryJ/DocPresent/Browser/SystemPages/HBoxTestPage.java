@@ -10,7 +10,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
@@ -37,16 +37,16 @@ public class HBoxTestPage extends SystemPage
 	private static PrimitiveStyleSheet outlineStyleSheet =styleSheet.withBorder( new SolidBorder( 1.0, 0.0, new Color( 0.0f, 0.3f, 0.7f ), null ) );
 
 	
-	protected DPWidget makeText(String text, int size)
+	protected DPElement makeText(String text, int size)
 	{
 		PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance.withFont( new Font( "Sans serif", Font.BOLD, size ) );
 		return outlineStyleSheet.border( styleSheet.text( text ) );
 	}
 	
 	
-	protected DPWidget createContents()
+	protected DPElement createContents()
 	{
-		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
+		ArrayList<DPElement> children = new ArrayList<DPElement>();
 		children.add( makeText( "a", 24 ).alignVBaselines() );
 		children.add( makeText( "g", 24 ).alignVBaselines() );
 		children.add( makeText( "v_ref_y", 18 ).alignVBaselines() );

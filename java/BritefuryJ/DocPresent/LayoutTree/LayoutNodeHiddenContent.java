@@ -7,8 +7,8 @@
 package BritefuryJ.DocPresent.LayoutTree;
 
 import BritefuryJ.DocPresent.DPHiddenContent;
-import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.WidgetFilter;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.ElementFilter;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.Math.Point2;
 
@@ -31,7 +31,7 @@ public class LayoutNodeHiddenContent extends LeafLayoutNodeSharedReq
 	}
 
 	
-	public DPWidget getLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
+	public DPElement getLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
 	{
 		if ( filter == null  ||  filter.testElement( element ) )
 		{

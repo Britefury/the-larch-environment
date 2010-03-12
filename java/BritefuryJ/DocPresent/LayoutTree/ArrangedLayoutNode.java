@@ -9,8 +9,8 @@ package BritefuryJ.DocPresent.LayoutTree;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPContainer;
-import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.WidgetFilter;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.ElementFilter;
 import BritefuryJ.DocPresent.Layout.ElementAlignment;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
 import BritefuryJ.DocPresent.Layout.LAllocV;
@@ -32,7 +32,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 	}
 
 
-	public DPWidget getElement()
+	public DPElement getElement()
 	{
 		return element;
 	}
@@ -175,7 +175,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 	
 	
 	
-	protected LReqBoxInterface[] getChildrenRefreshedRequistionXBoxes(List<DPWidget> nodes)
+	protected LReqBoxInterface[] getChildrenRefreshedRequistionXBoxes(List<DPElement> nodes)
 	{
 		LReqBoxInterface[] boxes = new LReqBoxInterface[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
@@ -186,7 +186,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 	}
 
 
-	protected LReqBoxInterface[] getChildrenRefreshedRequistionYBoxes(List<DPWidget> nodes)
+	protected LReqBoxInterface[] getChildrenRefreshedRequistionYBoxes(List<DPElement> nodes)
 	{
 		LReqBoxInterface[] boxes = new LReqBoxInterface[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
@@ -199,7 +199,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 	
 	
 	
-	protected LReqBoxInterface[] getChildrenRequisitionBoxes(List<DPWidget> nodes)
+	protected LReqBoxInterface[] getChildrenRequisitionBoxes(List<DPElement> nodes)
 	{
 		LReqBoxInterface[] boxes = new LReqBoxInterface[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
@@ -211,7 +211,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 
 	
 	
-	protected LAllocBoxInterface[] getChildrenAllocationBoxes(List<DPWidget> nodes)
+	protected LAllocBoxInterface[] getChildrenAllocationBoxes(List<DPElement> nodes)
 	{
 		LAllocBoxInterface[] boxes = new LAllocBoxInterface[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
@@ -223,7 +223,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 	
 	
 	
-	protected int[] getChildrenAlignmentFlags(List<DPWidget> nodes)
+	protected int[] getChildrenAlignmentFlags(List<DPElement> nodes)
 	{
 		int alignmentFlags[] = new int[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
@@ -236,7 +236,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 	
 	
 	
-	protected double[] getChildrenAllocationX(List<DPWidget> nodes)
+	protected double[] getChildrenAllocationX(List<DPElement> nodes)
 	{
 		double[] values = new double[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
@@ -248,7 +248,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 
 
 
-	protected double[] getChildrenAllocationY(List<DPWidget> nodes)
+	protected double[] getChildrenAllocationY(List<DPElement> nodes)
 	{
 		double[] values = new double[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
@@ -260,7 +260,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 
 
 
-	protected LAllocV[] getChildrenAllocV(List<DPWidget> nodes)
+	protected LAllocV[] getChildrenAllocV(List<DPElement> nodes)
 	{
 		LAllocV[] values = new LAllocV[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
@@ -273,19 +273,19 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 
 
 
-	public DPWidget getLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
+	public DPElement getLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
 	{
 		return getChildLeafClosestToLocalPoint( localPos, filter );
 	}
 
-	protected abstract DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter);
+	protected abstract DPElement getChildLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter);
 	
-	protected DPWidget getLeafClosestToLocalPointFromChild(DPWidget child, Point2 localPos, WidgetFilter filter)
+	protected DPElement getLeafClosestToLocalPointFromChild(DPElement child, Point2 localPos, ElementFilter filter)
 	{
 		return child.getLayoutNode().getLeafClosestToLocalPoint( child.getParentToLocalXform().transform( localPos ), filter );
 	}
 	
-	protected DPWidget getChildLeafClosestToLocalPointHorizontal(List<DPWidget> searchList, Point2 localPos, WidgetFilter filter)
+	protected DPElement getChildLeafClosestToLocalPointHorizontal(List<DPElement> searchList, Point2 localPos, ElementFilter filter)
 	{
 		if ( searchList.size() == 0 )
 		{
@@ -297,12 +297,12 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 		}
 		else
 		{
-			DPWidget start = null;
+			DPElement start = null;
 			int startIndex = -1;
-			DPWidget childI = searchList.get( 0 );
+			DPElement childI = searchList.get( 0 );
 			for (int i = 0; i < searchList.size() - 1; i++)
 			{
-				DPWidget childJ = searchList.get( i + 1 );
+				DPElement childJ = searchList.get( i + 1 );
 				double iUpperX = childI.getPositionInParentSpace().x + childI.getAllocationInParentSpace().x;
 				double jLowerX = childJ.getPositionInParentSpace().x;
 				
@@ -324,15 +324,15 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 				start = searchList.get( startIndex );
 			}
 			
-			DPWidget c = getLeafClosestToLocalPointFromChild( start, localPos, filter );
+			DPElement c = getLeafClosestToLocalPointFromChild( start, localPos, filter );
 			if ( c != null )
 			{
 				return c;
 			}
 			else
 			{
-				DPWidget next = null;
-				DPWidget nextC = null;
+				DPElement next = null;
+				DPElement nextC = null;
 				for (int j = startIndex + 1; j < searchList.size(); j++)
 				{
 					nextC = getLeafClosestToLocalPointFromChild( searchList.get( j ), localPos, filter );
@@ -343,8 +343,8 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 					}
 				}
 
-				DPWidget prev = null;
-				DPWidget prevC = null;
+				DPElement prev = null;
+				DPElement prevC = null;
 				for (int j = startIndex - 1; j >= 0; j--)
 				{
 					prevC = getLeafClosestToLocalPointFromChild( searchList.get( j ), localPos, filter );
@@ -379,7 +379,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 		}
 	}
 	
-	protected DPWidget getChildLeafClosestToLocalPointVertical(List<DPWidget> searchList, Point2 localPos, WidgetFilter filter)
+	protected DPElement getChildLeafClosestToLocalPointVertical(List<DPElement> searchList, Point2 localPos, ElementFilter filter)
 	{
 		if ( searchList.size() == 0 )
 		{
@@ -391,12 +391,12 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 		}
 		else
 		{
-			DPWidget start = null;
+			DPElement start = null;
 			int startIndex = -1;
-			DPWidget childI = searchList.get( 0 );
+			DPElement childI = searchList.get( 0 );
 			for (int i = 0; i < searchList.size() - 1; i++)
 			{
-				DPWidget childJ = searchList.get( i + 1 );
+				DPElement childJ = searchList.get( i + 1 );
 				double iUpperY = childI.getPositionInParentSpace().y + childI.getAllocationInParentSpace().y;
 				double jLowerY = childJ.getPositionInParentSpace().y;
 				
@@ -418,14 +418,14 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 				start = searchList.get( startIndex );
 			}
 			
-			DPWidget c = getLeafClosestToLocalPointFromChild( start, localPos, filter );
+			DPElement c = getLeafClosestToLocalPointFromChild( start, localPos, filter );
 			if ( c != null )
 			{
 				return c;
 			}
 			else
 			{
-				DPWidget next = null;
+				DPElement next = null;
 				for (int j = startIndex + 1; j < searchList.size(); j++)
 				{
 					next = getLeafClosestToLocalPointFromChild( searchList.get( j ), localPos, filter );
@@ -435,7 +435,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 					}
 				}
 
-				DPWidget prev = null;
+				DPElement prev = null;
 				for (int j = startIndex - 1; j >= 0; j--)
 				{
 					prev = getLeafClosestToLocalPointFromChild( searchList.get( j ), localPos, filter );

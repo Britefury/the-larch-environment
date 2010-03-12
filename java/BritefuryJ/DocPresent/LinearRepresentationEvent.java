@@ -8,16 +8,16 @@ package BritefuryJ.DocPresent;
 
 public class LinearRepresentationEvent
 {
-	protected DPWidget sourceElement;
+	protected DPElement sourceElement;
 	
 	
-	public LinearRepresentationEvent(DPWidget sourceElement)
+	public LinearRepresentationEvent(DPElement sourceElement)
 	{
 		this.sourceElement = sourceElement;
 	}
 	
 	
-	public DPWidget getSourceElement()
+	public DPElement getSourceElement()
 	{
 		return sourceElement;
 	}

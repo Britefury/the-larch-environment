@@ -14,7 +14,7 @@ import java.util.Arrays;
 import BritefuryJ.DocPresent.DPCanvas;
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Canvas.DrawingNode;
 import BritefuryJ.DocPresent.Canvas.GroupNode;
@@ -131,10 +131,10 @@ public class CanvasTestPage extends SystemPage
 	}
 
 	
-	protected DPWidget makeDestElement(String title)
+	protected DPElement makeDestElement(String title)
 	{
 		final DPText textElement = textStyle.text( title );
-		DPWidget destText = styleSheet.withBackground( new FillPainter( backgroundColour ) ).box( textElement.pad( 10.0, 10.0 ) );
+		DPElement destText = styleSheet.withBackground( new FillPainter( backgroundColour ) ).box( textElement.pad( 10.0, 10.0 ) );
 		
 		SimpleDndHandler.DropFn dropFn = new SimpleDndHandler.DropFn()
 		{
@@ -167,10 +167,10 @@ public class CanvasTestPage extends SystemPage
 		}
 	}
 	
-	protected DPWidget makeDestElement2(String title, final DPWidget firstElement)
+	protected DPElement makeDestElement2(String title, final DPElement firstElement)
 	{
 		final DPText textElement = textStyle.text( title );
-		DPWidget destText = styleSheet.withBackground( new FillPainter( backgroundColour ) ).box( textElement.pad( 10.0, 10.0 ) );
+		DPElement destText = styleSheet.withBackground( new FillPainter( backgroundColour ) ).box( textElement.pad( 10.0, 10.0 ) );
 		
 		SimpleDndHandler.DropFn dropFn = new SimpleDndHandler.DropFn()
 		{
@@ -203,16 +203,16 @@ public class CanvasTestPage extends SystemPage
 	}
 
 	
-	protected DPWidget createContents()
+	protected DPElement createContents()
 	{
 		DPCanvas canvas = styleSheet.canvas( createClockFace().translate( 320.0, 240.0 ), 640.0, 480.0, false, false );
-		DPWidget diagram = styleSheet.withBorder( new SolidBorder( 1.0, 3.0, 2.0, 2.0, Color.black, null ) ).border( canvas );
+		DPElement diagram = styleSheet.withBorder( new SolidBorder( 1.0, 3.0, 2.0, 2.0, Color.black, null ) ).border( canvas );
 		
-		DPWidget dest0 = makeDestElement( "Number" );
-		DPWidget dest1 = makeDestElement2( "Number", dest0 );
+		DPElement dest0 = makeDestElement( "Number" );
+		DPElement dest1 = makeDestElement2( "Number", dest0 );
 
-		DPHBox hbox = styleSheet.withHBoxSpacing( 20.0 ).hbox( Arrays.asList( new DPWidget[] { dest0, dest1 } ) );
+		DPHBox hbox = styleSheet.withHBoxSpacing( 20.0 ).hbox( Arrays.asList( new DPElement[] { dest0, dest1 } ) );
 
-		return styleSheet.withVBoxSpacing( 20.0 ).vbox( Arrays.asList( new DPWidget[] { diagram, hbox } ) );
+		return styleSheet.withVBoxSpacing( 20.0 ).vbox( Arrays.asList( new DPElement[] { diagram, hbox } ) );
 	}
 }

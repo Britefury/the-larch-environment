@@ -11,16 +11,16 @@ import java.awt.Cursor;
 
 import BritefuryJ.DocPresent.Painter.Painter;
 
-public class WidgetStyleParams
+public class ElementStyleParams
 {
-	public static final WidgetStyleParams defaultStyleParams = new WidgetStyleParams( null, null, null );
+	public static final ElementStyleParams defaultStyleParams = new ElementStyleParams( null, null, null );
 	
 	
 	private final Painter background, hoverBackground;
 	private final Cursor cursor;
 	
 	
-	public WidgetStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor)
+	public ElementStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor)
 	{
 		this.background = background;
 		this.hoverBackground = hoverBackground;

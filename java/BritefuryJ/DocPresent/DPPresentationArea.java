@@ -775,8 +775,8 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		else
 		{
 			DPContainer commonRoot = s.getCommonRoot();
-			ArrayList<DPWidget> startPath = s.getStartPathFromCommonRoot();
-			ArrayList<DPWidget> endPath = s.getEndPathFromCommonRoot();
+			ArrayList<DPElement> startPath = s.getStartPathFromCommonRoot();
+			ArrayList<DPElement> endPath = s.getEndPathFromCommonRoot();
 			
 			if ( commonRoot != null )
 			{
@@ -803,8 +803,8 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		else
 		{
 			DPContainer commonRoot = s.getCommonRoot();
-			ArrayList<DPWidget> startPath = s.getStartPathFromCommonRoot();
-			ArrayList<DPWidget> endPath = s.getEndPathFromCommonRoot();
+			ArrayList<DPElement> startPath = s.getStartPathFromCommonRoot();
+			ArrayList<DPElement> endPath = s.getEndPathFromCommonRoot();
 			
 			if ( commonRoot != null )
 			{
@@ -894,11 +894,11 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		queueFullRedraw();
 	}
 	
-	public void focusOn(DPWidget widget)
+	public void focusOn(DPElement element)
 	{
 		viewXform.rootScaleInWindowSpace = 1.0;
-		Point2 topLeft = widget.getLocalPointRelativeToRoot( new Point2( 0.0, 0.0 ) );
-		Point2 bottomRight = widget.getLocalPointRelativeToRoot( new Point2( widget.getAllocation() ) );
+		Point2 topLeft = element.getLocalPointRelativeToRoot( new Point2( 0.0, 0.0 ) );
+		Point2 bottomRight = element.getLocalPointRelativeToRoot( new Point2( element.getAllocation() ) );
 		Point2 centre = Point2.average( topLeft, bottomRight );
 		viewXform.windowTopLeftCornerInRootSpace = centre.sub( windowSize.mul( 0.5 ) );
 		updateRange();
@@ -1186,7 +1186,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 			updateRange();
 			bAllocationRequired = false;
 			
-			// Send motion events; pointer hasn't moved, but the widgets have
+			// Send motion events; pointer hasn't moved, but the elements have
 			inputTable.onRootElementReallocate();
 			long t2 = System.nanoTime();
 			System.out.println( "DPPresentationArea.performAllocation(): TYPESET TIME = " + (double)(t2-t1) * 1.0e-9  +  ", used memory = "  + ( Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() ) );
@@ -1307,13 +1307,13 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	{
 		if ( caret.isValid() )
 		{
-			DPContentLeafEditable widget = caret.getElement();
+			DPContentLeafEditable element = caret.getElement();
 			
-			if ( widget != null )
+			if ( element != null )
 			{
 				Color prevColour = graphics.getColor();
 				graphics.setColor( Color.blue );
-				widget.drawCaret( graphics, caret );
+				element.drawCaret( graphics, caret );
 				graphics.setColor( prevColour );
 			}
 		}
@@ -1326,8 +1326,8 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		{
 			Marker startMarker = selection.getStartMarker();
 			Marker endMarker = selection.getEndMarker();
-			List<DPWidget> startPath = selection.getStartPathFromCommonRoot();
-			List<DPWidget> endPath = selection.getEndPathFromCommonRoot();
+			List<DPElement> startPath = selection.getStartPathFromCommonRoot();
+			List<DPElement> endPath = selection.getEndPathFromCommonRoot();
 
 			Color prevColour = graphics.getColor();
 			graphics.setColor( Color.yellow );
@@ -1769,7 +1769,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	//
 	// 1. The user presses a mouse button:
 	//	onButtonDown is sent.
-	//	onDndButtonDown is also sent. If a widget with DnD enabled can be found, it creates and returns a DndDrop structure that will be used to track information
+	//	onDndButtonDown is also sent. If a element with DnD enabled can be found, it creates and returns a DndDrop structure that will be used to track information
 	//	on the drag.
 	// 2. The first motion event after the button press:
 	//	The getSourceRequestedAction() method of the DnD handler for the source element is invoked to get the requested initial action.
@@ -1851,7 +1851,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		return inputTable;
 	}
 	
-	public void elementUnrealised(DPWidget element)
+	public void elementUnrealised(DPElement element)
 	{
 		inputTable.onElementUnrealised( element );
 	}
@@ -1889,14 +1889,14 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		
 		if ( caretLeaf != currentCaretLeaf )
 		{
-			ArrayList<DPWidget> prevPath = null, curPath = null;
+			ArrayList<DPElement> prevPath = null, curPath = null;
 			if ( currentCaretLeaf != null )
 			{
 				prevPath = currentCaretLeaf.getElementPathToRoot();
 			}
 			else
 			{
-				prevPath = new ArrayList<DPWidget>();
+				prevPath = new ArrayList<DPElement>();
 			}
 			
 			if ( caretLeaf != null )
@@ -1905,14 +1905,14 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 			}
 			else
 			{
-				curPath = new ArrayList<DPWidget>();
+				curPath = new ArrayList<DPElement>();
 			}
 			
 
 			int prevPathDivergeIndex = prevPath.size() - 1, curPathDivergeIndex = curPath.size() - 1;
 			for (int i = prevPath.size() - 1, j = curPath.size() - 1; i >= 0  &&  j >= 0;  i--, j--)
 			{
-				DPWidget prev = prevPath.get( i ), cur = curPath.get( j );
+				DPElement prev = prevPath.get( i ), cur = curPath.get( j );
 				if ( prev != cur )
 				{
 					// Found indices where paths diverge
@@ -1942,12 +1942,12 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	}
 	
 	
-	protected void caretGrab(DPWidget element)
+	protected void caretGrab(DPElement element)
 	{
 		caret.grab( element );
 	}
 	
-	protected void caretUngrab(DPWidget element)
+	protected void caretUngrab(DPElement element)
 	{
 		caret.ungrab( element );
 	}

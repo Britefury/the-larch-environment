@@ -8,8 +8,8 @@ package BritefuryJ.DocView;
 
 import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocPresent.DPFragment;
-import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.ElementContext;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 
 public class DVNode extends IncrementalTreeNode
@@ -24,7 +24,7 @@ public class DVNode extends IncrementalTreeNode
 	
 	
 	private DPFragment fragmentElement;
-	private DPWidget element;
+	private DPElement element;
 	
 	
 	
@@ -45,19 +45,19 @@ public class DVNode extends IncrementalTreeNode
 	//
 	//
 	
-	public DPWidget getElementNoRefresh()
+	public DPElement getElementNoRefresh()
 	{
 		return fragmentElement;
 	}
 	
-	public DPWidget getElement()
+	public DPElement getElement()
 	{
 		refresh();
 		return fragmentElement;
 	}
 	
 	
-	public DPWidget getInnerElementNoRefresh()
+	public DPElement getInnerElementNoRefresh()
 	{
 		return element;
 	}
@@ -97,9 +97,9 @@ public class DVNode extends IncrementalTreeNode
 	//
 	//
 	
-	public void setElementContext(ElementContext elementContext)
+	public void setElementContext(FragmentContext elementContext)
 	{
-		fragmentElement.setContext( elementContext );
+		fragmentElement.setFragmentContext( elementContext );
 	}
 	
 	
@@ -127,7 +127,7 @@ public class DVNode extends IncrementalTreeNode
 		{
 			if ( r != null )
 			{
-				element = (DPWidget)r;
+				element = (DPElement)r;
 				fragmentElement.setChild( element );
 			}
 			else

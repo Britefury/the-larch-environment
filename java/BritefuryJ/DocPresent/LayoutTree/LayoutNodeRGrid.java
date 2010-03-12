@@ -10,8 +10,8 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPGridRow;
 import BritefuryJ.DocPresent.DPRGrid;
-import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.WidgetFilter;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.ElementFilter;
 import BritefuryJ.DocPresent.Layout.GridLayout;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
@@ -46,7 +46,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 		LReqBoxInterface childBoxes[][] = new LReqBoxInterface[numRows][];
 		for (int i = 0; i < leaves.length; i++)
 		{
-			DPWidget child = leaves[i];
+			DPElement child = leaves[i];
 			if ( child instanceof DPGridRow )
 			{
 				DPGridRow row = (DPGridRow)child;
@@ -63,7 +63,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 		// Copy the X-requisition to the child rows
 		for (int i = 0; i < leaves.length; i++)
 		{
-			DPWidget child = leaves[i];
+			DPElement child = leaves[i];
 			if ( child instanceof DPGridRow )
 			{
 				DPGridRow row = (DPGridRow)child;
@@ -114,7 +114,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 		int childAlignmentFlags[][] = new int[numRows][];
 		for (int i = 0; i < leaves.length; i++)
 		{
-			DPWidget child = leaves[i];
+			DPElement child = leaves[i];
 			if ( child instanceof DPGridRow )
 			{
 				DPGridRow row = (DPGridRow)child;
@@ -143,7 +143,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 		{
 			double rowPrevWidths[] = prevWidths[r];
 
-			DPWidget child = leaves[r];
+			DPElement child = leaves[r];
 			if ( child instanceof DPGridRow )
 			{
 				DPGridRow row = (DPGridRow)child;
@@ -176,7 +176,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 		GridLayout.allocateY( layoutReqBox, childBoxes, getAllocationBox(), childAllocBoxes, getRowSpacing(), getRowExpand() );
 		
 		int i = 0;
-		for (DPWidget child: leaves)
+		for (DPElement child: leaves)
 		{
 			child.getLayoutNode().refreshAllocationY( prevAllocVs[i] );
 			i++;
@@ -188,7 +188,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 	
 	
 	
-	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
+	protected DPElement getChildLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
 	{
 		return getChildLeafClosestToLocalPointVertical( getLeaves(), localPos, filter );
 	}
@@ -200,8 +200,8 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 	{
 		refreshSubtree();
 		
-		DPWidget startLeaf = leaves[rangeStart];
-		DPWidget endLeaf = leaves[rangeEnd-1];
+		DPElement startLeaf = leaves[rangeStart];
+		DPElement endLeaf = leaves[rangeEnd-1];
 		double yStart = startLeaf.getPositionInParentSpaceY();
 		double yEnd = endLeaf.getPositionInParentSpaceY()  +  endLeaf.getAllocationInParentSpaceY();
 		AABox2 box = new AABox2( 0.0, yStart, getAllocationX(), yEnd );
@@ -214,12 +214,12 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 	// Focus navigation methods
 	//
 	
-	public List<DPWidget> horizontalNavigationList()
+	public List<DPElement> horizontalNavigationList()
 	{
 		return getLeaves();
 	}
 	
-	public List<DPWidget> verticalNavigationList()
+	public List<DPElement> verticalNavigationList()
 	{
 		return getLeaves();
 	}

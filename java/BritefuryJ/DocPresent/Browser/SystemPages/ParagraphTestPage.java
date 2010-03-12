@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPParagraph;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class ParagraphTestPage extends SystemPage
@@ -36,10 +36,10 @@ public class ParagraphTestPage extends SystemPage
 	
 	static String textBlock = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 	
-	protected ArrayList<DPWidget> makeTextNodes(String text, PrimitiveStyleSheet styleSheet)
+	protected ArrayList<DPElement> makeTextNodes(String text, PrimitiveStyleSheet styleSheet)
 	{
 		String[] words = text.split( " " );
-		ArrayList<DPWidget> nodes = new ArrayList<DPWidget>();
+		ArrayList<DPElement> nodes = new ArrayList<DPElement>();
 		for (int i = 0; i < words.length; i++)
 		{
 			nodes.add( styleSheet.text( words[i] ) );
@@ -47,9 +47,9 @@ public class ParagraphTestPage extends SystemPage
 		return nodes;
 	}
 	
-	protected ArrayList<DPWidget> addLineBreaks(ArrayList<DPWidget> nodesIn, int step, PrimitiveStyleSheet styleSheet)
+	protected ArrayList<DPElement> addLineBreaks(ArrayList<DPElement> nodesIn, int step, PrimitiveStyleSheet styleSheet)
 	{
-		ArrayList<DPWidget> nodesOut = new ArrayList<DPWidget>();
+		ArrayList<DPElement> nodesOut = new ArrayList<DPElement>();
 		for (int i = 0; i < nodesIn.size(); i++)
 		{
 			nodesOut.add( nodesIn.get( i ) );
@@ -68,7 +68,7 @@ public class ParagraphTestPage extends SystemPage
 	
 	protected DPParagraph makeParagraph(String title, int lineBreakStep, PrimitiveStyleSheet styleSheet)
 	{
-		ArrayList<DPWidget> children = makeTextNodes( title + ": " + textBlock, styleSheet );
+		ArrayList<DPElement> children = makeTextNodes( title + ": " + textBlock, styleSheet );
 		if ( lineBreakStep > 0 )
 		{
 			children = addLineBreaks( children, lineBreakStep, styleSheet );
@@ -78,27 +78,27 @@ public class ParagraphTestPage extends SystemPage
 	
 	protected DPParagraph makeParagraphWithNestedPara(String title, int lineBreakStep, PrimitiveStyleSheet textStyle, PrimitiveStyleSheet nestedTextStyle)
 	{
-		ArrayList<DPWidget> children = makeTextNodes( title + ": " + textBlock, textStyle );
+		ArrayList<DPElement> children = makeTextNodes( title + ": " + textBlock, textStyle );
 		children = addLineBreaks( children, lineBreakStep, textStyle );
 		children.add( children.size()/2, makeParagraph( title + " (inner)", lineBreakStep, nestedTextStyle ) );
 		return textStyle.paragraph( children );
 	}
 	
 	
-	protected DPWidget createContents()
+	protected DPElement createContents()
 	{
 		PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
 		PrimitiveStyleSheet blackText = PrimitiveStyleSheet.instance.withFont( new Font( "Sans serif", Font.PLAIN, 12 ) ).withForeground( Color.black );
 		PrimitiveStyleSheet redText = PrimitiveStyleSheet.instance.withFont( new Font( "Sans serif", Font.PLAIN, 12 ) ).withForeground( Color.red );
 		
-		DPWidget b2 = makeParagraph( "PER-WORD", 1, blackText );
-		DPWidget b3 = makeParagraph( "EVERY-4-WORDS", 4, blackText);
-		DPWidget b4 = makeParagraphWithNestedPara( "NESTED-1", 1, blackText, redText );
-		DPWidget b5 = makeParagraphWithNestedPara( "NESTED-2", 2, blackText, redText );
-		DPWidget b6 = makeParagraphWithNestedPara( "NESTED-4", 4, blackText, redText );
-		DPWidget b7 = makeParagraph( "PER-WORD INDENTED", 1, blackText );
-		DPWidget b8 = makeParagraphWithNestedPara( "NESTED-2-INDENTED", 2, blackText, redText );
+		DPElement b2 = makeParagraph( "PER-WORD", 1, blackText );
+		DPElement b3 = makeParagraph( "EVERY-4-WORDS", 4, blackText);
+		DPElement b4 = makeParagraphWithNestedPara( "NESTED-1", 1, blackText, redText );
+		DPElement b5 = makeParagraphWithNestedPara( "NESTED-2", 2, blackText, redText );
+		DPElement b6 = makeParagraphWithNestedPara( "NESTED-4", 4, blackText, redText );
+		DPElement b7 = makeParagraph( "PER-WORD INDENTED", 1, blackText );
+		DPElement b8 = makeParagraphWithNestedPara( "NESTED-2-INDENTED", 2, blackText, redText );
 		
-		return styleSheet.withVBoxSpacing( 20.0 ).vbox( Arrays.asList( new DPWidget[] { b2, b3, b4, b5, b6, b7, b8 } ) );
+		return styleSheet.withVBoxSpacing( 20.0 ).vbox( Arrays.asList( new DPElement[] { b2, b3, b4, b5, b6, b7, b8 } ) );
 	}
 }

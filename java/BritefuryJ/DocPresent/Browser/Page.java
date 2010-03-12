@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 import BritefuryJ.CommandHistory.CommandHistoryController;
 import BritefuryJ.CommandHistory.CommandHistoryListener;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 
 public abstract class Page
 {
@@ -28,7 +28,7 @@ public abstract class Page
 	
 	
 	public abstract String getTitle();
-	public abstract DPWidget getContentsElement();
+	public abstract DPElement getContentsElement();
 	
 	public CommandHistoryController getCommandHistoryController()
 	{

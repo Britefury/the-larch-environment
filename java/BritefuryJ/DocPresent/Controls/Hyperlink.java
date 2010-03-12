@@ -10,7 +10,7 @@ import org.python.core.Py;
 import org.python.core.PyObject;
 
 import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.PageController;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
@@ -88,12 +88,12 @@ public class Hyperlink extends Control
 		{	
 		}
 		
-		public boolean onButtonDown(DPWidget element, PointerButtonEvent event)
+		public boolean onButtonDown(DPElement element, PointerButtonEvent event)
 		{
 			return true;
 		}
 
-		public boolean onButtonUp(DPWidget element, PointerButtonEvent event)
+		public boolean onButtonUp(DPElement element, PointerButtonEvent event)
 		{
 			if ( element.isRealised() )
 			{
@@ -128,7 +128,7 @@ public class Hyperlink extends Control
 	}
 	
 	
-	public DPWidget getElement()
+	public DPElement getElement()
 	{
 		return element;
 	}

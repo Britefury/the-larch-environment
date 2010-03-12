@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.ListView.HorizontalListViewLayoutStyleSheet;
 import BritefuryJ.DocPresent.ListView.ListViewStyleSheet;
@@ -43,7 +43,7 @@ public class ListViewTestPage extends SystemPage
 	}
 
 	
-	protected DPWidget makeText(String text, PrimitiveStyleSheet basicStyle)
+	protected DPElement makeText(String text, PrimitiveStyleSheet basicStyle)
 	{
 		if ( text != null )
 		{
@@ -65,7 +65,7 @@ public class ListViewTestPage extends SystemPage
 		}
 		
 		
-		public DPWidget createElement(StyleSheet basicStyle)
+		public DPElement createElement(StyleSheet basicStyle)
 		{
 			return ((PrimitiveStyleSheet)basicStyle).text( text );
 		}
@@ -81,7 +81,7 @@ public class ListViewTestPage extends SystemPage
 		}
 		
 		
-		public DPWidget createElement(StyleSheet basicStyle, int index, DPWidget child)
+		public DPElement createElement(StyleSheet basicStyle, int index, DPElement child)
 		{
 			return ((PrimitiveStyleSheet)basicStyle).text( text );
 		}
@@ -97,36 +97,36 @@ public class ListViewTestPage extends SystemPage
 		}
 		
 		
-		public DPWidget createElement(StyleSheet basicStyle)
+		public DPElement createElement(StyleSheet basicStyle)
 		{
 			return ((PrimitiveStyleSheet)basicStyle).whitespace( " ", spacing );
 		}
 	}
 	
 	
-	protected DPWidget makeListView(PrimitiveStyleSheet basicStyle, ListViewStyleSheet listView, String[] txt, String title, String beginDelim, String endDelim, String separator)
+	protected DPElement makeListView(PrimitiveStyleSheet basicStyle, ListViewStyleSheet listView, String[] txt, String title, String beginDelim, String endDelim, String separator)
 	{
 		PrimitiveStyleSheet titleStyle = basicStyle.withFont( new Font( "Serif", Font.BOLD, 16 ) ).withForeground( Color.blue );
 		PrimitiveStyleSheet elemStyle = basicStyle.withFont( new Font( "Sans serif", Font.PLAIN, 12 ) ).withForeground( Color.black );
 		PrimitiveStyleSheet puncStyle = basicStyle.withFont( new Font( "Sans serif", Font.PLAIN, 12 ) ).withForeground( new Color( 0.0f, 0.5f, 0.0f ) );
 
-		DPWidget children[] = new DPText[txt.length];
+		DPElement children[] = new DPText[txt.length];
 		for (int i = 0; i < txt.length; i++)
 		{
 			children[i] = elemStyle.text( txt[i] ); 
 		}
 		
 		listView = listView.withPrimitiveStyle( puncStyle ).withBeginDelimFactory( new TextElementFactory( beginDelim ) ).withEndDelimFactory( new TextElementFactory( endDelim ) ).withSeparatorFactory( new TextSeparatorElementFactory( separator ) );
-		DPWidget ls = listView.createListElement( Arrays.asList( children ), TrailingSeparator.NEVER );
+		DPElement ls = listView.createListElement( Arrays.asList( children ), TrailingSeparator.NEVER );
 		
 		
-		DPWidget titleElem = titleStyle.text( title );
+		DPElement titleElem = titleStyle.text( title );
 		
-		return basicStyle.vbox( Arrays.asList( new DPWidget[] { titleElem, ls } ) );
+		return basicStyle.vbox( Arrays.asList( new DPElement[] { titleElem, ls } ) );
 	}
 
 	
-	protected DPWidget createContents()
+	protected DPElement createContents()
 	{
 		String[] lessTexts = new String[] { "abcdef", "hello", "world" };
 		String[] texts = new String[] { "abcdef", "123456", "hello", "world", "this", "is", "a", "test", "of", "the", "list", "layout", "system" };
@@ -140,7 +140,7 @@ public class ListViewTestPage extends SystemPage
 		
 		ListViewStyleSheet listView = ListViewStyleSheet.instance.withSpacingFactory( new SpacingElementFactory( 5.0 ) );
 		
-		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
+		ArrayList<DPElement> children = new ArrayList<DPElement>();
 		children.add( makeListView( basicStyle, listView.withListLayout( paraLayout ), texts, "PARAGRAPH", "[", "]", "," ) );
 		children.add( makeListView( basicStyle, listView.withListLayout( hLayout ), lessTexts, "HORIZONTAL", "[", "]", "," ) );
 		children.add( makeListView( basicStyle, listView.withListLayout( vLayout ), texts, "VERTICAL", "[", "]", "," ) );

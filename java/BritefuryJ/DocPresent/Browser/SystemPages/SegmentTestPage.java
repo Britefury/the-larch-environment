@@ -10,7 +10,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class SegmentTestPage extends SystemPage
@@ -37,38 +37,38 @@ public class SegmentTestPage extends SystemPage
 	
 	
 	
-	protected DPWidget text(String t, Color colour)
+	protected DPElement text(String t, Color colour)
 	{
 		return styleSheet.withForeground( colour ).text( t );
 	}
 	
-	protected DPWidget text(String t)
+	protected DPElement text(String t)
 	{
 		return text( t, Color.black );
 	}
 	
 	
-	protected DPWidget segment(DPWidget x, boolean bGuardBegin, boolean bGuardEnd)
+	protected DPElement segment(DPElement x, boolean bGuardBegin, boolean bGuardEnd)
 	{
 		return styleSheet.segment( bGuardBegin, bGuardEnd, x );
 	}
 	
 	
-	protected DPWidget span(DPWidget... x)
+	protected DPElement span(DPElement... x)
 	{
 		return styleSheet.span( Arrays.asList( x ) );
 	}
 	
 	
-	protected DPWidget line(DPWidget... x)
+	protected DPElement line(DPElement... x)
 	{
 		return styleSheet.paragraph( Arrays.asList( x ) );
 	}
 	
 	
-	protected DPWidget createContents()
+	protected DPElement createContents()
 	{
-		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
+		ArrayList<DPElement> children = new ArrayList<DPElement>();
 		
 		children.add( line( text( "Bars (|) indicate segment boundaries" ) ) );
 		children.add( line( text( "One segment in middle of text |" ), segment( text( "no guards", Color.red ), false, false ), text( "| finish." ) ) );

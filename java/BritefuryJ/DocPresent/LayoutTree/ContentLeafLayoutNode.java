@@ -9,8 +9,8 @@ package BritefuryJ.DocPresent.LayoutTree;
 import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPContentLeaf;
 import BritefuryJ.DocPresent.DPContentLeafEditable;
-import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.WidgetFilter;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.ElementFilter;
 import BritefuryJ.Math.Point2;
 
 public abstract class ContentLeafLayoutNode extends LeafLayoutNode implements ContentLeafLayoutNodeInterface
@@ -33,7 +33,7 @@ public abstract class ContentLeafLayoutNode extends LeafLayoutNode implements Co
 	
 	public DPContentLeafEditable getEditableContentLeafAboveOrBelow(Point2 localPos, boolean bBelow)
 	{
-		DPWidget element = getElement();
+		DPElement element = getElement();
 		DPContainer parent = element.getParent();
 		BranchLayoutNode branchLayout = parent != null  ?  (BranchLayoutNode)parent.getValidLayoutNodeOfClass( BranchLayoutNode.class )  :  null;
 		
@@ -72,7 +72,7 @@ public abstract class ContentLeafLayoutNode extends LeafLayoutNode implements Co
 		}
 	}
 	
-	public DPWidget getLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
+	public DPElement getLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
 	{
 		if ( filter == null  ||  filter.testElement( element ) )
 		{

@@ -9,8 +9,8 @@ package BritefuryJ.DocPresent.LayoutTree;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPTable;
-import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.WidgetFilter;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.ElementFilter;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
 import BritefuryJ.DocPresent.Layout.LAllocV;
@@ -39,13 +39,13 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 	{
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPTable table = (DPTable)element;
-		List<DPWidget> layoutChildren = table.getLayoutChildren();
+		List<DPElement> layoutChildren = table.getLayoutChildren();
 		TableLayout.TablePackingParams packingParams[] = table.getTablePackingParamsArray();
 		
 		LReqBoxInterface childBoxes[] = new LReqBoxInterface[layoutChildren.size()];
 		for (int i = 0; i < layoutChildren.size(); i++)
 		{
-			DPWidget child = layoutChildren.get( i );
+			DPElement child = layoutChildren.get( i );
 			childBoxes[i] = child.getLayoutNode().refreshRequisitionX();
 		}
 
@@ -61,14 +61,14 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 	{
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPTable table = (DPTable)element;
-		List<DPWidget> layoutChildren = element.getLayoutChildren();
+		List<DPElement> layoutChildren = element.getLayoutChildren();
 		TableLayout.TablePackingParams packingParams[] = table.getTablePackingParamsArray();
 		
 		LReqBoxInterface childBoxes[] = new LReqBoxInterface[layoutChildren.size()];
 		int childAlignmentFlags[] = new int[layoutChildren.size()];
 		for (int i = 0; i < layoutChildren.size(); i++)
 		{
-			DPWidget child = layoutChildren.get( i );
+			DPElement child = layoutChildren.get( i );
 			childBoxes[i] = child.getLayoutNode().refreshRequisitionY();
 			childAlignmentFlags[i] = child.getAlignmentFlags();
 		}
@@ -91,7 +91,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 		
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPTable table = (DPTable)element;
-		List<DPWidget> layoutChildren = element.getLayoutChildren();
+		List<DPElement> layoutChildren = element.getLayoutChildren();
 		
 		LReqBoxInterface childBoxes[] = new LReqBoxInterface[layoutChildren.size()];
 		LAllocBoxInterface childAllocBoxes[] = new LAllocBoxInterface[layoutChildren.size()];
@@ -100,7 +100,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 		int childAlignmentFlags[] = new int[layoutChildren.size()];
 		for (int i = 0; i < layoutChildren.size(); i++)
 		{
-			DPWidget child = layoutChildren.get( i );
+			DPElement child = layoutChildren.get( i );
 			LayoutNode layoutNode = child.getLayoutNode();
 			childBoxes[i] = layoutNode.getRequisitionBox();
 			childAllocBoxes[i] = layoutNode.getAllocationBox();
@@ -111,7 +111,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 		TableLayout.allocateX( layoutReqBox, columnBoxes, childBoxes, getAllocationBox(), columnAllocBoxes, childAllocBoxes, packingParams, childAlignmentFlags, table.width(), table.height(), getColumnSpacing(), getRowSpacing(), getColumnExpand(), getRowExpand() );
 		
 		int i = 0;
-		for (DPWidget child: layoutChildren)
+		for (DPElement child: layoutChildren)
 		{
 			child.getLayoutNode().refreshAllocationX( prevWidths[i] );
 			i++;
@@ -126,7 +126,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 		
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPTable table = (DPTable)element;
-		List<DPWidget> layoutChildren = element.getLayoutChildren();
+		List<DPElement> layoutChildren = element.getLayoutChildren();
 		
 		LReqBoxInterface childBoxes[] = new LReqBoxInterface[layoutChildren.size()];
 		LAllocBoxInterface childAllocBoxes[] = new LAllocBoxInterface[layoutChildren.size()];
@@ -135,7 +135,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 		int childAlignmentFlags[] = new int[layoutChildren.size()];
 		for (int i = 0; i < layoutChildren.size(); i++)
 		{
-			DPWidget child = layoutChildren.get( i );
+			DPElement child = layoutChildren.get( i );
 			LayoutNode layoutNode = child.getLayoutNode();
 			childBoxes[i] = layoutNode.getRequisitionBox();
 			childAllocBoxes[i] = layoutNode.getAllocationBox();
@@ -146,7 +146,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 		TableLayout.allocateY( layoutReqBox, rowBoxes, childBoxes, getAllocationBox(), rowAllocBoxes, childAllocBoxes, packingParams, childAlignmentFlags, table.width(), table.height(), getColumnSpacing(), getRowSpacing(), getColumnExpand(), getRowExpand() );
 		
 		int i = 0;
-		for (DPWidget child: layoutChildren)
+		for (DPElement child: layoutChildren)
 		{
 			child.getLayoutNode().refreshAllocationY( prevAllocVs[i] );
 			i++;
@@ -157,7 +157,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 	
 	
 	
-	private boolean doesChildCoverCell(DPWidget child, int x, int y)
+	private boolean doesChildCoverCell(DPElement child, int x, int y)
 	{
 		DPTable table = (DPTable)element;
 		TablePackingParams packing = table.getTablePackingParamsForChild( child );
@@ -165,11 +165,11 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 		return x <= ( packing.x + packing.colSpan )  &&  y <= ( packing.y + packing.rowSpan );
 	}
 	
-	private DPWidget getChildCoveringCell(int x, int y)
+	private DPElement getChildCoveringCell(int x, int y)
 	{
 		DPTable table = (DPTable)element;
 
-		DPWidget child = table.get( x, y );
+		DPElement child = table.get( x, y );
 		
 		if ( child != null )
 		{
@@ -303,11 +303,11 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 
 	
 	
-	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
+	protected DPElement getChildLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
 	{
 		int x = getColumnForLocalPoint( localPos );
 		int y = getRowForLocalPoint( localPos );
-		DPWidget child = getChildCoveringCell( x, y );
+		DPElement child = getChildCoveringCell( x, y );
 		if ( child != null )
 		{
 			return getLeafClosestToLocalPointFromChild( child, localPos, filter );
@@ -326,7 +326,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 	// Focus navigation methods
 	//
 	
-	public List<DPWidget> horizontalNavigationList()
+	public List<DPElement> horizontalNavigationList()
 	{
 		DPTable table = (DPTable)element;
 		return table.getLayoutChildren();

@@ -28,7 +28,7 @@ import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
 
 
-public abstract class DPContainer extends DPWidget
+public abstract class DPContainer extends DPElement
 {
 	public static class CouldNotFindChildException extends RuntimeException
 	{
@@ -40,7 +40,7 @@ public abstract class DPContainer extends DPWidget
 
 	
 	
-	protected ArrayList<DPWidget> registeredChildren;				// Replace with array; operations like insert etc are hardly used at all
+	protected ArrayList<DPElement> registeredChildren;				// Replace with array; operations like insert etc are hardly used at all
 	public String cachedTextRep;								// Move to 'waypoint' element
 	
 	
@@ -59,7 +59,7 @@ public abstract class DPContainer extends DPWidget
 	{
 		super(styleParams);
 		
-		registeredChildren = new ArrayList<DPWidget>();
+		registeredChildren = new ArrayList<DPElement>();
 		cachedTextRep = null;
 	}
 	
@@ -69,7 +69,7 @@ public abstract class DPContainer extends DPWidget
 	// Geometry methods
 	//
 	
-	protected double getInternalChildScale(DPWidget child)
+	protected double getInternalChildScale(DPElement child)
 	{
 		return 1.0;
 	}
@@ -82,7 +82,7 @@ public abstract class DPContainer extends DPWidget
 	// Child registration methods
 	//
 	
-	protected DPWidget registerChild(DPWidget child)
+	protected DPElement registerChild(DPElement child)
 	{
 		child.unparent();
 		
@@ -96,7 +96,7 @@ public abstract class DPContainer extends DPWidget
 		return child;
 	}
 	
-	protected void unregisterChild(DPWidget child)
+	protected void unregisterChild(DPElement child)
 	{
 		if ( isRealised() )
 		{
@@ -131,7 +131,7 @@ public abstract class DPContainer extends DPWidget
 	public int computeSubtreeSize()
 	{
 		int subtreeSize = 1;
-		for (DPWidget child: registeredChildren)
+		for (DPElement child: registeredChildren)
 		{
 			subtreeSize += child.computeSubtreeSize();
 		}
@@ -139,11 +139,11 @@ public abstract class DPContainer extends DPWidget
 	}
 	
 	
-	protected abstract void replaceChildWithEmpty(DPWidget child);
+	protected abstract void replaceChildWithEmpty(DPElement child);
 	
-	public boolean hasChild(DPWidget c)
+	public boolean hasChild(DPElement c)
 	{
-		for (DPWidget child: registeredChildren)
+		for (DPElement child: registeredChildren)
 		{
 			if ( c == child )
 			{
@@ -155,22 +155,22 @@ public abstract class DPContainer extends DPWidget
 	}
 	
 	
-	protected List<DPWidget> getInternalChildren()
+	protected List<DPElement> getInternalChildren()
 	{
 		return registeredChildren;
 	}
 	
-	public List<DPWidget> getLayoutChildren()
+	public List<DPElement> getLayoutChildren()
 	{
 		return registeredChildren;
 	}
 	
-	public abstract List<DPWidget> getChildren();
+	public abstract List<DPElement> getChildren();
 
 	
-	public boolean areChildrenInOrder(DPWidget child0, DPWidget child1)
+	public boolean areChildrenInOrder(DPElement child0, DPElement child1)
 	{
-		List<DPWidget> children = getInternalChildren();
+		List<DPElement> children = getInternalChildren();
 		int index0 = children.indexOf( child0 );
 		int index1 = children.indexOf( child1 );
 		
@@ -221,9 +221,9 @@ public abstract class DPContainer extends DPWidget
 	//
 	//
 	
-	protected void drawSubtreeSelection(Graphics2D graphics, Marker startMarker, List<DPWidget> startPath, Marker endMarker, List<DPWidget> endPath)
+	protected void drawSubtreeSelection(Graphics2D graphics, Marker startMarker, List<DPElement> startPath, Marker endMarker, List<DPElement> endPath)
 	{
-		List<DPWidget> children = getInternalChildren();
+		List<DPElement> children = getInternalChildren();
 		
 		int startIndex = startMarker != null  ?  children.indexOf( startPath.get( 1 ) )  :  0;
 		int endIndex = endMarker != null  ?  children.indexOf( endPath.get( 1) )  :  children.size() - 1;
@@ -253,11 +253,11 @@ public abstract class DPContainer extends DPWidget
 	// Event handling methods
 	//
 	
-	protected void onLeaveIntoChild(PointerMotionEvent event, DPWidget child)
+	protected void onLeaveIntoChild(PointerMotionEvent event, DPElement child)
 	{
 	}
 	
-	protected void onEnterFromChild(PointerMotionEvent event, DPWidget child)
+	protected void onEnterFromChild(PointerMotionEvent event, DPElement child)
 	{
 	}
 	
@@ -265,7 +265,7 @@ public abstract class DPContainer extends DPWidget
 	
 	
 	
-	protected void childRedrawRequest(DPWidget child, Point2 childPos, Vector2 childSize)
+	protected void childRedrawRequest(DPElement child, Point2 childPos, Vector2 childSize)
 	{
 		Xform2 childToContainer = child.getLocalToParentXform();
 		Point2 localPos = childToContainer.transform( childPos );
@@ -275,9 +275,9 @@ public abstract class DPContainer extends DPWidget
 	
 	
 	
-	protected DPWidget getFirstChildAtLocalPoint(Point2 localPos)
+	protected DPElement getFirstChildAtLocalPoint(Point2 localPos)
 	{
-		for (DPWidget child: registeredChildren)
+		for (DPElement child: registeredChildren)
 		{
 			if ( child.containsParentSpacePoint( localPos ) )
 			{
@@ -288,11 +288,11 @@ public abstract class DPContainer extends DPWidget
 		return null;
 	}
 	
-	protected DPWidget getLastChildAtLocalPoint(Point2 localPos)
+	protected DPElement getLastChildAtLocalPoint(Point2 localPos)
 	{
 		for (int i = registeredChildren.size() - 1; i >= 0; i--)
 		{
-			DPWidget child = registeredChildren.get( i );
+			DPElement child = registeredChildren.get( i );
 			if ( child.containsParentSpacePoint( localPos ) )
 			{
 				return child;
@@ -303,14 +303,14 @@ public abstract class DPContainer extends DPWidget
 	}
 	
 
-	protected DPWidget getFirstLowestChildAtLocalPoint(Point2 localPos)
+	protected DPElement getFirstLowestChildAtLocalPoint(Point2 localPos)
 	{
-		DPWidget x = this;
+		DPElement x = this;
 		Point2 p = localPos;
 		
 		while ( true )
 		{
-			DPWidget child = x.getFirstChildAtLocalPoint( p );
+			DPElement child = x.getFirstChildAtLocalPoint( p );
 			if ( child != null )
 			{
 				p = child.getParentToLocalXform().transform( p );
@@ -325,14 +325,14 @@ public abstract class DPContainer extends DPWidget
 		return x;
 	}
 	
-	protected DPWidget getLastLowestChildAtLocalPoint(Point2 localPos)
+	protected DPElement getLastLowestChildAtLocalPoint(Point2 localPos)
 	{
-		DPWidget x = this;
+		DPElement x = this;
 		Point2 p = localPos;
 		
 		while ( true )
 		{
-			DPWidget child = x.getLastChildAtLocalPoint( p );
+			DPElement child = x.getLastChildAtLocalPoint( p );
 			if ( child != null )
 			{
 				p = child.getParentToLocalXform().transform( p );
@@ -358,7 +358,7 @@ public abstract class DPContainer extends DPWidget
 	
 	public PointerInputElement getDndElement(Point2 localPos, Point2 targetPos[])
 	{
-		DPWidget child = getFirstChildAtLocalPoint( localPos );
+		DPElement child = getFirstChildAtLocalPoint( localPos );
 		if ( child != null )
 		{
 			PointerInputElement element = child.getDndElement( child.getParentToLocalXform().transform( localPos ), targetPos );
@@ -389,15 +389,15 @@ public abstract class DPContainer extends DPWidget
 	protected void handleRealise()
 	{
 		super.handleRealise();
-		for (DPWidget child: registeredChildren)
+		for (DPElement child: registeredChildren)
 		{
 			child.handleRealise();
 		}
 	}
 	
-	protected void handleUnrealise(DPWidget unrealiseRoot)
+	protected void handleUnrealise(DPElement unrealiseRoot)
 	{
-		for (DPWidget child: registeredChildren)
+		for (DPElement child: registeredChildren)
 		{
 			child.handleUnrealise( unrealiseRoot );
 		}
@@ -411,7 +411,7 @@ public abstract class DPContainer extends DPWidget
 		super.handleDrawBackground( graphics, areaBox );
 		
 		AffineTransform currentTransform = graphics.getTransform();
-		for (DPWidget child: registeredChildren)
+		for (DPElement child: registeredChildren)
 		{
 			if ( child.getAABoxInParentSpace().intersects( areaBox ) )
 			{
@@ -427,7 +427,7 @@ public abstract class DPContainer extends DPWidget
 		super.handleDraw( graphics, areaBox );
 		
 		AffineTransform currentTransform = graphics.getTransform();
-		for (DPWidget child: registeredChildren)
+		for (DPElement child: registeredChildren)
 		{
 			if ( child.getAABoxInParentSpace().intersects( areaBox ) )
 			{
@@ -445,7 +445,7 @@ public abstract class DPContainer extends DPWidget
 	{
 		super.setPresentationArea( area );
 		
-		for (DPWidget child: registeredChildren)
+		for (DPElement child: registeredChildren)
 		{
 			child.setPresentationArea( area );
 		}
@@ -460,11 +460,11 @@ public abstract class DPContainer extends DPWidget
 	//
 	//
 
-	public DPContentLeaf getFirstLeafInSubtree(WidgetFilter branchFilter, WidgetFilter leafFilter)
+	public DPContentLeaf getFirstLeafInSubtree(ElementFilter branchFilter, ElementFilter leafFilter)
 	{
 		if ( branchFilter == null  ||  branchFilter.testElement( this ) )
 		{
-			for (DPWidget child: getInternalChildren())
+			for (DPElement child: getInternalChildren())
 			{
 				DPContentLeaf leaf = child.getFirstLeafInSubtree( branchFilter, leafFilter );
 				if ( leaf != null )
@@ -480,11 +480,11 @@ public abstract class DPContainer extends DPWidget
 		}
 	}
 
-	public DPContentLeaf getLastLeafInSubtree(WidgetFilter branchFilter, WidgetFilter leafFilter)
+	public DPContentLeaf getLastLeafInSubtree(ElementFilter branchFilter, ElementFilter leafFilter)
 	{
 		if ( branchFilter == null  ||  branchFilter.testElement( this ) )
 		{
-			List<DPWidget> children = getInternalChildren();
+			List<DPElement> children = getInternalChildren();
 			for (int i = children.size() - 1; i >= 0; i--)
 			{
 				DPContentLeaf leaf = children.get( i ).getLastLeafInSubtree( branchFilter, leafFilter );
@@ -504,17 +504,17 @@ public abstract class DPContainer extends DPWidget
 	
 
 	
-	protected DPContentLeaf getPreviousLeafFromChild(DPWidget child, WidgetFilter subtreeRootFilter, WidgetFilter branchFilter, WidgetFilter leafFilter)
+	protected DPContentLeaf getPreviousLeafFromChild(DPElement child, ElementFilter subtreeRootFilter, ElementFilter branchFilter, ElementFilter leafFilter)
 	{
 		if ( subtreeRootFilter == null  ||  subtreeRootFilter.testElement( this ) )
 		{
-			List<DPWidget> children = getInternalChildren();
+			List<DPElement> children = getInternalChildren();
 			int index = children.indexOf( child );
 			if ( index != -1 )
 			{
 				for (int i = index - 1; i >= 0; i--)
 				{
-					DPWidget e = children.get( i );
+					DPElement e = children.get( i );
 					DPContentLeaf l = e.getLastLeafInSubtree( branchFilter, leafFilter );
 					if ( l != null )
 					{
@@ -532,17 +532,17 @@ public abstract class DPContainer extends DPWidget
 		return null;
 	}
 	
-	protected DPContentLeaf getNextLeafFromChild(DPWidget child, WidgetFilter subtreeRootFilter, WidgetFilter branchFilter, WidgetFilter leafFilter)
+	protected DPContentLeaf getNextLeafFromChild(DPElement child, ElementFilter subtreeRootFilter, ElementFilter branchFilter, ElementFilter leafFilter)
 	{
 		if ( subtreeRootFilter == null  ||  subtreeRootFilter.testElement( this ) )
 		{
-			List<DPWidget> children = getInternalChildren();
+			List<DPElement> children = getInternalChildren();
 			int index = children.indexOf( child );
 			if ( index != -1 )
 			{
 				for (int i = index + 1; i < children.size(); i++)
 				{
-					DPWidget e = children.get( i );
+					DPElement e = children.get( i );
 					DPContentLeaf l = e.getFirstLeafInSubtree( branchFilter, leafFilter );
 					if ( l != null )
 					{
@@ -566,7 +566,7 @@ public abstract class DPContainer extends DPWidget
 	// CONTENT LEAF NAVIGATION METHODS
 	//
 	
-	protected DPContentLeaf getContentLeafToLeftFromChild(DPWidget child)
+	protected DPContentLeaf getContentLeafToLeftFromChild(DPElement child)
 	{
 		BranchLayoutNode branchLayout = (BranchLayoutNode)getValidLayoutNodeOfClass( BranchLayoutNode.class );
 		if ( branchLayout != null )
@@ -579,7 +579,7 @@ public abstract class DPContainer extends DPWidget
 		}
 	}
 	
-	protected DPContentLeaf getContentLeafToRightFromChild(DPWidget child)
+	protected DPContentLeaf getContentLeafToRightFromChild(DPElement child)
 	{
 		BranchLayoutNode branchLayout = (BranchLayoutNode)getValidLayoutNodeOfClass( BranchLayoutNode.class );
 		if ( branchLayout != null )
@@ -592,7 +592,7 @@ public abstract class DPContainer extends DPWidget
 		}
 	}
 	
-	public DPContentLeafEditable getEditableContentLeafAboveOrBelowFromChild(DPWidget child, boolean bBelow, Point2 localPos)
+	public DPContentLeafEditable getEditableContentLeafAboveOrBelowFromChild(DPElement child, boolean bBelow, Point2 localPos)
 	{
 		BranchLayoutNode branchLayout = (BranchLayoutNode)getValidLayoutNodeOfClass( BranchLayoutNode.class );
 		if ( branchLayout != null )
@@ -614,7 +614,7 @@ public abstract class DPContainer extends DPWidget
 	
 	public DPContentLeaf getLeafAtTextRepresentationPosition(int position)
 	{
-		DPWidget c = getChildAtTextRepresentationPosition( position );
+		DPElement c = getChildAtTextRepresentationPosition( position );
 		
 		if ( c != null )
 		{
@@ -626,10 +626,10 @@ public abstract class DPContainer extends DPWidget
 		}
 	}
 
-	public DPWidget getChildAtTextRepresentationPosition(int position)
+	public DPElement getChildAtTextRepresentationPosition(int position)
 	{
 		int offset = 0;
-		for (DPWidget c: getInternalChildren())
+		for (DPElement c: getInternalChildren())
 		{
 			int end = offset + c.getTextRepresentationLength();
 			if ( position >= offset  &&  position < end )
@@ -643,10 +643,10 @@ public abstract class DPContainer extends DPWidget
 	}
 
 	
-	public int getTextRepresentationOffsetOfChild(DPWidget elem)
+	public int getTextRepresentationOffsetOfChild(DPElement elem)
 	{
 		int offset = 0;
-		for (DPWidget c: getInternalChildren())
+		for (DPElement c: getInternalChildren())
 		{
 			if ( c == elem )
 			{
@@ -658,7 +658,7 @@ public abstract class DPContainer extends DPWidget
 		throw new DPContainer.CouldNotFindChildException();
 	}
 	
-	protected int getChildTextRepresentationOffsetInSubtree(DPWidget child, DPContainer subtreeRoot)
+	protected int getChildTextRepresentationOffsetInSubtree(DPElement child, DPContainer subtreeRoot)
 	{
 		return getTextRepresentationOffsetOfChild( child )  +  getTextRepresentationOffsetInSubtree( subtreeRoot );
 	}
@@ -692,7 +692,7 @@ public abstract class DPContainer extends DPWidget
 	protected String computeSubtreeTextRepresentation()
 	{
 		StringBuilder builder = new StringBuilder();
-		for (DPWidget child: getInternalChildren())
+		for (DPElement child: getInternalChildren())
 		{
 			builder.append( child.getTextRepresentation() );
 		}
@@ -701,10 +701,10 @@ public abstract class DPContainer extends DPWidget
 	
 	
 	
-	public void getTextRepresentationFromStartToPath(StringBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	public void getTextRepresentationFromStartToPath(StringBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
-		DPWidget pathChild = path.get( pathMyIndex + 1 );
-		for (DPWidget child: getInternalChildren())
+		DPElement pathChild = path.get( pathMyIndex + 1 );
+		for (DPElement child: getInternalChildren())
 		{
 			if ( child != pathChild )
 			{
@@ -718,35 +718,35 @@ public abstract class DPContainer extends DPWidget
 		}
 	}
 	
-	public void getTextRepresentationFromPathToEnd(StringBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	public void getTextRepresentationFromPathToEnd(StringBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
-		List<DPWidget> children = getInternalChildren();
+		List<DPElement> children = getInternalChildren();
 		int pathChildIndex = pathMyIndex + 1;
-		DPWidget pathChild = path.get( pathChildIndex );
+		DPElement pathChild = path.get( pathChildIndex );
 		int childIndex = children.indexOf( pathChild );
 		
 		pathChild.getTextRepresentationFromPathToEnd( builder, marker, path, pathChildIndex );
 
 		if ( (childIndex + 1) < children.size() )
 		{
-			for (DPWidget child: children.subList( childIndex + 1, children.size() ))
+			for (DPElement child: children.subList( childIndex + 1, children.size() ))
 			{
 				builder.append( child.getTextRepresentation() );
 			}
 		}
 	}
 
-	public void getTextRepresentationBetweenPaths(StringBuilder builder, Marker startMarker, ArrayList<DPWidget> startPath, int startPathMyIndex,
-			Marker endMarker, ArrayList<DPWidget> endPath, int endPathMyIndex)
+	public void getTextRepresentationBetweenPaths(StringBuilder builder, Marker startMarker, ArrayList<DPElement> startPath, int startPathMyIndex,
+			Marker endMarker, ArrayList<DPElement> endPath, int endPathMyIndex)
 	{
-		List<DPWidget> children = getInternalChildren();
+		List<DPElement> children = getInternalChildren();
 		
 	
 		int startPathChildIndex = startPathMyIndex + 1;
 		int endPathChildIndex = endPathMyIndex + 1;
 		
-		DPWidget startChild = startPath.get( startPathChildIndex );
-		DPWidget endChild = endPath.get( endPathChildIndex );
+		DPElement startChild = startPath.get( startPathChildIndex );
+		DPElement endChild = endPath.get( endPathChildIndex );
 		
 		int startIndex = children.indexOf( startChild );
 		int endIndex = children.indexOf( endChild );
@@ -763,14 +763,14 @@ public abstract class DPContainer extends DPWidget
 	}
 
 
-	protected void getTextRepresentationFromStartOfRootToMarkerFromChild(StringBuilder builder, Marker marker, DPWidget root, DPWidget fromChild)
+	protected void getTextRepresentationFromStartOfRootToMarkerFromChild(StringBuilder builder, Marker marker, DPElement root, DPElement fromChild)
 	{
 		if ( root != this  &&  parent != null )
 		{
 			parent.getTextRepresentationFromStartOfRootToMarkerFromChild( builder, marker, root, this );
 		}
 		
-		for (DPWidget child: getInternalChildren())
+		for (DPElement child: getInternalChildren())
 		{
 			if ( child != fromChild )
 			{
@@ -783,14 +783,14 @@ public abstract class DPContainer extends DPWidget
 		}
 	}
 	
-	protected void getTextRepresentationFromMarkerToEndOfRootFromChild(StringBuilder builder, Marker marker, DPWidget root, DPWidget fromChild)
+	protected void getTextRepresentationFromMarkerToEndOfRootFromChild(StringBuilder builder, Marker marker, DPElement root, DPElement fromChild)
 	{
-		List<DPWidget> children = getInternalChildren();
+		List<DPElement> children = getInternalChildren();
 		int childIndex = children.indexOf( fromChild );
 		
 		if ( (childIndex + 1) < children.size() )
 		{
-			for (DPWidget child: children.subList( childIndex + 1, children.size() ))
+			for (DPElement child: children.subList( childIndex + 1, children.size() ))
 			{
 				builder.append( child.getTextRepresentation() );
 			}
@@ -814,7 +814,7 @@ public abstract class DPContainer extends DPWidget
 	
 	public void buildLinearRepresentation(ItemStreamBuilder builder)
 	{
-		for (DPWidget child: getInternalChildren())
+		for (DPElement child: getInternalChildren())
 		{
 			child.appendToLinearRepresentation( builder );
 		}
@@ -823,10 +823,10 @@ public abstract class DPContainer extends DPWidget
 	
 	
 
-	public void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	public void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
-		DPWidget pathChild = path.get( pathMyIndex + 1 );
-		for (DPWidget child: getInternalChildren())
+		DPElement pathChild = path.get( pathMyIndex + 1 );
+		for (DPElement child: getInternalChildren())
 		{
 			if ( child != pathChild )
 			{
@@ -840,35 +840,35 @@ public abstract class DPContainer extends DPWidget
 		}
 	}
 	
-	public void getLinearRepresentationFromPathToEnd(ItemStreamBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	public void getLinearRepresentationFromPathToEnd(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
-		List<DPWidget> children = getInternalChildren();
+		List<DPElement> children = getInternalChildren();
 		int pathChildIndex = pathMyIndex + 1;
-		DPWidget pathChild = path.get( pathChildIndex );
+		DPElement pathChild = path.get( pathChildIndex );
 		int childIndex = children.indexOf( pathChild );
 		
 		pathChild.getLinearRepresentationFromPathToEnd( builder, marker, path, pathChildIndex );
 
 		if ( (childIndex + 1) < children.size() )
 		{
-			for (DPWidget child: children.subList( childIndex + 1, children.size() ))
+			for (DPElement child: children.subList( childIndex + 1, children.size() ))
 			{
 				child.appendToLinearRepresentation( builder );
 			}
 		}
 	}
 
-	public void getLinearRepresentationBetweenPaths(ItemStreamBuilder builder, Marker startMarker, ArrayList<DPWidget> startPath, int startPathMyIndex,
-			Marker endMarker, ArrayList<DPWidget> endPath, int endPathMyIndex)
+	public void getLinearRepresentationBetweenPaths(ItemStreamBuilder builder, Marker startMarker, ArrayList<DPElement> startPath, int startPathMyIndex,
+			Marker endMarker, ArrayList<DPElement> endPath, int endPathMyIndex)
 	{
-		List<DPWidget> children = getInternalChildren();
+		List<DPElement> children = getInternalChildren();
 		
 	
 		int startPathChildIndex = startPathMyIndex + 1;
 		int endPathChildIndex = endPathMyIndex + 1;
 		
-		DPWidget startChild = startPath.get( startPathChildIndex );
-		DPWidget endChild = endPath.get( endPathChildIndex );
+		DPElement startChild = startPath.get( startPathChildIndex );
+		DPElement endChild = endPath.get( endPathChildIndex );
 		
 		int startIndex = children.indexOf( startChild );
 		int endIndex = children.indexOf( endChild );
@@ -885,7 +885,7 @@ public abstract class DPContainer extends DPWidget
 	}
 
 
-	protected void getLinearRepresentationFromStartOfRootToMarkerFromChild(ItemStreamBuilder builder, Marker marker, DPWidget root, DPWidget fromChild)
+	protected void getLinearRepresentationFromStartOfRootToMarkerFromChild(ItemStreamBuilder builder, Marker marker, DPElement root, DPElement fromChild)
 	{
 		if ( root != this  &&  parent != null )
 		{
@@ -894,7 +894,7 @@ public abstract class DPContainer extends DPWidget
 		
 		appendStructuralPrefixToLinearRepresentation( builder );
 
-		for (DPWidget child: getInternalChildren())
+		for (DPElement child: getInternalChildren())
 		{
 			if ( child != fromChild )
 			{
@@ -907,14 +907,14 @@ public abstract class DPContainer extends DPWidget
 		}
 	}
 	
-	protected void getLinearRepresentationFromMarkerToEndOfRootFromChild(ItemStreamBuilder builder, Marker marker, DPWidget root, DPWidget fromChild)
+	protected void getLinearRepresentationFromMarkerToEndOfRootFromChild(ItemStreamBuilder builder, Marker marker, DPElement root, DPElement fromChild)
 	{
-		List<DPWidget> children = getInternalChildren();
+		List<DPElement> children = getInternalChildren();
 		int childIndex = children.indexOf( fromChild );
 		
 		if ( (childIndex + 1) < children.size() )
 		{
-			for (DPWidget child: children.subList( childIndex + 1, children.size() ))
+			for (DPElement child: children.subList( childIndex + 1, children.size() ))
 			{
 				child.appendToLinearRepresentation( builder );
 			}
@@ -939,7 +939,7 @@ public abstract class DPContainer extends DPWidget
 	static EmptyBorder metaIndentBorder = new EmptyBorder( 25.0, 0.0, 0.0, 0.0 );
 	static VBoxStyleParams metaVBoxStyle = new VBoxStyleParams( null, null, null, 0.0 );
 	
-	public DPBorder getMetaHeaderBorderWidget()
+	public DPBorder getMetaHeaderBorderElement()
 	{
 		if ( metaElement != null )
 		{
@@ -952,14 +952,14 @@ public abstract class DPContainer extends DPWidget
 		}
 	}
 	
-	public DPWidget createMetaElement()
+	public DPElement createMetaElement()
 	{
 		DPVBox metaChildrenVBox = new DPVBox( metaVBoxStyle );
-		for (DPWidget child: getChildren())
+		for (DPElement child: getChildren())
 		{
 			if ( child != null )
 			{
-				DPWidget metaChild = child.initialiseMetaElement();
+				DPElement metaChild = child.initialiseMetaElement();
 				metaChildrenVBox.append( metaChild );
 			}
 			else
@@ -988,10 +988,10 @@ public abstract class DPContainer extends DPWidget
 			DPBorder indentMetaChildren = (DPBorder)metaVBox.get( 1 );
 			DPVBox metaChildrenVBox = (DPVBox)indentMetaChildren.getChild();
 
-			ArrayList<DPWidget> childMetaElements = new ArrayList<DPWidget>();
-			for (DPWidget child: getChildren())
+			ArrayList<DPElement> childMetaElements = new ArrayList<DPElement>();
+			for (DPElement child: getChildren())
 			{
-				DPWidget metaChild = child.initialiseMetaElement();
+				DPElement metaChild = child.initialiseMetaElement();
 				childMetaElements.add( metaChild );
 			}
 			metaChildrenVBox.setChildren( childMetaElements );
@@ -1002,7 +1002,7 @@ public abstract class DPContainer extends DPWidget
 	{
 		if ( metaElement != null )
 		{
-			for (DPWidget child: getChildren())
+			for (DPElement child: getChildren())
 			{
 				child.shutdownMetaElement();
 			}

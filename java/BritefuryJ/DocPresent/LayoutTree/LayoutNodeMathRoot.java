@@ -9,8 +9,8 @@ package BritefuryJ.DocPresent.LayoutTree;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPMathRoot;
-import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.WidgetFilter;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.ElementFilter;
 import BritefuryJ.DocPresent.Layout.LAllocHelper;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
@@ -29,7 +29,7 @@ public class LayoutNodeMathRoot extends ArrangedLayoutNode
 	{
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPMathRoot mathRoot = (DPMathRoot)element;
-		DPWidget child = mathRoot.getChild();
+		DPElement child = mathRoot.getChild();
 		if ( child != null )
 		{
 			MathRootStyleParams s = (MathRootStyleParams)mathRoot.getStyleParams();
@@ -47,7 +47,7 @@ public class LayoutNodeMathRoot extends ArrangedLayoutNode
 	{
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPMathRoot mathRoot = (DPMathRoot)element;
-		DPWidget child = mathRoot.getChild();
+		DPElement child = mathRoot.getChild();
 		if ( child != null )
 		{
 			MathRootStyleParams s = (MathRootStyleParams)mathRoot.getStyleParams();
@@ -66,7 +66,7 @@ public class LayoutNodeMathRoot extends ArrangedLayoutNode
 	protected void updateAllocationX()
 	{
 		DPMathRoot mathRoot = (DPMathRoot)element;
-		DPWidget child = mathRoot.getChild();
+		DPElement child = mathRoot.getChild();
 		if ( child != null )
 		{
 			MathRootStyleParams s = (MathRootStyleParams)mathRoot.getStyleParams();
@@ -82,7 +82,7 @@ public class LayoutNodeMathRoot extends ArrangedLayoutNode
 	protected void updateAllocationY()
 	{
 		DPMathRoot mathRoot = (DPMathRoot)element;
-		DPWidget child = mathRoot.getChild();
+		DPElement child = mathRoot.getChild();
 		if ( child != null )
 		{
 			MathRootStyleParams s = (MathRootStyleParams)mathRoot.getStyleParams();
@@ -97,10 +97,10 @@ public class LayoutNodeMathRoot extends ArrangedLayoutNode
 	
 	
 	
-	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
+	protected DPElement getChildLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
 	{
 		DPMathRoot mathRoot = (DPMathRoot)element;
-		DPWidget child = mathRoot.getChild();
+		DPElement child = mathRoot.getChild();
 		if ( child == null )
 		{
 			return null;
@@ -118,10 +118,10 @@ public class LayoutNodeMathRoot extends ArrangedLayoutNode
 	// Focus navigation methods
 	//
 	
-	public List<DPWidget> horizontalNavigationList()
+	public List<DPElement> horizontalNavigationList()
 	{
 		DPMathRoot mathRoot = (DPMathRoot)element;
-		List<DPWidget> children = mathRoot.getLayoutChildren();
+		List<DPElement> children = mathRoot.getLayoutChildren();
 		if ( children.size() > 0 )
 		{
 			return children;

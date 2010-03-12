@@ -12,7 +12,7 @@ import java.util.List;
 import BritefuryJ.DocPresent.DPLineBreak;
 import BritefuryJ.DocPresent.DPParagraphDedentMarker;
 import BritefuryJ.DocPresent.DPParagraphIndentMarker;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
@@ -85,12 +85,12 @@ public class SpanListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 	}
 
 	
-	public DPWidget createListElement(List<DPWidget> children, PrimitiveStyleSheet primitiveStyle, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator,
+	public DPElement createListElement(List<DPElement> children, PrimitiveStyleSheet primitiveStyle, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator,
 			ElementFactory spacing, TrailingSeparator trailingSeparator)
 	{
 		SpanListViewLayoutParams params = getLayoutParams();
 		
-		ArrayList<DPWidget> childElems = new ArrayList<DPWidget>();
+		ArrayList<DPElement> childElems = new ArrayList<DPElement>();
 		childElems.ensureCapacity( children.size() + 2 );
 		
 		if ( beginDelim != null )
@@ -108,7 +108,7 @@ public class SpanListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 		{
 			for (int i = 0; i < children.size() - 1; i++)
 			{
-				DPWidget child = children.get( i );
+				DPElement child = children.get( i );
 				childElems.add( child );
 				if ( separator != null )
 				{
@@ -132,7 +132,7 @@ public class SpanListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 				}
 			}
 
-			DPWidget lastChild = children.get( children.size() - 1 );
+			DPElement lastChild = children.get( children.size() - 1 );
 			childElems.add( lastChild );
 			
 			if ( ListViewStyleSheet.trailingSeparatorRequired( children, trailingSeparator ) )

@@ -7,7 +7,7 @@
 package BritefuryJ.DocPresent.LayoutTree;
 
 import BritefuryJ.DocPresent.DPContainer;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
 import BritefuryJ.DocPresent.Layout.LAllocV;
@@ -18,12 +18,12 @@ import BritefuryJ.Math.Vector2;
 
 public abstract class LeafLayoutNode extends LayoutNode
 {
-	protected DPWidget element;
+	protected DPElement element;
 	protected LReqBox layoutReqBox;
 	protected LAllocBox layoutAllocBox;
 	
 	
-	public LeafLayoutNode(DPWidget element)
+	public LeafLayoutNode(DPElement element)
 	{
 		this.element = element;
 		layoutReqBox = new LReqBox();
@@ -31,7 +31,7 @@ public abstract class LeafLayoutNode extends LayoutNode
 	}
 
 
-	public DPWidget getElement()
+	public DPElement getElement()
 	{
 		return element;
 	}

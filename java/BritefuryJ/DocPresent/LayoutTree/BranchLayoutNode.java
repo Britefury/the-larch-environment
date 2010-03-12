@@ -11,7 +11,7 @@ import java.util.List;
 import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPContentLeaf;
 import BritefuryJ.DocPresent.DPContentLeafEditable;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 
@@ -28,10 +28,10 @@ public abstract class BranchLayoutNode extends LayoutNode
 	public DPContentLeaf getLeftContentLeaf()
 	{
 		// Check the child nodes
-		List<DPWidget> navList = horizontalNavigationList();
+		List<DPElement> navList = horizontalNavigationList();
 		if ( navList != null )
 		{
-			for (DPWidget w: navList)
+			for (DPElement w: navList)
 			{
 				DPContentLeaf l = w.getLayoutNode().getLeftContentLeaf();
 				if ( l != null )
@@ -47,12 +47,12 @@ public abstract class BranchLayoutNode extends LayoutNode
 	public DPContentLeaf getRightContentLeaf()
 	{
 		// Check the child nodes
-		List<DPWidget> navList = horizontalNavigationList();
+		List<DPElement> navList = horizontalNavigationList();
 		if ( navList != null )
 		{
 			for (int i = navList.size() - 1; i >= 0; i--)
 			{
-				DPWidget w = navList.get( i );
+				DPElement w = navList.get( i );
 				DPContentLeaf l = w.getLayoutNode().getRightContentLeaf();
 				if ( l != null )
 				{
@@ -67,10 +67,10 @@ public abstract class BranchLayoutNode extends LayoutNode
 	public DPContentLeafEditable getLeftEditableContentLeaf()
 	{
 		// Check the child nodes
-		List<DPWidget> navList = horizontalNavigationList();
+		List<DPElement> navList = horizontalNavigationList();
 		if ( navList != null )
 		{
-			for (DPWidget w: navList)
+			for (DPElement w: navList)
 			{
 				DPContentLeafEditable l = w.getLayoutNode().getLeftEditableContentLeaf();
 				if ( l != null )
@@ -86,12 +86,12 @@ public abstract class BranchLayoutNode extends LayoutNode
 	public DPContentLeafEditable getRightEditableContentLeaf()
 	{
 		// Check the child nodes
-		List<DPWidget> navList = horizontalNavigationList();
+		List<DPElement> navList = horizontalNavigationList();
 		if ( navList != null )
 		{
 			for (int i = navList.size() - 1; i >= 0; i--)
 			{
-				DPWidget w = navList.get( i );
+				DPElement w = navList.get( i );
 				DPContentLeafEditable l = w.getLayoutNode().getRightEditableContentLeaf();
 				if ( l != null )
 				{
@@ -105,14 +105,14 @@ public abstract class BranchLayoutNode extends LayoutNode
 
 	public DPContentLeafEditable getTopOrBottomEditableContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace)
 	{
-		List<DPWidget> navList = verticalNavigationList();
+		List<DPElement> navList = verticalNavigationList();
 		if ( navList != null )
 		{
 			if ( bBottom )
 			{
 				for (int i = navList.size() - 1; i >= 0; i--)
 				{
-					DPWidget w = navList.get( i );
+					DPElement w = navList.get( i );
 					DPContentLeafEditable l = w.getLayoutNode().getTopOrBottomEditableContentLeaf( bBottom, cursorPosInRootSpace );
 					if ( l != null )
 					{
@@ -122,7 +122,7 @@ public abstract class BranchLayoutNode extends LayoutNode
 			}
 			else
 			{
-				for (DPWidget w: navList)
+				for (DPElement w: navList)
 				{
 					DPContentLeafEditable l = w.getLayoutNode().getTopOrBottomEditableContentLeaf( bBottom, cursorPosInRootSpace );
 					if ( l != null )
@@ -141,7 +141,7 @@ public abstract class BranchLayoutNode extends LayoutNode
 			{
 				double closestDistance = 0.0;
 				DPContentLeafEditable closestNode = null;
-				for (DPWidget item: navList)
+				for (DPElement item: navList)
 				{
 					AABox2 bounds = item.getLocalAABox();
 					double lower = item.getLocalPointRelativeToRoot( bounds.getLower() ).x;
@@ -191,9 +191,9 @@ public abstract class BranchLayoutNode extends LayoutNode
 	}
 	
 	
-	public DPContentLeaf getContentLeafToLeftFromChild(DPWidget child)
+	public DPContentLeaf getContentLeafToLeftFromChild(DPElement child)
 	{
-		List<DPWidget> navList = horizontalNavigationList();
+		List<DPElement> navList = horizontalNavigationList();
 		if ( navList != null )
 		{
 			int index = navList.indexOf( child );
@@ -201,7 +201,7 @@ public abstract class BranchLayoutNode extends LayoutNode
 			{
 				for (int i = index - 1; i >= 0; i--)
 				{
-					DPWidget w = navList.get( i );
+					DPElement w = navList.get( i );
 					DPContentLeaf l = w.getLayoutNode().getRightContentLeaf();
 					if ( l != null )
 					{
@@ -211,7 +211,7 @@ public abstract class BranchLayoutNode extends LayoutNode
 			}
 		}
 		
-		DPWidget element = getElement();
+		DPElement element = getElement();
 		DPContainer parent = element.getParent();
 		BranchLayoutNode parentBranchLayout = parent != null  ?  (BranchLayoutNode)parent.getValidLayoutNodeOfClass( BranchLayoutNode.class )  :  null;
 		
@@ -225,9 +225,9 @@ public abstract class BranchLayoutNode extends LayoutNode
 		}
 	}
 	
-	public DPContentLeaf getContentLeafToRightFromChild(DPWidget child)
+	public DPContentLeaf getContentLeafToRightFromChild(DPElement child)
 	{
-		List<DPWidget> navList = horizontalNavigationList();
+		List<DPElement> navList = horizontalNavigationList();
 		if ( navList != null )
 		{
 			int index = navList.indexOf( child );
@@ -235,7 +235,7 @@ public abstract class BranchLayoutNode extends LayoutNode
 			{
 				for (int i = index + 1; i < navList.size(); i++)
 				{
-					DPWidget w = navList.get( i );
+					DPElement w = navList.get( i );
 					DPContentLeaf l = w.getLayoutNode().getLeftContentLeaf();
 					if ( l != null )
 					{
@@ -245,7 +245,7 @@ public abstract class BranchLayoutNode extends LayoutNode
 			}
 		}
 		
-		DPWidget element = getElement();
+		DPElement element = getElement();
 		DPContainer parent = element.getParent();
 		BranchLayoutNode parentBranchLayout = parent != null  ?  (BranchLayoutNode)parent.getValidLayoutNodeOfClass( BranchLayoutNode.class )  :  null;
 		
@@ -259,9 +259,9 @@ public abstract class BranchLayoutNode extends LayoutNode
 		}
 	}
 	
-	public DPContentLeafEditable getEditableContentLeafAboveOrBelowFromChild(DPWidget child, boolean bBelow, Point2 localPos)
+	public DPContentLeafEditable getEditableContentLeafAboveOrBelowFromChild(DPElement child, boolean bBelow, Point2 localPos)
 	{
-		List<DPWidget> navList = verticalNavigationList();
+		List<DPElement> navList = verticalNavigationList();
 		if ( navList != null )
 		{
 			int index = navList.indexOf( child );
@@ -272,7 +272,7 @@ public abstract class BranchLayoutNode extends LayoutNode
 				{
 					for (int i = index + 1; i < navList.size(); i++)
 					{
-						DPWidget w = navList.get( i );
+						DPElement w = navList.get( i );
 						DPContentLeafEditable l = w.getLayoutNode().getTopOrBottomEditableContentLeaf( false, posInRootSpace );
 						if ( l != null )
 						{
@@ -284,7 +284,7 @@ public abstract class BranchLayoutNode extends LayoutNode
 				{
 					for (int i = index - 1; i >= 0; i--)
 					{
-						DPWidget w = navList.get( i );
+						DPElement w = navList.get( i );
 						DPContentLeafEditable l = w.getLayoutNode().getTopOrBottomEditableContentLeaf( true, posInRootSpace );
 						if ( l != null )
 						{
@@ -295,7 +295,7 @@ public abstract class BranchLayoutNode extends LayoutNode
 			}
 		}
 		
-		DPWidget element = getElement();
+		DPElement element = getElement();
 		DPContainer parent = element.getParent();
 		BranchLayoutNode branchLayout = parent != null  ?  (BranchLayoutNode)parent.getValidLayoutNodeOfClass( BranchLayoutNode.class )  :  null;
 		

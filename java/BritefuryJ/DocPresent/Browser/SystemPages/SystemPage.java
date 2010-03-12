@@ -10,7 +10,7 @@ import java.awt.Font;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPParagraph;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Browser.Page;
 import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
@@ -43,16 +43,16 @@ public abstract class SystemPage extends Page
 
 	
 	
-	public DPWidget getContentsElement()
+	public DPElement getContentsElement()
 	{
 		
-		DPWidget title = styleSheet.withFont( new Font( "Serif", Font.BOLD, 32 ) ).withTextSmallCaps( true ).staticText( "System page: " + getTitle() );
+		DPElement title = styleSheet.withFont( new Font( "Serif", Font.BOLD, 32 ) ).withTextSmallCaps( true ).staticText( "System page: " + getTitle() );
 		
-		ArrayList<DPWidget> headChildren = new ArrayList<DPWidget>();
+		ArrayList<DPElement> headChildren = new ArrayList<DPElement>();
 		headChildren.add( SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE | SystemRootPage.LINKHEADER_SYSTEMPAGE ) );
 		headChildren.add( title.alignHCentre() );
 		
-		ArrayList<DPWidget> pageChildren = new ArrayList<DPWidget>();
+		ArrayList<DPElement> pageChildren = new ArrayList<DPElement>();
 		pageChildren.add( styleSheet.vbox( headChildren ).alignHExpand() );
 		String description = getDescription();
 		if ( description != null )
@@ -65,16 +65,16 @@ public abstract class SystemPage extends Page
 	}
 
 
-	protected DPWidget createLink()
+	protected DPElement createLink()
 	{
 		return controlsStyleSheet.link( getTitle(), getLocation() ).getElement();
 	}
 	
 	
-	protected ArrayList<DPWidget> createTextNodes(PrimitiveStyleSheet style, String text)
+	protected ArrayList<DPElement> createTextNodes(PrimitiveStyleSheet style, String text)
 	{
 		String[] words = text.split( " " );
-		ArrayList<DPWidget> nodes = new ArrayList<DPWidget>();
+		ArrayList<DPElement> nodes = new ArrayList<DPElement>();
 		boolean bFirst = true;
 		for (String word: words)
 		{
@@ -92,7 +92,7 @@ public abstract class SystemPage extends Page
 		return nodes;
 	}
 
-	protected ArrayList<DPWidget> createTextNodes(String text)
+	protected ArrayList<DPElement> createTextNodes(String text)
 	{
 		return createTextNodes( styleSheet, text );
 	}
@@ -114,5 +114,5 @@ public abstract class SystemPage extends Page
 		return null;
 	}
 	
-	protected abstract DPWidget createContents();
+	protected abstract DPElement createContents();
 }

@@ -12,7 +12,7 @@ import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocPresent.DPFrame;
 import BritefuryJ.DocPresent.DPPresentationArea;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.EditHandler;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Selection.Selection;
@@ -56,7 +56,7 @@ public class GSymViewContext extends GSymIncrementalTreeContext implements DocVi
 			GSymNodeViewContext nodeContext = createContext( treeContext, incrementalNode );
 			
 			// Create the view fragment
-			DPWidget fragment = viewFragmentFunction.createViewFragment( docNode, nodeContext, styleSheet, state );
+			DPElement fragment = viewFragmentFunction.createViewFragment( docNode, nodeContext, styleSheet, state );
 			
 			docView.profile_stopPython();
 			

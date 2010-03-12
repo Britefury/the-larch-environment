@@ -9,8 +9,8 @@ package BritefuryJ.DocPresent.LayoutTree;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPContainer;
-import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.WidgetFilter;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.ElementFilter;
 import BritefuryJ.DocPresent.Layout.GridLayout;
 import BritefuryJ.DocPresent.Layout.HorizontalLayout;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
@@ -78,7 +78,7 @@ public class LayoutNodeGridRow extends ArrangedSequenceLayoutNode
 	
 	
 	
-	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
+	protected DPElement getChildLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
 	{
 		return getChildLeafClosestToLocalPointHorizontal( getLeaves(), localPos, filter );
 	}
@@ -89,8 +89,8 @@ public class LayoutNodeGridRow extends ArrangedSequenceLayoutNode
 	{
 		refreshSubtree();
 		
-		DPWidget startLeaf = leaves[rangeStart];
-		DPWidget endLeaf = leaves[rangeEnd-1];
+		DPElement startLeaf = leaves[rangeStart];
+		DPElement endLeaf = leaves[rangeEnd-1];
 		double xStart = startLeaf.getPositionInParentSpaceX();
 		double xEnd = endLeaf.getPositionInParentSpaceX()  +  endLeaf.getAllocationInParentSpaceX();
 		AABox2 box = new AABox2( xStart, 0.0, xEnd, getAllocationY() );
@@ -103,7 +103,7 @@ public class LayoutNodeGridRow extends ArrangedSequenceLayoutNode
 	// Focus navigation methods
 	//
 	
-	public List<DPWidget> horizontalNavigationList()
+	public List<DPElement> horizontalNavigationList()
 	{
 		return getLeaves();
 	}

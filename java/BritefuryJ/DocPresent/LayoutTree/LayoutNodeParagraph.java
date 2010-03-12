@@ -10,8 +10,8 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPContentLeafEditable;
-import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.WidgetFilter;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.ElementFilter;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
 import BritefuryJ.DocPresent.Layout.LAllocV;
@@ -47,7 +47,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 
 	protected void updateRequisitionY()
 	{
-		for (DPWidget child: leaves)
+		for (DPElement child: leaves)
 		{
 			child.getLayoutNode().refreshRequisitionY();
 		}
@@ -139,7 +139,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 		}
 	}
 
-	private DPWidget getLineChildClosestToLocalPoint(ParagraphLayout.Line line, Point2 localPos)
+	private DPElement getLineChildClosestToLocalPoint(ParagraphLayout.Line line, Point2 localPos)
 	{
 		LAllocBoxInterface children[] = line.getChildAllocBoxes();
 		if ( children.length == 0 )
@@ -173,16 +173,16 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 		}
 	}
 
-	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
+	protected DPElement getChildLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
 	{
 		refreshSubtree();
 		ParagraphLayout.Line line = getLineClosestToLocalPoint( localPos );
 		
 		if ( line != null )
 		{
-			DPWidget child = getLineChildClosestToLocalPoint( line, localPos );
+			DPElement child = getLineChildClosestToLocalPoint( line, localPos );
 			
-			DPWidget c = getLeafClosestToLocalPointFromChild( child, localPos, filter );
+			DPElement c = getLeafClosestToLocalPointFromChild( child, localPos, filter );
 			
 			if ( c != null )
 			{
@@ -190,7 +190,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 			}
 			
 			int index = 0;
-			for (DPWidget w: leaves)
+			for (DPElement w: leaves)
 			{
 				if ( w == child )
 				{
@@ -203,7 +203,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 				throw new RuntimeException( "This shouldn't have happened" );
 			}
 			
-			DPWidget next = null;
+			DPElement next = null;
 			for (int j = index + 1; j < leaves.length; j++)
 			{
 				next = getLeafClosestToLocalPointFromChild( leaves[j], localPos, filter );
@@ -213,7 +213,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 				}
 			}
 
-			DPWidget prev = null;
+			DPElement prev = null;
 			for (int j = index - 1; j >= 0; j--)
 			{
 				prev = getLeafClosestToLocalPointFromChild( leaves[j], localPos, filter );
@@ -329,7 +329,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 	// Focus navigation methods
 	//
 	
-	public DPContentLeafEditable getEditableContentLeafAboveOrBelowFromChild(DPWidget child, boolean bBelow, Point2 localCursorPos)
+	public DPContentLeafEditable getEditableContentLeafAboveOrBelowFromChild(DPElement child, boolean bBelow, Point2 localCursorPos)
 	{
 		int childIndex = getLeaves().indexOf( child );
 		int lineIndex = ParagraphLayout.Line.searchForEndLine( lines, childIndex );
@@ -359,7 +359,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 			}
 		}
 		
-		DPWidget element = getElement();
+		DPElement element = getElement();
 		DPContainer parent = element.getParent();
 		BranchLayoutNode branchLayout = parent != null  ?  (BranchLayoutNode)parent.getValidLayoutNodeOfClass( BranchLayoutNode.class )  :  null;
 		
@@ -381,7 +381,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 		DPContentLeafEditable closestNode = null;
 		for (LAllocBoxInterface allocBox: line.getChildAllocBoxes())
 		{
-			DPWidget item = allocBox.getAllocLayoutNode().getElement();
+			DPElement item = allocBox.getAllocLayoutNode().getElement();
 			
 			AABox2 bounds = item.getLocalAABox();
 			double lower = item.getLocalPointRelativeToRoot( bounds.getLower() ).x;
@@ -460,7 +460,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 
 	
 	
-	public List<DPWidget> horizontalNavigationList()
+	public List<DPElement> horizontalNavigationList()
 	{
 		return getLeaves();
 	}

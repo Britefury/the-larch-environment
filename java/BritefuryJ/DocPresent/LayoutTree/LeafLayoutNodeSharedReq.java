@@ -7,7 +7,7 @@
 package BritefuryJ.DocPresent.LayoutTree;
 
 import BritefuryJ.DocPresent.DPContainer;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBox;
@@ -17,18 +17,18 @@ import BritefuryJ.Math.Vector2;
 
 public abstract class LeafLayoutNodeSharedReq extends LayoutNode implements LAllocBoxInterface
 {
-	protected DPWidget element;
+	protected DPElement element;
 	protected LReqBox layoutReqBox;
 	
 	
-	public LeafLayoutNodeSharedReq(DPWidget element, LReqBox reqBox)
+	public LeafLayoutNodeSharedReq(DPElement element, LReqBox reqBox)
 	{
 		this.element = element;
 		layoutReqBox = reqBox;
 	}
 
 
-	public DPWidget getElement()
+	public DPElement getElement()
 	{
 		return element;
 	}

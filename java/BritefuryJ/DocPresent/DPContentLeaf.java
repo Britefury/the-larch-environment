@@ -21,7 +21,7 @@ import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
-public abstract class DPContentLeaf extends DPWidget
+public abstract class DPContentLeaf extends DPElement
 {
 	public static class CannotCreateMarkerWithEmptyContent extends RuntimeException
 	{
@@ -63,7 +63,7 @@ public abstract class DPContentLeaf extends DPWidget
 	//
 	//
 	
-	public DPContentLeaf getFirstLeafInSubtree(WidgetFilter branchFilter, WidgetFilter leafFilter)
+	public DPContentLeaf getFirstLeafInSubtree(ElementFilter branchFilter, ElementFilter leafFilter)
 	{
 		if ( leafFilter == null  ||  leafFilter.testElement( this ) )
 		{
@@ -75,7 +75,7 @@ public abstract class DPContentLeaf extends DPWidget
 		}
 	}
 
-	public DPContentLeaf getLastLeafInSubtree(WidgetFilter branchFilter, WidgetFilter leafFilter)
+	public DPContentLeaf getLastLeafInSubtree(ElementFilter branchFilter, ElementFilter leafFilter)
 	{
 		if ( leafFilter == null  ||  leafFilter.testElement( this ) )
 		{
@@ -100,7 +100,7 @@ public abstract class DPContentLeaf extends DPWidget
 	}
 
 
-	public DPContentLeaf getPreviousLeaf(WidgetFilter subtreeRootFilter, WidgetFilter branchFilter, WidgetFilter leafFilter)
+	public DPContentLeaf getPreviousLeaf(ElementFilter subtreeRootFilter, ElementFilter branchFilter, ElementFilter leafFilter)
 	{
 		if ( parent != null )
 		{
@@ -112,7 +112,7 @@ public abstract class DPContentLeaf extends DPWidget
 		}
 	}
 	
-	public DPContentLeaf getNextLeaf(WidgetFilter subtreeRootFilter, WidgetFilter branchFilter, WidgetFilter leafFilter)
+	public DPContentLeaf getNextLeaf(ElementFilter subtreeRootFilter, ElementFilter branchFilter, ElementFilter leafFilter)
 	{
 		if ( parent != null )
 		{
@@ -125,12 +125,12 @@ public abstract class DPContentLeaf extends DPWidget
 	}
 	
 	
-	public DPContentLeaf getPreviousEditableLeaf(WidgetFilter subtreeRootFilter, WidgetFilter branchFilter)
+	public DPContentLeaf getPreviousEditableLeaf(ElementFilter subtreeRootFilter, ElementFilter branchFilter)
 	{
 		return getPreviousLeaf( subtreeRootFilter, branchFilter, new DPContentLeafEditable.EditableLeafElementFilter() );
 	}
 
-	public DPContentLeaf getNextEditableLeaf(WidgetFilter subtreeRootFilter, WidgetFilter branchFilter)
+	public DPContentLeaf getNextEditableLeaf(ElementFilter subtreeRootFilter, ElementFilter branchFilter)
 	{
 		return getNextLeaf( subtreeRootFilter, branchFilter, new DPContentLeafEditable.EditableLeafElementFilter() );
 	}
@@ -200,11 +200,11 @@ public abstract class DPContentLeaf extends DPWidget
 		return textRepresentation.length();
 	}
 	
-	protected void getTextRepresentationFromStartToPath(StringBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	protected void getTextRepresentationFromStartToPath(StringBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
 	}
 
-	protected void getTextRepresentationFromPathToEnd(StringBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	protected void getTextRepresentationFromPathToEnd(StringBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
 	}
 
@@ -237,11 +237,11 @@ public abstract class DPContentLeaf extends DPWidget
 		builder.appendTextValue( textRepresentation );
 	}
 	
-	protected void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	protected void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
 	}
 
-	protected void getLinearRepresentationFromPathToEnd(ItemStreamBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	protected void getLinearRepresentationFromPathToEnd(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
 	}
 	
@@ -306,7 +306,7 @@ public abstract class DPContentLeaf extends DPWidget
 	protected static TextStyleParams headerTextRepTextStyle = new TextStyleParams( null, null, null, true, new Font( "Sans serif", Font.PLAIN, 14 ), Color.BLACK, null, null, false );
 	protected static SolidBorder metaHeaderHighlightBorder = new SolidBorder( 1.0, 1.0, 5.0, 5.0, new Color( 0.75f, 0.0f, 0.0f ), new Color( 1.0f, 0.9f, 0.8f ) );
 
-	public DPWidget createMetaHeaderData()
+	public DPElement createMetaHeaderData()
 	{
 		return new DPText( headerTextRepTextStyle, "'" + textRepresentation.replace( "\n", "\\n" ) + "'" );
 	}

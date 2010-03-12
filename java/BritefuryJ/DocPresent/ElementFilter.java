@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-public interface WidgetFilter
+public interface ElementFilter
 {
-	public boolean testElement(DPWidget element);
+	public boolean testElement(DPElement element);
 }

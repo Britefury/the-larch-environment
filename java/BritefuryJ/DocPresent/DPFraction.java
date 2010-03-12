@@ -180,7 +180,7 @@ public class DPFraction extends DPContainer
 
 	public static int NUMCHILDREN = LayoutNodeFraction.NUMCHILDREN;
 	
-	protected DPWidget children[];
+	protected DPElement children[];
 	protected DPSegment segs[];
 	protected DPParagraph paras[];
 	TextStyleParams segmentTextStyleParams;
@@ -211,7 +211,7 @@ public class DPFraction extends DPContainer
 		
 		this.segmentTextStyleParams = segmentTextStyleParams;
 		
-		children = new DPWidget[NUMCHILDREN];
+		children = new DPElement[NUMCHILDREN];
 		segs = new DPSegment[NUMCHILDREN];
 		paras = new DPParagraph[NUMCHILDREN];
 		
@@ -220,19 +220,19 @@ public class DPFraction extends DPContainer
 
 	
 	
-	public DPWidget getChild(int slot)
+	public DPElement getChild(int slot)
 	{
 		return children[slot];
 	}
 	
-	public DPWidget getWrappedChild(int slot)
+	public DPElement getWrappedChild(int slot)
 	{
 		return slot == BAR  ?  children[slot]  :  paras[slot];
 	}
 	
-	public void setChild(int slot, DPWidget child)
+	public void setChild(int slot, DPElement child)
 	{
-		DPWidget existingChild = children[slot];
+		DPElement existingChild = children[slot];
 		if ( child != existingChild )
 		{
 			if ( slot == BAR )
@@ -262,7 +262,7 @@ public class DPFraction extends DPContainer
 					DPSegment seg = new DPSegment( (ContainerStyleParams)getStyleParams(), segmentTextStyleParams, true, true );
 					segs[slot] = seg;
 					DPParagraph para = new DPParagraph( );
-					para.setChildren( Arrays.asList( new DPWidget[] { seg } ) );
+					para.setChildren( Arrays.asList( new DPElement[] { seg } ) );
 					paras[slot] = para;
 					
 					int insertIndex = 0;
@@ -304,45 +304,45 @@ public class DPFraction extends DPContainer
 	
 	
 	
-	public DPWidget getNumeratorChild()
+	public DPElement getNumeratorChild()
 	{
 		return getChild( NUMERATOR );
 	}
 	
-	public DPWidget getDenominatorChild()
+	public DPElement getDenominatorChild()
 	{
 		return getChild( DENOMINATOR );
 	}
 	
-	public DPWidget getBarChild()
+	public DPElement getBarChild()
 	{
 		return getChild( BAR );
 	}
 	
 	
-	public DPWidget getWrappedNumeratorChild()
+	public DPElement getWrappedNumeratorChild()
 	{
 		return paras[NUMERATOR];
 	}
 	
-	public DPWidget getWrappedDenominatorChild()
+	public DPElement getWrappedDenominatorChild()
 	{
 		return paras[DENOMINATOR];
 	}
 	
 
 	
-	public void setNumeratorChild(DPWidget child)
+	public void setNumeratorChild(DPElement child)
 	{
 		setChild( NUMERATOR, child );
 	}
 	
-	public void setDenominatorChild(DPWidget child)
+	public void setDenominatorChild(DPElement child)
 	{
 		setChild( DENOMINATOR, child );
 	}
 	
-	public void setBarChild(DPWidget child)
+	public void setBarChild(DPElement child)
 	{
 		setChild( BAR, child );
 	}
@@ -350,7 +350,7 @@ public class DPFraction extends DPContainer
 
 	
 	
-	protected double getInternalChildScale(DPWidget child)
+	protected double getInternalChildScale(DPElement child)
 	{
 		return child == children[BAR]  ?  1.0  :  childScale;
 	}
@@ -358,7 +358,7 @@ public class DPFraction extends DPContainer
 
 	
 	
-	protected void replaceChildWithEmpty(DPWidget child)
+	protected void replaceChildWithEmpty(DPElement child)
 	{
 		int slot = Arrays.asList( children ).indexOf( child );
 		setChild( slot, null );
@@ -366,7 +366,7 @@ public class DPFraction extends DPContainer
 	
 	
 	
-	public List<DPWidget> getChildren()
+	public List<DPElement> getChildren()
 	{
 		return registeredChildren;
 	}

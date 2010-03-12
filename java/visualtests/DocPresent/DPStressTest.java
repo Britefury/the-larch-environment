@@ -18,7 +18,7 @@ import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleParams.ParagraphStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 
@@ -34,11 +34,11 @@ public class DPStressTest
 	// 120MB: shared TextVisual objects
 	// 117MB: created pointer->child table in DPContainer on demand
 	// 117MB: replaced paragraph ArrayLists with arrays
-	// 111MB: replaced Vector2 and Point2 objects in DPWidget with doubles
+	// 111MB: replaced Vector2 and Point2 objects in DPElement with doubles
 	// 83MB: cached metrics in TextVisual objects, and modified Metrics.scaled() (and subclass) methods to only create a new metrics object in cases scale != 1.0
 	
 	
-	// Version							Platform		# lines	Process size			Measured mem usage		Mem usage at start		Widget tree creation time		typeset time
+	// Version							Platform		# lines	Process size			Measured mem usage		Mem usage at start		Element tree creation time		typeset time
 	//
 	// [1] Same as with last measurements	A			10240	80.7MB				56.6MB				--					0.839s					0.410s
 	// [2] New layout system				A			10240	71.4MB				46.4MB				0.6MB				0.705s					0.294s
@@ -60,7 +60,7 @@ public class DPStressTest
 	// [5] Collation system finished
 	// [6] All ElementTree functionality merged into document presentation system
 	// [7] Minor optimisations - pointer containment (pointer within bounds of element) moved to root (DPPresentationArea)
-	// [8] Pointer refactor - moved all pointer containment state out of the widget tree and into the input system
+	// [8] Pointer refactor - moved all pointer containment state out of the element tree and into the input system
 	// [9] As of 2010-01-30; no significant changes, different platform
 	// [10] Refactored layout system into separate layout tree
 	//
@@ -84,23 +84,23 @@ public class DPStressTest
 	TextStyleParams puncStyle = new TextStyleParams( null, null, null, true, f0, Color.blue, null, null, false );
 	ParagraphStyleParams paraStyle = new ParagraphStyleParams( null, null, null, 0.0, 0.0, 0.0 );
 
-	public DPWidget name(String n)
+	public DPElement name(String n)
 	{
 		return new DPText( nameStyle, n );
 	}
 	
-	public DPWidget[] attr(DPWidget x, String a)
+	public DPElement[] attr(DPElement x, String a)
 	{
 		DPText dot = new DPText( puncStyle, "." );
 		DPText attrName = new DPText( nameStyle, a );
-		return new DPWidget[] { x, dot, attrName };
+		return new DPElement[] { x, dot, attrName };
 	}
 	
-	public DPWidget call(DPWidget[] x, DPWidget... args)
+	public DPElement call(DPElement[] x, DPElement... args)
 	{
 		DPText openParen = new DPText( puncStyle, "(" );
 		DPText closeParen = new DPText( puncStyle, ")" );
-		ArrayList<DPWidget> elems = new ArrayList<DPWidget>();
+		ArrayList<DPElement> elems = new ArrayList<DPElement>();
 		elems.addAll( Arrays.asList( x ) );
 		elems.add( openParen );
 		for (int i = 0; i < args.length; i++)
@@ -125,10 +125,10 @@ public class DPStressTest
 	
 	
 	
-	protected DPWidget createContentNode()
+	protected DPElement createContentNode()
 	{
 		DPVBox box = new DPVBox( );
-		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
+		ArrayList<DPElement> children = new ArrayList<DPElement>();
 		
 		for (int i = 0; i < NUMLINES; i++)
 		{
@@ -155,9 +155,9 @@ public class DPStressTest
 	     
 	     
 		long t1 = System.nanoTime();
-		DPWidget w = createContentNode();
+		DPElement w = createContentNode();
 		long t2 = System.nanoTime();
-		System.out.println( "Widget tree creation time: " + (double)( t2 - t1 ) / 1000000000.0 );
+		System.out.println( "Element tree creation time: " + (double)( t2 - t1 ) / 1000000000.0 );
 		area.setChild( w );
 	     
 	     

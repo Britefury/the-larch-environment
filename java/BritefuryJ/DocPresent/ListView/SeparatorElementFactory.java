@@ -6,10 +6,10 @@
 //##************************
 package BritefuryJ.DocPresent.ListView;
 
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public interface SeparatorElementFactory
 {
-	public DPWidget createElement(StyleSheet styleSheet, int index, DPWidget child);
+	public DPElement createElement(StyleSheet styleSheet, int index, DPElement child);
 }

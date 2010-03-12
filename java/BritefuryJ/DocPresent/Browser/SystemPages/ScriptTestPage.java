@@ -13,7 +13,7 @@ import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPFraction;
 import BritefuryJ.DocPresent.DPScript;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class ScriptTestPage extends SystemPage
@@ -45,35 +45,35 @@ public class ScriptTestPage extends SystemPage
 	private static PrimitiveStyleSheet sScriptStyleSheet = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 16 ) ).withForeground( Color.black );
 
 	
-	protected DPWidget makeScriptLine(DPWidget main, DPWidget leftSuper, DPWidget leftSub, DPWidget rightSuper, DPWidget rightSub)
+	protected DPElement makeScriptLine(DPElement main, DPElement leftSuper, DPElement leftSub, DPElement rightSuper, DPElement rightSub)
 	{
-		return styleSheet.hbox( Arrays.asList( new DPWidget[] { scriptPreStyleSheet.text( "<<Left<<" ), styleSheet.script( main, leftSuper, leftSub, rightSuper, rightSub ),
+		return styleSheet.hbox( Arrays.asList( new DPElement[] { scriptPreStyleSheet.text( "<<Left<<" ), styleSheet.script( main, leftSuper, leftSub, rightSuper, rightSub ),
 				scriptPostStyleSheet.text( ">>Right>>" ) } ) );
 	}
 
 	
 	
-	protected DPWidget makeScriptFraction(String mainText, String numText, String denomText)
+	protected DPElement makeScriptFraction(String mainText, String numText, String denomText)
 	{
 		DPFraction fraction = styleSheet.fraction( sScriptStyleSheet.text( numText ), sScriptStyleSheet.text( denomText ), "/" );
 		
-		DPScript script = styleSheet.scriptRSuper( sMainStyleSheet.text( mainText ), styleSheet.paragraph( Arrays.asList( new DPWidget[] { fraction } ) ) );
+		DPScript script = styleSheet.scriptRSuper( sMainStyleSheet.text( mainText ), styleSheet.paragraph( Arrays.asList( new DPElement[] { fraction } ) ) );
 		
-		return styleSheet.hbox( Arrays.asList( new DPWidget[] { scriptPreStyleSheet.text( "Label A yYgGjJpPqQ" ), script, scriptPostStyleSheet.text( "Label B yYgGjJpPqQ" ) } ) );
+		return styleSheet.hbox( Arrays.asList( new DPElement[] { scriptPreStyleSheet.text( "Label A yYgGjJpPqQ" ), script, scriptPostStyleSheet.text( "Label B yYgGjJpPqQ" ) } ) );
 	}
 
 	
 	
-	protected DPWidget createContents()
+	protected DPElement createContents()
 	{
-		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
+		ArrayList<DPElement> children = new ArrayList<DPElement>();
 		
 		for (int i = 0; i < 16; i++)
 		{
-			DPWidget leftSuperText = ( i & 1 ) != 0   ?   sScriptStyleSheet.text( "left super" )  :  null; 
-			DPWidget leftSubText = ( i & 2 ) != 0   ?   sScriptStyleSheet.text( "left sub" )  :  null; 
-			DPWidget rightSuperText = ( i & 4 ) != 0   ?   sScriptStyleSheet.text( "right super" )  :  null; 
-			DPWidget rightSubText = ( i & 8 ) != 0   ?   sScriptStyleSheet.text( "right sub" )  :  null;
+			DPElement leftSuperText = ( i & 1 ) != 0   ?   sScriptStyleSheet.text( "left super" )  :  null; 
+			DPElement leftSubText = ( i & 2 ) != 0   ?   sScriptStyleSheet.text( "left sub" )  :  null; 
+			DPElement rightSuperText = ( i & 4 ) != 0   ?   sScriptStyleSheet.text( "right super" )  :  null; 
+			DPElement rightSubText = ( i & 8 ) != 0   ?   sScriptStyleSheet.text( "right sub" )  :  null;
 			
 			children.add( makeScriptLine( sMainStyleSheet.text( "MAIN" + String.valueOf( i ) ), leftSuperText, leftSubText, rightSuperText, rightSubText ) );
 		}
@@ -82,10 +82,10 @@ public class ScriptTestPage extends SystemPage
 
 		for (int i = 0; i < 16; i++)
 		{
-			DPWidget leftSuperText = ( i & 1 ) != 0   ?   styleSheet.fraction( sScriptStyleSheet.text( "a" ), sScriptStyleSheet.text( "x" ), "/" )  :  sScriptStyleSheet.text( "a" ); 
-			DPWidget leftSubText = ( i & 2 ) != 0   ?   styleSheet.fraction( sScriptStyleSheet.text( "b" ), sScriptStyleSheet.text( "x" ), "/" )  :  sScriptStyleSheet.text( "b" ); 
-			DPWidget rightSuperText = ( i & 4 ) != 0   ?   styleSheet.fraction( sScriptStyleSheet.text( "c" ), sScriptStyleSheet.text( "x" ), "/" )  :  sScriptStyleSheet.text( "c" ); 
-			DPWidget rightSubText = ( i & 8 ) != 0   ?   styleSheet.fraction( sScriptStyleSheet.text( "d" ), sScriptStyleSheet.text( "x" ), "/" )  :  sScriptStyleSheet.text( "d" );
+			DPElement leftSuperText = ( i & 1 ) != 0   ?   styleSheet.fraction( sScriptStyleSheet.text( "a" ), sScriptStyleSheet.text( "x" ), "/" )  :  sScriptStyleSheet.text( "a" ); 
+			DPElement leftSubText = ( i & 2 ) != 0   ?   styleSheet.fraction( sScriptStyleSheet.text( "b" ), sScriptStyleSheet.text( "x" ), "/" )  :  sScriptStyleSheet.text( "b" ); 
+			DPElement rightSuperText = ( i & 4 ) != 0   ?   styleSheet.fraction( sScriptStyleSheet.text( "c" ), sScriptStyleSheet.text( "x" ), "/" )  :  sScriptStyleSheet.text( "c" ); 
+			DPElement rightSubText = ( i & 8 ) != 0   ?   styleSheet.fraction( sScriptStyleSheet.text( "d" ), sScriptStyleSheet.text( "x" ), "/" )  :  sScriptStyleSheet.text( "d" );
 			
 			children.add( makeScriptLine( sMainStyleSheet.text( "MAIN" + String.valueOf( i ) ), leftSuperText, leftSubText, rightSuperText, rightSubText ) );
 		}

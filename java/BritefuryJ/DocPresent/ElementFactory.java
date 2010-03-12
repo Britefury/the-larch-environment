@@ -10,5 +10,5 @@ import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public interface ElementFactory
 {
-	public DPWidget createElement(StyleSheet styleSheet);
+	public DPElement createElement(StyleSheet styleSheet);
 }

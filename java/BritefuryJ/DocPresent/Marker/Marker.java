@@ -12,8 +12,8 @@ import java.util.ArrayList;
 import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPContentLeaf;
 import BritefuryJ.DocPresent.DPContentLeafEditable;
-import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.DPWidget.IsNotInSubtreeException;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPElement.IsNotInSubtreeException;
 
 public class Marker
 {
@@ -45,11 +45,11 @@ public class Marker
 		this.bias = Bias.START;
 	}
 	
-	public Marker(DPContentLeafEditable widget, int position, Bias bias)
+	public Marker(DPContentLeafEditable element, int position, Bias bias)
 	{
-		checkPositionAndBias( widget, position, bias );
+		checkPositionAndBias( element, position, bias );
 		
-		this.element = widget;
+		this.element = element;
 		this.position = position;
 		this.bias = bias;
 		
@@ -97,7 +97,7 @@ public class Marker
 		return position;
 	}
 	
-	public int getPositionInSubtree(DPWidget subtreeRoot) throws IsNotInSubtreeException
+	public int getPositionInSubtree(DPElement subtreeRoot) throws IsNotInSubtreeException
 	{
 		if ( subtreeRoot == element )
 		{
@@ -114,7 +114,7 @@ public class Marker
 				}
 				else
 				{
-					throw new DPWidget.IsNotInSubtreeException();
+					throw new DPElement.IsNotInSubtreeException();
 				}
 			}
 			else if ( subtreeRoot instanceof DPContentLeaf )
@@ -125,12 +125,12 @@ public class Marker
 				}
 				else
 				{
-					throw new DPWidget.IsNotInSubtreeException();
+					throw new DPElement.IsNotInSubtreeException();
 				}
 			}
 			else
 			{
-				throw new DPWidget.IsNotInSubtreeException();
+				throw new DPElement.IsNotInSubtreeException();
 			}
 		}
 	}
@@ -151,7 +151,7 @@ public class Marker
 		return Math.min( bias == Bias.END  ?  position + 1  :  position,  element.getMarkerRange() );
 	}
 	
-	public int getIndexInSubtree(DPWidget subtreeRoot) throws IsNotInSubtreeException
+	public int getIndexInSubtree(DPElement subtreeRoot) throws IsNotInSubtreeException
 	{
 		int p = getPositionInSubtree( subtreeRoot );
 		return getBias() == Bias.END  ?  p + 1  :  p;
@@ -171,11 +171,11 @@ public class Marker
 		changed();
 	}
 	
-	public void set(DPContentLeafEditable widget, int position, Bias bias)
+	public void set(DPContentLeafEditable element, int position, Bias bias)
 	{
-		if ( widget != null )
+		if ( element != null )
 		{
-			checkPositionAndBias( widget, position, bias );
+			checkPositionAndBias( element, position, bias );
 		}
 		
 		if ( this.element != null )
@@ -183,7 +183,7 @@ public class Marker
 			this.element.unregisterMarker( this );
 		}
 		
-		this.element = widget;
+		this.element = element;
 		this.position = position;
 		this.bias = bias;
 		

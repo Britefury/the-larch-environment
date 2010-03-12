@@ -8,8 +8,8 @@ package BritefuryJ.DocPresent.LayoutTree;
 
 import BritefuryJ.DocPresent.DPContentLeaf;
 import BritefuryJ.DocPresent.DPContentLeafEditable;
-import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.WidgetFilter;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.ElementFilter;
 import BritefuryJ.Math.Point2;
 
 public interface ContentLeafLayoutNodeInterface
@@ -22,5 +22,5 @@ public interface ContentLeafLayoutNodeInterface
 	DPContentLeaf getLeftContentLeaf();
 	DPContentLeaf getRightContentLeaf();
 	DPContentLeafEditable getTopOrBottomEditableContentLeaf(boolean bBottom, Point2 cursorPosInRootSpace);
-	DPWidget getLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter);
+	DPElement getLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter);
 }

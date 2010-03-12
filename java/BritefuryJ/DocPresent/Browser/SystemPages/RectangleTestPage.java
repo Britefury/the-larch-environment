@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.util.Arrays;
 
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
@@ -38,9 +38,9 @@ public class RectangleTestPage extends SystemPage
 
 	
 	
-	protected DPWidget createContents()
+	protected DPElement createContents()
 	{
-		return styleSheet.vbox( Arrays.asList( new DPWidget[] {
+		return styleSheet.vbox( Arrays.asList( new DPElement[] {
 				styleSheet.text( "Rectangle 50x10; 1 pixel padding" ),
 				shapeStyle.rectangle( 50.0, 10.0 ).pad( 1.0, 1.0 ),
 				styleSheet.text( "Rectangle 50x10; 10 pixel padding" ),
