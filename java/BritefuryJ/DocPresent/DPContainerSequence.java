@@ -34,12 +34,12 @@ abstract public class DPContainerSequence extends DPContainer
 
 	
 	
-	public void setChildren(DPWidget items[])
+	public void setChildren(DPElement items[])
 	{
 		setChildren( Arrays.asList( items ) );
 	}
 	
-	public void setChildren(List<DPWidget> items)
+	public void setChildren(List<DPElement> items)
 	{
 		if ( registeredChildren.isEmpty() )
 		{
@@ -49,7 +49,7 @@ abstract public class DPContainerSequence extends DPContainer
 				registeredChildren.addAll( items );
 		
 				// Register added entries
-				for (DPWidget child: items)
+				for (DPElement child: items)
 				{
 					registerChild( child );
 				}
@@ -69,8 +69,8 @@ abstract public class DPContainerSequence extends DPContainer
 			}
 			else if ( items.size() == 1 )
 			{
-				DPWidget prevChild = registeredChildren.get( 0 );
-				DPWidget newChild = items.get( 0 );
+				DPElement prevChild = registeredChildren.get( 0 );
+				DPElement newChild = items.get( 0 );
 				
 				if ( newChild != prevChild )
 				{
@@ -84,16 +84,16 @@ abstract public class DPContainerSequence extends DPContainer
 		}
 		else
 		{
-			HashSet<DPWidget> added, removed;
+			HashSet<DPElement> added, removed;
 			
-			added = new HashSet<DPWidget>( items );
-			removed = new HashSet<DPWidget>( registeredChildren );
+			added = new HashSet<DPElement>( items );
+			removed = new HashSet<DPElement>( registeredChildren );
 			added.removeAll( registeredChildren );
 			removed.removeAll( items );
 
 			
 			// Unregister removed entries
-			for (DPWidget child: removed)
+			for (DPElement child: removed)
 			{
 				unregisterChild( child );
 			}
@@ -103,7 +103,7 @@ abstract public class DPContainerSequence extends DPContainer
 			registeredChildren.addAll( items );
 	
 			// Register added entries
-			for (DPWidget child: added)
+			for (DPElement child: added)
 			{
 				registerChild( child );
 			}
@@ -117,7 +117,7 @@ abstract public class DPContainerSequence extends DPContainer
 	public void clear()
 	{
 		// Unregister removed entries
-		for (DPWidget child: registeredChildren)
+		for (DPElement child: registeredChildren)
 		{
 			unregisterChild( child );
 		}
@@ -144,35 +144,35 @@ abstract public class DPContainerSequence extends DPContainer
 	}
 	
 	
-	public DPWidget get(int index)
+	public DPElement get(int index)
 	{
 		return registeredChildren.get( index );
 	}
 	
-	public DPWidget __getitem__(int index)
+	public DPElement __getitem__(int index)
 	{
 		index = JythonIndex.pyIndexToJava( index, size(), "BranchElement index out of range" );
 
 		return get( index );
 	}
 	
-	public DPWidget[] __getitem__(PySlice slice)
+	public DPElement[] __getitem__(PySlice slice)
 	{
-		DPWidget[] in = new DPWidget[registeredChildren.size()];
+		DPElement[] in = new DPElement[registeredChildren.size()];
 		
 		for (int i = 0; i < in.length; i++)
 		{
 			in[i] = registeredChildren.get( i );
 		}
 		
-		return (DPWidget[])JythonSlice.arrayGetSlice( in, slice );
+		return (DPElement[])JythonSlice.arrayGetSlice( in, slice );
 	}
 	
 	
 	
-	public void set(int index, DPWidget child)
+	public void set(int index, DPElement child)
 	{
-		DPWidget oldChild = registeredChildren.get( index );
+		DPElement oldChild = registeredChildren.get( index );
 		unregisterChild( oldChild );
 		registeredChildren.set( index, child );
 		registerChild( child );
@@ -180,7 +180,7 @@ abstract public class DPContainerSequence extends DPContainer
 		queueResize();
 	}
 	
-	public void __setitem__(int index, DPWidget item)
+	public void __setitem__(int index, DPElement item)
 	{
 		index = JythonIndex.pyIndexToJava( index, size(), "BranchElement assignment index out of range" );
 
@@ -188,23 +188,23 @@ abstract public class DPContainerSequence extends DPContainer
 	}
 
 	@SuppressWarnings("unchecked")
-	public void __setitem__(PySlice slice, DPWidget[] items)
+	public void __setitem__(PySlice slice, DPElement[] items)
 	{
-		HashSet<DPWidget> oldEntrySet = new HashSet<DPWidget>( registeredChildren );
+		HashSet<DPElement> oldEntrySet = new HashSet<DPElement>( registeredChildren );
 		
-		DPWidget[] oldChildArray = (DPWidget[])registeredChildren.toArray();
-		DPWidget[] newChildEntriesArray = (DPWidget[])JythonSlice.arraySetSlice( oldChildArray, slice, items );
+		DPElement[] oldChildArray = (DPElement[])registeredChildren.toArray();
+		DPElement[] newChildEntriesArray = (DPElement[])JythonSlice.arraySetSlice( oldChildArray, slice, items );
 		
-		HashSet<DPWidget> newEntrySet = new HashSet<DPWidget>( registeredChildren );
+		HashSet<DPElement> newEntrySet = new HashSet<DPElement>( registeredChildren );
 		
 		
-		HashSet<DPWidget> removed = (HashSet<DPWidget>)oldEntrySet.clone();
+		HashSet<DPElement> removed = (HashSet<DPElement>)oldEntrySet.clone();
 		removed.removeAll( newEntrySet );
-		HashSet<DPWidget> added = (HashSet<DPWidget>)newEntrySet.clone();
+		HashSet<DPElement> added = (HashSet<DPElement>)newEntrySet.clone();
 		added.removeAll( oldEntrySet );
 		
 		
-		for (DPWidget child: removed)
+		for (DPElement child: removed)
 		{
 			unregisterChild( child );
 		}
@@ -212,7 +212,7 @@ abstract public class DPContainerSequence extends DPContainer
 		registeredChildren.clear();
 		registeredChildren.addAll( Arrays.asList( newChildEntriesArray ) );
 		
-		for (DPWidget child: added)
+		for (DPElement child: added)
 		{
 			registerChild( child );
 		}
@@ -227,7 +227,7 @@ abstract public class DPContainerSequence extends DPContainer
 	{
 		index = JythonIndex.pyIndexToJava( index, size(), "BranchElement assignment index out of range" );
 
-		DPWidget child = registeredChildren.get( index );
+		DPElement child = registeredChildren.get( index );
 		unregisterChild( child );
 		registeredChildren.remove( index );
 		
@@ -237,13 +237,13 @@ abstract public class DPContainerSequence extends DPContainer
 	
 	public void __delitem__(PySlice slice)
 	{
-		DPWidget[] in = (DPWidget[])registeredChildren.toArray();
+		DPElement[] in = (DPElement[])registeredChildren.toArray();
 		
-		DPWidget[] removedArray = (DPWidget[])JythonSlice.arrayGetSlice( in, slice );
+		DPElement[] removedArray = (DPElement[])JythonSlice.arrayGetSlice( in, slice );
 		
-		DPWidget[] newChildEntriesArray = (DPWidget[])JythonSlice.arrayDelSlice( in, slice );
+		DPElement[] newChildEntriesArray = (DPElement[])JythonSlice.arrayDelSlice( in, slice );
 		
-		for (DPWidget child: removedArray)
+		for (DPElement child: removedArray)
 		{
 			unregisterChild( child );
 		}
@@ -258,7 +258,7 @@ abstract public class DPContainerSequence extends DPContainer
 	
 	
 	
-	public void append(DPWidget child)
+	public void append(DPElement child)
 	{
 		assert !hasChild( child );
 		
@@ -269,9 +269,9 @@ abstract public class DPContainerSequence extends DPContainer
 	}
 
 	
-	public void extend(List<DPWidget> children)
+	public void extend(List<DPElement> children)
 	{
-		for (DPWidget child: children)
+		for (DPElement child: children)
 		{
 			assert !hasChild( child );
 		}
@@ -280,7 +280,7 @@ abstract public class DPContainerSequence extends DPContainer
 		registeredChildren.ensureCapacity( start + children.size() );
 		for (int i = 0; i < children.size(); i++)
 		{
-			DPWidget child = children.get( i );
+			DPElement child = children.get( i );
 			registeredChildren.add( child );
 			registerChild( child );
 		}
@@ -289,13 +289,13 @@ abstract public class DPContainerSequence extends DPContainer
 		queueResize();
 	}
 	
-	public void extend(DPWidget[] children)
+	public void extend(DPElement[] children)
 	{
 		extend( Arrays.asList( children ) );
 	}
 	
 	
-	public void insert(int index, DPWidget child)
+	public void insert(int index, DPElement child)
 	{
 		assert !hasChild( child );
 		
@@ -306,7 +306,7 @@ abstract public class DPContainerSequence extends DPContainer
 	}
 	
 	
-	public void remove(DPWidget child)
+	public void remove(DPElement child)
 	{
 		assert hasChild( child );
 		
@@ -319,7 +319,7 @@ abstract public class DPContainerSequence extends DPContainer
 		
 
 
-	protected void replaceChildWithEmpty(DPWidget child)
+	protected void replaceChildWithEmpty(DPElement child)
 	{
 		int index = registeredChildren.indexOf( child );
 		set( index, new DPHiddenContent() );
@@ -329,7 +329,7 @@ abstract public class DPContainerSequence extends DPContainer
 
 	
 	
-	public List<DPWidget> getChildren()
+	public List<DPElement> getChildren()
 	{
 		return registeredChildren;
 	}
@@ -338,7 +338,7 @@ abstract public class DPContainerSequence extends DPContainer
 
 
 
-	protected double[] getChildrenAllocationX(List<DPWidget> nodes)
+	protected double[] getChildrenAllocationX(List<DPElement> nodes)
 	{
 		double[] values = new double[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
@@ -355,7 +355,7 @@ abstract public class DPContainerSequence extends DPContainer
 
 
 
-	protected double[] getChildrenAllocationY(List<DPWidget> nodes)
+	protected double[] getChildrenAllocationY(List<DPElement> nodes)
 	{
 		double[] values = new double[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)
@@ -372,7 +372,7 @@ abstract public class DPContainerSequence extends DPContainer
 
 
 
-	protected LAllocV[] getChildrenAllocV(List<DPWidget> nodes)
+	protected LAllocV[] getChildrenAllocV(List<DPElement> nodes)
 	{
 		LAllocV[] values = new LAllocV[nodes.size()];
 		for (int i = 0; i < nodes.size(); i++)

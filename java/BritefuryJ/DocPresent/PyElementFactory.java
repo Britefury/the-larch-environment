@@ -21,9 +21,9 @@ public class PyElementFactory implements ElementFactory
 	}
 	
 	
-	public DPWidget createElement(StyleSheet styleSheet)
+	public DPElement createElement(StyleSheet styleSheet)
 	{
-		return (DPWidget)Py.tojava( callable.__call__( Py.java2py( styleSheet ) ), DPWidget.class );
+		return (DPElement)Py.tojava( callable.__call__( Py.java2py( styleSheet ) ), DPElement.class );
 	}
 	
 	

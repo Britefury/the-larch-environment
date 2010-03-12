@@ -8,7 +8,7 @@ package BritefuryJ.DocPresent.ListView;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
@@ -22,6 +22,6 @@ public abstract class ListViewLayoutStyleSheet extends StyleSheet
 
 	
 	
-	public abstract DPWidget createListElement(List<DPWidget> children, PrimitiveStyleSheet primitiveStyle, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator,
+	public abstract DPElement createListElement(List<DPElement> children, PrimitiveStyleSheet primitiveStyle, ElementFactory beginDelim, ElementFactory endDelim, SeparatorElementFactory separator,
 			ElementFactory spacing, TrailingSeparator trailingSeparator);
 }

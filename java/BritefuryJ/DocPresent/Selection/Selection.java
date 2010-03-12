@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPFrame;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Marker.MarkerListener;
 
@@ -19,7 +19,7 @@ public class Selection implements MarkerListener
 	private Marker marker0, marker1;
 	
 	private Marker startMarker, endMarker;
-	private ArrayList<DPWidget> startPathFromCommonRoot, endPathFromCommonRoot;
+	private ArrayList<DPElement> startPathFromCommonRoot, endPathFromCommonRoot;
 	private DPContainer commonRoot;
 	protected ArrayList<SelectionListener> listeners;
 	
@@ -74,13 +74,13 @@ public class Selection implements MarkerListener
 		return endMarker;
 	}
 	
-	public ArrayList<DPWidget> getStartPathFromCommonRoot()
+	public ArrayList<DPElement> getStartPathFromCommonRoot()
 	{
 		refresh();
 		return startPathFromCommonRoot;
 	}
 	
-	public ArrayList<DPWidget> getEndPathFromCommonRoot()
+	public ArrayList<DPElement> getEndPathFromCommonRoot()
 	{
 		refresh();
 		return endPathFromCommonRoot;
@@ -171,11 +171,11 @@ public class Selection implements MarkerListener
 		{
 			if ( !marker0.equals( marker1 )  &&  marker0.isValid()  &&  marker1.isValid())
 			{
-				DPWidget w0 = marker0.getElement();
-				ArrayList<DPWidget> path0 = new ArrayList<DPWidget>();
-				DPWidget w1 = marker1.getElement();
-				ArrayList<DPWidget> path1 = new ArrayList<DPWidget>();
-				DPWidget.getPathsFromCommonSubtreeRoot( w0, path0, w1, path1 );
+				DPElement w0 = marker0.getElement();
+				ArrayList<DPElement> path0 = new ArrayList<DPElement>();
+				DPElement w1 = marker1.getElement();
+				ArrayList<DPElement> path1 = new ArrayList<DPElement>();
+				DPElement.getPathsFromCommonSubtreeRoot( w0, path0, w1, path1 );
 				
 				boolean bInOrder = true;
 				commonRoot = null;
@@ -189,7 +189,7 @@ public class Selection implements MarkerListener
 				{
 					if ( w0 != w1 )
 					{
-						throw new RuntimeException( "Paths have length 1, but widgets are different" );
+						throw new RuntimeException( "Paths have length 1, but elements are different" );
 					}
 					bInOrder = marker0.getIndex()  <  marker1.getIndex();
 				}

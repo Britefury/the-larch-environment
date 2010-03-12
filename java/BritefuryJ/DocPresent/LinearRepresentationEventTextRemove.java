@@ -10,7 +10,7 @@ public class LinearRepresentationEventTextRemove extends LinearRepresentationEve
 {
 	protected int position, length;
 	
-	public LinearRepresentationEventTextRemove(DPWidget sourceElement, int position, int length)
+	public LinearRepresentationEventTextRemove(DPElement sourceElement, int position, int length)
 	{
 		super( sourceElement );
 		

@@ -17,7 +17,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
 import BritefuryJ.DocPresent.DPPresentationArea;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Caret.Caret;
 
 public class ElementTreeExplorer implements WindowListener
@@ -100,13 +100,13 @@ public class ElementTreeExplorer implements WindowListener
 				Caret caret = tree.getCaret();
 				if ( caret != null )
 				{
-					DPWidget caretElement = caret.getMarker().getElement();
+					DPElement caretElement = caret.getMarker().getElement();
 					if ( caretElement != null )
 					{
-						DPWidget metaCaretWidget = caretElement.getMetaElement();
-						if ( metaCaretWidget != null )
+						DPElement metaCaretElement = caretElement.getMetaElement();
+						if ( metaCaretElement != null )
 						{
-							metaArea.focusOn( metaCaretWidget );
+							metaArea.focusOn( metaCaretElement );
 						}
 					}
 				}

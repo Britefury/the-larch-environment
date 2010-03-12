@@ -14,15 +14,15 @@ import java.util.HashMap;
 
 import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPPresentationArea;
-import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.ElementContext;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 import BritefuryJ.ParserHelpers.DebugNode;
 import BritefuryJ.ParserHelpers.DebugParseResultInterface;
 
-public class ParseView implements ElementContext
+public class ParseView implements FragmentContext
 {
 	private static class DPViewBin extends DPBin
 	{
@@ -74,8 +74,8 @@ public class ParseView implements ElementContext
 		{
 			if ( curve == null )
 			{
-				DPWidget wa = a.getNodeWidget();
-				DPWidget wb = b.getNodeWidget();
+				DPElement wa = a.getNodeElement();
+				DPElement wb = b.getNodeElement();
 				
 				Point2 p1 = wa.getLocalPointRelativeTo( parseView.bin, new Point2( wa.getAllocation().x, wa.getAllocation().y * 0.5 ) );
 				Point2 p4 = wb.getLocalPointRelativeTo( parseView.bin, new Point2( 0.0, wb.getAllocation().y * 0.5 ) );
@@ -149,7 +149,7 @@ public class ParseView implements ElementContext
 		
 		root.registerEdges();
 		
-		bin.setChild( root.getWidget() );
+		bin.setChild( root.getElement() );
 		area.setChild( bin );
 		area.disableHorizontalClamping();
 	}

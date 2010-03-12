@@ -10,7 +10,7 @@ package BritefuryJ.DocPresent.Caret;
 import BritefuryJ.DocPresent.DPContentLeaf;
 import BritefuryJ.DocPresent.DPContentLeafEditable;
 import BritefuryJ.DocPresent.DPSegment;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Marker.MarkerListener;
 import BritefuryJ.Math.Point2;
@@ -19,7 +19,7 @@ public class Caret implements MarkerListener
 {
 	protected Marker marker;
 	protected CaretListener listener;
-	protected DPWidget grabElement = null;
+	protected DPElement grabElement = null;
 	
 	
 	
@@ -92,7 +92,7 @@ public class Caret implements MarkerListener
 	//
 	//
 	
-	public void grab(DPWidget element)
+	public void grab(DPElement element)
 	{
 		if ( element != grabElement )
 		{
@@ -109,7 +109,7 @@ public class Caret implements MarkerListener
 		}
 	}
 	
-	public void ungrab(DPWidget element)
+	public void ungrab(DPElement element)
 	{
 		if ( element == grabElement )
 		{
@@ -117,7 +117,7 @@ public class Caret implements MarkerListener
 		}
 	}
 	
-	private boolean isElementWithinGrabSubtree(DPWidget element)
+	private boolean isElementWithinGrabSubtree(DPElement element)
 	{
 		if ( grabElement == null )
 		{

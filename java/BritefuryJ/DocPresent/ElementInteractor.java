@@ -17,85 +17,85 @@ import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 
 public abstract class ElementInteractor
 {
-	public boolean onButtonDown(DPWidget element, PointerButtonEvent event)
+	public boolean onButtonDown(DPElement element, PointerButtonEvent event)
 	{
 		return false;
 	}
 	
-	public boolean onButtonDown2(DPWidget element, PointerButtonEvent event)
+	public boolean onButtonDown2(DPElement element, PointerButtonEvent event)
 	{
 		return false;
 	}
 	
-	public boolean onButtonDown3(DPWidget element, PointerButtonEvent event)
+	public boolean onButtonDown3(DPElement element, PointerButtonEvent event)
 	{
 		return false;
 	}
 	
-	public boolean onButtonUp(DPWidget element, PointerButtonEvent event)
+	public boolean onButtonUp(DPElement element, PointerButtonEvent event)
 	{
 		return false;
 	}
 	
-	public boolean onContextButton(DPWidget element, ContextMenu menu)
+	public boolean onContextButton(DPElement element, ContextMenu menu)
 	{
 		return false;
 	}
 	
 
-	public void onMotion(DPWidget element, PointerMotionEvent event)
+	public void onMotion(DPElement element, PointerMotionEvent event)
 	{
 	}
 	
-	public void onDrag(DPWidget element, PointerMotionEvent event)
+	public void onDrag(DPElement element, PointerMotionEvent event)
 	{
 	}
 	
-	public void onEnter(DPWidget element, PointerMotionEvent event)
+	public void onEnter(DPElement element, PointerMotionEvent event)
 	{
 	}
 	
-	public void onLeave(DPWidget element, PointerMotionEvent event)
-	{
-	}
-	
-	
-	public boolean onScroll(DPWidget element, PointerScrollEvent event)
-	{
-		return false;
-	}
-
-	
-	public void onCaretEnter(DPWidget element, Caret c)
-	{
-	}
-
-	public void onCaretLeave(DPWidget element, Caret c)
+	public void onLeave(DPElement element, PointerMotionEvent event)
 	{
 	}
 	
 	
-	public boolean onKeyPress(DPWidget element, KeyEvent event)
-	{
-		return false;
-	}
-	
-	public boolean onKeyRelease(DPWidget element, KeyEvent event)
-	{
-		return false;
-	}
-	
-	public boolean onKeyTyped(DPWidget element, KeyEvent event)
+	public boolean onScroll(DPElement element, PointerScrollEvent event)
 	{
 		return false;
 	}
 
 	
-	public void drawBackground(DPWidget element, Graphics2D graphics)
+	public void onCaretEnter(DPElement element, Caret c)
 	{
 	}
 
-	public void draw(DPWidget element, Graphics2D graphics)
+	public void onCaretLeave(DPElement element, Caret c)
+	{
+	}
+	
+	
+	public boolean onKeyPress(DPElement element, KeyEvent event)
+	{
+		return false;
+	}
+	
+	public boolean onKeyRelease(DPElement element, KeyEvent event)
+	{
+		return false;
+	}
+	
+	public boolean onKeyTyped(DPElement element, KeyEvent event)
+	{
+		return false;
+	}
+
+	
+	public void drawBackground(DPElement element, Graphics2D graphics)
+	{
+	}
+
+	public void draw(DPElement element, Graphics2D graphics)
 	{
 	}
 }

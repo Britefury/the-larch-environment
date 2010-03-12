@@ -8,7 +8,7 @@ package BritefuryJ.DocPresent;
 
 public class LinearRepresentationEventTextEdit extends LinearRepresentationEvent
 {
-	public LinearRepresentationEventTextEdit(DPWidget sourceElement)
+	public LinearRepresentationEventTextEdit(DPElement sourceElement)
 	{
 		super( sourceElement );
 	}

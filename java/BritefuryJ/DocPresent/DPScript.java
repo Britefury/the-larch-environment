@@ -30,7 +30,7 @@ public class DPScript extends DPContainer
 	
 	
 	
-	protected DPWidget[] children;
+	protected DPElement[] children;
 	protected DPSegment segs[];
 	protected DPParagraph paras[];
 	TextStyleParams segmentTextStyleParams;
@@ -49,26 +49,26 @@ public class DPScript extends DPContainer
 		
 		this.segmentTextStyleParams = segmentTextStyleParams;
 		
-		children = new DPWidget[NUMCHILDREN];
+		children = new DPElement[NUMCHILDREN];
 		segs = new DPSegment[NUMCHILDREN];
 		paras = new DPParagraph[NUMCHILDREN];
 	}
 
 	
 	
-	public DPWidget getChild(int slot)
+	public DPElement getChild(int slot)
 	{
 		return children[slot];
 	}
 	
-	public DPWidget getWrappedChild(int slot)
+	public DPElement getWrappedChild(int slot)
 	{
 		return paras[slot];
 	}
 	
-	public void setChild(int slot, DPWidget child)
+	public void setChild(int slot, DPElement child)
 	{
-		DPWidget existingChild = children[slot];
+		DPElement existingChild = children[slot];
 		if ( child != existingChild )
 		{
 			boolean bSegmentRequired = child != null;
@@ -79,7 +79,7 @@ public class DPScript extends DPContainer
 				DPSegment seg = new DPSegment( (ContainerStyleParams)getStyleParams(), segmentTextStyleParams, isBeginGuardRequired( slot ), isEndGuardRequired( slot ) );
 				segs[slot] = seg;
 				DPParagraph para = new DPParagraph( );
-				para.setChildren( Arrays.asList( new DPWidget[] { seg } ) );
+				para.setChildren( Arrays.asList( new DPElement[] { seg } ) );
 				paras[slot] = para;
 				
 				int insertIndex = 0;
@@ -132,79 +132,79 @@ public class DPScript extends DPContainer
 	
 	
 	
-	public DPWidget getMainChild()
+	public DPElement getMainChild()
 	{
 		return getChild( MAIN );
 	}
 	
-	public DPWidget getLeftSuperscriptChild()
+	public DPElement getLeftSuperscriptChild()
 	{
 		return getChild( LEFTSUPER );
 	}
 	
-	public DPWidget getLeftSubscriptChild()
+	public DPElement getLeftSubscriptChild()
 	{
 		return getChild( LEFTSUB );
 	}
 	
-	public DPWidget getRightSuperscriptChild()
+	public DPElement getRightSuperscriptChild()
 	{
 		return getChild( RIGHTSUPER );
 	}
 	
-	public DPWidget getRightSubscriptChild()
+	public DPElement getRightSubscriptChild()
 	{
 		return getChild( RIGHTSUB );
 	}
 	
 	
-	public DPWidget getWrappedMainChild()
+	public DPElement getWrappedMainChild()
 	{
 		return getWrappedChild( MAIN );
 	}
 	
-	public DPWidget getWrappedLeftSuperscriptChild()
+	public DPElement getWrappedLeftSuperscriptChild()
 	{
 		return getWrappedChild( LEFTSUPER );
 	}
 	
-	public DPWidget getWrappedLeftSubscriptChild()
+	public DPElement getWrappedLeftSubscriptChild()
 	{
 		return getWrappedChild( LEFTSUB );
 	}
 	
-	public DPWidget getWrappedRightSuperscriptChild()
+	public DPElement getWrappedRightSuperscriptChild()
 	{
 		return getWrappedChild( RIGHTSUPER );
 	}
 	
-	public DPWidget getWrappedRightSubscriptChild()
+	public DPElement getWrappedRightSubscriptChild()
 	{
 		return getWrappedChild( RIGHTSUB );
 	}
 	
 	
-	public void setMainChild(DPWidget child)
+	public void setMainChild(DPElement child)
 	{
 		setChild( MAIN, child );
 	}
 	
-	public void setLeftSuperscriptChild(DPWidget child)
+	public void setLeftSuperscriptChild(DPElement child)
 	{
 		setChild( LEFTSUPER, child );
 	}
 	
-	public void setLeftSubscriptChild(DPWidget child)
+	public void setLeftSubscriptChild(DPElement child)
 	{
 		setChild( LEFTSUB, child );
 	}
 	
-	public void setRightSuperscriptChild(DPWidget child)
+	public void setRightSuperscriptChild(DPElement child)
 	{
 		setChild( RIGHTSUPER, child );
 	}
 	
-	public void setRightSubscriptChild(DPWidget child)
+	public void setRightSubscriptChild(DPElement child)
 	{
 		setChild( RIGHTSUB, child );
 	}
@@ -212,14 +212,14 @@ public class DPScript extends DPContainer
 
 	
 	
-	protected double getInternalChildScale(DPWidget child)
+	protected double getInternalChildScale(DPElement child)
 	{
 		return child == paras[MAIN]  ?  1.0  :  childScale;
 	}
 	
 
 	
-	protected void replaceChildWithEmpty(DPWidget child)
+	protected void replaceChildWithEmpty(DPElement child)
 	{
 		int slot = Arrays.asList( children ).indexOf( child );
 		setChild( slot, null );
@@ -227,7 +227,7 @@ public class DPScript extends DPContainer
 	
 	
 	
-	public List<DPWidget> getChildren()
+	public List<DPElement> getChildren()
 	{
 		return registeredChildren;
 	}

@@ -10,7 +10,7 @@ import java.awt.Color;
 import java.awt.Font;
 
 import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.SimpleDndHandler;
 import BritefuryJ.DocPresent.Painter.FillPainter;
@@ -43,10 +43,10 @@ public class DndTestPage extends SystemPage
 	
 	
 	
-	protected DPWidget makeSourceElement(String title, final String dragData)
+	protected DPElement makeSourceElement(String title, final String dragData)
 	{
 		final DPText textElement = textStyle.text( title );
-		DPWidget source = sourceStyle.box( textElement.pad( 10.0, 10.0 ) );
+		DPElement source = sourceStyle.box( textElement.pad( 10.0, 10.0 ) );
 		
 		SimpleDndHandler.SourceDataFn sourceDataFn = new SimpleDndHandler.SourceDataFn()
 		{
@@ -64,10 +64,10 @@ public class DndTestPage extends SystemPage
 		return source;
 	}
 	
-	protected DPWidget makeDestElement(String title)
+	protected DPElement makeDestElement(String title)
 	{
 		final DPText textElement = textStyle.text( title );
-		DPWidget dest = destStyle.box( textElement.pad( 10.0, 10.0 ) );
+		DPElement dest = destStyle.box( textElement.pad( 10.0, 10.0 ) );
 
 		SimpleDndHandler.DropFn dropFn = new SimpleDndHandler.DropFn()
 		{
@@ -90,15 +90,15 @@ public class DndTestPage extends SystemPage
 	
 
 	
-	protected DPWidget createContents()
+	protected DPElement createContents()
 	{
-		DPWidget source0 = makeSourceElement( "abc", "abc" );
-		DPWidget source1 = makeSourceElement( "xyz", "xyz" );
+		DPElement source0 = makeSourceElement( "abc", "abc" );
+		DPElement source1 = makeSourceElement( "xyz", "xyz" );
 
-		DPWidget dest0 = makeDestElement( "abc" );
-		DPWidget dest1 = makeDestElement( "xyz" );
+		DPElement dest0 = makeDestElement( "abc" );
+		DPElement dest1 = makeDestElement( "xyz" );
 		
-		return tableStyle.table( new DPWidget[][] { { styleSheet.text( "Source:" ), source0, source1 },
+		return tableStyle.table( new DPElement[][] { { styleSheet.text( "Source:" ), source0, source1 },
 				{ styleSheet.text( "Destination:" ), dest0, dest1 } } ).padY( 10.0 );
 	}
 }

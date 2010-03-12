@@ -78,7 +78,7 @@ class ParsedExpressionLinearRepresentationListener (ElementLinearRepresentationL
 
 	def linearRepresentationModified(self, element, event):
 		value = element.getLinearRepresentation()
-		ctx = element.getContext()
+		ctx = element.getFragmentContext()
 		node = ctx.getDocNode()
 		if '\n' not in value:
 			#parsed = parseText( self._parser, value, self._outerPrecedence )
@@ -138,7 +138,7 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it
 		if not isinstance( event, SelectionLinearRepresentationEvent )  or  event.getSourceElement() is not element:
 			element.clearStructuralRepresentation()
-		ctx = element.getContext()
+		ctx = element.getFragmentContext()
 		node = ctx.getDocNode()
 		# Get the content
 		value = element.getLinearRepresentation()
@@ -165,7 +165,7 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 				# Statement has been replaced by unparsed content
 				# Only edit the innermost node around the element that is the source of the event
 				sourceElement = event.getSourceElement()
-				sourceCtx = sourceElement.getContext()
+				sourceCtx = sourceElement.getFragmentContext()
 				if sourceCtx is None:
 					print 'NULL SOURCE CONTEXT: ', sourceElement
 				sourceCtxElement = sourceCtx.getViewNodeContentElement()
@@ -213,7 +213,7 @@ class CompoundHeaderLinearRepresentationListener (ElementLinearRepresentationLis
 		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it
 		if not isinstance( event, SelectionLinearRepresentationEvent )  or  event.getSourceElement() is not element:
 			element.clearStructuralRepresentation()
-		ctx = element.getContext()
+		ctx = element.getFragmentContext()
 		# Get the content
 		value = element.getLinearRepresentation()
 		parsed = parseStream( self._parser, value )
@@ -254,7 +254,7 @@ class SuiteLinearRepresentationListener (ElementLinearRepresentationListener):
 		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it
 		if not isinstance( event, SelectionLinearRepresentationEvent )  or  event.getSourceElement() is not element:
 			element.clearStructuralRepresentation()
-		ctx = element.getContext()
+		ctx = element.getFragmentContext()
 		# Get the content
 		value = element.getLinearRepresentation()
 		parsed = parseStream( self._parser, value )
@@ -280,7 +280,7 @@ class StatementIndentationInteractor (ElementInteractor):
 		
 	def onKeyTyped(self, element, event):
 		if event.getKeyChar() == '\t':
-			context = element.getContext()
+			context = element.getFragmentContext()
 			node = context.getDocNode()
 			
 			editHandler = context.getViewContext().getEditHandler()

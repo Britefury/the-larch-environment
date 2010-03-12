@@ -9,8 +9,8 @@ package BritefuryJ.DocPresent.LayoutTree;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPFraction;
-import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.WidgetFilter;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.ElementFilter;
 import BritefuryJ.DocPresent.Layout.FractionLayout;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
 import BritefuryJ.DocPresent.Layout.LAllocV;
@@ -73,7 +73,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 		LReqBoxInterface boxes[] = new LReqBoxInterface[NUMCHILDREN];
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			DPWidget child = frac.getWrappedChild( i );
+			DPElement child = frac.getWrappedChild( i );
 			if ( i != BAR )
 			{
 				boxes[i] = child != null  ?  child.getLayoutNode().refreshRequisitionX().scaledRequisition( childScale )  :  null;
@@ -96,7 +96,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 		LReqBoxInterface boxes[] = new LReqBoxInterface[NUMCHILDREN];
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			DPWidget child = frac.getWrappedChild( i );
+			DPElement child = frac.getWrappedChild( i );
 			if ( i != BAR )
 			{
 				boxes[i] = child != null  ?  child.getLayoutNode().refreshRequisitionY().scaledRequisition( childScale )  :  null;
@@ -125,7 +125,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 		double prevChildWidths[] = new double[NUMCHILDREN];
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			DPWidget child = frac.getWrappedChild( i );
+			DPElement child = frac.getWrappedChild( i );
 			if ( i != BAR )
 			{
 				reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox().scaledRequisition( childScale )  :  null;
@@ -145,7 +145,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 		
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			DPWidget child = frac.getWrappedChild( i );
+			DPElement child = frac.getWrappedChild( i );
 			if ( child != null )
 			{
 				if ( i != BAR )
@@ -171,7 +171,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 		LAllocV prevChildAllocVs[] = new LAllocV[NUMCHILDREN];
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			DPWidget child = frac.getWrappedChild( i );
+			DPElement child = frac.getWrappedChild( i );
 			if ( i != BAR )
 			{
 				reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox().scaledRequisition( childScale )  :  null;
@@ -191,7 +191,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 		
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
-			DPWidget child = frac.getWrappedChild( i );
+			DPElement child = frac.getWrappedChild( i );
 			if ( child != null )
 			{
 				if ( i != BAR )
@@ -205,7 +205,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 	
 	
 
-	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
+	protected DPElement getChildLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
 	{
 		return getChildLeafClosestToLocalPointVertical( element.getLayoutChildren(), localPos, filter );
 	}
@@ -216,12 +216,12 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 	// Focus navigation methods
 	//
 	
-	public List<DPWidget> horizontalNavigationList()
+	public List<DPElement> horizontalNavigationList()
 	{
 		return verticalNavigationList();
 	}
 
-	public List<DPWidget> verticalNavigationList()
+	public List<DPElement> verticalNavigationList()
 	{
 		return element.getLayoutChildren();
 	}

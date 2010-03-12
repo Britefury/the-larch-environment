@@ -88,7 +88,7 @@ def isIndentedBlock(node):
 #
 
 def getStatementContextFromElement(element):
-	context = element.getContext()
+	context = element.getFragmentContext()
 	
 	assert context is not None
 	

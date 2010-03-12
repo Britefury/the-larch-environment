@@ -17,7 +17,7 @@ import org.python.core.PyObject;
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPFrame;
 import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.EditHandler;
 import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.Caret.Caret;
@@ -68,12 +68,12 @@ public class TextEntry extends Control
 		}
 		
 		
-		public boolean onKeyPress(DPWidget element, KeyEvent event)
+		public boolean onKeyPress(DPElement element, KeyEvent event)
 		{
 			return event.getKeyCode() == KeyEvent.VK_ENTER  ||  event.getKeyCode() == KeyEvent.VK_ESCAPE;
 		}
 
-		public boolean onKeyRelease(DPWidget element, KeyEvent event)
+		public boolean onKeyRelease(DPElement element, KeyEvent event)
 		{
 			if ( event.getKeyCode() == KeyEvent.VK_ENTER )
 			{
@@ -88,7 +88,7 @@ public class TextEntry extends Control
 			return false;
 		}
 
-		public boolean onKeyTyped(DPWidget element, KeyEvent event)
+		public boolean onKeyTyped(DPElement element, KeyEvent event)
 		{
 			return event.getKeyChar() == KeyEvent.VK_ENTER  ||  event.getKeyChar() == KeyEvent.VK_ESCAPE;
 		}
@@ -176,7 +176,7 @@ public class TextEntry extends Control
 	}
 	
 	
-	public DPWidget getElement()
+	public DPElement getElement()
 	{
 		return outerElement;
 	}

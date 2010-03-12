@@ -9,8 +9,8 @@ package BritefuryJ.DocPresent.LayoutTree;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPVBox;
-import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.WidgetFilter;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.ElementFilter;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
@@ -82,7 +82,7 @@ public class LayoutNodeVBox extends LayoutNodeAbstractBox
 	
 	
 	
-	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
+	protected DPElement getChildLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
 	{
 		return getChildLeafClosestToLocalPointVertical( getLeaves(), localPos, filter );
 	}
@@ -93,8 +93,8 @@ public class LayoutNodeVBox extends LayoutNodeAbstractBox
 	{
 		refreshSubtree();
 		
-		DPWidget startLeaf = leaves[rangeStart];
-		DPWidget endLeaf = leaves[rangeEnd-1];
+		DPElement startLeaf = leaves[rangeStart];
+		DPElement endLeaf = leaves[rangeEnd-1];
 		double yStart = startLeaf.getPositionInParentSpaceY();
 		double yEnd = endLeaf.getPositionInParentSpaceY()  +  endLeaf.getAllocationInParentSpaceY();
 		AABox2 box = new AABox2( 0.0, yStart, getAllocationX(), yEnd );
@@ -107,12 +107,12 @@ public class LayoutNodeVBox extends LayoutNodeAbstractBox
 	// Focus navigation methods
 	//
 	
-	public List<DPWidget> horizontalNavigationList()
+	public List<DPElement> horizontalNavigationList()
 	{
 		return getLeaves();
 	}
 	
-	public List<DPWidget> verticalNavigationList()
+	public List<DPElement> verticalNavigationList()
 	{
 		return getLeaves();
 	}

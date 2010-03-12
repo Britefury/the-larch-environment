@@ -15,7 +15,7 @@ import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPHiddenContent;
 import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 
 public class ElementContentTest extends TestCase
 {
@@ -57,7 +57,7 @@ public class ElementContentTest extends TestCase
 		DPText t3 = new DPText( "stu" );
 		
 		DPHBox p = new DPHBox( );
-		DPWidget[] t = { t0, t1, t2, t3 };
+		DPElement[] t = { t0, t1, t2, t3 };
 		
 		p.setChildren( Arrays.asList( t ) );
 		
@@ -76,7 +76,7 @@ public class ElementContentTest extends TestCase
 		DPText ta3 = new DPText( "stu" );
 
 		DPHBox pa = new DPHBox( );
-		DPWidget[] ta = { ta0, ta1, ta2, ta3 };
+		DPElement[] ta = { ta0, ta1, ta2, ta3 };
 		pa.setChildren( Arrays.asList( ta ) );
 		
 		DPHiddenContent e = new DPHiddenContent( );
@@ -88,7 +88,7 @@ public class ElementContentTest extends TestCase
 		DPText tb2 = new DPText( "z" );
 
 		DPHBox pb = new DPHBox( );
-		DPWidget[] tb = { tb0, tb1, tb2 };
+		DPElement[] tb = { tb0, tb1, tb2 };
 		pb.setChildren( Arrays.asList( tb ) );
 		
 		DPBin b = new DPBin( );
@@ -101,11 +101,11 @@ public class ElementContentTest extends TestCase
 		
 		
 		DPHBox root = new DPHBox( );
-		DPWidget[] rootChildren = { pa, e, b, tx, ty };
+		DPElement[] rootChildren = { pa, e, b, tx, ty };
 		root.setChildren( Arrays.asList( rootChildren ) );
 		
 		
-		// Test getContent() and getContentLength() of all widgets
+		// Test getContent() and getContentLength() of all elements
 		assertEquals( ta0.getTextRepresentation(), "abc" );
 		assertEquals( ta0.getTextRepresentationLength(), 3 );
 		
@@ -140,7 +140,7 @@ public class ElementContentTest extends TestCase
 		assertEquals( root.getTextRepresentationOffsetOfChild( ty ), 19 );
 		
 		// Test getChildAtContentPosition() for containers
-		DPWidget[] getChildAtContentPositionResultsPA = { ta0, ta0, ta0, ta1, ta1, ta1, ta2, ta2, ta2, ta3, ta3, ta3, null };
+		DPElement[] getChildAtContentPositionResultsPA = { ta0, ta0, ta0, ta1, ta1, ta1, ta2, ta2, ta2, ta3, ta3, ta3, null };
 		for (int i = 0; i < getChildAtContentPositionResultsPA.length; i++)
 		{
 			assertSame( pa.getChildAtTextRepresentationPosition( i ), getChildAtContentPositionResultsPA[i] );
@@ -162,7 +162,7 @@ public class ElementContentTest extends TestCase
 		assertEquals( root.getChildAtTextRepresentationPosition( 21 ), null );
 
 		
-		// Test getLeafAtContentPosition() for widgets
+		// Test getLeafAtContentPosition() for elements
 		assertSame( ta0.getLeafAtTextRepresentationPosition( 0 ), ta0 );
 		
 		assertNull( e.getLeafAtTextRepresentationPosition( 0 ) );
@@ -195,7 +195,7 @@ public class ElementContentTest extends TestCase
 		assertEquals( b.getLeafAtTextRepresentationPosition( 4 ), tb2 );
 		
 		
-		// Test getContentOffsetInSubtree() for widgets
+		// Test getContentOffsetInSubtree() for elements
 		assertEquals( ta0.getTextRepresentationOffsetInSubtree( pa ), 0 );
 		assertEquals( ta3.getTextRepresentationOffsetInSubtree( pa ), 9 );
 		assertEquals( ta0.getTextRepresentationOffsetInSubtree( root ), 0 );
@@ -218,7 +218,7 @@ public class ElementContentTest extends TestCase
 		DPText ta3 = new DPText( "stu" );
 
 		DPParagraph pa = new DPParagraph( );
-		DPWidget[] ta = { ta0, ta1, ta2, ta3 };
+		DPElement[] ta = { ta0, ta1, ta2, ta3 };
 		pa.setChildren( Arrays.asList( ta ) );
 		
 		DPHiddenContent e = new DPHiddenContent( );
@@ -230,7 +230,7 @@ public class ElementContentTest extends TestCase
 		DPText tb2 = new DPText( "z" );
 
 		DPParagraph pb = new DPParagraph( );
-		DPWidget[] tb = { tb0, tb1, tb2 };
+		DPElement[] tb = { tb0, tb1, tb2 };
 		pb.setChildren( Arrays.asList( tb ) );
 		
 		
@@ -239,11 +239,11 @@ public class ElementContentTest extends TestCase
 		
 		
 		DPParagraph root = new DPParagraph( );
-		DPWidget[] rootChildren = { pa, e, pb, tx, ty };
+		DPElement[] rootChildren = { pa, e, pb, tx, ty };
 		root.setChildren( Arrays.asList( rootChildren ) );
 		
 		
-		// Test getContent() and getContentLength() of all widgets
+		// Test getContent() and getContentLength() of all elements
 		assertEquals( ta0.getTextRepresentation(), "abc" );
 		assertEquals( ta0.getTextRepresentationLength(), 3 );
 		
@@ -272,7 +272,7 @@ public class ElementContentTest extends TestCase
 		assertEquals( root.getTextRepresentationOffsetOfChild( ty ), 19 );
 		
 		// Test getChildAtContentPosition() for containers
-		DPWidget[] getChildAtContentPositionResultsPA = { ta0, ta0, ta0, ta1, ta1, ta1, ta2, ta2, ta2, ta3, ta3, ta3, null };
+		DPElement[] getChildAtContentPositionResultsPA = { ta0, ta0, ta0, ta1, ta1, ta1, ta2, ta2, ta2, ta3, ta3, ta3, null };
 		for (int i = 0; i < getChildAtContentPositionResultsPA.length; i++)
 		{
 			assertSame( pa.getChildAtTextRepresentationPosition( i ), getChildAtContentPositionResultsPA[i] );
@@ -288,7 +288,7 @@ public class ElementContentTest extends TestCase
 		assertEquals( root.getChildAtTextRepresentationPosition( 21 ), null );
 
 		
-		// Test getLeafAtContentPosition() for widgets
+		// Test getLeafAtContentPosition() for elements
 		assertSame( ta0.getLeafAtTextRepresentationPosition( 0 ), ta0 );
 		
 		assertNull( e.getLeafAtTextRepresentationPosition( 0 ) );
@@ -316,7 +316,7 @@ public class ElementContentTest extends TestCase
 		
 		
 		
-		// Test getContentOffsetInSubtree() for widgets
+		// Test getContentOffsetInSubtree() for elements
 		assertEquals( ta0.getTextRepresentationOffsetInSubtree( pa ), 0 );
 		assertEquals( ta3.getTextRepresentationOffsetInSubtree( pa ), 9 );
 		assertEquals( ta0.getTextRepresentationOffsetInSubtree( root ), 0 );

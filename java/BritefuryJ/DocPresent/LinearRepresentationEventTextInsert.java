@@ -11,7 +11,7 @@ public class LinearRepresentationEventTextInsert extends LinearRepresentationEve
 	protected int position;
 	protected String textInserted;
 	
-	public LinearRepresentationEventTextInsert(DPWidget sourceElement, int position, String textInserted)
+	public LinearRepresentationEventTextInsert(DPElement sourceElement, int position, String textInserted)
 	{
 		super( sourceElement );
 		

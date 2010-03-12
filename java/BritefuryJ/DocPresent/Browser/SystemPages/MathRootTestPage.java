@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class MathRootTestPage extends SystemPage
@@ -36,15 +36,15 @@ public class MathRootTestPage extends SystemPage
 	private static PrimitiveStyleSheet textStyleSheet = styleSheet.withForeground( new Color( 0.0f, 0.5f, 0.0f ) );
 
 	
-	private DPWidget makeFraction(String numeratorText, String denominatorText)
+	private DPElement makeFraction(String numeratorText, String denominatorText)
 	{
 		return styleSheet.fraction( textStyleSheet.text( numeratorText ), textStyleSheet.text( denominatorText ), "/" );
 	}
 
 	
-	protected DPWidget createContents()
+	protected DPElement createContents()
 	{
-		ArrayList<DPWidget> children = new ArrayList<DPWidget>( );
+		ArrayList<DPElement> children = new ArrayList<DPElement>( );
 		
 		children.add( rootStyleSheet.mathRoot( textStyleSheet.text( "a" ) ) );
 		children.add( rootStyleSheet.mathRoot( textStyleSheet.text( "a+p" ) ) );

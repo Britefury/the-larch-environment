@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.util.Arrays;
 
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
@@ -33,21 +33,21 @@ public class BorderTestPage extends SystemPage
 	}
 
 
-	protected DPWidget createContents()
+	protected DPElement createContents()
 	{
 		PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
 		
-		DPWidget onePixelBorder = styleSheet.border( styleSheet.text( "Normal 1-pixel border" ) );
+		DPElement onePixelBorder = styleSheet.border( styleSheet.text( "Normal 1-pixel border" ) );
 		
-		DPWidget padded = styleSheet.border( styleSheet.text( "Padding: 30 pixels of padding all round, via the pad() method" ).pad( 30.0, 30.0 ) );
+		DPElement padded = styleSheet.border( styleSheet.text( "Padding: 30 pixels of padding all round, via the pad() method" ).pad( 30.0, 30.0 ) );
 		
-		DPWidget emptyBorder = styleSheet.withBorder( new EmptyBorder( 50.0, 50.0, 20.0, 20.0, 20.0, 20.0, new Color( 0.8f, 0.8f, 0.8f ) ) ).border(
+		DPElement emptyBorder = styleSheet.withBorder( new EmptyBorder( 50.0, 50.0, 20.0, 20.0, 20.0, 20.0, new Color( 0.8f, 0.8f, 0.8f ) ) ).border(
 				styleSheet.text( "Empty border: 50 pixel h-margins, 20 pixel v-margins, 20 pixel rounding, light-grey background"  ) );
 		
-		DPWidget solidBorder = styleSheet.withBorder( new SolidBorder( 3.0f, 10.0, 20.0, 20.0, new Color( 0.6f, 0.6f, 0.6f ), new Color( 0.8f, 0.8f, 0.8f ) ) ).border(
+		DPElement solidBorder = styleSheet.withBorder( new SolidBorder( 3.0f, 10.0, 20.0, 20.0, new Color( 0.6f, 0.6f, 0.6f ), new Color( 0.8f, 0.8f, 0.8f ) ) ).border(
 				styleSheet.text( "Solid border: 3 pixel thickness, 10 pixel inset (margin), 20 pixel rounding, grey border, light-grey background" ) );
 		
 		
-		return styleSheet.withVBoxSpacing( 10.0 ).vbox( Arrays.asList( new DPWidget[] { onePixelBorder, padded, emptyBorder, solidBorder } ) );
+		return styleSheet.withVBoxSpacing( 10.0 ).vbox( Arrays.asList( new DPElement[] { onePixelBorder, padded, emptyBorder, solidBorder } ) );
 	}
 }

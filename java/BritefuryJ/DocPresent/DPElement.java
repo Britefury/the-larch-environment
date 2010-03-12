@@ -46,7 +46,7 @@ import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueSequence;
 import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueStream;
 import BritefuryJ.DocPresent.StyleParams.HBoxStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
-import BritefuryJ.DocPresent.StyleParams.WidgetStyleParams;
+import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -59,7 +59,7 @@ import BritefuryJ.Utils.HashUtils;
 
 
 
-abstract public class DPWidget extends PointerInputElement
+abstract public class DPElement extends PointerInputElement
 {
 	protected static double NON_TYPESET_CHILD_BASELINE_OFFSET = -5.0;
 	
@@ -257,7 +257,7 @@ abstract public class DPWidget extends PointerInputElement
 	
 	protected int flags;
 	
-	protected WidgetStyleParams styleParams;
+	protected ElementStyleParams styleParams;
 	protected DPContainer parent;
 	protected DPPresentationArea presentationArea;
 	
@@ -265,7 +265,7 @@ abstract public class DPWidget extends PointerInputElement
 	
 	private InteractionFields interactionFields;
 
-	protected DPWidget metaElement;
+	protected DPElement metaElement;
 	protected String debugName; 
 	
 	protected StructuralRepresentation structuralRepresentation;
@@ -282,7 +282,7 @@ abstract public class DPWidget extends PointerInputElement
 	// These fields would be null/non-existant for the vast majority of elements, so store them in a global dictionary to
 	// save space
 	
-	private static WeakHashMap<DPWidget, ArrayList<Runnable>> waitingImmediateEventsByWidget = new WeakHashMap<DPWidget, ArrayList<Runnable>>();
+	private static WeakHashMap<DPElement, ArrayList<Runnable>> waitingImmediateEventsByElement = new WeakHashMap<DPElement, ArrayList<Runnable>>();
 	
 	
 	
@@ -301,12 +301,12 @@ abstract public class DPWidget extends PointerInputElement
 	//
 	//
 	
-	public DPWidget()
+	public DPElement()
 	{
-		this( WidgetStyleParams.defaultStyleParams );
+		this( ElementStyleParams.defaultStyleParams );
 	}
 	
-	public DPWidget(WidgetStyleParams styleParams)
+	public DPElement(ElementStyleParams styleParams)
 	{
 		flags = 0;
 		this.styleParams = styleParams;
@@ -322,12 +322,12 @@ abstract public class DPWidget extends PointerInputElement
 	//
 	//
 	
-	public ElementContext getContext()
+	public FragmentContext getFragmentContext()
 	{
-		DPWidget w = this;
+		DPElement w = this;
 		while ( w != null )
 		{
-			ElementContext c = w.getContext_helper();
+			FragmentContext c = w.getFragmentContext_helper();
 			if ( c != null )
 			{
 				return c;
@@ -339,7 +339,8 @@ abstract public class DPWidget extends PointerInputElement
 		return null;
 	}
 	
-	protected ElementContext getContext_helper()
+	// Override this in subclasses
+	protected FragmentContext getFragmentContext_helper()
 	{
 		return null;
 	}
@@ -355,72 +356,72 @@ abstract public class DPWidget extends PointerInputElement
 	// Alignment methods
 	//
 	
-	public DPWidget align(HAlignment hAlign, VAlignment vAlign)
+	public DPElement align(HAlignment hAlign, VAlignment vAlign)
 	{
 		setAlignmentFlags( ElementAlignment.flagValue( hAlign, vAlign ) );
 		return this;
 	}
 
-	public DPWidget alignH(HAlignment hAlign)
+	public DPElement alignH(HAlignment hAlign)
 	{
 		setHAlignmentFlags( ElementAlignment.flagValue( hAlign ) );
 		return this;
 	}
 	
-	public DPWidget alignV(VAlignment vAlign)
+	public DPElement alignV(VAlignment vAlign)
 	{
 		setVAlignmentFlags( ElementAlignment.flagValue( vAlign ) );
 		return this;
 	}
 	
 
-	public DPWidget alignHLeft()
+	public DPElement alignHLeft()
 	{
 		return alignH( HAlignment.LEFT );
 	}
 
-	public DPWidget alignHCentre()
+	public DPElement alignHCentre()
 	{
 		return alignH( HAlignment.CENTRE );
 	}
 
-	public DPWidget alignHRight()
+	public DPElement alignHRight()
 	{
 		return alignH( HAlignment.RIGHT );
 	}
 
-	public DPWidget alignHExpand()
+	public DPElement alignHExpand()
 	{
 		return alignH( HAlignment.EXPAND );
 	}
 	
 	
-	public DPWidget alignVBaselines()
+	public DPElement alignVBaselines()
 	{
 		return alignV( VAlignment.REFY );
 	}
 
-	public DPWidget alignVBaselinesExpand()
+	public DPElement alignVBaselinesExpand()
 	{
 		return alignV( VAlignment.REFY_EXPAND );
 	}
 
-	public DPWidget alignVTop()
+	public DPElement alignVTop()
 	{
 		return alignV( VAlignment.TOP );
 	}
 
-	public DPWidget alignVCentre()
+	public DPElement alignVCentre()
 	{
 		return alignV( VAlignment.CENTRE );
 	}
 
-	public DPWidget alignVBottom()
+	public DPElement alignVBottom()
 	{
 		return alignV( VAlignment.BOTTOM );
 	}
 
-	public DPWidget alignVExpand()
+	public DPElement alignVExpand()
 	{
 		return alignV( VAlignment.EXPAND );
 	}
@@ -455,7 +456,7 @@ abstract public class DPWidget extends PointerInputElement
 	// Padding methods
 	//
 	
-	public DPWidget pad(double leftPad, double rightPad, double topPad, double bottomPad)
+	public DPElement pad(double leftPad, double rightPad, double topPad, double bottomPad)
 	{
 		if ( leftPad == 0.0  &&  rightPad == 0.0  &&  topPad == 0.0  &&  bottomPad == 0.0 )
 		{
@@ -478,27 +479,27 @@ abstract public class DPWidget extends PointerInputElement
 		}
 	}
 	
-	public DPWidget pad(double xPad, double yPad)
+	public DPElement pad(double xPad, double yPad)
 	{
 		return pad( xPad, xPad, yPad, yPad );
 	}
 	
-	public DPWidget padX(double xPad)
+	public DPElement padX(double xPad)
 	{
 		return pad( xPad, xPad, 0.0, 0.0 );
 	}
 	
-	public DPWidget padX(double leftPad, double rightPad)
+	public DPElement padX(double leftPad, double rightPad)
 	{
 		return pad( leftPad, rightPad, 0.0, 0.0 );
 	}
 	
-	public DPWidget padY(double yPad)
+	public DPElement padY(double yPad)
 	{
 		return pad( 0.0, 0.0, yPad, yPad );
 	}
 	
-	public DPWidget padY(double topPad, double bottomPad)
+	public DPElement padY(double topPad, double bottomPad)
 	{
 		return pad( 0.0, 0.0, topPad, bottomPad );
 	}
@@ -622,13 +623,13 @@ abstract public class DPWidget extends PointerInputElement
 	
 	
 	
-	public Xform2 getLocalToAncestorXform(DPWidget ancestor, Xform2 x)
+	public Xform2 getLocalToAncestorXform(DPElement ancestor, Xform2 x)
 	{
-		DPWidget node = this;
+		DPElement node = this;
 		
 		while ( node != ancestor )
 		{
-			DPWidget parentNode = node.parent;
+			DPElement parentNode = node.parent;
 			if ( parentNode != null )
 			{
 				x = x.concat( node.getLocalToParentXform() );
@@ -651,7 +652,7 @@ abstract public class DPWidget extends PointerInputElement
 		return x;
 	}
 	
-	public Xform2 getLocalToAncestorXform(DPWidget ancestor)
+	public Xform2 getLocalToAncestorXform(DPElement ancestor)
 	{
 		if ( ancestor == parent )
 		{
@@ -666,13 +667,13 @@ abstract public class DPWidget extends PointerInputElement
 	
 	
 	
-	public Xform2 getAncestorToLocalXform(DPWidget ancestor, Xform2 x)
+	public Xform2 getAncestorToLocalXform(DPElement ancestor, Xform2 x)
 	{
-		DPWidget node = this;
+		DPElement node = this;
 		
 		while ( node != ancestor )
 		{
-			DPWidget parentNode = node.parent;
+			DPElement parentNode = node.parent;
 			if ( parentNode != null )
 			{
 				x = node.getParentToLocalXform().concat( x );
@@ -695,7 +696,7 @@ abstract public class DPWidget extends PointerInputElement
 		return x;
 	}
 	
-	public Xform2 getAncestorToLocalXform(DPWidget ancestor)
+	public Xform2 getAncestorToLocalXform(DPElement ancestor)
 	{
 		if ( ancestor == parent )
 		{
@@ -710,11 +711,11 @@ abstract public class DPWidget extends PointerInputElement
 	
 	
 	
-	public Xform2 getTransformRelativeTo(DPWidget toWidget, Xform2 x)
+	public Xform2 getTransformRelativeTo(DPElement toElement, Xform2 x)
 	{
 		Xform2 myXform = getLocalToRootXform();
-		Xform2 toWidgetXform = toWidget.getLocalToRootXform();
-		return myXform.concat( toWidgetXform.inverse() );
+		Xform2 toElementXform = toElement.getLocalToRootXform();
+		return myXform.concat( toElementXform.inverse() );
 	}
 	
 	
@@ -723,13 +724,13 @@ abstract public class DPWidget extends PointerInputElement
 		return getLocalPointRelativeToAncestor( null, p );
 	}
 	
-	public Point2 getLocalPointRelativeToAncestor(DPWidget ancestor, Point2 p)
+	public Point2 getLocalPointRelativeToAncestor(DPElement ancestor, Point2 p)
 	{
-		DPWidget node = this;
+		DPElement node = this;
 		
 		while ( node != ancestor )
 		{
-			DPWidget parentNode = node.parent;
+			DPElement parentNode = node.parent;
 			if ( parentNode != null )
 			{
 				p = node.getLocalToParentXform().transform( p );
@@ -752,11 +753,11 @@ abstract public class DPWidget extends PointerInputElement
 		return p;
 	}
 	
-	public Point2 getLocalPointRelativeTo(DPWidget toWidget, Point2 p)
+	public Point2 getLocalPointRelativeTo(DPElement toElement, Point2 p)
 	{
 		Point2 pointInRoot = getLocalPointRelativeToRoot( p );
-		Xform2 toWidgetXform = toWidget.getLocalToRootXform();
-		return toWidgetXform.inverse().transform( pointInRoot );
+		Xform2 toElementXform = toElement.getLocalToRootXform();
+		return toElementXform.inverse().transform( pointInRoot );
 	}
 	
 	
@@ -937,9 +938,9 @@ abstract public class DPWidget extends PointerInputElement
 	}
 	
 	
-	public boolean isInSubtreeRootedAt(DPWidget r)
+	public boolean isInSubtreeRootedAt(DPElement r)
 	{
-		DPWidget e = this;
+		DPElement e = this;
 		
 		while ( e != null )
 		{
@@ -955,65 +956,65 @@ abstract public class DPWidget extends PointerInputElement
 	}
 	
 	
-	public ArrayList<DPWidget> getElementPathFromRoot()
+	public ArrayList<DPElement> getElementPathFromRoot()
 	{
-		ArrayList<DPWidget> path = new ArrayList<DPWidget>();
+		ArrayList<DPElement> path = new ArrayList<DPElement>();
 		
-		DPWidget widget = this;
-		while ( widget != null )
+		DPElement element = this;
+		while ( element != null )
 		{
-			path.add( 0, widget );
-			widget = widget.getParent();
+			path.add( 0, element );
+			element = element.getParent();
 		}
 		
 		return path;
 	}
 	
-	public ArrayList<DPWidget> getElementPathToRoot()
+	public ArrayList<DPElement> getElementPathToRoot()
 	{
-		ArrayList<DPWidget> path = new ArrayList<DPWidget>();
+		ArrayList<DPElement> path = new ArrayList<DPElement>();
 		
-		DPWidget widget = this;
-		while ( widget != null )
+		DPElement element = this;
+		while ( element != null )
 		{
-			path.add( widget );
-			widget = widget.getParent();
+			path.add( element );
+			element = element.getParent();
 		}
 		
 		return path;
 	}
 	
-	public ArrayList<DPWidget> getElementPathFromSubtreeRoot(DPContainer subtreeRoot)
+	public ArrayList<DPElement> getElementPathFromSubtreeRoot(DPContainer subtreeRoot)
 	{
-		ArrayList<DPWidget> path = new ArrayList<DPWidget>();
+		ArrayList<DPElement> path = new ArrayList<DPElement>();
 		
-		DPWidget widget = this;
-		while ( widget != null )
+		DPElement element = this;
+		while ( element != null )
 		{
-			path.add( 0, widget );
-			if ( widget == subtreeRoot )
+			path.add( 0, element );
+			if ( element == subtreeRoot )
 			{
 				return path;
 			}
-			widget = widget.getParent();
+			element = element.getParent();
 		}
 
 		return null;
 	}
 	
-	public ArrayList<DPWidget> getElementPathToSubtreeRoot(DPContainer subtreeRoot)
+	public ArrayList<DPElement> getElementPathToSubtreeRoot(DPContainer subtreeRoot)
 	{
-		ArrayList<DPWidget> path = new ArrayList<DPWidget>();
+		ArrayList<DPElement> path = new ArrayList<DPElement>();
 		
-		DPWidget widget = this;
-		while ( widget != null )
+		DPElement element = this;
+		while ( element != null )
 		{
-			path.add( widget );
-			if ( widget == subtreeRoot )
+			path.add( element );
+			if ( element == subtreeRoot )
 			{
 				return path;
 			}
-			widget = widget.getParent();
+			element = element.getParent();
 		}
 
 		return null;
@@ -1021,7 +1022,7 @@ abstract public class DPWidget extends PointerInputElement
 	
 	
 
-	public DPContentLeaf getFirstLeafInSubtree(WidgetFilter branchFilter, WidgetFilter leafFilter)
+	public DPContentLeaf getFirstLeafInSubtree(ElementFilter branchFilter, ElementFilter leafFilter)
 	{
 		return null;
 	}
@@ -1036,7 +1037,7 @@ abstract public class DPWidget extends PointerInputElement
 		return getFirstLeafInSubtree( null, new DPContentLeafEditable.EditableLeafElementFilter() );
 	}
 
-	public DPContentLeaf getLastLeafInSubtree(WidgetFilter branchFilter, WidgetFilter leafFilter)
+	public DPContentLeaf getLastLeafInSubtree(ElementFilter branchFilter, ElementFilter leafFilter)
 	{
 		return null;
 	}
@@ -1053,7 +1054,7 @@ abstract public class DPWidget extends PointerInputElement
 
 	
 	
-	public static void getPathsFromCommonSubtreeRoot(DPWidget w0, List<DPWidget> path0, DPWidget w1, List<DPWidget> path1)
+	public static void getPathsFromCommonSubtreeRoot(DPElement w0, List<DPElement> path0, DPElement w1, List<DPElement> path1)
 	{
 		if ( w0 == w1 )
 		{
@@ -1062,8 +1063,8 @@ abstract public class DPWidget extends PointerInputElement
 		}
 		else
 		{
-			ArrayList<DPWidget> p0 = w0.getElementPathFromRoot();
-			ArrayList<DPWidget> p1 = w1.getElementPathFromRoot();
+			ArrayList<DPElement> p0 = w0.getElementPathFromRoot();
+			ArrayList<DPElement> p1 = w1.getElementPathFromRoot();
 			
 			int minLength = Math.min( p0.size(), p1.size() );
 			
@@ -1072,11 +1073,11 @@ abstract public class DPWidget extends PointerInputElement
 				throw new RuntimeException( "Bad path" );
 			}
 			
-			int numCommonWidgets = 0;
+			int numCommonElements = 0;
 			
 			for (int i = 0; i < minLength; i++)
 			{
-				numCommonWidgets = i;
+				numCommonElements = i;
 				
 				if ( p0.get( i ) != p1.get( i ) )
 				{
@@ -1084,8 +1085,8 @@ abstract public class DPWidget extends PointerInputElement
 				}
 			}
 			
-			path0.addAll( p0.subList( numCommonWidgets - 1, p0.size() ) );
-			path1.addAll( p1.subList( numCommonWidgets - 1, p1.size() ) );
+			path0.addAll( p0.subList( numCommonElements - 1, p0.size() ) );
+			path1.addAll( p1.subList( numCommonElements - 1, p1.size() ) );
 		}
 	}
 	
@@ -1097,14 +1098,14 @@ abstract public class DPWidget extends PointerInputElement
 			presentationArea = area;
 			if ( presentationArea != null )
 			{
-				ArrayList<Runnable> waitingImmediateEvents = waitingImmediateEventsByWidget.get( this );
+				ArrayList<Runnable> waitingImmediateEvents = waitingImmediateEventsByElement.get( this );
 				if ( waitingImmediateEvents != null )
 				{
 					for (Runnable event: waitingImmediateEvents)
 					{
 						presentationArea.queueImmediateEvent( event );
 					}
-					waitingImmediateEventsByWidget.remove( this );
+					waitingImmediateEventsByElement.remove( this );
 				}
 			}
 		}
@@ -1121,7 +1122,7 @@ abstract public class DPWidget extends PointerInputElement
 	//
 	//
 	
-	protected void drawSubtreeSelection(Graphics2D graphics, Marker startMarker, List<DPWidget> startPath, Marker endMarker, List<DPWidget> endPath)
+	protected void drawSubtreeSelection(Graphics2D graphics, Marker startMarker, List<DPElement> startPath, Marker endMarker, List<DPElement> endPath)
 	{
 	}
 
@@ -1141,11 +1142,11 @@ abstract public class DPWidget extends PointerInputElement
 		}
 		else
 		{
-			ArrayList<Runnable> waitingImmediateEvents = waitingImmediateEventsByWidget.get( this );
+			ArrayList<Runnable> waitingImmediateEvents = waitingImmediateEventsByElement.get( this );
 			if ( waitingImmediateEvents == null )
 			{
 				waitingImmediateEvents = new ArrayList<Runnable>();
-				waitingImmediateEventsByWidget.put( this, waitingImmediateEvents );
+				waitingImmediateEventsByElement.put( this, waitingImmediateEvents );
 			}
 			if ( !waitingImmediateEvents.contains( event ) )
 			{
@@ -1163,14 +1164,14 @@ abstract public class DPWidget extends PointerInputElement
 		}
 		else
 		{
-			ArrayList<Runnable> waitingImmediateEvents = waitingImmediateEventsByWidget.get( this );
+			ArrayList<Runnable> waitingImmediateEvents = waitingImmediateEventsByElement.get( this );
 			if ( waitingImmediateEvents != null )
 			{
 				waitingImmediateEvents.remove( event );
 				if ( waitingImmediateEvents.isEmpty() )
 				{
 					waitingImmediateEvents = null;
-					waitingImmediateEventsByWidget.remove( this );
+					waitingImmediateEventsByElement.remove( this );
 				}
 			}
 		}
@@ -1240,7 +1241,7 @@ abstract public class DPWidget extends PointerInputElement
 	{
 	}
 	
-	protected void onUnrealise(DPWidget unrealiseRoot)
+	protected void onUnrealise(DPElement unrealiseRoot)
 	{
 	}
 	
@@ -1251,7 +1252,7 @@ abstract public class DPWidget extends PointerInputElement
 	
 	protected void drawBackground(Graphics2D graphics)
 	{
-		WidgetStyleParams styleParams = getStyleParams();
+		ElementStyleParams styleParams = getStyleParams();
 		
 		Painter backgroundPainter;
 		if ( testFlag( FLAG_HOVER ) )
@@ -1334,7 +1335,7 @@ abstract public class DPWidget extends PointerInputElement
 		onRealise();
 	}
 	
-	protected void handleUnrealise(DPWidget unrealiseRoot)
+	protected void handleUnrealise(DPElement unrealiseRoot)
 	{
 		if ( testFlag( FLAG_CARET_GRABBED ) )
 		{
@@ -1389,12 +1390,12 @@ abstract public class DPWidget extends PointerInputElement
 	//
 	//
 	
-	protected DPWidget getFirstChildAtLocalPoint(Point2 localPos)
+	protected DPElement getFirstChildAtLocalPoint(Point2 localPos)
 	{
 		return null;
 	}
 	
-	protected DPWidget getLastChildAtLocalPoint(Point2 localPos)
+	protected DPElement getLastChildAtLocalPoint(Point2 localPos)
 	{
 		return null;
 	}
@@ -1416,7 +1417,7 @@ abstract public class DPWidget extends PointerInputElement
 	
 	protected Cursor getAncestorCursor()
 	{
-		DPWidget w = getParent();
+		DPElement w = getParent();
 		while ( w != null )
 		{
 			Cursor cursor = w.getCursor();
@@ -1959,7 +1960,7 @@ abstract public class DPWidget extends PointerInputElement
 		return false;
 	}
 	
-	protected List<DPWidget> horizontalNavigationList()
+	protected List<DPElement> horizontalNavigationList()
 	{
 		if ( layoutNode != null )
 		{
@@ -1981,7 +1982,7 @@ abstract public class DPWidget extends PointerInputElement
 		}
 	}
 	
-	protected List<DPWidget> verticalNavigationList()
+	protected List<DPElement> verticalNavigationList()
 	{
 		if ( layoutNode != null )
 		{
@@ -2114,7 +2115,7 @@ abstract public class DPWidget extends PointerInputElement
 
 
 
-	protected DPWidget getLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
+	protected DPElement getLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
 	{
 		if ( layoutNode != null )
 		{
@@ -2288,8 +2289,8 @@ abstract public class DPWidget extends PointerInputElement
 		return builder.toString();
 	}
 
-	protected abstract void getTextRepresentationFromStartToPath(StringBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex);
-	protected abstract void getTextRepresentationFromPathToEnd(StringBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex);
+	protected abstract void getTextRepresentationFromStartToPath(StringBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex);
+	protected abstract void getTextRepresentationFromPathToEnd(StringBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex);
 
 
 
@@ -2328,7 +2329,7 @@ abstract public class DPWidget extends PointerInputElement
 		return false;
 	}
 	
-	public DPWidget getElementAtTextRepresentationStart()
+	public DPElement getElementAtTextRepresentationStart()
 	{
 		return this;
 	}
@@ -2362,8 +2363,8 @@ abstract public class DPWidget extends PointerInputElement
 		return builder.stream();
 	}
 
-	protected abstract void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex);
-	protected abstract void getLinearRepresentationFromPathToEnd(ItemStreamBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex);
+	protected abstract void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex);
+	protected abstract void getLinearRepresentationFromPathToEnd(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex);
 
 
 
@@ -2459,7 +2460,7 @@ abstract public class DPWidget extends PointerInputElement
 		structuralRepresentation = null;
 	}
 	
-	public void clearStructuralRepresentationUpTo(DPWidget subtreeRoot)
+	public void clearStructuralRepresentationUpTo(DPElement subtreeRoot)
 	{
 		structuralRepresentation = null;
 		if ( this != subtreeRoot )
@@ -2727,12 +2728,12 @@ abstract public class DPWidget extends PointerInputElement
 	protected static EmptyBorder metaHeaderEmptyBorder = new EmptyBorder();
 
 
-	public DPWidget createMetaHeaderData()
+	public DPElement createMetaHeaderData()
 	{
 		return null;
 	}
 	
-	public DPWidget createMetaHeaderDebug()
+	public DPElement createMetaHeaderDebug()
 	{
 		if ( debugName != null )
 		{
@@ -2744,7 +2745,7 @@ abstract public class DPWidget extends PointerInputElement
 		}
 	}
 	
-	public DPWidget createMetaDescription()
+	public DPElement createMetaDescription()
 	{
 		String description = toString();
 		description = description.replace( "BritefuryJ.DocPresent.", "" );
@@ -2756,12 +2757,12 @@ abstract public class DPWidget extends PointerInputElement
 		return metaHeaderEmptyBorder;
 	}
 	
-	public DPWidget createMetaHeader()
+	public DPElement createMetaHeader()
 	{
 		DPHBox hbox = new DPHBox( metaHeaderHBoxStyle );
-		DPWidget data = createMetaHeaderData();
-		DPWidget debug = createMetaHeaderDebug();
-		DPWidget descr = createMetaDescription();
+		DPElement data = createMetaHeaderData();
+		DPElement debug = createMetaHeaderDebug();
+		DPElement descr = createMetaDescription();
 		if ( data != null )
 		{
 			hbox.append( data );
@@ -2778,7 +2779,7 @@ abstract public class DPWidget extends PointerInputElement
 		return border;
 	}
 	
-	public DPBorder getMetaHeaderBorderWidget()
+	public DPBorder getMetaHeaderBorderElement()
 	{
 		if ( metaElement != null )
 		{
@@ -2795,12 +2796,12 @@ abstract public class DPWidget extends PointerInputElement
 	{
 		if ( metaElement != null )
 		{
-			DPBorder border = getMetaHeaderBorderWidget();
+			DPBorder border = getMetaHeaderBorderElement();
 			DPHBox hbox = (DPHBox)border.getChild();
 			
-			DPWidget data = createMetaHeaderData();
-			DPWidget debug = createMetaHeaderDebug();
-			DPWidget descr = createMetaDescription();
+			DPElement data = createMetaHeaderData();
+			DPElement debug = createMetaHeaderDebug();
+			DPElement descr = createMetaDescription();
 			hbox.clear();
 			
 			if ( data != null )
@@ -2815,14 +2816,14 @@ abstract public class DPWidget extends PointerInputElement
 		}
 	}
 
-	public DPWidget createMetaElement()
+	public DPElement createMetaElement()
 	{
 		DPBin bin = new DPBin( );
 		bin.setChild( createMetaHeader() );
 		return bin;
 	}
 	
-	public DPWidget initialiseMetaElement()
+	public DPElement initialiseMetaElement()
 	{
 		if ( metaElement == null )
 		{
@@ -2836,7 +2837,7 @@ abstract public class DPWidget extends PointerInputElement
 		metaElement = null;
 	}
 	
-	public DPWidget getMetaElement()
+	public DPElement getMetaElement()
 	{
 		return metaElement;
 	}
@@ -2857,7 +2858,7 @@ abstract public class DPWidget extends PointerInputElement
 	
 	
 	
-	public WidgetStyleParams getStyleParams()
+	public ElementStyleParams getStyleParams()
 	{
 		return styleParams;
 	}

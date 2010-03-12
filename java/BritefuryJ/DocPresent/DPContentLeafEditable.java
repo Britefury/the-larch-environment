@@ -22,9 +22,9 @@ import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
 public abstract class DPContentLeafEditable extends DPContentLeaf
 {
-	public static class EditableLeafElementFilter implements WidgetFilter
+	public static class EditableLeafElementFilter implements ElementFilter
 	{
-		public boolean testElement(DPWidget element)
+		public boolean testElement(DPElement element)
 		{
 			if ( element instanceof DPContentLeafEditable )
 			{
@@ -94,7 +94,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	{
 		super.onCaretEnter( c );
 		
-		DPBorder border = getMetaHeaderBorderWidget(); 
+		DPBorder border = getMetaHeaderBorderElement(); 
 		if ( border != null )
 		{
 			border.setBorder( metaHeaderHighlightBorder );
@@ -105,7 +105,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	{
 		super.onCaretLeave( c );
 		
-		DPBorder border = getMetaHeaderBorderWidget(); 
+		DPBorder border = getMetaHeaderBorderElement(); 
 		if ( border != null )
 		{
 			border.setBorder( metaHeaderEmptyBorder );
@@ -143,7 +143,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	public abstract void drawSelection(Graphics2D graphics, Marker from, Marker to);
 	
 
-	protected void drawSubtreeSelection(Graphics2D graphics, Marker startMarker, List<DPWidget> startPath, Marker endMarker, List<DPWidget> endPath)
+	protected void drawSubtreeSelection(Graphics2D graphics, Marker startMarker, List<DPElement> startPath, Marker endMarker, List<DPElement> endPath)
 	{
 		drawSelection( graphics, startMarker, endMarker );
 	}
@@ -403,7 +403,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	//
 	//
 
-	protected void onUnrealise(DPWidget unrealiseRoot)
+	protected void onUnrealise(DPElement unrealiseRoot)
 	{
 		super.onUnrealise( unrealiseRoot );
 		
@@ -481,12 +481,12 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	//
 	//
 	
-	protected void getTextRepresentationFromStartToPath(StringBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	protected void getTextRepresentationFromStartToPath(StringBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
 		builder.append( textRepresentation.substring( 0, marker.getClampedIndex() ) );
 	}
 
-	protected void getTextRepresentationFromPathToEnd(StringBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	protected void getTextRepresentationFromPathToEnd(StringBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
 		builder.append( textRepresentation.substring( marker.getClampedIndex() ) );
 	}
@@ -500,7 +500,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		return textRepresentation.substring( startMarker.getClampedIndex(), endMarker.getClampedIndex() );
 	}
 
-	protected void getTextRepresentationFromStartOfRootToMarker(StringBuilder builder, Marker marker, DPWidget root)
+	protected void getTextRepresentationFromStartOfRootToMarker(StringBuilder builder, Marker marker, DPElement root)
 	{
 		if ( this != root  &&  parent != null )
 		{
@@ -509,7 +509,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		builder.append( textRepresentation.substring( 0, marker.getClampedIndex() ) );
 	}
 	
-	protected void getTextRepresentationFromMarkerToEndOfRoot(StringBuilder builder, Marker marker, DPWidget root)
+	protected void getTextRepresentationFromMarkerToEndOfRoot(StringBuilder builder, Marker marker, DPElement root)
 	{
 		builder.append( textRepresentation.substring( marker.getClampedIndex() ) );
 		if ( this != root  &&  parent != null )
@@ -529,12 +529,12 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	//
 	//
 	
-	protected void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	protected void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
 		builder.appendTextValue( textRepresentation.substring( 0, marker.getClampedIndex() ) );
 	}
 
-	protected void getLinearRepresentationFromPathToEnd(ItemStreamBuilder builder, Marker marker, ArrayList<DPWidget> path, int pathMyIndex)
+	protected void getLinearRepresentationFromPathToEnd(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
 		builder.appendTextValue( textRepresentation.substring( marker.getClampedIndex() ) );
 	}
@@ -550,7 +550,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		return builder.stream();
 	}
 
-	protected void getLinearRepresentationFromStartOfRootToMarker(ItemStreamBuilder builder, Marker marker, DPWidget root)
+	protected void getLinearRepresentationFromStartOfRootToMarker(ItemStreamBuilder builder, Marker marker, DPElement root)
 	{
 		if ( this != root  &&  parent != null )
 		{
@@ -559,7 +559,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		builder.appendTextValue( textRepresentation.substring( 0, marker.getClampedIndex() ) );
 	}
 	
-	protected void getLinearRepresentationFromMarkerToEndOfRoot(ItemStreamBuilder builder, Marker marker, DPWidget root)
+	protected void getLinearRepresentationFromMarkerToEndOfRoot(ItemStreamBuilder builder, Marker marker, DPElement root)
 	{
 		builder.appendTextValue( textRepresentation.substring( marker.getClampedIndex() ) );
 		if ( this != root  &&  parent != null )

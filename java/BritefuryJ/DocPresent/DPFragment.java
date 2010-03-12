@@ -10,17 +10,17 @@ import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 
 public class DPFragment extends DPProxy
 {
-	protected ElementContext context;
+	protected FragmentContext context;
 
 
-	public DPFragment(ElementContext context)
+	public DPFragment(FragmentContext context)
 	{
 		super();
 		
 		this.context = context;
 	}
 
-	public DPFragment(ElementContext context, ContainerStyleParams styleParams)
+	public DPFragment(FragmentContext context, ContainerStyleParams styleParams)
 	{
 		super(styleParams);
 		
@@ -35,20 +35,20 @@ public class DPFragment extends DPProxy
 	// Context
 	//
 	
-	// DPWidget.getContext() is the public method to get the element context, this helper method
-	// simply retrieves the context at this element, DPWidget.getContext() will search parent elements
+	// DPElement.getContext() is the public method to get the element context, this helper method
+	// simply retrieves the context at this element, DPElement.getContext() will search parent elements
 	// for it.
-	protected ElementContext getContext_helper()
+	protected FragmentContext getFragmentContext_helper()
 	{
 		return context;
 	}
 	
-	public ElementContext getContext()
+	public FragmentContext getFragmentContext()
 	{
 		return context;
 	}
 	
-	public void setContext(ElementContext context)
+	public void setFragmentContext(FragmentContext context)
 	{
 		this.context = context;
 	}

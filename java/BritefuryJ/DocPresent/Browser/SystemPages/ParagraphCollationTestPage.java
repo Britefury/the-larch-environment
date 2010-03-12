@@ -11,7 +11,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Painter.FilledOutlinePainter;
 import BritefuryJ.DocPresent.Painter.OutlinePainter;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
@@ -38,10 +38,10 @@ public class ParagraphCollationTestPage extends SystemPage
 
 	static String textBlock = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 	
-	protected ArrayList<DPWidget> makeTextNodes(String text, PrimitiveStyleSheet style)
+	protected ArrayList<DPElement> makeTextNodes(String text, PrimitiveStyleSheet style)
 	{
 		String[] words = text.split( " " );
-		ArrayList<DPWidget> nodes = new ArrayList<DPWidget>();
+		ArrayList<DPElement> nodes = new ArrayList<DPElement>();
 		for (int i = 0; i < words.length; i++)
 		{
 			nodes.add( style.text( words[i] ) );
@@ -49,9 +49,9 @@ public class ParagraphCollationTestPage extends SystemPage
 		return nodes;
 	}
 	
-	protected ArrayList<DPWidget> addLineBreaks(ArrayList<DPWidget> nodesIn, int step, PrimitiveStyleSheet style)
+	protected ArrayList<DPElement> addLineBreaks(ArrayList<DPElement> nodesIn, int step, PrimitiveStyleSheet style)
 	{
-		ArrayList<DPWidget> nodesOut = new ArrayList<DPWidget>();
+		ArrayList<DPElement> nodesOut = new ArrayList<DPElement>();
 		for (int i = 0; i < nodesIn.size(); i++)
 		{
 			nodesOut.add( nodesIn.get( i ) );
@@ -68,9 +68,9 @@ public class ParagraphCollationTestPage extends SystemPage
 	}
 	
 	
-	protected DPWidget makeParagraph(String title, double indentation, int lineBreakStep, PrimitiveStyleSheet textStyle)
+	protected DPElement makeParagraph(String title, double indentation, int lineBreakStep, PrimitiveStyleSheet textStyle)
 	{
-		ArrayList<DPWidget> children = makeTextNodes( title + ": " + textBlock, textStyle );
+		ArrayList<DPElement> children = makeTextNodes( title + ": " + textBlock, textStyle );
 		if ( lineBreakStep > 0 )
 		{
 			children = addLineBreaks( children, lineBreakStep, textStyle );
@@ -78,9 +78,9 @@ public class ParagraphCollationTestPage extends SystemPage
 		return textStyle.withParagraphIndentation( indentation ).paragraph( children );
 	}
 	
-	protected DPWidget makeSpan(String title, int lineBreakStep, PrimitiveStyleSheet textStyle, PrimitiveStyleSheet spanStyle)
+	protected DPElement makeSpan(String title, int lineBreakStep, PrimitiveStyleSheet textStyle, PrimitiveStyleSheet spanStyle)
 	{
-		ArrayList<DPWidget> children = makeTextNodes( title + ": " + textBlock, textStyle );
+		ArrayList<DPElement> children = makeTextNodes( title + ": " + textBlock, textStyle );
 		if ( lineBreakStep > 0 )
 		{
 			children = addLineBreaks( children, lineBreakStep, textStyle );
@@ -88,30 +88,30 @@ public class ParagraphCollationTestPage extends SystemPage
 		return spanStyle.span( children );
 	}
 	
-	protected DPWidget makeParagraphWithNestedSpan(String title, double indentation, int lineBreakStep, PrimitiveStyleSheet textStyle, PrimitiveStyleSheet nestedTextStyle, PrimitiveStyleSheet spanStyle)
+	protected DPElement makeParagraphWithNestedSpan(String title, double indentation, int lineBreakStep, PrimitiveStyleSheet textStyle, PrimitiveStyleSheet nestedTextStyle, PrimitiveStyleSheet spanStyle)
 	{
-		ArrayList<DPWidget> children = makeTextNodes( title + ": " + textBlock, textStyle );
+		ArrayList<DPElement> children = makeTextNodes( title + ": " + textBlock, textStyle );
 		children = addLineBreaks( children, lineBreakStep, textStyle );
 		children.add( children.size()/2, makeSpan( title + " (inner)", lineBreakStep, nestedTextStyle, spanStyle ) );
 		return textStyle.withParagraphIndentation( indentation ).paragraph( children );
 	}
 	
 	
-	protected DPWidget createContents()
+	protected DPElement createContents()
 	{
 		PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
 		PrimitiveStyleSheet nestedTextStyleSheet = styleSheet.withForeground( Color.red );
 		PrimitiveStyleSheet spanStyleSheet = styleSheet.withBackground( new OutlinePainter( new Color( 1.0f, 0.7f, 0.3f ) ) ).withHoverBackground( 
 				new FilledOutlinePainter( new Color( 1.0f, 1.0f, 0.7f ), new Color( 1.0f, 1.0f, 0.0f ), new BasicStroke( 1.0f ) ) );
 		
-		DPWidget b2 = makeParagraph( "PER-WORD", 0.0, 1, styleSheet );
-		DPWidget b3 = makeParagraph( "EVERY-4-WORDS", 0.0, 4, styleSheet);
-		DPWidget b4 = makeParagraphWithNestedSpan( "NESTED-1", 0.0, 1, styleSheet, nestedTextStyleSheet, spanStyleSheet );
-		DPWidget b5 = makeParagraphWithNestedSpan( "NESTED-2", 0.0, 2, styleSheet, nestedTextStyleSheet, spanStyleSheet );
-		DPWidget b6 = makeParagraphWithNestedSpan( "NESTED-4", 0.0, 4, styleSheet, nestedTextStyleSheet, spanStyleSheet );
-		DPWidget b7 = makeParagraph( "PER-WORD INDENTED", 50.0, 1, styleSheet );
-		DPWidget b8 = makeParagraphWithNestedSpan( "NESTED-2-INDENTED", 50.0, 2, styleSheet, nestedTextStyleSheet, spanStyleSheet );
-		DPWidget[] children = { b2, b3, b4, b5, b6, b7, b8 };
+		DPElement b2 = makeParagraph( "PER-WORD", 0.0, 1, styleSheet );
+		DPElement b3 = makeParagraph( "EVERY-4-WORDS", 0.0, 4, styleSheet);
+		DPElement b4 = makeParagraphWithNestedSpan( "NESTED-1", 0.0, 1, styleSheet, nestedTextStyleSheet, spanStyleSheet );
+		DPElement b5 = makeParagraphWithNestedSpan( "NESTED-2", 0.0, 2, styleSheet, nestedTextStyleSheet, spanStyleSheet );
+		DPElement b6 = makeParagraphWithNestedSpan( "NESTED-4", 0.0, 4, styleSheet, nestedTextStyleSheet, spanStyleSheet );
+		DPElement b7 = makeParagraph( "PER-WORD INDENTED", 50.0, 1, styleSheet );
+		DPElement b8 = makeParagraphWithNestedSpan( "NESTED-2-INDENTED", 50.0, 2, styleSheet, nestedTextStyleSheet, spanStyleSheet );
+		DPElement[] children = { b2, b3, b4, b5, b6, b7, b8 };
 		return styleSheet.withVBoxSpacing( 30.0 ).vbox( Arrays.asList( children ) );
 	}
 }

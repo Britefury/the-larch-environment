@@ -9,12 +9,12 @@ package BritefuryJ.DocPresent;
 
 public abstract class ElementLinearRepresentationListener
 {
-	public boolean textRepresentationModified(DPWidget element, LinearRepresentationEvent event)
+	public boolean textRepresentationModified(DPElement element, LinearRepresentationEvent event)
 	{
 		return false;
 	}
 	
-	public boolean linearRepresentationModified(DPWidget element, LinearRepresentationEvent event)
+	public boolean linearRepresentationModified(DPElement element, LinearRepresentationEvent event)
 	{
 		return false;
 	}

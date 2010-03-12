@@ -29,7 +29,7 @@ public class DPBin extends DPContainer
 	
 	
 	
-	public DPWidget getChild()
+	public DPElement getChild()
 	{
 		if ( registeredChildren.size() > 0 )
 		{
@@ -41,9 +41,9 @@ public class DPBin extends DPContainer
 		}
 	}
 	
-	public void setChild(DPWidget child)
+	public void setChild(DPElement child)
 	{
-		DPWidget prevChild = getChild();
+		DPElement prevChild = getChild();
 		if ( child != prevChild )
 		{
 			if ( child != null  &&  child.getLayoutNode() == null )
@@ -69,7 +69,7 @@ public class DPBin extends DPContainer
 	}
 	
 	
-	protected void replaceChildWithEmpty(DPWidget child)
+	protected void replaceChildWithEmpty(DPElement child)
 	{
 		assert child == this.getChild();
 		setChild( null );
@@ -77,7 +77,7 @@ public class DPBin extends DPContainer
 	
 	
 
-	public List<DPWidget> getChildren()
+	public List<DPElement> getChildren()
 	{
 		return registeredChildren;
 	}
@@ -91,7 +91,7 @@ public class DPBin extends DPContainer
 	
 	protected String computeSubtreeTextRepresentation()
 	{
-		DPWidget child = getChild();
+		DPElement child = getChild();
 		return child != null  ?  child.getTextRepresentation()  :  "";
 	}
 }

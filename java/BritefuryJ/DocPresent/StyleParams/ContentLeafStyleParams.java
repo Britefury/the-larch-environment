@@ -11,7 +11,7 @@ import java.awt.Cursor;
 
 import BritefuryJ.DocPresent.Painter.Painter;
 
-public class ContentLeafStyleParams extends WidgetStyleParams
+public class ContentLeafStyleParams extends ElementStyleParams
 {
 	public static final ContentLeafStyleParams defaultStyleParams = new ContentLeafStyleParams( null, null, null );
 	

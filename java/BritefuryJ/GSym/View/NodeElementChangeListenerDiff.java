@@ -12,7 +12,7 @@ import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPContentLeaf;
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPSegment;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Marker.Marker.Bias;
@@ -56,12 +56,12 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 	}
 
 	
-	public void elementChangeFrom(DVNode node, DPWidget element)
+	public void elementChangeFrom(DVNode node, DPElement element)
 	{
 		if ( caretNode == null )
 		{
 			// Get and store initial state
-			DPWidget nodeElement = node.getInnerElementNoRefresh();
+			DPElement nodeElement = node.getInnerElementNoRefresh();
 			if ( nodeElement != null )
 			{
 				DPPresentationArea tree = nodeElement.getPresentationArea();
@@ -78,18 +78,18 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 					bias = caret.getMarker().getBias();
 					position = pos;
 				}
-				catch (DPWidget.IsNotInSubtreeException e)
+				catch (DPElement.IsNotInSubtreeException e)
 				{
 				}
 			}
 		}
 	}
 
-	public void elementChangeTo(DVNode node, DPWidget element)
+	public void elementChangeTo(DVNode node, DPElement element)
 	{
 		if ( caretNode == node )
 		{
-			DPWidget nodeElement = node.getInnerElementNoRefresh();
+			DPElement nodeElement = node.getInnerElementNoRefresh();
 			
 			// Invoking child.refresh() above can cause this method to be invoked on another node; recursively;
 			// Ensure that only the inner-most recursion level handles the caret

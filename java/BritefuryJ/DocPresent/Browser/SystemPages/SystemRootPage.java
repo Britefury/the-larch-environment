@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPVBox;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.EmptyBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Browser.Page;
@@ -48,16 +48,16 @@ public class SystemRootPage extends Page
 
 	
 	
-	public DPWidget getContentsElement()
+	public DPElement getContentsElement()
 	{
-		DPWidget title = styleSheet.withFont( new Font( "Serif", Font.BOLD, 32 ) ).withTextSmallCaps( true ).staticText( "GSym System Page" );
+		DPElement title = styleSheet.withFont( new Font( "Serif", Font.BOLD, 32 ) ).withTextSmallCaps( true ).staticText( "GSym System Page" );
 		
-		ArrayList<DPWidget> headChildren = new ArrayList<DPWidget>();
+		ArrayList<DPElement> headChildren = new ArrayList<DPElement>();
 		headChildren.add( createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE ) );
 		headChildren.add( title.alignHCentre() );
 		DPVBox headBox = styleSheet.vbox( headChildren );
 		
-		ArrayList<DPWidget> pageChildren = new ArrayList<DPWidget>();
+		ArrayList<DPElement> pageChildren = new ArrayList<DPElement>();
 		pageChildren.add( headBox.alignHExpand() );
 		pageChildren.add( createContents().alignHExpand() );
 		
@@ -65,11 +65,11 @@ public class SystemRootPage extends Page
 	}
 
 	
-	protected DPWidget createTestsBox(String title, List<SystemPage> pages)
+	protected DPElement createTestsBox(String title, List<SystemPage> pages)
 	{
-		ArrayList<DPWidget> testBoxChildren = new ArrayList<DPWidget>();
+		ArrayList<DPElement> testBoxChildren = new ArrayList<DPElement>();
 		
-		DPWidget titleElement = styleSheet.withFont( new Font( "Serif", Font.BOLD, 18 ) ).staticText( title ).pad( 30.0, 30.0, 5.0, 15.0 );
+		DPElement titleElement = styleSheet.withFont( new Font( "Serif", Font.BOLD, 18 ) ).staticText( title ).pad( 30.0, 30.0, 5.0, 15.0 );
 		testBoxChildren.add( titleElement );
 		
 		for (SystemPage page: pages)
@@ -80,15 +80,15 @@ public class SystemRootPage extends Page
 		return outlineStyle.border( styleSheet.vbox( testBoxChildren ) );
 	}
 	
-	protected DPWidget createContents()
+	protected DPElement createContents()
 	{
-		DPWidget titleElement = styleSheet.withFont( new Font( "Serif", Font.BOLD, 24 ) ).staticText( "Tests:" ).pad( 0.0, 5.0 ).alignHCentre();
+		DPElement titleElement = styleSheet.withFont( new Font( "Serif", Font.BOLD, 24 ) ).staticText( "Tests:" ).pad( 0.0, 5.0 ).alignHCentre();
 		
-		ArrayList<DPWidget> testBoxes = new ArrayList<DPWidget>();
+		ArrayList<DPElement> testBoxes = new ArrayList<DPElement>();
 		testBoxes.add( createTestsBox( "Primitive elements:", SystemDirectory.getPrimitiveTestPages() ).pad( 25.0, 5.0 ) );
 		testBoxes.add( createTestsBox( "Controls:", SystemDirectory.getControlTestPages() ).pad( 25.0, 5.0 ) );
 
-		ArrayList<DPWidget> contents = new ArrayList<DPWidget>();
+		ArrayList<DPElement> contents = new ArrayList<DPElement>();
 		contents.add( titleElement );
 		contents.add( styleSheet.hbox( testBoxes ) );
 		
@@ -100,9 +100,9 @@ public class SystemRootPage extends Page
 	public static int LINKHEADER_ROOTPAGE = 0x1;
 	public static int LINKHEADER_SYSTEMPAGE = 0x2;
 	
-	public static DPWidget createLinkHeader(int linkHeaderFlags)
+	public static DPElement createLinkHeader(int linkHeaderFlags)
 	{
-		ArrayList<DPWidget> linkElements = new ArrayList<DPWidget>();
+		ArrayList<DPElement> linkElements = new ArrayList<DPElement>();
 		
 		if ( ( linkHeaderFlags & LINKHEADER_ROOTPAGE )  !=  0 )
 		{
@@ -114,10 +114,10 @@ public class SystemRootPage extends Page
 			linkElements.add( controlsStyleSheet.link( "SYSTEM PAGE", "system" ).getElement() );
 		}
 
-		DPWidget links = styleSheet.withHBoxSpacing( 25.0 ).hbox( linkElements );
+		DPElement links = styleSheet.withHBoxSpacing( 25.0 ).hbox( linkElements );
 		
-		DPWidget linksBackground = styleSheet.withBorder( new EmptyBorder( 5.0, 5.0, 5.0, 5.0, new Color( 184, 206, 203 ) ) ).border( links.alignHRight() );
-		DPWidget linksHeader = styleSheet.withBorder( new EmptyBorder( 5.0, 5.0, 5.0, 5.0 ) ).border( linksBackground.alignHExpand() );
+		DPElement linksBackground = styleSheet.withBorder( new EmptyBorder( 5.0, 5.0, 5.0, 5.0, new Color( 184, 206, 203 ) ) ).border( links.alignHRight() );
+		DPElement linksHeader = styleSheet.withBorder( new EmptyBorder( 5.0, 5.0, 5.0, 5.0 ) ).border( linksBackground.alignHExpand() );
 		
 		return linksHeader.alignHExpand();
 	}

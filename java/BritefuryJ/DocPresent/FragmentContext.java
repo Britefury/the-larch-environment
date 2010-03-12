@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-public interface ElementContext
+public interface FragmentContext
 {
 
 }

@@ -10,7 +10,7 @@ import org.python.core.Py;
 import org.python.core.PyObject;
 
 import BritefuryJ.DocPresent.DPBorder;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
@@ -48,12 +48,12 @@ public class Button extends Control
 		}
 		
 		
-		public boolean onButtonDown(DPWidget element, PointerButtonEvent event)
+		public boolean onButtonDown(DPElement element, PointerButtonEvent event)
 		{
 			return true;
 		}
 
-		public boolean onButtonUp(DPWidget element, PointerButtonEvent event)
+		public boolean onButtonUp(DPElement element, PointerButtonEvent event)
 		{
 			if ( buttonElement.isRealised() )
 			{
@@ -64,12 +64,12 @@ public class Button extends Control
 		}
 		
 		
-		public void onEnter(DPWidget element, PointerMotionEvent event)
+		public void onEnter(DPElement element, PointerMotionEvent event)
 		{
 			buttonElement.setBorder( highlightBorder );
 		}
 
-		public void onLeave(DPWidget element, PointerMotionEvent event)
+		public void onLeave(DPElement element, PointerMotionEvent event)
 		{
 			buttonElement.setBorder( buttonBorder );
 		}
@@ -98,12 +98,12 @@ public class Button extends Control
 	}
 	
 	
-	public DPWidget getElement()
+	public DPElement getElement()
 	{
 		return buttonElement;
 	}
 	
-	public void setContents(DPWidget contents)
+	public void setContents(DPElement contents)
 	{
 		buttonElement.setChild( contents );
 	}

@@ -11,7 +11,7 @@ import java.awt.Font;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPTable;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
@@ -91,9 +91,9 @@ public class TableTestPage extends SystemPage
 	
 	
 	
-	protected DPWidget createContents()
+	protected DPElement createContents()
 	{
-		ArrayList<DPWidget> children = new ArrayList<DPWidget>();
+		ArrayList<DPElement> children = new ArrayList<DPElement>();
 		children.add( sectionStyle.border( makeTable0() ) );
 		children.add( sectionStyle.border( makeTable1() ) );
 		children.add( sectionStyle.border( makeTable2() ) );

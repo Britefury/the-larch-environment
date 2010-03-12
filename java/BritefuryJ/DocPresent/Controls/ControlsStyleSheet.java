@@ -17,7 +17,7 @@ import org.python.core.PyObject;
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPFrame;
 import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.StyleSheet.AttributeSet;
@@ -278,13 +278,13 @@ public class ControlsStyleSheet extends StyleSheet
 	
 	
 	
-	public Button button(DPWidget child, Button.ButtonListener listener)
+	public Button button(DPElement child, Button.ButtonListener listener)
 	{
 		DPBorder element = getButtonStyleSheet().border( child );
 		return new Button( element, getButtonBorder(), getButtonHighlightBorder(), listener );
 	}
 
-	public Button button(DPWidget child, PyObject listener)
+	public Button button(DPElement child, PyObject listener)
 	{
 		DPBorder element = getButtonStyleSheet().border( child );
 		return new Button( element, getButtonBorder(), getButtonHighlightBorder(), listener );
@@ -293,7 +293,7 @@ public class ControlsStyleSheet extends StyleSheet
 	public Button buttonWithLabel(String text, Button.ButtonListener listener)
 	{
 		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
-		DPWidget child = primitive.staticText( text );
+		DPElement child = primitive.staticText( text );
 		DPBorder element = getButtonStyleSheet().border( child );
 		return new Button( element, getButtonBorder(), getButtonHighlightBorder(), listener );
 	}
@@ -301,7 +301,7 @@ public class ControlsStyleSheet extends StyleSheet
 	public Button buttonWithLabel(String text, PyObject listener)
 	{
 		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
-		DPWidget child = primitive.staticText( text );
+		DPElement child = primitive.staticText( text );
 		DPBorder element = getButtonStyleSheet().border( child );
 		return new Button( element, getButtonBorder(), getButtonHighlightBorder(), listener );
 	}
@@ -312,7 +312,7 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		PrimitiveStyleSheet textEntryStyle = getTextEntryStyleSheet();
 		DPText textElement = textEntryStyle.text( text );
-		DPWidget line = textEntryStyle.hbox( Arrays.asList( new DPWidget[] { textEntryStyle.segment( false, false, textElement ) } ) );
+		DPElement line = textEntryStyle.hbox( Arrays.asList( new DPElement[] { textEntryStyle.segment( false, false, textElement ) } ) );
 		DPFrame frame = textEntryStyle.frame( line );
 		DPBorder outerElement = textEntryStyle.border( frame );
 		return new TextEntry( outerElement, frame, textElement, listener );
@@ -322,7 +322,7 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		PrimitiveStyleSheet textEntryStyle = getTextEntryStyleSheet();
 		DPText textElement = textEntryStyle.text( text );
-		DPWidget line = textEntryStyle.hbox( Arrays.asList( new DPWidget[] { textEntryStyle.segment( false, false, textElement ) } ) );
+		DPElement line = textEntryStyle.hbox( Arrays.asList( new DPElement[] { textEntryStyle.segment( false, false, textElement ) } ) );
 		DPFrame frame = textEntryStyle.frame( line );
 		DPBorder outerElement = textEntryStyle.border( frame );
 		return new TextEntry( outerElement, frame, textElement, accept, cancel );

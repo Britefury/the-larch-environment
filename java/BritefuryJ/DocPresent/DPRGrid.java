@@ -34,7 +34,7 @@ public class DPRGrid extends DPContainerSequence
 	{
 		numColumns = 0;
 		LayoutNodeRGrid gridLayout = (LayoutNodeRGrid)getLayoutNode();
-		for (DPWidget child: gridLayout.getLeaves())
+		for (DPElement child: gridLayout.getLeaves())
 		{
 			if ( child instanceof DPGridRow )
 			{

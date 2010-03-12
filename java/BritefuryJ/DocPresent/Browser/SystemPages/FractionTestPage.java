@@ -11,7 +11,7 @@ import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class FractionTestPage extends SystemPage
@@ -39,19 +39,19 @@ public class FractionTestPage extends SystemPage
 	}
 
 
-	private DPWidget makeFractionLine(DPWidget num, DPWidget denom)
+	private DPElement makeFractionLine(DPElement num, DPElement denom)
 	{
-		return styleSheet.hbox( Arrays.asList( new DPWidget[] { smallStyle.text( "<<Left<<" ), fractionStyle.fraction( num, denom, "/" ), largeStyle.text( ">>Right>>" ) } ) );
+		return styleSheet.hbox( Arrays.asList( new DPElement[] { smallStyle.text( "<<Left<<" ), fractionStyle.fraction( num, denom, "/" ), largeStyle.text( ">>Right>>" ) } ) );
 	}
 	
-	private DPWidget span(DPWidget... children)
+	private DPElement span(DPElement... children)
 	{
 		return styleSheet.span( Arrays.asList( children ) );
 	}
 
-	protected DPWidget createContents()
+	protected DPElement createContents()
 	{
-		ArrayList<DPWidget> lines = new ArrayList<DPWidget>();
+		ArrayList<DPElement> lines = new ArrayList<DPElement>();
 		
 		lines.add( makeFractionLine( styleSheet.text( "a" ), styleSheet.text( "p" ) ) );
 		lines.add( makeFractionLine( styleSheet.text( "a" ), styleSheet.text( "p+q" ) ) );

@@ -31,7 +31,7 @@ public class DPProxy extends DPContainer
 
 
 
-	public DPWidget getChild()
+	public DPElement getChild()
 	{
 		if ( registeredChildren.size() > 0 )
 		{
@@ -43,9 +43,9 @@ public class DPProxy extends DPContainer
 		}
 	}
 	
-	public void setChild(DPWidget child)
+	public void setChild(DPElement child)
 	{
-		DPWidget prevChild = getChild();
+		DPElement prevChild = getChild();
 		if ( child != prevChild )
 		{
 			if ( prevChild != null )
@@ -66,7 +66,7 @@ public class DPProxy extends DPContainer
 	}
 	
 	
-	protected void replaceChildWithEmpty(DPWidget child)
+	protected void replaceChildWithEmpty(DPElement child)
 	{
 		assert child == this.getChild();
 		setChild( null );
@@ -74,7 +74,7 @@ public class DPProxy extends DPContainer
 	
 	
 
-	public List<DPWidget> getChildren()
+	public List<DPElement> getChildren()
 	{
 		return registeredChildren;
 	}

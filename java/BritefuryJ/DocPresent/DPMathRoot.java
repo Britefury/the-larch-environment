@@ -19,7 +19,7 @@ import BritefuryJ.DocPresent.StyleParams.MathRootStyleParams;
 
 public class DPMathRoot extends DPContainer
 {
-	protected DPWidget child;
+	protected DPElement child;
 	
 	
 	
@@ -37,12 +37,12 @@ public class DPMathRoot extends DPContainer
 	
 	
 	
-	public DPWidget getChild()
+	public DPElement getChild()
 	{
 		return child;
 	}
 	
-	public void setChild(DPWidget child)
+	public void setChild(DPElement child)
 	{
 		if ( child != this.child )
 		{
@@ -51,7 +51,7 @@ public class DPMathRoot extends DPContainer
 				throw new ChildHasNoLayoutException();
 			}
 
-			DPWidget prevChild = this.child;
+			DPElement prevChild = this.child;
 			
 			if ( prevChild != null )
 			{
@@ -73,7 +73,7 @@ public class DPMathRoot extends DPContainer
 	}
 	
 	
-	protected void replaceChildWithEmpty(DPWidget child)
+	protected void replaceChildWithEmpty(DPElement child)
 	{
 		assert child == this.child;
 		setChild( null );
@@ -81,16 +81,16 @@ public class DPMathRoot extends DPContainer
 	
 	
 
-	public List<DPWidget> getChildren()
+	public List<DPElement> getChildren()
 	{
 		if ( child != null )
 		{
-			DPWidget[] children = { child };
+			DPElement[] children = { child };
 			return Arrays.asList( children );
 		}
 		else
 		{
-			DPWidget[] children = {};
+			DPElement[] children = {};
 			return Arrays.asList( children );
 		}
 	}

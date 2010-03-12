@@ -7,7 +7,7 @@
 package BritefuryJ.DocPresent.LayoutTree;
 
 import BritefuryJ.DocPresent.DPBorder;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Layout.LAllocHelper;
 import BritefuryJ.DocPresent.Layout.LAllocV;
@@ -26,7 +26,7 @@ public class LayoutNodeBorder extends LayoutNodeBin
 	{
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPBorder borderElement = (DPBorder)element;
-		DPWidget child = borderElement.getChild();
+		DPElement child = borderElement.getChild();
 		Border border = borderElement.getBorder();
 		if ( child != null )
 		{
@@ -43,7 +43,7 @@ public class LayoutNodeBorder extends LayoutNodeBin
 	{
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPBorder borderElement = (DPBorder)element;
-		DPWidget child = borderElement.getChild();
+		DPElement child = borderElement.getChild();
 		Border border = borderElement.getBorder();
 		if ( child != null )
 		{
@@ -62,7 +62,7 @@ public class LayoutNodeBorder extends LayoutNodeBin
 	protected void updateAllocationX()
 	{
 		DPBorder borderElement = (DPBorder)element;
-		DPWidget child = borderElement.getChild();
+		DPElement child = borderElement.getChild();
 		Border border = borderElement.getBorder();
 		if ( child != null )
 		{
@@ -77,7 +77,7 @@ public class LayoutNodeBorder extends LayoutNodeBin
 	protected void updateAllocationY()
 	{
 		DPBorder borderElement = (DPBorder)element;
-		DPWidget child = borderElement.getChild();
+		DPElement child = borderElement.getChild();
 		Border border = borderElement.getBorder();
 		if ( child != null )
 		{

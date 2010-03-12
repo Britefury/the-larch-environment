@@ -6,9 +6,9 @@
 //##************************
 package BritefuryJ.DocPresent.Controls;
 
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 
 public abstract class Control
 {
-	public abstract DPWidget getElement();
+	public abstract DPElement getElement();
 }

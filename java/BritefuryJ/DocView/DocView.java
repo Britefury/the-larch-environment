@@ -10,7 +10,7 @@ import java.util.Arrays;
 
 import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocPresent.DPVBox;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
 import BritefuryJ.IncrementalTree.IncrementalTree;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
@@ -31,8 +31,8 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 	public interface NodeElementChangeListener
 	{
 		public void reset(DocView view);
-		public void elementChangeFrom(DVNode node, DPWidget e);
-		public void elementChangeTo(DVNode node, DPWidget e);
+		public void elementChangeFrom(DVNode node, DPElement e);
+		public void elementChangeTo(DVNode node, DPElement e);
 	}
 	
 	
@@ -82,7 +82,7 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 	}
 	
 	
-	public DPWidget getRootViewElement()
+	public DPElement getRootViewElement()
 	{
 		if ( rootBox == null )
 		{
@@ -91,7 +91,7 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 			rootView.getElement().alignHExpand();
 			rootView.getElement().alignVExpand();
 			rootBox = new DPVBox( rootBoxStyle );
-			rootBox.setChildren( Arrays.asList( new DPWidget[] { rootView.getElement() } ) );
+			rootBox.setChildren( Arrays.asList( new DPElement[] { rootView.getElement() } ) );
 		}
 		return rootBox;
 	}
@@ -291,14 +291,14 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 	public void resultChangeFrom(IncrementalTreeNode node, Object result)
 	{
 		profile_startContentChange();
-		elementChangeListener.elementChangeFrom( (DVNode)node, (DPWidget)result );
+		elementChangeListener.elementChangeFrom( (DVNode)node, (DPElement)result );
 		profile_stopContentChange();
 	}
 
 	public void resultChangeTo(IncrementalTreeNode node, Object result)
 	{
 		profile_startContentChange();
-		elementChangeListener.elementChangeTo( (DVNode)node, (DPWidget)result );
+		elementChangeListener.elementChangeTo( (DVNode)node, (DPElement)result );
 		profile_stopContentChange();
 	}
 }

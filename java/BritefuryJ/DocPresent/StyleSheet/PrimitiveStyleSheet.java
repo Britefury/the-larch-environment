@@ -39,7 +39,7 @@ import BritefuryJ.DocPresent.DPTable;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWhitespace;
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.EditHandler;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.SolidBorder;
@@ -609,14 +609,14 @@ public class PrimitiveStyleSheet extends StyleSheet
 
 	
 	
-	public DPBin box(DPWidget child)
+	public DPBin box(DPElement child)
 	{
 		DPBin box = new DPBin( getContainerParams() );
 		box.setChild( child );
 		return box;
 	}
 	
-	public DPBorder border(DPWidget child)
+	public DPBorder border(DPElement child)
 	{
 		DPBorder border = new DPBorder( getBorderParams().border );
 		border.setChild( child );
@@ -635,7 +635,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 	
 	
-	public DPFraction fraction(DPWidget numerator, DPWidget denominator, String barContent)
+	public DPFraction fraction(DPElement numerator, DPElement denominator, String barContent)
 	{
 		DPFraction element = new DPFraction( getFractionParams(), getTextParams(), barContent );
 		element.setNumeratorChild( numerator );
@@ -644,14 +644,14 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 	
 	
-	public DPFrame frame(DPWidget child)
+	public DPFrame frame(DPElement child)
 	{
 		DPFrame element = new DPFrame();
 		element.setChild( child );
 		return element;
 	}
 
-	public DPFrame frame(DPWidget child, EditHandler editHandler)
+	public DPFrame frame(DPElement child, EditHandler editHandler)
 	{
 		DPFrame element = new DPFrame();
 		element.setChild( child );
@@ -660,7 +660,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 
 	
-	public DPHBox hbox(List<DPWidget> children)
+	public DPHBox hbox(List<DPElement> children)
 	{
 		DPHBox element = new DPHBox( getHBoxParams() );
 		element.setChildren( children );
@@ -737,7 +737,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 	
 	
 	
-	public DPMathRoot mathRoot(DPWidget child)
+	public DPMathRoot mathRoot(DPElement child)
 	{
 		DPMathRoot element = new DPMathRoot( getMathRootParams() );
 		element.setChild( child );
@@ -745,7 +745,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 	
 	
-	public DPParagraph paragraph(List<DPWidget> children)
+	public DPParagraph paragraph(List<DPElement> children)
 	{
 		DPParagraph element = new DPParagraph( getParagraphParams() );
 		element.setChildren( children );
@@ -753,7 +753,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 	
 
-	public DPProxy proxy(DPWidget child)
+	public DPProxy proxy(DPElement child)
 	{
 		DPProxy proxy = new DPProxy();
 		proxy.setChild( child );
@@ -761,14 +761,14 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 	
 
-	public DPSpan span(List<DPWidget> children)
+	public DPSpan span(List<DPElement> children)
 	{
 		DPSpan element = new DPSpan( getContainerParams() );
 		element.setChildren( children );
 		return element;
 	}
 	
-	public DPParagraphStructureSpan paragraphStructureSpan(List<DPWidget> children)
+	public DPParagraphStructureSpan paragraphStructureSpan(List<DPElement> children)
 	{
 		DPParagraphStructureSpan element = new DPParagraphStructureSpan( getContainerParams() );
 		element.setChildren( children );
@@ -776,7 +776,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 	
 
-	public DPLineBreak lineBreak(DPWidget child)
+	public DPLineBreak lineBreak(DPElement child)
 	{
 		DPLineBreak element = new DPLineBreak( getContainerParams() );
 		if ( child != null )
@@ -808,7 +808,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 
 	
-	public DPScript script(DPWidget mainChild, DPWidget leftSuperChild, DPWidget leftSubChild, DPWidget rightSuperChild, DPWidget rightSubChild)
+	public DPScript script(DPElement mainChild, DPElement leftSuperChild, DPElement leftSubChild, DPElement rightSuperChild, DPElement rightSubChild)
 	{
 		DPScript element = new DPScript( getScriptParams(), getTextParams() );
 		element.setMainChild( mainChild );
@@ -832,28 +832,28 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 	
 	
-	public DPScript scriptLSuper(DPWidget mainChild, DPWidget scriptChild)
+	public DPScript scriptLSuper(DPElement mainChild, DPElement scriptChild)
 	{
 		return script( mainChild, scriptChild, null, null, null );
 	}
 	
-	public DPScript scriptLSub(DPWidget mainChild, DPWidget scriptChild)
+	public DPScript scriptLSub(DPElement mainChild, DPElement scriptChild)
 	{
 		return script( mainChild, null, scriptChild, null, null );
 	}
 	
-	public DPScript scriptRSuper(DPWidget mainChild, DPWidget scriptChild)
+	public DPScript scriptRSuper(DPElement mainChild, DPElement scriptChild)
 	{
 		return script( mainChild, null, null, scriptChild, null );
 	}
 	
-	public DPScript scriptRSub(DPWidget mainChild, DPWidget scriptChild)
+	public DPScript scriptRSub(DPElement mainChild, DPElement scriptChild)
 	{
 		return script( mainChild, null, null, null, scriptChild );
 	}
 	
 	
-	public DPSegment segment(boolean bGuardBegin, boolean bGuardEnd, DPWidget child)
+	public DPSegment segment(boolean bGuardBegin, boolean bGuardEnd, DPElement child)
 	{
 		DPSegment seg = new DPSegment( getContainerParams(), getTextParams(), bGuardBegin, bGuardEnd );
 		seg.setChild( child );
@@ -867,14 +867,14 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 	
 	
-	public DPGridRow gridRow(List<DPWidget> children)
+	public DPGridRow gridRow(List<DPElement> children)
 	{
 		DPGridRow element = new DPGridRow( getGridRowParams() );
 		element.setChildren( children );
 		return element;
 	}
 	
-	public DPRGrid rgrid(List<DPWidget> children)
+	public DPRGrid rgrid(List<DPElement> children)
 	{
 		DPRGrid element = new DPRGrid( getTableParams() );
 		element.setChildren( children );
@@ -887,7 +887,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 		return new DPTable( getTableParams() );
 	}
 	
-	public DPTable table(DPWidget children[][])
+	public DPTable table(DPElement children[][])
 	{
 		DPTable element = new DPTable( getTableParams() );
 		element.setChildren( children );
@@ -906,14 +906,14 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 
 	
-	public DPVBox vbox(List<DPWidget> children)
+	public DPVBox vbox(List<DPElement> children)
 	{
 		DPVBox element = new DPVBox( getVBoxParams() );
 		element.setChildren( children );
 		return element;
 	}
 	
-	public DPVBox vbox(List<DPWidget> children, int refPointIndex)
+	public DPVBox vbox(List<DPElement> children, int refPointIndex)
 	{
 		DPVBox element = new DPVBox( getVBoxParams() );
 		element.setChildren( children );

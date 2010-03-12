@@ -18,7 +18,7 @@ public class DPSegment extends DPContainer
 	// Utility classes
 	//
 	
-	public static class SegmentFilter implements WidgetFilter
+	public static class SegmentFilter implements ElementFilter
 	{
 		private DPSegment segment;
 		
@@ -28,7 +28,7 @@ public class DPSegment extends DPContainer
 			segment = seg;
 		}
 		
-		public boolean testElement(DPWidget element)
+		public boolean testElement(DPElement element)
 		{
 			return element.getSegment() == segment;
 		}
@@ -38,8 +38,8 @@ public class DPSegment extends DPContainer
 	
 	protected TextStyleParams textStyleParams;
 	protected boolean bGuardBegin, bGuardEnd;
-	protected DPWidget beginGuard, endGuard;
-	protected DPWidget child;
+	protected DPElement beginGuard, endGuard;
+	protected DPElement child;
 	protected boolean bGuardsRefreshing;
 	
 	
@@ -80,7 +80,7 @@ public class DPSegment extends DPContainer
 	// Container
 	//
 	
-	public void setChild(DPWidget child)
+	public void setChild(DPElement child)
 	{
 		if ( child != this.child )
 		{
@@ -102,28 +102,28 @@ public class DPSegment extends DPContainer
 		}
 	}
 	
-	public DPWidget getChild()
+	public DPElement getChild()
 	{
 		return child;
 	}
 
 	
-	protected void replaceChildWithEmpty(DPWidget child)
+	protected void replaceChildWithEmpty(DPElement child)
 	{
 		setChild( null );
 	}
 
 	
-	public List<DPWidget> getChildren()
+	public List<DPElement> getChildren()
 	{
 		if ( child != null )
 		{
-			DPWidget[] children = { child };
+			DPElement[] children = { child };
 			return Arrays.asList( children );
 		}
 		else
 		{
-			DPWidget[] children = {};
+			DPElement[] children = {};
 			return Arrays.asList( children );
 		}
 	}
@@ -142,8 +142,8 @@ public class DPSegment extends DPContainer
 		
 		if ( child != null )
 		{
-			DPWidget firstLeaf = child.getFirstLeafInSubtree();
-			DPWidget lastLeaf = child.getLastLeafInSubtree();
+			DPElement firstLeaf = child.getFirstLeafInSubtree();
+			DPElement lastLeaf = child.getLastLeafInSubtree();
 			
 			if ( firstLeaf != null  &&  lastLeaf != null )
 			{

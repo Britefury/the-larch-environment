@@ -9,8 +9,8 @@ package BritefuryJ.DocPresent.LayoutTree;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPBin;
-import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.WidgetFilter;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.ElementFilter;
 import BritefuryJ.DocPresent.Layout.LAllocHelper;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
@@ -28,7 +28,7 @@ public class LayoutNodeBin extends ArrangedLayoutNode
 	{
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPBin bin = (DPBin)element;
-		DPWidget child = bin.getChild();
+		DPElement child = bin.getChild();
 		if ( child != null )
 		{
 			layoutReqBox.setRequisitionX( child.getLayoutNode().refreshRequisitionX() );
@@ -43,7 +43,7 @@ public class LayoutNodeBin extends ArrangedLayoutNode
 	{
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPBin bin = (DPBin)element;
-		DPWidget child = bin.getChild();
+		DPElement child = bin.getChild();
 		if ( child != null )
 		{
 			layoutReqBox.setRequisitionY( child.getLayoutNode().refreshRequisitionY() );
@@ -59,7 +59,7 @@ public class LayoutNodeBin extends ArrangedLayoutNode
 	protected void updateAllocationX()
 	{
 		DPBin bin = (DPBin)element;
-		DPWidget child = bin.getChild();
+		DPElement child = bin.getChild();
 		if ( child != null )
 		{
 			LayoutNode childLayout = child.getLayoutNode();
@@ -72,7 +72,7 @@ public class LayoutNodeBin extends ArrangedLayoutNode
 	protected void updateAllocationY()
 	{
 		DPBin bin = (DPBin)element;
-		DPWidget child = bin.getChild();
+		DPElement child = bin.getChild();
 		if ( child != null )
 		{
 			LayoutNode childLayout = child.getLayoutNode();
@@ -84,10 +84,10 @@ public class LayoutNodeBin extends ArrangedLayoutNode
 	
 	
 	
-	protected DPWidget getChildLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter)
+	protected DPElement getChildLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
 	{
 		DPBin bin = (DPBin)element;
-		DPWidget child = bin.getChild();
+		DPElement child = bin.getChild();
 		if ( child == null )
 		{
 			return null;
@@ -105,10 +105,10 @@ public class LayoutNodeBin extends ArrangedLayoutNode
 	// Focus navigation methods
 	//
 	
-	public List<DPWidget> horizontalNavigationList()
+	public List<DPElement> horizontalNavigationList()
 	{
 		DPBin bin = (DPBin)element;
-		List<DPWidget> children = bin.getLayoutChildren();
+		List<DPElement> children = bin.getLayoutChildren();
 		if ( children.size() > 0 )
 		{
 			return children;

@@ -13,7 +13,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Arrays;
 
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class ImageTestPage extends SystemPage
@@ -40,7 +40,7 @@ public class ImageTestPage extends SystemPage
 
 	
 	
-	protected DPWidget createContents()
+	protected DPElement createContents()
 	{
 		BufferedImage ellipseImage = new BufferedImage( 64, 32, BufferedImage.TYPE_4BYTE_ABGR );
 		Graphics2D graphics = (Graphics2D)ellipseImage.getGraphics();
@@ -54,7 +54,7 @@ public class ImageTestPage extends SystemPage
 		graphics.setPaint( new Color( 0.1f, 0.25f, 0.5f ) );
 		graphics.fillOval( 4, 4, 56, 24 );
 		
-		return styleSheet.vbox( Arrays.asList( new DPWidget[] {
+		return styleSheet.vbox( Arrays.asList( new DPElement[] {
 				styleSheet.text( "A 64x32 image with a green oval" ),
 				styleSheet.image( ellipseImage ),
 				styleSheet.text( "A 64x32 image with a green oval, scaled to 256x128" ),

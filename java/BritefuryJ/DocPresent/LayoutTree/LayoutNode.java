@@ -11,8 +11,8 @@ import java.util.List;
 import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPContentLeaf;
 import BritefuryJ.DocPresent.DPContentLeafEditable;
-import BritefuryJ.DocPresent.DPWidget;
-import BritefuryJ.DocPresent.WidgetFilter;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.ElementFilter;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
@@ -21,12 +21,12 @@ import BritefuryJ.Math.Vector2;
 
 public abstract class LayoutNode
 {
-	public boolean hasLayoutForElement(DPWidget element)
+	public boolean hasLayoutForElement(DPElement element)
 	{
 		return element.getLayoutNode() != null;
 	}
 	
-	public abstract DPWidget getElement();
+	public abstract DPElement getElement();
 	
 	public abstract LReqBoxInterface getRequisitionBox();
 	public abstract LAllocBoxInterface getAllocationBox();
@@ -59,7 +59,7 @@ public abstract class LayoutNode
 	
 	protected void handleQueueResize()
 	{
-		DPWidget element = getElement();
+		DPElement element = getElement();
 
 		if ( !element.isResizeQueued() )
 		{
@@ -75,7 +75,7 @@ public abstract class LayoutNode
 
 	public void queueResize()
 	{
-		DPWidget element = getElement();
+		DPElement element = getElement();
 		
 		handleQueueResize();
 		element.clearFlagSizeUpToDate();
@@ -105,7 +105,7 @@ public abstract class LayoutNode
 	
 	public DPContentLeaf getContentLeafToLeft()
 	{
-		DPWidget element = getElement();
+		DPElement element = getElement();
 		DPContainer parent = element.getParent();
 		BranchLayoutNode parentBranchLayout = parent != null  ?  (BranchLayoutNode)parent.getValidLayoutNodeOfClass( BranchLayoutNode.class )  :  null;
 		
@@ -121,7 +121,7 @@ public abstract class LayoutNode
 	
 	public DPContentLeaf getContentLeafToRight()
 	{
-		DPWidget element = getElement();
+		DPElement element = getElement();
 		DPContainer parent = element.getParent();
 		BranchLayoutNode parentBranchLayout = parent != null  ?  (BranchLayoutNode)parent.getValidLayoutNodeOfClass( BranchLayoutNode.class )  :  null;
 		
@@ -140,17 +140,17 @@ public abstract class LayoutNode
 		return null;
 	}
 
-	public abstract DPWidget getLeafClosestToLocalPoint(Point2 localPos, WidgetFilter filter);
+	public abstract DPElement getLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter);
 
 	
 	
 
-	public List<DPWidget> horizontalNavigationList()
+	public List<DPElement> horizontalNavigationList()
 	{
 		return null;
 	}
 
-	public List<DPWidget> verticalNavigationList()
+	public List<DPElement> verticalNavigationList()
 	{
 		return null;
 	}

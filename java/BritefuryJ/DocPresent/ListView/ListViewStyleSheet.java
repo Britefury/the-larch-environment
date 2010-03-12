@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.python.core.PyObject;
 
-import BritefuryJ.DocPresent.DPWidget;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.PyElementFactory;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
@@ -151,7 +151,7 @@ public class ListViewStyleSheet extends StyleSheet
 	// LIST VIEW
 	//
 	
-	public DPWidget createListElement(List<DPWidget> children, TrailingSeparator trailingSeparator)
+	public DPElement createListElement(List<DPElement> children, TrailingSeparator trailingSeparator)
 	{
 		ListViewParams params = getListViewParams();
 		
@@ -162,7 +162,7 @@ public class ListViewStyleSheet extends StyleSheet
 
 
 
-	public static boolean trailingSeparatorRequired(List<DPWidget> children, TrailingSeparator trailingSeparator)
+	public static boolean trailingSeparatorRequired(List<DPElement> children, TrailingSeparator trailingSeparator)
 	{
 		return children.size() > 0  &&  ( trailingSeparator == TrailingSeparator.ALWAYS  ||  ( trailingSeparator == TrailingSeparator.ONE_ELEMENT && children.size() == 1 ) );
 	}
