@@ -71,7 +71,7 @@ public class ParagraphListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 		if ( layoutParams == null )
 		{
 			layoutParams = new ParagraphListViewLayoutParams(
-					get( "addParagraphIndentMarkers", Boolean.class, false ) );
+					getNonNull( "addParagraphIndentMarkers", Boolean.class, false ) );
 		}
 		return layoutParams;
 	}

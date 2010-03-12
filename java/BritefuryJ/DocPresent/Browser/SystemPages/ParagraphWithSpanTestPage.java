@@ -16,17 +16,17 @@ import BritefuryJ.DocPresent.Painter.FilledOutlinePainter;
 import BritefuryJ.DocPresent.Painter.OutlinePainter;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
-public class ParagraphCollationTestPage extends SystemPage
+public class ParagraphWithSpanTestPage extends SystemPage
 {
-	protected ParagraphCollationTestPage()
+	protected ParagraphWithSpanTestPage()
 	{
-		register( "tests.paracollate" );
+		register( "tests.parawithspan" );
 	}
 	
 	
 	public String getTitle()
 	{
-		return "Paragraph collation test";
+		return "Paragraph with span test";
 	}
 
 	protected String getDescription()

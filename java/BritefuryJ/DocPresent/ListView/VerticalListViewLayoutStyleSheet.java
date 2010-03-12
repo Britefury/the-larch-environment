@@ -70,7 +70,7 @@ public class VerticalListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 		if ( layoutParams == null )
 		{
 			layoutParams = new VerticalListViewLayoutParams(
-					get( "indentation", Double.class, 0.0 ) );
+					getNonNull( "indentation", Double.class, 0.0 ) );
 		}
 		return layoutParams;
 	}

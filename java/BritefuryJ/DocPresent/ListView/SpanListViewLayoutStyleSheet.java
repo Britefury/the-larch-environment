@@ -21,12 +21,13 @@ public class SpanListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 {
 	private static class SpanListViewLayoutParams
 	{
-		private boolean bAddLineBreaks, bAddParagraphIndentMarkers;
+		private boolean bAddLineBreaks, bAddParagraphIndentMarkers, bAddLineBreakCost;
 		
-		private SpanListViewLayoutParams(boolean bAddLineBreaks, boolean bAddParagraphIndentMarkers)
+		private SpanListViewLayoutParams(boolean bAddLineBreaks, boolean bAddParagraphIndentMarkers, boolean bAddLineBreakCost)
 		{
 			this.bAddLineBreaks = bAddLineBreaks;
 			this.bAddParagraphIndentMarkers = bAddParagraphIndentMarkers;
+			this.bAddLineBreakCost = bAddLineBreakCost;
 		}
 	}
 
@@ -44,6 +45,7 @@ public class SpanListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 		
 		initAttr( "addLineBreaks", true );
 		initAttr( "addParagraphIndentMarkers", false );
+		initAttr( "addLineBreakCost", false );
 	}
 	
 
@@ -68,6 +70,11 @@ public class SpanListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 		return (SpanListViewLayoutStyleSheet)withAttr( "addParagraphIndentMarkers", addParagraphIndentMarkers );
 	}
 
+	public SpanListViewLayoutStyleSheet withAddLineBreakCost(boolean addLineBreakCost)
+	{
+		return (SpanListViewLayoutStyleSheet)withAttr( "addLineBreakCost", addLineBreakCost );
+	}
+
 
 	
 	//
@@ -78,8 +85,9 @@ public class SpanListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 		if ( layoutParams == null )
 		{
 			layoutParams = new SpanListViewLayoutParams(
-					get( "addLineBreaks", Boolean.class, true ),
-					get( "addParagraphIndentMarkers", Boolean.class, false ) );
+					getNonNull( "addLineBreaks", Boolean.class, true ),
+					getNonNull( "addParagraphIndentMarkers", Boolean.class, false ),
+					getNonNull( "addLineBreakCost", Boolean.class, false ) );
 		}
 		return layoutParams;
 	}
@@ -155,6 +163,13 @@ public class SpanListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 			childElems.add( endDelim.createElement( primitiveStyle ) );
 		}
 		
-		return primitiveStyle.span( childElems );
+		if ( params.bAddLineBreakCost )
+		{
+			return primitiveStyle.paragraphBreakCostSpan( childElems );
+		}
+		else
+		{
+			return primitiveStyle.span( childElems );
+		}
 	}
 }
