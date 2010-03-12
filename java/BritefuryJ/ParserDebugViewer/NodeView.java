@@ -21,7 +21,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.Border.Border;
-import BritefuryJ.DocPresent.Border.EmptyBorder;
+import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
@@ -121,8 +121,8 @@ public class NodeView implements FragmentContext
 	static PrimitiveStyleSheet valueStyle = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 16 ) );
 	static PrimitiveStyleSheet failStyle = styleSheet.withFont( new Font( "Sans serif", Font.ITALIC, 16 ) ).withForeground( new Color( 0.5f, 0.0f, 0.0f ) );;
 	
-	static Border titleSuccessBorder = new EmptyBorder( 0.0, 0.0, 0.0, 0.0, new Color( 0.85f, 0.95f, 0.85f ) );
-	static Border titleFailBorder = new EmptyBorder( 0.0, 0.0, 0.0, 0.0, new Color( 1.0f, 0.85f, 0.85f ) );
+	static Border titleSuccessBorder = new FilledBorder( 0.0, 0.0, 0.0, 0.0, new Color( 0.85f, 0.95f, 0.85f ) );
+	static Border titleFailBorder = new FilledBorder( 0.0, 0.0, 0.0, 0.0, new Color( 1.0f, 0.85f, 0.85f ) );
 	static Border nodeBorder = new SolidBorder( 1.0, 1.0, Color.black, null );
 	
 	

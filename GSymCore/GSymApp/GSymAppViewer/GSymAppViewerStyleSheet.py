@@ -30,7 +30,7 @@ class GSymAppViewerStyleSheet (StyleSheet):
 		self.initAttr( 'titleBarStyle', TitleBarStyleSheet.instance )
 		self.initAttr( 'tabbedBoxStyle', TabbedBoxStyleSheet.instance )
 		
-		self.initAttr( 'appDocumentControlsAttrs', AttributeSet( border=EmptyBorder( 5.0, 5.0, 5.0, 5.0, Color( 0.9, 0.9, 0.9 ) ), hboxSpacing=20.0 ) )
+		self.initAttr( 'appDocumentControlsAttrs', AttributeSet( border=FilledBorder( 5.0, 5.0, 5.0, 5.0, Color( 0.9, 0.9, 0.9 ) ), hboxSpacing=20.0 ) )
 		self.initAttr( 'dcumentListTableAttrs', AttributeSet( tableColumnSpacing=15.0, tableColumnExpand=False, tableRowSpacing=5.0, tableRowExpand=False ) )
 		
 		self.initAttr( 'controlsPadding', 5.0 )

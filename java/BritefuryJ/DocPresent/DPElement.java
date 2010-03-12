@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.WeakHashMap;
 
 import BritefuryJ.DocPresent.Border.Border;
-import BritefuryJ.DocPresent.Border.EmptyBorder;
+import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.ContextMenu.ContextMenu;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
@@ -157,7 +157,7 @@ abstract public class DPElement extends PointerInputElement
 	}
 	
 
-	private static HashMap<PaddingKey, EmptyBorder> paddingBorders = new HashMap<PaddingKey, EmptyBorder>();
+	private static HashMap<PaddingKey, FilledBorder> paddingBorders = new HashMap<PaddingKey, FilledBorder>();
 	
 	
 	
@@ -465,11 +465,11 @@ abstract public class DPElement extends PointerInputElement
 		else
 		{
 			PaddingKey key = new PaddingKey( leftPad, rightPad, topPad, bottomPad );
-			EmptyBorder border = paddingBorders.get( key );
+			FilledBorder border = paddingBorders.get( key );
 			
 			if ( border == null )
 			{
-				border = new EmptyBorder( leftPad, rightPad, topPad, bottomPad );
+				border = new FilledBorder( leftPad, rightPad, topPad, bottomPad );
 				paddingBorders.put( key, border );
 			}
 			
@@ -2725,7 +2725,7 @@ abstract public class DPElement extends PointerInputElement
 	protected static TextStyleParams headerDebugTextStyle = new TextStyleParams( null, null, null, true, new Font( "Sans serif", Font.BOLD, 14 ), new Color( 0.0f, 0.5f, 0.5f ), null, null, false );
 	protected static TextStyleParams headerDescriptionTextStyle = new TextStyleParams( null, null, null, true, new Font( "Sans serif", Font.PLAIN, 14 ), new Color( 0.0f, 0.0f, 0.75f ), null, null, false );
 	protected static HBoxStyleParams metaHeaderHBoxStyle = new HBoxStyleParams( null, null, null, 10.0 );
-	protected static EmptyBorder metaHeaderEmptyBorder = new EmptyBorder();
+	protected static FilledBorder metaHeaderEmptyBorder = new FilledBorder();
 
 
 	public DPElement createMetaHeaderData()

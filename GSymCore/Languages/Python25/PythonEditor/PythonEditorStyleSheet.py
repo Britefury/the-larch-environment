@@ -251,7 +251,7 @@ class PythonEditorStyleSheet (StyleSheet):
 	def _solidHighlightBorder(self, colour):
 		solidHighlightRounding = self['solidHighlightRounding']
 		colour = lerpColour( colour, Color.white, 0.8 )
-		return EmptyBorder( 0.0, 0.0, 0.0, 0.0, solidHighlightRounding, solidHighlightRounding, colour )
+		return FilledBorder( 0.0, 0.0, 0.0, 0.0, solidHighlightRounding, solidHighlightRounding, colour )
 	
 	def _outlineHighlightBorder(self, colour):
 		thickness = self['outlineHighlightThickness']

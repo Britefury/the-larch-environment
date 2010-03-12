@@ -13,7 +13,7 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Border.EmptyBorder;
+import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Browser.Page;
 import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
@@ -116,8 +116,8 @@ public class SystemRootPage extends Page
 
 		DPElement links = styleSheet.withHBoxSpacing( 25.0 ).hbox( linkElements );
 		
-		DPElement linksBackground = styleSheet.withBorder( new EmptyBorder( 5.0, 5.0, 5.0, 5.0, new Color( 184, 206, 203 ) ) ).border( links.alignHRight() );
-		DPElement linksHeader = styleSheet.withBorder( new EmptyBorder( 5.0, 5.0, 5.0, 5.0 ) ).border( linksBackground.alignHExpand() );
+		DPElement linksBackground = styleSheet.withBorder( new FilledBorder( 5.0, 5.0, 5.0, 5.0, new Color( 184, 206, 203 ) ) ).border( links.alignHRight() );
+		DPElement linksHeader = styleSheet.withBorder( new FilledBorder( 5.0, 5.0, 5.0, 5.0 ) ).border( linksBackground.alignHExpand() );
 		
 		return linksHeader.alignHExpand();
 	}

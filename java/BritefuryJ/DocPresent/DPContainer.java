@@ -12,7 +12,7 @@ import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
 
-import BritefuryJ.DocPresent.Border.EmptyBorder;
+import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.LayoutTree.BranchLayoutNode;
@@ -936,7 +936,7 @@ public abstract class DPContainer extends DPElement
 	// Meta-element
 	//
 	
-	static EmptyBorder metaIndentBorder = new EmptyBorder( 25.0, 0.0, 0.0, 0.0 );
+	static FilledBorder metaIndentBorder = new FilledBorder( 25.0, 0.0, 0.0, 0.0 );
 	static VBoxStyleParams metaVBoxStyle = new VBoxStyleParams( null, null, null, 0.0 );
 	
 	public DPBorder getMetaHeaderBorderElement()
