@@ -24,7 +24,7 @@ class TitleBarStyleSheet (StyleSheet):
 	def _params(self):
 		primitiveStyle = self['primitiveStyle']
 		tpad = self['titlePadding']
-		return self._Params( primitiveStyle.withFont( self['titleFont'] ).withForeground( self['titleForeground'] ).withBorder( EmptyBorder( tpad, tpad, tpad, tpad, self['titleBackground'] ) ), \
+		return self._Params( primitiveStyle.withFont( self['titleFont'] ).withForeground( self['titleForeground'] ).withBorder( FilledBorder( tpad, tpad, tpad, tpad, self['titleBackground'] ) ), \
 	                                     primitiveStyle.withFont( self['headerFont'] ).withForeground( self['headerForeground' ] ),
 	                                     self['titleBorderWidth'] )
 		

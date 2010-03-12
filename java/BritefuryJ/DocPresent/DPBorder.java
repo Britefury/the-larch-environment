@@ -10,14 +10,14 @@ package BritefuryJ.DocPresent;
 import java.awt.Graphics2D;
 
 import BritefuryJ.DocPresent.Border.Border;
-import BritefuryJ.DocPresent.Border.EmptyBorder;
+import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeBorder;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 
 
 public class DPBorder extends DPBin
 {
-	public static EmptyBorder defaultBorder = new EmptyBorder( 0.0, 0.0, 0.0, 0.0 );
+	public static FilledBorder defaultBorder = new FilledBorder( 0.0, 0.0, 0.0, 0.0 );
 	
 	protected Border border;
 	

@@ -10,7 +10,7 @@ import java.awt.Color;
 import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Border.EmptyBorder;
+import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
@@ -41,7 +41,7 @@ public class BorderTestPage extends SystemPage
 		
 		DPElement padded = styleSheet.border( styleSheet.text( "Padding: 30 pixels of padding all round, via the pad() method" ).pad( 30.0, 30.0 ) );
 		
-		DPElement emptyBorder = styleSheet.withBorder( new EmptyBorder( 50.0, 50.0, 20.0, 20.0, 20.0, 20.0, new Color( 0.8f, 0.8f, 0.8f ) ) ).border(
+		DPElement emptyBorder = styleSheet.withBorder( new FilledBorder( 50.0, 50.0, 20.0, 20.0, 20.0, 20.0, new Color( 0.8f, 0.8f, 0.8f ) ) ).border(
 				styleSheet.text( "Empty border: 50 pixel h-margins, 20 pixel v-margins, 20 pixel rounding, light-grey background"  ) );
 		
 		DPElement solidBorder = styleSheet.withBorder( new SolidBorder( 3.0f, 10.0, 20.0, 20.0, new Color( 0.6f, 0.6f, 0.6f ), new Color( 0.8f, 0.8f, 0.8f ) ) ).border(

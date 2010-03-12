@@ -23,7 +23,7 @@ class TabbedBoxStyleSheet (StyleSheet):
 		bpad = self['bodyPadding']
 		boxColour = self['boxColour']
 		primitiveStyle = self['primitiveStyle']
-		return self._Params( primitiveStyle.withFont( self['headerFont'] ).withForeground( self['headerForeground'] ).withBorder( EmptyBorder( hpad, hpad, hpad, hpad, boxColour ) ), \
+		return self._Params( primitiveStyle.withFont( self['headerFont'] ).withForeground( self['headerForeground'] ).withBorder( FilledBorder( hpad, hpad, hpad, hpad, boxColour ) ), \
 	                                     primitiveStyle.withBorder( SolidBorder( bpad, bpad, boxColour, None ) ) )
 
 	

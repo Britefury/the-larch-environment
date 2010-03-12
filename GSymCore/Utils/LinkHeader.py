@@ -17,7 +17,7 @@ class LinkHeaderStyleSheet (StyleSheet):
 	def __init__(self):
 		super( LinkHeaderStyleSheet, self ).__init__()
 		
-		primtiveStyle = PrimitiveStyleSheet.instance.withHBoxSpacing( 25.0 ).withBorder( EmptyBorder( 10.0, 10.0, 5.0, 1.0, None ) )
+		primtiveStyle = PrimitiveStyleSheet.instance.withHBoxSpacing( 25.0 ).withBorder( FilledBorder( 10.0, 10.0, 5.0, 1.0, None ) )
 		self.initAttr( 'primitiveStyle', primtiveStyle )
 		
 	
