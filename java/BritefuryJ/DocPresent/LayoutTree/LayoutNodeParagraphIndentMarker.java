@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent.LayoutTree;
 import BritefuryJ.DocPresent.DPParagraphIndentMarker;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 
-public class LayoutNodeParagraphIndentMarker extends LayoutNodeEmpty
+public class LayoutNodeParagraphIndentMarker extends LayoutNodeEmptySharedReq
 {
 	protected static LReqBox indentReqBox = new LReqBox();
 	

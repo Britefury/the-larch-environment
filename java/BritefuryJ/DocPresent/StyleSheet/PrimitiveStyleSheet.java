@@ -776,19 +776,9 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 	
 
-	public DPLineBreak lineBreak(DPElement child)
-	{
-		DPLineBreak element = new DPLineBreak( getContainerParams() );
-		if ( child != null )
-		{
-			element.setChild( child );
-		}
-		return element;
-	}
-	
 	public DPLineBreak lineBreak()
 	{
-		return new DPLineBreak( getContainerParams() );
+		return new DPLineBreak();
 	}
 	
 	public DPParagraphIndentMarker paragraphIndentMarker()

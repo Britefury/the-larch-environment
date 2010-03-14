@@ -352,7 +352,7 @@ public class ParagraphLayout
 					bestLineBreakEntryIndex = lineBreaks.size();
 				}
 				
-				// Add afterwards so that size() will give the index of the entry to be added
+				// Add after testing to see if it is the best line break, so that size() will give the index of the entry to be added
 				lineBreaks.add( entry );
 			}
 			
@@ -368,9 +368,10 @@ public class ParagraphLayout
 				BreakEntry chosenLineBreak = null;
 				if ( ( lineProgress - bestLineBreak.xAfterBreak )  >  allocBoxAllocationX )
 				{
-					// We still go over the allocation limit even if we do split at the best line break.
+					// Splitting at the best line break will result in a new line that will also go over the allocation limit;
+					// we need to choose a different line break
 					
-					// In this case, choose a more recent line break
+					// Search the list of line breaks encountered backwards from the end, to the 'best line break'
 					BreakEntry newBestBreakEntry = null;
 					int newBestBreakEntryIndex = -1;
 					for (int j = lineBreaks.size() - 1; j > bestLineBreakEntryIndex; j--)
@@ -379,10 +380,12 @@ public class ParagraphLayout
 						
 						if ( ( lineProgress - entry.xAfterBreak )  >  allocBoxAllocationX )
 						{
+							// Over the allocation limit; use the previous one
 							break;
 						}
 						
-						if ( newBestBreakEntry == null  ||  entry.breakBox.getReqLineBreakCost() <= newBestBreakEntry.breakBox.getReqLineBreakCost() )
+						// We have found a 'new best break' if break @j has a lower cost than the current 'best'
+						if ( newBestBreakEntry == null  ||  entry.breakBox.getReqLineBreakCost() < newBestBreakEntry.breakBox.getReqLineBreakCost() )
 						{
 							newBestBreakEntry = entry;
 							newBestBreakEntryIndex = j;
@@ -457,6 +460,7 @@ public class ParagraphLayout
 					}
 				}
 
+				// Update each line line break subsequent to the chosen one, and update it's x-co-ordinate fields
 				// Scan for new line break
 				for (int j = lineBreakEntryListOffset; j < lineBreaks.size(); j++)
 				{

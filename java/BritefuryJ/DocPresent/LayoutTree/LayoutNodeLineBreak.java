@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent.LayoutTree;
 import BritefuryJ.DocPresent.DPLineBreak;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
 
-public class LayoutNodeLineBreak extends LayoutNodeBox
+public class LayoutNodeLineBreak extends LayoutNodeEmpty
 {
 	public LayoutNodeLineBreak(DPLineBreak element)
 	{

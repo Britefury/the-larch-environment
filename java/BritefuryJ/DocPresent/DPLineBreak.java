@@ -9,9 +9,9 @@ package BritefuryJ.DocPresent;
 
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeLineBreak;
-import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
+import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
 
-public class DPLineBreak extends DPBox
+public class DPLineBreak extends DPEmpty
 {
 	public DPLineBreak()
 	{
@@ -20,7 +20,7 @@ public class DPLineBreak extends DPBox
 		layoutNode = new LayoutNodeLineBreak( this );
 	}
 	
-	public DPLineBreak(ContainerStyleParams styleParams)
+	public DPLineBreak(ElementStyleParams styleParams)
 	{
 		super(styleParams);
 		
@@ -40,6 +40,7 @@ public class DPLineBreak extends DPBox
 		int cost = 0;
 		DPContainer w = getParent();
 		
+		// Accumulate line break costs, until we encounter a paragraph element		
 		while ( w != null  &&  !( w instanceof DPParagraph ) )
 		{
 			cost += w.getParagraphLinebreakCostModifier();
