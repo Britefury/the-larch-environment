@@ -47,11 +47,11 @@ public class HBoxTestPage extends SystemPage
 	protected DPElement createContents()
 	{
 		ArrayList<DPElement> children = new ArrayList<DPElement>();
-		children.add( makeText( "a", 24 ).alignVBaselines() );
-		children.add( makeText( "g", 24 ).alignVBaselines() );
-		children.add( makeText( "v_ref_y", 18 ).alignVBaselines() );
-		children.add( makeText( "v_ref_y48", 48 ).alignVBaselines() );
-		children.add( makeText( "v_ref_y-expand", 18 ).alignVBaselinesExpand() );
+		children.add( makeText( "a", 24 ).alignVRefY() );
+		children.add( makeText( "g", 24 ).alignVRefY() );
+		children.add( makeText( "v_ref_y", 18 ).alignVRefY() );
+		children.add( makeText( "v_ref_y48", 48 ).alignVRefY() );
+		children.add( makeText( "v_ref_y-expand", 18 ).alignVRefYExpand() );
 		children.add( makeText( "v_top", 18 ).alignVTop() );
 		children.add( makeText( "v_centre", 18 ).alignVCentre() );
 		children.add( makeText( "v_bottom", 18 ).alignVBottom() );

@@ -328,7 +328,7 @@ public class ParagraphLayout
 			}
 			else if ( child.isReqParagraphDedentMarker() )
 			{
-				if ( indentationStack.size() > 1 )
+				if ( indentationStack.size() > 1 )		// Do not remove entry 0 - it is added at stack creation time, and contains the default indentation
 				{
 					indentationStack.lastElement().bOnStack = false;
 					indentationStack.pop();
@@ -415,7 +415,8 @@ public class ParagraphLayout
 				int lineBreakIndex = chosenLineBreak.indexInChildList;
 				double xAfterLineBreak = chosenLineBreak.xAfterBreak;
 				double lineBreakIndentation = lineBreakAtLineStart != null  ?  lineBreakAtLineStart.lineIndentation.indentation  :  indentation;
-				
+				double nextLineIndentation = chosenLineBreak.lineIndentation.indentation;
+
 				
 				// Build a list of child boxes for the line
 				int lineLength = lineBreakIndex - lineStartIndex;
@@ -436,16 +437,14 @@ public class ParagraphLayout
 				lineAdvance -= xAfterLineBreak;
 				lineX -= xAfterLineBreak;
 				
-				lineWidth += lineBreakIndentation;
-				lineAdvance += lineBreakIndentation;
-				lineX += lineBreakIndentation;
+				lineWidth += nextLineIndentation;
+				lineAdvance += nextLineIndentation;
+				lineX += nextLineIndentation;
 				
 				// Reset line break
 				bestLineBreak = null;
 				bestLineBreakEntryIndex = -1;
 				
-				double nextLineIndentation = lineBreakAtLineStart.lineIndentation.indentation;
-
 				for (int j = indentationStack.size() - 1; j >= 1; j--)
 				{
 					IndentationEntry entry = indentationStack.get( j );

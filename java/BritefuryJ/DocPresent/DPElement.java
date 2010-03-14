@@ -396,12 +396,12 @@ abstract public class DPElement extends PointerInputElement
 	}
 	
 	
-	public DPElement alignVBaselines()
+	public DPElement alignVRefY()
 	{
 		return alignV( VAlignment.REFY );
 	}
 
-	public DPElement alignVBaselinesExpand()
+	public DPElement alignVRefYExpand()
 	{
 		return alignV( VAlignment.REFY_EXPAND );
 	}

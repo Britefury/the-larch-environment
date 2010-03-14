@@ -8,9 +8,9 @@ package BritefuryJ.DocPresent;
 
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 
-public class DPParagraphBreakCostSpan extends DPSpan
+public class DPLineBreakCostSpan extends DPSpan
 {
-	public DPParagraphBreakCostSpan(ContainerStyleParams styleParams)
+	public DPLineBreakCostSpan(ContainerStyleParams styleParams)
 	{
 		super( styleParams );
 	}
