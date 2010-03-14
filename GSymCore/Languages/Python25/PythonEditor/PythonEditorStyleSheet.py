@@ -473,7 +473,7 @@ class PythonEditorStyleSheet (StyleSheet):
 				itemViewsSpaced.append( primitiveStyle.whitespace( ' ', comprehensionSpacing ) )
 				itemViewsSpaced.append( primitiveStyle.lineBreak() )
 			itemViewsSpaced.append( comprehensionItems[-1] )
-		return primitiveStyle.paragraphBreakCostSpan( [ delimStyle.text( '[' ),  resultExpr,  primitiveStyle.whitespace( ' ', comprehensionSpacing ) ]  +  itemViewsSpaced  +  [ delimStyle.text( ']' ) ] )
+		return primitiveStyle.lineBreakCostSpan( [ delimStyle.text( '[' ),  resultExpr,  primitiveStyle.whitespace( ' ', comprehensionSpacing ) ]  +  itemViewsSpaced  +  [ delimStyle.text( ']' ) ] )
 
 	
 	def genExpr(self, resultExpr, comprehensionItems):
@@ -488,7 +488,7 @@ class PythonEditorStyleSheet (StyleSheet):
 				itemViewsSpaced.append( primitiveStyle.whitespace( ' ', comprehensionSpacing ) )
 				itemViewsSpaced.append( primitiveStyle.lineBreak() )
 			itemViewsSpaced.append( comprehensionItems[-1] )
-		return primitiveStyle.paragraphBreakCostSpan( [ delimStyle.text( '(' ),  resultExpr,  primitiveStyle.whitespace( ' ', comprehensionSpacing ) ]  +  itemViewsSpaced  +  [ delimStyle.text( ')' ) ] )
+		return primitiveStyle.lineBreakCostSpan( [ delimStyle.text( '(' ),  resultExpr,  primitiveStyle.whitespace( ' ', comprehensionSpacing ) ]  +  itemViewsSpaced  +  [ delimStyle.text( ')' ) ] )
 	
 	
 	def dictKeyValuePair(self, key, value):
@@ -586,7 +586,7 @@ class PythonEditorStyleSheet (StyleSheet):
 				argElements.append( punctuationStyle.text( ',' ) )
 			argElements.append( primitiveStyle.paragraphDedentMarker() )
 			argElements.append( primitiveStyle.text( ' ' ) )
-		return primitiveStyle.paragraphBreakCostSpan( [ target, delimStyle.text( '(' ) ]  +  argElements  +  [ delimStyle.text( ')' ) ] )
+		return primitiveStyle.lineBreakCostSpan( [ target, delimStyle.text( '(' ) ]  +  argElements  +  [ delimStyle.text( ')' ) ] )
 
 	
 	
@@ -601,13 +601,13 @@ class PythonEditorStyleSheet (StyleSheet):
 	def spanPrefixOp(self, x, op):
 		primitiveStyle = self['primitiveStyle']
 		opView = self._operatorStyle().text( op )
-		return primitiveStyle.paragraphBreakCostSpan( [ opView, x ] )
+		return primitiveStyle.lineBreakCostSpan( [ opView, x ] )
 
 	
 	def spanBinOp(self, x, y, op):
 		primitiveStyle = self['primitiveStyle']
 		opView = self._operatorStyle().text( op )
-		return primitiveStyle.paragraphBreakCostSpan( [ x, primitiveStyle.text( ' ' ), opView, primitiveStyle.text( ' ' ), y ] )
+		return primitiveStyle.lineBreakCostSpan( [ x, primitiveStyle.text( ' ' ), opView, primitiveStyle.text( ' ' ), y ] )
 	
 	
 	def spanCmpOp(self, op, y):
@@ -622,7 +622,7 @@ class PythonEditorStyleSheet (StyleSheet):
 	
 	def compare(self, x, cmpOps):
 		primitiveStyle = self['primitiveStyle']
-		return primitiveStyle.paragraphBreakCostSpan( [ x ]  +  cmpOps )
+		return primitiveStyle.lineBreakCostSpan( [ x ]  +  cmpOps )
 		
 		
 	def simpleParam(self, name):
@@ -669,7 +669,7 @@ class PythonEditorStyleSheet (StyleSheet):
 				elements.append( primitiveStyle.lineBreak() )
 			elements.append( primitiveStyle.paragraphDedentMarker() )
 		
-		return primitiveStyle.paragraphBreakCostSpan( [ self._keyword( 'lambda' ),  primitiveStyle.text( ' ' ) ]  +  elements  +  \
+		return primitiveStyle.lineBreakCostSpan( [ self._keyword( 'lambda' ),  primitiveStyle.text( ' ' ) ]  +  elements  +  \
 		                            [ punctuationStyle.text( ':' ),  primitiveStyle.text( ' ' ), primitiveStyle.lineBreak(), expr ] )
 
 
@@ -678,7 +678,7 @@ class PythonEditorStyleSheet (StyleSheet):
 		punctuationStyle = self._punctuationStyle()
 		conditionalSpacing = self['conditionalSpacing']
 		
-		return primitiveStyle.paragraphBreakCostSpan( [ expr,   primitiveStyle.whitespace( '  ', conditionalSpacing ),  primitiveStyle.lineBreak(),
+		return primitiveStyle.lineBreakCostSpan( [ expr,   primitiveStyle.whitespace( '  ', conditionalSpacing ),  primitiveStyle.lineBreak(),
 							 self._keyword( 'if' ), primitiveStyle.text( ' ' ), condition,   primitiveStyle.whitespace( '  ', conditionalSpacing ),  primitiveStyle.lineBreak(),
 							 self._keyword( 'else' ), primitiveStyle.text( ' ' ), elseExpr ] )
 

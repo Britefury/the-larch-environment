@@ -43,25 +43,28 @@ public class AlignmentTestPage extends SystemPage
 		DPBorder halignExpand = styleSheet.border( textStyleSheet.text( "hAlign=EXPAND" ).alignHExpand() );
 		
 		
-		DPElement spacer = styleSheet.withBackground( new FilledOutlinePainter( new Color( 0.8f, 0.85f, 1.0f ), new Color( 0.0f, 0.25f, 1.0f ) ) ).box( styleSheet.text( "SPACER" ).pad( 5.0, 50.0 ) );
+		DPElement refVBox = styleSheet.vbox( Arrays.asList( new DPElement[] { styleSheet.text( "0" ), styleSheet.text( "1 (ref-y)" ), styleSheet.text( "2" ),
+						styleSheet.text( "3" ), styleSheet.text( "4" ), styleSheet.text( "5" ) } ), 1 );
+		DPElement refBox = styleSheet.withBackground( new FilledOutlinePainter( new Color( 0.8f, 0.85f, 1.0f ), new Color( 0.0f, 0.25f, 1.0f ) ) ).box( refVBox.pad( 5.0, 5.0 ) );
 		
 
-		DPBorder valignBaselines = styleSheet.border( textStyleSheet.text( "vAlign=REFY" ).alignVBaselines() );
-		DPBorder valignBaselinesExpand = styleSheet.border( textStyleSheet.text( "vAlign=REFY_EXPAND" ).alignVBaselinesExpand() );
+		DPBorder valignBaselines = styleSheet.border( textStyleSheet.text( "vAlign=REFY" ).alignVRefY() );
+		DPBorder valignBaselinesExpand = styleSheet.border( textStyleSheet.text( "vAlign=REFY_EXPAND" ).alignVRefYExpand() );
 		DPBorder valignTop = styleSheet.border( textStyleSheet.text( "vAlign=TOP" ).alignVTop() );
 		DPBorder valignCentre = styleSheet.border( textStyleSheet.text( "vAlign=CENTRE" ).alignVCentre() );
 		DPBorder valignBottom = styleSheet.border( textStyleSheet.text( "vAlign=BOTTOM" ).alignVBottom() );
 		DPBorder valignExpand = styleSheet.border( textStyleSheet.text( "vAlign=EXPAND" ).alignVExpand() );
 
 		
-		DPElement vAlignBox = styleSheet.withHBoxSpacing( 10.0 ).hbox( Arrays.asList( new DPElement[] { valignBaselines.alignVExpand(), valignBaselinesExpand.alignVExpand(), valignTop.alignVExpand(),
-				valignCentre.alignVExpand(), valignBottom.alignVExpand(), valignExpand.alignVExpand() } ) );
+		DPElement vAlignBox = styleSheet.withHBoxSpacing( 10.0 ).hbox( Arrays.asList( new DPElement[] { valignBaselines.alignVRefYExpand(), valignBaselinesExpand.alignVRefYExpand(),
+				valignTop.alignVRefYExpand(), valignCentre.alignVRefYExpand(), valignBottom.alignVRefYExpand(), valignExpand.alignVRefYExpand() } ) );
 		
 		
-		DPElement bottomBox = styleSheet.withHBoxSpacing( 50.0 ).hbox( Arrays.asList( new DPElement[] { spacer, vAlignBox.alignVExpand() } ) );
+		DPElement bottomBox = styleSheet.withHBoxSpacing( 50.0 ).hbox( Arrays.asList( new DPElement[] { refBox.alignVRefYExpand(), vAlignBox.alignVRefYExpand() } ) );
 		
 		
-		return styleSheet.withVBoxSpacing( 10.0 ).vbox( Arrays.asList( new DPElement[] { halignLeft.alignHExpand(), halignCentre.alignHExpand(), halignRight.alignHExpand(),
+		DPElement mainBox = styleSheet.withVBoxSpacing( 10.0 ).vbox( Arrays.asList( new DPElement[] { halignLeft.alignHExpand(), halignCentre.alignHExpand(), halignRight.alignHExpand(),
 				halignExpand.alignHExpand(), bottomBox } ) );
+		return styleSheet.box( mainBox );
 	}
 }
