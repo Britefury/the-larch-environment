@@ -244,7 +244,7 @@ abstract public class DPElement extends PointerInputElement
 	
 	protected final static int FLAG_REALISED = 0x1;
 	protected final static int FLAG_RESIZE_QUEUED = 0x2;
-	protected final static int FLAG_SIZE_UP_TO_DATE = 0x4;
+	protected final static int FLAG_ALLOCATION_UP_TO_DATE = 0x4;
 	protected final static int FLAG_CARET_GRABBED = 0x8;
 	protected final static int FLAG_HOVER = 0x10;
 
@@ -838,19 +838,19 @@ abstract public class DPElement extends PointerInputElement
 	}
 	
 	
-	public boolean isSizeUpToDate()
+	public boolean isAllocationUpToDate()
 	{
-		return testFlag( FLAG_SIZE_UP_TO_DATE );
+		return testFlag( FLAG_ALLOCATION_UP_TO_DATE );
 	}
 	
-	public void clearFlagSizeUpToDate()
+	public void clearFlagAllocationUpToDate()
 	{
-		clearFlag( FLAG_SIZE_UP_TO_DATE );
+		clearFlag( FLAG_ALLOCATION_UP_TO_DATE );
 	}
 	
-	public void setFlagSizeUpToDate()
+	public void setFlagAllocationUpToDate()
 	{
-		setFlag( FLAG_SIZE_UP_TO_DATE );
+		setFlag( FLAG_ALLOCATION_UP_TO_DATE );
 	}
 	
 	
@@ -2783,7 +2783,7 @@ abstract public class DPElement extends PointerInputElement
 	{
 		if ( metaElement != null )
 		{
-			DPBin bin = (DPBin)metaElement;
+			DPBox bin = (DPBox)metaElement;
 			return (DPBorder)bin.getChild();
 		}
 		else
@@ -2818,7 +2818,7 @@ abstract public class DPElement extends PointerInputElement
 
 	public DPElement createMetaElement()
 	{
-		DPBin bin = new DPBin( );
+		DPBox bin = new DPBox( );
 		bin.setChild( createMetaHeader() );
 		return bin;
 	}

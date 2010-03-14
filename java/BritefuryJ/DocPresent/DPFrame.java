@@ -8,7 +8,7 @@ package BritefuryJ.DocPresent;
 
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 
-public class DPFrame extends DPBin
+public class DPFrame extends DPBox
 {
 	private EditHandler editHandler;
 
