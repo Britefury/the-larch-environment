@@ -53,13 +53,10 @@ public class ParagraphTestPage extends SystemPage
 		for (int i = 0; i < nodesIn.size(); i++)
 		{
 			nodesOut.add( nodesIn.get( i ) );
+			nodesOut.add( styleSheet.text( " " ) );
 			if ( step <= 1  ||  i % step == (step-1) )
 			{
-				nodesOut.add( styleSheet.lineBreak( styleSheet.text(  " " ) ) );
-			}
-			else
-			{
-				nodesOut.add( styleSheet.text( " " ) );
+				nodesOut.add( styleSheet.lineBreak() );
 			}
 		}
 		return nodesOut;

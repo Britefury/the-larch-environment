@@ -82,7 +82,8 @@ public abstract class SystemPage extends Page
 			{
 				if ( !bFirst )
 				{
-					nodes.add( style.lineBreak( style.staticText( " " ) ) );
+					nodes.add( style.staticText( " " ) );
+					nodes.add( style.lineBreak() );
 				}
 				nodes.add( style.staticText( word ) );
 				bFirst = false;

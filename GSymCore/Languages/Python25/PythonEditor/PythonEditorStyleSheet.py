@@ -470,7 +470,8 @@ class PythonEditorStyleSheet (StyleSheet):
 		if len( comprehensionItems ) > 0:
 			for x in comprehensionItems[:-1]:
 				itemViewsSpaced.append( x )
-				itemViewsSpaced.append( primitiveStyle.lineBreak( primitiveStyle.whitespace( ' ', comprehensionSpacing ) ) )
+				itemViewsSpaced.append( primitiveStyle.whitespace( ' ', comprehensionSpacing ) )
+				itemViewsSpaced.append( primitiveStyle.lineBreak() )
 			itemViewsSpaced.append( comprehensionItems[-1] )
 		return primitiveStyle.paragraphBreakCostSpan( [ delimStyle.text( '[' ),  resultExpr,  primitiveStyle.whitespace( ' ', comprehensionSpacing ) ]  +  itemViewsSpaced  +  [ delimStyle.text( ']' ) ] )
 
@@ -484,7 +485,8 @@ class PythonEditorStyleSheet (StyleSheet):
 		if len( comprehensionItems ) > 0:
 			for x in comprehensionItems[:-1]:
 				itemViewsSpaced.append( x )
-				itemViewsSpaced.append( primitiveStyle.lineBreak( primitiveStyle.whitespace( ' ', comprehensionSpacing ) ) )
+				itemViewsSpaced.append( primitiveStyle.whitespace( ' ', comprehensionSpacing ) )
+				itemViewsSpaced.append( primitiveStyle.lineBreak() )
 			itemViewsSpaced.append( comprehensionItems[-1] )
 		return primitiveStyle.paragraphBreakCostSpan( [ delimStyle.text( '(' ),  resultExpr,  primitiveStyle.whitespace( ' ', comprehensionSpacing ) ]  +  itemViewsSpaced  +  [ delimStyle.text( ')' ) ] )
 	
@@ -577,7 +579,8 @@ class PythonEditorStyleSheet (StyleSheet):
 			for a in args[:-1]:
 				argElements.append( a )
 				argElements.append( punctuationStyle.text( ',' ) )
-				argElements.append( primitiveStyle.lineBreak( primitiveStyle.text( ' ' ) ) )
+				argElements.append( primitiveStyle.text( ' ' ) )
+				argElements.append( primitiveStyle.lineBreak() )
 			argElements.append( args[-1] )
 			if bArgsTrailingSeparator:
 				argElements.append( punctuationStyle.text( ',' ) )
@@ -610,7 +613,7 @@ class PythonEditorStyleSheet (StyleSheet):
 	def spanCmpOp(self, op, y):
 		primitiveStyle = self['primitiveStyle']
 		opView = self._operatorStyle().text( op )
-		return primitiveStyle.span( [ primitiveStyle.text( ' ' ), opView, primitiveStyle.lineBreak( primitiveStyle.text( ' ' ) ), y ] )
+		return primitiveStyle.span( [ primitiveStyle.text( ' ' ), opView, primitiveStyle.text( ' ' ), primitiveStyle.lineBreak(), y ] )
 
 
 	def div(self, x, y, fractionBarContent):
@@ -657,15 +660,17 @@ class PythonEditorStyleSheet (StyleSheet):
 			for p in params[:-1]:
 				elements.append( p )
 				elements.append( punctuationStyle.text( ',' ) )
-				elements.append( primitiveStyle.lineBreak( primitiveStyle.text( ' ' ) ) )
+				elements.append( primitiveStyle.text( ' ' ) )
+				elements.append( primitiveStyle.lineBreak() )
 			elements.append( params[-1] )
 			if bParamsTrailingSeparator:
 				elements.append( punctuationStyle.text( ',' ) )
-				elements.append( primitiveStyle.lineBreak( primitiveStyle.text( ' ' ) ) )
+				elements.append( primitiveStyle.text( ' ' ) )
+				elements.append( primitiveStyle.lineBreak() )
 			elements.append( primitiveStyle.paragraphDedentMarker() )
 		
 		return primitiveStyle.paragraphBreakCostSpan( [ self._keyword( 'lambda' ),  primitiveStyle.text( ' ' ) ]  +  elements  +  \
-		                            [ punctuationStyle.text( ':' ),  primitiveStyle.lineBreak( primitiveStyle.text( ' ' ) ), expr ] )
+		                            [ punctuationStyle.text( ':' ),  primitiveStyle.text( ' ' ), primitiveStyle.lineBreak(), expr ] )
 
 
 	def conditionalExpr(self, condition, expr, elseExpr):
@@ -673,8 +678,8 @@ class PythonEditorStyleSheet (StyleSheet):
 		punctuationStyle = self._punctuationStyle()
 		conditionalSpacing = self['conditionalSpacing']
 		
-		return primitiveStyle.paragraphBreakCostSpan( [ expr,   primitiveStyle.lineBreak( primitiveStyle.whitespace( '  ', conditionalSpacing ) ),
-							 self._keyword( 'if' ), primitiveStyle.text( ' ' ), condition,   primitiveStyle.lineBreak( primitiveStyle.whitespace( '  ', conditionalSpacing ) ),
+		return primitiveStyle.paragraphBreakCostSpan( [ expr,   primitiveStyle.whitespace( '  ', conditionalSpacing ),  primitiveStyle.lineBreak(),
+							 self._keyword( 'if' ), primitiveStyle.text( ' ' ), condition,   primitiveStyle.whitespace( '  ', conditionalSpacing ),  primitiveStyle.lineBreak(),
 							 self._keyword( 'else' ), primitiveStyle.text( ' ' ), elseExpr ] )
 
 
@@ -688,7 +693,7 @@ class PythonEditorStyleSheet (StyleSheet):
 
 		elements = [ self._keyword( 'assert' ), primitiveStyle.text( ' ' ), condition ]
 		if fail is not None:
-			elements.extend( [ punctuationStyle.text( ',' ), primitiveStyle.lineBreak( primitiveStyle.text( ' ' ) ), fail ] )
+			elements.extend( [ punctuationStyle.text( ',' ), primitiveStyle.text( ' ' ), primitiveStyle.lineBreak(), fail ] )
 		return primitiveStyle.span( elements )
 
 
@@ -698,7 +703,7 @@ class PythonEditorStyleSheet (StyleSheet):
 
 		targetElements = []
 		for t in targets:
-			targetElements.extend( [ t,  primitiveStyle.text( ' ' ),  punctuationStyle.text( '=' ),  primitiveStyle.lineBreak( primitiveStyle.text( ' ' ) ) ] )
+			targetElements.extend( [ t,  primitiveStyle.text( ' ' ),  punctuationStyle.text( '=' ),  primitiveStyle.text( ' ' ),  primitiveStyle.lineBreak() ] )
 		return primitiveStyle.span( targetElements  +  [ value ] )
 
 
@@ -788,7 +793,7 @@ class PythonEditorStyleSheet (StyleSheet):
 		moduleElements = [ primitiveStyle.paragraphIndentMarker() ]
 		if len( modules ) > 0:
 			for m in modules[:-1]:
-				moduleElements.extend( [ m,  punctuationStyle.text( ',' ),  primitiveStyle.lineBreak( punctuationStyle.text( ' ' ) ) ] )
+				moduleElements.extend( [ m,  punctuationStyle.text( ',' ),  punctuationStyle.text( ' ' ),  primitiveStyle.lineBreak() ] )
 			moduleElements.append( modules[-1] )
 		moduleElements.append( primitiveStyle.paragraphDedentMarker() )
 		return primitiveStyle.span( [ self._keyword( 'import' ), primitiveStyle.text( ' ' ) ]  +  moduleElements )
@@ -801,7 +806,7 @@ class PythonEditorStyleSheet (StyleSheet):
 		importElements = [ primitiveStyle.paragraphIndentMarker() ]
 		if len( imports ) > 0:
 			for i in imports[:-1]:
-				importElements.extend( [ i,  punctuationStyle.text( ',' ),  primitiveStyle.lineBreak( primitiveStyle.text( ' ' ) ) ] )
+				importElements.extend( [ i,  punctuationStyle.text( ',' ),  primitiveStyle.text( ' ' ),  primitiveStyle.lineBreak() ] )
 			importElements.append( imports[-1] )
 		importElements.append( primitiveStyle.paragraphDedentMarker() )
 		return primitiveStyle.span( [ self._keyword( 'from' ), primitiveStyle.text( ' ' ), module, primitiveStyle.text( ' ' ),
@@ -828,7 +833,7 @@ class PythonEditorStyleSheet (StyleSheet):
 		varElements = []
 		if len( vars ) > 0:
 			for v in vars[:-1]:
-				varElements.extend( [ v,  punctuationStyle.text( ',' ),  primitiveStyle.lineBreak( primitiveStyle.text( ' ' ) ) ] )
+				varElements.extend( [ v,  punctuationStyle.text( ',' ),  primitiveStyle.text( ' ' ),  primitiveStyle.lineBreak() ] )
 			varElements.append( vars[-1] )
 		return primitiveStyle.span( [ self._keyword( 'global' ),  primitiveStyle.text( ' ' ) ]  +  varElements )
 
@@ -840,9 +845,9 @@ class PythonEditorStyleSheet (StyleSheet):
 
 		elements = [ self._keyword( 'exec' ),  primitiveStyle.text( ' ' ),  source ]
 		if locals is not None:
-			elements.extend( [ primitiveStyle.text( ' ' ),  self._keyword( 'in' ),  primitiveStyle.lineBreak( primitiveStyle.text( ' ' ) ),  locals ] )
+			elements.extend( [ primitiveStyle.text( ' ' ),  self._keyword( 'in' ),  primitiveStyle.text( ' ' ),  primitiveStyle.lineBreak(),  locals ] )
 		if globals is not None:
-			elements.extend( [ punctuationStyle.text( ',' ),  primitiveStyle.lineBreak( primitiveStyle.text( ' ' ) ),  globals ] )
+			elements.extend( [ punctuationStyle.text( ',' ),  primitiveStyle.text( ' ' ),  primitiveStyle.lineBreak(),  globals ] )
 		return primitiveStyle.span( elements )
 
 
@@ -860,11 +865,11 @@ class PythonEditorStyleSheet (StyleSheet):
 		if destination is not None:
 			elements.extend( [ punctuationStyle.text( '>>' ), primitiveStyle.text( ' ' ), destination ] )
 			if len( values ) > 0:
-				elements.extend( [ punctuationStyle.text( ',' ), primitiveStyle.lineBreak( primitiveStyle.text( ' ' ) ) ] )
+				elements.extend( [ punctuationStyle.text( ',' ), primitiveStyle.text( ' ' ), primitiveStyle.lineBreak() ] )
 		bFirst = True
 		for v in values:
 			if not bFirst:
-				elements.extend( [ punctuationStyle.text( ',' ), primitiveStyle.lineBreak( primitiveStyle.text( ' ' ) ) ] )
+				elements.extend( [ punctuationStyle.text( ',' ), primitiveStyle.text( ' ' ), primitiveStyle.lineBreak() ] )
 			elements.append( v )
 			bFirst = False
 		return primitiveStyle.span( elements )
@@ -914,7 +919,7 @@ class PythonEditorStyleSheet (StyleSheet):
 		primitiveStyle = self['primitiveStyle']
 		punctuationStyle = self._punctuationStyle()
 		return primitiveStyle.span( [ self._keyword( 'for' ),  primitiveStyle.text( ' ' ),  target,  primitiveStyle.text( ' ' ),
-							    self._keyword( 'in' ),  primitiveStyle.lineBreak( primitiveStyle.text( ' ' ) ),
+							    self._keyword( 'in' ),  primitiveStyle.text( ' ' ),  primitiveStyle.lineBreak(),
 							    source,  punctuationStyle.text( ':' ) ] )
 
 
@@ -931,7 +936,7 @@ class PythonEditorStyleSheet (StyleSheet):
 		if exception is not None:
 			elements.extend( [ primitiveStyle.text( ' ' ),  exception ] )
 		if target is not None:
-			elements.extend( [ punctuationStyle.text( ',' ),  primitiveStyle.lineBreak( primitiveStyle.text( ' ' ) ),  target ] )
+			elements.extend( [ punctuationStyle.text( ',' ),  primitiveStyle.text( ' ' ),  primitiveStyle.lineBreak(),  target ] )
 		elements.append( punctuationStyle.text( ':' ) )
 		return primitiveStyle.span( elements )
 
@@ -947,7 +952,7 @@ class PythonEditorStyleSheet (StyleSheet):
 		punctuationStyle = self._punctuationStyle()
 		elements = [ self._keyword( 'with' ),  primitiveStyle.text( ' ' ),  exprView ]
 		if target is not None:
-			elements.extend( [ primitiveStyle.text( ' ' ),  self._keyword( 'as' ),  primitiveStyle.lineBreak( primitiveStyle.text( ' ' ) ),  target ] )
+			elements.extend( [ primitiveStyle.text( ' ' ),  self._keyword( 'as' ),  primitiveStyle.text( ' ' ),  primitiveStyle.lineBreak(),  target ] )
 		elements.append( punctuationStyle.text( ':' ) )
 		return primitiveStyle.span( elements )
 

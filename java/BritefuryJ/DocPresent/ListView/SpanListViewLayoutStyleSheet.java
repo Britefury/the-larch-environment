@@ -9,10 +9,9 @@ package BritefuryJ.DocPresent.ListView;
 import java.util.ArrayList;
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPLineBreak;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPParagraphDedentMarker;
 import BritefuryJ.DocPresent.DPParagraphIndentMarker;
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
@@ -122,21 +121,13 @@ public class SpanListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 				{
 					childElems.add( separator.createElement( primitiveStyle, i, child ) );
 				}
+				if ( spacing != null )
+				{
+					childElems.add( spacing.createElement( primitiveStyle ) );
+				}
 				if ( params.bAddLineBreaks )
 				{
-					DPLineBreak lineBreak = new DPLineBreak( );
-					if ( spacing != null )
-					{
-						lineBreak.setChild( spacing.createElement( primitiveStyle ) );
-					}
-					childElems.add( lineBreak );
-				}
-				else
-				{
-					if ( spacing != null )
-					{
-						childElems.add( spacing.createElement( primitiveStyle ) );
-					}
+					childElems.add( primitiveStyle.lineBreak() );
 				}
 			}
 

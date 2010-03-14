@@ -55,13 +55,10 @@ public class ParagraphWithSpanTestPage extends SystemPage
 		for (int i = 0; i < nodesIn.size(); i++)
 		{
 			nodesOut.add( nodesIn.get( i ) );
+			nodesOut.add( style.text( " " ) );
 			if ( step <= 1  ||  i % step == (step-1) )
 			{
-				nodesOut.add( style.lineBreak( style.text( " " ) ) );
-			}
-			else
-			{
-				nodesOut.add( style.text( " " ) );
+				nodesOut.add( style.lineBreak() );
 			}
 		}
 		return nodesOut;

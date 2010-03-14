@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent.LayoutTree;
 import BritefuryJ.DocPresent.DPParagraphDedentMarker;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 
-public class LayoutNodeParagraphDedentMarker extends LayoutNodeEmpty
+public class LayoutNodeParagraphDedentMarker extends LayoutNodeEmptySharedReq
 {
 	protected static LReqBox dedentReqBox = new LReqBox();
 	

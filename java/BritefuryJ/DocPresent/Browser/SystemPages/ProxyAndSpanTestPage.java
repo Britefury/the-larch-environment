@@ -47,11 +47,6 @@ public class ProxyAndSpanTestPage extends SystemPage
 	private static ControlsStyleSheet controlsStyleSheet = ControlsStyleSheet.instance;
 
 	
-	protected DPElement lineBreak()
-	{
-		return styleSheet.lineBreak( styleSheet.text( " " ) );
-	}
-	
 	protected ArrayList<DPElement> makeTextNodes(String text, PrimitiveStyleSheet styleSheet)
 	{
 		String[] words = text.split( " " );
@@ -61,7 +56,8 @@ public class ProxyAndSpanTestPage extends SystemPage
 			nodes.add( styleSheet.text( words[i] ) );
 			if ( i  != words.length -1 )
 			{
-				nodes.add( lineBreak() );
+				nodes.add( styleSheet.text( " " ) );
+				nodes.add( styleSheet.lineBreak() );
 			}
 		}
 		return nodes;
@@ -90,9 +86,11 @@ public class ProxyAndSpanTestPage extends SystemPage
 		final DPSpan span = styleSheet.span( makeTextNodes( spanContentText, redText ) );
 		
 		ArrayList<DPElement> paragraph2Contents = makeTextNodes( spanParaText, blackText );
-		paragraph2Contents.add( lineBreak() );
+		paragraph2Contents.add( styleSheet.text( " " ) );
+		paragraph2Contents.add( styleSheet.lineBreak() );
 		paragraph2Contents.add( span );
-		paragraph2Contents.add( lineBreak() );
+		paragraph2Contents.add( styleSheet.text( " " ) );
+		paragraph2Contents.add( styleSheet.lineBreak() );
 		paragraph2Contents.addAll( makeTextNodes( spanParaPostText, blackText ) );
 		DPElement paragraph = styleSheet.paragraph( paragraph2Contents );
 		
@@ -115,9 +113,11 @@ public class ProxyAndSpanTestPage extends SystemPage
 		final DPProxy proxy = styleSheet.proxy( span );
 		
 		ArrayList<DPElement> paragraph2Contents = makeTextNodes( spanParaText, blackText );
-		paragraph2Contents.add( lineBreak() );
+		paragraph2Contents.add( styleSheet.text( " " ) );
+		paragraph2Contents.add( styleSheet.lineBreak() );
 		paragraph2Contents.add( proxy );
-		paragraph2Contents.add( lineBreak() );
+		paragraph2Contents.add( styleSheet.text( " " ) );
+		paragraph2Contents.add( styleSheet.lineBreak() );
 		paragraph2Contents.addAll( makeTextNodes( spanParaPostText, blackText ) );
 		DPElement paragraph = styleSheet.paragraph( paragraph2Contents );
 		

@@ -9,13 +9,14 @@ package BritefuryJ.DocPresent.LayoutTree;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPEmpty;
 import BritefuryJ.DocPresent.ElementFilter;
+import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.Math.Point2;
 
-public abstract class LayoutNodeEmpty extends LeafLayoutNode
+public abstract class LayoutNodeEmptySharedReq extends LeafLayoutNodeSharedReq
 {
-	public LayoutNodeEmpty(DPEmpty element)
+	public LayoutNodeEmptySharedReq(DPEmpty element, LReqBox reqBox)
 	{
-		super( element );
+		super( element, reqBox );
 	}
 
 
