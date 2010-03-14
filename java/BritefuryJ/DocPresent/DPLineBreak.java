@@ -11,7 +11,7 @@ import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeLineBreak;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 
-public class DPLineBreak extends DPBin
+public class DPLineBreak extends DPBox
 {
 	public DPLineBreak()
 	{

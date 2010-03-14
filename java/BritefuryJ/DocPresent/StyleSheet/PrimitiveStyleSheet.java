@@ -14,7 +14,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPBin;
+import BritefuryJ.DocPresent.DPBox;
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPCanvas;
 import BritefuryJ.DocPresent.DPFraction;
@@ -609,9 +609,9 @@ public class PrimitiveStyleSheet extends StyleSheet
 
 	
 	
-	public DPBin box(DPElement child)
+	public DPBox box(DPElement child)
 	{
-		DPBin box = new DPBin( getContainerParams() );
+		DPBox box = new DPBox( getContainerParams() );
 		box.setChild( child );
 		return box;
 	}

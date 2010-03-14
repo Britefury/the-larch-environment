@@ -75,7 +75,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 	
 	public LReqBoxInterface refreshRequisitionX()
 	{
-		if ( !element.isSizeUpToDate() )
+		if ( !element.isAllocationUpToDate() )
 		{
 			updateRequisitionX();
 		}
@@ -84,7 +84,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 	
 	public LReqBoxInterface refreshRequisitionY()
 	{
-		if ( !element.isSizeUpToDate() )
+		if ( !element.isAllocationUpToDate() )
 		{
 			updateRequisitionY();
 		}
@@ -102,20 +102,20 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 	
 	public void refreshAllocationX(double prevWidth)
 	{
-		if ( !element.isSizeUpToDate()  ||  getAllocationX() != prevWidth )
+		if ( !element.isAllocationUpToDate()  ||  getAllocationX() != prevWidth )
 		{
 			updateAllocationX();
-			element.clearFlagSizeUpToDate();
+			element.clearFlagAllocationUpToDate();
 		}
 	}
 	
 	public void refreshAllocationY(LAllocV prevHeight)
 	{
-		if ( !element.isSizeUpToDate()  ||  !getAllocV().equals( prevHeight ) )
+		if ( !element.isAllocationUpToDate()  ||  !getAllocV().equals( prevHeight ) )
 		{
 			updateAllocationY();
 		}
-		onSizeRefreshed();
+		onAllocationRefreshed();
 	}
 	
 
@@ -137,18 +137,18 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 	
 	protected void onAllocationXRefreshed()
 	{
-		element.clearFlagSizeUpToDate();
+		element.clearFlagAllocationUpToDate();
 	}
 	
 	protected void onAllocationYRefreshed()
 	{
-		onSizeRefreshed();
+		onAllocationRefreshed();
 	}
 	
-	protected void onSizeRefreshed()
+	protected void onAllocationRefreshed()
 	{
 		element.clearFlagResizeQueued();
-		element.setFlagSizeUpToDate();
+		element.setFlagAllocationUpToDate();
 		DPContainer parent = element.getParent();
 		while ( parent != null )
 		{

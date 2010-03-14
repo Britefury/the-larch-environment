@@ -9,22 +9,22 @@ package BritefuryJ.DocPresent;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.LayoutTree.LayoutNodeBin;
+import BritefuryJ.DocPresent.LayoutTree.LayoutNodeBox;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 
 
-public class DPBin extends DPContainer
+public class DPBox extends DPContainer
 {
-	public DPBin()
+	public DPBox()
 	{
 		this( ContainerStyleParams.defaultStyleParams );
 	}
 
-	public DPBin(ContainerStyleParams styleParams)
+	public DPBox(ContainerStyleParams styleParams)
 	{
 		super(styleParams);
 		
-		layoutNode = new LayoutNodeBin( this );
+		layoutNode = new LayoutNodeBox( this );
 	}
 	
 	

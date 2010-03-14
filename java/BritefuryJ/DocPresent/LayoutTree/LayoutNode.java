@@ -52,7 +52,7 @@ public abstract class LayoutNode
 	protected abstract void onAllocationXRefreshed();
 	protected abstract void onAllocationYRefreshed();
 	
-	protected abstract void onSizeRefreshed();
+	protected abstract void onAllocationRefreshed();
 	protected abstract void onChildSizeRefreshed();
 	
 
@@ -78,7 +78,7 @@ public abstract class LayoutNode
 		DPElement element = getElement();
 		
 		handleQueueResize();
-		element.clearFlagSizeUpToDate();
+		element.clearFlagAllocationUpToDate();
 	}
 
 	

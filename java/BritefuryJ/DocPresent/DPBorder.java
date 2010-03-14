@@ -15,7 +15,7 @@ import BritefuryJ.DocPresent.LayoutTree.LayoutNodeBorder;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 
 
-public class DPBorder extends DPBin
+public class DPBorder extends DPBox
 {
 	public static FilledBorder defaultBorder = new FilledBorder( 0.0, 0.0, 0.0, 0.0 );
 	

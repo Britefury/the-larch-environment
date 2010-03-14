@@ -115,16 +115,16 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 	}
 	
 	
-	protected void onSizeRefreshed()
+	protected void onAllocationRefreshed()
 	{
-		super.onSizeRefreshed();
+		super.onAllocationRefreshed();
 		refreshSubtree();
 		for (DPElement c: branches)
 		{
 			LayoutNode branchLayout = c.getLayoutNode();
 			if ( branchLayout != null )
 			{
-				branchLayout.onSizeRefreshed();
+				branchLayout.onAllocationRefreshed();
 			}
 		}
 	}
