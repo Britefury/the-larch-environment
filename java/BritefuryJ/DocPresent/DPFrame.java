@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 
 public class DPFrame extends DPBox

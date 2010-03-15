@@ -47,6 +47,8 @@ import javax.swing.event.ChangeListener;
 
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Caret.CaretListener;
+import BritefuryJ.DocPresent.Clipboard.DataTransfer;
+import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.Input.DndDropLocal;
 import BritefuryJ.DocPresent.Input.DndDropSwing;
 import BritefuryJ.DocPresent.Input.InputTable;
@@ -131,7 +133,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 						EditHandler editHandler = frame.getEditHandler();
 						if ( editHandler != null )
 						{	
-							return editHandler.getSourceActions();
+							return editHandler.getExportActions();
 						}
 					}
 					return NONE;
@@ -152,7 +154,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 						EditHandler editHandler = frame.getEditHandler();
 						if ( editHandler != null )
 						{
-							return editHandler.createTransferable();
+							return editHandler.createExportTransferable();
 						}
 					}
 					return null;
@@ -196,7 +198,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 						EditHandler editHandler = frame.getEditHandler();
 						if ( editHandler != null )
 						{
-							return editHandler.canImport( transfer );
+							return editHandler.canImport( new DataTransfer( transfer ) );
 						}
 					}
 					return false;
@@ -217,7 +219,7 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 						EditHandler editHandler = frame.getEditHandler();
 						if ( editHandler != null )
 						{
-							return editHandler.importData( transfer );
+							return editHandler.importData( new DataTransfer( transfer ) );
 						}
 					}
 					return false;

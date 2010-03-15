@@ -14,7 +14,7 @@ from java.lang import Object
 from java.io import IOException
 from java.util import List
 from java.awt.event import KeyEvent
-from java.awt.datatransfer import UnsupportedFlavorException, DataFlavor, StringSelection, Transferable
+from java.awt.datatransfer import UnsupportedFlavorException, StringSelection, Transferable
 
 from Britefury.Kernel.Abstract import abstractmethod
 
@@ -25,6 +25,7 @@ from BritefuryJ.Transformation import DefaultIdentityTransformationFunction
 from BritefuryJ.Parser.ItemStream import ItemStreamBuilder, ItemStream
 
 
+from BritefuryJ.DocPresent.Clipboard import *
 from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent import *
 
@@ -52,13 +53,19 @@ class NotImplementedError (Exception):
 _identity = DefaultIdentityTransformationFunction()
 	
 	
-class Python25BufferFlavor (DataFlavor):
-	def __init__(self):
-		super( Python25BufferFlavor, self ).__init__( Object, DataFlavor.javaJVMLocalObjectMimeType )
+class Python25Buffer (Object):
+	pass
 
 
-_python25BufferDataFlavor = Python25BufferFlavor()
+class Python25BufferStream (Python25Buffer):
+	def __init__(self, stream):
+		self.stream = stream
 	
+
+
+
+_python25BufferDataFlavor = LocalDataFlavor( Python25Buffer )
+
 
 
 class Python25Transferable (Transferable):
@@ -80,15 +87,6 @@ class Python25Transferable (Transferable):
 
 
 	
-class Python25Buffer (object):
-	pass
-
-
-class Python25BufferStream (Python25Buffer):
-	def __init__(self, stream):
-		self.stream = stream
-	
-
 
 
 		
@@ -351,12 +349,12 @@ class Python25EditHandler (EditHandler):
 	
 	
 	
-	def getSourceActions(self):					# -> int
+	def getExportActions(self):					# -> int
 		return self.COPY_OR_MOVE
 	
 	
 	
-	def createTransferable(self):					# -> Transferable
+	def createExportTransferable(self):					# -> Transferable
 		selection = self._viewContext.getSelection()
 		
 		if not selection.isEmpty():
@@ -395,45 +393,38 @@ class Python25EditHandler (EditHandler):
 				
 				
 				
-	def exportDone(self, data, action):				# -> None,   data <- Transferable, action <- int
+	def exportDone(self, transferable, action):				# -> None,   data <- Transferable, action <- int
 		if action == self.MOVE:
 			self.deleteSelection()
 		
 			
 			
 
-	def canImport(self, support):					# -> bool,   support <- TransferHandler.TransferSupport
-		if support.isDataFlavorSupported( _python25BufferDataFlavor ):
-			return True
-		else:
-			return False
+	def canImport(self, dataTransfer):					# -> bool,   dataTransfer <- DataTransfer
+		return dataTransfer.isDataFlavorSupported( _python25BufferDataFlavor )
 
 		
 		
-	def importData(self, info):					# -> bool,   info <- TransferHandler.TransferSupport
-		if not self.canImport( info ):
+	def importData(self, dataTransfer):					# -> bool,   dataTransfer <- DataTransfer
+		if not self.canImport( dataTransfer ):
 			return False
 		try:
-			data = info.getTransferable().getTransferData( _python25BufferDataFlavor )
+			data = dataTransfer.getTransferData( _python25BufferDataFlavor )
 		except UnsupportedFlavorException:
 			return False
 		except IOException:
 			return False
 		
-		if info.isDrop():
-			# Drop
-			return False
+		# Paste
+		selection = self._viewContext.getSelection()
+		if not selection.isEmpty():
+			self.replaceSelection( data )
+			return True
 		else:
-			# Paste
-			selection = self._viewContext.getSelection()
-			if not selection.isEmpty():
-				self.replaceSelection( data )
+			caret = self._viewContext.getCaret()
+			caretMarker = caret.getMarker()
+			if caretMarker.isValid():
+				self._insertBufferAtMarker( caretMarker, data )
 				return True
-			else:
-				caret = self._viewContext.getCaret()
-				caretMarker = caret.getMarker()
-				if caretMarker.isValid():
-					self._insertBufferAtMarker( caretMarker, data )
-					return True
-				return False
+			return False
 		
