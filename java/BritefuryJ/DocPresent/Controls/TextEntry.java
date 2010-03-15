@@ -14,7 +14,7 @@ import org.python.core.PyObject;
 
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPFrame;
+import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.Caret.Caret;
@@ -162,7 +162,7 @@ public class TextEntry extends Control
 
 
 	
-	protected TextEntry(DPBorder outerElement, DPFrame frame, DPText textElement, TextEntryListener listener)
+	protected TextEntry(DPBorder outerElement, DPRegion frame, DPText textElement, TextEntryListener listener)
 	{
 		this.outerElement = outerElement;
 		this.textElement = textElement;
@@ -172,7 +172,7 @@ public class TextEntry extends Control
 		frame.setEditHandler( new TextEntryEditHandler() );
 	}
 	
-	protected TextEntry(DPBorder outerElement, DPFrame frame, DPText textElement, PyObject acceptListener, PyObject cancelListener)
+	protected TextEntry(DPBorder outerElement, DPRegion frame, DPText textElement, PyObject acceptListener, PyObject cancelListener)
 	{
 		this( outerElement, frame, textElement, new PyTextEntryListener( acceptListener, cancelListener ) );
 	}

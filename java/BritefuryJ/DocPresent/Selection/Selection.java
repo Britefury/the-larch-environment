@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent.Selection;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPContainer;
-import BritefuryJ.DocPresent.DPFrame;
+import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Marker.MarkerListener;
@@ -93,7 +93,7 @@ public class Selection implements MarkerListener
 	}
 	
 	
-	public DPFrame getFrame()
+	public DPRegion getRegion()
 	{
 		if ( isEmpty() )
 		{
@@ -104,11 +104,11 @@ public class Selection implements MarkerListener
 			DPContainer root = getCommonRoot();
 			if ( root != null )
 			{
-				return root.getFrame();
+				return root.getRegion();
 			}
 			else
 			{
-				return marker0.getElement().getFrame();
+				return marker0.getElement().getRegion();
 			}
 		}
 	}

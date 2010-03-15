@@ -15,7 +15,7 @@ import java.util.Arrays;
 import org.python.core.PyObject;
 
 import BritefuryJ.DocPresent.DPBorder;
-import BritefuryJ.DocPresent.DPFrame;
+import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.Border;
@@ -313,7 +313,7 @@ public class ControlsStyleSheet extends StyleSheet
 		PrimitiveStyleSheet textEntryStyle = getTextEntryStyleSheet();
 		DPText textElement = textEntryStyle.text( text );
 		DPElement line = textEntryStyle.hbox( Arrays.asList( new DPElement[] { textEntryStyle.segment( false, false, textElement ) } ) );
-		DPFrame frame = textEntryStyle.frame( line );
+		DPRegion frame = textEntryStyle.region( line );
 		DPBorder outerElement = textEntryStyle.border( frame );
 		return new TextEntry( outerElement, frame, textElement, listener );
 	}
@@ -323,7 +323,7 @@ public class ControlsStyleSheet extends StyleSheet
 		PrimitiveStyleSheet textEntryStyle = getTextEntryStyleSheet();
 		DPText textElement = textEntryStyle.text( text );
 		DPElement line = textEntryStyle.hbox( Arrays.asList( new DPElement[] { textEntryStyle.segment( false, false, textElement ) } ) );
-		DPFrame frame = textEntryStyle.frame( line );
+		DPRegion frame = textEntryStyle.region( line );
 		DPBorder outerElement = textEntryStyle.border( frame );
 		return new TextEntry( outerElement, frame, textElement, accept, cancel );
 	}

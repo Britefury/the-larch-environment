@@ -18,7 +18,7 @@ import BritefuryJ.DocPresent.DPBox;
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPCanvas;
 import BritefuryJ.DocPresent.DPFraction;
-import BritefuryJ.DocPresent.DPFrame;
+import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.DPGridRow;
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPHiddenContent;
@@ -644,22 +644,6 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 	
 	
-	public DPFrame frame(DPElement child)
-	{
-		DPFrame element = new DPFrame();
-		element.setChild( child );
-		return element;
-	}
-
-	public DPFrame frame(DPElement child, EditHandler editHandler)
-	{
-		DPFrame element = new DPFrame();
-		element.setChild( child );
-		element.setEditHandler( editHandler );
-		return element;
-	}
-
-	
 	public DPHBox hbox(List<DPElement> children)
 	{
 		DPHBox element = new DPHBox( getHBoxParams() );
@@ -795,6 +779,22 @@ public class PrimitiveStyleSheet extends StyleSheet
 	public DPRectangle rectangle(double minWidth, double minHeight)
 	{
 		return new DPRectangle( getShapeParams(), "", minWidth, minHeight );
+	}
+
+	
+	public DPRegion region(DPElement child)
+	{
+		DPRegion element = new DPRegion();
+		element.setChild( child );
+		return element;
+	}
+
+	public DPRegion region(DPElement child, EditHandler editHandler)
+	{
+		DPRegion element = new DPRegion();
+		element.setChild( child );
+		element.setEditHandler( editHandler );
+		return element;
 	}
 
 	
