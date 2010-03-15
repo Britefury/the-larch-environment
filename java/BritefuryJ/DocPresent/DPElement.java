@@ -2697,15 +2697,15 @@ abstract public class DPElement extends PointerInputElement
 	
 	//
 	//
-	// FRAME METHODS
+	// REGION METHODS
 	//
 	//
 	
-	public DPFrame getFrame()
+	public DPRegion getRegion()
 	{
 		if ( parent != null )
 		{
-			return parent.getFrame();
+			return parent.getRegion();
 		}
 		else
 		{

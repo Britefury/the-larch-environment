@@ -75,7 +75,7 @@ import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
 
 
-public class DPPresentationArea extends DPFrame implements CaretListener, SelectionListener, PointerDndController
+public class DPPresentationArea extends DPRegion implements CaretListener, SelectionListener, PointerDndController
 {
 	public static class CannotGetGraphics2DException extends RuntimeException
 	{
@@ -127,10 +127,10 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 				}
 				else
 				{
-					DPFrame frame = area.getSelectionFrame();
-					if ( frame != null )
+					DPRegion region = area.getSelectionRegion();
+					if ( region != null )
 					{
-						EditHandler editHandler = frame.getEditHandler();
+						EditHandler editHandler = region.getEditHandler();
 						if ( editHandler != null )
 						{	
 							return editHandler.getExportActions();
@@ -148,10 +148,10 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 				}
 				else
 				{
-					DPFrame frame = area.getSelectionFrame();
-					if ( frame != null )
+					DPRegion region = area.getSelectionRegion();
+					if ( region != null )
 					{
-						EditHandler editHandler = frame.getEditHandler();
+						EditHandler editHandler = region.getEditHandler();
 						if ( editHandler != null )
 						{
 							return editHandler.createExportTransferable();
@@ -169,10 +169,10 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 				}
 				else
 				{
-					DPFrame frame = area.getSelectionFrame();
-					if ( frame != null )
+					DPRegion region = area.getSelectionRegion();
+					if ( region != null )
 					{
-						EditHandler editHandler = frame.getEditHandler();
+						EditHandler editHandler = region.getEditHandler();
 						if ( editHandler != null )
 						{
 							editHandler.exportDone( data, action );
@@ -192,10 +192,10 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 				}
 				else
 				{
-					DPFrame frame = area.getCaretFrame();
-					if ( frame != null )
+					DPRegion region = area.getCaretRegion();
+					if ( region != null )
 					{
-						EditHandler editHandler = frame.getEditHandler();
+						EditHandler editHandler = region.getEditHandler();
 						if ( editHandler != null )
 						{
 							return editHandler.canImport( new DataTransfer( transfer ) );
@@ -213,10 +213,10 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 				}
 				else
 				{
-					DPFrame frame = area.getCaretFrame();
-					if ( frame != null )
+					DPRegion region = area.getCaretRegion();
+					if ( region != null )
 					{
-						EditHandler editHandler = frame.getEditHandler();
+						EditHandler editHandler = region.getEditHandler();
 						if ( editHandler != null )
 						{
 							return editHandler.importData( new DataTransfer( transfer ) );
@@ -1983,10 +1983,10 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	
 	protected void deleteSelection()
 	{
-		DPFrame selectionFrame = getSelectionFrame();
-		if ( selectionFrame != null  &&  !selection.isEmpty() )
+		DPRegion selectionRegion = getSelectionRegion();
+		if ( selectionRegion != null  &&  !selection.isEmpty() )
 		{
-			EditHandler editHandler = selectionFrame.getEditHandler();
+			EditHandler editHandler = selectionRegion.getEditHandler();
 			if ( editHandler != null )
 			{
 				if ( caret.getMarker().equals( selection.getEndMarker() ) )
@@ -2000,10 +2000,10 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 
 	protected void replaceSelection(String replacement)
 	{
-		DPFrame selectionFrame = getSelectionFrame();
-		if ( selectionFrame != null )
+		DPRegion selectionRegion = getSelectionRegion();
+		if ( selectionRegion != null )
 		{
-			EditHandler editHandler = selectionFrame.getEditHandler();
+			EditHandler editHandler = selectionRegion.getEditHandler();
 			if ( editHandler != null )
 			{
 				editHandler.replaceSelection( replacement );
@@ -2020,11 +2020,11 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 	//
 	//
 	
-	protected DPFrame getCaretFrame()
+	protected DPRegion getCaretRegion()
 	{
 		if ( caret.isValid() )
 		{
-			return caret.getMarker().getElement().getFrame();
+			return caret.getMarker().getElement().getRegion();
 		}
 		else
 		{
@@ -2032,11 +2032,11 @@ public class DPPresentationArea extends DPFrame implements CaretListener, Select
 		}
 	}
 	
-	protected DPFrame getSelectionFrame()
+	protected DPRegion getSelectionRegion()
 	{
 		if ( !selection.isEmpty() )
 		{
-			return selection.getFrame();
+			return selection.getRegion();
 		}
 		else
 		{

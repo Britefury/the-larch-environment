@@ -9,19 +9,19 @@ package BritefuryJ.DocPresent;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 
-public class DPFrame extends DPBox
+public class DPRegion extends DPBox
 {
 	private EditHandler editHandler;
 
 	
 	
 	
-	public DPFrame()
+	public DPRegion()
 	{
 		this( ContainerStyleParams.defaultStyleParams );
 	}
 
-	public DPFrame(ContainerStyleParams styleParams)
+	public DPRegion(ContainerStyleParams styleParams)
 	{
 		super(styleParams);
 	}
@@ -49,7 +49,7 @@ public class DPFrame extends DPBox
 
 	
 	
-	public DPFrame getFrame()
+	public DPRegion getRegion()
 	{
 		return this;
 	}

@@ -10,7 +10,7 @@ import org.python.core.PyObject;
 
 import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.DocModel.DMNode;
-import BritefuryJ.DocPresent.DPFrame;
+import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Caret.Caret;
@@ -129,7 +129,7 @@ public class GSymViewContext extends GSymIncrementalTreeContext implements DocVi
 	
 	private DocView view;
 	
-	private DPFrame frame;
+	private DPRegion frame;
 	
 	private CommandHistory commandHistory;
 
@@ -140,7 +140,7 @@ public class GSymViewContext extends GSymIncrementalTreeContext implements DocVi
 		super( docRootNode, generalNodeViewFunction, rootNodeViewFunction, new ViewInheritedState( rootStyleSheet, null ) );
 		this.commandHistory = commandHistory;
 		
-		frame = new DPFrame( );
+		frame = new DPRegion( );
 		
 		
 		view = (DocView)incrementalTree;
@@ -206,7 +206,7 @@ public class GSymViewContext extends GSymIncrementalTreeContext implements DocVi
 		return view;
 	}
 	
-	public DPFrame getFrame()
+	public DPRegion getFrame()
 	{
 		return frame;
 	}
