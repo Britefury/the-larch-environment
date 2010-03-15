@@ -4,11 +4,12 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent;
+package BritefuryJ.DocPresent.Clipboard;
 
 import java.awt.datatransfer.Transferable;
 
 import javax.swing.TransferHandler;
+
 
 public interface EditHandler
 {
@@ -22,11 +23,11 @@ public interface EditHandler
 	void deleteSelection();
 	void replaceSelection(String replacement);
 	
-	
-	public boolean canImport(TransferHandler.TransferSupport support);
-	public boolean importData(TransferHandler.TransferSupport info);
 
-	public int getSourceActions();
-	public Transferable createTransferable();
-	public void exportDone(Transferable data, int action);
+	public int getExportActions();
+	public Transferable createExportTransferable();
+	public void exportDone(Transferable transferable, int action);
+	
+	public boolean canImport(DataTransfer dataTransfer);
+	public boolean importData(DataTransfer dataTransfer);
 }

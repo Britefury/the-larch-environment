@@ -9,18 +9,17 @@ package BritefuryJ.DocPresent.Controls;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.KeyEvent;
 
-import javax.swing.TransferHandler.TransferSupport;
-
 import org.python.core.Py;
 import org.python.core.PyObject;
 
 import BritefuryJ.DocPresent.DPBorder;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPFrame;
 import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.EditHandler;
 import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.Clipboard.DataTransfer;
+import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.Selection.Selection;
 
 public class TextEntry extends Control
@@ -117,34 +116,37 @@ public class TextEntry extends Control
 			textElement.insertText( caret.getMarker(), replacement );
 		}
 
-		public boolean canImport(TransferSupport support)
+
+
+		@Override
+		public int getExportActions()
 		{
 			// TODO Auto-generated method stub
-			return false;
+			return 0;
 		}
 
-		public Transferable createTransferable()
+		public Transferable createExportTransferable()
 		{
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
-		public void exportDone(Transferable data, int action)
+		public void exportDone(Transferable transferable, int action)
 		{
 			// TODO Auto-generated method stub
 			
 		}
 
-		@Override
-		public int getSourceActions()
+		
+		public boolean canImport(DataTransfer dataTransfer)
 		{
 			// TODO Auto-generated method stub
-			return 0;
+			return false;
 		}
 
 		@Override
-		public boolean importData(TransferSupport info)
+		public boolean importData(DataTransfer dataTransfer)
 		{
 			// TODO Auto-generated method stub
 			return false;
