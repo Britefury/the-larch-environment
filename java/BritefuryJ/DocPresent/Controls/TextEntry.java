@@ -6,8 +6,12 @@
 //##************************
 package BritefuryJ.DocPresent.Controls;
 
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 
 import org.python.core.Py;
 import org.python.core.PyObject;
@@ -118,37 +122,70 @@ public class TextEntry extends Control
 
 
 
-		@Override
 		public int getExportActions()
 		{
-			// TODO Auto-generated method stub
-			return 0;
+			return COPY_OR_MOVE;
 		}
 
 		public Transferable createExportTransferable()
 		{
-			// TODO Auto-generated method stub
-			return null;
+			Selection selection = textElement.getPresentationArea().getSelection();
+			if ( !selection.isEmpty() )
+			{
+				String selectedText = textElement.getTextRepresentationBetweenMarkers( selection.getStartMarker(), selection.getEndMarker() );
+				return new StringSelection( selectedText );
+			}
+			else
+			{
+				return null;
+			}
 		}
 
-		@Override
 		public void exportDone(Transferable transferable, int action)
 		{
-			// TODO Auto-generated method stub
-			
+			if ( action == MOVE )
+			{
+				Selection selection = textElement.getPresentationArea().getSelection();
+				if ( !selection.isEmpty() )
+				{
+					textElement.removeText( selection.getStartMarker(), selection.getEndMarker() );
+				}
+			}
 		}
 
 		
 		public boolean canImport(DataTransfer dataTransfer)
 		{
-			// TODO Auto-generated method stub
-			return false;
+			return dataTransfer.isDataFlavorSupported( DataFlavor.stringFlavor );
 		}
 
-		@Override
 		public boolean importData(DataTransfer dataTransfer)
 		{
-			// TODO Auto-generated method stub
+			if ( canImport( dataTransfer ) )
+			{
+				try
+				{
+					String data = (String)dataTransfer.getTransferData( DataFlavor.stringFlavor );
+					
+					Selection selection = textElement.getPresentationArea().getSelection();
+					if ( !selection.isEmpty() )
+					{
+						textElement.removeText( selection.getStartMarker(), selection.getEndMarker() );
+					}
+					
+					Caret caret = textElement.getPresentationArea().getCaret();
+					textElement.insertText( caret.getMarker(), data );
+				}
+				catch (UnsupportedFlavorException e)
+				{
+					return false;
+				}
+				catch (IOException e)
+				{
+					return false;
+				}
+			}
+			
 			return false;
 		}
 	}
