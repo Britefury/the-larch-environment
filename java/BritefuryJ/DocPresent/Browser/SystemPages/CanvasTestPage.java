@@ -11,6 +11,7 @@ import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import BritefuryJ.DocPresent.DPBox;
 import BritefuryJ.DocPresent.DPCanvas;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPHBox;
@@ -146,9 +147,7 @@ public class CanvasTestPage extends SystemPage
 			}
 		};
 		
-		ObjectDndHandler destDndHandler = ObjectDndHandler.instance.withDropDest( new ObjectDndHandler.DropDest( Integer.class, dropFn ) );
-
-		destText.enableDnd( destDndHandler );
+		destText.addDropDest( Integer.class, dropFn );
 
 		return destText;
 	}
@@ -185,16 +184,17 @@ public class CanvasTestPage extends SystemPage
 		{
 			public boolean canDrop(PointerInputElement destElement, Point2 targetPosition, Object data)
 			{
-				String firstText = textElement.getText();
+				DPBox box = (DPBox)firstElement;
+				DPBox pad = (DPBox)box.getChild();
+				DPText t = (DPText)pad.getChild();
+				String firstText = t.getText();
 				int firstNum = textAsNumber( firstText );
 				int secondNum = (Integer)data;
 				return secondNum >= firstNum;
 			}
 		};
 		
-		ObjectDndHandler destDndHandler = ObjectDndHandler.instance.withDropDest( new ObjectDndHandler.DropDest( Integer.class, canDropFn, dropFn ) );
-
-		destText.enableDnd( destDndHandler );
+		destText.addDropDest( Integer.class, canDropFn, dropFn );
 
 		return destText;
 	}

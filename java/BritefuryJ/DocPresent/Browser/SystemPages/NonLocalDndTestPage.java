@@ -51,12 +51,6 @@ public class NonLocalDndTestPage extends SystemPage
 		return styleSheet.proxy( placeHolderStyle.box( styleSheet.staticText( " " ).pad( 8.0, 8.0 ) ) );
 	}
 	
-	protected void dndDest(DPElement element, DataFlavor flavor, ObjectDndHandler.DropFn dropFn)
-	{
-		ObjectDndHandler destDndHandler = ObjectDndHandler.instance.withNonLocalDropDest( new ObjectDndHandler.NonLocalDropDest( flavor, dropFn ) );
-		element.enableDnd( destDndHandler );
-	}
-	
 	
 	protected DPElement makeReceiver(DPElement dest, String title)
 	{
@@ -89,7 +83,7 @@ public class NonLocalDndTestPage extends SystemPage
 			}
 		};
 		
-		dndDest( dest, DataFlavor.javaFileListFlavor, dropFn );
+		dest.addNonLocalDropDest( DataFlavor.javaFileListFlavor, dropFn );
 
 			
 		return makeReceiver( dest, "File:" );
