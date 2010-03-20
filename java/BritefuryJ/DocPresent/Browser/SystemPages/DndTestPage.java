@@ -64,8 +64,7 @@ public class DndTestPage extends SystemPage
 			}
 		};
 		
-		ObjectDndHandler sourceDndHandler = new ObjectDndHandler( new ObjectDndHandler.DndSource[] { new ObjectDndHandler.DndSource( ElementFactory.class, sourceDataFn ) },
-				new ObjectDndHandler.DndDest[] {} );
+		ObjectDndHandler sourceDndHandler = ObjectDndHandler.instance.withDragSource( new ObjectDndHandler.DragSource( ElementFactory.class, sourceDataFn ) );
 
 		source.enableDnd( sourceDndHandler );
 
@@ -100,7 +99,7 @@ public class DndTestPage extends SystemPage
 			}
 		};
 		
-		ObjectDndHandler destDndHandler = new ObjectDndHandler( new ObjectDndHandler.DndSource[] {}, new ObjectDndHandler.DndDest[] { new ObjectDndHandler.DndDest( ElementFactory.class, dropFn ) } );
+		ObjectDndHandler destDndHandler = ObjectDndHandler.instance.withDropDest( new ObjectDndHandler.DropDest( ElementFactory.class, dropFn ) );
 
 
 		placeHolder.enableDnd( destDndHandler );

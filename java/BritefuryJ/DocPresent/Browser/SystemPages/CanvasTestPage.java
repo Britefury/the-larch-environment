@@ -62,7 +62,7 @@ public class CanvasTestPage extends SystemPage
 			}
 		};
 		
-		ObjectDndHandler sourceDndHandler = new ObjectDndHandler( new ObjectDndHandler.DndSource[] { new ObjectDndHandler.DndSource( Integer.class, sourceDataFn ) },  new ObjectDndHandler.DndDest[] {} );
+		ObjectDndHandler sourceDndHandler = ObjectDndHandler.instance.withDragSource( new ObjectDndHandler.DragSource( Integer.class, sourceDataFn ) );
 		return sourceDndHandler;
 	}
 	
@@ -146,7 +146,7 @@ public class CanvasTestPage extends SystemPage
 			}
 		};
 		
-		ObjectDndHandler destDndHandler = new ObjectDndHandler( new ObjectDndHandler.DndSource[] {},  new ObjectDndHandler.DndDest[] { new ObjectDndHandler.DndDest( Integer.class, dropFn ) } );
+		ObjectDndHandler destDndHandler = ObjectDndHandler.instance.withDropDest( new ObjectDndHandler.DropDest( Integer.class, dropFn ) );
 
 		destText.enableDnd( destDndHandler );
 
@@ -192,7 +192,7 @@ public class CanvasTestPage extends SystemPage
 			}
 		};
 		
-		ObjectDndHandler destDndHandler = new ObjectDndHandler( new ObjectDndHandler.DndSource[] {},  new ObjectDndHandler.DndDest[] { new ObjectDndHandler.DndDest( Integer.class, canDropFn, dropFn ) } );
+		ObjectDndHandler destDndHandler = ObjectDndHandler.instance.withDropDest( new ObjectDndHandler.DropDest( Integer.class, canDropFn, dropFn ) );
 
 		destText.enableDnd( destDndHandler );
 
