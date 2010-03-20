@@ -12,6 +12,7 @@ import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Shape;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -29,6 +30,7 @@ import BritefuryJ.DocPresent.Event.PointerEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 import BritefuryJ.DocPresent.Input.DndHandler;
+import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.Layout.ElementAlignment;
@@ -169,7 +171,7 @@ abstract public class DPElement extends PointerInputElement
 	
 	private static class InteractionFields
 	{
-		private DndHandler dndHandler;
+		private ObjectDndHandler dndHandler;
 
 		private ElementLinearRepresentationListener linearRepresentationListener;		// Move this and the next one into an 'interactor' element
 		
@@ -1779,25 +1781,53 @@ abstract public class DPElement extends PointerInputElement
 	//
 	//
 	
-	public void enableDnd(DndHandler handler)
+	public void addDragSource(Class<?> dataType, ObjectDndHandler.SourceDataFn sourceDataFn, ObjectDndHandler.ExportDoneFn exportDoneFn)
 	{
+		ObjectDndHandler current = getValidInitialDndHandler();
 		ensureValidInteractionFields();
-		interactionFields.dndHandler = handler;
+		interactionFields.dndHandler = current.withDragSource( new ObjectDndHandler.DragSource( dataType, sourceDataFn, exportDoneFn ) ); 
 		notifyInteractionFieldsModified();
 	}
 	
-	public void disableDnd()
+	public void addDragSource(Class<?> dataType, ObjectDndHandler.SourceDataFn sourceDataFn)
 	{
-		if ( interactionFields != null )
+		addDragSource( dataType, sourceDataFn, null );
+	}
+	
+	
+	public void addDropDest(Class<?> dataType, ObjectDndHandler.CanDropFn canDropFn, ObjectDndHandler.DropFn dropFn)
+	{
+		ObjectDndHandler current = getValidInitialDndHandler();
+		ensureValidInteractionFields();
+		interactionFields.dndHandler = current.withDropDest( new ObjectDndHandler.DropDest( dataType, canDropFn, dropFn ) );
+		notifyInteractionFieldsModified();
+	}
+	
+	public void addDropDest(Class<?> dataType, ObjectDndHandler.DropFn dropFn)
+	{
+		addDropDest( dataType, null, dropFn );
+	}
+	
+	
+	public void addNonLocalDropDest(DataFlavor dataFlavor, ObjectDndHandler.DropFn dropFn)
+	{
+		ObjectDndHandler current = getValidInitialDndHandler();
+		ensureValidInteractionFields();
+		interactionFields.dndHandler = current.withNonLocalDropDest( new ObjectDndHandler.NonLocalDropDest( dataFlavor, dropFn ) );
+		notifyInteractionFieldsModified();
+	}
+	
+
+	private ObjectDndHandler getValidInitialDndHandler()
+	{
+		if ( interactionFields != null  &&  interactionFields.dndHandler != null )
 		{
-			interactionFields.dndHandler = null;
+			return interactionFields.dndHandler;
 		}
-		notifyInteractionFieldsModified();
-	}
-	
-	public boolean isDndEnabled()
-	{
-		return interactionFields != null  ?  interactionFields.dndHandler != null  :  false;
+		else
+		{
+			return ObjectDndHandler.instance;
+		}
 	}
 	
 	
