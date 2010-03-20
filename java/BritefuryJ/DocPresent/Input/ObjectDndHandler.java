@@ -11,7 +11,6 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import BritefuryJ.DocPresent.Clipboard.LocalDataFlavor;
@@ -21,6 +20,11 @@ import BritefuryJ.Utils.HashUtils;
 
 public class ObjectDndHandler extends DndHandler
 {
+	public static ObjectDndHandler instance = new ObjectDndHandler();
+	
+	
+	
+	
 	public static interface SourceDataFn
 	{
 		public Object createSourceData(PointerInputElement sourceElement);
@@ -43,21 +47,26 @@ public class ObjectDndHandler extends DndHandler
 
 	
 	
-	public static class DndSource
+	private static class DndPin
+	{
+	}
+	
+	
+	public static class DragSource extends DndPin
 	{
 		private Class<?> dataType;
 		private SourceDataFn sourceDataFn;
 		private ExportDoneFn exportDoneFn;
 		
 		
-		public DndSource(Class<?> dataType, SourceDataFn sourceDataFn, ExportDoneFn exportDoneFn)
+		public DragSource(Class<?> dataType, SourceDataFn sourceDataFn, ExportDoneFn exportDoneFn)
 		{
 			this.dataType = dataType;
 			this.sourceDataFn = sourceDataFn;
 			this.exportDoneFn = exportDoneFn;
 		}
 
-		public DndSource(Class<?> dataType, SourceDataFn sourceDataFn)
+		public DragSource(Class<?> dataType, SourceDataFn sourceDataFn)
 		{
 			this( dataType, sourceDataFn, null );
 		}
@@ -70,9 +79,9 @@ public class ObjectDndHandler extends DndHandler
 				return true;
 			}
 			
-			if ( x instanceof DndSource )
+			if ( x instanceof DragSource )
 			{
-				DndSource sx = (DndSource)x;
+				DragSource sx = (DragSource)x;
 				
 				return dataType.equals( sx.dataType )  &&
 					( sourceDataFn != null  ?  sourceDataFn.equals( sx.sourceDataFn )  :  sourceDataFn == sx.sourceDataFn )  &&
@@ -91,21 +100,22 @@ public class ObjectDndHandler extends DndHandler
 		}
 	}
 	
-	public static class DndDest
+	
+	public static class DropDest extends DndPin
 	{
 		private Class<?> dataType;
 		private CanDropFn canDropFn;
 		private DropFn dropFn;
 		
 		
-		public DndDest(Class<?> dataType, CanDropFn canDropFn, DropFn dropFn)
+		public DropDest(Class<?> dataType, CanDropFn canDropFn, DropFn dropFn)
 		{
 			this.dataType = dataType;
 			this.canDropFn = canDropFn;
 			this.dropFn = dropFn;
 		}
 
-		public DndDest(Class<?> dataType, DropFn dropFn)
+		public DropDest(Class<?> dataType, DropFn dropFn)
 		{
 			this( dataType, null, dropFn );
 		}
@@ -118,9 +128,9 @@ public class ObjectDndHandler extends DndHandler
 				return true;
 			}
 			
-			if ( x instanceof DndDest )
+			if ( x instanceof DropDest )
 			{
-				DndDest dx = (DndDest)x;
+				DropDest dx = (DropDest)x;
 				
 				return dataType.equals( dx.dataType )  &&
 					( canDropFn != null  ?  canDropFn.equals( dx.canDropFn )  :  canDropFn == dx.canDropFn )  &&
@@ -143,12 +153,12 @@ public class ObjectDndHandler extends DndHandler
 	
 	private static class TransferMatch
 	{
-		private DndSource source;
-		private DndDest dest;
+		private DragSource source;
+		private DropDest dest;
 		private Object dragData;
 		private boolean bHasDragData;
 		
-		public TransferMatch(DndSource source, DndDest dest, Object dragData, boolean bHasDragData)
+		public TransferMatch(DragSource source, DropDest dest, Object dragData, boolean bHasDragData)
 		{
 			this.source = source;
 			this.dest = dest;
@@ -164,7 +174,7 @@ public class ObjectDndHandler extends DndHandler
 		private ObjectDndHandler sourceHandler;
 		private ArrayList<TransferMatch> transferMatches;
 		private TransferMatch acceptedMatch;
-		private HashMap<DndSource, Object> dragDataTable = new HashMap<DndSource, Object>();
+		private HashMap<DragSource, Object> dragDataTable = new HashMap<DragSource, Object>();
 		
 		
 		public ObjectDndTransferData(PointerInputElement sourceElement, ObjectDndHandler sourceHandler)
@@ -175,7 +185,7 @@ public class ObjectDndHandler extends DndHandler
 		
 		
 		
-		public Object getDragDataForSrc(DndSource src)
+		public Object getDragDataForSrc(DragSource src)
 		{
 			if ( dragDataTable.containsKey( src ) )
 			{
@@ -252,21 +262,68 @@ public class ObjectDndHandler extends DndHandler
 
 	
 	
-	private ArrayList<DndSource> sources = new ArrayList<DndSource>();
-	private ArrayList<DndDest> dests = new ArrayList<DndDest>();
-	private HashMap<Class<?>, DndDest> typeToDest = new HashMap<Class<?>, DndDest>();
+	private ArrayList<DragSource> sources = new ArrayList<DragSource>();
+	private ArrayList<DropDest> dests = new ArrayList<DropDest>();
+	private HashMap<Class<?>, DropDest> typeToDest = new HashMap<Class<?>, DropDest>();
+	
+	private HashMap<DndPin, ObjectDndHandler> derivedDndHandlers;
 	
 	
 	
-	public ObjectDndHandler(DndSource sources[], DndDest dests[])
+	private ObjectDndHandler()
 	{
-		this.sources.addAll( Arrays.asList( sources ) );
-		this.dests.addAll( Arrays.asList( dests ) );
+	}
 		
-		for (DndDest dest: dests)
+	private ObjectDndHandler(ArrayList<DragSource> sources, ArrayList<DropDest> dests)
+	{
+		this.sources = sources;
+		this.dests = dests;
+		
+		for (DropDest dest: dests)
 		{
 			typeToDest.put( dest.dataType, dest );
 		}
+	}
+	
+	
+	public ObjectDndHandler withDragSource(DragSource source)
+	{
+		ObjectDndHandler derived = null;
+		if ( derivedDndHandlers != null )
+		{
+			derived = derivedDndHandlers.get( source );
+			if ( derived != null )
+			{
+				return derived;
+			}
+		}
+		
+		ArrayList<DragSource> src = new ArrayList<DragSource>();
+		src.addAll( sources );
+		src.add( source );
+		derived = new ObjectDndHandler( src, dests );
+		derivedDndHandlers.put( source, derived );
+		return derived;
+	}
+	
+	public ObjectDndHandler withDropDest(DropDest dest)
+	{
+		ObjectDndHandler derived = null;
+		if ( derivedDndHandlers != null )
+		{
+			derived = derivedDndHandlers.get( dest );
+			if ( derived != null )
+			{
+				return derived;
+			}
+		}
+		
+		ArrayList<DropDest> dst = new ArrayList<DropDest>();
+		dst.addAll( dests );
+		dst.add( dest );
+		derived = new ObjectDndHandler( sources, dst );
+		derivedDndHandlers.put( dest, derived );
+		return derived;
 	}
 	
 	
@@ -390,9 +447,9 @@ public class ObjectDndHandler extends DndHandler
 		ArrayList<TransferMatch> matches = new ArrayList<TransferMatch>();
 		
 		ObjectDndHandler sourceHandler = transferData.sourceHandler;
-		for (DndSource src: sourceHandler.sources)
+		for (DragSource src: sourceHandler.sources)
 		{
-			DndDest dest = getDestForType( src.dataType );
+			DropDest dest = getDestForType( src.dataType );
 			
 			if ( dest != null )
 			{
@@ -429,7 +486,7 @@ public class ObjectDndHandler extends DndHandler
 		return matches;
 	}
 
-	private DndDest getDestForType(Class<?> type)
+	private DropDest getDestForType(Class<?> type)
 	{
 		if ( typeToDest.containsKey( type ) )
 		{
@@ -438,7 +495,7 @@ public class ObjectDndHandler extends DndHandler
 		else
 		{
 			Class<?> superClass = type.getSuperclass();
-			DndDest destForSuperClass = null;  
+			DropDest destForSuperClass = null;  
 			
 			if ( superClass != null )
 			{
