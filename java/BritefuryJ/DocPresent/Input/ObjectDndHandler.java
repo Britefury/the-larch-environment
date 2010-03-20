@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import BritefuryJ.DocPresent.Clipboard.LocalDataFlavor;
+import BritefuryJ.Math.Point2;
+import BritefuryJ.Utils.HashUtils;
 
 
 public class ObjectDndHandler extends DndHandler
@@ -31,12 +33,12 @@ public class ObjectDndHandler extends DndHandler
 	
 	public static interface DropFn
 	{
-		public boolean acceptDrop(PointerInputElement destElement, Object data);
+		public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data);
 	}
 	
 	public static interface CanDropFn
 	{
-		public boolean canDrop(PointerInputElement destElement, Object data);
+		public boolean canDrop(PointerInputElement destElement, Point2 targetPosition, Object data);
 	}
 
 	
@@ -59,6 +61,34 @@ public class ObjectDndHandler extends DndHandler
 		{
 			this( dataType, sourceDataFn, null );
 		}
+		
+		
+		public boolean equals(Object x)
+		{
+			if ( this == x )
+			{
+				return true;
+			}
+			
+			if ( x instanceof DndSource )
+			{
+				DndSource sx = (DndSource)x;
+				
+				return dataType.equals( sx.dataType )  &&
+					( sourceDataFn != null  ?  sourceDataFn.equals( sx.sourceDataFn )  :  sourceDataFn == sx.sourceDataFn )  &&
+					( exportDoneFn != null  ?  exportDoneFn.equals( sx.exportDoneFn )  :  exportDoneFn == sx.exportDoneFn );
+			}
+			
+			return false;
+		}
+
+		public int hashCode()
+		{
+			int a = dataType.hashCode();
+			int b = sourceDataFn != null  ?  sourceDataFn.hashCode()  :  0;
+			int c = exportDoneFn != null  ?  exportDoneFn.hashCode()  :  0;
+			return HashUtils.tripleHash( a, b, c );
+		}
 	}
 	
 	public static class DndDest
@@ -78,6 +108,34 @@ public class ObjectDndHandler extends DndHandler
 		public DndDest(Class<?> dataType, DropFn dropFn)
 		{
 			this( dataType, null, dropFn );
+		}
+		
+		
+		public boolean equals(Object x)
+		{
+			if ( this == x )
+			{
+				return true;
+			}
+			
+			if ( x instanceof DndDest )
+			{
+				DndDest dx = (DndDest)x;
+				
+				return dataType.equals( dx.dataType )  &&
+					( canDropFn != null  ?  canDropFn.equals( dx.canDropFn )  :  canDropFn == dx.canDropFn )  &&
+					( dropFn != null  ?  dropFn.equals( dx.dropFn )  :  dropFn == dx.dropFn );
+			}
+			
+			return false;
+		}
+
+		public int hashCode()
+		{
+			int a = dataType.hashCode();
+			int b = canDropFn != null  ?  canDropFn.hashCode()  :  0;
+			int c = dropFn != null  ?  dropFn.hashCode()  :  0;
+			return HashUtils.tripleHash( a, b, c );
 		}
 	}
 	
@@ -279,7 +337,7 @@ public class ObjectDndHandler extends DndHandler
 		}
 		
 		
-		transferData.transferMatches = negotiateTransferMatches( transferData, destElement );
+		transferData.transferMatches = negotiateTransferMatches( transferData, destElement, drop );
 		
 		return transferData.transferMatches.size() > 0;
 	}
@@ -315,7 +373,7 @@ public class ObjectDndHandler extends DndHandler
 				match.dragData = transferData.getDragDataForSrc( match.source );
 				match.bHasDragData = true;
 			}
-			boolean bResult = match.dest.dropFn.acceptDrop( destElement, match.dragData );
+			boolean bResult = match.dest.dropFn.acceptDrop( destElement, drop.getTargetPosition(), match.dragData );
 			if ( bResult )
 			{
 				transferData.acceptDrop( match );
@@ -327,7 +385,7 @@ public class ObjectDndHandler extends DndHandler
 
 	
 	
-	private ArrayList<TransferMatch> negotiateTransferMatches(ObjectDndTransferData transferData, PointerInputElement destElement)
+	private ArrayList<TransferMatch> negotiateTransferMatches(ObjectDndTransferData transferData, PointerInputElement destElement, DndDrop drop)
 	{
 		ArrayList<TransferMatch> matches = new ArrayList<TransferMatch>();
 		
@@ -344,7 +402,7 @@ public class ObjectDndHandler extends DndHandler
 				if ( dest.canDropFn != null )
 				{
 					dragData = transferData.getDragDataForSrc( src );
-					bCanDrop = dest.canDropFn.canDrop( destElement, dragData );
+					bCanDrop = dest.canDropFn.canDrop( destElement, drop.getTargetPosition(), dragData );
 					bHasDragData = true;
 				}
 

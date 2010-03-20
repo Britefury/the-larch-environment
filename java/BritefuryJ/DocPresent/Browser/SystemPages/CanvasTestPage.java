@@ -25,6 +25,7 @@ import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.Math.Point2;
 
 public class CanvasTestPage extends SystemPage
 {
@@ -137,7 +138,7 @@ public class CanvasTestPage extends SystemPage
 		
 		ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
 		{
-			public boolean acceptDrop(PointerInputElement destElement, Object data)
+			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data)
 			{
 				String text = data.toString();
 				textElement.setText( text );
@@ -172,7 +173,7 @@ public class CanvasTestPage extends SystemPage
 		
 		ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
 		{
-			public boolean acceptDrop(PointerInputElement destElement, Object data)
+			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data)
 			{
 				String text = data.toString();
 				textElement.setText( text );
@@ -182,7 +183,7 @@ public class CanvasTestPage extends SystemPage
 		
 		ObjectDndHandler.CanDropFn canDropFn = new ObjectDndHandler.CanDropFn()
 		{
-			public boolean canDrop(PointerInputElement destElement, Object data)
+			public boolean canDrop(PointerInputElement destElement, Point2 targetPosition, Object data)
 			{
 				String firstText = textElement.getText();
 				int firstNum = textAsNumber( firstText );

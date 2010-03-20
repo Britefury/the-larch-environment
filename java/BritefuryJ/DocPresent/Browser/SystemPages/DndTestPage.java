@@ -8,21 +8,31 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPText;
+import BritefuryJ.DocPresent.DPProxy;
+import BritefuryJ.DocPresent.ElementFactory;
+import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.Math.Point2;
 
 public class DndTestPage extends SystemPage
 {
 	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
 	private static PrimitiveStyleSheet textStyle = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 16 ) );
+	private static PrimitiveStyleSheet mathStyle = PrimitiveStyleSheet.instance;
+	private static PrimitiveStyleSheet paletteTitleStyle = styleSheet.withFont( new Font( "Serif", Font.BOLD, 28 ) );
+	private static PrimitiveStyleSheet paletteSectionStyle = styleSheet.withFont( new Font( "Serif", Font.PLAIN, 18 ) );
+	private static PrimitiveStyleSheet outlineStyle = styleSheet.withBorder( new SolidBorder( 2.0, 10.0, new Color( 0.6f, 0.7f, 0.8f ), null ) );
+	
+	private static PrimitiveStyleSheet placeHolderStyle = styleSheet.withBackground( new FillPainter( new Color( 1.0f, 0.9f, 0.75f  ) ) );
 	private static PrimitiveStyleSheet sourceStyle = styleSheet.withBackground( new FillPainter( new Color( 0.75f, 0.85f, 1.0f ) ) );
-	private static PrimitiveStyleSheet destStyle = styleSheet.withBackground( new FillPainter( new Color( 1.0f, 0.9f, 0.75f  ) ) );
-	private static PrimitiveStyleSheet tableStyle = styleSheet.withTableColumnSpacing( 25.0 ).withTableRowSpacing( 25.0 );
 	
 	
 	protected DndTestPage()
@@ -38,66 +48,138 @@ public class DndTestPage extends SystemPage
 	
 	protected String getDescription()
 	{
-		return "Text can be dragged from the sources to the destinations.";
+		return "A very simple drag and drop based formula editor.";
 	}
 	
 	
-	
-	protected DPElement makeSourceElement(String title, final String dragData)
+	protected DPElement makeSource(DPElement contents, final ElementFactory factory)
 	{
-		final DPText textElement = textStyle.text( title );
-		DPElement source = sourceStyle.box( textElement.pad( 10.0, 10.0 ) );
+		DPElement source = sourceStyle.box( contents.pad( 4.0, 2.0 ) );
 		
 		ObjectDndHandler.SourceDataFn sourceDataFn = new ObjectDndHandler.SourceDataFn()
 		{
 			public Object createSourceData(PointerInputElement sourceElement)
 			{
-				return dragData;
+				return factory;
 			}
 		};
 		
-		ObjectDndHandler sourceDndHandler = new ObjectDndHandler( new ObjectDndHandler.DndSource[] { new ObjectDndHandler.DndSource( String.class, sourceDataFn ) },
+		ObjectDndHandler sourceDndHandler = new ObjectDndHandler( new ObjectDndHandler.DndSource[] { new ObjectDndHandler.DndSource( ElementFactory.class, sourceDataFn ) },
 				new ObjectDndHandler.DndDest[] {} );
 
 		source.enableDnd( sourceDndHandler );
 
 		return source;
 	}
-	
-	protected DPElement makeDestElement(String title)
-	{
-		final DPText textElement = textStyle.text( title );
-		DPElement dest = destStyle.box( textElement.pad( 10.0, 10.0 ) );
 
+	protected DPElement makeTextSource(final String text)
+	{
+		final ElementFactory factory = new ElementFactory()
+		{
+			public DPElement createElement(StyleSheet styleSheet)
+			{
+				return textStyle.staticText( text );
+			}
+		};
+
+		return makeSource( textStyle.text( text ), factory );
+	}
+	
+	
+	protected DPElement makePlaceHolder()
+	{
+		final DPProxy placeHolder = styleSheet.proxy( placeHolderStyle.box( styleSheet.staticText( " " ).pad( 8.0, 8.0 ) ) );
+		
 		ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
 		{
-			public boolean acceptDrop(PointerInputElement destElement, Object data)
+			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data)
 			{
-				String text = (String)data;
-				textElement.setText( text );
+				ElementFactory factory = (ElementFactory)data;
+				placeHolder.setChild( factory.createElement( styleSheet ) );
 				return true;
 			}
 		};
 		
-		ObjectDndHandler destDndHandler = new ObjectDndHandler( new ObjectDndHandler.DndSource[] {}, new ObjectDndHandler.DndDest[] { new ObjectDndHandler.DndDest( String.class, dropFn ) } );
+		ObjectDndHandler destDndHandler = new ObjectDndHandler( new ObjectDndHandler.DndSource[] {}, new ObjectDndHandler.DndDest[] { new ObjectDndHandler.DndDest( ElementFactory.class, dropFn ) } );
 
 
-		dest.enableDnd( destDndHandler );
+		placeHolder.enableDnd( destDndHandler );
 
-		return dest;
+		return placeHolder;
 	}
 	
+	
+	protected DPElement makeFractionSource()
+	{
+		final ElementFactory factory = new ElementFactory()
+		{
+			public DPElement createElement(StyleSheet styleSheet)
+			{
+				return mathStyle.fraction( makePlaceHolder(), makePlaceHolder(), "/" );
+			}
+		};
 
+		return makeSource( mathStyle.fraction( textStyle.staticText( "a" ), textStyle.staticText( "b" ), "/" ), factory );
+	}
+	
+	protected DPElement makeScriptSource()
+	{
+		final ElementFactory factory = new ElementFactory()
+		{
+			public DPElement createElement(StyleSheet styleSheet)
+			{
+				return mathStyle.script( makePlaceHolder(), makePlaceHolder(), makePlaceHolder(), makePlaceHolder(), makePlaceHolder() );
+			}
+		};
+
+		return makeSource( mathStyle.script( textStyle.staticText( "a" ), textStyle.staticText( "b" ), textStyle.staticText( "c" ), textStyle.staticText( "d" ), textStyle.staticText( "e" ) ), factory );
+	}
+	
+	
+	protected DPElement makePalette()
+	{
+		DPElement title = paletteTitleStyle.staticText( "Palette" ).alignHCentre();
+		
+		DPElement textsTitle = paletteSectionStyle.staticText( "Text:" );
+		ArrayList<DPElement> textElements = new ArrayList<DPElement>();
+		textElements.add( textsTitle.padX( 0.0, 20.0 ) );
+		String texts = "abcdefghijklmnopqrstuvwxyz";
+		for (int i = 0; i < texts.length(); i++)
+		{
+			textElements.add( makeTextSource( texts.substring( i, i+1 ) ) );
+		}
+		DPElement textSection = styleSheet.withHBoxSpacing( 3.0 ).hbox( textElements );
+		
+		DPElement mathTitle = paletteSectionStyle.staticText( "Math:" );
+		ArrayList<DPElement> mathElements = new ArrayList<DPElement>();
+		mathElements.add( mathTitle.padX( 0.0, 20.0 ) );
+		mathElements.add( makeFractionSource() );
+		mathElements.add( makeScriptSource() );
+		DPElement mathSection = styleSheet.withHBoxSpacing( 3.0 ).hbox( mathElements );
+		
+		DPElement vbox = styleSheet.withVBoxSpacing( 10.0 ).vbox( Arrays.asList( new DPElement[] { title, textSection, mathSection } ) );
+		
+		return outlineStyle.border( vbox.alignHExpand() ).alignHExpand().pad( 20.0, 5.0 ).alignHExpand();
+	}
+	
+	protected DPElement makeFormula()
+	{
+		DPElement title = paletteTitleStyle.staticText( "Formula" ).alignHCentre();
+		DPElement formula = makePlaceHolder();
+		DPElement formulaPara = styleSheet.paragraph( Arrays.asList( new DPElement[] { formula } ) );
+		
+		DPElement vbox = styleSheet.withVBoxSpacing( 10.0 ).vbox( Arrays.asList( new DPElement[] { title, formulaPara } ) ).alignHExpand();
+		
+		return vbox.pad( 20.0, 5.0 );
+	}
+	
+	
 	
 	protected DPElement createContents()
 	{
-		DPElement source0 = makeSourceElement( "abc", "abc" );
-		DPElement source1 = makeSourceElement( "xyz", "xyz" );
-
-		DPElement dest0 = makeDestElement( "abc" );
-		DPElement dest1 = makeDestElement( "xyz" );
+		DPElement palette = makePalette();
+		DPElement formula = makeFormula();
 		
-		return tableStyle.table( new DPElement[][] { { styleSheet.text( "Source:" ), source0, source1 },
-				{ styleSheet.text( "Destination:" ), dest0, dest1 } } ).padY( 10.0 );
+		return styleSheet.withVBoxSpacing( 20.0 ).vbox( Arrays.asList( new DPElement[] { palette.alignHExpand(), formula.alignHExpand() } ) ).alignHExpand();
 	}
 }
