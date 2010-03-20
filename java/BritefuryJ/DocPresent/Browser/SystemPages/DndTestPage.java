@@ -48,7 +48,7 @@ public class DndTestPage extends SystemPage
 	
 	protected String getDescription()
 	{
-		return "A very simple drag and drop based formula editor.";
+		return "A very simple drag and drop based formula editor. Drag elements from the palette into the yellow formula boxes.";
 	}
 	
 	
