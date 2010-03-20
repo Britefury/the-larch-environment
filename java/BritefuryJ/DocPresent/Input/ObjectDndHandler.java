@@ -151,6 +151,47 @@ public class ObjectDndHandler extends DndHandler
 	
 	
 	
+	public static class NonLocalDropDest extends DndPin
+	{
+		private DataFlavor dataFlavor;
+		private DropFn dropFn;
+		
+		
+		public NonLocalDropDest(DataFlavor dataFlavor, DropFn dropFn)
+		{
+			this.dataFlavor = dataFlavor;
+			this.dropFn = dropFn;
+		}
+		
+		
+		public boolean equals(Object x)
+		{
+			if ( this == x )
+			{
+				return true;
+			}
+			
+			if ( x instanceof NonLocalDropDest )
+			{
+				NonLocalDropDest dx = (NonLocalDropDest)x;
+				
+				return dataFlavor.equals( dx.dataFlavor )  &&
+					( dropFn != null  ?  dropFn.equals( dx.dropFn )  :  dropFn == dx.dropFn );
+			}
+			
+			return false;
+		}
+
+		public int hashCode()
+		{
+			int a = dataFlavor.hashCode();
+			int b = dropFn != null  ?  dropFn.hashCode()  :  0;
+			return HashUtils.doubleHash( a, b );
+		}
+	}
+	
+	
+	
 	private static class TransferMatch
 	{
 		private DragSource source;
@@ -262,9 +303,10 @@ public class ObjectDndHandler extends DndHandler
 
 	
 	
-	private ArrayList<DragSource> sources = new ArrayList<DragSource>();
-	private ArrayList<DropDest> dests = new ArrayList<DropDest>();
-	private HashMap<Class<?>, DropDest> typeToDest = new HashMap<Class<?>, DropDest>();
+	private ArrayList<DragSource> sources;
+	private ArrayList<DropDest> dests;
+	private ArrayList<NonLocalDropDest> nonLocalDests;
+	private HashMap<Class<?>, DropDest> typeToDest;
 	
 	private HashMap<DndPin, ObjectDndHandler> derivedDndHandlers;
 	
@@ -274,14 +316,19 @@ public class ObjectDndHandler extends DndHandler
 	{
 	}
 		
-	private ObjectDndHandler(ArrayList<DragSource> sources, ArrayList<DropDest> dests)
+	private ObjectDndHandler(ArrayList<DragSource> sources, ArrayList<DropDest> dests, ArrayList<NonLocalDropDest> nonLocalDests)
 	{
 		this.sources = sources;
 		this.dests = dests;
+		this.nonLocalDests = nonLocalDests;
 		
-		for (DropDest dest: dests)
+		if ( dests != null )
 		{
-			typeToDest.put( dest.dataType, dest );
+			typeToDest = new HashMap<Class<?>, DropDest>();
+			for (DropDest dest: dests)
+			{
+				typeToDest.put( dest.dataType, dest );
+			}
 		}
 	}
 	
@@ -297,11 +344,18 @@ public class ObjectDndHandler extends DndHandler
 				return derived;
 			}
 		}
+		else
+		{
+			derivedDndHandlers = new HashMap<DndPin, ObjectDndHandler>();
+		}
 		
 		ArrayList<DragSource> src = new ArrayList<DragSource>();
-		src.addAll( sources );
+		if ( sources != null )
+		{
+			src.addAll( sources );
+		}
 		src.add( source );
-		derived = new ObjectDndHandler( src, dests );
+		derived = new ObjectDndHandler( src, dests, nonLocalDests );
 		derivedDndHandlers.put( source, derived );
 		return derived;
 	}
@@ -317,11 +371,45 @@ public class ObjectDndHandler extends DndHandler
 				return derived;
 			}
 		}
+		else
+		{
+			derivedDndHandlers = new HashMap<DndPin, ObjectDndHandler>();
+		}
 		
 		ArrayList<DropDest> dst = new ArrayList<DropDest>();
-		dst.addAll( dests );
+		if ( dests != null )
+		{
+			dst.addAll( dests );
+		}
 		dst.add( dest );
-		derived = new ObjectDndHandler( sources, dst );
+		derived = new ObjectDndHandler( sources, dst, nonLocalDests );
+		derivedDndHandlers.put( dest, derived );
+		return derived;
+	}
+	
+	public ObjectDndHandler withNonLocalDropDest(NonLocalDropDest dest)
+	{
+		ObjectDndHandler derived = null;
+		if ( derivedDndHandlers != null )
+		{
+			derived = derivedDndHandlers.get( dest );
+			if ( derived != null )
+			{
+				return derived;
+			}
+		}
+		else
+		{
+			derivedDndHandlers = new HashMap<DndPin, ObjectDndHandler>();
+		}
+		
+		ArrayList<NonLocalDropDest> nonLocalDst = new ArrayList<NonLocalDropDest>();
+		if ( nonLocalDests != null )
+		{
+			nonLocalDst.addAll( nonLocalDests );
+		}
+		nonLocalDst.add( dest );
+		derived = new ObjectDndHandler( sources, dests, nonLocalDst );
 		derivedDndHandlers.put( dest, derived );
 		return derived;
 	}
@@ -379,65 +467,119 @@ public class ObjectDndHandler extends DndHandler
 	
 	public boolean canDrop(PointerInputElement destElement, DndDrop drop)
 	{
-		ObjectDndTransferData transferData = null;
-		try
+		Transferable transferable = drop.getTransferable();
+		if ( transferable.isDataFlavorSupported( ObjectDndDataFlavor.flavor ) )
 		{
-			transferData = (ObjectDndTransferData)drop.getTransferable().getTransferData( ObjectDndDataFlavor.flavor );
+			ObjectDndTransferData transferData = null;
+
+			try
+			{
+				transferData = (ObjectDndTransferData)transferable.getTransferData( ObjectDndDataFlavor.flavor );
+			}
+			catch (UnsupportedFlavorException e)
+			{
+				return false;
+			}
+			catch (IOException e)
+			{
+				return false;
+			}
+
+			transferData.transferMatches = negotiateTransferMatches( transferData, destElement, drop );
+			
+			return transferData.transferMatches.size() > 0;
 		}
-		catch (UnsupportedFlavorException e)
+		else
 		{
+			if ( nonLocalDests != null )
+			{
+				for (int i = nonLocalDests.size() - 1; i >= 0; i--)
+				{
+					NonLocalDropDest dest = nonLocalDests.get( i );
+					if ( transferable.isDataFlavorSupported( dest.dataFlavor ) )
+					{
+						return true;
+					}
+				}
+			}
+			
 			return false;
 		}
-		catch (IOException e)
-		{
-			return false;
-		}
-		
-		
-		transferData.transferMatches = negotiateTransferMatches( transferData, destElement, drop );
-		
-		return transferData.transferMatches.size() > 0;
 	}
 	
 	public boolean acceptDrop(PointerInputElement destElement, DndDrop drop)
 	{
-		ObjectDndTransferData transferData = null;
-		try
+		Transferable transferable = drop.getTransferable();
+		
+		if ( transferable.isDataFlavorSupported( ObjectDndDataFlavor.flavor ) )
 		{
-			transferData = (ObjectDndTransferData)drop.getTransferable().getTransferData( ObjectDndDataFlavor.flavor );
-		}
-		catch (UnsupportedFlavorException e)
-		{
+			ObjectDndTransferData transferData = null;
+			try
+			{
+				transferData = (ObjectDndTransferData)transferable.getTransferData( ObjectDndDataFlavor.flavor );
+			}
+			catch (UnsupportedFlavorException e)
+			{
+				return false;
+			}
+			catch (IOException e)
+			{
+				return false;
+			}
+	
+			
+			ArrayList<TransferMatch> matches = transferData.transferMatches;
+			if ( matches == null )
+			{
+				throw new RuntimeException( "canDrop not invoked - no transfer matches available" );
+			}
+			
+			for (int i = matches.size() - 1; i >= 0; i--)
+			{
+				TransferMatch match = matches.get( i );
+				if ( !match.bHasDragData )
+				{
+					match.dragData = transferData.getDragDataForSrc( match.source );
+					match.bHasDragData = true;
+				}
+				boolean bResult = match.dest.dropFn.acceptDrop( destElement, drop.getTargetPosition(), match.dragData );
+				if ( bResult )
+				{
+					transferData.acceptDrop( match );
+					return true;
+				}
+			}
 			return false;
 		}
-		catch (IOException e)
+		else
 		{
+			if ( nonLocalDests != null )
+			{
+				for (int i = nonLocalDests.size() - 1; i >= 0; i--)
+				{
+					NonLocalDropDest dest = nonLocalDests.get( i );
+					if ( transferable.isDataFlavorSupported( dest.dataFlavor ) )
+					{
+						Object data;
+						try
+						{
+							data = transferable.getTransferData( dest.dataFlavor );
+						}
+						catch (UnsupportedFlavorException e)
+						{
+							throw new RuntimeException( "DataFlavor should be supported" );
+						}
+						catch (IOException e)
+						{
+							return false;
+						}
+						return dest.dropFn.acceptDrop( destElement, drop.getTargetPosition(), data );
+					}
+				}
+			}
+			
 			return false;
 		}
-
-		
-		ArrayList<TransferMatch> matches = transferData.transferMatches;
-		if ( matches == null )
-		{
-			throw new RuntimeException( "canDrop not invoked - no transfer matches available" );
-		}
-		
-		for (int i = matches.size() - 1; i >= 0; i--)
-		{
-			TransferMatch match = matches.get( i );
-			if ( !match.bHasDragData )
-			{
-				match.dragData = transferData.getDragDataForSrc( match.source );
-				match.bHasDragData = true;
-			}
-			boolean bResult = match.dest.dropFn.acceptDrop( destElement, drop.getTargetPosition(), match.dragData );
-			if ( bResult )
-			{
-				transferData.acceptDrop( match );
-				return true;
-			}
-		}
-		return false;
 	}
 
 	
@@ -447,37 +589,40 @@ public class ObjectDndHandler extends DndHandler
 		ArrayList<TransferMatch> matches = new ArrayList<TransferMatch>();
 		
 		ObjectDndHandler sourceHandler = transferData.sourceHandler;
-		for (DragSource src: sourceHandler.sources)
+		if ( sourceHandler.sources != null )
 		{
-			DropDest dest = getDestForType( src.dataType );
-			
-			if ( dest != null )
+			for (DragSource src: sourceHandler.sources)
 			{
-				boolean bCanDrop = true;
-				Object dragData = null;
-				boolean bHasDragData = false;
-				if ( dest.canDropFn != null )
+				DropDest dest = getDestForType( src.dataType );
+				
+				if ( dest != null )
 				{
-					dragData = transferData.getDragDataForSrc( src );
-					bCanDrop = dest.canDropFn.canDrop( destElement, drop.getTargetPosition(), dragData );
-					bHasDragData = true;
-				}
-
-				if ( bCanDrop )
-				{
-					boolean bInserted = false;
-					for (int i = 0; i < matches.size(); i++)
+					boolean bCanDrop = true;
+					Object dragData = null;
+					boolean bHasDragData = false;
+					if ( dest.canDropFn != null )
 					{
-						TransferMatch match = matches.get( i );
-						if ( match.source.dataType.isAssignableFrom( src.dataType ) )
-						{
-							matches.set( i, new TransferMatch( src, dest, dragData, bHasDragData ) );
-						}
+						dragData = transferData.getDragDataForSrc( src );
+						bCanDrop = dest.canDropFn.canDrop( destElement, drop.getTargetPosition(), dragData );
+						bHasDragData = true;
 					}
-					
-					if ( !bInserted )
+	
+					if ( bCanDrop )
 					{
-						matches.add( new TransferMatch( src, dest, dragData, bHasDragData ) );
+						boolean bInserted = false;
+						for (int i = 0; i < matches.size(); i++)
+						{
+							TransferMatch match = matches.get( i );
+							if ( match.source.dataType.isAssignableFrom( src.dataType ) )
+							{
+								matches.set( i, new TransferMatch( src, dest, dragData, bHasDragData ) );
+							}
+						}
+						
+						if ( !bInserted )
+						{
+							matches.add( new TransferMatch( src, dest, dragData, bHasDragData ) );
+						}
 					}
 				}
 			}
@@ -488,7 +633,7 @@ public class ObjectDndHandler extends DndHandler
 
 	private DropDest getDestForType(Class<?> type)
 	{
-		if ( typeToDest.containsKey( type ) )
+		if ( typeToDest != null  &&  typeToDest.containsKey( type ) )
 		{
 			return typeToDest.get( type );
 		}
@@ -502,6 +647,7 @@ public class ObjectDndHandler extends DndHandler
 				destForSuperClass = getDestForType( superClass );
 			}
 			
+			typeToDest = new HashMap<Class<?>, DropDest>();
 			typeToDest.put( type, destForSuperClass );
 			return destForSuperClass;
 		}

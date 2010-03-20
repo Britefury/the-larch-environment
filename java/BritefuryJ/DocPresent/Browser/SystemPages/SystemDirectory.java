@@ -28,6 +28,7 @@ public class SystemDirectory
 		primitiveTestPages.add( new ImageTestPage() );
 		primitiveTestPages.add( new ListViewTestPage() );
 		primitiveTestPages.add( new MathRootTestPage() );
+		primitiveTestPages.add( new NonLocalDndTestPage() );
 		primitiveTestPages.add( new ParagraphTestPage() );
 		primitiveTestPages.add( new ParagraphWithSpanTestPage() );
 		primitiveTestPages.add( new ProxyAndSpanTestPage() );
