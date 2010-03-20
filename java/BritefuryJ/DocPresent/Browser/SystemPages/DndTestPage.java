@@ -9,10 +9,10 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.awt.Font;
 
-import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPText;
+import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.Input.SimpleDndHandler;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
@@ -48,7 +48,7 @@ public class DndTestPage extends SystemPage
 		final DPText textElement = textStyle.text( title );
 		DPElement source = sourceStyle.box( textElement.pad( 10.0, 10.0 ) );
 		
-		SimpleDndHandler.SourceDataFn sourceDataFn = new SimpleDndHandler.SourceDataFn()
+		ObjectDndHandler.SourceDataFn sourceDataFn = new ObjectDndHandler.SourceDataFn()
 		{
 			public Object createSourceData(PointerInputElement sourceElement)
 			{
@@ -56,8 +56,8 @@ public class DndTestPage extends SystemPage
 			}
 		};
 		
-		SimpleDndHandler sourceDndHandler = new SimpleDndHandler();
-		sourceDndHandler.registerSource( "text", sourceDataFn );
+		ObjectDndHandler sourceDndHandler = new ObjectDndHandler( new ObjectDndHandler.DndSource[] { new ObjectDndHandler.DndSource( String.class, sourceDataFn ) },
+				new ObjectDndHandler.DndDest[] {} );
 
 		source.enableDnd( sourceDndHandler );
 
@@ -69,7 +69,7 @@ public class DndTestPage extends SystemPage
 		final DPText textElement = textStyle.text( title );
 		DPElement dest = destStyle.box( textElement.pad( 10.0, 10.0 ) );
 
-		SimpleDndHandler.DropFn dropFn = new SimpleDndHandler.DropFn()
+		ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
 		{
 			public boolean acceptDrop(PointerInputElement destElement, Object data)
 			{
@@ -79,8 +79,7 @@ public class DndTestPage extends SystemPage
 			}
 		};
 		
-		SimpleDndHandler destDndHandler = new SimpleDndHandler();
-		destDndHandler.registerDest( "text", dropFn );
+		ObjectDndHandler destDndHandler = new ObjectDndHandler( new ObjectDndHandler.DndSource[] {}, new ObjectDndHandler.DndDest[] { new ObjectDndHandler.DndDest( String.class, dropFn ) } );
 
 
 		dest.enableDnd( destDndHandler );

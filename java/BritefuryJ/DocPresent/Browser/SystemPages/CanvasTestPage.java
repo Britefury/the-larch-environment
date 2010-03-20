@@ -12,17 +12,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPCanvas;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Canvas.DrawingNode;
 import BritefuryJ.DocPresent.Canvas.GroupNode;
 import BritefuryJ.DocPresent.Canvas.ShapeNode;
 import BritefuryJ.DocPresent.Canvas.TextNode;
 import BritefuryJ.DocPresent.Input.DndHandler;
+import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.Input.SimpleDndHandler;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
@@ -52,8 +52,8 @@ public class CanvasTestPage extends SystemPage
 	
 	protected DndHandler dndSource(int index)
 	{
-		final String dragData = new Integer( index ).toString();
-		SimpleDndHandler.SourceDataFn sourceDataFn = new SimpleDndHandler.SourceDataFn()
+		final Integer dragData = new Integer( index );
+		ObjectDndHandler.SourceDataFn sourceDataFn = new ObjectDndHandler.SourceDataFn()
 		{
 			public Object createSourceData(PointerInputElement sourceElement)
 			{
@@ -61,8 +61,7 @@ public class CanvasTestPage extends SystemPage
 			}
 		};
 		
-		SimpleDndHandler sourceDndHandler = new SimpleDndHandler();
-		sourceDndHandler.registerSource( "text", sourceDataFn );
+		ObjectDndHandler sourceDndHandler = new ObjectDndHandler( new ObjectDndHandler.DndSource[] { new ObjectDndHandler.DndSource( Integer.class, sourceDataFn ) },  new ObjectDndHandler.DndDest[] {} );
 		return sourceDndHandler;
 	}
 	
@@ -136,18 +135,17 @@ public class CanvasTestPage extends SystemPage
 		final DPText textElement = textStyle.text( title );
 		DPElement destText = styleSheet.withBackground( new FillPainter( backgroundColour ) ).box( textElement.pad( 10.0, 10.0 ) );
 		
-		SimpleDndHandler.DropFn dropFn = new SimpleDndHandler.DropFn()
+		ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
 		{
 			public boolean acceptDrop(PointerInputElement destElement, Object data)
 			{
-				String text = (String)data;
+				String text = data.toString();
 				textElement.setText( text );
 				return true;
 			}
 		};
 		
-		SimpleDndHandler destDndHandler = new SimpleDndHandler();
-		destDndHandler.registerDest( "text", dropFn );
+		ObjectDndHandler destDndHandler = new ObjectDndHandler( new ObjectDndHandler.DndSource[] {},  new ObjectDndHandler.DndDest[] { new ObjectDndHandler.DndDest( Integer.class, dropFn ) } );
 
 		destText.enableDnd( destDndHandler );
 
@@ -172,30 +170,28 @@ public class CanvasTestPage extends SystemPage
 		final DPText textElement = textStyle.text( title );
 		DPElement destText = styleSheet.withBackground( new FillPainter( backgroundColour ) ).box( textElement.pad( 10.0, 10.0 ) );
 		
-		SimpleDndHandler.DropFn dropFn = new SimpleDndHandler.DropFn()
+		ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
 		{
 			public boolean acceptDrop(PointerInputElement destElement, Object data)
 			{
-				String text = (String)data;
+				String text = data.toString();
 				textElement.setText( text );
 				return true;
 			}
 		};
 		
-		SimpleDndHandler.CanDropFn canDropFn = new SimpleDndHandler.CanDropFn()
+		ObjectDndHandler.CanDropFn canDropFn = new ObjectDndHandler.CanDropFn()
 		{
 			public boolean canDrop(PointerInputElement destElement, Object data)
 			{
-				String text = (String)data;
 				String firstText = textElement.getText();
 				int firstNum = textAsNumber( firstText );
-				int secondNum = textAsNumber( text );
+				int secondNum = (Integer)data;
 				return secondNum >= firstNum;
 			}
 		};
 		
-		SimpleDndHandler destDndHandler = new SimpleDndHandler();
-		destDndHandler.registerDest( "text", dropFn, canDropFn );
+		ObjectDndHandler destDndHandler = new ObjectDndHandler( new ObjectDndHandler.DndSource[] {},  new ObjectDndHandler.DndDest[] { new ObjectDndHandler.DndDest( Integer.class, canDropFn, dropFn ) } );
 
 		destText.enableDnd( destDndHandler );
 
