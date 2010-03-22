@@ -107,7 +107,7 @@ public class StyleSheet
 	protected HashMap<String, Object> values = new HashMap<String, Object>();
 	protected HashMap<StyleSheetValueSingle, StyleSheet> singleValueDerivedStyleSheets = new HashMap<StyleSheetValueSingle, StyleSheet>();
 	protected HashMap<StyleSheetValuesMultiple, StyleSheet> multiValueDerivedStyleSheets = new HashMap<StyleSheetValuesMultiple, StyleSheet>();
-	protected IdentityHashMap<AttributeSet, StyleSheet> attribSetDerivedStyleSheets = new IdentityHashMap<AttributeSet, StyleSheet>();
+	protected IdentityHashMap<AttributeValues, StyleSheet> attribSetDerivedStyleSheets = new IdentityHashMap<AttributeValues, StyleSheet>();
 	protected IdentityHashMap<StyleSheetDerivedPyAttrFn, PyObject> derivedAttributes = new IdentityHashMap<StyleSheetDerivedPyAttrFn, PyObject>();
 	
 	
@@ -268,7 +268,7 @@ public class StyleSheet
 		}
 	}
 	
-	public StyleSheet withAttrSet(AttributeSet attribs)
+	public StyleSheet withAttrSet(AttributeValues attribs)
 	{
 		StyleSheet derived = attribSetDerivedStyleSheets.get( attribs );
 		if ( derived == null )
