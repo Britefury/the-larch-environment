@@ -12,23 +12,23 @@ import java.util.Map;
 import org.python.core.Py;
 import org.python.core.PyObject;
 
-public class AttributeSet
+public class AttributeValues
 {
-	public static final AttributeSet identity = new AttributeSet();
+	public static final AttributeValues identity = new AttributeValues();
 	
 	protected HashMap<String, Object> values = new HashMap<String, Object>();
 
 	
-	public AttributeSet()
+	public AttributeValues()
 	{
 	}
 	
-	public AttributeSet(Map<String, Object> vals)
+	public AttributeValues(Map<String, Object> vals)
 	{
 		values.putAll( vals );
 	}
 	
-	public AttributeSet(String names[], Object values[])
+	public AttributeValues(String names[], Object values[])
 	{
 		if ( values.length != names.length )
 		{
@@ -41,7 +41,7 @@ public class AttributeSet
 		}
 	}
 	
-	public AttributeSet(PyObject values[], String names[])
+	public AttributeValues(PyObject values[], String names[])
 	{
 		if ( values.length != names.length )
 		{

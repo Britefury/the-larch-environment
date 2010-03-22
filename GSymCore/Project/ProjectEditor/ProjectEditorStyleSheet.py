@@ -30,9 +30,9 @@ class ProjectEditorStyleSheet (StyleSheet):
 		self.initAttr( 'titleBarStyle', TitleBarStyleSheet.instance )
 		self.initAttr( 'tabbedBoxStyle', TabbedBoxStyleSheet.instance )
 		
-		self.initAttr( 'projectControlsAttrs', AttributeSet( border=SolidBorder( 2.0, 2.0, Color( 131, 149, 172 ), None ), hBoxSpacing=30.0 ) )
-		self.initAttr( 'packageNameAttrs', AttributeSet( foreground=Color( 0.0, 0.0, 0.5 ), font=Font( 'Sans serif', Font.BOLD, 14 ) ) )
-		self.initAttr( 'itemHoverHighlightAttrs', AttributeSet( hoverBackground=FilledOutlinePainter( Color( 0.8, 0.825, 0.9 ), Color( 0.125, 0.341, 0.574 ), BasicStroke( 1.0 ) ) ) )
+		self.initAttr( 'projectControlsAttrs', AttributeValues( border=SolidBorder( 2.0, 2.0, Color( 131, 149, 172 ), None ), hBoxSpacing=30.0 ) )
+		self.initAttr( 'packageNameAttrs', AttributeValues( foreground=Color( 0.0, 0.0, 0.5 ), font=Font( 'Sans serif', Font.BOLD, 14 ) ) )
+		self.initAttr( 'itemHoverHighlightAttrs', AttributeValues( hoverBackground=FilledOutlinePainter( Color( 0.8, 0.825, 0.9 ), Color( 0.125, 0.341, 0.574 ), BasicStroke( 1.0 ) ) ) )
 		
 		self.initAttr( 'packageContentsIndentation', 20.0 )
 	

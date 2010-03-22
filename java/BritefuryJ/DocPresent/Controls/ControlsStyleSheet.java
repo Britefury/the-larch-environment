@@ -20,7 +20,7 @@ import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.StyleSheet.AttributeSet;
+import BritefuryJ.DocPresent.StyleSheet.AttributeValues;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
@@ -48,7 +48,7 @@ public class ControlsStyleSheet extends StyleSheet
 		
 		initAttr( "primitiveStyleSheet", PrimitiveStyleSheet.instance );
 
-		initAttr( "linkAttrs", new AttributeSet( new String[] { "editable", "font", "foreground", "hoverForeground", "cursor" }, new Object[] { false, defaultLinkFont, Color.blue, Color.red, defaultLinkCursor } ) );
+		initAttr( "linkAttrs", new AttributeValues( new String[] { "editable", "font", "foreground", "hoverForeground", "cursor" }, new Object[] { false, defaultLinkFont, Color.blue, Color.red, defaultLinkCursor } ) );
 		
 		initAttr( "buttonBorderThickness", 1.0 );
 		initAttr( "buttonMargin", 3.0 );
@@ -58,7 +58,7 @@ public class ControlsStyleSheet extends StyleSheet
 		initAttr( "buttonBackgPaint", new Color( 0.85f, 0.85f, 0.85f ) );
 		initAttr( "buttonBackgHighlightPaint", new Color( 0.925f, 0.925f, 0.925f ) );
 		
-		initAttr( "textEntryTextAttrs", new AttributeSet() );
+		initAttr( "textEntryTextAttrs", new AttributeValues() );
 		initAttr( "textEntryBorderThickness", 3.0 );
 		initAttr( "textEntryMargin", 3.0 );
 		initAttr( "textEntryRounding", 10.0 );
@@ -80,7 +80,7 @@ public class ControlsStyleSheet extends StyleSheet
 	}
 	
 	
-	public ControlsStyleSheet withLinkAttrs(AttributeSet attrs)
+	public ControlsStyleSheet withLinkAttrs(AttributeValues attrs)
 	{
 		return (ControlsStyleSheet)withAttr( "linkAttrs", attrs );
 	}
@@ -122,7 +122,7 @@ public class ControlsStyleSheet extends StyleSheet
 	}
 	
 	
-	public ControlsStyleSheet withTextEntryTextAttrs(AttributeSet attrs)
+	public ControlsStyleSheet withTextEntryTextAttrs(AttributeValues attrs)
 	{
 		return (ControlsStyleSheet)withAttr( "textEntryTextAttrs", attrs );
 	}
@@ -163,7 +163,7 @@ public class ControlsStyleSheet extends StyleSheet
 		if ( linkStyleSheet == null )
 		{
 			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
-			AttributeSet linkAttrs = getNonNull( "linkAttrs", AttributeSet.class, AttributeSet.identity );
+			AttributeValues linkAttrs = getNonNull( "linkAttrs", AttributeValues.class, AttributeValues.identity );
 			linkStyleSheet = (PrimitiveStyleSheet)primitive.withAttrSet( linkAttrs );
 		}
 		return linkStyleSheet;
@@ -249,7 +249,7 @@ public class ControlsStyleSheet extends StyleSheet
 		if ( textEntryStyleSheet == null )
 		{
 			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
-			AttributeSet textAttrs = getNonNull( "textEntryTextAttrs", AttributeSet.class, AttributeSet.identity );
+			AttributeValues textAttrs = getNonNull( "textEntryTextAttrs", AttributeValues.class, AttributeValues.identity );
 			textEntryStyleSheet = ((PrimitiveStyleSheet)primitive.withAttrSet( textAttrs )).withBorder( getTextEntryBorder() );
 		}
 		return textEntryStyleSheet;
