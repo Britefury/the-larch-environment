@@ -24,12 +24,12 @@ import BritefuryJ.DocView.DVNode;
 import BritefuryJ.GSym.IncrementalContext.GSymIncrementalNodeContext;
 import BritefuryJ.GSym.IncrementalContext.GSymIncrementalNodeFunction;
 
-public class GSymNodeViewContext extends GSymIncrementalNodeContext implements FragmentContext
+public class GSymFragmentViewContext extends GSymIncrementalNodeContext implements FragmentContext
 {
 	TextStyleParams viewError_textStyle = new TextStyleParams( null, null, null, false, new Font( "SansSerif", Font.BOLD, 12 ),  new Color( 0.8f, 0.0f, 0.0f ),  null,  null,  false );
 
 	
-	public GSymNodeViewContext(GSymViewContext viewContext, DVNode viewNode)
+	public GSymFragmentViewContext(GSymViewContext viewContext, DVNode viewNode)
 	{
 		super( viewContext, viewNode );
 		viewNode.setElementContext( this );
@@ -137,7 +137,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements F
 	
 	
 	
-	private GSymNodeViewContext getPreviousSiblingFromChildElement(GSymNodeViewContext parent, DPElement fromChild)
+	private GSymFragmentViewContext getPreviousSiblingFromChildElement(GSymFragmentViewContext parent, DPElement fromChild)
 	{
 		if ( fromChild == null )
 		{
@@ -153,7 +153,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements F
 		int index = children.indexOf( fromChild );
 		for (int i = index - 1; i >= 0; i--)
 		{
-			GSymNodeViewContext sibling = getLastChildFromParentElement( parent, children.get( i ) );
+			GSymFragmentViewContext sibling = getLastChildFromParentElement( parent, children.get( i ) );
 			if ( sibling != null )
 			{
 				return sibling;
@@ -163,12 +163,12 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements F
 		return getNextSiblingFromChildElement( parent, parentElement.getParent() );
 	}
 	
-	private GSymNodeViewContext getLastChildFromParentElement(GSymNodeViewContext parent, DPElement element)
+	private GSymFragmentViewContext getLastChildFromParentElement(GSymFragmentViewContext parent, DPElement element)
 	{
 		if ( element.getFragmentContext() != parent )
 		{
 			// We have recursed down the element tree far enough when we encounter an element with a different context
-			return (GSymNodeViewContext)element.getFragmentContext();
+			return (GSymFragmentViewContext)element.getFragmentContext();
 		}
 		else if ( element instanceof DPContainer )
 		{
@@ -176,7 +176,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements F
 			List<DPElement> children = branch.getChildren();
 			for (int i = children.size() - 1; i >= 0; i--)
 			{
-				GSymNodeViewContext sibling = getLastChildFromParentElement( parent, children.get( i ) );
+				GSymFragmentViewContext sibling = getLastChildFromParentElement( parent, children.get( i ) );
 				if ( sibling != null )
 				{
 					return sibling;
@@ -188,7 +188,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements F
 	
 
 	
-	private GSymNodeViewContext getNextSiblingFromChildElement(GSymNodeViewContext parent, DPElement fromChild)
+	private GSymFragmentViewContext getNextSiblingFromChildElement(GSymFragmentViewContext parent, DPElement fromChild)
 	{
 		if ( fromChild == null )
 		{
@@ -204,7 +204,7 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements F
 		int index = children.indexOf( fromChild );
 		for (int i = index + 1; i < children.size(); i++)
 		{
-			GSymNodeViewContext sibling = getFirstChildFromParentElement( parent, children.get( i ) );
+			GSymFragmentViewContext sibling = getFirstChildFromParentElement( parent, children.get( i ) );
 			if ( sibling != null )
 			{
 				return sibling;
@@ -214,19 +214,19 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements F
 		return getNextSiblingFromChildElement( parent, parentElement.getParent() );
 	}
 	
-	private GSymNodeViewContext getFirstChildFromParentElement(GSymNodeViewContext parent, DPElement element)
+	private GSymFragmentViewContext getFirstChildFromParentElement(GSymFragmentViewContext parent, DPElement element)
 	{
 		if ( element.getFragmentContext() != parent )
 		{
 			// We have recursed down the element tree far enough when we encounter an element with a different context
-			return (GSymNodeViewContext)element.getFragmentContext();
+			return (GSymFragmentViewContext)element.getFragmentContext();
 		}
 		else if ( element instanceof DPContainer )
 		{
 			DPContainer branch = (DPContainer)element;
 			for (DPElement child: branch.getChildren())
 			{
-				GSymNodeViewContext sibling = getFirstChildFromParentElement( parent, child );
+				GSymFragmentViewContext sibling = getFirstChildFromParentElement( parent, child );
 				if ( sibling != null )
 				{
 					return sibling;
@@ -238,24 +238,24 @@ public class GSymNodeViewContext extends GSymIncrementalNodeContext implements F
 	
 
 	
-	public GSymNodeViewContext getPrevSibling()
+	public GSymFragmentViewContext getPrevSibling()
 	{
-		return getPreviousSiblingFromChildElement( (GSymNodeViewContext)getParent(), getViewNodeElement() );
+		return getPreviousSiblingFromChildElement( (GSymFragmentViewContext)getParent(), getViewNodeElement() );
 	}
 	
-	public GSymNodeViewContext getNextSibling()
+	public GSymFragmentViewContext getNextSibling()
 	{
 		return getNextSiblingFromChildElement( this, getViewNodeElement() );
 	}
 	
 	
 	
-	public GSymNodeViewContext getFirstChild()
+	public GSymFragmentViewContext getFirstChild()
 	{
-		return getFirstChildFromParentElement( (GSymNodeViewContext)getParent(), getViewNodeElement() );
+		return getFirstChildFromParentElement( (GSymFragmentViewContext)getParent(), getViewNodeElement() );
 	}
 	
-	public GSymNodeViewContext getLastChild()
+	public GSymFragmentViewContext getLastChild()
 	{
 		return getNextSiblingFromChildElement( this, getViewNodeElement() );
 	}
