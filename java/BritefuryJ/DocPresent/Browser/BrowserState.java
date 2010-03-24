@@ -6,10 +6,27 @@
 //##************************
 package BritefuryJ.DocPresent.Browser;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPPresentationArea;
 
-public interface LocationResolver
+class BrowserState
 {
-	public DPElement resolveLocationAsElement(String location);
-	public Page resolveLocationAsPage(String location);
+	private String location;
+	private DPPresentationArea.ViewTransformation viewXform;
+	
+	
+	public BrowserState(String location)
+	{
+		this.location = location;
+		this.viewXform = new DPPresentationArea.ViewTransformation();
+	}
+	
+	public String getLocation()
+	{
+		return location;
+	}
+
+	public DPPresentationArea.ViewTransformation getViewTransformation()
+	{
+		return viewXform;
+	}
 }

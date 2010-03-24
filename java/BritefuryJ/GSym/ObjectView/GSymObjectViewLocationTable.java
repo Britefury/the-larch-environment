@@ -27,7 +27,7 @@ public class GSymObjectViewLocationTable
 		String location = objectToLocation.get( x );
 		if ( location == null )
 		{
-			location = "obj" + objectCount++;
+			location = "$object/" + x.getClass().getName() + objectCount++;
 			objectToLocation.put( x, location );
 		}
 		return location;

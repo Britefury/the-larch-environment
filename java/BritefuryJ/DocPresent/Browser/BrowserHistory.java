@@ -10,29 +10,29 @@ import java.util.Stack;
 
 class BrowserHistory
 {
-	private Stack<BrowserContext> past, future;
-	private BrowserContext currentContext;
+	private Stack<BrowserState> past, future;
+	private BrowserState currentState;
 	
 	
 	
 	public BrowserHistory(String location)
 	{
-		past = new Stack<BrowserContext>();
-		future = new Stack<BrowserContext>();
-		currentContext = new BrowserContext( location );
+		past = new Stack<BrowserState>();
+		future = new Stack<BrowserState>();
+		currentState = new BrowserState( location );
 	}
 	
 	
-	public BrowserContext getCurrentContext()
+	public BrowserState getCurrentState()
 	{
-		return currentContext;
+		return currentState;
 	}
 	
 	
 	public void visit(String location)
 	{
-		past.push( currentContext );
-		currentContext = new BrowserContext( location );
+		past.push( currentState );
+		currentState = new BrowserState( location );
 		future.clear();
 	}
 	
@@ -46,8 +46,8 @@ class BrowserHistory
 	{
 		if ( past.size() > 0 )
 		{
-			future.push( currentContext );
-			currentContext = past.pop();
+			future.push( currentState );
+			currentState = past.pop();
 		}
 	}
 
@@ -61,8 +61,8 @@ class BrowserHistory
 	{
 		if ( future.size() > 0 )
 		{
-			past.push( currentContext );
-			currentContext = future.pop();
+			past.push( currentState );
+			currentState = future.pop();
 		}
 	}
 	

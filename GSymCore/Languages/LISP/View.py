@@ -175,8 +175,8 @@ def viewLispNode(node, ctx, styleSheet, state):
 
 
 def viewLISPDocNodeAsElement(document, docNode, resolveContext, location, commandHistory, app):
-	viewContext = GSymViewContext( docNode, viewLispNode, defaultStyle, commandHistory )
-	return viewContext.getFrame()
+	viewContext = GSymViewContext( docNode, viewLispNode, defaultStyle, None, app.getBrowserContext(), commandHistory )
+	return viewContext.getRegion()
 
 
 

@@ -130,8 +130,8 @@ class ProjectView (GSymViewObjectNodeDispatch):
 	
 def viewProjectDocNodeAsElement(document, docRootNode, resolveContext, location, commandHistory, app):
 	viewFn = ProjectView( document, app, resolveContext, location )
-	viewContext = GSymViewContext( docRootNode, viewFn, ProjectEditorStyleSheet.instance, commandHistory )
-	return viewContext.getFrame()
+	viewContext = GSymViewContext( docRootNode, viewFn, ProjectEditorStyleSheet.instance, None, app.getBrowserContext(), commandHistory )
+	return viewContext.getRegion()
 
 
 
