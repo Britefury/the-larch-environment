@@ -9,7 +9,6 @@ package BritefuryJ.GSym.View;
 import org.python.core.Py;
 import org.python.core.PyObject;
 
-import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.IncrementalContext.GSymIncrementalNodeContext;
@@ -31,7 +30,7 @@ public class PyGSymViewFragmentFunction implements GSymViewFragmentFunction
 	}
 
 
-	public DPElement createViewFragment(DMNode x, GSymIncrementalNodeContext ctx, StyleSheet styleSheet, Object state)
+	public DPElement createViewFragment(Object x, GSymIncrementalNodeContext ctx, StyleSheet styleSheet, Object state)
 	{
 		return Py.tojava( callable.__call__( Py.java2py( x ), Py.java2py( ctx ), Py.java2py( styleSheet ), Py.java2py( state ) ), DPElement.class );
 	}

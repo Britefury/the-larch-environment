@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import BritefuryJ.DocModel.DMNode;
 
 public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTable
 {
@@ -33,7 +32,7 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 		
 		
 		
-		public IncrementalTreeNode takeUnusedNodeFor(DMNode node, IncrementalTreeNode.NodeResultFactory resultFactory)
+		public IncrementalTreeNode takeUnusedNodeFor(Object node, IncrementalTreeNode.NodeResultFactory resultFactory)
 		{
 			removeDeadEntries();
 			
@@ -170,7 +169,7 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 	
 	
 
-	public IncrementalTreeNode takeUnusedIncrementalNodeFor(DMNode docNode, IncrementalTreeNode.NodeResultFactory resultFactory)
+	public IncrementalTreeNode takeUnusedIncrementalNodeFor(Object docNode, IncrementalTreeNode.NodeResultFactory resultFactory)
 	{
 		Key key = new Key( docNode );
 		EntryForDocNode subTable = table.get( key );
@@ -185,7 +184,7 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 	}
 	
 	
-	public List<IncrementalTreeNode> get(DMNode docNode)
+	public List<IncrementalTreeNode> get(Object docNode)
 	{
 		Key key = new Key( docNode );
 		EntryForDocNode subTable = table.get( key );
@@ -199,7 +198,7 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 		}
 	}
 	
-	public void put(DMNode docNode, IncrementalTreeNode viewNode)
+	public void put(Object docNode, IncrementalTreeNode viewNode)
 	{
 		Key key = new Key( docNode );
 		EntryForDocNode subTable = table.get( key );
@@ -226,7 +225,7 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 	}
 	
 	
-	public boolean containsKey(DMNode docNode)
+	public boolean containsKey(Object docNode)
 	{
 		return getNumIncrementalNodesForDocNode( docNode ) > 0;
 	}
@@ -247,7 +246,7 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 		return table.size();
 	}
 	
-	public int getNumIncrementalNodesForDocNode(DMNode docNode)
+	public int getNumIncrementalNodesForDocNode(Object docNode)
 	{
 		Key key = new Key( docNode );
 		EntryForDocNode subTable = table.get( key );
@@ -261,7 +260,7 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 		}
 	}
 	
-	public int getNumUnrefedIncrementalNodesForDocNode(DMNode docNode)
+	public int getNumUnrefedIncrementalNodesForDocNode(Object docNode)
 	{
 		Key key = new Key( docNode );
 		EntryForDocNode subTable = table.get( key );

@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.DocView;
 
-import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocPresent.DPFragment;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.FragmentContext;
@@ -28,7 +27,7 @@ public class DVNode extends IncrementalTreeNode
 	
 	
 	
-	public DVNode(DocView view, DMNode docNode, NodeResultChangeListener resultChangeListener)
+	public DVNode(DocView view, Object docNode, NodeResultChangeListener resultChangeListener)
 	{
 		super( view, docNode, resultChangeListener );
 		

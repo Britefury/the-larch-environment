@@ -28,7 +28,7 @@ public abstract class GSymIncrementalTreeContext
 		}
 
 		
-		public abstract Object createNodeResult(IncrementalTreeNode incrementalNode, DMNode docNode);
+		public abstract Object createNodeResult(IncrementalTreeNode incrementalNode, Object docNode);
 	}
 	
 	
@@ -43,7 +43,7 @@ public abstract class GSymIncrementalTreeContext
 	
 	
 	
-	private DMNode docRootNode;
+	private Object docRootNode;
 	
 	private GSymIncrementalNodeFunction generalNodeFunction;
 	
@@ -52,7 +52,7 @@ public abstract class GSymIncrementalTreeContext
 	private HashMap<NodeContextAndResultFactoryKey, NodeContextAndResultFactory> nodeContextAndResultFactories;
 	
 	
-	public GSymIncrementalTreeContext(DMNode docRootNode, GSymIncrementalNodeFunction generalNodeFunction, GSymIncrementalNodeFunction rootNodeFunction, InheritedState rootInheritedState)
+	public GSymIncrementalTreeContext(Object docRootNode, GSymIncrementalNodeFunction generalNodeFunction, GSymIncrementalNodeFunction rootNodeFunction, InheritedState rootInheritedState)
 	{
 		this.docRootNode = docRootNode;
 		
@@ -71,7 +71,7 @@ public abstract class GSymIncrementalTreeContext
 
 	
 	
-	protected abstract IncrementalTree createIncrementalTree(DMNode docRootNode, IncrementalTreeNode.NodeResultFactory resultFactory);
+	protected abstract IncrementalTree createIncrementalTree(Object docRootNode, IncrementalTreeNode.NodeResultFactory resultFactory);
 	
 	protected abstract NodeContextAndResultFactory createContextAndResultFactory(GSymIncrementalTreeContext treeContext, GSymIncrementalNodeFunction nodeFunction, InheritedState inheritedState);
 	
@@ -109,7 +109,7 @@ public abstract class GSymIncrementalTreeContext
 	
 	
 	
-	public DMNode getDocRootNode()
+	public Object getDocRootNode()
 	{
 		return docRootNode;
 	}

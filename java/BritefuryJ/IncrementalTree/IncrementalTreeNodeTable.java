@@ -9,19 +9,17 @@ package BritefuryJ.IncrementalTree;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-import BritefuryJ.DocModel.DMNode;
-
 public abstract class IncrementalTreeNodeTable
 {
 	protected static class Key
 	{
-		private WeakReference<DMNode> node;
+		private WeakReference<Object> node;
 		private int hash;
 		
 		
-		public Key(DMNode node)
+		public Key(Object node)
 		{
-			this.node = new WeakReference<DMNode>( node );
+			this.node = new WeakReference<Object>( node );
 			hash = System.identityHashCode( node );
 		}
 		
@@ -51,15 +49,15 @@ public abstract class IncrementalTreeNodeTable
 	
 	
 
-	public abstract IncrementalTreeNode takeUnusedIncrementalNodeFor(DMNode docNode, IncrementalTreeNode.NodeResultFactory resultFactory);
-	public abstract List<IncrementalTreeNode> get(DMNode docNode);
-	public abstract void put(DMNode docNode, IncrementalTreeNode viewNode);
+	public abstract IncrementalTreeNode takeUnusedIncrementalNodeFor(Object docNode, IncrementalTreeNode.NodeResultFactory resultFactory);
+	public abstract List<IncrementalTreeNode> get(Object docNode);
+	public abstract void put(Object docNode, IncrementalTreeNode viewNode);
 	public abstract void remove(IncrementalTreeNode viewNode);
-	public abstract boolean containsKey(DMNode docNode);
+	public abstract boolean containsKey(Object docNode);
 	public abstract int size();
 	public abstract int getNumDocNodes();
-	public abstract int getNumIncrementalNodesForDocNode(DMNode docNode);
-	public abstract int getNumUnrefedIncrementalNodesForDocNode(DMNode docNode);
+	public abstract int getNumIncrementalNodesForDocNode(Object docNode);
+	public abstract int getNumUnrefedIncrementalNodesForDocNode(Object docNode);
 
 	public abstract void clean();
 	protected abstract void refIncrementalNode(IncrementalTreeNode node);
