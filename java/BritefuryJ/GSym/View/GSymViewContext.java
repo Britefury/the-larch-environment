@@ -41,9 +41,9 @@ public class GSymViewContext extends GSymIncrementalTreeContext implements DocVi
 		}
 
 
-		protected GSymNodeViewContext createContext(GSymIncrementalTreeContext treeContext, IncrementalTreeNode incrementalNode) 
+		protected GSymFragmentViewContext createContext(GSymIncrementalTreeContext treeContext, IncrementalTreeNode incrementalNode) 
 		{
-			return new GSymNodeViewContext( (GSymViewContext)treeContext, (DVNode)incrementalNode );
+			return new GSymFragmentViewContext( (GSymViewContext)treeContext, (DVNode)incrementalNode );
 		}
 
 		public Object createNodeResult(IncrementalTreeNode incrementalNode, DMNode docNode)
@@ -53,7 +53,7 @@ public class GSymViewContext extends GSymIncrementalTreeContext implements DocVi
 			docView.profile_startPython();
 
 			// Create the node context
-			GSymNodeViewContext nodeContext = createContext( treeContext, incrementalNode );
+			GSymFragmentViewContext nodeContext = createContext( treeContext, incrementalNode );
 			
 			// Create the view fragment
 			DPElement fragment = viewFragmentFunction.createViewFragment( docNode, nodeContext, styleSheet, state );
