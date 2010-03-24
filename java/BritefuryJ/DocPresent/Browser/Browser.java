@@ -9,11 +9,9 @@ package BritefuryJ.DocPresent.Browser;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.MediaTracker;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
 
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -30,13 +28,8 @@ import javax.swing.TransferHandler;
 
 import BritefuryJ.CommandHistory.CommandHistoryController;
 import BritefuryJ.CommandHistory.CommandHistoryListener;
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPPresentationArea;
-import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.PageController;
-import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class Browser
 {
@@ -63,8 +56,6 @@ public class Browser
 	private Page page;
 	private BrowserListener listener;
 	private CommandHistoryListener commandHistoryListener;
-	
-	private static DefaultRootPage defaultRootPage = new DefaultRootPage();
 	
 	
 	
@@ -248,21 +239,6 @@ public class Browser
 		
 		Page p = context.resolveLocationAsPage( location );
 		
-		// Resolve error:
-		if ( p == null )
-		{
-			if ( location.equals( "" ) )
-			{
-				// Empty location - use default root page
-				p = defaultRootPage;
-			}
-			else
-			{
-				// Resolve error
-				p = new ResolveErrorPage( location );
-			}
-		}
-
 		// Add browser, and add component
 		area.setChild( p.getContentsElement().alignHExpand() );		
 		
@@ -374,65 +350,5 @@ public class Browser
 		}
 		
 		return button;
-	}
-	
-	
-	
-	
-	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-	
-	
-	
-	private static class DefaultRootPage extends Page
-	{
-		public String getTitle()
-		{
-			return "Default";
-		}
-
-		
-		public DPElement getContentsElement()
-		{
-			DPText title = styleSheet.withFont( new Font( "Serif", Font.BOLD, 32 ) ).withTextSmallCaps( true ).staticText( "Default Root Page" );
-			
-			DPText contents = styleSheet.withFont( new Font( "SansSerif", Font.PLAIN, 16 ) ).staticText( "Empty document" );
-			DPVBox contentBox = styleSheet.withVBoxSpacing( 40.0 ).vbox( Arrays.asList( new DPElement[] { title.alignHCentre(), contents.alignHExpand() } ) );
-
-			DPVBox pageBox = styleSheet.vbox( Arrays.asList( new DPElement[] { SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_SYSTEMPAGE ),  contentBox.alignHExpand() } ) );
-			
-			return pageBox.alignHExpand();
-		}
-	}
-	
-	
-	
-	private static class ResolveErrorPage extends Page
-	{
-		private String location;
-		
-		public ResolveErrorPage(String location)
-		{
-			this.location = location;
-		}
-		
-		
-		public String getTitle()
-		{
-			return "Error";
-		}
-
-		public DPElement getContentsElement()
-		{
-			DPText title = styleSheet.withFont( new Font( "Serif", Font.BOLD, 32 ) ).withTextSmallCaps( true ).staticText( "Could Not Resolve Location" );
-			
-			DPText loc = styleSheet.withFont( new Font( "SansSerif", Font.PLAIN, 16 ) ).staticText( location );
-			DPText error = styleSheet.withFont( new Font( "SansSerif", Font.PLAIN, 16 ) ).staticText( "could not be resolved" );
-			DPVBox errorBox = styleSheet.withVBoxSpacing( 10.0 ).vbox( Arrays.asList( new DPElement[] { loc.alignHCentre(), error.alignHCentre() } ) );
-			
-			DPVBox pageBox = styleSheet.withVBoxSpacing( 40.0 ).vbox( Arrays.asList( new DPElement[] { SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE ),
-					title.padY( 10.0 ).alignHCentre(), errorBox.padY( 10.0 ).alignHCentre() } ) );
-
-			return pageBox.alignHExpand();
-		}
 	}
 }
