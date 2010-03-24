@@ -15,10 +15,9 @@ import org.python.core.PyObject;
 
 import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocPresent.DPContainer;
-import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.FragmentContext;
-import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocView.DVNode;
 import BritefuryJ.GSym.IncrementalContext.GSymIncrementalNodeContext;
@@ -26,7 +25,7 @@ import BritefuryJ.GSym.IncrementalContext.GSymIncrementalNodeFunction;
 
 public class GSymFragmentViewContext extends GSymIncrementalNodeContext implements FragmentContext
 {
-	TextStyleParams viewError_textStyle = new TextStyleParams( null, null, null, false, new Font( "SansSerif", Font.BOLD, 12 ),  new Color( 0.8f, 0.0f, 0.0f ),  null,  null,  false );
+	private static final PrimitiveStyleSheet viewError_textStyle = PrimitiveStyleSheet.instance.withFont( new Font( "SansSerif", Font.BOLD, 12 ) ).withForeground( new Color( 0.8f, 0.0f, 0.0f ) );
 
 	
 	public GSymFragmentViewContext(GSymViewContext viewContext, DVNode viewNode)
@@ -47,7 +46,7 @@ public class GSymFragmentViewContext extends GSymIncrementalNodeContext implemen
 	
 	public DPElement errorElement(String errorText)
 	{
-		return new DPText( viewError_textStyle, errorText );
+		return viewError_textStyle.staticText( errorText );
 	}
 	
 	
@@ -119,6 +118,13 @@ public class GSymFragmentViewContext extends GSymIncrementalNodeContext implemen
 	public List<DPElement> mapViewEvalFn(List<DMNode> xs, StyleSheet styleSheet, PyObject nodeViewFunction, Object state)
 	{
 		return mapViewEvalFn( xs, styleSheet, new PyGSymViewFragmentFunction( nodeViewFunction ), state );
+	}
+	
+	
+	
+	public void queueRefresh()
+	{
+		treeNode.queueRefresh();
 	}
 	
 	
