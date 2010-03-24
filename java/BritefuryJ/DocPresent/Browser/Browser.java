@@ -13,9 +13,7 @@ import java.awt.Font;
 import java.awt.MediaTracker;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -32,12 +30,11 @@ import javax.swing.TransferHandler;
 
 import BritefuryJ.CommandHistory.CommandHistoryController;
 import BritefuryJ.CommandHistory.CommandHistoryListener;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.PageController;
-import BritefuryJ.DocPresent.Browser.SystemPages.SystemLocationResolver;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
@@ -62,7 +59,7 @@ public class Browser
 	private DPPresentationArea area;
 	private BrowserHistory history;
 	
-	private List<LocationResolver> resolvers = new ArrayList<LocationResolver>();
+	private BrowserContext context;
 	private Page page;
 	private BrowserListener listener;
 	private CommandHistoryListener commandHistoryListener;
@@ -72,13 +69,12 @@ public class Browser
 	
 	
 	
-	public Browser(List<LocationResolver> resolvers, String location, PageController pageController)
+	public Browser(BrowserContext context, String location, PageController pageController)
 	{
-		this.resolvers.add( SystemLocationResolver.getSystemResolver() );
-		this.resolvers.addAll( resolvers );
+		this.context = context;
 		history = new BrowserHistory( location );
 		
-		area = new DPPresentationArea( history.getCurrentContext().getViewTransformation() );
+		area = new DPPresentationArea( history.getCurrentState().getViewTransformation() );
 		area.setPageController( pageController );
 		
 		ActionMap actionMap = area.getPresentationComponent().getActionMap();
@@ -147,7 +143,7 @@ public class Browser
 	
 	public String getLocation()
 	{
-		return history.getCurrentContext().getLocation();
+		return history.getCurrentState().getLocation();
 	}
 	
 	public void goToLocation(String location)
@@ -225,7 +221,7 @@ public class Browser
 		if ( history.canGoBack() )
 		{
 			history.back();
-			String location = history.getCurrentContext().getLocation();
+			String location = history.getCurrentState().getLocation();
 			locationField.setText( location );
 			resolve();
 		}
@@ -236,7 +232,7 @@ public class Browser
 		if ( history.canGoForward() )
 		{
 			history.forward();
-			String location = history.getCurrentContext().getLocation();
+			String location = history.getCurrentState().getLocation();
 			locationField.setText( location );
 			resolve();
 		}
@@ -247,26 +243,10 @@ public class Browser
 	
 	private void resolve()
 	{
-		Page p = page;
-		
-		// Remove this browser from existing page
-		if ( p != null )
-		{
-			p.removeBrowser( this );
-			p = null;
-		}
-		
 		// Get the location to resolve
-		String location = history.getCurrentContext().getLocation();
+		String location = history.getCurrentState().getLocation();
 		
-		for (LocationResolver resolver: resolvers)
-		{
-			p = resolver.resolveLocation( location );
-			if ( p != null )
-			{
-				break;
-			}
-		}
+		Page p = context.resolveLocationAsPage( location );
 		
 		// Resolve error:
 		if ( p == null )
@@ -284,13 +264,12 @@ public class Browser
 		}
 
 		// Add browser, and add component
-		p.addBrowser( this );
 		area.setChild( p.getContentsElement().alignHExpand() );		
 		
 		// Set the page
 		setPage( p );
 
-		area.setViewTransformation( history.getCurrentContext().getViewTransformation() );
+		area.setViewTransformation( history.getCurrentState().getViewTransformation() );
 	}
 	
 	private void setPage(Page p)

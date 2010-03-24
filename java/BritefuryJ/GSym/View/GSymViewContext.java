@@ -9,16 +9,16 @@ package BritefuryJ.GSym.View;
 import org.python.core.PyObject;
 
 import BritefuryJ.CommandHistory.CommandHistory;
-import BritefuryJ.DocModel.DMNode;
-import BritefuryJ.DocPresent.DPRegion;
-import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPPresentationArea;
+import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocView.DVNode;
 import BritefuryJ.DocView.DocView;
+import BritefuryJ.GSym.GSymBrowserContext;
 import BritefuryJ.GSym.IncrementalContext.GSymIncrementalNodeFunction;
 import BritefuryJ.GSym.IncrementalContext.GSymIncrementalTreeContext;
 import BritefuryJ.IncrementalTree.IncrementalTree;
@@ -129,41 +129,47 @@ public class GSymViewContext extends GSymIncrementalTreeContext implements DocVi
 	
 	private DocView view;
 	
-	private DPRegion frame;
+	private DPRegion region;
+	
+	private GSymBrowserContext browserContext;
 	
 	private CommandHistory commandHistory;
 
 	
 	public GSymViewContext(Object docRootNode, GSymIncrementalNodeFunction generalNodeViewFunction, GSymIncrementalNodeFunction rootNodeViewFunction, StyleSheet rootStyleSheet,
-			CommandHistory commandHistory)
+			Object rootState, GSymBrowserContext browserContext, CommandHistory commandHistory)
 	{
-		super( docRootNode, generalNodeViewFunction, rootNodeViewFunction, new ViewInheritedState( rootStyleSheet, null ) );
+		super( docRootNode, generalNodeViewFunction, rootNodeViewFunction, new ViewInheritedState( rootStyleSheet, rootState ) );
+		this.browserContext = browserContext;
 		this.commandHistory = commandHistory;
 		
-		frame = new DPRegion( );
+		region = new DPRegion( );
 		
 		
 		view = (DocView)incrementalTree;
 		view.setElementChangeListener( new NodeElementChangeListenerDiff() );
 		view.setRefreshListener( this );
-		frame.setChild( view.getRootViewElement().alignHExpand() );
+		region.setChild( view.getRootViewElement().alignHExpand() );
 	}
 	
 	
-	public GSymViewContext(DMNode docRootNode, PyObject generalNodeViewFunction, PyObject rootNodeViewFunction, StyleSheet rootStyleSheet, CommandHistory commandHistory)
+	public GSymViewContext(Object docRootNode, PyObject generalNodeViewFunction, PyObject rootNodeViewFunction, StyleSheet rootStyleSheet, Object rootState,
+			GSymBrowserContext browserContext, CommandHistory commandHistory)
 	{
-		this( docRootNode, new PyGSymViewFragmentFunction( generalNodeViewFunction ), new PyGSymViewFragmentFunction( generalNodeViewFunction ), rootStyleSheet, commandHistory );
-	}
-
-	
-	public GSymViewContext(DMNode docRootNode, GSymIncrementalNodeFunction nodeViewFunction, StyleSheet rootStyleSheet, CommandHistory commandHistory)
-	{
-		this( docRootNode, nodeViewFunction, nodeViewFunction, rootStyleSheet, commandHistory );
+		this( docRootNode, new PyGSymViewFragmentFunction( generalNodeViewFunction ), new PyGSymViewFragmentFunction( generalNodeViewFunction ), rootStyleSheet, rootState,
+				browserContext, commandHistory );
 	}
 
-	public GSymViewContext(DMNode docRootNode, PyObject nodeViewFunction, StyleSheet rootStyleSheet, CommandHistory commandHistory)
+	
+	public GSymViewContext(Object docRootNode, GSymIncrementalNodeFunction nodeViewFunction, StyleSheet rootStyleSheet, Object rootState,
+			GSymBrowserContext browserContext, CommandHistory commandHistory)
 	{
-		this( docRootNode, new PyGSymViewFragmentFunction( nodeViewFunction ), rootStyleSheet, commandHistory );
+		this( docRootNode, nodeViewFunction, nodeViewFunction, rootStyleSheet, rootState, browserContext, commandHistory );
+	}
+
+	public GSymViewContext(Object docRootNode, PyObject nodeViewFunction, StyleSheet rootStyleSheet, Object rootState, GSymBrowserContext browserContext, CommandHistory commandHistory)
+	{
+		this( docRootNode, new PyGSymViewFragmentFunction( nodeViewFunction ), rootStyleSheet, rootState, browserContext, commandHistory );
 	}
 
 	
@@ -188,13 +194,13 @@ public class GSymViewContext extends GSymIncrementalTreeContext implements DocVi
 	
 	public Caret getCaret()
 	{
-		DPPresentationArea elementTree = frame.getPresentationArea();
+		DPPresentationArea elementTree = region.getPresentationArea();
 		return elementTree != null  ?  elementTree.getCaret()  :  null;
 	}
 	
 	public Selection getSelection()
 	{
-		DPPresentationArea elementTree = frame.getPresentationArea();
+		DPPresentationArea elementTree = region.getPresentationArea();
 		return elementTree != null  ?  elementTree.getSelection()  :  null;
 	}
 	
@@ -206,22 +212,27 @@ public class GSymViewContext extends GSymIncrementalTreeContext implements DocVi
 		return view;
 	}
 	
-	public DPRegion getFrame()
+	public DPRegion getRegion()
 	{
-		return frame;
+		return region;
 	}
 	
 	public EditHandler getEditHandler()
 	{
-		return frame.getEditHandler();
+		return region.getEditHandler();
 	}
 	
 	public DPPresentationArea getElementTree()
 	{
-		return frame.getPresentationArea();
+		return region.getPresentationArea();
 	}
 	
 	
+	
+	public GSymBrowserContext getBrowserContext()
+	{
+		return browserContext;
+	}
 	
 	public CommandHistory getCommandHistory()
 	{
@@ -239,7 +250,7 @@ public class GSymViewContext extends GSymIncrementalTreeContext implements DocVi
 				refreshView();
 			}
 		};
-		frame.queueImmediateEvent( r );
+		region.queueImmediateEvent( r );
 	}
 	
 	

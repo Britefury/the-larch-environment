@@ -32,6 +32,9 @@ from BritefuryJ.DocPresent.StyleParams import *
 
 from BritefuryJ.DocView import DocView
 
+from BritefuryJ.GSym import GSymBrowserContext
+
+
 
 from Britefury.Kernel.Abstract import abstractmethod
 
@@ -101,8 +104,19 @@ class _AppLocationResolver (LocationResolver):
 	def __init__(self, app):
 		self._app = app
 		
+	
+	def resolveLocationAsElement(self, location):
+		document = self._app._document
+		if document is not None:
+			if location.startswith( 'model:' ):
+				location = location[6:]
+				return document.viewDocLocationAsLispElement( GSymResolveContext( None, '' ), location, self._app )
+			else:
+				return document.viewDocLocationAsElement( GSymResolveContext( None, '' ), location, self._app )
+		else:
+			return None
 		
-	def resolveLocation(self, location):
+	def resolveLocationAsPage(self, location):
 		document = self._app._document
 		if document is not None:
 			if location.startswith( 'model:' ):
@@ -114,6 +128,8 @@ class _AppLocationResolver (LocationResolver):
 			return None
 				
 
+		
+
 class MainApp (AppControlInterface):
 	def __init__(self, world, document, location=''):
 		self._world = world
@@ -121,6 +137,7 @@ class MainApp (AppControlInterface):
 		self._document = document
 		
 		self._resolver = _AppLocationResolver( self )
+		self._browserContext = GSymBrowserContext( [ self._resolver ] )
 		
 		
 		class _BrowserListener (TabbedBrowser.TabbedBrowserListener):
@@ -128,7 +145,7 @@ class MainApp (AppControlInterface):
 				self._createNewWindow( location )
 				
 				
-		self._browser = TabbedBrowser( [ self._resolver ], _BrowserListener(), location )
+		self._browser = TabbedBrowser( self._browserContext, _BrowserListener(), location )
 		self._browser.getComponent().setPreferredSize( Dimension( 800, 600 ) )
 
 		
@@ -403,6 +420,10 @@ class MainApp (AppControlInterface):
 	
 	def getWorld(self):
 		return self._world
+
+	
+	def getBrowserContext(self):
+		return self._browserContext
 
 	
 	

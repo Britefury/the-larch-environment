@@ -6,27 +6,12 @@
 //##************************
 package BritefuryJ.DocPresent.Browser;
 
-import java.util.ArrayList;
-
 import BritefuryJ.CommandHistory.CommandHistoryController;
 import BritefuryJ.CommandHistory.CommandHistoryListener;
 import BritefuryJ.DocPresent.DPElement;
 
 public abstract class Page
 {
-	private ArrayList<Browser> browsers = new ArrayList<Browser>();
-	
-
-	
-	public void contentsModified()
-	{
-		for (Browser browser: browsers)
-		{
-			browser.onPageContentsModified( this );
-		}
-	}
-	
-	
 	public abstract String getTitle();
 	public abstract DPElement getContentsElement();
 	
@@ -37,16 +22,5 @@ public abstract class Page
 	
 	public void setCommandHistoryListener(CommandHistoryListener listener)
 	{
-	}
-
-
-	protected void addBrowser(Browser browser)
-	{
-		browsers.add( browser );
-	}
-
-	protected void removeBrowser(Browser browser)
-	{
-		browsers.remove( browser );
 	}
 }

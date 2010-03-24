@@ -122,6 +122,18 @@ public class GSymFragmentViewContext extends GSymIncrementalNodeContext implemen
 	
 	
 	
+	public DPElement viewLocationAsElement(String location)
+	{
+		return getViewContext().getBrowserContext().resolveLocationAsElement( location );
+	}
+	
+	public String getLocationForObject(Object x)
+	{
+		return getViewContext().getBrowserContext().getLocationForObject( x );
+	}
+	
+	
+	
 	public void queueRefresh()
 	{
 		treeNode.queueRefresh();

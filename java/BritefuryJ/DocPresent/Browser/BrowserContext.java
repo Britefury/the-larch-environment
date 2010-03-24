@@ -6,27 +6,61 @@
 //##************************
 package BritefuryJ.DocPresent.Browser;
 
-import BritefuryJ.DocPresent.DPPresentationArea;
+import java.util.ArrayList;
+import java.util.List;
 
-class BrowserContext
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Browser.SystemPages.SystemLocationResolver;
+
+public class BrowserContext
 {
-	private String location;
-	private DPPresentationArea.ViewTransformation viewXform;
+	private List<LocationResolver> resolvers = new ArrayList<LocationResolver>();
 	
 	
-	public BrowserContext(String location)
+	public BrowserContext()
 	{
-		this.location = location;
-		this.viewXform = new DPPresentationArea.ViewTransformation();
+		this.resolvers.add( SystemLocationResolver.getSystemResolver() );
 	}
 	
-	public String getLocation()
+	public BrowserContext(List<LocationResolver> resolvers)
 	{
-		return location;
+		this();
+		this.resolvers.addAll( resolvers );
 	}
-
-	public DPPresentationArea.ViewTransformation getViewTransformation()
+	
+	
+	protected void addResolvers(List<LocationResolver> resolvers)
 	{
-		return viewXform;
+		this.resolvers.addAll( resolvers );
+	}
+	
+	
+	public DPElement resolveLocationAsElement(String location)
+	{
+		for (LocationResolver resolver: resolvers)
+		{
+			DPElement e = resolver.resolveLocationAsElement( location );
+			if ( e != null )
+			{
+				return e;
+			}
+		}
+		
+		return null;
+	}
+	
+	
+	public Page resolveLocationAsPage(String location)
+	{
+		for (LocationResolver resolver: resolvers)
+		{
+			Page p = resolver.resolveLocationAsPage( location );
+			if ( p != null )
+			{
+				return p;
+			}
+		}
+		
+		return null;
 	}
 }
