@@ -46,7 +46,7 @@ public class GSymViewContext extends GSymIncrementalTreeContext implements DocVi
 			return new GSymFragmentViewContext( (GSymViewContext)treeContext, (DVNode)incrementalNode );
 		}
 
-		public Object createNodeResult(IncrementalTreeNode incrementalNode, DMNode docNode)
+		public Object createNodeResult(IncrementalTreeNode incrementalNode, Object docNode)
 		{
 			GSymViewContext viewContext = (GSymViewContext)treeContext;
 			DocView docView = viewContext.getView();
@@ -134,7 +134,7 @@ public class GSymViewContext extends GSymIncrementalTreeContext implements DocVi
 	private CommandHistory commandHistory;
 
 	
-	public GSymViewContext(DMNode docRootNode, GSymIncrementalNodeFunction generalNodeViewFunction, GSymIncrementalNodeFunction rootNodeViewFunction, StyleSheet rootStyleSheet,
+	public GSymViewContext(Object docRootNode, GSymIncrementalNodeFunction generalNodeViewFunction, GSymIncrementalNodeFunction rootNodeViewFunction, StyleSheet rootStyleSheet,
 			CommandHistory commandHistory)
 	{
 		super( docRootNode, generalNodeViewFunction, rootNodeViewFunction, new ViewInheritedState( rootStyleSheet, null ) );
@@ -168,7 +168,7 @@ public class GSymViewContext extends GSymIncrementalTreeContext implements DocVi
 
 	
 
-	protected IncrementalTree createIncrementalTree(DMNode docRootNode, IncrementalTreeNode.NodeResultFactory resultFactory)
+	protected IncrementalTree createIncrementalTree(Object docRootNode, IncrementalTreeNode.NodeResultFactory resultFactory)
 	{
 		return new DocView( docRootNode, resultFactory );
 	}

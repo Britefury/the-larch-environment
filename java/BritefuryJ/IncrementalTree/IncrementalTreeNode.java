@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.IncrementalTree;
 
-import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.Incremental.IncrementalFunction;
 import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.Incremental.IncrementalValue;
@@ -21,7 +20,7 @@ public class IncrementalTreeNode implements IncrementalValueListener, Incrementa
 
 	public static interface NodeResultFactory
 	{
-		public Object createNodeResult(IncrementalTreeNode viewNode, DMNode docNode);
+		public Object createNodeResult(IncrementalTreeNode viewNode, Object docNode);
 	}
 	
 	public static interface NodeResultChangeListener
@@ -40,7 +39,7 @@ public class IncrementalTreeNode implements IncrementalValueListener, Incrementa
 	
 	
 	private IncrementalTree incrementalTree;
-	private DMNode docNode;
+	private Object docNode;
 	
 	private IncrementalFunction incr;
 	private NodeResultFactory resultFactory;
@@ -58,7 +57,7 @@ public class IncrementalTreeNode implements IncrementalValueListener, Incrementa
 	
 	
 	
-	public IncrementalTreeNode(IncrementalTree incrementalTree, DMNode docNode, NodeResultChangeListener elementChangeListener)
+	public IncrementalTreeNode(IncrementalTree incrementalTree, Object docNode, NodeResultChangeListener elementChangeListener)
 	{
 		this.incrementalTree = incrementalTree;
 		this.docNode = docNode;
@@ -139,7 +138,7 @@ public class IncrementalTreeNode implements IncrementalValueListener, Incrementa
 	}
 	
 
-	public DMNode getDocNode()
+	public Object getDocNode()
 	{
 		return docNode;
 	}

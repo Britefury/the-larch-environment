@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.IncrementalTree;
 
-import BritefuryJ.DocModel.DMNode;
 
 public class IncrementalTree
 {
@@ -24,7 +23,7 @@ public class IncrementalTree
 	}
 	
 	
-	private DMNode root;
+	private Object root;
 	private IncrementalTreeNode.NodeResultFactory rootElementFactory;
 	protected IncrementalTreeNodeTable nodeTable;
 	private IncrementalTreeNode rootIncrementalTreeNode;
@@ -40,7 +39,7 @@ public class IncrementalTree
 	
 	
 	
-	public IncrementalTree(DMNode root, IncrementalTreeNode.NodeResultFactory rootElementFactory, DuplicatePolicy duplicatePolicy)
+	public IncrementalTree(Object root, IncrementalTreeNode.NodeResultFactory rootElementFactory, DuplicatePolicy duplicatePolicy)
 	{
 		this.root = root;
 		this.rootElementFactory = rootElementFactory;
@@ -85,7 +84,7 @@ public class IncrementalTree
 	}
 	
 	
-	public IncrementalTreeNode buildIncrementalTreeNodeResult(DMNode node, IncrementalTreeNode.NodeResultFactory elementFactory)
+	public IncrementalTreeNode buildIncrementalTreeNodeResult(Object node, IncrementalTreeNode.NodeResultFactory elementFactory)
 	{
 		if ( node == null )
 		{
@@ -152,7 +151,7 @@ public class IncrementalTree
 	
 	
 	
-	protected IncrementalTreeNode createIncrementalTreeNode(DMNode node, IncrementalTreeNode.NodeResultChangeListener changeListener)
+	protected IncrementalTreeNode createIncrementalTreeNode(Object node, IncrementalTreeNode.NodeResultChangeListener changeListener)
 	{
 		return new IncrementalTreeNode( this, node, resultChangeListener );
 	}

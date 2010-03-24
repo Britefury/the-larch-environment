@@ -8,7 +8,6 @@ package BritefuryJ.DocView;
 
 import java.util.Arrays;
 
-import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
@@ -52,7 +51,7 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 	
 	
 	
-	public DocView(DMNode root, DVNode.NodeResultFactory rootElementFactory)
+	public DocView(Object root, DVNode.NodeResultFactory rootElementFactory)
 	{
 		super( root, rootElementFactory, DuplicatePolicy.ALLOW_DUPLICATES );
 		elementChangeListener = null;
@@ -144,7 +143,7 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 	
 	
 	
-	protected IncrementalTreeNode createIncrementalTreeNode(DMNode node, IncrementalTreeNode.NodeResultChangeListener changeListener)
+	protected IncrementalTreeNode createIncrementalTreeNode(Object node, IncrementalTreeNode.NodeResultChangeListener changeListener)
 	{
 		return new DVNode( this, node, changeListener );
 	}
