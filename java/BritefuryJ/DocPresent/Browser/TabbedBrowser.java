@@ -19,6 +19,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
@@ -201,7 +202,7 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	
 	private JTabbedPane tabs;
 	
-	private LocationResolver resolver;
+	private List<LocationResolver> resolvers = new ArrayList<LocationResolver>();;
 	
 	TabbedBrowserListener listener;
 	
@@ -211,9 +212,9 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	
 	
 	
-	public TabbedBrowser(LocationResolver resolver, TabbedBrowserListener listener, String location)
+	public TabbedBrowser(List<LocationResolver> resolvers, TabbedBrowserListener listener, String location)
 	{
-		this.resolver = resolver;
+		this.resolvers.addAll( resolvers );
 		this.listener = listener;
 		
 		browsers = new ArrayList<Browser>();
@@ -305,7 +306,7 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	
 	private Browser createBrowser(String location)
 	{
-		Browser browser = new Browser( resolver, location, this );
+		Browser browser = new Browser( resolvers, location, this );
 		browser.setListener( this );
 		return browser;
 	}

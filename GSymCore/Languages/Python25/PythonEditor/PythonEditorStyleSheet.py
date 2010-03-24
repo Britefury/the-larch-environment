@@ -183,67 +183,67 @@ class PythonEditorStyleSheet (StyleSheet):
 	
 	@StyleSheetDerivedPyAttrFn
 	def _keywordStyle(self):
-		return self['primitiveStyle'].withAttrSet( self['keywordAttrs'] )
+		return self['primitiveStyle'].withAttrValues( self['keywordAttrs'] )
 	
 	@StyleSheetDerivedPyAttrFn
 	def _literalFormatStyle(self):
-		return self['primitiveStyle'].withAttrSet( self['literalFormatAttrs'] )
+		return self['primitiveStyle'].withAttrValues( self['literalFormatAttrs'] )
 	
 	@StyleSheetDerivedPyAttrFn
 	def _quotationStyle(self):
-		return self['primitiveStyle'].withAttrSet( self['quotationAttrs'] )
+		return self['primitiveStyle'].withAttrValues( self['quotationAttrs'] )
 	
 	@StyleSheetDerivedPyAttrFn
 	def _stringLiteralStyle(self):
-		return self['primitiveStyle'].withAttrSet( self['stringLiteralAttrs'] )
+		return self['primitiveStyle'].withAttrValues( self['stringLiteralAttrs'] )
 	
 	@StyleSheetDerivedPyAttrFn
 	def _numLiteralStyle(self):
-		return self['primitiveStyle'].withAttrSet( self['numLiteralAttrs'] )
+		return self['primitiveStyle'].withAttrValues( self['numLiteralAttrs'] )
 	
 	@StyleSheetDerivedPyAttrFn
 	def _punctuationStyle(self):
-		return self['primitiveStyle'].withAttrSet( self['punctuationAttrs'] )
+		return self['primitiveStyle'].withAttrValues( self['punctuationAttrs'] )
 	
 	@StyleSheetDerivedPyAttrFn
 	def _delimStyle(self):
-		return self['primitiveStyle'].withAttrSet( self['delimAttrs'] )
+		return self['primitiveStyle'].withAttrValues( self['delimAttrs'] )
 	
 	@StyleSheetDerivedPyAttrFn
 	def _targetStyle(self):
-		return self['primitiveStyle'].withAttrSet( self['targetAttrs'] )
+		return self['primitiveStyle'].withAttrValues( self['targetAttrs'] )
 	
 	@StyleSheetDerivedPyAttrFn
 	def _varStyle(self):
-		return self['primitiveStyle'].withAttrSet( self['varAttrs'] )
+		return self['primitiveStyle'].withAttrValues( self['varAttrs'] )
 
 	@StyleSheetDerivedPyAttrFn
 	def _attributeStyle(self):
-		return self['primitiveStyle'].withAttrSet( self['attributeAttrs'] )
+		return self['primitiveStyle'].withAttrValues( self['attributeAttrs'] )
 
 	@StyleSheetDerivedPyAttrFn
 	def _kwNameStyle(self):
-		return self['primitiveStyle'].withAttrSet( self['kwNameAttrs'] )
+		return self['primitiveStyle'].withAttrValues( self['kwNameAttrs'] )
 
 	@StyleSheetDerivedPyAttrFn
 	def _operatorStyle(self):
-		return self['primitiveStyle'].withAttrSet( self['operatorAttrs'] )
+		return self['primitiveStyle'].withAttrValues( self['operatorAttrs'] )
 
 	@StyleSheetDerivedPyAttrFn
 	def _paramStyle(self):
-		return self['primitiveStyle'].withAttrSet( self['paramAttrs'] )
+		return self['primitiveStyle'].withAttrValues( self['paramAttrs'] )
 
 	@StyleSheetDerivedPyAttrFn
 	def _importStyle(self):
-		return self['primitiveStyle'].withAttrSet( self['importAttrs'] )
+		return self['primitiveStyle'].withAttrValues( self['importAttrs'] )
 
 	@StyleSheetDerivedPyAttrFn
 	def _commentStyle(self):
-		return self['primitiveStyle'].withAttrSet( self['commentAttrs'] )
+		return self['primitiveStyle'].withAttrValues( self['commentAttrs'] )
 	
 	@StyleSheetDerivedPyAttrFn
 	def _unparseableStyle(self):
-		return self['primitiveStyle'].withAttrSet( self['unparseableAttrs'] )
+		return self['primitiveStyle'].withAttrValues( self['unparseableAttrs'] )
 
 	
 	

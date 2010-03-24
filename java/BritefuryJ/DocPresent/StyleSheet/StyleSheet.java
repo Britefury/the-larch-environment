@@ -268,7 +268,7 @@ public class StyleSheet
 		}
 	}
 	
-	public StyleSheet withAttrSet(AttributeValues attribs)
+	public StyleSheet withAttrValues(AttributeValues attribs)
 	{
 		StyleSheet derived = attribSetDerivedStyleSheets.get( attribs );
 		if ( derived == null )

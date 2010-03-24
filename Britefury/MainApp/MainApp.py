@@ -128,7 +128,7 @@ class MainApp (AppControlInterface):
 				self._createNewWindow( location )
 				
 				
-		self._browser = TabbedBrowser( self._resolver, _BrowserListener(), location )
+		self._browser = TabbedBrowser( [ self._resolver ], _BrowserListener(), location )
 		self._browser.getComponent().setPreferredSize( Dimension( 800, 600 ) )
 
 		
