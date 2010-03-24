@@ -74,15 +74,15 @@ class ProjectEditorStyleSheet (StyleSheet):
 	
 	@StyleSheetDerivedPyAttrFn
 	def projectControlsStyle(self):
-		return self['primitiveStyle'].withAttrSet( self['projectControlsAttrs'] )
+		return self['primitiveStyle'].withAttrValues( self['projectControlsAttrs'] )
 	
 	@StyleSheetDerivedPyAttrFn
 	def packageNameStyle(self):
-		return self['primitiveStyle'].withAttrSet( self['packageNameAttrs'] )
+		return self['primitiveStyle'].withAttrValues( self['packageNameAttrs'] )
 	
 	@StyleSheetDerivedPyAttrFn
 	def itemHoverHighlightStyle(self):
-		return self['primitiveStyle'].withAttrSet( self['itemHoverHighlightAttrs'] )
+		return self['primitiveStyle'].withAttrValues( self['itemHoverHighlightAttrs'] )
 	
 	
 	

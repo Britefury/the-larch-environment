@@ -75,11 +75,11 @@ class GSymAppViewerStyleSheet (StyleSheet):
 	
 	@StyleSheetDerivedPyAttrFn
 	def appDocumentControlsStyle(self):
-		return self['primitiveStyle'].withAttrSet( self['appDocumentControlsAttrs'] )
+		return self['primitiveStyle'].withAttrValues( self['appDocumentControlsAttrs'] )
 	
 	@StyleSheetDerivedPyAttrFn
 	def documentListTableStyle(self):
-		return self['primitiveStyle'].withAttrSet( self['dcumentListTableAttrs'] )
+		return self['primitiveStyle'].withAttrValues( self['dcumentListTableAttrs'] )
 	
 	
 	

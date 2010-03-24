@@ -13,7 +13,9 @@ import java.awt.Font;
 import java.awt.MediaTracker;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -60,7 +62,7 @@ public class Browser
 	private DPPresentationArea area;
 	private BrowserHistory history;
 	
-	private LocationResolver resolver;
+	private List<LocationResolver> resolvers = new ArrayList<LocationResolver>();
 	private Page page;
 	private BrowserListener listener;
 	private CommandHistoryListener commandHistoryListener;
@@ -70,9 +72,10 @@ public class Browser
 	
 	
 	
-	public Browser(LocationResolver resolver, String location, PageController pageController)
+	public Browser(List<LocationResolver> resolvers, String location, PageController pageController)
 	{
-		this.resolver = resolver;
+		this.resolvers.add( SystemLocationResolver.getSystemResolver() );
+		this.resolvers.addAll( resolvers );
 		history = new BrowserHistory( location );
 		
 		area = new DPPresentationArea( history.getCurrentContext().getViewTransformation() );
@@ -256,15 +259,15 @@ public class Browser
 		// Get the location to resolve
 		String location = history.getCurrentContext().getLocation();
 		
-		// Look in the system pages first
-		p = SystemLocationResolver.getSystemResolver().resolveLocation( location );
-		
-		if ( p == null  &&  resolver != null )
+		for (LocationResolver resolver: resolvers)
 		{
-			// Could not find in system pages; try client supplied resolver
 			p = resolver.resolveLocation( location );
+			if ( p != null )
+			{
+				break;
+			}
 		}
-
+		
 		// Resolve error:
 		if ( p == null )
 		{

@@ -7,12 +7,14 @@
 package visualtests.DocPresent.Browser;
 
 import java.awt.Dimension;
+import java.util.Arrays;
 
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 
+import BritefuryJ.DocPresent.Browser.LocationResolver;
 import BritefuryJ.DocPresent.Browser.TabbedBrowser;
 
 public class BrowserTest implements TabbedBrowser.TabbedBrowserListener
@@ -31,7 +33,7 @@ public class BrowserTest implements TabbedBrowser.TabbedBrowserListener
 		JFrame frame = new JFrame( "Browser test" );
 		frame.setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
 		
-		TabbedBrowser browser = new TabbedBrowser( null, this, location );
+		TabbedBrowser browser = new TabbedBrowser( Arrays.asList( new LocationResolver[] {} ), this, location );
 		browser.getComponent().setPreferredSize( new Dimension( 800, 600 ) );
 		frame.add( browser.getComponent() );
 		frame.pack();

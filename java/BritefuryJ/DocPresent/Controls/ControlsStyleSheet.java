@@ -164,7 +164,7 @@ public class ControlsStyleSheet extends StyleSheet
 		{
 			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 			AttributeValues linkAttrs = getNonNull( "linkAttrs", AttributeValues.class, AttributeValues.identity );
-			linkStyleSheet = (PrimitiveStyleSheet)primitive.withAttrSet( linkAttrs );
+			linkStyleSheet = (PrimitiveStyleSheet)primitive.withAttrValues( linkAttrs );
 		}
 		return linkStyleSheet;
 	}
@@ -250,7 +250,7 @@ public class ControlsStyleSheet extends StyleSheet
 		{
 			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 			AttributeValues textAttrs = getNonNull( "textEntryTextAttrs", AttributeValues.class, AttributeValues.identity );
-			textEntryStyleSheet = ((PrimitiveStyleSheet)primitive.withAttrSet( textAttrs )).withBorder( getTextEntryBorder() );
+			textEntryStyleSheet = ((PrimitiveStyleSheet)primitive.withAttrValues( textAttrs )).withBorder( getTextEntryBorder() );
 		}
 		return textEntryStyleSheet;
 	}
