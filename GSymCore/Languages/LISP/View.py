@@ -174,14 +174,16 @@ def viewLispNode(node, ctx, styleSheet, state):
 	
 
 
-def viewLISPDocNodeAsElement(document, docNode, resolveContext, location, commandHistory, app):
-	viewContext = GSymViewContext( docNode, viewLispNode, defaultStyle, None, app.getBrowserContext(), commandHistory )
+def viewLISPDocNodeAsElement(document, docNode, resolveContext, page, location, commandHistory, app):
+	viewContext = GSymViewContext( docNode, viewLispNode, defaultStyle, None, app.getBrowserContext(), page, commandHistory )
 	return viewContext.getRegion()
 
 
 
 def viewLISPDocNodeAsPage(document, docNode, resolveContext, location, commandHistory, app):
-	return GSymViewPage( 'Model: ' + resolveContext.getTitle(), viewLISPDocNodeAsElement( document, docNode, resolveContext, location, commandHistory, app ), commandHistory )
+	page = GSymViewPage( 'Model: ' + resolveContext.getTitle(), commandHistory )
+	page.setContentsElement( viewLISPDocNodeAsElement( document, docNode, resolveContext, page, location, commandHistory, app ) )
+	return page
 
 
 def resolveLISPLocation(currentUnitClass, document, docRootNode, resolveContext, location, app):

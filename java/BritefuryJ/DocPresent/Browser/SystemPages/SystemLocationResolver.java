@@ -69,7 +69,7 @@ public class SystemLocationResolver implements LocationResolver
 		}
 	}
 	
-	public DPElement resolveLocationAsElement(String location)
+	public DPElement resolveLocationAsElement(Page page, String location)
 	{
 		Page p = resolveLocationAsPage( location );
 		return p.getContentsElement();

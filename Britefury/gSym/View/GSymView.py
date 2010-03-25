@@ -51,10 +51,13 @@ class GSymViewObjectNodeDispatch (object):
 
 	
 class GSymViewPage (Page):
-	def __init__(self, title, element, commandHistory):
+	def __init__(self, title, commandHistory):
 		self._title = title
-		self._element = element
 		self._commandHistory = commandHistory
+		
+		
+	def setContentsElement(self, element):
+		self._element = element
 		
 		
 	def getTitle(self):

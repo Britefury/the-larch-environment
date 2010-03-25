@@ -12,6 +12,7 @@ import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPRegion;
+import BritefuryJ.DocPresent.Browser.Page;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.Selection.Selection;
@@ -132,15 +133,17 @@ public class GSymViewContext extends GSymIncrementalTreeContext implements DocVi
 	private DPRegion region;
 	
 	private GSymBrowserContext browserContext;
+	private Page page;
 	
 	private CommandHistory commandHistory;
 
 	
 	public GSymViewContext(Object docRootNode, GSymIncrementalNodeFunction generalNodeViewFunction, GSymIncrementalNodeFunction rootNodeViewFunction, StyleSheet rootStyleSheet,
-			Object rootState, GSymBrowserContext browserContext, CommandHistory commandHistory)
+			Object rootState, GSymBrowserContext browserContext, Page page, CommandHistory commandHistory)
 	{
 		super( docRootNode, generalNodeViewFunction, rootNodeViewFunction, new ViewInheritedState( rootStyleSheet, rootState ) );
 		this.browserContext = browserContext;
+		this.page = page;
 		this.commandHistory = commandHistory;
 		
 		region = new DPRegion( );
@@ -154,22 +157,23 @@ public class GSymViewContext extends GSymIncrementalTreeContext implements DocVi
 	
 	
 	public GSymViewContext(Object docRootNode, PyObject generalNodeViewFunction, PyObject rootNodeViewFunction, StyleSheet rootStyleSheet, Object rootState,
-			GSymBrowserContext browserContext, CommandHistory commandHistory)
+			GSymBrowserContext browserContext, Page page, CommandHistory commandHistory)
 	{
 		this( docRootNode, new PyGSymViewFragmentFunction( generalNodeViewFunction ), new PyGSymViewFragmentFunction( generalNodeViewFunction ), rootStyleSheet, rootState,
-				browserContext, commandHistory );
+				browserContext, page, commandHistory );
 	}
 
 	
 	public GSymViewContext(Object docRootNode, GSymIncrementalNodeFunction nodeViewFunction, StyleSheet rootStyleSheet, Object rootState,
-			GSymBrowserContext browserContext, CommandHistory commandHistory)
+			GSymBrowserContext browserContext, Page page, CommandHistory commandHistory)
 	{
-		this( docRootNode, nodeViewFunction, nodeViewFunction, rootStyleSheet, rootState, browserContext, commandHistory );
+		this( docRootNode, nodeViewFunction, nodeViewFunction, rootStyleSheet, rootState, browserContext, page, commandHistory );
 	}
 
-	public GSymViewContext(Object docRootNode, PyObject nodeViewFunction, StyleSheet rootStyleSheet, Object rootState, GSymBrowserContext browserContext, CommandHistory commandHistory)
+	public GSymViewContext(Object docRootNode, PyObject nodeViewFunction, StyleSheet rootStyleSheet, Object rootState, GSymBrowserContext browserContext,
+			Page page, CommandHistory commandHistory)
 	{
-		this( docRootNode, new PyGSymViewFragmentFunction( nodeViewFunction ), rootStyleSheet, rootState, browserContext, commandHistory );
+		this( docRootNode, new PyGSymViewFragmentFunction( nodeViewFunction ), rootStyleSheet, rootState, browserContext, page, commandHistory );
 	}
 
 	
@@ -232,6 +236,11 @@ public class GSymViewContext extends GSymIncrementalTreeContext implements DocVi
 	public GSymBrowserContext getBrowserContext()
 	{
 		return browserContext;
+	}
+	
+	public Page getPage()
+	{
+		return page;
 	}
 	
 	public CommandHistory getCommandHistory()

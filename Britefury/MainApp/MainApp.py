@@ -105,14 +105,14 @@ class _AppLocationResolver (LocationResolver):
 		self._app = app
 		
 	
-	def resolveLocationAsElement(self, location):
+	def resolveLocationAsElement(self, page, location):
 		document = self._app._document
 		if document is not None:
 			if location.startswith( 'model:' ):
 				location = location[6:]
-				return document.viewDocLocationAsLispElement( GSymResolveContext( None, '' ), location, self._app )
+				return document.viewDocLocationAsLispElement( GSymResolveContext( None, '' ), page, location, self._app )
 			else:
-				return document.viewDocLocationAsElement( GSymResolveContext( None, '' ), location, self._app )
+				return document.viewDocLocationAsElement( GSymResolveContext( None, '' ), page, location, self._app )
 		else:
 			return None
 		

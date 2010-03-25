@@ -46,11 +46,11 @@ public class BrowserContext
 	}
 	
 	
-	public DPElement resolveLocationAsElement(String location)
+	public DPElement resolveLocationAsElement(Page page, String location)
 	{
 		for (LocationResolver resolver: resolvers)
 		{
-			DPElement e = resolver.resolveLocationAsElement( location );
+			DPElement e = resolver.resolveLocationAsElement( page, location );
 			if ( e != null )
 			{
 				return e;

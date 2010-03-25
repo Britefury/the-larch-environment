@@ -45,15 +45,17 @@ public class GSymObjectView
 	private class GSymObjectViewPage extends Page
 	{
 		private Object x;
+		private DPElement element;
 		
 		public GSymObjectViewPage(Object x)
 		{
 			this.x = x;
+			element = createObjectView( this, x );
 		}
 		
 		public DPElement getContentsElement()
 		{
-			return createObjectView( x );
+			return element;
 		}
 
 		public String getTitle()
@@ -72,12 +74,12 @@ public class GSymObjectView
 	
 	private class GSymObjectViewLocationResolver implements LocationResolver
 	{
-		public DPElement resolveLocationAsElement(String location)
+		public DPElement resolveLocationAsElement(Page page, String location)
 		{
 			Object x = locationTable.getObjectAtLocation( location );
 			if ( x != null )
 			{
-				return createObjectView( x );
+				return createObjectView( page, x );
 			}
 			else
 			{
@@ -128,9 +130,9 @@ public class GSymObjectView
 		return locationTable.getObjectAtLocation( location );
 	}
 	
-	private DPElement createObjectView(Object x)
+	private DPElement createObjectView(Page page, Object x)
 	{
-		GSymViewContext viewContext = new GSymViewContext( x, viewFragFn, PrimitiveStyleSheet.instance, null, browserContext, null );
+		GSymViewContext viewContext = new GSymViewContext( x, viewFragFn, PrimitiveStyleSheet.instance, null, browserContext, page, null );
 		return viewContext.getRegion();
 	}
 }

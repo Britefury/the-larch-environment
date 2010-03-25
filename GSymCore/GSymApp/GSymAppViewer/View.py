@@ -183,14 +183,16 @@ class AppView (GSymViewObjectNodeDispatch):
 	
 
 
-def viewGSymAppDocNodeAsElement(document, docRootNode, resolveContext, location, commandHistory, app):
-	viewContext = GSymViewContext( docRootNode, AppView( document, app ), GSymAppViewerStyleSheet.instance, None, app.getBrowserContext(), commandHistory )
+def viewGSymAppDocNodeAsElement(document, docRootNode, resolveContext, page, location, commandHistory, app):
+	viewContext = GSymViewContext( docRootNode, AppView( document, app ), GSymAppViewerStyleSheet.instance, None, app.getBrowserContext(), page, commandHistory )
 	return viewContext.getRegion()
 
 
 
 def viewGSymAppDocNodeAsPage(document, docRootNode, resolveContext, location, commandHistory, app):
-	return GSymViewPage( 'gSym', viewGSymAppDocNodeAsElement( document, docRootNode, resolveContext, location, commandHistory, app ), commandHistory )
+	page = GSymViewPage( 'gSym', commandHistory )
+	page.setContentsElement( viewGSymAppDocNodeAsElement( document, docRootNode, resolveContext, page, location, commandHistory, app ) )
+	return page
 
 
 
