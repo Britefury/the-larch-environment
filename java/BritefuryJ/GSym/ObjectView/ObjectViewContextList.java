@@ -12,11 +12,23 @@ import BritefuryJ.GSym.View.GSymFragmentViewContext;
 
 public class ObjectViewContextList
 {
+	public interface ContextListListener
+	{
+		void onObjectViewContextListEmpty();
+	}
+	
 	private WeakHashMap<GSymFragmentViewContext, Object> contexts = new WeakHashMap<GSymFragmentViewContext, Object>();
+	private ContextListListener listener;
 	
 	
 	public ObjectViewContextList()
 	{
+		this( null );
+	}
+	
+	public ObjectViewContextList(ContextListListener listener)
+	{
+		this.listener = listener;
 	}
 	
 	
@@ -30,6 +42,14 @@ public class ObjectViewContextList
 		for (GSymFragmentViewContext ctx: contexts.keySet())
 		{
 			ctx.queueRefresh();
+		}
+		
+		if ( contexts.isEmpty() )
+		{
+			if ( listener != null )
+			{
+				listener.onObjectViewContextListEmpty();
+			}
 		}
 	}
 }

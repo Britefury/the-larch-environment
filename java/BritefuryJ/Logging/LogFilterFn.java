@@ -4,12 +4,9 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.Browser;
+package BritefuryJ.Logging;
 
-import BritefuryJ.DocPresent.DPElement;
-
-public interface LocationResolver
+public interface LogFilterFn
 {
-	public DPElement resolveLocationAsElement(Page page, String location);
-	public Page resolveLocationAsPage(String location);
+	boolean test(LogEntry entry);
 }

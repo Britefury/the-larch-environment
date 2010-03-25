@@ -9,7 +9,6 @@ package BritefuryJ.GSym.IncrementalContext;
 import java.util.ArrayList;
 import java.util.List;
 
-import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.Incremental.IncrementalFunction;
 import BritefuryJ.Incremental.IncrementalValue;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
@@ -39,12 +38,12 @@ public class GSymIncrementalNodeContext implements IncrementalTreeNode.NodeConte
 
 
 
-	public Object eval(DMNode x, GSymIncrementalTreeContext.InheritedState state)
+	public Object eval(Object x, GSymIncrementalTreeContext.InheritedState state)
 	{
 		return evalFn( x, (GSymIncrementalNodeFunction)null, state );
 	}
 
-	public Object evalFn(DMNode x, GSymIncrementalNodeFunction nodeViewFunction, GSymIncrementalTreeContext.InheritedState state)
+	public Object evalFn(Object x, GSymIncrementalNodeFunction nodeViewFunction, GSymIncrementalTreeContext.InheritedState state)
 	{
 		if ( x == null )
 		{
@@ -73,16 +72,16 @@ public class GSymIncrementalNodeContext implements IncrementalTreeNode.NodeConte
 	
 	
 	
-	public List<Object> mapEval(List<DMNode> xs, GSymIncrementalTreeContext.InheritedState state)
+	public List<Object> mapEval(List<Object> xs, GSymIncrementalTreeContext.InheritedState state)
 	{
 		return mapEvalFn( xs, (GSymIncrementalNodeFunction)null, state );
 	}
 
-	public List<Object> mapEvalFn(List<DMNode> xs, GSymIncrementalNodeFunction nodeViewFunction, GSymIncrementalTreeContext.InheritedState state)
+	public List<Object> mapEvalFn(List<Object> xs, GSymIncrementalNodeFunction nodeViewFunction, GSymIncrementalTreeContext.InheritedState state)
 	{
 		ArrayList<Object> children = new ArrayList<Object>();
 		children.ensureCapacity( xs.size() );
-		for (DMNode x: xs)
+		for (Object x: xs)
 		{
 			children.add( evalFn( x, nodeViewFunction, state ) );
 		}

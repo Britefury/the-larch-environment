@@ -13,7 +13,6 @@ import java.util.List;
 
 import org.python.core.PyObject;
 
-import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.FragmentContext;
@@ -51,32 +50,32 @@ public class GSymFragmentViewContext extends GSymIncrementalNodeContext implemen
 	
 	
 	
-	public DPElement viewEval(DMNode x, StyleSheet styleSheet)
+	public DPElement viewEval(Object x, StyleSheet styleSheet)
 	{
 		return viewEvalFn( x, styleSheet, (GSymIncrementalNodeFunction)null, null );
 	}
 
-	public DPElement viewEval(DMNode x, StyleSheet styleSheet, Object state)
+	public DPElement viewEval(Object x, StyleSheet styleSheet, Object state)
 	{
 		return viewEvalFn( x, styleSheet, (GSymIncrementalNodeFunction)null, state );
 	}
 
-	public DPElement viewEvalFn(DMNode x, StyleSheet styleSheet, GSymIncrementalNodeFunction nodeViewFunction)
+	public DPElement viewEvalFn(Object x, StyleSheet styleSheet, GSymIncrementalNodeFunction nodeViewFunction)
 	{
 		return viewEvalFn( x, styleSheet, nodeViewFunction, null );
 	}
 
-	public DPElement viewEvalFn(DMNode x, StyleSheet styleSheet, GSymIncrementalNodeFunction nodeViewFunction, Object state)
+	public DPElement viewEvalFn(Object x, StyleSheet styleSheet, GSymIncrementalNodeFunction nodeViewFunction, Object state)
 	{
 		return (DPElement)evalFn( x, nodeViewFunction, new GSymViewContext.ViewInheritedState( styleSheet, state ) );
 	}
 	
-	public DPElement viewEvalFn(DMNode x, StyleSheet styleSheet, PyObject nodeViewFunction)
+	public DPElement viewEvalFn(Object x, StyleSheet styleSheet, PyObject nodeViewFunction)
 	{
 		return viewEvalFn( x, styleSheet, new PyGSymViewFragmentFunction( nodeViewFunction ), null );
 	}
 
-	public DPElement viewEvalFn(DMNode x, StyleSheet styleSheet, PyObject nodeViewFunction, Object state)
+	public DPElement viewEvalFn(Object x, StyleSheet styleSheet, PyObject nodeViewFunction, Object state)
 	{
 		return viewEvalFn( x, styleSheet, new PyGSymViewFragmentFunction( nodeViewFunction ), state );
 	}
@@ -84,38 +83,38 @@ public class GSymFragmentViewContext extends GSymIncrementalNodeContext implemen
 	
 	
 	
-	public List<DPElement> mapViewEval(List<DMNode> xs, StyleSheet styleSheet)
+	public List<DPElement> mapViewEval(List<Object> xs, StyleSheet styleSheet)
 	{
 		return mapViewEvalFn( xs, styleSheet, (GSymIncrementalNodeFunction)null, null );
 	}
 
-	public List<DPElement> mapViewEval(List<DMNode> xs, StyleSheet styleSheet, Object state)
+	public List<DPElement> mapViewEval(List<Object> xs, StyleSheet styleSheet, Object state)
 	{
 		return mapViewEvalFn( xs, styleSheet, (GSymIncrementalNodeFunction)null, state );
 	}
 
-	public List<DPElement> mapViewEvalFn(List<DMNode> xs, StyleSheet styleSheet, GSymIncrementalNodeFunction nodeViewFunction)
+	public List<DPElement> mapViewEvalFn(List<Object> xs, StyleSheet styleSheet, GSymIncrementalNodeFunction nodeViewFunction)
 	{
 		return mapViewEvalFn( xs, styleSheet, nodeViewFunction, null );
 	}
 
-	public List<DPElement> mapViewEvalFn(List<DMNode> xs, StyleSheet styleSheet, GSymIncrementalNodeFunction nodeViewFunction, Object state)
+	public List<DPElement> mapViewEvalFn(List<Object> xs, StyleSheet styleSheet, GSymIncrementalNodeFunction nodeViewFunction, Object state)
 	{
 		ArrayList<DPElement> children = new ArrayList<DPElement>();
 		children.ensureCapacity( xs.size() );
-		for (DMNode x: xs)
+		for (Object x: xs)
 		{
 			children.add( viewEvalFn( x, styleSheet, nodeViewFunction, state ) );
 		}
 		return children;
 	}
 	
-	public List<DPElement> mapViewEvalFn(List<DMNode> xs, StyleSheet styleSheet, PyObject nodeViewFunction)
+	public List<DPElement> mapViewEvalFn(List<Object> xs, StyleSheet styleSheet, PyObject nodeViewFunction)
 	{
 		return mapViewEvalFn( xs, styleSheet, new PyGSymViewFragmentFunction( nodeViewFunction ), null );
 	}
 
-	public List<DPElement> mapViewEvalFn(List<DMNode> xs, StyleSheet styleSheet, PyObject nodeViewFunction, Object state)
+	public List<DPElement> mapViewEvalFn(List<Object> xs, StyleSheet styleSheet, PyObject nodeViewFunction, Object state)
 	{
 		return mapViewEvalFn( xs, styleSheet, new PyGSymViewFragmentFunction( nodeViewFunction ), state );
 	}
@@ -124,7 +123,7 @@ public class GSymFragmentViewContext extends GSymIncrementalNodeContext implemen
 	
 	public DPElement viewLocationAsElement(String location)
 	{
-		return getViewContext().getBrowserContext().resolveLocationAsElement( location );
+		return getViewContext().getBrowserContext().resolveLocationAsElement( getViewContext().getPage(), location );
 	}
 	
 	public String getLocationForObject(Object x)

@@ -33,6 +33,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.ImageObserver;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.WeakHashMap;
 
@@ -63,7 +64,11 @@ import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Selection.SelectionListener;
 import BritefuryJ.DocPresent.Selection.SelectionManager;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.TreeExplorer.ElementTreeExplorer;
+import BritefuryJ.GSym.View.GSymFragmentViewContext;
+import BritefuryJ.Logging.Log;
+import BritefuryJ.Logging.LogEntry;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -99,6 +104,30 @@ public class DPPresentationArea extends DPRegion implements CaretListener, Selec
 		{
 			windowTopLeftCornerInRootSpace = new Point2();
 			rootScaleInWindowSpace = 1.0;
+		}
+	}
+	
+	
+	
+	public static class TypesettingPerformanceLogEntry extends LogEntry
+	{
+		private static final List<String> tags = Arrays.asList( new String[] { "typeset_performance" } ); 
+		
+		private double typesetTime;
+
+		
+		private TypesettingPerformanceLogEntry(double typesetTime)
+		{
+			super( tags );
+			this.typesetTime = typesetTime;
+		}
+		
+		
+		public DPElement present(GSymFragmentViewContext ctx, Object state)
+		{
+			super.present( ctx, state );
+			
+			return PrimitiveStyleSheet.instance.staticText( "Typesetting time: " + typesetTime );
 		}
 	}
 	
@@ -649,6 +678,9 @@ public class DPPresentationArea extends DPRegion implements CaretListener, Selec
 	
 	
 	protected PageController pageController;
+	
+	
+	private Log log;
 
 	
 	
@@ -704,6 +736,13 @@ public class DPPresentationArea extends DPRegion implements CaretListener, Selec
 	public PageController getPageController()
 	{
 		return pageController;
+	}
+	
+	
+	
+	public void setLog(Log log)
+	{
+		this.log = log;
 	}
 	
 	
@@ -1191,7 +1230,12 @@ public class DPPresentationArea extends DPRegion implements CaretListener, Selec
 			// Send motion events; pointer hasn't moved, but the elements have
 			inputTable.onRootElementReallocate();
 			long t2 = System.nanoTime();
-			System.out.println( "DPPresentationArea.performAllocation(): TYPESET TIME = " + (double)(t2-t1) * 1.0e-9  +  ", used memory = "  + ( Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() ) );
+			double typesetTime = (double)(t2-t1) * 1.0e-9;
+			System.out.println( "DPPresentationArea.performAllocation(): TYPESET TIME = " + typesetTime  +  ", used memory = "  + ( Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() ) );
+			if ( log != null )
+			{
+				log.log( new TypesettingPerformanceLogEntry( typesetTime ) );
+			}
 		}
 	}
 	

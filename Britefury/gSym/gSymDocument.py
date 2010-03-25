@@ -147,29 +147,29 @@ class GSymDocument (CommandHistoryListener):
 
 
 	
-	def viewDocLocationAsElement(self, resolveContext, location, app):
-		return self.viewUnitLocationAsElement( self._unit, resolveContext, location, app )
+	def viewDocLocationAsElement(self, resolveContext, page, location, app):
+		return self.viewUnitLocationAsElement( self._unit, resolveContext, page, location, app )
 	
 	
-	def viewDocLocationAsLispElement(self, resolveContext, location, app):
-		return self.viewUnitLocationAsLispElement( self._unit, resolveContext, location, app )
+	def viewDocLocationAsLispElement(self, resolveContext, page, location, app):
+		return self.viewUnitLocationAsLispElement( self._unit, resolveContext, page, location, app )
 
 
 	
-	def viewUnitLocationAsElement(self, unit, resolveContext, location, app):
+	def viewUnitLocationAsElement(self, unit, resolveContext, page, location, app):
 		resolveResult = self.resolveUnitLocation( unit, resolveContext, location, app )
 		if resolveResult is not None:
 			viewLocationAsElementFn = resolveResult.unitClass.getViewDocNodeAsElementFn()
-			return viewLocationAsElementFn( resolveResult.document, resolveResult.docNode, resolveResult.resolveContext, resolveResult.location, self._commandHistory, app )
+			return viewLocationAsElementFn( resolveResult.document, resolveResult.docNode, resolveResult.resolveContext, page, resolveResult.location, self._commandHistory, app )
 		else:
 			return None
 	
 	
-	def viewUnitLocationAsLispElement(self, unit, resolveContext, location, app):
+	def viewUnitLocationAsLispElement(self, unit, resolveContext, page, location, app):
 		resolveResult = self.resolveUnitLocation( unit, resolveContext, location, app )
 		if resolveResult is not None:
 			viewLocationAsElementFn = LISP.unitClass.getViewDocNodeAsElementFn()
-			return viewLocationAsElementFn( resolveResult.document, resolveResult.docNode, resolveResult.resolveContext, resolveResult.location, self._commandHistory, app )
+			return viewLocationAsElementFn( resolveResult.document, resolveResult.docNode, resolveResult.resolveContext, page, resolveResult.location, self._commandHistory, app )
 		else:
 			return None
 

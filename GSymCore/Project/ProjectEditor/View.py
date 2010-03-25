@@ -128,15 +128,17 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 	
 	
-def viewProjectDocNodeAsElement(document, docRootNode, resolveContext, location, commandHistory, app):
+def viewProjectDocNodeAsElement(document, docRootNode, resolveContext, page, location, commandHistory, app):
 	viewFn = ProjectView( document, app, resolveContext, location )
-	viewContext = GSymViewContext( docRootNode, viewFn, ProjectEditorStyleSheet.instance, None, app.getBrowserContext(), commandHistory )
+	viewContext = GSymViewContext( docRootNode, viewFn, ProjectEditorStyleSheet.instance, None, app.getBrowserContext(), page, commandHistory )
 	return viewContext.getRegion()
 
 
 
 def viewProjectDocNodeAsPage(document, docRootNode, resolveContext, location, commandHistory, app):
-	return GSymViewPage( resolveContext.getTitle(), viewProjectDocNodeAsElement( document, docRootNode, resolveContext, location, commandHistory, app ), commandHistory )
+	page = GSymViewPage( resolveContext.getTitle(), commandHistory )
+	page.setContentsElement( viewProjectDocNodeAsElement( document, docRootNode, resolveContext, page, location, commandHistory, app ) )
+	return page
 
 
 
