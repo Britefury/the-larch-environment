@@ -13,6 +13,7 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.ObjectView.ObjectViewContextList;
 import BritefuryJ.GSym.ObjectView.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
@@ -74,7 +75,7 @@ public class LogView implements Presentable, ObjectViewContextList.ContextListLi
 
 
 
-	public DPElement present(GSymFragmentViewContext ctx, Object state)
+	public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, Object state)
 	{
 		if ( objectViewContexts == null )
 		{

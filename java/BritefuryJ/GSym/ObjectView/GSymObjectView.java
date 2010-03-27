@@ -32,7 +32,7 @@ public class GSymObjectView
 			if ( x instanceof Presentable )
 			{
 				Presentable p = (Presentable)x;
-				return p.present( fragmentCtx, state );
+				return p.present( fragmentCtx, styleSheet, state );
 			}
 			else
 			{
