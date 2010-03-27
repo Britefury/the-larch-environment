@@ -65,6 +65,7 @@ import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Selection.SelectionListener;
 import BritefuryJ.DocPresent.Selection.SelectionManager;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.TreeExplorer.ElementTreeExplorer;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 import BritefuryJ.Logging.Log;
@@ -123,9 +124,9 @@ public class DPPresentationArea extends DPRegion implements CaretListener, Selec
 		}
 		
 		
-		public DPElement present(GSymFragmentViewContext ctx, Object state)
+		public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, Object state)
 		{
-			super.present( ctx, state );
+			super.present( ctx, styleSheet, state );
 			
 			return PrimitiveStyleSheet.instance.staticText( "Typesetting time: " + typesetTime );
 		}

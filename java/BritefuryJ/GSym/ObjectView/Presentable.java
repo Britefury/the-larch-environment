@@ -7,9 +7,10 @@
 package BritefuryJ.GSym.ObjectView;
 
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 
 public interface Presentable
 {
-	public DPElement present(GSymFragmentViewContext ctx, Object state);
+	public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, Object state);
 }
