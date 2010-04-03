@@ -163,7 +163,7 @@ public class DPPresentationArea extends DPRegion implements CaretListener, Selec
 						EditHandler editHandler = region.getEditHandler();
 						if ( editHandler != null )
 						{	
-							return editHandler.getExportActions();
+							return editHandler.getExportActions( area.selection );
 						}
 					}
 					return NONE;
@@ -184,7 +184,7 @@ public class DPPresentationArea extends DPRegion implements CaretListener, Selec
 						EditHandler editHandler = region.getEditHandler();
 						if ( editHandler != null )
 						{
-							return editHandler.createExportTransferable();
+							return editHandler.createExportTransferable( area.selection );
 						}
 					}
 					return null;
@@ -205,7 +205,7 @@ public class DPPresentationArea extends DPRegion implements CaretListener, Selec
 						EditHandler editHandler = region.getEditHandler();
 						if ( editHandler != null )
 						{
-							editHandler.exportDone( data, action );
+							editHandler.exportDone( area.selection, data, action );
 						}
 					}
 				}
@@ -228,7 +228,7 @@ public class DPPresentationArea extends DPRegion implements CaretListener, Selec
 						EditHandler editHandler = region.getEditHandler();
 						if ( editHandler != null )
 						{
-							return editHandler.canImport( new DataTransfer( transfer ) );
+							return editHandler.canImport( area.caret, area.selection, new DataTransfer( transfer ) );
 						}
 					}
 					return false;
@@ -249,7 +249,7 @@ public class DPPresentationArea extends DPRegion implements CaretListener, Selec
 						EditHandler editHandler = region.getEditHandler();
 						if ( editHandler != null )
 						{
-							return editHandler.importData( new DataTransfer( transfer ) );
+							return editHandler.importData( area.caret, area.selection, new DataTransfer( transfer ) );
 						}
 					}
 					return false;
@@ -2038,7 +2038,7 @@ public class DPPresentationArea extends DPRegion implements CaretListener, Selec
 				{
 					caret.getMarker().moveTo( selection.getStartMarker() );
 				}
-				editHandler.deleteSelection();
+				editHandler.deleteSelection( selection );
 			}
 		}
 	}
@@ -2051,7 +2051,7 @@ public class DPPresentationArea extends DPRegion implements CaretListener, Selec
 			EditHandler editHandler = selectionRegion.getEditHandler();
 			if ( editHandler != null )
 			{
-				editHandler.replaceSelection( replacement );
+				editHandler.replaceSelection( selection, replacement );
 			}
 		}
 	}

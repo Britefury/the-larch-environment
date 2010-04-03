@@ -48,7 +48,7 @@ public class IncrementalTree
 		{
 			nodeTable = new IncrementalTreeNodeTableWithDuplicates();
 		}
-		else if ( duplicatePolicy == DuplicatePolicy.ALLOW_DUPLICATES )
+		else if ( duplicatePolicy == DuplicatePolicy.REQUIRE_UNIQUES )
 		{
 			nodeTable = new IncrementalTreeNodeTableWithUniques();
 		}

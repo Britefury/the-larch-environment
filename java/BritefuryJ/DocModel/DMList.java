@@ -25,12 +25,17 @@ import org.python.core.PySlice;
 import BritefuryJ.CommandHistory.CommandTracker;
 import BritefuryJ.CommandHistory.CommandTrackerFactory;
 import BritefuryJ.CommandHistory.Trackable;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.GSym.ObjectView.Presentable;
+import BritefuryJ.GSym.View.GSymFragmentViewContext;
 import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.Incremental.IncrementalValue;
 import BritefuryJ.JythonInterface.JythonIndex;
 import BritefuryJ.JythonInterface.JythonSlice;
 
-public class DMList extends DMNode implements DMListInterface, Trackable, Serializable, IncrementalOwner
+public class DMList extends DMNode implements DMListInterface, Trackable, Serializable, IncrementalOwner, Presentable
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -1163,5 +1168,12 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	private void writeObject(ObjectOutputStream stream) throws IOException
 	{
 		stream.writeObject( value );
+	}
+
+
+	
+	public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, Object state)
+	{
+		return DocModelPresenter.presentDMList( this, ctx, PrimitiveStyleSheet.instance, state );
 	}
 }

@@ -11,14 +11,14 @@ from BritefuryJ.CommandHistory import CommandHistory, CommandHistoryListener
 
 from BritefuryJ.DocModel import DMNode, DMSchema, DMIOReader, DMIOWriter
 
+from BritefuryJ.GSym import GSymPerspective, GSymSubject
+
 from Britefury.Kernel.Abstract import abstractmethod
 
 from Britefury.Util.NodeUtil import isObjectNode
 from Britefury.gSymConfig.gSymVersion import compareVersions, gSymVersion
 
 from Britefury.gSym.gSymWorld import GSymWorld
-
-from GSymCore.Languages.LISP import LISP
 
 
 
@@ -74,6 +74,35 @@ def gSymUnit_getContent(unit):
 
 
 
+
+class GSymDocSubject (GSymSubject):
+	def __init__(self, enclosingSubject, focus, perspective, document, relativeLocation, locationSeparator):
+		super( GSymDocSubject, self ).__init__( enclosingSubject, focus, perspective, document.getCommandHistory(), relativeLocation, locationSeparator )
+		self._document = document
+		
+		
+	def getDocument(self):
+		return self._document
+		
+		
+	def withFocusAndPerspective(self, focus, perspective):
+		return GSymDocSubject( self.getEnclosingSubject(), focus, perspective, self._document, self.getRelativeLocation(), self.getLocationSeparator() )
+	
+	def withPerspective(self, perspective):
+		return GSymDocSubject( self.getEnclosingSubject(), self.getFocus(), perspective, self._document, self.getRelativeLocation(), self.getLocationSeparator() )
+	
+	def enclosedSubject(self, focus, perspective, relativeLocation, locationSeparator):
+		return GSymDocSubject( self, focus, perspective, self._document, relativeLocation, locationSeparator )
+
+	def enclosedSubjectWithNewDocument(self, focus, perspective, document, relativeLocation, locationSeparator):
+		return GSymDocSubject( self, focus, perspective, document, relativeLocation, locationSeparator )
+	
+	@staticmethod
+	def rootSubject(focus, perspective, document, relativeLocation, locationSeparator):
+		return GSymDocSubject( None, focus, perspective, document, relativeLocation, locationSeparator )
+	
+
+
 class GSymDocument (CommandHistoryListener):
 	def __init__(self, world, unit):
 		self._world = world
@@ -107,6 +136,10 @@ class GSymDocument (CommandHistoryListener):
 	
 	def setDocumentName(self, name):
 		self._docName = name
+		
+		
+	def getCommandHistory(self):
+		return self._commandHistory
 
 		
 	
@@ -119,69 +152,15 @@ class GSymDocument (CommandHistoryListener):
 		
 		
 	
-	def viewDocLocationAsPage(self, resolveContext, location, app):
-		return self.viewUnitLocationAsPage( self._unit, resolveContext, location, app )
 	
+	def resolveRelativeLocation(self, enclosingSubject, relativeLocation):
+		return self.resolveUnitRelativeLocation( self._unit, enclosingSubject, relativeLocation )
 	
-	def viewDocLocationAsLispPage(self, resolveContext, location, app):
-		return self.viewUnitLocationAsLispPage( self._unit, resolveContext, location, app )
-
-
-	
-	def viewUnitLocationAsPage(self, unit, resolveContext, location, app):
-		resolveResult = self.resolveUnitLocation( unit, resolveContext, location, app )
-		if resolveResult is not None:
-			viewLocationAsPageFn = resolveResult.unitClass.getViewDocNodeAsPageFn()
-			return viewLocationAsPageFn( resolveResult.document, resolveResult.docNode, resolveResult.resolveContext, resolveResult.location, self._commandHistory, app )
-		else:
-			return None
-	
-	
-	def viewUnitLocationAsLispPage(self, unit, resolveContext, location, app):
-		resolveResult = self.resolveUnitLocation( unit, resolveContext, location, app )
-		if resolveResult is not None:
-			viewLocationAsPageFn = LISP.unitClass.getViewDocNodeAsPageFn()
-			return viewLocationAsPageFn( resolveResult.document, resolveResult.docNode, resolveResult.resolveContext, resolveResult.location, self._commandHistory, app )
-		else:
-			return None
-
-
-	
-	def viewDocLocationAsElement(self, resolveContext, page, location, app):
-		return self.viewUnitLocationAsElement( self._unit, resolveContext, page, location, app )
-	
-	
-	def viewDocLocationAsLispElement(self, resolveContext, page, location, app):
-		return self.viewUnitLocationAsLispElement( self._unit, resolveContext, page, location, app )
-
-
-	
-	def viewUnitLocationAsElement(self, unit, resolveContext, page, location, app):
-		resolveResult = self.resolveUnitLocation( unit, resolveContext, location, app )
-		if resolveResult is not None:
-			viewLocationAsElementFn = resolveResult.unitClass.getViewDocNodeAsElementFn()
-			return viewLocationAsElementFn( resolveResult.document, resolveResult.docNode, resolveResult.resolveContext, page, resolveResult.location, self._commandHistory, app )
-		else:
-			return None
-	
-	
-	def viewUnitLocationAsLispElement(self, unit, resolveContext, page, location, app):
-		resolveResult = self.resolveUnitLocation( unit, resolveContext, location, app )
-		if resolveResult is not None:
-			viewLocationAsElementFn = LISP.unitClass.getViewDocNodeAsElementFn()
-			return viewLocationAsElementFn( resolveResult.document, resolveResult.docNode, resolveResult.resolveContext, page, resolveResult.location, self._commandHistory, app )
-		else:
-			return None
-
-
-	
-	def resolveLocation(self, resolveContext, location, app):
-		return self.resolveUnitLocation( self._unit, resolveContext, location, app )
-	
-	def resolveUnitLocation(self, unit, resolveContext, location, app):
+	def resolveUnitRelativeLocation(self, unit, enclosingSubject, relativeLocation):
 		unitClass = self._world.getUnitClass( gSymUnit_getSchemaLocation( unit ) )
-		resolveLocationFn = unitClass.getResolveLocationFn()
-		return resolveLocationFn( unitClass, self, gSymUnit_getContent( unit ), resolveContext, location, app )
+		perspective = unitClass.getUnitPerspective()
+		subject = enclosingSubject.withFocusAndPerspective( gSymUnit_getContent( unit ), perspective )
+		return perspective.resolveRelativeLocation( subject, relativeLocation )
 		
 	
 	

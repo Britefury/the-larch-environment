@@ -8,7 +8,7 @@
 from Britefury.gSym.gSymUnitClass import GSymUnitClass
 from Britefury.gSym.gSymDocument import gSymUnit
 
-from GSymCore.GSymApp.GSymAppViewer.View import viewGSymAppDocNodeAsElement, viewGSymAppDocNodeAsPage, resolveGSymAppLocation
+from GSymCore.GSymApp.GSymAppViewer.View import GSymAppViewerPerspective
 from GSymCore.GSymApp import NodeClasses as Nodes
 
 
@@ -18,10 +18,8 @@ def newAppState():
 	return gSymUnit( Nodes.schema, appState )
 
 
-
-unitClass = GSymUnitClass( Nodes.schema )
-unitClass.registerViewDocNodeAsElementFn( viewGSymAppDocNodeAsElement )
-unitClass.registerViewDocNodeAsPageFn( viewGSymAppDocNodeAsPage )
-unitClass.registerResolveLocationFn( resolveGSymAppLocation )
+def createUnitClass(world):
+	perspective = GSymAppViewerPerspective( world )
+	return GSymUnitClass( Nodes.schema, perspective )
 
 

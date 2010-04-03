@@ -13,13 +13,13 @@ import Britefury.Dispatch.MethodDispatch
 import Britefury.Tests.BritefuryJ.Parser.Utils.Operators
 import Britefury.Tests.Britefury.Grammar.Grammar
 import Britefury.Tests.Britefury.Dispatch.TestObjectNodeMethodDispatch
+import Britefury.Tests.Britefury.Dispatch.TestObjectMethodDispatch
 import Britefury.Tests.Britefury.AttributeVisitor.TestAttributeVisitor
 import GSymCore.Languages.Python25.CodeGenerator
 import GSymCore.Languages.Python25.Python25Importer
 import GSymCore.Languages.Python25.PythonEditor.Precedence
 import GSymCore.Languages.Python25.PythonEditor.Parser
 import GSymCore.Languages.Java.Parser
-import GSymCore.Languages.LISP.Parser2
 
 
 testModules = [ Britefury.Dispatch.Dispatch,
@@ -27,13 +27,13 @@ testModules = [ Britefury.Dispatch.Dispatch,
 		Britefury.Tests.BritefuryJ.Parser.Utils.Operators,
 		Britefury.Tests.Britefury.Grammar.Grammar,
 		Britefury.Tests.Britefury.Dispatch.TestObjectNodeMethodDispatch,
+		Britefury.Tests.Britefury.Dispatch.TestObjectMethodDispatch,
 		Britefury.Tests.Britefury.AttributeVisitor.TestAttributeVisitor,
 		GSymCore.Languages.Python25.CodeGenerator,
 		GSymCore.Languages.Python25.Python25Importer,
 		GSymCore.Languages.Python25.PythonEditor.Precedence,
 		GSymCore.Languages.Python25.PythonEditor.Parser,
-		GSymCore.Languages.Java.Parser,
-		#GSymCore.Languages.LISP.Parser2 ]
+		GSymCore.Languages.Java.Parser
 		]
 
 

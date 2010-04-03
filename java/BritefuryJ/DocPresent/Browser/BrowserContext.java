@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.DocPresent.Browser;
 
-import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,10 +20,6 @@ import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class BrowserContext
 {
-	private static DefaultRootPage defaultRootPage = new DefaultRootPage();
-	
-
-	
 	private List<LocationResolver> resolvers = new ArrayList<LocationResolver>();
 	
 	
@@ -43,28 +38,6 @@ public class BrowserContext
 	protected void addResolvers(List<LocationResolver> resolvers)
 	{
 		this.resolvers.addAll( resolvers );
-	}
-	
-	
-	public DPElement resolveLocationAsElement(Page page, String location)
-	{
-		for (LocationResolver resolver: resolvers)
-		{
-			DPElement e = resolver.resolveLocationAsElement( page, location );
-			if ( e != null )
-			{
-				return e;
-			}
-		}
-		
-		if ( location.equals( "" ) )
-		{
-			return styleSheet.staticText( "<<Root location>>" );
-		}
-		else
-		{
-			return resolveErrorStyleSheet.staticText( "<<Could not resolve " + location + ">>" );
-		}
 	}
 	
 	
@@ -152,6 +125,6 @@ public class BrowserContext
 	
 	
 	
+	private static DefaultRootPage defaultRootPage = new DefaultRootPage();
 	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-	private static PrimitiveStyleSheet resolveErrorStyleSheet = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 14 ) ).withForeground( new Color( 0.8f, 0.0f, 0.0f ) );
 }

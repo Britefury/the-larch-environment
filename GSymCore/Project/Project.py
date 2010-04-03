@@ -8,7 +8,7 @@
 from Britefury.gSym.gSymUnitClass import GSymUnitClass, GSymUnitFactory
 from Britefury.gSym.gSymDocument import gSymUnit
 
-from GSymCore.Project.ProjectEditor.View import viewProjectDocNodeAsElement, viewProjectDocNodeAsPage, resolveProjectLocation
+from GSymCore.Project.ProjectEditor.View import ProjectEditorPerspective
 from GSymCore.Project import NodeClasses as Nodes
 
 
@@ -19,10 +19,9 @@ def newProject():
 
 
 
-unitClass = GSymUnitClass( Nodes.schema )
-unitClass.registerViewDocNodeAsElementFn( viewProjectDocNodeAsElement )
-unitClass.registerViewDocNodeAsPageFn( viewProjectDocNodeAsPage )
-unitClass.registerResolveLocationFn( resolveProjectLocation )
+def createUnitClass(world):
+	perspective = ProjectEditorPerspective( world )
+	return GSymUnitClass( Nodes.schema, perspective )
 
 
 newUnitFactory = GSymUnitFactory( 'gSym Document', newProject )

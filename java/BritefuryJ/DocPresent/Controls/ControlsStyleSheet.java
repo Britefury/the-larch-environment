@@ -270,12 +270,6 @@ public class ControlsStyleSheet extends StyleSheet
 		return new Hyperlink( element, listener );
 	}
 	
-	public Hyperlink link(String txt, PyObject listener)
-	{
-		DPText element = getLinkStyleSheet().staticText( txt );
-		return new Hyperlink( element, listener );
-	}
-	
 	
 	
 	public Button button(DPElement child, Button.ButtonListener listener)

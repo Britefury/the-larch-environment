@@ -146,7 +146,7 @@ class ObjectNodeMethodDispatchMetaClass (type):
 		except AttributeError:
 			numArgs = 0
 		
-		# Store two tables for mapping class name to method; the method table, and the dispatch table
+		# Store two tables for mapping class to method; the method table, and the dispatch table
 		# The method table stores entries only for methods that were declared
 		# The dispatch table stores those, in addition to mappings for subclasses of the node class
 		# The method table is copied from base classes
@@ -197,7 +197,7 @@ class ObjectNodeMethodDispatchMetaClass (type):
 					pass
 				superClass = superClass.getSuperclass()
 			# Cache the result so that any lookups in the future will be faster
-			cls.__dispatch_table__[superClass] = method
+			cls.__dispatch_table__[nodeClass] = method
 			return method
 
 		

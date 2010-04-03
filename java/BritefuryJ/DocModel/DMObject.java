@@ -26,10 +26,15 @@ import BritefuryJ.CommandHistory.Trackable;
 import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 import BritefuryJ.DocModel.DMSchema.UnknownClassException;
 import BritefuryJ.DocModel.DMSchemaResolver.CouldNotResolveSchemaException;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.GSym.ObjectView.Presentable;
+import BritefuryJ.GSym.View.GSymFragmentViewContext;
 import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.Incremental.IncrementalValue;
 
-public class DMObject extends DMNode implements DMObjectInterface, Trackable, Serializable, IncrementalOwner
+public class DMObject extends DMNode implements DMObjectInterface, Trackable, Serializable, IncrementalOwner, Presentable
 {
 	public static class NotADMObjectStreamClassException extends RuntimeException
 	{
@@ -801,5 +806,12 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 		{
 			throw new NotADMObjectStreamClassException();
 		}
+	}
+
+
+	
+	public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, Object state)
+	{
+		return DocModelPresenter.presentDMObject( this, ctx, PrimitiveStyleSheet.instance, state );
 	}
 }

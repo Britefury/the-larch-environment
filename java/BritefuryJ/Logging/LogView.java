@@ -88,7 +88,7 @@ public class LogView implements Presentable, ObjectViewContextList.ContextListLi
 		int i = 1;
 		for (LogEntry entry: visibleEntries)
 		{
-			entryElements[i++] = ctx.viewEval( entry, PrimitiveStyleSheet.instance );
+			entryElements[i++] = ctx.presentFragment( entry, PrimitiveStyleSheet.instance );
 		}
 		
 		return PrimitiveStyleSheet.instance.vbox( Arrays.asList( entryElements ) );

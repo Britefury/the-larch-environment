@@ -6,10 +6,8 @@
 //##************************
 package BritefuryJ.DocPresent.Browser;
 
-import BritefuryJ.DocPresent.DPElement;
 
 public interface LocationResolver
 {
-	public DPElement resolveLocationAsElement(Page page, String location);
 	public Page resolveLocationAsPage(String location);
 }
