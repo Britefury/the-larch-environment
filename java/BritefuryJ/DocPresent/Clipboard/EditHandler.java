@@ -10,6 +10,9 @@ import java.awt.datatransfer.Transferable;
 
 import javax.swing.TransferHandler;
 
+import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.Selection.Selection;
+
 
 public interface EditHandler
 {
@@ -20,14 +23,14 @@ public interface EditHandler
 	public static int NONE = TransferHandler.NONE;
 	
 	
-	void deleteSelection();
-	void replaceSelection(String replacement);
+	void deleteSelection(Selection selection);
+	void replaceSelection(Selection selection, String replacement);
 	
 
-	public int getExportActions();
-	public Transferable createExportTransferable();
-	public void exportDone(Transferable transferable, int action);
+	public int getExportActions(Selection selection);
+	public Transferable createExportTransferable(Selection selection);
+	public void exportDone(Selection selection, Transferable transferable, int action);
 	
-	public boolean canImport(DataTransfer dataTransfer);
-	public boolean importData(DataTransfer dataTransfer);
+	public boolean canImport(Caret caret, Selection selection, DataTransfer dataTransfer);
+	public boolean importData(Caret caret, Selection selection, DataTransfer dataTransfer);
 }

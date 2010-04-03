@@ -4,8 +4,18 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.GSym.IncrementalContext;
+package BritefuryJ.GSym;
 
-public interface GSymIncrementalNodeFunction
+import BritefuryJ.DocPresent.Clipboard.EditHandler;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.GSym.View.GSymViewFragmentFunction;
+
+
+public interface GSymPerspective
 {
+	GSymViewFragmentFunction getFragmentViewFunction();
+	StyleSheet getStyleSheet();
+	EditHandler getEditHandler();
+
+	GSymSubject resolveRelativeLocation(GSymSubject enclosingSubject, String relativeLocation);
 }

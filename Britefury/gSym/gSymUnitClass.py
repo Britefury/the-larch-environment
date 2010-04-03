@@ -8,15 +8,12 @@
 
 
 class GSymUnitClass (object):
-	def __init__(self, schema):
+	def __init__(self, schema, unitPerspective):
 		super( GSymUnitClass, self ).__init__()
 		self._schema = schema
 		self.name = schema.getName()
 		self._codeGeneratorFactories = {}
-		self._viewDocNodeAsElementFn = None
-		self._viewDocNodeAsPageFn = None
-		self._resolveLocationFn = None
-		self._transformModifyFn = None
+		self._unitPerspective = unitPerspective
 		
 	
 	
@@ -28,28 +25,13 @@ class GSymUnitClass (object):
 
 
 
-	def registerViewDocNodeAsElementFn(self, viewDocNodeAsElementFn):
-		self._viewDocNodeAsElementFn = viewDocNodeAsElementFn
-
-	def registerViewDocNodeAsPageFn(self, viewDocNodeAsPageFn):
-		self._viewDocNodeAsPageFn = viewDocNodeAsPageFn
-
-	def registerResolveLocationFn(self, resolveLocationFn):
-		self._resolveLocationFn = resolveLocationFn
-
-		
 		
 	def getCodeGeneratorFactory(self, format):
 		return self._codeGeneratorFactories[format]
 	
-	def getViewDocNodeAsElementFn(self):
-		return self._viewDocNodeAsElementFn
-
-	def getViewDocNodeAsPageFn(self):
-		return self._viewDocNodeAsPageFn
-
-	def getResolveLocationFn(self):
-		return self._resolveLocationFn
+	def getUnitPerspective(self):
+		return self._unitPerspective
+	
 
 
 

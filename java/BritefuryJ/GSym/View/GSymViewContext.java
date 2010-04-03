@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.GSym.View;
 
-import org.python.core.PyObject;
+import java.util.HashMap;
 
 import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.DocPresent.DPElement;
@@ -20,41 +20,38 @@ import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocView.DVNode;
 import BritefuryJ.DocView.DocView;
 import BritefuryJ.GSym.GSymBrowserContext;
-import BritefuryJ.GSym.IncrementalContext.GSymIncrementalNodeFunction;
-import BritefuryJ.GSym.IncrementalContext.GSymIncrementalTreeContext;
+import BritefuryJ.GSym.GSymPerspective;
 import BritefuryJ.IncrementalTree.IncrementalTree;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 import BritefuryJ.Utils.HashUtils;
 
-public class GSymViewContext extends GSymIncrementalTreeContext implements DocView.RefreshListener
+public class GSymViewContext implements DocView.RefreshListener
 {
-	protected static class ViewFragmentContextAndResultFactory extends GSymIncrementalTreeContext.NodeContextAndResultFactory
+	private static class ViewFragmentContextAndResultFactory implements IncrementalTreeNode.NodeResultFactory
 	{
-		protected GSymViewFragmentFunction viewFragmentFunction;
-		protected StyleSheet styleSheet;
+		private GSymViewContext viewContext;
+		private GSymPerspective perspective;
+		private GSymViewFragmentFunction viewFragmentFunction;
+		private StyleSheet styleSheet;
+		private Object state;
 		
-		public ViewFragmentContextAndResultFactory(GSymIncrementalTreeContext treeContext, GSymViewFragmentFunction nodeFunction, StyleSheet styleSheet, Object state)
+		public ViewFragmentContextAndResultFactory(GSymViewContext viewContext, GSymPerspective perspective, GSymViewFragmentFunction nodeFunction, StyleSheet styleSheet, Object state)
 		{
-			super( treeContext, state );
-			
+			this.viewContext = viewContext;
+			this.perspective = perspective;
 			this.viewFragmentFunction = nodeFunction;
 			this.styleSheet = styleSheet;
+			this.state = state;
 		}
 
-
-		protected GSymFragmentViewContext createContext(GSymIncrementalTreeContext treeContext, IncrementalTreeNode incrementalNode) 
-		{
-			return new GSymFragmentViewContext( (GSymViewContext)treeContext, (DVNode)incrementalNode );
-		}
 
 		public Object createNodeResult(IncrementalTreeNode incrementalNode, Object docNode)
 		{
-			GSymViewContext viewContext = (GSymViewContext)treeContext;
 			DocView docView = viewContext.getView();
 			docView.profile_startPython();
 
 			// Create the node context
-			GSymFragmentViewContext nodeContext = createContext( treeContext, incrementalNode );
+			GSymFragmentViewContext nodeContext = new GSymFragmentViewContext( viewContext, (DVNode)incrementalNode, perspective, viewFragmentFunction );
 			
 			// Create the view fragment
 			DPElement fragment = viewFragmentFunction.createViewFragment( docNode, nodeContext, styleSheet, state );
@@ -66,7 +63,7 @@ public class GSymViewContext extends GSymIncrementalTreeContext implements DocVi
 	}
 	
 	
-	protected static class ViewInheritedState extends InheritedState
+	public static class ViewInheritedState
 	{
 		public StyleSheet styleSheet;
 		public Object state;
@@ -80,15 +77,17 @@ public class GSymViewContext extends GSymIncrementalTreeContext implements DocVi
 	}
 	
 	
-	protected static class ViewFragmentContextAndResultFactoryKey extends NodeContextAndResultFactoryKey
+	protected static class ViewFragmentContextAndResultFactoryKey
 	{
-		private GSymIncrementalNodeFunction nodeFunction;
+		private GSymPerspective perspective;
+		private GSymViewFragmentFunction nodeFunction;
 		private StyleSheet styleSheet;
 		private Object state;
 		
 		
-		public ViewFragmentContextAndResultFactoryKey(GSymIncrementalNodeFunction nodeFunction, StyleSheet styleSheet, Object state)
+		public ViewFragmentContextAndResultFactoryKey(GSymPerspective perspective, GSymViewFragmentFunction nodeFunction, StyleSheet styleSheet, Object state)
 		{
+			this.perspective = perspective;
 			this.nodeFunction = nodeFunction;
 			this.styleSheet = styleSheet;
 			this.state = state;
@@ -102,7 +101,7 @@ public class GSymViewContext extends GSymIncrementalTreeContext implements DocVi
 			{
 				throw new RuntimeException( "null?nodeFunction=" + ( nodeFunction == null ) + ", null?styleSheet=" + ( styleSheet == null ) );
 			}
-			return HashUtils.tripleHash( nodeFunction.hashCode(), styleSheet.hashCode(), stateHash );
+			return HashUtils.nHash( new int[] { System.identityHashCode( perspective ), System.identityHashCode( nodeFunction ), styleSheet.hashCode(), stateHash } );
 		}
 		
 		public boolean equals(Object x)
@@ -116,7 +115,7 @@ public class GSymViewContext extends GSymIncrementalTreeContext implements DocVi
 			{
 				ViewFragmentContextAndResultFactoryKey kx = (ViewFragmentContextAndResultFactoryKey)x;
 				boolean bStateEqual = ( state == null  ||  kx.state == null )  ?  ( state != null ) == ( kx.state != null )  :  state.equals( kx.state );
-				return nodeFunction == kx.nodeFunction  &&  styleSheet.equals( kx.styleSheet )  &&  bStateEqual;
+				return perspective == kx.perspective  &&  nodeFunction == kx.nodeFunction  &&  styleSheet.equals( kx.styleSheet )  &&  bStateEqual;
 			}
 			else
 			{
@@ -137,11 +136,20 @@ public class GSymViewContext extends GSymIncrementalTreeContext implements DocVi
 	
 	private CommandHistory commandHistory;
 
+	private Object docRootNode;
+
+	private HashMap<ViewFragmentContextAndResultFactoryKey, ViewFragmentContextAndResultFactory> viewFragmentContextAndResultFactories =
+		new HashMap<ViewFragmentContextAndResultFactoryKey, ViewFragmentContextAndResultFactory>();
+
 	
-	public GSymViewContext(Object docRootNode, GSymIncrementalNodeFunction generalNodeViewFunction, GSymIncrementalNodeFunction rootNodeViewFunction, StyleSheet rootStyleSheet,
-			Object rootState, GSymBrowserContext browserContext, Page page, CommandHistory commandHistory)
+	public GSymViewContext(Object docRootNode, GSymPerspective perspective, Object rootState, GSymBrowserContext browserContext, Page page, CommandHistory commandHistory)
 	{
-		super( docRootNode, generalNodeViewFunction, rootNodeViewFunction, new ViewInheritedState( rootStyleSheet, rootState ) );
+		this.docRootNode = docRootNode;
+		
+		ViewInheritedState rootInheritedState = new ViewInheritedState( perspective.getStyleSheet(), rootState );
+
+		view = new DocView( docRootNode, makeNodeResultFactory( perspective, perspective.getFragmentViewFunction(), rootInheritedState ) );
+
 		this.browserContext = browserContext;
 		this.page = page;
 		this.commandHistory = commandHistory;
@@ -149,52 +157,32 @@ public class GSymViewContext extends GSymIncrementalTreeContext implements DocVi
 		region = new DPRegion( );
 		
 		
-		view = (DocView)incrementalTree;
 		view.setElementChangeListener( new NodeElementChangeListenerDiff() );
 		view.setRefreshListener( this );
 		region.setChild( view.getRootViewElement().alignHExpand() );
 	}
 	
 	
-	public GSymViewContext(Object docRootNode, PyObject generalNodeViewFunction, PyObject rootNodeViewFunction, StyleSheet rootStyleSheet, Object rootState,
-			GSymBrowserContext browserContext, Page page, CommandHistory commandHistory)
-	{
-		this( docRootNode, new PyGSymViewFragmentFunction( generalNodeViewFunction ), new PyGSymViewFragmentFunction( generalNodeViewFunction ), rootStyleSheet, rootState,
-				browserContext, page, commandHistory );
-	}
-
 	
-	public GSymViewContext(Object docRootNode, GSymIncrementalNodeFunction nodeViewFunction, StyleSheet rootStyleSheet, Object rootState,
-			GSymBrowserContext browserContext, Page page, CommandHistory commandHistory)
-	{
-		this( docRootNode, nodeViewFunction, nodeViewFunction, rootStyleSheet, rootState, browserContext, page, commandHistory );
-	}
-
-	public GSymViewContext(Object docRootNode, PyObject nodeViewFunction, StyleSheet rootStyleSheet, Object rootState, GSymBrowserContext browserContext,
-			Page page, CommandHistory commandHistory)
-	{
-		this( docRootNode, new PyGSymViewFragmentFunction( nodeViewFunction ), rootStyleSheet, rootState, browserContext, page, commandHistory );
-	}
-
 	
 
-	protected IncrementalTree createIncrementalTree(Object docRootNode, IncrementalTreeNode.NodeResultFactory resultFactory)
+	protected DVNode.NodeResultFactory makeNodeResultFactory(GSymPerspective perspective, GSymViewFragmentFunction nodeFunction, ViewInheritedState inheritedState)
 	{
-		return new DocView( docRootNode, resultFactory );
+		// Memoise the contents factory, keyed by  @nodeViewFunction and @state
+		ViewFragmentContextAndResultFactoryKey key = new ViewFragmentContextAndResultFactoryKey( perspective, nodeFunction, inheritedState.styleSheet, inheritedState.state );
+		
+		ViewFragmentContextAndResultFactory factory = viewFragmentContextAndResultFactories.get( key );
+		
+		if ( factory == null )
+		{
+			factory = new ViewFragmentContextAndResultFactory( this, perspective, nodeFunction, inheritedState.styleSheet, inheritedState.state );
+			viewFragmentContextAndResultFactories.put( key, factory );
+			return factory;
+		}
+		
+		return factory;
 	}
-	
-	protected NodeContextAndResultFactory createContextAndResultFactory(GSymIncrementalTreeContext treeContext, GSymIncrementalNodeFunction nodeFunction, InheritedState inheritedState)
-	{
-		ViewInheritedState viewState = (ViewInheritedState)inheritedState;
-		return new ViewFragmentContextAndResultFactory( this, (GSymViewFragmentFunction)nodeFunction, viewState.styleSheet, viewState.state );
-	}
-	
-	protected NodeContextAndResultFactoryKey createFragmentKey(GSymIncrementalNodeFunction nodeFunction, InheritedState inheritedState)
-	{
-		ViewInheritedState viewState = (ViewInheritedState)inheritedState;
-		return new ViewFragmentContextAndResultFactoryKey( nodeFunction, viewState.styleSheet, viewState.state );
-	}
-	
+
 	
 	public Caret getCaret()
 	{
@@ -209,6 +197,20 @@ public class GSymViewContext extends GSymIncrementalTreeContext implements DocVi
 	}
 	
 	
+	
+	
+	public Object getDocRootNode()
+	{
+		return docRootNode;
+	}
+	
+	
+	
+	public void refreshTree()
+	{
+		view.refresh();
+	}
+
 	
 	
 	public DocView getView()

@@ -100,18 +100,16 @@ public class TextEntry extends Control
 	
 	private class TextEntryEditHandler implements EditHandler
 	{
-		public void deleteSelection()
+		public void deleteSelection(Selection selection)
 		{
-			Selection selection = textElement.getPresentationArea().getSelection();
 			if ( !selection.isEmpty() )
 			{
 				textElement.removeText( selection.getStartMarker(), selection.getEndMarker() );
 			}
 		}
 
-		public void replaceSelection(String replacement)
+		public void replaceSelection(Selection selection, String replacement)
 		{
-			Selection selection = textElement.getPresentationArea().getSelection();
 			if ( !selection.isEmpty() )
 			{
 				textElement.removeText( selection.getStartMarker(), selection.getEndMarker() );
@@ -122,14 +120,13 @@ public class TextEntry extends Control
 
 
 
-		public int getExportActions()
+		public int getExportActions(Selection selection)
 		{
 			return COPY_OR_MOVE;
 		}
 
-		public Transferable createExportTransferable()
+		public Transferable createExportTransferable(Selection selection)
 		{
-			Selection selection = textElement.getPresentationArea().getSelection();
 			if ( !selection.isEmpty() )
 			{
 				String selectedText = textElement.getTextRepresentationBetweenMarkers( selection.getStartMarker(), selection.getEndMarker() );
@@ -141,11 +138,10 @@ public class TextEntry extends Control
 			}
 		}
 
-		public void exportDone(Transferable transferable, int action)
+		public void exportDone(Selection selection, Transferable transferable, int action)
 		{
 			if ( action == MOVE )
 			{
-				Selection selection = textElement.getPresentationArea().getSelection();
 				if ( !selection.isEmpty() )
 				{
 					textElement.removeText( selection.getStartMarker(), selection.getEndMarker() );
@@ -154,26 +150,24 @@ public class TextEntry extends Control
 		}
 
 		
-		public boolean canImport(DataTransfer dataTransfer)
+		public boolean canImport(Caret caret, Selection selection, DataTransfer dataTransfer)
 		{
 			return dataTransfer.isDataFlavorSupported( DataFlavor.stringFlavor );
 		}
 
-		public boolean importData(DataTransfer dataTransfer)
+		public boolean importData(Caret caret, Selection selection, DataTransfer dataTransfer)
 		{
-			if ( canImport( dataTransfer ) )
+			if ( canImport( caret, selection, dataTransfer ) )
 			{
 				try
 				{
 					String data = (String)dataTransfer.getTransferData( DataFlavor.stringFlavor );
 					
-					Selection selection = textElement.getPresentationArea().getSelection();
 					if ( !selection.isEmpty() )
 					{
 						textElement.removeText( selection.getStartMarker(), selection.getEndMarker() );
 					}
 					
-					Caret caret = textElement.getPresentationArea().getCaret();
 					textElement.insertText( caret.getMarker(), data );
 				}
 				catch (UnsupportedFlavorException e)

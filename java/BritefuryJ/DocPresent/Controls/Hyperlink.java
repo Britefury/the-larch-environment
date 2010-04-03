@@ -6,11 +6,8 @@
 //##************************
 package BritefuryJ.DocPresent.Controls;
 
-import org.python.core.Py;
-import org.python.core.PyObject;
-
-import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.PageController;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
@@ -63,25 +60,6 @@ public class Hyperlink extends Control
 	}
 	
 	
-	private static class PyLinkListener implements LinkListener
-	{
-		private PyObject callable;
-		
-		
-		public PyLinkListener(PyObject callable)
-		{
-			this.callable = callable;
-		}
-		
-		public boolean onLinkClicked(Hyperlink link, PointerButtonEvent buttonEvent)
-		{
-			return Py.py2boolean( callable.__call__( Py.java2py( link ), Py.java2py( buttonEvent ) ) );
-		}
-	}
-	
-
-
-	
 	private class LinkInteractor extends ElementInteractor
 	{
 		public LinkInteractor()
@@ -120,11 +98,6 @@ public class Hyperlink extends Control
 	protected Hyperlink(DPText element, String targetLocation)
 	{
 		this( element, new LinkTargetListener( targetLocation ) );
-	}
-	
-	protected Hyperlink(DPText element, PyObject listener)
-	{
-		this( element, new PyLinkListener( listener ) );
 	}
 	
 	

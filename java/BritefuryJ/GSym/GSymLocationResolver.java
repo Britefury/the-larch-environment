@@ -4,12 +4,12 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.GSym.View;
+package BritefuryJ.GSym;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.DocPresent.Browser.Page;
 
-public interface GSymViewFragmentFunction
+public interface GSymLocationResolver
 {
-	public DPElement createViewFragment(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, Object state);
+	public Page resolveLocationAsPage(String location);
+	GSymSubject resolveLocationAsSubject(String location);
 }

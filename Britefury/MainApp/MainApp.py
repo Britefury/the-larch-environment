@@ -32,7 +32,8 @@ from BritefuryJ.DocPresent.StyleParams import *
 
 from BritefuryJ.DocView import DocView
 
-from BritefuryJ.GSym import GSymBrowserContext
+from BritefuryJ.GSym import GSymBrowserContext, GSymLocationResolver, GSymSubject
+from BritefuryJ.GSym.View import GSymViewContext
 
 
 
@@ -42,9 +43,9 @@ from Britefury.Kernel.Abstract import abstractmethod
 from Britefury.Event.QueuedEvent import queueEvent
 
 
+from Britefury.gSym.View.GSymView import GSymViewPage
 from Britefury.gSym.gSymWorld import GSymWorld
-from Britefury.gSym.gSymDocument import GSymDocument
-from Britefury.gSym.gSymResolveContext import GSymResolveContext
+from Britefury.gSym.gSymDocument import GSymDocument, GSymDocSubject
 from Britefury.gSym.AppControlInterface import AppControlInterface
 
 from GSymCore.GSymApp import GSymApp
@@ -100,34 +101,46 @@ class _GSymTransferActionListener (ActionListener):
 				a.actionPerformed( ActionEvent( focusOwner, ActionEvent.ACTION_PERFORMED, None ) )
 				
 				
-class _AppLocationResolver (LocationResolver):
+
+class _AppLocationResolver (GSymLocationResolver):
 	def __init__(self, app):
 		self._app = app
 		
 	
-	def resolveLocationAsElement(self, page, location):
-		document = self._app._document
-		if document is not None:
-			if location.startswith( 'model:' ):
-				location = location[6:]
-				return document.viewDocLocationAsLispElement( GSymResolveContext( None, '' ), page, location, self._app )
-			else:
-				return document.viewDocLocationAsElement( GSymResolveContext( None, '' ), page, location, self._app )
-		else:
-			return None
-		
 	def resolveLocationAsPage(self, location):
-		document = self._app._document
-		if document is not None:
-			if location.startswith( 'model:' ):
-				location = location[6:]
-				return document.viewDocLocationAsLispPage( GSymResolveContext( None, '' ), location, self._app )
-			else:
-				return document.viewDocLocationAsPage( GSymResolveContext( None, '' ), location, self._app )
+		subject = self.resolveLocationAsSubject( location )
+		if subject is not None:
+			page = GSymViewPage( 'MainApp: _AppLocationResolver: default title', subject.getCommandHistory() )
+			viewContext = GSymViewContext( subject.getFocus(), subject.getPerspective(), None, self._app._browserContext, page, subject.getCommandHistory() )
+			page.setContentsElement( viewContext.getRegion() )
+			return page
 		else:
 			return None
 				
+	def resolveLocationAsSubject(self, location):
+		document = self._app._document
+		if document is not None:
+			bModel = location.startswith( 'model:' )
+			if bModel:
+				enclosingSubject = GSymDocSubject.rootSubject( None, None, document, 'model', ':' )
+				location = location[6:]
+			else:
+				enclosingSubject = GSymDocSubject.rootSubject( None, None, document, '', '' )
+			subject = document.resolveRelativeLocation( enclosingSubject, location )
+			if subject is None:
+				return None
+			if bModel:
+				subject = subject.withPerspective( self._app._browserContext.getDefaultPerspective() )
+			return subject
+		else:
+			return None
+		
 
+		
+class _MainAppBrowserContext (GSymBrowserContext):
+	def __init__(self, app, *args):
+		super( _MainAppBrowserContext, self ).__init__( *args )
+		self.app = app
 		
 
 class MainApp (AppControlInterface):
@@ -137,7 +150,7 @@ class MainApp (AppControlInterface):
 		self._document = document
 		
 		self._resolver = _AppLocationResolver( self )
-		self._browserContext = GSymBrowserContext( [ self._resolver ] )
+		self._browserContext = _MainAppBrowserContext( self, [ self._resolver ] )
 		
 		
 		class _BrowserListener (TabbedBrowser.TabbedBrowserListener):
@@ -145,7 +158,7 @@ class MainApp (AppControlInterface):
 				self._createNewWindow( location )
 				
 				
-		self._browser = TabbedBrowser( self._browserContext, _BrowserListener(), location )
+		self._browser = TabbedBrowser( self._browserContext.getBrowserContext(), _BrowserListener(), location )
 		self._browser.getComponent().setPreferredSize( Dimension( 800, 600 ) )
 
 		

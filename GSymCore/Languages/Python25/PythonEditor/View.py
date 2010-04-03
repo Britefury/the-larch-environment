@@ -29,8 +29,6 @@ from BritefuryJ.Parser.ItemStream import ItemStreamBuilder
 
 from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeDispatchMethod
 
-from Britefury.gSym.gSymResolveContext import GSymResolveContext
-from Britefury.gSym.gSymResolveResult import GSymResolveResult
 from Britefury.gSym.View.GSymView import GSymViewObjectNodeDispatch, GSymViewPage
 
 from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replaceNodeContents, append, prepend, insertElement, insertRange, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
@@ -43,6 +41,7 @@ from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent import *
 
 from BritefuryJ.GSym.View import GSymViewContext
+from BritefuryJ.GSym import GSymPerspective, GSymSubject
 
 
 
@@ -174,7 +173,7 @@ def compoundStatementEditor(ctx, styleSheet, node, precedence, compoundBlocks, s
 			indent = styleSheet.indentElement()
 			indent.setStructuralValueObject( Nodes.Indent() )
 			
-			lineViews = ctx.mapViewEval( suite, styleSheet.withPythonState( PRECEDENCE_NONE, statementParser, PythonEditorStyleSheet.MODE_EDITSTATEMENT ) )
+			lineViews = ctx.mapPresentFragment( suite, styleSheet.withPythonState( PRECEDENCE_NONE, statementParser, PythonEditorStyleSheet.MODE_EDITSTATEMENT ) )
 			
 			dedent = styleSheet.dedentElement()
 			dedent.setStructuralValueObject( Nodes.Dedent() )
@@ -192,7 +191,7 @@ def compoundStatementEditor(ctx, styleSheet, node, precedence, compoundBlocks, s
 
 
 def spanPrefixOpView(ctx, styleSheet, node, x, op, precedence, parser):
-	xView = ctx.viewEval( x, styleSheet.withPythonState( precedence, parser, PythonEditorStyleSheet.MODE_DISPLAYCONTENTS ) )
+	xView = ctx.presentFragment( x, styleSheet.withPythonState( precedence, parser, PythonEditorStyleSheet.MODE_DISPLAYCONTENTS ) )
 	view = styleSheet.spanPrefixOp( xView, op )
 	return expressionNodeEditor( styleSheet, node, precedence,
 	                             view )
@@ -200,15 +199,15 @@ def spanPrefixOpView(ctx, styleSheet, node, x, op, precedence, parser):
 
 def spanBinOpView(ctx, styleSheet, node, x, y, op, precedence, bRightAssociative, parser):
 	xPrec, yPrec = computeBinOpViewPrecedenceValues( precedence, bRightAssociative )
-	xView = ctx.viewEval( x, styleSheet.withPythonState( xPrec, parser, PythonEditorStyleSheet.MODE_DISPLAYCONTENTS ) )
-	yView = ctx.viewEval( y, styleSheet.withPythonState( yPrec, parser, PythonEditorStyleSheet.MODE_DISPLAYCONTENTS ) )
+	xView = ctx.presentFragment( x, styleSheet.withPythonState( xPrec, parser, PythonEditorStyleSheet.MODE_DISPLAYCONTENTS ) )
+	yView = ctx.presentFragment( y, styleSheet.withPythonState( yPrec, parser, PythonEditorStyleSheet.MODE_DISPLAYCONTENTS ) )
 	view = styleSheet.spanBinOp( xView, yView, op )
 	return expressionNodeEditor( styleSheet, node, precedence,
 	                             view )
 
 
 def spanCmpOpView(ctx, styleSheet, node, op, y, precedence, parser):
-	yView = ctx.viewEval( y, styleSheet.withPythonState( precedence, parser, PythonEditorStyleSheet.MODE_DISPLAYCONTENTS ) )
+	yView = ctx.presentFragment( y, styleSheet.withPythonState( precedence, parser, PythonEditorStyleSheet.MODE_DISPLAYCONTENTS ) )
 	view = styleSheet.spanCmpOp( op, yView )
 	return expressionNodeEditor( styleSheet, node, precedence,
 	                             view )
@@ -234,7 +233,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# MISC
 	@ObjectNodeDispatchMethod( Nodes.PythonModule )
 	def PythonModule(self, ctx, styleSheet, state, node, suite):
-		lineViews = ctx.mapViewEval( suite, styleSheet.withPythonState( PRECEDENCE_NONE, self._parser.singleLineStatement(), PythonEditorStyleSheet.MODE_EDITSTATEMENT ) )
+		lineViews = ctx.mapPresentFragment( suite, styleSheet.withPythonState( PRECEDENCE_NONE, self._parser.singleLineStatement(), PythonEditorStyleSheet.MODE_EDITSTATEMENT ) )
 		suiteElement = styleSheet.suiteView( lineViews )
 		suiteElement.setStructuralValueObject( suite )
 		suiteElement.setLinearRepresentationListener( SuiteLinearRepresentationListener( self._parser.suite(), suite ) )
@@ -256,7 +255,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			if isinstance( x, str )  or  isinstance( x, unicode ):
 				return styleSheet.unparseableText( x )
 			elif isinstance( x, DMObjectInterface ):
-				return ctx.viewEval( x, styleSheet.withPythonState( PRECEDENCE_CONTAINER_UNPARSED, self._parser.expression() ) )
+				return ctx.presentFragment( x, styleSheet.withPythonState( PRECEDENCE_CONTAINER_UNPARSED, self._parser.expression() ) )
 			else:
 				raise TypeError, 'UNPARSED should contain a list of only strings or nodes, not a %s'  %  ( type( x ), )
 		views = [ _viewItem( x )   for x in value ]
@@ -345,7 +344,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.TupleTarget )
 	def TupleTarget(self, ctx, styleSheet, state, node, targets, trailingSeparator):
-		elementViews = ctx.mapViewEval( targets, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.targetItem() ) )
+		elementViews = ctx.mapPresentFragment( targets, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.targetItem() ) )
 		view = styleSheet.tupleTarget( elementViews, trailingSeparator is not None )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_TARGET,
@@ -353,7 +352,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.ListTarget )
 	def ListTarget(self, ctx, styleSheet, state, node, targets, trailingSeparator):
-		elementViews = ctx.mapViewEval( targets, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.targetItem() ) )
+		elementViews = ctx.mapPresentFragment( targets, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.targetItem() ) )
 		view = styleSheet.listTarget( elementViews, trailingSeparator is not None )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_TARGET,
@@ -374,7 +373,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Tuple literal
 	@ObjectNodeDispatchMethod( Nodes.TupleLiteral )
 	def TupleLiteral(self, ctx, styleSheet, state, node, values, trailingSeparator):
-		elementViews = ctx.mapViewEval( values, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
+		elementViews = ctx.mapPresentFragment( values, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
 		view = styleSheet.tupleLiteral( elementViews, trailingSeparator is not None )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_TUPLE,
@@ -385,7 +384,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# List literal
 	@ObjectNodeDispatchMethod( Nodes.ListLiteral )
 	def ListLiteral(self, ctx, styleSheet, state, node, values, trailingSeparator):
-		elementViews = ctx.mapViewEval( values, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
+		elementViews = ctx.mapPresentFragment( values, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
 		view = styleSheet.listLiteral( elementViews, trailingSeparator is not None )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_LISTDISPLAY,
@@ -396,8 +395,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# List comprehension / generator expression
 	@ObjectNodeDispatchMethod( Nodes.ComprehensionFor )
 	def ComprehensionFor(self, ctx, styleSheet, state, node, target, source):
-		targetView = ctx.viewEval( target, styleSheet.withPythonState( PRECEDENCE_CONTAINER_COMPREHENSIONFOR, self._parser.targetListOrTargetItem() ) )
-		sourceView = ctx.viewEval( source, styleSheet.withPythonState( PRECEDENCE_CONTAINER_COMPREHENSIONFOR, self._parser.oldTupleOrExpression() ) )
+		targetView = ctx.presentFragment( target, styleSheet.withPythonState( PRECEDENCE_CONTAINER_COMPREHENSIONFOR, self._parser.targetListOrTargetItem() ) )
+		sourceView = ctx.presentFragment( source, styleSheet.withPythonState( PRECEDENCE_CONTAINER_COMPREHENSIONFOR, self._parser.oldTupleOrExpression() ) )
 		view = styleSheet.comprehensionFor( targetView, sourceView )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_NONE,
@@ -405,7 +404,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.ComprehensionIf )
 	def ComprehensionIf(self, ctx, styleSheet, state, node, condition):
-		conditionView = ctx.viewEval( condition, styleSheet.withPythonState( PRECEDENCE_CONTAINER_COMPREHENSIONIF, self._parser.oldExpression() ) )
+		conditionView = ctx.presentFragment( condition, styleSheet.withPythonState( PRECEDENCE_CONTAINER_COMPREHENSIONIF, self._parser.oldExpression() ) )
 		view = styleSheet.comprehensionIf( conditionView )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_NONE,
@@ -413,8 +412,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.ListComp )
 	def ListComp(self, ctx, styleSheet, state, node, resultExpr, comprehensionItems):
-		exprView = ctx.viewEval( resultExpr, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
-		itemViews = ctx.mapViewEval( comprehensionItems, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.listCompItem() ) )
+		exprView = ctx.presentFragment( resultExpr, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
+		itemViews = ctx.mapPresentFragment( comprehensionItems, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.listCompItem() ) )
 		view = styleSheet.listComp( exprView, itemViews )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_LISTDISPLAY,
@@ -423,8 +422,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.GeneratorExpr )
 	def GeneratorExpr(self, ctx, styleSheet, state, node, resultExpr, comprehensionItems):
-		exprView = ctx.viewEval( resultExpr, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
-		itemViews = ctx.mapViewEval( comprehensionItems, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.listCompItem() ) )
+		exprView = ctx.presentFragment( resultExpr, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
+		itemViews = ctx.mapPresentFragment( comprehensionItems, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.listCompItem() ) )
 		view = styleSheet.genExpr( exprView, itemViews )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_LISTDISPLAY,
@@ -436,8 +435,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Dictionary literal
 	@ObjectNodeDispatchMethod( Nodes.DictKeyValuePair )
 	def DictKeyValuePair(self, ctx, styleSheet, state, node, key, value):
-		keyView = ctx.viewEval( key, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
-		valueView = ctx.viewEval( value, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
+		keyView = ctx.presentFragment( key, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
+		valueView = ctx.presentFragment( value, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
 		view = styleSheet.dictKeyValuePair( keyView, valueView )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_NONE,
@@ -445,7 +444,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.DictLiteral )
 	def DictLiteral(self, ctx, styleSheet, state, node, values, trailingSeparator):
-		elementViews = ctx.mapViewEval( values, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
+		elementViews = ctx.mapPresentFragment( values, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )
 		view = styleSheet.dictLiteral( elementViews, trailingSeparator is not None )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_DICTDISPLAY,
@@ -455,7 +454,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Yield expression
 	@ObjectNodeDispatchMethod( Nodes.YieldExpr )
 	def YieldExpr(self, ctx, styleSheet, state, node, value):
-		valueView = ctx.viewEval( value, styleSheet.withPythonState( PRECEDENCE_CONTAINER_YIELDEXPR, self._parser.expression() ) )
+		valueView = ctx.presentFragment( value, styleSheet.withPythonState( PRECEDENCE_CONTAINER_YIELDEXPR, self._parser.expression() ) )
 		view = styleSheet.yieldExpr( valueView )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_YIELDEXPR,
@@ -466,7 +465,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Attribute ref
 	@ObjectNodeDispatchMethod( Nodes.AttributeRef )
 	def AttributeRef(self, ctx, styleSheet, state, node, target, name):
-		targetView = ctx.viewEval( target, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ATTRIBUTEREFTARGET, self._parser.expression() ) )
+		targetView = ctx.presentFragment( target, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ATTRIBUTEREFTARGET, self._parser.expression() ) )
 		view = styleSheet.attributeRef( targetView, name )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_ATTR,
@@ -477,8 +476,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Subscript
 	@ObjectNodeDispatchMethod( Nodes.SubscriptSlice )
 	def SubscriptSlice(self, ctx, styleSheet, state, node, lower, upper):
-		lowerView = ctx.viewEval( lower, styleSheet.withPythonState( PRECEDENCE_CONTAINER_SUBSCRIPTINDEX, self._parser.expression() ) )   if lower is not None   else None
-		upperView = ctx.viewEval( upper, styleSheet.withPythonState( PRECEDENCE_CONTAINER_SUBSCRIPTINDEX, self._parser.expression() ) )   if upper is not None   else None
+		lowerView = ctx.presentFragment( lower, styleSheet.withPythonState( PRECEDENCE_CONTAINER_SUBSCRIPTINDEX, self._parser.expression() ) )   if lower is not None   else None
+		upperView = ctx.presentFragment( upper, styleSheet.withPythonState( PRECEDENCE_CONTAINER_SUBSCRIPTINDEX, self._parser.expression() ) )   if upper is not None   else None
 		view = styleSheet.subscriptSlice( lowerView, upperView )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_NONE,
@@ -486,9 +485,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.SubscriptLongSlice )
 	def SubscriptLongSlice(self, ctx, styleSheet, state, node, lower, upper, stride):
-		lowerView = ctx.viewEval( lower, styleSheet.withPythonState( PRECEDENCE_CONTAINER_SUBSCRIPTINDEX, self._parser.expression() ) )   if lower is not None   else None
-		upperView = ctx.viewEval( upper, styleSheet.withPythonState( PRECEDENCE_CONTAINER_SUBSCRIPTINDEX, self._parser.expression() ) )   if upper is not None   else None
-		strideView = ctx.viewEval( stride, styleSheet.withPythonState( PRECEDENCE_CONTAINER_SUBSCRIPTINDEX, self._parser.expression() ) )   if stride is not None   else None
+		lowerView = ctx.presentFragment( lower, styleSheet.withPythonState( PRECEDENCE_CONTAINER_SUBSCRIPTINDEX, self._parser.expression() ) )   if lower is not None   else None
+		upperView = ctx.presentFragment( upper, styleSheet.withPythonState( PRECEDENCE_CONTAINER_SUBSCRIPTINDEX, self._parser.expression() ) )   if upper is not None   else None
+		strideView = ctx.presentFragment( stride, styleSheet.withPythonState( PRECEDENCE_CONTAINER_SUBSCRIPTINDEX, self._parser.expression() ) )   if stride is not None   else None
 		view = styleSheet.subscriptLongSlice( lowerView, upperView, strideView )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_NONE,
@@ -503,7 +502,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.SubscriptTuple )
 	def SubscriptTuple(self, ctx, styleSheet, state, node, values, trailingSeparator):
-		elementViews = ctx.mapViewEval( values, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.subscriptItem() ) )
+		elementViews = ctx.mapPresentFragment( values, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.subscriptItem() ) )
 		view = styleSheet.subscriptTuple( elementViews, trailingSeparator is not None )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_TUPLE,
@@ -511,8 +510,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.Subscript )
 	def Subscript(self, ctx, styleSheet, state, node, target, index):
-		targetView = ctx.viewEval( target, styleSheet.withPythonState( PRECEDENCE_CONTAINER_SUBSCRIPTTARGET, self._parser.expression() ) )
-		indexView = ctx.viewEval( index, styleSheet.withPythonState( PRECEDENCE_CONTAINER_SUBSCRIPTINDEX, self._parser.subscriptIndex() ) )
+		targetView = ctx.presentFragment( target, styleSheet.withPythonState( PRECEDENCE_CONTAINER_SUBSCRIPTTARGET, self._parser.expression() ) )
+		indexView = ctx.presentFragment( index, styleSheet.withPythonState( PRECEDENCE_CONTAINER_SUBSCRIPTINDEX, self._parser.subscriptIndex() ) )
 		view = styleSheet.subscript( targetView, indexView )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_SUBSCRIPT,
@@ -524,7 +523,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Call
 	@ObjectNodeDispatchMethod( Nodes.CallKWArg )
 	def CallKWArg(self, ctx, styleSheet, state, node, name, value):
-		valueView = ctx.viewEval( value, styleSheet.withPythonState( PRECEDENCE_CONTAINER_CALLARG, self._parser.expression() ) )
+		valueView = ctx.presentFragment( value, styleSheet.withPythonState( PRECEDENCE_CONTAINER_CALLARG, self._parser.expression() ) )
 		view = styleSheet.callKWArg( name, valueView )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_NONE,
@@ -532,7 +531,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.CallArgList )
 	def CallArgList(self, ctx, styleSheet, state, node, value):
-		valueView = ctx.viewEval( value, styleSheet.withPythonState( PRECEDENCE_CONTAINER_CALLARG, self._parser.expression() ) )
+		valueView = ctx.presentFragment( value, styleSheet.withPythonState( PRECEDENCE_CONTAINER_CALLARG, self._parser.expression() ) )
 		view = styleSheet.callArgList( valueView )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_NONE,
@@ -540,7 +539,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.CallKWArgList )
 	def CallKWArgList(self, ctx, styleSheet, state, node, value):
-		valueView = ctx.viewEval( value, styleSheet.withPythonState( PRECEDENCE_CONTAINER_CALLARG, self._parser.expression() ) )
+		valueView = ctx.presentFragment( value, styleSheet.withPythonState( PRECEDENCE_CONTAINER_CALLARG, self._parser.expression() ) )
 		view = styleSheet.callKWArgList( valueView )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_NONE,
@@ -548,8 +547,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.Call )
 	def Call(self, ctx, styleSheet, state, node, target, args, argsTrailingSeparator):
-		targetView = ctx.viewEval( target, styleSheet.withPythonState( PRECEDENCE_CONTAINER_CALLTARGET, self._parser.expression() ) )
-		argViews = ctx.mapViewEval( args, styleSheet.withPythonState( PRECEDENCE_CONTAINER_CALLARG, self._parser.callArg() ) )
+		targetView = ctx.presentFragment( target, styleSheet.withPythonState( PRECEDENCE_CONTAINER_CALLTARGET, self._parser.expression() ) )
+		argViews = ctx.mapPresentFragment( args, styleSheet.withPythonState( PRECEDENCE_CONTAINER_CALLARG, self._parser.callArg() ) )
 		view = styleSheet.call( targetView, argViews, argsTrailingSeparator is not None )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_CALL,
@@ -563,8 +562,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod( Nodes.Pow )
 	def Pow(self, ctx, styleSheet, state, node, x, y):
 		xPrec, yPrec = computeBinOpViewPrecedenceValues( PRECEDENCE_POW, True )
-		xView = ctx.viewEval( x, styleSheet.withPythonState( xPrec, self._parser.expression() ) )
-		yView = ctx.viewEval( y, styleSheet.withPythonState( yPrec, self._parser.expression(), PythonEditorStyleSheet.MODE_EDITEXPRESSION ) )
+		xView = ctx.presentFragment( x, styleSheet.withPythonState( xPrec, self._parser.expression() ) )
+		yView = ctx.presentFragment( y, styleSheet.withPythonState( yPrec, self._parser.expression(), PythonEditorStyleSheet.MODE_EDITEXPRESSION ) )
 		view = styleSheet.pow( xView, yView )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_POW,
@@ -591,8 +590,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod( Nodes.Div )
 	def Div(self, ctx, styleSheet, state, node, x, y):
 		xPrec, yPrec = computeBinOpViewPrecedenceValues( PRECEDENCE_MULDIVMOD, False )
-		xView = ctx.viewEval( x, styleSheet.withPythonState( xPrec, self._parser.expression(), PythonEditorStyleSheet.MODE_EDITEXPRESSION ) )
-		yView = ctx.viewEval( y, styleSheet.withPythonState( yPrec, self._parser.expression(), PythonEditorStyleSheet.MODE_EDITEXPRESSION ) )
+		xView = ctx.presentFragment( x, styleSheet.withPythonState( xPrec, self._parser.expression(), PythonEditorStyleSheet.MODE_EDITEXPRESSION ) )
+		yView = ctx.presentFragment( y, styleSheet.withPythonState( yPrec, self._parser.expression(), PythonEditorStyleSheet.MODE_EDITEXPRESSION ) )
 		view = styleSheet.div( xView, yView, '/' )
 		view.setStructuralValueObject( node )
 		return expressionNodeEditor( styleSheet, node,
@@ -637,8 +636,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.Cmp )
 	def Cmp(self, ctx, styleSheet, state, node, x, ops):
-		xView = ctx.viewEval( x, styleSheet.withPythonState( PRECEDENCE_CMP, self._parser.expression() ) )
-		opViews = ctx.mapViewEval( ops, styleSheet.withPythonState( PRECEDENCE_CMP, self._parser.expression() ) )
+		xView = ctx.presentFragment( x, styleSheet.withPythonState( PRECEDENCE_CMP, self._parser.expression() ) )
+		opViews = ctx.mapPresentFragment( ops, styleSheet.withPythonState( PRECEDENCE_CMP, self._parser.expression() ) )
 		view = styleSheet.compare( xView, opViews )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_CMP,
@@ -712,7 +711,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.DefaultValueParam )
 	def DefaultValueParam(self, ctx, styleSheet, state, node, name, defaultValue):
-		valueView = ctx.viewEval( defaultValue, styleSheet.withPythonState( PRECEDENCE_NONE, self._parser.expression() ) )
+		valueView = ctx.presentFragment( defaultValue, styleSheet.withPythonState( PRECEDENCE_NONE, self._parser.expression() ) )
 		view = styleSheet.defaultValueParam( name, valueView )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_NONE,
@@ -746,8 +745,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 		else:
 			exprParser = self._parser.expression()
 
-		exprView = ctx.viewEval( expr, styleSheet.withPythonState( PRECEDENCE_CONTAINER_LAMBDAEXPR, exprParser ) )
-		paramViews = ctx.mapViewEval( params, styleSheet.withPythonState( PRECEDENCE_NONE, self._parser.param() ) )
+		exprView = ctx.presentFragment( expr, styleSheet.withPythonState( PRECEDENCE_CONTAINER_LAMBDAEXPR, exprParser ) )
+		paramViews = ctx.mapPresentFragment( params, styleSheet.withPythonState( PRECEDENCE_NONE, self._parser.param() ) )
 		
 		view = styleSheet.lambdaExpr( paramViews, paramsTrailingSeparator is not None, exprView )
 		return expressionNodeEditor( styleSheet, node,
@@ -759,9 +758,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Conditional expression
 	@ObjectNodeDispatchMethod( Nodes.ConditionalExpr )
 	def ConditionalExpr(self, ctx, styleSheet, state, node, condition, expr, elseExpr):
-		conditionView = ctx.viewEval( condition, styleSheet.withPythonState( PRECEDENCE_CONTAINER_CONDITIONALEXPR, self._parser.orTest() ) )
-		exprView = ctx.viewEval( expr, styleSheet.withPythonState( PRECEDENCE_CONTAINER_CONDITIONALEXPR, self._parser.orTest() ) )
-		elseExprView = ctx.viewEval( elseExpr, styleSheet.withPythonState( PRECEDENCE_CONTAINER_CONDITIONALEXPR, self._parser.expression() ) )
+		conditionView = ctx.presentFragment( condition, styleSheet.withPythonState( PRECEDENCE_CONTAINER_CONDITIONALEXPR, self._parser.orTest() ) )
+		exprView = ctx.presentFragment( expr, styleSheet.withPythonState( PRECEDENCE_CONTAINER_CONDITIONALEXPR, self._parser.orTest() ) )
+		elseExprView = ctx.presentFragment( elseExpr, styleSheet.withPythonState( PRECEDENCE_CONTAINER_CONDITIONALEXPR, self._parser.expression() ) )
 		view = styleSheet.conditionalExpr( conditionView, exprView, elseExprView )
 		return expressionNodeEditor( styleSheet, node,
 			                     PRECEDENCE_CONDITIONAL,
@@ -779,7 +778,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Expression statement
 	@ObjectNodeDispatchMethod( Nodes.ExprStmt )
 	def ExprStmt(self, ctx, styleSheet, state, node, expr):
-		exprView = ctx.viewEval( expr, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )
+		exprView = ctx.presentFragment( expr, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )
 		view = styleSheet.exprStmt( exprView )
 		return statementNodeEditor( styleSheet, node,
 		                            view )
@@ -789,8 +788,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Assert statement
 	@ObjectNodeDispatchMethod( Nodes.AssertStmt )
 	def AssertStmt(self, ctx, styleSheet, state, node, condition, fail):
-		conditionView = ctx.viewEval( condition, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )
-		failView = ctx.viewEval( fail, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )   if fail is not None   else None
+		conditionView = ctx.presentFragment( condition, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )
+		failView = ctx.presentFragment( fail, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )   if fail is not None   else None
 		view = styleSheet.assertStmt( conditionView, failView )
 		return statementNodeEditor( styleSheet, node,
 		                            view )
@@ -799,8 +798,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Assignment statement
 	@ObjectNodeDispatchMethod( Nodes.AssignStmt )
 	def AssignStmt(self, ctx, styleSheet, state, node, targets, value):
-		targetViews = ctx.mapViewEval( targets, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.targetListOrTargetItem() ) )
-		valueView = ctx.viewEval( value, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.tupleOrExpressionOrYieldExpression() ) )
+		targetViews = ctx.mapPresentFragment( targets, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.targetListOrTargetItem() ) )
+		valueView = ctx.presentFragment( value, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.tupleOrExpressionOrYieldExpression() ) )
 		view = styleSheet.assignStmt( targetViews, valueView )
 		return statementNodeEditor( styleSheet, node,
 		                            view )
@@ -809,8 +808,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Augmented assignment statement
 	@ObjectNodeDispatchMethod( Nodes.AugAssignStmt )
 	def AugAssignStmt(self, ctx, styleSheet, state, node, op, target, value):
-		targetView = ctx.viewEval( target, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.targetItem() ) )
-		valueView = ctx.viewEval( value, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.tupleOrExpressionOrYieldExpression() ) )
+		targetView = ctx.presentFragment( target, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.targetItem() ) )
+		valueView = ctx.presentFragment( value, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.tupleOrExpressionOrYieldExpression() ) )
 		view = styleSheet.augAssignStmt( op, targetView, valueView )
 		return statementNodeEditor( styleSheet, node,
 		                            view )
@@ -827,7 +826,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Del statement
 	@ObjectNodeDispatchMethod( Nodes.DelStmt )
 	def DelStmt(self, ctx, styleSheet, state, node, target):
-		targetView = ctx.viewEval( target, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.targetListOrTargetItem() ) )
+		targetView = ctx.presentFragment( target, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.targetListOrTargetItem() ) )
 		view = styleSheet.delStmt( targetView )
 		return statementNodeEditor( styleSheet, node,
 		                            view )
@@ -836,7 +835,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Return statement
 	@ObjectNodeDispatchMethod( Nodes.ReturnStmt )
 	def ReturnStmt(self, ctx, styleSheet, state, node, value):
-		valueView = ctx.viewEval( value, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.tupleOrExpression() ) )
+		valueView = ctx.presentFragment( value, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.tupleOrExpression() ) )
 		view = styleSheet.returnStmt( valueView )
 		return statementNodeEditor( styleSheet, node,
 		                            view )
@@ -845,7 +844,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Yield statement
 	@ObjectNodeDispatchMethod( Nodes.YieldStmt )
 	def YieldStmt(self, ctx, styleSheet, state, node, value):
-		valueView = ctx.viewEval( value, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )
+		valueView = ctx.presentFragment( value, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )
 		view = styleSheet.yieldStmt( valueView )
 		return statementNodeEditor( styleSheet, node,
 		                            view )
@@ -854,9 +853,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Raise statement
 	@ObjectNodeDispatchMethod( Nodes.RaiseStmt )
 	def RaiseStmt(self, ctx, styleSheet, state, node, excType, excValue, traceback):
-		excTypeView = ctx.viewEval( excType, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )   if excType is not None   else None
-		excValueView = ctx.viewEval( excValue, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )   if excValue is not None   else None
-		tracebackView = ctx.viewEval( traceback, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )   if traceback is not None   else None
+		excTypeView = ctx.presentFragment( excType, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )   if excType is not None   else None
+		excValueView = ctx.presentFragment( excValue, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )   if excValue is not None   else None
+		tracebackView = ctx.presentFragment( traceback, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )   if traceback is not None   else None
 		view = styleSheet.raiseStmt( excTypeView, excValueView, tracebackView )
 		return statementNodeEditor( styleSheet, node,
 		                            view )
@@ -911,22 +910,22 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.ImportStmt )
 	def ImportStmt(self, ctx, styleSheet, state, node, modules):
-		moduleViews = ctx.mapViewEval( modules, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.moduleImport() ) )
+		moduleViews = ctx.mapPresentFragment( modules, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.moduleImport() ) )
 		view = styleSheet.importStmt( moduleViews )
 		return statementNodeEditor( styleSheet, node,
 		                            view )
 
 	@ObjectNodeDispatchMethod( Nodes.FromImportStmt )
 	def FromImportStmt(self, ctx, styleSheet, state, node, module, imports):
-		moduleView = ctx.viewEval( module, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.moduleContentImport() ) )
-		importViews = ctx.mapViewEval( imports, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.moduleImport() ) )
+		moduleView = ctx.presentFragment( module, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.moduleContentImport() ) )
+		importViews = ctx.mapPresentFragment( imports, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.moduleImport() ) )
 		view = styleSheet.fromImportStmt( moduleView, importViews )
 		return statementNodeEditor( styleSheet, node,
 		                            view )
 
 	@ObjectNodeDispatchMethod( Nodes.FromImportAllStmt )
 	def FromImportAllStmt(self, ctx, styleSheet, state, node, module):
-		moduleView = ctx.viewEval( module, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.moduleContentImport() ) )
+		moduleView = ctx.presentFragment( module, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.moduleContentImport() ) )
 		view = styleSheet.fromImportAllStmt( moduleView )
 		return statementNodeEditor( styleSheet, node,
 		                            view )
@@ -941,7 +940,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Nodes.GlobalStmt )
 	def GlobalStmt(self, ctx, styleSheet, state, node, vars):
-		varViews = ctx.mapViewEval( vars, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.globalVar() ) )
+		varViews = ctx.mapPresentFragment( vars, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.globalVar() ) )
 		view = styleSheet.globalStmt( varViews )
 		return statementNodeEditor( styleSheet, node,
 		                            view )
@@ -951,9 +950,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Exec statement
 	@ObjectNodeDispatchMethod( Nodes.ExecStmt )
 	def ExecStmt(self, ctx, styleSheet, state, node, source, locals, globals):
-		sourceView = ctx.viewEval( source, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.orOp() ) )
-		localsView = ctx.viewEval( locals, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )   if locals is not None   else None
-		globalsView = ctx.viewEval( globals, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )    if globals is not None   else None
+		sourceView = ctx.presentFragment( source, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.orOp() ) )
+		localsView = ctx.presentFragment( locals, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )   if locals is not None   else None
+		globalsView = ctx.presentFragment( globals, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )    if globals is not None   else None
 		view = styleSheet.execStmt( sourceView, localsView, globalsView )
 		return statementNodeEditor( styleSheet, node,
 		                            view )
@@ -966,8 +965,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Exec statement
 	@ObjectNodeDispatchMethod( Nodes.PrintStmt )
 	def PrintStmt(self, ctx, styleSheet, state, node, destination, values):
-		destView = ctx.viewEval( destination, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.orOp() ) )   if destination is not None   else None
-		valueViews = ctx.mapViewEval( values, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )
+		destView = ctx.presentFragment( destination, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.orOp() ) )   if destination is not None   else None
+		valueViews = ctx.mapPresentFragment( values, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )
 		view = styleSheet.printStmt( destView, valueViews )
 		return statementNodeEditor( styleSheet, node,
 		                            view )
@@ -983,7 +982,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# If statement
 	def _ifStmtHeaderElement(self, ctx, styleSheet, state, condition):
-		conditionView = ctx.viewEval( condition, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )
+		conditionView = ctx.presentFragment( condition, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )
 		return styleSheet.ifStmtHeader( conditionView )
 
 	@ObjectNodeDispatchMethod( Nodes.IfStmtHeader )
@@ -994,7 +993,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Elif statement
 	def _elifStmtHeaderElement(self, ctx, styleSheet, state, condition):
-		conditionView = ctx.viewEval( condition, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )
+		conditionView = ctx.presentFragment( condition, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )
 		return styleSheet.elifStmtHeader( conditionView )
 
 	@ObjectNodeDispatchMethod( Nodes.ElifStmtHeader )
@@ -1016,7 +1015,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# While statement
 	def _whileStmtHeaderElement(self, ctx, styleSheet, state, condition):
-		conditionView = ctx.viewEval( condition, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )
+		conditionView = ctx.presentFragment( condition, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )
 		return styleSheet.whileStmtHeader( conditionView )
 
 	@ObjectNodeDispatchMethod( Nodes.WhileStmtHeader )
@@ -1027,8 +1026,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# For statement
 	def _forStmtHeaderElement(self, ctx, styleSheet, state, target, source):
-		targetView = ctx.viewEval( target, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.targetListOrTargetItem() ) )
-		sourceView = ctx.viewEval( source, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.tupleOrExpression() ) )
+		targetView = ctx.presentFragment( target, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.targetListOrTargetItem() ) )
+		sourceView = ctx.presentFragment( source, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.tupleOrExpression() ) )
 		return styleSheet.forStmtHeader( targetView, sourceView )
 
 	@ObjectNodeDispatchMethod( Nodes.ForStmtHeader )
@@ -1051,8 +1050,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Except statement
 	def _exceptStmtHeaderElement(self, ctx, styleSheet, state, exception, target):
-		excView = ctx.viewEval( exception, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )   if exception is not None   else None
-		targetView = ctx.viewEval( target, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )   if target is not None   else None
+		excView = ctx.presentFragment( exception, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )   if exception is not None   else None
+		targetView = ctx.presentFragment( target, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )   if target is not None   else None
 		return styleSheet.exceptStmtHeader( excView, targetView )
 
 	@ObjectNodeDispatchMethod( Nodes.ExceptStmtHeader )
@@ -1075,8 +1074,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# With statement
 	def _withStmtHeaderElement(self, ctx, styleSheet, state, expr, target):
-		exprView = ctx.viewEval( expr, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )
-		targetView = ctx.viewEval( target, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )   if target is not None   else None
+		exprView = ctx.presentFragment( expr, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )
+		targetView = ctx.presentFragment( target, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )   if target is not None   else None
 		return styleSheet.withStmtHeader( exprView, targetView )
 
 	@ObjectNodeDispatchMethod( Nodes.WithStmtHeader )
@@ -1088,7 +1087,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Decorator statement
 	def _decoStmtHeaderElement(self, ctx, styleSheet, state, name, args, argsTrailingSeparator):
-		argViews = ctx.mapViewEval( args, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.callArg() ) )   if args is not None   else None
+		argViews = ctx.mapPresentFragment( args, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.callArg() ) )   if args is not None   else None
 		return styleSheet.decoStmtHeader( name, argViews, argsTrailingSeparator is not None )
 
 	@ObjectNodeDispatchMethod( Nodes.DecoStmtHeader )
@@ -1100,7 +1099,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Def statement
 	def _defStmtHeaderElement(self, ctx, styleSheet, state, name, params, paramsTrailingSeparator):
-		paramViews = ctx.mapViewEval( params, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.param() ) )
+		paramViews = ctx.mapPresentFragment( params, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.param() ) )
 		return styleSheet.defStmtHeader( name, paramViews, paramsTrailingSeparator is not None )
 
 	@ObjectNodeDispatchMethod( Nodes.DefStmtHeader )
@@ -1113,7 +1112,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Def statement
 	def _classStmtHeaderElement(self, ctx, styleSheet, state, name, bases, basesTrailingSeparator):
-		baseViews = ctx.mapViewEval( bases, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )   if bases is not None   else None
+		baseViews = ctx.mapPresentFragment( bases, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.expression() ) )   if bases is not None   else None
 		return styleSheet.classStmtHeader( name, baseViews, basesTrailingSeparator is not None )
 
 	@ObjectNodeDispatchMethod( Nodes.ClassStmtHeader )
@@ -1138,7 +1137,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		indent = styleSheet.indentElement()
 		indent.setStructuralValueObject( Nodes.Indent() )
 		
-		lineViews = ctx.mapViewEval( suite, styleSheet.withPythonState( PRECEDENCE_NONE, self._parser.singleLineStatement(), PythonEditorStyleSheet.MODE_EDITSTATEMENT ) )
+		lineViews = ctx.mapPresentFragment( suite, styleSheet.withPythonState( PRECEDENCE_NONE, self._parser.singleLineStatement(), PythonEditorStyleSheet.MODE_EDITSTATEMENT ) )
 		
 		dedent = styleSheet.dedentElement()
 		dedent.setStructuralValueObject( Nodes.Dedent() )
@@ -1268,19 +1267,20 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 
 
-def viewPython25DocNodeAsElement(document, docRootNode, resolveContext, page, location, commandHistory, app):
-	viewContext = GSymViewContext( docRootNode, Python25View(), PythonEditorStyleSheet.instance, None, app.getBrowserContext(), page, commandHistory )
-	editHandler = Python25EditHandler( viewContext )
-	region = viewContext.getRegion()
-	region.setEditHandler( editHandler )
-	return region
-
-
-def viewPython25DocNodeAsPage(document, docRootNode, resolveContext, location, commandHistory, app):
-	page = GSymViewPage( 'Python: ' + resolveContext.getTitle(), commandHistory )
-	page.setContentsElement( viewPython25DocNodeAsElement( document, docRootNode, resolveContext, page, location, commandHistory, app ) )
-	return page
-
-
-def resolvePython25Location(currentUnitClass, document, docRootNode, resolveContext, location, app):
-	return GSymResolveResult( document, docRootNode, currentUnitClass, resolveContext, location )
+class Python25EditorPerspective (GSymPerspective):
+	def __init__(self):
+		self._viewFn = Python25View()
+		self._editHandler = Python25EditHandler()
+		
+	
+	
+	def resolveRelativeLocation(self, enclosingSubject, relativeLocation):
+		return enclosingSubject
+	
+	
+	def getFragmentViewFunction(self):
+		return self._viewFn
+	
+	def getEditHandler(self):
+		return self._editHandler
+	

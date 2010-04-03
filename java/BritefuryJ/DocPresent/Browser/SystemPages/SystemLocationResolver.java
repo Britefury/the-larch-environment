@@ -8,7 +8,6 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.util.HashMap;
 
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Browser.LocationResolver;
 import BritefuryJ.DocPresent.Browser.Page;
 
@@ -67,12 +66,6 @@ public class SystemLocationResolver implements LocationResolver
 		{
 			return null;
 		}
-	}
-	
-	public DPElement resolveLocationAsElement(Page page, String location)
-	{
-		Page p = resolveLocationAsPage( location );
-		return p.getContentsElement();
 	}
 	
 	

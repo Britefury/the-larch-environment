@@ -15,8 +15,6 @@ from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeDispatchMethod
 
 from Britefury.gSym.View.GSymView import GSymViewObjectNodeDispatch, GSymViewPage
 from Britefury.gSym.gSymDocument import GSymDocument
-from Britefury.gSym.gSymResolveContext import GSymResolveContext
-from Britefury.gSym.gSymResolveResult import GSymResolveResult
 
 from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replaceNodeContents, append, prepend, insertElement, insertRange, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
 
@@ -26,8 +24,8 @@ from Britefury.Util.NodeUtil import *
 
 from BritefuryJ.DocPresent.StyleSheet import *
 
-from BritefuryJ.GSym.View import GSymViewContext
-
+from BritefuryJ.GSym import GSymPerspective, GSymSubject
+from BritefuryJ.GSym.View import PyGSymViewFragmentFunction
 
 from GSymCore.GSymApp import NodeClasses as Nodes
 from GSymCore.GSymApp.GSymAppViewer.GSymAppViewerStyleSheet import GSymAppViewerStyleSheet
@@ -94,29 +92,95 @@ def _uniqueDocumentLocation(docs, location):
 
 
 
+	# handleNewDocumentFn(unit)
+	def promptNewDocument(self, handleNewDocumentFn):
+		def _make_newDocument(newUnitFn):
+			def newDoc():
+				unit = newUnitFn()
+				handleNewDocumentFn( unit )
+			return newDoc
+		newDocumentMenu = JPopupMenu( 'New document' )
+		for newUnitFactory in self._world.newUnitFactories:
+			newDocumentMenu.add( _action( newUnitFactory.menuLabelText, _make_newDocument( newUnitFactory.newDocumentFn ) ) )
+		pos = self._frame.getMousePosition( True )
+		newDocumentMenu.show( self._frame, pos.x, pos.y )
+	
+		
+		
+	# handleOpenedDocumentFn(fullPath, document)
+	def promptOpenDocument(self, handleOpenedDocumentFn):
+		openDialog = JFileChooser()
+		openDialog.setFileFilter( FileNameExtensionFilter( 'gSym project (*.gsym)', [ 'gsym' ] ) )
+		response = openDialog.showDialog( self._frame, 'Open' )
+		if response == JFileChooser.APPROVE_OPTION:
+			sf = openDialog.getSelectedFile()
+			if sf is not None:
+				filename = sf.getPath()
+				if filename is not None:
+					document = GSymDocument.readFile( self._world, filename )
+					if document is not None:
+						handleOpenedDocumentFn( filename, document )
+	
+	
+	
+	# handleSaveDocumentAsFn(filename)
+	def promptSaveDocumentAs(self, handleSaveDocumentAsFn):
+		filename = None
+		bFinished = False
+		while not bFinished:
+			openDialog = JFileChooser()
+			openDialog.setFileFilter( FileNameExtensionFilter( 'gSym project (*.gsym)', [ 'gsym' ] ) )
+			response = openDialog.showSaveDialog( self._frame )
+			if response == JFileChooser.APPROVE_OPTION:
+				sf = openDialog.getSelectedFile()
+				if sf is not None:
+					filenameFromDialog = sf.getPath()
+					if filenameFromDialog is not None:
+						if os.path.exists( filenameFromDialog ):
+							response = JOptionPane.showOptionDialog( self._frame, 'File already exists. Overwrite?', 'File already exists', JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'Overwrite', 'Cancel' ], 'Cancel' )
+							if response == JFileChooser.APPROVE_OPTION:
+								filename = filenameFromDialog
+								bFinished = True
+							else:
+								bFinished = False
+						else:
+							filename = filenameFromDialog
+							bFinished = True
+					else:
+						bFinished = True
+				else:
+					bFinished = True
+			else:
+				bFinished = True
+
+		if filename is not None:
+			handleSaveDocumentAsFn( filename )
+			return True
+		else:
+			return False
+
+
 class AppView (GSymViewObjectNodeDispatch):
-	def __init__(self, document, app):
-		self._document = document
-		self._app = app
+	def __init__(self, world):
+		self._world = world
 		
 		
 	@ObjectNodeDispatchMethod( Nodes.AppState )
 	def AppState(self, ctx, styleSheet, state, node, openDocuments, configuration):
 		def _onNew():
 			def handleNewDocumentFn(unit):
-				world = self._app.getWorld()
-				
 				name = _newDocumentName( openDocuments )
 				
-				doc = GSymDocument( world, unit )
+				doc = GSymDocument( self._world, unit )
 				doc.setDocumentName( name )
-				location = world.addNewDocument( doc )
+				location = self._world.addNewDocument( doc )
 
 				appDoc = Nodes.AppDocument( name=name, location=location )
 				openDocuments.append( appDoc )
 				
-				
-			self._app.promptNewDocument( handleNewDocumentFn )
+			
+			app = ctx.getViewContext().getBrowserContext().app
+			app.promptNewDocument( handleNewDocumentFn )
 			
 			return True
 		
@@ -124,24 +188,23 @@ class AppView (GSymViewObjectNodeDispatch):
 			
 		def _onOpen():
 			def handleOpenedDocumentFn(fullPath, document):
-				world = self._app.getWorld()
-				
 				head, documentName = os.path.split( fullPath )
 				documentName, ext = os.path.splitext( documentName )
 				
 				document.setDocumentName( documentName )
-				location = world.addNewDocument( document )
+				location = self._world.addNewDocument( document )
 				
 				appDoc = Nodes.AppDocument( name=documentName, location=location )
 				openDocuments.append( appDoc )
 
 				
-			self._app.promptOpenDocument( handleOpenedDocumentFn )
+			app = ctx.getViewContext().getBrowserContext().app
+			app.promptOpenDocument( handleOpenedDocumentFn )
 			
 			return True
 
 		
-		openDocViews = ctx.mapViewEval( openDocuments, styleSheet, _AppViewState( '' ) )
+		openDocViews = ctx.mapPresentFragment( openDocuments, styleSheet, _AppViewState( '' ) )
 		
 		return styleSheet.appState( openDocViews, _onNew, _onOpen )
 
@@ -150,26 +213,26 @@ class AppView (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod( Nodes.AppDocument )
 	def AppDocument(self, ctx, styleSheet, state, node, name, location):
 		def _onSave():
-			world = self._app.getWorld()
-			document = world.getDocument( location )
+			document = self._world.getDocument( location )
 			
 			if document._filename is None:
 				def handleSaveDocumentAsFn(filename):
 					document.saveAs( filename )
 				
-				self._app.promptSaveDocumentAs( handleSaveDocumentAsFn )
+				app = ctx.getViewContext().getBrowserContext().app
+				app.promptSaveDocumentAs( handleSaveDocumentAsFn )
 			else:
 				document.save()
 				
 		
 		def _onSaveAs():
-			world = self._app.getWorld()
-			document = world.getDocument( location )
+			document = self._world.getDocument( location )
 			
 			def handleSaveDocumentAsFn(filename):
 				document.saveAs( filename )
 			
-			self._app.promptSaveDocumentAs( handleSaveDocumentAsFn )
+			app = ctx.getViewContext().getBrowserContext().app
+			app.promptSaveDocumentAs( handleSaveDocumentAsFn )
 
 			
 			
@@ -183,32 +246,34 @@ class AppView (GSymViewObjectNodeDispatch):
 	
 
 
-def viewGSymAppDocNodeAsElement(document, docRootNode, resolveContext, page, location, commandHistory, app):
-	viewContext = GSymViewContext( docRootNode, AppView( document, app ), GSymAppViewerStyleSheet.instance, None, app.getBrowserContext(), page, commandHistory )
-	return viewContext.getRegion()
-
-
-
-def viewGSymAppDocNodeAsPage(document, docRootNode, resolveContext, location, commandHistory, app):
-	page = GSymViewPage( 'gSym', commandHistory )
-	page.setContentsElement( viewGSymAppDocNodeAsElement( document, docRootNode, resolveContext, page, location, commandHistory, app ) )
-	return page
-
-
-
-def resolveGSymAppLocation(currentUnitClass, document, docRootNode, resolveContext, location, app):
-	if location == '':
-		return GSymResolveResult( document, docRootNode, currentUnitClass, GSymAppResolveContext( resolveContext, '' ), location )
-	else:
-		documentLocation, dot, tail = location.partition( '.' )
+class GSymAppViewerPerspective (GSymPerspective):
+	def __init__(self, world):
+		self._world = world
+		self._viewFn = PyGSymViewFragmentFunction( AppView( world ) )
 		
-		doc = app.getWorld().getDocument( documentLocation )
-		
-		if doc is not None:
-			return doc.resolveLocation( GSymAppResolveContext( resolveContext, documentLocation + dot ), tail, app )
+	
+	
+	def resolveRelativeLocation(self, enclosingSubject, relativeLocation):
+		if relativeLocation == '':
+			return enclosingSubject
 		else:
-			return None
-
-
-class GSymAppResolveContext (GSymResolveContext):
-	pass
+			documentLocation, dot, tail = relativeLocation.partition( '.' )
+			
+			doc = self._world.getDocument( documentLocation )
+			
+			if doc is not None:
+				subject = enclosingSubject.enclosedSubjectWithNewDocument( enclosingSubject.getFocus(), self, doc, documentLocation, dot )
+				return doc.resolveRelativeLocation( subject, tail )
+			else:
+				return None
+	
+	
+	def getFragmentViewFunction(self):
+		return self._viewFn
+	
+	def getStyleSheet(self):
+		return GSymAppViewerStyleSheet.instance
+	
+	def getEditHandler(self):
+		return None
+	

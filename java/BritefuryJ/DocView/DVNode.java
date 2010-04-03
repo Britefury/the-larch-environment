@@ -96,7 +96,7 @@ public class DVNode extends IncrementalTreeNode
 	//
 	//
 	
-	public void setElementContext(FragmentContext elementContext)
+	public void setFragmentContext(FragmentContext elementContext)
 	{
 		fragmentElement.setFragmentContext( elementContext );
 	}

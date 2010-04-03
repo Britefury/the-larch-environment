@@ -121,14 +121,14 @@ class SelectionEditLinearRepresentationEvent (SelectionLinearRepresentationEvent
 		
 
 class Python25EditHandler (EditHandler):
-	def __init__(self, viewContext):
-		self._viewContext = viewContext
+	def __init__(self):
 		self._grammar = Python25Grammar()
 		
 		
 			
 	def indent(self, element, context, node):
-		selection = self._viewContext.getSelection()
+		viewContext = context.getViewContext()
+		selection = viewContext.getSelection()
 		
 		if selection.isEmpty():
 			self._indentLine( element, context, node )
@@ -148,7 +148,8 @@ class Python25EditHandler (EditHandler):
 			
 			
 	def dedent(self, element, context, node):
-		selection = self._viewContext.getSelection()
+		viewContext = context.getViewContext()
+		selection = viewContext.getSelection()
 		
 		if selection.isEmpty():
 			self._dedentLine( element, context, node )
@@ -258,13 +259,11 @@ class Python25EditHandler (EditHandler):
 			
 			
 			
-	def deleteSelection(self):
+	def deleteSelection(self, selection):
 		self.replaceSelection( None )
 	
 	
-	def replaceSelection(self, replacement):
-		selection = self._viewContext.getSelection()
-		
+	def replaceSelection(self, selection, replacement):
 		if not selection.isEmpty():
 			startMarker = selection.getStartMarker()
 			endMarker = selection.getEndMarker()
@@ -349,14 +348,12 @@ class Python25EditHandler (EditHandler):
 	
 	
 	
-	def getExportActions(self):					# -> int
+	def getExportActions(self, selection):					# -> int
 		return self.COPY_OR_MOVE
 	
 	
 	
-	def createExportTransferable(self):					# -> Transferable
-		selection = self._viewContext.getSelection()
-		
+	def createExportTransferable(self, selection):					# -> Transferable
 		if not selection.isEmpty():
 			startMarker = selection.getStartMarker()
 			endMarker = selection.getEndMarker()
@@ -393,19 +390,19 @@ class Python25EditHandler (EditHandler):
 				
 				
 				
-	def exportDone(self, transferable, action):				# -> None,   data <- Transferable, action <- int
+	def exportDone(self, selection, transferable, action):				# -> None,   transferable <- Transferable, action <- int
 		if action == self.MOVE:
-			self.deleteSelection()
+			self.deleteSelection( selection )
 		
 			
 			
 
-	def canImport(self, dataTransfer):					# -> bool,   dataTransfer <- DataTransfer
+	def canImport(self, caret, selection, dataTransfer):					# -> bool,   dataTransfer <- DataTransfer
 		return dataTransfer.isDataFlavorSupported( _python25BufferDataFlavor )
 
 		
 		
-	def importData(self, dataTransfer):					# -> bool,   dataTransfer <- DataTransfer
+	def importData(self, caret, selection, dataTransfer):					# -> bool,   dataTransfer <- DataTransfer
 		if not self.canImport( dataTransfer ):
 			return False
 		try:
@@ -416,12 +413,10 @@ class Python25EditHandler (EditHandler):
 			return False
 		
 		# Paste
-		selection = self._viewContext.getSelection()
 		if not selection.isEmpty():
 			self.replaceSelection( data )
 			return True
 		else:
-			caret = self._viewContext.getCaret()
 			caretMarker = caret.getMarker()
 			if caretMarker.isValid():
 				self._insertBufferAtMarker( caretMarker, data )

@@ -93,6 +93,10 @@ class GSymWorld (object):
 	
 
 		
+	def resolveRelativeLocation(self, enclosingSubject, relativeLocation):
+		return self.resolveUnitRelativeLocation( self._unit, enclosingSubject, relativeLocation )
+	
+	
 	def getDocument(self, location):
 		try:
 			return self._locationToDocument[location]
