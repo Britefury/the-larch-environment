@@ -478,12 +478,12 @@ class MainApp (AppControlInterface):
 		
 
 	def _onViewDocModel(self):
-		currentLoc = self._browser.getCurrentBrowserLocation()
+		currentLoc = self._browser.getCurrentBrowserLocation().getLocationString()
 		if currentLoc.startswith( 'model:' ):
 			currentLoc = currentLoc[6:]
 		else:
 			currentLoc = 'model:' + currentLoc
-		self._browser.openLocationInCurrentTab( currentLoc )
+		self._browser.openLocationInCurrentTab( Location( currentLoc ) )
 	
 	
 	def _onShowElementTreeExplorer(self):
