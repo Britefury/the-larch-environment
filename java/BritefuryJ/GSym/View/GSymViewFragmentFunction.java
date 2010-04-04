@@ -6,10 +6,11 @@
 //##************************
 package BritefuryJ.GSym.View;
 
+import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public interface GSymViewFragmentFunction
 {
-	public DPElement createViewFragment(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, Object state);
+	public DPElement createViewFragment(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state);
 }

@@ -6,10 +6,11 @@
 //##************************
 package BritefuryJ.GSym;
 
+import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.Page;
 
 public interface GSymLocationResolver
 {
-	public Page resolveLocationAsPage(String location);
-	GSymSubject resolveLocationAsSubject(String location);
+	public Page resolveLocationAsPage(Location location);
+	GSymSubject resolveLocationAsSubject(Location location);
 }

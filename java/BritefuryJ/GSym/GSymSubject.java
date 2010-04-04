@@ -6,32 +6,23 @@
 //##************************
 package BritefuryJ.GSym;
 
-import BritefuryJ.CommandHistory.CommandHistory;
+import BritefuryJ.AttributeTable.AttributeTable;
 
 public class GSymSubject
 {
-	private GSymSubject enclosingSubject;
 	private Object focus;
 	private GSymPerspective perspective;
-	private CommandHistory commandHistory;
-	private String relativeLocation, locationSeparator;
+	private AttributeTable subjectContext;
+
 	
 	
-	protected GSymSubject(GSymSubject enclosingSubject, Object focus, GSymPerspective perspective, CommandHistory commandHistory, String relativeLocation, String locationSeparator)
+	public GSymSubject(Object focus, GSymPerspective perspective, AttributeTable subjectContext)
 	{
-		this.enclosingSubject = enclosingSubject;
 		this.focus = focus;
 		this.perspective = perspective;
-		this.commandHistory = commandHistory;
-		this.relativeLocation = relativeLocation;
-		this.locationSeparator = locationSeparator;
+		this.subjectContext = subjectContext;
 	}
 	
-	
-	public GSymSubject getEnclosingSubject()
-	{
-		return enclosingSubject;
-	}
 	
 	public Object getFocus()
 	{
@@ -43,62 +34,15 @@ public class GSymSubject
 		return perspective;
 	}
 	
-	public CommandHistory getCommandHistory()
+	public AttributeTable getSubjectContext()
 	{
-		return commandHistory;
-	}
-	
-	public String getRelativeLocation()
-	{
-		return relativeLocation;
-	}
-	
-	public String getLocationSeparator()
-	{
-		return locationSeparator;
-	}
-	
-	
-	public String getLocation()
-	{
-		String enclosingLocation = enclosingSubject != null  ?  enclosingSubject.getLocationForEnclosedSubject()  :  "";
-		return enclosingLocation + relativeLocation;
-	}
-	
-	
-	private String getLocationForEnclosedSubject()
-	{
-		String enclosingLocation = enclosingSubject != null  ?  enclosingSubject.getLocationForEnclosedSubject()  :  "";
-		return enclosingLocation + relativeLocation + locationSeparator;
+		return subjectContext;
 	}
 	
 	
 	
 	public GSymSubject withFocusAndPerspective(Object focus, GSymPerspective perspective)
 	{
-		return new GSymSubject( enclosingSubject, focus, perspective, commandHistory, relativeLocation, locationSeparator );
+		return new GSymSubject( focus, perspective, subjectContext );
 	}
-	
-	public GSymSubject withPerspective(GSymPerspective perspective)
-	{
-		return new GSymSubject( enclosingSubject, focus, perspective, commandHistory, relativeLocation, locationSeparator );
-	}
-	
-	public GSymSubject enclosedSubject(Object focus, GSymPerspective perspective, String relativeLocation, String locationSeparator)
-	{
-		return new GSymSubject( this, focus, perspective, commandHistory, relativeLocation, locationSeparator );
-	}
-	
-	public GSymSubject enclosedSubjectWithNewCommandHistory(Object focus, GSymPerspective perspective, CommandHistory commandHistory, String relativeLocation, String locationSeparator)
-	{
-		return new GSymSubject( this, focus, perspective, commandHistory, relativeLocation, locationSeparator );
-	}
-	
-	
-	
-	public static GSymSubject rootSubject(Object focus, GSymPerspective perspective, CommandHistory commandHistory, String relativeLocation, String locationSeparator)
-	{
-		return new GSymSubject( null, focus, perspective, commandHistory, relativeLocation, locationSeparator );
-	}
-	
 }

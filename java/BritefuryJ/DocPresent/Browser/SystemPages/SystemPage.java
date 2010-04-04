@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.Page;
 import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
@@ -26,14 +27,9 @@ public abstract class SystemPage extends Page
 		SystemLocationResolver.getSystemResolver().registerPage( systemLocation, this );
 	}
 	
-	protected String getSystemLocation()
+	protected Location getLocation()
 	{
-		return systemLocation;
-	}
-	
-	protected String getLocation()
-	{
-		return SystemLocationResolver.systemLocationToLocation( systemLocation );
+		return new Location( SystemLocationResolver.systemLocationToLocation( systemLocation ) );
 	}
 	
 	

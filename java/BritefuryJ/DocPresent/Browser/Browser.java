@@ -60,7 +60,7 @@ public class Browser
 	
 	
 	
-	public Browser(BrowserContext context, String location, PageController pageController)
+	public Browser(BrowserContext context, Location location, PageController pageController)
 	{
 		this.context = context;
 		history = new BrowserHistory( location );
@@ -81,7 +81,7 @@ public class Browser
 		
 		JLabel locationLabel = new JLabel( "Location:" );
 		locationLabel.setBorder( BorderFactory.createEmptyBorder( 0, 5, 0, 10 ) );
-		locationField = new JTextField( location );
+		locationField = new JTextField( location.getLocationString() );
 		locationField.setMaximumSize( new Dimension( locationField.getMaximumSize().width, locationField.getMinimumSize().height ) );
 		locationField.setBorder( BorderFactory.createLineBorder( Color.black, 1 ) );
 		locationField.setDragEnabled( true );
@@ -132,14 +132,14 @@ public class Browser
 	
 	
 	
-	public String getLocation()
+	public Location getLocation()
 	{
 		return history.getCurrentState().getLocation();
 	}
 	
-	public void goToLocation(String location)
+	public void goToLocation(Location location)
 	{
-		locationField.setText( location );
+		locationField.setText( location.getLocationString() );
 		setLocation( location );
 	}
 	
@@ -176,11 +176,11 @@ public class Browser
 	
 
 	
-	public void reset(String location)
+	public void reset(Location location)
 	{
 		history.visit( location );
 		history.clear();
-		locationField.setText( location );
+		locationField.setText( location.getLocationString() );
 		viewportReset();
 		resolve();
 	}
@@ -212,8 +212,8 @@ public class Browser
 		if ( history.canGoBack() )
 		{
 			history.back();
-			String location = history.getCurrentState().getLocation();
-			locationField.setText( location );
+			Location location = history.getCurrentState().getLocation();
+			locationField.setText( location.getLocationString() );
 			resolve();
 		}
 	}
@@ -223,8 +223,8 @@ public class Browser
 		if ( history.canGoForward() )
 		{
 			history.forward();
-			String location = history.getCurrentState().getLocation();
-			locationField.setText( location );
+			Location location = history.getCurrentState().getLocation();
+			locationField.setText( location.getLocationString() );
 			resolve();
 		}
 	}
@@ -235,7 +235,7 @@ public class Browser
 	private void resolve()
 	{
 		// Get the location to resolve
-		String location = history.getCurrentState().getLocation();
+		Location location = history.getCurrentState().getLocation();
 		
 		Page p = context.resolveLocationAsPage( location );
 		
@@ -290,7 +290,7 @@ public class Browser
 	
 	
 	
-	private void setLocation(String location)
+	private void setLocation(Location location)
 	{
 		history.visit( location );
 		resolve();
@@ -299,7 +299,7 @@ public class Browser
 	
 	private void onLocationField(String location)
 	{
-		setLocation( location );
+		setLocation( new Location( location ) );
 	}
 
 

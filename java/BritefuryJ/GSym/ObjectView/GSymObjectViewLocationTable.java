@@ -10,11 +10,14 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.WeakHashMap;
 
+import BritefuryJ.DocPresent.Browser.Location;
+
 public class GSymObjectViewLocationTable
 {
 	private WeakHashMap<Object, String> objectToLocation = new WeakHashMap<Object, String>();
 	private HashMap<String, WeakReference<Object>> locationToObject = new HashMap<String, WeakReference<Object>>();
-	int objectCount = 1;
+	private int objectCount = 1;
+	
 	
 	
 	public GSymObjectViewLocationTable()
@@ -22,7 +25,7 @@ public class GSymObjectViewLocationTable
 	}
 	
 	
-	public String getLocationForObject(Object x)
+	public Location getLocationForObject(Object x)
 	{
 		String location = objectToLocation.get( x );
 		if ( location == null )
@@ -30,12 +33,13 @@ public class GSymObjectViewLocationTable
 			location = "$object/" + x.getClass().getName() + objectCount++;
 			objectToLocation.put( x, location );
 		}
-		return location;
+		return new Location( location );
 	}
 	
-	public Object getObjectAtLocation(String location)
+	public Object getObjectAtLocation(Location.TokenIterator location)
 	{
-		WeakReference<Object> ref = locationToObject.get( location );
+		String loc = location.getSuffix();
+		WeakReference<Object> ref = locationToObject.get( loc );
 		if ( ref != null )
 		{
 			Object x = ref.get();

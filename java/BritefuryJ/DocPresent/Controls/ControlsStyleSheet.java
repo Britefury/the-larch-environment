@@ -14,13 +14,14 @@ import java.util.Arrays;
 
 import org.python.core.PyObject;
 
+import BritefuryJ.AttributeTable.AttributeValues;
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.StyleSheet.AttributeValues;
+import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
@@ -258,7 +259,7 @@ public class ControlsStyleSheet extends StyleSheet
 	
 	
 	
-	public Hyperlink link(String txt, String targetLocation)
+	public Hyperlink link(String txt, Location targetLocation)
 	{
 		DPText element = getLinkStyleSheet().staticText( txt );
 		return new Hyperlink( element, targetLocation );

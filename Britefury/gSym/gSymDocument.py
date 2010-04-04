@@ -75,34 +75,6 @@ def gSymUnit_getContent(unit):
 
 
 
-class GSymDocSubject (GSymSubject):
-	def __init__(self, enclosingSubject, focus, perspective, document, relativeLocation, locationSeparator):
-		super( GSymDocSubject, self ).__init__( enclosingSubject, focus, perspective, document.getCommandHistory(), relativeLocation, locationSeparator )
-		self._document = document
-		
-		
-	def getDocument(self):
-		return self._document
-		
-		
-	def withFocusAndPerspective(self, focus, perspective):
-		return GSymDocSubject( self.getEnclosingSubject(), focus, perspective, self._document, self.getRelativeLocation(), self.getLocationSeparator() )
-	
-	def withPerspective(self, perspective):
-		return GSymDocSubject( self.getEnclosingSubject(), self.getFocus(), perspective, self._document, self.getRelativeLocation(), self.getLocationSeparator() )
-	
-	def enclosedSubject(self, focus, perspective, relativeLocation, locationSeparator):
-		return GSymDocSubject( self, focus, perspective, self._document, relativeLocation, locationSeparator )
-
-	def enclosedSubjectWithNewDocument(self, focus, perspective, document, relativeLocation, locationSeparator):
-		return GSymDocSubject( self, focus, perspective, document, relativeLocation, locationSeparator )
-	
-	@staticmethod
-	def rootSubject(focus, perspective, document, relativeLocation, locationSeparator):
-		return GSymDocSubject( None, focus, perspective, document, relativeLocation, locationSeparator )
-	
-
-
 class GSymDocument (CommandHistoryListener):
 	def __init__(self, world, unit):
 		self._world = world
@@ -129,6 +101,10 @@ class GSymDocument (CommandHistoryListener):
 	
 	def getSaveTime(self):
 		return self._saveTime
+	
+	
+	def getWorld(self):
+		return self._world
 	
 	
 	def getDocumentName(self):

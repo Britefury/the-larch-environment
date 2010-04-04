@@ -10,6 +10,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.PageController;
+import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Input.Modifier;
 
@@ -22,10 +23,10 @@ public class Hyperlink extends Control
 	
 	private static class LinkTargetListener implements LinkListener
 	{
-		private String targetLocation;
+		private Location targetLocation;
 		
 		
-		public LinkTargetListener(String targetLocation)
+		public LinkTargetListener(Location targetLocation)
 		{
 			this.targetLocation = targetLocation;
 		}
@@ -95,7 +96,7 @@ public class Hyperlink extends Control
 		this.element.addInteractor( new LinkInteractor() );
 	}
 	
-	protected Hyperlink(DPText element, String targetLocation)
+	protected Hyperlink(DPText element, Location targetLocation)
 	{
 		this( element, new LinkTargetListener( targetLocation ) );
 	}

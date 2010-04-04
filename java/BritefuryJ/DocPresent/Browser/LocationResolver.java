@@ -9,5 +9,5 @@ package BritefuryJ.DocPresent.Browser;
 
 public interface LocationResolver
 {
-	public Page resolveLocationAsPage(String location);
+	public Page resolveLocationAsPage(Location location);
 }

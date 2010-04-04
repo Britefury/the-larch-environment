@@ -8,6 +8,7 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.util.HashMap;
 
+import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.LocationResolver;
 import BritefuryJ.DocPresent.Browser.Page;
 
@@ -51,15 +52,18 @@ public class SystemLocationResolver implements LocationResolver
 
 	
 	
-	public Page resolveLocationAsPage(String location)
+	public Page resolveLocationAsPage(Location location)
 	{
+		Location.TokenIterator iter = location.iterator();
 		if ( location.equals( rootLocation ) )
 		{
 			return rootPage;
 		}
-		else if ( location.startsWith( prefix ) )
+		
+		Location.TokenIterator iterAfterPrefix = iter.consumeLiteral( prefix );
+		if ( iterAfterPrefix != null )
 		{
-			String systemLocation = location.substring( prefix.length() );
+			String systemLocation = iterAfterPrefix.getSuffix();
 			return pages.get( systemLocation );
 		}
 		else

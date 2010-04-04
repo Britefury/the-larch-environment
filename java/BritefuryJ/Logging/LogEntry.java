@@ -9,6 +9,7 @@ package BritefuryJ.Logging;
 import java.util.ArrayList;
 import java.util.List;
 
+import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.ObjectView.ObjectViewContextList;
@@ -46,7 +47,7 @@ public class LogEntry implements Presentable, ObjectViewContextList.ContextListL
 
 
 
-	public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, Object state)
+	public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
 	{
 		if ( objectViewContexts == null )
 		{

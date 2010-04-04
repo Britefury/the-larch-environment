@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.ListView.ListViewStyleSheet;
@@ -103,7 +104,7 @@ public class DocModelPresenter
 
 
 	
-	private static DPElement present(Object x, GSymFragmentViewContext ctx, PrimitiveStyleSheet styleSheet, Object state)
+	private static DPElement present(Object x, GSymFragmentViewContext ctx, PrimitiveStyleSheet styleSheet, AttributeTable state)
 	{
 		if ( x instanceof String )
 		{
@@ -115,7 +116,7 @@ public class DocModelPresenter
 		}
 	}
 	
-	protected static DPElement presentDMList(DMList node, GSymFragmentViewContext ctx, PrimitiveStyleSheet styleSheet, Object state)
+	protected static DPElement presentDMList(DMList node, GSymFragmentViewContext ctx, PrimitiveStyleSheet styleSheet, AttributeTable state)
 	{
 		List<DPElement> xViews = new ArrayList<DPElement>();
 		for (Object x: node)
@@ -143,7 +144,7 @@ public class DocModelPresenter
 	}
 	
 	
-	protected static DPElement presentDMObject(DMObject node, GSymFragmentViewContext ctx, PrimitiveStyleSheet styleSheet, Object state)
+	protected static DPElement presentDMObject(DMObject node, GSymFragmentViewContext ctx, PrimitiveStyleSheet styleSheet, AttributeTable state)
 	{
 		DMObjectClass cls = node.getDMObjectClass();
 		

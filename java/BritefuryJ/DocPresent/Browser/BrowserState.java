@@ -10,17 +10,17 @@ import BritefuryJ.DocPresent.DPPresentationArea;
 
 class BrowserState
 {
-	private String location;
+	private Location location;
 	private DPPresentationArea.ViewTransformation viewXform;
 	
 	
-	public BrowserState(String location)
+	public BrowserState(Location location)
 	{
 		this.location = location;
 		this.viewXform = new DPPresentationArea.ViewTransformation();
 	}
 	
-	public String getLocation()
+	public Location getLocation()
 	{
 		return location;
 	}
