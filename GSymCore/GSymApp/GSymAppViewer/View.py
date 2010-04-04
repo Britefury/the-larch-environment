@@ -183,16 +183,17 @@ class GSymAppViewerPerspective (GSymPerspective):
 			return enclosingSubject
 		else:
 			iterAfterDocName = locationIterator.consumeRegex( _docNameRegex )
-			documentName = iterAfterDocName.lastToken()
+			if iterAfterDocName is not None:
+				documentName = iterAfterDocName.lastToken()
+					
+				world = enclosingSubject.getSubjectContext()['document'].getWorld()
+				doc = world.getDocument( documentName )
 				
-			world = enclosingSubject.getSubjectContext()['document'].getWorld()
-			doc = world.getDocument( documentName )
-			
-			if doc is not None:
-				subject = GSymSubject( doc, self, enclosingSubject.getSubjectContext().withAttrs( document=doc, location=iterAfterDocName.getPrefix() ) )
-				return doc.resolveRelativeLocation( subject, iterAfterDocName )
-			else:
-				return None
+				if doc is not None:
+					subject = GSymSubject( doc, self, enclosingSubject.getSubjectContext().withAttrs( document=doc, location=iterAfterDocName.getPrefix() ) )
+					return doc.resolveRelativeLocation( subject, iterAfterDocName )
+
+			return None
 	
 	
 	def getFragmentViewFunction(self):

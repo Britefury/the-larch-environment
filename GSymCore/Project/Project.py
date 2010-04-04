@@ -19,9 +19,7 @@ def newProject():
 
 
 
-def createUnitClass(world):
-	perspective = ProjectEditorPerspective( world )
-	return GSymUnitClass( Nodes.schema, perspective )
+unitClass = GSymUnitClass( Nodes.schema, ProjectEditorPerspective() )
 
 
 newUnitFactory = GSymUnitFactory( 'gSym Document', newProject )

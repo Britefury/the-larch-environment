@@ -14,6 +14,7 @@ from BritefuryJ.DocPresent.StyleSheet import *
 from BritefuryJ.DocPresent.Controls import *
 from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.Painter import *
+from BritefuryJ.DocPresent.Browser import Location
 
 from GSymCore.Utils.LinkHeader import LinkHeaderStyleSheet
 from GSymCore.Utils.Title import TitleBarStyleSheet
@@ -93,7 +94,7 @@ class ProjectEditorStyleSheet (StyleSheet):
 		projectControlsStyle = self.projectControlsStyle()
 
 		
-		homeLink = controlsStyle.link( 'HOME PAGE', '' ).getElement()
+		homeLink = controlsStyle.link( 'HOME PAGE', Location( '' ) ).getElement()
 		linkHeader = self['linkHeaderStyle'].linkHeaderBar( [ homeLink ] )
 		
 		title = self['titleBarStyle'].titleBarWithHeader( 'DOCUMENT', projectName )

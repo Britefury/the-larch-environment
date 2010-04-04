@@ -9,6 +9,8 @@ import os
 
 from java.awt.event import KeyEvent
 
+from java.util.regex import Pattern
+
 from javax.swing import JPopupMenu
 
 from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeDispatchMethod
@@ -21,10 +23,12 @@ from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replac
 from Britefury.Util.NodeUtil import *
 
 
+from BritefuryJ.DocPresent.Browser import Location
 from BritefuryJ.DocPresent.StyleSheet import PrimitiveStyleSheet
 from BritefuryJ.DocPresent import *
 
 from BritefuryJ.GSym import GSymPerspective, GSymSubject
+from BritefuryJ.GSym.View import PyGSymViewFragmentFunction
 
 
 from GSymCore.Project import NodeClasses as Nodes
@@ -39,21 +43,11 @@ def _ProjectViewState(location):
 
 
 def _joinLocation(*xs):
-	loc = ''
-	for x in xs:
-		if x != '':
-			if loc != '':
-				loc += '.'
-			loc += x
-	return loc
+	s = '.'.join( [ str( x )   for x in xs ] )
+	return Location( s )
 
 
 class ProjectView (GSymViewObjectNodeDispatch):
-	def __init__(self, document, resolveContext):
-		self._document = document
-		self._resolveContext = resolveContext
-		
-		
 	@ObjectNodeDispatchMethod( Nodes.Project )
 	def Project(self, ctx, styleSheet, state, node, rootPackage):
 		def _onSave(link, buttonEvent):
@@ -77,11 +71,13 @@ class ProjectView (GSymViewObjectNodeDispatch):
 			return  True
 		
 		
-		document = self._document
+		subjectContext = ctx.getSubjectContext()
+		document = subjectContext['document']
+		location = subjectContext['location']
 		
 		name = document.getDocumentName()
 		
-		state = _ProjectViewState( self._resolveContext.location )
+		state = state.withAttrs( location=location )
 		rootView = ctx.presentFragment( rootPackage, styleSheet, state ).alignHExpand()
 
 		return styleSheet.project( name, rootView, _onSave, _onSaveAs )
@@ -104,10 +100,10 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		def _addPackage():
 			contents.append( Nodes.Package( name='New package', contents=[] ) )
 
-		location, = state
+		location = state['location']
 		packageLocation = _joinLocation( location, name )
 		
-		items = ctx.mapPresentFragment( contents, styleSheet, _ProjectViewState( packageLocation ) )
+		items = ctx.mapPresentFragment( contents, styleSheet, state.withAttrs( location=packageLocation ) )
 			
 		app = ctx.getViewContext().getBrowserContext().app
 		return styleSheet.package( name, packageLocation, items, _packageRename, app, _addPage, _importPage, _addPackage )
@@ -120,7 +116,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		def _pageRename(newName):
 			node['name'] = newName
 		
-		location, = state
+		location = state['location']
 		pageLocation = _joinLocation( location, name )
 		
 		return styleSheet.page( name, pageLocation, _pageRename )
@@ -171,55 +167,55 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		#return None
 
 
+_nameRegex = Pattern.compile( '[a-zA-Z_ ][a-zA-Z0-9_ ]*', 0 )
 
 	
 class ProjectEditorPerspective (GSymPerspective):
-	def __init__(self, world):
-		#self._viewFn = ProjectView( world )
-		self._viewFn = None
-		self._world = world
+	def __init__(self):
+		self._viewFn = PyGSymViewFragmentFunction( ProjectView() )
 		
 	
 	
-	def resolveRelativeLocation(self, enclosingSubject, relativeLocation):
-		if relativeLocation == '':
+	def resolveRelativeLocation(self, enclosingSubject, locationIterator):
+		if locationIterator.getSuffix() == '':
 			return enclosingSubject
 		else:
 			# Attempt to enter the root package
 			docRootNode = enclosingSubject.getFocus()
-			rootPackagePrefix = docRootNode['rootPackage']['name'] + '.'
-			if location.startswith( rootPackagePrefix ):
-				locationPrefix = rootPackagePrefix[:-1]
-				loc = location[len(rootPackagePrefix):]
+			rootPackagePrefix = docRootNode['rootPackage']['name']
+			iterAfterPackagePrefix = locationIterator.consumeLiteral( '.' + rootPackagePrefix )
+			if iterAfterPackagePrefix is not None:
+				locationIterator = iterAfterPackagePrefix
 				package = docRootNode['rootPackage']
 			else:
+				print 'No root package'
 				return None
 			
-			while loc != '':
-				try:
-					separatorPos = loc.index( '.' )
-					name = loc[:separatorPos]
-					loc = loc[separatorPos+1:]
-					locationPrefix += '.' + name
-				except ValueError:
-					separatorPos = len( loc )
-					name = loc
-					loc = ''
-					locationPrefix += '.' + name
+			while locationIterator.getSuffix() != '':
+				iterAfterDot = locationIterator.consumeLiteral( '.' )
+				name = None
+				if iterAfterDot is not None:
+					iterAfterName = iterAfterDot.consumeRegex( _nameRegex )
+					if iterAfterName is not None:
+						name = iterAfterName.lastToken()
+						locationIterator = iterAfterName
+
 				node = None
-				for n in package['contents']:
-					if n['name'] == name:
-						node = n
-						break
+				if name is not None:
+					for n in package['contents']:
+						if n['name'] == name:
+							node = n
+							break
 				if node is None:
 					return None
 				elif isinstance( node, DMObjectInterface ):
+					print 'Found a node named ' + name
 					if node.isInstanceOf( Nodes.Package ):
 						package = node
 					elif node.isInstanceOf( Nodes.Page ):
-						subject = enclosingSubject.enclosedSubject( node, self, locationPrefix, '.' )
-						document = enclosingSubject.getDocument()
-						return document.resolveRelativeUnitLocation( node['unit'], subject, loc )
+						subject = GSymSubject( node, self, enclosingSubject.getSubjectContext().withAttrs( location=locationIterator.getPrefix() ) )
+						document = enclosingSubject.getSubjectContext()['document']
+						return document.resolveUnitRelativeLocation( node['unit'], subject, locationIterator )
 					else:
 						return None
 				else:
