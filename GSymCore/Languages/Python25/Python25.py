@@ -24,7 +24,7 @@ def _py25ImportFile(filename):
 
 
 
-unitClass = GSymUnitClass( Nodes.schema, Python25EditorPerspective )
+unitClass = GSymUnitClass( Nodes.schema, Python25EditorPerspective() )
 unitClass.registerCodeGeneratorFactory( 'ascii', Python25CodeGenerator )
 
 

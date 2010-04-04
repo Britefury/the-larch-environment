@@ -40,8 +40,8 @@ from Britefury.Util.NodeUtil import *
 from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent import *
 
-from BritefuryJ.GSym.View import GSymViewContext
 from BritefuryJ.GSym import GSymPerspective, GSymSubject
+from BritefuryJ.GSym.View import PyGSymViewFragmentFunction
 
 
 
@@ -1269,17 +1269,20 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 class Python25EditorPerspective (GSymPerspective):
 	def __init__(self):
-		self._viewFn = Python25View()
+		self._viewFn = PyGSymViewFragmentFunction( Python25View() )
 		self._editHandler = Python25EditHandler()
 		
 	
 	
-	def resolveRelativeLocation(self, enclosingSubject, relativeLocation):
+	def resolveRelativeLocation(self, enclosingSubject, locationIterator):
 		return enclosingSubject
 	
 	
 	def getFragmentViewFunction(self):
 		return self._viewFn
+	
+	def getStyleSheet(self):
+		return PythonEditorStyleSheet.instance
 	
 	def getEditHandler(self):
 		return self._editHandler

@@ -116,6 +116,11 @@ public class Location
 		return new Location( locationString + x );
 	}
 	
+	public Location __add__(Location x)
+	{
+		return new Location( locationString + x.locationString );
+	}
+	
 	public Location join(String x)
 	{
 		return new Location( locationString + x );

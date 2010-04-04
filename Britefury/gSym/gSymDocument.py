@@ -129,14 +129,14 @@ class GSymDocument (CommandHistoryListener):
 		
 	
 	
-	def resolveRelativeLocation(self, enclosingSubject, relativeLocation):
-		return self.resolveUnitRelativeLocation( self._unit, enclosingSubject, relativeLocation )
+	def resolveRelativeLocation(self, enclosingSubject, locationIterator):
+		return self.resolveUnitRelativeLocation( self._unit, enclosingSubject, locationIterator )
 	
-	def resolveUnitRelativeLocation(self, unit, enclosingSubject, relativeLocation):
+	def resolveUnitRelativeLocation(self, unit, enclosingSubject, locationIterator):
 		unitClass = self._world.getUnitClass( gSymUnit_getSchemaLocation( unit ) )
 		perspective = unitClass.getUnitPerspective()
 		subject = enclosingSubject.withFocusAndPerspective( gSymUnit_getContent( unit ), perspective )
-		return perspective.resolveRelativeLocation( subject, relativeLocation )
+		return perspective.resolveRelativeLocation( subject, locationIterator )
 		
 	
 	
