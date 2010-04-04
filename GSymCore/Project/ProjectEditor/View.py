@@ -209,7 +209,6 @@ class ProjectEditorPerspective (GSymPerspective):
 				if node is None:
 					return None
 				elif isinstance( node, DMObjectInterface ):
-					print 'Found a node named ' + name
 					if node.isInstanceOf( Nodes.Package ):
 						package = node
 					elif node.isInstanceOf( Nodes.Page ):

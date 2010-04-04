@@ -41,6 +41,11 @@ public class GSymSubject
 	
 	
 	
+	public GSymSubject withPerspective(GSymPerspective perspective)
+	{
+		return new GSymSubject( focus, perspective, subjectContext );
+	}
+	
 	public GSymSubject withFocusAndPerspective(Object focus, GSymPerspective perspective)
 	{
 		return new GSymSubject( focus, perspective, subjectContext );
