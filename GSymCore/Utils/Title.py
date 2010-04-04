@@ -7,6 +7,7 @@
 ##-*************************
 from java.awt import Font, Color
 
+from BritefuryJ.AttributeTable import *
 from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.StyleSheet import *
 
@@ -20,7 +21,7 @@ class TitleBarStyleSheet (StyleSheet):
 			self.headerStyle = headerStyle
 			self.titleBorderWidth = titleBorderWidth
 	
-	@StyleSheetDerivedPyAttrFn
+	@AttributeTableDerivedPyAttrFn
 	def _params(self):
 		primitiveStyle = self['primitiveStyle']
 		tpad = self['titlePadding']

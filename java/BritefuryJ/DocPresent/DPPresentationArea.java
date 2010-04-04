@@ -46,6 +46,7 @@ import javax.swing.TransferHandler;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Caret.CaretListener;
 import BritefuryJ.DocPresent.Clipboard.DataTransfer;
@@ -124,7 +125,7 @@ public class DPPresentationArea extends DPRegion implements CaretListener, Selec
 		}
 		
 		
-		public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, Object state)
+		public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
 		{
 			super.present( ctx, styleSheet, state );
 			

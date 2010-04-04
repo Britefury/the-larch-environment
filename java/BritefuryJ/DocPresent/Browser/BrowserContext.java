@@ -41,7 +41,7 @@ public class BrowserContext
 	}
 	
 	
-	public Page resolveLocationAsPage(String location)
+	public Page resolveLocationAsPage(Location location)
 	{
 		for (LocationResolver resolver: resolvers)
 		{
@@ -52,7 +52,7 @@ public class BrowserContext
 			}
 		}
 		
-		if ( location.equals( "" ) )
+		if ( location.getLocationString().equals( "" ) )
 		{
 			return defaultRootPage;
 		}
@@ -96,9 +96,9 @@ public class BrowserContext
 	{
 		private String location;
 		
-		public ResolveErrorPage(String location)
+		public ResolveErrorPage(Location location)
 		{
-			this.location = location;
+			this.location = location.getLocationString();
 		}
 		
 		

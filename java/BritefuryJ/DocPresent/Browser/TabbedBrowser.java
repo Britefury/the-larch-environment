@@ -190,7 +190,7 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	
 	public static interface TabbedBrowserListener
 	{
-		public void createNewBrowserWindow(String location);
+		public void createNewBrowserWindow(Location location);
 	}
 	
 	
@@ -211,7 +211,7 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	
 	
 	
-	public TabbedBrowser(BrowserContext context, TabbedBrowserListener listener, String location)
+	public TabbedBrowser(BrowserContext context, TabbedBrowserListener listener, Location location)
 	{
 		this.context = context;
 		this.listener = listener;
@@ -252,7 +252,7 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	
 
 	
-	public void reset(String location)
+	public void reset(Location location)
 	{
 		browsers.clear();
 		browsers.add( currentBrowser );
@@ -303,7 +303,7 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	
 	
 	
-	private Browser createBrowser(String location)
+	private Browser createBrowser(Location location)
 	{
 		Browser browser = new Browser( context, location, this );
 		browser.setListener( this );
@@ -340,12 +340,12 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 
 
 
-	public String getCurrentBrowserLocation()
+	public Location getCurrentBrowserLocation()
 	{
 		return currentBrowser.getLocation();
 	}
 	
-	public void openLocation(String location, OpenOperation op)
+	public void openLocation(Location location, OpenOperation op)
 	{
 		if ( op == PageController.OpenOperation.OPEN_IN_CURRENT_TAB )
 		{
@@ -361,17 +361,17 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 		}
 	}
 	
-	public void openLocationInCurrentTab(String location)
+	public void openLocationInCurrentTab(Location location)
 	{
 		currentBrowser.goToLocation( location );
 	}
 	
-	public void openLocationInNewTab(String location)
+	public void openLocationInNewTab(Location location)
 	{
 		addNewBrowser( location );
 	}
 	
-	public void openLocationInNewWindow(String location)
+	public void openLocationInNewWindow(Location location)
 	{
 		if ( listener != null )
 		{
@@ -385,7 +385,7 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	
 	
 	
-	private Browser addNewBrowser(String location)
+	private Browser addNewBrowser(Location location)
 	{
 		int index = browsers.size();
 

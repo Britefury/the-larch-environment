@@ -7,6 +7,7 @@
 ##-*************************
 from java.awt import Font, Color, BasicStroke
 
+from BritefuryJ.AttributeTable import *
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent.StyleSheet import *
@@ -72,15 +73,15 @@ class ProjectEditorStyleSheet (StyleSheet):
 	
 	
 	
-	@StyleSheetDerivedPyAttrFn
+	@AttributeTableDerivedPyAttrFn
 	def projectControlsStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['projectControlsAttrs'] )
 	
-	@StyleSheetDerivedPyAttrFn
+	@AttributeTableDerivedPyAttrFn
 	def packageNameStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['packageNameAttrs'] )
 	
-	@StyleSheetDerivedPyAttrFn
+	@AttributeTableDerivedPyAttrFn
 	def itemHoverHighlightStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['itemHoverHighlightAttrs'] )
 	

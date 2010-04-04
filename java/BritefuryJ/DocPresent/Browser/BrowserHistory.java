@@ -15,7 +15,7 @@ class BrowserHistory
 	
 	
 	
-	public BrowserHistory(String location)
+	public BrowserHistory(Location location)
 	{
 		past = new Stack<BrowserState>();
 		future = new Stack<BrowserState>();
@@ -29,7 +29,7 @@ class BrowserHistory
 	}
 	
 	
-	public void visit(String location)
+	public void visit(Location location)
 	{
 		past.push( currentState );
 		currentState = new BrowserState( location );

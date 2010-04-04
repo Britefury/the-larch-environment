@@ -22,6 +22,7 @@ import java.util.NoSuchElementException;
 import org.python.core.Py;
 import org.python.core.PySlice;
 
+import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.CommandHistory.CommandTracker;
 import BritefuryJ.CommandHistory.CommandTrackerFactory;
 import BritefuryJ.CommandHistory.Trackable;
@@ -1172,7 +1173,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 
 
 	
-	public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, Object state)
+	public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
 	{
 		return DocModelPresenter.presentDMList( this, ctx, PrimitiveStyleSheet.instance, state );
 	}

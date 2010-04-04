@@ -7,12 +7,14 @@
 ##-*************************
 from java.awt import Font, Color
 
+from BritefuryJ.AttributeTable import *
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent.StyleSheet import *
 from BritefuryJ.DocPresent.Controls import *
 from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.Painter import *
+from BritefuryJ.DocPresent.Browser import Location
 
 from GSymCore.Utils.LinkHeader import LinkHeaderStyleSheet
 from GSymCore.Utils.Title import TitleBarStyleSheet
@@ -73,11 +75,11 @@ class GSymAppViewerStyleSheet (StyleSheet):
 	
 	
 	
-	@StyleSheetDerivedPyAttrFn
+	@AttributeTableDerivedPyAttrFn
 	def appDocumentControlsStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['appDocumentControlsAttrs'] )
 	
-	@StyleSheetDerivedPyAttrFn
+	@AttributeTableDerivedPyAttrFn
 	def documentListTableStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['dcumentListTableAttrs'] )
 	
@@ -103,7 +105,7 @@ class GSymAppViewerStyleSheet (StyleSheet):
 		appDocumentControlsStyle = self.appDocumentControlsStyle()		
 		documentListTableStyle = self.documentListTableStyle()
 
-		systemLink = controlsStyle.link( 'SYSTEM PAGE', 'system' ).getElement()
+		systemLink = controlsStyle.link( 'SYSTEM PAGE', Location( 'system' ) ).getElement()
 		linkHeader = linkHeaderStyle.linkHeaderBar( [ systemLink ] )
 		
 		title = titleBarStyle.titleBar( 'gSym' )

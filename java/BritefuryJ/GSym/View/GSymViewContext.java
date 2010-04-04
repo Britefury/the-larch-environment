@@ -8,6 +8,7 @@ package BritefuryJ.GSym.View;
 
 import java.util.HashMap;
 
+import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPPresentationArea;
@@ -32,14 +33,17 @@ public class GSymViewContext implements DocView.RefreshListener
 		private GSymViewContext viewContext;
 		private GSymPerspective perspective;
 		private GSymViewFragmentFunction viewFragmentFunction;
+		private AttributeTable subjectContext;
 		private StyleSheet styleSheet;
-		private Object state;
+		private AttributeTable state;
 		
-		public ViewFragmentContextAndResultFactory(GSymViewContext viewContext, GSymPerspective perspective, GSymViewFragmentFunction nodeFunction, StyleSheet styleSheet, Object state)
+		public ViewFragmentContextAndResultFactory(GSymViewContext viewContext, GSymPerspective perspective, GSymViewFragmentFunction nodeFunction, AttributeTable subjectContext,
+				StyleSheet styleSheet, AttributeTable state)
 		{
 			this.viewContext = viewContext;
 			this.perspective = perspective;
 			this.viewFragmentFunction = nodeFunction;
+			this.subjectContext = subjectContext;
 			this.styleSheet = styleSheet;
 			this.state = state;
 		}
@@ -51,7 +55,7 @@ public class GSymViewContext implements DocView.RefreshListener
 			docView.profile_startPython();
 
 			// Create the node context
-			GSymFragmentViewContext nodeContext = new GSymFragmentViewContext( viewContext, (DVNode)incrementalNode, perspective, viewFragmentFunction );
+			GSymFragmentViewContext nodeContext = new GSymFragmentViewContext( viewContext, (DVNode)incrementalNode, perspective, viewFragmentFunction, subjectContext );
 			
 			// Create the view fragment
 			DPElement fragment = viewFragmentFunction.createViewFragment( docNode, nodeContext, styleSheet, state );
@@ -63,45 +67,32 @@ public class GSymViewContext implements DocView.RefreshListener
 	}
 	
 	
-	public static class ViewInheritedState
-	{
-		public StyleSheet styleSheet;
-		public Object state;
-		
-		
-		public ViewInheritedState(StyleSheet styleSheet, Object state)
-		{
-			this.styleSheet = styleSheet;
-			this.state = state;
-		}
-	}
-	
-	
 	protected static class ViewFragmentContextAndResultFactoryKey
 	{
 		private GSymPerspective perspective;
 		private GSymViewFragmentFunction nodeFunction;
+		private AttributeTable subjectContext;
 		private StyleSheet styleSheet;
-		private Object state;
+		private AttributeTable state;
 		
 		
-		public ViewFragmentContextAndResultFactoryKey(GSymPerspective perspective, GSymViewFragmentFunction nodeFunction, StyleSheet styleSheet, Object state)
+		public ViewFragmentContextAndResultFactoryKey(GSymPerspective perspective, GSymViewFragmentFunction nodeFunction, AttributeTable subjectContext, StyleSheet styleSheet, AttributeTable state)
 		{
 			this.perspective = perspective;
 			this.nodeFunction = nodeFunction;
 			this.styleSheet = styleSheet;
 			this.state = state;
+			this.subjectContext = subjectContext;
 		}
 		
 		
 		public int hashCode()
 		{
-			int stateHash = state != null  ?  state.hashCode()  :  0;
 			if ( nodeFunction == null  ||  styleSheet == null )
 			{
 				throw new RuntimeException( "null?nodeFunction=" + ( nodeFunction == null ) + ", null?styleSheet=" + ( styleSheet == null ) );
 			}
-			return HashUtils.nHash( new int[] { System.identityHashCode( perspective ), System.identityHashCode( nodeFunction ), styleSheet.hashCode(), stateHash } );
+			return HashUtils.nHash( new int[] { System.identityHashCode( perspective ), System.identityHashCode( nodeFunction ), styleSheet.hashCode(), state.hashCode(), subjectContext.hashCode() } );
 		}
 		
 		public boolean equals(Object x)
@@ -114,8 +105,7 @@ public class GSymViewContext implements DocView.RefreshListener
 			if ( x instanceof ViewFragmentContextAndResultFactoryKey )
 			{
 				ViewFragmentContextAndResultFactoryKey kx = (ViewFragmentContextAndResultFactoryKey)x;
-				boolean bStateEqual = ( state == null  ||  kx.state == null )  ?  ( state != null ) == ( kx.state != null )  :  state.equals( kx.state );
-				return perspective == kx.perspective  &&  nodeFunction == kx.nodeFunction  &&  styleSheet.equals( kx.styleSheet )  &&  bStateEqual;
+				return perspective == kx.perspective  &&  nodeFunction == kx.nodeFunction  &&  styleSheet.equals( kx.styleSheet )  &&  state == kx.state  &&  subjectContext == kx.subjectContext;
 			}
 			else
 			{
@@ -142,13 +132,16 @@ public class GSymViewContext implements DocView.RefreshListener
 		new HashMap<ViewFragmentContextAndResultFactoryKey, ViewFragmentContextAndResultFactory>();
 
 	
-	public GSymViewContext(Object docRootNode, GSymPerspective perspective, Object rootState, GSymBrowserContext browserContext, Page page, CommandHistory commandHistory)
+	public GSymViewContext(Object docRootNode, GSymPerspective perspective, AttributeTable subjectContext, AttributeTable rootState, GSymBrowserContext browserContext,
+			Page page, CommandHistory commandHistory)
 	{
+		if ( rootState == null )
+		{
+			throw new RuntimeException( "GSymViewContext.<init>(): @rootState cannot be null" );
+		}
 		this.docRootNode = docRootNode;
 		
-		ViewInheritedState rootInheritedState = new ViewInheritedState( perspective.getStyleSheet(), rootState );
-
-		view = new DocView( docRootNode, makeNodeResultFactory( perspective, perspective.getFragmentViewFunction(), rootInheritedState ) );
+		view = new DocView( docRootNode, makeNodeResultFactory( perspective, perspective.getFragmentViewFunction(), subjectContext, perspective.getStyleSheet(), rootState ) );
 
 		this.browserContext = browserContext;
 		this.page = page;
@@ -166,16 +159,16 @@ public class GSymViewContext implements DocView.RefreshListener
 	
 	
 
-	protected DVNode.NodeResultFactory makeNodeResultFactory(GSymPerspective perspective, GSymViewFragmentFunction nodeFunction, ViewInheritedState inheritedState)
+	protected DVNode.NodeResultFactory makeNodeResultFactory(GSymPerspective perspective, GSymViewFragmentFunction nodeFunction, AttributeTable subjectContext, StyleSheet styleSheet, AttributeTable state)
 	{
 		// Memoise the contents factory, keyed by  @nodeViewFunction and @state
-		ViewFragmentContextAndResultFactoryKey key = new ViewFragmentContextAndResultFactoryKey( perspective, nodeFunction, inheritedState.styleSheet, inheritedState.state );
+		ViewFragmentContextAndResultFactoryKey key = new ViewFragmentContextAndResultFactoryKey( perspective, nodeFunction, subjectContext, styleSheet, state );
 		
 		ViewFragmentContextAndResultFactory factory = viewFragmentContextAndResultFactories.get( key );
 		
 		if ( factory == null )
 		{
-			factory = new ViewFragmentContextAndResultFactory( this, perspective, nodeFunction, inheritedState.styleSheet, inheritedState.state );
+			factory = new ViewFragmentContextAndResultFactory( this, perspective, nodeFunction, subjectContext, styleSheet, state );
 			viewFragmentContextAndResultFactories.put( key, factory );
 			return factory;
 		}

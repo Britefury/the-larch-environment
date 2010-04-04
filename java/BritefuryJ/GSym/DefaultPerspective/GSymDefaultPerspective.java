@@ -8,7 +8,9 @@ package BritefuryJ.GSym.DefaultPerspective;
 
 import java.awt.Font;
 
+import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.Page;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
@@ -30,7 +32,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 	
 	private class GSymObjectViewFragmentFunction implements GSymViewFragmentFunction
 	{
-		public DPElement createViewFragment(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, Object state)
+		public DPElement createViewFragment(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
 		{
 			if ( x instanceof Presentable )
 			{
@@ -77,13 +79,13 @@ public class GSymDefaultPerspective implements GSymPerspective
 		
 		
 		@Override
-		public Page resolveLocationAsPage(String location)
+		public Page resolveLocationAsPage(Location location)
 		{
-			GSymSubject subject = perspective.resolveRelativeLocation( null, location );
+			GSymSubject subject = perspective.resolveLocation( null, location.iterator() );
 			if ( subject != null )
 			{
 				DefaultPerspectivePage page = new DefaultPerspectivePage();
-				GSymViewContext viewContext = new GSymViewContext( subject.getFocus(), perspective, null, perspective.browserContext, page, null );
+				GSymViewContext viewContext = new GSymViewContext( subject.getFocus(), perspective, subject.getSubjectContext(), AttributeTable.instance, perspective.browserContext, page, null );
 				page.contents = viewContext.getRegion();
 				return page;
 			}
@@ -94,9 +96,9 @@ public class GSymDefaultPerspective implements GSymPerspective
 		}
 
 		@Override
-		public GSymSubject resolveLocationAsSubject(String location)
+		public GSymSubject resolveLocationAsSubject(Location location)
 		{
-			return perspective.resolveRelativeLocation( null, location );
+			return perspective.resolveLocation( null, location.iterator() );
 		}
 	}
 	
@@ -136,19 +138,12 @@ public class GSymDefaultPerspective implements GSymPerspective
 	}
 
 
-	public GSymSubject resolveRelativeLocation(GSymSubject enclosingSubject, String relativeLocation)
+	public GSymSubject resolveLocation(GSymSubject enclosingSubject, Location.TokenIterator relativeLocation)
 	{
 		Object x = locationTable.getObjectAtLocation( relativeLocation );
 		if ( x != null )
 		{
-			if ( enclosingSubject != null )
-			{
-				return enclosingSubject.enclosedSubject( x, this, "", "" );
-			}
-			else
-			{
-				return GSymSubject.rootSubject( x, this, null, "", relativeLocation );
-			}
+			return new GSymSubject( x, this, enclosingSubject.getSubjectContext() );
 		}
 		else
 		{
@@ -158,14 +153,14 @@ public class GSymDefaultPerspective implements GSymPerspective
 
 
 
-	public String getLocationForObject(Object x)
+	public Location getLocationForObject(Object x)
 	{
 		return locationTable.getLocationForObject( x );
 	}
 	
-	public Object getObjectAtLocation(String location)
+	public Object getObjectAtLocation(Location location)
 	{
-		return locationTable.getObjectAtLocation( location );
+		return locationTable.getObjectAtLocation( location.iterator() );
 	}
 	
 	

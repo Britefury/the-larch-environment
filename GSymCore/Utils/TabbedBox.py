@@ -7,6 +7,7 @@
 ##-*************************
 from java.awt import Font, Color
 
+from BritefuryJ.AttributeTable import *
 from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.StyleSheet import *
 
@@ -17,7 +18,7 @@ class TabbedBoxStyleSheet (StyleSheet):
 			self.headerStyle = headerStyle
 			self.bodyStyle = bodyStyle
 	
-	@StyleSheetDerivedPyAttrFn
+	@AttributeTableDerivedPyAttrFn
 	def _params(self):
 		hpad = self['headerPadding']
 		bpad = self['bodyPadding']

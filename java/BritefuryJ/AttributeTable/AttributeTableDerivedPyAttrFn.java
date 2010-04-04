@@ -4,21 +4,21 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.StyleSheet;
+package BritefuryJ.AttributeTable;
 
 import org.python.core.Py;
 import org.python.core.PyFunction;
 import org.python.core.PyObject;
 
-public class StyleSheetDerivedPyAttrFn
+public class AttributeTableDerivedPyAttrFn
 {
 	public static class Helper
 	{
-		private StyleSheet self;
-		private StyleSheetDerivedPyAttrFn attr;
+		private AttributeTable self;
+		private AttributeTableDerivedPyAttrFn attr;
 		
 		
-		public Helper(StyleSheet self, StyleSheetDerivedPyAttrFn attr)
+		public Helper(AttributeTable self, AttributeTableDerivedPyAttrFn attr)
 		{
 			this.self = self;
 			this.attr = attr;
@@ -43,13 +43,13 @@ public class StyleSheetDerivedPyAttrFn
 	private PyFunction fun;
 	
 	
-	public StyleSheetDerivedPyAttrFn(PyFunction fun)
+	public AttributeTableDerivedPyAttrFn(PyFunction fun)
 	{
 		this.fun = fun;
 	}
 	
 	
-	public Object __get__(StyleSheet instance, PyObject owner)
+	public Object __get__(AttributeTable instance, PyObject owner)
 	{
 		if ( instance != null )
 		{

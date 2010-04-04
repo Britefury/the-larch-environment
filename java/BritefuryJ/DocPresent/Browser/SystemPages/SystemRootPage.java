@@ -15,21 +15,22 @@ import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
+import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.Page;
 import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class SystemRootPage extends Page
 {
-	public static String getLocation()
+	public static Location getLocation()
 	{
-		return "system";
+		return new Location( "system" );
 	}
 	
 	
 	protected SystemRootPage()
 	{
-		SystemLocationResolver.getSystemResolver().registerPage( getLocation(), this );
+		SystemLocationResolver.getSystemResolver().registerPage( getLocation().getLocationString(), this );
 	}
 	
 	
@@ -106,12 +107,12 @@ public class SystemRootPage extends Page
 		
 		if ( ( linkHeaderFlags & LINKHEADER_ROOTPAGE )  !=  0 )
 		{
-			linkElements.add( controlsStyleSheet.link( "GSYM ROOT PAGE", "" ).getElement() );
+			linkElements.add( controlsStyleSheet.link( "GSYM ROOT PAGE", new Location( "" ) ).getElement() );
 		}
 		
 		if ( ( linkHeaderFlags & LINKHEADER_SYSTEMPAGE )  !=  0 )
 		{
-			linkElements.add( controlsStyleSheet.link( "SYSTEM PAGE", "system" ).getElement() );
+			linkElements.add( controlsStyleSheet.link( "SYSTEM PAGE", new Location( "system" ) ).getElement() );
 		}
 
 		DPElement links = styleSheet.withHBoxSpacing( 25.0 ).hbox( linkElements );

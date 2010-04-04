@@ -11,9 +11,11 @@ import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 
+import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.FragmentContext;
+import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocView.DVNode;
@@ -33,10 +35,11 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 	protected DVNode viewNode;
 	protected GSymPerspective perspective;
 	protected GSymViewFragmentFunction viewFragmentFunction;
+	protected AttributeTable subjectContext;
 
 	
 	
-	public GSymFragmentViewContext(GSymViewContext viewContext, DVNode viewNode, GSymPerspective perspective, GSymViewFragmentFunction viewFragmentFunction)
+	public GSymFragmentViewContext(GSymViewContext viewContext, DVNode viewNode, GSymPerspective perspective, GSymViewFragmentFunction viewFragmentFunction, AttributeTable subjectContext)
 	{
 		this.viewContext = viewContext;
 		this.viewNode = viewNode;
@@ -44,13 +47,20 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 		this.viewNode.setFragmentContext( this );
 		this.perspective = perspective;
 		this.viewFragmentFunction = viewFragmentFunction;
+		this.subjectContext = subjectContext;
 	}
 	
 	
 	
 	public GSymViewContext getViewContext()
 	{
-		return (GSymViewContext)viewContext;
+		return viewContext;
+	}
+	
+	
+	public AttributeTable getSubjectContext()
+	{
+		return subjectContext;
 	}
 	
 	
@@ -79,17 +89,20 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 
 
 	
-	private DPElement presentFragment(Object x, GSymPerspective perspective, GSymViewFragmentFunction fragmentViewFunction, StyleSheet styleSheet, Object state)
+	private DPElement presentFragment(Object x, GSymPerspective perspective, GSymViewFragmentFunction fragmentViewFunction, AttributeTable subjectContext, StyleSheet styleSheet, AttributeTable state)
 	{
-		GSymViewContext.ViewInheritedState inheritedState = new GSymViewContext.ViewInheritedState( styleSheet, state );
-
 		if ( x == null )
 		{
-			throw new RuntimeException( "GSymNodeViewInstance.viewEvanFn(): cannot build view of null node" );
+			throw new RuntimeException( "GSymFragmentViewContext.presentFragment(): cannot build view of null node" );
 		}
 		
+		if ( state == null )
+		{
+			throw new RuntimeException( "GSymFragmentViewContext.presentFragment(): @state cannot be null" );
+		}
+
 		// A call to DocNode.buildNodeView builds the view, and puts it in the DocView's table
-		DVNode incrementalNode = (DVNode)viewContext.getView().buildIncrementalTreeNodeResult( x, viewContext.makeNodeResultFactory( perspective, fragmentViewFunction, inheritedState ) );
+		DVNode incrementalNode = (DVNode)viewContext.getView().buildIncrementalTreeNodeResult( x, viewContext.makeNodeResultFactory( perspective, fragmentViewFunction, subjectContext, styleSheet, state ) );
 		
 		
 		// Block access tracking to prevent the contents of this node being dependent upon the child node being refreshed,
@@ -112,44 +125,45 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 	
 	public DPElement presentFragment(Object x, StyleSheet styleSheet)
 	{
-		return presentFragment( x, perspective, viewFragmentFunction, styleSheet, null );
+		return presentFragment( x, perspective, viewFragmentFunction, subjectContext, styleSheet, AttributeTable.instance );
 	}
 
-	public DPElement presentFragment(Object x, StyleSheet styleSheet, Object state)
+	public DPElement presentFragment(Object x, StyleSheet styleSheet, AttributeTable state)
 	{
-		return presentFragment( x, perspective, viewFragmentFunction, styleSheet, state );
+		return presentFragment( x, perspective, viewFragmentFunction, subjectContext, styleSheet, state );
 	}
 
 	public DPElement presentFragmentFn(Object x, StyleSheet styleSheet, GSymViewFragmentFunction fragmentViewFunction)
 	{
-		return presentFragment( x, perspective, fragmentViewFunction, styleSheet, null );
+		return presentFragment( x, perspective, fragmentViewFunction, subjectContext, styleSheet, AttributeTable.instance );
 	}
 
-	public DPElement presentFragmentFn(Object x, StyleSheet styleSheet, GSymViewFragmentFunction fragmentViewFunction, Object state)
+	public DPElement presentFragmentFn(Object x, StyleSheet styleSheet, GSymViewFragmentFunction fragmentViewFunction, AttributeTable state)
 	{
-		return presentFragment( x, perspective, fragmentViewFunction, styleSheet, state );
+		return presentFragment( x, perspective, fragmentViewFunction, subjectContext, styleSheet, state );
 	}
 
 	public DPElement presentFragmentWithPerspective(Object x, GSymPerspective perspective)
 	{
-		return presentFragment( x, perspective, perspective.getFragmentViewFunction(), perspective.getStyleSheet(), null );
+		return presentFragment( x, perspective, perspective.getFragmentViewFunction(), subjectContext, perspective.getStyleSheet(), AttributeTable.instance );
 	}
 
-	public DPElement presentFragmentWithPerspective(Object x, GSymPerspective perspective, Object state)
+	public DPElement presentFragmentWithPerspective(Object x, GSymPerspective perspective, AttributeTable state)
 	{
-		return presentFragment( x, perspective, perspective.getFragmentViewFunction(), perspective.getStyleSheet(), state );
+		return presentFragment( x, perspective, perspective.getFragmentViewFunction(), subjectContext, perspective.getStyleSheet(), state );
 	}
 	
 	
 	
 	
-	private List<DPElement> mapPresentFragment(List<Object> xs, GSymPerspective perspective, GSymViewFragmentFunction fragmentViewFunction, StyleSheet styleSheet, Object state)
+	private List<DPElement> mapPresentFragment(List<Object> xs, GSymPerspective perspective, GSymViewFragmentFunction fragmentViewFunction, AttributeTable subjectContext,
+			StyleSheet styleSheet, AttributeTable state)
 	{
 		ArrayList<DPElement> children = new ArrayList<DPElement>();
 		children.ensureCapacity( xs.size() );
 		for (Object x: xs)
 		{
-			children.add( presentFragment( x, perspective, fragmentViewFunction, styleSheet, state ) );
+			children.add( presentFragment( x, perspective, fragmentViewFunction, subjectContext, styleSheet, state ) );
 		}
 		return children;
 	}
@@ -157,45 +171,45 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 
 	public List<DPElement> mapPresentFragment(List<Object> xs, StyleSheet styleSheet)
 	{
-		return mapPresentFragment( xs, perspective, viewFragmentFunction, styleSheet, null );
+		return mapPresentFragment( xs, perspective, viewFragmentFunction, subjectContext, styleSheet, AttributeTable.instance );
 	}
 
-	public List<DPElement> mapPresentFragment(List<Object> xs, StyleSheet styleSheet, Object state)
+	public List<DPElement> mapPresentFragment(List<Object> xs, StyleSheet styleSheet, AttributeTable state)
 	{
-		return mapPresentFragment( xs, perspective, viewFragmentFunction, styleSheet, state );
+		return mapPresentFragment( xs, perspective, viewFragmentFunction, subjectContext, styleSheet, state );
 	}
 
 	public List<DPElement> mapPresentFragmentFn(List<Object> xs, StyleSheet styleSheet, GSymViewFragmentFunction nodeViewFunction)
 	{
-		return mapPresentFragment( xs, perspective, nodeViewFunction, styleSheet, null );
+		return mapPresentFragment( xs, perspective, nodeViewFunction, subjectContext, styleSheet, AttributeTable.instance );
 	}
 
-	public List<DPElement> mapPresentFragmentFn(List<Object> xs, StyleSheet styleSheet, GSymViewFragmentFunction nodeViewFunction, Object state)
+	public List<DPElement> mapPresentFragmentFn(List<Object> xs, StyleSheet styleSheet, GSymViewFragmentFunction nodeViewFunction, AttributeTable state)
 	{
-		return mapPresentFragment( xs, perspective, nodeViewFunction, styleSheet, state );
+		return mapPresentFragment( xs, perspective, nodeViewFunction, subjectContext, styleSheet, state );
 	}
 	
 	public List<DPElement> mapPresentFragmentPerspective(List<Object> xs, GSymPerspective perspective)
 	{
-		return mapPresentFragment( xs, perspective, perspective.getFragmentViewFunction(), perspective.getStyleSheet(), null );
+		return mapPresentFragment( xs, perspective, perspective.getFragmentViewFunction(), subjectContext, perspective.getStyleSheet(), AttributeTable.instance );
 	}
 
-	public List<DPElement> mapPresentFragmentPerspective(List<Object> xs, GSymPerspective perspective, Object state)
+	public List<DPElement> mapPresentFragmentPerspective(List<Object> xs, GSymPerspective perspective, AttributeTable state)
 	{
-		return mapPresentFragment( xs, perspective, perspective.getFragmentViewFunction(), perspective.getStyleSheet(), state );
+		return mapPresentFragment( xs, perspective, perspective.getFragmentViewFunction(), subjectContext, perspective.getStyleSheet(), state );
 	}
 	
 
 	
 	
-	public DPElement presentLocationAsElement(String location)
+	public DPElement presentLocationAsElement(Location location)
 	{
 		GSymSubject subject = getViewContext().getBrowserContext().resolveLocationAsSubject( location );
 		GSymPerspective perspective = subject.getPerspective();
-		return presentFragment( subject.getFocus(), perspective, perspective.getFragmentViewFunction(), perspective.getStyleSheet(), null );
+		return presentFragment( subject.getFocus(), perspective, perspective.getFragmentViewFunction(), subject.getSubjectContext(), perspective.getStyleSheet(), AttributeTable.instance );
 	}
 	
-	public String getLocationForObject(Object x)
+	public Location getLocationForObject(Object x)
 	{
 		return getViewContext().getBrowserContext().getLocationForObject( x );
 	}

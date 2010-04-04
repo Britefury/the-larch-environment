@@ -21,6 +21,8 @@ from java.beans import PropertyChangeListener
 
 from BritefuryJ.CommandHistory import CommandHistory, CommandHistoryListener
 
+from BritefuryJ.AttributeTable import AttributeTable
+
 from BritefuryJ.Cell import CellInterface
 from BritefuryJ.Utils.Profile import ProfileTimer
 
@@ -45,7 +47,7 @@ from Britefury.Event.QueuedEvent import queueEvent
 
 from Britefury.gSym.View.GSymView import GSymViewPage
 from Britefury.gSym.gSymWorld import GSymWorld
-from Britefury.gSym.gSymDocument import GSymDocument, GSymDocSubject
+from Britefury.gSym.gSymDocument import GSymDocument
 from Britefury.gSym.AppControlInterface import AppControlInterface
 
 from GSymCore.GSymApp import GSymApp
@@ -110,26 +112,33 @@ class _AppLocationResolver (GSymLocationResolver):
 	def resolveLocationAsPage(self, location):
 		subject = self.resolveLocationAsSubject( location )
 		if subject is not None:
-			page = GSymViewPage( 'MainApp: _AppLocationResolver: default title', subject.getCommandHistory() )
-			viewContext = GSymViewContext( subject.getFocus(), subject.getPerspective(), None, self._app._browserContext, page, subject.getCommandHistory() )
-			page.setContentsElement( viewContext.getRegion() )
-			return page
-		else:
-			return None
+			try:
+				doc = subject.getSubjectContext()['document']
+			except KeyError:
+				doc = None
+				
+			if doc is not None:
+				page = GSymViewPage( 'MainApp: _AppLocationResolver: default title', doc.getCommandHistory() )
+				viewContext = GSymViewContext( subject.getFocus(), subject.getPerspective(), subject.getSubjectContext(), AttributeTable.instance, self._app._browserContext, page, doc.getCommandHistory() )
+				page.setContentsElement( viewContext.getRegion() )
+				return page
+		
+		return None
 				
 	def resolveLocationAsSubject(self, location):
 		document = self._app._document
 		if document is not None:
-			bModel = location.startswith( 'model:' )
-			if bModel:
-				enclosingSubject = GSymDocSubject.rootSubject( None, None, document, 'model', ':' )
-				location = location[6:]
+			iterator = location.iterator()
+			iterAfterModel = iterator.consumeLiteral( 'model:' )
+			if iterAfterModel is not None:
+				enclosingSubject = GSymSubject( None, None, AttributeTable.instance.withAttrs( document=document, location=Location( 'model:' ) ) )
+				iterator = iterAfterModel
 			else:
-				enclosingSubject = GSymDocSubject.rootSubject( None, None, document, '', '' )
-			subject = document.resolveRelativeLocation( enclosingSubject, location )
+				enclosingSubject = GSymSubject( None, None, AttributeTable.instance.withAttrs( document=document, location=Location( '' ) ) )
+			subject = document.resolveRelativeLocation( enclosingSubject, iterator )
 			if subject is None:
 				return None
-			if bModel:
+			if iterAfterModel:
 				subject = subject.withPerspective( self._app._browserContext.getDefaultPerspective() )
 			return subject
 		else:
@@ -144,7 +153,7 @@ class _MainAppBrowserContext (GSymBrowserContext):
 		
 
 class MainApp (AppControlInterface):
-	def __init__(self, world, document, location=''):
+	def __init__(self, world, document, location=Location( '' )):
 		self._world = world
 		
 		self._document = document

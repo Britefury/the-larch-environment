@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
@@ -75,7 +76,7 @@ public class LogView implements Presentable, ObjectViewContextList.ContextListLi
 
 
 
-	public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, Object state)
+	public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
 	{
 		if ( objectViewContexts == null )
 		{

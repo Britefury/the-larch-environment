@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import BritefuryJ.DocPresent.Browser.Location;
+
 public interface PageController
 {
 	public enum OpenOperation
@@ -15,5 +17,5 @@ public interface PageController
 		OPEN_IN_NEW_WINDOW
 	}
 	
-	public void openLocation(String location, OpenOperation op);
+	public void openLocation(Location location, OpenOperation op);
 }

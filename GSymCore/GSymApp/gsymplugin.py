@@ -10,6 +10,5 @@ from GSymCore.GSymApp import GSymApp
 
 
 def initPlugin(plugin, world):
-	unitClass = GSymApp.createUnitClass( world )
-	world.registerUnitClass( plugin, unitClass )
+	world.registerUnitClass( plugin, GSymApp.unitClass )
 

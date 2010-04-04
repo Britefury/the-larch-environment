@@ -7,6 +7,8 @@
 ##-*************************
 from BritefuryJ.DocPresent.Browser import Page
 
+from BritefuryJ.GSym.View import GSymViewFragmentFunction
+
 from Britefury.Dispatch.Dispatch import DispatchError
 from Britefury.Dispatch.MethodDispatch import methodDispatch, methodDispatchAndGetName
 from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeMethodDispatchMetaClass, objectNodeMethodDispatch, objectNodeMethodDispatchAndGetName

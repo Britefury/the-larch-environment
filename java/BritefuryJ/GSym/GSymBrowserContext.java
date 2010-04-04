@@ -12,10 +12,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.Browser.BrowserContext;
+import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.LocationResolver;
 import BritefuryJ.DocPresent.Browser.Page;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
@@ -30,7 +32,7 @@ public class GSymBrowserContext
 {
 	private static class RootLocationFragmentViewFn implements GSymViewFragmentFunction
 	{
-		public DPElement createViewFragment(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, Object state)
+		public DPElement createViewFragment(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
 		{
 			return PrimitiveStyleSheet.instance.staticText( "<<Root location>>" );
 		}
@@ -38,7 +40,7 @@ public class GSymBrowserContext
 	
 	private static class ResolveErrorFragmentViewFn implements GSymViewFragmentFunction
 	{
-		public DPElement createViewFragment(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, Object state)
+		public DPElement createViewFragment(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
 		{
 			String location = (String)x;
 			return resolveErrorStyleSheet.staticText( "<<Could not resolve " + location + ">>" );
@@ -76,7 +78,7 @@ public class GSymBrowserContext
 		}
 		
 		@Override
-		public GSymSubject resolveRelativeLocation(GSymSubject enclosingSubject, String relativeLocation)
+		public GSymSubject resolveLocation(GSymSubject enclosingSubject, Location.TokenIterator relativeLocation)
 		{
 			return enclosingSubject;
 		}
@@ -87,7 +89,7 @@ public class GSymBrowserContext
 	
 	private class GSymBrowserContextLocationResolver implements LocationResolver
 	{
-		public Page resolveLocationAsPage(String location)
+		public Page resolveLocationAsPage(Location location)
 		{
 			return GSymBrowserContext.this.resolveLocationAsPage( location );
 		}
@@ -135,12 +137,12 @@ public class GSymBrowserContext
 	
 	
 
-	public String getLocationForObject(Object x)
+	public Location getLocationForObject(Object x)
 	{
 		return defaultPerspective.getLocationForObject( x );
 	}
 	
-	public Object getObjectAtLocation(String location)
+	public Object getObjectAtLocation(Location location)
 	{
 		return defaultPerspective.getObjectAtLocation( location );
 	}
@@ -148,7 +150,7 @@ public class GSymBrowserContext
 	
 	
 	
-	public GSymSubject resolveLocationAsSubject(String location)
+	public GSymSubject resolveLocationAsSubject(Location location)
 	{
 		for (GSymLocationResolver resolver: resolvers)
 		{
@@ -159,18 +161,18 @@ public class GSymBrowserContext
 			}
 		}
 		
-		if ( location.equals( "" ) )
+		if ( location.getLocationString().equals( "" ) )
 		{
-			return GSymSubject.rootSubject( null, rootLocationPerspective, null, "", "" );
+			return new GSymSubject( null, rootLocationPerspective, AttributeTable.instance );
 		}
 		else
 		{
-			return GSymSubject.rootSubject( location, resolveErrorPerspective, null, "", "" );
+			return new GSymSubject( location, resolveErrorPerspective, AttributeTable.instance );
 		}
 	}
 	
 	
-	public Page resolveLocationAsPage(String location)
+	public Page resolveLocationAsPage(Location location)
 	{
 		for (GSymLocationResolver resolver: resolvers)
 		{
@@ -181,7 +183,7 @@ public class GSymBrowserContext
 			}
 		}
 		
-		if ( location.equals( "" ) )
+		if ( location.getLocationString().equals( "" ) )
 		{
 			return defaultRootPage;
 		}
@@ -223,9 +225,9 @@ public class GSymBrowserContext
 	{
 		private String location;
 		
-		public ResolveErrorPage(String location)
+		public ResolveErrorPage(Location location)
 		{
-			this.location = location;
+			this.location = location.getLocationString();
 		}
 		
 		
