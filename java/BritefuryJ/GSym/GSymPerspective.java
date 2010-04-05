@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.GSym;
 
+import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
@@ -16,6 +17,7 @@ public interface GSymPerspective
 {
 	GSymViewFragmentFunction getFragmentViewFunction();
 	StyleSheet getStyleSheet();
+	AttributeTable getInitialState();
 	EditHandler getEditHandler();
 
 	GSymSubject resolveLocation(GSymSubject enclosingSubject, Location.TokenIterator locationIterator);

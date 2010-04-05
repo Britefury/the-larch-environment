@@ -22,6 +22,7 @@ from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replac
 
 from Britefury.Util.NodeUtil import *
 
+from BritefuryJ.AttributeTable import *
 
 from BritefuryJ.DocPresent.Browser import Location
 from BritefuryJ.DocPresent.StyleSheet import PrimitiveStyleSheet
@@ -227,6 +228,9 @@ class ProjectEditorPerspective (GSymPerspective):
 	
 	def getStyleSheet(self):
 		return ProjectEditorStyleSheet.instance
+	
+	def getInitialState(self):
+		return AttributeTable.instance
 	
 	def getEditHandler(self):
 		return None

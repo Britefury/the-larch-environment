@@ -18,6 +18,7 @@ def newAppState():
 	return gSymUnit( Nodes.schema, appState )
 
 
-unitClass = GSymUnitClass( Nodes.schema, GSymAppViewerPerspective() )
+gSymAppViewerPerspective = GSymAppViewerPerspective()
+unitClass = GSymUnitClass( Nodes.schema, gSymAppViewerPerspective )
 
 

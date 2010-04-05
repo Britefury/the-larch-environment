@@ -18,8 +18,8 @@ def newProject():
 	return gSymUnit( Nodes.schema, project )
 
 
-
-unitClass = GSymUnitClass( Nodes.schema, ProjectEditorPerspective() )
+projectEditorPerspective = ProjectEditorPerspective()
+unitClass = GSymUnitClass( Nodes.schema, projectEditorPerspective )
 
 
 newUnitFactory = GSymUnitFactory( 'gSym Document', newProject )

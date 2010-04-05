@@ -119,7 +119,7 @@ class _AppLocationResolver (GSymLocationResolver):
 				
 			if doc is not None:
 				page = GSymViewPage( 'MainApp: _AppLocationResolver: default title', doc.getCommandHistory() )
-				viewContext = GSymViewContext( subject.getFocus(), subject.getPerspective(), subject.getSubjectContext(), AttributeTable.instance, self._app._browserContext, page, doc.getCommandHistory() )
+				viewContext = GSymViewContext( subject.getFocus(), subject.getPerspective(), subject.getSubjectContext(), self._app._browserContext, page, doc.getCommandHistory() )
 				page.setContentsElement( viewContext.getRegion() )
 				return page
 		
