@@ -9,16 +9,14 @@ from Britefury.gSym.gSymUnitClass import GSymUnitClass
 from Britefury.gSym.gSymDocument import gSymUnit
 
 from GSymCore.GSymApp.GSymAppViewer.View import GSymAppViewerPerspective
+from GSymCore.GSymApp import Application
 from GSymCore.GSymApp import NodeClasses as Nodes
 
 
 def newAppState():
-	configuration = Nodes.AppConfiguration()
-	appState = Nodes.AppState( openDocuments=[], configuration=configuration )
-	return gSymUnit( Nodes.schema, appState )
+	return Application.AppState()
 
 
 gSymAppViewerPerspective = GSymAppViewerPerspective()
-unitClass = GSymUnitClass( Nodes.schema, gSymAppViewerPerspective )
 
 

@@ -36,7 +36,7 @@ from Britefury.gSym.View import EditOperations
 
 
 
-from GSymCore.Languages.Python25 import NodeClasses as Nodes
+from GSymCore.Languages.Python25 import Schema
 from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
 
 from GSymCore.Languages.Python25.PythonEditor.Parser import Python25Grammar
@@ -169,8 +169,8 @@ class Python25EditHandler (EditHandler):
 			
 			
 	def _indentLine(self, element, context, node):
-		element.setStructuralPrefixObject( Nodes.Indent() )
-		element.setStructuralSuffixObject( Nodes.Dedent() )
+		element.setStructuralPrefixObject( Schema.Indent() )
+		element.setStructuralSuffixObject( Schema.Dedent() )
 		bSuccess = element.sendLinearRepresentationModifiedEventToParent( IndentLinearRepresentationEvent( element ) )
 		if not bSuccess:
 			print 'Python25EditHandler._indentLine(): INDENT LINE FAILED'
@@ -182,10 +182,10 @@ class Python25EditHandler (EditHandler):
 	def _dedentLine(self, element, context, node):
 		suite = node.getValidParents()[0]
 		suiteParent = suite.getValidParents()[0]
-		if not suiteParent.isInstanceOf( Nodes.PythonModule ):
+		if not suiteParent.isInstanceOf( Schema.PythonModule ):
 			# This statement is not in the root node
-			element.setStructuralPrefixObject( Nodes.Dedent() )
-			element.setStructuralSuffixObject( Nodes.Indent() )
+			element.setStructuralPrefixObject( Schema.Dedent() )
+			element.setStructuralSuffixObject( Schema.Indent() )
 			bSuccess = element.sendLinearRepresentationModifiedEventToParent( DedentLinearRepresentationEvent( element ) )
 			if not bSuccess:
 				print 'Python25EditHandler._dedentLine(): DEDENT LINE FAILED'
@@ -212,8 +212,8 @@ class Python25EditHandler (EditHandler):
 		
 		rootElement = root.getViewNodeElement()
 				
-		startStmtElement.setStructuralPrefixObject( Nodes.Indent() )
-		endStmtElement.setStructuralSuffixObject( Nodes.Dedent() )
+		startStmtElement.setStructuralPrefixObject( Schema.Indent() )
+		endStmtElement.setStructuralSuffixObject( Schema.Dedent() )
 		
 		startContext.getViewNodeElement().clearStructuralRepresentationUpTo( rootElement )
 		endContext.getViewNodeElement().clearStructuralRepresentationUpTo( rootElement )
@@ -244,8 +244,8 @@ class Python25EditHandler (EditHandler):
 		
 		rootElement = root.getViewNodeElement()
 				
-		startStmtElement.setStructuralPrefixObject( Nodes.Dedent() )
-		endStmtElement.setStructuralSuffixObject( Nodes.Indent() )
+		startStmtElement.setStructuralPrefixObject( Schema.Dedent() )
+		endStmtElement.setStructuralSuffixObject( Schema.Indent() )
 		
 		startContext.getViewNodeElement().clearStructuralRepresentationUpTo( rootElement )
 		endContext.getViewNodeElement().clearStructuralRepresentationUpTo( rootElement )

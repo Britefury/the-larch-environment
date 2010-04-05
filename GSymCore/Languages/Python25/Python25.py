@@ -9,23 +9,23 @@ from Britefury.gSym.gSymUnitClass import GSymUnitClass, GSymPageFactory, GSymPag
 from Britefury.gSym.gSymDocument import gSymUnit
 
 from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
-from GSymCore.Languages.Python25 import NodeClasses as Nodes
+from GSymCore.Languages.Python25 import Schema
 from GSymCore.Languages.Python25.Python25Importer import importPy25File
 from GSymCore.Languages.Python25.PythonEditor.View import Python25EditorPerspective
 
 
 
 def _py25New():
-	return gSymUnit( Nodes.schema, Nodes.PythonModule( suite=[ Nodes.BlankLine() ] ) )
+	return gSymUnit( Schema.schema, Schema.PythonModule( suite=[ Schema.BlankLine() ] ) )
 
 def _py25ImportFile(filename):
 	content = importPy25File( filename )
-	return gSymUnit( Nodes.schema, content )
+	return gSymUnit( Schema.schema, content )
 
 
 
 python25EditorPerspective = Python25EditorPerspective()
-unitClass = GSymUnitClass( Nodes.schema, python25EditorPerspective )
+unitClass = GSymUnitClass( Schema.schema, python25EditorPerspective )
 unitClass.registerCodeGeneratorFactory( 'ascii', Python25CodeGenerator )
 
 

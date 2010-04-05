@@ -9,17 +9,17 @@ from Britefury.gSym.gSymUnitClass import GSymUnitClass, GSymUnitFactory
 from Britefury.gSym.gSymDocument import gSymUnit
 
 from GSymCore.Project.ProjectEditor.View import ProjectEditorPerspective
-from GSymCore.Project import NodeClasses as Nodes
+from GSymCore.Project import Schema
 
 
 def newProject():
-	package = Nodes.Package( name='Root', contents=[] )
-	project = Nodes.Project( rootPackage=package )
-	return gSymUnit( Nodes.schema, project )
+	package = Schema.Package( name='Root', contents=[] )
+	project = Schema.Project( rootPackage=package )
+	return gSymUnit( Schema.schema, project )
 
 
 projectEditorPerspective = ProjectEditorPerspective()
-unitClass = GSymUnitClass( Nodes.schema, projectEditorPerspective )
+unitClass = GSymUnitClass( Schema.schema, projectEditorPerspective )
 
 
 newUnitFactory = GSymUnitFactory( 'gSym Document', newProject )

@@ -8,7 +8,7 @@
 from Britefury.gSym.gSymCodeGenerator import GSymCodeGeneratorObjectNodeDispatch
 from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeDispatchMethod
 
-import GSymCore.Languages.Python25.NodeClasses as Nodes
+from GSymCore.Languages.Python25 import Schema
 
 
 def _indent(x):
@@ -34,18 +34,18 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 	
 	# Misc
-	@ObjectNodeDispatchMethod( Nodes.BlankLine )
+	@ObjectNodeDispatchMethod( Schema.BlankLine )
 	def BlankLine(self, node):
 		return ''
 	
 
-	@ObjectNodeDispatchMethod( Nodes.UNPARSED )
+	@ObjectNodeDispatchMethod( Schema.UNPARSED )
 	def UNPARSED(self, node, value):
 		raise CodeGeneratorUnparsedException
 	
 	
 	# String literal
-	@ObjectNodeDispatchMethod( Nodes.StringLiteral )
+	@ObjectNodeDispatchMethod( Schema.StringLiteral )
 	def StringLiteral(self, node, format, quotation, value):
 		if isinstance( value, unicode ):
 			return repr( value )[1:]
@@ -55,7 +55,7 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 	
 	# Integer literal
-	@ObjectNodeDispatchMethod( Nodes.IntLiteral )
+	@ObjectNodeDispatchMethod( Schema.IntLiteral )
 	def IntLiteral(self, node, format, numType, value):
 		format = format
 		numType = numType
@@ -84,261 +84,261 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 
 	# Float literal
-	@ObjectNodeDispatchMethod( Nodes.FloatLiteral )
+	@ObjectNodeDispatchMethod( Schema.FloatLiteral )
 	def FloatLiteral(self, node, value):
 		return value
 
 	
 	
 	# Imaginary literal
-	@ObjectNodeDispatchMethod( Nodes.ImaginaryLiteral )
+	@ObjectNodeDispatchMethod( Schema.ImaginaryLiteral )
 	def ImaginaryLiteral(self, node, value):
 		return value
 	
 	
 	
 	# Target
-	@ObjectNodeDispatchMethod( Nodes.SingleTarget )
+	@ObjectNodeDispatchMethod( Schema.SingleTarget )
 	def SingleTarget(self, node, name):
 		return name
 	
-	@ObjectNodeDispatchMethod( Nodes.TupleTarget )
+	@ObjectNodeDispatchMethod( Schema.TupleTarget )
 	def TupleTarget(self, node, targets):
 		return '( '  +  ', '.join( [ self( i )   for i in targets ] )  +  ', )'
 	
-	@ObjectNodeDispatchMethod( Nodes.ListTarget )
+	@ObjectNodeDispatchMethod( Schema.ListTarget )
 	def ListTarget(self, node, targets):
 		return '[ '  +  ', '.join( [ self( i )   for i in targets ] )  +  ' ]'
 	
 	
 
 	# Variable reference
-	@ObjectNodeDispatchMethod( Nodes.Load )
+	@ObjectNodeDispatchMethod( Schema.Load )
 	def Load(self, node, name):
 		return str( name )
 
 	
 	
 	# Tuple literal	
-	@ObjectNodeDispatchMethod( Nodes.TupleLiteral )
+	@ObjectNodeDispatchMethod( Schema.TupleLiteral )
 	def TupleLiteral(self, node, values):
 		return '( '  +  ', '.join( [ self( i )   for i in values ] )  +  ', )'
 
 	
 	
 	# List literal
-	@ObjectNodeDispatchMethod( Nodes.ListLiteral )
+	@ObjectNodeDispatchMethod( Schema.ListLiteral )
 	def ListLiteral(self, node, values):
 		return '[ '  +  ', '.join( [ self( i )   for i in values ] )  +  ' ]'
 	
 	
 	
 	# List comprehension / generator expression
-	@ObjectNodeDispatchMethod( Nodes.ComprehensionFor )
+	@ObjectNodeDispatchMethod( Schema.ComprehensionFor )
 	def ComprehensionFor(self, node, target, source):
 		return 'for ' + self( target ) + ' in ' + self( source )
 	
-	@ObjectNodeDispatchMethod( Nodes.ComprehensionIf )
+	@ObjectNodeDispatchMethod( Schema.ComprehensionIf )
 	def ComprehensionIf(self, node, condition):
 		return 'if ' + self( condition )
 	
-	@ObjectNodeDispatchMethod( Nodes.ListComp )
+	@ObjectNodeDispatchMethod( Schema.ListComp )
 	def ListComp(self, node, resultExpr, comprehensionItems):
 		return '[ ' + self( resultExpr ) + '   ' + '   '.join( [ self( x )   for x in comprehensionItems ] )  +  ' ]'
 	
-	@ObjectNodeDispatchMethod( Nodes.GeneratorExpr )
+	@ObjectNodeDispatchMethod( Schema.GeneratorExpr )
 	def GeneratorExpr(self, node, resultExpr, comprehensionItems):
 		return '( ' + self( resultExpr ) + '   ' + '   '.join( [ self( c )   for c in comprehensionItems ] )  +  ' )'
 	
 	
 	
 	# Dictionary literal
-	@ObjectNodeDispatchMethod( Nodes.DictKeyValuePair )
+	@ObjectNodeDispatchMethod( Schema.DictKeyValuePair )
 	def DictKeyValuePair(self, node, key, value):
 		return self( key ) + ':' + self( value )
 	
-	@ObjectNodeDispatchMethod( Nodes.DictLiteral )
+	@ObjectNodeDispatchMethod( Schema.DictLiteral )
 	def DictLiteral(self, node, values):
 		return '{ '  +  ', '.join( [ self( i )   for i in values ] )  +  ' }'
 	
 	
 	
 	# Yield expression and yield atom
-	@ObjectNodeDispatchMethod( Nodes.YieldExpr )
+	@ObjectNodeDispatchMethod( Schema.YieldExpr )
 	def YieldExpr(self, node, value):
 		return '(yield ' + self( value ) + ')'
 		
 	
 	
 	# Attribute ref
-	@ObjectNodeDispatchMethod( Nodes.AttributeRef )
+	@ObjectNodeDispatchMethod( Schema.AttributeRef )
 	def AttributeRef(self, node, target, name):
 		return self( target ) + '.' + name
 
 	
 
 	# Subscript
-	@ObjectNodeDispatchMethod( Nodes.SubscriptSlice )
+	@ObjectNodeDispatchMethod( Schema.SubscriptSlice )
 	def SubscriptSlice(self, node, lower, upper):
 		txt = lambda x:  self( x )   if x is not None   else ''
 		return txt( lower ) + ':' + txt( upper )
 
-	@ObjectNodeDispatchMethod( Nodes.SubscriptLongSlice )
+	@ObjectNodeDispatchMethod( Schema.SubscriptLongSlice )
 	def SubscriptLongSlice(self, node, lower, upper, stride):
 		txt = lambda x:  self( x )   if x is not None   else ''
 		return txt( lower ) + ':' + txt( upper ) + ':' + txt( stride )
 	
-	@ObjectNodeDispatchMethod( Nodes.SubscriptEllipsis )
+	@ObjectNodeDispatchMethod( Schema.SubscriptEllipsis )
 	def SubscriptEllipsis(self, node):
 		return '...'
 
-	@ObjectNodeDispatchMethod( Nodes.SubscriptTuple )
+	@ObjectNodeDispatchMethod( Schema.SubscriptTuple )
 	def SubscriptTuple(self, node, values):
 		return '('  +  ','.join( [ self( i )   for i in values ] )  +  ',)'
 
-	@ObjectNodeDispatchMethod( Nodes.Subscript )
+	@ObjectNodeDispatchMethod( Schema.Subscript )
 	def Subscript(self, node, target, index):
 		return self( target ) + '[' + self( index ) + ']'
 	
 
 	
 	# Call	
-	@ObjectNodeDispatchMethod( Nodes.CallKWArg )
+	@ObjectNodeDispatchMethod( Schema.CallKWArg )
 	def CallKWArg(self, node, name, value):
 		return name + '=' + self( value )
 	
-	@ObjectNodeDispatchMethod( Nodes.CallArgList )
+	@ObjectNodeDispatchMethod( Schema.CallArgList )
 	def CallArgList(self, node, value):
 		return '*' + self( value )
 	
-	@ObjectNodeDispatchMethod( Nodes.CallKWArgList )
+	@ObjectNodeDispatchMethod( Schema.CallKWArgList )
 	def CallKWArgList(self, node, value):
 		return '**' + self( value )
 	
-	@ObjectNodeDispatchMethod( Nodes.Call )
+	@ObjectNodeDispatchMethod( Schema.Call )
 	def Call(self, node, target, args):
 		return self( target ) + '( ' + ', '.join( [ self( a )   for a in args ] ) + ' )'
 	
 	
 	
 	# Operators
-	@ObjectNodeDispatchMethod( Nodes.Pow )
+	@ObjectNodeDispatchMethod( Schema.Pow )
 	def Pow(self, node, x, y):
 		return '( '  +  self( x )  +  ' ** '  +  self( y )  +  ' )'
 	
 	
-	@ObjectNodeDispatchMethod( Nodes.Invert )
+	@ObjectNodeDispatchMethod( Schema.Invert )
 	def Invert(self, node, x):
 		return '( ~'  +  self( x )  +  ' )'
 	
-	@ObjectNodeDispatchMethod( Nodes.Negate )
+	@ObjectNodeDispatchMethod( Schema.Negate )
 	def Negate(self, node, x):
 		return '( -'  +  self( x )  +  ' )'
 	
-	@ObjectNodeDispatchMethod( Nodes.Pos )
+	@ObjectNodeDispatchMethod( Schema.Pos )
 	def Pos(self, node, x):
 		return '( +'  +  self( x )  +  ' )'
 	
 	
-	@ObjectNodeDispatchMethod( Nodes.Mul )
+	@ObjectNodeDispatchMethod( Schema.Mul )
 	def Mul(self, node, x, y):
 		return '( '  +  self( x )  +  ' * '  +  self( y )  +  ' )'
 	
-	@ObjectNodeDispatchMethod( Nodes.Div )
+	@ObjectNodeDispatchMethod( Schema.Div )
 	def Div(self, node, x, y):
 		return '( '  +  self( x )  +  ' / '  +  self( y )  +  ' )'
 	
-	@ObjectNodeDispatchMethod( Nodes.Mod )
+	@ObjectNodeDispatchMethod( Schema.Mod )
 	def Mod(self, node, x, y):
 		return '( '  +  self( x )  +  ' % '  +  self( y )  +  ' )'
 	
-	@ObjectNodeDispatchMethod( Nodes.Add )
+	@ObjectNodeDispatchMethod( Schema.Add )
 	def Add(self, node, x, y):
 		return '( '  +  self( x )  +  ' + '  +  self( y )  +  ' )'
 	
-	@ObjectNodeDispatchMethod( Nodes.Sub )
+	@ObjectNodeDispatchMethod( Schema.Sub )
 	def Sub(self, node, x, y):
 		return '( '  +  self( x )  +  ' - '  +  self( y )  +  ' )'
 	
 	
-	@ObjectNodeDispatchMethod( Nodes.LShift )
+	@ObjectNodeDispatchMethod( Schema.LShift )
 	def LShift(self, node, x, y):
 		return '( '  +  self( x )  +  ' << '  +  self( y )  +  ' )'
 	
-	@ObjectNodeDispatchMethod( Nodes.RShift )
+	@ObjectNodeDispatchMethod( Schema.RShift )
 	def RShift(self, node, x, y):
 		return '( '  +  self( x )  +  ' >> '  +  self( y )  +  ' )'
 	
 	
-	@ObjectNodeDispatchMethod( Nodes.BitAnd )
+	@ObjectNodeDispatchMethod( Schema.BitAnd )
 	def BitAnd(self, node, x, y):
 		return '( '  +  self( x )  +  ' & '  +  self( y )  +  ' )'
 	
-	@ObjectNodeDispatchMethod( Nodes.BitXor )
+	@ObjectNodeDispatchMethod( Schema.BitXor )
 	def BitXor(self, node, x, y):
 		return '( '  +  self( x )  +  ' ^ '  +  self( y )  +  ' )'
 	
-	@ObjectNodeDispatchMethod( Nodes.BitOr )
+	@ObjectNodeDispatchMethod( Schema.BitOr )
 	def BitOr(self, node, x, y):
 		return '( '  +  self( x )  +  ' | '  +  self( y )  +  ' )'
 	
 
-	@ObjectNodeDispatchMethod( Nodes.Cmp )
+	@ObjectNodeDispatchMethod( Schema.Cmp )
 	def Cmp(self, node, x, ops):
 		return '( ' + self( x )  +  ''.join( [ self( op )   for op in ops ] ) + ' )'
 	
-	@ObjectNodeDispatchMethod( Nodes.CmpOpLte )
+	@ObjectNodeDispatchMethod( Schema.CmpOpLte )
 	def CmpOpLte(self, node, y):
 		return ' <= ' + self( y )
 	
-	@ObjectNodeDispatchMethod( Nodes.CmpOpLt )
+	@ObjectNodeDispatchMethod( Schema.CmpOpLt )
 	def CmpOpLt(self, node, y):
 		return ' < ' + self( y )
 	
-	@ObjectNodeDispatchMethod( Nodes.CmpOpGte )
+	@ObjectNodeDispatchMethod( Schema.CmpOpGte )
 	def CmpOpGte(self, node, y):
 		return ' >= ' + self( y )
 	
-	@ObjectNodeDispatchMethod( Nodes.CmpOpGt )
+	@ObjectNodeDispatchMethod( Schema.CmpOpGt )
 	def CmpOpGt(self, node, y):
 		return ' > ' + self( y )
 	
-	@ObjectNodeDispatchMethod( Nodes.CmpOpEq )
+	@ObjectNodeDispatchMethod( Schema.CmpOpEq )
 	def CmpOpEq(self, node, y):
 		return ' == ' + self( y )
 	
-	@ObjectNodeDispatchMethod( Nodes.CmpOpNeq )
+	@ObjectNodeDispatchMethod( Schema.CmpOpNeq )
 	def CmpOpNeq(self, node, y):
 		return ' != ' + self( y )
 	
-	@ObjectNodeDispatchMethod( Nodes.CmpOpIsNot )
+	@ObjectNodeDispatchMethod( Schema.CmpOpIsNot )
 	def CmpOpIsNot(self, node, y):
 		return ' is not ' + self( y )
 	
-	@ObjectNodeDispatchMethod( Nodes.CmpOpIs )
+	@ObjectNodeDispatchMethod( Schema.CmpOpIs )
 	def CmpOpIs(self, node, y):
 		return ' is ' + self( y )
 	
-	@ObjectNodeDispatchMethod( Nodes.CmpOpNotIn )
+	@ObjectNodeDispatchMethod( Schema.CmpOpNotIn )
 	def CmpOpNotIn(self, node, y):
 		return ' not in ' + self( y )
 	
-	@ObjectNodeDispatchMethod( Nodes.CmpOpIn )
+	@ObjectNodeDispatchMethod( Schema.CmpOpIn )
 	def CmpOpIn(self, node, y):
 		return ' in ' + self( y )
 	
 	
 
 	
-	@ObjectNodeDispatchMethod( Nodes.NotTest )
+	@ObjectNodeDispatchMethod( Schema.NotTest )
 	def NotTest(self, node, x):
 		return '(not '  +  self( x )  +  ')'
 	
-	@ObjectNodeDispatchMethod( Nodes.AndTest )
+	@ObjectNodeDispatchMethod( Schema.AndTest )
 	def AndTest(self, node, x, y):
 		return '( '  +  self( x )  +  ' and '  +  self( y )  +  ' )'
 	
-	@ObjectNodeDispatchMethod( Nodes.OrTest )
+	@ObjectNodeDispatchMethod( Schema.OrTest )
 	def OrTest(self, node, x, y):
 		return '( '  +  self( x )  +  ' or '  +  self( y )  +  ' )'
 	
@@ -346,82 +346,82 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 	
 	# Parameters	
-	@ObjectNodeDispatchMethod( Nodes.SimpleParam )
+	@ObjectNodeDispatchMethod( Schema.SimpleParam )
 	def SimpleParam(self, node, name):
 		return name
 	
-	@ObjectNodeDispatchMethod( Nodes.DefaultValueParam )
+	@ObjectNodeDispatchMethod( Schema.DefaultValueParam )
 	def DefaultValueParam(self, node, name, defaultValue):
 		return name  +  '='  +  self( defaultValue )
 	
-	@ObjectNodeDispatchMethod( Nodes.ParamList )
+	@ObjectNodeDispatchMethod( Schema.ParamList )
 	def ParamList(self, node, name):
 		return '*'  +  name
 	
-	@ObjectNodeDispatchMethod( Nodes.KWParamList )
+	@ObjectNodeDispatchMethod( Schema.KWParamList )
 	def KWParamList(self, node, name):
 		return '**'  +  name
 	
 	
 	
 	# Lambda expression
-	@ObjectNodeDispatchMethod( Nodes.LambdaExpr )
+	@ObjectNodeDispatchMethod( Schema.LambdaExpr )
 	def LambdaExpr(self, node, params, expr):
 		return '( lambda '  +  ', '.join( [ self( p )   for p in params ] )  +  ': '  +  self( expr ) + ' )'
 	
 	
 	
 	# Conditional expression
-	@ObjectNodeDispatchMethod( Nodes.ConditionalExpr )
+	@ObjectNodeDispatchMethod( Schema.ConditionalExpr )
 	def ConditionalExpr(self, node, condition, expr, elseExpr):
 		return self( expr )  +  '   if '  +  self( condition )  +  '   else '  +  self( elseExpr )
 
 	
 	
 	# Assert statement
-	@ObjectNodeDispatchMethod( Nodes.AssertStmt )
+	@ObjectNodeDispatchMethod( Schema.AssertStmt )
 	def AssertStmt(self, node, condition, fail):
 		return 'assert '  +  self( condition )  +  ( ', ' + self( fail )   if fail is not None   else  '' )
 	
 	
 	# Assignment statement
-	@ObjectNodeDispatchMethod( Nodes.AssignStmt )
+	@ObjectNodeDispatchMethod( Schema.AssignStmt )
 	def AssignStmt(self, node, targets, value):
 		return ''.join( [ self( t ) + ' = '   for t in targets ] )  +  self( value )
 	
 	
 	# Augmented assignment statement
-	@ObjectNodeDispatchMethod( Nodes.AugAssignStmt )
+	@ObjectNodeDispatchMethod( Schema.AugAssignStmt )
 	def AugAssignStmt(self, node, op, target, value):
 		return self( target )  +  ' '  +  op  +  ' '  +  self( value )
 	
 	
 	# Pass statement
-	@ObjectNodeDispatchMethod( Nodes.PassStmt )
+	@ObjectNodeDispatchMethod( Schema.PassStmt )
 	def PassStmt(self, node):
 		return 'pass'
 	
 	
 	# Del statement
-	@ObjectNodeDispatchMethod( Nodes.DelStmt )
+	@ObjectNodeDispatchMethod( Schema.DelStmt )
 	def DelStmt(self, node, target):
 		return 'del '  +  self( target )
 	
 	
 	# Return statement
-	@ObjectNodeDispatchMethod( Nodes.ReturnStmt )
+	@ObjectNodeDispatchMethod( Schema.ReturnStmt )
 	def ReturnStmt(self, node, value):
 		return 'return '  +  self( value )
 	
 	
 	# Yield statement
-	@ObjectNodeDispatchMethod( Nodes.YieldStmt )
+	@ObjectNodeDispatchMethod( Schema.YieldStmt )
 	def YieldStmt(self, node, value):
 		return 'yield '  +  self( value )
 	
 	
 	# Raise statement
-	@ObjectNodeDispatchMethod( Nodes.RaiseStmt )
+	@ObjectNodeDispatchMethod( Schema.RaiseStmt )
 	def RaiseStmt(self, node, excType, excValue, traceback):
 		params = ', '.join( [ self( x )   for x in excType, excValue, traceback   if x is not None ] )
 		if params != '':
@@ -431,63 +431,63 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 	
 	# Break statement
-	@ObjectNodeDispatchMethod( Nodes.BreakStmt )
+	@ObjectNodeDispatchMethod( Schema.BreakStmt )
 	def BreakStmt(self, node):
 		return 'break'
 	
 	
 	# Continue statement
-	@ObjectNodeDispatchMethod( Nodes.ContinueStmt )
+	@ObjectNodeDispatchMethod( Schema.ContinueStmt )
 	def ContinueStmt(self, node):
 		return 'continue'
 	
 	
 	# Import statement
-	@ObjectNodeDispatchMethod( Nodes.RelativeModule )
+	@ObjectNodeDispatchMethod( Schema.RelativeModule )
 	def RelativeModule(self, node, name):
 		return name
 	
-	@ObjectNodeDispatchMethod( Nodes.ModuleImport )
+	@ObjectNodeDispatchMethod( Schema.ModuleImport )
 	def ModuleImport(self, node, name):
 		return name
 	
-	@ObjectNodeDispatchMethod( Nodes.ModuleImportAs )
+	@ObjectNodeDispatchMethod( Schema.ModuleImportAs )
 	def ModuleImportAs(self, node, name, asName):
 		return name + ' as ' + asName
 	
-	@ObjectNodeDispatchMethod( Nodes.ModuleContentImport )
+	@ObjectNodeDispatchMethod( Schema.ModuleContentImport )
 	def ModuleContentImport(self, node, name):
 		return name
 	
-	@ObjectNodeDispatchMethod( Nodes.ModuleContentImportAs )
+	@ObjectNodeDispatchMethod( Schema.ModuleContentImportAs )
 	def ModuleContentImportAs(self, node, name, asName):
 		return name + ' as ' + asName
 	
-	@ObjectNodeDispatchMethod( Nodes.ImportStmt )
+	@ObjectNodeDispatchMethod( Schema.ImportStmt )
 	def ImportStmt(self, node, modules):
 		return 'import '  +  ', '.join( [ self( x )   for x in modules ] )
 	
-	@ObjectNodeDispatchMethod( Nodes.FromImportStmt )
+	@ObjectNodeDispatchMethod( Schema.FromImportStmt )
 	def FromImportStmt(self, node, module, imports):
 		return 'from ' + self( module ) + ' import ' + ', '.join( [ self( x )   for x in imports ] )
 	
-	@ObjectNodeDispatchMethod( Nodes.FromImportAllStmt )
+	@ObjectNodeDispatchMethod( Schema.FromImportAllStmt )
 	def FromImportAllStmt(self, node, module):
 		return 'from ' + self( module ) + ' import *'
 	
 	
 	# Global statement
-	@ObjectNodeDispatchMethod( Nodes.GlobalVar )
+	@ObjectNodeDispatchMethod( Schema.GlobalVar )
 	def GlobalVar(self, node, name):
 		return name
 	
-	@ObjectNodeDispatchMethod( Nodes.GlobalStmt )
+	@ObjectNodeDispatchMethod( Schema.GlobalStmt )
 	def GlobalStmt(self, node, vars):
 		return 'global '  +  ', '.join( [ self( x )   for x in vars ] )
 	
 	
 	# Exec statement
-	@ObjectNodeDispatchMethod( Nodes.ExecStmt )
+	@ObjectNodeDispatchMethod( Schema.ExecStmt )
 	def ExecStmt(self, node, source, locals, globals):
 		txt = 'exec '  +  self( source )
 		if locals is not None:
@@ -498,7 +498,7 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 	
 	# Print statement
-	@ObjectNodeDispatchMethod( Nodes.PrintStmt )
+	@ObjectNodeDispatchMethod( Schema.PrintStmt )
 	def PrintStmt(self, node, destination, values):
 		txt = 'print'
 		if destination is not None:
@@ -531,7 +531,7 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 	
 	# If statement
-	@ObjectNodeDispatchMethod( Nodes.IfStmt )
+	@ObjectNodeDispatchMethod( Schema.IfStmt )
 	def IfStmt(self, node, condition, suite, elifBlocks, elseSuite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
 		elifText = ''.join( [ self( b )   for b in elifBlocks ] )
@@ -539,28 +539,28 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 
 	# Elif block
-	@ObjectNodeDispatchMethod( Nodes.ElifBlock )
+	@ObjectNodeDispatchMethod( Schema.ElifBlock )
 	def ElifBlock(self, node, condition, suite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
 		return 'elif '  +  self( condition ) + ':\n'  +  _indent( suiteText )
 	
 
 	# While statement
-	@ObjectNodeDispatchMethod( Nodes.WhileStmt )
+	@ObjectNodeDispatchMethod( Schema.WhileStmt )
 	def WhileStmt(self, node, condition, suite, elseSuite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
 		return 'while '  +  self( condition ) + ':\n'  +  _indent( suiteText )  +  self._elseSuiteToText( elseSuite )
 	
 
 	# For statement
-	@ObjectNodeDispatchMethod( Nodes.ForStmt )
+	@ObjectNodeDispatchMethod( Schema.ForStmt )
 	def ForStmt(self, node, target, source, suite, elseSuite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
 		return 'for '  +  self( target )  +  ' in '  +  self( source )  +  ':\n'  +  _indent( suiteText )  +  self._elseSuiteToText( elseSuite )
 	
 
 	# Try statement
-	@ObjectNodeDispatchMethod( Nodes.TryStmt )
+	@ObjectNodeDispatchMethod( Schema.TryStmt )
 	def TryStmt(self, node, suite, exceptBlocks, elseSuite, finallySuite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
 		exceptText = ''.join( [ self( b )   for b in exceptBlocks ] )
@@ -568,7 +568,7 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 
 	# Except statement
-	@ObjectNodeDispatchMethod( Nodes.ExceptBlock )
+	@ObjectNodeDispatchMethod( Schema.ExceptBlock )
 	def ExceptBlock(self, node, exception, target, suite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
 		txt = 'except'
@@ -580,14 +580,14 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 
 	# With statement
-	@ObjectNodeDispatchMethod( Nodes.WithStmt )
+	@ObjectNodeDispatchMethod( Schema.WithStmt )
 	def WithStmt(self, node, expr, target, suite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
 		return 'with '  +  self( expr )  +  ( ' as ' + self( target )   if target is not None   else   '' )  +  ':\n'  +  _indent( suiteText )
 	
 	
 	# Decorator
-	@ObjectNodeDispatchMethod( Nodes.Decorator )
+	@ObjectNodeDispatchMethod( Schema.Decorator )
 	def Decorator(self, node, name, args):
 		text = '@' + name
 		if args is not None:
@@ -603,14 +603,14 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 
 	# Def statement
-	@ObjectNodeDispatchMethod( Nodes.DefStmt )
+	@ObjectNodeDispatchMethod( Schema.DefStmt )
 	def DefStmt(self, node, decorators, name, params, suite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
 		return self._decoratorsToText( decorators )  +  'def '  +  name  +  '('  +  ', '.join( [ self( p )   for p in params ] )  +  '):\n'  +  _indent( suiteText )
 	
 
 	# Class statement
-	@ObjectNodeDispatchMethod( Nodes.ClassStmt )
+	@ObjectNodeDispatchMethod( Schema.ClassStmt )
 	def ClassStmt(self, node, name, bases, suite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
 		text = 'class '  +  name
@@ -621,7 +621,7 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 	
 	# Indented block
-	@ObjectNodeDispatchMethod( Nodes.IndentedBlock )
+	@ObjectNodeDispatchMethod( Schema.IndentedBlock )
 	def IndentedBlock(self, node, suite):
 		if self._bErrorChecking:
 			raise ValueError, 'Indentation error'
@@ -631,13 +631,13 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 	
 	# Comment statement
-	@ObjectNodeDispatchMethod( Nodes.CommentStmt )
+	@ObjectNodeDispatchMethod( Schema.CommentStmt )
 	def CommentStmt(self, node, comment):
 		return '#' + comment
 
 	
 	# Module
-	@ObjectNodeDispatchMethod( Nodes.PythonModule )
+	@ObjectNodeDispatchMethod( Schema.PythonModule )
 	def PythonModule(self, node, suite):
 		return '\n'.join( [ self( line )   for line in suite ] )
 
@@ -651,7 +651,7 @@ from BritefuryJ.DocModel import DMIOReader, DMSchemaResolver
 class TestCase_Python25CodeGenerator (unittest.TestCase):
 	class _Resolver (DMSchemaResolver):
 		def getSchema(self, location):
-			return Nodes.schema
+			return Schema.schema
 		
 	_resolver = _Resolver()
 	

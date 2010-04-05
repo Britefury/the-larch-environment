@@ -12,9 +12,9 @@ from java.util.regex import Pattern
 
 from javax.swing import JPopupMenu
 
-from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeDispatchMethod
+from Britefury.Dispatch.ObjectMethodDispatch import ObjectDispatchMethod
 
-from Britefury.gSym.View.GSymView import GSymViewObjectNodeDispatch, GSymViewPage
+from Britefury.gSym.View.GSymView import GSymViewObjectDispatch, GSymViewPage
 from Britefury.gSym.gSymDocument import GSymDocument
 
 from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replaceNodeContents, append, prepend, insertElement, insertRange, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
@@ -31,7 +31,7 @@ from BritefuryJ.DocPresent.Browser import Location
 from BritefuryJ.GSym import GSymPerspective, GSymSubject
 from BritefuryJ.GSym.View import PyGSymViewFragmentFunction
 
-from GSymCore.GSymApp import NodeClasses as Nodes
+from GSymCore.GSymApp import Application
 from GSymCore.GSymApp.GSymAppViewer.GSymAppViewerStyleSheet import GSymAppViewerStyleSheet
 
 
@@ -90,22 +90,22 @@ def _uniqueDocumentLocation(docs, location):
 
 
 
-class AppView (GSymViewObjectNodeDispatch):
-	@ObjectNodeDispatchMethod( Nodes.AppState )
-	def AppState(self, ctx, styleSheet, state, node, openDocuments, configuration):
+class AppView (GSymViewObjectDispatch):
+	@ObjectDispatchMethod( Application.AppState )
+	def AppState(self, ctx, styleSheet, state, node):
 		def _onNew():
 			def handleNewDocumentFn(unit):
 				name = _newDocumentName( openDocuments )
 				
-				world = ctx.getSubjectContext()['document'].getWorld()
+				world = ctx.getSubjectContext()['world']
 				doc = GSymDocument( world, unit )
 				doc.setDocumentName( name )
 				location = world.addNewDocument( doc )
 
-				appDoc = Nodes.AppDocument( name=name, location=location )
-				openDocuments.append( appDoc )
+				appDoc = Application.AppDocument( name, location )
+				node.addOpenDocument( appDoc )
 				
-			
+			openDocuments = node.getOpenDocuments()
 			app = ctx.getViewContext().getBrowserContext().app
 			app.promptNewDocument( handleNewDocumentFn )
 			
@@ -118,12 +118,12 @@ class AppView (GSymViewObjectNodeDispatch):
 				head, documentName = os.path.split( fullPath )
 				documentName, ext = os.path.splitext( documentName )
 				
-				world = ctx.getSubjectContext()['document'].getWorld()
+				world = ctx.getSubjectContext()['world']
 				document.setDocumentName( documentName )
 				location = world.addNewDocument( document )
 				
-				appDoc = Nodes.AppDocument( name=documentName, location=location )
-				openDocuments.append( appDoc )
+				appDoc = Application.AppDocument( name, location )
+				node.addOpenDocument( appDoc )
 
 				
 			app = ctx.getViewContext().getBrowserContext().app
@@ -132,16 +132,16 @@ class AppView (GSymViewObjectNodeDispatch):
 			return True
 
 		
-		openDocViews = ctx.mapPresentFragment( openDocuments, styleSheet, state.withAttrs( location='' ) )
+		openDocViews = ctx.mapPresentFragment( node.getOpenDocuments(), styleSheet, state.withAttrs( location='' ) )
 		
 		return styleSheet.appState( openDocViews, _onNew, _onOpen )
 
 
 
-	@ObjectNodeDispatchMethod( Nodes.AppDocument )
-	def AppDocument(self, ctx, styleSheet, state, node, name, location):
+	@ObjectDispatchMethod( Application.AppDocument )
+	def AppDocument(self, ctx, styleSheet, state, node):
 		def _onSave():
-			world = ctx.getSubjectContext()['document'].getWorld()
+			world = ctx.getSubjectContext()['world']
 			document = world.getDocument( location )
 			
 			if document._filename is None:
@@ -155,7 +155,7 @@ class AppView (GSymViewObjectNodeDispatch):
 				
 		
 		def _onSaveAs():
-			world = ctx.getSubjectContext()['document'].getWorld()
+			world = ctx.getSubjectContext()['world']
 			document = world.getDocument( location )
 			
 			def handleSaveDocumentAsFn(filename):
@@ -165,7 +165,8 @@ class AppView (GSymViewObjectNodeDispatch):
 			app.promptSaveDocumentAs( handleSaveDocumentAsFn )
 
 			
-			
+		name = node.getName()
+		location = node.getLocation()
 		return styleSheet.appDocument( name, Location( location ), _onSave, _onSaveAs )
 
 
@@ -188,7 +189,7 @@ class GSymAppViewerPerspective (GSymPerspective):
 			if iterAfterDocName is not None:
 				documentName = iterAfterDocName.lastToken()
 					
-				world = enclosingSubject.getSubjectContext()['document'].getWorld()
+				world = enclosingSubject.getSubjectContext()['world']
 				doc = world.getDocument( documentName )
 				
 				if doc is not None:

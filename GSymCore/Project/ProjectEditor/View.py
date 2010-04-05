@@ -32,7 +32,7 @@ from BritefuryJ.GSym import GSymPerspective, GSymSubject
 from BritefuryJ.GSym.View import PyGSymViewFragmentFunction
 
 
-from GSymCore.Project import NodeClasses as Nodes
+from GSymCore.Project import Schema
 from GSymCore.Project.ProjectEditor.ProjectEditorStyleSheet import ProjectEditorStyleSheet
 
 
@@ -49,7 +49,7 @@ def _joinLocation(*xs):
 
 
 class ProjectView (GSymViewObjectNodeDispatch):
-	@ObjectNodeDispatchMethod( Nodes.Project )
+	@ObjectNodeDispatchMethod( Schema.Project )
 	def Project(self, ctx, styleSheet, state, node, rootPackage):
 		def _onSave(link, buttonEvent):
 			if document._filename is None:
@@ -85,21 +85,21 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 
 
-	@ObjectNodeDispatchMethod( Nodes.Package )
+	@ObjectNodeDispatchMethod( Schema.Package )
 	def Package(self, ctx, styleSheet, state, node, name, contents):
 		def _packageRename(newName):
 			node['name'] = newName
 			
 		def _addPage(pageUnit):
-			#contents.append( Nodes.Page( name='New page', unit=pageUnit ) )
-			p = Nodes.Page( name='New page', unit=pageUnit )
+			#contents.append( Schema.Page( name='New page', unit=pageUnit ) )
+			p = Schema.Page( name='New page', unit=pageUnit )
 			contents.append( p )
 		
 		def _importPage(name, pageUnit):
-			contents.append( Nodes.Page( name=name, unit=pageUnit ) )
+			contents.append( Schema.Page( name=name, unit=pageUnit ) )
 
 		def _addPackage():
-			contents.append( Nodes.Package( name='New package', contents=[] ) )
+			contents.append( Schema.Package( name='New package', contents=[] ) )
 
 		location = state['location']
 		packageLocation = _joinLocation( location, name )
@@ -112,7 +112,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 
 
-	@ObjectNodeDispatchMethod( Nodes.Page )
+	@ObjectNodeDispatchMethod( Schema.Page )
 	def Page(self, ctx, styleSheet, state, node, name, unit):
 		def _pageRename(newName):
 			node['name'] = newName
@@ -157,9 +157,9 @@ class ProjectView (GSymViewObjectNodeDispatch):
 			#if node is None:
 				#return None
 			#elif isinstance( node, DMObjectInterface ):
-				#if node.isInstanceOf( Nodes.Package ):
+				#if node.isInstanceOf( Schema.Package ):
 					#package = node
-				#elif n.isInstanceOf( Nodes.Page ):
+				#elif n.isInstanceOf( Schema.Page ):
 					#return document.resolveUnitLocation( node['unit'], ProjectResolveContext( resolveContext, locationPrefix, document ), loc, app )
 				#else:
 					#return None
@@ -210,9 +210,9 @@ class ProjectEditorPerspective (GSymPerspective):
 				if node is None:
 					return None
 				elif isinstance( node, DMObjectInterface ):
-					if node.isInstanceOf( Nodes.Package ):
+					if node.isInstanceOf( Schema.Package ):
 						package = node
-					elif node.isInstanceOf( Nodes.Page ):
+					elif node.isInstanceOf( Schema.Page ):
 						subject = GSymSubject( node, self, enclosingSubject.getSubjectContext().withAttrs( location=locationIterator.getPrefix() ) )
 						document = enclosingSubject.getSubjectContext()['document']
 						return document.resolveUnitRelativeLocation( node['unit'], subject, locationIterator )
