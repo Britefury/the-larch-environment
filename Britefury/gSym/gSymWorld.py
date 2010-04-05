@@ -59,6 +59,8 @@ class GSymWorld (object):
 		self.newPageFactories = []
 		self.newUnitFactories = []
 		self.pageImporters = []
+		self._appState = None
+		self._appStatePerspective = None
 		
 		
 		for plugin in self._plugins:
@@ -79,6 +81,18 @@ class GSymWorld (object):
 		
 	def registerPageImporter(self, plugin, pageImporter):
 		self.pageImporters.append( pageImporter )
+		
+	def registerAppStateAndPerspective(self, plugin, appState, appStatePerspective):
+		assert self._appState is None
+		self._appState = appState
+		self._appStatePerspective = appStatePerspective
+		
+		
+	def getAppState(self):
+		return self._appState
+	
+	def getAppStatePerspective(self):
+		return self._appStatePerspective
 		
 		
 	def addNewDocument(self, document):

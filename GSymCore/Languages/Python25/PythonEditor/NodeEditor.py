@@ -29,7 +29,7 @@ from Britefury.Util.NodeUtil import *
 from Britefury.gSym.View import EditOperations
 
 
-from GSymCore.Languages.Python25 import NodeClasses as Nodes
+from GSymCore.Languages.Python25 import Schema
 from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
 
 from GSymCore.Languages.Python25.PythonEditor.Parser import Python25Grammar
@@ -91,7 +91,7 @@ class ParsedExpressionLinearRepresentationListener (ElementLinearRepresentationL
 				if len( items ) == 1  and  ( isinstance( items[0], str )  or  isinstance( items[0], unicode ) ):
 					if items[0].strip() == '':
 						return False
-				unparsed = Nodes.UNPARSED( value=items )
+				unparsed = Schema.UNPARSED( value=items )
 				pyReplaceExpression( ctx, node, unparsed )
 			return True
 		else:
@@ -178,7 +178,7 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 						pyReplaceStmt( ctx, node, parsed )
 						return True
 					
-				unparsed = Nodes.UNPARSED( value=items )
+				unparsed = Schema.UNPARSED( value=items )
 				pyReplaceNode( sourceCtx, sourceNode, unparsed )
 				return True
 			else:

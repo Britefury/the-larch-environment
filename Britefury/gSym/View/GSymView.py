@@ -12,6 +12,7 @@ from BritefuryJ.GSym.View import GSymViewFragmentFunction
 from Britefury.Dispatch.Dispatch import DispatchError
 from Britefury.Dispatch.MethodDispatch import methodDispatch, methodDispatchAndGetName
 from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeMethodDispatchMetaClass, objectNodeMethodDispatch, objectNodeMethodDispatchAndGetName
+from Britefury.Dispatch.ObjectMethodDispatch import ObjectMethodDispatchMetaClass, objectMethodDispatch, objectMethodDispatchAndGetName
 
 import time
 
@@ -52,6 +53,23 @@ class GSymViewObjectNodeDispatch (object):
 		
 
 	
+class GSymViewObjectDispatch (object):
+	__metaclass__ = ObjectMethodDispatchMetaClass
+	__dispatch_num_args__ = 3
+	
+	def __call__(self, obj, ctx, styleSheet, state):
+		element = None
+		try:
+			element, name = objectMethodDispatchAndGetName( self, obj, ctx, styleSheet, state )
+			element.setDebugName( name )
+		except DispatchError:
+			print node
+			element = ctx.errorElement( '<<VIEW OBJECT DISPATCH ERROR>>' )
+		return element
+	
+		
+
+	
 class GSymViewPage (Page):
 	def __init__(self, title, commandHistory):
 		self._title = title
@@ -72,7 +90,8 @@ class GSymViewPage (Page):
 		return self._commandHistory
 	
 	def setCommandHistoryListener(self, listener):
-		self._commandHistory.setCommandHistoryListener( listener )
+		if self._commandHistory is not None:
+			self._commandHistory.setCommandHistoryListener( listener )
 
 
 

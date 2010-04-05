@@ -10,5 +10,5 @@ from GSymCore.GSymApp import GSymApp
 
 
 def initPlugin(plugin, world):
-	world.registerUnitClass( plugin, GSymApp.unitClass )
+	world.registerAppStateAndPerspective( plugin, GSymApp.newAppState(), GSymApp.gSymAppViewerPerspective )
 

@@ -35,9 +35,7 @@ def main():
 		filename = sys.argv[1]
 		assert False, 'Load file from command line not implemented yet'
 		
-	unit = GSymApp.newAppState()
-	document = GSymDocument( world, unit )
-	app = MainApp( world, document )
+	app = MainApp( world )
 
 	app.show()
 

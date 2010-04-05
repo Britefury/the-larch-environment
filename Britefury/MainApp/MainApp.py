@@ -112,30 +112,34 @@ class _AppLocationResolver (GSymLocationResolver):
 	def resolveLocationAsPage(self, location):
 		subject = self.resolveLocationAsSubject( location )
 		if subject is not None:
+			commandHistory = None
 			try:
 				doc = subject.getSubjectContext()['document']
 			except KeyError:
 				doc = None
 				
-			if doc is not None:
-				page = GSymViewPage( 'MainApp: _AppLocationResolver: default title', doc.getCommandHistory() )
-				viewContext = GSymViewContext( subject.getFocus(), subject.getPerspective(), subject.getSubjectContext(), self._app._browserContext, page, doc.getCommandHistory() )
-				page.setContentsElement( viewContext.getRegion() )
-				return page
+			commandHistory = doc.getCommandHistory()   if doc is not None   else None
+
+			page = GSymViewPage( 'MainApp: _AppLocationResolver: default title', commandHistory )
+			viewContext = GSymViewContext( subject.getFocus(), subject.getPerspective(), subject.getSubjectContext(), self._app._browserContext, page, commandHistory )
+			page.setContentsElement( viewContext.getRegion() )
+			return page
 		
 		return None
 				
 	def resolveLocationAsSubject(self, location):
-		document = self._app._document
-		if document is not None:
+		appState = self._app._appState
+		if appState is not None:
+			world = self._app._world
 			iterator = location.iterator()
 			iterAfterModel = iterator.consumeLiteral( 'model:' )
+			perspective = world.getAppStatePerspective()
 			if iterAfterModel is not None:
-				enclosingSubject = GSymSubject( None, None, AttributeTable.instance.withAttrs( document=document, location=Location( 'model:' ) ) )
+				enclosingSubject = GSymSubject( appState, perspective, AttributeTable.instance.withAttrs( world=world, document=None, location=Location( 'model:' ) ) )
 				iterator = iterAfterModel
 			else:
-				enclosingSubject = GSymSubject( None, None, AttributeTable.instance.withAttrs( document=document, location=Location( '' ) ) )
-			subject = document.resolveRelativeLocation( enclosingSubject, iterator )
+				enclosingSubject = GSymSubject( appState, perspective, AttributeTable.instance.withAttrs( world=world, document=None, location=Location( '' ) ) )
+			subject = perspective.resolveRelativeLocation( enclosingSubject, iterator )
 			if subject is None:
 				return None
 			if iterAfterModel:
@@ -153,10 +157,10 @@ class _MainAppBrowserContext (GSymBrowserContext):
 		
 
 class MainApp (AppControlInterface):
-	def __init__(self, world, document, location=Location( '' )):
+	def __init__(self, world, location=Location( '' )):
 		self._world = world
 		
-		self._document = document
+		self._appState = world.getAppState()
 		
 		self._resolver = _AppLocationResolver( self )
 		self._browserContext = _MainAppBrowserContext( self, [ self._resolver ] )
@@ -459,7 +463,7 @@ class MainApp (AppControlInterface):
 		
 		
 	def _createNewWindow(self, location):
-		newWindow = MainApp( self._world, self._document, location )
+		newWindow = MainApp( self._world, location )
 		newWindow.show()
 	
 	

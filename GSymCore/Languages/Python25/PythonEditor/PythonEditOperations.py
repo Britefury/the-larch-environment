@@ -39,7 +39,7 @@ from Britefury.gSym.View import EditOperations
 
 
 
-from GSymCore.Languages.Python25 import NodeClasses as Nodes
+from GSymCore.Languages.Python25 import Schema
 from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
 
 from GSymCore.Languages.Python25.PythonEditor.Parser import Python25Grammar
@@ -59,25 +59,25 @@ class NotImplementedError (Exception):
 #
 
 def isStmt(node):
-	return isinstance( node, DMObjectInterface )  and  ( node.isInstanceOf( Nodes.Stmt )  or  node.isInstanceOf( Nodes.BlankLine )  or  node.isInstanceOf( Nodes.UNPARSED ) )
+	return isinstance( node, DMObjectInterface )  and  ( node.isInstanceOf( Schema.Stmt )  or  node.isInstanceOf( Schema.BlankLine )  or  node.isInstanceOf( Schema.UNPARSED ) )
 
 def isCompoundStmt(node):
-	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Nodes.CompoundStmt )
+	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Schema.CompoundStmt )
 
 def isCompoundStmtHeader(node):
-	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Nodes.CompountStmtHeader )
+	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Schema.CompountStmtHeader )
 
 def isCompoundStmtOrCompoundHeader(node):
-	return isinstance( node, DMObjectInterface )  and  ( node.isInstanceOf( Nodes.CompoundStmt )  or  node.isInstanceOf( Nodes.CompountStmtHeader ) )
+	return isinstance( node, DMObjectInterface )  and  ( node.isInstanceOf( Schema.CompoundStmt )  or  node.isInstanceOf( Schema.CompountStmtHeader ) )
 
 def isUnparsed(node):
-	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Nodes.UNPARSED )
+	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Schema.UNPARSED )
 
 def isPythonModule(node):
-	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Nodes.PythonModule )
+	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Schema.PythonModule )
 
 def isIndentedBlock(node):
-	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Nodes.IndentedBlock )
+	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Schema.IndentedBlock )
 
 
 
@@ -99,7 +99,7 @@ def getStatementContextFromElement(element):
 
 def getParentStatementContext(ctx):
 	ctx = ctx.getParent()
-	while ctx is not None  and  not isStmt( ctx.getDocNode() )  and  not ctx.getDocNode().isInstanceOf( Nodes.PythonModule ):
+	while ctx is not None  and  not isStmt( ctx.getDocNode() )  and  not ctx.getDocNode().isInstanceOf( Schema.PythonModule ):
 		ctx = ctx.getParent()
 	return ctx
 
@@ -283,10 +283,10 @@ def getMinDepthOfStream(itemStream):
 	for item in itemStream.getItems():
 		if isinstance( item, ItemStream.StructuralItem ):
 			v = item.getStructuralValue()
-			if v.isInstanceOf( Nodes.Indent ):
+			if v.isInstanceOf( Schema.Indent ):
 				depth += 1
 				minDepth = min( minDepth, depth )
-			elif v.isInstanceOf( Nodes.Dedent ):
+			elif v.isInstanceOf( Schema.Dedent ):
 				depth -= 1
 				minDepth = min( minDepth, depth )
 	return minDepth
@@ -297,9 +297,9 @@ def getDepthOffsetOfStream(itemStream):
 	for item in itemStream.getItems():
 		if isinstance( item, ItemStream.StructuralItem ):
 			v = item.getStructuralValue()
-			if v.isInstanceOf( Nodes.Indent ):
+			if v.isInstanceOf( Schema.Indent ):
 				depth += 1
-			elif v.isInstanceOf( Nodes.Dedent ):
+			elif v.isInstanceOf( Schema.Dedent ):
 				depth -= 1
 	return depth
 
@@ -323,10 +323,10 @@ def joinStreamsAroundDeletionPoint(before, after):
 				
 		if offset < 0:
 			for i in xrange( 0, -offset ):
-				builder.appendStructuralValue( Nodes.Indent() )
+				builder.appendStructuralValue( Schema.Indent() )
 		else:
 			for i in xrange( 0, offset ):
-				builder.appendStructuralValue( Nodes.Dedent() )
+				builder.appendStructuralValue( Schema.Dedent() )
 
 		for x in afterItems:
 			builder.appendItemStreamItem( x )
@@ -340,13 +340,13 @@ def _extendStreamWithoutDedents(builder, itemStream, startDepth):
 	for item in itemStream.getItems():
 		if isinstance( item, ItemStream.StructuralItem ):
 			v = item.getStructuralValue()
-			if v.isInstanceOf( Nodes.Indent ):
+			if v.isInstanceOf( Schema.Indent ):
 				if indentsToSkip > 0:
 					indentsToSkip -= 1
 					item = None
 				else:
 					depth += 1
-			elif v.isInstanceOf( Nodes.Dedent ):
+			elif v.isInstanceOf( Schema.Dedent ):
 				if depth == 0:
 					indentsToSkip += 1
 					item = None
@@ -388,10 +388,10 @@ def joinStreamsForInsertion(commonRootCtx, before, insertion, after):
 				
 		if offset < 0:
 			for i in xrange( 0, -offset ):
-				builder.appendStructuralValue( Nodes.Indent() )
+				builder.appendStructuralValue( Schema.Indent() )
 		else:
 			for i in xrange( 0, offset ):
-				builder.appendStructuralValue( Nodes.Dedent() )
+				builder.appendStructuralValue( Schema.Dedent() )
 
 		for x in afterItems:
 			builder.appendItemStreamItem( x )

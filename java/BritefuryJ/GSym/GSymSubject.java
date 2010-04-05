@@ -50,4 +50,10 @@ public class GSymSubject
 	{
 		return new GSymSubject( focus, perspective, subjectContext );
 	}
+	
+	
+	public String toString()
+	{
+		return "GSymSubject( focus=" + focus + ", perspective=" + perspective + ", subjectContext=" + subjectContext + " )";
+	}
 }
