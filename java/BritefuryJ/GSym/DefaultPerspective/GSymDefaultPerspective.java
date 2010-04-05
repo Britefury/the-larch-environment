@@ -85,7 +85,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 			if ( subject != null )
 			{
 				DefaultPerspectivePage page = new DefaultPerspectivePage();
-				GSymViewContext viewContext = new GSymViewContext( subject.getFocus(), perspective, subject.getSubjectContext(), AttributeTable.instance, perspective.browserContext, page, null );
+				GSymViewContext viewContext = new GSymViewContext( subject.getFocus(), perspective, subject.getSubjectContext(), perspective.browserContext, page, null );
 				page.contents = viewContext.getRegion();
 				return page;
 			}
@@ -125,6 +125,11 @@ public class GSymDefaultPerspective implements GSymPerspective
 	public StyleSheet getStyleSheet()
 	{
 		return PrimitiveStyleSheet.instance;
+	}
+	
+	public AttributeTable getInitialState()
+	{
+		return AttributeTable.instance;
 	}
 	
 	public Object createInitialState(GSymSubject subject)

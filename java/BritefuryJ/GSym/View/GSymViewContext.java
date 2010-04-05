@@ -28,14 +28,14 @@ import BritefuryJ.Utils.HashUtils;
 
 public class GSymViewContext implements DocView.RefreshListener
 {
-	private static class ViewFragmentContextAndResultFactory implements IncrementalTreeNode.NodeResultFactory
+	protected static class ViewFragmentContextAndResultFactory implements IncrementalTreeNode.NodeResultFactory
 	{
-		private GSymViewContext viewContext;
-		private GSymPerspective perspective;
-		private GSymViewFragmentFunction viewFragmentFunction;
-		private AttributeTable subjectContext;
-		private StyleSheet styleSheet;
-		private AttributeTable state;
+		protected GSymViewContext viewContext;
+		protected GSymPerspective perspective;
+		protected GSymViewFragmentFunction viewFragmentFunction;
+		protected AttributeTable subjectContext;
+		protected StyleSheet styleSheet;
+		protected AttributeTable state;
 		
 		public ViewFragmentContextAndResultFactory(GSymViewContext viewContext, GSymPerspective perspective, GSymViewFragmentFunction nodeFunction, AttributeTable subjectContext,
 				StyleSheet styleSheet, AttributeTable state)
@@ -55,7 +55,7 @@ public class GSymViewContext implements DocView.RefreshListener
 			docView.profile_startPython();
 
 			// Create the node context
-			GSymFragmentViewContext nodeContext = new GSymFragmentViewContext( viewContext, (DVNode)incrementalNode, perspective, viewFragmentFunction, subjectContext );
+			GSymFragmentViewContext nodeContext = new GSymFragmentViewContext( this, (DVNode)incrementalNode, subjectContext );
 			
 			// Create the view fragment
 			DPElement fragment = viewFragmentFunction.createViewFragment( docNode, nodeContext, styleSheet, state );
@@ -132,16 +132,12 @@ public class GSymViewContext implements DocView.RefreshListener
 		new HashMap<ViewFragmentContextAndResultFactoryKey, ViewFragmentContextAndResultFactory>();
 
 	
-	public GSymViewContext(Object docRootNode, GSymPerspective perspective, AttributeTable subjectContext, AttributeTable rootState, GSymBrowserContext browserContext,
+	public GSymViewContext(Object docRootNode, GSymPerspective perspective, AttributeTable subjectContext, GSymBrowserContext browserContext,
 			Page page, CommandHistory commandHistory)
 	{
-		if ( rootState == null )
-		{
-			throw new RuntimeException( "GSymViewContext.<init>(): @rootState cannot be null" );
-		}
 		this.docRootNode = docRootNode;
 		
-		view = new DocView( docRootNode, makeNodeResultFactory( perspective, perspective.getFragmentViewFunction(), subjectContext, perspective.getStyleSheet(), rootState ) );
+		view = new DocView( docRootNode, makeNodeResultFactory( perspective, perspective.getFragmentViewFunction(), subjectContext, perspective.getStyleSheet(), perspective.getInitialState() ) );
 
 		this.browserContext = browserContext;
 		this.page = page;

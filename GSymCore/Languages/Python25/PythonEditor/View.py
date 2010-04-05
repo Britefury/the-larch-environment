@@ -37,7 +37,7 @@ from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replac
 from Britefury.Util.NodeUtil import *
 
 
-from BritefuryJ.DocPresent.StyleParams import *
+from BritefuryJ.AttributeTable import *
 from BritefuryJ.DocPresent import *
 
 from BritefuryJ.GSym import GSymPerspective, GSymSubject
@@ -226,8 +226,8 @@ def printElem(elem, level):
 
 
 class Python25View (GSymViewObjectNodeDispatch):
-	def __init__(self):
-		self._parser = Python25Grammar()
+	def __init__(self, parser):
+		self._parser = parser
 
 
 	# MISC
@@ -1269,7 +1269,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 class Python25EditorPerspective (GSymPerspective):
 	def __init__(self):
-		self._viewFn = PyGSymViewFragmentFunction( Python25View() )
+		self._parser = Python25Grammar()
+		self._viewFn = PyGSymViewFragmentFunction( Python25View( self._parser ) )
 		self._editHandler = Python25EditHandler()
 		
 	
@@ -1283,6 +1284,9 @@ class Python25EditorPerspective (GSymPerspective):
 	
 	def getStyleSheet(self):
 		return PythonEditorStyleSheet.instance
+	
+	def getInitialState(self):
+		return AttributeTable.instance
 	
 	def getEditHandler(self):
 		return self._editHandler

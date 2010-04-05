@@ -78,6 +78,12 @@ public class GSymBrowserContext
 		}
 		
 		@Override
+		public AttributeTable getInitialState()
+		{
+			return AttributeTable.instance;
+		}
+		
+		@Override
 		public GSymSubject resolveLocation(GSymSubject enclosingSubject, Location.TokenIterator relativeLocation)
 		{
 			return enclosingSubject;
