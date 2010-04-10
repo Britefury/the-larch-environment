@@ -9,23 +9,35 @@ from copy import copy
 
 from BritefuryJ.Incremental import IncrementalOwner, IncrementalValue
 
+from GSymCore.Terminal import TerminalSchema
+
 
 class AppState (IncrementalOwner):
 	def __init__(self):
 		self._incr = IncrementalValue( self )
 		
 		self._openDocuments = []
+		self._terminals = []
 		self._configuration = AppConfiguration()
 		
 		
 	def getOpenDocuments(self):
 		self._incr.onAccess()
 		return copy( self._openDocuments )
-	
 		
 	def addOpenDocument(self, doc):
 		self._openDocuments.append( doc )
 		self._incr.onChanged()
+		
+		
+	def getTerminals(self):
+		self._incr.onAccess()
+		return copy( self._terminals )
+	
+	def addTerminal(self, term):
+		self._terminals.append( term )
+		self._incr.onChanged()
+
 		
 	def getConfiguration(self):
 		self._incr.onAccess()
@@ -51,6 +63,26 @@ class AppDocument (IncrementalOwner):
 		return self._location
 		
 	
+
+class AppTerminal (IncrementalOwner):
+	def __init__(self, name):
+		self._incr = IncrementalValue( self )
+		
+		self._name = name
+		self._terminal = TerminalSchema.Terminal()
+		
+		
+		
+	def getName(self):
+		self._incr.onAccess()
+		return self._name
+	
+	def getTerminal(self):
+		self._incr.onAccess()
+		return self._terminal
+		
+	
+
 class AppConfiguration (IncrementalOwner):
 	def __init__(self):
 		self._incr = IncrementalValue( self )

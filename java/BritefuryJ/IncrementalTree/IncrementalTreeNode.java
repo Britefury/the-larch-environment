@@ -47,12 +47,12 @@ public class IncrementalTreeNode implements IncrementalValueListener, Incrementa
 	
 	private NodeResultChangeListener resultChangeListener;
 	
-	private boolean bRefreshRequired;
-	
 	private IncrementalTreeNode parent, nextSibling;
 	private IncrementalTreeNode childrenHead, childrenTail;
 	
 	private NodeContext nodeContext;
+	
+	private boolean bRefreshRequired;
 	
 	
 	

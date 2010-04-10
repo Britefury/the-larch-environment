@@ -15,8 +15,11 @@ from GSymCore.Languages.Python25.PythonEditor.View import Python25EditorPerspect
 
 
 
-def _py25New():
-	return gSymUnit( Schema.schema, Schema.PythonModule( suite=[ Schema.BlankLine() ] ) )
+def py25NewModule():
+	return Schema.PythonModule( suite=[ Schema.BlankLine() ] )
+
+def _py25NewUnit():
+	return gSymUnit( Schema.schema, py25NewModule() )
 
 def _py25ImportFile(filename):
 	content = importPy25File( filename )
@@ -29,7 +32,7 @@ unitClass = GSymUnitClass( Schema.schema, python25EditorPerspective )
 unitClass.registerCodeGeneratorFactory( 'ascii', Python25CodeGenerator )
 
 
-newPageFactory = GSymPageFactory( 'Python 2.5', _py25New )
+newPageFactory = GSymPageFactory( 'Python 2.5', _py25NewUnit )
 
 
 pageImporter = GSymPageImporter( 'Python 2.5', 'Python 2.5 source (*.py)', 'py', _py25ImportFile )

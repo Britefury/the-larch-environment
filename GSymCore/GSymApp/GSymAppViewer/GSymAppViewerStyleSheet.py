@@ -85,14 +85,38 @@ class GSymAppViewerStyleSheet (StyleSheet):
 	
 	
 	
+	def _contentsList(self, controls, contentsLists, title):
+		primitiveStyle = self['primitiveStyle']
+		controlsPadding = self['controlsPadding']
+		tabbedBoxStyle = self['tabbedBoxStyle']
+		appDocumentControlsStyle = self.appDocumentControlsStyle()		
+		documentListTableStyle = self.documentListTableStyle()
 
-	def appState(self, openDocuments, onNew, onOpen):
-		def _onNew(link, event):
-			onNew()
+		controlsBox = appDocumentControlsStyle.hbox( [ c.padX( controlsPadding )   for c in controls ] )
+		controlsBorder = appDocumentControlsStyle.border( controlsBox )
+
+		lineStyle = primitiveStyle.withShapePainter( FillPainter( Color( 32, 87, 147 ) ) )
+		openDocumentsSeparator = lineStyle.rectangle( 0.0, 1.0 ).alignHExpand().pad( self['separatingLinePaddingX'], self['separatingLinePaddingY'] ).alignHExpand()
+		
+		docListBox = documentListTableStyle.rgrid( contentsLists )
+
+		contentsBox = primitiveStyle.vbox( [ controlsBorder.pad( 2.0, 2.0 ), openDocumentsSeparator, docListBox.pad( 10.0, 2.0 ) ] )
+		
+		return tabbedBoxStyle.tabbedBox( title, contentsBox )
+	
+	
+
+	def appState(self, openDocuments, terminals, onNewDoc, onOpenDoc, onNewTerminal):
+		def _onNewDoc(link, event):
+			onNewDoc()
 			return True
 		
-		def _onOpen(link, evnet):
-			onOpen()
+		def _onOpenDoc(link, evnet):
+			onOpenDoc()
+			return True
+		
+		def _onNewTerm(link, event):
+			onNewTerminal()
 			return True
 		
 		
@@ -100,33 +124,24 @@ class GSymAppViewerStyleSheet (StyleSheet):
 		controlsStyle = self['controlsStyle']
 		linkHeaderStyle = self['linkHeaderStyle']
 		titleBarStyle = self['titleBarStyle']
-		tabbedBoxStyle = self['tabbedBoxStyle']
 		
 		appDocumentControlsStyle = self.appDocumentControlsStyle()		
-		documentListTableStyle = self.documentListTableStyle()
 
 		systemLink = controlsStyle.link( 'SYSTEM PAGE', Location( 'system' ) ).getElement()
 		linkHeader = linkHeaderStyle.linkHeaderBar( [ systemLink ] )
 		
 		title = titleBarStyle.titleBar( 'gSym' )
 		
-		controlsPadding = self['controlsPadding']
-		newLink = controlsStyle.link( 'NEW', _onNew ).getElement()
-		openLink = controlsStyle.link( 'OPEN', _onOpen ).getElement()
-		controlsBox = appDocumentControlsStyle.hbox( [ newLink.padX( controlsPadding ), openLink.padX( controlsPadding ) ] )
-		controlsBorder = appDocumentControlsStyle.border( controlsBox )
-
+		newLink = controlsStyle.link( 'NEW', _onNewDoc ).getElement()
+		openLink = controlsStyle.link( 'OPEN', _onOpenDoc ).getElement()
+		openDocumentsBox = self._contentsList( [ newLink, openLink ], openDocuments, 'Documents' )
 		
-		lineStyle = primitiveStyle.withShapePainter( FillPainter( Color( 32, 87, 147 ) ) )
-		openDocumentsSeparator = lineStyle.rectangle( 0.0, 1.0 ).alignHExpand().pad( self['separatingLinePaddingX'], self['separatingLinePaddingY'] ).alignHExpand()
 		
-		docListBox = documentListTableStyle.rgrid( openDocuments )
-
-		openDocumentsContentsBox = primitiveStyle.vbox( [ controlsBorder.pad( 2.0, 2.0 ), openDocumentsSeparator, docListBox.pad( 10.0, 2.0 ) ] )
+		newTermLink = controlsStyle.link( 'NEW', _onNewTerm ).getElement()
+		terminalsBox = self._contentsList( [ newTermLink ], terminals, 'Terminals' )
 		
-		openDocumentsBox = tabbedBoxStyle.tabbedBox( 'Documents', openDocumentsContentsBox )
 		
-		contentBox = primitiveStyle.vbox( [ linkHeader, title, openDocumentsBox.pad( 10.0, 10.0 ).alignHLeft() ] )
+		contentBox = primitiveStyle.vbox( [ linkHeader, title, openDocumentsBox.pad( 10.0, 10.0 ).alignHLeft(), terminalsBox.pad( 10.0, 10.0 ).alignHLeft() ] )
 		
 		return contentBox.alignHExpand()
 	
@@ -149,6 +164,15 @@ class GSymAppViewerStyleSheet (StyleSheet):
 		saveAsLink = controlsStyle.link( 'SAVE AS', _onSaveAs ).getElement()
 
 		return primitiveStyle.gridRow( [ docLink, saveLink, saveAsLink ] )
+		
+	
+	def appTerminal(self, name, location):
+		primitiveStyle = self['primitiveStyle']
+		controlsStyle = self['controlsStyle']
+		
+		termLink = controlsStyle.link( name, location ).getElement().padX( 0.0, self['appDocRightPadding'] )
+
+		return primitiveStyle.gridRow( [ termLink ] )
 		
 	
 

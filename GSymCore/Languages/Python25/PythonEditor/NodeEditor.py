@@ -283,7 +283,7 @@ class StatementIndentationInteractor (ElementInteractor):
 			context = element.getFragmentContext()
 			node = context.getDocNode()
 			
-			editHandler = context.getViewContext().getEditHandler()
+			editHandler = element.getRegion().getEditHandler()
 			if event.getModifiers() & KeyEvent.SHIFT_MASK  !=  0:
 				editHandler.dedent( element, context, node )
 			else:

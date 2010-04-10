@@ -50,10 +50,7 @@ public class LiteralCell extends CellInterface
 	
 	public Object getValue()
 	{
-		Object refreshState = inc.onRefreshBegin();
-		inc.onRefreshEnd( refreshState );
-		
-		inc.onAccess();
+		inc.onLiteralAccess();
 		
 		return value;
 	}

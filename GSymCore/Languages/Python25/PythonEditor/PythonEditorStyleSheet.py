@@ -85,6 +85,9 @@ class PythonEditorStyleSheet (StyleSheet):
 
 		
 
+	def withPrimitiveStyle(self, primitiveStyle):
+		return self.withAttr( 'primitiveStyle', primitiveStyle )
+			
 
 	def withOuterPrecedence(self, outerPrecedence):
 		return self.withAttr( 'precedenceParens', self['precedenceParens'].withOuterPrecedence( outerPrecedence ) )
