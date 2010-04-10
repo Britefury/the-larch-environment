@@ -95,6 +95,13 @@ public class IncrementalValue
 			currentComputation.onIncomingDependencyAccess( this );
 		}
 	}
+	
+	public void onLiteralAccess()
+	{
+		Object refreshState = onRefreshBegin();
+		onRefreshEnd( refreshState );
+		onAccess();
+	}
 
 	public void onChanged()
 	{

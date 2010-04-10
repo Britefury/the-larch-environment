@@ -34,6 +34,8 @@ from BritefuryJ.GSym.View import PyGSymViewFragmentFunction
 from GSymCore.GSymApp import Application
 from GSymCore.GSymApp.GSymAppViewer.GSymAppViewerStyleSheet import GSymAppViewerStyleSheet
 
+from GSymCore.Terminal import Terminal
+
 
 
 def _joinLocation(x, y):
@@ -49,7 +51,7 @@ def _joinLocation(x, y):
 
 def _hasDocForName(docs, name):
 	for d in docs:
-		if name == d['name']:
+		if name == d.getName():
 			return True
 	return False
 
@@ -63,6 +65,20 @@ def _newDocumentName(docs):
 	while _hasDocForName( docs, name ):
 		index += 1
 		name = 'Untitled' + str(index)
+
+	return name
+
+
+def _newTerminalName(docs):
+	name = 'Terminal'
+	if not _hasDocForName( docs, name ):
+		return name
+	
+	index = 2
+	name = 'Terminal' + str(index)
+	while _hasDocForName( docs, name ):
+		index += 1
+		name = 'Terminal' + str(index)
 
 	return name
 
@@ -93,7 +109,7 @@ def _uniqueDocumentLocation(docs, location):
 class AppView (GSymViewObjectDispatch):
 	@ObjectDispatchMethod( Application.AppState )
 	def AppState(self, ctx, styleSheet, state, node):
-		def _onNew():
+		def _onNewDoc():
 			def handleNewDocumentFn(unit):
 				name = _newDocumentName( openDocuments )
 				
@@ -113,7 +129,7 @@ class AppView (GSymViewObjectDispatch):
 		
 			
 			
-		def _onOpen():
+		def _onOpenDoc():
 			def handleOpenedDocumentFn(fullPath, document):
 				head, documentName = os.path.split( fullPath )
 				documentName, ext = os.path.splitext( documentName )
@@ -132,9 +148,20 @@ class AppView (GSymViewObjectDispatch):
 			return True
 
 		
-		openDocViews = ctx.mapPresentFragment( node.getOpenDocuments(), styleSheet, state.withAttrs( location='' ) )
+		def _onNewTerminal():
+			terminals = node.getTerminals()
+			name = _newTerminalName( terminals )
+			appTerm = Application.AppTerminal( name )
+			node.addTerminal( appTerm )
+			
+			return True
 		
-		return styleSheet.appState( openDocViews, _onNew, _onOpen )
+			
+			
+		openDocViews = ctx.mapPresentFragment( node.getOpenDocuments(), styleSheet, state.withAttrs( location='' ) )
+		terminals = ctx.mapPresentFragment( node.getTerminals(), styleSheet, state.withAttrs( location='' ) )
+		
+		return styleSheet.appState( openDocViews, terminals, _onNewDoc, _onOpenDoc, _onNewTerminal )
 
 
 
@@ -171,6 +198,13 @@ class AppView (GSymViewObjectDispatch):
 
 
 
+	@ObjectDispatchMethod( Application.AppTerminal )
+	def AppTerminal(self, ctx, styleSheet, state, node):
+		name = node.getName()
+		return styleSheet.appTerminal( name, Location( '$terminals/' + name ) )
+
+
+
 	
 	
 _docNameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*', 0 )
@@ -184,6 +218,15 @@ class GSymAppViewerPerspective (GSymPerspective):
 	def resolveRelativeLocation(self, enclosingSubject, locationIterator):
 		if locationIterator.getSuffix() == '':
 			return enclosingSubject
+		
+		terminalsIterator = locationIterator.consumeLiteral( '$terminals/' )
+		if terminalsIterator is not None:
+			terminalName = terminalsIterator.getSuffix()
+			for terminal in enclosingSubject.getFocus().getTerminals():
+				if terminalName == terminal.getName():
+					return GSymSubject( terminal.getTerminal(), Terminal.terminalViewerPerspective, enclosingSubject.getSubjectContext().withAttrs( location=locationIterator.getLocation().getLocationString() ) )
+			
+			return None
 		else:
 			iterAfterDocName = locationIterator.consumeRegex( _docNameRegex )
 			if iterAfterDocName is not None:

@@ -19,7 +19,19 @@ def _indent(x):
 	return '\n'.join( lines )
 
 
-class CodeGeneratorUnparsedException (Exception):
+class Python25CodeGeneratorError (Exception):
+	pass
+
+
+class Python25CodeGeneratorUnparsedError (Python25CodeGeneratorError):
+	pass
+
+
+class Python25CodeGeneratorIndentationError (Python25CodeGeneratorError):
+	pass
+
+
+class Python25CodeGeneratorInvalidFormatError (Python25CodeGeneratorError):
 	pass
 
 
@@ -41,7 +53,7 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Schema.UNPARSED )
 	def UNPARSED(self, node, value):
-		raise CodeGeneratorUnparsedException
+		raise Python25CodeGeneratorUnparsedError
 	
 	
 	# String literal
@@ -67,16 +79,16 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 			elif format == 'hex':
 				valueString = '0x%x'  %  int( value, 16 )
 			else:
-				raise ValueError, 'invalid integer literal format'
+				raise Python25CodeGeneratorInvalidFormatError, 'invalid integer literal format'
 		elif numType == 'long':
 			if format == 'decimal':
 				valueString = '%dL'  %  long( value )
 			elif format == 'hex':
 				valueString = '0x%xL'  %  long( value, 16 )
 			else:
-				raise ValueError, 'invalid integer literal format'
+				raise Python25CodeGeneratorInvalidFormatError, 'invalid integer literal format'
 		else:
-			raise ValueError, 'invalid integer literal type'
+			raise Python25CodeGeneratorInvalidFormatError, 'invalid integer literal type'
 				
 		return valueString
 
@@ -624,7 +636,7 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	@ObjectNodeDispatchMethod( Schema.IndentedBlock )
 	def IndentedBlock(self, node, suite):
 		if self._bErrorChecking:
-			raise ValueError, 'Indentation error'
+			raise Python25CodeGeneratorIndentationError, 'Indentation error'
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
 		return _indent( suiteText )
 	
@@ -673,6 +685,22 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		self.assert_( result == expected )
 		
 		
+	def _testGenSX(self, gen, sx, expected):
+		sx = '{ py=org.Britefury.gSym.Languages.Python25 : ' + sx + ' }'
+		data = DMIOReader.readFromString( sx, self._resolver )
+		
+		result = gen( data )
+		
+		if result != expected:
+			print 'UNEXPECTED RESULT'
+			print 'EXPECTED:'
+			print expected.replace( '\n', '\\n' ) + '<<'
+			print 'RESULT:'
+			print result.replace( '\n', '\\n' ) + '<<'
+			
+		self.assert_( result == expected )
+		
+		
 	def _binOpTest(self, sxOp, expectedOp):
 		self._testSX( '(py %s x=(py Load name=a) y=(py Load name=b))'  %  sxOp,  '( a %s b )'  %  expectedOp )
 		
@@ -682,7 +710,7 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		
 		
 	def test_UNPARSED(self):
-		self.assertRaises( CodeGeneratorUnparsedException, lambda: self._testSX( '(py UNPARSED value=Test)', '' ) )
+		self.assertRaises( Python25CodeGeneratorUnparsedError, lambda: self._testSX( '(py UNPARSED value=Test)', '' ) )
 		
 		
 	def test_StringLiteral(self):
@@ -694,6 +722,8 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		self._testSX( '(py IntLiteral format=hex numType=int value=1a4)', '0x1a4' )
 		self._testSX( '(py IntLiteral format=decimal numType=long value=123)', '123L' )
 		self._testSX( '(py IntLiteral format=hex numType=long value=1a4)', '0x1a4L' )
+		self.assertRaises( Python25CodeGeneratorInvalidFormatError, lambda: self._testSX( '(py IntLiteral format=foo numType=long value=1a4)', '' ) )
+		self.assertRaises( Python25CodeGeneratorInvalidFormatError, lambda: self._testSX( '(py IntLiteral format=hex numType=foo value=1a4)', '' ) )
 		
 		
 	def test_FloatLiteral(self):
@@ -984,6 +1014,10 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		self._testSX( '(py ClassStmt name=A bases=[(py Load name=object) (py Load name=Q)] suite=[(py Load name=b)])', 'class A (object, Q):\n\tb\n' )
 
 
+	def test_IndentedBlock(self):
+		self._testGenSX( Python25CodeGenerator( False ), '(py IndentedBlock suite=[(py Load name=b)])', '\tb\n' )
+		self.assertRaises( Python25CodeGeneratorIndentationError, lambda: self._testSX( '(py IndentedBlock suite=[(py Load name=b)])', '' ) )
+		
 
 	def test_CommentStmt(self):
 		self._testSX( '(py CommentStmt comment=HelloWorld)', '#HelloWorld' )

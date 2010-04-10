@@ -15,7 +15,6 @@ import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.Browser.Page;
 import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocView.DVNode;
@@ -55,7 +54,7 @@ public class GSymViewContext implements DocView.RefreshListener
 			docView.profile_startPython();
 
 			// Create the node context
-			GSymFragmentViewContext nodeContext = new GSymFragmentViewContext( this, (DVNode)incrementalNode, subjectContext );
+			GSymFragmentViewContext nodeContext = new GSymFragmentViewContext( this, (DVNode)incrementalNode );
 			
 			// Create the view fragment
 			DPElement fragment = viewFragmentFunction.createViewFragment( docNode, nodeContext, styleSheet, state );
@@ -149,6 +148,7 @@ public class GSymViewContext implements DocView.RefreshListener
 		view.setElementChangeListener( new NodeElementChangeListenerDiff() );
 		view.setRefreshListener( this );
 		region.setChild( view.getRootViewElement().alignHExpand() );
+		region.setEditHandler( perspective.getEditHandler() );
 	}
 	
 	
@@ -210,11 +210,6 @@ public class GSymViewContext implements DocView.RefreshListener
 	public DPRegion getRegion()
 	{
 		return region;
-	}
-	
-	public EditHandler getEditHandler()
-	{
-		return region.getEditHandler();
 	}
 	
 	public DPPresentationArea getElementTree()
