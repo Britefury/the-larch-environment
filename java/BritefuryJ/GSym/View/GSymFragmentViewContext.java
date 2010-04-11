@@ -30,6 +30,7 @@ import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext, FragmentContext
 {
 	private static final PrimitiveStyleSheet viewError_textStyle = PrimitiveStyleSheet.instance.withFont( new Font( "SansSerif", Font.BOLD, 12 ) ).withForeground( new Color( 0.8f, 0.0f, 0.0f ) );
+	private static final PrimitiveStyleSheet viewNull_textStyle = PrimitiveStyleSheet.instance.withFont( new Font( "SansSerif", Font.ITALIC | Font.BOLD, 12 ) ).withForeground( new Color( 0.8f, 0.0f, 0.4f ) );
 
 	
 
@@ -95,7 +96,7 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 	{
 		if ( x == null )
 		{
-			throw new RuntimeException( "GSymFragmentViewContext.presentFragment(): cannot build view of null node" );
+			return viewNull_textStyle.staticText( "<null>" );
 		}
 		
 		if ( state == null )

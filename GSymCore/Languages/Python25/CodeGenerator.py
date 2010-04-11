@@ -390,6 +390,12 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 
 	
 	
+	# Expression statement
+	@ObjectNodeDispatchMethod( Schema.ExprStmt )
+	def ExprStmt(self, node, expr):
+		return self( expr )
+	
+	
 	# Assert statement
 	@ObjectNodeDispatchMethod( Schema.AssertStmt )
 	def AssertStmt(self, node, condition, fail):
@@ -870,6 +876,10 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 	#
 	
 	
+	def test_exprStmt(self):
+		self._testSX( '(py exprStmt expr=(py Load name=x))', 'x' )
+		
+		
 	def test_assertStmt(self):
 		self._testSX( '(py AssertStmt condition=(py Load name=x) fail=`null`)', 'assert x' )
 		self._testSX( '(py AssertStmt condition=(py Load name=x) fail=(py Load name=y))', 'assert x, y' )
