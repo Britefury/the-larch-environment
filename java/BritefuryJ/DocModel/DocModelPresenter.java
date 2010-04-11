@@ -36,6 +36,8 @@ public class DocModelPresenter
 
 	private static final PrimitiveStyleSheet defaultStyle = PrimitiveStyleSheet.instance.withFont( new Font( "SansSerif", Font.PLAIN, 14 ) ).withForeground( Color.black ).withParagraphIndentation( 60.0 );
 
+	private static final PrimitiveStyleSheet nullStyle = defaultStyle.withFont( new Font( "SansSerif", Font.ITALIC, 14 ) ).withForeground( new Color( 0.5f, 0.0f, 0.25f ) );
+
 	private static final PrimitiveStyleSheet stringStyle = defaultStyle.withFont( new Font( "SansSerif", Font.PLAIN, 14 ) ).withForeground( new Color( 0.0f, 0.5f, 0.5f ) );
 
 	private static final PrimitiveStyleSheet punctuationStyle = defaultStyle.withForeground( new Color( 0.0f, 0.0f, 1.0f ) );
@@ -106,7 +108,11 @@ public class DocModelPresenter
 	
 	private static DPElement present(Object x, GSymFragmentViewContext ctx, PrimitiveStyleSheet styleSheet, AttributeTable state)
 	{
-		if ( x instanceof String )
+		if ( x == null )
+		{
+			return nullStyle.staticText( "<null>" );
+		}
+		else if ( x instanceof String )
 		{
 			return stringStyle.staticText( (String)x );
 		}

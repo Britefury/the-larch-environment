@@ -6,13 +6,23 @@
 //##************************
 package BritefuryJ.Parser.ItemStream;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.python.core.PySlice;
 
-public class ItemStream
+import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Border.SolidBorder;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.GSym.ObjectView.Presentable;
+import BritefuryJ.GSym.View.GSymFragmentViewContext;
+
+public class ItemStream implements Presentable
 {
 	public static abstract class Item
 	{
@@ -53,7 +63,7 @@ public class ItemStream
 	
 	
 	
-	public static class TextItem extends Item
+	public static class TextItem extends Item implements Presentable
 	{
 		protected String textValue;
 		
@@ -106,11 +116,21 @@ public class ItemStream
 		{
 			return textValue;
 		}
+
+
+		@Override
+		public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+		{
+			return textItemStyle.staticText( textValue );
+		}
+
+	
+		private static PrimitiveStyleSheet textItemStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.0f, 0.5f, 0.5f ) ); 
 	}
 	
 	
 	
-	public static class StructuralItem extends Item
+	public static class StructuralItem extends Item implements Presentable
 	{
 		protected Object structuralValue;
 		
@@ -159,6 +179,16 @@ public class ItemStream
 		{
 			return "<<--Structural: " + structuralValue.toString() + "-->>";
 		}
+
+
+		@Override
+		public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+		{
+			return borderStyle.border( PrimitiveStyleSheet.instance.vbox( Arrays.asList( new DPElement[] { ctx.presentFragment( structuralValue, styleSheet ) } ) ) );
+		}
+
+	
+		private static PrimitiveStyleSheet borderStyle = PrimitiveStyleSheet.instance.withBorder( new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.15f, 0.25f, 0.75f ), null ) ); 
 	}
 	
 	
@@ -409,4 +439,21 @@ public class ItemStream
 		}
 		return builder.toString();
 	}
+
+
+
+	@Override
+	public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+	{
+		DPElement label = labelStyle.staticText( "ITEM STREAM" );
+		
+		List<DPElement> itemViews = ctx.mapPresentFragment( Arrays.asList( (Object[])items ), styleSheet );
+		DPElement contents = PrimitiveStyleSheet.instance.paragraph( itemViews );
+		
+		return borderStyle.border( PrimitiveStyleSheet.instance.vbox( Arrays.asList( new DPElement[] { label, contents.padX( 5.0, 0.0 ) } ) ) );
+	}
+
+
+	private static PrimitiveStyleSheet labelStyle = PrimitiveStyleSheet.instance.withFont( new Font( "Sans serif", Font.PLAIN, 10 ) ).withForeground( new Color( 0.65f, 0.0f, 0.55f ) ); 
+	private static PrimitiveStyleSheet borderStyle = PrimitiveStyleSheet.instance.withBorder( new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.65f, 0.0f, 0.55f ), null ) ); 
 }

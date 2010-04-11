@@ -22,7 +22,7 @@ class AppState (IncrementalOwner):
 		
 		
 	def getOpenDocuments(self):
-		self._incr.onAccess()
+		self._incr.onLiteralAccess()
 		return copy( self._openDocuments )
 		
 	def addOpenDocument(self, doc):
@@ -31,7 +31,7 @@ class AppState (IncrementalOwner):
 		
 		
 	def getTerminals(self):
-		self._incr.onAccess()
+		self._incr.onLiteralAccess()
 		return copy( self._terminals )
 	
 	def addTerminal(self, term):
@@ -40,7 +40,7 @@ class AppState (IncrementalOwner):
 
 		
 	def getConfiguration(self):
-		self._incr.onAccess()
+		self._incr.onLiteralAccess()
 		return self._configuration
 	
 		
@@ -55,11 +55,11 @@ class AppDocument (IncrementalOwner):
 		
 		
 	def getName(self):
-		self._incr.onAccess()
+		self._incr.onLiteralAccess()
 		return self._name
 	
 	def getLocation(self):
-		self._incr.onAccess()
+		self._incr.onLiteralAccess()
 		return self._location
 		
 	
@@ -74,11 +74,11 @@ class AppTerminal (IncrementalOwner):
 		
 		
 	def getName(self):
-		self._incr.onAccess()
+		self._incr.onLiteralAccess()
 		return self._name
 	
 	def getTerminal(self):
-		self._incr.onAccess()
+		self._incr.onLiteralAccess()
 		return self._terminal
 		
 	
