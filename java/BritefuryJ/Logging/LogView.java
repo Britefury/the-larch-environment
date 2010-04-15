@@ -35,6 +35,7 @@ public class LogView implements Presentable, ObjectViewContextList.ContextListLi
 	public LogView(Log log, LogFilterFn filterFn)
 	{
 		this.log = log;
+		this.log.registerView( this );
 		this.filterFn = filterFn;
 		
 		for (LogEntry entry: log.logEntries)
@@ -80,7 +81,7 @@ public class LogView implements Presentable, ObjectViewContextList.ContextListLi
 	{
 		if ( objectViewContexts == null )
 		{
-			objectViewContexts = new ObjectViewContextList();
+			objectViewContexts = new ObjectViewContextList( this );
 		}
 		objectViewContexts.addContext( ctx );
 		
@@ -92,7 +93,7 @@ public class LogView implements Presentable, ObjectViewContextList.ContextListLi
 			entryElements[i++] = ctx.presentFragment( entry, PrimitiveStyleSheet.instance );
 		}
 		
-		return PrimitiveStyleSheet.instance.vbox( Arrays.asList( entryElements ) );
+		return PrimitiveStyleSheet.instance.withVBoxSpacing( 5.0 ).vbox( Arrays.asList( entryElements ) ).alignHExpand();
 	}
 
 

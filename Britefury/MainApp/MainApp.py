@@ -45,7 +45,6 @@ from Britefury.Kernel.Abstract import abstractmethod
 from Britefury.Event.QueuedEvent import queueEvent
 
 
-from Britefury.gSym.View.GSymView import GSymViewPage
 from Britefury.gSym.gSymWorld import GSymWorld
 from Britefury.gSym.gSymDocument import GSymDocument
 from Britefury.gSym.AppControlInterface import AppControlInterface
@@ -120,10 +119,8 @@ class _AppLocationResolver (GSymLocationResolver):
 				
 			commandHistory = doc.getCommandHistory()   if doc is not None   else None
 
-			page = GSymViewPage( 'MainApp: _AppLocationResolver: default title', commandHistory )
-			viewContext = GSymViewContext( subject.getFocus(), subject.getPerspective(), subject.getSubjectContext(), self._app._browserContext, page, commandHistory )
-			page.setContentsElement( viewContext.getRegion() )
-			return page
+			viewContext = GSymViewContext( subject, self._app._browserContext, commandHistory )
+			return viewContext.getPage()
 		
 		return None
 				
@@ -135,10 +132,10 @@ class _AppLocationResolver (GSymLocationResolver):
 			iterAfterModel = iterator.consumeLiteral( 'model:' )
 			perspective = world.getAppStatePerspective()
 			if iterAfterModel is not None:
-				enclosingSubject = GSymSubject( appState, perspective, AttributeTable.instance.withAttrs( world=world, document=None, location=Location( 'model:' ) ) )
+				enclosingSubject = GSymSubject( appState, perspective, '[model]', AttributeTable.instance.withAttrs( world=world, document=None, location=Location( 'model:' ) ) )
 				iterator = iterAfterModel
 			else:
-				enclosingSubject = GSymSubject( appState, perspective, AttributeTable.instance.withAttrs( world=world, document=None, location=Location( '' ) ) )
+				enclosingSubject = GSymSubject( appState, perspective, '', AttributeTable.instance.withAttrs( world=world, document=None, location=Location( '' ) ) )
 			subject = perspective.resolveRelativeLocation( enclosingSubject, iterator )
 			if subject is None:
 				return None
@@ -157,13 +154,17 @@ class _MainAppBrowserContext (GSymBrowserContext):
 		
 
 class MainApp (AppControlInterface):
-	def __init__(self, world, location=Location( '' )):
+	def __init__(self, world, location=Location( '' ), _app=None):
 		self._world = world
 		
 		self._appState = world.getAppState()
 		
-		self._resolver = _AppLocationResolver( self )
-		self._browserContext = _MainAppBrowserContext( self, [ self._resolver ] )
+		if _app is None:
+			self._resolver = _AppLocationResolver( self )
+			self._browserContext = _MainAppBrowserContext( self, [ self._resolver ] )
+		else:
+			self._resolver = _app._resolver
+			self._browserContext = _app._browserContext
 		
 		
 		class _BrowserListener (TabbedBrowser.TabbedBrowserListener):
@@ -459,11 +460,11 @@ class MainApp (AppControlInterface):
 	
 	
 	def _onNewWindow(self):
-		self._createNewWindow( '' )
+		self._createNewWindow( Location( '' ) )
 		
 		
 	def _createNewWindow(self, location):
-		newWindow = MainApp( self._world, location )
+		newWindow = MainApp( self._world, location, _app=self )
 		newWindow.show()
 	
 	

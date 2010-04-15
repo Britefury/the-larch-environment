@@ -230,7 +230,6 @@ public class IncrementalTreeNode implements IncrementalValueListener, Incrementa
 	
 	public void queueRefresh()
 	{
-		bRefreshRequired = true;
 		incr.onChanged();
 	}
 	

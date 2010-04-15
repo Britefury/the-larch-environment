@@ -50,25 +50,6 @@ public class GSymDefaultPerspective implements GSymPerspective
 	
 	private static class DefaultPerspectiveLocationResolver implements GSymLocationResolver
 	{
-		private class DefaultPerspectivePage extends Page
-		{
-			private DPElement contents;
-			
-			
-			@Override
-			public DPElement getContentsElement()
-			{
-				return contents;
-			}
-
-			@Override
-			public String getTitle()
-			{
-				return "Object - default perspective";
-			}
-		}
-		
-		
 		private GSymDefaultPerspective perspective;
 		
 		
@@ -84,10 +65,8 @@ public class GSymDefaultPerspective implements GSymPerspective
 			GSymSubject subject = perspective.resolveLocation( null, location.iterator() );
 			if ( subject != null )
 			{
-				DefaultPerspectivePage page = new DefaultPerspectivePage();
-				GSymViewContext viewContext = new GSymViewContext( subject.getFocus(), perspective, subject.getSubjectContext(), perspective.browserContext, page, null );
-				page.contents = viewContext.getRegion();
-				return page;
+				GSymViewContext viewContext = new GSymViewContext( subject, perspective.browserContext, null );
+				return viewContext.getPage();
 			}
 			else
 			{
@@ -148,7 +127,8 @@ public class GSymDefaultPerspective implements GSymPerspective
 		Object x = locationTable.getObjectAtLocation( relativeLocation );
 		if ( x != null )
 		{
-			return new GSymSubject( x, this, enclosingSubject.getSubjectContext() );
+			String title = x != null  ?  x.getClass().getName()  :  "<null>";
+			return new GSymSubject( x, this, title, AttributeTable.instance );
 		}
 		else
 		{

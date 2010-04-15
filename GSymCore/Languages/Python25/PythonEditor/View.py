@@ -29,7 +29,7 @@ from BritefuryJ.Parser.ItemStream import ItemStreamBuilder
 
 from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeDispatchMethod
 
-from Britefury.gSym.View.GSymView import GSymViewObjectNodeDispatch, GSymViewPage
+from Britefury.gSym.View.GSymView import GSymViewObjectNodeDispatch
 
 from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replaceNodeContents, append, prepend, insertElement, insertRange, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
 
@@ -1276,7 +1276,7 @@ class Python25EditorPerspective (GSymPerspective):
 	
 	
 	def resolveRelativeLocation(self, enclosingSubject, locationIterator):
-		return enclosingSubject
+		return enclosingSubject.withTitle( 'Py2.5: ' + enclosingSubject.getTitle() )
 	
 	
 	def getFragmentViewFunction(self):

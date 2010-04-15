@@ -14,7 +14,7 @@ from javax.swing import JPopupMenu
 
 from Britefury.Dispatch.ObjectMethodDispatch import ObjectDispatchMethod
 
-from Britefury.gSym.View.GSymView import GSymViewObjectDispatch, GSymViewPage
+from Britefury.gSym.View.GSymView import GSymViewObjectDispatch
 from Britefury.gSym.gSymDocument import GSymDocument
 
 from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replaceNodeContents, append, prepend, insertElement, insertRange, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
@@ -217,14 +217,14 @@ class GSymAppViewerPerspective (GSymPerspective):
 	
 	def resolveRelativeLocation(self, enclosingSubject, locationIterator):
 		if locationIterator.getSuffix() == '':
-			return enclosingSubject
+			return enclosingSubject.withTitle( 'gSym' )
 		
 		terminalsIterator = locationIterator.consumeLiteral( '$terminals/' )
 		if terminalsIterator is not None:
 			terminalName = terminalsIterator.getSuffix()
 			for terminal in enclosingSubject.getFocus().getTerminals():
 				if terminalName == terminal.getName():
-					return GSymSubject( terminal.getTerminal(), Terminal.terminalViewerPerspective, enclosingSubject.getSubjectContext().withAttrs( location=locationIterator.getLocation().getLocationString() ) )
+					return GSymSubject( terminal.getTerminal(), Terminal.terminalViewerPerspective, terminalName, enclosingSubject.getSubjectContext().withAttrs( location=locationIterator.getLocation().getLocationString() ) )
 			
 			return None
 		else:
@@ -236,7 +236,7 @@ class GSymAppViewerPerspective (GSymPerspective):
 				doc = world.getDocument( documentName )
 				
 				if doc is not None:
-					subject = GSymSubject( doc, self, enclosingSubject.getSubjectContext().withAttrs( document=doc, location=iterAfterDocName.getPrefix() ) )
+					subject = GSymSubject( doc, self, enclosingSubject.getTitle() + ' [' + documentName + ']', enclosingSubject.getSubjectContext().withAttrs( document=doc, location=iterAfterDocName.getPrefix() ) )
 					return doc.resolveRelativeLocation( subject, iterAfterDocName )
 
 			return None
