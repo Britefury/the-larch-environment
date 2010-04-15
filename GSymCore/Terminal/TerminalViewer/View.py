@@ -14,7 +14,7 @@ from javax.swing import JPopupMenu
 
 from Britefury.Dispatch.ObjectMethodDispatch import ObjectDispatchMethod
 
-from Britefury.gSym.View.GSymView import GSymViewObjectDispatch, GSymViewPage
+from Britefury.gSym.View.GSymView import GSymViewObjectDispatch
 from Britefury.gSym.gSymDocument import GSymDocument
 
 from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replaceNodeContents, append, prepend, insertElement, insertRange, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter

@@ -169,11 +169,11 @@ public class GSymBrowserContext
 		
 		if ( location.getLocationString().equals( "" ) )
 		{
-			return new GSymSubject( null, rootLocationPerspective, AttributeTable.instance );
+			return new GSymSubject( null, rootLocationPerspective, "Root page", AttributeTable.instance );
 		}
 		else
 		{
-			return new GSymSubject( location, resolveErrorPerspective, AttributeTable.instance );
+			return new GSymSubject( location, resolveErrorPerspective, "Resolve error", AttributeTable.instance );
 		}
 	}
 	

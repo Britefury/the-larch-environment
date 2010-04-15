@@ -32,6 +32,7 @@ public class GSymObjectViewLocationTable
 		{
 			location = "$object/" + x.getClass().getName() + objectCount++;
 			objectToLocation.put( x, location );
+			locationToObject.put( location, new WeakReference<Object>( x ) );
 		}
 		return new Location( location );
 	}

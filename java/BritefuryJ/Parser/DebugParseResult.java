@@ -8,10 +8,16 @@ package BritefuryJ.Parser;
 
 import java.util.Map;
 
+import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.GSym.ObjectView.Presentable;
+import BritefuryJ.GSym.View.GSymFragmentViewContext;
+import BritefuryJ.Parser.DebugParseResultView.ParseView;
 import BritefuryJ.ParserHelpers.DebugNode;
 import BritefuryJ.ParserHelpers.DebugParseResultInterface;
 
-public class DebugParseResult extends ParseResult implements DebugParseResultInterface
+public class DebugParseResult extends ParseResult implements DebugParseResultInterface, Presentable
 {
 	public DebugNode debugNode;
 	
@@ -26,5 +32,12 @@ public class DebugParseResult extends ParseResult implements DebugParseResultInt
 	public DebugNode getDebugNode()
 	{
 		return debugNode;
+	}
+
+
+	@Override
+	public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+	{
+		return ParseView.presentDebugParseResult( this, ctx, styleSheet, state );
 	}
 }

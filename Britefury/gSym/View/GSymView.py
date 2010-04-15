@@ -66,32 +66,6 @@ class GSymViewObjectDispatch (object):
 			print node
 			element = ctx.errorElement( '<<VIEW OBJECT DISPATCH ERROR>>' )
 		return element
-	
-		
-
-	
-class GSymViewPage (Page):
-	def __init__(self, title, commandHistory):
-		self._title = title
-		self._commandHistory = commandHistory
-		
-		
-	def setContentsElement(self, element):
-		self._element = element
-		
-		
-	def getTitle(self):
-		return self._title
-	
-	def getContentsElement(self):
-		return self._element
-	
-	def getCommandHistoryController(self):
-		return self._commandHistory
-	
-	def setCommandHistoryListener(self, listener):
-		if self._commandHistory is not None:
-			self._commandHistory.setCommandHistoryListener( listener )
 
 
 

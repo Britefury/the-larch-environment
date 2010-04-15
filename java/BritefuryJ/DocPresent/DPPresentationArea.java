@@ -125,10 +125,13 @@ public class DPPresentationArea extends DPRegion implements CaretListener, Selec
 		}
 		
 		
-		public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+		public String getLogEntryTitle()
 		{
-			super.present( ctx, styleSheet, state );
-			
+			return "Presentation typesetting performance";
+		}
+		
+		public DPElement createLogEntryPresentationContent(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+		{
 			return PrimitiveStyleSheet.instance.staticText( "Typesetting time: " + typesetTime );
 		}
 	}

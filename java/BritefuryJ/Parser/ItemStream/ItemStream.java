@@ -17,6 +17,7 @@ import org.python.core.PySlice;
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
+import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.ObjectView.Presentable;
@@ -121,11 +122,52 @@ public class ItemStream implements Presentable
 		@Override
 		public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
 		{
-			return textItemStyle.staticText( textValue );
+			ArrayList<DPElement> elements = new ArrayList<DPElement>();
+			StringBuilder builder = new StringBuilder();
+			for (int i = 0; i < textValue.length(); i++)
+			{
+				char c = textValue.charAt( i );
+				
+				DPElement escapeItem = null;
+
+				if ( c == '\n' )
+				{
+					escapeItem = escapeItemStyle.staticText( "\\n" );
+				}
+				else if ( c == '\r' )
+				{
+					escapeItem = escapeItemStyle.staticText( "\\r" );
+				}
+				else if ( c == '\t' )
+				{
+					escapeItem = escapeItemStyle.staticText( "\\t" );
+				}
+				
+				if ( escapeItem != null )
+				{
+					if ( builder.length() > 0 )
+					{
+						elements.add( textItemStyle.staticText( builder.toString() ) );
+					}
+					elements.add( escapeItem );
+				}
+				else
+				{
+					builder.append( c );
+				}
+			}
+			
+			if ( builder.length() > 0 )
+			{
+				elements.add( textItemStyle.staticText( builder.toString() ) );
+			}
+			
+			return PrimitiveStyleSheet.instance.span( elements );
 		}
 
-	
+		
 		private static PrimitiveStyleSheet textItemStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.0f, 0.5f, 0.5f ) ); 
+		private static PrimitiveStyleSheet escapeItemStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.0f, 0.15f, 0.35f ) ).withBackground( new FillPainter( new Color( 0.8f, 0.8f, 1.0f ) ) ); 
 	}
 	
 	

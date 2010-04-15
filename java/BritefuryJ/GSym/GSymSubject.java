@@ -12,14 +12,16 @@ public class GSymSubject
 {
 	private Object focus;
 	private GSymPerspective perspective;
+	private String title;
 	private AttributeTable subjectContext;
 
 	
 	
-	public GSymSubject(Object focus, GSymPerspective perspective, AttributeTable subjectContext)
+	public GSymSubject(Object focus, GSymPerspective perspective, String title, AttributeTable subjectContext)
 	{
 		this.focus = focus;
 		this.perspective = perspective;
+		this.title = title;
 		this.subjectContext = subjectContext;
 	}
 	
@@ -34,6 +36,11 @@ public class GSymSubject
 		return perspective;
 	}
 	
+	public String getTitle()
+	{
+		return title;
+	}
+	
 	public AttributeTable getSubjectContext()
 	{
 		return subjectContext;
@@ -41,19 +48,34 @@ public class GSymSubject
 	
 	
 	
+	public GSymSubject withTitle(String title)
+	{
+		return new GSymSubject( focus, perspective, title, subjectContext );
+	}
+	
 	public GSymSubject withPerspective(GSymPerspective perspective)
 	{
-		return new GSymSubject( focus, perspective, subjectContext );
+		return new GSymSubject( focus, perspective, title, subjectContext );
+	}
+	
+	public GSymSubject withPerspectiveAndTitle(GSymPerspective perspective, String title)
+	{
+		return new GSymSubject( focus, perspective, title, subjectContext );
 	}
 	
 	public GSymSubject withFocusAndPerspective(Object focus, GSymPerspective perspective)
 	{
-		return new GSymSubject( focus, perspective, subjectContext );
+		return new GSymSubject( focus, perspective, title, subjectContext );
+	}
+	
+	public GSymSubject withFocusPerspectiveAndTitle(Object focus, GSymPerspective perspective, String title)
+	{
+		return new GSymSubject( focus, perspective, title, subjectContext );
 	}
 	
 	
 	public String toString()
 	{
-		return "GSymSubject( focus=" + focus + ", perspective=" + perspective + ", subjectContext=" + subjectContext + " )";
+		return "GSymSubject( focus=" + focus + ", perspective=" + perspective + ", title=" + title + ", subjectContext=" + subjectContext + " )";
 	}
 }

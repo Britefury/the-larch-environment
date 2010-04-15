@@ -11,6 +11,7 @@ from java.lang import Object, System
 from java.io import IOException
 from java.util import List
 from java.awt.event import KeyEvent
+from java.awt import Font, Color
 
 from Britefury.Kernel.Abstract import abstractmethod
 
@@ -20,7 +21,11 @@ from BritefuryJ.Transformation import DefaultIdentityTransformationFunction
 
 
 from BritefuryJ.DocPresent.StyleParams import *
+from BritefuryJ.DocPresent.StyleSheet import *
 from BritefuryJ.DocPresent import *
+
+
+from BritefuryJ.Logging import LogEntry
 
 
 from Britefury.Util.NodeUtil import *
@@ -41,7 +46,31 @@ from GSymCore.Languages.Python25.PythonEditor.SelectionEditor import SelectionLi
 
 
 
+#
+#
+# LOG ENTRY
+#
+#
 
+class Python25EditLogEntry (LogEntry):
+	labelStyle = PrimitiveStyleSheet.instance.withFont( Font( "Sans serif", Font.PLAIN, 10 ) ).withForeground( Color( 0.0, 0.0, 0.8 ) )
+
+	def __init__(self, editedStream, parsedResult):
+		super( Python25EditLogEntry, self ).__init__( [ 'Py25Edit' ] )
+		self._editedStream = editedStream
+		self._parsedResult = parsedResult
+		
+	
+	def getLogEntryTitle(self):
+		return 'Python 2.5 edit'
+	
+	def createLogEntryPresentationContent(self, ctx, styleSheet, state):
+		editedStreamLabel = self.labelStyle.staticText( 'Edited stream:' )
+		editedStreamView = ctx.presentFragment( self._editedStream, styleSheet )
+		parsedResultLabel = self.labelStyle.staticText( 'Parsed result:' )
+		parsedResultView = ctx.presentFragment( self._parsedResult, styleSheet )
+		return PrimitiveStyleSheet.instance.vbox( [ editedStreamLabel, editedStreamView, parsedResultLabel, parsedResultView ] )
+		
 
 	
 	
@@ -85,6 +114,9 @@ class ParsedExpressionLinearRepresentationListener (ElementLinearRepresentationL
 			parsed = parseStream( self._parser, value, self._outerPrecedence )
 			if parsed is not None:
 				if parsed != node:
+					log = ctx.getViewContext().getPageLog()
+					if log is not None:
+						log.log( Python25EditLogEntry( value, parsed ) )
 					pyReplaceExpression( ctx, node, parsed )
 			else:
 				items = value.getItemValues()
@@ -92,6 +124,9 @@ class ParsedExpressionLinearRepresentationListener (ElementLinearRepresentationL
 					if items[0].strip() == '':
 						return False
 				unparsed = Schema.UNPARSED( value=items )
+				log = ctx.getViewContext().getPageLog()
+				if log is not None:
+					log.log( Python25EditLogEntry( value, unparsed ) )
 				pyReplaceExpression( ctx, node, unparsed )
 			return True
 		else:
@@ -179,9 +214,15 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 						return True
 					
 				unparsed = Schema.UNPARSED( value=items )
+				log = ctx.getViewContext().getPageLog()
+				if log is not None:
+					log.log( Python25EditLogEntry( value, unparsed ) )
 				pyReplaceNode( sourceCtx, sourceNode, unparsed )
 				return True
 			else:
+				log = ctx.getViewContext().getPageLog()
+				if log is not None:
+					log.log( Python25EditLogEntry( value, parsed ) )
 				pyReplaceStmt( ctx, node, parsed )
 				return True
 		else:

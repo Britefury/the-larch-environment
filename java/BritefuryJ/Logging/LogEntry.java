@@ -6,23 +6,26 @@
 //##************************
 package BritefuryJ.Logging;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Border.SolidBorder;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.GSym.ObjectView.ObjectViewContextList;
 import BritefuryJ.GSym.ObjectView.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 
-public class LogEntry implements Presentable, ObjectViewContextList.ContextListListener
+public class LogEntry implements Presentable
 {
 	private static final List<String> emptyTags = new ArrayList<String>();
 	
 	
 	private List<String> tags;
-	private ObjectViewContextList objectViewContexts = new ObjectViewContextList();
 	
 	
 	
@@ -45,22 +48,28 @@ public class LogEntry implements Presentable, ObjectViewContextList.ContextListL
 
 
 
+	public String getLogEntryTitle()
+	{
+		return "Log entry";
+	}
+	
+	public DPElement createLogEntryPresentationContent(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+	{
+		return PrimitiveStyleSheet.instance.staticText( "<empty>" );
+	}
 
 
 	public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
 	{
-		if ( objectViewContexts == null )
-		{
-			objectViewContexts = new ObjectViewContextList();
-		}
-		objectViewContexts.addContext( ctx );
-		return null;
+		DPElement label = labelStyle.staticText( getLogEntryTitle() );
+		
+		DPElement entryContent = createLogEntryPresentationContent( ctx, styleSheet, state );
+		DPElement content = PrimitiveStyleSheet.instance.vbox( Arrays.asList( new DPElement[] { entryContent }  ) );
+		
+		return borderStyle.border( PrimitiveStyleSheet.instance.vbox( Arrays.asList( new DPElement[] { label, content.padX( 5.0, 0.0 ) } ) ) );
 	}
 
 
-
-	public void onObjectViewContextListEmpty()
-	{
-		objectViewContexts = null;
-	}
+	private static PrimitiveStyleSheet labelStyle = PrimitiveStyleSheet.instance.withFont( new Font( "Sans serif", Font.PLAIN, 10 ) ).withForeground( new Color( 0.45f, 0.65f, 0.0f ) ); 
+	private static PrimitiveStyleSheet borderStyle = PrimitiveStyleSheet.instance.withBorder( new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.45f, 0.65f, 0.0f ), null ) ); 
 }

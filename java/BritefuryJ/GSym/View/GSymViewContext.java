@@ -21,8 +21,10 @@ import BritefuryJ.DocView.DVNode;
 import BritefuryJ.DocView.DocView;
 import BritefuryJ.GSym.GSymBrowserContext;
 import BritefuryJ.GSym.GSymPerspective;
+import BritefuryJ.GSym.GSymSubject;
 import BritefuryJ.IncrementalTree.IncrementalTree;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
+import BritefuryJ.Logging.Log;
 import BritefuryJ.Utils.HashUtils;
 
 public class GSymViewContext implements DocView.RefreshListener
@@ -121,7 +123,7 @@ public class GSymViewContext implements DocView.RefreshListener
 	private DPRegion region;
 	
 	private GSymBrowserContext browserContext;
-	private Page page;
+	private GSymViewPage page;
 	
 	private CommandHistory commandHistory;
 
@@ -131,18 +133,19 @@ public class GSymViewContext implements DocView.RefreshListener
 		new HashMap<ViewFragmentContextAndResultFactoryKey, ViewFragmentContextAndResultFactory>();
 
 	
-	public GSymViewContext(Object docRootNode, GSymPerspective perspective, AttributeTable subjectContext, GSymBrowserContext browserContext,
-			Page page, CommandHistory commandHistory)
+	public GSymViewContext(GSymSubject subject, GSymBrowserContext browserContext, CommandHistory commandHistory)
 	{
-		this.docRootNode = docRootNode;
+		this.docRootNode = subject.getFocus();
+		GSymPerspective perspective = subject.getPerspective();
 		
-		view = new DocView( docRootNode, makeNodeResultFactory( perspective, perspective.getFragmentViewFunction(), subjectContext, perspective.getStyleSheet(), perspective.getInitialState() ) );
+		view = new DocView( docRootNode, makeNodeResultFactory( perspective, perspective.getFragmentViewFunction(), subject.getSubjectContext(), perspective.getStyleSheet(), perspective.getInitialState() ) );
 
 		this.browserContext = browserContext;
-		this.page = page;
 		this.commandHistory = commandHistory;
 		
-		region = new DPRegion( );
+		region = new DPRegion();
+		
+		page = new GSymViewPage( region, subject.getTitle(), browserContext, commandHistory );
 		
 		
 		view.setElementChangeListener( new NodeElementChangeListenerDiff() );
@@ -227,6 +230,11 @@ public class GSymViewContext implements DocView.RefreshListener
 	public Page getPage()
 	{
 		return page;
+	}
+	
+	public Log getPageLog()
+	{
+		return page.getLog();
 	}
 	
 	public CommandHistory getCommandHistory()

@@ -113,6 +113,7 @@ class Terminal (IncrementalOwner):
 						result = [ eval( evalSource, self._globalVars, self._localVars ) ]
 					except Exception, exc:
 						caughtException = exc
+						result = None
 					outout, outerr = self._shutdownStdOurErr( stdout, stderr )
 					self.addBlock( TerminalBlock( module, outout.getText(), outerr.getText(), caughtException, result ) )
 					self.setCurrentPythonModule( Python25.py25NewModule() )
