@@ -251,11 +251,11 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 			double edgeX = 0.0;
 			if ( bRightEdge )
 			{
-				edgeX = childNode.getAllocPositionInParentSpaceX() + childNode.getAllocationInParentSpaceX();
+				edgeX = childNode.getAllocPositionInParentAllocationSpaceX() + childNode.getAllocationInParentSpaceX();
 			}
 			else
 			{
-				edgeX = childNode.getAllocPositionInParentSpaceX();
+				edgeX = childNode.getAllocPositionInParentAllocationSpaceX();
 			}
 			
 			if ( i > 0 )

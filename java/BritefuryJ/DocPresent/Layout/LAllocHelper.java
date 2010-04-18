@@ -11,7 +11,7 @@ public class LAllocHelper
 	public static void allocateX(LAllocBoxInterface alloc, LReqBoxInterface requisition, double x, double width)
 	{
 		double w = Math.max( width, requisition.getReqMinWidth() );
-		alloc.setPositionInParentSpaceAndAllocationX( x, w );
+		alloc.setPositionInParentAllocationSpaceAndAllocationX( x, w );
 	}
 	
 	public static void allocateY(LAllocBoxInterface alloc, LReqBoxInterface requisition, double y, double height)
@@ -20,7 +20,7 @@ public class LAllocHelper
 		double delta = Math.max( ( height - requisition.getReqHeight() )  *  0.5,  0.0 );
 		double refY = requisition.getReqRefY() + delta;
 		
-		alloc.setPositionInParentSpaceAndAllocationY( y, h, refY );
+		alloc.setPositionInParentAllocationSpaceAndAllocationY( y, h, refY );
 	}
 	
 	public static void allocateY(LAllocBoxInterface alloc, LReqBoxInterface requisition, double y, double height, double refY)
@@ -29,7 +29,7 @@ public class LAllocHelper
 		double delta = Math.max( ( height - requisition.getReqHeight() )  *  0.5,  0.0 );
 		refY += delta;
 		
-		alloc.setPositionInParentSpaceAndAllocationY( y, h, refY );
+		alloc.setPositionInParentAllocationSpaceAndAllocationY( y, h, refY );
 	}
 	
 	public static void allocateY(LAllocBoxInterface alloc, LReqBoxInterface requisition, double y, LAllocV allocV)
@@ -37,7 +37,7 @@ public class LAllocHelper
 		double h = Math.max( allocV.height, requisition.getReqHeight() );
 		double refY = Math.max( allocV.refY, requisition.getReqRefY() );
 		
-		alloc.setPositionInParentSpaceAndAllocationY( y, h, refY );
+		alloc.setPositionInParentAllocationSpaceAndAllocationY( y, h, refY );
 	}
 
 	
@@ -63,7 +63,7 @@ public class LAllocHelper
 	
 	protected static void allocateChildPositionX(LAllocBoxInterface childAllocation, double localPosX)
 	{
-		childAllocation.setAllocPositionInParentSpaceX( localPosX );
+		childAllocation.setAllocPositionInParentAllocationSpaceX( localPosX );
 	}
 	
 	protected static void allocateChildWidth(LAllocBoxInterface childAllocation, double localWidth)
@@ -73,7 +73,7 @@ public class LAllocHelper
 	
 	protected static void allocateChildX(LAllocBoxInterface childAllocation, double localPosX, double localWidth)
 	{
-		childAllocation.setPositionInParentSpaceAndAllocationX( localPosX, localWidth );
+		childAllocation.setPositionInParentAllocationSpaceAndAllocationX( localPosX, localWidth );
 	}
 	
 	public static void allocateChildXAligned(LAllocBoxInterface childAllocation, LReqBoxInterface childRequisition, int alignmentFlags, double regionX, double regionWidth)
@@ -86,27 +86,27 @@ public class LAllocHelper
 		double childWidth = childRequisition.getReqPrefWidth();
 		if ( regionWidth <= childWidth )
 		{
-			childAllocation.setPositionInParentSpaceAndAllocationX( regionX, Math.max( regionWidth, childRequisition.getReqMinWidth() ) );
+			childAllocation.setPositionInParentAllocationSpaceAndAllocationX( regionX, Math.max( regionWidth, childRequisition.getReqMinWidth() ) );
 		}
 		else
 		{
 			if ( hAlign == HAlignment.EXPAND )
 			{
-				childAllocation.setPositionInParentSpaceAndAllocationX( regionX, regionWidth );
+				childAllocation.setPositionInParentAllocationSpaceAndAllocationX( regionX, regionWidth );
 			}
 			else
 			{
 				if ( hAlign == HAlignment.LEFT )
 				{
-					childAllocation.setPositionInParentSpaceAndAllocationX( regionX, childWidth );
+					childAllocation.setPositionInParentAllocationSpaceAndAllocationX( regionX, childWidth );
 				}
 				else if ( hAlign == HAlignment.CENTRE )
 				{
-					childAllocation.setPositionInParentSpaceAndAllocationX( regionX + ( regionWidth - childWidth ) * 0.5, childWidth );
+					childAllocation.setPositionInParentAllocationSpaceAndAllocationX( regionX + ( regionWidth - childWidth ) * 0.5, childWidth );
 				}
 				else if ( hAlign == HAlignment.RIGHT )
 				{
-					childAllocation.setPositionInParentSpaceAndAllocationX( regionX + ( regionWidth - childWidth ), childWidth );
+					childAllocation.setPositionInParentAllocationSpaceAndAllocationX( regionX + ( regionWidth - childWidth ), childWidth );
 				}
 				else
 				{
@@ -123,7 +123,7 @@ public class LAllocHelper
 	
 	protected static void allocateChildPositionY(LAllocBoxInterface childAllocation, double localPosY)
 	{
-		childAllocation.setAllocPositionInParentSpaceY( localPosY );
+		childAllocation.setAllocPositionInParentAllocationSpaceY( localPosY );
 	}
 	
 	protected static void allocateChildHeightAsRequisition(LAllocBoxInterface childAllocation, LReqBoxInterface childRequisition)
@@ -146,7 +146,7 @@ public class LAllocHelper
 	
 	protected static void allocateChildYAsRequisition(LAllocBoxInterface childAllocation, LReqBoxInterface childRequisition, double localPosY)
 	{
-		childAllocation.setPositionInParentSpaceAndAllocationY( localPosY, childRequisition.getReqHeight(), childRequisition.getReqRefY() );
+		childAllocation.setPositionInParentAllocationSpaceAndAllocationY( localPosY, childRequisition.getReqHeight(), childRequisition.getReqRefY() );
 	}
 	
 	
@@ -160,32 +160,32 @@ public class LAllocHelper
 		if ( vAlign == VAlignment.REFY_EXPAND )
 		{
 			double childHeight = Math.max( childRequisition.getReqHeight(), regionAllocV.getHeight() );
-			childAllocation.setPositionInParentSpaceAndAllocationY( regionY, childHeight, regionAllocV.getRefY() );
+			childAllocation.setPositionInParentAllocationSpaceAndAllocationY( regionY, childHeight, regionAllocV.getRefY() );
 		}
 		else if ( vAlign == VAlignment.REFY )
 		{
 			double offset = regionAllocV.getRefY() - childRequisition.getReqRefY();
-			childAllocation.setPositionInParentSpaceAndAllocationY( regionY + offset, childRequisition.getReqHeight(), childRequisition.getReqRefY() );
+			childAllocation.setPositionInParentAllocationSpaceAndAllocationY( regionY + offset, childRequisition.getReqHeight(), childRequisition.getReqRefY() );
 		}
 		else if ( vAlign == VAlignment.EXPAND )
 		{
 			double childHeight = Math.max( childRequisition.getReqHeight(), regionAllocV.getHeight() );
 			double delta = Math.max( regionAllocV.getHeight() - childRequisition.getReqHeight(), 0.0 );
-			childAllocation.setPositionInParentSpaceAndAllocationY( regionY, childHeight, childRequisition.getReqRefY() + delta * 0.5 );
+			childAllocation.setPositionInParentAllocationSpaceAndAllocationY( regionY, childHeight, childRequisition.getReqRefY() + delta * 0.5 );
 		}
 		else if ( vAlign == VAlignment.TOP )
 		{
-			childAllocation.setPositionInParentSpaceAndAllocationY( regionY, childRequisition.getReqHeight(), childRequisition.getReqRefY() );
+			childAllocation.setPositionInParentAllocationSpaceAndAllocationY( regionY, childRequisition.getReqHeight(), childRequisition.getReqRefY() );
 		}
 		else if ( vAlign == VAlignment.CENTRE )
 		{
 			double delta = Math.max( regionAllocV.getHeight() - childRequisition.getReqHeight(), 0.0 );
-			childAllocation.setPositionInParentSpaceAndAllocationY( regionY + delta * 0.5, childRequisition.getReqHeight(), childRequisition.getReqRefY() );
+			childAllocation.setPositionInParentAllocationSpaceAndAllocationY( regionY + delta * 0.5, childRequisition.getReqHeight(), childRequisition.getReqRefY() );
 		}
 		else if ( vAlign == VAlignment.BOTTOM )
 		{
 			double delta = Math.max( regionAllocV.getHeight() - childRequisition.getReqHeight(), 0.0 );
-			childAllocation.setPositionInParentSpaceAndAllocationY( regionY + delta, childRequisition.getReqHeight(), childRequisition.getReqRefY() );
+			childAllocation.setPositionInParentAllocationSpaceAndAllocationY( regionY + delta, childRequisition.getReqHeight(), childRequisition.getReqRefY() );
 		}
 	}
 }

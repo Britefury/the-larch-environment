@@ -13,23 +13,23 @@ public interface LAllocBoxInterface
 {
 	public abstract LayoutNode getAllocLayoutNode();
 
-	public abstract double getAllocPositionInParentSpaceX();
-	public abstract double getAllocPositionInParentSpaceY();
+	public abstract double getAllocPositionInParentAllocationSpaceX();
+	public abstract double getAllocPositionInParentAllocationSpaceY();
 	public abstract double getAllocationX();
 	public abstract double getAllocationY();
 	public abstract double getAllocRefY();
 	public abstract LAllocV getAllocV();
 	public abstract Vector2 getAllocation();
 	
-	public abstract void setAllocPositionInParentSpaceX(double x);
-	public abstract void setAllocPositionInParentSpaceY(double y);
+	public abstract void setAllocPositionInParentAllocationSpaceX(double x);
+	public abstract void setAllocPositionInParentAllocationSpaceY(double y);
 	public abstract void setAllocationX(double width);
 	public abstract void setAllocationY(double height, double refY);
 	public abstract void setAllocation(double width, double height, double refY);
 	
-	public abstract void setPositionInParentSpaceAndAllocationX(double x, double width);
-	public abstract void setPositionInParentSpaceAndAllocationY(double y, double height);
-	public abstract void setPositionInParentSpaceAndAllocationY(double y, double height, double refY);
+	public abstract void setPositionInParentAllocationSpaceAndAllocationX(double x, double width);
+	public abstract void setPositionInParentAllocationSpaceAndAllocationY(double y, double height);
+	public abstract void setPositionInParentAllocationSpaceAndAllocationY(double y, double height, double refY);
 	
 	public abstract void scaleAllocationX(double scale);
 	public abstract void scaleAllocationY(double scale);

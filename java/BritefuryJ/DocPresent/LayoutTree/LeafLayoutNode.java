@@ -53,19 +53,24 @@ public abstract class LeafLayoutNode extends LayoutNode
 	
 	
 	
-	public double getAllocPositionInParentSpaceX()
-	{
-		return layoutAllocBox.getAllocPositionInParentSpaceX();
-	}
-	
-	public double getAllocPositionInParentSpaceY()
-	{
-		return layoutAllocBox.getAllocPositionInParentSpaceY();
-	}
-	
 	public Point2 getPositionInParentSpace()
 	{
-		return layoutAllocBox.getPositionInParentSpace();
+		return getParentAllocationToParentSpaceXform().transform( layoutAllocBox.getPositionInParentAllocationSpace() );
+	}
+	
+	public double getAllocPositionInParentAllocationSpaceX()
+	{
+		return layoutAllocBox.getAllocPositionInParentAllocationSpaceX();
+	}
+	
+	public double getAllocPositionInParentAllocationSpaceY()
+	{
+		return layoutAllocBox.getAllocPositionInParentAllocationSpaceY();
+	}
+	
+	public Point2 getPositionInParentAllocationSpace()
+	{
+		return layoutAllocBox.getPositionInParentAllocationSpace();
 	}
 
 	public double getAllocationX()
@@ -90,17 +95,17 @@ public abstract class LeafLayoutNode extends LayoutNode
 
 	public double getAllocationInParentSpaceX()
 	{
-		return layoutAllocBox.getAllocationX()  *  getScale();
+		return layoutAllocBox.getAllocationX()  *  getParentAllocationToParentSpaceXform().scale;
 	}
 	
 	public double getAllocationInParentSpaceY()
 	{
-		return layoutAllocBox.getAllocationY()  *  getScale();
+		return layoutAllocBox.getAllocationY()  *  getParentAllocationToParentSpaceXform().scale;
 	}
 	
 	public Vector2 getAllocationInParentSpace()
 	{
-		return layoutAllocBox.getAllocation().mul( getScale() );
+		return layoutAllocBox.getAllocation().mul( getParentAllocationToParentSpaceXform().scale );
 	}
 	
 	
@@ -198,13 +203,5 @@ public abstract class LeafLayoutNode extends LayoutNode
 	
 	protected void onChildSizeRefreshed()
 	{
-	}
-	
-	
-	
-	
-	protected double getScale()
-	{
-		return element.getScale();
 	}
 }

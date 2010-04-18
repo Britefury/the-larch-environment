@@ -11,8 +11,8 @@ import java.util.HashMap;
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPRegion;
+import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Browser.Page;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Selection.Selection;
@@ -178,13 +178,13 @@ public class GSymViewContext implements DocView.RefreshListener
 	
 	public Caret getCaret()
 	{
-		DPPresentationArea elementTree = region.getPresentationArea();
+		PresentationComponent.RootElement elementTree = region.getRootElement();
 		return elementTree != null  ?  elementTree.getCaret()  :  null;
 	}
 	
 	public Selection getSelection()
 	{
-		DPPresentationArea elementTree = region.getPresentationArea();
+		PresentationComponent.RootElement elementTree = region.getRootElement();
 		return elementTree != null  ?  elementTree.getSelection()  :  null;
 	}
 	
@@ -215,9 +215,9 @@ public class GSymViewContext implements DocView.RefreshListener
 		return region;
 	}
 	
-	public DPPresentationArea getElementTree()
+	public PresentationComponent.RootElement getElementTree()
 	{
-		return region.getPresentationArea();
+		return region.getRootElement();
 	}
 	
 	

@@ -10,9 +10,9 @@ import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPContentLeaf;
-import BritefuryJ.DocPresent.DPPresentationArea;
-import BritefuryJ.DocPresent.DPSegment;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPSegment;
+import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Marker.Marker.Bias;
@@ -64,7 +64,7 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 			DPElement nodeElement = node.getInnerElementNoRefresh();
 			if ( nodeElement != null )
 			{
-				DPPresentationArea tree = nodeElement.getPresentationArea();
+				PresentationComponent.RootElement tree = nodeElement.getRootElement();
 				Caret caret = tree.getCaret();
 	
 				String text = nodeElement.getTextRepresentation();
@@ -241,7 +241,7 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 				}
 				
 				
-				DPPresentationArea elementTree = nodeElement.getPresentationArea();
+				PresentationComponent.RootElement elementTree = nodeElement.getRootElement();
 				Caret caret = elementTree.getCaret();
 				
 				

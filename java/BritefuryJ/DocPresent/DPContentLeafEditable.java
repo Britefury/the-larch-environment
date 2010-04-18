@@ -117,7 +117,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	{
 		if ( isRealised() )
 		{
-			getPresentationArea().caretGrab( this );
+			getRootElement().caretGrab( this );
 		}
 	}
 	
@@ -125,7 +125,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	{
 		if ( isRealised() )
 		{
-			getPresentationArea().caretUngrab( this );
+			getRootElement().caretUngrab( this );
 		}
 	}
 	
@@ -289,9 +289,9 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	protected WeakHashMap<Marker, Object> getMarkersForLeaf()
 	{
-		if ( presentationArea != null )
+		if ( rootElement != null )
 		{
-			return presentationArea.markersByLeaf.get( this );
+			return rootElement.markersByLeaf.get( this );
 		}
 		else
 		{
@@ -301,14 +301,14 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	protected WeakHashMap<Marker, Object> getValidMarkersForLeaf()
 	{
-		if ( presentationArea != null )
+		if ( rootElement != null )
 		{
-			WeakHashMap<Marker, Object> markers = presentationArea.markersByLeaf.get( this );
+			WeakHashMap<Marker, Object> markers = rootElement.markersByLeaf.get( this );
 			
 			if ( markers == null )
 			{
 				markers = new WeakHashMap<Marker, Object>(); 
-				presentationArea.markersByLeaf.put( this, markers );
+				rootElement.markersByLeaf.put( this, markers );
 			}
 			
 			return markers;
@@ -321,7 +321,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	protected void removeMarkersForLeaf()
 	{
-		presentationArea.markersByLeaf.remove( this );
+		rootElement.markersByLeaf.remove( this );
 	}
 	
 	
@@ -650,9 +650,9 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	protected boolean handleBackspace(Caret caret)
 	{
-		if ( presentationArea.isSelectionValid() )
+		if ( rootElement.isSelectionValid() )
 		{
-			presentationArea.deleteSelection();
+			rootElement.deleteSelection();
 			return true;
 		}
 		else if ( isMarkerAtStart( caret.getMarker() ) )
@@ -694,9 +694,9 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	protected boolean handleDelete(Caret caret)
 	{
-		if ( presentationArea.isSelectionValid() )
+		if ( rootElement.isSelectionValid() )
 		{
-			presentationArea.deleteSelection();
+			rootElement.deleteSelection();
 			return true;
 		}
 		else if ( isMarkerAtEnd( caret.getMarker() ) )
@@ -761,9 +761,9 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 			String str = String.valueOf( event.getKeyChar() );
 			if ( str.length() > 0 )
 			{
-				if ( presentationArea.isSelectionValid() )
+				if ( rootElement.isSelectionValid() )
 				{
-					presentationArea.replaceSelection( str );
+					rootElement.replaceSelection( str );
 				}
 				else
 				{

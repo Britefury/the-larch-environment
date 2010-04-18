@@ -28,10 +28,11 @@ import javax.swing.TransferHandler;
 
 import BritefuryJ.CommandHistory.CommandHistoryController;
 import BritefuryJ.CommandHistory.CommandHistoryListener;
-import BritefuryJ.DocPresent.DPPresentationArea;
+import BritefuryJ.DocPresent.PresentationComponent;
+import BritefuryJ.DocPresent.DPViewport;
 import BritefuryJ.DocPresent.PageController;
 
-public class Browser
+public class Browser implements DPViewport.ViewportListener
 {
 	protected interface BrowserListener
 	{
@@ -49,7 +50,8 @@ public class Browser
 	private JTextField locationField;
 	private JPanel locationPanel, panel;
 
-	private DPPresentationArea area;
+	private PresentationComponent presComponent;
+	private DPViewport viewport;
 	private BrowserHistory history;
 	
 	private BrowserContext context;
@@ -65,10 +67,16 @@ public class Browser
 		this.context = context;
 		history = new BrowserHistory( location );
 		
-		area = new DPPresentationArea( history.getCurrentState().getViewTransformation() );
-		area.setPageController( pageController );
+		viewport = new DPViewport( 0.0, 0.0 );
+		viewport.alignHExpand().alignVExpand();
+		viewport.setListener( this );
+		viewport.setViewportXform( history.getCurrentState().getViewTransformation() );
 		
-		ActionMap actionMap = area.getPresentationComponent().getActionMap();
+		presComponent = new PresentationComponent();
+		presComponent.setPageController( pageController );
+		presComponent.setChild( viewport );
+		
+		ActionMap actionMap = presComponent.getActionMap();
 		actionMap.put( TransferHandler.getCutAction().getValue( Action.NAME ), TransferHandler.getCutAction() );
 		actionMap.put( TransferHandler.getCopyAction().getValue( Action.NAME ), TransferHandler.getCopyAction() );
 		actionMap.put( TransferHandler.getPasteAction().getValue( Action.NAME ), TransferHandler.getPasteAction() );
@@ -112,7 +120,7 @@ public class Browser
 		panel = new JPanel();
 		panel.setLayout( new BorderLayout() );
 		panel.add( header, BorderLayout.PAGE_START );
-		panel.add( area.getComponent(), BorderLayout.CENTER );
+		panel.add( presComponent, BorderLayout.CENTER );
 
 		
 		resolve();
@@ -188,17 +196,17 @@ public class Browser
 	
 	public void createTreeExplorer()
 	{
-		area.createTreeExplorer();
+		presComponent.createTreeExplorer();
 	}
 	
 	public void viewportReset()
 	{
-		area.reset();
+		viewport.resetXform();
 	}
 
 	public void viewportOneToOne()
 	{
-		area.oneToOne();
+		viewport.oneToOne();
 	}
 
 	
@@ -240,12 +248,12 @@ public class Browser
 		Page p = context.resolveLocationAsPage( location );
 		
 		// Add browser, and add component
-		area.setChild( p.getContentsElement().alignHExpand() );		
+		viewport.setChild( p.getContentsElement().alignHExpand() );		
 		
 		// Set the page
 		setPage( p );
 
-		area.setViewTransformation( history.getCurrentState().getViewTransformation() );
+		viewport.setViewportXform( history.getCurrentState().getViewTransformation() );
 	}
 	
 	private void setPage(Page p)
@@ -285,7 +293,7 @@ public class Browser
 			throw new RuntimeException( "Received page contents modified notification from invalid page" );
 		}
 		
-		area.setChild( page.getContentsElement() );		
+		viewport.setChild( page.getContentsElement() );		
 	}
 	
 	
@@ -350,5 +358,12 @@ public class Browser
 		}
 		
 		return button;
+	}
+	
+	
+	
+	public void onViewportXformModified(DPViewport v)
+	{
+		history.getCurrentState().setViewTransformation( viewport.getViewportXform() );
 	}
 }

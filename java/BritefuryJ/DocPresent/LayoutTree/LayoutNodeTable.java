@@ -249,8 +249,8 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 			for (int i = 0; i < columnBoxes.length - 1; i++)
 			{
 				LAllocBox columnJ = columnAllocBoxes[i+1];
-				double iUpperX = columnI.getAllocPositionInParentSpaceX() + columnI.getAllocationX();
-				double jLowerX = columnJ.getAllocPositionInParentSpaceX();
+				double iUpperX = columnI.getAllocPositionInParentAllocationSpaceX() + columnI.getAllocationX();
+				double jLowerX = columnJ.getAllocPositionInParentAllocationSpaceX();
 				
 				double midX = ( iUpperX + jLowerX ) * 0.5;
 				
@@ -284,8 +284,8 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 			for (int i = 0; i < rowBoxes.length - 1; i++)
 			{
 				LAllocBox rowJ = rowAllocBoxes[i+1];
-				double iUpperY = rowI.getAllocPositionInParentSpaceY() + rowI.getAllocationY();
-				double jLowerY = rowJ.getAllocPositionInParentSpaceY();
+				double iUpperY = rowI.getAllocPositionInParentAllocationSpaceY() + rowI.getAllocationY();
+				double jLowerY = rowJ.getAllocPositionInParentAllocationSpaceY();
 				
 				double midY = ( iUpperY + jLowerY ) * 0.5;
 				

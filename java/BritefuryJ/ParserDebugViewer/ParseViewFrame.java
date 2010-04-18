@@ -28,7 +28,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
-import BritefuryJ.DocPresent.DPPresentationArea;
+import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.ItemStream.ItemStream;
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
@@ -44,7 +44,7 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 	private JMenuBar menuBar;
 	private JPanel graphPanel;
 	private JLabel graphLabel;
-	private DPPresentationArea graph;
+	private PresentationComponent graph;
 	
 	private JPanel inputPanel, resultPanel, parserPanel;
 	private JLabel inputLabel, resultLabel, parserLabel;
@@ -57,8 +57,8 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 	{
 		view = new ParseView( result );
 		view.setListener( this );
-		graph = view.getPresentationArea();
-		graph.getComponent().setPreferredSize( new Dimension( 640, 480 ) );
+		graph = view.getPresentationComponent();
+		graph.setPreferredSize( new Dimension( 640, 480 ) );
 		
 		frame = new JFrame( "Parse tree" );
 		frame.setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
@@ -67,7 +67,7 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 		graphPanel = new JPanel();
 		graphPanel.setLayout( new BoxLayout( graphPanel, BoxLayout.PAGE_AXIS ) );
 		graphPanel.add( graphLabel );
-		graphPanel.add( graph.getComponent() );
+		graphPanel.add( graph );
 		
 		
 		Style defaultStyle = StyleContext.getDefaultStyleContext().getStyle( StyleContext.DEFAULT_STYLE );
@@ -150,7 +150,7 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				graph.reset();
+				view.getViewport().resetXform();
 			}
 
 			private static final long serialVersionUID = 1L;
@@ -160,7 +160,7 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				graph.oneToOne();
+				view.getViewport().oneToOne();
 			}
 
 			private static final long serialVersionUID = 1L;
@@ -170,7 +170,7 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				graph.zoomToFit();
+				view.getViewport().zoomToFit();
 			}
 
 			private static final long serialVersionUID = 1L;
@@ -187,7 +187,7 @@ public class ParseViewFrame implements ParseView.ParseViewListener
 		frame.add( mainSplitPane );
 		frame.pack();
 		frame.setVisible(true);
-		graph.zoomToFit();
+		view.getViewport().zoomToFit();
 	}
 
 

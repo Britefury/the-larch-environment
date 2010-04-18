@@ -14,11 +14,12 @@ import java.util.Arrays;
 
 import javax.swing.JFrame;
 
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPParagraph;
-import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPViewport;
+import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.StyleParams.ParagraphStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 
@@ -149,7 +150,7 @@ public class DPStressTest
 		//This stops the app on window close.
 		frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
 
-		DPPresentationArea area = new DPPresentationArea( );
+		PresentationComponent presentation = new PresentationComponent();
 	     
 		System.out.println( "Start memory usage = "  + ( Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() ) );
 	     
@@ -158,12 +159,14 @@ public class DPStressTest
 		DPElement w = createContentNode();
 		long t2 = System.nanoTime();
 		System.out.println( "Element tree creation time: " + (double)( t2 - t1 ) / 1000000000.0 );
-		area.setChild( w );
+		DPViewport viewport = new DPViewport( 0.0, 0.0 );
+		viewport.setChild( w );
+		presentation.setChild( viewport.alignHExpand().alignVExpand() );
 	     
 	     
 	     
-		area.getComponent().setPreferredSize( new Dimension( 640, 480 ) );
-		frame.add( area.getComponent() );
+		presentation.setPreferredSize( new Dimension( 640, 480 ) );
+		frame.add( presentation );
 		frame.pack();
 		frame.setVisible(true);
 	}

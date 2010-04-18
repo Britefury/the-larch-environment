@@ -33,7 +33,7 @@ public class Hyperlink extends Control
 		
 		public boolean onLinkClicked(Hyperlink link, PointerButtonEvent buttonEvent)
 		{
-			PageController pageController = link.getElement().getPresentationArea().getPageController();
+			PageController pageController = link.getElement().getRootElement().getPageController();
 			if ( ( buttonEvent.getPointer().getModifiers() & Modifier.CTRL ) != 0 )
 			{
 				if ( buttonEvent.getButton() == 1  ||  buttonEvent.getButton() == 2 )

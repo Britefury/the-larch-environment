@@ -7,6 +7,9 @@
 //##************************
 package BritefuryJ.Math;
 
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+
 public class Vector2 implements Cloneable
 {
 	public double x, y;
@@ -27,7 +30,8 @@ public class Vector2 implements Cloneable
 	
 	public Vector2 clone()
 	{
-		try {
+		try
+		{
 			return (Vector2)super.clone();
 		}
 		catch (CloneNotSupportedException e)
@@ -62,6 +66,22 @@ public class Vector2 implements Cloneable
 	public Vector2 mul(double s)
 	{
 		return new Vector2( x*s, y*s );
+	}
+	
+	
+	public Vector2 negate()
+	{
+		return new Vector2( -x, -y );
+	}
+	
+	
+	public Vector2 transform(AffineTransform affine)
+	{
+		Point2D.Double origin = new Point2D.Double( 0.0, 0.0 );
+		Point2D.Double v = new Point2D.Double( x, y );
+		affine.transform( origin, origin );
+		affine.transform( v, v );
+		return new Vector2( v.x - origin.x, v.y - origin.y );
 	}
 	
 	

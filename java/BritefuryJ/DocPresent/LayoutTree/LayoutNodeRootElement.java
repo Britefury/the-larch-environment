@@ -6,13 +6,13 @@
 //##************************
 package BritefuryJ.DocPresent.LayoutTree;
 
-import BritefuryJ.DocPresent.DPPresentationArea;
+import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Layout.LAllocHelper;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
 
 public class LayoutNodeRootElement extends LayoutNodeBox
 {
-	public LayoutNodeRootElement(DPPresentationArea element)
+	public LayoutNodeRootElement(PresentationComponent.RootElement element)
 	{
 		super( element );
 	}
@@ -23,7 +23,7 @@ public class LayoutNodeRootElement extends LayoutNodeBox
 	{
 		super.handleQueueResize();
 		
-		DPPresentationArea rootElement = (DPPresentationArea)getElement();
+		PresentationComponent.RootElement rootElement = (PresentationComponent.RootElement)getElement();
 		rootElement.queueReallocation();
 	}
 

@@ -28,6 +28,7 @@ import BritefuryJ.DocPresent.ContextMenu.ContextMenu;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
+import BritefuryJ.DocPresent.Event.PointerNavigationEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
@@ -46,9 +47,9 @@ import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValue;
 import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueObject;
 import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueSequence;
 import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueStream;
+import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
 import BritefuryJ.DocPresent.StyleParams.HBoxStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
-import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -261,7 +262,7 @@ abstract public class DPElement extends PointerInputElement
 	
 	protected ElementStyleParams styleParams;
 	protected DPContainer parent;
-	protected DPPresentationArea presentationArea;
+	protected PresentationComponent.RootElement rootElement;
 	
 	protected LayoutNode layoutNode;
 	
@@ -520,14 +521,19 @@ abstract public class DPElement extends PointerInputElement
 		return layoutNode != null  ?  layoutNode.getPositionInParentSpace()  :  new Point2();
 	}
 	
-	public double getPositionInParentSpaceX()
+	public Point2 getPositionInParentAllocationSpace()
 	{
-		return layoutNode != null  ?  layoutNode.getAllocPositionInParentSpaceX()  :  0.0;
+		return layoutNode != null  ?  layoutNode.getPositionInParentAllocationSpace()  :  new Point2();
 	}
 	
-	public double getPositionInParentSpaceY()
+	public double getPositionInParentAllocationSpaceX()
 	{
-		return layoutNode != null  ?  layoutNode.getAllocPositionInParentSpaceY()  :  0.0;
+		return layoutNode != null  ?  layoutNode.getAllocPositionInParentAllocationSpaceX()  :  0.0;
+	}
+	
+	public double getPositionInParentAllocationSpaceY()
+	{
+		return layoutNode != null  ?  layoutNode.getAllocPositionInParentAllocationSpaceY()  :  0.0;
 	}
 	
 	public double getAllocationX()
@@ -568,12 +574,22 @@ abstract public class DPElement extends PointerInputElement
 	
 	public AABox2 getLocalAABox()
 	{
-		return new AABox2( new Point2(), new Point2( getAllocation() ) );
+		return new AABox2( new Point2(), getAllocation() );
+	}
+	
+	public AABox2 getLocalClipBox()
+	{
+		return null;
+	}
+	
+	public AABox2 getAABoxInParentAllocationSpace()
+	{
+		return new AABox2( getPositionInParentAllocationSpace(), getAllocation() );
 	}
 	
 	public AABox2 getAABoxInParentSpace()
 	{
-		return new AABox2( getPositionInParentSpace(), getAllocationInParentSpace() );
+		return getParentAllocationToParentSpaceXform().transform( getAABoxInParentAllocationSpace() );
 	}
 	
 	
@@ -584,19 +600,19 @@ abstract public class DPElement extends PointerInputElement
 	}
 
 	
-	public double getScale()
+	public Xform2 getParentAllocationToParentSpaceXform()
 	{
-		return parent != null  ?  parent.getInternalChildScale( this )  :  1.0;
+		return parent != null  ?  parent.getAllocationSpaceToLocalSpaceXform( this )  :  Xform2.identity;
 	}
 	
 	public Xform2 getLocalToParentXform()
 	{
-		return new Xform2( getScale(), getPositionInParentSpace().toVector2() );
+		return new Xform2( getPositionInParentAllocationSpace().toVector2() ).concat( getParentAllocationToParentSpaceXform() );
 	}
 	
 	public Xform2 getParentToLocalXform()
 	{
-		return Xform2.inverseOf( getScale(), getPositionInParentSpace().toVector2() );
+		return getLocalToParentXform().inverse();
 	}
 	
 	
@@ -867,9 +883,9 @@ abstract public class DPElement extends PointerInputElement
 	
 	protected boolean arePointersWithinBounds()
 	{
-		if ( presentationArea != null )
+		if ( rootElement != null )
 		{
-			return presentationArea.getInputTable().arePointersWithinBoundsOfElement( this );
+			return rootElement.getInputTable().arePointersWithinBoundsOfElement( this );
 		}
 		else
 		{
@@ -879,9 +895,9 @@ abstract public class DPElement extends PointerInputElement
 	
 	protected ArrayList<PointerInterface> getPointersWithinBounds()
 	{
-		if ( presentationArea != null )
+		if ( rootElement != null )
 		{
-			return presentationArea.getInputTable().getPointersWithinBoundsOfElement( this );
+			return rootElement.getInputTable().getPointersWithinBoundsOfElement( this );
 		}
 		else
 		{
@@ -903,9 +919,9 @@ abstract public class DPElement extends PointerInputElement
 		return testFlag( FLAG_REALISED );
 	}
 	
-	public DPPresentationArea getPresentationArea()
+	public PresentationComponent.RootElement getRootElement()
 	{
-		return presentationArea;
+		return rootElement;
 	}
 	
 	
@@ -914,12 +930,12 @@ abstract public class DPElement extends PointerInputElement
 		return parent;
 	}
 	
-	protected void setParent(DPContainer parent, DPPresentationArea area)
+	protected void setParent(DPContainer parent, PresentationComponent.RootElement root)
 	{
 		this.parent = parent;
-		if ( area != presentationArea )
+		if ( root != rootElement )
 		{
-			setPresentationArea( area );
+			setRootElement( root );
 		}
 		onParentChanged();
 	}
@@ -1093,19 +1109,19 @@ abstract public class DPElement extends PointerInputElement
 	}
 	
 	
-	protected void setPresentationArea(DPPresentationArea area)
+	protected void setRootElement(PresentationComponent.RootElement root)
 	{
-		if ( area != presentationArea )
+		if ( root != rootElement )
 		{
-			presentationArea = area;
-			if ( presentationArea != null )
+			rootElement = root;
+			if ( rootElement != null )
 			{
 				ArrayList<Runnable> waitingImmediateEvents = waitingImmediateEventsByElement.get( this );
 				if ( waitingImmediateEvents != null )
 				{
 					for (Runnable event: waitingImmediateEvents)
 					{
-						presentationArea.queueImmediateEvent( event );
+						rootElement.queueImmediateEvent( event );
 					}
 					waitingImmediateEventsByElement.remove( this );
 				}
@@ -1138,9 +1154,9 @@ abstract public class DPElement extends PointerInputElement
 	
 	public void queueImmediateEvent(Runnable event)
 	{
-		if ( presentationArea != null )
+		if ( rootElement != null )
 		{
-			presentationArea.queueImmediateEvent( event );
+			rootElement.queueImmediateEvent( event );
 		}
 		else
 		{
@@ -1160,9 +1176,9 @@ abstract public class DPElement extends PointerInputElement
 
 	public void dequeueImmediateEvent(Runnable event)
 	{
-		if ( presentationArea != null )
+		if ( rootElement != null )
 		{
-			presentationArea.dequeueImmediateEvent( event );
+			rootElement.dequeueImmediateEvent( event );
 		}
 		else
 		{
@@ -1298,17 +1314,17 @@ abstract public class DPElement extends PointerInputElement
 	}
 	
 	
-	protected void queueRedraw(Point2 localPos, Vector2 localSize)
+	protected void queueRedraw(AABox2 box)
 	{
 		if ( isRealised()  &&  parent != null )
 		{
-			parent.childRedrawRequest( this, localPos, localSize );
+			parent.childRedrawRequest( this, box );
 		}
 	}
 	
 	public void queueFullRedraw()
 	{
-		queueRedraw( new Point2(), getAllocation() );
+		queueRedraw( getLocalAABox() );
 	}
 	
 	
@@ -1341,16 +1357,16 @@ abstract public class DPElement extends PointerInputElement
 	{
 		if ( testFlag( FLAG_CARET_GRABBED ) )
 		{
-			if ( presentationArea != null )
+			if ( rootElement != null )
 			{
-				presentationArea.caretUngrab( this );
+				rootElement.caretUngrab( this );
 			}
 			clearFlag( FLAG_CARET_GRABBED );
 		}
 		
-		if ( presentationArea != null )
+		if ( rootElement != null )
 		{
-			presentationArea.elementUnrealised( this );
+			rootElement.elementUnrealised( this );
 		}
 		onUnrealise( unrealiseRoot );
 		clearFlagRealised();
@@ -1553,9 +1569,9 @@ abstract public class DPElement extends PointerInputElement
 		handleHover();
 			
 		Cursor cursor = getCursor();
-		if ( cursor != null  &&  presentationArea != null )
+		if ( cursor != null  &&  rootElement != null )
 		{
-			presentationArea.setPointerCursor( cursor );
+			rootElement.setPointerCursor( cursor );
 		}
 		onEnter( event );
 		List<ElementInteractor> interactors = getInteractors();
@@ -1573,16 +1589,16 @@ abstract public class DPElement extends PointerInputElement
 		handleHover();
 		
 		Cursor cursor = getCursor();
-		if ( cursor != null  &&  presentationArea != null )
+		if ( cursor != null  &&  rootElement != null )
 		{
 			Cursor ancestorCursor = getAncestorCursor();
 			if ( ancestorCursor != null )
 			{
-				getPresentationArea().setPointerCursor( ancestorCursor );
+				getRootElement().setPointerCursor( ancestorCursor );
 			}
 			else
 			{
-				getPresentationArea().setPointerCursorDefault();
+				getRootElement().setPointerCursorDefault();
 			}
 		}
 		onLeave( event );
@@ -1642,6 +1658,23 @@ abstract public class DPElement extends PointerInputElement
 		}
 		return bResult;
 	}
+	
+	
+	protected boolean handlePointerNavigationGestureBegin(PointerButtonEvent event)
+	{
+		return false;
+	}
+	
+	protected boolean handlePointerNavigationGestureEnd(PointerButtonEvent event)
+	{
+		return false;
+	}
+
+	protected boolean handlePointerNavigationGesture(PointerNavigationEvent event)
+	{
+		return false;
+	}
+
 	
 	
 	protected PointerInputElement getFirstPointerChildAtLocalPoint(Point2 localPos)
@@ -1735,7 +1768,7 @@ abstract public class DPElement extends PointerInputElement
 		if ( isRealised() )
 		{
 			setFlag( FLAG_CARET_GRABBED );
-			getPresentationArea().caretGrab( this );
+			getRootElement().caretGrab( this );
 		}
 	}
 	
@@ -1743,7 +1776,7 @@ abstract public class DPElement extends PointerInputElement
 	{
 		if ( isRealised()  &&  testFlag( FLAG_CARET_GRABBED ) )
 		{
-			getPresentationArea().caretUngrab( this );
+			getRootElement().caretUngrab( this );
 			clearFlag( FLAG_CARET_GRABBED );
 		}
 	}

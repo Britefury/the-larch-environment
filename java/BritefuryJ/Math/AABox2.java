@@ -35,10 +35,10 @@ public class AABox2 implements Cloneable
 	
 	public AABox2(Point2 a, Point2 b)
 	{
-		lowerX = a.x < b.x  ?  a.x  :  b.x;
-		lowerY = a.y < b.y  ?  a.y  :  b.y;
-		upperX = a.x < b.x  ?  b.x  :  a.x;
-		upperY = a.y < b.y  ?  b.y  :  a.y;
+		lowerX = Math.min( a.x, b.x );
+		lowerY = Math.min( a.y, b.y );
+		upperX = Math.max( a.x, b.x );
+		upperY = Math.max( a.y, b.y );
 	}
 	
 	public AABox2(Point2 a, Vector2 size)
@@ -51,6 +51,11 @@ public class AABox2 implements Cloneable
 	}
 	
 	
+	public boolean isEmpty()
+	{
+		return lowerX > upperX  ||  lowerY > upperY;
+	}
+	
 	
 	public boolean containsPoint(Point2 p)
 	{
@@ -60,6 +65,12 @@ public class AABox2 implements Cloneable
 	public boolean intersects(AABox2 b)
 	{
 		return lowerX <= b.upperX  &&  lowerY <= b.upperY   &&   upperX >= b.lowerX  &&  upperY >= b.lowerY;
+	}
+	
+	
+	public AABox2 intersection(AABox2 b)
+	{
+		return new AABox2( Math.max( lowerX, b.lowerX ), Math.max( lowerY, b.lowerY ),  Math.min( upperX, b.upperX ), Math.min( upperY, b.upperY ) );
 	}
 	
 	
@@ -133,6 +144,6 @@ public class AABox2 implements Cloneable
 
 	public String toString()
 	{
-		return "AABox2( " + lowerX + "," + lowerY + " -> " + lowerX + "," + lowerY + " )";
+		return "AABox2( " + lowerX + "," + lowerY + " -> " + upperX + "," + upperY + " )";
 	}
 }

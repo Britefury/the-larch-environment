@@ -4,35 +4,18 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.Browser;
+package BritefuryJ.DocPresent.Event;
 
+import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.Math.Xform2;
 
-class BrowserState
+public abstract class PointerNavigationEvent extends PointerEvent
 {
-	private Location location;
-	private Xform2 viewXform;
-	
-	
-	public BrowserState(Location location)
+	public PointerNavigationEvent(PointerInterface pointer)
 	{
-		this.location = location;
-		this.viewXform = new Xform2();
-	}
-	
-	public Location getLocation()
-	{
-		return location;
-	}
-
-	public Xform2 getViewTransformation()
-	{
-		return viewXform;
+		super( pointer );
 	}
 	
 	
-	public void setViewTransformation(Xform2 x)
-	{
-		viewXform = x;
-	}
+	public abstract Xform2 createXform();
 }

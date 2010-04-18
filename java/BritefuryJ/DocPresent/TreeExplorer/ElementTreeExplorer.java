@@ -16,13 +16,15 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
-import BritefuryJ.DocPresent.DPPresentationArea;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPViewport;
+import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Caret.Caret;
 
 public class ElementTreeExplorer implements WindowListener
 {
-	protected DPPresentationArea tree, metaArea;
+	protected PresentationComponent.RootElement tree;
+	protected PresentationComponent metaArea;
 	protected boolean bVisible;
 	
 	
@@ -58,7 +60,7 @@ public class ElementTreeExplorer implements WindowListener
 
 	
 	
-	public ElementTreeExplorer(DPPresentationArea t)
+	public ElementTreeExplorer(PresentationComponent.RootElement t)
 	{
 		JFrame frame = new JFrame( "Tree explorer" );
 
@@ -66,7 +68,7 @@ public class ElementTreeExplorer implements WindowListener
 		this.tree = t;
 		
 		metaArea = this.tree.initialiseMetaTree();
-		metaArea.getComponent().setPreferredSize( new Dimension( 640, 480 ) );
+		metaArea.setPreferredSize( new Dimension( 640, 480 ) );
 
 	
 		AbstractAction resetAction = new AbstractAction( "Reset" )
@@ -75,7 +77,8 @@ public class ElementTreeExplorer implements WindowListener
 
 			public void actionPerformed(ActionEvent event)
 			{
-				metaArea.reset();
+				DPViewport viewport = (DPViewport)metaArea.getChild();
+				viewport.resetXform();
 			}
 		};
 		
@@ -86,7 +89,8 @@ public class ElementTreeExplorer implements WindowListener
 
 			public void actionPerformed(ActionEvent event)
 			{
-				metaArea.oneToOne();
+				DPViewport viewport = (DPViewport)metaArea.getChild();
+				viewport.oneToOne();
 			}
 		};
 		
@@ -106,7 +110,8 @@ public class ElementTreeExplorer implements WindowListener
 						DPElement metaCaretElement = caretElement.getMetaElement();
 						if ( metaCaretElement != null )
 						{
-							metaArea.focusOn( metaCaretElement );
+							DPViewport viewport = (DPViewport)metaArea.getChild();
+							viewport.focusOn( metaCaretElement );
 						}
 					}
 				}
@@ -129,7 +134,7 @@ public class ElementTreeExplorer implements WindowListener
 		
 		
 		frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
-		frame.add( metaArea.getComponent() );
+		frame.add( metaArea );
 		frame.pack();
 		frame.setVisible( true );
 		frame.addWindowListener( this );

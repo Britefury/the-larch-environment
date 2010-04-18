@@ -10,7 +10,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 
-import BritefuryJ.DocPresent.DPPresentationArea;
+import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Util.TextVisual;
@@ -61,9 +61,9 @@ public class TextNode extends DrawingNode
 	{
 		super.realise( owner );
 
-		DPPresentationArea area = owner.getDrawingPresentationArea();
-		visual = TextVisual.getTextVisual( area, text, font, bMixedSizeCaps );
-		visual.realise( area );
+		PresentationComponent.RootElement root = owner.getDrawingRootElement();
+		visual = TextVisual.getTextVisual( root, text, font, bMixedSizeCaps );
+		visual.realise( root );
 		LReqBox req = visual.getRequisition();
 		parentSpaceBox = new AABox2( 0.0, 0.0, req.getReqPrefWidth(), req.getReqHeight() );
 	}

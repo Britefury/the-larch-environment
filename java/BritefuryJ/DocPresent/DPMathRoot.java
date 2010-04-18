@@ -102,7 +102,7 @@ public class DPMathRoot extends DPContainer
 	{
 		super.onRealise();
 		MathRootStyleParams s = (MathRootStyleParams) styleParams;
-		s.realise( presentationArea );
+		s.realise( rootElement );
 	}
 
 	

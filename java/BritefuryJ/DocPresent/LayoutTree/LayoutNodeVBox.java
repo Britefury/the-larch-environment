@@ -95,8 +95,8 @@ public class LayoutNodeVBox extends LayoutNodeAbstractBox
 		
 		DPElement startLeaf = leaves[rangeStart];
 		DPElement endLeaf = leaves[rangeEnd-1];
-		double yStart = startLeaf.getPositionInParentSpaceY();
-		double yEnd = endLeaf.getPositionInParentSpaceY()  +  endLeaf.getAllocationInParentSpaceY();
+		double yStart = startLeaf.getPositionInParentAllocationSpaceY();
+		double yEnd = endLeaf.getPositionInParentAllocationSpaceY()  +  endLeaf.getAllocationInParentSpaceY();
 		AABox2 box = new AABox2( 0.0, yStart, getAllocationX(), yEnd );
 		return new AABox2[] { box };
 	}

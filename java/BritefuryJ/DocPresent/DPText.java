@@ -47,7 +47,7 @@ public class DPText extends DPContentLeafEditable
 		
 		this.text = text;
 		
-		visual = TextVisual.getTextVisual( getPresentationArea(), this.text, styleParams.getFont(), styleParams.getMixedSizeCaps() );
+		visual = TextVisual.getTextVisual( getRootElement(), this.text, styleParams.getFont(), styleParams.getMixedSizeCaps() );
 		
 		layoutNode = new LayoutNodeText( this );
 	}
@@ -77,7 +77,7 @@ public class DPText extends DPContentLeafEditable
 	{
 		TextStyleParams textStyleParams = (TextStyleParams) styleParams;
 
-		TextVisual v = TextVisual.getTextVisual( getPresentationArea(), text, textStyleParams.getFont(), textStyleParams.getMixedSizeCaps() );
+		TextVisual v = TextVisual.getTextVisual( getRootElement(), text, textStyleParams.getFont(), textStyleParams.getMixedSizeCaps() );
 		if ( v != visual )
 		{
 			visual = v;
@@ -85,7 +85,7 @@ public class DPText extends DPContentLeafEditable
 			layout.setVisual( visual );
 			if ( isRealised() )
 			{
-				visual.realise( getPresentationArea() );
+				visual.realise( getRootElement() );
 			}
 			
 			queueResize();
@@ -103,7 +103,7 @@ public class DPText extends DPContentLeafEditable
 	protected void onRealise()
 	{
 		super.onRealise();
-		visual.realise( getPresentationArea() );
+		visual.realise( getRootElement() );
 	}
 	
 	

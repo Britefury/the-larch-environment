@@ -38,6 +38,7 @@ import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.DPTable;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
+import BritefuryJ.DocPresent.DPViewport;
 import BritefuryJ.DocPresent.DPWhitespace;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.Border;
@@ -909,6 +910,14 @@ public class PrimitiveStyleSheet extends StyleSheet
 		element.setChildren( children );
 		element.setRefPointIndex( refPointIndex );
 		return element;
+	}
+	
+	
+	public DPViewport viewport(DPElement child, double minWidth, double minHeight)
+	{
+		DPViewport viewport = new DPViewport( minWidth, minHeight );
+		viewport.setChild( child );
+		return viewport;
 	}
 	
 	

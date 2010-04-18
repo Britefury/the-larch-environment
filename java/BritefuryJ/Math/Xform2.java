@@ -12,6 +12,9 @@ import java.awt.geom.AffineTransform;
 
 public class Xform2 implements Cloneable
 {
+	public static final Xform2 identity = new Xform2();
+	
+	
 	public double scale;
 	public Vector2 translation;
 	
@@ -44,7 +47,8 @@ public class Xform2 implements Cloneable
 	
 	public Xform2 clone()
 	{
-		try {
+		try
+		{
 			return (Xform2)super.clone();
 		}
 		catch (CloneNotSupportedException e)
@@ -122,5 +126,15 @@ public class Xform2 implements Cloneable
 	{
 		double invScale = 1.0 / scale;
 		return new Xform2( invScale, translation.mul( -invScale ) );
+	}
+
+	public static Xform2 inverseOf(double scale)
+	{
+		return new Xform2( 1.0 / scale );
+	}
+
+	public static Xform2 inverseOf(Vector2 translation)
+	{
+		return new Xform2( translation.negate() );
 	}
 }
