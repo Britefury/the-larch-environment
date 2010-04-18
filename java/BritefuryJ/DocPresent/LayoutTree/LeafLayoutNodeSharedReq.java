@@ -52,17 +52,17 @@ public abstract class LeafLayoutNodeSharedReq extends LayoutNode implements LAll
 	
 	public double getAllocationInParentSpaceX()
 	{
-		return getAllocationX()  *  getScale();
+		return getAllocationX()  *  getParentAllocationToParentSpaceXform().scale;
 	}
 	
 	public double getAllocationInParentSpaceY()
 	{
-		return getAllocationY()  *  getScale();
+		return getAllocationY()  *  getParentAllocationToParentSpaceXform().scale;
 	}
 	
 	public Vector2 getAllocationInParentSpace()
 	{
-		return getAllocation().mul( getScale() );
+		return getAllocation().mul( getParentAllocationToParentSpaceXform().scale );
 	}
 	
 	
@@ -165,12 +165,6 @@ public abstract class LeafLayoutNodeSharedReq extends LayoutNode implements LAll
 	
 	
 	
-	protected double getScale()
-	{
-		return element.getScale();
-	}
-	
-	
 	
 	
 	
@@ -190,7 +184,7 @@ public abstract class LeafLayoutNodeSharedReq extends LayoutNode implements LAll
 	//
 	//
 
-	protected double alloc_positionInParentSpaceX, alloc_positionInParentSpaceY;
+	protected double alloc_positionInParentAllocationSpaceX, alloc_positionInParentAllocationSpaceY;
 	protected double alloc_allocationX, alloc_allocationY;
 	protected double alloc_refY;
 
@@ -202,19 +196,24 @@ public abstract class LeafLayoutNodeSharedReq extends LayoutNode implements LAll
 	
 	
 	
-	public double getAllocPositionInParentSpaceX()
-	{
-		return alloc_positionInParentSpaceX;
-	}
-	
-	public double getAllocPositionInParentSpaceY()
-	{
-		return alloc_positionInParentSpaceY;
-	}
-	
 	public Point2 getPositionInParentSpace()
 	{
-		return new Point2( alloc_positionInParentSpaceX, alloc_positionInParentSpaceY );
+		return getParentAllocationToParentSpaceXform().transform( new Point2( alloc_positionInParentAllocationSpaceX, alloc_positionInParentAllocationSpaceY ) );
+	}
+	
+	public double getAllocPositionInParentAllocationSpaceX()
+	{
+		return alloc_positionInParentAllocationSpaceX;
+	}
+	
+	public double getAllocPositionInParentAllocationSpaceY()
+	{
+		return alloc_positionInParentAllocationSpaceY;
+	}
+	
+	public Point2 getPositionInParentAllocationSpace()
+	{
+		return new Point2( alloc_positionInParentAllocationSpaceX, alloc_positionInParentAllocationSpaceY );
 	}
 	
 	public double getAllocationX()
@@ -250,14 +249,14 @@ public abstract class LeafLayoutNodeSharedReq extends LayoutNode implements LAll
 	// SETTERS
 	//
 	
-	public void setAllocPositionInParentSpaceX(double x)
+	public void setAllocPositionInParentAllocationSpaceX(double x)
 	{
-		alloc_positionInParentSpaceX = x;
+		alloc_positionInParentAllocationSpaceX = x;
 	}
 	
-	public void setAllocPositionInParentSpaceY(double y)
+	public void setAllocPositionInParentAllocationSpaceY(double y)
 	{
-		alloc_positionInParentSpaceY = y;
+		alloc_positionInParentAllocationSpaceY = y;
 	}
 	
 	public void setAllocationX(double width)
@@ -278,22 +277,22 @@ public abstract class LeafLayoutNodeSharedReq extends LayoutNode implements LAll
 		this.alloc_refY = refY;
 	}
 
-	public void setPositionInParentSpaceAndAllocationX(double x, double width)
+	public void setPositionInParentAllocationSpaceAndAllocationX(double x, double width)
 	{
-		alloc_positionInParentSpaceX = x;
+		alloc_positionInParentAllocationSpaceX = x;
 		alloc_allocationX = width;
 	}
 	
-	public void setPositionInParentSpaceAndAllocationY(double y, double height)
+	public void setPositionInParentAllocationSpaceAndAllocationY(double y, double height)
 	{
-		alloc_positionInParentSpaceY = y;
+		alloc_positionInParentAllocationSpaceY = y;
 		alloc_allocationY = height;
 		alloc_refY = height * 0.5;
 	}
 	
-	public void setPositionInParentSpaceAndAllocationY(double y, double height, double refY)
+	public void setPositionInParentAllocationSpaceAndAllocationY(double y, double height, double refY)
 	{
-		alloc_positionInParentSpaceY = y;
+		alloc_positionInParentAllocationSpaceY = y;
 		alloc_allocationY = height;
 		this.alloc_refY = refY;
 	}

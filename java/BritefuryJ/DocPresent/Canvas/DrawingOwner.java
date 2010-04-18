@@ -8,12 +8,12 @@ package BritefuryJ.DocPresent.Canvas;
 
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.DPPresentationArea;
+import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 
 public interface DrawingOwner
 {
 	void drawingQueueRedraw();
-	DPPresentationArea getDrawingPresentationArea();
+	PresentationComponent.RootElement getDrawingRootElement();
 	ArrayList<PointerInterface> getPointersWithinDrawingNodeBounds(DrawingNode node);
 }

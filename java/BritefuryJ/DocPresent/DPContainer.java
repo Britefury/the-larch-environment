@@ -21,7 +21,6 @@ import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
-import BritefuryJ.Math.Vector2;
 import BritefuryJ.Math.Xform2;
 import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
@@ -69,9 +68,9 @@ public abstract class DPContainer extends DPElement
 	// Geometry methods
 	//
 	
-	protected double getInternalChildScale(DPElement child)
+	protected Xform2 getAllocationSpaceToLocalSpaceXform(DPElement child)
 	{
-		return 1.0;
+		return Xform2.identity;
 	}
 	
 
@@ -86,7 +85,7 @@ public abstract class DPContainer extends DPElement
 	{
 		child.unparent();
 		
-		child.setParent( this, presentationArea );
+		child.setParent( this, rootElement );
 		
 		if ( isRealised() )
 		{
@@ -265,12 +264,19 @@ public abstract class DPContainer extends DPElement
 	
 	
 	
-	protected void childRedrawRequest(DPElement child, Point2 childPos, Vector2 childSize)
+	protected void childRedrawRequest(DPElement child, AABox2 childBox)
 	{
 		Xform2 childToContainer = child.getLocalToParentXform();
-		Point2 localPos = childToContainer.transform( childPos );
-		Vector2 localSize = childToContainer.transform( childSize );
-		queueRedraw( localPos, localSize );
+		AABox2 localBox = childToContainer.transform( childBox );
+		AABox2 clipBox = getLocalClipBox();
+		if ( clipBox != null )
+		{
+			localBox = localBox.intersection( getLocalAABox() );
+		}
+		if ( !localBox.isEmpty() )
+		{
+			queueRedraw( localBox );
+		}
 	}
 	
 	
@@ -410,14 +416,23 @@ public abstract class DPContainer extends DPElement
 	{
 		super.handleDrawBackground( graphics, areaBox );
 		
-		AffineTransform currentTransform = graphics.getTransform();
-		for (DPElement child: registeredChildren)
+		AABox2 clipBox = getLocalClipBox();
+		if ( clipBox != null )
 		{
-			if ( child.getAABoxInParentSpace().intersects( areaBox ) )
+			areaBox = areaBox.intersection( clipBox );
+		}
+		
+		if ( !areaBox.isEmpty() )
+		{
+			AffineTransform currentTransform = graphics.getTransform();
+			for (DPElement child: registeredChildren)
 			{
-				child.getLocalToParentXform().apply( graphics );
-				child.handleDrawBackground( graphics, child.getParentToLocalXform().transform( areaBox ) );
-				graphics.setTransform( currentTransform );
+				if ( child.getAABoxInParentSpace().intersects( areaBox ) )
+				{
+					child.getLocalToParentXform().apply( graphics );
+					child.handleDrawBackground( graphics, child.getParentToLocalXform().transform( areaBox ) );
+					graphics.setTransform( currentTransform );
+				}
 			}
 		}
 	}
@@ -426,14 +441,23 @@ public abstract class DPContainer extends DPElement
 	{
 		super.handleDraw( graphics, areaBox );
 		
-		AffineTransform currentTransform = graphics.getTransform();
-		for (DPElement child: registeredChildren)
+		AABox2 clipBox = getLocalClipBox();
+		if ( clipBox != null )
 		{
-			if ( child.getAABoxInParentSpace().intersects( areaBox ) )
+			areaBox = areaBox.intersection( clipBox );
+		}
+		
+		if ( !areaBox.isEmpty() )
+		{
+			AffineTransform currentTransform = graphics.getTransform();
+			for (DPElement child: registeredChildren)
 			{
-				child.getLocalToParentXform().apply( graphics );
-				child.handleDraw( graphics, child.getParentToLocalXform().transform( areaBox ) );
-				graphics.setTransform( currentTransform );
+				if ( child.getAABoxInParentSpace().intersects( areaBox ) )
+				{
+					child.getLocalToParentXform().apply( graphics );
+					child.handleDraw( graphics, child.getParentToLocalXform().transform( areaBox ) );
+					graphics.setTransform( currentTransform );
+				}
 			}
 		}
 	}
@@ -441,13 +465,13 @@ public abstract class DPContainer extends DPElement
 	
 	
 	
-	protected void setPresentationArea(DPPresentationArea area)
+	protected void setRootElement(PresentationComponent.RootElement area)
 	{
-		super.setPresentationArea( area );
+		super.setRootElement( area );
 		
 		for (DPElement child: registeredChildren)
 		{
-			child.setPresentationArea( area );
+			child.setRootElement( area );
 		}
 	}
 

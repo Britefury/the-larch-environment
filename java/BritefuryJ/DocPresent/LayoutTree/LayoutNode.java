@@ -18,6 +18,7 @@ import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
+import BritefuryJ.Math.Xform2;
 
 public abstract class LayoutNode
 {
@@ -31,9 +32,10 @@ public abstract class LayoutNode
 	public abstract LReqBoxInterface getRequisitionBox();
 	public abstract LAllocBoxInterface getAllocationBox();
 	
-	public abstract double getAllocPositionInParentSpaceX();
-	public abstract double getAllocPositionInParentSpaceY();
 	public abstract Point2 getPositionInParentSpace();
+	public abstract double getAllocPositionInParentAllocationSpaceX();
+	public abstract double getAllocPositionInParentAllocationSpaceY();
+	public abstract Point2 getPositionInParentAllocationSpace();
 	public abstract double getAllocationX();
 	public abstract double getAllocationY();
 	public abstract Vector2 getAllocation();
@@ -57,6 +59,12 @@ public abstract class LayoutNode
 	
 
 	
+	protected Xform2 getParentAllocationToParentSpaceXform()
+	{
+		return getElement().getParentAllocationToParentSpaceXform();
+	}
+	
+
 	protected void handleQueueResize()
 	{
 		DPElement element = getElement();

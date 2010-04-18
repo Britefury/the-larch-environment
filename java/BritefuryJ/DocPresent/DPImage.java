@@ -144,9 +144,9 @@ public class DPImage extends DPContentLeaf
 
 	protected void draw(Graphics2D graphics)
 	{
-		DPPresentationArea presArea = getPresentationArea();
+		PresentationComponent.RootElement root = getRootElement();
 		
-		if ( presArea != null )
+		if ( root != null )
 		{
 			boolean bUseHover = testFlag( FLAG_HOVER )  ?  hoverImage != null  :  false;
 			
@@ -157,13 +157,13 @@ public class DPImage extends DPContentLeaf
 			
 			if ( sX == 1.0  &&  sY == 1.0 )
 			{
-				graphics.drawImage( img, 0, 0, presArea.getImageObserver() );
+				graphics.drawImage( img, 0, 0, root.getImageObserver() );
 			}
 			else
 			{
 				AffineTransform xform = new AffineTransform();
 				xform.setToScale( sX, sY );
-				graphics.drawImage( img, xform, presArea.getImageObserver() );
+				graphics.drawImage( img, xform, root.getImageObserver() );
 			}
 		}
 	}

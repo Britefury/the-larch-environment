@@ -286,7 +286,7 @@ public class HorizontalLayout
 	{
 		LAllocV h = computeVerticalAllocationForRow( box, allocBox );
 		
-		//System.out.println( "HorizontalLayout.allocatey(): box=" + box + ", allocBox=" + allocBox + ", h=" + h );
+		//System.out.println( "HorizontalLayout.allocateY(): box=" + box + ", allocBox=" + allocBox + ", h=" + h );
 		
 		for (int i = 0; i < children.length; i++)
 		{

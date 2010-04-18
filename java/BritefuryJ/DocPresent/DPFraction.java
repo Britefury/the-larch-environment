@@ -22,6 +22,7 @@ import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleParams.FractionStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 import BritefuryJ.Math.Point2;
+import BritefuryJ.Math.Xform2;
 
 public class DPFraction extends DPContainer
 {
@@ -350,9 +351,9 @@ public class DPFraction extends DPContainer
 
 	
 	
-	protected double getInternalChildScale(DPElement child)
+	protected Xform2 getAllocationSpaceToLocalSpaceXform(DPElement child)
 	{
-		return child == children[BAR]  ?  1.0  :  childScale;
+		return child == children[BAR]  ?  null  :  new Xform2( childScale );
 	}
 	
 

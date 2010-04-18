@@ -114,7 +114,7 @@ public class TextEntry extends Control
 			{
 				textElement.removeText( selection.getStartMarker(), selection.getEndMarker() );
 			}
-			Caret caret = textElement.getPresentationArea().getCaret();
+			Caret caret = textElement.getRootElement().getCaret();
 			textElement.insertText( caret.getMarker(), replacement );
 		}
 

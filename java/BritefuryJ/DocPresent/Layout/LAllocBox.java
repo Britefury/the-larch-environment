@@ -12,7 +12,7 @@ import BritefuryJ.Math.Vector2;
 
 public class LAllocBox implements LAllocBoxInterface
 {
-	protected double positionInParentSpaceX, positionInParentSpaceY;
+	protected double positionInParentAllocationSpaceX, positionInParentAllocationSpaceY;
 	protected double allocationX, allocationY;
 	protected double refY;
 	protected LayoutNode layoutNode;
@@ -25,8 +25,8 @@ public class LAllocBox implements LAllocBoxInterface
 	
 	public LAllocBox(double x, double y, double width, double height, double refY, LayoutNode layoutNode)
 	{
-		positionInParentSpaceX = x;
-		positionInParentSpaceY = y;
+		positionInParentAllocationSpaceX = x;
+		positionInParentAllocationSpaceY = y;
 		allocationX = width;
 		allocationY = height;
 		this.refY = refY;
@@ -41,19 +41,19 @@ public class LAllocBox implements LAllocBoxInterface
 	
 	
 	
-	public double getAllocPositionInParentSpaceX()
+	public double getAllocPositionInParentAllocationSpaceX()
 	{
-		return positionInParentSpaceX;
+		return positionInParentAllocationSpaceX;
 	}
 	
-	public double getAllocPositionInParentSpaceY()
+	public double getAllocPositionInParentAllocationSpaceY()
 	{
-		return positionInParentSpaceY;
+		return positionInParentAllocationSpaceY;
 	}
 	
-	public Point2 getPositionInParentSpace()
+	public Point2 getPositionInParentAllocationSpace()
 	{
-		return new Point2( positionInParentSpaceX, positionInParentSpaceY );
+		return new Point2( positionInParentAllocationSpaceX, positionInParentAllocationSpaceY );
 	}
 	
 	public double getAllocationX()
@@ -89,14 +89,14 @@ public class LAllocBox implements LAllocBoxInterface
 	// SETTERS
 	//
 	
-	public void setAllocPositionInParentSpaceX(double x)
+	public void setAllocPositionInParentAllocationSpaceX(double x)
 	{
-		positionInParentSpaceX = x;
+		positionInParentAllocationSpaceX = x;
 	}
 	
-	public void setAllocPositionInParentSpaceY(double y)
+	public void setAllocPositionInParentAllocationSpaceY(double y)
 	{
-		positionInParentSpaceY = y;
+		positionInParentAllocationSpaceY = y;
 	}
 	
 	public void setAllocationX(double width)
@@ -117,22 +117,22 @@ public class LAllocBox implements LAllocBoxInterface
 		this.refY = refY;
 	}
 
-	public void setPositionInParentSpaceAndAllocationX(double x, double width)
+	public void setPositionInParentAllocationSpaceAndAllocationX(double x, double width)
 	{
-		positionInParentSpaceX = x;
+		positionInParentAllocationSpaceX = x;
 		allocationX = width;
 	}
 	
-	public void setPositionInParentSpaceAndAllocationY(double y, double height)
+	public void setPositionInParentAllocationSpaceAndAllocationY(double y, double height)
 	{
-		positionInParentSpaceY = y;
+		positionInParentAllocationSpaceY = y;
 		allocationY = height;
 		refY = height * 0.5;
 	}
 	
-	public void setPositionInParentSpaceAndAllocationY(double y, double height, double refY)
+	public void setPositionInParentAllocationSpaceAndAllocationY(double y, double height, double refY)
 	{
-		positionInParentSpaceY = y;
+		positionInParentAllocationSpaceY = y;
 		allocationY = height;
 		this.refY = refY;
 	}
@@ -163,7 +163,7 @@ public class LAllocBox implements LAllocBoxInterface
 		{
 			LAllocBox b = (LAllocBox)x;
 			
-			return positionInParentSpaceX == b.positionInParentSpaceX  &&  positionInParentSpaceY == b.positionInParentSpaceY  &&  
+			return positionInParentAllocationSpaceX == b.positionInParentAllocationSpaceX  &&  positionInParentAllocationSpaceY == b.positionInParentAllocationSpaceY  &&  
 					allocationX == b.allocationX  &&  allocationY == b.allocationY  &&  refY == b.refY;
 		}
 		else
@@ -175,7 +175,7 @@ public class LAllocBox implements LAllocBoxInterface
 	
 	public String toString()
 	{
-		return "LAllocBox( positionInParentSpaceX=" + positionInParentSpaceX + ", positionInParentSpaceY=" + positionInParentSpaceY +
+		return "LAllocBox( positionInParentSpaceX=" + positionInParentAllocationSpaceX + ", positionInParentSpaceY=" + positionInParentAllocationSpaceY +
 			", allocationX=" + allocationX + ", allocationY=" + allocationY + ", refY=" + refY + " )";
 	}
 }

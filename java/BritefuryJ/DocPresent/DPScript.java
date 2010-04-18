@@ -14,6 +14,7 @@ import BritefuryJ.DocPresent.LayoutTree.LayoutNodeScript;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ScriptStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
+import BritefuryJ.Math.Xform2;
 
 
 public class DPScript extends DPContainer
@@ -212,9 +213,9 @@ public class DPScript extends DPContainer
 
 	
 	
-	protected double getInternalChildScale(DPElement child)
+	protected Xform2 getAllocationSpaceToLocalSpaceXform(DPElement child)
 	{
-		return child == paras[MAIN]  ?  1.0  :  childScale;
+		return child == paras[MAIN]  ?  null  :  new Xform2( childScale );
 	}
 	
 

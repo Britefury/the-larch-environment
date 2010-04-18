@@ -23,6 +23,7 @@ import BritefuryJ.DocPresent.ContextMenu.ContextMenu;
 import BritefuryJ.DocPresent.ContextMenu.ContextPopupMenu;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
+import BritefuryJ.DocPresent.Event.PointerNavigationEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 import BritefuryJ.Math.Point2;
 
@@ -30,10 +31,10 @@ import BritefuryJ.Math.Point2;
 
 public class Pointer extends PointerInterface
 {
-	private static class ElementEntry
+	static class ElementEntry
 	{
 		public PointerInputElement element;
-		public ElementEntry pressGrabChild, childUnderPointer;
+		public ElementEntry pressGrabChild, childUnderPointer, navigationChild;
 		
 		
 		public ElementEntry(PointerInputElement element)
@@ -304,6 +305,113 @@ public class Pointer extends PointerInterface
 		}
 		
 		
+		
+		protected boolean handleNavigationGestureBegin(Pointer pointer, PointerButtonEvent event)
+		{
+			if ( navigationChild == null )
+			{
+				PointerInputElement childElement = element.getFirstPointerChildAtLocalPoint( event.pointer.getLocalPos() );
+				if ( childElement != null )
+				{
+					ElementEntry childEntry = pointer.getEntryForElement( childElement );
+					boolean bHandled = childEntry.handleNavigationGestureBegin( pointer, (PointerButtonEvent)childElement.transformParentToLocalEvent( event ) );
+					if ( bHandled  &&  element.isPointerInputElementRealised() )
+					{
+						navigationChild = childEntry;
+						return true;
+					}
+				}
+				
+				if ( navigationChild == null )
+				{
+					return element.handlePointerNavigationGestureBegin( event );
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				throw new RuntimeException( "Navigation gesture already started" );
+			}
+		}
+		
+		protected boolean handleNavigationGestureEnd(Pointer pointer, PointerButtonEvent event)
+		{
+			if ( navigationChild != null )
+			{
+				PointerButtonEvent childSpaceEvent = (PointerButtonEvent)navigationChild.element.transformParentToLocalEvent( event );
+				Point2 localPos = event.pointer.getLocalPos();
+				if ( !navigationChild.element.containsParentSpacePoint( localPos ) )
+				{
+					navigationChild.handleLeave( pointer, new PointerMotionEvent( childSpaceEvent.pointer, PointerMotionEvent.Action.LEAVE ) );
+				}
+				
+				boolean bHandled = navigationChild.handleNavigationGestureEnd( pointer, childSpaceEvent );
+				ElementEntry savedNavigationChild = navigationChild;
+				navigationChild = null;
+				
+				if ( element.isPointerInputElementRealised()  &&  element.containsLocalSpacePoint( localPos ) )
+				{
+					PointerInputElement childElement = element.getFirstPointerChildAtLocalPoint( localPos );
+					if ( childElement != null )
+					{
+						ElementEntry childEntry = pointer.getEntryForElement( childElement );
+						PointerInputElement savedNavigationChildElement = savedNavigationChild != null  ?  savedNavigationChild.element  :  null;
+						if ( childElement != savedNavigationChildElement )
+						{
+							childEntry.handleEnter( pointer, new PointerMotionEvent( childSpaceEvent.pointer, PointerMotionEvent.Action.ENTER ) );
+						}
+						childUnderPointer = childEntry;
+					}
+					else
+					{
+						childUnderPointer = null;
+						element.handlePointerEnter( new PointerMotionEvent( event.pointer, PointerMotionEvent.Action.ENTER ) );
+					}
+				}
+				
+				return bHandled;
+			}
+			else
+			{
+				return element.handlePointerNavigationGestureEnd( event );
+			}
+		}
+		
+		protected boolean handleNavigationGestureDrag(Pointer pointer, PointerNavigationEvent event)
+		{
+			if ( navigationChild != null )
+			{
+				boolean bHandled = navigationChild.handleNavigationGestureDrag( pointer, (PointerNavigationEvent)navigationChild.element.transformParentToLocalEvent( event ) );
+				if ( bHandled )
+				{
+					return true;
+				}
+			}
+			
+			return element.handlePointerNavigationGesture( event );
+		}
+		
+		protected boolean handleNavigationGestureClick(Pointer pointer, PointerNavigationEvent event)
+		{
+			if ( childUnderPointer != null )
+			{
+				boolean bHandled = childUnderPointer.handleNavigationGestureClick( pointer, (PointerNavigationEvent)childUnderPointer.element.transformParentToLocalEvent( event ) );
+				if ( bHandled )
+				{
+					return true;
+				}
+			}
+			
+			return element.handlePointerNavigationGesture( event );
+		}
+		
+		
+		
+		
+		
 		protected void notifyUnrealise(Pointer pointer)
 		{
 			if ( pressGrabChild != null )
@@ -317,29 +425,23 @@ public class Pointer extends PointerInterface
 	
 	
 	
-	protected Point2 localPos;
-	protected int modifiers;
+	protected Point2 localPos = new Point2();
+	protected int modifiers = 0;
 	protected ElementEntry rootEntry;
 	protected InputTable inputTable;
 	protected DndDropLocal dndDrop;
 	protected PointerDndController dndController;
 	protected JComponent component;
 	
-	protected ReferenceQueue<ElementEntry> refQueue;
-	protected HashMap<PointerInputElement, WeakReference<ElementEntry> > elementToEntryTable;
-	
+	protected ReferenceQueue<ElementEntry> refQueue = new ReferenceQueue<ElementEntry>();
+	protected HashMap<PointerInputElement, WeakReference<ElementEntry> > elementToEntryTable = new HashMap<PointerInputElement, WeakReference<ElementEntry> >();
 	
 	public Pointer(InputTable inputTable, PointerInputElement rootElement, PointerDndController dndController, JComponent component)
 	{
 		this.inputTable = inputTable;
-		localPos = new Point2();
-		modifiers = 0;
 		this.dndController = dndController;
 		this.component = component;
 		
-		refQueue = new ReferenceQueue<ElementEntry>();
-		elementToEntryTable = new HashMap<PointerInputElement, WeakReference<ElementEntry> >();
-
 		rootEntry = getEntryForElement( rootElement );
 	}
 	
@@ -403,7 +505,6 @@ public class Pointer extends PointerInterface
 			motion( localPos, null );
 		}			
 	}
-	
 	
 	
 	

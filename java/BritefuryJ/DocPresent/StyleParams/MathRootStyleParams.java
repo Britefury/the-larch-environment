@@ -16,7 +16,7 @@ import java.awt.font.LineMetrics;
 
 import javax.swing.JComponent;
 
-import BritefuryJ.DocPresent.DPPresentationArea;
+import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Painter.Painter;
 
 public class MathRootStyleParams extends ContainerStyleParams
@@ -84,7 +84,7 @@ public class MathRootStyleParams extends ContainerStyleParams
 
 	
 	
-	public void realise(DPPresentationArea a)
+	public void realise(PresentationComponent.RootElement a)
 	{
 		realise( a.getComponent() );
 	}

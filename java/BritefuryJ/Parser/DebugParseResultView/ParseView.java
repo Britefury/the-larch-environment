@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.ParserDebugViewer;
+package BritefuryJ.Parser.DebugParseResultView;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -12,12 +12,13 @@ import java.awt.geom.CubicCurve2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPBox;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPViewport;
 import BritefuryJ.DocPresent.FragmentContext;
-import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.GSym.View.GSymFragmentViewContext;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 import BritefuryJ.ParserHelpers.DebugNode;
@@ -78,8 +79,8 @@ public class ParseView implements FragmentContext
 				DPElement wa = a.getNodeElement();
 				DPElement wb = b.getNodeElement();
 				
-				Point2 p1 = wa.getLocalPointRelativeTo( parseView.bin, new Point2( wa.getAllocation().x, wa.getAllocation().y * 0.5 ) );
-				Point2 p4 = wb.getLocalPointRelativeTo( parseView.bin, new Point2( 0.0, wb.getAllocation().y * 0.5 ) );
+				Point2 p1 = wa.getLocalPointRelativeTo( parseView.element, new Point2( wa.getAllocation().x, wa.getAllocation().y * 0.5 ) );
+				Point2 p4 = wb.getLocalPointRelativeTo( parseView.element, new Point2( 0.0, wb.getAllocation().y * 0.5 ) );
 				
 				// dx is the x-difference from p1 to p4, clamped to >=20, divided by 3; space the control points evenly
 				double dx = Math.max( Math.abs( p4.x - p1.x ), 20.0 )  /  3.0;
@@ -123,9 +124,7 @@ public class ParseView implements FragmentContext
 		public void onSelectionChanged(DebugNode selection);
 	}
 	
-	private PresentationComponent presComponent;
-	private DPViewport viewport;
-	private DPViewBin bin;
+	private DPViewBin element;
 	private HashMap<DebugNode, NodeView> nodeTable;
 	private ArrayList<Edge> callEdges, memoEdges;
 	private NodeView root;
@@ -135,13 +134,11 @@ public class ParseView implements FragmentContext
 	
 	
 	
-	public ParseView(DebugParseResultInterface result)
+	private ParseView(DebugParseResultInterface result)
 	{
 		selection = null;
 		
-		presComponent = new PresentationComponent();
-		
-		bin = new DPViewBin( ContainerStyleParams.defaultStyleParams, this );
+		element = new DPViewBin( ContainerStyleParams.defaultStyleParams, this );
 		
 		nodeTable = new HashMap<DebugNode, NodeView>();
 		callEdges = new ArrayList<Edge>();
@@ -151,10 +148,7 @@ public class ParseView implements FragmentContext
 		
 		root.registerEdges();
 		
-		bin.setChild( root.getElement() );
-		viewport = new DPViewport( 0.0, 0.0 );
-		viewport.setChild( bin );
-		presComponent.setChild( viewport );
+		element.setChild( root.getElement() );
 	}
 	
 	
@@ -164,16 +158,6 @@ public class ParseView implements FragmentContext
 		this.listener = listener;
 	}
 	
-	
-	public PresentationComponent getPresentationComponent()
-	{
-		return presComponent;
-	}
-	
-	public DPViewport getViewport()
-	{
-		return viewport;
-	}
 	
 	
 	protected NodeView buildNodeView(DebugNode node)
@@ -236,5 +220,13 @@ public class ParseView implements FragmentContext
 				listener.onSelectionChanged( d );
 			}
 		}
+	}
+	
+	
+	
+	public static DPElement presentDebugParseResult(DebugParseResultInterface x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+	{
+		ParseView v = new ParseView( x );
+		return v.element;
 	}
 }

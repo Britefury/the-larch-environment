@@ -169,7 +169,7 @@ public class GridLayout
 					LAllocBoxInterface colAlloc = columnAllocBoxes[c];
 					double cellWidth = Math.max( colAlloc.getAllocationX(), childRequisition.getReqMinWidth() );
 		
-					LAllocHelper.allocateChildXAligned( childAlloc, childRequisition, hAlign, colAlloc.getAllocPositionInParentSpaceX(), cellWidth );
+					LAllocHelper.allocateChildXAligned( childAlloc, childRequisition, hAlign, colAlloc.getAllocPositionInParentAllocationSpaceX(), cellWidth );
 				}
 			}
 		}

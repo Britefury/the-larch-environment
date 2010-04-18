@@ -32,7 +32,7 @@ import java.util.Set;
 import javax.swing.JComponent;
 import javax.swing.text.Segment;
 
-import BritefuryJ.DocPresent.DPPresentationArea;
+import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Utils.HashUtils;
@@ -293,7 +293,7 @@ public class TextVisual
 	}
 	
 	
-	private static final HashMap<DPPresentationArea, TextVisualTable> visualTables = new  HashMap<DPPresentationArea, TextVisualTable>();
+	private static final HashMap<PresentationComponent.RootElement, TextVisualTable> visualTables = new  HashMap<PresentationComponent.RootElement, TextVisualTable>();
 	
 	
 	private TextLayout layout;
@@ -330,11 +330,11 @@ public class TextVisual
 	
 	
 	
-	public void realise(DPPresentationArea a)
+	public void realise(PresentationComponent.RootElement root)
 	{
 		if ( !bRealised )
 		{
-			JComponent component = a.getComponent();
+			JComponent component = root.getComponent();
 			assert component != null;
 			if ( text.length() > 0 )
 			{
@@ -550,13 +550,13 @@ public class TextVisual
 	
 	
 	
-	public static TextVisual getTextVisual(DPPresentationArea area, String text, Font font, boolean bMixedSizeCaps)
+	public static TextVisual getTextVisual(PresentationComponent.RootElement root, String text, Font font, boolean bMixedSizeCaps)
 	{
-		TextVisualTable table = visualTables.get( area );
+		TextVisualTable table = visualTables.get( root );
 		if ( table == null )
 		{
 			table = new TextVisualTable();
-			visualTables.put( area, table );
+			visualTables.put( root, table );
 		}
 		
 		return table.get( text, font, bMixedSizeCaps );
