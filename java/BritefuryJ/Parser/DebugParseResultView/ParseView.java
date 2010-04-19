@@ -17,6 +17,7 @@ import BritefuryJ.DocPresent.DPBox;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPViewport;
 import BritefuryJ.DocPresent.FragmentContext;
+import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
@@ -152,7 +153,9 @@ public class ParseView implements FragmentContext
 		root.registerEdges();
 		
 		element.setChild( root.getElement() );
-		viewport = PrimitiveStyleSheet.instance.viewport( element, 0.0, 0.0 ).alignHExpand().alignVExpand();
+		
+		
+		viewport = viewportBorderStyle.border( PrimitiveStyleSheet.instance.viewport( element, 0.0, 800.0 ).alignHExpand().alignVExpand() ).alignHExpand().alignVExpand();
 	}
 	
 	
@@ -231,6 +234,10 @@ public class ParseView implements FragmentContext
 	public static DPElement presentDebugParseResult(DebugParseResultInterface x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
 	{
 		ParseView v = new ParseView( x );
-		return v.viewport;
+		return v.viewport.alignHExpand().alignVExpand();
 	}
+
+
+
+	private final static PrimitiveStyleSheet viewportBorderStyle = PrimitiveStyleSheet.instance.withBorder( new SolidBorder( 2.0, 2.0, 5.0, 5.0, Color.black, null ) );
 }

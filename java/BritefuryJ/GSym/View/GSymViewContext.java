@@ -6,16 +6,19 @@
 //##************************
 package BritefuryJ.GSym.View;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRegion;
+import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Browser.Page;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Selection.Selection;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocView.DVNode;
 import BritefuryJ.DocView.DocView;
@@ -120,6 +123,7 @@ public class GSymViewContext implements DocView.RefreshListener
 	
 	private DocView view;
 	
+	private DPVBox vbox;
 	private DPRegion region;
 	
 	private GSymBrowserContext browserContext;
@@ -144,13 +148,15 @@ public class GSymViewContext implements DocView.RefreshListener
 		this.commandHistory = commandHistory;
 		
 		region = new DPRegion();
-		
-		page = new GSymViewPage( region, subject.getTitle(), browserContext, commandHistory );
-		
+		vbox = PrimitiveStyleSheet.instance.vbox( Arrays.asList( new DPElement[] { region } ) );
+
+		page = new GSymViewPage( vbox.alignHExpand().alignVExpand(), subject.getTitle(), browserContext, commandHistory );
 		
 		view.setElementChangeListener( new NodeElementChangeListenerDiff() );
 		view.setRefreshListener( this );
-		region.setChild( view.getRootViewElement().alignHExpand() );
+		
+		// We need to do this last
+		region.setChild( view.getRootViewElement().alignHExpand().alignVExpand() );
 		region.setEditHandler( perspective.getEditHandler() );
 	}
 	
@@ -210,14 +216,9 @@ public class GSymViewContext implements DocView.RefreshListener
 		return view;
 	}
 	
-	public DPRegion getRegion()
-	{
-		return region;
-	}
-	
 	public PresentationComponent.RootElement getElementTree()
 	{
-		return region.getRootElement();
+		return vbox.getRootElement();
 	}
 	
 	

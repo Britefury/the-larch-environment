@@ -245,7 +245,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 
 	
 	
-	public static class RootElement extends DPRegion implements CaretListener, SelectionListener, PointerDndController
+	public static class RootElement extends DPBox implements CaretListener, SelectionListener, PointerDndController
 	{
 		private PresentationComponent component;
 		
@@ -1396,7 +1396,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				metaElementComponent = new PresentationComponent();
 				DPViewport viewport = new DPViewport( 0.0, 0.0 );
 				viewport.setChild( initialiseMetaElement() );
-				metaElementComponent.getRootElement().setChild( viewport );
+				metaElementComponent.getRootElement().setChild( viewport.alignHExpand().alignVExpand() );
 			}
 			
 			return metaElementComponent;

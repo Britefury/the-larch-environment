@@ -9,13 +9,11 @@ package BritefuryJ.GSym.View;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
@@ -124,12 +122,9 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 		return incrementalNode.getElementNoRefresh();
 	}
 	
-	protected static DPRegion perspectiveFragmentRegion(DPElement fragmentContents, GSymPerspective perspective)
+	protected static DPElement perspectiveFragmentRegion(DPElement fragmentContents, GSymPerspective perspective)
 	{
-		DPRegion r = new DPRegion();
-		r.setEditHandler( perspective.getEditHandler() );
-		r.setChild( PrimitiveStyleSheet.instance.vbox( Arrays.asList( new DPElement[] { fragmentContents } ) ) );
-		return r;
+		return PrimitiveStyleSheet.instance.region( fragmentContents, perspective.getEditHandler() );
 	}
 	
 

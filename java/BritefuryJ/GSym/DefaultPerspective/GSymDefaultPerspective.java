@@ -34,15 +34,18 @@ public class GSymDefaultPerspective implements GSymPerspective
 	{
 		public DPElement createViewFragment(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
 		{
+			DPElement result;
 			if ( x instanceof Presentable )
 			{
 				Presentable p = (Presentable)x;
-				return p.present( ctx, styleSheet, state );
+				result = p.present( ctx, styleSheet, state );
 			}
 			else
 			{
-				return asStringStyle.text( x.toString() );
+				result = asStringStyle.text( x.toString() );
 			}
+			result.setDebugName( x.getClass().getName() );
+			return result;
 		}
 	}
 

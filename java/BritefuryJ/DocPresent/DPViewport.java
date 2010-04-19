@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.awt.Graphics2D;
+import java.awt.Shape;
 import java.util.List;
 
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
@@ -215,6 +217,23 @@ public class DPViewport extends DPContainer
 		applyLocalSpaceXform( xform );
 		return true;
 	}
+	
+	
+	
+	protected void handleDrawBackground(Graphics2D graphics, AABox2 areaBox)
+	{
+		Shape clipShape = pushClip( graphics );
+		super.handleDrawBackground( graphics, areaBox );
+		popClip( graphics, clipShape );
+	}
+	
+	protected void handleDraw(Graphics2D graphics, AABox2 areaBox)
+	{
+		Shape clipShape = pushClip( graphics );
+		super.handleDraw( graphics, areaBox );
+		popClip( graphics, clipShape );
+	}
+
 	
 	
 	private void applyLocalSpaceXform(Xform2 x)

@@ -452,6 +452,16 @@ abstract public class DPElement extends PointerInputElement
 		return ( flags & _ALIGN_MASK )  >>  _ALIGN_SHIFT;
 	}
 	
+	public HAlignment getHAlignment()
+	{
+		return ElementAlignment.getHAlignment( getAlignmentFlags() );
+	}
+	
+	public VAlignment getVAlignment()
+	{
+		return ElementAlignment.getVAlignment( getAlignmentFlags() );
+	}
+	
 	
 	
 	
@@ -1370,6 +1380,26 @@ abstract public class DPElement extends PointerInputElement
 		}
 		onUnrealise( unrealiseRoot );
 		clearFlagRealised();
+	}
+	
+	protected Shape pushClip(Graphics2D graphics)
+	{
+		Shape clipShape = null;
+		AABox2 localClip = getLocalClipBox();
+		if ( localClip != null )
+		{
+			clipShape = graphics.getClip();
+			graphics.clip( new Rectangle2D.Double( localClip.getLowerX(), localClip.getLowerY(), localClip.getWidth(), localClip.getHeight() ) );
+		}
+		return clipShape;
+	}
+	
+	protected void popClip(Graphics2D graphics, Shape clipShape)
+	{
+		if ( getLocalClipBox() != null )
+		{
+			graphics.setClip( clipShape );
+		}
 	}
 	
 	protected void handleDrawBackground(Graphics2D graphics, AABox2 areaBox)
