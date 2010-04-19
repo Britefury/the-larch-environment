@@ -135,7 +135,7 @@ public class MousePointer extends Pointer
 			double delta = (double)scrollY;
 			double scaleDelta = Math.pow( 2.0,  ( delta / 1.5 ) );
 			
-			rootEntry.handleNavigationGestureClick( this, new PointerNavigationZoomEvent( this, navigationDragStartPos, scaleDelta ) );
+			rootEntry.handleNavigationGestureClick( this, new PointerNavigationZoomEvent( this, localPos, scaleDelta ) );
 		}
 		else
 		{

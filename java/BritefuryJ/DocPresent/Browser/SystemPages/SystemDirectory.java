@@ -38,6 +38,7 @@ public class SystemDirectory
 		primitiveTestPages.add( new TableTestPage() );
 		primitiveTestPages.add( new TextTestPage() );
 		primitiveTestPages.add( new VBoxTestPage() );
+		primitiveTestPages.add( new ViewportTestPage() );
 
 		controlTestPages.add( new ButtonTestPage() );
 		controlTestPages.add( new HyperlinkTestPage() );
