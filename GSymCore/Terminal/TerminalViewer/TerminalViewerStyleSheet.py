@@ -172,7 +172,8 @@ class TerminalViewerStyleSheet (StyleSheet):
 		resultBorderStyle = self.resultBorderStyle()
 		
 		blockContents = []
-		blockContents.append( pythonModuleBorderStyle.border( pythonModule.alignHExpand() ).alignHExpand() )
+		pythonModuleBox = PrimitiveStyleSheet.instance.vbox( [ pythonModule ] )
+		blockContents.append( pythonModuleBorderStyle.border( pythonModuleBox.alignHExpand() ).alignHExpand() )
 		if stdout is not None:
 			blockContents.append( stdOutStyle.border( self._textLines( 'STDOUT:', stdout, stdOutStyle ).alignHExpand() ).alignHExpand() )
 		if stderr is not None:
@@ -180,7 +181,8 @@ class TerminalViewerStyleSheet (StyleSheet):
 		if caughtException is not None:
 			blockContents.append( exceptionBorderStyle.border( self._exception( 'EXCEPTION:', caughtException ) ).alignHExpand() )
 		if result is not None:
-			blockContents.append( resultBorderStyle.border( result.alignHExpand() ).alignHExpand() )
+			resultBox = PrimitiveStyleSheet.instance.vbox( [ result ] )
+			blockContents.append( resultBorderStyle.border( resultBox.alignHExpand() ).alignHExpand() )
 		blockVBox = blockStyle.vbox( blockContents ).alignHExpand()
 		return blockStyle.border( blockVBox ).alignHExpand()
 		

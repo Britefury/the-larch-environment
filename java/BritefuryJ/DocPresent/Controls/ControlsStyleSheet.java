@@ -309,7 +309,7 @@ public class ControlsStyleSheet extends StyleSheet
 		DPText textElement = textEntryStyle.text( text );
 		DPElement line = textEntryStyle.hbox( Arrays.asList( new DPElement[] { textEntryStyle.segment( false, false, textElement ) } ) );
 		DPRegion frame = textEntryStyle.region( line );
-		DPBorder outerElement = textEntryStyle.border( frame );
+		DPBorder outerElement = textEntryStyle.border( PrimitiveStyleSheet.instance.vbox( Arrays.asList( new DPElement[] { frame } ) ) );
 		return new TextEntry( outerElement, frame, textElement, listener );
 	}
 
@@ -319,7 +319,7 @@ public class ControlsStyleSheet extends StyleSheet
 		DPText textElement = textEntryStyle.text( text );
 		DPElement line = textEntryStyle.hbox( Arrays.asList( new DPElement[] { textEntryStyle.segment( false, false, textElement ) } ) );
 		DPRegion frame = textEntryStyle.region( line );
-		DPBorder outerElement = textEntryStyle.border( frame );
+		DPBorder outerElement = textEntryStyle.border( PrimitiveStyleSheet.instance.vbox( Arrays.asList( new DPElement[] { frame } ) ) );
 		return new TextEntry( outerElement, frame, textElement, accept, cancel );
 	}
 }

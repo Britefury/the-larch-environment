@@ -293,13 +293,22 @@ public class Pointer extends PointerInterface
 		
 		protected boolean handleScroll(Pointer pointer, PointerScrollEvent event)
 		{
+			boolean bHandled = false;
 			if ( pressGrabChild != null )
 			{
-				pressGrabChild.handleScroll( pointer, (PointerScrollEvent)pressGrabChild.element.transformParentToLocalEvent( event ) );
+				bHandled = pressGrabChild.handleScroll( pointer, (PointerScrollEvent)pressGrabChild.element.transformParentToLocalEvent( event ) );
+				if ( bHandled )
+				{
+					return true;
+				}
 			}
 			else if ( childUnderPointer != null )
 			{
-				childUnderPointer.handleScroll( pointer, (PointerScrollEvent)childUnderPointer.element.transformParentToLocalEvent( event ) );
+				bHandled = childUnderPointer.handleScroll( pointer, (PointerScrollEvent)childUnderPointer.element.transformParentToLocalEvent( event ) );
+				if ( bHandled )
+				{
+					return true;
+				}
 			}
 			return element.handlePointerScroll( event );
 		}

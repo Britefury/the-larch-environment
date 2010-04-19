@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 
-public class DPRegion extends DPBox
+public class DPRegion extends DPProxy
 {
 	private EditHandler editHandler;
 

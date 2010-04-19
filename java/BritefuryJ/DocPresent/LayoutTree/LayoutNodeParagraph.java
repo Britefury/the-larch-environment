@@ -258,67 +258,74 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 	{
 		refreshSubtree();
 		
-		int startLineIndex = ParagraphLayout.Line.searchForStartLine( lines, rangeStart );
-		int endLineIndex = ParagraphLayout.Line.searchForEndLine( lines, rangeEnd );
-		
-		if ( startLineIndex == endLineIndex )
+		if ( leaves.length == 0 )
 		{
-			ParagraphLayout.Line line = lines[startLineIndex];
-			LAllocBoxInterface lineChildAllocBoxes[] = line.getChildAllocBoxes();
-			int lineRangeStart = line.getRangeStart();
-			int startInLine = Math.min( rangeStart - lineRangeStart, lineChildAllocBoxes.length - 1 );
-			int endInLine = Math.min( ( rangeEnd - 1 ) - lineRangeStart, lineChildAllocBoxes.length - 1 );
-			LAllocBoxInterface startBox = lineChildAllocBoxes[startInLine];
-			LAllocBoxInterface endBox = lineChildAllocBoxes[endInLine];
-			LAllocBox lineBox = line.getLineAllocBox();
-			double xStart = startBox.getAllocPositionInParentAllocationSpaceX();
-			double xEnd = endBox.getAllocPositionInParentAllocationSpaceX()  +  endBox.getAllocationX();
-			double yStart = lineBox.getAllocPositionInParentAllocationSpaceY();
-			double yEnd = yStart + lineBox.getAllocationY();
-			AABox2 box = new AABox2( xStart, yStart, xEnd, yEnd );
-			return new AABox2[] { box };
+			return new AABox2[] {};
 		}
 		else
 		{
-			AABox2 boxes[] = new AABox2[endLineIndex + 1 - startLineIndex];
-
-			ParagraphLayout.Line startLine = lines[startLineIndex];
-			int startInLine = rangeStart - startLine.getRangeStart();
-			startInLine = Math.min( startInLine, startLine.getChildAllocBoxes().length - 1 );
-			LAllocBoxInterface startChildBox = startLine.getChildAllocBoxes()[startInLine];
-			LAllocBox startLineBox = startLine.getLineAllocBox();
-			double xStart = startChildBox.getAllocPositionInParentAllocationSpaceX();
-			double xEnd = startLineBox.getAllocationX();
-			double yStart = startLineBox.getAllocPositionInParentAllocationSpaceY();
-			double yEnd = yStart + startLineBox.getAllocationY();
-			AABox2 startBox = new AABox2( xStart, yStart, xEnd, yEnd );
-
-			ParagraphLayout.Line endLine = lines[endLineIndex];
-			int endInLine = ( rangeEnd - 1 ) - endLine.getRangeStart();
-			endInLine = Math.min( endInLine, endLine.getChildAllocBoxes().length - 1 );
-			LAllocBoxInterface endChildBox = endLine.getChildAllocBoxes()[endInLine];
-			LAllocBox endLineBox = endLine.getLineAllocBox();
-			xStart = 0.0;
-			xEnd = endChildBox.getAllocPositionInParentAllocationSpaceX() + endChildBox.getAllocationX();
-			yStart = endLineBox.getAllocPositionInParentAllocationSpaceY();
-			yEnd = yStart + endLineBox.getAllocationY();
-			AABox2 endBox = new AABox2( xStart, yStart, xEnd, yEnd );
+			int startLineIndex = ParagraphLayout.Line.searchForStartLine( lines, rangeStart );
+			int endLineIndex = ParagraphLayout.Line.searchForEndLine( lines, rangeEnd );
 			
-			boxes[0] = startBox;
-			boxes[boxes.length-1] = endBox;
-			
-			int j = 1;
-			for (int i = startLineIndex + 1; i < endLineIndex; i++)
+			if ( startLineIndex == endLineIndex )
 			{
-				LAllocBox lineBox = lines[i].getLineAllocBox();
-				xStart = 0.0;
-				xEnd = lineBox.getAllocationX();
-				yStart = lineBox.getAllocPositionInParentAllocationSpaceY();
-				yEnd = yStart + lineBox.getAllocationY();
-				boxes[j++] = new AABox2( xStart, yStart, xEnd, yEnd );
+				ParagraphLayout.Line line = lines[startLineIndex];
+				LAllocBoxInterface lineChildAllocBoxes[] = line.getChildAllocBoxes();
+				int lineRangeStart = line.getRangeStart();
+				int startInLine = Math.min( rangeStart - lineRangeStart, lineChildAllocBoxes.length - 1 );
+				int endInLine = Math.min( ( rangeEnd - 1 ) - lineRangeStart, lineChildAllocBoxes.length - 1 );
+				LAllocBoxInterface startBox = lineChildAllocBoxes[startInLine];
+				LAllocBoxInterface endBox = lineChildAllocBoxes[endInLine];
+				LAllocBox lineBox = line.getLineAllocBox();
+				double xStart = startBox.getAllocPositionInParentAllocationSpaceX();
+				double xEnd = endBox.getAllocPositionInParentAllocationSpaceX()  +  endBox.getAllocationX();
+				double yStart = lineBox.getAllocPositionInParentAllocationSpaceY();
+				double yEnd = yStart + lineBox.getAllocationY();
+				AABox2 box = new AABox2( xStart, yStart, xEnd, yEnd );
+				return new AABox2[] { box };
 			}
-			
-			return boxes;
+			else
+			{
+				AABox2 boxes[] = new AABox2[endLineIndex + 1 - startLineIndex];
+	
+				ParagraphLayout.Line startLine = lines[startLineIndex];
+				int startInLine = rangeStart - startLine.getRangeStart();
+				startInLine = Math.min( startInLine, startLine.getChildAllocBoxes().length - 1 );
+				LAllocBoxInterface startChildBox = startLine.getChildAllocBoxes()[startInLine];
+				LAllocBox startLineBox = startLine.getLineAllocBox();
+				double xStart = startChildBox.getAllocPositionInParentAllocationSpaceX();
+				double xEnd = startLineBox.getAllocationX();
+				double yStart = startLineBox.getAllocPositionInParentAllocationSpaceY();
+				double yEnd = yStart + startLineBox.getAllocationY();
+				AABox2 startBox = new AABox2( xStart, yStart, xEnd, yEnd );
+	
+				ParagraphLayout.Line endLine = lines[endLineIndex];
+				int endInLine = ( rangeEnd - 1 ) - endLine.getRangeStart();
+				endInLine = Math.min( endInLine, endLine.getChildAllocBoxes().length - 1 );
+				LAllocBoxInterface endChildBox = endLine.getChildAllocBoxes()[endInLine];
+				LAllocBox endLineBox = endLine.getLineAllocBox();
+				xStart = 0.0;
+				xEnd = endChildBox.getAllocPositionInParentAllocationSpaceX() + endChildBox.getAllocationX();
+				yStart = endLineBox.getAllocPositionInParentAllocationSpaceY();
+				yEnd = yStart + endLineBox.getAllocationY();
+				AABox2 endBox = new AABox2( xStart, yStart, xEnd, yEnd );
+				
+				boxes[0] = startBox;
+				boxes[boxes.length-1] = endBox;
+				
+				int j = 1;
+				for (int i = startLineIndex + 1; i < endLineIndex; i++)
+				{
+					LAllocBox lineBox = lines[i].getLineAllocBox();
+					xStart = 0.0;
+					xEnd = lineBox.getAllocationX();
+					yStart = lineBox.getAllocPositionInParentAllocationSpaceY();
+					yEnd = yStart + lineBox.getAllocationY();
+					boxes[j++] = new AABox2( xStart, yStart, xEnd, yEnd );
+				}
+				
+				return boxes;
+			}
 		}
 	}
 
