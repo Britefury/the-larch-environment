@@ -15,8 +15,10 @@ import java.util.HashMap;
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPBox;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPViewport;
 import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 import BritefuryJ.Math.Point2;
@@ -124,6 +126,7 @@ public class ParseView implements FragmentContext
 		public void onSelectionChanged(DebugNode selection);
 	}
 	
+	private DPElement viewport;
 	private DPViewBin element;
 	private HashMap<DebugNode, NodeView> nodeTable;
 	private ArrayList<Edge> callEdges, memoEdges;
@@ -149,6 +152,7 @@ public class ParseView implements FragmentContext
 		root.registerEdges();
 		
 		element.setChild( root.getElement() );
+		viewport = PrimitiveStyleSheet.instance.viewport( element, 0.0, 0.0 ).alignHExpand().alignVExpand();
 	}
 	
 	
@@ -227,6 +231,6 @@ public class ParseView implements FragmentContext
 	public static DPElement presentDebugParseResult(DebugParseResultInterface x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
 	{
 		ParseView v = new ParseView( x );
-		return v.element;
+		return v.viewport;
 	}
 }

@@ -920,6 +920,13 @@ public class PrimitiveStyleSheet extends StyleSheet
 		return viewport;
 	}
 	
+	public DPViewport viewport(DPElement child)
+	{
+		DPViewport viewport = new DPViewport( 0.0, 0.0 );
+		viewport.setChild( child );
+		return viewport;
+	}
+	
 	
 	public DPWhitespace whitespace(String txt, double width)
 	{
