@@ -19,6 +19,7 @@ import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
 import BritefuryJ.DocPresent.Layout.ScriptLayout;
 import BritefuryJ.DocPresent.StyleParams.ScriptStyleParams;
 import BritefuryJ.Math.Point2;
+import BritefuryJ.Math.Xform2;
 
 public class LayoutNodeScript extends ArrangedLayoutNode
 {
@@ -51,9 +52,14 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 
 	
 
-	private static double getChildScale()
+	private static Xform2 getScriptChildXform()
 	{
-		return DPScript.getChildScale();
+		return DPScript.getScriptChildXform();
+	}
+	
+	public static Xform2 getInverseScriptChildXform()
+	{
+		return DPScript.getInverseScriptChildXform();
 	}
 	
 
@@ -61,7 +67,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 	{
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPScript script = (DPScript)element;
-		double childScale = getChildScale();
+		Xform2 childXform = getScriptChildXform();
 		
 		LReqBoxInterface boxes[] = new LReqBoxInterface[NUMCHILDREN];
 		for (int i = 0; i < NUMCHILDREN; i++)
@@ -69,7 +75,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 			DPElement child = script.getWrappedChild( i );
 			if ( i != MAIN )
 			{
-				boxes[i] = child != null  ?  child.getLayoutNode().refreshRequisitionX().scaledRequisition( childScale )  :  null;
+				boxes[i] = child != null  ?  child.getLayoutNode().refreshRequisitionX().transformedRequisition( childXform )  :  null;
 			}
 			else
 			{
@@ -84,7 +90,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 	{
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPScript script = (DPScript)element;
-		double childScale = getChildScale();
+		Xform2 childXform = getScriptChildXform();
 		
 		LReqBoxInterface boxes[] = new LReqBoxInterface[NUMCHILDREN];
 		for (int i = 0; i < NUMCHILDREN; i++)
@@ -92,7 +98,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 			DPElement child = script.getWrappedChild( i );
 			if ( i != MAIN )
 			{
-				boxes[i] = child != null  ?  child.getLayoutNode().refreshRequisitionY().scaledRequisition( childScale )  :  null;
+				boxes[i] = child != null  ?  child.getLayoutNode().refreshRequisitionY().transformedRequisition( childXform )  :  null;
 			}
 			else
 			{
@@ -113,7 +119,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 		
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPScript script = (DPScript)element;
-		double childScale = getChildScale();
+		Xform2 childXform = getScriptChildXform();
 		
 		LReqBoxInterface reqBoxes[] = new LReqBoxInterface[NUMCHILDREN];
 		LAllocBoxInterface allocBoxes[] = new LAllocBoxInterface[NUMCHILDREN];
@@ -123,7 +129,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 			DPElement child = script.getWrappedChild( i );
 			if ( i != MAIN )
 			{
-				reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox().scaledRequisition( childScale )  :  null;
+				reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox().transformedRequisition( childXform )  :  null;
 			}
 			else
 			{
@@ -144,7 +150,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 			{
 				if ( i != MAIN )
 				{
-					allocBoxes[i].scaleAllocationX( 1.0 / childScale );
+					allocBoxes[i].transformAllocationX( getInverseScriptChildXform() );
 				}
 				child.getLayoutNode().refreshAllocationX( prevChildWidths[i] );
 			}
@@ -158,7 +164,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 		
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPScript script = (DPScript)element;
-		double childScale = getChildScale();
+		Xform2 childXform = getScriptChildXform();
 		
 		LReqBoxInterface reqBoxes[] = new LReqBoxInterface[NUMCHILDREN];
 		LAllocBoxInterface allocBoxes[] = new LAllocBoxInterface[NUMCHILDREN];
@@ -168,7 +174,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 			DPElement child = script.getWrappedChild( i );
 			if ( i != MAIN )
 			{
-				reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox().scaledRequisition( childScale )  :  null;
+				reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox().transformedRequisition( childXform )  :  null;
 			}
 			else
 			{
@@ -189,7 +195,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 			{
 				if ( i != MAIN )
 				{
-					allocBoxes[i].scaleAllocationY( 1.0 / childScale );
+					allocBoxes[i].transformAllocationY( getInverseScriptChildXform() );
 				}
 				child.getLayoutNode().refreshAllocationY( prevChildAllocVs[i] );
 			}
@@ -251,11 +257,11 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 			double edgeX = 0.0;
 			if ( bRightEdge )
 			{
-				edgeX = childNode.getAllocPositionInParentAllocationSpaceX() + childNode.getAllocationInParentSpaceX();
+				edgeX = childNode.getAllocPositionInParentSpaceX() + childNode.getAllocationInParentSpaceX();
 			}
 			else
 			{
-				edgeX = childNode.getAllocPositionInParentAllocationSpaceX();
+				edgeX = childNode.getAllocPositionInParentSpaceX();
 			}
 			
 			if ( i > 0 )

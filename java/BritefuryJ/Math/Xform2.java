@@ -99,6 +99,12 @@ public class Xform2 implements Cloneable
 	}
 	
 	
+	public double scale(double x)
+	{
+		return x * scale;
+	}
+	
+	
 	public AffineTransform toAffineTransform()
 	{
 		AffineTransform x = new AffineTransform();

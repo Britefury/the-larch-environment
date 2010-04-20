@@ -33,9 +33,8 @@ public abstract class LayoutNode
 	public abstract LAllocBoxInterface getAllocationBox();
 	
 	public abstract Point2 getPositionInParentSpace();
-	public abstract double getAllocPositionInParentAllocationSpaceX();
-	public abstract double getAllocPositionInParentAllocationSpaceY();
-	public abstract Point2 getPositionInParentAllocationSpace();
+	public abstract double getAllocPositionInParentSpaceX();
+	public abstract double getAllocPositionInParentSpaceY();
 	public abstract double getAllocationX();
 	public abstract double getAllocationY();
 	public abstract Vector2 getAllocation();
@@ -59,9 +58,9 @@ public abstract class LayoutNode
 	
 
 	
-	protected Xform2 getParentAllocationToParentSpaceXform()
+	protected Xform2 getLocalToParentAllocationSpaceXform()
 	{
-		return getElement().getParentAllocationToParentSpaceXform();
+		return getElement().getLocalToParentAllocationSpaceXform();
 	}
 	
 

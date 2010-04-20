@@ -19,6 +19,7 @@ import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
+import BritefuryJ.Math.Xform2;
 
 public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LReqBoxInterface, LAllocBoxInterface
 {
@@ -56,17 +57,17 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 	
 	public double getAllocationInParentSpaceX()
 	{
-		return getAllocationX()  *  getParentAllocationToParentSpaceXform().scale;
+		return getAllocationX()  *  getLocalToParentAllocationSpaceXform().scale;
 	}
 	
 	public double getAllocationInParentSpaceY()
 	{
-		return getAllocationY()  *  getParentAllocationToParentSpaceXform().scale;
+		return getAllocationY()  *  getLocalToParentAllocationSpaceXform().scale;
 	}
 	
 	public Vector2 getAllocationInParentSpace()
 	{
-		return getAllocation().mul( getParentAllocationToParentSpaceXform().scale );
+		return getAllocation().mul( getLocalToParentAllocationSpaceXform().scale );
 	}
 	
 	
@@ -569,9 +570,9 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 	}
 	
 	
-	public LReqBoxInterface scaledRequisition(double scale)
+	public LReqBoxInterface transformedRequisition(Xform2 xform)
 	{
-		return new LReqBox( this, scale );
+		return new LReqBox( this, xform );
 	}
 	
 	
@@ -748,22 +749,17 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 	
 	public Point2 getPositionInParentSpace()
 	{
-		return getParentAllocationToParentSpaceXform().transform( new Point2( alloc_positionInParentAllocationSpaceX, alloc_positionInParentAllocationSpaceY ) );
+		return new Point2( alloc_positionInParentAllocationSpaceX, alloc_positionInParentAllocationSpaceY );
 	}
 	
-	public double getAllocPositionInParentAllocationSpaceX()
+	public double getAllocPositionInParentSpaceX()
 	{
 		return alloc_positionInParentAllocationSpaceX;
 	}
 	
-	public double getAllocPositionInParentAllocationSpaceY()
+	public double getAllocPositionInParentSpaceY()
 	{
 		return alloc_positionInParentAllocationSpaceY;
-	}
-	
-	public Point2 getPositionInParentAllocationSpace()
-	{
-		return new Point2( alloc_positionInParentAllocationSpaceX, alloc_positionInParentAllocationSpaceY );
 	}
 	
 	public double getAllocationX()
@@ -799,12 +795,12 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 	// SETTERS
 	//
 	
-	public void setAllocPositionInParentAllocationSpaceX(double x)
+	public void setAllocPositionInParentSpaceX(double x)
 	{
 		alloc_positionInParentAllocationSpaceX = x;
 	}
 	
-	public void setAllocPositionInParentAllocationSpaceY(double y)
+	public void setAllocPositionInParentSpaceY(double y)
 	{
 		alloc_positionInParentAllocationSpaceY = y;
 	}
@@ -827,20 +823,20 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 		this.alloc_refY = refY;
 	}
 
-	public void setPositionInParentAllocationSpaceAndAllocationX(double x, double width)
+	public void setPositionInParentSpaceAndAllocationX(double x, double width)
 	{
 		alloc_positionInParentAllocationSpaceX = x;
 		alloc_allocationX = width;
 	}
 	
-	public void setPositionInParentAllocationSpaceAndAllocationY(double y, double height)
+	public void setPositionInParentSpaceAndAllocationY(double y, double height)
 	{
 		alloc_positionInParentAllocationSpaceY = y;
 		alloc_allocationY = height;
 		alloc_refY = height * 0.5;
 	}
 	
-	public void setPositionInParentAllocationSpaceAndAllocationY(double y, double height, double refY)
+	public void setPositionInParentSpaceAndAllocationY(double y, double height, double refY)
 	{
 		alloc_positionInParentAllocationSpaceY = y;
 		alloc_allocationY = height;
@@ -849,14 +845,14 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 
 
 
-	public void scaleAllocationX(double scale)
+	public void transformAllocationX(Xform2 xform)
 	{
-		alloc_allocationX *= scale;
+		alloc_allocationX = xform.scale( alloc_allocationX );
 	}
 
-	public void scaleAllocationY(double scale)
+	public void transformAllocationY(Xform2 xform)
 	{
-		alloc_allocationY *= scale;
-		alloc_refY *= scale;
+		alloc_allocationY = xform.scale( alloc_allocationY );
+		alloc_refY = xform.scale( alloc_refY );
 	}
 }

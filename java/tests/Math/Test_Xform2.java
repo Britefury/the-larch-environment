@@ -71,7 +71,7 @@ public class Test_Xform2 extends TestCase
 		Xform2 b = new Xform2( 2.0, new Vector2( 3.0, 3.0 ) );
 		
 		assertTrue( a.concat( b ).equals( new Xform2( 10.0, new Vector2( 23.0, 23.0 ) ) ) );
-		assertFalse( b.concat( a ).equals( new Xform2( 10.0, new Vector2( 23.0, 23.0 ) ) ) );
+		assertTrue( b.concat( a ).equals( new Xform2( 10.0, new Vector2( 25.0, 25.0 ) ) ) );
 		assertTrue( a.concat( a.inverse() ).equals( new Xform2() ) );
 	}
 }

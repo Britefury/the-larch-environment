@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.DocPresent.Layout;
 
+import BritefuryJ.Math.Xform2;
+
 public interface LReqBoxInterface
 {
 	public abstract double getReqMinWidth();
@@ -24,7 +26,7 @@ public interface LReqBoxInterface
 	public abstract boolean isReqParagraphDedentMarker();
 	public abstract int getReqLineBreakCost();
 	
-	public abstract LReqBoxInterface scaledRequisition(double scale);
+	public abstract LReqBoxInterface transformedRequisition(Xform2 xform);
 
 
 	public abstract void clearRequisitionX();

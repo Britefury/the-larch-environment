@@ -148,6 +148,7 @@ public class ItemStream implements Presentable
 					if ( builder.length() > 0 )
 					{
 						elements.add( textItemStyle.staticText( builder.toString() ) );
+						builder = new StringBuilder();
 					}
 					elements.add( escapeItem );
 				}

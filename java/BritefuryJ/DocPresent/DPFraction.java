@@ -27,6 +27,8 @@ import BritefuryJ.Math.Xform2;
 public class DPFraction extends DPContainer
 {
 	private static double childScale = 0.85;
+	private static final Xform2 childScaleXform = new Xform2( childScale );
+	private static final Xform2 childScaleXformInv = childScaleXform.inverse();
 
 
 	public static class DPFractionBar extends DPContentLeafEditable
@@ -353,7 +355,7 @@ public class DPFraction extends DPContainer
 	
 	protected Xform2 getAllocationSpaceToLocalSpaceXform(DPElement child)
 	{
-		return child == children[BAR]  ?  null  :  new Xform2( childScale );
+		return child == children[BAR]  ?  Xform2.identity  :  new Xform2( childScale );
 	}
 	
 
@@ -376,9 +378,14 @@ public class DPFraction extends DPContainer
 	
 	
 	
-	public static double getChildScale()
+	public static Xform2 getScriptChildXform()
 	{
-		return childScale;
+		return childScaleXform;
+	}
+
+	public static Xform2 getInverseScriptChildXform()
+	{
+		return childScaleXformInv;
 	}
 
 	

@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent.Layout;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNode;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
+import BritefuryJ.Math.Xform2;
 
 public class LAllocBox implements LAllocBoxInterface
 {
@@ -41,17 +42,17 @@ public class LAllocBox implements LAllocBoxInterface
 	
 	
 	
-	public double getAllocPositionInParentAllocationSpaceX()
+	public double getAllocPositionInParentSpaceX()
 	{
 		return positionInParentAllocationSpaceX;
 	}
 	
-	public double getAllocPositionInParentAllocationSpaceY()
+	public double getAllocPositionInParentSpaceY()
 	{
 		return positionInParentAllocationSpaceY;
 	}
 	
-	public Point2 getPositionInParentAllocationSpace()
+	public Point2 getPositionInParentSpace()
 	{
 		return new Point2( positionInParentAllocationSpaceX, positionInParentAllocationSpaceY );
 	}
@@ -89,12 +90,12 @@ public class LAllocBox implements LAllocBoxInterface
 	// SETTERS
 	//
 	
-	public void setAllocPositionInParentAllocationSpaceX(double x)
+	public void setAllocPositionInParentSpaceX(double x)
 	{
 		positionInParentAllocationSpaceX = x;
 	}
 	
-	public void setAllocPositionInParentAllocationSpaceY(double y)
+	public void setAllocPositionInParentSpaceY(double y)
 	{
 		positionInParentAllocationSpaceY = y;
 	}
@@ -117,20 +118,20 @@ public class LAllocBox implements LAllocBoxInterface
 		this.refY = refY;
 	}
 
-	public void setPositionInParentAllocationSpaceAndAllocationX(double x, double width)
+	public void setPositionInParentSpaceAndAllocationX(double x, double width)
 	{
 		positionInParentAllocationSpaceX = x;
 		allocationX = width;
 	}
 	
-	public void setPositionInParentAllocationSpaceAndAllocationY(double y, double height)
+	public void setPositionInParentSpaceAndAllocationY(double y, double height)
 	{
 		positionInParentAllocationSpaceY = y;
 		allocationY = height;
 		refY = height * 0.5;
 	}
 	
-	public void setPositionInParentAllocationSpaceAndAllocationY(double y, double height, double refY)
+	public void setPositionInParentSpaceAndAllocationY(double y, double height, double refY)
 	{
 		positionInParentAllocationSpaceY = y;
 		allocationY = height;
@@ -139,15 +140,15 @@ public class LAllocBox implements LAllocBoxInterface
 
 
 
-	public void scaleAllocationX(double scale)
+	public void transformAllocationX(Xform2 xform)
 	{
-		allocationX *= scale;
+		allocationX = xform.scale( allocationX );
 	}
 
-	public void scaleAllocationY(double scale)
+	public void transformAllocationY(Xform2 xform)
 	{
-		allocationY *= scale;
-		refY *= scale;
+		allocationY = xform.scale( allocationY );
+		refY = xform.scale( refY );
 	}
 	
 	
