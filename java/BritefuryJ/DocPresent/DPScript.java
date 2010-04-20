@@ -27,7 +27,9 @@ public class DPScript extends DPContainer
 	
 	public static int NUMCHILDREN = 5;
 	
-	private static double childScale = 0.7;
+	private static final double childScale = 0.7;
+	private static final Xform2 childScaleXform = new Xform2( childScale );
+	private static final Xform2 childScaleXformInv = childScaleXform.inverse();
 	
 	
 	
@@ -215,7 +217,7 @@ public class DPScript extends DPContainer
 	
 	protected Xform2 getAllocationSpaceToLocalSpaceXform(DPElement child)
 	{
-		return child == paras[MAIN]  ?  null  :  new Xform2( childScale );
+		return child == paras[MAIN]  ?  Xform2.identity  :  childScaleXform;
 	}
 	
 
@@ -289,9 +291,14 @@ public class DPScript extends DPContainer
 	
 
 	
-	public static double getChildScale()
+	public static Xform2 getScriptChildXform()
 	{
-		return childScale;
+		return childScaleXform;
+	}
+
+	public static Xform2 getInverseScriptChildXform()
+	{
+		return childScaleXformInv;
 	}
 
 	

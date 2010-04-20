@@ -115,7 +115,7 @@ public class ParagraphLayout
 			HorizontalLayout.allocateX( lineReqBox, children, lineAllocBox, childrenAlloc, childAllocationFlags, spacing );
 			for (LAllocBoxInterface childAlloc: childrenAlloc)
 			{
-				childAlloc.setAllocPositionInParentAllocationSpaceX( childAlloc.getAllocPositionInParentAllocationSpaceX() + lineIndentation );
+				childAlloc.setAllocPositionInParentSpaceX( childAlloc.getAllocPositionInParentSpaceX() + lineIndentation );
 			}
 		}
 		
@@ -125,7 +125,7 @@ public class ParagraphLayout
 			
 			for (LAllocBoxInterface childAlloc: childrenAlloc)
 			{
-				childAlloc.setAllocPositionInParentAllocationSpaceY( childAlloc.getAllocPositionInParentAllocationSpaceY() + lineAllocBox.positionInParentAllocationSpaceY );
+				childAlloc.setAllocPositionInParentSpaceY( childAlloc.getAllocPositionInParentSpaceY() + lineAllocBox.positionInParentAllocationSpaceY );
 			}
 		}
 		

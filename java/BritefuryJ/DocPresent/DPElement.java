@@ -531,19 +531,14 @@ abstract public class DPElement extends PointerInputElement
 		return layoutNode != null  ?  layoutNode.getPositionInParentSpace()  :  new Point2();
 	}
 	
-	public Point2 getPositionInParentAllocationSpace()
+	public double getPositionInParentSpaceX()
 	{
-		return layoutNode != null  ?  layoutNode.getPositionInParentAllocationSpace()  :  new Point2();
+		return layoutNode != null  ?  layoutNode.getAllocPositionInParentSpaceX()  :  0.0;
 	}
 	
-	public double getPositionInParentAllocationSpaceX()
+	public double getPositionInParentSpaceY()
 	{
-		return layoutNode != null  ?  layoutNode.getAllocPositionInParentAllocationSpaceX()  :  0.0;
-	}
-	
-	public double getPositionInParentAllocationSpaceY()
-	{
-		return layoutNode != null  ?  layoutNode.getAllocPositionInParentAllocationSpaceY()  :  0.0;
+		return layoutNode != null  ?  layoutNode.getAllocPositionInParentSpaceY()  :  0.0;
 	}
 	
 	public double getAllocationX()
@@ -592,14 +587,9 @@ abstract public class DPElement extends PointerInputElement
 		return null;
 	}
 	
-	public AABox2 getAABoxInParentAllocationSpace()
-	{
-		return new AABox2( getPositionInParentAllocationSpace(), getAllocation() );
-	}
-	
 	public AABox2 getAABoxInParentSpace()
 	{
-		return getParentAllocationToParentSpaceXform().transform( getAABoxInParentAllocationSpace() );
+		return new AABox2( getPositionInParentSpace(), getAllocationInParentSpace() );
 	}
 	
 	
@@ -610,14 +600,14 @@ abstract public class DPElement extends PointerInputElement
 	}
 
 	
-	public Xform2 getParentAllocationToParentSpaceXform()
+	public Xform2 getLocalToParentAllocationSpaceXform()
 	{
 		return parent != null  ?  parent.getAllocationSpaceToLocalSpaceXform( this )  :  Xform2.identity;
 	}
 	
 	public Xform2 getLocalToParentXform()
 	{
-		return new Xform2( getPositionInParentAllocationSpace().toVector2() ).concat( getParentAllocationToParentSpaceXform() );
+		return getLocalToParentAllocationSpaceXform().concat( new Xform2( getPositionInParentSpace().toVector2() ) );
 	}
 	
 	public Xform2 getParentToLocalXform()

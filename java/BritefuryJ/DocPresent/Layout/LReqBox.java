@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.DocPresent.Layout;
 
+import BritefuryJ.Math.Xform2;
+
 
 
 
@@ -86,15 +88,15 @@ public class LReqBox implements LReqBoxInterface
 		lineBreakCost = box.getReqLineBreakCost();
 	}
 	
-	public LReqBox(LReqBoxInterface box, double scale)
+	public LReqBox(LReqBoxInterface box, Xform2 xform)
 	{
-		minWidth = box.getReqMinWidth() * scale;
-		prefWidth = box.getReqPrefWidth() * scale;
-		minHAdvance = box.getReqMinHAdvance() * scale;
-		prefHAdvance = box.getReqPrefHAdvance() * scale;
-		reqHeight = box.getReqHeight() * scale;
-		reqVSpacing = box.getReqVSpacing() * scale;
-		refY = box.getReqRefY() * scale;
+		minWidth = xform.scale( box.getReqMinWidth() );
+		prefWidth = xform.scale( box.getReqPrefWidth() );
+		minHAdvance = xform.scale( box.getReqMinHAdvance() );
+		prefHAdvance = xform.scale( box.getReqPrefHAdvance() );
+		reqHeight = xform.scale( box.getReqHeight() );
+		reqVSpacing = xform.scale( box.getReqVSpacing() );
+		refY = xform.scale( box.getReqRefY() );
 
 		flags = 0;
 		setFlag( FLAG_LINEBREAK, box.isReqLineBreak() );
@@ -354,9 +356,9 @@ public class LReqBox implements LReqBoxInterface
 		return new LReqBox( this );
 	}
 	
-	public LReqBox scaledRequisition(double scale)
+	public LReqBoxInterface transformedRequisition(Xform2 xform)
 	{
-		return new LReqBox( this, scale );
+		return new LReqBox( this, xform );
 	}
 	
 	

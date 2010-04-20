@@ -15,7 +15,6 @@ import java.util.HashMap;
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPBox;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPViewport;
 import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;

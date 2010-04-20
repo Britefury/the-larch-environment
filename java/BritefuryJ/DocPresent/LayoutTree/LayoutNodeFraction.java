@@ -8,8 +8,8 @@ package BritefuryJ.DocPresent.LayoutTree;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPFraction;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPFraction;
 import BritefuryJ.DocPresent.ElementFilter;
 import BritefuryJ.DocPresent.Layout.FractionLayout;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
@@ -17,6 +17,7 @@ import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
 import BritefuryJ.DocPresent.StyleParams.FractionStyleParams;
 import BritefuryJ.Math.Point2;
+import BritefuryJ.Math.Xform2;
 
 public class LayoutNodeFraction extends ArrangedLayoutNode
 {
@@ -58,9 +59,14 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 	}
 	
 	
-	private static double getChildScale()
+	private static Xform2 getScriptChildXform()
 	{
-		return DPFraction.getChildScale();
+		return DPFraction.getScriptChildXform();
+	}
+	
+	public static Xform2 getInverseScriptChildXform()
+	{
+		return DPFraction.getInverseScriptChildXform();
 	}
 	
 
@@ -68,7 +74,6 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 	{
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPFraction frac = (DPFraction)element;
-		double childScale = getChildScale();
 		
 		LReqBoxInterface boxes[] = new LReqBoxInterface[NUMCHILDREN];
 		for (int i = 0; i < NUMCHILDREN; i++)
@@ -76,7 +81,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 			DPElement child = frac.getWrappedChild( i );
 			if ( i != BAR )
 			{
-				boxes[i] = child != null  ?  child.getLayoutNode().refreshRequisitionX().scaledRequisition( childScale )  :  null;
+				boxes[i] = child != null  ?  child.getLayoutNode().refreshRequisitionX().transformedRequisition( getScriptChildXform() )  :  null;
 			}
 			else
 			{
@@ -91,7 +96,6 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 	{
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPFraction frac = (DPFraction)element;
-		double childScale = getChildScale();
 		
 		LReqBoxInterface boxes[] = new LReqBoxInterface[NUMCHILDREN];
 		for (int i = 0; i < NUMCHILDREN; i++)
@@ -99,7 +103,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 			DPElement child = frac.getWrappedChild( i );
 			if ( i != BAR )
 			{
-				boxes[i] = child != null  ?  child.getLayoutNode().refreshRequisitionY().scaledRequisition( childScale )  :  null;
+				boxes[i] = child != null  ?  child.getLayoutNode().refreshRequisitionY().transformedRequisition( getScriptChildXform() )  :  null;
 			}
 			else
 			{
@@ -118,7 +122,6 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 		
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPFraction frac = (DPFraction)element;
-		double childScale = getChildScale();
 		
 		LReqBoxInterface reqBoxes[] = new LReqBoxInterface[NUMCHILDREN];
 		LAllocBoxInterface allocBoxes[] = new LAllocBoxInterface[NUMCHILDREN];
@@ -128,7 +131,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 			DPElement child = frac.getWrappedChild( i );
 			if ( i != BAR )
 			{
-				reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox().scaledRequisition( childScale )  :  null;
+				reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox().transformedRequisition( getScriptChildXform() )  :  null;
 			}
 			else
 			{
@@ -150,7 +153,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 			{
 				if ( i != BAR )
 				{
-					allocBoxes[i].scaleAllocationX( 1.0 / childScale );
+					allocBoxes[i].transformAllocationX( getInverseScriptChildXform() );
 				}
 				child.getLayoutNode().refreshAllocationX( prevChildWidths[i] );
 			}
@@ -164,7 +167,6 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 		
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		DPFraction frac = (DPFraction)element;
-		double childScale = getChildScale();
 		
 		LReqBoxInterface reqBoxes[] = new LReqBoxInterface[NUMCHILDREN];
 		LAllocBoxInterface allocBoxes[] = new LAllocBoxInterface[NUMCHILDREN];
@@ -174,7 +176,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 			DPElement child = frac.getWrappedChild( i );
 			if ( i != BAR )
 			{
-				reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox().scaledRequisition( childScale )  :  null;
+				reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox().transformedRequisition( getScriptChildXform() )  :  null;
 			}
 			else
 			{
@@ -196,7 +198,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 			{
 				if ( i != BAR )
 				{
-					allocBoxes[i].scaleAllocationY( 1.0 / childScale );
+					allocBoxes[i].transformAllocationY( getInverseScriptChildXform() );
 				}
 				child.getLayoutNode().refreshAllocationY( prevChildAllocVs[i] );
 			}
