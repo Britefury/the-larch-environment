@@ -373,8 +373,8 @@ class Python25EditHandler (EditHandler):
 				
 			commonRoot = path0[0]
 				
-			presArea = startStmtElement.getPresentationArea()
-			stream = presArea.getLinearRepresentationInSelection( selection )
+			rootElement = startStmtElement.getRootElement()
+			stream = rootElement.getLinearRepresentationInSelection( selection )
 			
 			builder = ItemStreamBuilder()
 			for item in stream.getItems():
@@ -403,7 +403,7 @@ class Python25EditHandler (EditHandler):
 		
 		
 	def importData(self, caret, selection, dataTransfer):					# -> bool,   dataTransfer <- DataTransfer
-		if not self.canImport( dataTransfer ):
+		if not self.canImport( caret, selection, dataTransfer ):
 			return False
 		try:
 			data = dataTransfer.getTransferData( _python25BufferDataFlavor )
@@ -414,7 +414,7 @@ class Python25EditHandler (EditHandler):
 		
 		# Paste
 		if not selection.isEmpty():
-			self.replaceSelection( data )
+			self.replaceSelection( selection, data )
 			return True
 		else:
 			caretMarker = caret.getMarker()

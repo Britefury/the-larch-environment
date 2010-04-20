@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
@@ -150,7 +151,7 @@ public class DPImage extends DPContentLeaf
 		{
 			boolean bUseHover = testFlag( FLAG_HOVER )  ?  hoverImage != null  :  false;
 			
-			BufferedImage img = bUseHover  ?  hoverImage  :  image;
+			Image img = bUseHover  ?  hoverImage  :  image;
 			double sX = bUseHover  ?  hoverImageScaleX  :  imageScaleX;
 			double sY = bUseHover  ?  hoverImageScaleY  :  imageScaleY;
 

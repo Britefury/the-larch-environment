@@ -99,7 +99,7 @@ def getStatementContextFromElement(element):
 
 def getParentStatementContext(ctx):
 	ctx = ctx.getParent()
-	while ctx is not None  and  not isStmt( ctx.getDocNode() )  and  not ctx.getDocNode().isInstanceOf( Schema.PythonModule ):
+	while ctx is not None  and  not isStmt( ctx.getDocNode() )  and  not isPythonModule( ctx.getDocNode() ):
 		ctx = ctx.getParent()
 	return ctx
 

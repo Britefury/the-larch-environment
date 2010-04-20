@@ -162,7 +162,7 @@ class ProjectEditorStyleSheet (StyleSheet):
 		
 		def _onRename(actionEvent):
 			textEntry = controlsStyle.textEntry( pageName, _onRenameAccept, _onRenameCancel )
-			box.setChild( textEntry.getElement() )
+			box.setChildren( [ textEntry.getElement() ] )
 			textEntry.grabCaret()
 		
 		def _pageContextMenuFactory(menu):
