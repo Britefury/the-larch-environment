@@ -179,9 +179,9 @@ class TerminalViewerStyleSheet (StyleSheet):
 		if stderr is not None:
 			blockContents.append( stdErrStyle.border( self._textLines( 'STDERR:', stderr, stdErrStyle ).alignHExpand() ).alignHExpand() )
 		if caughtException is not None:
-			blockContents.append( exceptionBorderStyle.border( self._exception( 'EXCEPTION:', caughtException ) ).alignHExpand() )
+			blockContents.append( exceptionBorderStyle.border( self._exception( 'EXCEPTION:', PrimitiveStyleSheet.instance.paragraph( [ caughtException ] ) ) ).alignHExpand() )
 		if result is not None:
-			resultBox = PrimitiveStyleSheet.instance.vbox( [ result ] )
+			resultBox = PrimitiveStyleSheet.instance.paragraph( [ result ] )
 			blockContents.append( resultBorderStyle.border( resultBox.alignHExpand() ).alignHExpand() )
 		blockVBox = blockStyle.vbox( blockContents ).alignHExpand()
 		return blockStyle.border( blockVBox ).alignHExpand()

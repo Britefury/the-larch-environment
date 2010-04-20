@@ -138,7 +138,7 @@ class AppView (GSymViewObjectDispatch):
 				document.setDocumentName( documentName )
 				location = world.addNewDocument( document )
 				
-				appDoc = Application.AppDocument( name, location )
+				appDoc = Application.AppDocument( documentName, location )
 				node.addOpenDocument( appDoc )
 
 				
