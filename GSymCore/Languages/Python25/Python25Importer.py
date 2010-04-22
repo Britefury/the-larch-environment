@@ -441,7 +441,7 @@ class _StmtImporter (_Importer):
 	
 	# Exec
 	def Exec(self, node):
-		return Schema.ExecStmt( source=_expr( node.body ), locals=_expr( node.locals ), globals=_expr( node.globals ) )
+		return Schema.ExecStmt( source=_expr( node.body ), globals=_expr( node.globals ), locals=_expr( node.locals ) )
 	
 	
 	# Print
@@ -1133,8 +1133,8 @@ class ImporterTestCase (unittest.TestCase):
 		
 	def testExecStmt(self):
 		self._stmtTest( 'exec a', Schema.ExecStmt( source=Schema.Load( name='a' ), locals=None, globals=None ) )
-		self._stmtTest( 'exec a in b', Schema.ExecStmt( source=Schema.Load( name='a' ), locals=None, globals=Schema.Load( name='b' ) ) )
-		self._stmtTest( 'exec a in b,c', Schema.ExecStmt( source=Schema.Load( name='a' ), locals=Schema.Load( name='c' ), globals=Schema.Load( name='b' ) ) )
+		self._stmtTest( 'exec a in b', Schema.ExecStmt( source=Schema.Load( name='a' ), globals=Schema.Load( name='b' ), locals=None ) )
+		self._stmtTest( 'exec a in b,c', Schema.ExecStmt( source=Schema.Load( name='a' ), globals=Schema.Load( name='b' ), locals=Schema.Load( name='c' ) ) )
 		
 		
 	def testPrintnl(self):

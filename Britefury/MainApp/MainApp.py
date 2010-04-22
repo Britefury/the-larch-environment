@@ -60,23 +60,6 @@ _bProfile = True
 
 
 
-class GSymScriptEnvironment (object):
-	def __init__(self, app):
-		self._app = app
-
-
-	def _p_getApp(self):
-		return self._app
-
-	app = property( _p_getApp, doc=_( 'The gSym app (a Britefury.MainApp.MainApp)' ) )
-
-	__doc__ = _( """gSym Scripting Environment
-	GSymScriptEnvironment(app) -> scripting environment with @app as the app""" )
-
-
-	
-	
-	
 def _action(name, f):
 	class Act (AbstractAction):
 		def actionPerformed(action, event):
@@ -256,17 +239,10 @@ class MainApp (AppControlInterface):
 		
 		
 		
-		# SCRIPT MENU
-		
-		scriptMenu = JMenu( 'Script' )
-		scriptMenu.add( _action( _( 'Script window' ), self._onScriptWindowMenuItem ) )
-		
-		
 		menuBar = JMenuBar();
 		menuBar.add( newMenu )
 		menuBar.add( editMenu )
 		menuBar.add( viewMenu )
-		menuBar.add( scriptMenu )
 
 		
 		
@@ -293,29 +269,6 @@ class MainApp (AppControlInterface):
 		self._onCommandHistoryChanged( None )
 		
 		
-		#
-		# Script window
-		#
-		scriptBanner = _( "gSym scripting console (uses pyconsole by Yevgen Muntyan)\nPython %s\nType help(object) for help on an object\nThe gSym scripting environment is available via the local variable 'gsym'\n" ) % ( sys.version, )
-		self._scriptEnv = GSymScriptEnvironment( self )
-		#self._scriptConsole = Console( locals = { 'gsym' : self._scriptEnv }, banner=scriptBanner, use_rlcompleter=False )
-		#self._scriptConsole.connect( 'command', self._p_onScriptPreCommand )
-		#self._scriptConsole.connect_after( 'command', self._p_onScriptPostCommand )
-		#self._scriptConsole.show()
-
-		#self._scriptScrolledWindow = gtk.ScrolledWindow()
-		#self._scriptScrolledWindow.set_policy( gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC )
-		#self._scriptScrolledWindow.add( self._scriptConsole )
-		#self._scriptScrolledWindow.set_size_request( 640, 480 )
-		#self._scriptScrolledWindow.show()
-
-		#self._scriptWindow = gtk.Window( gtk.WINDOW_TOPLEVEL )
-		#self._scriptWindow.set_transient_for( self._window )
-		#self._scriptWindow.add( self._scriptScrolledWindow )
-		#self._scriptWindow.connect( 'delete-event', self._p_onScriptWindowDelete )
-		#self._scriptWindow.set_title( _( 'gSym Script Window' ) )
-		self._bScriptWindowVisible = False
-
 		
 
 	
@@ -492,15 +445,10 @@ class MainApp (AppControlInterface):
 	
 	
 	def _onShowElementTreeExplorer(self):
-		self._browser.createTreeExplorer()
-
-
-	def _onScriptWindowMenuItem(self):
-		self._bScriptWindowVisible = not self._bScriptWindowVisible
-		if self._bScriptWindowVisible:
-			self._scriptWindow.show()
-		else:
-			self._scriptWindow.hide()
+		currentTab = self._browser.getCurrentBrowser()
+		element = currentTab.getContentsElement()
+		location = self._browserContext.getLocationForObject( element )
+		self._browser.openLocationInNewWindow( location )
 
 
 	def _onReset(self):

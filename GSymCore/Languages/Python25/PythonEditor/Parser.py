@@ -871,18 +871,18 @@ class Python25Grammar (Grammar):
 		return ( Keyword( execKeyword )  +  self.orOp() + Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.ExecStmt( source=xs[1], locals=None, globals=None ) )
 
 	@Rule
-	def execCodeInLocalsStmt(self):
+	def execCodeInGlobalsStmt(self):
 		return ( Keyword( execKeyword )  +  self.orOp()  +  Keyword( inKeyword )  +  self.expression() + Literal( '\n' ) ).action(
-			lambda input, begin, end, xs, bindings: Schema.ExecStmt( source=xs[1], locals=xs[3], globals=None ) )
+			lambda input, begin, end, xs, bindings: Schema.ExecStmt( source=xs[1], globals=xs[3], locals=None ) )
 
 	@Rule
 	def execCodeInLocalsAndGlobalsStmt(self):
 		return ( Keyword( execKeyword )  +  self.orOp()  +  Keyword( inKeyword )  +  self.expression()  +  ','  +  self.expression() + Literal( '\n' ) ).action(
-			lambda input, begin, end, xs, bindings: Schema.ExecStmt( source=xs[1], locals=xs[3], globals=xs[5] ) )
+			lambda input, begin, end, xs, bindings: Schema.ExecStmt( source=xs[1], globals=xs[3], locals=xs[5] ) )
 
 	@Rule
 	def execStmt(self):
-		return self.execCodeInLocalsAndGlobalsStmt() | self.execCodeInLocalsStmt() | self.execCodeStmt()
+		return self.execCodeInLocalsAndGlobalsStmt() | self.execCodeInGlobalsStmt() | self.execCodeStmt()
 	
 	
 	
@@ -1701,9 +1701,9 @@ class TestCase_Python25Parser (ParserTestCase):
 
 	def testExecStmt(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.singleLineStatementValid(), 'exec a\n', Schema.ExecStmt( source=Schema.Load( name='a' ), locals=None, globals=None ) )
-		self._parseStringTest( g.singleLineStatementValid(), 'exec a in b\n', Schema.ExecStmt( source=Schema.Load( name='a' ), locals=Schema.Load( name='b' ), globals=None ) )
-		self._parseStringTest( g.singleLineStatementValid(), 'exec a in b,c\n', Schema.ExecStmt( source=Schema.Load( name='a' ), locals=Schema.Load( name='b' ), globals=Schema.Load( name='c' ) ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'exec a\n', Schema.ExecStmt( source=Schema.Load( name='a' ), globals=None, locals=None ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'exec a in b\n', Schema.ExecStmt( source=Schema.Load( name='a' ), globals=Schema.Load( name='b' ), locals=None ) )
+		self._parseStringTest( g.singleLineStatementValid(), 'exec a in b,c\n', Schema.ExecStmt( source=Schema.Load( name='a' ), globals=Schema.Load( name='b' ), locals=Schema.Load( name='c' ) ) )
 
 
 		

@@ -21,11 +21,12 @@ import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocView.DVNode;
 import BritefuryJ.GSym.GSymPerspective;
 import BritefuryJ.GSym.GSymSubject;
+import BritefuryJ.GSym.ObjectView.PresentationStateListener;
 import BritefuryJ.Incremental.IncrementalFunction;
 import BritefuryJ.Incremental.IncrementalValue;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 
-public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext, FragmentContext
+public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext, FragmentContext, PresentationStateListener
 {
 	private static final PrimitiveStyleSheet viewError_textStyle = PrimitiveStyleSheet.instance.withFont( new Font( "SansSerif", Font.BOLD, 12 ) ).withForeground( new Color( 0.8f, 0.0f, 0.0f ) );
 	private static final PrimitiveStyleSheet viewNull_textStyle = PrimitiveStyleSheet.instance.withFont( new Font( "SansSerif", Font.ITALIC | Font.BOLD, 12 ) ).withForeground( new Color( 0.8f, 0.0f, 0.4f ) );
@@ -420,5 +421,11 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 	public GSymFragmentViewContext getLastChild()
 	{
 		return getNextSiblingFromChildElement( this, getViewNodeElement() );
+	}
+	
+	
+	public void onPresentationStateChanged(Object x)
+	{
+		queueRefresh();
 	}
 }

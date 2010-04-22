@@ -843,15 +843,15 @@ class PythonEditorStyleSheet (StyleSheet):
 
 
 
-	def execStmt(self, source, locals, globals):
+	def execStmt(self, source, globals, locals):
 		primitiveStyle = self['primitiveStyle']
 		punctuationStyle = self._punctuationStyle()
 
 		elements = [ self._keyword( 'exec' ),  primitiveStyle.text( ' ' ),  source ]
-		if locals is not None:
-			elements.extend( [ primitiveStyle.text( ' ' ),  self._keyword( 'in' ),  primitiveStyle.text( ' ' ),  primitiveStyle.lineBreak(),  locals ] )
 		if globals is not None:
-			elements.extend( [ punctuationStyle.text( ',' ),  primitiveStyle.text( ' ' ),  primitiveStyle.lineBreak(),  globals ] )
+			elements.extend( [ primitiveStyle.text( ' ' ),  self._keyword( 'in' ),  primitiveStyle.text( ' ' ),  primitiveStyle.lineBreak(),  globals ] )
+		if locals is not None:
+			elements.extend( [ punctuationStyle.text( ',' ),  primitiveStyle.text( ' ' ),  primitiveStyle.lineBreak(),  locals ] )
 		return primitiveStyle.span( elements )
 
 

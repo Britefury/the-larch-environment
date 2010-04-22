@@ -146,7 +146,7 @@ YieldStmt = schema.newClass( 'YieldStmt', SimpleStmt, [ 'value' ] )
 RaiseStmt = schema.newClass( 'RaiseStmt', SimpleStmt, [ 'excType', 'excValue', 'traceback' ] )
 BreakStmt = schema.newClass( 'BreakStmt', SimpleStmt, [] )
 ContinueStmt = schema.newClass( 'ContinueStmt', SimpleStmt, [] )
-ExecStmt = schema.newClass( 'ExecStmt', SimpleStmt, [ 'source', 'locals', 'globals' ] )
+ExecStmt = schema.newClass( 'ExecStmt', SimpleStmt, [ 'source', 'globals', 'locals' ] )
 PrintStmt = schema.newClass( 'PrintStmt', SimpleStmt, [ 'destination', 'values' ] )
 # Import
 RelativeModule = schema.newClass( 'RelativeModule', Node, [ 'name' ] )

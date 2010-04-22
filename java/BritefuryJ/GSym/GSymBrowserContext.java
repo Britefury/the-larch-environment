@@ -42,8 +42,8 @@ public class GSymBrowserContext
 	{
 		public DPElement createViewFragment(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
 		{
-			String location = (String)x;
-			return resolveErrorStyleSheet.staticText( "<<Could not resolve " + location + ">>" );
+			Location location = (Location)x;
+			return resolveErrorStyleSheet.staticText( "<<Could not resolve " + location.getLocationString() + ">>" );
 		}
 	}
 	

@@ -260,7 +260,7 @@ class Python25EditHandler (EditHandler):
 			
 			
 	def deleteSelection(self, selection):
-		self.replaceSelection( None )
+		self.replaceSelection( selection, None )
 	
 	
 	def replaceSelection(self, selection, replacement):

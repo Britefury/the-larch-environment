@@ -506,12 +506,12 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 	# Exec statement
 	@ObjectNodeDispatchMethod( Schema.ExecStmt )
-	def ExecStmt(self, node, source, locals, globals):
+	def ExecStmt(self, node, source, globals, locals):
 		txt = 'exec '  +  self( source )
-		if locals is not None:
-			txt += ' in '  +  self( locals )
 		if globals is not None:
-			txt += ', '  +  self( globals )
+			txt += ' in '  +  self( globals )
+		if locals is not None:
+			txt += ', '  +  self( locals )
 		return txt
 	
 	
@@ -877,7 +877,7 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 	
 	
 	def test_exprStmt(self):
-		self._testSX( '(py exprStmt expr=(py Load name=x))', 'x' )
+		self._testSX( '(py ExprStmt expr=(py Load name=x))', 'x' )
 		
 		
 	def test_assertStmt(self):
@@ -948,9 +948,9 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		
 		
 	def test_ExecStmt(self):
-		self._testSX( '(py ExecStmt source=(py Load name=a) locals=`null` globals=`null`)', 'exec a' )
-		self._testSX( '(py ExecStmt source=(py Load name=a) locals=(py Load name=b) globals=`null`)', 'exec a in b' )
-		self._testSX( '(py ExecStmt source=(py Load name=a) locals=(py Load name=b) globals=(py Load name=c))', 'exec a in b, c' )
+		self._testSX( '(py ExecStmt source=(py Load name=a) globals=`null` locals=`null`)', 'exec a' )
+		self._testSX( '(py ExecStmt source=(py Load name=a) globals=(py Load name=b) locals=`null`)', 'exec a in b' )
+		self._testSX( '(py ExecStmt source=(py Load name=a) globals=(py Load name=b) locals=(py Load name=c))', 'exec a in b, c' )
 		
 		
 	def test_PrintStmt(self):
