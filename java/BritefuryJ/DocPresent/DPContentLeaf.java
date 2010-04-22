@@ -313,7 +313,7 @@ public abstract class DPContentLeaf extends DPElement
 	
 	protected Border getDebugPresentationHeaderBorder()
 	{
-		Caret caret = rootElement.getCaret();
+		Caret caret = rootElement != null  ?  rootElement.getCaret()  :  null;
 		if ( caret != null )
 		{
 			DPContentLeaf e = caret.getMarker().getElement();
