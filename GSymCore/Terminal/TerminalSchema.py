@@ -45,7 +45,6 @@ class Terminal (IncrementalOwner):
 		
 		self._blocks = []
 		self._currentPythonModule = Python25.py25NewModule()
-		self._localVars = {}
 		self._globalVars = {}
 		
 		
@@ -104,13 +103,13 @@ class Terminal (IncrementalOwner):
 					print 'Code generation error'
 					execSource = None
 					evalSource = None
-				
+			
 				if execSource is not None  and  evalSource is not None:
 					caughtException = None
 					stdout, stderr = self._initStdOutErr()
 					try:
-						exec execSource in self._localVars, self._globalVars
-						result = [ eval( evalSource, self._globalVars, self._localVars ) ]
+						exec execSource in self._globalVars
+						result = [ eval( evalSource, self._globalVars ) ]
 					except Exception, exc:
 						caughtException = exc
 						result = None
@@ -129,7 +128,7 @@ class Terminal (IncrementalOwner):
 			caughtException = None
 			stdout, stderr = self._initStdOutErr()
 			try:
-				exec source in self._localVars, self._globalVars
+				exec source in self._globalVars
 			except Exception, exc:
 				caughtException = exc
 			outout, outerr = self._shutdownStdOurErr( stdout, stderr )

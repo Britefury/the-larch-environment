@@ -261,11 +261,6 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	}
 	
 	
-	public void createTreeExplorer()
-	{
-		currentBrowser.createTreeExplorer();
-	}
-
 	public void viewportReset()
 	{
 		currentBrowser.viewportReset();

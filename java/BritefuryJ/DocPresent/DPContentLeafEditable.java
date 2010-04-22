@@ -94,22 +94,14 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	{
 		super.onCaretEnter( c );
 		
-		DPBorder border = getMetaHeaderBorderElement(); 
-		if ( border != null )
-		{
-			border.setBorder( metaHeaderHighlightBorder );
-		}
+		onDebugPresentationStateChanged();
 	}
 	
 	protected void onCaretLeave(Caret c)
 	{
 		super.onCaretLeave( c );
 		
-		DPBorder border = getMetaHeaderBorderElement(); 
-		if ( border != null )
-		{
-			border.setBorder( metaHeaderEmptyBorder );
-		}
+		onDebugPresentationStateChanged();
 	}
 	
 	

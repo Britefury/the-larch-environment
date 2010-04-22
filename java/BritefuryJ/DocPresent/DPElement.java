@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.WeakHashMap;
 
+import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
@@ -50,6 +51,10 @@ import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueStream;
 import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
 import BritefuryJ.DocPresent.StyleParams.HBoxStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.GSym.ObjectView.Presentable;
+import BritefuryJ.GSym.ObjectView.PresentationStateListenerList;
+import BritefuryJ.GSym.View.GSymFragmentViewContext;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -62,7 +67,7 @@ import BritefuryJ.Utils.HashUtils;
 
 
 
-abstract public class DPElement extends PointerInputElement
+abstract public class DPElement extends PointerInputElement implements Presentable
 {
 	protected static double NON_TYPESET_CHILD_BASELINE_OFFSET = -5.0;
 	
@@ -108,6 +113,32 @@ abstract public class DPElement extends PointerInputElement
 		static final long serialVersionUID = 0L;
 	}
 	
+	
+	
+	//
+	//
+	// PRESENTABLE
+	//
+	//
+	
+	private static class ElementPresentable implements Presentable
+	{
+		private DPElement element;
+		
+		
+		protected ElementPresentable(DPElement element)
+		{
+			this.element = element;
+		}
+
+
+		@Override
+		public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+		{
+			return element;
+		}
+	}
+
 	
 	
 	//
@@ -268,7 +299,7 @@ abstract public class DPElement extends PointerInputElement
 	
 	private InteractionFields interactionFields;
 
-	protected DPElement metaElement;
+	protected PresentationStateListenerList debugPresStateListeners = null;
 	protected String debugName; 
 	
 	protected StructuralRepresentation structuralRepresentation;
@@ -2800,134 +2831,6 @@ abstract public class DPElement extends PointerInputElement
 	
 	
 	
-	
-	//
-	// Meta-element
-	//
-	
-	protected static TextStyleParams headerDebugTextStyle = new TextStyleParams( null, null, null, true, new Font( "Sans serif", Font.BOLD, 14 ), new Color( 0.0f, 0.5f, 0.5f ), null, null, false );
-	protected static TextStyleParams headerDescriptionTextStyle = new TextStyleParams( null, null, null, true, new Font( "Sans serif", Font.PLAIN, 14 ), new Color( 0.0f, 0.0f, 0.75f ), null, null, false );
-	protected static HBoxStyleParams metaHeaderHBoxStyle = new HBoxStyleParams( null, null, null, 10.0 );
-	protected static FilledBorder metaHeaderEmptyBorder = new FilledBorder();
-
-
-	public DPElement createMetaHeaderData()
-	{
-		return null;
-	}
-	
-	public DPElement createMetaHeaderDebug()
-	{
-		if ( debugName != null )
-		{
-			return new DPText( headerDebugTextStyle, "<" + debugName + ">" );
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	public DPElement createMetaDescription()
-	{
-		String description = toString();
-		description = description.replace( "BritefuryJ.DocPresent.", "" );
-		return new DPText( headerDescriptionTextStyle, description );
-	}
-	
-	protected Border getMetaHeaderBorder()
-	{
-		return metaHeaderEmptyBorder;
-	}
-	
-	public DPElement createMetaHeader()
-	{
-		DPHBox hbox = new DPHBox( metaHeaderHBoxStyle );
-		DPElement data = createMetaHeaderData();
-		DPElement debug = createMetaHeaderDebug();
-		DPElement descr = createMetaDescription();
-		if ( data != null )
-		{
-			hbox.append( data );
-		}
-		if ( debug != null )
-		{
-			hbox.append( debug );
-		}
-		hbox.append( descr );
-		
-
-		DPBorder border = new DPBorder( getMetaHeaderBorder() );
-		border.setChild( hbox );
-		return border;
-	}
-	
-	public DPBorder getMetaHeaderBorderElement()
-	{
-		if ( metaElement != null )
-		{
-			DPBox bin = (DPBox)metaElement;
-			return (DPBorder)bin.getChild();
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	public void refreshMetaHeader()
-	{
-		if ( metaElement != null )
-		{
-			DPBorder border = getMetaHeaderBorderElement();
-			DPHBox hbox = (DPHBox)border.getChild();
-			
-			DPElement data = createMetaHeaderData();
-			DPElement debug = createMetaHeaderDebug();
-			DPElement descr = createMetaDescription();
-			hbox.clear();
-			
-			if ( data != null )
-			{
-				hbox.append( data );
-			}
-			if ( debug != null )
-			{
-				hbox.append( debug );
-			}
-			hbox.append( descr );
-		}
-	}
-
-	public DPElement createMetaElement()
-	{
-		DPBox bin = new DPBox( );
-		bin.setChild( createMetaHeader() );
-		return bin;
-	}
-	
-	public DPElement initialiseMetaElement()
-	{
-		if ( metaElement == null )
-		{
-			metaElement = createMetaElement();
-		}
-		return metaElement;
-	}
-	
-	public void shutdownMetaElement()
-	{
-		metaElement = null;
-	}
-	
-	public DPElement getMetaElement()
-	{
-		return metaElement;
-	}
-	
-	
-	
-	
 	public void setDebugName(String debugName)
 	{
 		this.debugName = debugName;
@@ -2944,5 +2847,96 @@ abstract public class DPElement extends PointerInputElement
 	public ElementStyleParams getStyleParams()
 	{
 		return styleParams;
+	}
+	
+	
+	
+	
+	
+	//
+	// Meta-element
+	//
+	
+	protected static TextStyleParams headerDebugTextStyle = new TextStyleParams( null, null, null, true, new Font( "Sans serif", Font.BOLD, 14 ), new Color( 0.0f, 0.5f, 0.5f ), null, null, false );
+	protected static TextStyleParams headerDescriptionTextStyle = new TextStyleParams( null, null, null, true, new Font( "Sans serif", Font.PLAIN, 14 ), new Color( 0.0f, 0.0f, 0.75f ), null, null, false );
+	protected static HBoxStyleParams metaHeaderHBoxStyle = new HBoxStyleParams( null, null, null, 10.0 );
+	protected static FilledBorder metaHeaderEmptyBorder = new FilledBorder();
+
+
+	public DPElement createDebugPresentationHeaderData()
+	{
+		return null;
+	}
+	
+	public DPElement createDebugPresentationHeaderDebug()
+	{
+		if ( debugName != null )
+		{
+			return new DPText( headerDebugTextStyle, "<" + debugName + ">" );
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	public DPElement createDebugPresentationDescription()
+	{
+		String description = toString();
+		description = description.replace( "BritefuryJ.DocPresent.", "" );
+		return new DPText( headerDescriptionTextStyle, description );
+	}
+	
+	protected Border getDebugPresentationHeaderBorder()
+	{
+		return metaHeaderEmptyBorder;
+	}
+	
+	public DPElement createDebugPresentationHeader()
+	{
+		DPHBox hbox = new DPHBox( metaHeaderHBoxStyle );
+		DPElement data = createDebugPresentationHeaderData();
+		DPElement debug = createDebugPresentationHeaderDebug();
+		DPElement descr = createDebugPresentationDescription();
+		if ( data != null )
+		{
+			hbox.append( data );
+		}
+		if ( debug != null )
+		{
+			hbox.append( debug );
+		}
+		hbox.append( descr );
+		
+
+		DPBorder border = new DPBorder( getDebugPresentationHeaderBorder() );
+		border.setChild( hbox );
+		return border;
+	}
+	
+	public DPElement createMetaElement(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+	{
+		DPBox bin = new DPBox( );
+		bin.setChild( createDebugPresentationHeader() );
+		return bin;
+	}
+	
+	public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+	{
+		debugPresStateListeners = PresentationStateListenerList.addListener( debugPresStateListeners, ctx );
+		return createMetaElement( ctx, styleSheet, state );
+	}
+	
+	protected void onDebugPresentationStateChanged()
+	{
+		debugPresStateListeners = PresentationStateListenerList.onPresentationStateChanged( debugPresStateListeners, this );
+	}
+	
+	
+	
+	// Element presentable
+	public Presentable presentable()
+	{
+		return new ElementPresentable( this );
 	}
 }

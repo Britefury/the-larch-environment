@@ -12,6 +12,7 @@ import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
 
+import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
@@ -19,6 +20,8 @@ import BritefuryJ.DocPresent.LayoutTree.BranchLayoutNode;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.GSym.View.GSymFragmentViewContext;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Xform2;
@@ -109,7 +112,7 @@ public abstract class DPContainer extends DPElement
 	protected void onChildListModified()
 	{
 		onSubtreeStructureChanged();
-		refreshMetaElement();
+		onDebugPresentationStateChanged();
 		
 		BranchLayoutNode branchLayout = (BranchLayoutNode)getValidLayoutNodeOfClass( BranchLayoutNode.class );
 		if ( branchLayout != null )
@@ -963,27 +966,14 @@ public abstract class DPContainer extends DPElement
 	static FilledBorder metaIndentBorder = new FilledBorder( 25.0, 0.0, 0.0, 0.0 );
 	static VBoxStyleParams metaVBoxStyle = new VBoxStyleParams( null, null, null, 0.0 );
 	
-	public DPBorder getMetaHeaderBorderElement()
-	{
-		if ( metaElement != null )
-		{
-			DPVBox metaVBox = (DPVBox)metaElement;
-			return (DPBorder)metaVBox.get( 0 );
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	public DPElement createMetaElement()
+	public DPElement createMetaElement(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
 	{
 		DPVBox metaChildrenVBox = new DPVBox( metaVBoxStyle );
 		for (DPElement child: getChildren())
 		{
 			if ( child != null )
 			{
-				DPElement metaChild = child.initialiseMetaElement();
+				DPElement metaChild = ctx.presentFragmentWithDefaultPerspective( child, state ); 
 				metaChildrenVBox.append( metaChild );
 			}
 			else
@@ -997,40 +987,9 @@ public abstract class DPContainer extends DPElement
 		indentMetaChildren.setChild( metaChildrenVBox );
 		
 		DPVBox metaVBox = new DPVBox( metaVBoxStyle );
-		metaVBox.append( createMetaHeader() );
+		metaVBox.append( createDebugPresentationHeader() );
 		metaVBox.append( indentMetaChildren );
 		
 		return metaVBox;
-	}
-	
-	public void refreshMetaElement()
-	{
-		if ( metaElement != null )
-		{
-			DPVBox metaVBox = (DPVBox)metaElement;
-			
-			DPBorder indentMetaChildren = (DPBorder)metaVBox.get( 1 );
-			DPVBox metaChildrenVBox = (DPVBox)indentMetaChildren.getChild();
-
-			ArrayList<DPElement> childMetaElements = new ArrayList<DPElement>();
-			for (DPElement child: getChildren())
-			{
-				DPElement metaChild = child.initialiseMetaElement();
-				childMetaElements.add( metaChild );
-			}
-			metaChildrenVBox.setChildren( childMetaElements );
-		}
-	}
-
-	public void shutdownMetaElement()
-	{
-		if ( metaElement != null )
-		{
-			for (DPElement child: getChildren())
-			{
-				child.shutdownMetaElement();
-			}
-		}
-		super.shutdownMetaElement();
 	}
 }

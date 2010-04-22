@@ -949,11 +949,11 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Exec statement
 	@ObjectNodeDispatchMethod( Schema.ExecStmt )
-	def ExecStmt(self, ctx, styleSheet, state, node, source, locals, globals):
+	def ExecStmt(self, ctx, styleSheet, state, node, source, globals, locals):
 		sourceView = ctx.presentFragment( source, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.orOp() ) )
-		localsView = ctx.presentFragment( locals, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )   if locals is not None   else None
 		globalsView = ctx.presentFragment( globals, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )    if globals is not None   else None
-		view = styleSheet.execStmt( sourceView, localsView, globalsView )
+		localsView = ctx.presentFragment( locals, styleSheet.withPythonState( PRECEDENCE_STMT, self._parser.expression() ) )   if locals is not None   else None
+		view = styleSheet.execStmt( sourceView, globalsView, localsView )
 		return statementNodeEditor( styleSheet, node,
 		                            view )
 

@@ -59,7 +59,6 @@ import BritefuryJ.DocPresent.Selection.SelectionListener;
 import BritefuryJ.DocPresent.Selection.SelectionManager;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.DocPresent.TreeExplorer.ElementTreeExplorer;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Logging.LogEntry;
@@ -276,7 +275,6 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		
 		protected PresentationComponent metaElementComponent;
-		protected ElementTreeExplorer explorer;
 		
 			
 		protected PageController pageController;
@@ -1379,49 +1377,6 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				return null;
 			}
 		}
-		
-		
-		
-		
-		//
-		//
-		// META-TREE METHODS
-		//
-		//
-
-		public PresentationComponent initialiseMetaTree()
-		{
-			if ( metaElementComponent == null )
-			{
-				metaElementComponent = new PresentationComponent();
-				DPViewport viewport = new DPViewport( 0.0, 0.0 );
-				viewport.setChild( initialiseMetaElement() );
-				metaElementComponent.getRootElement().setChild( viewport.alignHExpand().alignVExpand() );
-			}
-			
-			return metaElementComponent;
-		}
-		
-		public void shutdownMetaTree()
-		{
-			if ( metaElementComponent != null )
-			{
-				shutdownMetaElement();
-				metaElementComponent = null;
-			}
-		}
-		
-		
-		
-		
-		public ElementTreeExplorer createTreeExplorer()
-		{
-			if ( explorer == null  ||  !explorer.isVisible() )
-			{
-				explorer = new ElementTreeExplorer( this );
-			}
-			return explorer;
-		}
 	}
 
 	
@@ -1481,13 +1436,6 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	{
 		return rootElement.getChild();
 	}
-	
-	
-	public ElementTreeExplorer createTreeExplorer()
-	{
-		return rootElement.createTreeExplorer();
-	}
-	
 	
 	
 	public void paint(Graphics g)

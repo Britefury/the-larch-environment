@@ -28,6 +28,7 @@ import javax.swing.TransferHandler;
 
 import BritefuryJ.CommandHistory.CommandHistoryController;
 import BritefuryJ.CommandHistory.CommandHistoryListener;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.DPViewport;
 import BritefuryJ.DocPresent.PageController;
@@ -138,6 +139,11 @@ public class Browser implements DPViewport.ViewportListener
 		return page.getTitle();
 	}
 	
+	public DPElement getContentsElement()
+	{
+		return viewport.getChild();
+	}
+	
 	
 	
 	public Location getLocation()
@@ -193,11 +199,6 @@ public class Browser implements DPViewport.ViewportListener
 		resolve();
 	}
 	
-	
-	public void createTreeExplorer()
-	{
-		presComponent.createTreeExplorer();
-	}
 	
 	public void viewportReset()
 	{

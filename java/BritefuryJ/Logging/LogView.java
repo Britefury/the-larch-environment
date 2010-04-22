@@ -15,16 +15,16 @@ import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.GSym.ObjectView.ObjectViewContextList;
+import BritefuryJ.GSym.ObjectView.PresentationStateListenerList;
 import BritefuryJ.GSym.ObjectView.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 
-public class LogView implements Presentable, ObjectViewContextList.ContextListListener
+public class LogView implements Presentable
 {
 	private Log log;
 	private LogFilterFn filterFn;
 	private List<LogEntry> visibleEntries = new ArrayList<LogEntry>();
-	private ObjectViewContextList objectViewContexts = new ObjectViewContextList();
+	private PresentationStateListenerList stateListeners = null;
 	
 	
 	public LogView(Log log)
@@ -68,10 +68,7 @@ public class LogView implements Presentable, ObjectViewContextList.ContextListLi
 	
 	private void onModified()
 	{
-		if ( objectViewContexts != null )
-		{
-			objectViewContexts.queueRefresh();
-		}
+		stateListeners = PresentationStateListenerList.onPresentationStateChanged( stateListeners, this );
 	}
 
 
@@ -79,11 +76,7 @@ public class LogView implements Presentable, ObjectViewContextList.ContextListLi
 
 	public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
 	{
-		if ( objectViewContexts == null )
-		{
-			objectViewContexts = new ObjectViewContextList( this );
-		}
-		objectViewContexts.addContext( ctx );
+		stateListeners = PresentationStateListenerList.addListener( stateListeners, ctx );
 		
 		DPElement entryElements[] = new DPElement[visibleEntries.size()+1];
 		entryElements[0] = titleStyle.staticText( log.getTitle() ).pad( 0.0, 20.0 ).alignHCentre();
@@ -98,11 +91,5 @@ public class LogView implements Presentable, ObjectViewContextList.ContextListLi
 
 
 
-	public void onObjectViewContextListEmpty()
-	{
-		objectViewContexts = null;
-	}
-	
-	
 	static PrimitiveStyleSheet titleStyle = PrimitiveStyleSheet.instance.withFont( new Font( "Serif", Font.BOLD, 28 ) );
 }
