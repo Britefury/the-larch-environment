@@ -25,14 +25,28 @@ public class BrowserContext
 	
 	public BrowserContext()
 	{
-		this.resolvers.add( SystemLocationResolver.getSystemResolver() );
 	}
 	
 	public BrowserContext(List<LocationResolver> resolvers)
 	{
-		this();
 		this.resolvers.addAll( resolvers );
 	}
+	
+	
+	
+	public static BrowserContext browserContextWithSystemPages()
+	{
+		return new BrowserContext( Arrays.asList( new LocationResolver[] { SystemLocationResolver.getSystemResolver() } ) );
+	}
+	
+	public static BrowserContext browserContextWithSystemPages(List<LocationResolver> resolvers)
+	{
+		ArrayList<LocationResolver> rs = new ArrayList<LocationResolver>();
+		rs.add( SystemLocationResolver.getSystemResolver() );
+		rs.addAll( resolvers );
+		return new BrowserContext( rs );
+	}
+	
 	
 	
 	protected void addResolvers(List<LocationResolver> resolvers)

@@ -20,12 +20,14 @@ import BritefuryJ.DocPresent.Browser.BrowserContext;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.LocationResolver;
 import BritefuryJ.DocPresent.Browser.Page;
+import BritefuryJ.DocPresent.Browser.SystemPages.SystemLocationResolver;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.DefaultPerspective.GSymDefaultPerspective;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
+import BritefuryJ.GSym.View.GSymViewContext;
 import BritefuryJ.GSym.View.GSymViewFragmentFunction;
 
 public class GSymBrowserContext
@@ -93,6 +95,100 @@ public class GSymBrowserContext
 	
 	
 	
+	private static class SystemPageFragmentViewFn implements GSymViewFragmentFunction
+	{
+		public DPElement createViewFragment(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+		{
+			Page p = (Page)x;
+			return p.getContentsElement();
+		}
+	}
+	
+	private static class SystemPagePerspective implements GSymPerspective
+	{
+		private static SystemPageFragmentViewFn fragmentViewFn = new SystemPageFragmentViewFn();
+		private LocationResolver systemLocationResolver;
+		
+		public SystemPagePerspective(LocationResolver systemLocationResolver)
+		{
+			this.systemLocationResolver = systemLocationResolver;
+		}
+		
+		@Override
+		public EditHandler getEditHandler()
+		{
+			return null;
+		}
+
+		@Override
+		public GSymViewFragmentFunction getFragmentViewFunction()
+		{
+			return fragmentViewFn;
+		}
+
+		@Override
+		public StyleSheet getStyleSheet()
+		{
+			return PrimitiveStyleSheet.instance;
+		}
+		
+		@Override
+		public AttributeTable getInitialState()
+		{
+			return AttributeTable.instance;
+		}
+		
+		@Override
+		public GSymSubject resolveLocation(GSymSubject enclosingSubject, Location.TokenIterator relativeLocation)
+		{
+			Location location = new Location( relativeLocation.getSuffix() );
+			Page p = systemLocationResolver.resolveLocationAsPage( location );
+			if ( p != null )
+			{
+				return new GSymSubject( p, this, p.getTitle(), AttributeTable.instance );
+			}
+			else
+			{
+				return null;
+			}
+		}
+	}
+	
+	private class SystemPageLocationResolver implements GSymLocationResolver
+	{
+		private SystemPagePerspective perspective;
+		
+		
+		public SystemPageLocationResolver(LocationResolver systemLocationResolver)
+		{
+			this.perspective = new SystemPagePerspective( systemLocationResolver );
+		}
+		
+		
+		@Override
+		public Page resolveLocationAsPage(Location location)
+		{
+			GSymSubject subject = perspective.resolveLocation( null, location.iterator() );
+			if ( subject != null )
+			{
+				GSymViewContext viewContext = new GSymViewContext( subject, GSymBrowserContext.this, null );
+				return viewContext.getPage();
+			}
+			else
+			{
+				return null;
+			}
+		}
+
+		@Override
+		public GSymSubject resolveLocationAsSubject(Location location)
+		{
+			return perspective.resolveLocation( null, location.iterator() );
+		}
+	}
+	
+	
+	
 	private class GSymBrowserContextLocationResolver implements LocationResolver
 	{
 		public Page resolveLocationAsPage(Location location)
@@ -108,20 +204,29 @@ public class GSymBrowserContext
 	
 	
 	
-	public GSymBrowserContext()
+	public GSymBrowserContext(boolean bWithSystemPages)
 	{
 		super();
 		defaultPerspective = new GSymDefaultPerspective( this );
+		if ( bWithSystemPages )
+		{
+			addResolvers( Arrays.asList( new GSymLocationResolver[] { new SystemPageLocationResolver( SystemLocationResolver.getSystemResolver() ) } ) );
+		}
 		addResolvers( Arrays.asList( new GSymLocationResolver[] { defaultPerspective.getLocationResolver() } ) );
 	}
 	
-	public GSymBrowserContext(List<GSymLocationResolver> resolvers)
+	public GSymBrowserContext(boolean bWithSystemPages, List<GSymLocationResolver> resolvers)
 	{
 		super();
 		defaultPerspective = new GSymDefaultPerspective( this );
+		if ( bWithSystemPages )
+		{
+			addResolvers( Arrays.asList( new GSymLocationResolver[] { new SystemPageLocationResolver( SystemLocationResolver.getSystemResolver() ) } ) );
+		}
 		addResolvers( Arrays.asList( new GSymLocationResolver[] { defaultPerspective.getLocationResolver() } ) );
 		addResolvers( resolvers );
 	}
+	
 	
 	
 	
