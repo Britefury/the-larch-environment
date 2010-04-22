@@ -97,6 +97,7 @@ class GSymWorld (object):
 		
 	def addNewDocument(self, document):
 		location = 'Doc%03d'  %  self._documentIDCounter
+		self._documentIDCounter += 1
 		if location in self._locationToDocument:
 			raise KeyError
 		else:
