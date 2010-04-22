@@ -131,8 +131,8 @@ class _AppLocationResolver (GSymLocationResolver):
 
 		
 class _MainAppBrowserContext (GSymBrowserContext):
-	def __init__(self, app, *args):
-		super( _MainAppBrowserContext, self ).__init__( *args )
+	def __init__(self, app, bWithSystemPages, resolvers=[]):
+		super( _MainAppBrowserContext, self ).__init__( bWithSystemPages, resolvers )
 		self.app = app
 		
 
@@ -144,7 +144,7 @@ class MainApp (AppControlInterface):
 		
 		if _app is None:
 			self._resolver = _AppLocationResolver( self )
-			self._browserContext = _MainAppBrowserContext( self, [ self._resolver ] )
+			self._browserContext = _MainAppBrowserContext( self, True, [ self._resolver ] )
 		else:
 			self._resolver = _app._resolver
 			self._browserContext = _app._browserContext

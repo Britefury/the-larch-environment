@@ -26,7 +26,7 @@ public class SystemLocationResolver implements LocationResolver
 	private boolean bInitialised;
 	
 	
-	private SystemLocationResolver()
+	public SystemLocationResolver()
 	{
 		bInitialised = false;
 	}

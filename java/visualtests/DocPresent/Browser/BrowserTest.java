@@ -33,7 +33,7 @@ public class BrowserTest implements TabbedBrowser.TabbedBrowserListener
 		JFrame frame = new JFrame( "Browser test" );
 		frame.setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
 		
-		TabbedBrowser browser = new TabbedBrowser( new BrowserContext(), this, location );
+		TabbedBrowser browser = new TabbedBrowser( BrowserContext.browserContextWithSystemPages(), this, location );
 		browser.getComponent().setPreferredSize( new Dimension( 800, 600 ) );
 		frame.add( browser.getComponent() );
 		frame.pack();
