@@ -10,31 +10,30 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Paint;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
+import java.awt.Shape;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPBorder;
+import BritefuryJ.DocPresent.DPBox;
 import BritefuryJ.DocPresent.DPCanvas;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPFraction;
-import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.DPGridRow;
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPHiddenContent;
 import BritefuryJ.DocPresent.DPImage;
 import BritefuryJ.DocPresent.DPLineBreak;
+import BritefuryJ.DocPresent.DPLineBreakCostSpan;
 import BritefuryJ.DocPresent.DPMathRoot;
 import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPParagraphDedentMarker;
 import BritefuryJ.DocPresent.DPParagraphIndentMarker;
-import BritefuryJ.DocPresent.DPLineBreakCostSpan;
 import BritefuryJ.DocPresent.DPProxy;
 import BritefuryJ.DocPresent.DPRGrid;
-import BritefuryJ.DocPresent.DPBox;
+import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.DPScript;
 import BritefuryJ.DocPresent.DPSegment;
 import BritefuryJ.DocPresent.DPShape;
@@ -44,7 +43,6 @@ import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPViewport;
 import BritefuryJ.DocPresent.DPWhitespace;
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Canvas.DrawingNode;
@@ -934,32 +932,37 @@ public class PrimitiveStyleSheet extends StyleSheet
 	
 	public DPShape rectangle(double x, double y, double w, double h)
 	{
-		return new DPShape( getShapeParams(), "", new Rectangle2D.Double( x, y, w, h ) );
+		return new DPShape( getShapeParams(), "", DPShape.rectangle( x, y, w, h ) );
 	}
 	
 	public DPShape rectangle(Point2 pos, Vector2 size)
 	{
-		return new DPShape( getShapeParams(), "", new Rectangle2D.Double( pos.x, pos.y, size.x, size.y ) );
+		return new DPShape( getShapeParams(), "", DPShape.rectangle( pos, size ) );
 	}
 	
 	public DPShape roundRectangle(double x, double y, double w, double h, double roundingX, double roundingY)
 	{
-		return new DPShape( getShapeParams(), "", new RoundRectangle2D.Double( x, y, w, h, roundingX, roundingY ) );
+		return new DPShape( getShapeParams(), "", DPShape.roundRectangle( x, y, w, h, roundingX, roundingY ) );
 	}
 	
 	public DPShape roundRectangle(Point2 pos, Vector2 size, Vector2 rounding)
 	{
-		return new DPShape( getShapeParams(), "", new RoundRectangle2D.Double( pos.x, pos.y, size.x, size.y, rounding.x, rounding.y ) );
+		return new DPShape( getShapeParams(), "", DPShape.roundRectangle( pos, size, rounding ) );
 	}
 	
-	public DPShape ellipse(double x, double y, double rx, double ry)
+	public DPShape ellipse(double x, double y, double w, double h)
 	{
-		return new DPShape( getShapeParams(), "", new Ellipse2D.Double( x, y, rx, ry ) );
+		return new DPShape( getShapeParams(), "", DPShape.ellipse( x, y, w, h ) );
 	}
 	
-	public DPShape ellipse(Point2 pos, Vector2 radius)
+	public DPShape ellipse(Point2 pos, Vector2 size)
 	{
-		return new DPShape( getShapeParams(), "", new Ellipse2D.Double( pos.x, pos.y, radius.x, radius.y ) );
+		return new DPShape( getShapeParams(), "", DPShape.ellipse( pos, size ) );
+	}
+	
+	public DPShape shape(Shape shape)
+	{
+		return new DPShape( getShapeParams(), "", shape );
 	}
 	
 	

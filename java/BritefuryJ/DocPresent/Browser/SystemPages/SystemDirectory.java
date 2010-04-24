@@ -42,6 +42,7 @@ public class SystemDirectory
 
 		controlTestPages.add( new ButtonTestPage() );
 		controlTestPages.add( new HyperlinkTestPage() );
+		controlTestPages.add( new ScrollBarTestPage() );
 		controlTestPages.add( new TextEntryTestPage() );
 	}
 	

@@ -68,10 +68,32 @@ public class Vector2 implements Cloneable
 		return new Vector2( x*s, y*s );
 	}
 	
+	public double dot(Vector2 v)
+	{
+		return x * v.x  +  y * v.y;
+	}
 	
 	public Vector2 negate()
 	{
 		return new Vector2( -x, -y );
+	}
+	
+	
+	public double sqrLength()
+	{
+		return dot( this );
+	}
+	
+	public double length()
+	{
+		return Math.sqrt( sqrLength() );
+	}
+	
+	
+	public Vector2 getNormalised()
+	{
+		double oneOverLength = 1.0 / length();
+		return mul( oneOverLength );
 	}
 	
 	

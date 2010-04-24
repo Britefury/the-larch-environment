@@ -73,7 +73,14 @@ public class VerticalLayout
 				reqY = reqAdvance + spacing;
 			}
 			
-			box.setRequisitionY( reqHeight, reqAdvance - reqHeight, refY );
+			if ( refPointIndex == -1 )
+			{
+				box.setRequisitionY( reqHeight, reqAdvance - reqHeight );
+			}
+			else
+			{
+				box.setRequisitionY( reqHeight, reqAdvance - reqHeight, refY );
+			}
 		}
 	}
 
@@ -90,6 +97,59 @@ public class VerticalLayout
 
 	
 	
+	
+	public static void allocateSpaceY(LReqBoxInterface box, LReqBoxInterface children[], LAllocBoxInterface allocBox, LAllocBoxInterface childrenAlloc[], int childAllocationFlags[])
+	{
+		int numExpand = 0;
+		
+		// Count the number of children that should expand to use additional space
+		if ( children.length > 0 )
+		{
+			for (int flags: childAllocationFlags)
+			{
+				VAlignment alignment = ElementAlignment.getVAlignment( flags );
+				if ( alignment == VAlignment.EXPAND  ||  alignment == VAlignment.REFY_EXPAND )
+				{
+					numExpand++;
+				}
+			}
+		}
+
+		double allocBoxAllocationY = allocBox.getAllocationY();
+
+		if ( allocBoxAllocationY <= box.getReqHeight() * LReqBox.ONE_PLUS_EPSILON  ||  numExpand == 0 )			// if allocation <= required   or   numExpand == 0
+		{
+			// Allocate children their preferred width
+			for (int i = 0; i < children.length; i++)
+			{
+				LReqBoxInterface child = children[i];
+				LAllocBoxInterface childAlloc = childrenAlloc[i];
+				LAllocHelper.allocateChildHeightAsRequisition( childAlloc, child );
+			}
+		}
+		else
+		{
+			// Allocate children their preferred size, plus any extra to those for which the expand flag is set
+			double totalExpand = allocBoxAllocationY - box.getReqHeight();
+			double expandPerChild = numExpand > 0  ?  totalExpand / (double)numExpand  :  0.0;
+			
+			
+			for (int i = 0; i < children.length; i++)
+			{
+				LReqBoxInterface child = children[i];
+				LAllocBoxInterface childAlloc = childrenAlloc[i];
+				VAlignment alignment = ElementAlignment.getVAlignment( childAllocationFlags[i] );
+				if ( alignment == VAlignment.EXPAND  ||  alignment == VAlignment.REFY_EXPAND )
+				{
+					LAllocHelper.allocateChildHeightPaddedRequisition( childAlloc, child, child.getReqHeight() + expandPerChild );
+				}
+				else
+				{
+					LAllocHelper.allocateChildHeightAsRequisition( childAlloc, child );
+				}
+			}
+		}
+	}
 	
 	public static boolean allocateSpaceY(LReqBoxInterface box, LReqBoxInterface children[], LAllocBoxInterface allocBox, LAllocBoxInterface childrenAlloc[], int childAllocationFlags[], int refPointIndex)
 	{
@@ -173,7 +233,7 @@ public class VerticalLayout
 				}
 			}
 			
-			return numExpandBeforeRef > 0.0;
+			return numExpandBeforeRef > 0.0  &&  refPointIndex != -1;
 		}
 	}
 	
@@ -187,16 +247,23 @@ public class VerticalLayout
 		
 		// There should be at least the specified amount of spacing between each child, or the child's own h-spacing if it is greater
 
-		boolean bExpandBeforeRefPoint = allocateSpaceY( box, children, allocBox, childrenAlloc, childAllocationFlags, refPointIndex );
-		
 		double size = 0.0;
 		double pos = 0.0;
-
-		if ( !bExpandBeforeRefPoint )
+		if ( refPointIndex == -1 )
 		{
-			// No expansion before ref point
-			double offsetY = Math.max( allocBox.getAllocRefY() - box.getReqRefY(),  0.0 );
-			pos += offsetY;
+			allocateSpaceY( box, children, allocBox, childrenAlloc, childAllocationFlags );
+		}
+		else
+		{
+			boolean bExpandBeforeRefPoint = allocateSpaceY( box, children, allocBox, childrenAlloc, childAllocationFlags, refPointIndex );
+
+			if ( !bExpandBeforeRefPoint )
+			{
+				// No expansion before ref point
+				double offsetY = Math.max( allocBox.getAllocRefY() - box.getReqRefY(),  0.0 );
+				pos += offsetY;
+			}
+			
 		}
 		
 		for (int i = 0; i < children.length; i++)

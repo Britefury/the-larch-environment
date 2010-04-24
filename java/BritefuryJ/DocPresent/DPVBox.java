@@ -19,7 +19,7 @@ public class DPVBox extends DPAbstractBox
 	}
 	
 	
-	private int refPointIndex;
+	private int refPointIndex = -1;
 	
 
 	
