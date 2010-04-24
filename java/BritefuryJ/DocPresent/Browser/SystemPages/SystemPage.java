@@ -57,7 +57,7 @@ public abstract class SystemPage extends Page
 		}
 		pageChildren.add( createContents().alignHExpand() );
 		
-		return styleSheet.withVBoxSpacing( 40.0 ).vbox( pageChildren );
+		return styleSheet.withVBoxSpacing( 40.0 ).vbox( pageChildren ).alignHExpand();
 	}
 
 

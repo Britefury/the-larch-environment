@@ -281,8 +281,9 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	protected final static int FLAG_ALLOCATION_UP_TO_DATE = 0x4;
 	protected final static int FLAG_CARET_GRABBED = 0x8;
 	protected final static int FLAG_HOVER = 0x10;
+	protected final static int FLAG_ENSURE_VISIBLE_QUEUED = 0x20;
 
-	protected final static int _ALIGN_SHIFT = 5;
+	protected final static int _ALIGN_SHIFT = 6;
 	protected final static int _ALIGN_MASK = ElementAlignment._ELEMENTALIGN_MASK  <<  _ALIGN_SHIFT;
 	protected final static int _HALIGN_MASK = ElementAlignment._HALIGN_MASK  <<  _ALIGN_SHIFT;
 	protected final static int _VALIGN_MASK = ElementAlignment._VALIGN_MASK  <<  _ALIGN_SHIFT;
@@ -820,6 +821,33 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	protected void popGraphicsTransform(Graphics2D graphics, AffineTransform x)
 	{
 		graphics.setTransform( x );
+	}
+	
+	
+	
+	protected void ensureRegionVisible(AABox2 box)
+	{
+		if ( parent != null )
+		{
+			parent.ensureRegionVisible( getLocalToParentXform().transform( box ) );
+		}
+	}
+	
+	public void ensureVisibleImpl()
+	{
+		ensureRegionVisible( getLocalAABox() );
+	}
+	
+	public void ensureVisible()
+	{
+		if ( isRealised() )
+		{
+			ensureVisibleImpl();
+		}
+		else
+		{
+			setFlag( FLAG_ENSURE_VISIBLE_QUEUED );
+		}
 	}
 	
 	
@@ -1382,6 +1410,12 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	{
 		setFlagRealised();
 		onRealise();
+		if ( testFlag( FLAG_ENSURE_VISIBLE_QUEUED ) )
+		{
+			System.out.println( "DPElement.handleRealise: ensure visible queued" );
+			clearFlag( FLAG_ENSURE_VISIBLE_QUEUED );
+			ensureVisibleImpl();
+		}
 	}
 	
 	protected void handleUnrealise(DPElement unrealiseRoot)

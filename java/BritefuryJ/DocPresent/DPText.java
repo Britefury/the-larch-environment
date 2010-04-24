@@ -189,19 +189,6 @@ public class DPText extends DPContentLeafEditable
 		popGraphicsTransform( graphics, current );
 	}
 
-	public void drawCaretAtStart(Graphics2D graphics)
-	{
-		AffineTransform current = pushGraphicsTransform( graphics );
-		visual.drawCaretAtStart( graphics );
-		popGraphicsTransform( graphics, current );
-	}
-
-	public void drawCaretAtEnd(Graphics2D graphics)
-	{
-		AffineTransform current = pushGraphicsTransform( graphics );
-		visual.drawCaretAtEnd( graphics );
-		popGraphicsTransform( graphics, current );
-	}
 
 
 

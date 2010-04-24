@@ -86,8 +86,6 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	//
 	
 	public abstract void drawCaret(Graphics2D graphics, Caret c);
-	public abstract void drawCaretAtStart(Graphics2D graphics);
-	public abstract void drawCaretAtEnd(Graphics2D graphics);
 	
 	
 	protected void onCaretEnter(Caret c)

@@ -37,23 +37,23 @@ public class AlignmentTestPage extends SystemPage
 		PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
 		PrimitiveStyleSheet textStyleSheet = styleSheet.withBackground( new FilledOutlinePainter( new Color( 1.0f, 1.0f, 0.7f ), new Color( 1.0f, 1.0f, 0.0f ) ) );
 		
-		DPBorder halignLeft = styleSheet.border( textStyleSheet.text( "hAlign=LEFT" ).alignHLeft() );
-		DPBorder halignCentre = styleSheet.border( textStyleSheet.text( "hAlign=CENTRE" ).alignHCentre() );
-		DPBorder halignRight = styleSheet.border( textStyleSheet.text( "hAlign=RIGHT" ).alignHRight() );
-		DPBorder halignExpand = styleSheet.border( textStyleSheet.text( "hAlign=EXPAND" ).alignHExpand() );
+		DPBorder halignLeft = styleSheet.border( textStyleSheet.staticText( "hAlign=LEFT" ).alignHLeft() );
+		DPBorder halignCentre = styleSheet.border( textStyleSheet.staticText( "hAlign=CENTRE" ).alignHCentre() );
+		DPBorder halignRight = styleSheet.border( textStyleSheet.staticText( "hAlign=RIGHT" ).alignHRight() );
+		DPBorder halignExpand = styleSheet.border( textStyleSheet.staticText( "hAlign=EXPAND" ).alignHExpand() );
 		
 		
-		DPElement refVBox = styleSheet.vbox( Arrays.asList( new DPElement[] { styleSheet.text( "0" ), styleSheet.text( "1 (ref-y)" ), styleSheet.text( "2" ),
-						styleSheet.text( "3" ), styleSheet.text( "4" ), styleSheet.text( "5" ) } ), 1 );
+		DPElement refVBox = styleSheet.vbox( Arrays.asList( new DPElement[] { styleSheet.staticText( "0" ), styleSheet.staticText( "1 (ref-y)" ), styleSheet.staticText( "2" ),
+						styleSheet.staticText( "3" ), styleSheet.staticText( "4" ), styleSheet.staticText( "5" ) } ), 1 );
 		DPElement refBox = styleSheet.withBackground( new FilledOutlinePainter( new Color( 0.8f, 0.85f, 1.0f ), new Color( 0.0f, 0.25f, 1.0f ) ) ).box( refVBox.pad( 5.0, 5.0 ) );
 		
 
-		DPBorder valignBaselines = styleSheet.border( textStyleSheet.text( "vAlign=REFY" ).alignVRefY() );
-		DPBorder valignBaselinesExpand = styleSheet.border( textStyleSheet.text( "vAlign=REFY_EXPAND" ).alignVRefYExpand() );
-		DPBorder valignTop = styleSheet.border( textStyleSheet.text( "vAlign=TOP" ).alignVTop() );
-		DPBorder valignCentre = styleSheet.border( textStyleSheet.text( "vAlign=CENTRE" ).alignVCentre() );
-		DPBorder valignBottom = styleSheet.border( textStyleSheet.text( "vAlign=BOTTOM" ).alignVBottom() );
-		DPBorder valignExpand = styleSheet.border( textStyleSheet.text( "vAlign=EXPAND" ).alignVExpand() );
+		DPBorder valignBaselines = styleSheet.border( textStyleSheet.staticText( "vAlign=REFY" ).alignVRefY() );
+		DPBorder valignBaselinesExpand = styleSheet.border( textStyleSheet.staticText( "vAlign=REFY_EXPAND" ).alignVRefYExpand() );
+		DPBorder valignTop = styleSheet.border( textStyleSheet.staticText( "vAlign=TOP" ).alignVTop() );
+		DPBorder valignCentre = styleSheet.border( textStyleSheet.staticText( "vAlign=CENTRE" ).alignVCentre() );
+		DPBorder valignBottom = styleSheet.border( textStyleSheet.staticText( "vAlign=BOTTOM" ).alignVBottom() );
+		DPBorder valignExpand = styleSheet.border( textStyleSheet.staticText( "vAlign=EXPAND" ).alignVExpand() );
 
 		
 		DPElement vAlignBox = styleSheet.withHBoxSpacing( 10.0 ).hbox( Arrays.asList( new DPElement[] { valignBaselines.alignVRefYExpand(), valignBaselinesExpand.alignVRefYExpand(),

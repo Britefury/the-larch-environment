@@ -81,6 +81,23 @@ public class DPFraction extends DPContainer
 		//
 		//
 		
+		private void drawCaretAtStart(Graphics2D graphics)
+		{
+			double allocationY = getAllocationY();
+			AffineTransform current = pushGraphicsTransform( graphics );
+			graphics.draw( new Line2D.Double( 0.0, -2.0, 0.0, allocationY + 2.0 ) );
+			popGraphicsTransform( graphics, current );
+		}
+
+		private void drawCaretAtEnd(Graphics2D graphics)
+		{
+			double allocationX = getAllocationX();
+			double allocationY = getAllocationY();
+			AffineTransform current = pushGraphicsTransform( graphics );
+			graphics.draw( new Line2D.Double( allocationX, -2.0, allocationX, allocationY + 2.0 ) );
+			popGraphicsTransform( graphics, current );
+		}
+
 		public void drawCaret(Graphics2D graphics, Caret c)
 		{
 			int index = c.getMarker().getIndex();
@@ -94,24 +111,6 @@ public class DPFraction extends DPContainer
 				drawCaretAtEnd( graphics );
 			}
 		}
-
-		public void drawCaretAtStart(Graphics2D graphics)
-		{
-			double allocationY = getAllocationY();
-			AffineTransform current = pushGraphicsTransform( graphics );
-			graphics.draw( new Line2D.Double( 0.0, -2.0, 0.0, allocationY + 2.0 ) );
-			popGraphicsTransform( graphics, current );
-		}
-
-		public void drawCaretAtEnd(Graphics2D graphics)
-		{
-			double allocationX = getAllocationX();
-			double allocationY = getAllocationY();
-			AffineTransform current = pushGraphicsTransform( graphics );
-			graphics.draw( new Line2D.Double( allocationX, -2.0, allocationX, allocationY + 2.0 ) );
-			popGraphicsTransform( graphics, current );
-		}
-
 		
 		
 		//

@@ -40,7 +40,7 @@ public class HBoxTestPage extends SystemPage
 	protected DPElement makeText(String text, int size)
 	{
 		PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance.withFont( new Font( "Sans serif", Font.BOLD, size ) );
-		return outlineStyleSheet.border( styleSheet.text( text ) );
+		return outlineStyleSheet.border( styleSheet.staticText( text ) );
 	}
 	
 	

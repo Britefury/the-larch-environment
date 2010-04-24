@@ -38,7 +38,7 @@ public class MathRootTestPage extends SystemPage
 	
 	private DPElement makeFraction(String numeratorText, String denominatorText)
 	{
-		return styleSheet.fraction( textStyleSheet.text( numeratorText ), textStyleSheet.text( denominatorText ), "/" );
+		return styleSheet.fraction( textStyleSheet.staticText( numeratorText ), textStyleSheet.staticText( denominatorText ), "/" );
 	}
 
 	
@@ -46,8 +46,8 @@ public class MathRootTestPage extends SystemPage
 	{
 		ArrayList<DPElement> children = new ArrayList<DPElement>( );
 		
-		children.add( rootStyleSheet.mathRoot( textStyleSheet.text( "a" ) ) );
-		children.add( rootStyleSheet.mathRoot( textStyleSheet.text( "a+p" ) ) );
+		children.add( rootStyleSheet.mathRoot( textStyleSheet.staticText( "a" ) ) );
+		children.add( rootStyleSheet.mathRoot( textStyleSheet.staticText( "a+p" ) ) );
 		children.add( rootStyleSheet.mathRoot( makeFraction( "a", "p+q" ) ) );
 		
 		return styleSheet.vbox( children );
