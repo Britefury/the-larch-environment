@@ -32,7 +32,7 @@ public class HyperlinkTestPage extends SystemPage
 	
 	protected String getDescription()
 	{
-		return "Hyperlink element: used to take the browser to a different location, or perform an action";
+		return "Hyperlink control: used to take the browser to a different location, or perform an action";
 	}
 	
 	
