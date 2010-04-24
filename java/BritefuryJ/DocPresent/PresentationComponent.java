@@ -244,7 +244,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 
 	
 	
-	public static class RootElement extends DPBox implements CaretListener, SelectionListener, PointerDndController
+	public static class RootElement extends DPBin implements CaretListener, SelectionListener, PointerDndController
 	{
 		private PresentationComponent component;
 		

@@ -10,11 +10,14 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Paint;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPBox;
+import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPCanvas;
 import BritefuryJ.DocPresent.DPFraction;
@@ -31,9 +34,10 @@ import BritefuryJ.DocPresent.DPParagraphIndentMarker;
 import BritefuryJ.DocPresent.DPLineBreakCostSpan;
 import BritefuryJ.DocPresent.DPProxy;
 import BritefuryJ.DocPresent.DPRGrid;
-import BritefuryJ.DocPresent.DPRectangle;
+import BritefuryJ.DocPresent.DPBox;
 import BritefuryJ.DocPresent.DPScript;
 import BritefuryJ.DocPresent.DPSegment;
+import BritefuryJ.DocPresent.DPShape;
 import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.DPTable;
 import BritefuryJ.DocPresent.DPText;
@@ -59,6 +63,8 @@ import BritefuryJ.DocPresent.StyleParams.ShapeStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
+import BritefuryJ.Math.Point2;
+import BritefuryJ.Math.Vector2;
 
 public class PrimitiveStyleSheet extends StyleSheet
 {
@@ -610,11 +616,11 @@ public class PrimitiveStyleSheet extends StyleSheet
 
 	
 	
-	public DPBox box(DPElement child)
+	public DPBin bin(DPElement child)
 	{
-		DPBox box = new DPBox( getContainerParams() );
-		box.setChild( child );
-		return box;
+		DPBin bin = new DPBin( getContainerParams() );
+		bin.setChild( child );
+		return bin;
 	}
 	
 	public DPBorder border(DPElement child)
@@ -658,68 +664,6 @@ public class PrimitiveStyleSheet extends StyleSheet
 		return new DPHiddenContent( textRepresentation );
 	}
 
-	
-	
-	public DPImage image(BufferedImage image, double imageWidth, double imageHeight)
-	{
-		return new DPImage( getContentLeafStyleParams(), "", image, null, imageWidth, imageHeight );
-	}
-	
-	public DPImage image(BufferedImage image, BufferedImage hoverImage, double imageWidth, double imageHeight)
-	{
-		return new DPImage( getContentLeafStyleParams(), "", image, hoverImage, imageWidth, imageHeight );
-	}
-	
-	public DPImage image(BufferedImage image)
-	{
-		return new DPImage( getContentLeafStyleParams(), "", image, null );
-	}
-	
-	public DPImage image(BufferedImage image, BufferedImage hoverImage)
-	{
-		return new DPImage( getContentLeafStyleParams(), "", image, hoverImage );
-	}
-	
-	public DPImage image(File imageFile, double imageWidth, double imageHeight)
-	{
-		return new DPImage( getContentLeafStyleParams(), "", imageFile, null, imageWidth, imageHeight );
-	}
-	
-	public DPImage image(File imageFile, File hoverImageFile, double imageWidth, double imageHeight)
-	{
-		return new DPImage( getContentLeafStyleParams(), "", imageFile, hoverImageFile, imageWidth, imageHeight );
-	}
-	
-	public DPImage image(File imageFile)
-	{
-		return new DPImage( getContentLeafStyleParams(), "", imageFile, null );
-	}
-	
-	public DPImage image(File imageFile, File hoverImageFile)
-	{
-		return new DPImage( getContentLeafStyleParams(), "", imageFile, hoverImageFile );
-	}
-	
-	public DPImage image(String imageFilename, double imageWidth, double imageHeight)
-	{
-		return new DPImage( getContentLeafStyleParams(), "", imageFilename, null, imageWidth, imageHeight );
-	}
-	
-	public DPImage image(String imageFilename, String hoverImageFilename, double imageWidth, double imageHeight)
-	{
-		return new DPImage( getContentLeafStyleParams(), "", imageFilename, hoverImageFilename, imageWidth, imageHeight );
-	}
-	
-	public DPImage image(String imageFilename)
-	{
-		return new DPImage( getContentLeafStyleParams(), "", imageFilename, null );
-	}
-	
-	public DPImage image(String imageFilename, String hoverImageFilename)
-	{
-		return new DPImage( getContentLeafStyleParams(), "", imageFilename, hoverImageFilename );
-	}
-	
 	
 	
 	public DPMathRoot mathRoot(DPElement child)
@@ -776,12 +720,6 @@ public class PrimitiveStyleSheet extends StyleSheet
 		return new DPParagraphDedentMarker();
 	}
 	
-	
-	public DPRectangle rectangle(double minWidth, double minHeight)
-	{
-		return new DPRectangle( getShapeParams(), "", minWidth, minHeight );
-	}
-
 	
 	public DPRegion region(DPElement child)
 	{
@@ -913,6 +851,118 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 	
 	
+	public DPWhitespace whitespace(String txt, double width)
+	{
+		return new DPWhitespace( getContentLeafStyleParams(), txt, width );
+	}
+
+	public DPWhitespace whitespace(String txt)
+	{
+		return new DPWhitespace( getContentLeafStyleParams(), txt, 0.0 );
+	}
+
+
+
+
+	public DPImage image(BufferedImage image, double imageWidth, double imageHeight)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", image, null, imageWidth, imageHeight );
+	}
+	
+	public DPImage image(BufferedImage image, BufferedImage hoverImage, double imageWidth, double imageHeight)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", image, hoverImage, imageWidth, imageHeight );
+	}
+	
+	public DPImage image(BufferedImage image)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", image, null );
+	}
+	
+	public DPImage image(BufferedImage image, BufferedImage hoverImage)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", image, hoverImage );
+	}
+	
+	public DPImage image(File imageFile, double imageWidth, double imageHeight)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", imageFile, null, imageWidth, imageHeight );
+	}
+	
+	public DPImage image(File imageFile, File hoverImageFile, double imageWidth, double imageHeight)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", imageFile, hoverImageFile, imageWidth, imageHeight );
+	}
+	
+	public DPImage image(File imageFile)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", imageFile, null );
+	}
+	
+	public DPImage image(File imageFile, File hoverImageFile)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", imageFile, hoverImageFile );
+	}
+	
+	public DPImage image(String imageFilename, double imageWidth, double imageHeight)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", imageFilename, null, imageWidth, imageHeight );
+	}
+	
+	public DPImage image(String imageFilename, String hoverImageFilename, double imageWidth, double imageHeight)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", imageFilename, hoverImageFilename, imageWidth, imageHeight );
+	}
+	
+	public DPImage image(String imageFilename)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", imageFilename, null );
+	}
+	
+	public DPImage image(String imageFilename, String hoverImageFilename)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", imageFilename, hoverImageFilename );
+	}
+	
+	
+	
+	public DPBox box(double minWidth, double minHeight)
+	{
+		return new DPBox( getShapeParams(), "", minWidth, minHeight );
+	}
+
+	
+	public DPShape rectangle(double x, double y, double w, double h)
+	{
+		return new DPShape( getShapeParams(), "", new Rectangle2D.Double( x, y, w, h ) );
+	}
+	
+	public DPShape rectangle(Point2 pos, Vector2 size)
+	{
+		return new DPShape( getShapeParams(), "", new Rectangle2D.Double( pos.x, pos.y, size.x, size.y ) );
+	}
+	
+	public DPShape roundRectangle(double x, double y, double w, double h, double roundingX, double roundingY)
+	{
+		return new DPShape( getShapeParams(), "", new RoundRectangle2D.Double( x, y, w, h, roundingX, roundingY ) );
+	}
+	
+	public DPShape roundRectangle(Point2 pos, Vector2 size, Vector2 rounding)
+	{
+		return new DPShape( getShapeParams(), "", new RoundRectangle2D.Double( pos.x, pos.y, size.x, size.y, rounding.x, rounding.y ) );
+	}
+	
+	public DPShape ellipse(double x, double y, double rx, double ry)
+	{
+		return new DPShape( getShapeParams(), "", new Ellipse2D.Double( x, y, rx, ry ) );
+	}
+	
+	public DPShape ellipse(Point2 pos, Vector2 radius)
+	{
+		return new DPShape( getShapeParams(), "", new Ellipse2D.Double( pos.x, pos.y, radius.x, radius.y ) );
+	}
+	
+	
 	public DPViewport viewport(DPElement child, double minWidth, double minHeight)
 	{
 		DPViewport viewport = new DPViewport( minWidth, minHeight );
@@ -925,16 +975,5 @@ public class PrimitiveStyleSheet extends StyleSheet
 		DPViewport viewport = new DPViewport( 0.0, 0.0 );
 		viewport.setChild( child );
 		return viewport;
-	}
-	
-	
-	public DPWhitespace whitespace(String txt, double width)
-	{
-		return new DPWhitespace( getContentLeafStyleParams(), txt, width );
-	}
-
-	public DPWhitespace whitespace(String txt)
-	{
-		return new DPWhitespace( getContentLeafStyleParams(), txt, 0.0 );
 	}
 }

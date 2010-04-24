@@ -12,7 +12,7 @@ import java.awt.geom.CubicCurve2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import BritefuryJ.DocPresent.DPBox;
+import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPViewport;
 import BritefuryJ.DocPresent.FragmentContext;
@@ -25,7 +25,7 @@ import BritefuryJ.ParserHelpers.DebugParseResultInterface;
 
 public class ParseView implements FragmentContext
 {
-	private static class DPViewBin extends DPBox
+	private static class DPViewBin extends DPBin
 	{
 		private ParseView parseView;
 		

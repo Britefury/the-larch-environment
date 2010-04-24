@@ -7,46 +7,65 @@
 package BritefuryJ.DocPresent;
 
 import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-import BritefuryJ.DocPresent.LayoutTree.LayoutNodeRectangle;
+import BritefuryJ.DocPresent.LayoutTree.LayoutNodeShape;
 import BritefuryJ.DocPresent.Painter.Painter;
 import BritefuryJ.DocPresent.StyleParams.ShapeStyleParams;
+import BritefuryJ.Math.AABox2;
+import BritefuryJ.Math.Point2;
 
-public class DPRectangle extends DPContentLeaf
+public class DPShape extends DPContentLeaf
 {
-	private double minWidth, minHeight;
+	private Shape shape;
+	private AABox2 bounds;
 	
 	
-	public DPRectangle(String textRepresentation, double minWidth, double minHeight)
+	public DPShape(String textRepresentation, Shape shape)
 	{
-		this( ShapeStyleParams.defaultStyleParams, textRepresentation, minWidth, minHeight );
+		this( ShapeStyleParams.defaultStyleParams, textRepresentation, shape );
 	}
 	
-	public DPRectangle(ShapeStyleParams styleParams, String textRepresentation, double minWidth, double minHeight)
+	public DPShape(ShapeStyleParams styleParams, String textRepresentation, Shape shape)
 	{
 		super( styleParams, textRepresentation );
 		
-		this.minWidth = minWidth;
-		this.minHeight = minHeight;
+		this.shape = shape;
 		
-		layoutNode = new LayoutNodeRectangle( this );
+		Rectangle2D bounds2D = shape.getBounds2D();
+
+		bounds = new AABox2( bounds2D.getMinX(), bounds2D.getMinY(), bounds2D.getMaxX(), bounds2D.getMaxY() );
+		
+		layoutNode = new LayoutNodeShape( this );
 	}
 	
 	
-	
-	public double getMinWidth()
+
+	public AABox2 getShapeBounds()
 	{
-		return minWidth;
+		return bounds;
 	}
 	
-	public double getMinHeight()
+	public AABox2 getLocalAABox()
 	{
-		return minHeight;
+		return bounds;
 	}
 
 
+	public boolean containsParentSpacePoint(Point2 parentPos)
+	{
+		Point2 localPos = getParentToLocalXform().transform( parentPos );
+		return containsLocalSpacePoint( localPos );
+	}
 
+	public boolean containsLocalSpacePoint(Point2 localPos)
+	{
+		return shape.contains( new Point2D.Double( localPos.x, localPos.y ) );
+	}
+
+	
 	public boolean isRedrawRequiredOnHover()
 	{
 		ShapeStyleParams s = (ShapeStyleParams)styleParams;
@@ -68,7 +87,10 @@ public class DPRectangle extends DPContentLeaf
 		{
 			painter = p.getPainter();
 		}
-
-		painter.drawShape( graphics, new Rectangle2D.Double( 0.0, 0.0, getAllocationX(), getAllocationY() ) );
+		
+		if ( painter != null )
+		{
+			painter.drawShape( graphics, shape );
+		}
 	}
 }

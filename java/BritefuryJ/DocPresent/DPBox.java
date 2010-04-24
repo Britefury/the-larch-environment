@@ -1,97 +1,77 @@
-//##************************
 //##* This program is free software; you can use it, redistribute it and/or modify it
 //##* under the terms of the GNU General Public License version 2 as published by the
 //##* Free Software Foundation. The full text of the GNU General Public License
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
-//##* program. This source code is (C)copyright Geoffrey French 1999-2008.
+//##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
 package BritefuryJ.DocPresent;
 
-import java.util.List;
+import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
 
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeBox;
-import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
+import BritefuryJ.DocPresent.Painter.Painter;
+import BritefuryJ.DocPresent.StyleParams.ShapeStyleParams;
 
-
-public class DPBox extends DPContainer
+public class DPBox extends DPContentLeaf
 {
-	public DPBox()
+	private double minWidth, minHeight;
+	
+	
+	public DPBox(String textRepresentation, double minWidth, double minHeight)
 	{
-		this( ContainerStyleParams.defaultStyleParams );
+		this( ShapeStyleParams.defaultStyleParams, textRepresentation, minWidth, minHeight );
 	}
-
-	public DPBox(ContainerStyleParams styleParams)
+	
+	public DPBox(ShapeStyleParams styleParams, String textRepresentation, double minWidth, double minHeight)
 	{
-		super(styleParams);
+		super( styleParams, textRepresentation );
+		
+		this.minWidth = minWidth;
+		this.minHeight = minHeight;
 		
 		layoutNode = new LayoutNodeBox( this );
 	}
 	
 	
 	
-	public DPElement getChild()
+	public double getMinWidth()
 	{
-		if ( registeredChildren.size() > 0 )
+		return minWidth;
+	}
+	
+	public double getMinHeight()
+	{
+		return minHeight;
+	}
+
+
+
+	public boolean isRedrawRequiredOnHover()
+	{
+		ShapeStyleParams s = (ShapeStyleParams)styleParams;
+		return super.isRedrawRequiredOnHover()  ||  s.getHoverPainter() != null;
+	}
+	
+
+	protected void draw(Graphics2D graphics)
+	{
+		ShapeStyleParams p = (ShapeStyleParams)styleParams;
+		
+		Painter painter;
+		if ( testFlag( FLAG_HOVER ) )
 		{
-			return registeredChildren.get( 0 );
+			Painter hoverPainter = p.getHoverPainter();
+			painter = hoverPainter != null  ?  hoverPainter  :  p.getPainter();
 		}
 		else
 		{
-			return null;
+			painter = p.getPainter();
 		}
-	}
-	
-	public void setChild(DPElement child)
-	{
-		DPElement prevChild = getChild();
-		if ( child != prevChild )
+		
+		if ( painter != null )
 		{
-			if ( child != null  &&  child.getLayoutNode() == null )
-			{
-				throw new ChildHasNoLayoutException();
-			}
-
-			if ( prevChild != null )
-			{
-				unregisterChild( prevChild );
-				registeredChildren.remove( 0 );
-			}
-			
-			if ( child != null )
-			{
-				registeredChildren.add( child );
-				registerChild( child );				
-			}
-			
-			onChildListModified();
-			queueResize();
+			painter.drawShape( graphics, new Rectangle2D.Double( 0.0, 0.0, getAllocationX(), getAllocationY() ) );
 		}
-	}
-	
-	
-	protected void replaceChildWithEmpty(DPElement child)
-	{
-		assert child == this.getChild();
-		setChild( null );
-	}
-	
-	
-
-	public List<DPElement> getChildren()
-	{
-		return registeredChildren;
-	}
-
-	
-	
-	
-	//
-	// Text representation methods
-	//
-	
-	protected String computeSubtreeTextRepresentation()
-	{
-		DPElement child = getChild();
-		return child != null  ?  child.getTextRepresentation()  :  "";
 	}
 }

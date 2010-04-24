@@ -10,7 +10,7 @@ import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Layout.LAllocHelper;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
 
-public class LayoutNodeRootElement extends LayoutNodeBox
+public class LayoutNodeRootElement extends LayoutNodeBin
 {
 	public LayoutNodeRootElement(PresentationComponent.RootElement element)
 	{

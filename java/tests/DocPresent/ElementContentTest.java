@@ -10,7 +10,7 @@ package tests.DocPresent;
 import java.util.Arrays;
 
 import junit.framework.TestCase;
-import BritefuryJ.DocPresent.DPBox;
+import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPHiddenContent;
 import BritefuryJ.DocPresent.DPParagraph;
@@ -40,7 +40,7 @@ public class ElementContentTest extends TestCase
 	{
 		DPText t0 = new DPText( "abc" );
 
-		DPBox b = new DPBox( );
+		DPBin b = new DPBin( );
 		
 		b.setChild( t0 );
 
@@ -91,7 +91,7 @@ public class ElementContentTest extends TestCase
 		DPElement[] tb = { tb0, tb1, tb2 };
 		pb.setChildren( Arrays.asList( tb ) );
 		
-		DPBox b = new DPBox( );
+		DPBin b = new DPBin( );
 		b.setChild( pb );
 
 		

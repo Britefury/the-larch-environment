@@ -6,11 +6,11 @@
 //##************************
 package BritefuryJ.DocPresent.LayoutTree;
 
-import BritefuryJ.DocPresent.DPRectangle;
+import BritefuryJ.DocPresent.DPShape;
 
-public class LayoutNodeRectangle extends ContentLeafLayoutNode
+public class LayoutNodeShape extends ContentLeafLayoutNode
 {
-	public LayoutNodeRectangle(DPRectangle element)
+	public LayoutNodeShape(DPShape element)
 	{
 		super( element );
 	}
@@ -18,16 +18,16 @@ public class LayoutNodeRectangle extends ContentLeafLayoutNode
 
 	protected void updateRequisitionX()
 	{
-		DPRectangle rectangle = (DPRectangle)element;
+		DPShape shape = (DPShape)element;
 		
-		double w = rectangle.getMinWidth();
+		double w = shape.getShapeBounds().getUpperX();
 		layoutReqBox.setRequisitionX( w, w );
 	}
 
 	protected void updateRequisitionY()
 	{
-		DPRectangle rectangle = (DPRectangle)element;
+		DPShape shape = (DPShape)element;
 		
-		layoutReqBox.setRequisitionY( rectangle.getMinHeight(), 0.0 );
+		layoutReqBox.setRequisitionY( shape.getShapeBounds().getUpperY(), 0.0, 0.0 );
 	}
 }

@@ -9,7 +9,9 @@ package BritefuryJ.DocPresent.Controls;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.event.KeyEvent;
 import java.util.Arrays;
 
 import org.python.core.PyObject;
@@ -19,9 +21,15 @@ import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Browser.Location;
+import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.ContextMenu.ContextMenu;
+import BritefuryJ.DocPresent.Event.PointerButtonEvent;
+import BritefuryJ.DocPresent.Event.PointerMotionEvent;
+import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
@@ -321,5 +329,133 @@ public class ControlsStyleSheet extends StyleSheet
 		DPRegion frame = textEntryStyle.region( line );
 		DPBorder outerElement = textEntryStyle.border( PrimitiveStyleSheet.instance.vbox( Arrays.asList( new DPElement[] { frame } ) ) );
 		return new TextEntry( outerElement, frame, textElement, accept, cancel );
+	}
+	
+	
+	
+	private static class ScrollBarArrowInteractor extends ElementInteractor
+	{
+		public static enum Direction
+		{
+			LEFT,
+			RIGHT,
+			UP,
+			DOWN
+		}
+		
+		
+		private Direction direction;
+		
+		
+		public ScrollBarArrowInteractor(Direction direction, Range range)
+		{
+			this.direction = direction;
+		}
+		
+		
+		public boolean onButtonDown(DPElement element, PointerButtonEvent event)
+		{
+			return false;
+		}
+		
+		public boolean onButtonUp(DPElement element, PointerButtonEvent event)
+		{
+			return false;
+		}
+		
+		public void onEnter(DPElement element, PointerMotionEvent event)
+		{
+		}
+		
+		public void onLeave(DPElement element, PointerMotionEvent event)
+		{
+		}
+
+		
+		public void drawBackground(DPElement element, Graphics2D graphics)
+		{
+		}
+
+		public void draw(DPElement element, Graphics2D graphics)
+		{
+		}
+	}
+	
+	private static class ScrollBarDragBarInteractor extends ElementInteractor
+	{
+		public boolean onButtonDown(DPElement element, PointerButtonEvent event)
+		{
+			return false;
+		}
+		
+		public boolean onButtonUp(DPElement element, PointerButtonEvent event)
+		{
+			return false;
+		}
+		
+		public void onMotion(DPElement element, PointerMotionEvent event)
+		{
+		}
+		
+		public void onDrag(DPElement element, PointerMotionEvent event)
+		{
+		}
+		
+		public void onEnter(DPElement element, PointerMotionEvent event)
+		{
+		}
+		
+		public void onLeave(DPElement element, PointerMotionEvent event)
+		{
+		}
+		
+		
+		public boolean onScroll(DPElement element, PointerScrollEvent event)
+		{
+			return false;
+		}
+
+		
+		public void onCaretEnter(DPElement element, Caret c)
+		{
+		}
+
+		public void onCaretLeave(DPElement element, Caret c)
+		{
+		}
+		
+		
+		public boolean onKeyPress(DPElement element, KeyEvent event)
+		{
+			return false;
+		}
+		
+		public boolean onKeyRelease(DPElement element, KeyEvent event)
+		{
+			return false;
+		}
+		
+		public boolean onKeyTyped(DPElement element, KeyEvent event)
+		{
+			return false;
+		}
+
+		
+		public void drawBackground(DPElement element, Graphics2D graphics)
+		{
+		}
+
+		public void draw(DPElement element, Graphics2D graphics)
+		{
+		}
+	}
+	
+	
+	
+	public ScrollBar horizontalScrollBar(Range range)
+	{
+		
+		//return new ScrollBar( range, element );
+		return null;
 	}
 }

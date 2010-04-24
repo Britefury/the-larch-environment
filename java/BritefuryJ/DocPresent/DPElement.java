@@ -1799,7 +1799,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 	public boolean containsLocalSpacePoint(Point2 localPos)
 	{
-		return localPos.x >= 0.0  &&  localPos.y >= 0.0  &&  localPos.x < getAllocationX()  &&  localPos.y < getAllocationY();
+		return getLocalAABox().containsPoint( localPos );
 	}
 	
 
@@ -2950,7 +2950,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	public DPElement createMetaElement(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
 	{
-		DPBox bin = new DPBox( );
+		DPBin bin = new DPBin( );
 		bin.setChild( createDebugPresentationHeader() );
 		return bin;
 	}

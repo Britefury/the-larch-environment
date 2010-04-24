@@ -96,7 +96,7 @@ class GSymAppViewerStyleSheet (StyleSheet):
 		controlsBorder = appDocumentControlsStyle.border( controlsBox )
 
 		lineStyle = primitiveStyle.withShapePainter( FillPainter( Color( 32, 87, 147 ) ) )
-		openDocumentsSeparator = lineStyle.rectangle( 0.0, 1.0 ).alignHExpand().pad( self['separatingLinePaddingX'], self['separatingLinePaddingY'] ).alignHExpand()
+		openDocumentsSeparator = lineStyle.box( 0.0, 1.0 ).alignHExpand().pad( self['separatingLinePaddingX'], self['separatingLinePaddingY'] ).alignHExpand()
 		
 		docListBox = documentListTableStyle.rgrid( contentsLists )
 
