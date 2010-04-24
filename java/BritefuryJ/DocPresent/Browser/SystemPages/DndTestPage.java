@@ -54,7 +54,7 @@ public class DndTestPage extends SystemPage
 	
 	protected DPElement makeSource(DPElement contents, final ElementFactory factory)
 	{
-		DPElement source = sourceStyle.box( contents.pad( 4.0, 2.0 ) );
+		DPElement source = sourceStyle.bin( contents.pad( 4.0, 2.0 ) );
 		
 		ObjectDndHandler.SourceDataFn sourceDataFn = new ObjectDndHandler.SourceDataFn()
 		{
@@ -85,7 +85,7 @@ public class DndTestPage extends SystemPage
 	
 	protected DPElement makePlaceHolder()
 	{
-		final DPProxy placeHolder = styleSheet.proxy( placeHolderStyle.box( styleSheet.staticText( " " ).pad( 8.0, 8.0 ) ) );
+		final DPProxy placeHolder = styleSheet.proxy( placeHolderStyle.bin( styleSheet.staticText( " " ).pad( 8.0, 8.0 ) ) );
 		
 		ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
 		{

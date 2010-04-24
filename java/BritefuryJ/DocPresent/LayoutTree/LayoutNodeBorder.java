@@ -13,7 +13,7 @@ import BritefuryJ.DocPresent.Layout.LAllocHelper;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
 
-public class LayoutNodeBorder extends LayoutNodeBox
+public class LayoutNodeBorder extends LayoutNodeBin
 {
 	public LayoutNodeBorder(DPBorder element)
 	{

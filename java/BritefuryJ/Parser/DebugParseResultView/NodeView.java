@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import BritefuryJ.DocPresent.DPBox;
+import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.FragmentContext;
@@ -128,7 +128,7 @@ public class NodeView implements FragmentContext
 	
 	
 	private DPElement nodeElement, mainElement;
-	private DPBox nodeBinElement;
+	private DPBin nodeBinElement;
 	private NodeInteractor nodeInteractor;
 	private ParseView parseView;
 	private ArrayList<NodeView> children;
@@ -337,7 +337,7 @@ public class NodeView implements FragmentContext
 		
 		DPVBox nodeBoxElement = styleSheet.vbox( Arrays.asList( new DPElement[] { titleBoxElement.alignHExpand(), contentBoxElement.alignHExpand() } ) );
 		
-		nodeBinElement = styleSheet.box( nodeBoxElement );
+		nodeBinElement = styleSheet.bin( nodeBoxElement );
 		
 		nodeInteractor = new NodeInteractor( this, nodeBinElement );
 		nodeBinElement.addInteractor( nodeInteractor );

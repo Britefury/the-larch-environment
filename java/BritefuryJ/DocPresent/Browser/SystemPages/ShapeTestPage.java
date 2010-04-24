@@ -13,22 +13,22 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
-public class RectangleTestPage extends SystemPage
+public class ShapeTestPage extends SystemPage
 {
-	protected RectangleTestPage()
+	protected ShapeTestPage()
 	{
-		register( "tests.rectangle" );
+		register( "tests.shape" );
 	}
 	
 	
 	public String getTitle()
 	{
-		return "Rectangle test";
+		return "Shape test";
 	}
 
 	protected String getDescription()
 	{
-		return "The rectangle element covers all space given it, with a specified minimum size.";
+		return "The box element covers all space given to it, with a specified minimum size. The shape element displays a java.awt.shape.";
 	}
 	
 	
@@ -41,11 +41,18 @@ public class RectangleTestPage extends SystemPage
 	protected DPElement createContents()
 	{
 		return styleSheet.vbox( Arrays.asList( new DPElement[] {
-				styleSheet.staticText( "Rectangle 50x10; 1 pixel padding" ),
-				shapeStyle.rectangle( 50.0, 10.0 ).pad( 1.0, 1.0 ),
-				styleSheet.staticText( "Rectangle 50x10; 10 pixel padding" ),
-				shapeStyle.rectangle( 50.0, 10.0 ).pad( 10.0, 10.0 ),
-				styleSheet.staticText( "Rectangle 50x10; 10 pixel padding, h-expand" ),
-				shapeStyle.rectangle( 50.0, 10.0 ).alignHExpand().pad( 10.0, 10.0 ).alignHExpand() } ) );
+				styleSheet.staticText( "Box 50x10; 1 pixel padding" ),
+				shapeStyle.box( 50.0, 10.0 ).pad( 1.0, 1.0 ),
+				styleSheet.staticText( "Box 50x10; 10 pixel padding" ),
+				shapeStyle.box( 50.0, 10.0 ).pad( 10.0, 10.0 ),
+				styleSheet.staticText( "Box 50x10; 10 pixel padding, h-expand" ),
+				shapeStyle.box( 50.0, 10.0 ).alignHExpand().pad( 10.0, 10.0 ).alignHExpand(),
+				styleSheet.staticText( "Rectangle 50x20  @  0,0; 1 pixel padding" ),
+				shapeStyle.rectangle( 0.0, 0.0, 50.0, 20.0 ).pad( 1.0, 1.0 ),
+				styleSheet.staticText( "Rectangle 50x20  @  -10,-10; 1 pixel padding" ),
+				shapeStyle.rectangle( -10.0, -10.0, 50.0, 20.0 ).pad( 1.0, 1.0 ),
+				styleSheet.staticText( "Ellipse 25x25  @  0,0; 1 pixel padding" ),
+				shapeStyle.ellipse( 0.0, 0.0, 25.0, 25.0 ).pad( 1.0, 1.0 ),
+				} ) );
 	}
 }

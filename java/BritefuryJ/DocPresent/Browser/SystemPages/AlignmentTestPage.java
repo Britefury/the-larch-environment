@@ -18,7 +18,7 @@ public class AlignmentTestPage extends SystemPage
 {
 	protected AlignmentTestPage()
 	{
-		register( "alignment" );
+		register( "tests.alignment" );
 	}
 	
 	
@@ -45,7 +45,7 @@ public class AlignmentTestPage extends SystemPage
 		
 		DPElement refVBox = styleSheet.vbox( Arrays.asList( new DPElement[] { styleSheet.staticText( "0" ), styleSheet.staticText( "1 (ref-y)" ), styleSheet.staticText( "2" ),
 						styleSheet.staticText( "3" ), styleSheet.staticText( "4" ), styleSheet.staticText( "5" ) } ), 1 );
-		DPElement refBox = styleSheet.withBackground( new FilledOutlinePainter( new Color( 0.8f, 0.85f, 1.0f ), new Color( 0.0f, 0.25f, 1.0f ) ) ).box( refVBox.pad( 5.0, 5.0 ) );
+		DPElement refBox = styleSheet.withBackground( new FilledOutlinePainter( new Color( 0.8f, 0.85f, 1.0f ), new Color( 0.0f, 0.25f, 1.0f ) ) ).bin( refVBox.pad( 5.0, 5.0 ) );
 		
 
 		DPBorder valignBaselines = styleSheet.border( textStyleSheet.staticText( "vAlign=REFY" ).alignVRefY() );
@@ -65,6 +65,6 @@ public class AlignmentTestPage extends SystemPage
 		
 		DPElement mainBox = styleSheet.withVBoxSpacing( 10.0 ).vbox( Arrays.asList( new DPElement[] { halignLeft.alignHExpand(), halignCentre.alignHExpand(), halignRight.alignHExpand(),
 				halignExpand.alignHExpand(), bottomBox } ) );
-		return styleSheet.box( mainBox );
+		return styleSheet.bin( mainBox );
 	}
 }

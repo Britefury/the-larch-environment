@@ -48,7 +48,7 @@ public class NonLocalDndTestPage extends SystemPage
 	
 	protected DPProxy makeDest()
 	{
-		return styleSheet.proxy( placeHolderStyle.box( styleSheet.staticText( " " ).pad( 8.0, 8.0 ) ) );
+		return styleSheet.proxy( placeHolderStyle.bin( styleSheet.staticText( " " ).pad( 8.0, 8.0 ) ) );
 	}
 	
 	

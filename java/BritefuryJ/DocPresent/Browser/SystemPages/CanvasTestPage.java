@@ -11,7 +11,7 @@ import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import BritefuryJ.DocPresent.DPBox;
+import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPCanvas;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPHBox;
@@ -135,7 +135,7 @@ public class CanvasTestPage extends SystemPage
 	protected DPElement makeDestElement(String title)
 	{
 		final DPText textElement = textStyle.text( title );
-		DPElement destText = styleSheet.withBackground( new FillPainter( backgroundColour ) ).box( textElement.pad( 10.0, 10.0 ) );
+		DPElement destText = styleSheet.withBackground( new FillPainter( backgroundColour ) ).bin( textElement.pad( 10.0, 10.0 ) );
 		
 		ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
 		{
@@ -168,7 +168,7 @@ public class CanvasTestPage extends SystemPage
 	protected DPElement makeDestElement2(String title, final DPElement firstElement)
 	{
 		final DPText textElement = textStyle.text( title );
-		DPElement destText = styleSheet.withBackground( new FillPainter( backgroundColour ) ).box( textElement.pad( 10.0, 10.0 ) );
+		DPElement destText = styleSheet.withBackground( new FillPainter( backgroundColour ) ).bin( textElement.pad( 10.0, 10.0 ) );
 		
 		ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
 		{
@@ -184,8 +184,8 @@ public class CanvasTestPage extends SystemPage
 		{
 			public boolean canDrop(PointerInputElement destElement, Point2 targetPosition, Object data)
 			{
-				DPBox box = (DPBox)firstElement;
-				DPBox pad = (DPBox)box.getChild();
+				DPBin box = (DPBin)firstElement;
+				DPBin pad = (DPBin)box.getChild();
 				DPText t = (DPText)pad.getChild();
 				String firstText = t.getText();
 				int firstNum = textAsNumber( firstText );

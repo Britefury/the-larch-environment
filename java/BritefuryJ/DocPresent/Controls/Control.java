@@ -7,8 +7,15 @@
 package BritefuryJ.DocPresent.Controls;
 
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.GSym.ObjectView.Presentable;
 
 public abstract class Control
 {
 	public abstract DPElement getElement();
+	
+	
+	public Presentable presentable()
+	{
+		return getElement().presentable();
+	}
 }
