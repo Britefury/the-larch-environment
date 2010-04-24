@@ -43,8 +43,8 @@ public class ViewportTestPage extends SystemPage
 		ArrayList<DPElement> nodes = new ArrayList<DPElement>();
 		for (int i = 0; i < words.length; i++)
 		{
-			nodes.add( styleSheet.text( words[i] ) );
-			nodes.add( styleSheet.text( " " ) );
+			nodes.add( styleSheet.staticText( words[i] ) );
+			nodes.add( styleSheet.staticText( " " ) );
 			nodes.add( styleSheet.lineBreak() );
 		}
 		return nodes;

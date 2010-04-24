@@ -114,7 +114,7 @@ class ProjectEditorStyleSheet (StyleSheet):
 
 
 
-	def package(self, packageName, packageLocation, items, packageRenameFn, app, onPageAdd, onPageImport, onPackageAdd):
+	def package(self, packageName, packageLocation, items, packageRenameFn, window, onPageAdd, onPageImport, onPackageAdd):
 		def _onRenameAccept(textEntry, text):
 			packageRenameFn( text )
 			
@@ -131,8 +131,8 @@ class ProjectEditorStyleSheet (StyleSheet):
 		
 		def _packageContextMenuFactory(menu):
 			menu.addItem( 'New package', _onNewPackage )
-			app.populateNewPageMenu( menu.addSubMenu( 'New page' ), onPageAdd )
-			app.populateImportPageMenu( menu.addSubMenu( 'Import page' ), onPageImport )
+			window.populateNewPageMenu( menu.addSubMenu( 'New page' ), onPageAdd )
+			window.populateImportPageMenu( menu.addSubMenu( 'Import page' ), onPageImport )
 			menu.addSeparator()
 			menu.addItem( 'Rename', _onRename )
 			return True

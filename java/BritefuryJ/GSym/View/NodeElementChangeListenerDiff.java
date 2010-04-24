@@ -313,6 +313,7 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 						String leafTextRepresentation = leaf.getTextRepresentation();
 						int leafTextReprLength = leafTextRepresentation.length();
 						
+						// First, see if the leaf textual representation contains a new-line. If so, try to stay on the same side of the new line.
 						if ( leafTextRepresentation.contains( "\n" ) )
 						{
 							int leafIndex = newIndex - leafOffset;
@@ -361,8 +362,26 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 								}
 								else
 								{
-									// Searching backwards and forwards failed; place the cursor in the non-editable leaf and hope for the best
-									leaf.moveMarker( caret.getMarker(), leafPosition, newBias );
+									// Search backwards, this time potentially leaving the segment
+									left = leaf.getPreviousEditableLeaf( null, null );
+									if ( left != null )
+									{
+										left.moveMarkerToEnd( caret.getMarker() );
+									}
+									else
+									{
+										// Searching backwards failed; search forwards
+										right = leaf.getNextEditableLeaf( null, null );
+										if ( right != null )
+										{
+											right.moveMarkerToStart( caret.getMarker() );
+										}
+										else
+										{
+											// Searching backwards and forwards failed; place the cursor in the non-editable leaf and hope for the best
+											leaf.moveMarker( caret.getMarker(), leafPosition, newBias );
+										}
+									}
 								}
 							}
 						}
@@ -384,8 +403,26 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 								}
 								else
 								{
-									// Searching forwards and backwards failed; place the cursor in the non-editable leaf and hope for the best
-									leaf.moveMarker( caret.getMarker(), leafPosition, newBias );
+									// Search forwards, this time potentially leaving the segment
+									right = leaf.getNextEditableLeaf( null, null );
+									if ( right != null )
+									{
+										right.moveMarkerToStart( caret.getMarker() );
+									}
+									else
+									{
+										// Searching forwards failed; search backwards
+										left = leaf.getPreviousEditableLeaf( null, null );
+										if ( left != null )
+										{
+											left.moveMarkerToEnd( caret.getMarker() );
+										}
+										else
+										{
+											// Searching forwards and backwards failed; place the cursor in the non-editable leaf and hope for the best
+											leaf.moveMarker( caret.getMarker(), leafPosition, newBias );
+										}
+									}
 								}
 							}
 						}

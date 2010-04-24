@@ -41,11 +41,11 @@ public class RectangleTestPage extends SystemPage
 	protected DPElement createContents()
 	{
 		return styleSheet.vbox( Arrays.asList( new DPElement[] {
-				styleSheet.text( "Rectangle 50x10; 1 pixel padding" ),
+				styleSheet.staticText( "Rectangle 50x10; 1 pixel padding" ),
 				shapeStyle.rectangle( 50.0, 10.0 ).pad( 1.0, 1.0 ),
-				styleSheet.text( "Rectangle 50x10; 10 pixel padding" ),
+				styleSheet.staticText( "Rectangle 50x10; 10 pixel padding" ),
 				shapeStyle.rectangle( 50.0, 10.0 ).pad( 10.0, 10.0 ),
-				styleSheet.text( "Rectangle 50x10; 10 pixel padding, h-expand" ),
+				styleSheet.staticText( "Rectangle 50x10; 10 pixel padding, h-expand" ),
 				shapeStyle.rectangle( 50.0, 10.0 ).alignHExpand().pad( 10.0, 10.0 ).alignHExpand() } ) );
 	}
 }

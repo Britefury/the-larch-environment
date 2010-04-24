@@ -47,7 +47,7 @@ public class ListViewTestPage extends SystemPage
 	{
 		if ( text != null )
 		{
-			return basicStyle.text( text );
+			return basicStyle.staticText( text );
 		}
 		else
 		{
@@ -67,7 +67,7 @@ public class ListViewTestPage extends SystemPage
 		
 		public DPElement createElement(StyleSheet basicStyle)
 		{
-			return ((PrimitiveStyleSheet)basicStyle).text( text );
+			return ((PrimitiveStyleSheet)basicStyle).staticText( text );
 		}
 	}
 	
@@ -83,7 +83,7 @@ public class ListViewTestPage extends SystemPage
 		
 		public DPElement createElement(StyleSheet basicStyle, int index, DPElement child)
 		{
-			return ((PrimitiveStyleSheet)basicStyle).text( text );
+			return ((PrimitiveStyleSheet)basicStyle).staticText( text );
 		}
 	}
 	
@@ -113,14 +113,14 @@ public class ListViewTestPage extends SystemPage
 		DPElement children[] = new DPText[txt.length];
 		for (int i = 0; i < txt.length; i++)
 		{
-			children[i] = elemStyle.text( txt[i] ); 
+			children[i] = elemStyle.staticText( txt[i] ); 
 		}
 		
 		listView = listView.withPrimitiveStyle( puncStyle ).withBeginDelimFactory( new TextElementFactory( beginDelim ) ).withEndDelimFactory( new TextElementFactory( endDelim ) ).withSeparatorFactory( new TextSeparatorElementFactory( separator ) );
 		DPElement ls = listView.createListElement( Arrays.asList( children ), TrailingSeparator.NEVER );
 		
 		
-		DPElement titleElem = titleStyle.text( title );
+		DPElement titleElem = titleStyle.staticText( title );
 		
 		return basicStyle.vbox( Arrays.asList( new DPElement[] { titleElem, ls } ) );
 	}

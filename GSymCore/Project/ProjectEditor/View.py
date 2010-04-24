@@ -56,8 +56,8 @@ class ProjectView (GSymViewObjectNodeDispatch):
 				def handleSaveDocumentAsFn(filename):
 					document.saveAs( filename )
 				
-				app = ctx.getViewContext().getBrowserContext().app
-				app.promptSaveDocumentAs( handleSaveDocumentAsFn )
+				window = ctx.getViewContext().getBrowserContext().window
+				window.promptSaveDocumentAs( handleSaveDocumentAsFn )
 			else:
 				document.save()
 			return True
@@ -67,8 +67,8 @@ class ProjectView (GSymViewObjectNodeDispatch):
 			def handleSaveDocumentAsFn(filename):
 				document.saveAs( filename )
 			
-			app = ctx.getViewContext().getBrowserContext().app
-			app.promptSaveDocumentAs( handleSaveDocumentAsFn )
+			window = ctx.getViewContext().getBrowserContext().window
+			window.promptSaveDocumentAs( handleSaveDocumentAsFn )
 			return  True
 		
 		
@@ -106,8 +106,8 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		
 		items = ctx.mapPresentFragment( contents, styleSheet, state.withAttrs( location=packageLocation ) )
 			
-		app = ctx.getViewContext().getBrowserContext().app
-		return styleSheet.package( name, packageLocation, items, _packageRename, app, _addPage, _importPage, _addPackage )
+		window = ctx.getViewContext().getBrowserContext().window
+		return styleSheet.package( name, packageLocation, items, _packageRename, window, _addPage, _importPage, _addPackage )
 	
 
 
@@ -124,48 +124,6 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 	
 	
-
-#def resolveProjectLocation(currentUnitClass, document, docRootNode, resolveContext, location, app):
-	#if location == '':
-		#return GSymResolveResult( document, docRootNode, currentUnitClass, ProjectResolveContext( resolveContext, '', document ), location )
-	#else:
-		## Attempt to enter the root package
-		#rootPackagePrefix = docRootNode['rootPackage']['name'] + '.'
-		#if location.startswith( rootPackagePrefix ):
-			#locationPrefix = rootPackagePrefix
-			#loc = location[len(rootPackagePrefix):]
-			#package = docRootNode['rootPackage']
-		#else:
-			#return None
-		
-		#while loc != '':
-			#try:
-				#separatorPos = loc.index( '.' )
-				#name = loc[:separatorPos]
-				#loc = loc[separatorPos+1:]
-				#locationPrefix += name + '.'
-			#except ValueError:
-				#separatorPos = len( loc )
-				#name = loc
-				#loc = ''
-				#locationPrefix += name
-			#node = None
-			#for n in package['contents']:
-				#if n['name'] == name:
-					#node = n
-					#break
-			#if node is None:
-				#return None
-			#elif isinstance( node, DMObjectInterface ):
-				#if node.isInstanceOf( Schema.Package ):
-					#package = node
-				#elif n.isInstanceOf( Schema.Page ):
-					#return document.resolveUnitLocation( node['unit'], ProjectResolveContext( resolveContext, locationPrefix, document ), loc, app )
-				#else:
-					#return None
-			#else:
-				#return None
-		#return None
 
 
 _nameRegex = Pattern.compile( '[a-zA-Z_ ][a-zA-Z0-9_ ]*', 0 )

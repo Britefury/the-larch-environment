@@ -79,7 +79,7 @@ public class DndTestPage extends SystemPage
 			}
 		};
 
-		return makeSource( textStyle.text( text ), factory );
+		return makeSource( textStyle.staticText( text ), factory );
 	}
 	
 	

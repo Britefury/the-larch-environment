@@ -268,6 +268,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		
 		private boolean bStructureRefreshQueued;
+		private boolean bEnsureCaretVisibilityQueued = false;
 		
 		
 		protected ArrayList<Runnable> waitingImmediateEvents;			// only initialised when non-empty; otherwise null
@@ -604,6 +605,8 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				{
 					log.log( new TypesettingPerformanceLogEntry( typesetTime ) );
 				}
+				
+				checkCaretVisibility();
 			}
 		}
 		
@@ -1274,7 +1277,38 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				}
 			}
 			
+			
+			if ( caretLeaf != null )
+			{
+				caretLeaf.ensureVisible();
+			}
+			
+			queueEnsureCaretVisible();
+			
 			queueFullRedraw();
+		}
+		
+		
+		private void queueEnsureCaretVisible()
+		{
+			bEnsureCaretVisibilityQueued = true;
+		}
+		
+		private void checkCaretVisibility()
+		{
+			if ( bEnsureCaretVisibilityQueued )
+			{
+				bEnsureCaretVisibilityQueued = false;
+				
+				if ( caret != null )
+				{
+					DPContentLeafEditable leaf = caret.getElement();
+					if ( leaf != null )
+					{
+						leaf.ensureVisible();
+					}
+				}
+			}
 		}
 		
 		

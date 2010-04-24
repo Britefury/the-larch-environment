@@ -122,8 +122,8 @@ class AppView (GSymViewObjectDispatch):
 				node.addOpenDocument( appDoc )
 				
 			openDocuments = node.getOpenDocuments()
-			app = ctx.getViewContext().getBrowserContext().app
-			app.promptNewDocument( handleNewDocumentFn )
+			window = ctx.getViewContext().getBrowserContext().window
+			window.promptNewDocument( handleNewDocumentFn )
 			
 			return True
 		
@@ -142,8 +142,8 @@ class AppView (GSymViewObjectDispatch):
 				node.addOpenDocument( appDoc )
 
 				
-			app = ctx.getViewContext().getBrowserContext().app
-			app.promptOpenDocument( handleOpenedDocumentFn )
+			window = ctx.getViewContext().getBrowserContext().window
+			window.promptOpenDocument( handleOpenedDocumentFn )
 			
 			return True
 
@@ -175,8 +175,8 @@ class AppView (GSymViewObjectDispatch):
 				def handleSaveDocumentAsFn(filename):
 					document.saveAs( filename )
 				
-				app = ctx.getViewContext().getBrowserContext().app
-				app.promptSaveDocumentAs( handleSaveDocumentAsFn )
+				window = ctx.getViewContext().getBrowserContext().window
+				window.promptSaveDocumentAs( handleSaveDocumentAsFn )
 			else:
 				document.save()
 				
@@ -188,8 +188,8 @@ class AppView (GSymViewObjectDispatch):
 			def handleSaveDocumentAsFn(filename):
 				document.saveAs( filename )
 			
-			app = ctx.getViewContext().getBrowserContext().app
-			app.promptSaveDocumentAs( handleSaveDocumentAsFn )
+			window = ctx.getViewContext().getBrowserContext().window
+			window.promptSaveDocumentAs( handleSaveDocumentAsFn )
 
 			
 		name = node.getName()

@@ -55,19 +55,19 @@ public class ImageTestPage extends SystemPage
 		graphics.fillOval( 4, 4, 56, 24 );
 		
 		return styleSheet.vbox( Arrays.asList( new DPElement[] {
-				styleSheet.text( "A 64x32 image with a green oval" ),
+				styleSheet.staticText( "A 64x32 image with a green oval" ),
 				styleSheet.image( ellipseImage ),
-				styleSheet.text( "A 64x32 image with a green oval, scaled to 256x128" ),
+				styleSheet.staticText( "A 64x32 image with a green oval, scaled to 256x128" ),
 				styleSheet.image( ellipseImage, 256.0, 128.0 ),
-				styleSheet.text( "Image from 'back arrow' image file, as file object" ),
+				styleSheet.staticText( "Image from 'back arrow' image file, as file object" ),
 				styleSheet.image( new File( "icons/back arrow.png" ) ),
-				styleSheet.text( "Image from 'forward arrow' image file, as file name string" ),
+				styleSheet.staticText( "Image from 'forward arrow' image file, as file name string" ),
 				styleSheet.image( "icons/forward arrow.png" ),
-				styleSheet.text( "Invalid image filename" ),
+				styleSheet.staticText( "Invalid image filename" ),
 				styleSheet.image( "" ),
-				styleSheet.text( "A 64x32 image with a green oval, with a blue oval displayed on hover" ),
+				styleSheet.staticText( "A 64x32 image with a green oval, with a blue oval displayed on hover" ),
 				styleSheet.image( ellipseImage, blueEllipseImage ),
-				styleSheet.text( "Image from 'back arrow' image file, as file object, with 'forward arrow' image file on hover" ),
+				styleSheet.staticText( "Image from 'back arrow' image file, as file object, with 'forward arrow' image file on hover" ),
 				styleSheet.image( new File( "icons/back arrow.png" ), new File( "icons/forward arrow.png" ) ) } ) );
 	}
 }

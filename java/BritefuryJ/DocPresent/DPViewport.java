@@ -118,6 +118,85 @@ public class DPViewport extends DPContainer
 	}
 	
 	
+	protected void ensureRegionVisible(AABox2 box)
+	{
+		AABox2 localBox = getLocalAABox();
+		
+		boolean bScroll = !box.intersects( localBox );
+		
+		if ( !bScroll )
+		{
+			if ( box.getWidth() < localBox.getWidth() )
+			{
+				if ( box.getLowerX() < localBox.getLowerX()  ||  box.getUpperX() > localBox.getUpperX() )
+				{
+					bScroll = true;
+				}
+			}
+			else
+			{
+				if ( box.getUpperX() < localBox.getLowerX()  ||  box.getLowerX() > localBox.getUpperX() )
+				{
+					bScroll = true;
+				}
+			}
+		}
+		
+		if ( !bScroll )
+		{
+			if ( box.getHeight() < localBox.getHeight() )
+			{
+				if ( box.getLowerY() < localBox.getLowerY()  ||  box.getUpperY() > localBox.getUpperY() )
+				{
+					bScroll = true;
+				}
+			}
+			else
+			{
+				if ( box.getUpperY() < localBox.getLowerY()  ||  box.getLowerY() > localBox.getUpperY() )
+				{
+					bScroll = true;
+				}
+			}
+		}
+		
+		if ( bScroll )
+		{
+			double deltaX = 0.0, deltaY = 0.0;
+			
+			if ( box.getUpperX() < localBox.getLowerX() )
+			{
+				deltaX = localBox.getLowerX() - box.getLowerX();
+			}
+			else if ( box.getLowerX() > localBox.getUpperX() )
+			{
+				deltaX = localBox.getUpperX() - box.getUpperX();
+			}
+
+			if ( box.getUpperY() < localBox.getLowerY() )
+			{
+				deltaY = localBox.getLowerY() - box.getLowerY();
+			}
+			else if ( box.getLowerY() > localBox.getUpperY() )
+			{
+				deltaY = localBox.getUpperY() - box.getUpperY();
+			}
+			
+			Xform2 translation = new Xform2( new Vector2( deltaX, deltaY ) );
+			applyLocalSpaceXform( translation );
+
+			if ( parent != null )
+			{
+				box = translation.transform( box );
+				parent.ensureRegionVisible( getLocalToParentXform().transform( box ) );
+			}
+		}
+		else
+		{
+			super.ensureRegionVisible( box );
+		}
+	}
+	
 	
 	
 	//

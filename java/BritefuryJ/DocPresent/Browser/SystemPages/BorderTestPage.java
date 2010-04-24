@@ -37,15 +37,15 @@ public class BorderTestPage extends SystemPage
 	{
 		PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
 		
-		DPElement onePixelBorder = styleSheet.border( styleSheet.text( "Normal 1-pixel border" ) );
+		DPElement onePixelBorder = styleSheet.border( styleSheet.staticText( "Normal 1-pixel border" ) );
 		
-		DPElement padded = styleSheet.border( styleSheet.text( "Padding: 30 pixels of padding all round, via the pad() method" ).pad( 30.0, 30.0 ) );
+		DPElement padded = styleSheet.border( styleSheet.staticText( "Padding: 30 pixels of padding all round, via the pad() method" ).pad( 30.0, 30.0 ) );
 		
 		DPElement emptyBorder = styleSheet.withBorder( new FilledBorder( 50.0, 50.0, 20.0, 20.0, 20.0, 20.0, new Color( 0.8f, 0.8f, 0.8f ) ) ).border(
-				styleSheet.text( "Empty border: 50 pixel h-margins, 20 pixel v-margins, 20 pixel rounding, light-grey background"  ) );
+				styleSheet.staticText( "Empty border: 50 pixel h-margins, 20 pixel v-margins, 20 pixel rounding, light-grey background"  ) );
 		
 		DPElement solidBorder = styleSheet.withBorder( new SolidBorder( 3.0f, 10.0, 20.0, 20.0, new Color( 0.6f, 0.6f, 0.6f ), new Color( 0.8f, 0.8f, 0.8f ) ) ).border(
-				styleSheet.text( "Solid border: 3 pixel thickness, 10 pixel inset (margin), 20 pixel rounding, grey border, light-grey background" ) );
+				styleSheet.staticText( "Solid border: 3 pixel thickness, 10 pixel inset (margin), 20 pixel rounding, grey border, light-grey background" ) );
 		
 		
 		return styleSheet.withVBoxSpacing( 10.0 ).vbox( Arrays.asList( new DPElement[] { onePixelBorder, padded, emptyBorder, solidBorder } ) );

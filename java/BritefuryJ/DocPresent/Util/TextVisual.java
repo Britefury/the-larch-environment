@@ -448,38 +448,24 @@ public class TextVisual
 		}
 	}
 	
-	public void drawCaretAtStart(Graphics2D graphics)
+	public Point2 getCaretPosition(Graphics2D graphics, int offset)
 	{
-		double h = 0.0;
 		if ( layout != null )
 		{
-			h = layout.getAscent() + layout.getDescent();
+			if ( offset < 0  ||  offset > layout.getCharacterCount() )
+			{
+				throw new RuntimeException( "TextVisual.getCaretPosition(): offset is out of range; offset=" + offset + ", text range=[0-" + text.length() + "], layout range=[0-" + layout.getCharacterCount() + "]." );
+			}
+			TextHitInfo hit = layout.getNextLeftHit( offset );
+			float caretInfo[] = layout.getCaretInfo( hit );
+			return new Point2( caretInfo[0],  ( layout.getAscent() + layout.getDescent() ) * 0.5 );
 		}
 		else
 		{
 			FontRenderContext frc = graphics.getFontRenderContext();
 			LineMetrics lineMetrics = font.getLineMetrics( "", frc );
-			h = lineMetrics.getAscent() + lineMetrics.getDescent();
+			return new Point2( 0.0, ( lineMetrics.getAscent() + lineMetrics.getDescent() ) * 0.5 );
 		}
-		graphics.draw( new Line2D.Double( 0.0, 0.0, 0.0, h ) );
-	}
-
-	public void drawCaretAtEnd(Graphics2D graphics)
-	{
-		double x = 0.0, h = 0.0;
-		if ( layout != null )
-		{
-			x = layout.getBounds().getWidth();
-			h = layout.getAscent() + layout.getDescent();
-		}
-		else
-		{
-			FontRenderContext frc = graphics.getFontRenderContext();
-			LineMetrics lineMetrics = font.getLineMetrics( "", frc );
-			x = 0.0;
-			h = lineMetrics.getAscent() + lineMetrics.getDescent();
-		}
-		graphics.draw( new Line2D.Double( x, 0.0, x, h ) );
 	}
 	
 	
