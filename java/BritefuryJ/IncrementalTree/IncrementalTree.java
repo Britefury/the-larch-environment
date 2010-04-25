@@ -76,9 +76,17 @@ public class IncrementalTree
 	
 	protected IncrementalTreeNode getRootIncrementalTreeNode()
 	{
+		if ( rootIncrementalTreeNode != null )
+		{
+			nodeTable.unrefIncrementalNode( rootIncrementalTreeNode );
+		}
 		if ( rootIncrementalTreeNode == null )
 		{
 			rootIncrementalTreeNode = buildIncrementalTreeNodeResult( root, rootElementFactory );
+		}
+		if ( rootIncrementalTreeNode != null )
+		{
+			nodeTable.refIncrementalNode( rootIncrementalTreeNode );
 		}
 		return rootIncrementalTreeNode;
 	}
@@ -93,14 +101,13 @@ public class IncrementalTree
 		else
 		{
 			// Try asking the table for an unused incremental tree node for the document node
-			IncrementalTreeNode viewNode = nodeTable.takeUnusedIncrementalNodeFor( node, elementFactory );
+			IncrementalTreeNode viewNode = nodeTable.getUnrefedIncrementalNodeFor( node, elementFactory );
 			
 			if ( viewNode == null )
 			{
 				// No existing incremental tree node could be acquired.
 				// Create a new one and add it to the table
 				viewNode = createIncrementalTreeNode( node, resultChangeListener );
-				nodeTable.put( node, viewNode );
 			}
 			
 			viewNode.setNodeResultFactory( elementFactory );

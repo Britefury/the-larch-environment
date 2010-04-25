@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.IncrementalTree;
 
+import java.util.Iterator;
+
 import BritefuryJ.Incremental.IncrementalFunction;
 import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.Incremental.IncrementalValue;
@@ -32,6 +34,58 @@ public class IncrementalTreeNode implements IncrementalValueListener, Incrementa
 	
 	public static interface NodeContext
 	{
+	}
+	
+	
+	public static class ChildrenIterator implements Iterator<IncrementalTreeNode>
+	{
+		private IncrementalTreeNode current;
+		
+		
+		
+		private ChildrenIterator(IncrementalTreeNode childrenHead)
+		{
+			current = childrenHead;
+		}
+
+		
+		@Override
+		public boolean hasNext()
+		{
+			return current != null;
+		}
+
+		@Override
+		public IncrementalTreeNode next()
+		{
+			IncrementalTreeNode res = current;
+			current = current.nextSibling;
+			return res;
+		}
+
+		@Override
+		public void remove()
+		{
+			throw new UnsupportedOperationException();
+		}
+	}
+	
+	
+	public static class ChildrenIterable implements Iterable<IncrementalTreeNode>
+	{
+		private IncrementalTreeNode node;
+		
+		private ChildrenIterable(IncrementalTreeNode node)
+		{
+			this.node = node;
+		}
+		
+		
+		@Override
+		public Iterator<IncrementalTreeNode> iterator()
+		{
+			return new ChildrenIterator( node.childrenHead );
+		}
 	}
 	
 	
@@ -135,6 +189,11 @@ public class IncrementalTreeNode implements IncrementalValueListener, Incrementa
 	public IncrementalTreeNode getParent()
 	{
 		return parent;
+	}
+	
+	public ChildrenIterable getChildren()
+	{
+		return new ChildrenIterable( this );
 	}
 	
 

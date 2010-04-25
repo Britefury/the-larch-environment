@@ -7,6 +7,8 @@
 package tests.IncrementalTree;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 
 import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMList;
@@ -28,6 +30,17 @@ public abstract class Test_IncrementalTreeNodeTable extends TestCase
 	protected abstract void refIncrementalNode(IncrementalTreeNode node);
 	protected abstract void unrefIncrementalNode(IncrementalTreeNode node);
 	
+	
+	protected void assertNodeSetsEqual(Collection<IncrementalTreeNode> x, Collection<IncrementalTreeNode> y)
+	{
+		HashSet<IncrementalTreeNode> setX = new HashSet<IncrementalTreeNode>();
+		HashSet<IncrementalTreeNode> setY = new HashSet<IncrementalTreeNode>();
+		setX.addAll( x );
+		setY.addAll( y );
+		assertEquals( setX, setY );
+	}
+	
+	
 	public void setUp()
 	{
 		dd = new DMList( Arrays.asList( new Object[] { "d" } ) );
@@ -47,11 +60,11 @@ public abstract class Test_IncrementalTreeNodeTable extends TestCase
 		
 		table = createTable();
 
-		table.put( da, ia );
-		table.put( db, ib );
-		table.put( dc, ic );
-		table.put( dd, id1 );
-		table.put( dd, id2 );
+		refIncrementalNode( ia );
+		refIncrementalNode( ib );
+		refIncrementalNode( ic );
+		refIncrementalNode( id1 );
+		refIncrementalNode( id2 );
 	}
 	
 	public void tearDown()
