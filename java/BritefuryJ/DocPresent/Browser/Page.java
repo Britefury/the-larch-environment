@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent.Browser;
 import BritefuryJ.CommandHistory.CommandHistoryController;
 import BritefuryJ.CommandHistory.CommandHistoryListener;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 
 public abstract class Page
 {
@@ -22,5 +23,11 @@ public abstract class Page
 	
 	public void setCommandHistoryListener(CommandHistoryListener listener)
 	{
+	}
+	
+	
+	public PersistentStateStore storePersistentState()
+	{
+		return null;
 	}
 }

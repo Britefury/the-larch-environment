@@ -4,12 +4,9 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocPresent.Browser;
+package BritefuryJ.DocPresent.PersistentState;
 
-import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
-
-
-public interface LocationResolver
+public abstract class PersistentStateStore
 {
-	public Page resolveLocationAsPage(Location location, PersistentStateStore persistentState);
+
 }

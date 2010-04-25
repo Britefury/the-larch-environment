@@ -19,7 +19,7 @@ public class IncrementalTreeNode implements IncrementalValueListener, Incrementa
 	{
 		private static final long serialVersionUID = 1L;
 	}
-
+	
 	public static interface NodeResultFactory
 	{
 		public Object createNodeResult(IncrementalTreeNode viewNode, Object docNode);
@@ -148,7 +148,7 @@ public class IncrementalTreeNode implements IncrementalValueListener, Incrementa
 		}
 	}
 	
-	protected NodeResultFactory getNodeResultFactory()
+	public NodeResultFactory getNodeResultFactory()
 	{
 		return resultFactory;
 	}

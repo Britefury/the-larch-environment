@@ -17,6 +17,7 @@ import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Browser.Page;
 import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
@@ -74,16 +75,16 @@ public class GSymViewContext implements DocView.RefreshListener
 	protected static class ViewFragmentContextAndResultFactoryKey
 	{
 		private GSymPerspective perspective;
-		private GSymViewFragmentFunction nodeFunction;
+		private GSymViewFragmentFunction viewFragmentFunction;
 		private AttributeTable subjectContext;
 		private StyleSheet styleSheet;
 		private AttributeTable state;
 		
 		
-		public ViewFragmentContextAndResultFactoryKey(GSymPerspective perspective, GSymViewFragmentFunction nodeFunction, AttributeTable subjectContext, StyleSheet styleSheet, AttributeTable state)
+		public ViewFragmentContextAndResultFactoryKey(GSymPerspective perspective, GSymViewFragmentFunction viewFragmentFunction, AttributeTable subjectContext, StyleSheet styleSheet, AttributeTable state)
 		{
 			this.perspective = perspective;
-			this.nodeFunction = nodeFunction;
+			this.viewFragmentFunction = viewFragmentFunction;
 			this.styleSheet = styleSheet;
 			this.state = state;
 			this.subjectContext = subjectContext;
@@ -92,11 +93,11 @@ public class GSymViewContext implements DocView.RefreshListener
 		
 		public int hashCode()
 		{
-			if ( nodeFunction == null  ||  styleSheet == null )
+			if ( viewFragmentFunction == null  ||  styleSheet == null )
 			{
-				throw new RuntimeException( "null?nodeFunction=" + ( nodeFunction == null ) + ", null?styleSheet=" + ( styleSheet == null ) );
+				throw new RuntimeException( "null?nodeFunction=" + ( viewFragmentFunction == null ) + ", null?styleSheet=" + ( styleSheet == null ) );
 			}
-			return HashUtils.nHash( new int[] { System.identityHashCode( perspective ), System.identityHashCode( nodeFunction ), styleSheet.hashCode(), state.hashCode(), subjectContext.hashCode() } );
+			return HashUtils.nHash( new int[] { System.identityHashCode( perspective ), System.identityHashCode( viewFragmentFunction ), styleSheet.hashCode(), state.hashCode(), subjectContext.hashCode() } );
 		}
 		
 		public boolean equals(Object x)
@@ -109,7 +110,7 @@ public class GSymViewContext implements DocView.RefreshListener
 			if ( x instanceof ViewFragmentContextAndResultFactoryKey )
 			{
 				ViewFragmentContextAndResultFactoryKey kx = (ViewFragmentContextAndResultFactoryKey)x;
-				return perspective == kx.perspective  &&  nodeFunction == kx.nodeFunction  &&  styleSheet.equals( kx.styleSheet )  &&  state == kx.state  &&  subjectContext == kx.subjectContext;
+				return perspective == kx.perspective  &&  viewFragmentFunction == kx.viewFragmentFunction  &&  styleSheet.equals( kx.styleSheet )  &&  state == kx.state  &&  subjectContext == kx.subjectContext;
 			}
 			else
 			{
@@ -137,12 +138,13 @@ public class GSymViewContext implements DocView.RefreshListener
 		new HashMap<ViewFragmentContextAndResultFactoryKey, ViewFragmentContextAndResultFactory>();
 
 	
-	public GSymViewContext(GSymSubject subject, GSymBrowserContext browserContext, CommandHistory commandHistory)
+	public GSymViewContext(GSymSubject subject, GSymBrowserContext browserContext, CommandHistory commandHistory, PersistentStateStore persistentState)
 	{
 		this.docRootNode = subject.getFocus();
 		GSymPerspective perspective = subject.getPerspective();
 		
-		view = new DocView( docRootNode, makeNodeResultFactory( perspective, perspective.getFragmentViewFunction(), subject.getSubjectContext(), perspective.getStyleSheet(), perspective.getInitialState() ) );
+		view = new DocView( docRootNode, makeNodeResultFactory( perspective, perspective.getFragmentViewFunction(), subject.getSubjectContext(), perspective.getStyleSheet(), perspective.getInitialState() ),
+				persistentState );
 
 		this.browserContext = browserContext;
 		this.commandHistory = commandHistory;
@@ -150,7 +152,7 @@ public class GSymViewContext implements DocView.RefreshListener
 		region = new DPRegion();
 		vbox = PrimitiveStyleSheet.instance.vbox( Arrays.asList( new DPElement[] { region } ) );
 
-		page = new GSymViewPage( vbox.alignHExpand().alignVExpand(), subject.getTitle(), browserContext, commandHistory );
+		page = new GSymViewPage( vbox.alignHExpand().alignVExpand(), subject.getTitle(), browserContext, commandHistory, this );
 		
 		view.setElementChangeListener( new NodeElementChangeListenerDiff() );
 		view.setRefreshListener( this );
@@ -242,7 +244,14 @@ public class GSymViewContext implements DocView.RefreshListener
 	{
 		return commandHistory;
 	}
-
+	
+	
+	
+	public PersistentStateStore storePersistentState()
+	{
+		return view.storePersistentState();
+	}
+	
 
 
 	public void onIncrementalTreeRequestRefresh(IncrementalTree tree)

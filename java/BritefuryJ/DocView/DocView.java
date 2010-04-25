@@ -7,12 +7,18 @@
 package BritefuryJ.DocView;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.ListIterator;
 
-import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPVBox;
+import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
+import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
 import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
 import BritefuryJ.IncrementalTree.IncrementalTree;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
+import BritefuryJ.IncrementalTree.IncrementalTreeNodeTable;
 import BritefuryJ.Utils.Profile.ProfileTimer;
 
 public class DocView extends IncrementalTree implements IncrementalTreeNode.NodeResultChangeListener
@@ -35,8 +41,52 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 	}
 	
 	
+	public static class StateStore extends PersistentStateStore
+	{
+		private HashMap<IncrementalTreeNodeTable.Key, LinkedList<PersistentStateTable>> table = new HashMap<IncrementalTreeNodeTable.Key, LinkedList<PersistentStateTable>>();
+		
+		
+		public StateStore()
+		{
+		}
+		
+		private void addPersistentState(Object node, PersistentStateTable persistentStateTable)
+		{
+			IncrementalTreeNodeTable.Key key = new IncrementalTreeNodeTable.Key( node );
+			LinkedList<PersistentStateTable> entryList = table.get( key );
+			if ( entryList == null )
+			{
+				entryList = new LinkedList<PersistentStateTable>();
+				table.put( key, entryList );
+			}
+			entryList.push( persistentStateTable );
+		}
+		
+		private PersistentStateTable usePersistentState(Object node)
+		{
+			LinkedList<PersistentStateTable> entryList = table.get( new IncrementalTreeNodeTable.Key( node ) );
+			if ( entryList != null )
+			{
+				return entryList.removeFirst();
+			}
+			else
+			{
+				return null;
+			}
+		}
+		
+		
+		public boolean isEmpty()
+		{
+			return table.isEmpty();
+		}
+	}
+	
+	
 	private NodeElementChangeListener elementChangeListener;
 	private DPVBox rootBox;
+	
+	private StateStore stateStoreToLoad;
 	
 	
 	private boolean bProfilingEnabled;
@@ -51,7 +101,7 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 	
 	
 	
-	public DocView(Object root, DVNode.NodeResultFactory rootElementFactory)
+	public DocView(Object root, DVNode.NodeResultFactory rootElementFactory, PersistentStateStore persistentState)
 	{
 		super( root, rootElementFactory, DuplicatePolicy.ALLOW_DUPLICATES );
 		elementChangeListener = null;
@@ -64,6 +114,11 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 		elementTimer = new ProfileTimer();
 		contentChangeTimer = new ProfileTimer();
 		updateNodeElementTimer = new ProfileTimer();
+
+		if ( persistentState != null  &&  persistentState instanceof StateStore )
+		{
+			stateStoreToLoad = (StateStore)persistentState;
+		}
 	}
 	
 	
@@ -97,6 +152,40 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 	
 	
 	
+	public PersistentStateStore storePersistentState()
+	{
+		StateStore store = new StateStore();
+		
+		LinkedList<IncrementalTreeNode> nodeQueue = new LinkedList<IncrementalTreeNode>();
+		nodeQueue.push( getRootIncrementalTreeNode() );
+		
+		while ( !nodeQueue.isEmpty() )
+		{
+			IncrementalTreeNode node = nodeQueue.removeFirst();
+			
+			// Get the persistent state, if any, and store it
+			DVNode viewNode = (DVNode)node;
+			PersistentStateTable stateTable = viewNode.getPersistentStateTable();
+			if ( stateTable != null )
+			{
+				store.addPersistentState( node.getDocNode(), stateTable );
+			}
+			
+			// Add the children using an interator; that means that they will be inserted at the beginning
+			// of the queue so that they appear *in order*, hence they will be removed in order.
+			ListIterator<IncrementalTreeNode> iterator = nodeQueue.listIterator();
+			for (IncrementalTreeNode child: node.getChildren())
+			{
+				iterator.add( child );
+			}
+		}
+		
+		
+		return store;
+	}
+	
+	
+	
 	protected void performRefresh()
 	{
 		// >>> PROFILING
@@ -112,8 +201,8 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 		profile_startJava();
 		// <<< PROFILING
 		
-		
 		super.performRefresh();
+		stateStoreToLoad = null;
 		
 		// >>> PROFILING
 		profile_stopJava();
@@ -145,7 +234,12 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 	
 	protected IncrementalTreeNode createIncrementalTreeNode(Object node, IncrementalTreeNode.NodeResultChangeListener changeListener)
 	{
-		return new DVNode( this, node, changeListener );
+		PersistentStateTable persistentState = null;
+		if ( stateStoreToLoad != null )
+		{
+			persistentState = stateStoreToLoad.usePersistentState( node );
+		}
+		return new DVNode( this, node, changeListener, persistentState );
 	}
 
 	
