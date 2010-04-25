@@ -6,11 +6,12 @@
 //##************************
 package BritefuryJ.IncrementalTree;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Stack;
 
 
 public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTable
@@ -19,7 +20,7 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 	{
 		private IncrementalTreeNodeTableWithUniques table;
 		private Key key;
-		private WeakReference<IncrementalTreeNode> refedNode;
+		private IncrementalTreeNode refedNode;
 		private IncrementalTreeNode unrefedNode;
 		
 		
@@ -32,66 +33,32 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 		
 		
 		
-		public IncrementalTreeNode takeUnusedNodeFor(Object node, IncrementalTreeNode.NodeResultFactory resultFactory)
+		public IncrementalTreeNode getUnrefedNodeFor(Object node, IncrementalTreeNode.NodeResultFactory resultFactory)
 		{
-			removeDeadEntries();
-			
-			
 			if ( refedNode == null  &&  unrefedNode != null )
 			{
-				// Find a view node; prefer one with the same result factory, otherwise pick one from the end of the list
-				IncrementalTreeNode incrementalNode = unrefedNode;
-				
-				if ( incrementalNode != null )
+				if ( unrefedNode.getNodeResultFactory() == resultFactory )
 				{
-					// Found an unused incremental tree node; move it into the ref'ed table
-					unrefedNode = null;
-					refedNode = new WeakReference<IncrementalTreeNode>( incrementalNode );
+					return unrefedNode;
 				}
-				
-				return incrementalNode;
 			}
 			
 			return null;
 		}
 		
 		
-		public void addRefedIncrementalNode(IncrementalTreeNode incrementalNode)
-		{
-			refedNode = new WeakReference<IncrementalTreeNode>( incrementalNode );
-		}
-		
-		public void removeIncrementalNode(IncrementalTreeNode incrementalNode)
-		{
-			if ( refedNode != null  &&  refedNode.get() == incrementalNode )
-			{
-				refedNode = null;
-				destroyIfEmpty();
-			}
-			else if ( unrefedNode == incrementalNode )
-			{
-				unrefedNode = null;
-				destroyIfEmpty();
-			}
-		}
-		
-		
-		public List<IncrementalTreeNode> getRefedNodes()
+		public Collection<IncrementalTreeNode> getRefedNodes()
 		{
 			if ( refedNode != null )
 			{
-				IncrementalTreeNode node = refedNode.get();
-				if ( node != null )
-				{
-					return Arrays.asList( new IncrementalTreeNode[] { node } );
-				}
+				return Arrays.asList( new IncrementalTreeNode[] { refedNode } );
 			}
 			return new ArrayList<IncrementalTreeNode>();
 		}
 		
 		public int size()
 		{
-			return refedNode != null  &&  refedNode.get() != null   ?   1  :  0;
+			return refedNode != null  ?  1  :  0;
 		}
 		
 		public int getNumUnrefedNodes()
@@ -107,15 +74,14 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 				throw new RuntimeException( "Attempting to ref the wrong incremental tree node (unique nodes for each key)" );
 			}
 			unrefedNode = null;
-			refedNode = new WeakReference<IncrementalTreeNode>( incrementalNode );
+			refedNode = incrementalNode;
 		}
 		
 		public void unrefIncrementalNode(IncrementalTreeNode incrementalNode)
 		{
 			if ( refedNode != null )
 			{
-				IncrementalTreeNode node = refedNode.get();
-				if ( node != null  &&  node != incrementalNode )
+				if ( refedNode != incrementalNode )
 				{
 					throw new RuntimeException( "Attempting to unref the wrong incremental tree node (unique nodes for each key)" );
 				}
@@ -133,19 +99,8 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 			destroyIfEmpty();
 		}
 		
-		private void removeDeadEntries()
-		{
-			// Remove the refed node if it is dead
-			if ( refedNode != null  &&  refedNode.get() == null )
-			{
-				refedNode = null;
-			}
-		}
-		
 		private void destroyIfEmpty()
 		{
-			removeDeadEntries();
-			
 			if ( refedNode == null  &&  unrefedNode == null )
 			{
 				table.removeViewTable( key );
@@ -155,7 +110,8 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 	
 	
 	
-	private HashMap<Key, EntryForDocNode> table;
+	private HashMap<Key, EntryForDocNode> table = new HashMap<Key, EntryForDocNode>();
+	private HashSet<IncrementalTreeNode> unrefedNodes = new HashSet<IncrementalTreeNode>();
 	
 	
 	
@@ -163,19 +119,18 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 	
 	public IncrementalTreeNodeTableWithUniques()
 	{
-		table = new HashMap<Key, EntryForDocNode>();
 	}
 	
 	
 	
 
-	public IncrementalTreeNode takeUnusedIncrementalNodeFor(Object docNode, IncrementalTreeNode.NodeResultFactory resultFactory)
+	public IncrementalTreeNode getUnrefedIncrementalNodeFor(Object docNode, IncrementalTreeNode.NodeResultFactory resultFactory)
 	{
 		Key key = new Key( docNode );
 		EntryForDocNode subTable = table.get( key );
 		if ( subTable != null )
 		{
-			return subTable.takeUnusedNodeFor( docNode, resultFactory );
+			return subTable.getUnrefedNodeFor( docNode, resultFactory );
 		}
 		else
 		{
@@ -184,7 +139,7 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 	}
 	
 	
-	public List<IncrementalTreeNode> get(Object docNode)
+	public Collection<IncrementalTreeNode> get(Object docNode)
 	{
 		Key key = new Key( docNode );
 		EntryForDocNode subTable = table.get( key );
@@ -195,32 +150,6 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 		else
 		{
 			return Arrays.asList( new IncrementalTreeNode[] {} );
-		}
-	}
-	
-	public void put(Object docNode, IncrementalTreeNode viewNode)
-	{
-		Key key = new Key( docNode );
-		EntryForDocNode subTable = table.get( key );
-		if ( subTable == null )
-		{
-			subTable = new EntryForDocNode( this, key );
-			table.put( key, subTable );
-		}
-		subTable.addRefedIncrementalNode( viewNode );
-	}
-	
-	public void remove(IncrementalTreeNode viewNode)
-	{
-		Key key = new Key( viewNode.getDocNode() );
-		EntryForDocNode subTable = table.get( key );
-		if ( subTable != null )
-		{
-			subTable.removeIncrementalNode( viewNode );
-		}
-		else
-		{
-			throw new RuntimeException( "Could not get sub-table for doc-node" );
 		}
 	}
 	
@@ -277,12 +206,27 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 	
 	public void clean()
 	{
-		ArrayList<EntryForDocNode> subTables = new ArrayList<EntryForDocNode>();
-		subTables.addAll( table.values() );
-		for (EntryForDocNode subTable: subTables)
+		// We need to remove all nodes within the sub-trees rooted at the unrefed nodes
+		Stack<IncrementalTreeNode> unrefedStack = new Stack<IncrementalTreeNode>();
+		unrefedStack.addAll( unrefedNodes );
+		
+		while ( !unrefedStack.isEmpty() )
 		{
-			subTable.clean();
+			IncrementalTreeNode node = unrefedStack.pop();
+			
+			EntryForDocNode subTable = table.get( new Key( node.getDocNode() ) );
+			if ( subTable != null )
+			{
+				subTable.clean();
+			}
+			
+			for (IncrementalTreeNode child: node.getChildren())
+			{
+				unrefedStack.push( child );
+			}
 		}
+		
+		unrefedNodes.clear();
 	}
 	
 	
@@ -290,14 +234,26 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 	{
 		Key key = new Key( node.getDocNode() );
 		EntryForDocNode subTable = table.get( key );
+		if ( subTable == null )
+		{
+			subTable = new EntryForDocNode( this, key );
+			table.put( key, subTable );
+		}
 		subTable.refIncrementalNode( node );
+		unrefedNodes.remove( node );
 	}
 
 	protected void unrefIncrementalNode(IncrementalTreeNode node)
 	{
 		Key key = new Key( node.getDocNode() );
 		EntryForDocNode subTable = table.get( key );
+		if ( subTable == null )
+		{
+			subTable = new EntryForDocNode( this, key );
+			table.put( key, subTable );
+		}
 		subTable.unrefIncrementalNode( node );
+		unrefedNodes.add( node );
 	}
 
 

@@ -60,106 +60,36 @@ public class Test_IncrementalTreeNodeTableWithDuplicates extends Test_Incrementa
 		assertTrue( table.containsKey( dc ) );
 		assertTrue( table.containsKey( dd ) );
 		
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] { ia } ), table.get( da ) );
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] { ib } ), table.get( db ) );
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] { ic } ), table.get( dc ) );
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] { id1, id2 } ), table.get( dd ) );
+		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { ia } ), table.get( da ) );
+		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { ib } ), table.get( db ) );
+		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { ic } ), table.get( dc ) );
+		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { id1, id2 } ), table.get( dd ) );
 	}
-	
-	public void testRemove()
-	{
-		table.remove( ia );
-		table.remove( id1 );
-
-		assertEquals( table.size(), 3 );
-		assertEquals( table.getNumDocNodes(), 3 );
-		assertEquals( table.getNumIncrementalNodesForDocNode( dd ), 1 );
-		
-		assertFalse( table.containsKey( da ) );
-		assertTrue( table.containsKey( db ) );
-		assertTrue( table.containsKey( dc ) );
-		assertTrue( table.containsKey( dd ) );
-
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] {} ), table.get( da ) );
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] { ib } ), table.get( db ) );
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] { ic } ), table.get( dc ) );
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] { id2 } ), table.get( dd ) );
-	}
-
-	public void testPut()
-	{
-		IncrementalTreeNode ix = new IncrementalTreeNode( tree, da, null  );
-		IncrementalTreeNode iy = new IncrementalTreeNode( tree, dd, null );
-		
-		table.put( da, ix );
-		table.put( dd, iy );
-
-		assertEquals( table.size(), 7 );
-		assertEquals( table.getNumDocNodes(), 4 );
-		assertEquals( table.getNumIncrementalNodesForDocNode( dd ), 3 );
-		
-		assertTrue( table.containsKey( da ) );
-		assertTrue( table.containsKey( db ) );
-		assertTrue( table.containsKey( dc ) );
-		assertTrue( table.containsKey( dd ) );
-
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] { ia, ix } ), table.get( da ) );
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] { ib } ), table.get( db ) );
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] { ic } ), table.get( dc ) );
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] { id1, id2, iy } ), table.get( dd ) );
-	}
-
-	public void testViewGC()
-	{
-		ia = null;
-		id1 = null;
-		System.gc();
-		
-		// Need to call DocViewNodeTable.clean() in order to clean away all weak-refs, etc
-		table.clean();
-
-		assertEquals( table.size(), 3 );
-		assertEquals( table.getNumDocNodes(), 3 );
-		assertEquals( table.getNumIncrementalNodesForDocNode( dd ), 1 );
-		
-		assertFalse( table.containsKey( da ) );
-		assertTrue( table.containsKey( db ) );
-		assertTrue( table.containsKey( dc ) );
-		assertTrue( table.containsKey( dd ) );
-
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] {} ), table.get( da ) );
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] { ib } ), table.get( db ) );
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] { ic } ), table.get( dc ) );
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] { id2 } ), table.get( dd ) );
-	}
-	
 	
 	public void testUnref()
 	{
 		unrefIncrementalNode( ia );
 		unrefIncrementalNode( id1 );
-
-		assertEquals( table.size(), 3 );
-		assertEquals( table.getNumDocNodes(), 4 );
-		assertEquals( table.getNumIncrementalNodesForDocNode( da ), 0 );
-		assertEquals( table.getNumIncrementalNodesForDocNode( dd ), 1 );
+		
 		assertEquals( table.getNumUnrefedIncrementalNodesForDocNode( da ), 1 );
 		assertEquals( table.getNumUnrefedIncrementalNodesForDocNode( dd ), 1 );
+
+		table.clean();
+
+		assertEquals( table.size(), 3 );
+		assertEquals( table.getNumDocNodes(), 3 );
+		assertEquals( table.getNumIncrementalNodesForDocNode( da ), 0 );
+		assertEquals( table.getNumIncrementalNodesForDocNode( dd ), 1 );
 		
 		assertFalse( table.containsKey( da ) );
 		assertTrue( table.containsKey( db ) );
 		assertTrue( table.containsKey( dc ) );
 		assertTrue( table.containsKey( dd ) );
 
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] {} ), table.get( da ) );
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] { ib } ), table.get( db ) );
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] { ic } ), table.get( dc ) );
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] { id2 } ), table.get( dd ) );
-		
-		table.clean();
-
-		assertEquals( table.size(), 3 );
-		assertEquals( table.getNumDocNodes(), 3 );
+		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] {} ), table.get( da ) );
+		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { ib } ), table.get( db ) );
+		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { ic } ), table.get( dc ) );
+		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { id2 } ), table.get( dd ) );
 	}
 
 	
@@ -170,6 +100,8 @@ public class Test_IncrementalTreeNodeTableWithDuplicates extends Test_Incrementa
 		unrefIncrementalNode( id1 );
 		refIncrementalNode( ia );
 		refIncrementalNode( id1 );
+
+		table.clean();
 
 		assertEquals( table.size(), 5 );
 		assertEquals( table.getNumDocNodes(), 4 );
@@ -183,15 +115,10 @@ public class Test_IncrementalTreeNodeTableWithDuplicates extends Test_Incrementa
 		assertTrue( table.containsKey( dc ) );
 		assertTrue( table.containsKey( dd ) );
 
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] { ia } ), table.get( da ) );
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] { ib } ), table.get( db ) );
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] { ic } ), table.get( dc ) );
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] { id2, id1 } ), table.get( dd ) );
-		
-		table.clean();
-
-		assertEquals( table.size(), 5 );
-		assertEquals( table.getNumDocNodes(), 4 );
+		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { ia } ), table.get( da ) );
+		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { ib } ), table.get( db ) );
+		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { ic } ), table.get( dc ) );
+		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { id2, id1 } ), table.get( dd ) );
 	}
 
 
@@ -200,7 +127,8 @@ public class Test_IncrementalTreeNodeTableWithDuplicates extends Test_Incrementa
 
 	public void testReuseUnrefed()
 	{
-		table.remove( id1 );
+		unrefIncrementalNode( id1 );
+		table.clean();
 		unrefIncrementalNode( id2 );
 
 		assertEquals( table.size(), 3 );
@@ -213,18 +141,19 @@ public class Test_IncrementalTreeNodeTableWithDuplicates extends Test_Incrementa
 		assertTrue( table.containsKey( dc ) );
 		assertFalse( table.containsKey( dd ) );
 
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] { ia } ), table.get( da ) );
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] { ib } ), table.get( db ) );
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] { ic } ), table.get( dc ) );
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] {} ), table.get( dd ) );
+		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { ia } ), table.get( da ) );
+		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { ib } ), table.get( db ) );
+		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { ic } ), table.get( dc ) );
+		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] {} ), table.get( dd ) );
 		
 		
 		// Reuse
-		IncrementalTreeNode val = table.takeUnusedIncrementalNodeFor( dd, null );
+		IncrementalTreeNode val = table.getUnrefedIncrementalNodeFor( dd, null );
+		refIncrementalNode( val );
 		assertSame( val, id2 );
 		assertSame( val.getDocNode(), dd );
 		
-		assertEquals( Arrays.asList( new IncrementalTreeNode[] { id2 } ), table.get( dd ) );
+		assertNodeSetsEqual( Arrays.asList( new IncrementalTreeNode[] { id2 } ), table.get( dd ) );
 		assertTrue( table.containsKey( dd ) );
 		assertEquals( table.size(), 4 );
 		
@@ -235,11 +164,12 @@ public class Test_IncrementalTreeNodeTableWithDuplicates extends Test_Incrementa
 		assertEquals( table.size(), 3 );
 		
 		// Take an unused node again
-		val = table.takeUnusedIncrementalNodeFor( dd, null );
+		val = table.getUnrefedIncrementalNodeFor( dd, null );
+		refIncrementalNode( val );
 		assertSame( val, id2 );
 		
 		
 		// Ensure that no unused nodes remain
-		assertSame( table.takeUnusedIncrementalNodeFor( dd, null ), null );
+		assertSame( table.getUnrefedIncrementalNodeFor( dd, null ), null );
 	}
 }

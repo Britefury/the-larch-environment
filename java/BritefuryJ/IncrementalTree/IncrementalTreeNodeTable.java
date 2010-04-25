@@ -7,7 +7,7 @@
 package BritefuryJ.IncrementalTree;
 
 import java.lang.ref.WeakReference;
-import java.util.List;
+import java.util.Collection;
 
 public abstract class IncrementalTreeNodeTable
 {
@@ -49,10 +49,8 @@ public abstract class IncrementalTreeNodeTable
 	
 	
 
-	public abstract IncrementalTreeNode takeUnusedIncrementalNodeFor(Object docNode, IncrementalTreeNode.NodeResultFactory resultFactory);
-	public abstract List<IncrementalTreeNode> get(Object docNode);
-	public abstract void put(Object docNode, IncrementalTreeNode viewNode);
-	public abstract void remove(IncrementalTreeNode viewNode);
+	public abstract IncrementalTreeNode getUnrefedIncrementalNodeFor(Object docNode, IncrementalTreeNode.NodeResultFactory resultFactory);
+	public abstract Collection<IncrementalTreeNode> get(Object docNode);
 	public abstract boolean containsKey(Object docNode);
 	public abstract int size();
 	public abstract int getNumDocNodes();
