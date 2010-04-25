@@ -14,6 +14,7 @@ import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerNavigationEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeViewport;
+import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
@@ -22,30 +23,31 @@ import BritefuryJ.Math.Xform2;
 
 public class DPViewport extends DPContainer
 {
-	public static interface ViewportListener
-	{
-		void onViewportXformModified(DPViewport viewport);
-	}
-	
-	
 	private double minWidth, minHeight;
 	private Xform2 allocationSpaceToLocalSpace;
-	private ViewportListener listener;
+	private PersistentState state;
 	
 	
-	public DPViewport(double minWidth, double minHeight)
+	public DPViewport(double minWidth, double minHeight, PersistentState state)
 	{
-		this( ContainerStyleParams.defaultStyleParams, minWidth, minHeight );
+		this( ContainerStyleParams.defaultStyleParams, minWidth, minHeight, state );
 	}
 
-	public DPViewport(ContainerStyleParams styleParams, double minWidth, double minHeight)
+	public DPViewport(ContainerStyleParams styleParams, double minWidth, double minHeight, PersistentState state)
 	{
 		super(styleParams);
 		
 		this.minWidth = minWidth;
 		this.minHeight = minHeight;
 		layoutNode = new LayoutNodeViewport( this );
-		allocationSpaceToLocalSpace = new Xform2();
+		this.state = state;
+		Xform2 x = state.getValueAsType( Xform2.class );
+		if ( x == null )
+		{
+			x = new Xform2();
+			state.setValue( x );
+		}
+		allocationSpaceToLocalSpace = x;
 	}
 	
 	
@@ -60,12 +62,6 @@ public class DPViewport extends DPContainer
 	}
 	
 	
-	public void setListener(ViewportListener listener)
-	{
-		this.listener = listener;
-	}
-	
-	
 	public Xform2 getViewportXform()
 	{
 		return allocationSpaceToLocalSpace.clone();
@@ -74,6 +70,7 @@ public class DPViewport extends DPContainer
 	public void setViewportXform(Xform2 x)
 	{
 		allocationSpaceToLocalSpace = x.clone();
+		state.setValue( allocationSpaceToLocalSpace );
 		queueFullRedraw();
 	}
 	
@@ -324,10 +321,7 @@ public class DPViewport extends DPContainer
 	
 	public void onXformModified()
 	{
-		if ( listener != null )
-		{
-			listener.onViewportXformModified( this );
-		}
+		state.setValue( allocationSpaceToLocalSpace );
 		queueFullRedraw();
 	}
 

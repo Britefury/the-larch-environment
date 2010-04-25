@@ -16,6 +16,8 @@ import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.Browser.Location;
+import BritefuryJ.DocPresent.PersistentState.PersistentState;
+import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocView.DVNode;
@@ -71,6 +73,18 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 	public Object getDocNode()
 	{
 		return viewNode.getDocNode();
+	}
+	
+	
+	
+	public PersistentState persistentState(Object key)
+	{
+		return viewNode.persistentState( key );
+	}
+	
+	public PersistentStateTable getPersistentStateTable()
+	{
+		return viewNode.getPersistentStateTable();
 	}
 	
 	

@@ -29,11 +29,12 @@ import javax.swing.TransferHandler;
 import BritefuryJ.CommandHistory.CommandHistoryController;
 import BritefuryJ.CommandHistory.CommandHistoryListener;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.DPViewport;
 import BritefuryJ.DocPresent.PageController;
+import BritefuryJ.DocPresent.PresentationComponent;
+import BritefuryJ.DocPresent.PersistentState.PersistentState;
 
-public class Browser implements DPViewport.ViewportListener
+public class Browser
 {
 	protected interface BrowserListener
 	{
@@ -68,10 +69,7 @@ public class Browser implements DPViewport.ViewportListener
 		this.context = context;
 		history = new BrowserHistory( location );
 		
-		viewport = new DPViewport( 0.0, 0.0 );
-		viewport.alignHExpand().alignVExpand();
-		viewport.setListener( this );
-		viewport.setViewportXform( history.getCurrentState().getViewTransformation() );
+		viewport = makeViewport( history.getCurrentState().getViewportState() );
 		
 		presComponent = new PresentationComponent();
 		presComponent.setPageController( pageController );
@@ -240,6 +238,12 @@ public class Browser implements DPViewport.ViewportListener
 
 	
 	
+	private DPViewport makeViewport(PersistentState state)
+	{
+		DPViewport vp = new DPViewport( 0.0, 0.0, state );
+		return (DPViewport)vp.alignHExpand().alignVExpand();
+	}
+	
 	
 	private void resolve()
 	{
@@ -248,13 +252,12 @@ public class Browser implements DPViewport.ViewportListener
 		
 		Page p = context.resolveLocationAsPage( location );
 		
-		// Add browser, and add component
-		viewport.setChild( p.getContentsElement().alignHExpand() );		
+		viewport = makeViewport( history.getCurrentState().getViewportState() );
+		viewport.setChild( p.getContentsElement().alignHExpand() );
+		presComponent.getRootElement().setChild( viewport );
 		
 		// Set the page
 		setPage( p );
-
-		viewport.setViewportXform( history.getCurrentState().getViewTransformation() );
 	}
 	
 	private void setPage(Page p)
@@ -359,12 +362,5 @@ public class Browser implements DPViewport.ViewportListener
 		}
 		
 		return button;
-	}
-	
-	
-	
-	public void onViewportXformModified(DPViewport v)
-	{
-		history.getCurrentState().setViewTransformation( viewport.getViewportXform() );
 	}
 }

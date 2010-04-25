@@ -17,6 +17,7 @@ import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.Border.SolidBorder;
+import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
@@ -137,7 +138,7 @@ public class ParseView implements FragmentContext
 	
 	
 	
-	private ParseView(DebugParseResultInterface result)
+	private ParseView(DebugParseResultInterface result, PersistentState viewportState)
 	{
 		selection = null;
 		
@@ -153,8 +154,8 @@ public class ParseView implements FragmentContext
 		
 		element.setChild( root.getElement() );
 		
-		
-		viewport = viewportBorderStyle.border( PrimitiveStyleSheet.instance.viewport( element, 0.0, 800.0 ).alignHExpand().alignVExpand() ).alignHExpand().alignVExpand();
+		DPElement vp = PrimitiveStyleSheet.instance.viewport( element, 0.0, 800.0, viewportState ).alignHExpand().alignVExpand();
+		viewport = viewportBorderStyle.border( vp ).alignHExpand().alignVExpand();
 	}
 	
 	
@@ -232,7 +233,7 @@ public class ParseView implements FragmentContext
 	
 	public static DPElement presentDebugParseResult(DebugParseResultInterface x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
 	{
-		ParseView v = new ParseView( x );
+		ParseView v = new ParseView( x, ctx.persistentState( "viewport " ) );
 		return v.viewport.alignHExpand().alignVExpand();
 	}
 

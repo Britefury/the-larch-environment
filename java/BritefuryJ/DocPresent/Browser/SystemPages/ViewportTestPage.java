@@ -14,6 +14,7 @@ import java.util.Arrays;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.Border.SolidBorder;
+import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class ViewportTestPage extends SystemPage
@@ -66,7 +67,7 @@ public class ViewportTestPage extends SystemPage
 		
 		DPElement b2 = makeParagraph( "Exampe text:", 1, blackText );
 		
-		DPElement viewport = borderStyle.border( styleSheet.viewport( b2, 0.0, 200.0 ).alignHExpand().alignVExpand() ).alignHExpand().alignVExpand();
+		DPElement viewport = borderStyle.border( styleSheet.viewport( b2, 0.0, 200.0, new PersistentState() ).alignHExpand().alignVExpand() ).alignHExpand().alignVExpand();
 		DPElement vbox = PrimitiveStyleSheet.instance.withVBoxSpacing( 5.0 ).vbox( Arrays.asList( new DPElement[] { PrimitiveStyleSheet.instance.staticText( "Viewport:" ), viewport } ) ).alignHExpand().alignVExpand();
 		return vbox.pad( 50.0, 50.0 ).alignHExpand().alignVExpand();
 	}

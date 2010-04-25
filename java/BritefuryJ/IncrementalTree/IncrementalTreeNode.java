@@ -308,6 +308,7 @@ public class IncrementalTreeNode implements IncrementalValueListener, Incrementa
 			child = next;
 		}
 		childrenHead = childrenTail = null;
+		onComputeNodeResultBegin();
 		
 		if ( resultFactory != null )
 		{
@@ -320,12 +321,22 @@ public class IncrementalTreeNode implements IncrementalValueListener, Incrementa
 				incrementalTree.nodeTable.refIncrementalNode( child );
 				child = child.nextSibling;
 			}
+			onComputeNodeResultEnd();
 			return r;
 		}
 		else
 		{
+			onComputeNodeResultEnd();
 			return null;
 		}
+	}
+	
+	protected void onComputeNodeResultBegin()
+	{
+	}
+	
+	protected void onComputeNodeResultEnd()
+	{
 	}
 
 	

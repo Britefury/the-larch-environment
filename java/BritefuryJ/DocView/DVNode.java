@@ -9,6 +9,8 @@ package BritefuryJ.DocView;
 import BritefuryJ.DocPresent.DPFragment;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.FragmentContext;
+import BritefuryJ.DocPresent.PersistentState.PersistentState;
+import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 
 public class DVNode extends IncrementalTreeNode
@@ -24,6 +26,7 @@ public class DVNode extends IncrementalTreeNode
 	
 	private DPFragment fragmentElement;
 	private DPElement element;
+	private PersistentStateTable persistentState;
 	
 	
 	
@@ -34,6 +37,7 @@ public class DVNode extends IncrementalTreeNode
 		// Fragment element, with null context, initially; later set in @setContext method
 		fragmentElement = new DPFragment( null );
 		element = null;
+		persistentState = new PersistentStateTable();
 	}
 	
 	
@@ -136,5 +140,42 @@ public class DVNode extends IncrementalTreeNode
 			}
 		}
 		getDocView().profile_stopUpdateNodeElement();
+	}
+	
+	
+	
+	protected void onComputeNodeResultBegin()
+	{
+		if ( persistentState != null )
+		{
+			persistentState.onRefreshBegin();
+		}
+	}
+	
+	protected void onComputeNodeResultEnd()
+	{
+		if ( persistentState != null )
+		{
+			persistentState.onRefreshEnd();
+			if ( persistentState.isEmpty() )
+			{
+				persistentState = null;
+			}
+		}
+	}
+
+	
+	public PersistentStateTable getPersistentStateTable()
+	{
+		if ( persistentState == null )
+		{
+			persistentState = new PersistentStateTable();
+		}
+		return persistentState;
+	}
+	
+	public PersistentState persistentState(Object key)
+	{
+		return getPersistentStateTable().persistentState( key );
 	}
 }
