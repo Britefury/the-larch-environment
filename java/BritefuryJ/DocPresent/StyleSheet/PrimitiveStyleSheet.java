@@ -49,6 +49,7 @@ import BritefuryJ.DocPresent.Canvas.DrawingNode;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.Painter.Painter;
+import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ContentLeafStyleParams;
 import BritefuryJ.DocPresent.StyleParams.FractionStyleParams;
@@ -966,16 +967,16 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 	
 	
-	public DPViewport viewport(DPElement child, double minWidth, double minHeight)
+	public DPViewport viewport(DPElement child, double minWidth, double minHeight, PersistentState state)
 	{
-		DPViewport viewport = new DPViewport( minWidth, minHeight );
+		DPViewport viewport = new DPViewport( minWidth, minHeight, state );
 		viewport.setChild( child );
 		return viewport;
 	}
 	
-	public DPViewport viewport(DPElement child)
+	public DPViewport viewport(DPElement child, PersistentState state)
 	{
-		DPViewport viewport = new DPViewport( 0.0, 0.0 );
+		DPViewport viewport = new DPViewport( 0.0, 0.0, state );
 		viewport.setChild( child );
 		return viewport;
 	}

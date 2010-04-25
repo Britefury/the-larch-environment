@@ -21,6 +21,7 @@ import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ParagraphStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
@@ -147,7 +148,7 @@ public class DPStress2Test
 		DPElement w = createContentNode();
 		long t2 = System.nanoTime();
 		System.out.println( "Element tree creation time: " + (double)( t2 - t1 ) / 1000000000.0 );
-		DPViewport viewport = new DPViewport( 0.0, 0.0 );
+		DPViewport viewport = new DPViewport( 0.0, 0.0, new PersistentState() );
 		viewport.setChild( w );
 		presentation.setChild( viewport.alignHExpand().alignVExpand() );
 	     

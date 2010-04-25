@@ -6,18 +6,18 @@
 //##************************
 package BritefuryJ.DocPresent.Browser;
 
-import BritefuryJ.Math.Xform2;
+import BritefuryJ.DocPresent.PersistentState.PersistentState;
 
 class BrowserState
 {
 	private Location location;
-	private Xform2 viewXform;
+	private PersistentState viewportState;
 	
 	
 	public BrowserState(Location location)
 	{
 		this.location = location;
-		this.viewXform = new Xform2();
+		this.viewportState = new PersistentState();
 	}
 	
 	public Location getLocation()
@@ -25,14 +25,8 @@ class BrowserState
 		return location;
 	}
 
-	public Xform2 getViewTransformation()
+	public PersistentState getViewportState()
 	{
-		return viewXform;
-	}
-	
-	
-	public void setViewTransformation(Xform2 x)
-	{
-		viewXform = x;
+		return viewportState;
 	}
 }

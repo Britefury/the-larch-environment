@@ -20,6 +20,7 @@ import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPViewport;
 import BritefuryJ.DocPresent.PresentationComponent;
+import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.StyleParams.ParagraphStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 
@@ -159,7 +160,7 @@ public class DPStressTest
 		DPElement w = createContentNode();
 		long t2 = System.nanoTime();
 		System.out.println( "Element tree creation time: " + (double)( t2 - t1 ) / 1000000000.0 );
-		DPViewport viewport = new DPViewport( 0.0, 0.0 );
+		DPViewport viewport = new DPViewport( 0.0, 0.0, new PersistentState() );
 		viewport.setChild( w );
 		presentation.setChild( viewport.alignHExpand().alignVExpand() );
 	     

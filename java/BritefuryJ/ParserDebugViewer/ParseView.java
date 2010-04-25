@@ -17,6 +17,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPViewport;
 import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.PresentationComponent;
+import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -152,7 +153,7 @@ public class ParseView implements FragmentContext
 		root.registerEdges();
 		
 		bin.setChild( root.getElement() );
-		viewport = new DPViewport( 0.0, 0.0 );
+		viewport = new DPViewport( 0.0, 0.0, new PersistentState() );
 		viewport.setChild( bin );
 		presComponent.setChild( viewport );
 	}
