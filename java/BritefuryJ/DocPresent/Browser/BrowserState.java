@@ -7,11 +7,13 @@
 package BritefuryJ.DocPresent.Browser;
 
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
+import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 
 class BrowserState
 {
 	private Location location;
 	private PersistentState viewportState;
+	private PersistentStateStore pageState;
 	
 	
 	public BrowserState(Location location)
@@ -28,5 +30,16 @@ class BrowserState
 	public PersistentState getViewportState()
 	{
 		return viewportState;
+	}
+	
+	
+	public void setPagePersistentState(PersistentStateStore state)
+	{
+		pageState = state;
+	}
+	
+	public PersistentStateStore getPagePersistentState()
+	{
+		return pageState;
 	}
 }

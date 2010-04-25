@@ -8,10 +8,11 @@ package BritefuryJ.IncrementalTree;
 
 import java.lang.ref.WeakReference;
 import java.util.Collection;
+import java.util.Set;
 
 public abstract class IncrementalTreeNodeTable
 {
-	protected static class Key
+	public static class Key
 	{
 		private WeakReference<Object> node;
 		private int hash;
@@ -21,6 +22,12 @@ public abstract class IncrementalTreeNodeTable
 		{
 			this.node = new WeakReference<Object>( node );
 			hash = System.identityHashCode( node );
+		}
+		
+		
+		public Object getNode()
+		{
+			return node.get();
 		}
 		
 		
@@ -50,6 +57,7 @@ public abstract class IncrementalTreeNodeTable
 	
 
 	public abstract IncrementalTreeNode getUnrefedIncrementalNodeFor(Object docNode, IncrementalTreeNode.NodeResultFactory resultFactory);
+	public abstract Set<Key> getKeys();
 	public abstract Collection<IncrementalTreeNode> get(Object docNode);
 	public abstract boolean containsKey(Object docNode);
 	public abstract int size();

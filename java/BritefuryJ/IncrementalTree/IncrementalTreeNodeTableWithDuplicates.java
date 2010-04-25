@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.Stack;
 
 
@@ -20,8 +21,8 @@ public class IncrementalTreeNodeTableWithDuplicates extends IncrementalTreeNodeT
 		private IncrementalTreeNodeTableWithDuplicates table;
 		private Key key;
 		
-		private HashSet<IncrementalTreeNode> refedNodes;
-		private HashMap<IncrementalTreeNode.NodeResultFactory, IncrementalTreeNode> unrefedNodes;
+		private HashSet<IncrementalTreeNode> refedNodes = new HashSet<IncrementalTreeNode>();
+		private HashSet<IncrementalTreeNode> unrefedNodes;
 		
 		
 		
@@ -29,8 +30,6 @@ public class IncrementalTreeNodeTableWithDuplicates extends IncrementalTreeNodeT
 		{
 			this.table = table;
 			this.key = key;
-			
-			refedNodes = new HashSet<IncrementalTreeNode>();
 		}
 		
 		
@@ -38,9 +37,9 @@ public class IncrementalTreeNodeTableWithDuplicates extends IncrementalTreeNodeT
 		{
 			if ( unrefedNodes == null )
 			{
-				unrefedNodes = new HashMap<IncrementalTreeNode.NodeResultFactory, IncrementalTreeNode>();
+				unrefedNodes = new HashSet<IncrementalTreeNode>();
 			}
-			unrefedNodes.put( node.getNodeResultFactory(), node );
+			unrefedNodes.add( node );
 		}
 		
 		private void removeUnrefedNode(IncrementalTreeNode node)
@@ -57,7 +56,17 @@ public class IncrementalTreeNodeTableWithDuplicates extends IncrementalTreeNodeT
 		
 		private IncrementalTreeNode getUnrefedNode(IncrementalTreeNode.NodeResultFactory nodeResultFactory)
 		{
-			return unrefedNodes != null  ?  unrefedNodes.get( nodeResultFactory )  :  null;
+			if ( unrefedNodes != null )
+			{
+				for (IncrementalTreeNode node: unrefedNodes)
+				{
+					if ( node.getNodeResultFactory() == nodeResultFactory )
+					{
+						return node;
+					}
+				}
+			}
+			return null;
 		}
 		
 		
@@ -206,6 +215,10 @@ public class IncrementalTreeNodeTableWithDuplicates extends IncrementalTreeNodeT
 		}
 	}
 	
+	public Set<Key> getKeys()
+	{
+		return table.keySet();
+	}
 	
 	public void clean()
 	{

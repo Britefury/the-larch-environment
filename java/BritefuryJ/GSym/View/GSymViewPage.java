@@ -18,6 +18,7 @@ import BritefuryJ.DocPresent.Browser.Page;
 import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
 import BritefuryJ.DocPresent.Controls.Hyperlink;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
+import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.GSym.GSymBrowserContext;
 import BritefuryJ.Logging.Log;
@@ -31,14 +32,16 @@ public class GSymViewPage extends Page
 	private String title;
 	private Log log;
 	private CommandHistory commandHistory;
+	private GSymViewContext viewContext;
 	
 	
 	
-	public GSymViewPage(DPElement element, String title, final GSymBrowserContext browserContext, CommandHistory commandHistory)
+	public GSymViewPage(DPElement element, String title, final GSymBrowserContext browserContext, CommandHistory commandHistory, GSymViewContext viewContext)
 	{
 		this.element = element;
 		this.title = title;
 		this.commandHistory = commandHistory;
+		this.viewContext = viewContext;
 		
 		Hyperlink.LinkListener listener = new Hyperlink.LinkListener()
 		{
@@ -96,5 +99,11 @@ public class GSymViewPage extends Page
 		{
 			commandHistory.setCommandHistoryListener( listener );
 		}
+	}
+
+
+	public PersistentStateStore storePersistentState()
+	{
+		return viewContext.storePersistentState();
 	}
 }

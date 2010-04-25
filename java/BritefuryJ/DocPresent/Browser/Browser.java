@@ -33,6 +33,7 @@ import BritefuryJ.DocPresent.DPViewport;
 import BritefuryJ.DocPresent.PageController;
 import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
+import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 
 public class Browser
 {
@@ -218,6 +219,7 @@ public class Browser
 	{
 		if ( history.canGoBack() )
 		{
+			onPreHistoryChange();
 			history.back();
 			Location location = history.getCurrentState().getLocation();
 			locationField.setText( location.getLocationString() );
@@ -229,6 +231,7 @@ public class Browser
 	{
 		if ( history.canGoForward() )
 		{
+			onPreHistoryChange();
 			history.forward();
 			Location location = history.getCurrentState().getLocation();
 			locationField.setText( location.getLocationString() );
@@ -250,8 +253,9 @@ public class Browser
 		// Get the location to resolve
 		Location location = history.getCurrentState().getLocation();
 		
-		Page p = context.resolveLocationAsPage( location );
-		
+		PersistentStateStore stateStore = history.getCurrentState().getPagePersistentState();
+		Page p = context.resolveLocationAsPage( location, stateStore );
+
 		viewport = makeViewport( history.getCurrentState().getViewportState() );
 		viewport.setChild( p.getContentsElement().alignHExpand() );
 		presComponent.getRootElement().setChild( viewport );
@@ -304,6 +308,7 @@ public class Browser
 	
 	private void setLocation(Location location)
 	{
+		onPreHistoryChange();
 		history.visit( location );
 		resolve();
 	}
@@ -312,6 +317,13 @@ public class Browser
 	private void onLocationField(String location)
 	{
 		setLocation( new Location( location ) );
+	}
+	
+	
+	private void onPreHistoryChange()
+	{
+		PersistentStateStore store = page.storePersistentState();
+		history.getCurrentState().setPagePersistentState( store );
 	}
 
 

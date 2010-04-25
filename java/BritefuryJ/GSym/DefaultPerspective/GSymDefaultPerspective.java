@@ -35,6 +35,7 @@ import BritefuryJ.DocPresent.ListView.SeparatorElementFactory;
 import BritefuryJ.DocPresent.ListView.SpanListViewLayoutStyleSheet;
 import BritefuryJ.DocPresent.ListView.TrailingSeparator;
 import BritefuryJ.DocPresent.Painter.FillPainter;
+import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GSymBrowserContext;
@@ -91,12 +92,12 @@ public class GSymDefaultPerspective implements GSymPerspective
 		
 		
 		@Override
-		public Page resolveLocationAsPage(Location location)
+		public Page resolveLocationAsPage(Location location, PersistentStateStore persistentState)
 		{
 			GSymSubject subject = perspective.resolveLocation( null, location.iterator() );
 			if ( subject != null )
 			{
-				GSymViewContext viewContext = new GSymViewContext( subject, perspective.browserContext, null );
+				GSymViewContext viewContext = new GSymViewContext( subject, perspective.browserContext, null, persistentState );
 				return viewContext.getPage();
 			}
 			else

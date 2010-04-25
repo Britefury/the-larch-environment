@@ -91,7 +91,7 @@ class _WindowLocationResolver (GSymLocationResolver):
 		self._window = window
 		
 	
-	def resolveLocationAsPage(self, location):
+	def resolveLocationAsPage(self, location, persistentState):
 		subject = self.resolveLocationAsSubject( location )
 		if subject is not None:
 			commandHistory = None
@@ -102,7 +102,7 @@ class _WindowLocationResolver (GSymLocationResolver):
 				
 			commandHistory = doc.getCommandHistory()   if doc is not None   else None
 
-			viewContext = GSymViewContext( subject, self._window._browserContext, commandHistory )
+			viewContext = GSymViewContext( subject, self._window._browserContext, commandHistory, persistentState )
 			return viewContext.getPage()
 		
 		return None

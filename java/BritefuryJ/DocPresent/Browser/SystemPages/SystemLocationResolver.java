@@ -11,6 +11,7 @@ import java.util.HashMap;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.LocationResolver;
 import BritefuryJ.DocPresent.Browser.Page;
+import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 
 public class SystemLocationResolver implements LocationResolver
 {
@@ -52,7 +53,7 @@ public class SystemLocationResolver implements LocationResolver
 
 	
 	
-	public Page resolveLocationAsPage(Location location)
+	public Page resolveLocationAsPage(Location location, PersistentStateStore persistentState)
 	{
 		Location.TokenIterator iter = location.iterator();
 		if ( location.equals( rootLocation ) )

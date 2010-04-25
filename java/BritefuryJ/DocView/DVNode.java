@@ -30,14 +30,18 @@ public class DVNode extends IncrementalTreeNode
 	
 	
 	
-	public DVNode(DocView view, Object docNode, NodeResultChangeListener resultChangeListener)
+	public DVNode(DocView view, Object docNode, NodeResultChangeListener resultChangeListener, PersistentStateTable persistentState)
 	{
 		super( view, docNode, resultChangeListener );
 		
 		// Fragment element, with null context, initially; later set in @setContext method
 		fragmentElement = new DPFragment( null );
 		element = null;
-		persistentState = new PersistentStateTable();
+		this.persistentState = persistentState;
+		if ( this.persistentState == null )
+		{
+			this.persistentState = new PersistentStateTable();
+		}
 	}
 	
 	

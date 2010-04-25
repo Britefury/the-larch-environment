@@ -8,9 +8,10 @@ package BritefuryJ.GSym;
 
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.Page;
+import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 
 public interface GSymLocationResolver
 {
-	public Page resolveLocationAsPage(Location location);
+	public Page resolveLocationAsPage(Location location, PersistentStateStore persistentState);
 	GSymSubject resolveLocationAsSubject(Location location);
 }

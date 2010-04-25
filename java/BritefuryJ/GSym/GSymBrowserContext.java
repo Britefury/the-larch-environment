@@ -23,6 +23,7 @@ import BritefuryJ.DocPresent.Browser.Page;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemLocationResolver;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
+import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.DefaultPerspective.GSymDefaultPerspective;
@@ -142,7 +143,7 @@ public class GSymBrowserContext
 		public GSymSubject resolveLocation(GSymSubject enclosingSubject, Location.TokenIterator relativeLocation)
 		{
 			Location location = new Location( relativeLocation.getSuffix() );
-			Page p = systemLocationResolver.resolveLocationAsPage( location );
+			Page p = systemLocationResolver.resolveLocationAsPage( location, null );
 			if ( p != null )
 			{
 				return new GSymSubject( p, this, p.getTitle(), AttributeTable.instance );
@@ -166,12 +167,12 @@ public class GSymBrowserContext
 		
 		
 		@Override
-		public Page resolveLocationAsPage(Location location)
+		public Page resolveLocationAsPage(Location location, PersistentStateStore persistentState)
 		{
 			GSymSubject subject = perspective.resolveLocation( null, location.iterator() );
 			if ( subject != null )
 			{
-				GSymViewContext viewContext = new GSymViewContext( subject, GSymBrowserContext.this, null );
+				GSymViewContext viewContext = new GSymViewContext( subject, GSymBrowserContext.this, null, persistentState );
 				return viewContext.getPage();
 			}
 			else
@@ -191,9 +192,9 @@ public class GSymBrowserContext
 	
 	private class GSymBrowserContextLocationResolver implements LocationResolver
 	{
-		public Page resolveLocationAsPage(Location location)
+		public Page resolveLocationAsPage(Location location, PersistentStateStore persistentState)
 		{
-			return GSymBrowserContext.this.resolveLocationAsPage( location );
+			return GSymBrowserContext.this.resolveLocationAsPage( location, persistentState );
 		}
 	}
 	
@@ -283,11 +284,11 @@ public class GSymBrowserContext
 	}
 	
 	
-	public Page resolveLocationAsPage(Location location)
+	public Page resolveLocationAsPage(Location location, PersistentStateStore persistentState)
 	{
 		for (GSymLocationResolver resolver: resolvers)
 		{
-			Page p = resolver.resolveLocationAsPage( location );
+			Page p = resolver.resolveLocationAsPage( location, persistentState );
 			if ( p != null )
 			{
 				return p;

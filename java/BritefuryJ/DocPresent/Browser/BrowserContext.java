@@ -16,6 +16,7 @@ import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemLocationResolver;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
+import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class BrowserContext
@@ -55,11 +56,11 @@ public class BrowserContext
 	}
 	
 	
-	public Page resolveLocationAsPage(Location location)
+	public Page resolveLocationAsPage(Location location, PersistentStateStore persistentState)
 	{
 		for (LocationResolver resolver: resolvers)
 		{
-			Page p = resolver.resolveLocationAsPage( location );
+			Page p = resolver.resolveLocationAsPage( location, persistentState );
 			if ( p != null )
 			{
 				return p;
