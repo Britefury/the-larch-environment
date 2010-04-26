@@ -1285,7 +1285,7 @@ class Python25EditorPerspective (GSymPerspective):
 	def getStyleSheet(self):
 		return PythonEditorStyleSheet.instance
 	
-	def getInitialState(self):
+	def getInitialInheritedState(self):
 		return AttributeTable.instance
 	
 	def getEditHandler(self):

@@ -187,7 +187,7 @@ class ProjectEditorPerspective (GSymPerspective):
 	def getStyleSheet(self):
 		return ProjectEditorStyleSheet.instance
 	
-	def getInitialState(self):
+	def getInitialInheritedState(self):
 		return AttributeTable.instance
 	
 	def getEditHandler(self):
