@@ -37,6 +37,7 @@ import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.DPScript;
 import BritefuryJ.DocPresent.DPSegment;
 import BritefuryJ.DocPresent.DPShape;
+import BritefuryJ.DocPresent.DPSpacer;
 import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.DPTable;
 import BritefuryJ.DocPresent.DPText;
@@ -62,6 +63,7 @@ import BritefuryJ.DocPresent.StyleParams.ShapeStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
+import BritefuryJ.DocPresent.Util.Range;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 
@@ -929,6 +931,11 @@ public class PrimitiveStyleSheet extends StyleSheet
 	{
 		return new DPBox( getShapeParams(), "", minWidth, minHeight );
 	}
+	
+	public DPSpacer spacer(double minWidth, double minHeight)
+	{
+		return new DPSpacer( minWidth, minHeight );
+	}
 
 	
 	public DPShape rectangle(double x, double y, double w, double h)
@@ -967,6 +974,20 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 	
 	
+	public DPViewport viewport(DPElement child, double minWidth, double minHeight, Range xRange, Range yRange, PersistentState state)
+	{
+		DPViewport viewport = new DPViewport( minWidth, minHeight, xRange, yRange, state );
+		viewport.setChild( child );
+		return viewport;
+	}
+	
+	public DPViewport viewport(DPElement child, Range xRange, Range yRange, PersistentState state)
+	{
+		DPViewport viewport = new DPViewport( 0.0, 0.0, xRange, yRange, state );
+		viewport.setChild( child );
+		return viewport;
+	}
+
 	public DPViewport viewport(DPElement child, double minWidth, double minHeight, PersistentState state)
 	{
 		DPViewport viewport = new DPViewport( minWidth, minHeight, state );

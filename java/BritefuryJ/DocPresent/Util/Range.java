@@ -6,38 +6,70 @@
 //##************************
 package BritefuryJ.DocPresent.Util;
 
+import java.util.ArrayList;
+
 import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.Incremental.IncrementalValue;
 
 
 public class Range implements IncrementalOwner
 {
+	public interface RangeListener
+	{
+		void onRangeModified(Range r);
+	}
+	
+	
 	private IncrementalValue incr = new IncrementalValue( this );
-	private double lower, upper;
+	private double min, max;
 	private double begin, end;
 	private double stepSize;
+	private ArrayList<RangeListener> listeners;
 	
 	
-	public Range(double lower, double upper, double begin, double end, double stepSize)
+	public Range(double min, double max, double begin, double end, double stepSize)
 	{
-		this.lower = lower;
-		this.upper = upper;
+		this.min = min;
+		this.max = max;
 		this.begin = begin;
 		this.end = end;
 		this.stepSize = stepSize;
 	}
 	
 	
-	public double getLower()
+	public void addListener(RangeListener listener)
+	{
+		if ( listeners == null )
+		{
+			listeners = new ArrayList<RangeListener>();
+		}
+		listeners.add( listener );
+	}
+	
+	public void removeListener(RangeListener listener)
+	{
+		if ( listeners != null )
+		{
+			listeners.add( listener );
+			
+			if ( listeners.isEmpty() )
+			{
+				listeners = null;
+			}
+		}
+	}
+	
+	
+	public double getMin()
 	{
 		incr.onLiteralAccess();
-		return lower;
+		return min;
 	}
 
-	public double getUpper()
+	public double getMax()
 	{
 		incr.onLiteralAccess();
-		return upper;
+		return max;
 	}
 
 	public double getBegin()
@@ -52,6 +84,12 @@ public class Range implements IncrementalOwner
 		return end;
 	}
 	
+	public double getPageSize()
+	{
+		incr.onLiteralAccess();
+		return end - begin;
+	}
+	
 	public double getStepSize()
 	{
 		incr.onLiteralAccess();
@@ -59,43 +97,68 @@ public class Range implements IncrementalOwner
 	}
 	
 	
-	public void setBounds(double lower, double upper)
+	public void setBounds(double min, double max)
 	{
-		this.lower = lower;
-		this.upper = upper;
-		incr.onChanged();
+		this.min = min;
+		this.max = max;
+		onModified();
 	}
 
 	public void setValue(double begin, double end)
 	{
 		this.begin = begin;
 		this.end = end;
-		incr.onChanged();
+		onModified();
 	}
 	
 	public void setStepSize(double stepSize)
 	{
 		this.stepSize = stepSize;
-		incr.onChanged();
+		onModified();
 	}
 	
 	public void move(double delta)
 	{
+		incr.onLiteralAccess();
 		if ( delta < 0.0 )
 		{
-			delta = Math.max( delta, getLower() - getBegin() );
+			delta = Math.max( delta, min - begin );
 		}
 		else if ( delta > 0.0 )
 		{
-			delta = Math.min( delta, getUpper() - getEnd() );
+			delta = Math.min( delta, max - end );
 		}
 		
-		setValue( getBegin() + delta, getEnd() + delta );
+		begin += delta;
+		end += delta;
+		begin = Math.min( Math.max( begin, min ), max );
+		end = Math.min( Math.max( end, min ), max );
+		onModified();
 	}
 	
 	public void moveBeginTo(double v)
 	{
 		move( v - begin );
+	}
+	
+	
+	
+	private void onModified()
+	{
+		incr.onChanged();
+		if ( listeners != null )
+		{
+			for (RangeListener listener: listeners)
+			{
+				listener.onRangeModified( this );
+			}
+		}
+	}
+	
+	
+	public String toString()
+	{
+		return "Range( min=" + min + ", max=" + max + ", begin=" + begin + ", end=" + end + ", stepSize=" + stepSize + " )";
 	}
 };
 

@@ -29,9 +29,10 @@ import javax.swing.TransferHandler;
 import BritefuryJ.CommandHistory.CommandHistoryController;
 import BritefuryJ.CommandHistory.CommandHistoryListener;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPViewport;
 import BritefuryJ.DocPresent.PageController;
 import BritefuryJ.DocPresent.PresentationComponent;
+import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
+import BritefuryJ.DocPresent.Controls.ScrolledViewport;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 
@@ -54,7 +55,7 @@ public class Browser
 	private JPanel locationPanel, panel;
 
 	private PresentationComponent presComponent;
-	private DPViewport viewport;
+	private ScrolledViewport viewport;
 	private BrowserHistory history;
 	
 	private BrowserContext context;
@@ -74,7 +75,7 @@ public class Browser
 		
 		presComponent = new PresentationComponent();
 		presComponent.setPageController( pageController );
-		presComponent.setChild( viewport );
+		presComponent.setChild( viewport.getElement() );
 		
 		ActionMap actionMap = presComponent.getActionMap();
 		actionMap.put( TransferHandler.getCutAction().getValue( Action.NAME ), TransferHandler.getCutAction() );
@@ -140,7 +141,7 @@ public class Browser
 	
 	public DPElement getContentsElement()
 	{
-		return viewport.getChild();
+		return viewport.getViewportElement().getChild();
 	}
 	
 	
@@ -201,12 +202,12 @@ public class Browser
 	
 	public void viewportReset()
 	{
-		viewport.resetXform();
+		viewport.getViewportElement().resetXform();
 	}
 
 	public void viewportOneToOne()
 	{
-		viewport.oneToOne();
+		viewport.getViewportElement().oneToOne();
 	}
 
 	
@@ -241,10 +242,9 @@ public class Browser
 
 	
 	
-	private DPViewport makeViewport(PersistentState state)
+	private ScrolledViewport makeViewport(PersistentState state)
 	{
-		DPViewport vp = new DPViewport( 0.0, 0.0, state );
-		return (DPViewport)vp.alignHExpand().alignVExpand();
+		return ControlsStyleSheet.instance.scrolledViewport( null, 0.0, 0.0, state );
 	}
 	
 	
@@ -257,8 +257,8 @@ public class Browser
 		Page p = context.resolveLocationAsPage( location, stateStore );
 
 		viewport = makeViewport( history.getCurrentState().getViewportState() );
-		viewport.setChild( p.getContentsElement().alignHExpand() );
-		presComponent.getRootElement().setChild( viewport );
+		viewport.getViewportElement().setChild( p.getContentsElement().alignHExpand() );
+		presComponent.getRootElement().setChild( viewport.getElement().alignHExpand().alignVExpand() );
 		
 		// Set the page
 		setPage( p );
@@ -292,18 +292,6 @@ public class Browser
 			}
 		}
 	}
-	
-	
-	protected void onPageContentsModified(Page page)
-	{
-		if ( page != this.page )
-		{
-			throw new RuntimeException( "Received page contents modified notification from invalid page" );
-		}
-		
-		viewport.setChild( page.getContentsElement() );		
-	}
-	
 	
 	
 	private void setLocation(Location location)
