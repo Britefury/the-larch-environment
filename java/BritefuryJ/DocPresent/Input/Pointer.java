@@ -517,7 +517,7 @@ public class Pointer extends PointerInterface
 	
 	
 	
-	public void buttonDown(Point2 pos, int button)
+	public boolean buttonDown(Point2 pos, int button)
 	{
 		PointerButtonEvent event = new PointerButtonEvent( this, button, PointerButtonEvent.Action.DOWN );
 		if ( button == 3  &&  getModifiers() == Modifier.BUTTON3 )
@@ -527,32 +527,38 @@ public class Pointer extends PointerInterface
 			if ( !menu.isEmpty() )
 			{
 				menu.show( component );
+				return true;
 			}
+			return false;
 		}
 		else
 		{
 			dndButtonDownEvent( event );
-			rootEntry.handleButtonDown( this, event );
+			return rootEntry.handleButtonDown( this, event );
 		}
 	}
 	
-	public void buttonDown2(Point2 pos, int button)
+	public boolean buttonDown2(Point2 pos, int button)
 	{
-		rootEntry.handleButtonDown2( this, new PointerButtonEvent( this, button, PointerButtonEvent.Action.DOWN2 ) );
+		return rootEntry.handleButtonDown2( this, new PointerButtonEvent( this, button, PointerButtonEvent.Action.DOWN2 ) );
 	}
 	
-	public void buttonDown3(Point2 pos, int button)
+	public boolean buttonDown3(Point2 pos, int button)
 	{
-		rootEntry.handleButtonDown3( this, new PointerButtonEvent( this, button, PointerButtonEvent.Action.DOWN3 ) );
+		return rootEntry.handleButtonDown3( this, new PointerButtonEvent( this, button, PointerButtonEvent.Action.DOWN3 ) );
 	}
 	
-	public void buttonUp(Point2 pos, int button)
+	public boolean buttonUp(Point2 pos, int button)
 	{
 		PointerButtonEvent event = new PointerButtonEvent( this, button, PointerButtonEvent.Action.UP );
 		boolean bHandled = dndButtonUpEvent( event );
-		if ( !bHandled )
+		if ( bHandled )
 		{
-			rootEntry.handleButtonUp( this, event );
+			return true;
+		}
+		else
+		{
+			return rootEntry.handleButtonUp( this, event );
 		}
 	}
 	
@@ -582,9 +588,9 @@ public class Pointer extends PointerInterface
 		rootEntry.handleLeave( this, new PointerMotionEvent( this, PointerMotionEvent.Action.LEAVE ) );
 	}
 
-	public void scroll(int scrollX, int scrollY)
+	public boolean scroll(int scrollX, int scrollY)
 	{
-		rootEntry.handleScroll( this, new PointerScrollEvent( this, scrollX, scrollY ) );
+		return rootEntry.handleScroll( this, new PointerScrollEvent( this, scrollX, scrollY ) );
 	}
 
 

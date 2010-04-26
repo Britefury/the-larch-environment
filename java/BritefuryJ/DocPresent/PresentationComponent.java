@@ -760,7 +760,10 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			rootSpaceMouse.setLocalPos( windowPos );
 			rootSpaceMouse.setButtonModifiers( buttonModifiers );
 			int modifiers = rootSpaceMouse.getModifiers();
-			if ( button == 1  &&  ( modifiers & ( Modifier.ALT | Modifier.ALT_GRAPH | Modifier.CTRL | Modifier.SHIFT ) )  ==  0 )
+			
+			boolean bHandled = rootSpaceMouse.buttonDown( windowPos, button );
+
+			if ( !bHandled  &&  button == 1  &&  ( modifiers & ( Modifier.ALT | Modifier.ALT_GRAPH | Modifier.CTRL | Modifier.SHIFT ) )  ==  0 )
 			{
 				DPContentLeafEditable leaf = (DPContentLeafEditable)getLeafClosestToLocalPoint( windowPos, new DPContentLeafEditable.EditableLeafElementFilter() );
 				if ( leaf != null )
@@ -773,8 +776,6 @@ public class PresentationComponent extends JComponent implements ComponentListen
 					selectionManager.mouseSelectionBegin( marker );
 				}
 			}
-
-			rootSpaceMouse.buttonDown( windowPos, button );
 
 			emitImmediateEvents();
 		}

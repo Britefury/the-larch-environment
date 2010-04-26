@@ -41,7 +41,7 @@ public class MousePointer extends Pointer
 	
 	
 	
-	public void buttonDown(Point2 pos, int button)
+	public boolean buttonDown(Point2 pos, int button)
 	{
 		if ( testNavigationModifiers( getModifiers() ) )
 		{
@@ -53,31 +53,44 @@ public class MousePointer extends Pointer
 				navigationDragCurrentPos = pos.clone();
 				bNavigationDragInProgress = true;
 				rootEntry.handleNavigationGestureBegin( this, event );
+				return true;
+			}
+			else
+			{
+				return false;
 			}
 		}
 		else
 		{
-			super.buttonDown( pos, button );
+			return super.buttonDown( pos, button );
 		}
 	}
 
-	public void buttonDown2(Point2 pos, int button)
+	public boolean buttonDown2(Point2 pos, int button)
 	{
 		if ( !bNavigationDragInProgress )
 		{
-			super.buttonDown2( pos, button );
+			return super.buttonDown2( pos, button );
+		}
+		else
+		{
+			return false;
 		}
 	}
 	
-	public void buttonDown3(Point2 pos, int button)
+	public boolean buttonDown3(Point2 pos, int button)
 	{
 		if ( !bNavigationDragInProgress )
 		{
-			super.buttonDown3( pos, button );
+			return super.buttonDown3( pos, button );
+		}
+		else
+		{
+			return false;
 		}
 	}
 
-	public void buttonUp(Point2 pos, int button)
+	public boolean buttonUp(Point2 pos, int button)
 	{
 		if ( bNavigationDragInProgress )
 		{
@@ -86,11 +99,16 @@ public class MousePointer extends Pointer
 				PointerButtonEvent event = new PointerButtonEvent( this, button, PointerButtonEvent.Action.UP );
 				rootEntry.handleNavigationGestureEnd( this, event );
 				bNavigationDragInProgress = false;
+				return true;
+			}
+			else
+			{
+				return false;
 			}
 		}
 		else
 		{
-			super.buttonUp( pos, button );
+			return super.buttonUp( pos, button );
 		}
 	}
 
@@ -128,7 +146,7 @@ public class MousePointer extends Pointer
 	}
 	
 	
-	public void scroll(int scrollX, int scrollY)
+	public boolean scroll(int scrollX, int scrollY)
 	{
 		if ( testNavigationModifiers( getModifiers() ) )
 		{
@@ -136,10 +154,11 @@ public class MousePointer extends Pointer
 			double scaleDelta = Math.pow( 2.0,  ( delta / 1.5 ) );
 			
 			rootEntry.handleNavigationGestureClick( this, new PointerNavigationZoomEvent( this, localPos, scaleDelta ) );
+			return true;
 		}
 		else
 		{
-			super.scroll( scrollX, scrollY );
+			return super.scroll( scrollX, scrollY );
 		}
 	}
 	
