@@ -81,7 +81,7 @@ public class GSymBrowserContext
 		}
 		
 		@Override
-		public AttributeTable getInitialState()
+		public AttributeTable getInitialInheritedState()
 		{
 			return AttributeTable.instance;
 		}
@@ -134,7 +134,7 @@ public class GSymBrowserContext
 		}
 		
 		@Override
-		public AttributeTable getInitialState()
+		public AttributeTable getInitialInheritedState()
 		{
 			return AttributeTable.instance;
 		}

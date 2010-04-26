@@ -248,7 +248,7 @@ class GSymAppViewerPerspective (GSymPerspective):
 	def getStyleSheet(self):
 		return GSymAppViewerStyleSheet.instance
 	
-	def getInitialState(self):
+	def getInitialInheritedState(self):
 		return AttributeTable.instance
 	
 	def getEditHandler(self):

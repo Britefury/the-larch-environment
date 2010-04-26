@@ -17,7 +17,7 @@ public interface GSymPerspective
 {
 	GSymViewFragmentFunction getFragmentViewFunction();
 	StyleSheet getStyleSheet();
-	AttributeTable getInitialState();
+	AttributeTable getInitialInheritedState();
 	EditHandler getEditHandler();
 
 	GSymSubject resolveLocation(GSymSubject enclosingSubject, Location.TokenIterator locationIterator);

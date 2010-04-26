@@ -115,7 +115,7 @@ class TerminalViewerPerspective (GSymPerspective):
 	def getStyleSheet(self):
 		return TerminalViewerStyleSheet.instance
 	
-	def getInitialState(self):
+	def getInitialInheritedState(self):
 		return AttributeTable.instance
 	
 	def getEditHandler(self):
