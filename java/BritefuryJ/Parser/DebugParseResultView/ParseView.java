@@ -17,6 +17,8 @@ import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.Border.SolidBorder;
+import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
+import BritefuryJ.DocPresent.Controls.ScrolledViewport;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
@@ -82,8 +84,8 @@ public class ParseView implements FragmentContext
 				DPElement wa = a.getNodeElement();
 				DPElement wb = b.getNodeElement();
 				
-				Point2 p1 = wa.getLocalPointRelativeTo( parseView.element, new Point2( wa.getAllocation().x, wa.getAllocation().y * 0.5 ) );
-				Point2 p4 = wb.getLocalPointRelativeTo( parseView.element, new Point2( 0.0, wb.getAllocation().y * 0.5 ) );
+				Point2 p1 = wa.getLocalPointRelativeTo( parseView.viewBin, new Point2( wa.getAllocation().x, wa.getAllocation().y * 0.5 ) );
+				Point2 p4 = wb.getLocalPointRelativeTo( parseView.viewBin, new Point2( 0.0, wb.getAllocation().y * 0.5 ) );
 				
 				// dx is the x-difference from p1 to p4, clamped to >=20, divided by 3; space the control points evenly
 				double dx = Math.max( Math.abs( p4.x - p1.x ), 20.0 )  /  3.0;
@@ -127,8 +129,9 @@ public class ParseView implements FragmentContext
 		public void onSelectionChanged(DebugNode selection);
 	}
 	
-	private DPElement viewport;
-	private DPViewBin element;
+	private DPElement element; 
+	private ScrolledViewport viewport;
+	private DPViewBin viewBin;
 	private HashMap<DebugNode, NodeView> nodeTable;
 	private ArrayList<Edge> callEdges, memoEdges;
 	private NodeView root;
@@ -142,7 +145,7 @@ public class ParseView implements FragmentContext
 	{
 		selection = null;
 		
-		element = new DPViewBin( ContainerStyleParams.defaultStyleParams, this );
+		viewBin = new DPViewBin( ContainerStyleParams.defaultStyleParams, this );
 		
 		nodeTable = new HashMap<DebugNode, NodeView>();
 		callEdges = new ArrayList<Edge>();
@@ -152,10 +155,10 @@ public class ParseView implements FragmentContext
 		
 		root.registerEdges();
 		
-		element.setChild( root.getElement() );
+		viewBin.setChild( root.getElement() );
 		
-		DPElement vp = PrimitiveStyleSheet.instance.viewport( element, 0.0, 800.0, viewportState ).alignHExpand().alignVExpand();
-		viewport = viewportBorderStyle.border( vp ).alignHExpand().alignVExpand();
+		viewport = ControlsStyleSheet.instance.scrolledViewport( viewBin, 0.0, 800.0, viewportState );
+		element = viewportBorderStyle.border( viewport.getElement().alignHExpand().alignVExpand() ).alignHExpand().alignVExpand();
 	}
 	
 	
@@ -234,7 +237,7 @@ public class ParseView implements FragmentContext
 	public static DPElement presentDebugParseResult(DebugParseResultInterface x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
 	{
 		ParseView v = new ParseView( x, ctx.persistentState( "viewport " ) );
-		return v.viewport.alignHExpand().alignVExpand();
+		return v.element.alignHExpand().alignVExpand();
 	}
 
 

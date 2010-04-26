@@ -16,29 +16,49 @@ import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeViewport;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
+import BritefuryJ.DocPresent.Util.Range;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 import BritefuryJ.Math.Xform2;
 
-public class DPViewport extends DPContainer
+public class DPViewport extends DPContainer implements Range.RangeListener
 {
+	protected final static int FLAG_IGNORE_RANGE_EVENTS = FLAGS_CONTAINER_END * 0x1;
+
+	protected final static int FLAGS_VIEWPORT_END = FLAGS_CONTAINER_END  <<  1;
+
+	
+	
 	private double minWidth, minHeight;
+	private Range xRange, yRange;
 	private Xform2 allocationSpaceToLocalSpace;
 	private PersistentState state;
 	
 	
 	public DPViewport(double minWidth, double minHeight, PersistentState state)
 	{
-		this( ContainerStyleParams.defaultStyleParams, minWidth, minHeight, state );
+		this( ContainerStyleParams.defaultStyleParams, minWidth, minHeight, null, null, state );
+	}
+
+	public DPViewport(double minWidth, double minHeight, Range xRange, Range yRange, PersistentState state)
+	{
+		this( ContainerStyleParams.defaultStyleParams, minWidth, minHeight, xRange, yRange, state );
 	}
 
 	public DPViewport(ContainerStyleParams styleParams, double minWidth, double minHeight, PersistentState state)
+	{
+		this( styleParams, minWidth, minHeight, null, null, state );
+	}
+
+	public DPViewport(ContainerStyleParams styleParams, double minWidth, double minHeight, Range xRange, Range yRange, PersistentState state)
 	{
 		super(styleParams);
 		
 		this.minWidth = minWidth;
 		this.minHeight = minHeight;
+		this.xRange = xRange;
+		this.yRange = yRange;
 		layoutNode = new LayoutNodeViewport( this );
 		this.state = state;
 		Xform2 x = state.getValueAsType( Xform2.class );
@@ -70,8 +90,7 @@ public class DPViewport extends DPContainer
 	public void setViewportXform(Xform2 x)
 	{
 		allocationSpaceToLocalSpace = x.clone();
-		state.setValue( allocationSpaceToLocalSpace );
-		queueFullRedraw();
+		onXformModified();
 	}
 	
 	
@@ -322,11 +341,123 @@ public class DPViewport extends DPContainer
 	public void onXformModified()
 	{
 		state.setValue( allocationSpaceToLocalSpace );
+		refreshRangesFromXform();
 		queueFullRedraw();
+	}
+	
+	
+	
+	@Override
+	protected void onRealise()
+	{
+		if ( xRange != null )
+		{
+			xRange.addListener( this );
+		}
+		if ( yRange != null )
+		{
+			yRange.addListener( this );
+		}
+	}
+	
+	@Override
+	protected void onUnrealise(DPElement unrealiseRoot)
+	{
+		if ( xRange != null )
+		{
+			xRange.removeListener( this );
+		}
+		if ( yRange != null )
+		{
+			yRange.removeListener( this );
+		}
+	}
+	
+	
+	private void refreshRangesFromXform()
+	{
+		DPElement child = getChild();
+		
+		setFlag( FLAG_IGNORE_RANGE_EVENTS );
+		
+		double invScale = 1.0 / allocationSpaceToLocalSpace.scale;
+		Xform2 localSpaceToAllocationSpace = allocationSpaceToLocalSpace.inverse();
+		Point2 topLeftInAllocationSpace = localSpaceToAllocationSpace.transform( new Point2() );
+		Point2 bottomRightInAllocationSpace = localSpaceToAllocationSpace.transform( new Point2( getAllocationX(), getAllocationY() ) );
+
+		if ( xRange != null )
+		{
+			double min = 0.0;
+			double max = child != null  ?  child.getAllocationX()  :  1.0;
+			
+			updateRange( xRange, min, max, topLeftInAllocationSpace.x, bottomRightInAllocationSpace.x, 10.0 * invScale );
+		}
+
+		if ( yRange != null )
+		{
+			double min = 0.0;
+			double max = child != null  ?  child.getAllocationY()  :  1.0;
+
+			updateRange( yRange, min, max, topLeftInAllocationSpace.y, bottomRightInAllocationSpace.y, 10.0 * invScale );
+		}
+
+		clearFlag( FLAG_IGNORE_RANGE_EVENTS );
+	}
+	
+	
+	private static void updateRange(Range range, double min, double max, double begin, double end, double stepSize)
+	{
+		double size = end - begin;
+		
+		if ( begin < min )
+		{
+			begin = min;
+			end = Math.min( begin + size, max );
+		}
+		if ( end > max )
+		{
+			end = max;
+			begin = Math.max( end - size, min );
+		}
+
+		range.setBounds( min, max );
+		range.setValue( begin, end );
+		range.setStepSize( stepSize );
+	}
+	
+	
+	
+	public void onAllocationRefreshed()
+	{
+		refreshRangesFromXform();
+	}
+	
+	
+	
+
+	@Override
+	public void onRangeModified(Range r)
+	{
+		if ( !testFlag( FLAG_IGNORE_RANGE_EVENTS ) )
+		{
+			Xform2 xform = allocationSpaceToLocalSpace.clone();
+			
+			if ( r == xRange )
+			{
+				xform.translation.x = -xRange.getBegin() * xform.scale;
+			}
+			else if ( r == yRange )
+			{
+				xform.translation.y = -yRange.getBegin() * xform.scale;
+			}
+			
+			allocationSpaceToLocalSpace = xform;
+			state.setValue( allocationSpaceToLocalSpace );
+			queueFullRedraw();
+		}
 	}
 
 	
-
 	//
 	// Text representation methods
 	//

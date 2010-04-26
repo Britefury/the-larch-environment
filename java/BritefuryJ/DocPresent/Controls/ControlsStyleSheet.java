@@ -16,7 +16,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 import java.awt.geom.RoundRectangle2D;
 import java.util.Arrays;
-import java.util.HashSet;
 
 import org.python.core.PyObject;
 
@@ -29,6 +28,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.DPShape;
 import BritefuryJ.DocPresent.DPText;
+import BritefuryJ.DocPresent.DPViewport;
 import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.SolidBorder;
@@ -38,6 +38,7 @@ import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.Painter.FilledOutlinePainter;
 import BritefuryJ.DocPresent.Painter.Painter;
+import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.Util.Range;
@@ -53,6 +54,13 @@ public class ControlsStyleSheet extends StyleSheet
 	private static final Cursor defaultLinkCursor = new Cursor( Cursor.HAND_CURSOR );
 	private static final Painter defaultScrollBarArrowPainter = new FilledOutlinePainter( new Color( 0.7f, 0.85f, 1.0f ), new Color( 0.0f, 0.5f, 1.0f ), new BasicStroke( 1.0f ) );
 	private static final Painter defaultScrollBarDragBackgroundPainter = new FilledOutlinePainter( new Color( 0.9f, 0.9f, 0.9f ), new Color( 0.75f, 0.75f, 0.75f ), new BasicStroke( 1.0f ) );
+	
+	private static final double defaultScrollBarArrowPadding = 0.0;
+	private static final double defaultScrollBarArrowSpacing = 2.0;
+	private static final double defaultScrollBarArrowFilletSize = 4.0;
+	private static final double defaultScrollBarDragBoxPadding = 3.0;
+	private static final double defaultScrollBarDragBoxRounding = 4.0;
+	private static final double defaultScrollBarSize = 20.0;
 	
 	
 	public static final ControlsStyleSheet instance = new ControlsStyleSheet();
@@ -92,15 +100,15 @@ public class ControlsStyleSheet extends StyleSheet
 		
 		initAttr( "scrollBarArrowPainter", defaultScrollBarArrowPainter );
 		initAttr( "scrollBarArrowHoverPainter", new FilledOutlinePainter( new Color( 0.8f, 0.9f, 1.0f ), new Color( 0.5f, 0.75f, 1.0f ), new BasicStroke( 1.0f ) ) );
-		initAttr( "scrollBarArrowPadding", 1.0 );
-		initAttr( "scrollBarArrowFilletSize", 4.0 );
+		initAttr( "scrollBarArrowPadding", defaultScrollBarArrowPadding );
+		initAttr( "scrollBarArrowSpacing", defaultScrollBarArrowSpacing );
+		initAttr( "scrollBarArrowFilletSize", defaultScrollBarArrowFilletSize );
 		initAttr( "scrollBarDragBackgroundPainter", defaultScrollBarDragBackgroundPainter );
 		initAttr( "scrollBarDragBackgroundHoverPainter", new FilledOutlinePainter( new Color( 0.85f, 0.85f, 0.85f ), new Color( 0.5f, 0.5f, 0.5f ), new BasicStroke( 1.0f ) ) );
 		initAttr( "scrollBarDragBoxPainter", defaultScrollBarArrowPainter );
-		initAttr( "scrollBarDragBoxHoverPainter", new FilledOutlinePainter( new Color( 0.8f, 0.9f, 1.0f ), new Color( 0.5f, 0.75f, 1.0f ), new BasicStroke( 1.0f ) ) );
-		initAttr( "scrollBarDragBoxPadding", 2.0 );
-		initAttr( "scrollBarDragBoxRounding", 4.0 );
-		initAttr( "scrollBarSize", 24.0 );
+		initAttr( "scrollBarDragBoxPadding", defaultScrollBarDragBoxPadding );
+		initAttr( "scrollBarDragBoxRounding", defaultScrollBarDragBoxRounding );
+		initAttr( "scrollBarSize", defaultScrollBarSize );
 	}
 
 	
@@ -205,18 +213,40 @@ public class ControlsStyleSheet extends StyleSheet
 		return (ControlsStyleSheet)withAttr( "scrollBarArrowPadding", padding );
 	}
 	
+	public ControlsStyleSheet withScrollBarArrowSpacing(double spacing)
+	{
+		return (ControlsStyleSheet)withAttr( "scrollBarArrowSpacing", spacing );
+	}
+	
 	public ControlsStyleSheet withScrollBarArrowFilletSize(double fillet)
 	{
 		return (ControlsStyleSheet)withAttr( "scrollBarArrowFilletSize", fillet );
+	}
+	
+	public ControlsStyleSheet withScrollBarDragBackgroundPainter(Painter painter)
+	{
+		return (ControlsStyleSheet)withAttr( "scrollBarDragBackgroundPainter", painter );
+	}
+	
+	public ControlsStyleSheet withScrollBarDragBackgroundHoverPainter(Painter painter)
+	{
+		return (ControlsStyleSheet)withAttr( "scrollBarDragBackgroundHoverPainter", painter );
+	}
+	
+	public ControlsStyleSheet withScrollBarDragBoxPadding(double padding)
+	{
+		return (ControlsStyleSheet)withAttr( "scrollBarDragBoxPadding", padding );
+	}
+	
+	public ControlsStyleSheet withScrollBarDragBoxRounding(double rounding)
+	{
+		return (ControlsStyleSheet)withAttr( "scrollBarDragBoxRounding", rounding );
 	}
 	
 	public ControlsStyleSheet withScrollBarSize(double size)
 	{
 		return (ControlsStyleSheet)withAttr( "scrollBarSize", size );
 	}
-	
-	
-	
 	
 	
 	
@@ -344,9 +374,9 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		if ( scrollBarArrowPaths == null )
 		{
-			double scrollBarSize = get( "scrollBarSize", Double.class, 24.0 );
-			double arrowPadding = get( "scrollBarArrowPadding", Double.class, 1.0 );
-			double arrowFilletSize = get( "scrollBarArrowFilletSize", Double.class, 4.0 );
+			double scrollBarSize = get( "scrollBarSize", Double.class, defaultScrollBarSize );
+			double arrowPadding = get( "scrollBarArrowPadding", Double.class, defaultScrollBarArrowPadding );
+			double arrowFilletSize = get( "scrollBarArrowFilletSize", Double.class, defaultScrollBarArrowFilletSize );
 			double arrowRadius = scrollBarSize * 0.5  -  arrowPadding;
 			
 			Point2 a = new Point2( 0.0, arrowRadius );
@@ -519,15 +549,14 @@ public class ControlsStyleSheet extends StyleSheet
 		private Direction direction;
 		private Range range;
 		private double padding, rounding;
-		private Painter dragBoxPainter, dragBoxHoverPainter;
-		private HashSet<PointerInterface> dragBoxHoverPointers = new HashSet<PointerInterface>();
+		private Painter dragBoxPainter;
 		private PointerInterface dragPointer = null;
 		private Point2 dragStartPos = null;
 		private double dragStartValue = 0.0;
 		private Cell dragBoxCell = new Cell();
 		
 		
-		public ScrollBarDragBarInteractor(DPElement element, Direction direction, Range range, double padding, double rounding, Painter dragBoxPainter, Painter dragBoxHoverPainter)
+		public ScrollBarDragBarInteractor(DPElement element, Direction direction, Range range, double padding, double rounding, Painter dragBoxPainter)
 		{
 			this.element = element;
 			this.direction = direction;
@@ -535,7 +564,6 @@ public class ControlsStyleSheet extends StyleSheet
 			this.padding = padding;
 			this.rounding = rounding;
 			this.dragBoxPainter = dragBoxPainter;
-			this.dragBoxHoverPainter = dragBoxHoverPainter;
 			
 			CellEvaluator dragBoxCellEval = new CellEvaluator()
 			{
@@ -561,13 +589,11 @@ public class ControlsStyleSheet extends StyleSheet
 				
 				if ( direction == Direction.HORIZONTAL  &&  localPos.x < dragBox.getLowerX()    ||  direction == Direction.VERTICAL  &&  localPos.y < dragBox.getLowerY() )
 				{
-					double pageSize = range.getEnd() - range.getBegin();
-					range.move( -pageSize );
+					range.move( -range.getPageSize() );
 				}
 				else if ( direction == Direction.HORIZONTAL  &&  localPos.x > dragBox.getUpperX()    ||  direction == Direction.VERTICAL  &&  localPos.y > dragBox.getUpperY() )
 				{
-					double pageSize = range.getEnd() - range.getBegin();
-					range.move( pageSize );
+					range.move( range.getPageSize() );
 				}
 				else
 				{
@@ -588,31 +614,6 @@ public class ControlsStyleSheet extends StyleSheet
 		{
 			dragPointer = null;
 			return event.button == 1;
-		}
-		
-		public void onMotion(DPElement element, PointerMotionEvent event)
-		{
-			AABox2 dragBox = (AABox2)dragBoxCell.getValue();
-			if ( dragBox.containsPoint( event.getPointer().getLocalPos() ) )
-			{
-				boolean bEmptyBefore = dragBoxHoverPointers.isEmpty();
-				dragBoxHoverPointers.add( event.getPointer().concretePointer() );
-				boolean bEmptyAfter = dragBoxHoverPointers.isEmpty();
-				if ( bEmptyBefore != bEmptyAfter )
-				{
-					element.queueFullRedraw();
-				}
-			}
-			else
-			{
-				boolean bEmptyBefore = dragBoxHoverPointers.isEmpty();
-				dragBoxHoverPointers.remove( event.getPointer().concretePointer() );
-				boolean bEmptyAfter = dragBoxHoverPointers.isEmpty();
-				if ( bEmptyBefore != bEmptyAfter )
-				{
-					element.queueFullRedraw();
-				}
-			}
 		}
 		
 		public void onDrag(DPElement element, PointerMotionEvent event)
@@ -639,34 +640,8 @@ public class ControlsStyleSheet extends StyleSheet
 					throw new RuntimeException( "Invalid direction" );
 				}
 
-				double scaleFactor = ( range.getUpper() - range.getLower() ) / visibleRange;
+				double scaleFactor = ( range.getMax() - range.getMin() ) / visibleRange;
 				range.moveBeginTo( dragStartValue  +  delta * scaleFactor );
-			}
-		}
-		
-		public void onEnter(DPElement element, PointerMotionEvent event)
-		{
-			AABox2 dragBox = (AABox2)dragBoxCell.getValue();
-			if ( dragBox.containsPoint( event.getPointer().getLocalPos() ) )
-			{
-				boolean bEmptyBefore = dragBoxHoverPointers.isEmpty();
-				dragBoxHoverPointers.add( event.getPointer().concretePointer() );
-				boolean bEmptyAfter = dragBoxHoverPointers.isEmpty();
-				if ( bEmptyBefore != bEmptyAfter )
-				{
-					element.queueFullRedraw();
-				}
-			}
-		}
-		
-		public void onLeave(DPElement element, PointerMotionEvent event)
-		{
-			boolean bEmptyBefore = dragBoxHoverPointers.isEmpty();
-			dragBoxHoverPointers.remove( event.getPointer().concretePointer() );
-			boolean bEmptyAfter = dragBoxHoverPointers.isEmpty();
-			if ( bEmptyBefore != bEmptyAfter )
-			{
-				element.queueFullRedraw();
 			}
 		}
 		
@@ -681,34 +656,26 @@ public class ControlsStyleSheet extends StyleSheet
 			
 			RoundRectangle2D.Double shape = new RoundRectangle2D.Double( dragBox.getLowerX(), dragBox.getLowerY(), dragBox.getWidth(), dragBox.getHeight(), rounding, rounding );
 			
-			Painter painter;
-			if ( dragBoxHoverPainter != null )
-			{
-				painter = dragBoxHoverPointers.isEmpty()  ?  dragBoxPainter  :  dragBoxHoverPainter;
-			}
-			else
-			{
-				painter = dragBoxPainter;
-			}
-			
-			painter.drawShape( graphics, shape );
+			dragBoxPainter.drawShape( graphics, shape );
 		}
 		
 		
 		private AABox2 computeDragBox(DPElement element)
 		{
 			AABox2 box = element.getLocalAABox();
+			double value = Math.min( Math.max( range.getBegin(), range.getMin() ), range.getMax() );
+			double end = Math.min( Math.max( range.getEnd(), range.getMin() ), range.getMax() );
 			if ( direction == Direction.HORIZONTAL )
 			{
 				double visibleRange = box.getWidth()  -  padding * 2.0;
-				double scaleFactor = visibleRange / ( range.getUpper() - range.getLower() );
-				return new AABox2( padding + range.getBegin() * scaleFactor, padding, padding + range.getEnd() * scaleFactor, box.getUpperY() - padding );
+				double scaleFactor = visibleRange / ( range.getMax() - range.getMin() );
+				return new AABox2( padding + value * scaleFactor, padding, padding + end * scaleFactor, box.getUpperY() - padding );
 			}
 			else if ( direction == Direction.VERTICAL )
 			{
 				double visibleRange = box.getHeight()  -  padding * 2.0;
-				double scaleFactor = visibleRange / ( range.getUpper() - range.getLower() );
-				return new AABox2( padding, padding + range.getBegin() * scaleFactor, box.getUpperX() - padding, padding + range.getEnd() * scaleFactor );
+				double scaleFactor = visibleRange / ( range.getMax() - range.getMin() );
+				return new AABox2( padding, padding + value * scaleFactor, box.getUpperX() - padding, padding + end * scaleFactor );
 			}
 			else
 			{
@@ -735,13 +702,13 @@ public class ControlsStyleSheet extends StyleSheet
 		Path2D.Double leftPath = getScrollBarArrowPaths()[3];
 		Path2D.Double rightPath = getScrollBarArrowPaths()[1];
 		
-		double arrowPadding = get( "scrollBarArrowPadding", Double.class, 1.0 );
+		double arrowPadding = get( "scrollBarArrowPadding", Double.class, defaultScrollBarArrowPadding );
+		double arrowSpacing = get( "scrollBarArrowSpacing", Double.class, defaultScrollBarArrowSpacing );
 
-		double scrollBarSize = get( "scrollBarSize", Double.class, 24.0 );
+		double scrollBarSize = get( "scrollBarSize", Double.class, defaultScrollBarSize );
 		Painter scrollBarDragBoxPainter = getNonNull( "scrollBarDragBoxPainter", Painter.class, defaultScrollBarArrowPainter );
-		Painter scrollBarDragBoxHoverPainter = get( "scrollBarDragBoxPainter", Painter.class, null );
-		double scrollBarDragBoxPadding = get( "scrollBarDragBoxPadding", Double.class, 2.0 );
-		double scrollBarDragBoxRounding = get( "scrollBarDragBoxRounding", Double.class, 4.0 );
+		double scrollBarDragBoxPadding = get( "scrollBarDragBoxPadding", Double.class, defaultScrollBarDragBoxPadding );
+		double scrollBarDragBoxRounding = get( "scrollBarDragBoxRounding", Double.class, defaultScrollBarDragBoxRounding );
 		
 		
 		DPShape leftArrow = arrowStyle.shape( leftPath );
@@ -752,9 +719,9 @@ public class ControlsStyleSheet extends StyleSheet
 		
 		DPBox dragBar = dragBackgroundStyle.box( 0.0, scrollBarSize );
 		dragBar.addInteractor( new ScrollBarDragBarInteractor( dragBar, ScrollBarDragBarInteractor.Direction.HORIZONTAL, range, scrollBarDragBoxPadding, scrollBarDragBoxRounding,
-				scrollBarDragBoxPainter, scrollBarDragBoxHoverPainter ) );
+				scrollBarDragBoxPainter ) );
 		
-		DPElement element = primitive.hbox( Arrays.asList( new DPElement[] { leftArrow.pad( arrowPadding, arrowPadding ).alignVCentre(),
+		DPElement element = primitive.withHBoxSpacing( arrowSpacing ).hbox( Arrays.asList( new DPElement[] { leftArrow.pad( arrowPadding, arrowPadding ).alignVCentre(),
 				dragBar.alignHExpand().alignVCentre(),
 				rightArrow.pad( arrowPadding, arrowPadding ).alignVCentre() } ) );
 		
@@ -770,13 +737,13 @@ public class ControlsStyleSheet extends StyleSheet
 		Path2D.Double upPath = getScrollBarArrowPaths()[0];
 		Path2D.Double downPath = getScrollBarArrowPaths()[2];
 		
-		double arrowPadding = get( "scrollBarArrowPadding", Double.class, 1.0 );
+		double arrowPadding = get( "scrollBarArrowPadding", Double.class, defaultScrollBarArrowPadding );
+		double arrowSpacing = get( "scrollBarArrowSpacing", Double.class, defaultScrollBarArrowSpacing );
 
-		double scrollBarSize = get( "scrollBarSize", Double.class, 24.0 );
+		double scrollBarSize = get( "scrollBarSize", Double.class, defaultScrollBarSize );
 		Painter scrollBarDragBoxPainter = getNonNull( "scrollBarDragBoxPainter", Painter.class, defaultScrollBarArrowPainter );
-		Painter scrollBarDragBoxHoverPainter = get( "scrollBarDragBoxPainter", Painter.class, null );
-		double scrollBarDragBoxPadding = get( "scrollBarDragBoxPadding", Double.class, 2.0 );
-		double scrollBarDragBoxRounding = get( "scrollBarDragBoxRounding", Double.class, 4.0 );
+		double scrollBarDragBoxPadding = get( "scrollBarDragBoxPadding", Double.class, defaultScrollBarDragBoxPadding );
+		double scrollBarDragBoxRounding = get( "scrollBarDragBoxRounding", Double.class, defaultScrollBarDragBoxRounding );
 		
 		
 		DPShape upArrow = arrowStyle.shape( upPath );
@@ -787,12 +754,29 @@ public class ControlsStyleSheet extends StyleSheet
 		
 		DPBox dragBar = dragBackgroundStyle.box( scrollBarSize, 0.0 );
 		dragBar.addInteractor( new ScrollBarDragBarInteractor( dragBar, ScrollBarDragBarInteractor.Direction.VERTICAL, range, scrollBarDragBoxPadding, scrollBarDragBoxRounding,
-				scrollBarDragBoxPainter, scrollBarDragBoxHoverPainter ) );
+				scrollBarDragBoxPainter ) );
 		
-		DPElement element = primitive.vbox( Arrays.asList( new DPElement[] { upArrow.pad( arrowPadding, arrowPadding ).alignHCentre(),
+		DPElement element = primitive.withVBoxSpacing( arrowSpacing ).vbox( Arrays.asList( new DPElement[] { upArrow.pad( arrowPadding, arrowPadding ).alignHCentre(),
 				dragBar.alignVExpand().alignHCentre(),
 				downArrow.pad( arrowPadding, arrowPadding ).alignHCentre() } ) );
 		
 		return new ScrollBar( range, element.alignVExpand() );
+	}
+	
+	
+	public ScrolledViewport scrolledViewport(DPElement child, double minWidth, double minHeight, PersistentState state)
+	{
+		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+		double scrollBarSize = get( "scrollBarSize", Double.class, defaultScrollBarSize );
+
+		Range xRange = new Range( 0.0, 1.0, 0.0, 1.0, 0.1 );
+		Range yRange = new Range( 0.0, 1.0, 0.0, 1.0, 0.1 );
+		DPViewport viewport = primitive.viewport( child, minWidth, minHeight, xRange, yRange, state );
+		ScrollBar xScroll = horizontalScrollBar( xRange );
+		ScrollBar yScroll = verticalScrollBar( yRange );
+		DPElement hbox0 = primitive.hbox( Arrays.asList( new DPElement[] { viewport.alignHExpand().alignVExpand(),  yScroll.getElement().alignVExpand() } ) );
+		DPElement hbox1 = primitive.hbox( Arrays.asList( new DPElement[] { xScroll.getElement().alignHExpand(), primitive.spacer( scrollBarSize, scrollBarSize ) } ) );
+		DPElement vbox = primitive.vbox( Arrays.asList( new DPElement[] { hbox0.alignHExpand().alignVExpand(), hbox1.alignHExpand() } ) );
+		return new ScrolledViewport( viewport, vbox, xScroll, yScroll, xRange, yRange );
 	}
 }
