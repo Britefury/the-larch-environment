@@ -72,6 +72,64 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	protected static double NON_TYPESET_CHILD_BASELINE_OFFSET = -5.0;
 	
 	
+	//
+	//
+	// PRESENTABLE
+	//
+	//
+	
+	public static class ExploreTreePresentable implements Presentable
+	{
+		private DPElement element;
+		
+		
+		protected ExploreTreePresentable(DPElement element)
+		{
+			this.element = element;
+		}
+		
+		
+		public DPElement getElement()
+		{
+			return element;
+		}
+
+
+		@Override
+		public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+		{
+			return element.exploreTreePresent( ctx, styleSheet, state );
+		}
+	}
+
+	public static class AsIsPresentable implements Presentable
+	{
+		private DPElement element;
+		
+		
+		protected AsIsPresentable(DPElement element)
+		{
+			this.element = element;
+		}
+		
+		
+		public DPElement getElement()
+		{
+			return element;
+		}
+
+
+		@Override
+		public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+		{
+			return element;
+		}
+	}
+	
+	
+
+	
+	
 	public static interface ContextMenuFactory
 	{
 		public void buildContextMenu(DPElement element, ContextMenu menu);
@@ -113,32 +171,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		static final long serialVersionUID = 0L;
 	}
 	
-	
-	
-	//
-	//
-	// PRESENTABLE
-	//
-	//
-	
-	private static class ElementPresentable implements Presentable
-	{
-		private DPElement element;
-		
-		
-		protected ElementPresentable(DPElement element)
-		{
-			this.element = element;
-		}
-
-
-		@Override
-		public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
-		{
-			return element;
-		}
-	}
-
 	
 	
 	//
@@ -214,6 +246,25 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		
 		public InteractionFields()
 		{
+		}
+		
+		
+		public InteractionFields copy()
+		{
+			InteractionFields f = new InteractionFields();
+			f.dndHandler = dndHandler;
+			f.linearRepresentationListener = linearRepresentationListener;
+			if ( interactors != null )
+			{
+				f.interactors = new ArrayList<ElementInteractor>();
+				f.interactors.addAll( interactors );
+			}
+			if ( contextFactories != null )
+			{
+				f.contextFactories = new ArrayList<ContextMenuFactory>();
+				f.contextFactories.addAll( contextFactories );
+			}
+			return f;
 		}
 		
 		
@@ -346,6 +397,31 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		flags = 0;
 		this.styleParams = styleParams;
 	}
+	
+	protected DPElement(DPElement element)
+	{
+		this( element.styleParams );
+		debugName = element.debugName;
+		structuralRepresentation = element.structuralRepresentation;
+		if ( element.interactionFields != null )
+		{
+			interactionFields = element.interactionFields.copy();
+		}
+	}
+	
+	
+	
+	//
+	//
+	// Presentation tree cloning
+	//
+	//
+	
+	protected void clonePostConstuct(DPElement src)
+	{
+	}
+	
+	public abstract DPElement clonePresentationSubtree();
 	
 	
 	
@@ -2965,22 +3041,34 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		return bin;
 	}
 	
-	public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+	private DPElement exploreTreePresent(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
 	{
 		debugPresStateListeners = PresentationStateListenerList.addListener( debugPresStateListeners, ctx );
 		return createMetaElement( ctx, styleSheet, state );
 	}
 	
+	public ExploreTreePresentable treeExplorer()
+	{
+		return new ExploreTreePresentable( this );
+	}
+	
+	
 	protected void onDebugPresentationStateChanged()
 	{
 		debugPresStateListeners = PresentationStateListenerList.onPresentationStateChanged( debugPresStateListeners, this );
 	}
-	
-	
-	
-	// Element presentable
-	public Presentable presentable()
+
+
+
+	public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
 	{
-		return new ElementPresentable( this );
+		return clonePresentationSubtree();
+	}
+	
+	
+	
+	public Presentable asIsPresentable()
+	{
+		return new AsIsPresentable( this );
 	}
 }

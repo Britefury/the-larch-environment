@@ -42,8 +42,8 @@ public abstract class DPContainer extends DPElement
 
 	
 	
-	protected ArrayList<DPElement> registeredChildren;				// Replace with array; operations like insert etc are hardly used at all
-	public String cachedTextRep;								// Move to 'waypoint' element
+	protected ArrayList<DPElement> registeredChildren = new ArrayList<DPElement>();			// Replace with array; operations like insert etc are hardly used at all
+	public String cachedTextRep = null;
 	
 	
 	
@@ -60,9 +60,11 @@ public abstract class DPContainer extends DPElement
 	public DPContainer(ContainerStyleParams styleParams)
 	{
 		super(styleParams);
-		
-		registeredChildren = new ArrayList<DPElement>();
-		cachedTextRep = null;
+	}
+	
+	protected DPContainer(DPContainer element)
+	{
+		super( element );
 	}
 	
 	
@@ -973,7 +975,7 @@ public abstract class DPContainer extends DPElement
 		{
 			if ( child != null )
 			{
-				DPElement metaChild = ctx.presentFragmentWithDefaultPerspective( child, state ); 
+				DPElement metaChild = ctx.presentFragmentWithDefaultPerspective( child.treeExplorer(), state ); 
 				metaChildrenVBox.append( metaChild );
 			}
 			else

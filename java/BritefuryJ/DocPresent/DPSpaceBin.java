@@ -29,7 +29,38 @@ public class DPSpaceBin extends DPBin
 		layoutNode = new LayoutNodeSpaceBin( this );
 	}
 	
+	protected DPSpaceBin(DPSpaceBin element)
+	{
+		super( element );
+
+		minWidth = element.minWidth;
+		minHeight = element.minHeight;
+		
+		layoutNode = new LayoutNodeSpaceBin( this );
+	}
 	
+	
+	
+	//
+	//
+	// Presentation tree cloning
+	//
+	//
+	
+	public DPElement clonePresentationSubtree()
+	{
+		DPSpaceBin clone = new DPSpaceBin( this );
+		clone.clonePostConstuct( this );
+		return clone;
+	}
+
+	
+	
+	//
+	//
+	// Space bin
+	//
+	//
 	
 	public double getMinWidth()
 	{

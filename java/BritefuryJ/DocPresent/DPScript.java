@@ -56,8 +56,58 @@ public class DPScript extends DPContainer
 		segs = new DPSegment[NUMCHILDREN];
 		paras = new DPParagraph[NUMCHILDREN];
 	}
+	
+	protected DPScript(DPScript element)
+	{
+		super( element );
+		
+		layoutNode = new LayoutNodeScript( this );
+		
+		this.segmentTextStyleParams = element.segmentTextStyleParams;
+		
+		children = new DPElement[NUMCHILDREN];
+		segs = new DPSegment[NUMCHILDREN];
+		paras = new DPParagraph[NUMCHILDREN];
+	}
+	
+	
+	
+	//
+	//
+	// Presentation tree cloning
+	//
+	//
+	
+	protected void clonePostConstuct(DPElement src)
+	{
+		super.clonePostConstuct( src );
+		for (int i = 0; i < NUMCHILDREN; i++)
+		{
+			DPElement child = ((DPScript)src).getChild( i );
+			if ( child != null )
+			{
+				setChild( i, child.clonePresentationSubtree() );
+			}
+		}
+	}
+	
+	public DPElement clonePresentationSubtree()
+	{
+		DPScript clone = new DPScript( this );
+		clone.clonePostConstuct( this );
+		return clone;
+	}
 
 	
+	
+
+	
+	
+	//
+	//
+	// Child access / modification
+	//
+	//
 	
 	public DPElement getChild(int slot)
 	{

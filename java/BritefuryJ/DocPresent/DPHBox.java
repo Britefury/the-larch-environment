@@ -24,4 +24,26 @@ public class DPHBox extends DPAbstractBox
 		
 		layoutNode = new LayoutNodeHBox( this );
 	}
+	
+	protected DPHBox(DPHBox element)
+	{
+		super( element );
+		
+		layoutNode = new LayoutNodeHBox( this );
+	}
+	
+	
+	
+	//
+	//
+	// Presentation tree cloning
+	//
+	//
+	
+	public DPElement clonePresentationSubtree()
+	{
+		DPHBox clone = new DPHBox( this );
+		clone.clonePostConstuct( this );
+		return clone;
+	}
 }

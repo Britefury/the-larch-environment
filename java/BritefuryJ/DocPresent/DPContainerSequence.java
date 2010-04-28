@@ -7,6 +7,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -31,8 +32,41 @@ abstract public class DPContainerSequence extends DPContainer
 	{
 		super(styleParams);
 	}
+	
+	protected DPContainerSequence(DPContainerSequence element)
+	{
+		super( element );
+	}
+
 
 	
+	//
+	//
+	// Presentation tree cloning
+	//
+	//
+	
+	protected void clonePostConstuct(DPElement src)
+	{
+		super.clonePostConstuct( src );
+		List<DPElement> children = ((DPContainerSequence)src).getChildren();
+		
+		List<DPElement> childClones = new ArrayList<DPElement>();
+		for (DPElement child: children)
+		{
+			childClones.add( child != null  ?  child.clonePresentationSubtree()  :  null );
+		}
+		setChildren( childClones );
+	}
+	
+	
+	
+	
+	//
+	//
+	// Child list access and modifications
+	//
+	//
 	
 	public void setChildren(DPElement items[])
 	{

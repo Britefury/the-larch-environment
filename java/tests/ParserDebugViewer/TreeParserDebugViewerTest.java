@@ -24,20 +24,18 @@ import BritefuryJ.Parser.Production;
 import BritefuryJ.Parser.RegEx;
 import BritefuryJ.Parser.ParserExpression.ParserCoerceException;
 import BritefuryJ.Parser.Production.CannotOverwriteProductionExpressionException;
-import BritefuryJ.ParserDebugViewer.ParseViewFrame;
 
 public class TreeParserDebugViewerTest
 {
 	static ParserExpression identifier = new RegEx( "[A-Za-z_][A-Za-z0-9_]*" );
 
 	
-	public static void main(final String[] args) throws ParseErrorException, BadModuleNameException, UnknownClassException, CouldNotResolveSchemaException, CannotOverwriteProductionExpressionException, ParserCoerceException
+	public static DebugParseResult treeParseDebugResultTest() throws ParseErrorException, BadModuleNameException, UnknownClassException, CouldNotResolveSchemaException, CannotOverwriteProductionExpressionException, ParserCoerceException
 	{
 		String inputSX = "[call [getAttr [getAttr [call [getAttr [load x] blah] [params]] foo] blah] [params]]";
 		Object input = DMIOReader.readFromString( inputSX, null );
 		ParserExpression parser = buildParser();
-		DebugParseResult result = parser.debugParseNode( input );
-		new ParseViewFrame( result );
+		return parser.debugParseNode( input );
 	}
 	
 	

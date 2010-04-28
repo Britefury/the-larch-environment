@@ -33,7 +33,37 @@ public class DPBox extends DPContentLeaf
 		layoutNode = new LayoutNodeBox( this );
 	}
 	
+	protected DPBox(DPBox element)
+	{
+		super( element );
+		
+		this.minWidth = element.minWidth;
+		this.minHeight = element.minHeight;
+		
+		layoutNode = new LayoutNodeBox( this );
+	}
 	
+	
+	//
+	//
+	// Presentation tree cloning
+	//
+	//
+	
+	public DPElement clonePresentationSubtree()
+	{
+		DPBox clone = new DPBox( this );
+		clone.clonePostConstuct( this );
+		return clone;
+	}
+	
+	
+	
+	//
+	//
+	// Box size
+	//
+	//
 	
 	public double getMinWidth()
 	{

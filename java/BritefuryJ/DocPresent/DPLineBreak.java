@@ -27,7 +27,35 @@ public class DPLineBreak extends DPEmpty
 		layoutNode = new LayoutNodeLineBreak( this );
 	}
 	
+	protected DPLineBreak(DPLineBreak element)
+	{
+		super( element );
+		
+		layoutNode = new LayoutNodeLineBreak( this );
+	}
 	
+	
+	//
+	//
+	// Presentation tree cloning
+	//
+	//
+	
+	public DPElement clonePresentationSubtree()
+	{
+		DPLineBreak clone = new DPLineBreak( this );
+		clone.clonePostConstuct( this );
+		return clone;
+	}
+	
+	
+	
+	
+	//
+	//
+	// Line break
+	//
+	//
 	
 	public void initialiseLineBreakRequisition(LReqBoxInterface reqBox)
 	{

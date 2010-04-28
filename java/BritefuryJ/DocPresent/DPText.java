@@ -52,6 +52,33 @@ public class DPText extends DPContentLeafEditable
 		layoutNode = new LayoutNodeText( this );
 	}
 	
+	protected DPText(DPText element)
+	{
+		super( element );
+		
+		text = element.text;
+		visual = element.visual;
+		
+		layoutNode = new LayoutNodeText( this );
+	}
+	
+	
+	//
+	//
+	// Presentation tree cloning
+	//
+	//
+	
+	public DPElement clonePresentationSubtree()
+	{
+		DPText clone = new DPText( this );
+		clone.clonePostConstuct( this );
+		return clone;
+	}
+	
+	
+	
+	
 	
 	
 	public void setText(String text)

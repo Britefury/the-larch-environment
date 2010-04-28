@@ -276,8 +276,8 @@ class AppWindow (object):
 	
 	def _onShowElementTreeExplorer(self):
 		currentTab = self._browser.getCurrentBrowser()
-		element = currentTab.getRootElement()
-		location = self._app._browserContext.getLocationForObject( element )
+		treeExplorer = currentTab.getRootElement().treeExplorer()
+		location = self._app._browserContext.getLocationForObject( treeExplorer )
 		self._browser.openLocationInNewWindow( location )
 
 

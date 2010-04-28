@@ -26,6 +26,40 @@ public class DPProxy extends DPContainer
 	{
 		super(styleParams);
 	}
+	
+	protected DPProxy(DPProxy element)
+	{
+		super( element );
+	}
+	
+	
+	//
+	//
+	// Presentation tree cloning
+	//
+	//
+	
+	protected void clonePostConstuct(DPElement src)
+	{
+		super.clonePostConstuct( src );
+		DPElement child = ((DPProxy)src).getChild();
+		if ( child != null )
+		{
+			setChild( child.clonePresentationSubtree() );
+		}
+	}
+	
+	public DPElement clonePresentationSubtree()
+	{
+		DPProxy clone = new DPProxy( this );
+		clone.clonePostConstuct( this );
+		return clone;
+	}
+	
+	
+	
+	
+	
 
 	
 

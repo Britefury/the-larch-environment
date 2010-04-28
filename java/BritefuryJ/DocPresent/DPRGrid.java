@@ -28,6 +28,28 @@ public class DPRGrid extends DPContainerSequence
 		layoutNode = new LayoutNodeRGrid( this );
 	}
 	
+	protected DPRGrid(DPRGrid element)
+	{
+		super( element );
+		
+		layoutNode = new LayoutNodeRGrid( this );
+	}
+	
+	
+	
+	//
+	//
+	// Presentation tree cloning
+	//
+	//
+	
+	public DPElement clonePresentationSubtree()
+	{
+		DPRGrid clone = new DPRGrid( this );
+		clone.clonePostConstuct( this );
+		return clone;
+	}
+	
 	
 	
 	private void refreshSize()

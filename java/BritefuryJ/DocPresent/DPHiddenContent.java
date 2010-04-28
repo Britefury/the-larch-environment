@@ -42,6 +42,32 @@ public class DPHiddenContent extends DPElement
 		
 		this.textRepresentation = textRepresentation;
 	}
+	
+	protected DPHiddenContent(DPHiddenContent element)
+	{
+		super( element );
+		
+		layoutNode = new LayoutNodeHiddenContent( this );
+		
+		this.textRepresentation = element.textRepresentation;
+	}
+	
+	
+	//
+	//
+	// Presentation tree cloning
+	//
+	//
+	
+	public DPElement clonePresentationSubtree()
+	{
+		DPHiddenContent clone = new DPHiddenContent( this );
+		clone.clonePostConstuct( this );
+		return clone;
+	}
+	
+	
+	
 
 	
 	

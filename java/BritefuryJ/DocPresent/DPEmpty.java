@@ -25,6 +25,11 @@ public abstract class DPEmpty extends DPElement
 	}
 	
 	
+	protected DPEmpty(DPEmpty element)
+	{
+		super( element );
+	}
+	
 	
 	
 	

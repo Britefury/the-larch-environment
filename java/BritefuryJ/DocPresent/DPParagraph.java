@@ -32,6 +32,28 @@ public class DPParagraph extends DPContainerSequence
 		
 		layoutNode = new LayoutNodeParagraph( this );
 	}
+	
+	protected DPParagraph(DPParagraph element)
+	{
+		super( element );
+		
+		layoutNode = new LayoutNodeParagraph( this );
+	}
+	
+	
+	
+	//
+	//
+	// Presentation tree cloning
+	//
+	//
+	
+	public DPElement clonePresentationSubtree()
+	{
+		DPParagraph clone = new DPParagraph( this );
+		clone.clonePostConstuct( this );
+		return clone;
+	}
 
 	
 	

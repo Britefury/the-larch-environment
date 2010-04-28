@@ -15,6 +15,7 @@ import java.util.HashMap;
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
@@ -31,23 +32,19 @@ import BritefuryJ.ParserHelpers.DebugParseResultInterface;
 
 public class ParseView implements FragmentContext
 {
-	private static class DPViewBin extends DPBin
+	private static class ParseViewInteractor extends ElementInteractor
 	{
 		private ParseView parseView;
 		
-		public DPViewBin(ContainerStyleParams styleParams, ParseView parseView)
+		public ParseViewInteractor(ParseView parseView)
 		{
-			super(styleParams);
-			
 			this.parseView = parseView;
 		}
 		
 		
 		
-		protected void drawBackground(Graphics2D graphics)
+		public void drawBackground(DPElement element, Graphics2D graphics)
 		{
-			super.drawBackground( graphics );
-			
 			graphics.setColor( Color.black );
 			for (Edge e: parseView.callEdges)
 			{
@@ -131,7 +128,7 @@ public class ParseView implements FragmentContext
 	
 	private DPElement element; 
 	private ScrolledViewport viewport;
-	private DPViewBin viewBin;
+	private DPBin viewBin;
 	private HashMap<DebugNode, NodeView> nodeTable;
 	private ArrayList<Edge> callEdges, memoEdges;
 	private NodeView root;
@@ -145,7 +142,8 @@ public class ParseView implements FragmentContext
 	{
 		selection = null;
 		
-		viewBin = new DPViewBin( ContainerStyleParams.defaultStyleParams, this );
+		viewBin = new DPBin( ContainerStyleParams.defaultStyleParams );
+		viewBin.addInteractor( new ParseViewInteractor( this ) );
 		
 		nodeTable = new HashMap<DebugNode, NodeView>();
 		callEdges = new ArrayList<Edge>();
