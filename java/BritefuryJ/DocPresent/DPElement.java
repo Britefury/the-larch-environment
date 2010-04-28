@@ -407,6 +407,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		{
 			interactionFields = element.interactionFields.copy();
 		}
+		setAlignmentFlags( element.getAlignmentFlags() );
 	}
 	
 	
