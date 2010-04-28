@@ -50,6 +50,7 @@ public class DPBorder extends DPBin
 	{
 		super( element );
 		border = element.border;
+		layoutNode = new LayoutNodeBorder( this );
 	}
 	
 	
