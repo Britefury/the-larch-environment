@@ -72,10 +72,10 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 				
 				try
 				{
-					pos = caret.getMarker().getPositionInSubtree( nodeElement );
+					pos = caret.getPositionInSubtree( nodeElement );
 					caretNode = node;
 					textRepresentation = text;
-					bias = caret.getMarker().getBias();
+					bias = caret.getBias();
 					position = pos;
 				}
 				catch (DPElement.IsNotInSubtreeException e)
@@ -299,7 +299,7 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 					
 					if ( leaf.isEditable() )
 					{
-						leaf.moveMarker( caret.getMarker(), leafPosition, newBias );
+						caret.moveTo( leaf.marker( leafPosition, newBias ) );
 					}
 					else
 					{
@@ -350,7 +350,7 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 							DPContentLeaf left = leaf.getPreviousEditableLeaf( segFilter, null );
 							if ( left != null )
 							{
-								left.moveMarkerToEnd( caret.getMarker() );
+								caret.moveTo( leaf.markerAtEnd() );
 							}
 							else
 							{
@@ -358,7 +358,7 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 								DPContentLeaf right = leaf.getNextEditableLeaf( segFilter, null );
 								if ( right != null )
 								{
-									right.moveMarkerToStart( caret.getMarker() );
+									caret.moveTo( right.markerAtStart() );
 								}
 								else
 								{
@@ -366,7 +366,7 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 									left = leaf.getPreviousEditableLeaf( null, null );
 									if ( left != null )
 									{
-										left.moveMarkerToEnd( caret.getMarker() );
+										caret.moveTo( leaf.markerAtEnd() );
 									}
 									else
 									{
@@ -374,12 +374,12 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 										right = leaf.getNextEditableLeaf( null, null );
 										if ( right != null )
 										{
-											right.moveMarkerToStart( caret.getMarker() );
+											caret.moveTo( right.markerAtStart() );
 										}
 										else
 										{
 											// Searching backwards and forwards failed; place the cursor in the non-editable leaf and hope for the best
-											leaf.moveMarker( caret.getMarker(), leafPosition, newBias );
+											caret.moveTo( leaf.marker( leafPosition, newBias ) );
 										}
 									}
 								}
@@ -391,7 +391,7 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 							DPContentLeaf right = leaf.getNextEditableLeaf( segFilter, null );
 							if ( right != null )
 							{
-								right.moveMarkerToStart( caret.getMarker() );
+								caret.moveTo( right.markerAtStart() );
 							}
 							else
 							{
@@ -399,7 +399,7 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 								DPContentLeaf left = leaf.getPreviousEditableLeaf( segFilter, null );
 								if ( left != null )
 								{
-									left.moveMarkerToEnd( caret.getMarker() );
+									caret.moveTo( leaf.markerAtEnd() );
 								}
 								else
 								{
@@ -407,7 +407,7 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 									right = leaf.getNextEditableLeaf( null, null );
 									if ( right != null )
 									{
-										right.moveMarkerToStart( caret.getMarker() );
+										caret.moveTo( right.markerAtStart() );
 									}
 									else
 									{
@@ -415,12 +415,12 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 										left = leaf.getPreviousEditableLeaf( null, null );
 										if ( left != null )
 										{
-											left.moveMarkerToEnd( caret.getMarker() );
+											caret.moveTo( leaf.markerAtEnd() );
 										}
 										else
 										{
 											// Searching forwards and backwards failed; place the cursor in the non-editable leaf and hope for the best
-											leaf.moveMarker( caret.getMarker(), leafPosition, newBias );
+											caret.moveTo( leaf.marker( leafPosition, newBias ) );
 										}
 									}
 								}

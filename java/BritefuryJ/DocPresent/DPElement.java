@@ -1489,9 +1489,8 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		onRealise();
 		if ( testFlag( FLAG_ENSURE_VISIBLE_QUEUED ) )
 		{
-			System.out.println( "DPElement.handleRealise: ensure visible queued" );
 			clearFlag( FLAG_ENSURE_VISIBLE_QUEUED );
-			ensureVisibleImpl();
+			rootElement.queueEnsureVisible( this );
 		}
 	}
 	

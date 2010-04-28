@@ -323,7 +323,7 @@ public abstract class DPContentLeaf extends DPElement
 		Caret caret = rootElement != null  ?  rootElement.getCaret()  :  null;
 		if ( caret != null )
 		{
-			DPContentLeaf e = caret.getMarker().getElement();
+			DPContentLeaf e = caret.getElement();
 			if ( e == this )
 			{
 				return metaHeaderHighlightBorder;

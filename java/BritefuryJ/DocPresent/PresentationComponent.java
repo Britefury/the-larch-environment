@@ -268,7 +268,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		
 		private boolean bStructureRefreshQueued;
-		private boolean bEnsureCaretVisibilityQueued = false;
+		private DPElement ensureVisibilityElement;
 		
 		
 		protected ArrayList<Runnable> waitingImmediateEvents;			// only initialised when non-empty; otherwise null
@@ -625,7 +625,11 @@ public class PresentationComponent extends JComponent implements ComponentListen
 					log.log( new TypesettingPerformanceLogEntry( typesetTime ) );
 				}
 				
-				checkCaretVisibility();
+				if ( ensureVisibilityElement != null )
+				{
+					ensureVisibilityElement.ensureVisible();
+					ensureVisibilityElement = null;
+				}
 			}
 		}
 		
@@ -660,7 +664,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 								DPContentLeafEditable leaf = getLayoutNode().getLeftEditableContentLeaf();
 								if ( leaf != null )
 								{
-									leaf.moveMarkerToStart( caret.getMarker() );
+									caret.moveTo( leaf.markerAtStart() );
 								}
 							}
 							
@@ -791,7 +795,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 					x = x.inverse();
 					
 					Marker marker = leaf.markerAtPoint( x.transform( windowPos ) );
-					caret.getMarker().moveTo( marker );
+					caret.moveTo( marker );
 					selectionManager.mouseSelectionBegin( marker );
 				}
 			}
@@ -840,7 +844,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 
 				Marker marker = leaf.markerAtPoint( x.transform( windowPos ) );
 				
-				caret.getMarker().moveTo( marker );
+				caret.moveTo( marker );
 				
 				selectionManager.mouseSelectionDrag( marker );
 			}
@@ -926,7 +930,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				{
 					if ( caret.isValid() )
 					{
-						DPContentLeafEditable leaf = caret.getMarker().getElement();
+						DPContentLeafEditable leaf = caret.getElement();
 						if ( leaf.onKeyPress( event ) )
 						{
 							return true;
@@ -971,7 +975,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				{
 					if ( caret.isValid() )
 					{
-						DPContentLeafEditable leaf = caret.getMarker().getElement();
+						DPContentLeafEditable leaf = caret.getElement();
 						if ( leaf.onKeyRelease( event ) )
 						{
 							return true;
@@ -1022,7 +1026,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				{
 					if ( caret.isValid()  &&  !bCtrl  &&  !bAlt )
 					{
-						DPContentLeafEditable leaf = caret.getMarker().getElement();
+						DPContentLeafEditable leaf = caret.getElement();
 						if ( leaf.onKeyTyped( event ) )
 						{
 							return true;
@@ -1097,6 +1101,8 @@ public class PresentationComponent extends JComponent implements ComponentListen
 					{
 						selectionManager.onCaretMove( caret, prevPos, ( modifiers & Modifier.SHIFT ) != 0 );
 					}
+					
+					caret.ensureVisible();
 				}
 				return true;
 			}
@@ -1298,39 +1304,21 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			}
 			
 			
-			if ( caretLeaf != null )
+			/*if ( caretLeaf != null )
 			{
 				caretLeaf.ensureVisible();
 			}
 			
-			queueEnsureCaretVisible();
+			queueEnsureCaretVisible();*/
 			
 			queueFullRedraw();
 		}
 		
 		
-		private void queueEnsureCaretVisible()
+		protected void queueEnsureVisible(DPElement element)
 		{
-			bEnsureCaretVisibilityQueued = true;
+			ensureVisibilityElement = element;
 		}
-		
-		private void checkCaretVisibility()
-		{
-			if ( bEnsureCaretVisibilityQueued )
-			{
-				bEnsureCaretVisibilityQueued = false;
-				
-				if ( caret != null )
-				{
-					DPContentLeafEditable leaf = caret.getElement();
-					if ( leaf != null )
-					{
-						leaf.ensureVisible();
-					}
-				}
-			}
-		}
-		
 		
 		protected void caretGrab(DPElement element)
 		{
@@ -1379,7 +1367,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				{
 					if ( caret.getMarker().equals( selection.getEndMarker() ) )
 					{
-						caret.getMarker().moveTo( selection.getStartMarker() );
+						caret.moveTo( selection.getStartMarker() );
 					}
 					editHandler.deleteSelection( selection );
 				}
