@@ -357,6 +357,12 @@ public abstract class ArrangedSequenceLayoutNode extends ArrangedLayoutNode
 		refreshSubtree();
 		return Arrays.asList( leaves );
 	}
+	
+	public int getNumLeaves()
+	{
+		refreshSubtree();
+		return leaves.length;
+	}
 
 
 	LReqBoxInterface[] getLeavesRefreshedRequisitonXBoxes()

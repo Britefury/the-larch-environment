@@ -74,7 +74,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	public static interface ContextMenuFactory
 	{
-		public void buildContextMenu(ContextMenu menu);
+		public void buildContextMenu(DPElement element, ContextMenu menu);
 	}
 
 
@@ -1616,7 +1616,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		{
 			for (ContextMenuFactory contextFactory: contextFactories)
 			{
-				contextFactory.buildContextMenu( menu );
+				contextFactory.buildContextMenu( this, menu );
 				bResult = true;
 			}
 		}
@@ -1899,26 +1899,36 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	//
 	//
 	
-	public void addDragSource(Class<?> dataType, ObjectDndHandler.SourceDataFn sourceDataFn, ObjectDndHandler.ExportDoneFn exportDoneFn)
+	public void addDragSource(ObjectDndHandler.DragSource dragSource)
 	{
 		ObjectDndHandler current = getValidInitialDndHandler();
 		ensureValidInteractionFields();
-		interactionFields.dndHandler = current.withDragSource( new ObjectDndHandler.DragSource( dataType, sourceDataFn, exportDoneFn ) ); 
+		interactionFields.dndHandler = current.withDragSource( dragSource ); 
 		notifyInteractionFieldsModified();
 	}
 	
-	public void addDragSource(Class<?> dataType, ObjectDndHandler.SourceDataFn sourceDataFn)
+	public void addDragSource(Class<?> dataType, int sourceActions, ObjectDndHandler.SourceDataFn sourceDataFn, ObjectDndHandler.ExportDoneFn exportDoneFn)
 	{
-		addDragSource( dataType, sourceDataFn, null );
+		addDragSource( new ObjectDndHandler.DragSource( dataType, sourceActions, sourceDataFn, exportDoneFn ) );
 	}
 	
+	public void addDragSource(Class<?> dataType, int sourceActions, ObjectDndHandler.SourceDataFn sourceDataFn)
+	{
+		addDragSource( dataType, sourceActions, sourceDataFn, null );
+	}
+	
+	
+	public void addDropDest(ObjectDndHandler.DropDest dropDest)
+	{
+		ObjectDndHandler current = getValidInitialDndHandler();
+		ensureValidInteractionFields();
+		interactionFields.dndHandler = current.withDropDest( dropDest );
+		notifyInteractionFieldsModified();
+	}
 	
 	public void addDropDest(Class<?> dataType, ObjectDndHandler.CanDropFn canDropFn, ObjectDndHandler.DropFn dropFn)
 	{
-		ObjectDndHandler current = getValidInitialDndHandler();
-		ensureValidInteractionFields();
-		interactionFields.dndHandler = current.withDropDest( new ObjectDndHandler.DropDest( dataType, canDropFn, dropFn ) );
-		notifyInteractionFieldsModified();
+		addDropDest( new ObjectDndHandler.DropDest( dataType, canDropFn, dropFn ) );
 	}
 	
 	public void addDropDest(Class<?> dataType, ObjectDndHandler.DropFn dropFn)

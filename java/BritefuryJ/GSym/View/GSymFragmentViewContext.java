@@ -16,11 +16,14 @@ import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.Browser.Location;
+import BritefuryJ.DocPresent.Input.ObjectDndHandler;
+import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocView.DVNode;
+import BritefuryJ.GSym.GSymBrowserContext;
 import BritefuryJ.GSym.GSymPerspective;
 import BritefuryJ.GSym.GSymSubject;
 import BritefuryJ.GSym.ObjectView.PresentationStateListener;
@@ -30,6 +33,39 @@ import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 
 public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext, FragmentContext, PresentationStateListener
 {
+	public static class FragmentDocNode
+	{
+		private Object docNode;
+		
+		
+		public FragmentDocNode(Object docNode)
+		{
+			this.docNode = docNode;
+		}
+		
+		
+		public Object getDocNode()
+		{
+			return docNode;
+		}
+	}
+	
+	
+	private ObjectDndHandler.SourceDataFn fragmentDragSourceFn = new ObjectDndHandler.SourceDataFn()
+	{
+		@Override
+		public Object createSourceData(PointerInputElement sourceElement, int aspect)
+		{
+			DPElement element = (DPElement)sourceElement;
+			GSymFragmentViewContext ctx = (GSymFragmentViewContext)element.getFragmentContext();
+			return new FragmentDocNode( ctx.viewNode.getDocNode() );
+		}
+	};
+	
+
+	private ObjectDndHandler.DragSource fragmentDragSource = new ObjectDndHandler.DragSource( FragmentDocNode.class, ObjectDndHandler.ASPECT_DOC_NODE, fragmentDragSourceFn );
+	
+	
 	private static final PrimitiveStyleSheet viewError_textStyle = PrimitiveStyleSheet.instance.withFont( new Font( "SansSerif", Font.BOLD, 12 ) ).withForeground( new Color( 0.8f, 0.0f, 0.0f ) );
 	private static final PrimitiveStyleSheet viewNull_textStyle = PrimitiveStyleSheet.instance.withFont( new Font( "SansSerif", Font.ITALIC | Font.BOLD, 12 ) ).withForeground( new Color( 0.8f, 0.0f, 0.4f ) );
 
@@ -46,6 +82,7 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 		this.viewNode = viewNode;
 		this.viewNode.setContext( this );
 		this.viewNode.setFragmentContext( this );
+		this.viewNode.getElementNoRefresh().addDragSource( fragmentDragSource );
 	}
 	
 	
@@ -53,6 +90,11 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 	public GSymViewContext getViewContext()
 	{
 		return factory.viewContext;
+	}
+	
+	public GSymBrowserContext getBrowserContext()
+	{
+		return factory.viewContext.getBrowserContext();
 	}
 	
 	

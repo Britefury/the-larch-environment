@@ -293,4 +293,10 @@ public class Caret implements MarkerListener
 			}
 		}
 	}
+	
+	
+	public void moveTo(Marker m)
+	{
+		marker.moveTo( m );
+	}
 }

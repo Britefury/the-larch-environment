@@ -139,9 +139,9 @@ public class Browser
 		return page.getTitle();
 	}
 	
-	public DPElement getContentsElement()
+	public DPElement getRootElement()
 	{
-		return viewport.getViewportElement().getChild();
+		return presComponent.getRootElement();
 	}
 	
 	

@@ -134,7 +134,7 @@ public class VerticalListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 				outerChildElems.add(  endDelim.createElement( primitiveStyle ) );
 			}
 			
-			return primitiveStyle.vbox( outerChildElems );
+			return primitiveStyle.vbox( outerChildElems, 0 );
 		}
 		else
 		{

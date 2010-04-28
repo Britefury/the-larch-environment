@@ -12,11 +12,15 @@ import javax.swing.TransferHandler;
 
 public abstract class DndHandler
 {
-	public static int COPY = TransferHandler.COPY;
-	public static int COPY_OR_MOVE = TransferHandler.COPY_OR_MOVE;
-	public static int LINK = TransferHandler.LINK;
-	public static int MOVE = TransferHandler.MOVE;
-	public static int NONE = TransferHandler.NONE;
+	public final static int COPY = TransferHandler.COPY;
+	public final static int COPY_OR_MOVE = TransferHandler.COPY_OR_MOVE;
+	public final static int LINK = TransferHandler.LINK;
+	public final static int MOVE = TransferHandler.MOVE;
+	public final static int NONE = TransferHandler.NONE;
+	
+	public final static int ASPECT_NONE = 0;
+	public final static int ASPECT_NORMAL = 0x1;
+	public final static int ASPECT_DOC_NODE = 0x2;
 
 	
 	
@@ -25,7 +29,12 @@ public abstract class DndHandler
 		return COPY;
 	}
 	
-	public Transferable createTransferable(PointerInputElement sourceElement)
+	public int getSourceRequestedAspect(PointerInputElement sourceElement, PointerInterface pointer, int button)
+	{
+		return ASPECT_NORMAL;
+	}
+	
+	public Transferable createTransferable(PointerInputElement sourceElement, int aspect)
 	{
 		return null;
 	}

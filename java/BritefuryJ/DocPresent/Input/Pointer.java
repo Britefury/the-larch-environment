@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Map;
 
 import javax.swing.JComponent;
+import javax.swing.TransferHandler;
 
 import BritefuryJ.DocPresent.ContextMenu.ContextMenu;
 import BritefuryJ.DocPresent.ContextMenu.ContextPopupMenu;
@@ -622,12 +623,22 @@ public class Pointer extends PointerInterface
 				{
 					if ( mouseEvent != null )
 					{
-						drop.bInProgress = true;
 						int requestedAction = drop.sourceElement.getDndHandler().getSourceRequestedAction( drop.sourceElement, event.pointer, drop.sourceButton );
-						Transferable transferable = drop.sourceElement.getDndHandler().createTransferable( drop.sourceElement );
-						drop.initialise( transferable, requestedAction );
-						
-						dndController.pointerDndInitiateDrag( this, drop, mouseEvent, requestedAction );
+						if ( requestedAction != TransferHandler.NONE )
+						{
+							int requestedAspect = drop.sourceElement.getDndHandler().getSourceRequestedAspect( drop.sourceElement, event.pointer, drop.sourceButton );
+							if ( requestedAspect != DndHandler.ASPECT_NONE )
+							{
+								Transferable transferable = drop.sourceElement.getDndHandler().createTransferable( drop.sourceElement, requestedAspect );
+								if ( transferable != null )
+								{
+									drop.bInProgress = true;
+									drop.initialise( transferable, requestedAction );
+								
+									dndController.pointerDndInitiateDrag( this, drop, mouseEvent, requestedAction );
+								}
+							}
+						}
 					}
 				}
 				else

@@ -64,6 +64,7 @@ abstract public class DPContainerSequence extends DPContainer
 			if ( items.size() == 0 )
 			{
 				unregisterChild( registeredChildren.get( 0 ) );
+				registeredChildren.clear();
 				onChildListModified();
 				queueResize();
 			}

@@ -166,11 +166,11 @@ public class VerticalInlineListViewLayoutStyleSheet extends ListViewLayoutStyleS
 			
 			if ( endDelim != null )
 			{
-				return primitiveStyle.vbox( Arrays.asList( new DPElement[] { first, indent, endDelim.createElement( primitiveStyle ) } ) );
+				return primitiveStyle.vbox( Arrays.asList( new DPElement[] { first, indent, endDelim.createElement( primitiveStyle ) } ), 0 );
 			}
 			else
 			{
-				return primitiveStyle.vbox( Arrays.asList( new DPElement[] { first, indent } ) );
+				return primitiveStyle.vbox( Arrays.asList( new DPElement[] { first, indent } ), 0 );
 			}
 		}
 	}

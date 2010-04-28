@@ -112,31 +112,12 @@ class ProjectEditorStyleSheet (StyleSheet):
 		return contentBox.alignHExpand()
 
 
+	def renameEntry(self, name, onAccept, onCancel):
+		controlsStyle = self['controlsStyle']
+		return controlsStyle.textEntry( name, onAccept, onCancel )
+	
 
-
-	def package(self, packageName, packageLocation, items, packageRenameFn, window, onPageAdd, onPageImport, onPackageAdd):
-		def _onRenameAccept(textEntry, text):
-			packageRenameFn( text )
-			
-		def _onRenameCancel(textEntry, originalText):
-			nameBox.setChild( nameElement )
-		
-		def _onRename(actionEvent):
-			textEntry = controlsStyle.textEntry( packageName, _onRenameAccept, _onRenameCancel )
-			nameBox.setChild( textEntry.getElement() )
-			textEntry.grabCaret()
-			
-		def _onNewPackage(actionEvent):
-			onPackageAdd()
-		
-		def _packageContextMenuFactory(menu):
-			menu.addItem( 'New package', _onNewPackage )
-			window.populateNewPageMenu( menu.addSubMenu( 'New page' ), onPageAdd )
-			window.populateImportPageMenu( menu.addSubMenu( 'Import page' ), onPageImport )
-			menu.addSeparator()
-			menu.addItem( 'Rename', _onRename )
-			return True
-		
+	def package(self, packageName, packageLocation, items, packageContextMenuFactory):
 		packageNameStyle = self.packageNameStyle()
 		itemHoverHighlightStyle = self.itemHoverHighlightStyle()
 		primitiveStyle = self['primitiveStyle']
@@ -145,39 +126,24 @@ class ProjectEditorStyleSheet (StyleSheet):
 		icon = primitiveStyle.image( 'GSymCore/Project/icons/Package.png' )
 		nameElement = packageNameStyle.staticText( packageName )
 		nameBox = itemHoverHighlightStyle.hbox( [ icon.padX( 5.0 ).alignVCentre(), nameElement.alignVCentre() ] )
-		nameBox.addContextMenuFactory( _packageContextMenuFactory )
+		nameBox.addContextMenuFactory( packageContextMenuFactory )
 		
 		itemsBox = primitiveStyle.vbox( items )
 		
-		return primitiveStyle.vbox( [ nameBox, itemsBox.padX( self['packageContentsIndentation'], 0.0 ).alignHExpand() ] )
+		return primitiveStyle.vbox( [ nameBox, itemsBox.padX( self['packageContentsIndentation'], 0.0 ).alignHExpand() ] ), nameBox, nameElement
 
 	
 	
-	def page(self, pageName, pageLocation, pageRenameFn):
-		def _onRenameAccept(textEntry, text):
-			pageRenameFn( text )
-			
-		def _onRenameCancel(textEntry, originalText):
-			box.setChild( link )
-		
-		def _onRename(actionEvent):
-			textEntry = controlsStyle.textEntry( pageName, _onRenameAccept, _onRenameCancel )
-			box.setChildren( [ textEntry.getElement() ] )
-			textEntry.grabCaret()
-		
-		def _pageContextMenuFactory(menu):
-			menu.addItem( 'Rename', _onRename )
-			return True
-		
+	def page(self, pageName, pageLocation, pageContextMenuFactory):
 		primitiveStyle = self['primitiveStyle']
 		controlsStyle = self['controlsStyle']
 		itemHoverHighlightStyle = self.itemHoverHighlightStyle()
 
 		link = controlsStyle.link( pageName, pageLocation ).getElement()
-		link.addContextMenuFactory( _pageContextMenuFactory )
+		link.addContextMenuFactory( pageContextMenuFactory )
 		box = itemHoverHighlightStyle.hbox( [ link ] )
 
-		return box
+		return box, box, link
 	
 	
 

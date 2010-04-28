@@ -139,7 +139,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 	
 	public StyleSheet getStyleSheet()
 	{
-		return PrimitiveStyleSheet.instance;
+		return DefaultPerspectiveStyleSheet.instance;
 	}
 	
 	public AttributeTable getInitialInheritedState()

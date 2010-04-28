@@ -28,9 +28,10 @@ from BritefuryJ.AttributeTable import *
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.StyleSheet import *
 from BritefuryJ.DocPresent.Browser import Location
+from BritefuryJ.DocPresent.Input import ObjectDndHandler
 
 from BritefuryJ.GSym import GSymPerspective, GSymSubject
-from BritefuryJ.GSym.View import PyGSymViewFragmentFunction
+from BritefuryJ.GSym.View import GSymFragmentViewContext, PyGSymViewFragmentFunction
 
 from GSymCore.Languages.Python25 import Python25
 
@@ -70,8 +71,32 @@ class TerminalView (GSymViewObjectDispatch):
 	def Terminal(self, ctx, styleSheet, state, node):
 		blockViews = ctx.mapPresentFragment( node.getBlocks(), styleSheet )
 		currentModuleView = ctx.presentFragmentWithPerspectiveAndStyleSheet( node.getCurrentPythonModule(), Python25.python25EditorPerspective, styleSheet['pythonStyle'] )
+	
+		def _onDrop(element, pos, data):
+			def _onAccept(entry, text):
+				node.setGlobalVar( text, data.getDocNode() )
+				_finish( entry )
+			
+			def _onCancel(entry, text):
+				_finish( entry )
+				
+			def _finish(entry):
+				caret.moveTo( marker )
+				dropPromptInsertionPoint.setChildren( [] )
+			
+			dropPrompt, textEntry = styleSheet.dropPrompt( _onAccept, _onCancel )
+			caret = element.getRootElement().getCaret()
+			marker = caret.getMarker().copy()
+			dropPromptInsertionPoint.setChildren( [ dropPrompt ] )
+			textEntry.grabCaret()
+			
+			return True
+			
 		
-		return styleSheet.terminal( blockViews, currentModuleView, CurrentModuleInteractor( node )  )
+		
+		dropDest = ObjectDndHandler.DropDest( GSymFragmentViewContext.FragmentDocNode, _onDrop )
+		terminalView, dropPromptInsertionPoint = styleSheet.terminal( blockViews, currentModuleView, CurrentModuleInteractor( node ), dropDest )
+		return terminalView
 
 
 

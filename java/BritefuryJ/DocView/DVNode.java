@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.DocView;
 
-import BritefuryJ.DocPresent.DPFragment;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPFragment;
 import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
@@ -20,9 +20,6 @@ public class DVNode extends IncrementalTreeNode
 		private static final long serialVersionUID = 1L;
 	}
 
-	
-
-	
 	
 	private DPFragment fragmentElement;
 	private DPElement element;

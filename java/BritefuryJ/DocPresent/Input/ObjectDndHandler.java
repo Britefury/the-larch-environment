@@ -27,7 +27,7 @@ public class ObjectDndHandler extends DndHandler
 	
 	public static interface SourceDataFn
 	{
-		public Object createSourceData(PointerInputElement sourceElement);
+		public Object createSourceData(PointerInputElement sourceElement, int aspect);
 	}
 	
 	public static interface ExportDoneFn
@@ -54,21 +54,23 @@ public class ObjectDndHandler extends DndHandler
 	
 	public static class DragSource extends DndPin
 	{
+		private int sourceAspects;
 		private Class<?> dataType;
 		private SourceDataFn sourceDataFn;
 		private ExportDoneFn exportDoneFn;
 		
 		
-		public DragSource(Class<?> dataType, SourceDataFn sourceDataFn, ExportDoneFn exportDoneFn)
+		public DragSource(Class<?> dataType, int sourceAspects, SourceDataFn sourceDataFn, ExportDoneFn exportDoneFn)
 		{
+			this.sourceAspects = sourceAspects;
 			this.dataType = dataType;
 			this.sourceDataFn = sourceDataFn;
 			this.exportDoneFn = exportDoneFn;
 		}
 
-		public DragSource(Class<?> dataType, SourceDataFn sourceDataFn)
+		public DragSource(Class<?> dataType, int sourceAspects, SourceDataFn sourceDataFn)
 		{
-			this( dataType, sourceDataFn, null );
+			this( dataType, sourceAspects, sourceDataFn, null );
 		}
 		
 		
@@ -83,7 +85,7 @@ public class ObjectDndHandler extends DndHandler
 			{
 				DragSource sx = (DragSource)x;
 				
-				return dataType.equals( sx.dataType )  &&
+				return sourceAspects == sx.sourceAspects  &&  dataType.equals( sx.dataType )  &&
 					( sourceDataFn != null  ?  sourceDataFn.equals( sx.sourceDataFn )  :  sourceDataFn == sx.sourceDataFn )  &&
 					( exportDoneFn != null  ?  exportDoneFn.equals( sx.exportDoneFn )  :  exportDoneFn == sx.exportDoneFn );
 			}
@@ -93,10 +95,11 @@ public class ObjectDndHandler extends DndHandler
 
 		public int hashCode()
 		{
-			int a = dataType.hashCode();
-			int b = sourceDataFn != null  ?  sourceDataFn.hashCode()  :  0;
-			int c = exportDoneFn != null  ?  exportDoneFn.hashCode()  :  0;
-			return HashUtils.tripleHash( a, b, c );
+			int a = sourceAspects;
+			int b = dataType.hashCode();
+			int c = sourceDataFn != null  ?  sourceDataFn.hashCode()  :  0;
+			int d = exportDoneFn != null  ?  exportDoneFn.hashCode()  :  0;
+			return HashUtils.nHash( new int [] { a, b, c, d } );
 		}
 	}
 	
@@ -212,15 +215,17 @@ public class ObjectDndHandler extends DndHandler
 	private static class ObjectDndTransferData
 	{
 		private PointerInputElement sourceElement;
+		private int sourceAspect;
 		private ObjectDndHandler sourceHandler;
 		private ArrayList<TransferMatch> transferMatches;
 		private TransferMatch acceptedMatch;
 		private HashMap<DragSource, Object> dragDataTable = new HashMap<DragSource, Object>();
 		
 		
-		public ObjectDndTransferData(PointerInputElement sourceElement, ObjectDndHandler sourceHandler)
+		public ObjectDndTransferData(PointerInputElement sourceElement, int sourceAspect, ObjectDndHandler sourceHandler)
 		{
 			this.sourceElement = sourceElement;
+			this.sourceAspect = sourceAspect;
 			this.sourceHandler = sourceHandler;
 		}
 		
@@ -234,7 +239,7 @@ public class ObjectDndHandler extends DndHandler
 			}
 			else
 			{
-				Object dragData = src.sourceDataFn.createSourceData( sourceElement );
+				Object dragData = src.sourceDataFn.createSourceData( sourceElement, sourceAspect );
 				dragDataTable.put( src, dragData );
 				return dragData;
 			}
@@ -260,13 +265,15 @@ public class ObjectDndHandler extends DndHandler
 	private static class ObjectDndTransferable implements Transferable
 	{
 		private PointerInputElement sourceElement;
+		private int sourceAspect;
 		private ObjectDndHandler handler;
 		private ObjectDndTransferData objectDndTransferData;
 		
 		
-		public ObjectDndTransferable(PointerInputElement sourceElement, ObjectDndHandler handler)
+		public ObjectDndTransferable(PointerInputElement sourceElement, int aspect, ObjectDndHandler handler)
 		{
 			this.sourceElement = sourceElement;
+			sourceAspect = aspect;
 			this.handler = handler;
 		}
 		
@@ -277,7 +284,7 @@ public class ObjectDndHandler extends DndHandler
 			{
 				if ( objectDndTransferData == null )
 				{
-					objectDndTransferData =  new ObjectDndTransferData( sourceElement, handler );
+					objectDndTransferData =  new ObjectDndTransferData( sourceElement, sourceAspect, handler );
 				}
 				return objectDndTransferData;
 			}
@@ -305,6 +312,7 @@ public class ObjectDndHandler extends DndHandler
 	
 	private ArrayList<DragSource> sources;
 	private ArrayList<DropDest> dests;
+	private int sourceAspectsMask = 0;
 	private ArrayList<NonLocalDropDest> nonLocalDests;
 	private HashMap<Class<?>, DropDest> typeToDest;
 	
@@ -321,6 +329,14 @@ public class ObjectDndHandler extends DndHandler
 		this.sources = sources;
 		this.dests = dests;
 		this.nonLocalDests = nonLocalDests;
+		
+		if ( sources != null )
+		{
+			for (DragSource source: sources)
+			{
+				sourceAspectsMask = sourceAspectsMask | source.sourceAspects;
+			}
+		}
 		
 		if ( dests != null )
 		{
@@ -434,33 +450,72 @@ public class ObjectDndHandler extends DndHandler
 		}
 		else
 		{
-			return COPY;
+			return NONE;
 		}
 	}
 	
-	public Transferable createTransferable(PointerInputElement sourceElement)
+	public int getSourceRequestedAspect(PointerInputElement sourceElement, PointerInterface pointer, int button)
 	{
-		return new ObjectDndTransferable( sourceElement, this );
+		int requestedAspect = 0;
+		
+		int modifiers = pointer.getModifiers();
+		int mods = modifiers & ( Modifier.CTRL | Modifier.SHIFT | Modifier.ALT | Modifier.ALT_GRAPH );
+		if ( mods == ( Modifier.CTRL | Modifier.ALT ) )
+		{
+			requestedAspect = ASPECT_DOC_NODE;
+		}
+		else
+		{
+			requestedAspect = ASPECT_NORMAL;
+		}
+		
+		if ( ( requestedAspect & sourceAspectsMask )  !=  0 )
+		{
+			return requestedAspect;
+		}
+		else
+		{
+			return ASPECT_NONE;
+		}
+	}
+	
+	public Transferable createTransferable(PointerInputElement sourceElement, int aspect)
+	{
+		if ( sources != null )
+		{
+			for (DragSource source: sources)
+			{
+				if ( ( aspect & source.sourceAspects )  !=  0 )
+				{
+					return new ObjectDndTransferable( sourceElement, aspect, this );
+				}
+			}
+		}
+		
+		return null;
 	}
 	
 	public void exportDone(PointerInputElement sourceElement, Transferable data, int action)
 	{
-		ObjectDndTransferData sourceData = null;
-		try
+		if ( data != null )
 		{
-			sourceData = (ObjectDndTransferData)data.getTransferData( ObjectDndDataFlavor.flavor );
+			ObjectDndTransferData sourceData = null;
+			try
+			{
+				sourceData = (ObjectDndTransferData)data.getTransferData( ObjectDndDataFlavor.flavor );
+			}
+			catch (UnsupportedFlavorException e)
+			{
+				return;
+			}
+			catch (IOException e)
+			{
+				return;
+			}
+			
+			ExportDoneFn exportDoneFn = sourceData.acceptedMatch.source.exportDoneFn;
+			exportDoneFn.exportDone( sourceElement, sourceData.acceptedMatch.dragData, action );
 		}
-		catch (UnsupportedFlavorException e)
-		{
-			return;
-		}
-		catch (IOException e)
-		{
-			return;
-		}
-		
-		ExportDoneFn exportDoneFn = sourceData.acceptedMatch.source.exportDoneFn;
-		exportDoneFn.exportDone( sourceElement, sourceData.acceptedMatch.dragData, action );
 	}
 
 	
@@ -593,35 +648,38 @@ public class ObjectDndHandler extends DndHandler
 		{
 			for (DragSource src: sourceHandler.sources)
 			{
-				DropDest dest = getDestForType( src.dataType );
-				
-				if ( dest != null )
+				if ( ( transferData.sourceAspect & src.sourceAspects )  !=  0 )
 				{
-					boolean bCanDrop = true;
-					Object dragData = null;
-					boolean bHasDragData = false;
-					if ( dest.canDropFn != null )
+					DropDest dest = getDestForType( src.dataType );
+					
+					if ( dest != null )
 					{
-						dragData = transferData.getDragDataForSrc( src );
-						bCanDrop = dest.canDropFn.canDrop( destElement, drop.getTargetPosition(), dragData );
-						bHasDragData = true;
-					}
-	
-					if ( bCanDrop )
-					{
-						boolean bInserted = false;
-						for (int i = 0; i < matches.size(); i++)
+						boolean bCanDrop = true;
+						Object dragData = null;
+						boolean bHasDragData = false;
+						if ( dest.canDropFn != null )
 						{
-							TransferMatch match = matches.get( i );
-							if ( match.source.dataType.isAssignableFrom( src.dataType ) )
-							{
-								matches.set( i, new TransferMatch( src, dest, dragData, bHasDragData ) );
-							}
+							dragData = transferData.getDragDataForSrc( src );
+							bCanDrop = dest.canDropFn.canDrop( destElement, drop.getTargetPosition(), dragData );
+							bHasDragData = true;
 						}
-						
-						if ( !bInserted )
+		
+						if ( bCanDrop )
 						{
-							matches.add( new TransferMatch( src, dest, dragData, bHasDragData ) );
+							boolean bInserted = false;
+							for (int i = 0; i < matches.size(); i++)
+							{
+								TransferMatch match = matches.get( i );
+								if ( match.source.dataType.isAssignableFrom( src.dataType ) )
+								{
+									matches.set( i, new TransferMatch( src, dest, dragData, bHasDragData ) );
+								}
+							}
+							
+							if ( !bInserted )
+							{
+								matches.add( new TransferMatch( src, dest, dragData, bHasDragData ) );
+							}
 						}
 					}
 				}
