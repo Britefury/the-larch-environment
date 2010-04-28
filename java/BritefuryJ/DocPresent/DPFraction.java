@@ -122,7 +122,7 @@ public class DPFraction extends DPContainer
 
 		public void drawCaret(Graphics2D graphics, Caret c)
 		{
-			int index = c.getMarker().getIndex();
+			int index = c.getIndex();
 			
 			if ( index == 0 )
 			{

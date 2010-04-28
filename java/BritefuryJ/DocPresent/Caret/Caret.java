@@ -44,14 +44,27 @@ public class Caret implements MarkerListener
 	
 	public DPContentLeafEditable getElement()
 	{
-		if ( marker != null )
-		{
-			return marker.getElement();
-		}
-		else
-		{
-			return null;
-		}
+		return marker.getElement();
+	}
+	
+	public int getPosition()
+	{
+		return marker.getPosition();
+	}
+	
+	public int getIndex()
+	{
+		return marker.getIndex();
+	}
+	
+	public Marker.Bias getBias()
+	{
+		return marker.getBias();
+	}
+	
+	public int getPositionInSubtree(DPElement subtreeRoot)
+	{
+		return marker.getPositionInSubtree( subtreeRoot );
 	}
 	
 	
@@ -81,6 +94,16 @@ public class Caret implements MarkerListener
 		if ( listener != null )
 		{
 			listener.caretChanged( this );
+		}
+	}
+	
+	
+	public void ensureVisible()
+	{
+		DPElement element = getElement();
+		if ( element != null )
+		{
+			element.ensureVisible();
 		}
 	}
 	
@@ -117,7 +140,7 @@ public class Caret implements MarkerListener
 		}
 	}
 	
-	private boolean isElementWithinGrabSubtree(DPElement element)
+	protected boolean isElementWithinGrabSubtree(DPElement element)
 	{
 		if ( grabElement == null )
 		{
@@ -295,8 +318,16 @@ public class Caret implements MarkerListener
 	}
 	
 	
-	public void moveTo(Marker m)
+	public boolean moveTo(Marker m)
 	{
-		marker.moveTo( m );
+		if ( isElementWithinGrabSubtree( m.getElement() ) )
+		{
+			marker.moveTo( m );
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 }

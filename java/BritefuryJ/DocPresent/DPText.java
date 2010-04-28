@@ -206,7 +206,7 @@ public class DPText extends DPContentLeafEditable
 	
 	public void drawCaret(Graphics2D graphics, Caret c)
 	{
-		int index = c.getMarker().getIndex();
+		int index = c.getIndex();
 		if ( index < 0  ||  ( text.length() > 0  ?  ( index > text.length() )  :  ( index > 1 ) ) )
 		{
 			throw new RuntimeException( "DPText.drawCaret(): caret marker is out of range; " + index + " is not within the range[0-" + text.length() + "]." );

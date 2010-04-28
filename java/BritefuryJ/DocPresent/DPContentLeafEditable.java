@@ -674,10 +674,12 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 						return false;
 					}
 				}
-				left.moveMarkerToEnd( caret.getMarker() );
-				if ( !bNonEditableContentCleared )
+				if ( caret.moveTo( left.markerAtEnd() ) )
 				{
-					left.removeTextFromEnd( 1 );
+					if ( !bNonEditableContentCleared )
+					{
+						left.removeTextFromEnd( 1 );
+					}
 				}
 				return true;
 			}
@@ -718,10 +720,12 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 						return false;
 					}
 				}
-				right.moveMarkerToStart( caret.getMarker() );
-				if ( !bNonEditableContentCleared )
+				if ( caret.moveTo( right.markerAtStart() ) )
 				{
-					right.removeTextFromStart( 1 );
+					if ( !bNonEditableContentCleared )
+					{
+						right.removeTextFromStart( 1 );
+					}
 				}
 				return true;
 			}

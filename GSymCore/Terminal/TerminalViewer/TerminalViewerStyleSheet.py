@@ -155,6 +155,7 @@ class TerminalViewerStyleSheet (StyleSheet):
 		
 		m = pythonModuleBorderStyle.border( primitiveStyle.vbox( [ currentModule.alignHExpand() ] ) ).alignHExpand()
 		m.addDropDest( currentModuleDropDest )
+		m.ensureVisible()
 		
 		dropPromptInsertionPoint = primitiveStyle.vbox( [] ).alignHExpand()
 		
