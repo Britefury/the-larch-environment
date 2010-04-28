@@ -35,6 +35,42 @@ public class DPMathRoot extends DPContainer
 		layoutNode = new LayoutNodeMathRoot( this );
 	}
 	
+	protected DPMathRoot(DPMathRoot element)
+	{
+		super( element );
+		
+		layoutNode = new LayoutNodeMathRoot( this );
+	}
+	
+	
+	
+	//
+	//
+	// Presentation tree cloning
+	//
+	//
+	
+	protected void clonePostConstuct(DPElement src)
+	{
+		super.clonePostConstuct( src );
+		DPElement child = ((DPMathRoot)src).getChild();
+		if ( child != null )
+		{
+			setChild( child.clonePresentationSubtree() );
+		}
+	}
+	
+	
+	public DPElement clonePresentationSubtree()
+	{
+		DPMathRoot clone = new DPMathRoot( this );
+		clone.clonePostConstuct( this );
+		return clone;
+	}
+
+	
+	
+	
 	
 	
 	public DPElement getChild()

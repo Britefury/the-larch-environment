@@ -58,6 +58,50 @@ public class DPTable extends DPContainer
 		numColumns = 0;
 		numRows = 0;
 	}
+	
+	protected DPTable(DPTable element)
+	{
+		super( element );
+		
+		layoutNode = new LayoutNodeTable( this );
+
+		childEntryTable = new TableChildEntry[0][];
+		childEntries = new ArrayList<TableChildEntry>();
+		rowPositions = new int[0];
+		numColumns = 0;
+		numRows = 0;
+	}
+	
+	
+	
+	//
+	//
+	// Presentation tree cloning
+	//
+	//
+	
+	protected void clonePostConstuct(DPElement src)
+	{
+		super.clonePostConstuct( src );
+		DPTable table = (DPTable)src;
+		List<DPElement> children = table.getChildren();
+		List<? extends TableLayout.TablePackingParams> packingParams = table.getTablePackingParams();
+		for (int i = 0; i < children.size(); i++)
+		{
+			TableLayout.TablePackingParams packing = packingParams.get( i );
+			put( packing.x, packing.y, packing.colSpan, packing.rowSpan, children.get( i ) );
+		}
+	}
+	
+	public DPElement clonePresentationSubtree()
+	{
+		DPTable clone = new DPTable( this );
+		clone.clonePostConstuct( this );
+		return clone;
+	}
+
+	
+	
 
 	
 	

@@ -53,7 +53,6 @@ import BritefuryJ.Parser.Production.CannotOverwriteProductionExpressionException
 import BritefuryJ.Parser.SeparatedList.CannotApplyConditionAfterActionException;
 import BritefuryJ.Parser.SeparatedList.CannotApplyMoreThanOneActionException;
 import BritefuryJ.Parser.SeparatedList.CannotApplyMoreThanOneConditionException;
-import BritefuryJ.ParserDebugViewer.ParseViewFrame;
 
 public class Test_Parser extends ParserTestCase
 {
@@ -1514,7 +1513,7 @@ public class Test_Parser extends ParserTestCase
 	}
 	
 	
-	public static void main(String[] args) throws ParserCoerceException, Production.CannotOverwriteProductionExpressionException
+	public static DebugParseResult getJavaPrimaryTestDebugParseResult() throws ParserCoerceException, Production.CannotOverwriteProductionExpressionException
 	{
 		ParseAction arrayAccessAction = new ParseAction()
 		{
@@ -1589,8 +1588,7 @@ public class Test_Parser extends ParserTestCase
 		primary.setExpression( primaryNoNewArray );
 
 		
-		DebugParseResult d = fieldAccessOrArrayAccess.debugParseStringChars( "this[i]" );
-		new ParseViewFrame( d );
+		return fieldAccessOrArrayAccess.debugParseStringChars( "this[i]" );
 	}
 
 

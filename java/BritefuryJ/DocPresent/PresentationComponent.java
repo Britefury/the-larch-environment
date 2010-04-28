@@ -318,6 +318,25 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		
 		
+		//
+		//
+		// Presentation tree cloning
+		//
+		//
+		
+		public DPElement clonePresentationSubtree()
+		{
+			DPElement child = getChild();
+			return child != null  ?  child.clonePresentationSubtree()  :  null;
+		}
+
+		
+		
+		//
+		//
+		// Page controller
+		//
+		//
 		public void setPageController(PageController pageController)
 		{
 			this.pageController = pageController;

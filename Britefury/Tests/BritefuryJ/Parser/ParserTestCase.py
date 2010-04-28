@@ -7,7 +7,6 @@
 ##-*************************
 from BritefuryJ.DocModel import DMNode
 from BritefuryJ.DocModel import DMIOReader, DMIOWriter, DMSchemaResolver
-from BritefuryJ.ParserDebugViewer import ParseViewFrame
 
 import string
 import unittest
@@ -37,13 +36,7 @@ class ParserTestCase (unittest.TestCase):
 	
 	def __init__(self, *args, **kwargs):
 		super( ParserTestCase, self ).__init__( *args, **kwargs )
-		self._bShowDebugView = False
-		self._bDebugViewVisible = False
-		
-	
-	def enableDebugView(self):
-		self._bShowDebugView = True
-		
+				
 	
 	
 	
@@ -428,8 +421,5 @@ class ParserTestCase (unittest.TestCase):
 		
 		
 	def _onError(self, parseResult):
-		if self._bShowDebugView:
-			if not self._bDebugViewVisible:
-				ParseViewFrame( parseResult )
-				self._bDebugViewVisible = True
+		pass
 	

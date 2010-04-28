@@ -26,6 +26,27 @@ public class DPRegion extends DPProxy
 		super(styleParams);
 	}
 	
+	protected DPRegion(DPRegion element)
+	{
+		super( element );
+		
+		editHandler = element.editHandler;
+	}
+	
+	
+	//
+	//
+	// Presentation tree cloning
+	//
+	//
+	
+	public DPElement clonePresentationSubtree()
+	{
+		DPRegion clone = new DPRegion( this );
+		clone.clonePostConstuct( this );
+		return clone;
+	}
+
 	
 	
 

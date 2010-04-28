@@ -15,7 +15,6 @@ import BritefuryJ.Parser.Literal;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.Production;
 import BritefuryJ.Parser.Utils.Tokens;
-import BritefuryJ.ParserDebugViewer.ParseViewFrame;
 
 public class OperatorTable
 {
@@ -83,7 +82,7 @@ public class OperatorTable
 	
 	
 	
-	public static void main(String[] args) throws BritefuryJ.Parser.Production.CannotOverwriteProductionExpressionException
+	public static DebugParseResult getOperatorTableTestDebugParseResult() throws BritefuryJ.Parser.Production.CannotOverwriteProductionExpressionException
 	{
 		BinaryOperatorParseAction mulAction = new BinaryOperatorParseAction()
 		{
@@ -113,9 +112,7 @@ public class OperatorTable
 		List<ParserExpression> parsers = t.buildParsers();
 		ParserExpression e = parsers.get( parsers.size() - 1 );
 		
-		DebugParseResult r = e.debugParseStringChars( "a * b * c!" );
+		return e.debugParseStringChars( "a * b * c!" );
 //		DebugParseResult r = e.debugParseString( "a!!!" );
-		
-		new ParseViewFrame( r );
 	}
 }

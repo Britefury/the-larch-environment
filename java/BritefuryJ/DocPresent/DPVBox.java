@@ -42,7 +42,39 @@ public class DPVBox extends DPAbstractBox
 		layoutNode = new LayoutNodeVBox( this );
 		clearFlag( FLAG_HAS_REFPOINT_INDEX );
 	}
+	
+	protected DPVBox(DPVBox element)
+	{
+		super( element );
+		
+		layoutNode = new LayoutNodeVBox( this );
+		setFlagValue( FLAG_HAS_REFPOINT_INDEX, element.testFlag( FLAG_HAS_REFPOINT_INDEX ) );
+		refPointIndex = element.refPointIndex;
+	}
+	
+	
+	
+	//
+	//
+	// Presentation tree cloning
+	//
+	//
+	
+	public DPElement clonePresentationSubtree()
+	{
+		DPVBox clone = new DPVBox( this );
+		clone.clonePostConstuct( this );
+		return clone;
+	}
 
+	
+	
+	
+	//
+	//
+	// Ref-point index
+	//
+	//
 
 
 	public void setRefPointIndex(int refPointIndex)

@@ -43,7 +43,39 @@ public class DPWhitespace extends DPContentLeaf
 		layoutNode = new LayoutNodeWhitespace( this );
 	}
 	
+	protected DPWhitespace(DPWhitespace element)
+	{
+		super( element );
+		
+		this.width = element.width;
+		
+		layoutNode = new LayoutNodeWhitespace( this );
+	}
 	
+	
+	
+	//
+	//
+	// Presentation tree cloning
+	//
+	//
+	
+	public DPElement clonePresentationSubtree()
+	{
+		DPWhitespace clone = new DPWhitespace( this );
+		clone.clonePostConstuct( this );
+		return clone;
+	}
+	
+	
+	
+	
+	
+	//
+	//
+	// Whitespace width
+	//
+	//
 	
 	public double getWhitespaceWidth()
 	{

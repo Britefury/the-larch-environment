@@ -10,11 +10,10 @@ import BritefuryJ.Parser.DebugParseResult;
 import BritefuryJ.Parser.Literal;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.Production;
-import BritefuryJ.ParserDebugViewer.ParseViewFrame;
 
 public class LRParserDebugViewerTest
 {
-	public static void main(final String[] args) throws ParserExpression.ParserCoerceException, Production.CannotOverwriteProductionExpressionException
+	public static DebugParseResult lrDebugParseResultTest() throws ParserExpression.ParserCoerceException, Production.CannotOverwriteProductionExpressionException
 	{
 		String testSource = "";
 		for (int i = 0; i < 100; i++)
@@ -22,8 +21,7 @@ public class LRParserDebugViewerTest
 			testSource += "x";
 		}
 		ParserExpression parser = buildParser();
-		DebugParseResult result = parser.debugParseStringChars( testSource );
-		new ParseViewFrame( result );
+		return parser.debugParseStringChars( testSource );
 	}
 	
 	

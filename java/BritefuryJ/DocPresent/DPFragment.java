@@ -26,6 +26,27 @@ public class DPFragment extends DPProxy
 		
 		this.context = context;
 	}
+	
+	protected DPFragment(DPFragment element)
+	{
+		super( element );
+		
+		context = element.context;
+	}
+	
+	
+	//
+	//
+	// Presentation tree cloning
+	//
+	//
+	
+	public DPElement clonePresentationSubtree()
+	{
+		DPFragment clone = new DPFragment( this );
+		clone.clonePostConstuct( this );
+		return clone;
+	}
 
 
 

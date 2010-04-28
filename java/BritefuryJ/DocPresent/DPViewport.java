@@ -70,6 +70,48 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 		allocationSpaceToLocalSpace = x;
 	}
 	
+	protected DPViewport(DPViewport element)
+	{
+		super( element );
+		
+		this.minWidth = element.minWidth;
+		this.minHeight = element.minHeight;
+		this.xRange = element.xRange;
+		this.yRange = element.yRange;
+		layoutNode = new LayoutNodeViewport( this );
+		this.state = element.state;
+		allocationSpaceToLocalSpace = element.allocationSpaceToLocalSpace;
+	}
+	
+	
+	//
+	//
+	// Presentation tree cloning
+	//
+	//
+	
+	protected void clonePostConstuct(DPElement src)
+	{
+		super.clonePostConstuct( src );
+		DPElement child = ((DPViewport)src).getChild();
+		if ( child != null )
+		{
+			setChild( child.clonePresentationSubtree() );
+		}
+	}
+	
+	public DPElement clonePresentationSubtree()
+	{
+		DPViewport clone = new DPViewport( this );
+		clone.clonePostConstuct( this );
+		return clone;
+	}
+	
+	
+	
+	
+	
+	
 	
 	public double getMinWidth()
 	{
@@ -79,6 +121,17 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 	public double getMinHeight()
 	{
 		return minHeight;
+	}
+	
+	
+	public Range getXRange()
+	{
+		return xRange;
+	}
+	
+	public Range getYRange()
+	{
+		return yRange;
 	}
 	
 	

@@ -22,4 +22,26 @@ public class DPGridRow extends DPContainerSequence
 		
 		layoutNode = new LayoutNodeGridRow( this );
 	}
+	
+	protected DPGridRow(DPGridRow element)
+	{
+		super( element );
+		
+		layoutNode = new LayoutNodeGridRow( this );
+	}
+	
+	
+	
+	//
+	//
+	// Presentation tree cloning
+	//
+	//
+	
+	public DPElement clonePresentationSubtree()
+	{
+		DPGridRow clone = new DPGridRow( this );
+		clone.clonePostConstuct( this );
+		return clone;
+	}
 }

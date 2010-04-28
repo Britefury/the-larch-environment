@@ -51,7 +51,39 @@ public class DPShape extends DPContentLeaf
 		layoutNode = new LayoutNodeShape( this );
 	}
 	
+	protected DPShape(DPShape element)
+	{
+		super( element );
+		
+		bounds = element.bounds;
+		shape = element.shape;
+		
+		layoutNode = new LayoutNodeShape( this );
+	}
+
 	
+	
+	
+	//
+	//
+	// Presentation tree cloning
+	//
+	//
+	
+	public DPElement clonePresentationSubtree()
+	{
+		DPShape clone = new DPShape( this );
+		clone.clonePostConstuct( this );
+		return clone;
+	}
+	
+	
+	
+	//
+	//
+	// Geometry methods
+	//
+	//
 
 	public AABox2 getShapeBounds()
 	{

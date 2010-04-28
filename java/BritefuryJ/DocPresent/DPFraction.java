@@ -44,6 +44,28 @@ public class DPFraction extends DPContainer
 			
 			layoutNode = new LayoutNodeFraction.LayoutNodeFractionBar( this );
 		}
+		
+		protected DPFractionBar(DPFractionBar element)
+		{
+			super( element );
+			
+			layoutNode = new LayoutNodeFraction.LayoutNodeFractionBar( this );
+		}
+		
+		
+		
+		//
+		//
+		// Presentation tree cloning
+		//
+		//
+		
+		public DPElement clonePresentationSubtree()
+		{
+			DPFractionBar clone = new DPFractionBar( this );
+			clone.clonePostConstuct( this );
+			return clone;
+		}
 
 	
 
@@ -219,8 +241,55 @@ public class DPFraction extends DPContainer
 		
 		setChild( BAR, new DPFractionBar( styleParams.getBarStyleSheet(), barTextRepresentation ) );
 	}
+	
+	protected DPFraction(DPFraction element)
+	{
+		super( element );
+		
+		layoutNode = new LayoutNodeFraction( this );
+		
+		this.segmentTextStyleParams = element.segmentTextStyleParams;
+		
+		children = new DPElement[NUMCHILDREN];
+		segs = new DPSegment[NUMCHILDREN];
+		paras = new DPParagraph[NUMCHILDREN];
+	}
+	
+	
+	
+	//
+	//
+	// Presentation tree cloning
+	//
+	//
+	
+	protected void clonePostConstuct(DPElement src)
+	{
+		super.clonePostConstuct( src );
+		for (int i = 0; i < NUMCHILDREN; i++)
+		{
+			DPElement child = ((DPFraction)src).getChild( i );
+			if ( child != null )
+			{
+				setChild( i, child.clonePresentationSubtree() );
+			}
+		}
+	}
+	
+	public DPElement clonePresentationSubtree()
+	{
+		DPFraction clone = new DPFraction( this );
+		clone.clonePostConstuct( this );
+		return clone;
+	}
 
 	
+	
+	//
+	//
+	// Child element access / modification
+	//
+	//
 	
 	public DPElement getChild(int slot)
 	{

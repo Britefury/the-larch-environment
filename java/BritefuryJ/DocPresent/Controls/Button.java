@@ -55,7 +55,7 @@ public class Button extends Control
 
 		public boolean onButtonUp(DPElement element, PointerButtonEvent event)
 		{
-			if ( buttonElement.isRealised() )
+			if ( element.isRealised() )
 			{
 				return listener.onButtonClicked( Button.this, event );
 			}
@@ -66,12 +66,12 @@ public class Button extends Control
 		
 		public void onEnter(DPElement element, PointerMotionEvent event)
 		{
-			buttonElement.setBorder( highlightBorder );
+			((DPBorder)element).setBorder( highlightBorder );
 		}
 
 		public void onLeave(DPElement element, PointerMotionEvent event)
 		{
-			buttonElement.setBorder( buttonBorder );
+			((DPBorder)element).setBorder( buttonBorder );
 		}
 	}
 	

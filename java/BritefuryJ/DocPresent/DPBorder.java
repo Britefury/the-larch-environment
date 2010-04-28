@@ -46,7 +46,34 @@ public class DPBorder extends DPBin
 		this.border = border;
 	}
 	
+	protected DPBorder(DPBorder element)
+	{
+		super( element );
+		border = element.border;
+	}
 	
+	
+	
+	//
+	//
+	// Presentation tree cloning
+	//
+	//
+	
+	public DPElement clonePresentationSubtree()
+	{
+		DPBorder clone = new DPBorder( this );
+		clone.clonePostConstuct( this );
+		return clone;
+	}
+
+	
+	
+	//
+	//
+	// Border
+	//
+	//
 	
 	public Border getBorder()
 	{

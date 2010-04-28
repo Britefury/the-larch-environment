@@ -22,8 +22,6 @@ from BritefuryJ.DocModel import DMList, DMObject, DMObjectInterface, DMNode
 
 from BritefuryJ.Transformation import DefaultIdentityTransformationFunction
 
-from BritefuryJ.ParserDebugViewer import ParseViewFrame
-
 from BritefuryJ.Parser.ItemStream import ItemStreamBuilder, ItemStream
 
 
@@ -237,38 +235,6 @@ def parseStream(parser, input, outerPrecedence=None):
 
 
 
-	
-	
-#
-#
-# DEBUG PARSE STREAM
-#
-#
-
-
-def debugParseStream(parser, input, outerPrecedence=None):
-	#f = open( 'parselog.txt', 'a+' )
-	res = parser.debugParseStreamItems( input )
-	ParseViewFrame( res )
-	pos = res.getEnd()
-	if res.isValid():
-		if pos == len( input ):
-			value = res.getValue()
-			return removeUnNeededParens( value, outerPrecedence )
-		else:
-			#f.write( '<INCOMPLETE> %s\n'  %  ( parser.getExpressionName(), ) )
-			#f.write( 'FULL TEXT: ' + input.toString() + '\n' )
-			#f.write( 'PARSED: ' + input[:pos].toString() + '\n' )
-			#f.close()
-			return None
-	else:
-		#f.write( '<FAIL> %s\n'  %  ( parser.getExpressionName(), ) )
-		#f.write( 'FULL TEXT:' + input.toString() + '\n' )
-		#f.close()
-		return None
-
-	
-	
 	
 	
 #

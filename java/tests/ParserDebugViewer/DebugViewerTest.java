@@ -15,16 +15,14 @@ import BritefuryJ.Parser.Literal;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.Production;
-import BritefuryJ.ParserDebugViewer.ParseViewFrame;
 
 public class DebugViewerTest
 {
-	public static void main(final String[] args) throws ParserExpression.ParserCoerceException, Production.CannotOverwriteProductionExpressionException
+	public static DebugParseResult debugParseResultTest() throws ParserExpression.ParserCoerceException, Production.CannotOverwriteProductionExpressionException
 	{
 		String input = "this[i][j].x.m()";
 		ParserExpression parser = buildParser();
-		DebugParseResult result = parser.debugParseStringChars( input );
-		new ParseViewFrame( result );
+		return parser.debugParseStringChars( input );
 	}
 	
 	

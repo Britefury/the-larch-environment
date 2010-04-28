@@ -17,11 +17,10 @@ import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.Production;
 import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
-import BritefuryJ.ParserDebugViewer.ParseViewFrame;
 
 public class StreamParserDebugViewerTest
 {
-	public static void main(final String[] args) throws ParserExpression.ParserCoerceException, Production.CannotOverwriteProductionExpressionException
+	public static DebugParseResult streamParseDebugResultTest() throws ParserExpression.ParserCoerceException, Production.CannotOverwriteProductionExpressionException
 	{
 		ItemStreamBuilder builder1 = new ItemStreamBuilder();
 		builder1.appendTextValue( "this[" );
@@ -31,8 +30,7 @@ public class StreamParserDebugViewerTest
 
 		
 		ParserExpression parser = buildParser();
-		DebugParseResult result = parser.debugParseStreamItems( builder1.stream() );
-		new ParseViewFrame( result );
+		return parser.debugParseStreamItems( builder1.stream() );
 	}
 	
 	

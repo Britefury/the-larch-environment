@@ -24,4 +24,25 @@ public class DPParagraphIndentMarker extends DPEmpty
 		
 		layoutNode = new LayoutNodeParagraphIndentMarker( this );
 	}
+	
+	protected DPParagraphIndentMarker(DPParagraphIndentMarker element)
+	{
+		super( element );
+		
+		layoutNode = new LayoutNodeParagraphIndentMarker( this );
+	}
+	
+	
+	//
+	//
+	// Presentation tree cloning
+	//
+	//
+	
+	public DPElement clonePresentationSubtree()
+	{
+		DPParagraphIndentMarker clone = new DPParagraphIndentMarker( this );
+		clone.clonePostConstuct( this );
+		return clone;
+	}
 }

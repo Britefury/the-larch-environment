@@ -21,6 +21,26 @@ public class DPSpan extends DPContainerSequence
 	{
 		super( styleParams );
 	}
+	
+	protected DPSpan(DPSpan element)
+	{
+		super( element );
+	}
+	
+	
+	
+	//
+	//
+	// Presentation tree cloning
+	//
+	//
+	
+	public DPElement clonePresentationSubtree()
+	{
+		DPSpan clone = new DPSpan( this );
+		clone.clonePostConstuct( this );
+		return clone;
+	}
 
 
 
