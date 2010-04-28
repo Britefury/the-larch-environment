@@ -6,12 +6,15 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 import os
+from datetime import datetime
 
 from java.awt.event import KeyEvent
 
 from java.util.regex import Pattern
 
-from javax.swing import JPopupMenu
+from javax.swing import AbstractAction
+from javax.swing import JPopupMenu, JOptionPane, JFileChooser
+from javax.swing.filechooser import FileNameExtensionFilter
 
 from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeDispatchMethod
 
@@ -32,8 +35,52 @@ from BritefuryJ.GSym import GSymPerspective, GSymSubject
 from BritefuryJ.GSym.View import PyGSymViewFragmentFunction
 
 
+from GSymCore.GSymApp import DocumentManagement
+
 from GSymCore.Project import Schema
 from GSymCore.Project.ProjectEditor.ProjectEditorStyleSheet import ProjectEditorStyleSheet
+
+
+
+
+
+# handleNewPageFn(unit)
+def _populateNewPageMenu(world, menu, handleNewPageFn):
+	def _make_newPage(newPageFn):
+		def newPage(actionEvent):
+			unit = newPageFn()
+			handleNewPageFn( unit )
+		return newPage
+	for newPageFactory in world.newPageFactories:
+		menu.addItem( newPageFactory.menuLabelText, _make_newPage( newPageFactory.newPageFn ) )
+	
+	
+	
+# handleImportedPageFn(name, unit)
+def _populateImportPageMenu(world, component, menu, handleImportedPageFn):
+	def _make_importPage(fileType, filePattern, importUnitFn):
+		def _import(actionEvent):
+			openDialog = JFileChooser()
+			openDialog.setFileFilter( FileNameExtensionFilter( fileType, [ filePattern ] ) )
+			response = openDialog.showDialog( component, 'Import' )
+			if response == JFileChooser.APPROVE_OPTION:
+				sf = openDialog.getSelectedFile()
+				if sf is not None:
+					filename = sf.getPath()
+					if filename is not None:
+						t1 = datetime.now()
+						unit = importUnitFn( filename )
+						t2 = datetime.now()
+						if unit is not None:
+							unitName = os.path.splitext( filename )[0]
+							unitName = os.path.split( unitName )[1]
+							print 'ProjectEditor.View: IMPORT TIME = %s'  %  ( t2 - t1, )
+							handleImportedPageFn( unitName, unit )
+		return _import
+
+	for pageImporter in world.pageImporters:
+		menu.addItem( pageImporter.menuLabelText, _make_importPage( pageImporter.fileType, pageImporter.filePattern, pageImporter.importFn ) )
+
 
 
 
@@ -56,8 +103,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 				def handleSaveDocumentAsFn(filename):
 					document.saveAs( filename )
 				
-				window = ctx.getViewContext().getBrowserContext().window
-				window.promptSaveDocumentAs( handleSaveDocumentAsFn )
+				DocumentManagement.promptSaveDocumentAs( ctx.getSubjectContext()['world'], link.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn )
 			else:
 				document.save()
 			return True
@@ -67,8 +113,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 			def handleSaveDocumentAsFn(filename):
 				document.saveAs( filename )
 			
-			window = ctx.getViewContext().getBrowserContext().window
-			window.promptSaveDocumentAs( handleSaveDocumentAsFn )
+			DocumentManagement.promptSaveDocumentAs( ctx.getSubjectContext()['world'], link.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn )
 			return  True
 		
 		
@@ -87,8 +132,19 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 	@ObjectNodeDispatchMethod( Schema.Package )
 	def Package(self, ctx, styleSheet, state, node, name, contents):
-		def _packageRename(newName):
-			node['name'] = newName
+		def _addPackage(actionEvent):
+			contents.append( Schema.Package( name='New package', contents=[] ) )
+
+		def _onRenameAccept(textEntry, text):
+			node['name'] = text
+			
+		def _onRenameCancel(textEntry, originalText):
+			nameBox.setChildren( [ nameElement ] )
+		
+		def _onRename(actionEvent):
+			textEntry = styleSheet.renameEntry( name, _onRenameAccept, _onRenameCancel )
+			nameBox.setChildren( [ textEntry.getElement() ] )
+			textEntry.grabCaret()
 			
 		def _addPage(pageUnit):
 			#contents.append( Schema.Page( name='New page', unit=pageUnit ) )
@@ -98,29 +154,48 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		def _importPage(name, pageUnit):
 			contents.append( Schema.Page( name=name, unit=pageUnit ) )
 
-		def _addPackage():
-			contents.append( Schema.Package( name='New package', contents=[] ) )
+		def _packageContextMenuFactory(element, menu):
+			menu.addItem( 'New package', _addPackage )
+			_populateNewPageMenu( world, menu.addSubMenu( 'New page' ), _addPage )
+			_populateImportPageMenu( world, element.getRootElement().getComponent(), menu.addSubMenu( 'Import page' ), _importPage )
+			menu.addSeparator()
+			menu.addItem( 'Rename', _onRename )
+			return True
 
 		location = state['location']
 		packageLocation = _joinLocation( location, name )
 		
 		items = ctx.mapPresentFragment( contents, styleSheet, state.withAttrs( location=packageLocation ) )
 			
-		window = ctx.getViewContext().getBrowserContext().window
-		return styleSheet.package( name, packageLocation, items, _packageRename, window, _addPage, _importPage, _addPackage )
+		world = ctx.getSubjectContext()['world']
+		packageView, nameBox, nameElement = styleSheet.package( name, packageLocation, items, _packageContextMenuFactory )
+		return packageView
 	
 
 
 
 	@ObjectNodeDispatchMethod( Schema.Page )
 	def Page(self, ctx, styleSheet, state, node, name, unit):
-		def _pageRename(newName):
-			node['name'] = newName
+		def _onRenameAccept(textEntry, text):
+			node['name'] = text
+			
+		def _onRenameCancel(textEntry, originalText):
+			nameBox.setChildren( [ nameElement ] )
 		
+		def _onRename(actionEvent):
+			textEntry = styleSheet.renameEntry( name, _onRenameAccept, _onRenameCancel )
+			nameBox.setChildren( [ textEntry.getElement() ] )
+			textEntry.grabCaret()
+		
+		def _pageContextMenuFactory(element, menu):
+			menu.addItem( 'Rename', _onRename )
+			return True
+
 		location = state['location']
 		pageLocation = _joinLocation( location, name )
 		
-		return styleSheet.page( name, pageLocation, _pageRename )
+		pageView, nameBox, nameElement = styleSheet.page( name, pageLocation, _pageContextMenuFactory )
+		return pageView
 
 	
 	

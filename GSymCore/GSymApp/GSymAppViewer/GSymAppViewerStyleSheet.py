@@ -108,11 +108,11 @@ class GSymAppViewerStyleSheet (StyleSheet):
 
 	def appState(self, openDocuments, terminals, onNewDoc, onOpenDoc, onNewTerminal):
 		def _onNewDoc(link, event):
-			onNewDoc()
+			onNewDoc( link.getElement() )
 			return True
 		
 		def _onOpenDoc(link, evnet):
-			onOpenDoc()
+			onOpenDoc( link.getElement() )
 			return True
 		
 		def _onNewTerm(link, event):
@@ -148,11 +148,11 @@ class GSymAppViewerStyleSheet (StyleSheet):
 	
 	def appDocument(self, name, location, onSave, onSaveAs):
 		def _onSave(link, event):
-			onSave()
+			onSave( link.getElement() )
 			return True
 			
 		def _onSaveAs(link, event):
-			onSaveAs()
+			onSaveAs( link.getElement() )
 			return True
 			
 		

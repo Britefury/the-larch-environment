@@ -31,6 +31,24 @@ public class LayoutNodeVBox extends LayoutNodeAbstractBox
 		return ((DPVBox)element).getRefPointIndex();
 	}
 	
+	protected boolean hasRefPointIndex()
+	{
+		return ((DPVBox)element).hasRefPointIndex();
+	}
+	
+	
+	protected int clampRefPointIndex(int refPointIndex)
+	{
+		int numLeaves = getNumLeaves();
+		refPointIndex = Math.min( refPointIndex, numLeaves - 1 );
+		if ( refPointIndex < 0 )
+		{
+			refPointIndex = numLeaves + refPointIndex;
+			refPointIndex = Math.max( refPointIndex, 0 );
+		}
+		return refPointIndex;
+	}
+	
 
 	
 	protected void updateRequisitionX()
@@ -44,7 +62,19 @@ public class LayoutNodeVBox extends LayoutNodeAbstractBox
 	protected void updateRequisitionY()
 	{
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
-		VerticalLayout.computeRequisitionY( layoutReqBox, getLeavesRefreshedRequistionYBoxes(), getRefPointIndex(), getSpacing() );
+		
+		int refPointIndex = getRefPointIndex();
+		boolean bHasRefPointIndex = hasRefPointIndex();
+		if ( bHasRefPointIndex )
+		{
+			refPointIndex = clampRefPointIndex( refPointIndex );
+		}
+		else
+		{
+			refPointIndex = -1;
+		}
+		
+		VerticalLayout.computeRequisitionY( layoutReqBox, getLeavesRefreshedRequistionYBoxes(), refPointIndex, getSpacing() );
 	}
 
 
@@ -75,7 +105,18 @@ public class LayoutNodeVBox extends LayoutNodeAbstractBox
 		int childAllocFlags[] = getLeavesAlignmentFlags();
 		LAllocV prevAllocV[] = getLeavesAllocV();
 		
-		VerticalLayout.allocateY( layoutReqBox, childBoxes, getAllocationBox(), childAllocBoxes, childAllocFlags, getRefPointIndex(), getSpacing() );
+		int refPointIndex = getRefPointIndex();
+		boolean bHasRefPointIndex = hasRefPointIndex();
+		if ( bHasRefPointIndex )
+		{
+			refPointIndex = clampRefPointIndex( refPointIndex );
+		}
+		else
+		{
+			refPointIndex = -1;
+		}
+
+		VerticalLayout.allocateY( layoutReqBox, childBoxes, getAllocationBox(), childAllocBoxes, childAllocFlags, refPointIndex, getSpacing() );
 		
 		refreshLeavesAllocationY( prevAllocV );
 	}

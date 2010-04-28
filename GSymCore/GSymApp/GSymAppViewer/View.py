@@ -10,7 +10,9 @@ import os
 from java.awt.event import KeyEvent
 from java.util.regex import Pattern
 
-from javax.swing import JPopupMenu
+from javax.swing import AbstractAction
+from javax.swing import JPopupMenu, JOptionPane, JFileChooser
+from javax.swing.filechooser import FileNameExtensionFilter
 
 from Britefury.Dispatch.ObjectMethodDispatch import ObjectDispatchMethod
 
@@ -33,6 +35,7 @@ from BritefuryJ.GSym.View import PyGSymViewFragmentFunction
 
 from GSymCore.GSymApp import Application
 from GSymCore.GSymApp.GSymAppViewer.GSymAppViewerStyleSheet import GSymAppViewerStyleSheet
+from GSymCore.GSymApp import DocumentManagement
 
 from GSymCore.Terminal import Terminal
 
@@ -103,13 +106,14 @@ def _uniqueDocumentLocation(docs, location):
 	return loc
 
 
-
-
-
+						
+						
+						
+						
 class AppView (GSymViewObjectDispatch):
 	@ObjectDispatchMethod( Application.AppState )
 	def AppState(self, ctx, styleSheet, state, node):
-		def _onNewDoc():
+		def _onNewDoc(element):
 			def handleNewDocumentFn(unit):
 				name = _newDocumentName( openDocuments )
 				
@@ -122,14 +126,13 @@ class AppView (GSymViewObjectDispatch):
 				node.addOpenDocument( appDoc )
 				
 			openDocuments = node.getOpenDocuments()
-			window = ctx.getViewContext().getBrowserContext().window
-			window.promptNewDocument( handleNewDocumentFn )
+			DocumentManagement.promptNewDocument( ctx.getSubjectContext()['world'], element.getRootElement().getComponent(), handleNewDocumentFn )
 			
 			return True
 		
 			
 			
-		def _onOpenDoc():
+		def _onOpenDoc(element):
 			def handleOpenedDocumentFn(fullPath, document):
 				head, documentName = os.path.split( fullPath )
 				documentName, ext = os.path.splitext( documentName )
@@ -142,8 +145,7 @@ class AppView (GSymViewObjectDispatch):
 				node.addOpenDocument( appDoc )
 
 				
-			window = ctx.getViewContext().getBrowserContext().window
-			window.promptOpenDocument( handleOpenedDocumentFn )
+			DocumentManagement.promptOpenDocument( ctx.getSubjectContext()['world'], element.getRootElement().getComponent(), handleOpenedDocumentFn )
 			
 			return True
 
@@ -167,7 +169,7 @@ class AppView (GSymViewObjectDispatch):
 
 	@ObjectDispatchMethod( Application.AppDocument )
 	def AppDocument(self, ctx, styleSheet, state, node):
-		def _onSave():
+		def _onSave(element):
 			world = ctx.getSubjectContext()['world']
 			document = world.getDocument( location )
 			
@@ -175,21 +177,19 @@ class AppView (GSymViewObjectDispatch):
 				def handleSaveDocumentAsFn(filename):
 					document.saveAs( filename )
 				
-				window = ctx.getViewContext().getBrowserContext().window
-				window.promptSaveDocumentAs( handleSaveDocumentAsFn )
+				DocumentManagement.promptSaveDocumentAs( world, element.getRootElement().getComponent(), handleSaveDocumentAsFn )
 			else:
 				document.save()
 				
 		
-		def _onSaveAs():
+		def _onSaveAs(element):
 			world = ctx.getSubjectContext()['world']
 			document = world.getDocument( location )
 			
 			def handleSaveDocumentAsFn(filename):
 				document.saveAs( filename )
 			
-			window = ctx.getViewContext().getBrowserContext().window
-			window.promptSaveDocumentAs( handleSaveDocumentAsFn )
+			DocumentManagement.promptSaveDocumentAs( world, element.getRootElement().getComponent(), handleSaveDocumentAsFn )
 
 			
 		name = node.getName()

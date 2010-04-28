@@ -75,7 +75,7 @@ public class LayoutNodeViewport extends ArrangedLayoutNode
 			LayoutNode childLayout = child.getLayoutNode();
 			LReqBoxInterface childReq = childLayout.getRequisitionBox();
 			LAllocV prevAllocV = childLayout.getAllocationBox().getAllocV();
-			LAllocHelper.allocateY( childLayout.getAllocationBox(), childReq, 0.0, childReq.getReqHeight() );
+			LAllocHelper.allocateY( childLayout.getAllocationBox(), childReq, 0.0, Math.max( childReq.getReqHeight(), getAllocationY() ) );
 			childLayout.refreshAllocationY( prevAllocV );
 		}
 	}

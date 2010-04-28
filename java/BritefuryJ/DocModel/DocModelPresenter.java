@@ -52,7 +52,7 @@ public class DocModelPresenter
 	{
 		public DPElement createElement(StyleSheet styleSheet, int index, DPElement child)
 		{
-			return ((PrimitiveStyleSheet)styleSheet).text( " " );
+			return ((PrimitiveStyleSheet)styleSheet).staticText( " " );
 		}
 	};
 	
@@ -60,7 +60,7 @@ public class DocModelPresenter
 	{
 		public DPElement createElement(StyleSheet styleSheet)
 		{
-			return punctuationStyle.text( "[" );
+			return punctuationStyle.staticText( "[" );
 		}
 	};
 
@@ -68,7 +68,7 @@ public class DocModelPresenter
 	{
 		public DPElement createElement(StyleSheet styleSheet)
 		{
-			return punctuationStyle.text( "]" );
+			return punctuationStyle.staticText( "]" );
 		}
 	};
 
@@ -76,7 +76,7 @@ public class DocModelPresenter
 	{
 		public DPElement createElement(StyleSheet styleSheet)
 		{
-			return punctuationStyle.text( "(" );
+			return punctuationStyle.staticText( "(" );
 		}
 	};
 
@@ -84,7 +84,7 @@ public class DocModelPresenter
 	{
 		public DPElement createElement(StyleSheet styleSheet)
 		{
-			return punctuationStyle.text( ")" );
+			return punctuationStyle.staticText( ")" );
 		}
 	};
 
@@ -176,11 +176,11 @@ public class DocModelPresenter
 		DPElement className;
 		if ( mode == ObjectPresentMode.HORIZONTAL )
 		{
-			className = defaultStyle.span( Arrays.asList( new DPElement[] { classNameStyle.text( cls.getName() ), stringStyle.text( " " ), punctuationStyle.text( ":" ) } ) );
+			className = defaultStyle.span( Arrays.asList( new DPElement[] { classNameStyle.staticText( cls.getName() ), stringStyle.staticText( " " ), punctuationStyle.staticText( ":" ) } ) );
 		}
 		else if ( mode == ObjectPresentMode.VERTICALINLINE )
 		{
-			className = defaultStyle.paragraph( Arrays.asList( new DPElement[] { classNameStyle.text( cls.getName() ), stringStyle.text( " " ), punctuationStyle.text( ":" ) } ) );
+			className = defaultStyle.paragraph( Arrays.asList( new DPElement[] { classNameStyle.staticText( cls.getName() ), stringStyle.staticText( " " ), punctuationStyle.staticText( ":" ) } ) );
 		}
 		else
 		{
@@ -199,11 +199,11 @@ public class DocModelPresenter
 				DPElement line;
 				if ( mode == ObjectPresentMode.HORIZONTAL )
 				{
-					line = defaultStyle.span( Arrays.asList( new DPElement[] { fieldNameStyle.text( fieldName ), punctuationStyle.text( "=" ), present( value, ctx, styleSheet, state ) } ) );
+					line = defaultStyle.span( Arrays.asList( new DPElement[] { fieldNameStyle.staticText( fieldName ), punctuationStyle.staticText( "=" ), present( value, ctx, styleSheet, state ) } ) );
 				}
 				else if ( mode == ObjectPresentMode.VERTICALINLINE )
 				{
-					line = defaultStyle.paragraph( Arrays.asList( new DPElement[] { fieldNameStyle.text( fieldName ), punctuationStyle.text( "=" ), present( value, ctx, styleSheet, state ) } ) );
+					line = defaultStyle.paragraph( Arrays.asList( new DPElement[] { fieldNameStyle.staticText( fieldName ), punctuationStyle.staticText( "=" ), present( value, ctx, styleSheet, state ) } ) );
 				}
 				else
 				{

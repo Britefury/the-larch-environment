@@ -19,7 +19,14 @@ public class DPVBox extends DPAbstractBox
 	}
 	
 	
-	private int refPointIndex = -1;
+	
+	protected final static int FLAG_HAS_REFPOINT_INDEX = FLAGS_CONTAINER_END * 0x1;
+	
+	protected final static int FLAGS_VBOX_END = FLAGS_CONTAINER_END << 1;
+
+	
+	
+	private int refPointIndex = 0;
 	
 
 	
@@ -33,17 +40,27 @@ public class DPVBox extends DPAbstractBox
 		super(styleParams);
 		
 		layoutNode = new LayoutNodeVBox( this );
+		clearFlag( FLAG_HAS_REFPOINT_INDEX );
 	}
 
 
 
 	public void setRefPointIndex(int refPointIndex)
 	{
-		if ( refPointIndex >= getChildren().size() )
-		{
-			throw new IndexOutOfBoundsException( "Vertical box - reference index out of range" );
-		}
 		this.refPointIndex = refPointIndex;
+		setFlag( FLAG_HAS_REFPOINT_INDEX );
+	}
+	
+	public void clearRefPointIndex()
+	{
+		clearFlag( FLAG_HAS_REFPOINT_INDEX );
+	}
+	
+	
+	
+	public boolean hasRefPointIndex()
+	{
+		return testFlag( FLAG_HAS_REFPOINT_INDEX );
 	}
 	
 	public int getRefPointIndex()

@@ -57,13 +57,13 @@ public class CanvasTestPage extends SystemPage
 		final Integer dragData = new Integer( index );
 		ObjectDndHandler.SourceDataFn sourceDataFn = new ObjectDndHandler.SourceDataFn()
 		{
-			public Object createSourceData(PointerInputElement sourceElement)
+			public Object createSourceData(PointerInputElement sourceElement, int aspect)
 			{
 				return dragData;
 			}
 		};
 		
-		ObjectDndHandler sourceDndHandler = ObjectDndHandler.instance.withDragSource( new ObjectDndHandler.DragSource( Integer.class, sourceDataFn ) );
+		ObjectDndHandler sourceDndHandler = ObjectDndHandler.instance.withDragSource( new ObjectDndHandler.DragSource( Integer.class, DndHandler.ASPECT_NORMAL, sourceDataFn ) );
 		return sourceDndHandler;
 	}
 	

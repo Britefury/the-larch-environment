@@ -37,6 +37,7 @@ import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.DPScript;
 import BritefuryJ.DocPresent.DPSegment;
 import BritefuryJ.DocPresent.DPShape;
+import BritefuryJ.DocPresent.DPSpaceBin;
 import BritefuryJ.DocPresent.DPSpacer;
 import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.DPTable;
@@ -620,6 +621,13 @@ public class PrimitiveStyleSheet extends StyleSheet
 	public DPBin bin(DPElement child)
 	{
 		DPBin bin = new DPBin( getContainerParams() );
+		bin.setChild( child );
+		return bin;
+	}
+	
+	public DPSpaceBin spaceBin(DPElement child, double minWidth, double minHeight)
+	{
+		DPSpaceBin bin = new DPSpaceBin( getContainerParams(), minWidth, minHeight );
 		bin.setChild( child );
 		return bin;
 	}

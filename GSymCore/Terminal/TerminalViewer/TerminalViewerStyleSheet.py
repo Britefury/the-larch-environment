@@ -37,9 +37,11 @@ class TerminalViewerStyleSheet (StyleSheet):
 		self.initAttr( 'stdErrAttrs', AttributeValues( border=SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.8, 0.4, 0.0 ), Color.WHITE ), foreground=Color( 0.5, 0.25, 0.0 ) ) )
 		self.initAttr( 'exceptionBorderAttrs', AttributeValues( border=SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.8, 0.0, 0.0 ), Color( 1.0, 0.9, 0.9 ) ) ) )
 		self.initAttr( 'resultBorderAttrs', AttributeValues( border=SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.0, 0.0, 0.8 ), Color.WHITE ) ) )
+		self.initAttr( 'dropPromptAttrs', AttributeValues( border=SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.0, 0.8, 0.0 ), Color.WHITE ) ) )
 		
 		self.initAttr( 'terminalBlockListSpacing', 5.0 )
 		self.initAttr( 'terminalSpacing', 8.0 )
+		
 	
 		
 	def newInstance(self):
@@ -79,6 +81,9 @@ class TerminalViewerStyleSheet (StyleSheet):
 	
 	def withResultBorderAttrs(self, resultBorderAttrs):
 		return self.withAttrs( resultBorderAttrs=resultBorderAttrs )
+	
+	def withDropPromptAttrs(self, dropPromptAttrs):
+		return self.withAttrs( dropPromptAttrs=dropPromptAttrs )
 	
 	
 	def withTerminalSpacing(self, terminalSpacing):
@@ -123,6 +128,10 @@ class TerminalViewerStyleSheet (StyleSheet):
 	def resultBorderStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['resultBorderAttrs'] )
 	
+	@AttributeTableDerivedPyAttrFn
+	def dropPromptStyle(self):
+		return self['primitiveStyle'].withAttrValues( self['dropPromptAttrs'] )
+	
 	
 	@AttributeTableDerivedPyAttrFn
 	def terminalBlockListStyle(self):
@@ -134,8 +143,9 @@ class TerminalViewerStyleSheet (StyleSheet):
 	
 	
 
-	def terminal(self, blocks, currentModule, currentModuleInteractor):
+	def terminal(self, blocks, currentModule, currentModuleInteractor, currentModuleDropDest):
 		primitiveStyle = self['primitiveStyle']
+		controlsStyle = self['controlsStyle']
 		terminalBlockListStyle = self.terminalBlockListStyle()
 		terminalStyle = self.terminalStyle()
 		pythonModuleBorderStyle = self.pythonModuleBorderStyle()
@@ -144,12 +154,25 @@ class TerminalViewerStyleSheet (StyleSheet):
 		currentModule.addInteractor( currentModuleInteractor )
 		
 		m = pythonModuleBorderStyle.border( primitiveStyle.vbox( [ currentModule.alignHExpand() ] ) ).alignHExpand()
+		m.addDropDest( currentModuleDropDest )
+		
+		dropPromptInsertionPoint = primitiveStyle.vbox( [] ).alignHExpand()
 		
 		if len( blocks ) > 0:
 			blockList = terminalBlockListStyle.vbox( blocks ).alignHExpand()
-			return terminalStyle.vbox( [ blockList, m ] ).alignHExpand()
+			return terminalStyle.vbox( [ blockList.alignHExpand(), m.alignHExpand(), dropPromptInsertionPoint ] ).alignHExpand(), dropPromptInsertionPoint
 		else:
-			return m
+			return terminalStyle.vbox( [ m.alignVTop().alignHExpand(), dropPromptInsertionPoint ] ).alignHExpand(), dropPromptInsertionPoint
+		
+		
+	def dropPrompt(self, onAccept, onCancel):
+		primitiveStyle = self['primitiveStyle']
+		controlsStyle = self['controlsStyle']
+		dropPromptStyle = self.dropPromptStyle()
+		textEntry = controlsStyle.textEntry( 'var', onAccept, onCancel )
+		prompt = primitiveStyle.staticText( 'Place node into a variable named: ' )
+		return dropPromptStyle.border( primitiveStyle.paragraph( [ prompt.alignVCentre(), textEntry.getElement().alignVCentre() ] ) ), textEntry
+		
 	
 	
 	def _textLines(self, labelText, text, textStyle):

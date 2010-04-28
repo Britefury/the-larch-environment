@@ -66,6 +66,10 @@ class Terminal (IncrementalOwner):
 		self._incr.onChanged()
 		
 		
+	def setGlobalVar(self, name, value):
+		self._globalVars[name] = value
+		
+		
 	def _initStdOutErr(self):
 		stdout, stderr = sys.stdout, sys.stderr
 		sys.stdout = self.Output()
@@ -76,7 +80,7 @@ class Terminal (IncrementalOwner):
 		outout, outerr = sys.stdout, sys.stderr
 		sys.stdout, sys.stderr = stdout, stderr
 		return outout, outerr
-		
+	
 		
 		
 	def execute(self, bEvaluate):

@@ -21,8 +21,6 @@ from java.beans import PropertyChangeListener
 
 from BritefuryJ.CommandHistory import CommandHistory, CommandHistoryListener
 
-from BritefuryJ.AttributeTable import AttributeTable
-
 from BritefuryJ.Cell import CellInterface
 from BritefuryJ.Utils.Profile import ProfileTimer
 
@@ -34,8 +32,6 @@ from BritefuryJ.DocPresent.StyleParams import *
 
 from BritefuryJ.DocView import DocView
 
-from BritefuryJ.GSym import GSymBrowserContext, GSymLocationResolver, GSymSubject
-from BritefuryJ.GSym.View import GSymViewContext
 
 
 
@@ -47,7 +43,6 @@ from Britefury.Event.QueuedEvent import queueEvent
 
 from Britefury.gSym.gSymWorld import GSymWorld
 from Britefury.gSym.gSymDocument import GSymDocument
-from Britefury.gSym.AppControlInterface import AppControlInterface
 
 from GSymCore.GSymApp import GSymApp
 from GSymCore.Project import Project
@@ -86,70 +81,17 @@ class _GSymTransferActionListener (ActionListener):
 				
 				
 
-class _WindowLocationResolver (GSymLocationResolver):
-	def __init__(self, window):
-		self._window = window
 		
-	
-	def resolveLocationAsPage(self, location, persistentState):
-		subject = self.resolveLocationAsSubject( location )
-		if subject is not None:
-			commandHistory = None
-			try:
-				doc = subject.getSubjectContext()['document']
-			except KeyError:
-				doc = None
-				
-			commandHistory = doc.getCommandHistory()   if doc is not None   else None
-
-			viewContext = GSymViewContext( subject, self._window._browserContext, commandHistory, persistentState )
-			return viewContext.getPage()
-		
-		return None
-				
-	def resolveLocationAsSubject(self, location):
-		appState = self._window._app._appState
-		if appState is not None:
-			world = self._window._app._world
-			iterator = location.iterator()
-			iterAfterModel = iterator.consumeLiteral( 'model:' )
-			perspective = world.getAppStatePerspective()
-			if iterAfterModel is not None:
-				enclosingSubject = GSymSubject( appState, perspective, '[model]', AttributeTable.instance.withAttrs( world=world, document=None, location=Location( 'model:' ) ) )
-				iterator = iterAfterModel
-			else:
-				enclosingSubject = GSymSubject( appState, perspective, '', AttributeTable.instance.withAttrs( world=world, document=None, location=Location( '' ) ) )
-			subject = perspective.resolveRelativeLocation( enclosingSubject, iterator )
-			if subject is None:
-				return None
-			if iterAfterModel:
-				subject = subject.withPerspective( self._window._browserContext.getDefaultPerspective() )
-			return subject
-		else:
-			return None
-		
-
-		
-class _WindowBrowserContext (GSymBrowserContext):
-	def __init__(self, window, bWithSystemPages, resolvers=[]):
-		super( _WindowBrowserContext, self ).__init__( bWithSystemPages, resolvers )
-		self.window = window
-		
-
 class AppWindow (object):
 	def __init__(self, app, location=Location( '' )):
 		self._app = app
-		
-		self._resolver = _WindowLocationResolver( self )
-		self._browserContext = _WindowBrowserContext( self, True, [ self._resolver ] )
-		
 		
 		class _BrowserListener (TabbedBrowser.TabbedBrowserListener):
 			def createNewBrowserWindow(_self, location):
 				self._createNewWindow( location )
 				
 				
-		self._browser = TabbedBrowser( self._browserContext.getBrowserContext(), _BrowserListener(), location )
+		self._browser = TabbedBrowser( self._app._browserContext.getBrowserContext(), _BrowserListener(), location )
 		self._browser.getComponent().setPreferredSize( Dimension( 800, 600 ) )
 
 		
@@ -165,7 +107,7 @@ class AppWindow (object):
 		
 		newMenu = JMenu( 'New' )
 		newMenu.add( _action( 'New tab', self._onNewTab ) )
-		newMenu.add( _action( 'New widnow', self._onNewWindow ) )
+		newMenu.add( _action( 'New window', self._onNewWindow ) )
 		
 		
 		
@@ -263,6 +205,9 @@ class AppWindow (object):
 	
 	def show(self):
 		self._frame.setVisible( True )
+		
+	def getFrame(self):
+		return self._frame
 
 		
 		
@@ -278,112 +223,9 @@ class AppWindow (object):
 			
 		
 		
-	# handleNewPageFn(unit)
-	def populateNewPageMenu(self, menu, handleNewPageFn):
-		def _make_newPage(newPageFn):
-			def newPage(actionEvent):
-				unit = newPageFn()
-				handleNewPageFn( unit )
-			return newPage
-		for newPageFactory in self._app._world.newPageFactories:
-			menu.addItem( newPageFactory.menuLabelText, _make_newPage( newPageFactory.newPageFn ) )
-		
-		
-		
-	# handleImportedPageFn(name, unit)
-	def populateImportPageMenu(self, menu, handleImportedPageFn):
-		def _make_importPage(fileType, filePattern, importUnitFn):
-			def _import(actionEvent):
-				openDialog = JFileChooser()
-				openDialog.setFileFilter( FileNameExtensionFilter( fileType, [ filePattern ] ) )
-				response = openDialog.showDialog( self._frame, 'Import' )
-				if response == JFileChooser.APPROVE_OPTION:
-					sf = openDialog.getSelectedFile()
-					if sf is not None:
-						filename = sf.getPath()
-						if filename is not None:
-							t1 = datetime.now()
-							unit = importUnitFn( filename )
-							t2 = datetime.now()
-							if unit is not None:
-								unitName = os.path.splitext( filename )[0]
-								unitName = os.path.split( unitName )[1]
-								print 'MainApp: IMPORT TIME = %s'  %  ( t2 - t1, )
-								handleImportedPageFn( unitName, unit )
-			return _import
-
-		for pageImporter in self._app._world.pageImporters:
-			menu.addItem( pageImporter.menuLabelText, _make_importPage( pageImporter.fileType, pageImporter.filePattern, pageImporter.importFn ) )
 			
 			
 		
-		
-	# handleNewDocumentFn(unit)
-	def promptNewDocument(self, handleNewDocumentFn):
-		def _make_newDocument(newUnitFn):
-			def newDoc():
-				unit = newUnitFn()
-				handleNewDocumentFn( unit )
-			return newDoc
-		newDocumentMenu = JPopupMenu( 'New document' )
-		for newUnitFactory in self._app._world.newUnitFactories:
-			newDocumentMenu.add( _action( newUnitFactory.menuLabelText, _make_newDocument( newUnitFactory.newDocumentFn ) ) )
-		pos = self._frame.getMousePosition( True )
-		newDocumentMenu.show( self._frame, pos.x, pos.y )
-	
-		
-		
-	# handleOpenedDocumentFn(fullPath, document)
-	def promptOpenDocument(self, handleOpenedDocumentFn):
-		openDialog = JFileChooser()
-		openDialog.setFileFilter( FileNameExtensionFilter( 'gSym project (*.gsym)', [ 'gsym' ] ) )
-		response = openDialog.showDialog( self._frame, 'Open' )
-		if response == JFileChooser.APPROVE_OPTION:
-			sf = openDialog.getSelectedFile()
-			if sf is not None:
-				filename = sf.getPath()
-				if filename is not None:
-					document = GSymDocument.readFile( self._app._world, filename )
-					if document is not None:
-						handleOpenedDocumentFn( filename, document )
-	
-	
-	
-	# handleSaveDocumentAsFn(filename)
-	def promptSaveDocumentAs(self, handleSaveDocumentAsFn):
-		filename = None
-		bFinished = False
-		while not bFinished:
-			openDialog = JFileChooser()
-			openDialog.setFileFilter( FileNameExtensionFilter( 'gSym project (*.gsym)', [ 'gsym' ] ) )
-			response = openDialog.showSaveDialog( self._frame )
-			if response == JFileChooser.APPROVE_OPTION:
-				sf = openDialog.getSelectedFile()
-				if sf is not None:
-					filenameFromDialog = sf.getPath()
-					if filenameFromDialog is not None:
-						if os.path.exists( filenameFromDialog ):
-							response = JOptionPane.showOptionDialog( self._frame, 'File already exists. Overwrite?', 'File already exists', JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'Overwrite', 'Cancel' ], 'Cancel' )
-							if response == JFileChooser.APPROVE_OPTION:
-								filename = filenameFromDialog
-								bFinished = True
-							else:
-								bFinished = False
-						else:
-							filename = filenameFromDialog
-							bFinished = True
-					else:
-						bFinished = True
-				else:
-					bFinished = True
-			else:
-				bFinished = True
-
-		if filename is not None:
-			handleSaveDocumentAsFn( filename )
-			return True
-		else:
-			return False
 		
 		
 	
@@ -392,7 +234,7 @@ class AppWindow (object):
 
 	
 	def getBrowserContext(self):
-		return self._browserContext
+		return self._app.getBrowserContext()
 
 	
 	
@@ -406,8 +248,7 @@ class AppWindow (object):
 		
 		
 	def _createNewWindow(self, location):
-		newWindow = self._app._createNewWindow( location )
-		newWindow.show()
+		self._app._createNewWindow( location )
 	
 	
 	
@@ -435,8 +276,8 @@ class AppWindow (object):
 	
 	def _onShowElementTreeExplorer(self):
 		currentTab = self._browser.getCurrentBrowser()
-		element = currentTab.getContentsElement()
-		location = self._browserContext.getLocationForObject( element )
+		element = currentTab.getRootElement()
+		location = self._app._browserContext.getLocationForObject( element )
 		self._browser.openLocationInNewWindow( location )
 
 

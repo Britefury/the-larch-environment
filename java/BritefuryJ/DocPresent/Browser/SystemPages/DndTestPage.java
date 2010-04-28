@@ -15,6 +15,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPProxy;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.Border.SolidBorder;
+import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Painter.FillPainter;
@@ -58,13 +59,13 @@ public class DndTestPage extends SystemPage
 		
 		ObjectDndHandler.SourceDataFn sourceDataFn = new ObjectDndHandler.SourceDataFn()
 		{
-			public Object createSourceData(PointerInputElement sourceElement)
+			public Object createSourceData(PointerInputElement sourceElement, int aspect)
 			{
 				return factory;
 			}
 		};
 		
-		source.addDragSource( ElementFactory.class, sourceDataFn );
+		source.addDragSource( ElementFactory.class, DndHandler.ASPECT_NORMAL, sourceDataFn );
 
 		return source;
 	}
