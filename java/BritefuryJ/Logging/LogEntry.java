@@ -7,13 +7,11 @@
 package BritefuryJ.Logging;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.GSym.DefaultPerspective.DefaultPerspectiveStyleSheet;
 import BritefuryJ.GSym.ObjectView.Presentable;
@@ -60,15 +58,13 @@ public class LogEntry implements Presentable
 
 	public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
-		DPElement label = labelStyle.staticText( getLogEntryTitle() );
-		
 		DPElement entryContent = createLogEntryPresentationContent( ctx, styleSheet, state );
-		DPElement content = PrimitiveStyleSheet.instance.vbox( new DPElement[] { entryContent } );
+		DPElement content = PrimitiveStyleSheet.instance.layoutWrap( entryContent );
 		
-		return borderStyle.border( PrimitiveStyleSheet.instance.vbox( new DPElement[] { label, content.padX( 5.0, 0.0 ) } ) );
+		return logEntryStyle.objectBox( getLogEntryTitle(), content );
 	}
 
 
-	private static PrimitiveStyleSheet labelStyle = PrimitiveStyleSheet.instance.withFont( new Font( "Sans serif", Font.PLAIN, 10 ) ).withForeground( new Color( 0.45f, 0.65f, 0.0f ) ); 
-	private static PrimitiveStyleSheet borderStyle = PrimitiveStyleSheet.instance.withBorder( new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.45f, 0.65f, 0.0f ), null ) ); 
+	private static DefaultPerspectiveStyleSheet logEntryStyle = DefaultPerspectiveStyleSheet.instance.withObjectBorderPaint( new Color( 0.45f, 0.65f, 0.0f ) ).withObjectTitlePaint(
+			new Color( 0.45f, 0.65f, 0.0f ) );
 }

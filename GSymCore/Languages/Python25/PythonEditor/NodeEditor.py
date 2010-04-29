@@ -55,21 +55,27 @@ from GSymCore.Languages.Python25.PythonEditor.SelectionEditor import SelectionLi
 class Python25EditLogEntry (LogEntry):
 	labelStyle = PrimitiveStyleSheet.instance.withFont( Font( "Sans serif", Font.PLAIN, 10 ) ).withForeground( Color( 0.0, 0.0, 0.8 ) )
 
-	def __init__(self, editedStream, parser, parsedResult):
+	def __init__(self, description, editedStream, parser, parsedResult, **kwargs):
 		super( Python25EditLogEntry, self ).__init__( [ 'Py25Edit' ] )
+		self._description = description
 		self._editedStream = editedStream
 		self._parser = parser
 		self._parsedResult = parsedResult
+		self._kw = kwargs
 		
 	
 	def getLogEntryTitle(self):
 		return 'Python 2.5 edit'
 	
 	def createLogEntryPresentationContent(self, ctx, styleSheet, state):
+		description = styleSheet.horizontalObjectField( 'Description:', PrimitiveStyleSheet.instance.staticText( self._description ) )
 		editedStream = styleSheet.verticalObjectField( 'Edited stream:', ctx.presentFragment( self._editedStream, styleSheet ) )
 		parserName = styleSheet.horizontalObjectField( 'Parser rule:', PrimitiveStyleSheet.instance.staticText( self._parser.getExpressionName() ) )
 		parsedResult = styleSheet.verticalObjectField( 'Parsed result:', ctx.presentFragment( self._parsedResult, styleSheet ) )
-		return PrimitiveStyleSheet.instance.vbox( [ editedStream, parserName, parsedResult ] )
+		fields = [ description, editedStream, parserName, parsedResult ]
+		for k, v in self._kw.items():
+			fields.append( styleSheet.verticalObjectField( k, ctx.presentFragment( v, styleSheet ) ) )
+		return PrimitiveStyleSheet.instance.vbox( fields )
 		
 
 	
@@ -115,7 +121,7 @@ class ParsedExpressionLinearRepresentationListener (ElementLinearRepresentationL
 			if parsed is not None:
 				log = ctx.getViewContext().getPageLog()
 				if log.isRecording():
-					log.log( Python25EditLogEntry( value, self._parser, parsed ) )
+					log.log( Python25EditLogEntry( 'Expression - success', value, self._parser, parsed ) )
 				if parsed != node:
 					pyReplaceExpression( ctx, node, parsed )
 			else:
@@ -126,7 +132,7 @@ class ParsedExpressionLinearRepresentationListener (ElementLinearRepresentationL
 				unparsed = Schema.UNPARSED( value=items )
 				log = ctx.getViewContext().getPageLog()
 				if log.isRecording():
-					log.log( Python25EditLogEntry( value, self._parser, unparsed ) )
+					log.log( Python25EditLogEntry( 'Expression - unparsed', value, self._parser, unparsed ) )
 				pyReplaceExpression( ctx, node, unparsed )
 			return True
 		else:
@@ -203,29 +209,37 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 				sourceCtx = sourceElement.getFragmentContext()
 				if sourceCtx is None:
 					print 'NULL SOURCE CONTEXT: ', sourceElement
-				sourceCtxElement = sourceCtx.getViewNodeContentElement()
-				sourceNode = sourceCtx.getDocNode()
-				sourceValue = sourceCtxElement.getLinearRepresentation()
-				
-				items = sourceValue.getItemValues()
-				if len( items ) == 1  and  ( isinstance( items[0], str )  or  isinstance( items[0], unicode ) ):
-					if items[0].strip() == '':
-						log = ctx.getViewContext().getPageLog()
-						if log.isRecording():
-							log.log( Python25EditLogEntry( value, self._parser, parsed ) )
-						pyReplaceStmt( ctx, node, parsed )
-						return True
+				if sourceCtx is ctx:
+					log = ctx.getViewContext().getPageLog()
+					if log.isRecording():
+						log.log( Python25EditLogEntry( 'Statement - unparsed, node replaced', value, self._parser, parsed ) )
+					pyReplaceNode( ctx, node, parsed )
+					return True
+				else:
+					sourceCtxElement = sourceCtx.getViewNodeContentElement()
+					sourceNode = sourceCtx.getDocNode()
+					sourceValue = sourceCtxElement.getLinearRepresentation()
 					
-				unparsed = Schema.UNPARSED( value=items )
-				log = ctx.getViewContext().getPageLog()
-				if log.isRecording():
-					log.log( Python25EditLogEntry( value, self._parser, unparsed ) )
-				pyReplaceNode( sourceCtx, sourceNode, unparsed )
-				return True
+					items = sourceValue.getItemValues()
+					if len( items ) == 1  and  ( isinstance( items[0], str )  or  isinstance( items[0], unicode ) ):
+						if items[0].strip() == '':
+							# The content within @sourceCtxElement has been deleted entirely, replace the whole statement
+							log = ctx.getViewContext().getPageLog()
+							if log.isRecording():
+								log.log( Python25EditLogEntry( 'Statement - unparsed, sub-node deleted', sourceValue, self._parser, parsed, sourceNode=sourceNode ) )
+							pyReplaceStmt( ctx, node, parsed )
+							return True
+					
+					unparsed = Schema.UNPARSED( value=items )
+					log = ctx.getViewContext().getPageLog()
+					if log.isRecording():
+						log.log( Python25EditLogEntry( 'Statement - unparsed, sub-node replaced', sourceValue, self._parser, unparsed ) )
+					pyReplaceNode( sourceCtx, sourceNode, unparsed )
+					return True
 			else:
 				log = ctx.getViewContext().getPageLog()
 				if log.isRecording():
-					log.log( Python25EditLogEntry( value, self._parser, parsed ) )
+					log.log( Python25EditLogEntry( 'Statement', value, self._parser, parsed ) )
 				pyReplaceStmt( ctx, node, parsed )
 				return True
 		else:
