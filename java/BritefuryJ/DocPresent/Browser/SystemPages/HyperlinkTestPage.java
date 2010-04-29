@@ -8,10 +8,9 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.util.Arrays;
 
-import BritefuryJ.DocPresent.DPProxy;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPProxy;
 import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
 import BritefuryJ.DocPresent.Controls.Hyperlink;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
@@ -72,7 +71,7 @@ public class HyperlinkTestPage extends SystemPage
 	{
 		DPElement heading = headingStyleSheet.staticText( title );
 		
-		return styleSheet.vbox( Arrays.asList( new DPElement[] { heading.padY( 10.0 ), contents } ) );
+		return styleSheet.vbox( new DPElement[] { heading.padY( 10.0 ), contents } );
 	}
 	
 	protected DPElement colouredText(PrimitiveStyleSheet style)
@@ -86,13 +85,13 @@ public class HyperlinkTestPage extends SystemPage
 		Hyperlink blackLink = controlsStyleSheet.link( "Black", new LinkColourChanger( colouredTextProxy, blackText ) );
 		Hyperlink redLink = controlsStyleSheet.link( "Red", new LinkColourChanger( colouredTextProxy, redText ) );
 		Hyperlink greenLink = controlsStyleSheet.link( "Green", new LinkColourChanger( colouredTextProxy, greenText ) );
-		DPElement colourLinks = styleSheet.withHBoxSpacing( 20.0 ).hbox( Arrays.asList( new DPElement[] { blackLink.getElement(), redLink.getElement(), greenLink.getElement() } ) ).padX( 5.0 );
-		DPElement colourBox = styleSheet.vbox( Arrays.asList( new DPElement[] { colouredTextProxy, colourLinks } ) );
+		DPElement colourLinks = styleSheet.withHBoxSpacing( 20.0 ).hbox( new DPElement[] { blackLink.getElement(), redLink.getElement(), greenLink.getElement() } ).padX( 5.0 );
+		DPElement colourBox = styleSheet.vbox( new DPElement[] { colouredTextProxy, colourLinks } );
 		DPElement colourSection = section( "Action hyperlinks", colourBox );
 		
 		Hyperlink locationLink = controlsStyleSheet.link( "To system page", SystemRootPage.getLocation() );
 		DPElement locationSection = section( "Location hyperlinks", locationLink.getElement() );
 		
-		return styleSheet.withVBoxSpacing( 30.0 ).vbox( Arrays.asList( new DPElement[] { colourSection, locationSection } ) );
+		return styleSheet.withVBoxSpacing( 30.0 ).vbox( new DPElement[] { colourSection, locationSection } );
 	}
 }

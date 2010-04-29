@@ -9,14 +9,13 @@ package BritefuryJ.Logging;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.GSym.DefaultPerspective.DefaultPerspectiveStyleSheet;
 import BritefuryJ.GSym.ObjectView.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 
@@ -53,20 +52,20 @@ public class LogEntry implements Presentable
 		return "Log entry";
 	}
 	
-	public DPElement createLogEntryPresentationContent(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+	public DPElement createLogEntryPresentationContent(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
 		return PrimitiveStyleSheet.instance.staticText( "<empty>" );
 	}
 
 
-	public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+	public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
 		DPElement label = labelStyle.staticText( getLogEntryTitle() );
 		
 		DPElement entryContent = createLogEntryPresentationContent( ctx, styleSheet, state );
-		DPElement content = PrimitiveStyleSheet.instance.vbox( Arrays.asList( new DPElement[] { entryContent }  ) );
+		DPElement content = PrimitiveStyleSheet.instance.vbox( new DPElement[] { entryContent } );
 		
-		return borderStyle.border( PrimitiveStyleSheet.instance.vbox( Arrays.asList( new DPElement[] { label, content.padX( 5.0, 0.0 ) } ) ) );
+		return borderStyle.border( PrimitiveStyleSheet.instance.vbox( new DPElement[] { label, content.padX( 5.0, 0.0 ) } ) );
 	}
 
 

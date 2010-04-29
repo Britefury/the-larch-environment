@@ -9,7 +9,6 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
@@ -41,12 +40,12 @@ public class FractionTestPage extends SystemPage
 
 	private DPElement makeFractionLine(DPElement num, DPElement denom)
 	{
-		return styleSheet.hbox( Arrays.asList( new DPElement[] { smallStyle.text( "<<Left<<" ), fractionStyle.fraction( num, denom, "/" ), largeStyle.text( ">>Right>>" ) } ) );
+		return styleSheet.hbox( new DPElement[] { smallStyle.text( "<<Left<<" ), fractionStyle.fraction( num, denom, "/" ), largeStyle.text( ">>Right>>" ) } );
 	}
 	
 	private DPElement span(DPElement... children)
 	{
-		return styleSheet.span( Arrays.asList( children ) );
+		return styleSheet.span( children );
 	}
 
 	protected DPElement createContents()
@@ -69,6 +68,6 @@ public class FractionTestPage extends SystemPage
 		lines.add( makeFractionLine( styleSheet.text( "a+b" ),
 				span( fractionStyle.fraction( styleSheet.text( "x" ), styleSheet.text( "y" ), "/" ),  styleSheet.text( "+q" ) ) ) );
 		
-		return styleSheet.withVBoxSpacing( 10.0 ).vbox( lines  );
+		return styleSheet.withVBoxSpacing( 10.0 ).vbox( lines.toArray( new DPElement[0] ) );
 	}
 }

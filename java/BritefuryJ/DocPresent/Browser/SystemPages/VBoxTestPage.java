@@ -8,11 +8,10 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.util.Arrays;
 
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPVBox;
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
@@ -46,27 +45,37 @@ public class VBoxTestPage extends SystemPage
 	
 	private DPHBox makeRefAlignedHBox(int refPointIndex, String header)
 	{
-		DPVBox v = styleSheet.vbox( Arrays.asList( new DPElement[] { styleSheet.staticText( "First item" ), styleSheet.staticText( "Second item" ),
-				styleSheet.staticText( "Third item" ), styleSheet.staticText( "Fourth item item" ) } ), refPointIndex );
+		DPVBox v = styleSheet.vbox( new DPElement[] { styleSheet.staticText( "First item" ), styleSheet.staticText( "Second item" ),
+				styleSheet.staticText( "Third item" ), styleSheet.staticText( "Fourth item item" ) }, refPointIndex );
 
-		return styleSheet.hbox( Arrays.asList( new DPElement[] { t18Style.staticText( header ), v, t18Style.staticText( "After" ) } ) );
+		return styleSheet.hbox( new DPElement[] { t18Style.staticText( header ), v, t18Style.staticText( "After" ) } );
 	}
 	
 	
 
 	protected DPElement createContents()
 	{
-		DPVBox vboxTest = styleSheet.vbox( Arrays.asList( new DPElement[] { t24Style.staticText( "VBox" ), t12Style.staticText( "First item" ), t12Style.staticText( "Second item" ), t12Style.staticText( "Third item" ) } ) );
+		DPVBox vboxTest = styleSheet.vbox( new DPElement[] { t24Style.staticText( "VBox" ), t12Style.staticText( "First item" ), t12Style.staticText( "Second item" ), t12Style.staticText( "Third item" ) } );
 		
-		DPVBox hAlignTest = styleSheet.withVBoxSpacing( 10.0 ).vbox( Arrays.asList( new DPElement[] { t24Style.staticText( "Horizontal alignment" ),
-				textOnGreyStyle.staticText( "Left" ).alignHLeft(),textOnGreyStyle.staticText( "Centre" ).alignHCentre(), textOnGreyStyle.staticText( "Right" ).alignHRight(), textOnGreyStyle.staticText( "Expand" ).alignHExpand() } ) );
+		DPVBox hAlignTest = styleSheet.withVBoxSpacing( 10.0 ).vbox( new DPElement[] {
+				t24Style.staticText( "Horizontal alignment" ),
+				textOnGreyStyle.staticText( "Left" ).alignHLeft(),
+				textOnGreyStyle.staticText( "Centre" ).alignHCentre(),
+				textOnGreyStyle.staticText( "Right" ).alignHRight(),
+				textOnGreyStyle.staticText( "Expand" ).alignHExpand() } );
 		
 		
-		DPVBox refPointAlignTest = styleSheet.withVBoxSpacing( 20.0 ).vbox( Arrays.asList( new DPElement[] { t24Style.staticText( "VBox reference point alignment" ),
-				makeRefAlignedHBox( 0, "ALIGN_WITH_0" ), makeRefAlignedHBox( 1, "ALIGN_WITH_1" ), makeRefAlignedHBox( 2, "ALIGN_WITH_2" ), makeRefAlignedHBox( 3, "ALIGN_WITH_3" ) } ) );
+		DPVBox refPointAlignTest = styleSheet.withVBoxSpacing( 20.0 ).vbox(
+				new DPElement[] { t24Style.staticText( "VBox reference point alignment" ),
+				makeRefAlignedHBox( 0, "ALIGN_WITH_0" ),
+				makeRefAlignedHBox( 1, "ALIGN_WITH_1" ),
+				makeRefAlignedHBox( 2, "ALIGN_WITH_2" ),
+				makeRefAlignedHBox( 3, "ALIGN_WITH_3" ) } );
 		
 		
-		return styleSheet.withVBoxSpacing( 20.0 ).vbox( Arrays.asList( new DPElement[] { outlineStyleSheet.border( vboxTest ),
-				outlineStyleSheet.border( hAlignTest ), outlineStyleSheet.border( refPointAlignTest ) } ) );
+		return styleSheet.withVBoxSpacing( 20.0 ).vbox( new DPElement[] {
+				outlineStyleSheet.border( vboxTest ),
+				outlineStyleSheet.border( hAlignTest ),
+				outlineStyleSheet.border( refPointAlignTest ) } );
 	}
 }

@@ -122,7 +122,7 @@ public class ListViewTestPage extends SystemPage
 		
 		DPElement titleElem = titleStyle.staticText( title );
 		
-		return basicStyle.vbox( Arrays.asList( new DPElement[] { titleElem, ls } ) );
+		return basicStyle.vbox( new DPElement[] { titleElem, ls } );
 	}
 
 	
@@ -146,6 +146,6 @@ public class ListViewTestPage extends SystemPage
 		children.add( makeListView( basicStyle, listView.withListLayout( vLayout ), texts, "VERTICAL", "[", "]", "," ) );
 		children.add( makeListView( basicStyle, listView.withListLayout( vInlineLayout ), texts, "VERTICAL-INLINE", "[", "]", "," ) );
 		
-		return basicStyle.withVBoxSpacing( 20.0 ).vbox( children );
+		return basicStyle.withVBoxSpacing( 20.0 ).vbox( children.toArray( new DPElement[0] ) );
 	}
 }

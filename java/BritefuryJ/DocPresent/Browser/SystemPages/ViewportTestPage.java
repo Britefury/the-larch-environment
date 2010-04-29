@@ -9,7 +9,6 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPParagraph;
@@ -54,7 +53,7 @@ public class ViewportTestPage extends SystemPage
 	
 	protected DPParagraph makeParagraph(String title, int lineBreakStep, PrimitiveStyleSheet styleSheet)
 	{
-		return styleSheet.paragraph( makeTextNodes( title + ": " + textBlock, styleSheet ) );
+		return styleSheet.paragraph( makeTextNodes( title + ": " + textBlock, styleSheet ).toArray( new DPElement[0] ) );
 	}
 	
 	
@@ -68,7 +67,7 @@ public class ViewportTestPage extends SystemPage
 		DPElement b2 = makeParagraph( "Exampe text:", 1, blackText );
 		
 		DPElement viewport = borderStyle.border( styleSheet.viewport( b2, 0.0, 200.0, new PersistentState() ).alignHExpand().alignVExpand() ).alignHExpand().alignVExpand();
-		DPElement vbox = PrimitiveStyleSheet.instance.withVBoxSpacing( 5.0 ).vbox( Arrays.asList( new DPElement[] { PrimitiveStyleSheet.instance.staticText( "Viewport:" ), viewport } ) ).alignHExpand().alignVExpand();
+		DPElement vbox = PrimitiveStyleSheet.instance.withVBoxSpacing( 5.0 ).vbox( new DPElement[] { PrimitiveStyleSheet.instance.staticText( "Viewport:" ), viewport } ).alignHExpand().alignVExpand();
 		return vbox.pad( 50.0, 50.0 ).alignHExpand().alignVExpand();
 	}
 }

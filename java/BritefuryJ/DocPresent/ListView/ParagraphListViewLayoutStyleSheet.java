@@ -136,6 +136,6 @@ public class ParagraphListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 		}
 		
 		
-		return primitiveStyle.paragraph( childElems );
+		return primitiveStyle.paragraph( childElems.toArray( new DPElement[0] ) );
 	}
 }

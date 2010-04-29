@@ -9,7 +9,6 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Painter.FilledOutlinePainter;
@@ -72,7 +71,7 @@ public class ParagraphWithSpanTestPage extends SystemPage
 		{
 			children = addLineBreaks( children, lineBreakStep, textStyle );
 		}
-		return textStyle.withParagraphIndentation( indentation ).paragraph( children );
+		return textStyle.withParagraphIndentation( indentation ).paragraph( children.toArray( new DPElement[0] ) );
 	}
 	
 	protected DPElement makeSpan(String title, int lineBreakStep, PrimitiveStyleSheet textStyle, PrimitiveStyleSheet spanStyle)
@@ -82,7 +81,7 @@ public class ParagraphWithSpanTestPage extends SystemPage
 		{
 			children = addLineBreaks( children, lineBreakStep, textStyle );
 		}
-		return spanStyle.span( children );
+		return spanStyle.span( children.toArray( new DPElement[0] ) );
 	}
 	
 	protected DPElement makeParagraphWithNestedSpan(String title, double indentation, int lineBreakStep, PrimitiveStyleSheet textStyle, PrimitiveStyleSheet nestedTextStyle, PrimitiveStyleSheet spanStyle)
@@ -90,7 +89,7 @@ public class ParagraphWithSpanTestPage extends SystemPage
 		ArrayList<DPElement> children = makeTextNodes( title + ": " + textBlock, textStyle );
 		children = addLineBreaks( children, lineBreakStep, textStyle );
 		children.add( children.size()/2, makeSpan( title + " (inner)", lineBreakStep, nestedTextStyle, spanStyle ) );
-		return textStyle.withParagraphIndentation( indentation ).paragraph( children );
+		return textStyle.withParagraphIndentation( indentation ).paragraph( children.toArray( new DPElement[0] ) );
 	}
 	
 	
@@ -109,6 +108,6 @@ public class ParagraphWithSpanTestPage extends SystemPage
 		DPElement b7 = makeParagraph( "PER-WORD INDENTED", 50.0, 1, styleSheet );
 		DPElement b8 = makeParagraphWithNestedSpan( "NESTED-2-INDENTED", 50.0, 2, styleSheet, nestedTextStyleSheet, spanStyleSheet );
 		DPElement[] children = { b2, b3, b4, b5, b6, b7, b8 };
-		return styleSheet.withVBoxSpacing( 30.0 ).vbox( Arrays.asList( children ) );
+		return styleSheet.withVBoxSpacing( 30.0 ).vbox( children );
 	}
 }

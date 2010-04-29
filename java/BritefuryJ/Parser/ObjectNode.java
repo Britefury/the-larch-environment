@@ -71,11 +71,8 @@ public class ObjectNode extends ParserExpression
 			}
 		}
 		
-		this.fieldNames = new String[fn.size()];
-		this.fieldExps = new ParserExpression[fe.size()];
-		
-		this.fieldNames = fn.toArray( this.fieldNames );
-		this.fieldExps = fe.toArray( this.fieldExps );
+		this.fieldNames = fn.toArray( new String[0] );
+		this.fieldExps = fe.toArray( new ParserExpression[0] );
 
 		initialise();
 	}

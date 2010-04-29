@@ -9,8 +9,8 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Font;
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.Page;
 import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
@@ -49,7 +49,7 @@ public abstract class SystemPage extends Page
 		headChildren.add( title.alignHCentre() );
 		
 		ArrayList<DPElement> pageChildren = new ArrayList<DPElement>();
-		pageChildren.add( styleSheet.vbox( headChildren ).alignHExpand() );
+		pageChildren.add( styleSheet.vbox( headChildren.toArray( new DPElement[0] ) ).alignHExpand() );
 		String description = getDescription();
 		if ( description != null )
 		{
@@ -57,7 +57,7 @@ public abstract class SystemPage extends Page
 		}
 		pageChildren.add( createContents().alignHExpand() );
 		
-		return styleSheet.withVBoxSpacing( 40.0 ).vbox( pageChildren ).alignHExpand();
+		return styleSheet.withVBoxSpacing( 40.0 ).vbox( pageChildren.toArray( new DPElement[0] ) ).alignHExpand();
 	}
 
 
@@ -96,7 +96,7 @@ public abstract class SystemPage extends Page
 	
 	protected DPParagraph createTextParagraph(PrimitiveStyleSheet style, String text)
 	{
-		return style.paragraph( createTextNodes( style, text ) );
+		return style.paragraph( createTextNodes( style, text ).toArray( new DPElement[0] ) );
 	}
 
 	protected DPParagraph createTextParagraph(String text)

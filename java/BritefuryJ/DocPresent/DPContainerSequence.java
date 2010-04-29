@@ -227,7 +227,7 @@ abstract public class DPContainerSequence extends DPContainer
 	{
 		HashSet<DPElement> oldEntrySet = new HashSet<DPElement>( registeredChildren );
 		
-		DPElement[] oldChildArray = (DPElement[])registeredChildren.toArray();
+		DPElement[] oldChildArray = registeredChildren.toArray( new DPElement[0] );
 		DPElement[] newChildEntriesArray = (DPElement[])JythonSlice.arraySetSlice( oldChildArray, slice, items );
 		
 		HashSet<DPElement> newEntrySet = new HashSet<DPElement>( registeredChildren );

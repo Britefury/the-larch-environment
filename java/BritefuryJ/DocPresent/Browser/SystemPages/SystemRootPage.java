@@ -56,13 +56,13 @@ public class SystemRootPage extends Page
 		ArrayList<DPElement> headChildren = new ArrayList<DPElement>();
 		headChildren.add( createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE ) );
 		headChildren.add( title.alignHCentre() );
-		DPVBox headBox = styleSheet.vbox( headChildren );
+		DPVBox headBox = styleSheet.vbox( headChildren.toArray( new DPElement[0] ) );
 		
 		ArrayList<DPElement> pageChildren = new ArrayList<DPElement>();
 		pageChildren.add( headBox.alignHExpand() );
 		pageChildren.add( createContents().alignHExpand() );
 		
-		return styleSheet.withVBoxSpacing( 40.0 ).vbox( pageChildren ).alignHExpand();
+		return styleSheet.withVBoxSpacing( 40.0 ).vbox( pageChildren.toArray( new DPElement[0] ) ).alignHExpand();
 	}
 
 	
@@ -78,7 +78,7 @@ public class SystemRootPage extends Page
 			testBoxChildren.add( page.createLink() );
 		}
 		
-		return outlineStyle.border( styleSheet.vbox( testBoxChildren ) );
+		return outlineStyle.border( styleSheet.vbox( testBoxChildren.toArray( new DPElement[0] ) ) );
 	}
 	
 	protected DPElement createContents()
@@ -91,9 +91,9 @@ public class SystemRootPage extends Page
 
 		ArrayList<DPElement> contents = new ArrayList<DPElement>();
 		contents.add( titleElement );
-		contents.add( styleSheet.hbox( testBoxes ) );
+		contents.add( styleSheet.hbox( testBoxes.toArray( new DPElement[0] ) ) );
 		
-		return styleSheet.vbox( contents ).alignHExpand();
+		return styleSheet.vbox( contents.toArray( new DPElement[0] ) ).alignHExpand();
 	}
 
 
@@ -115,7 +115,7 @@ public class SystemRootPage extends Page
 			linkElements.add( controlsStyleSheet.link( "SYSTEM PAGE", new Location( "system" ) ).getElement() );
 		}
 
-		DPElement links = styleSheet.withHBoxSpacing( 25.0 ).hbox( linkElements );
+		DPElement links = styleSheet.withHBoxSpacing( 25.0 ).hbox( linkElements.toArray( new DPElement[0] ) );
 		
 		DPElement linksBackground = styleSheet.withBorder( new FilledBorder( 5.0, 5.0, 5.0, 5.0, new Color( 184, 206, 203 ) ) ).border( links.alignHRight() );
 		DPElement linksHeader = styleSheet.withBorder( new FilledBorder( 5.0, 5.0, 5.0, 5.0 ) ).border( linksBackground.alignHExpand() );

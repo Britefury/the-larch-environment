@@ -11,7 +11,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
@@ -54,7 +53,7 @@ public class ImageTestPage extends SystemPage
 		graphics.setPaint( new Color( 0.1f, 0.25f, 0.5f ) );
 		graphics.fillOval( 4, 4, 56, 24 );
 		
-		return styleSheet.vbox( Arrays.asList( new DPElement[] {
+		return styleSheet.vbox( new DPElement[] {
 				styleSheet.staticText( "A 64x32 image with a green oval" ),
 				styleSheet.image( ellipseImage ),
 				styleSheet.staticText( "A 64x32 image with a green oval, scaled to 256x128" ),
@@ -68,6 +67,6 @@ public class ImageTestPage extends SystemPage
 				styleSheet.staticText( "A 64x32 image with a green oval, with a blue oval displayed on hover" ),
 				styleSheet.image( ellipseImage, blueEllipseImage ),
 				styleSheet.staticText( "Image from 'back arrow' image file, as file object, with 'forward arrow' image file on hover" ),
-				styleSheet.image( new File( "icons/back arrow.png" ), new File( "icons/forward arrow.png" ) ) } ) );
+				styleSheet.image( new File( "icons/back arrow.png" ), new File( "icons/forward arrow.png" ) ) } );
 	}
 }

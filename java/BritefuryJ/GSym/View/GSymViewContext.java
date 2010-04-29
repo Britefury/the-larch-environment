@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.GSym.View;
 
-import java.util.Arrays;
 import java.util.HashMap;
 
 import BritefuryJ.AttributeTable.AttributeTable;
@@ -153,11 +152,11 @@ public class GSymViewContext implements DocView.RefreshListener
 		this.commandHistory = commandHistory;
 		
 		region = new DPRegion();
-		vbox = PrimitiveStyleSheet.instance.vbox( Arrays.asList( new DPElement[] { region } ) );
+		vbox = PrimitiveStyleSheet.instance.vbox( new DPElement[] { region } );
 
 		page = new GSymViewPage( vbox.alignHExpand().alignVExpand(), subject.getTitle(), browserContext, commandHistory, this );
 		
-		view.setElementChangeListener( new NodeElementChangeListenerDiff() );
+		view.setElementChangeListener( new NodeElementChangeListenerDiff( page.getLog() ) );
 		view.setRefreshListener( this );
 		
 		// We need to do this last

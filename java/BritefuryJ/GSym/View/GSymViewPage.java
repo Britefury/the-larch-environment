@@ -6,8 +6,6 @@
 //##************************
 package BritefuryJ.GSym.View;
 
-import java.util.Arrays;
-
 import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.CommandHistory.CommandHistoryController;
 import BritefuryJ.CommandHistory.CommandHistoryListener;
@@ -42,13 +40,14 @@ public class GSymViewPage extends Page
 		this.title = title;
 		this.commandHistory = commandHistory;
 		this.viewContext = viewContext;
+		log = new Log( "Page log" );
 		
 		Hyperlink.LinkListener listener = new Hyperlink.LinkListener()
 		{
 			@Override
 			public boolean onLinkClicked(Hyperlink link, PointerButtonEvent event)
 			{
-				initLog();
+				log.startRecording();
 				LogView view = new LogView( log );
 				Location location = browserContext.getLocationForObject( view );
 				link.getElement().getRootElement().getPageController().openLocation( location, PageController.OpenOperation.OPEN_IN_NEW_WINDOW );
@@ -57,7 +56,7 @@ public class GSymViewPage extends Page
 		};
 		
 		logLink = ControlsStyleSheet.instance.link( "Page log", listener );
-		pageElement = PrimitiveStyleSheet.instance.vbox( Arrays.asList( new DPElement[] { this.element.alignHExpand(), logLink.getElement().pad( 10, 10 ).alignHRight() } ) );
+		pageElement = PrimitiveStyleSheet.instance.vbox( new DPElement[] { this.element.alignHExpand(), logLink.getElement().pad( 10, 10 ).alignHRight() } );
 	}
 	
 	
@@ -77,16 +76,6 @@ public class GSymViewPage extends Page
 		return log;
 	}
 
-	
-	private Log initLog()
-	{
-		if ( log == null )
-		{
-			log = new Log( "Page log" );
-		}
-		return log;
-	}
-	
 	
 	public CommandHistoryController getCommandHistoryController()
 	{

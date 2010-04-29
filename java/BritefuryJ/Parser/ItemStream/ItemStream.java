@@ -19,7 +19,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.GSym.DefaultPerspective.DefaultPerspectiveStyleSheet;
 import BritefuryJ.GSym.ObjectView.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 
@@ -120,7 +120,7 @@ public class ItemStream implements Presentable
 
 
 		@Override
-		public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+		public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
 			ArrayList<DPElement> elements = new ArrayList<DPElement>();
 			StringBuilder builder = new StringBuilder();
@@ -163,7 +163,7 @@ public class ItemStream implements Presentable
 				elements.add( textItemStyle.staticText( builder.toString() ) );
 			}
 			
-			return PrimitiveStyleSheet.instance.span( elements );
+			return PrimitiveStyleSheet.instance.span( elements.toArray( new DPElement[0] ) );
 		}
 
 		
@@ -225,9 +225,9 @@ public class ItemStream implements Presentable
 
 
 		@Override
-		public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+		public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
-			return borderStyle.border( PrimitiveStyleSheet.instance.vbox( Arrays.asList( new DPElement[] { ctx.presentFragment( structuralValue, styleSheet ) } ) ) );
+			return borderStyle.border( PrimitiveStyleSheet.instance.vbox( new DPElement[] { ctx.presentFragment( structuralValue, styleSheet ) } ) );
 		}
 
 	
@@ -486,14 +486,14 @@ public class ItemStream implements Presentable
 
 
 	@Override
-	public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+	public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
 		DPElement label = labelStyle.staticText( "ITEM STREAM" );
 		
 		List<DPElement> itemViews = ctx.mapPresentFragment( Arrays.asList( (Object[])items ), styleSheet );
-		DPElement contents = PrimitiveStyleSheet.instance.paragraph( itemViews );
+		DPElement contents = PrimitiveStyleSheet.instance.paragraph( itemViews.toArray( new DPElement[0] ) );
 		
-		return borderStyle.border( PrimitiveStyleSheet.instance.vbox( Arrays.asList( new DPElement[] { label, contents.padX( 5.0, 0.0 ) } ) ) );
+		return borderStyle.border( PrimitiveStyleSheet.instance.vbox( new DPElement[] { label, contents.padX( 5.0, 0.0 ) } ) );
 	}
 
 

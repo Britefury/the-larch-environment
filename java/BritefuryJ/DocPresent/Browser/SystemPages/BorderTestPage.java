@@ -7,7 +7,6 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
-import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.FilledBorder;
@@ -48,6 +47,6 @@ public class BorderTestPage extends SystemPage
 				styleSheet.staticText( "Solid border: 3 pixel thickness, 10 pixel inset (margin), 20 pixel rounding, grey border, light-grey background" ) );
 		
 		
-		return styleSheet.withVBoxSpacing( 10.0 ).vbox( Arrays.asList( new DPElement[] { onePixelBorder, padded, emptyBorder, solidBorder } ) );
+		return styleSheet.withVBoxSpacing( 10.0 ).vbox( new DPElement[] { onePixelBorder, padded, emptyBorder, solidBorder } );
 	}
 }

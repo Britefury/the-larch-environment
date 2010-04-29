@@ -7,11 +7,10 @@
 package BritefuryJ.DocPresent.ListView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
@@ -80,7 +79,7 @@ public class VerticalInlineListViewLayoutStyleSheet extends ListViewLayoutStyleS
 	{
 		if ( separator != null )
 		{
-			return basicStyle.paragraph( Arrays.asList( new DPElement[] { child, separator.createElement( basicStyle, index, child ) } ) );
+			return basicStyle.paragraph( new DPElement[] { child, separator.createElement( basicStyle, index, child ) } );
 		}
 		else
 		{
@@ -114,7 +113,7 @@ public class VerticalInlineListViewLayoutStyleSheet extends ListViewLayoutStyleS
 				childElems.add( endDelim.createElement( primitiveStyle ) );
 			}
 			
-			return primitiveStyle.paragraph( childElems );
+			return primitiveStyle.paragraph( childElems.toArray( new DPElement[0] ) );
 		}
 		else
 		{
@@ -134,7 +133,7 @@ public class VerticalInlineListViewLayoutStyleSheet extends ListViewLayoutStyleS
 				{
 					firstChildElems.add( separator.createElement( primitiveStyle, 0, child ) );
 				}
-				first = primitiveStyle.paragraph( firstChildElems );
+				first = primitiveStyle.paragraph( firstChildElems.toArray( new DPElement[0] ) );
 			}
 			else
 			{
@@ -160,17 +159,17 @@ public class VerticalInlineListViewLayoutStyleSheet extends ListViewLayoutStyleS
 				childElems.add( createLineParagraph( primitiveStyle, children.size() - 1, children.get( children.size() - 1 ), null ) );
 			}
 			
-			DPVBox middleVBox = primitiveStyle.vbox( childElems );
+			DPVBox middleVBox = primitiveStyle.vbox( childElems.toArray( new DPElement[0] ) );
 			DPElement indent = middleVBox.padX( params.indentation );
 			
 			
 			if ( endDelim != null )
 			{
-				return primitiveStyle.vbox( Arrays.asList( new DPElement[] { first, indent, endDelim.createElement( primitiveStyle ) } ), 0 );
+				return primitiveStyle.vbox( new DPElement[] { first, indent, endDelim.createElement( primitiveStyle ) }, 0 );
 			}
 			else
 			{
-				return primitiveStyle.vbox( Arrays.asList( new DPElement[] { first, indent } ), 0 );
+				return primitiveStyle.vbox( new DPElement[] { first, indent }, 0 );
 			}
 		}
 	}

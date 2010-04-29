@@ -18,6 +18,7 @@ import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Marker.Marker.Bias;
 import BritefuryJ.DocView.DVNode;
 import BritefuryJ.DocView.DocView;
+import BritefuryJ.Logging.Log;
 import BritefuryJ.Utils.StringDiff;
 
 public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeListener
@@ -36,14 +37,16 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 	private String textRepresentation;
 	private Marker.Bias bias;
 	private int position;
+	private Log log;
 	
 	
-	public NodeElementChangeListenerDiff()
+	public NodeElementChangeListenerDiff(Log log)
 	{
 		caretNode = null;
 		textRepresentation = null;
 		bias = Marker.Bias.START;
 		position = -1;
+		this.log = log;
 	}
 	
 	
@@ -305,7 +308,8 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 					{
 						// The leaf is not editable. We must choose a nearby leaf to place the caret in
 						
-						DPSegment.SegmentFilter segFilter = new DPSegment.SegmentFilter( leaf.getSegment() );
+						DPSegment segment = leaf.getSegment();
+						DPSegment.SegmentFilter segFilter = segment != null  ?  new DPSegment.SegmentFilter( segment )  :  null;
 						
 						
 						// First, we must decide whether we should search backwards or forwards
@@ -350,7 +354,7 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 							DPContentLeaf left = leaf.getPreviousEditableLeaf( segFilter, null );
 							if ( left != null )
 							{
-								caret.moveTo( leaf.markerAtEnd() );
+								caret.moveTo( left.markerAtEnd() );
 							}
 							else
 							{
@@ -366,7 +370,7 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 									left = leaf.getPreviousEditableLeaf( null, null );
 									if ( left != null )
 									{
-										caret.moveTo( leaf.markerAtEnd() );
+										caret.moveTo( left.markerAtEnd() );
 									}
 									else
 									{
@@ -399,7 +403,7 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 								DPContentLeaf left = leaf.getPreviousEditableLeaf( segFilter, null );
 								if ( left != null )
 								{
-									caret.moveTo( leaf.markerAtEnd() );
+									caret.moveTo( left.markerAtEnd() );
 								}
 								else
 								{
@@ -415,7 +419,7 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 										left = leaf.getPreviousEditableLeaf( null, null );
 										if ( left != null )
 										{
-											caret.moveTo( leaf.markerAtEnd() );
+											caret.moveTo( left.markerAtEnd() );
 										}
 										else
 										{

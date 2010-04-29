@@ -97,9 +97,9 @@ public class BrowserContext
 			DPText title = styleSheet.withFont( new Font( "Serif", Font.BOLD, 32 ) ).withTextSmallCaps( true ).staticText( "Default Root Page" );
 			
 			DPText contents = styleSheet.withFont( new Font( "SansSerif", Font.PLAIN, 16 ) ).staticText( "Empty document" );
-			DPVBox contentBox = styleSheet.withVBoxSpacing( 40.0 ).vbox( Arrays.asList( new DPElement[] { title.alignHCentre(), contents.alignHExpand() } ) );
+			DPVBox contentBox = styleSheet.withVBoxSpacing( 40.0 ).vbox( new DPElement[] { title.alignHCentre(), contents.alignHExpand() } );
 
-			DPVBox pageBox = styleSheet.vbox( Arrays.asList( new DPElement[] { SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_SYSTEMPAGE ),  contentBox.alignHExpand() } ) );
+			DPVBox pageBox = styleSheet.vbox( new DPElement[] { SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_SYSTEMPAGE ),  contentBox.alignHExpand() } );
 			
 			return pageBox.alignHExpand();
 		}
@@ -128,10 +128,10 @@ public class BrowserContext
 			
 			DPText loc = styleSheet.withFont( new Font( "SansSerif", Font.PLAIN, 16 ) ).staticText( location );
 			DPText error = styleSheet.withFont( new Font( "SansSerif", Font.PLAIN, 16 ) ).staticText( "could not be resolved" );
-			DPVBox errorBox = styleSheet.withVBoxSpacing( 10.0 ).vbox( Arrays.asList( new DPElement[] { loc.alignHCentre(), error.alignHCentre() } ) );
+			DPVBox errorBox = styleSheet.withVBoxSpacing( 10.0 ).vbox( new DPElement[] { loc.alignHCentre(), error.alignHCentre() } );
 			
-			DPVBox pageBox = styleSheet.withVBoxSpacing( 40.0 ).vbox( Arrays.asList( new DPElement[] { SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE ),
-					title.padY( 10.0 ).alignHCentre(), errorBox.padY( 10.0 ).alignHCentre() } ) );
+			DPVBox pageBox = styleSheet.withVBoxSpacing( 40.0 ).vbox( new DPElement[] { SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE ),
+					title.padY( 10.0 ).alignHCentre(), errorBox.padY( 10.0 ).alignHCentre() } );
 
 			return pageBox.alignHExpand();
 		}

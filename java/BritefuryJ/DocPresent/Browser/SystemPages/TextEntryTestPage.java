@@ -7,10 +7,9 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Font;
-import java.util.Arrays;
 
-import BritefuryJ.DocPresent.DPProxy;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPProxy;
 import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
 import BritefuryJ.DocPresent.Controls.Hyperlink;
 import BritefuryJ.DocPresent.Controls.TextEntry;
@@ -89,14 +88,14 @@ public class TextEntryTestPage extends SystemPage
 	{
 		DPElement heading = headingStyleSheet.staticText( title );
 		
-		return styleSheet.vbox( Arrays.asList( new DPElement[] { heading.padY( 10.0 ), contents } ) );
+		return styleSheet.vbox( new DPElement[] { heading.padY( 10.0 ), contents } );
 	}
 	
 	protected DPElement createContents()
 	{
 		EditableLink hello = new EditableLink( styleSheet, controlsStyleSheet, "Hello" );
 		EditableLink world = new EditableLink( styleSheet, controlsStyleSheet, "World" );
-		DPElement entriesBox = styleSheet.vbox( Arrays.asList( new DPElement[] { hello.getElement(), world.getElement() } ) );
+		DPElement entriesBox = styleSheet.vbox( new DPElement[] { hello.getElement(), world.getElement() } );
 		DPElement entriesSection = section( "Text entries", entriesBox );
 		
 		return entriesSection;

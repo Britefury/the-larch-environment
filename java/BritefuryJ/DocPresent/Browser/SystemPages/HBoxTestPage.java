@@ -57,6 +57,6 @@ public class HBoxTestPage extends SystemPage
 		children.add( makeText( "v_bottom", 18 ).alignVBottom() );
 		children.add( makeText( "v_expand", 18 ).alignVExpand() );
 		
-		return outlineStyleSheet.border( styleSheet.hbox( children ) ).pad( 10.0, 20.0 );
+		return outlineStyleSheet.border( styleSheet.hbox( children.toArray( new DPElement[0] ) ) ).pad( 10.0, 20.0 );
 	}
 }

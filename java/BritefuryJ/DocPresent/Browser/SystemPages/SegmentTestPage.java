@@ -8,7 +8,6 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
@@ -56,13 +55,13 @@ public class SegmentTestPage extends SystemPage
 	
 	protected DPElement span(DPElement... x)
 	{
-		return styleSheet.span( Arrays.asList( x ) );
+		return styleSheet.span( x );
 	}
 	
 	
 	protected DPElement line(DPElement... x)
 	{
-		return styleSheet.paragraph( Arrays.asList( x ) );
+		return styleSheet.paragraph( x );
 	}
 	
 	
@@ -79,6 +78,6 @@ public class SegmentTestPage extends SystemPage
 		children.add( line( text( "Nested segment at beginning outer seg |" ), segment( span( segment( text( "both guards", Color.blue ), true, true ), text( "....", Color.red ) ), true, true ), text( "| finish." ) ) );
 		children.add( line( text( "Nested segment at end outer seg |" ), segment( span( text( "....", Color.red ), segment( text( "both guards", Color.blue ), true, true ) ), true, true ), text( "| finish." ) ) );
 		
-		return styleSheet.vbox( children );
+		return styleSheet.vbox( children.toArray( new DPElement[0] ) );
 	}
 }

@@ -15,11 +15,13 @@ public class Log
 	protected List<LogEntry> logEntries = new ArrayList<LogEntry>();
 	private WeakHashMap<LogView, Object> views = new WeakHashMap<LogView, Object>();
 	private String title;
+	private boolean bRecording;
 	
 	
 	public Log(String title)
 	{
 		this.title = title;
+		bRecording = false;
 	}
 	
 	
@@ -31,11 +33,28 @@ public class Log
 	
 	public void log(LogEntry entry)
 	{
-		logEntries.add( entry );
-		for (LogView view: views.keySet())
+		if ( bRecording )
 		{
-			view.notifyLogEntryAdded( entry );
+			logEntries.add( entry );
+			for (LogView view: views.keySet())
+			{
+				view.notifyLogEntryAdded( entry );
+			}
 		}
+		else
+		{
+			throw new RuntimeException( "Log not recording - check before attempting to add an entry" );
+		}
+	}
+	
+	public boolean isRecording()
+	{
+		return bRecording;
+	}
+	
+	public void startRecording()
+	{
+		bRecording = true;
 	}
 	
 	

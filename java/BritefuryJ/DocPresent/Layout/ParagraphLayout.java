@@ -512,8 +512,7 @@ public class ParagraphLayout
 		}
 
 		
-		Line[] lineArray = new Line[lines.size()];
-		return lines.toArray( lineArray );
+		return lines.toArray( new Line[0] );
 	}
 
 

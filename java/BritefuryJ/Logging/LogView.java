@@ -8,15 +8,14 @@ package BritefuryJ.Logging;
 
 import java.awt.Font;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.GSym.ObjectView.PresentationStateListenerList;
+import BritefuryJ.GSym.DefaultPerspective.DefaultPerspectiveStyleSheet;
 import BritefuryJ.GSym.ObjectView.Presentable;
+import BritefuryJ.GSym.ObjectView.PresentationStateListenerList;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 
 public class LogView implements Presentable
@@ -74,7 +73,7 @@ public class LogView implements Presentable
 
 
 
-	public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+	public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
 		stateListeners = PresentationStateListenerList.addListener( stateListeners, ctx );
 		
@@ -86,7 +85,7 @@ public class LogView implements Presentable
 			entryElements[i++] = ctx.presentFragment( entry, PrimitiveStyleSheet.instance );
 		}
 		
-		return PrimitiveStyleSheet.instance.withVBoxSpacing( 5.0 ).vbox( Arrays.asList( entryElements ) ).alignHExpand();
+		return PrimitiveStyleSheet.instance.withVBoxSpacing( 5.0 ).vbox( entryElements ).alignHExpand();
 	}
 
 
