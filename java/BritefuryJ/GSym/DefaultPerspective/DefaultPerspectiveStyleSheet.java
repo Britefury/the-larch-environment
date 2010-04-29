@@ -9,10 +9,13 @@ package BritefuryJ.GSym.DefaultPerspective;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Paint;
+import java.util.ArrayList;
+import java.util.List;
 
 import BritefuryJ.AttributeTable.AttributeValues;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
+import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
@@ -28,6 +31,8 @@ public class DefaultPerspectiveStyleSheet extends StyleSheet
 	private static final Paint defaultObjectFieldTitlePaint = new Color( 0.0f, 0.25f, 0.5f );
 	private static final double defaultObjectFieldIndentation = 5.0;
 	private static final double defaultObjectFieldSpacing = 2.0;
+	private static final AttributeValues defaultStringEscapeAttrs = new AttributeValues( new String[] { "foreground", "background" },
+			new Object[] { new Color( 0.0f, 0.15f, 0.35f ), new FillPainter( new Color( 0.8f, 0.8f, 1.0f ) ) } );
 	
 	public enum PresentationSize
 	{
@@ -62,9 +67,12 @@ public class DefaultPerspectiveStyleSheet extends StyleSheet
 		initAttr( "objectFieldIndentation", defaultObjectFieldIndentation );
 
 		initAttr( "objectFieldSpacing", defaultObjectFieldSpacing );
-}
+		
+		initAttr( "stringContentAttrs", AttributeValues.identity );
+		initAttr( "stringEscapeAttrs", defaultStringEscapeAttrs );
+	}
 	
-	
+		
 	protected StyleSheet newInstance()
 	{
 		return new DefaultPerspectiveStyleSheet();
@@ -134,6 +142,37 @@ public class DefaultPerspectiveStyleSheet extends StyleSheet
 			objectFieldStyleSheet = primitive.withForeground( objectFieldTitlePaint ).withParagraphIndentation( objectFieldIndentation );
 		}
 		return objectFieldStyleSheet;
+	}
+	
+	
+	
+	private static PrimitiveStyleSheet stringContentStyleSheet = null;
+	
+	private PrimitiveStyleSheet getStringContentStyleSheet()
+	{
+		if ( stringContentStyleSheet == null )
+		{
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			AttributeValues attrs = getNonNull( "stringContentAttrs", AttributeValues.class, AttributeValues.identity );
+			stringContentStyleSheet = (PrimitiveStyleSheet)primitive.withAttrValues( attrs );
+		}
+		return stringContentStyleSheet;
+	}
+	
+	
+	
+	private static PrimitiveStyleSheet stringEscapeStyleSheet = null;
+	
+	private PrimitiveStyleSheet getStringEscapeStyleSheet()
+	{
+		if ( stringEscapeStyleSheet == null )
+		{
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			AttributeValues contentAttrs = getNonNull( "stringContentAttrs", AttributeValues.class, AttributeValues.identity );
+			AttributeValues escapeAttrs = getNonNull( "stringEscapeAttrs", AttributeValues.class, AttributeValues.identity );
+			stringEscapeStyleSheet = (PrimitiveStyleSheet)primitive.withAttrValues( contentAttrs ).withAttrValues( escapeAttrs );
+		}
+		return stringEscapeStyleSheet;
 	}
 	
 
@@ -207,9 +246,20 @@ public class DefaultPerspectiveStyleSheet extends StyleSheet
 	{
 		return (DefaultPerspectiveStyleSheet)withAttr( "objectFieldSpacing", spacing );
 	}
-
-
 	
+	
+	public DefaultPerspectiveStyleSheet withStringContentAttrs(AttributeValues attrs)
+	{
+		return (DefaultPerspectiveStyleSheet)withAttr( "stringContentAttrs", attrs );
+	}
+	
+	public DefaultPerspectiveStyleSheet withStringEscapeAttrs(AttributeValues attrs)
+	{
+		return (DefaultPerspectiveStyleSheet)withAttr( "stringEscapeAttrs", attrs );
+	}
+	
+
+
 	public PresentationSize getPresentationSize()
 	{
 		return getNonNull( "presentationSize", PresentationSize.class, PresentationSize.FULL );
@@ -254,5 +304,82 @@ public class DefaultPerspectiveStyleSheet extends StyleSheet
 		PrimitiveStyleSheet titleStyle = getObjectFieldStyleSheet();
 		double indentation = getNonNull( "objectFieldIndentation", Double.class, defaultObjectFieldIndentation );
 		return primitive.vbox( new DPElement[] { titleStyle.staticText( title ), primitive.layoutWrap( value ).padX( indentation, 0.0 ) } );
+	}
+	
+	
+	public List<DPElement> unescapedStringAsElementList(String x)
+	{
+		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+		PrimitiveStyleSheet stringContentStyle = getStringContentStyleSheet();
+		PrimitiveStyleSheet escapeStyle = getStringEscapeStyleSheet();
+
+		ArrayList<DPElement> elements = new ArrayList<DPElement>();
+		// Break the string up into escaped and not escaped items
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < x.length(); i++)
+		{
+			char c = x.charAt( i );
+			
+			DPElement escapeItem = null;
+
+			// Process a list of known escape sequences
+			if ( c == '\r' )
+			{
+				escapeItem = escapeStyle.staticText( "\\r" );
+			}
+			else if ( c == '\t' )
+			{
+				escapeItem = escapeStyle.staticText( "\\t" );
+			}
+			else if ( c == '\n' )
+			{
+				escapeItem = escapeStyle.staticText( "\\n" );
+			}
+			
+			if ( escapeItem != null )
+			{
+				// We have an escape sequence item
+				// First, add any non-escaped content to the element list, then add the escape item
+				if ( builder.length() > 0 )
+				{
+					elements.add( stringContentStyle.staticText( builder.toString() ) );
+					elements.add( primitive.lineBreak() );
+					builder = new StringBuilder();
+				}
+				elements.add( escapeItem );
+				elements.add( primitive.lineBreak() );
+			}
+			else
+			{
+				// Non-escaped character - add to the string
+				builder.append( c );
+			}
+		}
+		
+		if ( builder.length() > 0 )
+		{
+			// Non-escaped content remains - create a text element and add
+			elements.add( stringContentStyle.staticText( builder.toString() ) );
+		}
+		
+		return elements;
+	}
+
+	public DPElement unescapedStringAsHBox(String x)
+	{
+		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+		return primitive.hbox( unescapedStringAsElementList( x ).toArray( new DPElement[0] ) );
+	}
+
+	public DPElement unescapedStringAsParagraph(String x)
+	{
+		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+		return primitive.paragraph( unescapedStringAsElementList( x ).toArray( new DPElement[0] ) );
+	}
+
+	public DPElement unescapedStringAsSpan(String x)
+	{
+		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+		return primitive.span( unescapedStringAsElementList( x ).toArray( new DPElement[0] ) );
 	}
 }
