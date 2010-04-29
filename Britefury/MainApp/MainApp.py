@@ -53,7 +53,7 @@ class _AppLocationResolver (GSymLocationResolver):
 			if subject is None:
 				return None
 			if iterAfterModel:
-				subject = subject.withPerspective( self._browserContext.getDefaultPerspective() )
+				subject = subject.withPerspective( self._app._browserContext.getDefaultPerspective() )
 			return subject
 		else:
 			return None
