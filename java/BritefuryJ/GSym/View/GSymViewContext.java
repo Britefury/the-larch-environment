@@ -156,7 +156,7 @@ public class GSymViewContext implements DocView.RefreshListener
 
 		page = new GSymViewPage( vbox.alignHExpand().alignVExpand(), subject.getTitle(), browserContext, commandHistory, this );
 		
-		view.setElementChangeListener( new NodeElementChangeListenerDiff( page.getLog() ) );
+		view.setElementChangeListener( new NodeElementChangeListenerDiff() );
 		view.setRefreshListener( this );
 		
 		// We need to do this last

@@ -18,7 +18,6 @@ import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Marker.Marker.Bias;
 import BritefuryJ.DocView.DVNode;
 import BritefuryJ.DocView.DocView;
-import BritefuryJ.Logging.Log;
 import BritefuryJ.Utils.StringDiff;
 
 public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeListener
@@ -37,16 +36,14 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 	private String textRepresentation;
 	private Marker.Bias bias;
 	private int position;
-	private Log log;
 	
 	
-	public NodeElementChangeListenerDiff(Log log)
+	public NodeElementChangeListenerDiff()
 	{
 		caretNode = null;
 		textRepresentation = null;
 		bias = Marker.Bias.START;
 		position = -1;
-		this.log = log;
 	}
 	
 	
