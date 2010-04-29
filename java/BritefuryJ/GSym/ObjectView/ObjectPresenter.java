@@ -8,10 +8,10 @@ package BritefuryJ.GSym.ObjectView;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.GSym.DefaultPerspective.DefaultPerspectiveStyleSheet;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 
 public interface ObjectPresenter
 {
-	public DPElement presentObject(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state);
+	public DPElement presentObject(Object x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state);
 }

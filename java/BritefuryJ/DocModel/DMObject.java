@@ -28,7 +28,6 @@ import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 import BritefuryJ.DocModel.DMSchema.UnknownClassException;
 import BritefuryJ.DocModel.DMSchemaResolver.CouldNotResolveSchemaException;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.GSym.DefaultPerspective.DefaultPerspectiveStyleSheet;
 import BritefuryJ.GSym.ObjectView.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
@@ -813,6 +812,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	
 	public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
-		return DocModelPresenter.presentDMObject( this, ctx, PrimitiveStyleSheet.instance, state );
+		return DocModelPresenter.presentDMObject( this, ctx, styleSheet, state );
 	}
 }

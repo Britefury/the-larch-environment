@@ -113,10 +113,10 @@ class ParsedExpressionLinearRepresentationListener (ElementLinearRepresentationL
 			#parsed = parseText( self._parser, value, self._outerPrecedence )
 			parsed = parseStream( self._parser, value, self._outerPrecedence )
 			if parsed is not None:
+				log = ctx.getViewContext().getPageLog()
+				if log.isRecording():
+					log.log( Python25EditLogEntry( value, self._parser, parsed ) )
 				if parsed != node:
-					log = ctx.getViewContext().getPageLog()
-					if log.isRecording():
-						log.log( Python25EditLogEntry( value, self._parser, parsed ) )
 					pyReplaceExpression( ctx, node, parsed )
 			else:
 				items = value.getItemValues()
@@ -210,6 +210,9 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 				items = sourceValue.getItemValues()
 				if len( items ) == 1  and  ( isinstance( items[0], str )  or  isinstance( items[0], unicode ) ):
 					if items[0].strip() == '':
+						log = ctx.getViewContext().getPageLog()
+						if log.isRecording():
+							log.log( Python25EditLogEntry( value, self._parser, parsed ) )
 						pyReplaceStmt( ctx, node, parsed )
 						return True
 					

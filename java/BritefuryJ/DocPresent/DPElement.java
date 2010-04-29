@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.WeakHashMap;
 
 import BritefuryJ.AttributeTable.AttributeTable;
-import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
@@ -50,8 +49,6 @@ import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueObject;
 import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueSequence;
 import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueStream;
 import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
-import BritefuryJ.DocPresent.StyleParams.HBoxStyleParams;
-import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.DefaultPerspective.DefaultPerspectiveStyleSheet;
@@ -2980,10 +2977,10 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	// Meta-element
 	//
 	
-	protected static TextStyleParams headerDebugTextStyle = new TextStyleParams( null, null, null, true, new Font( "Sans serif", Font.BOLD, 14 ), new Color( 0.0f, 0.5f, 0.5f ), null, null, false );
-	protected static TextStyleParams headerDescriptionTextStyle = new TextStyleParams( null, null, null, true, new Font( "Sans serif", Font.PLAIN, 14 ), new Color( 0.0f, 0.0f, 0.75f ), null, null, false );
-	protected static HBoxStyleParams metaHeaderHBoxStyle = new HBoxStyleParams( null, null, null, 10.0 );
-	protected static FilledBorder metaHeaderEmptyBorder = new FilledBorder();
+	protected static PrimitiveStyleSheet headerDebugTextStyle = PrimitiveStyleSheet.instance.withFont( new Font( "Sans serif", Font.BOLD, 14 ) ).withForeground( new Color( 0.0f, 0.5f, 0.5f ) );
+	protected static PrimitiveStyleSheet headerDescriptionTextStyle = PrimitiveStyleSheet.instance.withFont( new Font( "Sans serif", Font.PLAIN, 14 ) ).withForeground( new Color( 0.0f, 0.0f, 0.75f ) );
+	protected static PrimitiveStyleSheet metaHeaderHBoxStyle = PrimitiveStyleSheet.instance.withHBoxSpacing( 10.0 );
+	protected static PrimitiveStyleSheet metaHeaderEmptyBorderStyle = PrimitiveStyleSheet.instance.withBorder( new FilledBorder() );
 
 
 	public DPElement createDebugPresentationHeaderData()
@@ -2995,7 +2992,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	{
 		if ( debugName != null )
 		{
-			return new DPText( headerDebugTextStyle, "<" + debugName + ">" );
+			return headerDebugTextStyle.staticText( "<" + debugName + ">" );
 		}
 		else
 		{
@@ -3007,41 +3004,36 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	{
 		String description = toString();
 		description = description.replace( "BritefuryJ.DocPresent.", "" );
-		return new DPText( headerDescriptionTextStyle, description );
+		return headerDescriptionTextStyle.staticText( description );
 	}
 	
-	protected Border getDebugPresentationHeaderBorder()
+	protected PrimitiveStyleSheet getDebugPresentationHeaderBorderStyle()
 	{
-		return metaHeaderEmptyBorder;
+		return metaHeaderEmptyBorderStyle;
 	}
 	
 	public DPElement createDebugPresentationHeader()
 	{
-		DPHBox hbox = new DPHBox( metaHeaderHBoxStyle );
+		ArrayList<DPElement> elements = new ArrayList<DPElement>();
 		DPElement data = createDebugPresentationHeaderData();
 		DPElement debug = createDebugPresentationHeaderDebug();
 		DPElement descr = createDebugPresentationDescription();
 		if ( data != null )
 		{
-			hbox.append( data );
+			elements.add( data );
 		}
 		if ( debug != null )
 		{
-			hbox.append( debug );
+			elements.add( debug );
 		}
-		hbox.append( descr );
-		
-
-		DPBorder border = new DPBorder( getDebugPresentationHeaderBorder() );
-		border.setChild( hbox );
-		return border;
+		elements.add( descr );
+		DPElement box = metaHeaderHBoxStyle.hbox( elements.toArray( new DPElement[0] ) );
+		return getDebugPresentationHeaderBorderStyle().border( box );
 	}
 	
 	public DPElement createMetaElement(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
 	{
-		DPBin bin = new DPBin( );
-		bin.setChild( createDebugPresentationHeader() );
-		return bin;
+		return createDebugPresentationHeader();
 	}
 	
 	private DPElement exploreTreePresent(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)

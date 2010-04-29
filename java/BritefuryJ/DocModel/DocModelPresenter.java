@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.AttributeValues;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.ListView.ListViewStyleSheet;
@@ -22,6 +23,7 @@ import BritefuryJ.DocPresent.ListView.VerticalInlineListViewLayoutStyleSheet;
 import BritefuryJ.DocPresent.ListView.VerticalListViewLayoutStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.GSym.DefaultPerspective.DefaultPerspectiveStyleSheet;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 
 public class DocModelPresenter
@@ -37,8 +39,9 @@ public class DocModelPresenter
 
 	private static final PrimitiveStyleSheet nullStyle = defaultStyle.withFont( new Font( "SansSerif", Font.ITALIC, 14 ) ).withForeground( new Color( 0.5f, 0.0f, 0.25f ) );
 
-	private static final PrimitiveStyleSheet stringStyle = defaultStyle.withFont( new Font( "SansSerif", Font.PLAIN, 14 ) ).withForeground( new Color( 0.0f, 0.5f, 0.5f ) );
-
+	private static final DefaultPerspectiveStyleSheet stringStyle = DefaultPerspectiveStyleSheet.instance.withPrimitiveStyleSheet( defaultStyle ).withStringContentAttrs(
+			new AttributeValues( new String[] { "foreground" }, new Object[] { new Color( 0.5f, 0.0f, 0.25f ) } ) );
+	
 	private static final PrimitiveStyleSheet punctuationStyle = defaultStyle.withForeground( new Color( 0.0f, 0.0f, 1.0f ) );
 
 	private static final PrimitiveStyleSheet classNameStyle = defaultStyle.withFont( new Font( "SansSerif", Font.PLAIN, 14 ) ).withForeground( new Color( 0.0f, 0.5f, 0.0f ) );
@@ -105,7 +108,7 @@ public class DocModelPresenter
 
 
 	
-	private static DPElement present(Object x, GSymFragmentViewContext ctx, PrimitiveStyleSheet styleSheet, AttributeTable state)
+	private static DPElement present(Object x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
 		if ( x == null )
 		{
@@ -113,7 +116,7 @@ public class DocModelPresenter
 		}
 		else if ( x instanceof String )
 		{
-			return stringStyle.staticText( (String)x );
+			return stringStyle.unescapedStringAsHBox( (String )x );
 		}
 		else
 		{
@@ -121,7 +124,7 @@ public class DocModelPresenter
 		}
 	}
 	
-	protected static DPElement presentDMList(DMList node, GSymFragmentViewContext ctx, PrimitiveStyleSheet styleSheet, AttributeTable state)
+	protected static DPElement presentDMList(DMList node, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
 		List<DPElement> xViews = new ArrayList<DPElement>();
 		for (Object x: node)
@@ -149,7 +152,7 @@ public class DocModelPresenter
 	}
 	
 	
-	protected static DPElement presentDMObject(DMObject node, GSymFragmentViewContext ctx, PrimitiveStyleSheet styleSheet, AttributeTable state)
+	protected static DPElement presentDMObject(DMObject node, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
 		DMObjectClass cls = node.getDMObjectClass();
 		
@@ -175,11 +178,11 @@ public class DocModelPresenter
 		DPElement className;
 		if ( mode == ObjectPresentMode.HORIZONTAL )
 		{
-			className = defaultStyle.span( new DPElement[] { classNameStyle.staticText( cls.getName() ), stringStyle.staticText( " " ), punctuationStyle.staticText( ":" ) } );
+			className = defaultStyle.span( new DPElement[] { classNameStyle.staticText( cls.getName() ), defaultStyle.staticText( " " ), punctuationStyle.staticText( ":" ) } );
 		}
 		else if ( mode == ObjectPresentMode.VERTICALINLINE )
 		{
-			className = defaultStyle.paragraph( new DPElement[] { classNameStyle.staticText( cls.getName() ), stringStyle.staticText( " " ), punctuationStyle.staticText( ":" ) } );
+			className = defaultStyle.paragraph( new DPElement[] { classNameStyle.staticText( cls.getName() ), defaultStyle.staticText( " " ), punctuationStyle.staticText( ":" ) } );
 		}
 		else
 		{
