@@ -24,6 +24,7 @@ import java.util.WeakHashMap;
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.FilledBorder;
+import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.ContextMenu.ContextMenu;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
@@ -51,6 +52,7 @@ import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueStream;
 import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
 import BritefuryJ.DocPresent.StyleParams.HBoxStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.DefaultPerspective.DefaultPerspectiveStyleSheet;
 import BritefuryJ.GSym.ObjectView.Presentable;
@@ -103,27 +105,27 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		}
 	}
 
-	public static class AsIsPresentable implements Presentable
+	public static class ClonePresentable implements Presentable
 	{
-		private DPElement element;
+		private DPElement originalElement;
 		
 		
-		protected AsIsPresentable(DPElement element)
+		protected ClonePresentable(DPElement originalElement)
 		{
-			this.element = element;
+			this.originalElement = originalElement;
 		}
 		
 		
-		public DPElement getElement()
+		public DPElement getOriginalElement()
 		{
-			return element;
+			return originalElement;
 		}
 
 
 		@Override
 		public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
-			return element;
+			return originalElement.clonePresentationSubtree();
 		}
 	}
 	
@@ -3063,13 +3065,24 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 	public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
-		return clonePresentationSubtree();
+		if ( getParent() == null )
+		{
+			return this;
+		}
+		else
+		{
+			return alreadyInUseStyle.border( alreadyInUseStyle.staticText( "Element already in use." ) );
+		}
 	}
 	
 	
 	
-	public Presentable asIsPresentable()
+	public Presentable presentableClone()
 	{
-		return new AsIsPresentable( this );
+		return new ClonePresentable( this );
 	}
+	
+	
+	private static final PrimitiveStyleSheet alreadyInUseStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.75f, 0.0f, 0.0f ) ).withBorder(
+			new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.75f, 0.0f, 0.0f ), null ) );
 }
