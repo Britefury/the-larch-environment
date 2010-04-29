@@ -9,10 +9,9 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
-import java.util.Arrays;
 
-import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class ParagraphTestPage extends SystemPage
@@ -70,7 +69,7 @@ public class ParagraphTestPage extends SystemPage
 		{
 			children = addLineBreaks( children, lineBreakStep, styleSheet );
 		}
-		return styleSheet.paragraph( children );
+		return styleSheet.paragraph( children.toArray( new DPElement[0] ) );
 	}
 	
 	protected DPParagraph makeParagraphWithNestedPara(String title, int lineBreakStep, PrimitiveStyleSheet textStyle, PrimitiveStyleSheet nestedTextStyle)
@@ -78,7 +77,7 @@ public class ParagraphTestPage extends SystemPage
 		ArrayList<DPElement> children = makeTextNodes( title + ": " + textBlock, textStyle );
 		children = addLineBreaks( children, lineBreakStep, textStyle );
 		children.add( children.size()/2, makeParagraph( title + " (inner)", lineBreakStep, nestedTextStyle ) );
-		return textStyle.paragraph( children );
+		return textStyle.paragraph( children.toArray( new DPElement[0] ) );
 	}
 	
 	
@@ -96,6 +95,6 @@ public class ParagraphTestPage extends SystemPage
 		DPElement b7 = makeParagraph( "PER-WORD INDENTED", 1, blackText );
 		DPElement b8 = makeParagraphWithNestedPara( "NESTED-2-INDENTED", 2, blackText, redText );
 		
-		return styleSheet.withVBoxSpacing( 20.0 ).vbox( Arrays.asList( new DPElement[] { b2, b3, b4, b5, b6, b7, b8 } ) );
+		return styleSheet.withVBoxSpacing( 20.0 ).vbox( new DPElement[] { b2, b3, b4, b5, b6, b7, b8 } );
 	}
 }

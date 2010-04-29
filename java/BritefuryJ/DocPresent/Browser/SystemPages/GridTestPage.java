@@ -9,11 +9,10 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
-import java.util.Arrays;
 
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPGridRow;
 import BritefuryJ.DocPresent.DPRGrid;
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
@@ -43,7 +42,7 @@ public class GridTestPage extends SystemPage
 
 	private DPElement section(String description, DPElement w)
 	{
-		return sectionStyle.vbox( Arrays.asList( new DPElement[] { createTextParagraph( description ), sectionStyle.border( w ) } ) );
+		return sectionStyle.vbox( new DPElement[] { createTextParagraph( description ), sectionStyle.border( w ) } );
 	}
 	
 	
@@ -54,7 +53,7 @@ public class GridTestPage extends SystemPage
 		{
 			children.add( outlineStyle.border( t12.text( "<" + col + "_" + row + ">" ) ) );
 		}
-		return styleSheet.span( children );
+		return styleSheet.span( children.toArray( new DPElement[0] ) );
 	}
 	
 
@@ -65,7 +64,7 @@ public class GridTestPage extends SystemPage
 		{
 			children.add( outlineStyle.border( t12.text( "<" + col + "_" + row + ">" ) ) );
 		}
-		return styleSheet.gridRow( children );
+		return styleSheet.gridRow( children.toArray( new DPElement[0] ) );
 	}
 	
 	private DPGridRow makeGridRowCollated(int row)
@@ -77,7 +76,7 @@ public class GridTestPage extends SystemPage
 		}
 		children.add( span( row, 2, 5 ) );
 		children.add( outlineStyle.border( t12.text( "<" + 5 + "_" + row + ">" ) ) );
-		return styleSheet.gridRow( children );
+		return styleSheet.gridRow( children.toArray( new DPElement[0] ) );
 	}
 	
 	private DPRGrid makeGrid()
@@ -87,7 +86,7 @@ public class GridTestPage extends SystemPage
 		{
 			children.add( makeGridRow( row ) );
 		}
-		return tableStyle.rgrid( children );
+		return tableStyle.rgrid( children.toArray( new DPElement[0] ) );
 	}
 	
 	private DPRGrid makeGridwithShortenedRow()
@@ -107,7 +106,7 @@ public class GridTestPage extends SystemPage
 		{
 			children.add( makeGridRowCollated( row ) );
 		}
-		return tableStyle.rgrid( children );
+		return tableStyle.rgrid( children.toArray( new DPElement[0] ) );
 	}
 	
 	private DPRGrid makeCollatedGridWithCollatedRows()
@@ -123,9 +122,9 @@ public class GridTestPage extends SystemPage
 		{
 			columns.add( makeGridRowCollated( row ) );
 		}
-		rows.add( styleSheet.span( columns ) );
+		rows.add( styleSheet.span( columns.toArray( new DPElement[0] ) ) );
 		rows.add( makeGridRowCollated( 5 ) );
-		return tableStyle.rgrid( rows );
+		return tableStyle.rgrid( rows.toArray( new DPElement[0] ) );
 	}
 	
 	private DPRGrid makeCollatedGridWithCollatedRowsAndNonRows()
@@ -143,10 +142,10 @@ public class GridTestPage extends SystemPage
 		}
 		columns.add( outlineStyle.border( t12.text( "Non-row in a span" ) ) );
 		
-		rows.add( styleSheet.span( columns ) );
+		rows.add( styleSheet.span( columns.toArray( new DPElement[0] ) ) );
 		rows.add( makeGridRowCollated( 5 ) );
 		rows.add( outlineStyle.border( t12.text( "Non-row in the grid" ) ) );
-		return tableStyle.rgrid( rows );
+		return tableStyle.rgrid( rows.toArray( new DPElement[0] ) );
 	}
 	
 	
@@ -161,6 +160,6 @@ public class GridTestPage extends SystemPage
 		children.add( section( "Collated grid with collated rows", makeCollatedGridWithCollatedRows() ) );
 		children.add( section( "Collated grid with collated rows and non-rows", makeCollatedGridWithCollatedRowsAndNonRows() ) );
 		
-		return styleSheet.withVBoxSpacing( 20.0 ).vbox( children );
+		return styleSheet.withVBoxSpacing( 20.0 ).vbox( children.toArray( new DPElement[0] ) );
 	}
 }

@@ -8,11 +8,10 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Arrays;
 
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPProxy;
 import BritefuryJ.DocPresent.DPSpan;
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
 import BritefuryJ.DocPresent.Controls.Hyperlink;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
@@ -78,12 +77,12 @@ public class ProxyAndSpanTestPage extends SystemPage
 
 	protected DPElement createParagraph1()
 	{
-		return styleSheet.paragraph( makeTextNodes( paragraphText, blackText ) );
+		return styleSheet.paragraph( makeTextNodes( paragraphText, blackText ).toArray( new DPElement[0] ) );
 	}
 	
 	protected DPElement createParagraph2()
 	{
-		final DPSpan span = styleSheet.span( makeTextNodes( spanContentText, redText ) );
+		final DPSpan span = styleSheet.span( makeTextNodes( spanContentText, redText ).toArray( new DPElement[0] ) );
 		
 		ArrayList<DPElement> paragraph2Contents = makeTextNodes( spanParaText, blackText );
 		paragraph2Contents.add( styleSheet.text( " " ) );
@@ -92,7 +91,7 @@ public class ProxyAndSpanTestPage extends SystemPage
 		paragraph2Contents.add( styleSheet.text( " " ) );
 		paragraph2Contents.add( styleSheet.lineBreak() );
 		paragraph2Contents.addAll( makeTextNodes( spanParaPostText, blackText ) );
-		DPElement paragraph = styleSheet.paragraph( paragraph2Contents );
+		DPElement paragraph = styleSheet.paragraph( paragraph2Contents.toArray( new DPElement[0] ) );
 		
 		Hyperlink.LinkListener onModifySpanLink = new Hyperlink.LinkListener()
 		{
@@ -104,12 +103,12 @@ public class ProxyAndSpanTestPage extends SystemPage
 		};
 		Hyperlink modifySpanLink = controlsStyleSheet.link( "Place secondary text into span", onModifySpanLink );
 		
-		return styleSheet.withVBoxSpacing( 5.0 ).vbox( Arrays.asList( new DPElement[] { paragraph, modifySpanLink.getElement() } ) );
+		return styleSheet.withVBoxSpacing( 5.0 ).vbox( new DPElement[] { paragraph, modifySpanLink.getElement() } );
 	}
 	
 	protected DPElement createParagraph3()
 	{
-		DPSpan span = styleSheet.span( makeTextNodes( spanInProxyContentText, redText ) );
+		DPSpan span = styleSheet.span( makeTextNodes( spanInProxyContentText, redText ).toArray( new DPElement[0] ) );
 		final DPProxy proxy = styleSheet.proxy( span );
 		
 		ArrayList<DPElement> paragraph2Contents = makeTextNodes( spanParaText, blackText );
@@ -119,7 +118,7 @@ public class ProxyAndSpanTestPage extends SystemPage
 		paragraph2Contents.add( styleSheet.text( " " ) );
 		paragraph2Contents.add( styleSheet.lineBreak() );
 		paragraph2Contents.addAll( makeTextNodes( spanParaPostText, blackText ) );
-		DPElement paragraph = styleSheet.paragraph( paragraph2Contents );
+		DPElement paragraph = styleSheet.paragraph( paragraph2Contents.toArray( new DPElement[0] ) );
 		
 		Hyperlink.LinkListener onModifySpanLink = new Hyperlink.LinkListener()
 		{
@@ -136,18 +135,18 @@ public class ProxyAndSpanTestPage extends SystemPage
 		{
 			public boolean onLinkClicked(Hyperlink link, PointerButtonEvent buttonEvent)
 			{
-				proxy.setChild( styleSheet.span( makeTextNodes( proxySecondaryText, seaGreenText ) ) );
+				proxy.setChild( styleSheet.span( makeTextNodes( proxySecondaryText, seaGreenText ).toArray( new DPElement[0] ) ) );
 				return true;
 			}
 		};
 		Hyperlink modifyProxyLink = controlsStyleSheet.link( "Place new span into proxy", onModifyProxyLink );
 
-		return styleSheet.withVBoxSpacing( 5.0 ).vbox( Arrays.asList( new DPElement[] { paragraph,
-				styleSheet.withHBoxSpacing( 15.0 ).hbox( Arrays.asList( new DPElement[] { modifySpanLink.getElement(), modifyProxyLink.getElement() } ) ) } ) );
+		return styleSheet.withVBoxSpacing( 5.0 ).vbox( new DPElement[] { paragraph,
+				styleSheet.withHBoxSpacing( 15.0 ).hbox( new DPElement[] { modifySpanLink.getElement(), modifyProxyLink.getElement() } ) } );
 	}
 	
 	protected DPElement createContents()
 	{
-		return styleSheet.withVBoxSpacing( 30.0 ).vbox( Arrays.asList( new DPElement[] { createParagraph1(), createParagraph2(), createParagraph3() } ) );
+		return styleSheet.withVBoxSpacing( 30.0 ).vbox( new DPElement[] { createParagraph1(), createParagraph2(), createParagraph3() } );
 	}
 }

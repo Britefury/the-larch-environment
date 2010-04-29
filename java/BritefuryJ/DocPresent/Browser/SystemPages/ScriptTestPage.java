@@ -9,11 +9,10 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
-import java.util.Arrays;
 
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPFraction;
 import BritefuryJ.DocPresent.DPScript;
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class ScriptTestPage extends SystemPage
@@ -47,8 +46,8 @@ public class ScriptTestPage extends SystemPage
 	
 	protected DPElement makeScriptLine(DPElement main, DPElement leftSuper, DPElement leftSub, DPElement rightSuper, DPElement rightSub)
 	{
-		return styleSheet.hbox( Arrays.asList( new DPElement[] { scriptPreStyleSheet.text( "<<Left<<" ), styleSheet.script( main, leftSuper, leftSub, rightSuper, rightSub ),
-				scriptPostStyleSheet.text( ">>Right>>" ) } ) );
+		return styleSheet.hbox( new DPElement[] { scriptPreStyleSheet.text( "<<Left<<" ), styleSheet.script( main, leftSuper, leftSub, rightSuper, rightSub ),
+				scriptPostStyleSheet.text( ">>Right>>" ) } );
 	}
 
 	
@@ -57,9 +56,9 @@ public class ScriptTestPage extends SystemPage
 	{
 		DPFraction fraction = styleSheet.fraction( sScriptStyleSheet.text( numText ), sScriptStyleSheet.text( denomText ), "/" );
 		
-		DPScript script = styleSheet.scriptRSuper( sMainStyleSheet.text( mainText ), styleSheet.paragraph( Arrays.asList( new DPElement[] { fraction } ) ) );
+		DPScript script = styleSheet.scriptRSuper( sMainStyleSheet.text( mainText ), styleSheet.paragraph( new DPElement[] { fraction } ) );
 		
-		return styleSheet.hbox( Arrays.asList( new DPElement[] { scriptPreStyleSheet.text( "Label A yYgGjJpPqQ" ), script, scriptPostStyleSheet.text( "Label B yYgGjJpPqQ" ) } ) );
+		return styleSheet.hbox( new DPElement[] { scriptPreStyleSheet.text( "Label A yYgGjJpPqQ" ), script, scriptPostStyleSheet.text( "Label B yYgGjJpPqQ" ) } );
 	}
 
 	
@@ -90,6 +89,6 @@ public class ScriptTestPage extends SystemPage
 			children.add( makeScriptLine( sMainStyleSheet.text( "MAIN" + String.valueOf( i ) ), leftSuperText, leftSubText, rightSuperText, rightSubText ) );
 		}
 		
-		return styleSheet.withVBoxSpacing( 10.0 ).vbox( children );
+		return styleSheet.withVBoxSpacing( 10.0 ).vbox( children.toArray( new DPElement[0] ) );
 	}
 }

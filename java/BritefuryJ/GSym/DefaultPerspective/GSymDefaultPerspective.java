@@ -10,7 +10,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -59,7 +58,16 @@ public class GSymDefaultPerspective implements GSymPerspective
 			if ( x instanceof Presentable )
 			{
 				Presentable p = (Presentable)x;
-				result = p.present( ctx, styleSheet, state );
+				DefaultPerspectiveStyleSheet defaultStyleSheet = null;
+				if ( styleSheet instanceof DefaultPerspectiveStyleSheet )
+				{
+					defaultStyleSheet = (DefaultPerspectiveStyleSheet)styleSheet;
+				}
+				else
+				{
+					defaultStyleSheet = DefaultPerspectiveStyleSheet.instance;
+				}
+				result = p.present( ctx, defaultStyleSheet, state );
 			}
 			else
 			{
@@ -313,7 +321,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 	{
 		DPElement className = javaObjectClassNameStyle.staticText( x.getClass().getName() );
 		DPElement asString = asStringStyle.text( x.toString() );
-		return javaObjectBorderStyle.border( javaObjectBorderStyle.vbox( Arrays.asList( new DPElement[] { className, asString.padX( 10.0 ) } ) ) );
+		return javaObjectBorderStyle.border( javaObjectBorderStyle.vbox( new DPElement[] { className, asString.padX( 10.0 ) } ) );
 	}
 	
 	
@@ -323,11 +331,10 @@ public class GSymDefaultPerspective implements GSymPerspective
 		public static DPElement presentChar(char c, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
 		{
 			String str = Character.toString( c );
-			ArrayList<DPElement> lineContent = new ArrayList<DPElement>();
-			lineContent.add( punctuationStyle.staticText(  "'" ) );
-			lineContent.add( stringContentStyle.staticText( str ) );
-			lineContent.add( punctuationStyle.staticText(  "'" ) );
-			return PrimitiveStyleSheet.instance.hbox( lineContent );
+			return PrimitiveStyleSheet.instance.hbox( new DPElement[] {
+					punctuationStyle.staticText(  "'" ),
+					stringContentStyle.staticText( str ),
+					punctuationStyle.staticText(  "'" ) } );
 		}
 		
 		public static DPElement presentString(String str, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
@@ -339,7 +346,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 				lineContent.add( punctuationStyle.staticText(  "\"" ) );
 				unescapeString( lineContent, str );
 				lineContent.add( punctuationStyle.staticText(  "\"" ) );
-				return PrimitiveStyleSheet.instance.hbox( lineContent );
+				return PrimitiveStyleSheet.instance.hbox( lineContent.toArray( new DPElement[0] ) );
 			}
 			else
 			{
@@ -357,10 +364,10 @@ public class GSymDefaultPerspective implements GSymPerspective
 					{
 						lineContent.add( punctuationStyle.staticText(  "\"" ) );
 					}
-					lineElements.add( PrimitiveStyleSheet.instance.hbox( lineContent ) );
+					lineElements.add( PrimitiveStyleSheet.instance.hbox( lineContent.toArray( new DPElement[0]) ) );
 					index++;
 				}
-				return multiLineStringStyle.vbox( lineElements );
+				return multiLineStringStyle.vbox( lineElements.toArray( new DPElement[0]) );
 			}
 		}
 		

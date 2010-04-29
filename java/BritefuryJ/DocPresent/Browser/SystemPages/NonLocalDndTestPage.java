@@ -10,7 +10,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.datatransfer.DataFlavor;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
@@ -56,7 +55,7 @@ public class NonLocalDndTestPage extends SystemPage
 	{
 		DPElement titleElement = textStyle.staticText( title );
 		
-		return styleSheet.withHBoxSpacing( 20.0 ).hbox( Arrays.asList( new DPElement[] { titleElement, dest } ) );
+		return styleSheet.withHBoxSpacing( 20.0 ).hbox( new DPElement[] { titleElement, dest } );
 	}
 	
 	protected DPElement makeFileReceiver()
@@ -75,7 +74,7 @@ public class NonLocalDndTestPage extends SystemPage
 				{
 					elements.add( styleSheet.staticText( x.toString() ) );
 				}
-				DPElement e = styleSheet.vbox( elements );
+				DPElement e = styleSheet.vbox( elements.toArray( new DPElement[0] ) );
 				
 				dest.setChild( e );
 				
@@ -96,6 +95,6 @@ public class NonLocalDndTestPage extends SystemPage
 	{
 		DPElement fileReceiver = makeFileReceiver();
 		
-		return styleSheet.withVBoxSpacing( 20.0 ).vbox( Arrays.asList( new DPElement[] { fileReceiver.alignHExpand() } ) ).alignHExpand();
+		return styleSheet.withVBoxSpacing( 20.0 ).vbox( new DPElement[] { fileReceiver.alignHExpand() } ).alignHExpand();
 	}
 }

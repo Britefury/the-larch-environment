@@ -277,8 +277,7 @@ public class DPTable extends DPContainer
 		int i = 0;
 		for (List<DPElement> srcRow: itemTable)
 		{
-			DPElement row[] = new DPElement[srcRow.size()];
-			itemArray[i++] = srcRow.toArray( row );
+			itemArray[i++] = srcRow.toArray( new DPElement[0] );
 		}
 		setChildren( itemArray );
 	}
@@ -555,8 +554,7 @@ public class DPTable extends DPContainer
 
 	public TableLayout.TablePackingParams[] getTablePackingParamsArray()
 	{
-		TableLayout.TablePackingParams a[] = new TableLayout.TablePackingParams[childEntries.size()];
-		a = childEntries.toArray( a );
+		TableLayout.TablePackingParams a[] = childEntries.toArray( new TableLayout.TablePackingParams[0] );
 		return a;
 	}
 

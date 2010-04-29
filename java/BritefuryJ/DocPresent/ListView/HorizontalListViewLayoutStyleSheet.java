@@ -75,7 +75,7 @@ public class HorizontalListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 			childElems.add( endDelim.createElement( primitiveStyle ) );
 		}
 		
-
-		return primitiveStyle.hbox( childElems  );
+		
+		return primitiveStyle.hbox( childElems.toArray( new DPElement[0] ) );
 	}
 }

@@ -11,15 +11,14 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import BritefuryJ.DocPresent.DPBin;
-import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.FragmentContext;
+import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.ElementInteractor;
+import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
@@ -152,9 +151,9 @@ public class NodeView implements FragmentContext
 			childElements.add( childView.getElement().padY( 3.0 ) );
 		}
 		
-		DPElement childrenVBox = styleSheet.withVBoxSpacing( 3.0 ).vbox( childElements );
+		DPElement childrenVBox = styleSheet.withVBoxSpacing( 3.0 ).vbox( childElements.toArray( new DPElement[0] ) );
 		
-		mainElement = styleSheet.withHBoxSpacing( 80.0 ).hbox( Arrays.asList( new DPElement[] { nodeElement.alignVCentre(), childrenVBox.alignVCentre() } ) );
+		mainElement = styleSheet.withHBoxSpacing( 80.0 ).hbox( new DPElement[] { nodeElement.alignVCentre(), childrenVBox.alignVCentre() } );
 	}
 	
 	
@@ -233,7 +232,7 @@ public class NodeView implements FragmentContext
 		if ( exprName != null )
 		{
 			DPElement exprText = debugNameStyle.staticText( exprName );
-			return styleSheet.withHBoxSpacing( 10.0 ).hbox( Arrays.asList( new DPElement[] { exprText, classText } ) );
+			return styleSheet.withHBoxSpacing( 10.0 ).hbox( new DPElement[] { exprText, classText } );
 		}
 		else
 		{
@@ -327,7 +326,7 @@ public class NodeView implements FragmentContext
 		DPElement inputElement = makeInputElement( data );
 		DPElement valueElement = makeValueElement( data );
 		
-		return styleSheet.vbox( Arrays.asList( new DPElement[] { rangeElement, inputElement, valueElement } ) );
+		return styleSheet.vbox( new DPElement[] { rangeElement, inputElement, valueElement } );
 	}
 	
 	private DPElement makeNodeElement(DebugNode data)
@@ -335,7 +334,7 @@ public class NodeView implements FragmentContext
 		DPElement titleBoxElement = makeTitleBoxElement( data );
 		DPElement contentBoxElement = makeContentBoxElement( data );
 		
-		DPVBox nodeBoxElement = styleSheet.vbox( Arrays.asList( new DPElement[] { titleBoxElement.alignHExpand(), contentBoxElement.alignHExpand() } ) );
+		DPVBox nodeBoxElement = styleSheet.vbox( new DPElement[] { titleBoxElement.alignHExpand(), contentBoxElement.alignHExpand() } );
 		
 		nodeBinElement = styleSheet.bin( nodeBoxElement );
 		

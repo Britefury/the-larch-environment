@@ -52,6 +52,7 @@ import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
 import BritefuryJ.DocPresent.StyleParams.HBoxStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.GSym.DefaultPerspective.DefaultPerspectiveStyleSheet;
 import BritefuryJ.GSym.ObjectView.Presentable;
 import BritefuryJ.GSym.ObjectView.PresentationStateListenerList;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
@@ -96,7 +97,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 
 		@Override
-		public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+		public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
 			return element.exploreTreePresent( ctx, styleSheet, state );
 		}
@@ -120,7 +121,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 
 		@Override
-		public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+		public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
 			return element;
 		}
@@ -3060,7 +3061,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 
 
-	public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+	public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
 		return clonePresentationSubtree();
 	}

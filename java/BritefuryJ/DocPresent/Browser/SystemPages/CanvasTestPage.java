@@ -9,7 +9,6 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPCanvas;
@@ -208,8 +207,8 @@ public class CanvasTestPage extends SystemPage
 		DPElement dest0 = makeDestElement( "Number" );
 		DPElement dest1 = makeDestElement2( "Number", dest0 );
 
-		DPHBox hbox = styleSheet.withHBoxSpacing( 20.0 ).hbox( Arrays.asList( new DPElement[] { dest0, dest1 } ) );
+		DPHBox hbox = styleSheet.withHBoxSpacing( 20.0 ).hbox( new DPElement[] { dest0, dest1 } );
 
-		return styleSheet.withVBoxSpacing( 20.0 ).vbox( Arrays.asList( new DPElement[] { diagram, hbox } ) );
+		return styleSheet.withVBoxSpacing( 20.0 ).vbox( new DPElement[] { diagram, hbox } );
 	}
 }

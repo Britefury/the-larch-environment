@@ -8,7 +8,6 @@ package BritefuryJ.DocPresent.Browser;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,7 +15,7 @@ import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.GSym.DefaultPerspective.DefaultPerspectiveStyleSheet;
 import BritefuryJ.GSym.ObjectView.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 
@@ -118,7 +117,7 @@ public class Location implements Presentable
 
 
 		@Override
-		public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+		public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
 			// TODO: Check for infinitely recursive nesting
 			return ctx.presentLocationAsElement( loc );
@@ -203,13 +202,13 @@ public class Location implements Presentable
 	}
 
 
-	public DPElement present(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+	public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
 		DPElement label = labelStyle.staticText( "Location" );
 		
 		DPElement locLabel = PrimitiveStyleSheet.instance.staticText( locationString );
 		
-		return borderStyle.border( PrimitiveStyleSheet.instance.vbox( Arrays.asList( new DPElement[] { label, locLabel.padX( 5.0, 0.0 ) } ) ) );
+		return borderStyle.border( PrimitiveStyleSheet.instance.vbox( new DPElement[] { label, locLabel.padX( 5.0, 0.0 ) } ) );
 	}
 	
 	

@@ -7,7 +7,6 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
-import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
@@ -43,8 +42,8 @@ public class AlignmentTestPage extends SystemPage
 		DPBorder halignExpand = styleSheet.border( textStyleSheet.staticText( "hAlign=EXPAND" ).alignHExpand() );
 		
 		
-		DPElement refVBox = styleSheet.vbox( Arrays.asList( new DPElement[] { styleSheet.staticText( "0" ), styleSheet.staticText( "1 (ref-y)" ), styleSheet.staticText( "2" ),
-						styleSheet.staticText( "3" ), styleSheet.staticText( "4" ), styleSheet.staticText( "5" ) } ), 1 );
+		DPElement refVBox = styleSheet.vbox( new DPElement[] { styleSheet.staticText( "0" ), styleSheet.staticText( "1 (ref-y)" ), styleSheet.staticText( "2" ),
+						styleSheet.staticText( "3" ), styleSheet.staticText( "4" ), styleSheet.staticText( "5" ) }, 1 );
 		DPElement refBox = styleSheet.withBackground( new FilledOutlinePainter( new Color( 0.8f, 0.85f, 1.0f ), new Color( 0.0f, 0.25f, 1.0f ) ) ).bin( refVBox.pad( 5.0, 5.0 ) );
 		
 
@@ -56,15 +55,15 @@ public class AlignmentTestPage extends SystemPage
 		DPBorder valignExpand = styleSheet.border( textStyleSheet.staticText( "vAlign=EXPAND" ).alignVExpand() );
 
 		
-		DPElement vAlignBox = styleSheet.withHBoxSpacing( 10.0 ).hbox( Arrays.asList( new DPElement[] { valignBaselines.alignVRefYExpand(), valignBaselinesExpand.alignVRefYExpand(),
-				valignTop.alignVRefYExpand(), valignCentre.alignVRefYExpand(), valignBottom.alignVRefYExpand(), valignExpand.alignVRefYExpand() } ) );
+		DPElement vAlignBox = styleSheet.withHBoxSpacing( 10.0 ).hbox( new DPElement[] { valignBaselines.alignVRefYExpand(), valignBaselinesExpand.alignVRefYExpand(),
+				valignTop.alignVRefYExpand(), valignCentre.alignVRefYExpand(), valignBottom.alignVRefYExpand(), valignExpand.alignVRefYExpand() } );
 		
 		
-		DPElement bottomBox = styleSheet.withHBoxSpacing( 50.0 ).hbox( Arrays.asList( new DPElement[] { refBox.alignVRefYExpand(), vAlignBox.alignVRefYExpand() } ) );
+		DPElement bottomBox = styleSheet.withHBoxSpacing( 50.0 ).hbox( new DPElement[] { refBox.alignVRefYExpand(), vAlignBox.alignVRefYExpand() } );
 		
 		
-		DPElement mainBox = styleSheet.withVBoxSpacing( 10.0 ).vbox( Arrays.asList( new DPElement[] { halignLeft.alignHExpand(), halignCentre.alignHExpand(), halignRight.alignHExpand(),
-				halignExpand.alignHExpand(), bottomBox } ) );
+		DPElement mainBox = styleSheet.withVBoxSpacing( 10.0 ).vbox( new DPElement[] { halignLeft.alignHExpand(), halignCentre.alignHExpand(), halignRight.alignHExpand(),
+				halignExpand.alignHExpand(), bottomBox } );
 		return styleSheet.bin( mainBox );
 	}
 }

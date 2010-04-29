@@ -7,7 +7,6 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
-import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Painter.FillPainter;
@@ -40,7 +39,7 @@ public class ShapeTestPage extends SystemPage
 	
 	protected DPElement createContents()
 	{
-		return styleSheet.vbox( Arrays.asList( new DPElement[] {
+		return styleSheet.vbox( new DPElement[] {
 				styleSheet.staticText( "Box 50x10; 1 pixel padding" ),
 				shapeStyle.box( 50.0, 10.0 ).pad( 1.0, 1.0 ),
 				styleSheet.staticText( "Box 50x10; 10 pixel padding" ),
@@ -53,6 +52,6 @@ public class ShapeTestPage extends SystemPage
 				shapeStyle.rectangle( -10.0, -10.0, 50.0, 20.0 ).pad( 1.0, 1.0 ),
 				styleSheet.staticText( "Ellipse 25x25  @  0,0; 1 pixel padding" ),
 				shapeStyle.ellipse( 0.0, 0.0, 25.0, 25.0 ).pad( 1.0, 1.0 ),
-				} ) );
+				} );
 	}
 }

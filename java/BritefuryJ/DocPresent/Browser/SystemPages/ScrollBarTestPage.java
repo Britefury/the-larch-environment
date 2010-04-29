@@ -7,7 +7,6 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Font;
-import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
@@ -45,7 +44,7 @@ public class ScrollBarTestPage extends SystemPage
 	{
 		DPElement heading = headingStyleSheet.staticText( title );
 		
-		return styleSheet.vbox( Arrays.asList( new DPElement[] { heading.padY( 10.0 ), contents.alignHExpand() } ) ).alignHExpand();
+		return styleSheet.vbox( new DPElement[] { heading.padY( 10.0 ), contents.alignHExpand() } ).alignHExpand();
 	}
 	
 	protected DPElement createContents()
@@ -55,9 +54,9 @@ public class ScrollBarTestPage extends SystemPage
 		ScrollBar vertical = controlsStyleSheet.verticalScrollBar( range );
 		
 		DPElement horizontalSection = section( "Horizontal scroll bar", horizontal.getElement() );
-		DPElement verticalSection = section( "Vertical scroll bar", styleSheet.withHBoxSpacing( 40.0 ).hbox( Arrays.asList( new DPElement[] { styleSheet.box( 1.0, 300.0 ),
-				vertical.getElement().alignVExpand() } ) ) );
+		DPElement verticalSection = section( "Vertical scroll bar", styleSheet.withHBoxSpacing( 40.0 ).hbox( new DPElement[] { styleSheet.box( 1.0, 300.0 ),
+				vertical.getElement().alignVExpand() } ) );
 		
-		return styleSheet.withVBoxSpacing( 30.0 ).vbox( Arrays.asList( new DPElement[] { horizontalSection, verticalSection } ) ).alignHExpand();
+		return styleSheet.withVBoxSpacing( 30.0 ).vbox( new DPElement[] { horizontalSection, verticalSection } ).alignHExpand();
 	}
 }

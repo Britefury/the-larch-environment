@@ -15,6 +15,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
 
+import org.python.expose.ExposedMethod;
+
 import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPBox;
@@ -660,6 +662,14 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 	
 	
+	@ExposedMethod( names={ "_hbox" } )
+	public DPHBox hbox(DPElement children[])
+	{
+		DPHBox element = new DPHBox( getHBoxParams() );
+		element.setChildren( children );
+		return element;
+	}
+
 	public DPHBox hbox(List<DPElement> children)
 	{
 		DPHBox element = new DPHBox( getHBoxParams() );
@@ -683,6 +693,14 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 	
 	
+	@ExposedMethod( names={ "_paragraph" } )
+	public DPParagraph paragraph(DPElement children[])
+	{
+		DPParagraph element = new DPParagraph( getParagraphParams() );
+		element.setChildren( children );
+		return element;
+	}
+	
 	public DPParagraph paragraph(List<DPElement> children)
 	{
 		DPParagraph element = new DPParagraph( getParagraphParams() );
@@ -699,9 +717,25 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 	
 
+	@ExposedMethod( names={ "_span" } )
+	public DPSpan span(DPElement children[])
+	{
+		DPSpan element = new DPSpan( getContainerParams() );
+		element.setChildren( children );
+		return element;
+	}
+	
 	public DPSpan span(List<DPElement> children)
 	{
 		DPSpan element = new DPSpan( getContainerParams() );
+		element.setChildren( children );
+		return element;
+	}
+	
+	@ExposedMethod( names={ "_lineBreakCostSpan" } )
+	public DPLineBreakCostSpan lineBreakCostSpan(DPElement children[])
+	{
+		DPLineBreakCostSpan element = new DPLineBreakCostSpan( getContainerParams() );
 		element.setChildren( children );
 		return element;
 	}
@@ -805,9 +839,25 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 	
 	
+	@ExposedMethod( names={ "_gridRow" } )
+	public DPGridRow gridRow(DPElement children[])
+	{
+		DPGridRow element = new DPGridRow( getGridRowParams() );
+		element.setChildren( children );
+		return element;
+	}
+	
 	public DPGridRow gridRow(List<DPElement> children)
 	{
 		DPGridRow element = new DPGridRow( getGridRowParams() );
+		element.setChildren( children );
+		return element;
+	}
+	
+	@ExposedMethod( names={ "_rgrid" } )
+	public DPRGrid rgrid(DPElement children[])
+	{
+		DPRGrid element = new DPRGrid( getTableParams() );
 		element.setChildren( children );
 		return element;
 	}
@@ -844,6 +894,23 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 
 	
+	@ExposedMethod( names={ "_vbox" } )
+	public DPVBox vbox(DPElement children[])
+	{
+		DPVBox element = new DPVBox( getVBoxParams() );
+		element.setChildren( children );
+		return element;
+	}
+	
+	@ExposedMethod( names={ "_vbox" } )
+	public DPVBox vbox(DPElement children[], int refPointIndex)
+	{
+		DPVBox element = new DPVBox( getVBoxParams() );
+		element.setChildren( children );
+		element.setRefPointIndex( refPointIndex );
+		return element;
+	}
+	
 	public DPVBox vbox(List<DPElement> children)
 	{
 		DPVBox element = new DPVBox( getVBoxParams() );
@@ -857,6 +924,19 @@ public class PrimitiveStyleSheet extends StyleSheet
 		element.setChildren( children );
 		element.setRefPointIndex( refPointIndex );
 		return element;
+	}
+	
+	
+	public DPElement layoutWrap(DPElement element)
+	{
+		if ( element.getLayoutNode() == null )
+		{
+			return vbox( new DPElement[] { element } );
+		}
+		else
+		{
+			return element;
+		}
 	}
 	
 	

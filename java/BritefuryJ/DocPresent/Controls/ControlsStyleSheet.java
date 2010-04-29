@@ -15,7 +15,6 @@ import java.awt.Paint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 import java.awt.geom.RoundRectangle2D;
-import java.util.Arrays;
 
 import org.python.core.PyObject;
 
@@ -472,9 +471,9 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		PrimitiveStyleSheet textEntryStyle = getTextEntryStyleSheet();
 		DPText textElement = textEntryStyle.text( text );
-		DPElement line = textEntryStyle.hbox( Arrays.asList( new DPElement[] { textEntryStyle.segment( false, false, textElement ) } ) );
+		DPElement line = textEntryStyle.hbox( new DPElement[] { textEntryStyle.segment( false, false, textElement ) } );
 		DPRegion frame = textEntryStyle.region( line );
-		DPBorder outerElement = textEntryStyle.border( PrimitiveStyleSheet.instance.vbox( Arrays.asList( new DPElement[] { frame } ) ) );
+		DPBorder outerElement = textEntryStyle.border( PrimitiveStyleSheet.instance.vbox( new DPElement[] { frame } ) );
 		return new TextEntry( outerElement, frame, textElement, listener );
 	}
 
@@ -482,9 +481,9 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		PrimitiveStyleSheet textEntryStyle = getTextEntryStyleSheet();
 		DPText textElement = textEntryStyle.text( text );
-		DPElement line = textEntryStyle.hbox( Arrays.asList( new DPElement[] { textEntryStyle.segment( false, false, textElement ) } ) );
+		DPElement line = textEntryStyle.hbox( new DPElement[] { textEntryStyle.segment( false, false, textElement ) } );
 		DPRegion frame = textEntryStyle.region( line );
-		DPBorder outerElement = textEntryStyle.border( PrimitiveStyleSheet.instance.vbox( Arrays.asList( new DPElement[] { frame } ) ) );
+		DPBorder outerElement = textEntryStyle.border( PrimitiveStyleSheet.instance.vbox( new DPElement[] { frame } ) );
 		return new TextEntry( outerElement, frame, textElement, accept, cancel );
 	}
 	
@@ -721,9 +720,9 @@ public class ControlsStyleSheet extends StyleSheet
 		dragBar.addInteractor( new ScrollBarDragBarInteractor( dragBar, ScrollBarDragBarInteractor.Direction.HORIZONTAL, range, scrollBarDragBoxPadding, scrollBarDragBoxRounding,
 				scrollBarDragBoxPainter ) );
 		
-		DPElement element = primitive.withHBoxSpacing( arrowSpacing ).hbox( Arrays.asList( new DPElement[] { leftArrow.pad( arrowPadding, arrowPadding ).alignVCentre(),
+		DPElement element = primitive.withHBoxSpacing( arrowSpacing ).hbox( new DPElement[] { leftArrow.pad( arrowPadding, arrowPadding ).alignVCentre(),
 				dragBar.alignHExpand().alignVCentre(),
-				rightArrow.pad( arrowPadding, arrowPadding ).alignVCentre() } ) );
+				rightArrow.pad( arrowPadding, arrowPadding ).alignVCentre() } );
 		
 		return new ScrollBar( range, element.alignHExpand() );
 	}
@@ -756,9 +755,9 @@ public class ControlsStyleSheet extends StyleSheet
 		dragBar.addInteractor( new ScrollBarDragBarInteractor( dragBar, ScrollBarDragBarInteractor.Direction.VERTICAL, range, scrollBarDragBoxPadding, scrollBarDragBoxRounding,
 				scrollBarDragBoxPainter ) );
 		
-		DPElement element = primitive.withVBoxSpacing( arrowSpacing ).vbox( Arrays.asList( new DPElement[] { upArrow.pad( arrowPadding, arrowPadding ).alignHCentre(),
+		DPElement element = primitive.withVBoxSpacing( arrowSpacing ).vbox( new DPElement[] { upArrow.pad( arrowPadding, arrowPadding ).alignHCentre(),
 				dragBar.alignVExpand().alignHCentre(),
-				downArrow.pad( arrowPadding, arrowPadding ).alignHCentre() } ) );
+				downArrow.pad( arrowPadding, arrowPadding ).alignHCentre() } );
 		
 		return new ScrollBar( range, element.alignVExpand() );
 	}
@@ -774,9 +773,9 @@ public class ControlsStyleSheet extends StyleSheet
 		DPViewport viewport = primitive.viewport( child, minWidth, minHeight, xRange, yRange, state );
 		ScrollBar xScroll = horizontalScrollBar( xRange );
 		ScrollBar yScroll = verticalScrollBar( yRange );
-		DPElement hbox0 = primitive.hbox( Arrays.asList( new DPElement[] { viewport.alignHExpand().alignVExpand(),  yScroll.getElement().alignVExpand() } ) );
-		DPElement hbox1 = primitive.hbox( Arrays.asList( new DPElement[] { xScroll.getElement().alignHExpand(), primitive.spacer( scrollBarSize, scrollBarSize ) } ) );
-		DPElement vbox = primitive.vbox( Arrays.asList( new DPElement[] { hbox0.alignHExpand().alignVExpand(), hbox1.alignHExpand() } ) );
+		DPElement hbox0 = primitive.hbox( new DPElement[] { viewport.alignHExpand().alignVExpand(),  yScroll.getElement().alignVExpand() } );
+		DPElement hbox1 = primitive.hbox( new DPElement[] { xScroll.getElement().alignHExpand(), primitive.spacer( scrollBarSize, scrollBarSize ) } );
+		DPElement vbox = primitive.vbox( new DPElement[] { hbox0.alignHExpand().alignVExpand(), hbox1.alignHExpand() } );
 		return new ScrolledViewport( viewport, vbox, xScroll, yScroll, xRange, yRange );
 	}
 }

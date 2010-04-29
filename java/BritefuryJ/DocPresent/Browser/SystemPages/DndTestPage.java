@@ -9,7 +9,6 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPProxy;
@@ -143,16 +142,16 @@ public class DndTestPage extends SystemPage
 		{
 			textElements.add( makeTextSource( texts.substring( i, i+1 ) ) );
 		}
-		DPElement textSection = styleSheet.withHBoxSpacing( 3.0 ).hbox( textElements );
+		DPElement textSection = styleSheet.withHBoxSpacing( 3.0 ).hbox( textElements.toArray( new DPElement[0] ) );
 		
 		DPElement mathTitle = paletteSectionStyle.staticText( "Math:" );
 		ArrayList<DPElement> mathElements = new ArrayList<DPElement>();
 		mathElements.add( mathTitle.padX( 0.0, 20.0 ) );
 		mathElements.add( makeFractionSource() );
 		mathElements.add( makeScriptSource() );
-		DPElement mathSection = styleSheet.withHBoxSpacing( 3.0 ).hbox( mathElements );
+		DPElement mathSection = styleSheet.withHBoxSpacing( 3.0 ).hbox( mathElements.toArray( new DPElement[0] ) );
 		
-		DPElement vbox = styleSheet.withVBoxSpacing( 10.0 ).vbox( Arrays.asList( new DPElement[] { title, textSection, mathSection } ) );
+		DPElement vbox = styleSheet.withVBoxSpacing( 10.0 ).vbox( new DPElement[] { title, textSection, mathSection } );
 		
 		return outlineStyle.border( vbox.alignHExpand() ).alignHExpand().pad( 20.0, 5.0 ).alignHExpand();
 	}
@@ -161,9 +160,9 @@ public class DndTestPage extends SystemPage
 	{
 		DPElement title = paletteTitleStyle.staticText( "Formula" ).alignHCentre();
 		DPElement formula = makePlaceHolder();
-		DPElement formulaPara = styleSheet.paragraph( Arrays.asList( new DPElement[] { formula } ) );
+		DPElement formulaPara = styleSheet.paragraph( new DPElement[] { formula } );
 		
-		DPElement vbox = styleSheet.withVBoxSpacing( 10.0 ).vbox( Arrays.asList( new DPElement[] { title, formulaPara } ) ).alignHExpand();
+		DPElement vbox = styleSheet.withVBoxSpacing( 10.0 ).vbox( new DPElement[] { title, formulaPara } ).alignHExpand();
 		
 		return vbox.pad( 20.0, 5.0 );
 	}
@@ -175,6 +174,6 @@ public class DndTestPage extends SystemPage
 		DPElement palette = makePalette();
 		DPElement formula = makeFormula();
 		
-		return styleSheet.withVBoxSpacing( 20.0 ).vbox( Arrays.asList( new DPElement[] { palette.alignHExpand(), formula.alignHExpand() } ) ).alignHExpand();
+		return styleSheet.withVBoxSpacing( 20.0 ).vbox( new DPElement[] { palette.alignHExpand(), formula.alignHExpand() } ).alignHExpand();
 	}
 }

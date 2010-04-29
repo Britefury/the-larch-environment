@@ -7,11 +7,10 @@
 package BritefuryJ.DocPresent.ListView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
@@ -80,7 +79,7 @@ public class VerticalListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 	{
 		if ( separator != null )
 		{
-			return basicStyle.paragraph( Arrays.asList( new DPElement[] { child, separator.createElement( basicStyle, index, child ) } ) );
+			return basicStyle.paragraph( new DPElement[] { child, separator.createElement( basicStyle, index, child ) } );
 		}
 		else
 		{
@@ -113,7 +112,7 @@ public class VerticalListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 			}
 		}
 
-		DPVBox vbox = primitiveStyle.vbox( childElems );
+		DPVBox vbox = primitiveStyle.vbox( childElems.toArray( new DPElement[0] ) );
 		DPElement indented = vbox.padX( params.indentation, 0.0 );
 		
 		
@@ -134,7 +133,7 @@ public class VerticalListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 				outerChildElems.add(  endDelim.createElement( primitiveStyle ) );
 			}
 			
-			return primitiveStyle.vbox( outerChildElems, 0 );
+			return primitiveStyle.vbox( outerChildElems.toArray( new DPElement[0] ), 0 );
 		}
 		else
 		{

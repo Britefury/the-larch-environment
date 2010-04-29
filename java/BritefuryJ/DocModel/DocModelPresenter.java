@@ -9,7 +9,6 @@ package BritefuryJ.DocModel;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.AttributeTable;
@@ -176,11 +175,11 @@ public class DocModelPresenter
 		DPElement className;
 		if ( mode == ObjectPresentMode.HORIZONTAL )
 		{
-			className = defaultStyle.span( Arrays.asList( new DPElement[] { classNameStyle.staticText( cls.getName() ), stringStyle.staticText( " " ), punctuationStyle.staticText( ":" ) } ) );
+			className = defaultStyle.span( new DPElement[] { classNameStyle.staticText( cls.getName() ), stringStyle.staticText( " " ), punctuationStyle.staticText( ":" ) } );
 		}
 		else if ( mode == ObjectPresentMode.VERTICALINLINE )
 		{
-			className = defaultStyle.paragraph( Arrays.asList( new DPElement[] { classNameStyle.staticText( cls.getName() ), stringStyle.staticText( " " ), punctuationStyle.staticText( ":" ) } ) );
+			className = defaultStyle.paragraph( new DPElement[] { classNameStyle.staticText( cls.getName() ), stringStyle.staticText( " " ), punctuationStyle.staticText( ":" ) } );
 		}
 		else
 		{
@@ -199,11 +198,11 @@ public class DocModelPresenter
 				DPElement line;
 				if ( mode == ObjectPresentMode.HORIZONTAL )
 				{
-					line = defaultStyle.span( Arrays.asList( new DPElement[] { fieldNameStyle.staticText( fieldName ), punctuationStyle.staticText( "=" ), present( value, ctx, styleSheet, state ) } ) );
+					line = defaultStyle.span( new DPElement[] { fieldNameStyle.staticText( fieldName ), punctuationStyle.staticText( "=" ), present( value, ctx, styleSheet, state ) } );
 				}
 				else if ( mode == ObjectPresentMode.VERTICALINLINE )
 				{
-					line = defaultStyle.paragraph( Arrays.asList( new DPElement[] { fieldNameStyle.staticText( fieldName ), punctuationStyle.staticText( "=" ), present( value, ctx, styleSheet, state ) } ) );
+					line = defaultStyle.paragraph( new DPElement[] { fieldNameStyle.staticText( fieldName ), punctuationStyle.staticText( "=" ), present( value, ctx, styleSheet, state ) } );
 				}
 				else
 				{

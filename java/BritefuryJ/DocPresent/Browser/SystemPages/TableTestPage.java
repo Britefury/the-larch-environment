@@ -99,6 +99,6 @@ public class TableTestPage extends SystemPage
 		children.add( sectionStyle.border( makeTable2() ) );
 		children.add( sectionStyle.border( makeTable3() ) );
 		
-		return styleSheet.withVBoxSpacing( 20.0 ).vbox( children );
+		return styleSheet.withVBoxSpacing( 20.0 ).vbox( children.toArray( new DPElement[0] ) );
 	}
 }

@@ -7,10 +7,9 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
-import java.util.Arrays;
 
-import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class TextTestPage extends SystemPage
@@ -47,6 +46,6 @@ public class TextTestPage extends SystemPage
 		DPText t2 = redUnderlineStyle.text( "Normal text with squiggle-underline; with characters that go above and below the basline." );
 		DPText t3 = hoverStyle.text( "Text with colour that is affected by pointer hover." );
 		
-		return styleSheet.vbox( Arrays.asList( new DPElement[] { t0, t1, t2, t3 } ) );
+		return styleSheet.vbox( new DPElement[] { t0, t1, t2, t3 } );
 	}
 }

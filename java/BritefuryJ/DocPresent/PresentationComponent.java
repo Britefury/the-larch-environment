@@ -58,7 +58,7 @@ import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Selection.SelectionListener;
 import BritefuryJ.DocPresent.Selection.SelectionManager;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.GSym.DefaultPerspective.DefaultPerspectiveStyleSheet;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Logging.LogEntry;
@@ -105,7 +105,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			return "Presentation typesetting performance";
 		}
 		
-		public DPElement createLogEntryPresentationContent(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+		public DPElement createLogEntryPresentationContent(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
 			return PrimitiveStyleSheet.instance.staticText( "Typesetting time: " + typesetTime );
 		}
@@ -620,7 +620,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				long t2 = System.nanoTime();
 				double typesetTime = (double)(t2-t1) * 1.0e-9;
 				System.out.println( "DPPresentationArea.performAllocation(): TYPESET TIME = " + typesetTime  +  ", used memory = "  + ( Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() ) );
-				if ( log != null )
+				if ( log != null  &&  log.isRecording() )
 				{
 					log.log( new TypesettingPerformanceLogEntry( typesetTime ) );
 				}

@@ -156,11 +156,11 @@ public class SpanListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 		
 		if ( params.bAddLineBreakCost )
 		{
-			return primitiveStyle.lineBreakCostSpan( childElems );
+			return primitiveStyle.lineBreakCostSpan( childElems.toArray( new DPElement[0] ) );
 		}
 		else
 		{
-			return primitiveStyle.span( childElems );
+			return primitiveStyle.span( childElems.toArray( new DPElement[0] ) );
 		}
 	}
 }

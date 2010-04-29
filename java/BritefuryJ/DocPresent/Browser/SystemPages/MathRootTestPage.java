@@ -50,6 +50,6 @@ public class MathRootTestPage extends SystemPage
 		children.add( rootStyleSheet.mathRoot( textStyleSheet.staticText( "a+p" ) ) );
 		children.add( rootStyleSheet.mathRoot( makeFraction( "a", "p+q" ) ) );
 		
-		return styleSheet.vbox( children );
+		return styleSheet.vbox( children.toArray( new DPElement[0] ) );
 	}
 }
