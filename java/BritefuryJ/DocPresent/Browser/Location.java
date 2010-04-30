@@ -7,13 +7,11 @@
 package BritefuryJ.DocPresent.Browser;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.GSym.DefaultPerspective.DefaultPerspectiveStyleSheet;
 import BritefuryJ.GSym.ObjectView.Presentable;
@@ -204,11 +202,7 @@ public class Location implements Presentable
 
 	public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
-		DPElement label = labelStyle.staticText( "Location" );
-		
-		DPElement locLabel = PrimitiveStyleSheet.instance.staticText( locationString );
-		
-		return borderStyle.border( PrimitiveStyleSheet.instance.vbox( new DPElement[] { label, locLabel.padX( 5.0, 0.0 ) } ) );
+		return locationStyle.objectBox( "Location", PrimitiveStyleSheet.instance.staticText( locationString ) );
 	}
 	
 	
@@ -218,6 +212,5 @@ public class Location implements Presentable
 	}
 
 
-	private static PrimitiveStyleSheet labelStyle = PrimitiveStyleSheet.instance.withFont( new Font( "Sans serif", Font.PLAIN, 10 ) ).withForeground( new Color( 0.4f, 0.65f, 0.4f ) ).withTextSmallCaps( true );
-	private static PrimitiveStyleSheet borderStyle = PrimitiveStyleSheet.instance.withBorder( new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.4f, 0.65f, 0.4f ), null ) ); 
+	private static final DefaultPerspectiveStyleSheet locationStyle = DefaultPerspectiveStyleSheet.instance.withObjectBorderPaint( new Color( 0.4f, 0.65f, 0.4f ) ); 
 }

@@ -9,7 +9,6 @@ package BritefuryJ.DocPresent.Controls;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.geom.AffineTransform;
@@ -49,7 +48,8 @@ import BritefuryJ.Math.Vector2;
 
 public class ControlsStyleSheet extends StyleSheet
 {
-	private static final Font defaultLinkFont = new Font( "Sans serif", Font.PLAIN, 14 );
+	private static final String defaultLinkFontFace = "Sans serif";
+	private static final int defaultLinkFontSize = 14;
 	private static final Cursor defaultLinkCursor = new Cursor( Cursor.HAND_CURSOR );
 	private static final Painter defaultScrollBarArrowPainter = new FilledOutlinePainter( new Color( 0.7f, 0.85f, 1.0f ), new Color( 0.0f, 0.5f, 1.0f ), new BasicStroke( 1.0f ) );
 	private static final Painter defaultScrollBarDragBackgroundPainter = new FilledOutlinePainter( new Color( 0.9f, 0.9f, 0.9f ), new Color( 0.75f, 0.75f, 0.75f ), new BasicStroke( 1.0f ) );
@@ -80,7 +80,8 @@ public class ControlsStyleSheet extends StyleSheet
 		
 		initAttr( "primitiveStyleSheet", PrimitiveStyleSheet.instance );
 
-		initAttr( "linkAttrs", new AttributeValues( new String[] { "editable", "font", "foreground", "hoverForeground", "cursor" }, new Object[] { false, defaultLinkFont, Color.blue, Color.red, defaultLinkCursor } ) );
+		initAttr( "linkAttrs", new AttributeValues( new String[] { "editable", "fontFace", "fontSize", "foreground", "hoverForeground", "cursor" },
+				new Object[] { false, defaultLinkFontFace, defaultLinkFontSize, Color.blue, Color.red, defaultLinkCursor } ) );
 		
 		initAttr( "buttonBorderThickness", 1.0 );
 		initAttr( "buttonMargin", 3.0 );

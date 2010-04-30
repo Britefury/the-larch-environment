@@ -7,7 +7,6 @@
 package BritefuryJ.GSym.DefaultPerspective;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -320,7 +319,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 	private static DPElement presentJavaObject(Object x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
 		DPElement className = javaObjectClassNameStyle.staticText( x.getClass().getName() );
-		DPElement asString = asStringStyle.text( x.toString() );
+		DPElement asString = asStringStyle.staticText( x.toString() );
 		return javaObjectBorderStyle.border( javaObjectBorderStyle.vbox( new DPElement[] { className, asString.padX( 10.0 ) } ) );
 	}
 	
@@ -590,7 +589,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 	
 	
 	private static final PrimitiveStyleSheet punctuationStyle = PrimitiveStyleSheet.instance.withForeground( Color.blue );
-	private static final PrimitiveStyleSheet delimStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.1f, 0.3f, 0.4f ) ).withFont( new Font( "Sans serif", Font.BOLD, 14 ) );
+	private static final PrimitiveStyleSheet delimStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.1f, 0.3f, 0.4f ) ).withFontBold( true ).withFontSize( 14 );
 	private static final PrimitiveStyleSheet charStyle = PrimitiveStyleSheet.instance; 
 	private static final PrimitiveStyleSheet multiLineStringStyle = PrimitiveStyleSheet.instance.withBackground( new FillPainter( new Color( 0.8f, 0.8f, 1.0f ) ) );
 	private static final PrimitiveStyleSheet integerStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.5f, 0.0f, 0.5f ) );
@@ -598,8 +597,8 @@ public class GSymDefaultPerspective implements GSymPerspective
 	private static final PrimitiveStyleSheet booleanStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.0f, 0.5f, 0.0f ) ).withTextSmallCaps( true );
 	
 	private static final PrimitiveStyleSheet javaObjectBorderStyle = PrimitiveStyleSheet.instance.withBorder( new SolidBorder( 2.0, 2.0, 5.0, 5.0, new Color( 63, 70, 95 ), null ) );
-	private static final PrimitiveStyleSheet javaObjectClassNameStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 63, 70, 95 ) ).withFont( new Font( "Sans serif", Font.BOLD, 12 ) );
-	private static final PrimitiveStyleSheet asStringStyle = PrimitiveStyleSheet.instance.withFont( new Font( "Sans serif", Font.ITALIC, 14 ) );
+	private static final PrimitiveStyleSheet javaObjectClassNameStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 63, 70, 95 ) ).withFontBold( true ).withFontSize( 12 );
+	private static final PrimitiveStyleSheet asStringStyle = PrimitiveStyleSheet.instance.withFontItalic( true ).withFontSize( 14 );
 
 
 	private static final SeparatorElementFactory commaFactory = new SeparatorElementFactory()

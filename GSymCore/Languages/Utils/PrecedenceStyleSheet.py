@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2010.
 ##-*************************
-from java.awt import Font, Color
+from java.awt import Color
 
 from Britefury.Kernel.Abstract import abstractmethod
 

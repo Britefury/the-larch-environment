@@ -14,7 +14,7 @@ from java.lang import Runnable
 from javax.swing import AbstractAction, Action, TransferHandler, KeyStroke, BoxLayout, BorderFactory
 from javax.swing import JComponent, JFrame, JMenuItem, JMenu, JMenuBar, JMenuItem, JPopupMenu, JOptionPane, JFileChooser, JOptionPane, JTextField, JLabel, JPanel
 from javax.swing.filechooser import FileNameExtensionFilter
-from java.awt import Dimension, Font, Color, KeyboardFocusManager
+from java.awt import Dimension, Color, KeyboardFocusManager
 from java.awt.event import WindowListener, ActionListener, ActionEvent, KeyEvent
 from java.beans import PropertyChangeListener
 

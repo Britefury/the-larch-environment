@@ -21,6 +21,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.ElementInteractor;
+import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Clipboard.DataTransfer;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
@@ -228,6 +229,21 @@ public class TextEntry extends Control
 	public void setText(String text)
 	{
 		textElement.setText( text );
+	}
+	
+	
+	public void selectAll()
+	{
+		PresentationComponent.RootElement root = textElement.getRootElement();
+		if ( root != null )
+		{
+			Selection selection = root.getSelection();
+			selection.setSelection( textElement.markerAtStart(), textElement.markerAtEnd() );
+		}
+		else
+		{
+			throw new RuntimeException( "Could not get root element - text element is not realised" );
+		}
 	}
 	
 	

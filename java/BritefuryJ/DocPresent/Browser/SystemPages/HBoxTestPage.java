@@ -7,7 +7,6 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPElement;
@@ -39,7 +38,7 @@ public class HBoxTestPage extends SystemPage
 	
 	protected DPElement makeText(String text, int size)
 	{
-		PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance.withFont( new Font( "Sans serif", Font.BOLD, size ) );
+		PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance.withFontBold( true ).withFontSize( size );
 		return outlineStyleSheet.border( styleSheet.staticText( text ) );
 	}
 	

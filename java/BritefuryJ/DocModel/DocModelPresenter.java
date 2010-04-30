@@ -7,7 +7,6 @@
 package BritefuryJ.DocModel;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,18 +34,18 @@ public class DocModelPresenter
 	}
 
 
-	private static final PrimitiveStyleSheet defaultStyle = PrimitiveStyleSheet.instance.withFont( new Font( "SansSerif", Font.PLAIN, 14 ) ).withForeground( Color.black ).withParagraphIndentation( 60.0 );
+	private static final PrimitiveStyleSheet defaultStyle = PrimitiveStyleSheet.instance.withFontFace( "Sans serif" ).withFontSize( 14 ).withForeground( Color.black ).withParagraphIndentation( 60.0 );
 
-	private static final PrimitiveStyleSheet nullStyle = defaultStyle.withFont( new Font( "SansSerif", Font.ITALIC, 14 ) ).withForeground( new Color( 0.5f, 0.0f, 0.25f ) );
+	private static final PrimitiveStyleSheet nullStyle = defaultStyle.withFontItalic( true ).withForeground( new Color( 0.5f, 0.0f, 0.25f ) );
 
 	private static final DefaultPerspectiveStyleSheet stringStyle = DefaultPerspectiveStyleSheet.instance.withPrimitiveStyleSheet( defaultStyle ).withStringContentAttrs(
 			new AttributeValues( new String[] { "foreground" }, new Object[] { new Color( 0.5f, 0.0f, 0.25f ) } ) );
 	
 	private static final PrimitiveStyleSheet punctuationStyle = defaultStyle.withForeground( new Color( 0.0f, 0.0f, 1.0f ) );
 
-	private static final PrimitiveStyleSheet classNameStyle = defaultStyle.withFont( new Font( "SansSerif", Font.PLAIN, 14 ) ).withForeground( new Color( 0.0f, 0.5f, 0.0f ) );
+	private static final PrimitiveStyleSheet classNameStyle = defaultStyle.withForeground( new Color( 0.0f, 0.5f, 0.0f ) );
 
-	private static final PrimitiveStyleSheet fieldNameStyle = defaultStyle.withFont( new Font( "SansSerif", Font.PLAIN, 14 ) ).withForeground( new Color( 0.5f, 0.0f, 0.5f ) );
+	private static final PrimitiveStyleSheet fieldNameStyle = defaultStyle.withForeground( new Color( 0.5f, 0.0f, 0.5f ) );
 
 	
 	

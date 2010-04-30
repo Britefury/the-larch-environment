@@ -7,7 +7,6 @@
 package BritefuryJ.Parser.DebugParseResultView;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -113,12 +112,12 @@ public class NodeView implements FragmentContext
 	
 	static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
 
-	static PrimitiveStyleSheet debugNameStyle = styleSheet.withFont( new Font( "Sans serif", Font.BOLD, 24 ) ).withForeground( Color.blue );
-	static PrimitiveStyleSheet classNameStyle = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 18 ) ).withForeground( new Color( 0.0f, 0.0f, 0.5f ) );
-	static PrimitiveStyleSheet rangeStyle = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 12 ) );
-	static PrimitiveStyleSheet inputStyle = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 12 ) );
-	static PrimitiveStyleSheet valueStyle = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 16 ) );
-	static PrimitiveStyleSheet failStyle = styleSheet.withFont( new Font( "Sans serif", Font.ITALIC, 16 ) ).withForeground( new Color( 0.5f, 0.0f, 0.0f ) );;
+	static PrimitiveStyleSheet debugNameStyle = styleSheet.withFontBold( true ).withFontSize( 24 ).withForeground( Color.blue );
+	static PrimitiveStyleSheet classNameStyle = styleSheet.withFontSize( 18 ).withForeground( new Color( 0.0f, 0.0f, 0.5f ) );
+	static PrimitiveStyleSheet rangeStyle = styleSheet.withFontSize( 12 );
+	static PrimitiveStyleSheet inputStyle = styleSheet.withFontSize( 12 );
+	static PrimitiveStyleSheet valueStyle = styleSheet.withFontSize( 16 );
+	static PrimitiveStyleSheet failStyle = styleSheet.withFontItalic( true ).withFontSize( 16 ).withForeground( new Color( 0.5f, 0.0f, 0.0f ) );;
 	
 	static Border titleSuccessBorder = new FilledBorder( 0.0, 0.0, 0.0, 0.0, new Color( 0.85f, 0.95f, 0.85f ) );
 	static Border titleFailBorder = new FilledBorder( 0.0, 0.0, 0.0, 0.0, new Color( 1.0f, 0.85f, 0.85f ) );

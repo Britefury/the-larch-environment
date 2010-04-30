@@ -39,7 +39,7 @@ public class SelectionManager
 					initialMarkerCaret = prevPos.copy();
 				}
 				
-				selection.setRegion( initialMarkerCaret, c.getMarker().copy() );
+				selection.setSelection( initialMarkerCaret, c.getMarker().copy() );
 			}
 		}
 	}
@@ -62,7 +62,7 @@ public class SelectionManager
 	{
 		if ( bMouseDragInProgress )
 		{
-			selection.setRegion( initialMarkerMouse, pos.copy() );
+			selection.setSelection( initialMarkerMouse, pos.copy() );
 		}
 	}
 	

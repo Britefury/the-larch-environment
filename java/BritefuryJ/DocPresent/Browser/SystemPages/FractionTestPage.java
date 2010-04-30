@@ -7,7 +7,6 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPElement;
@@ -17,8 +16,8 @@ public class FractionTestPage extends SystemPage
 {
 	private static final PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
 	private static final PrimitiveStyleSheet fractionStyle = styleSheet.withForeground( Color.black ).withHoverForeground( new Color( 0.0f, 0.5f, 0.5f ) );
-	private static final PrimitiveStyleSheet smallStyle = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 10 ) ).withForeground( new Color( 0.0f, 0.5f, 0.0f) );
-	private static final PrimitiveStyleSheet largeStyle = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 24 ) ).withForeground( new Color( 0.0f, 0.5f, 0.0f) );
+	private static final PrimitiveStyleSheet smallStyle = styleSheet.withFontSize( 10 ).withForeground( new Color( 0.0f, 0.5f, 0.0f) );
+	private static final PrimitiveStyleSheet largeStyle = styleSheet.withFontSize( 24 ).withForeground( new Color( 0.0f, 0.5f, 0.0f) );
 	
 	
 	protected FractionTestPage()
@@ -57,7 +56,7 @@ public class FractionTestPage extends SystemPage
 		lines.add( makeFractionLine( styleSheet.text( "a+b" ), styleSheet.text( "p" ) ) );
 		lines.add( makeFractionLine( styleSheet.text( "a+b" ), styleSheet.text( "p+q" ) ) );
 
-		lines.add( styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 24 ) ).text( "---" ) );
+		lines.add( styleSheet.withFontSize( 24 ).text( "---" ) );
 		
 		lines.add( makeFractionLine( span( styleSheet.text( "a+" ), fractionStyle.fraction( styleSheet.text( "x" ), styleSheet.text( "y" ), "/" ) ),
 				styleSheet.text( "p+q" ) ) );

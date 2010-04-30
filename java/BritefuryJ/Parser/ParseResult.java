@@ -7,7 +7,6 @@
 package BritefuryJ.Parser;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -272,8 +271,8 @@ public class ParseResult implements ParseResultInterface, Presentable
 	}
 
 
-	private static PrimitiveStyleSheet successStyle = PrimitiveStyleSheet.instance.withFont( new Font( "Sans serif", Font.ITALIC, 12 ) ).withForeground( new Color( 0.0f, 0.5f, 0.0f ) );
-	private static PrimitiveStyleSheet failStyle = PrimitiveStyleSheet.instance.withFont( new Font( "Sans serif", Font.ITALIC, 12 ) ).withForeground( new Color( 0.5f, 0.0f, 0.0f ) );
-	private static PrimitiveStyleSheet rangeStyle = PrimitiveStyleSheet.instance.withFont( new Font( "Sans serif", Font.PLAIN, 12 ) ).withForeground( new Color( 0.0f, 0.5f, 0.5f ) );
+	private static PrimitiveStyleSheet successStyle = PrimitiveStyleSheet.instance.withFontItalic( true ).withFontSize( 12 ).withForeground( new Color( 0.0f, 0.5f, 0.0f ) );
+	private static PrimitiveStyleSheet failStyle = PrimitiveStyleSheet.instance.withFontItalic( true ).withFontSize( 12 ).withForeground( new Color( 0.5f, 0.0f, 0.0f ) );
+	private static PrimitiveStyleSheet rangeStyle = PrimitiveStyleSheet.instance.withFontSize( 12 ).withForeground( new Color( 0.0f, 0.5f, 0.5f ) );
 	private static DefaultPerspectiveStyleSheet parseResultStyle = DefaultPerspectiveStyleSheet.instance.withObjectTitlePaint( new Color( 0.4f, 0.4f, 0.4f ) ).withObjectBorderPaint( new Color( 0.6f, 0.6f, 0.6f ) );
 }

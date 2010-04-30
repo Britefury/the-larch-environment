@@ -7,7 +7,6 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPElement;
@@ -60,7 +59,7 @@ public class ViewportTestPage extends SystemPage
 	protected DPElement createContents()
 	{
 		PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-		PrimitiveStyleSheet blackText = PrimitiveStyleSheet.instance.withFont( new Font( "Sans serif", Font.PLAIN, 12 ) ).withForeground( Color.black );
+		PrimitiveStyleSheet blackText = PrimitiveStyleSheet.instance.withFontSize( 12 ).withForeground( Color.black );
 		
 		PrimitiveStyleSheet borderStyle = PrimitiveStyleSheet.instance.withBorder( new SolidBorder( 2.0, 2.0, 5.0, 5.0, Color.black, null ) );
 		

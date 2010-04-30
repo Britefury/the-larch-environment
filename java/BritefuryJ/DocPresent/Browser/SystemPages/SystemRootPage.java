@@ -7,12 +7,11 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Browser.Location;
@@ -51,7 +50,7 @@ public class SystemRootPage extends Page
 	
 	public DPElement getContentsElement()
 	{
-		DPElement title = styleSheet.withFont( new Font( "Serif", Font.BOLD, 32 ) ).withTextSmallCaps( true ).staticText( "GSym System Page" );
+		DPElement title = styleSheet.withFontFace( "Serif" ).withFontBold( true ).withFontSize( 32 ).withTextSmallCaps( true ).staticText( "GSym System Page" );
 		
 		ArrayList<DPElement> headChildren = new ArrayList<DPElement>();
 		headChildren.add( createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE ) );
@@ -70,7 +69,7 @@ public class SystemRootPage extends Page
 	{
 		ArrayList<DPElement> testBoxChildren = new ArrayList<DPElement>();
 		
-		DPElement titleElement = styleSheet.withFont( new Font( "Serif", Font.BOLD, 18 ) ).staticText( title ).pad( 30.0, 30.0, 5.0, 15.0 );
+		DPElement titleElement = styleSheet.withFontFace( "Serif" ).withFontBold( true ).withFontSize( 18 ).staticText( title ).pad( 30.0, 30.0, 5.0, 15.0 );
 		testBoxChildren.add( titleElement );
 		
 		for (SystemPage page: pages)
@@ -83,7 +82,7 @@ public class SystemRootPage extends Page
 	
 	protected DPElement createContents()
 	{
-		DPElement titleElement = styleSheet.withFont( new Font( "Serif", Font.BOLD, 24 ) ).staticText( "Tests:" ).pad( 0.0, 5.0 ).alignHCentre();
+		DPElement titleElement = styleSheet.withFontFace( "Serif" ).withFontBold( true ).withFontSize( 24 ).staticText( "Tests:" ).pad( 0.0, 5.0 ).alignHCentre();
 		
 		ArrayList<DPElement> testBoxes = new ArrayList<DPElement>();
 		testBoxes.add( createTestsBox( "Primitive elements:", SystemDirectory.getPrimitiveTestPages() ).pad( 25.0, 5.0 ) );

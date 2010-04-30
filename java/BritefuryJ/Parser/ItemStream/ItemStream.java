@@ -7,7 +7,6 @@
 package BritefuryJ.Parser.ItemStream;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -442,15 +441,12 @@ public class ItemStream implements Presentable
 	@Override
 	public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
-		DPElement label = labelStyle.staticText( "ITEM STREAM" );
-		
 		List<DPElement> itemViews = ctx.mapPresentFragment( Arrays.asList( (Object[])items ), styleSheet );
 		DPElement contents = PrimitiveStyleSheet.instance.paragraph( itemViews.toArray( new DPElement[0] ) );
 		
-		return borderStyle.border( PrimitiveStyleSheet.instance.vbox( new DPElement[] { label, contents.padX( 5.0, 0.0 ) } ) );
+		return itemStreamStyle.objectBox( "BritefuryJ.Parser.ItemStream.ItemStream", contents );
 	}
 
 
-	private static PrimitiveStyleSheet labelStyle = PrimitiveStyleSheet.instance.withFont( new Font( "Sans serif", Font.PLAIN, 10 ) ).withForeground( new Color( 0.65f, 0.0f, 0.55f ) ); 
-	private static PrimitiveStyleSheet borderStyle = PrimitiveStyleSheet.instance.withBorder( new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.65f, 0.0f, 0.55f ), null ) ); 
+	private static final DefaultPerspectiveStyleSheet itemStreamStyle = DefaultPerspectiveStyleSheet.instance.withObjectBorderPaint( new Color( 0.65f, 0.0f, 0.55f ) );
 }

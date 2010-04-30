@@ -7,11 +7,10 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.DPTable;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPTable;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
@@ -34,8 +33,8 @@ public class TableTestPage extends SystemPage
 	}
 
 	private static final PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-	private static PrimitiveStyleSheet t12 = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 12 ) );
-	private static PrimitiveStyleSheet t18 = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 18 ) );
+	private static PrimitiveStyleSheet t12 = styleSheet.withFontSize( 12 );
+	private static PrimitiveStyleSheet t18 = styleSheet.withFontSize( 18 );
 	private static PrimitiveStyleSheet sectionStyle = styleSheet.withVBoxSpacing( 5.0 ).withBorder( new SolidBorder( 2.0, 3.0, new Color( 0.0f, 0.3f, 0.7f ), new Color( 0.95f, 0.975f, 1.0f  ) ) );
 	private static PrimitiveStyleSheet outlineStyle = styleSheet.withBorder( new SolidBorder( 1.0, 0.0, new Color( 0.5f, 0.5f, 0.5f ), new Color( 0.9f, 0.9f, 0.9f ) ) );
 	private static PrimitiveStyleSheet tableStyle = styleSheet.withTableColumnSpacing( 5.0 ).withTableRowSpacing( 5.0 );

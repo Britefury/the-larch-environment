@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.DocPresent.Browser;
 
-import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -94,9 +93,9 @@ public class BrowserContext
 		
 		public DPElement getContentsElement()
 		{
-			DPText title = styleSheet.withFont( new Font( "Serif", Font.BOLD, 32 ) ).withTextSmallCaps( true ).staticText( "Default Root Page" );
+			DPText title = styleSheet.withFontFace( "Serif" ).withFontBold( true ).withFontSize( 32 ).withTextSmallCaps( true ).staticText( "Default Root Page" );
 			
-			DPText contents = styleSheet.withFont( new Font( "SansSerif", Font.PLAIN, 16 ) ).staticText( "Empty document" );
+			DPText contents = styleSheet.withFontSize( 16 ).staticText( "Empty document" );
 			DPVBox contentBox = styleSheet.withVBoxSpacing( 40.0 ).vbox( new DPElement[] { title.alignHCentre(), contents.alignHExpand() } );
 
 			DPVBox pageBox = styleSheet.vbox( new DPElement[] { SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_SYSTEMPAGE ),  contentBox.alignHExpand() } );
@@ -124,10 +123,10 @@ public class BrowserContext
 
 		public DPElement getContentsElement()
 		{
-			DPText title = styleSheet.withFont( new Font( "Serif", Font.BOLD, 32 ) ).withTextSmallCaps( true ).staticText( "Could Not Resolve Location" );
+			DPText title = styleSheet.withFontFace( "Serif" ).withFontBold( true ).withFontSize( 32 ).withTextSmallCaps( true ).staticText( "Could Not Resolve Location" );
 			
-			DPText loc = styleSheet.withFont( new Font( "SansSerif", Font.PLAIN, 16 ) ).staticText( location );
-			DPText error = styleSheet.withFont( new Font( "SansSerif", Font.PLAIN, 16 ) ).staticText( "could not be resolved" );
+			DPText loc = styleSheet.withFontSize( 16 ).staticText( location );
+			DPText error = styleSheet.withFontSize( 16 ).staticText( "could not be resolved" );
 			DPVBox errorBox = styleSheet.withVBoxSpacing( 10.0 ).vbox( new DPElement[] { loc.alignHCentre(), error.alignHCentre() } );
 			
 			DPVBox pageBox = styleSheet.withVBoxSpacing( 40.0 ).vbox( new DPElement[] { SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE ),

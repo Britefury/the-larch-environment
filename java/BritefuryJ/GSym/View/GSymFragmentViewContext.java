@@ -7,7 +7,6 @@
 package BritefuryJ.GSym.View;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,8 +65,8 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 	private ObjectDndHandler.DragSource fragmentDragSource = new ObjectDndHandler.DragSource( FragmentDocNode.class, ObjectDndHandler.ASPECT_DOC_NODE, fragmentDragSourceFn );
 	
 	
-	private static final PrimitiveStyleSheet viewError_textStyle = PrimitiveStyleSheet.instance.withFont( new Font( "SansSerif", Font.BOLD, 12 ) ).withForeground( new Color( 0.8f, 0.0f, 0.0f ) );
-	private static final PrimitiveStyleSheet viewNull_textStyle = PrimitiveStyleSheet.instance.withFont( new Font( "SansSerif", Font.ITALIC | Font.BOLD, 12 ) ).withForeground( new Color( 0.8f, 0.0f, 0.4f ) );
+	private static final PrimitiveStyleSheet viewError_textStyle = PrimitiveStyleSheet.instance.withFontBold( true ).withFontSize( 12 ).withForeground( new Color( 0.8f, 0.0f, 0.0f ) );
+	private static final PrimitiveStyleSheet viewNull_textStyle = PrimitiveStyleSheet.instance.withFontItalic( true ).withFontSize( 12 ).withForeground( new Color( 0.8f, 0.0f, 0.4f ) );
 
 	
 

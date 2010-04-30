@@ -51,12 +51,17 @@ class CurrentModuleInteractor (ElementInteractor):
 		
 	def onKeyPress(self, element, event):
 		if event.getKeyCode() == KeyEvent.VK_ENTER:
-			context = element.getFragmentContext()
-			node = context.getDocNode()
-			
 			if event.getModifiers() & KeyEvent.CTRL_MASK  !=  0:
 				bEvaluate = event.getModifiers() & KeyEvent.SHIFT_MASK  ==  0
 				self._terminal.execute( bEvaluate )
+				return True
+		elif event.getKeyCode() == KeyEvent.VK_UP:
+			if event.getModifiers() & KeyEvent.ALT_MASK  !=  0:
+				self._terminal.backwards()
+				return True
+		elif event.getKeyCode() == KeyEvent.VK_DOWN:
+			if event.getModifiers() & KeyEvent.ALT_MASK  !=  0:
+				self._terminal.forwards()
 				return True
 		return False
 	
@@ -85,10 +90,13 @@ class TerminalView (GSymViewObjectDispatch):
 				dropPromptInsertionPoint.setChildren( [] )
 			
 			dropPrompt, textEntry = styleSheet.dropPrompt( _onAccept, _onCancel )
-			caret = element.getRootElement().getCaret()
+			rootElement = element.getRootElement()
+			caret = rootElement.getCaret()
 			marker = caret.getMarker().copy()
 			dropPromptInsertionPoint.setChildren( [ dropPrompt ] )
 			textEntry.grabCaret()
+			textEntry.selectAll()
+			rootElement.grabFocus()
 			
 			return True
 			

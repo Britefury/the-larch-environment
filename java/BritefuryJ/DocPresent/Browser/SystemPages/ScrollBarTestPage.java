@@ -6,8 +6,6 @@
 //##************************
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
-import java.awt.Font;
-
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
 import BritefuryJ.DocPresent.Controls.ScrollBar;
@@ -34,7 +32,7 @@ public class ScrollBarTestPage extends SystemPage
 	
 
 	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-	private static PrimitiveStyleSheet headingStyleSheet = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 18) );
+	private static PrimitiveStyleSheet headingStyleSheet = styleSheet.withFontSize( 18 );
 
 	private static ControlsStyleSheet controlsStyleSheet = ControlsStyleSheet.instance;
 

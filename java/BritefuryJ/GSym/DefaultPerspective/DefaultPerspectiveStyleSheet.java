@@ -7,7 +7,6 @@
 package BritefuryJ.GSym.DefaultPerspective;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Paint;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +25,7 @@ public class DefaultPerspectiveStyleSheet extends StyleSheet
 	private static final double defaultObjectBorderRounding = 1.0;
 	private static final Color defaultObjectBorderPaint = new Color( 0.35f, 0.35f, 0.35f );
 	private static final Color defaultObjectTitlePaint = new Color( 0.35f, 0.35f, 0.35f );
-	private static final AttributeValues defaultObjectTitleAttrs = new AttributeValues( new String[] { "font", "textSmallCaps" }, new Object[] { new Font( "Sans serif", Font.PLAIN, 10 ), true } );
+	private static final AttributeValues defaultObjectTitleAttrs = new AttributeValues( new String[] { "fontFace", "fontSize", "textSmallCaps" }, new Object[] { "Sans serif", 10, true } );
 	private static final double defaultObjectContentPadding = 5.0;
 	private static final Paint defaultObjectFieldTitlePaint = new Color( 0.0f, 0.25f, 0.5f );
 	private static final double defaultObjectFieldIndentation = 5.0;

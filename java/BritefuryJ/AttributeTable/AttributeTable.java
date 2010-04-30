@@ -6,17 +6,25 @@
 //##************************
 package BritefuryJ.AttributeTable;
 
+import java.awt.Color;
 import java.lang.ref.WeakReference;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.python.core.Py;
 import org.python.core.PyObject;
 
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.GSym.DefaultPerspective.DefaultPerspectiveStyleSheet;
+import BritefuryJ.GSym.ObjectView.Presentable;
+import BritefuryJ.GSym.View.GSymFragmentViewContext;
 import BritefuryJ.Utils.HashUtils;
 
-public class AttributeTable
+public class AttributeTable implements Presentable
 {
 	public static class AttributeDoesNotExistException extends RuntimeException
 	{
@@ -339,4 +347,38 @@ public class AttributeTable
 	{
 		System.err.println( "WARNING: attrib table \"" + getClass().getName() + "\": attribute '" + attrName + "' should not have a null value; type='" + expectedType.getName() + "'" );
 	}
+
+
+	
+	
+	protected DPElement presentAttributes(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+	{
+		Set<String> nameSet = values.keySet();
+		String names[] = nameSet.toArray( new String[0] );
+		Arrays.sort( names );
+		DPElement children[][] = new DPElement[names.length+1][];
+		
+		children[0] = new DPElement[] { attrTableStyle.staticText( "Name" ), attrTableStyle.staticText( "Value" ) };
+		for (int i = 0; i < names.length; i++)
+		{
+			String name = names[i];
+			Object value = values.get( name );
+			DPElement valueView = PrimitiveStyleSheet.instance.layoutWrap( ctx.presentFragment( value, styleSheet ) );
+			children[i+1] = new DPElement[] {
+					PrimitiveStyleSheet.instance.staticText( name ), valueView };
+		}
+		
+		return attrTableStyle.table( children );
+	}
+	
+	@Override
+	public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+	{
+		DPElement valueField = styleSheet.verticalObjectField( "Attributes:", presentAttributes( ctx, styleSheet, state ) );
+		return styleSheet.objectBoxWithFields( getClass().getName(), new DPElement[] { valueField } );
+	}
+	
+	
+	private static final PrimitiveStyleSheet attrTableStyle = PrimitiveStyleSheet.instance.withFontBold( true ).withFontSize( 14 ).withForeground(
+			new Color( 0.0f, 0.0f, 0.5f ) ).withTableColumnSpacing( 10.0 );
 }
