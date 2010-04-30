@@ -25,7 +25,7 @@ public class DefaultPerspectiveStyleSheet extends StyleSheet
 	private static final double defaultObjectBorderRounding = 1.0;
 	private static final Color defaultObjectBorderPaint = new Color( 0.35f, 0.35f, 0.35f );
 	private static final Color defaultObjectTitlePaint = new Color( 0.35f, 0.35f, 0.35f );
-	private static final AttributeValues defaultObjectTitleAttrs = new AttributeValues( new String[] { "fontFace", "fontSize", "textSmallCaps" }, new Object[] { "Sans serif", 10, true } );
+	private static final AttributeValues defaultObjectTitleAttrs = new AttributeValues( new String[] { "fontFace", "fontSize" }, new Object[] { "Sans serif", 10 } );
 	private static final double defaultObjectContentPadding = 5.0;
 	private static final Paint defaultObjectFieldTitlePaint = new Color( 0.0f, 0.25f, 0.5f );
 	private static final double defaultObjectFieldIndentation = 5.0;

@@ -272,6 +272,11 @@ public class Marker
 	private static void checkPositionAndBias(DPContentLeafEditable w, int position, Bias bias)
 	{
 		int markerRange = w.getMarkerRange();
+		if ( position < 0 )
+		{
+			throw new InvalidMarkerPosition( "Cannot place marker at " + position + ":" + bias + " - range is " + markerRange );
+		}
+		
 		if ( position > markerRange )
 		{
 			throw new InvalidMarkerPosition( "Cannot place marker at " + position + ":" + bias + " - range is " + markerRange );

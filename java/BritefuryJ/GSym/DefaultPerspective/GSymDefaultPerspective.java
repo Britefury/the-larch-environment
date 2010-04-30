@@ -55,17 +55,17 @@ public class GSymDefaultPerspective implements GSymPerspective
 		{
 			DPElement result;
 			DefaultPerspectiveStyleSheet defaultStyleSheet = null;
+			if ( styleSheet instanceof DefaultPerspectiveStyleSheet )
+			{
+				defaultStyleSheet = (DefaultPerspectiveStyleSheet)styleSheet;
+			}
+			else
+			{
+				defaultStyleSheet = DefaultPerspectiveStyleSheet.instance;
+			}
 			if ( x instanceof Presentable )
 			{
 				Presentable p = (Presentable)x;
-				if ( styleSheet instanceof DefaultPerspectiveStyleSheet )
-				{
-					defaultStyleSheet = (DefaultPerspectiveStyleSheet)styleSheet;
-				}
-				else
-				{
-					defaultStyleSheet = DefaultPerspectiveStyleSheet.instance;
-				}
 				result = p.present( ctx, defaultStyleSheet, state );
 			}
 			else
@@ -313,7 +313,8 @@ public class GSymDefaultPerspective implements GSymPerspective
 		
 		registerObjectPresenter( List.class,  PrimitivePresenter.presenter_List );
 		registerObjectPresenter( BufferedImage.class,  PrimitivePresenter.presenter_BufferedImage );
-}
+		registerObjectPresenter( Color.class,  PrimitivePresenter.presenter_Color );
+	}
 	
 	
 	private static DPElement presentJavaObject(Object x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
@@ -569,6 +570,31 @@ public class GSymDefaultPerspective implements GSymPerspective
 			}
 		};
 
+		public static final ObjectPresenter presenter_Color = new ObjectPresenter()
+		{
+			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+			{
+				Color colour = (Color)x;
+				
+				DPElement title = colourTitleStyle.staticText( "java.awt.Color" );
+				
+				DPElement red = colourRedStyle.staticText( "R=" + String.valueOf( colour.getRed() ) );
+				DPElement green = colourGreenStyle.staticText( "G=" + String.valueOf( colour.getGreen() ) );
+				DPElement blue = colourBlueStyle.staticText( "B=" + String.valueOf( colour.getBlue() ) );
+				DPElement alpha = colourAlphaStyle.staticText( "A=" + String.valueOf( colour.getAlpha() ) );
+				
+				DPElement components = colourBoxStyle.hbox( new DPElement[] { red, green, blue, alpha } );
+				
+				DPElement textBox = PrimitiveStyleSheet.instance.vbox( new DPElement[] { title, components } );
+				
+				DPElement swatch = PrimitiveStyleSheet.instance.withShapePainter( new FillPainter( colour ) ).box( 50.0, 20.0 ).alignVExpand();
+				
+				DPElement contents = colourBoxStyle.hbox( new DPElement[] { textBox, swatch } );
+				
+				return PrimitiveStyleSheet.instance.border( contents );
+			}
+		};
+
 		public static final ObjectPresenter presenter_List = new ObjectPresenter()
 		{
 			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
@@ -595,6 +621,15 @@ public class GSymDefaultPerspective implements GSymPerspective
 	private static final PrimitiveStyleSheet integerStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.5f, 0.0f, 0.5f ) );
 	private static final PrimitiveStyleSheet floatStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.25f, 0.0f, 0.5f ) );
 	private static final PrimitiveStyleSheet booleanStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.0f, 0.5f, 0.0f ) ).withTextSmallCaps( true );
+	
+	
+	private static final PrimitiveStyleSheet colourTitleStyle = PrimitiveStyleSheet.instance.withFontSize( 10 ).withForeground( new Color( 0.0f, 0.1f, 0.4f ) );
+	private static final PrimitiveStyleSheet colourRedStyle = PrimitiveStyleSheet.instance.withFontSize( 12 ).withForeground( new Color( 0.75f, 0.0f, 0.0f ) );
+	private static final PrimitiveStyleSheet colourGreenStyle = PrimitiveStyleSheet.instance.withFontSize( 12 ).withForeground( new Color( 0.0f, 0.75f, 0.0f ) );
+	private static final PrimitiveStyleSheet colourBlueStyle = PrimitiveStyleSheet.instance.withFontSize( 12 ).withForeground( new Color( 0.0f, 0.0f, 0.75f ) );
+	private static final PrimitiveStyleSheet colourAlphaStyle = PrimitiveStyleSheet.instance.withFontSize( 12 ).withForeground( new Color( 0.3f, 0.3f, 0.3f ) );
+	private static final PrimitiveStyleSheet colourBoxStyle = PrimitiveStyleSheet.instance.withHBoxSpacing( 5.0 );
+
 	
 	private static final PrimitiveStyleSheet javaObjectBorderStyle = PrimitiveStyleSheet.instance.withBorder( new SolidBorder( 2.0, 2.0, 5.0, 5.0, new Color( 63, 70, 95 ), null ) );
 	private static final PrimitiveStyleSheet javaObjectClassNameStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 63, 70, 95 ) ).withFontBold( true ).withFontSize( 12 );
