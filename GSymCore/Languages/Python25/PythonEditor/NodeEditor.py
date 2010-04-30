@@ -11,7 +11,7 @@ from java.lang import Object, System
 from java.io import IOException
 from java.util import List
 from java.awt.event import KeyEvent
-from java.awt import Font, Color
+from java.awt import Color
 
 from Britefury.Kernel.Abstract import abstractmethod
 
@@ -53,8 +53,6 @@ from GSymCore.Languages.Python25.PythonEditor.SelectionEditor import SelectionLi
 #
 
 class Python25EditLogEntry (LogEntry):
-	labelStyle = PrimitiveStyleSheet.instance.withFont( Font( "Sans serif", Font.PLAIN, 10 ) ).withForeground( Color( 0.0, 0.0, 0.8 ) )
-
 	def __init__(self, description, editedStream, parser, parsedResult, **kwargs):
 		super( Python25EditLogEntry, self ).__init__( [ 'Py25Edit' ] )
 		self._description = description

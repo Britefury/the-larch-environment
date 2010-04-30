@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
-import java.awt.Font;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPElement;
@@ -42,7 +41,7 @@ public abstract class SystemPage extends Page
 	public DPElement getContentsElement()
 	{
 		
-		DPElement title = styleSheet.withFont( new Font( "Serif", Font.BOLD, 32 ) ).withTextSmallCaps( true ).staticText( "System page: " + getTitle() );
+		DPElement title = styleSheet.withFontFace( "Serif" ).withFontBold( true ).withFontSize( 32 ).withTextSmallCaps( true ).staticText( "System page: " + getTitle() );
 		
 		ArrayList<DPElement> headChildren = new ArrayList<DPElement>();
 		headChildren.add( SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE | SystemRootPage.LINKHEADER_SYSTEMPAGE ) );
@@ -53,7 +52,7 @@ public abstract class SystemPage extends Page
 		String description = getDescription();
 		if ( description != null )
 		{
-			pageChildren.add( createTextParagraph( styleSheet.withFont( new Font( "Sans Serif", Font.PLAIN, 16 ) ), description ) );
+			pageChildren.add( createTextParagraph( styleSheet.withFontSize( 16 ), description ) );
 		}
 		pageChildren.add( createContents().alignHExpand() );
 		

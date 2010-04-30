@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.Logging;
 
-import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,5 +89,5 @@ public class LogView implements Presentable
 
 
 
-	static PrimitiveStyleSheet titleStyle = PrimitiveStyleSheet.instance.withFont( new Font( "Serif", Font.BOLD, 28 ) );
+	static PrimitiveStyleSheet titleStyle = PrimitiveStyleSheet.instance.withFontFace( "Serif" ).withFontBold( true ).withFontSize( 28 );
 }

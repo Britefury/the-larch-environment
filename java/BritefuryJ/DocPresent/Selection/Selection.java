@@ -46,7 +46,7 @@ public class Selection implements MarkerListener
 	}
 	
 	
-	public void setRegion(Marker m0, Marker m1)
+	public void setSelection(Marker m0, Marker m1)
 	{
 		marker0.moveTo( m0 );
 		marker1.moveTo( m1 );

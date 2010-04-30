@@ -7,7 +7,6 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
-import java.awt.Font;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPProxy;
@@ -58,7 +57,7 @@ public class ButtonTestPage extends SystemPage
 	
 
 	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-	private static PrimitiveStyleSheet headingStyleSheet = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 18) );
+	private static PrimitiveStyleSheet headingStyleSheet = styleSheet.withFontSize( 18 );
 	private static PrimitiveStyleSheet blackText = styleSheet.withForeground( Color.black );
 	private static PrimitiveStyleSheet redText = styleSheet.withForeground( Color.red );
 	private static PrimitiveStyleSheet greenText = styleSheet.withForeground( new Color( 0.0f, 0.5f, 0.0f ) );

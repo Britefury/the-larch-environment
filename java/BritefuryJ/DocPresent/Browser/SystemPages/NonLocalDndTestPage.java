@@ -7,7 +7,6 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.datatransfer.DataFlavor;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +22,7 @@ import BritefuryJ.Math.Point2;
 public class NonLocalDndTestPage extends SystemPage
 {
 	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-	private static PrimitiveStyleSheet textStyle = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 18 ) );
+	private static PrimitiveStyleSheet textStyle = styleSheet.withFontSize( 18 );
 	
 	private static PrimitiveStyleSheet placeHolderStyle = styleSheet.withBackground( new FillPainter( new Color( 1.0f, 0.9f, 0.75f  ) ) );
 	

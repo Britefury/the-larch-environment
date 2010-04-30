@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2010.
 ##-*************************
-from java.awt import Font, Color
+from java.awt import Color
 
 from Britefury.Kernel.Lerp import lerp, lerpColour
 
@@ -38,22 +38,22 @@ class PythonEditorStyleSheet (StyleSheet):
 		self.initAttr( 'editMode', None )
 		
 		
-		self.initAttr( 'keywordAttrs', AttributeValues( font=Font( 'SansSerif', Font.BOLD, 14 ), foreground=Color( 0.25, 0.0, 0.5 ), textSmallCaps=True ) )
-		self.initAttr( 'literalFormatAttrs', AttributeValues( font=Font( 'SansSerif', Font.PLAIN, 14 ), foreground=Color( 0.0, 0.25, 0.25 ) ) )
-		self.initAttr( 'quotationAttrs', AttributeValues( font=Font( 'SansSerif', Font.PLAIN, 14 ), foreground=Color( 0.0, 0.0, 0.5 ) ) )
-		self.initAttr( 'stringLiteralAttrs', AttributeValues( font=Font( 'SansSerif', Font.PLAIN, 14 ), foreground=Color( 0.25, 0.0, 0.5 ) ) )
-		self.initAttr( 'numLiteralAttrs', AttributeValues( font=Font( 'SansSerif', Font.PLAIN, 14 ), foreground=Color( 0.0, 0.5, 0.5 ) ) )
-		self.initAttr( 'punctuationAttrs', AttributeValues( font=Font( 'SansSerif', Font.PLAIN, 14 ), foreground=Color( 0.0, 0.0, 1.0 ) ) )
-		self.initAttr( 'delimAttrs', AttributeValues( font=Font( 'SansSerif', Font.PLAIN, 14 ), foreground=Color( 0.0, 0.0, 1.0 ) ) )
-		self.initAttr( 'targetAttrs', AttributeValues( font=Font( 'SansSerif', Font.PLAIN, 14 ), foreground=Color.black ) )
-		self.initAttr( 'varAttrs', AttributeValues( font=Font( 'SansSerif', Font.PLAIN, 14 ), foreground=Color.black ) )
-		self.initAttr( 'attributeAttrs', AttributeValues( font=Font( 'SansSerif', Font.PLAIN, 14 ), foreground=Color.black ) )
-		self.initAttr( 'kwNameAttrs', AttributeValues( font=Font( 'SansSerif', Font.PLAIN, 14 ), foreground=Color.black ) )
-		self.initAttr( 'operatorAttrs', AttributeValues( font=Font( 'SansSerif', Font.BOLD, 14 ), foreground=Color( 0.0, 0.5, 0.0 ) ) )
-		self.initAttr( 'paramAttrs', AttributeValues( font=Font( 'SansSerif', Font.PLAIN, 14 ), foreground=Color.black ) )
-		self.initAttr( 'importAttrs', AttributeValues( font=Font( 'SansSerif', Font.PLAIN, 14 ), foreground=Color.black ) )
-		self.initAttr( 'commentAttrs', AttributeValues( font=Font( 'SansSerif', Font.PLAIN, 14 ), foreground=Color( 0.4, 0.4, 0.4 ) ) )
-		self.initAttr( 'unparseableAttrs', AttributeValues( font=Font( 'SansSerif', Font.PLAIN, 14 ), foreground=Color.black, textSquiggleUnderlinePaint=Color.red ) )
+		self.initAttr( 'keywordAttrs', AttributeValues( fontFace='Sans serif', fontBold=True, fontSize=14, foreground=Color( 0.25, 0.0, 0.5 ), textSmallCaps=True ) )
+		self.initAttr( 'literalFormatAttrs', AttributeValues( fontFace='Sans serif', fontSize=14, foreground=Color( 0.0, 0.25, 0.25 ) ) )
+		self.initAttr( 'quotationAttrs', AttributeValues( fontFace='Sans serif', fontSize=14, foreground=Color( 0.0, 0.0, 0.5 ) ) )
+		self.initAttr( 'stringLiteralAttrs', AttributeValues( fontFace='Sans serif', fontSize=14, foreground=Color( 0.25, 0.0, 0.5 ) ) )
+		self.initAttr( 'numLiteralAttrs', AttributeValues( fontFace='Sans serif', fontSize=14, foreground=Color( 0.0, 0.5, 0.5 ) ) )
+		self.initAttr( 'punctuationAttrs', AttributeValues( fontFace='Sans serif', fontSize=14, foreground=Color( 0.0, 0.0, 1.0 ) ) )
+		self.initAttr( 'delimAttrs', AttributeValues( fontFace='Sans serif', fontSize=14, foreground=Color( 0.0, 0.0, 1.0 ) ) )
+		self.initAttr( 'targetAttrs', AttributeValues( fontFace='Sans serif', fontSize=14, foreground=Color.black ) )
+		self.initAttr( 'varAttrs', AttributeValues( fontFace='Sans serif', fontSize=14, foreground=Color.black ) )
+		self.initAttr( 'attributeAttrs', AttributeValues( fontFace='Sans serif', fontSize=14, foreground=Color.black ) )
+		self.initAttr( 'kwNameAttrs', AttributeValues( fontFace='Sans serif', fontSize=14, foreground=Color.black ) )
+		self.initAttr( 'operatorAttrs', AttributeValues( fontFace='Sans serif', fontBold=True, fontSize=14, foreground=Color( 0.0, 0.5, 0.0 ) ) )
+		self.initAttr( 'paramAttrs', AttributeValues( fontFace='Sans serif', fontSize=14, foreground=Color.black ) )
+		self.initAttr( 'importAttrs', AttributeValues( fontFace='Sans serif', fontSize=14, foreground=Color.black ) )
+		self.initAttr( 'commentAttrs', AttributeValues( fontFace='Sans serif', fontSize=14, foreground=Color( 0.4, 0.4, 0.4 ) ) )
+		self.initAttr( 'unparseableAttrs', AttributeValues( fontFace='Sans serif', fontSize=14, foreground=Color.black, textSquiggleUnderlinePaint=Color.red ) )
 		
 		self.initAttr( 'solidHighlightRounding', 3.0 )
 		self.initAttr( 'outlineHighlightThickness', 2.0 )

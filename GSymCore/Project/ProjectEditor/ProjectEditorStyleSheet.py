@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from java.awt import Font, Color, BasicStroke
+from java.awt import Color, BasicStroke
 
 from BritefuryJ.AttributeTable import *
 from BritefuryJ.DocPresent import *
@@ -33,7 +33,7 @@ class ProjectEditorStyleSheet (StyleSheet):
 		self.initAttr( 'tabbedBoxStyle', TabbedBoxStyleSheet.instance )
 		
 		self.initAttr( 'projectControlsAttrs', AttributeValues( border=SolidBorder( 2.0, 2.0, Color( 131, 149, 172 ), None ), hBoxSpacing=30.0 ) )
-		self.initAttr( 'packageNameAttrs', AttributeValues( foreground=Color( 0.0, 0.0, 0.5 ), font=Font( 'Sans serif', Font.BOLD, 14 ) ) )
+		self.initAttr( 'packageNameAttrs', AttributeValues( foreground=Color( 0.0, 0.0, 0.5 ), fontBold=True, fontSize=14 ) )
 		self.initAttr( 'itemHoverHighlightAttrs', AttributeValues( hoverBackground=FilledOutlinePainter( Color( 0.8, 0.825, 0.9 ), Color( 0.125, 0.341, 0.574 ), BasicStroke( 1.0 ) ) ) )
 		
 		self.initAttr( 'packageContentsIndentation', 20.0 )

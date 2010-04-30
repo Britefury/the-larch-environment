@@ -13,6 +13,7 @@ import java.awt.Paint;
 import java.awt.Shape;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.python.expose.ExposedMethod;
@@ -72,7 +73,8 @@ import BritefuryJ.Math.Vector2;
 
 public class PrimitiveStyleSheet extends StyleSheet
 {
-	private static final Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
+	private static final String defaultFontFace = "Sans serif";
+	private static final int defaultFontSize = 14;
 	
 	private static final Painter default_shapePainter = new FillPainter( Color.black );
 	
@@ -88,7 +90,10 @@ public class PrimitiveStyleSheet extends StyleSheet
 	{
 		super();
 		
-		initAttr( "font", defaultFont );
+		initAttr( "fontFace", defaultFontFace );
+		initAttr( "fontItalic", false );
+		initAttr( "fontBold", false );
+		initAttr( "fontSize", defaultFontSize );
 		initAttr( "foreground", Color.black );
 		initAttr( "hoverForeground", null );
 		initAttr( "background", null );
@@ -141,9 +146,24 @@ public class PrimitiveStyleSheet extends StyleSheet
 	// GENERAL
 	//
 	
-	public PrimitiveStyleSheet withFont(Font font)
+	public PrimitiveStyleSheet withFontFace(String face)
 	{
-		return (PrimitiveStyleSheet)withAttr( "font", font );
+		return (PrimitiveStyleSheet)withAttr( "fontFace", face );
+	}
+
+	public PrimitiveStyleSheet withFontBold(boolean bBold)
+	{
+		return (PrimitiveStyleSheet)withAttr( "fontBold", bBold );
+	}
+
+	public PrimitiveStyleSheet withFontItalic(boolean bItalic)
+	{
+		return (PrimitiveStyleSheet)withAttr( "fontItalic", bItalic );
+	}
+
+	public PrimitiveStyleSheet withFontSize(int size)
+	{
+		return (PrimitiveStyleSheet)withAttr( "fontSize", size );
 	}
 
 	public PrimitiveStyleSheet withForeground(Paint paint)
@@ -347,6 +367,24 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 	
 
+	
+	
+	
+	private Font styleSheetFont = null;
+	
+	private Font getFont()
+	{
+		if ( styleSheetFont == null )
+		{
+			String fontFace = getNonNull( "fontFace", String.class, defaultFontFace );
+			boolean bBold = getNonNull( "fontBold", Boolean.class, false );
+			boolean bItalic = getNonNull( "fontItalic", Boolean.class, false );
+			int size = getNonNull( "fontSize", Integer.class, defaultFontSize );
+			int flags = ( bBold ? Font.BOLD : 0 )  |  ( bItalic ? Font.ITALIC : 0 );
+			styleSheetFont = new Font( fontFace, flags, size );
+		}
+		return styleSheetFont;
+	}
 
 	
 	
@@ -481,7 +519,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 					get( "background", Painter.class, null ),
 					get( "hoverBackground", Painter.class, null ),
 					get( "cursor", Cursor.class, null ),
-					getNonNull( "font", Font.class, defaultFont ),
+					getFont(),
 					getNonNull( "foreground", Paint.class, Color.black ),
 					get( "hoverForeground", Paint.class, null ),
 					getNonNull( "mathRootThickness", Double.class, 1.5 ) );
@@ -553,7 +591,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 					get( "hoverBackground", Painter.class, null ),
 					get( "cursor", Cursor.class, null ),
 					false,
-					getNonNull( "font", Font.class, defaultFont ),
+					getFont(),
 					getNonNull( "foreground", Paint.class, Color.black ),
 					get( "hoverForeground", Paint.class, null ),
 					get( "textSquiggleUnderlinePaint", Paint.class, null ),
@@ -593,7 +631,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 					get( "hoverBackground", Painter.class, null ),
 					get( "cursor", Cursor.class, null ),
 					getNonNull( "editable", Boolean.class, true ),
-					getNonNull( "font", Font.class, defaultFont ),
+					getFont(),
 					getNonNull( "foreground", Paint.class, Color.black ),
 					get( "hoverForeground", Paint.class, null ),
 					get( "textSquiggleUnderlinePaint", Paint.class, null ),
@@ -1088,5 +1126,50 @@ public class PrimitiveStyleSheet extends StyleSheet
 		DPViewport viewport = new DPViewport( 0.0, 0.0, state );
 		viewport.setChild( child );
 		return viewport;
+	}
+	
+	
+	
+	private ArrayList<DPElement> textToWordsAndLineBreaks(String text)
+	{
+		String words[] = text.split( " " );
+		ArrayList<DPElement> elements = new ArrayList<DPElement>();
+		boolean bFirst = true;
+		for (String word: words)
+		{
+			if ( word.length() > 0 )
+			{
+				if ( !bFirst )
+				{
+					elements.add( text( " " ) );
+					elements.add( lineBreak() );
+				}
+				elements.add( text( word ) );
+			}
+		}
+		return elements;
+	}
+	
+	public DPElement textSpan(String text)
+	{
+		return span( textToWordsAndLineBreaks( text ).toArray( new DPElement[0] ) );
+	}
+
+	public DPElement textParagraph(String text)
+	{
+		return paragraph( textToWordsAndLineBreaks( text ).toArray( new DPElement[0] ) );
+	}
+	
+	public DPElement textParagraphs(String text)
+	{
+		String lines[] = text.split( "\n" );
+		DPElement lineElements[] = new DPElement[lines.length];
+		
+		for (int i = 0; i < lines.length; i++)
+		{
+			lineElements[i] = textParagraph( lines[i] );
+		}
+		
+		return vbox( lineElements );
 	}
 }

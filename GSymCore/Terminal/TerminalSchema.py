@@ -45,6 +45,8 @@ class Terminal (IncrementalOwner):
 		
 		self._blocks = []
 		self._currentPythonModule = Python25.py25NewModule()
+		self._before = []
+		self._after = []
 		self._globalVars = {}
 		
 		
@@ -52,18 +54,35 @@ class Terminal (IncrementalOwner):
 		self._incr.onLiteralAccess()
 		return copy( self._blocks )
 	
-	def addBlock(self, block):
-		self._blocks.append( block )
-		self._incr.onChanged()
-		
-	
 	def getCurrentPythonModule(self):
 		self._incr.onLiteralAccess()
 		return self._currentPythonModule
 	
-	def setCurrentPythonModule(self, m):
-		self._currentPythonModule = m
+		
+	def commit(self, outText, errText, caughtException, result=None):
+		self._blocks.append( TerminalBlock( self._currentPythonModule, outText, errText, caughtException, result ) )
+		blank = Python25.py25NewModule()
+		for a in self._after:
+			if a != blank:
+				self._before.append( a )
+		if self._currentPythonModule != blank:
+			self._before.append( self._currentPythonModule.deepCopy() )
+		self._after = []
+		self._currentPythonModule = Python25.py25NewModule()
 		self._incr.onChanged()
+	
+	def backwards(self):
+		if len( self._before ) > 0:
+			self._after.insert( 0, self._currentPythonModule )
+			self._currentPythonModule = self._before.pop()
+			self._incr.onChanged()
+			
+	def forwards(self):
+		if len( self._after ) > 0:
+			self._before.append( self._currentPythonModule )
+			self._currentPythonModule = self._after[0]
+			del self._after[0]
+			self._incr.onChanged()
 		
 		
 	def setGlobalVar(self, name, value):
@@ -85,59 +104,57 @@ class Terminal (IncrementalOwner):
 		
 	def execute(self, bEvaluate):
 		module = self.getCurrentPythonModule()
-		
-		if bEvaluate:
-			execModule = None
-			evalExpr = None
-			for i, stmt in reversed( list( enumerate( module['suite'] ) ) ):
-				if stmt.isInstanceOf( PySchema.ExprStmt ):
-					execModule = PySchema.PythonModule( suite=module['suite'][:i] )
-					evalExpr = stmt['expr']
-					break
-				elif stmt.isInstanceOf( PySchema.BlankLine )  or  stmt.isInstanceOf( PySchema.CommentStmt ):
-					pass
-				else:
-					break
-			
-			if execModule is not None  and  evalExpr is not None:
-				try:
-					execSource = _codeGen( execModule )
-					evalSource = _codeGen( evalExpr )
-				except CodeGenerator.Python25CodeGeneratorError:
-					print 'Code generation error'
-					execSource = None
-					evalSource = None
-			
-				if execSource is not None  and  evalSource is not None:
-					caughtException = None
-					stdout, stderr = self._initStdOutErr()
+		if module != Python25.py25NewModule():
+			if bEvaluate:
+				execModule = None
+				evalExpr = None
+				for i, stmt in reversed( list( enumerate( module['suite'] ) ) ):
+					if stmt.isInstanceOf( PySchema.ExprStmt ):
+						execModule = PySchema.PythonModule( suite=module['suite'][:i] )
+						evalExpr = stmt['expr']
+						break
+					elif stmt.isInstanceOf( PySchema.BlankLine )  or  stmt.isInstanceOf( PySchema.CommentStmt ):
+						pass
+					else:
+						break
+				
+				if execModule is not None  and  evalExpr is not None:
 					try:
-						exec execSource in self._globalVars
-						result = [ eval( evalSource, self._globalVars ) ]
-					except Exception, exc:
-						caughtException = exc
-						result = None
-					outout, outerr = self._shutdownStdOurErr( stdout, stderr )
-					self.addBlock( TerminalBlock( module, outout.getText(), outerr.getText(), caughtException, result ) )
-					self.setCurrentPythonModule( Python25.py25NewModule() )
-					return
-
-		try:
-			source = _codeGen( module )
-		except CodeGenerator.Python25CodeGeneratorError:
-			print 'Code generation error'
-			source = None
-		
-		if source is not None:
-			caughtException = None
-			stdout, stderr = self._initStdOutErr()
+						execSource = _codeGen( execModule )
+						evalSource = _codeGen( evalExpr )
+					except CodeGenerator.Python25CodeGeneratorError:
+						print 'Code generation error'
+						execSource = None
+						evalSource = None
+				
+					if execSource is not None  and  evalSource is not None:
+						caughtException = None
+						stdout, stderr = self._initStdOutErr()
+						try:
+							exec execSource in self._globalVars
+							result = [ eval( evalSource, self._globalVars ) ]
+						except Exception, exc:
+							caughtException = exc
+							result = None
+						outout, outerr = self._shutdownStdOurErr( stdout, stderr )
+						self.commit( outout.getText(), outerr.getText(), caughtException, result )
+						return
+	
 			try:
-				exec source in self._globalVars
-			except Exception, exc:
-				caughtException = exc
-			outout, outerr = self._shutdownStdOurErr( stdout, stderr )
-			self.addBlock( TerminalBlock( module, outout.getText(), outerr.getText(), caughtException ) )
-			self.setCurrentPythonModule( Python25.py25NewModule() )
+				source = _codeGen( module )
+			except CodeGenerator.Python25CodeGeneratorError:
+				print 'Code generation error'
+				source = None
+			
+			if source is not None:
+				caughtException = None
+				stdout, stderr = self._initStdOutErr()
+				try:
+					exec source in self._globalVars
+				except Exception, exc:
+					caughtException = exc
+				outout, outerr = self._shutdownStdOurErr( stdout, stderr )
+				self.commit( outout.getText(), outerr.getText(), caughtException )
 		
 		
 	

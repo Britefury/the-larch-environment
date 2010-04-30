@@ -329,6 +329,19 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			DPElement child = getChild();
 			return child != null  ?  child.clonePresentationSubtree()  :  null;
 		}
+		
+		
+		
+		//
+		//
+		// Focus
+		//
+		//
+		
+		public void grabFocus()
+		{
+			component.grabFocus();
+		}
 
 		
 		
@@ -1053,9 +1066,18 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		protected boolean isNavigationKey(KeyEvent event)
 		{
-			int keyCode = event.getKeyCode();
-			return keyCode == KeyEvent.VK_LEFT  ||  keyCode == KeyEvent.VK_RIGHT  ||  keyCode == KeyEvent.VK_UP  ||  keyCode == KeyEvent.VK_DOWN  ||
-						keyCode == KeyEvent.VK_HOME  ||  keyCode == KeyEvent.VK_END;
+			int modifiers = rootSpaceMouse.getModifiers();
+			int keyMods = modifiers & Modifier.KEYS_MASK;
+			if  ( keyMods == Modifier.SHIFT  ||  keyMods == 0 )
+			{
+				int keyCode = event.getKeyCode();
+				return keyCode == KeyEvent.VK_LEFT  ||  keyCode == KeyEvent.VK_RIGHT  ||  keyCode == KeyEvent.VK_UP  ||  keyCode == KeyEvent.VK_DOWN  ||
+					keyCode == KeyEvent.VK_HOME  ||  keyCode == KeyEvent.VK_END;
+			}
+			else
+			{
+				return false;
+			}
 		}
 		
 		protected boolean isModifierKey(KeyEvent event)
@@ -1066,9 +1088,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		protected boolean handleNavigationKeyPress(KeyEvent event)
 		{
+			int modifiers = rootSpaceMouse.getModifiers();
 			if ( isNavigationKey( event ) )
 			{
-				int modifiers = rootSpaceMouse.getModifiers();
 				if ( caret.isValid() )
 				{
 					Marker prevPos = caret.getMarker().copy();

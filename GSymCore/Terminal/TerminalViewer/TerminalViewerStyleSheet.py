@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from java.awt import Font, Color
+from java.awt import Color
 
 from BritefuryJ.AttributeTable import *
 from BritefuryJ.DocPresent import *
@@ -28,7 +28,7 @@ class TerminalViewerStyleSheet (StyleSheet):
 		self.initAttr( 'controlsStyle', ControlsStyleSheet.instance )
 		self.initAttr( 'pythonStyle', PythonEditorStyleSheet.instance )
 		
-		self.initAttr( 'labelAttrs', AttributeValues( font=Font( 'Sans serif', Font.PLAIN, 10 ) ) )
+		self.initAttr( 'labelAttrs', AttributeValues( fontSize=10 ) )
 
 		self.initAttr( 'blockStyleAttrs', AttributeValues( vboxSpacing=2.0, border=SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.25, 0.25, 0.25 ), Color( 0.8, 0.8, 0.8 ) ) ) )
 		
@@ -161,9 +161,9 @@ class TerminalViewerStyleSheet (StyleSheet):
 		
 		if len( blocks ) > 0:
 			blockList = terminalBlockListStyle.vbox( blocks ).alignHExpand()
-			return terminalStyle.vbox( [ blockList.alignHExpand(), m.alignHExpand(), dropPromptInsertionPoint ] ).alignHExpand(), dropPromptInsertionPoint
+			return terminalStyle.vbox( [ blockList.alignHExpand(), dropPromptInsertionPoint, m.alignHExpand() ] ).alignHExpand(), dropPromptInsertionPoint
 		else:
-			return terminalStyle.vbox( [ m.alignVTop().alignHExpand(), dropPromptInsertionPoint ] ).alignHExpand(), dropPromptInsertionPoint
+			return terminalStyle.vbox( [ dropPromptInsertionPoint, m.alignVTop().alignHExpand() ] ).alignHExpand(), dropPromptInsertionPoint
 		
 		
 	def dropPrompt(self, onAccept, onCancel):

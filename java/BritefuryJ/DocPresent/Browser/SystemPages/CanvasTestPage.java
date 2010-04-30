@@ -7,7 +7,6 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPBin;
@@ -30,7 +29,7 @@ import BritefuryJ.Math.Point2;
 public class CanvasTestPage extends SystemPage
 {
 	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-	private static PrimitiveStyleSheet textStyle = PrimitiveStyleSheet.instance.withFont( new Font( "Sans serif", Font.PLAIN, 12 ) );
+	private static PrimitiveStyleSheet textStyle = PrimitiveStyleSheet.instance.withFontSize( 12 );
 	private static Color backgroundColour = new Color( 1.0f, 0.9f, 0.75f );
 
 

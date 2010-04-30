@@ -7,12 +7,11 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.ListView.HorizontalListViewLayoutStyleSheet;
 import BritefuryJ.DocPresent.ListView.ListViewStyleSheet;
@@ -106,9 +105,9 @@ public class ListViewTestPage extends SystemPage
 	
 	protected DPElement makeListView(PrimitiveStyleSheet basicStyle, ListViewStyleSheet listView, String[] txt, String title, String beginDelim, String endDelim, String separator)
 	{
-		PrimitiveStyleSheet titleStyle = basicStyle.withFont( new Font( "Serif", Font.BOLD, 16 ) ).withForeground( Color.blue );
-		PrimitiveStyleSheet elemStyle = basicStyle.withFont( new Font( "Sans serif", Font.PLAIN, 12 ) ).withForeground( Color.black );
-		PrimitiveStyleSheet puncStyle = basicStyle.withFont( new Font( "Sans serif", Font.PLAIN, 12 ) ).withForeground( new Color( 0.0f, 0.5f, 0.0f ) );
+		PrimitiveStyleSheet titleStyle = basicStyle.withFontFace( "Serif" ).withFontBold( true ).withFontSize( 16 ).withForeground( Color.blue );
+		PrimitiveStyleSheet elemStyle = basicStyle.withFontSize( 12 ).withForeground( Color.black );
+		PrimitiveStyleSheet puncStyle = basicStyle.withFontSize( 12 ).withForeground( new Color( 0.0f, 0.5f, 0.0f ) );
 
 		DPElement children[] = new DPText[txt.length];
 		for (int i = 0; i < txt.length; i++)

@@ -9,7 +9,6 @@ package BritefuryJ.DocPresent;
 
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.datatransfer.DataFlavor;
@@ -2977,8 +2976,8 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	// Meta-element
 	//
 	
-	protected static PrimitiveStyleSheet headerDebugTextStyle = PrimitiveStyleSheet.instance.withFont( new Font( "Sans serif", Font.BOLD, 14 ) ).withForeground( new Color( 0.0f, 0.5f, 0.5f ) );
-	protected static PrimitiveStyleSheet headerDescriptionTextStyle = PrimitiveStyleSheet.instance.withFont( new Font( "Sans serif", Font.PLAIN, 14 ) ).withForeground( new Color( 0.0f, 0.0f, 0.75f ) );
+	protected static PrimitiveStyleSheet headerDebugTextStyle = PrimitiveStyleSheet.instance.withFontBold( true ).withForeground( new Color( 0.0f, 0.5f, 0.5f ) );
+	protected static PrimitiveStyleSheet headerDescriptionTextStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.0f, 0.0f, 0.75f ) );
 	protected static PrimitiveStyleSheet metaHeaderHBoxStyle = PrimitiveStyleSheet.instance.withHBoxSpacing( 10.0 );
 	protected static PrimitiveStyleSheet metaHeaderEmptyBorderStyle = PrimitiveStyleSheet.instance.withBorder( new FilledBorder() );
 

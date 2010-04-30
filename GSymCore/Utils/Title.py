@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from java.awt import Font, Color
+from java.awt import Color
 
 from BritefuryJ.AttributeTable import *
 from BritefuryJ.DocPresent.Border import *
@@ -25,8 +25,8 @@ class TitleBarStyleSheet (StyleSheet):
 	def _params(self):
 		primitiveStyle = self['primitiveStyle']
 		tpad = self['titlePadding']
-		return self._Params( primitiveStyle.withFont( self['titleFont'] ).withForeground( self['titleForeground'] ).withBorder( FilledBorder( tpad, tpad, tpad, tpad, self['titleBackground'] ) ), \
-	                                     primitiveStyle.withFont( self['headerFont'] ).withForeground( self['headerForeground' ] ),
+		return self._Params( primitiveStyle.withAttrValues( self['titleTextAttrs'] ).withForeground( self['titleForeground'] ).withBorder( FilledBorder( tpad, tpad, tpad, tpad, self['titleBackground'] ) ), \
+	                                     primitiveStyle.withAttrValues( self['headerTextAttrs'] ).withForeground( self['headerForeground' ] ),
 	                                     self['titleBorderWidth'] )
 		
 	
@@ -35,13 +35,13 @@ class TitleBarStyleSheet (StyleSheet):
 			
 		self.initAttr( 'primitiveStyle', PrimitiveStyleSheet.instance )
 
-		self.initAttr( 'titleFont', Font( 'Serif', Font.BOLD, 32 ) )
+		self.initAttr( 'titleTextAttrs', AttributeValues( fontFace='Serif', fontBold=True, fontSize=32 ) )
 		self.initAttr( 'titleForeground', Color.BLACK )
 		self.initAttr( 'titleBackground', Color( 240, 240, 240 ) )
 		self.initAttr( 'titlePadding', 5.0 )
 		self.initAttr( 'titleBorderWidth', 5.0 )
 		
-		self.initAttr( 'headerFont', Font( 'Sans serif', Font.PLAIN, 14 ) )
+		self.initAttr( 'headerTextAttrs', AttributeValues( fontFace='Sans serif', fontSize=14 ) )
 		self.initAttr( 'headerForeground', Color( 0.0, 0.5, 0.0 ) )
 	
 	
@@ -53,8 +53,8 @@ class TitleBarStyleSheet (StyleSheet):
 		return self.withAttr( 'primitiveStyle', primitiveStyle )
 	
 	
-	def withTitleFont(self, titleFont):
-		return self.withAttr( 'titleFont', titleFont )
+	def withTitleTextAttrs(self, titleTextAttrs):
+		return self.withAttr( 'titleTextAttrs', titleTextAttrs )
 	
 	def withTitleForeground(self, titleForeground):
 		return self.withAttr( 'titleForeground', titleForeground )
@@ -69,8 +69,8 @@ class TitleBarStyleSheet (StyleSheet):
 		return self.withAttr( 'titleBorderWidth', titleBorderWidth )
 	
 	
-	def withHeaderFont(self, headerFont):
-		return self.withAttr( 'headerFont', headerFont )
+	def withHeaderTextAttrs(self, headerTextAttrs):
+		return self.withAttr( 'headerTextAttrs', headerTextAttrs )
 	
 	def withHeaderForeground(self, headerForeground):
 		return self.withAttr( 'headerForeground', headerForeground )

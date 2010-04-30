@@ -7,7 +7,6 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
-import java.awt.Font;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPHBox;
@@ -37,9 +36,9 @@ public class VBoxTestPage extends SystemPage
 	PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
 	PrimitiveStyleSheet outlineStyleSheet = styleSheet.withBorder( new SolidBorder( 1.0, 0.0, new Color( 0.0f, 0.3f, 0.7f ), null ) );
 	PrimitiveStyleSheet textOnGreyStyle = styleSheet.withBackground( new FillPainter( new Color( 0.8f, 0.8f, 0.8f ) ) );
-	PrimitiveStyleSheet t12Style = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 12 ) );
-	PrimitiveStyleSheet t18Style = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 18 ) ).withForeground( new Color( 0.0f, 0.3f, 0.6f ) );
-	PrimitiveStyleSheet t24Style = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 24 ) );
+	PrimitiveStyleSheet t12Style = styleSheet.withFontSize( 12 );
+	PrimitiveStyleSheet t18Style = styleSheet.withFontSize( 18 ).withForeground( new Color( 0.0f, 0.3f, 0.6f ) );
+	PrimitiveStyleSheet t24Style = styleSheet.withFontSize( 24 );
 
 	
 	

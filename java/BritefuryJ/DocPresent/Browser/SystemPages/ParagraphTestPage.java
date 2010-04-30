@@ -7,7 +7,6 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPElement;
@@ -84,8 +83,8 @@ public class ParagraphTestPage extends SystemPage
 	protected DPElement createContents()
 	{
 		PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-		PrimitiveStyleSheet blackText = PrimitiveStyleSheet.instance.withFont( new Font( "Sans serif", Font.PLAIN, 12 ) ).withForeground( Color.black );
-		PrimitiveStyleSheet redText = PrimitiveStyleSheet.instance.withFont( new Font( "Sans serif", Font.PLAIN, 12 ) ).withForeground( Color.red );
+		PrimitiveStyleSheet blackText = PrimitiveStyleSheet.instance.withFontSize( 12 ).withForeground( Color.black );
+		PrimitiveStyleSheet redText = PrimitiveStyleSheet.instance.withFontSize( 12 ).withForeground( Color.red );
 		
 		DPElement b2 = makeParagraph( "PER-WORD", 1, blackText );
 		DPElement b3 = makeParagraph( "EVERY-4-WORDS", 4, blackText);

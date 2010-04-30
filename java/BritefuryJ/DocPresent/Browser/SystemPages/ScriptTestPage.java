@@ -7,7 +7,6 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPElement;
@@ -36,12 +35,12 @@ public class ScriptTestPage extends SystemPage
 	
 	
 	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-	private static PrimitiveStyleSheet scriptPreStyleSheet = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 12 ) ).withForeground( Color.blue );
-	private static PrimitiveStyleSheet scriptPostStyleSheet = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 24 ) ).withForeground( Color.red );
-	private static PrimitiveStyleSheet dividerStyleSheet = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 24 ) );
+	private static PrimitiveStyleSheet scriptPreStyleSheet = styleSheet.withFontSize( 12 ).withForeground( Color.blue );
+	private static PrimitiveStyleSheet scriptPostStyleSheet = styleSheet.withFontSize( 24 ).withForeground( Color.red );
+	private static PrimitiveStyleSheet dividerStyleSheet = styleSheet.withFontSize( 24 );
 
-	private static PrimitiveStyleSheet sMainStyleSheet = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 16 ) ).withForeground( Color.black );
-	private static PrimitiveStyleSheet sScriptStyleSheet = styleSheet.withFont( new Font( "Sans serif", Font.PLAIN, 16 ) ).withForeground( Color.black );
+	private static PrimitiveStyleSheet sMainStyleSheet = styleSheet.withFontSize( 16 ).withForeground( Color.black );
+	private static PrimitiveStyleSheet sScriptStyleSheet = styleSheet.withFontSize( 16 ).withForeground( Color.black );
 
 	
 	protected DPElement makeScriptLine(DPElement main, DPElement leftSuper, DPElement leftSub, DPElement rightSuper, DPElement rightSub)
