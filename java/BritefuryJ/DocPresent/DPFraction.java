@@ -163,7 +163,7 @@ public class DPFraction extends DPContainer
 
 		public int getMarkerRange()
 		{
-			return 1;
+			return textRepresentation.length();
 		}
 
 		public int getMarkerPositonForPoint(Point2 localPos)
