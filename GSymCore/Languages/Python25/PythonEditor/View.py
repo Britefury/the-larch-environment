@@ -338,7 +338,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod( Schema.SingleTarget )
 	def SingleTarget(self, ctx, styleSheet, state, node, name):
 		return expressionNodeEditor( styleSheet, node,
-					     PRECEDENCE_TARGET,
+					     PRECEDENCE_SINGLETARGET,
 					     styleSheet.singleTarget( name ) )
 
 
@@ -347,7 +347,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		elementViews = ctx.mapPresentFragment( targets, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.targetItem() ) )
 		view = styleSheet.tupleTarget( elementViews, trailingSeparator is not None )
 		return expressionNodeEditor( styleSheet, node,
-			                     PRECEDENCE_TARGET,
+			                     PRECEDENCE_TUPLE,
 		                             view )
 
 	@ObjectNodeDispatchMethod( Schema.ListTarget )
@@ -355,7 +355,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		elementViews = ctx.mapPresentFragment( targets, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT, self._parser.targetItem() ) )
 		view = styleSheet.listTarget( elementViews, trailingSeparator is not None )
 		return expressionNodeEditor( styleSheet, node,
-			                     PRECEDENCE_TARGET,
+			                     PRECEDENCE_LISTDISPLAY,
 		                             view )
 
 

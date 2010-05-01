@@ -97,7 +97,8 @@ public class AttributeTable implements Presentable
 			if ( x instanceof AttributeValueSingle )
 			{
 				AttributeValueSingle v = (AttributeValueSingle)x;
-				return fieldName.equals( v.fieldName )  &&  value.equals( v.value );
+				
+				return fieldName.equals( v.fieldName )  &&  ( value != null  ?  value.equals( v.value )  :  value == v.value );
 			}
 			else
 			{
