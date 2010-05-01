@@ -9,7 +9,7 @@ from java.util import List
 
 from BritefuryJ.Transformation import DefaultIdentityTransformationFunction, Transformation, TransformationFunction
 
-from BritefuryJ.DocModel import DMObjectInterface, DMListInterface
+from BritefuryJ.DocModel import DMObjectInterface, DMListInterface, DMClassAttribute
 
 from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeMethodDispatchMetaClass, ObjectNodeDispatchMethod, objectNodeMethodDispatch
 from Britefury.Dispatch.Dispatch import DispatchError
@@ -85,139 +85,48 @@ PRECEDENCE_IMPORTCONTENT = 0
 
 
 
+precedence = DMClassAttribute( 'precedence', Schema.Node )
+precedence[Schema.CommentStmt] = PRECEDENCE_COMMENT
+precedence[Schema.BlankLine] = PRECEDENCE_COMMENT
+precedence[Schema.UNPARSED] = PRECEDENCE_UNPARSED
+precedence[Schema.Target] = PRECEDENCE_TARGET
 
-class NodePrecedence (object):
-	__metaclass__ = ObjectNodeMethodDispatchMetaClass
-	__dispatch_num_args__ = 0
-	
-	
-	def __call__(self, node):
-		return objectNodeMethodDispatch( self, node )
-	
-	@ObjectNodeDispatchMethod( Schema.CommentStmt )
-	def CommentStmt(self, node):
-		return PRECEDENCE_COMMENT
-	
-	@ObjectNodeDispatchMethod( Schema.BlankLine )
-	def BlankLine(self, node):
-		return PRECEDENCE_COMMENT
-	
-	@ObjectNodeDispatchMethod( Schema.UNPARSED )
-	def UNPARSED(self, node):
-		return PRECEDENCE_UNPARSED
-	
-	
-	
-	@ObjectNodeDispatchMethod( Schema.Stmt )
-	def Stmt(self, node):
-		return PRECEDENCE_STMT
-	
-	@ObjectNodeDispatchMethod( Schema.Expr )
-	def Expr(self, node):
-		return PRECEDENCE_EXPR
-	
-	@ObjectNodeDispatchMethod( Schema.Pow )
-	def Pow(self, node):
-		return PRECEDENCE_POW
-	
-	@ObjectNodeDispatchMethod( Schema.Invert )
-	def Invert(self, node):
-		return PRECEDENCE_INVERT_NEGATE_POS
-	
-	@ObjectNodeDispatchMethod( Schema.Negate )
-	def Negate(self, node):
-		return PRECEDENCE_INVERT_NEGATE_POS
+precedence[Schema.Stmt] = PRECEDENCE_STMT
+precedence[Schema.Expr] = PRECEDENCE_EXPR
 
-	@ObjectNodeDispatchMethod( Schema.Pos )
-	def Pos(self, node):
-		return PRECEDENCE_INVERT_NEGATE_POS
-	
-	@ObjectNodeDispatchMethod( Schema.Mul )
-	def Mul(self, node):
-		return PRECEDENCE_MULDIVMOD
-	
-	@ObjectNodeDispatchMethod( Schema.Div )
-	def Div(self, node):
-		return PRECEDENCE_MULDIVMOD
-	
-	@ObjectNodeDispatchMethod( Schema.Mod )
-	def Mod(self, node):
-		return PRECEDENCE_MULDIVMOD
-	
-	@ObjectNodeDispatchMethod( Schema.Add )
-	def Add(self, node):
-		return PRECEDENCE_ADDSUB
-	
-	@ObjectNodeDispatchMethod( Schema.Sub )
-	def Sub(self, node):
-		return PRECEDENCE_ADDSUB
-	
-	@ObjectNodeDispatchMethod( Schema.LShift )
-	def LShift(self, node):
-		return PRECEDENCE_SHIFT
-	
-	@ObjectNodeDispatchMethod( Schema.RShift )
-	def RShift(self, node):
-		return PRECEDENCE_SHIFT
-	
-	@ObjectNodeDispatchMethod( Schema.BitAnd )
-	def BitAnd(self, node):
-		return PRECEDENCE_BITAND
-
-	@ObjectNodeDispatchMethod( Schema.BitXor )
-	def BitXor(self, node):
-		return PRECEDENCE_BITXOR
-
-	@ObjectNodeDispatchMethod( Schema.BitOr )
-	def BitOr(self, node):
-		return PRECEDENCE_BITOR
-	
-	@ObjectNodeDispatchMethod( Schema.Cmp )
-	def Cmp(self, node):
-		return PRECEDENCE_CMP
-	
-	@ObjectNodeDispatchMethod( Schema.NotTest )
-	def NotTest(self, node):
-		return PRECEDENCE_NOT
-	
-	@ObjectNodeDispatchMethod( Schema.AndTest )
-	def AndTest(self, node):
-		return PRECEDENCE_AND
-	
-	@ObjectNodeDispatchMethod( Schema.OrTest )
-	def OrTest(self, node):
-		return PRECEDENCE_OR
-
-	@ObjectNodeDispatchMethod( Schema.LambdaExpr )
-	def LambdaExpr(self, node):
-		return PRECEDENCE_LAMBDAEXPR
-	
-	
-	@ObjectNodeDispatchMethod( Schema.ConditionalExpr )
-	def ConditionalExpr(self, node):
-		return PRECEDENCE_CONDITIONAL
+precedence[Schema.Pow] = PRECEDENCE_POW
+precedence[Schema.Invert] = PRECEDENCE_INVERT_NEGATE_POS
+precedence[Schema.Negate] = PRECEDENCE_INVERT_NEGATE_POS
+precedence[Schema.Pos] = PRECEDENCE_INVERT_NEGATE_POS
+precedence[Schema.Mul] = PRECEDENCE_MULDIVMOD
+precedence[Schema.Div] = PRECEDENCE_MULDIVMOD
+precedence[Schema.Mod] = PRECEDENCE_MULDIVMOD
+precedence[Schema.Add] = PRECEDENCE_ADDSUB
+precedence[Schema.Sub] = PRECEDENCE_ADDSUB
+precedence[Schema.LShift] = PRECEDENCE_SHIFT
+precedence[Schema.RShift] = PRECEDENCE_SHIFT
+precedence[Schema.BitAnd] = PRECEDENCE_BITAND
+precedence[Schema.BitXor] = PRECEDENCE_BITXOR
+precedence[Schema.BitOr] = PRECEDENCE_BITOR
+precedence[Schema.Cmp] = PRECEDENCE_CMP
+precedence[Schema.NotTest] = PRECEDENCE_NOT
+precedence[Schema.AndTest] = PRECEDENCE_AND
+precedence[Schema.OrTest] = PRECEDENCE_OR
+precedence[Schema.LambdaExpr] = PRECEDENCE_LAMBDAEXPR
+precedence[Schema.ConditionalExpr] = PRECEDENCE_CONDITIONAL
+precedence[Schema.YieldExpr] = PRECEDENCE_YIELDEXPR
+precedence.commit()
 
 	
 	
-class NodeRightAssociativity (object):
-	__metaclass__ = ObjectNodeMethodDispatchMetaClass
-	__dispatch_num_args__ = 0
-	
-	def __call__(self, node):
-		return objectNodeMethodDispatch( self, node )
-	
-	@ObjectNodeDispatchMethod( Schema.BinOp )
-	def BinOp(self, node):
-		return False
-	
-	@ObjectNodeDispatchMethod( Schema.Pow )
-	def Pow(self, node):
-		return True
+rightAssociative = DMClassAttribute( 'rightAssociative', Schema.BinOp )
+rightAssociative[Schema.BinOp] = False
+rightAssociative[Schema.Pow] = True
+rightAssociative.commit()
+
 
 
 _identity = DefaultIdentityTransformationFunction()
-_precedence = NodePrecedence()
-_rightAssoc = NodeRightAssociativity()
 def _updatedNodeCopy(node, xform, **fieldValues):
 	newNode = _identity( node, xform )
 	newNode.update( fieldValues )
@@ -226,7 +135,7 @@ def _updatedNodeCopy(node, xform, **fieldValues):
 
 	
 def _areParensRequired(childNode, outerPrecedence):
-	childPrec = _precedence( childNode )
+	childPrec = precedence[childNode]
 	return childPrec is not None   and   outerPrecedence is not None   and   childPrec > outerPrecedence
 	
 def getNumParens(node):
@@ -260,8 +169,8 @@ def _computeBinOpContainmentPrecedenceValues(precedence, bRightAssociative):
 		return precedence, precedence - 1
 	
 def _transformBinOp(node, xform):
-	outerPrec = _precedence( node )
-	bRightAssociative = _rightAssoc( node )
+	outerPrec = precedence[node]
+	bRightAssociative = rightAssociative[node]
 	
 	xPrec, yPrec = _computeBinOpContainmentPrecedenceValues( outerPrec, bRightAssociative )
 	x = node['x']
@@ -313,17 +222,17 @@ def _transformOpMulti(node, xform, outerPrec, fieldNames):
 
 	
 def _transformUnaryOp(node, xform):
-	outerPrec = _precedence( node )
+	outerPrec = precedence[node]
 	return _transformOp( node, xform, outerPrec, 'x' )
 
 
 def _transformCmpOp(node, xform):
-	outerPrec = _precedence( node )
+	outerPrec = precedence[node]
 	return _transformOp( node, xform, outerPrec, 'y' )
 
 	
 def _transformCmp(node, xform):
-	outerPrec = _precedence( node )
+	outerPrec = precedence[node]
 	return _transformOp( node, xform, outerPrec, 'x' )
 
 	

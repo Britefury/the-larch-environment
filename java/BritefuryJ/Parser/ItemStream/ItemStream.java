@@ -109,7 +109,25 @@ public class ItemStream implements Presentable
 		{
 			return textValue;
 		}
-
+		
+		
+		public boolean equals(Object x)
+		{
+			if ( x == this )
+			{
+				return true;
+			}
+			
+			if ( x instanceof TextItem )
+			{
+				TextItem tx = (TextItem)x;
+				
+				return textValue.equals( tx.textValue );
+			}
+			
+			return false;
+		}
+		
 		
 		public String toString()
 		{
@@ -168,6 +186,24 @@ public class ItemStream implements Presentable
 		public Object getStructuralValue()
 		{
 			return structuralValue;
+		}
+		
+		
+		public boolean equals(Object x)
+		{
+			if ( x == this )
+			{
+				return true;
+			}
+			
+			if ( x instanceof StructuralItem )
+			{
+				StructuralItem sx = (StructuralItem)x;
+				
+				return structuralValue.equals( sx.structuralValue );
+			}
+			
+			return false;
 		}
 		
 		
@@ -241,6 +277,11 @@ public class ItemStream implements Presentable
 		return itemValues;
 	}
 	
+	public boolean isTextual()
+	{
+		return items.length == 1 &&  items[0] instanceof TextItem;
+	}
+	
 	public int length()
 	{
 		return length;
@@ -249,6 +290,28 @@ public class ItemStream implements Presentable
 	public int __len__()
 	{
 		return length;
+	}
+	
+	public int numItems()
+	{
+		return items.length;
+	}
+	
+	public boolean hasNoItems()
+	{
+		return items.length == 0;
+	}
+	
+	public String textualValue()
+	{
+		if ( items.length == 1 &&  items[0] instanceof TextItem )
+		{
+			return ((TextItem)items[0]).textValue;
+		}
+		else
+		{
+			throw new RuntimeException( "Item stream is not textual" );
+		}
 	}
 	
 	public boolean contains(String sub)
@@ -425,6 +488,44 @@ public class ItemStream implements Presentable
 	
 	
 	
+	public boolean equals(Object x)
+	{
+		if ( x == this )
+		{
+			return true;
+		}
+		
+		if ( x instanceof ItemStream )
+		{
+			ItemStream sx = (ItemStream)x;
+			
+			if ( length == sx.length  &&  items.length == sx.items.length )
+			{
+				for (int i = 0; i < items.length; i++)
+				{
+					if ( !items[i].equals( sx.items[i] ) )
+					{
+						return false;
+					}
+				}
+				
+				return true;
+			}
+		}
+		else if ( x instanceof String )
+		{
+			String sx = (String)x;
+			
+			if ( items.length == 1  &&  items[0] instanceof TextItem )
+			{
+				return ((TextItem)items[0]).textValue.equals( sx );
+			}
+			
+			return false;
+		}
+		
+		return false;
+	}
 
 	public String toString()
 	{

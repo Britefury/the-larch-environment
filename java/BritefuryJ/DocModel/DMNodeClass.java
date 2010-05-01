@@ -6,10 +6,13 @@
 //##************************
 package BritefuryJ.DocModel;
 
+import java.util.HashMap;
+
 
 public class DMNodeClass
 {
 	protected String name;
+	protected HashMap<String, DMClassAttribute> classAttributes = new HashMap<String, DMClassAttribute>();
 	
 	
 	
@@ -33,5 +36,24 @@ public class DMNodeClass
 	public boolean isSubclassOf(DMNodeClass c)
 	{
 		return false;
+	}
+	
+	
+	public DMClassAttribute getClassAttribute(String name)
+	{
+		return classAttributes.get( name );
+	}
+	
+	
+	
+	protected void registerClassAttribute(DMClassAttribute attr)
+	{
+		String attrName = attr.getName();
+		if ( classAttributes.containsKey( attrName ) )
+		{
+			throw new RuntimeException( "Class '" + name + "' already has a class attribute named " + attrName );
+		}
+		
+		classAttributes.put( attrName, attr );
 	}
 }
