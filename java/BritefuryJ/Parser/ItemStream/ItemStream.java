@@ -549,5 +549,5 @@ public class ItemStream implements Presentable
 	}
 
 
-	private static final GenericPerspectiveStyleSheet itemStreamStyle = GenericPerspectiveStyleSheet.instance.withObjectBorderPaint( new Color( 0.65f, 0.0f, 0.55f ) );
+	private static final GenericPerspectiveStyleSheet itemStreamStyle = GenericPerspectiveStyleSheet.instance.withObjectBorderAndTitlePaint( new Color( 0.65f, 0.0f, 0.55f ) );
 }

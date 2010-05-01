@@ -22,7 +22,7 @@ public class GenericPerspectiveStyleSheet extends StyleSheet
 {
 	private static final double defaultObjectBorderThickness = 1.0;
 	private static final double defaultObjectBorderInset = 3.0;
-	private static final double defaultObjectBorderRounding = 1.0;
+	private static final double defaultObjectBorderRounding = 5.0;
 	private static final Color defaultObjectBorderPaint = new Color( 0.35f, 0.35f, 0.35f );
 	private static final Color defaultObjectTitlePaint = new Color( 0.35f, 0.35f, 0.35f );
 	private static final AttributeValues defaultObjectTitleAttrs = new AttributeValues( new String[] { "fontFace", "fontSize" }, new Object[] { "Sans serif", 10 } );
@@ -91,7 +91,8 @@ public class GenericPerspectiveStyleSheet extends StyleSheet
 			double objectBorderRounding = getNonNull( "objectBorderRounding", Double.class, defaultObjectBorderRounding );
 			Paint objectBorderPaint = getNonNull( "objectBorderPaint", Paint.class, defaultObjectBorderPaint );
 			Paint objectBorderBackground = get( "objectBorderBackground", Paint.class, null );
-			objectBorderStyleSheet = primitive.withBorder( new SolidBorder( objectBorderThickness, objectBorderInset, objectBorderRounding, objectBorderRounding, objectBorderPaint, objectBorderBackground ) );
+			objectBorderStyleSheet = primitive.withBorder( new SolidBorder( objectBorderThickness, objectBorderInset, objectBorderRounding, objectBorderRounding,
+					objectBorderPaint, objectBorderBackground ) );
 		}
 		return objectBorderStyleSheet;
 	}
@@ -230,6 +231,14 @@ public class GenericPerspectiveStyleSheet extends StyleSheet
 	
 	
 	
+	public GenericPerspectiveStyleSheet withObjectBorderAndTitlePaint(Paint paint)
+	{
+		return withObjectBorderPaint( paint ).withObjectTitlePaint( paint );
+	}
+	
+
+	
+	
 	public GenericPerspectiveStyleSheet withObjectFieldTitlePaint(Paint paint)
 	{
 		return (GenericPerspectiveStyleSheet)withAttr( "objectFieldTitlePaint", paint );
@@ -265,14 +274,20 @@ public class GenericPerspectiveStyleSheet extends StyleSheet
 	}
 	
 	
+	public DPElement objectTitle(String title)
+	{
+		PrimitiveStyleSheet titleStyle = getObjectTitleStyleSheet();
+		return titleStyle.staticText( title );
+	}
+	
+	
 	public DPElement objectBox(String title, DPElement contents)
 	{
 		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 		PrimitiveStyleSheet borderStyle = getObjectBorderStyleSheet();
-		PrimitiveStyleSheet titleStyle = getObjectTitleStyleSheet();
 		double padding = getNonNull( "objectContentPadding", Double.class, defaultObjectContentPadding );
 		
-		DPElement titleElement = titleStyle.staticText( title );
+		DPElement titleElement = objectTitle( title );
 		DPElement contentsBox = primitive.layoutWrap( contents ).padX( padding );
 		return borderStyle.border( primitive.vbox( new DPElement[] { titleElement, contentsBox } ) ); 
 	}
@@ -281,13 +296,18 @@ public class GenericPerspectiveStyleSheet extends StyleSheet
 	{
 		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 		PrimitiveStyleSheet borderStyle = getObjectBorderStyleSheet();
-		PrimitiveStyleSheet titleStyle = getObjectTitleStyleSheet();
 		PrimitiveStyleSheet fieldListStyle = getObjectFieldListStyleSheet();
 		double padding = getNonNull( "objectContentPadding", Double.class, defaultObjectContentPadding );
 		
-		DPElement titleElement = titleStyle.staticText( title );
+		DPElement titleElement = objectTitle( title );
 		DPElement contentsBox = fieldListStyle.vbox( fields ).padX( padding );
 		return borderStyle.border( primitive.vbox( new DPElement[] { titleElement, contentsBox } ) ); 
+	}
+	
+	public DPElement objectBorder(DPElement contents)
+	{
+		PrimitiveStyleSheet borderStyle = getObjectBorderStyleSheet();
+		return borderStyle.border( PrimitiveStyleSheet.instance.layoutWrap( contents ) );
 	}
 	
 	public DPElement horizontalObjectField(String title, DPElement value)

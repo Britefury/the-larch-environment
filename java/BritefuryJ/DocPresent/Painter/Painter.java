@@ -9,8 +9,24 @@ package BritefuryJ.DocPresent.Painter;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 
-public interface Painter
+import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.GSym.GenericPerspective.Presentable;
+import BritefuryJ.GSym.View.GSymFragmentViewContext;
+
+public abstract class Painter implements Presentable
 {
-	public void drawShape(Graphics2D graphics, Shape shape);
-	public void drawShapes(Graphics2D graphics, Shape shapes[]);
+	public abstract void drawShape(Graphics2D graphics, Shape shape);
+	public abstract void drawShapes(Graphics2D graphics, Shape shapes[]);
+
+
+
+	@Override
+	public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	{
+		PrimitiveStyleSheet p = PrimitiveStyleSheet.instance;
+		return styleSheet.objectBox( getClass().getName(), p.border( p.withShapePainter( this ).box( 50.0, 25.0 ) ) );
+	}
 }
