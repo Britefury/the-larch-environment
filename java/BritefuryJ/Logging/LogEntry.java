@@ -13,8 +13,8 @@ import java.util.List;
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.GSym.DefaultPerspective.DefaultPerspectiveStyleSheet;
-import BritefuryJ.GSym.ObjectView.Presentable;
+import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 
 public class LogEntry implements Presentable
@@ -50,21 +50,21 @@ public class LogEntry implements Presentable
 		return "Log entry";
 	}
 	
-	public DPElement createLogEntryPresentationContent(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+	public DPElement createLogEntryPresentationContent(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
 		return PrimitiveStyleSheet.instance.staticText( "<empty>" );
 	}
 
 
-	public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+	public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
-		DPElement entryContent = createLogEntryPresentationContent( ctx, styleSheet, state );
+		DPElement entryContent = createLogEntryPresentationContent( ctx, styleSheet, inheritedState );
 		DPElement content = PrimitiveStyleSheet.instance.layoutWrap( entryContent );
 		
 		return logEntryStyle.objectBox( getLogEntryTitle(), content );
 	}
 
 
-	private static DefaultPerspectiveStyleSheet logEntryStyle = DefaultPerspectiveStyleSheet.instance.withObjectBorderPaint( new Color( 0.45f, 0.65f, 0.0f ) ).withObjectTitlePaint(
+	private static GenericPerspectiveStyleSheet logEntryStyle = GenericPerspectiveStyleSheet.instance.withObjectBorderPaint( new Color( 0.45f, 0.65f, 0.0f ) ).withObjectTitlePaint(
 			new Color( 0.45f, 0.65f, 0.0f ) );
 }

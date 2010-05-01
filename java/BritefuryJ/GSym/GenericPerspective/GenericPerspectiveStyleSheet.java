@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.GSym.DefaultPerspective;
+package BritefuryJ.GSym.GenericPerspective;
 
 import java.awt.Color;
 import java.awt.Paint;
@@ -18,7 +18,7 @@ import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
-public class DefaultPerspectiveStyleSheet extends StyleSheet
+public class GenericPerspectiveStyleSheet extends StyleSheet
 {
 	private static final double defaultObjectBorderThickness = 1.0;
 	private static final double defaultObjectBorderInset = 3.0;
@@ -41,11 +41,11 @@ public class DefaultPerspectiveStyleSheet extends StyleSheet
 	
 	
 	
-	public static final DefaultPerspectiveStyleSheet instance = new DefaultPerspectiveStyleSheet();
+	public static final GenericPerspectiveStyleSheet instance = new GenericPerspectiveStyleSheet();
 
 	
 	
-	public DefaultPerspectiveStyleSheet()
+	public GenericPerspectiveStyleSheet()
 	{
 		super();
 		
@@ -74,7 +74,7 @@ public class DefaultPerspectiveStyleSheet extends StyleSheet
 		
 	protected StyleSheet newInstance()
 	{
-		return new DefaultPerspectiveStyleSheet();
+		return new GenericPerspectiveStyleSheet();
 	}
 	
 	
@@ -176,85 +176,85 @@ public class DefaultPerspectiveStyleSheet extends StyleSheet
 	
 
 	
-	public DefaultPerspectiveStyleSheet withPrimitiveStyleSheet(PrimitiveStyleSheet styleSheet)
+	public GenericPerspectiveStyleSheet withPrimitiveStyleSheet(PrimitiveStyleSheet styleSheet)
 	{
-		return (DefaultPerspectiveStyleSheet)withAttr( "primitiveStyleSheet", styleSheet );
+		return (GenericPerspectiveStyleSheet)withAttr( "primitiveStyleSheet", styleSheet );
 	}
 	
 	
-	public DefaultPerspectiveStyleSheet withPresentationSize(PresentationSize size)
+	public GenericPerspectiveStyleSheet withPresentationSize(PresentationSize size)
 	{
-		return (DefaultPerspectiveStyleSheet)withAttr( "presentationSize", size );
+		return (GenericPerspectiveStyleSheet)withAttr( "presentationSize", size );
 	}
 	
 	
-	public DefaultPerspectiveStyleSheet withObjectBorderThickness(double thickness)
+	public GenericPerspectiveStyleSheet withObjectBorderThickness(double thickness)
 	{
-		return (DefaultPerspectiveStyleSheet)withAttr( "objectBorderThickness", thickness );
+		return (GenericPerspectiveStyleSheet)withAttr( "objectBorderThickness", thickness );
 	}
 	
-	public DefaultPerspectiveStyleSheet withObjectBorderInset(double inset)
+	public GenericPerspectiveStyleSheet withObjectBorderInset(double inset)
 	{
-		return (DefaultPerspectiveStyleSheet)withAttr( "objectBorderInset", inset );
+		return (GenericPerspectiveStyleSheet)withAttr( "objectBorderInset", inset );
 	}
 	
-	public DefaultPerspectiveStyleSheet withObjectBorderRounding(double rounding)
+	public GenericPerspectiveStyleSheet withObjectBorderRounding(double rounding)
 	{
-		return (DefaultPerspectiveStyleSheet)withAttr( "objectBorderRounding", rounding );
+		return (GenericPerspectiveStyleSheet)withAttr( "objectBorderRounding", rounding );
 	}
 	
-	public DefaultPerspectiveStyleSheet withObjectBorderPaint(Paint paint)
+	public GenericPerspectiveStyleSheet withObjectBorderPaint(Paint paint)
 	{
-		return (DefaultPerspectiveStyleSheet)withAttr( "objectBorderPaint", paint );
+		return (GenericPerspectiveStyleSheet)withAttr( "objectBorderPaint", paint );
 	}
 	
-	public DefaultPerspectiveStyleSheet withObjectBorderBackground(Paint paint)
+	public GenericPerspectiveStyleSheet withObjectBorderBackground(Paint paint)
 	{
-		return (DefaultPerspectiveStyleSheet)withAttr( "objectBorderBackground", paint );
+		return (GenericPerspectiveStyleSheet)withAttr( "objectBorderBackground", paint );
 	}
 	
-	public DefaultPerspectiveStyleSheet withObjectTitlePaint(Paint paint)
+	public GenericPerspectiveStyleSheet withObjectTitlePaint(Paint paint)
 	{
-		return (DefaultPerspectiveStyleSheet)withAttr( "objectTitlePaint", paint );
+		return (GenericPerspectiveStyleSheet)withAttr( "objectTitlePaint", paint );
 	}
 	
-	public DefaultPerspectiveStyleSheet withObjectTitleAttrs(AttributeValues attrs)
+	public GenericPerspectiveStyleSheet withObjectTitleAttrs(AttributeValues attrs)
 	{
-		return (DefaultPerspectiveStyleSheet)withAttr( "objectTitleAttrs", attrs );
+		return (GenericPerspectiveStyleSheet)withAttr( "objectTitleAttrs", attrs );
 	}
 	
-	public DefaultPerspectiveStyleSheet withObjectContentPadding(double padding)
+	public GenericPerspectiveStyleSheet withObjectContentPadding(double padding)
 	{
-		return (DefaultPerspectiveStyleSheet)withAttr( "objectContentPadding", padding );
+		return (GenericPerspectiveStyleSheet)withAttr( "objectContentPadding", padding );
 	}
 	
 	
 	
-	public DefaultPerspectiveStyleSheet withObjectFieldTitlePaint(Paint paint)
+	public GenericPerspectiveStyleSheet withObjectFieldTitlePaint(Paint paint)
 	{
-		return (DefaultPerspectiveStyleSheet)withAttr( "objectFieldTitlePaint", paint );
+		return (GenericPerspectiveStyleSheet)withAttr( "objectFieldTitlePaint", paint );
 	}
 	
-	public DefaultPerspectiveStyleSheet withObjectFieldIndentation(double indentation)
+	public GenericPerspectiveStyleSheet withObjectFieldIndentation(double indentation)
 	{
-		return (DefaultPerspectiveStyleSheet)withAttr( "objectFieldIndentation", indentation );
+		return (GenericPerspectiveStyleSheet)withAttr( "objectFieldIndentation", indentation );
 	}
 
 	
-	public DefaultPerspectiveStyleSheet withObjectFieldSpacing(double spacing)
+	public GenericPerspectiveStyleSheet withObjectFieldSpacing(double spacing)
 	{
-		return (DefaultPerspectiveStyleSheet)withAttr( "objectFieldSpacing", spacing );
+		return (GenericPerspectiveStyleSheet)withAttr( "objectFieldSpacing", spacing );
 	}
 	
 	
-	public DefaultPerspectiveStyleSheet withStringContentAttrs(AttributeValues attrs)
+	public GenericPerspectiveStyleSheet withStringContentAttrs(AttributeValues attrs)
 	{
-		return (DefaultPerspectiveStyleSheet)withAttr( "stringContentAttrs", attrs );
+		return (GenericPerspectiveStyleSheet)withAttr( "stringContentAttrs", attrs );
 	}
 	
-	public DefaultPerspectiveStyleSheet withStringEscapeAttrs(AttributeValues attrs)
+	public GenericPerspectiveStyleSheet withStringEscapeAttrs(AttributeValues attrs)
 	{
-		return (DefaultPerspectiveStyleSheet)withAttr( "stringEscapeAttrs", attrs );
+		return (GenericPerspectiveStyleSheet)withAttr( "stringEscapeAttrs", attrs );
 	}
 	
 

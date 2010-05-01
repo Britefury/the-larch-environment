@@ -16,7 +16,7 @@ import BritefuryJ.DocPresent.LayoutTree.ContentLeafLayoutNodeInterface;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleParams.ContentLeafStyleParams;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.GSym.DefaultPerspective.DefaultPerspectiveStyleSheet;
+import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
@@ -314,7 +314,7 @@ public abstract class DPContentLeaf extends DPElement
 
 	public DPElement createDebugPresentationHeaderData()
 	{
-		return DefaultPerspectiveStyleSheet.instance.unescapedStringAsHBox( textRepresentation );
+		return GenericPerspectiveStyleSheet.instance.unescapedStringAsHBox( textRepresentation );
 	}
 	
 	protected PrimitiveStyleSheet getDebugPresentationHeaderBorderStyle()

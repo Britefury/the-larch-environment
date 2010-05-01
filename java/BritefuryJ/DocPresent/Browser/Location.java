@@ -13,8 +13,8 @@ import java.util.regex.Pattern;
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.GSym.DefaultPerspective.DefaultPerspectiveStyleSheet;
-import BritefuryJ.GSym.ObjectView.Presentable;
+import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 
 public class Location implements Presentable
@@ -115,7 +115,7 @@ public class Location implements Presentable
 
 
 		@Override
-		public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+		public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 		{
 			// TODO: Check for infinitely recursive nesting
 			return ctx.presentLocationAsElement( loc );
@@ -200,7 +200,7 @@ public class Location implements Presentable
 	}
 
 
-	public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+	public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		return locationStyle.objectBox( "Location", PrimitiveStyleSheet.instance.staticText( locationString ) );
 	}
@@ -212,5 +212,5 @@ public class Location implements Presentable
 	}
 
 
-	private static final DefaultPerspectiveStyleSheet locationStyle = DefaultPerspectiveStyleSheet.instance.withObjectBorderPaint( new Color( 0.4f, 0.65f, 0.4f ) ); 
+	private static final GenericPerspectiveStyleSheet locationStyle = GenericPerspectiveStyleSheet.instance.withObjectBorderPaint( new Color( 0.4f, 0.65f, 0.4f ) ); 
 }

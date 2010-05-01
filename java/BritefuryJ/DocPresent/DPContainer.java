@@ -975,7 +975,7 @@ public abstract class DPContainer extends DPElement
 		{
 			if ( child != null )
 			{
-				DPElement metaChild = ctx.presentFragmentWithDefaultPerspective( child.treeExplorer(), state ); 
+				DPElement metaChild = ctx.presentFragmentWithGenerixcPerspective( child.treeExplorer(), state ); 
 				metaChildrenVBox.append( metaChild );
 			}
 			else

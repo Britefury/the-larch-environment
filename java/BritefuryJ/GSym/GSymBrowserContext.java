@@ -25,7 +25,7 @@ import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.GSym.DefaultPerspective.GSymDefaultPerspective;
+import BritefuryJ.GSym.GenericPerspective.GSymGenericPerspective;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 import BritefuryJ.GSym.View.GSymViewContext;
 import BritefuryJ.GSym.View.GSymViewFragmentFunction;
@@ -51,7 +51,7 @@ public class GSymBrowserContext
 	
 	
 	
-	private static class GSymBrowserContextPerspective implements GSymPerspective
+	private static class GSymBrowserContextPerspective extends GSymPerspective
 	{
 		private GSymViewFragmentFunction fragmentViewFn;
 		
@@ -104,7 +104,7 @@ public class GSymBrowserContext
 		}
 	}
 	
-	private static class SystemPagePerspective implements GSymPerspective
+	private static class SystemPagePerspective extends GSymPerspective
 	{
 		private static SystemPageFragmentViewFn fragmentViewFn = new SystemPageFragmentViewFn();
 		private LocationResolver systemLocationResolver;
@@ -199,7 +199,7 @@ public class GSymBrowserContext
 	
 	
 	private BrowserContext browserContext = new BrowserContext( Arrays.asList( new LocationResolver[] { new GSymBrowserContextLocationResolver() } ) );
-	private GSymDefaultPerspective defaultPerspective;
+	private GSymGenericPerspective genericPerspective;
 	private List<GSymLocationResolver> resolvers = new ArrayList<GSymLocationResolver>();
 	
 	
@@ -207,23 +207,23 @@ public class GSymBrowserContext
 	public GSymBrowserContext(boolean bWithSystemPages)
 	{
 		super();
-		defaultPerspective = new GSymDefaultPerspective( this );
+		genericPerspective = new GSymGenericPerspective( this );
 		if ( bWithSystemPages )
 		{
 			addResolvers( Arrays.asList( new GSymLocationResolver[] { new SystemPageLocationResolver( SystemLocationResolver.getSystemResolver() ) } ) );
 		}
-		addResolvers( Arrays.asList( new GSymLocationResolver[] { defaultPerspective.getLocationResolver() } ) );
+		addResolvers( Arrays.asList( new GSymLocationResolver[] { genericPerspective.getLocationResolver() } ) );
 	}
 	
 	public GSymBrowserContext(boolean bWithSystemPages, List<GSymLocationResolver> resolvers)
 	{
 		super();
-		defaultPerspective = new GSymDefaultPerspective( this );
+		genericPerspective = new GSymGenericPerspective( this );
 		if ( bWithSystemPages )
 		{
 			addResolvers( Arrays.asList( new GSymLocationResolver[] { new SystemPageLocationResolver( SystemLocationResolver.getSystemResolver() ) } ) );
 		}
-		addResolvers( Arrays.asList( new GSymLocationResolver[] { defaultPerspective.getLocationResolver() } ) );
+		addResolvers( Arrays.asList( new GSymLocationResolver[] { genericPerspective.getLocationResolver() } ) );
 		addResolvers( resolvers );
 	}
 	
@@ -241,21 +241,21 @@ public class GSymBrowserContext
 		return browserContext;
 	}
 	
-	public GSymDefaultPerspective getDefaultPerspective()
+	public GSymGenericPerspective getGenericPerspective()
 	{
-		return defaultPerspective;
+		return genericPerspective;
 	}
 	
 	
 
 	public Location getLocationForObject(Object x)
 	{
-		return defaultPerspective.getLocationForObject( x );
+		return genericPerspective.getLocationForObject( x );
 	}
 	
 	public Object getObjectAtLocation(Location location)
 	{
-		return defaultPerspective.getObjectAtLocation( location );
+		return genericPerspective.getObjectAtLocation( location );
 	}
 	
 	

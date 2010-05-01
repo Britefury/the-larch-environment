@@ -19,8 +19,8 @@ import org.python.core.PyObject;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.GSym.DefaultPerspective.DefaultPerspectiveStyleSheet;
-import BritefuryJ.GSym.ObjectView.Presentable;
+import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 import BritefuryJ.Utils.HashUtils;
 
@@ -353,7 +353,7 @@ public class AttributeTable implements Presentable
 
 	
 	
-	protected static DPElement presentAttributeMap(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state, HashMap<String, Object> values)
+	protected static DPElement presentAttributeMap(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state, HashMap<String, Object> values)
 	{
 		PrimitiveStyleSheet attrTableStyle = getAttrTableStyle();
 		Set<String> nameSet = values.keySet();
@@ -375,9 +375,9 @@ public class AttributeTable implements Presentable
 	}
 	
 	@Override
-	public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+	public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
-		DPElement valueField = styleSheet.verticalObjectField( "Attributes:", presentAttributeMap( ctx, styleSheet, state, values ) );
+		DPElement valueField = styleSheet.verticalObjectField( "Attributes:", presentAttributeMap( ctx, styleSheet, inheritedState, values ) );
 		return styleSheet.objectBoxWithFields( getClass().getName(), new DPElement[] { valueField } );
 	}
 	

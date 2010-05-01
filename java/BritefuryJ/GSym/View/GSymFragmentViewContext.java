@@ -25,7 +25,7 @@ import BritefuryJ.DocView.DVNode;
 import BritefuryJ.GSym.GSymBrowserContext;
 import BritefuryJ.GSym.GSymPerspective;
 import BritefuryJ.GSym.GSymSubject;
-import BritefuryJ.GSym.ObjectView.PresentationStateListener;
+import BritefuryJ.GSym.GenericPerspective.PresentationStateListener;
 import BritefuryJ.Incremental.IncrementalFunction;
 import BritefuryJ.Incremental.IncrementalValue;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
@@ -232,16 +232,16 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 		return perspectiveFragmentRegion( e, perspective );
 	}
 	
-	public DPElement presentFragmentWithDefaultPerspective(Object x)
+	public DPElement presentFragmentWithGenericPerspective(Object x)
 	{
-		GSymPerspective defaultPerspective = getViewContext().getBrowserContext().getDefaultPerspective();
-		return presentFragmentWithPerspective( x, defaultPerspective );
+		GSymPerspective genericPerspective = getViewContext().getBrowserContext().getGenericPerspective();
+		return presentFragmentWithPerspective( x, genericPerspective );
 	}
 	
-	public DPElement presentFragmentWithDefaultPerspective(Object x, AttributeTable inheritedState)
+	public DPElement presentFragmentWithGenerixcPerspective(Object x, AttributeTable inheritedState)
 	{
-		GSymPerspective defaultPerspective = getViewContext().getBrowserContext().getDefaultPerspective();
-		return presentFragmentWithPerspective( x, defaultPerspective, inheritedState );
+		GSymPerspective genericPerspective = getViewContext().getBrowserContext().getGenericPerspective();
+		return presentFragmentWithPerspective( x, genericPerspective, inheritedState );
 	}
 	
 	
