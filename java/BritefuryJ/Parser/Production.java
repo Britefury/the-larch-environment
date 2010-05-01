@@ -148,7 +148,7 @@ public class Production extends ParserExpression
 		}
 		else
 		{
-			return "Production( <" + subexp.getExpressionName() + "> )";
+			return "Production( <" + getExpressionName() + "> )";
 		}
 	}
 }

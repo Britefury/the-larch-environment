@@ -28,7 +28,7 @@ class PrecedenceStyleSheet (StyleSheet):
 	
 	
 	def withOuterPrecedence(self, outerPrecedence):
-		return withAttr( 'outerPrecedence', outerPrecedence )
+		return self.withAttr( 'outerPrecedence', outerPrecedence )
 
 
 	def _numParensRequired(self, precedence):

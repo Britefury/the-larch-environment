@@ -2693,16 +2693,17 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		structuralRepresentation = null;
 	}
 	
-	public void clearStructuralRepresentationUpTo(DPElement subtreeRoot)
+	public void clearStructuralRepresentationsOnPathUpTo(DPElement subtreeRoot)
 	{
-		structuralRepresentation = null;
-		if ( this != subtreeRoot )
+		DPElement e = this;
+		
+		while ( e != subtreeRoot )
 		{
-			if ( parent != null )
-			{
-				parent.clearStructuralRepresentationUpTo( subtreeRoot );
-			}
-			else
+			e.structuralRepresentation = null;
+			
+			e = e.parent;
+			
+			if ( e == null )
 			{
 				throw new IsNotInSubtreeException();
 			}

@@ -68,9 +68,9 @@ class Python25EditLogEntry (LogEntry):
 	def createLogEntryPresentationContent(self, ctx, styleSheet, state):
 		description = styleSheet.horizontalObjectField( 'Description:', PrimitiveStyleSheet.instance.staticText( self._description ) )
 		editedStream = styleSheet.verticalObjectField( 'Edited stream:', ctx.presentFragment( self._editedStream, styleSheet ) )
-		parserName = styleSheet.horizontalObjectField( 'Parser rule:', PrimitiveStyleSheet.instance.staticText( self._parser.getExpressionName() ) )
+		parser = styleSheet.horizontalObjectField( 'Parser rule:', ctx.presentFragment( self._parser, styleSheet ) )
 		parsedResult = styleSheet.verticalObjectField( 'Parsed result:', ctx.presentFragment( self._parsedResult, styleSheet ) )
-		fields = [ description, editedStream, parserName, parsedResult ]
+		fields = [ description, editedStream, parser, parsedResult ]
 		for k, v in self._kw.items():
 			fields.append( styleSheet.verticalObjectField( k, ctx.presentFragment( v, styleSheet ) ) )
 		return PrimitiveStyleSheet.instance.vbox( fields )
@@ -110,6 +110,12 @@ class ParsedExpressionLinearRepresentationListener (ElementLinearRepresentationL
 		self._outerPrecedence = outerPrecedence
 
 	def linearRepresentationModified(self, element, event):
+		# if @event is a @SelectionLinearRepresentationEvent, and its source element is @element, then @element has had its
+		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it.
+		# Otherwise, clear the structural represnetation of all elements on the path from the source element to @element
+		if not ( isinstance( event, SelectionLinearRepresentationEvent )  and  event.getSourceElement() is element ):
+			event.getSourceElement().clearStructuralRepresentationsOnPathUpTo( element )
+			element.clearStructuralRepresentation()
 		value = element.getLinearRepresentation()
 		ctx = element.getFragmentContext()
 		node = ctx.getDocNode()
@@ -123,15 +129,14 @@ class ParsedExpressionLinearRepresentationListener (ElementLinearRepresentationL
 				if parsed != node:
 					pyReplaceExpression( ctx, node, parsed )
 			else:
-				items = value.getItemValues()
-				if len( items ) == 1  and  ( isinstance( items[0], str )  or  isinstance( items[0], unicode ) ):
-					if items[0].strip() == '':
+				if value.isTextual():
+					if value.textualValue().strip() == '':
 						# Expression content has been deleted entirely; clear the structural representation
 						log = ctx.getViewContext().getPageLog()
 						if log.isRecording():
-							log.log( Python25EditLogEntry( 'Expression - cleared', value, self._parser, parsed ) )
+							log.log( Python25EditLogEntry( 'Expression - deleted', value, self._parser, parsed ) )
 						return False
-				unparsed = Schema.UNPARSED( value=items )
+				unparsed = Schema.UNPARSED( value=value.getItemValues() )
 				log = ctx.getViewContext().getPageLog()
 				if log.isRecording():
 					log.log( Python25EditLogEntry( 'Expression - unparsed', value, self._parser, unparsed ) )
@@ -180,11 +185,8 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 		# if @event is a @SelectionLinearRepresentationEvent, and its source element is @element, then @element has had its
 		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it.
 		# Otherwise, clear the structural represnetation of all elements on the path from the source element to @element
-		if not isinstance( event, SelectionLinearRepresentationEvent )  or  event.getSourceElement() is not element:
-			e = event.getSourceElement()
-			while e is not element:
-				e.clearStructuralRepresentation()
-				e = e.getParent()
+		if not ( isinstance( event, SelectionLinearRepresentationEvent )  and  event.getSourceElement() is element ):
+			event.getSourceElement().clearStructuralRepresentationsOnPathUpTo( element )
 			element.clearStructuralRepresentation()
 		ctx = element.getFragmentContext()
 		node = ctx.getDocNode()
@@ -227,9 +229,8 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 					sourceNode = sourceCtx.getDocNode()
 					sourceValue = sourceCtxElement.getLinearRepresentation()
 					
-					items = sourceValue.getItemValues()
-					if len( items ) == 1  and  ( isinstance( items[0], str )  or  isinstance( items[0], unicode ) ):
-						if items[0].strip() == '':
+					if sourceValue.isTextual():
+						if sourceValue.textualValue().strip() == '':
 							# The content within @sourceCtxElement has been deleted entirely, replace the whole statement
 							log = ctx.getViewContext().getPageLog()
 							if log.isRecording():
@@ -237,7 +238,7 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 							pyReplaceStmt( ctx, node, parsed )
 							return True
 					
-					unparsed = Schema.UNPARSED( value=items )
+					unparsed = Schema.UNPARSED( value=sourceValue.getItemValues() )
 					log = ctx.getViewContext().getPageLog()
 					if log.isRecording():
 						log.log( Python25EditLogEntry( 'Statement - unparsed, sub-node replaced', sourceValue, self._parser, unparsed ) )

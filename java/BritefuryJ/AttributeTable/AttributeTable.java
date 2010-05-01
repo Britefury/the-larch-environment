@@ -78,7 +78,8 @@ public class AttributeTable implements Presentable
 		{
 			this.fieldName = fieldName;
 			this.value = value;
-			this.hash = HashUtils.doubleHash( fieldName.hashCode(), value.hashCode() );
+			int valueHash = value != null  ?  value.hashCode()  :  0;
+			this.hash = HashUtils.doubleHash( fieldName.hashCode(), valueHash );
 		}
 		
 		public int hashCode()
@@ -351,8 +352,9 @@ public class AttributeTable implements Presentable
 
 	
 	
-	protected DPElement presentAttributes(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+	protected static DPElement presentAttributeMap(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state, HashMap<String, Object> values)
 	{
+		PrimitiveStyleSheet attrTableStyle = getAttrTableStyle();
 		Set<String> nameSet = values.keySet();
 		String names[] = nameSet.toArray( new String[0] );
 		Arrays.sort( names );
@@ -374,11 +376,19 @@ public class AttributeTable implements Presentable
 	@Override
 	public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
-		DPElement valueField = styleSheet.verticalObjectField( "Attributes:", presentAttributes( ctx, styleSheet, state ) );
+		DPElement valueField = styleSheet.verticalObjectField( "Attributes:", presentAttributeMap( ctx, styleSheet, state, values ) );
 		return styleSheet.objectBoxWithFields( getClass().getName(), new DPElement[] { valueField } );
 	}
 	
 	
-	private static final PrimitiveStyleSheet attrTableStyle = PrimitiveStyleSheet.instance.withFontBold( true ).withFontSize( 14 ).withForeground(
-			new Color( 0.0f, 0.0f, 0.5f ) ).withTableColumnSpacing( 10.0 );
+	// We have to initialise this style sheet on request, otherwise we can end up with a circular class initialisation problem
+	private static PrimitiveStyleSheet _attrTableStyle;
+	private static PrimitiveStyleSheet getAttrTableStyle()
+	{
+		if ( _attrTableStyle == null )
+		{
+			_attrTableStyle = PrimitiveStyleSheet.instance.withFontBold( true ).withFontSize( 14 ).withForeground( new Color( 0.0f, 0.0f, 0.5f ) ).withTableColumnSpacing( 10.0 );
+		}
+		return _attrTableStyle;
+	}
 }

@@ -100,7 +100,7 @@ class PythonEditorStyleSheet (StyleSheet):
 	
 	
 	def withPythonState(self, outerPrecedence, parser, editMode=MODE_DISPLAYCONTENTS):
-		return self.withAttrs( outerPrecedence=outerPrecedence, parser=parser, editMode=editMode )
+		return self.withOuterPrecedence( outerPrecedence ).withAttrs( parser=parser, editMode=editMode )
 	
 	
 	

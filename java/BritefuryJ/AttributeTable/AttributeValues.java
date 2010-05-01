@@ -12,7 +12,12 @@ import java.util.Map;
 import org.python.core.Py;
 import org.python.core.PyObject;
 
-public class AttributeValues
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.GSym.DefaultPerspective.DefaultPerspectiveStyleSheet;
+import BritefuryJ.GSym.ObjectView.Presentable;
+import BritefuryJ.GSym.View.GSymFragmentViewContext;
+
+public class AttributeValues implements Presentable
 {
 	public static final AttributeValues identity = new AttributeValues();
 	
@@ -76,5 +81,13 @@ public class AttributeValues
 	public String toString()
 	{
 		return "AttributeSet( " + values.toString() + " )";
+	}
+	
+	
+	@Override
+	public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+	{
+		DPElement valueField = styleSheet.verticalObjectField( "Values:", AttributeTable.presentAttributeMap( ctx, styleSheet, state, values ) );
+		return styleSheet.objectBoxWithFields( getClass().getName(), new DPElement[] { valueField } );
 	}
 }
