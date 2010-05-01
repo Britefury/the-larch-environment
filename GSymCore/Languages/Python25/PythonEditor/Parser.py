@@ -264,7 +264,7 @@ class Python25Grammar (Grammar):
 	def tupleLiteral(self):
 		return SeparatedList( self.expression(), '(', ')', 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ). \
 		       listCondition( lambda input, begin, end, xs, bindings, bTrailingSep: len( xs ) != 1  or  bTrailingSep ). \
-		       listAction( lambda input, begin, end, xs, bindings, bTrailingSep: Schema.TupleLiteral( values=xs, trailingSeparator='1' if bTrailingSep else None ) )
+		       listAction( lambda input, begin, end, xs, bindings, bTrailingSep: Schema.TupleLiteral( values=xs, parens='1', trailingSeparator='1' if bTrailingSep else None ) )
 
 	@Rule
 	def oldTupleAsExpressionList(self):

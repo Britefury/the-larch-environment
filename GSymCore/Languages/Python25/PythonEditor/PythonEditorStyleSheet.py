@@ -299,7 +299,7 @@ class PythonEditorStyleSheet (StyleSheet):
 		span_listViewLayout = SpanListViewLayoutStyleSheet.instance.withAddLineBreaks( True ).withAddParagraphIndentMarkers( True ).withAddLineBreakCost( True )
 		
 		tupleListViewStyle = ListViewStyleSheet.instance.withSeparatorFactory( lambda styleSheet, index, child: punctuationStyle.text( ',' ) ).withSpacingFactory( lambda styleSheet: primitiveStyle.text( ' ' ) )
-		tupleListViewStyle = tupleListViewStyle.withBeginDelimFactory( lambda styleSheet: delimStyle.text( '(' ) ).withEndDelimFactory( lambda styleSheet: delimStyle.text( ')' ) )
+		#tupleListViewStyle = tupleListViewStyle.withBeginDelimFactory( lambda styleSheet: delimStyle.text( '(' ) ).withEndDelimFactory( lambda styleSheet: delimStyle.text( ')' ) )
 		tupleListViewStyle = tupleListViewStyle.withListLayout( span_listViewLayout )
 		
 		return tupleListViewStyle
