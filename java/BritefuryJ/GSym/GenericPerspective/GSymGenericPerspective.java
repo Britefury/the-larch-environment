@@ -14,17 +14,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Stack;
 
+import org.python.core.Py;
 import org.python.core.PyBoolean;
+import org.python.core.PyException;
 import org.python.core.PyFloat;
 import org.python.core.PyInteger;
 import org.python.core.PyLong;
+import org.python.core.PyObject;
 import org.python.core.PyString;
+import org.python.core.PyTuple;
 import org.python.core.PyUnicode;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementFactory;
-import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.Page;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
@@ -50,7 +53,7 @@ public class GSymGenericPerspective extends GSymPerspective
 	{
 		public DPElement createViewFragment(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
 		{
-			DPElement result;
+			DPElement result = null;
 			GenericPerspectiveStyleSheet genericStyleSheet = null;
 			if ( styleSheet instanceof GenericPerspectiveStyleSheet )
 			{
@@ -60,12 +63,36 @@ public class GSymGenericPerspective extends GSymPerspective
 			{
 				genericStyleSheet = GenericPerspectiveStyleSheet.instance;
 			}
+			
+			
 			if ( x instanceof Presentable )
 			{
+				// @x is an instance of @Presentable; use Presentable#present()
 				Presentable p = (Presentable)x;
 				result = p.present( ctx, genericStyleSheet, state );
 			}
-			else
+			
+			if ( result == null  &&  x instanceof PyObject )
+			{
+				// @x is a Python object - if it offers a __present__ method, use that
+				PyObject pyX = (PyObject)x;
+				PyObject __present__ = null;
+				try
+				{
+					__present__ = pyX.__getattr__( "__present__" );
+				}
+				catch (PyException e)
+				{
+					__present__ = null;
+				}
+				
+				if ( __present__ != null  &&  __present__.isCallable() )
+				{
+					result = Py.tojava( __present__.__call__( Py.java2py( ctx ), Py.java2py( styleSheet ), Py.java2py( state ) ),  DPElement.class );
+				}
+			}
+			
+			if ( result == null )
 			{
 				ObjectPresenter presenter = getPresenterForJavaObject( x );
 				if ( presenter != null )
@@ -77,6 +104,7 @@ public class GSymGenericPerspective extends GSymPerspective
 					result = presentJavaObject( x, ctx, genericStyleSheet, state );
 				}
 			}
+			
 			result.setDebugName( x.getClass().getName() );
 			return result;
 		}
@@ -306,6 +334,7 @@ public class GSymGenericPerspective extends GSymPerspective
 		registerObjectPresenter( PyLong.class,  PrimitivePresenter.presenter_PyLong );
 		registerObjectPresenter( PyFloat.class,  PrimitivePresenter.presenter_PyFloat );
 		registerObjectPresenter( PyBoolean.class,  PrimitivePresenter.presenter_PyBoolean );
+		registerObjectPresenter( PyTuple.class,  PrimitivePresenter.presenter_PyTuple );
 
 		
 		registerObjectPresenter( List.class,  PrimitivePresenter.presenter_List );
@@ -316,9 +345,7 @@ public class GSymGenericPerspective extends GSymPerspective
 	
 	private static DPElement presentJavaObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
-		DPElement className = javaObjectClassNameStyle.staticText( x.getClass().getName() );
-		DPElement asString = asStringStyle.staticText( x.toString() );
-		return javaObjectBorderStyle.border( javaObjectBorderStyle.vbox( new DPElement[] { className, asString.padX( 10.0 ) } ) );
+		return styleSheet.objectBox( x.getClass().getName(), asStringStyle.staticText( x.toString() ) );
 	}
 	
 	
@@ -573,7 +600,7 @@ public class GSymGenericPerspective extends GSymPerspective
 			{
 				Color colour = (Color)x;
 				
-				DPElement title = colourTitleStyle.staticText( "java.awt.Color" );
+				DPElement title = colourObjectBoxStyle.objectTitle( "java.awt.Color" );
 				
 				DPElement red = colourRedStyle.staticText( "R=" + String.valueOf( colour.getRed() ) );
 				DPElement green = colourGreenStyle.staticText( "G=" + String.valueOf( colour.getGreen() ) );
@@ -588,7 +615,7 @@ public class GSymGenericPerspective extends GSymPerspective
 				
 				DPElement contents = colourBoxStyle.hbox( new DPElement[] { textBox, swatch } );
 				
-				return PrimitiveStyleSheet.instance.border( contents );
+				return colourObjectBoxStyle.objectBorder( contents );
 			}
 		};
 
@@ -607,6 +634,22 @@ public class GSymGenericPerspective extends GSymPerspective
 				return listListViewStyle.createListElement( itemViews, TrailingSeparator.NEVER );
 			}
 		};
+
+		public static final ObjectPresenter presenter_PyTuple = new ObjectPresenter()
+		{
+			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+			{
+				PyTuple tuple = (PyTuple)x;
+				
+				ArrayList<DPElement> itemViews = new ArrayList<DPElement>();
+				for (Object item: tuple)
+				{
+					itemViews.add( ctx.presentFragmentWithGenericPerspective( item ) );
+				}
+				
+				return tupleListViewStyle.createListElement( itemViews, TrailingSeparator.NEVER );
+			}
+		};
 	}
 	
 	
@@ -620,7 +663,7 @@ public class GSymGenericPerspective extends GSymPerspective
 	private static final PrimitiveStyleSheet booleanStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.0f, 0.5f, 0.0f ) ).withTextSmallCaps( true );
 	
 	
-	private static final PrimitiveStyleSheet colourTitleStyle = PrimitiveStyleSheet.instance.withFontSize( 10 ).withForeground( new Color( 0.0f, 0.1f, 0.4f ) );
+	private static final GenericPerspectiveStyleSheet colourObjectBoxStyle = GenericPerspectiveStyleSheet.instance.withObjectBorderAndTitlePaint( new Color( 0.0f, 0.1f, 0.4f ) );
 	private static final PrimitiveStyleSheet colourRedStyle = PrimitiveStyleSheet.instance.withFontSize( 12 ).withForeground( new Color( 0.75f, 0.0f, 0.0f ) );
 	private static final PrimitiveStyleSheet colourGreenStyle = PrimitiveStyleSheet.instance.withFontSize( 12 ).withForeground( new Color( 0.0f, 0.75f, 0.0f ) );
 	private static final PrimitiveStyleSheet colourBlueStyle = PrimitiveStyleSheet.instance.withFontSize( 12 ).withForeground( new Color( 0.0f, 0.0f, 0.75f ) );
@@ -628,8 +671,6 @@ public class GSymGenericPerspective extends GSymPerspective
 	private static final PrimitiveStyleSheet colourBoxStyle = PrimitiveStyleSheet.instance.withHBoxSpacing( 5.0 );
 
 	
-	private static final PrimitiveStyleSheet javaObjectBorderStyle = PrimitiveStyleSheet.instance.withBorder( new SolidBorder( 2.0, 2.0, 5.0, 5.0, new Color( 63, 70, 95 ), null ) );
-	private static final PrimitiveStyleSheet javaObjectClassNameStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 63, 70, 95 ) ).withFontBold( true ).withFontSize( 12 );
 	private static final PrimitiveStyleSheet asStringStyle = PrimitiveStyleSheet.instance.withFontItalic( true ).withFontSize( 14 );
 
 
@@ -665,8 +706,26 @@ public class GSymGenericPerspective extends GSymPerspective
 		}
 	};
 	
+	private static final ElementFactory openParenFactory = new ElementFactory()
+	{
+		public DPElement createElement(StyleSheet styleSheet)
+		{
+			return delimStyle.staticText( "(" );
+		}
+	};
+	
+	private static final ElementFactory closeParenFactory = new ElementFactory()
+	{
+		public DPElement createElement(StyleSheet styleSheet)
+		{
+			return delimStyle.staticText( ")" );
+		}
+	};
+	
 	
 	private static SpanListViewLayoutStyleSheet span_listViewLayout = SpanListViewLayoutStyleSheet.instance.withAddLineBreaks( true ).withAddParagraphIndentMarkers( true ).withAddLineBreakCost( true );
 	private static ListViewStyleSheet listListViewStyle = ListViewStyleSheet.instance.withSeparatorFactory( commaFactory ).withSpacingFactory( spaceFactory )
 		.withBeginDelimFactory( openBracketFactory ).withEndDelimFactory( closeBracketFactory ).withListLayout( span_listViewLayout );
+	private static ListViewStyleSheet tupleListViewStyle = ListViewStyleSheet.instance.withSeparatorFactory( commaFactory ).withSpacingFactory( spaceFactory )
+		.withBeginDelimFactory( openParenFactory ).withEndDelimFactory( closeParenFactory ).withListLayout( span_listViewLayout );
 }

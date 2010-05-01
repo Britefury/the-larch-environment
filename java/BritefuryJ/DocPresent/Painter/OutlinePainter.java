@@ -12,7 +12,7 @@ import java.awt.Paint;
 import java.awt.Shape;
 import java.awt.Stroke;
 
-public class OutlinePainter implements Painter
+public class OutlinePainter extends Painter
 {
 	private final Paint outlinePaint;
 	private final Stroke outlineStroke;

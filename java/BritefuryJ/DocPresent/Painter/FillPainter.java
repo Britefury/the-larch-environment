@@ -10,7 +10,7 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Shape;
 
-public class FillPainter implements Painter
+public class FillPainter extends Painter
 {
 	private final Paint fillPaint;
 	

@@ -212,5 +212,5 @@ public class Location implements Presentable
 	}
 
 
-	private static final GenericPerspectiveStyleSheet locationStyle = GenericPerspectiveStyleSheet.instance.withObjectBorderPaint( new Color( 0.4f, 0.65f, 0.4f ) ); 
+	private static final GenericPerspectiveStyleSheet locationStyle = GenericPerspectiveStyleSheet.instance.withObjectBorderAndTitlePaint( new Color( 0.4f, 0.65f, 0.4f ) ); 
 }
