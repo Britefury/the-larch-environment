@@ -115,9 +115,9 @@ class TerminalView (GSymViewObjectDispatch):
 		result = node.getResult()
 		
 		moduleView = ctx.presentFragmentWithPerspectiveAndStyleSheet( pythonModule, Python25.python25EditorPerspective, styleSheet.staticPythonStyle() )
-		caughtExceptionView = ctx.presentFragmentWithDefaultPerspective( caughtException )   if caughtException is not None   else None
+		caughtExceptionView = ctx.presentFragmentWithGenericPerspective( caughtException )   if caughtException is not None   else None
 		if result is not None:
-			resultView = ctx.presentFragmentWithDefaultPerspective( result[0]   if result[0] is not None   else   str( None ) )
+			resultView = ctx.presentFragmentWithGenericPerspective( result[0]   if result[0] is not None   else   str( None ) )
 		else:
 			resultView = None
 		
