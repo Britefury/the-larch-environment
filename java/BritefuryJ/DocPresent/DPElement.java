@@ -50,9 +50,9 @@ import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueStream;
 import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.GSym.DefaultPerspective.DefaultPerspectiveStyleSheet;
-import BritefuryJ.GSym.ObjectView.Presentable;
-import BritefuryJ.GSym.ObjectView.PresentationStateListenerList;
+import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.GSym.GenericPerspective.Presentable;
+import BritefuryJ.GSym.GenericPerspective.PresentationStateListenerList;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
@@ -95,9 +95,9 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 
 		@Override
-		public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+		public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 		{
-			return element.exploreTreePresent( ctx, styleSheet, state );
+			return element.exploreTreePresent( ctx, styleSheet, inheritedState );
 		}
 	}
 
@@ -119,7 +119,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 
 		@Override
-		public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+		public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 		{
 			return originalElement.clonePresentationSubtree();
 		}
@@ -3055,7 +3055,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 
 
-	public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+	public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		if ( getParent() == null )
 		{

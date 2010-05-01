@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.DocView;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -15,7 +14,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
-import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.IncrementalTree.IncrementalTree;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 import BritefuryJ.IncrementalTree.IncrementalTreeNodeTable;
@@ -92,8 +91,6 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 	private boolean bProfilingEnabled;
 	private ProfileTimer pythonTimer, javaTimer, elementTimer, contentChangeTimer, updateNodeElementTimer;
 	
-	private static VBoxStyleParams rootBoxStyle = VBoxStyleParams.defaultStyleParams;
-	
 	
 	
 	
@@ -144,8 +141,7 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 			DVNode rootView = (DVNode)getRootIncrementalTreeNode();
 			rootView.getElement().alignHExpand();
 			rootView.getElement().alignVExpand();
-			rootBox = new DPVBox( rootBoxStyle );
-			rootBox.setChildren( Arrays.asList( new DPElement[] { rootView.getElement() } ) );
+			rootBox = PrimitiveStyleSheet.instance.vbox( new DPElement[] { rootView.getElement() } );
 		}
 		return rootBox;
 	}

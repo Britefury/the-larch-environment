@@ -10,8 +10,8 @@ import java.util.Map;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.GSym.DefaultPerspective.DefaultPerspectiveStyleSheet;
-import BritefuryJ.GSym.ObjectView.Presentable;
+import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 import BritefuryJ.Parser.DebugParseResultView.ParseView;
 import BritefuryJ.ParserHelpers.DebugNode;
@@ -36,8 +36,8 @@ public class DebugParseResult extends ParseResult implements DebugParseResultInt
 
 
 	@Override
-	public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+	public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
-		return ParseView.presentDebugParseResult( this, ctx, styleSheet, state );
+		return ParseView.presentDebugParseResult( this, ctx, styleSheet, inheritedState );
 	}
 }

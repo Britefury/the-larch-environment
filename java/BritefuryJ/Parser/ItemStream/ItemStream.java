@@ -17,8 +17,8 @@ import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.GSym.DefaultPerspective.DefaultPerspectiveStyleSheet;
-import BritefuryJ.GSym.ObjectView.Presentable;
+import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 
 public class ItemStream implements Presentable
@@ -136,7 +136,7 @@ public class ItemStream implements Presentable
 
 
 		@Override
-		public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+		public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 		{
 			return styleSheet.unescapedStringAsSpan( textValue );
 		}
@@ -214,7 +214,7 @@ public class ItemStream implements Presentable
 
 
 		@Override
-		public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+		public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 		{
 			return borderStyle.border( PrimitiveStyleSheet.instance.vbox( new DPElement[] { ctx.presentFragment( structuralValue, styleSheet ) } ) );
 		}
@@ -540,7 +540,7 @@ public class ItemStream implements Presentable
 
 
 	@Override
-	public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+	public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		List<DPElement> itemViews = ctx.mapPresentFragment( Arrays.asList( (Object[])items ), styleSheet );
 		DPElement contents = PrimitiveStyleSheet.instance.paragraph( itemViews.toArray( new DPElement[0] ) );
@@ -549,5 +549,5 @@ public class ItemStream implements Presentable
 	}
 
 
-	private static final DefaultPerspectiveStyleSheet itemStreamStyle = DefaultPerspectiveStyleSheet.instance.withObjectBorderPaint( new Color( 0.65f, 0.0f, 0.55f ) );
+	private static final GenericPerspectiveStyleSheet itemStreamStyle = GenericPerspectiveStyleSheet.instance.withObjectBorderPaint( new Color( 0.65f, 0.0f, 0.55f ) );
 }

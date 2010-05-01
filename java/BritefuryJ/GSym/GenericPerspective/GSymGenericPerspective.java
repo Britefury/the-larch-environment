@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.GSym.DefaultPerspective;
+package BritefuryJ.GSym.GenericPerspective;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -40,44 +40,41 @@ import BritefuryJ.GSym.GSymBrowserContext;
 import BritefuryJ.GSym.GSymLocationResolver;
 import BritefuryJ.GSym.GSymPerspective;
 import BritefuryJ.GSym.GSymSubject;
-import BritefuryJ.GSym.ObjectView.GSymObjectViewLocationTable;
-import BritefuryJ.GSym.ObjectView.ObjectPresenter;
-import BritefuryJ.GSym.ObjectView.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 import BritefuryJ.GSym.View.GSymViewContext;
 import BritefuryJ.GSym.View.GSymViewFragmentFunction;
 
-public class GSymDefaultPerspective implements GSymPerspective
+public class GSymGenericPerspective extends GSymPerspective
 {
 	private class GSymObjectViewFragmentFunction implements GSymViewFragmentFunction
 	{
 		public DPElement createViewFragment(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
 		{
 			DPElement result;
-			DefaultPerspectiveStyleSheet defaultStyleSheet = null;
-			if ( styleSheet instanceof DefaultPerspectiveStyleSheet )
+			GenericPerspectiveStyleSheet genericStyleSheet = null;
+			if ( styleSheet instanceof GenericPerspectiveStyleSheet )
 			{
-				defaultStyleSheet = (DefaultPerspectiveStyleSheet)styleSheet;
+				genericStyleSheet = (GenericPerspectiveStyleSheet)styleSheet;
 			}
 			else
 			{
-				defaultStyleSheet = DefaultPerspectiveStyleSheet.instance;
+				genericStyleSheet = GenericPerspectiveStyleSheet.instance;
 			}
 			if ( x instanceof Presentable )
 			{
 				Presentable p = (Presentable)x;
-				result = p.present( ctx, defaultStyleSheet, state );
+				result = p.present( ctx, genericStyleSheet, state );
 			}
 			else
 			{
 				ObjectPresenter presenter = getPresenterForJavaObject( x );
 				if ( presenter != null )
 				{
-					result = presenter.presentObject( x, ctx, defaultStyleSheet, state );
+					result = presenter.presentObject( x, ctx, genericStyleSheet, state );
 				}
 				else
 				{
-					result = presentJavaObject( x, ctx, defaultStyleSheet, state );
+					result = presentJavaObject( x, ctx, genericStyleSheet, state );
 				}
 			}
 			result.setDebugName( x.getClass().getName() );
@@ -87,12 +84,12 @@ public class GSymDefaultPerspective implements GSymPerspective
 
 	
 	
-	private static class DefaultPerspectiveLocationResolver implements GSymLocationResolver
+	private static class GenericPerspectiveLocationResolver implements GSymLocationResolver
 	{
-		private GSymDefaultPerspective perspective;
+		private GSymGenericPerspective perspective;
 		
 		
-		public DefaultPerspectiveLocationResolver(GSymDefaultPerspective perspective)
+		public GenericPerspectiveLocationResolver(GSymGenericPerspective perspective)
 		{
 			this.perspective = perspective;
 		}
@@ -123,13 +120,13 @@ public class GSymDefaultPerspective implements GSymPerspective
 	
 	private GSymObjectViewLocationTable locationTable = new GSymObjectViewLocationTable();
 	private GSymObjectViewFragmentFunction fragmentViewFn = new GSymObjectViewFragmentFunction();
-	private DefaultPerspectiveLocationResolver locationResolver = new DefaultPerspectiveLocationResolver( this );
+	private GenericPerspectiveLocationResolver locationResolver = new GenericPerspectiveLocationResolver( this );
 	private HashMap<Class<?>, ObjectPresenter> registeredObjectPresenters = new HashMap<Class<?>, ObjectPresenter>();
 	private HashMap<Class<?>, ObjectPresenter> objectPresenters = new HashMap<Class<?>, ObjectPresenter>();
 	private GSymBrowserContext browserContext;
 	
 	
-	public GSymDefaultPerspective(GSymBrowserContext browserContext)
+	public GSymGenericPerspective(GSymBrowserContext browserContext)
 	{
 		this.browserContext = browserContext;
 
@@ -146,7 +143,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 	
 	public StyleSheet getStyleSheet()
 	{
-		return DefaultPerspectiveStyleSheet.instance;
+		return GenericPerspectiveStyleSheet.instance;
 	}
 	
 	public AttributeTable getInitialInheritedState()
@@ -317,7 +314,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 	}
 	
 	
-	private static DPElement presentJavaObject(Object x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+	private static DPElement presentJavaObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
 		DPElement className = javaObjectClassNameStyle.staticText( x.getClass().getName() );
 		DPElement asString = asStringStyle.staticText( x.toString() );
@@ -328,7 +325,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 	
 	private static class PrimitivePresenter
 	{
-		public static DPElement presentChar(char c, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+		public static DPElement presentChar(char c, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
 			String str = Character.toString( c );
 			return PrimitiveStyleSheet.instance.hbox( new DPElement[] {
@@ -337,7 +334,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 					punctuationStyle.staticText(  "'" ) } );
 		}
 		
-		public static DPElement presentString(String str, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+		public static DPElement presentString(String str, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
 			String lines[] = str.split( "\n" );
 			if ( lines.length == 1 )
@@ -371,18 +368,18 @@ public class GSymDefaultPerspective implements GSymPerspective
 			}
 		}
 
-		public static DPElement presentByte(byte b, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+		public static DPElement presentByte(byte b, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
 			return integerStyle.staticText( Integer.toHexString( (int)b ) );
 		}
 		
 		
-		public static DPElement presentInt(int x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+		public static DPElement presentInt(int x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
 			return integerStyle.staticText( Integer.toString( x ) );
 		}
 		
-		public static DPElement presentDouble(double x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+		public static DPElement presentDouble(double x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
 			String asText = Double.toString( x );
 			
@@ -407,7 +404,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 			return PrimitiveStyleSheet.instance.scriptRSuper( mantissa, exponent );
 		}
 		
-		public static DPElement presentBoolean(boolean b, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+		public static DPElement presentBoolean(boolean b, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
 			if ( b )
 			{
@@ -423,7 +420,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 	
 		public static final ObjectPresenter presenter_Character = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				return PrimitivePresenter.presentChar( (Character)x, ctx, styleSheet, state );
 			}
@@ -431,7 +428,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 		
 		public static final ObjectPresenter presenter_String = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				return PrimitivePresenter.presentString( (String)x, ctx, styleSheet, state );
 			}
@@ -439,7 +436,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 		
 		public static final ObjectPresenter presenter_Byte = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				return PrimitivePresenter.presentByte( (Byte)x, ctx, styleSheet, state );
 			}
@@ -447,7 +444,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 		
 		public static final ObjectPresenter presenter_Short = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				return PrimitivePresenter.presentInt( ((Short)x).intValue(), ctx, styleSheet, state );
 			}
@@ -455,7 +452,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 		
 		public static final ObjectPresenter presenter_Integer = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				return PrimitivePresenter.presentInt( (Integer)x, ctx, styleSheet, state );
 			}
@@ -463,7 +460,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 		
 		public static final ObjectPresenter presenter_Long = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				return PrimitivePresenter.presentInt( ((Long)x).intValue(), ctx, styleSheet, state );
 			}
@@ -471,7 +468,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 		
 		public static final ObjectPresenter presenter_Float = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				return PrimitivePresenter.presentDouble( ((Float)x).doubleValue(), ctx, styleSheet, state );
 			}
@@ -479,7 +476,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 		
 		public static final ObjectPresenter presenter_Double = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				return PrimitivePresenter.presentDouble( (Double)x, ctx, styleSheet, state );
 			}
@@ -487,7 +484,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 		
 		public static final ObjectPresenter presenter_Boolean = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				return PrimitivePresenter.presentBoolean( (Boolean)x, ctx, styleSheet, state );
 			}
@@ -498,7 +495,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 		
 		public static final ObjectPresenter presenter_PyString = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				return PrimitivePresenter.presentString( ((PyString)x).asString(), ctx, styleSheet, state );
 			}
@@ -506,7 +503,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 		
 		public static final ObjectPresenter presenter_PyUnicode = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				return PrimitivePresenter.presentString( ((PyUnicode)x).asString(), ctx, styleSheet, state );
 			}
@@ -514,7 +511,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 		
 		public static final ObjectPresenter presenter_PyInteger = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				return PrimitivePresenter.presentInt( ((PyInteger)x).asInt(), ctx, styleSheet, state );
 			}
@@ -522,7 +519,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 		
 		public static final ObjectPresenter presenter_PyLong = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				return integerStyle.staticText( x.toString() );
 			}
@@ -530,7 +527,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 		
 		public static final ObjectPresenter presenter_PyFloat = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				return PrimitivePresenter.presentDouble( ((PyFloat)x).asDouble(), ctx, styleSheet, state );
 			}
@@ -538,7 +535,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 		
 		public static final ObjectPresenter presenter_PyBoolean = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				return PrimitivePresenter.presentBoolean( ((PyBoolean)x).__nonzero__(), ctx, styleSheet, state );
 			}
@@ -549,7 +546,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 		
 		public static final ObjectPresenter presenter_BufferedImage = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				BufferedImage image = (BufferedImage)x;
 				double width = (double)image.getWidth();
@@ -572,7 +569,7 @@ public class GSymDefaultPerspective implements GSymPerspective
 
 		public static final ObjectPresenter presenter_Color = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				Color colour = (Color)x;
 				
@@ -597,14 +594,14 @@ public class GSymDefaultPerspective implements GSymPerspective
 
 		public static final ObjectPresenter presenter_List = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				List<?> list = (List<?>)x;
 				
 				ArrayList<DPElement> itemViews = new ArrayList<DPElement>();
 				for (Object item: list)
 				{
-					itemViews.add( ctx.presentFragmentWithDefaultPerspective( item ) );
+					itemViews.add( ctx.presentFragmentWithGenericPerspective( item ) );
 				}
 				
 				return listListViewStyle.createListElement( itemViews, TrailingSeparator.NEVER );

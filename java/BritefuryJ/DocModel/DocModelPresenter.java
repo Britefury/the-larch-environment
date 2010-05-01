@@ -22,7 +22,7 @@ import BritefuryJ.DocPresent.ListView.VerticalInlineListViewLayoutStyleSheet;
 import BritefuryJ.DocPresent.ListView.VerticalListViewLayoutStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.GSym.DefaultPerspective.DefaultPerspectiveStyleSheet;
+import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 
 public class DocModelPresenter
@@ -38,7 +38,7 @@ public class DocModelPresenter
 
 	private static final PrimitiveStyleSheet nullStyle = defaultStyle.withFontItalic( true ).withForeground( new Color( 0.5f, 0.0f, 0.25f ) );
 
-	private static final DefaultPerspectiveStyleSheet stringStyle = DefaultPerspectiveStyleSheet.instance.withPrimitiveStyleSheet( defaultStyle ).withStringContentAttrs(
+	private static final GenericPerspectiveStyleSheet stringStyle = GenericPerspectiveStyleSheet.instance.withPrimitiveStyleSheet( defaultStyle ).withStringContentAttrs(
 			new AttributeValues( new String[] { "foreground" }, new Object[] { new Color( 0.5f, 0.0f, 0.25f ) } ) );
 	
 	private static final PrimitiveStyleSheet punctuationStyle = defaultStyle.withForeground( new Color( 0.0f, 0.0f, 1.0f ) );
@@ -107,7 +107,7 @@ public class DocModelPresenter
 
 
 	
-	private static DPElement present(Object x, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+	private static DPElement present(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
 		if ( x == null )
 		{
@@ -123,7 +123,7 @@ public class DocModelPresenter
 		}
 	}
 	
-	protected static DPElement presentDMList(DMList node, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+	protected static DPElement presentDMList(DMList node, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
 		List<DPElement> xViews = new ArrayList<DPElement>();
 		for (Object x: node)
@@ -151,7 +151,7 @@ public class DocModelPresenter
 	}
 	
 	
-	protected static DPElement presentDMObject(DMObject node, GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+	protected static DPElement presentDMObject(DMObject node, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
 		DMObjectClass cls = node.getDMObjectClass();
 		

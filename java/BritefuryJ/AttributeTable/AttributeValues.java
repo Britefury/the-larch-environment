@@ -13,8 +13,8 @@ import org.python.core.Py;
 import org.python.core.PyObject;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.GSym.DefaultPerspective.DefaultPerspectiveStyleSheet;
-import BritefuryJ.GSym.ObjectView.Presentable;
+import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 
 public class AttributeValues implements Presentable
@@ -85,9 +85,9 @@ public class AttributeValues implements Presentable
 	
 	
 	@Override
-	public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+	public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
-		DPElement valueField = styleSheet.verticalObjectField( "Values:", AttributeTable.presentAttributeMap( ctx, styleSheet, state, values ) );
+		DPElement valueField = styleSheet.verticalObjectField( "Values:", AttributeTable.presentAttributeMap( ctx, styleSheet, inheritedState, values ) );
 		return styleSheet.objectBoxWithFields( getClass().getName(), new DPElement[] { valueField } );
 	}
 }

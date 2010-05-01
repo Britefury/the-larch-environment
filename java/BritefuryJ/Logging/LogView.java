@@ -12,9 +12,9 @@ import java.util.List;
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.GSym.DefaultPerspective.DefaultPerspectiveStyleSheet;
-import BritefuryJ.GSym.ObjectView.Presentable;
-import BritefuryJ.GSym.ObjectView.PresentationStateListenerList;
+import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.GSym.GenericPerspective.Presentable;
+import BritefuryJ.GSym.GenericPerspective.PresentationStateListenerList;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 
 public class LogView implements Presentable
@@ -72,7 +72,7 @@ public class LogView implements Presentable
 
 
 
-	public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+	public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		stateListeners = PresentationStateListenerList.addListener( stateListeners, ctx );
 		

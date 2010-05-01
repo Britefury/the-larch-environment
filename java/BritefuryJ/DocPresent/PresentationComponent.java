@@ -58,7 +58,7 @@ import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Selection.SelectionListener;
 import BritefuryJ.DocPresent.Selection.SelectionManager;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.GSym.DefaultPerspective.DefaultPerspectiveStyleSheet;
+import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Logging.LogEntry;
@@ -105,7 +105,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			return "Presentation typesetting performance";
 		}
 		
-		public DPElement createLogEntryPresentationContent(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+		public DPElement createLogEntryPresentationContent(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
 			return PrimitiveStyleSheet.instance.staticText( "Typesetting time: " + typesetTime );
 		}

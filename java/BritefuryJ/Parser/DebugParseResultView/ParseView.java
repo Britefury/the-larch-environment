@@ -21,7 +21,6 @@ import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
 import BritefuryJ.DocPresent.Controls.ScrolledViewport;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
-import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
@@ -142,9 +141,6 @@ public class ParseView implements FragmentContext
 	{
 		selection = null;
 		
-		viewBin = new DPBin( ContainerStyleParams.defaultStyleParams );
-		viewBin.addInteractor( new ParseViewInteractor( this ) );
-		
 		nodeTable = new HashMap<DebugNode, NodeView>();
 		callEdges = new ArrayList<Edge>();
 		memoEdges = new ArrayList<Edge>();
@@ -153,7 +149,8 @@ public class ParseView implements FragmentContext
 		
 		root.registerEdges();
 		
-		viewBin.setChild( root.getElement() );
+		viewBin = PrimitiveStyleSheet.instance.bin( root.getElement() );
+		viewBin.addInteractor( new ParseViewInteractor( this ) );
 		
 		viewport = ControlsStyleSheet.instance.scrolledViewport( viewBin, 0.0, 800.0, viewportState );
 		element = viewportBorderStyle.border( viewport.getElement().alignHExpand().alignVExpand() ).alignHExpand().alignVExpand();

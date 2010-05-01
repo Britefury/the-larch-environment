@@ -14,8 +14,8 @@ import java.util.Map;
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.GSym.DefaultPerspective.DefaultPerspectiveStyleSheet;
-import BritefuryJ.GSym.ObjectView.Presentable;
+import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 import BritefuryJ.ParserHelpers.DebugNode;
 import BritefuryJ.ParserHelpers.ParseResultInterface;
@@ -245,7 +245,7 @@ public class ParseResult implements ParseResultInterface, Presentable
 
 
 	@Override
-	public DPElement present(GSymFragmentViewContext ctx, DefaultPerspectiveStyleSheet styleSheet, AttributeTable state)
+	public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		DPElement fields[];
 		
@@ -258,7 +258,7 @@ public class ParseResult implements ParseResultInterface, Presentable
 							PrimitiveStyleSheet.instance.staticText( " to " ),
 							rangeStyle.staticText( String.valueOf( getEnd() ) ) } ) );
 			
-			DPElement valueView = PrimitiveStyleSheet.instance.layoutWrap( ctx.presentFragmentWithDefaultPerspective( getValue(), state ) );
+			DPElement valueView = PrimitiveStyleSheet.instance.layoutWrap( ctx.presentFragmentWithGenerixcPerspective( getValue(), inheritedState ) );
 			DPElement value = parseResultStyle.verticalObjectField( "Value:", valueView );
 			fields = new DPElement[] { status, range, value };
 		}
@@ -274,5 +274,5 @@ public class ParseResult implements ParseResultInterface, Presentable
 	private static PrimitiveStyleSheet successStyle = PrimitiveStyleSheet.instance.withFontItalic( true ).withFontSize( 12 ).withForeground( new Color( 0.0f, 0.5f, 0.0f ) );
 	private static PrimitiveStyleSheet failStyle = PrimitiveStyleSheet.instance.withFontItalic( true ).withFontSize( 12 ).withForeground( new Color( 0.5f, 0.0f, 0.0f ) );
 	private static PrimitiveStyleSheet rangeStyle = PrimitiveStyleSheet.instance.withFontSize( 12 ).withForeground( new Color( 0.0f, 0.5f, 0.5f ) );
-	private static DefaultPerspectiveStyleSheet parseResultStyle = DefaultPerspectiveStyleSheet.instance.withObjectTitlePaint( new Color( 0.4f, 0.4f, 0.4f ) ).withObjectBorderPaint( new Color( 0.6f, 0.6f, 0.6f ) );
+	private static GenericPerspectiveStyleSheet parseResultStyle = GenericPerspectiveStyleSheet.instance.withObjectTitlePaint( new Color( 0.4f, 0.4f, 0.4f ) ).withObjectBorderPaint( new Color( 0.6f, 0.6f, 0.6f ) );
 }
