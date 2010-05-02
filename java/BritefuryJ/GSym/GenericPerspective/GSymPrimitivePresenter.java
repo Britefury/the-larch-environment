@@ -119,7 +119,7 @@ public class GSymPrimitivePresenter
 	}
 	private static final PrimitiveStyleSheet punctuationStyle = PrimitiveStyleSheet.instance.withForeground( Color.blue );
 	private static final PrimitiveStyleSheet charStyle = PrimitiveStyleSheet.instance; 
-	private static final PrimitiveStyleSheet multiLineStringStyle = PrimitiveStyleSheet.instance.withBackground( new FillPainter( new Color( 0.8f, 0.8f, 1.0f ) ) );
+	private static final PrimitiveStyleSheet multiLineStringStyle = PrimitiveStyleSheet.instance.withBackground( new FillPainter( new Color( 1.0f, 1.0f, 0.75f ) ) );
 	private static final PrimitiveStyleSheet integerStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.5f, 0.0f, 0.5f ) );
 	private static final PrimitiveStyleSheet floatStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.25f, 0.0f, 0.5f ) );
 	private static final PrimitiveStyleSheet booleanStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.0f, 0.5f, 0.0f ) ).withTextSmallCaps( true );
