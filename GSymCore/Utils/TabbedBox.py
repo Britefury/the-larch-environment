@@ -75,7 +75,7 @@ class TabbedBoxStyleSheet (StyleSheet):
 		bodyStyle = params.bodyStyle
 		
 		header = headerStyle.border( headerStyle.staticText( tabTitle ) )
-		body = bodyStyle.border( bodyStyle.vbox( [ contents ] ) )
+		body = bodyStyle.border( contents )
 		return bodyStyle.vbox( [ header, body.alignHExpand() ] )
 	
 	

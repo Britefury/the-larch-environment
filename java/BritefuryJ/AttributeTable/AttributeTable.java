@@ -366,7 +366,7 @@ public class AttributeTable implements Presentable
 		{
 			String name = names[i];
 			Object value = values.get( name );
-			DPElement valueView = PrimitiveStyleSheet.instance.layoutWrap( ctx.presentFragment( value, styleSheet ) );
+			DPElement valueView = ctx.presentFragment( value, styleSheet );
 			children[i+1] = new DPElement[] {
 					PrimitiveStyleSheet.instance.staticText( name ), valueView };
 		}

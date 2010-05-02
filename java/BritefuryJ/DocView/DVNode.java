@@ -133,11 +133,13 @@ public class DVNode extends IncrementalTreeNode
 			{
 				element = (DPElement)r;
 				fragmentElement.setChild( element );
+				fragmentElement.copyAlignmentFlagsFrom( element );
 			}
 			else
 			{
 				element = null;
 				fragmentElement.setChild( null );
+				fragmentElement.alignHLeft().alignVRefY();
 			}
 		}
 		getDocView().profile_stopUpdateNodeElement();

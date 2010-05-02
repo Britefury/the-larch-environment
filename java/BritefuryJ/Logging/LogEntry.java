@@ -59,9 +59,8 @@ public class LogEntry implements Presentable
 	public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		DPElement entryContent = createLogEntryPresentationContent( ctx, styleSheet, inheritedState );
-		DPElement content = PrimitiveStyleSheet.instance.layoutWrap( entryContent );
 		
-		return logEntryStyle.objectBox( getLogEntryTitle(), content );
+		return logEntryStyle.objectBox( getLogEntryTitle(), entryContent );
 	}
 
 

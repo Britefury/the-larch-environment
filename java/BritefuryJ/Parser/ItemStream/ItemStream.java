@@ -216,7 +216,7 @@ public class ItemStream implements Presentable
 		@Override
 		public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 		{
-			return borderStyle.border( PrimitiveStyleSheet.instance.vbox( new DPElement[] { ctx.presentFragment( structuralValue, styleSheet ) } ) );
+			return borderStyle.border( ctx.presentFragment( structuralValue, styleSheet ) );
 		}
 
 	
