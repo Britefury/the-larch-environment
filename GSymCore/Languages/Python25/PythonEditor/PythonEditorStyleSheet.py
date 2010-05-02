@@ -651,7 +651,7 @@ class PythonEditorStyleSheet (StyleSheet):
 		primitiveStyle = self['primitiveStyle']
 		punctuationStyle = self._punctuationStyle()
 		paramStyle = self._paramStyle()
-		return primitiveStyle.span( [ punctuationStyle.text( '*' ), paramStyle.text( name ) ] )
+		return primitiveStyle.span( [ punctuationStyle.text( '**' ), paramStyle.text( name ) ] )
 
 	
 	def lambdaExpr(self, params, bParamsTrailingSeparator, expr):
