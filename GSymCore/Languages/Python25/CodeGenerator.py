@@ -59,10 +59,19 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	# String literal
 	@ObjectNodeDispatchMethod( Schema.StringLiteral )
 	def StringLiteral(self, node, format, quotation, value):
-		if isinstance( value, unicode ):
-			return repr( value )[1:]
+		prefix = ''
+		if format == 'ascii':
+			prefix = ''
+		elif format == 'unicode':
+			prefix = 'u'
+		elif format == 'ascii-regex':
+			prefix = 'r'
+		elif format == 'unicode-regex':
+			prefix = 'ur'
 		else:
-			return repr( value )
+			raise ValueError, 'Unknown string literal format'
+		quote = '"'   if quotation == 'double'   else   "'"
+		return prefix + quote + value + quote
 	
 	
 	
