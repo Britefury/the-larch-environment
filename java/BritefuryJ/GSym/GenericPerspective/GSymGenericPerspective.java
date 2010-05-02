@@ -15,15 +15,9 @@ import java.util.List;
 import java.util.Stack;
 
 import org.python.core.Py;
-import org.python.core.PyBoolean;
 import org.python.core.PyException;
-import org.python.core.PyFloat;
-import org.python.core.PyInteger;
-import org.python.core.PyLong;
 import org.python.core.PyObject;
-import org.python.core.PyString;
 import org.python.core.PyTuple;
-import org.python.core.PyUnicode;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
@@ -318,28 +312,21 @@ public class GSymGenericPerspective extends GSymPerspective
 	
 	private void registerDefaultObjectPresenters()
 	{
-		registerObjectPresenter( Character.class, PrimitivePresenter.presenter_Character );
-		registerObjectPresenter( String.class,  PrimitivePresenter.presenter_String );
-		registerObjectPresenter( Integer.class,  PrimitivePresenter.presenter_Integer );
-		registerObjectPresenter( Short.class,  PrimitivePresenter.presenter_Short );
-		registerObjectPresenter( Long.class,  PrimitivePresenter.presenter_Long );
-		registerObjectPresenter( Byte.class,  PrimitivePresenter.presenter_Byte );
-		registerObjectPresenter( Float.class,  PrimitivePresenter.presenter_Float );
-		registerObjectPresenter( Double.class,  PrimitivePresenter.presenter_Double );
-		registerObjectPresenter( Boolean.class,  PrimitivePresenter.presenter_Boolean );
+		registerObjectPresenter( Character.class, BasicPresenters.presenter_Character );
+		registerObjectPresenter( String.class,  BasicPresenters.presenter_String );
+		registerObjectPresenter( Integer.class,  BasicPresenters.presenter_Integer );
+		registerObjectPresenter( Short.class,  BasicPresenters.presenter_Short );
+		registerObjectPresenter( Long.class,  BasicPresenters.presenter_Long );
+		registerObjectPresenter( Byte.class,  BasicPresenters.presenter_Byte );
+		registerObjectPresenter( Float.class,  BasicPresenters.presenter_Float );
+		registerObjectPresenter( Double.class,  BasicPresenters.presenter_Double );
+		registerObjectPresenter( Boolean.class,  BasicPresenters.presenter_Boolean );
 
-		registerObjectPresenter( PyString.class,  PrimitivePresenter.presenter_PyString );
-		registerObjectPresenter( PyUnicode.class,  PrimitivePresenter.presenter_PyUnicode );
-		registerObjectPresenter( PyInteger.class,  PrimitivePresenter.presenter_PyInteger );
-		registerObjectPresenter( PyLong.class,  PrimitivePresenter.presenter_PyLong );
-		registerObjectPresenter( PyFloat.class,  PrimitivePresenter.presenter_PyFloat );
-		registerObjectPresenter( PyBoolean.class,  PrimitivePresenter.presenter_PyBoolean );
-		registerObjectPresenter( PyTuple.class,  PrimitivePresenter.presenter_PyTuple );
-
+		registerObjectPresenter( PyTuple.class,  BasicPresenters.presenter_PyTuple );
 		
-		registerObjectPresenter( List.class,  PrimitivePresenter.presenter_List );
-		registerObjectPresenter( BufferedImage.class,  PrimitivePresenter.presenter_BufferedImage );
-		registerObjectPresenter( Color.class,  PrimitivePresenter.presenter_Color );
+		registerObjectPresenter( List.class,  BasicPresenters.presenter_List );
+		registerObjectPresenter( BufferedImage.class,  BasicPresenters.presenter_BufferedImage );
+		registerObjectPresenter( Color.class,  BasicPresenters.presenter_Color );
 	}
 	
 	
@@ -350,114 +337,13 @@ public class GSymGenericPerspective extends GSymPerspective
 	
 	
 	
-	private static class PrimitivePresenter
+	private static class BasicPresenters
 	{
-		public static DPElement presentChar(char c, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
-		{
-			String str = Character.toString( c );
-			return PrimitiveStyleSheet.instance.hbox( new DPElement[] {
-					punctuationStyle.staticText(  "'" ),
-					charStyle.staticText( str ),
-					punctuationStyle.staticText(  "'" ) } );
-		}
-		
-		public static DPElement presentString(String str, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
-		{
-			String lines[] = str.split( "\n" );
-			if ( lines.length == 1 )
-			{
-				ArrayList<DPElement> lineContent = new ArrayList<DPElement>();
-				lineContent.add( punctuationStyle.staticText(  "\"" ) );
-				lineContent.addAll( styleSheet.unescapedStringAsElementList( str ) );
-				lineContent.add( punctuationStyle.staticText(  "\"" ) );
-				return PrimitiveStyleSheet.instance.hbox( lineContent.toArray( new DPElement[0] ) );
-			}
-			else
-			{
-				ArrayList<DPElement> lineElements = new ArrayList<DPElement>();
-				int index = 0;
-				for (String line: lines)
-				{
-					ArrayList<DPElement> lineContent = new ArrayList<DPElement>();
-					if ( index == 0 )
-					{
-						lineContent.add( punctuationStyle.staticText(  "\"" ) );
-					}
-					lineContent.addAll( styleSheet.unescapedStringAsElementList( line ) );
-					if ( index == lines.length - 1 )
-					{
-						lineContent.add( punctuationStyle.staticText(  "\"" ) );
-					}
-					lineElements.add( PrimitiveStyleSheet.instance.hbox( lineContent.toArray( new DPElement[0]) ) );
-					index++;
-				}
-				return multiLineStringStyle.vbox( lineElements.toArray( new DPElement[0]) );
-			}
-		}
-
-		public static DPElement presentByte(byte b, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
-		{
-			return integerStyle.staticText( Integer.toHexString( (int)b ) );
-		}
-		
-		
-		public static DPElement presentInt(int x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
-		{
-			return integerStyle.staticText( Integer.toString( x ) );
-		}
-		
-		public static DPElement presentDouble(double x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
-		{
-			String asText = Double.toString( x );
-			
-			if ( asText.contains( "e" ) )
-			{
-				return presentSIDouble( asText, asText.indexOf( "e" ) );
-			}
-			else if ( asText.contains( "E" ) )
-			{
-				return presentSIDouble( asText, asText.indexOf( "E" ) );
-			}
-			else
-			{
-				return floatStyle.staticText( asText );
-			}
-		}
-		
-		private static DPElement presentSIDouble(String textValue, int expIndex)
-		{
-			DPElement mantissa = floatStyle.staticText( textValue.substring( 0, expIndex ) + "*10" );
-			DPElement exponent = floatStyle.staticText( textValue.substring( expIndex + 1, textValue.length() ) );
-			return PrimitiveStyleSheet.instance.scriptRSuper( mantissa, exponent );
-		}
-		
-		public static DPElement presentBoolean(boolean b, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
-		{
-			if ( b )
-			{
-				return booleanStyle.staticText( "True" );
-			}
-			else
-			{
-				return booleanStyle.staticText( "False" );
-			}
-		}
-
-	
-	
-		public static final ObjectPresenter presenter_Character = new ObjectPresenter()
+		public static final ObjectPresenter presenter_Boolean = new ObjectPresenter()
 		{
 			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
-				return PrimitivePresenter.presentChar( (Character)x, ctx, styleSheet, state );
-			}
-		};
-		
-		public static final ObjectPresenter presenter_String = new ObjectPresenter()
-		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
-			{
-				return PrimitivePresenter.presentString( (String)x, ctx, styleSheet, state );
+				return GSymPrimitivePresenter.presentBoolean( (Boolean)x, ctx, styleSheet, state );
 			}
 		};
 		
@@ -465,7 +351,15 @@ public class GSymGenericPerspective extends GSymPerspective
 		{
 			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
-				return PrimitivePresenter.presentByte( (Byte)x, ctx, styleSheet, state );
+				return GSymPrimitivePresenter.presentByte( (Byte)x, ctx, styleSheet, state );
+			}
+		};
+		
+		public static final ObjectPresenter presenter_Character = new ObjectPresenter()
+		{
+			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+			{
+				return GSymPrimitivePresenter.presentChar( (Character)x, ctx, styleSheet, state );
 			}
 		};
 		
@@ -473,7 +367,7 @@ public class GSymGenericPerspective extends GSymPerspective
 		{
 			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
-				return PrimitivePresenter.presentInt( ((Short)x).intValue(), ctx, styleSheet, state );
+				return GSymPrimitivePresenter.presentShort( (Short)x, ctx, styleSheet, state );
 			}
 		};
 		
@@ -481,7 +375,7 @@ public class GSymGenericPerspective extends GSymPerspective
 		{
 			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
-				return PrimitivePresenter.presentInt( (Integer)x, ctx, styleSheet, state );
+				return GSymPrimitivePresenter.presentInt( (Integer)x, ctx, styleSheet, state );
 			}
 		};
 		
@@ -489,7 +383,7 @@ public class GSymGenericPerspective extends GSymPerspective
 		{
 			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
-				return PrimitivePresenter.presentInt( ((Long)x).intValue(), ctx, styleSheet, state );
+				return GSymPrimitivePresenter.presentLong( (Long)x, ctx, styleSheet, state );
 			}
 		};
 		
@@ -497,7 +391,7 @@ public class GSymGenericPerspective extends GSymPerspective
 		{
 			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
-				return PrimitivePresenter.presentDouble( ((Float)x).doubleValue(), ctx, styleSheet, state );
+				return GSymPrimitivePresenter.presentDouble( ((Float)x).doubleValue(), ctx, styleSheet, state );
 			}
 		};
 		
@@ -505,71 +399,54 @@ public class GSymGenericPerspective extends GSymPerspective
 		{
 			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
-				return PrimitivePresenter.presentDouble( (Double)x, ctx, styleSheet, state );
+				return GSymPrimitivePresenter.presentDouble( (Double)x, ctx, styleSheet, state );
 			}
 		};
 		
-		public static final ObjectPresenter presenter_Boolean = new ObjectPresenter()
+		public static final ObjectPresenter presenter_String = new ObjectPresenter()
 		{
 			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
-				return PrimitivePresenter.presentBoolean( (Boolean)x, ctx, styleSheet, state );
+				return GSymPrimitivePresenter.presentString( (String)x, ctx, styleSheet, state );
 			}
 		};
+		
 		
 		
 
-		
-		public static final ObjectPresenter presenter_PyString = new ObjectPresenter()
+		public static final ObjectPresenter presenter_PyTuple = new ObjectPresenter()
 		{
 			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
-				return PrimitivePresenter.presentString( ((PyString)x).asString(), ctx, styleSheet, state );
+				PyTuple tuple = (PyTuple)x;
+				
+				ArrayList<DPElement> itemViews = new ArrayList<DPElement>();
+				for (Object item: tuple)
+				{
+					itemViews.add( ctx.presentFragmentWithGenericPerspective( item ) );
+				}
+				
+				return tupleListViewStyle.createListElement( itemViews, TrailingSeparator.NEVER );
 			}
 		};
+
 		
-		public static final ObjectPresenter presenter_PyUnicode = new ObjectPresenter()
+
+		public static final ObjectPresenter presenter_List = new ObjectPresenter()
 		{
 			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
-				return PrimitivePresenter.presentString( ((PyUnicode)x).asString(), ctx, styleSheet, state );
+				List<?> list = (List<?>)x;
+				
+				ArrayList<DPElement> itemViews = new ArrayList<DPElement>();
+				for (Object item: list)
+				{
+					itemViews.add( ctx.presentFragmentWithGenericPerspective( item ) );
+				}
+				
+				return listListViewStyle.createListElement( itemViews, TrailingSeparator.NEVER );
 			}
 		};
-		
-		public static final ObjectPresenter presenter_PyInteger = new ObjectPresenter()
-		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
-			{
-				return PrimitivePresenter.presentInt( ((PyInteger)x).asInt(), ctx, styleSheet, state );
-			}
-		};
-		
-		public static final ObjectPresenter presenter_PyLong = new ObjectPresenter()
-		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
-			{
-				return integerStyle.staticText( x.toString() );
-			}
-		};
-		
-		public static final ObjectPresenter presenter_PyFloat = new ObjectPresenter()
-		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
-			{
-				return PrimitivePresenter.presentDouble( ((PyFloat)x).asDouble(), ctx, styleSheet, state );
-			}
-		};
-		
-		public static final ObjectPresenter presenter_PyBoolean = new ObjectPresenter()
-		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
-			{
-				return PrimitivePresenter.presentBoolean( ((PyBoolean)x).__nonzero__(), ctx, styleSheet, state );
-			}
-		};
-		
-		
-		
 		
 		public static final ObjectPresenter presenter_BufferedImage = new ObjectPresenter()
 		{
@@ -618,49 +495,12 @@ public class GSymGenericPerspective extends GSymPerspective
 				return colourObjectBoxStyle.objectBorder( contents );
 			}
 		};
-
-		public static final ObjectPresenter presenter_List = new ObjectPresenter()
-		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
-			{
-				List<?> list = (List<?>)x;
-				
-				ArrayList<DPElement> itemViews = new ArrayList<DPElement>();
-				for (Object item: list)
-				{
-					itemViews.add( ctx.presentFragmentWithGenericPerspective( item ) );
-				}
-				
-				return listListViewStyle.createListElement( itemViews, TrailingSeparator.NEVER );
-			}
-		};
-
-		public static final ObjectPresenter presenter_PyTuple = new ObjectPresenter()
-		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
-			{
-				PyTuple tuple = (PyTuple)x;
-				
-				ArrayList<DPElement> itemViews = new ArrayList<DPElement>();
-				for (Object item: tuple)
-				{
-					itemViews.add( ctx.presentFragmentWithGenericPerspective( item ) );
-				}
-				
-				return tupleListViewStyle.createListElement( itemViews, TrailingSeparator.NEVER );
-			}
-		};
 	}
 	
 	
 	
 	private static final PrimitiveStyleSheet punctuationStyle = PrimitiveStyleSheet.instance.withForeground( Color.blue );
 	private static final PrimitiveStyleSheet delimStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.1f, 0.3f, 0.4f ) ).withFontBold( true ).withFontSize( 14 );
-	private static final PrimitiveStyleSheet charStyle = PrimitiveStyleSheet.instance; 
-	private static final PrimitiveStyleSheet multiLineStringStyle = PrimitiveStyleSheet.instance.withBackground( new FillPainter( new Color( 0.8f, 0.8f, 1.0f ) ) );
-	private static final PrimitiveStyleSheet integerStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.5f, 0.0f, 0.5f ) );
-	private static final PrimitiveStyleSheet floatStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.25f, 0.0f, 0.5f ) );
-	private static final PrimitiveStyleSheet booleanStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.0f, 0.5f, 0.0f ) ).withTextSmallCaps( true );
 	
 	
 	private static final GenericPerspectiveStyleSheet colourObjectBoxStyle = GenericPerspectiveStyleSheet.instance.withObjectBorderAndTitlePaint( new Color( 0.0f, 0.1f, 0.4f ) );
