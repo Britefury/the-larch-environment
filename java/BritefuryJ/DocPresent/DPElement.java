@@ -50,6 +50,7 @@ import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueStream;
 import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.GSym.GSymLightweightPerspective;
 import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.GenericPerspective.PresentationStateListenerList;
@@ -77,30 +78,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	//
 	//
 	
-	public static class ExploreTreePresentable implements Presentable
-	{
-		private DPElement element;
-		
-		
-		protected ExploreTreePresentable(DPElement element)
-		{
-			this.element = element;
-		}
-		
-		
-		public DPElement getElement()
-		{
-			return element;
-		}
-
-
-		@Override
-		public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
-		{
-			return element.exploreTreePresent( ctx, styleSheet, inheritedState );
-		}
-	}
-
 	public static class ClonePresentable implements Presentable
 	{
 		private DPElement originalElement;
@@ -125,6 +102,42 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		}
 	}
 	
+	
+	private static class TreeExplorerPerspective extends GSymLightweightPerspective
+	{
+		public DPElement present(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable inheritedState)
+		{
+			DPElement element = (DPElement)x;
+			return element.exploreTreePresent( ctx, (GenericPerspectiveStyleSheet)styleSheet, inheritedState );
+		}
+	}
+	
+	private static TreeExplorerPerspective treeExplorerPerspective = new TreeExplorerPerspective();
+	
+	public static class ElementTreeExplorer implements Presentable
+	{
+		private DPElement element;
+		
+		
+		protected ElementTreeExplorer(DPElement element)
+		{
+			this.element = element;
+		}
+		
+		
+		public DPElement getElement()
+		{
+			return element;
+		}
+
+
+		@Override
+		public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		{
+			return ctx.presentFragmentWithPerspective( element, treeExplorerPerspective );
+		}
+	}
+
 	
 
 	
@@ -3042,9 +3055,9 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		return createMetaElement( ctx, styleSheet, state );
 	}
 	
-	public ExploreTreePresentable treeExplorer()
+	public ElementTreeExplorer treeExplorer()
 	{
-		return new ExploreTreePresentable( this );
+		return new ElementTreeExplorer( this );
 	}
 	
 	
