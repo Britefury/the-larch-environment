@@ -18,6 +18,7 @@ import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
+import org.python.core.PyType;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
@@ -84,6 +85,24 @@ public class GSymGenericPerspective extends GSymPerspective
 				{
 					result = Py.tojava( __present__.__call__( Py.java2py( ctx ), Py.java2py( styleSheet ), Py.java2py( state ) ),  DPElement.class );
 				}
+				
+				
+				
+				if ( result == null )
+				{
+					// Now try Python object presenters
+					PyType typeX = pyX.getType();
+					
+					PyObjectPresenter presenter = getPresenterForPythonType( typeX );
+					if ( presenter != null )
+					{
+						result = presenter.presentObject( pyX, ctx, genericStyleSheet, state );
+					}
+					else
+					{
+						result = presentPythonObjectAsString( pyX, ctx, genericStyleSheet, state );
+					}
+				}
 			}
 			
 			if ( result == null )
@@ -95,7 +114,7 @@ public class GSymGenericPerspective extends GSymPerspective
 				}
 				else
 				{
-					result = presentJavaObject( x, ctx, genericStyleSheet, state );
+					result = presentJavaObjectAsString( x, ctx, genericStyleSheet, state );
 				}
 			}
 			
@@ -143,8 +162,10 @@ public class GSymGenericPerspective extends GSymPerspective
 	private GSymObjectViewLocationTable locationTable = new GSymObjectViewLocationTable();
 	private GSymObjectViewFragmentFunction fragmentViewFn = new GSymObjectViewFragmentFunction();
 	private GenericPerspectiveLocationResolver locationResolver = new GenericPerspectiveLocationResolver( this );
-	private HashMap<Class<?>, ObjectPresenter> registeredObjectPresenters = new HashMap<Class<?>, ObjectPresenter>();
-	private HashMap<Class<?>, ObjectPresenter> objectPresenters = new HashMap<Class<?>, ObjectPresenter>();
+	private HashMap<Class<?>, ObjectPresenter> registeredJavaObjectPresenters = new HashMap<Class<?>, ObjectPresenter>();
+	private HashMap<Class<?>, ObjectPresenter> javaObjectPresenters = new HashMap<Class<?>, ObjectPresenter>();
+	private HashMap<PyType, PyObjectPresenter> registeredPythonObjectPresenters = new HashMap<PyType, PyObjectPresenter>();
+	private HashMap<PyType, PyObjectPresenter> pythonObjectPresenters = new HashMap<PyType, PyObjectPresenter>();
 	private GSymBrowserContext browserContext;
 	
 	
@@ -218,10 +239,16 @@ public class GSymGenericPerspective extends GSymPerspective
 	
 	
 	
-	public void registerObjectPresenter(Class<?> cls, ObjectPresenter presenter)
+	public void registerJavaObjectPresenter(Class<?> cls, ObjectPresenter presenter)
 	{
-		registeredObjectPresenters.put( cls, presenter );
-		objectPresenters.put( cls, presenter );
+		registeredJavaObjectPresenters.put( cls, presenter );
+		javaObjectPresenters.put( cls, presenter );
+	}
+	
+	public void registerPythonObjectPresenter(PyType type, PyObjectPresenter presenter)
+	{
+		registeredPythonObjectPresenters.put( type, presenter );
+		pythonObjectPresenters.put( type, presenter );
 	}
 	
 	
@@ -230,7 +257,7 @@ public class GSymGenericPerspective extends GSymPerspective
 		Class<?> xClass = x.getClass();
 		
 		// See if we have a presenter
-		ObjectPresenter presenter = registeredObjectPresenters.get( xClass );
+		ObjectPresenter presenter = registeredJavaObjectPresenters.get( xClass );
 		if ( presenter != null )
 		{
 			return presenter;
@@ -245,11 +272,11 @@ public class GSymGenericPerspective extends GSymPerspective
 			while ( superClass != Object.class )
 			{
 				// See if we can get a presenter for this superclass
-				presenter = objectPresenters.get( superClass );
+				presenter = javaObjectPresenters.get( superClass );
 				if ( presenter != null )
 				{
 					// Yes - cache it for future tests
-					objectPresenters.put( xClass, presenter );
+					javaObjectPresenters.put( xClass, presenter );
 					return presenter;
 				}
 				
@@ -268,11 +295,11 @@ public class GSymGenericPerspective extends GSymPerspective
 		{
 			for (Class<?> iface: c.getInterfaces())
 			{
-				presenter = objectPresenters.get( iface );
+				presenter = javaObjectPresenters.get( iface );
 				if ( presenter != null )
 				{
 					// Yes - cache it for future tests
-					objectPresenters.put( xClass, presenter );
+					javaObjectPresenters.put( xClass, presenter );
 					return presenter;
 				}
 				if ( !interfaces.contains( iface ) )
@@ -290,11 +317,11 @@ public class GSymGenericPerspective extends GSymPerspective
 			Class<?> interfaceFromStack = interfaceStack.pop();
 			for (Class<?> superInterface: interfaceFromStack.getInterfaces())
 			{
-				presenter = objectPresenters.get( superInterface );
+				presenter = javaObjectPresenters.get( superInterface );
 				if ( presenter != null )
 				{
 					// Yes - cache it for future tests
-					objectPresenters.put( xClass, presenter );
+					javaObjectPresenters.put( xClass, presenter );
 					return presenter;
 				}
 				if ( !interfaces.contains( superInterface ) )
@@ -309,30 +336,65 @@ public class GSymGenericPerspective extends GSymPerspective
 	}
 	
 	
-	
-	private void registerDefaultObjectPresenters()
+	private PyObjectPresenter getPresenterForPythonType(PyType typeX)
 	{
-		registerObjectPresenter( Character.class, BasicPresenters.presenter_Character );
-		registerObjectPresenter( String.class,  BasicPresenters.presenter_String );
-		registerObjectPresenter( Integer.class,  BasicPresenters.presenter_Integer );
-		registerObjectPresenter( Short.class,  BasicPresenters.presenter_Short );
-		registerObjectPresenter( Long.class,  BasicPresenters.presenter_Long );
-		registerObjectPresenter( Byte.class,  BasicPresenters.presenter_Byte );
-		registerObjectPresenter( Float.class,  BasicPresenters.presenter_Float );
-		registerObjectPresenter( Double.class,  BasicPresenters.presenter_Double );
-		registerObjectPresenter( Boolean.class,  BasicPresenters.presenter_Boolean );
-
-		registerObjectPresenter( PyTuple.class,  BasicPresenters.presenter_PyTuple );
+		// See if we have a presenter
+		PyObjectPresenter presenter = registeredPythonObjectPresenters.get( typeX );
+		if ( presenter != null )
+		{
+			return presenter;
+		}
 		
-		registerObjectPresenter( List.class,  BasicPresenters.presenter_List );
-		registerObjectPresenter( BufferedImage.class,  BasicPresenters.presenter_BufferedImage );
-		registerObjectPresenter( Color.class,  BasicPresenters.presenter_Color );
+		// No, we don't
+		PyTuple mro = typeX.getMro();
+		
+		for (PyObject t: mro.getArray())
+		{
+			PyType superType = (PyType)t;
+			
+			// See if we can get a presenter for this superclass
+			presenter = pythonObjectPresenters.get( superType );
+			if ( presenter != null )
+			{
+				// Yes - cache it for future tests
+				pythonObjectPresenters.put( typeX, presenter );
+				return presenter;
+			}
+		}
+
+		return null;
 	}
 	
 	
-	private static DPElement presentJavaObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+	private void registerDefaultObjectPresenters()
+	{
+		registerJavaObjectPresenter( Character.class, BasicPresenters.presenter_Character );
+		registerJavaObjectPresenter( String.class,  BasicPresenters.presenter_String );
+		registerJavaObjectPresenter( Integer.class,  BasicPresenters.presenter_Integer );
+		registerJavaObjectPresenter( Short.class,  BasicPresenters.presenter_Short );
+		registerJavaObjectPresenter( Long.class,  BasicPresenters.presenter_Long );
+		registerJavaObjectPresenter( Byte.class,  BasicPresenters.presenter_Byte );
+		registerJavaObjectPresenter( Float.class,  BasicPresenters.presenter_Float );
+		registerJavaObjectPresenter( Double.class,  BasicPresenters.presenter_Double );
+		registerJavaObjectPresenter( Boolean.class,  BasicPresenters.presenter_Boolean );
+
+		registerPythonObjectPresenter( PyTuple.TYPE,  BasicPresenters.presenter_PyTuple );
+		
+		registerJavaObjectPresenter( List.class,  BasicPresenters.presenter_List );
+		registerJavaObjectPresenter( BufferedImage.class,  BasicPresenters.presenter_BufferedImage );
+		registerJavaObjectPresenter( Color.class,  BasicPresenters.presenter_Color );
+	}
+	
+	
+	private static DPElement presentJavaObjectAsString(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
 		return styleSheet.objectBox( x.getClass().getName(), asStringStyle.staticText( x.toString() ) );
+	}
+	
+	private static DPElement presentPythonObjectAsString(PyObject pyX, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+	{
+		PyType typeX = pyX.getType();
+		return styleSheet.objectBox( typeX.getName(), asStringStyle.staticText( pyX.toString() ) );
 	}
 	
 	
@@ -414,9 +476,9 @@ public class GSymGenericPerspective extends GSymPerspective
 		
 		
 
-		public static final ObjectPresenter presenter_PyTuple = new ObjectPresenter()
+		public static final PyObjectPresenter presenter_PyTuple = new PyObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(PyObject x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				PyTuple tuple = (PyTuple)x;
 				
