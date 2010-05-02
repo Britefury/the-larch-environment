@@ -154,6 +154,7 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 			return viewNull_textStyle.staticText( "<null>" );
 		}
 		
+		
 		if ( inheritedState == null )
 		{
 			throw new RuntimeException( "GSymFragmentViewContext.presentFragment(): @state cannot be null" );
