@@ -655,11 +655,18 @@ public class PrimitiveStyleSheet extends StyleSheet
 		}
 		return vboxParams;
 	}
+	
+	
+	private DPElement layoutWrap(DPElement child)
+	{
+		return child != null  ?  child.layoutWrap()  :  null;
+	}
 
 	
 	
 	public DPBin bin(DPElement child)
 	{
+		child = layoutWrap( child );
 		DPBin bin = new DPBin( getContainerParams() );
 		bin.setChild( child );
 		return bin;
@@ -667,6 +674,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 	
 	public DPSpaceBin spaceBin(DPElement child, double minWidth, double minHeight)
 	{
+		child = layoutWrap( child );
 		DPSpaceBin bin = new DPSpaceBin( getContainerParams(), minWidth, minHeight );
 		bin.setChild( child );
 		return bin;
@@ -674,6 +682,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 	
 	public DPBorder border(DPElement child)
 	{
+		child = layoutWrap( child );
 		DPBorder border = new DPBorder( getBorderParams().border );
 		border.setChild( child );
 		return border;
@@ -725,6 +734,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 	
 	public DPMathRoot mathRoot(DPElement child)
 	{
+		child = layoutWrap( child );
 		DPMathRoot element = new DPMathRoot( getMathRootParams() );
 		element.setChild( child );
 		return element;
@@ -751,6 +761,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 	{
 		DPProxy proxy = new DPProxy();
 		proxy.setChild( child );
+		proxy.copyAlignmentFlagsFrom( child );
 		return proxy;
 	}
 	
@@ -806,6 +817,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 	{
 		DPRegion element = new DPRegion();
 		element.setChild( child );
+		element.copyAlignmentFlagsFrom( child );
 		return element;
 	}
 
@@ -814,6 +826,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 		DPRegion element = new DPRegion();
 		element.setChild( child );
 		element.setEditHandler( editHandler );
+		element.copyAlignmentFlagsFrom( child );
 		return element;
 	}
 
@@ -915,8 +928,17 @@ public class PrimitiveStyleSheet extends StyleSheet
 	
 	public DPTable table(DPElement children[][])
 	{
+		DPElement wrappedChildren[][] = new DPElement[children.length][];
+		for (int y = 0; y < children.length; y++)
+		{
+			wrappedChildren[y] = new DPElement[children[y].length];
+			for (int x = 0; x < children[y].length; x++)
+			{
+				wrappedChildren[y][x] = layoutWrap( children[y][x] );
+			}
+		}
 		DPTable element = new DPTable( getTableParams() );
-		element.setChildren( children );
+		element.setChildren( wrappedChildren );
 		return element;
 	}
 	
@@ -962,19 +984,6 @@ public class PrimitiveStyleSheet extends StyleSheet
 		element.setChildren( children );
 		element.setRefPointIndex( refPointIndex );
 		return element;
-	}
-	
-	
-	public DPElement layoutWrap(DPElement element)
-	{
-		if ( element.getLayoutNode() == null )
-		{
-			return vbox( new DPElement[] { element } );
-		}
-		else
-		{
-			return element;
-		}
 	}
 	
 	
@@ -1102,6 +1111,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 	
 	public DPViewport viewport(DPElement child, double minWidth, double minHeight, Range xRange, Range yRange, PersistentState state)
 	{
+		child = layoutWrap( child );
 		DPViewport viewport = new DPViewport( minWidth, minHeight, xRange, yRange, state );
 		viewport.setChild( child );
 		return viewport;
@@ -1109,6 +1119,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 	
 	public DPViewport viewport(DPElement child, Range xRange, Range yRange, PersistentState state)
 	{
+		child = layoutWrap( child );
 		DPViewport viewport = new DPViewport( 0.0, 0.0, xRange, yRange, state );
 		viewport.setChild( child );
 		return viewport;
@@ -1116,6 +1127,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 
 	public DPViewport viewport(DPElement child, double minWidth, double minHeight, PersistentState state)
 	{
+		child = layoutWrap( child );
 		DPViewport viewport = new DPViewport( minWidth, minHeight, state );
 		viewport.setChild( child );
 		return viewport;
@@ -1123,6 +1135,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 	
 	public DPViewport viewport(DPElement child, PersistentState state)
 	{
+		child = layoutWrap( child );
 		DPViewport viewport = new DPViewport( 0.0, 0.0, state );
 		viewport.setChild( child );
 		return viewport;

@@ -288,8 +288,7 @@ public class GenericPerspectiveStyleSheet extends StyleSheet
 		double padding = getNonNull( "objectContentPadding", Double.class, defaultObjectContentPadding );
 		
 		DPElement titleElement = objectTitle( title );
-		DPElement contentsBox = primitive.layoutWrap( contents ).padX( padding );
-		return borderStyle.border( primitive.vbox( new DPElement[] { titleElement, contentsBox } ) ); 
+		return borderStyle.border( primitive.vbox( new DPElement[] { titleElement, contents.padX( padding ) } ) ); 
 	}
 	
 	public DPElement objectBoxWithFields(String title, DPElement fields[])
@@ -307,7 +306,7 @@ public class GenericPerspectiveStyleSheet extends StyleSheet
 	public DPElement objectBorder(DPElement contents)
 	{
 		PrimitiveStyleSheet borderStyle = getObjectBorderStyleSheet();
-		return borderStyle.border( PrimitiveStyleSheet.instance.layoutWrap( contents ) );
+		return borderStyle.border( contents );
 	}
 	
 	public DPElement horizontalObjectField(String title, DPElement value)
@@ -322,7 +321,7 @@ public class GenericPerspectiveStyleSheet extends StyleSheet
 		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 		PrimitiveStyleSheet titleStyle = getObjectFieldStyleSheet();
 		double indentation = getNonNull( "objectFieldIndentation", Double.class, defaultObjectFieldIndentation );
-		return primitive.vbox( new DPElement[] { titleStyle.staticText( title ), primitive.layoutWrap( value ).padX( indentation, 0.0 ) } );
+		return primitive.vbox( new DPElement[] { titleStyle.staticText( title ), value.padX( indentation, 0.0 ) } );
 	}
 	
 	

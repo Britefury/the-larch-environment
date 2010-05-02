@@ -153,7 +153,7 @@ class TerminalViewerStyleSheet (StyleSheet):
 		currentModule = primitiveStyle.span( [ currentModule ] )
 		currentModule.addInteractor( currentModuleInteractor )
 		
-		m = pythonModuleBorderStyle.border( primitiveStyle.vbox( [ currentModule.alignHExpand() ] ) ).alignHExpand()
+		m = pythonModuleBorderStyle.border( currentModule.alignHExpand() ).alignHExpand()
 		m.addDropDest( currentModuleDropDest )
 		m.ensureVisible()
 		
@@ -196,8 +196,7 @@ class TerminalViewerStyleSheet (StyleSheet):
 		resultBorderStyle = self.resultBorderStyle()
 		
 		blockContents = []
-		pythonModuleBox = PrimitiveStyleSheet.instance.vbox( [ pythonModule ] )
-		blockContents.append( pythonModuleBorderStyle.border( pythonModuleBox.alignHExpand() ).alignHExpand() )
+		blockContents.append( pythonModuleBorderStyle.border( pythonModule.alignHExpand() ).alignHExpand() )
 		if stdout is not None:
 			blockContents.append( stdOutStyle.border( self._textLines( 'STDOUT:', stdout, stdOutStyle ).alignHExpand() ).alignHExpand() )
 		if stderr is not None:
@@ -205,8 +204,7 @@ class TerminalViewerStyleSheet (StyleSheet):
 		if caughtException is not None:
 			blockContents.append( exceptionBorderStyle.border( self._exception( 'EXCEPTION:', PrimitiveStyleSheet.instance.paragraph( [ caughtException ] ) ) ).alignHExpand() )
 		if result is not None:
-			resultBox = PrimitiveStyleSheet.instance.paragraph( [ result ] )
-			blockContents.append( resultBorderStyle.border( resultBox.alignHExpand() ).alignHExpand() )
+			blockContents.append( resultBorderStyle.border( result.alignHExpand() ).alignHExpand() )
 		blockVBox = blockStyle.vbox( blockContents ).alignHExpand()
 		return blockStyle.border( blockVBox ).alignHExpand()
 		

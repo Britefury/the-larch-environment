@@ -473,9 +473,9 @@ public class ControlsStyleSheet extends StyleSheet
 		PrimitiveStyleSheet textEntryStyle = getTextEntryStyleSheet();
 		DPText textElement = textEntryStyle.text( text );
 		DPElement line = textEntryStyle.hbox( new DPElement[] { textEntryStyle.segment( false, false, textElement ) } );
-		DPRegion frame = textEntryStyle.region( line );
-		DPBorder outerElement = textEntryStyle.border( PrimitiveStyleSheet.instance.vbox( new DPElement[] { frame } ) );
-		return new TextEntry( outerElement, frame, textElement, listener );
+		DPRegion region = textEntryStyle.region( line );
+		DPBorder outerElement = textEntryStyle.border( region );
+		return new TextEntry( outerElement, region, textElement, listener );
 	}
 
 	public TextEntry textEntry(String text, PyObject accept, PyObject cancel)
@@ -483,9 +483,9 @@ public class ControlsStyleSheet extends StyleSheet
 		PrimitiveStyleSheet textEntryStyle = getTextEntryStyleSheet();
 		DPText textElement = textEntryStyle.text( text );
 		DPElement line = textEntryStyle.hbox( new DPElement[] { textEntryStyle.segment( false, false, textElement ) } );
-		DPRegion frame = textEntryStyle.region( line );
-		DPBorder outerElement = textEntryStyle.border( PrimitiveStyleSheet.instance.vbox( new DPElement[] { frame } ) );
-		return new TextEntry( outerElement, frame, textElement, accept, cancel );
+		DPRegion region = textEntryStyle.region( line );
+		DPBorder outerElement = textEntryStyle.border( region );
+		return new TextEntry( outerElement, region, textElement, accept, cancel );
 	}
 	
 	

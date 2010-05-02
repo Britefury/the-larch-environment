@@ -258,7 +258,7 @@ public class ParseResult implements ParseResultInterface, Presentable
 							PrimitiveStyleSheet.instance.staticText( " to " ),
 							rangeStyle.staticText( String.valueOf( getEnd() ) ) } ) );
 			
-			DPElement valueView = PrimitiveStyleSheet.instance.layoutWrap( ctx.presentFragmentWithGenerixcPerspective( getValue(), inheritedState ) );
+			DPElement valueView = ctx.presentFragmentWithGenerixcPerspective( getValue(), inheritedState );
 			DPElement value = parseResultStyle.verticalObjectField( "Value:", valueView );
 			fields = new DPElement[] { status, range, value };
 		}

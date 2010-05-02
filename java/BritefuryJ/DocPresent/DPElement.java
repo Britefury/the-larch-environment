@@ -586,6 +586,34 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	
 	
+	public void copyAlignmentFlagsFrom(DPElement element)
+	{
+		setAlignmentFlags( element.getAlignmentFlags() );
+	}
+	
+
+	
+	
+	//
+	// Layout wrap method - papers over the fact that some elements cannot have layout-less elements as children
+	//
+	
+	public DPElement layoutWrap()
+	{
+		if ( getLayoutNode() != null )
+		{
+			return this;
+		}
+		else
+		{
+			DPHBox hbox = new DPHBox();
+			hbox.setChildren( new DPElement[] { this } );
+			hbox.copyAlignmentFlagsFrom( this );
+			return hbox;
+		}
+	}
+	
+	
 	//
 	// Padding methods
 	//
@@ -607,8 +635,12 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 				paddingBorders.put( key, border );
 			}
 			
+			
+			
+			DPElement child = layoutWrap();
 			DPBorder padElement = new DPBorder( border );
-			padElement.setChild( this );
+			padElement.setChild( child );
+			padElement.copyAlignmentFlagsFrom( child );
 			return padElement;
 		}
 	}
