@@ -24,15 +24,7 @@ class _AppLocationResolver (GSymLocationResolver):
 	def resolveLocationAsPage(self, location, persistentState):
 		subject = self.resolveLocationAsSubject( location )
 		if subject is not None:
-			commandHistory = None
-			try:
-				doc = subject.getSubjectContext()['document']
-			except KeyError:
-				doc = None
-				
-			commandHistory = doc.getCommandHistory()   if doc is not None   else None
-
-			viewContext = GSymViewContext( subject, self._app._browserContext, commandHistory, persistentState )
+			viewContext = GSymViewContext( subject, self._app._browserContext, persistentState )
 			return viewContext.getPage()
 		
 		return None
@@ -45,10 +37,10 @@ class _AppLocationResolver (GSymLocationResolver):
 			iterAfterModel = iterator.consumeLiteral( 'model:' )
 			perspective = world.getAppStatePerspective()
 			if iterAfterModel is not None:
-				enclosingSubject = GSymSubject( appState, perspective, '[model]', AttributeTable.instance.withAttrs( world=world, document=None, location=Location( 'model:' ) ) )
+				enclosingSubject = GSymSubject( appState, perspective, '[model]', AttributeTable.instance.withAttrs( world=world, document=None, location=Location( 'model:' ) ), None )
 				iterator = iterAfterModel
 			else:
-				enclosingSubject = GSymSubject( appState, perspective, '', AttributeTable.instance.withAttrs( world=world, document=None, location=Location( '' ) ) )
+				enclosingSubject = GSymSubject( appState, perspective, '', AttributeTable.instance.withAttrs( world=world, document=None, location=Location( '' ) ), None )
 			subject = perspective.resolveRelativeLocation( enclosingSubject, iterator )
 			if subject is None:
 				return None
