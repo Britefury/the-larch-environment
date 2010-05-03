@@ -8,7 +8,7 @@
 from Britefury.gSym.gSymUnitClass import GSymUnitClass, GSymUnitFactory
 from Britefury.gSym.gSymDocument import gSymUnit
 
-from GSymCore.Project.ProjectEditor.View import ProjectEditorPerspective
+from GSymCore.Project.ProjectEditor.View import perspective
 from GSymCore.Project import Schema
 
 
@@ -18,7 +18,7 @@ def newProject():
 	return gSymUnit( Schema.schema, project )
 
 
-projectEditorPerspective = ProjectEditorPerspective()
+projectEditorPerspective = perspective
 unitClass = GSymUnitClass( Schema.schema, projectEditorPerspective )
 
 

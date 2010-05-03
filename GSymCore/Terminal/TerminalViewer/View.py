@@ -129,28 +129,6 @@ class TerminalView (GSymViewObjectDispatch):
 	
 _docNameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*', 0 )
 
-class TerminalViewerPerspective (GSymPerspective):
-	def __init__(self):
-		self._viewFn = PyGSymViewFragmentFunction( TerminalView() )
-		
 	
-	
-	def resolveRelativeLocation(self, enclosingSubject, locationIterator):
-		if locationIterator.getSuffix() == '':
-			return enclosingSubject
-		else:
-			return None
-	
-	
-	def getFragmentViewFunction(self):
-		return self._viewFn
-	
-	def getStyleSheet(self):
-		return TerminalViewerStyleSheet.instance
-	
-	def getInitialInheritedState(self):
-		return AttributeTable.instance
-	
-	def getEditHandler(self):
-		return None
-	
+
+perspective = GSymPerspective( PyGSymViewFragmentFunction( TerminalView() ), TerminalViewerStyleSheet.instance, AttributeTable.instance, None, None )

@@ -40,7 +40,7 @@ from Britefury.Util.NodeUtil import *
 from BritefuryJ.AttributeTable import *
 from BritefuryJ.DocPresent import *
 
-from BritefuryJ.GSym import GSymPerspective, GSymSubject
+from BritefuryJ.GSym import GSymPerspective, GSymSubject, GSymRelativeLocationResolver
 from BritefuryJ.GSym.View import PyGSymViewFragmentFunction
 
 
@@ -1267,27 +1267,15 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 
 
-class Python25EditorPerspective (GSymPerspective):
-	def __init__(self):
-		self._parser = Python25Grammar()
-		self._viewFn = PyGSymViewFragmentFunction( Python25View( self._parser ) )
-		self._editHandler = Python25EditHandler()
-		
-	
-	
+class Python25EditorRelativeLocationResolver (GSymRelativeLocationResolver):
 	def resolveRelativeLocation(self, enclosingSubject, locationIterator):
-		return enclosingSubject.withTitle( 'Py2.5: ' + enclosingSubject.getTitle() )
+		if locationIterator.getSuffix() == '':
+			return enclosingSubject.withTitle( 'Py2.5: ' + enclosingSubject.getTitle() )
+		else:
+			return None
 	
+
 	
-	def getFragmentViewFunction(self):
-		return self._viewFn
-	
-	def getStyleSheet(self):
-		return PythonEditorStyleSheet.instance
-	
-	def getInitialInheritedState(self):
-		return AttributeTable.instance
-	
-	def getEditHandler(self):
-		return self._editHandler
-	
+_parser = Python25Grammar()
+_viewFn = PyGSymViewFragmentFunction( Python25View( _parser ) )
+perspective = GSymPerspective( _viewFn, PythonEditorStyleSheet.instance, AttributeTable.instance, Python25EditHandler(), Python25EditorRelativeLocationResolver() )

@@ -23,7 +23,7 @@ import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocView.DVNode;
 import BritefuryJ.DocView.DocView;
 import BritefuryJ.GSym.GSymBrowserContext;
-import BritefuryJ.GSym.GSymPerspective;
+import BritefuryJ.GSym.GSymAbstractPerspective;
 import BritefuryJ.GSym.GSymSubject;
 import BritefuryJ.IncrementalTree.IncrementalTree;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
@@ -35,12 +35,12 @@ public class GSymViewContext implements DocView.RefreshListener
 	protected static class ViewFragmentContextAndResultFactory implements IncrementalTreeNode.NodeResultFactory
 	{
 		protected GSymViewContext viewContext;
-		protected GSymPerspective perspective;
+		protected GSymAbstractPerspective perspective;
 		protected AttributeTable subjectContext;
 		protected StyleSheet styleSheet;
 		protected AttributeTable inheritedState;
 		
-		public ViewFragmentContextAndResultFactory(GSymViewContext viewContext, GSymPerspective perspective, AttributeTable subjectContext, StyleSheet styleSheet, AttributeTable inheritedState)
+		public ViewFragmentContextAndResultFactory(GSymViewContext viewContext, GSymAbstractPerspective perspective, AttributeTable subjectContext, StyleSheet styleSheet, AttributeTable inheritedState)
 		{
 			this.viewContext = viewContext;
 			this.perspective = perspective;
@@ -56,10 +56,10 @@ public class GSymViewContext implements DocView.RefreshListener
 			docView.profile_startPython();
 
 			// Create the node context
-			GSymFragmentViewContext nodeContext = new GSymFragmentViewContext( this, (DVNode)incrementalNode );
+			GSymFragmentViewContext fragmentContext = new GSymFragmentViewContext( this, (DVNode)incrementalNode );
 			
 			// Create the view fragment
-			DPElement fragment = perspective.getFragmentViewFunction().createViewFragment( docNode, nodeContext, styleSheet, inheritedState );
+			DPElement fragment = perspective.present( docNode, fragmentContext, styleSheet, inheritedState );
 			
 			docView.profile_stopPython();
 			
@@ -70,13 +70,13 @@ public class GSymViewContext implements DocView.RefreshListener
 	
 	protected static class ViewFragmentContextAndResultFactoryKey
 	{
-		private GSymPerspective perspective;
+		private GSymAbstractPerspective perspective;
 		private AttributeTable subjectContext;
 		private StyleSheet styleSheet;
 		private AttributeTable inheritedState;
 		
 		
-		public ViewFragmentContextAndResultFactoryKey(GSymPerspective perspective, AttributeTable subjectContext, StyleSheet styleSheet, AttributeTable inheritedState)
+		public ViewFragmentContextAndResultFactoryKey(GSymAbstractPerspective perspective, AttributeTable subjectContext, StyleSheet styleSheet, AttributeTable inheritedState)
 		{
 			this.perspective = perspective;
 			this.styleSheet = styleSheet;
@@ -135,7 +135,7 @@ public class GSymViewContext implements DocView.RefreshListener
 	public GSymViewContext(GSymSubject subject, GSymBrowserContext browserContext, PersistentStateStore persistentState)
 	{
 		this.docRootNode = subject.getFocus();
-		GSymPerspective perspective = subject.getPerspective();
+		GSymAbstractPerspective perspective = subject.getPerspective();
 		
 		view = new DocView( docRootNode,
 				makeNodeResultFactory( perspective, subject.getSubjectContext(), perspective.getStyleSheet(), perspective.getInitialInheritedState() ),
@@ -161,7 +161,7 @@ public class GSymViewContext implements DocView.RefreshListener
 	
 	
 
-	protected DVNode.NodeResultFactory makeNodeResultFactory(GSymPerspective perspective, AttributeTable subjectContext, StyleSheet styleSheet, AttributeTable inheritedState)
+	protected DVNode.NodeResultFactory makeNodeResultFactory(GSymAbstractPerspective perspective, AttributeTable subjectContext, StyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		// Memoise the contents factory, keyed by  @nodeViewFunction and @state
 		ViewFragmentContextAndResultFactoryKey key = new ViewFragmentContextAndResultFactoryKey( perspective, subjectContext, styleSheet, inheritedState );

@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from GSymCore.Terminal.TerminalViewer.View import TerminalViewerPerspective
+from GSymCore.Terminal.TerminalViewer.View import perspective
 from GSymCore.Terminal import TerminalSchema
 
 
@@ -13,4 +13,4 @@ def newAppState():
 	return TerminalSchema.Terminal()
 
 
-terminalViewerPerspective = TerminalViewerPerspective()
+terminalViewerPerspective = perspective

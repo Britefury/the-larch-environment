@@ -50,11 +50,12 @@ import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueStream;
 import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.GSym.GSymLightweightPerspective;
+import BritefuryJ.GSym.GSymPerspective;
 import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.GenericPerspective.PresentationStateListenerList;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
+import BritefuryJ.GSym.View.GSymViewFragmentFunction;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -103,16 +104,17 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	}
 	
 	
-	private static class TreeExplorerPerspective extends GSymLightweightPerspective
+	private static class TreeExplorerViewFragmentFn implements GSymViewFragmentFunction
 	{
-		public DPElement present(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable inheritedState)
+		@Override
+		public DPElement createViewFragment(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable inheritedState)
 		{
 			DPElement element = (DPElement)x;
 			return element.exploreTreePresent( ctx, (GenericPerspectiveStyleSheet)styleSheet, inheritedState );
 		}
 	}
 	
-	private static TreeExplorerPerspective treeExplorerPerspective = new TreeExplorerPerspective();
+	private static GSymPerspective treeExplorerPerspective = new GSymPerspective( new TreeExplorerViewFragmentFn() );
 	
 	public static class ElementTreeExplorer implements Presentable
 	{

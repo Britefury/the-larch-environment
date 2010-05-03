@@ -11,7 +11,7 @@ from Britefury.gSym.gSymDocument import gSymUnit
 from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
 from GSymCore.Languages.Python25 import Schema
 from GSymCore.Languages.Python25.Python25Importer import importPy25File
-from GSymCore.Languages.Python25.PythonEditor.View import Python25EditorPerspective
+from GSymCore.Languages.Python25.PythonEditor.View import perspective
 
 
 
@@ -27,7 +27,7 @@ def _py25ImportFile(filename):
 
 
 
-python25EditorPerspective = Python25EditorPerspective()
+python25EditorPerspective = perspective
 unitClass = GSymUnitClass( Schema.schema, python25EditorPerspective )
 unitClass.registerCodeGeneratorFactory( 'ascii', Python25CodeGenerator )
 
