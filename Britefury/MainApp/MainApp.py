@@ -21,14 +21,6 @@ class _AppLocationResolver (GSymLocationResolver):
 		self._app = app
 		
 	
-	def resolveLocationAsPage(self, location, persistentState):
-		subject = self.resolveLocationAsSubject( location )
-		if subject is not None:
-			viewContext = GSymViewContext( subject, self._app._browserContext, persistentState )
-			return viewContext.getPage()
-		
-		return None
-				
 	def resolveLocationAsSubject(self, location):
 		appState = self._app._appState
 		if appState is not None:
