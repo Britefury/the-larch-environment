@@ -12,14 +12,14 @@ import BritefuryJ.CommandHistory.CommandHistory;
 public class GSymSubject
 {
 	private Object focus;
-	private GSymPerspective perspective;
+	private GSymAbstractPerspective perspective;
 	private String title;
 	private AttributeTable subjectContext;
 	private CommandHistory commandHistory;
 
 	
 	
-	public GSymSubject(Object focus, GSymPerspective perspective, String title, AttributeTable subjectContext, CommandHistory commandHistory)
+	public GSymSubject(Object focus, GSymAbstractPerspective perspective, String title, AttributeTable subjectContext, CommandHistory commandHistory)
 	{
 		this.focus = focus;
 		this.perspective = perspective;
@@ -34,7 +34,7 @@ public class GSymSubject
 		return focus;
 	}
 	
-	public GSymPerspective getPerspective()
+	public GSymAbstractPerspective getPerspective()
 	{
 		return perspective;
 	}
@@ -56,27 +56,27 @@ public class GSymSubject
 	
 	
 	
+	public GSymSubject withFocus(Object focus)
+	{
+		return new GSymSubject( focus, perspective, title, subjectContext, commandHistory );
+	}
+	
+	public GSymSubject withPerspective(GSymAbstractPerspective perspective)
+	{
+		return new GSymSubject( focus, perspective, title, subjectContext, commandHistory );
+	}
+	
 	public GSymSubject withTitle(String title)
 	{
 		return new GSymSubject( focus, perspective, title, subjectContext, commandHistory );
 	}
 	
-	public GSymSubject withPerspective(GSymPerspective perspective)
+	public GSymSubject withSubjectContext(AttributeTable subjectContext)
 	{
 		return new GSymSubject( focus, perspective, title, subjectContext, commandHistory );
 	}
 	
-	public GSymSubject withPerspectiveAndTitle(GSymPerspective perspective, String title)
-	{
-		return new GSymSubject( focus, perspective, title, subjectContext, commandHistory );
-	}
-	
-	public GSymSubject withFocusAndPerspective(Object focus, GSymPerspective perspective)
-	{
-		return new GSymSubject( focus, perspective, title, subjectContext, commandHistory );
-	}
-	
-	public GSymSubject withFocusPerspectiveAndTitle(Object focus, GSymPerspective perspective, String title)
+	public GSymSubject withCommandHistory(CommandHistory commandHistory)
 	{
 		return new GSymSubject( focus, perspective, title, subjectContext, commandHistory );
 	}

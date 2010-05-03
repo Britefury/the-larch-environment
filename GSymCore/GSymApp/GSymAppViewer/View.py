@@ -30,7 +30,7 @@ from BritefuryJ.AttributeTable import *
 from BritefuryJ.DocPresent.StyleSheet import *
 from BritefuryJ.DocPresent.Browser import Location
 
-from BritefuryJ.GSym import GSymPerspective, GSymSubject
+from BritefuryJ.GSym import GSymPerspective, GSymRelativeLocationResolver, GSymSubject
 from BritefuryJ.GSym.View import PyGSymViewFragmentFunction
 
 from GSymCore.GSymApp import Application
@@ -209,12 +209,9 @@ class AppView (GSymViewObjectDispatch):
 	
 _docNameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*', 0 )
 
-class GSymAppViewerPerspective (GSymPerspective):
-	def __init__(self):
-		self._viewFn = PyGSymViewFragmentFunction( AppView() )
-		
-	
-	
+
+
+class GSymAppRelativeLocationResolver (GSymRelativeLocationResolver):
 	def resolveRelativeLocation(self, enclosingSubject, locationIterator):
 		if locationIterator.getSuffix() == '':
 			return enclosingSubject.withTitle( 'gSym' )
@@ -224,8 +221,8 @@ class GSymAppViewerPerspective (GSymPerspective):
 			terminalName = terminalsIterator.getSuffix()
 			for terminal in enclosingSubject.getFocus().getTerminals():
 				if terminalName == terminal.getName():
-					return GSymSubject( terminal.getTerminal(), Terminal.terminalViewerPerspective, terminalName,
-					                    enclosingSubject.getSubjectContext().withAttrs( location=locationIterator.getLocation().getLocationString() ), None )
+					return enclosingSubject.withFocus( terminal.getTerminal() ).withPerspective( Terminal.terminalViewerPerspective ).withTitle( terminalName ).withSubjectContext( 
+					        enclosingSubject.getSubjectContext().withAttrs( location=locationIterator.getLocation().getLocationString() ) )
 			
 			return None
 		else:
@@ -237,22 +234,15 @@ class GSymAppViewerPerspective (GSymPerspective):
 				doc = world.getDocument( documentName )
 				
 				if doc is not None:
-					subject = GSymSubject( doc, self, enclosingSubject.getTitle() + ' [' + documentName + ']', enclosingSubject.getSubjectContext().withAttrs( document=doc, location=iterAfterDocName.getPrefix() ),
-					                       doc.getCommandHistory() )
+					subject = enclosingSubject.withFocus( doc ).withTitle( enclosingSubject.getTitle() + ' [' + documentName + ']' )
+					subject = subject.withSubjectContext( enclosingSubject.getSubjectContext().withAttrs( document=doc, location=iterAfterDocName.getPrefix() ) )
+					subject = subject.withCommandHistory( doc.getCommandHistory() )
 					return doc.resolveRelativeLocation( subject, iterAfterDocName )
 
 			return None
+
+
+perspective = GSymPerspective( PyGSymViewFragmentFunction( AppView() ), GSymAppViewerStyleSheet.instance, AttributeTable.instance, None, GSymAppRelativeLocationResolver() )
+
 	
-	
-	def getFragmentViewFunction(self):
-		return self._viewFn
-	
-	def getStyleSheet(self):
-		return GSymAppViewerStyleSheet.instance
-	
-	def getInitialInheritedState(self):
-		return AttributeTable.instance
-	
-	def getEditHandler(self):
-		return None
 	

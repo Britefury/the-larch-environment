@@ -32,105 +32,13 @@ import BritefuryJ.DocPresent.ListView.TrailingSeparator;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.GSym.GSymAbstractPerspective;
 import BritefuryJ.GSym.GSymLocationResolver;
-import BritefuryJ.GSym.GSymPerspective;
 import BritefuryJ.GSym.GSymSubject;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
-import BritefuryJ.GSym.View.GSymViewFragmentFunction;
 
-public class GSymGenericPerspective extends GSymPerspective
+public class GSymGenericPerspective extends GSymAbstractPerspective
 {
-	private class GSymObjectViewFragmentFunction implements GSymViewFragmentFunction
-	{
-		public DPElement createViewFragment(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
-		{
-			DPElement result = null;
-			GenericPerspectiveStyleSheet genericStyleSheet = null;
-			if ( styleSheet instanceof GenericPerspectiveStyleSheet )
-			{
-				genericStyleSheet = (GenericPerspectiveStyleSheet)styleSheet;
-			}
-			else
-			{
-				genericStyleSheet = GenericPerspectiveStyleSheet.instance;
-			}
-			
-			
-			PyObject pyX = null;
-
-			// Java object presentation protocol - Presentable interface
-			if ( x instanceof Presentable )
-			{
-				// @x is an instance of @Presentable; use Presentable#present()
-				Presentable p = (Presentable)x;
-				result = p.present( ctx, genericStyleSheet, state );
-			}
-			
-			// Python object presentation protocol
-			if ( result == null  &&  x instanceof PyObject )
-			{
-				// @x is a Python object - if it offers a __present__ method, use that
-				pyX = (PyObject)x;
-				PyObject __present__ = null;
-				try
-				{
-					__present__ = pyX.__getattr__( "__present__" );
-				}
-				catch (PyException e)
-				{
-					__present__ = null;
-				}
-				
-				if ( __present__ != null  &&  __present__.isCallable() )
-				{
-					result = Py.tojava( __present__.__call__( Py.java2py( ctx ), Py.java2py( styleSheet ), Py.java2py( state ) ),  DPElement.class );
-				}
-				
-				
-				// __present__ did not succeed. Try the registered presenters.
-				if ( result == null )
-				{
-					// Now try Python object presenters
-					PyType typeX = pyX.getType();
-					
-					PyObjectPresenter presenter = getPresenterForPythonType( typeX );
-					if ( presenter != null )
-					{
-						result = presenter.presentObject( pyX, ctx, genericStyleSheet, state );
-					}
-				}
-			}
-			
-			// Java object presentation protocol - registered presenters
-			if ( result == null )
-			{
-				ObjectPresenter presenter = getPresenterForJavaObject( x );
-				if ( presenter != null )
-				{
-					result = presenter.presentObject( x, ctx, genericStyleSheet, state );
-				}
-			}
-			
-			// Fallback - use Java or Python toString() / __str__() methods
-			if ( result == null )
-			{
-				if ( pyX != null )
-				{
-					result = presentPythonObjectAsString( pyX, ctx, genericStyleSheet, state );
-				}
-				else
-				{
-					result = presentJavaObjectAsString( x, ctx, genericStyleSheet, state );
-				}
-			}
-			
-			result.setDebugName( x.getClass().getName() );
-			return result;
-		}
-	}
-
-	
-	
 	private static class GenericPerspectiveLocationResolver implements GSymLocationResolver
 	{
 		private GSymGenericPerspective perspective;
@@ -145,13 +53,12 @@ public class GSymGenericPerspective extends GSymPerspective
 		@Override
 		public GSymSubject resolveLocationAsSubject(Location location)
 		{
-			return perspective.resolveLocation( null, location.iterator() );
+			return perspective.resolveRelativeLocation( null, location.iterator() );
 		}
 	}
 	
 	
 	private GSymObjectViewLocationTable locationTable = new GSymObjectViewLocationTable();
-	private GSymObjectViewFragmentFunction fragmentViewFn = new GSymObjectViewFragmentFunction();
 	private GenericPerspectiveLocationResolver locationResolver = new GenericPerspectiveLocationResolver( this );
 	private HashMap<Class<?>, ObjectPresenter> registeredJavaObjectPresenters = new HashMap<Class<?>, ObjectPresenter>();
 	private HashMap<Class<?>, ObjectPresenter> javaObjectPresenters = new HashMap<Class<?>, ObjectPresenter>();
@@ -167,33 +74,115 @@ public class GSymGenericPerspective extends GSymPerspective
 	
 
 
-	public GSymViewFragmentFunction getFragmentViewFunction()
+	@Override
+	public DPElement present(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
 	{
-		return fragmentViewFn;
+		DPElement result = null;
+		GenericPerspectiveStyleSheet genericStyleSheet = null;
+		if ( styleSheet instanceof GenericPerspectiveStyleSheet )
+		{
+			genericStyleSheet = (GenericPerspectiveStyleSheet)styleSheet;
+		}
+		else
+		{
+			genericStyleSheet = GenericPerspectiveStyleSheet.instance;
+		}
+		
+		
+		PyObject pyX = null;
+
+		// Java object presentation protocol - Presentable interface
+		if ( x instanceof Presentable )
+		{
+			// @x is an instance of @Presentable; use Presentable#present()
+			Presentable p = (Presentable)x;
+			result = p.present( ctx, genericStyleSheet, state );
+		}
+		
+		// Python object presentation protocol
+		if ( result == null  &&  x instanceof PyObject )
+		{
+			// @x is a Python object - if it offers a __present__ method, use that
+			pyX = (PyObject)x;
+			PyObject __present__ = null;
+			try
+			{
+				__present__ = pyX.__getattr__( "__present__" );
+			}
+			catch (PyException e)
+			{
+				__present__ = null;
+			}
+			
+			if ( __present__ != null  &&  __present__.isCallable() )
+			{
+				result = Py.tojava( __present__.__call__( Py.java2py( ctx ), Py.java2py( styleSheet ), Py.java2py( state ) ),  DPElement.class );
+			}
+			
+			
+			// __present__ did not succeed. Try the registered presenters.
+			if ( result == null )
+			{
+				// Now try Python object presenters
+				PyType typeX = pyX.getType();
+				
+				PyObjectPresenter presenter = getPresenterForPythonType( typeX );
+				if ( presenter != null )
+				{
+					result = presenter.presentObject( pyX, ctx, genericStyleSheet, state );
+				}
+			}
+		}
+		
+		// Java object presentation protocol - registered presenters
+		if ( result == null )
+		{
+			ObjectPresenter presenter = getPresenterForJavaObject( x );
+			if ( presenter != null )
+			{
+				result = presenter.presentObject( x, ctx, genericStyleSheet, state );
+			}
+		}
+		
+		// Fallback - use Java or Python toString() / __str__() methods
+		if ( result == null )
+		{
+			if ( pyX != null )
+			{
+				result = presentPythonObjectAsString( pyX, ctx, genericStyleSheet, state );
+			}
+			else
+			{
+				result = presentJavaObjectAsString( x, ctx, genericStyleSheet, state );
+			}
+		}
+		
+		result.setDebugName( x.getClass().getName() );
+		return result;
 	}
+
 	
+	
+	@Override
 	public StyleSheet getStyleSheet()
 	{
 		return GenericPerspectiveStyleSheet.instance;
 	}
 	
+	@Override
 	public AttributeTable getInitialInheritedState()
 	{
 		return AttributeTable.instance;
 	}
 	
-	public Object createInitialState(GSymSubject subject)
-	{
-		return null;
-	}
-
+	@Override
 	public EditHandler getEditHandler()
 	{
 		return null;
 	}
 
 
-	public GSymSubject resolveLocation(GSymSubject enclosingSubject, Location.TokenIterator relativeLocation)
+	public GSymSubject resolveRelativeLocation(GSymSubject enclosingSubject, Location.TokenIterator relativeLocation)
 	{
 		Object x = locationTable.getObjectAtLocation( relativeLocation );
 		if ( x != null )

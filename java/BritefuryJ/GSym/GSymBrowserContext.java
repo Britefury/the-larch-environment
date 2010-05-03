@@ -19,9 +19,9 @@ import BritefuryJ.DocPresent.Browser.BrowserContext;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.LocationResolver;
 import BritefuryJ.DocPresent.Browser.Page;
+import BritefuryJ.DocPresent.Browser.Location.TokenIterator;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemLocationResolver;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
-import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
@@ -49,52 +49,6 @@ public class GSymBrowserContext
 		}
 	}
 	
-	
-	
-	private static class GSymBrowserContextPerspective extends GSymPerspective
-	{
-		private GSymViewFragmentFunction fragmentViewFn;
-		
-		
-		public GSymBrowserContextPerspective(GSymViewFragmentFunction fragmentViewFn)
-		{
-			this.fragmentViewFn = fragmentViewFn;
-		}
-		
-		@Override
-		public EditHandler getEditHandler()
-		{
-			return null;
-		}
-
-		@Override
-		public GSymViewFragmentFunction getFragmentViewFunction()
-		{
-			return fragmentViewFn;
-		}
-
-		@Override
-		public StyleSheet getStyleSheet()
-		{
-			return PrimitiveStyleSheet.instance;
-		}
-		
-		@Override
-		public AttributeTable getInitialInheritedState()
-		{
-			return AttributeTable.instance;
-		}
-		
-		@Override
-		public GSymSubject resolveLocation(GSymSubject enclosingSubject, Location.TokenIterator relativeLocation)
-		{
-			return enclosingSubject;
-		}
-	}
-	
-	
-	
-	
 	private static class SystemPageFragmentViewFn implements GSymViewFragmentFunction
 	{
 		public DPElement createViewFragment(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
@@ -104,48 +58,24 @@ public class GSymBrowserContext
 		}
 	}
 	
-	private static class SystemPagePerspective extends GSymPerspective
+	private static class SystemPageRelativeLocationResolver implements GSymRelativeLocationResolver
 	{
-		private static SystemPageFragmentViewFn fragmentViewFn = new SystemPageFragmentViewFn();
 		private LocationResolver systemLocationResolver;
 		
-		public SystemPagePerspective(LocationResolver systemLocationResolver)
+		public SystemPageRelativeLocationResolver(LocationResolver systemLocationResolver)
 		{
 			this.systemLocationResolver = systemLocationResolver;
 		}
-		
-		@Override
-		public EditHandler getEditHandler()
-		{
-			return null;
-		}
 
-		@Override
-		public GSymViewFragmentFunction getFragmentViewFunction()
-		{
-			return fragmentViewFn;
-		}
-
-		@Override
-		public StyleSheet getStyleSheet()
-		{
-			return PrimitiveStyleSheet.instance;
-		}
 		
 		@Override
-		public AttributeTable getInitialInheritedState()
+		public GSymSubject resolveRelativeLocation(GSymSubject enclosingSubject, TokenIterator locationIterator)
 		{
-			return AttributeTable.instance;
-		}
-		
-		@Override
-		public GSymSubject resolveLocation(GSymSubject enclosingSubject, Location.TokenIterator relativeLocation)
-		{
-			Location location = new Location( relativeLocation.getSuffix() );
+			Location location = new Location( locationIterator.getSuffix() );
 			Page p = systemLocationResolver.resolveLocationAsPage( location, null );
 			if ( p != null )
 			{
-				return new GSymSubject( p, this, p.getTitle(), AttributeTable.instance, null );
+				return enclosingSubject.withFocus( p ).withTitle( p.getTitle() );
 			}
 			else
 			{
@@ -156,19 +86,19 @@ public class GSymBrowserContext
 	
 	private class SystemPageLocationResolver implements GSymLocationResolver
 	{
-		private SystemPagePerspective perspective;
+		private GSymPerspective perspective;
 		
 		
 		public SystemPageLocationResolver(LocationResolver systemLocationResolver)
 		{
-			perspective = new SystemPagePerspective( systemLocationResolver );
+			perspective = new GSymPerspective( new SystemPageFragmentViewFn(), new SystemPageRelativeLocationResolver( systemLocationResolver ) );
 		}
 		
 		
 		@Override
 		public GSymSubject resolveLocationAsSubject(Location location)
 		{
-			return perspective.resolveLocation( null, location.iterator() );
+			return perspective.resolveRelativeLocation( new GSymSubject( null, perspective, "", AttributeTable.instance, null ), location.iterator() );
 		}
 	}
 	
@@ -348,6 +278,6 @@ public class GSymBrowserContext
 	private static DefaultRootPage defaultRootPage = new DefaultRootPage();
 	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
 	private static PrimitiveStyleSheet resolveErrorStyleSheet = styleSheet.withFontSize( 14 ).withForeground( new Color( 0.8f, 0.0f, 0.0f ) );
-	private static GSymBrowserContextPerspective rootLocationPerspective = new GSymBrowserContextPerspective( new RootLocationFragmentViewFn() );
-	private static GSymBrowserContextPerspective resolveErrorPerspective = new GSymBrowserContextPerspective( new ResolveErrorFragmentViewFn() );
+	private static GSymPerspective rootLocationPerspective = new GSymPerspective( new RootLocationFragmentViewFn() );
+	private static GSymPerspective resolveErrorPerspective = new GSymPerspective( new ResolveErrorFragmentViewFn() );
 }

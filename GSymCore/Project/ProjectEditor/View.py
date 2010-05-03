@@ -31,7 +31,7 @@ from BritefuryJ.DocPresent.Browser import Location
 from BritefuryJ.DocPresent.StyleSheet import PrimitiveStyleSheet
 from BritefuryJ.DocPresent import *
 
-from BritefuryJ.GSym import GSymPerspective, GSymSubject
+from BritefuryJ.GSym import GSymPerspective, GSymSubject, GSymRelativeLocationResolver
 from BritefuryJ.GSym.View import PyGSymViewFragmentFunction
 
 
@@ -204,12 +204,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 _nameRegex = Pattern.compile( '[a-zA-Z_ ][a-zA-Z0-9_ ]*', 0 )
 
 	
-class ProjectEditorPerspective (GSymPerspective):
-	def __init__(self):
-		self._viewFn = PyGSymViewFragmentFunction( ProjectView() )
-		
-	
-	
+class ProjectEditorRelativeLocationResolver (GSymRelativeLocationResolver):
 	def resolveRelativeLocation(self, enclosingSubject, locationIterator):
 		if locationIterator.getSuffix() == '':
 			return enclosingSubject
@@ -246,8 +241,8 @@ class ProjectEditorPerspective (GSymPerspective):
 					if node.isInstanceOf( Schema.Package ):
 						package = node
 					elif node.isInstanceOf( Schema.Page ):
-						subject = GSymSubject( node, self, enclosingSubject.getTitle() + ' ' + name, enclosingSubject.getSubjectContext().withAttrs( location=locationIterator.getPrefix() ),
-						                       enclosingSubject.getCommandHistory() )
+						subject = enclosingSubject.withFocus( node ).withTitle( enclosingSubject.getTitle() + ' ' + name )
+						subject = subject.withSubjectContext( enclosingSubject.getSubjectContext().withAttrs( location=locationIterator.getPrefix() ) )
 						document = enclosingSubject.getSubjectContext()['document']
 						return document.resolveUnitRelativeLocation( node['unit'], subject, locationIterator )
 					else:
@@ -257,15 +252,7 @@ class ProjectEditorPerspective (GSymPerspective):
 			return None
 	
 	
-	def getFragmentViewFunction(self):
-		return self._viewFn
 	
-	def getStyleSheet(self):
-		return ProjectEditorStyleSheet.instance
-	
-	def getInitialInheritedState(self):
-		return AttributeTable.instance
-	
-	def getEditHandler(self):
-		return None
+
+perspective = GSymPerspective( PyGSymViewFragmentFunction( ProjectView() ), ProjectEditorStyleSheet.instance, AttributeTable.instance, None, ProjectEditorRelativeLocationResolver() )
 	
