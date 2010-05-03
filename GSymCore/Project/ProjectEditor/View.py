@@ -246,7 +246,8 @@ class ProjectEditorPerspective (GSymPerspective):
 					if node.isInstanceOf( Schema.Package ):
 						package = node
 					elif node.isInstanceOf( Schema.Page ):
-						subject = GSymSubject( node, self, enclosingSubject.getTitle() + ' ' + name, enclosingSubject.getSubjectContext().withAttrs( location=locationIterator.getPrefix() ) )
+						subject = GSymSubject( node, self, enclosingSubject.getTitle() + ' ' + name, enclosingSubject.getSubjectContext().withAttrs( location=locationIterator.getPrefix() ),
+						                       enclosingSubject.getCommandHistory() )
 						document = enclosingSubject.getSubjectContext()['document']
 						return document.resolveUnitRelativeLocation( node['unit'], subject, locationIterator )
 					else:

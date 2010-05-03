@@ -145,7 +145,7 @@ public class GSymBrowserContext
 			Page p = systemLocationResolver.resolveLocationAsPage( location, null );
 			if ( p != null )
 			{
-				return new GSymSubject( p, this, p.getTitle(), AttributeTable.instance );
+				return new GSymSubject( p, this, p.getTitle(), AttributeTable.instance, null );
 			}
 			else
 			{
@@ -171,7 +171,7 @@ public class GSymBrowserContext
 			GSymSubject subject = perspective.resolveLocation( null, location.iterator() );
 			if ( subject != null )
 			{
-				GSymViewContext viewContext = new GSymViewContext( subject, GSymBrowserContext.this, null, persistentState );
+				GSymViewContext viewContext = new GSymViewContext( subject, GSymBrowserContext.this, persistentState );
 				return viewContext.getPage();
 			}
 			else
@@ -274,11 +274,11 @@ public class GSymBrowserContext
 		
 		if ( location.getLocationString().equals( "" ) )
 		{
-			return new GSymSubject( null, rootLocationPerspective, "Root page", AttributeTable.instance );
+			return new GSymSubject( null, rootLocationPerspective, "Root page", AttributeTable.instance, null );
 		}
 		else
 		{
-			return new GSymSubject( location, resolveErrorPerspective, "Resolve error", AttributeTable.instance );
+			return new GSymSubject( location, resolveErrorPerspective, "Resolve error", AttributeTable.instance, null );
 		}
 	}
 	

@@ -224,7 +224,8 @@ class GSymAppViewerPerspective (GSymPerspective):
 			terminalName = terminalsIterator.getSuffix()
 			for terminal in enclosingSubject.getFocus().getTerminals():
 				if terminalName == terminal.getName():
-					return GSymSubject( terminal.getTerminal(), Terminal.terminalViewerPerspective, terminalName, enclosingSubject.getSubjectContext().withAttrs( location=locationIterator.getLocation().getLocationString() ) )
+					return GSymSubject( terminal.getTerminal(), Terminal.terminalViewerPerspective, terminalName,
+					                    enclosingSubject.getSubjectContext().withAttrs( location=locationIterator.getLocation().getLocationString() ), None )
 			
 			return None
 		else:
@@ -236,7 +237,8 @@ class GSymAppViewerPerspective (GSymPerspective):
 				doc = world.getDocument( documentName )
 				
 				if doc is not None:
-					subject = GSymSubject( doc, self, enclosingSubject.getTitle() + ' [' + documentName + ']', enclosingSubject.getSubjectContext().withAttrs( document=doc, location=iterAfterDocName.getPrefix() ) )
+					subject = GSymSubject( doc, self, enclosingSubject.getTitle() + ' [' + documentName + ']', enclosingSubject.getSubjectContext().withAttrs( document=doc, location=iterAfterDocName.getPrefix() ),
+					                       doc.getCommandHistory() )
 					return doc.resolveRelativeLocation( subject, iterAfterDocName )
 
 			return None

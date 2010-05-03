@@ -60,6 +60,9 @@ public class GSymGenericPerspective extends GSymPerspective
 			}
 			
 			
+			PyObject pyX = null;
+
+			// Java object presentation protocol - Presentable interface
 			if ( x instanceof Presentable )
 			{
 				// @x is an instance of @Presentable; use Presentable#present()
@@ -67,10 +70,11 @@ public class GSymGenericPerspective extends GSymPerspective
 				result = p.present( ctx, genericStyleSheet, state );
 			}
 			
+			// Python object presentation protocol
 			if ( result == null  &&  x instanceof PyObject )
 			{
 				// @x is a Python object - if it offers a __present__ method, use that
-				PyObject pyX = (PyObject)x;
+				pyX = (PyObject)x;
 				PyObject __present__ = null;
 				try
 				{
@@ -87,7 +91,7 @@ public class GSymGenericPerspective extends GSymPerspective
 				}
 				
 				
-				
+				// __present__ did not succeed. Try the registered presenters.
 				if ( result == null )
 				{
 					// Now try Python object presenters
@@ -98,19 +102,25 @@ public class GSymGenericPerspective extends GSymPerspective
 					{
 						result = presenter.presentObject( pyX, ctx, genericStyleSheet, state );
 					}
-					else
-					{
-						result = presentPythonObjectAsString( pyX, ctx, genericStyleSheet, state );
-					}
 				}
 			}
 			
+			// Java object presentation protocol - registered presenters
 			if ( result == null )
 			{
 				ObjectPresenter presenter = getPresenterForJavaObject( x );
 				if ( presenter != null )
 				{
 					result = presenter.presentObject( x, ctx, genericStyleSheet, state );
+				}
+			}
+			
+			// Fallback - use Java or Python toString() / __str__() methods
+			if ( result == null )
+			{
+				if ( pyX != null )
+				{
+					result = presentPythonObjectAsString( pyX, ctx, genericStyleSheet, state );
 				}
 				else
 				{
@@ -142,7 +152,7 @@ public class GSymGenericPerspective extends GSymPerspective
 			GSymSubject subject = perspective.resolveLocation( null, location.iterator() );
 			if ( subject != null )
 			{
-				GSymViewContext viewContext = new GSymViewContext( subject, perspective.browserContext, null, persistentState );
+				GSymViewContext viewContext = new GSymViewContext( subject, perspective.browserContext, persistentState );
 				return viewContext.getPage();
 			}
 			else
@@ -211,7 +221,7 @@ public class GSymGenericPerspective extends GSymPerspective
 		if ( x != null )
 		{
 			String title = x != null  ?  x.getClass().getName()  :  "<null>";
-			return new GSymSubject( x, this, title, AttributeTable.instance );
+			return new GSymSubject( x, this, title, AttributeTable.instance, null );
 		}
 		else
 		{

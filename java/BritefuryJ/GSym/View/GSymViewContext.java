@@ -132,7 +132,7 @@ public class GSymViewContext implements DocView.RefreshListener
 		new HashMap<ViewFragmentContextAndResultFactoryKey, ViewFragmentContextAndResultFactory>();
 
 	
-	public GSymViewContext(GSymSubject subject, GSymBrowserContext browserContext, CommandHistory commandHistory, PersistentStateStore persistentState)
+	public GSymViewContext(GSymSubject subject, GSymBrowserContext browserContext, PersistentStateStore persistentState)
 	{
 		this.docRootNode = subject.getFocus();
 		GSymPerspective perspective = subject.getPerspective();
@@ -142,7 +142,7 @@ public class GSymViewContext implements DocView.RefreshListener
 				persistentState );
 
 		this.browserContext = browserContext;
-		this.commandHistory = commandHistory;
+		this.commandHistory = subject.getCommandHistory();
 		
 		region = new DPRegion();
 		vbox = PrimitiveStyleSheet.instance.vbox( new DPElement[] { region } );
