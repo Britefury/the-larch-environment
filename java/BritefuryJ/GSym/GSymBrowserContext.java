@@ -161,25 +161,10 @@ public class GSymBrowserContext
 		
 		public SystemPageLocationResolver(LocationResolver systemLocationResolver)
 		{
-			this.perspective = new SystemPagePerspective( systemLocationResolver );
+			perspective = new SystemPagePerspective( systemLocationResolver );
 		}
 		
 		
-		@Override
-		public Page resolveLocationAsPage(Location location, PersistentStateStore persistentState)
-		{
-			GSymSubject subject = perspective.resolveLocation( null, location.iterator() );
-			if ( subject != null )
-			{
-				GSymViewContext viewContext = new GSymViewContext( subject, GSymBrowserContext.this, persistentState );
-				return viewContext.getPage();
-			}
-			else
-			{
-				return null;
-			}
-		}
-
 		@Override
 		public GSymSubject resolveLocationAsSubject(Location location)
 		{
@@ -207,7 +192,7 @@ public class GSymBrowserContext
 	public GSymBrowserContext(boolean bWithSystemPages)
 	{
 		super();
-		genericPerspective = new GSymGenericPerspective( this );
+		genericPerspective = new GSymGenericPerspective();
 		if ( bWithSystemPages )
 		{
 			addResolvers( Arrays.asList( new GSymLocationResolver[] { new SystemPageLocationResolver( SystemLocationResolver.getSystemResolver() ) } ) );
@@ -217,13 +202,7 @@ public class GSymBrowserContext
 	
 	public GSymBrowserContext(boolean bWithSystemPages, List<GSymLocationResolver> resolvers)
 	{
-		super();
-		genericPerspective = new GSymGenericPerspective( this );
-		if ( bWithSystemPages )
-		{
-			addResolvers( Arrays.asList( new GSymLocationResolver[] { new SystemPageLocationResolver( SystemLocationResolver.getSystemResolver() ) } ) );
-		}
-		addResolvers( Arrays.asList( new GSymLocationResolver[] { genericPerspective.getLocationResolver() } ) );
+		this( bWithSystemPages );
 		addResolvers( resolvers );
 	}
 	
@@ -287,10 +266,11 @@ public class GSymBrowserContext
 	{
 		for (GSymLocationResolver resolver: resolvers)
 		{
-			Page p = resolver.resolveLocationAsPage( location, persistentState );
-			if ( p != null )
+			GSymSubject subject = resolver.resolveLocationAsSubject( location );
+			if ( subject != null )
 			{
-				return p;
+				GSymViewContext viewContext = new GSymViewContext( subject, this, persistentState );
+				return viewContext.getPage();
 			}
 		}
 		

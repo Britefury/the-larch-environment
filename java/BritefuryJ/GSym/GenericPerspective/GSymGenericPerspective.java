@@ -24,22 +24,18 @@ import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.Browser.Location;
-import BritefuryJ.DocPresent.Browser.Page;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.ListView.ListViewStyleSheet;
 import BritefuryJ.DocPresent.ListView.SeparatorElementFactory;
 import BritefuryJ.DocPresent.ListView.SpanListViewLayoutStyleSheet;
 import BritefuryJ.DocPresent.ListView.TrailingSeparator;
 import BritefuryJ.DocPresent.Painter.FillPainter;
-import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.GSym.GSymBrowserContext;
 import BritefuryJ.GSym.GSymLocationResolver;
 import BritefuryJ.GSym.GSymPerspective;
 import BritefuryJ.GSym.GSymSubject;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
-import BritefuryJ.GSym.View.GSymViewContext;
 import BritefuryJ.GSym.View.GSymViewFragmentFunction;
 
 public class GSymGenericPerspective extends GSymPerspective
@@ -147,21 +143,6 @@ public class GSymGenericPerspective extends GSymPerspective
 		
 		
 		@Override
-		public Page resolveLocationAsPage(Location location, PersistentStateStore persistentState)
-		{
-			GSymSubject subject = perspective.resolveLocation( null, location.iterator() );
-			if ( subject != null )
-			{
-				GSymViewContext viewContext = new GSymViewContext( subject, perspective.browserContext, persistentState );
-				return viewContext.getPage();
-			}
-			else
-			{
-				return null;
-			}
-		}
-
-		@Override
 		public GSymSubject resolveLocationAsSubject(Location location)
 		{
 			return perspective.resolveLocation( null, location.iterator() );
@@ -176,13 +157,10 @@ public class GSymGenericPerspective extends GSymPerspective
 	private HashMap<Class<?>, ObjectPresenter> javaObjectPresenters = new HashMap<Class<?>, ObjectPresenter>();
 	private HashMap<PyType, PyObjectPresenter> registeredPythonObjectPresenters = new HashMap<PyType, PyObjectPresenter>();
 	private HashMap<PyType, PyObjectPresenter> pythonObjectPresenters = new HashMap<PyType, PyObjectPresenter>();
-	private GSymBrowserContext browserContext;
 	
 	
-	public GSymGenericPerspective(GSymBrowserContext browserContext)
+	public GSymGenericPerspective()
 	{
-		this.browserContext = browserContext;
-
 		registerDefaultObjectPresenters();
 	}
 
