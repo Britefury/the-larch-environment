@@ -36,17 +36,14 @@ public class GSymViewContext implements DocView.RefreshListener
 	{
 		protected GSymViewContext viewContext;
 		protected GSymPerspective perspective;
-		protected GSymViewFragmentFunction viewFragmentFunction;
 		protected AttributeTable subjectContext;
 		protected StyleSheet styleSheet;
 		protected AttributeTable inheritedState;
 		
-		public ViewFragmentContextAndResultFactory(GSymViewContext viewContext, GSymPerspective perspective, GSymViewFragmentFunction nodeFunction, AttributeTable subjectContext,
-				StyleSheet styleSheet, AttributeTable inheritedState)
+		public ViewFragmentContextAndResultFactory(GSymViewContext viewContext, GSymPerspective perspective, AttributeTable subjectContext, StyleSheet styleSheet, AttributeTable inheritedState)
 		{
 			this.viewContext = viewContext;
 			this.perspective = perspective;
-			this.viewFragmentFunction = nodeFunction;
 			this.subjectContext = subjectContext;
 			this.styleSheet = styleSheet;
 			this.inheritedState = inheritedState;
@@ -62,7 +59,7 @@ public class GSymViewContext implements DocView.RefreshListener
 			GSymFragmentViewContext nodeContext = new GSymFragmentViewContext( this, (DVNode)incrementalNode );
 			
 			// Create the view fragment
-			DPElement fragment = viewFragmentFunction.createViewFragment( docNode, nodeContext, styleSheet, inheritedState );
+			DPElement fragment = perspective.getFragmentViewFunction().createViewFragment( docNode, nodeContext, styleSheet, inheritedState );
 			
 			docView.profile_stopPython();
 			
@@ -74,17 +71,14 @@ public class GSymViewContext implements DocView.RefreshListener
 	protected static class ViewFragmentContextAndResultFactoryKey
 	{
 		private GSymPerspective perspective;
-		private GSymViewFragmentFunction viewFragmentFunction;
 		private AttributeTable subjectContext;
 		private StyleSheet styleSheet;
 		private AttributeTable inheritedState;
 		
 		
-		public ViewFragmentContextAndResultFactoryKey(GSymPerspective perspective, GSymViewFragmentFunction viewFragmentFunction, AttributeTable subjectContext,
-				StyleSheet styleSheet, AttributeTable inheritedState)
+		public ViewFragmentContextAndResultFactoryKey(GSymPerspective perspective, AttributeTable subjectContext, StyleSheet styleSheet, AttributeTable inheritedState)
 		{
 			this.perspective = perspective;
-			this.viewFragmentFunction = viewFragmentFunction;
 			this.styleSheet = styleSheet;
 			this.inheritedState = inheritedState;
 			this.subjectContext = subjectContext;
@@ -93,11 +87,11 @@ public class GSymViewContext implements DocView.RefreshListener
 		
 		public int hashCode()
 		{
-			if ( viewFragmentFunction == null  ||  styleSheet == null )
+			if ( styleSheet == null )
 			{
-				throw new RuntimeException( "null?nodeFunction=" + ( viewFragmentFunction == null ) + ", null?styleSheet=" + ( styleSheet == null ) );
+				throw new RuntimeException( "null?styleSheet=" + ( styleSheet == null ) );
 			}
-			return HashUtils.nHash( new int[] { System.identityHashCode( perspective ), System.identityHashCode( viewFragmentFunction ), styleSheet.hashCode(), inheritedState.hashCode(), subjectContext.hashCode() } );
+			return HashUtils.nHash( new int[] { System.identityHashCode( perspective ), styleSheet.hashCode(), inheritedState.hashCode(), subjectContext.hashCode() } );
 		}
 		
 		public boolean equals(Object x)
@@ -110,8 +104,7 @@ public class GSymViewContext implements DocView.RefreshListener
 			if ( x instanceof ViewFragmentContextAndResultFactoryKey )
 			{
 				ViewFragmentContextAndResultFactoryKey kx = (ViewFragmentContextAndResultFactoryKey)x;
-				return perspective == kx.perspective  &&  viewFragmentFunction == kx.viewFragmentFunction  &&  styleSheet.equals( kx.styleSheet )  &&  inheritedState == kx.inheritedState  &&
-					subjectContext == kx.subjectContext;
+				return perspective == kx.perspective  &&  styleSheet.equals( kx.styleSheet )  &&  inheritedState == kx.inheritedState  &&  subjectContext == kx.subjectContext;
 			}
 			else
 			{
@@ -145,7 +138,7 @@ public class GSymViewContext implements DocView.RefreshListener
 		GSymPerspective perspective = subject.getPerspective();
 		
 		view = new DocView( docRootNode,
-				makeNodeResultFactory( perspective, perspective.getFragmentViewFunction(), subject.getSubjectContext(), perspective.getStyleSheet(), perspective.getInitialInheritedState() ),
+				makeNodeResultFactory( perspective, subject.getSubjectContext(), perspective.getStyleSheet(), perspective.getInitialInheritedState() ),
 				persistentState );
 
 		this.browserContext = browserContext;
@@ -168,17 +161,16 @@ public class GSymViewContext implements DocView.RefreshListener
 	
 	
 
-	protected DVNode.NodeResultFactory makeNodeResultFactory(GSymPerspective perspective, GSymViewFragmentFunction nodeFunction, AttributeTable subjectContext,
-			StyleSheet styleSheet, AttributeTable inheritedState)
+	protected DVNode.NodeResultFactory makeNodeResultFactory(GSymPerspective perspective, AttributeTable subjectContext, StyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		// Memoise the contents factory, keyed by  @nodeViewFunction and @state
-		ViewFragmentContextAndResultFactoryKey key = new ViewFragmentContextAndResultFactoryKey( perspective, nodeFunction, subjectContext, styleSheet, inheritedState );
+		ViewFragmentContextAndResultFactoryKey key = new ViewFragmentContextAndResultFactoryKey( perspective, subjectContext, styleSheet, inheritedState );
 		
 		ViewFragmentContextAndResultFactory factory = viewFragmentContextAndResultFactories.get( key );
 		
 		if ( factory == null )
 		{
-			factory = new ViewFragmentContextAndResultFactory( this, perspective, nodeFunction, subjectContext, styleSheet, inheritedState );
+			factory = new ViewFragmentContextAndResultFactory( this, perspective, subjectContext, styleSheet, inheritedState );
 			viewFragmentContextAndResultFactories.put( key, factory );
 			return factory;
 		}
