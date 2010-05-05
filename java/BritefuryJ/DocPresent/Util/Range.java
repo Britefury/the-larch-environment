@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent.Util;
 import java.util.ArrayList;
 
 import BritefuryJ.Incremental.IncrementalOwner;
-import BritefuryJ.Incremental.IncrementalValue;
+import BritefuryJ.Incremental.IncrementalValueMonitor;
 
 
 public class Range implements IncrementalOwner
@@ -20,7 +20,7 @@ public class Range implements IncrementalOwner
 	}
 	
 	
-	private IncrementalValue incr = new IncrementalValue( this );
+	private IncrementalValueMonitor incr = new IncrementalValueMonitor( this );
 	private double min, max;
 	private double begin, end;
 	private double stepSize;
@@ -62,37 +62,37 @@ public class Range implements IncrementalOwner
 	
 	public double getMin()
 	{
-		incr.onLiteralAccess();
+		incr.onAccess();
 		return min;
 	}
 
 	public double getMax()
 	{
-		incr.onLiteralAccess();
+		incr.onAccess();
 		return max;
 	}
 
 	public double getBegin()
 	{
-		incr.onLiteralAccess();
+		incr.onAccess();
 		return begin;
 	}
 
 	public double getEnd()
 	{
-		incr.onLiteralAccess();
+		incr.onAccess();
 		return end;
 	}
 	
 	public double getPageSize()
 	{
-		incr.onLiteralAccess();
+		incr.onAccess();
 		return end - begin;
 	}
 	
 	public double getStepSize()
 	{
-		incr.onLiteralAccess();
+		incr.onAccess();
 		return stepSize;
 	}
 	
@@ -119,7 +119,7 @@ public class Range implements IncrementalOwner
 	
 	public void move(double delta)
 	{
-		incr.onLiteralAccess();
+		incr.onAccess();
 		if ( delta < 0.0 )
 		{
 			delta = Math.max( delta, min - begin );

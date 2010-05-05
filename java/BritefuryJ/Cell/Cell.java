@@ -9,14 +9,14 @@ package BritefuryJ.Cell;
 
 import org.python.core.PyObject;
 
-import BritefuryJ.Incremental.IncrementalFunction;
-import BritefuryJ.Incremental.IncrementalValueListener;
+import BritefuryJ.Incremental.IncrementalFunctionMonitor;
+import BritefuryJ.Incremental.IncrementalMonitorListener;
 
 
 
 public class Cell extends CellInterface
 {
-	private IncrementalFunction inc;
+	private IncrementalFunctionMonitor inc;
 	private CellEvaluator evaluator;
 	private Object valueCache;
 	
@@ -25,7 +25,7 @@ public class Cell extends CellInterface
 	
 	public Cell()
 	{
-		inc = new IncrementalFunction();
+		inc = new IncrementalFunctionMonitor();
 		evaluator = new CellEvaluatorLiteral( null );
 		valueCache = null;
 	}
@@ -107,12 +107,12 @@ public class Cell extends CellInterface
 	
 	
 	
-	public void addListener(IncrementalValueListener listener)
+	public void addListener(IncrementalMonitorListener listener)
 	{
 		inc.addListener( listener );
 	}
 
-	public void removeListener(IncrementalValueListener listener)
+	public void removeListener(IncrementalMonitorListener listener)
 	{
 		inc.removeListener( listener );
 	}

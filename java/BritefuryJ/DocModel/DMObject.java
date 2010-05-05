@@ -32,7 +32,7 @@ import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 import BritefuryJ.Incremental.IncrementalOwner;
-import BritefuryJ.Incremental.IncrementalValue;
+import BritefuryJ.Incremental.IncrementalValueMonitor;
 
 public class DMObject extends DMNode implements DMObjectInterface, Trackable, Serializable, IncrementalOwner, Presentable
 {
@@ -47,7 +47,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	private static final long serialVersionUID = 1L;
 
 	
-	private IncrementalValue incr;
+	private IncrementalValueMonitor incr;
 	private DMObjectClass objClass;
 	private Object fieldData[];
 	private DMObjectCommandTracker commandTracker;
@@ -57,7 +57,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	
 	public DMObject(DMObjectClass objClass)
 	{
-		incr = new IncrementalValue( this );
+		incr = new IncrementalValueMonitor( this );
 		this.objClass = objClass;
 		fieldData = new Object[objClass.getNumFields()];
 		commandTracker = null;
@@ -65,7 +65,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	
 	public DMObject(DMObjectClass objClass, Object values[])
 	{
-		incr = new IncrementalValue( this );
+		incr = new IncrementalValueMonitor( this );
 		this.objClass = objClass;
 		fieldData = new Object[objClass.getNumFields()];
 		
@@ -85,7 +85,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	
 	public DMObject(DMObjectClass objClass, PyObject values[])
 	{
-		incr = new IncrementalValue( this );
+		incr = new IncrementalValueMonitor( this );
 		this.objClass = objClass;
 		fieldData = new Object[objClass.getNumFields()];
 		
@@ -107,7 +107,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	{
 		assert keys.length == values.length;
 		
-		incr = new IncrementalValue( this );
+		incr = new IncrementalValueMonitor( this );
 		this.objClass = objClass;
 		fieldData = new Object[objClass.getNumFields()];
 	
@@ -136,7 +136,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	{
 		assert names.length == values.length;
 		
-		incr = new IncrementalValue( this );
+		incr = new IncrementalValueMonitor( this );
 		this.objClass = objClass;
 		fieldData = new Object[objClass.getNumFields()];
 	
@@ -163,7 +163,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	
 	public DMObject(DMObjectInterface obj)
 	{
-		incr = new IncrementalValue( this );
+		incr = new IncrementalValueMonitor( this );
 		this.objClass = obj.getDMObjectClass();
 		fieldData = new Object[objClass.getNumFields()];
 		
@@ -182,7 +182,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 
 	public DMObject(PyObject values[])
 	{
-		incr = new IncrementalValue( this );
+		incr = new IncrementalValueMonitor( this );
 		objClass = Py.tojava( values[0], DMObjectClass.class );
 		fieldData = new Object[objClass.getNumFields()];
 		
@@ -204,7 +204,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	{
 		assert values.length == ( names.length + 1 );
 		
-		incr = new IncrementalValue( this );
+		incr = new IncrementalValueMonitor( this );
 		objClass = Py.tojava( values[0], DMObjectClass.class );
 		fieldData = new Object[objClass.getNumFields()];
 		
@@ -231,7 +231,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 
 	public DMObject(DMObjectClass objClass, Map<String, Object> data) throws InvalidFieldNameException
 	{
-		incr = new IncrementalValue( this );
+		incr = new IncrementalValueMonitor( this );
 		this.objClass = objClass;
 		fieldData = new Object[objClass.getNumFields()];
 		
@@ -259,7 +259,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	@SuppressWarnings("unchecked")
 	public DMObject(DMObjectClass objClass, PyDictionary data) throws InvalidFieldNameException
 	{
-		incr = new IncrementalValue( this );
+		incr = new IncrementalValueMonitor( this );
 		this.objClass = objClass;
 		fieldData = new Object[objClass.getNumFields()];
 		
@@ -688,8 +688,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	
 	private void onAccess()
 	{
-		Object refreshState = incr.onRefreshBegin();
-		incr.onRefreshEnd( refreshState );
 		incr.onAccess();
 	}
 
@@ -781,7 +779,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 				}
 			}
 			
-			incr = new IncrementalValue( this );
+			incr = new IncrementalValueMonitor( this );
 			incr.onChanged();
 			commandTracker = null;
 		}

@@ -6,7 +6,24 @@
 //##************************
 package BritefuryJ.Incremental;
 
-public interface IncrementalValueListener
+
+public class IncrementalValueMonitor extends IncrementalMonitor
 {
-	public void onIncrementalValueChanged(IncrementalValue inc);
+	public IncrementalValueMonitor()
+	{
+		this( null );
+	}
+	
+	public IncrementalValueMonitor(IncrementalOwner owner)
+	{
+		super( owner );
+	}
+	
+	
+	
+	public void onAccess()
+	{
+		notifyRefreshed();
+		onValueAccess();
+	}
 }

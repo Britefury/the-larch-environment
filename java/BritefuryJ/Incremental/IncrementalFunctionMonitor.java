@@ -11,7 +11,7 @@ import java.util.Set;
 
 
 
-public class IncrementalFunction extends IncrementalValue
+public class IncrementalFunctionMonitor extends IncrementalMonitor
 {
 	public static class IncrementalEvaluationCycleException extends RuntimeException
 	{
@@ -20,18 +20,18 @@ public class IncrementalFunction extends IncrementalValue
 	
 	
 	
-	private HashSet<IncrementalValue> incomingDependencies;
+	private HashSet<IncrementalMonitor> incomingDependencies;
 	private boolean cycleLock;
 	
 	
 	
 	
-	public IncrementalFunction()
+	public IncrementalFunctionMonitor()
 	{
 		this( null );
 	}
 
-	public IncrementalFunction(IncrementalOwner owner)
+	public IncrementalFunctionMonitor(IncrementalOwner owner)
 	{
 		super( owner );
 		
@@ -41,11 +41,11 @@ public class IncrementalFunction extends IncrementalValue
 	
 	
 	
-	public Set<IncrementalValue> getIncomingDependencies()
+	public Set<IncrementalMonitor> getIncomingDependencies()
 	{
 		if ( incomingDependencies == null )
 		{
-			return new HashSet<IncrementalValue>();
+			return new HashSet<IncrementalMonitor>();
 		}
 		else
 		{
@@ -53,8 +53,12 @@ public class IncrementalFunction extends IncrementalValue
 		}
 	}
 
-	
 
+	public void onAccess()
+	{
+		onValueAccess();
+	}
+	
 	public Object onRefreshBegin()
 	{
 		if ( cycleLock )
@@ -67,7 +71,7 @@ public class IncrementalFunction extends IncrementalValue
 		if ( incrementalState != IncrementalState.REFRESH_NOT_REQUIRED )
 		{
 			// Push current computation
-			IncrementalFunction oldComputation = pushCurrentComputation( this );
+			IncrementalFunctionMonitor oldComputation = pushCurrentComputation( this );
 			
 			Object refreshState[] = new Object[] { oldComputation, incomingDependencies };
 			
@@ -87,8 +91,8 @@ public class IncrementalFunction extends IncrementalValue
 		if ( incrementalState != IncrementalState.REFRESH_NOT_REQUIRED )
 		{
 			Object refreshStateArray[] = (Object[])refreshState;
-			IncrementalFunction oldCurrentComputation = (IncrementalFunction)refreshStateArray[0];
-			HashSet<IncrementalValue> prevIncomingDependencies = (HashSet<IncrementalValue>)refreshStateArray[1];
+			IncrementalFunctionMonitor oldCurrentComputation = (IncrementalFunctionMonitor)refreshStateArray[0];
+			HashSet<IncrementalMonitor> prevIncomingDependencies = (HashSet<IncrementalMonitor>)refreshStateArray[1];
 			
 			// Restore the current computation
 			popCurrentComputation( oldCurrentComputation );
@@ -96,7 +100,7 @@ public class IncrementalFunction extends IncrementalValue
 			// Disconnect the dependencies that are being removed
 			if ( prevIncomingDependencies != null )
 			{
-				for (IncrementalValue inc: prevIncomingDependencies)
+				for (IncrementalMonitor inc: prevIncomingDependencies)
 				{
 					if ( incomingDependencies == null  ||  !incomingDependencies.contains( inc ) )
 					{
@@ -108,7 +112,7 @@ public class IncrementalFunction extends IncrementalValue
 			// Connect new dependencies
 			if ( incomingDependencies != null )
 			{
-				for (IncrementalValue inc: incomingDependencies)
+				for (IncrementalMonitor inc: incomingDependencies)
 				{
 					if ( prevIncomingDependencies == null  ||  !prevIncomingDependencies.contains( inc ) )
 					{
@@ -125,22 +129,22 @@ public class IncrementalFunction extends IncrementalValue
 	}
 
 	
-	protected void onIncomingDependencyAccess(IncrementalValue inc)
+	protected void onIncomingDependencyAccess(IncrementalMonitor inc)
 	{
 		addIncomingDependency( inc );
 	}
 
 
-	protected void addIncomingDependency(IncrementalValue dep)
+	protected void addIncomingDependency(IncrementalMonitor dep)
 	{
 		if ( incomingDependencies == null )
 		{
-			incomingDependencies = new HashSet<IncrementalValue>();
+			incomingDependencies = new HashSet<IncrementalMonitor>();
 		}
 		incomingDependencies.add( dep );
 	}
 
-	protected void removeIncomingDependency(IncrementalValue dep)
+	protected void removeIncomingDependency(IncrementalMonitor dep)
 	{
 		incomingDependencies.remove( dep );
 		if ( incomingDependencies.isEmpty() )

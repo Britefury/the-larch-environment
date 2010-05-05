@@ -6,30 +6,30 @@
 //##************************
 package BritefuryJ.DocPresent.PersistentState;
 
-import BritefuryJ.Incremental.IncrementalValue;
+import BritefuryJ.Incremental.IncrementalValueMonitor;
 
 public class PersistentState
 {
-	private IncrementalValue incr;
+	private IncrementalValueMonitor incr;
 	private Object value;
 	
 	
 	public PersistentState()
 	{
-		incr = new IncrementalValue();
+		incr = new IncrementalValueMonitor();
 	}
 	
 	
 	public Object getValue()
 	{
-		incr.onLiteralAccess();
+		incr.onAccess();
 		return value;
 	}
 	
 	@SuppressWarnings("unchecked")
 	public <C> C getValueAsType(Class<C> cls)
 	{
-		incr.onLiteralAccess();
+		incr.onAccess();
 		if ( cls.isInstance( value ) )
 		{
 			return (C)value;
