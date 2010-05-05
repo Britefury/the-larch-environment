@@ -9,14 +9,14 @@ package BritefuryJ.Cell;
 
 
 import BritefuryJ.Incremental.IncrementalOwner;
-import BritefuryJ.Incremental.IncrementalValueListener;
+import BritefuryJ.Incremental.IncrementalMonitorListener;
 
 
 
 public abstract class CellInterface implements IncrementalOwner
 {
-	public abstract void addListener(IncrementalValueListener listener);
-	public abstract void removeListener(IncrementalValueListener listener);
+	public abstract void addListener(IncrementalMonitorListener listener);
+	public abstract void removeListener(IncrementalMonitorListener listener);
 	
 	
 	

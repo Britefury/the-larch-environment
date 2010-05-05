@@ -7,14 +7,14 @@
 ##-*************************
 from copy import copy
 
-from BritefuryJ.Incremental import IncrementalOwner, IncrementalValue
+from BritefuryJ.Incremental import IncrementalOwner, IncrementalValueMonitor
 
 from GSymCore.Terminal import TerminalSchema
 
 
 class AppState (IncrementalOwner):
 	def __init__(self):
-		self._incr = IncrementalValue( self )
+		self._incr = IncrementalValueMonitor( self )
 		
 		self._openDocuments = []
 		self._terminals = []
@@ -22,7 +22,7 @@ class AppState (IncrementalOwner):
 		
 		
 	def getOpenDocuments(self):
-		self._incr.onLiteralAccess()
+		self._incr.onAccess()
 		return copy( self._openDocuments )
 		
 	def addOpenDocument(self, doc):
@@ -31,7 +31,7 @@ class AppState (IncrementalOwner):
 		
 		
 	def getTerminals(self):
-		self._incr.onLiteralAccess()
+		self._incr.onAccess()
 		return copy( self._terminals )
 	
 	def addTerminal(self, term):
@@ -40,14 +40,14 @@ class AppState (IncrementalOwner):
 
 		
 	def getConfiguration(self):
-		self._incr.onLiteralAccess()
+		self._incr.onAccess()
 		return self._configuration
 	
 		
 	
 class AppDocument (IncrementalOwner):
 	def __init__(self, name, location):
-		self._incr = IncrementalValue( self )
+		self._incr = IncrementalValueMonitor( self )
 		
 		self._name = name
 		self._location = location
@@ -55,18 +55,18 @@ class AppDocument (IncrementalOwner):
 		
 		
 	def getName(self):
-		self._incr.onLiteralAccess()
+		self._incr.onAccess()
 		return self._name
 	
 	def getLocation(self):
-		self._incr.onLiteralAccess()
+		self._incr.onAccess()
 		return self._location
 		
 	
 
 class AppTerminal (IncrementalOwner):
 	def __init__(self, name):
-		self._incr = IncrementalValue( self )
+		self._incr = IncrementalValueMonitor( self )
 		
 		self._name = name
 		self._terminal = TerminalSchema.Terminal()
@@ -74,18 +74,18 @@ class AppTerminal (IncrementalOwner):
 		
 		
 	def getName(self):
-		self._incr.onLiteralAccess()
+		self._incr.onAccess()
 		return self._name
 	
 	def getTerminal(self):
-		self._incr.onLiteralAccess()
+		self._incr.onAccess()
 		return self._terminal
 		
 	
 
 class AppConfiguration (IncrementalOwner):
 	def __init__(self):
-		self._incr = IncrementalValue( self )
+		self._incr = IncrementalValueMonitor( self )
 		
 
 

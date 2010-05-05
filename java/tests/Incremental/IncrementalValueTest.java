@@ -7,8 +7,8 @@
 //##************************
 package tests.Incremental;
 
-import BritefuryJ.Incremental.IncrementalValue;
-import BritefuryJ.Incremental.IncrementalValueListener;
+import BritefuryJ.Incremental.IncrementalValueMonitor;
+import BritefuryJ.Incremental.IncrementalMonitorListener;
 
 
 public class IncrementalValueTest extends IncrementalTest_base
@@ -17,9 +17,9 @@ public class IncrementalValueTest extends IncrementalTest_base
 	{
 		assertEquals( getSignalCount( "changed" ), 0 );
 		
-		IncrementalValue inc = new IncrementalValue();
+		IncrementalValueMonitor inc = new IncrementalValueMonitor();
 		
-		IncrementalValueListener listener = makeListener( "" );
+		IncrementalMonitorListener listener = makeListener( "" );
 		
 		inc.addListener( listener );
 		
@@ -29,8 +29,7 @@ public class IncrementalValueTest extends IncrementalTest_base
 		inc.onChanged();
 		assertEquals( 1, getSignalCount( "changed" ) );
 
-		Object refreshState = inc.onRefreshBegin();
-		inc.onRefreshEnd( refreshState );
+		inc.onAccess();
 		inc.onChanged();
 		assertEquals( 2, getSignalCount( "changed" ) );
 	}

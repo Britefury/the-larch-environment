@@ -11,29 +11,29 @@ import java.util.LinkedList;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-public class IncrementalValue
+public abstract class IncrementalMonitor
 {
 	protected enum IncrementalState { UNINITIALISED, REFRESH_REQUIRED, REFRESH_NOT_REQUIRED }
 	
-	protected static IncrementalFunction currentComputation;
+	protected static IncrementalFunctionMonitor currentComputation;
 	
 	
 	
 	protected IncrementalOwner owner;
 	protected IncrementalState incrementalState;
-	protected WeakHashMap<IncrementalFunction, Object> outgoingDependencies;
-	protected LinkedList<IncrementalValueListener> listeners;
+	protected WeakHashMap<IncrementalFunctionMonitor, Object> outgoingDependencies;
+	protected LinkedList<IncrementalMonitorListener> listeners;
 	
 	
 	
 	
 	
-	public IncrementalValue()
+	public IncrementalMonitor()
 	{
 		this( null );
 	}
 	
-	public IncrementalValue(IncrementalOwner owner)
+	public IncrementalMonitor(IncrementalOwner owner)
 	{
 		this.owner = owner;
 		incrementalState = IncrementalState.UNINITIALISED;
@@ -43,16 +43,16 @@ public class IncrementalValue
 	
 	
 	
-	public void addListener(IncrementalValueListener listener)
+	public void addListener(IncrementalMonitorListener listener)
 	{
 		if ( listeners == null )
 		{
-			listeners = new LinkedList<IncrementalValueListener>();
+			listeners = new LinkedList<IncrementalMonitorListener>();
 		}
 		listeners.add( listener );
 	}
 
-	public void removeListener(IncrementalValueListener listener)
+	public void removeListener(IncrementalMonitorListener listener)
 	{
 		if ( listeners != null )
 		{
@@ -70,11 +70,11 @@ public class IncrementalValue
 		return owner;
 	}
 	
-	public Set<IncrementalFunction> getOutgoingDependecies()
+	public Set<IncrementalFunctionMonitor> getOutgoingDependecies()
 	{
 		if ( outgoingDependencies == null )
 		{
-			return new HashSet<IncrementalFunction>();
+			return new HashSet<IncrementalFunctionMonitor>();
 		}
 		else
 		{
@@ -88,7 +88,7 @@ public class IncrementalValue
 	
 	
 	
-	public void onAccess()
+	protected void onValueAccess()
 	{
 		if ( currentComputation != null )
 		{
@@ -96,13 +96,6 @@ public class IncrementalValue
 		}
 	}
 	
-	public void onLiteralAccess()
-	{
-		Object refreshState = onRefreshBegin();
-		onRefreshEnd( refreshState );
-		onAccess();
-	}
-
 	public void onChanged()
 	{
 		if ( incrementalState != IncrementalState.REFRESH_REQUIRED )
@@ -112,7 +105,7 @@ public class IncrementalValue
 			
 			if ( outgoingDependencies != null )
 			{
-				for (IncrementalFunction dep: outgoingDependencies.keySet())
+				for (IncrementalFunctionMonitor dep: outgoingDependencies.keySet())
 				{
 					dep.onChanged();
 				}
@@ -120,12 +113,7 @@ public class IncrementalValue
 		}
 	}
 	
-	public Object onRefreshBegin()
-	{
-		return null;
-	}
-	
-	public void onRefreshEnd(Object refreshState)
+	protected void notifyRefreshed()
 	{
 		incrementalState = IncrementalState.REFRESH_NOT_REQUIRED;
 	}
@@ -137,9 +125,9 @@ public class IncrementalValue
 	{
 		if ( listeners != null )
 		{
-			for (IncrementalValueListener l: listeners)
+			for (IncrementalMonitorListener l: listeners)
 			{
-				l.onIncrementalValueChanged( this );
+				l.onIncrementalMonitorChanged( this );
 			}
 		}
 	}
@@ -150,25 +138,25 @@ public class IncrementalValue
 
 
 
-	protected static IncrementalFunction pushCurrentComputation(IncrementalFunction newCurrentComputation)
+	protected static IncrementalFunctionMonitor pushCurrentComputation(IncrementalFunctionMonitor newCurrentComputation)
 	{
-		IncrementalFunction f = currentComputation;
+		IncrementalFunctionMonitor f = currentComputation;
 		currentComputation = newCurrentComputation;
 		return f;
 	}
 	
-	protected static void popCurrentComputation(IncrementalFunction prevCurrentComputation)
+	protected static void popCurrentComputation(IncrementalFunctionMonitor prevCurrentComputation)
 	{
 		currentComputation = prevCurrentComputation;
 	}
 	
 
-	public static IncrementalFunction blockAccessTracking()
+	public static IncrementalFunctionMonitor blockAccessTracking()
 	{
 		return pushCurrentComputation( null );
 	}
 
-	public static void unblockAccessTracking(IncrementalFunction prevCurrentComputation)
+	public static void unblockAccessTracking(IncrementalFunctionMonitor prevCurrentComputation)
 	{
 		popCurrentComputation( prevCurrentComputation );
 	}
@@ -177,21 +165,21 @@ public class IncrementalValue
 	
 	
 	
-	protected void addOutgoingDependency(IncrementalFunction dep)
+	protected void addOutgoingDependency(IncrementalFunctionMonitor dep)
 	{
 		if ( outgoingDependencies == null )
 		{
-			outgoingDependencies = new WeakHashMap<IncrementalFunction, Object>();
+			outgoingDependencies = new WeakHashMap<IncrementalFunctionMonitor, Object>();
 		}
 		outgoingDependencies.put( dep, null );
 	}
 
-	protected void removeOutgoingDependency(IncrementalFunction dep)
+	protected void removeOutgoingDependency(IncrementalFunctionMonitor dep)
 	{
 		outgoingDependencies.put( dep, null );
 		if ( outgoingDependencies == null )
 		{
-			outgoingDependencies = new WeakHashMap<IncrementalFunction, Object>();
+			outgoingDependencies = new WeakHashMap<IncrementalFunctionMonitor, Object>();
 		}
 	}
 }

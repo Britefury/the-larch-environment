@@ -7,6 +7,7 @@
 package BritefuryJ.GSym.GenericPerspective;
 
 import java.awt.Color;
+import java.awt.Shape;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -359,6 +360,7 @@ public class GSymGenericPerspective extends GSymAbstractPerspective
 		
 		registerJavaObjectPresenter( List.class,  BasicPresenters.presenter_List );
 		registerJavaObjectPresenter( BufferedImage.class,  BasicPresenters.presenter_BufferedImage );
+		registerJavaObjectPresenter( Shape.class,  BasicPresenters.presenter_Shape );
 		registerJavaObjectPresenter( Color.class,  BasicPresenters.presenter_Color );
 	}
 	
@@ -487,6 +489,29 @@ public class GSymGenericPerspective extends GSymAbstractPerspective
 			}
 		};
 		
+		public static final ObjectPresenter presenter_Shape = new ObjectPresenter()
+		{
+			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+			{
+				Shape shape = (Shape)x;
+//				Rectangle2D bounds = shape.getBounds2D();
+//				double offsetX = -bounds.getMinX(), offsetY = -bounds.getMinY();
+//				double width = bounds.getWidth(), height = bounds.getHeight();
+//				
+//				double scale = 1.0;
+//				if ( width > height  &&  width > 96.0 )
+//				{
+//					scale = 96.0 / width;
+//				}
+//				else if ( height > width  &&  height > 96.0 )
+//				{
+//					scale = 96.0 / height;
+//				}
+				
+				return styleSheet.objectBox( x.getClass().getName(), PrimitiveStyleSheet.instance.shape( shape ) );
+			}
+		};
+
 		public static final ObjectPresenter presenter_BufferedImage = new ObjectPresenter()
 		{
 			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)

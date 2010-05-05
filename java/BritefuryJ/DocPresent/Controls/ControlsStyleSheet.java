@@ -40,8 +40,8 @@ import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.Util.Range;
-import BritefuryJ.Incremental.IncrementalValue;
-import BritefuryJ.Incremental.IncrementalValueListener;
+import BritefuryJ.Incremental.IncrementalMonitor;
+import BritefuryJ.Incremental.IncrementalMonitorListener;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -536,7 +536,7 @@ public class ControlsStyleSheet extends StyleSheet
 		}
 	}
 	
-	private static class ScrollBarDragBarInteractor extends ElementInteractor implements IncrementalValueListener
+	private static class ScrollBarDragBarInteractor extends ElementInteractor implements IncrementalMonitorListener
 	{
 		public enum Direction
 		{
@@ -686,7 +686,7 @@ public class ControlsStyleSheet extends StyleSheet
 
 
 		@Override
-		public void onIncrementalValueChanged(IncrementalValue inc)
+		public void onIncrementalMonitorChanged(IncrementalMonitor inc)
 		{
 			element.queueFullRedraw();
 		}

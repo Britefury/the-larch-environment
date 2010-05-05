@@ -10,7 +10,7 @@ from java.lang import StringBuilder
 import sys
 from copy import copy
 
-from BritefuryJ.Incremental import IncrementalOwner, IncrementalValue
+from BritefuryJ.Incremental import IncrementalOwner, IncrementalValueMonitor
 
 from GSymCore.Languages.Python25 import Python25
 from GSymCore.Languages.Python25 import CodeGenerator
@@ -41,7 +41,7 @@ class Terminal (IncrementalOwner):
 
 			
 	def __init__(self):
-		self._incr = IncrementalValue( self )
+		self._incr = IncrementalValueMonitor( self )
 		
 		self._blocks = []
 		self._currentPythonModule = Python25.py25NewModule()
@@ -51,11 +51,11 @@ class Terminal (IncrementalOwner):
 		
 		
 	def getBlocks(self):
-		self._incr.onLiteralAccess()
+		self._incr.onAccess()
 		return copy( self._blocks )
 	
 	def getCurrentPythonModule(self):
-		self._incr.onLiteralAccess()
+		self._incr.onAccess()
 		return self._currentPythonModule
 	
 		
@@ -160,7 +160,7 @@ class Terminal (IncrementalOwner):
 	
 class TerminalBlock (IncrementalOwner):
 	def __init__(self, pythonModule, stdout, stderr, caughtException, result=None):
-		self._incr = IncrementalValue( self )
+		self._incr = IncrementalValueMonitor( self )
 		
 		self._pythonModule = pythonModule
 		self._stdout = stdout
@@ -171,23 +171,23 @@ class TerminalBlock (IncrementalOwner):
 		
 		
 	def getPythonModule(self):
-		self._incr.onLiteralAccess()
+		self._incr.onAccess()
 		return self._pythonModule
 	
 	def getStdOut(self):
-		self._incr.onLiteralAccess()
+		self._incr.onAccess()
 		return self._stdout
 	
 	def getStdErr(self):
-		self._incr.onLiteralAccess()
+		self._incr.onAccess()
 		return self._stderr
 	
 	def getCaughtException(self):
-		self._incr.onLiteralAccess()
+		self._incr.onAccess()
 		return self._caughtException
 	
 	def getResult(self):
-		self._incr.onLiteralAccess()
+		self._incr.onAccess()
 		return self._result
 		
 	

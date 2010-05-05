@@ -7,13 +7,13 @@
 //##************************
 package BritefuryJ.Cell;
 
-import BritefuryJ.Incremental.IncrementalValue;
-import BritefuryJ.Incremental.IncrementalValueListener;
+import BritefuryJ.Incremental.IncrementalValueMonitor;
+import BritefuryJ.Incremental.IncrementalMonitorListener;
 
 
 public class LiteralCell extends CellInterface
 {
-	private IncrementalValue inc;
+	private IncrementalValueMonitor inc;
 	private Object value;
 	
 	
@@ -26,7 +26,7 @@ public class LiteralCell extends CellInterface
 	public LiteralCell(Object value)
 	{
 		super();
-		inc = new IncrementalValue( this );
+		inc = new IncrementalValueMonitor( this );
 		this.value = value;
 	}
 	
@@ -50,19 +50,19 @@ public class LiteralCell extends CellInterface
 	
 	public Object getValue()
 	{
-		inc.onLiteralAccess();
+		inc.onAccess();
 		
 		return value;
 	}
 
 
 	
-	public void addListener(IncrementalValueListener listener)
+	public void addListener(IncrementalMonitorListener listener)
 	{
 		inc.addListener( listener );
 	}
 
-	public void removeListener(IncrementalValueListener listener)
+	public void removeListener(IncrementalMonitorListener listener)
 	{
 		inc.removeListener( listener );
 	}

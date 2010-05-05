@@ -8,12 +8,12 @@ package BritefuryJ.IncrementalTree;
 
 import java.util.Iterator;
 
-import BritefuryJ.Incremental.IncrementalFunction;
+import BritefuryJ.Incremental.IncrementalFunctionMonitor;
+import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalOwner;
-import BritefuryJ.Incremental.IncrementalValue;
-import BritefuryJ.Incremental.IncrementalValueListener;
+import BritefuryJ.Incremental.IncrementalMonitorListener;
 
-public class IncrementalTreeNode implements IncrementalValueListener, IncrementalOwner
+public class IncrementalTreeNode implements IncrementalMonitorListener, IncrementalOwner
 {
 	public static class CannotChangeDocNodeException extends Exception
 	{
@@ -95,7 +95,7 @@ public class IncrementalTreeNode implements IncrementalValueListener, Incrementa
 	private IncrementalTree incrementalTree;
 	private Object docNode;
 	
-	private IncrementalFunction incr;
+	private IncrementalFunctionMonitor incr;
 	private NodeResultFactory resultFactory;
 	private Object result;
 	
@@ -127,7 +127,7 @@ public class IncrementalTreeNode implements IncrementalValueListener, Incrementa
 		
 		resultFactory = null;
 
-		incr = new IncrementalFunction( this );
+		incr = new IncrementalFunctionMonitor( this );
 		incr.addListener( this );
 		
 		
@@ -384,7 +384,7 @@ public class IncrementalTreeNode implements IncrementalValueListener, Incrementa
 	//
 	//
 	
-	public void onIncrementalValueChanged(IncrementalValue inc)
+	public void onIncrementalMonitorChanged(IncrementalMonitor inc)
 	{
 		//assert cell == resultCell;
 		requestRefresh();

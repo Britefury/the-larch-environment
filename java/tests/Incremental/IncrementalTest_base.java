@@ -12,9 +12,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import junit.framework.TestCase;
-import BritefuryJ.Incremental.IncrementalFunction;
-import BritefuryJ.Incremental.IncrementalValue;
-import BritefuryJ.Incremental.IncrementalValueListener;
+import BritefuryJ.Incremental.IncrementalFunctionMonitor;
+import BritefuryJ.Incremental.IncrementalMonitor;
+import BritefuryJ.Incremental.IncrementalMonitorListener;
 
 public class IncrementalTest_base extends TestCase
 {
@@ -63,13 +63,13 @@ public class IncrementalTest_base extends TestCase
 		
 
 	
-	protected IncrementalValueListener makeListener(final String prefix)
+	protected IncrementalMonitorListener makeListener(final String prefix)
 	{
 		final IncrementalTest_base tester = this;
 
-		IncrementalValueListener listener = new IncrementalValueListener()
+		IncrementalMonitorListener listener = new IncrementalMonitorListener()
 		{
-			public void onIncrementalValueChanged(IncrementalValue inc)
+			public void onIncrementalMonitorChanged(IncrementalMonitor inc)
 			{
 				tester.onSignal( prefix + "changed" );
 			}
@@ -79,16 +79,16 @@ public class IncrementalTest_base extends TestCase
 	}
 	
 	
-	protected void checkOutgoingDependencies(IncrementalValue inc, IncrementalFunction expected[])
+	protected void checkOutgoingDependencies(IncrementalMonitor inc, IncrementalFunctionMonitor expected[])
 	{
-		HashSet<IncrementalFunction> expectedSet = new HashSet<IncrementalFunction>();
+		HashSet<IncrementalFunctionMonitor> expectedSet = new HashSet<IncrementalFunctionMonitor>();
 		expectedSet.addAll( Arrays.asList( expected ) );
 		assertEquals( expectedSet, inc.getOutgoingDependecies() );
 	}
 
-	protected void checkIncomingDependencies(IncrementalFunction inc, IncrementalValue expected[])
+	protected void checkIncomingDependencies(IncrementalFunctionMonitor inc, IncrementalMonitor expected[])
 	{
-		HashSet<IncrementalValue> expectedSet = new HashSet<IncrementalValue>();
+		HashSet<IncrementalMonitor> expectedSet = new HashSet<IncrementalMonitor>();
 		expectedSet.addAll( Arrays.asList( expected ) );
 		assertEquals( expectedSet, inc.getIncomingDependencies() );
 	}

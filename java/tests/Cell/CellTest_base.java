@@ -10,8 +10,8 @@ package tests.Cell;
 import java.util.HashMap;
 
 import junit.framework.TestCase;
-import BritefuryJ.Incremental.IncrementalValue;
-import BritefuryJ.Incremental.IncrementalValueListener;
+import BritefuryJ.Incremental.IncrementalMonitor;
+import BritefuryJ.Incremental.IncrementalMonitorListener;
 
 public class CellTest_base extends TestCase
 {
@@ -60,13 +60,13 @@ public class CellTest_base extends TestCase
 		
 
 	
-	protected IncrementalValueListener makeListener(final String prefix)
+	protected IncrementalMonitorListener makeListener(final String prefix)
 	{
 		final CellTest_base tester = this;
 
-		IncrementalValueListener listener = new IncrementalValueListener()
+		IncrementalMonitorListener listener = new IncrementalMonitorListener()
 		{
-			public void onIncrementalValueChanged(IncrementalValue inc)
+			public void onIncrementalMonitorChanged(IncrementalMonitor inc)
 			{
 				tester.onSignal( prefix + "changed" );
 			}

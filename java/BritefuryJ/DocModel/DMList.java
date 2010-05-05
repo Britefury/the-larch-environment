@@ -31,7 +31,7 @@ import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentViewContext;
 import BritefuryJ.Incremental.IncrementalOwner;
-import BritefuryJ.Incremental.IncrementalValue;
+import BritefuryJ.Incremental.IncrementalValueMonitor;
 import BritefuryJ.JythonInterface.JythonIndex;
 import BritefuryJ.JythonInterface.JythonSlice;
 
@@ -359,7 +359,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	
 	
 	
-	private IncrementalValue incr;
+	private IncrementalValueMonitor incr;
 	ArrayList<Object> value;
 	private DMListCommandTracker commandTracker;
 	
@@ -371,7 +371,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	
 	public DMList(List<Object> xs)
 	{
-		incr = new IncrementalValue( this );
+		incr = new IncrementalValueMonitor( this );
 		value = new ArrayList<Object>();
 
 		if ( xs != null )
@@ -1118,8 +1118,6 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	
 	private void onAccess()
 	{
-		Object refreshState = incr.onRefreshBegin();
-		incr.onRefreshEnd( refreshState );
 		incr.onAccess();
 	}
 
@@ -1151,7 +1149,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	@SuppressWarnings("unchecked")
 	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException
 	{
-		incr = new IncrementalValue( this );
+		incr = new IncrementalValueMonitor( this );
 		value = (ArrayList<Object>)stream.readObject();
 		for (Object x: value)
 		{
