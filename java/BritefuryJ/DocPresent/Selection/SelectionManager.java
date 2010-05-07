@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent.Selection;
 
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Marker.Marker;
 
@@ -64,6 +65,11 @@ public class SelectionManager
 		{
 			selection.setSelection( initialMarkerMouse, pos.copy() );
 		}
+	}
+	
+	public void selectElement(DPElement element)
+	{
+		selection.setSelection( element.markerAtStart(), element.markerAtEnd() );
 	}
 	
 	

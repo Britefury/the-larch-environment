@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPContentLeaf;
+import BritefuryJ.DocPresent.DPContentLeafEditable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPSegment;
 import BritefuryJ.DocPresent.PresentationComponent;
@@ -299,7 +300,7 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 					
 					if ( leaf.isEditable() )
 					{
-						caret.moveTo( leaf.marker( leafPosition, newBias ) );
+						caret.moveTo( ((DPContentLeafEditable)leaf).marker( leafPosition, newBias ) );
 					}
 					else
 					{
@@ -380,7 +381,7 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 										else
 										{
 											// Searching backwards and forwards failed; place the cursor in the non-editable leaf and hope for the best
-											caret.moveTo( leaf.marker( leafPosition, newBias ) );
+											caret.moveTo( leaf.markerAtStart() );
 										}
 									}
 								}
@@ -421,7 +422,7 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 										else
 										{
 											// Searching forwards and backwards failed; place the cursor in the non-editable leaf and hope for the best
-											caret.moveTo( leaf.marker( leafPosition, newBias ) );
+											caret.moveTo( leaf.markerAtStart() );
 										}
 									}
 								}

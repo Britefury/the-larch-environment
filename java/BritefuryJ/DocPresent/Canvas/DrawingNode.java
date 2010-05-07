@@ -14,6 +14,7 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 
 import BritefuryJ.DocPresent.ContextMenu.ContextMenu;
+import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
@@ -208,17 +209,12 @@ public abstract class DrawingNode extends PointerInputElement
 		return false;
 	}
 	
-	protected boolean handlePointerButtonDown2(PointerButtonEvent event)
-	{
-		return false;
-	}
-	
-	protected boolean handlePointerButtonDown3(PointerButtonEvent event)
-	{
-		return false;
-	}
-	
 	protected boolean handlePointerButtonUp(PointerButtonEvent event)
+	{
+		return false;
+	}
+	
+	protected boolean handlePointerButtonClicked(PointerButtonClickedEvent event)
 	{
 		return false;
 	}

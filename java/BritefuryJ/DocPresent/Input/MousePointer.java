@@ -66,23 +66,11 @@ public class MousePointer extends Pointer
 		}
 	}
 
-	public boolean buttonDown2(Point2 pos, int button)
+	public boolean buttonClicked(Point2 pos, int button, int clickCount)
 	{
 		if ( !bNavigationDragInProgress )
 		{
-			return super.buttonDown2( pos, button );
-		}
-		else
-		{
-			return false;
-		}
-	}
-	
-	public boolean buttonDown3(Point2 pos, int button)
-	{
-		if ( !bNavigationDragInProgress )
-		{
-			return super.buttonDown3( pos, button );
+			return super.buttonClicked( pos, button, clickCount );
 		}
 		else
 		{

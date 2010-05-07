@@ -25,6 +25,7 @@ import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.ContextMenu.ContextMenu;
+import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
@@ -1390,11 +1391,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		return false;
 	}
 
-	protected boolean onButtonDown2(PointerButtonEvent event)
-	{
-		return false;
-	}
-	
 	protected boolean onButtonDown3(PointerButtonEvent event)
 	{
 		return false;
@@ -1405,6 +1401,11 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		return false;
 	}
 
+	protected boolean onButtonClicked(PointerButtonClickedEvent event)
+	{
+		return false;
+	}
+	
 
 	protected void onMotion(PointerMotionEvent event)
 	{
@@ -1676,42 +1677,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		return bResult;
 	}
 	
-	protected boolean handlePointerButtonDown2(PointerButtonEvent event)
-	{
-		if ( onButtonDown2( event ) )
-		{
-			return true;
-		}
-		List<ElementInteractor> interactors = getInteractors();
-		boolean bResult = false;
-		if ( interactors != null )
-		{
-			for (ElementInteractor interactor: interactors)
-			{
-				bResult = bResult || interactor.onButtonDown2( this, event );
-			}
-		}
-		return bResult;
-	}
-	
-	protected boolean handlePointerButtonDown3(PointerButtonEvent event)
-	{
-		if ( onButtonDown3( event ) )
-		{
-			return true;
-		}
-		List<ElementInteractor> interactors = getInteractors();
-		boolean bResult = false;
-		if ( interactors != null )
-		{
-			for (ElementInteractor interactor: interactors)
-			{
-				bResult = bResult || interactor.onButtonDown3( this, event );
-			}
-		}
-		return bResult;
-	}
-	
 	protected boolean handlePointerButtonUp(PointerButtonEvent event)
 	{
 		if ( onButtonUp( event ) )
@@ -1725,6 +1690,24 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 			for (ElementInteractor interactor: interactors)
 			{
 				bResult = bResult || interactor.onButtonUp( this, event );
+			}
+		}
+		return bResult;
+	}
+	
+	protected boolean handlePointerButtonClicked(PointerButtonClickedEvent event)
+	{
+		if ( onButtonClicked( event ) )
+		{
+			return true;
+		}
+		List<ElementInteractor> interactors = getInteractors();
+		boolean bResult = false;
+		if ( interactors != null )
+		{
+			for (ElementInteractor interactor: interactors)
+			{
+				bResult = bResult || interactor.onButtonClicked( this, event );
 			}
 		}
 		return bResult;
@@ -2421,11 +2404,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	//
 	//
 	
-	public Marker marker(int position, Marker.Bias bias)
-	{
-		return markerAtStart();
-	}
-	
 	public Marker markerAtStart()
 	{
 		DPContentLeaf leaf = null;
@@ -2461,11 +2439,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		return markerAtStart();
 	}
 	
-	
-	public void moveMarker(Marker m, int position, Marker.Bias bias)
-	{
-		moveMarkerToStart( m );
-	}
 	
 	public void moveMarkerToStart(Marker m)
 	{

@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent.Canvas;
 
+import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
@@ -18,21 +19,16 @@ public class InteractionListener
 		return false;
 	}
 
-	public boolean onButtonDown2(PointerButtonEvent event)
-	{
-		return false;
-	}
-	
-	public boolean onButtonDown3(PointerButtonEvent event)
-	{
-		return false;
-	}
-
 	public boolean onButtonUp(PointerButtonEvent event)
 	{
 		return false;
 	}
 
+	public boolean onButtonClicked(PointerButtonClickedEvent event)
+	{
+		return false;
+	}
+	
 
 	public void onMotion(PointerMotionEvent event)
 	{

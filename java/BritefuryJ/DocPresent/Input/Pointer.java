@@ -22,6 +22,7 @@ import javax.swing.TransferHandler;
 
 import BritefuryJ.DocPresent.ContextMenu.ContextMenu;
 import BritefuryJ.DocPresent.ContextMenu.ContextPopupMenu;
+import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerNavigationEvent;
@@ -75,27 +76,15 @@ public class Pointer extends PointerInterface
 			}
 		}
 		
-		protected boolean handleButtonDown2(Pointer pointer, PointerButtonEvent event)
+		protected boolean handleButtonClicked(Pointer pointer, PointerButtonClickedEvent event)
 		{
 			if ( pressGrabChild != null )
 			{
-				return pressGrabChild.handleButtonDown2( pointer, (PointerButtonEvent)pressGrabChild.element.transformParentToLocalEvent( event ) );
+				return pressGrabChild.handleButtonClicked( pointer, (PointerButtonClickedEvent)pressGrabChild.element.transformParentToLocalEvent( event ) );
 			}
 			else
 			{
-				return element.handlePointerButtonDown2( event );
-			}
-		}
-		
-		protected boolean handleButtonDown3(Pointer pointer, PointerButtonEvent event)
-		{
-			if ( pressGrabChild != null )
-			{
-				return pressGrabChild.handleButtonDown3( pointer, (PointerButtonEvent)pressGrabChild.element.transformParentToLocalEvent( event ) );
-			}
-			else
-			{
-				return element.handlePointerButtonDown3( event );
+				return element.handlePointerButtonClicked( event );
 			}
 		}
 		
@@ -539,16 +528,6 @@ public class Pointer extends PointerInterface
 		}
 	}
 	
-	public boolean buttonDown2(Point2 pos, int button)
-	{
-		return rootEntry.handleButtonDown2( this, new PointerButtonEvent( this, button, PointerButtonEvent.Action.DOWN2 ) );
-	}
-	
-	public boolean buttonDown3(Point2 pos, int button)
-	{
-		return rootEntry.handleButtonDown3( this, new PointerButtonEvent( this, button, PointerButtonEvent.Action.DOWN3 ) );
-	}
-	
 	public boolean buttonUp(Point2 pos, int button)
 	{
 		PointerButtonEvent event = new PointerButtonEvent( this, button, PointerButtonEvent.Action.UP );
@@ -561,6 +540,11 @@ public class Pointer extends PointerInterface
 		{
 			return rootEntry.handleButtonUp( this, event );
 		}
+	}
+	
+	public boolean buttonClicked(Point2 pos, int button, int clickCount)
+	{
+		return rootEntry.handleButtonClicked( this, new PointerButtonClickedEvent( this, button, clickCount ) );
 	}
 	
 	public void motion(Point2 pos, MouseEvent mouseEvent)
