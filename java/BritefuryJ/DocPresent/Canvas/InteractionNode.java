@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent.Canvas;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 
+import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
@@ -173,35 +174,23 @@ public class InteractionNode extends UnaryBranchNode
 		}
 	}
 	
-	protected boolean handlePointerButtonDown2(PointerButtonEvent event)
-	{
-		if ( interactionListener != null )
-		{
-			return interactionListener.onButtonDown2( event );
-		}
-		else
-		{
-			return false;
-		}
-	}
-	
-	protected boolean handlePointerButtonDown3(PointerButtonEvent event)
-	{
-		if ( interactionListener != null )
-		{
-			return interactionListener.onButtonDown3( event );
-		}
-		else
-		{
-			return false;
-		}
-	}
-	
 	protected boolean handlePointerButtonUp(PointerButtonEvent event)
 	{
 		if ( interactionListener != null )
 		{
 			return interactionListener.onButtonUp( event );
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	protected boolean handlePointerButtonClicked(PointerButtonClickedEvent event)
+	{
+		if ( interactionListener != null )
+		{
+			return interactionListener.onButtonClicked( event );
 		}
 		else
 		{

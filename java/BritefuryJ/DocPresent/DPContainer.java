@@ -221,6 +221,55 @@ public abstract class DPContainer extends DPElement
 	
 	//
 	//
+	// MARKER METHODS
+	//
+	//
+	
+	public Marker markerAtStart()
+	{
+		for (DPElement child: getChildren())
+		{
+			Marker m = child.markerAtStart();
+			if ( m != null )
+			{
+				return m;
+			}
+		}
+		
+		return super.markerAtStart();
+	}
+	
+	public Marker markerAtEnd()
+	{
+		List<DPElement> children = getChildren();
+		for (int i = children.size() - 1; i >= 0; i--)
+		{
+			DPElement child = children.get( i );
+			Marker m = child.markerAtEnd();
+			if ( m != null )
+			{
+				return m;
+			}
+		}
+		
+		return super.markerAtEnd();
+	}
+	
+	
+	public void moveMarkerToStart(Marker m)
+	{
+		m.moveTo( markerAtStart() );
+	}
+	
+	public void moveMarkerToEnd(Marker m)
+	{
+		m.moveTo( markerAtEnd() );
+	}
+	
+	
+	
+	//
+	//
 	// SELECTION METHODS
 	//
 	//

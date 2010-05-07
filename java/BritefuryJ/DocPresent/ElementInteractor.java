@@ -11,6 +11,7 @@ import java.awt.event.KeyEvent;
 
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.ContextMenu.ContextMenu;
+import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
@@ -22,17 +23,12 @@ public abstract class ElementInteractor
 		return false;
 	}
 	
-	public boolean onButtonDown2(DPElement element, PointerButtonEvent event)
-	{
-		return false;
-	}
-	
-	public boolean onButtonDown3(DPElement element, PointerButtonEvent event)
-	{
-		return false;
-	}
-	
 	public boolean onButtonUp(DPElement element, PointerButtonEvent event)
+	{
+		return false;
+	}
+	
+	public boolean onButtonClicked(DPElement element, PointerButtonClickedEvent event)
 	{
 		return false;
 	}

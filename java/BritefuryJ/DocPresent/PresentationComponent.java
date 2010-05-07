@@ -262,6 +262,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		protected WeakHashMap<DPContentLeafEditable, WeakHashMap<Marker, Object>> markersByLeaf = new WeakHashMap<DPContentLeafEditable, WeakHashMap<Marker, Object>>();
 		private Caret caret;
 		private DPContentLeafEditable currentCaretLeaf;
+		private boolean bLastMousePressPositionedCaret = false;
 		
 		private SelectionManager selectionManager;
 		private Selection selection;
@@ -311,6 +312,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			currentCaretLeaf = null;
 
 			selection = new Selection();
+			selection.addSelectionListener( this );
 			selectionManager = new SelectionManager( selection );
 			
 			bStructureRefreshQueued = false;
@@ -764,7 +766,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		private void drawSelection(Graphics2D graphics)
 		{
-			if ( selection != null  &&  !selection.isEmpty() )
+			if ( !selection.isEmpty() )
 			{
 				Marker startMarker = selection.getStartMarker();
 				Marker endMarker = selection.getEndMarker();
@@ -811,6 +813,12 @@ public class PresentationComponent extends JComponent implements ComponentListen
 					caret.moveTo( marker );
 					selectionManager.mouseSelectionBegin( marker );
 				}
+				
+				bLastMousePressPositionedCaret = true;
+			}
+			else
+			{
+				bLastMousePressPositionedCaret = false;
 			}
 
 			emitImmediateEvents();
@@ -833,6 +841,43 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		}
 		
 		
+		protected void mouseClicked(int button, int clickCount, Point2 windowPos, int buttonModifiers)
+		{
+			rootSpaceMouse.setLocalPos( windowPos );
+			rootSpaceMouse.setButtonModifiers( buttonModifiers );
+			
+			int modifiers = rootSpaceMouse.getModifiers();
+			
+			if ( bLastMousePressPositionedCaret  &&  button == 1  &&  ( modifiers & ( Modifier.ALT | Modifier.ALT_GRAPH | Modifier.CTRL | Modifier.SHIFT ) )  ==  0 )
+			{
+				DPContentLeafEditable leaf = (DPContentLeafEditable)getLeafClosestToLocalPoint( windowPos, new DPContentLeafEditable.EditableLeafElementFilter() );
+				if ( leaf != null )
+				{
+					DPElement elementToSelect = null;
+					
+					if ( clickCount == 2 )
+					{
+						elementToSelect = leaf;
+					}
+					else if ( clickCount >= 3 )
+					{
+						elementToSelect = leaf.getSegment();
+					}
+						
+					if ( elementToSelect != null )
+					{
+						selectionManager.mouseSelectionReset();
+						selectionManager.selectElement( elementToSelect );
+					}
+				}
+			}
+			else
+			{
+				rootSpaceMouse.buttonClicked( windowPos, button, clickCount );
+			}
+		}
+
+
 		
 		protected void mouseMotionEvent(Point2 windowPos, int buttonModifiers, MouseEvent mouseEvent)
 		{
@@ -891,22 +936,6 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		}
 
 
-		protected void mouseDown2Event(int button, Point2 windowPos, int buttonModifiers)
-		{
-			rootSpaceMouse.setLocalPos( windowPos );
-			rootSpaceMouse.setButtonModifiers( buttonModifiers );
-			rootSpaceMouse.buttonDown2( windowPos, button );
-		}
-
-
-		protected void mouseDown3Event(int button, Point2 windowPos, int buttonModifiers)
-		{
-			rootSpaceMouse.setLocalPos( windowPos );
-			rootSpaceMouse.setButtonModifiers( buttonModifiers );
-			rootSpaceMouse.buttonDown3( windowPos, button );
-		}
-		
-		
 		protected void mouseWheelEvent(Point2 windowPos, int wheelClicks, int unitsToScroll, int buttonModifiers)
 		{
 			rootSpaceMouse.setLocalPos( windowPos );
@@ -1326,13 +1355,6 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			}
 			
 			
-			/*if ( caretLeaf != null )
-			{
-				caretLeaf.ensureVisible();
-			}
-			
-			queueEnsureCaretVisible();*/
-			
 			queueFullRedraw();
 		}
 		
@@ -1534,17 +1556,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	
 	public void mouseClicked(MouseEvent e)
 	{
-		switch ( e.getClickCount() )
-		{
-		case 2:
-			rootElement.mouseDown2Event( getButton( e ), new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ) );
-			break;
-		case 3:
-			rootElement.mouseDown3Event( getButton( e ), new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ) );
-			break;
-		default:
-			break;
-		}
+		rootElement.mouseClicked( getButton( e ), e.getClickCount(), new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ) );
 	}
 
 	
