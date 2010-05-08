@@ -79,7 +79,7 @@ public class GenericPerspectiveStyleSheet extends StyleSheet
 	
 	
 	
-	private static PrimitiveStyleSheet objectBorderStyleSheet = null;
+	private PrimitiveStyleSheet objectBorderStyleSheet = null;
 	
 	private PrimitiveStyleSheet getObjectBorderStyleSheet()
 	{
@@ -99,7 +99,7 @@ public class GenericPerspectiveStyleSheet extends StyleSheet
 	
 	
 	
-	private static PrimitiveStyleSheet objectTitleStyleSheet = null;
+	private PrimitiveStyleSheet objectTitleStyleSheet = null;
 	
 	private PrimitiveStyleSheet getObjectTitleStyleSheet()
 	{
@@ -115,7 +115,7 @@ public class GenericPerspectiveStyleSheet extends StyleSheet
 	
 	
 	
-	private static PrimitiveStyleSheet objectFieldListStyleSheet = null;
+	private PrimitiveStyleSheet objectFieldListStyleSheet = null;
 	
 	private PrimitiveStyleSheet getObjectFieldListStyleSheet()
 	{
@@ -130,7 +130,7 @@ public class GenericPerspectiveStyleSheet extends StyleSheet
 	
 	
 	
-	private static PrimitiveStyleSheet objectFieldStyleSheet = null;
+	private PrimitiveStyleSheet objectFieldStyleSheet = null;
 	
 	private PrimitiveStyleSheet getObjectFieldStyleSheet()
 	{
@@ -146,7 +146,7 @@ public class GenericPerspectiveStyleSheet extends StyleSheet
 	
 	
 	
-	private static PrimitiveStyleSheet stringContentStyleSheet = null;
+	private PrimitiveStyleSheet stringContentStyleSheet = null;
 	
 	private PrimitiveStyleSheet getStringContentStyleSheet()
 	{
@@ -161,7 +161,7 @@ public class GenericPerspectiveStyleSheet extends StyleSheet
 	
 	
 	
-	private static PrimitiveStyleSheet stringEscapeStyleSheet = null;
+	private PrimitiveStyleSheet stringEscapeStyleSheet = null;
 	
 	private PrimitiveStyleSheet getStringEscapeStyleSheet()
 	{
