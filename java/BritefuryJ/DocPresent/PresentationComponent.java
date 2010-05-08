@@ -29,7 +29,6 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.ImageObserver;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.WeakHashMap;
 
@@ -37,7 +36,6 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
-import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Caret.CaretListener;
 import BritefuryJ.DocPresent.Clipboard.DataTransfer;
@@ -57,9 +55,6 @@ import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Selection.SelectionListener;
 import BritefuryJ.DocPresent.Selection.SelectionManager;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
-import BritefuryJ.GSym.View.GSymFragmentViewContext;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Logging.LogEntry;
 import BritefuryJ.Math.AABox2;
@@ -85,33 +80,6 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	private static final long serialVersionUID = 1L;
 	
 	
-	
-	public static class TypesettingPerformanceLogEntry extends LogEntry
-	{
-		private static final List<String> tags = Arrays.asList( new String[] { "typeset_performance" } ); 
-		
-		private double typesetTime;
-
-		
-		private TypesettingPerformanceLogEntry(double typesetTime)
-		{
-			super( tags );
-			this.typesetTime = typesetTime;
-		}
-		
-		
-		public String getLogEntryTitle()
-		{
-			return "Presentation typesetting performance";
-		}
-		
-		public DPElement createLogEntryPresentationContent(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
-		{
-			return PrimitiveStyleSheet.instance.staticText( "Typesetting time: " + typesetTime );
-		}
-	}
-	
-
 	
 	private class PresAreaTransferHandler extends TransferHandler
 	{
@@ -637,7 +605,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				System.out.println( "DPPresentationArea.performAllocation(): TYPESET TIME = " + typesetTime  +  ", used memory = "  + ( Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() ) );
 				if ( log != null  &&  log.isRecording() )
 				{
-					log.log( new TypesettingPerformanceLogEntry( typesetTime ) );
+					log.log( new LogEntry( "PresentationTypesetPerformance" ).hItem( "typesetTime", typesetTime ) );
 				}
 				
 				if ( ensureVisibilityElement != null )
