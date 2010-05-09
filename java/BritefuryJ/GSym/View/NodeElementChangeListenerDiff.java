@@ -17,11 +17,9 @@ import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Marker.Marker.Bias;
-import BritefuryJ.DocView.DVNode;
-import BritefuryJ.DocView.DocView;
 import BritefuryJ.Utils.StringDiff;
 
-public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeListener
+public class NodeElementChangeListenerDiff implements GSymView.NodeElementChangeListener
 {
 	private static int DIFF_THRESHHOLD = 65536;
 	
@@ -33,7 +31,7 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 	}
 	
 	
-	private DVNode caretNode;
+	private GSymViewFragment caretNode;
 	private String textRepresentation;
 	private Marker.Bias bias;
 	private int position;
@@ -48,7 +46,7 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 	}
 	
 	
-	public void reset(DocView view)
+	public void reset(GSymView view)
 	{
 		caretNode = null;
 		textRepresentation = null;
@@ -57,7 +55,7 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 	}
 
 	
-	public void elementChangeFrom(DVNode node, DPElement element)
+	public void elementChangeFrom(GSymViewFragment node, DPElement element)
 	{
 		if ( caretNode == null )
 		{
@@ -86,7 +84,7 @@ public class NodeElementChangeListenerDiff implements DocView.NodeElementChangeL
 		}
 	}
 
-	public void elementChangeTo(DVNode node, DPElement element)
+	public void elementChangeTo(GSymViewFragment node, DPElement element)
 	{
 		if ( caretNode == node )
 		{

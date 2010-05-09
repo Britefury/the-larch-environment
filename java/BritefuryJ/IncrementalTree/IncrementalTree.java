@@ -27,7 +27,6 @@ public class IncrementalTree
 	private IncrementalTreeNode.NodeResultFactory rootElementFactory;
 	protected IncrementalTreeNodeTable nodeTable;
 	private IncrementalTreeNode rootIncrementalTreeNode;
-	private IncrementalTreeNode.NodeResultChangeListener resultChangeListener;
 	private boolean bRefreshRequired;
 	private RefreshListener refreshListener;
 	
@@ -57,8 +56,6 @@ public class IncrementalTree
 			throw new RuntimeException( "Invalid duplicate policy" );
 		}
 		
-		resultChangeListener = null;
-		
 		bRefreshRequired = false;
 	}
 	
@@ -66,11 +63,6 @@ public class IncrementalTree
 	public void setRefreshListener(RefreshListener listener)
 	{
 		refreshListener = listener;
-	}
-	
-	public void setNodeResultChangeListener(IncrementalTreeNode.NodeResultChangeListener elementChangeListener)
-	{
-		this.resultChangeListener = elementChangeListener;
 	}
 	
 	
@@ -107,7 +99,7 @@ public class IncrementalTree
 			{
 				// No existing incremental tree node could be acquired.
 				// Create a new one and add it to the table
-				viewNode = createIncrementalTreeNode( node, resultChangeListener );
+				viewNode = createIncrementalTreeNode( node );
 			}
 			
 			viewNode.setNodeResultFactory( elementFactory );
@@ -121,7 +113,7 @@ public class IncrementalTree
 	
 	protected void performRefresh()
 	{
-		resultChangeListener.reset( this );
+		onResultChangeTreeRefresh();
 		getRootIncrementalTreeNode().refresh();
 		
 		// Clear unused entries from the node table
@@ -158,8 +150,21 @@ public class IncrementalTree
 	
 	
 	
-	protected IncrementalTreeNode createIncrementalTreeNode(Object node, IncrementalTreeNode.NodeResultChangeListener changeListener)
+	protected IncrementalTreeNode createIncrementalTreeNode(Object node)
 	{
-		return new IncrementalTreeNode( this, node, resultChangeListener );
+		return new IncrementalTreeNode( this, node );
+	}
+	
+	
+	protected void onResultChangeTreeRefresh()
+	{
+	}
+	
+	protected void onResultChangeFrom(IncrementalTreeNode node, Object result)
+	{
+	}
+	
+	protected void onResultChangeTo(IncrementalTreeNode node, Object result)
+	{
 	}
 }

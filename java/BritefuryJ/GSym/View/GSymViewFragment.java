@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocView;
+package BritefuryJ.GSym.View;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPFragment;
@@ -13,7 +13,7 @@ import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 
-public class DVNode extends IncrementalTreeNode
+public class GSymViewFragment extends IncrementalTreeNode
 {
 	public static class CannotChangeDocNodeException extends Exception
 	{
@@ -27,9 +27,9 @@ public class DVNode extends IncrementalTreeNode
 	
 	
 	
-	public DVNode(DocView view, Object docNode, NodeResultChangeListener resultChangeListener, PersistentStateTable persistentState)
+	public GSymViewFragment(GSymView view, Object docNode, PersistentStateTable persistentState)
 	{
-		super( view, docNode, resultChangeListener );
+		super( view, docNode );
 		
 		// Fragment element, with null context, initially; later set in @setContext method
 		fragmentElement = new DPFragment( null );
@@ -67,17 +67,24 @@ public class DVNode extends IncrementalTreeNode
 	}
 	
 	
-	public Object getResultNoRefresh()
+	protected Object getResultNoRefresh()
 	{
 		return fragmentElement;
 	}
 	
-	public Object getResult()
+	protected Object getResult()
 	{
 		refresh();
 		return fragmentElement;
 	}
 	
+
+	
+	
+	protected ChildrenIterable getChildren()
+	{
+		return super.getChildren();
+	}
 
 	
 	
@@ -87,9 +94,9 @@ public class DVNode extends IncrementalTreeNode
 	//
 	//
 	
-	public DocView getDocView()
+	public GSymView getDocView()
 	{
-		return (DocView)getIncrementalTree();
+		return (GSymView)getIncrementalTree();
 	}
 	
 	

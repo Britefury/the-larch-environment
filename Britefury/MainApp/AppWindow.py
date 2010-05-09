@@ -30,8 +30,6 @@ from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.Browser import *
 from BritefuryJ.DocPresent.StyleParams import *
 
-from BritefuryJ.DocView import DocView
-
 
 
 
