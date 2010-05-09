@@ -13,7 +13,7 @@ import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
-import BritefuryJ.GSym.View.GSymFragmentViewContext;
+import BritefuryJ.GSym.View.GSymFragmentView;
 
 
 public abstract class GSymAbstractPerspective
@@ -34,14 +34,14 @@ public abstract class GSymAbstractPerspective
 
 		
 		@Override
-		public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 		{
 			return ctx.presentFragmentWithPerspectiveAndStyleSheet( x, GSymAbstractPerspective.this, this.styleSheet, this.inheritedState );
 		}
 	}
 	
 	
-	public abstract DPElement present(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable inheritedState);
+	public abstract DPElement present(Object x, GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable inheritedState);
 	public abstract StyleSheet getStyleSheet();
 	public abstract AttributeTable getInitialInheritedState();
 	public abstract EditHandler getEditHandler();

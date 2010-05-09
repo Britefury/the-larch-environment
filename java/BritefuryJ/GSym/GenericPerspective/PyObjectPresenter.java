@@ -10,9 +10,9 @@ import org.python.core.PyObject;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.GSym.View.GSymFragmentViewContext;
+import BritefuryJ.GSym.View.GSymFragmentView;
 
 public interface PyObjectPresenter
 {
-	public DPElement presentObject(PyObject x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state);
+	public DPElement presentObject(PyObject x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state);
 }

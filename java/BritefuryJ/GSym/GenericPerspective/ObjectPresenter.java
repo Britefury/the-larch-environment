@@ -8,9 +8,9 @@ package BritefuryJ.GSym.GenericPerspective;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.GSym.View.GSymFragmentViewContext;
+import BritefuryJ.GSym.View.GSymFragmentView;
 
 public interface ObjectPresenter
 {
-	public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state);
+	public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state);
 }

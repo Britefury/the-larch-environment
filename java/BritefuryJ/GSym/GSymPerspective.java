@@ -12,7 +12,7 @@ import BritefuryJ.DocPresent.Browser.Location.TokenIterator;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
-import BritefuryJ.GSym.View.GSymFragmentViewContext;
+import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.GSym.View.GSymViewFragmentFunction;
 
 public class GSymPerspective extends GSymAbstractPerspective
@@ -47,7 +47,7 @@ public class GSymPerspective extends GSymAbstractPerspective
 	
 	
 	@Override
-	public DPElement present(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable inheritedState)
+	public DPElement present(Object x, GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		return fragmentViewFn.createViewFragment( x, ctx, styleSheet, inheritedState );
 	}

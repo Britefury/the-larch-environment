@@ -26,15 +26,15 @@ import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.GSymGenericPerspective;
-import BritefuryJ.GSym.View.GSymFragmentViewContext;
-import BritefuryJ.GSym.View.GSymViewContext;
+import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.GSym.View.GSymView;
 import BritefuryJ.GSym.View.GSymViewFragmentFunction;
 
 public class GSymBrowserContext
 {
 	private static class RootLocationFragmentViewFn implements GSymViewFragmentFunction
 	{
-		public DPElement createViewFragment(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+		public DPElement createViewFragment(Object x, GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable state)
 		{
 			return PrimitiveStyleSheet.instance.staticText( "<<Root location>>" );
 		}
@@ -42,7 +42,7 @@ public class GSymBrowserContext
 	
 	private static class ResolveErrorFragmentViewFn implements GSymViewFragmentFunction
 	{
-		public DPElement createViewFragment(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+		public DPElement createViewFragment(Object x, GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable state)
 		{
 			Location location = (Location)x;
 			return resolveErrorStyleSheet.staticText( "<<Could not resolve " + location.getLocationString() + ">>" );
@@ -51,7 +51,7 @@ public class GSymBrowserContext
 	
 	private static class SystemPageFragmentViewFn implements GSymViewFragmentFunction
 	{
-		public DPElement createViewFragment(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+		public DPElement createViewFragment(Object x, GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable state)
 		{
 			Page p = (Page)x;
 			return p.getContentsElement();
@@ -199,7 +199,7 @@ public class GSymBrowserContext
 			GSymSubject subject = resolver.resolveLocationAsSubject( location );
 			if ( subject != null )
 			{
-				GSymViewContext viewContext = new GSymViewContext( subject, this, persistentState );
+				GSymView viewContext = new GSymView( subject, this, persistentState );
 				return viewContext.getPage();
 			}
 		}

@@ -36,7 +36,7 @@ import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GSymAbstractPerspective;
 import BritefuryJ.GSym.GSymLocationResolver;
 import BritefuryJ.GSym.GSymSubject;
-import BritefuryJ.GSym.View.GSymFragmentViewContext;
+import BritefuryJ.GSym.View.GSymFragmentView;
 
 public class GSymGenericPerspective extends GSymAbstractPerspective
 {
@@ -76,7 +76,7 @@ public class GSymGenericPerspective extends GSymAbstractPerspective
 
 
 	@Override
-	public DPElement present(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+	public DPElement present(Object x, GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable state)
 	{
 		DPElement result = null;
 		GenericPerspectiveStyleSheet genericStyleSheet = null;
@@ -365,12 +365,12 @@ public class GSymGenericPerspective extends GSymAbstractPerspective
 	}
 	
 	
-	private static DPElement presentJavaObjectAsString(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+	private static DPElement presentJavaObjectAsString(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
 		return styleSheet.objectBox( x.getClass().getName(), asStringStyle.staticText( x.toString() ) );
 	}
 	
-	private static DPElement presentPythonObjectAsString(PyObject pyX, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+	private static DPElement presentPythonObjectAsString(PyObject pyX, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
 		PyType typeX = pyX.getType();
 		return styleSheet.objectBox( typeX.getName(), asStringStyle.staticText( pyX.toString() ) );
@@ -382,7 +382,7 @@ public class GSymGenericPerspective extends GSymAbstractPerspective
 	{
 		public static final ObjectPresenter presenter_Boolean = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				return GSymPrimitivePresenter.presentBoolean( (Boolean)x, ctx, styleSheet, state );
 			}
@@ -390,7 +390,7 @@ public class GSymGenericPerspective extends GSymAbstractPerspective
 		
 		public static final ObjectPresenter presenter_Byte = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				return GSymPrimitivePresenter.presentByte( (Byte)x, ctx, styleSheet, state );
 			}
@@ -398,7 +398,7 @@ public class GSymGenericPerspective extends GSymAbstractPerspective
 		
 		public static final ObjectPresenter presenter_Character = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				return GSymPrimitivePresenter.presentChar( (Character)x, ctx, styleSheet, state );
 			}
@@ -406,7 +406,7 @@ public class GSymGenericPerspective extends GSymAbstractPerspective
 		
 		public static final ObjectPresenter presenter_Short = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				return GSymPrimitivePresenter.presentShort( (Short)x, ctx, styleSheet, state );
 			}
@@ -414,7 +414,7 @@ public class GSymGenericPerspective extends GSymAbstractPerspective
 		
 		public static final ObjectPresenter presenter_Integer = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				return GSymPrimitivePresenter.presentInt( (Integer)x, ctx, styleSheet, state );
 			}
@@ -422,7 +422,7 @@ public class GSymGenericPerspective extends GSymAbstractPerspective
 		
 		public static final ObjectPresenter presenter_Long = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				return GSymPrimitivePresenter.presentLong( (Long)x, ctx, styleSheet, state );
 			}
@@ -430,7 +430,7 @@ public class GSymGenericPerspective extends GSymAbstractPerspective
 		
 		public static final ObjectPresenter presenter_Float = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				return GSymPrimitivePresenter.presentDouble( ((Float)x).doubleValue(), ctx, styleSheet, state );
 			}
@@ -438,7 +438,7 @@ public class GSymGenericPerspective extends GSymAbstractPerspective
 		
 		public static final ObjectPresenter presenter_Double = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				return GSymPrimitivePresenter.presentDouble( (Double)x, ctx, styleSheet, state );
 			}
@@ -446,7 +446,7 @@ public class GSymGenericPerspective extends GSymAbstractPerspective
 		
 		public static final ObjectPresenter presenter_String = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				return GSymPrimitivePresenter.presentString( (String)x, ctx, styleSheet, state );
 			}
@@ -457,7 +457,7 @@ public class GSymGenericPerspective extends GSymAbstractPerspective
 
 		public static final PyObjectPresenter presenter_PyTuple = new PyObjectPresenter()
 		{
-			public DPElement presentObject(PyObject x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(PyObject x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				PyTuple tuple = (PyTuple)x;
 				
@@ -475,7 +475,7 @@ public class GSymGenericPerspective extends GSymAbstractPerspective
 
 		public static final ObjectPresenter presenter_List = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				List<?> list = (List<?>)x;
 				
@@ -491,7 +491,7 @@ public class GSymGenericPerspective extends GSymAbstractPerspective
 		
 		public static final ObjectPresenter presenter_Shape = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				Shape shape = (Shape)x;
 //				Rectangle2D bounds = shape.getBounds2D();
@@ -514,7 +514,7 @@ public class GSymGenericPerspective extends GSymAbstractPerspective
 
 		public static final ObjectPresenter presenter_BufferedImage = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				BufferedImage image = (BufferedImage)x;
 				double width = (double)image.getWidth();
@@ -537,7 +537,7 @@ public class GSymGenericPerspective extends GSymAbstractPerspective
 
 		public static final ObjectPresenter presenter_Color = new ObjectPresenter()
 		{
-			public DPElement presentObject(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+			public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 			{
 				Color colour = (Color)x;
 				

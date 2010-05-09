@@ -91,7 +91,7 @@ class ParsedExpressionLinearRepresentationListener (ElementLinearRepresentationL
 			#parsed = parseText( self._parser, value, self._outerPrecedence )
 			parsed = parseStream( self._parser, value, self._outerPrecedence )
 			if parsed is not None:
-				log = ctx.getViewContext().getPageLog()
+				log = ctx.getView().getPageLog()
 				if log.isRecording():
 					log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - success' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
 				if parsed != node:
@@ -100,12 +100,12 @@ class ParsedExpressionLinearRepresentationListener (ElementLinearRepresentationL
 				if value.isTextual():
 					if value.textualValue().strip() == '':
 						# Expression content has been deleted entirely; clear the structural representation
-						log = ctx.getViewContext().getPageLog()
+						log = ctx.getView().getPageLog()
 						if log.isRecording():
 							log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - deleted' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
 						return False
 				unparsed = Schema.UNPARSED( value=value.getItemValues() )
-				log = ctx.getViewContext().getPageLog()
+				log = ctx.getView().getPageLog()
 				if log.isRecording():
 					log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - unparsed' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', unparsed ) )
 				pyReplaceExpression( ctx, node, unparsed )
@@ -187,7 +187,7 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 				if sourceCtx is None:
 					print 'NULL SOURCE CONTEXT: ', sourceElement
 				if sourceCtx is ctx:
-					log = ctx.getViewContext().getPageLog()
+					log = ctx.getView().getPageLog()
 					if log.isRecording():
 						log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'tatement - unparsed, node replaced' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
 					pyReplaceNode( ctx, node, parsed )
@@ -200,20 +200,20 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 					if sourceValue.isTextual():
 						if sourceValue.textualValue().strip() == '':
 							# The content within @sourceCtxElement has been deleted entirely, replace the whole statement
-							log = ctx.getViewContext().getPageLog()
+							log = ctx.getView().getPageLog()
 							if log.isRecording():
 								log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - unparsed, sub-node deleted' ).vItem( 'editedStream', sourceValue ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ).vItem( 'sourceNode', sourceNode ) )
 							pyReplaceStmt( ctx, node, parsed )
 							return True
 					
 					unparsed = Schema.UNPARSED( value=sourceValue.getItemValues() )
-					log = ctx.getViewContext().getPageLog()
+					log = ctx.getView().getPageLog()
 					if log.isRecording():
 						log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - unparsed, sub-node replaced' ).vItem( 'editedStream', sourceValue ).hItem( 'parser', self._parser ).vItem( 'parsedResult', unparsed ) )
 					pyReplaceNode( sourceCtx, sourceNode, unparsed )
 					return True
 			else:
-				log = ctx.getViewContext().getPageLog()
+				log = ctx.getView().getPageLog()
 				if log.isRecording():
 					log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
 				pyReplaceStmt( ctx, node, parsed )

@@ -12,6 +12,7 @@ import java.util.List;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPFragment;
 import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
@@ -28,7 +29,7 @@ import BritefuryJ.Incremental.IncrementalFunctionMonitor;
 import BritefuryJ.Incremental.IncrementalValueMonitor;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 
-public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext, FragmentContext, PresentationStateListener
+public class GSymFragmentView extends IncrementalTreeNode implements FragmentContext, PresentationStateListener
 {
 	public static class FragmentDocNode
 	{
@@ -54,8 +55,8 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 		public Object createSourceData(PointerInputElement sourceElement, int aspect)
 		{
 			DPElement element = (DPElement)sourceElement;
-			GSymFragmentViewContext ctx = (GSymFragmentViewContext)element.getFragmentContext();
-			return new FragmentDocNode( ctx.viewNode.getDocNode() );
+			GSymFragmentView ctx = (GSymFragmentView)element.getFragmentContext();
+			return new FragmentDocNode( ctx.getDocNode() );
 		}
 	};
 	
@@ -67,68 +68,202 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 	private static final PrimitiveStyleSheet viewNull_textStyle = PrimitiveStyleSheet.instance.withFontItalic( true ).withFontSize( 12 ).withForeground( new Color( 0.8f, 0.0f, 0.4f ) );
 
 	
-
-	protected GSymViewContext.ViewFragmentContextAndResultFactory factory;
-	protected GSymViewFragment viewNode;
-
 	
 	
-	public GSymFragmentViewContext(GSymViewContext.ViewFragmentContextAndResultFactory factory, GSymViewFragment viewNode)
+	
+	public static class CannotChangeDocNodeException extends Exception
 	{
-		this.factory = factory;
-		this.viewNode = viewNode;
-		this.viewNode.setContext( this );
-		this.viewNode.setFragmentContext( this );
-		this.viewNode.getElementNoRefresh().addDragSource( fragmentDragSource );
+		private static final long serialVersionUID = 1L;
+	}
+
+	
+	private DPFragment fragmentElement;
+	private DPElement element;
+	private PersistentStateTable persistentState;
+	
+
+	
+	
+	
+	public GSymFragmentView(Object modelNode, GSymView view, PersistentStateTable persistentState)
+	{
+		super( view, modelNode );
+		
+		// Fragment element, with null context, initially; later set in @setContext method
+		fragmentElement = new DPFragment( this );
+		fragmentElement.addDragSource( fragmentDragSource );
+		element = null;
+		this.persistentState = persistentState;
+		if ( this.persistentState == null )
+		{
+			this.persistentState = new PersistentStateTable();
+		}
 	}
 	
 	
 	
-	public GSymViewContext getViewContext()
+	//
+	//
+	// Result acquisition methods
+	//
+	//
+	
+	public DPElement getElementNoRefresh()
 	{
-		return factory.viewContext;
+		return fragmentElement;
 	}
 	
+	public DPElement getElement()
+	{
+		refresh();
+		return fragmentElement;
+	}
+	
+	
+	public DPElement getInnerElementNoRefresh()
+	{
+		return element;
+	}
+	
+	
+	protected Object getResultNoRefresh()
+	{
+		return fragmentElement;
+	}
+	
+	protected Object getResult()
+	{
+		refresh();
+		return fragmentElement;
+	}
+	
+
+	
+	
+	protected ChildrenIterable getChildren()
+	{
+		return super.getChildren();
+	}
+
+	
+	protected GSymView.ViewFragmentContextAndResultFactory getFragmentElementFactory()
+	{
+		return (GSymView.ViewFragmentContextAndResultFactory)resultFactory;
+	}
+
+	
+	
+	//
+	//
+	// Document view and node / tree methods
+	//
+	//
+	
+	public GSymView getView()
+	{
+		return (GSymView)getIncrementalTree();
+	}
+	
+	
+	
+	
+	//
+	//
+	// Refresh methods
+	//
+	//
+	
+	protected Object computeNodeResult()
+	{
+		getView().profile_startJava();
+		Object result = super.computeNodeResult();
+		getView().profile_stopJava();
+		return result;
+	}
+
+	protected void updateNodeResult(Object r)
+	{
+		getView().profile_startUpdateNodeElement();
+		super.updateNodeResult( r );
+		if ( r != element )
+		{
+			if ( r != null )
+			{
+				element = (DPElement)r;
+				fragmentElement.setChild( element );
+				fragmentElement.copyAlignmentFlagsFrom( element );
+			}
+			else
+			{
+				element = null;
+				fragmentElement.setChild( null );
+				fragmentElement.alignHLeft().alignVRefY();
+			}
+		}
+		getView().profile_stopUpdateNodeElement();
+	}
+	
+	
+	
+	protected void onComputeNodeResultBegin()
+	{
+		if ( persistentState != null )
+		{
+			persistentState.onRefreshBegin();
+		}
+	}
+	
+	protected void onComputeNodeResultEnd()
+	{
+		if ( persistentState != null )
+		{
+			persistentState.onRefreshEnd();
+			if ( persistentState.isEmpty() )
+			{
+				persistentState = null;
+			}
+		}
+	}
+
+	
+	public PersistentStateTable getPersistentStateTable()
+	{
+		if ( persistentState == null )
+		{
+			persistentState = new PersistentStateTable();
+		}
+		return persistentState;
+	}
+	
+	public PersistentState persistentState(Object key)
+	{
+		return getPersistentStateTable().persistentState( key );
+	}
+
+
+
+
+
 	public GSymBrowserContext getBrowserContext()
 	{
-		return factory.viewContext.getBrowserContext();
+		return getView().getBrowserContext();
 	}
 	
 	
 	public AttributeTable getSubjectContext()
 	{
-		return factory.subjectContext;
+		return getFragmentElementFactory().subjectContext;
 	}
 	
 	
 	public GSymAbstractPerspective getPerspective()
 	{
-		return factory.perspective;
+		return getFragmentElementFactory().perspective;
 	}
 	
 	
 	
 	
-	public Object getDocNode()
-	{
-		return viewNode.getDocNode();
-	}
-	
-	
-	
-	public PersistentState persistentState(Object key)
-	{
-		return viewNode.persistentState( key );
-	}
-	
-	public PersistentStateTable getPersistentStateTable()
-	{
-		return viewNode.getPersistentStateTable();
-	}
-	
-	
-	
-
 	public DPElement errorElement(String errorText)
 	{
 		return viewError_textStyle.staticText( errorText );
@@ -138,7 +273,7 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 	
 	protected void registerIncrementalNodeRelationship(IncrementalTreeNode childNode)
 	{
-		viewNode.registerChild( childNode );
+		registerChild( childNode );
 	}
 
 
@@ -158,9 +293,8 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 		}
 
 		// A call to DocNode.buildNodeView builds the view, and puts it in the DocView's table
-		GSymViewContext viewContext = factory.viewContext;
-		GSymViewFragment incrementalNode = (GSymViewFragment)viewContext.getView().buildIncrementalTreeNodeResult( x,
-				viewContext.makeNodeResultFactory( perspective, subjectContext, styleSheet, inheritedState ) );
+		GSymView view = getView();
+		GSymFragmentView incrementalNode = (GSymFragmentView)view.buildIncrementalTreeNodeResult( x, view.makeNodeResultFactory( perspective, subjectContext, styleSheet, inheritedState ) );
 		
 		
 		// Block access tracking to prevent the contents of this node being dependent upon the child node being refreshed,
@@ -188,47 +322,53 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 	
 	public DPElement presentFragment(Object x, StyleSheet styleSheet)
 	{
+		GSymView.ViewFragmentContextAndResultFactory factory = getFragmentElementFactory();
 		return presentFragment( x, factory.perspective, factory.subjectContext, styleSheet, factory.inheritedState );
 	}
 
 	public DPElement presentFragment(Object x, StyleSheet styleSheet, AttributeTable inheritedState)
 	{
+		GSymView.ViewFragmentContextAndResultFactory factory = getFragmentElementFactory();
 		return presentFragment( x, factory.perspective, factory.subjectContext, styleSheet, inheritedState );
 	}
 
 	public DPElement presentFragmentWithPerspective(Object x, GSymAbstractPerspective perspective)
 	{
+		GSymView.ViewFragmentContextAndResultFactory factory = getFragmentElementFactory();
 		DPElement e = presentFragment( x, perspective, factory.subjectContext, perspective.getStyleSheet(), perspective.getInitialInheritedState() );
 		return perspectiveFragmentRegion( e, perspective );
 	}
 
 	public DPElement presentFragmentWithPerspective(Object x, GSymAbstractPerspective perspective, AttributeTable inheritedState)
 	{
+		GSymView.ViewFragmentContextAndResultFactory factory = getFragmentElementFactory();
 		DPElement e = presentFragment( x, perspective, factory.subjectContext, perspective.getStyleSheet(), inheritedState );
 		return perspectiveFragmentRegion( e, perspective );
 	}
 
 	public DPElement presentFragmentWithPerspectiveAndStyleSheet(Object x, GSymAbstractPerspective perspective, StyleSheet styleSheet)
 	{
+		GSymView.ViewFragmentContextAndResultFactory factory = getFragmentElementFactory();
 		DPElement e = presentFragment( x, perspective, factory.subjectContext, styleSheet, perspective.getInitialInheritedState() );
 		return perspectiveFragmentRegion( e, perspective );
 	}
 
 	public DPElement presentFragmentWithPerspectiveAndStyleSheet(Object x, GSymAbstractPerspective perspective, StyleSheet styleSheet, AttributeTable inheritedState)
 	{
+		GSymView.ViewFragmentContextAndResultFactory factory = getFragmentElementFactory();
 		DPElement e = presentFragment( x, perspective, factory.subjectContext, styleSheet, inheritedState );
 		return perspectiveFragmentRegion( e, perspective );
 	}
 	
 	public DPElement presentFragmentWithGenericPerspective(Object x)
 	{
-		GSymAbstractPerspective genericPerspective = getViewContext().getBrowserContext().getGenericPerspective();
+		GSymAbstractPerspective genericPerspective = getBrowserContext().getGenericPerspective();
 		return presentFragmentWithPerspective( x, genericPerspective );
 	}
 	
 	public DPElement presentFragmentWithGenerixcPerspective(Object x, AttributeTable inheritedState)
 	{
-		GSymAbstractPerspective genericPerspective = getViewContext().getBrowserContext().getGenericPerspective();
+		GSymAbstractPerspective genericPerspective = getBrowserContext().getGenericPerspective();
 		return presentFragmentWithPerspective( x, genericPerspective, inheritedState );
 	}
 	
@@ -250,11 +390,13 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 
 	public List<DPElement> mapPresentFragment(List<Object> xs, StyleSheet styleSheet)
 	{
+		GSymView.ViewFragmentContextAndResultFactory factory = getFragmentElementFactory();
 		return mapPresentFragment( xs, factory.perspective, factory.subjectContext, styleSheet, factory.inheritedState );
 	}
 
 	public List<DPElement> mapPresentFragment(List<Object> xs, StyleSheet styleSheet, AttributeTable inheritedState)
 	{
+		GSymView.ViewFragmentContextAndResultFactory factory = getFragmentElementFactory();
 		return mapPresentFragment( xs, factory.perspective, factory.subjectContext, styleSheet, inheritedState );
 	}
 
@@ -262,7 +404,7 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 	
 	public DPElement presentLocationAsElement(Location location)
 	{
-		GSymSubject subject = getViewContext().getBrowserContext().resolveLocationAsSubject( location );
+		GSymSubject subject = getBrowserContext().resolveLocationAsSubject( location );
 		GSymAbstractPerspective perspective = subject.getPerspective();
 		DPElement e = presentFragment( subject.getFocus(), perspective, subject.getSubjectContext(), perspective.getStyleSheet(), perspective.getInitialInheritedState() );
 		return perspectiveFragmentRegion( e, perspective );
@@ -270,56 +412,42 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 	
 	public Location getLocationForObject(Object x)
 	{
-		return getViewContext().getBrowserContext().getLocationForObject( x );
-	}
-	
-	
-	
-	public void queueRefresh()
-	{
-		viewNode.queueRefresh();
+		return getBrowserContext().getLocationForObject( x );
 	}
 	
 	
 	
 	public DPElement getViewNodeElement()
 	{
-		return viewNode.getElementNoRefresh();
+		return getElementNoRefresh();
 	}
 	
 	public DPElement getViewNodeContentElement()
 	{
-		return viewNode.getInnerElementNoRefresh();
+		return getInnerElementNoRefresh();
 	}
 	
 	
 	
-	public GSymFragmentViewContext getParent()
+	public ArrayList<GSymFragmentView> getNodeViewInstancePathFromRoot()
 	{
-		GSymViewFragment parentViewNode = (GSymViewFragment)viewNode.getParent();
-		return parentViewNode != null  ?  (GSymFragmentViewContext)parentViewNode.getContext()  :  null;
-	}
-	
-
-	public ArrayList<GSymFragmentViewContext> getNodeViewInstancePathFromRoot()
-	{
-		ArrayList<GSymFragmentViewContext> path = new ArrayList<GSymFragmentViewContext>();
+		ArrayList<GSymFragmentView> path = new ArrayList<GSymFragmentView>();
 		
-		GSymFragmentViewContext n = this;
+		GSymFragmentView n = this;
 		while ( n != null )
 		{
 			path.add( 0, n );
-			n = n.getParent();
+			n = (GSymFragmentView)n.getParent();
 		}
 		
 		return path;
 	}
 	
-	public ArrayList<GSymFragmentViewContext> getNodeViewInstancePathFromSubtreeRoot(GSymFragmentViewContext root)
+	public ArrayList<GSymFragmentView> getNodeViewInstancePathFromSubtreeRoot(GSymFragmentView root)
 	{
-		ArrayList<GSymFragmentViewContext> path = new ArrayList<GSymFragmentViewContext>();
+		ArrayList<GSymFragmentView> path = new ArrayList<GSymFragmentView>();
 		
-		GSymFragmentViewContext n = this;
+		GSymFragmentView n = this;
 		while ( n != null )
 		{
 			path.add( 0, n );
@@ -327,7 +455,7 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 			{
 				return path;
 			}
-			n = n.getParent();
+			n = (GSymFragmentView)n.getParent();
 		}
 
 		return null;

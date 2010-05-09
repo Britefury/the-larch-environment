@@ -127,7 +127,7 @@ class Python25EditHandler (EditHandler):
 		
 			
 	def indent(self, element, context, node):
-		viewContext = context.getViewContext()
+		viewContext = context.getView()
 		selection = viewContext.getSelection()
 		
 		if selection.isEmpty():
@@ -148,7 +148,7 @@ class Python25EditHandler (EditHandler):
 			
 			
 	def dedent(self, element, context, node):
-		viewContext = context.getViewContext()
+		viewContext = context.getView()
 		selection = viewContext.getSelection()
 		
 		if selection.isEmpty():

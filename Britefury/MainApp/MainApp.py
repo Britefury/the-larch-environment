@@ -10,7 +10,6 @@ from BritefuryJ.AttributeTable import AttributeTable
 from BritefuryJ.DocPresent.Browser import Location
 
 from BritefuryJ.GSym import GSymBrowserContext, GSymLocationResolver, GSymSubject
-from BritefuryJ.GSym.View import GSymViewContext
 
 from Britefury.MainApp.AppWindow import AppWindow
 

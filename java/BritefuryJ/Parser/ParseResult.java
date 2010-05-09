@@ -16,7 +16,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
-import BritefuryJ.GSym.View.GSymFragmentViewContext;
+import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.ParserHelpers.DebugNode;
 import BritefuryJ.ParserHelpers.ParseResultInterface;
 
@@ -245,7 +245,7 @@ public class ParseResult implements ParseResultInterface, Presentable
 
 
 	@Override
-	public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		DPElement fields[];
 		

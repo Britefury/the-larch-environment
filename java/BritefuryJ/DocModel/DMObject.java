@@ -30,7 +30,7 @@ import BritefuryJ.DocModel.DMSchemaResolver.CouldNotResolveSchemaException;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
-import BritefuryJ.GSym.View.GSymFragmentViewContext;
+import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.Incremental.IncrementalValueMonitor;
 
@@ -808,7 +808,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 
 
 	
-	public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		return DocModelPresenter.presentDMObject( this, ctx, styleSheet, inheritedState );
 	}

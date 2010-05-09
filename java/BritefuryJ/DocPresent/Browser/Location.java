@@ -15,7 +15,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
-import BritefuryJ.GSym.View.GSymFragmentViewContext;
+import BritefuryJ.GSym.View.GSymFragmentView;
 
 public class Location implements Presentable
 {
@@ -115,7 +115,7 @@ public class Location implements Presentable
 
 
 		@Override
-		public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 		{
 			// TODO: Check for infinitely recursive nesting
 			return ctx.presentLocationAsElement( loc );
@@ -200,7 +200,7 @@ public class Location implements Presentable
 	}
 
 
-	public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		return locationStyle.objectBox( "Location", PrimitiveStyleSheet.instance.staticText( locationString ) );
 	}

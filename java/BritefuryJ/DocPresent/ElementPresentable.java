@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent;
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
-import BritefuryJ.GSym.View.GSymFragmentViewContext;
+import BritefuryJ.GSym.View.GSymFragmentView;
 
 public class ElementPresentable implements Presentable
 {
@@ -23,7 +23,7 @@ public class ElementPresentable implements Presentable
 
 
 	@Override
-	public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		return element;
 	}

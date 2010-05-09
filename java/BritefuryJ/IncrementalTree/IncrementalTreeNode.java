@@ -25,11 +25,6 @@ public class IncrementalTreeNode implements IncrementalMonitorListener, Incremen
 		public Object createNodeResult(IncrementalTreeNode viewNode, Object docNode);
 	}
 	
-	public static interface NodeContext
-	{
-	}
-	
-	
 	public static class ChildrenIterator implements Iterator<IncrementalTreeNode>
 	{
 		private IncrementalTreeNode current;
@@ -89,13 +84,11 @@ public class IncrementalTreeNode implements IncrementalMonitorListener, Incremen
 	private Object docNode;
 	
 	private IncrementalFunctionMonitor incr;
-	private NodeResultFactory resultFactory;
+	protected NodeResultFactory resultFactory;
 	private Object result;
 	
 	private IncrementalTreeNode parent, nextSibling;
 	private IncrementalTreeNode childrenHead, childrenTail;
-	
-	private NodeContext nodeContext;
 	
 	private boolean bRefreshRequired;
 	
@@ -106,7 +99,6 @@ public class IncrementalTreeNode implements IncrementalMonitorListener, Incremen
 	{
 		this.incrementalTree = incrementalTree;
 		this.docNode = docNode;
-		nodeContext = null;
 		
 		parent = null;
 		nextSibling = null;
@@ -136,7 +128,7 @@ public class IncrementalTreeNode implements IncrementalMonitorListener, Incremen
 		}
 	}
 	
-	protected NodeResultFactory getNodeResultFactory()
+	protected NodeResultFactory getFragmentElementFactory()
 	{
 		return resultFactory;
 	}
@@ -204,25 +196,6 @@ public class IncrementalTreeNode implements IncrementalMonitorListener, Incremen
 	}
 	
 
-	
-	//
-	//
-	// Context methods
-	//
-	//
-	
-	public NodeContext getContext()
-	{
-		return nodeContext;
-	}
-	
-	public void setContext(NodeContext context)
-	{
-		nodeContext = context;
-	}
-	
-	
-	
 	
 	//
 	//

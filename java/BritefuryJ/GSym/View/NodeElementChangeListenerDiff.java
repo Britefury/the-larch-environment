@@ -31,7 +31,7 @@ public class NodeElementChangeListenerDiff implements GSymView.NodeElementChange
 	}
 	
 	
-	private GSymViewFragment caretNode;
+	private GSymFragmentView caretNode;
 	private String textRepresentation;
 	private Marker.Bias bias;
 	private int position;
@@ -55,7 +55,7 @@ public class NodeElementChangeListenerDiff implements GSymView.NodeElementChange
 	}
 
 	
-	public void elementChangeFrom(GSymViewFragment node, DPElement element)
+	public void elementChangeFrom(GSymFragmentView node, DPElement element)
 	{
 		if ( caretNode == null )
 		{
@@ -84,7 +84,7 @@ public class NodeElementChangeListenerDiff implements GSymView.NodeElementChange
 		}
 	}
 
-	public void elementChangeTo(GSymViewFragment node, DPElement element)
+	public void elementChangeTo(GSymFragmentView node, DPElement element)
 	{
 		if ( caretNode == node )
 		{
