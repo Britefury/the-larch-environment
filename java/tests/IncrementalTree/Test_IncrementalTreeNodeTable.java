@@ -51,11 +51,11 @@ public abstract class Test_IncrementalTreeNodeTable extends TestCase
 		
 		tree = new IncrementalTree( da, null, DuplicatePolicy.ALLOW_DUPLICATES );
 		
-		ia = new IncrementalTreeNode( tree, da, null );
-		ib = new IncrementalTreeNode( tree, db, null );
-		ic = new IncrementalTreeNode( tree, dc, null );
-		id1 = new IncrementalTreeNode( tree, dd, null );
-		id2 = new IncrementalTreeNode( tree, dd, null );
+		ia = new IncrementalTreeNode( tree, da );
+		ib = new IncrementalTreeNode( tree, db );
+		ic = new IncrementalTreeNode( tree, dc );
+		id1 = new IncrementalTreeNode( tree, dd );
+		id2 = new IncrementalTreeNode( tree, dd );
 		
 		
 		table = createTable();

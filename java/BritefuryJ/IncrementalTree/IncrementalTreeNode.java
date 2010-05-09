@@ -25,13 +25,6 @@ public class IncrementalTreeNode implements IncrementalMonitorListener, Incremen
 		public Object createNodeResult(IncrementalTreeNode viewNode, Object docNode);
 	}
 	
-	public static interface NodeResultChangeListener
-	{
-		public void reset(IncrementalTree view);
-		public void resultChangeFrom(IncrementalTreeNode node, Object result);
-		public void resultChangeTo(IncrementalTreeNode node, Object result);
-	}
-	
 	public static interface NodeContext
 	{
 	}
@@ -99,8 +92,6 @@ public class IncrementalTreeNode implements IncrementalMonitorListener, Incremen
 	private NodeResultFactory resultFactory;
 	private Object result;
 	
-	private NodeResultChangeListener resultChangeListener;
-	
 	private IncrementalTreeNode parent, nextSibling;
 	private IncrementalTreeNode childrenHead, childrenTail;
 	
@@ -111,7 +102,7 @@ public class IncrementalTreeNode implements IncrementalMonitorListener, Incremen
 	
 	
 	
-	public IncrementalTreeNode(IncrementalTree incrementalTree, Object docNode, NodeResultChangeListener elementChangeListener)
+	public IncrementalTreeNode(IncrementalTree incrementalTree, Object docNode)
 	{
 		this.incrementalTree = incrementalTree;
 		this.docNode = docNode;
@@ -129,9 +120,6 @@ public class IncrementalTreeNode implements IncrementalMonitorListener, Incremen
 
 		incr = new IncrementalFunctionMonitor( this );
 		incr.addListener( this );
-		
-		
-		this.resultChangeListener = elementChangeListener;
 	}
 	
 	
@@ -148,7 +136,7 @@ public class IncrementalTreeNode implements IncrementalMonitorListener, Incremen
 		}
 	}
 	
-	public NodeResultFactory getNodeResultFactory()
+	protected NodeResultFactory getNodeResultFactory()
 	{
 		return resultFactory;
 	}
@@ -161,12 +149,12 @@ public class IncrementalTreeNode implements IncrementalMonitorListener, Incremen
 	//
 	//
 	
-	public Object getResultNoRefresh()
+	protected Object getResultNoRefresh()
 	{
 		return result;
 	}
 	
-	public Object getResult()
+	protected Object getResult()
 	{
 		refresh();
 		return result;
@@ -191,7 +179,7 @@ public class IncrementalTreeNode implements IncrementalMonitorListener, Incremen
 		return parent;
 	}
 	
-	public ChildrenIterable getChildren()
+	protected ChildrenIterable getChildren()
 	{
 		return new ChildrenIterable( this );
 	}
@@ -244,10 +232,7 @@ public class IncrementalTreeNode implements IncrementalMonitorListener, Incremen
 	
 	private void refreshNode()
 	{
-		if ( resultChangeListener != null )
-		{
-			resultChangeListener.resultChangeFrom( this, result );
-		}
+		incrementalTree.onResultChangeFrom( this, result );
 
 		// Compute the result for this node, and refresh all children
 		Object refreshState = incr.onRefreshBegin();
@@ -271,10 +256,7 @@ public class IncrementalTreeNode implements IncrementalMonitorListener, Incremen
 		updateNodeResult( r );
 		
 		
-		if ( resultChangeListener != null )
-		{
-			resultChangeListener.resultChangeTo( this, result );
-		}
+		incrementalTree.onResultChangeTo( this, result );
 	}
 	
 	

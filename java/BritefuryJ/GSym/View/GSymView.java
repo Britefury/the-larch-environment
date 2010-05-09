@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DocView;
+package BritefuryJ.GSym.View;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -20,7 +20,7 @@ import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 import BritefuryJ.IncrementalTree.IncrementalTreeNodeTable;
 import BritefuryJ.Utils.Profile.ProfileTimer;
 
-public class DocView extends IncrementalTree implements IncrementalTreeNode.NodeResultChangeListener
+public class GSymView extends IncrementalTree
 {
 	//
 	//
@@ -34,9 +34,9 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 	
 	public interface NodeElementChangeListener
 	{
-		public void reset(DocView view);
-		public void elementChangeFrom(DVNode node, DPElement e);
-		public void elementChangeTo(DVNode node, DPElement e);
+		public void reset(GSymView view);
+		public void elementChangeFrom(GSymViewFragment node, DPElement e);
+		public void elementChangeTo(GSymViewFragment node, DPElement e);
 	}
 	
 	
@@ -98,7 +98,7 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 	
 	
 	
-	public DocView(Object root, DVNode.NodeResultFactory rootElementFactory, PersistentStateStore persistentState)
+	public GSymView(Object root, GSymViewFragment.NodeResultFactory rootElementFactory, PersistentStateStore persistentState)
 	{
 		super( root, rootElementFactory, DuplicatePolicy.ALLOW_DUPLICATES );
 		elementChangeListener = null;
@@ -122,14 +122,6 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 	public void setElementChangeListener(NodeElementChangeListener elementChangeListener)
 	{
 		this.elementChangeListener = elementChangeListener;
-		if ( elementChangeListener != null )
-		{
-			setNodeResultChangeListener( this );
-		}
-		else
-		{
-			setNodeResultChangeListener( null );
-		}
 	}
 	
 	
@@ -138,7 +130,7 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 		if ( rootBox == null )
 		{
 			performRefresh();
-			DVNode rootView = (DVNode)getRootIncrementalTreeNode();
+			GSymViewFragment rootView = (GSymViewFragment)getRootIncrementalTreeNode();
 			rootView.getElement().alignHExpand();
 			rootView.getElement().alignVExpand();
 			rootBox = PrimitiveStyleSheet.instance.vbox( new DPElement[] { rootView.getElement() } );
@@ -160,7 +152,7 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 			IncrementalTreeNode node = nodeQueue.removeFirst();
 			
 			// Get the persistent state, if any, and store it
-			DVNode viewNode = (DVNode)node;
+			GSymViewFragment viewNode = (GSymViewFragment)node;
 			PersistentStateTable stateTable = viewNode.getPersistentStateTable();
 			if ( stateTable != null )
 			{
@@ -170,7 +162,7 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 			// Add the children using an interator; that means that they will be inserted at the beginning
 			// of the queue so that they appear *in order*, hence they will be removed in order.
 			ListIterator<IncrementalTreeNode> iterator = nodeQueue.listIterator();
-			for (IncrementalTreeNode child: node.getChildren())
+			for (IncrementalTreeNode child: ((GSymViewFragment)node).getChildren())
 			{
 				iterator.add( child );
 			}
@@ -218,7 +210,7 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 		
 		if ( ENABLE_DISPLAY_TREESIZES )
 		{
-			DVNode rootView = (DVNode)getRootIncrementalTreeNode();
+			GSymViewFragment rootView = (GSymViewFragment)getRootIncrementalTreeNode();
 			int presTreeSize = rootView.getElement().computeSubtreeSize();
 			int numFragments = rootView.computeSubtreeSize();
 			System.out.println( "DocView.performRefresh(): presentation tree size=" + presTreeSize + ", # fragments=" + numFragments );
@@ -228,14 +220,14 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 	
 	
 	
-	protected IncrementalTreeNode createIncrementalTreeNode(Object node, IncrementalTreeNode.NodeResultChangeListener changeListener)
+	protected IncrementalTreeNode createIncrementalTreeNode(Object node)
 	{
 		PersistentStateTable persistentState = null;
 		if ( stateStoreToLoad != null )
 		{
 			persistentState = stateStoreToLoad.usePersistentState( node );
 		}
-		return new DVNode( this, node, changeListener, persistentState );
+		return new GSymViewFragment( this, node, persistentState );
 	}
 
 	
@@ -372,22 +364,31 @@ public class DocView extends IncrementalTree implements IncrementalTreeNode.Node
 	
 	
 
-	public void reset(IncrementalTree view)
+	protected void onResultChangeTreeRefresh()
 	{
-		elementChangeListener.reset( this );
+		if ( elementChangeListener != null )
+		{
+			elementChangeListener.reset( this );
+		}
 	}
 
-	public void resultChangeFrom(IncrementalTreeNode node, Object result)
+	protected void onResultChangeFrom(IncrementalTreeNode node, Object result)
 	{
-		profile_startContentChange();
-		elementChangeListener.elementChangeFrom( (DVNode)node, (DPElement)result );
-		profile_stopContentChange();
+		if ( elementChangeListener != null )
+		{
+			profile_startContentChange();
+			elementChangeListener.elementChangeFrom( (GSymViewFragment)node, (DPElement)result );
+			profile_stopContentChange();
+		}
 	}
 
-	public void resultChangeTo(IncrementalTreeNode node, Object result)
+	protected void onResultChangeTo(IncrementalTreeNode node, Object result)
 	{
-		profile_startContentChange();
-		elementChangeListener.elementChangeTo( (DVNode)node, (DPElement)result );
-		profile_stopContentChange();
+		if ( elementChangeListener != null )
+		{
+			profile_startContentChange();
+			elementChangeListener.elementChangeTo( (GSymViewFragment)node, (DPElement)result );
+			profile_stopContentChange();
+		}
 	}
 }

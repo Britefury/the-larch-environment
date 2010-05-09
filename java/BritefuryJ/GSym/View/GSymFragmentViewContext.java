@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.AttributeTable;
-import BritefuryJ.DocPresent.DPContainer;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.Browser.Location;
@@ -21,9 +20,8 @@ import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.DocView.DVNode;
-import BritefuryJ.GSym.GSymBrowserContext;
 import BritefuryJ.GSym.GSymAbstractPerspective;
+import BritefuryJ.GSym.GSymBrowserContext;
 import BritefuryJ.GSym.GSymSubject;
 import BritefuryJ.GSym.GenericPerspective.PresentationStateListener;
 import BritefuryJ.Incremental.IncrementalFunctionMonitor;
@@ -50,7 +48,7 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 	}
 	
 	
-	private ObjectDndHandler.SourceDataFn fragmentDragSourceFn = new ObjectDndHandler.SourceDataFn()
+	private static final ObjectDndHandler.SourceDataFn fragmentDragSourceFn = new ObjectDndHandler.SourceDataFn()
 	{
 		@Override
 		public Object createSourceData(PointerInputElement sourceElement, int aspect)
@@ -62,7 +60,7 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 	};
 	
 
-	private ObjectDndHandler.DragSource fragmentDragSource = new ObjectDndHandler.DragSource( FragmentDocNode.class, ObjectDndHandler.ASPECT_DOC_NODE, fragmentDragSourceFn );
+	private static final ObjectDndHandler.DragSource fragmentDragSource = new ObjectDndHandler.DragSource( FragmentDocNode.class, ObjectDndHandler.ASPECT_DOC_NODE, fragmentDragSourceFn );
 	
 	
 	private static final PrimitiveStyleSheet viewError_textStyle = PrimitiveStyleSheet.instance.withFontBold( true ).withFontSize( 12 ).withForeground( new Color( 0.8f, 0.0f, 0.0f ) );
@@ -71,11 +69,11 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 	
 
 	protected GSymViewContext.ViewFragmentContextAndResultFactory factory;
-	protected DVNode viewNode;
+	protected GSymViewFragment viewNode;
 
 	
 	
-	public GSymFragmentViewContext(GSymViewContext.ViewFragmentContextAndResultFactory factory, DVNode viewNode)
+	public GSymFragmentViewContext(GSymViewContext.ViewFragmentContextAndResultFactory factory, GSymViewFragment viewNode)
 	{
 		this.factory = factory;
 		this.viewNode = viewNode;
@@ -161,7 +159,7 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 
 		// A call to DocNode.buildNodeView builds the view, and puts it in the DocView's table
 		GSymViewContext viewContext = factory.viewContext;
-		DVNode incrementalNode = (DVNode)viewContext.getView().buildIncrementalTreeNodeResult( x,
+		GSymViewFragment incrementalNode = (GSymViewFragment)viewContext.getView().buildIncrementalTreeNodeResult( x,
 				viewContext.makeNodeResultFactory( perspective, subjectContext, styleSheet, inheritedState ) );
 		
 		
@@ -298,7 +296,7 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 	
 	public GSymFragmentViewContext getParent()
 	{
-		DVNode parentViewNode = (DVNode)viewNode.getParent();
+		GSymViewFragment parentViewNode = (GSymViewFragment)viewNode.getParent();
 		return parentViewNode != null  ?  (GSymFragmentViewContext)parentViewNode.getContext()  :  null;
 	}
 	
@@ -335,130 +333,6 @@ public class GSymFragmentViewContext implements IncrementalTreeNode.NodeContext,
 		return null;
 	}
 
-	
-	
-	private GSymFragmentViewContext getPreviousSiblingFromChildElement(GSymFragmentViewContext parent, DPElement fromChild)
-	{
-		if ( fromChild == null )
-		{
-			return null;
-		}
-		DPContainer parentElement = fromChild.getParent();
-		if ( parentElement == parent.getViewNodeElement() )
-		{
-			return null;
-		}
-		
-		List<DPElement> children = parentElement.getChildren();
-		int index = children.indexOf( fromChild );
-		for (int i = index - 1; i >= 0; i--)
-		{
-			GSymFragmentViewContext sibling = getLastChildFromParentElement( parent, children.get( i ) );
-			if ( sibling != null )
-			{
-				return sibling;
-			}
-		}
-		
-		return getNextSiblingFromChildElement( parent, parentElement.getParent() );
-	}
-	
-	private GSymFragmentViewContext getLastChildFromParentElement(GSymFragmentViewContext parent, DPElement element)
-	{
-		if ( element.getFragmentContext() != parent )
-		{
-			// We have recursed down the element tree far enough when we encounter an element with a different context
-			return (GSymFragmentViewContext)element.getFragmentContext();
-		}
-		else if ( element instanceof DPContainer )
-		{
-			DPContainer branch = (DPContainer)element;
-			List<DPElement> children = branch.getChildren();
-			for (int i = children.size() - 1; i >= 0; i--)
-			{
-				GSymFragmentViewContext sibling = getLastChildFromParentElement( parent, children.get( i ) );
-				if ( sibling != null )
-				{
-					return sibling;
-				}
-			}
-		}
-		return null;
-	}
-	
-
-	
-	private GSymFragmentViewContext getNextSiblingFromChildElement(GSymFragmentViewContext parent, DPElement fromChild)
-	{
-		if ( fromChild == null )
-		{
-			return null;
-		}
-		DPContainer parentElement = fromChild.getParent();
-		if ( parentElement == parent.getViewNodeElement() )
-		{
-			return null;
-		}
-		
-		List<DPElement> children = parentElement.getChildren();
-		int index = children.indexOf( fromChild );
-		for (int i = index + 1; i < children.size(); i++)
-		{
-			GSymFragmentViewContext sibling = getFirstChildFromParentElement( parent, children.get( i ) );
-			if ( sibling != null )
-			{
-				return sibling;
-			}
-		}
-		
-		return getNextSiblingFromChildElement( parent, parentElement.getParent() );
-	}
-	
-	private GSymFragmentViewContext getFirstChildFromParentElement(GSymFragmentViewContext parent, DPElement element)
-	{
-		if ( element.getFragmentContext() != parent )
-		{
-			// We have recursed down the element tree far enough when we encounter an element with a different context
-			return (GSymFragmentViewContext)element.getFragmentContext();
-		}
-		else if ( element instanceof DPContainer )
-		{
-			DPContainer branch = (DPContainer)element;
-			for (DPElement child: branch.getChildren())
-			{
-				GSymFragmentViewContext sibling = getFirstChildFromParentElement( parent, child );
-				if ( sibling != null )
-				{
-					return sibling;
-				}
-			}
-		}
-		return null;
-	}
-	
-
-	
-	public GSymFragmentViewContext getPrevSibling()
-	{
-		return getPreviousSiblingFromChildElement( (GSymFragmentViewContext)getParent(), getViewNodeElement() );
-	}
-	
-	public GSymFragmentViewContext getNextSibling()
-	{
-		return getNextSiblingFromChildElement( this, getViewNodeElement() );
-	}
-	
-	
-	
-	public GSymFragmentViewContext getFirstChild()
-	{
-		return getFirstChildFromParentElement( (GSymFragmentViewContext)getParent(), getViewNodeElement() );
-	}
-	
-	public GSymFragmentViewContext getLastChild()
-	{
-		return getNextSiblingFromChildElement( this, getViewNodeElement() );
-	}
 	
 	
 	public void onPresentationStateChanged(Object x)
