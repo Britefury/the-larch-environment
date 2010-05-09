@@ -55,7 +55,7 @@ import BritefuryJ.GSym.GSymPerspective;
 import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.GenericPerspective.PresentationStateListenerList;
-import BritefuryJ.GSym.View.GSymFragmentViewContext;
+import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.GSym.View.GSymViewFragmentFunction;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
@@ -98,7 +98,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 
 		@Override
-		public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 		{
 			return originalElement.clonePresentationSubtree();
 		}
@@ -108,7 +108,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	private static class TreeExplorerViewFragmentFn implements GSymViewFragmentFunction
 	{
 		@Override
-		public DPElement createViewFragment(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable inheritedState)
+		public DPElement createViewFragment(Object x, GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable inheritedState)
 		{
 			DPElement element = (DPElement)x;
 			return element.exploreTreePresent( ctx, (GenericPerspectiveStyleSheet)styleSheet, inheritedState );
@@ -135,7 +135,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 
 		@Override
-		public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 		{
 			return ctx.presentFragmentWithPerspective( element, treeExplorerPerspective );
 		}
@@ -3051,12 +3051,12 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		return getDebugPresentationHeaderBorderStyle().border( box );
 	}
 	
-	public DPElement createMetaElement(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+	public DPElement createMetaElement(GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable state)
 	{
 		return createDebugPresentationHeader();
 	}
 	
-	private DPElement exploreTreePresent(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+	private DPElement exploreTreePresent(GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable state)
 	{
 		debugPresStateListeners = PresentationStateListenerList.addListener( debugPresStateListeners, ctx );
 		return createMetaElement( ctx, styleSheet, state );
@@ -3075,7 +3075,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 
 
-	public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		if ( getParent() == null )
 		{

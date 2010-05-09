@@ -10,14 +10,27 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
+import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.DPVBox;
+import BritefuryJ.DocPresent.PresentationComponent;
+import BritefuryJ.DocPresent.Browser.Page;
+import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
+import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.GSym.GSymAbstractPerspective;
+import BritefuryJ.GSym.GSymBrowserContext;
+import BritefuryJ.GSym.GSymSubject;
 import BritefuryJ.IncrementalTree.IncrementalTree;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 import BritefuryJ.IncrementalTree.IncrementalTreeNodeTable;
+import BritefuryJ.Logging.Log;
+import BritefuryJ.Utils.HashUtils;
 import BritefuryJ.Utils.Profile.ProfileTimer;
 
 public class GSymView extends IncrementalTree
@@ -35,8 +48,8 @@ public class GSymView extends IncrementalTree
 	public interface NodeElementChangeListener
 	{
 		public void reset(GSymView view);
-		public void elementChangeFrom(GSymViewFragment node, DPElement e);
-		public void elementChangeTo(GSymViewFragment node, DPElement e);
+		public void elementChangeFrom(GSymFragmentView node, DPElement e);
+		public void elementChangeTo(GSymFragmentView node, DPElement e);
 	}
 	
 	
@@ -82,40 +95,153 @@ public class GSymView extends IncrementalTree
 	}
 	
 	
-	private NodeElementChangeListener elementChangeListener;
-	private DPVBox rootBox;
+	
+	
+	protected static class ViewFragmentContextAndResultFactory implements IncrementalTreeNode.NodeResultFactory
+	{
+		protected GSymView view;
+		protected GSymAbstractPerspective perspective;
+		protected AttributeTable subjectContext;
+		protected StyleSheet styleSheet;
+		protected AttributeTable inheritedState;
+		
+		public ViewFragmentContextAndResultFactory(GSymView view, GSymAbstractPerspective perspective, AttributeTable subjectContext, StyleSheet styleSheet, AttributeTable inheritedState)
+		{
+			this.view = view;
+			this.perspective = perspective;
+			this.subjectContext = subjectContext;
+			this.styleSheet = styleSheet;
+			this.inheritedState = inheritedState;
+		}
+
+
+		public Object createNodeResult(IncrementalTreeNode incrementalNode, Object docNode)
+		{
+			view.profile_startPython();
+
+			// Create the node context
+			GSymFragmentView fragmentView = (GSymFragmentView)incrementalNode;
+			
+			// Create the view fragment
+			DPElement fragment = perspective.present( docNode, fragmentView, styleSheet, inheritedState );
+			
+			view.profile_stopPython();
+			
+			return fragment;
+		}
+	}
+	
+	
+	protected static class ViewFragmentContextAndResultFactoryKey
+	{
+		private GSymAbstractPerspective perspective;
+		private AttributeTable subjectContext;
+		private StyleSheet styleSheet;
+		private AttributeTable inheritedState;
+		
+		
+		public ViewFragmentContextAndResultFactoryKey(GSymAbstractPerspective perspective, AttributeTable subjectContext, StyleSheet styleSheet, AttributeTable inheritedState)
+		{
+			this.perspective = perspective;
+			this.styleSheet = styleSheet;
+			this.inheritedState = inheritedState;
+			this.subjectContext = subjectContext;
+		}
+		
+		
+		public int hashCode()
+		{
+			if ( styleSheet == null )
+			{
+				throw new RuntimeException( "null?styleSheet=" + ( styleSheet == null ) );
+			}
+			return HashUtils.nHash( new int[] { System.identityHashCode( perspective ), styleSheet.hashCode(), inheritedState.hashCode(), subjectContext.hashCode() } );
+		}
+		
+		public boolean equals(Object x)
+		{
+			if ( x == this )
+			{
+				return true;
+			}
+			
+			if ( x instanceof ViewFragmentContextAndResultFactoryKey )
+			{
+				ViewFragmentContextAndResultFactoryKey kx = (ViewFragmentContextAndResultFactoryKey)x;
+				return perspective == kx.perspective  &&  styleSheet.equals( kx.styleSheet )  &&  inheritedState == kx.inheritedState  &&  subjectContext == kx.subjectContext;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+
+
+	
+	
+	
+	
+	
+	private NodeElementChangeListener elementChangeListener = null;
+	private DPVBox rootBox = null;
 	
 	private StateStore stateStoreToLoad;
 	
 	
-	private boolean bProfilingEnabled;
-	private ProfileTimer pythonTimer, javaTimer, elementTimer, contentChangeTimer, updateNodeElementTimer;
+	private boolean bProfilingEnabled = false;
+	private ProfileTimer pythonTimer = new ProfileTimer();
+	private ProfileTimer javaTimer = new ProfileTimer();
+	private ProfileTimer elementTimer = new ProfileTimer();
+	private ProfileTimer contentChangeTimer = new ProfileTimer();
+	private ProfileTimer updateNodeElementTimer = new ProfileTimer();
+	
+	
+	
+	private GSymFragmentView.NodeResultFactory rootNodeResultFactory;
+	
+	
+	private DPVBox vbox;
+	private DPRegion region;
+	
+	private GSymBrowserContext browserContext;
+	private GSymViewPage page;
+	
+	private CommandHistory commandHistory;
+
+	private HashMap<ViewFragmentContextAndResultFactoryKey, ViewFragmentContextAndResultFactory> viewFragmentContextAndResultFactories =
+		new HashMap<ViewFragmentContextAndResultFactoryKey, ViewFragmentContextAndResultFactory>();
 	
 	
 	
 	
-	
-	
-	
-	
-	public GSymView(Object root, GSymViewFragment.NodeResultFactory rootElementFactory, PersistentStateStore persistentState)
+	public GSymView(GSymSubject subject, GSymBrowserContext browserContext, PersistentStateStore persistentState)
 	{
-		super( root, rootElementFactory, DuplicatePolicy.ALLOW_DUPLICATES );
-		elementChangeListener = null;
+		super( subject.getFocus(), DuplicatePolicy.ALLOW_DUPLICATES );
+		rootNodeResultFactory = makeNodeResultFactory( subject.getPerspective(), subject.getSubjectContext(), subject.getPerspective().getStyleSheet(), subject.getPerspective().getInitialInheritedState() );
 		
 		rootBox = null;
 		
-		bProfilingEnabled = false;
-		pythonTimer = new ProfileTimer();
-		javaTimer = new ProfileTimer();
-		elementTimer = new ProfileTimer();
-		contentChangeTimer = new ProfileTimer();
-		updateNodeElementTimer = new ProfileTimer();
-
 		if ( persistentState != null  &&  persistentState instanceof StateStore )
 		{
 			stateStoreToLoad = (StateStore)persistentState;
 		}
+	
+	
+		
+		this.browserContext = browserContext;
+		this.commandHistory = subject.getCommandHistory();
+		
+		region = new DPRegion();
+		vbox = PrimitiveStyleSheet.instance.vbox( new DPElement[] { region } );
+
+		page = new GSymViewPage( vbox.alignHExpand().alignVExpand(), subject.getTitle(), browserContext, commandHistory, this );
+		
+		setElementChangeListener( new NodeElementChangeListenerDiff() );
+		
+		// We need to do this last
+		region.setChild( getRootViewElement().alignHExpand().alignVExpand() );
+		region.setEditHandler( subject.getPerspective().getEditHandler() );
 	}
 	
 	
@@ -125,12 +251,40 @@ public class GSymView extends IncrementalTree
 	}
 	
 	
+	
+	
+	protected IncrementalTreeNode.NodeResultFactory getRootNodeResultFactory()
+	{
+		return rootNodeResultFactory;
+	}
+
+	protected GSymFragmentView.NodeResultFactory makeNodeResultFactory(GSymAbstractPerspective perspective, AttributeTable subjectContext, StyleSheet styleSheet, AttributeTable inheritedState)
+	{
+		// Memoise the contents factory, keyed by  @nodeViewFunction and @state
+		ViewFragmentContextAndResultFactoryKey key = new ViewFragmentContextAndResultFactoryKey( perspective, subjectContext, styleSheet, inheritedState );
+		
+		ViewFragmentContextAndResultFactory factory = viewFragmentContextAndResultFactories.get( key );
+		
+		if ( factory == null )
+		{
+			factory = new ViewFragmentContextAndResultFactory( this, perspective, subjectContext, styleSheet, inheritedState );
+			viewFragmentContextAndResultFactories.put( key, factory );
+			return factory;
+		}
+		
+		return factory;
+	}
+
+	
+	
+	
+	
 	public DPElement getRootViewElement()
 	{
 		if ( rootBox == null )
 		{
 			performRefresh();
-			GSymViewFragment rootView = (GSymViewFragment)getRootIncrementalTreeNode();
+			GSymFragmentView rootView = (GSymFragmentView)getRootIncrementalTreeNode();
 			rootView.getElement().alignHExpand();
 			rootView.getElement().alignVExpand();
 			rootBox = PrimitiveStyleSheet.instance.vbox( new DPElement[] { rootView.getElement() } );
@@ -152,7 +306,7 @@ public class GSymView extends IncrementalTree
 			IncrementalTreeNode node = nodeQueue.removeFirst();
 			
 			// Get the persistent state, if any, and store it
-			GSymViewFragment viewNode = (GSymViewFragment)node;
+			GSymFragmentView viewNode = (GSymFragmentView)node;
 			PersistentStateTable stateTable = viewNode.getPersistentStateTable();
 			if ( stateTable != null )
 			{
@@ -162,7 +316,7 @@ public class GSymView extends IncrementalTree
 			// Add the children using an interator; that means that they will be inserted at the beginning
 			// of the queue so that they appear *in order*, hence they will be removed in order.
 			ListIterator<IncrementalTreeNode> iterator = nodeQueue.listIterator();
-			for (IncrementalTreeNode child: ((GSymViewFragment)node).getChildren())
+			for (IncrementalTreeNode child: ((GSymFragmentView)node).getChildren())
 			{
 				iterator.add( child );
 			}
@@ -210,7 +364,7 @@ public class GSymView extends IncrementalTree
 		
 		if ( ENABLE_DISPLAY_TREESIZES )
 		{
-			GSymViewFragment rootView = (GSymViewFragment)getRootIncrementalTreeNode();
+			GSymFragmentView rootView = (GSymFragmentView)getRootIncrementalTreeNode();
 			int presTreeSize = rootView.getElement().computeSubtreeSize();
 			int numFragments = rootView.computeSubtreeSize();
 			System.out.println( "DocView.performRefresh(): presentation tree size=" + presTreeSize + ", # fragments=" + numFragments );
@@ -218,16 +372,20 @@ public class GSymView extends IncrementalTree
 		// <<< PROFILING
 	}
 	
-	
-	
-	protected IncrementalTreeNode createIncrementalTreeNode(Object node)
+
+	private PersistentStateTable persistentStateForNode(Object node)
 	{
 		PersistentStateTable persistentState = null;
 		if ( stateStoreToLoad != null )
 		{
 			persistentState = stateStoreToLoad.usePersistentState( node );
 		}
-		return new GSymViewFragment( this, node, persistentState );
+		return persistentState;
+	}
+	
+	protected IncrementalTreeNode createIncrementalTreeNode(Object node)
+	{
+		return new GSymFragmentView( node, this, persistentStateForNode( node ) );
 	}
 
 	
@@ -377,7 +535,7 @@ public class GSymView extends IncrementalTree
 		if ( elementChangeListener != null )
 		{
 			profile_startContentChange();
-			elementChangeListener.elementChangeFrom( (GSymViewFragment)node, (DPElement)result );
+			elementChangeListener.elementChangeFrom( (GSymFragmentView)node, (DPElement)result );
 			profile_stopContentChange();
 		}
 	}
@@ -387,8 +545,78 @@ public class GSymView extends IncrementalTree
 		if ( elementChangeListener != null )
 		{
 			profile_startContentChange();
-			elementChangeListener.elementChangeTo( (GSymViewFragment)node, (DPElement)result );
+			elementChangeListener.elementChangeTo( (GSymFragmentView)node, (DPElement)result );
 			profile_stopContentChange();
 		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	public Caret getCaret()
+	{
+		PresentationComponent.RootElement elementTree = region.getRootElement();
+		return elementTree != null  ?  elementTree.getCaret()  :  null;
+	}
+	
+	public Selection getSelection()
+	{
+		PresentationComponent.RootElement elementTree = region.getRootElement();
+		return elementTree != null  ?  elementTree.getSelection()  :  null;
+	}
+	
+	
+	
+	
+	public Object getDocRootNode()
+	{
+		return modelRootNode;
+	}
+	
+	
+	
+	public PresentationComponent.RootElement getElementTree()
+	{
+		return vbox.getRootElement();
+	}
+	
+	
+	
+	public GSymBrowserContext getBrowserContext()
+	{
+		return browserContext;
+	}
+	
+	public Page getPage()
+	{
+		return page;
+	}
+	
+	public Log getPageLog()
+	{
+		return page.getLog();
+	}
+	
+	public CommandHistory getCommandHistory()
+	{
+		return commandHistory;
+	}
+	
+	
+	
+	public void onRequestRefresh()
+	{
+		Runnable r = new Runnable()
+		{
+			public void run()
+			{
+				refresh();
+			}
+		};
+		region.queueImmediateEvent( r );
 	}
 }

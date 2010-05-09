@@ -23,7 +23,7 @@ import BritefuryJ.DocPresent.ListView.VerticalListViewLayoutStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
-import BritefuryJ.GSym.View.GSymFragmentViewContext;
+import BritefuryJ.GSym.View.GSymFragmentView;
 
 public class DocModelPresenter
 {
@@ -107,7 +107,7 @@ public class DocModelPresenter
 
 
 	
-	private static DPElement present(Object x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+	private static DPElement present(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
 		if ( x == null )
 		{
@@ -123,7 +123,7 @@ public class DocModelPresenter
 		}
 	}
 	
-	protected static DPElement presentDMList(DMList node, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+	protected static DPElement presentDMList(DMList node, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
 		List<DPElement> xViews = new ArrayList<DPElement>();
 		for (Object x: node)
@@ -151,7 +151,7 @@ public class DocModelPresenter
 	}
 	
 	
-	protected static DPElement presentDMObject(DMObject node, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+	protected static DPElement presentDMObject(DMObject node, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 	{
 		DMObjectClass cls = node.getDMObjectClass();
 		

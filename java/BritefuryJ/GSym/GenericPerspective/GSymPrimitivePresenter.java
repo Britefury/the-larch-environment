@@ -13,11 +13,11 @@ import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.GSym.View.GSymFragmentViewContext;
+import BritefuryJ.GSym.View.GSymFragmentView;
 
 public class GSymPrimitivePresenter
 {
-	public static DPElement presentChar(char c, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public static DPElement presentChar(char c, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		String str = Character.toString( c );
 		return PrimitiveStyleSheet.instance.hbox( new DPElement[] {
@@ -26,7 +26,7 @@ public class GSymPrimitivePresenter
 				punctuationStyle.staticText(  "'" ) } );
 	}
 	
-	public static DPElement presentString(String str, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public static DPElement presentString(String str, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		String lines[] = str.split( "\n" );
 		if ( lines.length == 1 )
@@ -60,28 +60,28 @@ public class GSymPrimitivePresenter
 		}
 	}
 
-	public static DPElement presentByte(byte b, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public static DPElement presentByte(byte b, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		return integerStyle.staticText( Integer.toHexString( (int)b ) );
 	}
 	
 	
-	public static DPElement presentShort(short x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public static DPElement presentShort(short x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		return integerStyle.staticText( Short.toString( x ) );
 	}
 	
-	public static DPElement presentInt(int x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public static DPElement presentInt(int x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		return integerStyle.staticText( Integer.toString( x ) );
 	}
 	
-	public static DPElement presentLong(long x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public static DPElement presentLong(long x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		return integerStyle.staticText( Long.toString( x ) );
 	}
 	
-	public static DPElement presentDouble(double x, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public static DPElement presentDouble(double x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		String asText = Double.toString( x );
 		
@@ -106,7 +106,7 @@ public class GSymPrimitivePresenter
 		return PrimitiveStyleSheet.instance.scriptRSuper( mantissa, exponent );
 	}
 	
-	public static DPElement presentBoolean(boolean b, GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public static DPElement presentBoolean(boolean b, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		if ( b )
 		{

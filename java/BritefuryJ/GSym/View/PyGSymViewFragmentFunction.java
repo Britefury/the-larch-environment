@@ -30,7 +30,7 @@ public class PyGSymViewFragmentFunction implements GSymViewFragmentFunction
 	}
 
 
-	public DPElement createViewFragment(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+	public DPElement createViewFragment(Object x, GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable state)
 	{
 		return Py.tojava( callable.__call__( Py.java2py( x ), Py.java2py( ctx ), Py.java2py( styleSheet ), Py.java2py( state ) ), DPElement.class );
 	}

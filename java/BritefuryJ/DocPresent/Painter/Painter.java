@@ -14,7 +14,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
-import BritefuryJ.GSym.View.GSymFragmentViewContext;
+import BritefuryJ.GSym.View.GSymFragmentView;
 
 public abstract class Painter implements Presentable
 {
@@ -24,7 +24,7 @@ public abstract class Painter implements Presentable
 
 
 	@Override
-	public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		PrimitiveStyleSheet p = PrimitiveStyleSheet.instance;
 		return styleSheet.objectBox( getClass().getName(), p.border( p.withShapePainter( this ).box( 50.0, 25.0 ) ) );

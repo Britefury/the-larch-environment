@@ -21,7 +21,7 @@ import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.GSym.View.GSymFragmentViewContext;
+import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Xform2;
@@ -1017,7 +1017,7 @@ public abstract class DPContainer extends DPElement
 	static FilledBorder metaIndentBorder = new FilledBorder( 25.0, 0.0, 0.0, 0.0 );
 	static VBoxStyleParams metaVBoxStyle = new VBoxStyleParams( null, null, null, 0.0 );
 	
-	public DPElement createMetaElement(GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable state)
+	public DPElement createMetaElement(GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable state)
 	{
 		DPVBox metaChildrenVBox = new DPVBox( metaVBoxStyle );
 		for (DPElement child: getChildren())

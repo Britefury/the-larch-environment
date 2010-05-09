@@ -30,16 +30,16 @@ public class GSymViewPage extends Page
 	private String title;
 	private Log log;
 	private CommandHistory commandHistory;
-	private GSymViewContext viewContext;
+	private GSymView view;
 	
 	
 	
-	public GSymViewPage(DPElement element, String title, final GSymBrowserContext browserContext, CommandHistory commandHistory, GSymViewContext viewContext)
+	public GSymViewPage(DPElement element, String title, final GSymBrowserContext browserContext, CommandHistory commandHistory, GSymView view)
 	{
 		this.element = element;
 		this.title = title;
 		this.commandHistory = commandHistory;
-		this.viewContext = viewContext;
+		this.view = view;
 		log = new Log( "Page log" );
 		
 		Hyperlink.LinkListener listener = new Hyperlink.LinkListener()
@@ -93,6 +93,6 @@ public class GSymViewPage extends Page
 
 	public PersistentStateStore storePersistentState()
 	{
-		return viewContext.storePersistentState();
+		return view.storePersistentState();
 	}
 }

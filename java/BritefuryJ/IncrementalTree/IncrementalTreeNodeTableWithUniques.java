@@ -38,7 +38,7 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 		{
 			if ( refedNode == null  &&  unrefedNode != null )
 			{
-				if ( unrefedNode.getNodeResultFactory() == resultFactory )
+				if ( unrefedNode.getFragmentElementFactory() == resultFactory )
 				{
 					return unrefedNode;
 				}

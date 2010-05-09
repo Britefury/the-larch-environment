@@ -29,7 +29,7 @@ import BritefuryJ.CommandHistory.Trackable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
-import BritefuryJ.GSym.View.GSymFragmentViewContext;
+import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.Incremental.IncrementalValueMonitor;
 import BritefuryJ.JythonInterface.JythonIndex;
@@ -1170,7 +1170,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 
 
 	
-	public DPElement present(GSymFragmentViewContext ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		return DocModelPresenter.presentDMList( this, ctx, styleSheet, inheritedState );
 	}

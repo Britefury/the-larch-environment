@@ -31,7 +31,7 @@ from BritefuryJ.DocPresent.Browser import Location
 from BritefuryJ.DocPresent.Input import ObjectDndHandler
 
 from BritefuryJ.GSym import GSymPerspective, GSymSubject
-from BritefuryJ.GSym.View import GSymFragmentViewContext, PyGSymViewFragmentFunction
+from BritefuryJ.GSym.View import GSymFragmentView, PyGSymViewFragmentFunction
 
 from GSymCore.Languages.Python25 import Python25
 
@@ -102,7 +102,7 @@ class TerminalView (GSymViewObjectDispatch):
 			
 		
 		
-		dropDest = ObjectDndHandler.DropDest( GSymFragmentViewContext.FragmentDocNode, _onDrop )
+		dropDest = ObjectDndHandler.DropDest( GSymFragmentView.FragmentDocNode, _onDrop )
 		terminalView, dropPromptInsertionPoint = styleSheet.terminal( blockViews, currentModuleView, CurrentModuleInteractor( node ), dropDest )
 		return terminalView
 

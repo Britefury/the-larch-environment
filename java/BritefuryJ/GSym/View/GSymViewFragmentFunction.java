@@ -12,5 +12,5 @@ import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public interface GSymViewFragmentFunction
 {
-	public DPElement createViewFragment(Object x, GSymFragmentViewContext ctx, StyleSheet styleSheet, AttributeTable inheritedState);
+	public DPElement createViewFragment(Object x, GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable inheritedState);
 }

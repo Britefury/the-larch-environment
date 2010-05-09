@@ -7,7 +7,7 @@
 package BritefuryJ.IncrementalTree;
 
 
-public class IncrementalTree
+public abstract class IncrementalTree
 {
 	public enum DuplicatePolicy
 	{
@@ -23,8 +23,7 @@ public class IncrementalTree
 	}
 	
 	
-	private Object root;
-	private IncrementalTreeNode.NodeResultFactory rootElementFactory;
+	protected Object modelRootNode;
 	protected IncrementalTreeNodeTable nodeTable;
 	private IncrementalTreeNode rootIncrementalTreeNode;
 	private boolean bRefreshRequired;
@@ -38,10 +37,9 @@ public class IncrementalTree
 	
 	
 	
-	public IncrementalTree(Object root, IncrementalTreeNode.NodeResultFactory rootElementFactory, DuplicatePolicy duplicatePolicy)
+	public IncrementalTree(Object root, DuplicatePolicy duplicatePolicy)
 	{
-		this.root = root;
-		this.rootElementFactory = rootElementFactory;
+		this.modelRootNode = root;
 		
 		if ( duplicatePolicy == DuplicatePolicy.ALLOW_DUPLICATES )
 		{
@@ -66,6 +64,9 @@ public class IncrementalTree
 	}
 	
 	
+	protected abstract IncrementalTreeNode.NodeResultFactory getRootNodeResultFactory();
+	
+	
 	protected IncrementalTreeNode getRootIncrementalTreeNode()
 	{
 		if ( rootIncrementalTreeNode != null )
@@ -74,7 +75,7 @@ public class IncrementalTree
 		}
 		if ( rootIncrementalTreeNode == null )
 		{
-			rootIncrementalTreeNode = buildIncrementalTreeNodeResult( root, rootElementFactory );
+			rootIncrementalTreeNode = buildIncrementalTreeNodeResult( modelRootNode, getRootNodeResultFactory() );
 		}
 		if ( rootIncrementalTreeNode != null )
 		{
@@ -139,6 +140,7 @@ public class IncrementalTree
 			if ( !bRefreshRequired )
 			{
 				bRefreshRequired = true;
+				onRequestRefresh();
 				
 				if ( refreshListener != null )
 				{
@@ -165,6 +167,11 @@ public class IncrementalTree
 	}
 	
 	protected void onResultChangeTo(IncrementalTreeNode node, Object result)
+	{
+	}
+	
+	
+	protected void onRequestRefresh()
 	{
 	}
 }

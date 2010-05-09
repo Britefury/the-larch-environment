@@ -16,9 +16,22 @@ import BritefuryJ.IncrementalTree.IncrementalTree;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 import BritefuryJ.IncrementalTree.IncrementalTreeNodeTable;
 import BritefuryJ.IncrementalTree.IncrementalTree.DuplicatePolicy;
+import BritefuryJ.IncrementalTree.IncrementalTreeNode.NodeResultFactory;
 
 public abstract class Test_IncrementalTreeNodeTable extends TestCase
 {
+	protected static class TestIncrementalTree extends IncrementalTree
+	{
+		public TestIncrementalTree(Object root, DuplicatePolicy duplicatePolicy)
+		{
+			super( root, duplicatePolicy );
+		}
+
+		protected NodeResultFactory getRootNodeResultFactory()
+		{
+			return null;
+		}
+	}
 	protected DMList da, db, dc, dd;
 	protected IncrementalTreeNodeTable table;
 	protected IncrementalTreeNode ia, ib, ic, id1, id2;
@@ -49,7 +62,7 @@ public abstract class Test_IncrementalTreeNodeTable extends TestCase
 		da = new DMList( Arrays.asList( new Object[] { db, dc } ) );
 		
 		
-		tree = new IncrementalTree( da, null, DuplicatePolicy.ALLOW_DUPLICATES );
+		tree = new TestIncrementalTree( da, DuplicatePolicy.ALLOW_DUPLICATES );
 		
 		ia = new IncrementalTreeNode( tree, da );
 		ib = new IncrementalTreeNode( tree, db );
