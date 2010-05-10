@@ -16,6 +16,8 @@ from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.Painter import *
 from BritefuryJ.DocPresent.Browser import Location
 
+from Britefury.AttributeTableUtils.DerivedAttributeMethod import DerivedAttributeMethod
+
 from GSymCore.Utils.LinkHeader import LinkHeaderStyleSheet
 from GSymCore.Utils.Title import TitleBarStyleSheet
 from GSymCore.Utils.TabbedBox import TabbedBoxStyleSheet
@@ -74,15 +76,15 @@ class ProjectEditorStyleSheet (StyleSheet):
 	
 	
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def projectControlsStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['projectControlsAttrs'] )
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def packageNameStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['packageNameAttrs'] )
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def itemHoverHighlightStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['itemHoverHighlightAttrs'] )
 	

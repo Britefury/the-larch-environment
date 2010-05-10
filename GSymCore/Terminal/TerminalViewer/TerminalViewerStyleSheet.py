@@ -16,6 +16,8 @@ from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.Painter import *
 from BritefuryJ.DocPresent.Browser import Location
 
+from Britefury.AttributeTableUtils.DerivedAttributeMethod import DerivedAttributeMethod
+
 from GSymCore.Languages.Python25.PythonEditor.PythonEditorStyleSheet import PythonEditorStyleSheet
 
 
@@ -94,50 +96,50 @@ class TerminalViewerStyleSheet (StyleSheet):
 	
 	
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def staticPythonStyle(self):
 		return self['pythonStyle'].withPrimitiveStyle( self['pythonStyle']['primitiveStyle'].withNonEditable() )
 	
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def labelStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['labelAttrs'] )
 
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def blockStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['blockStyleAttrs'] )
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def pythonModuleBorderStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['pythonModuleBorderAttrs'] )
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def stdOutStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['stdOutAttrs'] )
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def stdErrStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['stdErrAttrs'] )
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def exceptionBorderStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['exceptionBorderAttrs'] )
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def resultBorderStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['resultBorderAttrs'] )
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def dropPromptStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['dropPromptAttrs'] )
 	
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def terminalBlockListStyle(self):
 		return self['primitiveStyle'].withVBoxSpacing( self['terminalBlockListSpacing'] )
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def terminalStyle(self):
 		return self['primitiveStyle'].withVBoxSpacing( self['terminalSpacing'] )
 	

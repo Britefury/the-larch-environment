@@ -11,6 +11,8 @@ from BritefuryJ.AttributeTable import *
 from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.StyleSheet import *
 
+from Britefury.AttributeTableUtils.DerivedAttributeMethod import DerivedAttributeMethod
+
 
 class TabbedBoxStyleSheet (StyleSheet):
 	class _Params (object):
@@ -18,7 +20,7 @@ class TabbedBoxStyleSheet (StyleSheet):
 			self.headerStyle = headerStyle
 			self.bodyStyle = bodyStyle
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def _params(self):
 		hpad = self['headerPadding']
 		bpad = self['bodyPadding']

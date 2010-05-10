@@ -120,7 +120,6 @@ public class AttributeTable implements Presentable
 	protected HashMap<AttributeValueSingle, WeakReference<AttributeTable>> singleValueDerivedAttributeTables = new HashMap<AttributeValueSingle, WeakReference<AttributeTable>>();
 	protected HashMap<AttributeValuesMultiple, WeakReference<AttributeTable>> multiValueDerivedAttributeTables = new HashMap<AttributeValuesMultiple, WeakReference<AttributeTable>>();
 	protected IdentityHashMap<AttributeValues, WeakReference<AttributeTable>> attribSetDerivedAttributeTables = new IdentityHashMap<AttributeValues, WeakReference<AttributeTable>>();
-	protected IdentityHashMap<AttributeTableDerivedPyAttrFn, PyObject> derivedAttributes = new IdentityHashMap<AttributeTableDerivedPyAttrFn, PyObject>();
 	
 	
 	public static AttributeTable instance = new AttributeTable();

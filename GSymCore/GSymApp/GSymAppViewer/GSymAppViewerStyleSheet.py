@@ -16,6 +16,8 @@ from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.Painter import *
 from BritefuryJ.DocPresent.Browser import Location
 
+from Britefury.AttributeTableUtils.DerivedAttributeMethod import DerivedAttributeMethod
+
 from GSymCore.Utils.LinkHeader import LinkHeaderStyleSheet
 from GSymCore.Utils.Title import TitleBarStyleSheet
 from GSymCore.Utils.TabbedBox import TabbedBoxStyleSheet
@@ -75,11 +77,11 @@ class GSymAppViewerStyleSheet (StyleSheet):
 	
 	
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def appDocumentControlsStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['appDocumentControlsAttrs'] )
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def documentListTableStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['dcumentListTableAttrs'] )
 	
