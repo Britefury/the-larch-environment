@@ -90,7 +90,7 @@ public class IncrementalTreeNode implements IncrementalMonitorListener, Incremen
 	private IncrementalTreeNode parent, nextSibling;
 	private IncrementalTreeNode childrenHead, childrenTail;
 	
-	private boolean bRefreshRequired;
+	private boolean bSubtreeRefreshRequired = true, bNodeRefreshRequired = true;
 	
 	
 	
@@ -103,9 +103,6 @@ public class IncrementalTreeNode implements IncrementalMonitorListener, Incremen
 		parent = null;
 		nextSibling = null;
 		childrenHead = childrenTail = null;
-		
-		
-		bRefreshRequired = true;
 		
 		
 		resultFactory = null;
@@ -203,19 +200,22 @@ public class IncrementalTreeNode implements IncrementalMonitorListener, Incremen
 	//
 	//
 	
-	private void refreshNode()
+	private void refreshSubtree()
 	{
 		incrementalTree.onResultChangeFrom( this, result );
 
-		// Compute the result for this node, and refresh all children
-		Object refreshState = incr.onRefreshBegin();
 		Object r = result;
-		if ( refreshState != null )
+		if ( bNodeRefreshRequired )
 		{
-			r = computeNodeResult();
+			// Compute the result for this node, and refresh all children
+			Object refreshState = incr.onRefreshBegin();
+			if ( refreshState != null )
+			{
+				r = computeNodeResult();
+			}
+			incr.onRefreshEnd( refreshState );
+			incr.onAccess();
 		}
-		incr.onRefreshEnd( refreshState );
-		incr.onAccess();
 		
 		// Refresh each child
 		IncrementalTreeNode child = childrenHead;
@@ -225,20 +225,24 @@ public class IncrementalTreeNode implements IncrementalMonitorListener, Incremen
 			child = child.nextSibling;
 		}
 		
-		// Set the node result
-		updateNodeResult( r );
+		if ( bNodeRefreshRequired )
+		{
+			// Set the node result
+			updateNodeResult( r );
+		}
 		
 		
 		incrementalTree.onResultChangeTo( this, result );
+		bNodeRefreshRequired = false;
 	}
 	
 	
 	public void refresh()
 	{
-		if ( bRefreshRequired )
+		if ( bSubtreeRefreshRequired )
 		{
-			refreshNode();
-			bRefreshRequired = false;
+			refreshSubtree();
+			bSubtreeRefreshRequired = false;
 		}
 	}
 	
@@ -341,8 +345,11 @@ public class IncrementalTreeNode implements IncrementalMonitorListener, Incremen
 	
 	public void onIncrementalMonitorChanged(IncrementalMonitor inc)
 	{
-		//assert cell == resultCell;
-		requestRefresh();
+		if ( !bNodeRefreshRequired )
+		{
+			bNodeRefreshRequired = true;
+			requestSubtreeRefresh();
+		}
 	}
 
 	
@@ -353,27 +360,14 @@ public class IncrementalTreeNode implements IncrementalMonitorListener, Incremen
 	//
 	//
 	
-	protected void onChildRefreshRequired()
+	protected void requestSubtreeRefresh()
 	{
-		requestRefresh();
-	}
-	
-	
-	
-	//
-	//
-	// Refresh request
-	//
-	//
-	
-	private void requestRefresh()
-	{
-		if ( !bRefreshRequired )
+		if ( !bSubtreeRefreshRequired )
 		{
-			bRefreshRequired = true;
+			bSubtreeRefreshRequired = true;
 			if ( parent != null )
 			{
-				parent.onChildRefreshRequired();
+				parent.requestSubtreeRefresh();
 			}
 			
 			incrementalTree.onNodeRequestRefresh( this );
