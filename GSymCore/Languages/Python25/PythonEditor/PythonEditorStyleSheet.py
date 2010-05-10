@@ -15,6 +15,8 @@ from BritefuryJ.DocPresent.StyleSheet import *
 from BritefuryJ.DocPresent.ListView import *
 from BritefuryJ.DocPresent.Border import *
 
+from Britefury.AttributeTableUtils.DerivedAttributeMethod import DerivedAttributeMethod
+
 from GSymCore.Languages.Utils.PrecedenceStyleSheet import PrecedenceStyleSheetText
 
 
@@ -185,67 +187,67 @@ class PythonEditorStyleSheet (StyleSheet):
 		
 	
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def _keywordStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['keywordAttrs'] )
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def _literalFormatStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['literalFormatAttrs'] )
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def _quotationStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['quotationAttrs'] )
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def _stringLiteralStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['stringLiteralAttrs'] )
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def _numLiteralStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['numLiteralAttrs'] )
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def _punctuationStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['punctuationAttrs'] )
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def _delimStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['delimAttrs'] )
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def _targetStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['targetAttrs'] )
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def _varStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['varAttrs'] )
 
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def _attributeStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['attributeAttrs'] )
 
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def _kwNameStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['kwNameAttrs'] )
 
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def _operatorStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['operatorAttrs'] )
 
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def _paramStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['paramAttrs'] )
 
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def _importStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['importAttrs'] )
 
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def _commentStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['commentAttrs'] )
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def _unparseableStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['unparseableAttrs'] )
 
@@ -264,33 +266,33 @@ class PythonEditorStyleSheet (StyleSheet):
 		return SolidBorder( thickness, inset, rounding, rounding, colour, None )
 	
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def _defStmtHeaderHighlightStyle(self):
 		border = self._solidHighlightBorder( self['defStmtHighlightColour'] )
 		return self['primitiveStyle'].withAttrs( border=border )
 
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def _defStmtHighlightStyle(self):
 		border = self._outlineHighlightBorder( self['defStmtHighlightColour'] )
 		return self['primitiveStyle'].withAttrs( border=border )
 
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def _classStmtHeaderHighlightStyle(self):
 		border = self._solidHighlightBorder( self['classStmtHighlightColour'] )
 		return self['primitiveStyle'].withAttrs( border=border )
 
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def _classStmtHighlightStyle(self):
 		border = self._outlineHighlightBorder( self['classStmtHighlightColour'] )
 		return self['primitiveStyle'].withAttrs( border=border )
 
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def _badIndentationHighlightStyle(self):
 		border = self._outlineHighlightBorder( self['badIndentationHighlightColour'] )
 		return self['primitiveStyle'].withAttrs( border=border )
 
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def _tupleListViewLayout(self):
 		primitiveStyle = self['primitiveStyle']
 		punctuationStyle = self._punctuationStyle()
@@ -305,7 +307,7 @@ class PythonEditorStyleSheet (StyleSheet):
 		return tupleListViewStyle
 		
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def _listListViewLayout(self):
 		primitiveStyle = self['primitiveStyle']
 		punctuationStyle = self._punctuationStyle()
@@ -320,7 +322,7 @@ class PythonEditorStyleSheet (StyleSheet):
 		return listListViewStyle
 		
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def _dictListViewLayout(self):
 		primitiveStyle = self['primitiveStyle']
 		punctuationStyle = self._punctuationStyle()
@@ -335,7 +337,7 @@ class PythonEditorStyleSheet (StyleSheet):
 		return dictListViewStyle
 
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def _noParenTupleListViewLayout(self):
 		primitiveStyle = self['primitiveStyle']
 		punctuationStyle = self._punctuationStyle()

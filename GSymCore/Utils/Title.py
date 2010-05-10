@@ -11,6 +11,8 @@ from BritefuryJ.AttributeTable import *
 from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.StyleSheet import *
 
+from Britefury.AttributeTableUtils.DerivedAttributeMethod import DerivedAttributeMethod
+
 
 
 
@@ -21,7 +23,7 @@ class TitleBarStyleSheet (StyleSheet):
 			self.headerStyle = headerStyle
 			self.titleBorderWidth = titleBorderWidth
 	
-	@AttributeTableDerivedPyAttrFn
+	@DerivedAttributeMethod
 	def _params(self):
 		primitiveStyle = self['primitiveStyle']
 		tpad = self['titlePadding']
