@@ -8,6 +8,7 @@
 package BritefuryJ.Cell;
 
 
+import org.python.core.Py;
 import org.python.core.PyObject;
 
 
@@ -26,6 +27,6 @@ public class CellEvaluatorPythonFunction extends CellEvaluator
 
 	public Object evaluate()
 	{
-		return func.__call__();
+		return Py.tojava( func.__call__(), Object.class );
 	}
 }

@@ -25,9 +25,19 @@ public class Cell extends CellInterface
 	
 	public Cell()
 	{
+		this( new CellEvaluatorLiteral( null ) );
+	}
+	
+	public Cell(CellEvaluator evaluator)
+	{
 		inc = new IncrementalFunctionMonitor();
-		evaluator = new CellEvaluatorLiteral( null );
+		this.evaluator = evaluator;
 		valueCache = null;
+	}
+	
+	public Cell(PyObject function)
+	{
+		this( new CellEvaluatorPythonFunction( function ) );
 	}
 	
 	
@@ -115,5 +125,17 @@ public class Cell extends CellInterface
 	public void removeListener(IncrementalMonitorListener listener)
 	{
 		inc.removeListener( listener );
+	}
+	
+	
+	
+	public static Cell functionCell(PyObject function)
+	{
+		return new Cell( function );
+	}
+	
+	public static Cell valueCell(Object value)
+	{
+		return new Cell( new CellEvaluatorLiteral( value ) );
 	}
 }

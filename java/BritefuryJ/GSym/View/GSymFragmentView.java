@@ -366,7 +366,7 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 		return presentFragmentWithPerspective( x, genericPerspective );
 	}
 	
-	public DPElement presentFragmentWithGenerixcPerspective(Object x, AttributeTable inheritedState)
+	public DPElement presentFragmentWithGenericPerspective(Object x, AttributeTable inheritedState)
 	{
 		GSymAbstractPerspective genericPerspective = getBrowserContext().getGenericPerspective();
 		return presentFragmentWithPerspective( x, genericPerspective, inheritedState );
