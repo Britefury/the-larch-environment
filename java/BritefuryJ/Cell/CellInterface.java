@@ -8,12 +8,19 @@
 package BritefuryJ.Cell;
 
 
+import java.awt.Color;
+
+import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.GSym.GenericPerspective.Presentable;
+import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
 
 
 
-public abstract class CellInterface implements IncrementalOwner
+public abstract class CellInterface implements IncrementalOwner, Presentable
 {
 	public abstract void addListener(IncrementalMonitorListener listener);
 	public abstract void removeListener(IncrementalMonitorListener listener);
@@ -25,4 +32,17 @@ public abstract class CellInterface implements IncrementalOwner
 	public abstract boolean isLiteral();
 	
 	public abstract Object getValue();
+	
+	
+	
+	@Override
+	public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	{
+		DPElement valueView = ctx.presentFragment( getValue(), styleSheet, inheritedState );
+		
+		return cellStyle.objectBox( getClass().getName(), valueView );
+	}
+	
+	
+	private static GenericPerspectiveStyleSheet cellStyle = GenericPerspectiveStyleSheet.instance.withObjectBorderPaint( new Color( 0.5f, 0.0f, 0.5f ) ).withObjectTitlePaint( new Color( 0.5f, 0.0f, 0.5f ) );
 }
