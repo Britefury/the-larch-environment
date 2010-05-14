@@ -152,10 +152,7 @@ public abstract class IncrementalTree
 	
 	
 	
-	protected IncrementalTreeNode createIncrementalTreeNode(Object node)
-	{
-		return new IncrementalTreeNode( this, node );
-	}
+	protected abstract IncrementalTreeNode createIncrementalTreeNode(Object node);
 	
 	
 	protected void onResultChangeTreeRefresh()

@@ -285,9 +285,9 @@ public class GSymView extends IncrementalTree
 		{
 			performRefresh();
 			GSymFragmentView rootView = (GSymFragmentView)getRootIncrementalTreeNode();
-			rootView.getElement().alignHExpand();
-			rootView.getElement().alignVExpand();
-			rootBox = PrimitiveStyleSheet.instance.vbox( new DPElement[] { rootView.getElement() } );
+			rootView.getRefreshedFragmentElement().alignHExpand();
+			rootView.getRefreshedFragmentElement().alignVExpand();
+			rootBox = PrimitiveStyleSheet.instance.vbox( new DPElement[] { rootView.getRefreshedFragmentElement() } );
 		}
 		return rootBox;
 	}
@@ -365,7 +365,7 @@ public class GSymView extends IncrementalTree
 		if ( ENABLE_DISPLAY_TREESIZES )
 		{
 			GSymFragmentView rootView = (GSymFragmentView)getRootIncrementalTreeNode();
-			int presTreeSize = rootView.getElement().computeSubtreeSize();
+			int presTreeSize = rootView.getRefreshedFragmentElement().computeSubtreeSize();
 			int numFragments = rootView.computeSubtreeSize();
 			System.out.println( "DocView.performRefresh(): presentation tree size=" + presTreeSize + ", # fragments=" + numFragments );
 		}

@@ -13,7 +13,7 @@ import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
 
-public class IncrementalTreeNode implements IncrementalMonitorListener, IncrementalOwner
+public abstract class IncrementalTreeNode implements IncrementalMonitorListener, IncrementalOwner
 {
 	public static class CannotChangeDocNodeException extends Exception
 	{
@@ -85,7 +85,6 @@ public class IncrementalTreeNode implements IncrementalMonitorListener, Incremen
 	
 	private IncrementalFunctionMonitor incr;
 	protected NodeResultFactory resultFactory;
-	private Object result;
 	
 	private IncrementalTreeNode parent, nextSibling;
 	private IncrementalTreeNode childrenHead, childrenTail;
@@ -125,7 +124,7 @@ public class IncrementalTreeNode implements IncrementalMonitorListener, Incremen
 		}
 	}
 	
-	protected NodeResultFactory getFragmentElementFactory()
+	protected NodeResultFactory getNodeResultFactory()
 	{
 		return resultFactory;
 	}
@@ -138,16 +137,7 @@ public class IncrementalTreeNode implements IncrementalMonitorListener, Incremen
 	//
 	//
 	
-	protected Object getResultNoRefresh()
-	{
-		return result;
-	}
-	
-	protected Object getResult()
-	{
-		refresh();
-		return result;
-	}
+	protected abstract Object getResultNoRefresh();
 	
 	
 	
@@ -202,6 +192,7 @@ public class IncrementalTreeNode implements IncrementalMonitorListener, Incremen
 	
 	private void refreshSubtree()
 	{
+		Object result = getResultNoRefresh();
 		incrementalTree.onResultChangeFrom( this, result );
 
 		Object r = result;
@@ -299,10 +290,7 @@ public class IncrementalTreeNode implements IncrementalMonitorListener, Incremen
 	}
 
 	
-	protected void updateNodeResult(Object r)
-	{
-		result = r;
-	}
+	protected abstract void updateNodeResult(Object r);
 	
 	
 	

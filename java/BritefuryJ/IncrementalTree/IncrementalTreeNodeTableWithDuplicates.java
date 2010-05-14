@@ -46,7 +46,7 @@ public class IncrementalTreeNodeTableWithDuplicates extends IncrementalTreeNodeT
 		{
 			if ( unrefedNodes != null )
 			{
-				unrefedNodes.remove( node.getFragmentElementFactory() );
+				unrefedNodes.remove( node );
 				if ( unrefedNodes.size() == 0 )
 				{
 					unrefedNodes = null;
@@ -60,7 +60,7 @@ public class IncrementalTreeNodeTableWithDuplicates extends IncrementalTreeNodeT
 			{
 				for (IncrementalTreeNode node: unrefedNodes)
 				{
-					if ( node.getFragmentElementFactory() == nodeResultFactory )
+					if ( node.getNodeResultFactory() == nodeResultFactory )
 					{
 						return node;
 					}
