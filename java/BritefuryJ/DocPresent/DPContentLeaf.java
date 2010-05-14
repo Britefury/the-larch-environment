@@ -281,13 +281,13 @@ public abstract class DPContentLeaf extends DPElement
 	}
 
 	
-	public boolean clearText()
+	protected boolean deleteText()
 	{
 		int length = textRepresentation.length();
 		if ( length > 0 )
 		{
 			textRepresentation = "";
-			notifyTextRemoved( 9, length );
+			notifyTextRemoved( 0, length );
 			textRepresentationChanged( new LinearRepresentationEventTextRemove( this, 0, length ) );
 			return true;
 		}

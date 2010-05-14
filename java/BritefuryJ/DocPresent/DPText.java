@@ -305,13 +305,20 @@ public class DPText extends DPContentLeafEditable
 		super.replaceText( marker, length, x );
 	}
 	
-	public boolean clearText()
+	protected boolean deleteText()
 	{
-		boolean bResult = super.clearText();
-		
-		setText( "" );
-		
-		return bResult;
+		if ( isEditable() )
+		{
+			boolean bResult = super.deleteText();
+			
+			setText( "" );
+			
+			return bResult;
+		}
+		else
+		{
+			return false;
+		}
 	}
 	
 	

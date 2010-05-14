@@ -188,7 +188,7 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 				if sourceCtx is ctx:
 					log = ctx.getView().getPageLog()
 					if log.isRecording():
-						log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'tatement - unparsed, node replaced' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
+						log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - unparsed, node replaced' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
 					pyReplaceNode( ctx, node, parsed )
 					return True
 				else:
@@ -292,14 +292,18 @@ class SuiteLinearRepresentationListener (ElementLinearRepresentationListener):
 		value = element.getLinearRepresentation()
 		parsed = parseStream( self._parser, value )
 		if parsed is not None:
-			return self.handleParsed( value, parsed )
+			log = ctx.getView().getPageLog()
+			if log.isRecording():
+				log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Suite - parse SUCCESS' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
+			# Alter the value of the existing suite so that it becomes the same as the parsed result, but minimise the number of changes required to do so
+			modifySuiteMinimisingChanges( self._suite, parsed )
+			return True
 		else:
+			log = ctx.getView().getPageLog()
+			if log.isRecording():
+				log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Suite - parse FAIL - passing to parent' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ) )
 			return element.sendLinearRepresentationModifiedEventToParent( event )
 
-
-	def handleParsed(self, value, parsed):
-		performSuiteEdits( self._suite, parsed )
-		return True
 			
 			
 			
