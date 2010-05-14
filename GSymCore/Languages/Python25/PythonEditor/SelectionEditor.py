@@ -215,8 +215,8 @@ class Python25EditHandler (EditHandler):
 		startStmtElement.setStructuralPrefixObject( Schema.Indent() )
 		endStmtElement.setStructuralSuffixObject( Schema.Dedent() )
 		
-		startContext.getFragmentElement().clearStructuralRepresentationUpTo( rootElement )
-		endContext.getFragmentElement().clearStructuralRepresentationUpTo( rootElement )
+		startContext.getFragmentElement().clearStructuralRepresentationsOnPathUpTo( rootElement )
+		endContext.getFragmentElement().clearStructuralRepresentationsOnPathUpTo( rootElement )
 		
 		bSuccess = root.getFragmentContentElement().sendLinearRepresentationModifiedEvent( IndentSelectionLinearRepresentationEvent( rootElement ) )
 		if not bSuccess:
@@ -247,8 +247,8 @@ class Python25EditHandler (EditHandler):
 		startStmtElement.setStructuralPrefixObject( Schema.Dedent() )
 		endStmtElement.setStructuralSuffixObject( Schema.Indent() )
 		
-		startContext.getFragmentElement().clearStructuralRepresentationUpTo( rootElement )
-		endContext.getFragmentElement().clearStructuralRepresentationUpTo( rootElement )
+		startContext.getFragmentElement().clearStructuralRepresentationsOnPathUpTo( rootElement )
+		endContext.getFragmentElement().clearStructuralRepresentationsOnPathUpTo( rootElement )
 		
 		bSuccess = rootElement.sendLinearRepresentationModifiedEvent( DedentSelectionLinearRepresentationEvent( rootElement ) )
 		if not bSuccess:
@@ -290,7 +290,8 @@ class Python25EditHandler (EditHandler):
 					path0, path1 = getStatementContextPathsFromCommonRoot( startContext, endContext )
 					root = path0[0]
 					
-					rootElement = root.getFragmentElement()
+					# Get the content element, not the fragment itself, otherwise editing operations that involve the module (top level) will trigger events that will NOT be caught
+					rootElement = root.getFragmentContentElement()
 				
 					before = rootElement.getLinearRepresentationFromStartToMarker( startMarker )
 					after = rootElement.getLinearRepresentationFromMarkerToEnd( endMarker )
@@ -314,7 +315,8 @@ class Python25EditHandler (EditHandler):
 					path0, path1 = getStatementContextPathsFromCommonRoot( startContext, endContext )
 					root = path0[0]
 					
-					rootElement = root.getFragmentElement()
+					# Get the content element, not the fragment itself, otherwise editing operations that involve the module (top level) will trigger events that will NOT be caught
+					rootElement = root.getFragmentContentElement()
 				
 					before = rootElement.getLinearRepresentationFromStartToMarker( startMarker )
 					after = rootElement.getLinearRepresentationFromMarkerToEnd( endMarker )

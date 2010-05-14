@@ -7,15 +7,11 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import java.awt.Color;
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.LayoutTree.ContentLeafLayoutNodeInterface;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleParams.ContentLeafStyleParams;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
@@ -301,6 +297,19 @@ public abstract class DPContentLeaf extends DPElement
 	protected void notifyTextRemoved(int index, int length)
 	{
 	}
+	
+
+
+	
+	
+	//
+	// EDITABILITY METHODS
+	//
+
+	public boolean isEditable()
+	{
+		return false;
+	}
 
 	
 	
@@ -309,38 +318,10 @@ public abstract class DPContentLeaf extends DPElement
 	// Meta element methods
 	//
 	
-	protected static PrimitiveStyleSheet metaHeaderHighlightBorderStyle = PrimitiveStyleSheet.instance.withBorder(
-			new SolidBorder( 1.0, 1.0, 5.0, 5.0, new Color( 0.75f, 0.0f, 0.0f ), new Color( 1.0f, 0.9f, 0.8f ) ) );
-
-	public DPElement createDebugPresentationHeaderData()
+	protected void createDebugPresentationHeaderContents(ArrayList<DPElement> elements)
 	{
-		return GenericPerspectiveStyleSheet.instance.unescapedStringAsHBox( textRepresentation );
-	}
-	
-	protected PrimitiveStyleSheet getDebugPresentationHeaderBorderStyle()
-	{
-		Caret caret = rootElement != null  ?  rootElement.getCaret()  :  null;
-		if ( caret != null )
-		{
-			DPContentLeaf e = caret.getElement();
-			if ( e == this )
-			{
-				return metaHeaderHighlightBorderStyle;
-			}
-		}
-		return metaHeaderEmptyBorderStyle;
-	}
-	
-
-
-	
-	
-	//
-	// TYPE METHODS
-	//
-
-	public boolean isEditable()
-	{
-		return false;
+		elements.add( GenericPerspectiveStyleSheet.instance.unescapedStringAsHBox( textRepresentation ) );
+		
+		super.createDebugPresentationHeaderContents( elements );
 	}
 }

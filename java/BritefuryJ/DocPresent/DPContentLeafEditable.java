@@ -7,15 +7,18 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
 
+import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleParams.ContentLeafEditableStyleParams;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Parser.ItemStream.ItemStream;
 import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
@@ -206,7 +209,17 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	public Marker markerAtEnd()
 	{
-		return marker( Math.max( getMarkerRange() - 1, 0 ), Marker.Bias.END );
+		// We must ensure that an element with no content CANNOT have a marker given a bias of END, otherwise
+		// empty text elements will consume a backspace character.
+		int range = getMarkerRange();
+		if ( range == 0 )
+		{
+			return marker( 0, Marker.Bias.START );
+		}
+		else
+		{
+			return marker( Math.max( range - 1, 0 ), Marker.Bias.END );
+		}
 	}
 	
 	public Marker markerAtEndMinusOne()
@@ -240,7 +253,17 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	public void moveMarkerToEnd(Marker m)
 	{
-		moveMarker( m, Math.max( getMarkerRange() - 1, 0 ), Marker.Bias.END );
+		// We must ensure that an element with no content CANNOT have a marker given a bias of END, otherwise
+		// empty text elements will consume a backspace character.
+		int range = getMarkerRange();
+		if ( range == 0 )
+		{
+			moveMarker( m, 0, Marker.Bias.START );
+		}
+		else
+		{
+			moveMarker( m, Math.max( range - 1, 0 ), Marker.Bias.END );
+		}
 	}
 	
 	public void moveMarkerToEndMinusOne(Marker m)
@@ -806,5 +829,44 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	public boolean isEditable()
 	{
 		return testFlag( FLAG_EDITABLE );
+	}
+	
+	
+	
+	
+	//
+	// Meta element methods
+	//
+	
+	protected static PrimitiveStyleSheet metaHeaderHighlightBorderStyle = PrimitiveStyleSheet.instance.withBorder(
+			new SolidBorder( 1.0, 1.0, 5.0, 5.0, new Color( 0.75f, 0.0f, 0.0f ), new Color( 1.0f, 0.9f, 0.8f ) ) );
+	protected static PrimitiveStyleSheet metaHeaderCaretPosStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.25f, 0.0f, 0.5f ) );
+
+	protected void createDebugPresentationHeaderContents(ArrayList<DPElement> elements)
+	{
+		super.createDebugPresentationHeaderContents( elements );
+		Caret caret = rootElement != null  ?  rootElement.getCaret()  :  null;
+		if ( caret != null )
+		{
+			DPContentLeaf e = caret.getElement();
+			if ( e == this )
+			{
+				elements.add( metaHeaderCaretPosStyle.staticText( "@[" + caret.getPosition() + ":" + caret.getBias() + "]" ) );
+			}
+		}
+	}
+
+	protected PrimitiveStyleSheet getDebugPresentationHeaderBorderStyle()
+	{
+		Caret caret = rootElement != null  ?  rootElement.getCaret()  :  null;
+		if ( caret != null )
+		{
+			DPContentLeaf e = caret.getElement();
+			if ( e == this )
+			{
+				return metaHeaderHighlightBorderStyle;
+			}
+		}
+		return metaHeaderEmptyBorderStyle;
 	}
 }
