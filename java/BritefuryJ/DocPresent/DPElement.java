@@ -3003,50 +3003,27 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	protected static PrimitiveStyleSheet metaHeaderEmptyBorderStyle = PrimitiveStyleSheet.instance.withBorder( new FilledBorder() );
 
 
-	public DPElement createDebugPresentationHeaderData()
-	{
-		return null;
-	}
-	
-	public DPElement createDebugPresentationHeaderDebug()
-	{
-		if ( debugName != null )
-		{
-			return headerDebugTextStyle.staticText( "<" + debugName + ">" );
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	public DPElement createDebugPresentationDescription()
-	{
-		String description = toString();
-		description = description.replace( "BritefuryJ.DocPresent.", "" );
-		return headerDescriptionTextStyle.staticText( description );
-	}
-	
 	protected PrimitiveStyleSheet getDebugPresentationHeaderBorderStyle()
 	{
 		return metaHeaderEmptyBorderStyle;
 	}
 	
+	protected void createDebugPresentationHeaderContents(ArrayList<DPElement> elements)
+	{
+		if ( debugName != null )
+		{
+			elements.add( headerDebugTextStyle.staticText( "<" + debugName + ">" ) );
+		}
+
+		String description = toString();
+		description = description.replace( "BritefuryJ.DocPresent.", "" );
+		elements.add( headerDescriptionTextStyle.staticText( description ) );
+	}
+	
 	public DPElement createDebugPresentationHeader()
 	{
 		ArrayList<DPElement> elements = new ArrayList<DPElement>();
-		DPElement data = createDebugPresentationHeaderData();
-		DPElement debug = createDebugPresentationHeaderDebug();
-		DPElement descr = createDebugPresentationDescription();
-		if ( data != null )
-		{
-			elements.add( data );
-		}
-		if ( debug != null )
-		{
-			elements.add( debug );
-		}
-		elements.add( descr );
+		createDebugPresentationHeaderContents( elements );
 		DPElement box = metaHeaderHBoxStyle.hbox( elements.toArray( new DPElement[0] ) );
 		return getDebugPresentationHeaderBorderStyle().border( box );
 	}
