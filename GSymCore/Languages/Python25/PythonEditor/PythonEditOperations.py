@@ -159,7 +159,7 @@ def pyReplaceStmt(ctx, target, replacement, bDontReplaceIfEqual=True):
 	else:
 		raise TypeError, 'PythonEditOperations:pyReplaceStmt(): @target must be a DMNode'
 			
-def performSuiteEdits(target, modified):
+def modifySuiteMinimisingChanges(target, modified):
 	commonPrefixLen = 0
 	for i, (t, m) in enumerate( zip( target, modified ) ):
 		if t != m:
