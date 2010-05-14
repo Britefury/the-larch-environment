@@ -88,7 +88,6 @@ class ParsedExpressionLinearRepresentationListener (ElementLinearRepresentationL
 		ctx = element.getFragmentContext()
 		node = ctx.getDocNode()
 		if '\n' not in value:
-			#parsed = parseText( self._parser, value, self._outerPrecedence )
 			parsed = parseStream( self._parser, value, self._outerPrecedence )
 			if parsed is not None:
 				log = ctx.getView().getPageLog()
@@ -99,7 +98,7 @@ class ParsedExpressionLinearRepresentationListener (ElementLinearRepresentationL
 			else:
 				if value.isTextual():
 					if value.textualValue().strip() == '':
-						# Expression content has been deleted entirely; clear the structural representation
+						# Expression content has been deleted entirely
 						log = ctx.getView().getPageLog()
 						if log.isRecording():
 							log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - deleted' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
@@ -193,7 +192,7 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 					pyReplaceNode( ctx, node, parsed )
 					return True
 				else:
-					sourceCtxElement = sourceCtx.getViewNodeContentElement()
+					sourceCtxElement = sourceCtx.getFragmentContentElement()
 					sourceNode = sourceCtx.getDocNode()
 					sourceValue = sourceCtxElement.getLinearRepresentation()
 					

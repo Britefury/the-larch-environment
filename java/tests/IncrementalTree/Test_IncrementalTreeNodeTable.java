@@ -31,7 +31,37 @@ public abstract class Test_IncrementalTreeNodeTable extends TestCase
 		{
 			return null;
 		}
+
+		@Override
+		protected IncrementalTreeNode createIncrementalTreeNode(Object node)
+		{
+			return new TestIncrementalTreeNode( this, node );
+		}
 	}
+	
+	protected static class TestIncrementalTreeNode extends IncrementalTreeNode
+	{
+		private Object result;
+		
+		public TestIncrementalTreeNode(IncrementalTree incrementalTree, Object docNode)
+		{
+			super( incrementalTree, docNode );
+		}
+
+		@Override
+		protected Object getResultNoRefresh()
+		{
+			return result;
+		}
+
+		@Override
+		protected void updateNodeResult(Object r)
+		{
+			result = r;
+		}
+	}
+	
+	
 	protected DMList da, db, dc, dd;
 	protected IncrementalTreeNodeTable table;
 	protected IncrementalTreeNode ia, ib, ic, id1, id2;
@@ -64,11 +94,11 @@ public abstract class Test_IncrementalTreeNodeTable extends TestCase
 		
 		tree = new TestIncrementalTree( da, DuplicatePolicy.ALLOW_DUPLICATES );
 		
-		ia = new IncrementalTreeNode( tree, da );
-		ib = new IncrementalTreeNode( tree, db );
-		ic = new IncrementalTreeNode( tree, dc );
-		id1 = new IncrementalTreeNode( tree, dd );
-		id2 = new IncrementalTreeNode( tree, dd );
+		ia = new TestIncrementalTreeNode( tree, da );
+		ib = new TestIncrementalTreeNode( tree, db );
+		ic = new TestIncrementalTreeNode( tree, dc );
+		id1 = new TestIncrementalTreeNode( tree, dd );
+		id2 = new TestIncrementalTreeNode( tree, dd );
 		
 		
 		table = createTable();

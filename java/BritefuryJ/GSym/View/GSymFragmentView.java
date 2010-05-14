@@ -108,19 +108,19 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	//
 	//
 	
-	public DPElement getElementNoRefresh()
+	public DPElement getFragmentElement()
 	{
 		return fragmentElement;
 	}
 	
-	public DPElement getElement()
+	public DPElement getRefreshedFragmentElement()
 	{
 		refresh();
 		return fragmentElement;
 	}
 	
 	
-	public DPElement getInnerElementNoRefresh()
+	public DPElement getFragmentContentElement()
 	{
 		return element;
 	}
@@ -128,12 +128,6 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	
 	protected Object getResultNoRefresh()
 	{
-		return fragmentElement;
-	}
-	
-	protected Object getResult()
-	{
-		refresh();
 		return fragmentElement;
 	}
 	
@@ -146,7 +140,7 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	}
 
 	
-	protected GSymView.ViewFragmentContextAndResultFactory getFragmentElementFactory()
+	protected GSymView.ViewFragmentContextAndResultFactory getNodeResultFactory()
 	{
 		return (GSymView.ViewFragmentContextAndResultFactory)resultFactory;
 	}
@@ -184,7 +178,6 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	protected void updateNodeResult(Object r)
 	{
 		getView().profile_startUpdateNodeElement();
-		super.updateNodeResult( r );
 		if ( r != element )
 		{
 			if ( r != null )
@@ -252,13 +245,13 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	
 	public AttributeTable getSubjectContext()
 	{
-		return getFragmentElementFactory().subjectContext;
+		return getNodeResultFactory().subjectContext;
 	}
 	
 	
 	public GSymAbstractPerspective getPerspective()
 	{
-		return getFragmentElementFactory().perspective;
+		return getNodeResultFactory().perspective;
 	}
 	
 	
@@ -309,7 +302,7 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 		
 		registerIncrementalNodeRelationship( incrementalNode );
 		
-		return incrementalNode.getElementNoRefresh();
+		return incrementalNode.getFragmentElement();
 	}
 	
 	protected static DPElement perspectiveFragmentRegion(DPElement fragmentContents, GSymAbstractPerspective perspective)
@@ -322,40 +315,40 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	
 	public DPElement presentFragment(Object x, StyleSheet styleSheet)
 	{
-		GSymView.ViewFragmentContextAndResultFactory factory = getFragmentElementFactory();
+		GSymView.ViewFragmentContextAndResultFactory factory = getNodeResultFactory();
 		return presentFragment( x, factory.perspective, factory.subjectContext, styleSheet, factory.inheritedState );
 	}
 
 	public DPElement presentFragment(Object x, StyleSheet styleSheet, AttributeTable inheritedState)
 	{
-		GSymView.ViewFragmentContextAndResultFactory factory = getFragmentElementFactory();
+		GSymView.ViewFragmentContextAndResultFactory factory = getNodeResultFactory();
 		return presentFragment( x, factory.perspective, factory.subjectContext, styleSheet, inheritedState );
 	}
 
 	public DPElement presentFragmentWithPerspective(Object x, GSymAbstractPerspective perspective)
 	{
-		GSymView.ViewFragmentContextAndResultFactory factory = getFragmentElementFactory();
+		GSymView.ViewFragmentContextAndResultFactory factory = getNodeResultFactory();
 		DPElement e = presentFragment( x, perspective, factory.subjectContext, perspective.getStyleSheet(), perspective.getInitialInheritedState() );
 		return perspectiveFragmentRegion( e, perspective );
 	}
 
 	public DPElement presentFragmentWithPerspective(Object x, GSymAbstractPerspective perspective, AttributeTable inheritedState)
 	{
-		GSymView.ViewFragmentContextAndResultFactory factory = getFragmentElementFactory();
+		GSymView.ViewFragmentContextAndResultFactory factory = getNodeResultFactory();
 		DPElement e = presentFragment( x, perspective, factory.subjectContext, perspective.getStyleSheet(), inheritedState );
 		return perspectiveFragmentRegion( e, perspective );
 	}
 
 	public DPElement presentFragmentWithPerspectiveAndStyleSheet(Object x, GSymAbstractPerspective perspective, StyleSheet styleSheet)
 	{
-		GSymView.ViewFragmentContextAndResultFactory factory = getFragmentElementFactory();
+		GSymView.ViewFragmentContextAndResultFactory factory = getNodeResultFactory();
 		DPElement e = presentFragment( x, perspective, factory.subjectContext, styleSheet, perspective.getInitialInheritedState() );
 		return perspectiveFragmentRegion( e, perspective );
 	}
 
 	public DPElement presentFragmentWithPerspectiveAndStyleSheet(Object x, GSymAbstractPerspective perspective, StyleSheet styleSheet, AttributeTable inheritedState)
 	{
-		GSymView.ViewFragmentContextAndResultFactory factory = getFragmentElementFactory();
+		GSymView.ViewFragmentContextAndResultFactory factory = getNodeResultFactory();
 		DPElement e = presentFragment( x, perspective, factory.subjectContext, styleSheet, inheritedState );
 		return perspectiveFragmentRegion( e, perspective );
 	}
@@ -390,13 +383,13 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 
 	public List<DPElement> mapPresentFragment(List<Object> xs, StyleSheet styleSheet)
 	{
-		GSymView.ViewFragmentContextAndResultFactory factory = getFragmentElementFactory();
+		GSymView.ViewFragmentContextAndResultFactory factory = getNodeResultFactory();
 		return mapPresentFragment( xs, factory.perspective, factory.subjectContext, styleSheet, factory.inheritedState );
 	}
 
 	public List<DPElement> mapPresentFragment(List<Object> xs, StyleSheet styleSheet, AttributeTable inheritedState)
 	{
-		GSymView.ViewFragmentContextAndResultFactory factory = getFragmentElementFactory();
+		GSymView.ViewFragmentContextAndResultFactory factory = getNodeResultFactory();
 		return mapPresentFragment( xs, factory.perspective, factory.subjectContext, styleSheet, inheritedState );
 	}
 
@@ -413,18 +406,6 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	public Location getLocationForObject(Object x)
 	{
 		return getBrowserContext().getLocationForObject( x );
-	}
-	
-	
-	
-	public DPElement getViewNodeElement()
-	{
-		return getElementNoRefresh();
-	}
-	
-	public DPElement getViewNodeContentElement()
-	{
-		return getInnerElementNoRefresh();
 	}
 	
 	

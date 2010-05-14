@@ -203,22 +203,22 @@ class Python25EditHandler (EditHandler):
 		startContext = getStatementContextFromElement( startMarker.getElement() )
 		endContext = getStatementContextFromElement( endMarker.getElement() )
 		# Get the statement elements
-		startStmtElement = startContext.getViewNodeContentElement()
-		endStmtElement = endContext.getViewNodeContentElement()
+		startStmtElement = startContext.getFragmentContentElement()
+		endStmtElement = endContext.getFragmentContentElement()
 
 		# Get paths to start and end nodes, from the common root statement
 		path0, path1 = getStatementContextPathsFromCommonRoot( startContext, endContext )
 		root = path0[0]
 		
-		rootElement = root.getViewNodeElement()
+		rootElement = root.getFragmentElement()
 				
 		startStmtElement.setStructuralPrefixObject( Schema.Indent() )
 		endStmtElement.setStructuralSuffixObject( Schema.Dedent() )
 		
-		startContext.getViewNodeElement().clearStructuralRepresentationUpTo( rootElement )
-		endContext.getViewNodeElement().clearStructuralRepresentationUpTo( rootElement )
+		startContext.getFragmentElement().clearStructuralRepresentationUpTo( rootElement )
+		endContext.getFragmentElement().clearStructuralRepresentationUpTo( rootElement )
 		
-		bSuccess = root.getViewNodeContentElement().sendLinearRepresentationModifiedEvent( IndentSelectionLinearRepresentationEvent( rootElement ) )
+		bSuccess = root.getFragmentContentElement().sendLinearRepresentationModifiedEvent( IndentSelectionLinearRepresentationEvent( rootElement ) )
 		if not bSuccess:
 			print 'Python25EditHandler._indentSelection(): INDENT SELECTION FAILED'
 			startStmtElement.clearStructuralPrefix()
@@ -235,20 +235,20 @@ class Python25EditHandler (EditHandler):
 		startContext = getStatementContextFromElement( startMarker.getElement() )
 		endContext = getStatementContextFromElement( endMarker.getElement() )
 		# Get the statement elements
-		startStmtElement = startContext.getViewNodeContentElement()
-		endStmtElement = endContext.getViewNodeContentElement()
+		startStmtElement = startContext.getFragmentContentElement()
+		endStmtElement = endContext.getFragmentContentElement()
 
 		# Get paths to start and end nodes, from the common root statement
 		path0, path1 = getStatementContextPathsFromCommonRoot( startContext, endContext )
 		root = path0[0]
 		
-		rootElement = root.getViewNodeElement()
+		rootElement = root.getFragmentElement()
 				
 		startStmtElement.setStructuralPrefixObject( Schema.Dedent() )
 		endStmtElement.setStructuralSuffixObject( Schema.Indent() )
 		
-		startContext.getViewNodeElement().clearStructuralRepresentationUpTo( rootElement )
-		endContext.getViewNodeElement().clearStructuralRepresentationUpTo( rootElement )
+		startContext.getFragmentElement().clearStructuralRepresentationUpTo( rootElement )
+		endContext.getFragmentElement().clearStructuralRepresentationUpTo( rootElement )
 		
 		bSuccess = rootElement.sendLinearRepresentationModifiedEvent( DedentSelectionLinearRepresentationEvent( rootElement ) )
 		if not bSuccess:
@@ -272,8 +272,8 @@ class Python25EditHandler (EditHandler):
 			startContext = getStatementContextFromElement( startMarker.getElement() )
 			endContext = getStatementContextFromElement( endMarker.getElement() )
 			# Get the statement elements
-			startStmtElement = startContext.getViewNodeContentElement()
-			endStmtElement = endContext.getViewNodeContentElement()
+			startStmtElement = startContext.getFragmentContentElement()
+			endStmtElement = endContext.getFragmentContentElement()
 			
 			if replacement is not None:
 				if isinstance( replacement, Python25BufferStream ):
@@ -290,7 +290,7 @@ class Python25EditHandler (EditHandler):
 					path0, path1 = getStatementContextPathsFromCommonRoot( startContext, endContext )
 					root = path0[0]
 					
-					rootElement = root.getViewNodeElement()
+					rootElement = root.getFragmentElement()
 				
 					before = rootElement.getLinearRepresentationFromStartToMarker( startMarker )
 					after = rootElement.getLinearRepresentationFromMarkerToEnd( endMarker )
@@ -314,7 +314,7 @@ class Python25EditHandler (EditHandler):
 					path0, path1 = getStatementContextPathsFromCommonRoot( startContext, endContext )
 					root = path0[0]
 					
-					rootElement = root.getViewNodeElement()
+					rootElement = root.getFragmentElement()
 				
 					before = rootElement.getLinearRepresentationFromStartToMarker( startMarker )
 					after = rootElement.getLinearRepresentationFromMarkerToEnd( endMarker )
@@ -329,7 +329,7 @@ class Python25EditHandler (EditHandler):
 	
 	def _insertBufferAtMarker(self, marker, b):
 		markerStmtContext = getStatementContextFromElement( marker.getElement() )
-		markerStmtElement = markerStmtContext.getViewNodeContentElement()
+		markerStmtElement = markerStmtContext.getFragmentContentElement()
 
 		if isinstance( b, Python25BufferStream ):
 			before = markerStmtElement.getLinearRepresentationFromStartToMarker( marker )
@@ -363,8 +363,8 @@ class Python25EditHandler (EditHandler):
 			endContext = getStatementContextFromElement( endMarker.getElement() )
 	
 			# Get the statement elements
-			startStmtElement = startContext.getViewNodeContentElement()
-			endStmtElement = endContext.getViewNodeContentElement()
+			startStmtElement = startContext.getFragmentContentElement()
+			endStmtElement = endContext.getFragmentContentElement()
 			# Get the text between the selection start and the end of the start line, and the start of the end line and the selection end
 			textInFirstLine = startStmtElement.getTextRepresentationFromMarkerToEnd( startMarker )
 			textInLastLine = endStmtElement.getTextRepresentationFromStartToMarker( endMarker )

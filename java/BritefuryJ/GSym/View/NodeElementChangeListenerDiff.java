@@ -60,7 +60,7 @@ public class NodeElementChangeListenerDiff implements GSymView.NodeElementChange
 		if ( caretNode == null )
 		{
 			// Get and store initial state
-			DPElement nodeElement = node.getInnerElementNoRefresh();
+			DPElement nodeElement = node.getFragmentContentElement();
 			if ( nodeElement != null )
 			{
 				PresentationComponent.RootElement tree = nodeElement.getRootElement();
@@ -88,7 +88,7 @@ public class NodeElementChangeListenerDiff implements GSymView.NodeElementChange
 	{
 		if ( caretNode == node )
 		{
-			DPElement nodeElement = node.getInnerElementNoRefresh();
+			DPElement nodeElement = node.getFragmentContentElement();
 			
 			// Invoking child.refresh() above can cause this method to be invoked on another node; recursively;
 			// Ensure that only the inner-most recursion level handles the caret
