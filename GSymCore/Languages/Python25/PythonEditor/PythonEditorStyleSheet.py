@@ -36,7 +36,6 @@ class PythonEditorStyleSheet (StyleSheet):
 		self.initAttr( 'primitiveStyle', PrimitiveStyleSheet.instance.withParagraphIndentation( 60.0 ) )
 		
 		self.initAttr( 'precedenceParens', PrecedenceStyleSheetText.instance )
-		self.initAttr( 'parser', None )
 		self.initAttr( 'editMode', None )
 		
 		
@@ -94,15 +93,12 @@ class PythonEditorStyleSheet (StyleSheet):
 	def withOuterPrecedence(self, outerPrecedence):
 		return self.withAttr( 'precedenceParens', self['precedenceParens'].withOuterPrecedence( outerPrecedence ) )
 		
-	def withParser(self, parser):
-		return self.withAttr( 'parser', parser )
-		
 	def withEditMode(self, editMode):
 		return self.withAttr( 'editMode', editMode )
 	
 	
-	def withPythonState(self, outerPrecedence, parser, editMode=MODE_DISPLAYCONTENTS):
-		return self.withOuterPrecedence( outerPrecedence ).withAttrs( parser=parser, editMode=editMode )
+	def withPythonState(self, outerPrecedence, editMode=MODE_DISPLAYCONTENTS):
+		return self.withOuterPrecedence( outerPrecedence ).withAttr( 'editMode', editMode )
 	
 	
 	
