@@ -76,6 +76,12 @@ public class PrimitiveStyleSheet extends StyleSheet
 	private static final String defaultFontFace = "Sans serif";
 	private static final int defaultFontSize = 14;
 	
+	private static final float defaultFractionFontScale = 0.9f;
+	private static final float defaultFractionMinFontScale = 0.9f;
+	
+	private static final float defaultScriptFontScale = 0.9f;
+	private static final float defaultScriptMinFontScale = 0.9f;
+	
 	private static final Painter default_shapePainter = new FillPainter( Color.black );
 	
 	private static final Border default_border = new SolidBorder( 1.0, 2.0, Color.black, null );
@@ -94,6 +100,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 		initAttr( "fontItalic", false );
 		initAttr( "fontBold", false );
 		initAttr( "fontSize", defaultFontSize );
+		initAttr( "fontScale", 1.0f );
 		initAttr( "foreground", Color.black );
 		initAttr( "hoverForeground", null );
 		initAttr( "background", null );
@@ -107,6 +114,8 @@ public class PrimitiveStyleSheet extends StyleSheet
 		initAttr( "fractionVSpacing", 2.0 );
 		initAttr( "fractionHPadding", 3.0 );
 		initAttr( "fractionRefYOffset", 5.0 );
+		initAttr( "fractionFontScale", defaultFractionFontScale );
+		initAttr( "fractionMinFontScale", defaultFractionMinFontScale );
 		
 		initAttr( "hboxSpacing", 0.0 );
 		
@@ -118,6 +127,8 @@ public class PrimitiveStyleSheet extends StyleSheet
 		
 		initAttr( "scriptColumnSpacing", 1.0 );
 		initAttr( "scriptRowSpacing", 1.0 );
+		initAttr( "scriptFontScale", defaultScriptFontScale );
+		initAttr( "scriptMinFontScale", defaultScriptMinFontScale );
 		
 		initAttr( "tableColumnSpacing", 0.0 );
 		initAttr( "tableColumnExpand", false );
@@ -164,6 +175,11 @@ public class PrimitiveStyleSheet extends StyleSheet
 	public PrimitiveStyleSheet withFontSize(int size)
 	{
 		return (PrimitiveStyleSheet)withAttr( "fontSize", size );
+	}
+
+	public PrimitiveStyleSheet withFontScale(float fontScale)
+	{
+		return (PrimitiveStyleSheet)withAttr( "fontScale", fontScale );
 	}
 
 	public PrimitiveStyleSheet withForeground(Paint paint)
@@ -233,6 +249,16 @@ public class PrimitiveStyleSheet extends StyleSheet
 		return (PrimitiveStyleSheet)withAttr( "fractionRefYOffset", refYOffset );
 	}
 	
+	public PrimitiveStyleSheet withFractionFontScale(float fontScale)
+	{
+		return (PrimitiveStyleSheet)withAttr( "fractionFontScale", fontScale );
+	}
+	
+	public PrimitiveStyleSheet withFractionMinFontScale(float fontScale)
+	{
+		return (PrimitiveStyleSheet)withAttr( "fractionMinFontScale", fontScale );
+	}
+	
 	
 	
 	//
@@ -292,6 +318,16 @@ public class PrimitiveStyleSheet extends StyleSheet
 		return (PrimitiveStyleSheet)withAttr( "scriptRowSpacing", rowSpacing );
 	}
 
+	public PrimitiveStyleSheet withScriptFontScale(float fontScale)
+	{
+		return (PrimitiveStyleSheet)withAttr( "scriptFontScale", fontScale );
+	}
+	
+	public PrimitiveStyleSheet withScriptMinFontScale(float fontScale)
+	{
+		return (PrimitiveStyleSheet)withAttr( "scriptMinFontScale", fontScale );
+	}
+	
 
 	
 	//
@@ -380,8 +416,9 @@ public class PrimitiveStyleSheet extends StyleSheet
 			boolean bBold = getNonNull( "fontBold", Boolean.class, false );
 			boolean bItalic = getNonNull( "fontItalic", Boolean.class, false );
 			int size = getNonNull( "fontSize", Integer.class, defaultFontSize );
+			float scale = getNonNull( "fontScale", Float.class, 1.0f );
 			int flags = ( bBold ? Font.BOLD : 0 )  |  ( bItalic ? Font.ITALIC : 0 );
-			styleSheetFont = new Font( fontFace, flags, size );
+			styleSheetFont = new Font( fontFace, flags, size ).deriveFont( (float)size * scale );
 		}
 		return styleSheetFont;
 	}
@@ -708,6 +745,20 @@ public class PrimitiveStyleSheet extends StyleSheet
 		return element;
 	}
 	
+	public PrimitiveStyleSheet fractionNumeratorStyle()
+	{
+		float scale = getNonNull( "fontScale", Float.class, 1.0f );
+		float fracScale = getNonNull( "fractionFontScale", Float.class, defaultFractionFontScale );
+		float minFracScale = getNonNull( "fractionMinFontScale", Float.class, defaultFractionMinFontScale );
+		scale = Math.max( scale * fracScale, minFracScale );
+		return withFontScale( scale );
+	}
+	
+	public PrimitiveStyleSheet fractionDenominatorStyle()
+	{
+		return fractionNumeratorStyle();
+	}
+	
 	
 	@ExposedMethod( names={ "_hbox" } )
 	public DPHBox hbox(DPElement children[])
@@ -873,6 +924,16 @@ public class PrimitiveStyleSheet extends StyleSheet
 	public DPScript scriptRSub(DPElement mainChild, DPElement scriptChild)
 	{
 		return script( mainChild, null, null, null, scriptChild );
+	}
+	
+	
+	public PrimitiveStyleSheet scriptScriptChildStyle()
+	{
+		float scale = getNonNull( "fontScale", Float.class, 1.0f );
+		float fracScale = getNonNull( "scriptFontScale", Float.class, defaultFractionFontScale );
+		float minFracScale = getNonNull( "scriptMinFontScale", Float.class, defaultFractionMinFontScale );
+		scale = Math.max( scale * fracScale, minFracScale );
+		return withFontScale( scale );
 	}
 	
 	

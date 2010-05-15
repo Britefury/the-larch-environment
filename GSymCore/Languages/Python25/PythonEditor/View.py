@@ -589,7 +589,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def Pow(self, ctx, styleSheet, state, node, x, y):
 		xPrec, yPrec = computeBinOpViewPrecedenceValues( PRECEDENCE_POW, True )
 		xView = ctx.presentFragment( x, styleSheet.withPythonState( xPrec ) )
-		yView = ctx.presentFragment( y, styleSheet.withPythonState( yPrec, PythonEditorStyleSheet.MODE_EDITEXPRESSION ) )
+		yView = ctx.presentFragment( y, styleSheet.powExponentStyle().withPythonState( yPrec, PythonEditorStyleSheet.MODE_EDITEXPRESSION ) )
 		view = styleSheet.pow( xView, yView )
 		return expressionNodeEditor( self._parser, styleSheet, node,
 			                     PRECEDENCE_POW,
@@ -616,8 +616,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod( Schema.Div )
 	def Div(self, ctx, styleSheet, state, node, x, y):
 		xPrec, yPrec = computeBinOpViewPrecedenceValues( PRECEDENCE_MULDIVMOD, False )
-		xView = ctx.presentFragment( x, styleSheet.withPythonState( xPrec, PythonEditorStyleSheet.MODE_EDITEXPRESSION ) )
-		yView = ctx.presentFragment( y, styleSheet.withPythonState( yPrec, PythonEditorStyleSheet.MODE_EDITEXPRESSION ) )
+		xView = ctx.presentFragment( x, styleSheet.divNumeratorStyle().withPythonState( xPrec, PythonEditorStyleSheet.MODE_EDITEXPRESSION ) )
+		yView = ctx.presentFragment( y, styleSheet.divDenominatorStyle().withPythonState( yPrec, PythonEditorStyleSheet.MODE_EDITEXPRESSION ) )
 		view = styleSheet.div( xView, yView, '/' )
 		view.setStructuralValueObject( node )
 		return expressionNodeEditor( self._parser, styleSheet, node,

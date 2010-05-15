@@ -22,15 +22,9 @@ import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleParams.FractionStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 import BritefuryJ.Math.Point2;
-import BritefuryJ.Math.Xform2;
 
 public class DPFraction extends DPContainer
 {
-	private static double childScale = 0.85;
-	private static final Xform2 childScaleXform = new Xform2( childScale );
-	private static final Xform2 childScaleXformInv = childScaleXform.inverse();
-
-
 	public static class DPFractionBar extends DPContentLeafEditable
 	{
 		public DPFractionBar(String textRepresentation)
@@ -421,14 +415,6 @@ public class DPFraction extends DPContainer
 
 	
 	
-	protected Xform2 getAllocationSpaceToLocalSpaceXform(DPElement child)
-	{
-		return child == children[BAR]  ?  Xform2.identity  :  new Xform2( childScale );
-	}
-	
-
-	
-	
 	protected void replaceChildWithEmpty(DPElement child)
 	{
 		int slot = Arrays.asList( children ).indexOf( child );
@@ -446,18 +432,6 @@ public class DPFraction extends DPContainer
 	
 	
 	
-	public static Xform2 getScriptChildXform()
-	{
-		return childScaleXform;
-	}
-
-	public static Xform2 getInverseScriptChildXform()
-	{
-		return childScaleXformInv;
-	}
-
-	
-
 	//
 	// STYLESHEET METHODS
 	//

@@ -10,7 +10,9 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class FractionTestPage extends SystemPage
 {
@@ -35,37 +37,77 @@ public class FractionTestPage extends SystemPage
 	{
 		return "The fraction element places its two child elements into a mathematical fraction arrangement."; 
 	}
-
-
-	private DPElement makeFractionLine(DPElement num, DPElement denom)
+	
+	
+	private ElementFactory textFactory(final String text)
 	{
-		return styleSheet.hbox( new DPElement[] { smallStyle.text( "<<Left<<" ), fractionStyle.fraction( num, denom, "/" ), largeStyle.text( ">>Right>>" ) } );
+		return new ElementFactory()
+		{
+			@Override
+			public DPElement createElement(StyleSheet styleSheet)
+			{
+				return ((PrimitiveStyleSheet)styleSheet).text( text );
+			}
+		};
 	}
 	
-	private DPElement span(DPElement... children)
+	private ElementFactory fractionFactory(final ElementFactory num, final ElementFactory denom, final String barContent)
 	{
-		return styleSheet.span( children );
+		return new ElementFactory()
+		{
+			@Override
+			public DPElement createElement(StyleSheet styleSheet)
+			{
+				PrimitiveStyleSheet numStyle = ((PrimitiveStyleSheet)styleSheet).fractionNumeratorStyle();
+				PrimitiveStyleSheet denomStyle = ((PrimitiveStyleSheet)styleSheet).fractionDenominatorStyle();
+				return ((PrimitiveStyleSheet)styleSheet).fraction( num.createElement( numStyle ), denom.createElement( denomStyle ) , barContent );
+			}
+		};
 	}
 
+	private ElementFactory spanFactory(final ElementFactory... children)
+	{
+		return new ElementFactory()
+		{
+			@Override
+			public DPElement createElement(StyleSheet styleSheet)
+			{
+				DPElement childElems[] = new DPElement[children.length];
+				for (int i = 0; i < children.length; i++)
+				{
+					childElems[i] = children[i].createElement( styleSheet );
+				}
+				return ((PrimitiveStyleSheet)styleSheet).span( childElems );
+			}
+		};
+	}
+
+
+	private DPElement makeFractionLine(ElementFactory num, ElementFactory denom)
+	{
+		ElementFactory fractionFac = fractionFactory( num, denom, "/" );
+		return styleSheet.hbox( new DPElement[] { smallStyle.text( "<<Left<<" ), fractionFac.createElement( fractionStyle ), largeStyle.text( ">>Right>>" ) } );
+	}
+	
 	protected DPElement createContents()
 	{
 		ArrayList<DPElement> lines = new ArrayList<DPElement>();
 		
-		lines.add( makeFractionLine( styleSheet.text( "a" ), styleSheet.text( "p" ) ) );
-		lines.add( makeFractionLine( styleSheet.text( "a" ), styleSheet.text( "p+q" ) ) );
-		lines.add( makeFractionLine( styleSheet.text( "a+b" ), styleSheet.text( "p" ) ) );
-		lines.add( makeFractionLine( styleSheet.text( "a+b" ), styleSheet.text( "p+q" ) ) );
+		lines.add( makeFractionLine( textFactory( "a" ), textFactory( "p" ) ) );
+		lines.add( makeFractionLine( textFactory( "a" ), textFactory( "p+q" ) ) );
+		lines.add( makeFractionLine( textFactory( "a+b" ), textFactory( "p" ) ) );
+		lines.add( makeFractionLine( textFactory( "a+b" ), textFactory( "p+q" ) ) );
 
 		lines.add( styleSheet.withFontSize( 24 ).text( "---" ) );
 		
-		lines.add( makeFractionLine( span( styleSheet.text( "a+" ), fractionStyle.fraction( styleSheet.text( "x" ), styleSheet.text( "y" ), "/" ) ),
-				styleSheet.text( "p+q" ) ) );
-		lines.add( makeFractionLine( span( fractionStyle.fraction( styleSheet.text( "x" ), styleSheet.text( "y" ), "/" ),  styleSheet.text( "+b" ) ),
-				styleSheet.text( "p+q" ) ) );
-		lines.add( makeFractionLine( styleSheet.text( "a+b" ),
-				span( styleSheet.text( "p+" ), fractionStyle.fraction( styleSheet.text( "x" ), styleSheet.text( "y" ), "/" ) ) ) );
-		lines.add( makeFractionLine( styleSheet.text( "a+b" ),
-				span( fractionStyle.fraction( styleSheet.text( "x" ), styleSheet.text( "y" ), "/" ),  styleSheet.text( "+q" ) ) ) );
+		lines.add( makeFractionLine( spanFactory( textFactory( "a+" ), fractionFactory( textFactory( "x" ), textFactory( "y" ), "/" ) ),
+				textFactory( "p+q" ) ) );
+		lines.add( makeFractionLine( spanFactory( fractionFactory( textFactory( "x" ), textFactory( "y" ), "/" ),  textFactory( "+b" ) ),
+				textFactory( "p+q" ) ) );
+		lines.add( makeFractionLine( textFactory( "a+b" ),
+				spanFactory( textFactory( "p+" ), fractionFactory( textFactory( "x" ), textFactory( "y" ), "/" ) ) ) );
+		lines.add( makeFractionLine( textFactory( "a+b" ),
+				spanFactory( fractionFactory( textFactory( "x" ), textFactory( "y" ), "/" ),  textFactory( "+q" ) ) ) );
 		
 		return styleSheet.withVBoxSpacing( 10.0 ).vbox( lines.toArray( new DPElement[0] ) );
 	}

@@ -14,7 +14,6 @@ import BritefuryJ.DocPresent.LayoutTree.LayoutNodeScript;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ScriptStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
-import BritefuryJ.Math.Xform2;
 
 
 public class DPScript extends DPContainer
@@ -26,10 +25,6 @@ public class DPScript extends DPContainer
 	public static int RIGHTSUB = 4;
 	
 	public static int NUMCHILDREN = 5;
-	
-	private static final double childScale = 0.7;
-	private static final Xform2 childScaleXform = new Xform2( childScale );
-	private static final Xform2 childScaleXformInv = childScaleXform.inverse();
 	
 	
 	
@@ -265,13 +260,6 @@ public class DPScript extends DPContainer
 
 	
 	
-	protected Xform2 getAllocationSpaceToLocalSpaceXform(DPElement child)
-	{
-		return child == paras[MAIN]  ?  Xform2.identity  :  childScaleXform;
-	}
-	
-
-	
 	protected void replaceChildWithEmpty(DPElement child)
 	{
 		int slot = Arrays.asList( children ).indexOf( child );
@@ -341,18 +329,6 @@ public class DPScript extends DPContainer
 	
 
 	
-	public static Xform2 getScriptChildXform()
-	{
-		return childScaleXform;
-	}
-
-	public static Xform2 getInverseScriptChildXform()
-	{
-		return childScaleXformInv;
-	}
-
-	
-
 	//
 	// STYLESHEET METHODS
 	//
