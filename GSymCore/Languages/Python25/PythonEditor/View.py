@@ -79,7 +79,7 @@ def computeBinOpViewPrecedenceValues(precedence, bRightAssociative):
 
 
 
-def expressionNodeEditor(styleSheet, node, precedence, contents):
+def unparsedNodeEditor(styleSheet, node, precedence, contents):
 	mode = styleSheet['editMode']
 	if mode == PythonEditorStyleSheet.MODE_DISPLAYCONTENTS:
 		if _nodeRequiresParens( node ):
@@ -95,6 +95,24 @@ def expressionNodeEditor(styleSheet, node, precedence, contents):
 		return contents
 	elif mode == PythonEditorStyleSheet.MODE_EDITSTATEMENT:
 		return statementNodeEditor( styleSheet, node, contents )
+	else:
+		raise ValueError, 'invalid mode %d'  %  mode
+
+
+def expressionNodeEditor(styleSheet, node, precedence, contents):
+	mode = styleSheet['editMode']
+	if mode == PythonEditorStyleSheet.MODE_DISPLAYCONTENTS:
+		if _nodeRequiresParens( node ):
+			contents = styleSheet.applyParens( contents, precedence, getNumParens( node ) )
+		return contents
+	elif mode == PythonEditorStyleSheet.MODE_EDITEXPRESSION:
+		parser = styleSheet['parser']
+		outerPrecedence = styleSheet.getOuterPrecedence()
+		
+		if _nodeRequiresParens( node ):
+			contents = styleSheet.applyParens( contents, precedence, getNumParens( node ) )
+		contents.setLinearRepresentationListener( ParsedExpressionLinearRepresentationListener.newListener( parser, outerPrecedence ) )
+		return contents
 	else:
 		raise ValueError, 'invalid mode %d'  %  mode
 
@@ -259,7 +277,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			else:
 				raise TypeError, 'UNPARSED should contain a list of only strings or nodes, not a %s'  %  ( type( x ), )
 		views = [ _viewItem( x )   for x in value ]
-		return expressionNodeEditor( styleSheet, node, PRECEDENCE_NONE,
+		return unparsedNodeEditor( styleSheet, node, PRECEDENCE_NONE,
 		                             styleSheet.unparsedElements( views ) )
 
 
