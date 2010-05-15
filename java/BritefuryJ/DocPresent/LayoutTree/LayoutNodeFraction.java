@@ -17,7 +17,6 @@ import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
 import BritefuryJ.DocPresent.StyleParams.FractionStyleParams;
 import BritefuryJ.Math.Point2;
-import BritefuryJ.Math.Xform2;
 
 public class LayoutNodeFraction extends ArrangedLayoutNode
 {
@@ -59,17 +58,6 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 	}
 	
 	
-	private static Xform2 getScriptChildXform()
-	{
-		return DPFraction.getScriptChildXform();
-	}
-	
-	public static Xform2 getInverseScriptChildXform()
-	{
-		return DPFraction.getInverseScriptChildXform();
-	}
-	
-
 	protected void updateRequisitionX()
 	{
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
@@ -79,14 +67,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
 			DPElement child = frac.getWrappedChild( i );
-			if ( i != BAR )
-			{
-				boxes[i] = child != null  ?  child.getLayoutNode().refreshRequisitionX().transformedRequisition( getScriptChildXform() )  :  null;
-			}
-			else
-			{
-				boxes[i] = child != null  ?  child.getLayoutNode().refreshRequisitionX()  :  null;
-			}
+			boxes[i] = child != null  ?  child.getLayoutNode().refreshRequisitionX()  :  null;
 		}
 
 		FractionLayout.computeRequisitionX( layoutReqBox, boxes[NUMERATOR], boxes[BAR], boxes[DENOMINATOR], getHPadding(), getVSpacing(), getYOffset() );
@@ -101,14 +82,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
 			DPElement child = frac.getWrappedChild( i );
-			if ( i != BAR )
-			{
-				boxes[i] = child != null  ?  child.getLayoutNode().refreshRequisitionY().transformedRequisition( getScriptChildXform() )  :  null;
-			}
-			else
-			{
-				boxes[i] = child != null  ?  child.getLayoutNode().refreshRequisitionY()  :  null;
-			}
+			boxes[i] = child != null  ?  child.getLayoutNode().refreshRequisitionY()  :  null;
 		}
 
 		FractionLayout.computeRequisitionY( layoutReqBox, boxes[NUMERATOR], boxes[BAR], boxes[DENOMINATOR], getHPadding(), getVSpacing(), getYOffset() );
@@ -129,14 +103,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
 			DPElement child = frac.getWrappedChild( i );
-			if ( i != BAR )
-			{
-				reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox().transformedRequisition( getScriptChildXform() )  :  null;
-			}
-			else
-			{
-				reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox()  :  null;
-			}
+			reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox()  :  null;
 			allocBoxes[i] = child != null  ?  child.getLayoutNode().getAllocationBox()  :  null;
 			prevChildWidths[i] = child != null  ?  allocBoxes[i].getAllocationX()  :  0.0;
 		}
@@ -151,10 +118,6 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 			DPElement child = frac.getWrappedChild( i );
 			if ( child != null )
 			{
-				if ( i != BAR )
-				{
-					allocBoxes[i].transformAllocationX( getInverseScriptChildXform() );
-				}
 				child.getLayoutNode().refreshAllocationX( prevChildWidths[i] );
 			}
 		}
@@ -174,14 +137,7 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 		for (int i = 0; i < NUMCHILDREN; i++)
 		{
 			DPElement child = frac.getWrappedChild( i );
-			if ( i != BAR )
-			{
-				reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox().transformedRequisition( getScriptChildXform() )  :  null;
-			}
-			else
-			{
-				reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox()  :  null;
-			}
+			reqBoxes[i] = child != null  ?  child.getLayoutNode().getRequisitionBox()  :  null;
 			allocBoxes[i] = child != null  ?  child.getLayoutNode().getAllocationBox()  :  null;
 			prevChildAllocVs[i] = child != null  ?  allocBoxes[i].getAllocV()  :  null;
 		}
@@ -196,10 +152,6 @@ public class LayoutNodeFraction extends ArrangedLayoutNode
 			DPElement child = frac.getWrappedChild( i );
 			if ( child != null )
 			{
-				if ( i != BAR )
-				{
-					allocBoxes[i].transformAllocationY( getInverseScriptChildXform() );
-				}
 				child.getLayoutNode().refreshAllocationY( prevChildAllocVs[i] );
 			}
 		}

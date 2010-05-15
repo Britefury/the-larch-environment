@@ -592,6 +592,10 @@ class PythonEditorStyleSheet (StyleSheet):
 
 	
 	
+	def powExponentStyle(self):
+		primitiveStyle = self['primitiveStyle']
+		return self.withPrimitiveStyle( primitiveStyle.scriptScriptChildStyle() )
+	
 	def pow(self, x, y):
 		primitiveStyle = self['primitiveStyle']
 		punctuationStyle = self._punctuationStyle()
@@ -618,6 +622,14 @@ class PythonEditorStyleSheet (StyleSheet):
 		return primitiveStyle.span( [ primitiveStyle.text( ' ' ), opView, primitiveStyle.text( ' ' ), primitiveStyle.lineBreak(), y ] )
 
 
+	def divNumeratorStyle(self):
+		primitiveStyle = self['primitiveStyle']
+		return self.withPrimitiveStyle( primitiveStyle.fractionNumeratorStyle() )
+	
+	def divDenominatorStyle(self):
+		primitiveStyle = self['primitiveStyle']
+		return self.withPrimitiveStyle( primitiveStyle.fractionDenominatorStyle() )
+	
 	def div(self, x, y, fractionBarContent):
 		return self._operatorStyle().fraction( x, y, fractionBarContent )
 	

@@ -10,9 +10,9 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPFraction;
-import BritefuryJ.DocPresent.DPScript;
+import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class ScriptTestPage extends SystemPage
 {
@@ -39,13 +39,60 @@ public class ScriptTestPage extends SystemPage
 	private static PrimitiveStyleSheet scriptPostStyleSheet = styleSheet.withFontSize( 24 ).withForeground( Color.red );
 	private static PrimitiveStyleSheet dividerStyleSheet = styleSheet.withFontSize( 24 );
 
-	private static PrimitiveStyleSheet sMainStyleSheet = styleSheet.withFontSize( 16 ).withForeground( Color.black );
-	private static PrimitiveStyleSheet sScriptStyleSheet = styleSheet.withFontSize( 16 ).withForeground( Color.black );
+	private static PrimitiveStyleSheet scriptStyleSheet = styleSheet.withFontSize( 16 ).withForeground( Color.black );
 
 	
-	protected DPElement makeScriptLine(DPElement main, DPElement leftSuper, DPElement leftSub, DPElement rightSuper, DPElement rightSub)
+	private ElementFactory textFactory(final String text)
 	{
-		return styleSheet.hbox( new DPElement[] { scriptPreStyleSheet.text( "<<Left<<" ), styleSheet.script( main, leftSuper, leftSub, rightSuper, rightSub ),
+		return new ElementFactory()
+		{
+			@Override
+			public DPElement createElement(StyleSheet styleSheet)
+			{
+				return ((PrimitiveStyleSheet)styleSheet).text( text );
+			}
+		};
+	}
+	
+	private ElementFactory fractionFactory(final ElementFactory num, final ElementFactory denom, final String barContent)
+	{
+		return new ElementFactory()
+		{
+			@Override
+			public DPElement createElement(StyleSheet styleSheet)
+			{
+				PrimitiveStyleSheet numStyle = ((PrimitiveStyleSheet)styleSheet).fractionNumeratorStyle();
+				PrimitiveStyleSheet denomStyle = ((PrimitiveStyleSheet)styleSheet).fractionDenominatorStyle();
+				return ((PrimitiveStyleSheet)styleSheet).fraction( num.createElement( numStyle ), denom.createElement( denomStyle ) , barContent );
+			}
+		};
+	}
+
+	private ElementFactory scriptFactory(final ElementFactory main, final ElementFactory leftSuper, final ElementFactory leftSub, final ElementFactory rightSuper, final ElementFactory rightSub)
+	{
+		return new ElementFactory()
+		{
+			@Override
+			public DPElement createElement(StyleSheet styleSheet)
+			{
+				PrimitiveStyleSheet childStyle = ((PrimitiveStyleSheet)styleSheet).scriptScriptChildStyle();
+				return ((PrimitiveStyleSheet)styleSheet).script( main.createElement( styleSheet ),
+						leftSuper != null  ?  leftSuper.createElement( childStyle )  :  null,
+						leftSub != null  ?  leftSub.createElement( childStyle )  :  null,
+						rightSuper != null  ?  rightSuper.createElement( childStyle )  :  null,
+						rightSub != null  ?  rightSub.createElement( childStyle )  :  null
+					);
+			}
+		};
+	}
+
+	
+	
+	protected DPElement makeScriptLine(ElementFactory main, ElementFactory leftSuper, ElementFactory leftSub, ElementFactory rightSuper, ElementFactory rightSub)
+	{
+		ElementFactory scriptFac = scriptFactory( main, leftSuper, leftSub, rightSuper, rightSub );
+		return styleSheet.hbox( new DPElement[] { scriptPreStyleSheet.text( "<<Left<<" ),
+				scriptFac.createElement( styleSheet ),
 				scriptPostStyleSheet.text( ">>Right>>" ) } );
 	}
 
@@ -53,11 +100,10 @@ public class ScriptTestPage extends SystemPage
 	
 	protected DPElement makeScriptFraction(String mainText, String numText, String denomText)
 	{
-		DPFraction fraction = styleSheet.fraction( sScriptStyleSheet.text( numText ), sScriptStyleSheet.text( denomText ), "/" );
+		ElementFactory fractionFac = fractionFactory( textFactory( numText ), textFactory( denomText ), "/" );
+		ElementFactory scriptFac = scriptFactory( textFactory( mainText ), null, null, fractionFac, null );
 		
-		DPScript script = styleSheet.scriptRSuper( sMainStyleSheet.text( mainText ), styleSheet.paragraph( new DPElement[] { fraction } ) );
-		
-		return styleSheet.hbox( new DPElement[] { scriptPreStyleSheet.text( "Label A yYgGjJpPqQ" ), script, scriptPostStyleSheet.text( "Label B yYgGjJpPqQ" ) } );
+		return styleSheet.hbox( new DPElement[] { scriptPreStyleSheet.text( "Label A yYgGjJpPqQ" ), scriptFac.createElement( scriptStyleSheet ), scriptPostStyleSheet.text( "Label B yYgGjJpPqQ" ) } );
 	}
 
 	
@@ -68,24 +114,24 @@ public class ScriptTestPage extends SystemPage
 		
 		for (int i = 0; i < 16; i++)
 		{
-			DPElement leftSuperText = ( i & 1 ) != 0   ?   sScriptStyleSheet.text( "left super" )  :  null; 
-			DPElement leftSubText = ( i & 2 ) != 0   ?   sScriptStyleSheet.text( "left sub" )  :  null; 
-			DPElement rightSuperText = ( i & 4 ) != 0   ?   sScriptStyleSheet.text( "right super" )  :  null; 
-			DPElement rightSubText = ( i & 8 ) != 0   ?   sScriptStyleSheet.text( "right sub" )  :  null;
+			ElementFactory leftSuperText = ( i & 1 ) != 0   ?   textFactory( "left super" )  :  null; 
+			ElementFactory leftSubText = ( i & 2 ) != 0   ?   textFactory( "left sub" )  :  null; 
+			ElementFactory rightSuperText = ( i & 4 ) != 0   ?   textFactory( "right super" )  :  null; 
+			ElementFactory rightSubText = ( i & 8 ) != 0   ?   textFactory( "right sub" )  :  null;
 			
-			children.add( makeScriptLine( sMainStyleSheet.text( "MAIN" + String.valueOf( i ) ), leftSuperText, leftSubText, rightSuperText, rightSubText ) );
+			children.add( makeScriptLine( textFactory( "MAIN" + String.valueOf( i ) ), leftSuperText, leftSubText, rightSuperText, rightSubText ) );
 		}
 		
 		children.add( dividerStyleSheet.text( "---" ) );
 
 		for (int i = 0; i < 16; i++)
 		{
-			DPElement leftSuperText = ( i & 1 ) != 0   ?   styleSheet.fraction( sScriptStyleSheet.text( "a" ), sScriptStyleSheet.text( "x" ), "/" )  :  sScriptStyleSheet.text( "a" ); 
-			DPElement leftSubText = ( i & 2 ) != 0   ?   styleSheet.fraction( sScriptStyleSheet.text( "b" ), sScriptStyleSheet.text( "x" ), "/" )  :  sScriptStyleSheet.text( "b" ); 
-			DPElement rightSuperText = ( i & 4 ) != 0   ?   styleSheet.fraction( sScriptStyleSheet.text( "c" ), sScriptStyleSheet.text( "x" ), "/" )  :  sScriptStyleSheet.text( "c" ); 
-			DPElement rightSubText = ( i & 8 ) != 0   ?   styleSheet.fraction( sScriptStyleSheet.text( "d" ), sScriptStyleSheet.text( "x" ), "/" )  :  sScriptStyleSheet.text( "d" );
+			ElementFactory leftSuperText = ( i & 1 ) != 0   ?   fractionFactory( textFactory( "a" ), textFactory( "x" ), "/" )  :  textFactory( "a" ); 
+			ElementFactory leftSubText = ( i & 2 ) != 0   ?   fractionFactory( textFactory( "b" ), textFactory( "x" ), "/" )  :  textFactory( "b" ); 
+			ElementFactory rightSuperText = ( i & 4 ) != 0   ?   fractionFactory( textFactory( "c" ), textFactory( "x" ), "/" )  :  textFactory( "c" ); 
+			ElementFactory rightSubText = ( i & 8 ) != 0   ?   fractionFactory( textFactory( "d" ), textFactory( "x" ), "/" )  :  textFactory( "d" );
 			
-			children.add( makeScriptLine( sMainStyleSheet.text( "MAIN" + String.valueOf( i ) ), leftSuperText, leftSubText, rightSuperText, rightSubText ) );
+			children.add( makeScriptLine( textFactory( "MAIN" + String.valueOf( i ) ), leftSuperText, leftSubText, rightSuperText, rightSubText ) );
 		}
 		
 		return styleSheet.withVBoxSpacing( 10.0 ).vbox( children.toArray( new DPElement[0] ) );
