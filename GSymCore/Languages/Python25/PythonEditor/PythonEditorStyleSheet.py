@@ -375,6 +375,9 @@ class PythonEditorStyleSheet (StyleSheet):
 		return primitiveStyleSheet.vbox( lineViews )
 	
 	
+		
+	
+	
 	
 	def blankLine(self):
 		return self['primitiveStyle'].text( '' )

@@ -259,7 +259,11 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# MISC
 	@ObjectNodeDispatchMethod( Schema.PythonModule )
 	def PythonModule(self, ctx, styleSheet, state, node, suite):
-		lineViews = ctx.mapPresentFragment( suite, styleSheet.withPythonState( PRECEDENCE_NONE, PythonEditorStyleSheet.MODE_EDITSTATEMENT ) )
+		if len( suite ) == 0:
+			# Empty document - create a single blank line so that there is something to edit
+			lineViews = [ styleSheet.statementLine( styleSheet.blankLine() ) ]
+		else:
+			lineViews = ctx.mapPresentFragment( suite, styleSheet.withPythonState( PRECEDENCE_NONE, PythonEditorStyleSheet.MODE_EDITSTATEMENT ) )
 		suiteElement = styleSheet.suiteView( lineViews )
 		suiteElement.setStructuralValueObject( suite )
 		suiteElement.setLinearRepresentationListener( SuiteLinearRepresentationListener( self._parser.suite(), suite ) )
