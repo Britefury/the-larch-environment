@@ -85,7 +85,7 @@ public abstract class IncrementalTree
 	}
 	
 	
-	public IncrementalTreeNode buildIncrementalTreeNodeResult(Object node, IncrementalTreeNode.NodeResultFactory elementFactory)
+	public IncrementalTreeNode buildIncrementalTreeNodeResult(Object node, IncrementalTreeNode.NodeResultFactory resultFactory)
 	{
 		if ( node == null )
 		{
@@ -94,18 +94,18 @@ public abstract class IncrementalTree
 		else
 		{
 			// Try asking the table for an unused incremental tree node for the document node
-			IncrementalTreeNode viewNode = nodeTable.getUnrefedIncrementalNodeFor( node, elementFactory );
+			IncrementalTreeNode resultNode = nodeTable.getUnrefedIncrementalNodeFor( node, resultFactory );
 			
-			if ( viewNode == null )
+			if ( resultNode == null )
 			{
 				// No existing incremental tree node could be acquired.
 				// Create a new one and add it to the table
-				viewNode = createIncrementalTreeNode( node );
+				resultNode = createIncrementalTreeNode( node );
 			}
 			
-			viewNode.setNodeResultFactory( elementFactory );
+			resultNode.setNodeResultFactory( resultFactory );
 			
-			return viewNode;
+			return resultNode;
 		}
 	}
 	

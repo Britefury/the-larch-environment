@@ -1318,13 +1318,13 @@ class TestCase_Python25Parser (ParserTestCase):
 
 	def testTupleLiteral(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.expression(), '()', Schema.TupleLiteral( values=[] ) )
-		self._parseStringTest( g.expression(), '(())', Schema.TupleLiteral( values=[], parens='1' ) )
+		self._parseStringTest( g.expression(), '()', Schema.TupleLiteral( values=[], parens='1' ) )
+		self._parseStringTest( g.expression(), '(())', Schema.TupleLiteral( values=[], parens='2' ) )
 		self._parseStringTest( g.expression(), '(a)', Schema.Load( name='a', parens='1' ) )
-		self._parseStringTest( g.expression(), '(a,)', Schema.TupleLiteral( values=[ Schema.Load( name='a' ) ], trailingSeparator='1' ) )
-		self._parseStringTest( g.expression(), '((a,))', Schema.TupleLiteral( values=[ Schema.Load( name='a' ) ], trailingSeparator='1', parens='1' ) )
-		self._parseStringTest( g.expression(), '(a,b)', Schema.TupleLiteral( values=[ Schema.Load( name='a' ), Schema.Load( name='b' ) ] ) )
-		self._parseStringTest( g.expression(), '(a,b,)', Schema.TupleLiteral( values=[ Schema.Load( name='a' ), Schema.Load( name='b' ) ], trailingSeparator='1' ) )
+		self._parseStringTest( g.expression(), '(a,)', Schema.TupleLiteral( values=[ Schema.Load( name='a' ) ], parens='1', trailingSeparator='1' ) )
+		self._parseStringTest( g.expression(), '((a,))', Schema.TupleLiteral( values=[ Schema.Load( name='a' ) ], parens='2', trailingSeparator='1' ) )
+		self._parseStringTest( g.expression(), '(a,b)', Schema.TupleLiteral( values=[ Schema.Load( name='a' ), Schema.Load( name='b' ) ], parens='1' ) )
+		self._parseStringTest( g.expression(), '(a,b,)', Schema.TupleLiteral( values=[ Schema.Load( name='a' ), Schema.Load( name='b' ) ], parens='1', trailingSeparator='1' ) )
 
 
 	def testListLiteral(self):

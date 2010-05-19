@@ -26,7 +26,7 @@ import BritefuryJ.GSym.GSymBrowserContext;
 import BritefuryJ.GSym.GSymSubject;
 import BritefuryJ.GSym.GenericPerspective.PresentationStateListener;
 import BritefuryJ.Incremental.IncrementalFunctionMonitor;
-import BritefuryJ.Incremental.IncrementalValueMonitor;
+import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 
 public class GSymFragmentView extends IncrementalTreeNode implements FragmentContext, PresentationStateListener
@@ -296,9 +296,9 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 		// is up to date and available.
 		// Blocking the access tracking prevents an inner node from causing all parent/grandparent/etc nodes from requiring a
 		// refresh.
-		IncrementalFunctionMonitor currentComputation = IncrementalValueMonitor.blockAccessTracking();
+		IncrementalFunctionMonitor currentComputation = IncrementalMonitor.blockAccessTracking();
 		incrementalNode.refresh();
-		IncrementalValueMonitor.unblockAccessTracking( currentComputation );
+		IncrementalMonitor.unblockAccessTracking( currentComputation );
 		
 		registerIncrementalNodeRelationship( incrementalNode );
 		

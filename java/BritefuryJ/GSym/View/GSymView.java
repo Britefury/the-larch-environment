@@ -269,7 +269,6 @@ public class GSymView extends IncrementalTree
 		{
 			factory = new ViewFragmentContextAndResultFactory( this, perspective, subjectContext, styleSheet, inheritedState );
 			viewFragmentContextAndResultFactories.put( key, factory );
-			return factory;
 		}
 		
 		return factory;
