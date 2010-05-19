@@ -199,8 +199,8 @@ public class GSymBrowserContext
 			GSymSubject subject = resolver.resolveLocationAsSubject( location );
 			if ( subject != null )
 			{
-				GSymView viewContext = new GSymView( subject, this, persistentState );
-				return viewContext.getPage();
+				GSymView view = new GSymView( subject, this, persistentState );
+				return view.getPage();
 			}
 		}
 		

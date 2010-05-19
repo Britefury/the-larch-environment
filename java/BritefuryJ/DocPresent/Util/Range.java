@@ -6,13 +6,20 @@
 //##************************
 package BritefuryJ.DocPresent.Util;
 
+import java.awt.Color;
 import java.util.ArrayList;
 
+import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.GSym.GenericPerspective.Presentable;
+import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.Incremental.IncrementalValueMonitor;
 
 
-public class Range implements IncrementalOwner
+public class Range implements IncrementalOwner, Presentable
 {
 	public interface RangeListener
 	{
@@ -160,5 +167,22 @@ public class Range implements IncrementalOwner
 	{
 		return "Range( min=" + min + ", max=" + max + ", begin=" + begin + ", end=" + end + ", stepSize=" + stepSize + " )";
 	}
+
+
+	@Override
+	public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	{
+		incr.onAccess();
+		DPElement rangeField = styleSheet.horizontalObjectField( "Valid range:",
+				defaultStyle.paragraph( new DPElement[] { numValueStyle.staticText( String.valueOf( min ) ), defaultStyle.staticText( " to " ), numValueStyle.staticText( String.valueOf( max ) ) } ) );
+		DPElement valueField = styleSheet.horizontalObjectField( "Value range:",
+				defaultStyle.paragraph( new DPElement[] { numValueStyle.staticText( String.valueOf( begin ) ), defaultStyle.staticText( " to " ), numValueStyle.staticText( String.valueOf( end ) ) } ) );
+		DPElement stepSizeField = styleSheet.horizontalObjectField( "Step size:", numValueStyle.staticText( String.valueOf( stepSize ) ) );
+		return styleSheet.objectBoxWithFields( getClass().getName(), new DPElement[] { rangeField, valueField, stepSizeField } );
+	}
+	
+	
+	private final static PrimitiveStyleSheet defaultStyle = PrimitiveStyleSheet.instance;
+	private final static PrimitiveStyleSheet numValueStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.5f, 0.0f, 0.25f ) );
 };
 

@@ -146,6 +146,11 @@ public class AttributeTable implements Presentable
 		return values.get( attrName );
 	}
 	
+	public Object getOptional(String attrName)
+	{
+		return values.get( attrName );
+	}
+	
 	public <V extends Object> V get(String attrName, Class<V> valueClass, V defaultValue)
 	{
 		if ( !values.containsKey( attrName ) )
@@ -153,6 +158,30 @@ public class AttributeTable implements Presentable
 			throw new AttributeDoesNotExistException();
 		}
 		
+		Object v = values.get( attrName );
+		
+		if ( v == null )
+		{
+			return null;
+		}
+		else
+		{
+			V typedV;
+			try
+			{
+				typedV = valueClass.cast( v );
+			}
+			catch (ClassCastException e)
+			{
+				notifyBadAttributeType( attrName, v, valueClass );
+				return defaultValue;
+			}
+			return typedV;
+		}
+	}
+	
+	public <V extends Object> V getOptional(String attrName, Class<V> valueClass, V defaultValue)
+	{
 		Object v = values.get( attrName );
 		
 		if ( v == null )

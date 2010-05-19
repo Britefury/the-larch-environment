@@ -205,7 +205,6 @@ public abstract class IncrementalTreeNode implements IncrementalMonitorListener,
 				r = computeNodeResult();
 			}
 			incr.onRefreshEnd( refreshState );
-			incr.onAccess();
 		}
 		
 		// Refresh each child
@@ -218,6 +217,7 @@ public abstract class IncrementalTreeNode implements IncrementalMonitorListener,
 		
 		if ( bNodeRefreshRequired )
 		{
+			incr.onAccess();
 			// Set the node result
 			updateNodeResult( r );
 		}
