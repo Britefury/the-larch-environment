@@ -357,11 +357,13 @@ public class GSymGenericPerspective extends GSymAbstractPerspective
 		registerJavaObjectPresenter( Boolean.class,  BasicPresenters.presenter_Boolean );
 
 		registerPythonObjectPresenter( PyTuple.TYPE,  BasicPresenters.presenter_PyTuple );
+		registerPythonObjectPresenter( PyType.TYPE,  BasicPresenters.presenter_PyType );
 		
 		registerJavaObjectPresenter( List.class,  BasicPresenters.presenter_List );
 		registerJavaObjectPresenter( BufferedImage.class,  BasicPresenters.presenter_BufferedImage );
 		registerJavaObjectPresenter( Shape.class,  BasicPresenters.presenter_Shape );
 		registerJavaObjectPresenter( Color.class,  BasicPresenters.presenter_Color );
+		registerJavaObjectPresenter( Class.class,  BasicPresenters.presenter_Class );
 	}
 	
 	
@@ -471,6 +473,49 @@ public class GSymGenericPerspective extends GSymAbstractPerspective
 			}
 		};
 
+		public static final PyObjectPresenter presenter_PyType = new PyObjectPresenter()
+		{
+			public DPElement presentObject(PyObject x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+			{
+				PyType type = (PyType)x;
+				
+				//Class<?> superClass = cls.getSuperclass();
+				//Class<?> interfaces[] = cls.getInterfaces();
+				
+				ArrayList<DPElement> lines = new ArrayList<DPElement>();
+				
+				ArrayList<DPElement> header = new ArrayList<DPElement>();
+				header.add( classKeywordStyle.staticText( "Class " ) );
+				header.add( classNameStyle.staticText( type.getName() ) );
+				
+				PyTuple bases = (PyTuple)type.getBases();
+				
+				if ( bases.size() > 0 )
+				{
+					header.add( PrimitiveStyleSheet.instance.staticText( " " ) );
+					header.add( classPunctuationStyle.staticText( "(" ) );
+					header.add( PrimitiveStyleSheet.instance.paragraphIndentMarker() );
+					boolean bFirst = true;
+					for (PyObject base: bases.getArray())
+					{
+						PyType baseType = (PyType)base;
+						if ( !bFirst )
+						{
+							header.add( classPunctuationStyle.staticText( ", " ) );
+						}
+						header.add( classNameStyle.staticText( baseType.getName() ) );
+						bFirst = false;
+					}
+					header.add( PrimitiveStyleSheet.instance.paragraphDedentMarker() );
+					header.add( classPunctuationStyle.staticText( ")" ) );
+				}
+				
+				lines.add( PrimitiveStyleSheet.instance.paragraph( header ) );
+				
+				return styleSheet.objectBoxWithFields( "Python Class", lines.toArray( new DPElement[0] ) );
+			}
+		};
+
 		
 
 		public static final ObjectPresenter presenter_List = new ObjectPresenter()
@@ -559,6 +604,56 @@ public class GSymGenericPerspective extends GSymAbstractPerspective
 				return colourObjectBoxStyle.objectBorder( contents );
 			}
 		};
+
+		public static final ObjectPresenter presenter_Class = new ObjectPresenter()
+		{
+			public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+			{
+				Class<?> cls = (Class<?>)x;
+				Class<?> superClass = cls.getSuperclass();
+				Class<?> interfaces[] = cls.getInterfaces();
+				
+				ArrayList<DPElement> lines = new ArrayList<DPElement>();
+				
+				DPElement title = classKeywordStyle.staticText( "Class " );
+				DPElement name = classNameStyle.staticText( cls.getName() );
+				lines.add( PrimitiveStyleSheet.instance.hbox( new DPElement[] { title, name } ) );
+				
+				if ( superClass != null  ||  interfaces.length > 0 )
+				{
+					ArrayList<DPElement> inheritance = new ArrayList<DPElement>();
+					if ( superClass != null )
+					{
+						inheritance.add( classKeywordStyle.staticText( "Extends " ) );
+						inheritance.add( classNameStyle.staticText( superClass.getName() ) );
+					}
+					
+					if ( interfaces.length > 0 )
+					{
+						if ( superClass != null )
+						{
+							inheritance.add( classKeywordStyle.staticText( " " ) );
+						}
+						inheritance.add( classKeywordStyle.staticText( "Implements " ) );
+						boolean bFirst = true;
+						for (Class<?> iface: interfaces)
+						{
+							if ( !bFirst )
+							{
+								inheritance.add( classPunctuationStyle.staticText( ", " ) );
+							}
+							inheritance.add( classNameStyle.staticText( iface.getName() ) );
+							bFirst = false;
+						}
+					}
+					
+					DPElement para = PrimitiveStyleSheet.instance.paragraph( inheritance );
+					lines.add( para.padX( 45.0, 0.0 ) );
+				}
+				
+				return styleSheet.objectBoxWithFields( "Java Class", lines.toArray( new DPElement[0] ) );
+			}
+		};
 	}
 	
 	
@@ -573,6 +668,11 @@ public class GSymGenericPerspective extends GSymAbstractPerspective
 	private static final PrimitiveStyleSheet colourBlueStyle = PrimitiveStyleSheet.instance.withFontSize( 12 ).withForeground( new Color( 0.0f, 0.0f, 0.75f ) );
 	private static final PrimitiveStyleSheet colourAlphaStyle = PrimitiveStyleSheet.instance.withFontSize( 12 ).withForeground( new Color( 0.3f, 0.3f, 0.3f ) );
 	private static final PrimitiveStyleSheet colourBoxStyle = PrimitiveStyleSheet.instance.withHBoxSpacing( 5.0 );
+
+	
+	private static final PrimitiveStyleSheet classKeywordStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.0f, 0.0f, 0.5f ) ).withFontBold( true ).withTextSmallCaps( true );
+	private static final PrimitiveStyleSheet classPunctuationStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.25f, 0.0f, 0.5f ) );
+	private static final PrimitiveStyleSheet classNameStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.0f, 0.25f, 0.5f ) );
 
 	
 	private static final PrimitiveStyleSheet asStringStyle = PrimitiveStyleSheet.instance.withFontItalic( true ).withFontSize( 14 );
