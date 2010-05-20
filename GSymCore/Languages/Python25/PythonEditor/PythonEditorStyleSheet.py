@@ -1024,7 +1024,7 @@ class PythonEditorStyleSheet (StyleSheet):
 			basesListLayout = self._noParenTupleListViewLayout()
 
 			trailingSep = TrailingSeparator.ALWAYS   if bBasesTrailingSeparator   else TrailingSeparator.NEVER
-			elements.extend( [ delimStyle.text( '(' ),  basesListLayout.createListElement( bases, trailingSep ),  delimStyle.text( ')' ) ] )
+			elements.extend( [ primitiveStyle.text( ' ' ),  delimStyle.text( '(' ),  basesListLayout.createListElement( bases, trailingSep ),  delimStyle.text( ')' ) ] )
 		elements.append( punctuationStyle.text( ':' ) )
 		return primitiveStyle.span( elements )
 	
