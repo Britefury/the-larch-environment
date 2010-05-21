@@ -16,8 +16,12 @@ import java.util.List;
 import java.util.Stack;
 
 import org.python.core.Py;
+import org.python.core.PyDictionary;
 import org.python.core.PyException;
+import org.python.core.PyFunction;
+import org.python.core.PyList;
 import org.python.core.PyObject;
+import org.python.core.PyString;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
 
@@ -358,6 +362,7 @@ public class GSymGenericPerspective extends GSymAbstractPerspective
 
 		registerPythonObjectPresenter( PyTuple.TYPE,  BasicPresenters.presenter_PyTuple );
 		registerPythonObjectPresenter( PyType.TYPE,  BasicPresenters.presenter_PyType );
+		registerPythonObjectPresenter( PyFunction.TYPE,  BasicPresenters.presenter_PyFunction );
 		
 		registerJavaObjectPresenter( List.class,  BasicPresenters.presenter_List );
 		registerJavaObjectPresenter( BufferedImage.class,  BasicPresenters.presenter_BufferedImage );
@@ -479,9 +484,6 @@ public class GSymGenericPerspective extends GSymAbstractPerspective
 			{
 				PyType type = (PyType)x;
 				
-				//Class<?> superClass = cls.getSuperclass();
-				//Class<?> interfaces[] = cls.getInterfaces();
-				
 				ArrayList<DPElement> lines = new ArrayList<DPElement>();
 				
 				ArrayList<DPElement> header = new ArrayList<DPElement>();
@@ -513,6 +515,116 @@ public class GSymGenericPerspective extends GSymAbstractPerspective
 				lines.add( PrimitiveStyleSheet.instance.paragraph( header ) );
 				
 				return styleSheet.objectBoxWithFields( "Python Class", lines.toArray( new DPElement[0] ) );
+			}
+		};
+
+		private static PyFunction pyFunction_inspectFn = null;
+		public static final PyObjectPresenter presenter_PyFunction = new PyObjectPresenter()
+		{
+			
+			private PyFunction getInspectFunction()
+			{
+				if ( pyFunction_inspectFn == null )
+				{
+					String code = "import inspect\n" +
+					"\n" +
+					"def _flatten(xs):\n" +
+					"	ys = []\n" +
+					"	for x in xs:\n" +
+					"		if isinstance( x, list ):\n" +
+					"			ys.extend( _flatten( x ) )\n" +
+					"		else:\n" +
+					"			ys.append( x )\n" +
+					"	return ys\n" +
+					"\n" +
+					"def inspectFunction(f):\n" +
+					"	args, varargs, varkw, defaults = inspect.getargspec( f )\n" +
+					"	args = _flatten( args )\n" +
+					"	kwargs = []\n" + 
+					"	if defaults is not None:\n" +
+					"		kwargs = args[-len(defaults):]\n" +
+					"		del args[-len(defaults):]\n" +
+					"	return args, kwargs, varargs, varkw\n";
+					
+					PyDictionary locals = new PyDictionary();
+					
+					Py.exec( new PyString( code ), locals, locals );
+					
+					pyFunction_inspectFn = (PyFunction)locals.get( new PyString( "inspectFunction" ) );
+				}
+				
+				return pyFunction_inspectFn;
+			}
+			
+			private PyTuple inspectFunction(PyFunction fun)
+			{
+				return (PyTuple)getInspectFunction().__call__( fun );
+			}
+			
+			
+			
+			
+			
+			public DPElement presentObject(PyObject x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+			{
+				PyFunction fun = (PyFunction)x;
+				
+				PyTuple argSpec = inspectFunction( fun );
+				PyObject args = argSpec.getArray()[0];
+				PyObject kwargs = argSpec.getArray()[1];
+				PyObject varargs = argSpec.getArray()[2];
+				PyObject varkw = argSpec.getArray()[3];
+				
+				
+				ArrayList<DPElement> lines = new ArrayList<DPElement>();
+				
+				ArrayList<DPElement> header = new ArrayList<DPElement>();
+				header.add( fnNameStyle.staticText( fun.__name__.toString() ) );
+				header.add( fnPunctuationStyle.staticText( "(" ) );
+				boolean bFirst = true;
+				for (PyObject arg: ((PyList)args).getArray())
+				{
+					if ( !bFirst )
+					{
+						header.add( fnPunctuationStyle.staticText( ", " ) );
+					}
+					header.add( fnArgStyle.staticText( arg.toString() ) );
+					bFirst = false;
+				}
+				for (PyObject arg: ((PyList)kwargs).getArray())
+				{
+					if ( !bFirst )
+					{
+						header.add( fnPunctuationStyle.staticText( ", " ) );
+					}
+					header.add( fnKWArgStyle.staticText( arg.toString() ) );
+					bFirst = false;
+				}
+				if ( varargs != Py.None )
+				{
+					if ( !bFirst )
+					{
+						header.add( fnPunctuationStyle.staticText( ", " ) );
+					}
+					header.add( fnPunctuationStyle.staticText( "*" ) );
+					header.add( fnVarArgStyle.staticText( varargs.toString() ) );
+					bFirst = false;
+				}
+				if ( varkw != Py.None )
+				{
+					if ( !bFirst )
+					{
+						header.add( fnPunctuationStyle.staticText( ", " ) );
+					}
+					header.add( fnPunctuationStyle.staticText( "**" ) );
+					header.add( fnVarArgStyle.staticText( varkw.toString() ) );
+					bFirst = false;
+				}
+				header.add( fnPunctuationStyle.staticText( ")" ) );
+				
+				lines.add( PrimitiveStyleSheet.instance.paragraph( header ) );
+				
+				return styleSheet.objectBoxWithFields( "Python Function", lines.toArray( new DPElement[0] ) );
 			}
 		};
 
@@ -674,6 +786,11 @@ public class GSymGenericPerspective extends GSymAbstractPerspective
 	private static final PrimitiveStyleSheet classPunctuationStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.25f, 0.0f, 0.5f ) );
 	private static final PrimitiveStyleSheet classNameStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.0f, 0.25f, 0.5f ) );
 
+	private static final PrimitiveStyleSheet fnPunctuationStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.25f, 0.0f, 0.5f ) );
+	private static final PrimitiveStyleSheet fnNameStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.0f, 0.25f, 0.5f ) );
+	private static final PrimitiveStyleSheet fnArgStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.0f, 0.5f, 0.25f ) );
+	private static final PrimitiveStyleSheet fnKWArgStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.0f, 0.5f, 0.25f ) ).withFontItalic( true );
+	private static final PrimitiveStyleSheet fnVarArgStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.0f, 0.5f, 0.25f ) );
 	
 	private static final PrimitiveStyleSheet asStringStyle = PrimitiveStyleSheet.instance.withFontItalic( true ).withFontSize( 14 );
 
