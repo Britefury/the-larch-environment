@@ -700,7 +700,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	
 	public CommandTrackerFactory getTrackerFactory()
 	{
-		return DMObjectTrackerFactory.factory;
+		return DMObjectCommandTracker.factory;
 	}
 
 	public void setTracker(CommandTracker tracker)

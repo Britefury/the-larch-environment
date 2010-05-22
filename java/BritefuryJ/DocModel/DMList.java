@@ -1131,7 +1131,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 
 	public CommandTrackerFactory getTrackerFactory()
 	{
-		return DMListTrackerFactory.factory;
+		return DMListCommandTracker.factory;
 	}
 
 	public void setTracker(CommandTracker tracker)
