@@ -117,6 +117,7 @@ public class GSymPrimitivePresenter
 			return booleanStyle.staticText( "False" );
 		}
 	}
+	
 	private static final PrimitiveStyleSheet punctuationStyle = PrimitiveStyleSheet.instance.withForeground( Color.blue );
 	private static final PrimitiveStyleSheet charStyle = PrimitiveStyleSheet.instance; 
 	private static final PrimitiveStyleSheet multiLineStringStyle = PrimitiveStyleSheet.instance.withBackground( new FillPainter( new Color( 1.0f, 1.0f, 0.75f ) ) );
