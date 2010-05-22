@@ -37,6 +37,13 @@ public class DPImage extends DPContentLeaf
 		initImage( image, hoverImage, imageWidth, imageHeight );
 	}
 	
+	public DPImage(ContentLeafStyleParams styleParams, String textRepresentation, BufferedImage image, BufferedImage hoverImage, double imageWidth)
+	{
+		super( styleParams, textRepresentation );
+		
+		initImage( image, hoverImage, imageWidth );
+	}
+	
 	public DPImage(ContentLeafStyleParams styleParams, String textRepresentation, BufferedImage image, BufferedImage hoverImage)
 	{
 		super( styleParams, textRepresentation );
@@ -51,6 +58,13 @@ public class DPImage extends DPContentLeaf
 		initImage( readImageFile( imageFile ), hoverImageFile != null  ?  readImageFile( hoverImageFile )  :  null,  imageWidth, imageHeight );
 	}
 	
+	public DPImage(ContentLeafStyleParams styleParams, String textRepresentation, File imageFile, File hoverImageFile, double imageWidth)
+	{
+		super( styleParams, textRepresentation );
+		
+		initImage( readImageFile( imageFile ), hoverImageFile != null  ?  readImageFile( hoverImageFile )  :  null,  imageWidth );
+	}
+	
 	public DPImage(ContentLeafStyleParams styleParams, String textRepresentation, File imageFile, File hoverImageFile)
 	{
 		super( styleParams, textRepresentation );
@@ -61,6 +75,11 @@ public class DPImage extends DPContentLeaf
 	public DPImage(ContentLeafStyleParams styleParams, String textRepresentation, String imageFilename, String hoverImageFilename, double imageWidth, double imageHeight)
 	{
 		this( styleParams, textRepresentation, new File( imageFilename ), hoverImageFilename != null  ?  new File( hoverImageFilename )  :  null,  imageWidth, imageHeight );
+	}
+	
+	public DPImage(ContentLeafStyleParams styleParams, String textRepresentation, String imageFilename, String hoverImageFilename, double imageWidth)
+	{
+		this( styleParams, textRepresentation, new File( imageFilename ), hoverImageFilename != null  ?  new File( hoverImageFilename )  :  null,  imageWidth );
 	}
 	
 	public DPImage(ContentLeafStyleParams styleParams, String textRepresentation, String imageFilename, String hoverImageFilename)
@@ -115,6 +134,20 @@ public class DPImage extends DPContentLeaf
 		{
 			hoverImageScaleX = imageWidth / (double)hoverImage.getWidth();
 			hoverImageScaleY = imageHeight / (double)hoverImage.getHeight();
+		}
+		
+		layoutNode = new LayoutNodeImage( this );
+	}
+	
+	private void initImage(BufferedImage image, BufferedImage hoverImage, double imageWidth)
+	{
+		this.image = image;
+		imageScaleX = imageScaleY = imageWidth / (double)image.getWidth();
+		
+		this.hoverImage = hoverImage;
+		if ( hoverImage != null )
+		{
+			hoverImageScaleX = hoverImageScaleY = imageWidth / (double)hoverImage.getWidth();
 		}
 		
 		layoutNode = new LayoutNodeImage( this );

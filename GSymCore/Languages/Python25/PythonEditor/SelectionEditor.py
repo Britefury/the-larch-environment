@@ -210,7 +210,8 @@ class Python25EditHandler (EditHandler):
 		path0, path1 = getStatementContextPathsFromCommonRoot( startContext, endContext )
 		root = path0[0]
 		
-		rootElement = root.getFragmentElement()
+		# Get the content element, not the fragment itself, otherwise editing operations that involve the module (top level) will trigger events that will NOT be caught
+		rootElement = root.getFragmentContentElement()
 				
 		startStmtElement.setStructuralPrefixObject( Schema.Indent() )
 		endStmtElement.setStructuralSuffixObject( Schema.Dedent() )
@@ -242,7 +243,8 @@ class Python25EditHandler (EditHandler):
 		path0, path1 = getStatementContextPathsFromCommonRoot( startContext, endContext )
 		root = path0[0]
 		
-		rootElement = root.getFragmentElement()
+		# Get the content element, not the fragment itself, otherwise editing operations that involve the module (top level) will trigger events that will NOT be caught
+		rootElement = root.getFragmentContentElement()
 				
 		startStmtElement.setStructuralPrefixObject( Schema.Dedent() )
 		endStmtElement.setStructuralSuffixObject( Schema.Indent() )

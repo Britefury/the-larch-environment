@@ -160,7 +160,7 @@ public class DPStressTest
 		DPElement w = createContentNode();
 		long t2 = System.nanoTime();
 		System.out.println( "Element tree creation time: " + (double)( t2 - t1 ) / 1000000000.0 );
-		DPViewport viewport = new DPViewport( 0.0, 0.0, new PersistentState() );
+		DPViewport viewport = new DPViewport( new PersistentState() );
 		viewport.setChild( w );
 		presentation.setChild( viewport.alignHExpand().alignVExpand() );
 	     

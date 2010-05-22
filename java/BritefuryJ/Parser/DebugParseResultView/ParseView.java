@@ -152,7 +152,7 @@ public class ParseView implements FragmentContext
 		viewBin = PrimitiveStyleSheet.instance.bin( root.getElement() );
 		viewBin.addInteractor( new ParseViewInteractor( this ) );
 		
-		viewport = ControlsStyleSheet.instance.scrolledViewport( viewBin, 0.0, 800.0, viewportState );
+		viewport = ControlsStyleSheet.instance.aspectRatioScrolledViewport( viewBin, 0.0, 1.333, viewportState );
 		element = viewportBorderStyle.border( viewport.getElement().alignHExpand().alignVExpand() ).alignHExpand().alignVExpand();
 	}
 	

@@ -30,33 +30,30 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 
 	
 	
-	private double minWidth, minHeight;
 	private Range xRange, yRange;
 	private Xform2 allocationSpaceToLocalSpace;
 	private PersistentState state;
 	
 	
-	public DPViewport(double minWidth, double minHeight, PersistentState state)
+	public DPViewport(PersistentState state)
 	{
-		this( ContainerStyleParams.defaultStyleParams, minWidth, minHeight, null, null, state );
+		this( ContainerStyleParams.defaultStyleParams, null, null, state );
 	}
 
-	public DPViewport(double minWidth, double minHeight, Range xRange, Range yRange, PersistentState state)
+	public DPViewport(Range xRange, Range yRange, PersistentState state)
 	{
-		this( ContainerStyleParams.defaultStyleParams, minWidth, minHeight, xRange, yRange, state );
+		this( ContainerStyleParams.defaultStyleParams, xRange, yRange, state );
 	}
 
-	public DPViewport(ContainerStyleParams styleParams, double minWidth, double minHeight, PersistentState state)
+	public DPViewport(ContainerStyleParams styleParams, PersistentState state)
 	{
-		this( styleParams, minWidth, minHeight, null, null, state );
+		this( styleParams, null, null, state );
 	}
 
-	public DPViewport(ContainerStyleParams styleParams, double minWidth, double minHeight, Range xRange, Range yRange, PersistentState state)
+	public DPViewport(ContainerStyleParams styleParams, Range xRange, Range yRange, PersistentState state)
 	{
 		super(styleParams);
 		
-		this.minWidth = minWidth;
-		this.minHeight = minHeight;
 		this.xRange = xRange;
 		this.yRange = yRange;
 		layoutNode = new LayoutNodeViewport( this );
@@ -70,12 +67,10 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 		allocationSpaceToLocalSpace = x;
 	}
 	
-	protected DPViewport(DPViewport element)
+	private DPViewport(DPViewport element)
 	{
 		super( element );
 		
-		this.minWidth = element.minWidth;
-		this.minHeight = element.minHeight;
 		this.xRange = element.xRange;
 		this.yRange = element.yRange;
 		layoutNode = new LayoutNodeViewport( this );
@@ -111,17 +106,6 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 	
 	
 	
-	
-	
-	public double getMinWidth()
-	{
-		return minWidth;
-	}
-	
-	public double getMinHeight()
-	{
-		return minHeight;
-	}
 	
 	
 	public Range getXRange()
