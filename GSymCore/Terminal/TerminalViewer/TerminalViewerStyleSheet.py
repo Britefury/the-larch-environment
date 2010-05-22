@@ -32,14 +32,14 @@ class TerminalViewerStyleSheet (StyleSheet):
 		
 		self.initAttr( 'labelAttrs', AttributeValues( fontSize=10 ) )
 
-		self.initAttr( 'blockStyleAttrs', AttributeValues( vboxSpacing=2.0, border=SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.25, 0.25, 0.25 ), Color( 0.8, 0.8, 0.8 ) ) ) )
+		self.initAttr( 'blockStyleAttrs', AttributeValues( vboxSpacing=2.0, border=SolidBorder( 1.0, 5.0, 15.0, 15.0, Color( 0.25, 0.25, 0.25 ), Color( 0.8, 0.8, 0.8 ) ) ) )
 		
 		self.initAttr( 'pythonModuleBorderAttrs', AttributeValues( border=SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), Color.WHITE ) ) )
-		self.initAttr( 'stdOutAttrs', AttributeValues( border=SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.0, 0.8, 0.0 ), Color.WHITE ), foreground=Color( 0.0, 0.5, 0.0 ) ) )
-		self.initAttr( 'stdErrAttrs', AttributeValues( border=SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.8, 0.4, 0.0 ), Color.WHITE ), foreground=Color( 0.5, 0.25, 0.0 ) ) )
-		self.initAttr( 'exceptionBorderAttrs', AttributeValues( border=SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.8, 0.0, 0.0 ), Color( 1.0, 0.9, 0.9 ) ) ) )
-		self.initAttr( 'resultBorderAttrs', AttributeValues( border=SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.0, 0.0, 0.8 ), Color.WHITE ) ) )
-		self.initAttr( 'dropPromptAttrs', AttributeValues( border=SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.0, 0.8, 0.0 ), Color.WHITE ) ) )
+		self.initAttr( 'stdOutAttrs', AttributeValues( border=SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.0, 0.8, 0.0 ), Color.WHITE ), foreground=Color( 0.0, 0.5, 0.0 ) ) )
+		self.initAttr( 'stdErrAttrs', AttributeValues( border=SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.8, 0.4, 0.0 ), Color.WHITE ), foreground=Color( 0.5, 0.25, 0.0 ) ) )
+		self.initAttr( 'exceptionBorderAttrs', AttributeValues( border=SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.8, 0.0, 0.0 ), Color( 1.0, 0.9, 0.9 ) ) ) )
+		self.initAttr( 'resultBorderAttrs', AttributeValues( border=SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.0, 0.0, 0.8 ), Color.WHITE ) ) )
+		self.initAttr( 'dropPromptAttrs', AttributeValues( border=SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.0, 0.8, 0.0 ), Color.WHITE ) ) )
 		
 		self.initAttr( 'terminalBlockListSpacing', 5.0 )
 		self.initAttr( 'terminalSpacing', 8.0 )
