@@ -9,6 +9,7 @@ package BritefuryJ.DocModel;
 import BritefuryJ.CommandHistory.Command;
 import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.CommandHistory.CommandTracker;
+import BritefuryJ.CommandHistory.CommandTrackerFactory;
 import BritefuryJ.CommandHistory.Trackable;
 
 public class DMObjectCommandTracker extends CommandTracker
@@ -190,4 +191,14 @@ public class DMObjectCommandTracker extends CommandTracker
 			}
 		}
 	}
+	
+	
+	public static CommandTrackerFactory factory = new CommandTrackerFactory()
+	{
+		@Override
+		public CommandTracker createTracker(CommandHistory history)
+		{
+			return new DMObjectCommandTracker( history );
+		}
+	};
 }

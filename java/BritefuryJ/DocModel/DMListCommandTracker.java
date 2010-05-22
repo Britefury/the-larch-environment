@@ -13,6 +13,7 @@ import java.util.List;
 import BritefuryJ.CommandHistory.Command;
 import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.CommandHistory.CommandTracker;
+import BritefuryJ.CommandHistory.CommandTrackerFactory;
 import BritefuryJ.CommandHistory.Trackable;
 
 class DMListCommandTracker extends CommandTracker
@@ -360,4 +361,14 @@ class DMListCommandTracker extends CommandTracker
 			}
 		}
 	}
+	
+	
+	public static CommandTrackerFactory factory = new CommandTrackerFactory()
+	{
+		@Override
+		public CommandTracker createTracker(CommandHistory history)
+		{
+			return new DMListCommandTracker( history );
+		}
+	};
 }

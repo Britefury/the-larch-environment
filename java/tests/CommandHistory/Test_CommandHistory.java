@@ -15,16 +15,6 @@ import BritefuryJ.CommandHistory.Trackable;
 
 public class Test_CommandHistory extends TestCase
 {
-	private static class DataTrackerFactory implements CommandTrackerFactory
-	{
-		public static DataTrackerFactory factory = new DataTrackerFactory();
-		
-		public CommandTracker createTracker(CommandHistory history)
-		{
-			return new DataCommandTracker( history );
-		}
-	}
-	
 	private static class DataXCommand extends Command
 	{
 		private Data d;
@@ -106,6 +96,16 @@ public class Test_CommandHistory extends TestCase
 		{
 			commandHistory.addCommand( new DataYCommand( d, oldY, y ) );
 		}
+
+		
+		private static CommandTrackerFactory factory = new CommandTrackerFactory()
+		{
+			@Override
+			public CommandTracker createTracker(CommandHistory history)
+			{
+				return new DataCommandTracker( history );
+			}
+		};
 	}
 	
 	private static class Data implements Trackable
@@ -157,7 +157,7 @@ public class Test_CommandHistory extends TestCase
 
 		public CommandTrackerFactory getTrackerFactory()
 		{
-			return DataTrackerFactory.factory;
+			return DataCommandTracker.factory;
 		}
 
 		public void setTracker(CommandTracker tracker)
