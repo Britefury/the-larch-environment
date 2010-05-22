@@ -20,11 +20,13 @@ import org.python.core.PyObject;
 import BritefuryJ.AttributeTable.AttributeValues;
 import BritefuryJ.Cell.Cell;
 import BritefuryJ.Cell.CellEvaluator;
+import BritefuryJ.DocPresent.DPAspectRatioBin;
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPBox;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.DPShape;
+import BritefuryJ.DocPresent.DPSpaceBin;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPViewport;
 import BritefuryJ.DocPresent.ElementInteractor;
@@ -771,10 +773,28 @@ public class ControlsStyleSheet extends StyleSheet
 
 		Range xRange = new Range( 0.0, 1.0, 0.0, 1.0, 0.1 );
 		Range yRange = new Range( 0.0, 1.0, 0.0, 1.0, 0.1 );
-		DPViewport viewport = primitive.viewport( child, minWidth, minHeight, xRange, yRange, state );
+		DPViewport viewport = primitive.viewport( child, xRange, yRange, state );
+		DPSpaceBin space = primitive.spaceBin( viewport.alignHExpand().alignVExpand(), minWidth, minHeight );
 		ScrollBar xScroll = horizontalScrollBar( xRange );
 		ScrollBar yScroll = verticalScrollBar( yRange );
-		DPElement hbox0 = primitive.hbox( new DPElement[] { viewport.alignHExpand().alignVExpand(),  yScroll.getElement().alignVExpand() } );
+		DPElement hbox0 = primitive.hbox( new DPElement[] { space.alignHExpand().alignVExpand(),  yScroll.getElement().alignVExpand() } );
+		DPElement hbox1 = primitive.hbox( new DPElement[] { xScroll.getElement().alignHExpand(), primitive.spacer( scrollBarSize, scrollBarSize ) } );
+		DPElement vbox = primitive.vbox( new DPElement[] { hbox0.alignHExpand().alignVExpand(), hbox1.alignHExpand() } );
+		return new ScrolledViewport( viewport, vbox, xScroll, yScroll, xRange, yRange );
+	}
+
+	public ScrolledViewport aspectRatioScrolledViewport(DPElement child, double minWidth, double aspectRatio, PersistentState state)
+	{
+		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+		double scrollBarSize = get( "scrollBarSize", Double.class, defaultScrollBarSize );
+
+		Range xRange = new Range( 0.0, 1.0, 0.0, 1.0, 0.1 );
+		Range yRange = new Range( 0.0, 1.0, 0.0, 1.0, 0.1 );
+		DPViewport viewport = primitive.viewport( child, xRange, yRange, state );
+		DPAspectRatioBin space = primitive.aspectRatioBin( viewport.alignHExpand().alignVExpand(), minWidth, aspectRatio );
+		ScrollBar xScroll = horizontalScrollBar( xRange );
+		ScrollBar yScroll = verticalScrollBar( yRange );
+		DPElement hbox0 = primitive.hbox( new DPElement[] { space.alignHExpand().alignVExpand(),  yScroll.getElement().alignVExpand() } );
 		DPElement hbox1 = primitive.hbox( new DPElement[] { xScroll.getElement().alignHExpand(), primitive.spacer( scrollBarSize, scrollBarSize ) } );
 		DPElement vbox = primitive.vbox( new DPElement[] { hbox0.alignHExpand().alignVExpand(), hbox1.alignHExpand() } );
 		return new ScrolledViewport( viewport, vbox, xScroll, yScroll, xRange, yRange );

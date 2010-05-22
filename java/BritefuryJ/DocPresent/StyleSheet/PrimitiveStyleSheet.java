@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.python.expose.ExposedMethod;
 
+import BritefuryJ.DocPresent.DPAspectRatioBin;
 import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPBox;
@@ -717,6 +718,14 @@ public class PrimitiveStyleSheet extends StyleSheet
 		return bin;
 	}
 	
+	public DPAspectRatioBin aspectRatioBin(DPElement child, double minWidth, double aspectRatio)
+	{
+		child = layoutWrap( child );
+		DPAspectRatioBin bin = new DPAspectRatioBin( getContainerParams(), minWidth, aspectRatio );
+		bin.setChild( child );
+		return bin;
+	}
+	
 	public DPBorder border(DPElement child)
 	{
 		child = layoutWrap( child );
@@ -1071,6 +1080,11 @@ public class PrimitiveStyleSheet extends StyleSheet
 		return new DPImage( getContentLeafStyleParams(), "", image, hoverImage, imageWidth, imageHeight );
 	}
 	
+	public DPImage image(BufferedImage image, BufferedImage hoverImage, double imageWidth)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", image, hoverImage, imageWidth );
+	}
+	
 	public DPImage image(BufferedImage image)
 	{
 		return new DPImage( getContentLeafStyleParams(), "", image, null );
@@ -1086,9 +1100,19 @@ public class PrimitiveStyleSheet extends StyleSheet
 		return new DPImage( getContentLeafStyleParams(), "", imageFile, null, imageWidth, imageHeight );
 	}
 	
+	public DPImage image(File imageFile, double imageWidth)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", imageFile, null, imageWidth );
+	}
+	
 	public DPImage image(File imageFile, File hoverImageFile, double imageWidth, double imageHeight)
 	{
 		return new DPImage( getContentLeafStyleParams(), "", imageFile, hoverImageFile, imageWidth, imageHeight );
+	}
+	
+	public DPImage image(File imageFile, File hoverImageFile, double imageWidth)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", imageFile, hoverImageFile, imageWidth );
 	}
 	
 	public DPImage image(File imageFile)
@@ -1106,9 +1130,19 @@ public class PrimitiveStyleSheet extends StyleSheet
 		return new DPImage( getContentLeafStyleParams(), "", imageFilename, null, imageWidth, imageHeight );
 	}
 	
+	public DPImage image(String imageFilename, double imageWidth)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", imageFilename, null, imageWidth );
+	}
+	
 	public DPImage image(String imageFilename, String hoverImageFilename, double imageWidth, double imageHeight)
 	{
 		return new DPImage( getContentLeafStyleParams(), "", imageFilename, hoverImageFilename, imageWidth, imageHeight );
+	}
+	
+	public DPImage image(String imageFilename, String hoverImageFilename, double imageWidth)
+	{
+		return new DPImage( getContentLeafStyleParams(), "", imageFilename, hoverImageFilename, imageWidth );
 	}
 	
 	public DPImage image(String imageFilename)
@@ -1170,34 +1204,18 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 	
 	
-	public DPViewport viewport(DPElement child, double minWidth, double minHeight, Range xRange, Range yRange, PersistentState state)
-	{
-		child = layoutWrap( child );
-		DPViewport viewport = new DPViewport( minWidth, minHeight, xRange, yRange, state );
-		viewport.setChild( child );
-		return viewport;
-	}
-	
 	public DPViewport viewport(DPElement child, Range xRange, Range yRange, PersistentState state)
 	{
 		child = layoutWrap( child );
-		DPViewport viewport = new DPViewport( 0.0, 0.0, xRange, yRange, state );
+		DPViewport viewport = new DPViewport( getContainerParams(), xRange, yRange, state );
 		viewport.setChild( child );
 		return viewport;
 	}
 
-	public DPViewport viewport(DPElement child, double minWidth, double minHeight, PersistentState state)
-	{
-		child = layoutWrap( child );
-		DPViewport viewport = new DPViewport( minWidth, minHeight, state );
-		viewport.setChild( child );
-		return viewport;
-	}
-	
 	public DPViewport viewport(DPElement child, PersistentState state)
 	{
 		child = layoutWrap( child );
-		DPViewport viewport = new DPViewport( 0.0, 0.0, state );
+		DPViewport viewport = new DPViewport( getContainerParams(), state );
 		viewport.setChild( child );
 		return viewport;
 	}

@@ -33,7 +33,7 @@ public class LayoutNodeViewport extends ArrangedLayoutNode
 		{
 			child.getLayoutNode().refreshRequisitionX();
 		}
-		layoutReqBox.setRequisitionX( viewport.getMinWidth(), viewport.getMinWidth() );
+		layoutReqBox.setRequisitionX( 0.0, 0.0 );
 	}
 
 	protected void updateRequisitionY()
@@ -45,7 +45,7 @@ public class LayoutNodeViewport extends ArrangedLayoutNode
 		{
 			child.getLayoutNode().refreshRequisitionY();
 		}
-		layoutReqBox.setRequisitionY( viewport.getMinHeight(), 0.0 );
+		layoutReqBox.setRequisitionY( 0.0, 0.0 );
 	}
 	
 	
