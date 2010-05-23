@@ -26,6 +26,8 @@ import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.GSymGenericPerspective;
+import BritefuryJ.GSym.ObjectPresentation.GSymObjectPresentationPerspective;
+import BritefuryJ.GSym.ObjectPresentation.ObjectPresentationLocationResolver;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.GSym.View.GSymView;
 import BritefuryJ.GSym.View.GSymViewFragmentFunction;
@@ -114,6 +116,7 @@ public class GSymBrowserContext
 	
 	
 	private BrowserContext browserContext = new BrowserContext( Arrays.asList( new LocationResolver[] { new GSymBrowserContextLocationResolver() } ) );
+	private ObjectPresentationLocationResolver objPresLocationResolver = new ObjectPresentationLocationResolver();
 	private GSymGenericPerspective genericPerspective;
 	private List<GSymLocationResolver> resolvers = new ArrayList<GSymLocationResolver>();
 	
@@ -122,12 +125,12 @@ public class GSymBrowserContext
 	public GSymBrowserContext(boolean bWithSystemPages)
 	{
 		super();
-		genericPerspective = new GSymGenericPerspective();
+		genericPerspective = new GSymGenericPerspective( objPresLocationResolver );
 		if ( bWithSystemPages )
 		{
 			addResolvers( Arrays.asList( new GSymLocationResolver[] { new SystemPageLocationResolver( SystemLocationResolver.getSystemResolver() ) } ) );
 		}
-		addResolvers( Arrays.asList( new GSymLocationResolver[] { genericPerspective.getLocationResolver() } ) );
+		addResolvers( Arrays.asList( new GSymLocationResolver[] { objPresLocationResolver } ) );
 	}
 	
 	public GSymBrowserContext(boolean bWithSystemPages, List<GSymLocationResolver> resolvers)
@@ -157,14 +160,19 @@ public class GSymBrowserContext
 	
 	
 
+	public Location getLocationForObject(GSymObjectPresentationPerspective perspective, Object x)
+	{
+		return objPresLocationResolver.getLocationForObject( perspective, x );
+	}
+	
 	public Location getLocationForObject(Object x)
 	{
-		return genericPerspective.getLocationForObject( x );
+		return objPresLocationResolver.getLocationForObject( genericPerspective, x );
 	}
 	
 	public Object getObjectAtLocation(Location location)
 	{
-		return genericPerspective.getObjectAtLocation( location );
+		return objPresLocationResolver.getObjectAtLocation( location );
 	}
 	
 	

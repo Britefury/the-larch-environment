@@ -4,13 +4,14 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.GSym.GenericPerspective;
+package BritefuryJ.GSym.ObjectPresentation;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
-public interface ObjectPresenter
+public interface ObjectPresenter<StyleSheetType extends StyleSheet>
 {
-	public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state);
+	public DPElement presentObject(Object x, GSymFragmentView ctx, StyleSheetType styleSheet, AttributeTable state);
 }

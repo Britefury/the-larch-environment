@@ -78,6 +78,19 @@ public class GenericPerspectiveStyleSheet extends StyleSheet
 	}
 	
 	
+	public static GenericPerspectiveStyleSheet asGenericPerspectiveStyleSheetOrDefault(StyleSheet styleSheet)
+	{
+		if ( styleSheet instanceof GenericPerspectiveStyleSheet )
+		{
+			return (GenericPerspectiveStyleSheet)styleSheet;
+		}
+		else
+		{
+			return GenericPerspectiveStyleSheet.instance;
+		}
+	}
+	
+	
 	
 	private PrimitiveStyleSheet objectBorderStyleSheet = null;
 	
