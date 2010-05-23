@@ -71,6 +71,20 @@ public class Location implements Presentable
 				return null;
 			}
 		}
+		
+		public TokenIterator consumeUpTo(String pattern)
+		{
+			String suffix = getSuffix();
+			int index = suffix.indexOf( pattern );
+			if ( index == -1 )
+			{
+				return new TokenIterator( loc, this, loc.locationString.length() );
+			}
+			else
+			{
+				return new TokenIterator( loc, this, position + index );
+			}
+		}
 
 		public TokenIterator consumeRegex(Pattern pattern)
 		{

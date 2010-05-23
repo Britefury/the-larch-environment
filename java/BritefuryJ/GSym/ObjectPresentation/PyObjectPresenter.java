@@ -4,15 +4,16 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.GSym.GenericPerspective;
+package BritefuryJ.GSym.ObjectPresentation;
 
 import org.python.core.PyObject;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
-public interface PyObjectPresenter
+public interface PyObjectPresenter<StyleSheetType extends StyleSheet>
 {
-	public DPElement presentObject(PyObject x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state);
+	public DPElement presentObject(PyObject x, GSymFragmentView ctx, StyleSheetType styleSheet, AttributeTable state);
 }

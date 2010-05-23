@@ -31,6 +31,8 @@ import BritefuryJ.DocPresent.ListView.TrailingSeparator;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.GSym.ObjectPresentation.ObjectPresenter;
+import BritefuryJ.GSym.ObjectPresentation.PyObjectPresenter;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
 public class SystemObjectPresenters
@@ -60,7 +62,7 @@ public class SystemObjectPresenters
 
 	
 	
-	public static final ObjectPresenter presenter_Boolean = new ObjectPresenter()
+	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Boolean = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
 		public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
@@ -68,7 +70,7 @@ public class SystemObjectPresenters
 		}
 	};
 	
-	public static final ObjectPresenter presenter_Byte = new ObjectPresenter()
+	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Byte = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
 		public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
@@ -76,7 +78,7 @@ public class SystemObjectPresenters
 		}
 	};
 	
-	public static final ObjectPresenter presenter_Character = new ObjectPresenter()
+	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Character = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
 		public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
@@ -84,7 +86,7 @@ public class SystemObjectPresenters
 		}
 	};
 	
-	public static final ObjectPresenter presenter_Short = new ObjectPresenter()
+	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Short = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
 		public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
@@ -92,7 +94,7 @@ public class SystemObjectPresenters
 		}
 	};
 	
-	public static final ObjectPresenter presenter_Integer = new ObjectPresenter()
+	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Integer = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
 		public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
@@ -100,7 +102,7 @@ public class SystemObjectPresenters
 		}
 	};
 	
-	public static final ObjectPresenter presenter_Long = new ObjectPresenter()
+	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Long = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
 		public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
@@ -108,7 +110,7 @@ public class SystemObjectPresenters
 		}
 	};
 	
-	public static final ObjectPresenter presenter_Float = new ObjectPresenter()
+	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Float = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
 		public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
@@ -116,7 +118,7 @@ public class SystemObjectPresenters
 		}
 	};
 	
-	public static final ObjectPresenter presenter_Double = new ObjectPresenter()
+	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Double = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
 		public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
@@ -124,7 +126,7 @@ public class SystemObjectPresenters
 		}
 	};
 	
-	public static final ObjectPresenter presenter_String = new ObjectPresenter()
+	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_String = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
 		public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
@@ -135,7 +137,7 @@ public class SystemObjectPresenters
 	
 	
 
-	public static final PyObjectPresenter presenter_PyTuple = new PyObjectPresenter()
+	public static final PyObjectPresenter<GenericPerspectiveStyleSheet> presenter_PyTuple = new PyObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
 		public DPElement presentObject(PyObject x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
@@ -151,7 +153,7 @@ public class SystemObjectPresenters
 		}
 	};
 
-	public static final PyObjectPresenter presenter_PyType = new PyObjectPresenter()
+	public static final PyObjectPresenter<GenericPerspectiveStyleSheet> presenter_PyType = new PyObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
 		public DPElement presentObject(PyObject x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
@@ -192,7 +194,7 @@ public class SystemObjectPresenters
 	};
 
 	private static PyFunction pyFunction_inspectFn = null;
-	public static final PyObjectPresenter presenter_PyFunction = new PyObjectPresenter()
+	public static final PyObjectPresenter<GenericPerspectiveStyleSheet> presenter_PyFunction = new PyObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
 		
 		private PyFunction getInspectFunction()
@@ -303,7 +305,7 @@ public class SystemObjectPresenters
 
 	
 
-	public static final ObjectPresenter presenter_List = new ObjectPresenter()
+	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_List = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
 		public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
@@ -319,7 +321,7 @@ public class SystemObjectPresenters
 		}
 	};
 	
-	public static final ObjectPresenter presenter_Shape = new ObjectPresenter()
+	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Shape = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
 		public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
@@ -342,7 +344,7 @@ public class SystemObjectPresenters
 		}
 	};
 
-	public static final ObjectPresenter presenter_BufferedImage = new ObjectPresenter()
+	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_BufferedImage = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
 		public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
@@ -365,7 +367,7 @@ public class SystemObjectPresenters
 		}
 	};
 
-	public static final ObjectPresenter presenter_Color = new ObjectPresenter()
+	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Color = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
 		public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{
@@ -390,7 +392,7 @@ public class SystemObjectPresenters
 		}
 	};
 
-	public static final ObjectPresenter presenter_Class = new ObjectPresenter()
+	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Class = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
 		public DPElement presentObject(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
 		{

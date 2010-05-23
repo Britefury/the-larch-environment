@@ -54,7 +54,7 @@ import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GSymPerspective;
 import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
-import BritefuryJ.GSym.GenericPerspective.PresentationStateListenerList;
+import BritefuryJ.GSym.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.GSym.View.GSymViewFragmentFunction;
 import BritefuryJ.Math.AABox2;

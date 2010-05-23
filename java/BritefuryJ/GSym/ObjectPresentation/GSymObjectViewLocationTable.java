@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.GSym.GenericPerspective;
+package BritefuryJ.GSym.ObjectPresentation;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -25,16 +25,16 @@ public class GSymObjectViewLocationTable
 	}
 	
 	
-	public Location getLocationForObject(Object x)
+	public String getLocationForObject(Object x)
 	{
 		String location = objectToLocation.get( x );
 		if ( location == null )
 		{
-			location = "$object/" + x.getClass().getName() + objectCount++;
+			location = x.getClass().getName() + objectCount++;
 			objectToLocation.put( x, location );
 			locationToObject.put( location, new WeakReference<Object>( x ) );
 		}
-		return new Location( location );
+		return location;
 	}
 	
 	public Object getObjectAtLocation(Location.TokenIterator location)

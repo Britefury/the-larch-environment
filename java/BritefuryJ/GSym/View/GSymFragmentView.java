@@ -24,7 +24,7 @@ import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GSymAbstractPerspective;
 import BritefuryJ.GSym.GSymBrowserContext;
 import BritefuryJ.GSym.GSymSubject;
-import BritefuryJ.GSym.GenericPerspective.PresentationStateListener;
+import BritefuryJ.GSym.ObjectPresentation.PresentationStateListener;
 import BritefuryJ.Incremental.IncrementalFunctionMonitor;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;

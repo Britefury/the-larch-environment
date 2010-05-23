@@ -14,7 +14,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
-import BritefuryJ.GSym.GenericPerspective.PresentationStateListenerList;
+import BritefuryJ.GSym.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
 public class LogView implements Presentable
