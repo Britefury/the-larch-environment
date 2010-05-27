@@ -8,10 +8,10 @@ package BritefuryJ.DocPresent.Layout;
 
 public class LAllocHelper
 {
-	public static void allocateX(LAllocBoxInterface alloc, LReqBoxInterface requisition, double x, double width)
+	public static void allocateX(LAllocBoxInterface alloc, LReqBoxInterface requisition, double x, double allocX)
 	{
-		double w = Math.max( width, requisition.getReqMinWidth() );
-		alloc.setPositionInParentSpaceAndAllocationX( x, w );
+		double width = Math.max( allocX, requisition.getReqMinWidth() );
+		alloc.setPositionInParentSpaceAndAllocationX( x, allocX, width );
 	}
 	
 	public static void allocateY(LAllocBoxInterface alloc, LReqBoxInterface requisition, double y, double height)
@@ -43,7 +43,7 @@ public class LAllocHelper
 	
 	public static void allocateX(LAllocBoxInterface alloc, LAllocBoxInterface box)
 	{
-		alloc.setAllocationX( box.getAllocationX() );
+		alloc.setAllocationX( box.getAllocationX(), box.getWidth() );
 	}
 	
 	public static void allocateY(LAllocBoxInterface alloc, LAllocBoxInterface box)
@@ -56,19 +56,9 @@ public class LAllocHelper
 	
 	
 	
-	protected static void allocateChildPositionX(LAllocBoxInterface childAllocation, double localPosX)
+	protected static void allocateChildX(LAllocBoxInterface childAllocation, double localPosX, double localAllocX, double localWidth)
 	{
-		childAllocation.setAllocPositionInParentSpaceX( localPosX );
-	}
-	
-	protected static void allocateChildWidth(LAllocBoxInterface childAllocation, double localWidth)
-	{
-		childAllocation.setAllocationX( localWidth );
-	}
-	
-	protected static void allocateChildX(LAllocBoxInterface childAllocation, double localPosX, double localWidth)
-	{
-		childAllocation.setPositionInParentSpaceAndAllocationX( localPosX, localWidth );
+		childAllocation.setPositionInParentSpaceAndAllocationX( localPosX, localAllocX, localWidth );
 	}
 	
 	public static void allocateChildXAligned(LAllocBoxInterface childAllocation, LReqBoxInterface childRequisition, int alignmentFlags, double regionX, double regionWidth)
@@ -76,32 +66,32 @@ public class LAllocHelper
 		allocateChildXAligned( childAllocation, childRequisition, ElementAlignment.getHAlignment( alignmentFlags ), regionX, regionWidth );
 	}
 	
-	public static void allocateChildXAligned(LAllocBoxInterface childAllocation, LReqBoxInterface childRequisition, HAlignment hAlign, double regionX, double regionWidth)
+	public static void allocateChildXAligned(LAllocBoxInterface childAllocation, LReqBoxInterface childRequisition, HAlignment hAlign, double regionX, double regionAllocX)
 	{
 		double childWidth = childRequisition.getReqPrefWidth();
-		if ( regionWidth <= childWidth )
+		if ( regionAllocX <= childWidth )
 		{
-			childAllocation.setPositionInParentSpaceAndAllocationX( regionX, Math.max( regionWidth, childRequisition.getReqMinWidth() ) );
+			childAllocation.setPositionInParentSpaceAndAllocationX( regionX, regionAllocX, Math.max( regionAllocX, childRequisition.getReqMinWidth() ) );
 		}
 		else
 		{
 			if ( hAlign == HAlignment.EXPAND )
 			{
-				childAllocation.setPositionInParentSpaceAndAllocationX( regionX, regionWidth );
+				childAllocation.setPositionInParentSpaceAndAllocationX( regionX, regionAllocX, regionAllocX );
 			}
 			else
 			{
 				if ( hAlign == HAlignment.LEFT )
 				{
-					childAllocation.setPositionInParentSpaceAndAllocationX( regionX, childWidth );
+					childAllocation.setPositionInParentSpaceAndAllocationX( regionX, childWidth, childWidth );
 				}
 				else if ( hAlign == HAlignment.CENTRE )
 				{
-					childAllocation.setPositionInParentSpaceAndAllocationX( regionX + ( regionWidth - childWidth ) * 0.5, childWidth );
+					childAllocation.setPositionInParentSpaceAndAllocationX( regionX + ( regionAllocX - childWidth ) * 0.5, childWidth, childWidth );
 				}
 				else if ( hAlign == HAlignment.RIGHT )
 				{
-					childAllocation.setPositionInParentSpaceAndAllocationX( regionX + ( regionWidth - childWidth ), childWidth );
+					childAllocation.setPositionInParentSpaceAndAllocationX( regionX + ( regionAllocX - childWidth ), childWidth, childWidth );
 				}
 				else
 				{

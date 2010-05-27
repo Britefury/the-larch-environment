@@ -115,9 +115,9 @@ public class LAllocBox implements LAllocBoxInterface
 		positionInParentAllocationSpaceY = y;
 	}
 	
-	public void setAllocationX(double width)
+	public void setAllocationX(double allocX, double width)
 	{
-		allocationX = width;
+		allocationX = allocX;
 		this.width = width;
 	}
 
@@ -127,10 +127,10 @@ public class LAllocBox implements LAllocBoxInterface
 		this.refY = refY;
 	}
 
-	public void setPositionInParentSpaceAndAllocationX(double x, double width)
+	public void setPositionInParentSpaceAndAllocationX(double x, double allocX, double width)
 	{
 		positionInParentAllocationSpaceX = x;
-		allocationX = width;
+		allocationX = allocX;
 		this.width = width;
 	}
 	

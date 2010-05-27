@@ -27,10 +27,10 @@ public interface LAllocBoxInterface
 	
 	public abstract void setAllocPositionInParentSpaceX(double x);
 	public abstract void setAllocPositionInParentSpaceY(double y);
-	public abstract void setAllocationX(double width);
+	public abstract void setAllocationX(double allocX, double width);
 	public abstract void setAllocationY(double height, double refY);
 	
-	public abstract void setPositionInParentSpaceAndAllocationX(double x, double width);
+	public abstract void setPositionInParentSpaceAndAllocationX(double x, double allocX, double width);
 	public abstract void setPositionInParentSpaceAndAllocationY(double y, double height);
 	public abstract void setPositionInParentSpaceAndAllocationY(double y, double height, double refY);
 	

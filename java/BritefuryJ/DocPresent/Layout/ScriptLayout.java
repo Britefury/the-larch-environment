@@ -268,7 +268,7 @@ public class ScriptLayout
 		double t;
 		double boxReqMinWidth = box.getReqMinWidth();
 		double boxReqPrefWidth = box.getReqPrefWidth();
-		double allocAllocationX = allocBox.getAllocationX();
+		double allocAllocationX = Math.max( allocBox.getAllocationX(), box.getReqMinWidth() );
 		if ( boxReqPrefWidth > boxReqMinWidth )
 		{
 			t = ( allocAllocationX - boxReqMinWidth )  /  ( boxReqPrefWidth - boxReqMinWidth );
@@ -295,12 +295,12 @@ public class ScriptLayout
 		if ( leftSuper != null )
 		{
 			double childWidth = leftSuper.getReqMinWidth()  +  ( leftSuper.getReqPrefWidth() - leftSuper.getReqMinWidth() ) * t;
-			LAllocHelper.allocateChildX( leftSuperAlloc, x  +  ( leftWidth - childWidth ), childWidth );
+			LAllocHelper.allocateChildX( leftSuperAlloc, x  +  ( leftWidth - childWidth ), childWidth, childWidth );
 		}
 		if ( leftSub != null )
 		{
 			double childWidth = leftSub.getReqMinWidth()  +  ( leftSub.getReqPrefWidth() - leftSub.getReqMinWidth() ) * t;
-			LAllocHelper.allocateChildX( leftSubAlloc, x  +  ( leftWidth - childWidth ), childWidth ); 
+			LAllocHelper.allocateChildX( leftSubAlloc, x  +  ( leftWidth - childWidth ), childWidth, childWidth ); 
 		}
 		
 		if ( leftSuper != null  ||  leftSub != null )
@@ -312,7 +312,7 @@ public class ScriptLayout
 		// Allocate main child
 		if ( main != null )
 		{
-			LAllocHelper.allocateChildX( mainAlloc, x, mainWidth );
+			LAllocHelper.allocateChildX( mainAlloc, x, mainWidth, mainWidth );
 			x += Math.max( mainWidth, mainHAdvance )  +  columnSpacing;
 		}
 		
@@ -321,12 +321,12 @@ public class ScriptLayout
 		if ( rightSuper != null )
 		{
 			double childWidth = rightSuper.getReqMinWidth()  +  ( rightSuper.getReqPrefWidth() - rightSuper.getReqMinWidth() ) * t;
-			LAllocHelper.allocateChildX( rightSuperAlloc, x, childWidth );
+			LAllocHelper.allocateChildX( rightSuperAlloc, x, childWidth, childWidth );
 		}
 		if ( rightSub != null )
 		{
 			double childWidth = rightSub.getReqMinWidth()  +  ( rightSub.getReqPrefWidth() - rightSub.getReqMinWidth() ) * t;
-			LAllocHelper.allocateChildX( rightSubAlloc, x, childWidth ); 
+			LAllocHelper.allocateChildX( rightSubAlloc, x, childWidth, childWidth ); 
 		}
 	}
 

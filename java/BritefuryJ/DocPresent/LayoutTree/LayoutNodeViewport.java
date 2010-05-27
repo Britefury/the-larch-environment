@@ -60,8 +60,7 @@ public class LayoutNodeViewport extends ArrangedLayoutNode
 			LReqBoxInterface childReq = childLayout.getRequisitionBox();
 			double prevWidth = childLayout.getAllocationBox().getAllocationX();
 			double allocX = getAllocationBox().getAllocationX();
-			double childAllocWidth = Math.max( childReq.getReqMinWidth(), allocX );
-			LAllocHelper.allocateX( childLayout.getAllocationBox(), childReq, 0.0, childAllocWidth );
+			LAllocHelper.allocateX( childLayout.getAllocationBox(), childReq, 0.0, allocX );
 			childLayout.refreshAllocationX( prevWidth );
 		}
 	}
