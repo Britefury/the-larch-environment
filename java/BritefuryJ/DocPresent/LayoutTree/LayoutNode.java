@@ -35,13 +35,16 @@ public abstract class LayoutNode
 	public abstract Point2 getPositionInParentSpace();
 	public abstract double getAllocPositionInParentSpaceX();
 	public abstract double getAllocPositionInParentSpaceY();
+	public abstract double getWidth();
+	public abstract double getHeight();
+	public abstract Vector2 getSize();
+	public abstract double getWidthInParentSpace();
+	public abstract double getHeightInParentSpace();
+	public abstract Vector2 getSizeInParentSpace();
 	public abstract double getAllocationX();
 	public abstract double getAllocationY();
 	public abstract Vector2 getAllocation();
 	public abstract LAllocV getAllocV();
-	public abstract double getAllocationInParentSpaceX();
-	public abstract double getAllocationInParentSpaceY();
-	public abstract Vector2 getAllocationInParentSpace();
 
 	
 	public abstract LReqBoxInterface refreshRequisitionX();

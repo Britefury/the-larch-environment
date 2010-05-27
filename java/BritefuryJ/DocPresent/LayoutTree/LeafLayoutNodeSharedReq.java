@@ -51,21 +51,21 @@ public abstract class LeafLayoutNodeSharedReq extends LayoutNode implements LAll
 	
 	
 	
-	public double getAllocationInParentSpaceX()
+	public double getWidthInParentSpace()
 	{
-		return getAllocationX()  *  getLocalToParentAllocationSpaceXform().scale;
+		return getWidth()  *  getLocalToParentAllocationSpaceXform().scale;
 	}
 	
-	public double getAllocationInParentSpaceY()
+	public double getHeightInParentSpace()
 	{
-		return getAllocationY()  *  getLocalToParentAllocationSpaceXform().scale;
+		return getHeight()  *  getLocalToParentAllocationSpaceXform().scale;
 	}
 	
-	public Vector2 getAllocationInParentSpace()
+	public Vector2 getSizeInParentSpace()
 	{
-		return getAllocation().mul( getLocalToParentAllocationSpaceXform().scale );
+		return getSize().mul( getLocalToParentAllocationSpaceXform().scale );
 	}
-	
+
 	
 	
 	
@@ -186,7 +186,7 @@ public abstract class LeafLayoutNodeSharedReq extends LayoutNode implements LAll
 	//
 
 	protected double alloc_positionInParentAllocationSpaceX, alloc_positionInParentAllocationSpaceY;
-	protected double alloc_allocationX, alloc_allocationY;
+	protected double alloc_width, alloc_allocationX, alloc_allocationY;
 	protected double alloc_refY;
 
 	
@@ -212,6 +212,22 @@ public abstract class LeafLayoutNodeSharedReq extends LayoutNode implements LAll
 		return alloc_positionInParentAllocationSpaceY;
 	}
 	
+	public double getWidth()
+	{
+		return alloc_width;
+	}
+	
+	public double getHeight()
+	{
+		return alloc_allocationY;
+	}
+	
+	public Vector2 getSize()
+	{
+		return new Vector2( alloc_width, alloc_allocationY );
+	}
+	
+
 	public double getAllocationX()
 	{
 		return alloc_allocationX;
@@ -258,6 +274,7 @@ public abstract class LeafLayoutNodeSharedReq extends LayoutNode implements LAll
 	public void setAllocationX(double width)
 	{
 		alloc_allocationX = width;
+		alloc_width = width;
 	}
 
 	public void setAllocationY(double height, double refY)
@@ -266,17 +283,11 @@ public abstract class LeafLayoutNodeSharedReq extends LayoutNode implements LAll
 		this.alloc_refY = refY;
 	}
 
-	public void setAllocation(double width, double height, double refY)
-	{
-		alloc_allocationX = width;
-		alloc_allocationY = height;
-		this.alloc_refY = refY;
-	}
-
 	public void setPositionInParentSpaceAndAllocationX(double x, double width)
 	{
 		alloc_positionInParentAllocationSpaceX = x;
 		alloc_allocationX = width;
+		alloc_width = width;
 	}
 	
 	public void setPositionInParentSpaceAndAllocationY(double y, double height)

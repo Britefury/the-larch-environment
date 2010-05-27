@@ -156,8 +156,8 @@ public class DPMathRoot extends DPContainer
 		
 		if ( child != null )
 		{
-			double allocationX = getAllocationX();
-			double allocationY = getAllocationY();
+			double width = getWidth();
+			double height = getHeight();
 
 			MathRootStyleParams s = (MathRootStyleParams)styleParams;
 			Paint symbolPaint;
@@ -183,14 +183,14 @@ public class DPMathRoot extends DPContainer
 			double yOffset = thickness * 0.5;
 			double glyphWidth = s.getGlyphWidth();
 			double glyphLineWidths[] = s.getGlyphLineWidths();
-			double h = allocationY - thickness;
+			double heightBelowBar = height - thickness;
 
 			Path2D.Double path = new Path2D.Double();
-			path.moveTo( 0.0, yOffset + h * 0.65 );
-			path.lineTo( glyphLineWidths[0], yOffset + h * 0.6 );
-			path.lineTo( glyphLineWidths[0] + glyphLineWidths[1], yOffset + h );
+			path.moveTo( 0.0, yOffset + heightBelowBar * 0.65 );
+			path.lineTo( glyphLineWidths[0], yOffset + heightBelowBar * 0.6 );
+			path.lineTo( glyphLineWidths[0] + glyphLineWidths[1], yOffset + heightBelowBar );
 			path.lineTo( glyphWidth, yOffset );
-			path.lineTo( allocationX, yOffset );
+			path.lineTo( width, yOffset );
 			
 			graphics.draw( path );
 			

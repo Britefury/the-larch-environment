@@ -80,8 +80,9 @@ public class ParseView implements FragmentContext
 				DPElement wa = a.getNodeElement();
 				DPElement wb = b.getNodeElement();
 				
-				Point2 p1 = wa.getLocalPointRelativeTo( parseView.viewBin, new Point2( wa.getAllocation().x, wa.getAllocation().y * 0.5 ) );
-				Point2 p4 = wb.getLocalPointRelativeTo( parseView.viewBin, new Point2( 0.0, wb.getAllocation().y * 0.5 ) );
+				Vector2 sizeA = wa.getSize();
+				Point2 p1 = wa.getLocalPointRelativeTo( parseView.viewBin, new Point2( sizeA.x, sizeA.y * 0.5 ) );
+				Point2 p4 = wb.getLocalPointRelativeTo( parseView.viewBin, new Point2( 0.0, wb.getHeight() * 0.5 ) );
 				
 				// dx is the x-difference from p1 to p4, clamped to >=20, divided by 3; space the control points evenly
 				double dx = Math.max( Math.abs( p4.x - p1.x ), 20.0 )  /  3.0;

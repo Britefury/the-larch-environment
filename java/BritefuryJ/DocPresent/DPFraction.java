@@ -71,7 +71,7 @@ public class DPFraction extends DPContainer
 
 		protected void draw(Graphics2D graphics)
 		{
-			Shape s = new Rectangle2D.Double( 0.0, 0.0, getAllocationX(), getAllocationY() );
+			Shape s = new Rectangle2D.Double( 0.0, 0.0, getWidth(), getHeight() );
 			Paint curPaint = graphics.getPaint();
 
 			Paint barPaint;
@@ -99,18 +99,18 @@ public class DPFraction extends DPContainer
 		
 		private void drawCaretAtStart(Graphics2D graphics)
 		{
-			double allocationY = getAllocationY();
+			double height = getHeight();
 			AffineTransform current = pushGraphicsTransform( graphics );
-			graphics.draw( new Line2D.Double( 0.0, -2.0, 0.0, allocationY + 2.0 ) );
+			graphics.draw( new Line2D.Double( 0.0, -2.0, 0.0, height + 2.0 ) );
 			popGraphicsTransform( graphics, current );
 		}
 
 		private void drawCaretAtEnd(Graphics2D graphics)
 		{
-			double allocationX = getAllocationX();
-			double allocationY = getAllocationY();
+			double width = getWidth();
+			double height = getHeight();
 			AffineTransform current = pushGraphicsTransform( graphics );
-			graphics.draw( new Line2D.Double( allocationX, -2.0, allocationX, allocationY + 2.0 ) );
+			graphics.draw( new Line2D.Double( width, -2.0, width, height + 2.0 ) );
 			popGraphicsTransform( graphics, current );
 		}
 
@@ -137,14 +137,14 @@ public class DPFraction extends DPContainer
 		
 		public void drawSelection(Graphics2D graphics, Marker from, Marker to)
 		{
-			double allocationX = getAllocationX();
-			double allocationY = getAllocationY();
+			double width = getWidth();
+			double height = getHeight();
 			AffineTransform current = pushGraphicsTransform( graphics );
 			int startIndex = from != null  ?  from.getIndex()  :  0;
 			int endIndex = to != null  ?  to.getIndex()  :  1;
-			double startX = startIndex == 0  ?  0.0  :  allocationX;
-			double endX = endIndex == 0  ?  0.0  :  allocationX;
-			Rectangle2D.Double shape = new Rectangle2D.Double( startX, -2.0, endX - startX, allocationY + 4.0 );
+			double startX = startIndex == 0  ?  0.0  :  width;
+			double endX = endIndex == 0  ?  0.0  :  width;
+			Rectangle2D.Double shape = new Rectangle2D.Double( startX, -2.0, endX - startX, height + 4.0 );
 			graphics.fill( shape );
 			popGraphicsTransform( graphics, current );
 		}
@@ -162,8 +162,8 @@ public class DPFraction extends DPContainer
 
 		public int getMarkerPositonForPoint(Point2 localPos)
 		{
-			double allocationX = getAllocationX();
-			if ( localPos.x >= allocationX * 0.5 )
+			double width = getWidth();
+			if ( localPos.x >= width * 0.5 )
 			{
 				return 1;
 			}

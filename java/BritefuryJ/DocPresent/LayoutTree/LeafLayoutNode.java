@@ -68,6 +68,37 @@ public abstract class LeafLayoutNode extends LayoutNode
 		return layoutAllocBox.getAllocPositionInParentSpaceY();
 	}
 
+	public double getWidth()
+	{
+		return layoutAllocBox.getWidth();
+	}
+	
+	public double getHeight()
+	{
+		return layoutAllocBox.getHeight();
+	}
+	
+	public Vector2 getSize()
+	{
+		return layoutAllocBox.getSize();
+	}
+
+	public double getWidthInParentSpace()
+	{
+		return layoutAllocBox.getWidth()  *  getLocalToParentAllocationSpaceXform().scale;
+	}
+	
+	public double getHeightInParentSpace()
+	{
+		return layoutAllocBox.getHeight()  *  getLocalToParentAllocationSpaceXform().scale;
+	}
+	
+	public Vector2 getSizeInParentSpace()
+	{
+		return layoutAllocBox.getSize().mul( getLocalToParentAllocationSpaceXform().scale );
+	}
+	
+
 	public double getAllocationX()
 	{
 		return layoutAllocBox.getAllocationX();
@@ -86,21 +117,6 @@ public abstract class LeafLayoutNode extends LayoutNode
 	public LAllocV getAllocV()
 	{
 		return layoutAllocBox.getAllocV();
-	}
-
-	public double getAllocationInParentSpaceX()
-	{
-		return layoutAllocBox.getAllocationX()  *  getLocalToParentAllocationSpaceXform().scale;
-	}
-	
-	public double getAllocationInParentSpaceY()
-	{
-		return layoutAllocBox.getAllocationY()  *  getLocalToParentAllocationSpaceXform().scale;
-	}
-	
-	public Vector2 getAllocationInParentSpace()
-	{
-		return layoutAllocBox.getAllocation().mul( getLocalToParentAllocationSpaceXform().scale );
 	}
 	
 	
