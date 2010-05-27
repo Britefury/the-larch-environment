@@ -92,14 +92,14 @@ public class DPWhitespace extends DPContentLeaf
 	
 	public void drawSelection(Graphics2D graphics, Marker from, Marker to)
 	{
-		double allocationX = getAllocationX();
-		double allocationY = getAllocationY();
+		double width = getWidth();
+		double height = getHeight();
 		AffineTransform current = pushGraphicsTransform( graphics );
 		int startIndex = from != null  ?  from.getIndex()  :  0;
 		int endIndex = to != null  ?  to.getIndex()  :  1;
-		double startX = startIndex == 0  ?  0.0  :  allocationX;
-		double endX = endIndex == 0  ?  0.0  :  allocationX;
-		Rectangle2D.Double shape = new Rectangle2D.Double( startX, 0.0, endX - startX, allocationY);
+		double startX = startIndex == 0  ?  0.0  :  width;
+		double endX = endIndex == 0  ?  0.0  :  width;
+		Rectangle2D.Double shape = new Rectangle2D.Double( startX, 0.0, endX - startX, height );
 		graphics.fill( shape );
 		popGraphicsTransform( graphics, current );
 	}

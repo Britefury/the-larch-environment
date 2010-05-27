@@ -697,6 +697,38 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		return layoutNode != null  ?  layoutNode.getAllocPositionInParentSpaceY()  :  0.0;
 	}
 	
+	public double getWidth()
+	{
+		return layoutNode != null  ?  layoutNode.getWidth()  :  parent.getWidth();
+	}
+	
+	public double getHeight()
+	{
+		return layoutNode != null  ?  layoutNode.getHeight()  :  parent.getHeight();
+	}
+	
+	public Vector2 getSize()
+	{
+		return layoutNode != null  ?  layoutNode.getSize()  :  parent.getSize();
+	}
+	
+	public double getWidthInParentSpace()
+	{
+		return layoutNode != null  ?  layoutNode.getWidthInParentSpace()  :  parent.getWidthInParentSpace();
+	}
+	
+	public double getHeightInParentSpace()
+	{
+		return layoutNode != null  ?  layoutNode.getHeightInParentSpace()  :  parent.getHeightInParentSpace();
+	}
+	
+	public Vector2 getSizeInParentSpace()
+	{
+		return layoutNode != null  ?  layoutNode.getSizeInParentSpace()  :  parent.getSizeInParentSpace();
+	}
+	
+	
+
 	public double getAllocationX()
 	{
 		return layoutNode != null  ?  layoutNode.getAllocationX()  :  parent.getAllocationX();
@@ -716,26 +748,12 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	{
 		return layoutNode != null  ?  layoutNode.getAllocation()  :  parent.getAllocation();
 	}
-	
-	public double getAllocationInParentSpaceX()
-	{
-		return layoutNode != null  ?  layoutNode.getAllocationInParentSpaceX()  :  parent.getAllocationInParentSpaceX();
-	}
-	
-	public double getAllocationInParentSpaceY()
-	{
-		return layoutNode != null  ?  layoutNode.getAllocationInParentSpaceY()  :  parent.getAllocationInParentSpaceY();
-	}
-	
-	public Vector2 getAllocationInParentSpace()
-	{
-		return layoutNode != null  ?  layoutNode.getAllocationInParentSpace()  :  parent.getAllocationInParentSpace();
-	}
+
 	
 	
 	public AABox2 getLocalAABox()
 	{
-		return new AABox2( new Point2(), getAllocation() );
+		return new AABox2( new Point2(), getSize() );
 	}
 	
 	public AABox2 getLocalClipBox()
@@ -745,14 +763,14 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	public AABox2 getAABoxInParentSpace()
 	{
-		return new AABox2( getPositionInParentSpace(), getAllocationInParentSpace() );
+		return new AABox2( getPositionInParentSpace(), getSizeInParentSpace() );
 	}
 	
 	
 	protected Shape[] getShapes()
 	{
-		Vector2 alloc = getAllocation();
-		return new Shape[] { new Rectangle2D.Double( 0.0, 0.0, alloc.x, alloc.y ) };
+		Vector2 size = getSize();
+		return new Shape[] { new Rectangle2D.Double( 0.0, 0.0, size.x, size.y ) };
 	}
 
 	
@@ -1483,7 +1501,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	protected void clip(Graphics2D graphics)
 	{
-		graphics.clip( new Rectangle2D.Double( 0.0, 0.0, getAllocationX(), getAllocationY() ) );
+		graphics.clip( new Rectangle2D.Double( 0.0, 0.0, getWidth(), getHeight() ) );
 	}
 
 	
@@ -2273,7 +2291,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		{
 			throw new RuntimeException( "Marker is not within the bounds of this element" );
 		}
-		return new Point2( getAllocationX() * 0.5, getAllocationY() * 0.5 );
+		return new Point2( getWidth() * 0.5, getHeight() * 0.5 );
 	}
 	
 	

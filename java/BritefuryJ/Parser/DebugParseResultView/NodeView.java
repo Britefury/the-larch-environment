@@ -102,7 +102,7 @@ public class NodeView implements FragmentContext
 			Color backgroundColour = bHighlight  ?  new Color( 0.7f, 0.85f, 1.0f )  :  Color.white;
 			backgroundColour = bSelected  ?  new Color( 1.0f, 1.0f, 0.6f )  :  backgroundColour;
 			graphics.setColor( backgroundColour );
-			graphics.fill( new Rectangle2D.Double( 0.0, 0.0, element.getAllocationX(), element.getAllocationY() ) );
+			graphics.fill( new Rectangle2D.Double( 0.0, 0.0, element.getWidth(), element.getHeight() ) );
 		}
 	}
 

@@ -14,7 +14,7 @@ import BritefuryJ.Math.Xform2;
 public class LAllocBox implements LAllocBoxInterface
 {
 	protected double positionInParentAllocationSpaceX, positionInParentAllocationSpaceY;
-	protected double allocationX, allocationY;
+	protected double width, allocationX, allocationY;
 	protected double refY;
 	protected LayoutNode layoutNode;
 
@@ -57,6 +57,21 @@ public class LAllocBox implements LAllocBoxInterface
 		return new Point2( positionInParentAllocationSpaceX, positionInParentAllocationSpaceY );
 	}
 	
+	public double getWidth()
+	{
+		return width;
+	}
+	
+	public double getHeight()
+	{
+		return allocationY;
+	}
+	
+	public Vector2 getSize()
+	{
+		return new Vector2( width, allocationY );
+	}
+
 	public double getAllocationX()
 	{
 		return allocationX;
@@ -103,6 +118,7 @@ public class LAllocBox implements LAllocBoxInterface
 	public void setAllocationX(double width)
 	{
 		allocationX = width;
+		this.width = width;
 	}
 
 	public void setAllocationY(double height, double refY)
@@ -111,17 +127,11 @@ public class LAllocBox implements LAllocBoxInterface
 		this.refY = refY;
 	}
 
-	public void setAllocation(double width, double height, double refY)
-	{
-		allocationX = width;
-		allocationY = height;
-		this.refY = refY;
-	}
-
 	public void setPositionInParentSpaceAndAllocationX(double x, double width)
 	{
 		positionInParentAllocationSpaceX = x;
 		allocationX = width;
+		this.width = width;
 	}
 	
 	public void setPositionInParentSpaceAndAllocationY(double y, double height)

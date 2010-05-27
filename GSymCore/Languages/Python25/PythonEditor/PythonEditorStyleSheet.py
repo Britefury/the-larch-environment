@@ -454,6 +454,7 @@ class PythonEditorStyleSheet (StyleSheet):
 		                              primitiveStyle.text( ' ' ),
 		                              target,
 		                              primitiveStyle.text( ' ' ),
+		                              primitiveStyle.lineBreak(),
 		                              self._keyword( 'in' ),
 		                              primitiveStyle.text( ' ' ),
 		                              source ] )
@@ -549,7 +550,7 @@ class PythonEditorStyleSheet (StyleSheet):
 	def subscript(self, target, index):
 		primitiveStyle = self['primitiveStyle']
 		delimStyle = self._delimStyle()
-		return primitiveStyle.span( [ target, delimStyle.text( '[' ), index, delimStyle.text( ']' ) ] )
+		return primitiveStyle.span( [ target, primitiveStyle.lineBreak(), delimStyle.text( '[' ), index, delimStyle.text( ']' ) ] )
 		
 
 	
@@ -616,13 +617,13 @@ class PythonEditorStyleSheet (StyleSheet):
 	def spanBinOp(self, x, y, op):
 		primitiveStyle = self['primitiveStyle']
 		opView = self._operatorStyle().text( op )
-		return primitiveStyle.lineBreakCostSpan( [ x, primitiveStyle.text( ' ' ), opView, primitiveStyle.text( ' ' ), y ] )
+		return primitiveStyle.lineBreakCostSpan( [ x, primitiveStyle.text( ' ' ), opView, primitiveStyle.lineBreak(), primitiveStyle.text( ' ' ), y ] )
 	
 	
 	def spanCmpOp(self, op, y):
 		primitiveStyle = self['primitiveStyle']
 		opView = self._operatorStyle().text( op )
-		return primitiveStyle.span( [ primitiveStyle.text( ' ' ), opView, primitiveStyle.text( ' ' ), primitiveStyle.lineBreak(), y ] )
+		return primitiveStyle.span( [ primitiveStyle.text( ' ' ), opView, primitiveStyle.text( ' ' ), primitiveStyle.lineBreak(), primitiveStyle.lineBreak(), y ] )
 
 
 	def divNumeratorStyle(self):

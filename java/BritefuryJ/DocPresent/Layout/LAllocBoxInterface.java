@@ -16,6 +16,9 @@ public interface LAllocBoxInterface
 
 	public abstract double getAllocPositionInParentSpaceX();
 	public abstract double getAllocPositionInParentSpaceY();
+	public abstract double getWidth();
+	public abstract double getHeight();
+	public abstract Vector2 getSize();
 	public abstract double getAllocationX();
 	public abstract double getAllocationY();
 	public abstract double getAllocRefY();
@@ -26,7 +29,6 @@ public interface LAllocBoxInterface
 	public abstract void setAllocPositionInParentSpaceY(double y);
 	public abstract void setAllocationX(double width);
 	public abstract void setAllocationY(double height, double refY);
-	public abstract void setAllocation(double width, double height, double refY);
 	
 	public abstract void setPositionInParentSpaceAndAllocationX(double x, double width);
 	public abstract void setPositionInParentSpaceAndAllocationY(double y, double height);

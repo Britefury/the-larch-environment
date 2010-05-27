@@ -51,11 +51,6 @@ public class LAllocHelper
 		alloc.setAllocationY( box.getAllocationY(), box.getAllocRefY() );
 	}
 	
-	public static void allocateSize(LAllocBoxInterface alloc, LAllocBoxInterface box)
-	{
-		alloc.setAllocation( box.getAllocationX(), box.getAllocationY(), box.getAllocRefY() );
-	}
-	
 
 	
 	

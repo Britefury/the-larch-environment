@@ -148,9 +148,9 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 	{
 		allocationSpaceToLocalSpace.scale = 1.0;
 		Point2 topLeft = element.getLocalPointRelativeToAncestor( this, new Point2( 0.0, 0.0 ) );
-		Point2 bottomRight = element.getLocalPointRelativeToAncestor( this, new Point2( element.getAllocation() ) );
+		Point2 bottomRight = element.getLocalPointRelativeToAncestor( this, new Point2( element.getSize() ) );
 		Point2 centre = Point2.average( topLeft, bottomRight );
-		Point2 topLeftCorner = centre.sub( getAllocation().mul( 0.5 ) );
+		Point2 topLeftCorner = centre.sub( getSize().mul( 0.5 ) );
 		allocationSpaceToLocalSpace.translation = topLeftCorner.toVector2().negate();
 		onXformModified();
 	}
@@ -158,14 +158,14 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 	public void zoomToFit()
 	{
 		DPElement child = getChild();
-		double allocationX = child != null  ?  child.getAllocationX()  :  1.0;
-		double allocationY = child != null  ?  child.getAllocationY()  :  1.0;
+		double width = child != null  ?  child.getWidth()  :  1.0;
+		double height = child != null  ?  child.getHeight()  :  1.0;
 
-		double ax = allocationX == 0.0  ?  1.0  :  allocationX;
-		double ay = allocationY == 0.0  ?  1.0  :  allocationY;
+		double ax = width == 0.0  ?  1.0  :  width;
+		double ay = height == 0.0  ?  1.0  :  height;
 		
 		allocationSpaceToLocalSpace.translation = new Vector2();
-		allocationSpaceToLocalSpace.scale = Math.min( getAllocationX() / ax, getAllocationY() / ay );
+		allocationSpaceToLocalSpace.scale = Math.min( getWidth() / ax, getHeight() / ay );
 		allocationSpaceToLocalSpace.scale = allocationSpaceToLocalSpace.scale == 0.0  ?  1.0  :  allocationSpaceToLocalSpace.scale;
 		onXformModified();
 	}
@@ -420,12 +420,12 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 		double invScale = 1.0 / allocationSpaceToLocalSpace.scale;
 		Xform2 localSpaceToAllocationSpace = allocationSpaceToLocalSpace.inverse();
 		Point2 topLeftInAllocationSpace = localSpaceToAllocationSpace.transform( new Point2() );
-		Point2 bottomRightInAllocationSpace = localSpaceToAllocationSpace.transform( new Point2( getAllocationX(), getAllocationY() ) );
+		Point2 bottomRightInAllocationSpace = localSpaceToAllocationSpace.transform( new Point2( getWidth(), getHeight() ) );
 
 		if ( xRange != null )
 		{
 			double min = 0.0;
-			double max = child != null  ?  child.getAllocationX()  :  1.0;
+			double max = child != null  ?  child.getWidth()  :  1.0;
 			
 			updateRange( xRange, min, max, topLeftInAllocationSpace.x, bottomRightInAllocationSpace.x, 10.0 * invScale );
 		}
@@ -433,7 +433,7 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 		if ( yRange != null )
 		{
 			double min = 0.0;
-			double max = child != null  ?  child.getAllocationY()  :  1.0;
+			double max = child != null  ?  child.getHeight()  :  1.0;
 
 			updateRange( yRange, min, max, topLeftInAllocationSpace.y, bottomRightInAllocationSpace.y, 10.0 * invScale );
 		}

@@ -205,7 +205,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 			double edgeX = 0.0;
 			if ( bRightEdge )
 			{
-				edgeX = childNode.getAllocPositionInParentSpaceX() + childNode.getAllocationInParentSpaceX();
+				edgeX = childNode.getAllocPositionInParentSpaceX() + childNode.getWidthInParentSpace();
 			}
 			else
 			{
@@ -246,7 +246,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 		{
 			DPElement childI = column.get( 0 );
 			DPElement childJ = column.get( 1 );
-			double iUpperY = childI.getPositionInParentSpace().y + childI.getAllocationInParentSpace().y;
+			double iUpperY = childI.getPositionInParentSpace().y + childI.getHeightInParentSpace();
 			double jLowerY = childJ.getPositionInParentSpace().y;
 				
 			double midY = ( iUpperY + jLowerY ) * 0.5;
@@ -380,7 +380,7 @@ public class LayoutNodeScript extends ArrangedLayoutNode
 				}
 				else
 				{
-					double distToPrev = localPos.y - ( prev.getPositionInParentSpace().y + prev.getAllocationInParentSpace().y );
+					double distToPrev = localPos.y - ( prev.getPositionInParentSpace().y + prev.getHeightInParentSpace() );
 					double distToNext = next.getPositionInParentSpace().y - localPos.y;
 					
 					return distToPrev > distToNext  ?  prev  :  next;
