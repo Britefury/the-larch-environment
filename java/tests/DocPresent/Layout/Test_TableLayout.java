@@ -382,7 +382,7 @@ public class Test_TableLayout extends Test_Layout_base
 			columnAllocs[i] = new LAllocBox( null );
 		}
 		
-		boxAlloc.setAllocationX( allocX );
+		boxAlloc.setAllocationX( allocX, allocX );
 		TableLayout.allocateX( box, columnBoxes, children, boxAlloc, columnAllocs, childrenAllocs, packingParams, childAlignmentFlags, numColumns, numRows, columnSpacing, rowSpacing, bColumnExpand, bRowExpand );
 
 		LReqBox rowBoxes[] = TableLayout.computeRequisitionY( box, children, packingParams, childAlignmentFlags, numColumns, numRows, columnSpacing, rowSpacing );

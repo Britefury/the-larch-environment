@@ -271,9 +271,9 @@ public abstract class LeafLayoutNodeSharedReq extends LayoutNode implements LAll
 		alloc_positionInParentAllocationSpaceY = y;
 	}
 	
-	public void setAllocationX(double width)
+	public void setAllocationX(double allocX, double width)
 	{
-		alloc_allocationX = width;
+		alloc_allocationX = allocX;
 		alloc_width = width;
 	}
 
@@ -283,10 +283,10 @@ public abstract class LeafLayoutNodeSharedReq extends LayoutNode implements LAll
 		this.alloc_refY = refY;
 	}
 
-	public void setPositionInParentSpaceAndAllocationX(double x, double width)
+	public void setPositionInParentSpaceAndAllocationX(double x, double allocX, double width)
 	{
 		alloc_positionInParentAllocationSpaceX = x;
-		alloc_allocationX = width;
+		alloc_allocationX = allocX;
 		alloc_width = width;
 	}
 	

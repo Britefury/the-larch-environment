@@ -584,7 +584,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				
 				// Allocate X
 				double prevWidth = rootLayout.getAllocationX();
-				rootLayout.allocateX( reqX, 0.0, Math.max( reqX.getReqMinWidth(), windowSize.x ) );
+				rootLayout.allocateX( reqX, 0.0, windowSize.x );
 				rootLayout.refreshAllocationX( prevWidth );
 				
 				// Get Y requisition

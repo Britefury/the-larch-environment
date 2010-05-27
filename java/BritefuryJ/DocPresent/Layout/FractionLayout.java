@@ -82,27 +82,27 @@ public class FractionLayout
 			LAllocBoxInterface boxAlloc, LAllocBoxInterface numeratorAlloc, LAllocBoxInterface barAlloc, LAllocBoxInterface denominatorAlloc, double hPadding, double vSpacing, double baselineOffset)
 	{
 		double boxAllocAllocationX = boxAlloc.getAllocationX();
-		double width = Math.min( Math.max( boxAllocAllocationX, box.getReqMinWidth() ), box.getReqPrefWidth() );
-		double childrenAlloc = width - hPadding * 2.0;
+		double allocX = Math.min( boxAllocAllocationX, box.getReqPrefWidth() );
+		double childrenAlloc = allocX - hPadding * 2.0;
 		
 		
 		if ( numerator != null )
 		{
-			double childWidth = Math.min( Math.max( childrenAlloc, numerator.getReqMinWidth() ), numerator.getReqPrefWidth() );
+			double childWidth = Math.min( childrenAlloc, numerator.getReqPrefWidth() );
 			double childPos = Math.max( hPadding  +  ( childrenAlloc - childWidth ) * 0.5, 0.0 );
-			LAllocHelper.allocateChildX( numeratorAlloc, childPos, childWidth );
+			LAllocHelper.allocateChildX( numeratorAlloc, childPos, childWidth, Math.max( childWidth, numerator.getReqMinWidth() ) );
 		}
 		
 		if ( denominator != null )
 		{
-			double childWidth = Math.min( Math.max( childrenAlloc, denominator.getReqMinWidth() ), denominator.getReqPrefWidth() );
+			double childWidth = Math.min( childrenAlloc, denominator.getReqPrefWidth() );
 			double childPos = Math.max( hPadding  +  ( childrenAlloc - childWidth ) * 0.5, 0.0 );
-			LAllocHelper.allocateChildX( denominatorAlloc, childPos, childWidth );
+			LAllocHelper.allocateChildX( denominatorAlloc, childPos, childWidth, Math.max( childWidth, denominator.getReqMinWidth() ) );
 		}
 
 		if ( bar != null )
 		{
-			LAllocHelper.allocateChildX( barAlloc, 0.0, width );
+			LAllocHelper.allocateChildX( barAlloc, 0.0, allocX, Math.max( allocX, bar.getReqMinWidth() ) );
 		}
 	}
 

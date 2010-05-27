@@ -132,7 +132,8 @@ public class HorizontalLayout
 				double pos = 0.0;
 				for (int i = 0; i < children.length; i++)
 				{
-					LAllocHelper.allocateChildX( childrenAlloc[i], pos, children[i].getReqPrefWidth() );
+					double childWidth = children[i].getReqPrefWidth();
+					LAllocHelper.allocateChildX( childrenAlloc[i], pos, childWidth, childWidth );
 					pos += ( children[i].getReqPrefHAdvance() + spacing );
 				}
 			}
@@ -148,12 +149,14 @@ public class HorizontalLayout
 					HAlignment h = ElementAlignment.getHAlignment( childAlignmentFlags[i] );
 					if ( h == HAlignment.EXPAND )
 					{
-						LAllocHelper.allocateChildX( childrenAlloc[i], pos, children[i].getReqPrefWidth() + expandPerChild );
+						double childWidth = children[i].getReqPrefWidth() + expandPerChild;
+						LAllocHelper.allocateChildX( childrenAlloc[i], pos, childWidth, childWidth );
 						pos += ( children[i].getReqPrefHAdvance() + expandPerChild + spacing );
 					}
 					else
 					{
-						LAllocHelper.allocateChildX( childrenAlloc[i], pos, children[i].getReqPrefWidth() );
+						double childWidth = children[i].getReqPrefWidth();
+						LAllocHelper.allocateChildX( childrenAlloc[i], pos, childWidth, childWidth );
 						pos += ( children[i].getReqPrefHAdvance() + spacing );
 					}
 				}
@@ -167,7 +170,8 @@ public class HorizontalLayout
 			double pos = 0.0;
 			for (int i = 0; i < children.length; i++)
 			{
-				LAllocHelper.allocateChildX( childrenAlloc[i], pos, children[i].getReqMinWidth() );
+				double childWidth = children[i].getReqMinWidth();
+				LAllocHelper.allocateChildX( childrenAlloc[i], pos, childWidth, childWidth );
 				pos += ( children[i].getReqMinHAdvance() + spacing );
 			}
 		}
@@ -185,7 +189,8 @@ public class HorizontalLayout
 				for (int i = 0; i < children.length; i++)
 				{
 					double expand = ( children[i].getReqPrefWidth() - children[i].getReqMinWidth() )  *  fraction;
-					LAllocHelper.allocateChildX( childrenAlloc[i], pos, children[i].getReqMinWidth() + expand );
+					double childWidth = children[i].getReqMinWidth() + expand;
+					LAllocHelper.allocateChildX( childrenAlloc[i], pos, childWidth, childWidth );
 					pos += ( children[i].getReqMinHAdvance() + expand + spacing );
 				}
 			}
@@ -205,7 +210,8 @@ public class HorizontalLayout
 				double pos = 0.0;
 				for (int i = 0; i < children.length; i++)
 				{
-					LAllocHelper.allocateChildX( childrenAlloc[i], pos, children[i].getReqPrefWidth() );
+					double childWidth = children[i].getReqPrefWidth();
+					LAllocHelper.allocateChildX( childrenAlloc[i], pos, childWidth, childWidth );
 					pos += ( children[i].getReqPrefHAdvance() + spacing );
 				}
 			}
@@ -218,7 +224,8 @@ public class HorizontalLayout
 				double pos = 0.0;
 				for (int i = 0; i < children.length; i++)
 				{
-					LAllocHelper.allocateChildX( childrenAlloc[i], pos, children[i].getReqPrefWidth() + expandPerChild );
+					double childWidth = children[i].getReqPrefWidth() + expandPerChild;
+					LAllocHelper.allocateChildX( childrenAlloc[i], pos, childWidth, childWidth );
 					pos += ( children[i].getReqPrefHAdvance() + expandPerChild + spacing );
 				}
 			}
@@ -231,7 +238,8 @@ public class HorizontalLayout
 			double pos = 0.0;
 			for (int i = 0; i < children.length; i++)
 			{
-				LAllocHelper.allocateChildX( childrenAlloc[i], pos, children[i].getReqMinWidth() );
+				double childWidth = children[i].getReqMinWidth();
+				LAllocHelper.allocateChildX( childrenAlloc[i], pos, childWidth, childWidth );
 				pos += ( children[i].getReqMinHAdvance() + spacing );
 			}
 		}
@@ -249,7 +257,8 @@ public class HorizontalLayout
 				for (int i = 0; i < children.length; i++)
 				{
 					double expand = ( children[i].getReqPrefWidth() - children[i].getReqMinWidth() )  *  fraction;
-					LAllocHelper.allocateChildX( childrenAlloc[i], pos, children[i].getReqMinWidth() + expand );
+					double childWidth = children[i].getReqMinWidth() + expand;
+					LAllocHelper.allocateChildX( childrenAlloc[i], pos, childWidth, childWidth );
 					pos += ( children[i].getReqMinHAdvance() + expand + spacing );
 				}
 			}
