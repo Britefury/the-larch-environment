@@ -620,6 +620,8 @@ public class Pointer extends PointerInterface
 									drop.initialise( transferable, requestedAction );
 								
 									dndController.pointerDndInitiateDrag( this, drop, mouseEvent, requestedAction );
+									
+									return true;
 								}
 							}
 						}
@@ -634,9 +636,11 @@ public class Pointer extends PointerInterface
 						drop.setTarget( targetElement, targetPos[0] );
 						targetElement.getDndHandler().canDrop( targetElement, drop );
 					}
+					
+					return true;
 				}
 				
-				return true;
+				return false;
 			}
 			else
 			{
