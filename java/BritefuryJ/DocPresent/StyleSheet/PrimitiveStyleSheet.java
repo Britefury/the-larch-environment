@@ -13,7 +13,6 @@ import java.awt.Paint;
 import java.awt.Shape;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.python.expose.ExposedMethod;
@@ -1218,50 +1217,5 @@ public class PrimitiveStyleSheet extends StyleSheet
 		DPViewport viewport = new DPViewport( getContainerParams(), state );
 		viewport.setChild( child );
 		return viewport;
-	}
-	
-	
-	
-	private ArrayList<DPElement> textToWordsAndLineBreaks(String text)
-	{
-		String words[] = text.split( " " );
-		ArrayList<DPElement> elements = new ArrayList<DPElement>();
-		boolean bFirst = true;
-		for (String word: words)
-		{
-			if ( word.length() > 0 )
-			{
-				if ( !bFirst )
-				{
-					elements.add( text( " " ) );
-					elements.add( lineBreak() );
-				}
-				elements.add( text( word ) );
-			}
-		}
-		return elements;
-	}
-	
-	public DPElement textSpan(String text)
-	{
-		return span( textToWordsAndLineBreaks( text ).toArray( new DPElement[0] ) );
-	}
-
-	public DPElement textParagraph(String text)
-	{
-		return paragraph( textToWordsAndLineBreaks( text ).toArray( new DPElement[0] ) );
-	}
-	
-	public DPElement textParagraphs(String text)
-	{
-		String lines[] = text.split( "\n" );
-		DPElement lineElements[] = new DPElement[lines.length];
-		
-		for (int i = 0; i < lines.length; i++)
-		{
-			lineElements[i] = textParagraph( lines[i] );
-		}
-		
-		return vbox( lineElements );
 	}
 }
