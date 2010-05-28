@@ -9,7 +9,7 @@ from copy import copy
 
 from BritefuryJ.Incremental import IncrementalOwner, IncrementalValueMonitor
 
-from GSymCore.Terminal import TerminalSchema
+from GSymCore.PythonConsole import ConsoleSchema
 
 
 class AppState (IncrementalOwner):
@@ -17,7 +17,7 @@ class AppState (IncrementalOwner):
 		self._incr = IncrementalValueMonitor( self )
 		
 		self._openDocuments = []
-		self._terminals = []
+		self._consoles = []
 		self._configuration = AppConfiguration()
 		
 		
@@ -30,12 +30,12 @@ class AppState (IncrementalOwner):
 		self._incr.onChanged()
 		
 		
-	def getTerminals(self):
+	def getConsoles(self):
 		self._incr.onAccess()
-		return copy( self._terminals )
+		return copy( self._consoles )
 	
-	def addTerminal(self, term):
-		self._terminals.append( term )
+	def addConsole(self, console):
+		self._consoles.append( console )
 		self._incr.onChanged()
 
 		
@@ -64,12 +64,12 @@ class AppDocument (IncrementalOwner):
 		
 	
 
-class AppTerminal (IncrementalOwner):
+class AppConsole (IncrementalOwner):
 	def __init__(self, name):
 		self._incr = IncrementalValueMonitor( self )
 		
 		self._name = name
-		self._terminal = TerminalSchema.Terminal()
+		self._console = ConsoleSchema.Console()
 		
 		
 		
@@ -77,9 +77,9 @@ class AppTerminal (IncrementalOwner):
 		self._incr.onAccess()
 		return self._name
 	
-	def getTerminal(self):
+	def getConsole(self):
 		self._incr.onAccess()
-		return self._terminal
+		return self._console
 		
 	
 

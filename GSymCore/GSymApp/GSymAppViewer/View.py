@@ -37,7 +37,7 @@ from GSymCore.GSymApp import Application
 from GSymCore.GSymApp.GSymAppViewer.GSymAppViewerStyleSheet import GSymAppViewerStyleSheet
 from GSymCore.GSymApp import DocumentManagement
 
-from GSymCore.Terminal import Terminal
+from GSymCore.PythonConsole import Console
 
 
 
@@ -72,16 +72,16 @@ def _newDocumentName(docs):
 	return name
 
 
-def _newTerminalName(docs):
-	name = 'Terminal'
+def _newConsoleName(docs):
+	name = 'Console'
 	if not _hasDocForName( docs, name ):
 		return name
 	
 	index = 2
-	name = 'Terminal' + str(index)
+	name = 'Console' + str(index)
 	while _hasDocForName( docs, name ):
 		index += 1
-		name = 'Terminal' + str(index)
+		name = 'Console' + str(index)
 
 	return name
 
@@ -150,20 +150,20 @@ class AppView (GSymViewObjectDispatch):
 			return True
 
 		
-		def _onNewTerminal():
-			terminals = node.getTerminals()
-			name = _newTerminalName( terminals )
-			appTerm = Application.AppTerminal( name )
-			node.addTerminal( appTerm )
+		def _onNewConsole():
+			consoles = node.getConsoles()
+			name = _newConsoleName( consoles )
+			appConsole = Application.AppConsole( name )
+			node.addConsole( appConsole )
 			
 			return True
 		
 			
 			
 		openDocViews = ctx.mapPresentFragment( node.getOpenDocuments(), styleSheet, state.withAttrs( location='' ) )
-		terminals = ctx.mapPresentFragment( node.getTerminals(), styleSheet, state.withAttrs( location='' ) )
+		consoles = ctx.mapPresentFragment( node.getConsoles(), styleSheet, state.withAttrs( location='' ) )
 		
-		return styleSheet.appState( openDocViews, terminals, _onNewDoc, _onOpenDoc, _onNewTerminal )
+		return styleSheet.appState( openDocViews, consoles, _onNewDoc, _onOpenDoc, _onNewConsole )
 
 
 
@@ -198,10 +198,10 @@ class AppView (GSymViewObjectDispatch):
 
 
 
-	@ObjectDispatchMethod( Application.AppTerminal )
-	def AppTerminal(self, ctx, styleSheet, state, node):
+	@ObjectDispatchMethod( Application.AppConsole )
+	def AppConsole(self, ctx, styleSheet, state, node):
 		name = node.getName()
-		return styleSheet.appTerminal( name, Location( '$terminals/' + name ) )
+		return styleSheet.appConsole( name, Location( '$consoles/' + name ) )
 
 
 
@@ -216,12 +216,12 @@ class GSymAppRelativeLocationResolver (GSymRelativeLocationResolver):
 		if locationIterator.getSuffix() == '':
 			return enclosingSubject.withTitle( 'gSym' )
 		
-		terminalsIterator = locationIterator.consumeLiteral( '$terminals/' )
-		if terminalsIterator is not None:
-			terminalName = terminalsIterator.getSuffix()
-			for terminal in enclosingSubject.getFocus().getTerminals():
-				if terminalName == terminal.getName():
-					return enclosingSubject.withFocus( terminal.getTerminal() ).withPerspective( Terminal.terminalViewerPerspective ).withTitle( terminalName ).withSubjectContext( 
+		consolesIterator = locationIterator.consumeLiteral( '$consoles/' )
+		if consolesIterator is not None:
+			consoleName = consolesIterator.getSuffix()
+			for console in enclosingSubject.getFocus().getConsoles():
+				if consoleName == console.getName():
+					return enclosingSubject.withFocus( console.getConsole() ).withPerspective( Console.consoleViewerPerspective ).withTitle( consoleName ).withSubjectContext( 
 					        enclosingSubject.getSubjectContext().withAttrs( location=locationIterator.getLocation().getLocationString() ) )
 			
 			return None

@@ -163,6 +163,9 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 		if parsed is not None:
 			return self.handleParsed( element, ctx, node, value, parsed, event )
 		else:
+			log = ctx.getView().getPageLog()
+			if log.isRecording():
+				log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - could not parse - passing up' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ) )
 			# Pass further up:
 
 			# Replacing the node with itself ensures that the view of this node will be rebuilt,

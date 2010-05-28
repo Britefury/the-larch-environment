@@ -35,14 +35,14 @@ from BritefuryJ.GSym.View import GSymFragmentView, PyGSymViewFragmentFunction
 
 from GSymCore.Languages.Python25 import Python25
 
-from GSymCore.Terminal import TerminalSchema as Schema
-from GSymCore.Terminal.TerminalViewer.TerminalViewerStyleSheet import TerminalViewerStyleSheet
+from GSymCore.PythonConsole import ConsoleSchema as Schema
+from GSymCore.PythonConsole.ConsoleViewer.ConsoleViewerStyleSheet import ConsoleViewerStyleSheet
 
 
 
 class CurrentModuleInteractor (ElementInteractor):
-	def __init__(self, terminal):
-		self._terminal = terminal
+	def __init__(self, console):
+		self._console = console
 		
 		
 	def onKeyTyped(self, element, event):
@@ -53,15 +53,15 @@ class CurrentModuleInteractor (ElementInteractor):
 		if event.getKeyCode() == KeyEvent.VK_ENTER:
 			if event.getModifiers() & KeyEvent.CTRL_MASK  !=  0:
 				bEvaluate = event.getModifiers() & KeyEvent.SHIFT_MASK  ==  0
-				self._terminal.execute( bEvaluate )
+				self._console.execute( bEvaluate )
 				return True
 		elif event.getKeyCode() == KeyEvent.VK_UP:
 			if event.getModifiers() & KeyEvent.ALT_MASK  !=  0:
-				self._terminal.backwards()
+				self._console.backwards()
 				return True
 		elif event.getKeyCode() == KeyEvent.VK_DOWN:
 			if event.getModifiers() & KeyEvent.ALT_MASK  !=  0:
-				self._terminal.forwards()
+				self._console.forwards()
 				return True
 		return False
 	
@@ -71,9 +71,9 @@ class CurrentModuleInteractor (ElementInteractor):
 
 
 
-class TerminalView (GSymViewObjectDispatch):
-	@ObjectDispatchMethod( Schema.Terminal )
-	def Terminal(self, ctx, styleSheet, state, node):
+class ConsoleView (GSymViewObjectDispatch):
+	@ObjectDispatchMethod( Schema.Console )
+	def Console(self, ctx, styleSheet, state, node):
 		blockViews = ctx.mapPresentFragment( node.getBlocks(), styleSheet )
 		currentModuleView = ctx.presentFragmentWithPerspectiveAndStyleSheet( node.getCurrentPythonModule(), Python25.python25EditorPerspective, styleSheet['pythonStyle'] )
 	
@@ -103,13 +103,13 @@ class TerminalView (GSymViewObjectDispatch):
 		
 		
 		dropDest = ObjectDndHandler.DropDest( GSymFragmentView.FragmentDocNode, _onDrop )
-		terminalView, dropPromptInsertionPoint = styleSheet.terminal( blockViews, currentModuleView, CurrentModuleInteractor( node ), dropDest )
-		return terminalView
+		consoleView, dropPromptInsertionPoint = styleSheet.console( blockViews, currentModuleView, CurrentModuleInteractor( node ), dropDest )
+		return consoleView
 
 
 
-	@ObjectDispatchMethod( Schema.TerminalBlock )
-	def TerminalBlock(self, ctx, styleSheet, state, node):
+	@ObjectDispatchMethod( Schema.ConsoleBlock )
+	def ConsoleBlock(self, ctx, styleSheet, state, node):
 		pythonModule = node.getPythonModule()
 		caughtException = node.getCaughtException()
 		result = node.getResult()
@@ -121,7 +121,7 @@ class TerminalView (GSymViewObjectDispatch):
 		else:
 			resultView = None
 		
-		return styleSheet.terminalBlock( moduleView, node.getStdOut(), node.getStdErr(), caughtExceptionView, resultView )
+		return styleSheet.consoleBlock( moduleView, node.getStdOut(), node.getStdErr(), caughtExceptionView, resultView )
 
 
 
@@ -131,4 +131,4 @@ _docNameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*', 0 )
 
 	
 
-perspective = GSymPerspective( PyGSymViewFragmentFunction( TerminalView() ), TerminalViewerStyleSheet.instance, AttributeTable.instance, None, None )
+perspective = GSymPerspective( PyGSymViewFragmentFunction( ConsoleView() ), ConsoleViewerStyleSheet.instance, AttributeTable.instance, None, None )

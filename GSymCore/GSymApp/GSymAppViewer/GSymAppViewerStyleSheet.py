@@ -108,7 +108,7 @@ class GSymAppViewerStyleSheet (StyleSheet):
 	
 	
 
-	def appState(self, openDocuments, terminals, onNewDoc, onOpenDoc, onNewTerminal):
+	def appState(self, openDocuments, consoles, onNewDoc, onOpenDoc, onNewConsole):
 		def _onNewDoc(link, event):
 			onNewDoc( link.getElement() )
 			return True
@@ -117,8 +117,8 @@ class GSymAppViewerStyleSheet (StyleSheet):
 			onOpenDoc( link.getElement() )
 			return True
 		
-		def _onNewTerm(link, event):
-			onNewTerminal()
+		def _onNewConsole(link, event):
+			onNewConsole()
 			return True
 		
 		
@@ -139,11 +139,11 @@ class GSymAppViewerStyleSheet (StyleSheet):
 		openDocumentsBox = self._contentsList( [ newLink, openLink ], openDocuments, 'Documents' )
 		
 		
-		newTermLink = controlsStyle.link( 'NEW', _onNewTerm ).getElement()
-		terminalsBox = self._contentsList( [ newTermLink ], terminals, 'Terminals' )
+		newConsoleLink = controlsStyle.link( 'NEW', _onNewConsole ).getElement()
+		consolesBox = self._contentsList( [ newConsoleLink ], consoles, 'Python consoles' )
 		
 		
-		contentBox = primitiveStyle.vbox( [ linkHeader, title, openDocumentsBox.pad( 10.0, 10.0 ).alignHLeft(), terminalsBox.pad( 10.0, 10.0 ).alignHLeft() ] )
+		contentBox = primitiveStyle.vbox( [ linkHeader, title, openDocumentsBox.pad( 10.0, 10.0 ).alignHLeft(), consolesBox.pad( 10.0, 10.0 ).alignHLeft() ] )
 		
 		return contentBox.alignHExpand()
 	
@@ -168,7 +168,7 @@ class GSymAppViewerStyleSheet (StyleSheet):
 		return primitiveStyle.gridRow( [ docLink, saveLink, saveAsLink ] )
 		
 	
-	def appTerminal(self, name, location):
+	def appConsole(self, name, location):
 		primitiveStyle = self['primitiveStyle']
 		controlsStyle = self['controlsStyle']
 		

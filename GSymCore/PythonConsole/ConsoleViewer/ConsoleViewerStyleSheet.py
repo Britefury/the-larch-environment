@@ -22,9 +22,9 @@ from GSymCore.Languages.Python25.PythonEditor.PythonEditorStyleSheet import Pyth
 
 
 
-class TerminalViewerStyleSheet (StyleSheet):
+class ConsoleViewerStyleSheet (StyleSheet):
 	def __init__(self):
-		super( TerminalViewerStyleSheet, self ).__init__()
+		super( ConsoleViewerStyleSheet, self ).__init__()
 		
 		self.initAttr( 'primitiveStyle', PrimitiveStyleSheet.instance )
 		self.initAttr( 'controlsStyle', ControlsStyleSheet.instance )
@@ -41,8 +41,8 @@ class TerminalViewerStyleSheet (StyleSheet):
 		self.initAttr( 'resultBorderAttrs', AttributeValues( border=SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.0, 0.0, 0.8 ), Color.WHITE ) ) )
 		self.initAttr( 'dropPromptAttrs', AttributeValues( border=SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.0, 0.8, 0.0 ), Color.WHITE ) ) )
 		
-		self.initAttr( 'terminalBlockListSpacing', 5.0 )
-		self.initAttr( 'terminalSpacing', 8.0 )
+		self.initAttr( 'consoleBlockListSpacing', 5.0 )
+		self.initAttr( 'consoleSpacing', 8.0 )
 		
 	
 		
@@ -88,11 +88,11 @@ class TerminalViewerStyleSheet (StyleSheet):
 		return self.withAttrs( dropPromptAttrs=dropPromptAttrs )
 	
 	
-	def withTerminalSpacing(self, terminalSpacing):
-		return self.withAttrs( terminalSpacing=terminalSpacing )
+	def withConsoleSpacing(self, consoleSpacing):
+		return self.withAttrs( consoleSpacing=consoleSpacing )
 	
-	def withTerminalBlockListSpacing(self, terminalBlockListSpacing):
-		return self.withAttrs( terminalBlockListSpacing=terminalBlockListSpacing )
+	def withConsoleBlockListSpacing(self, consoleBlockListSpacing):
+		return self.withAttrs( consoleBlockListSpacing=consoleBlockListSpacing )
 	
 	
 	
@@ -136,20 +136,20 @@ class TerminalViewerStyleSheet (StyleSheet):
 	
 	
 	@DerivedAttributeMethod
-	def terminalBlockListStyle(self):
-		return self['primitiveStyle'].withVBoxSpacing( self['terminalBlockListSpacing'] )
+	def consoleBlockListStyle(self):
+		return self['primitiveStyle'].withVBoxSpacing( self['consoleBlockListSpacing'] )
 	
 	@DerivedAttributeMethod
-	def terminalStyle(self):
-		return self['primitiveStyle'].withVBoxSpacing( self['terminalSpacing'] )
+	def consoleStyle(self):
+		return self['primitiveStyle'].withVBoxSpacing( self['consoleSpacing'] )
 	
 	
 
-	def terminal(self, blocks, currentModule, currentModuleInteractor, currentModuleDropDest):
+	def console(self, blocks, currentModule, currentModuleInteractor, currentModuleDropDest):
 		primitiveStyle = self['primitiveStyle']
 		controlsStyle = self['controlsStyle']
-		terminalBlockListStyle = self.terminalBlockListStyle()
-		terminalStyle = self.terminalStyle()
+		consoleBlockListStyle = self.consoleBlockListStyle()
+		consoleStyle = self.consoleStyle()
 		pythonModuleBorderStyle = self.pythonModuleBorderStyle()
 		
 		currentModule = primitiveStyle.span( [ currentModule ] )
@@ -162,10 +162,10 @@ class TerminalViewerStyleSheet (StyleSheet):
 		dropPromptInsertionPoint = primitiveStyle.vbox( [] ).alignHExpand()
 		
 		if len( blocks ) > 0:
-			blockList = terminalBlockListStyle.vbox( blocks ).alignHExpand()
-			return terminalStyle.vbox( [ blockList.alignHExpand(), dropPromptInsertionPoint, m.alignHExpand() ] ).alignHExpand(), dropPromptInsertionPoint
+			blockList = consoleBlockListStyle.vbox( blocks ).alignHExpand()
+			return consoleStyle.vbox( [ blockList.alignHExpand(), dropPromptInsertionPoint, m.alignHExpand() ] ).alignHExpand(), dropPromptInsertionPoint
 		else:
-			return terminalStyle.vbox( [ dropPromptInsertionPoint, m.alignVTop().alignHExpand() ] ).alignHExpand(), dropPromptInsertionPoint
+			return consoleStyle.vbox( [ dropPromptInsertionPoint, m.alignVTop().alignHExpand() ] ).alignHExpand(), dropPromptInsertionPoint
 		
 		
 	def dropPrompt(self, onAccept, onCancel):
@@ -189,7 +189,7 @@ class TerminalViewerStyleSheet (StyleSheet):
 		label = self.labelStyle().staticText( labelText )
 		return primitiveStyle.vbox( [ label, exception.padX( 5.0, 0.0 ).alignHExpand() ] )
 	
-	def terminalBlock(self, pythonModule, stdout, stderr, caughtException, result):
+	def consoleBlock(self, pythonModule, stdout, stderr, caughtException, result):
 		blockStyle = self.blockStyle()
 		pythonModuleBorderStyle = self.pythonModuleBorderStyle()
 		stdOutStyle = self.stdOutStyle()
@@ -216,7 +216,7 @@ class TerminalViewerStyleSheet (StyleSheet):
 		
 	
 
-TerminalViewerStyleSheet.instance = TerminalViewerStyleSheet()
+ConsoleViewerStyleSheet.instance = ConsoleViewerStyleSheet()
 	
 	
 	

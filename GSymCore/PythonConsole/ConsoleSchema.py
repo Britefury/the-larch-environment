@@ -20,7 +20,7 @@ from GSymCore.Languages.Python25 import Schema as PySchema
 _codeGen = CodeGenerator.Python25CodeGenerator()
 
 
-class Terminal (IncrementalOwner):
+class Console (IncrementalOwner):
 	class Output (object):
 		def __init__(self):
 			self._builder = None
@@ -60,7 +60,7 @@ class Terminal (IncrementalOwner):
 	
 		
 	def commit(self, outText, errText, caughtException, result=None):
-		self._blocks.append( TerminalBlock( self._currentPythonModule, outText, errText, caughtException, result ) )
+		self._blocks.append( ConsoleBlock( self._currentPythonModule, outText, errText, caughtException, result ) )
 		blank = Python25.py25NewModule()
 		for a in self._after:
 			if a != blank:
@@ -158,7 +158,7 @@ class Terminal (IncrementalOwner):
 		
 		
 	
-class TerminalBlock (IncrementalOwner):
+class ConsoleBlock (IncrementalOwner):
 	def __init__(self, pythonModule, stdout, stderr, caughtException, result=None):
 		self._incr = IncrementalValueMonitor( self )
 		
