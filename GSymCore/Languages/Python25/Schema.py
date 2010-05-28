@@ -19,13 +19,6 @@ schema = DMSchema( 'Python25', 'py', 'GSymCore.Languages.Python25' )
 Node = schema.newClass( 'Node', [] )
 Expr = schema.newClass( 'Expr', Node, [ 'parens' ] )
 Stmt = schema.newClass( 'Stmt', Node, [] )
-CompoundStmt = schema.newClass( 'CompoundStmt', Stmt, [] )
-
-
-#
-# Module
-#
-PythonModule = schema.newClass( 'PythonModule', CompoundStmt, [ 'suite' ] )
 
 
 #
@@ -186,6 +179,7 @@ ClassStmtHeader = schema.newClass( 'ClassStmtHeader', CompountStmtHeader, [ 'nam
 #
 # Compound statements
 #
+CompoundStmt = schema.newClass( 'CompoundStmt', Stmt, [] )
 CompoundComponent = schema.newClass( 'CompoundComponent', Node, [] )
 
 IfStmt = schema.newClass( 'IfStmt', CompoundStmt, [ 'condition', 'suite', 'elifBlocks', 'elseSuite' ] )
@@ -208,5 +202,12 @@ Indent = schema.newClass( 'Indent', Node, [] )
 Dedent = schema.newClass( 'Dedent', Node, [] )
 
 IndentedBlock = schema.newClass( 'IndentedBlock', CompoundStmt, [ 'suite' ] )
+
+
+#
+# Module
+#
+PythonModule = schema.newClass( 'PythonModule', CompoundStmt, [ 'suite' ] )
+
 
 

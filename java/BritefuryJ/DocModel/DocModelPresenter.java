@@ -39,13 +39,13 @@ public class DocModelPresenter
 	private static final PrimitiveStyleSheet nullStyle = defaultStyle.withFontItalic( true ).withForeground( new Color( 0.5f, 0.0f, 0.25f ) );
 
 	private static final GenericPerspectiveStyleSheet stringStyle = GenericPerspectiveStyleSheet.instance.withPrimitiveStyleSheet( defaultStyle ).withStringContentAttrs(
-			new AttributeValues( new String[] { "foreground" }, new Object[] { new Color( 0.5f, 0.0f, 0.25f ) } ) );
+			new AttributeValues( new String[] { "foreground" }, new Object[] { new Color( 0.0f, 0.25f, 0.5f ) } ) );
 	
 	private static final PrimitiveStyleSheet punctuationStyle = defaultStyle.withForeground( new Color( 0.0f, 0.0f, 1.0f ) );
 
 	private static final PrimitiveStyleSheet classNameStyle = defaultStyle.withForeground( new Color( 0.0f, 0.5f, 0.0f ) );
 
-	private static final PrimitiveStyleSheet fieldNameStyle = defaultStyle.withForeground( new Color( 0.5f, 0.0f, 0.5f ) );
+	private static final PrimitiveStyleSheet fieldNameStyle = defaultStyle.withForeground( new Color( 0.5f, 0.0f, 0.25f ) );
 
 	
 	
