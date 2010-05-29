@@ -18,8 +18,6 @@ from BritefuryJ.DocPresent.Browser import Location
 
 from Britefury.AttributeTableUtils.DerivedAttributeMethod import DerivedAttributeMethod
 
-from GSymCore.Utils.LinkHeader import LinkHeaderStyleSheet
-from GSymCore.Utils.Title import TitleBarStyleSheet
 from GSymCore.Utils.TabbedBox import TabbedBoxStyleSheet
 
 
@@ -29,9 +27,8 @@ class GSymAppViewerStyleSheet (StyleSheet):
 		super( GSymAppViewerStyleSheet, self ).__init__()
 		
 		self.initAttr( 'primitiveStyle', PrimitiveStyleSheet.instance )
+		self.initAttr( 'richTextStyle', RichTextStyleSheet.instance )
 		self.initAttr( 'controlsStyle', ControlsStyleSheet.instance )
-		self.initAttr( 'linkHeaderStyle', LinkHeaderStyleSheet.instance )
-		self.initAttr( 'titleBarStyle', TitleBarStyleSheet.instance )
 		self.initAttr( 'tabbedBoxStyle', TabbedBoxStyleSheet.instance )
 		
 		self.initAttr( 'appDocumentControlsAttrs', AttributeValues( border=FilledBorder( 5.0, 5.0, 5.0, 5.0, Color( 0.9, 0.9, 0.9 ) ), hboxSpacing=20.0 ) )
@@ -52,14 +49,11 @@ class GSymAppViewerStyleSheet (StyleSheet):
 	def withPrimitiveStyleSheet(self, primitiveStyle):
 		return self.withAttrs( primitiveStyle=primitiveStyle )
 	
+	def withRichTextStyleSheet(self, richTextStyle):
+		return self.withAttrs( richTextStyle=richTextStyle )
+	
 	def withControlsStyleSheet(self, controlsStyle):
 		return self.withAttrs( controlsStyle=controlsStyle )
-	
-	def withLinkheaderStyleSheet(self, linkHeaderStyle):
-		return self.withAttrs( linkHeaderStyle=linkHeaderStyle )
-	
-	def withTitlebarStyleSheet(self, titleBarStyle):
-		return self.withAttrs( titleBarStyle=titleBarStyle )
 	
 	def withTabbedBoxStyleSheet(self, tabbedBoxStyle):
 		return self.withAttrs( tabbedBoxStyle=tabbedBoxStyle )
@@ -123,16 +117,15 @@ class GSymAppViewerStyleSheet (StyleSheet):
 		
 		
 		primitiveStyle = self['primitiveStyle']
+		richTextStyle = self['richTextStyle']
 		controlsStyle = self['controlsStyle']
-		linkHeaderStyle = self['linkHeaderStyle']
-		titleBarStyle = self['titleBarStyle']
 		
 		appDocumentControlsStyle = self.appDocumentControlsStyle()		
 
 		systemLink = controlsStyle.link( 'SYSTEM PAGE', Location( 'system' ) ).getElement()
-		linkHeader = linkHeaderStyle.linkHeaderBar( [ systemLink ] )
+		linkHeader = richTextStyle.linkHeaderBar( [ systemLink ] )
 		
-		title = titleBarStyle.titleBar( 'gSym' )
+		title = richTextStyle.titleBar( 'gSym' )
 		
 		newLink = controlsStyle.link( 'NEW', _onNewDoc ).getElement()
 		openLink = controlsStyle.link( 'OPEN', _onOpenDoc ).getElement()
