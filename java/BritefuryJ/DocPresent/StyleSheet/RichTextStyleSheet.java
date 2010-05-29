@@ -44,7 +44,7 @@ public class RichTextStyleSheet extends StyleSheet
 	{
 		super();
 		
-		initAttr( "primitiveStyleSheet", PrimitiveStyleSheet.instance );
+		initAttr( "primitiveStyleSheet", PrimitiveStyleSheet.instance.withNonEditable() );
 		
 		
 		initAttr( "pageSpacing", defaultPageSpacing );
