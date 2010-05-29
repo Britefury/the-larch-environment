@@ -18,8 +18,6 @@ from BritefuryJ.DocPresent.Browser import Location
 
 from Britefury.AttributeTableUtils.DerivedAttributeMethod import DerivedAttributeMethod
 
-from GSymCore.Utils.LinkHeader import LinkHeaderStyleSheet
-from GSymCore.Utils.Title import TitleBarStyleSheet
 from GSymCore.Utils.TabbedBox import TabbedBoxStyleSheet
 
 
@@ -29,9 +27,8 @@ class ProjectEditorStyleSheet (StyleSheet):
 		super( ProjectEditorStyleSheet, self ).__init__()
 		
 		self.initAttr( 'primitiveStyle', PrimitiveStyleSheet.instance )
+		self.initAttr( 'richTextStyle', RichTextStyleSheet.instance )
 		self.initAttr( 'controlsStyle', ControlsStyleSheet.instance )
-		self.initAttr( 'linkHeaderStyle', LinkHeaderStyleSheet.instance )
-		self.initAttr( 'titleBarStyle', TitleBarStyleSheet.instance )
 		self.initAttr( 'tabbedBoxStyle', TabbedBoxStyleSheet.instance )
 		
 		self.initAttr( 'projectControlsAttrs', AttributeValues( border=SolidBorder( 2.0, 2.0, Color( 131, 149, 172 ), None ), hBoxSpacing=30.0 ) )
@@ -49,14 +46,11 @@ class ProjectEditorStyleSheet (StyleSheet):
 	def withPrimitiveStyleSheet(self, primitiveStyle):
 		return self.withAttrs( primitiveStyle=primitiveStyle )
 	
+	def withRichTextStyleSheet(self, richTextStyle):
+		return self.withAttrs( richTextStyle=richTextStyle )
+	
 	def withControlsStyleSheet(self, controlsStyle):
 		return self.withAttrs( controlsStyle=controlsStyle )
-	
-	def withLinkheaderStyleSheet(self, linkHeaderStyle):
-		return self.withAttrs( linkHeaderStyle=linkHeaderStyle )
-	
-	def withTitlebarStyleSheet(self, titleBarStyle):
-		return self.withAttrs( titleBarStyle=titleBarStyle )
 	
 	def withTabbedBoxStyleSheet(self, tabbedBoxStyle):
 		return self.withAttrs( tabbedBoxStyle=tabbedBoxStyle )
@@ -92,14 +86,15 @@ class ProjectEditorStyleSheet (StyleSheet):
 	
 	def project(self, projectName, rootPackage, onSave, onSaveAs):
 		primitiveStyle = self['primitiveStyle']
+		richTextStyle = self['richTextStyle']
 		controlsStyle = self['controlsStyle']
 		projectControlsStyle = self.projectControlsStyle()
 
 		
 		homeLink = controlsStyle.link( 'HOME PAGE', Location( '' ) ).getElement()
-		linkHeader = self['linkHeaderStyle'].linkHeaderBar( [ homeLink ] )
+		linkHeader = richTextStyle.linkHeaderBar( [ homeLink ] )
 		
-		title = self['titleBarStyle'].titleBarWithHeader( 'DOCUMENT', projectName )
+		title = richTextStyle.titleBarWithSubtitle( 'DOCUMENT', projectName )
 		
 		
 		saveLink = controlsStyle.link( 'SAVE', onSave ).getElement()
