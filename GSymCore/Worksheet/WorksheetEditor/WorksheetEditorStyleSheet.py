@@ -19,12 +19,13 @@ from Britefury.AttributeTableUtils.DerivedAttributeMethod import DerivedAttribut
 
 
 
-class WorksheetStyleSheet (StyleSheet):
+class WorksheetEditorStyleSheet (StyleSheet):
 	def __init__(self):
-		super( WorksheetStyleSheet, self ).__init__()
+		super( WorksheetEditorStyleSheet, self ).__init__()
 		
 		self.initAttr( 'primitiveStyle', PrimitiveStyleSheet.instance )
 		self.initAttr( 'richTextStyle', RichTextStyleSheet.instance )
+		self.initAttr( 'editableRichTextStyle', RichTextStyleSheet.instance.withEditable() )
 		self.initAttr( 'controlsStyle', ControlsStyleSheet.instance )
 		
 		self.initAttr( 'projectControlsAttrs', AttributeValues( border=SolidBorder( 2.0, 2.0, Color( 131, 149, 172 ), None ), hBoxSpacing=30.0 ) )
@@ -90,11 +91,54 @@ class WorksheetStyleSheet (StyleSheet):
 		
 		title = richTextStyle.titleBarWithSubtitle( title, 'Worksheet' )
 		
-		return richTextStyle.page( [ linkHeader, title ] )
+		return richTextStyle.page( [ linkHeader, title ] + contents )
+	
+	
+	def paragraph(self, text):
+		if text != '':
+			return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].paragraph( text ) )
+		else:
+			return self['primitiveStyle'].segment( True, True, self['primitiveStyle'].text( '' ) )
+	
+	def h1(self, text):
+		if text != '':
+			return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h1( text ) )
+		else:
+			return self['primitiveStyle'].segment( True, True, self['primitiveStyle'].text( '' ) )
+	
+	def h2(self, text):
+		if text != '':
+			return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h2( text ) )
+		else:
+			return self['primitiveStyle'].segment( True, True, self['primitiveStyle'].text( '' ) )
+	
+	def h3(self, text):
+		if text != '':
+			return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h3( text ) )
+		else:
+			return self['primitiveStyle'].segment( True, True, self['primitiveStyle'].text( '' ) )
+	
+	def h4(self, text):
+		if text != '':
+			return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h4( text ) )
+		else:
+			return self['primitiveStyle'].segment( True, True, self['primitiveStyle'].text( '' ) )
+	
+	def h5(self, text):
+		if text != '':
+			return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h5( text ) )
+		else:
+			return self['primitiveStyle'].segment( True, True, self['primitiveStyle'].text( '' ) )
+	
+	def h6(self, text):
+		if text != '':
+			return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h6( text ) )
+		else:
+			return self['primitiveStyle'].segment( True, True, self['primitiveStyle'].text( '' ) )
 	
 	
 
-WorksheetStyleSheet.instance = WorksheetStyleSheet()
+WorksheetEditorStyleSheet.instance = WorksheetEditorStyleSheet()
 	
 	
 	

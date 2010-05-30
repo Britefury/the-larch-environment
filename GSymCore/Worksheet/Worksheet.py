@@ -20,7 +20,7 @@ def _worksheetNewUnit():
 	return gSymUnit( Schema.schema, newWorksheet() )
 
 
-unitClass = GSymUnitClass( Schema.schema, worksheetViewerPerspective )
+unitClass = GSymUnitClass( Schema.schema, worksheetEditorPerspective )
 
 
 newPageFactory = GSymPageFactory( 'Worksheet', _worksheetNewUnit )
