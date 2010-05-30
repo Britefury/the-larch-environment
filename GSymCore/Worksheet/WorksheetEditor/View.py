@@ -38,18 +38,77 @@ from BritefuryJ.GSym.View import PyGSymViewFragmentFunction
 from GSymCore.GSymApp import DocumentManagement
 
 from GSymCore.Worksheet import Schema
-from GSymCore.Worksheet.WorksheetStyleSheet import WorksheetStyleSheet
+from GSymCore.Worksheet.WorksheetEditor.WorksheetEditorStyleSheet import WorksheetEditorStyleSheet
+from GSymCore.Worksheet.WorksheetEditor.NodeEditor import *
 
 
+
+_textInteractor = TextInteractor()
 
 
 
 class WorksheetEditor (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod( Schema.Worksheet )
 	def Worksheet(self, ctx, styleSheet, inheritedState, node, title, contents):
-		contents = ctx.mapPresentFragment( contents, styleSheet, inheritedState )
+		if len( contents ) > 0:
+			contentViews = ctx.mapPresentFragment( contents, styleSheet, inheritedState )
+		else:
+			emptyLine = PrimitiveStyleSheet.instance.paragraph( [ PrimitiveStyleSheet.instance.text( '' ) ] )
+			emptyLine.setLinearRepresentationListener( EmptyLinearRepresentationListener.newListener() )
+			contentViews = [ emptyLine ]
 
-		return styleSheet.worksheet( title, contents )
+		return styleSheet.worksheet( title, contentViews )
+	
+	
+	@ObjectNodeDispatchMethod( Schema.Paragraph )
+	def Paragraph(self, ctx, styleSheet, inheritedState, node, text):
+		p = styleSheet.paragraph( text )
+		p.setLinearRepresentationListener( TextLinearRepresentationListener.newListener() )
+		p.addInteractor( _textInteractor )
+		return p
+	
+	@ObjectNodeDispatchMethod( Schema.H1 )
+	def H1(self, ctx, styleSheet, inheritedState, node, text):
+		p = styleSheet.h1( text )
+		p.setLinearRepresentationListener( TextLinearRepresentationListener.newListener() )
+		p.addInteractor( _textInteractor )
+		return p
+	
+	@ObjectNodeDispatchMethod( Schema.H2 )
+	def H2(self, ctx, styleSheet, inheritedState, node, text):
+		p = styleSheet.h2( text )
+		p.setLinearRepresentationListener( TextLinearRepresentationListener.newListener() )
+		p.addInteractor( _textInteractor )
+		return p
+	
+	@ObjectNodeDispatchMethod( Schema.H3 )
+	def H3(self, ctx, styleSheet, inheritedState, node, text):
+		p = styleSheet.h3( text )
+		p.setLinearRepresentationListener( TextLinearRepresentationListener.newListener() )
+		p.addInteractor( _textInteractor )
+		return p
+			
+	@ObjectNodeDispatchMethod( Schema.H4 )
+	def H4(self, ctx, styleSheet, inheritedState, node, text):
+		p = styleSheet.h4( text )
+		p.setLinearRepresentationListener( TextLinearRepresentationListener.newListener() )
+		p.addInteractor( _textInteractor )
+		return p
+	
+	@ObjectNodeDispatchMethod( Schema.H5 )
+	def H5(self, ctx, styleSheet, inheritedState, node, text):
+		p = styleSheet.h5( text )
+		p.setLinearRepresentationListener( TextLinearRepresentationListener.newListener() )
+		p.addInteractor( _textInteractor )
+		return p
+	
+	@ObjectNodeDispatchMethod( Schema.H6 )
+	def H6(self, ctx, styleSheet, inheritedState, node, text):
+		p = styleSheet.h6( text )
+		p.setLinearRepresentationListener( TextLinearRepresentationListener.newListener() )
+		p.addInteractor( _textInteractor )
+		return p
+
 
 	
 	
@@ -63,6 +122,6 @@ class WorksheetEditorRelativeLocationResolver (GSymRelativeLocationResolver):
 
 	
 _viewFn = PyGSymViewFragmentFunction( WorksheetEditor() )
-perspective = GSymPerspective( _viewFn, WorksheetStyleSheet.instance, AttributeTable.instance, None, WorksheetEditorRelativeLocationResolver() )
+perspective = GSymPerspective( _viewFn, WorksheetEditorStyleSheet.instance, AttributeTable.instance, None, WorksheetEditorRelativeLocationResolver() )
 
 	
