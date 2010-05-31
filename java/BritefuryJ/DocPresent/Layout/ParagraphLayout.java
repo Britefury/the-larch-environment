@@ -420,13 +420,16 @@ public class ParagraphLayout
 				
 				// Build a list of child boxes for the line
 				int lineLength = lineBreakIndex - lineStartIndex;
-				LReqBoxInterface lineChildren[] = new LReqBoxInterface[lineLength];
-				LAllocBoxInterface lineChildrenAlloc[] = new LAllocBoxInterface[lineLength];
-				int lineChildAllocFlags[] = new int[lineLength];
-				System.arraycopy( children, lineStartIndex, lineChildren, 0, lineLength );
-				System.arraycopy( childrenAlloc, lineStartIndex, lineChildrenAlloc, 0, lineLength );
-				System.arraycopy( childAllocationFlags, lineStartIndex, lineChildAllocFlags, 0, lineLength );
-				lines.add( new Line( lineChildren, lineChildrenAlloc, lineChildAllocFlags, bFirstLine  ?  0.0  :  lineBreakIndentation, lineStartIndex, lineBreakIndex ) );
+				if ( lineLength > 0 )
+				{
+					LReqBoxInterface lineChildren[] = new LReqBoxInterface[lineLength];
+					LAllocBoxInterface lineChildrenAlloc[] = new LAllocBoxInterface[lineLength];
+					int lineChildAllocFlags[] = new int[lineLength];
+					System.arraycopy( children, lineStartIndex, lineChildren, 0, lineLength );
+					System.arraycopy( childrenAlloc, lineStartIndex, lineChildrenAlloc, 0, lineLength );
+					System.arraycopy( childAllocationFlags, lineStartIndex, lineChildAllocFlags, 0, lineLength );
+					lines.add( new Line( lineChildren, lineChildrenAlloc, lineChildAllocFlags, bFirstLine  ?  0.0  :  lineBreakIndentation, lineStartIndex, lineBreakIndex ) );
+				}
 				
 				// Next line
 				lineBreakAtLineStart = chosenLineBreak;
@@ -495,14 +498,17 @@ public class ParagraphLayout
 		{
 			// Create the last line
 			int lineLength = children.length - lineStartIndex;
-			LReqBoxInterface lineChildren[] = new LReqBoxInterface[lineLength];
-			LAllocBoxInterface lineChildrenAlloc[] = new LAllocBoxInterface[lineLength];
-			int lineChildAllocFlags[] = new int[lineLength];
-			System.arraycopy( children, lineStartIndex, lineChildren, 0, lineLength );
-			System.arraycopy( childrenAlloc, lineStartIndex, lineChildrenAlloc, 0, lineLength );
-			System.arraycopy( childAllocationFlags, lineStartIndex, lineChildAllocFlags, 0, lineLength );
-			double lineIndentation = lineBreakAtLineStart != null  ?  lineBreakAtLineStart.lineIndentation.indentation  :  0.0;
-			lines.add( new Line( lineChildren, lineChildrenAlloc, lineChildAllocFlags, lineIndentation, lineStartIndex, children.length ) );
+			if ( lineLength > 0 )
+			{
+				LReqBoxInterface lineChildren[] = new LReqBoxInterface[lineLength];
+				LAllocBoxInterface lineChildrenAlloc[] = new LAllocBoxInterface[lineLength];
+				int lineChildAllocFlags[] = new int[lineLength];
+				System.arraycopy( children, lineStartIndex, lineChildren, 0, lineLength );
+				System.arraycopy( childrenAlloc, lineStartIndex, lineChildrenAlloc, 0, lineLength );
+				System.arraycopy( childAllocationFlags, lineStartIndex, lineChildAllocFlags, 0, lineLength );
+				double lineIndentation = lineBreakAtLineStart != null  ?  lineBreakAtLineStart.lineIndentation.indentation  :  0.0;
+				lines.add( new Line( lineChildren, lineChildrenAlloc, lineChildAllocFlags, lineIndentation, lineStartIndex, children.length ) );
+			}
 		}
 		
 		

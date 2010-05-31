@@ -40,7 +40,7 @@ from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
 from GSymCore.Languages.Python25.PythonEditor.Parser import Python25Grammar
 from GSymCore.Languages.Python25.PythonEditor.Precedence import *
 from GSymCore.Languages.Python25.PythonEditor.PythonEditOperations import *
-from GSymCore.Languages.Python25.PythonEditor.SelectionEditor import SelectionLinearRepresentationEvent
+from GSymCore.Languages.Python25.PythonEditor.SelectionEditor import PythonSelectionTreeEvent
 
 
 
@@ -69,20 +69,20 @@ class _ListenerTable (object):
 		
 	
 	
-class ParsedExpressionLinearRepresentationListener (ElementLinearRepresentationListener):
+class ParsedExpressionTreeEventListener (TreeEventListener):
 	__slots__ = [ '_parser', '_outerPrecedence' ]
 	
 	def __init__(self, parser, outerPrecedence, node=None):
-		#super( ParsedExpressionLinearRepresentationListener, self ).__init__()
+		#super( ParsedExpressionTreeEventListener, self ).__init__()
 		self._parser = parser
 		self._outerPrecedence = outerPrecedence
 
-	def linearRepresentationModified(self, element, event):
-		# if @event is a @SelectionLinearRepresentationEvent, and its source element is @element, then @element has had its
+	def onTreeEvent(self, element, sourceElement, event):
+		# if @event is a @PythonSelectionTreeEvent, and its source element is @element, then @element has had its
 		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it.
 		# Otherwise, clear the structural represnetation of all elements on the path from the source element to @element
-		if not ( isinstance( event, SelectionLinearRepresentationEvent )  and  event.getSourceElement() is element ):
-			event.getSourceElement().clearStructuralRepresentationsOnPathUpTo( element )
+		if not ( isinstance( event, PythonSelectionTreeEvent )  and  event.sourceElement is element ):
+			sourceElement.clearStructuralRepresentationsOnPathUpTo( element )
 			element.clearStructuralRepresentation()
 		value = element.getLinearRepresentation()
 		ctx = element.getFragmentContext()
@@ -117,15 +117,15 @@ class ParsedExpressionLinearRepresentationListener (ElementLinearRepresentationL
 		
 	@staticmethod
 	def newListener(parser, outerPrecedence):
-		if ParsedExpressionLinearRepresentationListener._listenerTable is None:
-			ParsedExpressionLinearRepresentationListener._listenerTable = _ListenerTable( ParsedExpressionLinearRepresentationListener )
-		return ParsedExpressionLinearRepresentationListener._listenerTable.get( parser, outerPrecedence )
+		if ParsedExpressionTreeEventListener._listenerTable is None:
+			ParsedExpressionTreeEventListener._listenerTable = _ListenerTable( ParsedExpressionTreeEventListener )
+		return ParsedExpressionTreeEventListener._listenerTable.get( parser, outerPrecedence )
 		
 		
 
 
-class StructuralExpressionLinearRepresentationListener (ElementLinearRepresentationListener):
-	def linearRepresentationModified(self, element, event):
+class StructuralExpressionTreeEventListener (TreeEventListener):
+	def onTreeEvent(self, element, sourceElement, event):
 		element.clearStructuralRepresentation()
 		return False
 		
@@ -134,13 +134,13 @@ class StructuralExpressionLinearRepresentationListener (ElementLinearRepresentat
 		
 	@staticmethod
 	def newListener():
-		if StructuralExpressionLinearRepresentationListener._listener is None:
-			StructuralExpressionLinearRepresentationListener._listener = StructuralExpressionLinearRepresentationListener()
-		return StructuralExpressionLinearRepresentationListener._listener
+		if StructuralExpressionTreeEventListener._listener is None:
+			StructuralExpressionTreeEventListener._listener = StructuralExpressionTreeEventListener()
+		return StructuralExpressionTreeEventListener._listener
 		
 
 
-class StatementLinearRepresentationListener (ElementLinearRepresentationListener):
+class StatementTreeEventListener (TreeEventListener):
 	__slots__ = [ '_parser' ]
 
 	
@@ -148,12 +148,12 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 		self._parser = parser
 
 		
-	def linearRepresentationModified(self, element, event):
-		# if @event is a @SelectionLinearRepresentationEvent, and its source element is @element, then @element has had its
+	def onTreeEvent(self, element, sourceElement, event):
+		# if @event is a @PythonSelectionTreeEvent, and its source element is @element, then @element has had its
 		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it.
 		# Otherwise, clear the structural represnetation of all elements on the path from the source element to @element
-		if not ( isinstance( event, SelectionLinearRepresentationEvent )  and  event.getSourceElement() is element ):
-			event.getSourceElement().clearStructuralRepresentationsOnPathUpTo( element )
+		if not ( isinstance( event, PythonSelectionTreeEvent )  and  event.sourceElement is element ):
+			sourceElement.clearStructuralRepresentationsOnPathUpTo( element )
 			element.clearStructuralRepresentation()
 		ctx = element.getFragmentContext()
 		node = ctx.getDocNode()
@@ -161,7 +161,7 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 		value = element.getLinearRepresentation()
 		parsed = parseStream( self._parser, value )
 		if parsed is not None:
-			return self.handleParsed( element, ctx, node, value, parsed, event )
+			return self.handleParsed( element, sourceElement, ctx, node, value, parsed, event )
 		else:
 			log = ctx.getView().getPageLog()
 			if log.isRecording():
@@ -176,15 +176,14 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 			# This normally leads to blank lines doubling on each press of the return key
 			pyReplaceStmt( ctx, node, node, False )
 			
-			return element.sendLinearRepresentationModifiedEventToParent( event )
+			return element.postTreeEventToParent( event )
 
 		
-	def handleParsed(self, element, ctx, node, value, parsed, event):
+	def handleParsed(self, element, sourceElement, ctx, node, value, parsed, event):
 		if not isCompoundStmtOrCompoundHeader( node )  and  not isCompoundStmtOrCompoundHeader( parsed ):
 			if isUnparsed( parsed ):
 				# Statement has been replaced by unparsed content
 				# Only edit the innermost node around the element that is the source of the event
-				sourceElement = event.getSourceElement()
 				sourceCtx = sourceElement.getFragmentContext()
 				if sourceCtx is None:
 					print 'NULL SOURCE CONTEXT: ', sourceElement
@@ -222,21 +221,21 @@ class StatementLinearRepresentationListener (ElementLinearRepresentationListener
 				return True
 		else:
 			element.setStructuralValueObject( parsed )
-			return element.sendLinearRepresentationModifiedEventToParent( event )
+			return element.postTreeEventToParent( event )
 
 			
 	_listenerTable = None
 		
 	@staticmethod
 	def newListener(parser):
-		if StatementLinearRepresentationListener._listenerTable is None:
-			StatementLinearRepresentationListener._listenerTable = _ListenerTable( StatementLinearRepresentationListener )
-		return StatementLinearRepresentationListener._listenerTable.get( parser )
+		if StatementTreeEventListener._listenerTable is None:
+			StatementTreeEventListener._listenerTable = _ListenerTable( StatementTreeEventListener )
+		return StatementTreeEventListener._listenerTable.get( parser )
 			
 			
 			
 			
-class CompoundHeaderLinearRepresentationListener (ElementLinearRepresentationListener):
+class CompoundHeaderTreeEventListener (TreeEventListener):
 	__slots__ = [ '_parser' ]
 
 	
@@ -244,10 +243,10 @@ class CompoundHeaderLinearRepresentationListener (ElementLinearRepresentationLis
 		self._parser = parser
 
 		
-	def linearRepresentationModified(self, element, event):
-		# if @event is a @SelectionLinearRepresentationEvent, and its source element is @element, then @element has had its
+	def onTreeEvent(self, element, sourceElement, event):
+		# if @event is a @PythonSelectionTreeEvent, and its source element is @element, then @element has had its
 		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it
-		if not isinstance( event, SelectionLinearRepresentationEvent )  or  event.getSourceElement() is not element:
+		if not isinstance( event, PythonSelectionTreeEvent )  or  event.sourceElement is not element:
 			element.clearStructuralRepresentation()
 		ctx = element.getFragmentContext()
 		# Get the content
@@ -256,27 +255,27 @@ class CompoundHeaderLinearRepresentationListener (ElementLinearRepresentationLis
 		if parsed is not None:
 			return self.handleParsed( element, value, parsed, event )
 		else:
-			return element.sendLinearRepresentationModifiedEventToParent( event )
+			return element.postTreeEventToParent( event )
 
 		
 	def handleParsed(self, element, value, parsed, event):
 		element.setStructuralValueObject( parsed )
-		return element.sendLinearRepresentationModifiedEventToParent( event )
+		return element.postTreeEventToParent( event )
 
 			
 	_listenerTable = None
 		
 	@staticmethod
 	def newListener(parser):
-		if CompoundHeaderLinearRepresentationListener._listenerTable is None:
-			CompoundHeaderLinearRepresentationListener._listenerTable = _ListenerTable( CompoundHeaderLinearRepresentationListener )
-		return CompoundHeaderLinearRepresentationListener._listenerTable.get( parser )
+		if CompoundHeaderTreeEventListener._listenerTable is None:
+			CompoundHeaderTreeEventListener._listenerTable = _ListenerTable( CompoundHeaderTreeEventListener )
+		return CompoundHeaderTreeEventListener._listenerTable.get( parser )
 			
 
 	
 
 			
-class SuiteLinearRepresentationListener (ElementLinearRepresentationListener):
+class SuiteTreeEventListener (TreeEventListener):
 	__slots__ = [ '_parser', '_suite' ]
 
 	
@@ -285,10 +284,10 @@ class SuiteLinearRepresentationListener (ElementLinearRepresentationListener):
 		self._suite = suite
 
 		
-	def linearRepresentationModified(self, element, event):
-		# if @event is a @SelectionLinearRepresentationEvent, and its source element is @element, then @element has had its
+	def onTreeEvent(self, element, sourceElement, event):
+		# if @event is a @PythonSelectionTreeEvent, and its source element is @element, then @element has had its
 		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it
-		if not isinstance( event, SelectionLinearRepresentationEvent )  or  event.getSourceElement() is not element:
+		if not isinstance( event, PythonSelectionTreeEvent )  or  event.sourceElement is not element:
 			element.clearStructuralRepresentation()
 		ctx = element.getFragmentContext()
 		# Get the content
@@ -305,7 +304,7 @@ class SuiteLinearRepresentationListener (ElementLinearRepresentationListener):
 			log = ctx.getView().getPageLog()
 			if log.isRecording():
 				log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Suite - parse FAIL - passing to parent' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ) )
-			return element.sendLinearRepresentationModifiedEventToParent( event )
+			return element.postTreeEventToParent( event )
 
 			
 			

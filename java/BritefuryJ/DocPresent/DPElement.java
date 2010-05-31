@@ -15,10 +15,13 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.WeakHashMap;
+
+import org.python.core.PyType;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.Border.FilledBorder;
@@ -64,6 +67,7 @@ import BritefuryJ.Math.Xform2;
 import BritefuryJ.Parser.ItemStream.ItemStream;
 import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 import BritefuryJ.Utils.HashUtils;
+import BritefuryJ.Utils.PolymorphicMap;
 
 
 
@@ -244,16 +248,133 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	//
 	//
-	// INTERACTOR
+	// TREE EVENTS
+	//
+	//
+	
+	private static class TreeEvent
+	{
+		private DPElement sourceElement;
+		private Object value;
+		
+		
+		public TreeEvent(DPElement sourceElement, Object value)
+		{
+			this.sourceElement = sourceElement;
+			this.value = value;
+		}
+	}
+	
+	private static class TreeEventHandlerTable
+	{
+		private static class HandlerEntry
+		{
+			private Object valueType;
+			private TreeEventListener handler;
+			int hash;
+			
+			
+			public HandlerEntry(Object valueType, TreeEventListener handler)
+			{
+				this.valueType = valueType;
+				this.handler = handler;
+				this.hash = HashUtils.doubleHash( valueType.hashCode(), handler.hashCode() );
+			}
+			
+			
+			public int hashCode()
+			{
+				return hash;
+			}
+			
+			public boolean equals(Object x)
+			{
+				if ( x == this )
+				{
+					return true;
+				}
+				
+				if ( x instanceof HandlerEntry )
+				{
+					HandlerEntry ex = (HandlerEntry)x;
+					return valueType.equals( ex.valueType )  &&  handler.equals( ex.handler );
+				}
+				
+				return false;
+			}
+		}
+		
+		private HashMap<HandlerEntry, WeakReference<TreeEventHandlerTable>> derivedTables = new HashMap<HandlerEntry, WeakReference<TreeEventHandlerTable>>();
+		private PolymorphicMap<HandlerEntry> handlers = new PolymorphicMap<HandlerEntry>();
+		
+		
+		public static TreeEventHandlerTable instance = new TreeEventHandlerTable();
+		
+		
+		private TreeEventHandlerTable()
+		{
+		}
+		
+		
+		public boolean handleTreeEvent(DPElement element, TreeEvent event)
+		{
+			HandlerEntry entry = handlers.getValueForObject( event.value );
+			if ( entry != null )
+			{
+				return entry.handler.onTreeEvent( element, event.sourceElement, event.value );
+			}
+			else
+			{
+				return false;
+			}
+		}
+		
+		
+		public TreeEventHandlerTable withJavaHandler(Class<?> valueType, TreeEventListener handler)
+		{
+			HandlerEntry handlerEntry = new HandlerEntry( valueType, handler );
+			WeakReference<TreeEventHandlerTable> derivedRef = derivedTables.get( handlerEntry );
+			if ( derivedRef == null  ||  derivedRef.get() == null )
+			{
+				TreeEventHandlerTable derived = new TreeEventHandlerTable();
+				derived.handlers.copyFrom( handlers );
+				derived.handlers.registerJavaType( valueType, handlerEntry );
+				derivedRef = new WeakReference<TreeEventHandlerTable>( derived );
+				derivedTables.put( handlerEntry, derivedRef );
+			}
+			return derivedRef.get();
+		}
+		
+		public TreeEventHandlerTable withPythonHandler(PyType valueType, TreeEventListener handler)
+		{
+			HandlerEntry handlerEntry = new HandlerEntry( valueType, handler );
+			WeakReference<TreeEventHandlerTable> derivedRef = derivedTables.get( handlerEntry );
+			if ( derivedRef == null  ||  derivedRef.get() == null )
+			{
+				TreeEventHandlerTable derived = new TreeEventHandlerTable();
+				derived.handlers.copyFrom( handlers );
+				derived.handlers.registerPythonType( valueType, handlerEntry );
+				derivedRef = new WeakReference<TreeEventHandlerTable>( derived );
+				derivedTables.put( handlerEntry, derivedRef );
+			}
+			return derivedRef.get();
+		}
+	}
+	
+	
+	
+	//
+	//
+	// INTERACTION FIELDS
 	//
 	//
 	
 	private static class InteractionFields
 	{
 		private ObjectDndHandler dndHandler;
-
-		private ElementLinearRepresentationListener linearRepresentationListener;		// Move this and the next one into an 'interactor' element
 		
+		private TreeEventHandlerTable treeEventHandlers;
+
 		private ArrayList<ElementInteractor> interactors;
 		private ArrayList<ContextMenuFactory> contextFactories;
 		
@@ -268,7 +389,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		{
 			InteractionFields f = new InteractionFields();
 			f.dndHandler = dndHandler;
-			f.linearRepresentationListener = linearRepresentationListener;
+			f.treeEventHandlers = treeEventHandlers;
 			if ( interactors != null )
 			{
 				f.interactors = new ArrayList<ElementInteractor>();
@@ -329,7 +450,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		
 		public boolean isIdentity()
 		{
-			return dndHandler == null  &&  linearRepresentationListener == null  &&  interactors == null  &&  contextFactories == null;
+			return dndHandler == null  &&  treeEventHandlers == null  &&  interactors == null  &&  contextFactories == null;
 		}
 	}
 
@@ -2495,27 +2616,76 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	
 	
+	
 	//
 	//
-	// LISTENER METHODS
+	// TREE EVENT METHODS
 	//
 	//
 	
-	
-	public ElementLinearRepresentationListener getLinearRepresentationListener()
+	private TreeEventHandlerTable getTreeEventHandlers()
 	{
-		return interactionFields != null  ?  interactionFields.linearRepresentationListener  :  null;
+		return interactionFields != null  ?  interactionFields.treeEventHandlers  :  null;
 	}
 	
-	public void setLinearRepresentationListener(ElementLinearRepresentationListener listener)
+	public void addTreeEventListener(Class<?> eventType, TreeEventListener handler)
 	{
 		ensureValidInteractionFields();
-		interactionFields.linearRepresentationListener = listener;
+		if ( interactionFields.treeEventHandlers == null )
+		{
+			interactionFields.treeEventHandlers = TreeEventHandlerTable.instance;
+		}
+		interactionFields.treeEventHandlers = interactionFields.treeEventHandlers.withJavaHandler( eventType, handler );
 		notifyInteractionFieldsModified();
 	}
 	
+	public void addTreeEventListener(PyType eventType, TreeEventListener handler)
+	{
+		ensureValidInteractionFields();
+		if ( interactionFields.treeEventHandlers == null )
+		{
+			interactionFields.treeEventHandlers = TreeEventHandlerTable.instance;
+		}
+		interactionFields.treeEventHandlers = interactionFields.treeEventHandlers.withPythonHandler( eventType, handler );
+		notifyInteractionFieldsModified();
+	}
 	
-
+	public boolean postTreeEventToParent(Object event)
+	{
+		if ( parent != null )
+		{
+			return parent.treeEvent( new TreeEvent( this, event ) );
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	public boolean postTreeEvent(Object event)
+	{
+		return treeEvent( new TreeEvent( this, event ) );
+	}
+	
+	
+	protected boolean treeEvent(TreeEvent event)
+	{
+		TreeEventHandlerTable handlers = getTreeEventHandlers();
+		if ( handlers != null )
+		{
+			if ( handlers.handleTreeEvent( this, event ) )
+			{
+				return true;
+			}
+		}
+		
+		if ( parent != null )
+		{
+			return parent.treeEvent( event );
+		}
+		
+		return false;
+	}
 	
 	
 	
@@ -2566,11 +2736,10 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 
 	
-	protected void textRepresentationChanged(LinearRepresentationEvent event)
+	protected void textRepresentationChanged(Object event)
 	{
 		onTextRepresentationModified();
-		onTextRepresentationModifiedEvent( event );
-		onLinearRepresentationModifiedEvent( event );
+		postTreeEvent( event );
 	}
 	
 	protected void onTextRepresentationModified()
@@ -2579,25 +2748,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		{
 			parent.onTextRepresentationModified();
 		}
-	}
-	
-	protected boolean onTextRepresentationModifiedEvent(LinearRepresentationEvent event)
-	{
-		ElementLinearRepresentationListener linearRepresentationListener = getLinearRepresentationListener();
-		if ( linearRepresentationListener != null )
-		{
-			if ( linearRepresentationListener.textRepresentationModified( this, event ) )
-			{
-				return true;
-			}
-		}
-		
-		if ( parent != null )
-		{
-			return parent.onTextRepresentationModifiedEvent( event );
-		}
-		
-		return false;
 	}
 	
 	public DPElement getElementAtTextRepresentationStart()
@@ -2640,44 +2790,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 
 	
-	public boolean sendLinearRepresentationModifiedEventToParent(LinearRepresentationEvent event)
-	{
-		if ( parent != null )
-		{
-			return parent.onLinearRepresentationModifiedEvent( event );
-		}
-		else
-		{
-			return false;
-		}
-	}
-	
-	public boolean sendLinearRepresentationModifiedEvent(LinearRepresentationEvent event)
-	{
-		return onLinearRepresentationModifiedEvent( event );
-	}
-	
-	
-	protected boolean onLinearRepresentationModifiedEvent(LinearRepresentationEvent event)
-	{
-		ElementLinearRepresentationListener linearRepresentationListener = getLinearRepresentationListener();
-		if ( linearRepresentationListener != null )
-		{
-			if ( linearRepresentationListener.linearRepresentationModified( this, event ) )
-			{
-				return true;
-			}
-		}
-		
-		if ( parent != null )
-		{
-			return parent.onLinearRepresentationModifiedEvent( event );
-		}
-		
-		return false;
-	}
-	
-		
 	protected abstract void buildLinearRepresentation(ItemStreamBuilder builder);
 	
 	protected void appendToLinearRepresentation(ItemStreamBuilder builder)

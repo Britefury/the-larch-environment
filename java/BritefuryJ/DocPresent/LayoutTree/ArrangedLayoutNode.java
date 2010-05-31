@@ -304,8 +304,8 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 			for (int i = 0; i < searchList.size() - 1; i++)
 			{
 				DPElement childJ = searchList.get( i + 1 );
-				double iUpperX = childI.getPositionInParentSpace().x + childI.getWidthInParentSpace();
-				double jLowerX = childJ.getPositionInParentSpace().x;
+				double iUpperX = childI.getPositionInParentSpaceX() + childI.getWidthInParentSpace();
+				double jLowerX = childJ.getPositionInParentSpaceX();
 				
 				double midx = ( iUpperX + jLowerX ) * 0.5;
 				
@@ -398,8 +398,8 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 			for (int i = 0; i < searchList.size() - 1; i++)
 			{
 				DPElement childJ = searchList.get( i + 1 );
-				double iUpperY = childI.getPositionInParentSpace().y + childI.getWidthInParentSpace();
-				double jLowerY = childJ.getPositionInParentSpace().y;
+				double iUpperY = childI.getPositionInParentSpaceY() + childI.getHeightInParentSpace();
+				double jLowerY = childJ.getPositionInParentSpaceY();
 				
 				double midY = ( iUpperY + jLowerY ) * 0.5;
 				
@@ -461,8 +461,8 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 				}
 				else
 				{
-					double distToPrev = localPos.y - ( prev.getPositionInParentSpace().y + prev.getWidthInParentSpace() );
-					double distToNext = next.getPositionInParentSpace().y - localPos.y;
+					double distToPrev = localPos.y - ( prev.getPositionInParentSpaceY() + prev.getHeightInParentSpace() );
+					double distToNext = next.getPositionInParentSpaceY() - localPos.y;
 					
 					return distToPrev > distToNext  ?  prev  :  next;
 				}

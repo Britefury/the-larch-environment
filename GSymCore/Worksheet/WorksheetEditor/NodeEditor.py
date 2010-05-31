@@ -27,6 +27,8 @@ from Britefury.Util.NodeUtil import *
 from Britefury.gSym.View import EditOperations
 
 
+from GSymCore.Languages.Python25 import Python25
+
 from GSymCore.Worksheet import Schema
 
 
@@ -48,18 +50,18 @@ class _ListenerTable (object):
 		
 	
 	
-class EmptyLinearRepresentationListener (ElementLinearRepresentationListener):
+class EmptyTreeEventListener (TreeEventListener):
 	__slots__ = []
 	
 	def __init__(self):
 		pass
 
-	def linearRepresentationModified(self, element, event):
+	def onTreeEvent(self, element, sourceElement, event):
 		value = element.getTextRepresentation()
 		ctx = element.getFragmentContext()
 		node = ctx.getDocNode()
 		if '\n' not in value:
-			node['contents'] = [ Schema.Paragraph( text=value ) ]
+			node['contents'] += [ Schema.Paragraph( text=value ) ]
 			return True
 		else:
 			return False
@@ -69,19 +71,19 @@ class EmptyLinearRepresentationListener (ElementLinearRepresentationListener):
 		
 	@staticmethod
 	def newListener():
-		if EmptyLinearRepresentationListener._listenerTable is None:
-			EmptyLinearRepresentationListener._listenerTable = _ListenerTable( EmptyLinearRepresentationListener )
-		return EmptyLinearRepresentationListener._listenerTable.get()
+		if EmptyTreeEventListener._listenerTable is None:
+			EmptyTreeEventListener._listenerTable = _ListenerTable( EmptyTreeEventListener )
+		return EmptyTreeEventListener._listenerTable.get()
 
 
 
-class TextLinearRepresentationListener (ElementLinearRepresentationListener):
+class TextTreeEventListener (TreeEventListener):
 	__slots__ = []
 	
 	def __init__(self):
 		pass
 
-	def linearRepresentationModified(self, element, event):
+	def onTreeEvent(self, element, sourceElement, event):
 		value = element.getTextRepresentation()
 		ctx = element.getFragmentContext()
 		node = ctx.getDocNode()
@@ -96,11 +98,16 @@ class TextLinearRepresentationListener (ElementLinearRepresentationListener):
 		
 	@staticmethod
 	def newListener():
-		if TextLinearRepresentationListener._listenerTable is None:
-			TextLinearRepresentationListener._listenerTable = _ListenerTable( TextLinearRepresentationListener )
-		return TextLinearRepresentationListener._listenerTable.get()
+		if TextTreeEventListener._listenerTable is None:
+			TextTreeEventListener._listenerTable = _ListenerTable( TextTreeEventListener )
+		return TextTreeEventListener._listenerTable.get()
 	
-	
+
+class InsertPythonCodeEvent (object):
+	def __init__(self, element, node):
+		super( InsertPythonCodeEvent, self ).__init__( element )
+		self._node = node
+
 	
 class TextInteractor (ElementInteractor):
 	def __init__(self):
@@ -112,7 +119,7 @@ class TextInteractor (ElementInteractor):
 		
 		
 	def onKeyPress(self, element, event):
-		if event.getModifiers() & KeyEvent.CTRL_MASK  !=  0:
+		if event.getModifiers() & KeyEvent.ALT_MASK  !=  0:
 			ctx = element.getFragmentContext()
 			node = ctx.getDocNode()
 
@@ -130,6 +137,8 @@ class TextInteractor (ElementInteractor):
 				return self._changeTextNodeClass( ctx, node, Schema.H5 )
 			elif event.getKeyCode() == KeyEvent.VK_6:
 				return self._changeTextNodeClass( ctx, node, Schema.H6 )
+			elif event.getKeyCode() == KeyEvent.VK_C:
+				return self._insertPythonCode( ctx, element, node )
 			
 		return False
 	
@@ -145,6 +154,35 @@ class TextInteractor (ElementInteractor):
 			return True
 		else:
 			return False
+	
+	def _insertPythonCode(self, ctx, element, node):
+		return element.postTreeEventToParent( InsertPythonCodeEvent( element, node ) )
 		
 		
+class WorksheetTreeEventListener (TreeEventListener):
+	__slots__ = []
+	
+	def __init__(self):
+		pass
+
+	def onTreeEvent(self, element, sourceElement, event):
+		if isinstance( event, InsertPythonCodeEvent ):
+			ctx = element.getFragmentContext()
+			node = ctx.getDocNode()
+			index = node['contents'].indexOf( event._node )
+			
+			if index != 1:
+				pythonCode = Schema.PythonCode( showCode='True', codeEditable='False', showResult='True', code=Python25.py25NewModule() )
+				node['contents'].insert( index+1, pythonCode )
+				return True
+		return False
+		
+	
+	_listenerTable = None
+		
+	@staticmethod
+	def newListener():
+		if WorksheetTreeEventListener._listenerTable is None:
+			WorksheetTreeEventListener._listenerTable = _ListenerTable( WorksheetTreeEventListener )
+		return WorksheetTreeEventListener._listenerTable.get()
 	

@@ -6,14 +6,9 @@
 //##************************
 package BritefuryJ.GSym.ObjectPresentation;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Stack;
-
 import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyObject;
-import org.python.core.PyTuple;
 import org.python.core.PyType;
 
 import BritefuryJ.AttributeTable.AttributeTable;
@@ -23,15 +18,13 @@ import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GSymAbstractPerspective;
 import BritefuryJ.GSym.GSymSubject;
 import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.Utils.PolymorphicMap;
 
 public abstract class GSymObjectPresentationPerspective extends GSymAbstractPerspective
 {
 	private String pythonPresentMethodName;
 	private GSymObjectViewLocationTable locationTable = new GSymObjectViewLocationTable();
-	private HashMap<Class<?>, ObjectPresenter<?>> registeredJavaObjectPresenters = new HashMap<Class<?>, ObjectPresenter<?>>();
-	private HashMap<Class<?>, ObjectPresenter<?>> javaObjectPresenters = new HashMap<Class<?>, ObjectPresenter<?>>();
-	private HashMap<PyType, PyObjectPresenter<?>> registeredPythonObjectPresenters = new HashMap<PyType, PyObjectPresenter<?>>();
-	private HashMap<PyType, PyObjectPresenter<?>> pythonObjectPresenters = new HashMap<PyType, PyObjectPresenter<?>>();
+	private PolymorphicMap<Object> objectPresenters = new PolymorphicMap<Object>();
 	
 	
 	public GSymObjectPresentationPerspective(String pythonMethodName, ObjectPresentationLocationResolver objPresLocationResolver)
@@ -50,6 +43,7 @@ public abstract class GSymObjectPresentationPerspective extends GSymAbstractPers
 	protected abstract DPElement invokePyObjectPresenter(PyObjectPresenter<? extends StyleSheet> presenter, PyObject x, GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable state);
 	
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public DPElement present(Object x, GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable state)
 	{
@@ -88,7 +82,7 @@ public abstract class GSymObjectPresentationPerspective extends GSymAbstractPers
 				// Now try Python object presenters
 				PyType typeX = pyX.getType();
 				
-				PyObjectPresenter<? extends StyleSheet> presenter = getPresenterForPythonType( typeX );
+				PyObjectPresenter<? extends StyleSheet> presenter = (PyObjectPresenter<? extends StyleSheet>)objectPresenters.getValueForPythonType( typeX );
 				if ( presenter != null )
 				{
 					result = invokePyObjectPresenter( presenter, pyX, ctx, styleSheet, state );
@@ -99,7 +93,7 @@ public abstract class GSymObjectPresentationPerspective extends GSymAbstractPers
 		// Java object presentation protocol - registered presenters
 		if ( result == null )
 		{
-			ObjectPresenter<? extends StyleSheet> presenter = getPresenterForJavaObject( x );
+			ObjectPresenter<? extends StyleSheet> presenter = (ObjectPresenter<? extends StyleSheet>)objectPresenters.getValueForJavaType( x.getClass() );
 			if ( presenter != null )
 			{
 				result = invokeObjectPresenter( presenter, x, ctx, styleSheet, state );
@@ -155,138 +149,11 @@ public abstract class GSymObjectPresentationPerspective extends GSymAbstractPers
 	
 	public void registerJavaObjectPresenter(Class<?> cls, ObjectPresenter<? extends StyleSheet> presenter)
 	{
-		registeredJavaObjectPresenters.put( cls, presenter );
-		javaObjectPresenters.clear();
+		objectPresenters.registerJavaType( cls, presenter );
 	}
 	
 	public void registerPythonObjectPresenter(PyType type, PyObjectPresenter<? extends StyleSheet> presenter)
 	{
-		registeredPythonObjectPresenters.put( type, presenter );
-		pythonObjectPresenters.clear();
-	}
-	
-	
-	private ObjectPresenter<? extends StyleSheet> getPresenterForJavaObject(Object x)
-	{
-		// If the list of java object presenters is empty, but the registered list is not, then copy
-		if ( javaObjectPresenters.isEmpty()  &&  !registeredJavaObjectPresenters.isEmpty() )
-		{
-			javaObjectPresenters.putAll( registeredJavaObjectPresenters );
-		}
-		Class<?> xClass = x.getClass();
-		
-		// See if we have a presenter
-		ObjectPresenter<? extends StyleSheet> presenter = registeredJavaObjectPresenters.get( xClass );
-		if ( presenter != null )
-		{
-			return presenter;
-		}
-		
-		// No, we don't
-		if ( xClass != Object.class )
-		{
-			// The class of x is a subclass of Object
-			Class<?> superClass = xClass.getSuperclass();
-			
-			while ( superClass != Object.class )
-			{
-				// See if we can get a presenter for this superclass
-				presenter = javaObjectPresenters.get( superClass );
-				if ( presenter != null )
-				{
-					// Yes - cache it for future tests
-					javaObjectPresenters.put( xClass, presenter );
-					return presenter;
-				}
-				
-				// Try the next class up the hierarchy
-				superClass = superClass.getSuperclass();
-			}
-		}
-		
-		// Now check the interfaces
-		
-		// First, build a list of all interfaces implemented by x, and its superclasses.
-		Class<?> c = xClass;
-		HashSet<Class<?>> interfaces = new HashSet<Class<?>>();
-		Stack<Class<?>> interfaceStack = new Stack<Class<?>>();
-		while ( c != Object.class )
-		{
-			for (Class<?> iface: c.getInterfaces())
-			{
-				presenter = javaObjectPresenters.get( iface );
-				if ( presenter != null )
-				{
-					// Yes - cache it for future tests
-					javaObjectPresenters.put( xClass, presenter );
-					return presenter;
-				}
-				if ( !interfaces.contains( iface ) )
-				{
-					interfaces.add( iface );
-					interfaceStack.add( iface );
-				}
-			}
-			c = c.getSuperclass();
-		}
-		
-		// Now check the super interfaces
-		while ( !interfaceStack.empty() )
-		{
-			Class<?> interfaceFromStack = interfaceStack.pop();
-			for (Class<?> superInterface: interfaceFromStack.getInterfaces())
-			{
-				presenter = javaObjectPresenters.get( superInterface );
-				if ( presenter != null )
-				{
-					// Yes - cache it for future tests
-					javaObjectPresenters.put( xClass, presenter );
-					return presenter;
-				}
-				if ( !interfaces.contains( superInterface ) )
-				{
-					interfaces.add( superInterface );
-					interfaceStack.add( superInterface );
-				}
-			}
-		}
-		
-		return null;
-	}
-	
-	
-	private PyObjectPresenter<? extends StyleSheet> getPresenterForPythonType(PyType typeX)
-	{
-		// If the list of python object presenters is empty, but the registered list is not, then copy
-		if ( pythonObjectPresenters.isEmpty()  &&  !registeredPythonObjectPresenters.isEmpty() )
-		{
-			pythonObjectPresenters.putAll( registeredPythonObjectPresenters );
-		}
-
-		// See if we have a presenter
-		PyObjectPresenter<? extends StyleSheet> presenter = registeredPythonObjectPresenters.get( typeX );
-		if ( presenter != null )
-		{
-			return presenter;
-		}
-		
-		// No, we don't
-		PyTuple mro = typeX.getMro();
-		
-		for (PyObject t: mro.getArray())
-		{
-			PyType superType = (PyType)t;
-			
-			// See if we can get a presenter for this superclass
-			presenter = pythonObjectPresenters.get( superType );
-			if ( presenter != null )
-			{
-				// Yes - cache it for future tests
-				pythonObjectPresenters.put( typeX, presenter );
-				return presenter;
-			}
-		}
-
-		return null;
+		objectPresenters.registerPythonType( type, presenter );
 	}
 }

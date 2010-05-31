@@ -238,8 +238,8 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 			}
 			else
 			{
-				double distToPrev = localPos.x - ( prev.getPositionInParentSpace().x + prev.getWidthInParentSpace() );
-				double distToNext = next.getPositionInParentSpace().x - localPos.x;
+				double distToPrev = localPos.x - ( prev.getPositionInParentSpaceX() + prev.getWidthInParentSpace() );
+				double distToNext = next.getPositionInParentSpaceX() - localPos.x;
 				
 				return distToPrev > distToNext  ?  prev  :  next;
 			}
