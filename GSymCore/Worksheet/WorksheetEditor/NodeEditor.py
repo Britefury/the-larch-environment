@@ -104,8 +104,8 @@ class TextTreeEventListener (TreeEventListener):
 	
 
 class InsertPythonCodeEvent (object):
-	def __init__(self, element, node):
-		super( InsertPythonCodeEvent, self ).__init__( element )
+	def __init__(self, node):
+		super( InsertPythonCodeEvent, self ).__init__()
 		self._node = node
 
 	
@@ -156,7 +156,7 @@ class TextInteractor (ElementInteractor):
 			return False
 	
 	def _insertPythonCode(self, ctx, element, node):
-		return element.postTreeEventToParent( InsertPythonCodeEvent( element, node ) )
+		return element.postTreeEvent( InsertPythonCodeEvent( node ) )
 		
 		
 class WorksheetTreeEventListener (TreeEventListener):
@@ -171,7 +171,7 @@ class WorksheetTreeEventListener (TreeEventListener):
 			node = ctx.getDocNode()
 			index = node['contents'].indexOf( event._node )
 			
-			if index != 1:
+			if index != -1:
 				pythonCode = Schema.PythonCode( showCode='True', codeEditable='False', showResult='True', code=Python25.py25NewModule() )
 				node['contents'].insert( index+1, pythonCode )
 				return True
