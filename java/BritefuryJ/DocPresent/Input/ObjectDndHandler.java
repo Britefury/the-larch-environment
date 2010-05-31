@@ -10,6 +10,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -316,7 +317,7 @@ public class ObjectDndHandler extends DndHandler
 	private ArrayList<NonLocalDropDest> nonLocalDests;
 	private HashMap<Class<?>, DropDest> typeToDest;
 	
-	private HashMap<DndPin, ObjectDndHandler> derivedDndHandlers;
+	private HashMap<DndPin, WeakReference<ObjectDndHandler>> derivedDndHandlers = new HashMap<DndPin, WeakReference<ObjectDndHandler>>();
 	
 	
 	
@@ -351,83 +352,59 @@ public class ObjectDndHandler extends DndHandler
 	
 	public ObjectDndHandler withDragSource(DragSource source)
 	{
-		ObjectDndHandler derived = null;
-		if ( derivedDndHandlers != null )
+		WeakReference<ObjectDndHandler> derivedRef = derivedDndHandlers.get( source );
+		if ( derivedRef == null  ||  derivedRef.get() == null )
 		{
-			derived = derivedDndHandlers.get( source );
-			if ( derived != null )
+			ArrayList<DragSource> src = new ArrayList<DragSource>();
+			if ( sources != null )
 			{
-				return derived;
+				src.addAll( sources );
 			}
+			src.add( source );
+			
+			ObjectDndHandler derived = new ObjectDndHandler( src, dests, nonLocalDests );
+			derivedRef = new WeakReference<ObjectDndHandler>( derived );
+			derivedDndHandlers.put( source, derivedRef );
 		}
-		else
-		{
-			derivedDndHandlers = new HashMap<DndPin, ObjectDndHandler>();
-		}
-		
-		ArrayList<DragSource> src = new ArrayList<DragSource>();
-		if ( sources != null )
-		{
-			src.addAll( sources );
-		}
-		src.add( source );
-		derived = new ObjectDndHandler( src, dests, nonLocalDests );
-		derivedDndHandlers.put( source, derived );
-		return derived;
+		return derivedRef.get();
 	}
 	
 	public ObjectDndHandler withDropDest(DropDest dest)
 	{
-		ObjectDndHandler derived = null;
-		if ( derivedDndHandlers != null )
+		WeakReference<ObjectDndHandler> derivedRef = derivedDndHandlers.get( dest );
+		if ( derivedRef == null  ||  derivedRef.get() == null )
 		{
-			derived = derivedDndHandlers.get( dest );
-			if ( derived != null )
+			ArrayList<DropDest> dst = new ArrayList<DropDest>();
+			if ( dests != null )
 			{
-				return derived;
+				dst.addAll( dests );
 			}
+			dst.add( dest );
+			
+			ObjectDndHandler derived = new ObjectDndHandler( sources, dst, nonLocalDests );
+			derivedRef = new WeakReference<ObjectDndHandler>( derived );
+			derivedDndHandlers.put( dest, derivedRef );
 		}
-		else
-		{
-			derivedDndHandlers = new HashMap<DndPin, ObjectDndHandler>();
-		}
-		
-		ArrayList<DropDest> dst = new ArrayList<DropDest>();
-		if ( dests != null )
-		{
-			dst.addAll( dests );
-		}
-		dst.add( dest );
-		derived = new ObjectDndHandler( sources, dst, nonLocalDests );
-		derivedDndHandlers.put( dest, derived );
-		return derived;
+		return derivedRef.get();
 	}
 	
 	public ObjectDndHandler withNonLocalDropDest(NonLocalDropDest dest)
 	{
-		ObjectDndHandler derived = null;
-		if ( derivedDndHandlers != null )
+		WeakReference<ObjectDndHandler> derivedRef = derivedDndHandlers.get( dest );
+		if ( derivedRef == null  ||  derivedRef.get() == null )
 		{
-			derived = derivedDndHandlers.get( dest );
-			if ( derived != null )
+			ArrayList<NonLocalDropDest> nonLocalDst = new ArrayList<NonLocalDropDest>();
+			if ( nonLocalDests != null )
 			{
-				return derived;
+				nonLocalDst.addAll( nonLocalDests );
 			}
+			nonLocalDst.add( dest );
+
+			ObjectDndHandler derived = new ObjectDndHandler( sources, dests, nonLocalDst );
+			derivedRef = new WeakReference<ObjectDndHandler>( derived );
+			derivedDndHandlers.put( dest, derivedRef );
 		}
-		else
-		{
-			derivedDndHandlers = new HashMap<DndPin, ObjectDndHandler>();
-		}
-		
-		ArrayList<NonLocalDropDest> nonLocalDst = new ArrayList<NonLocalDropDest>();
-		if ( nonLocalDests != null )
-		{
-			nonLocalDst.addAll( nonLocalDests );
-		}
-		nonLocalDst.add( dest );
-		derived = new ObjectDndHandler( sources, dests, nonLocalDst );
-		derivedDndHandlers.put( dest, derived );
-		return derived;
+		return derivedRef.get();
 	}
 	
 	

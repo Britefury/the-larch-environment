@@ -6,14 +6,14 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-public class LinearRepresentationEventTextInsert extends LinearRepresentationEventTextEdit
+public class TextEditEventInsert extends TextEditEvent
 {
 	protected int position;
 	protected String textInserted;
 	
-	public LinearRepresentationEventTextInsert(DPElement sourceElement, int position, String textInserted)
+	public TextEditEventInsert(int position, String textInserted)
 	{
-		super( sourceElement );
+		super();
 		
 		this.position = position;
 		this.textInserted = textInserted;

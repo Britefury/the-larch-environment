@@ -262,7 +262,7 @@ public abstract class DPContentLeaf extends DPElement
 		length = Math.min( length, getTextRepresentationLength() - index );
 		textRepresentation = textRepresentation.substring( 0, index ) + textRepresentation.substring( index + length );
 		notifyTextRemoved( index, length );
-		textRepresentationChanged( new LinearRepresentationEventTextRemove( this, index, length ) );
+		textRepresentationChanged( new TextEditEventRemove( index, length ) );
 	}
 	
 	public void removeTextFromStart(int length)
@@ -284,7 +284,7 @@ public abstract class DPContentLeaf extends DPElement
 		{
 			textRepresentation = "";
 			notifyTextRemoved( 0, length );
-			textRepresentationChanged( new LinearRepresentationEventTextRemove( this, 0, length ) );
+			textRepresentationChanged( new TextEditEventRemove( 0, length ) );
 			return true;
 		}
 		else

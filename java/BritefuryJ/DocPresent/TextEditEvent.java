@@ -6,10 +6,6 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-public class LinearRepresentationEventTextEdit extends LinearRepresentationEvent
+public abstract class TextEditEvent
 {
-	public LinearRepresentationEventTextEdit(DPElement sourceElement)
-	{
-		super( sourceElement );
-	}
 }

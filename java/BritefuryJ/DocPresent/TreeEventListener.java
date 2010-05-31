@@ -6,19 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-public class LinearRepresentationEvent
+public interface TreeEventListener
 {
-	protected DPElement sourceElement;
-	
-	
-	public LinearRepresentationEvent(DPElement sourceElement)
-	{
-		this.sourceElement = sourceElement;
-	}
-	
-	
-	public DPElement getSourceElement()
-	{
-		return sourceElement;
-	}
+	boolean onTreeEvent(DPElement element, DPElement sourceElement, Object value);
 }

@@ -35,7 +35,7 @@ from BritefuryJ.GSym import GSymPerspective, GSymSubject, GSymRelativeLocationRe
 from BritefuryJ.GSym.View import PyGSymViewFragmentFunction
 
 
-from GSymCore.GSymApp import DocumentManagement
+from GSymCore.Languages.Python25 import Python25
 
 from GSymCore.Worksheet import Schema
 from GSymCore.Worksheet.WorksheetEditor.WorksheetEditorStyleSheet import WorksheetEditorStyleSheet
@@ -50,68 +50,77 @@ _textInteractor = TextInteractor()
 class WorksheetEditor (GSymViewObjectNodeDispatch):
 	@ObjectNodeDispatchMethod( Schema.Worksheet )
 	def Worksheet(self, ctx, styleSheet, inheritedState, node, title, contents):
-		if len( contents ) > 0:
-			contentViews = ctx.mapPresentFragment( contents, styleSheet, inheritedState )
-		else:
-			emptyLine = PrimitiveStyleSheet.instance.paragraph( [ PrimitiveStyleSheet.instance.text( '' ) ] )
-			emptyLine.setLinearRepresentationListener( EmptyLinearRepresentationListener.newListener() )
-			contentViews = [ emptyLine ]
+		contentViews = ctx.mapPresentFragment( contents, styleSheet, inheritedState )
+		emptyLine = PrimitiveStyleSheet.instance.paragraph( [ PrimitiveStyleSheet.instance.text( '' ) ] )
+		emptyLine.addTreeEventListener( TextEditEvent, EmptyTreeEventListener.newListener() )
+		contentViews += [ emptyLine ]
 
-		return styleSheet.worksheet( title, contentViews )
+		w = styleSheet.worksheet( title, contentViews )
+		w.addTreeEventListener( InsertPythonCodeEvent, WorksheetTreeEventListener.newListener() )
+		return w
 	
 	
 	@ObjectNodeDispatchMethod( Schema.Paragraph )
 	def Paragraph(self, ctx, styleSheet, inheritedState, node, text):
 		p = styleSheet.paragraph( text )
-		p.setLinearRepresentationListener( TextLinearRepresentationListener.newListener() )
+		p.addTreeEventListener( TextEditEvent, TextTreeEventListener.newListener() )
 		p.addInteractor( _textInteractor )
 		return p
 	
 	@ObjectNodeDispatchMethod( Schema.H1 )
 	def H1(self, ctx, styleSheet, inheritedState, node, text):
 		p = styleSheet.h1( text )
-		p.setLinearRepresentationListener( TextLinearRepresentationListener.newListener() )
+		p.addTreeEventListener( TextEditEvent, TextTreeEventListener.newListener() )
 		p.addInteractor( _textInteractor )
 		return p
 	
 	@ObjectNodeDispatchMethod( Schema.H2 )
 	def H2(self, ctx, styleSheet, inheritedState, node, text):
 		p = styleSheet.h2( text )
-		p.setLinearRepresentationListener( TextLinearRepresentationListener.newListener() )
+		p.addTreeEventListener( TextEditEvent, TextTreeEventListener.newListener() )
 		p.addInteractor( _textInteractor )
 		return p
 	
 	@ObjectNodeDispatchMethod( Schema.H3 )
 	def H3(self, ctx, styleSheet, inheritedState, node, text):
 		p = styleSheet.h3( text )
-		p.setLinearRepresentationListener( TextLinearRepresentationListener.newListener() )
+		p.addTreeEventListener( TextEditEvent, TextTreeEventListener.newListener() )
 		p.addInteractor( _textInteractor )
 		return p
 			
 	@ObjectNodeDispatchMethod( Schema.H4 )
 	def H4(self, ctx, styleSheet, inheritedState, node, text):
 		p = styleSheet.h4( text )
-		p.setLinearRepresentationListener( TextLinearRepresentationListener.newListener() )
+		p.addTreeEventListener( TextEditEvent, TextTreeEventListener.newListener() )
 		p.addInteractor( _textInteractor )
 		return p
 	
 	@ObjectNodeDispatchMethod( Schema.H5 )
 	def H5(self, ctx, styleSheet, inheritedState, node, text):
 		p = styleSheet.h5( text )
-		p.setLinearRepresentationListener( TextLinearRepresentationListener.newListener() )
+		p.addTreeEventListener( TextEditEvent, TextTreeEventListener.newListener() )
 		p.addInteractor( _textInteractor )
 		return p
 	
 	@ObjectNodeDispatchMethod( Schema.H6 )
 	def H6(self, ctx, styleSheet, inheritedState, node, text):
 		p = styleSheet.h6( text )
-		p.setLinearRepresentationListener( TextLinearRepresentationListener.newListener() )
+		p.addTreeEventListener( TextEditEvent, TextTreeEventListener.newListener() )
 		p.addInteractor( _textInteractor )
 		return p
 
 
 	
-	
+	@ObjectNodeDispatchMethod( Schema.PythonCode )
+	def PythonCode(self, ctx, styleSheet, inheritedState, node, code, showCode, codeEditable, showResult):
+		codeView = ctx.presentFragmentWithPerspective( code, Python25.python25EditorPerspective )
+		p = styleSheet.pythonCode( codeView )
+		return p
+
+
+
+
+
 class WorksheetEditorRelativeLocationResolver (GSymRelativeLocationResolver):
 	def resolveRelativeLocation(self, enclosingSubject, locationIterator):
 		if locationIterator.getSuffix() == '':

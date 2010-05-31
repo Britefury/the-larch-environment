@@ -90,29 +90,30 @@ class Python25Transferable (Transferable):
 
 
 		
-class IndentLinearRepresentationEvent (LinearRepresentationEvent):
-	def __init__(self, element):
-		super( IndentLinearRepresentationEvent, self ).__init__( element )
+class PythonIndentationTreeEvent (object):
+	pass
 
-class DedentLinearRepresentationEvent (LinearRepresentationEvent):
-	def __init__(self, element):
-		super( DedentLinearRepresentationEvent, self ).__init__( element )
+class PythonIndentTreeEvent (PythonIndentationTreeEvent):
+	pass
 
-class SelectionLinearRepresentationEvent (LinearRepresentationEvent):
-	def __init__(self, element):
-		super( SelectionLinearRepresentationEvent, self ).__init__( element )
+class PythonDedentTreeEvent (PythonIndentationTreeEvent):
+	pass
 
-class IndentSelectionLinearRepresentationEvent (SelectionLinearRepresentationEvent):
-	def __init__(self, element):
-		super( IndentSelectionLinearRepresentationEvent, self ).__init__( element )
+class PythonSelectionTreeEvent (object):
+	def __init__(self, sourceElement):
+		self.sourceElement = sourceElement
 
-class DedentSelectionLinearRepresentationEvent (SelectionLinearRepresentationEvent):
-	def __init__(self, element):
-		super( DedentSelectionLinearRepresentationEvent, self ).__init__( element )
+class IndentPythonSelectionTreeEvent (PythonSelectionTreeEvent):
+	def __init__(self, sourceElement):
+		super( IndentPythonSelectionTreeEvent, self ).__init__( sourceElement )
 
-class SelectionEditLinearRepresentationEvent (SelectionLinearRepresentationEvent):
-	def __init__(self, element):
-		super( SelectionEditLinearRepresentationEvent, self ).__init__( element )
+class DedentPythonSelectionTreeEvent (PythonSelectionTreeEvent):
+	def __init__(self, sourceElement):
+		super( DedentPythonSelectionTreeEvent, self ).__init__( sourceElement )
+
+class SelectionEditLinearRepresentationEvent (PythonSelectionTreeEvent):
+	def __init__(self, sourceElement):
+		super( SelectionEditLinearRepresentationEvent, self ).__init__( sourceElement )
 
 
 		
@@ -171,7 +172,7 @@ class Python25EditHandler (EditHandler):
 	def _indentLine(self, element, context, node):
 		element.setStructuralPrefixObject( Schema.Indent() )
 		element.setStructuralSuffixObject( Schema.Dedent() )
-		bSuccess = element.sendLinearRepresentationModifiedEventToParent( IndentLinearRepresentationEvent( element ) )
+		bSuccess = element.postTreeEventToParent( PythonIndentTreeEvent() )
 		if not bSuccess:
 			print 'Python25EditHandler._indentLine(): INDENT LINE FAILED'
 			element.clearStructuralPrefix()
@@ -186,12 +187,14 @@ class Python25EditHandler (EditHandler):
 			# This statement is not in the root node
 			element.setStructuralPrefixObject( Schema.Dedent() )
 			element.setStructuralSuffixObject( Schema.Indent() )
-			bSuccess = element.sendLinearRepresentationModifiedEventToParent( DedentLinearRepresentationEvent( element ) )
+			bSuccess = element.postTreeEventToParent( PythonDedentTreeEvent() )
 			if not bSuccess:
 				print 'Python25EditHandler._dedentLine(): DEDENT LINE FAILED'
 				element.clearStructuralPrefix()
 				element.clearStructuralSuffix()
-				
+		else:
+			print 'Python25EditHandler._dedentLine(): Attempted to dedent line in top-level module'
+			
 				
 				
 				
@@ -213,13 +216,13 @@ class Python25EditHandler (EditHandler):
 		# Get the content element, not the fragment itself, otherwise editing operations that involve the module (top level) will trigger events that will NOT be caught
 		rootElement = root.getFragmentContentElement()
 				
+		startContext.getFragmentContentElement().clearStructuralRepresentationsOnPathUpTo( rootElement )
+		endContext.getFragmentContentElement().clearStructuralRepresentationsOnPathUpTo( rootElement )
+		
 		startStmtElement.setStructuralPrefixObject( Schema.Indent() )
 		endStmtElement.setStructuralSuffixObject( Schema.Dedent() )
 		
-		startContext.getFragmentElement().clearStructuralRepresentationsOnPathUpTo( rootElement )
-		endContext.getFragmentElement().clearStructuralRepresentationsOnPathUpTo( rootElement )
-		
-		bSuccess = root.getFragmentContentElement().sendLinearRepresentationModifiedEvent( IndentSelectionLinearRepresentationEvent( rootElement ) )
+		bSuccess = root.getFragmentContentElement().postTreeEvent( IndentPythonSelectionTreeEvent( rootElement ) )
 		if not bSuccess:
 			print 'Python25EditHandler._indentSelection(): INDENT SELECTION FAILED'
 			startStmtElement.clearStructuralPrefix()
@@ -246,13 +249,13 @@ class Python25EditHandler (EditHandler):
 		# Get the content element, not the fragment itself, otherwise editing operations that involve the module (top level) will trigger events that will NOT be caught
 		rootElement = root.getFragmentContentElement()
 				
+		startContext.getFragmentContentElement().clearStructuralRepresentationsOnPathUpTo( rootElement )
+		endContext.getFragmentContentElement().clearStructuralRepresentationsOnPathUpTo( rootElement )
+		
 		startStmtElement.setStructuralPrefixObject( Schema.Dedent() )
 		endStmtElement.setStructuralSuffixObject( Schema.Indent() )
 		
-		startContext.getFragmentElement().clearStructuralRepresentationsOnPathUpTo( rootElement )
-		endContext.getFragmentElement().clearStructuralRepresentationsOnPathUpTo( rootElement )
-		
-		bSuccess = rootElement.sendLinearRepresentationModifiedEvent( DedentSelectionLinearRepresentationEvent( rootElement ) )
+		bSuccess = rootElement.postTreeEvent( DedentPythonSelectionTreeEvent( rootElement ) )
 		if not bSuccess:
 			print 'Python25EditHandler._dedentSelection(): DEDENT SELECTION FAILED'
 			startStmtElement.clearStructuralPrefix()
@@ -302,7 +305,7 @@ class Python25EditHandler (EditHandler):
 	
 					rootElement.setStructuralValueStream( stream )
 					selection.clear()
-					rootElement.sendLinearRepresentationModifiedEvent( SelectionEditLinearRepresentationEvent( rootElement ) )
+					rootElement.postTreeEvent( SelectionEditLinearRepresentationEvent( rootElement ) )
 			else:
 				# Now, insert the parsed text into the document		
 				if startContext is endContext:
@@ -311,7 +314,7 @@ class Python25EditHandler (EditHandler):
 					builder.extend( endStmtElement.getLinearRepresentationFromMarkerToEnd( endMarker ) )
 					startStmtElement.setStructuralValueStream( builder.stream() )
 					selection.clear()
-					startStmtElement.sendLinearRepresentationModifiedEvent( SelectionEditLinearRepresentationEvent( startStmtElement ) )
+					startStmtElement.postTreeEvent( SelectionEditLinearRepresentationEvent( startStmtElement ) )
 				else:
 					# Get paths to start and end nodes, from the common root statement
 					path0, path1 = getStatementContextPathsFromCommonRoot( startContext, endContext )
@@ -325,7 +328,7 @@ class Python25EditHandler (EditHandler):
 					stream = joinStreamsAroundDeletionPoint( before, after )
 					rootElement.setStructuralValueStream( stream )
 					selection.clear()
-					rootElement.sendLinearRepresentationModifiedEvent( SelectionEditLinearRepresentationEvent( rootElement ) )
+					rootElement.postTreeEvent( SelectionEditLinearRepresentationEvent( rootElement ) )
 				
 	
 	
@@ -342,7 +345,7 @@ class Python25EditHandler (EditHandler):
 			stream = joinStreamsForInsertion( markerStmtContext, before, b.stream, after )
 	
 			markerStmtElement.setStructuralValueStream( stream )
-			markerStmtElement.sendLinearRepresentationModifiedEvent( SelectionEditLinearRepresentationEvent( markerStmtElement ) )
+			markerStmtElement.postTreeEvent( SelectionEditLinearRepresentationEvent( markerStmtElement ) )
 			
 
 			
