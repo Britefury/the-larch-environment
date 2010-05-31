@@ -37,6 +37,7 @@ public class Pointer extends PointerInterface
 	{
 		public PointerInputElement element;
 		public ElementEntry pressGrabChild, childUnderPointer, navigationChild;
+		private HashSet<ElementEntry> parents = new HashSet<ElementEntry>();
 		
 		
 		public ElementEntry(PointerInputElement element)
@@ -57,6 +58,7 @@ public class Pointer extends PointerInterface
 					if ( bHandled  &&  element.isPointerInputElementRealised() )
 					{
 						pressGrabChild = childEntry;
+						pressGrabChild.parents.add( this );
 						return true;
 					}
 				}
@@ -107,6 +109,10 @@ public class Pointer extends PointerInterface
 					
 					boolean bHandled = pressGrabChild.handleButtonUp( pointer, childSpaceEvent );
 					ElementEntry savedPressGrabChild = pressGrabChild;
+					if ( pressGrabChild != null )
+					{
+						pressGrabChild.parents.remove( this );
+					}
 					pressGrabChild = null;
 					
 					if ( element.isPointerInputElementRealised()  &&  element.containsLocalSpacePoint( localPos ) )
@@ -121,9 +127,14 @@ public class Pointer extends PointerInterface
 								childEntry.handleEnter( pointer, new PointerMotionEvent( childSpaceEvent.pointer, PointerMotionEvent.Action.ENTER ) );
 							}
 							childUnderPointer = childEntry;
+							childUnderPointer.parents.add( this );
 						}
 						else
 						{
+							if ( childUnderPointer != null )
+							{
+								childUnderPointer.parents.remove( this );
+							}
 							childUnderPointer = null;
 							element.handlePointerEnter( new PointerMotionEvent( event.pointer, PointerMotionEvent.Action.ENTER ) );
 						}
@@ -173,6 +184,7 @@ public class Pointer extends PointerInterface
 					if ( !childUnderPointer.element.containsParentSpacePoint( event.pointer.getLocalPos() ) )
 					{
 						childUnderPointer.handleLeave( pointer, new PointerMotionEvent( childUnderPointer.element.transformParentToLocalPointer( event.pointer ), PointerMotionEvent.Action.LEAVE ) );
+						childUnderPointer.parents.remove( this );
 						childUnderPointer = null;
 					}
 					else
@@ -189,6 +201,7 @@ public class Pointer extends PointerInterface
 						ElementEntry childEntry = pointer.getEntryForElement( childElement );
 						childEntry.handleEnter( pointer, (PointerMotionEvent)childElement.transformParentToLocalEvent( event ) );
 						childUnderPointer = childEntry;
+						childUnderPointer.parents.add( this );
 					}
 				}
 				
@@ -252,6 +265,7 @@ public class Pointer extends PointerInterface
 			
 				childEntry.handleEnter( pointer, (PointerMotionEvent)childElement.transformParentToLocalEvent( event ) );
 				childUnderPointer = childEntry;
+				childUnderPointer.parents.add( this );
 				element.handlePointerLeaveIntoChild( new PointerMotionEvent( event.pointer, PointerMotionEvent.Action.LEAVE ), childElement );
 			}
 		}
@@ -265,6 +279,7 @@ public class Pointer extends PointerInterface
 				{
 					childUnderPointer.handleLeave( pointer, (PointerMotionEvent)childUnderPointer.element.transformParentToLocalEvent( event ) );
 					element.handlePointerEnterFromChild( new PointerMotionEvent( event.pointer, PointerMotionEvent.Action.ENTER ), childUnderPointer.element );
+					childUnderPointer.parents.remove( this );
 					childUnderPointer = null;
 				}
 			}
@@ -317,6 +332,7 @@ public class Pointer extends PointerInterface
 					if ( bHandled  &&  element.isPointerInputElementRealised() )
 					{
 						navigationChild = childEntry;
+						navigationChild.parents.add( this );
 						return true;
 					}
 				}
@@ -349,6 +365,7 @@ public class Pointer extends PointerInterface
 				
 				boolean bHandled = navigationChild.handleNavigationGestureEnd( pointer, childSpaceEvent );
 				ElementEntry savedNavigationChild = navigationChild;
+				navigationChild.parents.remove( this );
 				navigationChild = null;
 				
 				if ( element.isPointerInputElementRealised()  &&  element.containsLocalSpacePoint( localPos ) )
@@ -363,9 +380,14 @@ public class Pointer extends PointerInterface
 							childEntry.handleEnter( pointer, new PointerMotionEvent( childSpaceEvent.pointer, PointerMotionEvent.Action.ENTER ) );
 						}
 						childUnderPointer = childEntry;
+						childUnderPointer.parents.add( this );
 					}
 					else
 					{
+						if ( childUnderPointer != null )
+						{
+							childUnderPointer.parents.remove( this );
+						}
 						childUnderPointer = null;
 						element.handlePointerEnter( new PointerMotionEvent( event.pointer, PointerMotionEvent.Action.ENTER ) );
 					}
@@ -418,7 +440,40 @@ public class Pointer extends PointerInterface
 				pressGrabChild = null;
 			}
 			
+			if ( childUnderPointer != null )
+			{
+				childUnderPointer = null;
+			}
+			
+			if ( navigationChild != null )
+			{
+				navigationChild = null;
+			}
+			
+			for (ElementEntry parent: parents)
+			{
+				parent.notifyChildUnrealised( this );
+			}
+			
 			pointer.inputTable.removePointerWithinElementBounds( pointer, element );
+		}
+
+		private void notifyChildUnrealised(ElementEntry childEntry)
+		{
+			if ( childEntry == pressGrabChild )
+			{
+				pressGrabChild = null;
+			}
+
+			if ( childEntry == childUnderPointer )
+			{
+				childUnderPointer = null;
+			}
+
+			if ( childEntry == navigationChild )
+			{
+				navigationChild = null;
+			}
 		}
 	}
 	

@@ -699,54 +699,54 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	public double getWidth()
 	{
-		return layoutNode != null  ?  layoutNode.getWidth()  :  parent.getWidth();
+		return layoutNode != null  ?  layoutNode.getWidth()  :  ( parent != null  ?  parent.getWidth()  :  0.0 );
 	}
 	
 	public double getHeight()
 	{
-		return layoutNode != null  ?  layoutNode.getHeight()  :  parent.getHeight();
+		return layoutNode != null  ?  layoutNode.getHeight()  :  ( parent != null  ?  parent.getHeight()  :  0.0 );
 	}
 	
 	public Vector2 getSize()
 	{
-		return layoutNode != null  ?  layoutNode.getSize()  :  parent.getSize();
+		return layoutNode != null  ?  layoutNode.getSize()  :  ( parent != null  ?  parent.getSize()  :  new Vector2() );
 	}
 	
 	public double getWidthInParentSpace()
 	{
-		return layoutNode != null  ?  layoutNode.getWidthInParentSpace()  :  parent.getWidthInParentSpace();
+		return layoutNode != null  ?  layoutNode.getWidthInParentSpace()  :  ( parent != null  ?  parent.getWidthInParentSpace()  :  0.0 );
 	}
 	
 	public double getHeightInParentSpace()
 	{
-		return layoutNode != null  ?  layoutNode.getHeightInParentSpace()  :  parent.getHeightInParentSpace();
+		return layoutNode != null  ?  layoutNode.getHeightInParentSpace()  :  ( parent != null  ?  parent.getHeightInParentSpace()  :  0.0 );
 	}
 	
 	public Vector2 getSizeInParentSpace()
 	{
-		return layoutNode != null  ?  layoutNode.getSizeInParentSpace()  :  parent.getSizeInParentSpace();
+		return layoutNode != null  ?  layoutNode.getSizeInParentSpace()  :  ( parent != null  ?  parent.getSizeInParentSpace()  :  new Vector2());
 	}
 	
 	
 
 	public double getAllocationX()
 	{
-		return layoutNode != null  ?  layoutNode.getAllocationX()  :  parent.getAllocationX();
+		return layoutNode != null  ?  layoutNode.getAllocationX()  :  ( parent != null  ?  parent.getAllocationX()  :  0.0 );
 	}
 	
 	public double getAllocationY()
 	{
-		return layoutNode != null  ?  layoutNode.getAllocationY()  :  parent.getAllocationY();
+		return layoutNode != null  ?  layoutNode.getAllocationY()  :  ( parent != null  ?  parent.getAllocationY()  :  0.0 );
 	}
 	
 	public LAllocV getAllocV()
 	{
-		return layoutNode != null  ?  layoutNode.getAllocV()  :  parent.getAllocV();
+		return layoutNode != null  ?  layoutNode.getAllocV()  :  ( parent != null  ?  parent.getAllocV()  :  new LAllocV( 0.0 ) );
 	}
 	
 	public Vector2 getAllocation()
 	{
-		return layoutNode != null  ?  layoutNode.getAllocation()  :  parent.getAllocation();
+		return layoutNode != null  ?  layoutNode.getAllocation()  :  ( parent != null  ?  parent.getAllocation()  :  new Vector2() );
 	}
 
 	
