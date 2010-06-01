@@ -106,55 +106,35 @@ class Console (IncrementalOwner):
 		module = self.getCurrentPythonModule()
 		if module != Python25.py25NewModule():
 			if bEvaluate:
-				execModule = None
-				evalExpr = None
-				for i, stmt in reversed( list( enumerate( module['suite'] ) ) ):
-					if stmt.isInstanceOf( PySchema.ExprStmt ):
-						execModule = PySchema.PythonModule( suite=module['suite'][:i] )
-						evalExpr = stmt['expr']
-						break
-					elif stmt.isInstanceOf( PySchema.BlankLine )  or  stmt.isInstanceOf( PySchema.CommentStmt ):
-						pass
-					else:
-						break
+				try:
+					execCode, evalCode = CodeGenerator.compileForExecutionAndEvaluation( module, '<console>' )
+				except CodeGenerator.Python25CodeGeneratorError:
+					print 'Code generation error'
+					execCode = None
+					evalCode = None
+			else:
+				try:
+					execCode = CodeGenerator.compileForExecution( module, '<console>' )
+				except CodeGenerator.Python25CodeGeneratorError:
+					print 'Code generation error'
+					execCode = None
 				
-				if execModule is not None  and  evalExpr is not None:
-					try:
-						execSource = _codeGen( execModule )
-						evalSource = _codeGen( evalExpr )
-					except CodeGenerator.Python25CodeGeneratorError:
-						print 'Code generation error'
-						execSource = None
-						evalSource = None
-				
-					if execSource is not None  and  evalSource is not None:
-						caughtException = None
-						stdout, stderr = self._initStdOutErr()
-						try:
-							exec execSource in self._globalVars
-							result = [ eval( evalSource, self._globalVars ) ]
-						except Exception, exc:
-							caughtException = exc
-							result = None
-						outout, outerr = self._shutdownStdOurErr( stdout, stderr )
-						self.commit( outout.getText(), outerr.getText(), caughtException, result )
-						return
-	
-			try:
-				source = _codeGen( module )
-			except CodeGenerator.Python25CodeGeneratorError:
-				print 'Code generation error'
-				source = None
-			
-			if source is not None:
+			if execCode is not None:
 				caughtException = None
 				stdout, stderr = self._initStdOutErr()
 				try:
-					exec source in self._globalVars
+					exec execCode in self._globalVars
+					if evalCode is not None:
+						result = [ eval( evalCode, self._globalVars ) ]
+					else:
+						result = None
 				except Exception, exc:
 					caughtException = exc
+					result = None
 				outout, outerr = self._shutdownStdOurErr( stdout, stderr )
-				self.commit( outout.getText(), outerr.getText(), caughtException )
+				self.commit( outout.getText(), outerr.getText(), caughtException, result )
+				return
+					
 		
 		
 	
