@@ -15,6 +15,7 @@ from BritefuryJ.Incremental import IncrementalOwner, IncrementalValueMonitor
 from GSymCore.Languages.Python25 import Python25
 from GSymCore.Languages.Python25 import CodeGenerator
 from GSymCore.Languages.Python25 import Schema as PySchema
+from GSymCore.Languages.Python25.Execution import Execution
 
 
 _codeGen = CodeGenerator.Python25CodeGenerator()
@@ -59,8 +60,8 @@ class Console (IncrementalOwner):
 		return self._currentPythonModule
 	
 		
-	def commit(self, outText, errText, caughtException, result=None):
-		self._blocks.append( ConsoleBlock( self._currentPythonModule, outText, errText, caughtException, result ) )
+	def commit(self, execResult):
+		self._blocks.append( ConsoleBlock( self._currentPythonModule, execResult ) )
 		blank = Python25.py25NewModule()
 		for a in self._after:
 			if a != blank:
@@ -105,48 +106,18 @@ class Console (IncrementalOwner):
 	def execute(self, bEvaluate):
 		module = self.getCurrentPythonModule()
 		if module != Python25.py25NewModule():
-			if bEvaluate:
-				try:
-					execCode, evalCode = CodeGenerator.compileForExecutionAndEvaluation( module, '<console>' )
-				except CodeGenerator.Python25CodeGeneratorError:
-					print 'Code generation error'
-					execCode = None
-					evalCode = None
-			else:
-				try:
-					execCode = CodeGenerator.compileForExecution( module, '<console>' )
-				except CodeGenerator.Python25CodeGeneratorError:
-					print 'Code generation error'
-					execCode = None
-				
-			if execCode is not None:
-				caughtException = None
-				stdout, stderr = self._initStdOutErr()
-				try:
-					exec execCode in self._globalVars
-					if evalCode is not None:
-						result = [ eval( evalCode, self._globalVars ) ]
-					else:
-						result = None
-				except Exception, exc:
-					caughtException = exc
-					result = None
-				outout, outerr = self._shutdownStdOurErr( stdout, stderr )
-				self.commit( outout.getText(), outerr.getText(), caughtException, result )
-				return
+			execResult = Execution.executePythonModule( module, '<console>', self._globalVars, bEvaluate )
+			self.commit( execResult )
 					
 		
 		
 	
 class ConsoleBlock (IncrementalOwner):
-	def __init__(self, pythonModule, stdout, stderr, caughtException, result=None):
+	def __init__(self, pythonModule, execResult):
 		self._incr = IncrementalValueMonitor( self )
 		
 		self._pythonModule = pythonModule
-		self._stdout = stdout
-		self._stderr = stderr
-		self._caughtException = caughtException
-		self._result = result
+		self._execResult = execResult
 		
 		
 		
@@ -154,21 +125,9 @@ class ConsoleBlock (IncrementalOwner):
 		self._incr.onAccess()
 		return self._pythonModule
 	
-	def getStdOut(self):
+	def getExecResult(self):
 		self._incr.onAccess()
-		return self._stdout
-	
-	def getStdErr(self):
-		self._incr.onAccess()
-		return self._stderr
-	
-	def getCaughtException(self):
-		self._incr.onAccess()
-		return self._caughtException
-	
-	def getResult(self):
-		self._incr.onAccess()
-		return self._result
+		return self._execResult
 		
 	
 		
