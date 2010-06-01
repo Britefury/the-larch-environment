@@ -669,9 +669,45 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 		return '\n'.join( [ self( line )   for line in suite ] )
 
 	
+	
+python25CodeGeneratorWithErrorChecking = Python25CodeGenerator()
+python25CodeGeneratorWithoutErrorChecking = Python25CodeGenerator( False )
+
+
+
+def compileForExecution(pythonModule, filename):
+	source = python25CodeGeneratorWithErrorChecking( pythonModule )
+	return compile( source, filename, 'exec' )
 
 	
+def compileForExecutionAndEvaluation(pythonModule, filename):
+	execModule = None
+	evalExpr = None
+	for i, stmt in reversed( list( enumerate( pythonModule['suite'] ) ) ):
+		if stmt.isInstanceOf( Schema.ExprStmt ):
+			execModule = Schema.PythonModule( suite=pythonModule['suite'][:i] )
+			evalExpr = stmt['expr']
+			break
+		elif stmt.isInstanceOf( Schema.BlankLine )  or  stmt.isInstanceOf( Schema.CommentStmt ):
+			pass
+		else:
+			break
 	
+	if execModule is not None  and  evalExpr is not None:
+		execSource = python25CodeGeneratorWithErrorChecking( execModule )
+		evalSource = python25CodeGeneratorWithErrorChecking( evalExpr )
+		
+		execCode = compile( execSource, filename, 'exec' )
+		evalCode = compile( evalSource, filename, 'eval' )
+		
+		return execCode, evalCode
+	else:
+		return compileForExecution( pythonModule, filename ),  None
+
+				
+				
+				
+				
 import unittest
 from BritefuryJ.DocModel import DMIOReader, DMSchemaResolver
 
