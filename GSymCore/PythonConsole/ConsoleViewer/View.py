@@ -111,8 +111,9 @@ class ConsoleView (GSymViewObjectDispatch):
 	@ObjectDispatchMethod( Schema.ConsoleBlock )
 	def ConsoleBlock(self, ctx, styleSheet, state, node):
 		pythonModule = node.getPythonModule()
-		caughtException = node.getCaughtException()
-		result = node.getResult()
+		execResult = node.getExecResult()
+		caughtException = execResult.getCaughtException()
+		result = execResult.getResult()
 		
 		moduleView = ctx.presentFragmentWithPerspectiveAndStyleSheet( pythonModule, Python25.python25EditorPerspective, styleSheet.staticPythonStyle() )
 		caughtExceptionView = ctx.presentFragmentWithGenericPerspective( caughtException )   if caughtException is not None   else None
@@ -121,7 +122,7 @@ class ConsoleView (GSymViewObjectDispatch):
 		else:
 			resultView = None
 		
-		return styleSheet.consoleBlock( moduleView, node.getStdOut(), node.getStdErr(), caughtExceptionView, resultView )
+		return styleSheet.consoleBlock( moduleView, execResult.getStdOut(), execResult.getStdErr(), caughtExceptionView, resultView )
 
 
 
