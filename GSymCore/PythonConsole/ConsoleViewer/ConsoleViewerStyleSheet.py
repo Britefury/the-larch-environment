@@ -19,6 +19,7 @@ from BritefuryJ.DocPresent.Browser import Location
 from Britefury.AttributeTableUtils.DerivedAttributeMethod import DerivedAttributeMethod
 
 from GSymCore.Languages.Python25.PythonEditor.PythonEditorStyleSheet import PythonEditorStyleSheet
+from GSymCore.Languages.Python25.Execution.ExecutionStyleSheet import ExecutionStyleSheet
 
 
 
@@ -29,16 +30,13 @@ class ConsoleViewerStyleSheet (StyleSheet):
 		self.initAttr( 'primitiveStyle', PrimitiveStyleSheet.instance )
 		self.initAttr( 'controlsStyle', ControlsStyleSheet.instance )
 		self.initAttr( 'pythonStyle', PythonEditorStyleSheet.instance )
+		self.initAttr( 'executionStyle', ExecutionStyleSheet.instance )
 		
 		self.initAttr( 'labelAttrs', AttributeValues( fontSize=10 ) )
 
 		self.initAttr( 'blockStyleAttrs', AttributeValues( vboxSpacing=2.0, border=SolidBorder( 1.0, 5.0, 15.0, 15.0, Color( 0.25, 0.25, 0.25 ), Color( 0.8, 0.8, 0.8 ) ) ) )
 		
 		self.initAttr( 'pythonModuleBorderAttrs', AttributeValues( border=SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), Color.WHITE ) ) )
-		self.initAttr( 'stdOutAttrs', AttributeValues( border=SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.0, 0.8, 0.0 ), Color.WHITE ), foreground=Color( 0.0, 0.5, 0.0 ) ) )
-		self.initAttr( 'stdErrAttrs', AttributeValues( border=SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.8, 0.4, 0.0 ), Color.WHITE ), foreground=Color( 0.5, 0.25, 0.0 ) ) )
-		self.initAttr( 'exceptionBorderAttrs', AttributeValues( border=SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.8, 0.0, 0.0 ), Color( 1.0, 0.9, 0.9 ) ) ) )
-		self.initAttr( 'resultBorderAttrs', AttributeValues( border=SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.0, 0.0, 0.8 ), Color.WHITE ) ) )
 		self.initAttr( 'dropPromptAttrs', AttributeValues( border=SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.0, 0.8, 0.0 ), Color.WHITE ) ) )
 		
 		self.initAttr( 'consoleBlockListSpacing', 5.0 )
@@ -47,7 +45,7 @@ class ConsoleViewerStyleSheet (StyleSheet):
 	
 		
 	def newInstance(self):
-		return ProjectEditorStyleSheet()
+		return ConsoleViewerStyleSheet()
 	
 	
 	
@@ -60,6 +58,9 @@ class ConsoleViewerStyleSheet (StyleSheet):
 	def withPythonStyle(self, pythonStyle):
 		return self.withAttrs( pythonStyle=pythonStyle )
 	
+	def withExecutionStyle(self, executionStyle):
+		return self.withAttrs( executionStyle=executionStyle )
+	
 	
 	def withLabelAttrs(self, labelAttrs):
 		return self.withAttrs( labelAttrs=labelAttrs )
@@ -71,18 +72,6 @@ class ConsoleViewerStyleSheet (StyleSheet):
 	
 	def withPythonModuleBorderAttrs(self, pythonModuleBorderAttrs):
 		return self.withAttrs( pythonModuleBorderAttrs=pythonModuleBorderAttrs )
-	
-	def withStdOutAttrs(self, stdOutAttrs):
-		return self.withAttrs( stdOutAttrs=stdOutAttrs )
-	
-	def withStdErrAttrs(self, stdErrAttrs):
-		return self.withAttrs( stdErrAttrs=stdErrAttrs )
-	
-	def withExceptionBorderAttrs(self, exceptionBorderAttrs):
-		return self.withAttrs( exceptionBorderAttrs=exceptionBorderAttrs )
-	
-	def withResultBorderAttrs(self, resultBorderAttrs):
-		return self.withAttrs( resultBorderAttrs=resultBorderAttrs )
 	
 	def withDropPromptAttrs(self, dropPromptAttrs):
 		return self.withAttrs( dropPromptAttrs=dropPromptAttrs )
@@ -113,22 +102,6 @@ class ConsoleViewerStyleSheet (StyleSheet):
 	@DerivedAttributeMethod
 	def pythonModuleBorderStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['pythonModuleBorderAttrs'] )
-	
-	@DerivedAttributeMethod
-	def stdOutStyle(self):
-		return self['primitiveStyle'].withAttrValues( self['stdOutAttrs'] )
-	
-	@DerivedAttributeMethod
-	def stdErrStyle(self):
-		return self['primitiveStyle'].withAttrValues( self['stdErrAttrs'] )
-	
-	@DerivedAttributeMethod
-	def exceptionBorderStyle(self):
-		return self['primitiveStyle'].withAttrValues( self['exceptionBorderAttrs'] )
-	
-	@DerivedAttributeMethod
-	def resultBorderStyle(self):
-		return self['primitiveStyle'].withAttrValues( self['resultBorderAttrs'] )
 	
 	@DerivedAttributeMethod
 	def dropPromptStyle(self):
@@ -178,35 +151,21 @@ class ConsoleViewerStyleSheet (StyleSheet):
 		
 	
 	
-	def _textLines(self, labelText, text, textStyle):
-		primitiveStyle = self['primitiveStyle']
-		label = self.labelStyle().staticText( labelText )
-		lines = primitiveStyle.vbox( [ textStyle.staticText( line )   for line in text.split( '\n' ) ] )
-		return primitiveStyle.vbox( [ label, lines.padX( 5.0, 0.0 ) ] )
-	
-	def _exception(self, labelText, exception):
-		primitiveStyle = self['primitiveStyle']
-		label = self.labelStyle().staticText( labelText )
-		return primitiveStyle.vbox( [ label, exception.padX( 5.0, 0.0 ).alignHExpand() ] )
-	
 	def consoleBlock(self, pythonModule, stdout, stderr, caughtException, result):
+		executionStyle = self['executionStyle']
 		blockStyle = self.blockStyle()
 		pythonModuleBorderStyle = self.pythonModuleBorderStyle()
-		stdOutStyle = self.stdOutStyle()
-		stfErrStyle = self.stdErrStyle()
-		exceptionBorderStyle = self.exceptionBorderStyle()
-		resultBorderStyle = self.resultBorderStyle()
 		
 		blockContents = []
 		blockContents.append( pythonModuleBorderStyle.border( pythonModule.alignHExpand() ).alignHExpand() )
 		if stdout is not None:
-			blockContents.append( stdOutStyle.border( self._textLines( 'STDOUT:', stdout, stdOutStyle ).alignHExpand() ).alignHExpand() )
+			blockContents.append( executionStyle.stdout( stdout ) )
 		if stderr is not None:
-			blockContents.append( stdErrStyle.border( self._textLines( 'STDERR:', stderr, stdErrStyle ).alignHExpand() ).alignHExpand() )
+			blockContents.append( executionStyle.stderr( stderr ) )
 		if caughtException is not None:
-			blockContents.append( exceptionBorderStyle.border( self._exception( 'EXCEPTION:', caughtException ) ).alignHExpand() )
+			blockContents.append( executionStyle.exception( caughtException ) )
 		if result is not None:
-			blockContents.append( resultBorderStyle.border( PrimitiveStyleSheet.instance.paragraph( [ result.alignHExpand() ] ).alignHExpand() ).alignHExpand() )
+			blockContents.append( executionStyle.result( result ) )
 		blockVBox = blockStyle.vbox( blockContents ).alignHExpand()
 		return blockStyle.border( blockVBox ).alignHExpand()
 		
