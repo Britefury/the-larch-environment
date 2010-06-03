@@ -31,6 +31,7 @@ class WorksheetEditorStyleSheet (StyleSheet):
 		self.initAttr( 'controlsStyle', ControlsStyleSheet.instance )
 		self.initAttr( 'executionStyle', ExecutionStyleSheet.instance )
 		
+		self.initAttr( 'pythonCodeHeaderBackground', FillPainter( Color( 0.75, 0.8, 0.925 ) ) )
 		self.initAttr( 'pythonCodeBorderAttrs', AttributeValues( border=SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) ) )
 		self.initAttr( 'pythonCodeEditorBorderAttrs', AttributeValues( border=SolidBorder( 2.0, 5.0, 20.0, 20.0, Color( 0.4, 0.5, 0.6 ), None ) ) )
 
@@ -53,6 +54,10 @@ class WorksheetEditorStyleSheet (StyleSheet):
 	def withExecutionStyleSheet(self, executionStyle):
 		return self.withAttrs( executionStyle=executionStyle )
 	
+	
+	def withPythonCodeHeaderBackground(self, pythonCodeHeaderBackground):
+		return self.withAttrs( pythonCodeHeaderBackground=pythonCodeHeaderBackground )
+	
 	def withPythonCodeBorderAttrs(self, pythonCodeBorderAttrs):
 		return self.withAttrs( pythonCodeBorderAttrs=pythonCodeBorderAttrs )
 	
@@ -60,6 +65,10 @@ class WorksheetEditorStyleSheet (StyleSheet):
 		return self.withAttrs( pythonCodeEditorBorderAttrs=pythonCodeEditorBorderAttrs )
 	
 	
+	@DerivedAttributeMethod
+	def pythonCodeHeaderStyle(self):
+		return self['primitiveStyle'].withAttrs( background=self['pythonCodeHeaderBackground'] )
+		
 	@DerivedAttributeMethod
 	def pythonCodeBorderStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['pythonCodeBorderAttrs'] )
@@ -120,6 +129,7 @@ class WorksheetEditorStyleSheet (StyleSheet):
 		
 		primitiveStyle = self['primitiveStyle']
 		controlsStyle = self['controlsStyle']
+		pythonCodeHeaderStyle = self.pythonCodeHeaderStyle()
 		pythonCodeBorderStyle = self.pythonCodeBorderStyle()
 		pythonCodeEditorBorderStyle = self.pythonCodeEditorBorderStyle()
 		
@@ -128,7 +138,7 @@ class WorksheetEditorStyleSheet (StyleSheet):
 		showResultButton = controlsStyle.buttonWithLabel( 'Hide result'   if bShowResult   else   'Show result',   _onShowResult )
 		
 		buttonsBox = primitiveStyle.withHBoxSpacing( 10.0 ).hbox( [ showCodeButton.getElement(), codeEditableButton.getElement(), showResultButton.getElement() ] )
-		headerBox = primitiveStyle.withHBoxSpacing( 20.0 ).hbox( [ primitiveStyle.instance.staticText( 'Python code' ).alignHExpand(), buttonsBox ] ).alignHExpand()
+		headerBox = pythonCodeHeaderStyle.bin( primitiveStyle.withHBoxSpacing( 20.0 ).hbox( [ primitiveStyle.instance.staticText( 'Python code' ).alignHExpand(), buttonsBox ] ).alignHExpand().pad( 2.0, 2.0 ) )
 		
 		boxContents = [ headerBox.alignHExpand() ]
 		if bShowCode:

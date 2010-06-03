@@ -3184,13 +3184,13 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 	public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
-		if ( getParent() == null )
+		if ( !isRealised() )
 		{
 			return this;
 		}
 		else
 		{
-			return alreadyInUseStyle.border( alreadyInUseStyle.staticText( "Element already in use." ) );
+			return alreadyInUseStyle.border( alreadyInUseStyle.staticText( "Element already in use (element is realised)." ) );
 		}
 	}
 	
