@@ -61,50 +61,21 @@ class WorksheetEditor (GSymViewObjectNodeDispatch):
 	
 	
 	@ObjectNodeDispatchMethod( Schema.Paragraph )
-	def Paragraph(self, ctx, styleSheet, inheritedState, node, text):
-		p = styleSheet.paragraph( text )
-		p.addTreeEventListener( TextEditEvent, TextTreeEventListener.newListener() )
-		p.addInteractor( _textInteractor )
-		return p
-	
-	@ObjectNodeDispatchMethod( Schema.H1 )
-	def H1(self, ctx, styleSheet, inheritedState, node, text):
-		p = styleSheet.h1( text )
-		p.addTreeEventListener( TextEditEvent, TextTreeEventListener.newListener() )
-		p.addInteractor( _textInteractor )
-		return p
-	
-	@ObjectNodeDispatchMethod( Schema.H2 )
-	def H2(self, ctx, styleSheet, inheritedState, node, text):
-		p = styleSheet.h2( text )
-		p.addTreeEventListener( TextEditEvent, TextTreeEventListener.newListener() )
-		p.addInteractor( _textInteractor )
-		return p
-	
-	@ObjectNodeDispatchMethod( Schema.H3 )
-	def H3(self, ctx, styleSheet, inheritedState, node, text):
-		p = styleSheet.h3( text )
-		p.addTreeEventListener( TextEditEvent, TextTreeEventListener.newListener() )
-		p.addInteractor( _textInteractor )
-		return p
-			
-	@ObjectNodeDispatchMethod( Schema.H4 )
-	def H4(self, ctx, styleSheet, inheritedState, node, text):
-		p = styleSheet.h4( text )
-		p.addTreeEventListener( TextEditEvent, TextTreeEventListener.newListener() )
-		p.addInteractor( _textInteractor )
-		return p
-	
-	@ObjectNodeDispatchMethod( Schema.H5 )
-	def H5(self, ctx, styleSheet, inheritedState, node, text):
-		p = styleSheet.h5( text )
-		p.addTreeEventListener( TextEditEvent, TextTreeEventListener.newListener() )
-		p.addInteractor( _textInteractor )
-		return p
-	
-	@ObjectNodeDispatchMethod( Schema.H6 )
-	def H6(self, ctx, styleSheet, inheritedState, node, text):
-		p = styleSheet.h6( text )
+	def Paragraph(self, ctx, styleSheet, inheritedState, node, text, style):
+		if style == 'normal':
+			p = styleSheet.paragraph( text )
+		elif style == 'h1':
+			p = styleSheet.h1( text )
+		elif style == 'h2':
+			p = styleSheet.h2( text )
+		elif style == 'h3':
+			p = styleSheet.h3( text )
+		elif style == 'h4':
+			p = styleSheet.h4( text )
+		elif style == 'h5':
+			p = styleSheet.h5( text )
+		elif style == 'h6':
+			p = styleSheet.h6( text )
 		p.addTreeEventListener( TextEditEvent, TextTreeEventListener.newListener() )
 		p.addInteractor( _textInteractor )
 		return p
