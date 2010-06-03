@@ -9,17 +9,13 @@ package BritefuryJ.DocPresent.Controls;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
-import java.awt.geom.RoundRectangle2D;
 
 import org.python.core.PyObject;
 
 import BritefuryJ.AttributeTable.AttributeValues;
-import BritefuryJ.Cell.Cell;
-import BritefuryJ.Cell.CellEvaluator;
 import BritefuryJ.DocPresent.DPAspectRatioBin;
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPBox;
@@ -29,24 +25,16 @@ import BritefuryJ.DocPresent.DPShape;
 import BritefuryJ.DocPresent.DPSpaceBin;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPViewport;
-import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Browser.Location;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.Event.PointerMotionEvent;
-import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.Painter.FilledOutlinePainter;
 import BritefuryJ.DocPresent.Painter.Painter;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.Util.Range;
-import BritefuryJ.Incremental.IncrementalMonitor;
-import BritefuryJ.Incremental.IncrementalMonitorListener;
-import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
-import BritefuryJ.Math.Vector2;
 
 public class ControlsStyleSheet extends StyleSheet
 {
@@ -492,209 +480,6 @@ public class ControlsStyleSheet extends StyleSheet
 	
 	
 	
-	private static class ScrollBarArrowInteractor extends ElementInteractor
-	{
-		public enum Direction
-		{
-			INCREASE,
-			DECREASE
-		};
-		
-		
-		private Direction direction;
-		private Range range;
-		
-		
-		public ScrollBarArrowInteractor(Direction direction, Range range)
-		{
-			this.direction = direction;
-			this.range = range;
-		}
-		
-		
-		public boolean onButtonDown(DPElement element, PointerButtonEvent event)
-		{
-			if ( event.getButton() == 1 )
-			{
-				if ( direction == Direction.INCREASE )
-				{
-					range.move( range.getStepSize() );
-				}
-				else if ( direction == Direction.DECREASE )
-				{
-					range.move( -range.getStepSize() );
-				}
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-		
-		public boolean onButtonUp(DPElement element, PointerButtonEvent event)
-		{
-			return event.button == 1;
-		}
-	}
-	
-	private static class ScrollBarDragBarInteractor extends ElementInteractor implements IncrementalMonitorListener
-	{
-		public enum Direction
-		{
-			HORIZONTAL,
-			VERTICAL
-		};
-		
-		
-		private DPElement element;
-		private Direction direction;
-		private Range range;
-		private double padding, rounding;
-		private Painter dragBoxPainter;
-		private PointerInterface dragPointer = null;
-		private Point2 dragStartPos = null;
-		private double dragStartValue = 0.0;
-		private Cell dragBoxCell = new Cell();
-		
-		
-		public ScrollBarDragBarInteractor(DPElement element, Direction direction, Range range, double padding, double rounding, Painter dragBoxPainter)
-		{
-			this.element = element;
-			this.direction = direction;
-			this.range = range;
-			this.padding = padding;
-			this.rounding = rounding;
-			this.dragBoxPainter = dragBoxPainter;
-			
-			CellEvaluator dragBoxCellEval = new CellEvaluator()
-			{
-				@Override
-				public Object evaluate()
-				{
-					return computeDragBox( ScrollBarDragBarInteractor.this.element );
-				}
-			};
-			dragBoxCell.setEvaluator( dragBoxCellEval );
-			dragBoxCell.addListener( this );
-		}
-		
-		
-
-		public boolean onButtonDown(DPElement element, PointerButtonEvent event)
-		{
-			if ( event.button == 1 )
-			{
-				AABox2 dragBox = (AABox2)dragBoxCell.getValue();
-				
-				Point2 localPos = event.getPointer().getLocalPos();
-				
-				if ( direction == Direction.HORIZONTAL  &&  localPos.x < dragBox.getLowerX()    ||  direction == Direction.VERTICAL  &&  localPos.y < dragBox.getLowerY() )
-				{
-					range.move( -range.getPageSize() );
-				}
-				else if ( direction == Direction.HORIZONTAL  &&  localPos.x > dragBox.getUpperX()    ||  direction == Direction.VERTICAL  &&  localPos.y > dragBox.getUpperY() )
-				{
-					range.move( range.getPageSize() );
-				}
-				else
-				{
-					dragPointer = event.getPointer().concretePointer();
-					dragStartPos = event.getPointer().getLocalPos();
-					dragStartValue = range.getBegin();
-				}
-				
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-		
-		public boolean onButtonUp(DPElement element, PointerButtonEvent event)
-		{
-			dragPointer = null;
-			return event.button == 1;
-		}
-		
-		public void onDrag(DPElement element, PointerMotionEvent event)
-		{
-			if ( event.getPointer().concretePointer() == dragPointer )
-			{
-				AABox2 box = element.getLocalAABox();
-				Point2 localPos = event.getPointer().getLocalPos();
-				Vector2 deltaPos = localPos.sub( dragStartPos );
-				
-				double visibleRange, delta;
-				if ( direction == Direction.HORIZONTAL )
-				{
-					visibleRange = box.getWidth()  -  padding * 2.0;
-					delta = deltaPos.x;
-				}
-				else if ( direction == Direction.VERTICAL )
-				{
-					visibleRange = box.getHeight()  -  padding * 2.0;
-					delta = deltaPos.y;
-				}
-				else
-				{
-					throw new RuntimeException( "Invalid direction" );
-				}
-
-				double scaleFactor = ( range.getMax() - range.getMin() ) / visibleRange;
-				range.moveBeginTo( dragStartValue  +  delta * scaleFactor );
-			}
-		}
-		
-		
-		public void drawBackground(DPElement element, Graphics2D graphics)
-		{
-		}
-
-		public void draw(DPElement element, Graphics2D graphics)
-		{
-			AABox2 dragBox = (AABox2)dragBoxCell.getValue();
-			
-			RoundRectangle2D.Double shape = new RoundRectangle2D.Double( dragBox.getLowerX(), dragBox.getLowerY(), dragBox.getWidth(), dragBox.getHeight(), rounding, rounding );
-			
-			dragBoxPainter.drawShape( graphics, shape );
-		}
-		
-		
-		private AABox2 computeDragBox(DPElement element)
-		{
-			AABox2 box = element.getLocalAABox();
-			double value = Math.min( Math.max( range.getBegin(), range.getMin() ), range.getMax() );
-			double end = Math.min( Math.max( range.getEnd(), range.getMin() ), range.getMax() );
-			if ( direction == Direction.HORIZONTAL )
-			{
-				double visibleRange = box.getWidth()  -  padding * 2.0;
-				double scaleFactor = visibleRange / ( range.getMax() - range.getMin() );
-				return new AABox2( padding + value * scaleFactor, padding, padding + end * scaleFactor, box.getUpperY() - padding );
-			}
-			else if ( direction == Direction.VERTICAL )
-			{
-				double visibleRange = box.getHeight()  -  padding * 2.0;
-				double scaleFactor = visibleRange / ( range.getMax() - range.getMin() );
-				return new AABox2( padding, padding + value * scaleFactor, box.getUpperX() - padding, padding + end * scaleFactor );
-			}
-			else
-			{
-				throw new RuntimeException( "Invalid direction" );
-			}
-		}
-
-
-
-		@Override
-		public void onIncrementalMonitorChanged(IncrementalMonitor inc)
-		{
-			element.queueFullRedraw();
-		}
-	}
-	
-	
 	public ScrollBar horizontalScrollBar(Range range)
 	{
 		PrimitiveStyleSheet arrowStyle = getScrollBarArrowStyleSheet();
@@ -714,13 +499,13 @@ public class ControlsStyleSheet extends StyleSheet
 		
 		
 		DPShape leftArrow = arrowStyle.shape( leftPath );
-		leftArrow.addInteractor( new ScrollBarArrowInteractor( ScrollBarArrowInteractor.Direction.DECREASE, range ) );
+		leftArrow.addInteractor( new ScrollBarHelper.ScrollBarArrowInteractor( ScrollBarHelper.ScrollBarArrowInteractor.Direction.DECREASE, range ) );
 		
 		DPShape rightArrow = arrowStyle.shape( rightPath );
-		rightArrow.addInteractor( new ScrollBarArrowInteractor( ScrollBarArrowInteractor.Direction.INCREASE, range ) );
+		rightArrow.addInteractor( new ScrollBarHelper.ScrollBarArrowInteractor( ScrollBarHelper.ScrollBarArrowInteractor.Direction.INCREASE, range ) );
 		
 		DPBox dragBar = dragBackgroundStyle.box( 0.0, scrollBarSize );
-		dragBar.addInteractor( new ScrollBarDragBarInteractor( dragBar, ScrollBarDragBarInteractor.Direction.HORIZONTAL, range, scrollBarDragBoxPadding, scrollBarDragBoxRounding,
+		dragBar.addInteractor( new ScrollBarHelper.ScrollBarDragBarInteractor( dragBar, ScrollBarHelper.ScrollBarDragBarInteractor.Direction.HORIZONTAL, range, scrollBarDragBoxPadding, scrollBarDragBoxRounding,
 				scrollBarDragBoxPainter ) );
 		
 		DPElement element = primitive.withHBoxSpacing( arrowSpacing ).hbox( new DPElement[] { leftArrow.pad( arrowPadding, arrowPadding ).alignVCentre(),
@@ -749,13 +534,13 @@ public class ControlsStyleSheet extends StyleSheet
 		
 		
 		DPShape upArrow = arrowStyle.shape( upPath );
-		upArrow.addInteractor( new ScrollBarArrowInteractor( ScrollBarArrowInteractor.Direction.DECREASE, range ) );
+		upArrow.addInteractor( new ScrollBarHelper.ScrollBarArrowInteractor( ScrollBarHelper.ScrollBarArrowInteractor.Direction.DECREASE, range ) );
 		
 		DPShape downArrow = arrowStyle.shape( downPath );
-		downArrow.addInteractor( new ScrollBarArrowInteractor( ScrollBarArrowInteractor.Direction.INCREASE, range ) );
+		downArrow.addInteractor( new ScrollBarHelper.ScrollBarArrowInteractor( ScrollBarHelper.ScrollBarArrowInteractor.Direction.INCREASE, range ) );
 		
 		DPBox dragBar = dragBackgroundStyle.box( scrollBarSize, 0.0 );
-		dragBar.addInteractor( new ScrollBarDragBarInteractor( dragBar, ScrollBarDragBarInteractor.Direction.VERTICAL, range, scrollBarDragBoxPadding, scrollBarDragBoxRounding,
+		dragBar.addInteractor( new ScrollBarHelper.ScrollBarDragBarInteractor( dragBar, ScrollBarHelper.ScrollBarDragBarInteractor.Direction.VERTICAL, range, scrollBarDragBoxPadding, scrollBarDragBoxRounding,
 				scrollBarDragBoxPainter ) );
 		
 		DPElement element = primitive.withVBoxSpacing( arrowSpacing ).vbox( new DPElement[] { upArrow.pad( arrowPadding, arrowPadding ).alignHCentre(),
