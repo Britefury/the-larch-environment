@@ -16,7 +16,7 @@ from javax.swing import AbstractAction
 from javax.swing import JPopupMenu, JOptionPane, JFileChooser
 from javax.swing.filechooser import FileNameExtensionFilter
 
-from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeDispatchMethod
+from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod
 
 from Britefury.gSym.View.GSymView import GSymViewObjectNodeDispatch
 
@@ -96,7 +96,7 @@ def _joinLocation(*xs):
 
 
 class ProjectView (GSymViewObjectNodeDispatch):
-	@ObjectNodeDispatchMethod( Schema.Project )
+	@DMObjectNodeDispatchMethod( Schema.Project )
 	def Project(self, ctx, styleSheet, state, node, rootPackage):
 		def _onSave(link, buttonEvent):
 			if document._filename is None:
@@ -130,7 +130,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 
 
-	@ObjectNodeDispatchMethod( Schema.Package )
+	@DMObjectNodeDispatchMethod( Schema.Package )
 	def Package(self, ctx, styleSheet, state, node, name, contents):
 		def _addPackage(actionEvent):
 			contents.append( Schema.Package( name='New package', contents=[] ) )
@@ -174,7 +174,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 
 
-	@ObjectNodeDispatchMethod( Schema.Page )
+	@DMObjectNodeDispatchMethod( Schema.Page )
 	def Page(self, ctx, styleSheet, state, node, name, unit):
 		def _onRenameAccept(textEntry, text):
 			node['name'] = text

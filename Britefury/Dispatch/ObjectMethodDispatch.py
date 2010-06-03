@@ -60,8 +60,11 @@ To dispatch, call:
 
 class ObjectDispatchMethodCannotHaveVarArgs (Exception):
 	def __init__(self, className):
-		super( ObjectDispatchMethodCannotHaveVarArgs, self ).__init__( 'Object dispatch method \'%s\' should not have varargs'  %  className )
+		super( ObjectDispatchMethodCannotHaveVarArgs, self ).__init__( 'Object dispatch method \'%s\' should not have variable arguments'  %  className )
 
+class ObjectDispatchMethodCannotHaveVarKWArgs (Exception):
+	def __init__(self, methodName):
+		super( ObjectDispatchMethodCannotHaveVarKWArgs, self ).__init__( 'Object dispatch method \'%s\' should not have varaible keyword arguments'  %  methodName )
 
 		
 		
@@ -69,7 +72,9 @@ class ObjectDispatchMethodWrapper (object):
 	def __init__(self, cls, function):
 		args, varargs, varkw, defaults = inspect.getargspec( function )
 		if varargs is not None:
-			raise ObjectNodeDispatchMethodCannotHaveVarArgs( cls.__name__ )
+			raise ObjectNodeDispatchMethodCannotHaveVarArgs( function.__name__ )
+		if varkw is not None:
+			raise ObjectDispatchMethodCannotHaveVarKWArgs( function.__name__ )
 		
 		self._function = function
 		self._cls = cls

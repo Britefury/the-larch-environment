@@ -6,7 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 from Britefury.Dispatch.MethodDispatch import methodDispatch
-from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeMethodDispatchMetaClass, objectNodeMethodDispatch
+from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeMethodDispatchMetaClass, dmObjectNodeMethodDispatch
 
 
 
@@ -19,10 +19,10 @@ class GSymCodeGeneratorListNodeDispatch (object):
 	
 	
 class GSymCodeGeneratorObjectNodeDispatch (object):
-	__metaclass__ = ObjectNodeMethodDispatchMetaClass
+	__metaclass__ = DMObjectNodeMethodDispatchMetaClass
 	
 	def __call__(self, xs):
-		return objectNodeMethodDispatch( self, xs )
+		return dmObjectNodeMethodDispatch( self, xs )
 
 
 

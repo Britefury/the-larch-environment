@@ -35,6 +35,8 @@ class ExecutionStyleSheet (StyleSheet):
 		self.initAttr( 'exceptionBorderAttrs', AttributeValues( border=SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.8, 0.0, 0.0 ), Color( 1.0, 0.9, 0.9 ) ) ) )
 		self.initAttr( 'resultBorderAttrs', AttributeValues( border=SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.0, 0.0, 0.8 ), Color.WHITE ) ) )
 		
+		self.initAttr( 'resultSpacing', 5.0 )
+		
 	
 		
 	def newInstance(self):
@@ -63,6 +65,10 @@ class ExecutionStyleSheet (StyleSheet):
 		return self.withAttrs( resultBorderAttrs=resultBorderAttrs )
 	
 	
+	def withResultSpacing(self, resultSpacing):
+		return self.withAttrs( resultSpacing=resultSpacing )
+	
+	
 	
 	@DerivedAttributeMethod
 	def labelStyle(self):
@@ -84,6 +90,10 @@ class ExecutionStyleSheet (StyleSheet):
 	@DerivedAttributeMethod
 	def resultBorderStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['resultBorderAttrs'] )
+	
+	@DerivedAttributeMethod
+	def resultBoxStyle(self):
+		return self['primitiveStyle'].withAttrs( resultSpacing=self['resultSpacing'] )
 	
 	
 
@@ -111,6 +121,22 @@ class ExecutionStyleSheet (StyleSheet):
 	def result(self, resultView):
 		resultBorderStyle = self.resultBorderStyle()
 		return resultBorderStyle.border( PrimitiveStyleSheet.instance.paragraph( [ resultView.alignHExpand() ] ).alignHExpand() ).alignHExpand()
+	
+	
+	def executionResult(self, stdoutText, stderrText, exceptionView, resultView):
+		resultBoxStyle = self.resultBoxStyle()
+		
+		boxContents = []
+		if stdoutText is not None:
+			boxContents.append( self.stdout( stdoutText ).alignHExpand() )
+		if stderrText is not None:
+			boxContents.append( self.stderr( stderrText ).alignHExpand() )
+		if exceptionView is not None:
+			boxContents.append( self.exception( exceptionView ).alignHExpand() )
+		if resultView is not None:
+			boxContents.append( self.result( resultView ).alignHExpand() )
+		
+		return resultBoxStyle.vbox( boxContents )
 
 
 

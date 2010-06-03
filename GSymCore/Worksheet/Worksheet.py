@@ -9,7 +9,6 @@ from Britefury.gSym.gSymUnitClass import GSymUnitClass, GSymPageFactory
 from Britefury.gSym.gSymDocument import gSymUnit
 
 from GSymCore.Worksheet.WorksheetEditor.View import perspective as worksheetEditorPerspective
-from GSymCore.Worksheet.WorksheetViewer.View import perspective as worksheetViewerPerspective
 from GSymCore.Worksheet import Schema
 
 

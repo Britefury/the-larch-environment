@@ -7,8 +7,6 @@
 ##-*************************
 from BritefuryJ.DocModel import DMSchema, DMObjectClass
 
-from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeDispatchMethod, ObjectNodeMethodDispatchMetaClass
-
 
 
 

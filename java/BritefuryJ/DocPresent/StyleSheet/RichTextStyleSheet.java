@@ -452,6 +452,11 @@ public class RichTextStyleSheet extends StyleSheet
 		return textParagraph( getTitleStyleSheet(), text );
 	}
 
+	public DPElement subtitle(String text)
+	{
+		return textParagraph( getSubtitleStyleSheet(), text );
+	}
+
 	public DPElement titleBar(String text)
 	{
 		PrimitiveStyleSheet titleStyle = getTitleStyleSheet();
@@ -464,10 +469,19 @@ public class RichTextStyleSheet extends StyleSheet
 	public DPElement titleBarWithSubtitle(String text, String subtitleText)
 	{
 		PrimitiveStyleSheet titleStyle = getTitleStyleSheet();
-		PrimitiveStyleSheet subtitleStyle = getSubtitleStyleSheet();
 		double borderWidth = getNonNull( "titleBorderWidth", Double.class, defaultTitleBorderWidth );
-		DPElement title = textParagraph( titleStyle, text );
-		DPElement subtitle = textParagraph( subtitleStyle, subtitleText );
+		DPElement title = title( text );
+		DPElement subtitle = subtitle( subtitleText );
+		DPElement titleVBox = titleStyle.vbox( new DPElement[] { title.alignHCentre(), subtitle.alignHCentre() } );
+		DPElement titleBackground = titleStyle.border( titleVBox.alignHCentre() );
+		return titleBackground.alignHExpand().pad( borderWidth, borderWidth ).alignHExpand();
+	}
+
+	public DPElement titleBarWithSubtitleElement(String text, DPElement subtitle)
+	{
+		PrimitiveStyleSheet titleStyle = getTitleStyleSheet();
+		double borderWidth = getNonNull( "titleBorderWidth", Double.class, defaultTitleBorderWidth );
+		DPElement title = title( text );
 		DPElement titleVBox = titleStyle.vbox( new DPElement[] { title.alignHCentre(), subtitle.alignHCentre() } );
 		DPElement titleBackground = titleStyle.border( titleVBox.alignHCentre() );
 		return titleBackground.alignHExpand().pad( borderWidth, borderWidth ).alignHExpand();

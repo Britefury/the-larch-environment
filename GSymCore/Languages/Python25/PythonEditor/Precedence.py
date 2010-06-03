@@ -11,7 +11,7 @@ from BritefuryJ.Transformation import DefaultIdentityTransformationFunction, Tra
 
 from BritefuryJ.DocModel import DMObjectInterface, DMListInterface, DMClassAttribute
 
-from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeMethodDispatchMetaClass, ObjectNodeDispatchMethod, objectNodeMethodDispatch
+from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeMethodDispatchMetaClass, DMObjectNodeDispatchMethod, dmObjectNodeMethodDispatch
 from Britefury.Dispatch.Dispatch import DispatchError
 from Britefury.Util.NodeUtil import isStringNode
 
@@ -251,57 +251,57 @@ def _transformCmp(node, xform):
 	
 	
 class RemoveUnNeededParensXform (object):
-	__metaclass__ = ObjectNodeMethodDispatchMetaClass
+	__metaclass__ = DMObjectNodeMethodDispatchMetaClass
 	__dispatch_num_args__ = 1
 	
 	
 	def __call__(self, node, xform):
 		try:
-			return objectNodeMethodDispatch( self, node, xform )
+			return dmObjectNodeMethodDispatch( self, node, xform )
 		except DispatchError:
 			return TransformationFunction.cannotApplyTransformationValue
 	
-	@ObjectNodeDispatchMethod( Schema.ComprehensionFor )
+	@DMObjectNodeDispatchMethod( Schema.ComprehensionFor )
 	def ComprehensionFor(self, xform, node):
 		return _transformOp( node, xform, PRECEDENCE_CONTAINER_COMPREHENSIONFOR, 'source' )
 		
-	@ObjectNodeDispatchMethod( Schema.ComprehensionIf )
+	@DMObjectNodeDispatchMethod( Schema.ComprehensionIf )
 	def ComprehensionIf(self, xform, node):
 		return _transformOp( node, xform, PRECEDENCE_CONTAINER_COMPREHENSIONIF, 'condition' )
 	
-	@ObjectNodeDispatchMethod( Schema.AttributeRef )
+	@DMObjectNodeDispatchMethod( Schema.AttributeRef )
 	def AttributeRef(self, xform, node):
 		return _transformOp( node, xform, PRECEDENCE_CONTAINER_ATTRIBUTEREFTARGET, 'target' )
 	
-	@ObjectNodeDispatchMethod( Schema.Subscript )
+	@DMObjectNodeDispatchMethod( Schema.Subscript )
 	def Subscript(self, xform, node):
 		return _transformOp( node, xform, PRECEDENCE_CONTAINER_SUBSCRIPTTARGET, 'target' )
 	
-	@ObjectNodeDispatchMethod( Schema.Call )
+	@DMObjectNodeDispatchMethod( Schema.Call )
 	def Call(self, xform, node):
 		return _transformOp( node, xform, PRECEDENCE_CONTAINER_CALLTARGET, 'target' )
 	
-	@ObjectNodeDispatchMethod( Schema.BinOp )
+	@DMObjectNodeDispatchMethod( Schema.BinOp )
 	def BinOp(self, xform, node):
 		return _transformBinOp( node, xform )
 	
-	@ObjectNodeDispatchMethod( Schema.UnaryOp )
+	@DMObjectNodeDispatchMethod( Schema.UnaryOp )
 	def UnaryOp(self, xform, node):
 		return _transformUnaryOp( node, xform )
 	
-	@ObjectNodeDispatchMethod( Schema.Cmp )
+	@DMObjectNodeDispatchMethod( Schema.Cmp )
 	def Cmp(self, xform, node):
 		return _transformCmp( node, xform )
 	
-	@ObjectNodeDispatchMethod( Schema.CmpOp )
+	@DMObjectNodeDispatchMethod( Schema.CmpOp )
 	def CmpOp(self, xform, node):
 		return _transformCmpOp( node, xform )
 	
-	@ObjectNodeDispatchMethod( Schema.LambdaExpr )
+	@DMObjectNodeDispatchMethod( Schema.LambdaExpr )
 	def LambdaExpr(self, xform, node):
 		return _transformOp( node, xform, PRECEDENCE_CONTAINER_LAMBDAEXPR, 'expr' )
 	
-	@ObjectNodeDispatchMethod( Schema.ConditionalExpr )
+	@DMObjectNodeDispatchMethod( Schema.ConditionalExpr )
 	def ConditionalExpr(self, xform, node):
 		return _transformOpMulti( node, xform, PRECEDENCE_CONTAINER_CONDITIONALEXPR, [ 'expr', 'condition' ] )
 
