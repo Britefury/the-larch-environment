@@ -11,7 +11,7 @@ from BritefuryJ.GSym.View import GSymViewFragmentFunction
 
 from Britefury.Dispatch.Dispatch import DispatchError
 from Britefury.Dispatch.MethodDispatch import methodDispatch, methodDispatchAndGetName
-from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeMethodDispatchMetaClass, objectNodeMethodDispatch, objectNodeMethodDispatchAndGetName
+from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeMethodDispatchMetaClass, dmObjectNodeMethodDispatch, dmObjectNodeMethodDispatchAndGetName
 from Britefury.Dispatch.ObjectMethodDispatch import ObjectMethodDispatchMetaClass, objectMethodDispatch, objectMethodDispatchAndGetName
 
 import time
@@ -37,13 +37,13 @@ class GSymViewListNodeDispatch (object):
 
 		
 class GSymViewObjectNodeDispatch (object):
-	__metaclass__ = ObjectNodeMethodDispatchMetaClass
+	__metaclass__ = DMObjectNodeMethodDispatchMetaClass
 	__dispatch_num_args__ = 3
 	
 	def __call__(self, node, ctx, styleSheet, state):
 		element = None
 		try:
-			element, name = objectNodeMethodDispatchAndGetName( self, node, ctx, styleSheet, state )
+			element, name = dmObjectNodeMethodDispatchAndGetName( self, node, ctx, styleSheet, state )
 			element.setDebugName( name )
 		except DispatchError:
 			print node

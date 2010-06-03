@@ -61,7 +61,7 @@ class EmptyTreeEventListener (TreeEventListener):
 		ctx = element.getFragmentContext()
 		node = ctx.getDocNode()
 		if '\n' not in value:
-			node['contents'] += [ Schema.Paragraph( text=value, style='normal' ) ]
+			node.appendContentsNode( Schema.Paragraph( text=value, style='normal' ) )
 			return True
 		else:
 			return False
@@ -88,7 +88,7 @@ class TextTreeEventListener (TreeEventListener):
 		ctx = element.getFragmentContext()
 		node = ctx.getDocNode()
 		if '\n' not in value:
-			node['text'] = value
+			node.setText( value )
 			return True
 		else:
 			return False
@@ -123,20 +123,20 @@ class TextInteractor (ElementInteractor):
 			ctx = element.getFragmentContext()
 			node = ctx.getDocNode()
 
-			if event.getKeyCode() == KeyEvent.VK_P:
-				node['style'] = 'normal'
+			if event.getKeyCode() == KeyEvent.VK_N:
+				node.setStyle( 'normal' )
 			elif event.getKeyCode() == KeyEvent.VK_1:
-				node['style'] = 'h1'
+				node.setStyle( 'h1' )
 			elif event.getKeyCode() == KeyEvent.VK_2:
-				node['style'] = 'h2'
+				node.setStyle( 'h2' )
 			elif event.getKeyCode() == KeyEvent.VK_3:
-				node['style'] = 'h3'
+				node.setStyle( 'h3' )
 			elif event.getKeyCode() == KeyEvent.VK_4:
-				node['style'] = 'h4'
+				node.setStyle( 'h4' )
 			elif event.getKeyCode() == KeyEvent.VK_5:
-				node['style'] = 'h5'
+				node.setStyle( 'h5' )
 			elif event.getKeyCode() == KeyEvent.VK_6:
-				node['style'] = 'h6'
+				node.setStyle( 'h6' )
 			elif event.getKeyCode() == KeyEvent.VK_C:
 				self._insertPythonCode( ctx, element, node )
 				return True
@@ -153,7 +153,7 @@ class TextInteractor (ElementInteractor):
 
 
 	def _insertPythonCode(self, ctx, element, node):
-		return element.postTreeEvent( InsertPythonCodeEvent( node ) )
+		return element.postTreeEvent( InsertPythonCodeEvent( node.getModel() ) )
 		
 		
 class WorksheetTreeEventListener (TreeEventListener):
@@ -165,7 +165,7 @@ class WorksheetTreeEventListener (TreeEventListener):
 	def onTreeEvent(self, element, sourceElement, event):
 		if isinstance( event, InsertPythonCodeEvent ):
 			ctx = element.getFragmentContext()
-			node = ctx.getDocNode()
+			node = ctx.getDocNode().getModel()
 			index = node['contents'].indexOf( event._node )
 			
 			if index != -1:
@@ -182,4 +182,18 @@ class WorksheetTreeEventListener (TreeEventListener):
 		if WorksheetTreeEventListener._listenerTable is None:
 			WorksheetTreeEventListener._listenerTable = _ListenerTable( WorksheetTreeEventListener )
 		return WorksheetTreeEventListener._listenerTable.get()
-	
+
+
+class WorksheetInteractor (ElementInteractor):
+	def __init__(self):
+		pass
+		
+		
+	def onKeyPress(self, element, event):
+		if event.getKeyCode() == KeyEvent.VK_F5:
+			ctx = element.getFragmentContext()
+			node = ctx.getDocNode()
+			node.refreshResults()
+			return True
+		
+		

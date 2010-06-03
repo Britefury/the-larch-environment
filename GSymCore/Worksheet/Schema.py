@@ -16,12 +16,11 @@ schema = DMSchema( 'Worksheet', 'ws', 'GSymCore.Worksheet' )
 
 Worksheet = schema.newClass( 'Worksheet', [ 'title', 'contents' ] )
 
-Node = schema.newClass( 'Node', [] )
 
-Text = schema.newClass( 'Text', Node, [ 'text' ] )
+Text = schema.newClass( 'Text', [ 'text' ] )
 Paragraph = schema.newClass( 'Paragraph', Text, [ 'style' ] )
 
 
-PythonCode = schema.newClass( 'PythonCode', Node, [ 'code', 'showCode', 'codeEditable', 'showResult' ] )
+PythonCode = schema.newClass( 'PythonCode', [ 'code', 'showCode', 'codeEditable', 'showResult' ] )
 
 

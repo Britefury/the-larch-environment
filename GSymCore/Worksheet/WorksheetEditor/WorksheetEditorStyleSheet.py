@@ -17,6 +17,8 @@ from BritefuryJ.DocPresent.Browser import Location
 
 from Britefury.AttributeTableUtils.DerivedAttributeMethod import DerivedAttributeMethod
 
+from GSymCore.Languages.Python25.Execution.ExecutionStyleSheet import ExecutionStyleSheet
+
 
 
 class WorksheetEditorStyleSheet (StyleSheet):
@@ -27,8 +29,10 @@ class WorksheetEditorStyleSheet (StyleSheet):
 		self.initAttr( 'richTextStyle', RichTextStyleSheet.instance )
 		self.initAttr( 'editableRichTextStyle', RichTextStyleSheet.instance.withEditable() )
 		self.initAttr( 'controlsStyle', ControlsStyleSheet.instance )
+		self.initAttr( 'executionStyle', ExecutionStyleSheet.instance )
 		
-		self.initAttr( 'pythonCodeBorderAttrs', AttributeValues( border=SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), Color.WHITE ) ) )
+		self.initAttr( 'pythonCodeBorderAttrs', AttributeValues( border=SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) ) )
+		self.initAttr( 'pythonCodeEditorBorderAttrs', AttributeValues( border=SolidBorder( 2.0, 5.0, 20.0, 20.0, Color( 0.4, 0.5, 0.6 ), None ) ) )
 
 		
 		
@@ -46,13 +50,23 @@ class WorksheetEditorStyleSheet (StyleSheet):
 	def withControlsStyleSheet(self, controlsStyle):
 		return self.withAttrs( controlsStyle=controlsStyle )
 	
+	def withExecutionStyleSheet(self, executionStyle):
+		return self.withAttrs( executionStyle=executionStyle )
+	
 	def withPythonCodeBorderAttrs(self, pythonCodeBorderAttrs):
 		return self.withAttrs( pythonCodeBorderAttrs=pythonCodeBorderAttrs )
+	
+	def withPythonCodeEditorBorderAttrs(self, pythonCodeEditorBorderAttrs):
+		return self.withAttrs( pythonCodeEditorBorderAttrs=pythonCodeEditorBorderAttrs )
 	
 	
 	@DerivedAttributeMethod
 	def pythonCodeBorderStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['pythonCodeBorderAttrs'] )
+		
+	@DerivedAttributeMethod
+	def pythonCodeEditorBorderStyle(self):
+		return self['primitiveStyle'].withAttrValues( self['pythonCodeEditorBorderAttrs'] )
 		
 	
 	
@@ -60,6 +74,7 @@ class WorksheetEditorStyleSheet (StyleSheet):
 	def worksheet(self, title, contents):
 		primitiveStyle = self['primitiveStyle']
 		richTextStyle = self['richTextStyle']
+		editableRichTextStyle = self['editableRichTextStyle']
 		controlsStyle = self['controlsStyle']
 
 		
@@ -93,10 +108,36 @@ class WorksheetEditorStyleSheet (StyleSheet):
 		return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h6( text ) )
 
 	
-	def pythonCode(self, codeView):
-		pythonCodeBorderStyle = self.pythonCodeBorderStyle()
+	def pythonCode(self, codeView, resultView, bShowCode, bCodeEditable, bShowResult, onShowCode, onCodeEditable, onShowResult):
+		def _onShowCode(button, event):
+			return onShowCode()
 		
-		return pythonCodeBorderStyle.border( codeView.alignHExpand() ).alignHExpand()
+		def _onCodeEditable(button, event):
+			return onCodeEditable()
+		
+		def _onShowResult(button, event):
+			return onShowResult()
+		
+		primitiveStyle = self['primitiveStyle']
+		controlsStyle = self['controlsStyle']
+		pythonCodeBorderStyle = self.pythonCodeBorderStyle()
+		pythonCodeEditorBorderStyle = self.pythonCodeEditorBorderStyle()
+		
+		showCodeButton = controlsStyle.buttonWithLabel( 'Hide code'   if bShowCode   else   'Show code',   _onShowCode )
+		codeEditableButton = controlsStyle.buttonWithLabel( 'Non-editable'   if bCodeEditable   else   'Editable',   _onCodeEditable )
+		showResultButton = controlsStyle.buttonWithLabel( 'Hide result'   if bShowResult   else   'Show result',   _onShowResult )
+		
+		buttonsBox = primitiveStyle.withHBoxSpacing( 10.0 ).hbox( [ showCodeButton.getElement(), codeEditableButton.getElement(), showResultButton.getElement() ] )
+		headerBox = primitiveStyle.withHBoxSpacing( 20.0 ).hbox( [ primitiveStyle.instance.staticText( 'Python code' ).alignHExpand(), buttonsBox ] ).alignHExpand()
+		
+		boxContents = [ headerBox.alignHExpand() ]
+		if bShowCode:
+			boxContents.append( pythonCodeBorderStyle.border( codeView.alignHExpand() ).alignHExpand() )
+		if bShowResult  and  resultView is not None:
+			boxContents.append( resultView.alignHExpand() )
+		box = primitiveStyle.withVBoxSpacing( 5.0 ).vbox( boxContents )
+		
+		return pythonCodeEditorBorderStyle.border( box.alignHExpand() ).alignHExpand()
 	
 	
 

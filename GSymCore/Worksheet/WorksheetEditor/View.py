@@ -16,9 +16,9 @@ from javax.swing import AbstractAction
 from javax.swing import JPopupMenu, JOptionPane, JFileChooser
 from javax.swing.filechooser import FileNameExtensionFilter
 
-from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeDispatchMethod
+from Britefury.Dispatch.ObjectMethodDispatch import ObjectDispatchMethod
 
-from Britefury.gSym.View.GSymView import GSymViewObjectNodeDispatch
+from Britefury.gSym.View.GSymView import GSymViewObjectDispatch
 
 from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replaceNodeContents, append, prepend, insertElement, insertRange, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
 
@@ -38,30 +38,35 @@ from BritefuryJ.GSym.View import PyGSymViewFragmentFunction
 from GSymCore.Languages.Python25 import Python25
 
 from GSymCore.Worksheet import Schema
+from GSymCore.Worksheet import ViewSchema
 from GSymCore.Worksheet.WorksheetEditor.WorksheetEditorStyleSheet import WorksheetEditorStyleSheet
 from GSymCore.Worksheet.WorksheetEditor.NodeEditor import *
 
 
 
 _textInteractor = TextInteractor()
+_worksheetInteractor = WorksheetInteractor()
 
 
 
-class WorksheetEditor (GSymViewObjectNodeDispatch):
-	@ObjectNodeDispatchMethod( Schema.Worksheet )
-	def Worksheet(self, ctx, styleSheet, inheritedState, node, title, contents):
-		contentViews = ctx.mapPresentFragment( contents, styleSheet, inheritedState )
+class WorksheetEditor (GSymViewObjectDispatch):
+	@ObjectDispatchMethod( ViewSchema.WorksheetView )
+	def Worksheet(self, ctx, styleSheet, inheritedState, node):
+		contentViews = ctx.mapPresentFragment( node.getContents(), styleSheet, inheritedState )
 		emptyLine = PrimitiveStyleSheet.instance.paragraph( [ PrimitiveStyleSheet.instance.text( '' ) ] )
 		emptyLine.addTreeEventListener( TextEditEvent, EmptyTreeEventListener.newListener() )
 		contentViews += [ emptyLine ]
 
-		w = styleSheet.worksheet( title, contentViews )
+		w = styleSheet.worksheet( node.getTitle(), contentViews )
 		w.addTreeEventListener( InsertPythonCodeEvent, WorksheetTreeEventListener.newListener() )
+		w.addInteractor( _worksheetInteractor )
 		return w
 	
 	
-	@ObjectNodeDispatchMethod( Schema.Paragraph )
-	def Paragraph(self, ctx, styleSheet, inheritedState, node, text, style):
+	@ObjectDispatchMethod( ViewSchema.ParagraphView )
+	def Paragraph(self, ctx, styleSheet, inheritedState, node):
+		text = node.getText()
+		style = node.getStyle()
 		if style == 'normal':
 			p = styleSheet.paragraph( text )
 		elif style == 'h1':
@@ -82,10 +87,38 @@ class WorksheetEditor (GSymViewObjectNodeDispatch):
 
 
 	
-	@ObjectNodeDispatchMethod( Schema.PythonCode )
-	def PythonCode(self, ctx, styleSheet, inheritedState, node, code, showCode, codeEditable, showResult):
-		codeView = ctx.presentFragmentWithPerspective( code, Python25.python25EditorPerspective )
-		p = styleSheet.pythonCode( codeView )
+	@ObjectDispatchMethod( ViewSchema.PythonCodeView )
+	def PythonCode(self, ctx, styleSheet, inheritedState, node):
+		executionStyle = styleSheet['executionStyle']
+		
+		def _onShowCode():
+			node.setShowCode( not node.getShowCode() )
+			return True
+
+		def _onCodeEditable():
+			node.setCodeEditable( not node.getCodeEditable() )
+			return True
+
+		def _onShowResult():
+			node.setShowResult( not node.getShowResult() )
+			return True
+
+		if node.getShowCode():
+			codeView = ctx.presentFragmentWithPerspective( node.getCode(), Python25.python25EditorPerspective )
+		else:
+			codeView = None
+		
+		executionResultView = None
+		if node.getShowResult():
+			executionResult = node.getResult()
+			if executionResult is not None:
+				exc = executionResult.getCaughtException()
+				result = executionResult.getResult()
+				excView = ctx.presentFragmentWithGenericPerspective( exc )   if exc is not None   else None
+				resultView = ctx.presentFragmentWithGenericPerspective( result[0] )   if result is not None   else None
+				executionResultView = executionStyle.executionResult( executionResult.getStdOut(), executionResult.getStdErr(), excView, resultView )
+		
+		p = styleSheet.pythonCode( codeView, executionResultView, node.getShowCode(), node.getCodeEditable(), node.getShowResult(), _onShowCode, _onCodeEditable, _onShowResult )
 		return p
 
 
@@ -95,7 +128,8 @@ class WorksheetEditor (GSymViewObjectNodeDispatch):
 class WorksheetEditorRelativeLocationResolver (GSymRelativeLocationResolver):
 	def resolveRelativeLocation(self, enclosingSubject, locationIterator):
 		if locationIterator.getSuffix() == '':
-			return enclosingSubject.withTitle( 'WS: ' + enclosingSubject.getTitle() )
+			view = ViewSchema.WorksheetView( None, enclosingSubject.getFocus() )
+			return enclosingSubject.withTitle( 'WS: ' + enclosingSubject.getTitle() ).withFocus( view )
 		else:
 			return None
 	

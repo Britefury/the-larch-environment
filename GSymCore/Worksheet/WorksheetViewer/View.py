@@ -16,7 +16,7 @@ from javax.swing import AbstractAction
 from javax.swing import JPopupMenu, JOptionPane, JFileChooser
 from javax.swing.filechooser import FileNameExtensionFilter
 
-from Britefury.Dispatch.ObjectNodeMethodDispatch import ObjectNodeDispatchMethod
+from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod
 
 from Britefury.gSym.View.GSymView import GSymViewObjectNodeDispatch
 
@@ -45,7 +45,7 @@ from GSymCore.Worksheet.WorksheetStyleSheet import WorksheetStyleSheet
 
 
 class WorksheetEditor (GSymViewObjectNodeDispatch):
-	@ObjectNodeDispatchMethod( Schema.Worksheet )
+	@DMObjectNodeDispatchMethod( Schema.Worksheet )
 	def Worksheet(self, ctx, styleSheet, inheritedState, node, title, contents):
 		contents = ctx.mapPresentFragment( contents, styleSheet, inheritedState )
 
