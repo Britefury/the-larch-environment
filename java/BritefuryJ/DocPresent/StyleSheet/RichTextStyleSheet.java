@@ -410,7 +410,14 @@ public class RichTextStyleSheet extends StyleSheet
 	
 	private DPElement textParagraph(PrimitiveStyleSheet primitive, String text)
 	{
-		return primitive.paragraph( textToWordsAndLineBreaks( primitive, text ).toArray( new DPElement[0] ) );
+		if ( text.equals(  "" ) )
+		{
+			return primitive.paragraph( new DPElement[] { primitive.text( "" ) } );
+		}
+		else
+		{
+			return primitive.paragraph( textToWordsAndLineBreaks( primitive, text ) );
+		}
 	}
 	
 	

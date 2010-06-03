@@ -19,14 +19,7 @@ Worksheet = schema.newClass( 'Worksheet', [ 'title', 'contents' ] )
 Node = schema.newClass( 'Node', [] )
 
 Text = schema.newClass( 'Text', Node, [ 'text' ] )
-Paragraph = schema.newClass( 'Paragraph', Text, [] )
-Heading = schema.newClass( 'Heading', Text, [] )
-H1 = schema.newClass( 'H1', Heading, [] )
-H2 = schema.newClass( 'H2', Heading, [] )
-H3 = schema.newClass( 'H3', Heading, [] )
-H4 = schema.newClass( 'H4', Heading, [] )
-H5 = schema.newClass( 'H5', Heading, [] )
-H6 = schema.newClass( 'H6', Heading, [] )
+Paragraph = schema.newClass( 'Paragraph', Text, [ 'style' ] )
 
 
 PythonCode = schema.newClass( 'PythonCode', Node, [ 'code', 'showCode', 'codeEditable', 'showResult' ] )

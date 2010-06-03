@@ -72,47 +72,27 @@ class WorksheetEditorStyleSheet (StyleSheet):
 	
 	
 	def paragraph(self, text):
-		if text != '':
-			return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].paragraph( text ) )
-		else:
-			return self['primitiveStyle'].segment( True, True, self['primitiveStyle'].text( '' ) )
+		return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].paragraph( text ) )
 	
 	def h1(self, text):
-		if text != '':
-			return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h1( text ) )
-		else:
-			return self['primitiveStyle'].segment( True, True, self['primitiveStyle'].text( '' ) )
+		return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h1( text ) )
 	
 	def h2(self, text):
-		if text != '':
-			return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h2( text ) )
-		else:
-			return self['primitiveStyle'].segment( True, True, self['primitiveStyle'].text( '' ) )
+		return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h2( text ) )
 	
 	def h3(self, text):
-		if text != '':
-			return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h3( text ) )
-		else:
-			return self['primitiveStyle'].segment( True, True, self['primitiveStyle'].text( '' ) )
+		return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h3( text ) )
 	
 	def h4(self, text):
-		if text != '':
-			return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h4( text ) )
-		else:
-			return self['primitiveStyle'].segment( True, True, self['primitiveStyle'].text( '' ) )
+		return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h4( text ) )
 	
 	def h5(self, text):
-		if text != '':
-			return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h5( text ) )
-		else:
-			return self['primitiveStyle'].segment( True, True, self['primitiveStyle'].text( '' ) )
+		return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h5( text ) )
 	
 	def h6(self, text):
-		if text != '':
-			return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h6( text ) )
-		else:
-			return self['primitiveStyle'].segment( True, True, self['primitiveStyle'].text( '' ) )
-		
+		return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h6( text ) )
+
+	
 	def pythonCode(self, codeView):
 		pythonCodeBorderStyle = self.pythonCodeBorderStyle()
 		

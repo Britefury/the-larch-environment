@@ -61,7 +61,7 @@ class EmptyTreeEventListener (TreeEventListener):
 		ctx = element.getFragmentContext()
 		node = ctx.getDocNode()
 		if '\n' not in value:
-			node['contents'] += [ Schema.Paragraph( text=value ) ]
+			node['contents'] += [ Schema.Paragraph( text=value, style='normal' ) ]
 			return True
 		else:
 			return False
@@ -124,21 +124,26 @@ class TextInteractor (ElementInteractor):
 			node = ctx.getDocNode()
 
 			if event.getKeyCode() == KeyEvent.VK_P:
-				return self._changeTextNodeClass( ctx, node, Schema.Paragraph )
+				node['style'] = 'normal'
 			elif event.getKeyCode() == KeyEvent.VK_1:
-				return self._changeTextNodeClass( ctx, node, Schema.H1 )
+				node['style'] = 'h1'
 			elif event.getKeyCode() == KeyEvent.VK_2:
-				return self._changeTextNodeClass( ctx, node, Schema.H2 )
+				node['style'] = 'h2'
 			elif event.getKeyCode() == KeyEvent.VK_3:
-				return self._changeTextNodeClass( ctx, node, Schema.H3 )
+				node['style'] = 'h3'
 			elif event.getKeyCode() == KeyEvent.VK_4:
-				return self._changeTextNodeClass( ctx, node, Schema.H4 )
+				node['style'] = 'h4'
 			elif event.getKeyCode() == KeyEvent.VK_5:
-				return self._changeTextNodeClass( ctx, node, Schema.H5 )
+				node['style'] = 'h5'
 			elif event.getKeyCode() == KeyEvent.VK_6:
-				return self._changeTextNodeClass( ctx, node, Schema.H6 )
+				node['style'] = 'h6'
 			elif event.getKeyCode() == KeyEvent.VK_C:
-				return self._insertPythonCode( ctx, element, node )
+				self._insertPythonCode( ctx, element, node )
+				return True
+			else:
+				return False
+			
+			return True
 			
 		return False
 	
@@ -147,14 +152,6 @@ class TextInteractor (ElementInteractor):
 
 
 
-	def _changeTextNodeClass(self, ctx, node, nodeClass):
-		if node.isInstanceOf( Schema.Text ):
-			newNode = nodeClass( text=node['text'] )
-			EditOperations.replaceNodeContents( ctx, node, newNode )
-			return True
-		else:
-			return False
-	
 	def _insertPythonCode(self, ctx, element, node):
 		return element.postTreeEvent( InsertPythonCodeEvent( node ) )
 		
