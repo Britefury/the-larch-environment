@@ -184,6 +184,11 @@ class PythonEditorStyleSheet (StyleSheet):
 	
 	
 	@DerivedAttributeMethod
+	def staticStyle(self):
+		return self.withPrimitiveStyle( self['primitiveStyle'].withNonEditable() )
+	
+	
+	@DerivedAttributeMethod
 	def _keywordStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['keywordAttrs'] )
 	

@@ -112,14 +112,18 @@ class WorksheetEditor (GSymViewObjectDispatch):
 			codeView = None
 		
 		executionResultView = None
-		if node.getShowResult():
-			executionResult = node.getResult()
-			if executionResult is not None:
-				exc = executionResult.getCaughtException()
+		executionResult = node.getResult()
+		if executionResult is not None:
+			if node.getShowResult():
+				stdout = executionResult.getStdOut()
 				result = executionResult.getResult()
-				excView = ctx.presentFragmentWithGenericPerspective( exc )   if exc is not None   else None
 				resultView = ctx.presentFragmentWithGenericPerspective( result[0] )   if result is not None   else None
-				executionResultView = executionStyle.executionResult( executionResult.getStdOut(), executionResult.getStdErr(), excView, resultView )
+			else:
+				stdout = None
+				resultView = None
+			exc = executionResult.getCaughtException()
+			excView = ctx.presentFragmentWithGenericPerspective( exc )   if exc is not None   else None
+			executionResultView = executionStyle.executionResult( stdout, executionResult.getStdErr(), excView, resultView )
 		
 		p = styleSheet.pythonCode( codeView, executionResultView, node.getShowCode(), node.getCodeEditable(), node.getShowResult(), _onShowCode, _onCodeEditable, _onShowResult )
 		return p

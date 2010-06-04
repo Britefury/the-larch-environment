@@ -8,7 +8,7 @@
 from Britefury.gSym.gSymUnitClass import GSymUnitClass, GSymPageFactory
 from Britefury.gSym.gSymDocument import gSymUnit
 
-from GSymCore.Worksheet.WorksheetEditor.View import perspective as worksheetEditorPerspective
+from GSymCore.Worksheet.WorksheetViewer.View import perspective as worksheetViewerPerspective
 from GSymCore.Worksheet import Schema
 
 
@@ -19,7 +19,7 @@ def _worksheetNewUnit():
 	return gSymUnit( Schema.schema, newWorksheet() )
 
 
-unitClass = GSymUnitClass( Schema.schema, worksheetEditorPerspective )
+unitClass = GSymUnitClass( Schema.schema, worksheetViewerPerspective )
 
 
 newPageFactory = GSymPageFactory( 'Worksheet', _worksheetNewUnit )

@@ -87,7 +87,7 @@ class ConsoleViewerStyleSheet (StyleSheet):
 	
 	@DerivedAttributeMethod
 	def staticPythonStyle(self):
-		return self['pythonStyle'].withPrimitiveStyle( self['pythonStyle']['primitiveStyle'].withNonEditable() )
+		return self['pythonStyle'].staticStyle()
 	
 	
 	@DerivedAttributeMethod
@@ -158,12 +158,12 @@ class ConsoleViewerStyleSheet (StyleSheet):
 		
 		blockContents = []
 		blockContents.append( pythonModuleBorderStyle.border( pythonModule.alignHExpand() ).alignHExpand() )
-		if stdout is not None:
-			blockContents.append( executionStyle.stdout( stdout ) )
 		if stderr is not None:
 			blockContents.append( executionStyle.stderr( stderr ) )
 		if caughtException is not None:
 			blockContents.append( executionStyle.exception( caughtException ) )
+		if stdout is not None:
+			blockContents.append( executionStyle.stdout( stdout ) )
 		if result is not None:
 			blockContents.append( executionStyle.result( result ) )
 		blockVBox = blockStyle.vbox( blockContents ).alignHExpand()

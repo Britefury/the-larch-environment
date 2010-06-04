@@ -127,16 +127,19 @@ class ExecutionStyleSheet (StyleSheet):
 		resultBoxStyle = self.resultBoxStyle()
 		
 		boxContents = []
-		if stdoutText is not None:
-			boxContents.append( self.stdout( stdoutText ).alignHExpand() )
 		if stderrText is not None:
 			boxContents.append( self.stderr( stderrText ).alignHExpand() )
 		if exceptionView is not None:
 			boxContents.append( self.exception( exceptionView ).alignHExpand() )
+		if stdoutText is not None:
+			boxContents.append( self.stdout( stdoutText ).alignHExpand() )
 		if resultView is not None:
 			boxContents.append( self.result( resultView ).alignHExpand() )
 		
-		return resultBoxStyle.vbox( boxContents )
+		if len( boxContents ) > 0:
+			return resultBoxStyle.vbox( boxContents )
+		else:
+			return None
 
 
 
