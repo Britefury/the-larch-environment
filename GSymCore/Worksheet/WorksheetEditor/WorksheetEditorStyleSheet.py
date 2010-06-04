@@ -80,7 +80,13 @@ class WorksheetEditorStyleSheet (StyleSheet):
 	
 	
 	
-	def worksheet(self, title, contents):
+	def worksheetTitle(self, title):
+		editableRichTextStyle = self['editableRichTextStyle']
+		
+		return self['primitiveStyle'].segment( True, True, editableRichTextStyle.titleBar( title ) )
+	
+	
+	def worksheet(self, titleView, contents):
 		primitiveStyle = self['primitiveStyle']
 		richTextStyle = self['richTextStyle']
 		editableRichTextStyle = self['editableRichTextStyle']
@@ -90,9 +96,7 @@ class WorksheetEditorStyleSheet (StyleSheet):
 		homeLink = controlsStyle.link( 'HOME PAGE', Location( '' ) ).getElement()
 		linkHeader = richTextStyle.linkHeaderBar( [ homeLink ] )
 		
-		title = richTextStyle.titleBarWithSubtitle( title, 'Worksheet' )
-		
-		return richTextStyle.page( [ linkHeader, title ] + contents )
+		return richTextStyle.page( [ linkHeader, titleView ] + contents )
 	
 	
 	def paragraph(self, text):
@@ -118,14 +122,24 @@ class WorksheetEditorStyleSheet (StyleSheet):
 
 	
 	def pythonCode(self, codeView, resultView, bShowCode, bCodeEditable, bShowResult, onShowCode, onCodeEditable, onShowResult):
-		def _onShowCode(button, event):
-			return onShowCode()
+		#def _onShowCodeButton(button, event):
+			#return onShowCode()
 		
-		def _onCodeEditable(button, event):
-			return onCodeEditable()
+		#def _onCodeEditableButton(button, event):
+			#return onCodeEditable()
 		
-		def _onShowResult(button, event):
-			return onShowResult()
+		#def _onShowResultButton(button, event):
+			#return onShowResult()
+		
+		
+		def _onShowCodeCheck(button, state):
+			return onShowCode( state )
+		
+		def _onCodeEditableCheck(button, state):
+			return onCodeEditable( state )
+		
+		def _onShowResultCheck(button, state):
+			return onShowResult( state )
 		
 		primitiveStyle = self['primitiveStyle']
 		controlsStyle = self['controlsStyle']
@@ -133,11 +147,16 @@ class WorksheetEditorStyleSheet (StyleSheet):
 		pythonCodeBorderStyle = self.pythonCodeBorderStyle()
 		pythonCodeEditorBorderStyle = self.pythonCodeEditorBorderStyle()
 		
-		showCodeButton = controlsStyle.buttonWithLabel( 'Hide code'   if bShowCode   else   'Show code',   _onShowCode )
-		codeEditableButton = controlsStyle.buttonWithLabel( 'Non-editable'   if bCodeEditable   else   'Editable',   _onCodeEditable )
-		showResultButton = controlsStyle.buttonWithLabel( 'Hide result'   if bShowResult   else   'Show result',   _onShowResult )
+		showCodeCheck = controlsStyle.checkboxWithLabel( 'Show code', bShowCode, _onShowCodeCheck )
+		codeEditableCheck = controlsStyle.checkboxWithLabel( 'Editable', bCodeEditable, _onCodeEditableCheck )
+		showResultCheck = controlsStyle.checkboxWithLabel( 'Show result', bShowResult, _onShowResultCheck )
+		buttonsBox = primitiveStyle.withHBoxSpacing( 10.0 ).hbox( [ showCodeCheck.getElement(), codeEditableCheck.getElement(), showResultCheck.getElement() ] )
 		
-		buttonsBox = primitiveStyle.withHBoxSpacing( 10.0 ).hbox( [ showCodeButton.getElement(), codeEditableButton.getElement(), showResultButton.getElement() ] )
+		#showCodeButton = controlsStyle.buttonWithLabel( 'Hide code'   if bShowCode   else   'Show code',   _onShowCodeButton )
+		#codeEditableButton = controlsStyle.buttonWithLabel( 'Non-editable'   if bCodeEditable   else   'Editable',   _onCodeEditableButton )
+		#showResultButton = controlsStyle.buttonWithLabel( 'Hide result'   if bShowResult   else   'Show result',   _onShowResult )
+		#buttonsBox = primitiveStyle.withHBoxSpacing( 10.0 ).hbox( [ showCodeButton.getElement(), codeEditableButton.getElement(), showResultButton.getElement() ] )
+		
 		headerBox = pythonCodeHeaderStyle.bin( primitiveStyle.withHBoxSpacing( 20.0 ).hbox( [ primitiveStyle.instance.staticText( 'Python code' ).alignHExpand(), buttonsBox ] ).alignHExpand().pad( 2.0, 2.0 ) )
 		
 		boxContents = [ headerBox.alignHExpand() ]

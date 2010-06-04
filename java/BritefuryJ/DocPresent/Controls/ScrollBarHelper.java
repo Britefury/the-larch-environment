@@ -68,7 +68,7 @@ class ScrollBarHelper
 		
 		public boolean onButtonUp(DPElement element, PointerButtonEvent event)
 		{
-			return event.button == 1;
+			return event.getButton() == 1;
 		}
 	}
 
@@ -117,7 +117,7 @@ class ScrollBarHelper
 	
 		public boolean onButtonDown(DPElement element, PointerButtonEvent event)
 		{
-			if ( event.button == 1 )
+			if ( event.getButton() == 1 )
 			{
 				AABox2 dragBox = (AABox2)dragBoxCell.getValue();
 				
@@ -149,7 +149,7 @@ class ScrollBarHelper
 		public boolean onButtonUp(DPElement element, PointerButtonEvent event)
 		{
 			dragPointer = null;
-			return event.button == 1;
+			return event.getButton() == 1;
 		}
 		
 		public void onDrag(DPElement element, PointerMotionEvent event)

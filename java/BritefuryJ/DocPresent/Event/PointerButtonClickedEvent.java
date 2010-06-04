@@ -13,7 +13,7 @@ import BritefuryJ.Math.Xform2;
 
 public class PointerButtonClickedEvent extends PointerEvent
 {
-	public int button, clickCount;
+	protected int button, clickCount;
 	
 	
 	public PointerButtonClickedEvent(PointerInterface pointer, int button, int clickCount)

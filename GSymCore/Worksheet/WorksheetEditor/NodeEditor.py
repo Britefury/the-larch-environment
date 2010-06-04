@@ -50,9 +50,23 @@ class _ListenerTable (object):
 		
 	
 	
-class EmptyTreeEventListener (TreeEventListener):
-	__slots__ = []
+class TitleTreeEventListener (TreeEventListener):
+	def __init__(self):
+		pass
+
+	def onTreeEvent(self, element, sourceElement, event):
+		value = element.getTextRepresentation()
+		ctx = element.getFragmentContext()
+		node = ctx.getDocNode()
+		node.setTitle( value )
+		return True
+		
 	
+	
+titleTreeEventListener = TitleTreeEventListener()
+	
+
+class EmptyTreeEventListener (TreeEventListener):
 	def __init__(self):
 		pass
 
@@ -65,21 +79,14 @@ class EmptyTreeEventListener (TreeEventListener):
 			return True
 		else:
 			return False
+
 		
-	
-	_listenerTable = None
-		
-	@staticmethod
-	def newListener():
-		if EmptyTreeEventListener._listenerTable is None:
-			EmptyTreeEventListener._listenerTable = _ListenerTable( EmptyTreeEventListener )
-		return EmptyTreeEventListener._listenerTable.get()
+emptyTreeEventListener = EmptyTreeEventListener()
+
 
 
 
 class TextTreeEventListener (TreeEventListener):
-	__slots__ = []
-	
 	def __init__(self):
 		pass
 
@@ -93,14 +100,8 @@ class TextTreeEventListener (TreeEventListener):
 		else:
 			return False
 		
-	
-	_listenerTable = None
 		
-	@staticmethod
-	def newListener():
-		if TextTreeEventListener._listenerTable is None:
-			TextTreeEventListener._listenerTable = _ListenerTable( TextTreeEventListener )
-		return TextTreeEventListener._listenerTable.get()
+textTreeEventListener = TextTreeEventListener()
 	
 
 class InsertPythonCodeEvent (object):
@@ -157,8 +158,6 @@ class TextInteractor (ElementInteractor):
 		
 		
 class WorksheetTreeEventListener (TreeEventListener):
-	__slots__ = []
-	
 	def __init__(self):
 		pass
 
@@ -173,15 +172,9 @@ class WorksheetTreeEventListener (TreeEventListener):
 				node['contents'].insert( index+1, pythonCode )
 				return True
 		return False
-		
 	
-	_listenerTable = None
-		
-	@staticmethod
-	def newListener():
-		if WorksheetTreeEventListener._listenerTable is None:
-			WorksheetTreeEventListener._listenerTable = _ListenerTable( WorksheetTreeEventListener )
-		return WorksheetTreeEventListener._listenerTable.get()
+	
+worksheetTreeEventListener = WorksheetTreeEventListener()
 
 
 class WorksheetInteractor (ElementInteractor):

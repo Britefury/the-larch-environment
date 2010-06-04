@@ -14,7 +14,7 @@ import BritefuryJ.Math.Xform2;
 
 public class PointerNavigationPanEvent extends PointerNavigationEvent
 {
-	public Vector2 pan;
+	protected Vector2 pan;
 	
 	
 	public PointerNavigationPanEvent(PointerInterface device, Vector2 pan)

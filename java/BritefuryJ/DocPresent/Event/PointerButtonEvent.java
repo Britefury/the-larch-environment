@@ -24,8 +24,8 @@ public class PointerButtonEvent extends PointerEvent
 		UP
 	}
 	
-	public int button;
-	public Action action;
+	protected int button;
+	protected Action action;
 	
 	
 	public PointerButtonEvent(PointerInterface pointer, int button, Action action)

@@ -9,8 +9,11 @@ package BritefuryJ.DocPresent;
 import java.util.Arrays;
 import java.util.List;
 
+import BritefuryJ.DocPresent.LayoutTree.ArrangedSequenceLayoutNode;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
+import BritefuryJ.Math.AABox2;
+import BritefuryJ.Math.Point2;
 
 public class DPSegment extends DPContainer
 {
@@ -289,6 +292,65 @@ public class DPSegment extends DPContainer
 	}
 	
 	
+	
+	//
+	//
+	// Bounding box methods, and point query methods
+	//
+	//
+	
+	private AABox2[] computeBoundingBoxes()
+	{
+		ArrangedSequenceLayoutNode arrangedLayout = (ArrangedSequenceLayoutNode)getValidLayoutNodeOfClass( ArrangedSequenceLayoutNode.class );
+		if ( arrangedLayout != null )
+		{
+			return arrangedLayout.computeBranchBoundsBoxes( this );
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	public boolean containsParentSpacePoint(Point2 p)
+	{
+		AABox2 boundsBoxes[] = computeBoundingBoxes();
+		if ( boundsBoxes != null )
+		{
+			for (AABox2 box: boundsBoxes)
+			{
+				if ( box.containsPoint( p ) )
+				{
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
+	public boolean containsLocalSpacePoint(Point2 p)
+	{
+		AABox2 boundsBoxes[] = computeBoundingBoxes();
+		if ( boundsBoxes != null )
+		{
+			for (AABox2 box: boundsBoxes)
+			{
+				if ( box.containsPoint( p ) )
+				{
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+
+	
+	
+	//
+	// Get Segment
+	//
 	
 	public DPSegment getSegment()
 	{
