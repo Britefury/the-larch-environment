@@ -14,7 +14,7 @@ import BritefuryJ.Math.Xform2;
 
 public class PointerScrollEvent extends PointerEvent
 {
-	public int scrollX, scrollY;
+	protected int scrollX, scrollY;
 	
 	
 	public PointerScrollEvent(PointerInterface pointer, int scrollX, int scrollY)
@@ -23,6 +23,17 @@ public class PointerScrollEvent extends PointerEvent
 		
 		this.scrollX = scrollX;
 		this.scrollY = scrollY;
+	}
+	
+	
+	public int getScrollX()
+	{
+		return scrollX;
+	}
+	
+	public int getScrollY()
+	{
+		return scrollY;
 	}
 	
 	

@@ -54,11 +54,14 @@ class WorksheetEditor (GSymViewObjectDispatch):
 	def Worksheet(self, ctx, styleSheet, inheritedState, node):
 		contentViews = ctx.mapPresentFragment( node.getContents(), styleSheet, inheritedState )
 		emptyLine = PrimitiveStyleSheet.instance.paragraph( [ PrimitiveStyleSheet.instance.text( '' ) ] )
-		emptyLine.addTreeEventListener( TextEditEvent, EmptyTreeEventListener.newListener() )
+		emptyLine.addTreeEventListener( TextEditEvent, emptyTreeEventListener )
 		contentViews += [ emptyLine ]
+		
+		title = styleSheet.worksheetTitle( node.getTitle() )
+		title.addTreeEventListener( TextEditEvent, titleTreeEventListener )
 
-		w = styleSheet.worksheet( node.getTitle(), contentViews )
-		w.addTreeEventListener( InsertPythonCodeEvent, WorksheetTreeEventListener.newListener() )
+		w = styleSheet.worksheet( title, contentViews )
+		w.addTreeEventListener( InsertPythonCodeEvent, worksheetTreeEventListener )
 		w.addInteractor( _worksheetInteractor )
 		return w
 	
@@ -81,7 +84,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 			p = styleSheet.h5( text )
 		elif style == 'h6':
 			p = styleSheet.h6( text )
-		p.addTreeEventListener( TextEditEvent, TextTreeEventListener.newListener() )
+		p.addTreeEventListener( TextEditEvent, textTreeEventListener )
 		p.addInteractor( _textInteractor )
 		return p
 
@@ -91,16 +94,16 @@ class WorksheetEditor (GSymViewObjectDispatch):
 	def PythonCode(self, ctx, styleSheet, inheritedState, node):
 		executionStyle = styleSheet['executionStyle']
 		
-		def _onShowCode():
-			node.setShowCode( not node.getShowCode() )
+		def _onShowCode(state):
+			node.setShowCode( state )
 			return True
 
-		def _onCodeEditable():
-			node.setCodeEditable( not node.getCodeEditable() )
+		def _onCodeEditable(state):
+			node.setCodeEditable( state )
 			return True
 
-		def _onShowResult():
-			node.setShowResult( not node.getShowResult() )
+		def _onShowResult(state):
+			node.setShowResult( state )
 			return True
 
 		if node.getShowCode():

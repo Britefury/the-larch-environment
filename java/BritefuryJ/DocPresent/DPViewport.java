@@ -344,7 +344,7 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 	
 	protected boolean handlePointerScroll(PointerScrollEvent event)
 	{
-		double delta = (double)event.scrollY;
+		double delta = (double)event.getScrollY();
 		Xform2 xform = new Xform2( new Vector2( 0.0, delta * 75.0 ) );
 		applyLocalSpaceXform( xform );
 		return true;

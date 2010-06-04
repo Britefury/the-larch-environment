@@ -26,9 +26,11 @@ import BritefuryJ.DocPresent.DPSpaceBin;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPViewport;
 import BritefuryJ.DocPresent.Border.Border;
+import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Painter.FilledOutlinePainter;
+import BritefuryJ.DocPresent.Painter.OutlinePainter;
 import BritefuryJ.DocPresent.Painter.Painter;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
@@ -41,6 +43,13 @@ public class ControlsStyleSheet extends StyleSheet
 	private static final String defaultLinkFontFace = "Sans serif";
 	private static final int defaultLinkFontSize = 14;
 	private static final Cursor defaultLinkCursor = new Cursor( Cursor.HAND_CURSOR );
+	
+	private static final Painter defaultCheckboxHoverBackground = new OutlinePainter( new Color( 0.5f, 0.625f, 0.75f ) );
+	private static final Border defaultCheckboxCheckBorder = new FilledBorder( 3.0, 3.0, 3.0, 3.0, 5.0, 5.0, new Color( 0.75f, 0.75f, 0.75f ) );
+	private static final Paint defaultCheckboxCheckForeground = new Color( 0.0f, 0.2f, 0.4f );
+	private static final double defaultCheckboxCheckSize = 10.0;
+	private static final double defaultCheckboxSpacing = 8.0;
+	
 	private static final Painter defaultScrollBarArrowPainter = new FilledOutlinePainter( new Color( 0.7f, 0.85f, 1.0f ), new Color( 0.0f, 0.5f, 1.0f ), new BasicStroke( 1.0f ) );
 	private static final Painter defaultScrollBarDragBackgroundPainter = new FilledOutlinePainter( new Color( 0.9f, 0.9f, 0.9f ), new Color( 0.75f, 0.75f, 0.75f ), new BasicStroke( 1.0f ) );
 	
@@ -80,6 +89,12 @@ public class ControlsStyleSheet extends StyleSheet
 		initAttr( "buttonBorderHighlightPaint", new Color( 0.0f, 0.5f, 0.5f ) );
 		initAttr( "buttonBackgPaint", new Color( 0.85f, 0.85f, 0.85f ) );
 		initAttr( "buttonBackgHighlightPaint", new Color( 0.925f, 0.925f, 0.925f ) );
+		
+		initAttr( "checkboxHoverBackground", defaultCheckboxHoverBackground );
+		initAttr( "checkboxCheckBorder", defaultCheckboxCheckBorder );
+		initAttr( "checkboxCheckForeground", defaultCheckboxCheckForeground );
+		initAttr( "checkboxCheckSize", defaultCheckboxCheckSize );
+		initAttr( "checkboxSpacing", defaultCheckboxSpacing );
 		
 		initAttr( "textEntryTextAttrs", new AttributeValues() );
 		initAttr( "textEntryBorderThickness", 3.0 );
@@ -155,6 +170,33 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		return (ControlsStyleSheet)withAttr( "buttonBackgHighlightPaint", paint );
 	}
+	
+	
+	public ControlsStyleSheet withCheckboxHoverBackground(Painter painter)
+	{
+		return (ControlsStyleSheet)withAttr( "checkboxHoverBackground", painter );
+	}
+	
+	public ControlsStyleSheet withCheckboxCheckBorder(Border border)
+	{
+		return (ControlsStyleSheet)withAttr( "checkboxCheckBorder", border );
+	}
+	
+	public ControlsStyleSheet withCheckboxCheckForeground(Paint paint)
+	{
+		return (ControlsStyleSheet)withAttr( "checkboxCheckForeground", paint );
+	}
+	
+	public ControlsStyleSheet withCheckboxCheckSize(double size)
+	{
+		return (ControlsStyleSheet)withAttr( "checkboxCheckSize", size );
+	}
+	
+	public ControlsStyleSheet withCheckboxSpacing(double spacing)
+	{
+		return (ControlsStyleSheet)withAttr( "checkboxSpacing", spacing );
+	}
+	
 	
 	
 	public ControlsStyleSheet withTextEntryTextAttrs(AttributeValues attrs)
@@ -308,6 +350,50 @@ public class ControlsStyleSheet extends StyleSheet
 	
 	
 	
+	private PrimitiveStyleSheet checkboxStyleSheet = null;
+
+	private PrimitiveStyleSheet getCheckboxStyleSheet()
+	{
+		if ( checkboxStyleSheet == null )
+		{
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			double spacing = getNonNull( "checkboxSpacing", Double.class, defaultCheckboxSpacing );
+			Painter background = getNonNull( "checkboxHoverBackground", Painter.class, defaultCheckboxHoverBackground );
+			checkboxStyleSheet = primitive.withHBoxSpacing( spacing ).withHoverBackground( background );
+		}
+		return checkboxStyleSheet;
+	}
+	
+	
+	
+	private PrimitiveStyleSheet checkboxCheckStyleSheet = null;
+
+	private PrimitiveStyleSheet getCheckboxCheckStyleSheet()
+	{
+		if ( checkboxCheckStyleSheet == null )
+		{
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			Border border = getNonNull( "checkboxCheckBorder", Border.class, defaultCheckboxCheckBorder );
+			checkboxCheckStyleSheet = primitive.withBorder( border );
+		}
+		return checkboxCheckStyleSheet;
+	}
+	
+	
+	private CheckboxHelper.CheckboxCheckedPainterInteractor checkboxCheckInteractor = null;
+	
+	private CheckboxHelper.CheckboxCheckedPainterInteractor getCheckboxCheckInteractor()
+	{
+		if ( checkboxCheckInteractor == null )
+		{
+			Paint foreground = getNonNull( "checkboxCheckForeground", Paint.class, defaultCheckboxCheckForeground );
+			checkboxCheckInteractor = new CheckboxHelper.CheckboxCheckedPainterInteractor( foreground );
+		}
+		return checkboxCheckInteractor;
+	}
+	
+	
+	
 	private Border textEntryBorder = null;
 
 	private Border getTextEntryBorder()
@@ -454,6 +540,41 @@ public class ControlsStyleSheet extends StyleSheet
 		DPElement child = primitive.staticText( text );
 		DPBorder element = getButtonStyleSheet().border( child );
 		return new Button( element, getButtonBorder(), getButtonHighlightBorder(), listener );
+	}
+	
+	
+	
+	public Checkbox checkbox(DPElement child, boolean state, Checkbox.CheckboxListener listener)
+	{
+		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+		PrimitiveStyleSheet checkStyle = getCheckboxCheckStyleSheet();
+		double checkSize = getNonNull( "checkboxCheckSize", Double.class, defaultCheckboxCheckSize );
+		DPElement unchecked = primitive.spacer( checkSize, checkSize );
+		DPElement checked = primitive.spacer( checkSize, checkSize );
+		checked.addInteractor( getCheckboxCheckInteractor() );
+		DPBorder check = checkStyle.border( state  ?  checked  :  unchecked );
+		DPElement hbox = getCheckboxStyleSheet().hbox( new DPElement[] { check.alignVCentre(), child.alignVCentre() } );
+		DPElement element = primitive.bin( hbox );
+		Checkbox checkbox = new Checkbox( element, check, unchecked, checked, state, listener );
+		hbox.addInteractor( new CheckboxHelper.CheckboxCheckInteractor( checkbox ) );
+		return checkbox;
+	}
+	
+	public Checkbox checkboxWithLabel(String labelText, boolean state, PyObject listener)
+	{
+		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+		return checkbox( primitive.staticText( labelText ), state, listener );
+	}
+	
+	public Checkbox checkboxWithLabel(String labelText, boolean state, Checkbox.CheckboxListener listener)
+	{
+		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+		return checkbox( primitive.staticText( labelText ), state, listener );
+	}
+	
+	public Checkbox checkbox(DPElement child, boolean state, PyObject listener)
+	{
+		return checkbox( child, state, new Checkbox.PyCheckboxListener( listener ) );
 	}
 	
 	

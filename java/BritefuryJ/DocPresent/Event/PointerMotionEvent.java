@@ -23,7 +23,7 @@ public class PointerMotionEvent extends PointerEvent
 		MOTION
 	}
 	
-	public Action action;
+	protected Action action;
 	
 	
 	public PointerMotionEvent(PointerInterface device, Action action)

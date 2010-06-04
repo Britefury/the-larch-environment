@@ -41,6 +41,7 @@ public class SystemDirectory
 		primitiveTestPages.add( new ViewportTestPage() );
 
 		controlTestPages.add( new ButtonTestPage() );
+		controlTestPages.add( new CheckboxTestPage() );
 		controlTestPages.add( new HyperlinkTestPage() );
 		controlTestPages.add( new ScrollBarTestPage() );
 		controlTestPages.add( new ScrolledViewportTestPage() );

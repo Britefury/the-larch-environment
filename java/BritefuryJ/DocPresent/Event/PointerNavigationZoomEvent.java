@@ -14,8 +14,8 @@ import BritefuryJ.Math.Xform2;
 
 public class PointerNavigationZoomEvent extends PointerNavigationEvent
 {
-	public Point2 pos;
-	public double zoom;
+	protected Point2 pos;
+	protected double zoom;
 	
 	
 	public PointerNavigationZoomEvent(PointerInterface device, Point2 pos, double zoom)
