@@ -63,7 +63,7 @@ class GSymViewObjectDispatch (object):
 			element, name = objectMethodDispatchAndGetName( self, obj, ctx, styleSheet, state )
 			element.setDebugName( name )
 		except DispatchError:
-			print node
+			print obj
 			element = ctx.errorElement( '<<VIEW OBJECT DISPATCH ERROR>>' )
 		return element
 

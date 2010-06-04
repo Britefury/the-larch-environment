@@ -17,21 +17,22 @@ from BritefuryJ.DocPresent.Browser import Location
 
 from Britefury.AttributeTableUtils.DerivedAttributeMethod import DerivedAttributeMethod
 
+from GSymCore.Languages.Python25.PythonEditor.PythonEditorStyleSheet import PythonEditorStyleSheet
 from GSymCore.Languages.Python25.Execution.ExecutionStyleSheet import ExecutionStyleSheet
 
 
 
-class WorksheetEditorStyleSheet (StyleSheet):
+class WorksheetViewerStyleSheet (StyleSheet):
 	def __init__(self):
-		super( WorksheetEditorStyleSheet, self ).__init__()
+		super( WorksheetViewerStyleSheet, self ).__init__()
 		
 		self.initAttr( 'primitiveStyle', PrimitiveStyleSheet.instance )
-		self.initAttr( 'richTextStyle', RichTextStyleSheet.instance )
-		self.initAttr( 'editableRichTextStyle', RichTextStyleSheet.instance.withEditable() )
+		self.initAttr( 'richTextStyle', RichTextStyleSheet.instance.withNonEditable() )
 		self.initAttr( 'controlsStyle', ControlsStyleSheet.instance )
 		self.initAttr( 'executionStyle', ExecutionStyleSheet.instance )
+		self.initAttr( 'pythonStyle', PythonEditorStyleSheet.instance )
+		self.initAttr( 'staticPythonStyle', PythonEditorStyleSheet.instance.staticStyle() )
 		
-		self.initAttr( 'pythonCodeHeaderBackground', FillPainter( Color( 0.75, 0.8, 0.925 ) ) )
 		self.initAttr( 'pythonCodeBorderAttrs', AttributeValues( border=SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) ) )
 		self.initAttr( 'pythonCodeEditorBorderAttrs', AttributeValues( border=SolidBorder( 2.0, 5.0, 20.0, 20.0, Color( 0.4, 0.5, 0.6 ), None ) ) )
 
@@ -46,7 +47,7 @@ class WorksheetEditorStyleSheet (StyleSheet):
 		return self.withAttrs( primitiveStyle=primitiveStyle )
 	
 	def withRichTextStyleSheet(self, richTextStyle):
-		return self.withAttrs( richTextStyle=richTextStyle, editableRichTextStyle=richTextStyle.withEditable() )
+		return self.withAttrs( richTextStyle=richTextStyle )
 	
 	def withControlsStyleSheet(self, controlsStyle):
 		return self.withAttrs( controlsStyle=controlsStyle )
@@ -54,9 +55,12 @@ class WorksheetEditorStyleSheet (StyleSheet):
 	def withExecutionStyleSheet(self, executionStyle):
 		return self.withAttrs( executionStyle=executionStyle )
 	
+	def withPythonStyle(self, pythonStyle):
+		return self.withAttrs( pythonStyle=pythonStyle )
 	
-	def withPythonCodeHeaderBackground(self, pythonCodeHeaderBackground):
-		return self.withAttrs( pythonCodeHeaderBackground=pythonCodeHeaderBackground )
+	def withStaticPythonStyle(self, staticPythonStyle):
+		return self.withAttrs( staticPythonStyle=staticPythonStyle )
+	
 	
 	def withPythonCodeBorderAttrs(self, pythonCodeBorderAttrs):
 		return self.withAttrs( pythonCodeBorderAttrs=pythonCodeBorderAttrs )
@@ -65,10 +69,6 @@ class WorksheetEditorStyleSheet (StyleSheet):
 		return self.withAttrs( pythonCodeEditorBorderAttrs=pythonCodeEditorBorderAttrs )
 	
 	
-	@DerivedAttributeMethod
-	def pythonCodeHeaderStyle(self):
-		return self['primitiveStyle'].withAttrs( background=self['pythonCodeHeaderBackground'] )
-		
 	@DerivedAttributeMethod
 	def pythonCodeBorderStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['pythonCodeBorderAttrs'] )
@@ -81,70 +81,53 @@ class WorksheetEditorStyleSheet (StyleSheet):
 	
 	
 	def worksheetTitle(self, title):
-		editableRichTextStyle = self['editableRichTextStyle']
+		richTextStyle = self['richTextStyle']
 		
-		return self['primitiveStyle'].segment( True, True, editableRichTextStyle.titleBar( title ) )
+		return self['primitiveStyle'].segment( True, True, richTextStyle.titleBar( title ) )
 	
 	
-	def worksheet(self, titleView, contents):
+	def worksheet(self, titleView, contents, editLocation):
 		primitiveStyle = self['primitiveStyle']
 		richTextStyle = self['richTextStyle']
-		editableRichTextStyle = self['editableRichTextStyle']
 		controlsStyle = self['controlsStyle']
 
 		
 		homeLink = controlsStyle.link( 'HOME PAGE', Location( '' ) ).getElement()
+		editLink = controlsStyle.link( 'Edit', editLocation ).getElement()
 		linkHeader = richTextStyle.linkHeaderBar( [ homeLink ] )
 		
-		return richTextStyle.page( [ linkHeader, titleView ] + contents )
+		return richTextStyle.page( [ linkHeader, editLink, titleView ] + contents )
 	
 	
 	def paragraph(self, text):
-		return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].paragraph( text ) )
+		return self['primitiveStyle'].segment( True, True, self['richTextStyle'].paragraph( text ) )
 	
 	def h1(self, text):
-		return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h1( text ) )
+		return self['primitiveStyle'].segment( True, True, self['richTextStyle'].h1( text ) )
 	
 	def h2(self, text):
-		return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h2( text ) )
+		return self['primitiveStyle'].segment( True, True, self['richTextStyle'].h2( text ) )
 	
 	def h3(self, text):
-		return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h3( text ) )
+		return self['primitiveStyle'].segment( True, True, self['richTextStyle'].h3( text ) )
 	
 	def h4(self, text):
-		return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h4( text ) )
+		return self['primitiveStyle'].segment( True, True, self['richTextStyle'].h4( text ) )
 	
 	def h5(self, text):
-		return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h5( text ) )
+		return self['primitiveStyle'].segment( True, True, self['richTextStyle'].h5( text ) )
 	
 	def h6(self, text):
-		return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h6( text ) )
+		return self['primitiveStyle'].segment( True, True, self['richTextStyle'].h6( text ) )
 
 	
-	def pythonCode(self, codeView, resultView, bShowCode, bCodeEditable, bShowResult, onShowCode, onCodeEditable, onShowResult):
-		def _onShowCodeCheck(checkbox, state):
-			return onShowCode( state )
-		
-		def _onCodeEditableCheck(checkbox, state):
-			return onCodeEditable( state )
-		
-		def _onShowResultCheck(checkbox, state):
-			return onShowResult( state )
-		
+	def pythonCode(self, codeView, resultView, bShowCode, bShowResult):
 		primitiveStyle = self['primitiveStyle']
 		controlsStyle = self['controlsStyle']
-		pythonCodeHeaderStyle = self.pythonCodeHeaderStyle()
 		pythonCodeBorderStyle = self.pythonCodeBorderStyle()
 		pythonCodeEditorBorderStyle = self.pythonCodeEditorBorderStyle()
 		
-		showCodeCheck = controlsStyle.checkboxWithLabel( 'Show code', bShowCode, _onShowCodeCheck )
-		codeEditableCheck = controlsStyle.checkboxWithLabel( 'Editable', bCodeEditable, _onCodeEditableCheck )
-		showResultCheck = controlsStyle.checkboxWithLabel( 'Show result', bShowResult, _onShowResultCheck )
-		buttonsBox = primitiveStyle.withHBoxSpacing( 10.0 ).hbox( [ showCodeCheck.getElement(), codeEditableCheck.getElement(), showResultCheck.getElement() ] )
-		
-		headerBox = pythonCodeHeaderStyle.bin( primitiveStyle.withHBoxSpacing( 20.0 ).hbox( [ primitiveStyle.instance.staticText( 'Python code' ).alignHExpand(), buttonsBox ] ).alignHExpand().pad( 2.0, 2.0 ) )
-		
-		boxContents = [ headerBox.alignHExpand() ]
+		boxContents = []
 		if bShowCode:
 			boxContents.append( pythonCodeBorderStyle.border( codeView.alignHExpand() ).alignHExpand() )
 		if bShowResult  and  resultView is not None:
@@ -155,7 +138,7 @@ class WorksheetEditorStyleSheet (StyleSheet):
 	
 	
 
-WorksheetEditorStyleSheet.instance = WorksheetEditorStyleSheet()
+WorksheetViewerStyleSheet.instance = WorksheetViewerStyleSheet()
 	
 	
 	
