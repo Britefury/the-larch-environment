@@ -9,10 +9,9 @@ package BritefuryJ.DocModel;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.python.core.Py;
 import org.python.core.PyJavaType;
@@ -20,7 +19,7 @@ import org.python.core.PyObject;
 import org.python.core.PyObjectDerived;
 
 
-public abstract class DMNode
+public abstract class DMNode implements Cloneable
 {
 	public static class ParentListIterator implements Iterator<DMNode>
 	{
@@ -247,10 +246,10 @@ public abstract class DMNode
 	
 	public Object deepCopy()
 	{
-		return deepCopy( new HashMap<Object,Object>() );
+		return deepCopy( new IdentityHashMap<Object,Object>() );
 	}
 
-	public Object deepCopy(Map<Object, Object> memo)
+	public Object deepCopy(IdentityHashMap<Object, Object> memo)
 	{
 		if ( memo.containsKey( this ) )
 		{
@@ -262,7 +261,7 @@ public abstract class DMNode
 		}
 	}
 
-	protected abstract Object createDeepCopy(Map<Object, Object> memo);
+	protected abstract Object createDeepCopy(IdentityHashMap<Object, Object> memo);
 	
 	
 	public abstract DMNodeClass getDMNodeClass();

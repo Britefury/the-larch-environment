@@ -23,8 +23,8 @@ public interface EditHandler
 	public static int NONE = TransferHandler.NONE;
 	
 	
-	void deleteSelection(Selection selection);
-	void replaceSelection(Selection selection, String replacement);
+	public void deleteSelection(Selection selection);
+	public void replaceSelectionWithText(Selection selection, String replacement);
 	
 
 	public int getExportActions(Selection selection);

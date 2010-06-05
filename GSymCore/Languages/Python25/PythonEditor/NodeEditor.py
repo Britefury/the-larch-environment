@@ -17,8 +17,6 @@ from Britefury.Kernel.Abstract import abstractmethod
 
 from BritefuryJ.DocModel import DMList, DMObject, DMObjectInterface
 
-from BritefuryJ.Transformation import DefaultIdentityTransformationFunction
-
 
 from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent.StyleSheet import *

@@ -20,8 +20,6 @@ from Britefury.Kernel.Abstract import abstractmethod
 
 from BritefuryJ.DocModel import DMList, DMObject, DMObjectInterface, DMNode
 
-from BritefuryJ.Transformation import DefaultIdentityTransformationFunction
-
 from BritefuryJ.Parser.ItemStream import ItemStreamBuilder, ItemStream
 
 
@@ -50,9 +48,6 @@ class NotImplementedError (Exception):
 	pass
 
 
-_identity = DefaultIdentityTransformationFunction()
-	
-	
 class Python25Buffer (Object):
 	pass
 
@@ -266,6 +261,10 @@ class Python25EditHandler (EditHandler):
 			
 	def deleteSelection(self, selection):
 		self.replaceSelection( selection, None )
+		
+		
+	def replaceSelectionWithText(self, selection, replacement):
+		self.replaceSelection( selection, replacement )
 	
 	
 	def replaceSelection(self, selection, replacement):
@@ -372,21 +371,14 @@ class Python25EditHandler (EditHandler):
 			# Get the statement elements
 			startStmtElement = startContext.getFragmentContentElement()
 			endStmtElement = endContext.getFragmentContentElement()
-			# Get the text between the selection start and the end of the start line, and the start of the end line and the selection end
-			textInFirstLine = startStmtElement.getTextRepresentationFromMarkerToEnd( startMarker )
-			textInLastLine = endStmtElement.getTextRepresentationFromStartToMarker( endMarker )
 			
-			path0, path1 = getStatementContextPathsFromCommonRoot( startContext, endContext )
-				
-			commonRoot = path0[0]
-				
 			rootElement = startStmtElement.getRootElement()
 			stream = rootElement.getLinearRepresentationInSelection( selection )
 			
 			builder = ItemStreamBuilder()
 			for item in stream.getItems():
 				if isinstance( item, ItemStream.StructuralItem ):
-					builder.appendStructuralValue( _identity.apply( item.getStructuralValue(), _identity ) )
+					builder.appendStructuralValue( item.getStructuralValue().deepCopy() )
 				elif isinstance( item, ItemStream.TextItem ):
 					builder.appendTextValue( item.getTextValue() )
 			

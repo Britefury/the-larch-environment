@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -34,7 +35,7 @@ import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.Incremental.IncrementalValueMonitor;
 
-public class DMObject extends DMNode implements DMObjectInterface, Trackable, Serializable, IncrementalOwner, Presentable
+public class DMObject extends DMNode implements DMObjectInterface, Trackable, Serializable, Cloneable, IncrementalOwner, Presentable
 {
 	public static class NotADMObjectStreamClassException extends RuntimeException
 	{
@@ -299,7 +300,21 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	
 	
 	
-	protected Object createDeepCopy(Map<Object, Object> memo)
+	public Object clone()
+	{
+		onAccess();
+		Object[] ys = new Object[fieldData.length];
+		
+		int i = 0;
+		for (Object x: fieldData)
+		{
+			ys[i++] = x;
+		}
+		
+		return new DMObject( objClass, ys );
+	}
+	
+	protected Object createDeepCopy(IdentityHashMap<Object, Object> memo)
 	{
 		onAccess();
 		Object[] ys = new Object[fieldData.length];
