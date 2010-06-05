@@ -20,8 +20,6 @@ from Britefury.Kernel.Abstract import abstractmethod
 
 from BritefuryJ.DocModel import DMList, DMObject, DMObjectInterface, DMNode
 
-from BritefuryJ.Transformation import DefaultIdentityTransformationFunction
-
 from BritefuryJ.Parser.ItemStream import ItemStreamBuilder, ItemStream
 
 

@@ -13,10 +13,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.python.core.Py;
@@ -35,7 +35,7 @@ import BritefuryJ.Incremental.IncrementalValueMonitor;
 import BritefuryJ.JythonInterface.JythonIndex;
 import BritefuryJ.JythonInterface.JythonSlice;
 
-public class DMList extends DMNode implements DMListInterface, Trackable, Serializable, IncrementalOwner, Presentable
+public class DMList extends DMNode implements DMListInterface, Trackable, Serializable, Cloneable, IncrementalOwner, Presentable
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -397,7 +397,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		return new DMList( this );
 	}
 	
-	protected Object createDeepCopy(Map<Object, Object> memo)
+	protected Object createDeepCopy(IdentityHashMap<Object, Object> memo)
 	{
 		onAccess();
 
@@ -418,7 +418,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		
 		return new DMList( ys );
 	}
-	
+
 	
 	public static DMNodeClass getListDMNodeClass()
 	{

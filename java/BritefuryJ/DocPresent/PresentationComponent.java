@@ -1386,7 +1386,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			}
 		}
 
-		protected void replaceSelection(String replacement)
+		protected void replaceSelectionWithText(String replacement)
 		{
 			DPRegion selectionRegion = getSelectionRegion();
 			if ( selectionRegion != null )
@@ -1394,7 +1394,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				EditHandler editHandler = selectionRegion.getEditHandler();
 				if ( editHandler != null )
 				{
-					editHandler.replaceSelection( selection, replacement );
+					editHandler.replaceSelectionWithText( selection, replacement );
 				}
 			}
 		}

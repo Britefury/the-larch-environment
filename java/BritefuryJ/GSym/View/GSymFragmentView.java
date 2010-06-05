@@ -448,4 +448,79 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	{
 		queueRefresh();
 	}
+	
+	
+	
+	public static GSymFragmentView getEnclosingFragment(DPElement element, FragmentViewFilter filter)
+	{
+		if ( filter == null )
+		{
+			return (GSymFragmentView)element.getFragmentContext();
+		}
+		else
+		{
+			GSymFragmentView fragment = (GSymFragmentView)element.getFragmentContext();
+			
+			while ( !filter.testFragmentView( fragment ) )
+			{
+				fragment = (GSymFragmentView)fragment.getParent();
+				if ( fragment == null )
+				{
+					return null;
+				}
+			}
+			
+			return fragment;
+		}
+	}
+	
+	
+	public static GSymFragmentView getCommonRootFragment(GSymFragmentView a, GSymFragmentView b, FragmentViewFilter filter)
+	{
+		ArrayList<GSymFragmentView> pathA = new ArrayList<GSymFragmentView>();
+		ArrayList<GSymFragmentView> pathB = new ArrayList<GSymFragmentView>();
+		GSymFragmentView f = null;
+		
+		f = a;
+		while ( f != null )
+		{
+			if ( filter.testFragmentView( f ) )
+			{
+				pathA.add( f );
+			}
+			f = (GSymFragmentView)f.getParent();
+		}
+
+		f = b;
+		while ( f != null )
+		{
+			if ( filter.testFragmentView( f ) )
+			{
+				pathB.add( f );
+			}
+			f = (GSymFragmentView)f.getParent();
+		}
+		
+		int top = Math.min( pathA.size(), pathB.size() );
+		int commonLength = top;
+		for (int i = 0; i < top; i++)
+		{
+			GSymFragmentView x = pathA.get( pathA.size() - i );
+			GSymFragmentView y = pathB.get( pathB.size() - i );
+			if ( x != y )
+			{
+				commonLength = i;
+				break;
+			}
+		}
+		
+		if ( commonLength == 0 )
+		{
+			return null;
+		}
+		else
+		{
+			return pathA.get( pathA.size() - commonLength );
+		}
+	}
 }

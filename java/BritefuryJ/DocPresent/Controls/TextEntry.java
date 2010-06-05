@@ -109,7 +109,7 @@ public class TextEntry extends Control
 			}
 		}
 
-		public void replaceSelection(Selection selection, String replacement)
+		public void replaceSelectionWithText(Selection selection, String replacement)
 		{
 			if ( !selection.isEmpty() )
 			{

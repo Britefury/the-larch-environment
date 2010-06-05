@@ -790,7 +790,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 			{
 				if ( rootElement.isSelectionValid() )
 				{
-					rootElement.replaceSelection( str );
+					rootElement.replaceSelectionWithText( str );
 				}
 				else
 				{
