@@ -1196,7 +1196,7 @@ class Python25Grammar (Grammar):
 	
 	@Rule
 	def suiteItem(self):
-		return self.commentStmt()  |  self.blankLine()  |  self.compoundStmt()  |  self.indentedBlock()  |  self.simpleStmt()  |  self.compoundStmtHeader()  |  self.emptyIndentedSuite()  |  self.unparsed()
+		return self.commentStmt()  |  self.blankLine()  |  self.compoundStmt()  |  self.indentedBlock()  |  self.simpleStmt()  |  self.compoundStmtHeader()  |  self.emptyIndentation()  |  self.unparsed()
 	
 	
 	@Rule
@@ -1210,9 +1210,17 @@ class Python25Grammar (Grammar):
 
 	
 	@Rule
-	def emptyIndentedSuite(self):
-		return ( ObjectNode( Schema.Indent )  +  ObjectNode( Schema.Dedent ) ).suppress()
+	def emptyIndentation(self):
+		return ( self.emptyIndent() | self.emptyDedent() ).suppress()
 	
+	@Rule
+	def emptyIndent(self):
+		return ObjectNode( Schema.Indent )  +  self.emptyIndentation().optional() + ObjectNode( Schema.Dedent )
+	
+	@Rule
+	def emptyDedent(self):
+		return ObjectNode( Schema.Dedent )  +  self.emptyIndentation().optional() + ObjectNode( Schema.Indent )
+
 	@Rule
 	def suite(self):
 		return self.suiteItem().zeroOrMore()
