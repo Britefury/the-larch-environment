@@ -152,7 +152,7 @@ def statementNodeEditor(grammar, styleSheet, node, contents):
 		else:
 			statementLine.setStructuralValueObject( node )
 		statementLine.addTreeEventListener( TextEditEvent, StatementTreeEventListener.newListener( grammar.singleLineStatement() ) )
-		statementLine.addTreeEventListener( PythonSelectionTreeEvent, StatementTreeEventListener.newListener( grammar.singleLineStatement() ) )
+		statementLine.addTreeEventListener( PythonSelectionEditTreeEvent, StatementTreeEventListener.newListener( grammar.singleLineStatement() ) )
 		statementLine.addInteractor( _statementIndentationInteractor )
 		return statementLine
 	else:
@@ -164,7 +164,7 @@ def compoundStatementHeaderEditor(grammar, styleSheet, node, headerContents, hea
 	
 	headerStatementLine.setStructuralValueObject( node )
 	headerStatementLine.addTreeEventListener( TextEditEvent, StatementTreeEventListener.newListener( grammar.singleLineStatement() ) )
-	headerStatementLine.addTreeEventListener( PythonSelectionTreeEvent, StatementTreeEventListener.newListener( grammar.singleLineStatement() ) )
+	headerStatementLine.addTreeEventListener( PythonSelectionEditTreeEvent, StatementTreeEventListener.newListener( grammar.singleLineStatement() ) )
 	headerStatementLine.addInteractor( _statementIndentationInteractor )
 	if headerContainerFn is not None:
 		headerStatementLine = headerContainerFn( headerStatementLine )
@@ -189,7 +189,7 @@ def compoundStatementEditor(ctx, grammar, styleSheet, node, precedence, compound
 		headerStatementLine = styleSheet.statementLine( headerContents )
 		headerStatementLine.setStructuralValueObject( headerNode )
 		headerStatementLine.addTreeEventListener( TextEditEvent, CompoundHeaderTreeEventListener.newListener( statementParser ) )
-		headerStatementLine.addTreeEventListener( PythonSelectionTreeEvent, CompoundHeaderTreeEventListener.newListener( statementParser ) )
+		headerStatementLine.addTreeEventListener( PythonSelectionEditTreeEvent, CompoundHeaderTreeEventListener.newListener( statementParser ) )
 		headerStatementLine.addInteractor( _statementIndentationInteractor )
 		
 		if headerContainerFn is not None:
@@ -210,7 +210,7 @@ def compoundStatementEditor(ctx, grammar, styleSheet, node, precedence, compound
 			suiteElement.setStructuralValueObject( Schema.IndentedBlock( suite=suite ) )
 			suiteListener = SuiteTreeEventListener( suiteParser, suite )
 			suiteElement.addTreeEventListener( TextEditEvent, suiteListener )
-			suiteElement.addTreeEventListener( PythonSelectionTreeEvent, suiteListener )
+			suiteElement.addTreeEventListener( PythonSelectionEditTreeEvent, suiteListener )
 			suiteElement.addTreeEventListener( PythonIndentationTreeEvent, suiteListener )
 			
 			statementContents.extend( [ headerStatementLine.alignHExpand(), suiteElement.alignHExpand() ] )
@@ -274,7 +274,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		suiteListener = SuiteTreeEventListener( self._parser.suite(), suite )
 		suiteElement.addTreeEventListener( TextEditEvent, suiteListener )
 		suiteElement.addTreeEventListener( PythonIndentationTreeEvent, suiteListener )
-		suiteElement.addTreeEventListener( PythonSelectionTreeEvent, suiteListener )
+		suiteElement.addTreeEventListener( PythonSelectionEditTreeEvent, suiteListener )
 		return suiteElement
 
 
@@ -1176,7 +1176,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		suiteListener = SuiteTreeEventListener( self._parser.compoundSuite(), suite )
 		suiteElement.addTreeEventListener( TextEditEvent, suiteListener )
 		suiteElement.addTreeEventListener( PythonIndentationTreeEvent, suiteListener )
-		suiteElement.addTreeEventListener( PythonSelectionTreeEvent, suiteListener )
+		suiteElement.addTreeEventListener( PythonSelectionEditTreeEvent, suiteListener )
 		
 		return styleSheet.badIndentation( suiteElement )
 

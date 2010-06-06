@@ -505,8 +505,8 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 		int commonLength = top;
 		for (int i = 0; i < top; i++)
 		{
-			GSymFragmentView x = pathA.get( pathA.size() - i );
-			GSymFragmentView y = pathB.get( pathB.size() - i );
+			GSymFragmentView x = pathA.get( pathA.size() - 1 - i );
+			GSymFragmentView y = pathB.get( pathB.size() - 1 - i );
 			if ( x != y )
 			{
 				commonLength = i;

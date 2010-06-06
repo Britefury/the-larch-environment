@@ -16,8 +16,6 @@ from BritefuryJ.Parser.Utils.Tokens import identifier, decimalInteger, hexIntege
 from BritefuryJ.Parser.Utils.OperatorParser import PrefixLevel, SuffixLevel, InfixLeftLevel, InfixRightLevel, InfixChainLevel, UnaryOperator, BinaryOperator, ChainOperator, OperatorTable
 from BritefuryJ.Parser.ItemStream import ItemStreamBuilder
 
-from BritefuryJ.Transformation import DefaultIdentityTransformationFunction
-
 from Britefury.Tests.BritefuryJ.Parser.ParserTestCase import ParserTestCase
 
 from Britefury.Util.NodeUtil import isStringNode
@@ -39,13 +37,6 @@ from GSymCore.Languages.Python25.PythonEditor.Keywords import *
 #
 
 
-_identity = DefaultIdentityTransformationFunction()
-def _updatedNodeCopy(node, xform, **fieldValues):
-	newNode = _identity( node, xform )
-	newNode.update( fieldValues )
-	return newNode
-
-
 def _incrementParens(node):
 	def _xform(node, innerNodeXform):
 		return node
@@ -58,7 +49,9 @@ def _incrementParens(node):
 		except ValueError:
 			pass
 	numParens += 1
-	return _updatedNodeCopy( node, _xform, parens=str( numParens ) )
+	newNode = node.clone()
+	newNode['parens'] = str( numParens )
+	return  newNode
 
 
 
