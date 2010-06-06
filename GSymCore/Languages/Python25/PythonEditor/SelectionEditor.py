@@ -7,9 +7,6 @@
 ##-*************************
 from weakref import WeakValueDictionary
 
-import cPickle
-
-
 from java.lang import Object
 from java.io import IOException
 from java.util import List
@@ -22,10 +19,12 @@ from BritefuryJ.DocModel import DMList, DMObject, DMObjectInterface, DMNode
 
 from BritefuryJ.Parser.ItemStream import ItemStreamBuilder, ItemStream
 
-
 from BritefuryJ.DocPresent.Clipboard import *
 from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent import *
+
+from BritefuryJ.GSym.LinearRepresentationEditor import LinearRepresentationEditHandler, LinearRepresentationBuffer, SelectionEditTreeEvent
+
 
 from Britefury.Util.NodeUtil import *
 
@@ -48,40 +47,13 @@ class NotImplementedError (Exception):
 	pass
 
 
-class Python25Buffer (Object):
+class Python25Buffer (LinearRepresentationBuffer):
 	pass
-
-
-class Python25BufferStream (Python25Buffer):
-	def __init__(self, stream):
-		self.stream = stream
-	
 
 
 
 _python25BufferDataFlavor = LocalDataFlavor( Python25Buffer )
 
-
-
-class Python25Transferable (Transferable):
-	def __init__(self, data):
-		self.data = data
-
-	def getTransferData(self, flavor):
-		if flavor is _python25BufferDataFlavor:
-			return self.data
-		else:
-			raise UnsupportedFlavorException
-	
-	def getTransferDataFlavors(self):
-		return [ _python25BufferDataFlavor ]
-	
-	def isDataFlavorSupported(self, flavor):
-		return flavor is _python25BufferDataFlavor
-	
-
-
-	
 
 
 		
@@ -94,30 +66,27 @@ class PythonIndentTreeEvent (PythonIndentationTreeEvent):
 class PythonDedentTreeEvent (PythonIndentationTreeEvent):
 	pass
 
-class PythonSelectionTreeEvent (object):
-	def __init__(self, sourceElement):
-		self.sourceElement = sourceElement
+class PythonSelectionEditTreeEvent (SelectionEditTreeEvent):
+	def __init__(self, editHandler, sourceElement):
+		super( PythonSelectionEditTreeEvent, self ).__init__( editHandler, sourceElement )
 
-class IndentPythonSelectionTreeEvent (PythonSelectionTreeEvent):
-	def __init__(self, sourceElement):
-		super( IndentPythonSelectionTreeEvent, self ).__init__( sourceElement )
+class IndentPythonSelectionTreeEvent (PythonSelectionEditTreeEvent):
+	def __init__(self, editHandler, sourceElement):
+		super( IndentPythonSelectionTreeEvent, self ).__init__( editHandler, sourceElement )
 
-class DedentPythonSelectionTreeEvent (PythonSelectionTreeEvent):
-	def __init__(self, sourceElement):
-		super( DedentPythonSelectionTreeEvent, self ).__init__( sourceElement )
-
-class SelectionEditLinearRepresentationEvent (PythonSelectionTreeEvent):
-	def __init__(self, sourceElement):
-		super( SelectionEditLinearRepresentationEvent, self ).__init__( sourceElement )
-
-
-		
-		
+class DedentPythonSelectionTreeEvent (PythonSelectionEditTreeEvent):
+	def __init__(self, editHandler, sourceElement):
+		super( DedentPythonSelectionTreeEvent, self ).__init__( editHandler, sourceElement )
 
 		
 
-class Python25EditHandler (EditHandler):
+def _python25BufferFactory(stream):
+	return Python25Buffer( stream )
+
+
+class Python25EditHandler (LinearRepresentationEditHandler):
 	def __init__(self):
+		super( Python25EditHandler, self ).__init__( isStmtFragment, _python25BufferFactory, _python25BufferDataFlavor )
 		self._grammar = Python25Grammar()
 		
 		
@@ -217,7 +186,7 @@ class Python25EditHandler (EditHandler):
 		startStmtElement.setStructuralPrefixObject( Schema.Indent() )
 		endStmtElement.setStructuralSuffixObject( Schema.Dedent() )
 		
-		bSuccess = root.getFragmentContentElement().postTreeEvent( IndentPythonSelectionTreeEvent( rootElement ) )
+		bSuccess = root.getFragmentContentElement().postTreeEvent( IndentPythonSelectionTreeEvent( self, rootElement ) )
 		if not bSuccess:
 			print 'Python25EditHandler._indentSelection(): INDENT SELECTION FAILED'
 			startStmtElement.clearStructuralPrefix()
@@ -250,175 +219,25 @@ class Python25EditHandler (EditHandler):
 		startStmtElement.setStructuralPrefixObject( Schema.Dedent() )
 		endStmtElement.setStructuralSuffixObject( Schema.Indent() )
 		
-		bSuccess = rootElement.postTreeEvent( DedentPythonSelectionTreeEvent( rootElement ) )
+		bSuccess = rootElement.postTreeEvent( DedentPythonSelectionTreeEvent( self, rootElement ) )
 		if not bSuccess:
 			print 'Python25EditHandler._dedentSelection(): DEDENT SELECTION FAILED'
 			startStmtElement.clearStructuralPrefix()
 			endStmtElement.clearStructuralSuffix()
 
 			
-			
-			
-	def deleteSelection(self, selection):
-		self.replaceSelection( selection, None )
 		
-		
-	def replaceSelectionWithText(self, selection, replacement):
-		self.replaceSelection( selection, replacement )
-	
-	
-	def replaceSelection(self, selection, replacement):
-		if not selection.isEmpty():
-			startMarker = selection.getStartMarker()
-			endMarker = selection.getEndMarker()
 			
-			# Get the statements that contain the start and end markers
-			startContext = getStatementContextFromElement( startMarker.getElement() )
-			endContext = getStatementContextFromElement( endMarker.getElement() )
-			# Get the statement elements
-			startStmtElement = startContext.getFragmentContentElement()
-			endStmtElement = endContext.getFragmentContentElement()
-			
-			if replacement is not None:
-				if isinstance( replacement, Python25BufferStream ):
-					replacement = replacement.stream
-				elif isinstance( replacement, str )  or  isinstance( replacement, unicode ):
-					builder = ItemStreamBuilder()
-					builder.appendTextValue( replacement )
-					replacement = builder.stream()
-				else:
-					replacement = None
-					
-				if replacement is not None:
-					# Get paths to start and end nodes, from the common root statement
-					path0, path1 = getStatementContextPathsFromCommonRoot( startContext, endContext )
-					root = path0[0]
-					
-					# Get the content element, not the fragment itself, otherwise editing operations that involve the module (top level) will trigger events that will NOT be caught
-					rootElement = root.getFragmentContentElement()
-				
-					before = rootElement.getLinearRepresentationFromStartToMarker( startMarker )
-					after = rootElement.getLinearRepresentationFromMarkerToEnd( endMarker )
-					
-					stream = joinStreamsForInsertion( root, before, replacement, after )
+	def joinStreamsForInsertion(self, subtreeRootFragment, before, insertion, after):
+		return joinStreamsForInsertion( subtreeRootFragment, before, insertion, after )
 	
-					rootElement.setStructuralValueStream( stream )
-					selection.clear()
-					rootElement.postTreeEvent( SelectionEditLinearRepresentationEvent( rootElement ) )
-			else:
-				# Now, insert the parsed text into the document		
-				if startContext is endContext:
-					builder = ItemStreamBuilder()
-					builder.extend( startStmtElement.getLinearRepresentationFromStartToMarker( startMarker ) )
-					builder.extend( endStmtElement.getLinearRepresentationFromMarkerToEnd( endMarker ) )
-					startStmtElement.setStructuralValueStream( builder.stream() )
-					selection.clear()
-					startStmtElement.postTreeEvent( SelectionEditLinearRepresentationEvent( startStmtElement ) )
-				else:
-					# Get paths to start and end nodes, from the common root statement
-					path0, path1 = getStatementContextPathsFromCommonRoot( startContext, endContext )
-					root = path0[0]
-					
-					# Get the content element, not the fragment itself, otherwise editing operations that involve the module (top level) will trigger events that will NOT be caught
-					rootElement = root.getFragmentContentElement()
-				
-					before = rootElement.getLinearRepresentationFromStartToMarker( startMarker )
-					after = rootElement.getLinearRepresentationFromMarkerToEnd( endMarker )
-					stream = joinStreamsAroundDeletionPoint( before, after )
-					rootElement.setStructuralValueStream( stream )
-					selection.clear()
-					rootElement.postTreeEvent( SelectionEditLinearRepresentationEvent( rootElement ) )
-				
+	def joinStreamsForDeletion(self, subtreeRootFragment, before, after):
+		return joinStreamsAroundDeletionPoint( before, after )
+	
+	def copyStructuralValue(self, x):
+		return x.deepCopy()
 	
 	
-	
-	
-	def _insertBufferAtMarker(self, marker, b):
-		markerStmtContext = getStatementContextFromElement( marker.getElement() )
-		markerStmtElement = markerStmtContext.getFragmentContentElement()
+	def createSelectionEditTreeEvent(self, sourceElement):
+		return PythonSelectionEditTreeEvent( self, sourceElement )
 
-		if isinstance( b, Python25BufferStream ):
-			before = markerStmtElement.getLinearRepresentationFromStartToMarker( marker )
-			after = markerStmtElement.getLinearRepresentationFromMarkerToEnd( marker )
-					
-			stream = joinStreamsForInsertion( markerStmtContext, before, b.stream, after )
-	
-			markerStmtElement.setStructuralValueStream( stream )
-			markerStmtElement.postTreeEvent( SelectionEditLinearRepresentationEvent( markerStmtElement ) )
-			
-
-			
-			
-	
-	
-	
-	
-	
-	def getExportActions(self, selection):					# -> int
-		return self.COPY_OR_MOVE
-	
-	
-	
-	def createExportTransferable(self, selection):					# -> Transferable
-		if not selection.isEmpty():
-			startMarker = selection.getStartMarker()
-			endMarker = selection.getEndMarker()
-			
-			# Get the statements that contain the start and end markers
-			startContext = getStatementContextFromElement( startMarker.getElement() )
-			endContext = getStatementContextFromElement( endMarker.getElement() )
-	
-			# Get the statement elements
-			startStmtElement = startContext.getFragmentContentElement()
-			endStmtElement = endContext.getFragmentContentElement()
-			
-			rootElement = startStmtElement.getRootElement()
-			stream = rootElement.getLinearRepresentationInSelection( selection )
-			
-			builder = ItemStreamBuilder()
-			for item in stream.getItems():
-				if isinstance( item, ItemStream.StructuralItem ):
-					builder.appendStructuralValue( item.getStructuralValue().deepCopy() )
-				elif isinstance( item, ItemStream.TextItem ):
-					builder.appendTextValue( item.getTextValue() )
-			
-			return Python25Transferable( Python25BufferStream( builder.stream() ) )
-
-		return None
-
-				
-				
-				
-	def exportDone(self, selection, transferable, action):				# -> None,   transferable <- Transferable, action <- int
-		if action == self.MOVE:
-			self.deleteSelection( selection )
-		
-			
-			
-
-	def canImport(self, caret, selection, dataTransfer):					# -> bool,   dataTransfer <- DataTransfer
-		return dataTransfer.isDataFlavorSupported( _python25BufferDataFlavor )
-
-		
-		
-	def importData(self, caret, selection, dataTransfer):					# -> bool,   dataTransfer <- DataTransfer
-		if not self.canImport( caret, selection, dataTransfer ):
-			return False
-		try:
-			data = dataTransfer.getTransferData( _python25BufferDataFlavor )
-		except UnsupportedFlavorException:
-			return False
-		except IOException:
-			return False
-		
-		# Paste
-		if not selection.isEmpty():
-			self.replaceSelection( selection, data )
-			return True
-		else:
-			caretMarker = caret.getMarker()
-			if caretMarker.isValid():
-				self._insertBufferAtMarker( caretMarker, data )
-				return True
-			return False
-		

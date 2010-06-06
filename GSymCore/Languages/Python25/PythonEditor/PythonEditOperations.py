@@ -77,6 +77,19 @@ def isIndentedBlock(node):
 
 
 
+
+
+#
+#
+# FRAGMENT CLASSIFICATION
+#
+#
+
+def isStmtFragment(fragment):
+	return isStmt( fragment.getDocNode() )
+
+
+
 #
 #
 # DOM / CONTEXT NAVIGATION

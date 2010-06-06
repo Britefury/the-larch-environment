@@ -38,11 +38,11 @@ from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
 from GSymCore.Languages.Python25.PythonEditor.Parser import Python25Grammar
 from GSymCore.Languages.Python25.PythonEditor.Precedence import *
 from GSymCore.Languages.Python25.PythonEditor.PythonEditOperations import *
-from GSymCore.Languages.Python25.PythonEditor.SelectionEditor import PythonSelectionTreeEvent
+from GSymCore.Languages.Python25.PythonEditor.SelectionEditor import PythonSelectionEditTreeEvent
 
 
 
-
+	
 
 #
 #
@@ -76,10 +76,10 @@ class ParsedExpressionTreeEventListener (TreeEventListener):
 		self._outerPrecedence = outerPrecedence
 
 	def onTreeEvent(self, element, sourceElement, event):
-		# if @event is a @PythonSelectionTreeEvent, and its source element is @element, then @element has had its
+		# if @event is a @PythonSelectionEditTreeEvent, and its source element is @element, then @element has had its
 		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it.
 		# Otherwise, clear the structural represnetation of all elements on the path from the source element to @element
-		if not ( isinstance( event, PythonSelectionTreeEvent )  and  event.sourceElement is element ):
+		if not ( isinstance( event, PythonSelectionEditTreeEvent )  and  event.getSourceElement() is element ):
 			sourceElement.clearStructuralRepresentationsOnPathUpTo( element )
 			element.clearStructuralRepresentation()
 		value = element.getLinearRepresentation()
@@ -147,10 +147,10 @@ class StatementTreeEventListener (TreeEventListener):
 
 		
 	def onTreeEvent(self, element, sourceElement, event):
-		# if @event is a @PythonSelectionTreeEvent, and its source element is @element, then @element has had its
+		# if @event is a @PythonSelectionEditTreeEvent, and its source element is @element, then @element has had its
 		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it.
 		# Otherwise, clear the structural represnetation of all elements on the path from the source element to @element
-		if not ( isinstance( event, PythonSelectionTreeEvent )  and  event.sourceElement is element ):
+		if not ( isinstance( event, PythonSelectionEditTreeEvent )  and  event.getSourceElement() is element ):
 			sourceElement.clearStructuralRepresentationsOnPathUpTo( element )
 			element.clearStructuralRepresentation()
 		ctx = element.getFragmentContext()
@@ -242,9 +242,9 @@ class CompoundHeaderTreeEventListener (TreeEventListener):
 
 		
 	def onTreeEvent(self, element, sourceElement, event):
-		# if @event is a @PythonSelectionTreeEvent, and its source element is @element, then @element has had its
+		# if @event is a @PythonSelectionEditTreeEvent, and its source element is @element, then @element has had its
 		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it
-		if not isinstance( event, PythonSelectionTreeEvent )  or  event.sourceElement is not element:
+		if not isinstance( event, PythonSelectionEditTreeEvent )  or  event.getSourceElement() is not element:
 			element.clearStructuralRepresentation()
 		ctx = element.getFragmentContext()
 		# Get the content
@@ -283,9 +283,9 @@ class SuiteTreeEventListener (TreeEventListener):
 
 		
 	def onTreeEvent(self, element, sourceElement, event):
-		# if @event is a @PythonSelectionTreeEvent, and its source element is @element, then @element has had its
+		# if @event is a @PythonSelectionEditTreeEvent, and its source element is @element, then @element has had its
 		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it
-		if not isinstance( event, PythonSelectionTreeEvent )  or  event.sourceElement is not element:
+		if not isinstance( event, PythonSelectionEditTreeEvent )  or  event.getSourceElement() is not element:
 			element.clearStructuralRepresentation()
 		ctx = element.getFragmentContext()
 		# Get the content
