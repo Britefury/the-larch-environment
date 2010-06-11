@@ -548,7 +548,7 @@ class PythonEditorStyleSheet (StyleSheet):
 		return punctuationStyle.text( '...' )
 	
 	
-	def subscriptTuple(self, items, trailingSeparator):
+	def subscriptTuple(self, items, bTrailingSeparator):
 		return self._noParenTupleListViewLayout().createListElement( items, TrailingSeparator.ALWAYS   if bTrailingSeparator   else TrailingSeparator.NEVER )
 	
 	
