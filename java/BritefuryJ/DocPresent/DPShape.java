@@ -115,9 +115,9 @@ public class DPShape extends DPContentLeaf
 	}
 
 	
-	protected Point2 getPopupPositionInLocalSpace()
+	protected AABox2 getVisibleBoxInLocalSpace()
 	{
-		return new Point2( bounds.getLowerX(), bounds.getUpperY() );
+		return bounds;
 	}
 	
 

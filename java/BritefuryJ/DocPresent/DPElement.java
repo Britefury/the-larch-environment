@@ -848,9 +848,9 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		return layoutNode != null  ?  layoutNode.getSizeInParentSpace()  :  ( parent != null  ?  parent.getSizeInParentSpace()  :  new Vector2());
 	}
 	
-	protected Point2 getPopupPositionInLocalSpace()
+	protected AABox2 getVisibleBoxInLocalSpace()
 	{
-		return new Point2( 0.0, getHeight() );
+		return getLocalAABox();
 	}
 	
 	
@@ -3085,12 +3085,27 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	public void popupBelow(DPElement popupContents)
 	{
-		Point2 localPos = getPopupPositionInLocalSpace();
+		AABox2 visibleBox = getVisibleBoxInLocalSpace();
+		popup( popupContents, new Point2( visibleBox.getLowerX(), visibleBox.getUpperY() ) );
+	}
+	
+	public void popupRight(DPElement popupContents)
+	{
+		AABox2 visibleBox = getVisibleBoxInLocalSpace();
+		popup( popupContents, new Point2( visibleBox.getUpperX(), visibleBox.getLowerY() ) );
+	}
+	
+	public void popup(DPElement popupContents, Point2 localPos)
+	{
 		if ( isLocalSpacePointVisible( localPos ) )
 		{
 			Xform2 x = getLocalToRootXform();
 			Point2 rootPos = x.transform( localPos );
 			getRootElement().createPopup( popupContents, rootPos );
+		}
+		else
+		{
+			getRootElement().createPopupAtMousePosition( popupContents );
 		}
 	}
 	

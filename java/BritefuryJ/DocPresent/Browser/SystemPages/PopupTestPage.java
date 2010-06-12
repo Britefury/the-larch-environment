@@ -30,7 +30,7 @@ public class PopupTestPage extends SystemPage
 	
 	protected String getDescription()
 	{
-		return "Popup windows are used to display additional controls at the request of the user.";
+		return "Popup windows are used to display additional presented content, in a detached window.";
 	}
 	
 	
@@ -61,6 +61,9 @@ public class PopupTestPage extends SystemPage
 	private static PrimitiveStyleSheet blackText = styleSheet.withForeground( Color.black );
 	private static PrimitiveStyleSheet redText = styleSheet.withForeground( Color.red );
 	private static PrimitiveStyleSheet greenText = styleSheet.withForeground( new Color( 0.0f, 0.5f, 0.0f ) );
+	private static PrimitiveStyleSheet blueText = styleSheet.withForeground( new Color( 0.0f, 0.0f, 0.5f ) );
+	private static PrimitiveStyleSheet purpleText = styleSheet.withForeground( new Color( 0.5f, 0.0f, 0.5f ) );
+	private static PrimitiveStyleSheet cyanText = styleSheet.withForeground( new Color( 0.0f, 0.5f, 0.5f ) );
 
 	private static ControlsStyleSheet controlsStyleSheet = ControlsStyleSheet.instance;
 
@@ -73,9 +76,9 @@ public class PopupTestPage extends SystemPage
 		return styleSheet.vbox( new DPElement[] { heading.padY( 10.0 ), contents } );
 	}
 	
-	protected DPElement colouredText(PrimitiveStyleSheet style)
+	protected static DPElement colouredText(PrimitiveStyleSheet style)
 	{
-		return style.staticText( "Change the colour of this text using the hyperlinks below." );
+		return style.staticText( "Change the colour of this text, using the hyperlinks within the popup activated by the hyperlink below." );
 	}
 	
 	protected DPElement createContents()
@@ -84,13 +87,42 @@ public class PopupTestPage extends SystemPage
 		Hyperlink blackLink = controlsStyleSheet.link( "Black", new LinkColourChanger( colouredTextProxy, blackText ) );
 		Hyperlink redLink = controlsStyleSheet.link( "Red", new LinkColourChanger( colouredTextProxy, redText ) );
 		Hyperlink greenLink = controlsStyleSheet.link( "Green", new LinkColourChanger( colouredTextProxy, greenText ) );
-		final DPElement colourLinks = styleSheet.withHBoxSpacing( 20.0 ).hbox( new DPElement[] { blackLink.getElement(), redLink.getElement(), greenLink.getElement() } ).padX( 5.0 );
+		Hyperlink blueLink = controlsStyleSheet.link( "Blue", new LinkColourChanger( colouredTextProxy, blueText ) );
+		Hyperlink purpleLink = controlsStyleSheet.link( "Purple", new LinkColourChanger( colouredTextProxy, purpleText ) );
+		Hyperlink cyanLink = controlsStyleSheet.link( "Cyan", new LinkColourChanger( colouredTextProxy, cyanText ) );
+
+		final DPElement innerAColourLinks = styleSheet.vbox( new DPElement[] { greenLink.getElement(), blueLink.getElement() } ).padY( 5.0 );
+		Hyperlink.LinkListener innerAPopupListener = new Hyperlink.LinkListener()
+		{
+			public boolean onLinkClicked(Hyperlink link, PointerButtonEvent event)
+			{
+				link.getElement().popupBelow( innerAColourLinks );
+				return true;
+			}
+		};
+		Hyperlink innerAPopupLink = controlsStyleSheet.link( "More A...", innerAPopupListener );
+		
+		
+		final DPElement innerBColourLinks = styleSheet.vbox( new DPElement[] { purpleLink.getElement(), cyanLink.getElement() } ).padY( 5.0 );
+		Hyperlink.LinkListener innerBPopupListener = new Hyperlink.LinkListener()
+		{
+			public boolean onLinkClicked(Hyperlink link, PointerButtonEvent event)
+			{
+				link.getElement().popupBelow( innerBColourLinks );
+				return true;
+			}
+		};
+		Hyperlink innerBPopupLink = controlsStyleSheet.link( "More B...", innerBPopupListener );
+		
+		
+		final DPElement colourLinks = styleSheet.withHBoxSpacing( 20.0 ).hbox( new DPElement[] { blackLink.getElement(), redLink.getElement(),
+				innerAPopupLink.getElement(), innerBPopupLink.getElement() } ).padX( 5.0 );
 		
 		Hyperlink.LinkListener popupListener = new Hyperlink.LinkListener()
 		{
 			public boolean onLinkClicked(Hyperlink link, PointerButtonEvent event)
 			{
-				link.getElement().popupBelow( colourLinks );
+				link.getElement().popupRight( colourLinks );
 				return true;
 			}
 		};
