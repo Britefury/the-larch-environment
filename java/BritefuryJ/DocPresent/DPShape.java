@@ -115,6 +115,12 @@ public class DPShape extends DPContentLeaf
 	}
 
 	
+	protected Point2 getPopupPositionInLocalSpace()
+	{
+		return new Point2( bounds.getLowerX(), bounds.getUpperY() );
+	}
+	
+
 	public boolean isRedrawRequiredOnHover()
 	{
 		ShapeStyleParams s = (ShapeStyleParams)styleParams;

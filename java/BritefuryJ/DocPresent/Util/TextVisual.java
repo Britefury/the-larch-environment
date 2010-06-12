@@ -29,7 +29,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.JComponent;
 import javax.swing.text.Segment;
 
 import BritefuryJ.DocPresent.PresentationComponent;
@@ -301,7 +300,6 @@ public class TextVisual
 	private final String text;
 	private final Font font;
 	private final boolean bMixedSizeCaps;
-	private boolean bRealised;
 	private LReqBox reqBox;
 	
 
@@ -313,6 +311,7 @@ public class TextVisual
 		this.font = font;
 		this.bMixedSizeCaps = bMixedSizeCaps;
 		reqBox = new LReqBox();
+		computeRequisition();
 	}
 	
 	
@@ -330,64 +329,55 @@ public class TextVisual
 	
 	
 	
-	public void realise(PresentationComponent.RootElement root)
+	private void computeRequisition()
 	{
-		if ( !bRealised )
+		if ( text.length() > 0 )
 		{
-			JComponent component = root.getComponent();
-			assert component != null;
-			if ( text.length() > 0 )
+			FontRenderContext frc = new FontRenderContext( null, true, true );
+			
+			if ( bMixedSizeCaps )
 			{
-				Graphics2D graphics = (Graphics2D)component.getGraphics();
-				FontRenderContext frc = graphics.getFontRenderContext();
-				
-				if ( bMixedSizeCaps )
-				{
-					Font upperCaseFont = font;
-					Font lowerCaseFont = upperCaseFont.deriveFont( upperCaseFont.getSize2D() * SMALL_CAPS_FONT_SCALE );
+				Font upperCaseFont = font;
+				Font lowerCaseFont = upperCaseFont.deriveFont( upperCaseFont.getSize2D() * SMALL_CAPS_FONT_SCALE );
 
-					MixedSizeCapsAttributedCharacterIterator charIter = new MixedSizeCapsAttributedCharacterIterator( text, lowerCaseFont, upperCaseFont );
-					layout = new TextLayout( charIter, frc );
-				}
-				else
-				{
-					layout = new TextLayout( text, font, frc );
-				}
-
-				double width = layout.getBounds().getWidth();
-				double ascent = layout.getAscent(), descent = layout.getDescent();
-				
-				reqBox.setRequisitionX( width, layout.getAdvance() );
-				reqBox.setRequisitionY( layout.getAscent() + layout.getDescent(), layout.getLeading(), layout.getAscent() );
-				
-				// Squiggle shape
-				squiggleUnderlineShape = new Path2D.Double();
-				int numSquiggleSegments = (int)( width / descent  +  0.5 );
-				squiggleUnderlineShape.moveTo( 0.0, ascent + descent );
-				double squiggleDeltaX = width / (double)numSquiggleSegments;
-				double squiggleX = squiggleDeltaX;
-				
-				for (int i = 0; i < numSquiggleSegments; i++)
-				{
-					squiggleUnderlineShape.lineTo( squiggleX, ( i % 2 ) == 0  ?  ascent  :  ascent + descent );
-					squiggleX += squiggleDeltaX;
-				}
+				MixedSizeCapsAttributedCharacterIterator charIter = new MixedSizeCapsAttributedCharacterIterator( text, lowerCaseFont, upperCaseFont );
+				layout = new TextLayout( charIter, frc );
 			}
 			else
 			{
-				Graphics2D graphics = (Graphics2D)component.getGraphics();
-				assert graphics != null;
-				FontRenderContext frc = graphics.getFontRenderContext();
-				LineMetrics lineMetrics = font.getLineMetrics( "", frc );
-				
-				reqBox.setRequisitionX( 0.0, 0.0 );
-				reqBox.setRequisitionY( lineMetrics.getAscent() + lineMetrics.getDescent(), lineMetrics.getLeading(), lineMetrics.getAscent() );
-				
-				squiggleUnderlineShape = null;
+				layout = new TextLayout( text, font, frc );
 			}
+
+			double width = layout.getBounds().getWidth();
+			double ascent = layout.getAscent(), descent = layout.getDescent();
 			
-			bRealised = true;
+			reqBox.setRequisitionX( width, layout.getAdvance() );
+			reqBox.setRequisitionY( layout.getAscent() + layout.getDescent(), layout.getLeading(), layout.getAscent() );
+			
+			// Squiggle shape
+			squiggleUnderlineShape = new Path2D.Double();
+			int numSquiggleSegments = (int)( width / descent  +  0.5 );
+			squiggleUnderlineShape.moveTo( 0.0, ascent + descent );
+			double squiggleDeltaX = width / (double)numSquiggleSegments;
+			double squiggleX = squiggleDeltaX;
+			
+			for (int i = 0; i < numSquiggleSegments; i++)
+			{
+				squiggleUnderlineShape.lineTo( squiggleX, ( i % 2 ) == 0  ?  ascent  :  ascent + descent );
+				squiggleX += squiggleDeltaX;
+			}
 		}
+		else
+		{
+			FontRenderContext frc = new FontRenderContext( null, true, true );
+			LineMetrics lineMetrics = font.getLineMetrics( "", frc );
+			
+			reqBox.setRequisitionX( 0.0, 0.0 );
+			reqBox.setRequisitionY( lineMetrics.getAscent() + lineMetrics.getDescent(), lineMetrics.getLeading(), lineMetrics.getAscent() );
+			
+			squiggleUnderlineShape = null;
+		}
+
 	}
 	
 	

@@ -250,6 +250,25 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 		}
 	}
 	
+	protected boolean isLocalSpacePointVisible(Point2 point)
+	{
+		if ( getLocalAABox().containsPoint( point ) )
+		{
+			if ( parent != null )
+			{
+				return parent.isLocalSpacePointVisible( getLocalToParentXform().transform( point ) );
+			}
+			else
+			{
+				return true;
+			}
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
 	
 	
 	//

@@ -848,6 +848,11 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		return layoutNode != null  ?  layoutNode.getSizeInParentSpace()  :  ( parent != null  ?  parent.getSizeInParentSpace()  :  new Vector2());
 	}
 	
+	protected Point2 getPopupPositionInLocalSpace()
+	{
+		return new Point2( 0.0, getHeight() );
+	}
+	
 	
 
 	public double getAllocationX()
@@ -1093,6 +1098,18 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		if ( parent != null )
 		{
 			parent.ensureRegionVisible( getLocalToParentXform().transform( box ) );
+		}
+	}
+	
+	protected boolean isLocalSpacePointVisible(Point2 point)
+	{
+		if ( parent != null )
+		{
+			return parent.isLocalSpacePointVisible( getLocalToParentXform().transform( point ) );
+		}
+		else
+		{
+			return true;
 		}
 	}
 	
@@ -3054,6 +3071,27 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		}
 		
 		return false;
+	}
+	
+	
+	
+	
+	
+	//
+	//
+	// POPUP METHODS
+	//
+	//
+	
+	public void popupBelow(DPElement popupContents)
+	{
+		Point2 localPos = getPopupPositionInLocalSpace();
+		if ( isLocalSpacePointVisible( localPos ) )
+		{
+			Xform2 x = getLocalToRootXform();
+			Point2 rootPos = x.transform( localPos );
+			getRootElement().createPopup( popupContents, rootPos );
+		}
 	}
 	
 

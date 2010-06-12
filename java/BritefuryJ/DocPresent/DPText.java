@@ -110,10 +110,6 @@ public class DPText extends DPContentLeafEditable
 			visual = v;
 			LayoutNodeText layout = (LayoutNodeText)getLayoutNode();
 			layout.setVisual( visual );
-			if ( isRealised() )
-			{
-				visual.realise( getRootElement() );
-			}
 			
 			queueResize();
 		}
@@ -123,14 +119,6 @@ public class DPText extends DPContentLeafEditable
 	public TextHitInfo hitTest(Point2 pos)
 	{
 		return visual.hitTest( pos );
-	}
-	
-	
-	
-	protected void onRealise()
-	{
-		super.onRealise();
-		visual.realise( getRootElement() );
 	}
 	
 	
