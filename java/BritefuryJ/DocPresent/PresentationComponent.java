@@ -14,6 +14,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Window;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -27,6 +28,8 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.ImageObserver;
 import java.util.ArrayList;
@@ -34,9 +37,11 @@ import java.util.List;
 import java.util.WeakHashMap;
 
 import javax.swing.JComponent;
-import javax.swing.JPopupMenu;
+import javax.swing.JPanel;
+import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
+import javax.swing.border.LineBorder;
 
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Caret.CaretListener;
@@ -80,6 +85,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 
 	
 	private static final long serialVersionUID = 1L;
+	
+	
+	
 	
 	
 	
@@ -1399,6 +1407,12 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		{
 			component.popupPresentation( popupContents, (int)( localPos.x + 0.5 ), (int)( localPos.y + 0.5 ) );
 		}
+		
+		protected void createPopupAtMousePosition(DPElement popupContents)
+		{
+			Point mouse = component.getMousePosition();
+			component.popupPresentation( popupContents, mouse.x, mouse.y );
+		}
 
 		
 		
@@ -1496,12 +1510,26 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	
 	
 	public RootElement rootElement;
-	private boolean bShown, bConfigured, bUseContentSize = false;
+	private boolean bShown, bConfigured;
+	private PresentationComponent popupParent, popupChild;
+	private JWindow containingPopupWindow = null;
 	
 	
 	public PresentationComponent()
 	{
+		this( null, null );
+	}
+	
+	private PresentationComponent(PresentationComponent popupParent, JWindow containingPopupWindow)
+	{
 		super();
+		
+		this.popupParent = popupParent;
+		this.containingPopupWindow = containingPopupWindow;
+		if ( popupParent != null )
+		{
+			popupParent.popupChild = this;
+		}
 		
 		rootElement = new RootElement( this );
 		
@@ -1522,8 +1550,6 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		setTransferHandler( new PresAreaTransferHandler() );
 	}
-	
-	
 	
 	
 	public RootElement getRootElement()
@@ -1618,7 +1644,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	
 	public Dimension getMinimumSize()
 	{
-		if ( bUseContentSize )
+		if ( isPopup() )
 		{
 			Dimension s = rootElement.getMinimumSize();
 			return s;
@@ -1631,7 +1657,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	
 	public Dimension getPreferredSize()
 	{
-		if ( bUseContentSize )
+		if ( isPopup() )
 		{
 			Dimension s = rootElement.getPreferredSize();
 			return s;
@@ -1644,7 +1670,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	
 	public Dimension getMaximumSize()
 	{
-		if ( bUseContentSize )
+		if ( isPopup() )
 		{
 			Dimension s = rootElement.getMaximumSize();
 			return s;
@@ -1658,9 +1684,8 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	
 	private void notifyQueueReallocation()
 	{
-		if ( bUseContentSize )
+		if ( isPopup() )
 		{
-			System.out.println( "PresentationComponent.notifyQueueReallocation()" );
 			revalidate();
 		}
 	}
@@ -1827,14 +1852,98 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	}
 	
 	
+	private boolean isPopup()
+	{
+		return popupParent != null;
+	}
+	
+	private PresentationComponent getRootPresentationComponent()
+	{
+		PresentationComponent root = this;
+		while ( root.popupParent != null )
+		{
+			root = root.popupParent;
+		}
+		return root;
+	}
+	
+	
+	private void closePopupSubtree()
+	{
+		if ( popupChild != null )
+		{
+			popupChild.closePopupSubtree();
+			popupChild = null;
+		}
+		containingPopupWindow.setVisible( false );
+	}
+	
+	private void closePopupToRoot()
+	{
+		PresentationComponent p = this;
+		p.containingPopupWindow.setVisible( false );
+		while ( p.containingPopupWindow != null )
+		{
+			p.containingPopupWindow.setVisible( false );
+			p = p.popupParent;
+			p.popupChild = null;
+		}
+	}
+
 	private void popupPresentation(DPElement popupContents, int x, int y)
 	{
-		JPopupMenu popup = new JPopupMenu();
+		if ( popupChild != null )
+		{
+			popupChild.closePopupSubtree();
+			popupChild = null;
+		}
 		
-		PresentationComponent popupComponent = new PresentationComponent();
-		popupComponent.bUseContentSize = true;
+		// Get the root owning window
+		PresentationComponent root = getRootPresentationComponent();
+		Window ownerWindow = SwingUtilities.getWindowAncestor( root );
+		
+		// Offset the popup position by the location of this presentation component on the screen
+		Point locOnScreen = getLocationOnScreen();
+		x += locOnScreen.x;
+		y += locOnScreen.y;
+		
+		// Create the popup window
+		final JWindow popupWindow = new JWindow( ownerWindow );
+		popupWindow.setAlwaysOnTop( true );
+		popupWindow.setFocusable( true );
+		
+		// Create a presentation component for the popup contents, and add them
+		final PresentationComponent popupComponent = new PresentationComponent( this, popupWindow );
 		popupComponent.getRootElement().setChild( popupContents );
-		popup.add( popupComponent );
-		popup.show( this, x, y );
+		
+		JPanel panel = new JPanel();
+		panel.setBorder( new LineBorder( new Color( 0.0f, 0.15f, 0.35f ), 1 ) );
+		panel.add( popupComponent );
+		
+		// Add to the popup window
+		popupWindow.add( panel );
+		popupWindow.setLocation( x, y );
+		popupWindow.pack();
+		popupWindow.setVisible( true );
+		popupWindow.requestFocus();
+		
+		WindowFocusListener focusListener = new WindowFocusListener()
+		{
+			public void windowGainedFocus(WindowEvent arg0)
+			{
+			}
+
+			public void windowLostFocus(WindowEvent arg0)
+			{
+				// If the popup has no child
+				if ( popupComponent.popupChild == null )
+				{
+					// Close all popups, up to the root
+					popupComponent.closePopupToRoot();
+				}
+			}
+		};
+		
+		popupWindow.addWindowFocusListener( focusListener );
 	}
 }

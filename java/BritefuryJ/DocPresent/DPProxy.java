@@ -116,17 +116,21 @@ public class DPProxy extends DPContainer
 	
 	
 		
-	protected Point2 getPopupPositionInLocalSpace()
+	protected AABox2 getVisibleBoxInLocalSpace()
 	{
 		AABox2 boxes[] = computeBoundingBoxes();
-		AABox2 lastBox = boxes.length > 0  ?  boxes[boxes.length-1]  :  null;
-		if ( lastBox != null )
+		if ( boxes.length > 0 )
 		{
-			return new Point2( lastBox.getLowerX(), lastBox.getUpperY() );
+			AABox2 visibleBox = new AABox2();
+			for (AABox2 box: boxes)
+			{
+				visibleBox.addBox( box );
+			}
+			return visibleBox;
 		}
 		else
 		{
-			return new Point2( 0.0, getHeight() );
+			return getLocalAABox();
 		}
 	}
 	
