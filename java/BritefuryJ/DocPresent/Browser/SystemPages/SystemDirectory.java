@@ -43,6 +43,7 @@ public class SystemDirectory
 		controlTestPages.add( new ButtonTestPage() );
 		controlTestPages.add( new CheckboxTestPage() );
 		controlTestPages.add( new HyperlinkTestPage() );
+		controlTestPages.add( new PopupTestPage() );
 		controlTestPages.add( new ScrollBarTestPage() );
 		controlTestPages.add( new ScrolledViewportTestPage() );
 		controlTestPages.add( new TextEntryTestPage() );

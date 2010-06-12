@@ -8,6 +8,7 @@ package BritefuryJ.DocPresent;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.WeakHashMap;
 
 import javax.swing.JComponent;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
@@ -561,6 +563,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		public void queueReallocation()
 		{
 			bAllocationRequired = true;
+			component.notifyQueueReallocation();
 			queueFullRedraw();
 		}
 		
@@ -614,6 +617,53 @@ public class PresentationComponent extends JComponent implements ComponentListen
 					ensureVisibilityElement = null;
 				}
 			}
+		}
+		
+
+		
+		
+		private void performAllocationForSpaceRequirements()
+		{
+			if ( bAllocationRequired )
+			{
+				LayoutNodeRootElement rootLayout = (LayoutNodeRootElement)getLayoutNode();
+	
+				// Get X requisition
+				LReqBoxInterface reqX = rootLayout.refreshRequisitionX();
+				
+				// Allocate X
+				double prevWidth = rootLayout.getAllocationX();
+				rootLayout.allocateX( reqX, 0.0, windowSize.x );
+				rootLayout.refreshAllocationX( prevWidth );
+				
+				// Get Y requisition
+				LReqBoxInterface reqY = rootLayout.refreshRequisitionY();
+				
+				// Allocate Y
+				LAllocV prevAllocV = rootLayout.getAllocV();
+				//rootLayout.allocateY( reqY, 0.0, reqY.getReqHeight() );
+				rootLayout.allocateY( reqY, 0.0, windowSize.y );
+				rootLayout.refreshAllocationY( prevAllocV );
+			}
+		}
+		
+		private Dimension getMinimumSize()
+		{
+			performAllocationForSpaceRequirements();
+			LayoutNodeRootElement rootLayout = (LayoutNodeRootElement)getLayoutNode();
+			return new Dimension( (int)( rootLayout.getReqMinWidth() + 1.0 ),  (int)( rootLayout.getReqHeight() ) );
+		}
+		
+		private Dimension getPreferredSize()
+		{
+			performAllocationForSpaceRequirements();
+			LayoutNodeRootElement rootLayout = (LayoutNodeRootElement)getLayoutNode();
+			return new Dimension( (int)( rootLayout.getReqPrefWidth() + 1.0 ),  (int)( rootLayout.getReqHeight() ) );
+		}
+		
+		private Dimension getMaximumSize()
+		{
+			return getPreferredSize();
 		}
 		
 		
@@ -1345,6 +1395,13 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		
 		
+		protected void createPopup(DPElement popupContents, Point2 localPos)
+		{
+			component.popupPresentation( popupContents, (int)( localPos.x + 0.5 ), (int)( localPos.y + 0.5 ) );
+		}
+
+		
+		
 		//
 		//
 		// SELECTION METHODS (private)
@@ -1439,7 +1496,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	
 	
 	public RootElement rootElement;
-	private boolean bShown, bConfigured;
+	private boolean bShown, bConfigured, bUseContentSize = false;
 	
 	
 	public PresentationComponent()
@@ -1555,6 +1612,57 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	public void mouseWheelMoved(MouseWheelEvent e)
 	{
 		rootElement.mouseWheelEvent( new Point2( (double)e.getX(), (double)e.getY() ), e.getWheelRotation(), e.getUnitsToScroll(), getButtonModifiers( e ) );
+	}
+	
+	
+	
+	public Dimension getMinimumSize()
+	{
+		if ( bUseContentSize )
+		{
+			Dimension s = rootElement.getMinimumSize();
+			return s;
+		}
+		else
+		{
+			return super.getMinimumSize();
+		}
+	}
+	
+	public Dimension getPreferredSize()
+	{
+		if ( bUseContentSize )
+		{
+			Dimension s = rootElement.getPreferredSize();
+			return s;
+		}
+		else
+		{
+			return super.getPreferredSize();
+		}
+	}
+	
+	public Dimension getMaximumSize()
+	{
+		if ( bUseContentSize )
+		{
+			Dimension s = rootElement.getMaximumSize();
+			return s;
+		}
+		else
+		{
+			return super.getMaximumSize();
+		}
+	}
+	
+	
+	private void notifyQueueReallocation()
+	{
+		if ( bUseContentSize )
+		{
+			System.out.println( "PresentationComponent.notifyQueueReallocation()" );
+			revalidate();
+		}
 	}
 	
 	
@@ -1716,5 +1824,17 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		}
 		
 		return modifiers;
+	}
+	
+	
+	private void popupPresentation(DPElement popupContents, int x, int y)
+	{
+		JPopupMenu popup = new JPopupMenu();
+		
+		PresentationComponent popupComponent = new PresentationComponent();
+		popupComponent.bUseContentSize = true;
+		popupComponent.getRootElement().setChild( popupContents );
+		popup.add( popupComponent );
+		popup.show( this, x, y );
 	}
 }

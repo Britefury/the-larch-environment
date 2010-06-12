@@ -63,7 +63,6 @@ public class TextNode extends DrawingNode
 
 		PresentationComponent.RootElement root = owner.getDrawingRootElement();
 		visual = TextVisual.getTextVisual( root, text, font, bMixedSizeCaps );
-		visual.realise( root );
 		LReqBox req = visual.getRequisition();
 		parentSpaceBox = new AABox2( 0.0, 0.0, req.getReqPrefWidth(), req.getReqHeight() );
 	}

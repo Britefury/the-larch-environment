@@ -50,6 +50,20 @@ public class DPSpan extends DPContainerSequence
 	}
 
 	
+	protected Point2 getPopupPositionInLocalSpace()
+	{
+		AABox2 boxes[] = computeBoundingBoxes();
+		AABox2 lastBox = boxes.length > 0  ?  boxes[boxes.length-1]  :  null;
+		if ( lastBox != null )
+		{
+			return new Point2( lastBox.getLowerX(), lastBox.getUpperY() );
+		}
+		else
+		{
+			return new Point2( 0.0, getHeight() );
+		}
+	}
+	
 	protected Shape[] getShapes()
 	{
 		AABox2 bounds[] = computeBoundingBoxes();

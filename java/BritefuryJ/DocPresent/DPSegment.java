@@ -293,6 +293,20 @@ public class DPSegment extends DPContainer
 	
 	
 	
+	protected Point2 getPopupPositionInLocalSpace()
+	{
+		AABox2 boxes[] = computeBoundingBoxes();
+		AABox2 lastBox = boxes.length > 0  ?  boxes[boxes.length-1]  :  null;
+		if ( lastBox != null )
+		{
+			return new Point2( lastBox.getLowerX(), lastBox.getUpperY() );
+		}
+		else
+		{
+			return new Point2( 0.0, getHeight() );
+		}
+	}
+	
 	//
 	//
 	// Bounding box methods, and point query methods
