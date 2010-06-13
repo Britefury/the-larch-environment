@@ -8,6 +8,7 @@
 import os
 from datetime import datetime
 
+from java.awt import Color
 from java.awt.event import KeyEvent
 
 from java.util.regex import Pattern
@@ -28,7 +29,8 @@ from Britefury.Util.NodeUtil import *
 from BritefuryJ.AttributeTable import *
 
 from BritefuryJ.DocPresent.Browser import Location
-from BritefuryJ.DocPresent.StyleSheet import PrimitiveStyleSheet
+from BritefuryJ.DocPresent.StyleSheet import PrimitiveStyleSheet, RichTextStyleSheet
+from BritefuryJ.DocPresent.Controls import ControlsStyleSheet
 from BritefuryJ.DocPresent import *
 
 from BritefuryJ.GSym import GSymPerspective, GSymSubject, GSymRelativeLocationResolver
@@ -49,6 +51,32 @@ _worksheetInteractor = WorksheetInteractor()
 
 
 
+
+_titleStyle = PrimitiveStyleSheet.instance.withForeground( Color( 0.0, 0.0, 0.5 ) ).withFontBold( True )
+_optionsBoxStyle = PrimitiveStyleSheet.instance.withHBoxSpacing( 10.0 )
+_controlsStyle = ControlsStyleSheet.instance
+
+def _worksheetContextMenuFactory(element, menu):
+	def makeStyleFn(style):
+		def _onLink(link, event):
+			rootElement.getCaret().getElement().postTreeEvent( ParagraphStyleEvent( style ) )
+		return _onLink
+
+	rootElement = element.getRootElement()
+	
+	styleTitle = _titleStyle.staticText( 'Style' )
+	normalStyle = _controlsStyle.link( 'Normal', makeStyleFn( 'normal' ) ).getElement()
+	h1Style = _controlsStyle.link( 'H1', makeStyleFn( 'h1' ) ).getElement()
+	h2Style = _controlsStyle.link( 'H2', makeStyleFn( 'h2' ) ).getElement()
+	h3Style = _controlsStyle.link( 'H3', makeStyleFn( 'h3' ) ).getElement()
+	h4Style = _controlsStyle.link( 'H4', makeStyleFn( 'h4' ) ).getElement()
+	h5Style = _controlsStyle.link( 'H5', makeStyleFn( 'h5' ) ).getElement()
+	h6Style = _controlsStyle.link( 'H6', makeStyleFn( 'h6' ) ).getElement()
+	styles = _optionsBoxStyle.hbox( [ normalStyle, h1Style, h2Style, h3Style, h4Style, h5Style, h6Style ] )
+	menu.add( _optionsBoxStyle.vbox( [ styleTitle.alignHCentre(), styles ] ) )
+
+
+
 class WorksheetEditor (GSymViewObjectDispatch):
 	@ObjectDispatchMethod( ViewSchema.WorksheetView )
 	def Worksheet(self, ctx, styleSheet, inheritedState, node):
@@ -63,6 +91,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 		w = styleSheet.worksheet( title, contentViews )
 		w.addTreeEventListener( InsertPythonCodeEvent, worksheetTreeEventListener )
 		w.addInteractor( _worksheetInteractor )
+		w.addContextMenuFactory( _worksheetContextMenuFactory )
 		return w
 	
 	
@@ -85,6 +114,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 		elif style == 'h6':
 			p = styleSheet.h6( text )
 		p.addTreeEventListener( TextEditEvent, textTreeEventListener )
+		p.addTreeEventListener( TextOperationEvent, operationTreeEventListener )
 		p.addInteractor( _textInteractor )
 		return p
 

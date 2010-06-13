@@ -10,7 +10,7 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 
 import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.DocPresent.ContextMenu.ContextMenu;
+import BritefuryJ.DocPresent.Controls.PopupMenu;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
@@ -33,7 +33,7 @@ public abstract class ElementInteractor
 		return false;
 	}
 	
-	public boolean onContextButton(DPElement element, ContextMenu menu)
+	public boolean onContextButton(DPElement element, PopupMenu menu)
 	{
 		return false;
 	}

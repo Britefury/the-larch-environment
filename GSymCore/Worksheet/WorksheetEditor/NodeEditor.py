@@ -29,7 +29,7 @@ from Britefury.gSym.View import EditOperations
 
 from GSymCore.Languages.Python25 import Python25
 
-from GSymCore.Worksheet import Schema
+from GSymCore.Worksheet import Schema, ViewSchema
 
 
 
@@ -102,12 +102,39 @@ class TextTreeEventListener (TreeEventListener):
 		
 		
 textTreeEventListener = TextTreeEventListener()
+
+
+
+class OperationTreeEventListener (TreeEventListener):
+	def __init__(self):
+		pass
+
+	def onTreeEvent(self, element, sourceElement, event):
+		return event.apply( element.getFragmentContext().getDocNode() )
 	
+operationTreeEventListener = OperationTreeEventListener()
+	
+
 
 class InsertPythonCodeEvent (object):
 	def __init__(self, node):
 		super( InsertPythonCodeEvent, self ).__init__()
 		self._node = node
+		
+class OperationEvent (object):
+	def apply(self, node):
+		return False
+
+class TextOperationEvent (OperationEvent):
+	pass
+
+class ParagraphStyleEvent(TextOperationEvent):
+	def __init__(self, style):
+		self._style = style
+		
+	def apply(self, node):
+		node.setStyle( self._style )
+		return True
 
 	
 class TextInteractor (ElementInteractor):
