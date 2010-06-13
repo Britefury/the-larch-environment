@@ -95,10 +95,9 @@ public class ProxyAndSpanTestPage extends SystemPage
 		
 		Hyperlink.LinkListener onModifySpanLink = new Hyperlink.LinkListener()
 		{
-			public boolean onLinkClicked(Hyperlink link, PointerButtonEvent buttonEvent)
+			public void onLinkClicked(Hyperlink link, PointerButtonEvent buttonEvent)
 			{
 				span.setChildren( makeTextNodes( spanSecondaryText, greenText ) );
-				return true;
 			}
 		};
 		Hyperlink modifySpanLink = controlsStyleSheet.link( "Place secondary text into span", onModifySpanLink );
@@ -122,21 +121,19 @@ public class ProxyAndSpanTestPage extends SystemPage
 		
 		Hyperlink.LinkListener onModifySpanLink = new Hyperlink.LinkListener()
 		{
-			public boolean onLinkClicked(Hyperlink link, PointerButtonEvent buttonEvent)
+			public void onLinkClicked(Hyperlink link, PointerButtonEvent buttonEvent)
 			{
 				DPSpan span = (DPSpan)proxy.getChild();
 				span.setChildren( makeTextNodes( spanSecondaryText, greenText ) );
-				return true;
 			}
 		};
 		Hyperlink modifySpanLink = controlsStyleSheet.link( "Place secondary text into span", onModifySpanLink );
 		
 		Hyperlink.LinkListener onModifyProxyLink = new Hyperlink.LinkListener()
 		{
-			public boolean onLinkClicked(Hyperlink link, PointerButtonEvent buttonEvent)
+			public void onLinkClicked(Hyperlink link, PointerButtonEvent buttonEvent)
 			{
 				proxy.setChild( styleSheet.span( makeTextNodes( proxySecondaryText, seaGreenText ).toArray( new DPElement[0] ) ) );
-				return true;
 			}
 		};
 		Hyperlink modifyProxyLink = controlsStyleSheet.link( "Place new span into proxy", onModifyProxyLink );

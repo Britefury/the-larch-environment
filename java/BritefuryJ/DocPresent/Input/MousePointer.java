@@ -8,8 +8,7 @@ package BritefuryJ.DocPresent.Input;
 
 import java.awt.event.MouseEvent;
 
-import javax.swing.JComponent;
-
+import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerNavigationEvent;
 import BritefuryJ.DocPresent.Event.PointerNavigationPanEvent;
@@ -25,7 +24,7 @@ public class MousePointer extends Pointer
 	private boolean bNavigationDragInProgress = false;
 	
 	
-	public MousePointer(InputTable inputTable, PointerInputElement rootElement, PointerDndController dndController, JComponent component)
+	public MousePointer(InputTable inputTable, PointerInputElement rootElement, PointerDndController dndController, PresentationComponent component)
 	{
 		super( inputTable, rootElement, dndController, component );
 

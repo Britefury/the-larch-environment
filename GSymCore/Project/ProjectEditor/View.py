@@ -28,7 +28,8 @@ from Britefury.Util.NodeUtil import *
 from BritefuryJ.AttributeTable import *
 
 from BritefuryJ.DocPresent.Browser import Location
-from BritefuryJ.DocPresent.StyleSheet import PrimitiveStyleSheet
+from BritefuryJ.DocPresent.StyleSheet import PrimitiveStyleSheet, RichTextStyleSheet
+from BritefuryJ.DocPresent.Controls import ControlsStyleSheet
 from BritefuryJ.DocPresent import *
 
 from BritefuryJ.GSym import GSymPerspective, GSymSubject, GSymRelativeLocationResolver
@@ -42,22 +43,24 @@ from GSymCore.Project.ProjectEditor.ProjectEditorStyleSheet import ProjectEditor
 
 
 
-
+_controlsStyle = ControlsStyleSheet.instance.withClosePopupOnActivate()
 
 # handleNewPageFn(unit)
-def _populateNewPageMenu(world, menu, handleNewPageFn):
+def _newPageMenu(world, handleNewPageFn):
 	def _make_newPage(newPageFn):
-		def newPage(actionEvent):
+		def newPage(menuItem):
 			unit = newPageFn()
 			handleNewPageFn( unit )
 		return newPage
+	items = []
 	for newPageFactory in world.newPageFactories:
-		menu.addItem( newPageFactory.menuLabelText, _make_newPage( newPageFactory.newPageFn ) )
+		items.append( _controlsStyle.menuItemWithLabel( newPageFactory.menuLabelText, _make_newPage( newPageFactory.newPageFn ) ).getElement() )
+	return _controlsStyle.vpopupMenu( items )
 	
 	
 	
 # handleImportedPageFn(name, unit)
-def _populateImportPageMenu(world, component, menu, handleImportedPageFn):
+def _importPageMenu(world, component, handleImportedPageFn):
 	def _make_importPage(fileType, filePattern, importUnitFn):
 		def _import(actionEvent):
 			openDialog = JFileChooser()
@@ -78,8 +81,10 @@ def _populateImportPageMenu(world, component, menu, handleImportedPageFn):
 							handleImportedPageFn( unitName, unit )
 		return _import
 
+	items = []
 	for pageImporter in world.pageImporters:
-		menu.addItem( pageImporter.menuLabelText, _make_importPage( pageImporter.fileType, pageImporter.filePattern, pageImporter.importFn ) )
+		items.append( _controlsStyle.menuItemWithLabel( pageImporter.menuLabelText, _make_importPage( pageImporter.fileType, pageImporter.filePattern, pageImporter.importFn ) ).getElement() )
+	return _controlsStyle.vpopupMenu( items )
 
 
 
@@ -106,7 +111,6 @@ class ProjectView (GSymViewObjectNodeDispatch):
 				DocumentManagement.promptSaveDocumentAs( ctx.getSubjectContext()['world'], link.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn )
 			else:
 				document.save()
-			return True
 				
 		
 		def _onSaveAs(link, buttonEvent):
@@ -114,7 +118,6 @@ class ProjectView (GSymViewObjectNodeDispatch):
 				document.saveAs( filename )
 			
 			DocumentManagement.promptSaveDocumentAs( ctx.getSubjectContext()['world'], link.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn )
-			return  True
 		
 		
 		subjectContext = ctx.getSubjectContext()
@@ -132,7 +135,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 	@DMObjectNodeDispatchMethod( Schema.Package )
 	def Package(self, ctx, styleSheet, state, node, name, contents):
-		def _addPackage(actionEvent):
+		def _addPackage(menuItem):
 			contents.append( Schema.Package( name='New package', contents=[] ) )
 
 		def _onRenameAccept(textEntry, text):
@@ -141,7 +144,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		def _onRenameCancel(textEntry, originalText):
 			nameBox.setChildren( [ nameElement ] )
 		
-		def _onRename(actionEvent):
+		def _onRename(menuItem):
 			textEntry = styleSheet.renameEntry( name, _onRenameAccept, _onRenameCancel )
 			nameBox.setChildren( [ textEntry.getElement() ] )
 			textEntry.grabCaret()
@@ -155,11 +158,13 @@ class ProjectView (GSymViewObjectNodeDispatch):
 			contents.append( Schema.Page( name=name, unit=pageUnit ) )
 
 		def _packageContextMenuFactory(element, menu):
-			menu.addItem( 'New package', _addPackage )
-			_populateNewPageMenu( world, menu.addSubMenu( 'New page' ), _addPage )
-			_populateImportPageMenu( world, element.getRootElement().getComponent(), menu.addSubMenu( 'Import page' ), _importPage )
-			menu.addSeparator()
-			menu.addItem( 'Rename', _onRename )
+			menu.add( _controlsStyle.menuItemWithLabel( 'New package', _addPackage ).getElement() )
+			newPageMenu = _newPageMenu( world, _addPage )
+			importPageMenu = _importPageMenu( world, element.getRootElement().getComponent(), _importPage )
+			menu.add( _controlsStyle.subMenuItemRightWithLabel( 'New page', newPageMenu ).getElement() )
+			menu.add( _controlsStyle.subMenuItemRightWithLabel( 'Import page', importPageMenu ).getElement() )
+			menu.add( RichTextStyleSheet.instance.hseparator() )
+			menu.add( _controlsStyle.menuItemWithLabel( 'Rename', _onRename ).getElement() )
 			return True
 
 		location = state['location']
@@ -182,13 +187,13 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		def _onRenameCancel(textEntry, originalText):
 			nameBox.setChildren( [ nameElement ] )
 		
-		def _onRename(actionEvent):
+		def _onRename(menuItem):
 			textEntry = styleSheet.renameEntry( name, _onRenameAccept, _onRenameCancel )
 			nameBox.setChildren( [ textEntry.getElement() ] )
 			textEntry.grabCaret()
 		
 		def _pageContextMenuFactory(element, menu):
-			menu.addItem( 'Rename', _onRename )
+			menu.add( _controlsStyle.menuItemWithLabel( 'Rename', _onRename ).getElement() )
 			return True
 
 		location = state['location']

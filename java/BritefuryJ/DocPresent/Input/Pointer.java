@@ -17,11 +17,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import javax.swing.JComponent;
 import javax.swing.TransferHandler;
 
-import BritefuryJ.DocPresent.ContextMenu.ContextMenu;
-import BritefuryJ.DocPresent.ContextMenu.ContextPopupMenu;
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.PresentationComponent;
+import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
+import BritefuryJ.DocPresent.Controls.PopupMenu;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
@@ -156,7 +157,7 @@ public class Pointer extends PointerInterface
 			}
 		}
 
-		protected boolean handleContextButton(Pointer pointer, PointerButtonEvent event, ContextMenu menu)
+		protected boolean handleContextButton(Pointer pointer, PointerButtonEvent event, PopupMenu menu)
 		{
 			PointerInputElement childElement = element.getFirstPointerChildAtLocalPoint( event.getPointer().getLocalPos() );
 			if ( childElement != null )
@@ -492,12 +493,12 @@ public class Pointer extends PointerInterface
 	protected InputTable inputTable;
 	protected DndDropLocal dndDrop;
 	protected PointerDndController dndController;
-	protected JComponent component;
+	protected PresentationComponent component;
 	
 	protected ReferenceQueue<ElementEntry> refQueue = new ReferenceQueue<ElementEntry>();
 	protected HashMap<PointerInputElement, WeakReference<ElementEntry> > elementToEntryTable = new HashMap<PointerInputElement, WeakReference<ElementEntry> >();
 	
-	public Pointer(InputTable inputTable, PointerInputElement rootElement, PointerDndController dndController, JComponent component)
+	public Pointer(InputTable inputTable, PointerInputElement rootElement, PointerDndController dndController, PresentationComponent component)
 	{
 		this.inputTable = inputTable;
 		this.dndController = dndController;
@@ -574,11 +575,11 @@ public class Pointer extends PointerInterface
 		PointerButtonEvent event = new PointerButtonEvent( this, button, PointerButtonEvent.Action.DOWN );
 		if ( button == 3  &&  getModifiers() == Modifier.BUTTON3 )
 		{
-			ContextPopupMenu menu = new ContextPopupMenu( "" );
+			PopupMenu menu = ControlsStyleSheet.instance.withClosePopupOnActivate().vpopupMenu( new DPElement[] {} );
 			rootEntry.handleContextButton( this, event, menu );
 			if ( !menu.isEmpty() )
 			{
-				menu.show( component );
+				menu.popupAtMousePosition( component.getRootElement() );
 				return true;
 			}
 			return false;

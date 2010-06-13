@@ -91,6 +91,160 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	
 	
 	
+	public static class PresentationPopup
+	{
+		private JWindow popupWindow;
+		private PresentationComponent popupComponent;
+		private PopupChain chain;
+		private boolean bOpen;
+		
+		private PresentationPopup(PopupChain popupChain, Window ownerWindow, PresentationComponent parentComponent, DPElement popupContents, int x, int y, boolean bCloseOnLoseFocus)
+		{
+			chain = popupChain;
+			chain.addPopup( this );
+			bOpen = true;
+			
+			
+			// Create the popup window
+			popupWindow = new JWindow( ownerWindow );
+			popupWindow.setAlwaysOnTop( true );
+			popupWindow.setFocusable( true );
+			
+			// Create a presentation component for the popup contents, and add them
+			popupComponent = new PresentationComponent( this );
+			popupComponent.getRootElement().setChild( popupContents );
+			
+			JPanel panel = new JPanel();
+			panel.setBorder( new LineBorder( new Color( 0.0f, 0.15f, 0.35f ), 1 ) );
+			panel.add( popupComponent );
+			
+			// Add to the popup window
+			popupWindow.add( panel );
+			popupWindow.setLocation( x, y );
+			popupWindow.pack();
+			popupWindow.setVisible( true );
+			popupWindow.requestFocus();
+
+		
+			WindowFocusListener focusListener = new WindowFocusListener()
+			{
+				public void windowGainedFocus(WindowEvent arg0)
+				{
+				}
+
+				public void windowLostFocus(WindowEvent arg0)
+				{
+					// If the popup has no child
+					if ( bOpen )
+					{
+						if ( !chain.popupHasChild( PresentationPopup.this ) )
+						{
+							chain.closeChainNotContainingPointers();
+						}
+					}
+				}
+			};
+			
+			if ( bCloseOnLoseFocus )
+			{
+				popupWindow.addWindowFocusListener( focusListener );
+			}
+		}
+		
+		
+		public void closePopup()
+		{
+			bOpen = false;
+			popupWindow.setVisible( false );
+		}
+	}
+	
+	
+	private static class PopupChain
+	{
+		private ArrayList<PresentationPopup> popups = new ArrayList<PresentationPopup>();
+		private PresentationComponent owner;
+		
+		
+		public PopupChain(PresentationComponent owner)
+		{
+			this.owner = owner;
+		}
+		
+		
+		private void addPopup(PresentationPopup popup)
+		{
+			popups.add( 0, popup );
+		}
+		
+		
+		private boolean popupHasChild(PresentationPopup popup)
+		{
+			int index = popups.indexOf( popup );
+			if ( index == -1 )
+			{
+				throw new RuntimeException( "Could not find popup in chain" );
+			}
+			return index  > 0;
+		}
+
+
+		private void closeAllChildrenOf(PresentationPopup popup)
+		{
+			int index = 0;
+			for (PresentationPopup p: popups)
+			{
+				if ( p != popup )
+				{
+					p.closePopup();
+				}
+				else
+				{
+					ArrayList<PresentationPopup> ps = new ArrayList<PresentationPopup>();
+					ps.addAll( popups.subList( index, popups.size() ) );
+					popups = ps;
+					break;
+				}
+				index++;
+			}
+		}
+		
+		private void closeChainNotContainingPointers()
+		{
+			int index = 0;
+			for (PresentationPopup p: popups)
+			{
+				RootElement rootElement = p.popupComponent.getRootElement();
+				if ( rootElement.getInputTable().arePointersWithinBoundsOfElement( rootElement ) )
+				{
+					ArrayList<PresentationPopup> ps = new ArrayList<PresentationPopup>();
+					ps.addAll( popups.subList( index, popups.size() ) );
+					popups = ps;
+					return;
+				}
+				else
+				{
+					p.closePopup();
+				}
+				
+				index++;
+			}
+			popups.clear();
+		}
+
+
+		public void closeChain()
+		{
+			for (PresentationPopup p: popups)
+			{
+				p.closePopup();
+			}
+			popups.clear();
+		}
+	}
+	
+	
+	
 	private class PresAreaTransferHandler extends TransferHandler
 	{
 		private static final long serialVersionUID = 1L;
@@ -349,7 +503,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		
 		
-		public JComponent getComponent()
+		public PresentationComponent getComponent()
 		{
 			return component;
 		}
@@ -1403,15 +1557,15 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		
 		
-		protected void createPopup(DPElement popupContents, Point2 localPos)
+		protected PresentationPopup createPopupPresentation(DPElement popupContents, Point2 localPos, boolean bCloseOnLoseFocus)
 		{
-			component.popupPresentation( popupContents, (int)( localPos.x + 0.5 ), (int)( localPos.y + 0.5 ) );
+			return component.createPopupPresentation( popupContents, (int)( localPos.x + 0.5 ), (int)( localPos.y + 0.5 ), bCloseOnLoseFocus );
 		}
 		
-		protected void createPopupAtMousePosition(DPElement popupContents)
+		public PresentationPopup popupAtMousePosition(DPElement popupContents, boolean bCloseOnLoseFocus)
 		{
 			Point mouse = component.getMousePosition();
-			component.popupPresentation( popupContents, mouse.x, mouse.y );
+			return component.createPopupPresentation( popupContents, mouse.x, mouse.y, bCloseOnLoseFocus );
 		}
 
 		
@@ -1511,25 +1665,19 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	
 	public RootElement rootElement;
 	private boolean bShown, bConfigured;
-	private PresentationComponent popupParent, popupChild;
-	private JWindow containingPopupWindow = null;
+	private PresentationPopup containingPopup = null;
 	
 	
 	public PresentationComponent()
 	{
-		this( null, null );
+		this( null );
 	}
 	
-	private PresentationComponent(PresentationComponent popupParent, JWindow containingPopupWindow)
+	private PresentationComponent(PresentationPopup containingPopup)
 	{
 		super();
 		
-		this.popupParent = popupParent;
-		this.containingPopupWindow = containingPopupWindow;
-		if ( popupParent != null )
-		{
-			popupParent.popupChild = this;
-		}
+		this.containingPopup = containingPopup;
 		
 		rootElement = new RootElement( this );
 		
@@ -1852,98 +2000,83 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	}
 	
 	
-	private boolean isPopup()
-	{
-		return popupParent != null;
-	}
 	
-	private PresentationComponent getRootPresentationComponent()
+	//
+	//
+	// POPUP METHODS
+	//
+	//
+	
+	public boolean isPopup()
 	{
-		PresentationComponent root = this;
-		while ( root.popupParent != null )
-		{
-			root = root.popupParent;
-		}
-		return root;
+		return containingPopup != null;
 	}
 	
 	
-	private void closePopupSubtree()
+	public void closeContainingPopupChain()
 	{
-		if ( popupChild != null )
+		if ( isPopup() )
 		{
-			popupChild.closePopupSubtree();
-			popupChild = null;
+			containingPopup.chain.closeChain();
 		}
-		containingPopupWindow.setVisible( false );
+		else
+		{
+			throw new RuntimeException( "This presentation component is not contained within a popup" );
+		}
 	}
 	
-	private void closePopupToRoot()
+	private PopupChain getPopupChain()
 	{
-		PresentationComponent p = this;
-		p.containingPopupWindow.setVisible( false );
-		while ( p.containingPopupWindow != null )
+		if ( containingPopup != null )
 		{
-			p.containingPopupWindow.setVisible( false );
-			p = p.popupParent;
-			p.popupChild = null;
+			return containingPopup.chain;
+		}
+		else
+		{
+			return null;
 		}
 	}
-
-	private void popupPresentation(DPElement popupContents, int x, int y)
+	
+	private PopupChain createPopupChain()
 	{
-		if ( popupChild != null )
-		{
-			popupChild.closePopupSubtree();
-			popupChild = null;
-		}
-		
-		// Get the root owning window
-		PresentationComponent root = getRootPresentationComponent();
-		Window ownerWindow = SwingUtilities.getWindowAncestor( root );
-		
+		return new PopupChain( this );
+	}
+	
+	
+	private PresentationPopup createPopupPresentation(DPElement popupContents, int x, int y, boolean bCloseOnLoseFocus)
+	{
 		// Offset the popup position by the location of this presentation component on the screen
 		Point locOnScreen = getLocationOnScreen();
 		x += locOnScreen.x;
 		y += locOnScreen.y;
 		
-		// Create the popup window
-		final JWindow popupWindow = new JWindow( ownerWindow );
-		popupWindow.setAlwaysOnTop( true );
-		popupWindow.setFocusable( true );
-		
-		// Create a presentation component for the popup contents, and add them
-		final PresentationComponent popupComponent = new PresentationComponent( this, popupWindow );
-		popupComponent.getRootElement().setChild( popupContents );
-		
-		JPanel panel = new JPanel();
-		panel.setBorder( new LineBorder( new Color( 0.0f, 0.15f, 0.35f ), 1 ) );
-		panel.add( popupComponent );
-		
-		// Add to the popup window
-		popupWindow.add( panel );
-		popupWindow.setLocation( x, y );
-		popupWindow.pack();
-		popupWindow.setVisible( true );
-		popupWindow.requestFocus();
-		
-		WindowFocusListener focusListener = new WindowFocusListener()
+		// Get the popup chain that this presentation component is a member of
+		PopupChain chain = getPopupChain();
+		if ( chain != null )
 		{
-			public void windowGainedFocus(WindowEvent arg0)
-			{
-			}
-
-			public void windowLostFocus(WindowEvent arg0)
-			{
-				// If the popup has no child
-				if ( popupComponent.popupChild == null )
-				{
-					// Close all popups, up to the root
-					popupComponent.closePopupToRoot();
-				}
-			}
-		};
+			// Close any child popups
+			chain.closeAllChildrenOf( containingPopup );
+		}
 		
-		popupWindow.addWindowFocusListener( focusListener );
+		if ( chain == null )
+		{
+			// No chain; create a new one, rooted here
+			chain = createPopupChain();
+			
+			// Get the owning window of this presentation component
+			Window ownerWindow = SwingUtilities.getWindowAncestor( this );
+
+			return new PresentationPopup( chain, ownerWindow, this, popupContents, x, y, bCloseOnLoseFocus );
+		}
+		else
+		{
+			// Get the root presentation component
+			PresentationComponent root = chain.owner;
+			
+			// Get the owning window of the root presentation component
+			Window ownerWindow = SwingUtilities.getWindowAncestor( root );
+
+			return new PresentationPopup( chain, ownerWindow, this, popupContents, x, y, bCloseOnLoseFocus );
+		}
 	}
 }

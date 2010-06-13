@@ -47,10 +47,9 @@ public class HyperlinkTestPage extends SystemPage
 		}
 
 
-		public boolean onLinkClicked(Hyperlink link, PointerButtonEvent event)
+		public void onLinkClicked(Hyperlink link, PointerButtonEvent event)
 		{
 			parentElement.setChild( colouredText( style ) );
-			return true;
 		}
 	}
 

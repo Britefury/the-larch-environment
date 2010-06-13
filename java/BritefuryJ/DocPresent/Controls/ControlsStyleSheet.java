@@ -12,11 +12,13 @@ import java.awt.Cursor;
 import java.awt.Paint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
+import java.util.List;
 
 import org.python.core.PyObject;
 
 import BritefuryJ.AttributeTable.AttributeValues;
 import BritefuryJ.DocPresent.DPAspectRatioBin;
+import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPBox;
 import BritefuryJ.DocPresent.DPElement;
@@ -29,6 +31,7 @@ import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Browser.Location;
+import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.Painter.FilledOutlinePainter;
 import BritefuryJ.DocPresent.Painter.OutlinePainter;
 import BritefuryJ.DocPresent.Painter.Painter;
@@ -43,6 +46,9 @@ public class ControlsStyleSheet extends StyleSheet
 	private static final String defaultLinkFontFace = "Sans serif";
 	private static final int defaultLinkFontSize = 14;
 	private static final Cursor defaultLinkCursor = new Cursor( Cursor.HAND_CURSOR );
+	
+	private static final Painter defaultMenuItemHoverBackground = new FillPainter( new Color( 0.6f, 0.7f, 0.85f ) );
+	private static final AttributeValues defaultPopupMenuAttrs = new AttributeValues( new String[] { "hboxSpacing" }, new Object[] { 10.0 } );
 	
 	private static final Painter defaultCheckboxHoverBackground = new OutlinePainter( new Color( 0.5f, 0.625f, 0.75f ) );
 	private static final Border defaultCheckboxCheckBorder = new FilledBorder( 3.0, 3.0, 3.0, 3.0, 5.0, 5.0, new Color( 0.75f, 0.75f, 0.75f ) );
@@ -78,6 +84,8 @@ public class ControlsStyleSheet extends StyleSheet
 		super();
 		
 		initAttr( "primitiveStyleSheet", PrimitiveStyleSheet.instance );
+		
+		initAttr( "closePopupOnActivateFlag", false );
 
 		initAttr( "linkAttrs", new AttributeValues( new String[] { "editable", "fontFace", "fontSize", "foreground", "hoverForeground", "cursor" },
 				new Object[] { false, defaultLinkFontFace, defaultLinkFontSize, Color.blue, Color.red, defaultLinkCursor } ) );
@@ -89,6 +97,10 @@ public class ControlsStyleSheet extends StyleSheet
 		initAttr( "buttonBorderHighlightPaint", new Color( 0.0f, 0.5f, 0.5f ) );
 		initAttr( "buttonBackgPaint", new Color( 0.85f, 0.85f, 0.85f ) );
 		initAttr( "buttonBackgHighlightPaint", new Color( 0.925f, 0.925f, 0.925f ) );
+		
+		initAttr( "menuItemHoverBackground", defaultMenuItemHoverBackground );
+		
+		initAttr( "popupMenuAttrs", defaultPopupMenuAttrs );
 		
 		initAttr( "checkboxHoverBackground", defaultCheckboxHoverBackground );
 		initAttr( "checkboxCheckBorder", defaultCheckboxCheckBorder );
@@ -127,6 +139,22 @@ public class ControlsStyleSheet extends StyleSheet
 	public ControlsStyleSheet withPrimitiveStyleSheet(PrimitiveStyleSheet styleSheet)
 	{
 		return (ControlsStyleSheet)withAttr( "primitiveStyleSheet", styleSheet );
+	}
+	
+	
+	public ControlsStyleSheet withClosePopupOnActivateFlag(boolean bClosePopup)
+	{
+		return (ControlsStyleSheet)withAttr( "closePopupOnActivateFlag", bClosePopup );
+	}
+	
+	public ControlsStyleSheet withClosePopupOnActivate()
+	{
+		return withClosePopupOnActivateFlag( true );
+	}
+	
+	public ControlsStyleSheet withLeavePopupOnActivate()
+	{
+		return withClosePopupOnActivateFlag( false );
 	}
 	
 	
@@ -169,6 +197,18 @@ public class ControlsStyleSheet extends StyleSheet
 	public ControlsStyleSheet withButtonBackgHighlightPaint(Paint paint)
 	{
 		return (ControlsStyleSheet)withAttr( "buttonBackgHighlightPaint", paint );
+	}
+	
+	
+	public ControlsStyleSheet withMenuItemHoverBackground(Painter painter)
+	{
+		return (ControlsStyleSheet)withAttr( "menuItemHoverBackground", painter );
+	}
+	
+	
+	public ControlsStyleSheet withPopupMenuAttrs(AttributeValues attrs)
+	{
+		return (ControlsStyleSheet)withAttr( "popupMenuAttrs", attrs );
 	}
 	
 	
@@ -350,6 +390,36 @@ public class ControlsStyleSheet extends StyleSheet
 	
 	
 	
+	private PrimitiveStyleSheet menuItemStyleSheet = null;
+
+	private PrimitiveStyleSheet getMenuItemStyleSheet()
+	{
+		if ( menuItemStyleSheet == null )
+		{
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			Painter hoverBackground = getNonNull( "menuItemHoverBackground", Painter.class, defaultMenuItemHoverBackground );
+			menuItemStyleSheet = primitive.withHoverBackground( hoverBackground );
+		}
+		return menuItemStyleSheet;
+	}
+	
+	
+	
+	private PrimitiveStyleSheet popupMenuStyleSheet = null;
+
+	private PrimitiveStyleSheet getPopupMenuStyleSheet()
+	{
+		if ( popupMenuStyleSheet == null )
+		{
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			AttributeValues attrs = getNonNull( "popupMenuAttrs", AttributeValues.class, defaultPopupMenuAttrs );
+			popupMenuStyleSheet = (PrimitiveStyleSheet)primitive.withAttrValues( attrs );
+		}
+		return popupMenuStyleSheet;
+	}
+	
+	
+	
 	private PrimitiveStyleSheet checkboxStyleSheet = null;
 
 	private PrimitiveStyleSheet getCheckboxStyleSheet()
@@ -502,46 +572,102 @@ public class ControlsStyleSheet extends StyleSheet
 	
 	public Hyperlink link(String txt, Location targetLocation)
 	{
+		boolean bClosePopupOnActivate = getNonNull( "closePopupOnActivateFlag", Boolean.class, false );
 		DPText element = getLinkStyleSheet().staticText( txt );
-		return new Hyperlink( element, targetLocation );
+		return new Hyperlink( element, targetLocation, bClosePopupOnActivate );
 	}
 	
 	public Hyperlink link(String txt, Hyperlink.LinkListener listener)
 	{
+		boolean bClosePopupOnActivate = getNonNull( "closePopupOnActivateFlag", Boolean.class, false );
 		DPText element = getLinkStyleSheet().staticText( txt );
-		return new Hyperlink( element, listener );
+		return new Hyperlink( element, listener, bClosePopupOnActivate );
 	}
 	
 	
 	
 	public Button button(DPElement child, Button.ButtonListener listener)
 	{
+		boolean bClosePopupOnActivate = getNonNull( "closePopupOnActivateFlag", Boolean.class, false );
 		DPBorder element = getButtonStyleSheet().border( child );
-		return new Button( element, getButtonBorder(), getButtonHighlightBorder(), listener );
-	}
-
-	public Button button(DPElement child, PyObject listener)
-	{
-		DPBorder element = getButtonStyleSheet().border( child );
-		return new Button( element, getButtonBorder(), getButtonHighlightBorder(), listener );
+		return new Button( element, getButtonBorder(), getButtonHighlightBorder(), listener, bClosePopupOnActivate );
 	}
 
 	public Button buttonWithLabel(String text, Button.ButtonListener listener)
 	{
 		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+		boolean bClosePopupOnActivate = getNonNull( "closePopupOnActivateFlag", Boolean.class, false );
 		DPElement child = primitive.staticText( text );
 		DPBorder element = getButtonStyleSheet().border( child );
-		return new Button( element, getButtonBorder(), getButtonHighlightBorder(), listener );
-	}
-
-	public Button buttonWithLabel(String text, PyObject listener)
-	{
-		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
-		DPElement child = primitive.staticText( text );
-		DPBorder element = getButtonStyleSheet().border( child );
-		return new Button( element, getButtonBorder(), getButtonHighlightBorder(), listener );
+		return new Button( element, getButtonBorder(), getButtonHighlightBorder(), listener, bClosePopupOnActivate );
 	}
 	
+	
+	
+	public MenuItem menuItem(DPElement child, MenuItem.MenuItemListener listener)
+	{
+		boolean bClosePopupOnActivate = getNonNull( "closePopupOnActivateFlag", Boolean.class, false );
+		PrimitiveStyleSheet menuItemStyle = getMenuItemStyleSheet();
+		DPBin element = menuItemStyle.bin( child.alignHExpand() );
+		return new MenuItem( (DPBin)element.alignHExpand(), listener, bClosePopupOnActivate );
+	}
+
+	public MenuItem menuItemWithLabel(String text, MenuItem.MenuItemListener listener)
+	{
+		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+		return menuItem( primitive.staticText( text ), listener );
+	}
+
+	public MenuItem subMenuItemRight(DPElement child, PopupMenu subMenu)
+	{
+		PrimitiveStyleSheet menuItemStyle = getMenuItemStyleSheet();
+		DPBin element = menuItemStyle.bin( child.alignHExpand() );
+		return new MenuItem( (DPBin)element.alignHExpand(), subMenu, MenuItem.SubmenuPopupDirection.RIGHT, false );
+	}
+
+	public MenuItem subMenuItemDown(DPElement child, PopupMenu subMenu)
+	{
+		PrimitiveStyleSheet menuItemStyle = getMenuItemStyleSheet();
+		DPBin element = menuItemStyle.bin( child.alignHExpand() );
+		return new MenuItem( (DPBin)element.alignHExpand(), subMenu, MenuItem.SubmenuPopupDirection.DOWN, false );
+	}
+
+	public MenuItem subMenuItemRightWithLabel(String text, PopupMenu subMenu)
+	{
+		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+		return subMenuItemRight( primitive.staticText( text ), subMenu );
+	}
+
+	public MenuItem subMenuItemDownWithLabel(String text, PopupMenu subMenu)
+	{
+		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+		return subMenuItemDown( primitive.staticText( text ), subMenu );
+	}
+
+	public PopupMenu hpopupMenu(DPElement items[])
+	{
+		PrimitiveStyleSheet popupMenuStyle = getPopupMenuStyleSheet();
+		return new PopupMenu( popupMenuStyle.hbox( items ) );
+	}
+
+	public PopupMenu hpopupMenu(List<DPElement> items)
+	{
+		PrimitiveStyleSheet popupMenuStyle = getPopupMenuStyleSheet();
+		return new PopupMenu( popupMenuStyle.hbox( items ) );
+	}
+
+	public PopupMenu vpopupMenu(DPElement items[])
+	{
+		PrimitiveStyleSheet popupMenuStyle = getPopupMenuStyleSheet();
+		return new PopupMenu( popupMenuStyle.vbox( items ) );
+	}
+
+	public PopupMenu vpopupMenu(List<DPElement> items)
+	{
+		PrimitiveStyleSheet popupMenuStyle = getPopupMenuStyleSheet();
+		return new PopupMenu( popupMenuStyle.vbox( items ) );
+	}
+
 	
 	
 	public Checkbox checkbox(DPElement child, boolean state, Checkbox.CheckboxListener listener)
@@ -560,21 +686,10 @@ public class ControlsStyleSheet extends StyleSheet
 		return checkbox;
 	}
 	
-	public Checkbox checkboxWithLabel(String labelText, boolean state, PyObject listener)
-	{
-		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
-		return checkbox( primitive.staticText( labelText ), state, listener );
-	}
-	
 	public Checkbox checkboxWithLabel(String labelText, boolean state, Checkbox.CheckboxListener listener)
 	{
 		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 		return checkbox( primitive.staticText( labelText ), state, listener );
-	}
-	
-	public Checkbox checkbox(DPElement child, boolean state, PyObject listener)
-	{
-		return checkbox( child, state, new Checkbox.PyCheckboxListener( listener ) );
 	}
 	
 	

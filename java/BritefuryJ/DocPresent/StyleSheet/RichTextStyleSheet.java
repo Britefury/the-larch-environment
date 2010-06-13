@@ -15,6 +15,8 @@ import java.util.List;
 import BritefuryJ.AttributeTable.AttributeValues;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.FilledBorder;
+import BritefuryJ.DocPresent.Painter.FillPainter;
+import BritefuryJ.DocPresent.Painter.Painter;
 
 
 public class RichTextStyleSheet extends StyleSheet
@@ -34,6 +36,9 @@ public class RichTextStyleSheet extends StyleSheet
 	private static final AttributeValues defaultH4Attrs = new AttributeValues( new String[] { "fontSize", "foreground", "fontItalic" }, new Object[] { 22, new Color( 0.15f, 0.3f, 0.45f  ), true } );
 	private static final AttributeValues defaultH5Attrs = new AttributeValues( new String[] { "fontSize", "foreground", "fontItalic" }, new Object[] { 18, new Color( 0.2f, 0.4f, 0.6f ), true } );
 	private static final AttributeValues defaultH6Attrs = new AttributeValues( new String[] { "fontSize", "foreground", "fontItalic" }, new Object[] { 16, Color.black, true } );
+	private static final Painter defaultSeparatorPainter = new FillPainter( new Color( 32, 87, 147 ) );
+	private static final double defaultSeparatorMajorPadding = 15.0;
+	private static final double defaultSeparatorMinorPadding = 3.0;
 
 	
 	public static final RichTextStyleSheet instance = new RichTextStyleSheet();
@@ -62,6 +67,9 @@ public class RichTextStyleSheet extends StyleSheet
 		initAttr( "h4Attrs", defaultH4Attrs );
 		initAttr( "h5Attrs", defaultH5Attrs );
 		initAttr( "h6Attrs", defaultH6Attrs );
+		initAttr( "separatorPainter", defaultSeparatorPainter );
+		initAttr( "separatorMajorPadding", defaultSeparatorMajorPadding );
+		initAttr( "separatorMinorPadding", defaultSeparatorMinorPadding );
 	}
 
 
@@ -148,6 +156,22 @@ public class RichTextStyleSheet extends StyleSheet
 	public RichTextStyleSheet withH6Attrs(AttributeValues attrs)
 	{
 		return (RichTextStyleSheet)withAttr( "h6Attrs", attrs );
+	}
+	
+
+	public RichTextStyleSheet withSeparatorPainter(Painter painter)
+	{
+		return (RichTextStyleSheet)withAttr( "separatorPainter", painter );
+	}
+	
+	public RichTextStyleSheet withSeparatorMajorPadding(double padding)
+	{
+		return (RichTextStyleSheet)withAttr( "separatorMajorPadding", padding );
+	}
+	
+	public RichTextStyleSheet withSeparatorMinorPadding(double padding)
+	{
+		return (RichTextStyleSheet)withAttr( "separatorMinorPadding", padding );
 	}
 	
 	
@@ -360,6 +384,21 @@ public class RichTextStyleSheet extends StyleSheet
 
 	
 	
+	private PrimitiveStyleSheet separatorStyleSheet = null;
+
+	private PrimitiveStyleSheet getSeparatorStyleSheet()
+	{
+		if ( separatorStyleSheet == null )
+		{
+			PrimitiveStyleSheet header = getHeaderStyleSheet();
+			Painter painter = getNonNull( "separatorPainter", Painter.class, defaultSeparatorPainter );
+			separatorStyleSheet = (PrimitiveStyleSheet)header.withShapePainter( painter );
+		}
+		return separatorStyleSheet;
+	}
+
+	
+	
 	
 	
 	private ArrayList<DPElement> textToWordsAndLineBreaks(PrimitiveStyleSheet primitive, String text)
@@ -520,5 +559,22 @@ public class RichTextStyleSheet extends StyleSheet
 	public DPElement h6(String text)
 	{
 		return textParagraph( getH6StyleSheet(), text );
+	}
+	
+	
+	public DPElement hseparator()
+	{
+		PrimitiveStyleSheet style = getSeparatorStyleSheet();
+		double majorPadding = getNonNull( "separatorMajorPadding", Double.class, defaultSeparatorMajorPadding );
+		double minorPadding = getNonNull( "separatorMinorPadding", Double.class, defaultSeparatorMinorPadding );
+		return style.box( 0.0, 1.0 ).alignHExpand().pad( majorPadding, minorPadding ).alignHExpand();
+	}
+
+	public DPElement vseparator()
+	{
+		PrimitiveStyleSheet style = getSeparatorStyleSheet();
+		double majorPadding = getNonNull( "separatorMajorPadding", Double.class, defaultSeparatorMajorPadding );
+		double minorPadding = getNonNull( "separatorMinorPadding", Double.class, defaultSeparatorMinorPadding );
+		return style.box( 1.0, 0.0 ).alignVExpand().pad( minorPadding, majorPadding ).alignVExpand();
 	}
 }

@@ -37,8 +37,6 @@ class GSymAppViewerStyleSheet (StyleSheet):
 		self.initAttr( 'controlsPadding', 5.0 )
 
 		self.initAttr( 'appDocRightPadding', 30.0 )
-		self.initAttr( 'separatingLinePaddingX', 15.0 )
-		self.initAttr( 'separatingLinePaddingY', 3.0 )
 	
 		
 	def newInstance(self):
@@ -91,8 +89,7 @@ class GSymAppViewerStyleSheet (StyleSheet):
 		controlsBox = appDocumentControlsStyle.hbox( [ c.padX( controlsPadding )   for c in controls ] )
 		controlsBorder = appDocumentControlsStyle.border( controlsBox )
 
-		lineStyle = primitiveStyle.withShapePainter( FillPainter( Color( 32, 87, 147 ) ) )
-		openDocumentsSeparator = lineStyle.box( 0.0, 1.0 ).alignHExpand().pad( self['separatingLinePaddingX'], self['separatingLinePaddingY'] ).alignHExpand()
+		openDocumentsSeparator = RichTextStyleSheet.instance.hseparator()
 		
 		docListBox = documentListTableStyle.rgrid( contentsLists )
 
@@ -105,15 +102,12 @@ class GSymAppViewerStyleSheet (StyleSheet):
 	def appState(self, openDocuments, consoles, onNewDoc, onOpenDoc, onNewConsole):
 		def _onNewDoc(link, event):
 			onNewDoc( link.getElement() )
-			return True
 		
 		def _onOpenDoc(link, evnet):
 			onOpenDoc( link.getElement() )
-			return True
 		
 		def _onNewConsole(link, event):
 			onNewConsole()
-			return True
 		
 		
 		primitiveStyle = self['primitiveStyle']
@@ -144,11 +138,9 @@ class GSymAppViewerStyleSheet (StyleSheet):
 	def appDocument(self, name, location, onSave, onSaveAs):
 		def _onSave(link, event):
 			onSave( link.getElement() )
-			return True
 			
 		def _onSaveAs(link, event):
 			onSaveAs( link.getElement() )
-			return True
 			
 		
 		primitiveStyle = self['primitiveStyle']

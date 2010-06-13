@@ -6,9 +6,6 @@
 //##************************
 package BritefuryJ.DocPresent.Controls;
 
-import org.python.core.Py;
-import org.python.core.PyObject;
-
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementInteractor;
@@ -20,27 +17,10 @@ public class Button extends Control
 {
 	public static interface ButtonListener
 	{
-		public boolean onButtonClicked(Button button, PointerButtonEvent event);
+		public void onButtonClicked(Button button, PointerButtonEvent event);
 	}
 	
 	
-	private static class PyButtonListener implements ButtonListener
-	{
-		private PyObject callable;
-		
-		
-		public PyButtonListener(PyObject callable)
-		{
-			this.callable = callable;
-		}
-		
-		public boolean onButtonClicked(Button button, PointerButtonEvent buttonEvent)
-		{
-			return Py.py2boolean( callable.__call__( Py.java2py( button ), Py.java2py( buttonEvent ) ) );
-		}
-	}
-	
-
 	private class ButtonInteractor extends ElementInteractor
 	{
 		private ButtonInteractor()
@@ -57,7 +37,12 @@ public class Button extends Control
 		{
 			if ( element.isRealised() )
 			{
-				return listener.onButtonClicked( Button.this, event );
+				if ( bClosePopupOnActivate )
+				{
+					element.closeContainingPopupChain();
+				}
+				listener.onButtonClicked( Button.this, event );
+				return true;
 			}
 			
 			return false;
@@ -80,21 +65,17 @@ public class Button extends Control
 	private Border buttonBorder, highlightBorder;
 	private DPBorder buttonElement;
 	private ButtonListener listener;
+	private boolean bClosePopupOnActivate;
 
 
 	
-	protected Button(DPBorder buttonElement, Border buttonBorder, Border highlightBorder, ButtonListener listener)
+	protected Button(DPBorder buttonElement, Border buttonBorder, Border highlightBorder, ButtonListener listener, boolean bClosePopupOnActivate)
 	{
 		this.buttonElement = buttonElement;
 		this.buttonBorder = buttonBorder;
 		this.highlightBorder = highlightBorder;
 		this.listener = listener;
 		this.buttonElement.addInteractor( new ButtonInteractor() );
-	}
-	
-	protected Button(DPBorder buttonElement, Border buttonBorder, Border highlightBorder, PyObject listener)
-	{
-		this( buttonElement, buttonBorder, highlightBorder, new PyButtonListener( listener ) );
 	}
 	
 	

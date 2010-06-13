@@ -45,13 +45,12 @@ public class GSymViewPage extends Page
 		Hyperlink.LinkListener listener = new Hyperlink.LinkListener()
 		{
 			@Override
-			public boolean onLinkClicked(Hyperlink link, PointerButtonEvent event)
+			public void onLinkClicked(Hyperlink link, PointerButtonEvent event)
 			{
 				log.startRecording();
 				LogView view = new LogView( log );
 				Location location = browserContext.getLocationForObject( view );
 				link.getElement().getRootElement().getPageController().openLocation( location, PageController.OpenOperation.OPEN_IN_NEW_WINDOW );
-				return true;
 			}
 		};
 		
