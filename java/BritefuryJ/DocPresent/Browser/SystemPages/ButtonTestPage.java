@@ -47,10 +47,9 @@ public class ButtonTestPage extends SystemPage
 		}
 
 
-		public boolean onButtonClicked(Button button, PointerButtonEvent event)
+		public void onButtonClicked(Button button, PointerButtonEvent event)
 		{
 			parentElement.setChild( colouredText( style ) );
-			return true;
 		}
 	}
 

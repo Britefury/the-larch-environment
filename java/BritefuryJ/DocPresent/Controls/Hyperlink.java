@@ -18,7 +18,7 @@ public class Hyperlink extends Control
 {
 	public interface LinkListener
 	{
-		public boolean onLinkClicked(Hyperlink link, PointerButtonEvent event);
+		public void onLinkClicked(Hyperlink link, PointerButtonEvent event);
 	}
 	
 	private static class LinkTargetListener implements LinkListener
@@ -31,7 +31,7 @@ public class Hyperlink extends Control
 			this.targetLocation = targetLocation;
 		}
 		
-		public boolean onLinkClicked(Hyperlink link, PointerButtonEvent buttonEvent)
+		public void onLinkClicked(Hyperlink link, PointerButtonEvent buttonEvent)
 		{
 			PageController pageController = link.getElement().getRootElement().getPageController();
 			if ( ( buttonEvent.getPointer().getModifiers() & Modifier.CTRL ) != 0 )
@@ -39,7 +39,6 @@ public class Hyperlink extends Control
 				if ( buttonEvent.getButton() == 1  ||  buttonEvent.getButton() == 2 )
 				{
 					pageController.openLocation( targetLocation, PageController.OpenOperation.OPEN_IN_NEW_WINDOW );
-					return true;
 				}
 			}
 			else
@@ -47,16 +46,12 @@ public class Hyperlink extends Control
 				if ( buttonEvent.getButton() == 1 )
 				{
 					pageController.openLocation( targetLocation, PageController.OpenOperation.OPEN_IN_CURRENT_TAB );
-					return true;
 				}
 				else if ( buttonEvent.getButton() == 2 )
 				{
 					pageController.openLocation( targetLocation, PageController.OpenOperation.OPEN_IN_NEW_TAB );
-					return true;
 				}
 			}
-
-			return false;
 		}
 	}
 	
@@ -76,7 +71,11 @@ public class Hyperlink extends Control
 		{
 			if ( element.isRealised() )
 			{
-				return listener.onLinkClicked( Hyperlink.this, event );
+				if ( bClosePopupOnActivate )
+				{
+					element.closeContainingPopupChain();
+				}
+				listener.onLinkClicked( Hyperlink.this, event );
 			}
 			
 			return false;
@@ -87,18 +86,20 @@ public class Hyperlink extends Control
 	
 	private DPText element;
 	private LinkListener listener;
+	private boolean bClosePopupOnActivate;
 	
 	
-	protected Hyperlink(DPText element, LinkListener listener)
+	protected Hyperlink(DPText element, LinkListener listener, boolean bClosePopupOnActivate)
 	{
 		this.element = element;
 		this.listener = listener;
 		this.element.addInteractor( new LinkInteractor() );
+		this.bClosePopupOnActivate = bClosePopupOnActivate;
 	}
 	
-	protected Hyperlink(DPText element, Location targetLocation)
+	protected Hyperlink(DPText element, Location targetLocation, boolean bClosePopupOnActivate)
 	{
-		this( element, new LinkTargetListener( targetLocation ) );
+		this( element, new LinkTargetListener( targetLocation ), bClosePopupOnActivate );
 	}
 	
 	

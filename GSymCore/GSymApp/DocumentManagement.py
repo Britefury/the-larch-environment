@@ -11,31 +11,29 @@ from javax.swing import AbstractAction
 from javax.swing import JPopupMenu, JOptionPane, JFileChooser
 from javax.swing.filechooser import FileNameExtensionFilter
 
+from BritefuryJ.DocPresent.Controls import ControlsStyleSheet
+
 
 from Britefury.gSym.gSymDocument import GSymDocument
 
+_controlsStyle = ControlsStyleSheet.instance.withClosePopupOnActivate()
 
-
-def _action(name, f):
-	class Act (AbstractAction):
-		def actionPerformed(action, event):
-			f()
-	return Act( name )
 
 
 # handleNewDocumentFn(unit)
-def promptNewDocument(world, component, handleNewDocumentFn):
+def promptNewDocument(world, element, handleNewDocumentFn):
 	def _make_newDocument(newUnitFn):
-		def newDoc():
+		def newDoc(menuItem):
 			unit = newUnitFn()
 			handleNewDocumentFn( unit )
 		return newDoc
 	newDocumentMenu = JPopupMenu( 'New document' )
+	items = []
 	for newUnitFactory in world.newUnitFactories:
-		newDocumentMenu.add( _action( newUnitFactory.menuLabelText, _make_newDocument( newUnitFactory.newDocumentFn ) ) )
+		items.append( _controlsStyle.menuItemWithLabel( newUnitFactory.menuLabelText, _make_newDocument( newUnitFactory.newDocumentFn ) ).getElement() )
+	newDocumentMenu = _controlsStyle.vpopupMenu( items )
 	
-	pos = component.getMousePosition( True )
-	newDocumentMenu.show( component, pos.x, pos.y )
+	newDocumentMenu.popupToRightOf( element )
 
 	
 	

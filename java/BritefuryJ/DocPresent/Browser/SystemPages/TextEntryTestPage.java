@@ -64,12 +64,11 @@ public class TextEntryTestPage extends SystemPage
 			proxy.setChild( link.getElement() );
 		}
 
-		public boolean onLinkClicked(Hyperlink link, PointerButtonEvent event)
+		public void onLinkClicked(Hyperlink link, PointerButtonEvent event)
 		{
 			entry.setText( link.getText() );
 			proxy.setChild( entry.getElement() );
 			entry.grabCaret();
-			return true;
 		}
 	}
 

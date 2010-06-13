@@ -27,7 +27,7 @@ import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.DocPresent.ContextMenu.ContextMenu;
+import BritefuryJ.DocPresent.Controls.PopupMenu;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerEvent;
@@ -151,7 +151,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	public static interface ContextMenuFactory
 	{
-		public void buildContextMenu(DPElement element, ContextMenu menu);
+		public void buildContextMenu(DPElement element, PopupMenu menu);
 	}
 
 
@@ -1869,7 +1869,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		return bResult;
 	}
 	
-	protected boolean handlePointerContextButton(ContextMenu menu)
+	protected boolean handlePointerContextButton(PopupMenu menu)
 	{
 		List<ContextMenuFactory> contextFactories = getContextMenuFactories();
 		boolean bResult = false;
@@ -3083,29 +3083,42 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	//
 	//
 	
-	public void popupBelow(DPElement popupContents)
+	public PresentationComponent.PresentationPopup popupBelow(DPElement popupContents, boolean bCloseOnLoseFocus)
 	{
 		AABox2 visibleBox = getVisibleBoxInLocalSpace();
-		popup( popupContents, new Point2( visibleBox.getLowerX(), visibleBox.getUpperY() ) );
+		return popup( popupContents, new Point2( visibleBox.getLowerX(), visibleBox.getUpperY() ), bCloseOnLoseFocus );
 	}
 	
-	public void popupRight(DPElement popupContents)
+	public PresentationComponent.PresentationPopup popupRight(DPElement popupContents, boolean bCloseOnLoseFocus)
 	{
 		AABox2 visibleBox = getVisibleBoxInLocalSpace();
-		popup( popupContents, new Point2( visibleBox.getUpperX(), visibleBox.getLowerY() ) );
+		return popup( popupContents, new Point2( visibleBox.getUpperX(), visibleBox.getLowerY() ), bCloseOnLoseFocus );
 	}
 	
-	public void popup(DPElement popupContents, Point2 localPos)
+	public PresentationComponent.PresentationPopup popup(DPElement popupContents, Point2 localPos, boolean bCloseOnLoseFocus)
 	{
 		if ( isLocalSpacePointVisible( localPos ) )
 		{
 			Xform2 x = getLocalToRootXform();
 			Point2 rootPos = x.transform( localPos );
-			getRootElement().createPopup( popupContents, rootPos );
+			return getRootElement().createPopupPresentation( popupContents, rootPos, bCloseOnLoseFocus );
 		}
 		else
 		{
-			getRootElement().createPopupAtMousePosition( popupContents );
+			return getRootElement().popupAtMousePosition( popupContents, bCloseOnLoseFocus );
+		}
+	}
+	
+	public boolean isInsidePopup()
+	{
+		return getRootElement().getComponent().isPopup();
+	}
+	
+	public void closeContainingPopupChain()
+	{
+		if ( isInsidePopup() )
+		{
+			getRootElement().getComponent().closeContainingPopupChain();
 		}
 	}
 	

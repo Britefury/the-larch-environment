@@ -6,9 +6,6 @@
 //##************************
 package BritefuryJ.DocPresent.Controls;
 
-import org.python.core.Py;
-import org.python.core.PyObject;
-
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
 
@@ -16,24 +13,7 @@ public class Checkbox extends Control
 {
 	public static interface CheckboxListener
 	{
-		public boolean onCheckboxToggled(Checkbox checkbox, boolean state);
-	}
-	
-	
-	protected static class PyCheckboxListener implements CheckboxListener
-	{
-		private PyObject callable;
-		
-		
-		public PyCheckboxListener(PyObject callable)
-		{
-			this.callable = callable;
-		}
-		
-		public boolean onCheckboxToggled(Checkbox checkbox, boolean state)
-		{
-			return Py.py2boolean( callable.__call__( Py.java2py( checkbox ), Py.newBoolean( state ) ) );
-		}
+		public void onCheckboxToggled(Checkbox checkbox, boolean state);
 	}
 	
 	

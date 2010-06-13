@@ -96,15 +96,12 @@ class WorksheetEditor (GSymViewObjectDispatch):
 		
 		def _onShowCode(state):
 			node.setShowCode( state )
-			return True
 
 		def _onCodeEditable(state):
 			node.setCodeEditable( state )
-			return True
 
 		def _onShowResult(state):
 			node.setShowResult( state )
-			return True
 
 		if node.getShowCode():
 			codeView = ctx.presentFragmentWithPerspective( node.getCode(), Python25.python25EditorPerspective )

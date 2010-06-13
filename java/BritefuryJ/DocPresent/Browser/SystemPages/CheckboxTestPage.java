@@ -42,10 +42,9 @@ public class CheckboxTestPage extends SystemPage
 		}
 
 
-		public boolean onCheckboxToggled(Checkbox checkbox, boolean state)
+		public void onCheckboxToggled(Checkbox checkbox, boolean state)
 		{
 			textElement.setText( String.valueOf( state ) );
-			return true;
 		}
 	}
 

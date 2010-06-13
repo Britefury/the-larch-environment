@@ -126,7 +126,7 @@ class AppView (GSymViewObjectDispatch):
 				node.addOpenDocument( appDoc )
 				
 			openDocuments = node.getOpenDocuments()
-			DocumentManagement.promptNewDocument( ctx.getSubjectContext()['world'], element.getRootElement().getComponent(), handleNewDocumentFn )
+			DocumentManagement.promptNewDocument( ctx.getSubjectContext()['world'], element, handleNewDocumentFn )
 			
 			return True
 		
