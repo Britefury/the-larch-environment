@@ -25,6 +25,7 @@ from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replac
 
 
 from Britefury.Util.NodeUtil import *
+from Britefury.Util.InstanceCache import instanceCache
 
 from BritefuryJ.AttributeTable import *
 
@@ -45,34 +46,31 @@ from GSymCore.Worksheet.WorksheetEditor.NodeEditor import *
 
 
 
-_textInteractor = TextInteractor()
-_worksheetInteractor = WorksheetInteractor()
 
-
-
-
-_titleStyle = PrimitiveStyleSheet.instance.withForeground( Color( 0.0, 0.0, 0.5 ) ).withFontBold( True )
-_optionsBoxStyle = PrimitiveStyleSheet.instance.withHBoxSpacing( 10.0 )
-_controlsStyle = ControlsStyleSheet.instance
-
-def _worksheetContextMenuFactory(element, menu):
-	def makeStyleFn(style):
-		def _onLink(link, event):
-			rootElement.getCaret().getElement().postTreeEvent( ParagraphStyleEvent( style ) )
-		return _onLink
-
-	rootElement = element.getRootElement()
+class WorkSheetContextMenuFactory (ContextMenuFactory):
+	def __init__(self, styleSheet):
+		self._styleSheet = styleSheet
 	
-	styleTitle = _titleStyle.staticText( 'Style' )
-	normalStyle = _controlsStyle.link( 'Normal', makeStyleFn( 'normal' ) ).getElement()
-	h1Style = _controlsStyle.link( 'H1', makeStyleFn( 'h1' ) ).getElement()
-	h2Style = _controlsStyle.link( 'H2', makeStyleFn( 'h2' ) ).getElement()
-	h3Style = _controlsStyle.link( 'H3', makeStyleFn( 'h3' ) ).getElement()
-	h4Style = _controlsStyle.link( 'H4', makeStyleFn( 'h4' ) ).getElement()
-	h5Style = _controlsStyle.link( 'H5', makeStyleFn( 'h5' ) ).getElement()
-	h6Style = _controlsStyle.link( 'H6', makeStyleFn( 'h6' ) ).getElement()
-	styles = _optionsBoxStyle.hbox( [ normalStyle, h1Style, h2Style, h3Style, h4Style, h5Style, h6Style ] )
-	menu.add( _optionsBoxStyle.vbox( [ styleTitle.alignHCentre(), styles ] ) )
+	
+	def buildContextMenu(self, element, menu):
+		menuStyle = self._styleSheet['contextMenuStyle']
+		controlsStyle = menuStyle['controlsStyle']
+		def makeStyleFn(style):
+			def _onLink(link, event):
+				rootElement.getCaret().getElement().postTreeEvent( ParagraphStyleEvent( style ) )
+			return _onLink
+	
+		rootElement = element.getRootElement()
+		
+		normalStyle = controlsStyle.link( 'Normal', makeStyleFn( 'normal' ) ).getElement()
+		h1Style = controlsStyle.link( 'H1', makeStyleFn( 'h1' ) ).getElement()
+		h2Style = controlsStyle.link( 'H2', makeStyleFn( 'h2' ) ).getElement()
+		h3Style = controlsStyle.link( 'H3', makeStyleFn( 'h3' ) ).getElement()
+		h4Style = controlsStyle.link( 'H4', makeStyleFn( 'h4' ) ).getElement()
+		h5Style = controlsStyle.link( 'H5', makeStyleFn( 'h5' ) ).getElement()
+		h6Style = controlsStyle.link( 'H6', makeStyleFn( 'h6' ) ).getElement()
+		styles = menuStyle.controlsHBox( [ normalStyle, h1Style, h2Style, h3Style, h4Style, h5Style, h6Style ] )
+		menu.add( menuStyle.sectionWithTitle( 'Style', styles ) )
 
 
 
@@ -89,8 +87,8 @@ class WorksheetEditor (GSymViewObjectDispatch):
 
 		w = styleSheet.worksheet( title, contentViews )
 		w.addTreeEventListener( WorksheetTreeEventListener.instance )
-		w.addInteractor( _worksheetInteractor )
-		w.addContextMenuFactory( _worksheetContextMenuFactory )
+		w.addInteractor( WorksheetInteractor.instance )
+		w.addContextMenuFactory( instanceCache( WorkSheetContextMenuFactory, styleSheet ) )
 		return w
 	
 	
@@ -114,7 +112,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 			p = styleSheet.h6( text )
 		p.addTreeEventListener( TextTreeEventListener.instance )
 		p.addTreeEventListener( OperationTreeEventListener.instance )
-		p.addInteractor( _textInteractor )
+		p.addInteractor( TextInteractor.instance )
 		return p
 
 

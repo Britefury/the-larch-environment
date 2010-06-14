@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent.Controls;
 
+import BritefuryJ.DocPresent.ContextMenuFactory;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.ElementInteractor;
@@ -83,7 +84,7 @@ public class Hyperlink extends Control
 		}
 	}
 	
-	private class LinkContextMenuFactory implements DPElement.ContextMenuFactory
+	private class LinkContextMenuFactory implements ContextMenuFactory
 	{
 		@Override
 		public void buildContextMenu(final DPElement element, PopupMenu menu)

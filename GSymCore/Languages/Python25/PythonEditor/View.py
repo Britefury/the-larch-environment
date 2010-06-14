@@ -35,6 +35,7 @@ from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replac
 
 
 from Britefury.Util.NodeUtil import *
+from Britefury.Util.InstanceCache import instanceCache
 
 
 from BritefuryJ.AttributeTable import *
@@ -86,7 +87,7 @@ def unparsedNodeEditor(grammar, styleSheet, node, precedence, contents):
 		return contents
 	elif mode == PythonEditorStyleSheet.MODE_EDITEXPRESSION:
 		outerPrecedence = styleSheet.getOuterPrecedence()
-		contents.addTreeEventListener( ParsedExpressionTreeEventListener.newListener( grammar.expression(), outerPrecedence ) )
+		contents.addTreeEventListener( instanceCache( ParsedExpressionTreeEventListener, grammar.expression(), outerPrecedence ) )
 		return contents
 	elif mode == PythonEditorStyleSheet.MODE_EDITSTATEMENT:
 		statementLine = styleSheet.statementLine( contents )
@@ -100,7 +101,7 @@ def unparsedNodeEditor(grammar, styleSheet, node, precedence, contents):
 			else:
 				raise TypeError, 'UNPARSED node should only contain strings or objects, not %s'  %  ( type( x ), )
 		statementLine.setStructuralValueStream( builder.stream() )
-		statementLine.addTreeEventListener( StatementTreeEventListener.newListener( grammar.singleLineStatement() ) )
+		statementLine.addTreeEventListener( instanceCache( StatementTreeEventListener, grammar.singleLineStatement() ) )
 		return statementLine
 	else:
 		raise ValueError, 'invalid mode %d'  %  mode
@@ -117,7 +118,7 @@ def expressionNodeEditor(grammar, styleSheet, node, precedence, contents):
 		
 		if _nodeRequiresParens( node ):
 			contents = styleSheet.applyParens( contents, precedence, getNumParens( node ) )
-		contents.addTreeEventListener( ParsedExpressionTreeEventListener.newListener( grammar.expression(), outerPrecedence ) )
+		contents.addTreeEventListener( instanceCache( ParsedExpressionTreeEventListener, grammar.expression(), outerPrecedence ) )
 		return contents
 	else:
 		raise ValueError, 'invalid mode %d'  %  mode
@@ -127,7 +128,7 @@ def structuralExpressionNodeEditor(styleSheet, node, precedence, contents):
 	mode = styleSheet['editMode']
 	if mode == PythonEditorStyleSheet.MODE_DISPLAYCONTENTS  or  mode == PythonEditorStyleSheet.MODE_EDITEXPRESSION:
 		contents = styleSheet.applyParens( contents, _nodeRequiresParens( node ), precedence, getNumParens( node ) )
-		contents.addTreeEventListener( StructuralExpressionTreeEventListener.newListener() )
+		contents.addTreeEventListener( StructuralExpressionTreeEventListener.instance )
 		return contents
 	else:
 		raise ValueError, 'invalid mode %d'  %  mode
@@ -150,7 +151,7 @@ def statementNodeEditor(grammar, styleSheet, node, contents):
 			statementLine.setStructuralValueStream( builder.stream() )
 		else:
 			statementLine.setStructuralValueObject( node )
-		statementLine.addTreeEventListener( StatementTreeEventListener.newListener( grammar.singleLineStatement() ) )
+		statementLine.addTreeEventListener( instanceCache( StatementTreeEventListener, grammar.singleLineStatement() ) )
 		statementLine.addInteractor( _statementIndentationInteractor )
 		return statementLine
 	else:
@@ -161,7 +162,7 @@ def compoundStatementHeaderEditor(grammar, styleSheet, node, headerContents, hea
 	headerStatementLine = styleSheet.statementLine( headerContents )
 	
 	headerStatementLine.setStructuralValueObject( node )
-	headerStatementLine.addTreeEventListener( StatementTreeEventListener.newListener( grammar.singleLineStatement() ) )
+	headerStatementLine.addTreeEventListener( instanceCache( StatementTreeEventListener, grammar.singleLineStatement() ) )
 	headerStatementLine.addInteractor( _statementIndentationInteractor )
 	if headerContainerFn is not None:
 		headerStatementLine = headerContainerFn( headerStatementLine )
@@ -185,7 +186,7 @@ def compoundStatementEditor(ctx, grammar, styleSheet, node, precedence, compound
 		
 		headerStatementLine = styleSheet.statementLine( headerContents )
 		headerStatementLine.setStructuralValueObject( headerNode )
-		headerStatementLine.addTreeEventListener( CompoundHeaderTreeEventListener.newListener( statementParser ) )
+		headerStatementLine.addTreeEventListener( instanceCache( CompoundHeaderTreeEventListener, statementParser ) )
 		headerStatementLine.addInteractor( _statementIndentationInteractor )
 		
 		if headerContainerFn is not None:

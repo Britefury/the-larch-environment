@@ -51,23 +51,6 @@ from GSymCore.Languages.Python25.PythonEditor.SelectionEditor import PythonSelec
 #
 #
 
-class _ListenerTable (object):
-	def __init__(self, createFn):
-		self._table = WeakValueDictionary()
-		self._createFn = createFn
-	
-		
-	def get(self, *args):
-		key = args
-		try:
-			return self._table[key]
-		except KeyError:
-			listener = self._createFn( *args )
-			self._table[key] = listener
-			return listener
-		
-	
-	
 class ParsedExpressionTreeEventListener (TreeEventListenerObjectDispatch):
 	__slots__ = [ '_parser', '_outerPrecedence' ]
 	
@@ -114,13 +97,6 @@ class ParsedExpressionTreeEventListener (TreeEventListenerObjectDispatch):
 			return False
 		
 	
-	_listenerTable = None
-		
-	@staticmethod
-	def newListener(parser, outerPrecedence):
-		if ParsedExpressionTreeEventListener._listenerTable is None:
-			ParsedExpressionTreeEventListener._listenerTable = _ListenerTable( ParsedExpressionTreeEventListener )
-		return ParsedExpressionTreeEventListener._listenerTable.get( parser, outerPrecedence )
 		
 		
 
@@ -132,14 +108,9 @@ class StructuralExpressionTreeEventListener (TreeEventListenerObjectDispatch):
 		return False
 		
 	
-	_listener = None
-		
-	@staticmethod
-	def newListener():
-		if StructuralExpressionTreeEventListener._listener is None:
-			StructuralExpressionTreeEventListener._listener = StructuralExpressionTreeEventListener()
-		return StructuralExpressionTreeEventListener._listener
-		
+StructuralExpressionTreeEventListener.instance = StructuralExpressionTreeEventListener()
+
+
 
 
 class StatementTreeEventListener (TreeEventListenerObjectDispatch):
@@ -225,15 +196,6 @@ class StatementTreeEventListener (TreeEventListenerObjectDispatch):
 		else:
 			element.setStructuralValueObject( parsed )
 			return element.postTreeEventToParent( event )
-
-			
-	_listenerTable = None
-		
-	@staticmethod
-	def newListener(parser):
-		if StatementTreeEventListener._listenerTable is None:
-			StatementTreeEventListener._listenerTable = _ListenerTable( StatementTreeEventListener )
-		return StatementTreeEventListener._listenerTable.get( parser )
 			
 			
 			
@@ -265,15 +227,6 @@ class CompoundHeaderTreeEventListener (TreeEventListenerObjectDispatch):
 	def handleParsed(self, element, value, parsed, event):
 		element.setStructuralValueObject( parsed )
 		return element.postTreeEventToParent( event )
-
-			
-	_listenerTable = None
-		
-	@staticmethod
-	def newListener(parser):
-		if CompoundHeaderTreeEventListener._listenerTable is None:
-			CompoundHeaderTreeEventListener._listenerTable = _ListenerTable( CompoundHeaderTreeEventListener )
-		return CompoundHeaderTreeEventListener._listenerTable.get( parser )
 			
 
 	

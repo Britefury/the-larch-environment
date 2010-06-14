@@ -29,6 +29,7 @@ class WorksheetEditorStyleSheet (StyleSheet):
 		self.initAttr( 'richTextStyle', RichTextStyleSheet.instance )
 		self.initAttr( 'editableRichTextStyle', RichTextStyleSheet.instance.withEditable() )
 		self.initAttr( 'controlsStyle', ControlsStyleSheet.instance )
+		self.initAttr( 'contextMenuStyle', ContextMenuStyleSheet.instance )
 		self.initAttr( 'executionStyle', ExecutionStyleSheet.instance )
 		
 		self.initAttr( 'pythonCodeHeaderBackground', FillPainter( Color( 0.75, 0.8, 0.925 ) ) )
@@ -50,6 +51,9 @@ class WorksheetEditorStyleSheet (StyleSheet):
 	
 	def withControlsStyleSheet(self, controlsStyle):
 		return self.withAttrs( controlsStyle=controlsStyle )
+	
+	def withContextMenuStyleSheet(self, contextMenuStyle):
+		return self.withAttrs( contextMenuStyle=contextMenuStyle )
 	
 	def withExecutionStyleSheet(self, executionStyle):
 		return self.withAttrs( executionStyle=executionStyle )
@@ -152,7 +156,6 @@ class WorksheetEditorStyleSheet (StyleSheet):
 		box = primitiveStyle.withVBoxSpacing( 5.0 ).vbox( boxContents )
 		
 		return pythonCodeEditorBorderStyle.border( box.alignHExpand() ).alignHExpand()
-	
 	
 
 WorksheetEditorStyleSheet.instance = WorksheetEditorStyleSheet()

@@ -145,12 +145,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 	
 	
-	public static interface ContextMenuFactory
-	{
-		public void buildContextMenu(DPElement element, PopupMenu menu);
-	}
-
-
 	//
 	//
 	// EXCEPTIONS
