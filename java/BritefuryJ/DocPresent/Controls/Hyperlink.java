@@ -88,13 +88,14 @@ public class Hyperlink extends Control
 		@Override
 		public void buildContextMenu(final DPElement element, PopupMenu menu)
 		{
+			final PageController pageController = element.getRootElement().getPageController();
+			final LinkTargetListener targetListener = (LinkTargetListener)listener;
+
 			MenuItemListener openInNewTabListener = new MenuItemListener()
 			{
 				@Override
 				public void onMenuItemClicked(MenuItem menuItem)
 				{
-					PageController pageController = element.getRootElement().getPageController();
-					LinkTargetListener targetListener = (LinkTargetListener)listener;
 					pageController.openLocation( targetListener.targetLocation, PageController.OpenOperation.OPEN_IN_NEW_TAB );
 				}
 			};
@@ -104,8 +105,6 @@ public class Hyperlink extends Control
 				@Override
 				public void onMenuItemClicked(MenuItem menuItem)
 				{
-					PageController pageController = element.getRootElement().getPageController();
-					LinkTargetListener targetListener = (LinkTargetListener)listener;
 					pageController.openLocation( targetListener.targetLocation, PageController.OpenOperation.OPEN_IN_NEW_WINDOW );
 				}
 			};
