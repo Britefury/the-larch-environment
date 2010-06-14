@@ -169,6 +169,11 @@ class TextInteractor (ElementInteractor):
 	def _insertPythonCode(self, ctx, element, node):
 		return element.postTreeEvent( InsertPythonCodeEvent( node.getModel() ) )
 		
+TextInteractor.instance = TextInteractor()	
+	
+	
+	
+	
 		
 class WorksheetTreeEventListener (TreeEventListenerObjectDispatch):
 	def __init__(self):
@@ -201,4 +206,4 @@ class WorksheetInteractor (ElementInteractor):
 			node.refreshResults()
 			return True
 		
-		
+WorksheetInteractor.instance = WorksheetInteractor()		
