@@ -8,7 +8,7 @@
 import unittest
 
 from Britefury.Dispatch.Dispatch import DispatchError
-from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod, DMObjectNodeMethodDispatchMetaClass, dmObjectNodeMethodDispatch
+from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod, dmObjectNodeMethodDispatch
 from BritefuryJ.DocModel import DMSchema
 
 
@@ -23,7 +23,6 @@ class TestCase_objectNodeMethodDispatch (unittest.TestCase):
 		self.c = self.C( s='a', t='b' )
 	
 		class DispatchTest (object):
-			__metaclass__ = DMObjectNodeMethodDispatchMetaClass
 			__dispatch_num_args__ = 0
 			
 			@DMObjectNodeDispatchMethod( self.A )

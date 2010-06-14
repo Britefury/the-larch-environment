@@ -33,7 +33,6 @@ from BritefuryJ.DocPresent.Controls import ControlsStyleSheet
 from BritefuryJ.DocPresent import *
 
 from BritefuryJ.GSym import GSymPerspective, GSymSubject, GSymRelativeLocationResolver
-from BritefuryJ.GSym.View import PyGSymViewFragmentFunction
 
 
 from GSymCore.GSymApp import DocumentManagement
@@ -259,5 +258,5 @@ class ProjectEditorRelativeLocationResolver (GSymRelativeLocationResolver):
 	
 	
 
-perspective = GSymPerspective( PyGSymViewFragmentFunction( ProjectView() ), ProjectEditorStyleSheet.instance, AttributeTable.instance, None, ProjectEditorRelativeLocationResolver() )
+perspective = GSymPerspective( ProjectView(), ProjectEditorStyleSheet.instance, AttributeTable.instance, None, ProjectEditorRelativeLocationResolver() )
 	

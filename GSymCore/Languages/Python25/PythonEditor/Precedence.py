@@ -11,7 +11,7 @@ from BritefuryJ.Transformation import DefaultIdentityTransformationFunction, Tra
 
 from BritefuryJ.DocModel import DMObjectInterface, DMListInterface, DMClassAttribute
 
-from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeMethodDispatchMetaClass, DMObjectNodeDispatchMethod, dmObjectNodeMethodDispatch
+from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod, dmObjectNodeMethodDispatch
 from Britefury.Dispatch.Dispatch import DispatchError
 from Britefury.Util.NodeUtil import isStringNode
 
@@ -251,7 +251,6 @@ def _transformCmp(node, xform):
 	
 	
 class RemoveUnNeededParensXform (object):
-	__metaclass__ = DMObjectNodeMethodDispatchMetaClass
 	__dispatch_num_args__ = 1
 	
 	

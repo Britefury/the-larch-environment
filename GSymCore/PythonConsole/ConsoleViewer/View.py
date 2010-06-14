@@ -31,7 +31,7 @@ from BritefuryJ.DocPresent.Browser import Location
 from BritefuryJ.DocPresent.Input import ObjectDndHandler
 
 from BritefuryJ.GSym import GSymPerspective, GSymSubject
-from BritefuryJ.GSym.View import GSymFragmentView, PyGSymViewFragmentFunction
+from BritefuryJ.GSym.View import GSymFragmentView
 
 from GSymCore.Languages.Python25 import Python25
 
@@ -132,4 +132,4 @@ _docNameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*', 0 )
 
 	
 
-perspective = GSymPerspective( PyGSymViewFragmentFunction( ConsoleView() ), ConsoleViewerStyleSheet.instance, AttributeTable.instance, None, None )
+perspective = GSymPerspective( ConsoleView(), ConsoleViewerStyleSheet.instance, AttributeTable.instance, None, None )

@@ -34,7 +34,6 @@ from BritefuryJ.DocPresent.Controls import ControlsStyleSheet
 from BritefuryJ.DocPresent import *
 
 from BritefuryJ.GSym import GSymPerspective, GSymSubject, GSymRelativeLocationResolver
-from BritefuryJ.GSym.View import PyGSymViewFragmentFunction
 
 
 from GSymCore.Languages.Python25 import Python25
@@ -82,14 +81,14 @@ class WorksheetEditor (GSymViewObjectDispatch):
 	def Worksheet(self, ctx, styleSheet, inheritedState, node):
 		contentViews = ctx.mapPresentFragment( node.getContents(), styleSheet, inheritedState )
 		emptyLine = PrimitiveStyleSheet.instance.paragraph( [ PrimitiveStyleSheet.instance.text( '' ) ] )
-		emptyLine.addTreeEventListener( TextEditEvent, emptyTreeEventListener )
+		emptyLine.addTreeEventListener( EmptyTreeEventListener.instance )
 		contentViews += [ emptyLine ]
 		
 		title = styleSheet.worksheetTitle( node.getTitle() )
-		title.addTreeEventListener( TextEditEvent, titleTreeEventListener )
+		title.addTreeEventListener( TitleTextEditor.instance )
 
 		w = styleSheet.worksheet( title, contentViews )
-		w.addTreeEventListener( InsertPythonCodeEvent, worksheetTreeEventListener )
+		w.addTreeEventListener( WorksheetTreeEventListener.instance )
 		w.addInteractor( _worksheetInteractor )
 		w.addContextMenuFactory( _worksheetContextMenuFactory )
 		return w
@@ -113,8 +112,8 @@ class WorksheetEditor (GSymViewObjectDispatch):
 			p = styleSheet.h5( text )
 		elif style == 'h6':
 			p = styleSheet.h6( text )
-		p.addTreeEventListener( TextEditEvent, textTreeEventListener )
-		p.addTreeEventListener( TextOperationEvent, operationTreeEventListener )
+		p.addTreeEventListener( TextTreeEventListener.instance )
+		p.addTreeEventListener( OperationTreeEventListener.instance )
 		p.addInteractor( _textInteractor )
 		return p
 
@@ -169,7 +168,6 @@ class WorksheetEditorRelativeLocationResolver (GSymRelativeLocationResolver):
 	
 
 	
-_viewFn = PyGSymViewFragmentFunction( WorksheetEditor() )
-perspective = GSymPerspective( _viewFn, WorksheetEditorStyleSheet.instance, AttributeTable.instance, None, WorksheetEditorRelativeLocationResolver() )
+perspective = GSymPerspective( WorksheetEditor(), WorksheetEditorStyleSheet.instance, AttributeTable.instance, None, WorksheetEditorRelativeLocationResolver() )
 
 	

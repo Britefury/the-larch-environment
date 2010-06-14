@@ -5,8 +5,6 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2010.
 ##-*************************
-from weakref import WeakValueDictionary
-
 from java.util import List
 from java.awt.event import KeyEvent
 
@@ -25,6 +23,7 @@ from Britefury.Util.NodeUtil import *
 
 
 from Britefury.gSym.View import EditOperations
+from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
 
 
 from GSymCore.Languages.Python25 import Python25
@@ -33,28 +32,12 @@ from GSymCore.Worksheet import Schema, ViewSchema
 
 
 
-class _ListenerTable (object):
-	def __init__(self, createFn):
-		self._table = WeakValueDictionary()
-		self._createFn = createFn
-	
-		
-	def get(self, *args):
-		key = args
-		try:
-			return self._table[key]
-		except KeyError:
-			listener = self._createFn( *args )
-			self._table[key] = listener
-			return listener
-		
-	
-	
-class TitleTreeEventListener (TreeEventListener):
+class TitleTextEditor (TreeEventListenerObjectDispatch):
 	def __init__(self):
 		pass
 
-	def onTreeEvent(self, element, sourceElement, event):
+	@ObjectDispatchMethod( TextEditEvent )
+	def onTextEdit(self, element, sourceElement, event):
 		value = element.getTextRepresentation()
 		ctx = element.getFragmentContext()
 		node = ctx.getDocNode()
@@ -62,15 +45,15 @@ class TitleTreeEventListener (TreeEventListener):
 		return True
 		
 	
-	
-titleTreeEventListener = TitleTreeEventListener()
+TitleTextEditor.instance = TitleTextEditor()	
 	
 
-class EmptyTreeEventListener (TreeEventListener):
+class EmptyTreeEventListener (TreeEventListenerObjectDispatch):
 	def __init__(self):
 		pass
 
-	def onTreeEvent(self, element, sourceElement, event):
+	@ObjectDispatchMethod( TextEditEvent )
+	def onTextEdit(self, element, sourceElement, event):
 		value = element.getTextRepresentation()
 		ctx = element.getFragmentContext()
 		node = ctx.getDocNode()
@@ -80,17 +63,17 @@ class EmptyTreeEventListener (TreeEventListener):
 		else:
 			return False
 
-		
-emptyTreeEventListener = EmptyTreeEventListener()
+EmptyTreeEventListener.instance = EmptyTreeEventListener()
 
 
 
 
-class TextTreeEventListener (TreeEventListener):
+class TextTreeEventListener (TreeEventListenerObjectDispatch):
 	def __init__(self):
 		pass
 
-	def onTreeEvent(self, element, sourceElement, event):
+	@ObjectDispatchMethod( TextEditEvent )
+	def onTextEdit(self, element, sourceElement, event):
 		value = element.getTextRepresentation()
 		ctx = element.getFragmentContext()
 		node = ctx.getDocNode()
@@ -100,19 +83,10 @@ class TextTreeEventListener (TreeEventListener):
 		else:
 			return False
 		
-		
-textTreeEventListener = TextTreeEventListener()
+TextTreeEventListener.instance = TextTreeEventListener()		
 
 
 
-class OperationTreeEventListener (TreeEventListener):
-	def __init__(self):
-		pass
-
-	def onTreeEvent(self, element, sourceElement, event):
-		return event.apply( element.getFragmentContext().getDocNode() )
-	
-operationTreeEventListener = OperationTreeEventListener()
 	
 
 
@@ -137,6 +111,18 @@ class ParagraphStyleEvent(TextOperationEvent):
 		return True
 
 	
+class OperationTreeEventListener (TreeEventListenerObjectDispatch):
+	def __init__(self):
+		pass
+
+	@ObjectDispatchMethod( OperationEvent )
+	def onOperationEvent(self, element, sourceElement, event):
+		return event.apply( element.getFragmentContext().getDocNode() )
+
+OperationTreeEventListener.instance = OperationTreeEventListener()
+
+
+
 class TextInteractor (ElementInteractor):
 	def __init__(self):
 		pass
@@ -184,24 +170,23 @@ class TextInteractor (ElementInteractor):
 		return element.postTreeEvent( InsertPythonCodeEvent( node.getModel() ) )
 		
 		
-class WorksheetTreeEventListener (TreeEventListener):
+class WorksheetTreeEventListener (TreeEventListenerObjectDispatch):
 	def __init__(self):
 		pass
 
-	def onTreeEvent(self, element, sourceElement, event):
-		if isinstance( event, InsertPythonCodeEvent ):
-			ctx = element.getFragmentContext()
-			node = ctx.getDocNode().getModel()
-			index = node['contents'].indexOf( event._node )
-			
-			if index != -1:
-				pythonCode = Schema.PythonCode( showCode='True', codeEditable='False', showResult='True', code=Python25.py25NewModule() )
-				node['contents'].insert( index+1, pythonCode )
-				return True
+	@ObjectDispatchMethod( InsertPythonCodeEvent )
+	def onInsertPythonCode(self, element, sourceElement, event):
+		ctx = element.getFragmentContext()
+		node = ctx.getDocNode().getModel()
+		index = node['contents'].indexOf( event._node )
+		
+		if index != -1:
+			pythonCode = Schema.PythonCode( showCode='True', codeEditable='False', showResult='True', code=Python25.py25NewModule() )
+			node['contents'].insert( index+1, pythonCode )
+			return True
 		return False
 	
-	
-worksheetTreeEventListener = WorksheetTreeEventListener()
+WorksheetTreeEventListener.instance = WorksheetTreeEventListener()
 
 
 class WorksheetInteractor (ElementInteractor):

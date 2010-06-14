@@ -32,7 +32,6 @@ from BritefuryJ.DocPresent.StyleSheet import PrimitiveStyleSheet
 from BritefuryJ.DocPresent import *
 
 from BritefuryJ.GSym import GSymPerspective, GSymSubject, GSymRelativeLocationResolver
-from BritefuryJ.GSym.View import PyGSymViewFragmentFunction
 
 
 from GSymCore.Languages.Python25 import Python25
@@ -143,7 +142,6 @@ class WorksheetViewerRelativeLocationResolver (GSymRelativeLocationResolver):
 	
 
 	
-_viewFn = PyGSymViewFragmentFunction( WorksheetViewer() )
-perspective = GSymPerspective( _viewFn, WorksheetViewerStyleSheet.instance, AttributeTable.instance, None, WorksheetViewerRelativeLocationResolver() )
+perspective = GSymPerspective( WorksheetViewer(), WorksheetViewerStyleSheet.instance, AttributeTable.instance, None, WorksheetViewerRelativeLocationResolver() )
 
 	

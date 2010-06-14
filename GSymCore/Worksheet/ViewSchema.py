@@ -10,7 +10,7 @@ from weakref import WeakKeyDictionary
 from BritefuryJ.Incremental import IncrementalOwner, IncrementalValueMonitor
 from BritefuryJ.Cell import Cell
 
-from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod, DMObjectNodeMethodDispatchMetaClass, dmObjectNodeMethodDispatch
+from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod, dmObjectNodeMethodDispatch
 
 from GSymCore.Languages.Python25.Execution import Execution
 
@@ -21,7 +21,6 @@ from GSymCore.Worksheet import Schema
 
 
 class _Projection (object):
-	__metaclass__ = DMObjectNodeMethodDispatchMetaClass
 	__dispatch_num_args__ = 1
 	
 

@@ -8,7 +8,7 @@
 import unittest
 
 from Britefury.Dispatch.Dispatch import DispatchError
-from Britefury.Dispatch.ObjectMethodDispatch import ObjectDispatchMethod, ObjectMethodDispatchMetaClass, objectMethodDispatch
+from Britefury.Dispatch.ObjectMethodDispatch import ObjectDispatchMethod, objectMethodDispatch
 from BritefuryJ.DocModel import DMSchema
 
 
@@ -27,7 +27,6 @@ class TestCase_objectMethodDispatch (unittest.TestCase):
 	
 	def setUp(self):
 		class DispatchX (object):
-			__metaclass__ = ObjectMethodDispatchMetaClass
 			__dispatch_num_args__ = 0
 			
 			@ObjectDispatchMethod( self.A )
@@ -47,7 +46,6 @@ class TestCase_objectMethodDispatch (unittest.TestCase):
 				return 'd'
 		
 		class DispatchY (object):
-			__metaclass__ = ObjectMethodDispatchMetaClass
 			__dispatch_num_args__ = 0
 			
 			@ObjectDispatchMethod( self.A )
@@ -59,7 +57,6 @@ class TestCase_objectMethodDispatch (unittest.TestCase):
 				return 'b'
 			
 		class DispatchZ (object):
-			__metaclass__ = ObjectMethodDispatchMetaClass
 			__dispatch_num_args__ = 0
 			
 			@ObjectDispatchMethod( self.A )
@@ -71,13 +68,21 @@ class TestCase_objectMethodDispatch (unittest.TestCase):
 				return 'c'
 		
 		class DispatchW (object):
-			__metaclass__ = ObjectMethodDispatchMetaClass
 			__dispatch_num_args__ = 0
+		
+		class DispatchMulti (object):
+			__dispatch_num_args__ = 0
+			
+			@ObjectDispatchMethod( self.B, self.C )
+			def zA(self, node):
+				return 'bc'
+			
 		
 		self.DispatchX = DispatchX
 		self.DispatchY = DispatchY
 		self.DispatchZ = DispatchZ
 		self.DispatchW = DispatchW
+		self.DispatchMulti = DispatchMulti
 		
 		self.a = self.A()
 		self.b = self.B()
@@ -108,3 +113,10 @@ class TestCase_objectMethodDispatch (unittest.TestCase):
 	def testDispatchNoClass(self):
 		w = self.DispatchW()
 		self.assertRaises( DispatchError, lambda: objectMethodDispatch( w, self.c ) )
+
+	def testDispatchMulti(self):
+		m = self.DispatchMulti()
+		self.assertRaises( DispatchError, lambda: objectMethodDispatch( m, self.a ) )
+		self.assert_( objectMethodDispatch( m, self.b )  ==  'bc' )
+		self.assert_( objectMethodDispatch( m, self.c )  ==  'bc' )
+		self.assert_( objectMethodDispatch( m, self.d )  ==  'bc' )
