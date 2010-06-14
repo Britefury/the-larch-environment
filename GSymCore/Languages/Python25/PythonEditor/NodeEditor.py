@@ -30,6 +30,7 @@ from Britefury.Util.NodeUtil import *
 
 
 from Britefury.gSym.View import EditOperations
+from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
 
 
 from GSymCore.Languages.Python25 import Schema
@@ -38,7 +39,7 @@ from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
 from GSymCore.Languages.Python25.PythonEditor.Parser import Python25Grammar
 from GSymCore.Languages.Python25.PythonEditor.Precedence import *
 from GSymCore.Languages.Python25.PythonEditor.PythonEditOperations import *
-from GSymCore.Languages.Python25.PythonEditor.SelectionEditor import PythonSelectionEditTreeEvent
+from GSymCore.Languages.Python25.PythonEditor.SelectionEditor import PythonSelectionEditTreeEvent, PythonIndentationTreeEvent
 
 
 
@@ -67,7 +68,7 @@ class _ListenerTable (object):
 		
 	
 	
-class ParsedExpressionTreeEventListener (TreeEventListener):
+class ParsedExpressionTreeEventListener (TreeEventListenerObjectDispatch):
 	__slots__ = [ '_parser', '_outerPrecedence' ]
 	
 	def __init__(self, parser, outerPrecedence, node=None):
@@ -75,7 +76,9 @@ class ParsedExpressionTreeEventListener (TreeEventListener):
 		self._parser = parser
 		self._outerPrecedence = outerPrecedence
 
-	def onTreeEvent(self, element, sourceElement, event):
+
+	@ObjectDispatchMethod( TextEditEvent, PythonSelectionEditTreeEvent )
+	def editEvent(self, element, sourceElement, event):
 		# if @event is a @PythonSelectionEditTreeEvent, and its source element is @element, then @element has had its
 		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it.
 		# Otherwise, clear the structural represnetation of all elements on the path from the source element to @element
@@ -122,8 +125,9 @@ class ParsedExpressionTreeEventListener (TreeEventListener):
 		
 
 
-class StructuralExpressionTreeEventListener (TreeEventListener):
-	def onTreeEvent(self, element, sourceElement, event):
+class StructuralExpressionTreeEventListener (TreeEventListenerObjectDispatch):
+	@ObjectDispatchMethod( TextEditEvent )
+	def onTextEditEvent(self, element, sourceElement, event):
 		element.clearStructuralRepresentation()
 		return False
 		
@@ -138,7 +142,7 @@ class StructuralExpressionTreeEventListener (TreeEventListener):
 		
 
 
-class StatementTreeEventListener (TreeEventListener):
+class StatementTreeEventListener (TreeEventListenerObjectDispatch):
 	__slots__ = [ '_parser' ]
 
 	
@@ -146,7 +150,8 @@ class StatementTreeEventListener (TreeEventListener):
 		self._parser = parser
 
 		
-	def onTreeEvent(self, element, sourceElement, event):
+	@ObjectDispatchMethod( TextEditEvent, PythonSelectionEditTreeEvent )
+	def onEditEvent(self, element, sourceElement, event):
 		# if @event is a @PythonSelectionEditTreeEvent, and its source element is @element, then @element has had its
 		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it.
 		# Otherwise, clear the structural represnetation of all elements on the path from the source element to @element
@@ -232,16 +237,17 @@ class StatementTreeEventListener (TreeEventListener):
 			
 			
 			
-			
-class CompoundHeaderTreeEventListener (TreeEventListener):
+
+class CompoundHeaderTreeEventListener (TreeEventListenerObjectDispatch):
 	__slots__ = [ '_parser' ]
 
 	
 	def __init__(self, parser):
 		self._parser = parser
 
-		
-	def onTreeEvent(self, element, sourceElement, event):
+
+	@ObjectDispatchMethod( PythonSelectionEditTreeEvent, TextEditEvent )
+	def onEditEvent(self, element, sourceElement, event):
 		# if @event is a @PythonSelectionEditTreeEvent, and its source element is @element, then @element has had its
 		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it
 		if not isinstance( event, PythonSelectionEditTreeEvent )  or  event.getSourceElement() is not element:
@@ -273,7 +279,7 @@ class CompoundHeaderTreeEventListener (TreeEventListener):
 	
 
 			
-class SuiteTreeEventListener (TreeEventListener):
+class SuiteTreeEventListener (TreeEventListenerObjectDispatch):
 	__slots__ = [ '_parser', '_suite' ]
 
 	
@@ -281,8 +287,9 @@ class SuiteTreeEventListener (TreeEventListener):
 		self._parser = parser
 		self._suite = suite
 
-		
-	def onTreeEvent(self, element, sourceElement, event):
+	
+	@ObjectDispatchMethod( PythonSelectionEditTreeEvent, PythonIndentationTreeEvent, TextEditEvent )
+	def onEditEvent(self, element, sourceElement, event):
 		# if @event is a @PythonSelectionEditTreeEvent, and its source element is @element, then @element has had its
 		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it
 		if not isinstance( event, PythonSelectionEditTreeEvent )  or  event.getSourceElement() is not element:

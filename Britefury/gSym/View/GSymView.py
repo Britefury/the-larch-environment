@@ -11,8 +11,8 @@ from BritefuryJ.GSym.View import GSymViewFragmentFunction
 
 from Britefury.Dispatch.Dispatch import DispatchError
 from Britefury.Dispatch.MethodDispatch import methodDispatch, methodDispatchAndGetName
-from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeMethodDispatchMetaClass, dmObjectNodeMethodDispatch, dmObjectNodeMethodDispatchAndGetName
-from Britefury.Dispatch.ObjectMethodDispatch import ObjectMethodDispatchMetaClass, objectMethodDispatch, objectMethodDispatchAndGetName
+from Britefury.Dispatch.DMObjectNodeMethodDispatch import dmObjectNodeMethodDispatch, dmObjectNodeMethodDispatchAndGetName
+from Britefury.Dispatch.ObjectMethodDispatch import objectMethodDispatch, objectMethodDispatchAndGetName
 
 import time
 
@@ -20,8 +20,8 @@ import time
 			
 		
 		
-class GSymViewListNodeDispatch (object):
-	def __call__(self, xs, ctx, styleSheet, state):
+class GSymViewListNodeDispatch (GSymViewFragmentFunction):
+	def createViewFragment(self, xs, ctx, styleSheet, state):
 		element = None
 		try:
 			element, name = methodDispatchAndGetName( self, xs, ctx, styleSheet, state )
@@ -36,11 +36,10 @@ class GSymViewListNodeDispatch (object):
 
 
 		
-class GSymViewObjectNodeDispatch (object):
-	__metaclass__ = DMObjectNodeMethodDispatchMetaClass
+class GSymViewObjectNodeDispatch (GSymViewFragmentFunction):
 	__dispatch_num_args__ = 3
 	
-	def __call__(self, node, ctx, styleSheet, state):
+	def createViewFragment(self, node, ctx, styleSheet, state):
 		element = None
 		try:
 			element, name = dmObjectNodeMethodDispatchAndGetName( self, node, ctx, styleSheet, state )
@@ -53,11 +52,10 @@ class GSymViewObjectNodeDispatch (object):
 		
 
 	
-class GSymViewObjectDispatch (object):
-	__metaclass__ = ObjectMethodDispatchMetaClass
+class GSymViewObjectDispatch (GSymViewFragmentFunction):
 	__dispatch_num_args__ = 3
 	
-	def __call__(self, obj, ctx, styleSheet, state):
+	def createViewFragment(self, obj, ctx, styleSheet, state):
 		element = None
 		try:
 			element, name = objectMethodDispatchAndGetName( self, obj, ctx, styleSheet, state )

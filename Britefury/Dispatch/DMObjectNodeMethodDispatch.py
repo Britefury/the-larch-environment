@@ -41,7 +41,6 @@ fieldName0 ... fieldNameN
 	
 A dispatch class is declared like so:
 class MyDispatch (object):
-	__metaclass__ = DMObjectNodeMethodDispatchMetaClass
 	__dispatch_num_args__ = M
 	
 M
@@ -49,15 +48,15 @@ M
 	
 	
 To dispatch, call:
-	dmObjectNodeMethodDispatch( target, node, args ) -> result_of_method_invocation
-		target - the object that is an instance of a class which uses DMObjectNodeMethodDispatchMetaClass
+	dmObjectNodeMethodDispatch( dispatchInstance, node, args ) -> result_of_method_invocation
+		dispatchInstance - the object that is an instance of a dispatch class
 		node - the node to use as the dispatch 'key'
-		args - additional arguments to be supplied to the method from @target that is invoked
+		args - additional arguments to be supplied to the method from @dispatchInstance that is invoked
 
-	dmObjectNodeMethodDispatchAndGetName( target, node, args ) -> (result_of_method_invocation, method_name)
-		target - the object that is an instance of a class which uses DMObjectNodeMethodDispatchMetaClass
+	dmObjectNodeMethodDispatchAndGetName( dispatchInstance, node, args ) -> (result_of_method_invocation, method_name)
+		dispatchInstance - the object that is an instance of a dispatch class
 		node - the node to use as the dispatch 'key'
-		args - additional arguments to be supplied to the method from @target that is invoked
+		args - additional arguments to be supplied to the method from @dispatchInstance that is invoked
 """
 
 
@@ -137,87 +136,93 @@ def DMObjectNodeDispatchMethod(nodeClass):
 	
 	
 		
-class DMObjectNodeMethodDispatchMetaClass (type):
-	def __init__(cls, name, bases, clsDict):
-		super( DMObjectNodeMethodDispatchMetaClass, cls ).__init__( name, bases, clsDict )
-		
+def _initDispatchTableForClass (cls):
+	try:
+		numArgs = cls.__dispatch_num_args__
+	except AttributeError:
+		numArgs = 0
+	
+	# Store two tables for mapping class to method; the method table, and the dispatch table
+	# The method table stores entries only for methods that were declared
+	# The dispatch table stores those, in addition to mappings for subclasses of the node class
+	# The method table is copied from base classes
+
+	# Initialise method table with entries from base classes
+	cls.__method_table__ = {}
+	for base in cls.mro():
 		try:
-			numArgs = cls.__dispatch_num_args__
+			cls.__method_table__.update( base.__method_table__ )
 		except AttributeError:
-			numArgs = 0
-		
-		# Store two tables for mapping class to method; the method table, and the dispatch table
-		# The method table stores entries only for methods that were declared
-		# The dispatch table stores those, in addition to mappings for subclasses of the node class
-		# The method table is copied from base classes
+			pass
 
-		# Initialise method table with entries from base classes
-		cls.__method_table__ = {}
-		for base in bases:
-			try:
-				cls.__method_table__.update( base.__method_table__ )
-			except AttributeError:
-				pass
-		clsDict['__method_table__'] = cls.__method_table__
+	# Add entries to the method table
+	for k, v in cls.__dict__.items():
+		if isinstance( v, DMObjectNodeDispatchMethodWrapper ):
+			method = v
+			nodeClass = v._nodeClass
+			method._init( numArgs )
+			cls.__method_table__[nodeClass] = method
 
-		# Add entries to the method table
-		for k, v in clsDict.items():
-			if isinstance( v, DMObjectNodeDispatchMethodWrapper ):
-				method = v
-				nodeClass = v._nodeClass
-				method._init( numArgs )
-				cls.__method_table__[nodeClass] = method
-
-				
-		# Initialise the dispatch table to a copy of the method table
-		cls.__dispatch_table__ = copy.copy( cls.__method_table__ )
-		clsDict['__dispatch_table__'] = cls.__dispatch_table__
-		
-				
-		
-				
-	def _getMethodForNode(cls, node):
-		# First, try to get a method for the class of @node
-		try:
-			return cls.__dispatch_table__[node.getDMNodeClass()]
-		except KeyError:
-			# Did not find a suitable method
-			# Try looking for one declared for a superclass
-			nodeClass = node.getDMNodeClass()
 			
-			# Iterate over all superclasses of @nodeClass, until we hit one that has an entry
-			superClass = nodeClass.getSuperclass()
-			method = None
-			while superClass is not None:
-				# Try to get a method for a superclass of @node
-				try:
-					method = cls.__dispatch_table__[superClass]
-					break
-				except KeyError:
-					pass
-				superClass = superClass.getSuperclass()
-			# Cache the result so that any lookups in the future will be faster
-			cls.__dispatch_table__[nodeClass] = method
-			return method
-
+	# Initialise the dispatch table to a copy of the method table
+	cls.__dispatch_table__ = copy.copy( cls.__method_table__ )
+	return cls.__dispatch_table__
 		
 
-def dmObjectNodeMethodDispatch(target, node, *args):
+
+		
+		
+def _getMethodForNode(dispatchInstance, node):
+	# Get the class of the dispatch instance
+	dispatchClass = type( dispatchInstance )
+	
+	# Try to get the dispatch table. If it does not exist, initialise it
+	try:
+		dispatchTable = dispatchClass.__dispatch_table__
+	except AttributeError:
+		dispatchTable = _initDispatchTableForClass( dispatchClass )
+
+	# First, try to get a method for the class of @node
+	try:
+		return dispatchTable[node.getDMNodeClass()]
+	except KeyError:
+		# Did not find a suitable method
+		# Try looking for one declared for a superclass
+		nodeClass = node.getDMNodeClass()
+		
+		# Iterate over all superclasses of @nodeClass, until we hit one that has an entry
+		superClass = nodeClass.getSuperclass()
+		method = None
+		while superClass is not None:
+			# Try to get a method for a superclass of @node
+			try:
+				method = dispatchTable[superClass]
+				break
+			except KeyError:
+				pass
+			superClass = superClass.getSuperclass()
+		# Cache the result so that any lookups in the future will be faster
+		dispatchTable[nodeClass] = method
+		return method
+		
+		
+
+def dmObjectNodeMethodDispatch(dispatchInstance, node, *args):
 	if isObjectNode( node ):
-		method = type( target )._getMethodForNode( node )
+		method = _getMethodForNode( dispatchInstance, node )
 		if method is None:
-			raise DispatchError, 'dmObjectNodeMethodDispatch(): could not find method for nodes of type %s in class %s'  %  ( node.getDMNodeClass().getName(), type( target ).__name__ )
-		return method.call( node, target, args )
+			raise DispatchError, 'dmObjectNodeMethodDispatch(): could not find method for nodes of type %s in class %s'  %  ( node.getDMNodeClass().getName(), type( dispatchInstance ).__name__ )
+		return method.call( node, dispatchInstance, args )
 	else:
 		raise DispatchDataError, 'dmObjectNodeMethodDispatch(): can only dispatch on objects; not on %s'  %  ( nodeToSXString( node ) )
 
 
 		
-def dmObjectNodeMethodDispatchAndGetName(target, node, *args):
+def dmObjectNodeMethodDispatchAndGetName(dispatchInstance, node, *args):
 	if isObjectNode( node ):
-		method = type( target )._getMethodForNode( node )
+		method = _getMethodForNode( dispatchInstance, node )
 		if method is None:
-			raise DispatchError, 'dmObjectNodeMethodDispatchAndGetName(): could not find method for nodes of type %s in class %s'  %  ( node.getDMNodeClass().getName(), type( target ).__name__ )
-		return method.call( node, target, args ), method.getName()
+			raise DispatchError, 'dmObjectNodeMethodDispatchAndGetName(): could not find method for nodes of type %s in class %s'  %  ( node.getDMNodeClass().getName(), type( dispatchInstance ).__name__ )
+		return method.call( node, dispatchInstance, args ), method.getName()
 	else:
 		raise DispatchDataError, 'dmObjectNodeMethodDispatchAndGetName(): can only dispatch on objects; not on %s'  %  ( nodeToSXString( node ) )

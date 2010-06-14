@@ -31,7 +31,6 @@ from BritefuryJ.DocPresent.StyleSheet import *
 from BritefuryJ.DocPresent.Browser import Location
 
 from BritefuryJ.GSym import GSymPerspective, GSymRelativeLocationResolver, GSymSubject
-from BritefuryJ.GSym.View import PyGSymViewFragmentFunction
 
 from GSymCore.GSymApp import Application
 from GSymCore.GSymApp.GSymAppViewer.GSymAppViewerStyleSheet import GSymAppViewerStyleSheet
@@ -242,7 +241,7 @@ class GSymAppRelativeLocationResolver (GSymRelativeLocationResolver):
 			return None
 
 
-perspective = GSymPerspective( PyGSymViewFragmentFunction( AppView() ), GSymAppViewerStyleSheet.instance, AttributeTable.instance, None, GSymAppRelativeLocationResolver() )
+perspective = GSymPerspective( AppView(), GSymAppViewerStyleSheet.instance, AttributeTable.instance, None, GSymAppRelativeLocationResolver() )
 
 	
 	

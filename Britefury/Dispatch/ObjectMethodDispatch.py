@@ -22,7 +22,7 @@ Rules of inheritance apply; names of superclasses will be used if that is all th
 
 Methods should have the form:
 
-@ObjectDispatchMethod( Class )
+@ObjectDispatchMethod( Class1, Class2, ... ClassN )
 def methodFor_NodeClass(self, arg0, arg1, ... argM, node):
 	pass
 	
@@ -37,7 +37,6 @@ node
 	
 A dispatch class is declared like so:
 class MyDispatch (object):
-	__metaclass__ = ObjectMethodDispatchMetaClass
 	__dispatch_num_args__ = M
 	
 M
@@ -45,15 +44,15 @@ M
 	
 	
 To dispatch, call:
-	objectMethodDispatch( target, node, args ) -> result_of_method_invocation
-		target - the object that is an instance of a class which uses ObjectMethodDispatchMetaClass
+	objectMethodDispatch( dispatchInstance, node, args ) -> result_of_method_invocation
+		dispatchInstance - the object that is an instance of a dispatch class
 		node - the node to use as the dispatch 'key'
-		args - additional arguments to be supplied to the method from @target that is invoked
+		args - additional arguments to be supplied to the method from @dispatchInstance that is invoked
 
-	objectMethodDispatchAndGetName( target, node, args ) -> (result_of_method_invocation, method_name)
-		target - the object that is an instance of a class which uses ObjectMethodDispatchMetaClass
+	objectMethodDispatchAndGetName( dispatchInstance, node, args ) -> (result_of_method_invocation, method_name)
+		dispatchInstance - the object that is an instance of a dispatch class
 		node - the node to use as the dispatch 'key'
-		args - additional arguments to be supplied to the method from @target that is invoked
+		args - additional arguments to be supplied to the method from @dispatchInstance that is invoked
 """
 
 
@@ -69,7 +68,7 @@ class ObjectDispatchMethodCannotHaveVarKWArgs (Exception):
 		
 		
 class ObjectDispatchMethodWrapper (object):		
-	def __init__(self, cls, function):
+	def __init__(self, classes, function):
 		args, varargs, varkw, defaults = inspect.getargspec( function )
 		if varargs is not None:
 			raise ObjectNodeDispatchMethodCannotHaveVarArgs( function.__name__ )
@@ -77,17 +76,17 @@ class ObjectDispatchMethodWrapper (object):
 			raise ObjectDispatchMethodCannotHaveVarKWArgs( function.__name__ )
 		
 		self._function = function
-		self._cls = cls
+		self._classes = classes
 
 		
-	def call(self, object, dispatchSelf, args):
+	def call(self, object, dispatchInstance, args):
 		callArgs = args + ( object, )
 		
-		return self._function( dispatchSelf, *callArgs )
+		return self._function( dispatchInstance, *callArgs )
 		
 		
-	def callNoArgs(self, object, dispatchSelf):
-		return self._function( dispatchSelf, object )
+	def callNoArgs(self, object, dispatchInstance):
+		return self._function( dispatchInstance, object )
 		
 		
 	def getName(self):
@@ -95,85 +94,91 @@ class ObjectDispatchMethodWrapper (object):
 	
 	
 	
-def ObjectDispatchMethod(cls):
+def ObjectDispatchMethod(*classes):
 	def decorator(fn):
-		return ObjectDispatchMethodWrapper( cls, fn )
+		return ObjectDispatchMethodWrapper( classes, fn )
 	return decorator
 		
 	
 	
 		
-class ObjectMethodDispatchMetaClass (type):
-	def __init__(cls, name, bases, clsDict):
-		super( ObjectMethodDispatchMetaClass, cls ).__init__( name, bases, clsDict )
+
 		
+def _initDispatchTableForClass(cls):
+	try:
+		numArgs = cls.__dispatch_num_args__
+	except AttributeError:
+		numArgs = 0
+	
+	# Store two tables for mapping class to method; the method table, and the dispatch table
+	# The method table stores entries only for methods that were declared
+	# The dispatch table stores those, in addition to mappings for subclasses of the object class
+	# The method table is copied from base classes
+
+	# Initialise method table with entries from base classes
+	cls.__method_table__ = {}
+	for base in cls.mro():
 		try:
-			numArgs = cls.__dispatch_num_args__
+			cls.__method_table__.update( base.__method_table__ )
 		except AttributeError:
-			numArgs = 0
-		
-		# Store two tables for mapping class to method; the method table, and the dispatch table
-		# The method table stores entries only for methods that were declared
-		# The dispatch table stores those, in addition to mappings for subclasses of the object class
-		# The method table is copied from base classes
+			pass
 
-		# Initialise method table with entries from base classes
-		cls.__method_table__ = {}
-		for base in bases:
-			try:
-				cls.__method_table__.update( base.__method_table__ )
-			except AttributeError:
-				pass
-		clsDict['__method_table__'] = cls.__method_table__
+	# Add entries to the method table
+	for k, v in cls.__dict__.items():
+		if isinstance( v, ObjectDispatchMethodWrapper ):
+			method = v
+			for c in v._classes:
+				cls.__method_table__[c] = method
 
-		# Add entries to the method table
-		for k, v in clsDict.items():
-			if isinstance( v, ObjectDispatchMethodWrapper ):
-				method = v
-				cls.__method_table__[v._cls] = method
-
-				
-		# Initialise the dispatch table to a copy of the method table
-		cls.__dispatch_table__ = copy.copy( cls.__method_table__ )
-		clsDict['__dispatch_table__'] = cls.__dispatch_table__
-		
-				
-		
-				
-	def _getMethodForObject(cls, obj):
-		# First, try to get a method for the class of @obj
-		objClass = type( obj )
-		try:
-			return cls.__dispatch_table__[objClass]
-		except KeyError:
-			# Did not find a suitable method
-			# Try looking for one declared for a superclass
 			
-			# Iterate through mro of class
-			method = None
-			for superClass in objClass.mro():
-				# Try to get a method for cls
-				try:
-					method = cls.__dispatch_table__[superClass]
-					break
-				except KeyError:
-					pass
-			# Cache the result so that any lookups in the future will be faster
-			cls.__dispatch_table__[objClass] = method
-			return method
+	# Initialise the dispatch table to a copy of the method table
+	cls.__dispatch_table__ = copy.copy( cls.__method_table__ )
+	return cls.__dispatch_table__
 
 		
-
-def objectMethodDispatch(target, obj, *args):
-	method = type( target )._getMethodForObject( obj )
+def _getMethodForObject(dispatchInstance, obj):
+	# Get the class of the dispatch instance
+	dispatchClass = type( dispatchInstance )
+	
+	# Try to get the dispatch table. If it does not exist, initialise it
+	try:
+		dispatchTable = dispatchClass.__dispatch_table__
+	except AttributeError:
+		dispatchTable = _initDispatchTableForClass( dispatchClass )
+		
+	
+	# First, try to get a method for the class of @obj
+	objClass = type( obj )
+	try:
+		return dispatchTable[objClass]
+	except KeyError:
+		# Did not find a suitable method
+		# Try looking for one declared for a superclass
+		
+		# Iterate through mro of class
+		method = None
+		for superClass in objClass.mro():
+			# Try to get a method for cls
+			try:
+				method = dispatchTable[superClass]
+				break
+			except KeyError:
+				pass
+		# Cache the result so that any lookups in the future will be faster
+		dispatchTable[objClass] = method
+		return method
+		
+		
+def objectMethodDispatch(dispatchInstance, obj, *args):
+	method = _getMethodForObject( dispatchInstance, obj )
 	if method is None:
-		raise DispatchError, 'objectMethodDispatch(): could not find method for objects of type %s in class %s'  %  ( type( obj ).__name__, type( target ).__name__ )
-	return method.call( obj, target, args )
+		raise DispatchError, 'objectMethodDispatch(): could not find method for objects of type %s in class %s'  %  ( type( obj ).__name__, type( dispatchInstance ).__name__ )
+	return method.call( obj, dispatchInstance, args )
 
 
 		
-def objectMethodDispatchAndGetName(target, obj, *args):
-	method = type( target )._getMethodForObject( obj )
+def objectMethodDispatchAndGetName(dispatchInstance, obj, *args):
+	method = _getMethodForObject( dispatchInstance, obj )
 	if method is None:
-		raise DispatchError, 'objectMethodDispatchAndGetName(): could not find method for objects of type %s in class %s'  %  (type( obj ).__name__, type( target ).__name__ )
-	return method.call( obj, target, args ), method.getName()
+		raise DispatchError, 'objectMethodDispatchAndGetName(): could not find method for objects of type %s in class %s'  %  (type( obj ).__name__, type( dispatchInstance ).__name__ )
+	return method.call( obj, dispatchInstance, args ), method.getName()

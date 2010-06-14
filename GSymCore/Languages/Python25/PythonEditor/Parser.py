@@ -1865,15 +1865,42 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 		
 		
-	def test_emptyIndentedSuite(self):
+	def test_emptyIndentation(self):
 		g = Python25Grammar()
-		self._parseListTest( g.emptyIndentedSuite(),
+		self._parseListTest( g.emptyIndentation(),
 				     [
 					     Schema.Indent(),
+					     Schema.Dedent(),],
+				     [
+					     Schema.Indent(),
+		                             None,
+					     Schema.Dedent(), ] )
+		self._parseListTest( g.emptyIndentation(),
+				     [
+					     Schema.Dedent(),
+					     Schema.Indent(), ],
+				     [
+					     Schema.Dedent(),
+		                             None,
+					     Schema.Indent(), ] )
+		self._parseListTest( g.emptyIndentation(),
+				     [
+					     Schema.Indent(),
+					     Schema.Indent(),
+					     Schema.Dedent(),
 					     Schema.Dedent(), ],
 				     [
 					     Schema.Indent(),
 					     Schema.Dedent(), ] )
+		self._parseListTest( g.emptyIndentation(),
+				     [
+					     Schema.Dedent(),
+					     Schema.Dedent(),
+					     Schema.Indent(),
+					     Schema.Indent(), ],
+				     [
+					     Schema.Dedent(),
+					     Schema.Indent(), ] )
 
 		
 	def test_singleIndentedSuite(self):

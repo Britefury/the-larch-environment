@@ -48,6 +48,8 @@ public class ControlsStyleSheet extends StyleSheet
 	private static final Cursor defaultLinkCursor = new Cursor( Cursor.HAND_CURSOR );
 	
 	private static final Painter defaultMenuItemHoverBackground = new FillPainter( new Color( 0.6f, 0.7f, 0.85f ) );
+	private static final double defaultMenuItemXPadding = 5.0;
+	private static final double defaultMenuItemYPadding = 5.0;
 	private static final AttributeValues defaultPopupMenuAttrs = new AttributeValues( new String[] { "hboxSpacing" }, new Object[] { 10.0 } );
 	
 	private static final Painter defaultCheckboxHoverBackground = new OutlinePainter( new Color( 0.5f, 0.625f, 0.75f ) );
@@ -99,6 +101,8 @@ public class ControlsStyleSheet extends StyleSheet
 		initAttr( "buttonBackgHighlightPaint", new Color( 0.925f, 0.925f, 0.925f ) );
 		
 		initAttr( "menuItemHoverBackground", defaultMenuItemHoverBackground );
+		initAttr( "menuItemXPadding", defaultMenuItemXPadding );
+		initAttr( "menuItemYPadding", defaultMenuItemYPadding );
 		
 		initAttr( "popupMenuAttrs", defaultPopupMenuAttrs );
 		
@@ -203,6 +207,16 @@ public class ControlsStyleSheet extends StyleSheet
 	public ControlsStyleSheet withMenuItemHoverBackground(Painter painter)
 	{
 		return (ControlsStyleSheet)withAttr( "menuItemHoverBackground", painter );
+	}
+	
+	public ControlsStyleSheet withMenuItemXPadding(double xPadding)
+	{
+		return (ControlsStyleSheet)withAttr( "menuItemXPadding", xPadding );
+	}
+	
+	public ControlsStyleSheet withMenuItemYPadding(double yPadding)
+	{
+		return (ControlsStyleSheet)withAttr( "menuItemYPadding", yPadding );
 	}
 	
 	
@@ -574,14 +588,14 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		boolean bClosePopupOnActivate = getNonNull( "closePopupOnActivateFlag", Boolean.class, false );
 		DPText element = getLinkStyleSheet().staticText( txt );
-		return new Hyperlink( element, targetLocation, bClosePopupOnActivate );
+		return new Hyperlink( element, targetLocation, bClosePopupOnActivate, this );
 	}
 	
 	public Hyperlink link(String txt, Hyperlink.LinkListener listener)
 	{
 		boolean bClosePopupOnActivate = getNonNull( "closePopupOnActivateFlag", Boolean.class, false );
 		DPText element = getLinkStyleSheet().staticText( txt );
-		return new Hyperlink( element, listener, bClosePopupOnActivate );
+		return new Hyperlink( element, listener, bClosePopupOnActivate, this );
 	}
 	
 	
@@ -607,8 +621,10 @@ public class ControlsStyleSheet extends StyleSheet
 	public MenuItem menuItem(DPElement child, MenuItem.MenuItemListener listener)
 	{
 		boolean bClosePopupOnActivate = getNonNull( "closePopupOnActivateFlag", Boolean.class, false );
+		double xPadding = getNonNull( "menuItemXPadding", Double.class, defaultMenuItemXPadding );
+		double yPadding = getNonNull( "menuItemYPadding", Double.class, defaultMenuItemYPadding );
 		PrimitiveStyleSheet menuItemStyle = getMenuItemStyleSheet();
-		DPBin element = menuItemStyle.bin( child.alignHExpand() );
+		DPBin element = menuItemStyle.bin( child.alignHExpand().pad( xPadding, yPadding ) );
 		return new MenuItem( (DPBin)element.alignHExpand(), listener, bClosePopupOnActivate );
 	}
 
@@ -621,14 +637,18 @@ public class ControlsStyleSheet extends StyleSheet
 	public MenuItem subMenuItemRight(DPElement child, PopupMenu subMenu)
 	{
 		PrimitiveStyleSheet menuItemStyle = getMenuItemStyleSheet();
-		DPBin element = menuItemStyle.bin( child.alignHExpand() );
+		double xPadding = getNonNull( "menuItemXPadding", Double.class, defaultMenuItemXPadding );
+		double yPadding = getNonNull( "menuItemYPadding", Double.class, defaultMenuItemYPadding );
+		DPBin element = menuItemStyle.bin( child.alignHExpand().pad( xPadding, yPadding ) );
 		return new MenuItem( (DPBin)element.alignHExpand(), subMenu, MenuItem.SubmenuPopupDirection.RIGHT, false );
 	}
 
 	public MenuItem subMenuItemDown(DPElement child, PopupMenu subMenu)
 	{
 		PrimitiveStyleSheet menuItemStyle = getMenuItemStyleSheet();
-		DPBin element = menuItemStyle.bin( child.alignHExpand() );
+		double xPadding = getNonNull( "menuItemXPadding", Double.class, defaultMenuItemXPadding );
+		double yPadding = getNonNull( "menuItemYPadding", Double.class, defaultMenuItemYPadding );
+		DPBin element = menuItemStyle.bin( child.alignHExpand().pad( xPadding, yPadding ) );
 		return new MenuItem( (DPBin)element.alignHExpand(), subMenu, MenuItem.SubmenuPopupDirection.DOWN, false );
 	}
 

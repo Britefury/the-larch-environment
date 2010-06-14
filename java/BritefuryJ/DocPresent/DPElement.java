@@ -15,13 +15,10 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.WeakHashMap;
-
-import org.python.core.PyType;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.Border.FilledBorder;
@@ -67,7 +64,6 @@ import BritefuryJ.Math.Xform2;
 import BritefuryJ.Parser.ItemStream.ItemStream;
 import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 import BritefuryJ.Utils.HashUtils;
-import BritefuryJ.Utils.PolymorphicMap;
 
 
 
@@ -265,104 +261,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		}
 	}
 	
-	private static class TreeEventHandlerTable
-	{
-		private static class HandlerEntry
-		{
-			private Object valueType;
-			private TreeEventListener handler;
-			int hash;
-			
-			
-			public HandlerEntry(Object valueType, TreeEventListener handler)
-			{
-				this.valueType = valueType;
-				this.handler = handler;
-				this.hash = HashUtils.doubleHash( valueType.hashCode(), handler.hashCode() );
-			}
-			
-			
-			public int hashCode()
-			{
-				return hash;
-			}
-			
-			public boolean equals(Object x)
-			{
-				if ( x == this )
-				{
-					return true;
-				}
-				
-				if ( x instanceof HandlerEntry )
-				{
-					HandlerEntry ex = (HandlerEntry)x;
-					return valueType.equals( ex.valueType )  &&  handler.equals( ex.handler );
-				}
-				
-				return false;
-			}
-		}
-		
-		private HashMap<HandlerEntry, WeakReference<TreeEventHandlerTable>> derivedTables = new HashMap<HandlerEntry, WeakReference<TreeEventHandlerTable>>();
-		private PolymorphicMap<HandlerEntry> handlers = new PolymorphicMap<HandlerEntry>();
-		
-		
-		public static TreeEventHandlerTable instance = new TreeEventHandlerTable();
-		
-		
-		private TreeEventHandlerTable()
-		{
-		}
-		
-		
-		public boolean handleTreeEvent(DPElement element, TreeEvent event)
-		{
-			HandlerEntry entry = handlers.getValueForObject( event.value );
-			if ( entry != null )
-			{
-				return entry.handler.onTreeEvent( element, event.sourceElement, event.value );
-			}
-			else
-			{
-				return false;
-			}
-		}
-		
-		
-		public TreeEventHandlerTable withJavaHandler(Class<?> valueType, TreeEventListener handler)
-		{
-			HandlerEntry handlerEntry = new HandlerEntry( valueType, handler );
-			WeakReference<TreeEventHandlerTable> derivedRef = derivedTables.get( handlerEntry );
-			if ( derivedRef == null  ||  derivedRef.get() == null )
-			{
-				TreeEventHandlerTable derived = new TreeEventHandlerTable();
-				derived.handlers.copyFrom( handlers );
-				derived.handlers.registerJavaType( valueType, handlerEntry );
-				derivedRef = new WeakReference<TreeEventHandlerTable>( derived );
-				derivedTables.put( handlerEntry, derivedRef );
-			}
-			return derivedRef.get();
-		}
-		
-		public TreeEventHandlerTable withPythonHandler(PyType valueType, TreeEventListener handler)
-		{
-			HandlerEntry handlerEntry = new HandlerEntry( valueType, handler );
-			WeakReference<TreeEventHandlerTable> derivedRef = derivedTables.get( handlerEntry );
-			if ( derivedRef == null  ||  derivedRef.get() == null )
-			{
-				TreeEventHandlerTable derived = new TreeEventHandlerTable();
-				derived.handlers.copyFrom( handlers );
-				derived.handlers.registerPythonType( valueType, handlerEntry );
-				derivedRef = new WeakReference<TreeEventHandlerTable>( derived );
-				derivedTables.put( handlerEntry, derivedRef );
-			}
-			return derivedRef.get();
-		}
-	}
-	
-	
-	
 	//
 	//
 	// INTERACTION FIELDS
@@ -373,10 +271,9 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	{
 		private ObjectDndHandler dndHandler;
 		
-		private TreeEventHandlerTable treeEventHandlers;
-
 		private ArrayList<ElementInteractor> interactors;
 		private ArrayList<ContextMenuFactory> contextFactories;
+		private ArrayList<TreeEventListener> treeEventListeners;
 		
 		
 		
@@ -389,7 +286,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		{
 			InteractionFields f = new InteractionFields();
 			f.dndHandler = dndHandler;
-			f.treeEventHandlers = treeEventHandlers;
 			if ( interactors != null )
 			{
 				f.interactors = new ArrayList<ElementInteractor>();
@@ -399,6 +295,11 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 			{
 				f.contextFactories = new ArrayList<ContextMenuFactory>();
 				f.contextFactories.addAll( contextFactories );
+			}
+			if ( treeEventListeners != null )
+			{
+				f.treeEventListeners = new ArrayList<TreeEventListener>();
+				f.treeEventListeners.addAll( treeEventListeners );
 			}
 			return f;
 		}
@@ -448,9 +349,35 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		}
 		
 		
+		
+		public void addTreeEventListener(TreeEventListener listener)
+		{
+			if ( treeEventListeners == null )
+			{
+				treeEventListeners = new ArrayList<TreeEventListener>();
+			}
+			treeEventListeners.add( listener );
+		}
+		
+		public void removeTreeEventListener(TreeEventListener listener)
+		{
+			if ( treeEventListeners != null )
+			{
+				treeEventListeners.remove( listener );
+				if ( treeEventListeners.isEmpty() )
+				{
+					treeEventListeners = null;
+				}
+			}
+		}
+		
+		
+		
+		
+		
 		public boolean isIdentity()
 		{
-			return dndHandler == null  &&  treeEventHandlers == null  &&  interactors == null  &&  contextFactories == null;
+			return dndHandler == null  &&  treeEventListeners == null  &&  interactors == null  &&  contextFactories == null;
 		}
 	}
 
@@ -2640,32 +2567,28 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	//
 	//
 	
-	private TreeEventHandlerTable getTreeEventHandlers()
-	{
-		return interactionFields != null  ?  interactionFields.treeEventHandlers  :  null;
-	}
-	
-	public void addTreeEventListener(Class<?> eventType, TreeEventListener handler)
+	public void addTreeEventListener(TreeEventListener listener)
 	{
 		ensureValidInteractionFields();
-		if ( interactionFields.treeEventHandlers == null )
-		{
-			interactionFields.treeEventHandlers = TreeEventHandlerTable.instance;
-		}
-		interactionFields.treeEventHandlers = interactionFields.treeEventHandlers.withJavaHandler( eventType, handler );
+		interactionFields.addTreeEventListener( listener );
 		notifyInteractionFieldsModified();
 	}
 	
-	public void addTreeEventListener(PyType eventType, TreeEventListener handler)
+	public void removeTreeEventListener(TreeEventListener listener)
 	{
-		ensureValidInteractionFields();
-		if ( interactionFields.treeEventHandlers == null )
+		if ( interactionFields != null )
 		{
-			interactionFields.treeEventHandlers = TreeEventHandlerTable.instance;
+			interactionFields.removeTreeEventListener( listener );
+			notifyInteractionFieldsModified();
 		}
-		interactionFields.treeEventHandlers = interactionFields.treeEventHandlers.withPythonHandler( eventType, handler );
-		notifyInteractionFieldsModified();
 	}
+	
+	public ArrayList<TreeEventListener> getTreeEventListeners()
+	{
+		return interactionFields != null  ?  interactionFields.treeEventListeners  :  null;
+	}
+
+	
 	
 	public boolean postTreeEventToParent(Object event)
 	{
@@ -2687,12 +2610,15 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	protected boolean treeEvent(TreeEvent event)
 	{
-		TreeEventHandlerTable handlers = getTreeEventHandlers();
-		if ( handlers != null )
+		ArrayList<TreeEventListener> listeners = getTreeEventListeners();
+		if ( listeners != null )
 		{
-			if ( handlers.handleTreeEvent( this, event ) )
+			for (TreeEventListener listener: listeners)
 			{
-				return true;
+				if ( listener.onTreeEvent( this, event.sourceElement, event.value ) )
+				{
+					return true;
+				}
 			}
 		}
 		
