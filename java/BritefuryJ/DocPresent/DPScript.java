@@ -266,6 +266,12 @@ public class DPScript extends DPContainer
 		setChild( slot, null );
 	}
 	
+	protected void replaceChild(DPElement child, DPElement replacement)
+	{
+		int slot = Arrays.asList( children ).indexOf( child );
+		setChild( slot, replacement );
+	}
+	
 	
 	
 	public List<DPElement> getChildren()

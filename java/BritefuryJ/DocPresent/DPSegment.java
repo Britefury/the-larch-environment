@@ -151,7 +151,14 @@ public class DPSegment extends DPContainer
 	
 	protected void replaceChildWithEmpty(DPElement child)
 	{
+		assert child == this.child;
 		setChild( null );
+	}
+	
+	protected void replaceChild(DPElement child, DPElement replacement)
+	{
+		assert child == this.child;
+		setChild( replacement );
 	}
 
 	

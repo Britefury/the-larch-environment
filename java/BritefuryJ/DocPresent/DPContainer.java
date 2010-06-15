@@ -145,6 +145,8 @@ public abstract class DPContainer extends DPElement
 	
 	protected abstract void replaceChildWithEmpty(DPElement child);
 	
+	protected abstract void replaceChild(DPElement child, DPElement replacement);
+	
 	public boolean hasChild(DPElement c)
 	{
 		for (DPElement child: registeredChildren)

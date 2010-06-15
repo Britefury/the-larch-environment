@@ -1210,6 +1210,20 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	}
 	
 	
+	
+	public void replaceWith(DPElement replacement)
+	{
+		if ( parent != null )
+		{
+			parent.replaceChild( this, replacement );
+		}
+		else
+		{
+			throw new RuntimeException( "Could not replace element - element has no parent" );
+		}
+	}
+	
+	
 	public int computeSubtreeSize()
 	{
 		return 1;

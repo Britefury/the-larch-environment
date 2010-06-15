@@ -12,6 +12,7 @@ import java.awt.Cursor;
 import java.awt.Paint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
+import java.util.Arrays;
 import java.util.List;
 
 import org.python.core.PyObject;
@@ -22,6 +23,7 @@ import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPBox;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.DPShape;
 import BritefuryJ.DocPresent.DPSpaceBin;
@@ -43,9 +45,16 @@ import BritefuryJ.Math.Point2;
 
 public class ControlsStyleSheet extends StyleSheet
 {
-	private static final String defaultLinkFontFace = "Sans serif";
-	private static final int defaultLinkFontSize = 14;
-	private static final Cursor defaultLinkCursor = new Cursor( Cursor.HAND_CURSOR );
+	private static final AttributeValues defaultLinkAttrs = new AttributeValues( new String[] { "editable", "fontFace", "fontSize", "foreground", "hoverForeground", "cursor" },
+			new Object[] { false, "Sans serif", 14, Color.blue, Color.red, new Cursor( Cursor.HAND_CURSOR ) } );
+	
+	private static double defaultButtonBorderThickness = 1.0;
+	private static double defaultButtonMargin = 3.0;
+	private static double defaultButtonRounding = 10.0;
+	private static Paint defaultButtonBorderPaint = new Color( 0.55f, 0.525f, 0.5f );
+	private static Paint defaultButtonBorderHighlightPaint = new Color( 0.0f, 0.5f, 0.5f );
+	private static Paint defaultButtonBackgPaint = new Color( 0.85f, 0.85f, 0.85f );
+	private static Paint defaultButtonBackgHighlightPaint = new Color( 0.925f, 0.925f, 0.925f );
 	
 	private static final Painter defaultMenuItemHoverBackground = new FillPainter( new Color( 0.6f, 0.7f, 0.85f ) );
 	private static final double defaultMenuItemXPadding = 5.0;
@@ -57,6 +66,20 @@ public class ControlsStyleSheet extends StyleSheet
 	private static final Paint defaultCheckboxCheckForeground = new Color( 0.0f, 0.2f, 0.4f );
 	private static final double defaultCheckboxCheckSize = 10.0;
 	private static final double defaultCheckboxSpacing = 8.0;
+	
+	private static AttributeValues defaultTextEntryTextAttrs = new AttributeValues();
+	private static double defaultTextEntryBorderThickness = 1.0;
+	private static double defaultTextEntryMargin = 3.0;
+	private static double defaultTextEntryRounding = 5.0;
+	private static Paint defaultTextEntryBorderPaint = new Color( 0.0f, 0.3f, 0.0f );
+	private static Paint defaultTextEntryBackgPaint = new Color( 0.9f, 0.95f, 0.9f );
+	
+	private static final Border defaultOptionMenuBorder = new SolidBorder( 1.0, 3.0, 5.0, 5.0, Color.BLACK, new Color( 0.9f, 0.95f, 0.9f ) );
+	private static final Border defaultOptionMenuHoverBorder = new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.0f, 0.3f, 0.0f ), new Color( 0.95f, 1.0f, 0.95f ) );
+	private static final double defaultOptionMenuContentsSpacing = 5.0;
+	private static final double defaultOptionMenuArrowSize = 16.0;
+	private static final double defaultOptionMenuArrowFilletSize = 4.0;
+	private static final Painter defaultOptionMenuArrowPainter = new FilledOutlinePainter( new Color( 0.7f, 0.85f, 0.7f ), new Color( 0.0f, 0.25f, 0.0f ), new BasicStroke( 1.0f ) );
 	
 	private static final Painter defaultScrollBarArrowPainter = new FilledOutlinePainter( new Color( 0.7f, 0.85f, 1.0f ), new Color( 0.0f, 0.5f, 1.0f ), new BasicStroke( 1.0f ) );
 	private static final Painter defaultScrollBarDragBackgroundPainter = new FilledOutlinePainter( new Color( 0.9f, 0.9f, 0.9f ), new Color( 0.75f, 0.75f, 0.75f ), new BasicStroke( 1.0f ) );
@@ -75,12 +98,6 @@ public class ControlsStyleSheet extends StyleSheet
 	
 	
 	
-	
-	
-
-	
-	
-	
 	public ControlsStyleSheet()
 	{
 		super();
@@ -89,16 +106,15 @@ public class ControlsStyleSheet extends StyleSheet
 		
 		initAttr( "closePopupOnActivateFlag", false );
 
-		initAttr( "linkAttrs", new AttributeValues( new String[] { "editable", "fontFace", "fontSize", "foreground", "hoverForeground", "cursor" },
-				new Object[] { false, defaultLinkFontFace, defaultLinkFontSize, Color.blue, Color.red, defaultLinkCursor } ) );
+		initAttr( "linkAttrs", defaultLinkAttrs );
 		
-		initAttr( "buttonBorderThickness", 1.0 );
-		initAttr( "buttonMargin", 3.0 );
-		initAttr( "buttonRounding", 10.0 );
-		initAttr( "buttonBorderPaint", new Color( 0.55f, 0.525f, 0.5f ) );
-		initAttr( "buttonBorderHighlightPaint", new Color( 0.0f, 0.5f, 0.5f ) );
-		initAttr( "buttonBackgPaint", new Color( 0.85f, 0.85f, 0.85f ) );
-		initAttr( "buttonBackgHighlightPaint", new Color( 0.925f, 0.925f, 0.925f ) );
+		initAttr( "buttonBorderThickness", defaultButtonBorderThickness );
+		initAttr( "buttonMargin", defaultButtonMargin );
+		initAttr( "buttonRounding", defaultButtonRounding );
+		initAttr( "buttonBorderPaint", defaultButtonBorderPaint );
+		initAttr( "buttonBorderHighlightPaint", defaultButtonBorderHighlightPaint );
+		initAttr( "buttonBackgPaint", defaultButtonBackgPaint );
+		initAttr( "buttonBackgHighlightPaint", defaultButtonBackgHighlightPaint );
 		
 		initAttr( "menuItemHoverBackground", defaultMenuItemHoverBackground );
 		initAttr( "menuItemXPadding", defaultMenuItemXPadding );
@@ -112,12 +128,19 @@ public class ControlsStyleSheet extends StyleSheet
 		initAttr( "checkboxCheckSize", defaultCheckboxCheckSize );
 		initAttr( "checkboxSpacing", defaultCheckboxSpacing );
 		
-		initAttr( "textEntryTextAttrs", new AttributeValues() );
-		initAttr( "textEntryBorderThickness", 3.0 );
-		initAttr( "textEntryMargin", 3.0 );
-		initAttr( "textEntryRounding", 10.0 );
-		initAttr( "textEntryBorderPaint", new Color( 0.55f, 0.8f, 0.55f ) );
-		initAttr( "textEntryBackgPaint", new Color( 0.9f, 1.0f, 0.9f ) );
+		initAttr( "textEntryTextAttrs", defaultTextEntryTextAttrs );
+		initAttr( "textEntryBorderThickness", defaultTextEntryBorderThickness );
+		initAttr( "textEntryMargin", defaultTextEntryMargin );
+		initAttr( "textEntryRounding", defaultTextEntryRounding );
+		initAttr( "textEntryBorderPaint", defaultTextEntryBorderPaint );
+		initAttr( "textEntryBackgPaint", defaultTextEntryBackgPaint );
+		
+		initAttr( "optionMenuBorder", defaultOptionMenuBorder );
+		initAttr( "optionMenuHoverBorder", defaultOptionMenuHoverBorder );
+		initAttr( "optionMenuContentsSpacing", defaultOptionMenuContentsSpacing );
+		initAttr( "optionMenuArrowSize", defaultOptionMenuArrowSize );
+		initAttr( "optionMenuArrowFilletSize", defaultOptionMenuArrowFilletSize );
+		initAttr( "optionMenuArrowPainter", defaultOptionMenuArrowPainter );
 		
 		initAttr( "scrollBarArrowPainter", defaultScrollBarArrowPainter );
 		initAttr( "scrollBarArrowHoverPainter", new FilledOutlinePainter( new Color( 0.8f, 0.9f, 1.0f ), new Color( 0.5f, 0.75f, 1.0f ), new BasicStroke( 1.0f ) ) );
@@ -284,6 +307,39 @@ public class ControlsStyleSheet extends StyleSheet
 	}
 	
 	
+	
+	public ControlsStyleSheet withOptionMenuBorder(Border border)
+	{
+		return (ControlsStyleSheet)withAttr( "optionMenuBorder", border );
+	}
+	
+	public ControlsStyleSheet withOptionMenuHoverBorder(Border border)
+	{
+		return (ControlsStyleSheet)withAttr( "optionMenuHoverBorder", border );
+	}
+	
+	public ControlsStyleSheet withOptionMenuContentsSpacing(double spacing)
+	{
+		return (ControlsStyleSheet)withAttr( "optionMenuContentsSpacing", spacing );
+	}
+	
+	public ControlsStyleSheet withOptionMenuArrowSize(double size)
+	{
+		return (ControlsStyleSheet)withAttr( "optionMenuArrowSize", size );
+	}
+	
+	public ControlsStyleSheet withOptionMenuArrowFilletSize(double size)
+	{
+		return (ControlsStyleSheet)withAttr( "optionMenuArrowFilletSize", size );
+	}
+	
+	public ControlsStyleSheet withOptionMenuArrowPainter(Painter painter)
+	{
+		return (ControlsStyleSheet)withAttr( "optionMenuArrowPainter", painter );
+	}
+	
+	
+	
 	public ControlsStyleSheet withScrollBarArrowPainter(Painter painter)
 	{
 		return (ControlsStyleSheet)withAttr( "scrollBarArrowPainter", painter );
@@ -337,6 +393,36 @@ public class ControlsStyleSheet extends StyleSheet
 	
 	
 	
+	private Path2D.Double[] createArrowPaths(double size, double filletSize)
+	{
+		double arrowRadius = size * 0.5;
+		
+		Point2 a = new Point2( 0.0, arrowRadius );
+		Point2 b = new Point2( arrowRadius * Math.sin( Math.toRadians( 120.0 ) ), arrowRadius * Math.cos( Math.toRadians( 120.0 ) ) );
+		Point2 c = new Point2( arrowRadius * Math.sin( Math.toRadians( 240.0 ) ), arrowRadius * Math.cos( Math.toRadians( 240.0 ) ) );
+		
+		Path2D.Double arrowShape = DPShape.filletedPath( new Point2[] { a, b, c }, true, filletSize );
+		//Path2D.Double arrowShape = DPShape.path( new Point2[] { a, b, c }, true );
+		
+		Path2D.Double up = arrowShape;
+		Path2D.Double right = (Path2D.Double)arrowShape.clone();
+		Path2D.Double down = (Path2D.Double)arrowShape.clone();
+		Path2D.Double left = (Path2D.Double)arrowShape.clone();
+		
+		right.transform( AffineTransform.getQuadrantRotateInstance( 3 ) );
+		up.transform( AffineTransform.getQuadrantRotateInstance( 2 ) );
+		left.transform( AffineTransform.getQuadrantRotateInstance( 1 ) );
+		
+		up.transform( AffineTransform.getTranslateInstance( -up.getBounds2D().getMinX(), -up.getBounds2D().getMinY() ) );
+		right.transform( AffineTransform.getTranslateInstance( -right.getBounds2D().getMinX(), -right.getBounds2D().getMinY() ) );
+		down.transform( AffineTransform.getTranslateInstance( -down.getBounds2D().getMinX(), -down.getBounds2D().getMinY() ) );
+		left.transform( AffineTransform.getTranslateInstance( -left.getBounds2D().getMinX(), -left.getBounds2D().getMinY() ) );
+			
+		return new Path2D.Double[] { left, right, up, down }; 
+	}
+	
+	
+
 	private PrimitiveStyleSheet linkStyleSheet = null;
 
 	private PrimitiveStyleSheet getLinkStyleSheet()
@@ -358,11 +444,11 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		if ( buttonBorder == null )
 		{
-			double thickness = getNonNull( "buttonBorderThickness", Double.class, 1.0 );
-			double margin = getNonNull( "buttonMargin", Double.class, 5.0 );
-			double rounding = getNonNull( "buttonRounding", Double.class, 10.0 );
-			Paint borderPaint = getNonNull( "buttonBorderPaint", Paint.class, Color.black );
-			Paint backgPaint = getNonNull( "buttonBackgPaint", Paint.class, new Color( 1.0f, 1.0f, 0.7f ) );
+			double thickness = getNonNull( "buttonBorderThickness", Double.class, defaultButtonBorderThickness );
+			double margin = getNonNull( "buttonMargin", Double.class, defaultButtonMargin );
+			double rounding = getNonNull( "buttonRounding", Double.class, defaultButtonRounding );
+			Paint borderPaint = getNonNull( "buttonBorderPaint", Paint.class, defaultButtonBorderPaint );
+			Paint backgPaint = getNonNull( "buttonBackgPaint", Paint.class, defaultButtonBackgPaint );
 
 			buttonBorder = new SolidBorder( thickness, margin, rounding, rounding, borderPaint, backgPaint );
 		}
@@ -377,11 +463,11 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		if ( buttonHighlightBorder == null )
 		{
-			double thickness = getNonNull( "buttonBorderThickness", Double.class, 1.0 );
-			double margin = getNonNull( "buttonMargin", Double.class, 5.0 );
-			double rounding = getNonNull( "buttonRounding", Double.class, 10.0 );
-			Paint borderPaint = getNonNull( "buttonBorderHighlightPaint", Paint.class, Color.black );
-			Paint backgPaint = getNonNull( "buttonBackgHighlightPaint", Paint.class, new Color( 1.0f, 1.0f, 0.7f ) );
+			double thickness = getNonNull( "buttonBorderThickness", Double.class, defaultButtonBorderThickness );
+			double margin = getNonNull( "buttonMargin", Double.class, defaultButtonMargin );
+			double rounding = getNonNull( "buttonRounding", Double.class, defaultButtonRounding );
+			Paint borderPaint = getNonNull( "buttonBorderHighlightPaint", Paint.class, defaultButtonBorderHighlightPaint );
+			Paint backgPaint = getNonNull( "buttonBackgHighlightPaint", Paint.class, defaultButtonBackgHighlightPaint );
 
 			buttonHighlightBorder = new SolidBorder( thickness, margin, rounding, rounding, borderPaint, backgPaint );
 		}
@@ -484,11 +570,11 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		if ( textEntryBorder == null )
 		{
-			double thickness = getNonNull( "textEntryBorderThickness", Double.class, 3.0 );
-			double margin = getNonNull( "textEntryMargin", Double.class, 3.0 );
-			double rounding = getNonNull( "textEntryRounding", Double.class, 10.0 );
-			Paint borderPaint = getNonNull( "textEntryBorderPaint", Paint.class, new Color( 0.55f, 0.8f, 0.55f ) );
-			Paint backgPaint = getNonNull( "textEntryBackgPaint", Paint.class, new Color( 0.9f, 1.0f, 0.9f ) );
+			double thickness = getNonNull( "textEntryBorderThickness", Double.class, defaultTextEntryBorderThickness );
+			double margin = getNonNull( "textEntryMargin", Double.class, defaultTextEntryMargin );
+			double rounding = getNonNull( "textEntryRounding", Double.class, defaultTextEntryRounding );
+			Paint borderPaint = getNonNull( "textEntryBorderPaint", Paint.class, defaultTextEntryBorderPaint );
+			Paint backgPaint = getNonNull( "textEntryBackgPaint", Paint.class, defaultTextEntryBackgPaint );
 
 			textEntryBorder = new SolidBorder( thickness, margin, rounding, rounding, borderPaint, backgPaint );
 		}
@@ -504,11 +590,57 @@ public class ControlsStyleSheet extends StyleSheet
 		if ( textEntryStyleSheet == null )
 		{
 			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
-			AttributeValues textAttrs = getNonNull( "textEntryTextAttrs", AttributeValues.class, AttributeValues.identity );
+			AttributeValues textAttrs = getNonNull( "textEntryTextAttrs", AttributeValues.class, defaultTextEntryTextAttrs );
 			textEntryStyleSheet = ((PrimitiveStyleSheet)primitive.withAttrValues( textAttrs )).withBorder( getTextEntryBorder() );
 		}
 		return textEntryStyleSheet;
 	}
+	
+	
+	
+	private Path2D.Double optionMenuArrowPaths[] = null;
+	
+	private Path2D.Double[] getOptionMenuArrowPaths()
+	{
+		if ( optionMenuArrowPaths == null )
+		{
+			double arrowSize = get( "optionMenuArrowSize", Double.class, defaultScrollBarArrowPadding );
+			double arrowFilletSize = get( "optionMenuArrowFilletSize", Double.class, defaultScrollBarArrowFilletSize );
+			
+			optionMenuArrowPaths = createArrowPaths( arrowSize, arrowFilletSize );
+		}
+		return optionMenuArrowPaths;
+	}
+	
+	
+	private PrimitiveStyleSheet optionMenuArrowStyleSheet = null;
+	
+	private PrimitiveStyleSheet getOptionMenuArrowStyleSheet()
+	{
+		if ( optionMenuArrowStyleSheet == null )
+		{
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			Painter arrowPainter = getNonNull( "optionMenuArrowPainter", Painter.class, defaultOptionMenuArrowPainter );
+			optionMenuArrowStyleSheet = primitive.withShapePainter( arrowPainter );
+		}
+		return optionMenuArrowStyleSheet;
+	}
+	
+	
+	private PrimitiveStyleSheet optionMenuStyleSheet = null;
+
+	private PrimitiveStyleSheet getOptionMenuStyleSheet()
+	{
+		if ( optionMenuStyleSheet == null )
+		{
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			Border optionMenuBorder = getNonNull( "optionMenuBorder", Border.class, defaultOptionMenuBorder );
+			double contentsSpacing = getNonNull( "optionMenuContentsSpacing", Double.class, defaultOptionMenuContentsSpacing );
+			optionMenuStyleSheet = primitive.withBorder( optionMenuBorder ).withHBoxSpacing( contentsSpacing );
+		}
+		return optionMenuStyleSheet;
+	}
+	
 	
 	
 	
@@ -537,30 +669,8 @@ public class ControlsStyleSheet extends StyleSheet
 			double scrollBarSize = get( "scrollBarSize", Double.class, defaultScrollBarSize );
 			double arrowPadding = get( "scrollBarArrowPadding", Double.class, defaultScrollBarArrowPadding );
 			double arrowFilletSize = get( "scrollBarArrowFilletSize", Double.class, defaultScrollBarArrowFilletSize );
-			double arrowRadius = scrollBarSize * 0.5  -  arrowPadding;
 			
-			Point2 a = new Point2( 0.0, arrowRadius );
-			Point2 b = new Point2( arrowRadius * Math.sin( Math.toRadians( 120.0 ) ), arrowRadius * Math.cos( Math.toRadians( 120.0 ) ) );
-			Point2 c = new Point2( arrowRadius * Math.sin( Math.toRadians( 240.0 ) ), arrowRadius * Math.cos( Math.toRadians( 240.0 ) ) );
-			
-			Path2D.Double arrowShape = DPShape.filletedPath( new Point2[] { a, b, c }, true, arrowFilletSize );
-			//Path2D.Double arrowShape = DPShape.path( new Point2[] { a, b, c }, true );
-			
-			Path2D.Double up = arrowShape;
-			Path2D.Double right = (Path2D.Double)arrowShape.clone();
-			Path2D.Double down = (Path2D.Double)arrowShape.clone();
-			Path2D.Double left = (Path2D.Double)arrowShape.clone();
-			
-			right.transform( AffineTransform.getQuadrantRotateInstance( 3 ) );
-			up.transform( AffineTransform.getQuadrantRotateInstance( 2 ) );
-			left.transform( AffineTransform.getQuadrantRotateInstance( 1 ) );
-			
-			up.transform( AffineTransform.getTranslateInstance( -up.getBounds2D().getMinX(), -up.getBounds2D().getMinY() ) );
-			right.transform( AffineTransform.getTranslateInstance( -right.getBounds2D().getMinX(), -right.getBounds2D().getMinY() ) );
-			down.transform( AffineTransform.getTranslateInstance( -down.getBounds2D().getMinX(), -down.getBounds2D().getMinY() ) );
-			left.transform( AffineTransform.getTranslateInstance( -left.getBounds2D().getMinX(), -left.getBounds2D().getMinY() ) );
-			
-			scrollBarArrowPaths = new Path2D.Double[] { up, right, down, left }; 
+			scrollBarArrowPaths = createArrowPaths( scrollBarSize - arrowPadding * 2.0, arrowFilletSize );
 		}
 		return scrollBarArrowPaths;
 	}
@@ -736,13 +846,35 @@ public class ControlsStyleSheet extends StyleSheet
 	
 	
 	
+	public OptionMenu optionMenu(DPElement optionChoices[], DPElement menuChoices[], int initialChoice, OptionMenu.OptionMenuListener listener)
+	{
+		return optionMenu( Arrays.asList( optionChoices ), Arrays.asList( menuChoices ), initialChoice, listener );
+	}
+	
+	public OptionMenu optionMenu(List<DPElement> optionChoices, List<DPElement> menuChoices, int initialChoice, OptionMenu.OptionMenuListener listener)
+	{
+		PrimitiveStyleSheet arrowStyle = getOptionMenuArrowStyleSheet();
+		Border optionMenuBorder = getNonNull( "optionMenuBorder", Border.class, defaultOptionMenuBorder );
+		Border optionMenuHoverBorder = getNonNull( "optionMenuHoverBorder", Border.class, defaultOptionMenuHoverBorder );
+
+		Path2D.Double downPath = getOptionMenuArrowPaths()[3];
+		DPShape downArrow = arrowStyle.shape( downPath );
+		PrimitiveStyleSheet optionMenuStyle = getOptionMenuStyleSheet();
+		DPBin choiceBin = PrimitiveStyleSheet.instance.bin( optionChoices.get( initialChoice ) );
+		DPHBox optionContents = optionMenuStyle.hbox( new DPElement[] { choiceBin.alignVCentre(), downArrow.alignVCentre() } );
+		DPBorder element = getOptionMenuStyleSheet().border( optionContents );
+		return new OptionMenu( element, choiceBin, optionChoices, menuChoices, initialChoice, listener, optionMenuBorder, optionMenuHoverBorder, this );
+	}
+	
+	
+	
 	public ScrollBar horizontalScrollBar(Range range)
 	{
 		PrimitiveStyleSheet arrowStyle = getScrollBarArrowStyleSheet();
 		PrimitiveStyleSheet dragBackgroundStyle = getScrollBarDragBackgroundStyleSheet();
 		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 		
-		Path2D.Double leftPath = getScrollBarArrowPaths()[3];
+		Path2D.Double leftPath = getScrollBarArrowPaths()[0];
 		Path2D.Double rightPath = getScrollBarArrowPaths()[1];
 		
 		double arrowPadding = get( "scrollBarArrowPadding", Double.class, defaultScrollBarArrowPadding );
@@ -777,8 +909,8 @@ public class ControlsStyleSheet extends StyleSheet
 		PrimitiveStyleSheet dragBackgroundStyle = getScrollBarDragBackgroundStyleSheet();
 		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 		
-		Path2D.Double upPath = getScrollBarArrowPaths()[0];
-		Path2D.Double downPath = getScrollBarArrowPaths()[2];
+		Path2D.Double upPath = getScrollBarArrowPaths()[2];
+		Path2D.Double downPath = getScrollBarArrowPaths()[3];
 		
 		double arrowPadding = get( "scrollBarArrowPadding", Double.class, defaultScrollBarArrowPadding );
 		double arrowSpacing = get( "scrollBarArrowSpacing", Double.class, defaultScrollBarArrowSpacing );

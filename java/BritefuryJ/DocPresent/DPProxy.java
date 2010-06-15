@@ -106,6 +106,12 @@ public class DPProxy extends DPContainer
 		setChild( null );
 	}
 	
+	protected void replaceChild(DPElement child, DPElement replacement)
+	{
+		assert child == this.getChild();
+		setChild( replacement );
+	}
+	
 	
 
 	public List<DPElement> getChildren()

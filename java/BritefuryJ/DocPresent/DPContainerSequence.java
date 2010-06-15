@@ -360,6 +360,12 @@ abstract public class DPContainerSequence extends DPContainer
 		set( index, new DPHiddenContent() );
 	}
 		
+	protected void replaceChild(DPElement child, DPElement replacement)
+	{
+		int index = registeredChildren.indexOf( child );
+		set( index, replacement );
+	}
+	
 	
 
 	

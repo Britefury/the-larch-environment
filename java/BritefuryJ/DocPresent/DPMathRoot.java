@@ -115,6 +115,12 @@ public class DPMathRoot extends DPContainer
 		setChild( null );
 	}
 	
+	protected void replaceChild(DPElement child, DPElement replacement)
+	{
+		assert child == this.child;
+		setChild( replacement );
+	}
+	
 	
 
 	public List<DPElement> getChildren()
