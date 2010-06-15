@@ -88,11 +88,11 @@ public class SolidBorder extends Border
 		
 		if ( roundingX != 0.0  ||  roundingY != 0.0 )
 		{
-			graphics.draw( new RoundRectangle2D.Double( x + thickness*0.5, y + thickness*0.5, w-thickness, h-thickness, roundingX, roundingY ) );
+			graphics.draw( new RoundRectangle2D.Double( x, y, w-thickness, h-thickness, roundingX, roundingY ) );
 		}
 		else
 		{
-			graphics.draw( new Rectangle2D.Double( x + thickness*0.5, y + thickness*0.5, w-thickness, h-thickness ) );
+			graphics.draw( new Rectangle2D.Double( x, y, w-thickness, h-thickness ) );
 		}
 		
 		graphics.setStroke( prevStroke );

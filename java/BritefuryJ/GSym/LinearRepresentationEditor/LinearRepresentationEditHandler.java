@@ -53,7 +53,7 @@ public abstract class LinearRepresentationEditHandler implements EditHandler
 	}
 	
 	@Override
-	public void replaceSelectionWithText(Selection selection, String replacement)
+	public void replaceSelectionWithText(Selection selection, Caret caret, String replacement)
 	{
 		replaceSelection( selection, null );
 	}

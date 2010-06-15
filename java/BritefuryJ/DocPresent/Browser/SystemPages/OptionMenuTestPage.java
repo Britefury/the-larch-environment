@@ -64,19 +64,16 @@ public class OptionMenuTestPage extends SystemPage
 		return styleSheet.vbox( new DPElement[] { heading.padY( 10.0 ), contents } );
 	}
 	
-	protected DPElement colouredText(PrimitiveStyleSheet style)
-	{
-		return style.staticText( "Change the colour of this text using the buttons below." );
-	}
-	
 	protected DPElement createContents()
 	{
-		DPText choiceText = styleSheet.staticText( "false" );
-		DPElement optionChoices[] = new DPElement[] { styleSheet.staticText( "Zero" ), styleSheet.staticText( "One" ), styleSheet.staticText( "Two" ), styleSheet.staticText( "Three" ), styleSheet.staticText( "Four" ) };
-		DPElement menuChoices[] = new DPElement[] { styleSheet.staticText( "Zero" ), styleSheet.staticText( "One" ), styleSheet.staticText( "Two" ), styleSheet.staticText( "Three" ), styleSheet.staticText( "Four" ) };
+		DPText choiceText = styleSheet.staticText( "0" );
+		DPElement optionChoices[] = new DPElement[] { styleSheet.staticText( "Zero" ), styleSheet.staticText( "One" ), styleSheet.staticText( "Two" ),
+				styleSheet.staticText( "Three" ), styleSheet.staticText( "Four" ) };
+		DPElement menuChoices[] = new DPElement[] { styleSheet.staticText( "Zero" ), styleSheet.staticText( "One" ), styleSheet.staticText( "Two" ),
+				styleSheet.staticText( "Three" ), styleSheet.staticText( "Four" ) };
 		OptionMenuTextChanger listener = new OptionMenuTextChanger( choiceText );
 		OptionMenu optionMenu = controlsStyleSheet.optionMenu( optionChoices, menuChoices, 0, listener );
-		DPElement optionMenus = styleSheet.withHBoxSpacing( 20.0 ).hbox( new DPElement[] { optionMenu.getElement() } ).padX( 5.0 );
+		DPElement optionMenus = styleSheet.withHBoxSpacing( 20.0 ).hbox( new DPElement[] { styleSheet.spaceBin( optionMenu.getElement().alignHExpand(), 100.0, -1.0 ) } ).padX( 5.0 );
 		DPElement optionMenuSectionContents = styleSheet.vbox( new DPElement[] { choiceText, optionMenus } );
 		DPElement optionMenuSection = section( "Option menu", optionMenuSectionContents );
 		

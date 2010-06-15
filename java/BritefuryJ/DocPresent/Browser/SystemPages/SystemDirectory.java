@@ -47,6 +47,7 @@ public class SystemDirectory
 		controlTestPages.add( new PopupTestPage() );
 		controlTestPages.add( new ScrollBarTestPage() );
 		controlTestPages.add( new ScrolledViewportTestPage() );
+		controlTestPages.add( new SpinEntryTestPage() );
 		controlTestPages.add( new TextEntryTestPage() );
 	}
 	

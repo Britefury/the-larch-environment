@@ -11,12 +11,14 @@ import BritefuryJ.DocPresent.DPElement;
 
 public class PopupMenu
 {
+	private DPElement menuElement;
 	private DPAbstractBox menuBox;
 	private boolean bEmpty;
 	
 	
-	protected PopupMenu(DPAbstractBox menuBox)
+	protected PopupMenu(DPElement menuElement, DPAbstractBox menuBox)
 	{
+		this.menuElement = menuElement;
 		this.menuBox = menuBox;
 		bEmpty = menuBox.size() == 0;
 	}
@@ -32,17 +34,17 @@ public class PopupMenu
 	
 	public void popupToRightOf(DPElement element)
 	{
-		menuBox.popupToRightOf( element, true );
+		menuElement.popupToRightOf( element, true, true );
 	}
 	
 	public void popupBelow(DPElement element)
 	{
-		menuBox.popupBelow( element, true );
+		menuElement.popupBelow( element, true, true );
 	}
 	
 	public void popupAtMousePosition(DPElement element)
 	{
-		element.getRootElement().createPopupAtMousePosition( menuBox, true );
+		element.getRootElement().createPopupAtMousePosition( menuElement, true, true );
 	}
 	
 	

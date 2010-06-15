@@ -1215,6 +1215,8 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	{
 		if ( parent != null )
 		{
+			int alignmentFlags = getAlignmentFlags();
+			replacement.setAlignmentFlags( alignmentFlags );
 			parent.replaceChild( this, replacement );
 		}
 		else
@@ -3017,29 +3019,29 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	//
 	//
 	
-	public PresentationComponent.PresentationPopup popupBelow(DPElement targetElement, boolean bCloseOnLoseFocus)
+	public PresentationComponent.PresentationPopup popupBelow(DPElement targetElement, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		AABox2 visibleBox = targetElement.getVisibleBoxInLocalSpace();
-		return popupOver( targetElement, new Point2( visibleBox.getLowerX(), visibleBox.getUpperY() ), bCloseOnLoseFocus );
+		return popupOver( targetElement, new Point2( visibleBox.getLowerX(), visibleBox.getUpperY() ), bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public PresentationComponent.PresentationPopup popupToRightOf(DPElement targetElement, boolean bCloseOnLoseFocus)
+	public PresentationComponent.PresentationPopup popupToRightOf(DPElement targetElement, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		AABox2 visibleBox = targetElement.getVisibleBoxInLocalSpace();
-		return popupOver( targetElement, new Point2( visibleBox.getUpperX(), visibleBox.getLowerY() ), bCloseOnLoseFocus );
+		return popupOver( targetElement, new Point2( visibleBox.getUpperX(), visibleBox.getLowerY() ), bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public PresentationComponent.PresentationPopup popupOver(DPElement targetElement, Point2 targetLocalPos, boolean bCloseOnLoseFocus)
+	public PresentationComponent.PresentationPopup popupOver(DPElement targetElement, Point2 targetLocalPos, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		if ( targetElement.isLocalSpacePointVisible( targetLocalPos ) )
 		{
 			Xform2 x = targetElement.getLocalToRootXform();
 			Point2 rootPos = x.transform( targetLocalPos );
-			return getRootElement().createPopupPresentation( this, rootPos, bCloseOnLoseFocus );
+			return targetElement.getRootElement().createPopupPresentation( this, rootPos, bCloseOnLoseFocus, bRequestFocus );
 		}
 		else
 		{
-			return getRootElement().createPopupAtMousePosition( this, bCloseOnLoseFocus );
+			return targetElement.getRootElement().createPopupAtMousePosition( this, bCloseOnLoseFocus, bRequestFocus );
 		}
 	}
 	
