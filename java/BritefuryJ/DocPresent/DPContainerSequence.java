@@ -179,6 +179,13 @@ abstract public class DPContainerSequence extends DPContainer
 	}
 	
 	
+	
+	public int indexOf(DPElement child)
+	{
+		return registeredChildren.indexOf( child );
+	}
+	
+	
 	public DPElement get(int index)
 	{
 		return registeredChildren.get( index );

@@ -31,6 +31,7 @@ import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.DPShape;
 import BritefuryJ.DocPresent.DPSpaceBin;
 import BritefuryJ.DocPresent.DPText;
+import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPViewport;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.FilledBorder;
@@ -51,13 +52,13 @@ public class ControlsStyleSheet extends StyleSheet
 	private static final AttributeValues defaultLinkAttrs = new AttributeValues( new String[] { "editable", "fontFace", "fontSize", "foreground", "hoverForeground", "cursor" },
 			new Object[] { false, "Sans serif", 14, Color.blue, Color.red, new Cursor( Cursor.HAND_CURSOR ) } );
 	
-	private static double defaultButtonBorderThickness = 1.0;
-	private static double defaultButtonMargin = 3.0;
-	private static double defaultButtonRounding = 10.0;
-	private static Paint defaultButtonBorderPaint = new Color( 0.55f, 0.525f, 0.5f );
-	private static Paint defaultButtonBorderHighlightPaint = new Color( 0.0f, 0.5f, 0.5f );
-	private static Paint defaultButtonBackgPaint = new Color( 0.85f, 0.85f, 0.85f );
-	private static Paint defaultButtonBackgHighlightPaint = new Color( 0.925f, 0.925f, 0.925f );
+	private static final double defaultButtonBorderThickness = 1.0;
+	private static final double defaultButtonMargin = 3.0;
+	private static final double defaultButtonRounding = 10.0;
+	private static final Paint defaultButtonBorderPaint = new Color( 0.55f, 0.525f, 0.5f );
+	private static final Paint defaultButtonBorderHighlightPaint = new Color( 0.0f, 0.5f, 0.5f );
+	private static final Paint defaultButtonBackgPaint = new Color( 0.85f, 0.85f, 0.85f );
+	private static final Paint defaultButtonBackgHighlightPaint = new Color( 0.925f, 0.925f, 0.925f );
 	
 	private static final Painter defaultMenuItemHoverBackground = new FillPainter( new Color( 0.6f, 0.7f, 0.85f ) );
 	private static final double defaultMenuItemXPadding = 5.0;
@@ -72,12 +73,14 @@ public class ControlsStyleSheet extends StyleSheet
 	private static final double defaultCheckboxCheckSize = 10.0;
 	private static final double defaultCheckboxSpacing = 8.0;
 	
-	private static AttributeValues defaultTextEntryTextAttrs = new AttributeValues();
-	private static double defaultTextEntryBorderThickness = 1.0;
-	private static double defaultTextEntryMargin = 3.0;
-	private static double defaultTextEntryRounding = 5.0;
-	private static Paint defaultTextEntryBorderPaint = new Color( 0.0f, 0.3f, 0.0f );
-	private static Paint defaultTextEntryBackgPaint = new Color( 0.9f, 0.95f, 0.9f );
+	private static final AttributeValues defaultTextAreaAttrs = new AttributeValues( new String[] { "border" }, new Object[] { new SolidBorder( 2.0, 5.0, 3.0, 3.0, new Color( 0.3f, 0.3f, 0.3f ), null ) } );
+	
+	private static final AttributeValues defaultTextEntryTextAttrs = new AttributeValues();
+	private static final double defaultTextEntryBorderThickness = 1.0;
+	private static final double defaultTextEntryMargin = 3.0;
+	private static final double defaultTextEntryRounding = 5.0;
+	private static final Paint defaultTextEntryBorderPaint = new Color( 0.0f, 0.3f, 0.0f );
+	private static final Paint defaultTextEntryBackgPaint = new Color( 0.9f, 0.95f, 0.9f );
 	
 	private static final double defaultSpinEntryArrowSize = 16.0;
 	private static final double defaultSpinEntryArrowFilletSize = 4.0;
@@ -142,6 +145,8 @@ public class ControlsStyleSheet extends StyleSheet
 		initAttr( "checkboxCheckForeground", defaultCheckboxCheckForeground );
 		initAttr( "checkboxCheckSize", defaultCheckboxCheckSize );
 		initAttr( "checkboxSpacing", defaultCheckboxSpacing );
+		
+		initAttr( "textAreaAttrs", defaultTextAreaAttrs );
 		
 		initAttr( "textEntryTextAttrs", defaultTextEntryTextAttrs );
 		initAttr( "textEntryBorderThickness", defaultTextEntryBorderThickness );
@@ -301,6 +306,13 @@ public class ControlsStyleSheet extends StyleSheet
 	}
 	
 	
+	
+	public ControlsStyleSheet withTextAreaAttrs(AttributeValues attrs)
+	{
+		return (ControlsStyleSheet)withAttr( "textAreaAttrs", attrs );
+	}
+	
+
 	
 	public ControlsStyleSheet withTextEntryTextAttrs(AttributeValues attrs)
 	{
@@ -628,6 +640,21 @@ public class ControlsStyleSheet extends StyleSheet
 	
 	
 	
+	private PrimitiveStyleSheet textAreaStyleSheet = null;
+
+	private PrimitiveStyleSheet getTextAreaStyleSheet()
+	{
+		if ( textAreaStyleSheet == null )
+		{
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			AttributeValues attrs = getNonNull( "textAreaAttrs", AttributeValues.class, defaultTextAreaAttrs );
+			textAreaStyleSheet = (PrimitiveStyleSheet)primitive.withAttrValues( attrs );
+		}
+		return textAreaStyleSheet;
+	}
+	
+	
+	
 	private Border textEntryBorder = null;
 
 	private Border getTextEntryBorder()
@@ -951,6 +978,17 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 		return checkbox( primitive.staticText( labelText ), state, listener );
+	}
+	
+	
+	
+	public TextArea textArea(String text, TextArea.TextAreaListener listener)
+	{
+		PrimitiveStyleSheet textAreaStyle = getTextAreaStyleSheet();
+		DPVBox textBox = textAreaStyle.vbox( new DPElement[] {} );
+		DPRegion region = textAreaStyle.region( textBox );
+		DPBorder element = textAreaStyle.border( region );
+		return new TextArea( element, region, textBox, listener, textAreaStyle, text );
 	}
 	
 	

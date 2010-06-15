@@ -8,5 +8,5 @@ package BritefuryJ.DocPresent;
 
 public interface TreeEventListener
 {
-	boolean onTreeEvent(DPElement element, DPElement sourceElement, Object value);
+	boolean onTreeEvent(DPElement element, DPElement sourceElement, Object event);
 }
