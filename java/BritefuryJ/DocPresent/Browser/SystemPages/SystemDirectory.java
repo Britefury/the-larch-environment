@@ -48,6 +48,7 @@ public class SystemDirectory
 		controlTestPages.add( new ScrollBarTestPage() );
 		controlTestPages.add( new ScrolledViewportTestPage() );
 		controlTestPages.add( new SpinEntryTestPage() );
+		controlTestPages.add( new TextAreaTestPage() );
 		controlTestPages.add( new TextEntryTestPage() );
 	}
 	

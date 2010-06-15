@@ -656,6 +656,13 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		textRepresentationChanged( new TextEditEventReplace( index, length, x ) );
 	}
 	
+	public void replaceText(Marker startMarker, Marker endMarker, String x)
+	{
+		int start = startMarker.getClampedIndex();
+		int end = endMarker.getClampedIndex();
+		replaceText( startMarker, end - start, x );
+	}
+	
 	protected void notifyTextRemoved(int index, int length)
 	{
 		markerRemove( index, length );

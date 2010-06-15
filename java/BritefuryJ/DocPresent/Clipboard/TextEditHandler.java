@@ -18,16 +18,17 @@ import BritefuryJ.DocPresent.Selection.Selection;
 
 public abstract class TextEditHandler implements EditHandler
 {
-	protected abstract void deleteText(Marker start, Marker end);
-	protected abstract void insertText(Marker position, String text);
-	protected abstract String getText(Marker start, Marker end);
+	protected abstract void deleteText(Selection selection);
+	protected abstract void insertText(Marker marker, String text);
+	protected abstract void replaceText(Selection selection, String replacement);
+	protected abstract String getText(Selection selection);
 	
 	
 	public void deleteSelection(Selection selection)
 	{
 		if ( !selection.isEmpty() )
 		{
-			deleteText( selection.getStartMarker(), selection.getEndMarker() );
+			deleteText( selection );
 		}
 	}
 
@@ -35,9 +36,12 @@ public abstract class TextEditHandler implements EditHandler
 	{
 		if ( !selection.isEmpty() )
 		{
-			deleteText( selection.getStartMarker(), selection.getEndMarker() );
+			replaceText( selection, replacement );
 		}
-		insertText( caret.getMarker(), replacement );
+		else
+		{
+			insertText( caret.getMarker(), replacement );
+		}
 	}
 
 
@@ -51,7 +55,7 @@ public abstract class TextEditHandler implements EditHandler
 	{
 		if ( !selection.isEmpty() )
 		{
-			String selectedText = getText( selection.getStartMarker(), selection.getEndMarker() );
+			String selectedText = getText( selection );
 			return new StringSelection( selectedText );
 		}
 		else
@@ -66,7 +70,7 @@ public abstract class TextEditHandler implements EditHandler
 		{
 			if ( !selection.isEmpty() )
 			{
-				deleteText( selection.getStartMarker(), selection.getEndMarker() );
+				deleteText( selection );
 			}
 		}
 	}
@@ -87,10 +91,12 @@ public abstract class TextEditHandler implements EditHandler
 				
 				if ( !selection.isEmpty() )
 				{
-					deleteText( selection.getStartMarker(), selection.getEndMarker() );
+					replaceText( selection, data );
 				}
-				
-				insertText( caret.getMarker(), data );
+				else
+				{
+					insertText( caret.getMarker(), data );
+				}
 			}
 			catch (UnsupportedFlavorException e)
 			{

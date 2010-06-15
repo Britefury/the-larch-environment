@@ -69,7 +69,7 @@ class _GSymTransferActionListener (ActionListener):
 		pass
 		
 	def actionPerformed(self, e):
-		manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+		manager = KeyboardFocusManager.getCurrentKeyboardFocusManager()
 		focusOwner = manager.getPermanentFocusOwner()
 		if focusOwner is not None:
 			action = e.getActionCommand()
@@ -168,7 +168,7 @@ class AppWindow (object):
 		
 		
 		
-		menuBar = JMenuBar();
+		menuBar = JMenuBar()
 		menuBar.add( newMenu )
 		menuBar.add( editMenu )
 		menuBar.add( viewMenu )

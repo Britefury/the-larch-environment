@@ -165,18 +165,24 @@ public class TextEntry extends Control
 	
 	private class TextEntryEditHandler extends TextEditHandler
 	{
-		protected void deleteText(Marker start, Marker end)
+		protected void deleteText(Selection selection)
 		{
-			textElement.removeText( start, end );
+			textElement.removeText( selection.getStartMarker(), selection.getEndMarker() );
 		}
-		protected void insertText(Marker position, String text)
+
+		protected void insertText(Marker marker, String text)
 		{
-			textElement.insertText( position, text );
+			textElement.insertText( marker, text );
 		}
 		
-		protected String getText(Marker start, Marker end)
+		protected void replaceText(Selection selection, String replacement)
 		{
-			return textElement.getTextRepresentationBetweenMarkers( start, end );
+			textElement.replaceText(selection.getStartMarker(), selection.getEndMarker(), replacement );
+		}
+		
+		protected String getText(Selection selection)
+		{
+			return textElement.getTextRepresentationBetweenMarkers( selection.getStartMarker(), selection.getEndMarker() );
 		}
 	}
 	
