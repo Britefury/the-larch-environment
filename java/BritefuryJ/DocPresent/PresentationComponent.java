@@ -1562,7 +1562,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			return component.createPopupPresentation( popupContents, (int)( localPos.x + 0.5 ), (int)( localPos.y + 0.5 ), bCloseOnLoseFocus );
 		}
 		
-		public PresentationPopup popupAtMousePosition(DPElement popupContents, boolean bCloseOnLoseFocus)
+		public PresentationPopup createPopupAtMousePosition(DPElement popupContents, boolean bCloseOnLoseFocus)
 		{
 			Point mouse = component.getMousePosition();
 			return component.createPopupPresentation( popupContents, mouse.x, mouse.y, bCloseOnLoseFocus );

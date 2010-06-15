@@ -32,17 +32,17 @@ public class PopupMenu
 	
 	public void popupToRightOf(DPElement element)
 	{
-		element.popupRight( menuBox, true );
+		menuBox.popupToRightOf( element, true );
 	}
 	
 	public void popupBelow(DPElement element)
 	{
-		element.popupBelow( menuBox, true );
+		menuBox.popupBelow( element, true );
 	}
 	
 	public void popupAtMousePosition(DPElement element)
 	{
-		element.getRootElement().popupAtMousePosition( menuBox, true );
+		element.getRootElement().createPopupAtMousePosition( menuBox, true );
 	}
 	
 	
