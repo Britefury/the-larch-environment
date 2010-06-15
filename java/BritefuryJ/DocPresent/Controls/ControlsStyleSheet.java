@@ -12,12 +12,15 @@ import java.awt.Cursor;
 import java.awt.Paint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.python.core.PyObject;
 
 import BritefuryJ.AttributeTable.AttributeValues;
+import BritefuryJ.DocPresent.DPAbstractBox;
 import BritefuryJ.DocPresent.DPAspectRatioBin;
 import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPBorder;
@@ -59,7 +62,9 @@ public class ControlsStyleSheet extends StyleSheet
 	private static final Painter defaultMenuItemHoverBackground = new FillPainter( new Color( 0.6f, 0.7f, 0.85f ) );
 	private static final double defaultMenuItemXPadding = 5.0;
 	private static final double defaultMenuItemYPadding = 5.0;
-	private static final AttributeValues defaultPopupMenuAttrs = new AttributeValues( new String[] { "hboxSpacing" }, new Object[] { 10.0 } );
+	private static final AttributeValues defaultPopupMenuAttrs = new AttributeValues( new String[] { "border", "hboxSpacing" }, new Object[] { new SolidBorder( 1.0, 2.0, Color.black, null ), 10.0 } );
+	
+	private static final Border defaultTooltipBorder = new SolidBorder( 1.0, 2.0, 2.0, 2.0, Color.BLACK, new Color( 1.0f, 1.0f, 0.9f ) );
 	
 	private static final Painter defaultCheckboxHoverBackground = new OutlinePainter( new Color( 0.5f, 0.625f, 0.75f ) );
 	private static final Border defaultCheckboxCheckBorder = new FilledBorder( 3.0, 3.0, 3.0, 3.0, 5.0, 5.0, new Color( 0.75f, 0.75f, 0.75f ) );
@@ -73,6 +78,14 @@ public class ControlsStyleSheet extends StyleSheet
 	private static double defaultTextEntryRounding = 5.0;
 	private static Paint defaultTextEntryBorderPaint = new Color( 0.0f, 0.3f, 0.0f );
 	private static Paint defaultTextEntryBackgPaint = new Color( 0.9f, 0.95f, 0.9f );
+	
+	private static final double defaultSpinEntryArrowSize = 16.0;
+	private static final double defaultSpinEntryArrowFilletSize = 4.0;
+	private static final AttributeValues defaultSpinEntryArrowAttrs = new AttributeValues( new String[] { "vboxSpacing", "shapePainter", "hoverShapePainter" },
+			new Object[] { 2.0,
+				new FilledOutlinePainter( new Color( 0.7f, 0.85f, 0.7f ), new Color( 0.0f, 0.25f, 0.0f ), new BasicStroke( 1.0f ) ),
+				new FilledOutlinePainter( new Color( 0.85f, 1.0f, 0.85f ), new Color( 0.0f, 0.45f, 0.0f ), new BasicStroke( 1.0f ) ) } );
+	private static final double defaultSpinEntryHSpacing = 2.0;
 	
 	private static final Border defaultOptionMenuBorder = new SolidBorder( 1.0, 3.0, 5.0, 5.0, Color.BLACK, new Color( 0.9f, 0.95f, 0.9f ) );
 	private static final Border defaultOptionMenuHoverBorder = new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.0f, 0.3f, 0.0f ), new Color( 0.95f, 1.0f, 0.95f ) );
@@ -122,6 +135,8 @@ public class ControlsStyleSheet extends StyleSheet
 		
 		initAttr( "popupMenuAttrs", defaultPopupMenuAttrs );
 		
+		initAttr( "tooltipBorder", defaultTooltipBorder );
+		
 		initAttr( "checkboxHoverBackground", defaultCheckboxHoverBackground );
 		initAttr( "checkboxCheckBorder", defaultCheckboxCheckBorder );
 		initAttr( "checkboxCheckForeground", defaultCheckboxCheckForeground );
@@ -135,6 +150,11 @@ public class ControlsStyleSheet extends StyleSheet
 		initAttr( "textEntryBorderPaint", defaultTextEntryBorderPaint );
 		initAttr( "textEntryBackgPaint", defaultTextEntryBackgPaint );
 		
+		initAttr( "spinEntryArrowSize", defaultSpinEntryArrowSize );
+		initAttr( "spinEntryArrowFilletSize", defaultSpinEntryArrowFilletSize );
+		initAttr( "spinEntryArrowAttrs", defaultSpinEntryArrowAttrs );
+		initAttr( "spinEntryHSpacing", defaultSpinEntryHSpacing );
+
 		initAttr( "optionMenuBorder", defaultOptionMenuBorder );
 		initAttr( "optionMenuHoverBorder", defaultOptionMenuHoverBorder );
 		initAttr( "optionMenuContentsSpacing", defaultOptionMenuContentsSpacing );
@@ -249,6 +269,12 @@ public class ControlsStyleSheet extends StyleSheet
 	}
 	
 	
+	public ControlsStyleSheet withTooltipBorder(Border border)
+	{
+		return (ControlsStyleSheet)withAttr( "tooltipBorder", border );
+	}
+	
+	
 	public ControlsStyleSheet withCheckboxHoverBackground(Painter painter)
 	{
 		return (ControlsStyleSheet)withAttr( "checkboxHoverBackground", painter );
@@ -306,6 +332,29 @@ public class ControlsStyleSheet extends StyleSheet
 		return (ControlsStyleSheet)withAttr( "textEntryBackgPaint", paint );
 	}
 	
+	
+	
+	public ControlsStyleSheet withSpinEntryArrowSize(double size)
+	{
+		return (ControlsStyleSheet)withAttr( "spinEntryArrowSize", size );
+	}
+	
+	public ControlsStyleSheet withSpinEntryArrowFilletSize(double size)
+	{
+		return (ControlsStyleSheet)withAttr( "spinEntryArrowFilletSize", size );
+	}
+	
+	public ControlsStyleSheet withSpinEntryArrowAttrs(AttributeValues attrs)
+	{
+		return (ControlsStyleSheet)withAttr( "spinEntryArrowAttrs", attrs );
+	}
+	
+	public ControlsStyleSheet withSpinEntryHSpacing(double spacing)
+	{
+		return (ControlsStyleSheet)withAttr( "spinEntryHSpacing", spacing );
+	}
+	
+
 	
 	
 	public ControlsStyleSheet withOptionMenuBorder(Border border)
@@ -520,6 +569,21 @@ public class ControlsStyleSheet extends StyleSheet
 	
 	
 	
+	private PrimitiveStyleSheet tooltipStyleSheet = null;
+
+	private PrimitiveStyleSheet getTooltipStyleSheet()
+	{
+		if ( tooltipStyleSheet == null )
+		{
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			Border border = getNonNull( "tooltipBorder", Border.class, defaultTooltipBorder );
+			tooltipStyleSheet = primitive.withBorder( border );
+		}
+		return tooltipStyleSheet;
+	}
+	
+	
+	
 	private PrimitiveStyleSheet checkboxStyleSheet = null;
 
 	private PrimitiveStyleSheet getCheckboxStyleSheet()
@@ -598,14 +662,58 @@ public class ControlsStyleSheet extends StyleSheet
 	
 	
 	
+	private Path2D.Double spinEntryArrowPaths[] = null;
+	
+	private Path2D.Double[] getSpinEntryArrowPaths()
+	{
+		if ( spinEntryArrowPaths == null )
+		{
+			double arrowSize = get( "spinEntryArrowSize", Double.class, defaultSpinEntryArrowSize );
+			double arrowFilletSize = get( "spinEntryArrowFilletSize", Double.class, defaultSpinEntryArrowFilletSize );
+			
+			spinEntryArrowPaths = createArrowPaths( arrowSize, arrowFilletSize );
+		}
+		return spinEntryArrowPaths;
+	}
+	
+	
+	private PrimitiveStyleSheet spinEntryArrowStyleSheet = null;
+	
+	private PrimitiveStyleSheet getSpinEntryArrowStyleSheet()
+	{
+		if ( spinEntryArrowStyleSheet == null )
+		{
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			AttributeValues arrowAttrs = getNonNull( "spinEntryArrowAttrs", AttributeValues.class, defaultSpinEntryArrowAttrs );
+			spinEntryArrowStyleSheet = (PrimitiveStyleSheet)primitive.withAttrValues( arrowAttrs );
+		}
+		return spinEntryArrowStyleSheet;
+	}
+	
+	
+	private PrimitiveStyleSheet spinEntryStyleSheet = null;
+	
+	private PrimitiveStyleSheet getSpinEntryStyleSheet()
+	{
+		if ( spinEntryStyleSheet == null )
+		{
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			double hSpacing = getNonNull( "spinEntryHSpacing", Double.class, defaultSpinEntryHSpacing );
+			spinEntryStyleSheet = primitive.withHBoxSpacing( hSpacing );
+		}
+		return spinEntryStyleSheet;
+	}
+	
+	
+
 	private Path2D.Double optionMenuArrowPaths[] = null;
 	
 	private Path2D.Double[] getOptionMenuArrowPaths()
 	{
 		if ( optionMenuArrowPaths == null )
 		{
-			double arrowSize = get( "optionMenuArrowSize", Double.class, defaultScrollBarArrowPadding );
-			double arrowFilletSize = get( "optionMenuArrowFilletSize", Double.class, defaultScrollBarArrowFilletSize );
+			double arrowSize = get( "optionMenuArrowSize", Double.class, defaultOptionMenuArrowSize );
+			double arrowFilletSize = get( "optionMenuArrowFilletSize", Double.class, defaultOptionMenuArrowFilletSize );
 			
 			optionMenuArrowPaths = createArrowPaths( arrowSize, arrowFilletSize );
 		}
@@ -777,25 +885,48 @@ public class ControlsStyleSheet extends StyleSheet
 	public PopupMenu hpopupMenu(DPElement items[])
 	{
 		PrimitiveStyleSheet popupMenuStyle = getPopupMenuStyleSheet();
-		return new PopupMenu( popupMenuStyle.hbox( items ) );
+		DPAbstractBox menuBox = popupMenuStyle.hbox( items );
+		DPBorder menuElement = popupMenuStyle.border( menuBox );
+		return new PopupMenu( menuElement, menuBox );
 	}
 
 	public PopupMenu hpopupMenu(List<DPElement> items)
 	{
 		PrimitiveStyleSheet popupMenuStyle = getPopupMenuStyleSheet();
-		return new PopupMenu( popupMenuStyle.hbox( items ) );
+		DPAbstractBox menuBox = popupMenuStyle.hbox( items );
+		DPBorder menuElement = popupMenuStyle.border( menuBox );
+		return new PopupMenu( menuElement, menuBox );
 	}
 
 	public PopupMenu vpopupMenu(DPElement items[])
 	{
 		PrimitiveStyleSheet popupMenuStyle = getPopupMenuStyleSheet();
-		return new PopupMenu( popupMenuStyle.vbox( items ) );
+		DPAbstractBox menuBox = popupMenuStyle.vbox( items );
+		DPBorder menuElement = popupMenuStyle.border( menuBox );
+		return new PopupMenu( menuElement, menuBox );
 	}
 
 	public PopupMenu vpopupMenu(List<DPElement> items)
 	{
 		PrimitiveStyleSheet popupMenuStyle = getPopupMenuStyleSheet();
-		return new PopupMenu( popupMenuStyle.vbox( items ) );
+		DPAbstractBox menuBox = popupMenuStyle.vbox( items );
+		DPBorder menuElement = popupMenuStyle.border( menuBox );
+		return new PopupMenu( menuElement, menuBox );
+	}
+	
+	
+	
+	public TimedPopup tooltip(String text, double timeout)
+	{
+		PrimitiveStyleSheet tooltipStyle = getTooltipStyleSheet();
+		String lineTexts[] = text.split( "\n" );
+		ArrayList<DPElement> lines = new ArrayList<DPElement>();
+		for (String line: lineTexts)
+		{
+			lines.add( tooltipStyle.staticText( line ) );
+		}
+		DPElement contents = tooltipStyle.border( tooltipStyle.vbox( lines ) );
+		return new TimedPopup( contents, timeout, false );
 	}
 
 	
@@ -826,12 +957,27 @@ public class ControlsStyleSheet extends StyleSheet
 	
 	public TextEntry textEntry(String text, TextEntry.TextEntryListener listener)
 	{
+		return textEntry( text, listener, null );
+	}
+
+	public TextEntry textEntry(String text, TextEntry.TextEntryListener listener, TextEntry.TextEntryValidator validator)
+	{
 		PrimitiveStyleSheet textEntryStyle = getTextEntryStyleSheet();
 		DPText textElement = textEntryStyle.text( text );
 		DPElement line = textEntryStyle.hbox( new DPElement[] { textEntryStyle.segment( false, false, textElement ) } );
 		DPRegion region = textEntryStyle.region( line );
 		DPBorder outerElement = textEntryStyle.border( region );
-		return new TextEntry( outerElement, region, textElement, listener );
+		return new TextEntry( outerElement, region, textElement, listener, validator, this );
+	}
+
+	public TextEntry textEntry(String text, TextEntry.TextEntryListener listener, Pattern validatorRegex, String validationFailMessage)
+	{
+		PrimitiveStyleSheet textEntryStyle = getTextEntryStyleSheet();
+		DPText textElement = textEntryStyle.text( text );
+		DPElement line = textEntryStyle.hbox( new DPElement[] { textEntryStyle.segment( false, false, textElement ) } );
+		DPRegion region = textEntryStyle.region( line );
+		DPBorder outerElement = textEntryStyle.border( region );
+		return new TextEntry( outerElement, region, textElement, listener, validatorRegex, validationFailMessage, this );
 	}
 
 	public TextEntry textEntry(String text, PyObject accept, PyObject cancel)
@@ -841,9 +987,74 @@ public class ControlsStyleSheet extends StyleSheet
 		DPElement line = textEntryStyle.hbox( new DPElement[] { textEntryStyle.segment( false, false, textElement ) } );
 		DPRegion region = textEntryStyle.region( line );
 		DPBorder outerElement = textEntryStyle.border( region );
-		return new TextEntry( outerElement, region, textElement, accept, cancel );
+		return new TextEntry( outerElement, region, textElement, accept, cancel, this );
 	}
 	
+	public TextEntry textEntry(String text, PyObject accept, PyObject cancel, PyObject validationFn, PyObject validationFailMessageFn)
+	{
+		PrimitiveStyleSheet textEntryStyle = getTextEntryStyleSheet();
+		DPText textElement = textEntryStyle.text( text );
+		DPElement line = textEntryStyle.hbox( new DPElement[] { textEntryStyle.segment( false, false, textElement ) } );
+		DPRegion region = textEntryStyle.region( line );
+		DPBorder outerElement = textEntryStyle.border( region );
+		return new TextEntry( outerElement, region, textElement, accept, cancel, validationFn, validationFailMessageFn, this );
+	}
+	
+	public TextEntry textEntry(String text, PyObject accept, PyObject cancel, Pattern validatorRegex, String validationFailMessage)
+	{
+		PrimitiveStyleSheet textEntryStyle = getTextEntryStyleSheet();
+		DPText textElement = textEntryStyle.text( text );
+		DPElement line = textEntryStyle.hbox( new DPElement[] { textEntryStyle.segment( false, false, textElement ) } );
+		DPRegion region = textEntryStyle.region( line );
+		DPBorder outerElement = textEntryStyle.border( region );
+		return new TextEntry( outerElement, region, textElement, accept, cancel, validatorRegex, validationFailMessage, this );
+	}
+	
+	
+	public RealSpinEntry realSpinEntry(double value, double min, double max, double stepSize, double pageSize, RealSpinEntry.RealSpinEntryListener listener)
+	{
+		PrimitiveStyleSheet spinEntryStyle = getSpinEntryStyleSheet();
+		PrimitiveStyleSheet arrowStyle = getSpinEntryArrowStyleSheet();
+		
+		Path2D.Double upPath = getSpinEntryArrowPaths()[2];
+		Path2D.Double downPath = getSpinEntryArrowPaths()[3];
+		
+		DPShape upArrow = arrowStyle.shape( upPath );
+		DPShape downArrow = arrowStyle.shape( downPath );
+		DPElement arrowsBox = arrowStyle.vbox( new DPElement[] { upArrow, downArrow } );
+		
+		SpinEntry.SpinEntryTextListener textListener = new SpinEntry.SpinEntryTextListener();
+	
+		TextEntry textEntry = textEntry( String.valueOf( value ), textListener,
+				Pattern.compile( "[\\-]?(([0-9]+\\.[0-9]*)|(\\.[0-9]+))(e[\\-]?[0-9]+)?" ), "Please enter a real number." );
+		
+		DPElement element = spinEntryStyle.hbox( new DPElement[] { textEntry.getElement().alignHExpand().alignVCentre(), arrowsBox.alignVCentre() } );
+
+		return new RealSpinEntry( element, textEntry, upArrow, downArrow, textListener, value, min, max, stepSize, pageSize, listener );
+	}
+
+	public IntSpinEntry intSpinEntry(long value, long min, long max, long stepSize, long pageSize, IntSpinEntry.IntSpinEntryListener listener)
+	{
+		PrimitiveStyleSheet spinEntryStyle = getSpinEntryStyleSheet();
+		PrimitiveStyleSheet arrowStyle = getSpinEntryArrowStyleSheet();
+		
+		Path2D.Double upPath = getSpinEntryArrowPaths()[2];
+		Path2D.Double downPath = getSpinEntryArrowPaths()[3];
+		
+		DPShape upArrow = arrowStyle.shape( upPath );
+		DPShape downArrow = arrowStyle.shape( downPath );
+		DPElement arrowsBox = arrowStyle.vbox( new DPElement[] { upArrow, downArrow } );
+		
+		SpinEntry.SpinEntryTextListener textListener = new SpinEntry.SpinEntryTextListener();
+		
+		TextEntry textEntry = textEntry( String.valueOf( value ), textListener,
+				Pattern.compile( "[\\-]?[0-9]+" ), "Please enter an integer." );
+		
+		DPElement element = spinEntryStyle.hbox( new DPElement[] { textEntry.getElement().alignHExpand().alignVCentre(), arrowsBox.alignVCentre() } );
+		
+		return new IntSpinEntry( element, textEntry, upArrow, downArrow, textListener, value, min, max, stepSize, pageSize, listener );
+	}
+
 	
 	
 	public OptionMenu optionMenu(DPElement optionChoices[], DPElement menuChoices[], int initialChoice, OptionMenu.OptionMenuListener listener)
@@ -861,8 +1072,8 @@ public class ControlsStyleSheet extends StyleSheet
 		DPShape downArrow = arrowStyle.shape( downPath );
 		PrimitiveStyleSheet optionMenuStyle = getOptionMenuStyleSheet();
 		DPBin choiceBin = PrimitiveStyleSheet.instance.bin( optionChoices.get( initialChoice ) );
-		DPHBox optionContents = optionMenuStyle.hbox( new DPElement[] { choiceBin.alignVCentre(), downArrow.alignVCentre() } );
-		DPBorder element = getOptionMenuStyleSheet().border( optionContents );
+		DPHBox optionContents = optionMenuStyle.hbox( new DPElement[] { choiceBin.alignHExpand().alignVCentre(), downArrow.alignVCentre() } );
+		DPBorder element = getOptionMenuStyleSheet().border( optionContents.alignHExpand() );
 		return new OptionMenu( element, choiceBin, optionChoices, menuChoices, initialChoice, listener, optionMenuBorder, optionMenuHoverBorder, this );
 	}
 	

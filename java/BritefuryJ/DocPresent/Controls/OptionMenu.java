@@ -148,7 +148,7 @@ public class OptionMenu extends Control
 			currentChoice = choice;
 			
 			DPBin newChoiceContainer = PrimitiveStyleSheet.instance.bin( optionChoices.get( currentChoice ) );
-			choiceContainer.replaceWith( newChoiceContainer.alignVCentre() );
+			choiceContainer.replaceWith( newChoiceContainer );
 			choiceContainer = newChoiceContainer;
 			
 			listener.onOptionMenuChoice( this, oldChoice, currentChoice );

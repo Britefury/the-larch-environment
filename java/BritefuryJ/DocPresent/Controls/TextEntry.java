@@ -6,12 +6,8 @@
 //##************************
 package BritefuryJ.DocPresent.Controls;
 
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
+import java.util.regex.Pattern;
 
 import org.python.core.Py;
 import org.python.core.PyObject;
@@ -22,9 +18,8 @@ import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.PresentationComponent;
-import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.DocPresent.Clipboard.DataTransfer;
-import BritefuryJ.DocPresent.Clipboard.EditHandler;
+import BritefuryJ.DocPresent.Clipboard.TextEditHandler;
+import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
 
 public class TextEntry extends Control
@@ -33,6 +28,13 @@ public class TextEntry extends Control
 	{
 		public void onAccept(TextEntry textEntry, String text);
 		public void onCancel(TextEntry textEntry, String originalText);
+	}
+	
+	
+	public static interface TextEntryValidator
+	{
+		public boolean validateText(TextEntry textEntry, String text);
+		public String validationMessage(TextEntry textEntry, String text);
 	}
 	
 	
@@ -61,6 +63,68 @@ public class TextEntry extends Control
 			{
 				cancelCallable.__call__( Py.java2py( textEntry ), Py.java2py( originalText ) );
 			}
+		}
+	}
+	
+	private static class PyTextEntryValidator implements TextEntryValidator
+	{
+		private PyObject validationFn, validationMessageFn;
+		
+		
+		public PyTextEntryValidator(PyObject validationFn, PyObject validationMessageFn)
+		{
+			this.validationFn = validationFn;
+			this.validationMessageFn = validationMessageFn;
+		}
+		
+		public boolean validateText(TextEntry textEntry, String text)
+		{
+			if ( validationFn != null  &&  validationFn != Py.None )
+			{
+				return Py.py2boolean( validationFn.__call__( Py.java2py( textEntry ), Py.java2py( text ) ) );
+			}
+			else
+			{
+				return true;
+			}
+		}
+
+		public String validationMessage(TextEntry textEntry, String text)
+		{
+			if ( validationMessageFn != null  &&  validationMessageFn != Py.None )
+			{
+				return Py.tojava( validationMessageFn.__call__( Py.java2py( textEntry ), Py.java2py( text ) ), String.class );
+			}
+			else
+			{
+				return null;
+			}
+		}
+	}
+	
+	
+	private static class RegexTextEntryValidator implements TextEntryValidator
+	{
+		private Pattern pattern;
+		private String failMessage;
+		
+		private RegexTextEntryValidator(Pattern pattern, String failMessage)
+		{
+			this.pattern = pattern;
+			this.failMessage = failMessage;
+		}
+		
+		
+		@Override
+		public boolean validateText(TextEntry textEntry, String text)
+		{
+			return pattern.matcher( text ).matches();
+		}
+
+		@Override
+		public String validationMessage(TextEntry textEntry, String text)
+		{
+			return failMessage;
 		}
 	}
 	
@@ -99,89 +163,20 @@ public class TextEntry extends Control
 	}
 	
 	
-	private class TextEntryEditHandler implements EditHandler
+	private class TextEntryEditHandler extends TextEditHandler
 	{
-		public void deleteSelection(Selection selection)
+		protected void deleteText(Marker start, Marker end)
 		{
-			if ( !selection.isEmpty() )
-			{
-				textElement.removeText( selection.getStartMarker(), selection.getEndMarker() );
-			}
+			textElement.removeText( start, end );
 		}
-
-		public void replaceSelectionWithText(Selection selection, String replacement)
+		protected void insertText(Marker position, String text)
 		{
-			if ( !selection.isEmpty() )
-			{
-				textElement.removeText( selection.getStartMarker(), selection.getEndMarker() );
-			}
-			Caret caret = textElement.getRootElement().getCaret();
-			textElement.insertText( caret.getMarker(), replacement );
+			textElement.insertText( position, text );
 		}
-
-
-
-		public int getExportActions(Selection selection)
-		{
-			return COPY_OR_MOVE;
-		}
-
-		public Transferable createExportTransferable(Selection selection)
-		{
-			if ( !selection.isEmpty() )
-			{
-				String selectedText = textElement.getTextRepresentationBetweenMarkers( selection.getStartMarker(), selection.getEndMarker() );
-				return new StringSelection( selectedText );
-			}
-			else
-			{
-				return null;
-			}
-		}
-
-		public void exportDone(Selection selection, Transferable transferable, int action)
-		{
-			if ( action == MOVE )
-			{
-				if ( !selection.isEmpty() )
-				{
-					textElement.removeText( selection.getStartMarker(), selection.getEndMarker() );
-				}
-			}
-		}
-
 		
-		public boolean canImport(Caret caret, Selection selection, DataTransfer dataTransfer)
+		protected String getText(Marker start, Marker end)
 		{
-			return dataTransfer.isDataFlavorSupported( DataFlavor.stringFlavor );
-		}
-
-		public boolean importData(Caret caret, Selection selection, DataTransfer dataTransfer)
-		{
-			if ( canImport( caret, selection, dataTransfer ) )
-			{
-				try
-				{
-					String data = (String)dataTransfer.getTransferData( DataFlavor.stringFlavor );
-					
-					if ( !selection.isEmpty() )
-					{
-						textElement.removeText( selection.getStartMarker(), selection.getEndMarker() );
-					}
-					
-					textElement.insertText( caret.getMarker(), data );
-				}
-				catch (UnsupportedFlavorException e)
-				{
-					return false;
-				}
-				catch (IOException e)
-				{
-					return false;
-				}
-			}
-			
-			return false;
+			return textElement.getTextRepresentationBetweenMarkers( start, end );
 		}
 	}
 	
@@ -190,23 +185,53 @@ public class TextEntry extends Control
 	private DPBorder outerElement;
 	private DPText textElement;
 	private TextEntryListener listener;
+	private TextEntryValidator validator;
+	private ControlsStyleSheet styleSheet;
 	private String originalText;
 
 
 	
-	protected TextEntry(DPBorder outerElement, DPRegion frame, DPText textElement, TextEntryListener listener)
+	protected TextEntry(DPBorder outerElement, DPRegion frame, DPText textElement, TextEntryListener listener, ControlsStyleSheet styleSheet)
+	{
+		this( outerElement, frame, textElement, listener, (TextEntryValidator)null, styleSheet );
+	}
+	
+	protected TextEntry(DPBorder outerElement, DPRegion frame, DPText textElement, PyObject acceptListener, PyObject cancelListener, ControlsStyleSheet styleSheet)
+	{
+		this( outerElement, frame, textElement, new PyTextEntryListener( acceptListener, cancelListener ), styleSheet );
+	}
+	
+	
+	protected TextEntry(DPBorder outerElement, DPRegion frame, DPText textElement, TextEntryListener listener, TextEntryValidator validator, ControlsStyleSheet styleSheet)
 	{
 		this.outerElement = outerElement;
 		this.textElement = textElement;
 		this.listener = listener;
+		this.validator = validator;
+		this.styleSheet = styleSheet;
+
 		this.textElement.addInteractor( new TextEntryInteractor() );
 		originalText = textElement.getText();
 		frame.setEditHandler( new TextEntryEditHandler() );
 	}
 	
-	protected TextEntry(DPBorder outerElement, DPRegion frame, DPText textElement, PyObject acceptListener, PyObject cancelListener)
+	protected TextEntry(DPBorder outerElement, DPRegion frame, DPText textElement, PyObject acceptListener, PyObject cancelListener, PyObject validationFn, PyObject validationMessageFn,
+			ControlsStyleSheet styleSheet)
 	{
-		this( outerElement, frame, textElement, new PyTextEntryListener( acceptListener, cancelListener ) );
+		this( outerElement, frame, textElement, new PyTextEntryListener( acceptListener, cancelListener ), new PyTextEntryValidator( validationFn, validationMessageFn ), styleSheet );
+	}
+	
+	
+	protected TextEntry(DPBorder outerElement, DPRegion frame, DPText textElement, TextEntryListener listener, Pattern validationRegex, String validationFailMessage,
+			ControlsStyleSheet styleSheet)
+	{
+		this( outerElement, frame, textElement, listener, new RegexTextEntryValidator( validationRegex, validationFailMessage ), styleSheet );
+	}
+	
+	protected TextEntry(DPBorder outerElement, DPRegion frame, DPText textElement, PyObject acceptListener, PyObject cancelListener, Pattern validationRegex, String validationFailMessage,
+			ControlsStyleSheet styleSheet)
+	{
+		this( outerElement, frame, textElement, new PyTextEntryListener( acceptListener, cancelListener ), validationRegex, validationFailMessage, styleSheet );
 	}
 	
 	
@@ -260,6 +285,16 @@ public class TextEntry extends Control
 	
 	public void accept()
 	{
+		if ( validator != null  &&  !validator.validateText( this, getText() ) )
+		{
+			String failMessage = validator.validationMessage( this, getText() );
+			if ( failMessage != null )
+			{
+				TimedPopup tooltip = styleSheet.tooltip( failMessage, 5.0 );
+				tooltip.popupBelow( outerElement );
+			}
+			return;
+		}
 		ungrabCaret();
 		listener.onAccept( this, getText() );
 	}

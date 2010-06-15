@@ -24,7 +24,7 @@ public interface EditHandler
 	
 	
 	public void deleteSelection(Selection selection);
-	public void replaceSelectionWithText(Selection selection, String replacement);
+	public void replaceSelectionWithText(Selection selection, Caret caret, String replacement);
 	
 
 	public int getExportActions(Selection selection);

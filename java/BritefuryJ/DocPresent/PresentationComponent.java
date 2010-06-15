@@ -37,11 +37,9 @@ import java.util.List;
 import java.util.WeakHashMap;
 
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
-import javax.swing.border.LineBorder;
 
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Caret.CaretListener;
@@ -98,7 +96,8 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		private PopupChain chain;
 		private boolean bOpen;
 		
-		private PresentationPopup(PopupChain popupChain, Window ownerWindow, PresentationComponent parentComponent, DPElement popupContents, int x, int y, boolean bCloseOnLoseFocus)
+		private PresentationPopup(PopupChain popupChain, Window ownerWindow, PresentationComponent parentComponent, DPElement popupContents, int x, int y,
+				boolean bCloseOnLoseFocus, boolean bRequestFocus)
 		{
 			chain = popupChain;
 			chain.addPopup( this );
@@ -107,23 +106,24 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			
 			// Create the popup window
 			popupWindow = new JWindow( ownerWindow );
-			popupWindow.setAlwaysOnTop( true );
-			popupWindow.setFocusable( true );
+			if ( bRequestFocus )
+			{
+				popupWindow.setAlwaysOnTop( true );
+				popupWindow.setFocusable( true );
+			}
 			
 			// Create a presentation component for the popup contents, and add them
 			popupComponent = new PresentationComponent( this );
 			popupComponent.getRootElement().setChild( popupContents );
 			
-			JPanel panel = new JPanel();
-			panel.setBorder( new LineBorder( new Color( 0.0f, 0.15f, 0.35f ), 1 ) );
-			panel.add( popupComponent );
-			
-			// Add to the popup window
-			popupWindow.add( panel );
+			popupWindow.add( popupComponent );
 			popupWindow.setLocation( x, y );
 			popupWindow.pack();
 			popupWindow.setVisible( true );
-			popupWindow.requestFocus();
+			if ( bRequestFocus )
+			{
+				popupWindow.requestFocus();
+			}
 
 		
 			WindowFocusListener focusListener = new WindowFocusListener()
@@ -1557,15 +1557,15 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		
 		
-		protected PresentationPopup createPopupPresentation(DPElement popupContents, Point2 localPos, boolean bCloseOnLoseFocus)
+		protected PresentationPopup createPopupPresentation(DPElement popupContents, Point2 localPos, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 		{
-			return component.createPopupPresentation( popupContents, (int)( localPos.x + 0.5 ), (int)( localPos.y + 0.5 ), bCloseOnLoseFocus );
+			return component.createPopupPresentation( popupContents, (int)( localPos.x + 0.5 ), (int)( localPos.y + 0.5 ), bCloseOnLoseFocus, bRequestFocus );
 		}
 		
-		public PresentationPopup createPopupAtMousePosition(DPElement popupContents, boolean bCloseOnLoseFocus)
+		public PresentationPopup createPopupAtMousePosition(DPElement popupContents, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 		{
 			Point mouse = component.getMousePosition();
-			return component.createPopupPresentation( popupContents, mouse.x, mouse.y, bCloseOnLoseFocus );
+			return component.createPopupPresentation( popupContents, mouse.x, mouse.y, bCloseOnLoseFocus, bRequestFocus );
 		}
 
 		
@@ -1619,7 +1619,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				EditHandler editHandler = selectionRegion.getEditHandler();
 				if ( editHandler != null )
 				{
-					editHandler.replaceSelectionWithText( selection, replacement );
+					editHandler.replaceSelectionWithText( selection, caret, replacement );
 				}
 			}
 		}
@@ -2043,7 +2043,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	}
 	
 	
-	private PresentationPopup createPopupPresentation(DPElement popupContents, int x, int y, boolean bCloseOnLoseFocus)
+	private PresentationPopup createPopupPresentation(DPElement popupContents, int x, int y, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		// Offset the popup position by the location of this presentation component on the screen
 		Point locOnScreen = getLocationOnScreen();
@@ -2066,7 +2066,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			// Get the owning window of this presentation component
 			Window ownerWindow = SwingUtilities.getWindowAncestor( this );
 
-			return new PresentationPopup( chain, ownerWindow, this, popupContents, x, y, bCloseOnLoseFocus );
+			return new PresentationPopup( chain, ownerWindow, this, popupContents, x, y, bCloseOnLoseFocus, bRequestFocus );
 		}
 		else
 		{
@@ -2076,7 +2076,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			// Get the owning window of the root presentation component
 			Window ownerWindow = SwingUtilities.getWindowAncestor( root );
 
-			return new PresentationPopup( chain, ownerWindow, this, popupContents, x, y, bCloseOnLoseFocus );
+			return new PresentationPopup( chain, ownerWindow, this, popupContents, x, y, bCloseOnLoseFocus, bRequestFocus );
 		}
 	}
 }

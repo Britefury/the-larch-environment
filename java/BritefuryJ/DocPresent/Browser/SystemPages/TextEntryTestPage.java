@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
+import java.util.regex.Pattern;
+
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPProxy;
 import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
@@ -44,6 +46,13 @@ public class TextEntryTestPage extends SystemPage
 		{
 			link = controls.link( text, this );
 			entry = controls.textEntry( text, this );
+			proxy = primitive.proxy( link.getElement() );
+		}
+		
+		public EditableLink(PrimitiveStyleSheet primitive, ControlsStyleSheet controls, String text, Pattern validationRegex, String validationFailMessage)
+		{
+			link = controls.link( text, this );
+			entry = controls.textEntry( text, this, validationRegex, validationFailMessage );
 			proxy = primitive.proxy( link.getElement() );
 		}
 		
@@ -92,7 +101,13 @@ public class TextEntryTestPage extends SystemPage
 	{
 		EditableLink hello = new EditableLink( styleSheet, controlsStyleSheet, "Hello" );
 		EditableLink world = new EditableLink( styleSheet, controlsStyleSheet, "World" );
-		DPElement entriesBox = styleSheet.vbox( new DPElement[] { hello.getElement(), world.getElement() } );
+		EditableLink identifier = new EditableLink( styleSheet, controlsStyleSheet, "abc", Pattern.compile( "[a-zA-Z_][a-zA-Z0-9_]*" ), "Please enter a valid identifier.\n(alphabetic or underscore, followed by alphanumeric or underscore)" );
+		EditableLink integer = new EditableLink( styleSheet, controlsStyleSheet, "123", Pattern.compile( "[0-9]+" ), "Please enter a valid integer." );
+		
+		DPElement identifierLine = styleSheet.paragraph( new DPElement[] { styleSheet.staticText( "Identifier: " ), identifier.getElement() } );
+		DPElement integerLine = styleSheet.paragraph( new DPElement[] { styleSheet.staticText( "Integer: " ), integer.getElement() } );
+		
+		DPElement entriesBox = styleSheet.vbox( new DPElement[] { hello.getElement(), world.getElement(), identifierLine, integerLine } );
 		DPElement entriesSection = section( "Text entries", entriesBox );
 		
 		return entriesSection;
