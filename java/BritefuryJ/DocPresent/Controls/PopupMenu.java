@@ -37,7 +37,7 @@ public class PopupMenu
 	
 	public void popupBelow(DPElement element)
 	{
-		element.popupRight( menuBox, true );
+		element.popupBelow( menuBox, true );
 	}
 	
 	public void popupAtMousePosition(DPElement element)

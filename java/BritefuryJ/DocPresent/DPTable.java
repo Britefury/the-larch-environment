@@ -540,6 +540,15 @@ public class DPTable extends DPContainer
 		}
 	}
 	
+	protected void replaceChild(DPElement child, DPElement replacement)
+	{
+		TableChildEntry entry = getEntryForChild( child );
+		if ( entry != null )
+		{
+			put( entry.x, entry.y, entry.colSpan, entry.rowSpan, replacement );
+		}
+	}
+	
 	
 	
 	public List<DPElement> getLayoutChildren()

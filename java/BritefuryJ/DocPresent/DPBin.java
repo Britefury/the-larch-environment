@@ -114,6 +114,12 @@ public class DPBin extends DPContainer
 		setChild( null );
 	}
 	
+	protected void replaceChild(DPElement child, DPElement replacement)
+	{
+		assert child == this.getChild();
+		setChild( replacement );
+	}
+	
 	
 
 	public List<DPElement> getChildren()
