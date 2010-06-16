@@ -67,6 +67,11 @@ public class Caret implements MarkerListener
 		return marker.getPositionInSubtree( subtreeRoot );
 	}
 	
+	public int getClampedIndexInSubtree(DPElement subtreeRoot)
+	{
+		return marker.getClampedIndexInSubtree( subtreeRoot );
+	}
+	
 	
 	
 	public boolean isValid()

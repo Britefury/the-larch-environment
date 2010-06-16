@@ -34,7 +34,7 @@ public class TextAreaTestPage extends SystemPage
 	
 	
 
-	private class AreaListener implements TextArea.TextAreaListener
+	private class AreaListener extends TextArea.TextAreaListener
 	{
 		private DPVBox resultArea;
 		

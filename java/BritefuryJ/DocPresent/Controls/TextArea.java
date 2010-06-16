@@ -10,6 +10,8 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import BritefuryJ.DocPresent.DPContentLeaf;
+import BritefuryJ.DocPresent.DPContentLeafEditable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.DPSegment;
@@ -18,6 +20,9 @@ import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWhitespace;
 import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.TextEditEvent;
+import BritefuryJ.DocPresent.TextEditEventInsert;
+import BritefuryJ.DocPresent.TextEditEventRemove;
+import BritefuryJ.DocPresent.TextEditEventReplace;
 import BritefuryJ.DocPresent.TreeEventListener;
 import BritefuryJ.DocPresent.Clipboard.TextEditHandler;
 import BritefuryJ.DocPresent.Marker.Marker;
@@ -26,9 +31,23 @@ import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class TextArea extends Control
 {
-	public static interface TextAreaListener
+	public static class TextAreaListener
 	{
-		public void onAccept(TextArea textArea, String text);
+		public void onAccept(TextArea textArea, String text)
+		{
+		}
+
+		public void onTextInserted(TextArea textArea, int position, String textInserted)
+		{
+		}
+
+		public void onTextRemoved(TextArea textArea, int position, int length)
+		{
+		}
+		
+		public void onTextReplaced(TextArea textArea, int position, int length, String replacementText)
+		{
+		}
 	}
 	
 	
@@ -61,6 +80,81 @@ public class TextArea extends Control
 	}
 	
 	
+	private int computeNewCaretPositionAfterInsert(int caretPos, int insertPos, int insertLength)
+	{
+		if ( caretPos >= insertPos )
+		{
+			return caretPos + insertLength;
+		}
+		else
+		{
+			return caretPos;
+		}
+	}
+	
+	private int computeNewCaretPositionAfterRemove(int caretPos, int removePos, int removeLength)
+	{
+		if ( caretPos >= removePos )
+		{
+			int end = removePos + removeLength;
+			if ( caretPos >= end )
+			{
+				return caretPos - removeLength;
+			}
+			else
+			{
+				return removePos;
+			}
+		}
+		else
+		{
+			return caretPos;
+		}
+	}
+	
+	private int computeNewCaretPositionAfterReplace(int caretPos, int replacePos, int replaceLength, int replacementLength)
+	{
+		if ( replacementLength > replaceLength )
+		{
+			return computeNewCaretPositionAfterInsert( caretPos, replacePos + replaceLength, replacementLength - replaceLength );
+		}
+		else if ( replacementLength < replaceLength )
+		{
+			return computeNewCaretPositionAfterRemove( caretPos, replacePos + replacementLength, replaceLength - replacementLength );
+		}
+		else
+		{
+			return caretPos;
+		}
+	}
+	
+	private int computeNewCaretPosition(int lineOffset, TextEditEvent event)
+	{
+		int caretPos = getCaretIndex();
+		
+		if ( caretPos != -1 )
+		{
+			if ( event instanceof TextEditEventInsert )
+			{
+				TextEditEventInsert insert = (TextEditEventInsert)event;
+				caretPos = computeNewCaretPositionAfterInsert( caretPos, lineOffset + insert.getPosition(), insert.getTextInserted().length() );
+			}
+			else if ( event instanceof TextEditEventRemove )
+			{
+				TextEditEventRemove remove = (TextEditEventRemove)event;
+				caretPos = computeNewCaretPositionAfterRemove( caretPos, lineOffset + remove.getPosition(), remove.getLength() );
+			}
+			else if ( event instanceof TextEditEventReplace )
+			{
+				TextEditEventReplace replace = (TextEditEventReplace)event;
+				caretPos = computeNewCaretPositionAfterReplace( caretPos, lineOffset + replace.getPosition(), replace.getLength(), replace.getReplacement().length() );
+			}
+		}
+		
+		return caretPos;
+	}
+	
+	
 	private class TextAreaTextLineTreeEventListener implements TreeEventListener
 	{
 		@Override
@@ -70,10 +164,32 @@ public class TextArea extends Control
 			{
 				DPText textElement = (DPText)sourceElement;
 				String lineText = textElement.getText();
+				int lineOffset = textElement.getTextRepresentationOffsetInSubtree( textBox );
+				
 				if ( lineText.contains( "\n" ) )
 				{
-					recomputeText();
+					int caretPos = computeNewCaretPosition( lineOffset, (TextEditEvent)event );
+
+					recomputeText( caretPos );
 				}
+
+				if ( event instanceof TextEditEventInsert )
+				{
+					TextEditEventInsert insert = (TextEditEventInsert)event;
+					listener.onTextInserted( TextArea.this, lineOffset + insert.getPosition(), insert.getTextInserted() );
+				}
+				else if ( event instanceof TextEditEventRemove )
+				{
+					TextEditEventRemove remove = (TextEditEventRemove)event;
+					listener.onTextRemoved( TextArea.this, lineOffset + remove.getPosition(), remove.getLength() );
+				}
+				else if ( event instanceof TextEditEventReplace )
+				{
+					TextEditEventReplace replace = (TextEditEventReplace)event;
+					listener.onTextReplaced( TextArea.this, lineOffset + replace.getPosition(), replace.getLength(), replace.getReplacement() );
+				}
+				
+				
 				return true;
 			}
 			return false;
@@ -88,10 +204,32 @@ public class TextArea extends Control
 			if ( event instanceof TextEditEvent )
 			{
 				DPWhitespace whitespaceElement = (DPWhitespace)sourceElement;
+				
+				int lineOffset = whitespaceElement.getTextRepresentationOffsetInSubtree( textBox );
+				
 				if ( !whitespaceElement.getTextRepresentation().equals( "\n" ) )
 				{
-					recomputeText();
+					int caretPos = computeNewCaretPosition( lineOffset, (TextEditEvent)event );
+
+					recomputeText( caretPos );
 				}
+
+				if ( event instanceof TextEditEventInsert )
+				{
+					TextEditEventInsert insert = (TextEditEventInsert)event;
+					listener.onTextInserted( TextArea.this, lineOffset + insert.getPosition(), insert.getTextInserted() );
+				}
+				else if ( event instanceof TextEditEventRemove )
+				{
+					TextEditEventRemove remove = (TextEditEventRemove)event;
+					listener.onTextRemoved( TextArea.this, lineOffset + remove.getPosition(), remove.getLength() );
+				}
+				else if ( event instanceof TextEditEventReplace )
+				{
+					TextEditEventReplace replace = (TextEditEventReplace)event;
+					listener.onTextReplaced( TextArea.this, lineOffset + replace.getPosition(), replace.getLength(), replace.getReplacement() );
+				}
+
 				return true;
 			}
 			return false;
@@ -103,19 +241,33 @@ public class TextArea extends Control
 	{
 		protected void deleteText(Selection selection)
 		{
+			int startPosition = selection.getStartMarker().getClampedIndexInSubtree( textBox );
+			int endPosition = selection.getEndMarker().getClampedIndexInSubtree( textBox );
+
+			int caretPos = computeNewCaretPositionAfterRemove( getCaretIndex(), startPosition, endPosition - startPosition );
 			String newText = textBox.getTextRepresentationFromStartToMarker( selection.getStartMarker() )  +  textBox.getTextRepresentationFromMarkerToEnd( selection.getEndMarker() );
-			changeText( newText );
+			changeText( newText, caretPos );
+			
+			listener.onTextRemoved( TextArea.this, startPosition, endPosition - startPosition );
 		}
 		
 		protected void insertText(Marker marker, String text)
 		{
 			marker.getElement().insertText( marker, text );
+			
+			// Don't inform the listener - the text edit event will take care of that
 		}
 		
 		protected void replaceText(Selection selection, String replacement)
 		{
+			int startPosition = selection.getStartMarker().getClampedIndexInSubtree( textBox );
+			int endPosition = selection.getEndMarker().getClampedIndexInSubtree( textBox );
+
+			int caretPos = computeNewCaretPositionAfterReplace( getCaretIndex(), startPosition, endPosition - startPosition, replacement.length() );
 			String newText = textBox.getTextRepresentationFromStartToMarker( selection.getStartMarker() )  +  replacement  +  textBox.getTextRepresentationFromMarkerToEnd( selection.getEndMarker() );
-			changeText( newText );
+			changeText( newText, caretPos );
+			
+			listener.onTextReplaced( TextArea.this, startPosition, endPosition - startPosition, replacement );
 		}
 		
 		protected String getText(Selection selection)
@@ -147,7 +299,7 @@ public class TextArea extends Control
 		this.textBox.addInteractor( new TextAreaInteractor() );
 		region.setEditHandler( new TextAreaEditHandler() );
 		
-		changeText( text );
+		changeText( text, -1 );
 	}
 	
 
@@ -165,16 +317,29 @@ public class TextArea extends Control
 	
 	public void setText(String text)
 	{
-		changeText( text );
+		changeText( text, getCaretIndex() );
 	}
 	
 	
-	private void recomputeText()
+	
+	private int getCaretIndex()
 	{
-		changeText( textBox.getTextRepresentation() );
+		try
+		{
+			return textBox.getRootElement().getCaret().getClampedIndexInSubtree( textBox );
+		}
+		catch (DPElement.IsNotInSubtreeException e)
+		{
+			return -1;
+		}
 	}
 	
-	private void changeText(String text)
+	private void recomputeText(int caretPos)
+	{
+		changeText( textBox.getTextRepresentation(), caretPos );
+	}
+	
+	private void changeText(String text, int caretPos)
 	{
 		String lines[] = text.split( "\n" );
 		
@@ -195,6 +360,13 @@ public class TextArea extends Control
 		}
 		
 		textBox.setChildren( lineElements );
+		
+		if ( caretPos != -1 )
+		{
+			DPContentLeaf leaf = textBox.getLeafAtTextRepresentationPosition( caretPos );
+			int leafOffset = leaf.getTextRepresentationOffsetInSubtree( textBox );
+			textBox.getRootElement().getCaret().moveTo( ((DPContentLeafEditable)leaf).marker( leafOffset, Marker.Bias.START ) );
+		}
 	}
 	
 	public void grabCaret()
