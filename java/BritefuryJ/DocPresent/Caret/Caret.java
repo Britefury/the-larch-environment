@@ -9,8 +9,8 @@ package BritefuryJ.DocPresent.Caret;
 
 import BritefuryJ.DocPresent.DPContentLeaf;
 import BritefuryJ.DocPresent.DPContentLeafEditable;
-import BritefuryJ.DocPresent.DPSegment;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPSegment;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Marker.MarkerListener;
 import BritefuryJ.Math.Point2;
@@ -334,5 +334,12 @@ public class Caret implements MarkerListener
 		{
 			return false;
 		}
+	}
+
+
+
+	public void moveToPositionAndBiasWithinSubtree(DPElement subtree, int newPosition, Marker.Bias newBias)
+	{
+		marker.moveToPositionAndBiasWithinSubtree( subtree, newPosition, newBias );
 	}
 }

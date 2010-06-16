@@ -10,8 +10,6 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import BritefuryJ.DocPresent.DPContentLeaf;
-import BritefuryJ.DocPresent.DPContentLeafEditable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.DPSegment;
@@ -80,81 +78,6 @@ public class TextArea extends Control
 	}
 	
 	
-	private int computeNewCaretPositionAfterInsert(int caretPos, int insertPos, int insertLength)
-	{
-		if ( caretPos >= insertPos )
-		{
-			return caretPos + insertLength;
-		}
-		else
-		{
-			return caretPos;
-		}
-	}
-	
-	private int computeNewCaretPositionAfterRemove(int caretPos, int removePos, int removeLength)
-	{
-		if ( caretPos >= removePos )
-		{
-			int end = removePos + removeLength;
-			if ( caretPos >= end )
-			{
-				return caretPos - removeLength;
-			}
-			else
-			{
-				return removePos;
-			}
-		}
-		else
-		{
-			return caretPos;
-		}
-	}
-	
-	private int computeNewCaretPositionAfterReplace(int caretPos, int replacePos, int replaceLength, int replacementLength)
-	{
-		if ( replacementLength > replaceLength )
-		{
-			return computeNewCaretPositionAfterInsert( caretPos, replacePos + replaceLength, replacementLength - replaceLength );
-		}
-		else if ( replacementLength < replaceLength )
-		{
-			return computeNewCaretPositionAfterRemove( caretPos, replacePos + replacementLength, replaceLength - replacementLength );
-		}
-		else
-		{
-			return caretPos;
-		}
-	}
-	
-	private int computeNewCaretPosition(int lineOffset, TextEditEvent event)
-	{
-		int caretPos = getCaretIndex();
-		
-		if ( caretPos != -1 )
-		{
-			if ( event instanceof TextEditEventInsert )
-			{
-				TextEditEventInsert insert = (TextEditEventInsert)event;
-				caretPos = computeNewCaretPositionAfterInsert( caretPos, lineOffset + insert.getPosition(), insert.getTextInserted().length() );
-			}
-			else if ( event instanceof TextEditEventRemove )
-			{
-				TextEditEventRemove remove = (TextEditEventRemove)event;
-				caretPos = computeNewCaretPositionAfterRemove( caretPos, lineOffset + remove.getPosition(), remove.getLength() );
-			}
-			else if ( event instanceof TextEditEventReplace )
-			{
-				TextEditEventReplace replace = (TextEditEventReplace)event;
-				caretPos = computeNewCaretPositionAfterReplace( caretPos, lineOffset + replace.getPosition(), replace.getLength(), replace.getReplacement().length() );
-			}
-		}
-		
-		return caretPos;
-	}
-	
-	
 	private class TextAreaTextLineTreeEventListener implements TreeEventListener
 	{
 		@Override
@@ -168,7 +91,7 @@ public class TextArea extends Control
 				
 				if ( lineText.contains( "\n" ) )
 				{
-					int caretPos = computeNewCaretPosition( lineOffset, (TextEditEvent)event );
+					int caretPos = getCaretIndex();
 
 					recomputeText( caretPos );
 				}
@@ -209,7 +132,7 @@ public class TextArea extends Control
 				
 				if ( !whitespaceElement.getTextRepresentation().equals( "\n" ) )
 				{
-					int caretPos = computeNewCaretPosition( lineOffset, (TextEditEvent)event );
+					int caretPos = getCaretIndex();
 
 					recomputeText( caretPos );
 				}
@@ -322,6 +245,76 @@ public class TextArea extends Control
 	
 	
 	
+	public void grabCaret()
+	{
+		textBox.grabCaret();
+	}
+	
+	public void ungrabCaret()
+	{
+		textBox.ungrabCaret();
+	}
+
+	
+	public void accept()
+	{
+		ungrabCaret();
+		listener.onAccept( this, getText() );
+	}
+
+
+
+	private int computeNewCaretPositionAfterInsert(int caretPos, int insertPos, int insertLength)
+	{
+		if ( caretPos >= insertPos )
+		{
+			return caretPos + insertLength;
+		}
+		else
+		{
+			return caretPos;
+		}
+	}
+	
+	private int computeNewCaretPositionAfterRemove(int caretPos, int removePos, int removeLength)
+	{
+		if ( caretPos >= removePos )
+		{
+			int end = removePos + removeLength;
+			if ( caretPos >= end )
+			{
+				return caretPos - removeLength;
+			}
+			else
+			{
+				return removePos;
+			}
+		}
+		else
+		{
+			return caretPos;
+		}
+	}
+	
+	private int computeNewCaretPositionAfterReplace(int caretPos, int replacePos, int replaceLength, int replacementLength)
+	{
+		if ( replacementLength > replaceLength )
+		{
+			return computeNewCaretPositionAfterInsert( caretPos, replacePos + replaceLength, replacementLength - replaceLength );
+		}
+		else if ( replacementLength < replaceLength )
+		{
+			return computeNewCaretPositionAfterRemove( caretPos, replacePos + replacementLength, replaceLength - replacementLength );
+		}
+		else
+		{
+			return caretPos;
+		}
+	}
+	
+	
+	
+	
 	private int getCaretIndex()
 	{
 		try
@@ -341,10 +334,22 @@ public class TextArea extends Control
 	
 	private void changeText(String text, int caretPos)
 	{
-		String lines[] = text.split( "\n" );
+		if ( text.endsWith( "\n\n" ) )
+		{
+			// This handles the behaviour of String#split, which will not add a final blank line where the text ends with two new line characters.
+			// To correct for this, add a space character, then remove that final artificial line afterwards
+			text = text + " ";
+			String lines[] = text.split( "\\r?\\n" );
+			textLines.clear();
+			textLines.addAll( Arrays.asList( lines ).subList( 0, lines.length - 1 ) );
+		}
+		else
+		{
+			String lines[] = text.split( "\\r?\\n" );
+			textLines.clear();
+			textLines.addAll( Arrays.asList( lines ) );
+		}
 		
-		textLines.clear();
-		textLines.addAll( Arrays.asList( lines ) );
 		
 		ArrayList<DPElement> lineElements = new ArrayList<DPElement>();
 		for (String line: textLines)
@@ -363,26 +368,8 @@ public class TextArea extends Control
 		
 		if ( caretPos != -1 )
 		{
-			DPContentLeaf leaf = textBox.getLeafAtTextRepresentationPosition( caretPos );
-			int leafOffset = leaf.getTextRepresentationOffsetInSubtree( textBox );
-			textBox.getRootElement().getCaret().moveTo( ((DPContentLeafEditable)leaf).marker( leafOffset, Marker.Bias.START ) );
+			System.out.println( "TextArea.changeText(): moving caret to " + caretPos );
+			textBox.getRootElement().getCaret().moveToPositionAndBiasWithinSubtree( textBox, caretPos, Marker.Bias.START );
 		}
-	}
-	
-	public void grabCaret()
-	{
-		textBox.grabCaret();
-	}
-	
-	public void ungrabCaret()
-	{
-		textBox.ungrabCaret();
-	}
-
-	
-	public void accept()
-	{
-		ungrabCaret();
-		listener.onAccept( this, getText() );
 	}
 }

@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
+import java.awt.Color;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPElement;
@@ -36,11 +37,14 @@ public class TextAreaTestPage extends SystemPage
 
 	private class AreaListener extends TextArea.TextAreaListener
 	{
-		private DPVBox resultArea;
+		private DPVBox resultArea, eventArea;
+		private String prevText;
 		
-		public AreaListener(DPVBox resultArea)
+		public AreaListener(DPVBox resultArea, DPVBox eventArea, String text)
 		{
 			this.resultArea = resultArea;
+			this.eventArea = eventArea;
+			this.prevText = text;
 		}
 		
 		public void onAccept(TextArea textArea, String text)
@@ -54,6 +58,52 @@ public class TextAreaTestPage extends SystemPage
 			}
 			
 			resultArea.setChildren( lineElements );
+		}
+		
+		public void onTextInserted(TextArea textArea, int position, String textInserted)
+		{
+			String text = "Inserted text @" + position + ":\n" + textInserted;
+			setEventText( text );
+			prevText = prevText.substring( 0, position ) + textInserted + prevText.substring( position );
+			if ( !prevText.equals( textArea.getText() ) )
+			{
+				eventArea.append( PrimitiveStyleSheet.instance.withForeground( Color.RED ).staticText( "Insert event was invalid" ) );
+			}
+		}
+
+		public void onTextRemoved(TextArea textArea, int position, int length)
+		{
+			String text = "Removed " + position + " to " + ( position + length );
+			setEventText( text );
+			prevText = prevText.substring( 0, position ) + prevText.substring( position + length );
+			if ( !prevText.equals( textArea.getText() ) )
+			{
+				eventArea.append( PrimitiveStyleSheet.instance.withForeground( Color.RED ).staticText( "Insert event was invalid" ) );
+			}
+		}
+		
+		public void onTextReplaced(TextArea textArea, int position, int length, String replacementText)
+		{
+			String text = "Replaced " + position + " to " + ( position + length ) + " with:\n" + replacementText;
+			setEventText( text );
+			prevText = prevText.substring( 0, position ) + replacementText + prevText.substring( position + length );
+			if ( !prevText.equals( textArea.getText() ) )
+			{
+				eventArea.append( PrimitiveStyleSheet.instance.withForeground( Color.RED ).staticText( "Insert event was invalid" ) );
+			}
+		}
+		
+		private void setEventText(String text)
+		{
+			String[] lines = text.split( "\n" );
+			
+			ArrayList<DPElement> lineElements = new ArrayList<DPElement>();
+			for (String line: lines)
+			{
+				lineElements.add( styleSheet.staticText( line ) );
+			}
+			
+			eventArea.setChildren( lineElements );
 		}
 	}
 
@@ -78,9 +128,10 @@ public class TextAreaTestPage extends SystemPage
 	protected DPElement createContents()
 	{
 		DPVBox resultArea = styleSheet.vbox( new DPElement[] {} );
-		DPVBox resultBox = styleSheet.vbox( new DPElement[] { styleSheet.staticText( "Text:" ), resultArea } );
+		DPVBox eventArea = styleSheet.vbox( new DPElement[] {} );
+		DPVBox resultBox = styleSheet.withVBoxSpacing( 5.0 ).vbox( new DPElement[] { styleSheet.staticText( "Text:" ), resultArea, styleSheet.staticText( "Event:" ), eventArea } );
 		
-		TextArea area = controlsStyleSheet.textArea( testString, new AreaListener( resultArea ) );
+		TextArea area = controlsStyleSheet.textArea( testString, new AreaListener( resultArea, eventArea, testString ) );
 		
 		DPElement areaBox = styleSheet.withVBoxSpacing( 10.0 ).vbox( new DPElement[] { area.getElement().alignHExpand(), resultBox.alignHExpand() } );
 		DPElement textAreaSection = section( "Text area", areaBox.alignHExpand() );

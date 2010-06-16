@@ -8,11 +8,7 @@ package BritefuryJ.GSym.View;
 
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.DPContainer;
-import BritefuryJ.DocPresent.DPContentLeaf;
-import BritefuryJ.DocPresent.DPContentLeafEditable;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPSegment;
 import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Marker.Marker;
@@ -22,13 +18,6 @@ import BritefuryJ.Utils.StringDiff;
 public class NodeElementChangeListenerDiff implements GSymView.NodeElementChangeListener
 {
 	private static int DIFF_THRESHHOLD = 65536;
-	
-	private enum Direction
-	{
-		DIR_NONE,
-		FORWARD,
-		BACKWARD
-	}
 	
 	
 	private GSymFragmentView caretNode;
@@ -243,195 +232,7 @@ public class NodeElementChangeListenerDiff implements GSymView.NodeElementChange
 				PresentationComponent.RootElement elementTree = nodeElement.getRootElement();
 				Caret caret = elementTree.getCaret();
 				
-				
-				
-				
-				if ( newPosition < 0 )
-				{
-					newPosition = 0;
-					newBias = Marker.Bias.START;
-				}
-				else if ( newPosition >= newTextRepresentation.length() )
-				{
-					newPosition = newTextRepresentation.length() - 1;
-					newBias = Marker.Bias.END;
-				}
-				
-				
-				int newIndex = newPosition  +  ( newBias == Marker.Bias.END  ?  1  :  0 );
-				
-				
-//				int oldIndex = position  +  ( bias == Marker.Bias.END  ?  1  :  0 );
-//				if ( bias == Marker.Bias.START )
-//				{
-//					System.out.println( textRepresentation.substring( 0, oldIndex ).toString().replace( "\n", "\\n" )  +  ">|"  +  textRepresentation.substring( oldIndex, textRepresentation.length() ).toString().replace( "\n", "\\n" ) );
-//				}
-//				else
-//				{
-//					System.out.println( textRepresentation.substring( 0, oldIndex ).toString().replace( "\n", "\\n" )  +  "|<"  +  textRepresentation.substring( oldIndex, textRepresentation.length() ).toString().replace( "\n", "\\n" ) );
-//				}
-//
-//				if ( newBias == Marker.Bias.START )
-//				{
-//					System.out.println( newTextRepresentation.substring( 0, newIndex ).toString().replace( "\n", "\\n" )  +  ">|"  +  newTextRepresentation.substring( newIndex, newTextRepresentation.length() ).toString().replace( "\n", "\\n" ) );
-//				}
-//				else
-//				{
-//					System.out.println( newTextRepresentation.substring( 0, newIndex ).toString().replace( "\n", "\\n" )  +  "|<"  +  newTextRepresentation.substring( newIndex, newTextRepresentation.length() ).toString().replace( "\n", "\\n" ) );
-//				}
-				
-				
-				DPContentLeaf leaf = nodeElement.getLeafAtTextRepresentationPosition( newPosition );
-				if ( leaf != null )
-				{
-					int leafOffset = -1;
-					if ( leaf == nodeElement )
-					{
-						leafOffset = 0;
-					}
-					else
-					{
-						leafOffset = leaf.getTextRepresentationOffsetInSubtree( (DPContainer)nodeElement );
-					}
-					int leafPosition = newPosition - leafOffset;
-					
-					
-					if ( leaf.isEditable() )
-					{
-						caret.moveTo( ((DPContentLeafEditable)leaf).marker( leafPosition, newBias ) );
-					}
-					else
-					{
-						// The leaf is not editable. We must choose a nearby leaf to place the caret in
-						
-						DPSegment segment = leaf.getSegment();
-						DPSegment.SegmentFilter segFilter = segment != null  ?  new DPSegment.SegmentFilter( segment )  :  null;
-						
-						
-						// First, we must decide whether we should search backwards or forwards
-						Direction direction = Direction.DIR_NONE;
-						String leafTextRepresentation = leaf.getTextRepresentation();
-						int leafTextReprLength = leafTextRepresentation.length();
-						
-						// First, see if the leaf textual representation contains a new-line. If so, try to stay on the same side of the new line.
-						if ( leafTextRepresentation.contains( "\n" ) )
-						{
-							int leafIndex = newIndex - leafOffset;
-							if ( leafTextRepresentation.substring( leafIndex, leafTextReprLength ).contains( "\n" ) )
-							{
-								// Newline in text after the caret position; search backwards
-								direction = Direction.BACKWARD;
-							}
-							else if ( leafTextRepresentation.substring( 0, leafIndex ).contains( "\n" ) )
-							{
-								// Newline in text before the caret position; search forwards
-								direction = Direction.FORWARD;
-							}
-						}
-						
-						
-						if ( direction == Direction.DIR_NONE )
-						{
-							// Decide which way to go by staying on the same side of the centre of the leaf
-							if ( (float)leafPosition  <  ((float)leafTextReprLength) * 0.5f )
-							{
-								direction = Direction.BACKWARD;
-							}
-							else
-							{
-								direction = Direction.FORWARD;
-							}
-						}
-						
-						
-						if ( direction == Direction.BACKWARD )
-						{
-							// Search backwards
-							DPContentLeaf left = leaf.getPreviousEditableLeaf( segFilter, null );
-							if ( left != null )
-							{
-								caret.moveTo( left.markerAtEnd() );
-							}
-							else
-							{
-								// Searching backwards failed; search forwards
-								DPContentLeaf right = leaf.getNextEditableLeaf( segFilter, null );
-								if ( right != null )
-								{
-									caret.moveTo( right.markerAtStart() );
-								}
-								else
-								{
-									// Search backwards, this time potentially leaving the segment
-									left = leaf.getPreviousEditableLeaf( null, null );
-									if ( left != null )
-									{
-										caret.moveTo( left.markerAtEnd() );
-									}
-									else
-									{
-										// Searching backwards failed; search forwards
-										right = leaf.getNextEditableLeaf( null, null );
-										if ( right != null )
-										{
-											caret.moveTo( right.markerAtStart() );
-										}
-										else
-										{
-											// Searching backwards and forwards failed; place the cursor in the non-editable leaf and hope for the best
-											caret.moveTo( leaf.markerAtStart() );
-										}
-									}
-								}
-							}
-						}
-						else if ( direction == Direction.FORWARD )
-						{
-							// Search forwards
-							DPContentLeaf right = leaf.getNextEditableLeaf( segFilter, null );
-							if ( right != null )
-							{
-								caret.moveTo( right.markerAtStart() );
-							}
-							else
-							{
-								// Searching forwards failed; search backwards
-								DPContentLeaf left = leaf.getPreviousEditableLeaf( segFilter, null );
-								if ( left != null )
-								{
-									caret.moveTo( left.markerAtEnd() );
-								}
-								else
-								{
-									// Search forwards, this time potentially leaving the segment
-									right = leaf.getNextEditableLeaf( null, null );
-									if ( right != null )
-									{
-										caret.moveTo( right.markerAtStart() );
-									}
-									else
-									{
-										// Searching forwards failed; search backwards
-										left = leaf.getPreviousEditableLeaf( null, null );
-										if ( left != null )
-										{
-											caret.moveTo( left.markerAtEnd() );
-										}
-										else
-										{
-											// Searching forwards and backwards failed; place the cursor in the non-editable leaf and hope for the best
-											caret.moveTo( leaf.markerAtStart() );
-										}
-									}
-								}
-							}
-						}
-						else
-						{
-							throw new RuntimeException( "invalid direction" );
-						}
-					}
-				}
+				caret.moveToPositionAndBiasWithinSubtree( nodeElement, newPosition, newBias );
 			}
 		}
 	}
