@@ -110,6 +110,11 @@ public abstract class IncrementalTreeNode implements IncrementalMonitorListener,
 		incr.addListener( this );
 	}
 	
+	protected void dispose()
+	{
+		incr.removeListener( this );
+	}
+	
 	
 	
 	//

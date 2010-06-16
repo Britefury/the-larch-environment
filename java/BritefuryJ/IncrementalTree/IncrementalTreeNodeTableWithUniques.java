@@ -230,6 +230,8 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 			{
 				unrefedStack.push( child );
 			}
+			
+			node.dispose();
 		}
 		
 		unrefedNodes.clear();

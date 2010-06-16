@@ -240,6 +240,8 @@ public class IncrementalTreeNodeTableWithDuplicates extends IncrementalTreeNodeT
 			{
 				subTable.clean();
 			}
+			
+			node.dispose();
 		}
 		
 		unrefedNodes.clear();
