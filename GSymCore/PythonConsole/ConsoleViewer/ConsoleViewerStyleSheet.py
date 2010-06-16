@@ -141,11 +141,11 @@ class ConsoleViewerStyleSheet (StyleSheet):
 			return consoleStyle.vbox( [ dropPromptInsertionPoint, m.alignVTop().alignHExpand() ] ).alignHExpand(), dropPromptInsertionPoint
 		
 		
-	def dropPrompt(self, onAccept, onCancel):
+	def dropPrompt(self, varNameTextEntryListener):
 		primitiveStyle = self['primitiveStyle']
 		controlsStyle = self['controlsStyle']
 		dropPromptStyle = self.dropPromptStyle()
-		textEntry = controlsStyle.textEntry( 'var', onAccept, onCancel )
+		textEntry = controlsStyle.textEntry( 'var', varNameTextEntryListener )
 		prompt = primitiveStyle.staticText( 'Place node into a variable named: ' )
 		return dropPromptStyle.border( primitiveStyle.paragraph( [ prompt.alignVCentre(), textEntry.getElement().alignVCentre() ] ) ), textEntry
 		

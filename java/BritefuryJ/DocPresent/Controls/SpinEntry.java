@@ -18,7 +18,7 @@ public abstract class SpinEntry extends Control
 	protected DPElement upSpinButton, downSpinButton;
 	
 	
-	protected static class SpinEntryTextListener implements TextEntry.TextEntryListener
+	protected static class SpinEntryTextListener extends TextEntry.TextEntryListener
 	{
 		private SpinEntry spinEntry = null;
 		
@@ -27,11 +27,6 @@ public abstract class SpinEntry extends Control
 		public void onAccept(TextEntry textEntry, String text)
 		{
 			spinEntry.onTextChanged( text );
-		}
-
-		@Override
-		public void onCancel(TextEntry textEntry, String originalText)
-		{
 		}
 	}
 	

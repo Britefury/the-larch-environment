@@ -9,101 +9,58 @@ package BritefuryJ.DocPresent.Controls;
 import java.awt.event.KeyEvent;
 import java.util.regex.Pattern;
 
-import org.python.core.Py;
-import org.python.core.PyObject;
-
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.PresentationComponent;
+import BritefuryJ.DocPresent.TextEditEventInsert;
+import BritefuryJ.DocPresent.TextEditEventRemove;
+import BritefuryJ.DocPresent.TextEditEventReplace;
+import BritefuryJ.DocPresent.TreeEventListener;
 import BritefuryJ.DocPresent.Clipboard.TextEditHandler;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
 
 public class TextEntry extends Control
 {
-	public static interface TextEntryListener
+	public static class TextEntryListener
 	{
-		public void onAccept(TextEntry textEntry, String text);
-		public void onCancel(TextEntry textEntry, String originalText);
-	}
-	
-	
-	public static interface TextEntryValidator
-	{
-		public boolean validateText(TextEntry textEntry, String text);
-		public String validationMessage(TextEntry textEntry, String text);
-	}
-	
-	
-	private static class PyTextEntryListener implements TextEntryListener
-	{
-		private PyObject acceptCallable, cancelCallable;
-		
-		
-		public PyTextEntryListener(PyObject acceptCallable, PyObject cancelCallable)
-		{
-			this.acceptCallable = acceptCallable;
-			this.cancelCallable = cancelCallable;
-		}
-		
 		public void onAccept(TextEntry textEntry, String text)
 		{
-			if ( acceptCallable != null  &&  acceptCallable != Py.None )
-			{
-				acceptCallable.__call__( Py.java2py( textEntry ), Py.java2py( text ) );
-			}
-		}
-		
-		public void onCancel(TextEntry textEntry, String originalText)
-		{
-			if ( cancelCallable != null  &&  cancelCallable != Py.None )
-			{
-				cancelCallable.__call__( Py.java2py( textEntry ), Py.java2py( originalText ) );
-			}
-		}
-	}
-	
-	private static class PyTextEntryValidator implements TextEntryValidator
-	{
-		private PyObject validationFn, validationMessageFn;
-		
-		
-		public PyTextEntryValidator(PyObject validationFn, PyObject validationMessageFn)
-		{
-			this.validationFn = validationFn;
-			this.validationMessageFn = validationMessageFn;
-		}
-		
-		public boolean validateText(TextEntry textEntry, String text)
-		{
-			if ( validationFn != null  &&  validationFn != Py.None )
-			{
-				return Py.py2boolean( validationFn.__call__( Py.java2py( textEntry ), Py.java2py( text ) ) );
-			}
-			else
-			{
-				return true;
-			}
 		}
 
-		public String validationMessage(TextEntry textEntry, String text)
+		public void onCancel(TextEntry textEntry, String originalText)
 		{
-			if ( validationMessageFn != null  &&  validationMessageFn != Py.None )
-			{
-				return Py.tojava( validationMessageFn.__call__( Py.java2py( textEntry ), Py.java2py( text ) ), String.class );
-			}
-			else
-			{
-				return null;
-			}
+		}
+
+		public void onTextInserted(TextEntry textEntry, int position, String textInserted)
+		{
+		}
+
+		public void onTextRemoved(TextEntry textEntry, int position, int length)
+		{
+		}
+		
+		public void onTextReplaced(TextEntry textEntry, int position, int length, String replacementText)
+		{
 		}
 	}
 	
 	
-	private static class RegexTextEntryValidator implements TextEntryValidator
+	public static abstract class TextEntryValidator
+	{
+		public abstract boolean validateText(TextEntry textEntry, String text);
+		
+		public String validationMessage(TextEntry textEntry, String text)
+		{
+			return null;
+		}
+	}
+	
+	
+	private static class RegexTextEntryValidator extends TextEntryValidator
 	{
 		private Pattern pattern;
 		private String failMessage;
@@ -163,6 +120,34 @@ public class TextEntry extends Control
 	}
 	
 	
+	private class TextEntryTreeEventListener implements TreeEventListener
+	{
+		@Override
+		public boolean onTreeEvent(DPElement element, DPElement sourceElement, Object event)
+		{
+			if ( event instanceof TextEditEventInsert )
+			{
+				TextEditEventInsert insert = (TextEditEventInsert)event;
+				listener.onTextInserted( TextEntry.this, insert.getPosition(), insert.getTextInserted() );
+				return true;
+			}
+			else if ( event instanceof TextEditEventRemove )
+			{
+				TextEditEventRemove remove = (TextEditEventRemove)event;
+				listener.onTextRemoved( TextEntry.this, remove.getPosition(), remove.getLength() );
+				return true;
+			}
+			else if ( event instanceof TextEditEventReplace )
+			{
+				TextEditEventReplace replace = (TextEditEventReplace)event;
+				listener.onTextReplaced( TextEntry.this, replace.getPosition(), replace.getLength(), replace.getReplacement() );
+				return true;
+			}
+			return false;
+		}
+	}
+	
+	
 	private class TextEntryEditHandler extends TextEditHandler
 	{
 		protected void deleteText(Selection selection)
@@ -202,11 +187,6 @@ public class TextEntry extends Control
 		this( outerElement, frame, textElement, listener, (TextEntryValidator)null, styleSheet );
 	}
 	
-	protected TextEntry(DPBorder outerElement, DPRegion frame, DPText textElement, PyObject acceptListener, PyObject cancelListener, ControlsStyleSheet styleSheet)
-	{
-		this( outerElement, frame, textElement, new PyTextEntryListener( acceptListener, cancelListener ), styleSheet );
-	}
-	
 	
 	protected TextEntry(DPBorder outerElement, DPRegion frame, DPText textElement, TextEntryListener listener, TextEntryValidator validator, ControlsStyleSheet styleSheet)
 	{
@@ -217,27 +197,15 @@ public class TextEntry extends Control
 		this.styleSheet = styleSheet;
 
 		this.textElement.addInteractor( new TextEntryInteractor() );
+		this.textElement.addTreeEventListener( new TextEntryTreeEventListener() );
 		originalText = textElement.getText();
 		frame.setEditHandler( new TextEntryEditHandler() );
 	}
-	
-	protected TextEntry(DPBorder outerElement, DPRegion frame, DPText textElement, PyObject acceptListener, PyObject cancelListener, PyObject validationFn, PyObject validationMessageFn,
-			ControlsStyleSheet styleSheet)
-	{
-		this( outerElement, frame, textElement, new PyTextEntryListener( acceptListener, cancelListener ), new PyTextEntryValidator( validationFn, validationMessageFn ), styleSheet );
-	}
-	
 	
 	protected TextEntry(DPBorder outerElement, DPRegion frame, DPText textElement, TextEntryListener listener, Pattern validationRegex, String validationFailMessage,
 			ControlsStyleSheet styleSheet)
 	{
 		this( outerElement, frame, textElement, listener, new RegexTextEntryValidator( validationRegex, validationFailMessage ), styleSheet );
-	}
-	
-	protected TextEntry(DPBorder outerElement, DPRegion frame, DPText textElement, PyObject acceptListener, PyObject cancelListener, Pattern validationRegex, String validationFailMessage,
-			ControlsStyleSheet styleSheet)
-	{
-		this( outerElement, frame, textElement, new PyTextEntryListener( acceptListener, cancelListener ), validationRegex, validationFailMessage, styleSheet );
 	}
 	
 	

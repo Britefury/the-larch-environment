@@ -17,8 +17,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.python.core.PyObject;
-
 import BritefuryJ.AttributeTable.AttributeValues;
 import BritefuryJ.DocPresent.DPAbstractBox;
 import BritefuryJ.DocPresent.DPAspectRatioBin;
@@ -1018,36 +1016,6 @@ public class ControlsStyleSheet extends StyleSheet
 		return new TextEntry( outerElement, region, textElement, listener, validatorRegex, validationFailMessage, this );
 	}
 
-	public TextEntry textEntry(String text, PyObject accept, PyObject cancel)
-	{
-		PrimitiveStyleSheet textEntryStyle = getTextEntryStyleSheet();
-		DPText textElement = textEntryStyle.text( text );
-		DPElement line = textEntryStyle.hbox( new DPElement[] { textEntryStyle.segment( false, false, textElement ) } );
-		DPRegion region = textEntryStyle.region( line );
-		DPBorder outerElement = textEntryStyle.border( region );
-		return new TextEntry( outerElement, region, textElement, accept, cancel, this );
-	}
-	
-	public TextEntry textEntry(String text, PyObject accept, PyObject cancel, PyObject validationFn, PyObject validationFailMessageFn)
-	{
-		PrimitiveStyleSheet textEntryStyle = getTextEntryStyleSheet();
-		DPText textElement = textEntryStyle.text( text );
-		DPElement line = textEntryStyle.hbox( new DPElement[] { textEntryStyle.segment( false, false, textElement ) } );
-		DPRegion region = textEntryStyle.region( line );
-		DPBorder outerElement = textEntryStyle.border( region );
-		return new TextEntry( outerElement, region, textElement, accept, cancel, validationFn, validationFailMessageFn, this );
-	}
-	
-	public TextEntry textEntry(String text, PyObject accept, PyObject cancel, Pattern validatorRegex, String validationFailMessage)
-	{
-		PrimitiveStyleSheet textEntryStyle = getTextEntryStyleSheet();
-		DPText textElement = textEntryStyle.text( text );
-		DPElement line = textEntryStyle.hbox( new DPElement[] { textEntryStyle.segment( false, false, textElement ) } );
-		DPRegion region = textEntryStyle.region( line );
-		DPBorder outerElement = textEntryStyle.border( region );
-		return new TextEntry( outerElement, region, textElement, accept, cancel, validatorRegex, validationFailMessage, this );
-	}
-	
 	
 	public RealSpinEntry realSpinEntry(double value, double min, double max, double stepSize, double pageSize, RealSpinEntry.RealSpinEntryListener listener)
 	{

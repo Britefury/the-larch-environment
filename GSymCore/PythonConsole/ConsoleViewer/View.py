@@ -28,6 +28,7 @@ from BritefuryJ.AttributeTable import *
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.StyleSheet import *
 from BritefuryJ.DocPresent.Browser import Location
+from BritefuryJ.DocPresent.Controls import TextEntry
 from BritefuryJ.DocPresent.Input import ObjectDndHandler
 
 from BritefuryJ.GSym import GSymPerspective, GSymSubject
@@ -78,18 +79,19 @@ class ConsoleView (GSymViewObjectDispatch):
 		currentModuleView = ctx.presentFragmentWithPerspectiveAndStyleSheet( node.getCurrentPythonModule(), Python25.python25EditorPerspective, styleSheet['pythonStyle'] )
 	
 		def _onDrop(element, pos, data):
-			def _onAccept(entry, text):
-				node.setGlobalVar( text, data.getDocNode() )
-				_finish( entry )
-			
-			def _onCancel(entry, text):
-				_finish( entry )
+			class _VarNameEntryListener (TextEntry.TextEntryListener):
+				def onAccept(self, entry, text):
+					node.setGlobalVar( text, data.getDocNode() )
+					_finish( entry )
+				
+				def onCancel(self, entry, text):
+					_finish( entry )
 				
 			def _finish(entry):
 				caret.moveTo( marker )
 				dropPromptInsertionPoint.setChildren( [] )
 			
-			dropPrompt, textEntry = styleSheet.dropPrompt( _onAccept, _onCancel )
+			dropPrompt, textEntry = styleSheet.dropPrompt( _VarNameEntryListener() )
 			rootElement = element.getRootElement()
 			caret = rootElement.getCaret()
 			marker = caret.getMarker().copy()

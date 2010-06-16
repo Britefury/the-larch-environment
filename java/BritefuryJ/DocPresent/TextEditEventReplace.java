@@ -19,4 +19,20 @@ public class TextEditEventReplace extends TextEditEvent
 		this.length = length;
 		this.replacement = replacement;
 	}
+	
+	
+	public int getPosition()
+	{
+		return position;
+	}
+	
+	public int getLength()
+	{
+		return length;
+	}
+	
+	public String getReplacement()
+	{
+		return replacement;
+	}
 }

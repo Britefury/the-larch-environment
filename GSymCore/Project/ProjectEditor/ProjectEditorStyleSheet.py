@@ -21,7 +21,6 @@ from Britefury.AttributeTableUtils.DerivedAttributeMethod import DerivedAttribut
 from GSymCore.Utils.TabbedBox import TabbedBoxStyleSheet
 
 
-
 class ProjectEditorStyleSheet (StyleSheet):
 	def __init__(self):
 		super( ProjectEditorStyleSheet, self ).__init__()
@@ -109,9 +108,9 @@ class ProjectEditorStyleSheet (StyleSheet):
 		return contentBox.alignHExpand()
 
 
-	def renameEntry(self, name, onAccept, onCancel):
+	def renameEntry(self, name, renameEntryListener):
 		controlsStyle = self['controlsStyle']
-		return controlsStyle.textEntry( name, onAccept, onCancel )
+		return controlsStyle.textEntry( name, renameEntryListener )
 	
 
 	def package(self, packageName, packageLocation, items, packageContextMenuFactory):
