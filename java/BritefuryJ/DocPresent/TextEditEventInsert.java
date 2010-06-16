@@ -18,4 +18,15 @@ public class TextEditEventInsert extends TextEditEvent
 		this.position = position;
 		this.textInserted = textInserted;
 	}
+	
+	
+	public int getPosition()
+	{
+		return position;
+	}
+	
+	public String getTextInserted()
+	{
+		return textInserted;
+	}
 }

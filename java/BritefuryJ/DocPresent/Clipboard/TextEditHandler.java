@@ -37,6 +37,7 @@ public abstract class TextEditHandler implements EditHandler
 		if ( !selection.isEmpty() )
 		{
 			replaceText( selection, replacement );
+			selection.clear();
 		}
 		else
 		{
@@ -71,6 +72,7 @@ public abstract class TextEditHandler implements EditHandler
 			if ( !selection.isEmpty() )
 			{
 				deleteText( selection );
+				selection.clear();
 			}
 		}
 	}
@@ -92,6 +94,7 @@ public abstract class TextEditHandler implements EditHandler
 				if ( !selection.isEmpty() )
 				{
 					replaceText( selection, data );
+					selection.clear();
 				}
 				else
 				{

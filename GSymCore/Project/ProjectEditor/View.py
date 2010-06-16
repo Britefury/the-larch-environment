@@ -29,7 +29,7 @@ from BritefuryJ.AttributeTable import *
 
 from BritefuryJ.DocPresent.Browser import Location
 from BritefuryJ.DocPresent.StyleSheet import PrimitiveStyleSheet, RichTextStyleSheet
-from BritefuryJ.DocPresent.Controls import ControlsStyleSheet
+from BritefuryJ.DocPresent.Controls import ControlsStyleSheet, TextEntry
 from BritefuryJ.DocPresent import *
 
 from BritefuryJ.GSym import GSymPerspective, GSymSubject, GSymRelativeLocationResolver
@@ -180,14 +180,15 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 	@DMObjectNodeDispatchMethod( Schema.Page )
 	def Page(self, ctx, styleSheet, state, node, name, unit):
-		def _onRenameAccept(textEntry, text):
-			node['name'] = text
-			
-		def _onRenameCancel(textEntry, originalText):
-			nameBox.setChildren( [ nameElement ] )
+		class _RenameEntryListener (TextEntry.TextEntryListener):
+			def onAccept(self, textEntry, text):
+				node['name'] = text
+				
+			def onCancel(self, textEntry, originalText):
+				nameBox.setChildren( [ nameElement ] )
 		
 		def _onRename(menuItem):
-			textEntry = styleSheet.renameEntry( name, _onRenameAccept, _onRenameCancel )
+			textEntry = styleSheet.renameEntry( name, _RenameEntryListener() )
 			nameBox.setChildren( [ textEntry.getElement() ] )
 			textEntry.grabCaret()
 		

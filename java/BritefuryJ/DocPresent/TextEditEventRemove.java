@@ -17,4 +17,15 @@ public class TextEditEventRemove extends TextEditEvent
 		this.position = position;
 		this.length = length;
 	}
+	
+	
+	public int getPosition()
+	{
+		return position;
+	}
+	
+	public int getLength()
+	{
+		return length;
+	}
 }

@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPProxy;
+import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
 import BritefuryJ.DocPresent.Controls.Hyperlink;
 import BritefuryJ.DocPresent.Controls.TextEntry;
@@ -35,11 +36,13 @@ public class TextEntryTestPage extends SystemPage
 	}
 	
 	
-	private class EditableLink implements TextEntry.TextEntryListener, Hyperlink.LinkListener
+	private class EditableLink extends TextEntry.TextEntryListener implements Hyperlink.LinkListener
 	{
 		private DPProxy proxy;
 		private Hyperlink link;
 		private TextEntry entry;
+		private DPText status;
+		private PrimitiveStyleSheet primitive;
 		
 		
 		public EditableLink(PrimitiveStyleSheet primitive, ControlsStyleSheet controls, String text)
@@ -47,6 +50,7 @@ public class TextEntryTestPage extends SystemPage
 			link = controls.link( text, this );
 			entry = controls.textEntry( text, this );
 			proxy = primitive.proxy( link.getElement() );
+			this.primitive = primitive;
 		}
 		
 		public EditableLink(PrimitiveStyleSheet primitive, ControlsStyleSheet controls, String text, Pattern validationRegex, String validationFailMessage)
@@ -54,6 +58,7 @@ public class TextEntryTestPage extends SystemPage
 			link = controls.link( text, this );
 			entry = controls.textEntry( text, this, validationRegex, validationFailMessage );
 			proxy = primitive.proxy( link.getElement() );
+			this.primitive = primitive;
 		}
 		
 		
@@ -72,11 +77,27 @@ public class TextEntryTestPage extends SystemPage
 		{
 			proxy.setChild( link.getElement() );
 		}
+		
+		public void onTextInserted(TextEntry textEntry, int position, String textInserted)
+		{
+			status.setText( "INSERTED @" + position + " :" +  textInserted );
+		}
+
+		public void onTextRemoved(TextEntry textEntry, int position, int length)
+		{
+			status.setText( "REMOVED " + position + " to " + ( position + length ) );
+		}
+		
+		public void onTextReplaced(TextEntry textEntry, int position, int length, String replacementText)
+		{
+			status.setText( "REPLACED " + position + " to " + ( position + length ) + " with: " + replacementText );
+		}
 
 		public void onLinkClicked(Hyperlink link, PointerButtonEvent event)
 		{
+			status = primitive.staticText( "" );
 			entry.setText( link.getText() );
-			proxy.setChild( entry.getElement() );
+			proxy.setChild( primitive.withHBoxSpacing( 10.0 ).hbox( new DPElement[] { entry.getElement(), status } ) );
 			entry.grabCaret();
 		}
 	}
