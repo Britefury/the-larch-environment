@@ -151,10 +151,12 @@ public class Marker
 		return Math.min( bias == Bias.END  ?  position + 1  :  position,  element.getMarkerRange() );
 	}
 	
-	public int getIndexInSubtree(DPElement subtreeRoot) throws IsNotInSubtreeException
+	public int getClampedIndexInSubtree(DPElement subtreeRoot) throws IsNotInSubtreeException
 	{
 		int p = getPositionInSubtree( subtreeRoot );
-		return getBias() == Bias.END  ?  p + 1  :  p;
+		int clampedIndex = getClampedIndex();
+		int offset = clampedIndex - position;
+		return p + offset;
 	}
 	
 
