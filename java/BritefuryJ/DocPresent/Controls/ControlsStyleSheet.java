@@ -944,7 +944,7 @@ public class ControlsStyleSheet extends StyleSheet
 	public TimedPopup tooltip(String text, double timeout)
 	{
 		PrimitiveStyleSheet tooltipStyle = getTooltipStyleSheet();
-		String lineTexts[] = text.split( "\n" );
+		String lineTexts[] = text.split( "\\r?\\n" );
 		ArrayList<DPElement> lines = new ArrayList<DPElement>();
 		for (String line: lineTexts)
 		{

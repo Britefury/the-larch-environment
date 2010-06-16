@@ -194,6 +194,10 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	public Marker marker(int position, Marker.Bias bias)
 	{
+		if ( !isRealised() )
+		{
+			throw new RuntimeException( "Cannot create a marker within unrealised element " + this );
+		}
 		return new Marker( this, position, bias );
 	}
 	
@@ -698,6 +702,11 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 				while ( !left.isEditable() )
 				{
 					bNonEditableContentCleared |= left.deleteText();
+					if ( !isRealised() )
+					{
+						// Bail out if a response to the deletion of the text is this element becoming unrealised
+						return true;
+					}
 					left = left.getContentLeafToLeft();
 					if ( left == null )
 					{
@@ -744,6 +753,11 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 				while ( !right.isEditable() )
 				{
 					bNonEditableContentCleared |= right.deleteText();
+					if ( !isRealised() )
+					{
+						// Bail out if a response to the deletion of the text is this element becoming unrealised
+						return true;
+					}
 					right = right.getContentLeafToRight();
 					if ( right == null )
 					{
