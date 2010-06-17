@@ -11,6 +11,7 @@ from BritefuryJ.DocPresent.Browser import Location
 
 from BritefuryJ.GSym import GSymBrowserContext, GSymLocationResolver, GSymSubject
 
+from Britefury.gSym.Presentation.GenericPresenterRegistry import genericPresenterRegistry
 from Britefury.MainApp.AppWindow import AppWindow
 
 		
@@ -51,7 +52,7 @@ class MainApp (object):
 		self._world = world
 
 		self._resolver = _AppLocationResolver( self )
-		self._browserContext = GSymBrowserContext( True, [ self._resolver ] )
+		self._browserContext = GSymBrowserContext( genericPresenterRegistry, True, [ self._resolver ] )
 		
 		self._appState = world.getAppState()
 		

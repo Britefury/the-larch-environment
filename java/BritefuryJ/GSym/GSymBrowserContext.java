@@ -25,6 +25,7 @@ import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.GSym.GenericPerspective.GSymGenericObjectPresenterRegistry;
 import BritefuryJ.GSym.GenericPerspective.GSymGenericPerspective;
 import BritefuryJ.GSym.ObjectPresentation.GSymObjectPresentationPerspective;
 import BritefuryJ.GSym.ObjectPresentation.ObjectPresentationLocationResolver;
@@ -122,10 +123,10 @@ public class GSymBrowserContext
 	
 	
 	
-	public GSymBrowserContext(boolean bWithSystemPages)
+	public GSymBrowserContext(GSymGenericObjectPresenterRegistry genericPresenterRegistry, boolean bWithSystemPages)
 	{
 		super();
-		genericPerspective = new GSymGenericPerspective( objPresLocationResolver );
+		genericPerspective = new GSymGenericPerspective( objPresLocationResolver, genericPresenterRegistry );
 		if ( bWithSystemPages )
 		{
 			addResolvers( Arrays.asList( new GSymLocationResolver[] { new SystemPageLocationResolver( SystemLocationResolver.getSystemResolver() ) } ) );
@@ -133,9 +134,9 @@ public class GSymBrowserContext
 		addResolvers( Arrays.asList( new GSymLocationResolver[] { objPresLocationResolver } ) );
 	}
 	
-	public GSymBrowserContext(boolean bWithSystemPages, List<GSymLocationResolver> resolvers)
+	public GSymBrowserContext(GSymGenericObjectPresenterRegistry genericPresenterRegistry, boolean bWithSystemPages, List<GSymLocationResolver> resolvers)
 	{
-		this( bWithSystemPages );
+		this( genericPresenterRegistry, bWithSystemPages );
 		addResolvers( resolvers );
 	}
 	

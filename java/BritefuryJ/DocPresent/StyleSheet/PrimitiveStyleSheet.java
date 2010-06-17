@@ -402,6 +402,11 @@ public class PrimitiveStyleSheet extends StyleSheet
 		return withEditability( false );
 	}
 	
+	public boolean isEditable()
+	{
+		return getNonNull( "editable", Boolean.class, true );
+	}
+	
 
 	
 	

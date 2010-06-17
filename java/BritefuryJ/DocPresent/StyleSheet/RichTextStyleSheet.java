@@ -449,13 +449,24 @@ public class RichTextStyleSheet extends StyleSheet
 	
 	private DPElement textParagraph(PrimitiveStyleSheet primitive, String text)
 	{
+		List<DPElement> paragraphContents = null;
+		
 		if ( text.equals(  "" ) )
 		{
-			return primitive.paragraph( new DPElement[] { primitive.text( "" ) } );
+			paragraphContents = Arrays.asList( new DPElement[] { primitive.text( "" ) } );
 		}
 		else
 		{
-			return primitive.paragraph( textToWordsAndLineBreaks( primitive, text ) );
+			paragraphContents = textToWordsAndLineBreaks( primitive, text );
+		}
+
+		if ( primitive.isEditable() )
+		{
+			return primitive.paragraph( new DPElement[] { primitive.segment( true, true, primitive.span( paragraphContents ) ) } );
+		}
+		else
+		{
+			return primitive.paragraph( paragraphContents );
 		}
 	}
 	

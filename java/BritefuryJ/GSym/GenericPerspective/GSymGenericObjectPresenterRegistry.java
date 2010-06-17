@@ -31,33 +31,34 @@ import BritefuryJ.DocPresent.ListView.TrailingSeparator;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.GSym.ObjectPresentation.GSymObjectPresenterRegistry;
 import BritefuryJ.GSym.ObjectPresentation.ObjectPresenter;
 import BritefuryJ.GSym.ObjectPresentation.PyObjectPresenter;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
-public class SystemObjectPresenters
+public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegistry
 {
-	protected static void registerPresenters(GSymGenericPerspective persp)
+	public GSymGenericObjectPresenterRegistry()
 	{
-		persp.registerJavaObjectPresenter( Character.class, presenter_Character );
-		persp.registerJavaObjectPresenter( String.class,  presenter_String );
-		persp.registerJavaObjectPresenter( Integer.class,  presenter_Integer );
-		persp.registerJavaObjectPresenter( Short.class,  presenter_Short );
-		persp.registerJavaObjectPresenter( Long.class,  presenter_Long );
-		persp.registerJavaObjectPresenter( Byte.class,  presenter_Byte );
-		persp.registerJavaObjectPresenter( Float.class,  presenter_Float );
-		persp.registerJavaObjectPresenter( Double.class,  presenter_Double );
-		persp.registerJavaObjectPresenter( Boolean.class,  presenter_Boolean );
+		registerJavaObjectPresenter( Character.class, presenter_Character );
+		registerJavaObjectPresenter( String.class,  presenter_String );
+		registerJavaObjectPresenter( Integer.class,  presenter_Integer );
+		registerJavaObjectPresenter( Short.class,  presenter_Short );
+		registerJavaObjectPresenter( Long.class,  presenter_Long );
+		registerJavaObjectPresenter( Byte.class,  presenter_Byte );
+		registerJavaObjectPresenter( Float.class,  presenter_Float );
+		registerJavaObjectPresenter( Double.class,  presenter_Double );
+		registerJavaObjectPresenter( Boolean.class,  presenter_Boolean );
 
-		persp.registerPythonObjectPresenter( PyTuple.TYPE,  presenter_PyTuple );
-		persp.registerPythonObjectPresenter( PyType.TYPE,  presenter_PyType );
-		persp.registerPythonObjectPresenter( PyFunction.TYPE,  presenter_PyFunction );
+		registerPythonObjectPresenter( PyTuple.TYPE,  presenter_PyTuple );
+		registerPythonObjectPresenter( PyType.TYPE,  presenter_PyType );
+		registerPythonObjectPresenter( PyFunction.TYPE,  presenter_PyFunction );
 		
-		persp.registerJavaObjectPresenter( List.class,  presenter_List );
-		persp.registerJavaObjectPresenter( BufferedImage.class,  presenter_BufferedImage );
-		persp.registerJavaObjectPresenter( Shape.class,  presenter_Shape );
-		persp.registerJavaObjectPresenter( Color.class,  presenter_Color );
-		persp.registerJavaObjectPresenter( Class.class,  presenter_Class );
+		registerJavaObjectPresenter( List.class,  presenter_List );
+		registerJavaObjectPresenter( BufferedImage.class,  presenter_BufferedImage );
+		registerJavaObjectPresenter( Shape.class,  presenter_Shape );
+		registerJavaObjectPresenter( Color.class,  presenter_Color );
+		registerJavaObjectPresenter( Class.class,  presenter_Class );
 	}
 
 	
