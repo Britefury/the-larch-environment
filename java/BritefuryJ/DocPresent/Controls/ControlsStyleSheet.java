@@ -116,7 +116,7 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		super();
 		
-		initAttr( "primitiveStyleSheet", PrimitiveStyleSheet.instance );
+		initAttr( "primitiveStyle", PrimitiveStyleSheet.instance );
 		
 		initAttr( "closePopupOnActivateFlag", false );
 
@@ -188,7 +188,7 @@ public class ControlsStyleSheet extends StyleSheet
 	
 	public ControlsStyleSheet withPrimitiveStyleSheet(PrimitiveStyleSheet styleSheet)
 	{
-		return (ControlsStyleSheet)withAttr( "primitiveStyleSheet", styleSheet );
+		return (ControlsStyleSheet)withAttr( "primitiveStyle", styleSheet );
 	}
 	
 	
@@ -488,7 +488,7 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		if ( linkStyleSheet == null )
 		{
-			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 			AttributeValues linkAttrs = getNonNull( "linkAttrs", AttributeValues.class, AttributeValues.identity );
 			linkStyleSheet = (PrimitiveStyleSheet)primitive.withAttrValues( linkAttrs );
 		}
@@ -541,7 +541,7 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		if ( buttonStyleSheet == null )
 		{
-			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 			buttonStyleSheet = primitive.withBorder( getButtonBorder() );
 		}
 		return buttonStyleSheet;
@@ -555,7 +555,7 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		if ( menuItemStyleSheet == null )
 		{
-			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 			Painter hoverBackground = getNonNull( "menuItemHoverBackground", Painter.class, defaultMenuItemHoverBackground );
 			menuItemStyleSheet = primitive.withHoverBackground( hoverBackground );
 		}
@@ -570,7 +570,7 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		if ( popupMenuStyleSheet == null )
 		{
-			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 			AttributeValues attrs = getNonNull( "popupMenuAttrs", AttributeValues.class, defaultPopupMenuAttrs );
 			popupMenuStyleSheet = (PrimitiveStyleSheet)primitive.withAttrValues( attrs );
 		}
@@ -585,7 +585,7 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		if ( tooltipStyleSheet == null )
 		{
-			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 			Border border = getNonNull( "tooltipBorder", Border.class, defaultTooltipBorder );
 			tooltipStyleSheet = primitive.withBorder( border );
 		}
@@ -600,7 +600,7 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		if ( checkboxStyleSheet == null )
 		{
-			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 			double spacing = getNonNull( "checkboxSpacing", Double.class, defaultCheckboxSpacing );
 			Painter background = getNonNull( "checkboxHoverBackground", Painter.class, defaultCheckboxHoverBackground );
 			checkboxStyleSheet = primitive.withHBoxSpacing( spacing ).withHoverBackground( background );
@@ -616,7 +616,7 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		if ( checkboxCheckStyleSheet == null )
 		{
-			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 			Border border = getNonNull( "checkboxCheckBorder", Border.class, defaultCheckboxCheckBorder );
 			checkboxCheckStyleSheet = primitive.withBorder( border );
 		}
@@ -644,7 +644,7 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		if ( textAreaStyleSheet == null )
 		{
-			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 			AttributeValues attrs = getNonNull( "textAreaAttrs", AttributeValues.class, defaultTextAreaAttrs );
 			textAreaStyleSheet = (PrimitiveStyleSheet)primitive.withAttrValues( attrs );
 		}
@@ -678,7 +678,7 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		if ( textEntryStyleSheet == null )
 		{
-			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 			AttributeValues textAttrs = getNonNull( "textEntryTextAttrs", AttributeValues.class, defaultTextEntryTextAttrs );
 			textEntryStyleSheet = ((PrimitiveStyleSheet)primitive.withAttrValues( textAttrs )).withBorder( getTextEntryBorder() );
 		}
@@ -708,7 +708,7 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		if ( spinEntryArrowStyleSheet == null )
 		{
-			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 			AttributeValues arrowAttrs = getNonNull( "spinEntryArrowAttrs", AttributeValues.class, defaultSpinEntryArrowAttrs );
 			spinEntryArrowStyleSheet = (PrimitiveStyleSheet)primitive.withAttrValues( arrowAttrs );
 		}
@@ -722,7 +722,7 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		if ( spinEntryStyleSheet == null )
 		{
-			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 			double hSpacing = getNonNull( "spinEntryHSpacing", Double.class, defaultSpinEntryHSpacing );
 			spinEntryStyleSheet = primitive.withHBoxSpacing( hSpacing );
 		}
@@ -752,7 +752,7 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		if ( optionMenuArrowStyleSheet == null )
 		{
-			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 			Painter arrowPainter = getNonNull( "optionMenuArrowPainter", Painter.class, defaultOptionMenuArrowPainter );
 			optionMenuArrowStyleSheet = primitive.withShapePainter( arrowPainter );
 		}
@@ -766,7 +766,7 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		if ( optionMenuStyleSheet == null )
 		{
-			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 			Border optionMenuBorder = getNonNull( "optionMenuBorder", Border.class, defaultOptionMenuBorder );
 			double contentsSpacing = getNonNull( "optionMenuContentsSpacing", Double.class, defaultOptionMenuContentsSpacing );
 			optionMenuStyleSheet = primitive.withBorder( optionMenuBorder ).withHBoxSpacing( contentsSpacing );
@@ -783,7 +783,7 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		if ( scrollBarArrowStyleSheet == null )
 		{
-			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 			Painter arrowPainter = getNonNull( "scrollBarArrowPainter", Painter.class, defaultScrollBarArrowPainter );
 			Painter arrowHoverPainter = get( "scrollBarArrowHoverPainter", Painter.class, null );
 			scrollBarArrowStyleSheet = primitive.withShapePainter( arrowPainter ).withHoverShapePainter( arrowHoverPainter );
@@ -815,7 +815,7 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		if ( scrollBarDragBackgroundStyleSheet == null )
 		{
-			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 			Painter backgroundPainter = getNonNull( "scrollBarDragBackgroundPainter", Painter.class, defaultScrollBarDragBackgroundPainter );
 			Painter backgroundHoverPainter = get( "scrollBarDragBackgroundHoverPainter", Painter.class, null );
 			scrollBarDragBackgroundStyleSheet = primitive.withShapePainter( backgroundPainter ).withHoverShapePainter( backgroundHoverPainter );
@@ -852,7 +852,7 @@ public class ControlsStyleSheet extends StyleSheet
 
 	public Button buttonWithLabel(String text, Button.ButtonListener listener)
 	{
-		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 		boolean bClosePopupOnActivate = getNonNull( "closePopupOnActivateFlag", Boolean.class, false );
 		DPElement child = primitive.staticText( text );
 		DPBorder element = getButtonStyleSheet().border( child );
@@ -873,7 +873,7 @@ public class ControlsStyleSheet extends StyleSheet
 
 	public MenuItem menuItemWithLabel(String text, MenuItem.MenuItemListener listener)
 	{
-		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 		return menuItem( primitive.staticText( text ), listener );
 	}
 
@@ -897,13 +897,13 @@ public class ControlsStyleSheet extends StyleSheet
 
 	public MenuItem subMenuItemRightWithLabel(String text, PopupMenu subMenu)
 	{
-		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 		return subMenuItemRight( primitive.staticText( text ), subMenu );
 	}
 
 	public MenuItem subMenuItemDownWithLabel(String text, PopupMenu subMenu)
 	{
-		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 		return subMenuItemDown( primitive.staticText( text ), subMenu );
 	}
 
@@ -958,7 +958,7 @@ public class ControlsStyleSheet extends StyleSheet
 	
 	public Checkbox checkbox(DPElement child, boolean state, Checkbox.CheckboxListener listener)
 	{
-		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 		PrimitiveStyleSheet checkStyle = getCheckboxCheckStyleSheet();
 		double checkSize = getNonNull( "checkboxCheckSize", Double.class, defaultCheckboxCheckSize );
 		DPElement unchecked = primitive.spacer( checkSize, checkSize );
@@ -974,7 +974,7 @@ public class ControlsStyleSheet extends StyleSheet
 	
 	public Checkbox checkboxWithLabel(String labelText, boolean state, Checkbox.CheckboxListener listener)
 	{
-		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 		return checkbox( primitive.staticText( labelText ), state, listener );
 	}
 	
@@ -1089,7 +1089,7 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		PrimitiveStyleSheet arrowStyle = getScrollBarArrowStyleSheet();
 		PrimitiveStyleSheet dragBackgroundStyle = getScrollBarDragBackgroundStyleSheet();
-		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 		
 		Path2D.Double leftPath = getScrollBarArrowPaths()[0];
 		Path2D.Double rightPath = getScrollBarArrowPaths()[1];
@@ -1124,7 +1124,7 @@ public class ControlsStyleSheet extends StyleSheet
 	{
 		PrimitiveStyleSheet arrowStyle = getScrollBarArrowStyleSheet();
 		PrimitiveStyleSheet dragBackgroundStyle = getScrollBarDragBackgroundStyleSheet();
-		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 		
 		Path2D.Double upPath = getScrollBarArrowPaths()[2];
 		Path2D.Double downPath = getScrollBarArrowPaths()[3];
@@ -1158,7 +1158,7 @@ public class ControlsStyleSheet extends StyleSheet
 	
 	public ScrolledViewport scrolledViewport(DPElement child, double minWidth, double minHeight, PersistentState state)
 	{
-		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 		double scrollBarSize = get( "scrollBarSize", Double.class, defaultScrollBarSize );
 
 		Range xRange = new Range( 0.0, 1.0, 0.0, 1.0, 0.1 );
@@ -1175,7 +1175,7 @@ public class ControlsStyleSheet extends StyleSheet
 
 	public ScrolledViewport aspectRatioScrolledViewport(DPElement child, double minWidth, double aspectRatio, PersistentState state)
 	{
-		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 		double scrollBarSize = get( "scrollBarSize", Double.class, defaultScrollBarSize );
 
 		Range xRange = new Range( 0.0, 1.0, 0.0, 1.0, 0.1 );

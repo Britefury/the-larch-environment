@@ -121,24 +121,15 @@ class WorksheetEditor (GSymViewObjectDispatch):
 	def PythonCode(self, ctx, styleSheet, inheritedState, node):
 		executionStyle = styleSheet['executionStyle']
 		
-		def _onShowCode(state):
-			node.setShowCode( state )
+		def _onSetStyle(style):
+			node.setStyle( style )
 
-		def _onCodeEditable(state):
-			node.setCodeEditable( state )
-
-		def _onShowResult(state):
-			node.setShowResult( state )
-
-		if node.getShowCode():
-			codeView = ctx.presentFragmentWithPerspective( node.getCode(), Python25.python25EditorPerspective )
-		else:
-			codeView = None
+		codeView = ctx.presentFragmentWithPerspective( node.getCode(), Python25.python25EditorPerspective )
 		
 		executionResultView = None
 		executionResult = node.getResult()
 		if executionResult is not None:
-			if node.getShowResult():
+			if node.isResultVisible():
 				stdout = executionResult.getStdOut()
 				result = executionResult.getResult()
 				resultView = ctx.presentFragmentWithGenericPerspective( result[0] )   if result is not None   else None
@@ -149,7 +140,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 			excView = ctx.presentFragmentWithGenericPerspective( exc )   if exc is not None   else None
 			executionResultView = executionStyle.executionResult( stdout, executionResult.getStdErr(), excView, resultView )
 		
-		p = styleSheet.pythonCode( codeView, executionResultView, node.getShowCode(), node.getCodeEditable(), node.getShowResult(), _onShowCode, _onCodeEditable, _onShowResult )
+		p = styleSheet.pythonCode( codeView, executionResultView, node.getStyle(), node.isResultVisible(), _onSetStyle )
 		return p
 
 

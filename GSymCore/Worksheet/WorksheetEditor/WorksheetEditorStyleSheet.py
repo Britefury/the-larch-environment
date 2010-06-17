@@ -19,6 +19,8 @@ from Britefury.AttributeTableUtils.DerivedAttributeMethod import DerivedAttribut
 
 from GSymCore.Languages.Python25.Execution.ExecutionStyleSheet import ExecutionStyleSheet
 
+from GSymCore.Worksheet.ViewSchema import PythonCodeView
+
 
 
 class WorksheetEditorStyleSheet (StyleSheet):
@@ -125,33 +127,36 @@ class WorksheetEditorStyleSheet (StyleSheet):
 		return self['editableRichTextStyle'].h6( text )
 
 	
-	def pythonCode(self, codeView, resultView, bShowCode, bCodeEditable, bShowResult, onShowCode, onCodeEditable, onShowResult):
-		def _onShowCodeCheck(checkbox, state):
-			return onShowCode( state )
-		
-		def _onCodeEditableCheck(checkbox, state):
-			return onCodeEditable( state )
-		
-		def _onShowResultCheck(checkbox, state):
-			return onShowResult( state )
+	def pythonCode(self, codeView, resultView, style, bShowResult, onSetStyle):
+		def _onStyleOptionMenu(optionMenu, prevChoice, choice):
+			style = choiceValues[choice]
+			onSetStyle( style )
 		
 		primitiveStyle = self['primitiveStyle']
 		controlsStyle = self['controlsStyle']
+		controlsPrimStyle = controlsStyle['primitiveStyle']
 		pythonCodeHeaderStyle = self.pythonCodeHeaderStyle()
 		pythonCodeBorderStyle = self.pythonCodeBorderStyle()
 		pythonCodeEditorBorderStyle = self.pythonCodeEditorBorderStyle()
 		
-		showCodeCheck = controlsStyle.checkboxWithLabel( 'Show code', bShowCode, _onShowCodeCheck )
-		codeEditableCheck = controlsStyle.checkboxWithLabel( 'Editable', bCodeEditable, _onCodeEditableCheck )
-		showResultCheck = controlsStyle.checkboxWithLabel( 'Show result', bShowResult, _onShowResultCheck )
-		buttonsBox = primitiveStyle.withHBoxSpacing( 10.0 ).hbox( [ showCodeCheck.getElement(), codeEditableCheck.getElement(), showResultCheck.getElement() ] )
+		optionTexts = [ 'Minimal result', 'Result', 'Code with result', 'Code', 'Editable code with result', 'Editable code', 'Hidden' ]
+		optionChoices = [ controlsPrimStyle.staticText( text )   for text in optionTexts ]
+		menuChoices = [ controlsPrimStyle.staticText( text )   for text in optionTexts ]
+		choiceValues = [
+		        PythonCodeView.STYLE_MINIMAL_RESULT,
+		        PythonCodeView.STYLE_RESULT,
+		        PythonCodeView.STYLE_CODE_AND_RESULT,
+		        PythonCodeView.STYLE_CODE,
+		        PythonCodeView.STYLE_EDITABLE_CODE_AND_RESULT,
+		        PythonCodeView.STYLE_EDITABLE_CODE,
+		        PythonCodeView.STYLE_HIDDEN ]
+		styleOptionMenu = controlsStyle.optionMenu( optionChoices, menuChoices, choiceValues.index( style ), _onStyleOptionMenu )
 		
-		headerBox = pythonCodeHeaderStyle.bin( primitiveStyle.withHBoxSpacing( 20.0 ).hbox( [ primitiveStyle.instance.staticText( 'Python code' ).alignHExpand(), buttonsBox ] ).alignHExpand().pad( 2.0, 2.0 ) )
+		headerBox = pythonCodeHeaderStyle.bin( primitiveStyle.withHBoxSpacing( 20.0 ).hbox( [ primitiveStyle.instance.staticText( 'Python code' ).alignHExpand(), styleOptionMenu.getElement() ] ).alignHExpand().pad( 2.0, 2.0 ) )
 		
 		boxContents = [ headerBox.alignHExpand() ]
-		if bShowCode:
-			boxContents.append( pythonCodeBorderStyle.border( codeView.alignHExpand() ).alignHExpand() )
-		if bShowResult  and  resultView is not None:
+		boxContents.append( pythonCodeBorderStyle.border( codeView.alignHExpand() ).alignHExpand() )
+		if resultView is not None:
 			boxContents.append( resultView.alignHExpand() )
 		box = primitiveStyle.withVBoxSpacing( 5.0 ).vbox( boxContents )
 		

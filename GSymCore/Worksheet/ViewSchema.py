@@ -12,6 +12,7 @@ from BritefuryJ.Cell import Cell
 
 from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod, dmObjectNodeMethodDispatch
 
+from GSymCore.Languages.Python25 import Python25
 from GSymCore.Languages.Python25.Execution import Execution
 
 from GSymCore.Worksheet import Schema
@@ -50,6 +51,12 @@ class WorksheetNodeView (object):
 		
 	def getModel(self):
 		return self._model
+	
+	def isVisible(self):
+		return True
+	
+	def __present__(self, fragment, styleSheet, inheritedState):
+		return fragment.presentFragmentWithGenericPerspective( self._model, styleSheet )
 
 
 class WorksheetView (WorksheetNodeView):
@@ -121,6 +128,31 @@ class ParagraphView (WorksheetNodeView):
 		
 		
 class PythonCodeView (IncrementalOwner, WorksheetNodeView):
+	STYLE_MINIMAL_RESULT = 0
+	STYLE_RESULT = 1
+	STYLE_CODE_AND_RESULT = 2
+	STYLE_CODE = 3
+	STYLE_EDITABLE_CODE_AND_RESULT = 4
+	STYLE_EDITABLE_CODE = 5
+	STYLE_HIDDEN = 6
+	
+	_styleToName  = { STYLE_MINIMAL_RESULT : 'minimal_result',
+	                    STYLE_RESULT : 'result',
+	                    STYLE_CODE_AND_RESULT : 'code_result',
+	                    STYLE_CODE : 'code',
+	                    STYLE_EDITABLE_CODE_AND_RESULT : 'editable_code_result',
+	                    STYLE_EDITABLE_CODE : 'editable_code',
+	                    STYLE_HIDDEN : 'hidden' }
+	
+	_nameToStyle  = { 'minimal_result' : STYLE_MINIMAL_RESULT,
+	                  'result' : STYLE_RESULT,
+	                  'code_result' : STYLE_CODE_AND_RESULT,
+	                  'code' : STYLE_CODE,
+	                  'editable_code_result' : STYLE_EDITABLE_CODE_AND_RESULT,
+	                  'editable_code' : STYLE_EDITABLE_CODE,
+	                  'hidden' : STYLE_HIDDEN }
+	
+	
 	def __init__(self, worksheet, model):
 		WorksheetNodeView.__init__( self, worksheet, model )
 		self._incr = IncrementalValueMonitor( self )
@@ -132,27 +164,44 @@ class PythonCodeView (IncrementalOwner, WorksheetNodeView):
 	
 	def setCode(self, code):
 		self._model['code'] = code
+		
+		
+		
+	def getStyle(self):
+		name = self._model['style']
+		try:
+			return self._nameToStyle[name]
+		except KeyError:
+			return self.STYLE_CODE_AND_RESULT
 	
+	def setStyle(self, style):
+		try:
+			name = self._styleToName[style]
+		except KeyError:
+			raise ValueError, 'invalid style'
+		self._model['style'] = name
+		
+		
+	def isCodeVisible(self):
+		style = self.getStyle()
+		return style == self.STYLE_CODE  or  style == self.STYLE_CODE_AND_RESULT  or  style == self.STYLE_EDITABLE_CODE  or  style == self.STYLE_EDITABLE_CODE_AND_RESULT
+		
+	def isCodeEditable(self):
+		style = self.getStyle()
+		return style == self.STYLE_EDITABLE_CODE  or  style == self.STYLE_EDITABLE_CODE_AND_RESULT
 	
-	def getShowCode(self):
-		return self._model['showCode'] == 'True'
-
-	def setShowCode(self, bShowCode):
-		self._model['showCode'] = 'True'   if bShowCode   else 'False'
+	def isResultVisible(self):
+		style = self.getStyle()
+		return style == self.STYLE_MINIMAL_RESULT  or  style == self.STYLE_RESULT  or  style == self.STYLE_CODE_AND_RESULT  or  style == self.STYLE_EDITABLE_CODE_AND_RESULT
 		
+	def isResultMinimal(self):
+		style = self.getStyle()
+		return style == self.STYLE_MINIMAL_RESULT
+	
+	def isVisible(self):
+		style = self.getStyle()
+		return style != self.STYLE_HIDDEN
 		
-	def getCodeEditable(self):
-		return self._model['codeEditable'] == 'True'
-
-	def setCodeEditable(self, bCodeEditable):
-		self._model['codeEditable'] = 'True'   if bCodeEditable   else 'False'
-		
-		
-	def getShowResult(self):
-		return self._model['showResult'] == 'True'
-
-	def setShowResult(self, bShowResult):
-		self._model['showResult'] = 'True'   if bShowResult   else 'False'
 		
 		
 	def getResult(self):
@@ -162,6 +211,11 @@ class PythonCodeView (IncrementalOwner, WorksheetNodeView):
 		
 		
 	def _refreshResults(self, env):
-		self._result = Execution.executePythonModule( self.getCode(), '<worksheet>', env, self.getShowResult() )
+		self._result = Execution.executePythonModule( self.getCode(), '<worksheet>', env, self.isResultVisible() )
 		self._incr.onChanged()
+		
+		
+	@staticmethod
+	def newPythonCodeNode():
+		return Schema.PythonCode( style='code_result', code=Python25.py25NewModule() )
 	

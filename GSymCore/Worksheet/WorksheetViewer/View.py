@@ -62,7 +62,7 @@ _worksheetInteractor = WorksheetInteractor()
 class WorksheetViewer (GSymViewObjectDispatch):
 	@ObjectDispatchMethod( ViewSchema.WorksheetView )
 	def Worksheet(self, ctx, styleSheet, inheritedState, node):
-		contentViews = ctx.mapPresentFragment( node.getContents(), styleSheet, inheritedState )
+		contentViews = ctx.mapPresentFragment( [ c    for c in node.getContents()   if c.isVisible() ], styleSheet, inheritedState )
 		
 		title = styleSheet.worksheetTitle( node.getTitle() )
 
@@ -96,33 +96,43 @@ class WorksheetViewer (GSymViewObjectDispatch):
 	
 	@ObjectDispatchMethod( ViewSchema.PythonCodeView )
 	def PythonCode(self, ctx, styleSheet, inheritedState, node):
-		executionStyle = styleSheet['executionStyle']
-		
-		if node.getShowCode():
-			if node.getCodeEditable():
-				codeView = ctx.presentFragmentWithPerspectiveAndStyleSheet( node.getCode(), Python25.python25EditorPerspective, styleSheet['pythonStyle'] )
+		if node.isVisible():
+			executionStyle = styleSheet['executionStyle']
+			
+			if node.isCodeVisible():
+				if node.isCodeEditable():
+					codeView = ctx.presentFragmentWithPerspectiveAndStyleSheet( node.getCode(), Python25.python25EditorPerspective, styleSheet['pythonStyle'] )
+				else:
+					codeView = ctx.presentFragmentWithPerspectiveAndStyleSheet( node.getCode(), Python25.python25EditorPerspective, styleSheet['staticPythonStyle'] )
+					
 			else:
-				codeView = ctx.presentFragmentWithPerspectiveAndStyleSheet( node.getCode(), Python25.python25EditorPerspective, styleSheet['staticPythonStyle'] )
-				
+				codeView = None
+			
+			executionResultView = None
+			executionResult = node.getResult()
+			if executionResult is not None:
+				if node.isResultVisible():
+					stdout = executionResult.getStdOut()
+					result = executionResult.getResult()
+					resultView = ctx.presentFragmentWithGenericPerspective( result[0] )   if result is not None   else None
+				else:
+					stdout = None
+					resultView = None
+				exc = executionResult.getCaughtException()
+				excView = ctx.presentFragmentWithGenericPerspective( exc )   if exc is not None   else None
+				if node.isCodeVisible():
+					executionResultView = executionStyle.executionResult( stdout, executionResult.getStdErr(), excView, resultView )
+				else:
+					executionResultView = executionStyle.minimalExecutionResult( stdout, executionResult.getStdErr(), excView, resultView )
+			
+			if node.isResultMinimal():
+				p = styleSheet.minimalPythonCodeResult( executionResultView )
+			else:
+				p = styleSheet.pythonCode( codeView, executionResultView, node.isCodeVisible(), node.isResultVisible() )
+		
+			return p
 		else:
-			codeView = None
-		
-		executionResultView = None
-		executionResult = node.getResult()
-		if executionResult is not None:
-			if node.getShowResult():
-				stdout = executionResult.getStdOut()
-				result = executionResult.getResult()
-				resultView = ctx.presentFragmentWithGenericPerspective( result[0] )   if result is not None   else None
-			else:
-				stdout = None
-				resultView = None
-			exc = executionResult.getCaughtException()
-			excView = ctx.presentFragmentWithGenericPerspective( exc )   if exc is not None   else None
-			executionResultView = executionStyle.executionResult( stdout, executionResult.getStdErr(), excView, resultView )
-		
-		p = styleSheet.pythonCode( codeView, executionResultView, node.getShowCode(), node.getShowResult() )
-		return p
+			return PrimitiveStyleSheet.instance.hiddenContent( '' )
 
 
 
