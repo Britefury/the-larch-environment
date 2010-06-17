@@ -22,10 +22,10 @@ import BritefuryJ.GSym.View.GSymFragmentView;
 
 public class GSymGenericPerspective extends GSymObjectPresentationPerspective
 {
-	public GSymGenericPerspective(ObjectPresentationLocationResolver objPresLocationResolver)
+	public GSymGenericPerspective(ObjectPresentationLocationResolver objPresLocationResolver, GSymGenericObjectPresenterRegistry genericPresenterRegistry)
 	{
 		super( "__present__", objPresLocationResolver );
-		SystemObjectPresenters.registerPresenters( this );
+		genericPresenterRegistry.registerPerspective( this );
 	}
 
 	

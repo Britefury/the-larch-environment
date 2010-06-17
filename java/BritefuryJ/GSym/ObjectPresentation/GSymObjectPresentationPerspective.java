@@ -82,7 +82,7 @@ public abstract class GSymObjectPresentationPerspective extends GSymAbstractPers
 				// Now try Python object presenters
 				PyType typeX = pyX.getType();
 				
-				PyObjectPresenter<? extends StyleSheet> presenter = (PyObjectPresenter<? extends StyleSheet>)objectPresenters.getValueForPythonType( typeX );
+				PyObjectPresenter<? extends StyleSheet> presenter = (PyObjectPresenter<? extends StyleSheet>)objectPresenters.get( typeX );
 				if ( presenter != null )
 				{
 					result = invokePyObjectPresenter( presenter, pyX, ctx, styleSheet, state );
@@ -93,7 +93,7 @@ public abstract class GSymObjectPresentationPerspective extends GSymAbstractPers
 		// Java object presentation protocol - registered presenters
 		if ( result == null )
 		{
-			ObjectPresenter<? extends StyleSheet> presenter = (ObjectPresenter<? extends StyleSheet>)objectPresenters.getValueForJavaType( x.getClass() );
+			ObjectPresenter<? extends StyleSheet> presenter = (ObjectPresenter<? extends StyleSheet>)objectPresenters.get( x.getClass() );
 			if ( presenter != null )
 			{
 				result = invokeObjectPresenter( presenter, x, ctx, styleSheet, state );
@@ -149,11 +149,22 @@ public abstract class GSymObjectPresentationPerspective extends GSymAbstractPers
 	
 	public void registerJavaObjectPresenter(Class<?> cls, ObjectPresenter<? extends StyleSheet> presenter)
 	{
-		objectPresenters.registerJavaType( cls, presenter );
+		objectPresenters.put( cls, presenter );
 	}
 	
 	public void registerPythonObjectPresenter(PyType type, PyObjectPresenter<? extends StyleSheet> presenter)
 	{
-		objectPresenters.registerPythonType( type, presenter );
+		objectPresenters.put( type, presenter );
+	}
+
+
+	public void unregisterJavaObjectPresenter(Class<?> cls)
+	{
+		objectPresenters.remove( cls );
+	}
+	
+	public void unregisterPythonObjectPresenter(PyType type)
+	{
+		objectPresenters.remove( type );
 	}
 }

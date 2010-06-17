@@ -39,15 +39,27 @@ public class PolymorphicMap <ValueType extends Object>
 
 
 	
-	public void registerJavaType(Class<?> type, ValueType value)
+	public void put(Class<?> type, ValueType value)
 	{
 		registeredJavaValues.put( type, new Entry<ValueType>( value ) );
 		cachedJavaValues.clear();
 	}
 	
-	public void registerPythonType(PyType type, ValueType value)
+	public void put(PyType type, ValueType value)
 	{
 		registeredPythonValues.put( type, new Entry<ValueType>( value ) );
+		cachedPythonValues.clear();
+	}
+	
+	public void remove(Class<?> type)
+	{
+		registeredJavaValues.remove( type );
+		cachedJavaValues.clear();
+	}
+	
+	public void remove(PyType type)
+	{
+		registeredPythonValues.remove( type );
 		cachedPythonValues.clear();
 	}
 	
@@ -59,20 +71,20 @@ public class PolymorphicMap <ValueType extends Object>
 		cachedPythonValues.clear();
 	}
 	
-	public ValueType getValueForObject(Object x)
+	public ValueType getForInstance(Object x)
 	{
 		if ( x instanceof PyObject )
 		{
 			PyObject pyX = (PyObject)x;
-			return getValueForPythonType( pyX.getType() );
+			return get( pyX.getType() );
 		}
 		else
 		{
-			return getValueForJavaType( x.getClass() );
+			return get( x.getClass() );
 		}
 	}
 	
-	public ValueType getValueForJavaType(Class<?> type)
+	public ValueType get(Class<?> type)
 	{
 		if ( registeredJavaValues.isEmpty() )
 		{
@@ -168,7 +180,7 @@ public class PolymorphicMap <ValueType extends Object>
 		return null;
 	}
 	
-	public ValueType getValueForPythonType(PyType type)
+	public ValueType get(PyType type)
 	{
 		if ( registeredPythonValues.isEmpty() )
 		{

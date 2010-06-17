@@ -87,7 +87,7 @@ class WorksheetEditorStyleSheet (StyleSheet):
 	def worksheetTitle(self, title):
 		editableRichTextStyle = self['editableRichTextStyle']
 		
-		return self['primitiveStyle'].segment( True, True, editableRichTextStyle.titleBar( title ) )
+		return editableRichTextStyle.titleBar( title )
 	
 	
 	def worksheet(self, titleView, contents):
@@ -104,25 +104,25 @@ class WorksheetEditorStyleSheet (StyleSheet):
 	
 	
 	def paragraph(self, text):
-		return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].paragraph( text ) )
+		return self['editableRichTextStyle'].paragraph( text )
 	
 	def h1(self, text):
-		return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h1( text ) )
+		return self['editableRichTextStyle'].h1( text )
 	
 	def h2(self, text):
-		return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h2( text ) )
+		return self['editableRichTextStyle'].h2( text )
 	
 	def h3(self, text):
-		return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h3( text ) )
+		return self['editableRichTextStyle'].h3( text )
 	
 	def h4(self, text):
-		return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h4( text ) )
+		return self['editableRichTextStyle'].h4( text )
 	
 	def h5(self, text):
-		return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h5( text ) )
+		return self['editableRichTextStyle'].h5( text )
 	
 	def h6(self, text):
-		return self['primitiveStyle'].segment( True, True, self['editableRichTextStyle'].h6( text ) )
+		return self['editableRichTextStyle'].h6( text )
 
 	
 	def pythonCode(self, codeView, resultView, bShowCode, bCodeEditable, bShowResult, onShowCode, onCodeEditable, onShowResult):
