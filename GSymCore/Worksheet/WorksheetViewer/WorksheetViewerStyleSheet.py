@@ -136,6 +136,12 @@ class WorksheetViewerStyleSheet (StyleSheet):
 		
 		return pythonCodeEditorBorderStyle.border( box.alignHExpand() ).alignHExpand()
 	
+	def minimalPythonCodeResult(self, resultView):
+		if resultView is not None:
+			return resultView.alignHExpand()
+		else:
+			return PrimitiveStyleSheet.instance.hiddenContent( '' )
+	
 	
 
 WorksheetViewerStyleSheet.instance = WorksheetViewerStyleSheet()

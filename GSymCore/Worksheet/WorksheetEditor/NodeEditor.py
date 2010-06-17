@@ -186,7 +186,7 @@ class WorksheetTreeEventListener (TreeEventListenerObjectDispatch):
 		index = node['contents'].indexOf( event._node )
 		
 		if index != -1:
-			pythonCode = Schema.PythonCode( showCode='True', codeEditable='False', showResult='True', code=Python25.py25NewModule() )
+			pythonCode = ViewSchema.PythonCodeView.newPythonCodeNode()
 			node['contents'].insert( index+1, pythonCode )
 			return True
 		return False

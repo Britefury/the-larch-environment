@@ -142,6 +142,29 @@ class ExecutionStyleSheet (StyleSheet):
 			return None
 
 
+	def minimalExecutionResult(self, stdoutText, stderrText, exceptionView, resultView):
+		if stdoutText is None  and  stderrText is None  and  exceptionView is None:
+			if resultView is None:
+				return None
+			else:
+				return PrimitiveStyleSheet.instance.paragraph( [ resultView.alignHExpand() ] ).alignHExpand()
+		else:
+			resultBoxStyle = self.resultBoxStyle()
+			
+			boxContents = []
+			if stderrText is not None:
+				boxContents.append( self.stderr( stderrText ).alignHExpand() )
+			if exceptionView is not None:
+				boxContents.append( self.exception( exceptionView ).alignHExpand() )
+			if stdoutText is not None:
+				boxContents.append( self.stdout( stdoutText ).alignHExpand() )
+			if resultView is not None:
+				boxContents.append( self.result( resultView ).alignHExpand() )
+			
+			if len( boxContents ) > 0:
+				return resultBoxStyle.vbox( boxContents )
+			else:
+				return None
 
 
 

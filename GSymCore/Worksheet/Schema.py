@@ -21,6 +21,6 @@ Text = schema.newClass( 'Text', [ 'text' ] )
 Paragraph = schema.newClass( 'Paragraph', Text, [ 'style' ] )
 
 
-PythonCode = schema.newClass( 'PythonCode', [ 'code', 'showCode', 'codeEditable', 'showResult' ] )
+PythonCode = schema.newClass( 'PythonCode', [ 'code', 'style' ] )
 
 
