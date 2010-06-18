@@ -17,6 +17,8 @@ from GSymCore.Worksheet.WorksheetEditor.TextStyle import TextStyleOperation
 from GSymCore.Worksheet.WorksheetEditor.PythonCode import InsertPythonCodeOperation
 
 
+
+
 class TextNodeEventListener (TreeEventListenerObjectDispatch):
 	def __init__(self):
 		pass
@@ -30,7 +32,8 @@ class TextNodeEventListener (TreeEventListenerObjectDispatch):
 			node.setText( value )
 			return True
 		else:
-			return False
+			bSuccess = node.split( value.split( '\n' ) )
+			return bSuccess
 		
 	@ObjectDispatchMethod( TextStyleOperation )
 	def onTextStyleOp(self, element, sourceElement, event):
