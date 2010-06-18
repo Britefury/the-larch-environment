@@ -14,7 +14,7 @@ from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListene
 
 from GSymCore.Worksheet import Schema, ViewSchema
 from GSymCore.Worksheet.WorksheetEditor.TextStyle import TextStyleOperation
-from GSymCore.Worksheet.WorksheetEditor.PythonCode import InsertPythonCodeOperation
+from GSymCore.Worksheet.WorksheetEditor.PythonCode import NewPythonCodeRequest, InsertPythonCodeOperation
 
 
 
@@ -39,6 +39,11 @@ class TextNodeEventListener (TreeEventListenerObjectDispatch):
 	def onTextStyleOp(self, element, sourceElement, event):
 		event.applyToTextNode( element.getFragmentContext().getDocNode() )
 		return True
+		
+	@ObjectDispatchMethod( NewPythonCodeRequest )
+	def onNewPythonCode(self, element, sourceElement, event):
+		node = element.getFragmentContext().getDocNode()
+		return element.postTreeEvent( InsertPythonCodeOperation( node.getModel() ) )
 
 
 TextNodeEventListener.instance = TextNodeEventListener()		

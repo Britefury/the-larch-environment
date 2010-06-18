@@ -15,10 +15,44 @@ from GSymCore.Worksheet import Schema, ViewSchema
 
 
 
-class InsertPythonCodeOperation (object):
+class NewPythonCodeRequest (object):
+	pass
+
+
+class AddPythonCodeOperation (object):
+	pass
+
+class PrependPythonCodeOperation (AddPythonCodeOperation):
+	def apply(self, worksheet):
+		pythonCode = ViewSchema.PythonCodeView.newPythonCodeNode()
+		worksheet['contents'].insert( 0, pythonCode )
+		return True
+
+	
+
+class AppendPythonCodeOperation (AddPythonCodeOperation):
+	def apply(self, worksheet):
+		pythonCode = ViewSchema.PythonCodeView.newPythonCodeNode()
+		worksheet['contents'].append( pythonCode )
+		return True
+
+	
+
+class InsertPythonCodeOperation (AddPythonCodeOperation):
 	def __init__(self, node):
 		super( InsertPythonCodeOperation, self ).__init__()
 		self._node = node
+		
+		
+	def apply(self, worksheet):
+		index = worksheet['contents'].indexOf( self._node )
+		
+		if index != -1:
+			pythonCode = ViewSchema.PythonCodeView.newPythonCodeNode()
+			worksheet['contents'].insert( index+1, pythonCode )
+			return True
+		else:
+			return False
 
 		
 		

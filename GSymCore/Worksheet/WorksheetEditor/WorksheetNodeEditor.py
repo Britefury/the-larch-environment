@@ -13,24 +13,19 @@ from BritefuryJ.DocPresent import *
 from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
 
 from GSymCore.Worksheet import Schema, ViewSchema
-from GSymCore.Worksheet.WorksheetEditor.PythonCode import InsertPythonCodeOperation
+from GSymCore.Worksheet.WorksheetEditor.PythonCode import AddPythonCodeOperation
 
 
 class WorksheetNodeEventListener (TreeEventListenerObjectDispatch):
 	def __init__(self):
 		pass
 
-	@ObjectDispatchMethod( InsertPythonCodeOperation )
-	def onInsertPythonCode(self, element, sourceElement, event):
+	@ObjectDispatchMethod( AddPythonCodeOperation )
+	def onAddPythonCode(self, element, sourceElement, event):
 		ctx = element.getFragmentContext()
 		node = ctx.getDocNode().getModel()
-		index = node['contents'].indexOf( event._node )
 		
-		if index != -1:
-			pythonCode = ViewSchema.PythonCodeView.newPythonCodeNode()
-			node['contents'].insert( index+1, pythonCode )
-			return True
-		return False
+		return event.apply( node )
 	
 WorksheetNodeEventListener.instance = WorksheetNodeEventListener()
 
