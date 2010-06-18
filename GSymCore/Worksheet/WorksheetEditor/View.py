@@ -42,7 +42,14 @@ from GSymCore.Languages.Python25 import Python25
 from GSymCore.Worksheet import Schema
 from GSymCore.Worksheet import ViewSchema
 from GSymCore.Worksheet.WorksheetEditor.WorksheetEditorStyleSheet import WorksheetEditorStyleSheet
-from GSymCore.Worksheet.WorksheetEditor.NodeEditor import *
+
+from GSymCore.Worksheet.WorksheetEditor.TextStyle import *
+from GSymCore.Worksheet.WorksheetEditor.PythonCode import *
+
+from GSymCore.Worksheet.WorksheetEditor.TitleEditor import *
+from GSymCore.Worksheet.WorksheetEditor.EmptyEditor import *
+from GSymCore.Worksheet.WorksheetEditor.TextNodeEditor import *
+from GSymCore.Worksheet.WorksheetEditor.WorksheetNodeEditor import *
 
 
 
@@ -57,7 +64,7 @@ class WorkSheetContextMenuFactory (ContextMenuFactory):
 		controlsStyle = menuStyle['controlsStyle']
 		def makeStyleFn(style):
 			def _onLink(link, event):
-				rootElement.getCaret().getElement().postTreeEvent( ParagraphStyleEvent( style ) )
+				rootElement.getCaret().getElement().postTreeEvent( TextStyleOperation( style ) )
 			return _onLink
 	
 		rootElement = element.getRootElement()
@@ -79,15 +86,15 @@ class WorksheetEditor (GSymViewObjectDispatch):
 	def Worksheet(self, ctx, styleSheet, inheritedState, node):
 		contentViews = ctx.mapPresentFragment( node.getContents(), styleSheet, inheritedState )
 		emptyLine = PrimitiveStyleSheet.instance.paragraph( [ PrimitiveStyleSheet.instance.text( '' ) ] )
-		emptyLine.addTreeEventListener( EmptyTreeEventListener.instance )
+		emptyLine.addTreeEventListener( EmptyEventListener.instance )
 		contentViews += [ emptyLine ]
 		
 		title = styleSheet.worksheetTitle( node.getTitle() )
-		title.addTreeEventListener( TitleTextEditor.instance )
+		title.addTreeEventListener( TitleEventListener.instance )
 
 		w = styleSheet.worksheet( title, contentViews )
-		w.addTreeEventListener( WorksheetTreeEventListener.instance )
-		w.addInteractor( WorksheetInteractor.instance )
+		w.addTreeEventListener( WorksheetNodeEventListener.instance )
+		w.addInteractor( WorksheetNodeInteractor.instance )
 		w.addContextMenuFactory( instanceCache( WorkSheetContextMenuFactory, styleSheet ) )
 		return w
 	
@@ -110,9 +117,8 @@ class WorksheetEditor (GSymViewObjectDispatch):
 			p = styleSheet.h5( text )
 		elif style == 'h6':
 			p = styleSheet.h6( text )
-		p.addTreeEventListener( TextTreeEventListener.instance )
-		p.addTreeEventListener( OperationTreeEventListener.instance )
-		p.addInteractor( TextInteractor.instance )
+		p.addTreeEventListener( TextNodeEventListener.instance )
+		p.addInteractor( TextNodeInteractor.instance )
 		return p
 
 

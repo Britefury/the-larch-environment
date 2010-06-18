@@ -85,6 +85,9 @@ class WorksheetView (WorksheetNodeView):
 		return self._contentsCell.getValue()
 	
 	
+	def prependContentsNode(self, node):
+		self._model['contents'].insert( 0, node )
+
 	def appendContentsNode(self, node):
 		self._model['contents'].append( node )
 		
