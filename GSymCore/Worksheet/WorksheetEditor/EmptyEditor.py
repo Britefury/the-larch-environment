@@ -12,6 +12,7 @@ from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListene
 
 from GSymCore.Worksheet import Schema, ViewSchema
 from GSymCore.Worksheet.WorksheetEditor.TextStyle import TextStyleOperation
+from GSymCore.Worksheet.WorksheetEditor.PythonCode import NewPythonCodeRequest, AppendPythonCodeOperation
 
 
 
@@ -36,6 +37,10 @@ class EmptyEventListener (TreeEventListenerObjectDispatch):
 		node = ctx.getDocNode()
 		node.appendContentsNode( event.createTextNode( '' ) )
 		return True
+		
+	@ObjectDispatchMethod( NewPythonCodeRequest )
+	def onNewPythonCode(self, element, sourceElement, event):
+		return element.postTreeEvent( AppendPythonCodeOperation() )
 
 
 EmptyEventListener.instance = EmptyEventListener()

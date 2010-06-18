@@ -62,9 +62,13 @@ class WorkSheetContextMenuFactory (ContextMenuFactory):
 	def buildContextMenu(self, element, menu):
 		menuStyle = self._styleSheet['contextMenuStyle']
 		controlsStyle = menuStyle['controlsStyle']
+		
+		
 		def makeStyleFn(style):
 			def _onLink(link, event):
-				rootElement.getCaret().getElement().postTreeEvent( TextStyleOperation( style ) )
+				caret = rootElement.getCaret()
+				if caret.isValid():
+					caret.getElement().postTreeEvent( TextStyleOperation( style ) )
 			return _onLink
 	
 		rootElement = element.getRootElement()
@@ -78,6 +82,18 @@ class WorkSheetContextMenuFactory (ContextMenuFactory):
 		h6Style = controlsStyle.link( 'H6', makeStyleFn( 'h6' ) ).getElement()
 		styles = menuStyle.controlsHBox( [ normalStyle, h1Style, h2Style, h3Style, h4Style, h5Style, h6Style ] )
 		menu.add( menuStyle.sectionWithTitle( 'Style', styles ) )
+		
+		
+		def _onPythonCode(link, event):
+			caret = rootElement.getCaret()
+			if caret.isValid():
+				caret.getElement().postTreeEvent( NewPythonCodeRequest() )
+	
+		rootElement = element.getRootElement()
+		
+		newCode = controlsStyle.link( 'Python code', _onPythonCode ).getElement()
+		codeControls = menuStyle.controlsHBox( [ newCode ] )
+		menu.add( menuStyle.sectionWithTitle( 'Code', codeControls ) )
 
 
 

@@ -60,6 +60,7 @@ def executePythonModule(pythonModule, filename, globalVars, bEvaluate):
 		execCode, evalCode = CodeGenerator.compileForExecutionAndEvaluation( pythonModule, '<console>' )
 	else:
 		execCode = CodeGenerator.compileForExecution( pythonModule, '<console>' )
+		evalCode = None
 		
 	caughtException = None
 	
