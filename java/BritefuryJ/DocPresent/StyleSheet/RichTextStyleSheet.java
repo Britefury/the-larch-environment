@@ -451,7 +451,7 @@ public class RichTextStyleSheet extends StyleSheet
 	{
 		List<DPElement> paragraphContents = null;
 		
-		if ( text.equals(  "" ) )
+		if ( text.equals( "" ) )
 		{
 			paragraphContents = Arrays.asList( new DPElement[] { primitive.text( "" ) } );
 		}

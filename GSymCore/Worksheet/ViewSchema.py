@@ -87,7 +87,7 @@ class WorksheetView (WorksheetNodeView):
 	
 	def prependContentsNode(self, node):
 		self._model['contents'].insert( 0, node )
-
+		
 	def appendContentsNode(self, node):
 		self._model['contents'].append( node )
 		
@@ -123,6 +123,18 @@ class ParagraphView (WorksheetNodeView):
 	
 	def setStyle(self, style):
 		self._model['style'] = style
+		
+		
+	def split(self, texts):
+		style = self.getStyle()
+		nodes = [ Schema.Paragraph( text=t, style=style )   for t in texts ]
+		worksheetModel = self._worksheet.getModel()
+		index = worksheetModel['contents'].indexOfById( self.getModel() )
+		if index != -1:
+			worksheetModel['contents'][index:index+1] = nodes
+			return True
+		else:
+			return False
 		
 		
 	def _refreshResults(self, env):
