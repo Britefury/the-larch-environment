@@ -1384,6 +1384,31 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		}
 	}
 	
+	public static boolean areElementsInOrder(DPElement w0, DPElement w1)
+	{
+		ArrayList<DPElement> path0 = new ArrayList<DPElement>();
+		ArrayList<DPElement> path1 = new ArrayList<DPElement>();
+		DPElement.getPathsFromCommonSubtreeRoot( w0, path0, w1, path1 );
+		
+		if ( path0.size() > 1  &&  path1.size() > 1 )
+		{
+			DPContainer commonRoot = (DPContainer)path0.get( 0 );
+			return commonRoot.areChildrenInOrder( path0.get( 1 ), path1.get( 1 ) );
+		}
+		else if ( path0.size() == 1  &&  path1.size() == 1 )
+		{
+			if ( w0 != w1 )
+			{
+				throw new RuntimeException( "Paths have length 1, but elements are different" );
+			}
+			return true;
+		}
+		else
+		{
+			throw new RuntimeException( "Paths should either both have length == 1, or both have length > 1" );
+		}
+	}
+	
 	
 	protected void setRootElement(PresentationComponent.RootElement root)
 	{

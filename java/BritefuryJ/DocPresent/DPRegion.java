@@ -11,6 +11,44 @@ import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 
 public class DPRegion extends DPProxy
 {
+	public static class SharableSelectionFilter implements ElementFilter
+	{
+		private DPRegion regionA;
+		private EditHandler handlerA;
+		
+		
+		public SharableSelectionFilter(DPRegion regionA)
+		{
+			this.regionA = regionA;
+			handlerA = regionA.getEditHandler();
+		}
+		
+		
+		public boolean testElement(DPElement element)
+		{
+			DPRegion regionB = element.getRegion();
+			
+			if ( regionB == regionA )
+			{
+				return true;
+			}
+			else
+			{
+				EditHandler handlerB = regionB.getEditHandler();
+				if ( handlerA != null )
+				{
+					return handlerA.canShareSelectionWith( handlerB );
+				}
+				else
+				{
+					return false;
+				}
+			}
+		}
+	}
+
+	
+	
 	private EditHandler editHandler;
 
 	
@@ -73,5 +111,18 @@ public class DPRegion extends DPProxy
 	public DPRegion getRegion()
 	{
 		return this;
+	}
+	
+	
+	
+	//
+	//
+	// SHARABLE SELECTION FILTER
+	//
+	//
+	
+	public SharableSelectionFilter sharableSelectionFilter()
+	{
+		return new SharableSelectionFilter( this );
 	}
 }

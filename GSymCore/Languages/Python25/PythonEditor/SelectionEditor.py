@@ -240,4 +240,9 @@ class Python25EditHandler (LinearRepresentationEditHandler):
 	
 	def createSelectionEditTreeEvent(self, sourceElement):
 		return PythonSelectionEditTreeEvent( self, sourceElement )
+	
+	
+	
+	def canShareSelectionWith(self, editHandler):
+		return False
 

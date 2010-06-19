@@ -33,4 +33,7 @@ public interface EditHandler
 	
 	public boolean canImport(Caret caret, Selection selection, DataTransfer dataTransfer);
 	public boolean importData(Caret caret, Selection selection, DataTransfer dataTransfer);
+	
+	
+	public boolean canShareSelectionWith(EditHandler editHandler);
 }

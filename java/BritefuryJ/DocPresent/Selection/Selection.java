@@ -20,7 +20,8 @@ public class Selection implements MarkerListener
 	
 	private Marker startMarker, endMarker;
 	private ArrayList<DPElement> startPathFromCommonRoot, endPathFromCommonRoot;
-	private DPContainer commonRoot;
+	private DPContainer commonRootContainer;
+	private DPElement commonRoot;
 	protected ArrayList<SelectionListener> listeners;
 	
 	private boolean  bRefreshRequired;
@@ -86,7 +87,13 @@ public class Selection implements MarkerListener
 		return endPathFromCommonRoot;
 	}
 	
-	public DPContainer getCommonRoot()
+	public DPContainer getCommonRootContainer()
+	{
+		refresh();
+		return commonRootContainer;
+	}
+	
+	public DPElement getCommonRoot()
 	{
 		refresh();
 		return commonRoot;
@@ -101,7 +108,7 @@ public class Selection implements MarkerListener
 		}
 		else
 		{
-			DPContainer root = getCommonRoot();
+			DPElement root = getCommonRoot();
 			if ( root != null )
 			{
 				return root.getRegion();
@@ -153,6 +160,7 @@ public class Selection implements MarkerListener
 			bRefreshRequired = true;
 			startMarker = endMarker = null;
 			startPathFromCommonRoot = endPathFromCommonRoot = null;
+			commonRootContainer = null;
 			commonRoot = null;
 			
 			if ( listeners != null )
@@ -178,12 +186,14 @@ public class Selection implements MarkerListener
 				DPElement.getPathsFromCommonSubtreeRoot( w0, path0, w1, path1 );
 				
 				boolean bInOrder = true;
+				commonRootContainer = null;
 				commonRoot = null;
 				
 				if ( path0.size() > 1  &&  path1.size() > 1 )
 				{
-					commonRoot = (DPContainer)path0.get( 0 );
-					bInOrder = commonRoot.areChildrenInOrder( path0.get( 1 ), path1.get( 1 ) );
+					commonRootContainer = (DPContainer)path0.get( 0 );
+					bInOrder = commonRootContainer.areChildrenInOrder( path0.get( 1 ), path1.get( 1 ) );
+					commonRoot = commonRootContainer;
 				}
 				else if ( path0.size() == 1  &&  path1.size() == 1 )
 				{
@@ -191,7 +201,8 @@ public class Selection implements MarkerListener
 					{
 						throw new RuntimeException( "Paths have length 1, but elements are different" );
 					}
-					bInOrder = marker0.getIndex()  <  marker1.getIndex();
+					bInOrder = Marker.markerOrder( marker0, marker1 )  ==  1;
+					commonRoot = w0;
 				}
 				else
 				{
