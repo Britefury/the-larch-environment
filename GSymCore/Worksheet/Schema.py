@@ -14,9 +14,9 @@ schema = DMSchema( 'Worksheet', 'ws', 'GSymCore.Worksheet' )
 
 
 
-Worksheet = schema.newClass( 'Worksheet', [ 'title', 'contents' ] )
+Worksheet = schema.newClass( 'Worksheet', [ 'title', 'body' ] )
 
-
+Body = schema.newClass( 'Body', [ 'contents' ] )
 Text = schema.newClass( 'Text', [ 'text' ] )
 Paragraph = schema.newClass( 'Paragraph', Text, [ 'style' ] )
 

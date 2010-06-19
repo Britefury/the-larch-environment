@@ -21,7 +21,8 @@ import BritefuryJ.DocPresent.Painter.Painter;
 
 public class RichTextStyleSheet extends StyleSheet
 {
-	private static final double defaultPageSpacing = 10.0;
+	private static final double defaultPageSpacing = 15.0;
+	private static final double defaultBodySpacing = 10.0;
 	private static final AttributeValues defaultLinkHeaderAttrs = new AttributeValues( new String[] { "hboxSpacing", "border" }, new Object[] { 25.0, new FilledBorder( 10.0, 10.0, 5.0, 1.0, null ) } );
 	private static final AttributeValues defaultTitleTextAttrs = new AttributeValues( new String[] { "fontFace", "fontSize", "fontBold" }, new Object[] { "Serif", 36, true } );
 	private static final Paint defaultTitleBackground = new Color( 232, 232, 232 );
@@ -54,6 +55,7 @@ public class RichTextStyleSheet extends StyleSheet
 		
 		
 		initAttr( "pageSpacing", defaultPageSpacing );
+		initAttr( "bodySpacing", defaultBodySpacing );
 		initAttr( "linkHeaderAttrs", defaultLinkHeaderAttrs );
 		initAttr( "titleTextAttrs", defaultTitleTextAttrs );
 		initAttr( "titleBackground", defaultTitleBackground );
@@ -93,6 +95,11 @@ public class RichTextStyleSheet extends StyleSheet
 	public RichTextStyleSheet withPageSpacing(double spacing)
 	{
 		return (RichTextStyleSheet)withAttr( "pageSpacing", spacing );
+	}
+
+	public RichTextStyleSheet withBodySpacing(double spacing)
+	{
+		return (RichTextStyleSheet)withAttr( "bodySpacing", spacing );
 	}
 
 	public RichTextStyleSheet withLinkHeaderAttrs(AttributeValues attrs)
@@ -220,6 +227,22 @@ public class RichTextStyleSheet extends StyleSheet
 			pageStyleSheet = (PrimitiveStyleSheet)primitive.withVBoxSpacing( spacing );
 		}
 		return pageStyleSheet;
+	}
+
+	
+	
+	
+	private PrimitiveStyleSheet bodyStyleSheet = null;
+
+	private PrimitiveStyleSheet getBodyStyleSheet()
+	{
+		if ( bodyStyleSheet == null )
+		{
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			double spacing = getNonNull( "bodySpacing", Double.class, defaultPageSpacing );
+			bodyStyleSheet = (PrimitiveStyleSheet)primitive.withVBoxSpacing( spacing );
+		}
+		return bodyStyleSheet;
 	}
 
 	
@@ -501,6 +524,18 @@ public class RichTextStyleSheet extends StyleSheet
 	public DPElement page(List<DPElement> contents)
 	{
 		return getPageStyleSheet().vbox( contents ).alignHExpand();
+	}
+	
+	
+	
+	public DPElement body(DPElement contents[])
+	{
+		return body( Arrays.asList( contents ) );
+	}
+	
+	public DPElement body(List<DPElement> contents)
+	{
+		return getBodyStyleSheet().vbox( contents ).alignHExpand();
 	}
 	
 	

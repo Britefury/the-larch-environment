@@ -92,17 +92,21 @@ class WorksheetEditorStyleSheet (StyleSheet):
 		return editableRichTextStyle.titleBar( title )
 	
 	
-	def worksheet(self, titleView, contents):
+	def worksheet(self, titleView, body):
 		primitiveStyle = self['primitiveStyle']
 		richTextStyle = self['richTextStyle']
 		editableRichTextStyle = self['editableRichTextStyle']
 		controlsStyle = self['controlsStyle']
 
-		
 		homeLink = controlsStyle.link( 'HOME PAGE', Location( '' ) ).getElement()
 		linkHeader = richTextStyle.linkHeaderBar( [ homeLink ] )
 		
-		return richTextStyle.page( [ linkHeader, titleView ] + contents )
+		return richTextStyle.page( [ linkHeader, titleView, body ] )
+	
+	
+	def body(self, contents):
+		richTextStyle = self['richTextStyle']
+		return richTextStyle.body( contents )
 	
 	
 	def paragraph(self, text):

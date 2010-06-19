@@ -62,16 +62,23 @@ _worksheetInteractor = WorksheetInteractor()
 class WorksheetViewer (GSymViewObjectDispatch):
 	@ObjectDispatchMethod( ViewSchema.WorksheetView )
 	def Worksheet(self, ctx, styleSheet, inheritedState, node):
-		contentViews = ctx.mapPresentFragment( [ c    for c in node.getContents()   if c.isVisible() ], styleSheet, inheritedState )
+		bodyView = ctx.presentFragment( node.getBody(), styleSheet )
 		
 		title = styleSheet.worksheetTitle( node.getTitle() )
 
-		w = styleSheet.worksheet( title, contentViews, ctx.getSubjectContext()['editLocation'] )
+		w = styleSheet.worksheet( title, bodyView, ctx.getSubjectContext()['editLocation'] )
 		w.addInteractor( _worksheetInteractor )
 		return w
 	
 
 
+	@ObjectDispatchMethod( ViewSchema.BodyView )
+	def Body(self, ctx, styleSheet, inheritedState, node):
+		contentViews = ctx.mapPresentFragment( [ c    for c in node.getContents()   if c.isVisible() ], styleSheet, inheritedState )
+		
+		return styleSheet.body( contentViews )
+	
+	
 	@ObjectDispatchMethod( ViewSchema.ParagraphView )
 	def Paragraph(self, ctx, styleSheet, inheritedState, node):
 		text = node.getText()

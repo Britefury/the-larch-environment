@@ -49,6 +49,7 @@ from GSymCore.Worksheet.WorksheetEditor.PythonCode import *
 from GSymCore.Worksheet.WorksheetEditor.TitleEditor import *
 from GSymCore.Worksheet.WorksheetEditor.EmptyEditor import *
 from GSymCore.Worksheet.WorksheetEditor.TextNodeEditor import *
+from GSymCore.Worksheet.WorksheetEditor.BodyNodeEditor import *
 from GSymCore.Worksheet.WorksheetEditor.WorksheetNodeEditor import *
 
 
@@ -100,18 +101,27 @@ class WorkSheetContextMenuFactory (ContextMenuFactory):
 class WorksheetEditor (GSymViewObjectDispatch):
 	@ObjectDispatchMethod( ViewSchema.WorksheetView )
 	def Worksheet(self, ctx, styleSheet, inheritedState, node):
+		bodyView = ctx.presentFragment( node.getBody(), styleSheet, inheritedState )
+		
+		title = styleSheet.worksheetTitle( node.getTitle() )
+		title.addTreeEventListener( TitleEventListener.instance )
+
+		w = styleSheet.worksheet( title, bodyView )
+		w.addTreeEventListener( WorksheetNodeEventListener.instance )
+		w.addInteractor( WorksheetNodeInteractor.instance )
+		w.addContextMenuFactory( instanceCache( WorkSheetContextMenuFactory, styleSheet ) )
+		return w
+	
+	
+	@ObjectDispatchMethod( ViewSchema.BodyView )
+	def Body(self, ctx, styleSheet, inheritedState, node):
 		contentViews = ctx.mapPresentFragment( node.getContents(), styleSheet, inheritedState )
 		emptyLine = PrimitiveStyleSheet.instance.paragraph( [ PrimitiveStyleSheet.instance.text( '' ) ] )
 		emptyLine.addTreeEventListener( EmptyEventListener.instance )
 		contentViews += [ emptyLine ]
 		
-		title = styleSheet.worksheetTitle( node.getTitle() )
-		title.addTreeEventListener( TitleEventListener.instance )
-
-		w = styleSheet.worksheet( title, contentViews )
-		w.addTreeEventListener( WorksheetNodeEventListener.instance )
-		w.addInteractor( WorksheetNodeInteractor.instance )
-		w.addContextMenuFactory( instanceCache( WorkSheetContextMenuFactory, styleSheet ) )
+		w = styleSheet.body( contentViews )
+		w.addTreeEventListener( BodyNodeEventListener.instance )
 		return w
 	
 	

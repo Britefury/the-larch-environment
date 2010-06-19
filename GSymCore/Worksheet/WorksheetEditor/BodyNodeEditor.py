@@ -14,21 +14,12 @@ from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListene
 
 from GSymCore.Worksheet import Schema, ViewSchema
 from GSymCore.Worksheet.WorksheetEditor.PythonCode import AddPythonCodeOperation
-from GSymCore.Worksheet.WorksheetEditor.TextNodeEditor import TextNodeJoinOperation
-from GSymCore.Worksheet.WorksheetEditor.TitleEditor import TitleOperation
+from GSymCore.Worksheet.WorksheetEditor.TextNodeEditor import TextNodeJoinOperation, TextNodeSplitOperation
 
 
-class WorksheetNodeEventListener (TreeEventListenerObjectDispatch):
+class BodyNodeEventListener (TreeEventListenerObjectDispatch):
 	def __init__(self):
 		pass
-
-	
-	@ObjectDispatchMethod( TitleOperation )
-	def onTitleOp(self, element, sourceElement, event):
-		ctx = element.getFragmentContext()
-		node = ctx.getDocNode()
-		
-		return event.apply( node )
 
 	
 	@ObjectDispatchMethod( AddPythonCodeOperation )
@@ -36,23 +27,23 @@ class WorksheetNodeEventListener (TreeEventListenerObjectDispatch):
 		ctx = element.getFragmentContext()
 		node = ctx.getDocNode()
 		
-		return event.apply( node.getBody() )
-
-
-WorksheetNodeEventListener.instance = WorksheetNodeEventListener()
-
-
-
-class WorksheetNodeInteractor (ElementInteractor):
-	def __init__(self):
-		pass
+		return event.apply( node )
+	
+	
+	@ObjectDispatchMethod( TextNodeJoinOperation )
+	def onTextJoin(self, element, sourceElement, event):
+		ctx = element.getFragmentContext()
+		node = ctx.getDocNode()
 		
+		return event.apply( node )
+
+	
+	@ObjectDispatchMethod( TextNodeSplitOperation )
+	def onTextSplit(self, element, sourceElement, event):
+		ctx = element.getFragmentContext()
+		node = ctx.getDocNode()
 		
-	def onKeyPress(self, element, event):
-		if event.getKeyCode() == KeyEvent.VK_F5:
-			ctx = element.getFragmentContext()
-			node = ctx.getDocNode()
-			node.refreshResults()
-			return True
-		
-WorksheetNodeInteractor.instance = WorksheetNodeInteractor()		
+		return event.apply( node )
+	
+	
+BodyNodeEventListener.instance = BodyNodeEventListener()

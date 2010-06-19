@@ -26,7 +26,7 @@ class EmptyEventListener (TreeEventListenerObjectDispatch):
 		ctx = element.getFragmentContext()
 		node = ctx.getDocNode()
 		if '\n' not in value:
-			node.appendContentsNode( Schema.Paragraph( text=value, style='normal' ) )
+			node.appendModel( ViewSchema.ParagraphView.newParagraphModel( text=value, style='normal' ) )
 			return True
 		else:
 			return False
@@ -35,7 +35,7 @@ class EmptyEventListener (TreeEventListenerObjectDispatch):
 	def onTextStyleOp(self, element, sourceElement, event):
 		ctx = element.getFragmentContext()
 		node = ctx.getDocNode()
-		node.appendContentsNode( event.createTextNode( '' ) )
+		node.appendModel( event.createTextModel( '' ) )
 		return True
 		
 	@ObjectDispatchMethod( NewPythonCodeRequest )

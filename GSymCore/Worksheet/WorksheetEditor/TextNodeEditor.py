@@ -21,19 +21,22 @@ from GSymCore.Worksheet.WorksheetEditor.PythonCode import NewPythonCodeRequest, 
 
 class TextNodeJoinOperation (object):
 	def __init__(self, textNode):
-		self._textNode = textNode.getModel()
+		self._textNode = textNode
 		
 
-	def apply(self, worksheetNode):
-		contents = worksheetNode['contents']
-		index = contents.indexOfById( self._textNode )
-		if ( index + 1 )  <  len( contents ):
-			next = contents[index+1]
-			if next.isInstanceOf( Schema.Paragraph ):
-				self._textNode['text'] = self._textNode['text'] + next['text']
-				del contents[index+1]
-				return True
-		return False
+	def apply(self, bodyNode):
+		return bodyNode.joinConsecutiveTextNodes( self._textNode )
+
+
+
+class TextNodeSplitOperation (object):
+	def __init__(self, textNode, textLines):
+		self._textNode = textNode
+		self._textLines = textLines
+		
+
+	def apply(self, bodyNode):
+		return bodyNode.splitTextNodes( self._textNode, self._textLines )
 
 
 
@@ -52,8 +55,7 @@ class TextNodeEventListener (TreeEventListenerObjectDispatch):
 				node.setText( value )
 				return True
 			else:
-				bSuccess = node.split( value.split( '\n' ) )
-				return bSuccess
+				return element.postTreeEvent( TextNodeSplitOperation( node, value.split( '\n' ) ) )
 		else:
 			return element.postTreeEvent( TextNodeJoinOperation( node ) )
 		
@@ -65,7 +67,7 @@ class TextNodeEventListener (TreeEventListenerObjectDispatch):
 	@ObjectDispatchMethod( NewPythonCodeRequest )
 	def onNewPythonCode(self, element, sourceElement, event):
 		node = element.getFragmentContext().getDocNode()
-		return element.postTreeEvent( InsertPythonCodeOperation( node.getModel() ) )
+		return element.postTreeEvent( InsertPythonCodeOperation( node ) )
 
 
 TextNodeEventListener.instance = TextNodeEventListener()		

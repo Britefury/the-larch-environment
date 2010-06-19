@@ -16,6 +16,32 @@ from GSymCore.Worksheet.WorksheetEditor.PythonCode import NewPythonCodeRequest, 
 
 
 
+class TitleOperation (object):
+	def apply(self, worksheetNode):
+		pass
+
+
+class TitleJoinOperation (TitleOperation):
+	def __init__(self):
+		pass
+		
+
+	def apply(self, worksheetNode):
+		return worksheetNode.joinTitle()
+
+
+
+class TitleSplitOperation (TitleOperation):
+	def __init__(self, textLines):
+		self._textLines = textLines
+		
+
+	def apply(self, worksheetNode):
+		worksheetNode.splitTitle( self._textLines )
+		return True
+
+
+
 class TitleEventListener (TreeEventListenerObjectDispatch):
 	def __init__(self):
 		pass
@@ -25,7 +51,15 @@ class TitleEventListener (TreeEventListenerObjectDispatch):
 		value = element.getTextRepresentation()
 		ctx = element.getFragmentContext()
 		node = ctx.getDocNode()
-		node.setTitle( value )
+		if value.endswith( '\n' ):
+			value = value[:-1]
+			if '\n' not in value:
+				node.setTitle( value )
+				return True
+			else:
+				return element.postTreeEvent( TitleSplitOperation( value.split( '\n' ) ) )
+		else:
+			return element.postTreeEvent( TitleJoinOperation() )
 		return True
 
 
@@ -33,7 +67,7 @@ class TitleEventListener (TreeEventListenerObjectDispatch):
 	def onTextStyleOp(self, element, sourceElement, event):
 		ctx = element.getFragmentContext()
 		node = ctx.getDocNode()
-		node.prependContentsNode( event.createTextNode( '' ) )
+		node.prependBodyContentsModel( event.createTextModel( '' ) )
 		return True
 		
 	@ObjectDispatchMethod( NewPythonCodeRequest )
