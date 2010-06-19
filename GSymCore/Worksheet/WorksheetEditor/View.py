@@ -155,6 +155,9 @@ class WorksheetEditor (GSymViewObjectDispatch):
 		
 		def _onSetStyle(style):
 			node.setStyle( style )
+			
+		def _onDelete():
+			p.postTreeEvent( DeleteNodeOperation( node ) )
 
 		codeView = ctx.presentFragmentWithPerspective( node.getCode(), Python25.python25EditorPerspective )
 		
@@ -172,7 +175,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 			excView = ctx.presentFragmentWithGenericPerspective( exc )   if exc is not None   else None
 			executionResultView = executionStyle.executionResult( stdout, executionResult.getStdErr(), excView, resultView )
 		
-		p = styleSheet.pythonCode( codeView, executionResultView, node.getStyle(), node.isResultVisible(), _onSetStyle )
+		p = styleSheet.pythonCode( codeView, executionResultView, node.getStyle(), node.isResultVisible(), _onSetStyle, _onDelete )
 		return p
 
 

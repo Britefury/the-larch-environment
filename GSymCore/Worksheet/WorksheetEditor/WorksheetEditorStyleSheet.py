@@ -131,10 +131,13 @@ class WorksheetEditorStyleSheet (StyleSheet):
 		return self['editableRichTextStyle'].h6( text )
 
 	
-	def pythonCode(self, codeView, resultView, style, bShowResult, onSetStyle):
+	def pythonCode(self, codeView, resultView, style, bShowResult, onSetStyle, onDelete):
 		def _onStyleOptionMenu(optionMenu, prevChoice, choice):
 			style = choiceValues[choice]
 			onSetStyle( style )
+			
+		def _onDeleteButton(button, event):
+			onDelete()
 		
 		primitiveStyle = self['primitiveStyle']
 		controlsStyle = self['controlsStyle']
@@ -156,7 +159,10 @@ class WorksheetEditorStyleSheet (StyleSheet):
 		        PythonCodeView.STYLE_HIDDEN ]
 		styleOptionMenu = controlsStyle.optionMenu( optionChoices, menuChoices, choiceValues.index( style ), _onStyleOptionMenu )
 		
-		headerBox = pythonCodeHeaderStyle.bin( primitiveStyle.withHBoxSpacing( 20.0 ).hbox( [ primitiveStyle.instance.staticText( 'Python code' ).alignHExpand(), styleOptionMenu.getElement() ] ).alignHExpand().pad( 2.0, 2.0 ) )
+		deleteButton = controlsStyle.button( primitiveStyle.systemIcon( 'delete' ), _onDeleteButton )
+		
+		headerBox = pythonCodeHeaderStyle.bin(
+		        primitiveStyle.withHBoxSpacing( 20.0 ).hbox( [ primitiveStyle.staticText( 'Python code' ).alignHExpand(), styleOptionMenu.getElement(), deleteButton.getElement() ] ).alignHExpand().pad( 2.0, 2.0 ) )
 		
 		boxContents = [ headerBox.alignHExpand() ]
 		boxContents.append( pythonCodeBorderStyle.border( codeView.alignHExpand() ).alignHExpand() )

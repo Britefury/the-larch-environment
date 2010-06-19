@@ -48,5 +48,8 @@ class InsertPythonCodeOperation (AddPythonCodeOperation):
 		pythonCode = ViewSchema.PythonCodeView.newPythonCodeModel()
 		return body.insertModelBeforeNode( self._node, pythonCode )
 
-		
+
+	
+
+
 		
