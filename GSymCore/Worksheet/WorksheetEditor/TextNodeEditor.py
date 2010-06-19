@@ -19,6 +19,24 @@ from GSymCore.Worksheet.WorksheetEditor.PythonCode import NewPythonCodeRequest, 
 
 
 
+class TextNodeJoinOperation (object):
+	def __init__(self, textNode):
+		self._textNode = textNode.getModel()
+		
+
+	def apply(self, worksheetNode):
+		contents = worksheetNode['contents']
+		index = contents.indexOfById( self._textNode )
+		if ( index + 1 )  <  len( contents ):
+			next = contents[index+1]
+			if next.isInstanceOf( Schema.Paragraph ):
+				self._textNode['text'] = self._textNode['text'] + next['text']
+				del contents[index+1]
+				return True
+		return False
+
+
+
 class TextNodeEventListener (TreeEventListenerObjectDispatch):
 	def __init__(self):
 		pass
@@ -28,12 +46,16 @@ class TextNodeEventListener (TreeEventListenerObjectDispatch):
 		value = element.getTextRepresentation()
 		ctx = element.getFragmentContext()
 		node = ctx.getDocNode()
-		if '\n' not in value:
-			node.setText( value )
-			return True
+		if value.endswith( '\n' ):
+			value = value[:-1]
+			if '\n' not in value:
+				node.setText( value )
+				return True
+			else:
+				bSuccess = node.split( value.split( '\n' ) )
+				return bSuccess
 		else:
-			bSuccess = node.split( value.split( '\n' ) )
-			return bSuccess
+			return element.postTreeEvent( TextNodeJoinOperation( node ) )
 		
 	@ObjectDispatchMethod( TextStyleOperation )
 	def onTextStyleOp(self, element, sourceElement, event):

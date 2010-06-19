@@ -14,6 +14,7 @@ from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListene
 
 from GSymCore.Worksheet import Schema, ViewSchema
 from GSymCore.Worksheet.WorksheetEditor.PythonCode import AddPythonCodeOperation
+from GSymCore.Worksheet.WorksheetEditor.TextNodeEditor import TextNodeJoinOperation
 
 
 class WorksheetNodeEventListener (TreeEventListenerObjectDispatch):
@@ -26,6 +27,14 @@ class WorksheetNodeEventListener (TreeEventListenerObjectDispatch):
 		node = ctx.getDocNode().getModel()
 		
 		return event.apply( node )
+	
+	@ObjectDispatchMethod( TextNodeJoinOperation )
+	def onTextJoin(self, element, sourceElement, event):
+		ctx = element.getFragmentContext()
+		node = ctx.getDocNode().getModel()
+		
+		return event.apply( node )
+		
 	
 WorksheetNodeEventListener.instance = WorksheetNodeEventListener()
 
