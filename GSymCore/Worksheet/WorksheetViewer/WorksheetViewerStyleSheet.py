@@ -86,7 +86,7 @@ class WorksheetViewerStyleSheet (StyleSheet):
 		return self['primitiveStyle'].segment( True, True, richTextStyle.titleBar( title ) )
 	
 	
-	def worksheet(self, titleView, contents, editLocation):
+	def worksheet(self, titleView, body, editLocation):
 		primitiveStyle = self['primitiveStyle']
 		richTextStyle = self['richTextStyle']
 		controlsStyle = self['controlsStyle']
@@ -96,7 +96,12 @@ class WorksheetViewerStyleSheet (StyleSheet):
 		editLink = controlsStyle.link( 'Edit', editLocation ).getElement()
 		linkHeader = richTextStyle.linkHeaderBar( [ homeLink ] )
 		
-		return richTextStyle.page( [ linkHeader, editLink, titleView ] + contents )
+		return richTextStyle.page( [ linkHeader, editLink, titleView, body ] )
+	
+	
+	def body(self, contents):
+		richTextStyle = self['richTextStyle']
+		return richTextStyle.body( contents )
 	
 	
 	def paragraph(self, text):

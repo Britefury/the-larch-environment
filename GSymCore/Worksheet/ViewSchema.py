@@ -32,6 +32,10 @@ class _Projection (object):
 	def worksheet(self, worksheet, node):
 		return WorksheetView( worksheet, node )
 
+	@DMObjectNodeDispatchMethod( Schema.Body )
+	def body(self, worksheet, node):
+		return BodyView( worksheet, node )
+
 	@DMObjectNodeDispatchMethod( Schema.Paragraph )
 	def paragraph(self, worksheet, node):
 		return ParagraphView( worksheet, node )
@@ -44,7 +48,7 @@ _projection = _Projection()
 
 
 
-class WorksheetNodeView (object):
+class NodeView (object):
 	def __init__(self, worksheet, model):
 		self._worksheet = worksheet
 		self._model = model
@@ -57,21 +61,25 @@ class WorksheetNodeView (object):
 	
 	def __present__(self, fragment, styleSheet, inheritedState):
 		return fragment.presentFragmentWithGenericPerspective( self._model, styleSheet )
+	
+	def _viewOf(self, model):
+		return self._worksheet._viewOf( model )
+
+	
 
 
-class WorksheetView (WorksheetNodeView):
+class WorksheetView (NodeView):
 	def __init__(self, worksheet, model):
 		super( WorksheetView, self ).__init__( worksheet, model )
-		self._contentsModelToView = WeakKeyDictionary()
-		self._contentsCell = Cell( self._computeContents )
+		self._modelToView = WeakKeyDictionary()
 		self._executionEnvironment = {}
 		self.refreshResults()
 		
 		
 	def refreshResults(self):
 		self._executionEnvironment = {}
-		for v in self.getContents():
-			v._refreshResults( self._executionEnvironment )
+		body = self.getBody()
+		body.refreshResults( self._executionEnvironment )
 		
 		
 	def getTitle(self):
@@ -81,32 +89,113 @@ class WorksheetView (WorksheetNodeView):
 		self._model['title'] = title
 		
 		
+	def joinTitle(self):
+		contents = self.getBody().getContents()
+		if len( contents ) > 0  and  isinstance( contents[0], ParagraphView ):
+			text = self.getTitle() + contents[0].getText()
+			self.setTitle( text )
+			self.getBody().removeFirstNode()
+			return True
+		else:
+			return False
+	
+	
+	def splitTitle(self, textLines):
+		body = self.getBody()
+		self.setTitle( textLines[0] )
+		textLines = textLines[1:]
+		for t in reversed( textLines ):
+			textModel = ParagraphView.newParagraphModel( t, 'normal' )
+			body.prependModel( textModel )
+		
+		
+	def getBody(self):
+		return _projection( self._model['body'], self )
+	
+	
+	def prependBodyContentsModel(self, model):
+		self.getBody().prependModel( model )
+	
+	
+	def _viewOf(self, model):
+		try:
+			return self._modelToView[model]
+		except KeyError:
+			p = _projection( model, self )
+			self._modelToView[model] = p
+			return p
+		
+		
+
+
+class BodyView (NodeView):
+	def __init__(self, worksheet, model):
+		super( BodyView, self ).__init__( worksheet, model )
+		self._contentsCell = Cell( self._computeContents )
+		
+		
+	def refreshResults(self, executionEnvironment):
+		for v in self.getContents():
+			v._refreshResults( self._executionEnvironment )
+		
+		
 	def getContents(self):
 		return self._contentsCell.getValue()
 	
 	
-	def prependContentsNode(self, node):
+	def removeFirstNode(self):
+		del self._model['contents'][0]
+	
+	def prependModel(self, node):
 		self._model['contents'].insert( 0, node )
 		
-	def appendContentsNode(self, node):
+	def appendModel(self, node):
 		self._model['contents'].append( node )
+	
+	def insertModelBeforeNode(self, node, model):
+		try:
+			index = self.getContents().index( node )
+		except ValueError:
+			return False
+		self._model['contents'].insert( index, model )
+		return True
 		
+		
+	def joinConsecutiveTextNodes(self, firstNode):
+		assert isinstance( firstNode, ParagraphView )
+		contents = self.getContents()
+		
+		try:
+			index = contents.index( firstNode )
+		except ValueError:
+			return False
+		
+		if ( index + 1)  <  len( contents ):
+			next = contents[index+1]
+			if isinstance( next, ParagraphView ):
+				firstNode.setText( firstNode.getText() + next.getText() )
+				del self._model['contents'][index+1]
+				return True
+		return False
+	
+	def splitTextNodes(self, textNode, textLines):
+		style = textNode.getStyle()
+		textModels = [ Schema.Paragraph( text=t, style=style )   for t in textLines ]
+		try:
+			index = self.getContents().index( textNode )
+		except ValueError:
+			return False
+		self._model['contents'][index:index+1] = textModels
+		return True
 		
 		
 	def _computeContents(self):
 		return [ self._viewOf( x )   for x in self._model['contents'] ]
 	
-	def _viewOf(self, model):
-		try:
-			return self._contentsModelToView[model]
-		except KeyError:
-			p = _projection( model, self )
-			self._contentsModelToView[model] = p
-			return p
 		
 
 
-class ParagraphView (WorksheetNodeView):
+class ParagraphView (NodeView):
 	def __init__(self, worksheet, model):
 		super( ParagraphView, self ).__init__( worksheet, model )
 	
@@ -125,24 +214,17 @@ class ParagraphView (WorksheetNodeView):
 		self._model['style'] = style
 		
 		
-	def split(self, texts):
-		style = self.getStyle()
-		nodes = [ Schema.Paragraph( text=t, style=style )   for t in texts ]
-		worksheetModel = self._worksheet.getModel()
-		index = worksheetModel['contents'].indexOfById( self.getModel() )
-		if index != -1:
-			worksheetModel['contents'][index:index+1] = nodes
-			return True
-		else:
-			return False
-		
-		
 	def _refreshResults(self, env):
 		pass
+	
+	
+	@staticmethod
+	def newParagraphModel(text, style):
+		return Schema.Paragraph( text=text, style=style )
 		
 		
 		
-class PythonCodeView (IncrementalOwner, WorksheetNodeView):
+class PythonCodeView (IncrementalOwner, NodeView):
 	STYLE_MINIMAL_RESULT = 0
 	STYLE_RESULT = 1
 	STYLE_CODE_AND_RESULT = 2
@@ -169,7 +251,7 @@ class PythonCodeView (IncrementalOwner, WorksheetNodeView):
 	
 	
 	def __init__(self, worksheet, model):
-		WorksheetNodeView.__init__( self, worksheet, model )
+		NodeView.__init__( self, worksheet, model )
 		self._incr = IncrementalValueMonitor( self )
 		self._result = None
 		
@@ -231,6 +313,6 @@ class PythonCodeView (IncrementalOwner, WorksheetNodeView):
 		
 		
 	@staticmethod
-	def newPythonCodeNode():
+	def newPythonCodeModel():
 		return Schema.PythonCode( style='code_result', code=Python25.py25NewModule() )
 	

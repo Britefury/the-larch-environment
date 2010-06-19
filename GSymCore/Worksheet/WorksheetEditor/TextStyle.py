@@ -21,7 +21,7 @@ class TextStyleOperation (object):
 	def applyToTextNode(self, node):
 		node.setStyle( self._style )
 	
-	def createTextNode(self, text):
+	def createTextModel(self, text):
 		return Schema.Paragraph( text=text, style=self._style )
 
 	

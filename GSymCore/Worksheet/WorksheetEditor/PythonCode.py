@@ -23,17 +23,17 @@ class AddPythonCodeOperation (object):
 	pass
 
 class PrependPythonCodeOperation (AddPythonCodeOperation):
-	def apply(self, worksheet):
-		pythonCode = ViewSchema.PythonCodeView.newPythonCodeNode()
-		worksheet['contents'].insert( 0, pythonCode )
+	def apply(self, body):
+		pythonCode = ViewSchema.PythonCodeView.newPythonCodeModel()
+		body.prependModel( pythonCode )
 		return True
 
 	
 
 class AppendPythonCodeOperation (AddPythonCodeOperation):
-	def apply(self, worksheet):
-		pythonCode = ViewSchema.PythonCodeView.newPythonCodeNode()
-		worksheet['contents'].append( pythonCode )
+	def apply(self, body):
+		pythonCode = ViewSchema.PythonCodeView.newPythonCodeModel()
+		body.appendModel( pythonCode )
 		return True
 
 	
@@ -44,15 +44,9 @@ class InsertPythonCodeOperation (AddPythonCodeOperation):
 		self._node = node
 		
 		
-	def apply(self, worksheet):
-		index = worksheet['contents'].indexOf( self._node )
-		
-		if index != -1:
-			pythonCode = ViewSchema.PythonCodeView.newPythonCodeNode()
-			worksheet['contents'].insert( index+1, pythonCode )
-			return True
-		else:
-			return False
+	def apply(self, body):
+		pythonCode = ViewSchema.PythonCodeView.newPythonCodeModel()
+		return body.insertModelBeforeNode( self._node, pythonCode )
 
 		
 		
