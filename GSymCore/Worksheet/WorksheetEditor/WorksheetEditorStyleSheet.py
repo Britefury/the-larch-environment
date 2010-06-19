@@ -29,7 +29,7 @@ class WorksheetEditorStyleSheet (StyleSheet):
 		
 		self.initAttr( 'primitiveStyle', PrimitiveStyleSheet.instance )
 		self.initAttr( 'richTextStyle', RichTextStyleSheet.instance )
-		self.initAttr( 'editableRichTextStyle', RichTextStyleSheet.instance.withEditable() )
+		self.initAttr( 'editableRichTextStyle', RichTextStyleSheet.instance.withEditable().withAppendNewlineToParagraphs( True ) )
 		self.initAttr( 'controlsStyle', ControlsStyleSheet.instance )
 		self.initAttr( 'contextMenuStyle', ContextMenuStyleSheet.instance )
 		self.initAttr( 'executionStyle', ExecutionStyleSheet.instance )

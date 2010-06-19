@@ -28,6 +28,7 @@ public class RichTextStyleSheet extends StyleSheet
 	private static final double defaultTitlePadding = 5.0;
 	private static final double defaultTitleBorderWidth = 5.0;
 	private static final AttributeValues defaultSubtitleTextAttrs = new AttributeValues( new String[] { "fontFace", "fontSize", "foreground" }, new Object[] { "Sans serif", 14, new Color( 0.0f, 0.5f, 0.05f ) } );
+	private static final boolean defaultAppendNewlineToParagraphs = false;
 	private static final AttributeValues defaultParagraphAttrs = new AttributeValues();
 	private static final AttributeValues defaultHeaderAttrs = new AttributeValues( new String[] { "fontFace" }, new Object[] { "Serif" } );
 	private static final AttributeValues defaultH1Attrs = new AttributeValues( new String[] { "fontSize", "foreground", "fontBold", "textSmallCaps" }, new Object[] { 28, new Color( 0.1f, 0.2f, 0.3f ), true, true } );
@@ -59,6 +60,7 @@ public class RichTextStyleSheet extends StyleSheet
 		initAttr( "titlePadding", defaultTitlePadding );
 		initAttr( "titleBorderWidth", defaultTitleBorderWidth );
 		initAttr( "subtitleTextAttrs", defaultSubtitleTextAttrs );
+		initAttr( "appendNewlineToParagraphs", defaultAppendNewlineToParagraphs );
 		initAttr( "paragraphAttrs", defaultParagraphAttrs );
 		initAttr( "headerAttrs", defaultHeaderAttrs );
 		initAttr( "h1Attrs", defaultH1Attrs );
@@ -121,6 +123,16 @@ public class RichTextStyleSheet extends StyleSheet
 	public RichTextStyleSheet withSubtitleTextAttrs(AttributeValues attrs)
 	{
 		return (RichTextStyleSheet)withAttr( "subtitleTextAttrs", attrs );
+	}
+
+	public RichTextStyleSheet withAppendNewlineToParagraphs(boolean value)
+	{
+		return (RichTextStyleSheet)withAttr( "appendNewlineToParagraphs", value );
+	}
+
+	public RichTextStyleSheet withParagraphAttrs(AttributeValues attrs)
+	{
+		return (RichTextStyleSheet)withAttr( "paragraphAttrs", attrs );
 	}
 
 	public RichTextStyleSheet withHeaderAttrs(AttributeValues attrs)
@@ -444,6 +456,7 @@ public class RichTextStyleSheet extends StyleSheet
 			elements.add( primitive.text( word ) );
 			elements.add( primitive.lineBreak() );
 		}
+		
 		return elements;
 	}
 	
@@ -462,7 +475,15 @@ public class RichTextStyleSheet extends StyleSheet
 
 		if ( primitive.isEditable() )
 		{
-			return primitive.paragraph( new DPElement[] { primitive.segment( true, true, primitive.span( paragraphContents ) ) } );
+			boolean bAppendNewline = getNonNull( "appendNewlineToParagraphs", Boolean.class, defaultAppendNewlineToParagraphs );
+			if ( bAppendNewline )
+			{
+				return primitive.paragraph( new DPElement[] { primitive.segment( true, true, primitive.span( paragraphContents ) ), primitive.whitespace( "\n" ) } );
+			}
+			else
+			{
+				return primitive.paragraph( new DPElement[] { primitive.segment( true, true, primitive.span( paragraphContents ) ) } );
+			}
 		}
 		else
 		{
