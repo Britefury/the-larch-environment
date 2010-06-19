@@ -1159,6 +1159,11 @@ public class PrimitiveStyleSheet extends StyleSheet
 		return new DPImage( getContentLeafStyleParams(), "", imageFilename, hoverImageFilename );
 	}
 	
+	public DPImage systemIcon(String iconName)
+	{
+		return image( "icons/" + iconName + ".png" );
+	}
+	
 	
 	
 	public DPBox box(double minWidth, double minHeight)

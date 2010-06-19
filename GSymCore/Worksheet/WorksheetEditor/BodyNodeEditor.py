@@ -17,11 +17,29 @@ from GSymCore.Worksheet.WorksheetEditor.PythonCode import AddPythonCodeOperation
 from GSymCore.Worksheet.WorksheetEditor.TextNodeEditor import TextNodeJoinOperation, TextNodeSplitOperation
 
 
+
+class DeleteNodeOperation (object):
+	def __init__(self, node):
+		self._node = node
+		
+	def apply(self, bodyNode):
+		return bodyNode.deleteNode( self._node )
+
+
 class BodyNodeEventListener (TreeEventListenerObjectDispatch):
 	def __init__(self):
 		pass
 
 	
+	
+	@ObjectDispatchMethod( DeleteNodeOperation )
+	def onDeleteNode(self, element, sourceElement, event):
+		ctx = element.getFragmentContext()
+		node = ctx.getDocNode()
+		
+		return event.apply( node )
+	
+
 	@ObjectDispatchMethod( AddPythonCodeOperation )
 	def onAddPythonCode(self, element, sourceElement, event):
 		ctx = element.getFragmentContext()

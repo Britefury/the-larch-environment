@@ -159,6 +159,15 @@ class BodyView (NodeView):
 			return False
 		self._model['contents'].insert( index, model )
 		return True
+
+	def deleteNode(self, node):
+		try:
+			index = self.getContents().index( node )
+		except ValueError:
+			return False
+		del self._model['contents'][index]
+		return True
+		
 		
 		
 	def joinConsecutiveTextNodes(self, firstNode):
