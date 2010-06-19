@@ -19,6 +19,7 @@ import BritefuryJ.DocPresent.TextEditEventInsert;
 import BritefuryJ.DocPresent.TextEditEventRemove;
 import BritefuryJ.DocPresent.TextEditEventReplace;
 import BritefuryJ.DocPresent.TreeEventListener;
+import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.Clipboard.TextEditHandler;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
@@ -168,6 +169,12 @@ public class TextEntry extends Control
 		protected String getText(Selection selection)
 		{
 			return textElement.getTextRepresentationBetweenMarkers( selection.getStartMarker(), selection.getEndMarker() );
+		}
+
+		@Override
+		public boolean canShareSelectionWith(EditHandler editHandler)
+		{
+			return false;
 		}
 	}
 	

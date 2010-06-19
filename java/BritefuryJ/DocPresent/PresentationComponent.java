@@ -553,21 +553,22 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			}
 			else
 			{
-				DPContainer commonRoot = s.getCommonRoot();
+				DPContainer commonRootContainer = s.getCommonRootContainer();
 				ArrayList<DPElement> startPath = s.getStartPathFromCommonRoot();
 				ArrayList<DPElement> endPath = s.getEndPathFromCommonRoot();
 				
-				if ( commonRoot != null )
+				if ( commonRootContainer != null )
 				{
 					StringBuilder builder = new StringBuilder();
 
-					commonRoot.getTextRepresentationBetweenPaths( builder, s.getStartMarker(), startPath, 0, s.getEndMarker(), endPath, 0 );
+					commonRootContainer.getTextRepresentationBetweenPaths( builder, s.getStartMarker(), startPath, 0, s.getEndMarker(), endPath, 0 );
 				
 					return builder.toString();
 				}
 				else
 				{
-					return ((DPContentLeafEditable)startPath.get( 0 )).getTextRepresentationBetweenMarkers( s.getStartMarker(), s.getEndMarker() );
+					DPContentLeafEditable commonRoot = (DPContentLeafEditable)s.getCommonRoot();
+					return commonRoot.getTextRepresentationBetweenMarkers( s.getStartMarker(), s.getEndMarker() );
 				}
 			}
 		}
@@ -581,7 +582,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			}
 			else
 			{
-				DPContainer commonRoot = s.getCommonRoot();
+				DPContainer commonRoot = s.getCommonRootContainer();
 				ArrayList<DPElement> startPath = s.getStartPathFromCommonRoot();
 				ArrayList<DPElement> endPath = s.getEndPathFromCommonRoot();
 				

@@ -6,7 +6,9 @@
 //##************************
 package BritefuryJ.DocPresent.Selection;
 
+import BritefuryJ.DocPresent.DPContentLeafEditable;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Marker.Marker;
 
@@ -40,7 +42,7 @@ public class SelectionManager
 					initialMarkerCaret = prevPos.copy();
 				}
 				
-				selection.setSelection( initialMarkerCaret, c.getMarker().copy() );
+				setSelection( initialMarkerCaret, c.getMarker().copy() );
 			}
 		}
 	}
@@ -63,14 +65,71 @@ public class SelectionManager
 	{
 		if ( bMouseDragInProgress )
 		{
-			selection.setSelection( initialMarkerMouse, pos.copy() );
+			setSelection( initialMarkerMouse, pos.copy() );
 		}
 	}
 	
 	public void selectElement(DPElement element)
 	{
-		selection.setSelection( element.markerAtStart(), element.markerAtEnd() );
+		setSelection( element.markerAtStart(), element.markerAtEnd() );
 	}
+	
+	
+	
+	private void setSelection(Marker markerA, Marker markerB)
+	{
+		if ( markerA.isValid()  &&  markerB.isValid()  &&  !markerA.equals( markerB ) )
+		{
+			DPRegion regionA = markerA.getElement().getRegion();
+			if ( regionA != null )
+			{
+				DPContentLeafEditable elementB = markerB.getElement();
+				DPRegion regionB = elementB.getRegion();
+				
+				if ( regionB != regionA )
+				{
+					int order = Marker.markerOrder( markerA, markerB );
+					DPRegion.SharableSelectionFilter filter = regionA.sharableSelectionFilter();
+					
+					Marker markerBInSameRegion = null;
+					if ( order == 1 )
+					{
+						DPContentLeafEditable leaf = (DPContentLeafEditable)elementB.getPreviousEditableLeaf( filter, filter );
+						if ( leaf != null )
+						{
+							markerBInSameRegion = leaf.markerAtEnd();
+						}
+					}
+					else
+					{
+						DPContentLeafEditable leaf = (DPContentLeafEditable)elementB.getNextEditableLeaf( filter, filter );
+						if ( leaf != null )
+						{
+							markerBInSameRegion = leaf.markerAtStart();
+						}
+					}
+					
+					if ( markerBInSameRegion != null )
+					{
+						selection.setSelection( markerA, markerBInSameRegion );
+					}
+				}
+				else
+				{
+					selection.setSelection( markerA, markerB );
+				}
+			}
+			else
+			{
+				selection.clear();
+			}
+		}
+		else
+		{
+			selection.clear();
+		}
+	}
+	
 	
 	
 	public boolean isMouseDragInProgress()

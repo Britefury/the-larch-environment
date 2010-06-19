@@ -236,6 +236,38 @@ public class Marker
 	
 	
 	
+	// Returns:
+	//   1 : a is first
+	//   -1 : b is first
+	//   0 : equal
+	public static int markerOrder(Marker a, Marker b)
+	{
+		if ( a.element == b.element )
+		{
+			if ( a.position == b.position )
+			{
+				if ( a.bias == b.bias )
+				{
+					return 0;
+				}
+				else
+				{
+					return a.bias == Bias.START  ?  1  :  -1;
+				}
+			}
+			else
+			{
+				return a.position < b.position  ?  1 : -1;
+			}
+		}
+		else
+		{
+			return DPElement.areElementsInOrder( a.element, b.element )  ?  1  :  -1;
+		}
+	}
+	
+	
+	
 	public Marker copy()
 	{
 		if ( element != null )
@@ -330,7 +362,7 @@ public class Marker
 		}
 
 		
-	int 	newIndex = newPosition  +  ( newBias == Marker.Bias.END  ?  1  :  0 );
+		int newIndex = newPosition  +  ( newBias == Marker.Bias.END  ?  1  :  0 );
 
 		DPContentLeaf leaf = subtree.getLeafAtTextRepresentationPosition( newPosition );
 		if ( leaf != null )
