@@ -52,6 +52,8 @@ from GSymCore.Worksheet.WorksheetEditor.TextNodeEditor import *
 from GSymCore.Worksheet.WorksheetEditor.BodyNodeEditor import *
 from GSymCore.Worksheet.WorksheetEditor.WorksheetNodeEditor import *
 
+from GSymCore.Worksheet.WorksheetEditor.SelectionEditor import *
+
 
 
 
@@ -143,9 +145,12 @@ class WorksheetEditor (GSymViewObjectDispatch):
 			p = styleSheet.h5( text )
 		elif style == 'h6':
 			p = styleSheet.h6( text )
-		p.addTreeEventListener( TextNodeEventListener.instance )
-		p.addInteractor( TextNodeInteractor.instance )
-		return p
+		p.setStructuralPrefixObject( node.partialModel() )
+		w = PrimitiveStyleSheet.instance.span( [ p ] )
+		w.addTreeEventListener( TextNodeEventListener.instance )
+		w.addInteractor( TextNodeInteractor.instance )
+		w.setStructuralValueObject( node.getModel() )
+		return w
 
 
 	
@@ -176,6 +181,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 			executionResultView = executionStyle.executionResult( stdout, executionResult.getStdErr(), excView, resultView )
 		
 		p = styleSheet.pythonCode( codeView, executionResultView, node.getStyle(), node.isResultVisible(), _onSetStyle, _onDelete )
+		p.setStructuralValueObject( node.getModel() )
 		return p
 
 
@@ -192,6 +198,6 @@ class WorksheetEditorRelativeLocationResolver (GSymRelativeLocationResolver):
 	
 
 	
-perspective = GSymPerspective( WorksheetEditor(), WorksheetEditorStyleSheet.instance, AttributeTable.instance, None, WorksheetEditorRelativeLocationResolver() )
+perspective = GSymPerspective( WorksheetEditor(), WorksheetEditorStyleSheet.instance, AttributeTable.instance, WorksheetEditHandler(), WorksheetEditorRelativeLocationResolver() )
 
 	

@@ -264,8 +264,23 @@ public abstract class LinearRepresentationEditHandler implements EditHandler
 	
 	
 	
-	public abstract ItemStream joinStreamsForInsertion(GSymFragmentView subtreeRootFragment, ItemStream before, ItemStream insertion, ItemStream after);
-	public abstract ItemStream joinStreamsForDeletion(GSymFragmentView subtreeRootFragment, ItemStream before, ItemStream after);
+	public ItemStream joinStreamsForInsertion(GSymFragmentView subtreeRootFragment, ItemStream before, ItemStream insertion, ItemStream after)
+	{
+		ItemStreamBuilder builder = new ItemStreamBuilder();
+		builder.extend( before );
+		builder.extend( insertion );
+		builder.extend( after );
+		return builder.stream();
+	}
+	
+	public ItemStream joinStreamsForDeletion(GSymFragmentView subtreeRootFragment, ItemStream before, ItemStream after)
+	{
+		ItemStreamBuilder builder = new ItemStreamBuilder();
+		builder.extend( before );
+		builder.extend( after );
+		return builder.stream();
+	}
+
 	public abstract Object copyStructuralValue(Object x);
 	public abstract SelectionEditTreeEvent createSelectionEditTreeEvent(DPElement sourceElement);
 }

@@ -15,6 +15,7 @@ from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListene
 from GSymCore.Worksheet import Schema, ViewSchema
 from GSymCore.Worksheet.WorksheetEditor.TextStyle import TextStyleOperation
 from GSymCore.Worksheet.WorksheetEditor.PythonCode import NewPythonCodeRequest, InsertPythonCodeOperation
+from GSymCore.Worksheet.WorksheetEditor.SelectionEditor import WorksheetSelectionEditTreeEvent
 
 
 
@@ -44,11 +45,39 @@ class TextNodeEventListener (TreeEventListenerObjectDispatch):
 	def __init__(self):
 		pass
 
+
 	@ObjectDispatchMethod( TextEditEvent )
 	def onTextEdit(self, element, sourceElement, event):
 		value = element.getTextRepresentation()
 		ctx = element.getFragmentContext()
 		node = ctx.getDocNode()
+		return self._performTextEdit( element, node, value )
+
+
+	@ObjectDispatchMethod( TextStyleOperation )
+	def onTextStyleOp(self, element, sourceElement, event):
+		event.applyToTextNode( element.getFragmentContext().getDocNode() )
+		return True
+
+
+	@ObjectDispatchMethod( NewPythonCodeRequest )
+	def onNewPythonCode(self, element, sourceElement, event):
+		node = element.getFragmentContext().getDocNode()
+		return element.postTreeEvent( InsertPythonCodeOperation( node ) )
+
+
+	@ObjectDispatchMethod( WorksheetSelectionEditTreeEvent )
+	def onSelectionEdit(self, element, sourceElement, event):
+		element.clearStructuralValue()
+		value = element.getLinearRepresentation()
+		node = element.getFragmentContext().getDocNode()
+		if value.isTextual():
+			return self._performTextEdit( element, node, value.textualValue() )
+		else:
+			return False
+
+
+	def _performTextEdit(self, element, node, value):
 		if value.endswith( '\n' ):
 			value = value[:-1]
 			if '\n' not in value:
@@ -58,16 +87,6 @@ class TextNodeEventListener (TreeEventListenerObjectDispatch):
 				return element.postTreeEvent( TextNodeSplitOperation( node, value.split( '\n' ) ) )
 		else:
 			return element.postTreeEvent( TextNodeJoinOperation( node ) )
-		
-	@ObjectDispatchMethod( TextStyleOperation )
-	def onTextStyleOp(self, element, sourceElement, event):
-		event.applyToTextNode( element.getFragmentContext().getDocNode() )
-		return True
-		
-	@ObjectDispatchMethod( NewPythonCodeRequest )
-	def onNewPythonCode(self, element, sourceElement, event):
-		node = element.getFragmentContext().getDocNode()
-		return element.postTreeEvent( InsertPythonCodeOperation( node ) )
 
 
 TextNodeEventListener.instance = TextNodeEventListener()		
