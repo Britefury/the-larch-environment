@@ -68,7 +68,6 @@ class TextNodeEventListener (TreeEventListenerObjectDispatch):
 
 	@ObjectDispatchMethod( WorksheetSelectionEditTreeEvent )
 	def onSelectionEdit(self, element, sourceElement, event):
-		element.clearStructuralValue()
 		value = element.getLinearRepresentation()
 		node = element.getFragmentContext().getDocNode()
 		if value.isTextual():

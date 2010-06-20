@@ -241,10 +241,12 @@ public abstract class DPContentLeaf extends DPElement
 	
 	protected void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
+		super.getLinearRepresentationFromStartToPath( builder, marker, path, pathMyIndex );
 	}
 
 	protected void getLinearRepresentationFromPathToEnd(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
+		super.getLinearRepresentationFromPathToEnd( builder, marker, path, pathMyIndex );
 	}
 	
 	

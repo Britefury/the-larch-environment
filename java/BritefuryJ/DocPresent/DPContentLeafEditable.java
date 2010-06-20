@@ -558,12 +558,14 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	protected void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
+		super.getLinearRepresentationFromStartToPath( builder, marker, path, pathMyIndex );
 		builder.appendTextValue( textRepresentation.substring( 0, marker.getClampedIndex() ) );
 	}
 
 	protected void getLinearRepresentationFromPathToEnd(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
 		builder.appendTextValue( textRepresentation.substring( marker.getClampedIndex() ) );
+		super.getLinearRepresentationFromPathToEnd( builder, marker, path, pathMyIndex );
 	}
 
 	public ItemStream getLinearRepresentationBetweenMarkers(Marker startMarker, Marker endMarker)

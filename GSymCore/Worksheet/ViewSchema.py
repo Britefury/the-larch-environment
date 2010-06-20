@@ -136,7 +136,7 @@ class BodyView (NodeView):
 		
 	def refreshResults(self, executionEnvironment):
 		for v in self.getContents():
-			v._refreshResults( self._executionEnvironment )
+			v._refreshResults( executionEnvironment )
 		
 		
 	def getContents(self):
