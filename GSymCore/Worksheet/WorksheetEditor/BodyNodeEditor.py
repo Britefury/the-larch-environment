@@ -9,6 +9,8 @@ from java.awt.event import KeyEvent
 
 from BritefuryJ.DocPresent import *
 
+from BritefuryJ.Logging import LogEntry
+
 
 from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
 
@@ -67,9 +69,13 @@ class BodyNodeEventListener (TreeEventListenerObjectDispatch):
 
 	@ObjectDispatchMethod( WorksheetSelectionEditTreeEvent )
 	def onSelectionEdit(self, element, sourceElement, event):
-		element.clearStructuralValue()
 		value = element.getLinearRepresentation()
 		node = element.getFragmentContext().getDocNode()
+		
+		log = element.getFragmentContext().getView().getPageLog()
+		if log.isRecording():
+			log.log( LogEntry( 'WsEdit' ).hItem( 'description', 'Body - selection edit' ).vItem( 'editedStream', value ) )
+			
 		
 		xs = []
 		

@@ -905,6 +905,8 @@ public abstract class DPContainer extends DPElement
 
 	public void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
+		super.getLinearRepresentationFromStartToPath( builder, marker, path, pathMyIndex );
+
 		DPElement pathChild = path.get( pathMyIndex + 1 );
 		for (DPElement child: getInternalChildren())
 		{
@@ -936,6 +938,8 @@ public abstract class DPContainer extends DPElement
 				child.appendToLinearRepresentation( builder );
 			}
 		}
+		
+		super.getLinearRepresentationFromPathToEnd( builder, marker, path, pathMyIndex );
 	}
 
 	public void getLinearRepresentationBetweenPaths(ItemStreamBuilder builder, Marker startMarker, ArrayList<DPElement> startPath, int startPathMyIndex,

@@ -2762,8 +2762,24 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		return builder.stream();
 	}
 
-	protected abstract void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex);
-	protected abstract void getLinearRepresentationFromPathToEnd(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex);
+	
+	
+	protected void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
+	{
+		if ( structuralRepresentation != null )
+		{
+			structuralRepresentation.addPrefixToStream( builder );
+		}
+	}
+	
+	
+	protected void getLinearRepresentationFromPathToEnd(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
+	{
+		if ( structuralRepresentation != null )
+		{
+			structuralRepresentation.addSuffixToStream( builder );
+		}
+	}
 
 
 
