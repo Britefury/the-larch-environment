@@ -14,13 +14,18 @@ schema = DMSchema( 'Worksheet', 'ws', 'GSymCore.Worksheet' )
 
 
 
-Worksheet = schema.newClass( 'Worksheet', [ 'title', 'body' ] )
+WorksheetNode = schema.newClass( 'WorksheetNode', [] )
+WorksheetPartialNode = schema.newClass( 'WorksheetPartialNode', [] )
 
-Body = schema.newClass( 'Body', [ 'contents' ] )
-Text = schema.newClass( 'Text', [ 'text' ] )
+
+Worksheet = schema.newClass( 'Worksheet', WorksheetNode, [ 'title', 'body' ] )
+
+Body = schema.newClass( 'Body', WorksheetNode, [ 'contents' ] )
+Text = schema.newClass( 'Text', WorksheetNode, [ 'text' ] )
 Paragraph = schema.newClass( 'Paragraph', Text, [ 'style' ] )
+PartialParagraph = schema.newClass( 'PartialParagraph', WorksheetPartialNode, [ 'style' ] )
 
 
-PythonCode = schema.newClass( 'PythonCode', [ 'code', 'style' ] )
+PythonCode = schema.newClass( 'PythonCode', WorksheetNode, [ 'code', 'style' ] )
 
 

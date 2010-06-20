@@ -223,6 +223,10 @@ class ParagraphView (NodeView):
 		self._model['style'] = style
 		
 		
+	def partialModel(self):
+		return Schema.PartialParagraph( style=self._model['style'] )
+		
+		
 	def _refreshResults(self, env):
 		pass
 	
