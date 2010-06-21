@@ -86,8 +86,10 @@ class Console (IncrementalOwner):
 			self._incr.onChanged()
 		
 		
-	def setGlobalVar(self, name, value):
+	def assignVariable(self, name, value):
 		self._globalVars[name] = value
+		self._blocks.append( ConsoleVarAssignment( name, type( value ) ) )
+		self._incr.onChanged()
 		
 		
 	def _initStdOutErr(self):
@@ -128,6 +130,21 @@ class ConsoleBlock (IncrementalOwner):
 	def getExecResult(self):
 		self._incr.onAccess()
 		return self._execResult
+
+
+
+class ConsoleVarAssignment (object):
+	def __init__(self, varName, valueType):
+		self._varName = varName
+		self._valueType = valueType
+	
+	
+	def getVarName(self):
+		return self._varName
+	
+	def getValueType(self):
+		return self._valueType
+
 		
 	
 		

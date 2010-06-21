@@ -81,7 +81,7 @@ class ConsoleView (GSymViewObjectDispatch):
 		def _onDrop(element, pos, data):
 			class _VarNameEntryListener (TextEntry.TextEntryListener):
 				def onAccept(self, entry, text):
-					node.setGlobalVar( text, data.getDocNode() )
+					node.assignVariable( text, data.getDocNode() )
 					_finish( entry )
 				
 				def onCancel(self, entry, text):
@@ -125,6 +125,16 @@ class ConsoleView (GSymViewObjectDispatch):
 			resultView = None
 		
 		return styleSheet.consoleBlock( moduleView, execResult.getStdOut(), execResult.getStdErr(), caughtExceptionView, resultView )
+
+
+
+	@ObjectDispatchMethod( Schema.ConsoleVarAssignment )
+	def ConsoleVarAssignment(self, ctx, styleSheet, state, node):
+		varName = node.getVarName()
+		valueType = node.getValueType()
+		valueTypeName = valueType.__name__
+		
+		return styleSheet.varAssignment( varName, valueTypeName )
 
 
 
