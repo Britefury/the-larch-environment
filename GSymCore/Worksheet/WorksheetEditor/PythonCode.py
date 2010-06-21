@@ -10,43 +10,38 @@ from BritefuryJ.DocPresent import *
 
 from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
 
+from GSymCore.Languages.Python25 import Python25
+
 from GSymCore.Worksheet import Schema, ViewSchema
+from GSymCore.Worksheet.WorksheetEditor.NodeOperations import NodeRequest
 
 
 
 
-class NewPythonCodeRequest (object):
-	pass
-
-
-class AddPythonCodeOperation (object):
-	pass
-
-class PrependPythonCodeOperation (AddPythonCodeOperation):
-	def apply(self, body):
-		pythonCode = ViewSchema.PythonCodeView.newPythonCodeModel()
-		body.prependModel( pythonCode )
-		return True
-
-	
-
-class AppendPythonCodeOperation (AddPythonCodeOperation):
-	def apply(self, body):
-		pythonCode = ViewSchema.PythonCodeView.newPythonCodeModel()
-		body.appendModel( pythonCode )
-		return True
-
-	
-
-class InsertPythonCodeOperation (AddPythonCodeOperation):
-	def __init__(self, node):
-		super( InsertPythonCodeOperation, self ).__init__()
-		self._node = node
+class PythonCodeRequest (NodeRequest):
+	def applyToParagraphNode(self, paragraph, element):
+		return self._insertAfter( paragraph, element )
 		
-		
-	def apply(self, body):
-		pythonCode = ViewSchema.PythonCodeView.newPythonCodeModel()
-		return body.insertModelBeforeNode( self._node, pythonCode )
+	def applyToPythonCodeNode(self, pythonCode, element):
+		return self._insertAfter( pythonCode, element )
+	
+	def _createModel(self):
+		return ViewSchema.PythonCodeView.newPythonCodeModel()
+
+
+
+
+class PythonCodeNodeEventListener (TreeEventListenerObjectDispatch):
+	def __init__(self):
+		pass
+
+
+	@ObjectDispatchMethod( NodeRequest )
+	def onNodeRequest(self, element, sourceElement, event):
+		return event.applyToPythonCodeNode( element.getFragmentContext().getDocNode(), element )
+
+
+PythonCodeNodeEventListener.instance = PythonCodeNodeEventListener()		
 
 
 	

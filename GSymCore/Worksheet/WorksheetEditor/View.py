@@ -43,7 +43,6 @@ from GSymCore.Worksheet import Schema
 from GSymCore.Worksheet import ViewSchema
 from GSymCore.Worksheet.WorksheetEditor.WorksheetEditorStyleSheet import WorksheetEditorStyleSheet
 
-from GSymCore.Worksheet.WorksheetEditor.TextStyle import *
 from GSymCore.Worksheet.WorksheetEditor.PythonCode import *
 
 from GSymCore.Worksheet.WorksheetEditor.TitleEditor import *
@@ -71,7 +70,7 @@ class WorkSheetContextMenuFactory (ContextMenuFactory):
 			def _onLink(link, event):
 				caret = rootElement.getCaret()
 				if caret.isValid():
-					caret.getElement().postTreeEvent( TextStyleOperation( style ) )
+					caret.getElement().postTreeEvent( PargraphRequest( style ) )
 			return _onLink
 	
 		rootElement = element.getRootElement()
@@ -90,7 +89,7 @@ class WorkSheetContextMenuFactory (ContextMenuFactory):
 		def _onPythonCode(link, event):
 			caret = rootElement.getCaret()
 			if caret.isValid():
-				caret.getElement().postTreeEvent( NewPythonCodeRequest() )
+				caret.getElement().postTreeEvent( PythonCodeRequest() )
 	
 		rootElement = element.getRootElement()
 		
@@ -182,6 +181,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 		
 		p = styleSheet.pythonCode( codeView, executionResultView, node.getStyle(), node.isResultVisible(), _onSetStyle, _onDelete )
 		p.setStructuralValueObject( node.getModel() )
+		p.addTreeEventListener( PythonCodeNodeEventListener.instance )
 		return p
 
 

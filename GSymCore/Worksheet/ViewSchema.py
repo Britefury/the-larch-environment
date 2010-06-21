@@ -152,12 +152,12 @@ class BodyView (NodeView):
 	def appendModel(self, node):
 		self._model['contents'].append( node )
 	
-	def insertModelBeforeNode(self, node, model):
+	def insertModelAfterNode(self, node, model):
 		try:
 			index = self.getContents().index( node )
 		except ValueError:
 			return False
-		self._model['contents'].insert( index, model )
+		self._model['contents'].insert( index + 1, model )
 		return True
 
 	def deleteNode(self, node):

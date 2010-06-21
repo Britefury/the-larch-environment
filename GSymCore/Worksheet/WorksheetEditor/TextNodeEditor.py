@@ -13,9 +13,8 @@ from BritefuryJ.DocPresent import *
 from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
 
 from GSymCore.Worksheet import Schema, ViewSchema
-from GSymCore.Worksheet.WorksheetEditor.TextStyle import TextStyleOperation
-from GSymCore.Worksheet.WorksheetEditor.PythonCode import NewPythonCodeRequest, InsertPythonCodeOperation
 from GSymCore.Worksheet.WorksheetEditor.SelectionEditor import WorksheetSelectionEditTreeEvent
+from GSymCore.Worksheet.WorksheetEditor.NodeOperations import NodeRequest
 
 
 
@@ -41,6 +40,23 @@ class TextNodeSplitOperation (object):
 
 
 
+class PargraphRequest (NodeRequest):
+	def __init__(self, style):
+		self._style = style
+		
+	def applyToParagraphNode(self, paragraph, element):
+		paragraph.setStyle( self._style )
+		return True
+		
+	def applyToPythonCodeNode(self, pythonCode, element):
+		return self._insertAfter( pythonCode, element )
+	
+	def _createModel(self):
+		return ViewSchema.ParagraphView.newParagraphModel( '', self._style )
+
+
+
+
 class TextNodeEventListener (TreeEventListenerObjectDispatch):
 	def __init__(self):
 		pass
@@ -54,16 +70,9 @@ class TextNodeEventListener (TreeEventListenerObjectDispatch):
 		return self._performTextEdit( element, node, value )
 
 
-	@ObjectDispatchMethod( TextStyleOperation )
-	def onTextStyleOp(self, element, sourceElement, event):
-		event.applyToTextNode( element.getFragmentContext().getDocNode() )
-		return True
-
-
-	@ObjectDispatchMethod( NewPythonCodeRequest )
-	def onNewPythonCode(self, element, sourceElement, event):
-		node = element.getFragmentContext().getDocNode()
-		return element.postTreeEvent( InsertPythonCodeOperation( node ) )
+	@ObjectDispatchMethod( NodeRequest )
+	def onNodeRequest(self, element, sourceElement, event):
+		return event.applyToParagraphNode( element.getFragmentContext().getDocNode(), element )
 
 
 	@ObjectDispatchMethod( WorksheetSelectionEditTreeEvent )
@@ -139,6 +148,7 @@ class TextNodeInteractor (ElementInteractor):
 
 
 	def _insertPythonCode(self, ctx, element, node):
-		return element.postTreeEvent( InsertPythonCodeOperation( node.getModel() ) )
+		#return element.postTreeEvent( InsertPythonCodeOperation( node.getModel() ) )
+		return True
 		
 TextNodeInteractor.instance = TextNodeInteractor()	
