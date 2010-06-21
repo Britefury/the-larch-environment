@@ -12,5 +12,5 @@ import BritefuryJ.GSym.View.GSymFragmentView;
 
 public interface Presentable
 {
-	public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState);
+	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState);
 }

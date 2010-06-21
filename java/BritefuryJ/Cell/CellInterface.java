@@ -36,9 +36,9 @@ public abstract class CellInterface implements IncrementalOwner, Presentable
 	
 	
 	@Override
-	public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
-		DPElement valueView = ctx.presentFragment( getValue(), styleSheet, inheritedState );
+		DPElement valueView = fragment.presentFragment( getValue(), styleSheet, inheritedState );
 		
 		return cellStyle.objectBox( getClass().getName(), valueView );
 	}

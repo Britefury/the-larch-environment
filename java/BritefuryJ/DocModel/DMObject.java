@@ -821,8 +821,8 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 
 
 	
-	public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
-		return DocModelPresenter.presentDMObject( this, ctx, styleSheet, inheritedState );
+		return DocModelPresenter.presentDMObject( this, fragment, styleSheet, inheritedState );
 	}
 }

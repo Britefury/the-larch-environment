@@ -34,9 +34,9 @@ public abstract class GSymAbstractPerspective
 
 		
 		@Override
-		public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 		{
-			return ctx.presentFragmentWithPerspectiveAndStyleSheet( x, GSymAbstractPerspective.this, this.styleSheet, this.inheritedState );
+			return fragment.presentFragmentWithPerspectiveAndStyleSheet( x, GSymAbstractPerspective.this, this.styleSheet, this.inheritedState );
 		}
 	}
 	

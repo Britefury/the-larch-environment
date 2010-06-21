@@ -98,7 +98,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 
 		@Override
-		public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 		{
 			return originalElement.clonePresentationSubtree();
 		}
@@ -135,9 +135,9 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 
 		@Override
-		public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 		{
-			return ctx.presentFragmentWithPerspective( element, treeExplorerPerspective );
+			return fragment.presentFragmentWithPerspective( element, treeExplorerPerspective );
 		}
 	}
 
@@ -3225,7 +3225,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 
 
-	public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		if ( !isRealised() )
 		{

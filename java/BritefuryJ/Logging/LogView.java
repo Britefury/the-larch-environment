@@ -72,16 +72,16 @@ public class LogView implements Presentable
 
 
 
-	public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
-		stateListeners = PresentationStateListenerList.addListener( stateListeners, ctx );
+		stateListeners = PresentationStateListenerList.addListener( stateListeners, fragment );
 		
 		DPElement entryElements[] = new DPElement[visibleEntries.size()+1];
 		entryElements[0] = titleStyle.staticText( log.getTitle() ).pad( 0.0, 20.0 ).alignHCentre();
 		int i = 1;
 		for (LogEntry entry: visibleEntries)
 		{
-			entryElements[i++] = ctx.presentFragment( entry, PrimitiveStyleSheet.instance );
+			entryElements[i++] = fragment.presentFragment( entry, PrimitiveStyleSheet.instance );
 		}
 		
 		return PrimitiveStyleSheet.instance.withVBoxSpacing( 5.0 ).vbox( entryElements ).alignHExpand();

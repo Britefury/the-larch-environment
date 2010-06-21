@@ -70,7 +70,7 @@ public abstract class LiteralCellEditor implements Presentable, IncrementalMonit
 
 	
 	@Override
-	public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		return createEditor().getElement();
 	}

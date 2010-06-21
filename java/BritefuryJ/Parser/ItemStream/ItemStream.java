@@ -136,7 +136,7 @@ public class ItemStream implements Presentable
 
 
 		@Override
-		public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 		{
 			return styleSheet.unescapedStringAsSpan( textValue );
 		}
@@ -214,9 +214,9 @@ public class ItemStream implements Presentable
 
 
 		@Override
-		public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 		{
-			return borderStyle.border( ctx.presentFragment( structuralValue, styleSheet ) );
+			return borderStyle.border( fragment.presentFragment( structuralValue, styleSheet ) );
 		}
 
 	
@@ -540,9 +540,9 @@ public class ItemStream implements Presentable
 
 
 	@Override
-	public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
-		List<DPElement> itemViews = ctx.mapPresentFragment( Arrays.asList( (Object[])items ), styleSheet );
+		List<DPElement> itemViews = fragment.mapPresentFragment( Arrays.asList( (Object[])items ), styleSheet );
 		DPElement contents = PrimitiveStyleSheet.instance.paragraph( itemViews.toArray( new DPElement[0] ) );
 		
 		return itemStreamStyle.objectBox( "BritefuryJ.Parser.ItemStream.ItemStream", contents );

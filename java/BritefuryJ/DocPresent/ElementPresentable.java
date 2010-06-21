@@ -23,7 +23,7 @@ public class ElementPresentable implements Presentable
 
 
 	@Override
-	public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		return element;
 	}

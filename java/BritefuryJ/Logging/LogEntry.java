@@ -180,13 +180,13 @@ public class LogEntry implements Presentable
 	
 
 
-	public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		DPElement fields[] = new DPElement[items.size()];
 		for (int i = 0; i < items.size(); i++)
 		{
 			Item item = items.get( i );
-			DPElement valueView = ctx.presentFragment( item.getValue(), styleSheet, inheritedState );
+			DPElement valueView = fragment.presentFragment( item.getValue(), styleSheet, inheritedState );
 			if ( item.getLayout() == Layout.HORIZONTAL )
 			{
 				fields[i] = logEntryStyle.horizontalObjectField( item.getName(), valueView );
