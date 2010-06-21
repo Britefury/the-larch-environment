@@ -39,6 +39,10 @@ class ConsoleViewerStyleSheet (StyleSheet):
 		self.initAttr( 'pythonModuleBorderAttrs', AttributeValues( border=SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), Color.WHITE ) ) )
 		self.initAttr( 'dropPromptAttrs', AttributeValues( border=SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.0, 0.8, 0.0 ), Color.WHITE ) ) )
 		
+		self.initAttr( 'varAssignVarNameAttrs', AttributeValues( fontItalic=True, foreground=Color( 0.0, 0.0, 0.5 ) ) )
+		self.initAttr( 'varAssignTypeNameAttrs', AttributeValues( foreground=Color( 0.5, 0.0, 0.5 ) ) )
+		self.initAttr( 'varAssignMsgAttrs', AttributeValues( foreground=Color( 0.0, 0.125, 0.0 ) ) )
+
 		self.initAttr( 'consoleBlockListSpacing', 5.0 )
 		self.initAttr( 'consoleSpacing', 8.0 )
 		
@@ -77,6 +81,16 @@ class ConsoleViewerStyleSheet (StyleSheet):
 		return self.withAttrs( dropPromptAttrs=dropPromptAttrs )
 	
 	
+	def withVarAssignVarNameAttrs(self, attrs):
+		return self.withAttrs( varAssignVarNameAttrs=attrs )
+	
+	def withVarAssignTypeNameAttrs(self, attrs):
+		return self.withAttrs( varAssignTypeNameAttrs=attrs )
+	
+	def withVarAssignMsgAttrs(self, attrs):
+		return self.withAttrs( varAssignMsgAttrs=attrs )
+	
+	
 	def withConsoleSpacing(self, consoleSpacing):
 		return self.withAttrs( consoleSpacing=consoleSpacing )
 	
@@ -106,6 +120,19 @@ class ConsoleViewerStyleSheet (StyleSheet):
 	@DerivedAttributeMethod
 	def dropPromptStyle(self):
 		return self['primitiveStyle'].withAttrValues( self['dropPromptAttrs'] )
+	
+	
+	@DerivedAttributeMethod
+	def varAssignVarNameStyle(self):
+		return self['primitiveStyle'].withAttrValues( self['varAssignVarNameAttrs'] )
+	
+	@DerivedAttributeMethod
+	def varAssignTypeNameStyle(self):
+		return self['primitiveStyle'].withAttrValues( self['varAssignTypeNameAttrs'] )
+	
+	@DerivedAttributeMethod
+	def varAssignMsgStyle(self):
+		return self['primitiveStyle'].withAttrValues( self['varAssignMsgAttrs'] )
 	
 	
 	@DerivedAttributeMethod
@@ -169,7 +196,16 @@ class ConsoleViewerStyleSheet (StyleSheet):
 		blockVBox = blockStyle.vbox( blockContents ).alignHExpand()
 		return blockStyle.border( blockVBox ).alignHExpand()
 		
+	
+	def varAssignment(self, varName, valueTypeName):
+		varNameStyle = self.varAssignVarNameStyle()
+		typeNameStyle = self.varAssignTypeNameStyle()
+		msgStyle = self.varAssignMsgStyle()
 		
+		varNameView = varNameStyle.staticText( varName )
+		typeNameView = typeNameStyle.staticText( valueTypeName )
+		
+		return msgStyle.paragraph( [ msgStyle.staticText( 'Variable ' ), msgStyle.lineBreak(), varNameView, msgStyle.lineBreak(), msgStyle.staticText( ' was assigned a ' ), msgStyle.lineBreak(), typeNameView ] )
 		
 		
 		
