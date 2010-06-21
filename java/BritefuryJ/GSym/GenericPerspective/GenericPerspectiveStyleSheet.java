@@ -13,6 +13,7 @@ import java.util.List;
 
 import BritefuryJ.AttributeTable.AttributeValues;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
@@ -30,6 +31,7 @@ public class GenericPerspectiveStyleSheet extends StyleSheet
 	private static final Paint defaultObjectFieldTitlePaint = new Color( 0.0f, 0.25f, 0.5f );
 	private static final double defaultObjectFieldIndentation = 5.0;
 	private static final double defaultObjectFieldSpacing = 2.0;
+	private static final Border defaultErrorBorder = new SolidBorder( 1.0, 3.0, 10.0, 10.0, new Color( 0.8f, 0.0f, 0.0f ), new Color( 1.0f, 0.9f, 0.9f ) );
 	private static final AttributeValues defaultStringEscapeAttrs = new AttributeValues( new String[] { "foreground", "background" },
 			new Object[] { new Color( 0.0f, 0.15f, 0.35f ), new FillPainter( new Color( 0.8f, 0.8f, 1.0f ) ) } );
 	
@@ -66,6 +68,8 @@ public class GenericPerspectiveStyleSheet extends StyleSheet
 		initAttr( "objectFieldIndentation", defaultObjectFieldIndentation );
 
 		initAttr( "objectFieldSpacing", defaultObjectFieldSpacing );
+		
+		initAttr( "errorBorder", defaultErrorBorder );
 		
 		initAttr( "stringContentAttrs", AttributeValues.identity );
 		initAttr( "stringEscapeAttrs", defaultStringEscapeAttrs );
@@ -155,6 +159,21 @@ public class GenericPerspectiveStyleSheet extends StyleSheet
 			objectFieldStyleSheet = primitive.withForeground( objectFieldTitlePaint ).withParagraphIndentation( objectFieldIndentation );
 		}
 		return objectFieldStyleSheet;
+	}
+	
+	
+	
+	private PrimitiveStyleSheet errorStyleSheet = null;
+	
+	private PrimitiveStyleSheet getErrorStyleSheet()
+	{
+		if ( errorStyleSheet == null )
+		{
+			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+			Border border = getNonNull( "errorBorder", Border.class, defaultErrorBorder );
+			errorStyleSheet = primitive.withBorder( border );
+		}
+		return errorStyleSheet;
 	}
 	
 	
@@ -338,6 +357,30 @@ public class GenericPerspectiveStyleSheet extends StyleSheet
 	}
 	
 	
+	public DPElement errorBorder(DPElement contents)
+	{
+		PrimitiveStyleSheet errorStyle = getErrorStyleSheet();
+		return errorStyle.border( contents );
+	}
+	
+	public DPElement errorBox(String title, DPElement contents)
+	{
+		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
+		double padding = getNonNull( "objectContentPadding", Double.class, defaultObjectContentPadding );
+		
+		DPElement titleElement = objectTitle( title );
+		return errorBorder( primitive.vbox( new DPElement[] { titleElement, contents.padX( padding ) } ) ); 
+	}
+	
+	public DPElement errorBoxWithFields(String title, DPElement fields[])
+	{
+		PrimitiveStyleSheet fieldListStyle = getObjectFieldListStyleSheet();
+		double padding = getNonNull( "objectContentPadding", Double.class, defaultObjectContentPadding );
+		
+		DPElement contentsBox = fieldListStyle.vbox( fields ).padX( padding );
+		return errorBox( title, contentsBox ); 
+	}
+
 	public List<DPElement> unescapedStringAsElementList(String x)
 	{
 		PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );

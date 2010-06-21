@@ -26,7 +26,6 @@ public class DMObjectField
 	
 	static
 	{
-		disallowedFieldNames.add( "__version__" );
 	}
 
 	
