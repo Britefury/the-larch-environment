@@ -21,10 +21,7 @@ import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.DocModel.DMIOReader;
 import BritefuryJ.DocModel.DMList;
 import BritefuryJ.DocModel.DMNode;
-import BritefuryJ.DocModel.DMSchemaResolver;
-import BritefuryJ.DocModel.DMIOReader.BadModuleNameException;
 import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
-import BritefuryJ.DocModel.DMSchema.UnknownClassException;
 
 public class Test_DMList extends Test_DMNode_base
 {
@@ -54,21 +51,6 @@ public class Test_DMList extends Test_DMNode_base
 			System.out.println( "Could not parse expected SX" );
 			fail();
 		}
-		catch (BadModuleNameException e)
-		{
-			System.out.println( "Bad module name while parsing expected SX" );
-			fail();
-		}
-		catch (UnknownClassException e)
-		{
-			System.out.println( "Unknown class while parsing expected SX" );
-			fail();
-		}
-		catch (DMSchemaResolver.CouldNotResolveSchemaException e)
-		{
-			System.out.println( "Could not resolve module while parsing expected SX" );
-			fail();
-		}
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -82,24 +64,6 @@ public class Test_DMList extends Test_DMNode_base
 		catch (ParseErrorException e)
 		{
 			System.out.println( "Could not parse" );
-			fail();
-			return null;
-		}
-		catch (BadModuleNameException e)
-		{
-			System.out.println( "Bad module name while parsing" );
-			fail();
-			return null;
-		}
-		catch (UnknownClassException e)
-		{
-			System.out.println( "Unknown class while parsing" );
-			fail();
-			return null;
-		}
-		catch (DMSchemaResolver.CouldNotResolveSchemaException e)
-		{
-			System.out.println( "Could not resolve module while parsing" );
 			fail();
 			return null;
 		}
@@ -568,7 +532,7 @@ public class Test_DMList extends Test_DMNode_base
 	
 	
 	
-	public void test_trackTree() throws BritefuryJ.DocModel.DMIOWriter.InvalidDataTypeException
+	public void test_trackTree()
 	{
 		DMList xs = readTrackedDMListSX( "[a b [c d [e f]]]" );
 		cmpListSX( xs, "[a b [c d [e f]]]" );

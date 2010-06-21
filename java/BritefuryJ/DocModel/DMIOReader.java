@@ -11,10 +11,6 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
-import BritefuryJ.DocModel.DMSchema.UnknownClassException;
-import BritefuryJ.DocModel.DMSchemaResolver.CouldNotResolveSchemaException;
-
 
 public class DMIOReader
 {
@@ -34,7 +30,7 @@ public class DMIOReader
 	}
 
 	
-	public static class BadModuleNameException extends Exception
+	public static class BadModuleNameException extends RuntimeException
 	{
 		private static final long serialVersionUID = 1L;
 	}
@@ -273,14 +269,7 @@ public class DMIOReader
 			}
 			else if ( top instanceof DMObject )
 			{
-				try
-				{
-					((DMObject)top).set( getTopOfNameStack(), item );
-				}
-				catch (InvalidFieldNameException e)
-				{
-					System.out.println( "Could not set a field named " + getTopOfNameStack() );
-				}
+				((DMObject)top).set( getTopOfNameStack(), item );
 
 				objectAcquireFieldName();
 			}
@@ -326,7 +315,7 @@ public class DMIOReader
 		closeItem( item );
 	}
 	
-	private void openObject() throws ParseErrorException, BadModuleNameException, UnknownClassException
+	private void openObject() throws ParseErrorException
 	{
 		MatchResult res = null;
 		
@@ -408,7 +397,7 @@ public class DMIOReader
 	}
 	
 	
-	public Object read() throws ParseErrorException, BadModuleNameException, UnknownClassException
+	public Object read() throws ParseErrorException
 	{
 		while ( pos < source.length() )
 		{
@@ -503,7 +492,7 @@ public class DMIOReader
 	}
 	
 	
-	private Object readDocument() throws ParseErrorException, BadModuleNameException, UnknownClassException, CouldNotResolveSchemaException
+	private Object readDocument() throws ParseErrorException, BadModuleNameException
 	{
 		eatWhitespace();
 		
@@ -598,7 +587,7 @@ public class DMIOReader
 	}
 	
 	
-	public static Object readFromString(String source, DMSchemaResolver resolver) throws ParseErrorException, BadModuleNameException, UnknownClassException, CouldNotResolveSchemaException
+	public static Object readFromString(String source, DMSchemaResolver resolver) throws ParseErrorException, BadModuleNameException
 	{
 		DMIOReader reader = new DMIOReader( source, resolver );
 		return reader.readDocument();

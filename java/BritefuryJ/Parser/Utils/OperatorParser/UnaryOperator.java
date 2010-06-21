@@ -13,7 +13,7 @@ import org.python.core.PyInteger;
 import org.python.core.PyObject;
 
 import BritefuryJ.DocModel.DMObjectClass;
-import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
+import BritefuryJ.DocModel.DMObjectClass.UnknownFieldNameException;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
 
@@ -25,14 +25,14 @@ public class UnaryOperator extends Operator
 		private String fieldNames[];
 		
 		
-		public BuildASTNodeAction(DMObjectClass nodeClass, String fieldName) throws InvalidFieldNameException
+		public BuildASTNodeAction(DMObjectClass nodeClass, String fieldName)
 		{
 			this.nodeClass = nodeClass;
 			this.fieldNames = new String[] { fieldName };
 
 			if ( nodeClass.getFieldIndex( fieldName ) == -1 )
 			{
-				throw new InvalidFieldNameException( fieldName );
+				throw new UnknownFieldNameException( fieldName );
 			}
 		}
 		
@@ -43,7 +43,7 @@ public class UnaryOperator extends Operator
 			{
 				return nodeClass.newInstance( fieldNames, new Object[] { x } );
 			}
-			catch (InvalidFieldNameException e)
+			catch (UnknownFieldNameException e)
 			{
 				throw new RuntimeException( "This should not have happened." );
 			}
@@ -134,7 +134,7 @@ public class UnaryOperator extends Operator
 		this.action = new UnaryOpAction( action );
 	}
 
-	public UnaryOperator(ParserExpression opExpression, DMObjectClass nodeClass, String fieldName) throws InvalidFieldNameException
+	public UnaryOperator(ParserExpression opExpression, DMObjectClass nodeClass, String fieldName)
 	{
 		this( opExpression, new BuildASTNodeAction( nodeClass, fieldName ) );
 	}
@@ -150,7 +150,7 @@ public class UnaryOperator extends Operator
 		this.action = new UnaryOpAction( action );
 	}
 
-	public UnaryOperator(String operator, DMObjectClass nodeClass, String fieldName) throws InvalidFieldNameException
+	public UnaryOperator(String operator, DMObjectClass nodeClass, String fieldName)
 	{
 		this( ParserExpression.coerce( operator ), new BuildASTNodeAction( nodeClass, fieldName ) );
 	}

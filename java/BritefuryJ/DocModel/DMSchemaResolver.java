@@ -8,7 +8,7 @@ package BritefuryJ.DocModel;
 
 public interface DMSchemaResolver
 {
-	public static class CouldNotResolveSchemaException extends Exception
+	public static class CouldNotResolveSchemaException extends RuntimeException
 	{
 		private static final long serialVersionUID = 1L;
 		

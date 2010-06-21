@@ -13,7 +13,7 @@ import BritefuryJ.DocModel.DMList;
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMSchema;
-import BritefuryJ.DocModel.DMSchema.ClassAlreadyDefinedException;
+import BritefuryJ.DocModel.DMSchema.InvalidSchemaNameException;
 import BritefuryJ.Transformation.DefaultIdentityTransformationFunction;
 import BritefuryJ.Transformation.TransformationFunction;
 
@@ -24,7 +24,14 @@ public class Test_DefaultIdentityTransformationFunction extends TestCase
 
 	public void setUp()
 	{
-		m = new DMSchema( "m", "m", "test.m" );
+		try
+		{
+			m = new DMSchema( "m", "m", "test.m" );
+		}
+		catch (InvalidSchemaNameException e)
+		{
+			throw new RuntimeException( e.toString() );
+		}
 	}
 	
 	public void tearDown()
@@ -34,7 +41,7 @@ public class Test_DefaultIdentityTransformationFunction extends TestCase
 
 	
 	
-	public void test_identity_transform() throws ClassAlreadyDefinedException
+	public void test_identity_transform()
 	{
 		TransformationFunction xform = new TransformationFunction()
 		{

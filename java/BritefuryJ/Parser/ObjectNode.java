@@ -20,7 +20,6 @@ import org.python.core.PyUnicode;
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectInterface;
-import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 
 /*
@@ -41,7 +40,7 @@ public class ObjectNode extends ParserExpression
 
 	
 	
-	public ObjectNode(DMObjectClass objClass) throws InvalidFieldNameException
+	public ObjectNode(DMObjectClass objClass)
 	{
 		assert fieldNames.length == fieldExps.length;
 		
@@ -53,7 +52,7 @@ public class ObjectNode extends ParserExpression
 		initialise();
 	}
 
-	public ObjectNode(DMObjectClass objClass, Object[] fieldExps) throws InvalidFieldNameException, ParserCoerceException
+	public ObjectNode(DMObjectClass objClass, Object[] fieldExps) throws ParserCoerceException
 	{
 		assert fieldNames.length == fieldExps.length;
 		
@@ -77,7 +76,7 @@ public class ObjectNode extends ParserExpression
 		initialise();
 	}
 
-	public ObjectNode(DMObjectClass objClass, String[] fieldNames, Object[] fieldExps) throws InvalidFieldNameException, ParserCoerceException
+	public ObjectNode(DMObjectClass objClass, String[] fieldNames, Object[] fieldExps) throws ParserCoerceException
 	{
 		assert fieldNames.length == fieldExps.length;
 		
@@ -92,7 +91,7 @@ public class ObjectNode extends ParserExpression
 		initialise();
 	}
 	
-	public ObjectNode(DMObjectClass objClass, String[] fieldNames, PyObject[] fieldExps) throws InvalidFieldNameException, ParserCoerceException
+	public ObjectNode(DMObjectClass objClass, String[] fieldNames, PyObject[] fieldExps) throws ParserCoerceException
 	{
 		assert fieldNames.length == fieldExps.length;
 		
@@ -107,7 +106,7 @@ public class ObjectNode extends ParserExpression
 		initialise();
 	}
 	
-	public ObjectNode(PyObject[] values, String[] names) throws InvalidFieldNameException, ParserCoerceException
+	public ObjectNode(PyObject[] values, String[] names) throws ParserCoerceException
 	{
 		assert values.length == ( names.length + 1 );
 		
@@ -127,7 +126,7 @@ public class ObjectNode extends ParserExpression
 		initialise();
 	}
 	
-	public ObjectNode(DMObjectClass objClass, Map<String, Object> data) throws InvalidFieldNameException, ParserCoerceException
+	public ObjectNode(DMObjectClass objClass, Map<String, Object> data) throws ParserCoerceException
 	{
 		this.objClass = objClass;
 		fieldNames = new String[data.size()];
@@ -146,7 +145,7 @@ public class ObjectNode extends ParserExpression
 	
 	
 	@SuppressWarnings("unchecked")
-	public ObjectNode(DMObjectClass objClass, PyDictionary data) throws InvalidFieldNameException, ParserCoerceException
+	public ObjectNode(DMObjectClass objClass, PyDictionary data) throws ParserCoerceException
 	{
 		this.objClass = objClass;
 		this.fieldNames = new String[data.size()];
@@ -352,7 +351,7 @@ public class ObjectNode extends ParserExpression
 	
 	
 	
-	private void initialise() throws InvalidFieldNameException
+	private void initialise()
 	{
 		fieldExpTable = new ParserExpression[objClass.getNumFields()];
 		for (int i = 0; i < fieldNames.length; i++)
@@ -360,7 +359,7 @@ public class ObjectNode extends ParserExpression
 			int fieldIndex = objClass.getFieldIndex( fieldNames[i] );
 			if ( fieldIndex == -1 )
 			{
-				throw new DMObjectClass.InvalidFieldNameException( fieldNames[i] );
+				throw new DMObjectClass.UnknownFieldNameException( fieldNames[i] );
 			}
 			fieldExpTable[fieldIndex] = fieldExps[i];
 		}

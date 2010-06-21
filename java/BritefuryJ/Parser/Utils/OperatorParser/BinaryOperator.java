@@ -11,7 +11,7 @@ import org.python.core.PyInteger;
 import org.python.core.PyObject;
 
 import BritefuryJ.DocModel.DMObjectClass;
-import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
+import BritefuryJ.DocModel.DMObjectClass.UnknownFieldNameException;
 import BritefuryJ.Parser.ParserExpression;
 
 public class BinaryOperator extends Operator
@@ -22,19 +22,19 @@ public class BinaryOperator extends Operator
 		private String fieldNames[];
 		
 		
-		public BuildASTNodeAction(DMObjectClass nodeClass, String leftFieldName, String rightFieldName) throws InvalidFieldNameException
+		public BuildASTNodeAction(DMObjectClass nodeClass, String leftFieldName, String rightFieldName)
 		{
 			this.nodeClass = nodeClass;
 			this.fieldNames = new String[] { leftFieldName, rightFieldName };
 			
 			if ( nodeClass.getFieldIndex( leftFieldName ) == -1 )
 			{
-				throw new InvalidFieldNameException( leftFieldName );
+				throw new UnknownFieldNameException( leftFieldName );
 			}
 
 			if ( nodeClass.getFieldIndex( rightFieldName ) == -1 )
 			{
-				throw new InvalidFieldNameException( rightFieldName );
+				throw new UnknownFieldNameException( rightFieldName );
 			}
 		}
 		
@@ -45,7 +45,7 @@ public class BinaryOperator extends Operator
 			{
 				return nodeClass.newInstance( fieldNames, new Object[] { x, y } );
 			}
-			catch (InvalidFieldNameException e)
+			catch (UnknownFieldNameException e)
 			{
 				throw new RuntimeException( "This should not have happened." );
 			}
@@ -84,7 +84,7 @@ public class BinaryOperator extends Operator
 		this.action = action;
 	}
 
-	public BinaryOperator(ParserExpression opExpression, DMObjectClass nodeClass, String leftFieldName, String rightFieldName) throws InvalidFieldNameException
+	public BinaryOperator(ParserExpression opExpression, DMObjectClass nodeClass, String leftFieldName, String rightFieldName)
 	{
 		this( opExpression, new BuildASTNodeAction( nodeClass, leftFieldName, rightFieldName ) );
 	}
@@ -100,7 +100,7 @@ public class BinaryOperator extends Operator
 		this.action = action;
 	}
 
-	public BinaryOperator(String operator, DMObjectClass nodeClass, String leftFieldName, String rightFieldName) throws InvalidFieldNameException
+	public BinaryOperator(String operator, DMObjectClass nodeClass, String leftFieldName, String rightFieldName)
 	{
 		this( ParserExpression.coerce( operator ), new BuildASTNodeAction( nodeClass, leftFieldName, rightFieldName ) );
 	}

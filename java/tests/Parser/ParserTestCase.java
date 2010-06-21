@@ -13,10 +13,7 @@ import java.util.Map;
 import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMIOReader;
 import BritefuryJ.DocModel.DMSchemaResolver;
-import BritefuryJ.DocModel.DMIOReader.BadModuleNameException;
 import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
-import BritefuryJ.DocModel.DMSchema.UnknownClassException;
-import BritefuryJ.DocModel.DMSchemaResolver.CouldNotResolveSchemaException;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParseResult;
 import BritefuryJ.Parser.ParserExpression;
@@ -41,21 +38,6 @@ abstract public class ParserTestCase extends TestCase
 			System.out.println( "Could not parse input SX" );
 			fail();
 		}
-		catch (BadModuleNameException e)
-		{
-			System.out.println( "Bad module name - input" );
-			fail();
-		}
-		catch (UnknownClassException e)
-		{
-			System.out.println( "Unknown class name - input" );
-			fail();
-		}
-		catch (CouldNotResolveSchemaException e)
-		{
-			System.out.println( "Could not resolve module - input" );
-			fail();
-		}
 		return expected;
 	}
 	
@@ -70,21 +52,6 @@ abstract public class ParserTestCase extends TestCase
 		catch (ParseErrorException e)
 		{
 			System.out.println( "Could not parse expected SX" );
-			fail();
-		}
-		catch (BadModuleNameException e)
-		{
-			System.out.println( "Bad module name - expected" );
-			fail();
-		}
-		catch (UnknownClassException e)
-		{
-			System.out.println( "Unknown class name - expected" );
-			fail();
-		}
-		catch (CouldNotResolveSchemaException e)
-		{
-			System.out.println( "Could not resolve module - expected" );
 			fail();
 		}
 		return expected;

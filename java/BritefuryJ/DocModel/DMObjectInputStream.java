@@ -11,8 +11,6 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.HashMap;
 
-import BritefuryJ.DocModel.DMSchema.UnknownClassException;
-
 public class DMObjectInputStream extends ObjectInputStream
 {
 	private DMSchemaResolver resolver;
@@ -29,7 +27,7 @@ public class DMObjectInputStream extends ObjectInputStream
 	
 	
 	
-	protected DMSchema readDMModule() throws IOException, ClassNotFoundException, DMSchemaResolver.CouldNotResolveSchemaException
+	protected DMSchema readDMModule() throws IOException, ClassNotFoundException
 	{
 		boolean bNewModule = readBoolean();
 		
@@ -48,7 +46,7 @@ public class DMObjectInputStream extends ObjectInputStream
 		}
 	}
 	
-	protected DMObjectClass readDMObjectClass() throws IOException, ClassNotFoundException, DMSchemaResolver.CouldNotResolveSchemaException, UnknownClassException
+	protected DMObjectClass readDMObjectClass() throws IOException, ClassNotFoundException
 	{
 		DMSchema schema = readDMModule();
 		

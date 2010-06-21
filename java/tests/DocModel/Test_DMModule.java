@@ -10,12 +10,10 @@ import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectField;
 import BritefuryJ.DocModel.DMSchema;
-import BritefuryJ.DocModel.DMSchema.ClassAlreadyDefinedException;
-import BritefuryJ.DocModel.DMSchema.UnknownClassException;
 
 public class Test_DMModule extends TestCase
 {
-	public void test_get() throws UnknownClassException, ClassAlreadyDefinedException
+	public void test_get()
 	{
 		DMSchema m = new DMSchema( "m", "m", "test.m" );
 		
@@ -24,7 +22,7 @@ public class Test_DMModule extends TestCase
 		assertSame( m.get( "c" ), c );
 	}
 
-	public void test_getitem() throws ClassAlreadyDefinedException
+	public void test_getitem()
 	{
 		DMSchema m = new DMSchema( "m", "m", "test.m" );
 		
@@ -33,7 +31,7 @@ public class Test_DMModule extends TestCase
 		assertSame( m.__getitem__( "c" ), c );
 	}
 	
-	public void test_newInstance() throws UnknownClassException, ClassAlreadyDefinedException
+	public void test_newInstance()
 	{
 		DMObjectField f1[] = { new DMObjectField( "x" ) };
 

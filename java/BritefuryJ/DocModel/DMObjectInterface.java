@@ -8,8 +8,6 @@ package BritefuryJ.DocModel;
 
 import java.util.Map;
 
-import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
-
 public interface DMObjectInterface extends DMNodeInterface
 {
 	public DMObjectClass getDMObjectClass();
@@ -18,15 +16,15 @@ public interface DMObjectInterface extends DMNodeInterface
 	public int getFieldIndex(String key);
 	
 	public Object get(int index);
-	public Object get(String key) throws InvalidFieldNameException;
+	public Object get(String key);
 	
 	public void set(int index, Object value);
-	public void set(String key, Object value) throws InvalidFieldNameException;
+	public void set(String key, Object value);
 	
 	
 	public String[] getFieldNames();
 	
-	public void update(Map<String, Object> table) throws InvalidFieldNameException;
+	public void update(Map<String, Object> table);
 	public void become(DMObject obj);
 	
 	

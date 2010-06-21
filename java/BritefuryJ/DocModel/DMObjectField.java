@@ -6,13 +6,39 @@
 //##************************
 package BritefuryJ.DocModel;
 
+import java.util.HashSet;
+
 public class DMObjectField
 {
+	public static class InvalidFieldNameException extends RuntimeException
+	{
+		private static final long serialVersionUID = 1L;
+		
+		public InvalidFieldNameException(String message)
+		{
+			super( message );
+		}
+	}
+
+	
+	private static final HashSet<String> disallowedFieldNames = new HashSet<String>();
+
+	
+	static
+	{
+		disallowedFieldNames.add( "__version__" );
+	}
+
+	
+	
 	private String name;
+	
+	
 	
 	
 	public DMObjectField(String name)
 	{
+		checkFieldNameValidity( name );
 		this.name = name;
 	}
 	
@@ -48,5 +74,22 @@ public class DMObjectField
 			f[i] = new DMObjectField( fieldNames[i] );
 		}
 		return f;
+	}
+	
+	
+	
+	private static void checkFieldNameValidity(String name)
+	{
+		if ( DMNodeClass.validNamePattern.matcher( name ).matches() )
+		{
+			if ( disallowedFieldNames.contains( name ) )
+			{
+				throw new InvalidFieldNameException( "Invalid field name '" + name + "'; name cannot be any of " + disallowedFieldNames );
+			}
+		}
+		else
+		{
+			throw new InvalidFieldNameException( "Invalid field name '" + name + "'; name should be an identifier" );
+		}
 	}
 }
