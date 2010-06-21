@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.GSym.View;
 
+import java.awt.Color;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -26,6 +27,7 @@ import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GSymAbstractPerspective;
 import BritefuryJ.GSym.GSymBrowserContext;
 import BritefuryJ.GSym.GSymSubject;
+import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.IncrementalTree.IncrementalTree;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 import BritefuryJ.IncrementalTree.IncrementalTreeNodeTable;
@@ -123,7 +125,32 @@ public class GSymView extends IncrementalTree
 			GSymFragmentView fragmentView = (GSymFragmentView)incrementalNode;
 			
 			// Create the view fragment
-			DPElement fragment = perspective.present( docNode, fragmentView, styleSheet, inheritedState );
+			DPElement fragment;
+			try
+			{
+				fragment = perspective.present( docNode, fragmentView, styleSheet, inheritedState );
+			}
+			catch (Exception e)
+			{
+				try
+				{
+					GenericPerspectiveStyleSheet gs = GenericPerspectiveStyleSheet.instance;
+					DPElement exceptionView = view.browserContext.getGenericPerspective().present( e, fragmentView, GenericPerspectiveStyleSheet.instance, inheritedState );
+					fragment = gs.errorBox( "Presentation error - exception during presentation", exceptionView );
+				}
+				catch (Exception e2)
+				{
+					GenericPerspectiveStyleSheet gs = GenericPerspectiveStyleSheet.instance;
+					PrimitiveStyleSheet labelStyle = PrimitiveStyleSheet.instance;
+					PrimitiveStyleSheet exceptionStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 1.0f, 0.2f, 0.0f ) );
+					
+					fragment = gs.errorBox( "DOUBLE EXCEPTION!", PrimitiveStyleSheet.instance.vbox( new DPElement[] {
+							labelStyle.staticText( "Got exception:" ),
+							exceptionStyle.staticText( e2.toString() ).padX( 15.0, 0.0 ),
+							labelStyle.staticText( "While trying to display exception:" ),
+							exceptionStyle.staticText( e.toString() ).padX( 15.0, 0.0 )   } ) );
+				}
+			}
 			
 			view.profile_stopPython();
 			
