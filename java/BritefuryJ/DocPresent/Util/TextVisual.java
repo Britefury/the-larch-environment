@@ -81,7 +81,7 @@ public class TextVisual
 		{
 			if ( attrib == TextAttribute.FONT )
 			{
-				return Character.isUpperCase( text.charAt( getIndex() ) )  ?  upperCaseFont  :  lowerCaseFont;
+				return Character.isLowerCase( text.charAt( getIndex() ) )  ?  lowerCaseFont  :  upperCaseFont;
 			}
 			else
 			{
@@ -91,15 +91,15 @@ public class TextVisual
 
 		public Map<Attribute, Object> getAttributes()
 		{
-			return Character.isUpperCase( text.charAt( getIndex() ) )  ?  upperCaseAttribs  :  lowerCaseAttribs;
+			return Character.isLowerCase( text.charAt( getIndex() ) )  ?  lowerCaseAttribs  :  upperCaseAttribs;
 		}
 
 		public int getRunLimit()
 		{
-			boolean bUpperCase = Character.isUpperCase( text.charAt( getIndex() ) );
+			boolean bLowerCase = Character.isLowerCase( text.charAt( getIndex() ) );
 			for (int i = getIndex() + 1; i < getEndIndex(); i++)
 			{
-				if ( bUpperCase != Character.isUpperCase( text.charAt( i ) ) )
+				if ( bLowerCase != Character.isLowerCase( text.charAt( i ) ) )
 				{
 					return i;
 				}
@@ -134,10 +134,10 @@ public class TextVisual
 
 		public int getRunStart()
 		{
-			boolean bUpperCase = Character.isUpperCase( text.charAt( getIndex() ) );
+			boolean bLowerCase = Character.isLowerCase( text.charAt( getIndex() ) );
 			for (int i = getIndex() - 1; i >= 0; i--)
 			{
-				if ( bUpperCase != Character.isUpperCase( text.charAt( i ) ) )
+				if ( bLowerCase != Character.isLowerCase( text.charAt( i ) ) )
 				{
 					return i + 1;
 				}

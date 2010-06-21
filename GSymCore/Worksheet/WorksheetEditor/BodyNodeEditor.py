@@ -15,9 +15,9 @@ from BritefuryJ.Logging import LogEntry
 from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
 
 from GSymCore.Worksheet import Schema, ViewSchema
-from GSymCore.Worksheet.WorksheetEditor.PythonCode import AddPythonCodeOperation
 from GSymCore.Worksheet.WorksheetEditor.TextNodeEditor import TextNodeJoinOperation, TextNodeSplitOperation
 from GSymCore.Worksheet.WorksheetEditor.SelectionEditor import WorksheetSelectionEditTreeEvent
+from GSymCore.Worksheet.WorksheetEditor.NodeOperations import AddNodeOperation
 
 
 
@@ -43,8 +43,8 @@ class BodyNodeEventListener (TreeEventListenerObjectDispatch):
 		return event.apply( node )
 	
 
-	@ObjectDispatchMethod( AddPythonCodeOperation )
-	def onAddPythonCode(self, element, sourceElement, event):
+	@ObjectDispatchMethod( AddNodeOperation )
+	def onAddNode(self, element, sourceElement, event):
 		ctx = element.getFragmentContext()
 		node = ctx.getDocNode()
 		
@@ -93,7 +93,7 @@ class BodyNodeEventListener (TreeEventListenerObjectDispatch):
 			if len( partialValue ) > 0:
 				partialValue[0]['text'] = partialValue[0]['text'] + t
 			else:
-				return False
+				partialValue.append( Schema.Paragraph( text=t, style='normal' ) )
 
 		for item in value.getItems():
 			if item.isStructural():

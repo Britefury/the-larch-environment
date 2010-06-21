@@ -13,9 +13,8 @@ from BritefuryJ.DocPresent import *
 from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
 
 from GSymCore.Worksheet import Schema, ViewSchema
-from GSymCore.Worksheet.WorksheetEditor.PythonCode import AddPythonCodeOperation
-from GSymCore.Worksheet.WorksheetEditor.TextNodeEditor import TextNodeJoinOperation
 from GSymCore.Worksheet.WorksheetEditor.TitleEditor import TitleOperation
+from GSymCore.Worksheet.WorksheetEditor.NodeOperations import AddNodeOperation
 
 
 class WorksheetNodeEventListener (TreeEventListenerObjectDispatch):
@@ -31,8 +30,8 @@ class WorksheetNodeEventListener (TreeEventListenerObjectDispatch):
 		return event.apply( node )
 
 	
-	@ObjectDispatchMethod( AddPythonCodeOperation )
-	def onAddPythonCode(self, element, sourceElement, event):
+	@ObjectDispatchMethod( AddNodeOperation )
+	def onAddNode(self, element, sourceElement, event):
 		ctx = element.getFragmentContext()
 		node = ctx.getDocNode()
 		

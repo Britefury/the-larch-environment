@@ -11,8 +11,7 @@ from BritefuryJ.DocPresent import *
 from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
 
 from GSymCore.Worksheet import Schema, ViewSchema
-from GSymCore.Worksheet.WorksheetEditor.TextStyle import TextStyleOperation
-from GSymCore.Worksheet.WorksheetEditor.PythonCode import NewPythonCodeRequest, AppendPythonCodeOperation
+from GSymCore.Worksheet.WorksheetEditor.NodeOperations import NodeRequest
 
 
 
@@ -25,22 +24,17 @@ class EmptyEventListener (TreeEventListenerObjectDispatch):
 		value = element.getTextRepresentation()
 		ctx = element.getFragmentContext()
 		node = ctx.getDocNode()
-		if '\n' not in value:
-			node.appendModel( ViewSchema.ParagraphView.newParagraphModel( text=value, style='normal' ) )
-			return True
-		else:
-			return False
-
-	@ObjectDispatchMethod( TextStyleOperation )
-	def onTextStyleOp(self, element, sourceElement, event):
-		ctx = element.getFragmentContext()
-		node = ctx.getDocNode()
-		node.appendModel( event.createTextModel( '' ) )
+		lines = value.split( '\n' )
+		if lines[-1] == ''  and  len( lines ) > 1:
+			del lines[-1]
+		for line in lines:
+			node.appendModel( ViewSchema.ParagraphView.newParagraphModel( text=line, style='normal' ) )
 		return True
-		
-	@ObjectDispatchMethod( NewPythonCodeRequest )
-	def onNewPythonCode(self, element, sourceElement, event):
-		return element.postTreeEvent( AppendPythonCodeOperation() )
+
+	
+	@ObjectDispatchMethod( NodeRequest )
+	def onNodeRequest(self, element, sourceElement, event):
+		return event.applyToEmpty( element.getFragmentContext().getDocNode(), element )
 
 
 EmptyEventListener.instance = EmptyEventListener()

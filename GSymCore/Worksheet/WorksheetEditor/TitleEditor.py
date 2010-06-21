@@ -7,12 +7,13 @@
 ##-*************************
 from BritefuryJ.DocPresent import *
 
+from BritefuryJ.Logging import LogEntry
 
 from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
 
 from GSymCore.Worksheet import Schema, ViewSchema
-from GSymCore.Worksheet.WorksheetEditor.TextStyle import TextStyleOperation
-from GSymCore.Worksheet.WorksheetEditor.PythonCode import NewPythonCodeRequest, PrependPythonCodeOperation
+from GSymCore.Worksheet.WorksheetEditor.SelectionEditor import WorksheetSelectionEditTreeEvent
+from GSymCore.Worksheet.WorksheetEditor.NodeOperations import NodeRequest
 
 
 
@@ -63,16 +64,11 @@ class TitleEventListener (TreeEventListenerObjectDispatch):
 		return True
 
 
-	@ObjectDispatchMethod( TextStyleOperation )
-	def onTextStyleOp(self, element, sourceElement, event):
-		ctx = element.getFragmentContext()
-		node = ctx.getDocNode()
-		node.prependBodyContentsModel( event.createTextModel( '' ) )
-		return True
-		
-	@ObjectDispatchMethod( NewPythonCodeRequest )
-	def onNewPythonCode(self, element, sourceElement, event):
-		return element.postTreeEvent( PrependPythonCodeOperation() )
+	@ObjectDispatchMethod( NodeRequest )
+	def onNodeRequest(self, element, sourceElement, event):
+		return event.applyToTitle( element.getFragmentContext().getDocNode(), element )
 
-	
+
+
+
 TitleEventListener.instance = TitleEventListener()	
