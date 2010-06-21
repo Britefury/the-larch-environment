@@ -170,7 +170,7 @@ public class Range implements IncrementalOwner, Presentable
 
 
 	@Override
-	public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		incr.onAccess();
 		DPElement rangeField = styleSheet.horizontalObjectField( "Valid range:",

@@ -403,9 +403,9 @@ public class AttributeTable implements Presentable
 	}
 	
 	@Override
-	public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
-		DPElement valueField = styleSheet.verticalObjectField( "Attributes:", presentAttributeMap( ctx, styleSheet, inheritedState, values ) );
+		DPElement valueField = styleSheet.verticalObjectField( "Attributes:", presentAttributeMap( fragment, styleSheet, inheritedState, values ) );
 		return styleSheet.objectBoxWithFields( getClass().getName(), new DPElement[] { valueField } );
 	}
 	

@@ -39,7 +39,7 @@ public abstract class Border implements Presentable
 	
 
 	@Override
-	public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		return styleSheet.objectBox( getClass().getName(), PrimitiveStyleSheet.instance.withBorder( this ).border( presentationSwatch() ) );
 	}

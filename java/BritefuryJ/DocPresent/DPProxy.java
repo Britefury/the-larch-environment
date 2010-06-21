@@ -200,4 +200,23 @@ public class DPProxy extends DPContainer
 		
 		return false;
 	}
+
+
+
+
+	// Proxy elements should propagate alignment to the child element
+	protected void setAlignmentFlags(int alignmentFlags)
+	{
+		getChild().setAlignmentFlags( alignmentFlags );
+	}
+	
+	protected void setHAlignmentFlags(int alignmentFlags)
+	{
+		getChild().setHAlignmentFlags( alignmentFlags );
+	}
+	
+	protected void setVAlignmentFlags(int alignmentFlags)
+	{
+		getChild().setVAlignmentFlags( alignmentFlags );
+	}
 }

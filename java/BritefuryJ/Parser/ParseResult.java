@@ -245,7 +245,7 @@ public class ParseResult implements ParseResultInterface, Presentable
 
 
 	@Override
-	public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		DPElement fields[];
 		
@@ -258,7 +258,7 @@ public class ParseResult implements ParseResultInterface, Presentable
 							PrimitiveStyleSheet.instance.staticText( " to " ),
 							rangeStyle.staticText( String.valueOf( getEnd() ) ) } ) );
 			
-			DPElement valueView = ctx.presentFragment( getValue(), styleSheet, inheritedState );
+			DPElement valueView = fragment.presentFragment( getValue(), styleSheet, inheritedState );
 			DPElement value = parseResultStyle.verticalObjectField( "Value:", valueView );
 			fields = new DPElement[] { status, range, value };
 		}

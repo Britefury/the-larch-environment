@@ -36,8 +36,8 @@ public class DebugParseResult extends ParseResult implements DebugParseResultInt
 
 
 	@Override
-	public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
-		return ParseView.presentDebugParseResult( this, ctx, styleSheet, inheritedState );
+		return ParseView.presentDebugParseResult( this, fragment, styleSheet, inheritedState );
 	}
 }

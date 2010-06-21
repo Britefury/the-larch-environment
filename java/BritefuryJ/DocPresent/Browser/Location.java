@@ -129,10 +129,10 @@ public class Location implements Presentable
 
 
 		@Override
-		public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 		{
 			// TODO: Check for infinitely recursive nesting
-			return ctx.presentLocationAsElement( loc );
+			return fragment.presentLocationAsElement( loc );
 		}
 	}
 	
@@ -214,7 +214,7 @@ public class Location implements Presentable
 	}
 
 
-	public DPElement present(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		return locationStyle.objectBox( "Location", PrimitiveStyleSheet.instance.staticText( locationString ) );
 	}
