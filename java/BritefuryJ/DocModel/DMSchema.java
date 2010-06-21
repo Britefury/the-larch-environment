@@ -7,21 +7,45 @@
 package BritefuryJ.DocModel;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 import org.python.core.Py;
 
 public class DMSchema
 {
-	public static class UnknownClassException extends Exception
+	public static class UnknownClassException extends RuntimeException
 	{
 		private static final long serialVersionUID = 1L;
 	}
 
-	public static class ClassAlreadyDefinedException extends Exception
+	public static class ClassAlreadyDefinedException extends RuntimeException
 	{
 		private static final long serialVersionUID = 1L;
 	}
 
+	
+	
+	
+	public static class InvalidSchemaNameException extends RuntimeException
+	{
+		private static final long serialVersionUID = 1L;
+		
+		public InvalidSchemaNameException(String message)
+		{
+			super( message );
+		}
+	}
+
+	
+	private static final HashSet<String> disallowedSchemaNames = new HashSet<String>();
+
+	
+	static
+	{
+	}
+
+	
+	
 	
 	private String schemaName, shortName, moduleLocation;
 	private HashMap<String, DMObjectClass> classes;
@@ -30,6 +54,7 @@ public class DMSchema
 	
 	public DMSchema(String name, String shortName, String location)
 	{
+		checkSchemaNameValidity( name );
 		this.schemaName = name;
 		this.shortName = shortName;
 		this.moduleLocation = location;
@@ -55,7 +80,7 @@ public class DMSchema
 	
 	
 	
-	public DMObjectClass get(String name) throws UnknownClassException
+	public DMObjectClass get(String name)
 	{
 		DMObjectClass c = classes.get( name );
 		if ( c == null )
@@ -65,7 +90,7 @@ public class DMSchema
 		return c;
 	}
 	
-	protected void registerClass(String name, DMObjectClass c) throws ClassAlreadyDefinedException
+	protected void registerClass(String name, DMObjectClass c)
 	{
 		if ( classes.containsKey( name ) )
 		{
@@ -88,23 +113,43 @@ public class DMSchema
 	
 	
 	
-	public DMObjectClass newClass(String name, DMObjectField fields[]) throws ClassAlreadyDefinedException
+	public DMObjectClass newClass(String name, DMObjectField fields[])
 	{
 		return new DMObjectClass( this, name, fields );
 	}
 
-	public DMObjectClass newClass(String name, String fieldNames[]) throws ClassAlreadyDefinedException
+	public DMObjectClass newClass(String name, String fieldNames[])
 	{
 		return new DMObjectClass( this, name, fieldNames );
 	}
 
-	public DMObjectClass newClass(String name, DMObjectClass superClass, DMObjectField fields[]) throws ClassAlreadyDefinedException
+	public DMObjectClass newClass(String name, DMObjectClass superClass, DMObjectField fields[])
 	{
 		return new DMObjectClass( this, name, superClass, fields );
 	}
 
-	public DMObjectClass newClass(String name, DMObjectClass superClass, String fieldNames[]) throws ClassAlreadyDefinedException
+	public DMObjectClass newClass(String name, DMObjectClass superClass, String fieldNames[])
 	{
 		return new DMObjectClass( this, name, superClass, fieldNames );
+	}
+
+
+
+	
+	
+	
+	private static void checkSchemaNameValidity(String name)
+	{
+		if ( DMNodeClass.validNamePattern.matcher( name ).matches() )
+		{
+			if ( disallowedSchemaNames.contains( name ) )
+			{
+				throw new InvalidSchemaNameException( "Invalid schema name '" + name + "'; name cannot be any of " + disallowedSchemaNames );
+			}
+		}
+		else
+		{
+			throw new InvalidSchemaNameException( "Invalid schema name '" + name + "'; name should be an identifier" );
+		}
 	}
 }

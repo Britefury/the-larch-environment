@@ -15,7 +15,7 @@ import org.python.core.PyInteger;
 import org.python.core.PyObject;
 
 import BritefuryJ.DocModel.DMObjectClass;
-import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
+import BritefuryJ.DocModel.DMObjectClass.UnknownFieldNameException;
 import BritefuryJ.Parser.Choice;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
@@ -31,19 +31,19 @@ public class InfixChainLevel extends OperatorLevel
 		private String fieldNames[];
 		
 		
-		public BuildASTNodeInfixChainAction(DMObjectClass nodeClass, String leftFieldName, String rightListFieldName) throws InvalidFieldNameException
+		public BuildASTNodeInfixChainAction(DMObjectClass nodeClass, String leftFieldName, String rightListFieldName)
 		{
 			this.nodeClass = nodeClass;
 			this.fieldNames = new String[] { leftFieldName, rightListFieldName };
 
 			if ( nodeClass.getFieldIndex( leftFieldName ) == -1 )
 			{
-				throw new InvalidFieldNameException( leftFieldName );
+				throw new UnknownFieldNameException( leftFieldName );
 			}
 
 			if ( nodeClass.getFieldIndex( rightListFieldName ) == -1 )
 			{
-				throw new InvalidFieldNameException( rightListFieldName );
+				throw new UnknownFieldNameException( rightListFieldName );
 			}
 		}
 		
@@ -54,7 +54,7 @@ public class InfixChainLevel extends OperatorLevel
 			{
 				return nodeClass.newInstance( fieldNames, new Object[] { x, ys } );
 			}
-			catch (InvalidFieldNameException e)
+			catch (UnknownFieldNameException e)
 			{
 				throw new RuntimeException( "This should not have happened." );
 			}
@@ -114,14 +114,14 @@ public class InfixChainLevel extends OperatorLevel
 		private String fieldNames[];
 		
 		
-		public BuildASTNodeChainOperatorAction(DMObjectClass nodeClass, String fieldName) throws InvalidFieldNameException
+		public BuildASTNodeChainOperatorAction(DMObjectClass nodeClass, String fieldName)
 		{
 			this.nodeClass = nodeClass;
 			this.fieldNames = new String[] { fieldName };
 
 			if ( nodeClass.getFieldIndex( fieldName ) == -1 )
 			{
-				throw new InvalidFieldNameException( fieldName );
+				throw new UnknownFieldNameException( fieldName );
 			}
 		}
 		
@@ -132,7 +132,7 @@ public class InfixChainLevel extends OperatorLevel
 			{
 				return nodeClass.newInstance( fieldNames, new Object[] { x } );
 			}
-			catch (InvalidFieldNameException e)
+			catch (UnknownFieldNameException e)
 			{
 				throw new RuntimeException( "This should not have happened." );
 			}
@@ -197,7 +197,7 @@ public class InfixChainLevel extends OperatorLevel
 		this.action = new InfixChainAction( action );
 	}
 	
-	public InfixChainLevel(List<ChainOperator> operators, DMObjectClass nodeClass, String leftFieldName, String rightListFieldName) throws InvalidFieldNameException
+	public InfixChainLevel(List<ChainOperator> operators, DMObjectClass nodeClass, String leftFieldName, String rightListFieldName)
 	{
 		this( operators, new BuildASTNodeInfixChainAction( nodeClass, leftFieldName, rightListFieldName ) );
 	}

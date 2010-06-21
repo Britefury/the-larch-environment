@@ -12,7 +12,7 @@ import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectField;
 import BritefuryJ.DocModel.DMSchema;
-import BritefuryJ.DocModel.DMSchema.ClassAlreadyDefinedException;
+import BritefuryJ.DocModel.DMSchema.InvalidSchemaNameException;
 
 public class Test_DMObjectClass extends TestCase
 {
@@ -21,7 +21,14 @@ public class Test_DMObjectClass extends TestCase
 	
 	public void setUp()
 	{
-		m = new DMSchema( "m", "m", "test.m" );
+		try
+		{
+			m = new DMSchema( "m", "m", "test.m" );
+		}
+		catch (InvalidSchemaNameException e)
+		{
+			throw new RuntimeException( e.toString() );
+		}
 	}
 	
 	public void tearDown()
@@ -30,7 +37,7 @@ public class Test_DMObjectClass extends TestCase
 	}
 	
 	
-	public void test_Constructor_fields() throws ClassAlreadyDefinedException
+	public void test_Constructor_fields()
 	{
 		DMObjectField f1[] = { new DMObjectField( "x" ) };
 		DMObjectClass a0 = m.newClass( "A", new DMObjectField[] { } );
@@ -64,7 +71,7 @@ public class Test_DMObjectClass extends TestCase
 	}
 
 
-	public void test_Constructor_names() throws ClassAlreadyDefinedException
+	public void test_Constructor_names()
 	{
 		String f1[] = { "x" };
 		DMObjectClass a0 = m.newClass( "A", new String[] { } );
@@ -98,7 +105,7 @@ public class Test_DMObjectClass extends TestCase
 	}
 
 
-	public void test_Constructor_superclass_fields() throws ClassAlreadyDefinedException
+	public void test_Constructor_superclass_fields()
 	{
 		DMObjectField af[] = { new DMObjectField( "x" ) };
 		DMObjectClass a = m.newClass( "A", af );

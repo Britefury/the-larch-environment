@@ -17,8 +17,7 @@ import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMSchema;
-import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
-import BritefuryJ.DocModel.DMSchema.ClassAlreadyDefinedException;
+import BritefuryJ.DocModel.DMSchema.InvalidSchemaNameException;
 
 public class Test_DMObject extends Test_DMNode_base
 {
@@ -29,7 +28,14 @@ public class Test_DMObject extends Test_DMNode_base
 	public void setUp()
 	{
 		history = new CommandHistory();
-		m = new DMSchema( "m", "m", "test.m" );
+		try
+		{
+			m = new DMSchema( "m", "m", "test.m" );
+		}
+		catch (InvalidSchemaNameException e)
+		{
+			throw new RuntimeException( e.toString() );
+		}
 	}
 	
 	public void tearDown()
@@ -40,7 +46,7 @@ public class Test_DMObject extends Test_DMNode_base
 
 	
 	
-	public void test_getDMClass() throws InvalidFieldNameException, ClassAlreadyDefinedException
+	public void test_getDMClass()
 	{
 		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
 		DMObject a = A.newInstance( new Object[] { "a", "p" } );
@@ -50,7 +56,7 @@ public class Test_DMObject extends Test_DMNode_base
 	}
 
 		
-	public void test_getFieldIndex() throws InvalidFieldNameException, ClassAlreadyDefinedException
+	public void test_getFieldIndex()
 	{
 		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
 		DMObject a = A.newInstance( new Object[] { "a", "p" } );
@@ -61,7 +67,7 @@ public class Test_DMObject extends Test_DMNode_base
 	}
 
 
-	public void test_DMObject_getFieldNames() throws InvalidFieldNameException, ClassAlreadyDefinedException
+	public void test_DMObject_getFieldNames()
 	{
 		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
 		DMObject a = A.newInstance( new Object[] { "a", "p" } );
@@ -71,7 +77,7 @@ public class Test_DMObject extends Test_DMNode_base
 	}
 
 		
-	public void test_DMObject_getFieldValuesImmutable() throws InvalidFieldNameException, ClassAlreadyDefinedException
+	public void test_DMObject_getFieldValuesImmutable()
 	{
 		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
 		DMObject a = A.newInstance( new Object[] { "a", null } );
@@ -81,7 +87,7 @@ public class Test_DMObject extends Test_DMNode_base
 	}
 
 	
-	public void test_get() throws InvalidFieldNameException, ClassAlreadyDefinedException
+	public void test_get()
 	{
 		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
 		DMObject a = A.newInstance( new Object[] { "a", null } );
@@ -94,7 +100,7 @@ public class Test_DMObject extends Test_DMNode_base
 	}
 
 
-	public void test_getitem() throws InvalidFieldNameException, ClassAlreadyDefinedException
+	public void test_getitem()
 	{
 		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
 		DMObject a = A.newInstance( new Object[] { "a", null } );
@@ -107,7 +113,7 @@ public class Test_DMObject extends Test_DMNode_base
 	}
 
 
-	public void test_set() throws InvalidFieldNameException, ClassAlreadyDefinedException
+	public void test_set()
 	{
 		DMList ij = new DMList();
 		ij.extend( Arrays.asList( new Object[] { "i", "j" } ) );
@@ -176,7 +182,7 @@ public class Test_DMObject extends Test_DMNode_base
 	}
 
 
-	public void test_update() throws InvalidFieldNameException, ClassAlreadyDefinedException
+	public void test_update()
 	{
 		DMList ij = new DMList();
 		ij.extend( Arrays.asList( new Object[] { "i", "j" } ) );
@@ -212,7 +218,7 @@ public class Test_DMObject extends Test_DMNode_base
 	}
 
 
-	public void test_become() throws InvalidFieldNameException, ClassAlreadyDefinedException
+	public void test_become()
 	{
 		DMList ij = new DMList();
 		ij.extend( Arrays.asList( new Object[] { "i", "j" } ) );
@@ -251,7 +257,7 @@ public class Test_DMObject extends Test_DMNode_base
 	}
 
 
-	public void test_setitem() throws InvalidFieldNameException, ClassAlreadyDefinedException
+	public void test_setitem()
 	{
 		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
 		DMObject a = A.newInstance( new Object[] { "a", "p" } );
@@ -263,7 +269,7 @@ public class Test_DMObject extends Test_DMNode_base
 		assertEquals( Arrays.asList( a.getFieldValuesImmutable() ), Arrays.asList( new Object[] { "e", null } ) );
 	}
 
-	public void test_getChildren() throws InvalidFieldNameException, ClassAlreadyDefinedException
+	public void test_getChildren()
 	{
 		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
 		DMObject a = A.newInstance( new Object[] { "a", "p" } );
@@ -280,7 +286,7 @@ public class Test_DMObject extends Test_DMNode_base
 
 	
 	
-	public void test_DMObject_constructors() throws InvalidFieldNameException, ClassAlreadyDefinedException
+	public void test_DMObject_constructors()
 	{
 		HashMap<String, Object> data = new HashMap<String, Object>();
 		data.put( "x", "d" );
@@ -306,7 +312,7 @@ public class Test_DMObject extends Test_DMNode_base
 	
 	
 	
-	public void test_trackTree() throws InvalidFieldNameException, ClassAlreadyDefinedException
+	public void test_trackTree()
 	{
 		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
 		DMObject c = A.newInstance( new Object[] { "c", "r" } );
@@ -367,7 +373,7 @@ public class Test_DMObject extends Test_DMNode_base
 	}
 	
 	
-	public void test_equals() throws ClassAlreadyDefinedException
+	public void test_equals()
 	{
 		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
 		

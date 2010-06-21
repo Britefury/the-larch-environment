@@ -10,8 +10,6 @@ import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMSchema;
-import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
-import BritefuryJ.DocModel.DMSchema.ClassAlreadyDefinedException;
 import BritefuryJ.Transformation.DefaultIdentityTransformationFunction;
 import BritefuryJ.Transformation.Transformation;
 import BritefuryJ.Transformation.TransformationFunction;
@@ -27,16 +25,9 @@ public class Test_Transformation extends TestCase
 	public void setUp()
 	{
 		m = new DMSchema( "m", "m", "test.m" );
-		try
-		{
-			TwoStrings = m.newClass( "TwoStrings", new String[] { "s", "t" } );
-			TwoNodes = m.newClass( "TwoNodes", new String[] { "m", "n" } );
-			StringNode = m.newClass( "StringNode", new String[] { "s", "n" } );
-		}
-		catch (ClassAlreadyDefinedException e)
-		{
-			fail();
-		}
+		TwoStrings = m.newClass( "TwoStrings", new String[] { "s", "t" } );
+		TwoNodes = m.newClass( "TwoNodes", new String[] { "m", "n" } );
+		StringNode = m.newClass( "StringNode", new String[] { "s", "n" } );
 		
 		
 		data_s = TwoStrings.newInstance( new Object[] { "a", "b" } );
@@ -62,14 +53,7 @@ public class Test_Transformation extends TestCase
 				DMObject dx = (DMObject)x;
 				if ( dx.getDMObjectClass() == StringNode )
 				{
-					try
-					{
-						return StringNode.newInstance( new Object[] { (String)dx.get( "s" ) + "jk", innerNodeXform.apply( dx.get( "n" ), innerNodeXform ) } );
-					}
-					catch (InvalidFieldNameException e)
-					{
-						throw new RuntimeException();
-					}
+					return StringNode.newInstance( new Object[] { (String)dx.get( "s" ) + "jk", innerNodeXform.apply( dx.get( "n" ), innerNodeXform ) } );
 				}
 				else
 				{
@@ -85,14 +69,7 @@ public class Test_Transformation extends TestCase
 				DMObject dx = (DMObject)x;
 				if ( dx.getDMObjectClass() == StringNode )
 				{
-					try
-					{
-						return StringNode.newInstance( new Object[] { (String)dx.get( "s" ) + "pq", innerNodeXform.apply( dx.get( "n" ), innerNodeXform ) } );
-					}
-					catch (InvalidFieldNameException e)
-					{
-						throw new RuntimeException();
-					}
+					return StringNode.newInstance( new Object[] { (String)dx.get( "s" ) + "pq", innerNodeXform.apply( dx.get( "n" ), innerNodeXform ) } );
 				}
 				else
 				{
@@ -108,21 +85,14 @@ public class Test_Transformation extends TestCase
 				DMObject dx = (DMObject)x;
 				if ( dx.getDMObjectClass() == StringNode )
 				{
-					try
+					String s = (String)dx.get( "s" );
+					if ( s.startsWith( "x" ) )
 					{
-						String s = (String)dx.get( "s" );
-						if ( s.startsWith( "x" ) )
-						{
-							return StringNode.newInstance( new Object[] { "pq" + s, innerNodeXform.apply( dx.get( "n" ), innerNodeXform ) } );
-						}
-						else
-						{
-							return TransformationFunction.cannotApplyTransformationValue;
-						}
+						return StringNode.newInstance( new Object[] { "pq" + s, innerNodeXform.apply( dx.get( "n" ), innerNodeXform ) } );
 					}
-					catch (InvalidFieldNameException e)
+					else
 					{
-						throw new RuntimeException();
+						return TransformationFunction.cannotApplyTransformationValue;
 					}
 				}
 				else

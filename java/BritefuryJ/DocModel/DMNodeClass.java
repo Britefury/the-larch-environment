@@ -7,10 +7,14 @@
 package BritefuryJ.DocModel;
 
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 
 public class DMNodeClass
 {
+	protected static Pattern validNamePattern = Pattern.compile( "[a-zA-Z_][a-zA-Z0-9_]*" );
+
+	
 	protected String name;
 	protected HashMap<String, DMClassAttribute> classAttributes = new HashMap<String, DMClassAttribute>();
 	

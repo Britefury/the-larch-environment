@@ -14,8 +14,6 @@ import java.util.Map;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMSchema;
 import BritefuryJ.DocModel.DMSchemaResolver;
-import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
-import BritefuryJ.DocModel.DMSchema.ClassAlreadyDefinedException;
 import BritefuryJ.Parser.Action;
 import BritefuryJ.Parser.AnyList;
 import BritefuryJ.Parser.AnyNode;
@@ -63,7 +61,7 @@ public class Test_Parser extends ParserTestCase
 	protected DMObjectClass Foo, Bar, Bar2, A, Add, Sub, Mul;
 	protected DMSchemaResolver resolver = new DMSchemaResolver()
 	{
-		public DMSchema getSchema(String location) throws CouldNotResolveSchemaException
+		public DMSchema getSchema(String location)
 		{
 			return location.equals( "s" )  ? s :  null;
 		}
@@ -80,20 +78,13 @@ public class Test_Parser extends ParserTestCase
 	public void setUp()
 	{
 		s = new DMSchema( "s", "m", "s" );
-		try
-		{
-			Foo = s.newClass( "Foo", new String[] { "a" } );
-			Bar = s.newClass( "Bar", new String[] { "b" } );
-			Bar2 = s.newClass( "Bar2", Bar, new String[] { "c" } );
-			A = s.newClass( "A", new String[] { "x", "y" } );
-			Add = s.newClass( "Add", new String[] { "a", "b" } );
-			Sub = s.newClass( "Sub", new String[] { "a", "b" } );
-			Mul = s.newClass( "Mul", new String[] { "a", "b" } );
-		}
-		catch (ClassAlreadyDefinedException e)
-		{
-			throw new RuntimeException();
-		}
+		Foo = s.newClass( "Foo", new String[] { "a" } );
+		Bar = s.newClass( "Bar", new String[] { "b" } );
+		Bar2 = s.newClass( "Bar2", Bar, new String[] { "c" } );
+		A = s.newClass( "A", new String[] { "x", "y" } );
+		Add = s.newClass( "Add", new String[] { "a", "b" } );
+		Sub = s.newClass( "Sub", new String[] { "a", "b" } );
+		Mul = s.newClass( "Mul", new String[] { "a", "b" } );
 	}
 	
 	public void tearDown()
@@ -262,7 +253,7 @@ public class Test_Parser extends ParserTestCase
 	}
 
 
-	public void testBind() throws InvalidFieldNameException
+	public void testBind()
 	{
 		ParserExpression parser1 = identifier.bindTo(  "x" );
 		
@@ -279,7 +270,7 @@ public class Test_Parser extends ParserTestCase
 	}
 
 	
-	public void testChoice() throws ParserExpression.ParserCoerceException, InvalidFieldNameException
+	public void testChoice() throws ParserExpression.ParserCoerceException
 	{
 		Object[] abqwfh = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
 		Object[] abqw = { new Literal( "ab" ), new Literal( "qw" ) };
@@ -330,7 +321,7 @@ public class Test_Parser extends ParserTestCase
 	}
 
 
-	public void testClearBindings() throws InvalidFieldNameException
+	public void testClearBindings()
 	{
 		ParserExpression parser1 = identifier.bindTo(  "x" );
 		
@@ -351,7 +342,7 @@ public class Test_Parser extends ParserTestCase
 	}
 
 	
-	public void testCombine() throws ParserExpression.ParserCoerceException, InvalidFieldNameException
+	public void testCombine() throws ParserExpression.ParserCoerceException
 	{
 		Object[] abqwfh = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
 		Object[] abqw = { new Literal( "ab" ), new Literal( "qw" ) };
@@ -585,7 +576,7 @@ public class Test_Parser extends ParserTestCase
 	}
 
 
-	public void testObjectNode() throws InvalidFieldNameException, ParserCoerceException
+	public void testObjectNode() throws ParserCoerceException
 	{
 		ParserExpression parser1 = new ObjectNode( A, new String[] { "x" }, new Object[] { new Literal( "abc" ) } );
 		matchTestNodeSX( parser1, "{m=s : (m A x=abc y=xyz)}", "{m=s : (m A x=abc y=xyz)}" );
@@ -1349,7 +1340,7 @@ public class Test_Parser extends ParserTestCase
 		matchTestStringAndStreamSX( z, "yxxx", "[[[y x] x] x]" );
 	}
 
-	public void testLeftRecursion() throws Production.CannotOverwriteProductionExpressionException, ClassAlreadyDefinedException, InvalidFieldNameException
+	public void testLeftRecursion() throws Production.CannotOverwriteProductionExpressionException
 	{
 		DMObjectClass Num = s.newClass( "Num", new String[] { "x" } );
 		
@@ -1653,7 +1644,7 @@ public class Test_Parser extends ParserTestCase
 
 	
 	
-	public void testLerpRefactorObject() throws InvalidFieldNameException, ParserCoerceException
+	public void testLerpRefactorObject() throws ParserCoerceException
 	{
 		ParseCondition lerpCondition = new ParseCondition()
 		{

@@ -44,14 +44,7 @@ public class Test_DMIOReader extends TestCase
 	public void setUp()
 	{
 		schema = new DMSchema( "schema", "m", "test.schema" );
-		try
-		{
-			A = schema.newClass( "A", new String[] { "x", "y" } );
-		}
-		catch (DMSchema.ClassAlreadyDefinedException e)
-		{
-			throw new RuntimeException();
-		}
+		A = schema.newClass( "A", new String[] { "x", "y" } );
 		
 		
 		resolver = new DMSchemaResolver()
@@ -132,21 +125,6 @@ public class Test_DMIOReader extends TestCase
 		catch (DMIOReader.ParseErrorException e)
 		{
 			System.out.println( "PARSE FAILURE: " + e.getMessage() );
-			fail();
-		}
-		catch (DMSchemaResolver.CouldNotResolveSchemaException e)
-		{
-			System.out.println( "PARSE FAILURE: COULD NOT RESOLVE MODULE" );
-			fail();
-		}
-		catch (DMSchema.UnknownClassException e)
-		{
-			System.out.println( "PARSE FAILURE : UNKNOWN CLASS" );
-			fail();
-		}
-		catch (DMIOReader.BadModuleNameException e)
-		{
-			System.out.println( "PARSE FAILURE : BAD MODULE NAME" );
 			fail();
 		}
 		

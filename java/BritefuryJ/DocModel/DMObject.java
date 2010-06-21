@@ -25,9 +25,7 @@ import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.CommandHistory.CommandTracker;
 import BritefuryJ.CommandHistory.CommandTrackerFactory;
 import BritefuryJ.CommandHistory.Trackable;
-import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
-import BritefuryJ.DocModel.DMSchema.UnknownClassException;
-import BritefuryJ.DocModel.DMSchemaResolver.CouldNotResolveSchemaException;
+import BritefuryJ.DocModel.DMObjectClass.UnknownFieldNameException;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
@@ -104,7 +102,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 		commandTracker = null;
 	}
 	
-	public DMObject(DMObjectClass objClass, String[] keys, Object[] values) throws InvalidFieldNameException
+	public DMObject(DMObjectClass objClass, String[] keys, Object[] values)
 	{
 		assert keys.length == values.length;
 		
@@ -117,7 +115,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			int index = objClass.getFieldIndex( keys[i] );
 			if ( index == -1 )
 			{
-				throw new InvalidFieldNameException( keys[i] );
+				throw new UnknownFieldNameException( keys[i] );
 			}
 			else
 			{
@@ -230,7 +228,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 		commandTracker = null;
 	}
 
-	public DMObject(DMObjectClass objClass, Map<String, Object> data) throws InvalidFieldNameException
+	public DMObject(DMObjectClass objClass, Map<String, Object> data)
 	{
 		incr = new IncrementalValueMonitor( this );
 		this.objClass = objClass;
@@ -241,7 +239,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			int index = objClass.getFieldIndex( entry.getKey() );
 			if ( index == -1 )
 			{
-				throw new InvalidFieldNameException( entry.getKey() );
+				throw new UnknownFieldNameException( entry.getKey() );
 			}
 			else
 			{
@@ -258,7 +256,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	}
 	
 	@SuppressWarnings("unchecked")
-	public DMObject(DMObjectClass objClass, PyDictionary data) throws InvalidFieldNameException
+	public DMObject(DMObjectClass objClass, PyDictionary data)
 	{
 		incr = new IncrementalValueMonitor( this );
 		this.objClass = objClass;
@@ -282,7 +280,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			int index = objClass.getFieldIndex( key );
 			if ( index == -1 )
 			{
-				throw new InvalidFieldNameException( key );
+				throw new UnknownFieldNameException( key );
 			}
 			else
 			{
@@ -384,13 +382,13 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 		return fieldData[value];
 	}
 	
-	public Object get(String key) throws InvalidFieldNameException
+	public Object get(String key)
 	{
 		onAccess();
 		int index = objClass.getFieldIndex( key );
 		if ( index == -1 )
 		{
-			throw new InvalidFieldNameException( key );
+			throw new UnknownFieldNameException( key );
 		}
 		else
 		{
@@ -422,12 +420,12 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 		}
 	}
 	
-	public void set(String key, Object x) throws InvalidFieldNameException
+	public void set(String key, Object x)
 	{
 		int index = objClass.getFieldIndex( key );
 		if ( index == -1 )
 		{
-			throw new InvalidFieldNameException( key );
+			throw new UnknownFieldNameException( key );
 		}
 		else
 		{
@@ -452,7 +450,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	
 	
 	
-	public void update(Map<String, Object> table) throws InvalidFieldNameException
+	public void update(Map<String, Object> table)
 	{
 		int indices[] = new int[table.size()];
 		Object oldContents[] = new Object[table.size()];
@@ -463,7 +461,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			int index = objClass.getFieldIndex( e.getKey() );
 			if ( index == -1 )
 			{
-				throw new InvalidFieldNameException( e.getKey() );
+				throw new UnknownFieldNameException( e.getKey() );
 			}
 			else
 			{
@@ -766,7 +764,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	// Serialisation
 	//
 	
-	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException, CouldNotResolveSchemaException, UnknownClassException, InvalidFieldNameException
+	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException
 	{
 		if ( stream instanceof DMObjectInputStream )
 		{
@@ -786,7 +784,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 				int index = objClass.getFieldIndex( keys[i] );
 				if ( index == -1 )
 				{
-					throw new InvalidFieldNameException( keys[i] );
+					throw new UnknownFieldNameException( keys[i] );
 				}
 				else
 				{

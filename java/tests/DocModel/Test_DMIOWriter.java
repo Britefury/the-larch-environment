@@ -16,7 +16,6 @@ import BritefuryJ.DocModel.DMIOWriter;
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMSchema;
-import BritefuryJ.DocModel.DMSchema.ClassAlreadyDefinedException;
 
 public class Test_DMIOWriter extends TestCase
 {
@@ -41,15 +40,8 @@ public class Test_DMIOWriter extends TestCase
 	{
 		schema = new DMSchema( "schema", "m", "test.schema" );
 		module2 = new DMSchema( "module2", "m", "test.module2" );
-		try
-		{
-			A = schema.newClass( "A", new String[] { "x", "y" } );
-			A2 = module2.newClass( "A2", new String[] { "x", "y" } );
-		}
-		catch (ClassAlreadyDefinedException e)
-		{
-			throw new RuntimeException();
-		}
+		A = schema.newClass( "A", new String[] { "x", "y" } );
+		A2 = module2.newClass( "A2", new String[] { "x", "y" } );
 	}
 	
 	public void tearDown()

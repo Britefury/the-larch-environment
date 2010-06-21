@@ -8,27 +8,54 @@ package BritefuryJ.DocModel;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 import org.python.core.PyObject;
 
-import BritefuryJ.DocModel.DMSchema.ClassAlreadyDefinedException;
 import BritefuryJ.Parser.ObjectNode;
 import BritefuryJ.Parser.ParserExpression.ParserCoerceException;
 
 
 public class DMObjectClass extends DMNodeClass
 {
-	public static class InvalidFieldNameException extends Exception
+	public static class UnknownFieldNameException extends RuntimeException
 	{
 		private static final long serialVersionUID = 1L;
 		
-		public InvalidFieldNameException(String fieldName)
+		public UnknownFieldNameException(String fieldName)
 		{
-			super( "Invalid field name: '" + fieldName + "'" );
+			super( "Unknown field name: '" + fieldName + "'" );
 		}
 	}
+	
+	public static class InvalidClassNameException extends RuntimeException
+	{
+		private static final long serialVersionUID = 1L;
+		
+		public InvalidClassNameException(String message)
+		{
+			super( message );
+		}
+	}
+
+	
+	private static final HashSet<String> disallowedClassNames = new HashSet<String>();
+
+	
+	static
+	{
+		disallowedClassNames.add( "DMNode" );
+		disallowedClassNames.add( "DMNodeClass" );
+		disallowedClassNames.add( "DMObject" );
+		disallowedClassNames.add( "DMObjectClass" );
+		disallowedClassNames.add( "DMList" );
+		disallowedClassNames.add( "DMSchema" );
+	}
+
+	
+	
 	
 
 	
@@ -40,9 +67,10 @@ public class DMObjectClass extends DMNodeClass
 	
 	
 	
-	public DMObjectClass(DMSchema schema, String name, DMObjectField fields[]) throws ClassAlreadyDefinedException
+	public DMObjectClass(DMSchema schema, String name, DMObjectField fields[])
 	{
 		super( name );
+		checkClassNameValidity( name );
 		this.schema = schema;
 		superclass = null;
 		superclasses = new DMObjectClass[0];
@@ -52,17 +80,18 @@ public class DMObjectClass extends DMNodeClass
 		initialise();
 	}
 	
-	public DMObjectClass(DMSchema schema, String name, String fieldNames[]) throws ClassAlreadyDefinedException
+	public DMObjectClass(DMSchema schema, String name, String fieldNames[])
 	{
-		this(schema, name, DMObjectField.nameArrayToFieldArray( fieldNames ) );
+		this( schema, name, DMObjectField.nameArrayToFieldArray( fieldNames ) );
 	}
 	
 	
 	
-	public DMObjectClass(DMSchema schema, String name, DMObjectClass superclass, DMObjectField fields[]) throws ClassAlreadyDefinedException
+	public DMObjectClass(DMSchema schema, String name, DMObjectClass superclass, DMObjectField fields[])
 	{
 		super( name );
 		
+		checkClassNameValidity( name );
 		this.schema = schema;
 		
 		this.superclass = superclass;
@@ -78,14 +107,14 @@ public class DMObjectClass extends DMNodeClass
 		initialise();
 	}
 
-	public DMObjectClass(DMSchema schema, String name, DMObjectClass superclass, String fieldNames[]) throws ClassAlreadyDefinedException
+	public DMObjectClass(DMSchema schema, String name, DMObjectClass superclass, String fieldNames[])
 	{
-		this(schema, name, superclass, DMObjectField.nameArrayToFieldArray( fieldNames ) );
+		this( schema, name, superclass, DMObjectField.nameArrayToFieldArray( fieldNames ) );
 	}
 	
 	
 	
-	private void initialise() throws ClassAlreadyDefinedException
+	private void initialise()
 	{
 		fieldNameToIndex = new HashMap<String, Integer>();
 		for (int i = 0; i < allClassFields.length; i++)
@@ -178,7 +207,7 @@ public class DMObjectClass extends DMNodeClass
 		return new DMObject( this, values );
 	}
 
-	public DMObject newInstance(String keys[], Object values[]) throws InvalidFieldNameException
+	public DMObject newInstance(String keys[], Object values[])
 	{
 		return new DMObject( this, keys, values );
 	}
@@ -193,34 +222,34 @@ public class DMObjectClass extends DMNodeClass
 		return new DMObject( this, names, values );
 	}
 
-	public DMObject newInstance(Map<String, Object> data) throws InvalidFieldNameException
+	public DMObject newInstance(Map<String, Object> data)
 	{
 		return new DMObject( this, data );
 	}
 	
 	
 	
-	public ObjectNode parser() throws InvalidFieldNameException
+	public ObjectNode parser()
 	{
 		return new ObjectNode( this );
 	}
 	
-	public ObjectNode parser(Object fieldExps[]) throws InvalidFieldNameException, ParserCoerceException
+	public ObjectNode parser(Object fieldExps[]) throws ParserCoerceException
 	{
 		return new ObjectNode( this, fieldExps );
 	}
 	
-	public ObjectNode parser(String fieldNames[], Object fieldExps[]) throws InvalidFieldNameException, ParserCoerceException
+	public ObjectNode parser(String fieldNames[], Object fieldExps[]) throws ParserCoerceException
 	{
 		return new ObjectNode( this, fieldNames, fieldExps );
 	}
 	
-	public ObjectNode parser(PyObject values[], String names[]) throws InvalidFieldNameException, ParserCoerceException
+	public ObjectNode parser(PyObject values[], String names[]) throws ParserCoerceException
 	{
 		return new ObjectNode( this, names, values );
 	}
 	
-	public ObjectNode parser(Map<String, Object> data) throws InvalidFieldNameException, ParserCoerceException
+	public ObjectNode parser(Map<String, Object> data) throws ParserCoerceException
 	{
 		return new ObjectNode( this, data );
 	}
@@ -235,5 +264,25 @@ public class DMObjectClass extends DMNodeClass
 	public DMObject __call__(PyObject values[], String names[])
 	{
 		return newInstance( values, names );
+	}
+
+
+
+	
+	
+	
+	private static void checkClassNameValidity(String name)
+	{
+		if ( DMNodeClass.validNamePattern.matcher( name ).matches() )
+		{
+			if ( disallowedClassNames.contains( name ) )
+			{
+				throw new InvalidClassNameException( "Invalid class name '" + name + "'; name cannot be any of " + disallowedClassNames );
+			}
+		}
+		else
+		{
+			throw new InvalidClassNameException( "Invalid class name '" + name + "'; name should be an identifier" );
+		}
 	}
 }

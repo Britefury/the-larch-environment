@@ -30,14 +30,7 @@ public class Test_DocModelSerialisation extends TestCase
 	public void setUp()
 	{
 		schema = new DMSchema( "schema", "m", "test.schema" );
-		try
-		{
-			A = schema.newClass( "A", new String[] { "x", "y" } );
-		}
-		catch (DMSchema.ClassAlreadyDefinedException e)
-		{
-			throw new RuntimeException();
-		}
+		A = schema.newClass( "A", new String[] { "x", "y" } );
 		
 		
 		resolver = new DMSchemaResolver()

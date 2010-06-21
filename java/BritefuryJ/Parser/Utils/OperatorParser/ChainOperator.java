@@ -9,7 +9,6 @@ package BritefuryJ.Parser.Utils.OperatorParser;
 import org.python.core.PyObject;
 
 import BritefuryJ.DocModel.DMObjectClass;
-import BritefuryJ.DocModel.DMObjectClass.InvalidFieldNameException;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.Sequence;
 
@@ -23,7 +22,7 @@ public class ChainOperator extends Operator
 		this.action = action;
 	}
 
-	public ChainOperator(ParserExpression opExpression, DMObjectClass nodeClass, String fieldName) throws InvalidFieldNameException
+	public ChainOperator(ParserExpression opExpression, DMObjectClass nodeClass, String fieldName)
 	{
 		this( opExpression, new InfixChainLevel.BuildASTNodeChainOperatorAction( nodeClass, fieldName ) );
 	}
@@ -38,7 +37,7 @@ public class ChainOperator extends Operator
 		this( ParserExpression.coerce( operator ), action );
 	}
 
-	public ChainOperator(String operator, DMObjectClass nodeClass, String fieldName) throws InvalidFieldNameException
+	public ChainOperator(String operator, DMObjectClass nodeClass, String fieldName)
 	{
 		this( ParserExpression.coerce( operator ), new InfixChainLevel.BuildASTNodeChainOperatorAction( nodeClass, fieldName ) );
 	}
