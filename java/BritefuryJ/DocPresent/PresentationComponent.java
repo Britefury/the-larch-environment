@@ -814,14 +814,14 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		{
 			performAllocationForSpaceRequirements();
 			LayoutNodeRootElement rootLayout = (LayoutNodeRootElement)getLayoutNode();
-			return new Dimension( (int)( rootLayout.getReqMinWidth() + 1.0 ),  (int)( rootLayout.getReqHeight() ) );
+			return new Dimension( (int)( rootLayout.getReqMinWidth() + 1.0 ),  (int)( rootLayout.getReqHeight() + 1.0 ) );
 		}
 		
 		private Dimension getPreferredSize()
 		{
 			performAllocationForSpaceRequirements();
 			LayoutNodeRootElement rootLayout = (LayoutNodeRootElement)getLayoutNode();
-			return new Dimension( (int)( rootLayout.getReqPrefWidth() + 1.0 ),  (int)( rootLayout.getReqHeight() ) );
+			return new Dimension( (int)( rootLayout.getReqPrefWidth() + 1.0 ),  (int)( rootLayout.getReqHeight() + 1.0 ) );
 		}
 		
 		private Dimension getMaximumSize()
