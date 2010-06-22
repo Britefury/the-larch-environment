@@ -37,7 +37,7 @@ class ConsoleViewerStyleSheet (StyleSheet):
 		self.initAttr( 'blockStyleAttrs', AttributeValues( vboxSpacing=2.0, border=SolidBorder( 1.0, 5.0, 15.0, 15.0, Color( 0.25, 0.25, 0.25 ), Color( 0.8, 0.8, 0.8 ) ) ) )
 		
 		self.initAttr( 'pythonModuleBorderAttrs', AttributeValues( border=SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), Color.WHITE ) ) )
-		self.initAttr( 'dropPromptAttrs', AttributeValues( border=SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.0, 0.8, 0.0 ), Color.WHITE ) ) )
+		self.initAttr( 'dropPromptAttrs', AttributeValues( border=SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.0, 0.8, 0.0 ), None ) ) )
 		
 		self.initAttr( 'varAssignVarNameAttrs', AttributeValues( fontItalic=True, foreground=Color( 0.0, 0.0, 0.5 ) ) )
 		self.initAttr( 'varAssignTypeNameAttrs', AttributeValues( foreground=Color( 0.5, 0.0, 0.5 ) ) )

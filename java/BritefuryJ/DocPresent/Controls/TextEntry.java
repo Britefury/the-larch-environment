@@ -19,6 +19,7 @@ import BritefuryJ.DocPresent.TextEditEventInsert;
 import BritefuryJ.DocPresent.TextEditEventRemove;
 import BritefuryJ.DocPresent.TextEditEventReplace;
 import BritefuryJ.DocPresent.TreeEventListener;
+import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.Clipboard.TextEditHandler;
 import BritefuryJ.DocPresent.Marker.Marker;
@@ -130,18 +131,21 @@ public class TextEntry extends Control
 			{
 				TextEditEventInsert insert = (TextEditEventInsert)event;
 				listener.onTextInserted( TextEntry.this, insert.getPosition(), insert.getTextInserted() );
+				validate( getText() );
 				return true;
 			}
 			else if ( event instanceof TextEditEventRemove )
 			{
 				TextEditEventRemove remove = (TextEditEventRemove)event;
 				listener.onTextRemoved( TextEntry.this, remove.getPosition(), remove.getLength() );
+				validate( getText() );
 				return true;
 			}
 			else if ( event instanceof TextEditEventReplace )
 			{
 				TextEditEventReplace replace = (TextEditEventReplace)event;
 				listener.onTextReplaced( TextEntry.this, replace.getPosition(), replace.getLength(), replace.getReplacement() );
+				validate( getText() );
 				return true;
 			}
 			return false;
@@ -182,6 +186,7 @@ public class TextEntry extends Control
 	
 	private DPBorder outerElement;
 	private DPText textElement;
+	private Border validBorder, invalidBorder;
 	private TextEntryListener listener;
 	private TextEntryValidator validator;
 	private ControlsStyleSheet styleSheet;
@@ -189,30 +194,36 @@ public class TextEntry extends Control
 
 
 	
-	protected TextEntry(DPBorder outerElement, DPRegion frame, DPText textElement, TextEntryListener listener, ControlsStyleSheet styleSheet)
+	protected TextEntry(DPBorder outerElement, DPRegion frame, DPText textElement, TextEntryListener listener, ControlsStyleSheet styleSheet, Border validBorder, Border invalidBorder)
 	{
-		this( outerElement, frame, textElement, listener, (TextEntryValidator)null, styleSheet );
+		this( outerElement, frame, textElement, listener, (TextEntryValidator)null, styleSheet, validBorder, invalidBorder );
 	}
 	
 	
-	protected TextEntry(DPBorder outerElement, DPRegion frame, DPText textElement, TextEntryListener listener, TextEntryValidator validator, ControlsStyleSheet styleSheet)
+	protected TextEntry(DPBorder outerElement, DPRegion frame, DPText textElement, TextEntryListener listener, TextEntryValidator validator, ControlsStyleSheet styleSheet, Border validBorder, Border invalidBorder)
 	{
 		this.outerElement = outerElement;
 		this.textElement = textElement;
 		this.listener = listener;
 		this.validator = validator;
 		this.styleSheet = styleSheet;
+		
+		this.validBorder = validBorder;
+		this.invalidBorder = invalidBorder;
 
 		this.textElement.addInteractor( new TextEntryInteractor() );
 		this.textElement.addTreeEventListener( new TextEntryTreeEventListener() );
 		originalText = textElement.getText();
+		
 		frame.setEditHandler( new TextEntryEditHandler() );
+		
+		validate( originalText );
 	}
 	
 	protected TextEntry(DPBorder outerElement, DPRegion frame, DPText textElement, TextEntryListener listener, Pattern validationRegex, String validationFailMessage,
-			ControlsStyleSheet styleSheet)
+			ControlsStyleSheet styleSheet, Border validBorder, Border invalidBorder)
 	{
-		this( outerElement, frame, textElement, listener, new RegexTextEntryValidator( validationRegex, validationFailMessage ), styleSheet );
+		this( outerElement, frame, textElement, listener, new RegexTextEntryValidator( validationRegex, validationFailMessage ), styleSheet, validBorder, invalidBorder );
 	}
 	
 	
@@ -284,5 +295,12 @@ public class TextEntry extends Control
 	{
 		ungrabCaret();
 		listener.onCancel( this, originalText );
+	}
+	
+	
+	private void validate(String text)
+	{
+		boolean bValid = validator != null  ?  validator.validateText( this, text )  :  true;
+		outerElement.setBorder( bValid  ?  validBorder  :  invalidBorder );
 	}
 }

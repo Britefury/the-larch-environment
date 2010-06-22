@@ -74,11 +74,8 @@ public class ControlsStyleSheet extends StyleSheet
 	private static final AttributeValues defaultTextAreaAttrs = new AttributeValues( new String[] { "border" }, new Object[] { new SolidBorder( 2.0, 5.0, 3.0, 3.0, new Color( 0.3f, 0.3f, 0.3f ), null ) } );
 	
 	private static final AttributeValues defaultTextEntryTextAttrs = new AttributeValues();
-	private static final double defaultTextEntryBorderThickness = 1.0;
-	private static final double defaultTextEntryMargin = 3.0;
-	private static final double defaultTextEntryRounding = 5.0;
-	private static final Paint defaultTextEntryBorderPaint = new Color( 0.0f, 0.3f, 0.0f );
-	private static final Paint defaultTextEntryBackgPaint = new Color( 0.9f, 0.95f, 0.9f );
+	private static final Border defaultTextEntryBorder = new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.0f, 0.3f, 0.0f ), new Color( 0.9f, 0.95f, 0.9f ) );
+	private static final Border defaultTextEntryInvalidBorder = new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.6f, 0.0f, 0.0f ), new Color( 1.0f, 0.85f, 0.85f ) );
 	
 	private static final double defaultSpinEntryArrowSize = 16.0;
 	private static final double defaultSpinEntryArrowFilletSize = 4.0;
@@ -147,11 +144,8 @@ public class ControlsStyleSheet extends StyleSheet
 		initAttr( "textAreaAttrs", defaultTextAreaAttrs );
 		
 		initAttr( "textEntryTextAttrs", defaultTextEntryTextAttrs );
-		initAttr( "textEntryBorderThickness", defaultTextEntryBorderThickness );
-		initAttr( "textEntryMargin", defaultTextEntryMargin );
-		initAttr( "textEntryRounding", defaultTextEntryRounding );
-		initAttr( "textEntryBorderPaint", defaultTextEntryBorderPaint );
-		initAttr( "textEntryBackgPaint", defaultTextEntryBackgPaint );
+		initAttr( "textEntryBorder", defaultTextEntryBorder );
+		initAttr( "textEntryInvalidBorder", defaultTextEntryInvalidBorder );
 		
 		initAttr( "spinEntryArrowSize", defaultSpinEntryArrowSize );
 		initAttr( "spinEntryArrowFilletSize", defaultSpinEntryArrowFilletSize );
@@ -653,36 +647,17 @@ public class ControlsStyleSheet extends StyleSheet
 	
 	
 	
-	private Border textEntryBorder = null;
+	private PrimitiveStyleSheet textEntryTextStyleSheet = null;
 
-	private Border getTextEntryBorder()
+	private PrimitiveStyleSheet getTextEntryTextStyleSheet()
 	{
-		if ( textEntryBorder == null )
-		{
-			double thickness = getNonNull( "textEntryBorderThickness", Double.class, defaultTextEntryBorderThickness );
-			double margin = getNonNull( "textEntryMargin", Double.class, defaultTextEntryMargin );
-			double rounding = getNonNull( "textEntryRounding", Double.class, defaultTextEntryRounding );
-			Paint borderPaint = getNonNull( "textEntryBorderPaint", Paint.class, defaultTextEntryBorderPaint );
-			Paint backgPaint = getNonNull( "textEntryBackgPaint", Paint.class, defaultTextEntryBackgPaint );
-
-			textEntryBorder = new SolidBorder( thickness, margin, rounding, rounding, borderPaint, backgPaint );
-		}
-		return textEntryBorder;
-	}
-	
-
-	
-	private PrimitiveStyleSheet textEntryStyleSheet = null;
-
-	private PrimitiveStyleSheet getTextEntryStyleSheet()
-	{
-		if ( textEntryStyleSheet == null )
+		if ( textEntryTextStyleSheet == null )
 		{
 			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
 			AttributeValues textAttrs = getNonNull( "textEntryTextAttrs", AttributeValues.class, defaultTextEntryTextAttrs );
-			textEntryStyleSheet = ((PrimitiveStyleSheet)primitive.withAttrValues( textAttrs )).withBorder( getTextEntryBorder() );
+			textEntryTextStyleSheet = ((PrimitiveStyleSheet)primitive.withAttrValues( textAttrs ));
 		}
-		return textEntryStyleSheet;
+		return textEntryTextStyleSheet;
 	}
 	
 	
@@ -998,22 +973,26 @@ public class ControlsStyleSheet extends StyleSheet
 
 	public TextEntry textEntry(String text, TextEntry.TextEntryListener listener, TextEntry.TextEntryValidator validator)
 	{
-		PrimitiveStyleSheet textEntryStyle = getTextEntryStyleSheet();
-		DPText textElement = textEntryStyle.text( text );
-		DPElement line = textEntryStyle.hbox( new DPElement[] { textEntryStyle.segment( false, false, textElement ) } );
-		DPRegion region = textEntryStyle.region( line );
-		DPBorder outerElement = textEntryStyle.border( region );
-		return new TextEntry( outerElement, region, textElement, listener, validator, this );
+		PrimitiveStyleSheet textEntryTextStyle = getTextEntryTextStyleSheet();
+		DPText textElement = textEntryTextStyle.text( text );
+		DPElement line = textEntryTextStyle.hbox( new DPElement[] { textEntryTextStyle.segment( false, false, textElement ) } );
+		DPRegion region = textEntryTextStyle.region( line );
+		DPBorder outerElement = textEntryTextStyle.border( region );
+		Border validBorder = getNonNull( "textEntryBorder", Border.class, defaultTextEntryBorder );
+		Border invalidBorder = getNonNull( "textEntryInvalidBorder", Border.class, defaultTextEntryBorder );
+		return new TextEntry( outerElement, region, textElement, listener, validator, this, validBorder, invalidBorder );
 	}
 
 	public TextEntry textEntry(String text, TextEntry.TextEntryListener listener, Pattern validatorRegex, String validationFailMessage)
 	{
-		PrimitiveStyleSheet textEntryStyle = getTextEntryStyleSheet();
-		DPText textElement = textEntryStyle.text( text );
-		DPElement line = textEntryStyle.hbox( new DPElement[] { textEntryStyle.segment( false, false, textElement ) } );
-		DPRegion region = textEntryStyle.region( line );
-		DPBorder outerElement = textEntryStyle.border( region );
-		return new TextEntry( outerElement, region, textElement, listener, validatorRegex, validationFailMessage, this );
+		PrimitiveStyleSheet textEntryTextStyle = getTextEntryTextStyleSheet();
+		DPText textElement = textEntryTextStyle.text( text );
+		DPElement line = textEntryTextStyle.hbox( new DPElement[] { textEntryTextStyle.segment( false, false, textElement ) } );
+		DPRegion region = textEntryTextStyle.region( line );
+		DPBorder outerElement = textEntryTextStyle.border( region );
+		Border validBorder = getNonNull( "textEntryBorder", Border.class, defaultTextEntryBorder );
+		Border invalidBorder = getNonNull( "textEntryInvalidBorder", Border.class, defaultTextEntryBorder );
+		return new TextEntry( outerElement, region, textElement, listener, validatorRegex, validationFailMessage, this, validBorder, invalidBorder );
 	}
 
 	
