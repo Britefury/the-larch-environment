@@ -163,23 +163,14 @@ class ProjectView (GSymViewObjectNodeDispatch):
 			importPageMenu = _importPageMenu( world, element.getRootElement().getComponent(), _importPage )
 			menu.add( _controlsStyle.subMenuItemRightWithLabel( 'New page', newPageMenu ).getElement() )
 			menu.add( _controlsStyle.subMenuItemRightWithLabel( 'Import page', importPageMenu ).getElement() )
-			if not bRoot:
-				menu.add( RichTextStyleSheet.instance.hseparator() )
-				menu.add( _controlsStyle.menuItemWithLabel( 'Rename', _onRename ).getElement() )
+			menu.add( RichTextStyleSheet.instance.hseparator() )
+			menu.add( _controlsStyle.menuItemWithLabel( 'Rename', _onRename ).getElement() )
 			return True
 
 		location = state['location']
-		try:
-			bRoot = state['projectRootPackage']
-		except KeyError:
-			bRoot = False
+		packageLocation = _joinLocation( location, name )
 		
-		if bRoot:
-			packageLocation = location
-		else:
-			packageLocation = _joinLocation( location, name )
-		
-		items = ctx.mapPresentFragment( contents, styleSheet, state.withAttrs( location=packageLocation ).withoutAttr( 'projectRootPackage' ) )
+		items = ctx.mapPresentFragment( contents, styleSheet, state.withAttrs( location=packageLocation ) )
 			
 		world = ctx.getSubjectContext()['world']
 		packageView, nameBox, nameElement = styleSheet.package( name, packageLocation, items, _packageContextMenuFactory )
@@ -217,7 +208,6 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 
 _nameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*', 0 )
-_pathRegex = Pattern.compile( '[a-zA-Z_ ][a-zA-Z0-9_ ]*', 0 )
 
 	
 class ProjectEditorRelativeLocationResolver (GSymRelativeLocationResolver):
@@ -228,12 +218,17 @@ class ProjectEditorRelativeLocationResolver (GSymRelativeLocationResolver):
 			# Attempt to enter the root package
 			docRootNode = enclosingSubject.getFocus()
 			package = docRootNode['rootPackage']
+			iterAfterRoot = locationIterator.consumeLiteral( '.' + package['name'] )
+			if iterAfterRoot is None:
+				return None
+			else:
+				locationIterator = iterAfterRoot
 			
 			while locationIterator.getSuffix() != '':
 				iterAfterDot = locationIterator.consumeLiteral( '.' )
 				name = None
 				if iterAfterDot is not None:
-					iterAfterName = iterAfterDot.consumeRegex( _pathRegex )
+					iterAfterName = iterAfterDot.consumeRegex( _nameRegex )
 					if iterAfterName is not None:
 						name = iterAfterName.lastToken()
 						locationIterator = iterAfterName
