@@ -107,6 +107,41 @@ public class AttributeTable implements Presentable
 		}
 	}
 	
+	protected static class DelAttribute
+	{
+		protected String fieldName;
+		
+		
+		public DelAttribute(String fieldName)
+		{
+			this.fieldName = fieldName;
+		}
+		
+		public int hashCode()
+		{
+			return fieldName.hashCode();
+		}
+		
+		public boolean equals(Object x)
+		{
+			if ( x == this )
+			{
+				return true;
+			}
+			
+			if ( x instanceof DelAttribute )
+			{
+				DelAttribute v = (DelAttribute)x;
+				
+				return fieldName.equals( v.fieldName );
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+	
 	private static class AttributeTableSet 
 	{
 		private HashMap<AttributeValuesMultiple, WeakReference<AttributeTable>> attributeTableSet = new HashMap<AttributeValuesMultiple, WeakReference<AttributeTable>>();
@@ -120,6 +155,7 @@ public class AttributeTable implements Presentable
 	protected HashMap<AttributeValueSingle, WeakReference<AttributeTable>> singleValueDerivedAttributeTables = new HashMap<AttributeValueSingle, WeakReference<AttributeTable>>();
 	protected HashMap<AttributeValuesMultiple, WeakReference<AttributeTable>> multiValueDerivedAttributeTables = new HashMap<AttributeValuesMultiple, WeakReference<AttributeTable>>();
 	protected IdentityHashMap<AttributeValues, WeakReference<AttributeTable>> attribSetDerivedAttributeTables = new IdentityHashMap<AttributeValues, WeakReference<AttributeTable>>();
+	protected HashMap<DelAttribute, WeakReference<AttributeTable>> delDerivedAttributeTables = new HashMap<DelAttribute, WeakReference<AttributeTable>>();
 	
 	
 	public static AttributeTable instance = new AttributeTable();
@@ -320,6 +356,22 @@ public class AttributeTable implements Presentable
 			derivedRef = new WeakReference<AttributeTable>( derived );
 
 			attribSetDerivedAttributeTables.put( attribs, derivedRef );
+		}
+		return derivedRef.get();
+	}
+	
+	public AttributeTable withoutAttr(String fieldName)
+	{
+		DelAttribute v = new DelAttribute( fieldName );
+		WeakReference<AttributeTable> derivedRef = delDerivedAttributeTables.get( v );
+		if ( derivedRef == null  ||  derivedRef.get() == null )
+		{
+			AttributeTable derived = newInstance();
+			derived.values.putAll( values );
+			derived.values.remove( fieldName );
+			derived = getUniqueAttributeTable( derived );
+			derivedRef = new WeakReference<AttributeTable>( derived );
+			delDerivedAttributeTables.put( v, derivedRef );
 		}
 		return derivedRef.get();
 	}

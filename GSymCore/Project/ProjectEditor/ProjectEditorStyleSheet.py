@@ -108,9 +108,9 @@ class ProjectEditorStyleSheet (StyleSheet):
 		return contentBox.alignHExpand()
 
 
-	def renameEntry(self, name, renameEntryListener):
+	def renameEntry(self, name, renameEntryListener, validationRegex, validationFailMsg):
 		controlsStyle = self['controlsStyle']
-		return controlsStyle.textEntry( name, renameEntryListener )
+		return controlsStyle.textEntry( name, renameEntryListener, validationRegex, validationFailMsg )
 	
 
 	def package(self, packageName, packageLocation, items, packageContextMenuFactory):

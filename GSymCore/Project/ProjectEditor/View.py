@@ -126,7 +126,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		name = document.getDocumentName()
 		
 		state = state.withAttrs( location=location )
-		rootView = ctx.presentFragment( rootPackage, styleSheet, state ).alignHExpand()
+		rootView = ctx.presentFragment( rootPackage, styleSheet, state.withAttrs( projectRootPackage=True ) ).alignHExpand()
 
 		return styleSheet.project( name, rootView, _onSave, _onSaveAs )
 
@@ -135,22 +135,23 @@ class ProjectView (GSymViewObjectNodeDispatch):
 	@DMObjectNodeDispatchMethod( Schema.Package )
 	def Package(self, ctx, styleSheet, state, node, name, contents):
 		def _addPackage(menuItem):
-			contents.append( Schema.Package( name='New package', contents=[] ) )
+			contents.append( Schema.Package( name='NewPackage', contents=[] ) )
 
-		def _onRenameAccept(textEntry, text):
-			node['name'] = text
-			
-		def _onRenameCancel(textEntry, originalText):
-			nameBox.setChildren( [ nameElement ] )
+		class _RenameListener (TextEntry.TextEntryListener):
+			def onAccept(self, textEntry, text):
+				node['name'] = text
+				
+			def onCancel(self, textEntry, originalText):
+				nameBox.setChildren( [ nameElement ] )
 		
 		def _onRename(menuItem):
-			textEntry = styleSheet.renameEntry( name, _onRenameAccept, _onRenameCancel )
+			textEntry = styleSheet.renameEntry( name, _RenameListener(), _nameRegex, 'Please enter a valid identifier' )
 			nameBox.setChildren( [ textEntry.getElement() ] )
 			textEntry.grabCaret()
 			
 		def _addPage(pageUnit):
 			#contents.append( Schema.Page( name='New page', unit=pageUnit ) )
-			p = Schema.Page( name='New page', unit=pageUnit )
+			p = Schema.Page( name='NewPage', unit=pageUnit )
 			contents.append( p )
 		
 		def _importPage(name, pageUnit):
@@ -162,14 +163,23 @@ class ProjectView (GSymViewObjectNodeDispatch):
 			importPageMenu = _importPageMenu( world, element.getRootElement().getComponent(), _importPage )
 			menu.add( _controlsStyle.subMenuItemRightWithLabel( 'New page', newPageMenu ).getElement() )
 			menu.add( _controlsStyle.subMenuItemRightWithLabel( 'Import page', importPageMenu ).getElement() )
-			menu.add( RichTextStyleSheet.instance.hseparator() )
-			menu.add( _controlsStyle.menuItemWithLabel( 'Rename', _onRename ).getElement() )
+			if not bRoot:
+				menu.add( RichTextStyleSheet.instance.hseparator() )
+				menu.add( _controlsStyle.menuItemWithLabel( 'Rename', _onRename ).getElement() )
 			return True
 
 		location = state['location']
-		packageLocation = _joinLocation( location, name )
+		try:
+			bRoot = state['projectRootPackage']
+		except KeyError:
+			bRoot = False
 		
-		items = ctx.mapPresentFragment( contents, styleSheet, state.withAttrs( location=packageLocation ) )
+		if bRoot:
+			packageLocation = location
+		else:
+			packageLocation = _joinLocation( location, name )
+		
+		items = ctx.mapPresentFragment( contents, styleSheet, state.withAttrs( location=packageLocation ).withoutAttr( 'projectRootPackage' ) )
 			
 		world = ctx.getSubjectContext()['world']
 		packageView, nameBox, nameElement = styleSheet.package( name, packageLocation, items, _packageContextMenuFactory )
@@ -180,7 +190,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 	@DMObjectNodeDispatchMethod( Schema.Page )
 	def Page(self, ctx, styleSheet, state, node, name, unit):
-		class _RenameEntryListener (TextEntry.TextEntryListener):
+		class _RenameListener (TextEntry.TextEntryListener):
 			def onAccept(self, textEntry, text):
 				node['name'] = text
 				
@@ -188,7 +198,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 				nameBox.setChildren( [ nameElement ] )
 		
 		def _onRename(menuItem):
-			textEntry = styleSheet.renameEntry( name, _RenameEntryListener() )
+			textEntry = styleSheet.renameEntry( name, _RenameListener(), _nameRegex, 'Please enter a valid identifier' )
 			nameBox.setChildren( [ textEntry.getElement() ] )
 			textEntry.grabCaret()
 		
@@ -206,7 +216,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 	
 
 
-_nameRegex = Pattern.compile( '[a-zA-Z_ ][a-zA-Z0-9_ ]*', 0 )
+_nameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*', 0 )
 
 	
 class ProjectEditorRelativeLocationResolver (GSymRelativeLocationResolver):
@@ -216,14 +226,7 @@ class ProjectEditorRelativeLocationResolver (GSymRelativeLocationResolver):
 		else:
 			# Attempt to enter the root package
 			docRootNode = enclosingSubject.getFocus()
-			rootPackagePrefix = docRootNode['rootPackage']['name']
-			iterAfterPackagePrefix = locationIterator.consumeLiteral( '.' + rootPackagePrefix )
-			if iterAfterPackagePrefix is not None:
-				locationIterator = iterAfterPackagePrefix
-				package = docRootNode['rootPackage']
-			else:
-				print 'No root package'
-				return None
+			package = docRootNode['rootPackage']
 			
 			while locationIterator.getSuffix() != '':
 				iterAfterDot = locationIterator.consumeLiteral( '.' )
