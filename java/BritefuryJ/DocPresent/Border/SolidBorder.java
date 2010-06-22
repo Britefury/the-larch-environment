@@ -10,6 +10,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
@@ -67,17 +68,21 @@ public class SolidBorder extends Border
 	{
 		Stroke prevStroke = graphics.getStroke();
 		Paint prevPaint = graphics.getPaint();
+		
+		Shape borderShape;
+		if ( roundingX != 0.0  ||  roundingY != 0.0 )
+		{
+			borderShape = new RoundRectangle2D.Double( x + thickness*0.5, y + thickness*0.5, w - thickness, h - thickness, roundingX, roundingY );
+		}
+		else
+		{
+			borderShape = new Rectangle2D.Double( x + thickness*0.5, y + thickness*0.5, w - thickness, h - thickness );
+		}
+		
 		if ( backgroundPaint != null )
 		{
 			graphics.setPaint( backgroundPaint );
-			if ( roundingX != 0.0  ||  roundingY != 0.0 )
-			{
-				graphics.fill( new RoundRectangle2D.Double( x + thickness*0.5, y + thickness*0.5, w - thickness, h - thickness, roundingX, roundingY ) );
-			}
-			else
-			{
-				graphics.fill( new Rectangle2D.Double( x + thickness*0.5, y + thickness*0.5, w - thickness, h - thickness ) );
-			}
+			graphics.fill( borderShape );
 		}
 
 		
@@ -85,16 +90,7 @@ public class SolidBorder extends Border
 		Stroke s = new BasicStroke( (float)thickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL );
 		graphics.setStroke( s );
 		graphics.setPaint( borderPaint );
-		
-		if ( roundingX != 0.0  ||  roundingY != 0.0 )
-		{
-			graphics.draw( new RoundRectangle2D.Double( x, y, w-thickness, h-thickness, roundingX, roundingY ) );
-		}
-		else
-		{
-			graphics.draw( new Rectangle2D.Double( x, y, w-thickness, h-thickness ) );
-		}
-		
+		graphics.draw( borderShape );
 		graphics.setStroke( prevStroke );
 		graphics.setPaint( prevPaint );
 	}
