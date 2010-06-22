@@ -217,6 +217,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 
 _nameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*', 0 )
+_pathRegex = Pattern.compile( '[a-zA-Z_ ][a-zA-Z0-9_ ]*', 0 )
 
 	
 class ProjectEditorRelativeLocationResolver (GSymRelativeLocationResolver):
@@ -232,7 +233,7 @@ class ProjectEditorRelativeLocationResolver (GSymRelativeLocationResolver):
 				iterAfterDot = locationIterator.consumeLiteral( '.' )
 				name = None
 				if iterAfterDot is not None:
-					iterAfterName = iterAfterDot.consumeRegex( _nameRegex )
+					iterAfterName = iterAfterDot.consumeRegex( _pathRegex )
 					if iterAfterName is not None:
 						name = iterAfterName.lastToken()
 						locationIterator = iterAfterName

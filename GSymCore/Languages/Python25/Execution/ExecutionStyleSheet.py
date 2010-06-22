@@ -120,7 +120,7 @@ class ExecutionStyleSheet (StyleSheet):
 
 	def result(self, resultView):
 		resultBorderStyle = self.resultBorderStyle()
-		return resultBorderStyle.border( PrimitiveStyleSheet.instance.paragraph( [ resultView.alignHExpand() ] ).alignHExpand() ).alignHExpand()
+		return resultBorderStyle.border( PrimitiveStyleSheet.instance.paragraph( [ resultView ] ).alignHExpand() ).alignHExpand()
 	
 	
 	def executionResult(self, stdoutText, stderrText, exceptionView, resultView):
