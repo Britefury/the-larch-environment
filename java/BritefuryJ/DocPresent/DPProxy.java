@@ -219,4 +219,10 @@ public class DPProxy extends DPContainer
 	{
 		getChild().setVAlignmentFlags( alignmentFlags );
 	}
+
+
+	public int getAlignmentFlags()
+	{
+		return getChild().getAlignmentFlags();
+	}
 }

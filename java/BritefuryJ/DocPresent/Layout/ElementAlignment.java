@@ -8,28 +8,33 @@ package BritefuryJ.DocPresent.Layout;
 
 public class ElementAlignment
 {
-	public static int _HALIGN_MASK = 0x3;
-	public static int HALIGN_LEFT = 0;
-	public static int HALIGN_CENTRE = 1;
-	public static int HALIGN_RIGHT = 2;
-	public static int HALIGN_EXPAND = 3;
+	public static int _HALIGN_MASK = 0x7;
+	public static int HALIGN_PACK = 0;
+	public static int HALIGN_LEFT = 1;
+	public static int HALIGN_CENTRE = 2;
+	public static int HALIGN_RIGHT = 3;
+	public static int HALIGN_EXPAND = 4;
 
-	public static int _VALIGN_MASK = 0x7  *  0x4;
-	public static int VALIGN_REFY = 0  *  0x4;
-	public static int VALIGN_REFY_EXPAND = 1  *  0x4;
-	public static int VALIGN_TOP = 2  *  0x4;
-	public static int VALIGN_CENTRE = 3  *  0x4;
-	public static int VALIGN_BOTTOM = 4  *  0x4;
-	public static int VALIGN_EXPAND = 5  *  0x4;
+	public static int _VALIGN_MASK = 0x7  *  0x8;
+	public static int VALIGN_REFY = 0  *  0x8;
+	public static int VALIGN_REFY_EXPAND = 1  *  0x8;
+	public static int VALIGN_TOP = 2  *  0x8;
+	public static int VALIGN_CENTRE = 3  *  0x8;
+	public static int VALIGN_BOTTOM = 4  *  0x8;
+	public static int VALIGN_EXPAND = 5  *  0x8;
 	
-	public static int _ELEMENTALIGN_MASK = 0x1f;
-	public static int _ELEMENTALIGN_END = 0x20;
+	public static int _ELEMENTALIGN_MASK = 0x3f;
+	public static int _ELEMENTALIGN_END = 0x40;
 
 	
 	
 	public static int flagValue(HAlignment hAlignment)
 	{
-		if ( hAlignment == HAlignment.LEFT )
+		if ( hAlignment == HAlignment.PACK )
+		{
+			return HALIGN_PACK;
+		}
+		else if ( hAlignment == HAlignment.LEFT )
 		{
 			return HALIGN_LEFT;
 		}
@@ -89,7 +94,11 @@ public class ElementAlignment
 	{
 		int value = 0;
 		
-		if ( hAlignment == HAlignment.LEFT )
+		if ( hAlignment == HAlignment.PACK )
+		{
+			value = HALIGN_PACK;
+		}
+		else if ( hAlignment == HAlignment.LEFT )
 		{
 			value = HALIGN_LEFT;
 		}
@@ -148,7 +157,11 @@ public class ElementAlignment
 	public static HAlignment getHAlignment(int value)
 	{
 		value &= _HALIGN_MASK;
-		if ( value == HALIGN_LEFT )
+		if ( value == HALIGN_PACK )
+		{
+			return HAlignment.PACK;
+		}
+		else if ( value == HALIGN_LEFT )
 		{
 			return HAlignment.LEFT;
 		}

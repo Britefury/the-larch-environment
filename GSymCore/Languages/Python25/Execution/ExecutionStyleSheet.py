@@ -137,7 +137,7 @@ class ExecutionStyleSheet (StyleSheet):
 			boxContents.append( self.result( resultView ).alignHExpand() )
 		
 		if len( boxContents ) > 0:
-			return resultBoxStyle.vbox( boxContents )
+			return resultBoxStyle.vbox( boxContents ).alignHExpand()
 		else:
 			return None
 
@@ -147,7 +147,7 @@ class ExecutionStyleSheet (StyleSheet):
 			if resultView is None:
 				return None
 			else:
-				return PrimitiveStyleSheet.instance.paragraph( [ resultView.alignHExpand() ] ).alignHExpand()
+				return PrimitiveStyleSheet.instance.paragraph( [ resultView ] ).alignHExpand()
 		else:
 			resultBoxStyle = self.resultBoxStyle()
 			
@@ -162,7 +162,7 @@ class ExecutionStyleSheet (StyleSheet):
 				boxContents.append( self.result( resultView ).alignHExpand() )
 			
 			if len( boxContents ) > 0:
-				return resultBoxStyle.vbox( boxContents )
+				return resultBoxStyle.vbox( boxContents ).alignHExpand()
 			else:
 				return None
 

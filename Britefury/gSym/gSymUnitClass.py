@@ -8,30 +8,23 @@
 
 
 class GSymUnitClass (object):
-	def __init__(self, schema, unitPerspective):
+	def __init__(self, schema, unitPerspective, importHook=None):
 		super( GSymUnitClass, self ).__init__()
 		self._schema = schema
 		self.name = schema.getName()
-		self._codeGeneratorFactories = {}
 		self._unitPerspective = unitPerspective
-		
-	
-	
+		self._importHook = importHook
+
+
 	def getSchema(self):
 		return self._schema
-	
-	def registerCodeGeneratorFactory(self, format, factory):
-		self._codeGeneratorFactories[format] = factory
 
-
-
-		
-	def getCodeGeneratorFactory(self, format):
-		return self._codeGeneratorFactories[format]
-	
 	def getUnitPerspective(self):
 		return self._unitPerspective
-	
+
+	def getImportHook(self):
+		return self._importHook
+
 
 
 

@@ -8,6 +8,7 @@ package BritefuryJ.DocPresent.Layout;
 
 public enum HAlignment
 {
+	PACK,
 	LEFT,
 	CENTRE,
 	RIGHT,
