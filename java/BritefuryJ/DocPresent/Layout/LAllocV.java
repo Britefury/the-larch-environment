@@ -24,6 +24,12 @@ public class LAllocV
 		this.refY = refY;
 	}
 	
+	public LAllocV(LReqBoxInterface req)
+	{
+		this.height = req.getReqHeight();
+		this.refY = req.getReqRefY();
+	}
+	
 	
 	public double getHeight()
 	{
@@ -40,6 +46,12 @@ public class LAllocV
 	public LAllocV borderY(double topMargin, double bottomMargin)
 	{
 		return new LAllocV( height - ( topMargin + bottomMargin ), refY );
+	}
+	
+	public LAllocV expandToHeight(double h)
+	{
+		double padding = ( h - height ) * 0.5;
+		return new LAllocV( h, refY + padding );
 	}
 
 

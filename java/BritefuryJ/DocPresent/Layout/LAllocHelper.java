@@ -81,7 +81,7 @@ public class LAllocHelper
 			}
 			else
 			{
-				if ( hAlign == HAlignment.LEFT )
+				if ( hAlign == HAlignment.LEFT  ||  hAlign == HAlignment.PACK )
 				{
 					childAllocation.setPositionInParentSpaceAndAllocationX( regionX, childWidth, childWidth );
 				}
@@ -134,6 +134,13 @@ public class LAllocHelper
 		childAllocation.setPositionInParentSpaceAndAllocationY( localPosY, childRequisition.getReqHeight(), childRequisition.getReqRefY() );
 	}
 	
+	protected static void allocateChildYAsPaddedRequisition(LAllocBoxInterface childAllocation, LReqBoxInterface childRequisition, double localPosY, double totalHeight)
+	{
+		double totalPadding = Math.max( totalHeight - childRequisition.getReqHeight(),  0.0 );
+		double padding = totalPadding * 0.5;
+		childAllocation.setPositionInParentSpaceAndAllocationY( localPosY, childRequisition.getReqHeight() + totalPadding, childRequisition.getReqRefY() + padding );
+	}
+	
 	
 	public static void allocateChildYAligned(LAllocBoxInterface childAllocation, LReqBoxInterface childRequisition, int alignmentFlags, double regionY, LAllocV regionAllocV)
 	{
@@ -171,6 +178,10 @@ public class LAllocHelper
 		{
 			double delta = Math.max( regionAllocV.getHeight() - childRequisition.getReqHeight(), 0.0 );
 			childAllocation.setPositionInParentSpaceAndAllocationY( regionY + delta, childRequisition.getReqHeight(), childRequisition.getReqRefY() );
+		}
+		else
+		{
+			throw new RuntimeException( "Invalid v-align" );
 		}
 	}
 }

@@ -32,4 +32,20 @@ public enum VAlignment
 			return vAlign;
 		}
 	}
+	
+	
+	public static boolean isPack(VAlignment vAlign)
+	{
+		return vAlign == VAlignment.REFY;
+	}
+
+	public static boolean isExpand(VAlignment vAlign)
+	{
+		return vAlign == VAlignment.EXPAND  ||  vAlign == VAlignment.REFY_EXPAND;
+	}
+
+	public static boolean isRefY(VAlignment vAlign)
+	{
+		return vAlign == VAlignment.REFY  ||  vAlign == VAlignment.REFY_EXPAND;
+	}
 }

@@ -544,6 +544,11 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	}
 	
 
+	public DPElement alignHPack()
+	{
+		return alignH( HAlignment.PACK );
+	}
+
 	public DPElement alignHLeft()
 	{
 		return alignH( HAlignment.LEFT );

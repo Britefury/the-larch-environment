@@ -43,7 +43,7 @@ public class HBoxTestPage extends SystemPage
 	}
 	
 	
-	protected DPElement createContents()
+	protected DPElement createHBox1()
 	{
 		ArrayList<DPElement> children = new ArrayList<DPElement>();
 		children.add( makeText( "a", 24 ).alignVRefY() );
@@ -56,6 +56,24 @@ public class HBoxTestPage extends SystemPage
 		children.add( makeText( "v_bottom", 18 ).alignVBottom() );
 		children.add( makeText( "v_expand", 18 ).alignVExpand() );
 		
-		return outlineStyleSheet.border( styleSheet.hbox( children.toArray( new DPElement[0] ) ) ).pad( 10.0, 20.0 );
+		return outlineStyleSheet.border( styleSheet.hbox( children.toArray( new DPElement[0] ) ).alignHExpand() ).alignHExpand().pad( 10.0, 20.0 );
+	}
+
+	protected DPElement createHBox2()
+	{
+		ArrayList<DPElement> children = new ArrayList<DPElement>();
+		children.add( makeText( "h_pack", 18 ).alignVRefY() );
+		children.add( makeText( "h_left", 18 ).alignHLeft() );
+		children.add( makeText( "h_centre", 18 ).alignHCentre() );
+		children.add( makeText( "h_right", 18 ).alignHRight() );
+		children.add( makeText( "h_expand", 18 ).alignHExpand() );
+		
+		return outlineStyleSheet.border( styleSheet.hbox( children.toArray( new DPElement[0] ) ).alignHExpand() ).alignHExpand().pad( 10.0, 20.0 );
+	}
+
+	
+	protected DPElement createContents()
+	{
+		return styleSheet.vbox( new DPElement[] { createHBox1().alignHExpand(), createHBox2().alignHExpand() } ).alignHExpand();
 	}
 }

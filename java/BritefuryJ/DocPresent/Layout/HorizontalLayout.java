@@ -115,7 +115,7 @@ public class HorizontalLayout
 			for (int i = 0; i < children.length; i++)
 			{
 				HAlignment h = ElementAlignment.getHAlignment( childAlignmentFlags[i] );
-				if ( h == HAlignment.EXPAND )
+				if ( h != HAlignment.PACK )
 				{
 					numExpand++;
 				}
@@ -147,17 +147,17 @@ public class HorizontalLayout
 				for (int i = 0; i < children.length; i++)
 				{
 					HAlignment h = ElementAlignment.getHAlignment( childAlignmentFlags[i] );
-					if ( h == HAlignment.EXPAND )
-					{
-						double childWidth = children[i].getReqPrefWidth() + expandPerChild;
-						LAllocHelper.allocateChildX( childrenAlloc[i], pos, childWidth, childWidth );
-						pos += ( children[i].getReqPrefHAdvance() + expandPerChild + spacing );
-					}
-					else
+					if ( h == HAlignment.PACK )
 					{
 						double childWidth = children[i].getReqPrefWidth();
 						LAllocHelper.allocateChildX( childrenAlloc[i], pos, childWidth, childWidth );
 						pos += ( children[i].getReqPrefHAdvance() + spacing );
+					}
+					else
+					{
+						double childWidth = children[i].getReqPrefWidth() + expandPerChild;
+						LAllocHelper.allocateChildXAligned( childrenAlloc[i], children[i], h, pos, childWidth );
+						pos += ( children[i].getReqPrefHAdvance() + expandPerChild + spacing );
 					}
 				}
 			}

@@ -16,11 +16,21 @@ public class DMSchema
 	public static class UnknownClassException extends RuntimeException
 	{
 		private static final long serialVersionUID = 1L;
+		
+		public UnknownClassException(String className)
+		{
+			super( "Unknown class '" + className + "'" );
+		}
 	}
 
 	public static class ClassAlreadyDefinedException extends RuntimeException
 	{
 		private static final long serialVersionUID = 1L;
+		
+		public ClassAlreadyDefinedException(String className)
+		{
+			super( "Class '" + className + "' already defined" );
+		}
 	}
 
 	
@@ -85,7 +95,7 @@ public class DMSchema
 		DMObjectClass c = classes.get( name );
 		if ( c == null )
 		{
-			throw new UnknownClassException();
+			throw new UnknownClassException( name );
 		}
 		return c;
 	}
@@ -94,7 +104,7 @@ public class DMSchema
 	{
 		if ( classes.containsKey( name ) )
 		{
-			throw new ClassAlreadyDefinedException();
+			throw new ClassAlreadyDefinedException( name );
 		}
 		classes.put( name, c );
 	}
