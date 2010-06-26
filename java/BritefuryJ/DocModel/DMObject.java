@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -768,29 +769,20 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	{
 		if ( stream instanceof DMObjectInputStream )
 		{
-			DMObjectClass objClass = ((DMObjectInputStream)stream).readDMObjectClass();
+			DMObjectReader objReader = ((DMObjectInputStream)stream).readDMObjectReader();
 
 			String keys[] = (String[])stream.readObject();
 			Object values[] = (Object[])stream.readObject();
 			
-			
-			assert keys.length == values.length;
-			
-			this.objClass = objClass;
-			fieldData = new Object[objClass.getNumFields()];
-		
+			HashMap<String, Object> fieldValues = new HashMap<String, Object>();
 			for (int i = 0; i < keys.length; i++)
 			{
-				int index = objClass.getFieldIndex( keys[i] );
-				if ( index == -1 )
-				{
-					throw new UnknownFieldNameException( keys[i] );
-				}
-				else
-				{
-					fieldData[index] = coerce( values[i] );
-				}
+				fieldValues.put( keys[i], values[i] );
 			}
+			
+			DMObject val = objReader.readObject( fieldValues );
+			objClass = val.objClass;
+			fieldData = val.fieldData;
 			
 			incr = new IncrementalValueMonitor( this );
 			incr.onChanged();

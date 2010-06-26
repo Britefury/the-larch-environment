@@ -24,7 +24,7 @@ public class DMIOWriter
 	}
 	
 	
-	public static String unquotedStringPunctuationChars = "+-*/%^&|!$@.<>~";
+	public static String unquotedStringPunctuationChars = "+-*/%^&|!$@.~";
 	public static String quotedStringPunctuationChars = "+-*/%^&|!$@.,<>=[]{}~'()` ";
 	public static Pattern unquotedString = Pattern.compile( "[0-9A-Za-z_" + Pattern.quote( unquotedStringPunctuationChars ) + "]+" );
 	public static Pattern quotedStringContents = Pattern.compile( "[0-9A-Za-z_" + Pattern.quote( quotedStringPunctuationChars ) + "]+" );
@@ -85,7 +85,7 @@ public class DMIOWriter
 	private void writeObject(StringBuilder builder, DMObject obj) throws InvalidDataTypeException
 	{
 		DMObjectClass cls = obj.getDMObjectClass();
-		DMSchema mod = cls.getModule();
+		DMSchema mod = cls.getSchema();
 		
 		builder.append( "(" );
 		
@@ -176,6 +176,12 @@ public class DMIOWriter
 				docBuilder.append( name );
 				docBuilder.append( "=" );
 				docBuilder.append( mod.getLocation() );
+				if ( mod.getVersion() > 1 )
+				{
+					docBuilder.append( "<" );
+					docBuilder.append( String.valueOf( mod.getVersion() ) );
+					docBuilder.append( ">" );
+				}
 				docBuilder.append( " ");
 			}
 			

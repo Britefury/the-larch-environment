@@ -9,6 +9,7 @@ package tests.DocModel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
@@ -16,6 +17,7 @@ import BritefuryJ.DocModel.DMIOReader;
 import BritefuryJ.DocModel.DMIOWriter;
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
+import BritefuryJ.DocModel.DMObjectReader;
 import BritefuryJ.DocModel.DMSchema;
 import BritefuryJ.DocModel.DMSchemaResolver;
 import BritefuryJ.DocModel.DMIOWriter.InvalidDataTypeException;
@@ -36,24 +38,82 @@ public class Test_DMIOReader extends TestCase
 	}
 
 	
-	private DMSchema schema;
-	private DMSchemaResolver resolver;
+	private DMSchema schemaA;
 	private DMObjectClass A;
 	
+	private DMSchema schemaBv1, schemaBv7;
+	private DMObjectClass B1, B7;
+	
+	private DMSchemaResolver resolver1, resolver2;
+	
+	private DMObjectReader b1ReaderForV7, b4ReaderForV7;
 	
 	public void setUp()
 	{
-		schema = new DMSchema( "schema", "m", "test.schema" );
-		A = schema.newClass( "A", new String[] { "x", "y" } );
+		schemaA = new DMSchema( "schema", "m", "test.schemaA" );
+		A = schemaA.newClass( "A", new String[] { "x", "y" } );
+		
+		schemaBv1 = new DMSchema( "schema", "m", "test.schemaB" );
+		B1 = schemaBv1.newClass( "B", new String[] { "x", "y" } );
+
+		schemaBv7 = new DMSchema( "schema", "m", "test.schemaB", 7 );
+		B7 = schemaBv7.newClass( "B", new String[] { "x", "z" } );
+		b1ReaderForV7 = new DMObjectReader()
+		{
+			@Override
+			public DMObject readObject(Map<String, Object> fieldValues)
+			{
+				DMObject instance = B7.newInstance();
+				instance.set( "x", fieldValues.get( "x" ) );
+				instance.set( "z", fieldValues.get( "y" ) );
+				return instance;
+			}
+		};
+		b4ReaderForV7 = new DMObjectReader()
+		{
+			@Override
+			public DMObject readObject(Map<String, Object> fieldValues)
+			{
+				DMObject instance = B7.newInstance();
+				instance.set( "x", fieldValues.get( "x" ) );
+				instance.set( "z", fieldValues.get( "w" ) );
+				return instance;
+			}
+		};
+		schemaBv7.registerReader( "B", 1, b1ReaderForV7 );
+		schemaBv7.registerReader( "B", 4, b4ReaderForV7 );
 		
 		
-		resolver = new DMSchemaResolver()
+		resolver1 = new DMSchemaResolver()
 		{
 			public DMSchema getSchema(String location)
 			{
-				if ( location.equals( "test.schema" ) )
+				if ( location.equals( "test.schemaA" ) )
 				{
-					return schema;
+					return schemaA;
+				}
+				if ( location.equals( "test.schemaB" ) )
+				{
+					return schemaBv1;
+				}
+				else
+				{
+					return null;
+				}
+			}
+		};
+
+		resolver2 = new DMSchemaResolver()
+		{
+			public DMSchema getSchema(String location)
+			{
+				if ( location.equals( "test.schemaA" ) )
+				{
+					return schemaA;
+				}
+				if ( location.equals( "test.schemaB" ) )
+				{
+					return schemaBv7;
 				}
 				else
 				{
@@ -66,9 +126,19 @@ public class Test_DMIOReader extends TestCase
 	
 	public void tearDown()
 	{
-		schema = null;
-		resolver = null;
+		schemaA = null;
 		A = null;
+
+		schemaBv1 = null;
+		B1 = null;
+		schemaBv7 = null;
+		B7 = null;
+
+		resolver1 = null;
+		resolver2 = null;
+		
+		b1ReaderForV7 = null;
+		b4ReaderForV7 = null;
 	}
 
 	
@@ -117,6 +187,11 @@ public class Test_DMIOReader extends TestCase
 
 	public void readTest(String input, Object expected)
 	{
+		readTest( resolver1, input, expected );
+	}
+
+	public void readTest(DMSchemaResolver resolver, String input, Object expected)
+	{
 		Object res = null;
 		try
 		{
@@ -159,14 +234,16 @@ public class Test_DMIOReader extends TestCase
 	public void testUnquotedString()
 	{
 		matchTest( DMIOReader.unquotedString, "abc123ABC_", "abc123ABC_" );
-		matchTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.<>~", "abc123ABC_+-*/%^&|!$@.<>~" );
-		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~(" );
-		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~)" );
-		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~\"" );
-		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~ " );
-		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~\t" );
-		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~\n" );
-		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,<>=[]~\\" );
+		matchTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.~", "abc123ABC_+-*/%^&|!$@.~" );
+		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,=[]~(" );
+		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,=[]~)" );
+		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,=[]~<" );
+		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,=[]~>" );
+		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,=[]~\"" );
+		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,=[]~ " );
+		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,=[]~\t" );
+		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,=[]~\n" );
+		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,=[]~\\" );
 		matchFailTest( DMIOReader.unquotedString, "abc123ABC_`" );
 	}
 
@@ -223,7 +300,7 @@ public class Test_DMIOReader extends TestCase
 	{
 		readTest( "abc", "abc" );
 		readTest( "abc123ABC_", "abc123ABC_" );
-		readTest( "abc123ABC_+-*/%^&|!$@.<>~", "abc123ABC_+-*/%^&|!$@.<>~" );
+		readTest( "abc123ABC_+-*/%^&|!$@.~", "abc123ABC_+-*/%^&|!$@.~" );
 	}
 
 	public void testReadQuotedString()
@@ -271,14 +348,14 @@ public class Test_DMIOReader extends TestCase
 	public void testReadObject()
 	{
 		DMObject a = A.newInstance( new Object[] { "0", "1" } );
-		readTest( "{m=test.schema : (m A x=0 y=1)}", a );
+		readTest( "{m=test.schemaA : (m A x=0 y=1)}", a );
 	}
 
 	public void testReadNestedObject()
 	{
 		DMObject a = A.newInstance( new Object[] { "0", "1" } );
 		DMObject b = A.newInstance( new Object[] { a, "1" } );
-		readTest( "{m=test.schema : (m A x=(m A x=0 y=1) y=1)}", b );
+		readTest( "{m=test.schemaA : (m A x=(m A x=0 y=1) y=1)}", b );
 	}
 
 	public void testReadObjectInListInObject()
@@ -286,6 +363,25 @@ public class Test_DMIOReader extends TestCase
 		DMObject a = A.newInstance( new Object[] { "0", "1" } );
 		List<Object> b = Arrays.asList( new Object[] { a, "xyz" } );
 		DMObject c = A.newInstance( new Object[] { b, "1" } );
-		readTest( "{m=test.schema : (m A x=[(m A x=0 y=1) xyz] y=1)}", c );
+		readTest( "{m=test.schemaA : (m A x=[(m A x=0 y=1) xyz] y=1)}", c );
+	}
+	
+	
+	public void testVersioning()
+	{
+		DMObject b;
+		// Try old schema, v1
+		b = B1.newInstance( new Object[] { "0", "1" } );
+		readTest( resolver1, "{m=test.schemaB : (m B x=0 y=1)}", b );
+
+		// Try new schema, v1-7
+		b = B7.newInstance( new Object[] { "0", "1" } );
+		readTest( resolver2, "{m=test.schemaB : (m B x=0 y=1)}", b );
+		readTest( resolver2, "{m=test.schemaB<2> : (m B x=0 w=1)}", b );
+		readTest( resolver2, "{m=test.schemaB<3> : (m B x=0 w=1)}", b );
+		readTest( resolver2, "{m=test.schemaB<4> : (m B x=0 w=1)}", b );
+		readTest( resolver2, "{m=test.schemaB<5> : (m B x=0 z=1)}", b );
+		readTest( resolver2, "{m=test.schemaB<6> : (m B x=0 z=1)}", b );
+		readTest( resolver2, "{m=test.schemaB<7> : (m B x=0 z=1)}", b );
 	}
 }

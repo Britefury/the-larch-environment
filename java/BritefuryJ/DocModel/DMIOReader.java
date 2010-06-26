@@ -61,8 +61,82 @@ public class DMIOReader
 		}
 	}
 	
+	
+	
+	
+	private static class SchemaRef
+	{
+		private DMSchema schema;
+		private int version;
+		
+		
+		public SchemaRef(DMSchema schema, int version)
+		{
+			this.schema = schema;
+			this.version = version;
+		}
+		
+		
+		public DMObjectReader getReader(String className)
+		{
+			return schema.getReader( className, version );
+		}
+	}
+	
+	
+	
+	private static class ObjectBuilder
+	{
+		private SchemaRef schemaRef;
+		private String className;
+		private HashMap<String, Object> fieldValues = new HashMap<String, Object>();;
+		
+		private String currentFieldName = null;
+		
+		
+		public ObjectBuilder(SchemaRef schemaRef, String className)
+		{
+			this.schemaRef = schemaRef;
+			this.className = className;
+		}
+		
+		
+		public DMObject create()
+		{
+			DMObjectReader reader = schemaRef.getReader( className );
+			return reader.readObject( fieldValues );
+		}
+		
+		
+		public void beginField(String fieldName)
+		{
+			if ( currentFieldName != null )
+			{
+				throw new RuntimeException( "Field name already acquired" );
+			}
+			else
+			{
+				currentFieldName = fieldName;
+			}
+		}
 
-	public static String unquotedStringPunctuationChars = "+-*/%^&|!$@.<>~";
+		public void endField(Object value)
+		{
+			if ( currentFieldName == null )
+			{
+				throw new RuntimeException( "No field name acquired" );
+			}
+			else
+			{
+				fieldValues.put( currentFieldName, value );
+				currentFieldName = null;
+			}
+		}
+	}
+	
+
+	
+	public static String unquotedStringPunctuationChars = "+-*/%^&|!$@.~";
 	public static String quotedStringPunctuationChars = "+-*/%^&|!$@.,<>=[]{}~'()` ";
 	public static String inStringUnescapedChars = "[0-9A-Za-z_" + Pattern.quote( quotedStringPunctuationChars ) + "]";
 	
@@ -77,6 +151,7 @@ public class DMIOReader
 	public static Pattern quotedString = Pattern.compile( Pattern.quote( "\"" ) + "(?:" + inStringUnescapedChars + "|" + escapeSequence + ")*" + Pattern.quote( "\"" ) );
 	public static Pattern hexChar = Pattern.compile( hexCharEscape );
 	public static Pattern identifier = Pattern.compile( "[A-Za-z_][0-9A-Za-z_]*" );
+	public static Pattern positiveDecimalInteger = Pattern.compile( "[0-9]+" );
 	
 	
 	
@@ -151,18 +226,24 @@ public class DMIOReader
 	}
 	
 	
+	private static MatchResult matchPositiveDecimalInteger(String source, int position)
+	{
+		return match( positiveDecimalInteger, source, position );
+	}
+	
+	
 	private static MatchResult matchNull(String source, int position)
 	{
 		String nullString = "`null`";
 		
-		if ( source.substring( position, position + nullString.length() ).equals( nullString ) )
+		if ( source.length()  >=  ( position + nullString.length() ) )
 		{
-			return new MatchResult( nullString, position + nullString.length() );
+			if ( source.substring( position, position + nullString.length() ).equals( nullString ) )
+			{
+				return new MatchResult( nullString, position + nullString.length() );
+			}
 		}
-		else
-		{
-			return null;
-		}
+		return null;
 	}
 	
 	
@@ -181,9 +262,8 @@ public class DMIOReader
 	
 	
 	private ArrayList<Object> stack;
-	private ArrayList<String> nameStack;
 	private Object result;
-	private HashMap<String, DMSchema> moduleTable;
+	private HashMap<String, SchemaRef> moduleTable = new HashMap<String, SchemaRef>();
 	private String source;
 	private int pos;
 	DMSchemaResolver resolver;
@@ -192,9 +272,7 @@ public class DMIOReader
 	protected DMIOReader(String source, DMSchemaResolver resolver)
 	{
 		stack = new ArrayList<Object>();
-		nameStack = new ArrayList<String>();
 		result = null;
-		moduleTable = new HashMap<String, DMSchema>();
 		this.source = source;
 		pos = 0;
 		this.resolver = resolver;
@@ -204,11 +282,6 @@ public class DMIOReader
 	private Object getTopOfStack()
 	{
 		return stack.get( stack.size() - 1 ); 
-	}
-	
-	private String getTopOfNameStack()
-	{
-		return nameStack.get( nameStack.size() - 1 ); 
 	}
 	
 	
@@ -247,7 +320,8 @@ public class DMIOReader
 			eatWhitespace();
 			
 			// Put this name into the name stack
-			nameStack.set( nameStack.size() - 1, fieldName );
+			ObjectBuilder obj = (ObjectBuilder)getTopOfStack();
+			obj.beginField( fieldName );
 		}
 	}
 	
@@ -267,9 +341,9 @@ public class DMIOReader
 				// Just eat whitespace
 				eatWhitespace();
 			}
-			else if ( top instanceof DMObject )
+			else if ( top instanceof ObjectBuilder )
 			{
-				((DMObject)top).set( getTopOfNameStack(), item );
+				((ObjectBuilder)top).endField( item );
 
 				objectAcquireFieldName();
 			}
@@ -291,7 +365,6 @@ public class DMIOReader
 		Object item = new ArrayList<Object>();
 		// Make the top of the stack the new list
 		stack.add( item );
-		nameStack.add( "" );
 	}
 	
 	private void closeList() throws ParseErrorException
@@ -310,7 +383,6 @@ public class DMIOReader
 		
 		// Pop off stack
 		stack.remove( stack.size() - 1 );
-		nameStack.remove( nameStack.size() - 1 );
 		
 		closeItem( item );
 	}
@@ -332,9 +404,9 @@ public class DMIOReader
 			moduleName = res.value;
 		}
 		
-		// Get the schema
-		DMSchema schema = moduleTable.get( moduleName );
-		if ( schema == null )
+		// Get the schema reference
+		SchemaRef schemaRef = moduleTable.get( moduleName );
+		if ( schemaRef == null )
 		{
 			throw new BadModuleNameException();
 		}
@@ -364,13 +436,10 @@ public class DMIOReader
 		}
 		
 		// Get the class
-		DMObjectClass cls = schema.get( className );
-		
-		DMObject item = cls.newInstance( new Object[] {} );
+		ObjectBuilder item = new ObjectBuilder( schemaRef, className );
 		
 		// Make the top of the stack the new list
 		stack.add( item );
-		nameStack.add( "" );
 		
 		objectAcquireFieldName();
 	}
@@ -383,17 +452,18 @@ public class DMIOReader
 			throw new ParseErrorException( pos, "')' with no object to close" );
 		}
 		// Ensure that it is a list
-		Object item = getTopOfStack();
-		if ( !( item instanceof DMObject ) )
+		Object builder = getTopOfStack();
+		if ( !( builder instanceof ObjectBuilder ) )
 		{
 			throw new ParseErrorException( pos, "')' attempting to close non-object" );
 		}
 		
 		// Pop off stack
 		stack.remove( stack.size() - 1 );
-		nameStack.remove( nameStack.size() - 1 );
 		
-		closeItem( item );
+		DMObject value = ((ObjectBuilder)builder).create();
+		
+		closeItem( value );
 	}
 	
 	
@@ -403,8 +473,8 @@ public class DMIOReader
 		{
 			if ( source.charAt( pos ) == '}' )
 			{
-				// Close bindings
-				// Don't consume the character
+				// This character is used to close the bindings; the objects are contained *within* this bindings list,
+				// so don't consume this character.
 				break;
 			}
 			else if ( source.charAt( pos ) == '[' )
@@ -510,6 +580,7 @@ public class DMIOReader
 			while ( source.charAt( pos ) != ':' )
 			{
 				String key, value;
+				int version = 1;
 				MatchResult res = null;
 				
 				// Get key
@@ -535,6 +606,7 @@ public class DMIOReader
 				
 				
 				// Get value
+				eatWhitespace();
 				res = matchAtom( source, pos );
 				if ( res != null )
 				{
@@ -547,9 +619,46 @@ public class DMIOReader
 				}
 				
 				
+				// Get the version number
+				eatWhitespace();
+				if ( source.charAt( pos ) == '<' )
+				{
+					pos++;
+					
+					// Get version
+					eatWhitespace();
+					res = matchPositiveDecimalInteger( source, pos );
+					if ( res != null )
+					{
+						version = Integer.valueOf( res.value );
+						pos = res.position;
+					}
+					else
+					{
+						throw new ParseErrorException( pos, "Expected version number" );
+					}
+					
+					
+					// Consume the '>' character
+					eatWhitespace();
+					if ( source.charAt( pos ) != '>' )
+					{
+						throw new ParseErrorException( pos, "Expected '>' to close version number" );
+					}
+					pos++;
+				}
+				
+				
 				// Get the schema, and add to the schema table
 				DMSchema schema = resolver.getSchema( value );
-				moduleTable.put( key, schema);
+				// Ensure that the requested version is supported
+				if ( version > schema.getVersion() )
+				{
+					// This input data uses a newer schema version than the one we have available here.
+					// We cannot load this.
+					throw new DMSchema.UnsupportedSchemaVersionException( value, schema.getVersion(), version );
+				}
+				moduleTable.put( key, new SchemaRef( schema, version ) );
 				
 				
 				eatWhitespace();
