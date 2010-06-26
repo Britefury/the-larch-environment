@@ -28,12 +28,12 @@ public class DMObjectOutputStream extends ObjectOutputStream
 	}
 	
 	
-	public void writeDMModule(DMSchema mod) throws IOException
+	private void writeSchemaRef(DMSchema schema) throws IOException
 	{
-		String modName = moduleToName.get( mod );
+		String modName = moduleToName.get( schema );
 		if ( modName == null )
 		{
-			String shortName = mod.getShortName();
+			String shortName = schema.getShortName();
 			modName = shortName;
 			int index = 2;
 			while ( names.contains( modName ) )
@@ -42,14 +42,15 @@ public class DMObjectOutputStream extends ObjectOutputStream
 				index++;
 			}
 			
-			moduleToName.put( mod, modName );
+			moduleToName.put( schema, modName );
 			names.add( modName );
 			
 			
 			
 			writeBoolean( true );
 			writeObject( modName );
-			writeObject( mod.getLocation() );
+			writeObject( schema.getLocation() );
+			writeObject( (Integer)schema.getVersion() );
 		}
 		else
 		{
@@ -60,7 +61,7 @@ public class DMObjectOutputStream extends ObjectOutputStream
 
 	public void writeDMObjectClass(DMObjectClass cls) throws IOException
 	{
-		writeDMModule( cls.getModule() );
+		writeSchemaRef( cls.getSchema() );
 		writeObject( cls.getName() );
 	}
 }

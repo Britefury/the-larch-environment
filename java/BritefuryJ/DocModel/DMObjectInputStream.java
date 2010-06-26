@@ -13,8 +13,28 @@ import java.util.HashMap;
 
 public class DMObjectInputStream extends ObjectInputStream
 {
+	protected static class SchemaRef
+	{
+		private DMSchema schema;
+		private int version;
+		
+		
+		public SchemaRef(DMSchema schema, int version)
+		{
+			this.schema = schema;
+			this.version = version;
+		}
+		
+		
+		public DMObjectReader getReader(String className)
+		{
+			return schema.getReader( className, version );
+		}
+	}
+
+	
 	private DMSchemaResolver resolver;
-	private HashMap<String, DMSchema> moduleTable;
+	private HashMap<String, SchemaRef> moduleTable;
 	
 	
 	public DMObjectInputStream(InputStream stream, DMSchemaResolver resolver) throws IOException
@@ -22,12 +42,12 @@ public class DMObjectInputStream extends ObjectInputStream
 		super( stream );
 		
 		this.resolver = resolver;
-		moduleTable = new HashMap<String, DMSchema>();
+		moduleTable = new HashMap<String, SchemaRef>();
 	}
 	
 	
 	
-	protected DMSchema readDMModule() throws IOException, ClassNotFoundException
+	protected SchemaRef readSchemaRef() throws IOException, ClassNotFoundException
 	{
 		boolean bNewModule = readBoolean();
 		
@@ -35,9 +55,21 @@ public class DMObjectInputStream extends ObjectInputStream
 		{
 			String shortName = (String)readObject();
 			String location = (String)readObject();
+			Integer version = (Integer)readObject();
+			
 			DMSchema schema = resolver.getSchema( location );
-			moduleTable.put( shortName, schema);
-			return schema;
+			
+			// Ensure that the requested version is supported
+			if ( version > schema.getVersion() )
+			{
+				// This input data uses a newer schema version than the one we have available here.
+				// We cannot load this.
+				throw new DMSchema.UnsupportedSchemaVersionException( location, schema.getVersion(), version );
+			}
+			
+			SchemaRef schemaRef = new SchemaRef( schema, version );
+			moduleTable.put( shortName, schemaRef );
+			return schemaRef;
 		}
 		else
 		{
@@ -46,12 +78,12 @@ public class DMObjectInputStream extends ObjectInputStream
 		}
 	}
 	
-	protected DMObjectClass readDMObjectClass() throws IOException, ClassNotFoundException
+	protected DMObjectReader readDMObjectReader() throws IOException, ClassNotFoundException
 	{
-		DMSchema schema = readDMModule();
+		SchemaRef schemaRef = readSchemaRef();
 		
 		String className = (String)readObject();
 		
-		return schema.get( className );
+		return schemaRef.getReader( className );
 	}
 }

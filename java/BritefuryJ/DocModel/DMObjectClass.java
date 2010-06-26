@@ -64,6 +64,7 @@ public class DMObjectClass extends DMNodeClass
 	private DMObjectClass superclass, superclasses[];
 	private DMObjectField classFields[], allClassFields[];
 	private HashMap<String, Integer> fieldNameToIndex;
+	private DMObjectReaderDefault defaultReader = new DMObjectReaderDefault( this );
 	
 	
 	
@@ -127,7 +128,14 @@ public class DMObjectClass extends DMNodeClass
 	
 	
 	
-	public DMSchema getModule()
+	protected DMObjectReaderDefault getDefaultReader()
+	{
+		return defaultReader;
+	}
+	
+	
+	
+	public DMSchema getSchema()
 	{
 		return schema;
 	}
