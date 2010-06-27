@@ -10,7 +10,7 @@ from BritefuryJ.DocModel import DMSchema, DMObjectClass
 
 
 
-schema = DMSchema( 'Worksheet', 'ws', 'GSymCore.Worksheet' )
+schema = DMSchema( 'Worksheet', 'ws', 'GSymCore.Worksheet', 2 )
 
 
 
@@ -18,7 +18,7 @@ WorksheetNode = schema.newClass( 'WorksheetNode', [] )
 WorksheetPartialNode = schema.newClass( 'WorksheetPartialNode', [] )
 
 
-Worksheet = schema.newClass( 'Worksheet', WorksheetNode, [ 'title', 'body' ] )
+Worksheet = schema.newClass( 'Worksheet', WorksheetNode, [ 'body' ] )
 
 Body = schema.newClass( 'Body', WorksheetNode, [ 'contents' ] )
 Text = schema.newClass( 'Text', WorksheetNode, [ 'text' ] )
@@ -27,5 +27,25 @@ PartialParagraph = schema.newClass( 'PartialParagraph', WorksheetPartialNode, [ 
 
 
 PythonCode = schema.newClass( 'PythonCode', WorksheetNode, [ 'code', 'style' ] )
+
+
+
+
+#
+#
+# Version 1 backwards compatibility
+#
+#
+
+def _readWorksheet_v1(fieldValues):
+	# V1 included the title as a field in the worksheet node. Create a title paragraph to replace it.
+	title = fieldValues['title']
+	body = fieldValues['body']
+	
+	body['contents'].insert( 0, Paragraph( text=title, style='title' ) )
+	
+	return Worksheet( body=body )
+
+schema.registerReader( 'Worksheet', 1, _readWorksheet_v1 )
 
 

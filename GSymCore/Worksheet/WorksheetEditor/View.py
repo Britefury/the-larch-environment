@@ -45,8 +45,6 @@ from GSymCore.Worksheet.WorksheetEditor.WorksheetEditorStyleSheet import Workshe
 
 from GSymCore.Worksheet.WorksheetEditor.PythonCode import *
 
-from GSymCore.Worksheet.WorksheetEditor.TitleEditor import *
-from GSymCore.Worksheet.WorksheetEditor.EmptyEditor import *
 from GSymCore.Worksheet.WorksheetEditor.TextNodeEditor import *
 from GSymCore.Worksheet.WorksheetEditor.BodyNodeEditor import *
 from GSymCore.Worksheet.WorksheetEditor.WorksheetNodeEditor import *
@@ -82,7 +80,8 @@ class WorkSheetContextMenuFactory (ContextMenuFactory):
 		h4Style = controlsStyle.link( 'H4', makeStyleFn( 'h4' ) ).getElement()
 		h5Style = controlsStyle.link( 'H5', makeStyleFn( 'h5' ) ).getElement()
 		h6Style = controlsStyle.link( 'H6', makeStyleFn( 'h6' ) ).getElement()
-		styles = menuStyle.controlsHBox( [ normalStyle, h1Style, h2Style, h3Style, h4Style, h5Style, h6Style ] )
+		titleStyle = controlsStyle.link( 'Title', makeStyleFn( 'title' ) ).getElement()
+		styles = menuStyle.controlsHBox( [ normalStyle, h1Style, h2Style, h3Style, h4Style, h5Style, h6Style, titleStyle ] )
 		menu.add( menuStyle.sectionWithTitle( 'Style', styles ) )
 		
 		
@@ -104,10 +103,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 	def Worksheet(self, ctx, styleSheet, inheritedState, node):
 		bodyView = ctx.presentFragment( node.getBody(), styleSheet, inheritedState )
 		
-		title = styleSheet.worksheetTitle( node.getTitle() )
-		title.addTreeEventListener( TitleEventListener.instance )
-
-		w = styleSheet.worksheet( title, bodyView )
+		w = styleSheet.worksheet( bodyView, ctx.getSubjectContext()['viewLocation'] )
 		w.addTreeEventListener( WorksheetNodeEventListener.instance )
 		w.addInteractor( WorksheetNodeInteractor.instance )
 		w.addContextMenuFactory( instanceCache( WorkSheetContextMenuFactory, styleSheet ) )
@@ -144,6 +140,8 @@ class WorksheetEditor (GSymViewObjectDispatch):
 			p = styleSheet.h5( text )
 		elif style == 'h6':
 			p = styleSheet.h6( text )
+		elif style == 'title':
+			p = styleSheet.title( text )
 		p.setStructuralPrefixObject( node.partialModel() )
 		w = PrimitiveStyleSheet.instance.span( [ p ] )
 		w.addTreeEventListener( TextNodeEventListener.instance )

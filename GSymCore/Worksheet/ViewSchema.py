@@ -82,39 +82,8 @@ class WorksheetView (NodeView):
 		body.refreshResults( self._executionEnvironment )
 		
 		
-	def getTitle(self):
-		return self._model['title']
-	
-	def setTitle(self, title):
-		self._model['title'] = title
-		
-		
-	def joinTitle(self):
-		contents = self.getBody().getContents()
-		if len( contents ) > 0  and  isinstance( contents[0], ParagraphView ):
-			text = self.getTitle() + contents[0].getText()
-			self.setTitle( text )
-			self.getBody().removeFirstNode()
-			return True
-		else:
-			return False
-	
-	
-	def splitTitle(self, textLines):
-		body = self.getBody()
-		self.setTitle( textLines[0] )
-		textLines = textLines[1:]
-		for t in reversed( textLines ):
-			textModel = ParagraphView.newParagraphModel( t, 'normal' )
-			body.prependModel( textModel )
-		
-		
 	def getBody(self):
 		return _projection( self._model['body'], self )
-	
-	
-	def prependBodyContentsModel(self, model):
-		self.getBody().prependModel( model )
 	
 	
 	def _viewOf(self, model):
@@ -143,12 +112,6 @@ class BodyView (NodeView):
 		return self._contentsCell.getValue()
 	
 	
-	def removeFirstNode(self):
-		del self._model['contents'][0]
-	
-	def prependModel(self, node):
-		self._model['contents'].insert( 0, node )
-		
 	def appendModel(self, node):
 		self._model['contents'].append( node )
 	

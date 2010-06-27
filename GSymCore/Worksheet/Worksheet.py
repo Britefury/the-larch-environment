@@ -13,7 +13,7 @@ from GSymCore.Worksheet import Schema
 
 
 def newWorksheet():
-	return Schema.Worksheet( title='New Worksheet', body=Schema.Body( contents=[] ) )
+	return Schema.Worksheet( body=Schema.Body( contents=[] ) )
 
 def _worksheetNewUnit():
 	return gSymUnit( Schema.schema, newWorksheet() )

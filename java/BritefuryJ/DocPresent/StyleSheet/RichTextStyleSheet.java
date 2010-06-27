@@ -553,6 +553,21 @@ public class RichTextStyleSheet extends StyleSheet
 	
 	
 	
+	public DPElement splitLinkHeaderBar(DPElement leftLinks[], DPElement rightLinks[])
+	{
+		return splitLinkHeaderBar( Arrays.asList( leftLinks ), Arrays.asList( rightLinks ) );
+	}
+	
+	public DPElement splitLinkHeaderBar(List<DPElement> leftLinks, List<DPElement> rightLinks)
+	{
+		PrimitiveStyleSheet linkHeaderStyle = getLinkHeaderStyleSheet();
+		DPElement left = linkHeaderStyle.hbox( leftLinks );
+		DPElement right = linkHeaderStyle.hbox( rightLinks );
+		return linkHeaderStyle.border( linkHeaderStyle.hbox( new DPElement[] { left.alignHLeft(), right.alignHRight() } ).alignHExpand() ).alignHExpand();
+	}
+	
+	
+	
 	public DPElement title(String text)
 	{
 		return textParagraph( getTitleStyleSheet(), text );
