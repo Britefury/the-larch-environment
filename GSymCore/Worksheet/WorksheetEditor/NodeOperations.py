@@ -21,13 +21,6 @@ class AddNodeOperation (object):
 		self._nodeFactory = nodeFactory
 
 		
-class PrependNodeOperation (AddNodeOperation):
-	def apply(self, body):
-		node = self._nodeFactory()
-		body.prependModel( node )
-		return True
-
-	
 
 class AppendNodeOperation (AddNodeOperation):
 	def apply(self, body):
@@ -59,9 +52,6 @@ class NodeRequest (object):
 		pass
 	
 
-	def applyToTitle(self, worksheet, element):
-		return element.postTreeEvent( PrependNodeOperation( self._createModel ) )
-	
 	def applyToEmpty(self, body, element):
 		return element.postTreeEvent( AppendNodeOperation( self._createModel ) )
 	

@@ -92,16 +92,17 @@ class WorksheetEditorStyleSheet (StyleSheet):
 		return editableRichTextStyle.titleBar( title )
 	
 	
-	def worksheet(self, titleView, body):
+	def worksheet(self, body, viewLocation):
 		primitiveStyle = self['primitiveStyle']
 		richTextStyle = self['richTextStyle']
 		editableRichTextStyle = self['editableRichTextStyle']
 		controlsStyle = self['controlsStyle']
 
 		homeLink = controlsStyle.link( 'HOME PAGE', Location( '' ) ).getElement()
-		linkHeader = richTextStyle.linkHeaderBar( [ homeLink ] )
+		viewLink = controlsStyle.link( 'View this worksheet', viewLocation ).getElement()
+		linkHeader = richTextStyle.splitLinkHeaderBar( [ viewLink ], [ homeLink ] )
 		
-		return richTextStyle.page( [ linkHeader, titleView, body ] )
+		return richTextStyle.page( [ linkHeader, body ] )
 	
 	
 	def body(self, contents):
@@ -129,6 +130,9 @@ class WorksheetEditorStyleSheet (StyleSheet):
 	
 	def h6(self, text):
 		return self['editableRichTextStyle'].h6( text )
+	
+	def title(self, text):
+		return self['editableRichTextStyle'].titleBar( text )
 
 	
 	def pythonCode(self, codeView, resultView, style, bShowResult, onSetStyle, onDelete):

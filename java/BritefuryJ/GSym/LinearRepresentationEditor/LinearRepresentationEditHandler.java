@@ -55,7 +55,7 @@ public abstract class LinearRepresentationEditHandler implements EditHandler
 	@Override
 	public void replaceSelectionWithText(Selection selection, Caret caret, String replacement)
 	{
-		replaceSelection( selection, null );
+		replaceSelection( selection, replacement );
 	}
 	
 	

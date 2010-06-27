@@ -13,21 +13,12 @@ from BritefuryJ.DocPresent import *
 from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
 
 from GSymCore.Worksheet import Schema, ViewSchema
-from GSymCore.Worksheet.WorksheetEditor.TitleEditor import TitleOperation
 from GSymCore.Worksheet.WorksheetEditor.NodeOperations import AddNodeOperation
 
 
 class WorksheetNodeEventListener (TreeEventListenerObjectDispatch):
 	def __init__(self):
 		pass
-
-	
-	@ObjectDispatchMethod( TitleOperation )
-	def onTitleOp(self, element, sourceElement, event):
-		ctx = element.getFragmentContext()
-		node = ctx.getDocNode()
-		
-		return event.apply( node )
 
 	
 	@ObjectDispatchMethod( AddNodeOperation )

@@ -80,23 +80,17 @@ class WorksheetViewerStyleSheet (StyleSheet):
 	
 	
 	
-	def worksheetTitle(self, title):
-		richTextStyle = self['richTextStyle']
-		
-		return self['primitiveStyle'].segment( True, True, richTextStyle.titleBar( title ) )
-	
-	
-	def worksheet(self, titleView, body, editLocation):
+	def worksheet(self, body, editLocation):
 		primitiveStyle = self['primitiveStyle']
 		richTextStyle = self['richTextStyle']
 		controlsStyle = self['controlsStyle']
 
 		
 		homeLink = controlsStyle.link( 'HOME PAGE', Location( '' ) ).getElement()
-		editLink = controlsStyle.link( 'Edit', editLocation ).getElement()
-		linkHeader = richTextStyle.linkHeaderBar( [ homeLink ] )
+		editLink = controlsStyle.link( 'Edit this worksheet', editLocation ).getElement()
+		linkHeader = richTextStyle.splitLinkHeaderBar( [ editLink ], [ homeLink ] )
 		
-		return richTextStyle.page( [ linkHeader, editLink, titleView, body ] )
+		return richTextStyle.page( [ linkHeader, body ] )
 	
 	
 	def body(self, contents):
@@ -105,26 +99,29 @@ class WorksheetViewerStyleSheet (StyleSheet):
 	
 	
 	def paragraph(self, text):
-		return self['primitiveStyle'].segment( True, True, self['richTextStyle'].paragraph( text ) )
+		return self['richTextStyle'].paragraph( text )
 	
 	def h1(self, text):
-		return self['primitiveStyle'].segment( True, True, self['richTextStyle'].h1( text ) )
+		return elf['richTextStyle'].h1( text )
 	
 	def h2(self, text):
-		return self['primitiveStyle'].segment( True, True, self['richTextStyle'].h2( text ) )
+		return self['richTextStyle'].h2( text )
 	
 	def h3(self, text):
-		return self['primitiveStyle'].segment( True, True, self['richTextStyle'].h3( text ) )
+		return self['richTextStyle'].h3( text )
 	
 	def h4(self, text):
-		return self['primitiveStyle'].segment( True, True, self['richTextStyle'].h4( text ) )
+		return self['richTextStyle'].h4( text )
 	
 	def h5(self, text):
-		return self['primitiveStyle'].segment( True, True, self['richTextStyle'].h5( text ) )
+		return self['richTextStyle'].h5( text )
 	
 	def h6(self, text):
-		return self['primitiveStyle'].segment( True, True, self['richTextStyle'].h6( text ) )
+		return self['richTextStyle'].h6( text )
 
+	def title(self, text):
+		return self['richTextStyle'].titleBar( text )
+	
 	
 	def pythonCode(self, codeView, resultView, bShowCode, bShowResult):
 		primitiveStyle = self['primitiveStyle']

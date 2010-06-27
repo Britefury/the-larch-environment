@@ -130,6 +130,8 @@ class TextNodeInteractor (ElementInteractor):
 				node.setStyle( 'h5' )
 			elif event.getKeyCode() == KeyEvent.VK_6:
 				node.setStyle( 'h6' )
+			elif event.getKeyCode() == KeyEvent.VK_T:
+				node.setStyle( 'title' )
 			elif event.getKeyCode() == KeyEvent.VK_C:
 				self._insertPythonCode( ctx, element, node )
 				return True

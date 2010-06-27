@@ -64,9 +64,7 @@ class WorksheetViewer (GSymViewObjectDispatch):
 	def Worksheet(self, ctx, styleSheet, inheritedState, node):
 		bodyView = ctx.presentFragment( node.getBody(), styleSheet )
 		
-		title = styleSheet.worksheetTitle( node.getTitle() )
-
-		w = styleSheet.worksheet( title, bodyView, ctx.getSubjectContext()['editLocation'] )
+		w = styleSheet.worksheet( bodyView, ctx.getSubjectContext()['editLocation'] )
 		w.addInteractor( _worksheetInteractor )
 		return w
 	
@@ -97,6 +95,8 @@ class WorksheetViewer (GSymViewObjectDispatch):
 			p = styleSheet.h5( text )
 		elif style == 'h6':
 			p = styleSheet.h6( text )
+		elif style == 'title':
+			p = styleSheet.title( text )
 		return p
 
 
@@ -154,7 +154,9 @@ class WorksheetViewerRelativeLocationResolver (GSymRelativeLocationResolver):
 			editLocation = Location( locationIterator.getLocation().getLocationString() + ':edit' )
 			return enclosingSubject.withTitle( 'WS: ' + enclosingSubject.getTitle() ).withFocus( view ).withSubjectContext( subjectContext.withAttrs( editLocation=editLocation ) )
 		elif editIterator is not None:
-			subject = enclosingSubject.withPerspective( editorPerspective )
+			subjectContext = enclosingSubject.getSubjectContext()
+			viewLocation = Location( locationIterator.getPrefix() )
+			subject = enclosingSubject.withPerspective( editorPerspective ).withSubjectContext( subjectContext.withAttrs( viewLocation=viewLocation ) )
 			return editorPerspective.resolveRelativeLocation( subject, editIterator )
 	
 
