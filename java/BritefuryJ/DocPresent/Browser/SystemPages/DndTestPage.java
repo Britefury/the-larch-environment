@@ -23,15 +23,14 @@ import BritefuryJ.Math.Point2;
 
 public class DndTestPage extends SystemPage
 {
-	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-	private static PrimitiveStyleSheet textStyle = styleSheet.withFontSize( 16 );
-	private static PrimitiveStyleSheet mathStyle = PrimitiveStyleSheet.instance;
-	private static PrimitiveStyleSheet paletteTitleStyle = styleSheet.withFontFace( "Serif" ).withFontBold( true ).withFontSize( 28 );
-	private static PrimitiveStyleSheet paletteSectionStyle = styleSheet.withFontFace( "Serif" ).withFontSize( 18 );
-	private static PrimitiveStyleSheet outlineStyle = styleSheet.withBorder( new SolidBorder( 2.0, 10.0, new Color( 0.6f, 0.7f, 0.8f ), null ) );
+	private static PrimitiveStyleSheet mainStyle = PrimitiveStyleSheet.instance;
+	private static PrimitiveStyleSheet mathStyle = PrimitiveStyleSheet.instance.withFontSize( 16 ).withNonEditable();
+	private static PrimitiveStyleSheet paletteTitleStyle = mainStyle.withFontFace( "Serif" ).withFontBold( true ).withFontSize( 28 );
+	private static PrimitiveStyleSheet paletteSectionStyle = mainStyle.withFontFace( "Serif" ).withFontSize( 18 );
+	private static PrimitiveStyleSheet outlineStyle = mainStyle.withBorder( new SolidBorder( 2.0, 10.0, new Color( 0.6f, 0.7f, 0.8f ), null ) );
 	
-	private static PrimitiveStyleSheet placeHolderStyle = styleSheet.withBackground( new FillPainter( new Color( 1.0f, 0.9f, 0.75f  ) ) );
-	private static PrimitiveStyleSheet sourceStyle = styleSheet.withBackground( new FillPainter( new Color( 0.75f, 0.85f, 1.0f ) ) );
+	private static PrimitiveStyleSheet placeHolderStyle = mainStyle.withBackground( new FillPainter( new Color( 1.0f, 0.9f, 0.75f  ) ) );
+	private static PrimitiveStyleSheet sourceStyle = mainStyle.withBackground( new FillPainter( new Color( 0.75f, 0.85f, 1.0f ) ) );
 	
 	
 	protected DndTestPage()
@@ -74,24 +73,25 @@ public class DndTestPage extends SystemPage
 		{
 			public DPElement createElement(StyleSheet styleSheet)
 			{
-				return textStyle.staticText( text );
+				PrimitiveStyleSheet ps = (PrimitiveStyleSheet)styleSheet;
+				return ps.staticText( text );
 			}
 		};
 
-		return makeSource( textStyle.staticText( text ), factory );
+		return makeSource( mathStyle.staticText( text ), factory );
 	}
 	
 	
-	protected DPElement makePlaceHolder()
+	protected DPElement makePlaceHolder(final PrimitiveStyleSheet contentStyle)
 	{
-		final DPProxy placeHolder = styleSheet.proxy( placeHolderStyle.bin( styleSheet.staticText( " " ).pad( 8.0, 8.0 ) ) );
+		final DPProxy placeHolder = contentStyle.proxy( placeHolderStyle.bin( contentStyle.staticText( " " ).pad( 8.0, 8.0 ) ) );
 		
 		ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
 		{
 			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data)
 			{
 				ElementFactory factory = (ElementFactory)data;
-				placeHolder.setChild( factory.createElement( styleSheet ) );
+				placeHolder.setChild( factory.createElement( contentStyle ) );
 				return true;
 			}
 		};
@@ -108,11 +108,16 @@ public class DndTestPage extends SystemPage
 		{
 			public DPElement createElement(StyleSheet styleSheet)
 			{
-				return mathStyle.fraction( makePlaceHolder(), makePlaceHolder(), "/" );
+				PrimitiveStyleSheet ps = (PrimitiveStyleSheet)styleSheet;
+				PrimitiveStyleSheet numStyle = ps.fractionNumeratorStyle();
+				PrimitiveStyleSheet denomStyle = ps.fractionDenominatorStyle();
+				return ps.fraction( makePlaceHolder( numStyle ), makePlaceHolder( denomStyle ), "/" );
 			}
 		};
 
-		return makeSource( mathStyle.fraction( textStyle.staticText( "a" ), textStyle.staticText( "b" ), "/" ), factory );
+		PrimitiveStyleSheet numStyle = mathStyle.fractionNumeratorStyle();
+		PrimitiveStyleSheet denomStyle = mathStyle.fractionDenominatorStyle();
+		return makeSource( mathStyle.fraction( numStyle.staticText( "a" ), denomStyle.staticText( "b" ), "/" ), factory );
 	}
 	
 	protected DPElement makeScriptSource()
@@ -121,11 +126,14 @@ public class DndTestPage extends SystemPage
 		{
 			public DPElement createElement(StyleSheet styleSheet)
 			{
-				return mathStyle.script( makePlaceHolder(), makePlaceHolder(), makePlaceHolder(), makePlaceHolder(), makePlaceHolder() );
+				PrimitiveStyleSheet ps = (PrimitiveStyleSheet)styleSheet;
+				PrimitiveStyleSheet scriptStyle = ps.scriptScriptChildStyle();
+				return ps.script( makePlaceHolder( ps ), makePlaceHolder( scriptStyle ), makePlaceHolder( scriptStyle ), makePlaceHolder( scriptStyle ), makePlaceHolder( scriptStyle ) );
 			}
 		};
 
-		return makeSource( mathStyle.script( textStyle.staticText( "a" ), textStyle.staticText( "b" ), textStyle.staticText( "c" ), textStyle.staticText( "d" ), textStyle.staticText( "e" ) ), factory );
+		PrimitiveStyleSheet scriptStyle = mathStyle.scriptScriptChildStyle();
+		return makeSource( mathStyle.script( mathStyle.staticText( "a" ), scriptStyle.staticText( "b" ), scriptStyle.staticText( "c" ), scriptStyle.staticText( "d" ), scriptStyle.staticText( "e" ) ), factory );
 	}
 	
 	
@@ -141,16 +149,16 @@ public class DndTestPage extends SystemPage
 		{
 			textElements.add( makeTextSource( texts.substring( i, i+1 ) ) );
 		}
-		DPElement textSection = styleSheet.withHBoxSpacing( 3.0 ).hbox( textElements.toArray( new DPElement[0] ) );
+		DPElement textSection = mainStyle.withHBoxSpacing( 3.0 ).hbox( textElements.toArray( new DPElement[0] ) );
 		
 		DPElement mathTitle = paletteSectionStyle.staticText( "Math:" );
 		ArrayList<DPElement> mathElements = new ArrayList<DPElement>();
 		mathElements.add( mathTitle.padX( 0.0, 20.0 ) );
 		mathElements.add( makeFractionSource() );
 		mathElements.add( makeScriptSource() );
-		DPElement mathSection = styleSheet.withHBoxSpacing( 3.0 ).hbox( mathElements.toArray( new DPElement[0] ) );
+		DPElement mathSection = mainStyle.withHBoxSpacing( 3.0 ).hbox( mathElements.toArray( new DPElement[0] ) );
 		
-		DPElement vbox = styleSheet.withVBoxSpacing( 10.0 ).vbox( new DPElement[] { title, textSection, mathSection } );
+		DPElement vbox = mainStyle.withVBoxSpacing( 10.0 ).vbox( new DPElement[] { title, textSection, mathSection } );
 		
 		return outlineStyle.border( vbox.alignHExpand() ).alignHExpand().pad( 20.0, 5.0 ).alignHExpand();
 	}
@@ -158,10 +166,10 @@ public class DndTestPage extends SystemPage
 	protected DPElement makeFormula()
 	{
 		DPElement title = paletteTitleStyle.staticText( "Formula" ).alignHCentre();
-		DPElement formula = makePlaceHolder();
-		DPElement formulaPara = styleSheet.paragraph( new DPElement[] { formula } );
+		DPElement formula = makePlaceHolder( mathStyle );
+		DPElement formulaPara = mainStyle.paragraph( new DPElement[] { formula } );
 		
-		DPElement vbox = styleSheet.withVBoxSpacing( 10.0 ).vbox( new DPElement[] { title, formulaPara } ).alignHExpand();
+		DPElement vbox = mainStyle.withVBoxSpacing( 10.0 ).vbox( new DPElement[] { title, formulaPara } ).alignHExpand();
 		
 		return vbox.pad( 20.0, 5.0 );
 	}
@@ -173,6 +181,6 @@ public class DndTestPage extends SystemPage
 		DPElement palette = makePalette();
 		DPElement formula = makeFormula();
 		
-		return styleSheet.withVBoxSpacing( 20.0 ).vbox( new DPElement[] { palette.alignHExpand(), formula.alignHExpand() } ).alignHExpand();
+		return mainStyle.withVBoxSpacing( 20.0 ).vbox( new DPElement[] { palette.alignHExpand(), formula.alignHExpand() } ).alignHExpand();
 	}
 }
