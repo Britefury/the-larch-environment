@@ -102,7 +102,7 @@ class WorksheetViewerStyleSheet (StyleSheet):
 		return self['richTextStyle'].paragraph( text )
 	
 	def h1(self, text):
-		return elf['richTextStyle'].h1( text )
+		return self['richTextStyle'].h1( text )
 	
 	def h2(self, text):
 		return self['richTextStyle'].h2( text )

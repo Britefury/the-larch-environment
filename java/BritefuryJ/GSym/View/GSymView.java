@@ -333,7 +333,7 @@ public class GSymView extends IncrementalTree
 			
 			// Get the persistent state, if any, and store it
 			GSymFragmentView viewNode = (GSymFragmentView)node;
-			PersistentStateTable stateTable = viewNode.getPersistentStateTable();
+			PersistentStateTable stateTable = viewNode.getValidPersistentStateTable();
 			if ( stateTable != null )
 			{
 				store.addPersistentState( node.getDocNode(), stateTable );

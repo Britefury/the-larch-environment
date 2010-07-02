@@ -94,10 +94,6 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 		fragmentElement.addDragSource( fragmentDragSource );
 		element = null;
 		this.persistentState = persistentState;
-		if ( this.persistentState == null )
-		{
-			this.persistentState = new PersistentStateTable();
-		}
 	}
 	
 	
@@ -219,7 +215,7 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	}
 
 	
-	public PersistentStateTable getPersistentStateTable()
+	public PersistentStateTable getValidPersistentStateTable()
 	{
 		if ( persistentState == null )
 		{
@@ -228,9 +224,14 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 		return persistentState;
 	}
 	
+	public PersistentStateTable getPersistentStateTable()
+	{
+		return persistentState;
+	}
+	
 	public PersistentState persistentState(Object key)
 	{
-		return getPersistentStateTable().persistentState( key );
+		return getValidPersistentStateTable().persistentState( key );
 	}
 
 

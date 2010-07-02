@@ -6,11 +6,15 @@
 //##************************
 package BritefuryJ.CellEditor;
 
+import java.awt.Color;
 import java.util.WeakHashMap;
+
+import javax.swing.SwingUtilities;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.Cell.LiteralCell;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentView;
@@ -19,10 +23,58 @@ import BritefuryJ.Incremental.IncrementalMonitorListener;
 
 public abstract class LiteralCellEditor implements Presentable, IncrementalMonitorListener
 {
+	private static final PrimitiveStyleSheet errorStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.8f, 0.0f, 0.0f ) );
+	
 	protected abstract class Editor
 	{
-		protected abstract void onCellChanged();
-		protected abstract DPElement getElement();
+		private boolean bSettingCellValue = false;
+		private DPElement element;
+
+		
+		
+		protected abstract void refreshEditor();
+		
+		
+		protected DPElement getElement()
+		{
+			return element;
+		}
+		
+		
+		protected void setElement(DPElement e)
+		{
+			element = e;
+		}
+		
+		protected void error(String message)
+		{
+			element = errorStyle.staticText( "<" + message + ">" );
+		}
+		
+		
+		protected void onCellChanged()
+		{
+			if ( !bSettingCellValue )
+			{
+				Runnable run = new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						refreshEditor();
+					}
+				};
+				
+				SwingUtilities.invokeLater( run );
+			}
+		}
+		
+		protected void setCellValue(Object value)
+		{
+			bSettingCellValue = true;
+			cell.setLiteralValue( value );
+			bSettingCellValue = false;
+		}
 	};
 	
 	
@@ -62,9 +114,26 @@ public abstract class LiteralCellEditor implements Presentable, IncrementalMonit
 		return typedV;
 	}
 	
-	protected void setCellValue(Object value)
+	protected <V extends Object> V getCellValueNonNull(Class<V> valueClass, V defaultValue)
 	{
-		cell.setLiteralValue( value );
+		Object v = cell.getLiteralValue();
+		
+		if ( v == null )
+		{
+			return defaultValue;
+		}
+		
+		V typedV = null;
+		try
+		{
+			typedV = valueClass.cast( v );
+		}
+		catch (ClassCastException e)
+		{
+			return defaultValue;
+		}
+		
+		return typedV;
 	}
 	
 
