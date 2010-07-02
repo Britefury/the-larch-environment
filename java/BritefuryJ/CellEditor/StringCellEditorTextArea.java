@@ -7,7 +7,6 @@
 package BritefuryJ.CellEditor;
 
 import BritefuryJ.Cell.LiteralCell;
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
 import BritefuryJ.DocPresent.Controls.TextArea;
 
@@ -20,33 +19,41 @@ public class StringCellEditorTextArea extends LiteralCellEditor
 			@Override
 			public void onAccept(TextArea textArea, String text)
 			{
-				bResponding = true;
 				setCellValue( text );
-				bResponding = false;
 			}
 		}
 		
 		private TextArea textArea;
-		private boolean bResponding = false;
+		
+		
 		
 		public StringEditor()
 		{
-			String text = getCellValue( String.class );
-			textArea = styleSheet.textArea( text != null  ?  text  :  "<not a string>", new Listener() );
-		}
-		
-		protected void onCellChanged()
-		{
-			if ( !bResponding )
+			String value = getCellValue( String.class );
+			String text = value != null  ?  value  :  "";
+			textArea = styleSheet.textArea( text, new Listener() );
+			if ( value != null )
 			{
-				String text = getCellValue( String.class );
-				textArea.setText( text != null  ?  text  :  "<not a string>" );
+				setElement( textArea.getElement() );
+			}
+			else
+			{
+				error( "not a string" );
 			}
 		}
 		
-		protected DPElement getElement()
+		
+		protected void refreshEditor()
 		{
-			return textArea.getElement();
+			String text = getCellValue( String.class );
+			if ( text != null )
+			{
+				textArea.setText( text );
+			}
+			else
+			{
+				error( "not a string" );
+			}
 		}
 	};
 	

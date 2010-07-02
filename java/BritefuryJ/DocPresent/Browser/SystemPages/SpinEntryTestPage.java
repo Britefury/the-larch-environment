@@ -62,7 +62,7 @@ public class SpinEntryTestPage extends SystemPage
 		}
 
 
-		public void onSpinEntryValueChanged(IntSpinEntry spinEntry, long value)
+		public void onSpinEntryValueChanged(IntSpinEntry spinEntry, int value)
 		{
 			textElement.setText( String.valueOf( value ) );
 		}

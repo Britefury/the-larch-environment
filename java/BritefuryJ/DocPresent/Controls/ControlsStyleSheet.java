@@ -1018,7 +1018,7 @@ public class ControlsStyleSheet extends StyleSheet
 		return new RealSpinEntry( element, textEntry, upArrow, downArrow, textListener, value, min, max, stepSize, pageSize, listener );
 	}
 
-	public IntSpinEntry intSpinEntry(long value, long min, long max, long stepSize, long pageSize, IntSpinEntry.IntSpinEntryListener listener)
+	public IntSpinEntry intSpinEntry(int value, int min, int max, int stepSize, int pageSize, IntSpinEntry.IntSpinEntryListener listener)
 	{
 		PrimitiveStyleSheet spinEntryStyle = getSpinEntryStyleSheet();
 		PrimitiveStyleSheet arrowStyle = getSpinEntryArrowStyleSheet();

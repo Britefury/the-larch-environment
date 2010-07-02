@@ -12,17 +12,17 @@ public class IntSpinEntry extends SpinEntry
 {
 	public static interface IntSpinEntryListener
 	{
-		public void onSpinEntryValueChanged(IntSpinEntry spinEntry, long value);
+		public void onSpinEntryValueChanged(IntSpinEntry spinEntry, int value);
 	}
 
 	
 	
-	private long value, min, max, stepSize, pageSize;
+	private int value, min, max, stepSize, pageSize;
 	private IntSpinEntryListener listener;
 	
 
 	protected IntSpinEntry(DPElement element, TextEntry textEntry, DPElement upSpinButton, DPElement downSpinButton, SpinEntryTextListener textListener,
-			long value, long min, long max, long stepSize, long pageSize, IntSpinEntryListener listener)
+			int value, int min, int max, int stepSize, int pageSize, IntSpinEntryListener listener)
 	{
 		super( element, textEntry, upSpinButton, downSpinButton, textListener );
 		
@@ -36,12 +36,12 @@ public class IntSpinEntry extends SpinEntry
 	
 	
 	
-	public long getValue()
+	public int getValue()
 	{
 		return value;
 	}
 	
-	public void setValue(long newValue)
+	public void setValue(int newValue)
 	{
 		newValue = Math.min( Math.max( newValue, min ), max );
 		if ( newValue != value )
@@ -55,8 +55,8 @@ public class IntSpinEntry extends SpinEntry
 	
 	protected void onTextChanged(String text)
 	{
-		long textValue = Long.valueOf( text );
-		long newValue = Math.min( Math.max( textValue, min ), max );
+		int textValue = Integer.valueOf( text );
+		int newValue = Math.min( Math.max( textValue, min ), max );
 		if ( newValue != value )
 		{
 			value = newValue;

@@ -15,5 +15,5 @@ import BritefuryJ.GSym.View.GSymFragmentView;
 
 public interface PyObjectPresenter<StyleSheetType extends StyleSheet>
 {
-	public DPElement presentObject(PyObject x, GSymFragmentView ctx, StyleSheetType styleSheet, AttributeTable state);
+	public DPElement presentObject(PyObject x, GSymFragmentView fragment, StyleSheetType styleSheet, AttributeTable state);
 }
