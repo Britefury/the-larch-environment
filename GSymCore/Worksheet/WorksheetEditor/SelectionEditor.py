@@ -34,19 +34,22 @@ class WorksheetSelectionEditTreeEvent (SelectionEditTreeEvent):
 
 		
 
-def _worksheetBufferFactory(stream):
-	return WorksheetBuffer( stream )
-
-
-def _isEditLevelFragment(fragment):
-	return True
-
-
-
 
 class WorksheetEditHandler (LinearRepresentationEditHandler):
 	def __init__(self):
-		super( WorksheetEditHandler, self ).__init__( _isEditLevelFragment, _worksheetBufferFactory, _worksheetBufferDataFlavor )
+		super( WorksheetEditHandler, self ).__init__( _worksheetBufferDataFlavor )
+		
+		
+	def isEditLevelFragmentView(self, fragment):
+		return True
+	
+	
+	def createSelectionBuffer(self, stream):
+		return WorksheetBuffer( stream )
+	
+	
+	def filterTextForImport(self, text):
+		return text
 		
 		
 	def copyStructuralValue(self, x):

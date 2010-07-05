@@ -66,14 +66,22 @@ class DedentPythonSelectionTreeEvent (PythonSelectionEditTreeEvent):
 
 		
 
-def _python25BufferFactory(stream):
-	return Python25Buffer( stream )
-
-
 class Python25EditHandler (LinearRepresentationEditHandler):
 	def __init__(self):
-		super( Python25EditHandler, self ).__init__( isStmtFragment, _python25BufferFactory, _python25BufferDataFlavor )
+		super( Python25EditHandler, self ).__init__( _python25BufferDataFlavor )
 		self._grammar = Python25Grammar()
+		
+		
+	def isEditLevelFragmentView(self, fragment):
+		return isStmtFragment( fragment )
+	
+	
+	def createSelectionBuffer(self, stream):
+		return Python25Buffer( stream )
+	
+	
+	def filterTextForImport(self, text):
+		return text.replace( '\t', '' )
 		
 		
 			

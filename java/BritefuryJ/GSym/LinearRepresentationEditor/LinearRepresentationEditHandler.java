@@ -25,22 +25,51 @@ import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
 public abstract class LinearRepresentationEditHandler implements EditHandler
 {
-	private FragmentViewFilter editLevelFragmentFilter, commonRootEditLevelFragmentFilter;
-	private SelectionBufferFactory bufferFactory;
+	private FragmentViewFilter editLevelFragmentFilter = new FragmentViewFilter()
+	{
+		@Override
+		public boolean testFragmentView(GSymFragmentView fragment)
+		{
+			return isEditLevelFragmentView( fragment );
+		}
+	};
+	
+	
+	private FragmentViewFilter commonRootEditLevelFragmentFilter = new FragmentViewFilter()
+	{
+		@Override
+		public boolean testFragmentView(GSymFragmentView fragment)
+		{
+			return isCommonRootEditLevelFragmentView( fragment );
+		}
+	};
+	
+	
 	private DataFlavor bufferFlavor;
 	
 	
-	public LinearRepresentationEditHandler(FragmentViewFilter editLevelFragmentFilter, FragmentViewFilter commonRootEditLevelFragmentFilter, SelectionBufferFactory bufferFactory, DataFlavor bufferFlavor)
+	public LinearRepresentationEditHandler(DataFlavor bufferFlavor)
 	{
-		this.editLevelFragmentFilter = editLevelFragmentFilter;
-		this.commonRootEditLevelFragmentFilter = commonRootEditLevelFragmentFilter;
-		this.bufferFactory = bufferFactory;
 		this.bufferFlavor = bufferFlavor;
 	}
 	
-	public LinearRepresentationEditHandler(FragmentViewFilter editLevelFragmentFilter, SelectionBufferFactory bufferFactory, DataFlavor bufferFlavor)
+	
+	
+	
+	protected abstract boolean isEditLevelFragmentView(GSymFragmentView fragment);
+	
+	
+	protected boolean isCommonRootEditLevelFragmentView(GSymFragmentView fragment)
 	{
-		this( editLevelFragmentFilter, editLevelFragmentFilter, bufferFactory, bufferFlavor );
+		return isEditLevelFragmentView( fragment );
+	}
+	
+	
+	protected abstract LinearRepresentationBuffer createSelectionBuffer(ItemStream stream);
+	
+	protected String filterTextForImport(String text)
+	{
+		return null;
 	}
 	
 
@@ -95,7 +124,7 @@ public abstract class LinearRepresentationEditHandler implements EditHandler
 				else if ( replacement instanceof String )
 				{
 					ItemStreamBuilder builder = new ItemStreamBuilder();
-					builder.appendTextValue( (String )replacement );
+					builder.appendTextValue( (String)replacement );
 					replacementStream = builder.stream();
 				}
 				
@@ -139,11 +168,24 @@ public abstract class LinearRepresentationEditHandler implements EditHandler
 
 	private void insertAtMarker(Marker marker, Object data)
 	{
+		ItemStream stream = null;
+		
+		
 		if ( data instanceof LinearRepresentationBuffer )
 		{
 			LinearRepresentationBuffer buffer = (LinearRepresentationBuffer)data;
+			stream = buffer.stream;
+		}
+		else if ( data instanceof String )
+		{
+			ItemStreamBuilder builder = new ItemStreamBuilder();
+			builder.appendTextValue( (String)data );
+			stream = builder.stream();
+		}
+		
 			
-			
+		if ( stream != null )
+		{
 			GSymFragmentView insertionPointFragment = GSymFragmentView.getEnclosingFragment( marker.getElement(), editLevelFragmentFilter );
 			DPElement insertionPointElement = insertionPointFragment.getFragmentContentElement();
 			
@@ -151,13 +193,13 @@ public abstract class LinearRepresentationEditHandler implements EditHandler
 			ItemStream before = insertionPointElement.getLinearRepresentationFromStartToMarker( marker );
 			ItemStream after = insertionPointElement.getLinearRepresentationFromMarkerToEnd( marker );
 			
-			ItemStream joinedStream = joinStreamsForInsertion( insertionPointFragment, before, buffer.stream, after );
+			ItemStream joinedStream = joinStreamsForInsertion( insertionPointFragment, before, stream, after );
 			
 			// Store the joined stream in the structural value of the root element
 			insertionPointElement.setStructuralValueStream( joinedStream );
 			// Post a tree event
 			insertionPointElement.postTreeEvent( createSelectionEditTreeEvent( insertionPointElement ) );
-		}
+		};
 	}
 	
 	
@@ -195,7 +237,7 @@ public abstract class LinearRepresentationEditHandler implements EditHandler
 				}
 			}
 			
-			LinearRepresentationBuffer buffer = bufferFactory.createBuffer( builder.stream() );
+			LinearRepresentationBuffer buffer = createSelectionBuffer( builder.stream() );
 			return new LinearRepresentationEditTransferable( buffer, bufferFlavor );
 		}
 		
@@ -218,7 +260,7 @@ public abstract class LinearRepresentationEditHandler implements EditHandler
 	@Override
 	public boolean canImport(Caret caret, Selection selection, DataTransfer dataTransfer)
 	{
-		return dataTransfer.isDataFlavorSupported( bufferFlavor );
+		return dataTransfer.isDataFlavorSupported( bufferFlavor )  ||  dataTransfer.isDataFlavorSupported( DataFlavor.stringFlavor );
 	}
 	
 	@Override
@@ -229,36 +271,64 @@ public abstract class LinearRepresentationEditHandler implements EditHandler
 			return false;
 		}
 		
+		
+		
 		Object data = null;
-		try
-		{
-			data = dataTransfer.getTransferData( bufferFlavor );
-		}
-		catch (UnsupportedFlavorException e)
-		{
-			return false;
-		}
-		catch (IOException e)
-		{
-			return false;
-		}
 		
 		
-		// Paste
-		if ( selection.isEmpty() )
+		if ( dataTransfer.isDataFlavorSupported( bufferFlavor ) )
 		{
-			Marker caretMarker = caret.getMarker();
-			if ( caretMarker.isValid() )
+			try
 			{
-				insertAtMarker( caretMarker, data );
+				data = dataTransfer.getTransferData( bufferFlavor );
+			}
+			catch (UnsupportedFlavorException e)
+			{
+			}
+			catch (IOException e)
+			{
+			}
+		}
+		
+		
+		if ( dataTransfer.isDataFlavorSupported( DataFlavor.stringFlavor ) )
+		{
+			try
+			{
+				data = dataTransfer.getTransferData( DataFlavor.stringFlavor );
+				data = filterTextForImport( (String)data );
+			}
+			catch (UnsupportedFlavorException e)
+			{
+			}
+			catch (IOException e)
+			{
+			}
+		}
+		
+		
+		if ( data != null )
+		{
+			// Paste
+			if ( selection.isEmpty() )
+			{
+				Marker caretMarker = caret.getMarker();
+				if ( caretMarker.isValid() )
+				{
+					insertAtMarker( caretMarker, data );
+					return true;
+				}
+				return false;
+			}
+			else
+			{
+				replaceSelection( selection, data );
 				return true;
 			}
-			return false;
 		}
 		else
 		{
-			replaceSelection( selection, data );
-			return true;
+			return false;
 		}
 	}
 	
