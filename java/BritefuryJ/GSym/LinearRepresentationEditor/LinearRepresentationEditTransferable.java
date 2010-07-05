@@ -32,6 +32,17 @@ public class LinearRepresentationEditTransferable implements Transferable
 		{
 			return buffer;
 		}
+		else if ( flavor.equals( DataFlavor.stringFlavor ) )
+		{
+			if ( buffer.isTextual() )
+			{
+				return buffer.getTextualValue();
+			}
+			else
+			{
+				throw new UnsupportedFlavorException( flavor );
+			}
+		}
 		else
 		{
 			throw new UnsupportedFlavorException( flavor );
@@ -41,12 +52,26 @@ public class LinearRepresentationEditTransferable implements Transferable
 	@Override
 	public DataFlavor[] getTransferDataFlavors()
 	{
-		return new DataFlavor[] { bufferFlavor };
+		if ( buffer.isTextual() )
+		{
+			return new DataFlavor[] { bufferFlavor, DataFlavor.stringFlavor };
+		}
+		else
+		{
+			return new DataFlavor[] { bufferFlavor };
+		}
 	}
 
 	@Override
 	public boolean isDataFlavorSupported(DataFlavor flavor)
 	{
-		return flavor.equals( bufferFlavor );
+		if ( buffer.isTextual() )
+		{
+			return flavor.equals( bufferFlavor )  ||  flavor.equals( DataFlavor.stringFlavor );
+		}
+		else
+		{
+			return flavor.equals( bufferFlavor );
+		}
 	}
 }

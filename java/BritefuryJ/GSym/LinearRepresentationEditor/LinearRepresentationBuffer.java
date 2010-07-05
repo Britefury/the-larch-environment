@@ -19,4 +19,15 @@ public class LinearRepresentationBuffer
 	{
 		this.stream = stream;
 	}
+	
+	
+	protected boolean isTextual()
+	{
+		return stream.isTextual();
+	}
+	
+	protected String getTextualValue()
+	{
+		return stream.textualValue();
+	}
 }
