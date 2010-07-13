@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
 
 public class Sequence extends BranchExpression
 {
@@ -69,7 +69,7 @@ public class Sequence extends BranchExpression
 	}
 
 	@SuppressWarnings("unchecked")
-	protected ParseResult evaluateStreamItems(ParserState state, ItemStreamAccessor input, int start)
+	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
 	{
 		ArrayList<Object> value = new ArrayList<Object>();
 		Map<String, Object> bindings = null;

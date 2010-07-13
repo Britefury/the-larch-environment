@@ -17,11 +17,11 @@ import java.util.WeakHashMap;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Marker.Marker;
+import BritefuryJ.DocPresent.StreamValue.StreamValue;
+import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StyleParams.ContentLeafEditableStyleParams;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.Math.Point2;
-import BritefuryJ.Parser.ItemStream.ItemStream;
-import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
 public abstract class DPContentLeafEditable extends DPContentLeaf
 {
@@ -552,48 +552,48 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	//
 	//
-	// LINEAR REPRESENTATION METHODS
+	// VALUE METHODS
 	//
 	//
 	
-	protected void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
+	protected void buildStreamValueFromStartToPath(StreamValueBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
-		super.getLinearRepresentationFromStartToPath( builder, marker, path, pathMyIndex );
+		super.buildStreamValueFromStartToPath( builder, marker, path, pathMyIndex );
 		builder.appendTextValue( textRepresentation.substring( 0, marker.getClampedIndex() ) );
 	}
 
-	protected void getLinearRepresentationFromPathToEnd(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
+	protected void buildStreamValueFromPathToEnd(StreamValueBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
 		builder.appendTextValue( textRepresentation.substring( marker.getClampedIndex() ) );
-		super.getLinearRepresentationFromPathToEnd( builder, marker, path, pathMyIndex );
+		super.buildStreamValueFromPathToEnd( builder, marker, path, pathMyIndex );
 	}
 
-	public ItemStream getLinearRepresentationBetweenMarkers(Marker startMarker, Marker endMarker)
+	public StreamValue getStreamValueBetweenMarkers(Marker startMarker, Marker endMarker)
 	{
 		if ( startMarker.getElement() != this  ||  endMarker.getElement() != this )
 		{
 			throw new RuntimeException();
 		}
-		ItemStreamBuilder builder = new ItemStreamBuilder();
+		StreamValueBuilder builder = new StreamValueBuilder();
 		builder.appendTextValue( textRepresentation.substring( startMarker.getClampedIndex(), endMarker.getClampedIndex() ) );
 		return builder.stream();
 	}
 
-	protected void getLinearRepresentationFromStartOfRootToMarker(ItemStreamBuilder builder, Marker marker, DPElement root)
+	protected void buildStreamValueFromStartOfRootToMarker(StreamValueBuilder builder, Marker marker, DPElement root)
 	{
 		if ( this != root  &&  parent != null )
 		{
-			parent.getLinearRepresentationFromStartOfRootToMarkerFromChild( builder, marker, root, this );
+			parent.buildStreamValueFromStartOfRootToMarkerFromChild( builder, marker, root, this );
 		}
 		builder.appendTextValue( textRepresentation.substring( 0, marker.getClampedIndex() ) );
 	}
 	
-	protected void getLinearRepresentationFromMarkerToEndOfRoot(ItemStreamBuilder builder, Marker marker, DPElement root)
+	protected void buildStreamValueFromMarkerToEndOfRoot(StreamValueBuilder builder, Marker marker, DPElement root)
 	{
 		builder.appendTextValue( textRepresentation.substring( marker.getClampedIndex() ) );
 		if ( this != root  &&  parent != null )
 		{
-			parent.getLinearRepresentationFromMarkerToEndOfRootFromChild( builder, marker, root, this );
+			parent.buildStreamValueFromMarkerToEndOfRootFromChild( builder, marker, root, this );
 		}
 	}
 

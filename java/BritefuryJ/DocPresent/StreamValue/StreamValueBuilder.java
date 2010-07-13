@@ -4,19 +4,19 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.Parser.ItemStream;
+package BritefuryJ.DocPresent.StreamValue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 
-public class ItemStreamBuilder
+public class StreamValueBuilder
 {
 	public abstract static class Item
 	{
 		abstract public int length();
 		
-		abstract public ItemStream.Item streamItem(int start);
+		abstract public StreamValue.Item streamItem(int start);
 	}
 
 	
@@ -39,9 +39,9 @@ public class ItemStreamBuilder
 		}
 
 	
-		public ItemStream.Item streamItem(int start)
+		public StreamValue.Item streamItem(int start)
 		{
-			return new ItemStream.TextItem( textValue.toString(), start, start + textValue.length() );
+			return new StreamValue.TextItem( textValue.toString(), start, start + textValue.length() );
 		}
 	}
 
@@ -64,9 +64,9 @@ public class ItemStreamBuilder
 		}
 
 	
-		public ItemStream.Item streamItem(int start)
+		public StreamValue.Item streamItem(int start)
 		{
-			return new ItemStream.StructuralItem( structuralValue, start, start + 1 );
+			return new StreamValue.StructuralItem( structuralValue, start, start + 1 );
 		}
 	}
 
@@ -75,18 +75,18 @@ public class ItemStreamBuilder
 	private ArrayList<Item> items;
 	
 	
-	public ItemStreamBuilder()
+	public StreamValueBuilder()
 	{
 		items = new ArrayList<Item>();
 	}
 	
-	public ItemStreamBuilder(String text)
+	public StreamValueBuilder(String text)
 	{
 		items = new ArrayList<Item>();
 		appendTextValue( text );
 	}
 	
-	public ItemStreamBuilder(Item items[])
+	public StreamValueBuilder(Item items[])
 	{
 		this.items = new ArrayList<Item>();
 
@@ -113,37 +113,57 @@ public class ItemStreamBuilder
 		items.add( new StructuralItem( structuralValue ) );
 	}
 	
-	public void appendItemStreamItem(ItemStream.Item item)
+	public void appendStreamItem(StreamValue.Item item)
 	{
-		if ( item instanceof ItemStream.TextItem )
+		if ( item instanceof StreamValue.TextItem )
 		{
-			appendTextValue( ((ItemStream.TextItem)item).textValue );
+			appendTextValue( ((StreamValue.TextItem)item).textValue );
 		}
-		else if ( item instanceof ItemStream.StructuralItem )
+		else if ( item instanceof StreamValue.StructuralItem )
 		{
-			appendStructuralValue( ((ItemStream.StructuralItem)item).structuralValue );
-		}
-	}
-	
-	public void extend(ItemStream items)
-	{
-		for (ItemStream.Item item: items.getItems())
-		{
-			if ( item instanceof ItemStream.TextItem )
-			{
-				appendTextValue( ((ItemStream.TextItem)item).textValue );
-			}
-			else if ( item instanceof ItemStream.StructuralItem )
-			{
-				appendStructuralValue( ((ItemStream.StructuralItem)item).structuralValue );
-			}
+			appendStructuralValue( ((StreamValue.StructuralItem)item).structuralValue );
 		}
 	}
 	
-	
-	public ItemStream stream()
+	public void append(Object value)
 	{
-		ItemStream.Item streamItems[] = new ItemStream.Item[items.size()];
+		if ( value instanceof String )
+		{
+			appendTextValue( (String)value );
+		}
+		else if ( value instanceof StreamValue )
+		{
+			extend( (StreamValue)value );
+		}
+		else if ( value instanceof StreamValue.Item )
+		{
+			appendStreamItem( (StreamValue.Item)value );
+		}
+		else
+		{
+			appendStructuralValue( value );
+		}
+	}
+	
+	public void extend(StreamValue items)
+	{
+		for (StreamValue.Item item: items.getItems())
+		{
+			if ( item instanceof StreamValue.TextItem )
+			{
+				appendTextValue( ((StreamValue.TextItem)item).textValue );
+			}
+			else if ( item instanceof StreamValue.StructuralItem )
+			{
+				appendStructuralValue( ((StreamValue.StructuralItem)item).structuralValue );
+			}
+		}
+	}
+	
+	
+	public StreamValue stream()
+	{
+		StreamValue.Item streamItems[] = new StreamValue.Item[items.size()];
 		
 		int pos = 0;
 		int i = 0;
@@ -154,6 +174,6 @@ public class ItemStreamBuilder
 			i++;
 		}
 		
-		return new ItemStream( streamItems );		
+		return new StreamValue( streamItems );		
 	}
 }

@@ -8,8 +8,8 @@ package BritefuryJ.Parser;
 
 import java.util.List;
 
-import BritefuryJ.Parser.ItemStream.ItemStream;
-import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+import BritefuryJ.DocPresent.StreamValue.StreamValue;
+import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
 
 /*
  * TerminalString
@@ -27,7 +27,7 @@ import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 public abstract class TerminalString extends ParserExpression
 {
 	protected abstract ParseResult consumeString(String input, int start);
-	protected abstract ParseResult consumeStream(ItemStreamAccessor input, int start);
+	protected abstract ParseResult consumeStream(StreamValueAccessor input, int start);
 	
 	
 	private ParseResult matchNode(Object input, int start)
@@ -42,10 +42,10 @@ public abstract class TerminalString extends ParserExpression
 				return res.withRange( start, start + 1 );
 			}
 		}
-		else if ( input instanceof ItemStream )
+		else if ( input instanceof StreamValue )
 		{
-			ItemStream s = (ItemStream)input;
-			ItemStreamAccessor accessor = s.accessor();
+			StreamValue s = (StreamValue)input;
+			StreamValueAccessor accessor = s.accessor();
 			
 			ParseResult res = consumeStream( accessor, 0 );
 			if ( res.getEnd() == s.length() )
@@ -74,7 +74,7 @@ public abstract class TerminalString extends ParserExpression
 		return ParseResult.failure( start );
 	}
 	
-	protected ParseResult evaluateStreamItems(ParserState state, ItemStreamAccessor input, int start)
+	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
 	{
 		start = state.skipJunkChars( input, start );
 		

@@ -9,7 +9,7 @@ package BritefuryJ.Parser;
 import java.util.List;
 
 import BritefuryJ.DocModel.DMObjectInterface;
-import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
 
 /*
  * AnyObject
@@ -43,7 +43,7 @@ public class AnyObject extends ParserExpression
 		return ParseResult.failure( start );
 	}
 
-	protected ParseResult evaluateStreamItems(ParserState state, ItemStreamAccessor input, int start)
+	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
 	{
 		if ( start < input.length() )
 		{

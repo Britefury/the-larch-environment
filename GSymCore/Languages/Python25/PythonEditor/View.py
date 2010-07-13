@@ -25,7 +25,6 @@
 from java.awt.event import KeyEvent
 
 from BritefuryJ.Parser import ParserExpression
-from BritefuryJ.Parser.ItemStream import ItemStreamBuilder
 
 from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod
 
@@ -40,6 +39,7 @@ from Britefury.Util.InstanceCache import instanceCache
 
 from BritefuryJ.AttributeTable import *
 from BritefuryJ.DocPresent import *
+from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder
 
 from BritefuryJ.GSym import GSymPerspective, GSymSubject, GSymRelativeLocationResolver
 
@@ -92,15 +92,13 @@ def unparsedNodeEditor(grammar, styleSheet, node, precedence, contents):
 	elif mode == PythonEditorStyleSheet.MODE_EDITSTATEMENT:
 		statementLine = styleSheet.statementLine( contents )
 		
-		builder = ItemStreamBuilder()
+		builder = StreamValueBuilder()
 		for x in node['value']:
-			if isinstance( x, str )  or  isinstance( x, unicode ):
-				builder.appendTextValue( x )
-			elif isinstance( x, DMObjectInterface ):
-				builder.appendStructuralValue( x )
+			if isinstance( x, str )  or  isinstance( x, unicode )  or  isinstance( x, DMObjectInterface ):
+				builder.append( x )
 			else:
 				raise TypeError, 'UNPARSED node should only contain strings or objects, not %s'  %  ( type( x ), )
-		statementLine.setStructuralValueStream( builder.stream() )
+		statementLine.setFixedValue( builder.stream() )
 		statementLine.addTreeEventListener( instanceCache( StatementTreeEventListener, grammar.singleLineStatement() ) )
 		return statementLine
 	else:
@@ -140,17 +138,15 @@ def statementNodeEditor(grammar, styleSheet, node, contents):
 		statementLine = styleSheet.statementLine( contents )
 		
 		if node.isInstanceOf( Schema.UNPARSED ):
-			builder = ItemStreamBuilder()
+			builder = StreamValueBuilder()
 			for x in node['value']:
-				if isinstance( x, str )  or  isinstance( x, unicode ):
-					builder.appendTextValue( x )
-				elif isinstance( x, DMObjectInterface ):
-					builder.appendStructuralValue( x )
+				if isinstance( x, str )  or  isinstance( x, unicode )  or  isinstance( x, DMObjectInterface ):
+					builder.append( x )
 				else:
 					raise TypeError, 'UNPARSED node should only contain strings or objects, not %s'  %  ( type( x ), )
-			statementLine.setStructuralValueStream( builder.stream() )
+			statementLine.setFixedValue( builder.stream() )
 		else:
-			statementLine.setStructuralValueObject( node )
+			statementLine.setFixedValue( node )
 		statementLine.addTreeEventListener( instanceCache( StatementTreeEventListener, grammar.singleLineStatement() ) )
 		statementLine.addInteractor( _statementIndentationInteractor )
 		return statementLine
@@ -161,7 +157,7 @@ def statementNodeEditor(grammar, styleSheet, node, contents):
 def compoundStatementHeaderEditor(grammar, styleSheet, node, headerContents, headerContainerFn=None):
 	headerStatementLine = styleSheet.statementLine( headerContents )
 	
-	headerStatementLine.setStructuralValueObject( node )
+	headerStatementLine.setFixedValue( node )
 	headerStatementLine.addTreeEventListener( instanceCache( StatementTreeEventListener, grammar.singleLineStatement() ) )
 	headerStatementLine.addInteractor( _statementIndentationInteractor )
 	if headerContainerFn is not None:
@@ -185,7 +181,7 @@ def compoundStatementEditor(ctx, grammar, styleSheet, node, precedence, compound
 			raise TypeError, 'Compound block should be of the form (headerNode, headerContents, suite)  or  (headerNode, headerContents, suite, headerContainerFn)'
 		
 		headerStatementLine = styleSheet.statementLine( headerContents )
-		headerStatementLine.setStructuralValueObject( headerNode )
+		headerStatementLine.setFixedValue( headerNode )
 		headerStatementLine.addTreeEventListener( instanceCache( CompoundHeaderTreeEventListener, statementParser ) )
 		headerStatementLine.addInteractor( _statementIndentationInteractor )
 		
@@ -196,15 +192,15 @@ def compoundStatementEditor(ctx, grammar, styleSheet, node, precedence, compound
 
 		if suite is not None:
 			indent = styleSheet.indentElement()
-			indent.setStructuralValueObject( Schema.Indent() )
+			indent.setFixedValue( Schema.Indent() )
 			
 			lineViews = ctx.mapPresentFragment( suite, styleSheet.withPythonState( PRECEDENCE_NONE, PythonEditorStyleSheet.MODE_EDITSTATEMENT ) )
 			
 			dedent = styleSheet.dedentElement()
-			dedent.setStructuralValueObject( Schema.Dedent() )
+			dedent.setFixedValue( Schema.Dedent() )
 			
 			suiteElement = styleSheet.indentedBlock( indent, lineViews, dedent )
-			suiteElement.setStructuralValueObject( Schema.IndentedBlock( suite=suite ) )
+			suiteElement.setFixedValue( Schema.IndentedBlock( suite=suite ) )
 			suiteListener = SuiteTreeEventListener( suiteParser, suite )
 			suiteElement.addTreeEventListener( suiteListener )
 			
@@ -265,7 +261,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		else:
 			lineViews = ctx.mapPresentFragment( suite, styleSheet.withPythonState( PRECEDENCE_NONE, PythonEditorStyleSheet.MODE_EDITSTATEMENT ) )
 		suiteElement = styleSheet.suiteView( lineViews )
-		suiteElement.setStructuralValueObject( suite )
+		suiteElement.setFixedValue( suite )
 		suiteListener = SuiteTreeEventListener( self._parser.suite(), suite )
 		suiteElement.addTreeEventListener( suiteListener )
 		return suiteElement
@@ -624,7 +620,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		xView = ctx.presentFragment( x, styleSheet.divNumeratorStyle().withPythonState( xPrec, PythonEditorStyleSheet.MODE_EDITEXPRESSION ) )
 		yView = ctx.presentFragment( y, styleSheet.divDenominatorStyle().withPythonState( yPrec, PythonEditorStyleSheet.MODE_EDITEXPRESSION ) )
 		view = styleSheet.div( xView, yView, '/' )
-		view.setStructuralValueObject( node )
+		view.setFixedValue( node )
 		return expressionNodeEditor( self._parser, styleSheet, node,
 			                     PRECEDENCE_MULDIVMOD,
 		                             view )
@@ -1157,15 +1153,15 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@DMObjectNodeDispatchMethod( Schema.IndentedBlock )
 	def IndentedBlock(self, ctx, styleSheet, state, node, suite):
 		indent = styleSheet.indentElement()
-		indent.setStructuralValueObject( Schema.Indent() )
+		indent.setFixedValue( Schema.Indent() )
 		
 		lineViews = ctx.mapPresentFragment( suite, styleSheet.withPythonState( PRECEDENCE_NONE, PythonEditorStyleSheet.MODE_EDITSTATEMENT ) )
 		
 		dedent = styleSheet.dedentElement()
-		dedent.setStructuralValueObject( Schema.Dedent() )
+		dedent.setFixedValue( Schema.Dedent() )
 		
 		suiteElement = styleSheet.indentedBlock( indent, lineViews, dedent )
-		suiteElement.setStructuralValueObject( node )
+		suiteElement.setFixedValue( node )
 		suiteListener = SuiteTreeEventListener( self._parser.compoundSuite(), suite )
 		suiteElement.addTreeEventListener( suiteListener )
 		

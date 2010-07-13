@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.Parser;
 
-import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
 
 /*
  * Literal
@@ -45,7 +45,7 @@ public class Literal extends TerminalString
 		return ParseResult.failure( start );
 	}
 	
-	protected ParseResult consumeStream(ItemStreamAccessor input, int start)
+	protected ParseResult consumeStream(StreamValueAccessor input, int start)
 	{
 		int end = input.consumeString( start, matchString );
 		

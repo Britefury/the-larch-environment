@@ -4,18 +4,18 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.GSym.LinearRepresentationEditor;
+package BritefuryJ.GSym.SequentialEditor;
 
 import BritefuryJ.DocPresent.Clipboard.LocalDataFlavor;
-import BritefuryJ.Parser.ItemStream.ItemStream;
+import BritefuryJ.DocPresent.StreamValue.StreamValue;
 
-public class LinearRepresentationBuffer
+public class SequentialBuffer
 {
-	public static final LocalDataFlavor dataFlavor = new LocalDataFlavor( LinearRepresentationBuffer.class );
+	public static final LocalDataFlavor dataFlavor = new LocalDataFlavor( SequentialBuffer.class );
 	
-	protected ItemStream stream;
+	protected StreamValue stream;
 	
-	public LinearRepresentationBuffer(ItemStream stream)
+	public SequentialBuffer(StreamValue stream)
 	{
 		this.stream = stream;
 	}

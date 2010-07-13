@@ -4,24 +4,24 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.GSym.LinearRepresentationEditor;
+package BritefuryJ.GSym.SequentialEditor;
 
 import BritefuryJ.DocPresent.DPElement;
 
 public class SelectionEditTreeEvent
 {
-	protected LinearRepresentationEditHandler editHandler;
+	protected SequentialEditHandler editHandler;
 	protected DPElement sourceElement;
 	
 	
-	protected SelectionEditTreeEvent(LinearRepresentationEditHandler editHandler, DPElement sourceElement)
+	protected SelectionEditTreeEvent(SequentialEditHandler editHandler, DPElement sourceElement)
 	{
 		this.editHandler = editHandler;
 		this.sourceElement = sourceElement;
 	}
 	
 	
-	public LinearRepresentationEditHandler getEditHandler()
+	public SequentialEditHandler getEditHandler()
 	{
 		return editHandler;
 	}

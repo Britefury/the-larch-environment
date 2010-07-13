@@ -66,9 +66,9 @@ class ParsedExpressionTreeEventListener (TreeEventListenerObjectDispatch):
 		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it.
 		# Otherwise, clear the structural represnetation of all elements on the path from the source element to @element
 		if not ( isinstance( event, PythonSelectionEditTreeEvent )  and  event.getSourceElement() is element ):
-			sourceElement.clearStructuralRepresentationsOnPathUpTo( element )
-			element.clearStructuralRepresentation()
-		value = element.getLinearRepresentation()
+			sourceElement.clearFixedValuesOnPathUpTo( element )
+			element.clearFixedValue()
+		value = element.getStreamValue()
 		ctx = element.getFragmentContext()
 		node = ctx.getDocNode()
 		if '\n' not in value:
@@ -104,7 +104,7 @@ class ParsedExpressionTreeEventListener (TreeEventListenerObjectDispatch):
 class StructuralExpressionTreeEventListener (TreeEventListenerObjectDispatch):
 	@ObjectDispatchMethod( TextEditEvent )
 	def onTextEditEvent(self, element, sourceElement, event):
-		element.clearStructuralRepresentation()
+		element.clearFixedValue()
 		return False
 		
 	
@@ -127,12 +127,12 @@ class StatementTreeEventListener (TreeEventListenerObjectDispatch):
 		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it.
 		# Otherwise, clear the structural represnetation of all elements on the path from the source element to @element
 		if not ( isinstance( event, PythonSelectionEditTreeEvent )  and  event.getSourceElement() is element ):
-			sourceElement.clearStructuralRepresentationsOnPathUpTo( element )
-			element.clearStructuralRepresentation()
+			sourceElement.clearFixedValuesOnPathUpTo( element )
+			element.clearFixedValue()
 		ctx = element.getFragmentContext()
 		node = ctx.getDocNode()
 		# Get the content
-		value = element.getLinearRepresentation()
+		value = element.getStreamValue()
 		parsed = parseStream( self._parser, value )
 		if parsed is not None:
 			return self.handleParsed( element, sourceElement, ctx, node, value, parsed, event )
@@ -170,7 +170,7 @@ class StatementTreeEventListener (TreeEventListenerObjectDispatch):
 				else:
 					sourceCtxElement = sourceCtx.getFragmentContentElement()
 					sourceNode = sourceCtx.getDocNode()
-					sourceValue = sourceCtxElement.getLinearRepresentation()
+					sourceValue = sourceCtxElement.getStreamValue()
 					
 					if sourceValue.isTextual():
 						if sourceValue.textualValue().strip() == '':
@@ -194,7 +194,7 @@ class StatementTreeEventListener (TreeEventListenerObjectDispatch):
 				pyReplaceStmt( ctx, node, parsed )
 				return True
 		else:
-			element.setStructuralValueObject( parsed )
+			element.setFixedValue( parsed )
 			return element.postTreeEventToParent( event )
 			
 			
@@ -213,10 +213,10 @@ class CompoundHeaderTreeEventListener (TreeEventListenerObjectDispatch):
 		# if @event is a @PythonSelectionEditTreeEvent, and its source element is @element, then @element has had its
 		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it
 		if not isinstance( event, PythonSelectionEditTreeEvent )  or  event.getSourceElement() is not element:
-			element.clearStructuralRepresentation()
+			element.clearFixedValue()
 		ctx = element.getFragmentContext()
 		# Get the content
-		value = element.getLinearRepresentation()
+		value = element.getStreamValue()
 		parsed = parseStream( self._parser, value )
 		if parsed is not None:
 			return self.handleParsed( element, value, parsed, event )
@@ -225,7 +225,7 @@ class CompoundHeaderTreeEventListener (TreeEventListenerObjectDispatch):
 
 		
 	def handleParsed(self, element, value, parsed, event):
-		element.setStructuralValueObject( parsed )
+		element.setFixedValue( parsed )
 		return element.postTreeEventToParent( event )
 			
 
@@ -246,10 +246,10 @@ class SuiteTreeEventListener (TreeEventListenerObjectDispatch):
 		# if @event is a @PythonSelectionEditTreeEvent, and its source element is @element, then @element has had its
 		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it
 		if not isinstance( event, PythonSelectionEditTreeEvent )  or  event.getSourceElement() is not element:
-			element.clearStructuralRepresentation()
+			element.clearFixedValue()
 		ctx = element.getFragmentContext()
 		# Get the content
-		value = element.getLinearRepresentation()
+		value = element.getStreamValue()
 		parsed = parseStream( self._parser, value )
 		if parsed is not None:
 			log = ctx.getView().getPageLog()

@@ -9,7 +9,7 @@ from BritefuryJ.DocPresent.Clipboard import *
 from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent import *
 
-from BritefuryJ.GSym.LinearRepresentationEditor import LinearRepresentationEditHandler, LinearRepresentationBuffer, SelectionEditTreeEvent
+from BritefuryJ.GSym.SequentialEditor import SequentialEditHandler, SequentialBuffer, SelectionEditTreeEvent
 
 
 from Britefury.Util.NodeUtil import *
@@ -33,7 +33,7 @@ class NotImplementedError (Exception):
 	pass
 
 
-class Python25Buffer (LinearRepresentationBuffer):
+class Python25Buffer (SequentialBuffer):
 	pass
 
 
@@ -64,9 +64,38 @@ class DedentPythonSelectionTreeEvent (PythonSelectionEditTreeEvent):
 	def __init__(self, editHandler, sourceElement):
 		super( DedentPythonSelectionTreeEvent, self ).__init__( editHandler, sourceElement )
 
+
+
+class _IndentationStreamValueFn (ElementValueFunction):
+	def __init__(self, innerFn, prefix, suffix):
+		self._innerFn = innerFn
+		self._prefix = prefix
+		self._suffix = suffix
+		
+	def computeElementValue(self, element):
+		return element.getValue( self._innerFn )
+	
+	def addStreamValuePrefixToStream(self, builder, element):
+		if self._innerFn is not None:
+			self._innerFn.addStreamValuePrefixToStream( builder, element )
+		if self._prefix is not None:
+			builder.append( self._prefix )
+		
+	def addStreamValueSuffixToStream(self, builder, element):
+		if self._suffix is not None:
+			builder.append( self._suffix )
+		if self._innerFn is not None:
+			self._innerFn.addStreamValueSuffixToStream( builder, element )
+			
+			
+def _addIndentationStreamValueFnToElement(element, prefix, suffix):
+	oldFn = element.getValueFunction()
+	element.setValueFunction( _IndentationStreamValueFn( oldFn, prefix, suffix ) )
+	return oldFn
+		
 		
 
-class Python25EditHandler (LinearRepresentationEditHandler):
+class Python25EditHandler (SequentialEditHandler):
 	def __init__(self):
 		super( Python25EditHandler, self ).__init__( _python25BufferDataFlavor )
 		self._grammar = Python25Grammar()
@@ -128,13 +157,11 @@ class Python25EditHandler (LinearRepresentationEditHandler):
 			
 			
 	def _indentLine(self, element, context, node):
-		element.setStructuralPrefixObject( Schema.Indent() )
-		element.setStructuralSuffixObject( Schema.Dedent() )
+		oldFn = _addIndentationStreamValueFnToElement( element, Schema.Indent(), Schema.Dedent() )
 		bSuccess = element.postTreeEventToParent( PythonIndentTreeEvent() )
 		if not bSuccess:
 			print 'Python25EditHandler._indentLine(): INDENT LINE FAILED'
-			element.clearStructuralPrefix()
-			element.clearStructuralSuffix()
+			element.setValueFunction( oldFn )
 			
 	
 	
@@ -143,13 +170,11 @@ class Python25EditHandler (LinearRepresentationEditHandler):
 		suiteParent = suite.getValidParents()[0]
 		if not suiteParent.isInstanceOf( Schema.PythonModule ):
 			# This statement is not in the root node
-			element.setStructuralPrefixObject( Schema.Dedent() )
-			element.setStructuralSuffixObject( Schema.Indent() )
+			oldFn = _addIndentationStreamValueFnToElement( element, Schema.Dedent(), Schema.Indent() )
 			bSuccess = element.postTreeEventToParent( PythonDedentTreeEvent() )
 			if not bSuccess:
 				print 'Python25EditHandler._dedentLine(): DEDENT LINE FAILED'
-				element.clearStructuralPrefix()
-				element.clearStructuralSuffix()
+				element.setValueFunction( oldFn )
 		else:
 			print 'Python25EditHandler._dedentLine(): Attempted to dedent line in top-level module'
 			
@@ -174,17 +199,17 @@ class Python25EditHandler (LinearRepresentationEditHandler):
 		# Get the content element, not the fragment itself, otherwise editing operations that involve the module (top level) will trigger events that will NOT be caught
 		rootElement = root.getFragmentContentElement()
 				
-		startContext.getFragmentContentElement().clearStructuralRepresentationsOnPathUpTo( rootElement )
-		endContext.getFragmentContentElement().clearStructuralRepresentationsOnPathUpTo( rootElement )
+		startContext.getFragmentContentElement().clearFixedValuesOnPathUpTo( rootElement )
+		endContext.getFragmentContentElement().clearFixedValuesOnPathUpTo( rootElement )
 		
-		startStmtElement.setStructuralPrefixObject( Schema.Indent() )
-		endStmtElement.setStructuralSuffixObject( Schema.Dedent() )
+		oldStartFn = _addIndentationStreamValueFnToElement( startStmtElement, Schema.Indent(), None )
+		oldEndFn = _addIndentationStreamValueFnToElement( endStmtElement, None, Schema.Dedent() )
 		
 		bSuccess = root.getFragmentContentElement().postTreeEvent( IndentPythonSelectionTreeEvent( self, rootElement ) )
 		if not bSuccess:
 			print 'Python25EditHandler._indentSelection(): INDENT SELECTION FAILED'
-			startStmtElement.clearStructuralPrefix()
-			endStmtElement.clearStructuralSuffix()
+			startStmtElement.setValueFunction( oldStartFn )
+			endStmtElement.setValueFunction( oldEndFn )
 			
 				
 	
@@ -207,17 +232,17 @@ class Python25EditHandler (LinearRepresentationEditHandler):
 		# Get the content element, not the fragment itself, otherwise editing operations that involve the module (top level) will trigger events that will NOT be caught
 		rootElement = root.getFragmentContentElement()
 				
-		startContext.getFragmentContentElement().clearStructuralRepresentationsOnPathUpTo( rootElement )
-		endContext.getFragmentContentElement().clearStructuralRepresentationsOnPathUpTo( rootElement )
+		startContext.getFragmentContentElement().clearFixedValuesOnPathUpTo( rootElement )
+		endContext.getFragmentContentElement().clearFixedValuesOnPathUpTo( rootElement )
 		
-		startStmtElement.setStructuralPrefixObject( Schema.Dedent() )
-		endStmtElement.setStructuralSuffixObject( Schema.Indent() )
-		
+		oldStartFn = _addIndentationStreamValueFnToElement( startStmtElement, Schema.Dedent(), None )
+		oldEndFn = _addIndentationStreamValueFnToElement( endStmtElement, None, Schema.Indent() )
+
 		bSuccess = rootElement.postTreeEvent( DedentPythonSelectionTreeEvent( self, rootElement ) )
 		if not bSuccess:
 			print 'Python25EditHandler._dedentSelection(): DEDENT SELECTION FAILED'
-			startStmtElement.clearStructuralPrefix()
-			endStmtElement.clearStructuralSuffix()
+			startStmtElement.setValueFunction( oldStartFn )
+			endStmtElement.setValueFunction( oldEndFn )
 
 			
 		

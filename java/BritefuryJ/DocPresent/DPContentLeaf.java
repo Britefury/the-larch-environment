@@ -11,10 +11,10 @@ import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.LayoutTree.ContentLeafLayoutNodeInterface;
 import BritefuryJ.DocPresent.Marker.Marker;
+import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StyleParams.ContentLeafStyleParams;
 import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.Math.Point2;
-import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
 public abstract class DPContentLeaf extends DPElement
 {
@@ -230,23 +230,20 @@ public abstract class DPContentLeaf extends DPElement
 	
 	//
 	//
-	// LINEAR REPRESENTATION METHODS
+	// VALUE METHODS
 	//
 	//
 	
-	protected void buildLinearRepresentation(ItemStreamBuilder builder)
+	public Object getDefaultValue()
+	{
+		return textRepresentation;
+	}
+	
+	// Stream value computation
+	
+	protected void buildDefaultStreamValue(StreamValueBuilder builder)
 	{
 		builder.appendTextValue( textRepresentation );
-	}
-	
-	protected void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
-	{
-		super.getLinearRepresentationFromStartToPath( builder, marker, path, pathMyIndex );
-	}
-
-	protected void getLinearRepresentationFromPathToEnd(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
-	{
-		super.getLinearRepresentationFromPathToEnd( builder, marker, path, pathMyIndex );
 	}
 	
 	

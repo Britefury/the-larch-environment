@@ -9,7 +9,7 @@ package BritefuryJ.Parser;
 import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
 
 
 
@@ -86,7 +86,7 @@ public class Production extends ParserExpression
 	
 	
 	
-	protected ParseResult parseStream(ParserState state, ItemStreamAccessor input, int start)
+	protected ParseResult parseStream(ParserState state, StreamValueAccessor input, int start)
 	{
 		return state.memoisedMatchStream( subexp, input, start );
 	}
@@ -101,7 +101,7 @@ public class Production extends ParserExpression
 		return state.memoisedMatchString( subexp, input, start );
 	}
 
-	protected ParseResult evaluateStreamItems(ParserState state, ItemStreamAccessor input, int start)
+	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
 	{
 		return state.memoisedMatchStream( subexp, input, start );
 	}

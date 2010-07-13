@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.GSym.LinearRepresentationEditor;
+package BritefuryJ.GSym.SequentialEditor;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -18,12 +18,12 @@ import BritefuryJ.DocPresent.Clipboard.DataTransfer;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
+import BritefuryJ.DocPresent.StreamValue.StreamValue;
+import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.GSym.View.FragmentViewFilter;
 import BritefuryJ.GSym.View.GSymFragmentView;
-import BritefuryJ.Parser.ItemStream.ItemStream;
-import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
-public abstract class LinearRepresentationEditHandler implements EditHandler
+public abstract class SequentialEditHandler implements EditHandler
 {
 	private FragmentViewFilter editLevelFragmentFilter = new FragmentViewFilter()
 	{
@@ -48,7 +48,7 @@ public abstract class LinearRepresentationEditHandler implements EditHandler
 	private DataFlavor bufferFlavor;
 	
 	
-	public LinearRepresentationEditHandler(DataFlavor bufferFlavor)
+	public SequentialEditHandler(DataFlavor bufferFlavor)
 	{
 		this.bufferFlavor = bufferFlavor;
 	}
@@ -65,7 +65,7 @@ public abstract class LinearRepresentationEditHandler implements EditHandler
 	}
 	
 	
-	protected abstract LinearRepresentationBuffer createSelectionBuffer(ItemStream stream);
+	protected abstract SequentialBuffer createSelectionBuffer(StreamValue stream);
 	
 	protected String filterTextForImport(String text)
 	{
@@ -116,14 +116,14 @@ public abstract class LinearRepresentationEditHandler implements EditHandler
 			
 			if ( replacement != null )
 			{
-				ItemStream replacementStream = null;
-				if ( replacement instanceof LinearRepresentationBuffer )
+				StreamValue replacementStream = null;
+				if ( replacement instanceof SequentialBuffer )
 				{
-					replacementStream = ((LinearRepresentationBuffer)replacement).stream;
+					replacementStream = ((SequentialBuffer)replacement).stream;
 				}
 				else if ( replacement instanceof String )
 				{
-					ItemStreamBuilder builder = new ItemStreamBuilder();
+					StreamValueBuilder builder = new StreamValueBuilder();
 					builder.appendTextValue( (String)replacement );
 					replacementStream = builder.stream();
 				}
@@ -132,14 +132,14 @@ public abstract class LinearRepresentationEditHandler implements EditHandler
 				if ( replacementStream != null )
 				{
 					// Get the item streams for the root element content, before and after the selected region
-					ItemStream before = editRootFragmentElement.getLinearRepresentationFromStartToMarker( startMarker );
-					ItemStream after = editRootFragmentElement.getLinearRepresentationFromMarkerToEnd( endMarker );
+					StreamValue before = editRootFragmentElement.getStreamValueFromStartToMarker( startMarker );
+					StreamValue after = editRootFragmentElement.getStreamValueFromMarkerToEnd( endMarker );
 					
 					// Join
-					ItemStream joinedStream = joinStreamsForInsertion( editRootFragment, before, replacementStream, after );
+					StreamValue joinedStream = joinStreamsForInsertion( editRootFragment, before, replacementStream, after );
 					
 					// Store the joined stream in the structural value of the root element
-					editRootFragmentElement.setStructuralValueStream( joinedStream );
+					editRootFragmentElement.setFixedValue( joinedStream );
 					// Clear the selection
 					selection.clear();
 					// Post a tree event
@@ -149,13 +149,13 @@ public abstract class LinearRepresentationEditHandler implements EditHandler
 			else
 			{
 				// Get the item streams for the root element content, before and after the selected region
-				ItemStream before = editRootFragmentElement.getLinearRepresentationFromStartToMarker( startMarker );
-				ItemStream after = editRootFragmentElement.getLinearRepresentationFromMarkerToEnd( endMarker );
+				StreamValue before = editRootFragmentElement.getStreamValueFromStartToMarker( startMarker );
+				StreamValue after = editRootFragmentElement.getStreamValueFromMarkerToEnd( endMarker );
 				
-				ItemStream joinedStream = joinStreamsForDeletion( editRootFragment, before, after );
+				StreamValue joinedStream = joinStreamsForDeletion( editRootFragment, before, after );
 				
 				// Store the joined stream in the structural value of the root element
-				editRootFragmentElement.setStructuralValueStream( joinedStream );
+				editRootFragmentElement.setFixedValue( joinedStream );
 				// Clear the selection
 				selection.clear();
 				// Post a tree event
@@ -168,17 +168,17 @@ public abstract class LinearRepresentationEditHandler implements EditHandler
 
 	private void insertAtMarker(Marker marker, Object data)
 	{
-		ItemStream stream = null;
+		StreamValue stream = null;
 		
 		
-		if ( data instanceof LinearRepresentationBuffer )
+		if ( data instanceof SequentialBuffer )
 		{
-			LinearRepresentationBuffer buffer = (LinearRepresentationBuffer)data;
+			SequentialBuffer buffer = (SequentialBuffer)data;
 			stream = buffer.stream;
 		}
 		else if ( data instanceof String )
 		{
-			ItemStreamBuilder builder = new ItemStreamBuilder();
+			StreamValueBuilder builder = new StreamValueBuilder();
 			builder.appendTextValue( (String)data );
 			stream = builder.stream();
 		}
@@ -190,13 +190,13 @@ public abstract class LinearRepresentationEditHandler implements EditHandler
 			DPElement insertionPointElement = insertionPointFragment.getFragmentContentElement();
 			
 			// Get the item streams for the root element content, before and after the selected region
-			ItemStream before = insertionPointElement.getLinearRepresentationFromStartToMarker( marker );
-			ItemStream after = insertionPointElement.getLinearRepresentationFromMarkerToEnd( marker );
+			StreamValue before = insertionPointElement.getStreamValueFromStartToMarker( marker );
+			StreamValue after = insertionPointElement.getStreamValueFromMarkerToEnd( marker );
 			
-			ItemStream joinedStream = joinStreamsForInsertion( insertionPointFragment, before, stream, after );
+			StreamValue joinedStream = joinStreamsForInsertion( insertionPointFragment, before, stream, after );
 			
 			// Store the joined stream in the structural value of the root element
-			insertionPointElement.setStructuralValueStream( joinedStream );
+			insertionPointElement.setFixedValue( joinedStream );
 			// Post a tree event
 			insertionPointElement.postTreeEvent( createSelectionEditTreeEvent( insertionPointElement ) );
 		};
@@ -220,25 +220,25 @@ public abstract class LinearRepresentationEditHandler implements EditHandler
 			
 			
 			PresentationComponent.RootElement rootElement = startFragment.getFragmentContentElement().getRootElement();
-			ItemStream stream = rootElement.getLinearRepresentationInSelection( selection );
+			StreamValue stream = rootElement.getStreamValueInSelection( selection );
 			
-			ItemStreamBuilder builder = new ItemStreamBuilder();
-			for (ItemStream.Item item: stream.getItems())
+			StreamValueBuilder builder = new StreamValueBuilder();
+			for (StreamValue.Item item: stream.getItems())
 			{
-				if ( item instanceof ItemStream.StructuralItem )
+				if ( item instanceof StreamValue.StructuralItem )
 				{
-					ItemStream.StructuralItem structuralItem = (ItemStream.StructuralItem)item;
+					StreamValue.StructuralItem structuralItem = (StreamValue.StructuralItem)item;
 					builder.appendStructuralValue( copyStructuralValue( structuralItem.getStructuralValue() ) );
 				}
-				else if ( item instanceof ItemStream.TextItem )
+				else if ( item instanceof StreamValue.TextItem )
 				{
-					ItemStream.TextItem textItem = (ItemStream.TextItem)item;
+					StreamValue.TextItem textItem = (StreamValue.TextItem)item;
 					builder.appendTextValue( textItem.getTextValue() );
 				}
 			}
 			
-			LinearRepresentationBuffer buffer = createSelectionBuffer( builder.stream() );
-			return new LinearRepresentationEditTransferable( buffer, bufferFlavor );
+			SequentialBuffer buffer = createSelectionBuffer( builder.stream() );
+			return new SequentialEditTransferable( buffer, bufferFlavor );
 		}
 		
 		return null;
@@ -334,18 +334,18 @@ public abstract class LinearRepresentationEditHandler implements EditHandler
 	
 	
 	
-	public ItemStream joinStreamsForInsertion(GSymFragmentView subtreeRootFragment, ItemStream before, ItemStream insertion, ItemStream after)
+	public StreamValue joinStreamsForInsertion(GSymFragmentView subtreeRootFragment, StreamValue before, StreamValue insertion, StreamValue after)
 	{
-		ItemStreamBuilder builder = new ItemStreamBuilder();
+		StreamValueBuilder builder = new StreamValueBuilder();
 		builder.extend( before );
 		builder.extend( insertion );
 		builder.extend( after );
 		return builder.stream();
 	}
 	
-	public ItemStream joinStreamsForDeletion(GSymFragmentView subtreeRootFragment, ItemStream before, ItemStream after)
+	public StreamValue joinStreamsForDeletion(GSymFragmentView subtreeRootFragment, StreamValue before, StreamValue after)
 	{
-		ItemStreamBuilder builder = new ItemStreamBuilder();
+		StreamValueBuilder builder = new StreamValueBuilder();
 		builder.extend( before );
 		builder.extend( after );
 		return builder.stream();

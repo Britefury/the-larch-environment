@@ -8,7 +8,7 @@ package BritefuryJ.Parser;
 
 import java.util.List;
 
-import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
 
 /*
  * Suppress
@@ -41,7 +41,7 @@ public class Suppress extends UnaryBranchExpression
 		return subexp.handleStringChars( state, input, start ).suppressed();
 	}
 
-	protected ParseResult evaluateStreamItems(ParserState state, ItemStreamAccessor input, int start)
+	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
 	{
 		return subexp.handleStreamItems( state, input, start ).suppressed();
 	}
