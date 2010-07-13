@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
 import BritefuryJ.ParserHelpers.DebugNode;
 import BritefuryJ.Utils.HashUtils;
 
@@ -166,7 +166,7 @@ public class ParserState
 		return start;
 	}
 	
-	public int skipJunkChars(ItemStreamAccessor input, int start)
+	public int skipJunkChars(StreamValueAccessor input, int start)
 	{
 		if ( start <= input.length() )
 		{
@@ -197,7 +197,7 @@ public class ParserState
 		return memoisedMatch( rule, ParserExpression.Mode.STRING, input, start );
 	}
 	
-	ParseResult memoisedMatchStream(ParserExpression rule, ItemStreamAccessor input, int start)
+	ParseResult memoisedMatchStream(ParserExpression rule, StreamValueAccessor input, int start)
 	{
 		return memoisedMatch( rule, ParserExpression.Mode.STREAM, input, start );
 	}
@@ -367,7 +367,7 @@ public class ParserState
 		}
 		else if ( mode == ParserExpression.Mode.STREAM )
 		{
-			return rule.handleStreamItems( this, (ItemStreamAccessor)input, start );
+			return rule.handleStreamItems( this, (StreamValueAccessor)input, start );
 		}
 		else if ( mode == ParserExpression.Mode.NODE )
 		{

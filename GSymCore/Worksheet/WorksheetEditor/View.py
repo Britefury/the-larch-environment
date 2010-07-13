@@ -142,11 +142,11 @@ class WorksheetEditor (GSymViewObjectDispatch):
 			p = styleSheet.h6( text )
 		elif style == 'title':
 			p = styleSheet.title( text )
-		p.setStructuralPrefixObject( node.partialModel() )
+		addParagraphStreamValueFnToElement( p, node.partialModel() )
 		w = PrimitiveStyleSheet.instance.span( [ p ] )
 		w.addTreeEventListener( TextNodeEventListener.instance )
 		w.addInteractor( TextNodeInteractor.instance )
-		w.setStructuralValueObject( node.getModel() )
+		w.setFixedValue( node.getModel() )
 		return w
 
 
@@ -178,7 +178,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 			executionResultView = executionStyle.executionResult( stdout, executionResult.getStdErr(), excView, resultView )
 		
 		p = styleSheet.pythonCode( codeView, executionResultView, node.getStyle(), node.isResultVisible(), _onSetStyle, _onDelete )
-		p.setStructuralValueObject( node.getModel() )
+		p.setFixedValue( node.getModel() )
 		p.addTreeEventListener( PythonCodeNodeEventListener.instance )
 		return p
 

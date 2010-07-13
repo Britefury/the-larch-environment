@@ -77,7 +77,7 @@ class TextNodeEventListener (TreeEventListenerObjectDispatch):
 
 	@ObjectDispatchMethod( WorksheetSelectionEditTreeEvent )
 	def onSelectionEdit(self, element, sourceElement, event):
-		value = element.getLinearRepresentation()
+		value = element.getStreamValue()
 		node = element.getFragmentContext().getDocNode()
 		if value.isTextual():
 			return self._performTextEdit( element, node, value.textualValue() )
@@ -98,6 +98,33 @@ class TextNodeEventListener (TreeEventListenerObjectDispatch):
 
 
 TextNodeEventListener.instance = TextNodeEventListener()		
+
+
+
+
+class _ParagraphStreamValueFn (ElementValueFunction):
+	def __init__(self, innerFn, prefix):
+		self._innerFn = innerFn
+		self._prefix = prefix
+		
+	def computeElementValue(self, element):
+		return element.getValue( self._innerFn )
+	
+	def addStreamValuePrefixToStream(self, builder, element):
+		if self._innerFn is not None:
+			self._innerFn.addStreamValuePrefixToStream( builder, element )
+		if self._prefix is not None:
+			builder.append( self._prefix )
+		
+	def addStreamValueSuffixToStream(self, builder, element):
+		if self._innerFn is not None:
+			self._innerFn.addStreamValueSuffixToStream( builder, element )
+			
+			
+def addParagraphStreamValueFnToElement(element, prefix):
+	oldFn = element.getValueFunction()
+	element.setValueFunction( _ParagraphStreamValueFn( oldFn, prefix ) )
+	return oldFn
 
 
 

@@ -8,7 +8,7 @@ package BritefuryJ.Parser;
 
 import java.util.List;
 
-import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
 
 /*
  * LiteralValue
@@ -51,7 +51,7 @@ public class LiteralNode extends ParserExpression
 		return ParseResult.failure( start );
 	}
 	
-	protected ParseResult evaluateStreamItems(ParserState state, ItemStreamAccessor input, int start)
+	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
 	{
 		if ( start < input.length() )
 		{

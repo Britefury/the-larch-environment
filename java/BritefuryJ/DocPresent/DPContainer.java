@@ -18,6 +18,7 @@ import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.LayoutTree.BranchLayoutNode;
 import BritefuryJ.DocPresent.Marker.Marker;
+import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
@@ -25,7 +26,6 @@ import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Xform2;
-import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
 
 
@@ -888,61 +888,78 @@ public abstract class DPContainer extends DPElement
 	
 	//
 	//
-	// LINEAR REPRESENTATION METHODS
+	// VALUE METHODS
 	//
 	//
 	
-	public void buildLinearRepresentation(ItemStreamBuilder builder)
+	public Object getDefaultValue()
+	{
+		ArrayList<Object> value = new ArrayList<Object>();
+		for (DPElement child: getInternalChildren())
+		{
+			value.add( child.getValue() );
+		}
+		return value;
+	}
+
+	
+	//
+	//
+	// STREAM VALUE METHODS
+	//
+	//
+	
+	protected void buildDefaultStreamValue(StreamValueBuilder builder)
 	{
 		for (DPElement child: getInternalChildren())
 		{
-			child.appendToLinearRepresentation( builder );
+			child.buildStreamValue( builder );
 		}
 	}
 	
 	
 	
 
-	public void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
+	protected void buildStreamValueFromStartToPath(StreamValueBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
-		super.getLinearRepresentationFromStartToPath( builder, marker, path, pathMyIndex );
+		super.buildStreamValueFromStartToPath( builder, marker, path, pathMyIndex );
 
 		DPElement pathChild = path.get( pathMyIndex + 1 );
 		for (DPElement child: getInternalChildren())
 		{
 			if ( child != pathChild )
 			{
-				child.appendToLinearRepresentation( builder );
+				child.buildStreamValue( builder );
 			}
 			else
 			{
-				child.getLinearRepresentationFromStartToPath( builder, marker, path, pathMyIndex + 1 );
+				child.buildStreamValueFromStartToPath( builder, marker, path, pathMyIndex + 1 );
 				break;
 			}
 		}
 	}
 	
-	public void getLinearRepresentationFromPathToEnd(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
+	protected void buildStreamValueFromPathToEnd(StreamValueBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
 	{
 		List<DPElement> children = getInternalChildren();
 		int pathChildIndex = pathMyIndex + 1;
 		DPElement pathChild = path.get( pathChildIndex );
 		int childIndex = children.indexOf( pathChild );
 		
-		pathChild.getLinearRepresentationFromPathToEnd( builder, marker, path, pathChildIndex );
+		pathChild.buildStreamValueFromPathToEnd( builder, marker, path, pathChildIndex );
 
 		if ( (childIndex + 1) < children.size() )
 		{
 			for (DPElement child: children.subList( childIndex + 1, children.size() ))
 			{
-				child.appendToLinearRepresentation( builder );
+				child.buildStreamValue( builder );
 			}
 		}
 		
-		super.getLinearRepresentationFromPathToEnd( builder, marker, path, pathMyIndex );
+		super.buildStreamValueFromPathToEnd( builder, marker, path, pathMyIndex );
 	}
 
-	public void getLinearRepresentationBetweenPaths(ItemStreamBuilder builder, Marker startMarker, ArrayList<DPElement> startPath, int startPathMyIndex,
+	protected void buildStreamValueBetweenPaths(StreamValueBuilder builder, Marker startMarker, ArrayList<DPElement> startPath, int startPathMyIndex,
 			Marker endMarker, ArrayList<DPElement> endPath, int endPathMyIndex)
 	{
 		List<DPElement> children = getInternalChildren();
@@ -958,31 +975,31 @@ public abstract class DPContainer extends DPElement
 		int endIndex = children.indexOf( endChild );
 	
 		
-		startChild.getLinearRepresentationFromPathToEnd( builder, startMarker, startPath, startPathChildIndex );
+		startChild.buildStreamValueFromPathToEnd( builder, startMarker, startPath, startPathChildIndex );
 		
 		for (int i = startIndex + 1; i < endIndex; i++)
 		{
-			children.get( i ).appendToLinearRepresentation( builder );
+			children.get( i ).buildStreamValue( builder );
 		}
 
-		endChild.getLinearRepresentationFromStartToPath( builder, endMarker, endPath, endPathChildIndex );
+		endChild.buildStreamValueFromStartToPath( builder, endMarker, endPath, endPathChildIndex );
 	}
 
 
-	protected void getLinearRepresentationFromStartOfRootToMarkerFromChild(ItemStreamBuilder builder, Marker marker, DPElement root, DPElement fromChild)
+	protected void buildStreamValueFromStartOfRootToMarkerFromChild(StreamValueBuilder builder, Marker marker, DPElement root, DPElement fromChild)
 	{
 		if ( root != this  &&  parent != null )
 		{
-			parent.getLinearRepresentationFromStartOfRootToMarkerFromChild( builder, marker, root, this );
+			parent.buildStreamValueFromStartOfRootToMarkerFromChild( builder, marker, root, this );
 		}
 		
-		appendStructuralPrefixToLinearRepresentation( builder );
+		appendStreamValuePrefix( builder );
 
 		for (DPElement child: getInternalChildren())
 		{
 			if ( child != fromChild )
 			{
-				child.appendToLinearRepresentation( builder );
+				child.buildStreamValue( builder );
 			}
 			else
 			{
@@ -991,7 +1008,7 @@ public abstract class DPContainer extends DPElement
 		}
 	}
 	
-	protected void getLinearRepresentationFromMarkerToEndOfRootFromChild(ItemStreamBuilder builder, Marker marker, DPElement root, DPElement fromChild)
+	protected void buildStreamValueFromMarkerToEndOfRootFromChild(StreamValueBuilder builder, Marker marker, DPElement root, DPElement fromChild)
 	{
 		List<DPElement> children = getInternalChildren();
 		int childIndex = children.indexOf( fromChild );
@@ -1000,18 +1017,21 @@ public abstract class DPContainer extends DPElement
 		{
 			for (DPElement child: children.subList( childIndex + 1, children.size() ))
 			{
-				child.appendToLinearRepresentation( builder );
+				child.buildStreamValue( builder );
 			}
 		}
 
-		appendStructuralSuffixToLinearRepresentation( builder );
+		appendStreamValueSuffix( builder );
 
 		if ( root != this  &&  parent != null )
 		{
-			parent.getLinearRepresentationFromMarkerToEndOfRootFromChild( builder, marker, root, this );
+			parent.buildStreamValueFromMarkerToEndOfRootFromChild( builder, marker, root, this );
 		}
 	}
 
+	
+	
+	
 	
 	
 	

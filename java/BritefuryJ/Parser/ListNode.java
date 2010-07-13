@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
 
 /*
  * ListNode
@@ -108,7 +108,7 @@ public class ListNode extends BranchExpression
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected ParseResult evaluateStreamItems(ParserState state, ItemStreamAccessor input, int start)
+	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
 	{
 		if ( start < input.length() )
 		{

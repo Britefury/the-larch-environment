@@ -4,21 +4,21 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.GSym.LinearRepresentationEditor;
+package BritefuryJ.GSym.SequentialEditor;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
-public class LinearRepresentationEditTransferable implements Transferable
+public class SequentialEditTransferable implements Transferable
 {
-	protected LinearRepresentationBuffer buffer;
+	protected SequentialBuffer buffer;
 	protected DataFlavor bufferFlavor;
 	
 	
 	
-	public LinearRepresentationEditTransferable(LinearRepresentationBuffer buffer, DataFlavor bufferFlavor)
+	public SequentialEditTransferable(SequentialBuffer buffer, DataFlavor bufferFlavor)
 	{
 		this.buffer = buffer;
 		this.bufferFlavor = bufferFlavor;

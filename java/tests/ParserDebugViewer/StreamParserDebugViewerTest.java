@@ -10,19 +10,19 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.Parser.AnyNode;
 import BritefuryJ.Parser.DebugParseResult;
 import BritefuryJ.Parser.Literal;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.Production;
-import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
 public class StreamParserDebugViewerTest
 {
 	public static DebugParseResult streamParseDebugResultTest() throws ParserExpression.ParserCoerceException, Production.CannotOverwriteProductionExpressionException
 	{
-		ItemStreamBuilder builder1 = new ItemStreamBuilder();
+		StreamValueBuilder builder1 = new StreamValueBuilder();
 		builder1.appendTextValue( "this[" );
 		builder1.appendTextValue( "i" );
 		//builder1.appendStructuralValue( xs );

@@ -69,7 +69,7 @@ class BodyNodeEventListener (TreeEventListenerObjectDispatch):
 
 	@ObjectDispatchMethod( WorksheetSelectionEditTreeEvent )
 	def onSelectionEdit(self, element, sourceElement, event):
-		value = element.getLinearRepresentation()
+		value = element.getStreamValue()
 		node = element.getFragmentContext().getDocNode()
 		
 		log = element.getFragmentContext().getView().getPageLog()

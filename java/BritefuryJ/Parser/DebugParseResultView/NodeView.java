@@ -23,10 +23,10 @@ import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
+import BritefuryJ.DocPresent.StreamValue.StreamValue;
+import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.Parser.ParserExpression;
-import BritefuryJ.Parser.ItemStream.ItemStream;
-import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
 import BritefuryJ.ParserHelpers.DebugNode;
 import BritefuryJ.ParserHelpers.ParseResultInterface;
 
@@ -276,9 +276,9 @@ public class NodeView implements FragmentContext
 			inputString = (String)inputObject;
 			inputString = inputString.substring( data.getResult().getBegin(), data.getResult().getEnd() );
 		}
-		else if ( inputObject instanceof ItemStreamAccessor )
+		else if ( inputObject instanceof StreamValueAccessor )
 		{
-			ItemStream stream = ((ItemStreamAccessor)inputObject).getStream();
+			StreamValue stream = ((StreamValueAccessor)inputObject).getStream();
 			inputString = stream.subStream( data.getResult().getBegin(), data.getResult().getEnd() ).toString();
 		}
 		else if ( inputObject instanceof List )

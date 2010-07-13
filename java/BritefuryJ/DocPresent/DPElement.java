@@ -43,11 +43,8 @@ import BritefuryJ.DocPresent.LayoutTree.ArrangedSequenceLayoutNode;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNode;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Painter.Painter;
-import BritefuryJ.DocPresent.StructuralRepresentation.StructuralRepresentation;
-import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValue;
-import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueObject;
-import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueSequence;
-import BritefuryJ.DocPresent.StructuralRepresentation.StructuralValueStream;
+import BritefuryJ.DocPresent.StreamValue.StreamValue;
+import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
@@ -61,8 +58,6 @@ import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 import BritefuryJ.Math.Xform2;
-import BritefuryJ.Parser.ItemStream.ItemStream;
-import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 import BritefuryJ.Utils.HashUtils;
 
 
@@ -390,8 +385,9 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	protected final static int FLAG_CARET_GRABBED = 0x8;
 	protected final static int FLAG_HOVER = 0x10;
 	protected final static int FLAG_ENSURE_VISIBLE_QUEUED = 0x20;
+	protected final static int FLAG_HAS_FIXED_VALUE = 0x40;
 
-	protected final static int _ALIGN_SHIFT = 6;
+	protected final static int _ALIGN_SHIFT = 7;
 	protected final static int _ALIGN_MASK = ElementAlignment._ELEMENTALIGN_MASK  <<  _ALIGN_SHIFT;
 	protected final static int _HALIGN_MASK = ElementAlignment._HALIGN_MASK  <<  _ALIGN_SHIFT;
 	protected final static int _VALIGN_MASK = ElementAlignment._VALIGN_MASK  <<  _ALIGN_SHIFT;
@@ -409,9 +405,10 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	private InteractionFields interactionFields;
 
 	protected PresentationStateListenerList debugPresStateListeners = null;
-	protected String debugName; 
+	protected String debugName;
 	
-	protected StructuralRepresentation structuralRepresentation;
+	protected ElementValueFunction valueFn;
+	protected Object fixedValue;
 	
 	
 	
@@ -459,7 +456,11 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	{
 		this( element.styleParams );
 		debugName = element.debugName;
-		structuralRepresentation = element.structuralRepresentation;
+		valueFn = element.valueFn;
+		if ( element.hasFixedValue() )
+		{
+			setFixedValue( element.getFixedValue() );
+		}
 		if ( element.interactionFields != null )
 		{
 			interactionFields = element.interactionFields.copy();
@@ -2748,107 +2749,179 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	//
 	//
-	// LINEAR REPRESENTATION METHODS
+	// VALUE METHODS
 	//
 	//
 	
-	
-	public ItemStream getLinearRepresentationFromStartToMarker(Marker marker)
+	public Object getValue()
 	{
-		ItemStreamBuilder builder = new ItemStreamBuilder();
-		marker.getElement().getLinearRepresentationFromStartOfRootToMarker( builder, marker, this );
-		return builder.stream();
+		return getValue( valueFn );
 	}
 	
-	public ItemStream getLinearRepresentationFromMarkerToEnd(Marker marker)
+	public Object getValue(ElementValueFunction fn)
 	{
-		ItemStreamBuilder builder = new ItemStreamBuilder();
-		marker.getElement().getLinearRepresentationFromMarkerToEndOfRoot( builder, marker, this );
-		return builder.stream();
-	}
-
-	
-	
-	protected void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
-	{
-		if ( structuralRepresentation != null )
+		if ( hasFixedValue() )
 		{
-			structuralRepresentation.addPrefixToStream( builder );
-		}
-	}
-	
-	
-	protected void getLinearRepresentationFromPathToEnd(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
-	{
-		if ( structuralRepresentation != null )
-		{
-			structuralRepresentation.addSuffixToStream( builder );
-		}
-	}
-
-
-
-	
-	protected abstract void buildLinearRepresentation(ItemStreamBuilder builder);
-	
-	protected void appendToLinearRepresentation(ItemStreamBuilder builder)
-	{
-		if ( structuralRepresentation != null )
-		{
-			structuralRepresentation.addPrefixToStream( builder );
-			if ( structuralRepresentation.getMainValue()  !=  null )
-			{
-				structuralRepresentation.addMainToStream( builder );
-			}
-			else
-			{
-				buildLinearRepresentation( builder );
-			}
-			structuralRepresentation.addSuffixToStream( builder );
+			return fixedValue;
 		}
 		else
 		{
-			buildLinearRepresentation( builder );
+			if ( fn != null )
+			{
+				return fn.computeElementValue( this );
+			}
+			else
+			{
+				return getDefaultValue();
+			}
 		}
 	}
 	
-	protected void appendStructuralPrefixToLinearRepresentation(ItemStreamBuilder builder)
-	{
-		if ( structuralRepresentation != null )
-		{
-			structuralRepresentation.addPrefixToStream( builder );
-		}
-	}
+	public abstract Object getDefaultValue();
 	
-	protected void appendStructuralSuffixToLinearRepresentation(ItemStreamBuilder builder)
-	{
-		if ( structuralRepresentation != null )
-		{
-			structuralRepresentation.addSuffixToStream( builder );
-		}
-	}
 	
-	public ItemStream getLinearRepresentation()
+	
+	
+	
+	//
+	//
+	// STREAM VALUE METHODS
+	//
+	//
+	
+	public StreamValue getStreamValue()
 	{
-		ItemStreamBuilder builder = new ItemStreamBuilder();
-		appendToLinearRepresentation( builder );
+		StreamValueBuilder builder = new StreamValueBuilder();
+		buildStreamValue( builder );
 		return builder.stream();
 	}
 	
-	
-	
-	public void clearStructuralRepresentation()
+	public StreamValue getStreamValue(ElementValueFunction fn)
 	{
-		structuralRepresentation = null;
+		StreamValueBuilder builder = new StreamValueBuilder();
+		buildStreamValue( builder, fn );
+		return builder.stream();
 	}
 	
-	public void clearStructuralRepresentationsOnPathUpTo(DPElement subtreeRoot)
+	public StreamValue getDefaultStreamValue()
+	{
+		StreamValueBuilder builder = new StreamValueBuilder();
+		buildDefaultStreamValue( builder );
+		return builder.stream();
+	}
+	
+	protected void buildStreamValue(StreamValueBuilder builder)
+	{
+		buildStreamValue( builder, valueFn );
+	}
+	
+	protected void buildStreamValue(StreamValueBuilder builder, ElementValueFunction fn)
+	{
+		appendStreamValuePrefix( builder );
+		if ( hasFixedValue() )
+		{
+			builder.append( fixedValue );
+		}
+		else
+		{
+			if ( fn != null )
+			{
+				builder.append( fn.computeElementValue( this ) );
+			}
+			else
+			{
+				buildDefaultStreamValue( builder );
+			}
+		}
+		appendStreamValueSuffix( builder );
+	}
+	
+	protected abstract void buildDefaultStreamValue(StreamValueBuilder builder);
+	
+	
+	protected void appendStreamValuePrefix(StreamValueBuilder builder)
+	{
+		if ( valueFn != null )
+		{
+			valueFn.addStreamValuePrefixToStream( builder, this );
+		}
+	}
+	
+	protected void appendStreamValueSuffix(StreamValueBuilder builder)
+	{
+		if ( valueFn != null )
+		{
+			valueFn.addStreamValueSuffixToStream( builder, this );
+		}
+	}
+
+	
+	
+	// Stream value within range
+	
+	public StreamValue getStreamValueFromStartToMarker(Marker marker)
+	{
+		StreamValueBuilder builder = new StreamValueBuilder();
+		marker.getElement().buildStreamValueFromStartOfRootToMarker( builder, marker, this );
+		return builder.stream();
+	}
+	
+	public StreamValue getStreamValueFromMarkerToEnd(Marker marker)
+	{
+		StreamValueBuilder builder = new StreamValueBuilder();
+		marker.getElement().buildStreamValueFromMarkerToEndOfRoot( builder, marker, this );
+		return builder.stream();
+	}
+
+	
+	
+	protected void buildStreamValueFromStartToPath(StreamValueBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
+	{
+		appendStreamValuePrefix( builder );
+	}
+	
+	
+	protected void buildStreamValueFromPathToEnd(StreamValueBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
+	{
+		appendStreamValueSuffix( builder );
+	}
+
+	
+	
+	// Value function
+	
+	public void setValueFunction(ElementValueFunction fn)
+	{
+		valueFn = fn;
+	}
+	
+	public ElementValueFunction getValueFunction()
+	{
+		return valueFn;
+	}
+	
+	
+	// Fixed value
+	
+	public void setFixedValue(Object value)
+	{
+		fixedValue = value;
+		setFlag( FLAG_HAS_FIXED_VALUE );
+	}
+	
+	public void clearFixedValue()
+	{
+		fixedValue = null;
+		clearFlag( FLAG_HAS_FIXED_VALUE );
+	}
+	
+	public void clearFixedValuesOnPathUpTo(DPElement subtreeRoot)
 	{
 		DPElement e = this;
 		
 		while ( e != subtreeRoot )
 		{
-			e.structuralRepresentation = null;
+			e.clearFixedValue();
 			
 			e = e.parent;
 			
@@ -2859,112 +2932,21 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		}
 	}
 
-	
-	
-	public void setStructuralPrefix(StructuralValue value)
+	public boolean hasFixedValue()
 	{
-		if ( structuralRepresentation == null )
+		return testFlag( FLAG_HAS_FIXED_VALUE );
+	}
+	
+	public Object getFixedValue()
+	{
+		if ( hasFixedValue() )
 		{
-			structuralRepresentation = new StructuralRepresentation();
+			return fixedValue;
 		}
-		structuralRepresentation.setPrefixValue( value );
-	}
-	
-	public void setStructuralPrefixObject(Object value)
-	{
-		setStructuralPrefix( new StructuralValueObject( value ) );
-	}
-	
-	public void setStructuralPrefixSequence(List<Object> value)
-	{
-		setStructuralPrefix( new StructuralValueSequence( value ) );
-	}
-	
-	public void setStructuralPrefixStream(ItemStream value)
-	{
-		setStructuralPrefix( new StructuralValueStream( value ) );
-	}
-	
-	public void clearStructuralPrefix()
-	{
-		if ( structuralRepresentation != null )
+		else
 		{
-			structuralRepresentation.clearPrefixValue();
+			return null;
 		}
-	}
-	
-	
-	public void setStructuralSuffix(StructuralValue value)
-	{
-		if ( structuralRepresentation == null )
-		{
-			structuralRepresentation = new StructuralRepresentation();
-		}
-		structuralRepresentation.setSuffixValue( value );
-	}
-	
-	public void setStructuralSuffixObject(Object value)
-	{
-		setStructuralSuffix( new StructuralValueObject( value ) );
-	}
-	
-	public void setStructuralSuffixSequence(List<Object> value)
-	{
-		setStructuralSuffix( new StructuralValueSequence( value ) );
-	}
-	
-	public void setStructuralSuffixStream(ItemStream value)
-	{
-		setStructuralSuffix( new StructuralValueStream( value ) );
-	}
-	
-	public void clearStructuralValue()
-	{
-		if ( structuralRepresentation != null )
-		{
-			structuralRepresentation.clearMainValue();
-		}
-	}
-	
-	
-	
-	public void setStructuralValue(StructuralValue value)
-	{
-		if ( structuralRepresentation == null )
-		{
-			structuralRepresentation = new StructuralRepresentation();
-		}
-		structuralRepresentation.setMainValue( value );
-	}
-	
-	public void setStructuralValueObject(Object value)
-	{
-		setStructuralValue( new StructuralValueObject( value ) );
-	}
-	
-	public void setStructuralValueSequence(List<Object> value)
-	{
-		setStructuralValue( new StructuralValueSequence( value ) );
-	}
-	
-	public void setStructuralValueStream(ItemStream value)
-	{
-		setStructuralValue( new StructuralValueStream( value ) );
-	}
-	
-	public void clearStructuralSuffix()
-	{
-		if ( structuralRepresentation != null )
-		{
-			structuralRepresentation.clearSuffixValue();
-		}
-	}
-	
-	
-	
-	public boolean hasStructuralRepresentation()
-	{
-		return structuralRepresentation != null;
 	}
 	
 	

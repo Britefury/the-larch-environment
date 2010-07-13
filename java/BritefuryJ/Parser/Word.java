@@ -9,7 +9,7 @@ package BritefuryJ.Parser;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
 
 public class Word extends TerminalString
 {
@@ -58,7 +58,7 @@ public class Word extends TerminalString
 		return ParseResult.failure( start );
 	}
 	
-	protected ParseResult consumeStream(ItemStreamAccessor input, int start)
+	protected ParseResult consumeStream(StreamValueAccessor input, int start)
 	{
 		String match = input.matchRegEx( start, pattern );
 		

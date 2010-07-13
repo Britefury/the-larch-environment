@@ -14,7 +14,7 @@ from BritefuryJ.DocModel import DMObject, DMNode
 from BritefuryJ.Parser import Action, Condition, Suppress, Literal, Keyword, RegEx, Word, Sequence, Combine, Choice, Optional, Repetition, ZeroOrMore, OneOrMore, Peek, PeekNot, SeparatedList, ObjectNode
 from BritefuryJ.Parser.Utils.Tokens import identifier, decimalInteger, hexInteger, integer, singleQuotedString, doubleQuotedString, quotedString, floatingPoint
 from BritefuryJ.Parser.Utils.OperatorParser import PrefixLevel, SuffixLevel, InfixLeftLevel, InfixRightLevel, InfixChainLevel, UnaryOperator, BinaryOperator, ChainOperator, OperatorTable
-from BritefuryJ.Parser.ItemStream import ItemStreamBuilder
+from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder
 
 from Britefury.Tests.BritefuryJ.Parser.ParserTestCase import ParserTestCase
 
@@ -1238,12 +1238,9 @@ import unittest
 
 class TestCase_Python25Parser (ParserTestCase):
 	def _pythonStream(self, *args):
-		b = ItemStreamBuilder()
+		b = StreamValueBuilder()
 		for x in args:
-			if isinstance( x, str ):
-				b.appendTextValue( x )
-			else:
-				b.appendStructuralValue( x )
+			b.append( x )
 		return b.stream()
 	
 	

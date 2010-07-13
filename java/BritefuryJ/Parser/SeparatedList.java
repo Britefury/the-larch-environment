@@ -14,7 +14,7 @@ import org.python.core.Py;
 import org.python.core.PyInteger;
 import org.python.core.PyObject;
 
-import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
 
 public class SeparatedList extends ParserExpression
 {
@@ -195,7 +195,7 @@ public class SeparatedList extends ParserExpression
 		}
 		else if ( mode == Mode.STREAM )
 		{
-			return subExp.handleStreamItems( state, (ItemStreamAccessor)input, start );
+			return subExp.handleStreamItems( state, (StreamValueAccessor)input, start );
 		}
 		else if ( mode == Mode.LIST )
 		{
@@ -390,7 +390,7 @@ public class SeparatedList extends ParserExpression
 		return evaluate( Mode.STRING, state, input, start );
 	}
 
-	protected ParseResult evaluateStreamItems(ParserState state, ItemStreamAccessor input, int start)
+	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
 	{
 		return evaluate( Mode.STREAM, state, input, start );
 	}

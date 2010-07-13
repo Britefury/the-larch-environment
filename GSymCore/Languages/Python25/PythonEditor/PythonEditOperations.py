@@ -20,11 +20,12 @@ from Britefury.Kernel.Abstract import abstractmethod
 
 from BritefuryJ.DocModel import DMList, DMObject, DMObjectInterface, DMNode
 
-from BritefuryJ.Parser.ItemStream import ItemStreamBuilder, ItemStream
 
 
 from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent import *
+
+from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder, StreamValue
 
 
 from Britefury.Util.NodeUtil import *
@@ -258,7 +259,7 @@ def getMinDepthOfStream(itemStream):
 	depth = 0
 	minDepth = 0
 	for item in itemStream.getItems():
-		if isinstance( item, ItemStream.StructuralItem ):
+		if isinstance( item, StreamValue.StructuralItem ):
 			v = item.getStructuralValue()
 			if v.isInstanceOf( Schema.Indent ):
 				depth += 1
@@ -272,7 +273,7 @@ def getMinDepthOfStream(itemStream):
 def getDepthOffsetOfStream(itemStream):
 	depth = 0
 	for item in itemStream.getItems():
-		if isinstance( item, ItemStream.StructuralItem ):
+		if isinstance( item, StreamValue.StructuralItem ):
 			v = item.getStructuralValue()
 			if v.isInstanceOf( Schema.Indent ):
 				depth += 1
@@ -284,7 +285,7 @@ def getDepthOffsetOfStream(itemStream):
 def joinStreamsAroundDeletionPoint(before, after):
 	beforeOffset = getDepthOffsetOfStream( before )
 	afterOffset = getDepthOffsetOfStream( after )
-	builder = ItemStreamBuilder()
+	builder = StreamValueBuilder()
 	if ( beforeOffset + afterOffset )  ==  0:
 		builder.extend( before )
 		builder.extend( after )
@@ -294,8 +295,8 @@ def joinStreamsAroundDeletionPoint(before, after):
 		afterItems = after.getItems()
 		if len( afterItems ) > 0:
 			firstItem = afterItems[0]
-			if isinstance( firstItem, ItemStream.TextItem ):
-				builder.appendItemStreamItem( firstItem )
+			if isinstance( firstItem, StreamValue.TextItem ):
+				builder.appendStreamValueItem( firstItem )
 				afterItems = list(afterItems)[1:]
 				
 		if offset < 0:
@@ -306,7 +307,7 @@ def joinStreamsAroundDeletionPoint(before, after):
 				builder.appendStructuralValue( Schema.Dedent() )
 
 		for x in afterItems:
-			builder.appendItemStreamItem( x )
+			builder.appendStreamValueItem( x )
 	return builder.stream()
 
 
@@ -315,7 +316,7 @@ def _extendStreamWithoutDedents(builder, itemStream, startDepth):
 	depth = startDepth
 	indentsToSkip = 0
 	for item in itemStream.getItems():
-		if isinstance( item, ItemStream.StructuralItem ):
+		if isinstance( item, StreamValue.StructuralItem ):
 			v = item.getStructuralValue()
 			if v.isInstanceOf( Schema.Indent ):
 				if indentsToSkip > 0:
@@ -330,7 +331,7 @@ def _extendStreamWithoutDedents(builder, itemStream, startDepth):
 				else:
 					depth -= 1
 		if item is not None:
-			builder.appendItemStreamItem( item )
+			builder.appendStreamValueItem( item )
 	
 
 
@@ -343,7 +344,7 @@ def joinStreamsForInsertion(commonRootCtx, before, insertion, after):
 	insertionMinDepth = getMinDepthOfStream( insertion )
 	afterOffset = getDepthOffsetOfStream( after )
 	
-	builder = ItemStreamBuilder()
+	builder = StreamValueBuilder()
 	if ( beforeOffset + insertionOffset + afterOffset )  ==  0   and   ( beforeOffset + insertionMinDepth )  >=  0:
 		builder.extend( before )
 		builder.extend( insertion )
@@ -359,8 +360,8 @@ def joinStreamsForInsertion(commonRootCtx, before, insertion, after):
 		afterItems = after.getItems()
 		if len( afterItems ) > 0:
 			firstItem = afterItems[0]
-			if isinstance( firstItem, ItemStream.TextItem ):
-				builder.appendItemStreamItem( firstItem )
+			if isinstance( firstItem, StreamValue.TextItem ):
+				builder.appendStreamValueItem( firstItem )
 				afterItems = list(afterItems)[1:]
 				
 		if offset < 0:
@@ -371,5 +372,5 @@ def joinStreamsForInsertion(commonRootCtx, before, insertion, after):
 				builder.appendStructuralValue( Schema.Dedent() )
 
 		for x in afterItems:
-			builder.appendItemStreamItem( x )
+			builder.appendStreamValueItem( x )
 	return builder.stream()

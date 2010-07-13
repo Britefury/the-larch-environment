@@ -8,7 +8,7 @@ package BritefuryJ.Parser;
 
 import java.util.regex.Pattern;
 
-import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
 
 /*
  * Keyword
@@ -69,7 +69,7 @@ public class Keyword extends TerminalString
 		return ParseResult.failure( start );
 	}
 	
-	protected ParseResult consumeStream(ItemStreamAccessor input, int start)
+	protected ParseResult consumeStream(StreamValueAccessor input, int start)
 	{
 		CharSequence itemText = input.getItemTextFrom( start );
 		int end = keywordString.length();

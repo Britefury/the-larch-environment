@@ -11,8 +11,8 @@ import java.util.List;
 
 import org.python.core.PyObject;
 
-import BritefuryJ.Parser.ItemStream.ItemStream;
-import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+import BritefuryJ.DocPresent.StreamValue.StreamValue;
+import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
 import BritefuryJ.ParserHelpers.DebugNode;
 
 public abstract class ParserExpression
@@ -198,37 +198,37 @@ public abstract class ParserExpression
 	
 
 	
-	public ParseResult parseStreamItems(ItemStream input)
+	public ParseResult parseStreamItems(StreamValue input)
 	{
 		return parseStreamItems( input.accessor(), "[ ]*", null );
 	}
 
-	public ParseResult parseStreamItems(ItemStream input, String junkRegex)
+	public ParseResult parseStreamItems(StreamValue input, String junkRegex)
 	{
 		return parseStreamItems( input.accessor(), junkRegex, null );
 	}
 
-	public ParseResult parseStreamItems(ItemStream input, ParseAction delegateAction)
+	public ParseResult parseStreamItems(StreamValue input, ParseAction delegateAction)
 	{
 		return parseStreamItems( input.accessor(), "[ ]*", delegateAction );
 	}
 
-	public ParseResult parseStreamItems(ItemStream input, String junkRegex, ParseAction delegateAction)
+	public ParseResult parseStreamItems(StreamValue input, String junkRegex, ParseAction delegateAction)
 	{
 		return parseStreamItems( input.accessor(), junkRegex, delegateAction );
 	}
 
-	public ParseResult parseStreamItems(ItemStream input, PyObject delegateAction)
+	public ParseResult parseStreamItems(StreamValue input, PyObject delegateAction)
 	{
 		return parseStreamItems( input.accessor(), "[ ]*", new Action.PyAction( delegateAction ) );
 	}
 
-	public ParseResult parseStreamItems(ItemStream input, String junkRegex, PyObject delegateAction)
+	public ParseResult parseStreamItems(StreamValue input, String junkRegex, PyObject delegateAction)
 	{
 		return parseStreamItems( input.accessor(), junkRegex, new Action.PyAction( delegateAction ) );
 	}
 
-	private ParseResult parseStreamItems(ItemStreamAccessor input, String junkRegex, ParseAction delegateAction)
+	private ParseResult parseStreamItems(StreamValueAccessor input, String junkRegex, ParseAction delegateAction)
 	{
 		ParserState state = new ParserState( junkRegex, delegateAction );
 		ParseResult result = handleStreamItems( state, input, 0 );
@@ -241,37 +241,37 @@ public abstract class ParserExpression
 	}
 	
 	
-	public DebugParseResult debugParseStreamItems(ItemStream input)
+	public DebugParseResult debugParseStreamItems(StreamValue input)
 	{
 		return debugParseStreamItems( input.accessor(), "[ ]*", null );
 	}
 
-	public DebugParseResult debugParseStreamItems(ItemStream input, String junkRegex)
+	public DebugParseResult debugParseStreamItems(StreamValue input, String junkRegex)
 	{
 		return debugParseStreamItems( input.accessor(), junkRegex, null );
 	}
 
-	public DebugParseResult debugParseStreamItems(ItemStream input, ParseAction delegateAction)
+	public DebugParseResult debugParseStreamItems(StreamValue input, ParseAction delegateAction)
 	{
 		return debugParseStreamItems( input.accessor(), "[ ]*", delegateAction );
 	}
 
-	public DebugParseResult debugParseStreamItems(ItemStream input, String junkRegex, ParseAction delegateAction)
+	public DebugParseResult debugParseStreamItems(StreamValue input, String junkRegex, ParseAction delegateAction)
 	{
 		return debugParseStreamItems( input.accessor(), junkRegex, delegateAction );
 	}
 
-	public DebugParseResult debugParseStreamItems(ItemStream input, PyObject delegateAction)
+	public DebugParseResult debugParseStreamItems(StreamValue input, PyObject delegateAction)
 	{
 		return debugParseStreamItems( input.accessor(), "[ ]*", new Action.PyAction( delegateAction ) );
 	}
 
-	public DebugParseResult debugParseStreamItems(ItemStream input, String junkRegex, PyObject delegateAction)
+	public DebugParseResult debugParseStreamItems(StreamValue input, String junkRegex, PyObject delegateAction)
 	{
 		return debugParseStreamItems( input.accessor(), junkRegex, new Action.PyAction( delegateAction ) );
 	}
 
-	private DebugParseResult debugParseStreamItems(ItemStreamAccessor input, String junkRegex, ParseAction delegateAction)
+	private DebugParseResult debugParseStreamItems(StreamValueAccessor input, String junkRegex, ParseAction delegateAction)
 	{
 		ParserState state = new ParserState( junkRegex, delegateAction );
 		state.enableDebugging();
@@ -434,7 +434,7 @@ public abstract class ParserExpression
 		}
 	}	
 	
-	protected ParseResult handleStreamItems(ParserState state, ItemStreamAccessor input, int start)
+	protected ParseResult handleStreamItems(ParserState state, StreamValueAccessor input, int start)
 	{
 		if ( state.bDebuggingEnabled )
 		{
@@ -467,7 +467,7 @@ public abstract class ParserExpression
 	
 	protected abstract ParseResult evaluateNode(ParserState state, Object input);
 	protected abstract ParseResult evaluateStringChars(ParserState state, String input, int start);
-	protected abstract ParseResult evaluateStreamItems(ParserState state, ItemStreamAccessor input, int start);
+	protected abstract ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start);
 	protected abstract ParseResult evaluateListItems(ParserState state, List<Object> input, int start);
 	
 	

@@ -9,16 +9,16 @@ from BritefuryJ.DocPresent.Clipboard import *
 from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent import *
 
-from BritefuryJ.GSym.LinearRepresentationEditor import LinearRepresentationEditHandler, LinearRepresentationBuffer, SelectionEditTreeEvent
+from BritefuryJ.GSym.SequentialEditor import SequentialEditHandler, SequentialBuffer, SelectionEditTreeEvent
 
-from BritefuryJ.Parser.ItemStream import ItemStreamBuilder, ItemStream
+from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder, StreamValue
 
 from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
 
 
 
 
-class WorksheetBuffer (LinearRepresentationBuffer):
+class WorksheetBuffer (SequentialBuffer):
 	pass
 
 
@@ -35,7 +35,7 @@ class WorksheetSelectionEditTreeEvent (SelectionEditTreeEvent):
 		
 
 
-class WorksheetEditHandler (LinearRepresentationEditHandler):
+class WorksheetEditHandler (SequentialEditHandler):
 	def __init__(self):
 		super( WorksheetEditHandler, self ).__init__( _worksheetBufferDataFlavor )
 		

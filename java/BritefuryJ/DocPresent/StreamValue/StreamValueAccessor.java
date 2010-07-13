@@ -4,18 +4,18 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.Parser.ItemStream;
+package BritefuryJ.DocPresent.StreamValue;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ItemStreamAccessor
+public class StreamValueAccessor
 {
-	private ItemStream stream;
-	private ItemStream.Item currentItem;
+	private StreamValue stream;
+	private StreamValue.Item currentItem;
 	
 	
-	protected ItemStreamAccessor(ItemStream stream)
+	protected StreamValueAccessor(StreamValue stream)
 	{
 		this.stream = stream;
 		
@@ -23,7 +23,7 @@ public class ItemStreamAccessor
 	}
 	
 	
-	public ItemStream getStream()
+	public StreamValue getStream()
 	{
 		return stream;
 	}
@@ -38,12 +38,12 @@ public class ItemStreamAccessor
 	public int consumeString(int start, String x)
 	{
 		updateCurrentItem( start );
-		if ( currentItem instanceof ItemStream.TextItem )
+		if ( currentItem instanceof StreamValue.TextItem )
 		{
 			if ( start + x.length() <= currentItem.stop )
 			{
 				int offset = start - currentItem.start;
-				ItemStream.TextItem t = (ItemStream.TextItem)currentItem;
+				StreamValue.TextItem t = (StreamValue.TextItem)currentItem;
 				if ( t.textValue.substring( offset, offset + x.length() ).equals( x ) )
 				{
 					return start + x.length();
@@ -57,9 +57,9 @@ public class ItemStreamAccessor
 	public int consumeRegEx(int start, Pattern pattern)
 	{
 		updateCurrentItem( start );
-		if ( currentItem instanceof ItemStream.TextItem )
+		if ( currentItem instanceof StreamValue.TextItem )
 		{
-			ItemStream.TextItem t = (ItemStream.TextItem)currentItem;
+			StreamValue.TextItem t = (StreamValue.TextItem)currentItem;
 			int offset = start - t.start;
 			Matcher m = pattern.matcher( t.textValue.substring( offset, t.stop - t.start ) );
 			
@@ -76,9 +76,9 @@ public class ItemStreamAccessor
 	public int skipRegEx(int start,  Pattern pattern)
 	{
 		updateCurrentItem( start );
-		if ( currentItem instanceof ItemStream.TextItem )
+		if ( currentItem instanceof StreamValue.TextItem )
 		{
-			ItemStream.TextItem t = (ItemStream.TextItem)currentItem;
+			StreamValue.TextItem t = (StreamValue.TextItem)currentItem;
 			if ( start < t.stop )
 			{
 				int offset = start - t.start;
@@ -99,9 +99,9 @@ public class ItemStreamAccessor
 	public String matchRegEx(int start, Pattern pattern)
 	{
 		updateCurrentItem( start );
-		if ( currentItem instanceof ItemStream.TextItem )
+		if ( currentItem instanceof StreamValue.TextItem )
 		{
-			ItemStream.TextItem t = (ItemStream.TextItem)currentItem;
+			StreamValue.TextItem t = (StreamValue.TextItem)currentItem;
 			int offset = start - t.start;
 			Matcher m = pattern.matcher( t.textValue.substring( offset, t.stop - t.start ) );
 			
@@ -118,9 +118,9 @@ public class ItemStreamAccessor
 	public boolean matchesRegEx(int start, int stop, Pattern pattern)
 	{
 		updateCurrentItem( start );
-		if ( currentItem instanceof ItemStream.TextItem )
+		if ( currentItem instanceof StreamValue.TextItem )
 		{
-			ItemStream.TextItem t = (ItemStream.TextItem)currentItem;
+			StreamValue.TextItem t = (StreamValue.TextItem)currentItem;
 			int offset = start - t.start;
 			stop = Math.min( stop, t.stop );
 			Matcher m = pattern.matcher( t.textValue.substring( offset, stop - t.start ) );
@@ -145,9 +145,9 @@ public class ItemStreamAccessor
 	public Object[] matchStructuralNode(int start)
 	{
 		updateCurrentItem( start );
-		if ( currentItem instanceof ItemStream.StructuralItem )
+		if ( currentItem instanceof StreamValue.StructuralItem )
 		{
-			ItemStream.StructuralItem s = (ItemStream.StructuralItem)currentItem;
+			StreamValue.StructuralItem s = (StreamValue.StructuralItem)currentItem;
 			return new Object[] { s.structuralValue };
 		}
 		
@@ -159,13 +159,13 @@ public class ItemStreamAccessor
 	public boolean canMatchTextAt(int pos)
 	{
 		updateCurrentItem( pos );
-		return currentItem instanceof ItemStream.TextItem;
+		return currentItem instanceof StreamValue.TextItem;
 	}
 	
 	public boolean canMatchStructuralNodeAt(int pos)
 	{
 		updateCurrentItem( pos );
-		return currentItem instanceof ItemStream.StructuralItem;
+		return currentItem instanceof StreamValue.StructuralItem;
 	}
 	
 	public boolean isAtEnd(int pos)
@@ -178,9 +178,9 @@ public class ItemStreamAccessor
 	public CharSequence getItemTextFrom(int start)
 	{
 		updateCurrentItem( start );
-		if ( currentItem instanceof ItemStream.TextItem )
+		if ( currentItem instanceof StreamValue.TextItem )
 		{
-			ItemStream.TextItem t = (ItemStream.TextItem)currentItem;
+			StreamValue.TextItem t = (StreamValue.TextItem)currentItem;
 			return t.textValue.subSequence( start - currentItem.start, currentItem.stop - currentItem.start );
 		}
 		
@@ -189,7 +189,7 @@ public class ItemStreamAccessor
 	
 	
 	
-	public ItemStreamAccessor subStream(int start, int stop)
+	public StreamValueAccessor subStream(int start, int stop)
 	{
 		return stream.subStream( start, stop ).accessor();
 	}

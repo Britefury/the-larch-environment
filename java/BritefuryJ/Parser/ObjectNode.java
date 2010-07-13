@@ -20,7 +20,7 @@ import org.python.core.PyUnicode;
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectInterface;
-import BritefuryJ.Parser.ItemStream.ItemStreamAccessor;
+import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
 
 /*
  * ObjectNode
@@ -244,7 +244,7 @@ public class ObjectNode extends ParserExpression
 		return ParseResult.failure( start );
 	}
 	
-	protected ParseResult evaluateStreamItems(ParserState state, ItemStreamAccessor input, int start)
+	protected ParseResult evaluateStreamItems(ParserState state, StreamValueAccessor input, int start)
 	{
 		if ( start < input.length() )
 		{

@@ -9,8 +9,8 @@ package BritefuryJ.DocPresent;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.Marker.Marker;
+import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
-import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
 public abstract class DPEmpty extends DPElement
 {
@@ -64,22 +64,18 @@ public abstract class DPEmpty extends DPElement
 
 	//
 	//
-	// LINEAR REPRESENTATION METHODS
+	// VALUE METHODS
 	//
 	//
 	
-	
-	public void buildLinearRepresentation(ItemStreamBuilder builder)
+	public Object getDefaultValue()
 	{
-	}
-
-	protected void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
-	{
-		super.getLinearRepresentationFromStartToPath( builder, marker, path, pathMyIndex );
+		return null;
 	}
 	
-	protected void getLinearRepresentationFromPathToEnd(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
+	// Stream value computation
+	
+	protected void buildDefaultStreamValue(StreamValueBuilder builder)
 	{
-		super.getLinearRepresentationFromPathToEnd( builder, marker, path, pathMyIndex );
 	}
 }

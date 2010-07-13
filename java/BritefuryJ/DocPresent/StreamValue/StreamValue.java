@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.Parser.ItemStream;
+package BritefuryJ.DocPresent.StreamValue;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
-public class ItemStream implements Presentable
+public class StreamValue implements Presentable
 {
 	public static abstract class Item
 	{
@@ -229,13 +229,13 @@ public class ItemStream implements Presentable
 	protected int length;
 	
 	
-	public ItemStream(String text)
+	public StreamValue(String text)
 	{
 		items = new Item[] { new TextItem( text, 0, text.length() ) };
 		length = text.length();
 	}
 	
-	protected ItemStream(Item items[])
+	protected StreamValue(Item items[])
 	{
 		this.items = items;
 		length = items.length > 0  ?  items[items.length-1].stop  :  0;
@@ -359,7 +359,7 @@ public class ItemStream implements Presentable
 	{
 		if ( pos >= length )
 		{
-			throw new IndexOutOfBoundsException( "ItemStream index out of range: pos=" + pos + "/" + length );
+			throw new IndexOutOfBoundsException( "StreamValue index out of range: pos=" + pos + "/" + length );
 		}
 		Item x = itemAt( pos );
 		if ( x instanceof StructuralItem )
@@ -377,7 +377,7 @@ public class ItemStream implements Presentable
 		}
 	}
 	
-	public ItemStream __getitem__(PySlice i)
+	public StreamValue __getitem__(PySlice i)
 	{
 		int indices[] = i.indicesEx( length );
 		int start = indices[0];
@@ -385,7 +385,7 @@ public class ItemStream implements Presentable
 		int step = indices[2];
 		if ( step != 1 )
 		{
-			throw new RuntimeException( "ItemStream.__getItem__(PySlice) does not support slice step != 1" );
+			throw new RuntimeException( "StreamValue.__getItem__(PySlice) does not support slice step != 1" );
 		}
 
 		return subStream( start, stop );
@@ -393,7 +393,7 @@ public class ItemStream implements Presentable
 	
 	
 	
-	public ItemStream subStream(int start, int stop)
+	public StreamValue subStream(int start, int stop)
 	{
 		if ( items.length == 0 )
 		{
@@ -401,7 +401,7 @@ public class ItemStream implements Presentable
 		}
 		else if ( start == stop )
 		{
-			return new ItemStream( new Item[] {} );
+			return new StreamValue( new Item[] {} );
 		}
 		else
 		{
@@ -435,14 +435,14 @@ public class ItemStream implements Presentable
 				subItems[stopIndex-startIndex] = items[stopIndex].subItemTo( stop, pos );
 			}
 			
-			return new ItemStream( subItems );
+			return new StreamValue( subItems );
 		}
 	}
 	
 	
-	public ItemStreamAccessor accessor()
+	public StreamValueAccessor accessor()
 	{
-		return new ItemStreamAccessor( this );
+		return new StreamValueAccessor( this );
 	}
 	
 	
@@ -495,9 +495,9 @@ public class ItemStream implements Presentable
 			return true;
 		}
 		
-		if ( x instanceof ItemStream )
+		if ( x instanceof StreamValue )
 		{
-			ItemStream sx = (ItemStream)x;
+			StreamValue sx = (StreamValue)x;
 			
 			if ( length == sx.length  &&  items.length == sx.items.length )
 			{
@@ -545,9 +545,9 @@ public class ItemStream implements Presentable
 		List<DPElement> itemViews = fragment.mapPresentFragment( Arrays.asList( (Object[])items ), styleSheet );
 		DPElement contents = PrimitiveStyleSheet.instance.paragraph( itemViews.toArray( new DPElement[0] ) );
 		
-		return itemStreamStyle.objectBox( "BritefuryJ.Parser.ItemStream.ItemStream", contents );
+		return streamValueStyle.objectBox( "BritefuryJ.DocPresent.StreamValue.StreamValue", contents );
 	}
 
 
-	private static final GenericPerspectiveStyleSheet itemStreamStyle = GenericPerspectiveStyleSheet.instance.withObjectBorderAndTitlePaint( new Color( 0.65f, 0.0f, 0.55f ) );
+	private static final GenericPerspectiveStyleSheet streamValueStyle = GenericPerspectiveStyleSheet.instance.withObjectBorderAndTitlePaint( new Color( 0.65f, 0.0f, 0.55f ) );
 }

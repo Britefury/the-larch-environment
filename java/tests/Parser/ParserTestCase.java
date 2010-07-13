@@ -14,11 +14,11 @@ import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMIOReader;
 import BritefuryJ.DocModel.DMSchemaResolver;
 import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
+import BritefuryJ.DocPresent.StreamValue.StreamValue;
+import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParseResult;
 import BritefuryJ.Parser.ParserExpression;
-import BritefuryJ.Parser.ItemStream.ItemStream;
-import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
 abstract public class ParserTestCase extends TestCase
 {
@@ -105,7 +105,7 @@ abstract public class ParserTestCase extends TestCase
 
 	public void matchTestStringAndStream(ParserExpression parser, String input, Object expected, String ignoreCharsRegex, ParseAction delegateAction)
 	{
-		ItemStreamBuilder builder = new ItemStreamBuilder();
+		StreamValueBuilder builder = new StreamValueBuilder();
 		builder.appendTextValue( input );
 		
 		matchTestString( parser, input, expected, ignoreCharsRegex, delegateAction );
@@ -144,7 +144,7 @@ abstract public class ParserTestCase extends TestCase
 
 	public void bindingsTestStringAndStream(ParserExpression parser, String input, Map<String, Object> expectedBindings, String ignoreCharsRegex, ParseAction delegateAction)
 	{
-		ItemStreamBuilder builder = new ItemStreamBuilder();
+		StreamValueBuilder builder = new StreamValueBuilder();
 		builder.appendTextValue( input );
 		
 		bindingsTestString( parser, input, expectedBindings, ignoreCharsRegex, delegateAction );
@@ -296,34 +296,34 @@ abstract public class ParserTestCase extends TestCase
 
 	
 	
-	public void matchTestStreamSX(ParserExpression parser, ItemStream input, String expectedSX)
+	public void matchTestStreamSX(ParserExpression parser, StreamValue input, String expectedSX)
 	{
 		matchTestStreamSX( parser, input, expectedSX, "[ \t\n]*", null );
 	}
 
-	public void matchTestStreamSX(ParserExpression parser, ItemStream input, String expectedSX, ParseAction delegateAction)
+	public void matchTestStreamSX(ParserExpression parser, StreamValue input, String expectedSX, ParseAction delegateAction)
 	{
 		matchTestStreamSX( parser, input, expectedSX, "[ \t\n]*", delegateAction );
 	}
 
-	public void matchTestStreamSX(ParserExpression parser, ItemStream input, String expectedSX, String ignoreCharsRegex, ParseAction delegateAction)
+	public void matchTestStreamSX(ParserExpression parser, StreamValue input, String expectedSX, String ignoreCharsRegex, ParseAction delegateAction)
 	{
 		Object expected = readExpectedSX( expectedSX );
 		matchTestStream( parser, input, expected, ignoreCharsRegex, delegateAction );
 	}
 	
 
-	public void matchTestStream(ParserExpression parser, ItemStream input, Object expected)
+	public void matchTestStream(ParserExpression parser, StreamValue input, Object expected)
 	{
 		matchTestStream( parser, input, expected, "[ \t\n]*", null );
 	}
 
-	public void matchTestStream(ParserExpression parser, ItemStream input, Object expected, ParseAction delegateAction)
+	public void matchTestStream(ParserExpression parser, StreamValue input, Object expected, ParseAction delegateAction)
 	{
 		matchTestStream( parser, input, expected, "[ \t\n]*", delegateAction );
 	}
 
-	public void matchTestStream(ParserExpression parser, ItemStream input, Object expected, String ignoreCharsRegex, ParseAction delegateAction)
+	public void matchTestStream(ParserExpression parser, StreamValue input, Object expected, String ignoreCharsRegex, ParseAction delegateAction)
 	{
 		ParseResult result = parser.parseStreamItems( input, ignoreCharsRegex, delegateAction );
 		
@@ -377,32 +377,32 @@ abstract public class ParserTestCase extends TestCase
 	
 	
 
-	public void bindingsTestStreamSX(ParserExpression parser, ItemStream input, String expectedBindingsSX)
+	public void bindingsTestStreamSX(ParserExpression parser, StreamValue input, String expectedBindingsSX)
 	{
 		bindingsTestStreamSX( parser, input, expectedBindingsSX, "[ \t\n]*", null );
 	}
 
-	public void bindingsTestStreamSX(ParserExpression parser, ItemStream input, String expectedBindingsSX, ParseAction delegateAction)
+	public void bindingsTestStreamSX(ParserExpression parser, StreamValue input, String expectedBindingsSX, ParseAction delegateAction)
 	{
 		bindingsTestStreamSX( parser, input, expectedBindingsSX, "[ \t\n]*", delegateAction );
 	}
 
-	public void bindingsTestStreamSX(ParserExpression parser, ItemStream input, String expectedBindingsSX, String ignoreCharsRegex, ParseAction delegateAction)
+	public void bindingsTestStreamSX(ParserExpression parser, StreamValue input, String expectedBindingsSX, String ignoreCharsRegex, ParseAction delegateAction)
 	{
 		bindingsTestStream( parser, input, readExpectedBindingsSX( expectedBindingsSX ), ignoreCharsRegex, delegateAction );
 	}
 	
-	public void bindingsTestStream(ParserExpression parser, ItemStream input, Map<String, Object> expectedBindings)
+	public void bindingsTestStream(ParserExpression parser, StreamValue input, Map<String, Object> expectedBindings)
 	{
 		bindingsTestStream( parser, input, expectedBindings, "[ \t\n]*", null );
 	}
 
-	public void bindingsTestStream(ParserExpression parser, ItemStream input, Map<String, Object> expectedBindings, ParseAction delegateAction)
+	public void bindingsTestStream(ParserExpression parser, StreamValue input, Map<String, Object> expectedBindings, ParseAction delegateAction)
 	{
 		bindingsTestStream( parser, input, expectedBindings, "[ \t\n]*", delegateAction );
 	}
 
-	public void bindingsTestStream(ParserExpression parser, ItemStream input, Map<String, Object> expectedBindings, String ignoreCharsRegex, ParseAction delegateAction)
+	public void bindingsTestStream(ParserExpression parser, StreamValue input, Map<String, Object> expectedBindings, String ignoreCharsRegex, ParseAction delegateAction)
 	{
 		ParseResult result = parser.parseStreamItems( input, ignoreCharsRegex, delegateAction );
 		
@@ -723,7 +723,7 @@ abstract public class ParserTestCase extends TestCase
 	
 	public void matchSubTestStringAndStream(ParserExpression parser, String input, Object expected, int end, String ignoreCharsRegex)
 	{
-		ItemStreamBuilder builder = new ItemStreamBuilder();
+		StreamValueBuilder builder = new StreamValueBuilder();
 		builder.appendTextValue( input );
 		
 		matchSubTestString( parser, input, expected, end, ignoreCharsRegex );
@@ -801,12 +801,12 @@ abstract public class ParserTestCase extends TestCase
 
 
 
-	public void matchSubTestStreamSX(ParserExpression parser, ItemStream input, String expectedSX, int end)
+	public void matchSubTestStreamSX(ParserExpression parser, StreamValue input, String expectedSX, int end)
 	{
 		matchSubTestStreamSX( parser, input, expectedSX, end, "[ \t\n]*" );
 	}
 
-	public void matchSubTestStreamSX(ParserExpression parser, ItemStream input, String expectedSX, int end, String ignoreCharsRegex)
+	public void matchSubTestStreamSX(ParserExpression parser, StreamValue input, String expectedSX, int end, String ignoreCharsRegex)
 	{
 		Object expected = readExpectedSX( expectedSX );
 		matchSubTestStream( parser, input, expected, end, ignoreCharsRegex );
@@ -814,12 +814,12 @@ abstract public class ParserTestCase extends TestCase
 	}
 	
 	
-	public void matchSubTestStream(ParserExpression parser, ItemStream input, Object expected, int end)
+	public void matchSubTestStream(ParserExpression parser, StreamValue input, Object expected, int end)
 	{
 		matchSubTestStream( parser, input, expected, end, "[ \t\n]*" );
 	}
 	
-	public void matchSubTestStream(ParserExpression parser, ItemStream input, Object expected, int end, String ignoreCharsRegex)
+	public void matchSubTestStream(ParserExpression parser, StreamValue input, Object expected, int end, String ignoreCharsRegex)
 	{
 		ParseResult result = parser.parseStreamItems( input, ignoreCharsRegex );
 
@@ -952,7 +952,7 @@ abstract public class ParserTestCase extends TestCase
 	
 	public void matchFailTestStringAndStream(ParserExpression parser, String input, String ignoreCharsRegex)
 	{
-		ItemStreamBuilder builder = new ItemStreamBuilder();
+		StreamValueBuilder builder = new StreamValueBuilder();
 		builder.appendTextValue( input );
 		
 		matchFailTestString( parser, input, ignoreCharsRegex );
@@ -986,12 +986,12 @@ abstract public class ParserTestCase extends TestCase
 
 
 
-	public void matchFailTestStream(ParserExpression parser, ItemStream input)
+	public void matchFailTestStream(ParserExpression parser, StreamValue input)
 	{
 		matchFailTestStream( parser, input, "[ \t\n]*" );
 	}
 	
-	public void matchFailTestStream(ParserExpression parser, ItemStream input, String ignoreCharsRegex)
+	public void matchFailTestStream(ParserExpression parser, StreamValue input, String ignoreCharsRegex)
 	{
 		ParseResult result = parser.parseStreamItems( input, ignoreCharsRegex );
 
@@ -1099,7 +1099,7 @@ abstract public class ParserTestCase extends TestCase
 	
 	public void matchIncompleteTestStringAndStream(ParserExpression parser, String input, String ignoreCharsRegex)
 	{
-		ItemStreamBuilder builder = new ItemStreamBuilder();
+		StreamValueBuilder builder = new StreamValueBuilder();
 		builder.appendTextValue( input );
 		
 		matchIncompleteTestString( parser, input, ignoreCharsRegex );
@@ -1138,12 +1138,12 @@ abstract public class ParserTestCase extends TestCase
 
 
 
-	public void matchIncompleteTestStream(ParserExpression parser, ItemStream input)
+	public void matchIncompleteTestStream(ParserExpression parser, StreamValue input)
 	{
 		matchIncompleteTestStream( parser, input, "[ \t\n]*" );
 	}
 	
-	public void matchIncompleteTestStream(ParserExpression parser, ItemStream input, String ignoreCharsRegex)
+	public void matchIncompleteTestStream(ParserExpression parser, StreamValue input, String ignoreCharsRegex)
 	{
 		ParseResult result = parser.parseStreamItems( input, ignoreCharsRegex );
 

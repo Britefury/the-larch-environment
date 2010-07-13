@@ -14,6 +14,7 @@ import java.util.Map;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMSchema;
 import BritefuryJ.DocModel.DMSchemaResolver;
+import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.Parser.Action;
 import BritefuryJ.Parser.AnyList;
 import BritefuryJ.Parser.AnyNode;
@@ -45,7 +46,6 @@ import BritefuryJ.Parser.StringNode;
 import BritefuryJ.Parser.Suppress;
 import BritefuryJ.Parser.Word;
 import BritefuryJ.Parser.ZeroOrMore;
-import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 import BritefuryJ.Parser.ParserExpression.ParserCoerceException;
 import BritefuryJ.Parser.Production.CannotOverwriteProductionExpressionException;
 import BritefuryJ.Parser.SeparatedList.CannotApplyConditionAfterActionException;
@@ -193,8 +193,8 @@ public class Test_Parser extends ParserTestCase
 		
 		matchFailTestStringAndStream( new AnyList(), "abc" );
 		
-		matchTestStreamSX( new AnyList(), new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( readInputSX( "[a b]" ) ) } ).stream(), "[a b]" );
-		matchFailTestStream( new AnyList(), new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( readInputSX( "a" ) ) } ).stream() );
+		matchTestStreamSX( new AnyList(), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "[a b]" ) ) } ).stream(), "[a b]" );
+		matchFailTestStream( new AnyList(), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "a" ) ) } ).stream() );
 		
 		matchTestNodeSX( new AnyList(), "[a b c]", "[a b c]" );
 		matchFailTestNodeSX( new AnyList(), "a" );
@@ -209,8 +209,8 @@ public class Test_Parser extends ParserTestCase
 
 		matchFailTestStringAndStream( new AnyNode(), "abc" );
 		
-		matchTestStreamSX( new AnyNode(), new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( readInputSX( "[a b]" ) ) } ).stream(), "[a b]" );
-		matchTestStreamSX( new AnyNode(), new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( readInputSX( "a" ) ) } ).stream(), "a" );
+		matchTestStreamSX( new AnyNode(), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "[a b]" ) ) } ).stream(), "[a b]" );
+		matchTestStreamSX( new AnyNode(), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "a" ) ) } ).stream(), "a" );
 		
 		matchTestNodeSX( new AnyNode(), "a", "a" );
 		
@@ -224,8 +224,8 @@ public class Test_Parser extends ParserTestCase
 	
 		matchFailTestStringAndStream( new AnyObject(), "abc" );
 		
-		matchTestStreamSX( new AnyObject(), new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( readInputSX( "{m=s : (m Foo a=xyz)}" ) ) } ).stream(), "{m=s : (m Foo a=xyz)}" );
-		matchFailTestStream( new AnyObject(), new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( readInputSX( "a" ) ) } ).stream() );
+		matchTestStreamSX( new AnyObject(), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "{m=s : (m Foo a=xyz)}" ) ) } ).stream(), "{m=s : (m Foo a=xyz)}" );
+		matchFailTestStream( new AnyObject(), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "a" ) ) } ).stream() );
 		
 		matchTestNodeSX( new AnyObject(), "{m=s : (m Foo a=xyz)}", "{m=s : (m Foo a=xyz)}" );
 		matchFailTestNodeSX( new AnyObject(), "[a]" );
@@ -242,8 +242,8 @@ public class Test_Parser extends ParserTestCase
 	
 		matchFailTestStringAndStream( new AnyString(), "abc" );
 		
-		matchTestStreamSX( new AnyString(), new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( readInputSX( "a" ) ) } ).stream(), "a" );
-		matchFailTestStream( new AnyString(), new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( readInputSX( "[a b]" ) ) } ).stream() );
+		matchTestStreamSX( new AnyString(), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "a" ) ) } ).stream(), "a" );
+		matchFailTestStream( new AnyString(), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "[a b]" ) ) } ).stream() );
 
 		matchTestNodeSX( new AnyString(), "a", "a" );
 		matchFailTestNodeSX( new AnyString(), "[a]" );
@@ -478,7 +478,7 @@ public class Test_Parser extends ParserTestCase
 		matchFailTestStringAndStream( new Keyword( "hello", "abc" ), "helloaa" );
 		matchTestStringAndStreamSX( new Keyword( "hello" ).__add__( new Keyword( "there" ) ), "hello there", "[hello there]" );
 		
-		matchTestStream( new Keyword( "hello" ), new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( "hello" ) } ).stream(), "hello" );
+		matchTestStream( new Keyword( "hello" ), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( "hello" ) } ).stream(), "hello" );
 
 		matchTestNode( new Keyword( "hello" ), "hello", "hello" );
 
@@ -493,7 +493,7 @@ public class Test_Parser extends ParserTestCase
 		matchFailTestNodeSX( parser1, "[abcde]" );
 		matchFailTestNodeSX( parser1, "[abc de]" );
 		matchFailTestString( parser1, "abc" );
-		matchTestStreamSX( parser1, new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( readInputSX( "[abc]" ) ) } ).stream(), "[abc]" );
+		matchTestStreamSX( parser1, new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "[abc]" ) ) } ).stream(), "[abc]" );
 		matchTestListSX( parser1, "[[abc]]", "[abc]" );
 
 		ParserExpression parser2 = new ListNode( new Object[] { new Literal( "abc" ), new Literal( "def" ) } );
@@ -515,8 +515,8 @@ public class Test_Parser extends ParserTestCase
 		matchFailTestNodeSX( parser4, "[abc d]" );
 		bindingsTestNodeSX( parser4, "[abc [d]]", "[[x [d]]]" );
 		matchFailTestString( parser4, "abcd" );
-		matchTestStreamSX( parser4, new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( readInputSX( "[abc [d]]" ) ) } ).stream(), "[abc [d]]" );
-		bindingsTestStreamSX( parser4, new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( readInputSX( "[abc [d]]" ) ) } ).stream(), "[[x [d]]]" );
+		matchTestStreamSX( parser4, new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "[abc [d]]" ) ) } ).stream(), "[abc [d]]" );
+		bindingsTestStreamSX( parser4, new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "[abc [d]]" ) ) } ).stream(), "[[x [d]]]" );
 		matchTestListSX( parser4, "[[abc [d]]]", "[abc [d]]" );
 		bindingsTestListSX( parser4, "[[abc [d]]]", "[[x [d]]]" );
 
@@ -551,7 +551,7 @@ public class Test_Parser extends ParserTestCase
 		matchSubTestStringAndStream( new Literal( "abcxyz" ), "abcxyz123", "abcxyz", 6 );
 
 		
-		matchTestStream( new Literal( "hello" ), new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( "hello" ) } ).stream(), "hello" );
+		matchTestStream( new Literal( "hello" ), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( "hello" ) } ).stream(), "hello" );
 
 		matchTestNode( new Literal( "hello" ), "hello", "hello" );
 
@@ -566,12 +566,12 @@ public class Test_Parser extends ParserTestCase
 		
 		matchTestNode( new LiteralNode( "hello" ), "hello", "hello" );
 		matchFailTestStringAndStream( new LiteralNode( "hello" ), "hello" );
-		matchTestStream( new LiteralNode( "hello" ), new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( "hello" ) } ).stream(), "hello" );
+		matchTestStream( new LiteralNode( "hello" ), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( "hello" ) } ).stream(), "hello" );
 		matchTestListSX( new LiteralNode( "hello" ), "[hello]", "hello" );
 
 		matchTestNodeSX( new LiteralNode( Foo.newInstance( new Object[] { "x" } ) ), "{m=s : (m Foo a=x)}", "{m=s : (m Foo a=x)}" );
 		matchTestStreamSX( new LiteralNode( Foo.newInstance( new Object[] { "x" } ) ),
-				new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( readInputSX( "{m=s : (m Foo a=x)}" ) ) } ).stream(), "{m=s : (m Foo a=x)}" );
+				new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "{m=s : (m Foo a=x)}" ) ) } ).stream(), "{m=s : (m Foo a=x)}" );
 		matchTestListSX( new LiteralNode( Foo.newInstance( new Object[] { "x" } ) ), "{m=s : [(m Foo a=x)]}", "{m=s : (m Foo a=x)}" );
 	}
 
@@ -583,7 +583,7 @@ public class Test_Parser extends ParserTestCase
 		matchTestNodeSX( parser1, "{m=s : (m A x=abc y=pqr)}", "{m=s : (m A x=abc y=pqr)}" );
 		matchFailTestNodeSX( parser1, "{m=s : (m A x=pqr y=xyz)}" );
 		matchFailTestString( parser1, "abc" );
-		matchTestStreamSX( parser1, new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( readInputSX( "{m=s : (m A x=abc y=xyz)}" ) ) } ).stream(),
+		matchTestStreamSX( parser1, new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "{m=s : (m A x=abc y=xyz)}" ) ) } ).stream(),
 				"{m=s : (m A x=abc y=xyz)}" );
 		matchTestListSX( parser1, "{m=s : [(m A x=abc y=xyz)]}", "{m=s : (m A x=abc y=xyz)}" );
 		
@@ -611,7 +611,7 @@ public class Test_Parser extends ParserTestCase
 		matchTestNodeSX( parser6, "{m=s : (m A x=def y=def)}", "{m=s : (m A x=def y=def)}" );
 		bindingsTestNodeSX( parser6, "{m=s : (m A x=abc y=abc)}", "[[x abc]]" );
 		bindingsTestNodeSX( parser6, "{m=s : (m A x=abc y=def)}", "[[x def]]" );
-		bindingsTestStreamSX( parser6, new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( readInputSX( "{m=s : (m A x=abc y=def)}" ) ) } ).stream(),
+		bindingsTestStreamSX( parser6, new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "{m=s : (m A x=abc y=def)}" ) ) } ).stream(),
 		"[[x def]]" );
 		bindingsTestListSX( parser6, "{m=s : [(m A x=abc y=def)]}", "[[x def]]" );
 		
@@ -650,9 +650,9 @@ public class Test_Parser extends ParserTestCase
 		matchFailTestListSX( parser2, "[]" );
 		matchTestListSX( parser2, "[ab]", "[ab]" );
 		matchTestListSX( parser2, "[ab abb abbb]", "[ab abb abbb]" );
-		matchFailTestStream( parser2, new ItemStreamBuilder().stream() );
-		matchTestStreamSX( parser2, new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( "ab" ) } ).stream(), "[ab]" );
-		matchTestStreamSX( parser2, new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.TextItem( "ab" ), new ItemStreamBuilder.StructuralItem( "ab" ) } ).stream(),
+		matchFailTestStream( parser2, new StreamValueBuilder().stream() );
+		matchTestStreamSX( parser2, new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( "ab" ) } ).stream(), "[ab]" );
+		matchTestStreamSX( parser2, new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.TextItem( "ab" ), new StreamValueBuilder.StructuralItem( "ab" ) } ).stream(),
 		"[ab ab]" );
 	}
 
@@ -745,7 +745,7 @@ public class Test_Parser extends ParserTestCase
 		matchFailTestStringAndStream( new RegEx( "[A-Za-z_]*" ), "." );
 	
 
-		matchTestStream( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ), new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( "abc_123" ) } ).stream(), "abc_123" );
+		matchTestStream( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( "abc_123" ) } ).stream(), "abc_123" );
 
 		matchTestNode( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ), "abc_123", "abc_123" );
 
@@ -822,7 +822,7 @@ public class Test_Parser extends ParserTestCase
 		matchTestListSX( parserStructural, "[ab abb abbb]", "[ab abb abbb]" );
 		matchTestListSX( parserStructural, "[ab abb abbb abbb]", "[ab abb abbb abbb]" );
 		matchSubTestListSX( parserStructural, "[ab abb abbb abbb ab]", "[ab abb abbb abbb]", 4 );
-		matchTestStreamSX( parserStructural, new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.TextItem( "ab" ), new ItemStreamBuilder.StructuralItem( "ab" ) } ).stream(),
+		matchTestStreamSX( parserStructural, new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.TextItem( "ab" ), new StreamValueBuilder.StructuralItem( "ab" ) } ).stream(),
 		"[ab ab]" );
 	}
 
@@ -1126,7 +1126,7 @@ public class Test_Parser extends ParserTestCase
 		
 		ParserExpression parser2 = new Word( "a", "b" ).__add__( new Word( "a", "b" ) ).__add__( new Word( "a", "b" ) );
 		matchTestListSX( parser2, "[ab abb abbb]", "[ab abb abbb]" );
-		matchTestStreamSX( parser2, new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.TextItem( "ab" ), new ItemStreamBuilder.StructuralItem( "ab" ), new ItemStreamBuilder.TextItem( "ab" ) } ).stream(),
+		matchTestStreamSX( parser2, new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.TextItem( "ab" ), new StreamValueBuilder.StructuralItem( "ab" ), new StreamValueBuilder.TextItem( "ab" ) } ).stream(),
 		"[ab ab ab]" );
 	}
 
@@ -1142,9 +1142,9 @@ public class Test_Parser extends ParserTestCase
 
 		matchFailTestString( new StringNode( "abcxyz" ), "abcxyz" );
 		
-		matchFailTestStream( new StringNode( "hello" ), new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.TextItem( "hello" ) } ).stream(), "hello" );
-		matchTestStream( new StringNode( "hello" ), new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( "hello" ) } ).stream(), "hello" );
-		matchFailTestStream( new StringNode( "hello" ), new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( "hellothere" ) } ).stream() );
+		matchFailTestStream( new StringNode( "hello" ), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.TextItem( "hello" ) } ).stream(), "hello" );
+		matchTestStream( new StringNode( "hello" ), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( "hello" ) } ).stream(), "hello" );
+		matchFailTestStream( new StringNode( "hello" ), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( "hellothere" ) } ).stream() );
 
 		matchTestListSX( new StringNode( "hello" ), "[hello]", "hello" );
 		matchFailTestListSX( new StringNode( "hello" ), "[hellothere]" );
@@ -1196,7 +1196,7 @@ public class Test_Parser extends ParserTestCase
 	
 		
 
-		matchTestStream( new Word( "abc", "def" ), new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.StructuralItem( "addeeff" ) } ).stream(), "addeeff" );
+		matchTestStream( new Word( "abc", "def" ), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( "addeeff" ) } ).stream(), "addeeff" );
 
 		matchTestNode( new Word( "abc", "def" ), "addeeff", "addeeff" );
 
@@ -1232,9 +1232,9 @@ public class Test_Parser extends ParserTestCase
 		ParserExpression parser2 = new ZeroOrMore( new Word( "a", "b" ) );
 		matchTestListSX( parser2, "[ab abb abbb]", "[ab abb abbb]" );
 		matchTestListSX( parser2, "[]", "[]" );
-		matchTestStreamSX( parser2, new ItemStreamBuilder( new ItemStreamBuilder.Item[] { new ItemStreamBuilder.TextItem( "ab" ), new ItemStreamBuilder.StructuralItem( "ab" ) } ).stream(),
+		matchTestStreamSX( parser2, new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.TextItem( "ab" ), new StreamValueBuilder.StructuralItem( "ab" ) } ).stream(),
 		"[ab ab]" );
-		matchTestStreamSX( parser2, new ItemStreamBuilder().stream(), "[]" );
+		matchTestStreamSX( parser2, new StreamValueBuilder().stream(), "[]" );
 	}
 
 
@@ -1383,17 +1383,17 @@ public class Test_Parser extends ParserTestCase
 		matchTestStringAndStreamSX( parser, "1*2*3+4", "[[[1 * 2] * 3] + 4]" );
 		
 
-		ItemStreamBuilder builder1 = new ItemStreamBuilder();
+		StreamValueBuilder builder1 = new StreamValueBuilder();
 		builder1.appendTextValue( "1+" );
 		builder1.appendStructuralValue( Num.newInstance( new Object[] { "2" } ) );
 		builder1.appendTextValue( "*3*4" );
 
-		ItemStreamBuilder builder2 = new ItemStreamBuilder();
+		StreamValueBuilder builder2 = new StreamValueBuilder();
 		builder2.appendTextValue( "1*" );
 		builder2.appendStructuralValue( Num.newInstance( new Object[] { "2" } ) );
 		builder2.appendTextValue( "+3*4" );
 
-		ItemStreamBuilder builder3 = new ItemStreamBuilder();
+		StreamValueBuilder builder3 = new StreamValueBuilder();
 		builder3.appendTextValue( "1*" );
 		builder3.appendStructuralValue( Num.newInstance( new Object[] { "2" } ) );
 		builder3.appendTextValue( "*3+4" );

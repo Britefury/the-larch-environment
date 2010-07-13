@@ -60,14 +60,14 @@ import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Selection.SelectionListener;
 import BritefuryJ.DocPresent.Selection.SelectionManager;
+import BritefuryJ.DocPresent.StreamValue.StreamValue;
+import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Logging.LogEntry;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 import BritefuryJ.Math.Xform2;
-import BritefuryJ.Parser.ItemStream.ItemStream;
-import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
 public class PresentationComponent extends JComponent implements ComponentListener, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, HierarchyListener
 {
@@ -574,7 +574,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		}
 
 		
-		public ItemStream getLinearRepresentationInSelection(Selection s)
+		public StreamValue getStreamValueInSelection(Selection s)
 		{
 			if ( s.isEmpty() )
 			{
@@ -588,15 +588,15 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				
 				if ( commonRoot != null )
 				{
-					ItemStreamBuilder builder = new ItemStreamBuilder();
+					StreamValueBuilder builder = new StreamValueBuilder();
 
-					commonRoot.getLinearRepresentationBetweenPaths( builder, s.getStartMarker(), startPath, 0, s.getEndMarker(), endPath, 0 );
+					commonRoot.buildStreamValueBetweenPaths( builder, s.getStartMarker(), startPath, 0, s.getEndMarker(), endPath, 0 );
 				
 					return builder.stream();
 				}
 				else
 				{
-					return ((DPContentLeafEditable)startPath.get( 0 )).getLinearRepresentationBetweenMarkers( s.getStartMarker(), s.getEndMarker() );
+					return ((DPContentLeafEditable)startPath.get( 0 )).getStreamValueBetweenMarkers( s.getStartMarker(), s.getEndMarker() );
 				}
 			}
 		}

@@ -11,8 +11,8 @@ import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeHiddenContent;
 import BritefuryJ.DocPresent.Marker.Marker;
+import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
-import BritefuryJ.Parser.ItemStream.ItemStreamBuilder;
 
 public class DPHiddenContent extends DPElement
 {
@@ -101,23 +101,19 @@ public class DPHiddenContent extends DPElement
 
 	//
 	//
-	// LINEAR REPRESENTATION METHODS
+	// VALUE METHODS
 	//
 	//
 	
+	public Object getDefaultValue()
+	{
+		return textRepresentation;
+	}
 	
-	public void buildLinearRepresentation(ItemStreamBuilder builder)
+	// Stream value computation
+	
+	protected void buildDefaultStreamValue(StreamValueBuilder builder)
 	{
 		builder.appendTextValue( textRepresentation );
-	}
-
-	protected void getLinearRepresentationFromStartToPath(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
-	{
-		super.getLinearRepresentationFromStartToPath( builder, marker, path, pathMyIndex );
-	}
-	
-	protected void getLinearRepresentationFromPathToEnd(ItemStreamBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
-	{
-		super.getLinearRepresentationFromPathToEnd( builder, marker, path, pathMyIndex );
 	}
 }
