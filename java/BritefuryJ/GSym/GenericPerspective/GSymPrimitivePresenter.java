@@ -17,7 +17,7 @@ import BritefuryJ.GSym.View.GSymFragmentView;
 
 public class GSymPrimitivePresenter
 {
-	public static DPElement presentChar(char c, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public static DPElement presentChar(char c, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		String str = Character.toString( c );
 		return PrimitiveStyleSheet.instance.hbox( new DPElement[] {
@@ -26,7 +26,7 @@ public class GSymPrimitivePresenter
 				punctuationStyle.staticText(  "'" ) } );
 	}
 	
-	public static DPElement presentString(String str, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public static DPElement presentString(String str, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		String lines[] = str.split( "\n" );
 		if ( lines.length == 1 )
@@ -60,28 +60,28 @@ public class GSymPrimitivePresenter
 		}
 	}
 
-	public static DPElement presentByte(byte b, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public static DPElement presentByte(byte b, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		return integerStyle.staticText( Integer.toHexString( (int)b ) );
 	}
 	
 	
-	public static DPElement presentShort(short x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public static DPElement presentShort(short x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		return integerStyle.staticText( Short.toString( x ) );
 	}
 	
-	public static DPElement presentInt(int x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public static DPElement presentInt(int x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		return integerStyle.staticText( Integer.toString( x ) );
 	}
 	
-	public static DPElement presentLong(long x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public static DPElement presentLong(long x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		return integerStyle.staticText( Long.toString( x ) );
 	}
 	
-	public static DPElement presentDouble(double x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public static DPElement presentDouble(double x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		String asText = Double.toString( x );
 		
@@ -106,7 +106,17 @@ public class GSymPrimitivePresenter
 		return PrimitiveStyleSheet.instance.scriptRSuper( mantissa, exponent );
 	}
 	
-	public static DPElement presentBoolean(boolean b, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public static DPElement presentNull()
+	{
+		return nullStyle.staticText( "Null" );
+	}
+	
+	public static DPElement presentNone()
+	{
+		return nullStyle.staticText( "None" );
+	}
+	
+	public static DPElement presentBoolean(boolean b, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		if ( b )
 		{
@@ -124,4 +134,5 @@ public class GSymPrimitivePresenter
 	private static final PrimitiveStyleSheet integerStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.5f, 0.0f, 0.5f ) );
 	private static final PrimitiveStyleSheet floatStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.25f, 0.0f, 0.5f ) );
 	private static final PrimitiveStyleSheet booleanStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.0f, 0.5f, 0.0f ) ).withTextSmallCaps( true );
+	private static final PrimitiveStyleSheet nullStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.75f, 0.0f, 0.5f ) ).withTextSmallCaps( true );
 }

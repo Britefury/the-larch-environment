@@ -13,5 +13,5 @@ import BritefuryJ.GSym.View.GSymFragmentView;
 
 public interface ObjectPresenter<StyleSheetType extends StyleSheet>
 {
-	public DPElement presentObject(Object x, GSymFragmentView fragment, StyleSheetType styleSheet, AttributeTable state);
+	public DPElement presentObject(Object x, GSymFragmentView fragment, StyleSheetType styleSheet, AttributeTable inheritedState);
 }

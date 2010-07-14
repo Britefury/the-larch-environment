@@ -128,6 +128,11 @@ public class DPBin extends DPContainer
 	}
 
 	
+	public boolean isSingleElementContainer()
+	{
+		return true;
+	}
+	
 	
 	
 	//

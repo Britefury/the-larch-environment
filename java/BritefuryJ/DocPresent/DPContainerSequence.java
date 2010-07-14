@@ -163,6 +163,12 @@ abstract public class DPContainerSequence extends DPContainer
 		onChildListModified();
 		queueResize();
 	}
+
+	
+	public boolean isSingleElementContainer()
+	{
+		return false;
+	}
 	
 	
 

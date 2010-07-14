@@ -602,6 +602,12 @@ public class DPTable extends DPContainer
 		TableChildEntry entry = getEntryForChild( child );
 		return entry.rowSpan;
 	}
+
+	
+	public boolean isSingleElementContainer()
+	{
+		return false;
+	}
 	
 	
 	private void refreshSize()

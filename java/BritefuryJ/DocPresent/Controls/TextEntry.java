@@ -14,6 +14,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.ElementInteractor;
+import BritefuryJ.DocPresent.ElementValueFunction;
 import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.TextEditEventInsert;
 import BritefuryJ.DocPresent.TextEditEventRemove;
@@ -24,6 +25,7 @@ import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.Clipboard.TextEditHandler;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
+import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 
 public class TextEntry extends Control
 {
@@ -183,6 +185,23 @@ public class TextEntry extends Control
 	}
 	
 	
+	private class ValueFn implements ElementValueFunction
+	{
+		public Object computeElementValue(DPElement element)
+		{
+			return getText();
+		}
+
+		public void addStreamValuePrefixToStream(StreamValueBuilder builder, DPElement element)
+		{
+		}
+
+		public void addStreamValueSuffixToStream(StreamValueBuilder builder, DPElement element)
+		{
+		}
+	}
+	
+	
 	
 	private DPBorder outerElement;
 	private DPText textElement;
@@ -214,6 +233,8 @@ public class TextEntry extends Control
 		this.textElement.addInteractor( new TextEntryInteractor() );
 		this.textElement.addTreeEventListener( new TextEntryTreeEventListener() );
 		originalText = textElement.getText();
+		
+		outerElement.setValueFunction( new ValueFn() );
 		
 		frame.setEditHandler( new TextEntryEditHandler() );
 		

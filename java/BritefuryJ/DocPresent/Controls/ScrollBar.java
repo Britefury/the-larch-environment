@@ -21,6 +21,7 @@ public class ScrollBar extends Control
 	{
 		this.range = range;
 		this.element = element;
+		element.setFixedValue( range );
 	}
 	
 	

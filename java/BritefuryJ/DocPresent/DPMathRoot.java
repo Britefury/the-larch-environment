@@ -11,7 +11,6 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Stroke;
 import java.awt.geom.Path2D;
-import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeMathRoot;
@@ -125,16 +124,13 @@ public class DPMathRoot extends DPContainer
 
 	public List<DPElement> getChildren()
 	{
-		if ( child != null )
-		{
-			DPElement[] children = { child };
-			return Arrays.asList( children );
-		}
-		else
-		{
-			DPElement[] children = {};
-			return Arrays.asList( children );
-		}
+		return registeredChildren;
+	}
+
+	
+	public boolean isSingleElementContainer()
+	{
+		return true;
 	}
 
 	

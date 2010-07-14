@@ -151,6 +151,7 @@ public class OptionMenu extends Control
 			choiceContainer.replaceWith( newChoiceContainer );
 			choiceContainer = newChoiceContainer;
 			
+			element.setFixedValue( currentChoice );
 			listener.onOptionMenuChoice( this, oldChoice, currentChoice );
 		}
 	}

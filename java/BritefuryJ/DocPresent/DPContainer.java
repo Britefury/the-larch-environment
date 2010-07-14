@@ -191,6 +191,9 @@ public abstract class DPContainer extends DPElement
 	}
 	
 	
+	public abstract boolean isSingleElementContainer();
+	
+	
 	
 	
 	
@@ -894,12 +897,36 @@ public abstract class DPContainer extends DPElement
 	
 	public Object getDefaultValue()
 	{
-		ArrayList<Object> value = new ArrayList<Object>();
-		for (DPElement child: getInternalChildren())
+		// Use getChildren() rather than getInternalChildren(), as these are the children that are expose to the outside world, as opposed to some extra elements that may
+		// introduce unexpected objects into the value
+		if ( isSingleElementContainer() )
 		{
-			value.add( child.getValue() );
+			List<DPElement> children = getChildren();
+			if ( children.size() > 1 )
+			{
+				throw new RuntimeException( "Single element container should not have more than 1 child" );
+			}
+			else
+			{
+				if ( children.size() == 1 )
+				{
+					return children.get( 0 ).getValue();
+				}
+				else
+				{
+					return null;
+				}
+			}
 		}
-		return value;
+		else
+		{
+			ArrayList<Object> value = new ArrayList<Object>();
+			for (DPElement child: getChildren())
+			{
+				value.add( child.getValue() );
+			}
+			return value;
+		}
 	}
 
 	

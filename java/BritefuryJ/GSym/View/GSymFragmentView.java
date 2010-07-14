@@ -24,6 +24,7 @@ import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GSymAbstractPerspective;
 import BritefuryJ.GSym.GSymBrowserContext;
 import BritefuryJ.GSym.GSymSubject;
+import BritefuryJ.GSym.GenericPerspective.GSymPrimitivePresenter;
 import BritefuryJ.GSym.ObjectPresentation.PresentationStateListener;
 import BritefuryJ.Incremental.IncrementalFunctionMonitor;
 import BritefuryJ.Incremental.IncrementalMonitor;
@@ -65,7 +66,6 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	
 	
 	private static final PrimitiveStyleSheet viewError_textStyle = PrimitiveStyleSheet.instance.withFontBold( true ).withFontSize( 12 ).withForeground( new Color( 0.8f, 0.0f, 0.0f ) );
-	private static final PrimitiveStyleSheet viewNull_textStyle = PrimitiveStyleSheet.instance.withFontItalic( true ).withFontSize( 12 ).withForeground( new Color( 0.8f, 0.0f, 0.4f ) );
 
 	
 	
@@ -277,7 +277,7 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	{
 		if ( x == null )
 		{
-			return viewNull_textStyle.staticText( "<null>" );
+			return GSymPrimitivePresenter.presentNull();
 		}
 		
 		

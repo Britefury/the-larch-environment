@@ -177,6 +177,12 @@ public class DPSegment extends DPContainer
 	}
 
 	
+	public boolean isSingleElementContainer()
+	{
+		return true;
+	}
+
+	
 	
 	//
 	// Collation methods

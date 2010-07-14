@@ -120,6 +120,12 @@ public class DPProxy extends DPContainer
 	}
 
 	
+	public boolean isSingleElementContainer()
+	{
+		return true;
+	}
+
+	
 	
 		
 	protected AABox2 getVisibleBoxInLocalSpace()

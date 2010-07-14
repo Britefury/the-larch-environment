@@ -17,6 +17,7 @@ import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPWhitespace;
 import BritefuryJ.DocPresent.ElementInteractor;
+import BritefuryJ.DocPresent.ElementValueFunction;
 import BritefuryJ.DocPresent.TextEditEvent;
 import BritefuryJ.DocPresent.TextEditEventInsert;
 import BritefuryJ.DocPresent.TextEditEventRemove;
@@ -26,6 +27,7 @@ import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.Clipboard.TextEditHandler;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
+import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class TextArea extends Control
@@ -208,6 +210,23 @@ public class TextArea extends Control
 	}
 	
 	
+	private class ValueFn implements ElementValueFunction
+	{
+		public Object computeElementValue(DPElement element)
+		{
+			return getText();
+		}
+
+		public void addStreamValuePrefixToStream(StreamValueBuilder builder, DPElement element)
+		{
+		}
+
+		public void addStreamValueSuffixToStream(StreamValueBuilder builder, DPElement element)
+		{
+		}
+	}
+
+	
 	
 	private DPElement element;
 	private DPVBox textBox;
@@ -227,6 +246,8 @@ public class TextArea extends Control
 		this.listener = listener;
 		this.textStyle = textStyle;
 	
+		element.setValueFunction( new ValueFn() );
+		
 		this.textBox.addInteractor( new TextAreaInteractor() );
 		region.setEditHandler( new TextAreaEditHandler() );
 		

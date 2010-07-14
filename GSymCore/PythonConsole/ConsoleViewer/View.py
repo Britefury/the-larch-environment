@@ -120,7 +120,7 @@ class ConsoleView (GSymViewObjectDispatch):
 		moduleView = ctx.presentFragmentWithPerspectiveAndStyleSheet( pythonModule, Python25.python25EditorPerspective, styleSheet.staticPythonStyle() )
 		caughtExceptionView = ctx.presentFragmentWithGenericPerspective( caughtException )   if caughtException is not None   else None
 		if result is not None:
-			resultView = ctx.presentFragmentWithGenericPerspective( result[0]   if result[0] is not None   else   str( None ) )
+			resultView = ctx.presentFragmentWithGenericPerspective( result[0] )
 		else:
 			resultView = None
 		
