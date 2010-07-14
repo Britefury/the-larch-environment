@@ -32,6 +32,8 @@ public class RealSpinEntry extends SpinEntry
 		this.stepSize = stepSize;
 		this.pageSize = pageSize;
 		this.listener = listener;
+
+		element.setFixedValue( value );
 	}
 	
 	
@@ -47,6 +49,7 @@ public class RealSpinEntry extends SpinEntry
 		if ( newValue != value )
 		{
 			value = newValue;
+			element.setFixedValue( value );
 			textEntry.setText( String.valueOf( value ) );
 			listener.onSpinEntryValueChanged( this, value );
 		}
@@ -60,6 +63,7 @@ public class RealSpinEntry extends SpinEntry
 		if ( newValue != value )
 		{
 			value = newValue;
+			element.setFixedValue( value );
 			listener.onSpinEntryValueChanged( this, value );
 		}
 		if ( value != textValue )

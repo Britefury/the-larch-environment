@@ -348,6 +348,12 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 	}
 
 	
+	public boolean isSingleElementContainer()
+	{
+		return true;
+	}
+
+	
 	
 	
 	protected boolean handlePointerNavigationGestureBegin(PointerButtonEvent event)

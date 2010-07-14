@@ -31,6 +31,7 @@ public class Checkbox extends Control
 		this.checked = checked;
 		this.listener = listener;
 		this.state = state;
+		element.setFixedValue( state );
 	}
 	
 	
@@ -54,6 +55,8 @@ public class Checkbox extends Control
 			this.state = state;
 			
 			check.setChild( state  ?  checked  :  unchecked );
+			
+			element.setFixedValue( state );
 			
 			listener.onCheckboxToggled( this, state );
 		}

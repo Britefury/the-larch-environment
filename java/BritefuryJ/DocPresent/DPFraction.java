@@ -435,6 +435,12 @@ public class DPFraction extends DPContainer
 	}
 
 	
+	public boolean isSingleElementContainer()
+	{
+		return false;
+	}
+
+	
 	
 	
 	

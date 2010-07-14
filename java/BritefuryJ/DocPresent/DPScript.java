@@ -280,6 +280,12 @@ public class DPScript extends DPContainer
 	}
 
 	
+	public boolean isSingleElementContainer()
+	{
+		return false;
+	}
+
+	
 	
 	
 	
