@@ -113,7 +113,7 @@ public class StreamValueBuilder
 		items.add( new StructuralItem( structuralValue ) );
 	}
 	
-	public void appendStreamItem(StreamValue.Item item)
+	public void appendStreamValueItem(StreamValue.Item item)
 	{
 		if ( item instanceof StreamValue.TextItem )
 		{
@@ -137,7 +137,7 @@ public class StreamValueBuilder
 		}
 		else if ( value instanceof StreamValue.Item )
 		{
-			appendStreamItem( (StreamValue.Item)value );
+			appendStreamValueItem( (StreamValue.Item)value );
 		}
 		else
 		{
