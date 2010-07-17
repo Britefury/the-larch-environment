@@ -63,6 +63,8 @@ class WorkSheetContextMenuFactory (ContextMenuFactory):
 		menuStyle = self._styleSheet['contextMenuStyle']
 		controlsStyle = menuStyle['controlsStyle']
 		
+		rootElement = element.getRootElement()
+
 		
 		def makeStyleFn(style):
 			def _onLink(link, event):
@@ -70,8 +72,6 @@ class WorkSheetContextMenuFactory (ContextMenuFactory):
 				if caret.isValid():
 					caret.getElement().postTreeEvent( PargraphRequest( style ) )
 			return _onLink
-	
-		rootElement = element.getRootElement()
 		
 		normalStyle = controlsStyle.link( 'Normal', makeStyleFn( 'normal' ) ).getElement()
 		h1Style = controlsStyle.link( 'H1', makeStyleFn( 'h1' ) ).getElement()
@@ -82,7 +82,7 @@ class WorkSheetContextMenuFactory (ContextMenuFactory):
 		h6Style = controlsStyle.link( 'H6', makeStyleFn( 'h6' ) ).getElement()
 		titleStyle = controlsStyle.link( 'Title', makeStyleFn( 'title' ) ).getElement()
 		styles = menuStyle.controlsHBox( [ normalStyle, h1Style, h2Style, h3Style, h4Style, h5Style, h6Style, titleStyle ] )
-		menu.add( menuStyle.sectionWithTitle( 'Style', styles ) )
+		menu.add( menuStyle.sectionWithTitle( 'Style', styles ).alignHExpand() )
 		
 		
 		def _onPythonCode(link, event):
@@ -90,11 +90,19 @@ class WorkSheetContextMenuFactory (ContextMenuFactory):
 			if caret.isValid():
 				caret.getElement().postTreeEvent( PythonCodeRequest() )
 	
-		rootElement = element.getRootElement()
-		
 		newCode = controlsStyle.link( 'Python code', _onPythonCode ).getElement()
 		codeControls = menuStyle.controlsHBox( [ newCode ] )
-		menu.add( menuStyle.sectionWithTitle( 'Code', codeControls ) )
+		menu.add( menuStyle.sectionWithTitle( 'Code', codeControls ).alignHExpand() )
+		
+		
+		def _onRefresh(button, event):
+			model.refreshResults()
+	
+		model = element.getFragmentContext().getDocNode()
+
+		refreshButton = controlsStyle.buttonWithLabel( 'Refresh', _onRefresh ).getElement()
+		worksheetControls = menuStyle.controlsHBox( [ refreshButton ] )
+		menu.add( menuStyle.sectionWithTitle( 'Worksheet', worksheetControls ).alignHExpand() )
 
 
 

@@ -24,6 +24,7 @@ from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replac
 
 
 from Britefury.Util.NodeUtil import *
+from Britefury.Util.InstanceCache import instanceCache
 
 from BritefuryJ.AttributeTable import *
 
@@ -43,19 +44,25 @@ from GSymCore.Worksheet.WorksheetEditor.View import perspective as editorPerspec
 
 
 
-class WorksheetInteractor (ElementInteractor):
-	def __init__(self):
-		pass
+class WorkSheetContextMenuFactory (ContextMenuFactory):
+	def __init__(self, styleSheet):
+		self._styleSheet = styleSheet
+	
+	
+	def buildContextMenu(self, element, menu):
+		menuStyle = self._styleSheet['contextMenuStyle']
+		controlsStyle = menuStyle['controlsStyle']
 		
 		
-	def onKeyPress(self, element, event):
-		if event.getKeyCode() == KeyEvent.VK_F5:
-			ctx = element.getFragmentContext()
-			node = ctx.getDocNode()
-			node.refreshResults()
-			return True
+		def _onRefresh(button, event):
+			model.refreshResults()
+	
+		model = element.getFragmentContext().getDocNode()
 
-_worksheetInteractor = WorksheetInteractor()
+		refreshButton = controlsStyle.buttonWithLabel( 'Refresh', _onRefresh ).getElement()
+		worksheetControls = menuStyle.controlsHBox( [ refreshButton ] )
+		menu.add( menuStyle.sectionWithTitle( 'Worksheet', worksheetControls ).alignHExpand() )
+
 
 
 
@@ -65,7 +72,7 @@ class WorksheetViewer (GSymViewObjectDispatch):
 		bodyView = ctx.presentFragment( node.getBody(), styleSheet )
 		
 		w = styleSheet.worksheet( bodyView, ctx.getSubjectContext()['editLocation'] )
-		w.addInteractor( _worksheetInteractor )
+		w.addContextMenuFactory( instanceCache( WorkSheetContextMenuFactory, styleSheet ) )
 		return w
 	
 
