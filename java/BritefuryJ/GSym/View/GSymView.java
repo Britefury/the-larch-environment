@@ -605,13 +605,6 @@ public class GSymView extends IncrementalTree
 	
 	
 	
-	public PresentationComponent.RootElement getElementTree()
-	{
-		return vbox.getRootElement();
-	}
-	
-	
-	
 	public GSymBrowserContext getBrowserContext()
 	{
 		return browserContext;

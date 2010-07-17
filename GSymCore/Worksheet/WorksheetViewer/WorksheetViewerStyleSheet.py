@@ -29,6 +29,7 @@ class WorksheetViewerStyleSheet (StyleSheet):
 		self.initAttr( 'primitiveStyle', PrimitiveStyleSheet.instance )
 		self.initAttr( 'richTextStyle', RichTextStyleSheet.instance.withNonEditable() )
 		self.initAttr( 'controlsStyle', ControlsStyleSheet.instance )
+		self.initAttr( 'contextMenuStyle', ContextMenuStyleSheet.instance )
 		self.initAttr( 'executionStyle', ExecutionStyleSheet.instance )
 		self.initAttr( 'pythonStyle', PythonEditorStyleSheet.instance )
 		self.initAttr( 'staticPythonStyle', PythonEditorStyleSheet.instance.staticStyle() )
@@ -51,6 +52,9 @@ class WorksheetViewerStyleSheet (StyleSheet):
 	
 	def withControlsStyleSheet(self, controlsStyle):
 		return self.withAttrs( controlsStyle=controlsStyle )
+	
+	def withContextMenuStyleSheet(self, contextMenuStyle):
+		return self.withAttrs( contextMenuStyle=contextMenuStyle )
 	
 	def withExecutionStyleSheet(self, executionStyle):
 		return self.withAttrs( executionStyle=executionStyle )
