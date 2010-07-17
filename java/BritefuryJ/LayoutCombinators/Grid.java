@@ -14,25 +14,25 @@ import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
-public class Column extends Sequence
+public class Grid extends Sequence
 {
-	protected PrimitiveStyleSheet styleSheet;
+	private PrimitiveStyleSheet styleSheet;
 
 	
-	public Column(Object[] children)
+	public Grid(Object[] children)
 	{
 		super( children );
 		styleSheet = PrimitiveStyleSheet.instance;
 	}
 
-	public Column(PyObject[] values)
+	public Grid(PyObject[] values)
 	{
 		super( values );
 		styleSheet = PrimitiveStyleSheet.instance;
 	}
 	
 	
-	public Column withStyle(PrimitiveStyleSheet styleSheet)
+	public Grid withStyle(PrimitiveStyleSheet styleSheet)
 	{
 		this.styleSheet = styleSheet;
 		return this;
@@ -42,6 +42,6 @@ public class Column extends Sequence
 	@Override
 	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
-		return this.styleSheet.vbox( mapPresentChildren( children, fragment, styleSheet, inheritedState ) );
+		return this.styleSheet.rgrid( mapPresentChildren( children, fragment, styleSheet, inheritedState ) );
 	}
 }

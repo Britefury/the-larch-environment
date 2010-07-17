@@ -31,6 +31,13 @@ public class Row extends Sequence
 		styleSheet = PrimitiveStyleSheet.instance;
 	}
 	
+	
+	public Row withStyle(PrimitiveStyleSheet styleSheet)
+	{
+		this.styleSheet = styleSheet;
+		return this;
+	}
+	
 
 	@Override
 	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)

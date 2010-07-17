@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.LayoutCombinators;
 
+import org.python.core.Py;
 import org.python.core.PyObject;
 
 import BritefuryJ.AttributeTable.AttributeTable;
@@ -14,25 +15,30 @@ import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
-public class Column extends Sequence
+public class Table extends LayoutCombinator
 {
-	protected PrimitiveStyleSheet styleSheet;
-
+	private PrimitiveStyleSheet styleSheet;
+	private Object children[][];
 	
-	public Column(Object[] children)
+	
+	public Table(Object children[][])
 	{
-		super( children );
-		styleSheet = PrimitiveStyleSheet.instance;
-	}
-
-	public Column(PyObject[] values)
-	{
-		super( values );
+		this.children = children;
 		styleSheet = PrimitiveStyleSheet.instance;
 	}
 	
+	public Table(PyObject values[])
+	{
+		children = new Object[values.length][];
+		for (int i = 0; i < values.length; i++)
+		{
+			children[i] = Py.tojava( values[i], Object[].class );
+		}
+		styleSheet = PrimitiveStyleSheet.instance;
+	}
 	
-	public Column withStyle(PrimitiveStyleSheet styleSheet)
+	
+	public Table withStyle(PrimitiveStyleSheet styleSheet)
 	{
 		this.styleSheet = styleSheet;
 		return this;
@@ -42,6 +48,17 @@ public class Column extends Sequence
 	@Override
 	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
 	{
-		return this.styleSheet.vbox( mapPresentChildren( children, fragment, styleSheet, inheritedState ) );
+		DPElement elements[][] = new DPElement[children.length][];
+		
+		for (int y = 0; y < children.length; y++)
+		{
+			Object row[] = children[y];
+			elements[y] = new DPElement[row.length];
+			for (int x = 0; x < row.length; x++)
+			{
+				elements[y][x] = row[x] != null  ?  presentChild( row[x], fragment, styleSheet, inheritedState )  :  null;
+			}
+		}
+		return this.styleSheet.table( elements );
 	}
 }
