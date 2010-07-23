@@ -47,9 +47,9 @@ public class GSymPerspective extends GSymAbstractPerspective
 	
 	
 	@Override
-	public DPElement present(Object x, GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable inheritedState)
+	public DPElement present(Object x, GSymFragmentView fragment, StyleSheet styleSheet, AttributeTable inheritedState)
 	{
-		return fragmentViewFn.createViewFragment( x, ctx, styleSheet, inheritedState );
+		return fragmentViewFn.createViewFragment( x, fragment, styleSheet, inheritedState );
 	}
 
 	@Override

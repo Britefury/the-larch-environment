@@ -45,7 +45,7 @@ public abstract class GSymObjectPresentationPerspective extends GSymAbstractPers
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public DPElement present(Object x, GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable inheritedState)
+	public DPElement present(Object x, GSymFragmentView fragment, StyleSheet styleSheet, AttributeTable inheritedState)
 	{
 		DPElement result = null;
 		
@@ -53,7 +53,7 @@ public abstract class GSymObjectPresentationPerspective extends GSymAbstractPers
 		PyObject pyX = null;
 
 		// Java object presentation protocol - Java interface
-		result = presentWithJavaInterface( x, ctx, styleSheet, inheritedState );
+		result = presentWithJavaInterface( x, fragment, styleSheet, inheritedState );
 		
 		// Python object presentation protocol
 		if ( result == null  &&  x instanceof PyObject )
@@ -72,7 +72,7 @@ public abstract class GSymObjectPresentationPerspective extends GSymAbstractPers
 			
 			if ( presentMethod != null  &&  presentMethod.isCallable() )
 			{
-				result = Py.tojava( presentMethod.__call__( Py.java2py( ctx ), Py.java2py( styleSheet ), Py.java2py( inheritedState ) ),  DPElement.class );
+				result = Py.tojava( presentMethod.__call__( Py.java2py( fragment ), Py.java2py( styleSheet ), Py.java2py( inheritedState ) ),  DPElement.class );
 			}
 			
 			
@@ -85,7 +85,7 @@ public abstract class GSymObjectPresentationPerspective extends GSymAbstractPers
 				PyObjectPresenter<? extends StyleSheet> presenter = (PyObjectPresenter<? extends StyleSheet>)objectPresenters.get( typeX );
 				if ( presenter != null )
 				{
-					result = invokePyObjectPresenter( presenter, pyX, ctx, styleSheet, inheritedState );
+					result = invokePyObjectPresenter( presenter, pyX, fragment, styleSheet, inheritedState );
 				}
 			}
 		}
@@ -96,7 +96,7 @@ public abstract class GSymObjectPresentationPerspective extends GSymAbstractPers
 			ObjectPresenter<? extends StyleSheet> presenter = (ObjectPresenter<? extends StyleSheet>)objectPresenters.get( x.getClass() );
 			if ( presenter != null )
 			{
-				result = invokeObjectPresenter( presenter, x, ctx, styleSheet, inheritedState );
+				result = invokeObjectPresenter( presenter, x, fragment, styleSheet, inheritedState );
 			}
 		}
 		
@@ -105,11 +105,11 @@ public abstract class GSymObjectPresentationPerspective extends GSymAbstractPers
 		{
 			if ( pyX != null )
 			{
-				result = presentPyObjectFallback( pyX, ctx, styleSheet, inheritedState );
+				result = presentPyObjectFallback( pyX, fragment, styleSheet, inheritedState );
 			}
 			else
 			{
-				result = presentJavaObjectFallback( x, ctx, styleSheet, inheritedState );
+				result = presentJavaObjectFallback( x, fragment, styleSheet, inheritedState );
 			}
 		}
 		

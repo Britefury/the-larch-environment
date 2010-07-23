@@ -41,7 +41,7 @@ public abstract class GSymAbstractPerspective
 	}
 	
 	
-	public abstract DPElement present(Object x, GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable inheritedState);
+	public abstract DPElement present(Object x, GSymFragmentView fragment, StyleSheet styleSheet, AttributeTable inheritedState);
 	public abstract StyleSheet getStyleSheet();
 	public abstract AttributeTable getInitialInheritedState();
 	public abstract EditHandler getEditHandler();
