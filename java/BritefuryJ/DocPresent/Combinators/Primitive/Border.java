@@ -8,11 +8,11 @@ package BritefuryJ.DocPresent.Combinators.Primitive;
 
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Combinators.PresentationCombinator;
+import BritefuryJ.DocPresent.Combinators.Pres;
 
-public class Border extends PresentationCombinator
+public class Border extends Pres
 {
-	private PresentationCombinator child;
+	private Pres child;
 	
 	
 	public Border(Object child)
@@ -26,7 +26,7 @@ public class Border extends PresentationCombinator
 	public DPElement present(PresentationContext ctx)
 	{
 		DPBorder bin = new DPBorder( ctx.getStyle().getBorderParams().border );
-		bin.setChild( child.present( ctx ).layoutWrap() );
+		bin.setChild( child.present( ctx.withStyle( ctx.getStyle().useBorderParams() ) ).layoutWrap() );
 		return bin;
 	}
 }

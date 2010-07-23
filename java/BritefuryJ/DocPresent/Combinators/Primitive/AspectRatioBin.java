@@ -8,11 +8,11 @@ package BritefuryJ.DocPresent.Combinators.Primitive;
 
 import BritefuryJ.DocPresent.DPAspectRatioBin;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Combinators.PresentationCombinator;
+import BritefuryJ.DocPresent.Combinators.Pres;
 
-public class AspectRatioBin extends PresentationCombinator
+public class AspectRatioBin extends Pres
 {
-	private PresentationCombinator child;
+	private Pres child;
 	private double minWidth, aspectRatio;
 	
 	
@@ -29,7 +29,7 @@ public class AspectRatioBin extends PresentationCombinator
 	public DPElement present(PresentationContext ctx)
 	{
 		DPAspectRatioBin bin = new DPAspectRatioBin( ctx.getStyle().getContainerParams(), minWidth, aspectRatio );
-		bin.setChild( child.present( ctx ).layoutWrap() );
+		bin.setChild( child.present( ctx.withStyle( ctx.getStyle().useContainerParams() ) ).layoutWrap() );
 		return bin;
 	}
 }

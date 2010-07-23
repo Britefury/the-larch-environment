@@ -8,9 +8,9 @@ package BritefuryJ.DocPresent.Combinators.Primitive;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPWhitespace;
-import BritefuryJ.DocPresent.Combinators.PresentationCombinator;
+import BritefuryJ.DocPresent.Combinators.Pres;
 
-public class Whitespace extends PresentationCombinator
+public class Whitespace extends Pres
 {
 	private String text;
 	private double width;

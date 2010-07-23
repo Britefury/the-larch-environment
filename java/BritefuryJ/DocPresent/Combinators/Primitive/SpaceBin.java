@@ -8,11 +8,11 @@ package BritefuryJ.DocPresent.Combinators.Primitive;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPSpaceBin;
-import BritefuryJ.DocPresent.Combinators.PresentationCombinator;
+import BritefuryJ.DocPresent.Combinators.Pres;
 
-public class SpaceBin extends PresentationCombinator
+public class SpaceBin extends Pres
 {
-	private PresentationCombinator child;
+	private Pres child;
 	private double minWidth, minHeight;
 	
 	
@@ -29,7 +29,7 @@ public class SpaceBin extends PresentationCombinator
 	public DPElement present(PresentationContext ctx)
 	{
 		DPSpaceBin bin = new DPSpaceBin( ctx.getStyle().getContainerParams(), minWidth, minHeight );
-		bin.setChild( child.present( ctx ).layoutWrap() );
+		bin.setChild( child.present( ctx.withStyle( ctx.getStyle().useContainerParams() ) ).layoutWrap() );
 		return bin;
 	}
 }

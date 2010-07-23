@@ -10,11 +10,11 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPParagraph;
-import BritefuryJ.DocPresent.Combinators.PresentationCombinator;
+import BritefuryJ.DocPresent.Combinators.Pres;
 
-public class Paragraph extends PresentationCombinator
+public class Paragraph extends Pres
 {
-	private PresentationCombinator children[];
+	private Pres children[];
 	
 	
 	public Paragraph(Object children[])
@@ -32,7 +32,7 @@ public class Paragraph extends PresentationCombinator
 	public DPElement present(PresentationContext ctx)
 	{
 		DPParagraph element = new DPParagraph( ctx.getStyle().getParagraphParams() );
-		element.setChildren( mapPresent( ctx, children ) );
+		element.setChildren( mapPresent( ctx.withStyle( ctx.getStyle().useParagraphParams() ), children ) );
 		return element;
 	}
 }

@@ -9,11 +9,11 @@ package BritefuryJ.DocPresent.Combinators.Primitive;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
-import BritefuryJ.DocPresent.Combinators.PresentationCombinator;
+import BritefuryJ.DocPresent.Combinators.Pres;
 
-public class Region extends PresentationCombinator
+public class Region extends Pres
 {
-	private PresentationCombinator child;
+	private Pres child;
 	private EditHandler editHandler = null;
 	
 	

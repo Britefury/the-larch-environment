@@ -6,16 +6,14 @@
 //##************************
 package BritefuryJ.DocPresent.StyleSheet;
 
-import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Paint;
 import java.util.HashMap;
 
-import BritefuryJ.AttributeTable.AttributeValues;
+import BritefuryJ.AttributeTable.AttributeBase;
+import BritefuryJ.AttributeTable.AttributeTable2;
 import BritefuryJ.DocPresent.Border.Border;
-import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.Painter.Painter;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ContentLeafStyleParams;
@@ -30,20 +28,8 @@ import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
 
-public class StyleSheetValues extends StyleSheet
+public class StyleSheetValues extends AttributeTable2
 {
-	private static final String defaultFontFace = "Sans serif";
-	private static final int defaultFontSize = 14;
-
-	private static final Painter default_shapePainter = new FillPainter( Color.black );
-
-	private static final Border default_border = new SolidBorder( 1.0, 2.0, Color.black, null );
-
-	public static final float defaultFractionFontScale = 0.9f;
-	public static final float defaultFractionMinFontScale = 0.9f;
-	
-	public static final float defaultScriptFontScale = 0.9f;
-	public static final float defaultScriptMinFontScale = 0.9f;
 	
 	
 	public static StyleSheetValues instance = new StyleSheetValues();
@@ -63,43 +49,55 @@ public class StyleSheetValues extends StyleSheet
 
 
 
-	public StyleSheetValues withAttr(String fieldName, Object value)
+	public StyleSheetValues withAttr(AttributeBase fieldName, Object value)
 	{
 		return (StyleSheetValues)super.withAttr( fieldName, value );
 	}
 	
-	public StyleSheetValues withAttrs(HashMap<String, Object> valuesMap)
+	public StyleSheetValues withAttrs(HashMap<AttributeBase, Object> valuesMap)
 	{
 		return (StyleSheetValues)super.withAttrs( valuesMap );
 	}
 		
-	public StyleSheetValues withAttrValues(AttributeValues attribs)
+	public StyleSheetValues withAttrs(AttributeTable2 attribs)
 	{
-		return (StyleSheetValues)super.withAttrValues( attribs );
+		return (StyleSheetValues)super.withAttrs( attribs );
 	}
-	
-	public StyleSheetValues withoutAttr(String fieldName)
+		
+	public StyleSheetValues withoutAttr(AttributeBase fieldName)
 	{
 		return (StyleSheetValues)super.withoutAttr( fieldName );
 	}
+	
+	public StyleSheetValues useAttr(AttributeBase fieldName)
+	{
+		return (StyleSheetValues)super.useAttr( fieldName );
+	}
 
+	
 
-
+	
+	
 	private Font styleSheetFont = null;
 	
 	public Font getFont()
 	{
 		if ( styleSheetFont == null )
 		{
-			String fontFace = getNonNull( "fontFace", String.class, defaultFontFace );
-			boolean bBold = getNonNull( "fontBold", Boolean.class, false );
-			boolean bItalic = getNonNull( "fontItalic", Boolean.class, false );
-			int size = getNonNull( "fontSize", Integer.class, defaultFontSize );
-			float scale = getNonNull( "fontScale", Float.class, 1.0f );
+			String face = get( StyleSheet2.fontFace, String.class );
+			boolean bBold = get( StyleSheet2.fontBold, Boolean.class );
+			boolean bItalic = get( StyleSheet2.fontItalic, Boolean.class );
+			int size = get( StyleSheet2.fontSize, Integer.class );
+			double scale = get( StyleSheet2.fontScale, Double.class );
 			int flags = ( bBold ? Font.BOLD : 0 )  |  ( bItalic ? Font.ITALIC : 0 );
-			styleSheetFont = new Font( fontFace, flags, size ).deriveFont( (float)size * scale );
+			styleSheetFont = new Font( face, flags, size ).deriveFont( (float)( size * scale ) );
 		}
 		return styleSheetFont;
+	}
+	
+	public StyleSheetValues useFont()
+	{
+		return useAttr( StyleSheet2.fontFace ).useAttr( StyleSheet2.fontBold ).useAttr( StyleSheet2.fontItalic ).useAttr( StyleSheet2.fontSize ).useAttr( StyleSheet2.fontScale );
 	}
 
 	
@@ -121,11 +119,17 @@ public class StyleSheetValues extends StyleSheet
 		if ( borderParams == null )
 		{
 			borderParams = new BorderParams(
-					get( "border", Border.class, default_border ) );
+					get( StyleSheet2.border, Border.class ) );
 		}
 		return borderParams;
 	}
+	
+	public StyleSheetValues useBorderParams()
+	{
+		return useAttr( StyleSheet2.border );
+	}
 
+	
 	
 	private ContainerStyleParams containerParams = null;
 
@@ -134,13 +138,19 @@ public class StyleSheetValues extends StyleSheet
 		if ( containerParams == null )
 		{
 			containerParams = new ContainerStyleParams(
-					get( "background", Painter.class, null ),
-					get( "hoverBackground", Painter.class, null ),
-					get( "cursor", Cursor.class, null ) );
+					get( StyleSheet2.background, Painter.class ),
+					get( StyleSheet2.hoverBackground, Painter.class ),
+					get( StyleSheet2.cursor, Cursor.class ) );
 		}
 		return containerParams;
 	}
+	
+	public StyleSheetValues useContainerParams()
+	{
+		return useAttr( StyleSheet2.background ).useAttr( StyleSheet2.hoverBackground ).useAttr( StyleSheet2.cursor );
+	}
 
+	
 	
 	private ContentLeafStyleParams contentLeafParams = null;
 
@@ -149,13 +159,19 @@ public class StyleSheetValues extends StyleSheet
 		if ( contentLeafParams == null )
 		{
 			contentLeafParams = new ContentLeafStyleParams(
-					get( "background", Painter.class, null ),
-					get( "hoverBackground", Painter.class, null ),
-					get( "cursor", Cursor.class, null ) );
+					get( StyleSheet2.background, Painter.class ),
+					get( StyleSheet2.hoverBackground, Painter.class ),
+					get( StyleSheet2.cursor, Cursor.class ) );
 		}
 		return contentLeafParams;
 	}
+	
+	public StyleSheetValues useContentLeafParams()
+	{
+		return useAttr( StyleSheet2.background ).useAttr( StyleSheet2.hoverBackground ).useAttr( StyleSheet2.cursor );
+	}
 
+	
 	
 	private FractionStyleParams fractionParams = null;
 
@@ -164,16 +180,23 @@ public class StyleSheetValues extends StyleSheet
 		if ( fractionParams == null )
 		{
 			fractionParams = new FractionStyleParams(
-					get( "background", Painter.class, null ),
-					get( "hoverBackground", Painter.class, null ),
-					get( "cursor", Cursor.class, null ),
-					getNonNull( "fractionVSpacing", Double.class, 2.0 ),
-					getNonNull( "fractionHPadding", Double.class, 3.0 ),
-					getNonNull( "fractionRefYOffset", Double.class, 5.0 ),
+					get( StyleSheet2.background, Painter.class ),
+					get( StyleSheet2.hoverBackground, Painter.class ),
+					get( StyleSheet2.cursor, Cursor.class ),
+					get( StyleSheet2.fractionVSpacing, Double.class ),
+					get( StyleSheet2.fractionHPadding, Double.class ),
+					get( StyleSheet2.fractionRefYOffset, Double.class ),
 					getFractionBarParams() );
 		}
 		return fractionParams;
 	}
+	
+	public StyleSheetValues useFractionParams()
+	{
+		return useAttr( StyleSheet2.background ).useAttr( StyleSheet2.hoverBackground ).useAttr( StyleSheet2.cursor )
+				.useAttr( StyleSheet2.fractionVSpacing ).useAttr( StyleSheet2.fractionHPadding ).useAttr( StyleSheet2.fractionRefYOffset );
+	}
+	
 	
 	
 	private FractionStyleParams.BarStyleParams fractionBarParams = null;
@@ -183,15 +206,22 @@ public class StyleSheetValues extends StyleSheet
 		if ( fractionBarParams == null )
 		{
 			fractionBarParams = new FractionStyleParams.BarStyleParams(
-					get( "background", Painter.class, null ),
-					get( "hoverBackground", Painter.class, null ),
-					get( "cursor", Cursor.class, null ),
-					getNonNull( "editable", Boolean.class, true ),
-					getNonNull( "foreground", Paint.class, Color.black ),
-					get( "hoverForeground", Paint.class, null ) );
+					get( StyleSheet2.background, Painter.class ),
+					get( StyleSheet2.hoverBackground, Painter.class ),
+					get( StyleSheet2.cursor, Cursor.class ),
+					get( StyleSheet2.editable, Boolean.class ),
+					get( StyleSheet2.foreground, Paint.class ),
+					get( StyleSheet2.hoverForeground, Paint.class ) );
 		}
 		return fractionBarParams;
 	}
+	
+	public StyleSheetValues useFractionBarParams()
+	{
+		return useAttr( StyleSheet2.background ).useAttr( StyleSheet2.hoverBackground ).useAttr( StyleSheet2.cursor )
+				.useAttr( StyleSheet2.editable ).useAttr( StyleSheet2.foreground ).useAttr( StyleSheet2.hoverForeground );
+	}
+	
 	
 	
 	private GridRowStyleParams gridRowParams = null;
@@ -201,12 +231,18 @@ public class StyleSheetValues extends StyleSheet
 		if ( gridRowParams == null )
 		{
 			gridRowParams = new GridRowStyleParams(
-					get( "background", Painter.class, null ),
-					get( "hoverBackground", Painter.class, null ),
-					get( "cursor", Cursor.class, null ) );
+					get( StyleSheet2.background, Painter.class ),
+					get( StyleSheet2.hoverBackground, Painter.class ),
+					get( StyleSheet2.cursor, Cursor.class ) );
 		}
 		return gridRowParams;
 	}
+	
+	public StyleSheetValues useGridRowParams()
+	{
+		return useAttr( StyleSheet2.background ).useAttr( StyleSheet2.hoverBackground ).useAttr( StyleSheet2.cursor );
+	}
+	
 	
 	
 	private HBoxStyleParams hboxParams = null;
@@ -216,14 +252,20 @@ public class StyleSheetValues extends StyleSheet
 		if ( hboxParams == null )
 		{
 			hboxParams = new HBoxStyleParams(
-					get( "background", Painter.class, null ),
-					get( "hoverBackground", Painter.class, null ),
-					get( "cursor", Cursor.class, null ),
-					getNonNull( "hboxSpacing", Double.class, 0.0 ) );
+					get( StyleSheet2.background, Painter.class ),
+					get( StyleSheet2.hoverBackground, Painter.class ),
+					get( StyleSheet2.cursor, Cursor.class ),
+					get( StyleSheet2.hboxSpacing, Double.class ) );
 		}
 		return hboxParams;
 	}
+	
+	public StyleSheetValues useHBoxParams()
+	{
+		return useAttr( StyleSheet2.background ).useAttr( StyleSheet2.hoverBackground ).useAttr( StyleSheet2.cursor ).useAttr( StyleSheet2.hboxSpacing );
+	}
 
+	
 	
 	private MathRootStyleParams mathRootParams = null;
 
@@ -232,16 +274,23 @@ public class StyleSheetValues extends StyleSheet
 		if ( mathRootParams == null )
 		{
 			mathRootParams = new MathRootStyleParams(
-					get( "background", Painter.class, null ),
-					get( "hoverBackground", Painter.class, null ),
-					get( "cursor", Cursor.class, null ),
+					get( StyleSheet2.background, Painter.class ),
+					get( StyleSheet2.hoverBackground, Painter.class ),
+					get( StyleSheet2.cursor, Cursor.class ),
 					getFont(),
-					getNonNull( "foreground", Paint.class, Color.black ),
-					get( "hoverForeground", Paint.class, null ),
-					getNonNull( "mathRootThickness", Double.class, 1.5 ) );
+					get( StyleSheet2.foreground, Paint.class ),
+					get( StyleSheet2.hoverForeground, Paint.class ),
+					get( StyleSheet2.mathRootThickness, Double.class ) );
 		}
 		return mathRootParams;
 	}
+	
+	public StyleSheetValues useMathRootParams()
+	{
+		return useAttr( StyleSheet2.background ).useAttr( StyleSheet2.hoverBackground ).useAttr( StyleSheet2.cursor ).useFont()
+				.useAttr( StyleSheet2.foreground ).useAttr( StyleSheet2.hoverForeground ).useAttr( StyleSheet2.mathRootThickness );
+	}
+	
 	
 	
 	private ParagraphStyleParams paragraphParams = null;
@@ -251,15 +300,22 @@ public class StyleSheetValues extends StyleSheet
 		if ( paragraphParams == null )
 		{
 			paragraphParams = new ParagraphStyleParams(
-					get( "background", Painter.class, null ),
-					get( "hoverBackground", Painter.class, null ),
-					get( "cursor", Cursor.class, null ),
-					getNonNull( "paragraphSpacing", Double.class, 0.0 ),
-					getNonNull( "paragraphLineSpacing", Double.class, 0.0 ),
-					getNonNull( "paragraphIndentation", Double.class, 0.0 ) );
+					get( StyleSheet2.background, Painter.class ),
+					get( StyleSheet2.hoverBackground, Painter.class ),
+					get( StyleSheet2.cursor, Cursor.class ),
+					get( StyleSheet2.paragraphSpacing, Double.class ),
+					get( StyleSheet2.paragraphLineSpacing, Double.class ),
+					get( StyleSheet2.paragraphIndentation, Double.class ) );
 		}
 		return paragraphParams;
 	}
+	
+	public StyleSheetValues useParagraphParams()
+	{
+		return useAttr( StyleSheet2.background ).useAttr( StyleSheet2.hoverBackground ).useAttr( StyleSheet2.cursor )
+				.useAttr( StyleSheet2.paragraphSpacing ).useAttr( StyleSheet2.paragraphLineSpacing ).useAttr( StyleSheet2.paragraphIndentation );
+	}
+
 	
 	
 	private ShapeStyleParams shapeParams = null;
@@ -269,14 +325,21 @@ public class StyleSheetValues extends StyleSheet
 		if ( shapeParams == null )
 		{
 			shapeParams = new ShapeStyleParams(
-					get( "background", Painter.class, null ),
-					get( "hoverBackground", Painter.class, null ),
-					get( "cursor", Cursor.class, null ),
-					getNonNull( "shapePainter", Painter.class, default_shapePainter ),
-					get( "hoverShapePainter", Painter.class, null ) );
+					get( StyleSheet2.background, Painter.class ),
+					get( StyleSheet2.hoverBackground, Painter.class ),
+					get( StyleSheet2.cursor, Cursor.class ),
+					get( StyleSheet2.shapePainter, Painter.class ),
+					get( StyleSheet2.hoverShapePainter, Painter.class ) );
 		}
 		return shapeParams;
 	}
+	
+	public StyleSheetValues useShapeParams()
+	{
+		return useAttr( StyleSheet2.background ).useAttr( StyleSheet2.hoverBackground ).useAttr( StyleSheet2.cursor )
+				.useAttr( StyleSheet2.shapePainter ).useAttr( StyleSheet2.hoverShapePainter );
+	}
+	
 	
 	
 	private ScriptStyleParams scriptParams = null;
@@ -286,14 +349,21 @@ public class StyleSheetValues extends StyleSheet
 		if ( scriptParams == null )
 		{
 			scriptParams = new ScriptStyleParams(
-					get( "background", Painter.class, null ),
-					get( "hoverBackground", Painter.class, null ),
-					get( "cursor", Cursor.class, null ),
-					getNonNull( "scriptColumnSpacing", Double.class, 1.0 ),
-					getNonNull( "scriptRowSpacing", Double.class, 1.0 ) );
+					get( StyleSheet2.background, Painter.class ),
+					get( StyleSheet2.hoverBackground, Painter.class ),
+					get( StyleSheet2.cursor, Cursor.class ),
+					get( StyleSheet2.scriptColumnSpacing, Double.class ),
+					get( StyleSheet2.scriptRowSpacing, Double.class ) );
 		}
 		return scriptParams;
 	}
+	
+	public StyleSheetValues useScriptParams()
+	{
+		return useAttr( StyleSheet2.background ).useAttr( StyleSheet2.hoverBackground ).useAttr( StyleSheet2.cursor )
+				.useAttr( StyleSheet2.scriptColumnSpacing ).useAttr( StyleSheet2.scriptRowSpacing );
+	}
+
 	
 	
 	private TextStyleParams staticTextParams = null;
@@ -303,37 +373,53 @@ public class StyleSheetValues extends StyleSheet
 		if ( staticTextParams == null )
 		{
 			staticTextParams = new TextStyleParams(
-					get( "background", Painter.class, null ),
-					get( "hoverBackground", Painter.class, null ),
-					get( "cursor", Cursor.class, null ),
+					get( StyleSheet2.background, Painter.class ),
+					get( StyleSheet2.hoverBackground, Painter.class ),
+					get( StyleSheet2.cursor, Cursor.class ),
 					false,
 					getFont(),
-					getNonNull( "foreground", Paint.class, Color.black ),
-					get( "hoverForeground", Paint.class, null ),
-					get( "textSquiggleUnderlinePaint", Paint.class, null ),
-					getNonNull( "textSmallCaps", Boolean.class, false ) );
+					get( StyleSheet2.foreground, Paint.class ),
+					get( StyleSheet2.hoverForeground, Paint.class ),
+					get( StyleSheet2.textSquiggleUnderlinePaint, Paint.class ),
+					get( StyleSheet2.textSmallCaps, Boolean.class ) );
 		}
 		return staticTextParams;
 	}
 	
-	
-	private TableStyleParams tableParams = null;
-
-	public TableStyleParams getTableParams()
+	public StyleSheetValues useStaticTextParams()
 	{
-		if ( tableParams == null )
-		{
-			tableParams = new TableStyleParams(
-					get( "background", Painter.class, null ),
-					get( "hoverBackground", Painter.class, null ),
-					get( "cursor", Cursor.class, null ),
-					getNonNull( "tableColumnSpacing", Double.class, 0.0 ),
-					getNonNull( "tableColumnExpand", Boolean.class, false ),
-					getNonNull( "tableRowSpacing", Double.class, 0.0 ),
-					getNonNull( "tableRowExpand", Boolean.class, false ) );
-		}
-		return tableParams;
+		return useAttr( StyleSheet2.background ).useAttr( StyleSheet2.hoverBackground ).useAttr( StyleSheet2.cursor ).useFont()
+				.useAttr( StyleSheet2.foreground ).useAttr( StyleSheet2.hoverForeground ).useAttr( StyleSheet2.textSquiggleUnderlinePaint ).useAttr( StyleSheet2.textSmallCaps );
 	}
+
+	
+	
+	private TextStyleParams labelTextParams = null;
+
+	public TextStyleParams getLabelTextParams()
+	{
+		if ( labelTextParams == null )
+		{
+			labelTextParams = new TextStyleParams(
+					get( StyleSheet2.background, Painter.class ),
+					get( StyleSheet2.hoverBackground, Painter.class ),
+					get( StyleSheet2.cursor, Cursor.class ),
+					false,
+					getFont(),
+					get( StyleSheet2.foreground, Paint.class ),
+					get( StyleSheet2.hoverForeground, Paint.class ),
+					get( StyleSheet2.textSquiggleUnderlinePaint, Paint.class ),
+					get( StyleSheet2.textSmallCaps, Boolean.class ) );
+		}
+		return labelTextParams;
+	}
+	
+	public StyleSheetValues useLabelTextParams()
+	{
+		return useAttr( StyleSheet2.background ).useAttr( StyleSheet2.hoverBackground ).useAttr( StyleSheet2.cursor ).useFont()
+				.useAttr( StyleSheet2.foreground ).useAttr( StyleSheet2.hoverForeground ).useAttr( StyleSheet2.textSquiggleUnderlinePaint ).useAttr( StyleSheet2.textSmallCaps );
+	}
+	
 	
 	
 	private TextStyleParams textParams = null;
@@ -343,18 +429,52 @@ public class StyleSheetValues extends StyleSheet
 		if ( textParams == null )
 		{
 			textParams = new TextStyleParams(
-					get( "background", Painter.class, null ),
-					get( "hoverBackground", Painter.class, null ),
-					get( "cursor", Cursor.class, null ),
-					getNonNull( "editable", Boolean.class, true ),
+					get( StyleSheet2.background, Painter.class ),
+					get( StyleSheet2.hoverBackground, Painter.class ),
+					get( StyleSheet2.cursor, Cursor.class ),
+					get( StyleSheet2.editable, Boolean.class ),
 					getFont(),
-					getNonNull( "foreground", Paint.class, Color.black ),
-					get( "hoverForeground", Paint.class, null ),
-					get( "textSquiggleUnderlinePaint", Paint.class, null ),
-					getNonNull( "textSmallCaps", Boolean.class, false ) );
+					get( StyleSheet2.foreground, Paint.class ),
+					get( StyleSheet2.hoverForeground, Paint.class ),
+					get( StyleSheet2.textSquiggleUnderlinePaint, Paint.class ),
+					get( StyleSheet2.textSmallCaps, Boolean.class ) );
 		}
 		return textParams;
 	}
+	
+	public StyleSheetValues useTextParams()
+	{
+		return useAttr( StyleSheet2.background ).useAttr( StyleSheet2.hoverBackground ).useAttr( StyleSheet2.cursor ).useFont()
+				.useAttr( StyleSheet2.editable ).useAttr( StyleSheet2.foreground ).useAttr( StyleSheet2.hoverForeground ).useAttr( StyleSheet2.textSquiggleUnderlinePaint )
+				.useAttr( StyleSheet2.textSmallCaps );
+	}
+	
+	
+	
+	private TableStyleParams tableParams = null;
+
+	public TableStyleParams getTableParams()
+	{
+		if ( tableParams == null )
+		{
+			tableParams = new TableStyleParams(
+					get( StyleSheet2.background, Painter.class ),
+					get( StyleSheet2.hoverBackground, Painter.class ),
+					get( StyleSheet2.cursor, Cursor.class ),
+					get( StyleSheet2.tableColumnSpacing, Double.class ),
+					get( StyleSheet2.tableColumnExpand, Boolean.class ),
+					get( StyleSheet2.tableRowSpacing, Double.class ),
+					get( StyleSheet2.tableRowExpand, Boolean.class ) );
+		}
+		return tableParams;
+	}
+	
+	public StyleSheetValues useTableParams()
+	{
+		return useAttr( StyleSheet2.background ).useAttr( StyleSheet2.hoverBackground ).useAttr( StyleSheet2.cursor )
+				.useAttr( StyleSheet2.tableColumnSpacing ).useAttr( StyleSheet2.tableColumnExpand ).useAttr( StyleSheet2.tableRowSpacing ).useAttr( StyleSheet2.tableRowExpand );
+	}
+	
 	
 	
 	private VBoxStyleParams vboxParams = null;
@@ -364,11 +484,16 @@ public class StyleSheetValues extends StyleSheet
 		if ( vboxParams == null )
 		{
 			vboxParams = new VBoxStyleParams(
-					get( "background", Painter.class, null ),
-					get( "hoverBackground", Painter.class, null ),
-					get( "cursor", Cursor.class, null ),
-					getNonNull( "vboxSpacing", Double.class, 0.0 ) );
+					get( StyleSheet2.background, Painter.class ),
+					get( StyleSheet2.hoverBackground, Painter.class ),
+					get( StyleSheet2.cursor, Cursor.class ),
+					get( StyleSheet2.vboxSpacing, Double.class ) );
 		}
 		return vboxParams;
+	}
+	
+	public StyleSheetValues useVBoxParams()
+	{
+		return useAttr( StyleSheet2.background ).useAttr( StyleSheet2.hoverBackground ).useAttr( StyleSheet2.cursor ).useAttr( StyleSheet2.vboxSpacing );
 	}
 }

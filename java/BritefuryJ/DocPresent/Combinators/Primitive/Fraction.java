@@ -8,12 +8,13 @@ package BritefuryJ.DocPresent.Combinators.Primitive;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPFraction;
-import BritefuryJ.DocPresent.Combinators.PresentationCombinator;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
 
-public class Fraction extends PresentationCombinator
+public class Fraction extends Pres
 {
-	private PresentationCombinator numerator, denominator;
+	private Pres numerator, denominator;
 	private String barContent;
 	
 	public Fraction(Object numerator, Object denominator, String barContent)
@@ -30,8 +31,9 @@ public class Fraction extends PresentationCombinator
 	{
 		StyleSheetValues style = ctx.getStyle();
 		DPFraction element = new DPFraction( style.getFractionParams(), style.getTextParams(), barContent );
-		element.setNumeratorChild( numerator.present( ctx.withStyle( fractionNumeratorStyle( style ) ) ) );
-		element.setDenominatorChild( denominator.present( ctx.withStyle( fractionDenominatorStyle( style ) ) ) );
+		StyleSheetValues usedStyle = style.useFractionParams().useTextParams();
+		element.setNumeratorChild( numerator.present( ctx.withStyle( fractionNumeratorStyle( usedStyle ) ) ) );
+		element.setDenominatorChild( denominator.present( ctx.withStyle( fractionDenominatorStyle( usedStyle ) ) ) );
 		return element;
 	}
 
@@ -39,11 +41,11 @@ public class Fraction extends PresentationCombinator
 
 	private static StyleSheetValues fractionNumeratorStyle(StyleSheetValues style)
 	{
-		float scale = style.getNonNull( "fontScale", Float.class, 1.0f );
-		float fracScale = style.getNonNull( "fractionFontScale", Float.class, StyleSheetValues.defaultFractionFontScale );
-		float minFracScale = style.getNonNull( "fractionMinFontScale", Float.class, StyleSheetValues.defaultFractionMinFontScale );
+		double scale = style.get( StyleSheet2.fontScale, Double.class );
+		double fracScale = style.get( StyleSheet2.fractionFontScale, Double.class );
+		double minFracScale = style.get( StyleSheet2.fractionMinFontScale, Double.class );
 		scale = Math.max( scale * fracScale, minFracScale );
-		return style.withAttr( "fontScale", scale );
+		return style.withAttr( StyleSheet2.fontScale, scale );
 	}
 
 	private static StyleSheetValues fractionDenominatorStyle(StyleSheetValues style)

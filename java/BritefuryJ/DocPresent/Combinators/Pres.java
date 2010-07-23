@@ -10,12 +10,14 @@ import java.util.List;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
 import BritefuryJ.GSym.GSymAbstractPerspective;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
-public abstract class PresentationCombinator
+public abstract class Pres
 {
 	public static class PresentationContext
 	{
@@ -75,7 +77,14 @@ public abstract class PresentationCombinator
 		
 		public PresentationContext withStyle(StyleSheetValues style)
 		{
-			return new PresentationContext( fragment, perspective, style, inheritedState );
+			if ( style == this.style )
+			{
+				return this;
+			}
+			else
+			{
+				return new PresentationContext( fragment, perspective, style, inheritedState );
+			}
 		}
 	}
 	
@@ -90,7 +99,120 @@ public abstract class PresentationCombinator
 	
 	
 	
-	protected static DPElement[] mapPresent(PresentationContext ctx, PresentationCombinator children[])
+	public Align align(HAlignment hAlign, VAlignment vAlign)
+	{
+		return new Align( hAlign, vAlign, this );
+	}
+	
+
+	public Align alignH(HAlignment hAlign)
+	{
+		return new Align( hAlign, this );
+	}
+	
+	public Align alignV(VAlignment vAlign)
+	{
+		return new Align( vAlign, this );
+	}
+	
+
+	public Align alignHPack()
+	{
+		return alignH( HAlignment.PACK );
+	}
+
+	public Align alignHLeft()
+	{
+		return alignH( HAlignment.LEFT );
+	}
+
+	public Align alignHCentre()
+	{
+		return alignH( HAlignment.CENTRE );
+	}
+
+	public Align alignHRight()
+	{
+		return alignH( HAlignment.RIGHT );
+	}
+
+	public Align alignHExpand()
+	{
+		return alignH( HAlignment.EXPAND );
+	}
+	
+	
+	public Align alignVRefY()
+	{
+		return alignV( VAlignment.REFY );
+	}
+
+	public Align alignVRefYExpand()
+	{
+		return alignV( VAlignment.REFY_EXPAND );
+	}
+
+	public Align alignVTop()
+	{
+		return alignV( VAlignment.TOP );
+	}
+
+	public Align alignVCentre()
+	{
+		return alignV( VAlignment.CENTRE );
+	}
+
+	public Align alignVBottom()
+	{
+		return alignV( VAlignment.BOTTOM );
+	}
+
+	public Align alignVExpand()
+	{
+		return alignV( VAlignment.EXPAND );
+	}
+	
+	
+	
+	//
+	// Padding methods
+	//
+	
+	public Pres pad(double leftPad, double rightPad, double topPad, double bottomPad)
+	{
+		return new Pad( this, leftPad, rightPad, topPad, bottomPad );
+	}
+	
+	public Pres pad(double xPad, double yPad)
+	{
+		return pad( xPad, xPad, yPad, yPad );
+	}
+	
+	public Pres padX(double xPad)
+	{
+		return pad( xPad, xPad, 0.0, 0.0 );
+	}
+	
+	public Pres padX(double leftPad, double rightPad)
+	{
+		return pad( leftPad, rightPad, 0.0, 0.0 );
+	}
+	
+	public Pres padY(double yPad)
+	{
+		return pad( 0.0, 0.0, yPad, yPad );
+	}
+	
+	public Pres padY(double topPad, double bottomPad)
+	{
+		return pad( 0.0, 0.0, topPad, bottomPad );
+	}
+
+	
+	
+	
+	
+	protected static DPElement[] mapPresent(PresentationContext ctx, Pres children[])
 	{
 		DPElement result[] = new DPElement[children.length];
 		for (int i = 0; i < children.length; i++)
@@ -102,15 +224,15 @@ public abstract class PresentationCombinator
 	
 	
 	
-	protected static PresentationCombinator coerce(Object x)
+	protected static Pres coerce(Object x)
 	{
 		if ( x == null )
 		{
 			return null;
 		}
-		else if ( x instanceof PresentationCombinator )
+		else if ( x instanceof Pres )
 		{
-			return (PresentationCombinator)x;
+			return (Pres)x;
 		}
 		else if ( x instanceof DPElement )
 		{
@@ -122,9 +244,9 @@ public abstract class PresentationCombinator
 		}
 	}
 
-	protected static PresentationCombinator[] mapCoerce(Object children[])
+	protected static Pres[] mapCoerce(Object children[])
 	{
-		PresentationCombinator result[] = new PresentationCombinator[children.length];
+		Pres result[] = new Pres[children.length];
 		for (int i = 0; i < children.length; i++)
 		{
 			result[i] = coerce( children[i] );
@@ -133,9 +255,9 @@ public abstract class PresentationCombinator
 	}
 	
 
-	protected static PresentationCombinator[] mapCoerce(List<Object> children)
+	protected static Pres[] mapCoerce(List<Object> children)
 	{
-		PresentationCombinator result[] = new PresentationCombinator[children.size()];
+		Pres result[] = new Pres[children.size()];
 		for (int i = 0; i < children.size(); i++)
 		{
 			result[i] = coerce( children.get( i ) );

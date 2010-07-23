@@ -8,11 +8,11 @@ package BritefuryJ.DocPresent.Combinators.Primitive;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPProxy;
-import BritefuryJ.DocPresent.Combinators.PresentationCombinator;
+import BritefuryJ.DocPresent.Combinators.Pres;
 
-public class Proxy extends PresentationCombinator
+public class Proxy extends Pres
 {
-	private PresentationCombinator child;
+	private Pres child;
 	
 	
 	public Proxy(Object child)

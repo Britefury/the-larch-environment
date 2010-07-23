@@ -8,12 +8,12 @@ package BritefuryJ.DocPresent.Combinators.Primitive;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPSegment;
-import BritefuryJ.DocPresent.Combinators.PresentationCombinator;
+import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
 
-public class Segment extends PresentationCombinator
+public class Segment extends Pres
 {
-	private PresentationCombinator child;
+	private Pres child;
 	private boolean bGuardBegin, bGuardEnd;
 	
 	
@@ -31,7 +31,7 @@ public class Segment extends PresentationCombinator
 	{
 		StyleSheetValues style = ctx.getStyle();
 		DPSegment element = new DPSegment( style.getContainerParams(), style.getTextParams(), bGuardBegin, bGuardEnd );
-		element.setChild( child.present( ctx ) );
+		element.setChild( child.present( ctx.withStyle( ctx.getStyle().useContainerParams() ) ) );
 		return element;
 	}
 
