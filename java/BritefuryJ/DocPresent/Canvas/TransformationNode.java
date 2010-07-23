@@ -149,12 +149,6 @@ public class TransformationNode extends UnaryBranchNode
 		PointerInputElement element = child.getDndElement( new Point2( childPos.x, childPos.y ), targetPos );
 		if ( element != null )
 		{
-			if ( targetPos != null )
-			{
-				Point2D.Double targetParent = new Point2D.Double( targetPos[0].x, targetPos[0].y );
-				localToParent.transform( targetParent, targetParent );
-				targetPos[0] = new Point2( targetParent.x, targetParent.y );
-			}
 			return element;
 		}
 		

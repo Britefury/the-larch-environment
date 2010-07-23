@@ -66,19 +66,19 @@ class TextNodeEventListener (TreeEventListenerObjectDispatch):
 	def onTextEdit(self, element, sourceElement, event):
 		value = element.getTextRepresentation()
 		ctx = element.getFragmentContext()
-		node = ctx.getDocNode()
+		node = ctx.getModel()
 		return self._performTextEdit( element, node, value )
 
 
 	@ObjectDispatchMethod( NodeRequest )
 	def onNodeRequest(self, element, sourceElement, event):
-		return event.applyToParagraphNode( element.getFragmentContext().getDocNode(), element )
+		return event.applyToParagraphNode( element.getFragmentContext().getModel(), element )
 
 
 	@ObjectDispatchMethod( WorksheetSelectionEditTreeEvent )
 	def onSelectionEdit(self, element, sourceElement, event):
 		value = element.getStreamValue()
-		node = element.getFragmentContext().getDocNode()
+		node = element.getFragmentContext().getModel()
 		if value.isTextual():
 			return self._performTextEdit( element, node, value.textualValue() )
 		else:
@@ -141,7 +141,7 @@ class TextNodeInteractor (ElementInteractor):
 	def onKeyPress(self, element, event):
 		if event.getModifiers() & KeyEvent.ALT_MASK  !=  0:
 			ctx = element.getFragmentContext()
-			node = ctx.getDocNode()
+			node = ctx.getModel()
 
 			if event.getKeyCode() == KeyEvent.VK_N:
 				node.setStyle( 'normal' )

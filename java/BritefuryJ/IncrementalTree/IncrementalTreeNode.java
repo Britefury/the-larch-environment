@@ -81,7 +81,7 @@ public abstract class IncrementalTreeNode implements IncrementalMonitorListener,
 	
 	
 	private IncrementalTree incrementalTree;
-	private Object docNode;
+	private Object model;
 	
 	private IncrementalFunctionMonitor incr;
 	protected NodeResultFactory resultFactory;
@@ -94,10 +94,10 @@ public abstract class IncrementalTreeNode implements IncrementalMonitorListener,
 	
 	
 	
-	public IncrementalTreeNode(IncrementalTree incrementalTree, Object docNode)
+	public IncrementalTreeNode(IncrementalTree incrementalTree, Object model)
 	{
 		this.incrementalTree = incrementalTree;
-		this.docNode = docNode;
+		this.model = model;
 		
 		parent = null;
 		nextSibling = null;
@@ -169,9 +169,9 @@ public abstract class IncrementalTreeNode implements IncrementalMonitorListener,
 	}
 	
 
-	public Object getDocNode()
+	public Object getModel()
 	{
-		return docNode;
+		return model;
 	}
 	
 	
@@ -267,7 +267,7 @@ public abstract class IncrementalTreeNode implements IncrementalMonitorListener,
 		
 		if ( resultFactory != null )
 		{
-			Object r = resultFactory.createNodeResult( this, docNode );
+			Object r = resultFactory.createNodeResult( this, model );
 			
 			// Register new child relationships
 			child = childrenHead;

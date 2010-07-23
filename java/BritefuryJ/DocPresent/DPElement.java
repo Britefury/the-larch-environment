@@ -2136,14 +2136,14 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		notifyInteractionFieldsModified();
 	}
 	
-	public void addDragSource(Class<?> dataType, int sourceActions, ObjectDndHandler.SourceDataFn sourceDataFn, ObjectDndHandler.ExportDoneFn exportDoneFn)
+	public void addDragSource(Class<?> dataType, int sourceAspects, ObjectDndHandler.SourceDataFn sourceDataFn, ObjectDndHandler.ExportDoneFn exportDoneFn)
 	{
-		addDragSource( new ObjectDndHandler.DragSource( dataType, sourceActions, sourceDataFn, exportDoneFn ) );
+		addDragSource( new ObjectDndHandler.DragSource( dataType, sourceAspects, sourceDataFn, exportDoneFn ) );
 	}
 	
-	public void addDragSource(Class<?> dataType, int sourceActions, ObjectDndHandler.SourceDataFn sourceDataFn)
+	public void addDragSource(Class<?> dataType, int sourceAspects, ObjectDndHandler.SourceDataFn sourceDataFn)
 	{
-		addDragSource( dataType, sourceActions, sourceDataFn, null );
+		addDragSource( dataType, sourceAspects, sourceDataFn, null );
 	}
 	
 	

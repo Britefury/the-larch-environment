@@ -24,7 +24,7 @@ class WorksheetNodeEventListener (TreeEventListenerObjectDispatch):
 	@ObjectDispatchMethod( AddNodeOperation )
 	def onAddNode(self, element, sourceElement, event):
 		ctx = element.getFragmentContext()
-		node = ctx.getDocNode()
+		node = ctx.getModel()
 		
 		return event.apply( node.getBody() )
 
@@ -41,7 +41,7 @@ class WorksheetNodeInteractor (ElementInteractor):
 	def onKeyPress(self, element, event):
 		if event.getKeyCode() == KeyEvent.VK_F5:
 			ctx = element.getFragmentContext()
-			node = ctx.getDocNode()
+			node = ctx.getModel()
 			node.refreshResults()
 			return True
 		

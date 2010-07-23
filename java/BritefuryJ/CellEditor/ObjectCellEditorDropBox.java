@@ -22,9 +22,9 @@ public class ObjectCellEditorDropBox extends LiteralCellEditor
 		protected class Listener implements ObjectDndHandler.DropFn
 		{
 			@Override
-			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data)
+			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
 			{
-				setCellValue( ((GSymFragmentView.FragmentDocNode)data).getDocNode() );
+				setCellValue( ((GSymFragmentView.FragmentModel)data).getModel() );
 				return true;
 			}
 		}
@@ -46,7 +46,7 @@ public class ObjectCellEditorDropBox extends LiteralCellEditor
 			{
 				e = styleSheet.objectBox( "DocModel", PrimitiveStyleSheet.instance.staticText( "null" ) );
 			}
-			e.addDropDest( GSymFragmentView.FragmentDocNode.class, new Listener() );
+			e.addDropDest( GSymFragmentView.FragmentModel.class, new Listener() );
 			setElement( e );
 		}
 	};

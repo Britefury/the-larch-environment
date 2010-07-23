@@ -137,7 +137,7 @@ public class CanvasTestPage extends SystemPage
 		
 		ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
 		{
-			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data)
+			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
 			{
 				String text = data.toString();
 				textElement.setText( text );
@@ -170,7 +170,7 @@ public class CanvasTestPage extends SystemPage
 		
 		ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
 		{
-			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data)
+			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
 			{
 				String text = data.toString();
 				textElement.setText( text );
@@ -180,7 +180,7 @@ public class CanvasTestPage extends SystemPage
 		
 		ObjectDndHandler.CanDropFn canDropFn = new ObjectDndHandler.CanDropFn()
 		{
-			public boolean canDrop(PointerInputElement destElement, Point2 targetPosition, Object data)
+			public boolean canDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
 			{
 				DPBin box = (DPBin)firstElement;
 				DPBin pad = (DPBin)box.getChild();

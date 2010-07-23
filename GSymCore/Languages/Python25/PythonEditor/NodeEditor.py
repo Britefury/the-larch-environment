@@ -70,7 +70,7 @@ class ParsedExpressionTreeEventListener (TreeEventListenerObjectDispatch):
 			element.clearFixedValue()
 		value = element.getStreamValue()
 		ctx = element.getFragmentContext()
-		node = ctx.getDocNode()
+		node = ctx.getModel()
 		if '\n' not in value:
 			parsed = parseStream( self._parser, value, self._outerPrecedence )
 			if parsed is not None:
@@ -130,7 +130,7 @@ class StatementTreeEventListener (TreeEventListenerObjectDispatch):
 			sourceElement.clearFixedValuesOnPathUpTo( element )
 			element.clearFixedValue()
 		ctx = element.getFragmentContext()
-		node = ctx.getDocNode()
+		node = ctx.getModel()
 		# Get the content
 		value = element.getStreamValue()
 		parsed = parseStream( self._parser, value )
@@ -169,7 +169,7 @@ class StatementTreeEventListener (TreeEventListenerObjectDispatch):
 					return True
 				else:
 					sourceCtxElement = sourceCtx.getFragmentContentElement()
-					sourceNode = sourceCtx.getDocNode()
+					sourceNode = sourceCtx.getModel()
 					sourceValue = sourceCtxElement.getStreamValue()
 					
 					if sourceValue.isTextual():
@@ -278,7 +278,7 @@ class StatementIndentationInteractor (ElementInteractor):
 	def onKeyTyped(self, element, event):
 		if event.getKeyChar() == '\t':
 			context = element.getFragmentContext()
-			node = context.getDocNode()
+			node = context.getModel()
 			
 			editHandler = element.getRegion().getEditHandler()
 			if event.getModifiers() & KeyEvent.SHIFT_MASK  !=  0:

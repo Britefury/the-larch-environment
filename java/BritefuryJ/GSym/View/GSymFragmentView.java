@@ -32,20 +32,20 @@ import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 
 public class GSymFragmentView extends IncrementalTreeNode implements FragmentContext, PresentationStateListener
 {
-	public static class FragmentDocNode
+	public static class FragmentModel
 	{
-		private Object docNode;
+		private Object model;
 		
 		
-		public FragmentDocNode(Object docNode)
+		public FragmentModel(Object model)
 		{
-			this.docNode = docNode;
+			this.model = model;
 		}
 		
 		
-		public Object getDocNode()
+		public Object getModel()
 		{
-			return docNode;
+			return model;
 		}
 	}
 	
@@ -57,12 +57,12 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 		{
 			DPElement element = (DPElement)sourceElement;
 			GSymFragmentView ctx = (GSymFragmentView)element.getFragmentContext();
-			return new FragmentDocNode( ctx.getDocNode() );
+			return new FragmentModel( ctx.getModel() );
 		}
 	};
 	
 
-	private static final ObjectDndHandler.DragSource fragmentDragSource = new ObjectDndHandler.DragSource( FragmentDocNode.class, ObjectDndHandler.ASPECT_DOC_NODE, fragmentDragSourceFn );
+	private static final ObjectDndHandler.DragSource fragmentDragSource = new ObjectDndHandler.DragSource( FragmentModel.class, ObjectDndHandler.ASPECT_DOC_NODE, fragmentDragSourceFn );
 	
 	
 	private static final PrimitiveStyleSheet viewError_textStyle = PrimitiveStyleSheet.instance.withFontBold( true ).withFontSize( 12 ).withForeground( new Color( 0.8f, 0.0f, 0.0f ) );

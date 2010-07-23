@@ -336,7 +336,7 @@ public class GSymView extends IncrementalTree
 			PersistentStateTable stateTable = viewNode.getValidPersistentStateTable();
 			if ( stateTable != null )
 			{
-				store.addPersistentState( node.getDocNode(), stateTable );
+				store.addPersistentState( node.getModel(), stateTable );
 			}
 			
 			// Add the children using an interator; that means that they will be inserted at the beginning

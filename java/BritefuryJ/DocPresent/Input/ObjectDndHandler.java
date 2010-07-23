@@ -38,12 +38,12 @@ public class ObjectDndHandler extends DndHandler
 	
 	public static interface DropFn
 	{
-		public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data);
+		public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action);
 	}
 	
 	public static interface CanDropFn
 	{
-		public boolean canDrop(PointerInputElement destElement, Point2 targetPosition, Object data);
+		public boolean canDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action);
 	}
 
 	
@@ -574,7 +574,7 @@ public class ObjectDndHandler extends DndHandler
 					match.dragData = transferData.getDragDataForSrc( match.source );
 					match.bHasDragData = true;
 				}
-				boolean bResult = match.dest.dropFn.acceptDrop( destElement, drop.getTargetPosition(), match.dragData );
+				boolean bResult = match.dest.dropFn.acceptDrop( destElement, drop.getTargetPosition(), match.dragData, drop.getDropAction() );
 				if ( bResult )
 				{
 					transferData.acceptDrop( match );
@@ -605,7 +605,7 @@ public class ObjectDndHandler extends DndHandler
 						{
 							return false;
 						}
-						return dest.dropFn.acceptDrop( destElement, drop.getTargetPosition(), data );
+						return dest.dropFn.acceptDrop( destElement, drop.getTargetPosition(), data, drop.getDropAction() );
 					}
 				}
 			}
@@ -637,7 +637,7 @@ public class ObjectDndHandler extends DndHandler
 						if ( dest.canDropFn != null )
 						{
 							dragData = transferData.getDragDataForSrc( src );
-							bCanDrop = dest.canDropFn.canDrop( destElement, drop.getTargetPosition(), dragData );
+							bCanDrop = dest.canDropFn.canDrop( destElement, drop.getTargetPosition(), dragData, drop.getDropAction() );
 							bHasDragData = true;
 						}
 		

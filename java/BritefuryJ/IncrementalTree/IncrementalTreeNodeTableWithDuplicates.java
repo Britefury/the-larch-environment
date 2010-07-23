@@ -235,7 +235,7 @@ public class IncrementalTreeNodeTableWithDuplicates extends IncrementalTreeNodeT
 				unrefedStack.push( child );
 			}
 
-			TableForDocNode subTable = table.get( new Key( node.getDocNode() ) );
+			TableForDocNode subTable = table.get( new Key( node.getModel() ) );
 			if ( subTable != null )
 			{
 				subTable.clean();
@@ -250,7 +250,7 @@ public class IncrementalTreeNodeTableWithDuplicates extends IncrementalTreeNodeT
 	
 	protected void refIncrementalNode(IncrementalTreeNode node)
 	{
-		Key key = new Key( node.getDocNode() );
+		Key key = new Key( node.getModel() );
 		TableForDocNode subTable = table.get( key );
 		if ( subTable == null )
 		{
@@ -263,7 +263,7 @@ public class IncrementalTreeNodeTableWithDuplicates extends IncrementalTreeNodeT
 
 	protected void unrefIncrementalNode(IncrementalTreeNode node)
 	{
-		Key key = new Key( node.getDocNode() );
+		Key key = new Key( node.getModel() );
 		TableForDocNode subTable = table.get( key );
 		if ( subTable == null )
 		{

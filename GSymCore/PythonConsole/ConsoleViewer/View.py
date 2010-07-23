@@ -78,10 +78,10 @@ class ConsoleView (GSymViewObjectDispatch):
 		blockViews = ctx.mapPresentFragment( node.getBlocks(), styleSheet )
 		currentModuleView = ctx.presentFragmentWithPerspectiveAndStyleSheet( node.getCurrentPythonModule(), Python25.python25EditorPerspective, styleSheet['pythonStyle'] )
 	
-		def _onDrop(element, pos, data):
+		def _onDrop(element, pos, data, action):
 			class _VarNameEntryListener (TextEntry.TextEntryListener):
 				def onAccept(self, entry, text):
-					node.assignVariable( text, data.getDocNode() )
+					node.assignVariable( text, data.getModel() )
 					_finish( entry )
 				
 				def onCancel(self, entry, text):
@@ -104,7 +104,7 @@ class ConsoleView (GSymViewObjectDispatch):
 			
 		
 		
-		dropDest = ObjectDndHandler.DropDest( GSymFragmentView.FragmentDocNode, _onDrop )
+		dropDest = ObjectDndHandler.DropDest( GSymFragmentView.FragmentModel, _onDrop )
 		consoleView, dropPromptInsertionPoint = styleSheet.console( blockViews, currentModuleView, CurrentModuleInteractor( node ), dropDest )
 		return consoleView
 

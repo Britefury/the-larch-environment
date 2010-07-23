@@ -429,10 +429,6 @@ public abstract class DPContainer extends DPElement
 			PointerInputElement element = child.getDndElement( child.getParentToLocalXform().transform( localPos ), targetPos );
 			if ( element != null )
 			{
-				if ( targetPos != null )
-				{
-					targetPos[0] = child.getLocalToParentXform().transform( targetPos[0] );
-				}
 				return element;
 			}
 		}
