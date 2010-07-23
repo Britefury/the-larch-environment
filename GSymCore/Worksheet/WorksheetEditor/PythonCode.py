@@ -38,7 +38,7 @@ class PythonCodeNodeEventListener (TreeEventListenerObjectDispatch):
 
 	@ObjectDispatchMethod( NodeRequest )
 	def onNodeRequest(self, element, sourceElement, event):
-		return event.applyToPythonCodeNode( element.getFragmentContext().getDocNode(), element )
+		return event.applyToPythonCodeNode( element.getFragmentContext().getModel(), element )
 
 
 PythonCodeNodeEventListener.instance = PythonCodeNodeEventListener()		

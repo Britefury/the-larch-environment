@@ -87,7 +87,7 @@ def isIndentedBlock(node):
 #
 
 def isStmtFragment(fragment):
-	return isStmt( fragment.getDocNode() )
+	return isStmt( fragment.getModel() )
 
 
 
@@ -102,14 +102,14 @@ def getStatementContextFromElement(element):
 	
 	assert context is not None
 	
-	while not isStmt( context.getDocNode() ):
+	while not isStmt( context.getModel() ):
 		context = context.getParent()
 	return context
 
 
 def getParentStatementContext(ctx):
 	ctx = ctx.getParent()
-	while ctx is not None  and  not isStmt( ctx.getDocNode() )  and  not isPythonModule( ctx.getDocNode() ):
+	while ctx is not None  and  not isStmt( ctx.getModel() )  and  not isPythonModule( ctx.getModel() ):
 		ctx = ctx.getParent()
 	return ctx
 

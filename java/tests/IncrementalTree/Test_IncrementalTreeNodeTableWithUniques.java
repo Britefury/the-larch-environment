@@ -154,7 +154,7 @@ public class Test_IncrementalTreeNodeTableWithUniques extends Test_IncrementalTr
 		IncrementalTreeNode val = table.getUnrefedIncrementalNodeFor( dd, null );
 		refIncrementalNode( val );
 		assertSame( val, id2 );
-		assertSame( val.getDocNode(), dd );
+		assertSame( val.getModel(), dd );
 		
 		assertEquals( Arrays.asList( new IncrementalTreeNode[] { id2 } ), table.get( dd ) );
 		assertTrue( table.containsKey( dd ) );

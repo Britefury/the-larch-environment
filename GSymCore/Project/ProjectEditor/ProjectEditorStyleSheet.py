@@ -113,7 +113,7 @@ class ProjectEditorStyleSheet (StyleSheet):
 		return controlsStyle.textEntry( name, renameEntryListener, validationRegex, validationFailMsg )
 	
 
-	def package(self, packageName, packageLocation, items, packageContextMenuFactory):
+	def package(self, packageName, packageLocation, items, packageContextMenuFactory, dragSource, dropDest):
 		packageNameStyle = self.packageNameStyle()
 		itemHoverHighlightStyle = self.itemHoverHighlightStyle()
 		primitiveStyle = self['primitiveStyle']
@@ -123,6 +123,8 @@ class ProjectEditorStyleSheet (StyleSheet):
 		nameElement = packageNameStyle.staticText( packageName )
 		nameBox = itemHoverHighlightStyle.hbox( [ icon.padX( 5.0 ).alignVCentre(), nameElement.alignVCentre() ] )
 		nameBox.addContextMenuFactory( packageContextMenuFactory )
+		nameBox.addDragSource( dragSource )
+		nameBox.addDropDest( dropDest )
 		
 		itemsBox = primitiveStyle.vbox( items )
 		
@@ -130,16 +132,18 @@ class ProjectEditorStyleSheet (StyleSheet):
 
 	
 	
-	def page(self, pageName, pageLocation, pageContextMenuFactory):
+	def page(self, pageName, pageLocation, pageContextMenuFactory, dragSource, dropDest):
 		primitiveStyle = self['primitiveStyle']
 		controlsStyle = self['controlsStyle']
 		itemHoverHighlightStyle = self.itemHoverHighlightStyle()
 
 		link = controlsStyle.link( pageName, pageLocation ).getElement()
 		link.addContextMenuFactory( pageContextMenuFactory )
-		box = itemHoverHighlightStyle.hbox( [ link ] )
+		nameBox = itemHoverHighlightStyle.hbox( [ link ] )
+		nameBox.addDragSource( dragSource )
+		nameBox.addDropDest( dropDest )
 
-		return box, box, link
+		return nameBox, nameBox, link
 	
 	
 

@@ -57,7 +57,7 @@ class WorkSheetContextMenuFactory (ContextMenuFactory):
 		def _onRefresh(button, event):
 			model.refreshResults()
 	
-		model = element.getFragmentContext().getDocNode()
+		model = element.getFragmentContext().getModel()
 
 		refreshButton = controlsStyle.buttonWithLabel( 'Refresh', _onRefresh ).getElement()
 		worksheetControls = menuStyle.controlsHBox( [ refreshButton ] )

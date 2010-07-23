@@ -8,6 +8,8 @@
 import os
 from datetime import datetime
 
+from java.lang import Object
+
 from java.awt.event import KeyEvent
 
 from java.util.regex import Pattern
@@ -30,6 +32,7 @@ from BritefuryJ.AttributeTable import *
 from BritefuryJ.DocPresent.Browser import Location
 from BritefuryJ.DocPresent.StyleSheet import PrimitiveStyleSheet, RichTextStyleSheet
 from BritefuryJ.DocPresent.Controls import ControlsStyleSheet, TextEntry
+from BritefuryJ.DocPresent.Input import ObjectDndHandler
 from BritefuryJ.DocPresent import *
 
 from BritefuryJ.GSym import GSymPerspective, GSymSubject, GSymRelativeLocationResolver
@@ -97,6 +100,116 @@ def _ProjectViewState(location):
 def _joinLocation(*xs):
 	s = '.'.join( [ str( x )   for x in xs ] )
 	return Location( s )
+
+
+
+class ProjectDrag (Object):
+	def __init__(self, source):
+		self.source = source
+		
+
+def _dragSourceCreateSourceData(element, aspect):
+	return ProjectDrag( element.getFragmentContext().getModel() )
+
+
+_dragSource = ObjectDndHandler.DragSource( ProjectDrag, ObjectDndHandler.ASPECT_NORMAL, _dragSourceCreateSourceData )
+
+
+
+def _isChildOf(node, package):
+	if node is package:
+		return True
+	
+	if package.isInstanceOf( Schema.Package ):
+		for child in package['contents']:
+			if _isChildOf( node, child ):
+				return True
+	return False
+
+
+def _pageCanDrop(element, targetPos, data, action):
+	if action & ObjectDndHandler.COPY_OR_MOVE  !=  0:
+		model = element.getFragmentContext().getModel()
+		return model is not data.source
+	return False
+
+def _pageDrop(element, targetPos, data, action):
+	if action & ObjectDndHandler.COPY_OR_MOVE  !=  0:
+		destPage = element.getFragmentContext().getModel()
+		parent = destPage.getValidParents()[0]
+		index = parent.indexOfById( destPage )
+		if targetPos.y > ( element.getHeight() * 0.5 ):
+			index += 1
+		
+		source = data.source.deepCopy()   if action == ObjectDndHandler.COPY   else data.source
+		
+		if action == ObjectDndHandler.MOVE:
+			sourceParent = data.source.getValidParents()[0]
+			indexOfSource = sourceParent.indexOfById( data.source )
+			del sourceParent[indexOfSource]
+			if parent is sourceParent  and  index > indexOfSource:
+				index -= 1
+
+		parent.insert( index, source )
+		return True
+	return False
+			
+
+
+def _getDestPackageAndIndex(element, targetPos):
+	targetPackage = element.getFragmentContext().getModel()
+	if targetPos.x > ( element.getWidth() * 0.5 ):
+		return targetPackage, len( targetPackage['contents'] )
+	else:
+		parent1 = targetPackage.getValidParents()[0]
+		parent2 = parent1.getValidParents()[0]
+		index = parent1.indexOfById( targetPackage )
+		if targetPos.y > ( element.getHeight() * 0.5 ):
+			index += 1
+		return parent2, index
+	
+
+
+def _packageCanDrop(element, targetPos, data, action):
+	if action & ObjectDndHandler.COPY_OR_MOVE  !=  0:
+		destPackage, index = _getDestPackageAndIndex( element, targetPos )
+		if action == ObjectDndHandler.COPY  or  not _isChildOf( data.source, destPackage ):
+			return True
+	return False
+
+def _packageDrop(element, targetPos, data, action):
+	if action & ObjectDndHandler.COPY_OR_MOVE  !=  0:
+		destPackage, index = _getDestPackageAndIndex( element, targetPos )
+		if action == ObjectDndHandler.MOVE  and _isChildOf( data.source, destPackage ):
+			return False
+		
+		
+		
+		#targetPackage = element.getFragmentContext().getModel()
+		#if targetPos.x > ( element.getWidth() * 0.5 ):
+			#pass
+		#else:
+			#parent = targetPackage.getValidParents()[0]
+			#index = parent.indexOfById( targetPackage )
+			#if targetPos.y > ( element.getHeight() * 0.5 ):
+				#index += 1
+			
+			#source = data.source.deepCopy()   if action == ObjectDndHandler.COPY   else data.source
+			
+			#if action == ObjectDndHandler.MOVE:
+				#sourceParent = data.source.getValidParents()[0]
+				#indexOfSource = sourceParent.indexOfById( data.source )
+				#del sourceParent[indexOfSource]
+				#if parent is sourceParent  and  index > indexOfSource:
+					#index -= 1
+
+		#parent.insert( index, source )
+		#return True
+	return False
+
+
+_pageDropDest = ObjectDndHandler.DropDest( ProjectDrag, _pageCanDrop, _pageDrop )
+_packageDropDest = ObjectDndHandler.DropDest( ProjectDrag, _packageCanDrop, _packageDrop )
 
 
 class ProjectView (GSymViewObjectNodeDispatch):
@@ -173,7 +286,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		items = ctx.mapPresentFragment( contents, styleSheet, state.withAttrs( location=packageLocation ) )
 			
 		world = ctx.getSubjectContext()['world']
-		packageView, nameBox, nameElement = styleSheet.package( name, packageLocation, items, _packageContextMenuFactory )
+		packageView, nameBox, nameElement = styleSheet.package( name, packageLocation, items, _packageContextMenuFactory, _dragSource, _packageDropDest )
 		return packageView
 	
 
@@ -200,7 +313,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		location = state['location']
 		pageLocation = _joinLocation( location, name )
 		
-		pageView, nameBox, nameElement = styleSheet.page( name, pageLocation, _pageContextMenuFactory )
+		pageView, nameBox, nameElement = styleSheet.page( name, pageLocation, _pageContextMenuFactory, _dragSource, _pageDropDest )
 		return pageView
 
 	

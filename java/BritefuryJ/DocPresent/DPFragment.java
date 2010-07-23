@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import BritefuryJ.DocPresent.FragmentTree.FragmentIterator;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 
 public class DPFragment extends DPProxy
@@ -72,5 +73,12 @@ public class DPFragment extends DPProxy
 	public void setFragmentContext(FragmentContext context)
 	{
 		this.context = context;
+	}
+	
+	
+	
+	public FragmentIterator fragmentIterator()
+	{
+		return new FragmentIterator( this );
 	}
 }

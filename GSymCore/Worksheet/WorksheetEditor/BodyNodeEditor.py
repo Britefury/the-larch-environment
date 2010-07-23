@@ -38,7 +38,7 @@ class BodyNodeEventListener (TreeEventListenerObjectDispatch):
 	@ObjectDispatchMethod( DeleteNodeOperation )
 	def onDeleteNode(self, element, sourceElement, event):
 		ctx = element.getFragmentContext()
-		node = ctx.getDocNode()
+		node = ctx.getModel()
 		
 		return event.apply( node )
 	
@@ -46,7 +46,7 @@ class BodyNodeEventListener (TreeEventListenerObjectDispatch):
 	@ObjectDispatchMethod( AddNodeOperation )
 	def onAddNode(self, element, sourceElement, event):
 		ctx = element.getFragmentContext()
-		node = ctx.getDocNode()
+		node = ctx.getModel()
 		
 		return event.apply( node )
 	
@@ -54,7 +54,7 @@ class BodyNodeEventListener (TreeEventListenerObjectDispatch):
 	@ObjectDispatchMethod( TextNodeJoinOperation )
 	def onTextJoin(self, element, sourceElement, event):
 		ctx = element.getFragmentContext()
-		node = ctx.getDocNode()
+		node = ctx.getModel()
 		
 		return event.apply( node )
 
@@ -62,7 +62,7 @@ class BodyNodeEventListener (TreeEventListenerObjectDispatch):
 	@ObjectDispatchMethod( TextNodeSplitOperation )
 	def onTextSplit(self, element, sourceElement, event):
 		ctx = element.getFragmentContext()
-		node = ctx.getDocNode()
+		node = ctx.getModel()
 		
 		return event.apply( node )
 
@@ -70,7 +70,7 @@ class BodyNodeEventListener (TreeEventListenerObjectDispatch):
 	@ObjectDispatchMethod( WorksheetSelectionEditTreeEvent )
 	def onSelectionEdit(self, element, sourceElement, event):
 		value = element.getStreamValue()
-		node = element.getFragmentContext().getDocNode()
+		node = element.getFragmentContext().getModel()
 		
 		log = element.getFragmentContext().getView().getPageLog()
 		if log.isRecording():
@@ -130,7 +130,7 @@ class EmptyEventListener (TreeEventListenerObjectDispatch):
 	def onTextEdit(self, element, sourceElement, event):
 		value = element.getTextRepresentation()
 		ctx = element.getFragmentContext()
-		node = ctx.getDocNode()
+		node = ctx.getModel()
 		lines = value.split( '\n' )
 		if lines[-1] == ''  and  len( lines ) > 1:
 			del lines[-1]
@@ -141,7 +141,7 @@ class EmptyEventListener (TreeEventListenerObjectDispatch):
 	
 	@ObjectDispatchMethod( NodeRequest )
 	def onNodeRequest(self, element, sourceElement, event):
-		return event.applyToEmpty( element.getFragmentContext().getDocNode(), element )
+		return event.applyToEmpty( element.getFragmentContext().getModel(), element )
 
 
 EmptyEventListener.instance = EmptyEventListener()

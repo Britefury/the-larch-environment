@@ -64,7 +64,7 @@ public class NonLocalDndTestPage extends SystemPage
 		ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
 		{
 			@SuppressWarnings("unchecked")
-			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data)
+			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
 			{
 				List<Object> fileList = (List<Object>)data;
 				

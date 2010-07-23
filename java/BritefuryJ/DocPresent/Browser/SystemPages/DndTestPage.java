@@ -88,7 +88,7 @@ public class DndTestPage extends SystemPage
 		
 		ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
 		{
-			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data)
+			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
 			{
 				ElementFactory factory = (ElementFactory)data;
 				placeHolder.setChild( factory.createElement( contentStyle ) );

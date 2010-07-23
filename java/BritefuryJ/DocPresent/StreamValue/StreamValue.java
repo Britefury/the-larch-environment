@@ -249,6 +249,33 @@ public class StreamValue implements Presentable
 	}
 	
 	
+	public boolean startsWithString(String s)
+	{
+		if ( items.length > 0  &&  items[0] instanceof TextItem )
+		{
+			TextItem i = (TextItem)items[0];
+			return i.textValue.startsWith( s );
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	public boolean endsWithString(String s)
+	{
+		if ( items.length > 0  &&  items[items.length-1] instanceof TextItem )
+		{
+			TextItem i = (TextItem)items[items.length-1];
+			return i.textValue.endsWith( s );
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	
 	
 	public List<Item> getItems()
 	{

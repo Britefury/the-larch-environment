@@ -220,7 +220,7 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 		{
 			IncrementalTreeNode node = unrefedStack.pop();
 			
-			EntryForDocNode subTable = table.get( new Key( node.getDocNode() ) );
+			EntryForDocNode subTable = table.get( new Key( node.getModel() ) );
 			if ( subTable != null )
 			{
 				subTable.clean();
@@ -240,7 +240,7 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 	
 	protected void refIncrementalNode(IncrementalTreeNode node)
 	{
-		Key key = new Key( node.getDocNode() );
+		Key key = new Key( node.getModel() );
 		EntryForDocNode subTable = table.get( key );
 		if ( subTable == null )
 		{
@@ -253,7 +253,7 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 
 	protected void unrefIncrementalNode(IncrementalTreeNode node)
 	{
-		Key key = new Key( node.getDocNode() );
+		Key key = new Key( node.getModel() );
 		EntryForDocNode subTable = table.get( key );
 		if ( subTable == null )
 		{
