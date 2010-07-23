@@ -773,7 +773,6 @@ public class PrimitiveStyleSheet extends StyleSheet
 	}
 	
 	
-	@ExposedMethod( names={ "_hbox" } )
 	public DPHBox hbox(DPElement children[])
 	{
 		DPHBox element = new DPHBox( getHBoxParams() );
@@ -845,7 +844,6 @@ public class PrimitiveStyleSheet extends StyleSheet
 		return element;
 	}
 	
-	@ExposedMethod( names={ "_lineBreakCostSpan" } )
 	public DPLineBreakCostSpan lineBreakCostSpan(DPElement children[])
 	{
 		DPLineBreakCostSpan element = new DPLineBreakCostSpan( getContainerParams() );
@@ -979,7 +977,6 @@ public class PrimitiveStyleSheet extends StyleSheet
 		return element;
 	}
 	
-	@ExposedMethod( names={ "_rgrid" } )
 	public DPRGrid rgrid(DPElement children[])
 	{
 		DPRGrid element = new DPRGrid( getTableParams() );
