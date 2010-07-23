@@ -10,11 +10,11 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPVBox;
-import BritefuryJ.DocPresent.Combinators.PresentationCombinator;
+import BritefuryJ.DocPresent.Combinators.Pres;
 
-public class VBox extends PresentationCombinator
+public class VBox extends Pres
 {
-	private PresentationCombinator children[];
+	private Pres children[];
 	private int refPointIndex;
 	
 	
@@ -47,7 +47,7 @@ public class VBox extends PresentationCombinator
 	public DPElement present(PresentationContext ctx)
 	{
 		DPVBox element = new DPVBox( ctx.getStyle().getVBoxParams() );
-		element.setChildren( mapPresent( ctx, children ) );
+		element.setChildren( mapPresent( ctx.withStyle( ctx.getStyle().useContainerParams() ), children ) );
 		if ( refPointIndex != -1 )
 		{
 			element.setRefPointIndex( refPointIndex );

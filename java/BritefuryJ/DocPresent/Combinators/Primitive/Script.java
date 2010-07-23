@@ -8,12 +8,13 @@ package BritefuryJ.DocPresent.Combinators.Primitive;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPScript;
-import BritefuryJ.DocPresent.Combinators.PresentationCombinator;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
 
-public class Script extends PresentationCombinator
+public class Script extends Pres
 {
-	private PresentationCombinator main, leftSuper, leftSub, rightSuper, rightSub;
+	private Pres main, leftSuper, leftSub, rightSuper, rightSub;
 	
 	public Script(Object main, Object leftSuper, Object leftSub, Object rightSuper, Object rightSub)
 	{
@@ -52,29 +53,30 @@ public class Script extends PresentationCombinator
 	public DPElement present(PresentationContext ctx)
 	{
 		StyleSheetValues style = ctx.getStyle();
-		StyleSheetValues childStyle = null;
+		StyleSheetValues usedStyle = style.useScriptParams().useTextParams();
+		PresentationContext childCtx = null;
 		if ( leftSuper != null  ||  leftSub != null  ||  rightSuper != null  ||  rightSub != null )
 		{
-			childStyle = scriptScriptChildStyle( style );
+			childCtx = ctx.withStyle( scriptScriptChildStyle( usedStyle ) );
 		}
 		
 		DPScript element = new DPScript( style.getScriptParams(), style.getTextParams() );
-		element.setMainChild( main.present( ctx ) );
+		element.setMainChild( main.present( ctx.withStyle( usedStyle ) ) );
 		if ( leftSuper != null )
 		{
-			element.setLeftSuperscriptChild( leftSuper.present( ctx.withStyle( childStyle ) ) );
+			element.setLeftSuperscriptChild( leftSuper.present( childCtx ) );
 		}
 		if ( leftSub != null )
 		{
-			element.setLeftSubscriptChild( leftSub.present( ctx.withStyle( childStyle ) ) );
+			element.setLeftSubscriptChild( leftSub.present( childCtx ) );
 		}
 		if ( rightSuper != null )
 		{
-			element.setRightSuperscriptChild( rightSuper.present( ctx.withStyle( childStyle ) ) );
+			element.setRightSuperscriptChild( rightSuper.present( childCtx ) );
 		}
 		if ( rightSub != null )
 		{
-			element.setRightSubscriptChild( rightSub.present( ctx.withStyle( childStyle ) ) );
+			element.setRightSubscriptChild( rightSub.present( childCtx ) );
 		}
 		return element;
 	}
@@ -83,10 +85,10 @@ public class Script extends PresentationCombinator
 
 	private static StyleSheetValues scriptScriptChildStyle(StyleSheetValues style)
 	{
-		float scale = style.getNonNull( "fontScale", Float.class, 1.0f );
-		float fracScale = style.getNonNull( "scriptFontScale", Float.class, StyleSheetValues.defaultFractionFontScale );
-		float minFracScale = style.getNonNull( "scriptMinFontScale", Float.class, StyleSheetValues.defaultFractionMinFontScale );
-		scale = Math.max( scale * fracScale, minFracScale );
-		return style.withAttr( "fontScale", scale );
+		double scale = style.get( StyleSheet2.fontScale, Double.class );
+		double scriptScale = style.get( StyleSheet2.scriptFontScale, Double.class );
+		double minScriptScale = style.get( StyleSheet2.scriptMinFontScale, Double.class );
+		scale = Math.max( scale * scriptScale, minScriptScale );
+		return style.withAttr( StyleSheet2.fontScale, scale );
 	}
 }

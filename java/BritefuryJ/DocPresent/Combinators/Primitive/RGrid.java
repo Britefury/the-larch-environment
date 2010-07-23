@@ -10,11 +10,11 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRGrid;
-import BritefuryJ.DocPresent.Combinators.PresentationCombinator;
+import BritefuryJ.DocPresent.Combinators.Pres;
 
-public class RGrid extends PresentationCombinator
+public class RGrid extends Pres
 {
-	private PresentationCombinator children[];
+	private Pres children[];
 	
 	
 	public RGrid(Object children[])
@@ -32,7 +32,7 @@ public class RGrid extends PresentationCombinator
 	public DPElement present(PresentationContext ctx)
 	{
 		DPRGrid element = new DPRGrid( ctx.getStyle().getTableParams() );
-		element.setChildren( mapPresent( ctx, children ) );
+		element.setChildren( mapPresent( ctx.withStyle( ctx.getStyle().useTableParams() ), children ) );
 		return element;
 	}
 }

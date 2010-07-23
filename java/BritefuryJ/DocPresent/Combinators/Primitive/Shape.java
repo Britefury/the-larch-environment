@@ -8,11 +8,11 @@ package BritefuryJ.DocPresent.Combinators.Primitive;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPShape;
-import BritefuryJ.DocPresent.Combinators.PresentationCombinator;
+import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 
-public class Shape extends PresentationCombinator
+public class Shape extends Pres
 {
 	private java.awt.Shape shape;
 	

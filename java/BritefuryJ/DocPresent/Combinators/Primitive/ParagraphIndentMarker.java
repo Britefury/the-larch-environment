@@ -8,9 +8,9 @@ package BritefuryJ.DocPresent.Combinators.Primitive;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPParagraphIndentMarker;
-import BritefuryJ.DocPresent.Combinators.PresentationCombinator;
+import BritefuryJ.DocPresent.Combinators.Pres;
 
-public class ParagraphIndentMarker extends PresentationCombinator
+public class ParagraphIndentMarker extends Pres
 {
 	public ParagraphIndentMarker()
 	{

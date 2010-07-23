@@ -8,9 +8,9 @@ package BritefuryJ.DocPresent.Combinators.Primitive;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.Combinators.PresentationCombinator;
+import BritefuryJ.DocPresent.Combinators.Pres;
 
-public class Label extends PresentationCombinator
+public class Label extends Pres
 {
 	private String text;
 	
@@ -24,6 +24,6 @@ public class Label extends PresentationCombinator
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		return new DPText( ctx.getStyle().getStaticTextParams(), text, "" );
+		return new DPText( ctx.getStyle().getLabelTextParams(), text, "" );
 	}
 }

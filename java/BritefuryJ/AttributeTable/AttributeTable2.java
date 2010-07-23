@@ -1,0 +1,393 @@
+//##* This program is free software; you can use it, redistribute it and/or modify it
+//##* under the terms of the GNU General Public License version 2 as published by the
+//##* Free Software Foundation. The full text of the GNU General Public License
+//##* version 2 can be found in the file named 'COPYING' that accompanies this
+//##* program. This source code is (C)copyright Geoffrey French 2008-2010.
+//##************************
+package BritefuryJ.AttributeTable;
+
+import java.awt.Color;
+import java.lang.ref.WeakReference;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.python.core.Py;
+
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.GSym.GenericPerspective.Presentable;
+import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.Utils.HashUtils;
+
+public class AttributeTable2 implements Presentable
+{
+	public static class AttributeDoesNotExistException extends RuntimeException
+	{
+		private static final long serialVersionUID = 1L;
+	}
+	
+	
+	protected static class AttributeValuesMultiple
+	{
+		protected HashMap<AttributeBase, Object> values;
+		protected int hash;
+		
+		
+		public AttributeValuesMultiple(HashMap<AttributeBase, Object> values)
+		{
+			this.values = values;
+			this.hash = values.hashCode();
+		}
+		
+		public int hashCode()
+		{
+			return this.hash;
+		}
+		
+		public boolean equals(Object x)
+		{
+			if ( x == this )
+			{
+				return true;
+			}
+			
+			if ( x instanceof AttributeValuesMultiple )
+			{
+				return values.equals( ((AttributeValuesMultiple)x).values );
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+	
+	protected static class AttributeValueSingle
+	{
+		protected AttributeBase attribute;
+		protected Object value;
+		protected int hash;
+		
+		
+		public AttributeValueSingle(AttributeBase attribute, Object value)
+		{
+			this.attribute = attribute;
+			this.value = value;
+			int valueHash = value != null  ?  value.hashCode()  :  0;
+			this.hash = HashUtils.doubleHash( attribute.hashCode(), valueHash );
+		}
+		
+		public int hashCode()
+		{
+			return this.hash;
+		}
+		
+		public boolean equals(Object x)
+		{
+			if ( x == this )
+			{
+				return true;
+			}
+			
+			if ( x instanceof AttributeValueSingle )
+			{
+				AttributeValueSingle v = (AttributeValueSingle)x;
+				
+				return attribute.equals( v.attribute )  &&  ( value != null  ?  value.equals( v.value )  :  value == v.value );
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+	
+	protected static class DelAttribute
+	{
+		protected AttributeBase attribute;
+		
+		
+		public DelAttribute(AttributeBase attribute)
+		{
+			this.attribute = attribute;
+		}
+		
+		public int hashCode()
+		{
+			return attribute.hashCode();
+		}
+		
+		public boolean equals(Object x)
+		{
+			if ( x == this )
+			{
+				return true;
+			}
+			
+			if ( x instanceof DelAttribute )
+			{
+				DelAttribute v = (DelAttribute)x;
+				
+				return attribute.equals( v.attribute );
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+	
+	private static class AttributeTableSet 
+	{
+		private HashMap<AttributeValuesMultiple, WeakReference<AttributeTable2>> attributeTableSet = new HashMap<AttributeValuesMultiple, WeakReference<AttributeTable2>>();
+	}
+	
+	
+	protected static HashMap<Class<? extends AttributeTable2>, AttributeTableSet> attributeTableSetsByClass = new HashMap<Class<? extends AttributeTable2>, AttributeTableSet>();
+	
+
+	protected HashMap<AttributeBase, Object> values = new HashMap<AttributeBase, Object>();
+	protected HashMap<AttributeValueSingle, WeakReference<AttributeTable2>> singleValueDerivedAttributeTables = new HashMap<AttributeValueSingle, WeakReference<AttributeTable2>>();
+	protected HashMap<AttributeValuesMultiple, WeakReference<AttributeTable2>> multiValueDerivedAttributeTables = new HashMap<AttributeValuesMultiple, WeakReference<AttributeTable2>>();
+	protected IdentityHashMap<AttributeTable2, WeakReference<AttributeTable2>> attribTableDerivedAttributeTables = new IdentityHashMap<AttributeTable2, WeakReference<AttributeTable2>>();
+	protected HashMap<DelAttribute, WeakReference<AttributeTable2>> delDerivedAttributeTables = new HashMap<DelAttribute, WeakReference<AttributeTable2>>();
+	
+	
+	public static AttributeTable2 instance = new AttributeTable2();
+	
+	
+	protected AttributeTable2()
+	{
+	}
+	
+	
+	protected AttributeTable2 newInstance()
+	{
+		return new AttributeTable2();
+	}
+	
+	
+	public Object get(AttributeBase attribute)
+	{
+		if ( !values.containsKey( attribute ) )
+		{
+			return attribute.getDefaultValue();
+		}
+		
+		return values.get( attribute );
+	}
+	
+	public Object getRequired(AttributeBase attribute)
+	{
+		if ( !values.containsKey( attribute ) )
+		{
+			throw new AttributeDoesNotExistException();
+		}
+
+		return values.get( attribute );
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <V extends Object> V get(AttributeBase attribute, Class<V> valueClass)
+	{
+		if ( !values.containsKey( attribute ) )
+		{
+			return (V)attribute.getDefaultValue();
+		}
+		
+		return (V)values.get( attribute );
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <V extends Object> V getRequired(AttributeBase attribute, Class<V> valueClass)
+	{
+		if ( !values.containsKey( attribute ) )
+		{
+			throw new AttributeDoesNotExistException();
+		}
+		
+		return (V)values.get( attribute );
+	}
+	
+	
+	public Object __getitem__(AttributeBase key)
+	{
+		if ( !values.containsKey( key ) )
+		{
+		        throw Py.KeyError( key.getNamespace() + "." + key.getName() );
+		}
+		else
+		{
+			return values.get( key );
+		}
+	}
+	
+	
+	public AttributeTable2 withAttr(AttributeBase attribute, Object value)
+	{
+		AttributeValueSingle v = new AttributeValueSingle( attribute, value );
+		WeakReference<AttributeTable2> derivedRef = singleValueDerivedAttributeTables.get( v );
+		if ( derivedRef == null  ||  derivedRef.get() == null )
+		{
+			AttributeTable2 derived = newInstance();
+			derived.values.putAll( values );
+			derived.values.put( attribute, attribute.checkValue( value ) );
+			derived = getUniqueAttributeTable( derived );
+			derivedRef = new WeakReference<AttributeTable2>( derived );
+			singleValueDerivedAttributeTables.put( v, derivedRef );
+		}
+		return derivedRef.get();
+	}
+	
+	public AttributeTable2 withAttrs(HashMap<AttributeBase, Object> valuesMap)
+	{
+		if ( valuesMap.size() == 1 )
+		{
+			Map.Entry<AttributeBase, Object> entry = valuesMap.entrySet().iterator().next();
+			return withAttr( entry.getKey(), entry.getValue() );
+		}
+		else
+		{
+			AttributeValuesMultiple v = new AttributeValuesMultiple( valuesMap );
+			WeakReference<AttributeTable2> derivedRef = multiValueDerivedAttributeTables.get( v );
+			if ( derivedRef == null  ||  derivedRef.get() == null )
+			{
+				AttributeTable2 derived = newInstance();
+				derived.values.putAll( values );
+				for (Map.Entry<AttributeBase, Object> entry: valuesMap.entrySet())
+				{
+					AttributeBase attribute = entry.getKey();
+					derived.values.put( attribute, attribute.checkValue( entry.getValue() ) );
+				}
+				derived = getUniqueAttributeTable( derived );
+				derivedRef = new WeakReference<AttributeTable2>( derived );
+				multiValueDerivedAttributeTables.put( v, derivedRef );
+			}
+			return derivedRef.get();
+		}
+	}
+		
+	public AttributeTable2 withAttrs(AttributeTable2 attribs)
+	{
+		WeakReference<AttributeTable2> derivedRef = attribTableDerivedAttributeTables.get( attribs );
+		if ( derivedRef == null  ||  derivedRef.get() == null )
+		{
+			AttributeTable2 derived = newInstance();
+			derived.values.putAll( values );
+			derived.values.putAll( attribs.values );
+			derived = getUniqueAttributeTable( derived );
+			derivedRef = new WeakReference<AttributeTable2>( derived );
+			attribTableDerivedAttributeTables.put( attribs, derivedRef );
+		}
+		return derivedRef.get();
+	}
+	
+	public AttributeTable2 withoutAttr(AttributeBase attribute)
+	{
+		if ( !values.containsKey( attribute ) )
+		{
+			// No attribute to remove - no change
+			return this;
+		}
+		
+		DelAttribute v = new DelAttribute( attribute );
+		WeakReference<AttributeTable2> derivedRef = delDerivedAttributeTables.get( v );
+		if ( derivedRef == null  ||  derivedRef.get() == null )
+		{
+			AttributeTable2 derived = newInstance();
+			derived.values.putAll( values );
+			derived.values.remove( attribute );
+			derived = getUniqueAttributeTable( derived );
+			derivedRef = new WeakReference<AttributeTable2>( derived );
+			delDerivedAttributeTables.put( v, derivedRef );
+		}
+		return derivedRef.get();
+	}
+	
+	public AttributeTable2 useAttr(AttributeBase attribute)
+	{
+		return attribute.use( this );
+	}
+	
+		
+	
+	
+	
+	private AttributeTableSet getAttributeTableTableForClass()
+	{
+		AttributeTableSet setsForClass = attributeTableSetsByClass.get( getClass() );
+		if ( setsForClass == null )
+		{
+			setsForClass = new AttributeTableSet();
+			attributeTableSetsByClass.put( getClass(), setsForClass );
+		}
+		return setsForClass;
+	}
+	
+	private AttributeTable2 getUniqueAttributeTable(AttributeTable2 attribTable)
+	{
+		AttributeTableSet setsForClass = getAttributeTableTableForClass();
+		
+		AttributeValuesMultiple vals = attribTable.allValues();
+		WeakReference<AttributeTable2> uniqueRef = setsForClass.attributeTableSet.get( vals );
+		if ( uniqueRef == null  ||  uniqueRef.get() == null )
+		{
+			uniqueRef = new WeakReference<AttributeTable2>( attribTable );
+			setsForClass.attributeTableSet.put( vals, uniqueRef ); 
+		}
+		
+		return uniqueRef.get();
+	}
+	
+
+	private AttributeValuesMultiple allValues()
+	{
+		return new AttributeValuesMultiple( values );
+	}
+	
+	
+	
+	protected static DPElement presentAttributeMap(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state, HashMap<AttributeBase, Object> values)
+	{
+		PrimitiveStyleSheet attrTableStyle = getAttrTableStyle();
+		Set<AttributeBase> attributeSet = values.keySet();
+		AttributeBase attributes[] = attributeSet.toArray( new AttributeBase[0] );
+		Arrays.sort( attributes, new AttributeBase.AttributeNameComparator() );
+		DPElement children[][] = new DPElement[attributes.length+1][];
+		
+		children[0] = new DPElement[] { attrTableStyle.staticText( "Name" ), attrTableStyle.staticText( "Value" ) };
+		for (int i = 0; i < attributes.length; i++)
+		{
+			AttributeBase attribute = attributes[i];
+			Object value = values.get( attribute );
+			DPElement valueView = ctx.presentFragment( value, styleSheet );
+			children[i+1] = new DPElement[] {
+					PrimitiveStyleSheet.instance.staticText( attribute.getFullName() ), valueView };
+		}
+		
+		return attrTableStyle.table( children );
+	}
+	
+	@Override
+	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	{
+		DPElement valueField = styleSheet.verticalObjectField( "Attributes:", presentAttributeMap( fragment, styleSheet, inheritedState, values ) );
+		return styleSheet.objectBoxWithFields( getClass().getName(), new DPElement[] { valueField } );
+	}
+	
+	
+	// We have to initialise this style sheet on request, otherwise we can end up with a circular class initialisation problem
+	private static PrimitiveStyleSheet _attrTableStyle;
+	private static PrimitiveStyleSheet getAttrTableStyle()
+	{
+		if ( _attrTableStyle == null )
+		{
+			_attrTableStyle = PrimitiveStyleSheet.instance.withFontBold( true ).withFontSize( 14 ).withForeground( new Color( 0.0f, 0.0f, 0.5f ) ).withTableColumnSpacing( 10.0 );
+		}
+		return _attrTableStyle;
+	}
+}

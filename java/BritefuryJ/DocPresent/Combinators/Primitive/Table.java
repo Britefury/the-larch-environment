@@ -8,11 +8,11 @@ package BritefuryJ.DocPresent.Combinators.Primitive;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPTable;
-import BritefuryJ.DocPresent.Combinators.PresentationCombinator;
+import BritefuryJ.DocPresent.Combinators.Pres;
 
-public class Table extends PresentationCombinator
+public class Table extends Pres
 {
-	private PresentationCombinator children[][];
+	private Pres children[][];
 	
 	
 	public Table()
@@ -22,11 +22,11 @@ public class Table extends PresentationCombinator
 	
 	public Table(Object children[][])
 	{
-		this.children = new PresentationCombinator[children.length][];
+		this.children = new Pres[children.length][];
 		for (int y = 0; y < children.length; y++)
 		{
 			Object row[] = children[y];
-			this.children[y] = new PresentationCombinator[row.length];
+			this.children[y] = new Pres[row.length];
 			for (int x = 0; x < row.length; x++)
 			{
 				this.children[y][x] = coerce( row[x] );
@@ -38,18 +38,19 @@ public class Table extends PresentationCombinator
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
+		PresentationContext childCtx = ctx.withStyle( ctx.getStyle().useContainerParams() );		
 		DPTable element = new DPTable( ctx.getStyle().getTableParams() );
 		if ( children != null )
 		{
 			DPElement childElems[][] = new DPElement[children.length][];
 			for (int y = 0; y < children.length; y++)
 			{
-				PresentationCombinator row[] = children[y];
+				Pres row[] = children[y];
 				childElems[y] = new DPElement[row.length];
 				for (int x = 0; x < row.length; x++)
 				{
-					PresentationCombinator child = row[x];
-					childElems[y][x] = child != null  ?  child.present( ctx ).layoutWrap()  :  null;
+					Pres child = row[x];
+					childElems[y][x] = child != null  ?  child.present( childCtx ).layoutWrap()  :  null;
 				}
 			}
 		}

@@ -4,29 +4,27 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.DocPresent.Combinators.Primitive;
+package BritefuryJ.DocPresent.Combinators;
 
-import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
-public class Bin extends Pres
+public class ApplyStyleSheet extends Pres
 {
+	private StyleSheet2 styleSheet;
 	private Pres child;
 	
 	
-	public Bin(Object child)
+	public ApplyStyleSheet(StyleSheet2 styleSheet, Pres child)
 	{
-		this.child = coerce( child );
+		this.styleSheet = styleSheet;
+		this.child = child;
 	}
 	
 
-	
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		DPBin element = new DPBin( ctx.getStyle().getContainerParams() );
-		element.setChild( child.present( ctx.withStyle( ctx.getStyle().useContainerParams() ) ).layoutWrap() );
-		return element;
+		return child.present( ctx.withStyle( ctx.getStyle().withAttrs( styleSheet ) ) );
 	}
 }

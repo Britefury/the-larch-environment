@@ -9,9 +9,9 @@ package BritefuryJ.DocPresent.Combinators.Primitive;
 import BritefuryJ.DocPresent.DPCanvas;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Canvas.DrawingNode;
-import BritefuryJ.DocPresent.Combinators.PresentationCombinator;
+import BritefuryJ.DocPresent.Combinators.Pres;
 
-public class Canvas extends PresentationCombinator
+public class Canvas extends Pres
 {
 	private DrawingNode drawing;
 	private double width, height;

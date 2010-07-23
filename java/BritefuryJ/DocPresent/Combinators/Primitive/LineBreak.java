@@ -8,9 +8,9 @@ package BritefuryJ.DocPresent.Combinators.Primitive;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPLineBreak;
-import BritefuryJ.DocPresent.Combinators.PresentationCombinator;
+import BritefuryJ.DocPresent.Combinators.Pres;
 
-public class LineBreak extends PresentationCombinator
+public class LineBreak extends Pres
 {
 	public LineBreak()
 	{

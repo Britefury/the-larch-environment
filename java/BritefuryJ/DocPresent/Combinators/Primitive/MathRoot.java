@@ -8,11 +8,11 @@ package BritefuryJ.DocPresent.Combinators.Primitive;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPMathRoot;
-import BritefuryJ.DocPresent.Combinators.PresentationCombinator;
+import BritefuryJ.DocPresent.Combinators.Pres;
 
-public class MathRoot extends PresentationCombinator
+public class MathRoot extends Pres
 {
-	private PresentationCombinator child;
+	private Pres child;
 	
 	
 	public MathRoot(Object child)
@@ -26,7 +26,7 @@ public class MathRoot extends PresentationCombinator
 	public DPElement present(PresentationContext ctx)
 	{
 		DPMathRoot element = new DPMathRoot( ctx.getStyle().getMathRootParams() );
-		element.setChild( child.present( ctx ).layoutWrap() );
+		element.setChild( child.present( ctx.withStyle( ctx.getStyle().useMathRootParams() ) ).layoutWrap() );
 		return element;
 	}
 

@@ -8,12 +8,12 @@ package BritefuryJ.DocPresent.Combinators.Primitive;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPViewport;
-import BritefuryJ.DocPresent.Combinators.PresentationCombinator;
+import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Util.Range;
 
-public class Viewport extends PresentationCombinator
+public class Viewport extends Pres
 {
-	private PresentationCombinator child;
+	private Pres child;
 	private Range xRange = null, yRange = null;
 	private Object persistentStateKey;
 	
@@ -38,7 +38,7 @@ public class Viewport extends PresentationCombinator
 	public DPElement present(PresentationContext ctx)
 	{
 		DPViewport element = new DPViewport( ctx.getStyle().getContainerParams(), xRange, yRange, ctx.persistentState( persistentStateKey ) );
-		element.setChild( child.present( ctx ).layoutWrap() );
+		element.setChild( child.present( ctx.withStyle( ctx.getStyle().useContainerParams() ) ).layoutWrap() );
 		return element;
 	}
 }

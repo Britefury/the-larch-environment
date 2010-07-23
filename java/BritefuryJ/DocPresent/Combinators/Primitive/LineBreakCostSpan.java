@@ -10,11 +10,11 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPLineBreakCostSpan;
-import BritefuryJ.DocPresent.Combinators.PresentationCombinator;
+import BritefuryJ.DocPresent.Combinators.Pres;
 
-public class LineBreakCostSpan extends PresentationCombinator
+public class LineBreakCostSpan extends Pres
 {
-	private PresentationCombinator children[];
+	private Pres children[];
 	
 	
 	public LineBreakCostSpan(Object children[])
@@ -32,7 +32,7 @@ public class LineBreakCostSpan extends PresentationCombinator
 	public DPElement present(PresentationContext ctx)
 	{
 		DPLineBreakCostSpan element = new DPLineBreakCostSpan( ctx.getStyle().getContainerParams() );
-		element.setChildren( mapPresent( ctx, children ) );
+		element.setChildren( mapPresent( ctx.withStyle( ctx.getStyle().useContainerParams() ), children ) );
 		return element;
 	}
 }

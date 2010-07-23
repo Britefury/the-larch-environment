@@ -8,11 +8,17 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 
-import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
+import BritefuryJ.DocPresent.Combinators.Primitive.Border;
+import BritefuryJ.DocPresent.Combinators.Primitive.Box;
+import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.Painter.FilledOutlinePainter;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
 public class AlignmentTestPage extends SystemPage
 {
@@ -34,58 +40,59 @@ public class AlignmentTestPage extends SystemPage
 
 	protected DPElement createContents()
 	{
-		PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-		PrimitiveStyleSheet textStyleSheet = styleSheet.withBackground( new FilledOutlinePainter( new Color( 1.0f, 1.0f, 0.7f ), new Color( 1.0f, 1.0f, 0.0f ) ) );
-		PrimitiveStyleSheet dividerStyleSheet = styleSheet.withShapePainter( new FillPainter( new Color( 1.0f, 0.5f, 0.0f ) ) );
-		PrimitiveStyleSheet subtitleStyleSheet = styleSheet.withFontSize( 16 ).withFontFace( "Serif" ).withFontBold( true );
-		PrimitiveStyleSheet sectionStyleSheet = styleSheet.withVBoxSpacing( 5.0 );
+		StyleSheet2 styleSheet = StyleSheet2.instance;
+		StyleSheet2 textStyleSheet = styleSheet.withAttr( StyleSheet2.background, new FilledOutlinePainter( new Color( 1.0f, 1.0f, 0.7f ), new Color( 1.0f, 1.0f, 0.0f ) ) );
+		StyleSheet2 dividerStyleSheet = styleSheet.withAttr( StyleSheet2.shapePainter, new FillPainter( new Color( 1.0f, 0.5f, 0.0f ) ) );
+		StyleSheet2 subtitleStyleSheet = styleSheet.withAttr( StyleSheet2.fontSize, 16 ).withAttr( StyleSheet2.fontFace, "Serif" ).withAttr( StyleSheet2.fontBold, true );
+		StyleSheet2 sectionStyleSheet = styleSheet.withAttr( StyleSheet2.vboxSpacing, 5.0 );
 		
-		DPElement halignTitle = subtitleStyleSheet.staticText( "Horizontal alignment" ); 
-		DPBorder halignLeft = styleSheet.border( textStyleSheet.staticText( "hAlign=LEFT" ).alignHLeft() );
-		DPBorder halignCentre = styleSheet.border( textStyleSheet.staticText( "hAlign=CENTRE" ).alignHCentre() );
-		DPBorder halignRight = styleSheet.border( textStyleSheet.staticText( "hAlign=RIGHT" ).alignHRight() );
-		DPBorder halignExpand = styleSheet.border( textStyleSheet.staticText( "hAlign=EXPAND" ).alignHExpand() );
-		DPElement halignSection = sectionStyleSheet.vbox( new DPElement[] { halignTitle, halignLeft.alignHExpand(), halignCentre.alignHExpand(), halignRight.alignHExpand(), halignExpand.alignHExpand() } );
+		Pres halignTitle = subtitleStyleSheet.applyTo( new Label( "Horizontal alignment" ) ); 
+		Pres halignLeft = new Border( textStyleSheet.applyTo( new Label( "hAlign=LEFT" ).alignHLeft() ) );
+		Pres halignCentre = new Border( textStyleSheet.applyTo( new Label( "hAlign=CENTRE" ).alignHCentre() ) );
+		Pres halignRight = new Border( textStyleSheet.applyTo( new Label( "hAlign=RIGHT" ).alignHRight() ) );
+		Pres halignExpand = new Border( textStyleSheet.applyTo( new Label( "hAlign=EXPAND" ).alignHExpand() ) );
+		Pres halignSection = sectionStyleSheet.applyTo( new VBox( new Pres[] { halignTitle, halignLeft.alignHExpand(), halignCentre.alignHExpand(), halignRight.alignHExpand(), halignExpand.alignHExpand() } ) );
 		
 		
-		DPElement halignInHBoxTitle = subtitleStyleSheet.staticText( "Horizontal alignment in h-box" ); 
-		DPElement halignHBPack = textStyleSheet.staticText( "PACK" ).alignHPack();
-		DPElement halignHBLeft = textStyleSheet.staticText( "LEFT" ).alignHLeft();
-		DPElement halignHBCentre = textStyleSheet.staticText( "CENTRE" ).alignHCentre();
-		DPElement halignHBRight = textStyleSheet.staticText( "RIGHT" ).alignHRight();
-		DPElement halignHBExpand = textStyleSheet.staticText( "EXPAND" ).alignHExpand();
-		DPElement hAlignHBox = styleSheet.border( styleSheet.hbox( new DPElement[] {
-				halignHBPack, dividerStyleSheet.box( 1.0, 1.0 ).alignVExpand(),
-				halignHBLeft, dividerStyleSheet.box( 1.0, 1.0 ).alignVExpand(),
-				halignHBCentre, dividerStyleSheet.box( 1.0, 1.0 ).alignVExpand(),
-				halignHBRight, dividerStyleSheet.box( 1.0, 1.0 ).alignVExpand(),
+		Pres halignInHBoxTitle = subtitleStyleSheet.applyTo( new Label( "Horizontal alignment in h-box" ) );
+		Pres halignHBPack = textStyleSheet.applyTo( new Label( "PACK" ).alignHPack() );
+		Pres halignHBLeft = textStyleSheet.applyTo( new Label( "LEFT" ).alignHLeft() );
+		Pres halignHBCentre = textStyleSheet.applyTo( new Label( "CENTRE" ).alignHCentre() );
+		Pres halignHBRight = textStyleSheet.applyTo( new Label( "RIGHT" ).alignHRight() );
+		Pres halignHBExpand = textStyleSheet.applyTo( new Label( "EXPAND" ).alignHExpand() );
+		Pres hAlignHBox = new Border( new HBox( new Pres[] {
+				halignHBPack, dividerStyleSheet.applyTo( new Box( 1.0, 1.0 ).alignVExpand() ),
+				halignHBLeft, dividerStyleSheet.applyTo( new Box( 1.0, 1.0 ).alignVExpand() ),
+				halignHBCentre, dividerStyleSheet.applyTo( new Box( 1.0, 1.0 ).alignVExpand() ),
+				halignHBRight, dividerStyleSheet.applyTo( new Box( 1.0, 1.0 ).alignVExpand() ),
 				halignHBExpand
-		} ).alignHExpand() );
-		DPElement halignHBoxSection = sectionStyleSheet.vbox( new DPElement[] { halignInHBoxTitle, hAlignHBox.alignHExpand() } );
+			} ).alignHExpand() );
+		Pres halignHBoxSection = sectionStyleSheet.applyTo( new VBox( new Pres[] { halignInHBoxTitle, hAlignHBox.alignHExpand() } ) );
 
-		DPElement valignTitle = subtitleStyleSheet.staticText( "Vertical alignment" ); 
+		Pres valignTitle = subtitleStyleSheet.applyTo( new Label( "Vertical alignment" ) ); 
 
-		DPElement refVBox = styleSheet.vbox( new DPElement[] { styleSheet.staticText( "0" ), styleSheet.staticText( "1 (ref-y)" ), styleSheet.staticText( "2" ),
-						styleSheet.staticText( "3" ), styleSheet.staticText( "4" ), styleSheet.staticText( "5" ) }, 1 );
-		DPElement refBox = styleSheet.withBackground( new FilledOutlinePainter( new Color( 0.8f, 0.85f, 1.0f ), new Color( 0.0f, 0.25f, 1.0f ) ) ).bin( refVBox.pad( 5.0, 5.0 ) );
+		Pres refVBox = new VBox( new Pres[] { new Label( "0" ), new Label( "1 (ref-y)" ), new Label( "2" ),
+				new Label( "3" ), new Label( "4" ), new Label( "5" ) }, 1 );
+		Pres refBox = styleSheet.withAttr( StyleSheet2.background, new FilledOutlinePainter( new Color( 0.8f, 0.85f, 1.0f ), new Color( 0.0f, 0.25f, 1.0f ) ) ).applyTo( new Bin( refVBox.pad( 5.0, 5.0 ) ) );
 		
 
-		DPBorder valignBaselines = styleSheet.border( textStyleSheet.staticText( "vAlign=REFY" ).alignVRefY() );
-		DPBorder valignBaselinesExpand = styleSheet.border( textStyleSheet.staticText( "vAlign=REFY_EXPAND" ).alignVRefYExpand() );
-		DPBorder valignTop = styleSheet.border( textStyleSheet.staticText( "vAlign=TOP" ).alignVTop() );
-		DPBorder valignCentre = styleSheet.border( textStyleSheet.staticText( "vAlign=CENTRE" ).alignVCentre() );
-		DPBorder valignBottom = styleSheet.border( textStyleSheet.staticText( "vAlign=BOTTOM" ).alignVBottom() );
-		DPBorder valignExpand = styleSheet.border( textStyleSheet.staticText( "vAlign=EXPAND" ).alignVExpand() );
+		Pres valignBaselines = new Border( textStyleSheet.applyTo( new Label( "vAlign=REFY" ).alignVRefY() ) );
+		Pres valignBaselinesExpand = new Border( textStyleSheet.applyTo( new Label( "vAlign=REFY_EXPAND" ).alignVRefYExpand() ) );
+		Pres valignTop = new Border( textStyleSheet.applyTo( new Label( "vAlign=TOP" ).alignVTop() ) );
+		Pres valignCentre = new Border( textStyleSheet.applyTo( new Label( "vAlign=CENTRE" ).alignVCentre() ) );
+		Pres valignBottom = new Border( textStyleSheet.applyTo( new Label( "vAlign=BOTTOM" ).alignVBottom() ) );
+		Pres valignExpand = new Border( textStyleSheet.applyTo( new Label( "vAlign=EXPAND" ).alignVExpand() ) );
 
-		DPElement valignContentsBox = styleSheet.withHBoxSpacing( 10.0 ).hbox( new DPElement[] { valignBaselines.alignVRefYExpand(), valignBaselinesExpand.alignVRefYExpand(),
-				valignTop.alignVRefYExpand(), valignCentre.alignVRefYExpand(), valignBottom.alignVRefYExpand(), valignExpand.alignVRefYExpand() } );
+		Pres valignContentsBox = styleSheet.withAttr( StyleSheet2.hboxSpacing, 10.0 ).applyTo( new HBox( new Pres[] { valignBaselines.alignVRefYExpand(), valignBaselinesExpand.alignVRefYExpand(),
+				valignTop.alignVRefYExpand(), valignCentre.alignVRefYExpand(), valignBottom.alignVRefYExpand(), valignExpand.alignVRefYExpand() } ) );
 		
 		
-		DPElement vAlignBox = styleSheet.withHBoxSpacing( 50.0 ).hbox( new DPElement[] { refBox.alignVRefYExpand(), valignContentsBox.alignVRefYExpand() } );
+		Pres vAlignBox = styleSheet.withAttr( StyleSheet2.hboxSpacing, 50.0 ).applyTo( new HBox( new Pres[] { refBox.alignVRefYExpand(), valignContentsBox.alignVRefYExpand() } ) );
 		
-		DPElement valignSection = sectionStyleSheet.vbox( new DPElement[] { valignTitle, vAlignBox.alignHExpand() } );
+		Pres valignSection = sectionStyleSheet.applyTo( new VBox( new Pres[] { valignTitle, vAlignBox.alignHExpand() } ) );
 		
-		DPElement mainBox = styleSheet.withVBoxSpacing( 15.0 ).vbox( new DPElement[] { halignSection.alignHExpand(), halignHBoxSection.alignHExpand(), valignSection } );
-		return styleSheet.bin( mainBox );
+		Pres mainBox = styleSheet.withAttr( StyleSheet2.vboxSpacing, 15.0 ).applyTo( new VBox( new Pres[] { halignSection.alignHExpand(), halignHBoxSection.alignHExpand(), valignSection } ) );
+		Pres result = new Bin( mainBox );
+		return result.present();
 	}
 }

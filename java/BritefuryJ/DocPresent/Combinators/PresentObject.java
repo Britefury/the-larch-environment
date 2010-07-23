@@ -12,7 +12,7 @@ import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
 import BritefuryJ.GSym.GSymAbstractPerspective;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
-public class PresentObject extends PresentationCombinator
+public class PresentObject extends Pres
 {
 	private Object value;
 	
@@ -51,6 +51,7 @@ public class PresentObject extends PresentationCombinator
 			throw new RuntimeException( "Cannot present general object without valid inherited state" );
 		}
 		
-		return perspective.present( value, fragment, style, inheritedState );
+		throw new RuntimeException( "Not implemented" );
+		//return perspective.present( value, fragment, style, inheritedState );
 	}
 }

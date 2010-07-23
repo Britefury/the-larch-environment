@@ -10,11 +10,11 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPHBox;
-import BritefuryJ.DocPresent.Combinators.PresentationCombinator;
+import BritefuryJ.DocPresent.Combinators.Pres;
 
-public class HBox extends PresentationCombinator
+public class HBox extends Pres
 {
-	private PresentationCombinator children[];
+	private Pres children[];
 	
 	
 	public HBox(Object children[])
@@ -32,7 +32,7 @@ public class HBox extends PresentationCombinator
 	public DPElement present(PresentationContext ctx)
 	{
 		DPHBox element = new DPHBox( ctx.getStyle().getHBoxParams() );
-		element.setChildren( mapPresent( ctx, children ) );
+		element.setChildren( mapPresent( ctx.withStyle( ctx.getStyle().useHBoxParams() ), children ) );
 		return element;
 	}
 }

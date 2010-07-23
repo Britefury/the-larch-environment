@@ -8,9 +8,9 @@ package BritefuryJ.DocPresent.Combinators.Primitive;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPHiddenContent;
-import BritefuryJ.DocPresent.Combinators.PresentationCombinator;
+import BritefuryJ.DocPresent.Combinators.Pres;
 
-public class HiddenContent extends PresentationCombinator
+public class HiddenContent extends Pres
 {
 	private String textRepresentation;
 	

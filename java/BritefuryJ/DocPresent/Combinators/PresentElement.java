@@ -8,7 +8,7 @@ package BritefuryJ.DocPresent.Combinators;
 
 import BritefuryJ.DocPresent.DPElement;
 
-public class PresentElement extends PresentationCombinator
+public class PresentElement extends Pres
 {
 	private DPElement element;
 	

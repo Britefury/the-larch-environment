@@ -10,11 +10,11 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPSpan;
-import BritefuryJ.DocPresent.Combinators.PresentationCombinator;
+import BritefuryJ.DocPresent.Combinators.Pres;
 
-public class Span extends PresentationCombinator
+public class Span extends Pres
 {
-	private PresentationCombinator children[];
+	private Pres children[];
 	
 	
 	public Span(Object children[])
@@ -32,7 +32,7 @@ public class Span extends PresentationCombinator
 	public DPElement present(PresentationContext ctx)
 	{
 		DPSpan element = new DPSpan( ctx.getStyle().getContainerParams() );
-		element.setChildren( mapPresent( ctx, children ) );
+		element.setChildren( mapPresent( ctx.withStyle( ctx.getStyle().useContainerParams() ), children ) );
 		return element;
 	}
 }
