@@ -32,6 +32,6 @@ public class Whitespace extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		return new DPWhitespace( ctx.getStyle().getContentLeafStyleParams(), text, width );
+		return new DPWhitespace( Primitive.contentLeafParams.get( ctx.getStyle() ), text, width );
 	}
 }

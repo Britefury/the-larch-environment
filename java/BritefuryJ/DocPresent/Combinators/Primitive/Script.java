@@ -9,7 +9,6 @@ package BritefuryJ.DocPresent.Combinators.Primitive;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPScript;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
 
 public class Script extends Pres
@@ -53,14 +52,14 @@ public class Script extends Pres
 	public DPElement present(PresentationContext ctx)
 	{
 		StyleSheetValues style = ctx.getStyle();
-		StyleSheetValues usedStyle = style.useScriptParams().useTextParams();
+		StyleSheetValues usedStyle = Primitive.useScriptParams( Primitive.useTextParams( style ) );
 		PresentationContext childCtx = null;
 		if ( leftSuper != null  ||  leftSub != null  ||  rightSuper != null  ||  rightSub != null )
 		{
 			childCtx = ctx.withStyle( scriptScriptChildStyle( usedStyle ) );
 		}
 		
-		DPScript element = new DPScript( style.getScriptParams(), style.getTextParams() );
+		DPScript element = new DPScript( Primitive.scriptParams.get( style ), Primitive.textParams.get( style ) );
 		element.setMainChild( main.present( ctx.withStyle( usedStyle ) ) );
 		if ( leftSuper != null )
 		{
@@ -85,10 +84,10 @@ public class Script extends Pres
 
 	private static StyleSheetValues scriptScriptChildStyle(StyleSheetValues style)
 	{
-		double scale = style.get( StyleSheet2.fontScale, Double.class );
-		double scriptScale = style.get( StyleSheet2.scriptFontScale, Double.class );
-		double minScriptScale = style.get( StyleSheet2.scriptMinFontScale, Double.class );
+		double scale = style.get( Primitive.fontScale, Double.class );
+		double scriptScale = style.get( Primitive.scriptFontScale, Double.class );
+		double minScriptScale = style.get( Primitive.scriptMinFontScale, Double.class );
 		scale = Math.max( scale * scriptScale, minScriptScale );
-		return style.withAttr( StyleSheet2.fontScale, scale );
+		return style.withAttr( Primitive.fontScale, scale );
 	}
 }

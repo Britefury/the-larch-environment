@@ -31,8 +31,8 @@ public class RGrid extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		DPRGrid element = new DPRGrid( ctx.getStyle().getTableParams() );
-		element.setChildren( mapPresent( ctx.withStyle( ctx.getStyle().useTableParams() ), children ) );
+		DPRGrid element = new DPRGrid( Primitive.tableParams.get( ctx.getStyle() ) );
+		element.setChildren( mapPresent( ctx.withStyle( Primitive.useTableParams( ctx.getStyle() ) ), children ) );
 		return element;
 	}
 }

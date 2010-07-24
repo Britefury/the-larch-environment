@@ -59,6 +59,6 @@ public class Shape extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		return new DPShape( ctx.getStyle().getShapeParams(), "", shape );
+		return new DPShape( Primitive.shapeParams.get( ctx.getStyle() ), "", shape );
 	}
 }

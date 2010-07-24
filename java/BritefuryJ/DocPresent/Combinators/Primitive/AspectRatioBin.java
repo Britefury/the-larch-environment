@@ -28,8 +28,8 @@ public class AspectRatioBin extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		DPAspectRatioBin bin = new DPAspectRatioBin( ctx.getStyle().getContainerParams(), minWidth, aspectRatio );
-		bin.setChild( child.present( ctx.withStyle( ctx.getStyle().useContainerParams() ) ).layoutWrap() );
+		DPAspectRatioBin bin = new DPAspectRatioBin( Primitive.containerParams.get( ctx.getStyle() ), minWidth, aspectRatio );
+		bin.setChild( child.present( ctx.withStyle( Primitive.useContainerParams( ctx.getStyle() ) ) ).layoutWrap() );
 		return bin;
 	}
 }

@@ -31,8 +31,8 @@ public class Span extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		DPSpan element = new DPSpan( ctx.getStyle().getContainerParams() );
-		element.setChildren( mapPresent( ctx.withStyle( ctx.getStyle().useContainerParams() ), children ) );
+		DPSpan element = new DPSpan( Primitive.containerParams.get( ctx.getStyle() ) );
+		element.setChildren( mapPresent( ctx.withStyle( Primitive.useContainerParams( ctx.getStyle() ) ), children ) );
 		return element;
 	}
 }

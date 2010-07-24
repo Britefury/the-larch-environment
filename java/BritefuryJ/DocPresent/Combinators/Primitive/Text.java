@@ -31,6 +31,6 @@ public class Text extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		return new DPText( ctx.getStyle().getTextParams(), text, textRepresentation );
+		return new DPText( Primitive.textParams.get( ctx.getStyle() ), text, textRepresentation );
 	}
 }

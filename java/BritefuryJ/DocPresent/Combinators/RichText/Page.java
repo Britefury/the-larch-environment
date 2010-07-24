@@ -4,27 +4,34 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.DocPresent.Combinators.Primitive;
+package BritefuryJ.DocPresent.Combinators.RichText;
 
-import BritefuryJ.DocPresent.DPBox;
+import java.util.List;
+
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 
-public class Box extends Pres
+public class Page extends Pres
 {
-	private double minWidth, minHeight;
+	private Pres children[];
 	
 	
-	public Box(double minWidth, double minHeight)
+	public Page(Object children[])
 	{
-		this.minWidth = minWidth;
-		this.minHeight = minHeight;
+		this.children = mapCoerce( children );
+	}
+	
+	public Page(List<Object> children)
+	{
+		this.children = mapCoerce( children );
 	}
 
 	
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		return new DPBox( Primitive.shapeParams.get( ctx.getStyle() ), "", minWidth, minHeight );
+		DPElement childElems[] = mapPresent( ctx.withStyle( RichText.usePageAttrs( ctx.getStyle() ) ), children );
+		return new VBox( childElems ).present( ctx.withStyle( RichText.pageStyle( ctx.getStyle() ) ) );
 	}
 }

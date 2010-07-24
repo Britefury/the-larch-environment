@@ -30,8 +30,8 @@ public class Segment extends Pres
 	public DPElement present(PresentationContext ctx)
 	{
 		StyleSheetValues style = ctx.getStyle();
-		DPSegment element = new DPSegment( style.getContainerParams(), style.getTextParams(), bGuardBegin, bGuardEnd );
-		element.setChild( child.present( ctx.withStyle( ctx.getStyle().useContainerParams() ) ) );
+		DPSegment element = new DPSegment( Primitive.containerParams.get( style ), Primitive.textParams.get( style ), bGuardBegin, bGuardEnd );
+		element.setChild( child.present( ctx.withStyle( Primitive.useContainerParams( ctx.getStyle() ) ) ) );
 		return element;
 	}
 

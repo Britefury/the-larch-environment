@@ -15,6 +15,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.Box;
 import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
 import BritefuryJ.DocPresent.Combinators.Primitive.Label;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.Painter.FilledOutlinePainter;
@@ -41,10 +42,10 @@ public class AlignmentTestPage extends SystemPage
 	protected DPElement createContents()
 	{
 		StyleSheet2 styleSheet = StyleSheet2.instance;
-		StyleSheet2 textStyleSheet = styleSheet.withAttr( StyleSheet2.background, new FilledOutlinePainter( new Color( 1.0f, 1.0f, 0.7f ), new Color( 1.0f, 1.0f, 0.0f ) ) );
-		StyleSheet2 dividerStyleSheet = styleSheet.withAttr( StyleSheet2.shapePainter, new FillPainter( new Color( 1.0f, 0.5f, 0.0f ) ) );
-		StyleSheet2 subtitleStyleSheet = styleSheet.withAttr( StyleSheet2.fontSize, 16 ).withAttr( StyleSheet2.fontFace, "Serif" ).withAttr( StyleSheet2.fontBold, true );
-		StyleSheet2 sectionStyleSheet = styleSheet.withAttr( StyleSheet2.vboxSpacing, 5.0 );
+		StyleSheet2 textStyleSheet = styleSheet.withAttr( Primitive.background, new FilledOutlinePainter( new Color( 1.0f, 1.0f, 0.7f ), new Color( 1.0f, 1.0f, 0.0f ) ) );
+		StyleSheet2 dividerStyleSheet = styleSheet.withAttr( Primitive.shapePainter, new FillPainter( new Color( 1.0f, 0.5f, 0.0f ) ) );
+		StyleSheet2 subtitleStyleSheet = styleSheet.withAttr( Primitive.fontSize, 16 ).withAttr( Primitive.fontFace, "Serif" ).withAttr( Primitive.fontBold, true );
+		StyleSheet2 sectionStyleSheet = styleSheet.withAttr( Primitive.vboxSpacing, 5.0 );
 		
 		Pres halignTitle = subtitleStyleSheet.applyTo( new Label( "Horizontal alignment" ) ); 
 		Pres halignLeft = new Border( textStyleSheet.applyTo( new Label( "hAlign=LEFT" ).alignHLeft() ) );
@@ -73,7 +74,7 @@ public class AlignmentTestPage extends SystemPage
 
 		Pres refVBox = new VBox( new Pres[] { new Label( "0" ), new Label( "1 (ref-y)" ), new Label( "2" ),
 				new Label( "3" ), new Label( "4" ), new Label( "5" ) }, 1 );
-		Pres refBox = styleSheet.withAttr( StyleSheet2.background, new FilledOutlinePainter( new Color( 0.8f, 0.85f, 1.0f ), new Color( 0.0f, 0.25f, 1.0f ) ) ).applyTo( new Bin( refVBox.pad( 5.0, 5.0 ) ) );
+		Pres refBox = styleSheet.withAttr( Primitive.background, new FilledOutlinePainter( new Color( 0.8f, 0.85f, 1.0f ), new Color( 0.0f, 0.25f, 1.0f ) ) ).applyTo( new Bin( refVBox.pad( 5.0, 5.0 ) ) );
 		
 
 		Pres valignBaselines = new Border( textStyleSheet.applyTo( new Label( "vAlign=REFY" ).alignVRefY() ) );
@@ -83,15 +84,15 @@ public class AlignmentTestPage extends SystemPage
 		Pres valignBottom = new Border( textStyleSheet.applyTo( new Label( "vAlign=BOTTOM" ).alignVBottom() ) );
 		Pres valignExpand = new Border( textStyleSheet.applyTo( new Label( "vAlign=EXPAND" ).alignVExpand() ) );
 
-		Pres valignContentsBox = styleSheet.withAttr( StyleSheet2.hboxSpacing, 10.0 ).applyTo( new HBox( new Pres[] { valignBaselines.alignVRefYExpand(), valignBaselinesExpand.alignVRefYExpand(),
+		Pres valignContentsBox = styleSheet.withAttr( Primitive.hboxSpacing, 10.0 ).applyTo( new HBox( new Pres[] { valignBaselines.alignVRefYExpand(), valignBaselinesExpand.alignVRefYExpand(),
 				valignTop.alignVRefYExpand(), valignCentre.alignVRefYExpand(), valignBottom.alignVRefYExpand(), valignExpand.alignVRefYExpand() } ) );
 		
 		
-		Pres vAlignBox = styleSheet.withAttr( StyleSheet2.hboxSpacing, 50.0 ).applyTo( new HBox( new Pres[] { refBox.alignVRefYExpand(), valignContentsBox.alignVRefYExpand() } ) );
+		Pres vAlignBox = styleSheet.withAttr( Primitive.hboxSpacing, 50.0 ).applyTo( new HBox( new Pres[] { refBox.alignVRefYExpand(), valignContentsBox.alignVRefYExpand() } ) );
 		
 		Pres valignSection = sectionStyleSheet.applyTo( new VBox( new Pres[] { valignTitle, vAlignBox.alignHExpand() } ) );
 		
-		Pres mainBox = styleSheet.withAttr( StyleSheet2.vboxSpacing, 15.0 ).applyTo( new VBox( new Pres[] { halignSection.alignHExpand(), halignHBoxSection.alignHExpand(), valignSection } ) );
+		Pres mainBox = styleSheet.withAttr( Primitive.vboxSpacing, 15.0 ).applyTo( new VBox( new Pres[] { halignSection.alignHExpand(), halignHBoxSection.alignHExpand(), valignSection } ) );
 		Pres result = new Bin( mainBox );
 		return result.present();
 	}

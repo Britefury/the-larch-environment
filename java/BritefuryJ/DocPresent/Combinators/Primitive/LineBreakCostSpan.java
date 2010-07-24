@@ -31,8 +31,8 @@ public class LineBreakCostSpan extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		DPLineBreakCostSpan element = new DPLineBreakCostSpan( ctx.getStyle().getContainerParams() );
-		element.setChildren( mapPresent( ctx.withStyle( ctx.getStyle().useContainerParams() ), children ) );
+		DPLineBreakCostSpan element = new DPLineBreakCostSpan( Primitive.containerParams.get( ctx.getStyle() ) );
+		element.setChildren( mapPresent( ctx.withStyle( Primitive.useContainerParams( ctx.getStyle() ) ), children ) );
 		return element;
 	}
 }

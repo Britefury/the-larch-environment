@@ -31,8 +31,8 @@ public class HBox extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		DPHBox element = new DPHBox( ctx.getStyle().getHBoxParams() );
-		element.setChildren( mapPresent( ctx.withStyle( ctx.getStyle().useHBoxParams() ), children ) );
+		DPHBox element = new DPHBox( Primitive.hboxParams.get( ctx.getStyle() ) );
+		element.setChildren( mapPresent( ctx.withStyle( Primitive.useHBoxParams( ctx.getStyle() ) ), children ) );
 		return element;
 	}
 }

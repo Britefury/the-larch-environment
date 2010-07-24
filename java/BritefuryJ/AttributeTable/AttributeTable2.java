@@ -147,6 +147,7 @@ public class AttributeTable2 implements Presentable
 	}
 	
 	
+	
 	protected static HashMap<Class<? extends AttributeTable2>, AttributeTableSet> attributeTableSetsByClass = new HashMap<Class<? extends AttributeTable2>, AttributeTableSet>();
 	
 
@@ -311,6 +312,23 @@ public class AttributeTable2 implements Presentable
 	public AttributeTable2 useAttr(AttributeBase attribute)
 	{
 		return attribute.use( this );
+	}
+	
+	public AttributeTable2 remapAttr(AttributeBase destAttribute, AttributeBase sourceAttribute)
+	{
+		Object value = get( sourceAttribute );
+		AttributeValueSingle v = new AttributeValueSingle( destAttribute, value );
+		WeakReference<AttributeTable2> derivedRef = singleValueDerivedAttributeTables.get( v );
+		if ( derivedRef == null  ||  derivedRef.get() == null )
+		{
+			AttributeTable2 derived = newInstance();
+			derived.values.putAll( values );
+			derived.values.put( destAttribute, destAttribute.checkValue( value ) );
+			derived = getUniqueAttributeTable( derived );
+			derivedRef = new WeakReference<AttributeTable2>( derived );
+			singleValueDerivedAttributeTables.put( v, derivedRef );
+		}
+		return derivedRef.get();
 	}
 	
 		

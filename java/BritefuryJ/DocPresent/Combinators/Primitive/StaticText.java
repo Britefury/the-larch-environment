@@ -31,6 +31,6 @@ public class StaticText extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		return new DPText( ctx.getStyle().getStaticTextParams(), text, textRepresentation );
+		return new DPText( Primitive.staticTextParams.get( ctx.getStyle() ), text, textRepresentation );
 	}
 }
