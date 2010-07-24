@@ -11,7 +11,12 @@ import java.awt.Color;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Border;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
 public class BorderTestPage extends SystemPage
 {
@@ -34,19 +39,17 @@ public class BorderTestPage extends SystemPage
 
 	protected DPElement createContents()
 	{
-		PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
+		Pres onePixelBorder = new Border( new StaticText( "Normal 1-pixel border" ) ); 
 		
-		DPElement onePixelBorder = styleSheet.border( styleSheet.staticText( "Normal 1-pixel border" ) );
+		Pres padded = new Border( new StaticText( "Padding: 30 pixels of padding all round, via the pad() method" ).pad( 30.0, 30.0 ) ); 
+
+		Pres emptyBorder = StyleSheet2.instance.withAttr( Primitive.border, new FilledBorder( 50.0, 50.0, 20.0, 20.0, 20.0, 20.0, new Color( 0.8f, 0.8f, 0.8f ) ) ).applyTo(
+				new Border( new StaticText( "Empty border: 50 pixel h-margins, 20 pixel v-margins, 20 pixel rounding, light-grey background"  ) ) );
 		
-		DPElement padded = styleSheet.border( styleSheet.staticText( "Padding: 30 pixels of padding all round, via the pad() method" ).pad( 30.0, 30.0 ) );
-		
-		DPElement emptyBorder = styleSheet.withBorder( new FilledBorder( 50.0, 50.0, 20.0, 20.0, 20.0, 20.0, new Color( 0.8f, 0.8f, 0.8f ) ) ).border(
-				styleSheet.staticText( "Empty border: 50 pixel h-margins, 20 pixel v-margins, 20 pixel rounding, light-grey background"  ) );
-		
-		DPElement solidBorder = styleSheet.withBorder( new SolidBorder( 3.0f, 10.0, 20.0, 20.0, new Color( 0.6f, 0.6f, 0.6f ), new Color( 0.8f, 0.8f, 0.8f ) ) ).border(
-				styleSheet.staticText( "Solid border: 3 pixel thickness, 10 pixel inset (margin), 20 pixel rounding, grey border, light-grey background" ) );
+		Pres solidBorder = StyleSheet2.instance.withAttr( Primitive.border, new SolidBorder( 3.0f, 10.0, 20.0, 20.0, new Color( 0.6f, 0.6f, 0.6f ), new Color( 0.8f, 0.8f, 0.8f ) ) ).applyTo(
+				new Border( new StaticText( "Solid border: 3 pixel thickness, 10 pixel inset (margin), 20 pixel rounding, grey border, light-grey background" ) ) );
 		
 		
-		return styleSheet.withVBoxSpacing( 10.0 ).vbox( new DPElement[] { onePixelBorder, padded, emptyBorder, solidBorder } );
+		return StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 10.0 ).applyTo( new VBox( new Pres[] { onePixelBorder, padded, emptyBorder, solidBorder } ) ).present(); 
 	}
 }

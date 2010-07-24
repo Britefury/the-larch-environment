@@ -6,10 +6,12 @@
 //##************************
 package BritefuryJ.DocPresent.Combinators;
 
+import java.awt.datatransfer.DataFlavor;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
@@ -207,8 +209,57 @@ public abstract class Pres
 	{
 		return pad( 0.0, 0.0, topPad, bottomPad );
 	}
-
 	
+	
+	
+	//
+	// Drag and drop methods
+	//
+	
+	public Pres addDragSource(ObjectDndHandler.DragSource dragSource)
+	{
+		return new AddDragSource( this, dragSource );
+	}
+	
+	public Pres addDragSource(Class<?> dataType, int sourceAspects, ObjectDndHandler.SourceDataFn sourceDataFn, ObjectDndHandler.ExportDoneFn exportDoneFn)
+	{
+		return new AddDragSource( this, dataType, sourceAspects, sourceDataFn, exportDoneFn );
+	}
+	
+	public Pres addDragSource(Class<?> dataType, int sourceAspects, ObjectDndHandler.SourceDataFn sourceDataFn)
+	{
+		return new AddDragSource( this, dataType, sourceAspects, sourceDataFn );
+	}
+	
+	
+	
+	public Pres addDropDest(ObjectDndHandler.DropDest dropDest)
+	{
+		return new AddDropDest( this, dropDest );
+	}
+	
+	public Pres addDropDest(Class<?> dataType, ObjectDndHandler.CanDropFn canDropFn, ObjectDndHandler.DropFn dropFn)
+	{
+		return new AddDropDest( this, dataType, canDropFn, dropFn );
+	}
+	
+	public Pres addDropDest(Class<?> dataType, ObjectDndHandler.DropFn dropFn)
+	{
+		return new AddDropDest( this, dataType, dropFn );
+	}
+	
+	
+	public Pres addNonLocalDropDest(ObjectDndHandler.NonLocalDropDest dropDest)
+	{
+		return new AddNonLocalDropDest( this, dropDest );
+	}
+	
+	public Pres addNonLocalDropDest(DataFlavor dataFlavor, ObjectDndHandler.DropFn dropFn)
+	{
+		return new AddNonLocalDropDest( this, dataFlavor, dropFn );
+	}
+	
+
 	
 	
 	

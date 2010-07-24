@@ -2166,12 +2166,17 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	}
 	
 	
-	public void addNonLocalDropDest(DataFlavor dataFlavor, ObjectDndHandler.DropFn dropFn)
+	public void addNonLocalDropDest(ObjectDndHandler.NonLocalDropDest dropDest)
 	{
 		ObjectDndHandler current = getValidInitialDndHandler();
 		ensureValidInteractionFields();
-		interactionFields.dndHandler = current.withNonLocalDropDest( new ObjectDndHandler.NonLocalDropDest( dataFlavor, dropFn ) );
+		interactionFields.dndHandler = current.withNonLocalDropDest( dropDest );
 		notifyInteractionFieldsModified();
+	}
+	
+	public void addNonLocalDropDest(DataFlavor dataFlavor, ObjectDndHandler.DropFn dropFn)
+	{
+		addNonLocalDropDest( new ObjectDndHandler.NonLocalDropDest( dataFlavor, dropFn ) );
 	}
 	
 
