@@ -8,29 +8,40 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import BritefuryJ.DocPresent.DPBin;
-import BritefuryJ.DocPresent.DPCanvas;
+import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Canvas.DrawingNode;
 import BritefuryJ.DocPresent.Canvas.GroupNode;
 import BritefuryJ.DocPresent.Canvas.ShapeNode;
 import BritefuryJ.DocPresent.Canvas.TextNode;
+import BritefuryJ.DocPresent.Combinators.ElementRef;
+import BritefuryJ.DocPresent.Combinators.ElementRef.RefSet;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
+import BritefuryJ.DocPresent.Combinators.Primitive.Border;
+import BritefuryJ.DocPresent.Combinators.Primitive.Canvas;
+import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.Combinators.Primitive.Text;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Painter.FillPainter;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.Math.Point2;
 
 public class CanvasTestPage extends SystemPage
 {
-	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-	private static PrimitiveStyleSheet textStyle = PrimitiveStyleSheet.instance.withFontSize( 12 );
+	private static StyleSheet2 textStyle = StyleSheet2.instance.withAttr( Primitive.fontSize, 12 );
 	private static Color backgroundColour = new Color( 1.0f, 0.9f, 0.75f );
+	private static StyleSheet2 backgroundStyle = StyleSheet2.instance.withAttr( Primitive.background, new FillPainter( backgroundColour ) );
 
 
 	protected CanvasTestPage()
@@ -130,24 +141,25 @@ public class CanvasTestPage extends SystemPage
 	}
 
 	
-	protected DPElement makeDestElement(String title)
+	protected Pres makeDestElement(String title)
 	{
-		final DPText textElement = textStyle.text( title );
-		DPElement destText = styleSheet.withBackground( new FillPainter( backgroundColour ) ).bin( textElement.pad( 10.0, 10.0 ) );
+		final Pres textElement = textStyle.applyTo( new StaticText( title ) );
+		Pres destText = backgroundStyle.applyTo( new Bin( textElement.pad( 10.0, 10.0 ) ) ); 
 		
 		ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
 		{
 			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
 			{
 				String text = data.toString();
+				DPBin bin = (DPBin)destElement;
+				DPBorder pad = (DPBorder)bin.getChild();
+				DPText textElement = (DPText)pad.getChild();
 				textElement.setText( text );
 				return true;
 			}
 		};
 		
-		destText.addDropDest( Integer.class, dropFn );
-
-		return destText;
+		return destText.addDropDest( Integer.class, dropFn );
 	}
 
 	
@@ -163,16 +175,20 @@ public class CanvasTestPage extends SystemPage
 		}
 	}
 	
-	protected DPElement makeDestElement2(String title, final DPElement firstElement)
+	protected Pres makeDestElement2(String title, final ElementRef firstElem)
 	{
-		final DPText textElement = textStyle.text( title );
-		DPElement destText = styleSheet.withBackground( new FillPainter( backgroundColour ) ).bin( textElement.pad( 10.0, 10.0 ) );
+		final Pres textElement = textStyle.applyTo( new StaticText( title ) );
+		Pres destText = backgroundStyle.applyTo( new Bin( textElement.pad( 10.0, 10.0 ) ) ); 
+		final ElementRef.RefSet firstElementSet = firstElem.getRefs();
 		
 		ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
 		{
 			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
 			{
 				String text = data.toString();
+				DPBin bin = (DPBin)destElement;
+				DPBorder pad = (DPBorder)bin.getChild();
+				DPText textElement = (DPText)pad.getChild();
 				textElement.setText( text );
 				return true;
 			}
@@ -182,32 +198,41 @@ public class CanvasTestPage extends SystemPage
 		{
 			public boolean canDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
 			{
-				DPBin box = (DPBin)firstElement;
-				DPBin pad = (DPBin)box.getChild();
-				DPText t = (DPText)pad.getChild();
-				String firstText = t.getText();
-				int firstNum = textAsNumber( firstText );
-				int secondNum = (Integer)data;
-				return secondNum >= firstNum;
+				Iterator<DPElement> iter = firstElementSet.iterator();
+				if ( iter.hasNext() )
+				{
+					DPElement firstElement = iter.next();
+					DPBin box = (DPBin)firstElement;
+					DPBin pad = (DPBin)box.getChild();
+					DPText t = (DPText)pad.getChild();
+					String firstText = t.getText();
+					int firstNum = textAsNumber( firstText );
+					int secondNum = (Integer)data;
+					return secondNum >= firstNum;
+				}
+				else
+				{
+					System.out.println( "No ref" );
+					return false;
+				}
 			}
 		};
 		
-		destText.addDropDest( Integer.class, canDropFn, dropFn );
-
-		return destText;
+		return destText.addDropDest( Integer.class, canDropFn, dropFn );
 	}
 
 	
 	protected DPElement createContents()
 	{
-		DPCanvas canvas = styleSheet.canvas( createClockFace().translate( 320.0, 240.0 ), 640.0, 480.0, false, false );
-		DPElement diagram = styleSheet.withBorder( new SolidBorder( 1.0, 3.0, 2.0, 2.0, Color.black, null ) ).border( canvas );
+		Pres canvas = new Canvas( createClockFace().translate( 320.0, 240.0 ), 640.0, 480.0, false, false );
+		Pres diagram = StyleSheet2.instance.withAttr( Primitive.border, new SolidBorder( 1.0, 3.0, 2.0, 2.0, Color.black, null ) ).applyTo( new Border( canvas ) );
 		
-		DPElement dest0 = makeDestElement( "Number" );
-		DPElement dest1 = makeDestElement2( "Number", dest0 );
+		Pres dest0 = makeDestElement( "Number" );
+		ElementRef dest0Ref = new ElementRef( dest0 );
+		Pres dest1 = makeDestElement2( "Number", dest0Ref );
 
-		DPHBox hbox = styleSheet.withHBoxSpacing( 20.0 ).hbox( new DPElement[] { dest0, dest1 } );
-
-		return styleSheet.withVBoxSpacing( 20.0 ).vbox( new DPElement[] { diagram, hbox } );
+		Pres hbox = StyleSheet2.instance.withAttr( Primitive.hboxSpacing, 20.0 ).applyTo( new HBox( new Pres[] { dest0Ref, dest1 } ) );
+		
+		return StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 20.0 ).applyTo( new VBox( new Pres[] { diagram, hbox } ) ).present();
 	}
 }
