@@ -4,32 +4,34 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.DocPresent.Combinators.Primitive;
+package BritefuryJ.DocPresent.Combinators.RichText;
 
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPParagraph;
+import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.SequentialPres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Border;
+import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
 
-public class Paragraph extends SequentialPres
+public class LinkHeaderBar extends SequentialPres
 {
-	public Paragraph(Object children[])
+	public LinkHeaderBar(Object children[])
 	{
 		super( children );
 	}
 	
-	public Paragraph(List<Object> children)
+	public LinkHeaderBar(List<Object> children)
 	{
 		super( children );
 	}
-
+	
 	
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		DPParagraph element = new DPParagraph( Primitive.paragraphParams.get( ctx.getStyle() ) );
-		element.setChildren( mapPresent( ctx.withStyle( Primitive.useParagraphParams( ctx.getStyle() ) ), children ) );
-		return element;
+		Pres xs[] = mapPresentAsCombinators( ctx.withStyle( RichText.useBodyAttrs( ctx.getStyle() ) ), children );
+		return higherOrderPresent( ctx, RichText.linkHeaderStyle( ctx.getStyle() ),
+				new Border( new HBox( xs ).alignHRight() ).alignHExpand() );
 	}
 }

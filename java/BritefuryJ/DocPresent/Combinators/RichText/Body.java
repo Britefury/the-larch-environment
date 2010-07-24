@@ -4,32 +4,33 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.DocPresent.Combinators.Primitive;
+package BritefuryJ.DocPresent.Combinators.RichText;
 
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPParagraph;
+import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.SequentialPres;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 
-public class Paragraph extends SequentialPres
+public class Body extends SequentialPres
 {
-	public Paragraph(Object children[])
+	public Body(Object children[])
 	{
 		super( children );
 	}
 	
-	public Paragraph(List<Object> children)
+	public Body(List<Object> children)
 	{
 		super( children );
 	}
-
+	
 	
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		DPParagraph element = new DPParagraph( Primitive.paragraphParams.get( ctx.getStyle() ) );
-		element.setChildren( mapPresent( ctx.withStyle( Primitive.useParagraphParams( ctx.getStyle() ) ), children ) );
-		return element;
+		Pres xs[] = mapPresentAsCombinators( ctx.withStyle( RichText.useBodyAttrs( ctx.getStyle() ) ), children );
+		return higherOrderPresent( ctx, RichText.bodyStyle( ctx.getStyle() ),
+				new VBox( xs ) );
 	}
 }

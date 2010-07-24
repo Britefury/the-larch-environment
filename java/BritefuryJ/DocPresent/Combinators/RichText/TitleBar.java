@@ -6,31 +6,28 @@
 //##************************
 package BritefuryJ.DocPresent.Combinators.RichText;
 
-import java.util.List;
-
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.SequentialPres;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 
-public class Page extends SequentialPres
+public class TitleBar extends Pres
 {
-	public Page(Object children[])
+	private String text;
+	
+	
+	public TitleBar(String text)
 	{
-		super( children );
+		this.text = text;
 	}
-	
-	public Page(List<Object> children)
-	{
-		super( children );
-	}
-	
-	
+
+
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		Pres xs[] = mapPresentAsCombinators( ctx.withStyle( RichText.usePageAttrs( ctx.getStyle() ) ), children );
-		return higherOrderPresent( ctx, RichText.pageStyle( ctx.getStyle() ),
-				new VBox( xs ) );
+		Title title = new Title( text );
+		Pres titleBackground = new Border( title.alignHCentre() );
+		double borderWidth = ctx.getStyle().get( RichText.titleBorderWidth, Double.class );
+		return higherOrderPresent( ctx, RichText.titleStyle.get( ctx.getStyle() ),
+				titleBackground.alignHExpand().pad( borderWidth, borderWidth ).alignHExpand() );
 	}
 }

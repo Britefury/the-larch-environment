@@ -4,32 +4,20 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.DocPresent.Combinators.Primitive;
-
-import java.util.List;
+package BritefuryJ.DocPresent.Combinators.RichText;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPHBox;
-import BritefuryJ.DocPresent.Combinators.SequentialPres;
 
-public class HBox extends SequentialPres
+public class NormalText extends RichParagraph
 {
-	public HBox(Object children[])
+	public NormalText(String text)
 	{
-		super( children );
+		super( text );
 	}
-	
-	public HBox(List<Object> children)
-	{
-		super( children );
-	}
-	
-	
+
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		DPHBox element = new DPHBox( Primitive.hboxParams.get( ctx.getStyle() ) );
-		element.setChildren( mapPresent( ctx.withStyle( Primitive.useHBoxParams( ctx.getStyle() ) ), children ) );
-		return element;
+		return presentParagraph( ctx.withStyle( RichText.normalTextStyle( ctx.getStyle() ) ) );
 	}
 }

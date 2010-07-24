@@ -223,6 +223,28 @@ public abstract class Pres
 	}
 	
 	
+	protected static PresentElement presentAsCombinator(PresentationContext ctx, Pres child)
+	{
+		return new PresentElement( child.present( ctx ) );
+	}
+	
+	protected static PresentElement[] mapPresentAsCombinators(PresentationContext ctx, Pres children[])
+	{
+		PresentElement result[] = new PresentElement[children.length];
+		for (int i = 0; i < children.length; i++)
+		{
+			result[i] = new PresentElement( children[i].present( ctx ) );
+		}
+		return result;
+	}
+	
+	
+	protected static DPElement higherOrderPresent(PresentationContext ctx, StyleSheetValues style, Pres combinator)
+	{
+		return combinator.present( ctx.withStyle( style ) );
+	}
+	
+	
 	
 	protected static Pres coerce(Object x)
 	{

@@ -10,23 +10,20 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPSpan;
-import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.SequentialPres;
 
-public class Span extends Pres
+public class Span extends SequentialPres
 {
-	private Pres children[];
-	
-	
 	public Span(Object children[])
 	{
-		this.children = mapCoerce( children );
+		super( children );
 	}
 	
 	public Span(List<Object> children)
 	{
-		this.children = mapCoerce( children );
+		super( children );
 	}
-
+	
 	
 	@Override
 	public DPElement present(PresentationContext ctx)
