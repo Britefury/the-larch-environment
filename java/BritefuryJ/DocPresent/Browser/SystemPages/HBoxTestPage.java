@@ -11,7 +11,13 @@ import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Border;
+import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
 public class HBoxTestPage extends SystemPage
 {
@@ -32,20 +38,20 @@ public class HBoxTestPage extends SystemPage
 	}
 
 	
-	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-	private static PrimitiveStyleSheet outlineStyleSheet =styleSheet.withBorder( new SolidBorder( 1.0, 0.0, new Color( 0.0f, 0.3f, 0.7f ), null ) );
+	private static StyleSheet2 styleSheet = StyleSheet2.instance;
+	private static StyleSheet2 outlineStyleSheet = styleSheet.withAttr( Primitive.border, new SolidBorder( 1.0, 0.0, new Color( 0.0f, 0.3f, 0.7f ), null ) );
 
 	
-	protected DPElement makeText(String text, int size)
+	protected Pres makeText(String text, int size)
 	{
-		PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance.withFontBold( true ).withFontSize( size );
-		return outlineStyleSheet.border( styleSheet.staticText( text ) );
+		StyleSheet2 styleSheet = StyleSheet2.instance.withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, size );
+		return outlineStyleSheet.applyTo( new Border( styleSheet.applyTo( new StaticText( text ) ) ) );
 	}
 	
 	
-	protected DPElement createHBox1()
+	protected Pres createHBox1()
 	{
-		ArrayList<DPElement> children = new ArrayList<DPElement>();
+		ArrayList<Object> children = new ArrayList<Object>();
 		children.add( makeText( "a", 24 ).alignVRefY() );
 		children.add( makeText( "g", 24 ).alignVRefY() );
 		children.add( makeText( "v_ref_y", 18 ).alignVRefY() );
@@ -56,24 +62,24 @@ public class HBoxTestPage extends SystemPage
 		children.add( makeText( "v_bottom", 18 ).alignVBottom() );
 		children.add( makeText( "v_expand", 18 ).alignVExpand() );
 		
-		return outlineStyleSheet.border( styleSheet.hbox( children.toArray( new DPElement[0] ) ).alignHExpand() ).alignHExpand().pad( 10.0, 20.0 );
+		return outlineStyleSheet.applyTo( new Border( new HBox( children ).alignHExpand() ) ).alignHExpand().pad( 10.0, 20.0 );
 	}
 
-	protected DPElement createHBox2()
+	protected Pres createHBox2()
 	{
-		ArrayList<DPElement> children = new ArrayList<DPElement>();
+		ArrayList<Object> children = new ArrayList<Object>();
 		children.add( makeText( "h_pack", 18 ).alignVRefY() );
 		children.add( makeText( "h_left", 18 ).alignHLeft() );
 		children.add( makeText( "h_centre", 18 ).alignHCentre() );
 		children.add( makeText( "h_right", 18 ).alignHRight() );
 		children.add( makeText( "h_expand", 18 ).alignHExpand() );
 		
-		return outlineStyleSheet.border( styleSheet.hbox( children.toArray( new DPElement[0] ) ).alignHExpand() ).alignHExpand().pad( 10.0, 20.0 );
+		return outlineStyleSheet.applyTo( new Border( new HBox( children ).alignHExpand() ) ).alignHExpand().pad( 10.0, 20.0 );
 	}
 
 	
 	protected DPElement createContents()
 	{
-		return styleSheet.vbox( new DPElement[] { createHBox1().alignHExpand(), createHBox2().alignHExpand() } ).alignHExpand();
+		return new VBox( new Pres[] { createHBox1().alignHExpand(), createHBox2().alignHExpand() } ).alignHExpand().present();
 	}
 }

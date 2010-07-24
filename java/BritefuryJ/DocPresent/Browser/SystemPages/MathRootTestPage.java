@@ -10,7 +10,13 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Fraction;
+import BritefuryJ.DocPresent.Combinators.Primitive.MathRoot;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
 public class MathRootTestPage extends SystemPage
 {
@@ -31,25 +37,25 @@ public class MathRootTestPage extends SystemPage
 	}
 
 	
-	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-	private static PrimitiveStyleSheet rootStyleSheet = styleSheet.withForeground( Color.black ).withHoverForeground( new Color( 0.0f, 0.5f, 0.5f ) );
-	private static PrimitiveStyleSheet textStyleSheet = styleSheet.withForeground( new Color( 0.0f, 0.5f, 0.0f ) );
+	private static StyleSheet2 styleSheet = StyleSheet2.instance.withAttr( Primitive.editable, false );
+	private static StyleSheet2 rootStyleSheet = styleSheet.withAttr( Primitive.foreground, Color.black ).withAttr( Primitive.hoverForeground, new Color( 0.0f, 0.5f, 0.5f ) );
+	private static StyleSheet2 textStyleSheet = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) ).withAttr( Primitive.hoverForeground, null );
 
 	
-	private DPElement makeFraction(String numeratorText, String denominatorText)
+	private Pres makeFraction(String numeratorText, String denominatorText)
 	{
-		return styleSheet.fraction( textStyleSheet.staticText( numeratorText ), textStyleSheet.staticText( denominatorText ), "/" );
+		return new Fraction( textStyleSheet.applyTo( new StaticText( numeratorText ) ), textStyleSheet.applyTo( new StaticText( denominatorText ) ), "/" );
 	}
 
 	
 	protected DPElement createContents()
 	{
-		ArrayList<DPElement> children = new ArrayList<DPElement>( );
+		ArrayList<Object> children = new ArrayList<Object>( );
 		
-		children.add( rootStyleSheet.mathRoot( textStyleSheet.staticText( "a" ) ) );
-		children.add( rootStyleSheet.mathRoot( textStyleSheet.staticText( "a+p" ) ) );
-		children.add( rootStyleSheet.mathRoot( makeFraction( "a", "p+q" ) ) );
+		children.add( rootStyleSheet.applyTo( new MathRoot( textStyleSheet.applyTo( new StaticText( "a" ) ) ) ) );
+		children.add( rootStyleSheet.applyTo( new MathRoot( textStyleSheet.applyTo( new StaticText( "a+p" ) ) ) ) );
+		children.add( rootStyleSheet.applyTo( new MathRoot( makeFraction( "a", "p+q" ) ) ) );
 		
-		return styleSheet.vbox( children.toArray( new DPElement[0] ) );
+		return new VBox( children ).present();
 	}
 }

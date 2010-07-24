@@ -7,28 +7,17 @@
 package BritefuryJ.DocPresent.Combinators;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 
-public class AddDropDest extends Pres
+public class CustomElementAction extends Pres
 {
-	private ObjectDndHandler.DropDest dest;
 	private Pres child;
+	private CustomAction handler;
 	
 	
-	public AddDropDest(Pres child, ObjectDndHandler.DropDest source)
+	public CustomElementAction(Pres child, CustomAction handler)
 	{
-		this.dest = source;
+		this.handler = handler;
 		this.child = child;
-	}
-	
-	public AddDropDest(Pres child, Class<?> dataType, ObjectDndHandler.CanDropFn canDropFn, ObjectDndHandler.DropFn dropFn)
-	{
-		this( child, new ObjectDndHandler.DropDest( dataType, canDropFn, dropFn ) );
-	}
-	
-	public AddDropDest(Pres child, Class<?> dataType, ObjectDndHandler.DropFn dropFn)
-	{
-		this( child, new ObjectDndHandler.DropDest( dataType, dropFn) );
 	}
 	
 	
@@ -36,7 +25,7 @@ public class AddDropDest extends Pres
 	public DPElement present(PresentationContext ctx)
 	{
 		DPElement element = child.present( ctx );
-		element.addDropDest( dest );
+		handler.apply( element, ctx );
 		return element;
 	}
 }

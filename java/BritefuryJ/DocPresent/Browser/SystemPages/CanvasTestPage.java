@@ -8,10 +8,8 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import BritefuryJ.DocPresent.DPBin;
-import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.Border.SolidBorder;
@@ -19,16 +17,16 @@ import BritefuryJ.DocPresent.Canvas.DrawingNode;
 import BritefuryJ.DocPresent.Canvas.GroupNode;
 import BritefuryJ.DocPresent.Canvas.ShapeNode;
 import BritefuryJ.DocPresent.Canvas.TextNode;
+import BritefuryJ.DocPresent.Combinators.CustomAction;
 import BritefuryJ.DocPresent.Combinators.ElementRef;
-import BritefuryJ.DocPresent.Combinators.ElementRef.RefSet;
 import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Pres.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.Canvas;
 import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.Primitive.Text;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
@@ -143,23 +141,30 @@ public class CanvasTestPage extends SystemPage
 	
 	protected Pres makeDestElement(String title)
 	{
-		final Pres textElement = textStyle.applyTo( new StaticText( title ) );
-		Pres destText = backgroundStyle.applyTo( new Bin( textElement.pad( 10.0, 10.0 ) ) ); 
+		final ElementRef textRef = new ElementRef( textStyle.applyTo( new StaticText( title ) ) );
+		Pres destText = backgroundStyle.applyTo( new Bin( textRef.pad( 10.0, 10.0 ) ) ); 
 		
-		ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
+		CustomAction action = new CustomAction()
 		{
-			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
+			@Override
+			public void apply(DPElement element, PresentationContext ctx)
 			{
-				String text = data.toString();
-				DPBin bin = (DPBin)destElement;
-				DPBorder pad = (DPBorder)bin.getChild();
-				DPText textElement = (DPText)pad.getChild();
-				textElement.setText( text );
-				return true;
+				final DPText textElement = (DPText)textRef.getLastElement();
+				ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
+				{
+					public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
+					{
+						String text = data.toString();
+						textElement.setText( text );
+						return true;
+					}
+				};
+				
+				element.addDropDest( Integer.class, dropFn );
 			}
 		};
 		
-		return destText.addDropDest( Integer.class, dropFn );
+		return destText.customAction( action );
 	}
 
 	
@@ -177,48 +182,46 @@ public class CanvasTestPage extends SystemPage
 	
 	protected Pres makeDestElement2(String title, final ElementRef firstElem)
 	{
-		final Pres textElement = textStyle.applyTo( new StaticText( title ) );
-		Pres destText = backgroundStyle.applyTo( new Bin( textElement.pad( 10.0, 10.0 ) ) ); 
-		final ElementRef.RefSet firstElementSet = firstElem.getRefs();
+		final ElementRef textRef = new ElementRef( textStyle.applyTo( new StaticText( title ) ) );
+		Pres destText = backgroundStyle.applyTo( new Bin( textRef.pad( 10.0, 10.0 ) ) ); 
 		
-		ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
+		CustomAction action = new CustomAction()
 		{
-			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
+			@Override
+			public void apply(DPElement element, PresentationContext ctx)
 			{
-				String text = data.toString();
-				DPBin bin = (DPBin)destElement;
-				DPBorder pad = (DPBorder)bin.getChild();
-				DPText textElement = (DPText)pad.getChild();
-				textElement.setText( text );
-				return true;
+				final DPText textElement = (DPText)textRef.getLastElement();
+				final DPElement firstElement = firstElem.getLastElement();
+
+				ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
+				{
+					public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
+					{
+						String text = data.toString();
+						textElement.setText( text );
+						return true;
+					}
+				};
+				
+				ObjectDndHandler.CanDropFn canDropFn = new ObjectDndHandler.CanDropFn()
+				{
+					public boolean canDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
+					{
+						DPBin box = (DPBin)firstElement;
+						DPBin pad = (DPBin)box.getChild();
+						DPText t = (DPText)pad.getChild();
+						String firstText = t.getText();
+						int firstNum = textAsNumber( firstText );
+						int secondNum = (Integer)data;
+						return secondNum >= firstNum;
+					}
+				};
+				
+				element.addDropDest( Integer.class, canDropFn, dropFn );
 			}
 		};
 		
-		ObjectDndHandler.CanDropFn canDropFn = new ObjectDndHandler.CanDropFn()
-		{
-			public boolean canDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
-			{
-				Iterator<DPElement> iter = firstElementSet.iterator();
-				if ( iter.hasNext() )
-				{
-					DPElement firstElement = iter.next();
-					DPBin box = (DPBin)firstElement;
-					DPBin pad = (DPBin)box.getChild();
-					DPText t = (DPText)pad.getChild();
-					String firstText = t.getText();
-					int firstNum = textAsNumber( firstText );
-					int secondNum = (Integer)data;
-					return secondNum >= firstNum;
-				}
-				else
-				{
-					System.out.println( "No ref" );
-					return false;
-				}
-			}
-		};
-		
-		return destText.addDropDest( Integer.class, canDropFn, dropFn );
+		return destText.customAction( action ); 
 	}
 
 	

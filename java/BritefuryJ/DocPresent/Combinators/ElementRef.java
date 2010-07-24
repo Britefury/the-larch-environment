@@ -6,39 +6,14 @@
 //##************************
 package BritefuryJ.DocPresent.Combinators;
 
-import java.util.Iterator;
-import java.util.WeakHashMap;
+import java.lang.ref.WeakReference;
 
 import BritefuryJ.DocPresent.DPElement;
 
 public class ElementRef extends Pres
 {
-	public static class RefSet implements Iterable<DPElement>
-	{
-		private WeakHashMap<DPElement,Object> elements = new WeakHashMap<DPElement,Object>();
-		
-		private RefSet()
-		{
-		}
-		
-		
-		private void add(DPElement element)
-		{
-			elements.put( element, null );
-		}
-		
-		
-		@Override
-		public Iterator<DPElement> iterator()
-		{
-			return elements.keySet().iterator();
-		}
-		
-	}
-	
-	
 	private Pres child;
-	private RefSet refs = new RefSet();
+	private WeakReference<DPElement> lastElement = null;
 	
 	
 	public ElementRef(Pres child)
@@ -47,9 +22,16 @@ public class ElementRef extends Pres
 	}
 	
 	
-	public RefSet getRefs()
+	public DPElement getLastElement()
 	{
-		return refs;
+		if ( lastElement != null )
+		{
+			return lastElement.get();
+		}
+		else
+		{
+			return null;
+		}
 	}
 	
 	
@@ -57,7 +39,7 @@ public class ElementRef extends Pres
 	public DPElement present(PresentationContext ctx)
 	{
 		DPElement element = child.present( ctx );
-		refs.add( element );
+		lastElement = new WeakReference<DPElement>( element );
 		return element;
 	}
 }

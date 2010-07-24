@@ -10,16 +10,21 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.ElementFactory;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Fraction;
+import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.Span;
+import BritefuryJ.DocPresent.Combinators.Primitive.Text;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
 public class FractionTestPage extends SystemPage
 {
-	private static final PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-	private static final PrimitiveStyleSheet fractionStyle = styleSheet.withForeground( Color.black ).withHoverForeground( new Color( 0.0f, 0.5f, 0.5f ) );
-	private static final PrimitiveStyleSheet smallStyle = styleSheet.withFontSize( 10 ).withForeground( new Color( 0.0f, 0.5f, 0.0f) );
-	private static final PrimitiveStyleSheet largeStyle = styleSheet.withFontSize( 24 ).withForeground( new Color( 0.0f, 0.5f, 0.0f) );
+	private static final StyleSheet2 styleSheet = StyleSheet2.instance;
+	private static final StyleSheet2 fractionStyle = styleSheet.withAttr( Primitive.foreground, Color.black ).withAttr( Primitive.hoverForeground, new Color( 0.0f, 0.5f, 0.5f ) );
+	private static final StyleSheet2 smallStyle = styleSheet.withAttr( Primitive.fontSize, 10 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f) );
+	private static final StyleSheet2 largeStyle = styleSheet.withAttr( Primitive.fontSize, 24 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f) );
 	
 	
 	protected FractionTestPage()
@@ -39,76 +44,43 @@ public class FractionTestPage extends SystemPage
 	}
 	
 	
-	private ElementFactory textFactory(final String text)
+	private Pres fractionOf(Pres num, Pres denom, String barContent)
 	{
-		return new ElementFactory()
-		{
-			@Override
-			public DPElement createElement(StyleSheet styleSheet)
-			{
-				return ((PrimitiveStyleSheet)styleSheet).text( text );
-			}
-		};
-	}
-	
-	private ElementFactory fractionFactory(final ElementFactory num, final ElementFactory denom, final String barContent)
-	{
-		return new ElementFactory()
-		{
-			@Override
-			public DPElement createElement(StyleSheet styleSheet)
-			{
-				PrimitiveStyleSheet numStyle = ((PrimitiveStyleSheet)styleSheet).fractionNumeratorStyle();
-				PrimitiveStyleSheet denomStyle = ((PrimitiveStyleSheet)styleSheet).fractionDenominatorStyle();
-				return ((PrimitiveStyleSheet)styleSheet).fraction( num.createElement( numStyle ), denom.createElement( denomStyle ) , barContent );
-			}
-		};
+		return fractionStyle.applyTo( new Fraction( num, denom, barContent ) );
 	}
 
-	private ElementFactory spanFactory(final ElementFactory... children)
+	private Pres spanOf(Pres... children)
 	{
-		return new ElementFactory()
-		{
-			@Override
-			public DPElement createElement(StyleSheet styleSheet)
-			{
-				DPElement childElems[] = new DPElement[children.length];
-				for (int i = 0; i < children.length; i++)
-				{
-					childElems[i] = children[i].createElement( styleSheet );
-				}
-				return ((PrimitiveStyleSheet)styleSheet).span( childElems );
-			}
-		};
+		return new Span( children );
 	}
 
 
-	private DPElement makeFractionLine(ElementFactory num, ElementFactory denom)
+	private Pres makeFractionLine(Pres num, Pres denom)
 	{
-		ElementFactory fractionFac = fractionFactory( num, denom, "/" );
-		return styleSheet.hbox( new DPElement[] { smallStyle.text( "<<Left<<" ), fractionFac.createElement( fractionStyle ), largeStyle.text( ">>Right>>" ) } );
+		Pres fractionFac = fractionOf( num, denom, "/" );
+		return styleSheet.applyTo( new HBox( new Pres[] { smallStyle.applyTo( new Text( "<<Left<<" ) ), fractionFac, largeStyle.applyTo( new Text( ">>Right>>" ) ) } ) );
 	}
 	
 	protected DPElement createContents()
 	{
-		ArrayList<DPElement> lines = new ArrayList<DPElement>();
+		ArrayList<Object> lines = new ArrayList<Object>();
 		
-		lines.add( makeFractionLine( textFactory( "a" ), textFactory( "p" ) ) );
-		lines.add( makeFractionLine( textFactory( "a" ), textFactory( "p+q" ) ) );
-		lines.add( makeFractionLine( textFactory( "a+b" ), textFactory( "p" ) ) );
-		lines.add( makeFractionLine( textFactory( "a+b" ), textFactory( "p+q" ) ) );
+		lines.add( makeFractionLine( new Text( "a" ), new Text( "p" ) ) );
+		lines.add( makeFractionLine( new Text( "a" ), new Text( "p+q" ) ) );
+		lines.add( makeFractionLine( new Text( "a+b" ), new Text( "p" ) ) );
+		lines.add( makeFractionLine( new Text( "a+b" ), new Text( "p+q" ) ) );
 
-		lines.add( styleSheet.withFontSize( 24 ).text( "---" ) );
+		lines.add( styleSheet.withAttr( Primitive.fontSize, 24 ).applyTo( new Text( "---" ) ) );
 		
-		lines.add( makeFractionLine( spanFactory( textFactory( "a+" ), fractionFactory( textFactory( "x" ), textFactory( "y" ), "/" ) ),
-				textFactory( "p+q" ) ) );
-		lines.add( makeFractionLine( spanFactory( fractionFactory( textFactory( "x" ), textFactory( "y" ), "/" ),  textFactory( "+b" ) ),
-				textFactory( "p+q" ) ) );
-		lines.add( makeFractionLine( textFactory( "a+b" ),
-				spanFactory( textFactory( "p+" ), fractionFactory( textFactory( "x" ), textFactory( "y" ), "/" ) ) ) );
-		lines.add( makeFractionLine( textFactory( "a+b" ),
-				spanFactory( fractionFactory( textFactory( "x" ), textFactory( "y" ), "/" ),  textFactory( "+q" ) ) ) );
+		lines.add( makeFractionLine( spanOf( new Text( "a+" ), fractionOf( new Text( "x" ), new Text( "y" ), "/" ) ),
+				new Text( "p+q" ) ) );
+		lines.add( makeFractionLine( spanOf( fractionOf( new Text( "x" ), new Text( "y" ), "/" ),  new Text( "+b" ) ),
+				new Text( "p+q" ) ) );
+		lines.add( makeFractionLine( new Text( "a+b" ),
+				spanOf( new Text( "p+" ), fractionOf( new Text( "x" ), new Text( "y" ), "/" ) ) ) );
+		lines.add( makeFractionLine( new Text( "a+b" ),
+				spanOf( fractionOf( new Text( "x" ), new Text( "y" ), "/" ),  new Text( "+q" ) ) ) );
 		
-		return styleSheet.withVBoxSpacing( 10.0 ).vbox( lines.toArray( new DPElement[0] ) );
+		return styleSheet.withAttr( Primitive.vboxSpacing, 10.0 ).applyTo( new VBox( lines ) ).present();
 	}
 }

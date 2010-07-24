@@ -11,27 +11,39 @@ import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPProxy;
-import BritefuryJ.DocPresent.ElementFactory;
 import BritefuryJ.DocPresent.Border.SolidBorder;
+import BritefuryJ.DocPresent.Combinators.CustomAction;
+import BritefuryJ.DocPresent.Combinators.ElementRef;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Pres.PresentationContext;
+import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
+import BritefuryJ.DocPresent.Combinators.Primitive.Border;
+import BritefuryJ.DocPresent.Combinators.Primitive.Fraction;
+import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.Proxy;
+import BritefuryJ.DocPresent.Combinators.Primitive.Script;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Painter.FillPainter;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.Math.Point2;
 
 public class DndTestPage extends SystemPage
 {
-	private static PrimitiveStyleSheet mainStyle = PrimitiveStyleSheet.instance;
-	private static PrimitiveStyleSheet mathStyle = PrimitiveStyleSheet.instance.withFontSize( 16 ).withNonEditable();
-	private static PrimitiveStyleSheet paletteTitleStyle = mainStyle.withFontFace( "Serif" ).withFontBold( true ).withFontSize( 28 );
-	private static PrimitiveStyleSheet paletteSectionStyle = mainStyle.withFontFace( "Serif" ).withFontSize( 18 );
-	private static PrimitiveStyleSheet outlineStyle = mainStyle.withBorder( new SolidBorder( 2.0, 10.0, new Color( 0.6f, 0.7f, 0.8f ), null ) );
+	private static StyleSheet2 mainStyle = StyleSheet2.instance;
+	private static StyleSheet2 mathStyle = StyleSheet2.instance.withAttr( Primitive.fontSize, 16 ).withAttr( Primitive.editable, false );
+	private static StyleSheet2 paletteTitleStyle = mainStyle.withAttr( Primitive.fontFace, "Serif" ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 28 );
+	private static StyleSheet2 paletteSectionStyle = mainStyle.withAttr( Primitive.fontFace, "Serif" ).withAttr( Primitive.fontSize, 18 );
+	private static StyleSheet2 outlineStyle = mainStyle.withAttr( Primitive.border, new SolidBorder( 2.0, 10.0, new Color( 0.6f, 0.7f, 0.8f ), null ) );
 	
-	private static PrimitiveStyleSheet placeHolderStyle = mainStyle.withBackground( new FillPainter( new Color( 1.0f, 0.9f, 0.75f  ) ) );
-	private static PrimitiveStyleSheet sourceStyle = mainStyle.withBackground( new FillPainter( new Color( 0.75f, 0.85f, 1.0f ) ) );
-	
+	private static StyleSheet2 placeHolderStyle = mainStyle.withAttr( Primitive.background, new FillPainter( new Color( 1.0f, 0.9f, 0.75f  ) ) );
+	private static StyleSheet2 sourceStyle = mainStyle.withAttr( Primitive.background, new FillPainter( new Color( 0.75f, 0.85f, 1.0f ) ) );
+
 	
 	protected DndTestPage()
 	{
@@ -50,126 +62,114 @@ public class DndTestPage extends SystemPage
 	}
 	
 	
-	protected DPElement makeSource(DPElement contents, final ElementFactory factory)
+	protected Pres makeSource(Pres contents, final Pres factory)
 	{
-		DPElement source = sourceStyle.bin( contents.pad( 4.0, 2.0 ) );
+		Pres source = sourceStyle.applyTo( new Bin( contents.pad( 4.0, 2.0 ) ) );
 		
-		ObjectDndHandler.SourceDataFn sourceDataFn = new ObjectDndHandler.SourceDataFn()
+		CustomAction action = new CustomAction()
 		{
-			public Object createSourceData(PointerInputElement sourceElement, int aspect)
+			@Override
+			public void apply(DPElement element, PresentationContext ctx)
 			{
-				return factory;
+				ObjectDndHandler.SourceDataFn sourceDataFn = new ObjectDndHandler.SourceDataFn()
+				{
+					public Object createSourceData(PointerInputElement sourceElement, int aspect)
+					{
+						return factory;
+					}
+				};
+				
+				element.addDragSource( Pres.class, DndHandler.ASPECT_NORMAL, sourceDataFn );
 			}
 		};
 		
-		source.addDragSource( ElementFactory.class, DndHandler.ASPECT_NORMAL, sourceDataFn );
-
-		return source;
+		return source.customAction( action );
 	}
 
-	protected DPElement makeTextSource(final String text)
+	protected Pres makeTextSource(final String text)
 	{
-		final ElementFactory factory = new ElementFactory()
+		Pres factory = new StaticText( text );
+		return makeSource( mathStyle.applyTo( new StaticText( text ) ), factory );
+	}
+	
+	
+	protected Pres makePlaceHolder()
+	{
+		Pres placeHolder = placeHolderStyle.applyTo( new Proxy( new Bin( new StaticText( " " ).pad( 8.0, 8.0 ) ) ) );
+		final ElementRef ref = new ElementRef( placeHolder );
+		
+		CustomAction action = new CustomAction()
 		{
-			public DPElement createElement(StyleSheet styleSheet)
+			@Override
+			public void apply(final DPElement element, final PresentationContext ctx)
 			{
-				PrimitiveStyleSheet ps = (PrimitiveStyleSheet)styleSheet;
-				return ps.staticText( text );
+				ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
+				{
+					public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
+					{
+						Pres factory = (Pres)data;
+						DPProxy placeHolder = (DPProxy)element;
+						placeHolder.setChild( factory.present( ctx ) );
+						return true;
+					}
+				};
+
+				element.addDropDest( Pres.class, dropFn );
 			}
 		};
+		
+		return ref.customAction( action );
+	}
+	
+	
+	protected Pres makeFractionSource()
+	{
+		Pres factory = new Fraction( makePlaceHolder(), makePlaceHolder(), "/" );
 
-		return makeSource( mathStyle.staticText( text ), factory );
+		return makeSource( mathStyle.applyTo( new Fraction( new StaticText( "a" ), new StaticText( "b" ), "/" ) ), factory );
 	}
 	
-	
-	protected DPElement makePlaceHolder(final PrimitiveStyleSheet contentStyle)
+	protected Pres makeScriptSource()
 	{
-		final DPProxy placeHolder = contentStyle.proxy( placeHolderStyle.bin( contentStyle.staticText( " " ).pad( 8.0, 8.0 ) ) );
-		
-		ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
-		{
-			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
-			{
-				ElementFactory factory = (ElementFactory)data;
-				placeHolder.setChild( factory.createElement( contentStyle ) );
-				return true;
-			}
-		};
-		
-		placeHolder.addDropDest( ElementFactory.class, dropFn );
-		
-		return placeHolder;
-	}
-	
-	
-	protected DPElement makeFractionSource()
-	{
-		final ElementFactory factory = new ElementFactory()
-		{
-			public DPElement createElement(StyleSheet styleSheet)
-			{
-				PrimitiveStyleSheet ps = (PrimitiveStyleSheet)styleSheet;
-				PrimitiveStyleSheet numStyle = ps.fractionNumeratorStyle();
-				PrimitiveStyleSheet denomStyle = ps.fractionDenominatorStyle();
-				return ps.fraction( makePlaceHolder( numStyle ), makePlaceHolder( denomStyle ), "/" );
-			}
-		};
+		Pres factory = new Script( makePlaceHolder(), makePlaceHolder(), makePlaceHolder(), makePlaceHolder(), makePlaceHolder() );
 
-		PrimitiveStyleSheet numStyle = mathStyle.fractionNumeratorStyle();
-		PrimitiveStyleSheet denomStyle = mathStyle.fractionDenominatorStyle();
-		return makeSource( mathStyle.fraction( numStyle.staticText( "a" ), denomStyle.staticText( "b" ), "/" ), factory );
-	}
-	
-	protected DPElement makeScriptSource()
-	{
-		final ElementFactory factory = new ElementFactory()
-		{
-			public DPElement createElement(StyleSheet styleSheet)
-			{
-				PrimitiveStyleSheet ps = (PrimitiveStyleSheet)styleSheet;
-				PrimitiveStyleSheet scriptStyle = ps.scriptScriptChildStyle();
-				return ps.script( makePlaceHolder( ps ), makePlaceHolder( scriptStyle ), makePlaceHolder( scriptStyle ), makePlaceHolder( scriptStyle ), makePlaceHolder( scriptStyle ) );
-			}
-		};
-
-		PrimitiveStyleSheet scriptStyle = mathStyle.scriptScriptChildStyle();
-		return makeSource( mathStyle.script( mathStyle.staticText( "a" ), scriptStyle.staticText( "b" ), scriptStyle.staticText( "c" ), scriptStyle.staticText( "d" ), scriptStyle.staticText( "e" ) ), factory );
+		return makeSource( mathStyle.applyTo( new Script( new StaticText( "a" ), new StaticText( "b" ), new StaticText( "c" ), new StaticText( "d" ), new StaticText( "e" ) ) ), factory );
 	}
 	
 	
-	protected DPElement makePalette()
+	protected Pres makePalette()
 	{
-		DPElement title = paletteTitleStyle.staticText( "Palette" ).alignHCentre();
+		Pres title = paletteTitleStyle.applyTo( new StaticText( "Palette" ) ).alignHCentre();
 		
-		DPElement textsTitle = paletteSectionStyle.staticText( "Text:" );
-		ArrayList<DPElement> textElements = new ArrayList<DPElement>();
+		Pres textsTitle = paletteSectionStyle.applyTo( new StaticText( "Text:" ) );
+		ArrayList<Object> textElements = new ArrayList<Object>();
 		textElements.add( textsTitle.padX( 0.0, 20.0 ) );
 		String texts = "abcdefghijklmnopqrstuvwxyz";
 		for (int i = 0; i < texts.length(); i++)
 		{
 			textElements.add( makeTextSource( texts.substring( i, i+1 ) ) );
 		}
-		DPElement textSection = mainStyle.withHBoxSpacing( 3.0 ).hbox( textElements.toArray( new DPElement[0] ) );
+		Pres textSection = mainStyle.withAttr( Primitive.hboxSpacing, 3.0 ).applyTo( new HBox( textElements ) );
 		
-		DPElement mathTitle = paletteSectionStyle.staticText( "Math:" );
-		ArrayList<DPElement> mathElements = new ArrayList<DPElement>();
+		Pres mathTitle = paletteSectionStyle.applyTo( new StaticText( "Math:" ) );
+		ArrayList<Object> mathElements = new ArrayList<Object>();
 		mathElements.add( mathTitle.padX( 0.0, 20.0 ) );
 		mathElements.add( makeFractionSource() );
 		mathElements.add( makeScriptSource() );
-		DPElement mathSection = mainStyle.withHBoxSpacing( 3.0 ).hbox( mathElements.toArray( new DPElement[0] ) );
+		Pres mathSection = mainStyle.withAttr( Primitive.hboxSpacing, 3.0 ).applyTo( new HBox( mathElements ) );
 		
-		DPElement vbox = mainStyle.withVBoxSpacing( 10.0 ).vbox( new DPElement[] { title, textSection, mathSection } );
+		Pres vbox = mainStyle.withAttr( Primitive.vboxSpacing, 10.0 ).applyTo( new VBox( new Pres[] { title, textSection, mathSection } ) );
 		
-		return outlineStyle.border( vbox.alignHExpand() ).alignHExpand().pad( 20.0, 5.0 ).alignHExpand();
+		return outlineStyle.applyTo( new Border( vbox.alignHExpand() ) ).alignHExpand().pad( 20.0, 5.0 ).alignHExpand();
 	}
 	
-	protected DPElement makeFormula()
+	protected Pres makeFormula()
 	{
-		DPElement title = paletteTitleStyle.staticText( "Formula" ).alignHCentre();
-		DPElement formula = makePlaceHolder( mathStyle );
-		DPElement formulaPara = mainStyle.paragraph( new DPElement[] { formula } );
+		Pres title = paletteTitleStyle.applyTo( new StaticText( "Formula" ) ).alignHCentre();
+		Pres formula = mathStyle.applyTo( makePlaceHolder() );
+		Pres formulaPara = mainStyle.applyTo( new Paragraph( new Pres[] { formula } ) );
 		
-		DPElement vbox = mainStyle.withVBoxSpacing( 10.0 ).vbox( new DPElement[] { title, formulaPara } ).alignHExpand();
+		Pres vbox = mainStyle.withAttr( Primitive.vboxSpacing, 10.0 ).applyTo( new VBox( new Pres[] { title, formulaPara } ) ).alignHExpand();
 		
 		return vbox.pad( 20.0, 5.0 );
 	}
@@ -178,9 +178,9 @@ public class DndTestPage extends SystemPage
 	
 	protected DPElement createContents()
 	{
-		DPElement palette = makePalette();
-		DPElement formula = makeFormula();
+		Pres palette = makePalette();
+		Pres formula = makeFormula();
 		
-		return mainStyle.withVBoxSpacing( 20.0 ).vbox( new DPElement[] { palette.alignHExpand(), formula.alignHExpand() } ).alignHExpand();
+		return mainStyle.withAttr( Primitive.vboxSpacing, 20.0 ).applyTo( new VBox( new Pres[] { palette.alignHExpand(), formula.alignHExpand() } ) ).alignHExpand().present();
 	}
 }

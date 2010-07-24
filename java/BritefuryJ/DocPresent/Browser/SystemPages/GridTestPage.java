@@ -10,10 +10,17 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPGridRow;
-import BritefuryJ.DocPresent.DPRGrid;
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Border;
+import BritefuryJ.DocPresent.Combinators.Primitive.GridRow;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.RGrid;
+import BritefuryJ.DocPresent.Combinators.Primitive.Span;
+import BritefuryJ.DocPresent.Combinators.Primitive.Text;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.RichText.NormalText;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
 public class GridTestPage extends SystemPage
 {
@@ -33,132 +40,132 @@ public class GridTestPage extends SystemPage
 		return "The grid element arranges is children in a grid.";
 	}
 
-	private static final PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-	private static PrimitiveStyleSheet t12 = styleSheet.withFontSize( 12 );
-	private static PrimitiveStyleSheet sectionStyle = styleSheet.withVBoxSpacing( 5.0 ).withBorder( new SolidBorder( 2.0, 3.0, new Color( 0.0f, 0.3f, 0.7f ), new Color( 0.95f, 0.975f, 1.0f  ) ) );
-	private static PrimitiveStyleSheet outlineStyle = styleSheet.withBorder( new SolidBorder( 1.0, 0.0, new Color( 0.5f, 0.5f, 0.5f ), new Color( 0.9f, 0.9f, 0.9f ) ) );
-	private static PrimitiveStyleSheet tableStyle = styleSheet.withTableColumnSpacing( 5.0 ).withTableRowSpacing( 5.0 );
+	private static final StyleSheet2 styleSheet = StyleSheet2.instance;
+	private static StyleSheet2 t12 = styleSheet.withAttr( Primitive.fontSize, 12 );
+	private static StyleSheet2 sectionStyle = styleSheet.withAttr( Primitive.vboxSpacing, 5.0 ).withAttr( Primitive.border, new SolidBorder( 2.0, 3.0, new Color( 0.0f, 0.3f, 0.7f ), new Color( 0.95f, 0.975f, 1.0f  ) ) );
+	private static StyleSheet2 outlineStyle = styleSheet.withAttr( Primitive.border, new SolidBorder( 1.0, 0.0, new Color( 0.5f, 0.5f, 0.5f ), new Color( 0.9f, 0.9f, 0.9f ) ) );
+	private static StyleSheet2 tableStyle = styleSheet.withAttr( Primitive.tableColumnSpacing, 5.0 ).withAttr( Primitive.tableRowSpacing, 5.0 );
 
-	private DPElement section(String description, DPElement w)
+	private Pres section(String description, Pres w)
 	{
-		return sectionStyle.vbox( new DPElement[] { createTextParagraph( description ), sectionStyle.border( w ) } );
+		return sectionStyle.applyTo( new VBox( new Pres[] { new NormalText( description ), sectionStyle.applyTo( new Border( w ) ) } ) );
 	}
 	
 	
-	private DPElement span(int row, int startCol, int endCol)
+	private Pres span(int row, int startCol, int endCol)
 	{
-		ArrayList<DPElement> children = new ArrayList<DPElement>();
+		ArrayList<Object> children = new ArrayList<Object>();
 		for (int col = startCol; col < endCol; col++)
 		{
-			children.add( outlineStyle.border( t12.text( "<" + col + "_" + row + ">" ) ) );
+			children.add( outlineStyle.applyTo( new Border( t12.applyTo( new Text( "<" + col + "_" + row + ">" ) ) ) ) );
 		}
-		return styleSheet.span( children.toArray( new DPElement[0] ) );
+		return styleSheet.applyTo( new Span( children ) );
 	}
 	
 
-	private DPGridRow makeGridRow(int row)
+	private GridRow makeGridRow(int row, int length)
 	{
-		ArrayList<DPElement> children = new ArrayList<DPElement>();
-		for (int col = 0; col < 6; col++)
+		ArrayList<Object> children = new ArrayList<Object>();
+		for (int col = 0; col < length; col++)
 		{
-			children.add( outlineStyle.border( t12.text( "<" + col + "_" + row + ">" ) ) );
+			children.add( outlineStyle.applyTo( new Border( t12.applyTo( new Text( "<" + col + "_" + row + ">" ) ) ) ) );
 		}
-		return styleSheet.gridRow( children.toArray( new DPElement[0] ) );
+		return new GridRow( children );
 	}
 	
-	private DPGridRow makeGridRowCollated(int row)
+	private GridRow makeGridRowCollated(int row)
 	{
-		ArrayList<DPElement> children = new ArrayList<DPElement>();
+		ArrayList<Object> children = new ArrayList<Object>();
 		for (int col = 0; col < 2; col++)
 		{
-			children.add( outlineStyle.border( t12.text( "<" + col + "_" + row + ">" ) ) );
+			children.add( outlineStyle.applyTo( new Border( t12.applyTo( new Text( "<" + col + "_" + row + ">" ) ) ) ) );
 		}
 		children.add( span( row, 2, 5 ) );
-		children.add( outlineStyle.border( t12.text( "<" + 5 + "_" + row + ">" ) ) );
-		return styleSheet.gridRow( children.toArray( new DPElement[0] ) );
+		children.add( outlineStyle.applyTo( new Border( t12.applyTo( new Text( "<" + 5 + "_" + row + ">" ) ) ) ) );
+		return new GridRow( children );
 	}
 	
-	private DPRGrid makeGrid()
+	private Pres makeGrid()
 	{
-		ArrayList<DPElement> children = new ArrayList<DPElement>();
+		ArrayList<Object> children = new ArrayList<Object>();
 		for (int row = 0; row < 6; row++)
 		{
-			children.add( makeGridRow( row ) );
+			children.add( makeGridRow( row, 6 ) );
 		}
-		return tableStyle.rgrid( children.toArray( new DPElement[0] ) );
+		return tableStyle.applyTo( new RGrid( children ) );
 	}
 	
-	private DPRGrid makeGridwithShortenedRow()
+	private Pres makeGridwithShortenedRow()
 	{
-		DPRGrid grid = makeGrid();
-		DPGridRow row2 = (DPGridRow)grid.get( 2 );
-		row2.remove( row2.get( 5 ) );
-		row2.remove( row2.get( 4 ) );
-		row2.remove( row2.get( 3 ) );
-		return grid;
+		ArrayList<Object> children = new ArrayList<Object>();
+		for (int row = 0; row < 6; row++)
+		{
+			children.add( makeGridRow( row, row == 2  ?  3  :  6 ) );
+		}
+		return tableStyle.applyTo( new RGrid( children ) );
 	}
 	
-	private DPRGrid makeGridWithCollatedRows()
+	private Pres makeGridWithCollatedRows()
 	{
-		ArrayList<DPElement> children = new ArrayList<DPElement>();
+		ArrayList<Object> children = new ArrayList<Object>();
 		for (int row = 0; row < 6; row++)
 		{
 			children.add( makeGridRowCollated( row ) );
 		}
-		return tableStyle.rgrid( children.toArray( new DPElement[0] ) );
+		return tableStyle.applyTo( new RGrid( children ) );
 	}
 	
-	private DPRGrid makeCollatedGridWithCollatedRows()
+	private Pres makeCollatedGridWithCollatedRows()
 	{
-		ArrayList<DPElement> rows = new ArrayList<DPElement>();
+		ArrayList<Object> rows = new ArrayList<Object>();
 		for (int row = 0; row < 2; row++)
 		{
 			rows.add( makeGridRowCollated( row ) );
 		}
 
-		ArrayList<DPElement> columns = new ArrayList<DPElement>();
+		ArrayList<Object> columns = new ArrayList<Object>();
 		for (int row = 2; row < 5; row++)
 		{
 			columns.add( makeGridRowCollated( row ) );
 		}
-		rows.add( styleSheet.span( columns.toArray( new DPElement[0] ) ) );
+		rows.add( new Span( columns ) );
 		rows.add( makeGridRowCollated( 5 ) );
-		return tableStyle.rgrid( rows.toArray( new DPElement[0] ) );
+		return tableStyle.applyTo( new RGrid( rows ) );
 	}
 	
-	private DPRGrid makeCollatedGridWithCollatedRowsAndNonRows()
+	private Pres makeCollatedGridWithCollatedRowsAndNonRows()
 	{
-		ArrayList<DPElement> rows = new ArrayList<DPElement>();
+		ArrayList<Object> rows = new ArrayList<Object>();
 		for (int row = 0; row < 2; row++)
 		{
 			rows.add( makeGridRowCollated( row ) );
 		}
 		
-		ArrayList<DPElement> columns = new ArrayList<DPElement>();
+		ArrayList<Object> columns = new ArrayList<Object>();
 		for (int row = 2; row < 5; row++)
 		{
 			columns.add( makeGridRowCollated( row ) );
 		}
-		columns.add( outlineStyle.border( t12.text( "Non-row in a span" ) ) );
+		columns.add( outlineStyle.applyTo( new Border( t12.applyTo( new Text( "Non-row in a span" ) ) ) ) );
 		
-		rows.add( styleSheet.span( columns.toArray( new DPElement[0] ) ) );
+		rows.add( new Span( columns ) );
 		rows.add( makeGridRowCollated( 5 ) );
-		rows.add( outlineStyle.border( t12.text( "Non-row in the grid" ) ) );
-		return tableStyle.rgrid( rows.toArray( new DPElement[0] ) );
+		rows.add( outlineStyle.applyTo( new Border( t12.applyTo( new Text( "Non-row in the grid" ) ) ) ) );
+		return tableStyle.applyTo( new RGrid( rows ) );
 	}
 	
 	
 	
 	protected DPElement createContents()
 	{
-		ArrayList<DPElement> children = new ArrayList<DPElement>();
-		children.add( section( "Grid row", makeGridRow( 0 ) ) );
+		ArrayList<Object> children = new ArrayList<Object>();
+		children.add( section( "Grid row", makeGridRow( 0, 6 ) ) );
 		children.add( section( "Grid", makeGrid() ) );
 		children.add( section( "Grid with shortened row", makeGridwithShortenedRow() ) );
 		children.add( section( "Grid with collated rows", makeGridWithCollatedRows() ) );
 		children.add( section( "Collated grid with collated rows", makeCollatedGridWithCollatedRows() ) );
 		children.add( section( "Collated grid with collated rows and non-rows", makeCollatedGridWithCollatedRowsAndNonRows() ) );
 		
-		return styleSheet.withVBoxSpacing( 20.0 ).vbox( children.toArray( new DPElement[0] ) );
+		return styleSheet.withAttr( Primitive.vboxSpacing, 20.0 ).applyTo( new VBox( children ) ).present();
 	}
 }

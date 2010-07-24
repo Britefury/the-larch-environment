@@ -13,18 +13,27 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPProxy;
+import BritefuryJ.DocPresent.Combinators.CustomAction;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Pres.PresentationContext;
+import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
+import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.Proxy;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Painter.FillPainter;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.Math.Point2;
 
 public class NonLocalDndTestPage extends SystemPage
 {
-	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-	private static PrimitiveStyleSheet textStyle = styleSheet.withFontSize( 18 );
+	private static StyleSheet2 styleSheet = StyleSheet2.instance;
+	private static StyleSheet2 textStyle = styleSheet.withAttr( Primitive.fontSize, 18 );
 	
-	private static PrimitiveStyleSheet placeHolderStyle = styleSheet.withBackground( new FillPainter( new Color( 1.0f, 0.9f, 0.75f  ) ) );
+	private static StyleSheet2 placeHolderStyle = styleSheet.withAttr( Primitive.background, new FillPainter( new Color( 1.0f, 0.9f, 0.75f  ) ) );
 	
 	
 	protected NonLocalDndTestPage()
@@ -44,44 +53,55 @@ public class NonLocalDndTestPage extends SystemPage
 	}
 	
 	
-	protected DPProxy makeDest()
+	protected Pres makeDest()
 	{
-		return styleSheet.proxy( placeHolderStyle.bin( styleSheet.staticText( " " ).pad( 8.0, 8.0 ) ) );
+		return new Proxy( placeHolderStyle.applyTo( new Bin( new StaticText( " " ).pad( 8.0, 8.0 ) ) ) );
 	}
 	
 	
-	protected DPElement makeReceiver(DPElement dest, String title)
+	protected Pres makeReceiver(Pres dest, String title)
 	{
-		DPElement titleElement = textStyle.staticText( title );
+		Pres titleElem = textStyle.applyTo( new StaticText( title ) );
 		
-		return styleSheet.withHBoxSpacing( 20.0 ).hbox( new DPElement[] { titleElement, dest } );
+		return styleSheet.withAttr( Primitive.hboxSpacing, 20.0 ).applyTo( new HBox( new Pres[] { titleElem, dest } ) );
 	}
 	
-	protected DPElement makeFileReceiver()
+	protected Pres makeFileReceiver()
 	{
-		final DPProxy dest = makeDest(); 
+		Pres dest = makeDest(); 
 
-		ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
+		
+		CustomAction action = new CustomAction()
 		{
-			@SuppressWarnings("unchecked")
-			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
+			@Override
+			public void apply(final DPElement element, final PresentationContext ctx)
 			{
-				List<Object> fileList = (List<Object>)data;
-				
-				ArrayList<DPElement> elements = new ArrayList<DPElement>();
-				for (Object x: fileList)
+				ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
 				{
-					elements.add( styleSheet.staticText( x.toString() ) );
-				}
-				DPElement e = styleSheet.vbox( elements.toArray( new DPElement[0] ) );
+					@SuppressWarnings("unchecked")
+					public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
+					{
+						List<Object> fileList = (List<Object>)data;
+						
+						ArrayList<Object> elements = new ArrayList<Object>();
+						for (Object x: fileList)
+						{
+							elements.add( new StaticText( x.toString() ) );
+						}
+						DPElement e = new VBox( elements ).present( ctx );
+						
+						((DPProxy)element).setChild( e );
+						
+						return true;
+					}
+				};
 				
-				dest.setChild( e );
-				
-				return true;
+				element.addNonLocalDropDest( DataFlavor.javaFileListFlavor, dropFn );
 			}
 		};
 		
-		dest.addNonLocalDropDest( DataFlavor.javaFileListFlavor, dropFn );
+		
+		dest = dest.customAction( action );
 
 			
 		return makeReceiver( dest, "File:" );
@@ -92,8 +112,8 @@ public class NonLocalDndTestPage extends SystemPage
 	
 	protected DPElement createContents()
 	{
-		DPElement fileReceiver = makeFileReceiver();
+		Pres fileReceiver = makeFileReceiver();
 		
-		return styleSheet.withVBoxSpacing( 20.0 ).vbox( new DPElement[] { fileReceiver.alignHExpand() } ).alignHExpand();
+		return fileReceiver.alignHExpand().present();
 	}
 }
