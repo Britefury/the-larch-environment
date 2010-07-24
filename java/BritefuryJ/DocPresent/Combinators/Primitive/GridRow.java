@@ -10,23 +10,20 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPGridRow;
-import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.SequentialPres;
 
-public class GridRow extends Pres
+public class GridRow extends SequentialPres
 {
-	private Pres children[];
-	
-	
 	public GridRow(Object children[])
 	{
-		this.children = mapCoerce( children );
+		super( children );
 	}
 	
 	public GridRow(List<Object> children)
 	{
-		this.children = mapCoerce( children );
+		super( children );
 	}
-
+	
 	
 	@Override
 	public DPElement present(PresentationContext ctx)

@@ -425,4 +425,11 @@ public class Primitive
 	{
 		return style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor ).useAttr( vboxSpacing );
 	}
+	
+	
+	
+	public static boolean isEditable(StyleSheetValues style)
+	{
+		return style.get( editable, Boolean.class );
+	}
 }

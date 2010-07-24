@@ -10,35 +10,34 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPVBox;
-import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.SequentialPres;
 
-public class VBox extends Pres
+public class VBox extends SequentialPres
 {
-	private Pres children[];
 	private int refPointIndex;
 	
 	
 	public VBox(Object children[])
 	{
-		this.children = mapCoerce( children );
+		super( children );
 		this.refPointIndex = -1;
 	}
 	
 	public VBox(Object children[], int refPointIndex)
 	{
-		this.children = mapCoerce( children );
+		super( children );
 		this.refPointIndex = refPointIndex;
 	}
 	
 	public VBox(List<Object> children)
 	{
-		this.children = mapCoerce( children );
+		super( children );
 		this.refPointIndex = -1;
 	}
 
 	public VBox(List<Object> children, int refPointIndex)
 	{
-		this.children = mapCoerce( children );
+		super( children );
 		this.refPointIndex = refPointIndex;
 	}
 

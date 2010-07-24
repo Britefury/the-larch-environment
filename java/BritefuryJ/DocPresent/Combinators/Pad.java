@@ -110,5 +110,4 @@ public class Pad extends Pres
 		element.copyAlignmentFlagsFrom( childElem );
 		return element;
 	}
-
 }

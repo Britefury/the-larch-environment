@@ -10,23 +10,20 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPLineBreakCostSpan;
-import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.SequentialPres;
 
-public class LineBreakCostSpan extends Pres
+public class LineBreakCostSpan extends SequentialPres
 {
-	private Pres children[];
-	
-	
 	public LineBreakCostSpan(Object children[])
 	{
-		this.children = mapCoerce( children );
+		super( children );
 	}
 	
 	public LineBreakCostSpan(List<Object> children)
 	{
-		this.children = mapCoerce( children );
+		super( children );
 	}
-
+	
 	
 	@Override
 	public DPElement present(PresentationContext ctx)

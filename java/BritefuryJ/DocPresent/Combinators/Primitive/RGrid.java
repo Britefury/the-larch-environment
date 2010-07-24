@@ -10,23 +10,20 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRGrid;
-import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.SequentialPres;
 
-public class RGrid extends Pres
+public class RGrid extends SequentialPres
 {
-	private Pres children[];
-	
-	
 	public RGrid(Object children[])
 	{
-		this.children = mapCoerce( children );
+		super( children );
 	}
 	
 	public RGrid(List<Object> children)
 	{
-		this.children = mapCoerce( children );
+		super( children );
 	}
-
+	
 	
 	@Override
 	public DPElement present(PresentationContext ctx)
