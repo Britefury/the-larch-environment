@@ -25,8 +25,8 @@ public class MathRoot extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		DPMathRoot element = new DPMathRoot( ctx.getStyle().getMathRootParams() );
-		element.setChild( child.present( ctx.withStyle( ctx.getStyle().useMathRootParams() ) ).layoutWrap() );
+		DPMathRoot element = new DPMathRoot( Primitive.mathRootParams.get( ctx.getStyle() ) );
+		element.setChild( child.present( ctx.withStyle( Primitive.useMathRootParams( ctx.getStyle() ) ) ).layoutWrap() );
 		return element;
 	}
 

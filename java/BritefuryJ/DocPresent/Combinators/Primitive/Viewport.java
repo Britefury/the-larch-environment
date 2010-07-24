@@ -37,8 +37,8 @@ public class Viewport extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		DPViewport element = new DPViewport( ctx.getStyle().getContainerParams(), xRange, yRange, ctx.persistentState( persistentStateKey ) );
-		element.setChild( child.present( ctx.withStyle( ctx.getStyle().useContainerParams() ) ).layoutWrap() );
+		DPViewport element = new DPViewport( Primitive.containerParams.get( ctx.getStyle() ), xRange, yRange, ctx.persistentState( persistentStateKey ) );
+		element.setChild( child.present( ctx.withStyle( Primitive.useContainerParams( ctx.getStyle() ) ) ).layoutWrap() );
 		return element;
 	}
 }

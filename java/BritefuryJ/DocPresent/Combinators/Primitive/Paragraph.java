@@ -31,8 +31,8 @@ public class Paragraph extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		DPParagraph element = new DPParagraph( ctx.getStyle().getParagraphParams() );
-		element.setChildren( mapPresent( ctx.withStyle( ctx.getStyle().useParagraphParams() ), children ) );
+		DPParagraph element = new DPParagraph( Primitive.paragraphParams.get( ctx.getStyle() ) );
+		element.setChildren( mapPresent( ctx.withStyle( Primitive.useParagraphParams( ctx.getStyle() ) ), children ) );
 		return element;
 	}
 }

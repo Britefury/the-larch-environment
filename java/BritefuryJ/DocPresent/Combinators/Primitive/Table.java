@@ -38,8 +38,8 @@ public class Table extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		PresentationContext childCtx = ctx.withStyle( ctx.getStyle().useContainerParams() );		
-		DPTable element = new DPTable( ctx.getStyle().getTableParams() );
+		PresentationContext childCtx = ctx.withStyle( Primitive.useContainerParams( ctx.getStyle() ) );		
+		DPTable element = new DPTable( Primitive.tableParams.get( ctx.getStyle() ) );
 		if ( children != null )
 		{
 			DPElement childElems[][] = new DPElement[children.length][];

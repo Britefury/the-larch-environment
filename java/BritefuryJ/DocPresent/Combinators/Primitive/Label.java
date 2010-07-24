@@ -24,6 +24,6 @@ public class Label extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		return new DPText( ctx.getStyle().getLabelTextParams(), text, "" );
+		return new DPText( Primitive.labelTextParams.get( ctx.getStyle() ), text, "" );
 	}
 }

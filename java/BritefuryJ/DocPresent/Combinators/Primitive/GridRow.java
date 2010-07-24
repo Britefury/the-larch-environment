@@ -31,8 +31,8 @@ public class GridRow extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		DPGridRow element = new DPGridRow( ctx.getStyle().getGridRowParams() );
-		element.setChildren( mapPresent( ctx.withStyle( ctx.getStyle().useGridRowParams() ), children ) );
+		DPGridRow element = new DPGridRow( Primitive.gridRowParams.get( ctx.getStyle() ) );
+		element.setChildren( mapPresent( ctx.withStyle( Primitive.useGridRowParams( ctx.getStyle() ) ), children ) );
 		return element;
 	}
 }

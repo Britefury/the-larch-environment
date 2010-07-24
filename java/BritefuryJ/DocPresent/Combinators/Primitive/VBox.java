@@ -46,8 +46,8 @@ public class VBox extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		DPVBox element = new DPVBox( ctx.getStyle().getVBoxParams() );
-		element.setChildren( mapPresent( ctx.withStyle( ctx.getStyle().useContainerParams() ), children ) );
+		DPVBox element = new DPVBox( Primitive.vboxParams.get( ctx.getStyle() ) );
+		element.setChildren( mapPresent( ctx.withStyle( Primitive.useContainerParams( ctx.getStyle() ) ), children ) );
 		if ( refPointIndex != -1 )
 		{
 			element.setRefPointIndex( refPointIndex );

@@ -28,8 +28,8 @@ public class SpaceBin extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		DPSpaceBin bin = new DPSpaceBin( ctx.getStyle().getContainerParams(), minWidth, minHeight );
-		bin.setChild( child.present( ctx.withStyle( ctx.getStyle().useContainerParams() ) ).layoutWrap() );
+		DPSpaceBin bin = new DPSpaceBin( Primitive.containerParams.get( ctx.getStyle() ), minWidth, minHeight );
+		bin.setChild( child.present( ctx.withStyle( Primitive.useContainerParams( ctx.getStyle() ) ) ).layoutWrap() );
 		return bin;
 	}
 }

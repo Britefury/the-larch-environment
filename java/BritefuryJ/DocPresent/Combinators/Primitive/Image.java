@@ -223,6 +223,6 @@ public class Image extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		return imageFactory.create( ctx.getStyle().getContentLeafStyleParams() );
+		return imageFactory.create( Primitive.contentLeafParams.get( ctx.getStyle() ) );
 	}
 }
