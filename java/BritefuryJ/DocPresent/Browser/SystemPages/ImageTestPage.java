@@ -13,7 +13,10 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Image;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 
 public class ImageTestPage extends SystemPage
 {
@@ -35,10 +38,6 @@ public class ImageTestPage extends SystemPage
 	
 	
 	
-	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-
-	
-	
 	protected DPElement createContents()
 	{
 		BufferedImage ellipseImage = new BufferedImage( 64, 32, BufferedImage.TYPE_4BYTE_ABGR );
@@ -53,20 +52,20 @@ public class ImageTestPage extends SystemPage
 		graphics.setPaint( new Color( 0.1f, 0.25f, 0.5f ) );
 		graphics.fillOval( 4, 4, 56, 24 );
 		
-		return styleSheet.vbox( new DPElement[] {
-				styleSheet.staticText( "A 64x32 image with a green oval" ),
-				styleSheet.image( ellipseImage ),
-				styleSheet.staticText( "A 64x32 image with a green oval, scaled to 256x128" ),
-				styleSheet.image( ellipseImage, 256.0, 128.0 ),
-				styleSheet.staticText( "Image from 'back arrow' image file, as file object" ),
-				styleSheet.image( new File( "icons/back arrow.png" ) ),
-				styleSheet.staticText( "Image from 'forward arrow' image file, as file name string" ),
-				styleSheet.image( "icons/forward arrow.png" ),
-				styleSheet.staticText( "Invalid image filename" ),
-				styleSheet.image( "" ),
-				styleSheet.staticText( "A 64x32 image with a green oval, with a blue oval displayed on hover" ),
-				styleSheet.image( ellipseImage, blueEllipseImage ),
-				styleSheet.staticText( "Image from 'back arrow' image file, as file object, with 'forward arrow' image file on hover" ),
-				styleSheet.image( new File( "icons/back arrow.png" ), new File( "icons/forward arrow.png" ) ) } );
+		return new VBox( new Pres[] {
+				new StaticText( "A 64x32 image with a green oval" ),
+				new Image( ellipseImage ),
+				new StaticText( "A 64x32 image with a green oval, scaled to 256x128" ),
+				new Image( ellipseImage, 256.0, 128.0 ),
+				new StaticText( "Image from 'back arrow' image file, as file object" ),
+				new Image( new File( "icons/back arrow.png" ) ),
+				new StaticText( "Image from 'forward arrow' image file, as file name string" ),
+				new Image( "icons/forward arrow.png" ),
+				new StaticText( "Invalid image filename" ),
+				new Image( "" ),
+				new StaticText( "A 64x32 image with a green oval, with a blue oval displayed on hover" ),
+				new Image( ellipseImage, blueEllipseImage ),
+				new StaticText( "Image from 'back arrow' image file, as file object, with 'forward arrow' image file on hover" ),
+				new Image( new File( "icons/back arrow.png" ), new File( "icons/forward arrow.png" ) ) } ).present();
 	}
 }
