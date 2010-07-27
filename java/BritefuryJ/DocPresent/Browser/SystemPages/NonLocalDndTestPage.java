@@ -13,9 +13,8 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPProxy;
-import BritefuryJ.DocPresent.Combinators.CustomAction;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Pres.PresentationContext;
+import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
 import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
@@ -68,14 +67,15 @@ public class NonLocalDndTestPage extends SystemPage
 	
 	protected Pres makeFileReceiver()
 	{
-		Pres dest = makeDest(); 
-
-		
-		CustomAction action = new CustomAction()
+		Pres fileReceiverPres = new Pres()
 		{
 			@Override
-			public void apply(final DPElement element, final PresentationContext ctx)
+			public DPElement present(final PresentationContext ctx)
 			{
+				Pres dest = makeDest(); 
+				final DPElement element = dest.present( ctx );
+
+				
 				ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
 				{
 					@SuppressWarnings("unchecked")
@@ -97,14 +97,13 @@ public class NonLocalDndTestPage extends SystemPage
 				};
 				
 				element.addNonLocalDropDest( DataFlavor.javaFileListFlavor, dropFn );
+				
+				return element;
 			}
 		};
 		
 		
-		dest = dest.customAction( action );
-
-			
-		return makeReceiver( dest, "File:" );
+		return makeReceiver( fileReceiverPres, "File:" );
 	}
 	
 	

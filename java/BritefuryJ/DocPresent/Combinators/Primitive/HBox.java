@@ -10,9 +10,9 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPHBox;
-import BritefuryJ.DocPresent.Combinators.SequentialPres;
+import BritefuryJ.DocPresent.Combinators.PresentationContext;
 
-public class HBox extends SequentialPres
+public class HBox extends AbstractBox
 {
 	public HBox(Object children[])
 	{

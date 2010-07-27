@@ -12,6 +12,7 @@ import java.io.File;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPImage;
 import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.StyleParams.ContentLeafStyleParams;
 
 public class Image extends Pres

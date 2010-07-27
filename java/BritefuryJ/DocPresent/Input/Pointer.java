@@ -19,10 +19,9 @@ import java.util.Map;
 
 import javax.swing.TransferHandler;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.Controls.PopupMenu;
+import BritefuryJ.Controls.VPopupMenu;
 import BritefuryJ.DocPresent.PresentationComponent;
-import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
-import BritefuryJ.DocPresent.Controls.PopupMenu;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
@@ -575,7 +574,7 @@ public class Pointer extends PointerInterface
 		PointerButtonEvent event = new PointerButtonEvent( this, button, PointerButtonEvent.Action.DOWN );
 		if ( button == 3  &&  getModifiers() == Modifier.BUTTON3 )
 		{
-			PopupMenu menu = ControlsStyleSheet.instance.withClosePopupOnActivate().vpopupMenu( new DPElement[] {} );
+			VPopupMenu menu = new VPopupMenu();
 			rootEntry.handleContextButton( this, event, menu );
 			if ( !menu.isEmpty() )
 			{

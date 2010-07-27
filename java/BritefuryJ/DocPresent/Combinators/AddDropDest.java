@@ -6,38 +6,29 @@
 //##************************
 package BritefuryJ.DocPresent.Combinators;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.WeakHashMap;
-
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 
-public class ElementRef extends Pres
+public class AddDropDest extends Pres
 {
+	private ObjectDndHandler.DropDest dest;
 	private Pres child;
-	private WeakHashMap<DPElement, PresentationContext> elements = new WeakHashMap<DPElement, PresentationContext>();
 	
 	
-	public ElementRef(Pres child)
+	public AddDropDest(Pres child, ObjectDndHandler.DropDest dest)
 	{
+		this.dest = dest;
 		this.child = child;
 	}
 	
-	
-	public Set<DPElement> getElements()
+	public AddDropDest(Pres child, Class<?> dataType, ObjectDndHandler.CanDropFn canDropFn, ObjectDndHandler.DropFn dropFn)
 	{
-		return elements.keySet();
+		this( child, new ObjectDndHandler.DropDest( dataType, canDropFn, dropFn ) );
 	}
 	
-	public Set<Map.Entry<DPElement,PresentationContext>> getElementsAndContexts()
+	public AddDropDest(Pres child, Class<?> dataType, ObjectDndHandler.DropFn dropFn)
 	{
-		return elements.entrySet();
-	}
-	
-	
-	public ElementRef elementRef()
-	{
-		return this;
+		this( child, new ObjectDndHandler.DropDest( dataType, dropFn) );
 	}
 	
 	
@@ -45,7 +36,7 @@ public class ElementRef extends Pres
 	public DPElement present(PresentationContext ctx)
 	{
 		DPElement element = child.present( ctx );
-		elements.put( element, ctx );
+		element.addDropDest( dest );
 		return element;
 	}
 }

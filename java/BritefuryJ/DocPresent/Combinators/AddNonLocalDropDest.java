@@ -6,38 +6,26 @@
 //##************************
 package BritefuryJ.DocPresent.Combinators;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.WeakHashMap;
+import java.awt.datatransfer.DataFlavor;
 
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 
-public class ElementRef extends Pres
+public class AddNonLocalDropDest extends Pres
 {
+	private ObjectDndHandler.NonLocalDropDest dest;
 	private Pres child;
-	private WeakHashMap<DPElement, PresentationContext> elements = new WeakHashMap<DPElement, PresentationContext>();
 	
 	
-	public ElementRef(Pres child)
+	public AddNonLocalDropDest(Pres child, ObjectDndHandler.NonLocalDropDest dest)
 	{
+		this.dest = dest;
 		this.child = child;
 	}
 	
-	
-	public Set<DPElement> getElements()
+	public AddNonLocalDropDest(Pres child, DataFlavor dataFlavor, ObjectDndHandler.DropFn dropFn)
 	{
-		return elements.keySet();
-	}
-	
-	public Set<Map.Entry<DPElement,PresentationContext>> getElementsAndContexts()
-	{
-		return elements.entrySet();
-	}
-	
-	
-	public ElementRef elementRef()
-	{
-		return this;
+		this( child, new ObjectDndHandler.NonLocalDropDest( dataFlavor, dropFn ) );
 	}
 	
 	
@@ -45,7 +33,7 @@ public class ElementRef extends Pres
 	public DPElement present(PresentationContext ctx)
 	{
 		DPElement element = child.present( ctx );
-		elements.put( element, ctx );
+		element.addNonLocalDropDest( dest );
 		return element;
 	}
 }

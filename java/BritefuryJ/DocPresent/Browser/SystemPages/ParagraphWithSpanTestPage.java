@@ -11,9 +11,14 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.Span;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Painter.FilledOutlinePainter;
 import BritefuryJ.DocPresent.Painter.OutlinePainter;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
 public class ParagraphWithSpanTestPage extends SystemPage
 {
@@ -37,77 +42,51 @@ public class ParagraphWithSpanTestPage extends SystemPage
 
 	static String textBlock = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 	
-	protected ArrayList<DPElement> makeTextNodes(String text, PrimitiveStyleSheet style)
-	{
-		String[] words = text.split( " " );
-		ArrayList<DPElement> nodes = new ArrayList<DPElement>();
-		for (int i = 0; i < words.length; i++)
-		{
-			nodes.add( style.text( words[i] ) );
-		}
-		return nodes;
-	}
 	
-	protected ArrayList<DPElement> addLineBreaks(ArrayList<DPElement> nodesIn, int step, PrimitiveStyleSheet style)
+	protected Pres makeParagraph(String title, double indentation, int lineBreakStep, StyleSheet2 textStyle)
 	{
-		ArrayList<DPElement> nodesOut = new ArrayList<DPElement>();
-		for (int i = 0; i < nodesIn.size(); i++)
-		{
-			nodesOut.add( nodesIn.get( i ) );
-			nodesOut.add( style.text( " " ) );
-			if ( step <= 1  ||  i % step == (step-1) )
-			{
-				nodesOut.add( style.lineBreak() );
-			}
-		}
-		return nodesOut;
-	}
-	
-	
-	protected DPElement makeParagraph(String title, double indentation, int lineBreakStep, PrimitiveStyleSheet textStyle)
-	{
-		ArrayList<DPElement> children = makeTextNodes( title + ": " + textBlock, textStyle );
+		ArrayList<Object> children = ParagraphTestPage.makeTextNodes( title + ": " + textBlock );
 		if ( lineBreakStep > 0 )
 		{
-			children = addLineBreaks( children, lineBreakStep, textStyle );
+			children = ParagraphTestPage.addLineBreaks( children, lineBreakStep );
 		}
-		return textStyle.withParagraphIndentation( indentation ).paragraph( children.toArray( new DPElement[0] ) );
+		return textStyle.withAttr( Primitive.paragraphIndentation, indentation ).applyTo( new Paragraph( children ) );
 	}
 	
-	protected DPElement makeSpan(String title, int lineBreakStep, PrimitiveStyleSheet textStyle, PrimitiveStyleSheet spanStyle)
+	protected Pres makeSpan(String title, int lineBreakStep, StyleSheet2 spanStyle)
 	{
-		ArrayList<DPElement> children = makeTextNodes( title + ": " + textBlock, textStyle );
+		ArrayList<Object> children = ParagraphTestPage.makeTextNodes( title + ": " + textBlock );
 		if ( lineBreakStep > 0 )
 		{
-			children = addLineBreaks( children, lineBreakStep, textStyle );
+			children = ParagraphTestPage.addLineBreaks( children, lineBreakStep );
 		}
-		return spanStyle.span( children.toArray( new DPElement[0] ) );
+		return spanStyle.applyTo( new Span( children ) );
 	}
 	
-	protected DPElement makeParagraphWithNestedSpan(String title, double indentation, int lineBreakStep, PrimitiveStyleSheet textStyle, PrimitiveStyleSheet nestedTextStyle, PrimitiveStyleSheet spanStyle)
+	protected Pres makeParagraphWithNestedSpan(String title, double indentation, int lineBreakStep, StyleSheet2 textStyle, StyleSheet2 nestedTextStyle, StyleSheet2 spanStyle)
 	{
-		ArrayList<DPElement> children = makeTextNodes( title + ": " + textBlock, textStyle );
-		children = addLineBreaks( children, lineBreakStep, textStyle );
-		children.add( children.size()/2, makeSpan( title + " (inner)", lineBreakStep, nestedTextStyle, spanStyle ) );
-		return textStyle.withParagraphIndentation( indentation ).paragraph( children.toArray( new DPElement[0] ) );
+		ArrayList<Object> children = ParagraphTestPage.makeTextNodes( title + ": " + textBlock );
+		children = ParagraphTestPage.addLineBreaks( children, lineBreakStep );
+		children.add( children.size()/2, makeSpan( title + " (inner)", lineBreakStep, spanStyle ) );
+		return textStyle.withAttr( Primitive.paragraphIndentation, indentation ).applyTo( new Paragraph( children ) );
 	}
 	
 	
 	protected DPElement createContents()
 	{
-		PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-		PrimitiveStyleSheet nestedTextStyleSheet = styleSheet.withForeground( Color.red );
-		PrimitiveStyleSheet spanStyleSheet = styleSheet.withBackground( new OutlinePainter( new Color( 1.0f, 0.7f, 0.3f ) ) ).withHoverBackground( 
-				new FilledOutlinePainter( new Color( 1.0f, 1.0f, 0.7f ), new Color( 1.0f, 1.0f, 0.0f ), new BasicStroke( 1.0f ) ) );
+		StyleSheet2 styleSheet = StyleSheet2.instance;
+		StyleSheet2 nestedTextStyleSheet = styleSheet.withAttr( Primitive.foreground, Color.red );
+		StyleSheet2 spanStyleSheet = styleSheet.withAttr( Primitive.background, new OutlinePainter( new Color( 1.0f, 0.7f, 0.3f ) ) ).withAttr(
+				Primitive.hoverBackground, new FilledOutlinePainter( new Color( 1.0f, 1.0f, 0.7f ), new Color( 1.0f, 1.0f, 0.0f ), new BasicStroke( 1.0f ) ) );
 		
-		DPElement b2 = makeParagraph( "PER-WORD", 0.0, 1, styleSheet );
-		DPElement b3 = makeParagraph( "EVERY-4-WORDS", 0.0, 4, styleSheet);
-		DPElement b4 = makeParagraphWithNestedSpan( "NESTED-1", 0.0, 1, styleSheet, nestedTextStyleSheet, spanStyleSheet );
-		DPElement b5 = makeParagraphWithNestedSpan( "NESTED-2", 0.0, 2, styleSheet, nestedTextStyleSheet, spanStyleSheet );
-		DPElement b6 = makeParagraphWithNestedSpan( "NESTED-4", 0.0, 4, styleSheet, nestedTextStyleSheet, spanStyleSheet );
-		DPElement b7 = makeParagraph( "PER-WORD INDENTED", 50.0, 1, styleSheet );
-		DPElement b8 = makeParagraphWithNestedSpan( "NESTED-2-INDENTED", 50.0, 2, styleSheet, nestedTextStyleSheet, spanStyleSheet );
-		DPElement[] children = { b2, b3, b4, b5, b6, b7, b8 };
-		return styleSheet.withVBoxSpacing( 30.0 ).vbox( children );
+		Pres b2 = makeParagraph( "PER-WORD", 0.0, 1, styleSheet );
+		Pres b3 = makeParagraph( "EVERY-4-WORDS", 0.0, 4, styleSheet);
+		Pres b4 = makeParagraphWithNestedSpan( "NESTED-1", 0.0, 1, styleSheet, nestedTextStyleSheet, spanStyleSheet );
+		Pres b5 = makeParagraphWithNestedSpan( "NESTED-2", 0.0, 2, styleSheet, nestedTextStyleSheet, spanStyleSheet );
+		Pres b6 = makeParagraphWithNestedSpan( "NESTED-4", 0.0, 4, styleSheet, nestedTextStyleSheet, spanStyleSheet );
+		Pres b7 = makeParagraph( "PER-WORD INDENTED", 50.0, 1, styleSheet );
+		Pres b8 = makeParagraphWithNestedSpan( "NESTED-2-INDENTED", 50.0, 2, styleSheet, nestedTextStyleSheet, spanStyleSheet );
+		Pres[] children = { b2, b3, b4, b5, b6, b7, b8 };
+		return styleSheet.withAttr( Primitive.vboxSpacing, 30.0 ).applyTo( new VBox( children ) ).present();
 	}
 }

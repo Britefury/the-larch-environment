@@ -7,6 +7,7 @@
 package BritefuryJ.DocPresent.Combinators.RichText;
 
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Combinators.PresentationContext;
 
 public class Heading2 extends RichParagraph
 {

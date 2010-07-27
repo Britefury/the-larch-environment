@@ -10,6 +10,7 @@ import BritefuryJ.DocPresent.DPCanvas;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Canvas.DrawingNode;
 import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.PresentationContext;
 
 public class Canvas extends Pres
 {

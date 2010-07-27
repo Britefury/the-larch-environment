@@ -6,38 +6,29 @@
 //##************************
 package BritefuryJ.DocPresent.Combinators;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.WeakHashMap;
-
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 
-public class ElementRef extends Pres
+public class AddDragSource extends Pres
 {
+	private ObjectDndHandler.DragSource source;
 	private Pres child;
-	private WeakHashMap<DPElement, PresentationContext> elements = new WeakHashMap<DPElement, PresentationContext>();
 	
 	
-	public ElementRef(Pres child)
+	public AddDragSource(Pres child, ObjectDndHandler.DragSource source)
 	{
+		this.source = source;
 		this.child = child;
 	}
 	
-	
-	public Set<DPElement> getElements()
+	public AddDragSource(Pres child, Class<?> dataType, int sourceAspects, ObjectDndHandler.SourceDataFn sourceDataFn, ObjectDndHandler.ExportDoneFn exportDoneFn)
 	{
-		return elements.keySet();
+		this( child, new ObjectDndHandler.DragSource( dataType, sourceAspects, sourceDataFn, exportDoneFn ) );
 	}
 	
-	public Set<Map.Entry<DPElement,PresentationContext>> getElementsAndContexts()
+	public AddDragSource(Pres child, Class<?> dataType, int sourceAspects, ObjectDndHandler.SourceDataFn sourceDataFn)
 	{
-		return elements.entrySet();
-	}
-	
-	
-	public ElementRef elementRef()
-	{
-		return this;
+		this( child, new ObjectDndHandler.DragSource( dataType, sourceAspects, sourceDataFn ) );
 	}
 	
 	
@@ -45,7 +36,7 @@ public class ElementRef extends Pres
 	public DPElement present(PresentationContext ctx)
 	{
 		DPElement element = child.present( ctx );
-		elements.put( element, ctx );
+		element.addDragSource( source );
 		return element;
 	}
 }

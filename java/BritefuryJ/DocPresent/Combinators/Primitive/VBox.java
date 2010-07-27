@@ -10,9 +10,9 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPVBox;
-import BritefuryJ.DocPresent.Combinators.SequentialPres;
+import BritefuryJ.DocPresent.Combinators.PresentationContext;
 
-public class VBox extends SequentialPres
+public class VBox extends AbstractBox
 {
 	private int refPointIndex;
 	
