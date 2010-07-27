@@ -102,6 +102,11 @@ public class ParagraphLayout
 			return endIndex;
 		}
 		
+		public double getLineIndentation()
+		{
+			return lineIndentation;
+		}
+		
 		
 		private void computeRequisitionY()
 		{

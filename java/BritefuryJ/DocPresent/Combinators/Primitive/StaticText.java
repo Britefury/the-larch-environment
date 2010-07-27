@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent.Combinators.Primitive;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.PresentationContext;
 
 public class StaticText extends Pres
 {

@@ -8,14 +8,14 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Map;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPProxy;
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.Combinators.CustomAction;
 import BritefuryJ.DocPresent.Combinators.ElementRef;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Pres.PresentationContext;
+import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.Fraction;
@@ -62,28 +62,19 @@ public class DndTestPage extends SystemPage
 	}
 	
 	
-	protected Pres makeSource(Pres contents, final Pres factory)
+	protected Pres makeSource(final Pres contents, final Pres factory)
 	{
 		Pres source = sourceStyle.applyTo( new Bin( contents.pad( 4.0, 2.0 ) ) );
 		
-		CustomAction action = new CustomAction()
+		ObjectDndHandler.SourceDataFn sourceDataFn = new ObjectDndHandler.SourceDataFn()
 		{
-			@Override
-			public void apply(DPElement element, PresentationContext ctx)
+			public Object createSourceData(PointerInputElement sourceElement, int aspect)
 			{
-				ObjectDndHandler.SourceDataFn sourceDataFn = new ObjectDndHandler.SourceDataFn()
-				{
-					public Object createSourceData(PointerInputElement sourceElement, int aspect)
-					{
-						return factory;
-					}
-				};
-				
-				element.addDragSource( Pres.class, DndHandler.ASPECT_NORMAL, sourceDataFn );
+				return factory;
 			}
 		};
 		
-		return source.customAction( action );
+		return source.addDragSource( Pres.class, DndHandler.ASPECT_NORMAL, sourceDataFn );
 	}
 
 	protected Pres makeTextSource(final String text)
@@ -95,30 +86,23 @@ public class DndTestPage extends SystemPage
 	
 	protected Pres makePlaceHolder()
 	{
-		Pres placeHolder = placeHolderStyle.applyTo( new Proxy( new Bin( new StaticText( " " ).pad( 8.0, 8.0 ) ) ) );
-		final ElementRef ref = new ElementRef( placeHolder );
+		final ElementRef placeHolder = placeHolderStyle.applyTo( new Proxy( new Bin( new StaticText( " " ).pad( 8.0, 8.0 ) ) ) ).elementRef();
 		
-		CustomAction action = new CustomAction()
+		ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
 		{
-			@Override
-			public void apply(final DPElement element, final PresentationContext ctx)
+			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
 			{
-				ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
+				Pres factory = (Pres)data;
+				for (Map.Entry<DPElement,PresentationContext> entry: placeHolder.getElementsAndContexts())
 				{
-					public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
-					{
-						Pres factory = (Pres)data;
-						DPProxy placeHolder = (DPProxy)element;
-						placeHolder.setChild( factory.present( ctx ) );
-						return true;
-					}
-				};
-
-				element.addDropDest( Pres.class, dropFn );
+					DPProxy placeHolder = (DPProxy)entry.getKey();
+					placeHolder.setChild( factory.present( entry.getValue() ) );
+				}
+				return true;
 			}
 		};
-		
-		return ref.customAction( action );
+
+		return placeHolder.addDropDest( Pres.class, dropFn );
 	}
 	
 	

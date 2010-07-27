@@ -4,21 +4,31 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.DocPresent.Combinators.RichText;
+package BritefuryJ.DocPresent.Combinators;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Combinators.PresentationContext;
 
-public class Heading6 extends RichParagraph
+public class CustomPres extends Pres
 {
-	public Heading6(String text)
+	public static interface PresFn
 	{
-		super( text );
+		public DPElement present(PresentationContext ctx);
 	}
-
+	
+	
+	private PresFn presFn;
+	
+	
+	public CustomPres(PresFn presFn)
+	{
+		super();
+		this.presFn = presFn;
+	}
+	
+	
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		return presentParagraph( ctx.withStyle( RichText.h6TextStyle( ctx.getStyle() ) ) );
+		return presFn.present( ctx );
 	}
 }

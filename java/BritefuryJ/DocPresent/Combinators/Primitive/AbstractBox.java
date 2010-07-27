@@ -4,21 +4,21 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.DocPresent.Combinators.RichText;
+package BritefuryJ.DocPresent.Combinators.Primitive;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import java.util.List;
 
-public class Heading6 extends RichParagraph
+import BritefuryJ.DocPresent.Combinators.SequentialPres;
+
+public abstract class AbstractBox extends SequentialPres
 {
-	public Heading6(String text)
+	public AbstractBox(Object children[])
 	{
-		super( text );
+		super( children );
 	}
-
-	@Override
-	public DPElement present(PresentationContext ctx)
+	
+	public AbstractBox(List<Object> children)
 	{
-		return presentParagraph( ctx.withStyle( RichText.h6TextStyle( ctx.getStyle() ) ) );
+		super( children );
 	}
 }

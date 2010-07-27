@@ -6,90 +6,17 @@
 //##************************
 package BritefuryJ.DocPresent.Combinators;
 
+import java.awt.datatransfer.DataFlavor;
 import java.util.List;
 
-import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
-import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
-import BritefuryJ.GSym.GSymAbstractPerspective;
-import BritefuryJ.GSym.View.GSymFragmentView;
 
 public abstract class Pres
 {
-	public static class PresentationContext
-	{
-		private GSymFragmentView fragment = null;
-		private GSymAbstractPerspective perspective = null;
-		private StyleSheetValues style;
-		private AttributeTable inheritedState = null;
-		
-		
-		public PresentationContext()
-		{
-			style = StyleSheetValues.instance;
-		}
-		
-		public PresentationContext(GSymFragmentView fragment, GSymAbstractPerspective perspective, StyleSheetValues style, AttributeTable inheritedState)
-		{
-			this.fragment = fragment;
-			this.perspective = perspective;
-			this.style = style;
-			this.inheritedState = inheritedState;
-		}
-		
-		
-		public GSymFragmentView getFragment()
-		{
-			return fragment;
-		}
-		
-		public GSymAbstractPerspective getPerspective()
-		{
-			return perspective;
-		}
-		
-		public StyleSheetValues getStyle()
-		{
-			return style;
-		}
-		
-		public AttributeTable getInheritedState()
-		{
-			return inheritedState;
-		}
-		
-		
-		public PersistentState persistentState(Object key)
-		{
-			if ( fragment != null )
-			{
-				return fragment.persistentState( key );
-			}
-			else
-			{
-				return null;
-			}
-		}
-		
-		
-		public PresentationContext withStyle(StyleSheetValues style)
-		{
-			if ( style == this.style )
-			{
-				return this;
-			}
-			else
-			{
-				return new PresentationContext( fragment, perspective, style, inheritedState );
-			}
-		}
-	}
-	
-	
-	
 	public DPElement present()
 	{
 		return present( new PresentationContext() );
@@ -211,12 +138,60 @@ public abstract class Pres
 	
 	
 	//
-	// Custom handler
+	// Element reference
 	//
 	
-	public Pres customAction(CustomAction handler)
+	public ElementRef elementRef()
 	{
-		return new CustomElementAction( this, handler );
+		return new ElementRef( this );
+	}
+	
+	
+	
+	//
+	// Drag and drop
+	//
+	
+	public AddDragSource addDragSource(ObjectDndHandler.DragSource source)
+	{
+		return new AddDragSource( this, source );
+	}
+	
+	public AddDragSource addDragSource(Class<?> dataType, int sourceAspects, ObjectDndHandler.SourceDataFn sourceDataFn, ObjectDndHandler.ExportDoneFn exportDoneFn)
+	{
+		return new AddDragSource( this, dataType, sourceAspects, sourceDataFn, exportDoneFn );
+	}
+	
+	public AddDragSource addDragSource(Class<?> dataType, int sourceAspects, ObjectDndHandler.SourceDataFn sourceDataFn)
+	{
+		return new AddDragSource( this, dataType, sourceAspects, sourceDataFn );
+	}
+	
+	
+	public AddDropDest addDropDest(ObjectDndHandler.DropDest dest)
+	{
+		return new AddDropDest( this, dest );
+	}
+	
+	public AddDropDest addDropDest(Class<?> dataType, ObjectDndHandler.CanDropFn canDropFn, ObjectDndHandler.DropFn dropFn)
+	{
+		return new AddDropDest( this, dataType, canDropFn, dropFn );
+	}
+	
+	public AddDropDest addDropDest(Class<?> dataType, ObjectDndHandler.DropFn dropFn)
+	{
+		return new AddDropDest( this, dataType, dropFn );
+	}
+	
+	
+	public AddNonLocalDropDest addNonLocalDropDest(ObjectDndHandler.NonLocalDropDest dest)
+	{
+		return new AddNonLocalDropDest( this, dest );
+	}
+	
+	public AddNonLocalDropDest addNonLocalDropDest(DataFlavor dataFlavor, ObjectDndHandler.DropFn dropFn)
+	{
+		return new AddNonLocalDropDest( this, dataFlavor, dropFn );
 	}
 	
 	
@@ -229,6 +204,17 @@ public abstract class Pres
 		for (int i = 0; i < children.length; i++)
 		{
 			result[i] = children[i].present( ctx );
+		}
+		return result;
+	}
+	
+	protected static DPElement[] mapPresent(PresentationContext ctx, List<Pres> children)
+	{
+		DPElement result[] = new DPElement[children.size()];
+		int i = 0;
+		for (Pres child: children)
+		{
+			result[i++] = child.present( ctx );
 		}
 		return result;
 	}
@@ -249,6 +235,17 @@ public abstract class Pres
 		return result;
 	}
 	
+	protected static PresentElement[] mapPresentAsCombinators(PresentationContext ctx, List<Pres> children)
+	{
+		PresentElement result[] = new PresentElement[children.size()];
+		int i = 0;
+		for (Pres child: children)
+		{
+			result[i++] = new PresentElement( child.present( ctx ) );
+		}
+		return result;
+	}
+	
 	
 	protected static DPElement higherOrderPresent(PresentationContext ctx, StyleSheetValues style, Pres combinator)
 	{
@@ -257,7 +254,7 @@ public abstract class Pres
 	
 	
 	
-	protected static Pres coerce(Object x)
+	public static Pres coerce(Object x)
 	{
 		if ( x == null )
 		{
@@ -277,7 +274,7 @@ public abstract class Pres
 		}
 	}
 
-	protected static Pres[] mapCoerce(Object children[])
+	public static Pres[] mapCoerce(Object children[])
 	{
 		Pres result[] = new Pres[children.length];
 		for (int i = 0; i < children.length; i++)
@@ -288,7 +285,7 @@ public abstract class Pres
 	}
 	
 
-	protected static Pres[] mapCoerce(List<Object> children)
+	public static Pres[] mapCoerce(List<Object> children)
 	{
 		Pres result[] = new Pres[children.size()];
 		for (int i = 0; i < children.size(); i++)

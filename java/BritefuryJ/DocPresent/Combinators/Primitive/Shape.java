@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent.Combinators.Primitive;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPShape;
 import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 

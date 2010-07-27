@@ -4,21 +4,26 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.DocPresent.Combinators.RichText;
+package BritefuryJ.Controls;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 
-public class Heading6 extends RichParagraph
+public class VPopupMenu extends PopupMenu
 {
-	public Heading6(String text)
+	public VPopupMenu()
 	{
-		super( text );
+		super();
+	}
+	
+	public VPopupMenu(Object items[])
+	{
+		super( items );
 	}
 
 	@Override
-	public DPElement present(PresentationContext ctx)
+	protected Pres createMenuBox(Pres boxItems[])
 	{
-		return presentParagraph( ctx.withStyle( RichText.h6TextStyle( ctx.getStyle() ) ) );
+		return new VBox( boxItems );
 	}
 }

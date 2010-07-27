@@ -9,7 +9,6 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.Border.SolidBorder;
@@ -17,10 +16,8 @@ import BritefuryJ.DocPresent.Canvas.DrawingNode;
 import BritefuryJ.DocPresent.Canvas.GroupNode;
 import BritefuryJ.DocPresent.Canvas.ShapeNode;
 import BritefuryJ.DocPresent.Canvas.TextNode;
-import BritefuryJ.DocPresent.Combinators.CustomAction;
 import BritefuryJ.DocPresent.Combinators.ElementRef;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Pres.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.Canvas;
@@ -139,89 +136,64 @@ public class CanvasTestPage extends SystemPage
 	}
 
 	
-	protected Pres makeDestElement(String title)
+
+	private static class DataModel
 	{
-		final ElementRef textRef = new ElementRef( textStyle.applyTo( new StaticText( title ) ) );
-		Pres destText = backgroundStyle.applyTo( new Bin( textRef.pad( 10.0, 10.0 ) ) ); 
+		Integer value = null;
+	}
+	
+	protected Pres makeDestElement(final String title, final DataModel model)
+	{
+		final ElementRef text = textStyle.applyTo( new StaticText( title ) ).elementRef();
+		Pres dest = backgroundStyle.applyTo( new Bin( text.pad( 10.0, 10.0 ) ) ); 
 		
-		CustomAction action = new CustomAction()
+		ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
 		{
-			@Override
-			public void apply(DPElement element, PresentationContext ctx)
+			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
 			{
-				final DPText textElement = (DPText)textRef.getLastElement();
-				ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
+				String textValue = data.toString();
+				for (DPElement textElem: text.getElements())
 				{
-					public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
-					{
-						String text = data.toString();
-						textElement.setText( text );
-						return true;
-					}
-				};
-				
-				element.addDropDest( Integer.class, dropFn );
+					((DPText)textElem).setText( textValue );
+				}
+				model.value = (Integer)data;
+				return true;
 			}
 		};
 		
-		return destText.customAction( action );
+		return dest.addDropDest( Integer.class, dropFn );
 	}
 
 	
-	private static int textAsNumber(String text)
+	protected Pres makeDestElement2(final String title, final DataModel model)
 	{
-		try
-		{
-			return Integer.parseInt( text );
-		}
-		catch (NumberFormatException e)
-		{
-			return 0;
-		}
-	}
-	
-	protected Pres makeDestElement2(String title, final ElementRef firstElem)
-	{
-		final ElementRef textRef = new ElementRef( textStyle.applyTo( new StaticText( title ) ) );
-		Pres destText = backgroundStyle.applyTo( new Bin( textRef.pad( 10.0, 10.0 ) ) ); 
+		final ElementRef text = textStyle.applyTo( new StaticText( title ) ).elementRef();
+		Pres dest = backgroundStyle.applyTo( new Bin( text.pad( 10.0, 10.0 ) ) ); 
 		
-		CustomAction action = new CustomAction()
+		ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
 		{
-			@Override
-			public void apply(DPElement element, PresentationContext ctx)
+			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
 			{
-				final DPText textElement = (DPText)textRef.getLastElement();
-				final DPElement firstElement = firstElem.getLastElement();
-
-				ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
+				String textValue = data.toString();
+				for (DPElement textElem: text.getElements())
 				{
-					public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
-					{
-						String text = data.toString();
-						textElement.setText( text );
-						return true;
-					}
-				};
-				
-				ObjectDndHandler.CanDropFn canDropFn = new ObjectDndHandler.CanDropFn()
-				{
-					public boolean canDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
-					{
-						DPBin box = (DPBin)firstElement;
-						DPBin pad = (DPBin)box.getChild();
-						DPText t = (DPText)pad.getChild();
-						String firstText = t.getText();
-						int firstNum = textAsNumber( firstText );
-						int secondNum = (Integer)data;
-						return secondNum >= firstNum;
-					}
-				};
-				
-				element.addDropDest( Integer.class, canDropFn, dropFn );
+					((DPText)textElem).setText( textValue );
+				}
+				return true;
 			}
 		};
 		
-		return destText.customAction( action ); 
+		ObjectDndHandler.CanDropFn canDropFn = new ObjectDndHandler.CanDropFn()
+		{
+			public boolean canDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
+			{
+				Integer firstNum = model.value;
+				int secondNum = (Integer)data;
+				return secondNum >= firstNum;
+			}
+		};
+		
+		return dest.addDropDest( Integer.class, canDropFn, dropFn );
 	}
 
 	
@@ -230,11 +202,12 @@ public class CanvasTestPage extends SystemPage
 		Pres canvas = new Canvas( createClockFace().translate( 320.0, 240.0 ), 640.0, 480.0, false, false );
 		Pres diagram = StyleSheet2.instance.withAttr( Primitive.border, new SolidBorder( 1.0, 3.0, 2.0, 2.0, Color.black, null ) ).applyTo( new Border( canvas ) );
 		
-		Pres dest0 = makeDestElement( "Number" );
-		ElementRef dest0Ref = new ElementRef( dest0 );
-		Pres dest1 = makeDestElement2( "Number", dest0Ref );
+		DataModel model = new DataModel();
+		
+		Pres dest0 = makeDestElement( "Number", model );
+		Pres dest1 = makeDestElement2( "Number", model );
 
-		Pres hbox = StyleSheet2.instance.withAttr( Primitive.hboxSpacing, 20.0 ).applyTo( new HBox( new Pres[] { dest0Ref, dest1 } ) );
+		Pres hbox = StyleSheet2.instance.withAttr( Primitive.hboxSpacing, 20.0 ).applyTo( new HBox( new Object[] { dest0, dest1 } ) );
 		
 		return StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 20.0 ).applyTo( new VBox( new Pres[] { diagram, hbox } ) ).present();
 	}

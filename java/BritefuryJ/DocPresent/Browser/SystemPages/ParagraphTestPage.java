@@ -39,7 +39,7 @@ public class ParagraphTestPage extends SystemPage
 	
 	static String textBlock = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 	
-	protected ArrayList<Object> makeTextNodes(String text)
+	protected static ArrayList<Object> makeTextNodes(String text)
 	{
 		String[] words = text.split( " " );
 		ArrayList<Object> nodes = new ArrayList<Object>();
@@ -50,7 +50,7 @@ public class ParagraphTestPage extends SystemPage
 		return nodes;
 	}
 	
-	protected ArrayList<Object> addLineBreaks(ArrayList<Object> nodesIn, int step)
+	protected static ArrayList<Object> addLineBreaks(ArrayList<Object> nodesIn, int step)
 	{
 		ArrayList<Object> nodesOut = new ArrayList<Object>();
 		for (int i = 0; i < nodesIn.size(); i++)

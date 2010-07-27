@@ -8,6 +8,7 @@ package BritefuryJ.DocPresent.Combinators.RichText;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Box;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
 

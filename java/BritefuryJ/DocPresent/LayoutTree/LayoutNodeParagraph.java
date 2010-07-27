@@ -294,7 +294,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 				LAllocBoxInterface startChildBox = startLine.getChildAllocBoxes()[startInLine];
 				LAllocBox startLineBox = startLine.getLineAllocBox();
 				double xStart = startChildBox.getAllocPositionInParentSpaceX();
-				double xEnd = startLineBox.getAllocationX();
+				double xEnd = startLineBox.getAllocationX() + startLine.getLineIndentation();
 				double yStart = startLineBox.getAllocPositionInParentSpaceY();
 				double yEnd = yStart + startLineBox.getAllocationY();
 				AABox2 startBox = new AABox2( xStart, yStart, xEnd, yEnd );
@@ -305,7 +305,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 				endInLine = Math.min( endInLine, endLine.getChildAllocBoxes().length - 1 );
 				LAllocBoxInterface endChildBox = endLine.getChildAllocBoxes()[endInLine];
 				LAllocBox endLineBox = endLine.getLineAllocBox();
-				xStart = 0.0;
+				xStart = endLine.getLineIndentation();
 				xEnd = endChildBox.getAllocPositionInParentSpaceX() + endChildBox.getAllocationX();
 				yStart = endLineBox.getAllocPositionInParentSpaceY();
 				yEnd = yStart + endLineBox.getAllocationY();
@@ -318,8 +318,9 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 				for (int i = startLineIndex + 1; i < endLineIndex; i++)
 				{
 					LAllocBox lineBox = lines[i].getLineAllocBox();
-					xStart = 0.0;
-					xEnd = lineBox.getAllocationX();
+					double lineIndent = lines[i].getLineIndentation();
+					xStart = lineIndent;
+					xEnd = lineBox.getAllocationX() + lineIndent;
 					yStart = lineBox.getAllocPositionInParentSpaceY();
 					yEnd = yStart + lineBox.getAllocationY();
 					boxes[j++] = new AABox2( xStart, yStart, xEnd, yEnd );

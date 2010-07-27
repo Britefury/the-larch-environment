@@ -2,26 +2,27 @@
 //##* under the terms of the GNU General Public License version 2 as published by the
 //##* Free Software Foundation. The full text of the GNU General Public License
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
-//##* program. This source code is (C)copyright Geoffrey French 2008.
+//##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.DocPresent.Controls;
+package BritefuryJ.Controls;
 
-import BritefuryJ.Controls.PopupMenu;
 import BritefuryJ.DocPresent.ContextMenuFactory;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.PageController;
 import BritefuryJ.DocPresent.Browser.Location;
-import BritefuryJ.DocPresent.Controls.MenuItem.MenuItemListener;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.Combinators.Primitive.Text;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Input.Modifier;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
-public class Hyperlink extends Control
+public class Hyperlink extends Pres
 {
 	public interface LinkListener
 	{
-		public void onLinkClicked(Hyperlink link, PointerButtonEvent event);
+		public void onLinkClicked(Hyperlink link, DPElement element, PointerButtonEvent event);
 	}
 	
 	private static class LinkTargetListener implements LinkListener
@@ -34,9 +35,9 @@ public class Hyperlink extends Control
 			this.targetLocation = targetLocation;
 		}
 		
-		public void onLinkClicked(Hyperlink link, PointerButtonEvent buttonEvent)
+		public void onLinkClicked(Hyperlink link, DPElement element, PointerButtonEvent buttonEvent)
 		{
-			PageController pageController = link.getElement().getRootElement().getPageController();
+			PageController pageController = element.getRootElement().getPageController();
 			if ( ( buttonEvent.getPointer().getModifiers() & Modifier.CTRL ) != 0 )
 			{
 				if ( buttonEvent.getButton() == 1  ||  buttonEvent.getButton() == 2 )
@@ -61,8 +62,12 @@ public class Hyperlink extends Control
 	
 	private class LinkInteractor extends ElementInteractor
 	{
-		public LinkInteractor()
-		{	
+		private boolean bClosePopupOnActivate;
+		
+		
+		public LinkInteractor(boolean bClosePopupOnActivate)
+		{
+			this.bClosePopupOnActivate = bClosePopupOnActivate;
 		}
 		
 		public boolean onButtonDown(DPElement element, PointerButtonEvent event)
@@ -78,7 +83,7 @@ public class Hyperlink extends Control
 				{
 					element.closeContainingPopupChain();
 				}
-				listener.onLinkClicked( Hyperlink.this, event );
+				listener.onLinkClicked( Hyperlink.this, element, event );
 			}
 			
 			return false;
@@ -93,67 +98,62 @@ public class Hyperlink extends Control
 			final PageController pageController = element.getRootElement().getPageController();
 			final LinkTargetListener targetListener = (LinkTargetListener)listener;
 
-			MenuItemListener openInNewTabListener = new MenuItemListener()
+			MenuItem.MenuItemListener openInNewTabListener = new MenuItem.MenuItemListener()
 			{
 				@Override
-				public void onMenuItemClicked(MenuItem menuItem)
+				public void onMenuItemClicked(MenuItem menuItem, DPElement element)
 				{
 					pageController.openLocation( targetListener.targetLocation, PageController.OpenOperation.OPEN_IN_NEW_TAB );
 				}
 			};
 
-			MenuItemListener openInNewWindowListener = new MenuItemListener()
+			MenuItem.MenuItemListener openInNewWindowListener = new MenuItem.MenuItemListener()
 			{
 				@Override
-				public void onMenuItemClicked(MenuItem menuItem)
+				public void onMenuItemClicked(MenuItem menuItem, DPElement element)
 				{
 					pageController.openLocation( targetListener.targetLocation, PageController.OpenOperation.OPEN_IN_NEW_WINDOW );
 				}
 			};
 			
-			
-			menu.add( styleSheet.withClosePopupOnActivate().menuItemWithLabel( "Open in new tab", openInNewTabListener ).getElement() );
-			menu.add( styleSheet.withClosePopupOnActivate().menuItemWithLabel( "Open in new window", openInNewWindowListener ).getElement() );
+			menu.add( new MenuItem( "Open in new tab", openInNewTabListener ) );
+			menu.add( new MenuItem( "Open in new window", openInNewWindowListener ) );
 		}
 	}
 
 	
 	
-	private DPText element;
+	private String text;
 	private LinkListener listener;
-	private ControlsStyleSheet styleSheet;
-	private boolean bClosePopupOnActivate;
+	private ContextMenuFactory menuFactory;
 	
 	
-	protected Hyperlink(DPText element, LinkListener listener, boolean bClosePopupOnActivate, ControlsStyleSheet styleSheet)
+	public Hyperlink(String text, LinkListener listener)
 	{
-		this.element = element;
+		this.text = text;
 		this.listener = listener;
-		this.element.addInteractor( new LinkInteractor() );
-		this.bClosePopupOnActivate = bClosePopupOnActivate;
-		this.styleSheet = styleSheet;
 	}
 	
-	protected Hyperlink(DPText element, Location targetLocation, boolean bClosePopupOnActivate, ControlsStyleSheet styleSheet)
+	public Hyperlink(String text, Location targetLocation)
 	{
-		this( element, new LinkTargetListener( targetLocation ), bClosePopupOnActivate, styleSheet );
-		this.element.addContextMenuFactory( new LinkContextMenuFactory() );
+		this( text, new LinkTargetListener( targetLocation ) );
+		this.menuFactory = new LinkContextMenuFactory();
 	}
 	
 	
-	public DPElement getElement()
+	@Override
+	public DPElement present(PresentationContext ctx)
 	{
+		StyleSheet2 style = ctx.getStyle().get( Controls.hyperlinkAttrs, StyleSheet2.class );
+		Pres textElement = style.applyTo( new Text( text ) );
+		
+		DPElement element = textElement.present( ctx );
+		element.addInteractor( new LinkInteractor( ctx.getStyle().get( Controls.bClosePopupOnActivate, Boolean.class ) ) );
+		if ( menuFactory != null )
+		{
+			element.addContextMenuFactory( menuFactory );
+		}
+		
 		return element;
-	}
-	
-	
-	public String getText()
-	{
-		return element.getText();
-	}
-	
-	public void setText(String text)
-	{
-		element.setText( text );
 	}
 }

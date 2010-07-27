@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import BritefuryJ.DocPresent.Controls.PopupMenu;
+import BritefuryJ.Controls.PopupMenu;
 
 public interface ContextMenuFactory
 {
