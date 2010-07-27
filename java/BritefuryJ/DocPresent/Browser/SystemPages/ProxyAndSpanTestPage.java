@@ -10,22 +10,22 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Map;
 
+import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPProxy;
 import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.Combinators.ElementRef;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
 import BritefuryJ.DocPresent.Combinators.Primitive.LineBreak;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.Proxy;
 import BritefuryJ.DocPresent.Combinators.Primitive.Span;
 import BritefuryJ.DocPresent.Combinators.Primitive.Text;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
-import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
-import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
 public class ProxyAndSpanTestPage extends SystemPage
@@ -53,8 +53,6 @@ public class ProxyAndSpanTestPage extends SystemPage
 	private static StyleSheet2 redText = styleSheet.withAttr( Primitive.foreground, Color.red );
 	private static StyleSheet2 greenText = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
 	private static StyleSheet2 seaGreenText = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.5f ) );
-
-	private static ControlsStyleSheet controlsStyleSheet = ControlsStyleSheet.instance;
 
 	
 	protected ArrayList<Object> makeTextNodes(String text)
@@ -126,45 +124,59 @@ public class ProxyAndSpanTestPage extends SystemPage
 		return styleSheet.withAttr( Primitive.vboxSpacing, 5.0 ).applyTo( new VBox( new Pres[] { paragraph, modifySpanLink } ) );
 	}
 	
-	protected DPElement createParagraph3()
+	protected Pres createParagraph3()
 	{
-		DPSpan span = styleSheet.span( makeTextNodes( spanInProxyContentText, redText ).toArray( new DPElement[0] ) );
-		final DPProxy proxy = styleSheet.proxy( span );
+		final ElementRef spanRef = redText.applyTo( new Span( makeTextNodes( spanInProxyContentText ) ) ).elementRef();
+		final ElementRef proxyRef = new Proxy( spanRef ).elementRef();
 		
-		ArrayList<DPElement> paragraph2Contents = makeTextNodes( spanParaText, blackText );
-		paragraph2Contents.add( styleSheet.text( " " ) );
-		paragraph2Contents.add( styleSheet.lineBreak() );
-		paragraph2Contents.add( proxy );
-		paragraph2Contents.add( styleSheet.text( " " ) );
-		paragraph2Contents.add( styleSheet.lineBreak() );
-		paragraph2Contents.addAll( makeTextNodes( spanParaPostText, blackText ) );
-		DPElement paragraph = styleSheet.paragraph( paragraph2Contents.toArray( new DPElement[0] ) );
+		ArrayList<Object> paragraph2Contents = makeTextNodes( spanParaText );
+		paragraph2Contents.add( new Text( " " ) );
+		paragraph2Contents.add( new LineBreak() );
+		paragraph2Contents.add( proxyRef );
+		paragraph2Contents.add( new Text( " " ) );
+		paragraph2Contents.add( new LineBreak() );
+		paragraph2Contents.addAll( makeTextNodes( spanParaPostText ) );
+		Pres paragraph = new Paragraph( paragraph2Contents );
 		
 		Hyperlink.LinkListener onModifySpanLink = new Hyperlink.LinkListener()
 		{
-			public void onLinkClicked(Hyperlink link, PointerButtonEvent buttonEvent)
+			public void onLinkClicked(Hyperlink link, DPElement element, PointerButtonEvent buttonEvent)
 			{
-				DPSpan span = (DPSpan)proxy.getChild();
-				span.setChildren( makeTextNodes( spanSecondaryText, greenText ) );
+				for (Map.Entry<DPElement,PresentationContext> elem: spanRef.getElementsAndContexts())
+				{
+					DPSpan span = (DPSpan)elem.getKey();
+					ArrayList<DPElement> children = new ArrayList<DPElement>();
+					for (Object o: makeTextNodes( spanSecondaryText ))
+					{
+						Pres p = (Pres)o;
+						children.add( greenText.applyTo( p ).present( elem.getValue() ) );
+					}
+					span.setChildren( children );
+				}
 			}
 		};
-		Hyperlink modifySpanLink = controlsStyleSheet.link( "Place secondary text into span", onModifySpanLink );
+		Hyperlink modifySpanLink = new Hyperlink( "Place secondary text into span", onModifySpanLink );
 		
 		Hyperlink.LinkListener onModifyProxyLink = new Hyperlink.LinkListener()
 		{
-			public void onLinkClicked(Hyperlink link, PointerButtonEvent buttonEvent)
+			public void onLinkClicked(Hyperlink link, DPElement element, PointerButtonEvent buttonEvent)
 			{
-				proxy.setChild( styleSheet.span( makeTextNodes( proxySecondaryText, seaGreenText ).toArray( new DPElement[0] ) ) );
+				for (Map.Entry<DPElement,PresentationContext> elem: proxyRef.getElementsAndContexts())
+				{
+					DPProxy proxy = (DPProxy)elem.getKey();
+					Pres span = seaGreenText.applyTo( new Span( makeTextNodes( proxySecondaryText ) ) );
+					proxy.setChild( span.present( elem.getValue() ) );
+				}
 			}
 		};
-		Hyperlink modifyProxyLink = controlsStyleSheet.link( "Place new span into proxy", onModifyProxyLink );
+		Hyperlink modifyProxyLink = new Hyperlink( "Place new span into proxy", onModifyProxyLink );
 
-		return styleSheet.withVBoxSpacing( 5.0 ).vbox( new DPElement[] { paragraph,
-				styleSheet.withHBoxSpacing( 15.0 ).hbox( new DPElement[] { modifySpanLink.getElement(), modifyProxyLink.getElement() } ) } );
+		return styleSheet.withAttr( Primitive.vboxSpacing, 5.0 ).applyTo( new VBox( new Pres[] { paragraph,
+				styleSheet.withAttr( Primitive.hboxSpacing, 15.0 ).applyTo( new HBox( new Pres[] { modifySpanLink, modifyProxyLink } ) ) } ) );
 	}
 	
 	protected DPElement createContents()
 	{
-		return styleSheet.withVBoxSpacing( 30.0 ).vbox( new DPElement[] { createParagraph1(), createParagraph2(), createParagraph3() } );
+		return styleSheet.withAttr( Primitive.vboxSpacing, 30.0 ).applyTo( new VBox( new Pres[] { createParagraph1(), createParagraph2(), createParagraph3() } ) ).present();
 	}
 }

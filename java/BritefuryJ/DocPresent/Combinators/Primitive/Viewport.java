@@ -10,27 +10,28 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPViewport;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.Util.Range;
 
 public class Viewport extends Pres
 {
 	private Pres child;
 	private Range xRange = null, yRange = null;
-	private Object persistentStateKey;
+	private PersistentState persistentState;
 	
 	
-	public Viewport(Object child, Object persistentStateKey)
+	public Viewport(Object child, PersistentState persistentState)
 	{
 		this.child = coerce( child );
-		this.persistentStateKey = persistentStateKey;
+		this.persistentState = persistentState;
 	}
 	
-	public Viewport(Object child, Range xRange, Range yRange, Object persistentStateKey)
+	public Viewport(Object child, Range xRange, Range yRange, PersistentState persistentState)
 	{
 		this.child = coerce( child );
 		this.xRange = xRange;
 		this.yRange = yRange;
-		this.persistentStateKey = persistentStateKey;
+		this.persistentState = persistentState;
 	}
 	
 
@@ -38,7 +39,7 @@ public class Viewport extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		DPViewport element = new DPViewport( Primitive.containerParams.get( ctx.getStyle() ), xRange, yRange, ctx.persistentState( persistentStateKey ) );
+		DPViewport element = new DPViewport( Primitive.containerParams.get( ctx.getStyle() ), xRange, yRange, persistentState );
 		element.setChild( child.present( ctx.withStyle( Primitive.useContainerParams( ctx.getStyle() ) ) ).layoutWrap() );
 		return element;
 	}

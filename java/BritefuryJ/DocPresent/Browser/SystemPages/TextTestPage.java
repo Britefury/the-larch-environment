@@ -9,8 +9,11 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.Text;
+import BritefuryJ.DocPresent.Combinators.RichText.Body;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
 public class TextTestPage extends SystemPage
 {
@@ -32,20 +35,20 @@ public class TextTestPage extends SystemPage
 	
 	
 	
-	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-	private static PrimitiveStyleSheet smallCapsStyle = styleSheet.withTextSmallCaps( true );
-	private static PrimitiveStyleSheet redUnderlineStyle = styleSheet.withTextSquiggleUnderlinePaint( Color.red );
-	private static PrimitiveStyleSheet hoverStyle = styleSheet.withHoverForeground( new Color( 0.0f, 0.5f, 0.5f ) );
+	private static StyleSheet2 styleSheet = StyleSheet2.instance;
+	private static StyleSheet2 smallCapsStyle = styleSheet.withAttr( Primitive.textSmallCaps, true );
+	private static StyleSheet2 redUnderlineStyle = styleSheet.withAttr( Primitive.textSquiggleUnderlinePaint, Color.red );
+	private static StyleSheet2 hoverStyle = styleSheet.withAttr( Primitive.hoverForeground, new Color( 0.0f, 0.5f, 0.5f ) );
 
 	
 	
 	protected DPElement createContents()
 	{
-		DPText t0 = styleSheet.text( "Normal text; with characters that go above and below the basline." );
-		DPText t1 = smallCapsStyle.text( "Small caps text; with characters that go above and below the basline." );
-		DPText t2 = redUnderlineStyle.text( "Normal text with squiggle-underline; with characters that go above and below the basline." );
-		DPText t3 = hoverStyle.text( "Text with colour that is affected by pointer hover." );
+		Pres t0 = styleSheet.applyTo( new Text( "Normal text; with characters that go above and below the basline." ) );
+		Pres t1 = smallCapsStyle.applyTo( new Text( "Small caps text; with characters that go above and below the basline." ) );
+		Pres t2 = redUnderlineStyle.applyTo( new Text( "Normal text with squiggle-underline; with characters that go above and below the basline." ) );
+		Pres t3 = hoverStyle.applyTo( new Text( "Text with colour that is affected by pointer hover." ) );
 		
-		return styleSheet.vbox( new DPElement[] { t0, t1, t2, t3 } );
+		return new Body( new Pres[] { t0, t1, t2, t3 } ).present();
 	}
 }

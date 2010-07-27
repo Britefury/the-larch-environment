@@ -10,6 +10,8 @@ import java.util.HashMap;
 
 import BritefuryJ.AttributeTable.AttributeBase;
 import BritefuryJ.AttributeTable.AttributeTable2;
+import BritefuryJ.DocPresent.Combinators.ApplyStyleSheetValues;
+import BritefuryJ.DocPresent.Combinators.Pres;
 
 public class StyleSheetValues extends AttributeTable2
 {
@@ -25,6 +27,12 @@ public class StyleSheetValues extends AttributeTable2
 	protected StyleSheetValues newInstance()
 	{
 		return new StyleSheetValues();
+	}
+	
+	
+	public ApplyStyleSheetValues applyTo(Pres child)
+	{
+		return new ApplyStyleSheetValues( this, child );
 	}
 
 

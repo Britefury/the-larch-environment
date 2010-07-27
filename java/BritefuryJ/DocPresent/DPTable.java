@@ -30,12 +30,27 @@ public class DPTable extends DPContainer
 			this.child = child;
 		}
 	}
+	
+	
+	public static class TableCell
+	{
+		private DPElement child;
+		private int colSpan, rowSpan;
+		
+		
+		public TableCell(DPElement child, int colSpan, int rowSpan)
+		{
+			this.child = child;
+			this.colSpan = colSpan;
+			this.rowSpan = rowSpan;
+		}
+	}
 
 
 
 	private TableChildEntry[][] childEntryTable;
 	private ArrayList<TableChildEntry> childEntries;
-	private int rowPositions[];
+	private int rowStartIndices[];			// Indices into @childEntries, where each row starts
 	private int numColumns, numRows;		// Can be -1, indicating that these values must be refreshed
 
 	
@@ -54,7 +69,7 @@ public class DPTable extends DPContainer
 
 		childEntryTable = new TableChildEntry[0][];
 		childEntries = new ArrayList<TableChildEntry>();
-		rowPositions = new int[0];
+		rowStartIndices = new int[0];
 		numColumns = 0;
 		numRows = 0;
 	}
@@ -67,7 +82,7 @@ public class DPTable extends DPContainer
 
 		childEntryTable = new TableChildEntry[0][];
 		childEntries = new ArrayList<TableChildEntry>();
-		rowPositions = new int[0];
+		rowStartIndices = new int[0];
 		numColumns = 0;
 		numRows = 0;
 	}
@@ -129,12 +144,12 @@ public class DPTable extends DPContainer
 			// - Generate row positions
 			// - Compute number of columns
 			childEntryTable = new TableChildEntry[itemTable.length][];
-			rowPositions = new int[itemTable.length];
+			rowStartIndices = new int[itemTable.length];
 			int n = 0;
 			int rowI = 0;
 			for (DPElement[] row: itemTable)
 			{
-				rowPositions[rowI] = n;
+				rowStartIndices[rowI] = n;
 				numColumns = Math.max( numColumns, row.length );
 				
 				for (DPElement child: row)
@@ -159,7 +174,7 @@ public class DPTable extends DPContainer
 				TableChildEntry destRow[] = new TableChildEntry[row.length];
 				childEntryTable[rowI] = destRow;
 
-				rowPositions[rowI] = registeredChildren.size();
+				rowStartIndices[rowI] = registeredChildren.size();
 				numColumns = Math.max( numColumns, row.length );
 				
 				int columnI = 0;
@@ -211,12 +226,12 @@ public class DPTable extends DPContainer
 			// - Generate row positions
 			// - Compute number of columns
 			childEntryTable = new TableChildEntry[itemTable.length][];
-			rowPositions = new int[itemTable.length];
+			rowStartIndices = new int[itemTable.length];
 			int n = 0;
 			int rowI = 0;
 			for (DPElement[] row: itemTable)
 			{
-				rowPositions[rowI] = n;
+				rowStartIndices[rowI] = n;
 				numColumns = Math.max( numColumns, row.length );
 				
 				for (DPElement child: row)
@@ -241,7 +256,7 @@ public class DPTable extends DPContainer
 				TableChildEntry destRow[] = new TableChildEntry[row.length];
 				childEntryTable[rowI] = destRow;
 
-				rowPositions[rowI] = registeredChildren.size();
+				rowStartIndices[rowI] = registeredChildren.size();
 				numColumns = Math.max( numColumns, row.length );
 				
 				int columnI = 0;
@@ -284,6 +299,200 @@ public class DPTable extends DPContainer
 	
 
 	
+	public void setCells(TableCell[][] cellTable)
+	{
+		for (TableCell row[]: cellTable)
+		{
+			for (TableCell item: row)
+			{
+				if ( item != null  &&  item.child.getLayoutNode() == null )
+				{
+					throw new ChildHasNoLayoutException();
+				}
+			}
+		}
+		
+		if ( registeredChildren.isEmpty() )
+		{
+			// Empty; initialise from blank
+			numColumns = 0;
+			numRows = cellTable.length;
+
+			// - Count children
+			// - Generate row positions
+			// - Compute number of columns
+			childEntryTable = new TableChildEntry[cellTable.length][];
+			rowStartIndices = new int[cellTable.length];
+			int n = 0;
+			int rowI = 0;
+			for (TableCell[] row: cellTable)
+			{
+				rowStartIndices[rowI] = n;
+				int numColumnsForThisRow = 0;
+				if ( row.length > 0 )
+				{
+					numColumnsForThisRow = row.length;
+					TableCell lastCell = row[row.length-1];
+					if ( lastCell != null )
+					{
+						if ( lastCell.colSpan > 1 )
+						{
+							numColumnsForThisRow += lastCell.colSpan - 1;
+						}
+					}
+				}
+				numColumns = Math.max( numColumns, numColumnsForThisRow );
+				
+				for (TableCell cell: row)
+				{
+					if ( cell != null )
+					{
+						n++;
+					}
+				}
+				rowI++;
+			}
+
+			
+			// - Generate the list of registered children; an ordered list of all child elements
+			// - Create a table child entry for each child
+			// - Register each child
+			rowI = 0;
+			registeredChildren.ensureCapacity( n );
+			childEntries.ensureCapacity( n );
+			for (TableCell[] row: cellTable)
+			{
+				TableChildEntry destRow[] = new TableChildEntry[row.length];
+				childEntryTable[rowI] = destRow;
+
+				rowStartIndices[rowI] = registeredChildren.size();
+				numColumns = Math.max( numColumns, row.length );
+				
+				int columnI = 0;
+				for (TableCell cell: row)
+				{
+					if ( cell != null )
+					{
+						TableChildEntry entry = new TableChildEntry( cell.child, columnI, cell.colSpan, rowI, cell.rowSpan );
+						registeredChildren.add( cell.child );
+						childEntries.add( entry );
+						destRow[columnI] = entry;
+						registerChild( cell.child );
+					}
+					columnI++;
+				}
+				rowI++;
+			}
+		}
+		else
+		{
+			HashSet<DPElement> items, added, removed;
+			
+			numColumns = 0;
+			numRows = cellTable.length;
+			// Get a set of items being introduced
+			items = new HashSet<DPElement>();
+			for (TableCell[] row: cellTable)
+			{
+				for (TableCell cell: row)
+				{
+					items.add( cell.child );
+				}
+			}
+			items.remove( null );
+			
+			// Work out the set of elements that are being added to this table
+			// and the set that are being removed from this table
+			added = new HashSet<DPElement>( items );
+			removed = new HashSet<DPElement>( registeredChildren );
+			added.removeAll( registeredChildren );
+			removed.removeAll( items );
+
+			
+			// Unregister removed children
+			for (DPElement child: removed)
+			{
+				unregisterChild( child );
+			}
+			
+			// - Count children
+			// - Generate row positions
+			// - Compute number of columns
+			childEntryTable = new TableChildEntry[cellTable.length][];
+			rowStartIndices = new int[cellTable.length];
+			int n = 0;
+			int rowI = 0;
+			for (TableCell[] row: cellTable)
+			{
+				rowStartIndices[rowI] = n;
+				
+				int numColumnsForThisRow = 0;
+				if ( row.length > 0 )
+				{
+					numColumnsForThisRow = row.length;
+					TableCell lastCell = row[row.length-1];
+					if ( lastCell != null )
+					{
+						if ( lastCell.colSpan > 1 )
+						{
+							numColumnsForThisRow += lastCell.colSpan - 1;
+						}
+					}
+				}
+				numColumns = Math.max( numColumns, numColumnsForThisRow );
+				
+				for (TableCell cell: row)
+				{
+					if ( cell != null )
+					{
+						n++;
+					}
+				}
+				rowI++;
+			}
+
+			
+			// - Generate the list of registered children; an ordered list of all child elements
+			// - Create a table child entry for each child
+			// - Register each child
+			rowI = 0;
+			registeredChildren.ensureCapacity( n );
+			childEntries.ensureCapacity( n );
+			for (TableCell[] row: cellTable)
+			{
+				TableChildEntry destRow[] = new TableChildEntry[row.length];
+				childEntryTable[rowI] = destRow;
+
+				rowStartIndices[rowI] = registeredChildren.size();
+				numColumns = Math.max( numColumns, row.length );
+				
+				int columnI = 0;
+				for (TableCell cell: row)
+				{
+					if ( cell != null )
+					{
+						TableChildEntry entry = new TableChildEntry( cell.child, columnI, cell.colSpan, rowI, cell.rowSpan );
+						registeredChildren.add( cell.child );
+						childEntries.add( entry );
+						destRow[columnI] = entry;
+					}
+					columnI++;
+				}
+				rowI++;
+			}
+			
+			// Register added children
+			for (DPElement child: added)
+			{
+				registerChild( child );
+			}
+		}
+		
+		
+		onChildListModified();
+		queueResize();
+	}
+
 	
 	
 	public int width()
@@ -376,14 +585,14 @@ public class DPTable extends DPContainer
 				TableChildEntry ch[][] = new TableChildEntry[y+1][];
 				int rp[] = new int[y+1];
 				System.arraycopy( childEntryTable, 0, ch, 0, childEntryTable.length );
-				System.arraycopy( rowPositions, 0, rp, 0, rowPositions.length );
+				System.arraycopy( rowStartIndices, 0, rp, 0, rowStartIndices.length );
 				for (int i = childEntryTable.length; i < ch.length; i++)
 				{
 					ch[i] = new TableChildEntry[0];
 					rp[i] = registeredChildren.size();
 				}
 				childEntryTable = ch;
-				rowPositions = rp;
+				rowStartIndices = rp;
 			}
 			
 			// Get the row into which the child is being inserted
@@ -410,7 +619,7 @@ public class DPTable extends DPContainer
 					// If it is null, then we can only get this far if it is replacing an existing non-null
 					// child, else we won't get this far, due to the if-statement which ensures
 					// that work is not done, if a child is being replaced by itself
-					int insertionIndex = rowPositions[y];
+					int insertionIndex = rowStartIndices[y];
 					for (int i = 0; i < x; i++)
 					{
 						if ( row[i] != null )
@@ -420,9 +629,9 @@ public class DPTable extends DPContainer
 					}
 					registeredChildren.add( insertionIndex, item );
 					childEntries.add( insertionIndex, childEntry );
-					for (int i = y + 1; i < rowPositions.length; i++)
+					for (int i = y + 1; i < rowStartIndices.length; i++)
 					{
-						rowPositions[i]++;
+						rowStartIndices[i]++;
 					}
 				}
 			}
@@ -433,9 +642,9 @@ public class DPTable extends DPContainer
 					// Removing an existing child
 					registeredChildren.remove( oldChildIndex );
 					childEntries.remove( oldChildIndex );
-					for (int i = y + 1; i < rowPositions.length; i++)
+					for (int i = y + 1; i < rowStartIndices.length; i++)
 					{
-						rowPositions[i]--;
+						rowStartIndices[i]--;
 					}
 				}
 				else

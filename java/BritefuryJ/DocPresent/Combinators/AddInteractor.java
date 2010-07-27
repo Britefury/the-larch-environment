@@ -7,9 +7,26 @@
 package BritefuryJ.DocPresent.Combinators;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.ElementInteractor;
 
-public interface CustomAction
+public class AddInteractor extends Pres
 {
-	public void apply(DPElement element, PresentationContext ctx);
+	private ElementInteractor interactor;
+	private Pres child;
+	
+	
+	public AddInteractor(Pres child, ElementInteractor interactor)
+	{
+		this.interactor = interactor;
+		this.child = child;
+	}
+	
+	
+	@Override
+	public DPElement present(PresentationContext ctx)
+	{
+		DPElement element = child.present( ctx );
+		element.addInteractor( interactor );
+		return element;
+	}
 }

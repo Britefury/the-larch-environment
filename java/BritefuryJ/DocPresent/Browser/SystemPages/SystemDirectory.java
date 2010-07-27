@@ -32,9 +32,9 @@ public class SystemDirectory
 		primitiveTestPages.add( new ParagraphTestPage() );
 		primitiveTestPages.add( new ParagraphWithSpanTestPage() );
 		primitiveTestPages.add( new ProxyAndSpanTestPage() );
-		primitiveTestPages.add( new ShapeTestPage() );
 		primitiveTestPages.add( new ScriptTestPage() );
 		primitiveTestPages.add( new SegmentTestPage() );
+		primitiveTestPages.add( new ShapeTestPage() );
 		primitiveTestPages.add( new TableTestPage() );
 		primitiveTestPages.add( new TextTestPage() );
 		primitiveTestPages.add( new VBoxTestPage() );
