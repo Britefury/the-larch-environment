@@ -29,9 +29,14 @@ public class ElementRef extends Pres
 		return elements.keySet();
 	}
 	
-	public Set<Map.Entry<DPElement,PresentationContext>> getElementsAndContexts()
+	public Set<Map.Entry<DPElement, PresentationContext>> getElementsAndContexts()
 	{
 		return elements.entrySet();
+	}
+	
+	public PresentationContext getContextForElement(DPElement element)
+	{
+		return elements.get( element );
 	}
 	
 	
