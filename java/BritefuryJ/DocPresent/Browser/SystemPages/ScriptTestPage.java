@@ -10,9 +10,14 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.ElementFactory;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Fraction;
+import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.Script;
+import BritefuryJ.DocPresent.Combinators.Primitive.Text;
+import BritefuryJ.DocPresent.Combinators.RichText.Body;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
 public class ScriptTestPage extends SystemPage
 {
@@ -34,106 +39,62 @@ public class ScriptTestPage extends SystemPage
 	
 	
 	
-	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-	private static PrimitiveStyleSheet scriptPreStyleSheet = styleSheet.withFontSize( 12 ).withForeground( Color.blue );
-	private static PrimitiveStyleSheet scriptPostStyleSheet = styleSheet.withFontSize( 24 ).withForeground( Color.red );
-	private static PrimitiveStyleSheet dividerStyleSheet = styleSheet.withFontSize( 24 );
+	private static StyleSheet2 styleSheet = StyleSheet2.instance;
+	private static StyleSheet2 scriptPreStyleSheet = styleSheet.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, Color.blue );
+	private static StyleSheet2 scriptPostStyleSheet = styleSheet.withAttr( Primitive.fontSize, 24 ).withAttr( Primitive.foreground, Color.red );
+	private static StyleSheet2 dividerStyleSheet = styleSheet.withAttr( Primitive.fontSize, 24 );
 
-	private static PrimitiveStyleSheet scriptStyleSheet = styleSheet.withFontSize( 16 ).withForeground( Color.black );
+	private static StyleSheet2 scriptStyleSheet = styleSheet.withAttr( Primitive.fontSize, 16 ).withAttr( Primitive.foreground, Color.black );
 
 	
-	private ElementFactory textFactory(final String text)
-	{
-		return new ElementFactory()
-		{
-			@Override
-			public DPElement createElement(StyleSheet styleSheet)
-			{
-				return ((PrimitiveStyleSheet)styleSheet).text( text );
-			}
-		};
-	}
 	
-	private ElementFactory fractionFactory(final ElementFactory num, final ElementFactory denom, final String barContent)
+	protected Pres makeScriptLine(Pres main, Pres leftSuper, Pres leftSub, Pres rightSuper, Pres rightSub)
 	{
-		return new ElementFactory()
-		{
-			@Override
-			public DPElement createElement(StyleSheet styleSheet)
-			{
-				PrimitiveStyleSheet numStyle = ((PrimitiveStyleSheet)styleSheet).fractionNumeratorStyle();
-				PrimitiveStyleSheet denomStyle = ((PrimitiveStyleSheet)styleSheet).fractionDenominatorStyle();
-				return ((PrimitiveStyleSheet)styleSheet).fraction( num.createElement( numStyle ), denom.createElement( denomStyle ) , barContent );
-			}
-		};
-	}
-
-	private ElementFactory scriptFactory(final ElementFactory main, final ElementFactory leftSuper, final ElementFactory leftSub, final ElementFactory rightSuper, final ElementFactory rightSub)
-	{
-		return new ElementFactory()
-		{
-			@Override
-			public DPElement createElement(StyleSheet styleSheet)
-			{
-				PrimitiveStyleSheet childStyle = ((PrimitiveStyleSheet)styleSheet).scriptScriptChildStyle();
-				return ((PrimitiveStyleSheet)styleSheet).script( main.createElement( styleSheet ),
-						leftSuper != null  ?  leftSuper.createElement( childStyle )  :  null,
-						leftSub != null  ?  leftSub.createElement( childStyle )  :  null,
-						rightSuper != null  ?  rightSuper.createElement( childStyle )  :  null,
-						rightSub != null  ?  rightSub.createElement( childStyle )  :  null
-					);
-			}
-		};
+		return new HBox( new Pres[] { scriptPreStyleSheet.applyTo( new Text( "<<Left<<" ) ),
+				scriptStyleSheet.applyTo( new Script( main, leftSuper, leftSub, rightSuper, rightSub ) ),
+				scriptPostStyleSheet.applyTo( new Text( ">>Right>>" ) ) } );
 	}
 
 	
 	
-	protected DPElement makeScriptLine(ElementFactory main, ElementFactory leftSuper, ElementFactory leftSub, ElementFactory rightSuper, ElementFactory rightSub)
+	protected Pres makeScriptFraction(String mainText, String numText, String denomText)
 	{
-		ElementFactory scriptFac = scriptFactory( main, leftSuper, leftSub, rightSuper, rightSub );
-		return styleSheet.hbox( new DPElement[] { scriptPreStyleSheet.text( "<<Left<<" ),
-				scriptFac.createElement( styleSheet ),
-				scriptPostStyleSheet.text( ">>Right>>" ) } );
-	}
-
-	
-	
-	protected DPElement makeScriptFraction(String mainText, String numText, String denomText)
-	{
-		ElementFactory fractionFac = fractionFactory( textFactory( numText ), textFactory( denomText ), "/" );
-		ElementFactory scriptFac = scriptFactory( textFactory( mainText ), null, null, fractionFac, null );
+		Pres fraction = new Fraction( new Text( numText ), new Text( denomText ), "/" );
+		Pres script = new Script( new Text( mainText ), null, null, fraction, null );
 		
-		return styleSheet.hbox( new DPElement[] { scriptPreStyleSheet.text( "Label A yYgGjJpPqQ" ), scriptFac.createElement( scriptStyleSheet ), scriptPostStyleSheet.text( "Label B yYgGjJpPqQ" ) } );
+		return new HBox( new Pres[] { scriptPreStyleSheet.applyTo( new Text( "Label A yYgGjJpPqQ" ) ),
+				scriptStyleSheet.applyTo( script ),
+				scriptPostStyleSheet.applyTo( new Text( "Label B yYgGjJpPqQ" ) ) } );
 	}
 
 	
 	
 	protected DPElement createContents()
 	{
-		ArrayList<DPElement> children = new ArrayList<DPElement>();
+		ArrayList<Object> children = new ArrayList<Object>();
 		
 		for (int i = 0; i < 16; i++)
 		{
-			ElementFactory leftSuperText = ( i & 1 ) != 0   ?   textFactory( "left super" )  :  null; 
-			ElementFactory leftSubText = ( i & 2 ) != 0   ?   textFactory( "left sub" )  :  null; 
-			ElementFactory rightSuperText = ( i & 4 ) != 0   ?   textFactory( "right super" )  :  null; 
-			ElementFactory rightSubText = ( i & 8 ) != 0   ?   textFactory( "right sub" )  :  null;
+			Pres leftSuperText = ( i & 1 ) != 0   ?   new Text( "left super" )  :  null; 
+			Pres leftSubText = ( i & 2 ) != 0   ?   new Text( "left sub" )  :  null; 
+			Pres rightSuperText = ( i & 4 ) != 0   ?   new Text( "right super" )  :  null; 
+			Pres rightSubText = ( i & 8 ) != 0   ?   new Text( "right sub" )  :  null;
 			
-			children.add( makeScriptLine( textFactory( "MAIN" + String.valueOf( i ) ), leftSuperText, leftSubText, rightSuperText, rightSubText ) );
+			children.add( makeScriptLine( new Text( "MAIN" + String.valueOf( i ) ), leftSuperText, leftSubText, rightSuperText, rightSubText ) );
 		}
 		
-		children.add( dividerStyleSheet.text( "---" ) );
+		children.add( dividerStyleSheet.applyTo( new Text( "---" ) ) );
 
 		for (int i = 0; i < 16; i++)
 		{
-			ElementFactory leftSuperText = ( i & 1 ) != 0   ?   fractionFactory( textFactory( "a" ), textFactory( "x" ), "/" )  :  textFactory( "a" ); 
-			ElementFactory leftSubText = ( i & 2 ) != 0   ?   fractionFactory( textFactory( "b" ), textFactory( "x" ), "/" )  :  textFactory( "b" ); 
-			ElementFactory rightSuperText = ( i & 4 ) != 0   ?   fractionFactory( textFactory( "c" ), textFactory( "x" ), "/" )  :  textFactory( "c" ); 
-			ElementFactory rightSubText = ( i & 8 ) != 0   ?   fractionFactory( textFactory( "d" ), textFactory( "x" ), "/" )  :  textFactory( "d" );
+			Pres leftSuperText = ( i & 1 ) != 0   ?   new Fraction( new Text( "a" ), new Text( "x" ), "/" )  :  new Text( "a" ); 
+			Pres leftSubText = ( i & 2 ) != 0   ?   new Fraction( new Text( "b" ), new Text( "x" ), "/" )  :  new Text( "b" ); 
+			Pres rightSuperText = ( i & 4 ) != 0   ?   new Fraction( new Text( "c" ), new Text( "x" ), "/" )  :  new Text( "c" ); 
+			Pres rightSubText = ( i & 8 ) != 0   ?   new Fraction( new Text( "d" ), new Text( "x" ), "/" )  :  new Text( "d" );
 			
-			children.add( makeScriptLine( textFactory( "MAIN" + String.valueOf( i ) ), leftSuperText, leftSubText, rightSuperText, rightSubText ) );
+			children.add( makeScriptLine( new Text( "MAIN" + String.valueOf( i ) ), leftSuperText, leftSubText, rightSuperText, rightSubText ) );
 		}
 		
-		return styleSheet.withVBoxSpacing( 10.0 ).vbox( children.toArray( new DPElement[0] ) );
+		return new Body( children ).present();
 	}
 }

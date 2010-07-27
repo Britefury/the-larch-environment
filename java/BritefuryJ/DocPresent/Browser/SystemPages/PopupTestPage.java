@@ -8,15 +8,22 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 
+import BritefuryJ.Controls.HPopupMenu;
+import BritefuryJ.Controls.Hyperlink;
+import BritefuryJ.Controls.MenuItem;
+import BritefuryJ.Controls.PopupMenu;
+import BritefuryJ.Controls.VPopupMenu;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPProxy;
-import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
-import BritefuryJ.DocPresent.Controls.Hyperlink;
-import BritefuryJ.DocPresent.Controls.MenuItem;
-import BritefuryJ.DocPresent.Controls.PopupMenu;
+import BritefuryJ.DocPresent.Combinators.ElementRef;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.Proxy;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.RichText.Body;
+import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
+import BritefuryJ.DocPresent.Combinators.RichText.NormalText;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.DocPresent.StyleSheet.RichTextStyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
 public class PopupTestPage extends SystemPage
 {
@@ -37,90 +44,54 @@ public class PopupTestPage extends SystemPage
 	}
 	
 	
-	private class LinkColourChanger implements Hyperlink.LinkListener
+
+	private static StyleSheet2 styleSheet = StyleSheet2.instance;
+	private static StyleSheet2 blackText = styleSheet.withAttr( Primitive.foreground, Color.black );
+	private static StyleSheet2 redText = styleSheet.withAttr( Primitive.foreground, Color.red );
+	private static StyleSheet2 greenText = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
+	private static StyleSheet2 blueText = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) );
+	private static StyleSheet2 purpleText = styleSheet.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.5f ) );
+	private static StyleSheet2 cyanText = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.5f ) );
+
+	
+	
+	protected static Pres colouredText(StyleSheet2 style)
 	{
-		private DPProxy parentElement;
-		private PrimitiveStyleSheet style;
-		
-		
-		public LinkColourChanger(DPProxy parentElement, PrimitiveStyleSheet style)
-		{
-			this.parentElement = parentElement;
-			this.style = style;
-		}
-
-
-		public void onLinkClicked(Hyperlink link, PointerButtonEvent event)
-		{
-			parentElement.setChild( colouredText( style ) );
-		}
-	}
-
-	
-
-	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-	private static PrimitiveStyleSheet headingStyleSheet = styleSheet.withFontSize( 18 );
-	private static PrimitiveStyleSheet blackText = styleSheet.withForeground( Color.black );
-	private static PrimitiveStyleSheet redText = styleSheet.withForeground( Color.red );
-	private static PrimitiveStyleSheet greenText = styleSheet.withForeground( new Color( 0.0f, 0.5f, 0.0f ) );
-	private static PrimitiveStyleSheet blueText = styleSheet.withForeground( new Color( 0.0f, 0.0f, 0.5f ) );
-	private static PrimitiveStyleSheet purpleText = styleSheet.withForeground( new Color( 0.5f, 0.0f, 0.5f ) );
-	private static PrimitiveStyleSheet cyanText = styleSheet.withForeground( new Color( 0.0f, 0.5f, 0.5f ) );
-
-	private static ControlsStyleSheet controlsStyleSheet = ControlsStyleSheet.instance;
-	private static ControlsStyleSheet popupCloseControlsStyleSheet = ControlsStyleSheet.instance.withClosePopupOnActivate();
-
-	
-	
-	protected DPElement section(String title, DPElement contents)
-	{
-		DPElement heading = headingStyleSheet.staticText( title );
-		
-		return styleSheet.vbox( new DPElement[] { heading.padY( 10.0 ), contents } );
-	}
-	
-	protected static DPElement colouredText(PrimitiveStyleSheet style)
-	{
-		RichTextStyleSheet textStyle = RichTextStyleSheet.instance.withNonEditable().withPrimitiveStyleSheet( style );
-		return textStyle.paragraph( "Change the colour of this text, using the hyperlinks within the popup activated by the hyperlink below. The last links in the embedded popups will close the popup chain." );
+		return style.withAttr( Primitive.editable, false ).applyTo(
+				new NormalText( "Change the colour of this text, using the hyperlinks within the popup activated by the hyperlink below. The last links in the embedded popups will close the popup chain." ) );
 	}
 	
 	protected DPElement createContents()
 	{
-		DPProxy colouredTextProxy = styleSheet.proxy( colouredText( blackText ) );
-		Hyperlink blackLink = controlsStyleSheet.link( "Black", new LinkColourChanger( colouredTextProxy, blackText ) );
-		Hyperlink redLink = controlsStyleSheet.link( "Red", new LinkColourChanger( colouredTextProxy, redText ) );
-		Hyperlink greenLink = controlsStyleSheet.link( "Green", new LinkColourChanger( colouredTextProxy, greenText ) );
-		Hyperlink blueLink = popupCloseControlsStyleSheet.link( "Blue", new LinkColourChanger( colouredTextProxy, blueText ) );
-		Hyperlink purpleLink = controlsStyleSheet.link( "Purple", new LinkColourChanger( colouredTextProxy, purpleText ) );
-		Hyperlink cyanLink = popupCloseControlsStyleSheet.link( "Cyan", new LinkColourChanger( colouredTextProxy, cyanText ) );
+		ElementRef colouredTextProxyRef = new Proxy( colouredText( blackText ) ).elementRef();
+		Hyperlink blackLink = new Hyperlink( "Black", new HyperlinkTestPage.LinkContentChanger( colouredTextProxyRef, colouredText( blackText ) ) );
+		Hyperlink redLink = new Hyperlink( "Red", new HyperlinkTestPage.LinkContentChanger( colouredTextProxyRef, colouredText( redText ) ) );
+		Hyperlink greenLink = new Hyperlink( "Green", new HyperlinkTestPage.LinkContentChanger( colouredTextProxyRef, colouredText( greenText ) ) );
+		Hyperlink blueLink = new Hyperlink( "Blue", new HyperlinkTestPage.LinkContentChanger( colouredTextProxyRef, colouredText( blueText ) ) );
+		Hyperlink purpleLink = new Hyperlink( "Purple", new HyperlinkTestPage.LinkContentChanger( colouredTextProxyRef, colouredText( purpleText ) ) );
+		Hyperlink cyanLink = new Hyperlink( "Cyan", new HyperlinkTestPage.LinkContentChanger( colouredTextProxyRef, colouredText( cyanText ) ) );
 
 		
-		PopupMenu menuA = controlsStyleSheet.vpopupMenu( new DPElement[] { greenLink.getElement(), blueLink.getElement() } );
-		PopupMenu menuB = controlsStyleSheet.vpopupMenu( new DPElement[] { purpleLink.getElement(), cyanLink.getElement() } );
+		PopupMenu menuA = new VPopupMenu( new Pres[] { greenLink, blueLink } );
+		PopupMenu menuB = new VPopupMenu( new Pres[] { purpleLink, cyanLink } );
 		
-		MenuItem menuAItem = controlsStyleSheet.subMenuItemDownWithLabel( "Submenu A", menuA );
-		MenuItem menuBItem = controlsStyleSheet.subMenuItemDownWithLabel( "Submenu B", menuB );
+		MenuItem menuAItem = new MenuItem( "Submenu A", menuA, MenuItem.SubmenuPopupDirection.DOWN );
+		MenuItem menuBItem = new MenuItem( "Submenu B", menuB, MenuItem.SubmenuPopupDirection.DOWN );
 		
-		final PopupMenu mainMenu = controlsStyleSheet.hpopupMenu( new DPElement[] { blackLink.getElement(), redLink.getElement(),
-				menuAItem.getElement(), menuBItem.getElement() } );
+		final PopupMenu mainMenu = new HPopupMenu( new Pres[] { blackLink, redLink, menuAItem, menuBItem } );
 		
 		
 		Hyperlink.LinkListener popupListener = new Hyperlink.LinkListener()
 		{
-			public void onLinkClicked(Hyperlink link, PointerButtonEvent event)
+			public void onLinkClicked(Hyperlink link, DPElement element, PointerButtonEvent event)
 			{
-				mainMenu.popupToRightOf( link.getElement() );
+				mainMenu.popupToRightOf( element );
 			}
 		};
 		
-		Hyperlink popupLink = controlsStyleSheet.link( "Popup", popupListener );
-		DPElement colourBox = styleSheet.vbox( new DPElement[] { colouredTextProxy, popupLink.getElement() } );
-		DPElement colourSection = section( "Action hyperlinks", colourBox );
+		Hyperlink popupLink = new Hyperlink( "Popup", popupListener );
+		Pres colourBox = new VBox( new Pres[] { colouredTextProxyRef, popupLink } );
 		
-		Hyperlink locationLink = controlsStyleSheet.link( "To system page", SystemRootPage.getLocation() );
-		DPElement locationSection = section( "Location hyperlinks", locationLink.getElement() );
-		
-		return styleSheet.withVBoxSpacing( 30.0 ).vbox( new DPElement[] { colourSection, locationSection } );
+		return new Body( new Object[] { new Heading2( "Action hyperlinks" ), colourBox } ).present();
 	}
 }

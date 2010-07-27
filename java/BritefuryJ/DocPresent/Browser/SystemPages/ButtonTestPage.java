@@ -7,13 +7,23 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
+import java.util.Map;
 
+import BritefuryJ.Controls.Button;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPProxy;
-import BritefuryJ.DocPresent.Controls.Button;
-import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
+import BritefuryJ.DocPresent.Combinators.ElementRef;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.Proxy;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.RichText.Body;
+import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
+import BritefuryJ.DocPresent.Combinators.RichText.NormalText;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
 public class ButtonTestPage extends SystemPage
 {
@@ -34,59 +44,53 @@ public class ButtonTestPage extends SystemPage
 	}
 	
 	
-	private class ButtonColourChanger implements Button.ButtonListener
+	protected static class ButtonContentChanger implements Button.ButtonListener
 	{
-		private DPProxy parentElement;
-		private PrimitiveStyleSheet style;
+		private ElementRef parentElement;
+		private Pres newContents;
 		
 		
-		public ButtonColourChanger(DPProxy parentElement, PrimitiveStyleSheet style)
+		public ButtonContentChanger(ElementRef parentElement, Pres newContents)
 		{
 			this.parentElement = parentElement;
-			this.style = style;
+			this.newContents = newContents;
 		}
 
 
-		public void onButtonClicked(Button button, PointerButtonEvent event)
+		public void onButtonClicked(Button button, DPElement element, PointerButtonEvent event)
 		{
-			parentElement.setChild( colouredText( style ) );
+			for (Map.Entry<DPElement, PresentationContext> entry: parentElement.getElementsAndContexts())
+			{
+				DPProxy proxy = (DPProxy)entry.getKey();
+				proxy.setChild( newContents.present( entry.getValue() ) );
+			}
 		}
 	}
 
 	
 
-	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-	private static PrimitiveStyleSheet headingStyleSheet = styleSheet.withFontSize( 18 );
-	private static PrimitiveStyleSheet blackText = styleSheet.withForeground( Color.black );
-	private static PrimitiveStyleSheet redText = styleSheet.withForeground( Color.red );
-	private static PrimitiveStyleSheet greenText = styleSheet.withForeground( new Color( 0.0f, 0.5f, 0.0f ) );
+	private static StyleSheet2 styleSheet = StyleSheet2.instance;
+	private static StyleSheet2 blackText = styleSheet.withAttr( Primitive.foreground, Color.black );
+	private static StyleSheet2 redText = styleSheet.withAttr( Primitive.foreground, Color.red );
+	private static StyleSheet2 greenText = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
 
-	private static ControlsStyleSheet controlsStyleSheet = ControlsStyleSheet.instance;
 
 	
-	
-	protected DPElement section(String title, DPElement contents)
+	private static Pres colouredText(StyleSheet2 style)
 	{
-		DPElement heading = headingStyleSheet.staticText( title );
-		
-		return styleSheet.vbox( new DPElement[] { heading.padY( 10.0 ), contents } );
-	}
-	
-	protected DPElement colouredText(PrimitiveStyleSheet style)
-	{
-		return style.staticText( "Change the colour of this text using the buttons below." );
+		return style.withAttr( Primitive.editable, false ).applyTo(
+				new NormalText( "Change the colour of this text, using the buttons below." ) );
 	}
 	
 	protected DPElement createContents()
 	{
-		DPProxy colouredTextProxy = styleSheet.proxy( colouredText( blackText ) );
-		Button blackButton = controlsStyleSheet.button( styleSheet.staticText( "Black" ), new ButtonColourChanger( colouredTextProxy, blackText ) );
-		Button redButton = controlsStyleSheet.button( styleSheet.staticText( "Red" ), new ButtonColourChanger( colouredTextProxy, redText ) );
-		Button greenButton = controlsStyleSheet.button( styleSheet.staticText( "Green" ), new ButtonColourChanger( colouredTextProxy, greenText ) );
-		DPElement colourLinks = styleSheet.withHBoxSpacing( 20.0 ).hbox( new DPElement[] { blackButton.getElement(), redButton.getElement(), greenButton.getElement() } ).padX( 5.0 );
-		DPElement colourBox = styleSheet.vbox( new DPElement[] { colouredTextProxy, colourLinks } );
-		DPElement colourSection = section( "Action buttons", colourBox );
+		ElementRef colouredTextProxyRef = new Proxy( colouredText( blackText ) ).elementRef();
+		Button blackButton = Button.buttonWithLabel( "Black", new ButtonContentChanger( colouredTextProxyRef, colouredText( blackText ) ) );
+		Button redButton = Button.buttonWithLabel( "Red", new ButtonContentChanger( colouredTextProxyRef, colouredText( redText ) ) );
+		Button greenButton = Button.buttonWithLabel( "Green", new ButtonContentChanger( colouredTextProxyRef, colouredText( greenText ) ) );
+		Pres colourLinks = styleSheet.withAttr( Primitive.hboxSpacing, 20.0 ).applyTo( new HBox( new Pres[] { blackButton, redButton, greenButton } ) ).padX( 5.0 );
+		Pres colourBox = new VBox( new Pres[] { colouredTextProxyRef, colourLinks } );
 		
-		return colourSection;
+		return new Body( new Pres[] { new Heading2( "Action button" ), colourBox } ).present();
 	}
 }

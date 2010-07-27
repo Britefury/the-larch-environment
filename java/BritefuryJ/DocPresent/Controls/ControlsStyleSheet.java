@@ -618,14 +618,14 @@ public class ControlsStyleSheet extends StyleSheet
 	}
 	
 	
-	private CheckboxHelper.CheckboxCheckedPainterInteractor checkboxCheckInteractor = null;
+	private CheckboxHelper.CheckboxCheckPainterInteractor checkboxCheckInteractor = null;
 	
-	private CheckboxHelper.CheckboxCheckedPainterInteractor getCheckboxCheckInteractor()
+	private CheckboxHelper.CheckboxCheckPainterInteractor getCheckboxCheckInteractor()
 	{
 		if ( checkboxCheckInteractor == null )
 		{
 			Paint foreground = getNonNull( "checkboxCheckForeground", Paint.class, defaultCheckboxCheckForeground );
-			checkboxCheckInteractor = new CheckboxHelper.CheckboxCheckedPainterInteractor( foreground );
+			checkboxCheckInteractor = new CheckboxHelper.CheckboxCheckPainterInteractor( foreground );
 		}
 		return checkboxCheckInteractor;
 	}
@@ -943,7 +943,7 @@ public class ControlsStyleSheet extends StyleSheet
 		DPElement hbox = getCheckboxStyleSheet().hbox( new DPElement[] { check.alignVCentre(), child.alignVCentre() } );
 		DPElement element = primitive.bin( hbox );
 		Checkbox checkbox = new Checkbox( element, check, unchecked, checked, state, listener );
-		hbox.addInteractor( new CheckboxHelper.CheckboxCheckInteractor( checkbox ) );
+		hbox.addInteractor( new CheckboxHelper.CheckboxInteractor( checkbox ) );
 		return checkbox;
 	}
 	

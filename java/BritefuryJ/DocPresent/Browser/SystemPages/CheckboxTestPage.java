@@ -6,10 +6,15 @@
 //##************************
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
+import BritefuryJ.Controls.Checkbox;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.Controls.Checkbox;
-import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
+import BritefuryJ.DocPresent.Combinators.ElementRef;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.RichText.Body;
+import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class CheckboxTestPage extends SystemPage
@@ -33,37 +38,27 @@ public class CheckboxTestPage extends SystemPage
 	
 	private class CheckboxTextChanger implements Checkbox.CheckboxListener
 	{
-		private DPText textElement;
+		private ElementRef textElements;
 		
 		
-		public CheckboxTextChanger(DPText textElement)
+		public CheckboxTextChanger(ElementRef textElements)
 		{
-			this.textElement = textElement;
+			this.textElements = textElements;
 		}
 
 
 		public void onCheckboxToggled(Checkbox checkbox, boolean state)
 		{
-			textElement.setText( String.valueOf( state ) );
+			for (DPElement element: textElements.getElements())
+			{
+				DPText textElement = (DPText)element;
+				textElement.setText( String.valueOf( state ) );
+			}
 		}
 	}
 
 	
 
-	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-	private static PrimitiveStyleSheet headingStyleSheet = styleSheet.withFontSize( 18 );
-
-	private static ControlsStyleSheet controlsStyleSheet = ControlsStyleSheet.instance;
-
-	
-	
-	protected DPElement section(String title, DPElement contents)
-	{
-		DPElement heading = headingStyleSheet.staticText( title );
-		
-		return styleSheet.vbox( new DPElement[] { heading.padY( 10.0 ), contents } );
-	}
-	
 	protected DPElement colouredText(PrimitiveStyleSheet style)
 	{
 		return style.staticText( "Change the colour of this text using the buttons below." );
@@ -71,12 +66,10 @@ public class CheckboxTestPage extends SystemPage
 	
 	protected DPElement createContents()
 	{
-		DPText stateText = styleSheet.staticText( "false" );
-		Checkbox checkbox = controlsStyleSheet.checkbox( styleSheet.staticText( "State" ), false, new CheckboxTextChanger( stateText ) );
-		DPElement checkBoxes = styleSheet.withHBoxSpacing( 20.0 ).hbox( new DPElement[] { checkbox.getElement() } ).padX( 5.0 );
-		DPElement checkboxSectionContents = styleSheet.vbox( new DPElement[] { stateText, checkBoxes } );
-		DPElement checkboxSection = section( "Checkbox", checkboxSectionContents );
+		ElementRef stateTextRef = new StaticText( "false" ).elementRef();
+		Checkbox checkbox = Checkbox.checkboxWithLabel( "State", false, new CheckboxTextChanger( stateTextRef ) );
+		Pres checkboxSectionContents = new VBox( new Pres[] { stateTextRef, checkbox.padX( 5.0 ) } );
 		
-		return checkboxSection;
+		return new Body( new Pres[] { new Heading2( "Checkbox" ), checkboxSectionContents } ).present();
 	}
 }

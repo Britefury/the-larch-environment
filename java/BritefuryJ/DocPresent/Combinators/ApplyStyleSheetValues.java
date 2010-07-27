@@ -7,9 +7,24 @@
 package BritefuryJ.DocPresent.Combinators;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
 
-public interface CustomAction
+public class ApplyStyleSheetValues extends Pres
 {
-	public void apply(DPElement element, PresentationContext ctx);
+	private StyleSheetValues styleSheetValues;
+	private Pres child;
+	
+	
+	public ApplyStyleSheetValues(StyleSheetValues styleSheetValues, Pres child)
+	{
+		this.styleSheetValues = styleSheetValues;
+		this.child = child;
+	}
+	
+
+	@Override
+	public DPElement present(PresentationContext ctx)
+	{
+		return child.present( ctx.withStyle( styleSheetValues ) );
+	}
 }

@@ -10,7 +10,14 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.Segment;
+import BritefuryJ.DocPresent.Combinators.Primitive.Span;
+import BritefuryJ.DocPresent.Combinators.Primitive.Text;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
 public class SegmentTestPage extends SystemPage
 {
@@ -32,42 +39,42 @@ public class SegmentTestPage extends SystemPage
 	}
 
 
-	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
+	private static StyleSheet2 styleSheet = StyleSheet2.instance;
 	
 	
 	
-	protected DPElement text(String t, Color colour)
+	protected Pres text(String t, Color colour)
 	{
-		return styleSheet.withForeground( colour ).text( t );
+		return styleSheet.withAttr( Primitive.foreground, colour ).applyTo( new Text( t ) );
 	}
 	
-	protected DPElement text(String t)
+	protected Pres text(String t)
 	{
 		return text( t, Color.black );
 	}
 	
 	
-	protected DPElement segment(DPElement x, boolean bGuardBegin, boolean bGuardEnd)
+	protected Pres segment(Pres x, boolean bGuardBegin, boolean bGuardEnd)
 	{
-		return styleSheet.segment( bGuardBegin, bGuardEnd, x );
+		return new Segment( bGuardBegin, bGuardEnd, x );
 	}
 	
 	
-	protected DPElement span(DPElement... x)
+	protected Pres span(Pres... x)
 	{
-		return styleSheet.span( x );
+		return new Span( x );
 	}
 	
 	
-	protected DPElement line(DPElement... x)
+	protected Pres line(Pres... x)
 	{
-		return styleSheet.paragraph( x );
+		return new Paragraph( x );
 	}
 	
 	
 	protected DPElement createContents()
 	{
-		ArrayList<DPElement> children = new ArrayList<DPElement>();
+		ArrayList<Object> children = new ArrayList<Object>();
 		
 		children.add( line( text( "Bars (|) indicate segment boundaries" ) ) );
 		children.add( line( text( "One segment in middle of text |" ), segment( text( "no guards", Color.red ), false, false ), text( "| finish." ) ) );
@@ -78,6 +85,6 @@ public class SegmentTestPage extends SystemPage
 		children.add( line( text( "Nested segment at beginning outer seg |" ), segment( span( segment( text( "both guards", Color.blue ), true, true ), text( "....", Color.red ) ), true, true ), text( "| finish." ) ) );
 		children.add( line( text( "Nested segment at end outer seg |" ), segment( span( text( "....", Color.red ), segment( text( "both guards", Color.blue ), true, true ) ), true, true ), text( "| finish." ) ) );
 		
-		return styleSheet.vbox( children.toArray( new DPElement[0] ) );
+		return new VBox( children ).present();
 	}
 }
