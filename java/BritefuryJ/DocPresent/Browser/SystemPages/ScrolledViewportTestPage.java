@@ -7,14 +7,19 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
-import java.util.ArrayList;
 
+import BritefuryJ.Controls.ScrolledViewport;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Border;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.SpaceBin;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.RichText.NormalText;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
 public class ScrolledViewportTestPage extends SystemPage
 {
@@ -37,40 +42,17 @@ public class ScrolledViewportTestPage extends SystemPage
 	
 	static String textBlock = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 	
-	protected ArrayList<DPElement> makeTextNodes(String text, PrimitiveStyleSheet styleSheet)
-	{
-		String[] words = text.split( " " );
-		ArrayList<DPElement> nodes = new ArrayList<DPElement>();
-		for (int i = 0; i < words.length; i++)
-		{
-			nodes.add( styleSheet.staticText( words[i] ) );
-			nodes.add( styleSheet.staticText( " " ) );
-			nodes.add( styleSheet.lineBreak() );
-		}
-		return nodes;
-	}
-	
-	
-	protected DPParagraph makeParagraph(String title, int lineBreakStep, PrimitiveStyleSheet styleSheet)
-	{
-		return styleSheet.paragraph( makeTextNodes( title + ": " + textBlock, styleSheet ).toArray( new DPElement[0] ) );
-	}
-	
-	
 	protected DPElement createContents()
 	{
-		PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-		PrimitiveStyleSheet blackText = PrimitiveStyleSheet.instance.withFontSize( 12 ).withForeground( Color.black );
+		StyleSheet2 blackText = StyleSheet2.instance.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, Color.black );
 		
-		PrimitiveStyleSheet borderStyle = PrimitiveStyleSheet.instance.withBorder( new SolidBorder( 2.0, 2.0, 5.0, 5.0, Color.black, null ) );
+		StyleSheet2 borderStyle = StyleSheet2.instance.withAttr( Primitive.border,  new SolidBorder( 2.0, 2.0, 5.0, 5.0, Color.black, null ) );
 		
-		ControlsStyleSheet controls = ControlsStyleSheet.instance;
+		Pres b2 = blackText.applyTo( new NormalText( textBlock ) );
 		
-		DPElement b2 = makeParagraph( "Exampe text:", 1, blackText );
-		
-		DPElement viewport = styleSheet.spaceBin( controls.scrolledViewport( b2, 0.0, 0.0, new PersistentState() ).getElement().alignHExpand().alignVExpand(), 0.0, 200.0 );
-		DPElement border = borderStyle.border( viewport.alignHExpand().alignVExpand() ).alignHExpand().alignVExpand();
-		DPElement vbox = PrimitiveStyleSheet.instance.withVBoxSpacing( 5.0 ).vbox( new DPElement[] { PrimitiveStyleSheet.instance.staticText( "Viewport:" ), border } ).alignHExpand().alignVExpand();
-		return vbox.pad( 50.0, 50.0 ).alignHExpand().alignVExpand();
+		Pres viewport = new SpaceBin( new ScrolledViewport( b2, 0.0, 0.0, new PersistentState() ).alignHExpand().alignVExpand(), 0.0, 200.0 );
+		Pres border = borderStyle.applyTo( new Border( viewport.alignHExpand().alignVExpand() ).alignHExpand().alignVExpand() );
+		Pres vbox = StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 5.0 ).applyTo( new VBox( new Pres[] { new StaticText( "Viewport:" ), border } ) ).alignHExpand().alignVExpand();
+		return vbox.pad( 50.0, 50.0 ).present();
 	}
 }
