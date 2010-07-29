@@ -8,7 +8,6 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import BritefuryJ.Controls.IntSpinEntry;
 import BritefuryJ.Controls.RealSpinEntry;
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
@@ -77,7 +76,7 @@ public class SpinEntryTestPage extends SystemPage
 
 	
 
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
 		Pres realValueTextPres = new StaticText( "0.0" );
 		DPText realValueText = (DPText)realValueTextPres.present();
@@ -93,6 +92,6 @@ public class SpinEntryTestPage extends SystemPage
 				new SpaceBin( intSpinEntry.alignHExpand(), 100.0, -1.0 ), intValueText } ).padX( 5.0 ) );
 		Pres spinEntrySectionContents = new VBox( new Pres[] { realLine, intLine } );
 		
-		return new Body( new Pres[] { new Heading2( "Spin entries" ), spinEntrySectionContents } ).present();
+		return new Body( new Pres[] { new Heading2( "Spin entries" ), spinEntrySectionContents } );
 	}
 }

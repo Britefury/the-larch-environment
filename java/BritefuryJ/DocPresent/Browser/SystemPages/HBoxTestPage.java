@@ -9,14 +9,13 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
 public class HBoxTestPage extends SystemPage
@@ -78,8 +77,8 @@ public class HBoxTestPage extends SystemPage
 	}
 
 	
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
-		return new VBox( new Pres[] { createHBox1().alignHExpand(), createHBox2().alignHExpand() } ).alignHExpand().present();
+		return new Body( new Pres[] { createHBox1().alignHExpand(), createHBox2().alignHExpand() } ).alignHExpand();
 	}
 }

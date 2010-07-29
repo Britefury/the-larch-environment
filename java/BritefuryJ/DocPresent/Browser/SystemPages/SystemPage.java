@@ -12,6 +12,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.Page;
+import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
@@ -54,7 +55,7 @@ public abstract class SystemPage extends Page
 		{
 			pageChildren.add( createTextParagraph( styleSheet.withFontSize( 16 ), description ) );
 		}
-		pageChildren.add( createContents().alignHExpand() );
+		pageChildren.add( createContents().alignHExpand().present() );
 		
 		return styleSheet.withVBoxSpacing( 40.0 ).vbox( pageChildren.toArray( new DPElement[0] ) ).alignHExpand();
 	}
@@ -110,5 +111,5 @@ public abstract class SystemPage extends Page
 		return null;
 	}
 	
-	protected abstract DPElement createContents();
+	protected abstract Pres createContents();
 }

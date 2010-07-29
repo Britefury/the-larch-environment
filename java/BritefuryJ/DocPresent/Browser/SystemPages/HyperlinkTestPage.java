@@ -83,7 +83,7 @@ public class HyperlinkTestPage extends SystemPage
 				new NormalText( "Change the colour of this text, using the hyperlinks below." ) );
 	}
 	
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
 		ElementRef colouredTextProxyRef = new Proxy( colouredText( blackText ) ).elementRef();
 		Hyperlink blackLink = new Hyperlink( "Black", new LinkContentChanger( colouredTextProxyRef, colouredText( blackText ) ) );
@@ -94,6 +94,6 @@ public class HyperlinkTestPage extends SystemPage
 		
 		Hyperlink locationLink = new Hyperlink( "To system page", SystemRootPage.getLocation() );
 		
-		return new Body( new Object[] { new Heading2( "Action hyperlinks" ), colourBox, new Heading2( "Location hyperlinks" ), locationLink } ).present();
+		return new Body( new Object[] { new Heading2( "Action hyperlinks" ), colourBox, new Heading2( "Location hyperlinks" ), locationLink } );
 	}
 }

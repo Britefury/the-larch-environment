@@ -9,14 +9,13 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Segment;
 import BritefuryJ.DocPresent.Combinators.Primitive.Span;
 import BritefuryJ.DocPresent.Combinators.Primitive.Text;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
 public class SegmentTestPage extends SystemPage
@@ -72,7 +71,7 @@ public class SegmentTestPage extends SystemPage
 	}
 	
 	
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
 		ArrayList<Object> children = new ArrayList<Object>();
 		
@@ -85,6 +84,6 @@ public class SegmentTestPage extends SystemPage
 		children.add( line( text( "Nested segment at beginning outer seg |" ), segment( span( segment( text( "both guards", Color.blue ), true, true ), text( "....", Color.red ) ), true, true ), text( "| finish." ) ) );
 		children.add( line( text( "Nested segment at end outer seg |" ), segment( span( text( "....", Color.red ), segment( text( "both guards", Color.blue ), true, true ) ), true, true ), text( "| finish." ) ) );
 		
-		return new VBox( children ).present();
+		return new Body( children );
 	}
 }

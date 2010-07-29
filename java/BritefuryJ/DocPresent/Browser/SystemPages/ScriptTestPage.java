@@ -9,7 +9,6 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Fraction;
 import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
@@ -69,7 +68,7 @@ public class ScriptTestPage extends SystemPage
 
 	
 	
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
 		ArrayList<Object> children = new ArrayList<Object>();
 		
@@ -95,6 +94,6 @@ public class ScriptTestPage extends SystemPage
 			children.add( makeScriptLine( new Text( "MAIN" + String.valueOf( i ) ), leftSuperText, leftSubText, rightSuperText, rightSubText ) );
 		}
 		
-		return new Body( children ).present();
+		return new Body( children );
 	}
 }

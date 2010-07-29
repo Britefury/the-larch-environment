@@ -9,8 +9,8 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
+import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Table;
@@ -94,7 +94,7 @@ public class TableTestPage extends SystemPage
 	
 	
 	
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
 		ArrayList<Object> children = new ArrayList<Object>();
 		children.add( sectionStyle.applyTo( new Border( tableStyle.applyTo( makeTable0() ) ) ) );
@@ -102,6 +102,6 @@ public class TableTestPage extends SystemPage
 		children.add( sectionStyle.applyTo( new Border( tableStyle.applyTo( makeTable2() ) ) ) );
 		children.add( sectionStyle.applyTo( new Border( tableStyle.applyTo( makeTable3() ) ) ) );
 		
-		return new Body( children ).present();
+		return new Body( children );
 	}
 }

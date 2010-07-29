@@ -21,6 +21,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Proxy;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Painter.FillPainter;
@@ -48,7 +49,7 @@ public class NonLocalDndTestPage extends SystemPage
 	
 	protected String getDescription()
 	{
-		return "Receive non-local drops.";
+		return "Receive non-local drops. Drop a file onto the receiver titled 'File:'";
 	}
 	
 	
@@ -109,10 +110,10 @@ public class NonLocalDndTestPage extends SystemPage
 	
 	
 	
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
 		Pres fileReceiver = makeFileReceiver();
 		
-		return fileReceiver.alignHExpand().present();
+		return new Body( new Pres[] { fileReceiver.alignHExpand() } ).alignHExpand();
 	}
 }

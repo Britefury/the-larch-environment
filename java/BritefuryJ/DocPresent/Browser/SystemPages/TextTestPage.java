@@ -8,7 +8,6 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Text;
@@ -42,13 +41,13 @@ public class TextTestPage extends SystemPage
 
 	
 	
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
 		Pres t0 = styleSheet.applyTo( new Text( "Normal text; with characters that go above and below the basline." ) );
 		Pres t1 = smallCapsStyle.applyTo( new Text( "Small caps text; with characters that go above and below the basline." ) );
 		Pres t2 = redUnderlineStyle.applyTo( new Text( "Normal text with squiggle-underline; with characters that go above and below the basline." ) );
 		Pres t3 = hoverStyle.applyTo( new Text( "Text with colour that is affected by pointer hover." ) );
 		
-		return new Body( new Pres[] { t0, t1, t2, t3 } ).present();
+		return new Body( new Pres[] { t0, t1, t2, t3 } );
 	}
 }

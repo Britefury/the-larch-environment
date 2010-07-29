@@ -65,6 +65,10 @@ public class Controls
 			new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.6f, 0.0f, 0.0f ), new Color( 1.0f, 0.85f, 0.85f ) ) );
 
 	
+	public static final InheritedAttributeNonNull textAreaAttrs = new InheritedAttributeNonNull( "controls", "textAreaAttrs", StyleSheet2.class,
+			StyleSheet2.instance.withAttr( Primitive.border, new SolidBorder( 2.0, 5.0, 3.0, 3.0, new Color( 0.3f, 0.3f, 0.3f ), null ) ) );
+
+	
 	public static final InheritedAttributeNonNull spinEntryArrowSize = new InheritedAttributeNonNull( "controls", "spinEntryArrowSize", Double.class, 16.0 );
 	public static final InheritedAttributeNonNull spinEntryArrowAttrs = new InheritedAttributeNonNull( "controls", "spinEntryArrowAttrs", StyleSheet2.class,
 			StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 2.0 ).

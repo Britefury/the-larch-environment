@@ -9,7 +9,6 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import BritefuryJ.Controls.HScrollBar;
 import BritefuryJ.Controls.ScrollBar;
 import BritefuryJ.Controls.VScrollBar;
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.SpaceBin;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
@@ -35,13 +34,13 @@ public class ScrollBarTestPage extends SystemPage
 	}
 	
 
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
 		Range range = new Range( 0.0, 100.0, 0.0, 10.0, 1.0 );
 		ScrollBar horizontal = new HScrollBar( range );
 		ScrollBar vertical = new VScrollBar( range );
 		
 		return new Body( new Pres[] { new Heading2( "Horizontal scroll bar" ), new SpaceBin( horizontal.alignHExpand(), 300.0, -1.0 ),
-				new Heading2( "Vertical scroll bar" ), new SpaceBin( vertical.alignVExpand(), -1.0, 300.0 ).padX( 20.0 ) } ).present();
+				new Heading2( "Vertical scroll bar" ), new SpaceBin( vertical.alignVExpand(), -1.0, 300.0 ).padX( 20.0 ) } );
 	}
 }

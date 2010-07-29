@@ -13,7 +13,6 @@ import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.Controls.MenuItem;
 import BritefuryJ.Controls.PopupMenu;
 import BritefuryJ.Controls.VPopupMenu;
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.ElementRef;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
@@ -61,7 +60,7 @@ public class PopupTestPage extends SystemPage
 				new NormalText( "Change the colour of this text, using the hyperlinks within the popup activated by the hyperlink below. The last links in the embedded popups will close the popup chain." ) );
 	}
 	
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
 		ElementRef colouredTextProxyRef = new Proxy( colouredText( blackText ) ).elementRef();
 		Hyperlink blackLink = new Hyperlink( "Black", new HyperlinkTestPage.LinkContentChanger( colouredTextProxyRef, colouredText( blackText ) ) );
@@ -92,6 +91,6 @@ public class PopupTestPage extends SystemPage
 		Hyperlink popupLink = new Hyperlink( "Popup", popupListener );
 		Pres colourBox = new VBox( new Pres[] { colouredTextProxyRef, popupLink } );
 		
-		return new Body( new Object[] { new Heading2( "Action hyperlinks" ), colourBox } ).present();
+		return new Body( new Object[] { new Heading2( "Action hyperlinks" ), colourBox } );
 	}
 }

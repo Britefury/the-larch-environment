@@ -181,7 +181,7 @@ public class TextEntryTestPage extends SystemPage
 	
 
 	
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
 		EditableLink hello = new EditableLink( "Hello" );
 		EditableLink world = new EditableLink( "World" );
@@ -193,6 +193,6 @@ public class TextEntryTestPage extends SystemPage
 		
 		Pres entriesBox = new VBox( new Pres[] { hello, world, identifierLine, integerLine } );
 		
-		return new Body( new Pres[] { new Heading2( "Text entries" ), entriesBox } ).present();
+		return new Body( new Pres[] { new Heading2( "Text entries" ), entriesBox } );
 	}
 }

@@ -82,7 +82,7 @@ public class ButtonTestPage extends SystemPage
 				new NormalText( "Change the colour of this text, using the buttons below." ) );
 	}
 	
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
 		ElementRef colouredTextProxyRef = new Proxy( colouredText( blackText ) ).elementRef();
 		Button blackButton = Button.buttonWithLabel( "Black", new ButtonContentChanger( colouredTextProxyRef, colouredText( blackText ) ) );
@@ -91,6 +91,6 @@ public class ButtonTestPage extends SystemPage
 		Pres colourLinks = styleSheet.withAttr( Primitive.hboxSpacing, 20.0 ).applyTo( new HBox( new Pres[] { blackButton, redButton, greenButton } ) ).padX( 5.0 );
 		Pres colourBox = new VBox( new Pres[] { colouredTextProxyRef, colourLinks } );
 		
-		return new Body( new Pres[] { new Heading2( "Action button" ), colourBox } ).present();
+		return new Body( new Pres[] { new Heading2( "Action button" ), colourBox } );
 	}
 }

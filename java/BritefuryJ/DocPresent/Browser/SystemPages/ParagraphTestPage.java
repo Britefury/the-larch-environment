@@ -9,13 +9,12 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.LineBreak;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Text;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
 public class ParagraphTestPage extends SystemPage
@@ -85,9 +84,8 @@ public class ParagraphTestPage extends SystemPage
 	}
 	
 	
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
-		StyleSheet2 styleSheet = StyleSheet2.instance;
 		StyleSheet2 blackText = StyleSheet2.instance.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, Color.black );
 		StyleSheet2 redText = StyleSheet2.instance.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, Color.red );
 		
@@ -99,6 +97,6 @@ public class ParagraphTestPage extends SystemPage
 		Pres b7 = makeParagraph( "PER-WORD INDENTED", 1, blackText );
 		Pres b8 = makeParagraphWithNestedPara( "NESTED-2-INDENTED", 2, blackText, redText );
 		
-		return styleSheet.withAttr( Primitive.vboxSpacing, 20.0 ).applyTo( new VBox( new Pres[] { b2, b3, b4, b5, b6, b7, b8 } ) ).present();
+		return new Body( new Pres[] { b2, b3, b4, b5, b6, b7, b8 } );
 	}
 }

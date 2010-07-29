@@ -9,14 +9,13 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Fraction;
 import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Span;
 import BritefuryJ.DocPresent.Combinators.Primitive.Text;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
 public class FractionTestPage extends SystemPage
@@ -61,7 +60,7 @@ public class FractionTestPage extends SystemPage
 		return styleSheet.applyTo( new HBox( new Pres[] { smallStyle.applyTo( new Text( "<<Left<<" ) ), fractionFac, largeStyle.applyTo( new Text( ">>Right>>" ) ) } ) );
 	}
 	
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
 		ArrayList<Object> lines = new ArrayList<Object>();
 		
@@ -81,6 +80,6 @@ public class FractionTestPage extends SystemPage
 		lines.add( makeFractionLine( new Text( "a+b" ),
 				spanOf( fractionOf( new Text( "x" ), new Text( "y" ), "/" ),  new Text( "+q" ) ) ) );
 		
-		return styleSheet.withAttr( Primitive.vboxSpacing, 10.0 ).applyTo( new VBox( lines ) ).present();
+		return new Body( lines );
 	}
 }

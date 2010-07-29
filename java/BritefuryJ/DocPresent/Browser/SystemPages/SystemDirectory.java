@@ -26,7 +26,6 @@ public class SystemDirectory
 		primitiveTestPages.add( new GridTestPage() );
 		primitiveTestPages.add( new HBoxTestPage() );
 		primitiveTestPages.add( new ImageTestPage() );
-		primitiveTestPages.add( new ListViewTestPage() );
 		primitiveTestPages.add( new MathRootTestPage() );
 		primitiveTestPages.add( new NonLocalDndTestPage() );
 		primitiveTestPages.add( new ParagraphTestPage() );
@@ -34,6 +33,7 @@ public class SystemDirectory
 		primitiveTestPages.add( new ProxyAndSpanTestPage() );
 		primitiveTestPages.add( new ScriptTestPage() );
 		primitiveTestPages.add( new SegmentTestPage() );
+		primitiveTestPages.add( new SequenceViewTestPage() );
 		primitiveTestPages.add( new ShapeTestPage() );
 		primitiveTestPages.add( new TableTestPage() );
 		primitiveTestPages.add( new TextTestPage() );

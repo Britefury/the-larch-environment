@@ -9,7 +9,6 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 
 import BritefuryJ.Controls.ScrolledViewport;
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
@@ -42,7 +41,7 @@ public class ScrolledViewportTestPage extends SystemPage
 	
 	static String textBlock = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 	
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
 		StyleSheet2 blackText = StyleSheet2.instance.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, Color.black );
 		
@@ -53,6 +52,6 @@ public class ScrolledViewportTestPage extends SystemPage
 		Pres viewport = new SpaceBin( new ScrolledViewport( b2, 0.0, 0.0, new PersistentState() ).alignHExpand().alignVExpand(), 0.0, 200.0 );
 		Pres border = borderStyle.applyTo( new Border( viewport.alignHExpand().alignVExpand() ).alignHExpand().alignVExpand() );
 		Pres vbox = StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 5.0 ).applyTo( new VBox( new Pres[] { new StaticText( "Viewport:" ), border } ) ).alignHExpand().alignVExpand();
-		return vbox.pad( 50.0, 50.0 ).present();
+		return vbox.pad( 50.0, 50.0 );
 	}
 }

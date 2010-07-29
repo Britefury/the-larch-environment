@@ -8,7 +8,6 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
@@ -17,6 +16,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
 import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.Painter.FilledOutlinePainter;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
@@ -39,15 +39,14 @@ public class AlignmentTestPage extends SystemPage
 		return "Demonstrates horizontal and vertical alignment options.";
 	}
 
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
 		StyleSheet2 styleSheet = StyleSheet2.instance;
 		StyleSheet2 textStyleSheet = styleSheet.withAttr( Primitive.background, new FilledOutlinePainter( new Color( 1.0f, 1.0f, 0.7f ), new Color( 1.0f, 1.0f, 0.0f ) ) );
 		StyleSheet2 dividerStyleSheet = styleSheet.withAttr( Primitive.shapePainter, new FillPainter( new Color( 1.0f, 0.5f, 0.0f ) ) );
-		StyleSheet2 subtitleStyleSheet = styleSheet.withAttr( Primitive.fontSize, 16 ).withAttr( Primitive.fontFace, "Serif" ).withAttr( Primitive.fontBold, true );
 		StyleSheet2 sectionStyleSheet = styleSheet.withAttr( Primitive.vboxSpacing, 5.0 );
 		
-		Pres halignTitle = subtitleStyleSheet.applyTo( new Label( "Horizontal alignment" ) ); 
+		Pres halignTitle = new Heading2( "Horizontal alignment" ); 
 		Pres halignLeft = new Border( textStyleSheet.applyTo( new Label( "hAlign=LEFT" ).alignHLeft() ) );
 		Pres halignCentre = new Border( textStyleSheet.applyTo( new Label( "hAlign=CENTRE" ).alignHCentre() ) );
 		Pres halignRight = new Border( textStyleSheet.applyTo( new Label( "hAlign=RIGHT" ).alignHRight() ) );
@@ -55,7 +54,7 @@ public class AlignmentTestPage extends SystemPage
 		Pres halignSection = sectionStyleSheet.applyTo( new VBox( new Pres[] { halignTitle, halignLeft.alignHExpand(), halignCentre.alignHExpand(), halignRight.alignHExpand(), halignExpand.alignHExpand() } ) );
 		
 		
-		Pres halignInHBoxTitle = subtitleStyleSheet.applyTo( new Label( "Horizontal alignment in h-box" ) );
+		Pres halignInHBoxTitle = new Heading2( "Horizontal alignment in h-box" );
 		Pres halignHBPack = textStyleSheet.applyTo( new Label( "PACK" ).alignHPack() );
 		Pres halignHBLeft = textStyleSheet.applyTo( new Label( "LEFT" ).alignHLeft() );
 		Pres halignHBCentre = textStyleSheet.applyTo( new Label( "CENTRE" ).alignHCentre() );
@@ -70,7 +69,7 @@ public class AlignmentTestPage extends SystemPage
 			} ).alignHExpand() );
 		Pres halignHBoxSection = sectionStyleSheet.applyTo( new VBox( new Pres[] { halignInHBoxTitle, hAlignHBox.alignHExpand() } ) );
 
-		Pres valignTitle = subtitleStyleSheet.applyTo( new Label( "Vertical alignment" ) ); 
+		Pres valignTitle = new Heading2( "Vertical alignment" ); 
 
 		Pres refVBox = new VBox( new Pres[] { new Label( "0" ), new Label( "1 (ref-y)" ), new Label( "2" ),
 				new Label( "3" ), new Label( "4" ), new Label( "5" ) }, 1 );
@@ -93,7 +92,6 @@ public class AlignmentTestPage extends SystemPage
 		Pres valignSection = sectionStyleSheet.applyTo( new VBox( new Pres[] { valignTitle, vAlignBox.alignHExpand() } ) );
 		
 		Pres mainBox = styleSheet.withAttr( Primitive.vboxSpacing, 15.0 ).applyTo( new VBox( new Pres[] { halignSection.alignHExpand(), halignHBoxSection.alignHExpand(), valignSection } ) );
-		Pres result = new Bin( mainBox );
-		return result.present();
+		return new Bin( mainBox );
 	}
 }
