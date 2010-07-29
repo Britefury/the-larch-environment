@@ -104,7 +104,7 @@ public class ProxyAndSpanTestPage extends SystemPage
 		
 		Hyperlink.LinkListener onModifySpanLink = new Hyperlink.LinkListener()
 		{
-			public void onLinkClicked(Hyperlink link, DPElement element, PointerButtonEvent buttonEvent)
+			public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonEvent buttonEvent)
 			{
 				for (Map.Entry<DPElement,PresentationContext> elem: spanRef.getElementsAndContexts())
 				{
@@ -140,7 +140,7 @@ public class ProxyAndSpanTestPage extends SystemPage
 		
 		Hyperlink.LinkListener onModifySpanLink = new Hyperlink.LinkListener()
 		{
-			public void onLinkClicked(Hyperlink link, DPElement element, PointerButtonEvent buttonEvent)
+			public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonEvent buttonEvent)
 			{
 				for (Map.Entry<DPElement,PresentationContext> elem: spanRef.getElementsAndContexts())
 				{
@@ -159,7 +159,7 @@ public class ProxyAndSpanTestPage extends SystemPage
 		
 		Hyperlink.LinkListener onModifyProxyLink = new Hyperlink.LinkListener()
 		{
-			public void onLinkClicked(Hyperlink link, DPElement element, PointerButtonEvent buttonEvent)
+			public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonEvent buttonEvent)
 			{
 				for (Map.Entry<DPElement,PresentationContext> elem: proxyRef.getElementsAndContexts())
 				{

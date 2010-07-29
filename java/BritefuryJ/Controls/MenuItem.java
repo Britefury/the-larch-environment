@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.Controls;
 
+import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.Combinators.Pres;
@@ -17,7 +18,7 @@ import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Painter.Painter;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
 
-public class MenuItem extends Pres
+public class MenuItem extends ControlPres
 {
 	public enum SubmenuPopupDirection
 	{
@@ -27,59 +28,98 @@ public class MenuItem extends Pres
 	
 	public interface MenuItemListener
 	{
-		public void onMenuItemClicked(MenuItem menuItem, DPElement element);
+		public void onMenuItemClicked(MenuItemControl menuItem);
 	}
 	
 	
-	private class MenuItemInteractor extends ElementInteractor
+	public static class MenuItemControl extends Control
 	{
-		private boolean bClosePopupOnActivate;
-		private PresentationContext ctx;
-		
-		
-		public MenuItemInteractor(boolean bClosePopupOnActivate, PresentationContext ctx)
+		private class SubMenuItemListener implements MenuItemListener
 		{
-			this.bClosePopupOnActivate = bClosePopupOnActivate;
-			this.ctx = ctx;
-		}
-		
-		public boolean onButtonDown(DPElement element, PointerButtonEvent event)
-		{
-			return true;
-		}
-
-		public boolean onButtonUp(DPElement element, PointerButtonEvent event)
-		{
-			if ( element.isRealised() )
+			private PopupMenu subMenu;
+			private SubmenuPopupDirection direction;
+			
+			public SubMenuItemListener(PopupMenu subMenu, SubmenuPopupDirection direction)
 			{
-				if ( listener != null )
+				this.subMenu = subMenu;
+				this.direction = direction;
+			}
+			
+			
+			@Override
+			public void onMenuItemClicked(MenuItemControl menuItem)
+			{
+				if ( direction == SubmenuPopupDirection.RIGHT )
 				{
+					subMenu.popupToRightOf( menuItem.getElement(), ctx );
+				}
+				else
+				{
+					subMenu.popupBelow( menuItem.getElement(), ctx );
+				}
+			}
+		}
+		
+	
+		private class MenuItemInteractor extends ElementInteractor
+		{
+			public MenuItemInteractor()
+			{	
+			}
+			
+			public boolean onButtonDown(DPElement element, PointerButtonEvent event)
+			{
+				return true;
+			}
+	
+			public boolean onButtonUp(DPElement element, PointerButtonEvent event)
+			{
+				if ( element.isRealised() )
+				{
+					listener.onMenuItemClicked( MenuItemControl.this );
 					if ( bClosePopupOnActivate )
 					{
 						element.closeContainingPopupChain();
 					}
-					listener.onMenuItemClicked( MenuItem.this, element );
+					return true;
 				}
-				else if ( subMenu != null )
-				{
-					if ( direction == SubmenuPopupDirection.RIGHT )
-					{
-						subMenu.popupToRightOf( element, ctx );
-					}
-					else
-					{
-						subMenu.popupBelow( element, ctx );
-					}
-				}
-				return true;
+				
+				return false;
 			}
-			
-			return false;
+		}
+	
+		
+		
+		private DPBin element;
+		private MenuItemListener listener;
+		private boolean bClosePopupOnActivate;
+		
+		
+		protected MenuItemControl(PresentationContext ctx, DPBin element, MenuItemListener listener, boolean bClosePopupOnActivate)
+		{
+			super( ctx );
+			this.element = element;
+			this.listener = listener;
+			this.element.addInteractor( new MenuItemInteractor() );
+			this.bClosePopupOnActivate = bClosePopupOnActivate;
+		}
+		
+		protected MenuItemControl(PresentationContext ctx, DPBin element, PopupMenu subMenu, SubmenuPopupDirection direction, boolean bClosePopupOnActivate)
+		{
+			super( ctx );
+			this.element = element;
+			this.listener = new SubMenuItemListener( subMenu, direction );
+			this.element.addInteractor( new MenuItemInteractor() );
+			this.bClosePopupOnActivate = bClosePopupOnActivate;
+		}
+		
+		
+		public DPElement getElement()
+		{
+			return element;
 		}
 	}
 
-	
-	
 	private Pres child;
 	private MenuItemListener listener;
 	private PopupMenu subMenu;
@@ -114,7 +154,7 @@ public class MenuItem extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public Control createControl(PresentationContext ctx)
 	{
 		StyleSheetValues styleValues = ctx.getStyle();
 
@@ -123,13 +163,21 @@ public class MenuItem extends Pres
 		Painter hoverBackground = styleValues.get( Controls.menuItemHoverBackground, Painter.class );
 		double padX = styleValues.get( Controls.menuItemXPadding, Double.class );
 		double padY = styleValues.get( Controls.menuItemYPadding, Double.class );
+		boolean bClosePopupOnActivate = styleValues.get( Controls.bClosePopupOnActivate, Boolean.class );
 		
 		StyleSheetValues menuItemStyle = styleValues.withAttr( Primitive.hoverBackground, hoverBackground );
 		Pres menuItem = new Bin( childElem.alignHExpand().pad( padX, padY ) );
 
-		DPElement element = menuItem.present( ctx.withStyle( menuItemStyle ) );
-		element.addInteractor( new MenuItemInteractor( ctx.getStyle().get( Controls.bClosePopupOnActivate, Boolean.class ), ctx ) );
+		DPBin element = (DPBin)menuItem.present( ctx.withStyle( menuItemStyle ) );
 		
-		return element;
+		
+		if ( subMenu != null )
+		{
+			return new MenuItemControl( ctx, element, subMenu, direction, false );
+		}
+		else
+		{
+			return new MenuItemControl( ctx, element, listener, bClosePopupOnActivate );
+		}
 	}
 }

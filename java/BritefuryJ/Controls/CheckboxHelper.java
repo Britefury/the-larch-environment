@@ -21,11 +21,11 @@ class CheckboxHelper
 	protected static class CheckboxCheckPainterInteractor extends ElementInteractor
 	{
 		private Paint paint;
-		private Checkbox checkbox;
+		private Checkbox.CheckboxControl checkbox;
 		private static final Stroke stroke = new BasicStroke( 2.0f );
 		
 		
-		public CheckboxCheckPainterInteractor(Paint paint, Checkbox checkbox)
+		public CheckboxCheckPainterInteractor(Paint paint, Checkbox.CheckboxControl checkbox)
 		{
 			this.paint = paint;
 			this.checkbox = checkbox;
@@ -56,10 +56,10 @@ class CheckboxHelper
 
 	protected static class CheckboxCheckInteractor extends ElementInteractor
 	{
-		private Checkbox checkbox;
+		private Checkbox.CheckboxControl checkbox;
 		
 		
-		public CheckboxCheckInteractor(Checkbox checkbox)
+		public CheckboxCheckInteractor(Checkbox.CheckboxControl checkbox)
 		{
 			this.checkbox = checkbox;
 		}

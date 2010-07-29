@@ -57,7 +57,7 @@ public class ButtonTestPage extends SystemPage
 		}
 
 
-		public void onButtonClicked(Button button, DPElement element, PointerButtonEvent event)
+		public void onButtonClicked(Button.ButtonControl button, PointerButtonEvent event)
 		{
 			for (Map.Entry<DPElement, PresentationContext> entry: parentElement.getElementsAndContexts())
 			{

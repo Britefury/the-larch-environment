@@ -58,6 +58,12 @@ public class Controls
 			new FilledOutlinePainter( new Color( 0.7f, 0.85f, 0.7f ), new Color( 0.0f, 0.25f, 0.0f ), new BasicStroke( 1.0f ) ) );
 
 	
+	public static final InheritedAttributeNonNull textEntryBorder = new InheritedAttributeNonNull( "controls", "textEntryBorder", Border.class,
+			new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.0f, 0.3f, 0.0f ), new Color( 0.9f, 0.95f, 0.9f ) ) );
+	public static final InheritedAttributeNonNull textEntryInvalidBorder = new InheritedAttributeNonNull( "controls", "textEntryInvalidBorder", Border.class,
+			new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.6f, 0.0f, 0.0f ), new Color( 1.0f, 0.85f, 0.85f ) ) );
+
+	
 	public static final InheritedAttributeNonNull bClosePopupOnActivate = new InheritedAttributeNonNull( "controls", "bClosePopupOnActivate", Boolean.class, false );
 	
 	public static final InheritedAttributeNonNull menuItemHoverBackground = new InheritedAttributeNonNull( "controls", "menuItemHoverBackground", Painter.class,
@@ -67,6 +73,9 @@ public class Controls
 	public static final InheritedAttributeNonNull popupMenuAttrs = new InheritedAttributeNonNull( "controls", "popupMenuAttrs", StyleSheet2.class,
 			StyleSheet2.instance.withAttr( Primitive.border, new SolidBorder( 1.0, 2.0, Color.black, null ) ).withAttr( Primitive.hboxSpacing, 10.0 ) );
 
+	
+	public static final InheritedAttributeNonNull tooltipBorder = new InheritedAttributeNonNull( "controls", "tooltipBorder", Border.class,
+			new SolidBorder( 1.0, 2.0, 2.0, 2.0, Color.BLACK, new Color( 1.0f, 1.0f, 0.9f ) ) );
 	
 	
 	
@@ -133,6 +142,18 @@ public class Controls
 
 	
 	
+	public static StyleSheetValues useTextEntryAttrs(StyleSheetValues style)
+	{
+		return style.useAttr( textEntryBorder ).useAttr( textEntryInvalidBorder );
+	}
+	
+	public static PresentationContext useTextEntryAttrs(PresentationContext ctx)
+	{
+		return ctx.withStyle( useTextEntryAttrs( ctx.getStyle() ) );
+	}
+
+	
+	
 	public static StyleSheetValues useMenuItemAttrs(StyleSheetValues style)
 	{
 		return style.useAttr( checkboxHoverBackground ).useAttr( checkboxCheckBorder ).useAttr( checkboxCheckForeground ).useAttr( checkboxCheckSize ).useAttr( checkboxSpacing );
@@ -157,5 +178,18 @@ public class Controls
 	public static PresentationContext usePopupMenuAttrs(PresentationContext ctx)
 	{
 		return ctx.withStyle( usePopupMenuAttrs( ctx.getStyle() ) );
+	}
+
+
+
+
+	public static StyleSheetValues useTooltipAttrs(StyleSheetValues style)
+	{
+		return style.useAttr( tooltipBorder );
+	}
+
+	public static PresentationContext useTooltipAttrs(PresentationContext ctx)
+	{
+		return ctx.withStyle( useTooltipAttrs( ctx.getStyle() ) );
 	}
 }

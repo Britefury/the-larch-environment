@@ -15,6 +15,7 @@ import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
+import BritefuryJ.Math.Point2;
 
 public abstract class Pres
 {
@@ -196,9 +197,45 @@ public abstract class Pres
 	}
 	
 	
+	
+	//
+	// Interactor methods
+	//
+	
 	public AddInteractor addInteractor(ElementInteractor interactor)
 	{
 		return new AddInteractor( this, interactor );
+	}
+	
+	
+	
+	
+	//
+	// Popup methods
+	//
+	
+	public void popupToRightOf(DPElement element, PresentationContext ctx, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		DPElement popupElement = present( ctx );
+		popupElement.popupToRightOf( element, bCloseOnLoseFocus, bRequestFocus );
+	}
+	
+	public void popupBelow(DPElement element, PresentationContext ctx, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		DPElement popupElement = present( ctx );
+		popupElement.popupBelow( element, bCloseOnLoseFocus, bRequestFocus );
+	}
+	
+	public void popupOver(DPElement element, Point2 targetLocalPos, PresentationContext ctx, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		DPElement popupElement = present( ctx );
+		popupElement.popupOver( element, targetLocalPos, bCloseOnLoseFocus, bRequestFocus );
+	}
+	
+	public void popupAtMousePosition(DPElement element, PresentationContext ctx, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		DPElement popupElement = present( ctx );
+		element.getRootElement().createPopupAtMousePosition( popupElement, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
 	
