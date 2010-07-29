@@ -6,10 +6,14 @@
 //##************************
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
+import BritefuryJ.Controls.HScrollBar;
+import BritefuryJ.Controls.ScrollBar;
+import BritefuryJ.Controls.VScrollBar;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
-import BritefuryJ.DocPresent.Controls.ScrollBar;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.SpaceBin;
+import BritefuryJ.DocPresent.Combinators.RichText.Body;
+import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
 import BritefuryJ.DocPresent.Util.Range;
 
 public class ScrollBarTestPage extends SystemPage
@@ -31,30 +35,13 @@ public class ScrollBarTestPage extends SystemPage
 	}
 	
 
-	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-	private static PrimitiveStyleSheet headingStyleSheet = styleSheet.withFontSize( 18 );
-
-	private static ControlsStyleSheet controlsStyleSheet = ControlsStyleSheet.instance;
-
-	
-	
-	protected DPElement section(String title, DPElement contents)
-	{
-		DPElement heading = headingStyleSheet.staticText( title );
-		
-		return styleSheet.vbox( new DPElement[] { heading.padY( 10.0 ), contents.alignHExpand() } ).alignHExpand();
-	}
-	
 	protected DPElement createContents()
 	{
 		Range range = new Range( 0.0, 100.0, 0.0, 10.0, 1.0 );
-		ScrollBar horizontal = controlsStyleSheet.horizontalScrollBar( range );
-		ScrollBar vertical = controlsStyleSheet.verticalScrollBar( range );
+		ScrollBar horizontal = new HScrollBar( range );
+		ScrollBar vertical = new VScrollBar( range );
 		
-		DPElement horizontalSection = section( "Horizontal scroll bar", horizontal.getElement() );
-		DPElement verticalSection = section( "Vertical scroll bar", styleSheet.withHBoxSpacing( 40.0 ).hbox( new DPElement[] { styleSheet.box( 1.0, 300.0 ),
-				vertical.getElement().alignVExpand() } ) );
-		
-		return styleSheet.withVBoxSpacing( 30.0 ).vbox( new DPElement[] { horizontalSection, verticalSection } ).alignHExpand();
+		return new Body( new Pres[] { new Heading2( "Horizontal scroll bar" ), new SpaceBin( horizontal.alignHExpand(), 300.0, -1.0 ),
+				new Heading2( "Vertical scroll bar" ), new SpaceBin( vertical.alignVExpand(), -1.0, 300.0 ).padX( 20.0 ) } ).present();
 	}
 }
