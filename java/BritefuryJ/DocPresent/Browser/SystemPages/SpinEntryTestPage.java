@@ -6,12 +6,19 @@
 //##************************
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
+import BritefuryJ.Controls.IntSpinEntry;
+import BritefuryJ.Controls.RealSpinEntry;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
-import BritefuryJ.DocPresent.Controls.RealSpinEntry;
-import BritefuryJ.DocPresent.Controls.IntSpinEntry;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.SpaceBin;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.RichText.Body;
+import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
 public class SpinEntryTestPage extends SystemPage
 {
@@ -43,7 +50,7 @@ public class SpinEntryTestPage extends SystemPage
 		}
 
 
-		public void onSpinEntryValueChanged(RealSpinEntry spinEntry, double value)
+		public void onSpinEntryValueChanged(RealSpinEntry.RealSpinEntryControl spinEntry, double value)
 		{
 			textElement.setText( String.valueOf( value ) );
 		}
@@ -62,7 +69,7 @@ public class SpinEntryTestPage extends SystemPage
 		}
 
 
-		public void onSpinEntryValueChanged(IntSpinEntry spinEntry, int value)
+		public void onSpinEntryValueChanged(IntSpinEntry.IntSpinEntryControl spinEntry, int value)
 		{
 			textElement.setText( String.valueOf( value ) );
 		}
@@ -70,40 +77,22 @@ public class SpinEntryTestPage extends SystemPage
 
 	
 
-	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-	private static PrimitiveStyleSheet headingStyleSheet = styleSheet.withFontSize( 18 );
-
-	private static ControlsStyleSheet controlsStyleSheet = ControlsStyleSheet.instance;
-
-	
-	
-	protected DPElement section(String title, DPElement contents)
-	{
-		DPElement heading = headingStyleSheet.staticText( title );
-		
-		return styleSheet.vbox( new DPElement[] { heading.padY( 10.0 ), contents } );
-	}
-	
-	protected DPElement colouredText(PrimitiveStyleSheet style)
-	{
-		return style.staticText( "Change the colour of this text using the buttons below." );
-	}
-	
 	protected DPElement createContents()
 	{
-		DPText realValueText = styleSheet.staticText( "0.0" );
-		DPText intValueText = styleSheet.staticText( "0" );
+		Pres realValueTextPres = new StaticText( "0.0" );
+		DPText realValueText = (DPText)realValueTextPres.present();
+		Pres intValueTextPres = new StaticText( "0" );
+		DPText intValueText = (DPText)intValueTextPres.present();
 		RealSpinEntryTextChanger realListener = new RealSpinEntryTextChanger( realValueText );
 		IntSpinEntryTextChanger intListener = new IntSpinEntryTextChanger( intValueText );
-		RealSpinEntry realSpinEntry = controlsStyleSheet.realSpinEntry( 0.0, -100.0, 100.0, 1.0, 10.0, realListener );
-		IntSpinEntry intSpinEntry = controlsStyleSheet.intSpinEntry( 0, -100, 100, 1, 10, intListener );
-		DPElement realLine = styleSheet.withHBoxSpacing( 20.0 ).hbox( new DPElement[] { styleSheet.staticText( "Real: " ),
-				styleSheet.spaceBin( realSpinEntry.getElement().alignHExpand(), 100.0, -1.0 ), realValueText } ).padX( 5.0 );
-		DPElement intLine = styleSheet.withHBoxSpacing( 20.0 ).hbox( new DPElement[] { styleSheet.staticText( "Integer: " ),
-				styleSheet.spaceBin( intSpinEntry.getElement().alignHExpand(), 100.0, -1.0 ), intValueText } ).padX( 5.0 );
-		DPElement spinEntrySectionContents = styleSheet.vbox( new DPElement[] { realLine, intLine } );
-		DPElement spinEntrySection = section( "Spin entry", spinEntrySectionContents );
+		RealSpinEntry realSpinEntry = new RealSpinEntry( 0.0, -100.0, 100.0, 1.0, 10.0, realListener );
+		IntSpinEntry intSpinEntry = new IntSpinEntry( 0, -100, 100, 1, 10, intListener );
+		Pres realLine = StyleSheet2.instance.withAttr( Primitive.hboxSpacing, 20.0 ).applyTo( new HBox( new Object[] { new StaticText( "Real number: " ),
+				new SpaceBin( realSpinEntry.alignHExpand(), 100.0, -1.0 ), realValueText } ).padX( 5.0 ) );
+		Pres intLine = StyleSheet2.instance.withAttr( Primitive.hboxSpacing, 20.0 ).applyTo( new HBox( new Object[] { new StaticText( "Integer: " ),
+				new SpaceBin( intSpinEntry.alignHExpand(), 100.0, -1.0 ), intValueText } ).padX( 5.0 ) );
+		Pres spinEntrySectionContents = new VBox( new Pres[] { realLine, intLine } );
 		
-		return spinEntrySection;
+		return new Body( new Pres[] { new Heading2( "Spin entries" ), spinEntrySectionContents } ).present();
 	}
 }

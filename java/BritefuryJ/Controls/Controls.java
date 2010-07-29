@@ -64,6 +64,14 @@ public class Controls
 			new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.6f, 0.0f, 0.0f ), new Color( 1.0f, 0.85f, 0.85f ) ) );
 
 	
+	public static final InheritedAttributeNonNull spinEntryArrowSize = new InheritedAttributeNonNull( "controls", "spinEntryArrowSize", Double.class, 16.0 );
+	public static final InheritedAttributeNonNull spinEntryArrowAttrs = new InheritedAttributeNonNull( "controls", "spinEntryArrowAttrs", StyleSheet2.class,
+			StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 2.0 ).
+			withAttr( Primitive.shapePainter, new FilledOutlinePainter( new Color( 0.7f, 0.85f, 0.7f ), new Color( 0.0f, 0.25f, 0.0f ), new BasicStroke( 1.0f ) ) ).
+			withAttr( Primitive.hoverShapePainter, new FilledOutlinePainter( new Color( 0.85f, 1.0f, 0.85f ), new Color( 0.0f, 0.45f, 0.0f ), new BasicStroke( 1.0f ) ) ) );
+	public static final InheritedAttributeNonNull spinEntryHSpacing = new InheritedAttributeNonNull( "controls", "spinEntryHSpacing", Double.class, 2.0 );
+
+	
 	public static final InheritedAttributeNonNull bClosePopupOnActivate = new InheritedAttributeNonNull( "controls", "bClosePopupOnActivate", Boolean.class, false );
 	
 	public static final InheritedAttributeNonNull menuItemHoverBackground = new InheritedAttributeNonNull( "controls", "menuItemHoverBackground", Painter.class,
