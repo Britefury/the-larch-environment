@@ -61,12 +61,9 @@ public class HorizontalListViewLayoutStyleSheet extends ListViewLayoutStyleSheet
 			DPElement lastChild = children.get( children.size() - 1 );
 			childElems.add( lastChild );
 			
-			if ( ListViewStyleSheet.trailingSeparatorRequired( children, trailingSeparator ) )
+			if ( separator != null  &&  ListViewStyleSheet.trailingSeparatorRequired( children, trailingSeparator ) )
 			{
-				if ( separator != null )
-				{
-					childElems.add( separator.createElement( primitiveStyle, children.size() - 1, lastChild ) );
-				}
+				childElems.add( separator.createElement( primitiveStyle, children.size() - 1, lastChild ) );
 			}
 		}
 

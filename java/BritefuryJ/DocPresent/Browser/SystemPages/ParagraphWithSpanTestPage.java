@@ -10,12 +10,11 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Span;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Painter.FilledOutlinePainter;
 import BritefuryJ.DocPresent.Painter.OutlinePainter;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
@@ -72,7 +71,7 @@ public class ParagraphWithSpanTestPage extends SystemPage
 	}
 	
 	
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
 		StyleSheet2 styleSheet = StyleSheet2.instance;
 		StyleSheet2 nestedTextStyleSheet = styleSheet.withAttr( Primitive.foreground, Color.red );
@@ -87,6 +86,6 @@ public class ParagraphWithSpanTestPage extends SystemPage
 		Pres b7 = makeParagraph( "PER-WORD INDENTED", 50.0, 1, styleSheet );
 		Pres b8 = makeParagraphWithNestedSpan( "NESTED-2-INDENTED", 50.0, 2, styleSheet, nestedTextStyleSheet, spanStyleSheet );
 		Pres[] children = { b2, b3, b4, b5, b6, b7, b8 };
-		return styleSheet.withAttr( Primitive.vboxSpacing, 30.0 ).applyTo( new VBox( children ) ).present();
+		return new Body( children );
 	}
 }

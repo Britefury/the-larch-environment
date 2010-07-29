@@ -25,6 +25,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Proxy;
 import BritefuryJ.DocPresent.Combinators.Primitive.Span;
 import BritefuryJ.DocPresent.Combinators.Primitive.Text;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
@@ -175,8 +176,8 @@ public class ProxyAndSpanTestPage extends SystemPage
 				styleSheet.withAttr( Primitive.hboxSpacing, 15.0 ).applyTo( new HBox( new Pres[] { modifySpanLink, modifyProxyLink } ) ) } ) );
 	}
 	
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
-		return styleSheet.withAttr( Primitive.vboxSpacing, 30.0 ).applyTo( new VBox( new Pres[] { createParagraph1(), createParagraph2(), createParagraph3() } ) ).present();
+		return new Body( new Pres[] { createParagraph1(), createParagraph2(), createParagraph3() } );
 	}
 }

@@ -8,14 +8,13 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
 public class BorderTestPage extends SystemPage
@@ -37,7 +36,7 @@ public class BorderTestPage extends SystemPage
 	}
 
 
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
 		Pres onePixelBorder = new Border( new StaticText( "Normal 1-pixel border" ) ); 
 		
@@ -50,6 +49,6 @@ public class BorderTestPage extends SystemPage
 				new Border( new StaticText( "Solid border: 3 pixel thickness, 10 pixel inset (margin), 20 pixel rounding, grey border, light-grey background" ) ) );
 		
 		
-		return StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 10.0 ).applyTo( new VBox( new Pres[] { onePixelBorder, padded, emptyBorder, solidBorder } ) ).present(); 
+		return new Body( new Pres[] { onePixelBorder, padded, emptyBorder, solidBorder } ); 
 	}
 }

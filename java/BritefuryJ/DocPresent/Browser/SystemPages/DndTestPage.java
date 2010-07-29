@@ -24,8 +24,10 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Proxy;
 import BritefuryJ.DocPresent.Combinators.Primitive.Script;
+import BritefuryJ.DocPresent.Combinators.Primitive.Spacer;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
@@ -160,11 +162,11 @@ public class DndTestPage extends SystemPage
 	
 	
 	
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
 		Pres palette = makePalette();
 		Pres formula = makeFormula();
 		
-		return mainStyle.withAttr( Primitive.vboxSpacing, 20.0 ).applyTo( new VBox( new Pres[] { palette.alignHExpand(), formula.alignHExpand() } ) ).alignHExpand().present();
+		return new Body( new Pres[] { palette.alignHExpand(), new Spacer( 0.0, 10.0 ), formula.alignHExpand() } ).alignHExpand();
 	}
 }

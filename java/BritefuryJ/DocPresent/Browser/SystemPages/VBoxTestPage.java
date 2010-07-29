@@ -8,7 +8,6 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
@@ -57,7 +56,7 @@ public class VBoxTestPage extends SystemPage
 	
 	
 
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
 		Pres vboxTest = new VBox( new Pres[] { t24Style.applyTo( new StaticText( "VBox" ) ),
 				t12Style.applyTo( new StaticText( "First item" ) ),
@@ -83,6 +82,6 @@ public class VBoxTestPage extends SystemPage
 		return new Body( new Pres[] {
 				outlineStyleSheet.applyTo( new Border( vboxTest ) ),
 				outlineStyleSheet.applyTo( new Border( hAlignTest ) ),
-				outlineStyleSheet.applyTo( new Border( refPointAlignTest ) ) } ).present();
+				outlineStyleSheet.applyTo( new Border( refPointAlignTest ) ) } );
 	}
 }

@@ -11,12 +11,20 @@ import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPVBox;
-import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
-import BritefuryJ.DocPresent.Controls.TextArea;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.RichText.Body;
+import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
+import BritefuryJ.DocPresent.Combinators.RichText.Heading6;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.Controls.TextArea;
 
 public class TextAreaTestPage extends SystemPage
 {
+	private static final StyleSheet2 redText = StyleSheet2.instance.withAttr( Primitive.foreground, Color.RED );
+	
 	protected TextAreaTestPage()
 	{
 		register( "tests.controls.textarea" );
@@ -47,49 +55,49 @@ public class TextAreaTestPage extends SystemPage
 			this.prevText = text;
 		}
 		
-		public void onAccept(TextArea textArea, String text)
+		public void onAccept(TextArea.TextAreaControl textArea, String text)
 		{
 			String[] lines = text.split( "\n" );
 			
 			ArrayList<DPElement> lineElements = new ArrayList<DPElement>();
 			for (String line: lines)
 			{
-				lineElements.add( styleSheet.staticText( line ) );
+				lineElements.add( new StaticText( line ).present() );
 			}
 			
 			resultArea.setChildren( lineElements );
 		}
 		
-		public void onTextInserted(TextArea textArea, int position, String textInserted)
+		public void onTextInserted(TextArea.TextAreaControl textArea, int position, String textInserted)
 		{
 			String text = "Inserted text @" + position + ":\n" + textInserted;
 			setEventText( text );
 			prevText = prevText.substring( 0, position ) + textInserted + prevText.substring( position );
 			if ( !prevText.equals( textArea.getText() ) )
 			{
-				eventArea.append( PrimitiveStyleSheet.instance.withForeground( Color.RED ).staticText( "Insert event was invalid" ) );
+				eventArea.append( redText.applyTo( new StaticText( "Insert event was invalid" ) ).present() );
 			}
 		}
 
-		public void onTextRemoved(TextArea textArea, int position, int length)
+		public void onTextRemoved(TextArea.TextAreaControl textArea, int position, int length)
 		{
 			String text = "Removed " + position + " to " + ( position + length );
 			setEventText( text );
 			prevText = prevText.substring( 0, position ) + prevText.substring( position + length );
 			if ( !prevText.equals( textArea.getText() ) )
 			{
-				eventArea.append( PrimitiveStyleSheet.instance.withForeground( Color.RED ).staticText( "Insert event was invalid" ) );
+				eventArea.append( redText.applyTo( new StaticText( "Insert event was invalid" ) ).present() );
 			}
 		}
 		
-		public void onTextReplaced(TextArea textArea, int position, int length, String replacementText)
+		public void onTextReplaced(TextArea.TextAreaControl textArea, int position, int length, String replacementText)
 		{
 			String text = "Replaced " + position + " to " + ( position + length ) + " with:\n" + replacementText;
 			setEventText( text );
 			prevText = prevText.substring( 0, position ) + replacementText + prevText.substring( position + length );
 			if ( !prevText.equals( textArea.getText() ) )
 			{
-				eventArea.append( PrimitiveStyleSheet.instance.withForeground( Color.RED ).staticText( "Insert event was invalid" ) );
+				eventArea.append( redText.applyTo( new StaticText( "Insert event was invalid" ) ).present() );
 			}
 		}
 		
@@ -100,7 +108,7 @@ public class TextAreaTestPage extends SystemPage
 			ArrayList<DPElement> lineElements = new ArrayList<DPElement>();
 			for (String line: lines)
 			{
-				lineElements.add( styleSheet.staticText( line ) );
+				lineElements.add( new StaticText( line ).present() );
 			}
 			
 			eventArea.setChildren( lineElements );
@@ -109,33 +117,20 @@ public class TextAreaTestPage extends SystemPage
 
 	
 	
-	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-	private static PrimitiveStyleSheet headingStyleSheet = styleSheet.withFontSize( 18 );
-
-	private static ControlsStyleSheet controlsStyleSheet = ControlsStyleSheet.instance;
-	
 	private String testString = "This is a test of the capabilities of the text area control.\nA text area is a mult-line text editor.\nThe text is in the form of lines separated by newline characters.\n";
 
 	
 	
-	protected DPElement section(String title, DPElement contents)
+	protected Pres createContents()
 	{
-		DPElement heading = headingStyleSheet.staticText( title );
+		DPVBox resultArea = (DPVBox)new VBox( new Pres[] {} ).present();
+		DPVBox eventArea = (DPVBox)new VBox( new Pres[] {} ).present();
+		Pres resultBox = StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 5.0 ).applyTo( new VBox( new Object[] { new Heading6( "Text:" ), resultArea, new Heading6( "Event:" ), eventArea } ) );
 		
-		return styleSheet.vbox( new DPElement[] { heading.padY( 10.0 ), contents.alignHExpand() } ).alignHExpand();
-	}
-	
-	protected DPElement createContents()
-	{
-		DPVBox resultArea = styleSheet.vbox( new DPElement[] {} );
-		DPVBox eventArea = styleSheet.vbox( new DPElement[] {} );
-		DPVBox resultBox = styleSheet.withVBoxSpacing( 5.0 ).vbox( new DPElement[] { styleSheet.staticText( "Text:" ), resultArea, styleSheet.staticText( "Event:" ), eventArea } );
+		TextArea area = new TextArea( testString, new AreaListener( resultArea, eventArea, testString ) );
 		
-		TextArea area = controlsStyleSheet.textArea( testString, new AreaListener( resultArea, eventArea, testString ) );
+		Pres areaBox = StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 10.0 ).applyTo( new VBox( new Object[] { area.alignHExpand(), resultBox.alignHExpand() } ) );
 		
-		DPElement areaBox = styleSheet.withVBoxSpacing( 10.0 ).vbox( new DPElement[] { area.getElement().alignHExpand(), resultBox.alignHExpand() } );
-		DPElement textAreaSection = section( "Text area", areaBox.alignHExpand() );
-		
-		return textAreaSection;
+		return new Body( new Pres[] { new Heading2( "Text area" ), areaBox.alignHExpand() } ).alignHExpand();
 	}
 }

@@ -64,12 +64,12 @@ public class CheckboxTestPage extends SystemPage
 		return style.staticText( "Change the colour of this text using the buttons below." );
 	}
 	
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
 		ElementRef stateTextRef = new StaticText( "false" ).elementRef();
 		Checkbox checkbox = Checkbox.checkboxWithLabel( "State", false, new CheckboxTextChanger( stateTextRef ) );
 		Pres checkboxSectionContents = new VBox( new Pres[] { stateTextRef, checkbox.padX( 5.0 ) } );
 		
-		return new Body( new Pres[] { new Heading2( "Checkbox" ), checkboxSectionContents } ).present();
+		return new Body( new Pres[] { new Heading2( "Checkbox" ), checkboxSectionContents } );
 	}
 }

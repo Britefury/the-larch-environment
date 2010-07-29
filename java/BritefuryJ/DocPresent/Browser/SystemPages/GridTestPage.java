@@ -9,7 +9,6 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
@@ -18,8 +17,8 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.RGrid;
 import BritefuryJ.DocPresent.Combinators.Primitive.Span;
 import BritefuryJ.DocPresent.Combinators.Primitive.Text;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
-import BritefuryJ.DocPresent.Combinators.RichText.NormalText;
+import BritefuryJ.DocPresent.Combinators.RichText.Body;
+import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
 public class GridTestPage extends SystemPage
@@ -42,16 +41,9 @@ public class GridTestPage extends SystemPage
 
 	private static final StyleSheet2 styleSheet = StyleSheet2.instance;
 	private static StyleSheet2 t12 = styleSheet.withAttr( Primitive.fontSize, 12 );
-	private static StyleSheet2 sectionStyle = styleSheet.withAttr( Primitive.vboxSpacing, 5.0 ).withAttr( Primitive.border, new SolidBorder( 2.0, 3.0, new Color( 0.0f, 0.3f, 0.7f ), new Color( 0.95f, 0.975f, 1.0f  ) ) );
 	private static StyleSheet2 outlineStyle = styleSheet.withAttr( Primitive.border, new SolidBorder( 1.0, 0.0, new Color( 0.5f, 0.5f, 0.5f ), new Color( 0.9f, 0.9f, 0.9f ) ) );
 	private static StyleSheet2 tableStyle = styleSheet.withAttr( Primitive.tableColumnSpacing, 5.0 ).withAttr( Primitive.tableRowSpacing, 5.0 );
 
-	private Pres section(String description, Pres w)
-	{
-		return sectionStyle.applyTo( new VBox( new Pres[] { new NormalText( description ), sectionStyle.applyTo( new Border( w ) ) } ) );
-	}
-	
-	
 	private Pres span(int row, int startCol, int endCol)
 	{
 		ArrayList<Object> children = new ArrayList<Object>();
@@ -156,16 +148,20 @@ public class GridTestPage extends SystemPage
 	
 	
 	
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
-		ArrayList<Object> children = new ArrayList<Object>();
-		children.add( section( "Grid row", makeGridRow( 0, 6 ) ) );
-		children.add( section( "Grid", makeGrid() ) );
-		children.add( section( "Grid with shortened row", makeGridwithShortenedRow() ) );
-		children.add( section( "Grid with collated rows", makeGridWithCollatedRows() ) );
-		children.add( section( "Collated grid with collated rows", makeCollatedGridWithCollatedRows() ) );
-		children.add( section( "Collated grid with collated rows and non-rows", makeCollatedGridWithCollatedRowsAndNonRows() ) );
-		
-		return styleSheet.withAttr( Primitive.vboxSpacing, 20.0 ).applyTo( new VBox( children ) ).present();
+		return new Body( new Pres[] {
+				new Heading2( "Grid row" ),
+				makeGridRow( 0, 6 ),
+				new Heading2( "Grid" ),
+				makeGrid(),
+				new Heading2( "Grid with shortened row" ),
+				makeGridwithShortenedRow(),
+				new Heading2( "Grid with collated rows" ),
+				makeGridWithCollatedRows(),
+				new Heading2( "Collated grid with collated rows" ),
+				makeCollatedGridWithCollatedRows(),
+				new Heading2( "Collated grid with collated rows and non-rows" ),
+				makeCollatedGridWithCollatedRowsAndNonRows() } );
 	}
 }

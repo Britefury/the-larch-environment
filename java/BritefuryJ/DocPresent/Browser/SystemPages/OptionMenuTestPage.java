@@ -58,7 +58,7 @@ public class OptionMenuTestPage extends SystemPage
 
 	
 
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
 		ElementRef choiceTextRef = new StaticText( "0" ).elementRef();
 		Pres choices[] = new Pres[] { new StaticText( "Zero" ), new StaticText( "One" ), new StaticText( "Two" ), new StaticText( "Three" ), new StaticText( "Four" ) };
@@ -67,6 +67,6 @@ public class OptionMenuTestPage extends SystemPage
 		Pres optionMenuBox = new SpaceBin( optionMenu.alignHExpand(), 100.0, -1.0 ).padX( 5.0 );
 		Pres optionMenuSectionContents = new VBox( new Pres[] { choiceTextRef, optionMenuBox } );
 		
-		return new Body( new Pres[] { new Heading2( "Option menu" ), optionMenuSectionContents } ).present();
+		return new Body( new Pres[] { new Heading2( "Option menu" ), optionMenuSectionContents } );
 	}
 }

@@ -24,7 +24,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Canvas;
 import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
@@ -197,7 +197,7 @@ public class CanvasTestPage extends SystemPage
 	}
 
 	
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
 		Pres canvas = new Canvas( createClockFace().translate( 320.0, 240.0 ), 640.0, 480.0, false, false );
 		Pres diagram = StyleSheet2.instance.withAttr( Primitive.border, new SolidBorder( 1.0, 3.0, 2.0, 2.0, Color.black, null ) ).applyTo( new Border( canvas ) );
@@ -209,6 +209,6 @@ public class CanvasTestPage extends SystemPage
 
 		Pres hbox = StyleSheet2.instance.withAttr( Primitive.hboxSpacing, 20.0 ).applyTo( new HBox( new Object[] { dest0, dest1 } ) );
 		
-		return StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 20.0 ).applyTo( new VBox( new Pres[] { diagram, hbox } ) ).present();
+		return new Body( new Pres[] { diagram, hbox.padY( 10.0, 0.0 ) } );
 	}
 }

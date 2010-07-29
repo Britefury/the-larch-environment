@@ -8,7 +8,6 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Box;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
@@ -43,7 +42,7 @@ public class ShapeTestPage extends SystemPage
 
 	
 	
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
 		return styleSheet.applyTo( new VBox( new Pres[] {
 				new StaticText( "Box 50x10; 1 pixel padding" ),
@@ -58,6 +57,6 @@ public class ShapeTestPage extends SystemPage
 				Shape.rectangle( -10.0, -10.0, 50.0, 20.0 ).pad( 1.0, 1.0 ),
 				new StaticText( "Ellipse 25x25  @  0,0; 1 pixel padding" ),
 				Shape.ellipse( 0.0, 0.0, 25.0, 25.0 ).pad( 1.0, 1.0 ),
-				} ) ).present();
+				} ) );
 	}
 }

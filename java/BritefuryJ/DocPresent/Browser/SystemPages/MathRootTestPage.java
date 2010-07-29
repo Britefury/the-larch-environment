@@ -9,13 +9,12 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Fraction;
 import BritefuryJ.DocPresent.Combinators.Primitive.MathRoot;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
 public class MathRootTestPage extends SystemPage
@@ -48,7 +47,7 @@ public class MathRootTestPage extends SystemPage
 	}
 
 	
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
 		ArrayList<Object> children = new ArrayList<Object>( );
 		
@@ -56,6 +55,6 @@ public class MathRootTestPage extends SystemPage
 		children.add( rootStyleSheet.applyTo( new MathRoot( textStyleSheet.applyTo( new StaticText( "a+p" ) ) ) ) );
 		children.add( rootStyleSheet.applyTo( new MathRoot( makeFraction( "a", "p+q" ) ) ) );
 		
-		return new VBox( children ).present();
+		return new Body( children );
 	}
 }
