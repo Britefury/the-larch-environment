@@ -13,6 +13,7 @@ import java.awt.Paint;
 
 import BritefuryJ.AttributeTable.AttributeTable2;
 import BritefuryJ.AttributeTable.DerivedValueTable;
+import BritefuryJ.AttributeTable.InheritedAttribute;
 import BritefuryJ.AttributeTable.InheritedAttributeNonNull;
 import BritefuryJ.DocPresent.Border.Border;
 import BritefuryJ.DocPresent.Border.FilledBorder;
@@ -70,6 +71,20 @@ public class Controls
 			withAttr( Primitive.shapePainter, new FilledOutlinePainter( new Color( 0.7f, 0.85f, 0.7f ), new Color( 0.0f, 0.25f, 0.0f ), new BasicStroke( 1.0f ) ) ).
 			withAttr( Primitive.hoverShapePainter, new FilledOutlinePainter( new Color( 0.85f, 1.0f, 0.85f ), new Color( 0.0f, 0.45f, 0.0f ), new BasicStroke( 1.0f ) ) ) );
 	public static final InheritedAttributeNonNull spinEntryHSpacing = new InheritedAttributeNonNull( "controls", "spinEntryHSpacing", Double.class, 2.0 );
+	
+	
+	public static final InheritedAttributeNonNull scrollBarArrowPainter = new InheritedAttributeNonNull( "controls", "scrollBarArrowPainter", Painter.class,
+			new FilledOutlinePainter( new Color( 0.7f, 0.85f, 1.0f ), new Color( 0.0f, 0.5f, 1.0f ), new BasicStroke( 1.0f ) ) );
+	public static final InheritedAttributeNonNull scrollBarDragBoxPainter = new InheritedAttributeNonNull( "controls", "scrollBarDragBoxPainter", Painter.class,
+			new FilledOutlinePainter( new Color( 0.7f, 0.85f, 1.0f ), new Color( 0.0f, 0.5f, 1.0f ), new BasicStroke( 1.0f ) ) );
+	public static final InheritedAttributeNonNull scrollBarDragBarBackgroundPainter = new InheritedAttributeNonNull( "controls", "scrollBarDragBarBackgroundPainter", Painter.class,
+			new FilledOutlinePainter( new Color( 0.9f, 0.9f, 0.9f ), new Color( 0.75f, 0.75f, 0.75f ), new BasicStroke( 1.0f ) ) );
+	public static final InheritedAttribute scrollBarDragBackgroundHoverPainter = new InheritedAttribute( "controls", "scrollBarDragBackgroundHoverPainter", Painter.class, null );
+	public static final InheritedAttributeNonNull scrollBarArrowPadding = new InheritedAttributeNonNull( "controls", "scrollBarArrowPainter", Double.class, 0.0 );
+	public static final InheritedAttributeNonNull scrollBarArrowSpacing = new InheritedAttributeNonNull( "controls", "scrollBarArrowPainter", Double.class, 2.0 );
+	public static final InheritedAttributeNonNull scrollBarArrowDragboxPadding = new InheritedAttributeNonNull( "controls", "scrollBarArrowPainter", Double.class, 3.0 );
+	public static final InheritedAttributeNonNull scrollBarArrowDragboxRounding = new InheritedAttributeNonNull( "controls", "scrollBarArrowPainter", Double.class, 4.0 );
+	public static final InheritedAttributeNonNull scrollBarSize = new InheritedAttributeNonNull( "controls", "scrollBarArrowPainter", Double.class, 20.0 );
 
 	
 	public static final InheritedAttributeNonNull bClosePopupOnActivate = new InheritedAttributeNonNull( "controls", "bClosePopupOnActivate", Boolean.class, false );
@@ -161,6 +176,18 @@ public class Controls
 	}
 
 	
+	
+	protected static DerivedValueTable<StyleSheet2> scrollBarDragBoxStyle = new DerivedValueTable<StyleSheet2>()
+	{
+		protected StyleSheet2 evaluate(AttributeTable2 attribs)
+		{
+			Painter backgroundPainter = attribs.get( scrollBarDragBarBackgroundPainter, Painter.class );
+			Painter backgroundHoverPainter = attribs.get( scrollBarDragBackgroundHoverPainter, Painter.class );
+			return StyleSheet2.instance.withAttr( Primitive.shapePainter, backgroundPainter ).withAttr( Primitive.hoverShapePainter, backgroundHoverPainter );
+		}
+	};
+
+
 	
 	public static StyleSheetValues useMenuItemAttrs(StyleSheetValues style)
 	{
