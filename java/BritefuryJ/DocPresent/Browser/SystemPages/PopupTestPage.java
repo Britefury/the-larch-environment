@@ -75,17 +75,17 @@ public class PopupTestPage extends SystemPage
 		PopupMenu menuA = new VPopupMenu( new Pres[] { greenLink, blueLink } );
 		PopupMenu menuB = new VPopupMenu( new Pres[] { purpleLink, cyanLink } );
 		
-		MenuItem menuAItem = new MenuItem( "Submenu A", menuA, MenuItem.SubmenuPopupDirection.DOWN );
-		MenuItem menuBItem = new MenuItem( "Submenu B", menuB, MenuItem.SubmenuPopupDirection.DOWN );
+		MenuItem menuAItem = MenuItem.menuItemWithLabel( "Submenu A", menuA, MenuItem.SubmenuPopupDirection.DOWN );
+		MenuItem menuBItem = MenuItem.menuItemWithLabel( "Submenu B", menuB, MenuItem.SubmenuPopupDirection.DOWN );
 		
 		final PopupMenu mainMenu = new HPopupMenu( new Pres[] { blackLink, redLink, menuAItem, menuBItem } );
 		
 		
 		Hyperlink.LinkListener popupListener = new Hyperlink.LinkListener()
 		{
-			public void onLinkClicked(Hyperlink link, DPElement element, PointerButtonEvent event)
+			public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonEvent event)
 			{
-				mainMenu.popupToRightOf( element );
+				mainMenu.popupToRightOf( link.getElement() );
 			}
 		};
 		

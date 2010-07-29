@@ -7,8 +7,6 @@
 package BritefuryJ.Controls;
 
 import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
 
 import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPBorder;
@@ -27,83 +25,153 @@ import BritefuryJ.DocPresent.Painter.Painter;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
 
-public class OptionMenu extends Pres
+public class OptionMenu extends ControlPres
 {
 	public static interface OptionMenuListener
 	{
-		public void onOptionMenuChoice(OptionMenu optionMenu, int previousChoice, int choice);
+		public void onOptionMenuChoice(OptionMenuControl optionMenu, int previousChoice, int choice);
 	}
 	
 	
 	
-	private class OptionMenuInteractor extends ElementInteractor
+	public static class OptionMenuControl extends Control
 	{
-		private BritefuryJ.DocPresent.Border.Border border, hoverBorder;
-		
-		private OptionMenuInteractor(BritefuryJ.DocPresent.Border.Border border, BritefuryJ.DocPresent.Border.Border hoverBorder)
+		private class OptionMenuInteractor extends ElementInteractor
 		{
-			this.border = border;
-			this.hoverBorder = hoverBorder;
-		}
-		
-		
-		public boolean onButtonDown(DPElement element, PointerButtonEvent event)
-		{
-			return true;
-		}
-
-		public boolean onButtonUp(DPElement element, PointerButtonEvent event)
-		{
-			if ( element.isRealised() )
+			private OptionMenuInteractor()
 			{
-				displayDropdown( element );
-				return true;
 			}
 			
-			return false;
-		}
-		
-		
-		public void onEnter(DPElement element, PointerMotionEvent event)
-		{
-			((DPBorder)element).setBorder( hoverBorder );
-		}
+			
+			public boolean onButtonDown(DPElement element, PointerButtonEvent event)
+			{
+				return true;
+			}
 
-		public void onLeave(DPElement element, PointerMotionEvent event)
-		{
-			((DPBorder)element).setBorder( border );
+			public boolean onButtonUp(DPElement element, PointerButtonEvent event)
+			{
+				if ( element.isRealised() )
+				{
+					displayDropdown();
+					return true;
+				}
+				
+				return false;
+			}
+			
+			
+			public void onEnter(DPElement element, PointerMotionEvent event)
+			{
+				((DPBorder)element).setBorder( optionMenuHoverBorder );
+			}
+
+			public void onLeave(DPElement element, PointerMotionEvent event)
+			{
+				((DPBorder)element).setBorder( optionMenuBorder );
+			}
 		}
-	}
-	
-	
-	
-	private class MenuItemListener implements MenuItem.MenuItemListener
-	{
-		private int choiceIndex;
+		
+		private class MenuItemListener implements MenuItem.MenuItemListener
+		{
+			private int choiceIndex;
+			
+			
+			private MenuItemListener(int choiceIndex)
+			{
+				this.choiceIndex = choiceIndex;
+			}
+			
+			
+			@Override
+			public void onMenuItemClicked(MenuItem.MenuItemControl menuItem)
+			{
+				setChoice( choiceIndex );
+			}
+		}
 		
 		
-		private MenuItemListener(int choiceIndex)
+
+		private DPBorder element;
+		private BritefuryJ.DocPresent.Border.Border optionMenuBorder, optionMenuHoverBorder;
+		private DPBin choiceContainer;
+		private PopupMenu choiceMenu;
+		private Pres choices[];
+		private int currentChoice;
+		private OptionMenuListener listener;
+		
+		
+		protected OptionMenuControl(PresentationContext ctx, DPBorder element, DPBin choiceContainer, Pres choices[], int initialChoice, OptionMenuListener listener,
+				BritefuryJ.DocPresent.Border.Border optionMenuBorder, BritefuryJ.DocPresent.Border.Border optionMenuHoverBorder)
 		{
-			this.choiceIndex = choiceIndex;
+			super( ctx );
+			this.element = element;
+			this.optionMenuBorder = optionMenuBorder;
+			this.optionMenuHoverBorder = optionMenuHoverBorder;
+			this.choiceContainer = choiceContainer;
+			this.choices = choices;
+			currentChoice = initialChoice;
+			this.listener = listener;
+			
+			element.addInteractor( new OptionMenuInteractor() );
+
+			MenuItem menuItems[] = new MenuItem[choices.length];
+			int i = 0;
+			for (Pres choice: this.choices)
+			{
+				menuItems[i] = new MenuItem( choice, new MenuItemListener( i ) );
+				i++;
+			}
+			choiceMenu = new VPopupMenu( menuItems );
 		}
+		
+		
 		
 		
 		@Override
-		public void onMenuItemClicked(MenuItem menuItem, DPElement element)
+		public DPElement getElement()
 		{
-			setChoice( choiceIndex );
+			return element;
+		}
+		
+		
+		
+		private void displayDropdown()
+		{
+			PresentationContext dropDownCtx = ctx.withStyle( ctx.getStyle().withAttr( Controls.bClosePopupOnActivate, true ) );
+			choiceMenu.popupBelow( element, dropDownCtx );
+		}
+		
+		
+		public int getChoice()
+		{
+			return currentChoice;
+		}
+		
+		public void setChoice(int choice)
+		{
+			if ( choice != currentChoice )
+			{
+				int oldChoice = currentChoice;
+				currentChoice = choice;
+				
+				Pres newChoiceContainer = new Bin( choices[currentChoice] );
+				DPBin newChoiceContainerElement = (DPBin)newChoiceContainer.present( ctx );
+				choiceContainer.replaceWith( newChoiceContainerElement );
+				choiceContainer = newChoiceContainerElement;
+				
+				element.setFixedValue( currentChoice );
+				listener.onOptionMenuChoice( this, oldChoice, currentChoice );
+			}
 		}
 	}
+
+	
 	
 	
 
 	private Pres choices[];
-	private int currentChoice;
+	private int initialChoice;
 	private OptionMenuListener listener;
-	
-	private WeakHashMap<DPElement, PresentationContext> choiceBins = new WeakHashMap<DPElement, PresentationContext>();
-	private WeakHashMap<DPElement, PresentationContext> optionMenus = new WeakHashMap<DPElement, PresentationContext>();
-	private PopupMenu popupMenu;
 	
 	
 	
@@ -111,18 +179,8 @@ public class OptionMenu extends Pres
 	private OptionMenu(Pres choices[], int initialChoice, OptionMenuListener listener)
 	{
 		this.choices = choices;
-		currentChoice = initialChoice;
+		this.initialChoice = initialChoice;
 		this.listener = listener;
-		
-		
-		MenuItem menuItems[] = new MenuItem[choices.length];
-		int i = 0;
-		for (Pres choice: this.choices)
-		{
-			menuItems[i] = new MenuItem( choice, new MenuItemListener( i ) );
-			i++;
-		}
-		popupMenu = new VPopupMenu( menuItems );
 	}
 
 	public OptionMenu(List<Object> choices, int initialChoice, OptionMenuListener listener)
@@ -139,45 +197,8 @@ public class OptionMenu extends Pres
 	
 	
 	
-	private void displayDropdown(DPElement element)
-	{
-		PresentationContext ctx = optionMenus.get( element );
-		ctx = ctx.withStyle( ctx.getStyle().withAttr( Controls.bClosePopupOnActivate, true ) );
-		popupMenu.popupBelow( element, ctx );
-	}
-	
-	
-	public int getChoice()
-	{
-		return currentChoice;
-	}
-	
-	public void setChoice(int choice)
-	{
-		if ( choice != currentChoice )
-		{
-			int oldChoice = currentChoice;
-			currentChoice = choice;
-			
-			for (Map.Entry<DPElement, PresentationContext> entry: choiceBins.entrySet())
-			{
-				Pres newChoiceContainer = new Bin( choices[currentChoice] );
-				((DPBin)entry.getKey()).setChild( newChoiceContainer.present( entry.getValue() ) );
-			}
-			
-			for (Map.Entry<DPElement, PresentationContext> entry: optionMenus.entrySet())
-			{
-				entry.getKey().setFixedValue( currentChoice );
-			}
-			
-			listener.onOptionMenuChoice( this, oldChoice, currentChoice );
-		}
-	}
-	
-	
-	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public Control createControl(PresentationContext ctx)
 	{
 		StyleSheetValues style = ctx.getStyle();
 		PresentationContext usedStyleCtx = Controls.useOptionMenuAttrs( ctx );
@@ -186,18 +207,17 @@ public class OptionMenu extends Pres
 		double arrowSize = style.get( Controls.optionMenuArrowSize, Double.class );
 		Pres arrow = arrowStyle.applyTo( new Arrow( Arrow.Direction.DOWN, arrowSize ) );
 		
-		Pres choiceBin = new Bin( new Bin( choices[currentChoice] ) );
-		DPElement choiceBinElement = choiceBin.present( usedStyleCtx );
-		choiceBins.put( choiceBinElement, usedStyleCtx );
+		Pres choiceBin = new Bin( new Bin( choices[initialChoice] ) );
+		DPBin choiceContainer = (DPBin)choiceBin.present( usedStyleCtx );
 		
 		BritefuryJ.DocPresent.Border.Border border = style.get( Controls.optionMenuBorder, BritefuryJ.DocPresent.Border.Border.class );
 		BritefuryJ.DocPresent.Border.Border hoverBorder = style.get( Controls.optionMenuHoverBorder, BritefuryJ.DocPresent.Border.Border.class );
 		StyleSheet2 optionStyle = StyleSheet2.instance.withAttr( Primitive.hboxSpacing, style.get( Controls.optionMenuContentsSpacing, Double.class ) ).withAttr( Primitive.border, border );
-		Pres optionContents = new HBox( new Pres[] { coerce( choiceBinElement ).alignHExpand().alignVCentre(), arrow.alignVCentre() } );
+		Pres optionContents = new HBox( new Pres[] { coerce( choiceContainer ).alignHExpand().alignVCentre(), arrow.alignVCentre() } );
 		Pres optionMenu = optionStyle.applyTo( new Border( optionContents.alignHExpand() ) ); 
-		DPElement optionMenuElement = optionMenu.present( ctx );
-		optionMenuElement.addInteractor( new OptionMenuInteractor( border, hoverBorder ) );
-		optionMenus.put( optionMenuElement, ctx );
-		return optionMenuElement;
+		DPBorder optionMenuElement = (DPBorder)optionMenu.present( ctx );
+		
+		
+		return new OptionMenuControl( ctx, optionMenuElement, choiceContainer, choices, initialChoice, listener, border, hoverBorder );
 	}
 }

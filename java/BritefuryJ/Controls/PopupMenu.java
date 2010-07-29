@@ -44,18 +44,12 @@ public abstract class PopupMenu extends Pres
 	
 	
 	//
-	// Popup to right of
+	// Popup methods
 	//
-	
+
 	public void popupToRightOf(DPElement element, PresentationContext ctx)
 	{
-		DPElement menuElement = present( ctx );
-		menuElement.popupToRightOf( element, true, true );
-	}
-	
-	public void popupToRightOf(DPElement element, StyleSheetValues style)
-	{
-		popupToRightOf( element, new PresentationContext( style ) );
+		popupToRightOf( element, ctx, true, true );
 	}
 	
 	public void popupToRightOf(DPElement element)
@@ -63,21 +57,9 @@ public abstract class PopupMenu extends Pres
 		popupToRightOf( element, new PresentationContext( defaultPopupMenuContentsStyle ) );
 	}
 	
-	
-	
-	//
-	// Popup below
-	//
-	
 	public void popupBelow(DPElement element, PresentationContext ctx)
 	{
-		DPElement menuElement = present( ctx );
-		menuElement.popupBelow( element, true, true );
-	}
-	
-	public void popupBelow(DPElement element, StyleSheetValues style)
-	{
-		popupBelow( element, new PresentationContext( style ) );
+		popupBelow( element, ctx, true, true );
 	}
 	
 	public void popupBelow(DPElement element)
@@ -85,21 +67,9 @@ public abstract class PopupMenu extends Pres
 		popupBelow( element, new PresentationContext( defaultPopupMenuContentsStyle ) );
 	}
 	
-	
-	
-	//
-	// Popup at mouse position
-	//
-	
 	public void popupAtMousePosition(DPElement element, PresentationContext ctx)
 	{
-		DPElement menuElement = present( ctx );
-		element.getRootElement().createPopupAtMousePosition( menuElement, true, true );
-	}
-	
-	public void popupAtMousePosition(DPElement element, StyleSheetValues style)
-	{
-		popupAtMousePosition( element, new PresentationContext( style ) );
+		popupAtMousePosition( element, ctx, true, true );
 	}
 	
 	public void popupAtMousePosition(DPElement element)

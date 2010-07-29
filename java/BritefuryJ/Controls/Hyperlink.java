@@ -2,12 +2,13 @@
 //##* under the terms of the GNU General Public License version 2 as published by the
 //##* Free Software Foundation. The full text of the GNU General Public License
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
-//##* program. This source code is (C)copyright Geoffrey French 2008-2010.
+//##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
 package BritefuryJ.Controls;
 
 import BritefuryJ.DocPresent.ContextMenuFactory;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.PageController;
 import BritefuryJ.DocPresent.Browser.Location;
@@ -18,11 +19,11 @@ import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Input.Modifier;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
-public class Hyperlink extends Pres
+public class Hyperlink extends ControlPres
 {
 	public interface LinkListener
 	{
-		public void onLinkClicked(Hyperlink link, DPElement element, PointerButtonEvent event);
+		public void onLinkClicked(HyperlinkControl link, PointerButtonEvent event);
 	}
 	
 	private static class LinkTargetListener implements LinkListener
@@ -35,9 +36,9 @@ public class Hyperlink extends Pres
 			this.targetLocation = targetLocation;
 		}
 		
-		public void onLinkClicked(Hyperlink link, DPElement element, PointerButtonEvent buttonEvent)
+		public void onLinkClicked(HyperlinkControl link, PointerButtonEvent buttonEvent)
 		{
-			PageController pageController = element.getRootElement().getPageController();
+			PageController pageController = link.getElement().getRootElement().getPageController();
 			if ( ( buttonEvent.getPointer().getModifiers() & Modifier.CTRL ) != 0 )
 			{
 				if ( buttonEvent.getButton() == 1  ||  buttonEvent.getButton() == 2 )
@@ -60,35 +61,6 @@ public class Hyperlink extends Pres
 	}
 	
 	
-	private class LinkInteractor extends ElementInteractor
-	{
-		private boolean bClosePopupOnActivate;
-		
-		
-		public LinkInteractor(boolean bClosePopupOnActivate)
-		{
-			this.bClosePopupOnActivate = bClosePopupOnActivate;
-		}
-		
-		public boolean onButtonDown(DPElement element, PointerButtonEvent event)
-		{
-			return true;
-		}
-
-		public boolean onButtonUp(DPElement element, PointerButtonEvent event)
-		{
-			if ( element.isRealised() )
-			{
-				if ( bClosePopupOnActivate )
-				{
-					element.closeContainingPopupChain();
-				}
-				listener.onLinkClicked( Hyperlink.this, element, event );
-			}
-			
-			return false;
-		}
-	}
 	
 	private class LinkContextMenuFactory implements ContextMenuFactory
 	{
@@ -101,7 +73,7 @@ public class Hyperlink extends Pres
 			MenuItem.MenuItemListener openInNewTabListener = new MenuItem.MenuItemListener()
 			{
 				@Override
-				public void onMenuItemClicked(MenuItem menuItem, DPElement element)
+				public void onMenuItemClicked(MenuItem.MenuItemControl menuItem)
 				{
 					pageController.openLocation( targetListener.targetLocation, PageController.OpenOperation.OPEN_IN_NEW_TAB );
 				}
@@ -110,14 +82,78 @@ public class Hyperlink extends Pres
 			MenuItem.MenuItemListener openInNewWindowListener = new MenuItem.MenuItemListener()
 			{
 				@Override
-				public void onMenuItemClicked(MenuItem menuItem, DPElement element)
+				public void onMenuItemClicked(MenuItem.MenuItemControl menuItem)
 				{
 					pageController.openLocation( targetListener.targetLocation, PageController.OpenOperation.OPEN_IN_NEW_WINDOW );
 				}
 			};
 			
+			
 			menu.add( new MenuItem( "Open in new tab", openInNewTabListener ) );
 			menu.add( new MenuItem( "Open in new window", openInNewWindowListener ) );
+		}
+	}
+
+	
+	public static class HyperlinkControl extends Control
+	{
+		private class LinkInteractor extends ElementInteractor
+		{
+			public LinkInteractor()
+			{	
+			}
+			
+			public boolean onButtonDown(DPElement element, PointerButtonEvent event)
+			{
+				return true;
+			}
+	
+			public boolean onButtonUp(DPElement element, PointerButtonEvent event)
+			{
+				if ( element.isRealised() )
+				{
+					listener.onLinkClicked( HyperlinkControl.this, event );
+					if ( bClosePopupOnActivate )
+					{
+						element.closeContainingPopupChain();
+					}
+				}
+				
+				return false;
+			}
+		}
+	
+		
+		
+		private DPText element;
+		private LinkListener listener;
+		private boolean bClosePopupOnActivate;
+		
+		
+		protected HyperlinkControl(PresentationContext ctx, DPText element, LinkListener listener, boolean bClosePopupOnActivate)
+		{
+			super( ctx );
+			this.element = element;
+			this.listener = listener;
+			this.element.addInteractor( new LinkInteractor() );
+			this.bClosePopupOnActivate = bClosePopupOnActivate;
+		}
+		
+		
+		public DPElement getElement()
+		{
+			return element;
+		}
+		
+		
+		public String getText()
+		{
+			return element.getText();
+		}
+		
+		public void setText(String text)
+		{
+			element.setText( text );
 		}
 	}
 
@@ -142,18 +178,18 @@ public class Hyperlink extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public Control createControl(PresentationContext ctx)
 	{
 		StyleSheet2 style = ctx.getStyle().get( Controls.hyperlinkAttrs, StyleSheet2.class );
 		Pres textElement = style.applyTo( new Text( text ) );
+		boolean bClosePopupOnActivate = style.get( Controls.bClosePopupOnActivate, Boolean.class );
 		
-		DPElement element = textElement.present( ctx );
-		element.addInteractor( new LinkInteractor( ctx.getStyle().get( Controls.bClosePopupOnActivate, Boolean.class ) ) );
+		DPText element = (DPText)textElement.present( ctx );
 		if ( menuFactory != null )
 		{
 			element.addContextMenuFactory( menuFactory );
 		}
 		
-		return element;
+		return new HyperlinkControl( ctx, element, listener, bClosePopupOnActivate );
 	}
 }

@@ -47,7 +47,7 @@ public class OptionMenuTestPage extends SystemPage
 		}
 
 
-		public void onOptionMenuChoice(OptionMenu optionMenu, int previousChoice, int choice)
+		public void onOptionMenuChoice(OptionMenu.OptionMenuControl optionMenu, int previousChoice, int choice)
 		{
 			for (DPElement element: textElementRef.getElements())
 			{

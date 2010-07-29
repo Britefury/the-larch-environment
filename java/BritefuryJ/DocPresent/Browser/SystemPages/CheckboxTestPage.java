@@ -47,7 +47,7 @@ public class CheckboxTestPage extends SystemPage
 		}
 
 
-		public void onCheckboxToggled(Checkbox checkbox, boolean state)
+		public void onCheckboxToggled(Checkbox.CheckboxControl checkbox, boolean state)
 		{
 			for (DPElement element: textElements.getElements())
 			{

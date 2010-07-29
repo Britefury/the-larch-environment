@@ -57,7 +57,7 @@ public class HyperlinkTestPage extends SystemPage
 		}
 
 
-		public void onLinkClicked(Hyperlink link, DPElement element, PointerButtonEvent event)
+		public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonEvent event)
 		{
 			for (Map.Entry<DPElement, PresentationContext> entry: parentElement.getElementsAndContexts())
 			{
