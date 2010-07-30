@@ -8,12 +8,12 @@ package BritefuryJ.AttributeTable;
 
 public class AttributeNonNull extends AttributeBase
 {
-	public AttributeNonNull(String namespace, String name, Object defaultValue)
+	public AttributeNonNull(AttributeNamespace namespace, String name, Object defaultValue)
 	{
 		super( namespace, name, defaultValue );
 	}
 	
-	public AttributeNonNull(String namespace, String name, Class<?> valueClass, Object defaultValue)
+	public AttributeNonNull(AttributeNamespace namespace, String name, Class<?> valueClass, Object defaultValue)
 	{
 		super( namespace, name, valueClass, defaultValue );
 	}

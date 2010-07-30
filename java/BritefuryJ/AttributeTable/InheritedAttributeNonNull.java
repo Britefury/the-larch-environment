@@ -8,12 +8,12 @@ package BritefuryJ.AttributeTable;
 
 public class InheritedAttributeNonNull extends AttributeBase
 {
-	public InheritedAttributeNonNull(String namespace, String name, Object defaultValue)
+	public InheritedAttributeNonNull(AttributeNamespace namespace, String name, Object defaultValue)
 	{
 		super( namespace, name, defaultValue );
 	}
 	
-	public InheritedAttributeNonNull(String namespace, String name, Class<?> valueClass, Object defaultValue)
+	public InheritedAttributeNonNull(AttributeNamespace namespace, String name, Class<?> valueClass, Object defaultValue)
 	{
 		super( namespace, name, valueClass, defaultValue );
 	}

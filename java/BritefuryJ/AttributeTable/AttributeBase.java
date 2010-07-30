@@ -20,17 +20,18 @@ public abstract class AttributeBase
 	}
 	
 	
-	protected String namespace, name;
+	protected AttributeNamespace namespace;
+	protected String  name;
 	protected Class<?> valueClass;
 	protected Object defaultValue;
 	
 	
-	public AttributeBase(String namespace, String name, Object defaultValue)
+	public AttributeBase(AttributeNamespace namespace, String name, Object defaultValue)
 	{
 		this( namespace, name, null, defaultValue );
 	}
 	
-	public AttributeBase(String namespace, String name, Class<?> valueClass, Object defaultValue)
+	public AttributeBase(AttributeNamespace namespace, String name, Class<?> valueClass, Object defaultValue)
 	{
 		this.namespace = namespace;
 		this.name = name;
@@ -40,7 +41,7 @@ public abstract class AttributeBase
 	
 	
 	
-	public String getNamespace()
+	public AttributeNamespace getNamespace()
 	{
 		return namespace;
 	}
@@ -52,7 +53,7 @@ public abstract class AttributeBase
 	
 	public String getFullName()
 	{
-		return namespace + "." + name;
+		return namespace.getName() + "." + name;
 	}
 	
 	public Class<?> getValueClass()

@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent.Combinators.RichText;
 import java.awt.Color;
 import java.awt.Paint;
 
+import BritefuryJ.AttributeTable.AttributeNamespace;
 import BritefuryJ.AttributeTable.AttributeTable2;
 import BritefuryJ.AttributeTable.DerivedValueTable;
 import BritefuryJ.AttributeTable.InheritedAttributeNonNull;
@@ -21,40 +22,43 @@ import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 class RichText
 {
-	public static final InheritedAttributeNonNull pageSpacing = new InheritedAttributeNonNull( "richtext", "pageSpacing", Double.class, 15.0 );
-	public static final InheritedAttributeNonNull headSpacing = new InheritedAttributeNonNull( "richtext", "headSpacing", Double.class, 1.0 );
-	public static final InheritedAttributeNonNull bodySpacing = new InheritedAttributeNonNull( "richtext", "bodySpacing", Double.class, 10.0 );
-	public static final InheritedAttributeNonNull linkHeaderAttrs = new InheritedAttributeNonNull( "richtext", "linkHeaderAttrs", StyleSheet2.class,
+	public static final AttributeNamespace richTextNamespace = new AttributeNamespace( "richtext" );
+	
+	
+	public static final InheritedAttributeNonNull pageSpacing = new InheritedAttributeNonNull( richTextNamespace, "pageSpacing", Double.class, 15.0 );
+	public static final InheritedAttributeNonNull headSpacing = new InheritedAttributeNonNull( richTextNamespace, "headSpacing", Double.class, 1.0 );
+	public static final InheritedAttributeNonNull bodySpacing = new InheritedAttributeNonNull( richTextNamespace, "bodySpacing", Double.class, 10.0 );
+	public static final InheritedAttributeNonNull linkHeaderAttrs = new InheritedAttributeNonNull( richTextNamespace, "linkHeaderAttrs", StyleSheet2.class,
 			StyleSheet2.instance.withAttr( Primitive.hboxSpacing, 25.0 ).withAttr( Primitive.border, new FilledBorder( 5.0, 5.0, 5.0, 5.0, new Color( 184, 206, 203 ) ) ) );
-	public static final InheritedAttributeNonNull linkHeaderPadding = new InheritedAttributeNonNull( "richtext", "linkHeaderPadding", Double.class, 5.0 );
-	public static final InheritedAttributeNonNull titleTextAttrs = new InheritedAttributeNonNull( "richtext", "titleTextAttrs", StyleSheet2.class,
+	public static final InheritedAttributeNonNull linkHeaderPadding = new InheritedAttributeNonNull( richTextNamespace, "linkHeaderPadding", Double.class, 5.0 );
+	public static final InheritedAttributeNonNull titleTextAttrs = new InheritedAttributeNonNull( richTextNamespace, "titleTextAttrs", StyleSheet2.class,
 			StyleSheet2.instance.withAttr( Primitive.fontFace, "Serif" ).withAttr( Primitive.fontSize, 36 ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.textSmallCaps, true ) );
-	public static final InheritedAttributeNonNull titlePadding = new InheritedAttributeNonNull( "richtext", "titlePadding", Double.class, 5.0 );
-	public static final InheritedAttributeNonNull titleBackground = new InheritedAttributeNonNull( "richtext", "titleBackground", Paint.class, new Color( 232, 232, 232 ) );
-	public static final InheritedAttributeNonNull titleBorderWidth = new InheritedAttributeNonNull( "richtext", "titleBorderWidth", Double.class, 10.0 );
-	public static final InheritedAttributeNonNull subtitleTextAttrs = new InheritedAttributeNonNull( "richtext", "titleTextAttrs", StyleSheet2.class,
+	public static final InheritedAttributeNonNull titlePadding = new InheritedAttributeNonNull( richTextNamespace, "titlePadding", Double.class, 5.0 );
+	public static final InheritedAttributeNonNull titleBackground = new InheritedAttributeNonNull( richTextNamespace, "titleBackground", Paint.class, new Color( 232, 232, 232 ) );
+	public static final InheritedAttributeNonNull titleBorderWidth = new InheritedAttributeNonNull( richTextNamespace, "titleBorderWidth", Double.class, 10.0 );
+	public static final InheritedAttributeNonNull subtitleTextAttrs = new InheritedAttributeNonNull( richTextNamespace, "titleTextAttrs", StyleSheet2.class,
 			StyleSheet2.instance.withAttr( Primitive.fontFace, "Sans serif" ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.05f ) ) );
-	public static final InheritedAttributeNonNull normalTextAttrs = new InheritedAttributeNonNull( "richtext", "normalTextAttrs", StyleSheet2.class, StyleSheet2.instance );
-	public static final InheritedAttributeNonNull headingTextAttrs = new InheritedAttributeNonNull( "richtext", "headingTextAttrs", StyleSheet2.class,
+	public static final InheritedAttributeNonNull normalTextAttrs = new InheritedAttributeNonNull( richTextNamespace, "normalTextAttrs", StyleSheet2.class, StyleSheet2.instance );
+	public static final InheritedAttributeNonNull headingTextAttrs = new InheritedAttributeNonNull( richTextNamespace, "headingTextAttrs", StyleSheet2.class,
 			StyleSheet2.instance.withAttr( Primitive.fontFace, "Serif" ) );
-	public static final InheritedAttributeNonNull h1TextAttrs = new InheritedAttributeNonNull( "richtext", "h1TextAttrs", StyleSheet2.class,
+	public static final InheritedAttributeNonNull h1TextAttrs = new InheritedAttributeNonNull( richTextNamespace, "h1TextAttrs", StyleSheet2.class,
 			StyleSheet2.instance.withAttr( Primitive.fontSize, 28 ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.foreground, new Color( 0.1f, 0.2f, 0.3f ) ) );
-	public static final InheritedAttributeNonNull h2TextAttrs = new InheritedAttributeNonNull( "richtext", "h2TextAttrs", StyleSheet2.class,
+	public static final InheritedAttributeNonNull h2TextAttrs = new InheritedAttributeNonNull( richTextNamespace, "h2TextAttrs", StyleSheet2.class,
 			StyleSheet2.instance.withAttr( Primitive.fontSize, 26 ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.foreground, new Color( 0.15f, 0.3f, 0.45f ) ) );
-	public static final InheritedAttributeNonNull h3TextAttrs = new InheritedAttributeNonNull( "richtext", "h3TextAttrs", StyleSheet2.class,
+	public static final InheritedAttributeNonNull h3TextAttrs = new InheritedAttributeNonNull( richTextNamespace, "h3TextAttrs", StyleSheet2.class,
 			StyleSheet2.instance.withAttr( Primitive.fontSize, 24 ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.foreground, new Color( 0.2f, 0.4f, 0.6f ) ) );
-	public static final InheritedAttributeNonNull h4TextAttrs = new InheritedAttributeNonNull( "richtext", "h4TextAttrs", StyleSheet2.class,
+	public static final InheritedAttributeNonNull h4TextAttrs = new InheritedAttributeNonNull( richTextNamespace, "h4TextAttrs", StyleSheet2.class,
 			StyleSheet2.instance.withAttr( Primitive.fontSize, 22 ).withAttr( Primitive.fontItalic, true ).withAttr( Primitive.foreground, new Color( 0.15f, 0.3f, 0.45f  ) ) );
-	public static final InheritedAttributeNonNull h5TextAttrs = new InheritedAttributeNonNull( "richtext", "h5TextAttrs", StyleSheet2.class,
+	public static final InheritedAttributeNonNull h5TextAttrs = new InheritedAttributeNonNull( richTextNamespace, "h5TextAttrs", StyleSheet2.class,
 			StyleSheet2.instance.withAttr( Primitive.fontSize, 18 ).withAttr( Primitive.fontItalic, true ).withAttr( Primitive.foreground, new Color( 0.2f, 0.4f, 0.6f ) ) );
-	public static final InheritedAttributeNonNull h6TextAttrs = new InheritedAttributeNonNull( "richtext", "h6TextAttrs", StyleSheet2.class,
+	public static final InheritedAttributeNonNull h6TextAttrs = new InheritedAttributeNonNull( richTextNamespace, "h6TextAttrs", StyleSheet2.class,
 			StyleSheet2.instance.withAttr( Primitive.fontSize, 16 ).withAttr( Primitive.fontItalic, true ).withAttr( Primitive.foreground, Color.black ) );
-	public static final InheritedAttributeNonNull separatorPainter = new InheritedAttributeNonNull( "richtext", "separatorPainter", Painter.class, new FillPainter( new Color( 32, 87, 147 ) ) );
-	public static final InheritedAttributeNonNull separatorMajorPadding = new InheritedAttributeNonNull( "richtext", "separatorMajorPadding", Double.class, 15.0 );
-	public static final InheritedAttributeNonNull separatorMinorPadding = new InheritedAttributeNonNull( "richtext", "separatorMinorPadding", Double.class, 3.0 );
+	public static final InheritedAttributeNonNull separatorPainter = new InheritedAttributeNonNull( richTextNamespace, "separatorPainter", Painter.class, new FillPainter( new Color( 32, 87, 147 ) ) );
+	public static final InheritedAttributeNonNull separatorMajorPadding = new InheritedAttributeNonNull( richTextNamespace, "separatorMajorPadding", Double.class, 15.0 );
+	public static final InheritedAttributeNonNull separatorMinorPadding = new InheritedAttributeNonNull( richTextNamespace, "separatorMinorPadding", Double.class, 3.0 );
 
 	
-	public static final InheritedAttributeNonNull appendNewlineToParagraphs = new InheritedAttributeNonNull( "richtext", "appendNewlineToParagraphs", Boolean.class, false );
+	public static final InheritedAttributeNonNull appendNewlineToParagraphs = new InheritedAttributeNonNull( richTextNamespace, "appendNewlineToParagraphs", Boolean.class, false );
 	
 	
 	public static StyleSheet2 pageStyle(StyleValues style)
@@ -106,7 +110,7 @@ class RichText
 	
 
 	
-	protected static DerivedValueTable<StyleSheet2> titleStyle = new DerivedValueTable<StyleSheet2>()
+	protected static DerivedValueTable<StyleSheet2> titleStyle = new DerivedValueTable<StyleSheet2>( richTextNamespace )
 	{
 		protected StyleSheet2 evaluate(AttributeTable2 attribs)
 		{

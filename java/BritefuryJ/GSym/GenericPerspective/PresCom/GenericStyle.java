@@ -9,6 +9,7 @@ package BritefuryJ.GSym.GenericPerspective.PresCom;
 import java.awt.Color;
 import java.awt.Paint;
 
+import BritefuryJ.AttributeTable.AttributeNamespace;
 import BritefuryJ.AttributeTable.AttributeTable2;
 import BritefuryJ.AttributeTable.DerivedValueTable;
 import BritefuryJ.AttributeTable.InheritedAttribute;
@@ -21,29 +22,32 @@ import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class GenericStyle
 {
-	public static final InheritedAttributeNonNull objectBorderThickness = new InheritedAttributeNonNull( "genericPerspective", "objectBorderThickness", Double.class, 1.0 );
-	public static final InheritedAttributeNonNull objectBorderInset = new InheritedAttributeNonNull( "genericPerspective", "objectBorderInset", Double.class, 3.0 );
-	public static final InheritedAttributeNonNull objectBorderRounding = new InheritedAttributeNonNull( "genericPerspective", "objectBorderRounding", Double.class, 5.0 );
-	public static final InheritedAttributeNonNull objectBorderPaint = new InheritedAttributeNonNull( "genericPerspective", "objectBorderPaint", Paint.class, new Color( 0.35f, 0.35f, 0.35f ) );
-	public static final InheritedAttribute objectBorderBackground = new InheritedAttribute( "genericPerspective", "objectBorderBackground", Paint.class, null );
-	public static final InheritedAttributeNonNull objectTitlePaint = new InheritedAttributeNonNull( "genericPerspective", "objectTitlePaint", Paint.class, new Color( 0.35f, 0.35f, 0.35f ) );
-	public static final InheritedAttributeNonNull objectTitleAttrs = new InheritedAttributeNonNull( "genericPerspective", "objectTitleAttrs", StyleSheet2.class,
+	public static final AttributeNamespace genericPerspectiveNamespace = new AttributeNamespace( "genericPerspective" );
+	
+	
+	public static final InheritedAttributeNonNull objectBorderThickness = new InheritedAttributeNonNull( genericPerspectiveNamespace, "objectBorderThickness", Double.class, 1.0 );
+	public static final InheritedAttributeNonNull objectBorderInset = new InheritedAttributeNonNull( genericPerspectiveNamespace, "objectBorderInset", Double.class, 3.0 );
+	public static final InheritedAttributeNonNull objectBorderRounding = new InheritedAttributeNonNull( genericPerspectiveNamespace, "objectBorderRounding", Double.class, 5.0 );
+	public static final InheritedAttributeNonNull objectBorderPaint = new InheritedAttributeNonNull( genericPerspectiveNamespace, "objectBorderPaint", Paint.class, new Color( 0.35f, 0.35f, 0.35f ) );
+	public static final InheritedAttribute objectBorderBackground = new InheritedAttribute( genericPerspectiveNamespace, "objectBorderBackground", Paint.class, null );
+	public static final InheritedAttributeNonNull objectTitlePaint = new InheritedAttributeNonNull( genericPerspectiveNamespace, "objectTitlePaint", Paint.class, new Color( 0.35f, 0.35f, 0.35f ) );
+	public static final InheritedAttributeNonNull objectTitleAttrs = new InheritedAttributeNonNull( genericPerspectiveNamespace, "objectTitleAttrs", StyleSheet2.class,
 			StyleSheet2.instance.withAttr( Primitive.fontFace, "Sans serif" ).withAttr( Primitive.fontSize, 10 ) );
-	public static final InheritedAttributeNonNull objectContentPadding = new InheritedAttributeNonNull( "genericPerspective", "objectContentPadding", Double.class, 5.0 );
-	public static final InheritedAttributeNonNull objectFieldSpacing = new InheritedAttributeNonNull( "genericPerspective", "objectFieldSpacing", Double.class, 2.0 );
-	public static final InheritedAttributeNonNull objectFieldIndentation = new InheritedAttributeNonNull( "genericPerspective", "objectFieldIndentation", Double.class, 5.0 );
-	public static final InheritedAttributeNonNull objectFieldStyle = new InheritedAttributeNonNull( "genericPerspective", "objectFieldStyle", StyleSheet2.class, 
+	public static final InheritedAttributeNonNull objectContentPadding = new InheritedAttributeNonNull( genericPerspectiveNamespace, "objectContentPadding", Double.class, 5.0 );
+	public static final InheritedAttributeNonNull objectFieldSpacing = new InheritedAttributeNonNull( genericPerspectiveNamespace, "objectFieldSpacing", Double.class, 2.0 );
+	public static final InheritedAttributeNonNull objectFieldIndentation = new InheritedAttributeNonNull( genericPerspectiveNamespace, "objectFieldIndentation", Double.class, 5.0 );
+	public static final InheritedAttributeNonNull objectFieldStyle = new InheritedAttributeNonNull( genericPerspectiveNamespace, "objectFieldStyle", StyleSheet2.class, 
 			StyleSheet2.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.25f, 0.5f ) ).withAttr( Primitive.paragraphIndentation, objectFieldIndentation.getDefaultValue() ) );
-	public static final InheritedAttributeNonNull errorBorderStyle = new InheritedAttributeNonNull( "genericPerspective", "errorBorderStyle", StyleSheet2.class, 
+	public static final InheritedAttributeNonNull errorBorderStyle = new InheritedAttributeNonNull( genericPerspectiveNamespace, "errorBorderStyle", StyleSheet2.class, 
 			StyleSheet2.instance.withAttr( Primitive.border, new SolidBorder( 1.0, 3.0, 10.0, 10.0, new Color( 0.8f, 0.0f, 0.0f ), new Color( 1.0f, 0.9f, 0.9f ) ) ) );
-	public static final InheritedAttributeNonNull stringContentStyle = new InheritedAttributeNonNull( "genericPerspective", "stringContentStyle", StyleSheet2.class, 
+	public static final InheritedAttributeNonNull stringContentStyle = new InheritedAttributeNonNull( genericPerspectiveNamespace, "stringContentStyle", StyleSheet2.class, 
 			StyleSheet2.instance );
-	public static final InheritedAttributeNonNull stringEscapeStyle = new InheritedAttributeNonNull( "genericPerspective", "stringContentStyle", StyleSheet2.class, 
+	public static final InheritedAttributeNonNull stringEscapeStyle = new InheritedAttributeNonNull( genericPerspectiveNamespace, "stringContentStyle", StyleSheet2.class, 
 			StyleSheet2.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.15f, 0.35f ) ).withAttr( Primitive.background, new FillPainter( new Color( 0.8f, 0.8f, 1.0f ) ) ) );
 
 
 	
-	protected static DerivedValueTable<StyleSheet2> objectTitleStyle = new DerivedValueTable<StyleSheet2>()
+	protected static DerivedValueTable<StyleSheet2> objectTitleStyle = new DerivedValueTable<StyleSheet2>( genericPerspectiveNamespace )
 	{
 		protected StyleSheet2 evaluate(AttributeTable2 attribs)
 		{
@@ -53,7 +57,7 @@ public class GenericStyle
 		}
 	};
 	
-	protected static DerivedValueTable<StyleSheet2> objectBorderStyle = new DerivedValueTable<StyleSheet2>()
+	protected static DerivedValueTable<StyleSheet2> objectBorderStyle = new DerivedValueTable<StyleSheet2>( genericPerspectiveNamespace )
 	{
 		protected StyleSheet2 evaluate(AttributeTable2 attribs)
 		{
@@ -81,7 +85,7 @@ public class GenericStyle
 
 	
 	
-	protected static DerivedValueTable<StyleSheet2> objectBoxFieldListStyle = new DerivedValueTable<StyleSheet2>()
+	protected static DerivedValueTable<StyleSheet2> objectBoxFieldListStyle = new DerivedValueTable<StyleSheet2>( genericPerspectiveNamespace )
 	{
 		protected StyleSheet2 evaluate(AttributeTable2 attribs)
 		{
