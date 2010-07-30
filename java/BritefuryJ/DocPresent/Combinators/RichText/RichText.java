@@ -17,7 +17,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.Painter.Painter;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 class RichText
 {
@@ -57,48 +57,48 @@ class RichText
 	public static final InheritedAttributeNonNull appendNewlineToParagraphs = new InheritedAttributeNonNull( "richtext", "appendNewlineToParagraphs", Boolean.class, false );
 	
 	
-	public static StyleSheetValues pageStyle(StyleSheetValues style)
+	public static StyleSheet2 pageStyle(StyleValues style)
 	{
-		return style.remapAttr( Primitive.vboxSpacing, pageSpacing );
+		return StyleSheet2.instance.withAttrFrom( Primitive.vboxSpacing, style, pageSpacing );
 	}
 
-	public static StyleSheetValues usePageAttrs(StyleSheetValues style)
+	public static StyleValues usePageAttrs(StyleValues style)
 	{
 		return style.useAttr( pageSpacing );
 	}
 
 	
 
-	public static StyleSheetValues headStyle(StyleSheetValues style)
+	public static StyleSheet2 headStyle(StyleValues style)
 	{
-		return style.remapAttr( Primitive.vboxSpacing, headSpacing );
+		return StyleSheet2.instance.withAttrFrom( Primitive.vboxSpacing, style, headSpacing );
 	}
 	
-	public static StyleSheetValues useHeadAttrs(StyleSheetValues style)
+	public static StyleValues useHeadAttrs(StyleValues style)
 	{
 		return style.useAttr( headSpacing );
 	}
 
 	
 
-	public static StyleSheetValues bodyStyle(StyleSheetValues style)
+	public static StyleSheet2 bodyStyle(StyleValues style)
 	{
-		return style.remapAttr( Primitive.vboxSpacing, bodySpacing );
+		return StyleSheet2.instance.withAttrFrom( Primitive.vboxSpacing, style, bodySpacing );
 	}
 	
-	public static StyleSheetValues useBodyAttrs(StyleSheetValues style)
+	public static StyleValues useBodyAttrs(StyleValues style)
 	{
 		return style.useAttr( bodySpacing );
 	}
 
 	
 
-	public static StyleSheetValues linkHeaderStyle(StyleSheetValues style)
+	public static StyleSheet2 linkHeaderStyle(StyleValues style)
 	{
-		return style.withAttrs( style.get( linkHeaderAttrs, StyleSheet2.class ) );
+		return style.get( linkHeaderAttrs, StyleSheet2.class );
 	}
 	
-	public static StyleSheetValues useLinkHeaderAttrs(StyleSheetValues style)
+	public static StyleValues useLinkHeaderAttrs(StyleValues style)
 	{
 		return style.useAttr( linkHeaderAttrs );
 	}
@@ -106,137 +106,137 @@ class RichText
 	
 
 	
-	protected static DerivedValueTable<StyleSheetValues> titleStyle = new DerivedValueTable<StyleSheetValues>()
+	protected static DerivedValueTable<StyleSheet2> titleStyle = new DerivedValueTable<StyleSheet2>()
 	{
-		protected StyleSheetValues evaluate(AttributeTable2 attribs)
+		protected StyleSheet2 evaluate(AttributeTable2 attribs)
 		{
 			double pad = attribs.get( titlePadding, Double.class );
 			Paint background = attribs.get( titleBackground, Paint.class );
-			return (StyleSheetValues)attribs.withAttrs( attribs.get( titleTextAttrs, StyleSheet2.class ) ).withAttr( Primitive.border, new FilledBorder( pad, pad, pad, pad, background ) );
+			return StyleSheet2.instance.withAttrs( attribs.get( titleTextAttrs, StyleSheet2.class ) ).withAttr( Primitive.border, new FilledBorder( pad, pad, pad, pad, background ) );
 		}
 	};
 	
-	public static StyleSheetValues useTitleAttrs(StyleSheetValues style)
+	public static StyleValues useTitleAttrs(StyleValues style)
 	{
 		return style.useAttr( titleTextAttrs );
 	}
 
 	
 
-	public static StyleSheetValues titleTextStyle(StyleSheetValues style)
+	public static StyleSheet2 titleTextStyle(StyleValues style)
 	{
-		return style.withAttrs( style.get( titleTextAttrs, StyleSheet2.class ) );
+		return style.get( titleTextAttrs, StyleSheet2.class );
 	}
 	
-	public static StyleSheetValues useTitleTextAttrs(StyleSheetValues style)
+	public static StyleValues useTitleTextAttrs(StyleValues style)
 	{
 		return style.useAttr( titleTextAttrs );
 	}
 
 	
 
-	public static StyleSheetValues subtitleTextStyle(StyleSheetValues style)
+	public static StyleSheet2 subtitleTextStyle(StyleValues style)
 	{
-		return style.withAttrs( style.get( subtitleTextAttrs, StyleSheet2.class ) );
+		return style.get( subtitleTextAttrs, StyleSheet2.class );
 	}
 	
-	public static StyleSheetValues useSubtitleTextAttrs(StyleSheetValues style)
+	public static StyleValues useSubtitleTextAttrs(StyleValues style)
 	{
 		return style.useAttr( subtitleTextAttrs );
 	}
 
 	
 
-	public static StyleSheetValues normalTextStyle(StyleSheetValues style)
+	public static StyleSheet2 normalTextStyle(StyleValues style)
 	{
-		return style.withAttrs( style.get( normalTextAttrs, StyleSheet2.class ) );
+		return style.get( normalTextAttrs, StyleSheet2.class );
 	}
 	
-	public static StyleSheetValues useNormalTextAttrs(StyleSheetValues style)
+	public static StyleValues useNormalTextAttrs(StyleValues style)
 	{
 		return style.useAttr( normalTextAttrs );
 	}
 
 	
 
-	public static StyleSheetValues h1TextStyle(StyleSheetValues style)
+	public static StyleSheet2 h1TextStyle(StyleValues style)
 	{
-		return style.withAttrs( style.get( headingTextAttrs, StyleSheet2.class ) ).withAttrs( style.get( h1TextAttrs, StyleSheet2.class ) );
+		return style.get( headingTextAttrs, StyleSheet2.class ).withAttrs( style.get( h1TextAttrs, StyleSheet2.class ) );
 	}
 	
-	public static StyleSheetValues useH1TextAttrs(StyleSheetValues style)
+	public static StyleValues useH1TextAttrs(StyleValues style)
 	{
 		return style.useAttr( normalTextAttrs ).useAttr( h1TextAttrs );
 	}
 
 	
 
-	public static StyleSheetValues h2TextStyle(StyleSheetValues style)
+	public static StyleSheet2 h2TextStyle(StyleValues style)
 	{
-		return style.withAttrs( style.get( headingTextAttrs, StyleSheet2.class ) ).withAttrs( style.get( h2TextAttrs, StyleSheet2.class ) );
+		return style.get( headingTextAttrs, StyleSheet2.class ).withAttrs( style.get( h2TextAttrs, StyleSheet2.class ) );
 	}
 	
-	public static StyleSheetValues useH2TextAttrs(StyleSheetValues style)
+	public static StyleValues useH2TextAttrs(StyleValues style)
 	{
 		return style.useAttr( normalTextAttrs ).useAttr( h2TextAttrs );
 	}
 
 	
 
-	public static StyleSheetValues h3TextStyle(StyleSheetValues style)
+	public static StyleSheet2 h3TextStyle(StyleValues style)
 	{
-		return style.withAttrs( style.get( headingTextAttrs, StyleSheet2.class ) ).withAttrs( style.get( h3TextAttrs, StyleSheet2.class ) );
+		return style.get( headingTextAttrs, StyleSheet2.class ).withAttrs( style.get( h3TextAttrs, StyleSheet2.class ) );
 	}
 	
-	public static StyleSheetValues useH3TextAttrs(StyleSheetValues style)
+	public static StyleValues useH3TextAttrs(StyleValues style)
 	{
 		return style.useAttr( normalTextAttrs ).useAttr( h3TextAttrs );
 	}
 
 	
 
-	public static StyleSheetValues h4TextStyle(StyleSheetValues style)
+	public static StyleSheet2 h4TextStyle(StyleValues style)
 	{
-		return style.withAttrs( style.get( headingTextAttrs, StyleSheet2.class ) ).withAttrs( style.get( h4TextAttrs, StyleSheet2.class ) );
+		return style.get( headingTextAttrs, StyleSheet2.class ).withAttrs( style.get( h4TextAttrs, StyleSheet2.class ) );
 	}
 	
-	public static StyleSheetValues useH4TextAttrs(StyleSheetValues style)
+	public static StyleValues useH4TextAttrs(StyleValues style)
 	{
 		return style.useAttr( normalTextAttrs ).useAttr( h4TextAttrs );
 	}
 
 	
 
-	public static StyleSheetValues h5TextStyle(StyleSheetValues style)
+	public static StyleSheet2 h5TextStyle(StyleValues style)
 	{
-		return style.withAttrs( style.get( headingTextAttrs, StyleSheet2.class ) ).withAttrs( style.get( h5TextAttrs, StyleSheet2.class ) );
+		return style.get( headingTextAttrs, StyleSheet2.class ).withAttrs( style.get( h5TextAttrs, StyleSheet2.class ) );
 	}
 	
-	public static StyleSheetValues useH5TextAttrs(StyleSheetValues style)
+	public static StyleValues useH5TextAttrs(StyleValues style)
 	{
 		return style.useAttr( normalTextAttrs ).useAttr( h5TextAttrs );
 	}
 
 	
 
-	public static StyleSheetValues h6TextStyle(StyleSheetValues style)
+	public static StyleSheet2 h6TextStyle(StyleValues style)
 	{
-		return style.withAttrs( style.get( headingTextAttrs, StyleSheet2.class ) ).withAttrs( style.get( h6TextAttrs, StyleSheet2.class ) );
+		return style.get( headingTextAttrs, StyleSheet2.class ).withAttrs( style.get( h6TextAttrs, StyleSheet2.class ) );
 	}
 	
-	public static StyleSheetValues useH6TextAttrs(StyleSheetValues style)
+	public static StyleValues useH6TextAttrs(StyleValues style)
 	{
 		return style.useAttr( normalTextAttrs ).useAttr( h6TextAttrs );
 	}
 
 
 
-	public static StyleSheetValues separatorStyle(StyleSheetValues style)
+	public static StyleSheet2 separatorStyle(StyleValues style)
 	{
-		return style.remapAttr( Primitive.shapePainter, separatorPainter );
+		return StyleSheet2.instance.withAttrFrom( Primitive.shapePainter, style, separatorPainter );
 	}
 	
-	public static StyleSheetValues useSeparatorAttrs(StyleSheetValues style)
+	public static StyleValues useSeparatorAttrs(StyleValues style)
 	{
 		return style.useAttr( separatorPainter );
 	}

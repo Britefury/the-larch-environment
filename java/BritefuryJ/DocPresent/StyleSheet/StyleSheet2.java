@@ -53,6 +53,16 @@ public class StyleSheet2 extends AttributeTable2
 		return (StyleSheet2)super.withAttrs( attribs );
 	}
 		
+	public StyleSheet2 withAttrFrom(AttributeBase destAttr, AttributeTable2 srcTable, AttributeBase srcAttr)
+	{
+		return (StyleSheet2)super.withAttrFrom( destAttr, srcTable, srcAttr );
+	}
+	
+	public StyleSheet2 withAttrsFrom(AttributeTable2 srcTable, AttributeBase srcAttr)
+	{
+		return (StyleSheet2)super.withAttrsFrom( srcTable, srcAttr );
+	}
+	
 	public StyleSheet2 withoutAttr(AttributeBase attribute)
 	{
 		return (StyleSheet2)super.withoutAttr( attribute );

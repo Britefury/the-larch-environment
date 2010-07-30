@@ -15,7 +15,7 @@ import java.awt.Stroke;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 
-public class SolidBorder extends Border
+public class SolidBorder extends AbstractBorder
 {
 	private double thickness, inset, roundingX, roundingY;
 	private Paint borderPaint, backgroundPaint;

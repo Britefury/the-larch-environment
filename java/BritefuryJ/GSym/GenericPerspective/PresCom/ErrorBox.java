@@ -4,33 +4,35 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.DocPresent.Combinators.RichText;
-
-import java.util.List;
+package BritefuryJ.GSym.GenericPerspective.PresCom;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
-import BritefuryJ.DocPresent.Combinators.SequentialPres;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 
-public class Body extends SequentialPres
+public class ErrorBox extends Pres
 {
-	public Body(Object children[])
-	{
-		super( children );
-	}
+	private String title;
+	private Pres contents;
 	
-	public Body(List<Object> children)
+	
+	public ErrorBox(String title, Object contents)
 	{
-		super( children );
+		this.title = title;
+		this.contents = coerce( contents );
 	}
 	
 	
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		Pres xs[] = mapPresentAsCombinators( ctx.withStyle( RichText.useBodyAttrs( ctx.getStyle() ) ), children );
-		return RichText.bodyStyle( ctx.getStyle() ).applyTo( new VBox( xs ).alignHExpand() ).present( ctx );
+		double padding = ctx.getStyle().get( GenericStyle.objectContentPadding, Double.class );
+		PresentationContext childCtx = GenericStyle.useErrorBorderAttrs( GenericStyle.useErrorBoxAttrs( ctx ) );
+		DPElement contentsElement = contents.present( childCtx );
+		
+		Pres titlePres = new ObjectTitle( title );
+		
+		return new ErrorBorder( new VBox( new Object[] { titlePres, contentsElement.padX( padding ) } ) ).present( ctx );
 	}
 }

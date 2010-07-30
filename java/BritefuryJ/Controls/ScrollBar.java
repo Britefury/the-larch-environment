@@ -12,7 +12,7 @@ import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Painter.Painter;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 import BritefuryJ.DocPresent.Util.Range;
 
 public abstract class ScrollBar extends ControlPres
@@ -66,7 +66,7 @@ public abstract class ScrollBar extends ControlPres
 	@Override
 	public Control createControl(PresentationContext ctx)
 	{
-		StyleSheetValues style = ctx.getStyle();
+		StyleValues style = ctx.getStyle();
 		
 		double arrowPadding = style.get( Controls.scrollBarArrowPadding, Double.class ); 
 		double arrowSpacing = style.get( Controls.scrollBarArrowSpacing, Double.class ); 

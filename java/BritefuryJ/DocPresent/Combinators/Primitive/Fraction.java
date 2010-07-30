@@ -10,7 +10,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPFraction;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Fraction extends Pres
 {
@@ -29,9 +29,9 @@ public class Fraction extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		StyleSheetValues style = ctx.getStyle();
+		StyleValues style = ctx.getStyle();
 		DPFraction element = new DPFraction( Primitive.fractionParams.get( style ), Primitive.textParams.get( style ), barContent );
-		StyleSheetValues usedStyle = Primitive.useFractionParams( Primitive.useTextParams( style ) );
+		StyleValues usedStyle = Primitive.useFractionParams( Primitive.useTextParams( style ) );
 		element.setNumeratorChild( numerator.present( ctx.withStyle( fractionNumeratorStyle( usedStyle ) ) ) );
 		element.setDenominatorChild( denominator.present( ctx.withStyle( fractionDenominatorStyle( usedStyle ) ) ) );
 		return element;
@@ -39,7 +39,7 @@ public class Fraction extends Pres
 
 
 
-	private static StyleSheetValues fractionNumeratorStyle(StyleSheetValues style)
+	private static StyleValues fractionNumeratorStyle(StyleValues style)
 	{
 		double scale = style.get( Primitive.fontScale, Double.class );
 		double fracScale = style.get( Primitive.fractionFontScale, Double.class );
@@ -48,7 +48,7 @@ public class Fraction extends Pres
 		return style.withAttr( Primitive.fontScale, scale );
 	}
 
-	private static StyleSheetValues fractionDenominatorStyle(StyleSheetValues style)
+	private static StyleValues fractionDenominatorStyle(StyleValues style)
 	{
 		return fractionNumeratorStyle( style );
 	}

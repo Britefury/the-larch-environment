@@ -28,7 +28,7 @@ public class TitleBar extends Pres
 		Title title = new Title( text );
 		Pres titleBackground = new Border( title.alignHCentre() );
 		double borderWidth = ctx.getStyle().get( RichText.titleBorderWidth, Double.class );
-		return higherOrderPresent( ctx, RichText.titleStyle.get( ctx.getStyle() ),
-				titleBackground.alignHExpand().pad( borderWidth, borderWidth ).alignHExpand() );
+		return RichText.titleStyle.get( ctx.getStyle() ).applyTo(
+				titleBackground.alignHExpand().pad( borderWidth, borderWidth ).alignHExpand() ).present( ctx );
 	}
 }

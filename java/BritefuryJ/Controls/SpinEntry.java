@@ -20,7 +20,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Input.Modifier;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public abstract class SpinEntry extends ControlPres
 {
@@ -124,9 +124,9 @@ public abstract class SpinEntry extends ControlPres
 	@Override
 	public Control createControl(PresentationContext ctx)
 	{
-		StyleSheetValues style = ctx.getStyle();
+		StyleValues style = ctx.getStyle();
 		StyleSheet2 arrowStyleSheet = style.get( Controls.spinEntryArrowAttrs, StyleSheet2.class );
-		StyleSheetValues arrowStyle = style.withAttrs( arrowStyleSheet );
+		StyleValues arrowStyle = style.withAttrs( arrowStyleSheet );
 		double arrowSize = style.get( Controls.spinEntryArrowSize, Double.class );
 		double hspacing = style.get( Controls.spinEntryHSpacing, Double.class );
 		

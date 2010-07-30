@@ -16,7 +16,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Painter.Painter;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class MenuItem extends ControlPres
 {
@@ -156,7 +156,7 @@ public class MenuItem extends ControlPres
 	@Override
 	public Control createControl(PresentationContext ctx)
 	{
-		StyleSheetValues styleValues = ctx.getStyle();
+		StyleValues styleValues = ctx.getStyle();
 
 		Pres childElem = presentAsCombinator( Controls.useMenuItemAttrs( ctx ), child );
 		
@@ -165,7 +165,7 @@ public class MenuItem extends ControlPres
 		double padY = styleValues.get( Controls.menuItemYPadding, Double.class );
 		boolean bClosePopupOnActivate = styleValues.get( Controls.bClosePopupOnActivate, Boolean.class );
 		
-		StyleSheetValues menuItemStyle = styleValues.withAttr( Primitive.hoverBackground, hoverBackground );
+		StyleValues menuItemStyle = styleValues.withAttr( Primitive.hoverBackground, hoverBackground );
 		Pres menuItem = new Bin( childElem.alignHExpand().pad( padX, padY ) );
 
 		DPBin element = (DPBin)menuItem.present( ctx.withStyle( menuItemStyle ) );

@@ -17,7 +17,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.ParagraphDedentMarker;
 import BritefuryJ.DocPresent.Combinators.Primitive.ParagraphIndentMarker;
 import BritefuryJ.DocPresent.ListView.TrailingSeparator;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class ParagraphSequenceView extends AbstractSequenceView
 {
@@ -35,7 +35,7 @@ public class ParagraphSequenceView extends AbstractSequenceView
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		StyleSheetValues style = ctx.getStyle();
+		StyleValues style = ctx.getStyle();
 
 		boolean bAddParagraphIndentMarkers = style.get( Sequence.addParagraphIndentMarkers, Boolean.class );
 		

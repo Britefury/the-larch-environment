@@ -4,21 +4,30 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.DocPresent.Combinators.RichText;
+package BritefuryJ.GSym.GenericPerspective.PresCom;
 
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.Combinators.Primitive.Border;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
-public class Heading4 extends RichParagraph
+public class ObjectBorder extends Pres
 {
-	public Heading4(String text)
+	private Pres child;
+	
+	
+	public ObjectBorder(Pres child)
 	{
-		super( text );
+		this.child = child;
 	}
-
+	
+	
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		return presentParagraph( ctx.withStyleSheet( RichText.h4TextStyle( ctx.getStyle() ) ) );
+		StyleSheet2 borderStyle = GenericStyle.objectBorderStyle.get( ctx.getStyle() );
+		DPElement childElem = child.present( GenericStyle.useObjectBorderAttrs( ctx ) );
+		return borderStyle.applyTo( new Border( childElem ) ).present( ctx );
 	}
 }

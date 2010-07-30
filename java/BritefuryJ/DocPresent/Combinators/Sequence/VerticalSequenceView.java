@@ -15,7 +15,7 @@ import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.ListView.TrailingSeparator;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class VerticalSequenceView extends AbstractSequenceView
 {
@@ -45,7 +45,7 @@ public class VerticalSequenceView extends AbstractSequenceView
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		StyleSheetValues style = ctx.getStyle();
+		StyleValues style = ctx.getStyle();
 		
 		double indentation = style.get( Sequence.indentation, Double.class );
 		

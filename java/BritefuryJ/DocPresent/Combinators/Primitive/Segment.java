@@ -10,7 +10,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPSegment;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Segment extends Pres
 {
@@ -30,7 +30,7 @@ public class Segment extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		StyleSheetValues style = ctx.getStyle();
+		StyleValues style = ctx.getStyle();
 		DPSegment element = new DPSegment( Primitive.containerParams.get( style ), Primitive.textParams.get( style ), bGuardBegin, bGuardEnd );
 		element.setChild( child.present( ctx.withStyle( Primitive.useContainerParams( ctx.getStyle() ) ) ) );
 		return element;

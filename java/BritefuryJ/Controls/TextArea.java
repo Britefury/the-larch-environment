@@ -38,7 +38,7 @@ import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class TextArea extends ControlPres
 {
@@ -433,11 +433,11 @@ public class TextArea extends ControlPres
 	@Override
 	public Control createControl(PresentationContext ctx)
 	{
-		StyleSheetValues style = ctx.getStyle();
+		StyleValues style = ctx.getStyle();
 		
 		StyleSheet2 textAreaStyleSheet = style.get( Controls.textAreaAttrs, StyleSheet2.class );
 		
-		StyleSheetValues textAreaStyle = style.withAttrs( textAreaStyleSheet );
+		StyleValues textAreaStyle = style.withAttrs( textAreaStyleSheet );
 		PresentationContext textAreaCtx = ctx.withStyle( textAreaStyle );
 		
 		Pres textBoxPres = new VBox( new Pres[] {} );

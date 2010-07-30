@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent.Controls;
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementInteractor;
-import BritefuryJ.DocPresent.Border.Border;
+import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 
@@ -62,14 +62,14 @@ public class Button extends Control
 	
 	
 	
-	private Border buttonBorder, highlightBorder;
+	private AbstractBorder buttonBorder, highlightBorder;
 	private DPBorder buttonElement;
 	private ButtonListener listener;
 	private boolean bClosePopupOnActivate;
 
 
 	
-	protected Button(DPBorder buttonElement, Border buttonBorder, Border highlightBorder, ButtonListener listener, boolean bClosePopupOnActivate)
+	protected Button(DPBorder buttonElement, AbstractBorder buttonBorder, AbstractBorder highlightBorder, ButtonListener listener, boolean bClosePopupOnActivate)
 	{
 		this.buttonElement = buttonElement;
 		this.buttonBorder = buttonBorder;

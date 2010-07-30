@@ -19,6 +19,6 @@ public class Heading3 extends RichParagraph
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		return presentParagraph( ctx.withStyle( RichText.h3TextStyle( ctx.getStyle() ) ) );
+		return presentParagraph( ctx.withStyleSheet( RichText.h3TextStyle( ctx.getStyle() ) ) );
 	}
 }

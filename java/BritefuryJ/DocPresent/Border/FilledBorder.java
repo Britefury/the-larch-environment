@@ -11,7 +11,7 @@ import java.awt.Paint;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 
-public class FilledBorder extends Border
+public class FilledBorder extends AbstractBorder
 {
 	private double leftMargin, rightMargin, topMargin, bottomMargin, roundingX, roundingY;
 	private Paint backgroundPaint;

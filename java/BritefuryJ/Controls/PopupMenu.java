@@ -13,11 +13,11 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public abstract class PopupMenu extends Pres
 {
-	private static final StyleSheetValues defaultPopupMenuContentsStyle = StyleSheetValues.instance.withAttr( Controls.bClosePopupOnActivate, true );
+	private static final StyleValues defaultPopupMenuContentsStyle = StyleValues.instance.withAttr( Controls.bClosePopupOnActivate, true );
 	
 	protected ArrayList<Pres> items = new ArrayList<Pres>();
 	private boolean bEmpty;
@@ -96,7 +96,7 @@ public abstract class PopupMenu extends Pres
 	{
 		Pres itemCombinators[] = mapPresentAsCombinators( ctx, items );
 		Pres menuElement = new Border( createMenuBox( itemCombinators ) );
-		StyleSheetValues menuStyleValues = Controls.popupMenuStyle( ctx.getStyle() );
+		StyleValues menuStyleValues = Controls.popupMenuStyle( ctx.getStyle() );
 		return menuElement.present( ctx.withStyle( menuStyleValues ) );
 	}
 

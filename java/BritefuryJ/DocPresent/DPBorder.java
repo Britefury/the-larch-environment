@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent;
 
 import java.awt.Graphics2D;
 
-import BritefuryJ.DocPresent.Border.Border;
+import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeBorder;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
@@ -19,7 +19,7 @@ public class DPBorder extends DPBin
 {
 	public static FilledBorder defaultBorder = new FilledBorder( 0.0, 0.0, 0.0, 0.0 );
 	
-	protected Border border;
+	protected AbstractBorder border;
 	
 	
 	
@@ -28,7 +28,7 @@ public class DPBorder extends DPBin
 		this( defaultBorder, ContainerStyleParams.defaultStyleParams );
 	}
 
-	public DPBorder(Border border)
+	public DPBorder(AbstractBorder border)
 	{
 		this( border, ContainerStyleParams.defaultStyleParams );
 	}
@@ -38,7 +38,7 @@ public class DPBorder extends DPBin
 		this( defaultBorder, styleParams);
 	}
 	
-	public DPBorder(Border border, ContainerStyleParams styleParams)
+	public DPBorder(AbstractBorder border, ContainerStyleParams styleParams)
 	{
 		super(styleParams);
 		
@@ -76,12 +76,12 @@ public class DPBorder extends DPBin
 	//
 	//
 	
-	public Border getBorder()
+	public AbstractBorder getBorder()
 	{
 		return border;
 	}
 	
-	public void setBorder(Border b)
+	public void setBorder(AbstractBorder b)
 	{
 		if ( b != border )
 		{

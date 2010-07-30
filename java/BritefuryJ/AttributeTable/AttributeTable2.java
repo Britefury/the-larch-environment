@@ -287,6 +287,17 @@ public class AttributeTable2 implements Presentable
 		return derivedRef.get();
 	}
 	
+	public AttributeTable2 withAttrFrom(AttributeBase destAttr, AttributeTable2 srcTable, AttributeBase srcAttr)
+	{
+		return withAttr( destAttr, srcTable.get( srcAttr ) );
+	}
+	
+	public AttributeTable2 withAttrsFrom(AttributeTable2 srcTable, AttributeBase srcAttr)
+	{
+		AttributeTable2 attrs = srcTable.get( srcAttr, AttributeTable2.class );
+		return withAttrs( attrs );
+	}
+	
 	public AttributeTable2 withoutAttr(AttributeBase attribute)
 	{
 		if ( !values.containsKey( attribute ) )

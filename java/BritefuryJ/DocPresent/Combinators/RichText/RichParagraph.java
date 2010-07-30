@@ -20,7 +20,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Segment;
 import BritefuryJ.DocPresent.Combinators.Primitive.Span;
 import BritefuryJ.DocPresent.Combinators.Primitive.Text;
 import BritefuryJ.DocPresent.Combinators.Primitive.Whitespace;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 abstract class RichParagraph extends Pres
 {
@@ -95,7 +95,7 @@ abstract class RichParagraph extends Pres
 			paragraphContents = textToWordsAndLineBreaks();
 		}
 		
-		StyleSheetValues style = ctx.getStyle();
+		StyleValues style = ctx.getStyle();
 
 		if ( Primitive.isEditable( style ) )
 		{

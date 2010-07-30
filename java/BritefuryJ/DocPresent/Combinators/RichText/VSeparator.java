@@ -10,7 +10,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Box;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class VSeparator extends Pres
 {
@@ -21,10 +21,10 @@ public class VSeparator extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		StyleSheetValues style = ctx.getStyle();
+		StyleValues style = ctx.getStyle();
 		double majorPadding = style.get( RichText.separatorMajorPadding, Double.class );
 		double minorPadding = style.get( RichText.separatorMinorPadding, Double.class );
-		return higherOrderPresent( ctx, RichText.separatorStyle( style ),
-				new Box( 1.0, 0.0 ).alignVExpand().pad( majorPadding, minorPadding ) );
+		return RichText.separatorStyle( style ).applyTo(
+				new Box( 1.0, 0.0 ).alignVExpand().pad( majorPadding, minorPadding ) ).present( ctx );
 	}
 }

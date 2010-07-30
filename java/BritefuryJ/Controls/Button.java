@@ -17,7 +17,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Button extends ControlPres
 {
@@ -70,15 +70,15 @@ public class Button extends ControlPres
 		
 		
 		
-		private BritefuryJ.DocPresent.Border.Border buttonBorder, highlightBorder;
+		private BritefuryJ.DocPresent.Border.AbstractBorder buttonBorder, highlightBorder;
 		private DPBorder buttonElement;
 		private ButtonListener listener;
 		private boolean bClosePopupOnActivate;
 	
 	
 		
-		protected ButtonControl(PresentationContext ctx, DPBorder buttonElement, BritefuryJ.DocPresent.Border.Border buttonBorder,
-				BritefuryJ.DocPresent.Border.Border highlightBorder, ButtonListener listener, boolean bClosePopupOnActivate)
+		protected ButtonControl(PresentationContext ctx, DPBorder buttonElement, BritefuryJ.DocPresent.Border.AbstractBorder buttonBorder,
+				BritefuryJ.DocPresent.Border.AbstractBorder highlightBorder, ButtonListener listener, boolean bClosePopupOnActivate)
 		{
 			super( ctx );
 			this.buttonElement = buttonElement;
@@ -124,9 +124,9 @@ public class Button extends ControlPres
 	@Override
 	public Control createControl(PresentationContext ctx)
 	{
-		StyleSheetValues style = ctx.getStyle();
-		BritefuryJ.DocPresent.Border.Border border = style.get( Controls.buttonBorder, BritefuryJ.DocPresent.Border.Border.class );
-		BritefuryJ.DocPresent.Border.Border highlightBorder = style.get( Controls.buttonHighlightBorder, BritefuryJ.DocPresent.Border.Border.class );
+		StyleValues style = ctx.getStyle();
+		BritefuryJ.DocPresent.Border.AbstractBorder border = style.get( Controls.buttonBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class );
+		BritefuryJ.DocPresent.Border.AbstractBorder highlightBorder = style.get( Controls.buttonHighlightBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class );
 		boolean bClosePopupOnActivate = style.get( Controls.bClosePopupOnActivate, Boolean.class );
 		
 		Pres childElement = presentAsCombinator( Controls.useButtonAttrs( ctx ), child );

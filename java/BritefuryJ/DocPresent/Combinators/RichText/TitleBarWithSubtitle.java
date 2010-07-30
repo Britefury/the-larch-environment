@@ -32,7 +32,7 @@ public class TitleBarWithSubtitle extends Pres
 		Pres titleVBox = new VBox( new Pres[] { title.alignHCentre(), subtitle.alignHCentre() } );
 		Pres titleBackground = new Border( titleVBox.alignHCentre() );
 		double borderWidth = ctx.getStyle().get( RichText.titleBorderWidth, Double.class );
-		return higherOrderPresent( ctx, RichText.titleStyle.get( ctx.getStyle() ),
-				titleBackground.alignHExpand().pad( borderWidth, borderWidth ).alignHExpand() );
+		return RichText.titleStyle.get( ctx.getStyle() ).applyTo(
+				titleBackground.alignHExpand().pad( borderWidth, borderWidth ).alignHExpand() ).present( ctx );
 	}
 }

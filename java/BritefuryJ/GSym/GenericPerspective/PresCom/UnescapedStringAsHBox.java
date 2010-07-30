@@ -4,21 +4,24 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.DocPresent.Combinators.RichText;
+package BritefuryJ.GSym.GenericPerspective.PresCom;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import java.util.ArrayList;
 
-public class Heading4 extends RichParagraph
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+
+public class UnescapedStringAsHBox extends UnescapedString
 {
-	public Heading4(String text)
+	public UnescapedStringAsHBox(String value)
 	{
-		super( text );
+		super( value );
 	}
-
+	
+	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	protected Pres createContainer(ArrayList<Object> contents)
 	{
-		return presentParagraph( ctx.withStyleSheet( RichText.h4TextStyle( ctx.getStyle() ) ) );
+		return new HBox( contents );
 	}
 }
