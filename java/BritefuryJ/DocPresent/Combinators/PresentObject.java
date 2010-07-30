@@ -24,11 +24,10 @@ public class PresentObject extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
 		GSymAbstractPerspective perspective = ctx.getPerspective();
 		GSymFragmentView fragment = ctx.getFragment();
-		StyleValues style = ctx.getStyle();
 		AttributeTable inheritedState = ctx.getInheritedState();
 		
 		if ( perspective == null )

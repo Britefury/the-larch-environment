@@ -11,6 +11,7 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class ObjectTitle extends Pres
 {
@@ -24,9 +25,9 @@ public class ObjectTitle extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		StyleSheet2 style = GenericStyle.objectTitleStyle.get( ctx.getStyle() );
-		return style.applyTo( new StaticText( title ) ).present( ctx );
+		StyleSheet2 titleStyle = GenericStyle.objectTitleStyle.get( style );
+		return titleStyle.applyTo( new StaticText( title ) ).present( ctx, style );
 	}
 }

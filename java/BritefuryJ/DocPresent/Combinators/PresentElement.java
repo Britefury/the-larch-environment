@@ -7,6 +7,7 @@
 package BritefuryJ.DocPresent.Combinators;
 
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class PresentElement extends Pres
 {
@@ -20,7 +21,7 @@ public class PresentElement extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
 		return element;
 	}

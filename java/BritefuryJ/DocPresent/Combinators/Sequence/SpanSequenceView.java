@@ -34,10 +34,8 @@ public class SpanSequenceView extends AbstractSequenceView
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		StyleValues style = ctx.getStyle();
-		
 		boolean bAddLineBreaks = style.get( Sequence.addLineBreaks, Boolean.class );
 		boolean bAddParagraphIndentMarkers = style.get( Sequence.addParagraphIndentMarkers, Boolean.class );
 		boolean bAddLineBreakCost = style.get( Sequence.addLineBreakCost, Boolean.class );
@@ -94,11 +92,11 @@ public class SpanSequenceView extends AbstractSequenceView
 		
 		if ( bAddLineBreakCost )
 		{
-			return new LineBreakCostSpan( childElems ).present( ctx );
+			return new LineBreakCostSpan( childElems ).present( ctx, style );
 		}
 		else
 		{
-			return new Span( childElems ).present( ctx );
+			return new Span( childElems ).present( ctx, style );
 		}
 	}
 }

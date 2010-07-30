@@ -50,33 +50,32 @@ public class Script extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		StyleValues style = ctx.getStyle();
 		StyleValues usedStyle = Primitive.useScriptParams( Primitive.useTextParams( style ) );
-		PresentationContext childCtx = null;
+		StyleValues childStyle = null;
 		if ( leftSuper != null  ||  leftSub != null  ||  rightSuper != null  ||  rightSub != null )
 		{
-			childCtx = ctx.withStyle( scriptScriptChildStyle( usedStyle ) );
+			childStyle = scriptScriptChildStyle( usedStyle );
 		}
 		
 		DPScript element = new DPScript( Primitive.scriptParams.get( style ), Primitive.textParams.get( style ) );
-		element.setMainChild( main.present( ctx.withStyle( usedStyle ) ) );
+		element.setMainChild( main.present( ctx, usedStyle ) );
 		if ( leftSuper != null )
 		{
-			element.setLeftSuperscriptChild( leftSuper.present( childCtx ) );
+			element.setLeftSuperscriptChild( leftSuper.present( ctx, childStyle ) );
 		}
 		if ( leftSub != null )
 		{
-			element.setLeftSubscriptChild( leftSub.present( childCtx ) );
+			element.setLeftSubscriptChild( leftSub.present( ctx, childStyle ) );
 		}
 		if ( rightSuper != null )
 		{
-			element.setRightSuperscriptChild( rightSuper.present( childCtx ) );
+			element.setRightSuperscriptChild( rightSuper.present( ctx, childStyle ) );
 		}
 		if ( rightSub != null )
 		{
-			element.setRightSubscriptChild( rightSub.present( childCtx ) );
+			element.setRightSubscriptChild( rightSub.present( ctx, childStyle ) );
 		}
 		return element;
 	}

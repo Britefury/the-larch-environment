@@ -77,10 +77,10 @@ public class Button extends ControlPres
 	
 	
 		
-		protected ButtonControl(PresentationContext ctx, DPBorder buttonElement, BritefuryJ.DocPresent.Border.AbstractBorder buttonBorder,
+		protected ButtonControl(PresentationContext ctx, StyleValues style, DPBorder buttonElement, BritefuryJ.DocPresent.Border.AbstractBorder buttonBorder,
 				BritefuryJ.DocPresent.Border.AbstractBorder highlightBorder, ButtonListener listener, boolean bClosePopupOnActivate)
 		{
-			super( ctx );
+			super( ctx, style );
 			this.buttonElement = buttonElement;
 			this.buttonBorder = buttonBorder;
 			this.highlightBorder = highlightBorder;
@@ -122,16 +122,15 @@ public class Button extends ControlPres
 
 
 	@Override
-	public Control createControl(PresentationContext ctx)
+	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
-		StyleValues style = ctx.getStyle();
 		BritefuryJ.DocPresent.Border.AbstractBorder border = style.get( Controls.buttonBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class );
 		BritefuryJ.DocPresent.Border.AbstractBorder highlightBorder = style.get( Controls.buttonHighlightBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class );
 		boolean bClosePopupOnActivate = style.get( Controls.bClosePopupOnActivate, Boolean.class );
 		
-		Pres childElement = presentAsCombinator( Controls.useButtonAttrs( ctx ), child );
-		DPBorder borderElement = (DPBorder)StyleSheet2.instance.withAttr( Primitive.border, border ).applyTo( new Border( childElement ) ).present( ctx );
+		Pres childElement = presentAsCombinator( ctx, Controls.useButtonAttrs( style ), child );
+		DPBorder borderElement = (DPBorder)StyleSheet2.instance.withAttr( Primitive.border, border ).applyTo( new Border( childElement ) ).present( ctx, style );
 		
-		return new ButtonControl( ctx, borderElement, border, highlightBorder, listener, bClosePopupOnActivate );
+		return new ButtonControl( ctx, style, borderElement, border, highlightBorder, listener, bClosePopupOnActivate );
 	}
 }

@@ -13,6 +13,7 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class SplitLinkHeaderBar extends Pres
 {
@@ -33,12 +34,12 @@ public class SplitLinkHeaderBar extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		double padding = ctx.getStyle().get( RichText.linkHeaderPadding, Double.class );
-		Pres left[] = mapPresentAsCombinators( ctx.withStyle( RichText.useBodyAttrs( ctx.getStyle() ) ), leftChildren );
-		Pres right[] = mapPresentAsCombinators( ctx.withStyle( RichText.useBodyAttrs( ctx.getStyle() ) ), rightChildren );
-		return RichText.linkHeaderStyle( ctx.getStyle() ).applyTo( 
-				new Border( new HBox( new Pres[] { new HBox( left ).alignHLeft(), new HBox( right ).alignHRight() } ).alignHExpand()).alignHExpand().pad( padding, padding ) ).present( ctx );
+		double padding = style.get( RichText.linkHeaderPadding, Double.class );
+		Pres left[] = mapCoerce( mapPresent( ctx, RichText.useBodyAttrs( style ), leftChildren ) );
+		Pres right[] = mapCoerce( mapPresent( ctx, RichText.useBodyAttrs( style ), rightChildren ) );
+		return RichText.linkHeaderStyle( style ).applyTo( 
+				new Border( new HBox( new Pres[] { new HBox( left ).alignHLeft(), new HBox( right ).alignHRight() } ).alignHExpand()).alignHExpand().pad( padding, padding ) ).present( ctx, style );
 	}
 }

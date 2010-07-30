@@ -25,10 +25,10 @@ public abstract class ScrollBar extends ControlPres
 		
 		
 		
-		public ScrollBarControl(PresentationContext ctx, Range range, DPElement element, DPElement decArrow, DPElement incArrow, DPElement dragBox, ScrollBarHelper.Axis axis,
+		public ScrollBarControl(PresentationContext ctx, StyleValues style, Range range, DPElement element, DPElement decArrow, DPElement incArrow, DPElement dragBox, ScrollBarHelper.Axis axis,
 				double dragBoxPadding, double dragBoxRounding, Painter dragBoxPainter)
 		{
-			super( ctx );
+			super( ctx, style );
 			
 			this.range = range;
 			this.element = element;
@@ -64,10 +64,8 @@ public abstract class ScrollBar extends ControlPres
 
 
 	@Override
-	public Control createControl(PresentationContext ctx)
+	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
-		StyleValues style = ctx.getStyle();
-		
 		double arrowPadding = style.get( Controls.scrollBarArrowPadding, Double.class ); 
 		double arrowSpacing = style.get( Controls.scrollBarArrowSpacing, Double.class ); 
 		double scrollBarSize = style.get( Controls.scrollBarSize, Double.class ); 
@@ -80,18 +78,18 @@ public abstract class ScrollBar extends ControlPres
 		StyleSheet2 dragBoxStyle = Controls.scrollBarDragBoxStyle.get( style );
 		
 		Pres decArrow = arrowStyle.applyTo( createDecArrow( arrowSize ) );
-		DPElement decArrowElement = decArrow.present( ctx );
+		DPElement decArrowElement = decArrow.present( ctx, style );
 		Pres incArrow = arrowStyle.applyTo( createIncArrow( arrowSize ) );
-		DPElement incArrowElement = incArrow.present( ctx );
+		DPElement incArrowElement = incArrow.present( ctx, style );
 		
 		
 		Pres dragBar = dragBoxStyle.applyTo( createDragBox( scrollBarSize ) );
-		DPElement dragBarElement = dragBar.present( ctx );
+		DPElement dragBarElement = dragBar.present( ctx, style );
 		Pres p = createScrollBarPres( arrowSpacing, decArrowElement.pad( arrowPadding, arrowPadding ), dragBarElement, incArrowElement.pad( arrowPadding, arrowPadding ) );
 		
-		DPElement element = p.present( ctx );
+		DPElement element = p.present( ctx, style );
 		
-		return new ScrollBarControl( ctx, range, element, decArrowElement, incArrowElement, dragBarElement, getAxis(), dragBoxPadding, dragBoxRounding, dragBoxPainter );
+		return new ScrollBarControl( ctx, style, range, element, decArrowElement, incArrowElement, dragBarElement, getAxis(), dragBoxPadding, dragBoxRounding, dragBoxPainter );
 	}
 	
 	

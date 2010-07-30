@@ -8,7 +8,6 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Map;
 
 import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.DocPresent.DPElement;
@@ -16,7 +15,6 @@ import BritefuryJ.DocPresent.DPProxy;
 import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.Combinators.ElementRef;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
 import BritefuryJ.DocPresent.Combinators.Primitive.LineBreak;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
@@ -107,14 +105,14 @@ public class ProxyAndSpanTestPage extends SystemPage
 		{
 			public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonEvent buttonEvent)
 			{
-				for (Map.Entry<DPElement,PresentationContext> elem: spanRef.getElementsAndContexts())
+				for (DPElement element: spanRef.getElements())
 				{
-					DPSpan span = (DPSpan)elem.getKey();
+					DPSpan span = (DPSpan)element;
 					ArrayList<DPElement> children = new ArrayList<DPElement>();
 					for (Object o: makeTextNodes( spanSecondaryText ))
 					{
 						Pres p = (Pres)o;
-						children.add( greenText.applyTo( p ).present( elem.getValue() ) );
+						children.add( greenText.applyTo( p ).present( spanRef.getContextForElement( element ), spanRef.getStyleForElement( element ) ) );
 					}
 					span.setChildren( children );
 				}
@@ -143,14 +141,14 @@ public class ProxyAndSpanTestPage extends SystemPage
 		{
 			public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonEvent buttonEvent)
 			{
-				for (Map.Entry<DPElement,PresentationContext> elem: spanRef.getElementsAndContexts())
+				for (DPElement element: spanRef.getElements())
 				{
-					DPSpan span = (DPSpan)elem.getKey();
+					DPSpan span = (DPSpan)element;
 					ArrayList<DPElement> children = new ArrayList<DPElement>();
 					for (Object o: makeTextNodes( spanSecondaryText ))
 					{
 						Pres p = (Pres)o;
-						children.add( greenText.applyTo( p ).present( elem.getValue() ) );
+						children.add( greenText.applyTo( p ).present( spanRef.getContextForElement( element ), spanRef.getStyleForElement( element ) ) );
 					}
 					span.setChildren( children );
 				}
@@ -162,11 +160,11 @@ public class ProxyAndSpanTestPage extends SystemPage
 		{
 			public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonEvent buttonEvent)
 			{
-				for (Map.Entry<DPElement,PresentationContext> elem: proxyRef.getElementsAndContexts())
+				for (DPElement element: proxyRef.getElements())
 				{
-					DPProxy proxy = (DPProxy)elem.getKey();
+					DPProxy proxy = (DPProxy)element;
 					Pres span = seaGreenText.applyTo( new Span( makeTextNodes( proxySecondaryText ) ) );
-					proxy.setChild( span.present( elem.getValue() ) );
+					proxy.setChild( span.present( proxyRef.getContextForElement( element ), proxyRef.getStyleForElement( element ) ) );
 				}
 			}
 		};

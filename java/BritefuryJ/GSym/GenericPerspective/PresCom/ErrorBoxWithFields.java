@@ -13,6 +13,7 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.SequentialPres;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class ErrorBoxWithFields extends SequentialPres
 {
@@ -33,16 +34,16 @@ public class ErrorBoxWithFields extends SequentialPres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		double padding = ctx.getStyle().get( GenericStyle.objectContentPadding, Double.class );
-		PresentationContext childCtx = GenericStyle.useErrorBorderAttrs( GenericStyle.useErrorBoxAttrs( GenericStyle.useObjectFieldListAttrs( ctx ) ) );
+		double padding = style.get( GenericStyle.objectContentPadding, Double.class );
+		StyleValues childStyle = GenericStyle.useErrorBorderAttrs( GenericStyle.useErrorBoxAttrs( GenericStyle.useObjectFieldListAttrs( style ) ) );
 		
-		DPElement childElems[] = mapPresent( childCtx, children );
-		Pres contents = GenericStyle.objectBoxFieldListStyle.get( ctx.getStyle() ).applyTo( new VBox( childElems ) );
+		DPElement childElems[] = mapPresent( ctx, childStyle, children );
+		Pres contents = GenericStyle.objectBoxFieldListStyle.get( style ).applyTo( new VBox( childElems ) );
 		
 		Pres titlePres = new ObjectTitle( title );
 		
-		return new ErrorBorder( new VBox( new Pres[] { titlePres, contents.padX( padding ) } ) ).present( ctx );
+		return new ErrorBorder( new VBox( new Pres[] { titlePres, contents.padX( padding ) } ) ).present( ctx, style );
 	}
 }

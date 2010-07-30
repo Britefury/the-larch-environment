@@ -11,6 +11,7 @@ import java.util.List;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPHBox;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class HBox extends AbstractBox
 {
@@ -26,10 +27,10 @@ public class HBox extends AbstractBox
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPHBox element = new DPHBox( Primitive.hboxParams.get( ctx.getStyle() ) );
-		element.setChildren( mapPresent( ctx.withStyle( Primitive.useHBoxParams( ctx.getStyle() ) ), children ) );
+		DPHBox element = new DPHBox( Primitive.hboxParams.get( style ) );
+		element.setChildren( mapPresent( ctx, Primitive.useHBoxParams( style ), children ) );
 		return element;
 	}
 }

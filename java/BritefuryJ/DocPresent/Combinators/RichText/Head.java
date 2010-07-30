@@ -9,10 +9,10 @@ package BritefuryJ.DocPresent.Combinators.RichText;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.SequentialPres;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Head extends SequentialPres
 {
@@ -28,9 +28,9 @@ public class Head extends SequentialPres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		Pres xs[] = mapPresentAsCombinators( ctx.withStyle( RichText.useHeadAttrs( ctx.getStyle() ) ), children );
-		return RichText.headStyle( ctx.getStyle() ).applyTo( new VBox( xs ).alignHExpand() ).present( ctx );
+		DPElement xs[] = mapPresent( ctx, RichText.useHeadAttrs( style ), children );
+		return RichText.headStyle( style ).applyTo( new VBox( xs ).alignHExpand() ).present( ctx, style );
 	}
 }

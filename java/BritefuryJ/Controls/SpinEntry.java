@@ -87,9 +87,10 @@ public abstract class SpinEntry extends ControlPres
 		
 		
 		
-		protected SpinEntryControl(PresentationContext ctx, DPElement element, TextEntry.TextEntryControl textEntry, DPElement upSpinButton, DPElement downSpinButton, SpinEntryTextListener textListener)
+		protected SpinEntryControl(PresentationContext ctx, StyleValues style, DPElement element, TextEntry.TextEntryControl textEntry,
+				DPElement upSpinButton, DPElement downSpinButton, SpinEntryTextListener textListener)
 		{
-			super( ctx );
+			super( ctx, style );
 			
 			this.element = element;
 			this.textEntry = textEntry;
@@ -122,29 +123,28 @@ public abstract class SpinEntry extends ControlPres
 	
 	
 	@Override
-	public Control createControl(PresentationContext ctx)
+	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
-		StyleValues style = ctx.getStyle();
 		StyleSheet2 arrowStyleSheet = style.get( Controls.spinEntryArrowAttrs, StyleSheet2.class );
 		StyleValues arrowStyle = style.withAttrs( arrowStyleSheet );
 		double arrowSize = style.get( Controls.spinEntryArrowSize, Double.class );
 		double hspacing = style.get( Controls.spinEntryHSpacing, Double.class );
 		
 		Pres upArrow = new Arrow( Arrow.Direction.UP, arrowSize );
-		DPElement upArrowElement = arrowStyle.applyTo( upArrow ).present( ctx );
+		DPElement upArrowElement = arrowStyle.applyTo( upArrow ).present( ctx, style );
 		Pres downArrow = new Arrow( Arrow.Direction.DOWN, arrowSize );
-		DPElement downArrowElement = arrowStyle.applyTo( downArrow ).present( ctx );
+		DPElement downArrowElement = arrowStyle.applyTo( downArrow ).present( ctx, style );
 		Pres arrowsBox = arrowStyle.applyTo( new VBox( new Object[] { upArrowElement, downArrowElement } ) );
 		
 		SpinEntryControl.SpinEntryTextListener textListener = new SpinEntryControl.SpinEntryTextListener();
 		
 		TextEntry entry = new TextEntry( getInitialValueString(), textListener, getValidationPattern(), getValidationFailMessage() );
-		TextEntry.TextEntryControl entryControl = (TextEntryControl)entry.createControl( ctx );
+		TextEntry.TextEntryControl entryControl = (TextEntryControl)entry.createControl( ctx, style );
 		
 		Pres hbox = StyleSheet2.instance.withAttr( Primitive.hboxSpacing, hspacing ).applyTo( new HBox( new Object[] { entryControl.getElement().alignHExpand().alignVCentre(), arrowsBox.alignVCentre() } ) );
-		DPElement element = hbox.present( ctx );
+		DPElement element = hbox.present( ctx, style );
 		
-		return createSpinEntryControl( ctx, element, entryControl, upArrowElement, downArrowElement, textListener );
+		return createSpinEntryControl( ctx, style, element, entryControl, upArrowElement, downArrowElement, textListener );
 	}
 	
 	
@@ -153,6 +153,6 @@ public abstract class SpinEntry extends ControlPres
 	protected abstract String getValidationFailMessage();
 	
 	
-	protected abstract SpinEntryControl createSpinEntryControl(PresentationContext ctx, DPElement element, TextEntry.TextEntryControl entryControl, DPElement upArrow, DPElement downArrow,
-			SpinEntryControl.SpinEntryTextListener textListener);
+	protected abstract SpinEntryControl createSpinEntryControl(PresentationContext ctx, StyleValues style, DPElement element, TextEntry.TextEntryControl entryControl, DPElement upArrow,
+			DPElement downArrow, SpinEntryControl.SpinEntryTextListener textListener);
 }

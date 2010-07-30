@@ -10,6 +10,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPMathRoot;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class MathRoot extends Pres
 {
@@ -24,10 +25,10 @@ public class MathRoot extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPMathRoot element = new DPMathRoot( Primitive.mathRootParams.get( ctx.getStyle() ) );
-		element.setChild( child.present( ctx.withStyle( Primitive.useMathRootParams( ctx.getStyle() ) ) ).layoutWrap() );
+		DPMathRoot element = new DPMathRoot( Primitive.mathRootParams.get( style ) );
+		element.setChild( child.present( ctx, Primitive.useMathRootParams( style ) ).layoutWrap() );
 		return element;
 	}
 

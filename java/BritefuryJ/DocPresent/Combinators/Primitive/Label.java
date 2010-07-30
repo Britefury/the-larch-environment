@@ -10,6 +10,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Label extends Pres
 {
@@ -23,8 +24,8 @@ public class Label extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		return new DPText( Primitive.labelTextParams.get( ctx.getStyle() ), text, "" );
+		return new DPText( Primitive.labelTextParams.get( style ), text, "" );
 	}
 }

@@ -12,6 +12,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRGrid;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.SequentialPres;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class RGrid extends SequentialPres
 {
@@ -27,10 +28,10 @@ public class RGrid extends SequentialPres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPRGrid element = new DPRGrid( Primitive.tableParams.get( ctx.getStyle() ) );
-		element.setChildren( mapPresent( ctx.withStyle( Primitive.useTableParams( ctx.getStyle() ) ), children ) );
+		DPRGrid element = new DPRGrid( Primitive.tableParams.get( style ) );
+		element.setChildren( mapPresent( ctx, Primitive.useTableParams( style ), children ) );
 		return element;
 	}
 }

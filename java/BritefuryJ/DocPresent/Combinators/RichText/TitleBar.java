@@ -10,6 +10,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class TitleBar extends Pres
 {
@@ -23,12 +24,12 @@ public class TitleBar extends Pres
 
 
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
 		Title title = new Title( text );
 		Pres titleBackground = new Border( title.alignHCentre() );
-		double borderWidth = ctx.getStyle().get( RichText.titleBorderWidth, Double.class );
-		return RichText.titleStyle.get( ctx.getStyle() ).applyTo(
-				titleBackground.alignHExpand().pad( borderWidth, borderWidth ).alignHExpand() ).present( ctx );
+		double borderWidth = style.get( RichText.titleBorderWidth, Double.class );
+		return RichText.titleStyle.get( style ).applyTo(
+				titleBackground.alignHExpand().pad( borderWidth, borderWidth ).alignHExpand() ).present( ctx, style );
 	}
 }

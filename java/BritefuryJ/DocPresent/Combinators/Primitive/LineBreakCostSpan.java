@@ -12,6 +12,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPLineBreakCostSpan;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.SequentialPres;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class LineBreakCostSpan extends SequentialPres
 {
@@ -27,10 +28,10 @@ public class LineBreakCostSpan extends SequentialPres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPLineBreakCostSpan element = new DPLineBreakCostSpan( Primitive.containerParams.get( ctx.getStyle() ) );
-		element.setChildren( mapPresent( ctx.withStyle( Primitive.useContainerParams.get( ctx.getStyle() ) ), children ) );
+		DPLineBreakCostSpan element = new DPLineBreakCostSpan( Primitive.containerParams.get( style ) );
+		element.setChildren( mapPresent( ctx, Primitive.useContainerParams.get( style ), children ) );
 		return element;
 	}
 }

@@ -14,6 +14,7 @@ import BritefuryJ.DocPresent.DPImage;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.StyleParams.ContentLeafStyleParams;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Image extends Pres
 {
@@ -222,8 +223,8 @@ public class Image extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		return imageFactory.create( Primitive.contentLeafParams.get( ctx.getStyle() ) );
+		return imageFactory.create( Primitive.contentLeafParams.get( style ) );
 	}
 }

@@ -47,34 +47,34 @@ public abstract class PopupMenu extends Pres
 	// Popup methods
 	//
 
-	public void popupToRightOf(DPElement element, PresentationContext ctx)
+	public void popupToRightOf(DPElement element, PresentationContext ctx, StyleValues style)
 	{
-		popupToRightOf( element, ctx, true, true );
+		popupToRightOf( element, ctx, style, true, true );
 	}
 	
 	public void popupToRightOf(DPElement element)
 	{
-		popupToRightOf( element, new PresentationContext( defaultPopupMenuContentsStyle ) );
+		popupToRightOf( element, new PresentationContext(), defaultPopupMenuContentsStyle );
 	}
 	
-	public void popupBelow(DPElement element, PresentationContext ctx)
+	public void popupBelow(DPElement element, PresentationContext ctx, StyleValues style)
 	{
-		popupBelow( element, ctx, true, true );
+		popupBelow( element, ctx, style, true, true );
 	}
 	
 	public void popupBelow(DPElement element)
 	{
-		popupBelow( element, new PresentationContext( defaultPopupMenuContentsStyle ) );
+		popupBelow( element, new PresentationContext(), defaultPopupMenuContentsStyle );
 	}
 	
-	public void popupAtMousePosition(DPElement element, PresentationContext ctx)
+	public void popupAtMousePosition(DPElement element, PresentationContext ctx, StyleValues style)
 	{
-		popupAtMousePosition( element, ctx, true, true );
+		popupAtMousePosition( element, ctx, style, true, true );
 	}
 	
 	public void popupAtMousePosition(DPElement element)
 	{
-		popupAtMousePosition( element, new PresentationContext( defaultPopupMenuContentsStyle ) );
+		popupAtMousePosition( element, new PresentationContext(), defaultPopupMenuContentsStyle );
 	}
 
 	
@@ -92,12 +92,12 @@ public abstract class PopupMenu extends Pres
 	
 
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		Pres itemCombinators[] = mapPresentAsCombinators( ctx, items );
+		Pres itemCombinators[] = mapCoerce( mapPresent( ctx, style, items ) );
 		Pres menuElement = new Border( createMenuBox( itemCombinators ) );
-		StyleValues menuStyleValues = Controls.popupMenuStyle( ctx.getStyle() );
-		return menuElement.present( ctx.withStyle( menuStyleValues ) );
+		StyleValues menuStyleValues = Controls.popupMenuStyle( style );
+		return menuElement.present( ctx, menuStyleValues );
 	}
 
 	

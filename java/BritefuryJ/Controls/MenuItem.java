@@ -51,11 +51,11 @@ public class MenuItem extends ControlPres
 			{
 				if ( direction == SubmenuPopupDirection.RIGHT )
 				{
-					subMenu.popupToRightOf( menuItem.getElement(), ctx );
+					subMenu.popupToRightOf( menuItem.getElement(), ctx, style );
 				}
 				else
 				{
-					subMenu.popupBelow( menuItem.getElement(), ctx );
+					subMenu.popupBelow( menuItem.getElement(), ctx, style );
 				}
 			}
 		}
@@ -95,18 +95,18 @@ public class MenuItem extends ControlPres
 		private boolean bClosePopupOnActivate;
 		
 		
-		protected MenuItemControl(PresentationContext ctx, DPBin element, MenuItemListener listener, boolean bClosePopupOnActivate)
+		protected MenuItemControl(PresentationContext ctx, StyleValues style, DPBin element, MenuItemListener listener, boolean bClosePopupOnActivate)
 		{
-			super( ctx );
+			super( ctx, style );
 			this.element = element;
 			this.listener = listener;
 			this.element.addInteractor( new MenuItemInteractor() );
 			this.bClosePopupOnActivate = bClosePopupOnActivate;
 		}
 		
-		protected MenuItemControl(PresentationContext ctx, DPBin element, PopupMenu subMenu, SubmenuPopupDirection direction, boolean bClosePopupOnActivate)
+		protected MenuItemControl(PresentationContext ctx, StyleValues style, DPBin element, PopupMenu subMenu, SubmenuPopupDirection direction, boolean bClosePopupOnActivate)
 		{
-			super( ctx );
+			super( ctx, style );
 			this.element = element;
 			this.listener = new SubMenuItemListener( subMenu, direction );
 			this.element.addInteractor( new MenuItemInteractor() );
@@ -154,30 +154,28 @@ public class MenuItem extends ControlPres
 
 	
 	@Override
-	public Control createControl(PresentationContext ctx)
+	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
-		StyleValues styleValues = ctx.getStyle();
-
-		Pres childElem = presentAsCombinator( Controls.useMenuItemAttrs( ctx ), child );
+		Pres childElem = presentAsCombinator( ctx, Controls.useMenuItemAttrs( style ), child );
 		
-		Painter hoverBackground = styleValues.get( Controls.menuItemHoverBackground, Painter.class );
-		double padX = styleValues.get( Controls.menuItemXPadding, Double.class );
-		double padY = styleValues.get( Controls.menuItemYPadding, Double.class );
-		boolean bClosePopupOnActivate = styleValues.get( Controls.bClosePopupOnActivate, Boolean.class );
+		Painter hoverBackground = style.get( Controls.menuItemHoverBackground, Painter.class );
+		double padX = style.get( Controls.menuItemXPadding, Double.class );
+		double padY = style.get( Controls.menuItemYPadding, Double.class );
+		boolean bClosePopupOnActivate = style.get( Controls.bClosePopupOnActivate, Boolean.class );
 		
-		StyleValues menuItemStyle = styleValues.withAttr( Primitive.hoverBackground, hoverBackground );
+		StyleValues menuItemStyle = style.withAttr( Primitive.hoverBackground, hoverBackground );
 		Pres menuItem = new Bin( childElem.alignHExpand().pad( padX, padY ) );
 
-		DPBin element = (DPBin)menuItem.present( ctx.withStyle( menuItemStyle ) );
+		DPBin element = (DPBin)menuItem.present( ctx, menuItemStyle );
 		
 		
 		if ( subMenu != null )
 		{
-			return new MenuItemControl( ctx, element, subMenu, direction, false );
+			return new MenuItemControl( ctx, style, element, subMenu, direction, false );
 		}
 		else
 		{
-			return new MenuItemControl( ctx, element, listener, bClosePopupOnActivate );
+			return new MenuItemControl( ctx, style, element, listener, bClosePopupOnActivate );
 		}
 	}
 }

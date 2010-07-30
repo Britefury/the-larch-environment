@@ -19,12 +19,11 @@ public class HSeparator extends Pres
 	}
 
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		StyleValues style = ctx.getStyle();
 		double majorPadding = style.get( RichText.separatorMajorPadding, Double.class );
 		double minorPadding = style.get( RichText.separatorMinorPadding, Double.class );
 		return RichText.separatorStyle( style ).applyTo( 
-				new Box( 0.0, 1.0 ).alignHExpand().pad( majorPadding, minorPadding ) ).present( ctx );
+				new Box( 0.0, 1.0 ).alignHExpand().pad( majorPadding, minorPadding ) ).present( ctx, style );
 	}
 }

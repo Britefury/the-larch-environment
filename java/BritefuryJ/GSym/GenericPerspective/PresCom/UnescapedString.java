@@ -14,6 +14,7 @@ import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.LineBreak;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 abstract class UnescapedString extends Pres
 {
@@ -27,10 +28,10 @@ abstract class UnescapedString extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		StyleSheet2 escapeStyle = ctx.getStyle().get( GenericStyle.stringEscapeStyle, StyleSheet2.class );
-		StyleSheet2 contentStyle = ctx.getStyle().get( GenericStyle.stringContentStyle, StyleSheet2.class );
+		StyleSheet2 escapeStyle = style.get( GenericStyle.stringEscapeStyle, StyleSheet2.class );
+		StyleSheet2 contentStyle = style.get( GenericStyle.stringContentStyle, StyleSheet2.class );
 
 		ArrayList<Object> elements = new ArrayList<Object>();
 		// Break the string up into escaped and not escaped items
@@ -81,7 +82,7 @@ abstract class UnescapedString extends Pres
 			elements.add( new StaticText( builder.toString() ) );
 		}
 		
-		return contentStyle.applyTo( createContainer( elements ) ).present( ctx );
+		return contentStyle.applyTo( createContainer( elements ) ).present( ctx, style );
 	}
 	
 	

@@ -10,6 +10,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPProxy;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Proxy extends Pres
 {
@@ -24,9 +25,9 @@ public class Proxy extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPElement childElement = child.present( ctx );
+		DPElement childElement = child.present( ctx, style );
 		DPProxy proxy = new DPProxy();
 		proxy.setChild( childElement );
 		proxy.copyAlignmentFlagsFrom( childElement );

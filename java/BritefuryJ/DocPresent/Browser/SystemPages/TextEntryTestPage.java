@@ -28,6 +28,7 @@ import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class TextEntryTestPage extends SystemPage
 {
@@ -88,7 +89,7 @@ public class TextEntryTestPage extends SystemPage
 				{
 					status.setText( "" );
 					entry.setText( link.getText() );
-					proxy.setChild( StyleSheet2.instance.withAttr( Primitive.hboxSpacing, 10.0 ).applyTo( new HBox( new Object[] { entry.getElement(), status } ) ).present( ctx ) );
+					proxy.setChild( StyleSheet2.instance.withAttr( Primitive.hboxSpacing, 10.0 ).applyTo( new HBox( new Object[] { entry.getElement(), status } ) ).present( ctx, style ) );
 					entry.grabCaret();
 				}
 			}
@@ -100,9 +101,9 @@ public class TextEntryTestPage extends SystemPage
 			private DPProxy proxy;
 			
 			
-			public EditableLinkControl(PresentationContext ctx)
+			public EditableLinkControl(PresentationContext ctx, StyleValues style)
 			{
-				super( ctx );
+				super( ctx, style );
 			}
 			
 			
@@ -147,12 +148,12 @@ public class TextEntryTestPage extends SystemPage
 		
 		
 		@Override
-		public Control createControl(PresentationContext ctx)
+		public Control createControl(PresentationContext ctx, StyleValues style)
 		{
-			EditableLinkControl ctl = new EditableLinkControl( ctx );
+			EditableLinkControl ctl = new EditableLinkControl( ctx, style );
 			
 			StaticText status = new StaticText( "" );
-			DPText statusElement = (DPText)status.present( ctx );
+			DPText statusElement = (DPText)status.present( ctx, style );
 			
 			Hyperlink link = new Hyperlink( initialText, ctl.linkListener() );
 			TextEntry entry;
@@ -167,11 +168,11 @@ public class TextEntryTestPage extends SystemPage
 			}
 			
 			Proxy proxy = new Proxy( link );
-			DPProxy proxyElement = (DPProxy)proxy.present( ctx );
+			DPProxy proxyElement = (DPProxy)proxy.present( ctx, style );
 			
 			ctl.status = statusElement;
-			ctl.link = (HyperlinkControl)link.createControl( ctx );
-			ctl.entry = (TextEntryControl)entry.createControl( ctx );
+			ctl.link = (HyperlinkControl)link.createControl( ctx, style );
+			ctl.entry = (TextEntryControl)entry.createControl( ctx, style );
 			ctl.proxy = proxyElement;
 			
 			return ctl;

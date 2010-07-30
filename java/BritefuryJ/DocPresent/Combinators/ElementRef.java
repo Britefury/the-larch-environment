@@ -6,16 +6,17 @@
 //##************************
 package BritefuryJ.DocPresent.Combinators;
 
-import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class ElementRef extends Pres
 {
 	private Pres child;
-	private WeakHashMap<DPElement, PresentationContext> elements = new WeakHashMap<DPElement, PresentationContext>();
+	private WeakHashMap<DPElement, PresentationContext> contextByElement = new WeakHashMap<DPElement, PresentationContext>();
+	private WeakHashMap<DPElement, StyleValues> styleByElement = new WeakHashMap<DPElement, StyleValues>();
 	
 	
 	public ElementRef(Pres child)
@@ -26,17 +27,17 @@ public class ElementRef extends Pres
 	
 	public Set<DPElement> getElements()
 	{
-		return elements.keySet();
-	}
-	
-	public Set<Map.Entry<DPElement, PresentationContext>> getElementsAndContexts()
-	{
-		return elements.entrySet();
+		return contextByElement.keySet();
 	}
 	
 	public PresentationContext getContextForElement(DPElement element)
 	{
-		return elements.get( element );
+		return contextByElement.get( element );
+	}
+	
+	public StyleValues getStyleForElement(DPElement element)
+	{
+		return styleByElement.get( element );
 	}
 	
 	
@@ -47,10 +48,11 @@ public class ElementRef extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPElement element = child.present( ctx );
-		elements.put( element, ctx );
+		DPElement element = child.present( ctx, style );
+		contextByElement.put( element, ctx );
+		styleByElement.put( element, style );
 		return element;
 	}
 }

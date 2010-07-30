@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class RealSpinEntry extends SpinEntry
 {
@@ -24,10 +25,11 @@ public class RealSpinEntry extends SpinEntry
 		private RealSpinEntryListener listener;
 		
 	
-		protected RealSpinEntryControl(PresentationContext ctx, DPElement element, TextEntry.TextEntryControl textEntry, DPElement upSpinButton, DPElement downSpinButton, SpinEntryTextListener textListener,
+		protected RealSpinEntryControl(PresentationContext ctx, StyleValues style, DPElement element, TextEntry.TextEntryControl textEntry,
+				DPElement upSpinButton, DPElement downSpinButton, SpinEntryTextListener textListener,
 				double value, double min, double max, double stepSize, double pageSize, RealSpinEntryListener listener)
 		{
-			super( ctx, element, textEntry, upSpinButton, downSpinButton, textListener );
+			super( ctx, style, element, textEntry, upSpinButton, downSpinButton, textListener );
 			
 			this.value = value;
 			this.min = min;
@@ -120,9 +122,9 @@ public class RealSpinEntry extends SpinEntry
 	}
 	
 	
-	protected SpinEntryControl createSpinEntryControl(PresentationContext ctx, DPElement element, TextEntry.TextEntryControl entryControl, DPElement upArrow, DPElement downArrow,
-			SpinEntryControl.SpinEntryTextListener textListener)
+	protected SpinEntryControl createSpinEntryControl(PresentationContext ctx, StyleValues style, DPElement element, TextEntry.TextEntryControl entryControl, DPElement upArrow,
+			DPElement downArrow, SpinEntryControl.SpinEntryTextListener textListener)
 	{
-		return new RealSpinEntryControl( ctx, element, entryControl, upArrow, downArrow, textListener, initialValue, min, max, stepSize, pageSize, listener );
+		return new RealSpinEntryControl( ctx, style, element, entryControl, upArrow, downArrow, textListener, initialValue, min, max, stepSize, pageSize, listener );
 	}
 }

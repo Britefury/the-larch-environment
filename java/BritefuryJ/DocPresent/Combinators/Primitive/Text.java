@@ -10,6 +10,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Text extends Pres
 {
@@ -30,8 +31,8 @@ public class Text extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		return new DPText( Primitive.textParams.get( ctx.getStyle() ), text, textRepresentation );
+		return new DPText( Primitive.textParams.get( style ), text, textRepresentation );
 	}
 }

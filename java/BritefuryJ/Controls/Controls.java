@@ -18,7 +18,6 @@ import BritefuryJ.AttributeTable.InheritedAttributeNonNull;
 import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.Painter.FilledOutlinePainter;
@@ -113,11 +112,6 @@ public class Controls
 		return style.useAttr( buttonBorder ).useAttr( buttonHighlightBorder );
 	}
 	
-	public static PresentationContext useButtonAttrs(PresentationContext ctx)
-	{
-		return ctx.withStyle( useButtonAttrs( ctx.getStyle() ) );
-	}
-
 	
 	public static StyleValues hyperlinkStyle(StyleValues style)
 	{
@@ -127,11 +121,6 @@ public class Controls
 	public static StyleValues useHyperlinkAttrs(StyleValues style)
 	{
 		return style.useAttr( hyperlinkAttrs );
-	}
-	
-	public static PresentationContext useHyperlinkAttrs(PresentationContext ctx)
-	{
-		return ctx.withStyle( useHyperlinkAttrs( ctx.getStyle() ) );
 	}
 	
 	
@@ -150,11 +139,6 @@ public class Controls
 		return style.useAttr( checkboxHoverBackground ).useAttr( checkboxCheckBorder ).useAttr( checkboxCheckForeground ).useAttr( checkboxCheckSize ).useAttr( checkboxSpacing );
 	}
 	
-	public static PresentationContext useCheckboxAttrs(PresentationContext ctx)
-	{
-		return ctx.withStyle( useCheckboxAttrs( ctx.getStyle() ) );
-	}
-
 	
 
 	public static StyleValues useOptionMenuAttrs(StyleValues style)
@@ -162,11 +146,6 @@ public class Controls
 		return style.useAttr( optionMenuBorder ).useAttr( optionMenuHoverBorder ).useAttr( optionMenuContentsSpacing ).useAttr( optionMenuArrowSize ).useAttr( optionMenuArrowPainter );
 	}
 	
-	public static PresentationContext useOptionMenuAttrs(PresentationContext ctx)
-	{
-		return ctx.withStyle( useOptionMenuAttrs( ctx.getStyle() ) );
-	}
-
 	
 	
 	public static StyleValues useTextEntryAttrs(StyleValues style)
@@ -174,11 +153,6 @@ public class Controls
 		return style.useAttr( textEntryBorder ).useAttr( textEntryInvalidBorder );
 	}
 	
-	public static PresentationContext useTextEntryAttrs(PresentationContext ctx)
-	{
-		return ctx.withStyle( useTextEntryAttrs( ctx.getStyle() ) );
-	}
-
 	
 	
 	protected static DerivedValueTable<StyleSheet2> scrollBarDragBoxStyle = new DerivedValueTable<StyleSheet2>()
@@ -198,11 +172,6 @@ public class Controls
 		return style.useAttr( checkboxHoverBackground ).useAttr( checkboxCheckBorder ).useAttr( checkboxCheckForeground ).useAttr( checkboxCheckSize ).useAttr( checkboxSpacing );
 	}
 	
-	public static PresentationContext useMenuItemAttrs(PresentationContext ctx)
-	{
-		return ctx.withStyle( useMenuItemAttrs( ctx.getStyle() ) );
-	}
-
 	
 	public static StyleValues popupMenuStyle(StyleValues style)
 	{
@@ -214,21 +183,11 @@ public class Controls
 		return style.useAttr( popupMenuAttrs );
 	}
 
-	public static PresentationContext usePopupMenuAttrs(PresentationContext ctx)
-	{
-		return ctx.withStyle( usePopupMenuAttrs( ctx.getStyle() ) );
-	}
-
 
 
 
 	public static StyleValues useTooltipAttrs(StyleValues style)
 	{
 		return style.useAttr( tooltipBorder );
-	}
-
-	public static PresentationContext useTooltipAttrs(PresentationContext ctx)
-	{
-		return ctx.withStyle( useTooltipAttrs( ctx.getStyle() ) );
 	}
 }

@@ -10,6 +10,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPWhitespace;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Whitespace extends Pres
 {
@@ -31,8 +32,8 @@ public class Whitespace extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		return new DPWhitespace( Primitive.contentLeafParams.get( ctx.getStyle() ), text, width );
+		return new DPWhitespace( Primitive.contentLeafParams.get( style ), text, width );
 	}
 }

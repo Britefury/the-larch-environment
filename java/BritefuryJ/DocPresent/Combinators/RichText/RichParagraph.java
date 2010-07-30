@@ -82,7 +82,7 @@ abstract class RichParagraph extends Pres
 	}
 	
 
-	protected DPElement presentParagraph(PresentationContext ctx)
+	protected DPElement presentParagraph(PresentationContext ctx, StyleValues style)
 	{
 		List<Object> paragraphContents = null;
 		
@@ -95,23 +95,21 @@ abstract class RichParagraph extends Pres
 			paragraphContents = textToWordsAndLineBreaks();
 		}
 		
-		StyleValues style = ctx.getStyle();
-
 		if ( Primitive.isEditable( style ) )
 		{
 			boolean bAppendNewline = style.get( RichText.appendNewlineToParagraphs, Boolean.class );
 			if ( bAppendNewline )
 			{
-				return new Paragraph( new Pres[] { new Segment( true, true, new Span( paragraphContents ) ), new Whitespace( "\n" ) } ).present( ctx );
+				return new Paragraph( new Pres[] { new Segment( true, true, new Span( paragraphContents ) ), new Whitespace( "\n" ) } ).present( ctx, style );
 			}
 			else
 			{
-				return new Paragraph( new Pres[] { new Segment( true, true, new Span( paragraphContents ) ) } ).present( ctx );
+				return new Paragraph( new Pres[] { new Segment( true, true, new Span( paragraphContents ) ) } ).present( ctx, style );
 			}
 		}
 		else
 		{
-			return new Paragraph( paragraphContents ).present( ctx );
+			return new Paragraph( paragraphContents ).present( ctx, style );
 		}
 	}
 	

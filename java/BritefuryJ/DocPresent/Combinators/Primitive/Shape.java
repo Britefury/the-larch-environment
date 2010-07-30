@@ -10,6 +10,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPShape;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 
@@ -58,8 +59,8 @@ public class Shape extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		return new DPShape( Primitive.shapeParams.get( ctx.getStyle() ), "", shape );
+		return new DPShape( Primitive.shapeParams.get( style ), "", shape );
 	}
 }

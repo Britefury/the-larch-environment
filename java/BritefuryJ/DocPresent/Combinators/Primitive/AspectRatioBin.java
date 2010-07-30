@@ -10,6 +10,7 @@ import BritefuryJ.DocPresent.DPAspectRatioBin;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class AspectRatioBin extends Pres
 {
@@ -27,10 +28,10 @@ public class AspectRatioBin extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPAspectRatioBin bin = new DPAspectRatioBin( Primitive.containerParams.get( ctx.getStyle() ), minWidth, aspectRatio );
-		bin.setChild( child.present( ctx.withStyle( Primitive.useContainerParams.get( ctx.getStyle() ) ) ).layoutWrap() );
+		DPAspectRatioBin bin = new DPAspectRatioBin( Primitive.containerParams.get( style ), minWidth, aspectRatio );
+		bin.setChild( child.present( ctx, Primitive.useContainerParams.get( style ) ).layoutWrap() );
 		return bin;
 	}
 }

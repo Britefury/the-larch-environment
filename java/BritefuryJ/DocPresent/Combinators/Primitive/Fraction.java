@@ -27,13 +27,12 @@ public class Fraction extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		StyleValues style = ctx.getStyle();
 		DPFraction element = new DPFraction( Primitive.fractionParams.get( style ), Primitive.textParams.get( style ), barContent );
 		StyleValues usedStyle = Primitive.useFractionParams( Primitive.useTextParams( style ) );
-		element.setNumeratorChild( numerator.present( ctx.withStyle( fractionNumeratorStyle( usedStyle ) ) ) );
-		element.setDenominatorChild( denominator.present( ctx.withStyle( fractionDenominatorStyle( usedStyle ) ) ) );
+		element.setNumeratorChild( numerator.present( ctx, fractionNumeratorStyle( usedStyle ) ) );
+		element.setDenominatorChild( denominator.present( ctx, fractionDenominatorStyle( usedStyle ) ) );
 		return element;
 	}
 

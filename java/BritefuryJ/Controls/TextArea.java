@@ -250,9 +250,9 @@ public class TextArea extends ControlPres
 		
 		
 		
-		protected TextAreaControl(PresentationContext ctx, DPElement element, DPRegion region, DPVBox textBox, TextAreaListener listener, String text)
+		protected TextAreaControl(PresentationContext ctx, StyleValues style, DPElement element, DPRegion region, DPVBox textBox, TextAreaListener listener, String text)
 		{
-			super( ctx );
+			super( ctx, style );
 			
 			this.element = element;
 			this.textBox = textBox;
@@ -396,15 +396,15 @@ public class TextArea extends ControlPres
 			for (String line: textLines)
 			{
 				Pres textPres = new Text( line );
-				DPElement textElement = textPres.present( ctx );
+				DPElement textElement = textPres.present( ctx, style );
 				Pres seg = new Segment( true, true, textElement );
 				Pres newline = new Whitespace( "\n" );
-				DPElement newlineElement = newline.present( ctx );
+				DPElement newlineElement = newline.present( ctx, style );
 				textElement.addTreeEventListener( textLineTreeEventListener );
 				newlineElement.addTreeEventListener( newlineTreeEventListener );
 				
 				Pres linePres = new HBox( new Object[] { seg, newlineElement } );
-				DPElement lineElement = linePres.present( ctx );
+				DPElement lineElement = linePres.present( ctx, style );
 				lineElements.add( lineElement );
 			}
 			
@@ -431,22 +431,19 @@ public class TextArea extends ControlPres
 
 
 	@Override
-	public Control createControl(PresentationContext ctx)
+	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
-		StyleValues style = ctx.getStyle();
-		
 		StyleSheet2 textAreaStyleSheet = style.get( Controls.textAreaAttrs, StyleSheet2.class );
 		
 		StyleValues textAreaStyle = style.withAttrs( textAreaStyleSheet );
-		PresentationContext textAreaCtx = ctx.withStyle( textAreaStyle );
 		
 		Pres textBoxPres = new VBox( new Pres[] {} );
-		DPVBox textBox = (DPVBox)textBoxPres.present( textAreaCtx );
+		DPVBox textBox = (DPVBox)textBoxPres.present( ctx, textAreaStyle );
 		Pres regionPres = new Region( textBox );
-		DPRegion region = (DPRegion)regionPres.present( textAreaCtx );
+		DPRegion region = (DPRegion)regionPres.present( ctx, textAreaStyle );
 		Pres elementPres = new Border( region );
-		DPBorder element = (DPBorder)elementPres.present( textAreaCtx );
+		DPBorder element = (DPBorder)elementPres.present( ctx, textAreaStyle );
 		
-		return new TextAreaControl( ctx, element, region, textBox, listener, initialText );
+		return new TextAreaControl( ctx, style, element, region, textBox, listener, initialText );
 	}
 }

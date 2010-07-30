@@ -11,6 +11,7 @@ import BritefuryJ.DocPresent.DPViewport;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 import BritefuryJ.DocPresent.Util.Range;
 
 public class Viewport extends Pres
@@ -37,10 +38,10 @@ public class Viewport extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPViewport element = new DPViewport( Primitive.containerParams.get( ctx.getStyle() ), xRange, yRange, persistentState );
-		element.setChild( child.present( ctx.withStyle( Primitive.useContainerParams.get( ctx.getStyle() ) ) ).layoutWrap() );
+		DPViewport element = new DPViewport( Primitive.containerParams.get( style ), xRange, yRange, persistentState );
+		element.setChild( child.present( ctx, Primitive.useContainerParams.get( style ) ).layoutWrap() );
 		return element;
 	}
 }

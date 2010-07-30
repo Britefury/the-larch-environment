@@ -23,8 +23,8 @@ public class ApplyStyleSheetValues extends Pres
 	
 
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		return child.present( ctx.withStyle( styleSheetValues ) );
+		return child.present( ctx, styleSheetValues );
 	}
 }

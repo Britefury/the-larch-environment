@@ -21,10 +21,10 @@ public abstract class Pres
 {
 	public DPElement present()
 	{
-		return present( new PresentationContext() );
+		return present( new PresentationContext(), StyleValues.instance );
 	}
 
-	public abstract DPElement present(PresentationContext ctx);
+	public abstract DPElement present(PresentationContext ctx, StyleValues style);
 	
 	
 	
@@ -214,27 +214,27 @@ public abstract class Pres
 	// Popup methods
 	//
 	
-	public void popupToRightOf(DPElement element, PresentationContext ctx, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public void popupToRightOf(DPElement element, PresentationContext ctx, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		DPElement popupElement = present( ctx );
+		DPElement popupElement = present( ctx, style );
 		popupElement.popupToRightOf( element, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupBelow(DPElement element, PresentationContext ctx, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public void popupBelow(DPElement element, PresentationContext ctx, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		DPElement popupElement = present( ctx );
+		DPElement popupElement = present( ctx, style );
 		popupElement.popupBelow( element, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupOver(DPElement element, Point2 targetLocalPos, PresentationContext ctx, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public void popupOver(DPElement element, Point2 targetLocalPos, PresentationContext ctx, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		DPElement popupElement = present( ctx );
+		DPElement popupElement = present( ctx, style );
 		popupElement.popupOver( element, targetLocalPos, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupAtMousePosition(DPElement element, PresentationContext ctx, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	public void popupAtMousePosition(DPElement element, PresentationContext ctx, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		DPElement popupElement = present( ctx );
+		DPElement popupElement = present( ctx, style );
 		element.getRootElement().createPopupAtMousePosition( popupElement, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
@@ -242,58 +242,31 @@ public abstract class Pres
 	
 	
 	
-	protected static DPElement[] mapPresent(PresentationContext ctx, Pres children[])
+	protected static DPElement[] mapPresent(PresentationContext ctx, StyleValues style, Pres children[])
 	{
 		DPElement result[] = new DPElement[children.length];
 		for (int i = 0; i < children.length; i++)
 		{
-			result[i] = children[i].present( ctx );
+			result[i] = children[i].present( ctx, style );
 		}
 		return result;
 	}
 	
-	protected static DPElement[] mapPresent(PresentationContext ctx, List<Pres> children)
+	protected static DPElement[] mapPresent(PresentationContext ctx, StyleValues style, List<Pres> children)
 	{
 		DPElement result[] = new DPElement[children.size()];
 		int i = 0;
 		for (Pres child: children)
 		{
-			result[i++] = child.present( ctx );
+			result[i++] = child.present( ctx, style );
 		}
 		return result;
 	}
 	
 	
-	protected static PresentElement presentAsCombinator(PresentationContext ctx, Pres child)
+	protected static PresentElement presentAsCombinator(PresentationContext ctx, StyleValues style, Pres child)
 	{
-		return new PresentElement( child.present( ctx ) );
-	}
-	
-	protected static PresentElement[] mapPresentAsCombinators(PresentationContext ctx, Pres children[])
-	{
-		PresentElement result[] = new PresentElement[children.length];
-		for (int i = 0; i < children.length; i++)
-		{
-			result[i] = new PresentElement( children[i].present( ctx ) );
-		}
-		return result;
-	}
-	
-	protected static PresentElement[] mapPresentAsCombinators(PresentationContext ctx, List<Pres> children)
-	{
-		PresentElement result[] = new PresentElement[children.size()];
-		int i = 0;
-		for (Pres child: children)
-		{
-			result[i++] = new PresentElement( child.present( ctx ) );
-		}
-		return result;
-	}
-	
-	
-	protected static DPElement higherOrderPresent(PresentationContext ctx, StyleValues style, Pres combinator)
-	{
-		return combinator.present( ctx.withStyle( style ) );
+		return new PresentElement( child.present( ctx, style ) );
 	}
 	
 	

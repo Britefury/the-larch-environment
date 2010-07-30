@@ -44,10 +44,8 @@ public class VerticalInlineSequenceView extends AbstractSequenceView
 	}
 
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		StyleValues style = ctx.getStyle();
-		
 		double indentation = style.get( Sequence.indentation, Double.class );
 		
 		if ( children.length <= 1 )
@@ -71,7 +69,7 @@ public class VerticalInlineSequenceView extends AbstractSequenceView
 				childElems.add( endDelim );
 			}
 			
-			return new Paragraph( childElems ).present( ctx );
+			return new Paragraph( childElems ).present( ctx, style );
 		}
 		else
 		{
@@ -122,11 +120,11 @@ public class VerticalInlineSequenceView extends AbstractSequenceView
 			
 			if ( endDelim != null )
 			{
-				return new VBox( new Pres[] { first, indent, endDelim }, 0 ).present( ctx );
+				return new VBox( new Pres[] { first, indent, endDelim }, 0 ).present( ctx, style );
 			}
 			else
 			{
-				return new VBox( new Pres[] { first, indent }, 0 ).present( ctx );
+				return new VBox( new Pres[] { first, indent }, 0 ).present( ctx, style );
 			}
 		}
 	}

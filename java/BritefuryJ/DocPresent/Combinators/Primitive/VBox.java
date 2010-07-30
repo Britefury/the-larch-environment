@@ -11,6 +11,7 @@ import java.util.List;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class VBox extends AbstractBox
 {
@@ -43,10 +44,10 @@ public class VBox extends AbstractBox
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPVBox element = new DPVBox( Primitive.vboxParams.get( ctx.getStyle() ) );
-		element.setChildren( mapPresent( ctx.withStyle( Primitive.useContainerParams.get( ctx.getStyle() ) ), children ) );
+		DPVBox element = new DPVBox( Primitive.vboxParams.get( style ) );
+		element.setChildren( mapPresent( ctx, Primitive.useContainerParams.get( style ), children ) );
 		if ( refPointIndex != -1 )
 		{
 			element.setRefPointIndex( refPointIndex );
