@@ -6,12 +6,10 @@
 //##************************
 package BritefuryJ.AttributeTable;
 
-import java.util.ArrayList;
 
 public class AttributeNamespace
 {
 	private String name;
-	private int id = -1;
 	
 	
 	
@@ -25,32 +23,5 @@ public class AttributeNamespace
 	public String getName()
 	{
 		return name;
-	}
-	
-	protected int getID()
-	{
-		if ( id == -1 )
-		{
-			id = AttributeTable2.registerNamespace( this );
-		}
-		return id;
-	}
-
-
-
-
-	//
-	//
-	// DERIVED VALUES
-	//
-	//
-
-	private ArrayList<DerivedValueTable<? extends Object>> derivedValueTables = new ArrayList<DerivedValueTable<? extends Object>>();
-	
-	protected int registerDerivedValueTable(DerivedValueTable<? extends Object> derivedValueTable)
-	{
-		int id = derivedValueTables.size();
-		derivedValueTables.add( derivedValueTable );
-		return id;
 	}
 }

@@ -8,7 +8,6 @@ package BritefuryJ.AttributeTable;
 
 import java.awt.Color;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
@@ -36,97 +35,6 @@ public class AttributeTable2 implements Presentable
 	{
 		private static final long serialVersionUID = 1L;
 	}
-	
-	
-	
-	
-	//
-	//
-	// NAMESPACES
-	//
-	//
-	
-	private static ArrayList<AttributeNamespace> namespaces = new ArrayList<AttributeNamespace>();
-	
-	protected static int registerNamespace(AttributeNamespace namespace)
-	{
-		int id = namespaces.size();
-		namespaces.add( namespace );
-		return id;
-	}
-	
-	
-	
-	
-	private static class NamespaceTable
-	{
-		private Object derivedValues[][];
-		
-		private Object getDerivedValue(AttributeTable2 attribTable, DerivedValueTable<? extends Object> valueTable)
-		{
-			int id = valueTable.getIDWithinNamespace();
-			
-			if ( derivedValues == null )
-			{
-				derivedValues = new Object[id+1][];
-			}
-			else if ( id >= derivedValues.length )
-			{
-				Object newValues[][] = new Object[id+1][];
-				System.arraycopy( derivedValues, 0, newValues, 0, derivedValues.length );
-				derivedValues = newValues;
-			}
-			
-			Object valueHolder[] = derivedValues[id];
-			if ( valueHolder == null )
-			{
-				valueHolder = new Object[1];
-				valueHolder[0] = valueTable.evaluate( attribTable );
-			}
-			
-			return valueHolder[0];
-		}
-	}
-	
-	private NamespaceTable namespaceTables[] = null;
-	
-	
-	private NamespaceTable getNamespaceTable(AttributeNamespace namespace)
-	{
-		int id = namespace.getID();
-		
-		if ( namespaceTables == null )
-		{
-			namespaceTables = new NamespaceTable[id+1];
-		}
-		else if ( id >= namespaceTables.length )
-		{
-			NamespaceTable newTables[] = new NamespaceTable[id+1];
-			System.arraycopy( namespaceTables, 0, newTables, 0, namespaceTables.length );
-			namespaceTables = newTables;
-		}
-		
-		NamespaceTable table = namespaceTables[id];
-		if ( table == null )
-		{
-			table = new NamespaceTable();
-			namespaceTables[id] = table;
-		}
-		
-		return table;
-	}
-	
-	protected Object getDerivedValue(AttributeNamespace namespace, DerivedValueTable<? extends Object> valueTable)
-	{
-		NamespaceTable namespaceTable = getNamespaceTable( namespace );
-		return namespaceTable.getDerivedValue( this, valueTable );
-	}
-	
-	
-	
-	
-	
-	
 	
 	
 	protected static class AttributeValuesMultiple

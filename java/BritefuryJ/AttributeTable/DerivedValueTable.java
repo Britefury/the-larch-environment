@@ -6,23 +6,17 @@
 //##************************
 package BritefuryJ.AttributeTable;
 
+import java.util.WeakHashMap;
 
 public abstract class DerivedValueTable <V extends Object>
 {
 	private AttributeNamespace namespace;
-	private int idWithinNamespace = -1;
+	private WeakHashMap<AttributeTable2, Object[]> values = new WeakHashMap<AttributeTable2, Object[]>();
 	
 	
 	public DerivedValueTable(AttributeNamespace namespace)
 	{
 		this.namespace = namespace;
-	}
-	
-	
-	@SuppressWarnings("unchecked")
-	public V get(AttributeTable2 attribs)
-	{
-		return (V)attribs.getDerivedValue( namespace, this );
 	}
 	
 	
@@ -32,15 +26,22 @@ public abstract class DerivedValueTable <V extends Object>
 	}
 	
 	
-	protected int getIDWithinNamespace()
+	@SuppressWarnings("unchecked")
+	public V get(AttributeTable2 attribs)
 	{
-		if ( idWithinNamespace == -1 )
+		Object valueHolder[] = values.get( attribs );
+		if ( valueHolder != null )
 		{
-			idWithinNamespace = namespace.registerDerivedValueTable( this );
+			return (V)valueHolder[0];
 		}
-		return idWithinNamespace;
+		else
+		{
+			V value = evaluate( attribs );
+			values.put( attribs, new Object[] { value } );
+			return value;
+		}
 	}
-
+	
 	
 	protected abstract V evaluate(AttributeTable2 attribs);
 }
