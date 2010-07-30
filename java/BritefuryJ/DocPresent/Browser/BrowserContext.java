@@ -11,12 +11,16 @@ import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemLocationResolver;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.Combinators.RichText.Body;
+import BritefuryJ.DocPresent.Combinators.RichText.Head;
+import BritefuryJ.DocPresent.Combinators.RichText.TitleBar;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
 public class BrowserContext
 {
@@ -93,14 +97,14 @@ public class BrowserContext
 		
 		public DPElement getContentsElement()
 		{
-			DPText title = styleSheet.withFontFace( "Serif" ).withFontBold( true ).withFontSize( 32 ).withTextSmallCaps( true ).staticText( "Default Root Page" );
+			Pres linkHeader = SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_SYSTEMPAGE );
+			Pres title = new TitleBar( "Default Root Page" );
 			
-			DPText contents = styleSheet.withFontSize( 16 ).staticText( "Empty document" );
-			DPVBox contentBox = styleSheet.withVBoxSpacing( 40.0 ).vbox( new DPElement[] { title.alignHCentre(), contents.alignHExpand() } );
-
-			DPVBox pageBox = styleSheet.vbox( new DPElement[] { SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_SYSTEMPAGE ),  contentBox.alignHExpand() } );
+			Pres contents = StyleSheet2.instance.withAttr( Primitive.fontSize, 16 ).applyTo( new StaticText( "Empty document" ) ).alignHCentre();
 			
-			return pageBox.alignHExpand();
+			Pres head = new Head( new Pres[] { linkHeader, title } );
+			
+			return new BritefuryJ.DocPresent.Combinators.RichText.Page( new Pres[] { head, contents } ).present();
 		}
 	}
 	
@@ -123,16 +127,17 @@ public class BrowserContext
 
 		public DPElement getContentsElement()
 		{
-			DPText title = styleSheet.withFontFace( "Serif" ).withFontBold( true ).withFontSize( 32 ).withTextSmallCaps( true ).staticText( "Could Not Resolve Location" );
+			StyleSheet2 contentsStyle = StyleSheet2.instance.withAttr( Primitive.fontSize, 16 );
+			Pres linkHeader = SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_SYSTEMPAGE );
+			Pres title = new TitleBar( "Could Not Resolve Location" );
+			Pres head = new Head( new Pres[] { linkHeader, title } );
 			
-			DPText loc = styleSheet.withFontSize( 16 ).staticText( location );
-			DPText error = styleSheet.withFontSize( 16 ).staticText( "could not be resolved" );
-			DPVBox errorBox = styleSheet.withVBoxSpacing( 10.0 ).vbox( new DPElement[] { loc.alignHCentre(), error.alignHCentre() } );
+			Pres loc = contentsStyle.applyTo( new StaticText( location ) ).alignHCentre();
+			Pres error = contentsStyle.applyTo( new StaticText( "could not be resolved" ) ).alignHCentre();
+			Pres body = new Body( new Pres[] { loc, error } );
 			
-			DPVBox pageBox = styleSheet.withVBoxSpacing( 40.0 ).vbox( new DPElement[] { SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE ),
-					title.padY( 10.0 ).alignHCentre(), errorBox.padY( 10.0 ).alignHCentre() } );
-
-			return pageBox.alignHExpand();
+			
+			return new BritefuryJ.DocPresent.Combinators.RichText.Page( new Pres[] { head, body } ).present();
 		}
 	}
 	
@@ -140,5 +145,4 @@ public class BrowserContext
 	
 	
 	private static DefaultRootPage defaultRootPage = new DefaultRootPage();
-	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
 }

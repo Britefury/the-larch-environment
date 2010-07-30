@@ -8,13 +8,14 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.util.ArrayList;
 
+import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.Page;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.Combinators.RichText.Head;
+import BritefuryJ.DocPresent.Combinators.RichText.NormalText;
+import BritefuryJ.DocPresent.Combinators.RichText.TitleBar;
 
 public abstract class SystemPage extends Page
 {
@@ -34,77 +35,31 @@ public abstract class SystemPage extends Page
 	
 	
 
-	private static final PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-	private static final ControlsStyleSheet controlsStyleSheet = ControlsStyleSheet.instance;
-
-	
-	
 	public DPElement getContentsElement()
 	{
+		Pres linkHeader = SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE | SystemRootPage.LINKHEADER_SYSTEMPAGE );
+		Pres title = new TitleBar( "System page: " + getTitle() );
 		
-		DPElement title = styleSheet.withFontFace( "Serif" ).withFontBold( true ).withFontSize( 32 ).withTextSmallCaps( true ).staticText( "System page: " + getTitle() );
-		
-		ArrayList<DPElement> headChildren = new ArrayList<DPElement>();
-		headChildren.add( SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE | SystemRootPage.LINKHEADER_SYSTEMPAGE ) );
-		headChildren.add( title.alignHCentre() );
-		
-		ArrayList<DPElement> pageChildren = new ArrayList<DPElement>();
-		pageChildren.add( styleSheet.vbox( headChildren.toArray( new DPElement[0] ) ).alignHExpand() );
+		Pres head = new Head( new Pres[] { linkHeader, title } );
+
+		ArrayList<Object> pageChildren = new ArrayList<Object>();
+		pageChildren.add( head );
 		String description = getDescription();
 		if ( description != null )
 		{
-			pageChildren.add( createTextParagraph( styleSheet.withFontSize( 16 ), description ) );
+			pageChildren.add( new NormalText( description ) );
 		}
-		pageChildren.add( createContents().alignHExpand().present() );
+		pageChildren.add( createContents().alignHExpand() );
 		
-		return styleSheet.withVBoxSpacing( 40.0 ).vbox( pageChildren.toArray( new DPElement[0] ) ).alignHExpand();
+		return new BritefuryJ.DocPresent.Combinators.RichText.Page( pageChildren ).present();
 	}
 
 
-	protected DPElement createLink()
+	protected Pres createLink()
 	{
-		return controlsStyleSheet.link( getTitle(), getLocation() ).getElement();
+		return new Hyperlink( getTitle(), getLocation() );
 	}
 	
-	
-	protected ArrayList<DPElement> createTextNodes(PrimitiveStyleSheet style, String text)
-	{
-		String[] words = text.split( " " );
-		ArrayList<DPElement> nodes = new ArrayList<DPElement>();
-		boolean bFirst = true;
-		for (String word: words)
-		{
-			if ( !word.equals( "" ) )
-			{
-				if ( !bFirst )
-				{
-					nodes.add( style.staticText( " " ) );
-					nodes.add( style.lineBreak() );
-				}
-				nodes.add( style.staticText( word ) );
-				bFirst = false;
-			}
-		}
-		
-		return nodes;
-	}
-
-	protected ArrayList<DPElement> createTextNodes(String text)
-	{
-		return createTextNodes( styleSheet, text );
-	}
-	
-	protected DPParagraph createTextParagraph(PrimitiveStyleSheet style, String text)
-	{
-		return style.paragraph( createTextNodes( style, text ).toArray( new DPElement[0] ) );
-	}
-
-	protected DPParagraph createTextParagraph(String text)
-	{
-		return createTextParagraph( styleSheet, text );
-	}
-
-
 	
 	protected String getDescription()
 	{

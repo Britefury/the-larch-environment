@@ -22,9 +22,11 @@ import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
 class RichText
 {
 	public static final InheritedAttributeNonNull pageSpacing = new InheritedAttributeNonNull( "richtext", "pageSpacing", Double.class, 15.0 );
+	public static final InheritedAttributeNonNull headSpacing = new InheritedAttributeNonNull( "richtext", "headSpacing", Double.class, 1.0 );
 	public static final InheritedAttributeNonNull bodySpacing = new InheritedAttributeNonNull( "richtext", "bodySpacing", Double.class, 10.0 );
 	public static final InheritedAttributeNonNull linkHeaderAttrs = new InheritedAttributeNonNull( "richtext", "linkHeaderAttrs", StyleSheet2.class,
-			StyleSheet2.instance.withAttr( Primitive.hboxSpacing, 25.0 ).withAttr( Primitive.border, new FilledBorder( 10.0, 10.0, 5.0, 1.0, null ) ) );
+			StyleSheet2.instance.withAttr( Primitive.hboxSpacing, 25.0 ).withAttr( Primitive.border, new FilledBorder( 5.0, 5.0, 5.0, 5.0, new Color( 184, 206, 203 ) ) ) );
+	public static final InheritedAttributeNonNull linkHeaderPadding = new InheritedAttributeNonNull( "richtext", "linkHeaderPadding", Double.class, 5.0 );
 	public static final InheritedAttributeNonNull titleTextAttrs = new InheritedAttributeNonNull( "richtext", "titleTextAttrs", StyleSheet2.class,
 			StyleSheet2.instance.withAttr( Primitive.fontFace, "Serif" ).withAttr( Primitive.fontSize, 36 ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.textSmallCaps, true ) );
 	public static final InheritedAttributeNonNull titlePadding = new InheritedAttributeNonNull( "richtext", "titlePadding", Double.class, 5.0 );
@@ -63,6 +65,18 @@ class RichText
 	public static StyleSheetValues usePageAttrs(StyleSheetValues style)
 	{
 		return style.useAttr( pageSpacing );
+	}
+
+	
+
+	public static StyleSheetValues headStyle(StyleSheetValues style)
+	{
+		return style.remapAttr( Primitive.vboxSpacing, headSpacing );
+	}
+	
+	public static StyleSheetValues useHeadAttrs(StyleSheetValues style)
+	{
+		return style.useAttr( headSpacing );
 	}
 
 	

@@ -10,14 +10,23 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPVBox;
-import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.Page;
-import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Border;
+import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.RichText.Body;
+import BritefuryJ.DocPresent.Combinators.RichText.Head;
+import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
+import BritefuryJ.DocPresent.Combinators.RichText.Heading4;
+import BritefuryJ.DocPresent.Combinators.RichText.LinkHeaderBar;
+import BritefuryJ.DocPresent.Combinators.RichText.TitleBar;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
 public class SystemRootPage extends Page
 {
@@ -41,58 +50,44 @@ public class SystemRootPage extends Page
 	
 
 	
-	private static final PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-	private static PrimitiveStyleSheet outlineStyle = styleSheet.withBorder( new SolidBorder( 2.0, 10.0, new Color( 0.6f, 0.7f, 0.8f ), null ) );
-
-	private static final ControlsStyleSheet controlsStyleSheet = ControlsStyleSheet.instance;
+	private static StyleSheet2 outlineStyle = StyleSheet2.instance.withAttr( Primitive.border, new SolidBorder( 2.0, 10.0, new Color( 0.6f, 0.7f, 0.8f ), null ) );
 
 	
 	
 	public DPElement getContentsElement()
 	{
-		DPElement title = styleSheet.withFontFace( "Serif" ).withFontBold( true ).withFontSize( 32 ).withTextSmallCaps( true ).staticText( "GSym System Page" );
+		Pres title = new TitleBar( "GSym System Page" );
 		
-		ArrayList<DPElement> headChildren = new ArrayList<DPElement>();
-		headChildren.add( createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE ) );
-		headChildren.add( title.alignHCentre() );
-		DPVBox headBox = styleSheet.vbox( headChildren.toArray( new DPElement[0] ) );
+		Pres head = new Head( new Pres[] { createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE ), title } );
 		
-		ArrayList<DPElement> pageChildren = new ArrayList<DPElement>();
-		pageChildren.add( headBox.alignHExpand() );
-		pageChildren.add( createContents().alignHExpand() );
-		
-		return styleSheet.withVBoxSpacing( 40.0 ).vbox( pageChildren.toArray( new DPElement[0] ) ).alignHExpand();
+		return new BritefuryJ.DocPresent.Combinators.RichText.Page( new Pres[] { head, createContents() } ).present();
 	}
 
 	
-	protected DPElement createTestsBox(String title, List<SystemPage> pages)
+	protected Pres createTestsBox(String title, List<SystemPage> pages)
 	{
-		ArrayList<DPElement> testBoxChildren = new ArrayList<DPElement>();
+		ArrayList<Object> testBoxChildren = new ArrayList<Object>();
 		
-		DPElement titleElement = styleSheet.withFontFace( "Serif" ).withFontBold( true ).withFontSize( 18 ).staticText( title ).pad( 30.0, 30.0, 5.0, 15.0 );
-		testBoxChildren.add( titleElement );
+		Pres heading = new Heading4( title ).pad( 30.0, 30.0, 5.0, 15.0 );
+		testBoxChildren.add( heading );
 		
 		for (SystemPage page: pages)
 		{
 			testBoxChildren.add( page.createLink() );
 		}
 		
-		return outlineStyle.border( styleSheet.vbox( testBoxChildren.toArray( new DPElement[0] ) ) );
+		return outlineStyle.applyTo( new Border( new VBox( testBoxChildren ) ) );
 	}
 	
-	protected DPElement createContents()
+	protected Pres createContents()
 	{
-		DPElement titleElement = styleSheet.withFontFace( "Serif" ).withFontBold( true ).withFontSize( 24 ).staticText( "Tests:" ).pad( 0.0, 5.0 ).alignHCentre();
+		Pres heading = new Heading2( "Tests" ).alignHCentre();
 		
-		ArrayList<DPElement> testBoxes = new ArrayList<DPElement>();
+		ArrayList<Object> testBoxes = new ArrayList<Object>();
 		testBoxes.add( createTestsBox( "Primitive elements:", SystemDirectory.getPrimitiveTestPages() ).pad( 25.0, 5.0 ) );
 		testBoxes.add( createTestsBox( "Controls:", SystemDirectory.getControlTestPages() ).pad( 25.0, 5.0 ) );
 
-		ArrayList<DPElement> contents = new ArrayList<DPElement>();
-		contents.add( titleElement );
-		contents.add( styleSheet.hbox( testBoxes.toArray( new DPElement[0] ) ) );
-		
-		return styleSheet.vbox( contents.toArray( new DPElement[0] ) ).alignHExpand();
+		return new Body( new Pres[] { heading, new HBox( testBoxes ) } );
 	}
 
 
@@ -100,25 +95,20 @@ public class SystemRootPage extends Page
 	public static int LINKHEADER_ROOTPAGE = 0x1;
 	public static int LINKHEADER_SYSTEMPAGE = 0x2;
 	
-	public static DPElement createLinkHeader(int linkHeaderFlags)
+	public static Pres createLinkHeader(int linkHeaderFlags)
 	{
-		ArrayList<DPElement> linkElements = new ArrayList<DPElement>();
+		ArrayList<Object> links = new ArrayList<Object>();
 		
 		if ( ( linkHeaderFlags & LINKHEADER_ROOTPAGE )  !=  0 )
 		{
-			linkElements.add( controlsStyleSheet.link( "GSYM ROOT PAGE", new Location( "" ) ).getElement() );
+			links.add( new Hyperlink( "GSYM ROOT PAGE", new Location( "" ) ) );
 		}
 		
 		if ( ( linkHeaderFlags & LINKHEADER_SYSTEMPAGE )  !=  0 )
 		{
-			linkElements.add( controlsStyleSheet.link( "SYSTEM PAGE", new Location( "system" ) ).getElement() );
+			links.add( new Hyperlink( "SYSTEM PAGE", new Location( "system" ) ) );
 		}
-
-		DPElement links = styleSheet.withHBoxSpacing( 25.0 ).hbox( linkElements.toArray( new DPElement[0] ) );
 		
-		DPElement linksBackground = styleSheet.withBorder( new FilledBorder( 5.0, 5.0, 5.0, 5.0, new Color( 184, 206, 203 ) ) ).border( links.alignHRight() );
-		DPElement linksHeader = styleSheet.withBorder( new FilledBorder( 5.0, 5.0, 5.0, 5.0 ) ).border( linksBackground.alignHExpand() );
-		
-		return linksHeader.alignHExpand();
+		return new LinkHeaderBar( links );
 	}
 }

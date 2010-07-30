@@ -32,6 +32,6 @@ public class Body extends SequentialPres
 	{
 		Pres xs[] = mapPresentAsCombinators( ctx.withStyle( RichText.useBodyAttrs( ctx.getStyle() ) ), children );
 		return higherOrderPresent( ctx, RichText.bodyStyle( ctx.getStyle() ),
-				new VBox( xs ) );
+				new VBox( xs ).alignHExpand() );
 	}
 }

@@ -32,6 +32,6 @@ public class Page extends SequentialPres
 	{
 		Pres xs[] = mapPresentAsCombinators( ctx.withStyle( RichText.usePageAttrs( ctx.getStyle() ) ), children );
 		return higherOrderPresent( ctx, RichText.pageStyle( ctx.getStyle() ),
-				new VBox( xs ) );
+				new VBox( xs ).alignHExpand() );
 	}
 }
