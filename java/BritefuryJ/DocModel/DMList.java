@@ -26,8 +26,7 @@ import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.CommandHistory.CommandTracker;
 import BritefuryJ.CommandHistory.CommandTrackerFactory;
 import BritefuryJ.CommandHistory.Trackable;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Incremental.IncrementalOwner;
@@ -1170,8 +1169,8 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 
 
 	
-	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
 	{
-		return DocModelPresenter.presentDMList( this, fragment, styleSheet, inheritedState );
+		return DocModelPresenter.presentDMList( this, fragment, inheritedState );
 	}
 }

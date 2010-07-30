@@ -24,6 +24,10 @@ import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Border;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.Controls.PopupMenu;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
@@ -48,6 +52,7 @@ import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.GSym.GSymPerspective;
 import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
@@ -74,31 +79,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	// PRESENTABLE
 	//
 	//
-	
-	public static class ClonePresentable implements Presentable
-	{
-		private DPElement originalElement;
-		
-		
-		protected ClonePresentable(DPElement originalElement)
-		{
-			this.originalElement = originalElement;
-		}
-		
-		
-		public DPElement getOriginalElement()
-		{
-			return originalElement;
-		}
-
-
-		@Override
-		public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
-		{
-			return originalElement.clonePresentationSubtree();
-		}
-	}
-	
 	
 	private static class TreeExplorerViewFragmentFn implements GSymViewFragmentFunction
 	{
@@ -130,9 +110,9 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 
 		@Override
-		public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
 		{
-			return fragment.presentFragmentWithPerspective( element, treeExplorerPerspective );
+			return Pres.elementToPres( fragment.presentFragmentWithPerspective( element, treeExplorerPerspective ) );
 		}
 	}
 
@@ -3217,26 +3197,20 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 
 
-	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
 	{
 		if ( !isRealised() )
 		{
-			return this;
+			return Pres.elementToPres( this );
 		}
 		else
 		{
-			return alreadyInUseStyle.border( alreadyInUseStyle.staticText( "Element already in use (element is realised)." ) );
+			return alreadyInUseStyle.applyTo( new Border( new StaticText( "Element already in use (element is realised)." ) ) );
 		}
 	}
 	
 	
 	
-	public Presentable presentableClone()
-	{
-		return new ClonePresentable( this );
-	}
-	
-	
-	private static final PrimitiveStyleSheet alreadyInUseStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.75f, 0.0f, 0.0f ) ).withBorder(
+	private static final StyleSheet2 alreadyInUseStyle = StyleSheet2.instance.withAttr( Primitive.foreground, new Color( 0.75f, 0.0f, 0.0f ) ).withAttr( Primitive.border,
 			new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.75f, 0.0f, 0.0f ), null ) );
 }

@@ -10,9 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.AttributeTable;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.GSym.View.GSymFragmentView;
@@ -72,22 +75,23 @@ public class LogView implements Presentable
 
 
 
-	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
 	{
 		stateListeners = PresentationStateListenerList.addListener( stateListeners, fragment );
 		
-		DPElement entryElements[] = new DPElement[visibleEntries.size()+1];
-		entryElements[0] = titleStyle.staticText( log.getTitle() ).pad( 0.0, 20.0 ).alignHCentre();
+		Pres entryElements[] = new Pres[visibleEntries.size()+1];
+		entryElements[0] = titleStyle.applyTo( new StaticText( log.getTitle() ) ).pad( 0.0, 20.0 ).alignHCentre();
 		int i = 1;
 		for (LogEntry entry: visibleEntries)
 		{
-			entryElements[i++] = fragment.presentFragment( entry, PrimitiveStyleSheet.instance );
+			entryElements[i++] = Pres.elementToPres( fragment.presentFragment( entry, StyleSheet.instance ) );
 		}
 		
-		return PrimitiveStyleSheet.instance.withVBoxSpacing( 5.0 ).vbox( entryElements ).alignHExpand();
+		return boxStyle.applyTo( new VBox( entryElements ) ).alignHExpand();
 	}
 
 
 
-	static PrimitiveStyleSheet titleStyle = PrimitiveStyleSheet.instance.withFontFace( "Serif" ).withFontBold( true ).withFontSize( 28 );
+	static StyleSheet2 titleStyle = StyleSheet2.instance.withAttr( Primitive.fontFace, "Serif" ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 28 );
+	static StyleSheet2 boxStyle = StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 5.0 );
 }

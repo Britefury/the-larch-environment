@@ -14,8 +14,8 @@ import javax.swing.SwingUtilities;
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.Cell.LiteralCell;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Incremental.IncrementalMonitor;
@@ -139,9 +139,9 @@ public abstract class LiteralCellEditor implements Presentable, IncrementalMonit
 
 	
 	@Override
-	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
 	{
-		return createEditor().getElement();
+		return Pres.elementToPres( createEditor().getElement() );
 	}
 
 

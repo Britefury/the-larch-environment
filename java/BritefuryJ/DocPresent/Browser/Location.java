@@ -11,10 +11,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import BritefuryJ.AttributeTable.AttributeTable;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
+import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
+import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
 public class Location implements Presentable
@@ -129,10 +131,10 @@ public class Location implements Presentable
 
 
 		@Override
-		public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
 		{
 			// TODO: Check for infinitely recursive nesting
-			return fragment.presentLocationAsElement( loc );
+			return Pres.elementToPres( fragment.presentLocationAsElement( loc ) );
 		}
 	}
 	
@@ -214,9 +216,9 @@ public class Location implements Presentable
 	}
 
 
-	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
 	{
-		return locationStyle.objectBox( "Location", PrimitiveStyleSheet.instance.staticText( locationString ) );
+		return locationStyle.applyTo( new ObjectBox( "Location", new StaticText( locationString ) ) );
 	}
 	
 	
@@ -226,5 +228,6 @@ public class Location implements Presentable
 	}
 
 
-	private static final GenericPerspectiveStyleSheet locationStyle = GenericPerspectiveStyleSheet.instance.withObjectBorderAndTitlePaint( new Color( 0.4f, 0.65f, 0.4f ) ); 
+	private static final StyleSheet2 locationStyle = StyleSheet2.instance.withAttr( GenericStyle.objectBorderPaint, new Color( 0.4f, 0.65f, 0.4f ) )
+			.withAttr( GenericStyle.objectTitlePaint, new Color( 0.4f, 0.65f, 0.4f ) ); 
 }

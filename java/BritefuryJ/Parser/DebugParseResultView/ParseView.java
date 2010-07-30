@@ -18,11 +18,11 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.Border.SolidBorder;
+import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
 import BritefuryJ.DocPresent.Controls.ScrolledViewport;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -230,10 +230,10 @@ public class ParseView implements FragmentContext
 	
 	
 	
-	public static DPElement presentDebugParseResult(DebugParseResultInterface x, GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable state)
+	public static Pres presentDebugParseResult(DebugParseResultInterface x, GSymFragmentView fragment, AttributeTable inheritedState)
 	{
-		ParseView v = new ParseView( x, ctx.persistentState( "viewport " ) );
-		return v.element.alignHExpand().alignVExpand();
+		ParseView v = new ParseView( x, fragment.persistentState( "viewport " ) );
+		return Pres.elementToPres( v.element.alignHExpand().alignVExpand() );
 	}
 
 

@@ -318,6 +318,11 @@ public abstract class Pres
 		}
 	}
 
+	public static Pres elementToPres(DPElement e)
+	{
+		return new PresentElement( e );
+	}
+
 	public static Pres[] mapCoerce(Object children[])
 	{
 		Pres result[] = new Pres[children.length];

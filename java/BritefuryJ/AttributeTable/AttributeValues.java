@@ -12,9 +12,10 @@ import java.util.Map;
 import org.python.core.Py;
 import org.python.core.PyObject;
 
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
+import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBoxWithFields;
+import BritefuryJ.GSym.GenericPerspective.PresCom.VerticalField;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
 public class AttributeValues implements Presentable
@@ -85,9 +86,9 @@ public class AttributeValues implements Presentable
 	
 	
 	@Override
-	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
 	{
-		DPElement valueField = styleSheet.verticalObjectField( "Values:", AttributeTable.presentAttributeMap( fragment, styleSheet, inheritedState, values ) );
-		return styleSheet.objectBoxWithFields( getClass().getName(), new DPElement[] { valueField } );
+		Pres valueField = new VerticalField( "Values:", AttributeTable.presentAttributeMap( fragment, inheritedState, values ) );
+		return new ObjectBoxWithFields( getClass().getName(), new Pres[] { valueField } );
 	}
 }

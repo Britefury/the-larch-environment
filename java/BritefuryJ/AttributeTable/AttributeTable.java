@@ -18,9 +18,15 @@ import org.python.core.Py;
 import org.python.core.PyObject;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.Combinators.Primitive.Table;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
+import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBoxWithFields;
+import BritefuryJ.GSym.GenericPerspective.PresCom.VerticalField;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Utils.HashUtils;
 
@@ -478,43 +484,34 @@ public class AttributeTable implements Presentable
 
 	
 	
-	protected static DPElement presentAttributeMap(GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state, HashMap<String, Object> values)
+	protected static Pres presentAttributeMap(GSymFragmentView ctx, AttributeTable inheritedState, HashMap<String, Object> values)
 	{
-		PrimitiveStyleSheet attrTableStyle = getAttrTableStyle();
 		Set<String> nameSet = values.keySet();
 		String names[] = nameSet.toArray( new String[0] );
 		Arrays.sort( names );
-		DPElement children[][] = new DPElement[names.length+1][];
+		Pres children[][] = new Pres[names.length+1][];
 		
-		children[0] = new DPElement[] { attrTableStyle.staticText( "Name" ), attrTableStyle.staticText( "Value" ) };
+		children[0] = new Pres[] { attrTableStyle.applyTo( new StaticText( "Name" ) ), attrTableStyle.applyTo( new StaticText( "Value" ) ) };
 		for (int i = 0; i < names.length; i++)
 		{
 			String name = names[i];
 			Object value = values.get( name );
-			DPElement valueView = ctx.presentFragment( value, styleSheet );
-			children[i+1] = new DPElement[] {
-					PrimitiveStyleSheet.instance.staticText( name ), valueView };
+			DPElement valueView = ctx.presentFragment( value, StyleSheet.instance );
+			children[i+1] = new Pres[] { new StaticText( name ), Pres.elementToPres( valueView ) };
 		}
 		
-		return attrTableStyle.table( children );
+		return attrTableStyle.applyTo( new Table( children ) );
 	}
 	
 	@Override
-	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
 	{
-		DPElement valueField = styleSheet.verticalObjectField( "Attributes:", presentAttributeMap( fragment, styleSheet, inheritedState, values ) );
-		return styleSheet.objectBoxWithFields( getClass().getName(), new DPElement[] { valueField } );
+		Pres valueField = new VerticalField( "Attributes:", presentAttributeMap( fragment, inheritedState, values ) );
+		return new ObjectBoxWithFields( getClass().getName(), new Pres[] { valueField } );
 	}
 	
 	
 	// We have to initialise this style sheet on request, otherwise we can end up with a circular class initialisation problem
-	private static PrimitiveStyleSheet _attrTableStyle;
-	private static PrimitiveStyleSheet getAttrTableStyle()
-	{
-		if ( _attrTableStyle == null )
-		{
-			_attrTableStyle = PrimitiveStyleSheet.instance.withFontBold( true ).withFontSize( 14 ).withForeground( new Color( 0.0f, 0.0f, 0.5f ) ).withTableColumnSpacing( 10.0 );
-		}
-		return _attrTableStyle;
-	}
+	private static final StyleSheet2 attrTableStyle = StyleSheet2.instance.withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 14 )
+			.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.tableColumnSpacing, 10.0 );
 }

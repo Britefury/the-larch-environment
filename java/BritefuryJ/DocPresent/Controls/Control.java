@@ -6,20 +6,9 @@
 //##************************
 package BritefuryJ.DocPresent.Controls;
 
-import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
-import BritefuryJ.GSym.GenericPerspective.Presentable;
-import BritefuryJ.GSym.View.GSymFragmentView;
 
-public abstract class Control implements Presentable
+public abstract class Control
 {
 	public abstract DPElement getElement();
-
-	
-	@Override
-	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
-	{
-		return getElement();
-	}
 }

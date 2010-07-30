@@ -10,10 +10,14 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import BritefuryJ.AttributeTable.AttributeTable;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
+import BritefuryJ.GSym.GenericPerspective.PresCom.HorizontalField;
+import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBoxWithFields;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.Incremental.IncrementalValueMonitor;
@@ -170,19 +174,22 @@ public class Range implements IncrementalOwner, Presentable
 
 
 	@Override
-	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
 	{
 		incr.onAccess();
-		DPElement rangeField = styleSheet.horizontalObjectField( "Valid range:",
-				defaultStyle.paragraph( new DPElement[] { numValueStyle.staticText( String.valueOf( min ) ), defaultStyle.staticText( " to " ), numValueStyle.staticText( String.valueOf( max ) ) } ) );
-		DPElement valueField = styleSheet.horizontalObjectField( "Value range:",
-				defaultStyle.paragraph( new DPElement[] { numValueStyle.staticText( String.valueOf( begin ) ), defaultStyle.staticText( " to " ), numValueStyle.staticText( String.valueOf( end ) ) } ) );
-		DPElement stepSizeField = styleSheet.horizontalObjectField( "Step size:", numValueStyle.staticText( String.valueOf( stepSize ) ) );
-		return styleSheet.objectBoxWithFields( getClass().getName(), new DPElement[] { rangeField, valueField, stepSizeField } );
+		Pres rangeField = new HorizontalField( "Valid range:",
+				new Paragraph( new Pres[] { numValueStyle.applyTo( new StaticText( String.valueOf( min ) ) ),
+						new StaticText( " to " ),
+						numValueStyle.applyTo( new StaticText( String.valueOf( max ) ) ) } ) );
+		Pres valueField = new HorizontalField( "Value range:",
+				new Paragraph( new Pres[] { numValueStyle.applyTo( new StaticText( String.valueOf( begin ) ) ),
+						new StaticText( " to " ),
+						numValueStyle.applyTo( new StaticText( String.valueOf( end ) ) ) } ) );
+		Pres stepSizeField = new HorizontalField( "Step size:", numValueStyle.applyTo( new StaticText( String.valueOf( stepSize ) ) ) );
+		return new ObjectBoxWithFields( getClass().getName(), new Pres[] { rangeField, valueField, stepSizeField } );
 	}
 	
 	
-	private final static PrimitiveStyleSheet defaultStyle = PrimitiveStyleSheet.instance;
-	private final static PrimitiveStyleSheet numValueStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.5f, 0.0f, 0.25f ) );
+	private final static StyleSheet2 numValueStyle = StyleSheet2.instance.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.25f ) );
 };
 

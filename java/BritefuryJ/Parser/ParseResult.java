@@ -12,10 +12,17 @@ import java.util.List;
 import java.util.Map;
 
 import BritefuryJ.AttributeTable.AttributeTable;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
+import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
+import BritefuryJ.GSym.GenericPerspective.PresCom.HorizontalField;
+import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBoxWithFields;
+import BritefuryJ.GSym.GenericPerspective.PresCom.VerticalField;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.ParserHelpers.DebugNode;
 import BritefuryJ.ParserHelpers.ParseResultInterface;
@@ -245,34 +252,34 @@ public class ParseResult implements ParseResultInterface, Presentable
 
 
 	@Override
-	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
 	{
-		DPElement fields[];
+		Pres fields[];
 		
 		if ( isValid() )
 		{
-			DPElement status = parseResultStyle.horizontalObjectField( "Status:", successStyle.staticText( "Success" ) );
-			DPElement range = parseResultStyle.horizontalObjectField( "Range:",
-					PrimitiveStyleSheet.instance.paragraph( new DPElement[] { 
-							rangeStyle.staticText( String.valueOf( getBegin() ) ),
-							PrimitiveStyleSheet.instance.staticText( " to " ),
-							rangeStyle.staticText( String.valueOf( getEnd() ) ) } ) );
+			Pres status = parseResultStyle.applyTo( new HorizontalField( "Status:", successStyle.applyTo( new StaticText( "Success" ) ) ) );
+			Pres range = parseResultStyle.applyTo( new HorizontalField( "Range:",
+					new Paragraph( new Pres[] { 
+							rangeStyle.applyTo( new StaticText( String.valueOf( getBegin() ) ) ),
+							new StaticText( " to " ),
+							rangeStyle.applyTo( new StaticText( String.valueOf( getEnd() ) ) ) } ) ) );
 			
-			DPElement valueView = fragment.presentFragment( getValue(), styleSheet, inheritedState );
-			DPElement value = parseResultStyle.verticalObjectField( "Value:", valueView );
-			fields = new DPElement[] { status, range, value };
+			Pres valueView = Pres.elementToPres( fragment.presentFragment( getValue(), StyleSheet.instance, inheritedState ) );
+			Pres value = parseResultStyle.applyTo( new VerticalField( "Value:", valueView ) );
+			fields = new Pres[] { status, range, value };
 		}
 		else
 		{
-			fields = new DPElement[] { parseResultStyle.horizontalObjectField( "Status:", failStyle.staticText( "Fail" ) ) };
+			fields = new Pres[] { parseResultStyle.applyTo( new HorizontalField( "Status:", failStyle.applyTo( new StaticText( "Fail" ) ) ) ) };
 		}
 		
-		return parseResultStyle.objectBoxWithFields( "BritefuryJ.Parser.ParseResult", fields );
+		return parseResultStyle.applyTo( new ObjectBoxWithFields( "BritefuryJ.Parser.ParseResult", fields ) );
 	}
 
 
-	private static PrimitiveStyleSheet successStyle = PrimitiveStyleSheet.instance.withFontItalic( true ).withFontSize( 12 ).withForeground( new Color( 0.0f, 0.5f, 0.0f ) );
-	private static PrimitiveStyleSheet failStyle = PrimitiveStyleSheet.instance.withFontItalic( true ).withFontSize( 12 ).withForeground( new Color( 0.5f, 0.0f, 0.0f ) );
-	private static PrimitiveStyleSheet rangeStyle = PrimitiveStyleSheet.instance.withFontSize( 12 ).withForeground( new Color( 0.0f, 0.5f, 0.5f ) );
-	private static GenericPerspectiveStyleSheet parseResultStyle = GenericPerspectiveStyleSheet.instance.withObjectTitlePaint( new Color( 0.4f, 0.4f, 0.4f ) ).withObjectBorderPaint( new Color( 0.6f, 0.6f, 0.6f ) );
+	private static StyleSheet2 successStyle = StyleSheet2.instance.withAttr( Primitive.fontItalic, true ).withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
+	private static StyleSheet2 failStyle = StyleSheet2.instance.withAttr( Primitive.fontItalic, true ).withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.0f ) );
+	private static StyleSheet2 rangeStyle = StyleSheet2.instance.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.5f ) );
+	private static StyleSheet2 parseResultStyle = StyleSheet2.instance.withAttr( GenericStyle.objectTitlePaint, new Color( 0.4f, 0.4f, 0.4f ) ).withAttr( GenericStyle.objectBorderPaint, new Color( 0.6f, 0.6f, 0.6f ) );
 }

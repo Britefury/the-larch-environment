@@ -16,9 +16,16 @@ import org.python.core.PySlice;
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Border;
+import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
+import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
+import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
+import BritefuryJ.GSym.GenericPerspective.PresCom.UnescapedStringAsSpan;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
 public class StreamValue implements Presentable
@@ -136,9 +143,9 @@ public class StreamValue implements Presentable
 
 
 		@Override
-		public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
 		{
-			return styleSheet.unescapedStringAsSpan( textValue );
+			return new UnescapedStringAsSpan( textValue );
 		}
 	}
 	
@@ -214,13 +221,14 @@ public class StreamValue implements Presentable
 
 
 		@Override
-		public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
 		{
-			return borderStyle.border( fragment.presentFragment( structuralValue, styleSheet ) );
+			Pres valueView = Pres.elementToPres( fragment.presentFragment( structuralValue, StyleSheet.instance ) );
+			return borderStyle.applyTo( new Border( valueView ) );
 		}
 
 	
-		private static PrimitiveStyleSheet borderStyle = PrimitiveStyleSheet.instance.withBorder( new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.15f, 0.25f, 0.75f ), null ) ); 
+		private static StyleSheet2 borderStyle = StyleSheet2.instance.withAttr( Primitive.border, new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.15f, 0.25f, 0.75f ), null ) ); 
 	}
 	
 	
@@ -567,14 +575,14 @@ public class StreamValue implements Presentable
 
 
 	@Override
-	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
 	{
-		List<DPElement> itemViews = fragment.mapPresentFragment( Arrays.asList( (Object[])items ), styleSheet );
-		DPElement contents = PrimitiveStyleSheet.instance.paragraph( itemViews.toArray( new DPElement[0] ) );
+		List<DPElement> itemViews = fragment.mapPresentFragment( Arrays.asList( (Object[])items ), StyleSheet.instance );
+		Pres contents = new Paragraph( itemViews.toArray() );
 		
-		return streamValueStyle.objectBox( "BritefuryJ.DocPresent.StreamValue.StreamValue", contents );
+		return streamValueStyle.applyTo( new ObjectBox( "BritefuryJ.DocPresent.StreamValue.StreamValue", contents ) );
 	}
 
 
-	private static final GenericPerspectiveStyleSheet streamValueStyle = GenericPerspectiveStyleSheet.instance.withObjectBorderAndTitlePaint( new Color( 0.65f, 0.0f, 0.55f ) );
+	private static StyleSheet2 streamValueStyle = StyleSheet2.instance.withAttr( GenericStyle.objectBorderPaint,new Color( 0.65f, 0.0f, 0.55f ) ).withAttr( GenericStyle.objectTitlePaint,new Color( 0.65f, 0.0f, 0.55f ) );
 }

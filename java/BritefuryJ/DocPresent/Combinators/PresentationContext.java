@@ -89,8 +89,7 @@ public class PresentationContext
 	
 	public PresentationContext withStyleSheet(StyleSheet2 styleSheet)
 	{
-		StyleValues style = getStyle();
-		return withStyle( style.withAttrs( styleSheet ) );
+		return withStyle( getStyle().withAttrs( styleSheet ) );
 	}
 	
 	public PresentationContext withStyleSheetFromAttr(AttributeBase attr)

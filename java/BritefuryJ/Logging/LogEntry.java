@@ -14,9 +14,14 @@ import java.util.HashSet;
 import org.python.core.Py;
 
 import BritefuryJ.AttributeTable.AttributeTable;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
+import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
+import BritefuryJ.GSym.GenericPerspective.PresCom.HorizontalField;
+import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBoxWithFields;
+import BritefuryJ.GSym.GenericPerspective.PresCom.VerticalField;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
 public class LogEntry implements Presentable
@@ -180,20 +185,20 @@ public class LogEntry implements Presentable
 	
 
 
-	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
 	{
-		DPElement fields[] = new DPElement[items.size()];
+		Pres fields[] = new Pres[items.size()];
 		for (int i = 0; i < items.size(); i++)
 		{
 			Item item = items.get( i );
-			DPElement valueView = fragment.presentFragment( item.getValue(), styleSheet, inheritedState );
+			Pres valueView = Pres.elementToPres( fragment.presentFragment( item.getValue(), StyleSheet.instance, inheritedState ) );
 			if ( item.getLayout() == Layout.HORIZONTAL )
 			{
-				fields[i] = logEntryStyle.horizontalObjectField( item.getName(), valueView );
+				fields[i] = new HorizontalField( item.getName(), valueView );
 			}
 			else if ( item.getLayout() == Layout.VERTICAL )
 			{
-				fields[i] = logEntryStyle.verticalObjectField( item.getName(), valueView );
+				fields[i] = new VerticalField( item.getName(), valueView );
 			}
 			else
 			{
@@ -201,10 +206,10 @@ public class LogEntry implements Presentable
 			}
 		}
 		
-		return logEntryStyle.objectBoxWithFields( "Log entry - " + entryClass, fields );
+		return logEntryStyle.applyTo( new ObjectBoxWithFields( "Log entry - " + entryClass, fields ) );
 	}
 
 
-	private static GenericPerspectiveStyleSheet logEntryStyle = GenericPerspectiveStyleSheet.instance.withObjectBorderPaint( new Color( 0.45f, 0.65f, 0.0f ) ).withObjectTitlePaint(
+	private static StyleSheet2 logEntryStyle = StyleSheet2.instance.withAttr( GenericStyle.objectBorderPaint, new Color( 0.45f, 0.65f, 0.0f ) ).withAttr( GenericStyle.objectTitlePaint,
 			new Color( 0.45f, 0.65f, 0.0f ) );
 }

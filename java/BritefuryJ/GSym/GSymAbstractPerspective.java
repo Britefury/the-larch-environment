@@ -10,8 +10,8 @@ import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
+import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
@@ -34,9 +34,9 @@ public abstract class GSymAbstractPerspective
 
 		
 		@Override
-		public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
 		{
-			return fragment.presentFragmentWithPerspectiveAndStyleSheet( x, GSymAbstractPerspective.this, this.styleSheet, this.inheritedState );
+			return Pres.elementToPres( fragment.presentFragmentWithPerspectiveAndStyleSheet( x, GSymAbstractPerspective.this, this.styleSheet, this.inheritedState ) );
 		}
 	}
 	
