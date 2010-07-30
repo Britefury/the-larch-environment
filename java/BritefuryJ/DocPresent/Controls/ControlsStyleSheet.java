@@ -31,7 +31,7 @@ import BritefuryJ.DocPresent.DPSpaceBin;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPViewport;
-import BritefuryJ.DocPresent.Border.Border;
+import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Browser.Location;
@@ -63,10 +63,10 @@ public class ControlsStyleSheet extends StyleSheet
 	private static final double defaultMenuItemYPadding = 5.0;
 	private static final AttributeValues defaultPopupMenuAttrs = new AttributeValues( new String[] { "border", "hboxSpacing" }, new Object[] { new SolidBorder( 1.0, 2.0, Color.black, null ), 10.0 } );
 	
-	private static final Border defaultTooltipBorder = new SolidBorder( 1.0, 2.0, 2.0, 2.0, Color.BLACK, new Color( 1.0f, 1.0f, 0.9f ) );
+	private static final AbstractBorder defaultTooltipBorder = new SolidBorder( 1.0, 2.0, 2.0, 2.0, Color.BLACK, new Color( 1.0f, 1.0f, 0.9f ) );
 	
 	private static final Painter defaultCheckboxHoverBackground = new OutlinePainter( new Color( 0.5f, 0.625f, 0.75f ) );
-	private static final Border defaultCheckboxCheckBorder = new FilledBorder( 3.0, 3.0, 3.0, 3.0, 5.0, 5.0, new Color( 0.75f, 0.75f, 0.75f ) );
+	private static final AbstractBorder defaultCheckboxCheckBorder = new FilledBorder( 3.0, 3.0, 3.0, 3.0, 5.0, 5.0, new Color( 0.75f, 0.75f, 0.75f ) );
 	private static final Paint defaultCheckboxCheckForeground = new Color( 0.0f, 0.2f, 0.4f );
 	private static final double defaultCheckboxCheckSize = 10.0;
 	private static final double defaultCheckboxSpacing = 8.0;
@@ -74,8 +74,8 @@ public class ControlsStyleSheet extends StyleSheet
 	private static final AttributeValues defaultTextAreaAttrs = new AttributeValues( new String[] { "border" }, new Object[] { new SolidBorder( 2.0, 5.0, 3.0, 3.0, new Color( 0.3f, 0.3f, 0.3f ), null ) } );
 	
 	private static final AttributeValues defaultTextEntryTextAttrs = new AttributeValues();
-	private static final Border defaultTextEntryBorder = new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.0f, 0.3f, 0.0f ), new Color( 0.9f, 0.95f, 0.9f ) );
-	private static final Border defaultTextEntryInvalidBorder = new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.6f, 0.0f, 0.0f ), new Color( 1.0f, 0.85f, 0.85f ) );
+	private static final AbstractBorder defaultTextEntryBorder = new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.0f, 0.3f, 0.0f ), new Color( 0.9f, 0.95f, 0.9f ) );
+	private static final AbstractBorder defaultTextEntryInvalidBorder = new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.6f, 0.0f, 0.0f ), new Color( 1.0f, 0.85f, 0.85f ) );
 	
 	private static final double defaultSpinEntryArrowSize = 16.0;
 	private static final double defaultSpinEntryArrowFilletSize = 4.0;
@@ -85,8 +85,8 @@ public class ControlsStyleSheet extends StyleSheet
 				new FilledOutlinePainter( new Color( 0.85f, 1.0f, 0.85f ), new Color( 0.0f, 0.45f, 0.0f ), new BasicStroke( 1.0f ) ) } );
 	private static final double defaultSpinEntryHSpacing = 2.0;
 	
-	private static final Border defaultOptionMenuBorder = new SolidBorder( 1.0, 3.0, 5.0, 5.0, Color.BLACK, new Color( 0.9f, 0.95f, 0.9f ) );
-	private static final Border defaultOptionMenuHoverBorder = new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.0f, 0.3f, 0.0f ), new Color( 0.95f, 1.0f, 0.95f ) );
+	private static final AbstractBorder defaultOptionMenuBorder = new SolidBorder( 1.0, 3.0, 5.0, 5.0, Color.BLACK, new Color( 0.9f, 0.95f, 0.9f ) );
+	private static final AbstractBorder defaultOptionMenuHoverBorder = new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.0f, 0.3f, 0.0f ), new Color( 0.95f, 1.0f, 0.95f ) );
 	private static final double defaultOptionMenuContentsSpacing = 5.0;
 	private static final double defaultOptionMenuArrowSize = 16.0;
 	private static final double defaultOptionMenuArrowFilletSize = 4.0;
@@ -266,7 +266,7 @@ public class ControlsStyleSheet extends StyleSheet
 	}
 	
 	
-	public ControlsStyleSheet withTooltipBorder(Border border)
+	public ControlsStyleSheet withTooltipBorder(AbstractBorder border)
 	{
 		return (ControlsStyleSheet)withAttr( "tooltipBorder", border );
 	}
@@ -277,7 +277,7 @@ public class ControlsStyleSheet extends StyleSheet
 		return (ControlsStyleSheet)withAttr( "checkboxHoverBackground", painter );
 	}
 	
-	public ControlsStyleSheet withCheckboxCheckBorder(Border border)
+	public ControlsStyleSheet withCheckboxCheckBorder(AbstractBorder border)
 	{
 		return (ControlsStyleSheet)withAttr( "checkboxCheckBorder", border );
 	}
@@ -361,12 +361,12 @@ public class ControlsStyleSheet extends StyleSheet
 
 	
 	
-	public ControlsStyleSheet withOptionMenuBorder(Border border)
+	public ControlsStyleSheet withOptionMenuBorder(AbstractBorder border)
 	{
 		return (ControlsStyleSheet)withAttr( "optionMenuBorder", border );
 	}
 	
-	public ControlsStyleSheet withOptionMenuHoverBorder(Border border)
+	public ControlsStyleSheet withOptionMenuHoverBorder(AbstractBorder border)
 	{
 		return (ControlsStyleSheet)withAttr( "optionMenuHoverBorder", border );
 	}
@@ -491,9 +491,9 @@ public class ControlsStyleSheet extends StyleSheet
 	
 	
 	
-	private Border buttonBorder = null;
+	private AbstractBorder buttonBorder = null;
 
-	private Border getButtonBorder()
+	private AbstractBorder getButtonBorder()
 	{
 		if ( buttonBorder == null )
 		{
@@ -510,9 +510,9 @@ public class ControlsStyleSheet extends StyleSheet
 	
 	
 	
-	private Border buttonHighlightBorder = null;
+	private AbstractBorder buttonHighlightBorder = null;
 
-	private Border getButtonHighlightBorder()
+	private AbstractBorder getButtonHighlightBorder()
 	{
 		if ( buttonHighlightBorder == null )
 		{
@@ -580,7 +580,7 @@ public class ControlsStyleSheet extends StyleSheet
 		if ( tooltipStyleSheet == null )
 		{
 			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
-			Border border = getNonNull( "tooltipBorder", Border.class, defaultTooltipBorder );
+			AbstractBorder border = getNonNull( "tooltipBorder", AbstractBorder.class, defaultTooltipBorder );
 			tooltipStyleSheet = primitive.withBorder( border );
 		}
 		return tooltipStyleSheet;
@@ -611,7 +611,7 @@ public class ControlsStyleSheet extends StyleSheet
 		if ( checkboxCheckStyleSheet == null )
 		{
 			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
-			Border border = getNonNull( "checkboxCheckBorder", Border.class, defaultCheckboxCheckBorder );
+			AbstractBorder border = getNonNull( "checkboxCheckBorder", AbstractBorder.class, defaultCheckboxCheckBorder );
 			checkboxCheckStyleSheet = primitive.withBorder( border );
 		}
 		return checkboxCheckStyleSheet;
@@ -742,7 +742,7 @@ public class ControlsStyleSheet extends StyleSheet
 		if ( optionMenuStyleSheet == null )
 		{
 			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyle", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
-			Border optionMenuBorder = getNonNull( "optionMenuBorder", Border.class, defaultOptionMenuBorder );
+			AbstractBorder optionMenuBorder = getNonNull( "optionMenuBorder", AbstractBorder.class, defaultOptionMenuBorder );
 			double contentsSpacing = getNonNull( "optionMenuContentsSpacing", Double.class, defaultOptionMenuContentsSpacing );
 			optionMenuStyleSheet = primitive.withBorder( optionMenuBorder ).withHBoxSpacing( contentsSpacing );
 		}
@@ -978,8 +978,8 @@ public class ControlsStyleSheet extends StyleSheet
 		DPElement line = textEntryTextStyle.hbox( new DPElement[] { textEntryTextStyle.segment( false, false, textElement ) } );
 		DPRegion region = textEntryTextStyle.region( line );
 		DPBorder outerElement = textEntryTextStyle.border( region );
-		Border validBorder = getNonNull( "textEntryBorder", Border.class, defaultTextEntryBorder );
-		Border invalidBorder = getNonNull( "textEntryInvalidBorder", Border.class, defaultTextEntryBorder );
+		AbstractBorder validBorder = getNonNull( "textEntryBorder", AbstractBorder.class, defaultTextEntryBorder );
+		AbstractBorder invalidBorder = getNonNull( "textEntryInvalidBorder", AbstractBorder.class, defaultTextEntryBorder );
 		return new TextEntry( outerElement, region, textElement, listener, validator, this, validBorder, invalidBorder );
 	}
 
@@ -990,8 +990,8 @@ public class ControlsStyleSheet extends StyleSheet
 		DPElement line = textEntryTextStyle.hbox( new DPElement[] { textEntryTextStyle.segment( false, false, textElement ) } );
 		DPRegion region = textEntryTextStyle.region( line );
 		DPBorder outerElement = textEntryTextStyle.border( region );
-		Border validBorder = getNonNull( "textEntryBorder", Border.class, defaultTextEntryBorder );
-		Border invalidBorder = getNonNull( "textEntryInvalidBorder", Border.class, defaultTextEntryBorder );
+		AbstractBorder validBorder = getNonNull( "textEntryBorder", AbstractBorder.class, defaultTextEntryBorder );
+		AbstractBorder invalidBorder = getNonNull( "textEntryInvalidBorder", AbstractBorder.class, defaultTextEntryBorder );
 		return new TextEntry( outerElement, region, textElement, listener, validatorRegex, validationFailMessage, this, validBorder, invalidBorder );
 	}
 
@@ -1050,8 +1050,8 @@ public class ControlsStyleSheet extends StyleSheet
 	public OptionMenu optionMenu(List<DPElement> optionChoices, List<DPElement> menuChoices, int initialChoice, OptionMenu.OptionMenuListener listener)
 	{
 		PrimitiveStyleSheet arrowStyle = getOptionMenuArrowStyleSheet();
-		Border optionMenuBorder = getNonNull( "optionMenuBorder", Border.class, defaultOptionMenuBorder );
-		Border optionMenuHoverBorder = getNonNull( "optionMenuHoverBorder", Border.class, defaultOptionMenuHoverBorder );
+		AbstractBorder optionMenuBorder = getNonNull( "optionMenuBorder", AbstractBorder.class, defaultOptionMenuBorder );
+		AbstractBorder optionMenuHoverBorder = getNonNull( "optionMenuHoverBorder", AbstractBorder.class, defaultOptionMenuHoverBorder );
 
 		Path2D.Double downPath = getOptionMenuArrowPaths()[3];
 		DPShape downArrow = arrowStyle.shape( downPath );

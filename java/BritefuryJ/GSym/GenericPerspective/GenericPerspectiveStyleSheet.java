@@ -13,7 +13,7 @@ import java.util.List;
 
 import BritefuryJ.AttributeTable.AttributeValues;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Border.Border;
+import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
@@ -31,7 +31,7 @@ public class GenericPerspectiveStyleSheet extends StyleSheet
 	private static final Paint defaultObjectFieldTitlePaint = new Color( 0.0f, 0.25f, 0.5f );
 	private static final double defaultObjectFieldIndentation = 5.0;
 	private static final double defaultObjectFieldSpacing = 2.0;
-	private static final Border defaultErrorBorder = new SolidBorder( 1.0, 3.0, 10.0, 10.0, new Color( 0.8f, 0.0f, 0.0f ), new Color( 1.0f, 0.9f, 0.9f ) );
+	private static final AbstractBorder defaultErrorBorder = new SolidBorder( 1.0, 3.0, 10.0, 10.0, new Color( 0.8f, 0.0f, 0.0f ), new Color( 1.0f, 0.9f, 0.9f ) );
 	private static final AttributeValues defaultStringEscapeAttrs = new AttributeValues( new String[] { "foreground", "background" },
 			new Object[] { new Color( 0.0f, 0.15f, 0.35f ), new FillPainter( new Color( 0.8f, 0.8f, 1.0f ) ) } );
 	
@@ -170,7 +170,7 @@ public class GenericPerspectiveStyleSheet extends StyleSheet
 		if ( errorStyleSheet == null )
 		{
 			PrimitiveStyleSheet primitive = getNonNull( "primitiveStyleSheet", PrimitiveStyleSheet.class, PrimitiveStyleSheet.instance );
-			Border border = getNonNull( "errorBorder", Border.class, defaultErrorBorder );
+			AbstractBorder border = getNonNull( "errorBorder", AbstractBorder.class, defaultErrorBorder );
 			errorStyleSheet = primitive.withBorder( border );
 		}
 		return errorStyleSheet;

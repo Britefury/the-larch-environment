@@ -19,7 +19,7 @@ import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
-public abstract class Border implements Presentable
+public abstract class AbstractBorder implements Presentable
 {
 	public abstract double getLeftMargin();
 	public abstract double getRightMargin();

@@ -10,7 +10,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPScript;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Script extends Pres
 {
@@ -52,8 +52,8 @@ public class Script extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		StyleSheetValues style = ctx.getStyle();
-		StyleSheetValues usedStyle = Primitive.useScriptParams( Primitive.useTextParams( style ) );
+		StyleValues style = ctx.getStyle();
+		StyleValues usedStyle = Primitive.useScriptParams( Primitive.useTextParams( style ) );
 		PresentationContext childCtx = null;
 		if ( leftSuper != null  ||  leftSub != null  ||  rightSuper != null  ||  rightSub != null )
 		{
@@ -83,7 +83,7 @@ public class Script extends Pres
 
 
 
-	private static StyleSheetValues scriptScriptChildStyle(StyleSheetValues style)
+	private static StyleValues scriptScriptChildStyle(StyleValues style)
 	{
 		double scale = style.get( Primitive.fontScale, Double.class );
 		double scriptScale = style.get( Primitive.scriptFontScale, Double.class );

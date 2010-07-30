@@ -19,6 +19,6 @@ public class Title extends RichParagraph
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		return presentParagraph( ctx.withStyle( RichText.titleTextStyle( ctx.getStyle() ) ) );
+		return presentParagraph( ctx.withStyleSheet( RichText.titleTextStyle( ctx.getStyle() ) ) );
 	}
 }

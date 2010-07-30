@@ -34,7 +34,7 @@ import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class TextEntry extends ControlPres
 {
@@ -216,7 +216,7 @@ public class TextEntry extends ControlPres
 		
 		private DPBorder outerElement;
 		private DPText textElement;
-		private BritefuryJ.DocPresent.Border.Border validBorder, invalidBorder;
+		private BritefuryJ.DocPresent.Border.AbstractBorder validBorder, invalidBorder;
 		private TextEntryListener listener;
 		private TextEntryValidator validator;
 		private String originalText;
@@ -224,7 +224,7 @@ public class TextEntry extends ControlPres
 	
 		
 		protected TextEntryControl(PresentationContext ctx, DPBorder outerElement, DPRegion frame, DPText textElement, TextEntryListener listener, TextEntryValidator validator,
-				BritefuryJ.DocPresent.Border.Border validBorder, BritefuryJ.DocPresent.Border.Border invalidBorder)
+				BritefuryJ.DocPresent.Border.AbstractBorder validBorder, BritefuryJ.DocPresent.Border.AbstractBorder invalidBorder)
 		{
 			super( ctx );
 			
@@ -354,9 +354,9 @@ public class TextEntry extends ControlPres
 	@Override
 	public Control createControl(PresentationContext ctx)
 	{
-		StyleSheetValues style = ctx.getStyle();
-		BritefuryJ.DocPresent.Border.Border validBorder = style.get( Controls.textEntryBorder, BritefuryJ.DocPresent.Border.Border.class ); 
-		BritefuryJ.DocPresent.Border.Border invalidBorder = style.get( Controls.textEntryInvalidBorder, BritefuryJ.DocPresent.Border.Border.class );
+		StyleValues style = ctx.getStyle();
+		BritefuryJ.DocPresent.Border.AbstractBorder validBorder = style.get( Controls.textEntryBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class ); 
+		BritefuryJ.DocPresent.Border.AbstractBorder invalidBorder = style.get( Controls.textEntryInvalidBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class );
 		
 		DPText textElement = (DPText)StyleSheet2.instance.withAttr( Primitive.editable, true ).applyTo( new Text( initialText ) ).present( ctx );
 		Pres line = new HBox( new Pres[] { new Segment( false, false, textElement ) } );

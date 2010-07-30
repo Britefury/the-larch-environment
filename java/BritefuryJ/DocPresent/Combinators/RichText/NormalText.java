@@ -19,6 +19,6 @@ public class NormalText extends RichParagraph
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		return presentParagraph( ctx.withStyle( RichText.normalTextStyle( ctx.getStyle() ) ) );
+		return presentParagraph( ctx.withStyleSheet( RichText.normalTextStyle( ctx.getStyle() ) ) );
 	}
 }

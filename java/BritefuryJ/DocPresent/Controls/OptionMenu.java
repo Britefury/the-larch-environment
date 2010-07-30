@@ -13,7 +13,7 @@ import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementInteractor;
-import BritefuryJ.DocPresent.Border.Border;
+import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
@@ -83,7 +83,7 @@ public class OptionMenu extends Control
 	
 
 	private DPBorder element;
-	private Border optionMenuBorder, optionMenuHoverBorder;
+	private AbstractBorder optionMenuBorder, optionMenuHoverBorder;
 	private DPBin choiceContainer;
 	private ArrayList<DPElement> optionChoices = new ArrayList<DPElement>();
 	private ArrayList<DPElement> menuChoices = new ArrayList<DPElement>();
@@ -93,7 +93,7 @@ public class OptionMenu extends Control
 	
 	
 	protected OptionMenu(DPBorder element, DPBin choiceContainer, List<DPElement> optionChoices, List<DPElement> menuChoices, int initialChoice, OptionMenuListener listener,
-			Border optionMenuBorder, Border optionMenuHoverBorder, ControlsStyleSheet styleSheet)
+			AbstractBorder optionMenuBorder, AbstractBorder optionMenuHoverBorder, ControlsStyleSheet styleSheet)
 	{
 		this.element = element;
 		this.optionMenuBorder = optionMenuBorder;

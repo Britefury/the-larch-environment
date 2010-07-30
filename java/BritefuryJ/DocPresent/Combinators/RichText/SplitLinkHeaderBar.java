@@ -38,7 +38,7 @@ public class SplitLinkHeaderBar extends Pres
 		double padding = ctx.getStyle().get( RichText.linkHeaderPadding, Double.class );
 		Pres left[] = mapPresentAsCombinators( ctx.withStyle( RichText.useBodyAttrs( ctx.getStyle() ) ), leftChildren );
 		Pres right[] = mapPresentAsCombinators( ctx.withStyle( RichText.useBodyAttrs( ctx.getStyle() ) ), rightChildren );
-		return higherOrderPresent( ctx, RichText.linkHeaderStyle( ctx.getStyle() ),
-				new Border( new HBox( new Pres[] { new HBox( left ).alignHLeft(), new HBox( right ).alignHRight() } ).alignHExpand()).alignHExpand().pad( padding, padding ) );
+		return RichText.linkHeaderStyle( ctx.getStyle() ).applyTo( 
+				new Border( new HBox( new Pres[] { new HBox( left ).alignHLeft(), new HBox( right ).alignHRight() } ).alignHExpand()).alignHExpand().pad( padding, padding ) ).present( ctx );
 	}
 }

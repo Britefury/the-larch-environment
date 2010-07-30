@@ -14,7 +14,7 @@ import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 import BritefuryJ.Math.Point2;
 
 public abstract class Pres
@@ -291,7 +291,7 @@ public abstract class Pres
 	}
 	
 	
-	protected static DPElement higherOrderPresent(PresentationContext ctx, StyleSheetValues style, Pres combinator)
+	protected static DPElement higherOrderPresent(PresentationContext ctx, StyleValues style, Pres combinator)
 	{
 		return combinator.present( ctx.withStyle( style ) );
 	}

@@ -20,7 +20,7 @@ import BritefuryJ.DocPresent.TextEditEventInsert;
 import BritefuryJ.DocPresent.TextEditEventRemove;
 import BritefuryJ.DocPresent.TextEditEventReplace;
 import BritefuryJ.DocPresent.TreeEventListener;
-import BritefuryJ.DocPresent.Border.Border;
+import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.Clipboard.TextEditHandler;
 import BritefuryJ.DocPresent.Marker.Marker;
@@ -205,7 +205,7 @@ public class TextEntry extends Control
 	
 	private DPBorder outerElement;
 	private DPText textElement;
-	private Border validBorder, invalidBorder;
+	private AbstractBorder validBorder, invalidBorder;
 	private TextEntryListener listener;
 	private TextEntryValidator validator;
 	private ControlsStyleSheet styleSheet;
@@ -213,13 +213,13 @@ public class TextEntry extends Control
 
 
 	
-	protected TextEntry(DPBorder outerElement, DPRegion frame, DPText textElement, TextEntryListener listener, ControlsStyleSheet styleSheet, Border validBorder, Border invalidBorder)
+	protected TextEntry(DPBorder outerElement, DPRegion frame, DPText textElement, TextEntryListener listener, ControlsStyleSheet styleSheet, AbstractBorder validBorder, AbstractBorder invalidBorder)
 	{
 		this( outerElement, frame, textElement, listener, (TextEntryValidator)null, styleSheet, validBorder, invalidBorder );
 	}
 	
 	
-	protected TextEntry(DPBorder outerElement, DPRegion frame, DPText textElement, TextEntryListener listener, TextEntryValidator validator, ControlsStyleSheet styleSheet, Border validBorder, Border invalidBorder)
+	protected TextEntry(DPBorder outerElement, DPRegion frame, DPText textElement, TextEntryListener listener, TextEntryValidator validator, ControlsStyleSheet styleSheet, AbstractBorder validBorder, AbstractBorder invalidBorder)
 	{
 		this.outerElement = outerElement;
 		this.textElement = textElement;
@@ -242,7 +242,7 @@ public class TextEntry extends Control
 	}
 	
 	protected TextEntry(DPBorder outerElement, DPRegion frame, DPText textElement, TextEntryListener listener, Pattern validationRegex, String validationFailMessage,
-			ControlsStyleSheet styleSheet, Border validBorder, Border invalidBorder)
+			ControlsStyleSheet styleSheet, AbstractBorder validBorder, AbstractBorder invalidBorder)
 	{
 		this( outerElement, frame, textElement, listener, new RegexTextEntryValidator( validationRegex, validationFailMessage ), styleSheet, validBorder, invalidBorder );
 	}

@@ -48,7 +48,7 @@ import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.DPViewport;
 import BritefuryJ.DocPresent.DPWhitespace;
-import BritefuryJ.DocPresent.Border.Border;
+import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Canvas.DrawingNode;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
@@ -84,7 +84,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 	
 	private static final Painter default_shapePainter = new FillPainter( Color.black );
 	
-	private static final Border default_border = new SolidBorder( 1.0, 2.0, Color.black, null );
+	private static final AbstractBorder default_border = new SolidBorder( 1.0, 2.0, Color.black, null );
 
 
 	
@@ -223,7 +223,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 	// BORDER
 	//
 	
-	public PrimitiveStyleSheet withBorder(Border border)
+	public PrimitiveStyleSheet withBorder(AbstractBorder border)
 	{
 		return (PrimitiveStyleSheet)withAttr( "border", border );
 	}
@@ -432,9 +432,9 @@ public class PrimitiveStyleSheet extends StyleSheet
 	
 	private static class BorderParams
 	{
-		public Border border;
+		public AbstractBorder border;
 		
-		public BorderParams(Border border)
+		public BorderParams(AbstractBorder border)
 		{
 			this.border = border;
 		}
@@ -447,7 +447,7 @@ public class PrimitiveStyleSheet extends StyleSheet
 		if ( borderParams == null )
 		{
 			borderParams = new BorderParams(
-					get( "border", Border.class, default_border ) );
+					get( "border", AbstractBorder.class, default_border ) );
 		}
 		return borderParams;
 	}

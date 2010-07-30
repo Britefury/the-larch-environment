@@ -31,7 +31,6 @@ public class Page extends SequentialPres
 	public DPElement present(PresentationContext ctx)
 	{
 		Pres xs[] = mapPresentAsCombinators( ctx.withStyle( RichText.usePageAttrs( ctx.getStyle() ) ), children );
-		return higherOrderPresent( ctx, RichText.pageStyle( ctx.getStyle() ),
-				new VBox( xs ).alignHExpand() );
+		return RichText.pageStyle( ctx.getStyle() ).applyTo( new VBox( xs ).alignHExpand() ).present( ctx );
 	}
 }

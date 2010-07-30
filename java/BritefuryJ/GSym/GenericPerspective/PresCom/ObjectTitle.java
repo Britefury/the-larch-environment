@@ -4,21 +4,29 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.DocPresent.Combinators.RichText;
+package BritefuryJ.GSym.GenericPerspective.PresCom;
 
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
-public class Heading4 extends RichParagraph
+public class ObjectTitle extends Pres
 {
-	public Heading4(String text)
+	private String title;
+	
+	
+	public ObjectTitle(String title)
 	{
-		super( text );
+		this.title = title;
 	}
-
+	
+	
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		return presentParagraph( ctx.withStyleSheet( RichText.h4TextStyle( ctx.getStyle() ) ) );
+		StyleSheet2 style = ctx.getStyle().get( GenericStyle.objectTitleAttrs, StyleSheet2.class );
+		return style.applyTo( new StaticText( title ) ).present( ctx );
 	}
 }

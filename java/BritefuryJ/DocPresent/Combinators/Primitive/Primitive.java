@@ -16,7 +16,7 @@ import BritefuryJ.AttributeTable.AttributeTable2;
 import BritefuryJ.AttributeTable.DerivedValueTable;
 import BritefuryJ.AttributeTable.InheritedAttribute;
 import BritefuryJ.AttributeTable.InheritedAttributeNonNull;
-import BritefuryJ.DocPresent.Border.Border;
+import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.Painter.Painter;
@@ -32,7 +32,7 @@ import BritefuryJ.DocPresent.StyleParams.ShapeStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
 import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Primitive
 {
@@ -41,7 +41,7 @@ public class Primitive
 	public static final InheritedAttributeNonNull fontItalic = new InheritedAttributeNonNull( "primitive", "fontItalic", Boolean.class, false );
 	public static final InheritedAttributeNonNull fontSize = new InheritedAttributeNonNull( "primitive", "fontSize", Integer.class, 14 );
 	public static final InheritedAttributeNonNull fontScale = new InheritedAttributeNonNull( "primitive", "fontScale", Double.class, 1.0 );
-	public static final InheritedAttributeNonNull border = new InheritedAttributeNonNull( "primitive", "border", Border.class, new SolidBorder( 1.0, 2.0, Color.black, null ) );
+	public static final InheritedAttributeNonNull border = new InheritedAttributeNonNull( "primitive", "border", AbstractBorder.class, new SolidBorder( 1.0, 2.0, Color.black, null ) );
 	public static final Attribute background = new Attribute( "primitive", "background", Painter.class, null );
 	public static final Attribute hoverBackground = new Attribute( "primitive", "hoverBackground", Painter.class, null );
 	public static final InheritedAttribute cursor = new InheritedAttribute( "primitive", "cursor", Cursor.class, null );
@@ -88,19 +88,19 @@ public class Primitive
 		}
 	};
 	
-	protected static StyleSheetValues useFont(StyleSheetValues style)
+	protected static StyleValues useFont(StyleValues style)
 	{
 		return style.useAttr( fontFace ).useAttr( fontBold ).useAttr( fontItalic ).useAttr( fontSize ).useAttr( fontScale );
 	}
 
 	
 	
-	protected static Border getBorderParams(StyleSheetValues style)
+	protected static AbstractBorder getBorderParams(StyleValues style)
 	{
-		return style.get( border, Border.class );
+		return style.get( border, AbstractBorder.class );
 	}
 	
-	protected static StyleSheetValues useBorderParams(StyleSheetValues style)
+	protected static StyleValues useBorderParams(StyleValues style)
 	{
 		return style.useAttr( border );
 	}
@@ -118,7 +118,7 @@ public class Primitive
 		}
 	};
 	
-	protected static StyleSheetValues useContainerParams(StyleSheetValues style)
+	protected static StyleValues useContainerParams(StyleValues style)
 	{
 		return style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor );
 	}
@@ -136,7 +136,7 @@ public class Primitive
 		}
 	};
 
-	protected static StyleSheetValues useContentLeafParams(StyleSheetValues style)
+	protected static StyleValues useContentLeafParams(StyleValues style)
 	{
 		return style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor );
 	}
@@ -158,7 +158,7 @@ public class Primitive
 		}
 	};
 	
-	protected static StyleSheetValues useFractionParams(StyleSheetValues style)
+	protected static StyleValues useFractionParams(StyleValues style)
 	{
 		return style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
 				.useAttr( fractionVSpacing ).useAttr( fractionHPadding ).useAttr( fractionRefYOffset );
@@ -180,7 +180,7 @@ public class Primitive
 		}
 	};
 	
-	protected static StyleSheetValues useFractionBarParams(StyleSheetValues style)
+	protected static StyleValues useFractionBarParams(StyleValues style)
 	{
 		return style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
 				.useAttr( editable ).useAttr( foreground ).useAttr( hoverForeground );
@@ -199,7 +199,7 @@ public class Primitive
 		}
 	};
 	
-	protected static StyleSheetValues useGridRowParams(StyleSheetValues style)
+	protected static StyleValues useGridRowParams(StyleValues style)
 	{
 		return style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor );
 	}
@@ -218,7 +218,7 @@ public class Primitive
 		}
 	};
 	
-	protected static StyleSheetValues useHBoxParams(StyleSheetValues style)
+	protected static StyleValues useHBoxParams(StyleValues style)
 	{
 		return style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor ).useAttr( hboxSpacing );
 	}
@@ -240,7 +240,7 @@ public class Primitive
 		}
 	};
 	
-	protected static StyleSheetValues useMathRootParams(StyleSheetValues style)
+	protected static StyleValues useMathRootParams(StyleValues style)
 	{
 		return useFont( style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
 				.useAttr( foreground ).useAttr( hoverForeground ).useAttr( mathRootThickness ) );
@@ -262,7 +262,7 @@ public class Primitive
 		}
 	};
 	
-	protected static StyleSheetValues useParagraphParams(StyleSheetValues style)
+	protected static StyleValues useParagraphParams(StyleValues style)
 	{
 		return style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
 				.useAttr( paragraphSpacing ).useAttr( paragraphLineSpacing ).useAttr( paragraphIndentation );
@@ -283,7 +283,7 @@ public class Primitive
 		}
 	};
 	
-	protected static StyleSheetValues useShapeParams(StyleSheetValues style)
+	protected static StyleValues useShapeParams(StyleValues style)
 	{
 		return style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor ).useAttr( shapePainter ).useAttr( hoverShapePainter );
 	}
@@ -303,7 +303,7 @@ public class Primitive
 		}
 	};
 	
-	protected static StyleSheetValues useScriptParams(StyleSheetValues style)
+	protected static StyleValues useScriptParams(StyleValues style)
 	{
 		return style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor ).useAttr( scriptColumnSpacing ).useAttr( scriptRowSpacing );
 	}
@@ -327,7 +327,7 @@ public class Primitive
 		}
 	};
 	
-	protected static StyleSheetValues useStaticTextParams(StyleSheetValues style)
+	protected static StyleValues useStaticTextParams(StyleValues style)
 	{
 		return useFont( style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
 				.useAttr( foreground ).useAttr( hoverForeground ).useAttr( textSquiggleUnderlinePaint ).useAttr( textSmallCaps ) );
@@ -352,7 +352,7 @@ public class Primitive
 		}
 	};
 	
-	protected static StyleSheetValues useLabelTextParams(StyleSheetValues style)
+	protected static StyleValues useLabelTextParams(StyleValues style)
 	{
 		return useFont( style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
 				.useAttr( foreground ).useAttr( hoverForeground ).useAttr( textSquiggleUnderlinePaint ).useAttr( textSmallCaps ) );
@@ -377,7 +377,7 @@ public class Primitive
 		}
 	};
 	
-	protected static StyleSheetValues useTextParams(StyleSheetValues style)
+	protected static StyleValues useTextParams(StyleValues style)
 	{
 		return useFont( style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
 				.useAttr( editable ).useAttr( foreground ).useAttr( hoverForeground ).useAttr( textSquiggleUnderlinePaint )
@@ -401,7 +401,7 @@ public class Primitive
 		}
 	};
 	
-	protected static StyleSheetValues useTableParams(StyleSheetValues style)
+	protected static StyleValues useTableParams(StyleValues style)
 	{
 		return style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
 				.useAttr( tableColumnSpacing ).useAttr( tableColumnExpand ).useAttr( tableRowSpacing ).useAttr( tableRowExpand );
@@ -421,14 +421,14 @@ public class Primitive
 		}
 	};
 	
-	protected static StyleSheetValues useVBoxParams(StyleSheetValues style)
+	protected static StyleValues useVBoxParams(StyleValues style)
 	{
 		return style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor ).useAttr( vboxSpacing );
 	}
 	
 	
 	
-	public static boolean isEditable(StyleSheetValues style)
+	public static boolean isEditable(StyleValues style)
 	{
 		return style.get( editable, Boolean.class );
 	}

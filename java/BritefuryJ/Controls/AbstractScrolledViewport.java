@@ -16,7 +16,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Spacer;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Combinators.Primitive.Viewport;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheetValues;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 import BritefuryJ.DocPresent.Util.Range;
 
 abstract class AbstractScrolledViewport extends ControlPres
@@ -92,7 +92,7 @@ abstract class AbstractScrolledViewport extends ControlPres
 	@Override
 	public Control createControl(PresentationContext ctx)
 	{
-		StyleSheetValues style = ctx.getStyle();
+		StyleValues style = ctx.getStyle();
 		double scrollBarSize = style.get( Controls.scrollBarSize, Double.class );
 
 		Range xRange = new Range( 0.0, 1.0, 0.0, 1.0, 0.1 );

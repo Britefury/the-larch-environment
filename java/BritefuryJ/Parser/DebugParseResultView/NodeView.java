@@ -18,7 +18,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.FragmentContext;
-import BritefuryJ.DocPresent.Border.Border;
+import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
@@ -119,9 +119,9 @@ public class NodeView implements FragmentContext
 	static PrimitiveStyleSheet valueStyle = styleSheet.withFontSize( 16 );
 	static PrimitiveStyleSheet failStyle = styleSheet.withFontItalic( true ).withFontSize( 16 ).withForeground( new Color( 0.5f, 0.0f, 0.0f ) );;
 	
-	static Border titleSuccessBorder = new FilledBorder( 0.0, 0.0, 0.0, 0.0, new Color( 0.85f, 0.95f, 0.85f ) );
-	static Border titleFailBorder = new FilledBorder( 0.0, 0.0, 0.0, 0.0, new Color( 1.0f, 0.85f, 0.85f ) );
-	static Border nodeBorder = new SolidBorder( 1.0, 1.0, Color.black, null );
+	static AbstractBorder titleSuccessBorder = new FilledBorder( 0.0, 0.0, 0.0, 0.0, new Color( 0.85f, 0.95f, 0.85f ) );
+	static AbstractBorder titleFailBorder = new FilledBorder( 0.0, 0.0, 0.0, 0.0, new Color( 1.0f, 0.85f, 0.85f ) );
+	static AbstractBorder nodeBorder = new SolidBorder( 1.0, 1.0, Color.black, null );
 	
 	
 	
@@ -243,7 +243,7 @@ public class NodeView implements FragmentContext
 	{
 		DPElement titleElement = makeTitleElement( data );
 		
-		Border b = data.getResult().isValid()  ?  titleSuccessBorder  :  titleFailBorder;
+		AbstractBorder b = data.getResult().isValid()  ?  titleSuccessBorder  :  titleFailBorder;
 		
 		return styleSheet.withBorder( b ).border( titleElement.alignVCentre() );
 	}
