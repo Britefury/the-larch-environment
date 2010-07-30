@@ -30,7 +30,7 @@ public class LineBreakCostSpan extends SequentialPres
 	public DPElement present(PresentationContext ctx)
 	{
 		DPLineBreakCostSpan element = new DPLineBreakCostSpan( Primitive.containerParams.get( ctx.getStyle() ) );
-		element.setChildren( mapPresent( ctx.withStyle( Primitive.useContainerParams( ctx.getStyle() ) ), children ) );
+		element.setChildren( mapPresent( ctx.withStyle( Primitive.useContainerParams.get( ctx.getStyle() ) ), children ) );
 		return element;
 	}
 }

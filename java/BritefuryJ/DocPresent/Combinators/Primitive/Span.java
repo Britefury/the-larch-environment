@@ -30,7 +30,7 @@ public class Span extends SequentialPres
 	public DPElement present(PresentationContext ctx)
 	{
 		DPSpan element = new DPSpan( Primitive.containerParams.get( ctx.getStyle() ) );
-		element.setChildren( mapPresent( ctx.withStyle( Primitive.useContainerParams( ctx.getStyle() ) ), children ) );
+		element.setChildren( mapPresent( ctx.withStyle( Primitive.useContainerParams.get( ctx.getStyle() ) ), children ) );
 		return element;
 	}
 }

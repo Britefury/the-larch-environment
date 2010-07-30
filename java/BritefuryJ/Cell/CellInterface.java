@@ -12,11 +12,15 @@ import java.awt.Color;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
+import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
+import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
 import BritefuryJ.GSym.View.GSymFragmentView;
-import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
+import BritefuryJ.Incremental.IncrementalOwner;
 
 
 
@@ -36,13 +40,13 @@ public abstract class CellInterface implements IncrementalOwner, Presentable
 	
 	
 	@Override
-	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
 	{
-		DPElement valueView = fragment.presentFragment( getValue(), styleSheet, inheritedState );
+		DPElement valueView = fragment.presentFragment( getValue(), StyleSheet.instance, inheritedState );
 		
-		return cellStyle.objectBox( getClass().getName(), valueView );
+		return cellStyle.applyTo( new ObjectBox( getClass().getName(), valueView ) );
 	}
 	
 	
-	private static GenericPerspectiveStyleSheet cellStyle = GenericPerspectiveStyleSheet.instance.withObjectBorderPaint( new Color( 0.5f, 0.0f, 0.5f ) ).withObjectTitlePaint( new Color( 0.5f, 0.0f, 0.5f ) );
+	private static StyleSheet2 cellStyle = StyleSheet2.instance.withAttr( GenericStyle.objectBorderPaint, new Color( 0.5f, 0.0f, 0.5f ) ).withAttr( GenericStyle.objectTitlePaint, new Color( 0.5f, 0.0f, 0.5f ) );
 }

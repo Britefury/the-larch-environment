@@ -46,7 +46,7 @@ public class VBox extends AbstractBox
 	public DPElement present(PresentationContext ctx)
 	{
 		DPVBox element = new DPVBox( Primitive.vboxParams.get( ctx.getStyle() ) );
-		element.setChildren( mapPresent( ctx.withStyle( Primitive.useContainerParams( ctx.getStyle() ) ), children ) );
+		element.setChildren( mapPresent( ctx.withStyle( Primitive.useContainerParams.get( ctx.getStyle() ) ), children ) );
 		if ( refPointIndex != -1 )
 		{
 			element.setRefPointIndex( refPointIndex );

@@ -9,14 +9,16 @@ package BritefuryJ.DocPresent.Border;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.LinearGradientPaint;
-import java.awt.Paint;
 
 import BritefuryJ.AttributeTable.AttributeTable;
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Border;
+import BritefuryJ.DocPresent.Combinators.Primitive.Box;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Painter.FilledOutlinePainter;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
+import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
 public abstract class AbstractBorder implements Presentable
@@ -32,27 +34,30 @@ public abstract class AbstractBorder implements Presentable
 	
 	
 	
-	protected DPElement presentationSwatch()
+	protected Pres presentationSwatch()
 	{
-		return getSwatchStyle().box( 50.0, 25.0 );
+		return getSwatchStyle().applyTo( new Box( 50.0, 25.0 ) );
 	}
 	
 
 	@Override
-	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
 	{
-		return styleSheet.objectBox( getClass().getName(), PrimitiveStyleSheet.instance.withBorder( this ).border( presentationSwatch() ) );
+		return new ObjectBox( getClass().getName(), StyleSheet2.instance.withAttr( Primitive.border, this ).applyTo( new Border( presentationSwatch() ) ) );
 	}
 	
 	
-	private static PrimitiveStyleSheet _swatchStyle = null;
-	private static PrimitiveStyleSheet getSwatchStyle()
+	// We have to initialise this style sheet on request, otherwise we can end up with a circular class initialisation problem
+	private static StyleSheet2 _swatchStyle = null;
+	
+	private static StyleSheet2 getSwatchStyle()
 	{
 		if ( _swatchStyle == null )
 		{
-			Paint fillPaint = new LinearGradientPaint( 0.0f, 0.0f, 50.0f, 25.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 73, 69, 94 ), new Color( 24, 5, 7 ) } );
-			Paint outlinePaint = new LinearGradientPaint( 0.0f, 0.0f, 50.0f, 25.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 98, 95, 115 ), new Color( 126, 125, 135 ) } );
-			_swatchStyle = PrimitiveStyleSheet.instance.withShapePainter( new FilledOutlinePainter( fillPaint, outlinePaint ) );
+			_swatchStyle = StyleSheet2.instance.withAttr( Primitive.shapePainter, 
+					new FilledOutlinePainter(
+							new LinearGradientPaint( 0.0f, 0.0f, 50.0f, 25.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 73, 69, 94 ), new Color( 24, 5, 7 ) } ),
+							new LinearGradientPaint( 0.0f, 0.0f, 50.0f, 25.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 98, 95, 115 ), new Color( 126, 125, 135 ) } ) ) );
 		}
 		return _swatchStyle;
 	}

@@ -27,7 +27,7 @@ public class Border extends Pres
 	public DPElement present(PresentationContext ctx)
 	{
 		DPBorder bin = new DPBorder( Primitive.getBorderParams( ctx.getStyle() ) );
-		bin.setChild( child.present( ctx.withStyle( Primitive.useBorderParams( ctx.getStyle() ) ) ).layoutWrap() );
+		bin.setChild( child.present( ctx.withStyle( Primitive.useBorderParams.get( ctx.getStyle() ) ) ).layoutWrap() );
 		return bin;
 	}
 }

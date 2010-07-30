@@ -26,7 +26,7 @@ public class ObjectTitle extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		StyleSheet2 style = ctx.getStyle().get( GenericStyle.objectTitleAttrs, StyleSheet2.class );
+		StyleSheet2 style = GenericStyle.objectTitleStyle.get( ctx.getStyle() );
 		return style.applyTo( new StaticText( title ) ).present( ctx );
 	}
 }

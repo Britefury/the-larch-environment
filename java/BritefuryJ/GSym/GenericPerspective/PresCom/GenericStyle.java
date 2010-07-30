@@ -27,8 +27,9 @@ public class GenericStyle
 	public static final InheritedAttributeNonNull objectBorderRounding = new InheritedAttributeNonNull( "genericPerspective", "objectBorderRounding", Double.class, 5.0 );
 	public static final InheritedAttributeNonNull objectBorderPaint = new InheritedAttributeNonNull( "genericPerspective", "objectBorderPaint", Paint.class, new Color( 0.35f, 0.35f, 0.35f ) );
 	public static final InheritedAttribute objectBorderBackground = new InheritedAttribute( "genericPerspective", "objectBorderBackground", Paint.class, null );
+	public static final InheritedAttributeNonNull objectTitlePaint = new InheritedAttributeNonNull( "genericPerspective", "objectTitlePaint", Paint.class, new Color( 0.35f, 0.35f, 0.35f ) );
 	public static final InheritedAttributeNonNull objectTitleAttrs = new InheritedAttributeNonNull( "genericPerspective", "objectTitleAttrs", StyleSheet2.class,
-			StyleSheet2.instance.withAttr( Primitive.fontFace, "Sans serif" ).withAttr( Primitive.fontSize, 10 ).withAttr( Primitive.foreground, new Color( 0.35f, 0.35f, 0.35f ) ) );
+			StyleSheet2.instance.withAttr( Primitive.fontFace, "Sans serif" ).withAttr( Primitive.fontSize, 10 ) );
 	public static final InheritedAttributeNonNull objectContentPadding = new InheritedAttributeNonNull( "genericPerspective", "objectContentPadding", Double.class, 5.0 );
 	public static final InheritedAttributeNonNull objectFieldSpacing = new InheritedAttributeNonNull( "genericPerspective", "objectFieldSpacing", Double.class, 2.0 );
 	public static final InheritedAttributeNonNull objectFieldIndentation = new InheritedAttributeNonNull( "genericPerspective", "objectFieldIndentation", Double.class, 5.0 );
@@ -42,6 +43,16 @@ public class GenericStyle
 			StyleSheet2.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.15f, 0.35f ) ).withAttr( Primitive.background, new FillPainter( new Color( 0.8f, 0.8f, 1.0f ) ) ) );
 
 
+	
+	protected static DerivedValueTable<StyleSheet2> objectTitleStyle = new DerivedValueTable<StyleSheet2>()
+	{
+		protected StyleSheet2 evaluate(AttributeTable2 attribs)
+		{
+			StyleSheet2 attrs = attribs.get( objectTitleAttrs, StyleSheet2.class );
+			Paint paint = attribs.get( objectTitlePaint, Paint.class );
+			return StyleSheet2.instance.withAttrs( attrs ).withAttr( Primitive.foreground, paint );
+		}
+	};
 	
 	protected static DerivedValueTable<StyleSheet2> objectBorderStyle = new DerivedValueTable<StyleSheet2>()
 	{

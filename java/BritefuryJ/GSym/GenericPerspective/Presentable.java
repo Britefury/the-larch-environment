@@ -7,10 +7,10 @@
 package BritefuryJ.GSym.GenericPerspective;
 
 import BritefuryJ.AttributeTable.AttributeTable;
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
 public interface Presentable
 {
-	public DPElement present(GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState);
+	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState);
 }

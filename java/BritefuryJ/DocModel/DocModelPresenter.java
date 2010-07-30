@@ -11,18 +11,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.AttributeTable;
-import BritefuryJ.AttributeTable.AttributeValues;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.ElementFactory;
-import BritefuryJ.DocPresent.ListView.ListViewStyleSheet;
-import BritefuryJ.DocPresent.ListView.ParagraphListViewLayoutStyleSheet;
-import BritefuryJ.DocPresent.ListView.SeparatorElementFactory;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.Span;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.Combinators.Sequence.ParagraphSequenceView;
+import BritefuryJ.DocPresent.Combinators.Sequence.VerticalInlineSequenceView;
+import BritefuryJ.DocPresent.Combinators.Sequence.VerticalSequenceView;
 import BritefuryJ.DocPresent.ListView.TrailingSeparator;
-import BritefuryJ.DocPresent.ListView.VerticalInlineListViewLayoutStyleSheet;
-import BritefuryJ.DocPresent.ListView.VerticalListViewLayoutStyleSheet;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
+import BritefuryJ.GSym.GenericPerspective.PresCom.UnescapedStringAsHBox;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
 public class DocModelPresenter
@@ -34,130 +35,77 @@ public class DocModelPresenter
 	}
 
 
-	private static final PrimitiveStyleSheet defaultStyle = PrimitiveStyleSheet.instance.withFontFace( "Sans serif" ).withFontSize( 14 ).withForeground( Color.black ).withParagraphIndentation( 60.0 );
+	private static final StyleSheet2 defaultStyle = StyleSheet2.instance.withAttr( Primitive.fontFace, "Sans serif" ).withAttr( Primitive.fontSize, 14 )
+		.withAttr( Primitive.foreground, Color.black ).withAttr( Primitive.paragraphIndentation, 60.0 );
 
-	private static final PrimitiveStyleSheet nullStyle = defaultStyle.withFontItalic( true ).withForeground( new Color( 0.5f, 0.0f, 0.25f ) );
+	private static final StyleSheet2 nullStyle = defaultStyle.withAttr( Primitive.fontItalic, true ).withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.25f ) );
 
-	private static final GenericPerspectiveStyleSheet stringStyle = GenericPerspectiveStyleSheet.instance.withPrimitiveStyleSheet( defaultStyle ).withStringContentAttrs(
-			new AttributeValues( new String[] { "foreground" }, new Object[] { new Color( 0.0f, 0.25f, 0.5f ) } ) );
+	private static final StyleSheet2 stringStyle = defaultStyle.withAttr( GenericStyle.stringContentStyle, StyleSheet2.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.25f, 0.5f ) ) );
 	
-	private static final PrimitiveStyleSheet punctuationStyle = defaultStyle.withForeground( new Color( 0.0f, 0.0f, 1.0f ) );
+	private static final StyleSheet2 punctuationStyle = defaultStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 1.0f ) );
 
-	private static final PrimitiveStyleSheet classNameStyle = defaultStyle.withForeground( new Color( 0.0f, 0.5f, 0.0f ) );
+	private static final StyleSheet2 classNameStyle = defaultStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
 
-	private static final PrimitiveStyleSheet fieldNameStyle = defaultStyle.withForeground( new Color( 0.5f, 0.0f, 0.25f ) );
+	private static final StyleSheet2 fieldNameStyle = defaultStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.25f ) );
 
 	
 	
-	private static final SeparatorElementFactory spaceFactory = new SeparatorElementFactory()
-	{
-		public DPElement createElement(StyleSheet styleSheet, int index, DPElement child)
-		{
-			return ((PrimitiveStyleSheet)styleSheet).staticText( " " );
-		}
-	};
-	
-	private static final ElementFactory openBracketFactory = new ElementFactory()
-	{
-		public DPElement createElement(StyleSheet styleSheet)
-		{
-			return punctuationStyle.staticText( "[" );
-		}
-	};
-
-	private static final ElementFactory closeBracketFactory = new ElementFactory()
-	{
-		public DPElement createElement(StyleSheet styleSheet)
-		{
-			return punctuationStyle.staticText( "]" );
-		}
-	};
-
-	private static final ElementFactory openParenFactory = new ElementFactory()
-	{
-		public DPElement createElement(StyleSheet styleSheet)
-		{
-			return punctuationStyle.staticText( "(" );
-		}
-	};
-
-	private static final ElementFactory closeParenFactory = new ElementFactory()
-	{
-		public DPElement createElement(StyleSheet styleSheet)
-		{
-			return punctuationStyle.staticText( ")" );
-		}
-	};
-
-
-
-	private static final ParagraphListViewLayoutStyleSheet paragraph_listViewLayout = ParagraphListViewLayoutStyleSheet.instance.withAddParagraphIndentMarkers( true );
-	private static final VerticalInlineListViewLayoutStyleSheet verticalInline_listViewLayout = VerticalInlineListViewLayoutStyleSheet.instance.withIndentation( 30.0 );
-	private static final VerticalListViewLayoutStyleSheet vertical_listViewLayout = VerticalListViewLayoutStyleSheet.instance.withIndentation( 30.0 );
-
-	private static final ListViewStyleSheet _listviewStyle = ListViewStyleSheet.instance.withSeparatorFactory( spaceFactory ).withBeginDelimFactory( openBracketFactory ).withEndDelimFactory( closeBracketFactory );
-
-	private static final ListViewStyleSheet _objectviewStyle = ListViewStyleSheet.instance.withSeparatorFactory( spaceFactory ).withBeginDelimFactory( openParenFactory ).withEndDelimFactory( closeParenFactory );;
-
-	private static final ListViewStyleSheet paragraph_listViewStyle = _listviewStyle.withListLayout( paragraph_listViewLayout );
-	private static final ListViewStyleSheet vertical_listViewStyle = _listviewStyle.withListLayout( vertical_listViewLayout );
-
-	private static final ListViewStyleSheet paragraph_objectViewStyle = _objectviewStyle.withListLayout( paragraph_listViewLayout );
-	private static final ListViewStyleSheet verticalInline_objectViewStyle = _objectviewStyle.withListLayout( verticalInline_listViewLayout );
+	private static final Pres space = new StaticText( " " );
+	private static final Pres openBracket = punctuationStyle.applyTo( new StaticText( "[" ) );
+	private static final Pres closeBracket = punctuationStyle.applyTo( new StaticText( "]" ) );
+	private static final Pres openParen = punctuationStyle.applyTo( new StaticText( "(" ) );
+	private static final Pres closeParen = punctuationStyle.applyTo( new StaticText( ")" ) );
 
 
 	
-	private static DPElement present(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+	private static Pres present(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 	{
 		if ( x == null )
 		{
-			return nullStyle.staticText( "<null>" );
+			return nullStyle.applyTo( new StaticText( "<null>" ) );
 		}
 		else if ( x instanceof String )
 		{
-			return stringStyle.unescapedStringAsHBox( (String )x );
+			return stringStyle.applyTo( new UnescapedStringAsHBox( (String )x ) );
 		}
 		else
 		{
-			return ctx.presentFragment( x, styleSheet, state );
+			return Pres.elementToPres( fragment.presentFragment( x, StyleSheet.instance, inheritedState ) );
 		}
 	}
 	
-	protected static DPElement presentDMList(DMList node, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+	protected static Pres presentDMList(DMList node, GSymFragmentView fragment, AttributeTable inheritedState)
 	{
-		List<DPElement> xViews = new ArrayList<DPElement>();
+		List<Object> xViews = new ArrayList<Object>();
 		for (Object x: node)
 		{
-			xViews.add( present( x, ctx, styleSheet, state ) );
+			xViews.add( present( x, fragment, inheritedState ) );
 		}
 		
 		// Check the contents, to determine the layout
 		// Default: horizontal (paragraph layout)
-		ListViewStyleSheet listViewStyleSheet = paragraph_listViewStyle;
 		if ( node.size() > 0 )
 		{
 			for (Object x: node )
 			{
 				if ( !(x instanceof String) )
 				{
-					listViewStyleSheet = vertical_listViewStyle;
-					break;
+					return new VerticalSequenceView( xViews, openBracket, closeBracket, null, space, TrailingSeparator.NEVER );
 				}
 			}
 		}
 		
 		// Create a list view
-		return listViewStyleSheet.createListElement( xViews, TrailingSeparator.NEVER );
+		return new ParagraphSequenceView( xViews, openBracket, closeBracket, null, space, TrailingSeparator.NEVER );
 	}
 	
 	
-	protected static DPElement presentDMObject(DMObject node, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+	protected static Pres presentDMObject(DMObject node, GSymFragmentView fragment, AttributeTable inheritedState)
 	{
 		DMObjectClass cls = node.getDMObjectClass();
 		
 		// Check the contents, to determine the layout
 		// Default: horizontal (paragraph layout)
-		ListViewStyleSheet listViewStyleSheet = paragraph_listViewStyle;
 		ObjectPresentMode mode = ObjectPresentMode.HORIZONTAL;
 		for (int i = 0; i < cls.getNumFields(); i++)
 		{
@@ -174,21 +122,21 @@ public class DocModelPresenter
 		}
 		
 		// Header
-		DPElement className;
+		Pres className;
 		if ( mode == ObjectPresentMode.HORIZONTAL )
 		{
-			className = defaultStyle.span( new DPElement[] { classNameStyle.staticText( cls.getName() ), defaultStyle.staticText( " " ), punctuationStyle.staticText( ":" ) } );
+			className = defaultStyle.applyTo( new Span( new Object[] { classNameStyle.applyTo( new StaticText( cls.getName() ) ), new StaticText( " " ), punctuationStyle.applyTo( new StaticText( ":" ) ) } ) );
 		}
 		else if ( mode == ObjectPresentMode.VERTICALINLINE )
 		{
-			className = defaultStyle.paragraph( new DPElement[] { classNameStyle.staticText( cls.getName() ), defaultStyle.staticText( " " ), punctuationStyle.staticText( ":" ) } );
+			className = defaultStyle.applyTo( new Paragraph( new Object[] { classNameStyle.applyTo( new StaticText( cls.getName() ) ), new StaticText( " " ), punctuationStyle.applyTo( new StaticText( ":" ) ) } ) );
 		}
 		else
 		{
 			throw new RuntimeException( "Invalid mode" );
 		}
 		
-		ArrayList<DPElement> itemViews = new ArrayList<DPElement>();
+		ArrayList<Object> itemViews = new ArrayList<Object>();
 		itemViews.add( className );
 		// Create views of each item
 		for (int i = 0; i < cls.getNumFields(); i++)
@@ -197,14 +145,16 @@ public class DocModelPresenter
 			String fieldName = cls.getField( i ).getName();
 			if ( value != null )
 			{
-				DPElement line;
+				Pres line;
 				if ( mode == ObjectPresentMode.HORIZONTAL )
 				{
-					line = defaultStyle.span( new DPElement[] { fieldNameStyle.staticText( fieldName ), punctuationStyle.staticText( "=" ), present( value, ctx, styleSheet, state ) } );
+					line = defaultStyle.applyTo( new Span( new Object[] { fieldNameStyle.applyTo( new StaticText( fieldName ) ), punctuationStyle.applyTo( new StaticText( "=" ) ),
+							 present( value, fragment, inheritedState ) } ) );
 				}
 				else if ( mode == ObjectPresentMode.VERTICALINLINE )
 				{
-					line = defaultStyle.paragraph( new DPElement[] { fieldNameStyle.staticText( fieldName ), punctuationStyle.staticText( "=" ), present( value, ctx, styleSheet, state ) } );
+					line = defaultStyle.applyTo( new Paragraph( new Object[] { fieldNameStyle.applyTo( new StaticText( fieldName ) ), punctuationStyle.applyTo( new StaticText( "=" ) ),
+							 present( value, fragment, inheritedState ) } ) );
 				}
 				else
 				{
@@ -217,19 +167,16 @@ public class DocModelPresenter
 		// Create the layout
 		if ( mode == ObjectPresentMode.HORIZONTAL )
 		{
-			listViewStyleSheet = paragraph_objectViewStyle;
+			return new ParagraphSequenceView( itemViews, openParen, closeParen, null, space, TrailingSeparator.NEVER );
 		}
 		else if ( mode == ObjectPresentMode.VERTICALINLINE )
 		{
-			listViewStyleSheet = verticalInline_objectViewStyle;
+			return new VerticalInlineSequenceView( itemViews, openParen, closeParen, null, space, TrailingSeparator.NEVER );
 		}
 		else
 		{
 			throw new RuntimeException( "Invalid mode" );
 		}
-		
-		// Create a list view
-		return listViewStyleSheet.createListElement( itemViews, TrailingSeparator.NEVER );
 	}
 
 }

@@ -49,7 +49,7 @@ public class IntCellEditorSpinEntry extends LiteralCellEditor
 			}
 			else
 			{
-				error( "not a string" );
+				error( "not an integer number" );
 			}
 		}
 	};

@@ -88,10 +88,13 @@ public class Primitive
 		}
 	};
 	
-	protected static StyleValues useFont(StyleValues style)
+	protected static DerivedValueTable<StyleValues> useFont = new DerivedValueTable<StyleValues>()
 	{
-		return style.useAttr( fontFace ).useAttr( fontBold ).useAttr( fontItalic ).useAttr( fontSize ).useAttr( fontScale );
-	}
+		protected StyleValues evaluate(AttributeTable2 style)
+		{
+			return (StyleValues)style.useAttr( fontFace ).useAttr( fontBold ).useAttr( fontItalic ).useAttr( fontSize ).useAttr( fontScale );
+		}
+	};
 
 	
 	
@@ -100,10 +103,13 @@ public class Primitive
 		return style.get( border, AbstractBorder.class );
 	}
 	
-	protected static StyleValues useBorderParams(StyleValues style)
+	protected static DerivedValueTable<StyleValues> useBorderParams = new DerivedValueTable<StyleValues>()
 	{
-		return style.useAttr( border );
-	}
+		protected StyleValues evaluate(AttributeTable2 style)
+		{
+			return (StyleValues)style.useAttr( border );
+		}
+	};
 
 	
 	
@@ -118,10 +124,13 @@ public class Primitive
 		}
 	};
 	
-	protected static StyleValues useContainerParams(StyleValues style)
+	protected static DerivedValueTable<StyleValues> useContainerParams = new DerivedValueTable<StyleValues>()
 	{
-		return style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor );
-	}
+		protected StyleValues evaluate(AttributeTable2 style)
+		{
+			return (StyleValues)style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor );
+		}
+	};
 
 	
 	
@@ -242,7 +251,7 @@ public class Primitive
 	
 	protected static StyleValues useMathRootParams(StyleValues style)
 	{
-		return useFont( style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
+		return useFont.get( style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
 				.useAttr( foreground ).useAttr( hoverForeground ).useAttr( mathRootThickness ) );
 	}
 	
@@ -327,11 +336,14 @@ public class Primitive
 		}
 	};
 	
-	protected static StyleValues useStaticTextParams(StyleValues style)
+	protected static DerivedValueTable<StyleValues> useStaticTextParams = new DerivedValueTable<StyleValues>()
 	{
-		return useFont( style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
-				.useAttr( foreground ).useAttr( hoverForeground ).useAttr( textSquiggleUnderlinePaint ).useAttr( textSmallCaps ) );
-	}
+		protected StyleValues evaluate(AttributeTable2 style)
+		{
+			return useFont.get( style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
+					.useAttr( foreground ).useAttr( hoverForeground ).useAttr( textSquiggleUnderlinePaint ).useAttr( textSmallCaps ) );
+		}
+	};
 
 	
 	
@@ -354,7 +366,7 @@ public class Primitive
 	
 	protected static StyleValues useLabelTextParams(StyleValues style)
 	{
-		return useFont( style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
+		return useFont.get( style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
 				.useAttr( foreground ).useAttr( hoverForeground ).useAttr( textSquiggleUnderlinePaint ).useAttr( textSmallCaps ) );
 	}
 	
@@ -379,7 +391,7 @@ public class Primitive
 	
 	protected static StyleValues useTextParams(StyleValues style)
 	{
-		return useFont( style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
+		return useFont.get( style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
 				.useAttr( editable ).useAttr( foreground ).useAttr( hoverForeground ).useAttr( textSquiggleUnderlinePaint )
 				.useAttr( textSmallCaps ) );
 	}

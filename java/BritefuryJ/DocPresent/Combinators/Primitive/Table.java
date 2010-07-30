@@ -156,7 +156,7 @@ public class Table extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		PresentationContext childCtx = ctx.withStyle( Primitive.useContainerParams( ctx.getStyle() ) );		
+		PresentationContext childCtx = ctx.withStyle( Primitive.useContainerParams.get( ctx.getStyle() ) );		
 		DPTable element = new DPTable( Primitive.tableParams.get( ctx.getStyle() ) );
 		if ( childCells != null )
 		{

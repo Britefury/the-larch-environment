@@ -25,6 +25,6 @@ public class ApplyStyleSheet extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx)
 	{
-		return child.present( ctx.withStyle( ctx.getStyle().withAttrs( styleSheet ) ) );
+		return child.present( ctx.withStyleSheet( styleSheet ) );
 	}
 }

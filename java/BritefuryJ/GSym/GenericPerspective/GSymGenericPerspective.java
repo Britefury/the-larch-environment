@@ -35,7 +35,7 @@ public class GSymGenericPerspective extends GSymObjectPresentationPerspective
 		if ( x instanceof Presentable )
 		{
 			Presentable p = (Presentable)x;
-			return p.present( ctx, GenericPerspectiveStyleSheet.asGenericPerspectiveStyleSheetOrDefault( styleSheet ), state );
+			return p.present( ctx, state ).present();
 		}
 		else
 		{
