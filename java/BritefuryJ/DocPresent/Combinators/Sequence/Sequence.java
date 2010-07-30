@@ -6,12 +6,16 @@
 //##************************
 package BritefuryJ.DocPresent.Combinators.Sequence;
 
+import BritefuryJ.AttributeTable.AttributeNamespace;
 import BritefuryJ.AttributeTable.InheritedAttributeNonNull;
 
 public class Sequence
 {
-	public static final InheritedAttributeNonNull addLineBreaks = new InheritedAttributeNonNull( "sequence", "addLineBreaks", Boolean.class, true );
-	public static final InheritedAttributeNonNull addParagraphIndentMarkers = new InheritedAttributeNonNull( "sequence", "addParagraphIndentMarkers", Boolean.class, true );
-	public static final InheritedAttributeNonNull addLineBreakCost = new InheritedAttributeNonNull( "sequence", "addLineBreakCost", Boolean.class, true );
-	public static final InheritedAttributeNonNull indentation = new InheritedAttributeNonNull( "sequence", "indentation", Double.class, 30.0 );
+	public static final AttributeNamespace sequenceNamespace = new AttributeNamespace( "sequence" );
+	
+	
+	public static final InheritedAttributeNonNull addLineBreaks = new InheritedAttributeNonNull( sequenceNamespace, "addLineBreaks", Boolean.class, true );
+	public static final InheritedAttributeNonNull addParagraphIndentMarkers = new InheritedAttributeNonNull( sequenceNamespace, "addParagraphIndentMarkers", Boolean.class, true );
+	public static final InheritedAttributeNonNull addLineBreakCost = new InheritedAttributeNonNull( sequenceNamespace, "addLineBreakCost", Boolean.class, true );
+	public static final InheritedAttributeNonNull indentation = new InheritedAttributeNonNull( sequenceNamespace, "indentation", Double.class, 30.0 );
 }

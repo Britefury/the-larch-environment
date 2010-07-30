@@ -12,6 +12,7 @@ import java.awt.Font;
 import java.awt.Paint;
 
 import BritefuryJ.AttributeTable.Attribute;
+import BritefuryJ.AttributeTable.AttributeNamespace;
 import BritefuryJ.AttributeTable.AttributeTable2;
 import BritefuryJ.AttributeTable.DerivedValueTable;
 import BritefuryJ.AttributeTable.InheritedAttribute;
@@ -36,45 +37,48 @@ import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Primitive
 {
-	public static final InheritedAttributeNonNull fontFace = new InheritedAttributeNonNull( "primitive", "fontFace", String.class, "Sans serif" );
-	public static final InheritedAttributeNonNull fontBold = new InheritedAttributeNonNull( "primitive", "fontBold", Boolean.class, false );
-	public static final InheritedAttributeNonNull fontItalic = new InheritedAttributeNonNull( "primitive", "fontItalic", Boolean.class, false );
-	public static final InheritedAttributeNonNull fontSize = new InheritedAttributeNonNull( "primitive", "fontSize", Integer.class, 14 );
-	public static final InheritedAttributeNonNull fontScale = new InheritedAttributeNonNull( "primitive", "fontScale", Double.class, 1.0 );
-	public static final InheritedAttributeNonNull border = new InheritedAttributeNonNull( "primitive", "border", AbstractBorder.class, new SolidBorder( 1.0, 2.0, Color.black, null ) );
-	public static final Attribute background = new Attribute( "primitive", "background", Painter.class, null );
-	public static final Attribute hoverBackground = new Attribute( "primitive", "hoverBackground", Painter.class, null );
-	public static final InheritedAttribute cursor = new InheritedAttribute( "primitive", "cursor", Cursor.class, null );
-	public static final InheritedAttributeNonNull fractionVSpacing = new InheritedAttributeNonNull( "primitive", "fractionVSpacing", Double.class, 2.0 );
-	public static final InheritedAttributeNonNull fractionHPadding = new InheritedAttributeNonNull( "primitive", "fractionHPadding", Double.class, 3.0 );
-	public static final InheritedAttributeNonNull fractionRefYOffset = new InheritedAttributeNonNull( "primitive", "fractionRefYOffset", Double.class, 5.0 );
-	public static final InheritedAttributeNonNull fractionFontScale = new InheritedAttributeNonNull( "primitive", "fractionFontScale", Double.class, 0.9 );
-	public static final InheritedAttributeNonNull fractionMinFontScale = new InheritedAttributeNonNull( "primitive", "fractionMinFontScale", Double.class, 0.9 );
-	public static final InheritedAttributeNonNull editable = new InheritedAttributeNonNull( "primitive", "editable", Boolean.class, true );
-	public static final InheritedAttributeNonNull foreground = new InheritedAttributeNonNull( "primitive", "foreground", Paint.class, Color.black );
-	public static final InheritedAttribute hoverForeground = new InheritedAttribute( "primitive", "hoverForeground", Paint.class, null );
-	public static final InheritedAttributeNonNull hboxSpacing = new InheritedAttributeNonNull( "primitive", "hboxSpacing", Double.class, 0.0 );
-	public static final InheritedAttributeNonNull mathRootThickness = new InheritedAttributeNonNull( "primitive", "mathRootThickness", Double.class, 1.5 );
-	public static final InheritedAttributeNonNull paragraphSpacing = new InheritedAttributeNonNull( "primitive", "paragraphSpacing", Double.class, 0.0 );
-	public static final InheritedAttributeNonNull paragraphLineSpacing = new InheritedAttributeNonNull( "primitive", "paragraphLineSpacing", Double.class, 0.0 );
-	public static final InheritedAttributeNonNull paragraphIndentation = new InheritedAttributeNonNull( "primitive", "paragraphIndentation", Double.class, 0.0 );
-	public static final InheritedAttributeNonNull shapePainter = new InheritedAttributeNonNull( "primitive", "shapePainter", Painter.class, new FillPainter( Color.black ) );
-	public static final InheritedAttribute hoverShapePainter = new InheritedAttribute( "primitive", "hoverShapePainter", Painter.class, null );
-	public static final InheritedAttributeNonNull scriptColumnSpacing = new InheritedAttributeNonNull( "primitive", "scriptColumnSpacing", Double.class, 1.0 );
-	public static final InheritedAttributeNonNull scriptRowSpacing = new InheritedAttributeNonNull( "primitive", "scriptRowSpacing", Double.class, 1.0 );
-	public static final InheritedAttributeNonNull scriptFontScale = new InheritedAttributeNonNull( "primitive", "scriptFontScale", Double.class, 0.9 );
-	public static final InheritedAttributeNonNull scriptMinFontScale = new InheritedAttributeNonNull( "primitive", "scriptMinFontScale", Double.class, 0.9 );
-	public static final InheritedAttributeNonNull tableColumnSpacing = new InheritedAttributeNonNull( "primitive", "tableColumnSpacing", Double.class, 0.0 );
-	public static final InheritedAttributeNonNull tableColumnExpand = new InheritedAttributeNonNull( "primitive", "tableColumnExpand", Boolean.class, false );
-	public static final InheritedAttributeNonNull tableRowSpacing = new InheritedAttributeNonNull( "primitive", "tableRowSpacing", Double.class, 0.0 );
-	public static final InheritedAttributeNonNull tableRowExpand = new InheritedAttributeNonNull( "primitive", "tableRowExpand", Boolean.class, false );
-	public static final InheritedAttribute textSquiggleUnderlinePaint = new InheritedAttribute( "primitive", "textSquiggleUnderlinePaint", Paint.class, null );
-	public static final InheritedAttributeNonNull textSmallCaps = new InheritedAttributeNonNull( "primitive", "textSmallCaps", Boolean.class, false );
-	public static final InheritedAttributeNonNull vboxSpacing = new InheritedAttributeNonNull( "primitive", "vboxSpacing", Double.class, 0.0 );
+	public static final AttributeNamespace primitiveNamespace = new AttributeNamespace( "primitive" );
+	
+	
+	public static final InheritedAttributeNonNull fontFace = new InheritedAttributeNonNull( primitiveNamespace, "fontFace", String.class, "Sans serif" );
+	public static final InheritedAttributeNonNull fontBold = new InheritedAttributeNonNull( primitiveNamespace, "fontBold", Boolean.class, false );
+	public static final InheritedAttributeNonNull fontItalic = new InheritedAttributeNonNull( primitiveNamespace, "fontItalic", Boolean.class, false );
+	public static final InheritedAttributeNonNull fontSize = new InheritedAttributeNonNull( primitiveNamespace, "fontSize", Integer.class, 14 );
+	public static final InheritedAttributeNonNull fontScale = new InheritedAttributeNonNull( primitiveNamespace, "fontScale", Double.class, 1.0 );
+	public static final InheritedAttributeNonNull border = new InheritedAttributeNonNull( primitiveNamespace, "border", AbstractBorder.class, new SolidBorder( 1.0, 2.0, Color.black, null ) );
+	public static final Attribute background = new Attribute( primitiveNamespace, "background", Painter.class, null );
+	public static final Attribute hoverBackground = new Attribute( primitiveNamespace, "hoverBackground", Painter.class, null );
+	public static final InheritedAttribute cursor = new InheritedAttribute( primitiveNamespace, "cursor", Cursor.class, null );
+	public static final InheritedAttributeNonNull fractionVSpacing = new InheritedAttributeNonNull( primitiveNamespace, "fractionVSpacing", Double.class, 2.0 );
+	public static final InheritedAttributeNonNull fractionHPadding = new InheritedAttributeNonNull( primitiveNamespace, "fractionHPadding", Double.class, 3.0 );
+	public static final InheritedAttributeNonNull fractionRefYOffset = new InheritedAttributeNonNull( primitiveNamespace, "fractionRefYOffset", Double.class, 5.0 );
+	public static final InheritedAttributeNonNull fractionFontScale = new InheritedAttributeNonNull( primitiveNamespace, "fractionFontScale", Double.class, 0.9 );
+	public static final InheritedAttributeNonNull fractionMinFontScale = new InheritedAttributeNonNull( primitiveNamespace, "fractionMinFontScale", Double.class, 0.9 );
+	public static final InheritedAttributeNonNull editable = new InheritedAttributeNonNull( primitiveNamespace, "editable", Boolean.class, true );
+	public static final InheritedAttributeNonNull foreground = new InheritedAttributeNonNull( primitiveNamespace, "foreground", Paint.class, Color.black );
+	public static final InheritedAttribute hoverForeground = new InheritedAttribute( primitiveNamespace, "hoverForeground", Paint.class, null );
+	public static final InheritedAttributeNonNull hboxSpacing = new InheritedAttributeNonNull( primitiveNamespace, "hboxSpacing", Double.class, 0.0 );
+	public static final InheritedAttributeNonNull mathRootThickness = new InheritedAttributeNonNull( primitiveNamespace, "mathRootThickness", Double.class, 1.5 );
+	public static final InheritedAttributeNonNull paragraphSpacing = new InheritedAttributeNonNull( primitiveNamespace, "paragraphSpacing", Double.class, 0.0 );
+	public static final InheritedAttributeNonNull paragraphLineSpacing = new InheritedAttributeNonNull( primitiveNamespace, "paragraphLineSpacing", Double.class, 0.0 );
+	public static final InheritedAttributeNonNull paragraphIndentation = new InheritedAttributeNonNull( primitiveNamespace, "paragraphIndentation", Double.class, 0.0 );
+	public static final InheritedAttributeNonNull shapePainter = new InheritedAttributeNonNull( primitiveNamespace, "shapePainter", Painter.class, new FillPainter( Color.black ) );
+	public static final InheritedAttribute hoverShapePainter = new InheritedAttribute( primitiveNamespace, "hoverShapePainter", Painter.class, null );
+	public static final InheritedAttributeNonNull scriptColumnSpacing = new InheritedAttributeNonNull( primitiveNamespace, "scriptColumnSpacing", Double.class, 1.0 );
+	public static final InheritedAttributeNonNull scriptRowSpacing = new InheritedAttributeNonNull( primitiveNamespace, "scriptRowSpacing", Double.class, 1.0 );
+	public static final InheritedAttributeNonNull scriptFontScale = new InheritedAttributeNonNull( primitiveNamespace, "scriptFontScale", Double.class, 0.9 );
+	public static final InheritedAttributeNonNull scriptMinFontScale = new InheritedAttributeNonNull( primitiveNamespace, "scriptMinFontScale", Double.class, 0.9 );
+	public static final InheritedAttributeNonNull tableColumnSpacing = new InheritedAttributeNonNull( primitiveNamespace, "tableColumnSpacing", Double.class, 0.0 );
+	public static final InheritedAttributeNonNull tableColumnExpand = new InheritedAttributeNonNull( primitiveNamespace, "tableColumnExpand", Boolean.class, false );
+	public static final InheritedAttributeNonNull tableRowSpacing = new InheritedAttributeNonNull( primitiveNamespace, "tableRowSpacing", Double.class, 0.0 );
+	public static final InheritedAttributeNonNull tableRowExpand = new InheritedAttributeNonNull( primitiveNamespace, "tableRowExpand", Boolean.class, false );
+	public static final InheritedAttribute textSquiggleUnderlinePaint = new InheritedAttribute( primitiveNamespace, "textSquiggleUnderlinePaint", Paint.class, null );
+	public static final InheritedAttributeNonNull textSmallCaps = new InheritedAttributeNonNull( primitiveNamespace, "textSmallCaps", Boolean.class, false );
+	public static final InheritedAttributeNonNull vboxSpacing = new InheritedAttributeNonNull( primitiveNamespace, "vboxSpacing", Double.class, 0.0 );
 
 
 
-	protected static DerivedValueTable<Font> font = new DerivedValueTable<Font>()
+	protected static DerivedValueTable<Font> font = new DerivedValueTable<Font>( primitiveNamespace )
 	{
 		protected Font evaluate(AttributeTable2 attribs)
 		{
@@ -88,7 +92,7 @@ public class Primitive
 		}
 	};
 	
-	protected static DerivedValueTable<StyleValues> useFont = new DerivedValueTable<StyleValues>()
+	protected static DerivedValueTable<StyleValues> useFont = new DerivedValueTable<StyleValues>( primitiveNamespace )
 	{
 		protected StyleValues evaluate(AttributeTable2 style)
 		{
@@ -103,7 +107,7 @@ public class Primitive
 		return style.get( border, AbstractBorder.class );
 	}
 	
-	protected static DerivedValueTable<StyleValues> useBorderParams = new DerivedValueTable<StyleValues>()
+	protected static DerivedValueTable<StyleValues> useBorderParams = new DerivedValueTable<StyleValues>( primitiveNamespace )
 	{
 		protected StyleValues evaluate(AttributeTable2 style)
 		{
@@ -113,7 +117,7 @@ public class Primitive
 
 	
 	
-	protected static DerivedValueTable<ContainerStyleParams> containerParams = new DerivedValueTable<ContainerStyleParams>()
+	protected static DerivedValueTable<ContainerStyleParams> containerParams = new DerivedValueTable<ContainerStyleParams>( primitiveNamespace )
 	{
 		protected ContainerStyleParams evaluate(AttributeTable2 attribs)
 		{
@@ -124,7 +128,7 @@ public class Primitive
 		}
 	};
 	
-	protected static DerivedValueTable<StyleValues> useContainerParams = new DerivedValueTable<StyleValues>()
+	protected static DerivedValueTable<StyleValues> useContainerParams = new DerivedValueTable<StyleValues>( primitiveNamespace )
 	{
 		protected StyleValues evaluate(AttributeTable2 style)
 		{
@@ -134,7 +138,7 @@ public class Primitive
 
 	
 	
-	protected static DerivedValueTable<ContentLeafStyleParams> contentLeafParams = new DerivedValueTable<ContentLeafStyleParams>()
+	protected static DerivedValueTable<ContentLeafStyleParams> contentLeafParams = new DerivedValueTable<ContentLeafStyleParams>( primitiveNamespace )
 	{
 		protected ContentLeafStyleParams evaluate(AttributeTable2 attribs)
 		{
@@ -152,7 +156,7 @@ public class Primitive
 
 	
 	
-	protected static DerivedValueTable<FractionStyleParams> fractionParams = new DerivedValueTable<FractionStyleParams>()
+	protected static DerivedValueTable<FractionStyleParams> fractionParams = new DerivedValueTable<FractionStyleParams>( primitiveNamespace )
 	{
 		protected FractionStyleParams evaluate(AttributeTable2 attribs)
 		{
@@ -175,7 +179,7 @@ public class Primitive
 	
 	
 	
-	protected static DerivedValueTable<FractionStyleParams.BarStyleParams> fractionBarParams = new DerivedValueTable<FractionStyleParams.BarStyleParams>()
+	protected static DerivedValueTable<FractionStyleParams.BarStyleParams> fractionBarParams = new DerivedValueTable<FractionStyleParams.BarStyleParams>( primitiveNamespace )
 	{
 		protected FractionStyleParams.BarStyleParams evaluate(AttributeTable2 attribs)
 		{
@@ -197,7 +201,7 @@ public class Primitive
 	
 	
 	
-	protected static DerivedValueTable<GridRowStyleParams> gridRowParams = new DerivedValueTable<GridRowStyleParams>()
+	protected static DerivedValueTable<GridRowStyleParams> gridRowParams = new DerivedValueTable<GridRowStyleParams>( primitiveNamespace )
 	{
 		protected GridRowStyleParams evaluate(AttributeTable2 attribs)
 		{
@@ -215,7 +219,7 @@ public class Primitive
 	
 	
 	
-	protected static DerivedValueTable<HBoxStyleParams> hboxParams = new DerivedValueTable<HBoxStyleParams>()
+	protected static DerivedValueTable<HBoxStyleParams> hboxParams = new DerivedValueTable<HBoxStyleParams>( primitiveNamespace )
 	{
 		protected HBoxStyleParams evaluate(AttributeTable2 attribs)
 		{
@@ -234,7 +238,7 @@ public class Primitive
 
 	
 	
-	protected static DerivedValueTable<MathRootStyleParams> mathRootParams = new DerivedValueTable<MathRootStyleParams>()
+	protected static DerivedValueTable<MathRootStyleParams> mathRootParams = new DerivedValueTable<MathRootStyleParams>( primitiveNamespace )
 	{
 		protected MathRootStyleParams evaluate(AttributeTable2 attribs)
 		{
@@ -257,7 +261,7 @@ public class Primitive
 	
 	
 	
-	protected static DerivedValueTable<ParagraphStyleParams> paragraphParams = new DerivedValueTable<ParagraphStyleParams>()
+	protected static DerivedValueTable<ParagraphStyleParams> paragraphParams = new DerivedValueTable<ParagraphStyleParams>( primitiveNamespace )
 	{
 		protected ParagraphStyleParams evaluate(AttributeTable2 attribs)
 		{
@@ -279,7 +283,7 @@ public class Primitive
 
 	
 	
-	protected static DerivedValueTable<ShapeStyleParams> shapeParams = new DerivedValueTable<ShapeStyleParams>()
+	protected static DerivedValueTable<ShapeStyleParams> shapeParams = new DerivedValueTable<ShapeStyleParams>( primitiveNamespace )
 	{
 		protected ShapeStyleParams evaluate(AttributeTable2 attribs)
 		{
@@ -299,7 +303,7 @@ public class Primitive
 	
 	
 	
-	protected static DerivedValueTable<ScriptStyleParams> scriptParams = new DerivedValueTable<ScriptStyleParams>()
+	protected static DerivedValueTable<ScriptStyleParams> scriptParams = new DerivedValueTable<ScriptStyleParams>( primitiveNamespace )
 	{
 		protected ScriptStyleParams evaluate(AttributeTable2 attribs)
 		{
@@ -319,7 +323,7 @@ public class Primitive
 
 	
 	
-	protected static DerivedValueTable<TextStyleParams> staticTextParams = new DerivedValueTable<TextStyleParams>()
+	protected static DerivedValueTable<TextStyleParams> staticTextParams = new DerivedValueTable<TextStyleParams>( primitiveNamespace )
 	{
 		protected TextStyleParams evaluate(AttributeTable2 attribs)
 		{
@@ -336,7 +340,7 @@ public class Primitive
 		}
 	};
 	
-	protected static DerivedValueTable<StyleValues> useStaticTextParams = new DerivedValueTable<StyleValues>()
+	protected static DerivedValueTable<StyleValues> useStaticTextParams = new DerivedValueTable<StyleValues>( primitiveNamespace )
 	{
 		protected StyleValues evaluate(AttributeTable2 style)
 		{
@@ -347,7 +351,7 @@ public class Primitive
 
 	
 	
-	protected static DerivedValueTable<TextStyleParams> labelTextParams = new DerivedValueTable<TextStyleParams>()
+	protected static DerivedValueTable<TextStyleParams> labelTextParams = new DerivedValueTable<TextStyleParams>( primitiveNamespace )
 	{
 		protected TextStyleParams evaluate(AttributeTable2 attribs)
 		{
@@ -372,7 +376,7 @@ public class Primitive
 	
 	
 	
-	protected static DerivedValueTable<TextStyleParams> textParams = new DerivedValueTable<TextStyleParams>()
+	protected static DerivedValueTable<TextStyleParams> textParams = new DerivedValueTable<TextStyleParams>( primitiveNamespace )
 	{
 		protected TextStyleParams evaluate(AttributeTable2 attribs)
 		{
@@ -398,7 +402,7 @@ public class Primitive
 	
 	
 	
-	protected static DerivedValueTable<TableStyleParams> tableParams = new DerivedValueTable<TableStyleParams>()
+	protected static DerivedValueTable<TableStyleParams> tableParams = new DerivedValueTable<TableStyleParams>( primitiveNamespace )
 	{
 		protected TableStyleParams evaluate(AttributeTable2 attribs)
 		{
@@ -421,7 +425,7 @@ public class Primitive
 	
 	
 	
-	protected static DerivedValueTable<VBoxStyleParams> vboxParams = new DerivedValueTable<VBoxStyleParams>()
+	protected static DerivedValueTable<VBoxStyleParams> vboxParams = new DerivedValueTable<VBoxStyleParams>( primitiveNamespace )
 	{
 		protected VBoxStyleParams evaluate(AttributeTable2 attribs)
 		{

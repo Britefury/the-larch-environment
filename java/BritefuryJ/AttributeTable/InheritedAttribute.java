@@ -8,12 +8,12 @@ package BritefuryJ.AttributeTable;
 
 public class InheritedAttribute extends AttributeBase
 {
-	public InheritedAttribute(String namespace, String name, Object defaultValue)
+	public InheritedAttribute(AttributeNamespace namespace, String name, Object defaultValue)
 	{
 		super( namespace, name, defaultValue );
 	}
 	
-	public InheritedAttribute(String namespace, String name, Class<?> valueClass, Object defaultValue)
+	public InheritedAttribute(AttributeNamespace namespace, String name, Class<?> valueClass, Object defaultValue)
 	{
 		super( namespace, name, valueClass, defaultValue );
 	}
