@@ -10,7 +10,7 @@ package BritefuryJ.AttributeTable;
 public abstract class DerivedValueTable <V extends Object>
 {
 	private AttributeNamespace namespace;
-	private int idWithinNamespace;
+	private int idWithinNamespace = -1;
 	
 	
 	public DerivedValueTable(AttributeNamespace namespace)
