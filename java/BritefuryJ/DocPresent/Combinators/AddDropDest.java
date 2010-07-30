@@ -8,6 +8,7 @@ package BritefuryJ.DocPresent.Combinators;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class AddDropDest extends Pres
 {
@@ -33,9 +34,9 @@ public class AddDropDest extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPElement element = child.present( ctx );
+		DPElement element = child.present( ctx, style );
 		element.addDropDest( dest );
 		return element;
 	}

@@ -11,6 +11,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Canvas.DrawingNode;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Canvas extends Pres
 {
@@ -37,7 +38,7 @@ public class Canvas extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
 		return new DPCanvas( textRepresentation, drawing, width, height, bShrinkX, bShrinkY );
 	}

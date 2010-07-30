@@ -12,6 +12,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.SequentialPres;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Span extends SequentialPres
 {
@@ -27,10 +28,10 @@ public class Span extends SequentialPres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPSpan element = new DPSpan( Primitive.containerParams.get( ctx.getStyle() ) );
-		element.setChildren( mapPresent( ctx.withStyle( Primitive.useContainerParams.get( ctx.getStyle() ) ), children ) );
+		DPSpan element = new DPSpan( Primitive.containerParams.get( style ) );
+		element.setChildren( mapPresent( ctx, Primitive.useContainerParams.get( style ), children ) );
 		return element;
 	}
 }

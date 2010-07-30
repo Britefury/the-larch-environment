@@ -10,6 +10,7 @@ import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Border extends Pres
 {
@@ -24,10 +25,10 @@ public class Border extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPBorder bin = new DPBorder( Primitive.getBorderParams( ctx.getStyle() ) );
-		bin.setChild( child.present( ctx.withStyle( Primitive.useBorderParams.get( ctx.getStyle() ) ) ).layoutWrap() );
+		DPBorder bin = new DPBorder( Primitive.getBorderParams( style ) );
+		bin.setChild( child.present( ctx, Primitive.useBorderParams.get( style ) ).layoutWrap() );
 		return bin;
 	}
 }

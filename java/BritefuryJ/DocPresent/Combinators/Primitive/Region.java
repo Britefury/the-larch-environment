@@ -11,6 +11,7 @@ import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Region extends Pres
 {
@@ -32,9 +33,9 @@ public class Region extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPElement childElement = child.present( ctx );
+		DPElement childElement = child.present( ctx, style );
 		DPRegion element = new DPRegion();
 		element.setChild( childElement );
 		if ( editHandler != null )

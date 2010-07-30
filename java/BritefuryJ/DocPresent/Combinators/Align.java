@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent.Combinators;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Align extends Pres
 {
@@ -64,9 +65,9 @@ public class Align extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPElement element = child.present( ctx );
+		DPElement element = child.present( ctx, style );
 		if ( flags == FLAG_ALIGN_H )
 		{
 			return element.alignH( hAlign );

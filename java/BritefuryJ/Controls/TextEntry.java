@@ -223,10 +223,10 @@ public class TextEntry extends ControlPres
 	
 	
 		
-		protected TextEntryControl(PresentationContext ctx, DPBorder outerElement, DPRegion frame, DPText textElement, TextEntryListener listener, TextEntryValidator validator,
+		protected TextEntryControl(PresentationContext ctx, StyleValues style, DPBorder outerElement, DPRegion frame, DPText textElement, TextEntryListener listener, TextEntryValidator validator,
 				BritefuryJ.DocPresent.Border.AbstractBorder validBorder, BritefuryJ.DocPresent.Border.AbstractBorder invalidBorder)
 		{
-			super( ctx );
+			super( ctx, style );
 			
 			this.outerElement = outerElement;
 			this.textElement = textElement;
@@ -304,7 +304,7 @@ public class TextEntry extends ControlPres
 				if ( failMessage != null )
 				{
 					Tooltip tooltip = new Tooltip( failMessage, 5.0 );
-					tooltip.popupBelow( outerElement, ctx );
+					tooltip.popupBelow( outerElement, ctx, style );
 				}
 				return;
 			}
@@ -352,19 +352,18 @@ public class TextEntry extends ControlPres
 	
 	
 	@Override
-	public Control createControl(PresentationContext ctx)
+	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
-		StyleValues style = ctx.getStyle();
 		BritefuryJ.DocPresent.Border.AbstractBorder validBorder = style.get( Controls.textEntryBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class ); 
 		BritefuryJ.DocPresent.Border.AbstractBorder invalidBorder = style.get( Controls.textEntryInvalidBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class );
 		
-		DPText textElement = (DPText)StyleSheet2.instance.withAttr( Primitive.editable, true ).applyTo( new Text( initialText ) ).present( ctx );
+		DPText textElement = (DPText)StyleSheet2.instance.withAttr( Primitive.editable, true ).applyTo( new Text( initialText ) ).present( ctx, style );
 		Pres line = new HBox( new Pres[] { new Segment( false, false, textElement ) } );
 		Pres region = new Region( line );
-		DPRegion regionElement = (DPRegion)region.present( ctx );
+		DPRegion regionElement = (DPRegion)region.present( ctx, style );
 		Pres outer = new Border( regionElement );
-		DPBorder outerElement = (DPBorder)outer.present( ctx );
+		DPBorder outerElement = (DPBorder)outer.present( ctx, style );
 		
-		return new TextEntryControl( ctx, outerElement, regionElement, textElement, listener, validator, validBorder, invalidBorder );
+		return new TextEntryControl( ctx, style, outerElement, regionElement, textElement, listener, validator, validBorder, invalidBorder );
 	}
 }

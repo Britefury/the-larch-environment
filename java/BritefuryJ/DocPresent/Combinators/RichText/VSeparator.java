@@ -19,12 +19,11 @@ public class VSeparator extends Pres
 	}
 
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		StyleValues style = ctx.getStyle();
 		double majorPadding = style.get( RichText.separatorMajorPadding, Double.class );
 		double minorPadding = style.get( RichText.separatorMinorPadding, Double.class );
 		return RichText.separatorStyle( style ).applyTo(
-				new Box( 1.0, 0.0 ).alignVExpand().pad( majorPadding, minorPadding ) ).present( ctx );
+				new Box( 1.0, 0.0 ).alignVExpand().pad( majorPadding, minorPadding ) ).present( ctx, style );
 	}
 }

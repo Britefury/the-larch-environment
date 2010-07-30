@@ -12,6 +12,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.SequentialPres;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Paragraph extends SequentialPres
 {
@@ -27,10 +28,10 @@ public class Paragraph extends SequentialPres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPParagraph element = new DPParagraph( Primitive.paragraphParams.get( ctx.getStyle() ) );
-		element.setChildren( mapPresent( ctx.withStyle( Primitive.useParagraphParams( ctx.getStyle() ) ), children ) );
+		DPParagraph element = new DPParagraph( Primitive.paragraphParams.get( style ) );
+		element.setChildren( mapPresent( ctx, Primitive.useParagraphParams( style ), children ) );
 		return element;
 	}
 }

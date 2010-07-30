@@ -13,6 +13,7 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.SequentialPres;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class ObjectBoxWithFields extends SequentialPres
 {
@@ -33,16 +34,16 @@ public class ObjectBoxWithFields extends SequentialPres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		double padding = ctx.getStyle().get( GenericStyle.objectContentPadding, Double.class );
-		PresentationContext childCtx = GenericStyle.useObjectBorderAttrs( GenericStyle.useObjectBoxAttrs( GenericStyle.useObjectFieldListAttrs( ctx ) ) );
+		double padding = style.get( GenericStyle.objectContentPadding, Double.class );
+		StyleValues childStyle = GenericStyle.useObjectBorderAttrs( GenericStyle.useObjectBoxAttrs( GenericStyle.useObjectFieldListAttrs( style ) ) );
 		
-		DPElement childElems[] = mapPresent( childCtx, children );
-		Pres contents = GenericStyle.objectBoxFieldListStyle.get( ctx.getStyle() ).applyTo( new VBox( childElems ) );
+		DPElement childElems[] = mapPresent( ctx, childStyle, children );
+		Pres contents = GenericStyle.objectBoxFieldListStyle.get( style ).applyTo( new VBox( childElems ) );
 		
 		Pres titlePres = new ObjectTitle( title );
 		
-		return new ObjectBorder( new VBox( new Pres[] { titlePres, contents.padX( padding ) } ) ).present( ctx );
+		return new ObjectBorder( new VBox( new Pres[] { titlePres, contents.padX( padding ) } ) ).present( ctx, style );
 	}
 }

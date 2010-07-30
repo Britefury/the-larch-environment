@@ -37,9 +37,9 @@ public class Checkbox extends ControlPres
 		private boolean state;
 
 		
-		protected CheckboxControl(PresentationContext ctx, DPElement element, DPElement box, DPElement check, boolean state, CheckboxListener listener, Paint checkForeground)
+		protected CheckboxControl(PresentationContext ctx, StyleValues style, DPElement element, DPElement box, DPElement check, boolean state, CheckboxListener listener, Paint checkForeground)
 		{
-			super( ctx );
+			super( ctx, style );
 			
 			this.element = element;
 			this.box = box;
@@ -111,9 +111,8 @@ public class Checkbox extends ControlPres
 	
 	
 	@Override
-	public Control createControl(PresentationContext ctx)
+	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
-		StyleValues style = ctx.getStyle();
 		StyleSheet2 checkStyle = StyleSheet2.instance.withAttr( Primitive.border, style.get( Controls.checkboxCheckBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class ) );
 		StyleSheet2 checkboxStyle = Controls.checkboxStyle.get( style );
 		
@@ -121,17 +120,17 @@ public class Checkbox extends ControlPres
 		Paint checkForeground = style.get( Controls.checkboxCheckForeground, Paint.class );
 		
 		Pres check = new Spacer( checkSize, checkSize );
-		DPElement checkElement = check.present( ctx );
+		DPElement checkElement = check.present( ctx, style );
 		Pres checkBorder = checkStyle.applyTo( new Border( checkElement ) );
 		
-		Pres childElement = presentAsCombinator( Controls.useCheckboxAttrs( ctx ), child );
+		Pres childElement = presentAsCombinator( ctx, Controls.useCheckboxAttrs( style ), child );
 		Pres hbox = checkboxStyle.applyTo( new HBox( new Pres[] { checkBorder.alignVCentre(), childElement.alignVCentre() } ) );
-		DPElement hboxElement = hbox.present( ctx );
+		DPElement hboxElement = hbox.present( ctx, style);
 		
 		Pres bin = new Bin( hboxElement );
-		DPElement element = bin.present( ctx );
+		DPElement element = bin.present( ctx, style );
 		elements.put( element, null );
 		element.setFixedValue( initialState );
-		return new CheckboxControl( ctx, element, hboxElement, checkElement, initialState, listener, checkForeground );
+		return new CheckboxControl( ctx, style, element, hboxElement, checkElement, initialState, listener, checkForeground );
 	}
 }

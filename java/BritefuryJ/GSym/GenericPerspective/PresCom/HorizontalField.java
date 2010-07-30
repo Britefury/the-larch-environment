@@ -13,6 +13,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.LineBreak;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class HorizontalField extends Pres
 {
@@ -28,12 +29,12 @@ public class HorizontalField extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		StyleSheet2 fieldStyle = ctx.getStyle().get( GenericStyle.objectFieldStyle, StyleSheet2.class );
+		StyleSheet2 fieldStyle = style.get( GenericStyle.objectFieldStyle, StyleSheet2.class );
 		
-		DPElement valueElement = value.present( GenericStyle.useObjectFieldAttrs( ctx ) );
+		DPElement valueElement = value.present( ctx, GenericStyle.useObjectFieldAttrs( style ) );
 		
-		return fieldStyle.applyTo( new Paragraph( new Object[] { new StaticText( title ), new StaticText( " " ), new LineBreak(), valueElement } ) ).present( ctx );
+		return fieldStyle.applyTo( new Paragraph( new Object[] { new StaticText( title ), new StaticText( " " ), new LineBreak(), valueElement } ) ).present( ctx, style );
 	}
 }

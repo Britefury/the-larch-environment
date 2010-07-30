@@ -10,6 +10,7 @@ import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Bin extends Pres
 {
@@ -24,10 +25,10 @@ public class Bin extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPBin element = new DPBin( Primitive.containerParams.get( ctx.getStyle() ) );
-		element.setChild( child.present( ctx.withStyle( Primitive.useContainerParams.get( ctx.getStyle() ) ) ).layoutWrap() );
+		DPBin element = new DPBin( Primitive.containerParams.get( style ) );
+		element.setChild( child.present( ctx, Primitive.useContainerParams.get( style ) ).layoutWrap() );
 		return element;
 	}
 }

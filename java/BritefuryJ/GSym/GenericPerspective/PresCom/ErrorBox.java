@@ -10,6 +10,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class ErrorBox extends Pres
 {
@@ -25,14 +26,14 @@ public class ErrorBox extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		double padding = ctx.getStyle().get( GenericStyle.objectContentPadding, Double.class );
-		PresentationContext childCtx = GenericStyle.useErrorBorderAttrs( GenericStyle.useErrorBoxAttrs( ctx ) );
-		DPElement contentsElement = contents.present( childCtx );
+		double padding = style.get( GenericStyle.objectContentPadding, Double.class );
+		StyleValues childStyle = GenericStyle.useErrorBorderAttrs( GenericStyle.useErrorBoxAttrs( style ) );
+		DPElement contentsElement = contents.present( ctx, childStyle );
 		
 		Pres titlePres = new ObjectTitle( title );
 		
-		return new ErrorBorder( new VBox( new Object[] { titlePres, contentsElement.padX( padding ) } ) ).present( ctx );
+		return new ErrorBorder( new VBox( new Object[] { titlePres, contentsElement.padX( padding ) } ) ).present( ctx, style );
 	}
 }

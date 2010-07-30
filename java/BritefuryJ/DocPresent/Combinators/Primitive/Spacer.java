@@ -10,6 +10,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPSpacer;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Spacer extends Pres
 {
@@ -24,7 +25,7 @@ public class Spacer extends Pres
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
 		return new DPSpacer( minWidth, minHeight );
 	}

@@ -8,6 +8,7 @@ package BritefuryJ.DocPresent.Combinators;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementInteractor;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class AddInteractor extends Pres
 {
@@ -23,9 +24,9 @@ public class AddInteractor extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPElement element = child.present( ctx );
+		DPElement element = child.present( ctx, style );
 		element.addInteractor( interactor );
 		return element;
 	}

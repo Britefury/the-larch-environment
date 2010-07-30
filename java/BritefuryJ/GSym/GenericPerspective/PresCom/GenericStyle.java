@@ -14,7 +14,6 @@ import BritefuryJ.AttributeTable.DerivedValueTable;
 import BritefuryJ.AttributeTable.InheritedAttribute;
 import BritefuryJ.AttributeTable.InheritedAttributeNonNull;
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
@@ -72,22 +71,12 @@ public class GenericStyle
 		return values.useAttr( objectBorderThickness ).useAttr( objectBorderInset ).useAttr( objectBorderRounding ).useAttr( objectBorderPaint ).useAttr( objectBorderBackground );
 	}
 
-	public static PresentationContext useObjectBorderAttrs(PresentationContext ctx)
-	{
-		return ctx.withStyle( useObjectBorderAttrs( ctx.getStyle() ) );
-	}
-
 	
 	
 	
 	public static StyleValues useObjectBoxAttrs(StyleValues values)
 	{
 		return values.useAttr( objectContentPadding );
-	}
-	
-	public static PresentationContext useObjectBoxAttrs(PresentationContext ctx)
-	{
-		return ctx.withStyle( useObjectBoxAttrs( ctx.getStyle() ) );
 	}
 
 	
@@ -106,21 +95,11 @@ public class GenericStyle
 		return values.useAttr( objectFieldSpacing );
 	}
 	
-	public static PresentationContext useObjectFieldListAttrs(PresentationContext ctx)
-	{
-		return ctx.withStyle( useObjectFieldListAttrs( ctx.getStyle() ) );
-	}
-	
 	
 	
 	public static StyleValues useObjectFieldAttrs(StyleValues values)
 	{
 		return values.useAttr( objectFieldStyle );
-	}
-	
-	public static PresentationContext useObjectFieldAttrs(PresentationContext ctx)
-	{
-		return ctx.withStyle( useObjectFieldAttrs( ctx.getStyle() ) );
 	}
 
 
@@ -131,21 +110,11 @@ public class GenericStyle
 		return values.useAttr( errorBorderStyle );
 	}
 
-	public static PresentationContext useErrorBorderAttrs(PresentationContext ctx)
-	{
-		return ctx.withStyle( useErrorBorderAttrs( ctx.getStyle() ) );
-	}
-
 	
 	
 	
 	public static StyleValues useErrorBoxAttrs(StyleValues values)
 	{
 		return values.useAttr( objectContentPadding );
-	}
-	
-	public static PresentationContext useErrorBoxAttrs(PresentationContext ctx)
-	{
-		return ctx.withStyle( useErrorBoxAttrs( ctx.getStyle() ) );
 	}
 }

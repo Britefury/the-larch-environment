@@ -14,6 +14,7 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
 import BritefuryJ.DocPresent.ListView.TrailingSeparator;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class HorizontalSequenceView extends AbstractSequenceView
 {
@@ -29,7 +30,7 @@ public class HorizontalSequenceView extends AbstractSequenceView
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
 		ArrayList<Object> childElems = new ArrayList<Object>();
 		childElems.ensureCapacity( children.length + 2 );
@@ -71,6 +72,6 @@ public class HorizontalSequenceView extends AbstractSequenceView
 		}
 		
 		
-		return new HBox( childElems ).present( ctx );
+		return new HBox( childElems ).present( ctx, style );
 	}
 }

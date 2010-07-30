@@ -11,6 +11,7 @@ import java.util.WeakHashMap;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public abstract class ControlPres extends Pres
 {
@@ -20,11 +21,13 @@ public abstract class ControlPres extends Pres
 	public static abstract class Control
 	{
 		protected PresentationContext ctx;
+		protected StyleValues style;
 		
 		
-		public Control(PresentationContext ctx)
+		public Control(PresentationContext ctx, StyleValues style)
 		{
 			this.ctx = ctx;
+			this.style = style;
 		}
 		
 		public abstract DPElement getElement();
@@ -32,9 +35,9 @@ public abstract class ControlPres extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		Control control = createControl( ctx );
+		Control control = createControl( ctx, style );
 		DPElement element = control.getElement();
 		controls.put( element, control );
 		return element;
@@ -47,5 +50,5 @@ public abstract class ControlPres extends Pres
 	}
 	
 	
-	public abstract Control createControl(PresentationContext ctx);
+	public abstract Control createControl(PresentationContext ctx, StyleValues style);
 }

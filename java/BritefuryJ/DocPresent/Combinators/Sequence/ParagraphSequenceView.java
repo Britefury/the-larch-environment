@@ -33,10 +33,8 @@ public class ParagraphSequenceView extends AbstractSequenceView
 
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		StyleValues style = ctx.getStyle();
-
 		boolean bAddParagraphIndentMarkers = style.get( Sequence.addParagraphIndentMarkers, Boolean.class );
 		
 		ArrayList<Object> childElems = new ArrayList<Object>();
@@ -87,7 +85,7 @@ public class ParagraphSequenceView extends AbstractSequenceView
 		}
 		
 		
-		return new Paragraph( childElems ).present( ctx );
+		return new Paragraph( childElems ).present( ctx, style );
 	}
 
 }

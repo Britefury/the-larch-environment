@@ -14,6 +14,7 @@ import javax.swing.Timer;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class TimedPopup
 {
@@ -31,23 +32,23 @@ public class TimedPopup
 
 
 
-	public void popupToRightOf(DPElement element, PresentationContext ctx)
+	public void popupToRightOf(DPElement element, PresentationContext ctx, StyleValues style)
 	{
-		DPElement childElement = child.present( ctx );
+		DPElement childElement = child.present( ctx, style );
 		childElement.popupToRightOf( element, true, bRequestFocus );
 		initialiseTimeout( childElement );
 	}
 	
-	public void popupBelow(DPElement element, PresentationContext ctx)
+	public void popupBelow(DPElement element, PresentationContext ctx, StyleValues style)
 	{
-		DPElement childElement = child.present( ctx );
+		DPElement childElement = child.present( ctx, style );
 		childElement.popupBelow( element, true, bRequestFocus );
 		initialiseTimeout( childElement );
 	}
 	
-	public void popupAtMousePosition(DPElement element, PresentationContext ctx)
+	public void popupAtMousePosition(DPElement element, PresentationContext ctx, StyleValues style)
 	{
-		DPElement childElement = child.present( ctx );
+		DPElement childElement = child.present( ctx, style );
 		element.getRootElement().createPopupAtMousePosition( childElement, true, bRequestFocus );
 		initialiseTimeout( childElement );
 	}

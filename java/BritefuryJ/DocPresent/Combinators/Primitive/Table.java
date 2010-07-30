@@ -10,6 +10,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Table extends Pres
 {
@@ -154,10 +155,10 @@ public class Table extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		PresentationContext childCtx = ctx.withStyle( Primitive.useContainerParams.get( ctx.getStyle() ) );		
-		DPTable element = new DPTable( Primitive.tableParams.get( ctx.getStyle() ) );
+		StyleValues childStyle = Primitive.useContainerParams.get( style );		
+		DPTable element = new DPTable( Primitive.tableParams.get( style ) );
 		if ( childCells != null )
 		{
 			DPTable.TableCell elemCells[][] = new DPTable.TableCell[childCells.length][];
@@ -169,7 +170,7 @@ public class Table extends Pres
 				for (int x = 0; x < row.length; x++)
 				{
 					TableCell cell = row[x];
-					elemRow[x] = cell != null  ?  new DPTable.TableCell( cell.child.present( childCtx ).layoutWrap(), cell.colSpan, cell.rowSpan )  :  null;  
+					elemRow[x] = cell != null  ?  new DPTable.TableCell( cell.child.present( ctx, childStyle ).layoutWrap(), cell.colSpan, cell.rowSpan )  :  null;  
 				}
 			}
 			element.setCells( elemCells );

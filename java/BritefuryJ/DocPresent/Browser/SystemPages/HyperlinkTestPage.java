@@ -7,14 +7,12 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
-import java.util.Map;
 
 import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPProxy;
 import BritefuryJ.DocPresent.Combinators.ElementRef;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Proxy;
@@ -59,10 +57,10 @@ public class HyperlinkTestPage extends SystemPage
 
 		public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonEvent event)
 		{
-			for (Map.Entry<DPElement, PresentationContext> entry: parentElement.getElementsAndContexts())
+			for (DPElement element: parentElement.getElements())
 			{
-				DPProxy proxy = (DPProxy)entry.getKey();
-				proxy.setChild( newContents.present( entry.getValue() ) );
+				DPProxy proxy = (DPProxy)element;
+				proxy.setChild( newContents.present( parentElement.getContextForElement( element ), parentElement.getStyleForElement( element ) ) );
 			}
 		}
 	}

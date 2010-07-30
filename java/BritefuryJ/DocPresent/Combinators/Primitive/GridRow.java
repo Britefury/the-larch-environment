@@ -12,6 +12,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPGridRow;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.SequentialPres;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class GridRow extends SequentialPres
 {
@@ -27,10 +28,10 @@ public class GridRow extends SequentialPres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPGridRow element = new DPGridRow( Primitive.gridRowParams.get( ctx.getStyle() ) );
-		element.setChildren( mapPresent( ctx.withStyle( Primitive.useGridRowParams( ctx.getStyle() ) ), children ) );
+		DPGridRow element = new DPGridRow( Primitive.gridRowParams.get( style ) );
+		element.setChildren( mapPresent( ctx, Primitive.useGridRowParams( style ), children ) );
 		return element;
 	}
 }

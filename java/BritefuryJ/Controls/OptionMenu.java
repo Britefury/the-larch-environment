@@ -100,10 +100,10 @@ public class OptionMenu extends ControlPres
 		private OptionMenuListener listener;
 		
 		
-		protected OptionMenuControl(PresentationContext ctx, DPBorder element, DPBin choiceContainer, Pres choices[], int initialChoice, OptionMenuListener listener,
+		protected OptionMenuControl(PresentationContext ctx, StyleValues style, DPBorder element, DPBin choiceContainer, Pres choices[], int initialChoice, OptionMenuListener listener,
 				BritefuryJ.DocPresent.Border.AbstractBorder optionMenuBorder, BritefuryJ.DocPresent.Border.AbstractBorder optionMenuHoverBorder)
 		{
-			super( ctx );
+			super( ctx, style );
 			this.element = element;
 			this.optionMenuBorder = optionMenuBorder;
 			this.optionMenuHoverBorder = optionMenuHoverBorder;
@@ -137,8 +137,7 @@ public class OptionMenu extends ControlPres
 		
 		private void displayDropdown()
 		{
-			PresentationContext dropDownCtx = ctx.withStyle( ctx.getStyle().withAttr( Controls.bClosePopupOnActivate, true ) );
-			choiceMenu.popupBelow( element, dropDownCtx );
+			choiceMenu.popupBelow( element, ctx, style.withAttr( Controls.bClosePopupOnActivate, true ) );
 		}
 		
 		
@@ -155,7 +154,7 @@ public class OptionMenu extends ControlPres
 				currentChoice = choice;
 				
 				Pres newChoiceContainer = new Bin( choices[currentChoice] );
-				DPBin newChoiceContainerElement = (DPBin)newChoiceContainer.present( ctx );
+				DPBin newChoiceContainerElement = (DPBin)newChoiceContainer.present( ctx, style );
 				choiceContainer.replaceWith( newChoiceContainerElement );
 				choiceContainer = newChoiceContainerElement;
 				
@@ -198,26 +197,25 @@ public class OptionMenu extends ControlPres
 	
 	
 	@Override
-	public Control createControl(PresentationContext ctx)
+	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
-		StyleValues style = ctx.getStyle();
-		PresentationContext usedStyleCtx = Controls.useOptionMenuAttrs( ctx );
+		StyleValues usedStyle = Controls.useOptionMenuAttrs( style );
 		
 		StyleSheet2 arrowStyle = StyleSheet2.instance.withAttr( Primitive.shapePainter, style.get( Controls.optionMenuArrowPainter, Painter.class ) );
 		double arrowSize = style.get( Controls.optionMenuArrowSize, Double.class );
 		Pres arrow = arrowStyle.applyTo( new Arrow( Arrow.Direction.DOWN, arrowSize ) );
 		
 		Pres choiceBin = new Bin( new Bin( choices[initialChoice] ) );
-		DPBin choiceContainer = (DPBin)choiceBin.present( usedStyleCtx );
+		DPBin choiceContainer = (DPBin)choiceBin.present( ctx, usedStyle );
 		
 		BritefuryJ.DocPresent.Border.AbstractBorder border = style.get( Controls.optionMenuBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class );
 		BritefuryJ.DocPresent.Border.AbstractBorder hoverBorder = style.get( Controls.optionMenuHoverBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class );
 		StyleSheet2 optionStyle = StyleSheet2.instance.withAttr( Primitive.hboxSpacing, style.get( Controls.optionMenuContentsSpacing, Double.class ) ).withAttr( Primitive.border, border );
 		Pres optionContents = new HBox( new Pres[] { coerce( choiceContainer ).alignHExpand().alignVCentre(), arrow.alignVCentre() } );
 		Pres optionMenu = optionStyle.applyTo( new Border( optionContents.alignHExpand() ) ); 
-		DPBorder optionMenuElement = (DPBorder)optionMenu.present( ctx );
+		DPBorder optionMenuElement = (DPBorder)optionMenu.present( ctx, style );
 		
 		
-		return new OptionMenuControl( ctx, optionMenuElement, choiceContainer, choices, initialChoice, listener, border, hoverBorder );
+		return new OptionMenuControl( ctx, style, optionMenuElement, choiceContainer, choices, initialChoice, listener, border, hoverBorder );
 	}
 }

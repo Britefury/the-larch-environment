@@ -12,6 +12,7 @@ import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class VerticalField extends Pres
 {
@@ -27,13 +28,13 @@ public class VerticalField extends Pres
 	
 	
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		StyleSheet2 fieldStyle = ctx.getStyle().get( GenericStyle.objectFieldStyle, StyleSheet2.class );
-		double indentation = ctx.getStyle().get( GenericStyle.objectFieldIndentation, Double.class );
+		StyleSheet2 fieldStyle = style.get( GenericStyle.objectFieldStyle, StyleSheet2.class );
+		double indentation = style.get( GenericStyle.objectFieldIndentation, Double.class );
 		
-		DPElement valueElement = value.present( GenericStyle.useObjectFieldAttrs( ctx ) );
+		DPElement valueElement = value.present( ctx, GenericStyle.useObjectFieldAttrs( style ) );
 		
-		return fieldStyle.applyTo( new VBox( new Object[] { new StaticText( title ), valueElement.padX( indentation, 0.0 ) } ) ).present( ctx );
+		return fieldStyle.applyTo( new VBox( new Object[] { new StaticText( title ), valueElement.padX( indentation, 0.0 ) } ) ).present( ctx, style );
 	}
 }

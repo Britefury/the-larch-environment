@@ -30,10 +30,10 @@ abstract class AbstractScrolledViewport extends ControlPres
 		
 		
 		
-		public ScrolledViewportControl(PresentationContext ctx, DPViewport viewport, DPElement element,
+		public ScrolledViewportControl(PresentationContext ctx, StyleValues style, DPViewport viewport, DPElement element,
 				ScrollBar.ScrollBarControl xScrollBar, ScrollBar.ScrollBarControl yScrollBar, Range xRange, Range yRange)
 		{
-			super( ctx );
+			super( ctx, style );
 			
 			this.viewport = viewport;
 			this.element = element;
@@ -90,29 +90,28 @@ abstract class AbstractScrolledViewport extends ControlPres
 
 	
 	@Override
-	public Control createControl(PresentationContext ctx)
+	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
-		StyleValues style = ctx.getStyle();
 		double scrollBarSize = style.get( Controls.scrollBarSize, Double.class );
 
 		Range xRange = new Range( 0.0, 1.0, 0.0, 1.0, 0.1 );
 		Range yRange = new Range( 0.0, 1.0, 0.0, 1.0, 0.1 );
 		
 		Viewport viewport = new Viewport( child, xRange, yRange, state );
-		DPViewport viewportElement = (DPViewport)viewport.present( ctx );
+		DPViewport viewportElement = (DPViewport)viewport.present( ctx, style );
 		
 		Pres bin = createViewportBin( viewportElement.alignHExpand().alignVExpand() );
 		HScrollBar xScroll = new HScrollBar( xRange );
-		ScrollBar.ScrollBarControl xScrollCtl = (ScrollBarControl)xScroll.createControl( ctx );
+		ScrollBar.ScrollBarControl xScrollCtl = (ScrollBarControl)xScroll.createControl( ctx, style );
 		VScrollBar yScroll = new VScrollBar( yRange );
-		ScrollBar.ScrollBarControl yScrollCtl = (ScrollBarControl)yScroll.createControl( ctx );
+		ScrollBar.ScrollBarControl yScrollCtl = (ScrollBarControl)yScroll.createControl( ctx, style );
 		
 		Pres hbox0 = new HBox( new Object[] { bin.alignHExpand().alignVExpand(), yScrollCtl.getElement().alignVExpand() } );
 		Pres hbox1 = new HBox( new Object[] { xScrollCtl.getElement().alignHExpand(), new Spacer( scrollBarSize, scrollBarSize ) } );
 		Pres vbox = new VBox( new Pres[] { hbox0.alignHExpand().alignVExpand(), hbox1.alignHExpand() } );
-		DPElement element = vbox.present( ctx );
+		DPElement element = vbox.present( ctx, style );
 		
-		return new ScrolledViewportControl( ctx, viewportElement, element, xScrollCtl, yScrollCtl, xRange, yRange );
+		return new ScrolledViewportControl( ctx, style, viewportElement, element, xScrollCtl, yScrollCtl, xRange, yRange );
 	}
 
 

@@ -26,6 +26,7 @@ import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 import BritefuryJ.Math.Point2;
 
 public class NonLocalDndTestPage extends SystemPage
@@ -71,10 +72,10 @@ public class NonLocalDndTestPage extends SystemPage
 		Pres fileReceiverPres = new Pres()
 		{
 			@Override
-			public DPElement present(final PresentationContext ctx)
+			public DPElement present(final PresentationContext ctx, final StyleValues style)
 			{
 				Pres dest = makeDest(); 
-				final DPElement element = dest.present( ctx );
+				final DPElement element = dest.present( ctx, style );
 
 				
 				ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
@@ -89,7 +90,7 @@ public class NonLocalDndTestPage extends SystemPage
 						{
 							elements.add( new StaticText( x.toString() ) );
 						}
-						DPElement e = new VBox( elements ).present( ctx );
+						DPElement e = new VBox( elements ).present( ctx, style );
 						
 						((DPProxy)element).setChild( e );
 						

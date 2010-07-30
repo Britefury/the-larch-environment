@@ -8,14 +8,12 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Map;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPProxy;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Combinators.ElementRef;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.Fraction;
@@ -95,10 +93,10 @@ public class DndTestPage extends SystemPage
 			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
 			{
 				Pres factory = (Pres)data;
-				for (Map.Entry<DPElement,PresentationContext> entry: placeHolder.getElementsAndContexts())
+				for (DPElement element: placeHolder.getElements())
 				{
-					DPProxy placeHolder = (DPProxy)entry.getKey();
-					placeHolder.setChild( factory.present( entry.getValue() ) );
+					DPProxy proxy = (DPProxy)element;
+					proxy.setChild( factory.present( placeHolder.getContextForElement( element ), placeHolder.getStyleForElement( element ) ) );
 				}
 				return true;
 			}

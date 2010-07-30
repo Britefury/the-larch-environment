@@ -8,6 +8,7 @@ package BritefuryJ.DocPresent.Combinators.RichText;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Heading6 extends RichParagraph
 {
@@ -17,8 +18,8 @@ public class Heading6 extends RichParagraph
 	}
 
 	@Override
-	public DPElement present(PresentationContext ctx)
+	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		return presentParagraph( ctx.withStyleSheet( RichText.h6TextStyle( ctx.getStyle() ) ) );
+		return presentParagraph( ctx, style.withAttrs( RichText.h6TextStyle( style ) ) );
 	}
 }

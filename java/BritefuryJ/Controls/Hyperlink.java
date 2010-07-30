@@ -18,6 +18,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Text;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Input.Modifier;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Hyperlink extends ControlPres
 {
@@ -130,9 +131,9 @@ public class Hyperlink extends ControlPres
 		private boolean bClosePopupOnActivate;
 		
 		
-		protected HyperlinkControl(PresentationContext ctx, DPText element, LinkListener listener, boolean bClosePopupOnActivate)
+		protected HyperlinkControl(PresentationContext ctx, StyleValues style, DPText element, LinkListener listener, boolean bClosePopupOnActivate)
 		{
-			super( ctx );
+			super( ctx, style );
 			this.element = element;
 			this.listener = listener;
 			this.element.addInteractor( new LinkInteractor() );
@@ -178,18 +179,18 @@ public class Hyperlink extends ControlPres
 	
 	
 	@Override
-	public Control createControl(PresentationContext ctx)
+	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
-		StyleSheet2 style = ctx.getStyle().get( Controls.hyperlinkAttrs, StyleSheet2.class );
-		Pres textElement = style.applyTo( new Text( text ) );
-		boolean bClosePopupOnActivate = style.get( Controls.bClosePopupOnActivate, Boolean.class );
+		StyleSheet2 hyperlinkStyle = style.get( Controls.hyperlinkAttrs, StyleSheet2.class );
+		Pres textElement = hyperlinkStyle.applyTo( new Text( text ) );
+		boolean bClosePopupOnActivate = hyperlinkStyle.get( Controls.bClosePopupOnActivate, Boolean.class );
 		
-		DPText element = (DPText)textElement.present( ctx );
+		DPText element = (DPText)textElement.present( ctx, style );
 		if ( menuFactory != null )
 		{
 			element.addContextMenuFactory( menuFactory );
 		}
 		
-		return new HyperlinkControl( ctx, element, listener, bClosePopupOnActivate );
+		return new HyperlinkControl( ctx, style, element, listener, bClosePopupOnActivate );
 	}
 }
