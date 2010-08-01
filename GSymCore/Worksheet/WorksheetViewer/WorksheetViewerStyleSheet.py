@@ -18,7 +18,7 @@ from BritefuryJ.DocPresent.Browser import Location
 from Britefury.AttributeTableUtils.DerivedAttributeMethod import DerivedAttributeMethod
 
 #from GSymCore.Languages.Python25.PythonEditor.PythonEditorStyleSheet import PythonEditorStyleSheet
-from GSymCore.Languages.Python25.Execution.ExecutionStyleSheet import ExecutionStyleSheet
+#from GSymCore.Languages.Python25.Execution.ExecutionStyleSheet import ExecutionStyleSheet
 
 
 
