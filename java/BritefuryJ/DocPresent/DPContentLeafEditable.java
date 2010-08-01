@@ -16,11 +16,13 @@ import java.util.WeakHashMap;
 
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StyleParams.ContentLeafEditableStyleParams;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.Math.Point2;
 
 public abstract class DPContentLeafEditable extends DPContentLeaf
@@ -861,11 +863,11 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	// Meta element methods
 	//
 	
-	protected static PrimitiveStyleSheet metaHeaderHighlightBorderStyle = PrimitiveStyleSheet.instance.withBorder(
+	protected static StyleSheet2 metaHeaderHighlightBorderStyle = StyleSheet2.instance.withAttr( Primitive.border,
 			new SolidBorder( 1.0, 1.0, 5.0, 5.0, new Color( 0.75f, 0.0f, 0.0f ), new Color( 1.0f, 0.9f, 0.8f ) ) );
-	protected static PrimitiveStyleSheet metaHeaderCaretPosStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.25f, 0.0f, 0.5f ) );
+	protected static StyleSheet2 metaHeaderCaretPosStyle = StyleSheet2.instance.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
 
-	protected void createDebugPresentationHeaderContents(ArrayList<DPElement> elements)
+	protected void createDebugPresentationHeaderContents(ArrayList<Object> elements)
 	{
 		super.createDebugPresentationHeaderContents( elements );
 		Caret caret = rootElement != null  ?  rootElement.getCaret()  :  null;
@@ -874,12 +876,12 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 			DPContentLeaf e = caret.getElement();
 			if ( e == this )
 			{
-				elements.add( metaHeaderCaretPosStyle.staticText( "@[" + caret.getPosition() + ":" + caret.getBias() + "]" ) );
+				elements.add( metaHeaderCaretPosStyle.applyTo( new StaticText( "@[" + caret.getPosition() + ":" + caret.getBias() + "]" ) ) );
 			}
 		}
 	}
 
-	protected PrimitiveStyleSheet getDebugPresentationHeaderBorderStyle()
+	protected StyleSheet2 getDebugPresentationHeaderBorderStyle()
 	{
 		Caret caret = rootElement != null  ?  rootElement.getCaret()  :  null;
 		if ( caret != null )

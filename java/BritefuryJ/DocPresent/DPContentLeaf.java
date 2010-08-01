@@ -13,7 +13,7 @@ import BritefuryJ.DocPresent.LayoutTree.ContentLeafLayoutNodeInterface;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StyleParams.ContentLeafStyleParams;
-import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.GSym.GenericPerspective.PresCom.UnescapedStringAsHBox;
 import BritefuryJ.Math.Point2;
 
 public abstract class DPContentLeaf extends DPElement
@@ -317,9 +317,9 @@ public abstract class DPContentLeaf extends DPElement
 	// Meta element methods
 	//
 	
-	protected void createDebugPresentationHeaderContents(ArrayList<DPElement> elements)
+	protected void createDebugPresentationHeaderContents(ArrayList<Object> elements)
 	{
-		elements.add( GenericPerspectiveStyleSheet.instance.unescapedStringAsHBox( textRepresentation ) );
+		elements.add( new UnescapedStringAsHBox( textRepresentation ) );
 		
 		super.createDebugPresentationHeaderContents( elements );
 	}

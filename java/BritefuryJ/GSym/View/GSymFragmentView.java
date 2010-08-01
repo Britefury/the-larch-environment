@@ -15,12 +15,14 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPFragment;
 import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.Browser.Location;
+import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 import BritefuryJ.GSym.GSymAbstractPerspective;
 import BritefuryJ.GSym.GSymBrowserContext;
 import BritefuryJ.GSym.GSymSubject;
@@ -273,11 +275,11 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 
 
 	
-	private DPElement presentFragment(Object x, GSymAbstractPerspective perspective, AttributeTable subjectContext, StyleSheet styleSheet, AttributeTable inheritedState)
+	private DPElement presentInnerFragment(Object model, GSymAbstractPerspective perspective, AttributeTable subjectContext, StyleValues style, AttributeTable inheritedState)
 	{
-		if ( x == null )
+		if ( model == null )
 		{
-			return GSymPrimitivePresenter.presentNull();
+			return GSymPrimitivePresenter.presentNull().present( new PresentationContext( this, perspective, inheritedState ), style );
 		}
 		
 		
@@ -288,7 +290,7 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 
 		// A call to DocNode.buildNodeView builds the view, and puts it in the DocView's table
 		GSymView view = getView();
-		GSymFragmentView incrementalNode = (GSymFragmentView)view.buildIncrementalTreeNodeResult( x, view.makeNodeResultFactory( perspective, subjectContext, styleSheet, inheritedState ) );
+		GSymFragmentView incrementalNode = (GSymFragmentView)view.buildIncrementalTreeNodeResult( model, view.makeNodeResultFactory( perspective, subjectContext, style, inheritedState ) );
 		
 		
 		// Block access tracking to prevent the contents of this node being dependent upon the child node being refreshed,
@@ -312,95 +314,24 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	}
 	
 
-	
-	
-	public DPElement presentFragment(Object x, StyleSheet styleSheet)
+	public DPElement presentInnerFragment(Object x, GSymAbstractPerspective perspective, StyleValues style, AttributeTable inheritedState)
 	{
 		GSymView.ViewFragmentContextAndResultFactory factory = getNodeResultFactory();
-		return presentFragment( x, factory.perspective, factory.subjectContext, styleSheet, factory.inheritedState );
-	}
-
-	public DPElement presentFragment(Object x, StyleSheet styleSheet, AttributeTable inheritedState)
-	{
-		GSymView.ViewFragmentContextAndResultFactory factory = getNodeResultFactory();
-		return presentFragment( x, factory.perspective, factory.subjectContext, styleSheet, inheritedState );
-	}
-
-	public DPElement presentFragmentWithPerspective(Object x, GSymAbstractPerspective perspective)
-	{
-		GSymView.ViewFragmentContextAndResultFactory factory = getNodeResultFactory();
-		DPElement e = presentFragment( x, perspective, factory.subjectContext, perspective.getStyleSheet(), perspective.getInitialInheritedState() );
-		return perspectiveFragmentRegion( e, perspective );
-	}
-
-	public DPElement presentFragmentWithPerspective(Object x, GSymAbstractPerspective perspective, AttributeTable inheritedState)
-	{
-		GSymView.ViewFragmentContextAndResultFactory factory = getNodeResultFactory();
-		DPElement e = presentFragment( x, perspective, factory.subjectContext, perspective.getStyleSheet(), inheritedState );
-		return perspectiveFragmentRegion( e, perspective );
-	}
-
-	public DPElement presentFragmentWithPerspectiveAndStyleSheet(Object x, GSymAbstractPerspective perspective, StyleSheet styleSheet)
-	{
-		GSymView.ViewFragmentContextAndResultFactory factory = getNodeResultFactory();
-		DPElement e = presentFragment( x, perspective, factory.subjectContext, styleSheet, perspective.getInitialInheritedState() );
-		return perspectiveFragmentRegion( e, perspective );
-	}
-
-	public DPElement presentFragmentWithPerspectiveAndStyleSheet(Object x, GSymAbstractPerspective perspective, StyleSheet styleSheet, AttributeTable inheritedState)
-	{
-		GSymView.ViewFragmentContextAndResultFactory factory = getNodeResultFactory();
-		DPElement e = presentFragment( x, perspective, factory.subjectContext, styleSheet, inheritedState );
-		return perspectiveFragmentRegion( e, perspective );
-	}
-	
-	public DPElement presentFragmentWithGenericPerspective(Object x)
-	{
-		GSymAbstractPerspective genericPerspective = getBrowserContext().getGenericPerspective();
-		return presentFragmentWithPerspective( x, genericPerspective );
-	}
-	
-	public DPElement presentFragmentWithGenericPerspective(Object x, AttributeTable inheritedState)
-	{
-		GSymAbstractPerspective genericPerspective = getBrowserContext().getGenericPerspective();
-		return presentFragmentWithPerspective( x, genericPerspective, inheritedState );
-	}
-	
-	
-	
-	
-	private List<DPElement> mapPresentFragment(List<Object> xs, GSymAbstractPerspective perspective, AttributeTable subjectContext,
-			StyleSheet styleSheet, AttributeTable inheritedState)
-	{
-		ArrayList<DPElement> children = new ArrayList<DPElement>();
-		children.ensureCapacity( xs.size() );
-		for (Object x: xs)
+		DPElement e = presentInnerFragment( x, perspective, factory.subjectContext, style, inheritedState );
+		if ( perspective != factory.perspective )
 		{
-			children.add( presentFragment( x, perspective, subjectContext, styleSheet, inheritedState ) );
+			e = perspectiveFragmentRegion( e, perspective );
 		}
-		return children;
+		return e;
 	}
 	
-
-	public List<DPElement> mapPresentFragment(List<Object> xs, StyleSheet styleSheet)
-	{
-		GSymView.ViewFragmentContextAndResultFactory factory = getNodeResultFactory();
-		return mapPresentFragment( xs, factory.perspective, factory.subjectContext, styleSheet, factory.inheritedState );
-	}
-
-	public List<DPElement> mapPresentFragment(List<Object> xs, StyleSheet styleSheet, AttributeTable inheritedState)
-	{
-		GSymView.ViewFragmentContextAndResultFactory factory = getNodeResultFactory();
-		return mapPresentFragment( xs, factory.perspective, factory.subjectContext, styleSheet, inheritedState );
-	}
-
 	
 	
-	public DPElement presentLocationAsElement(Location location)
+	public DPElement presentLocationAsElement(Location location, StyleValues style)
 	{
 		GSymSubject subject = getBrowserContext().resolveLocationAsSubject( location );
 		GSymAbstractPerspective perspective = subject.getPerspective();
-		DPElement e = presentFragment( subject.getFocus(), perspective, subject.getSubjectContext(), perspective.getStyleSheet(), perspective.getInitialInheritedState() );
+		DPElement e = presentInnerFragment( subject.getFocus(), perspective, subject.getSubjectContext(), style.withAttrs( perspective.getStyleSheet() ), perspective.getInitialInheritedState() );
 		return perspectiveFragmentRegion( e, perspective );
 	}
 	

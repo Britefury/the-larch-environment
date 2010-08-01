@@ -16,13 +16,13 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
 import BritefuryJ.GSym.GenericPerspective.PresCom.HorizontalField;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBoxWithFields;
 import BritefuryJ.GSym.GenericPerspective.PresCom.VerticalField;
+import BritefuryJ.GSym.PresCom.InnerFragment;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.ParserHelpers.DebugNode;
 import BritefuryJ.ParserHelpers.ParseResultInterface;
@@ -265,7 +265,7 @@ public class ParseResult implements ParseResultInterface, Presentable
 							new StaticText( " to " ),
 							rangeStyle.applyTo( new StaticText( String.valueOf( getEnd() ) ) ) } ) ) );
 			
-			Pres valueView = Pres.elementToPres( fragment.presentFragment( getValue(), StyleSheet.instance, inheritedState ) );
+			Pres valueView = new InnerFragment( getValue() );
 			Pres value = parseResultStyle.applyTo( new VerticalField( "Value:", valueView ) );
 			fields = new Pres[] { status, range, value };
 		}

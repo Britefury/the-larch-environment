@@ -15,13 +15,13 @@ import org.python.core.Py;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
 import BritefuryJ.GSym.GenericPerspective.PresCom.HorizontalField;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBoxWithFields;
 import BritefuryJ.GSym.GenericPerspective.PresCom.VerticalField;
+import BritefuryJ.GSym.PresCom.InnerFragment;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
 public class LogEntry implements Presentable
@@ -191,7 +191,7 @@ public class LogEntry implements Presentable
 		for (int i = 0; i < items.size(); i++)
 		{
 			Item item = items.get( i );
-			Pres valueView = Pres.elementToPres( fragment.presentFragment( item.getValue(), StyleSheet.instance, inheritedState ) );
+			Pres valueView = new InnerFragment( item.getValue() );
 			if ( item.getLayout() == Layout.HORIZONTAL )
 			{
 				fields[i] = new HorizontalField( item.getName(), valueView );

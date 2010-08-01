@@ -10,6 +10,9 @@ from datetime import datetime
 
 from java.lang import Object
 
+from java.awt import Color
+from java.awt import BasicStroke
+
 from java.awt.event import KeyEvent
 
 from java.util.regex import Pattern
@@ -27,13 +30,19 @@ from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replac
 
 from Britefury.Util.NodeUtil import *
 
+from BritefuryJ.Cell import LiteralCell
+
 from BritefuryJ.AttributeTable import *
 
 from BritefuryJ.DocPresent.Browser import Location
-from BritefuryJ.DocPresent.StyleSheet import PrimitiveStyleSheet, RichTextStyleSheet
-from BritefuryJ.DocPresent.Controls import ControlsStyleSheet, TextEntry
+from BritefuryJ.DocPresent.Border import *
+from BritefuryJ.DocPresent.Painter import *
+from BritefuryJ.DocPresent.StyleSheet import StyleSheet2, PrimitiveStyleSheet, RichTextStyleSheet
 from BritefuryJ.DocPresent.Input import ObjectDndHandler
-from BritefuryJ.DocPresent import *
+from BritefuryJ.Controls import *
+from BritefuryJ.DocPresent.Combinators.Primitive import *
+from BritefuryJ.DocPresent.Combinators.RichText import *
+from BritefuryJ.GSym.PresCom import *
 
 from BritefuryJ.GSym import GSymPerspective, GSymSubject, GSymRelativeLocationResolver
 
@@ -41,11 +50,9 @@ from BritefuryJ.GSym import GSymPerspective, GSymSubject, GSymRelativeLocationRe
 from GSymCore.GSymApp import DocumentManagement
 
 from GSymCore.Project import Schema
-from GSymCore.Project.ProjectEditor.ProjectEditorStyleSheet import ProjectEditorStyleSheet
+#from GSymCore.Project.ProjectEditor.ProjectEditorStyleSheet import ProjectEditorStyleSheet
 
 
-
-_controlsStyle = ControlsStyleSheet.instance.withClosePopupOnActivate()
 
 # handleNewPageFn(unit)
 def _newPageMenu(world, handleNewPageFn):
@@ -56,8 +63,8 @@ def _newPageMenu(world, handleNewPageFn):
 		return newPage
 	items = []
 	for newPageFactory in world.newPageFactories:
-		items.append( _controlsStyle.menuItemWithLabel( newPageFactory.menuLabelText, _make_newPage( newPageFactory.newPageFn ) ).getElement() )
-	return _controlsStyle.vpopupMenu( items )
+		items.append( MenuItem.menuItemWithLabel( newPageFactory.menuLabelText, _make_newPage( newPageFactory.newPageFn ) ) )
+	return VPopupMenu( items )
 	
 	
 	
@@ -85,8 +92,8 @@ def _importPageMenu(world, component, handleImportedPageFn):
 
 	items = []
 	for pageImporter in world.pageImporters:
-		items.append( _controlsStyle.menuItemWithLabel( pageImporter.menuLabelText, _make_importPage( pageImporter.fileType, pageImporter.filePattern, pageImporter.importFn ) ).getElement() )
-	return _controlsStyle.vpopupMenu( items )
+		items.append( MenuItem.menuItemWithLabel( pageImporter.menuLabelText, _make_importPage( pageImporter.fileType, pageImporter.filePattern, pageImporter.importFn ) ) )
+	return VPopupMenu( items )
 
 
 
@@ -212,9 +219,21 @@ _pageDropDest = ObjectDndHandler.DropDest( ProjectDrag, _pageCanDrop, _pageDrop 
 _packageDropDest = ObjectDndHandler.DropDest( ProjectDrag, _packageCanDrop, _packageDrop )
 
 
+
+
+_controlsStyle = StyleSheet2.instance.withAttr( Controls.bClosePopupOnActivate, True )
+_projectControlsStyle = StyleSheet2.instance.withAttr( Primitive.border, SolidBorder( 2.0, 2.0, Color( 131, 149, 172 ), None ) ).withAttr( Primitive.hboxSpacing, 30.0 )
+_packageNameStyle = StyleSheet2.instance.withAttr( Primitive.foreground, Color( 0.0, 0.0, 0.5 ) ).withAttr( Primitive.fontBold, True ).withAttr( Primitive.fontSize, 14 )
+_itemHoverHighlightStyle = StyleSheet2.instance.withAttr( Primitive.hoverBackground, FilledOutlinePainter( Color( 0.8, 0.825, 0.9 ), Color( 0.125, 0.341, 0.574 ), BasicStroke( 1.0 ) ) )
+
+_packageContentsIndentation = 20.0
+
+
+
+
 class ProjectView (GSymViewObjectNodeDispatch):
 	@DMObjectNodeDispatchMethod( Schema.Project )
-	def Project(self, ctx, styleSheet, state, node, rootPackage):
+	def Project(self, ctx, state, node, rootPackage):
 		def _onSave(link, buttonEvent):
 			if document._filename is None:
 				def handleSaveDocumentAsFn(filename):
@@ -239,14 +258,31 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		name = document.getDocumentName()
 		
 		state = state.withAttrs( location=location )
-		rootView = ctx.presentFragment( rootPackage, styleSheet, state.withAttrs( projectRootPackage=True ) ).alignHExpand()
+		rootView = InnerFragment( rootPackage, state.withAttrs( projectRootPackage=True ) ).alignHExpand()
+		
 
-		return styleSheet.project( name, rootView, _onSave, _onSaveAs )
-
+		homeLink = Hyperlink( 'HOME PAGE', Location( '' ) )
+		linkHeader = LinkHeaderBar( [ homeLink ] )
+		
+		title = TitleBarWithSubtitle( 'DOCUMENT', name )
+		
+		
+		saveLink = Hyperlink( 'SAVE', _onSave )
+		saveAsLink = Hyperlink( 'SAVE AS', _onSaveAs )
+		controlsBox = HBox( [ saveLink.padX( 10.0 ), saveAsLink.padX( 10.0 ) ] )
+		controlsBorder = _projectControlsStyle.applyTo( Border( controlsBox ) )
+		
+		indexHeader = Heading3( 'Project Index' )
+		projectIndex = VBox( [ indexHeader, rootView.alignHExpand() ] )
+		
+		head = Head( [ linkHeader, title ] )
+		body = Body( [ controlsBorder.pad( 5.0, 10.0 ).alignHLeft(), projectIndex ] )
+		
+		return Page( [ head, body ] )
 
 
 	@DMObjectNodeDispatchMethod( Schema.Package )
-	def Package(self, ctx, styleSheet, state, node, name, contents):
+	def Package(self, ctx, state, node, name, contents):
 		def _addPackage(menuItem):
 			contents.append( Schema.Package( name='NewPackage', contents=[] ) )
 
@@ -255,12 +291,13 @@ class ProjectView (GSymViewObjectNodeDispatch):
 				node['name'] = text
 				
 			def onCancel(self, textEntry, originalText):
-				nameBox.setChildren( [ nameElement ] )
+				nameCell.setLiteralValue( nameBox )
 		
 		def _onRename(menuItem):
-			textEntry = styleSheet.renameEntry( name, _RenameListener(), _nameRegex, 'Please enter a valid identifier' )
-			nameBox.setChildren( [ textEntry.getElement() ] )
-			textEntry.grabCaret()
+			textEntry = TextEntry( name, _RenameListener(), _nameRegex, 'Please enter a valid identifier' )
+			nameCell.setLiteralValue( textEntry )
+			# TODO
+			# textEntry.grabCaret()
 			
 		def _addPage(pageUnit):
 			#contents.append( Schema.Page( name='New page', unit=pageUnit ) )
@@ -271,52 +308,69 @@ class ProjectView (GSymViewObjectNodeDispatch):
 			contents.append( Schema.Page( name=name, unit=pageUnit ) )
 
 		def _packageContextMenuFactory(element, menu):
-			menu.add( _controlsStyle.menuItemWithLabel( 'New package', _addPackage ).getElement() )
+			menu.add( MenuItem.menuItemWithLabel( 'New package', _addPackage ) )
 			newPageMenu = _newPageMenu( world, _addPage )
 			importPageMenu = _importPageMenu( world, element.getRootElement().getComponent(), _importPage )
-			menu.add( _controlsStyle.subMenuItemRightWithLabel( 'New page', newPageMenu ).getElement() )
-			menu.add( _controlsStyle.subMenuItemRightWithLabel( 'Import page', importPageMenu ).getElement() )
-			menu.add( RichTextStyleSheet.instance.hseparator() )
-			menu.add( _controlsStyle.menuItemWithLabel( 'Rename', _onRename ).getElement() )
+			menu.add( MenuItem.menuItemWithLabel( 'New page', newPageMenu, MenuItem.SubmenuPopupDirection.RIGHT ) )
+			menu.add( MenuItem.menuItemWithLabel( 'Import page', importPageMenu, MenuItem.SubmenuPopupDirection.RIGHT ) )
+			menu.add( HSeparator() )
+			menu.add( MenuItem.menuItemWithLabel( 'Rename', _onRename ) )
 			return True
 
 		location = state['location']
 		packageLocation = _joinLocation( location, name )
 		
-		items = ctx.mapPresentFragment( contents, styleSheet, state.withAttrs( location=packageLocation ) )
-			
+		items = InnerFragment.mapInnerFragments( contents, state.withAttrs( location=packageLocation ) )
+		
 		world = ctx.getSubjectContext()['world']
-		packageView, nameBox, nameElement = styleSheet.package( name, packageLocation, items, _packageContextMenuFactory, _dragSource, _packageDropDest )
-		return packageView
-	
-
-
+		
+		icon = Image( 'GSymCore/Project/icons/Package.png' )
+		nameElement = _packageNameStyle.applyTo( StaticText( name ) )
+		nameBox = _itemHoverHighlightStyle.applyTo( HBox( [ icon.padX( 5.0 ).alignVCentre(), nameElement.alignVCentre() ]  ) )
+		nameBox = nameBox.addContextMenuFactory( _packageContextMenuFactory )
+		nameBox = nameBox.addDragSource( _dragSource )
+		nameBox = nameBox.addDropDest( _packageDropDest )
+		
+		nameCell = LiteralCell( nameBox )
+		
+		itemsBox = VBox( items )
+		
+		return VBox( [ nameCell.genericPerspectiveValuePresInFragment(), itemsBox.padX( _packageContentsIndentation, 0.0 ).alignHExpand() ] )
+		
+		
 
 	@DMObjectNodeDispatchMethod( Schema.Page )
-	def Page(self, ctx, styleSheet, state, node, name, unit):
+	def Page(self, ctx, state, node, name, unit):
 		class _RenameListener (TextEntry.TextEntryListener):
 			def onAccept(self, textEntry, text):
 				node['name'] = text
 				
 			def onCancel(self, textEntry, originalText):
-				nameBox.setChildren( [ nameElement ] )
-		
-		def _onRename(menuItem):
-			textEntry = styleSheet.renameEntry( name, _RenameListener(), _nameRegex, 'Please enter a valid identifier' )
-			nameBox.setChildren( [ textEntry.getElement() ] )
-			textEntry.grabCaret()
-		
-		def _pageContextMenuFactory(element, menu):
-			menu.add( _controlsStyle.menuItemWithLabel( 'Rename', _onRename ).getElement() )
-			return True
+				nameCell.setLiteralValue( nameBox )
 
+		def _onRename(menuItem):
+			textEntry = TextEntry( name, _RenameListener(), _nameRegex, 'Please enter a valid identifier' )
+			nameCell.setLiteralValue( textEntry )
+			# TODO
+			# textEntry.grabCaret()
+			
+		def _pageContextMenuFactory(element, menu):
+			menu.add( MenuItem.menuItemWithLabel( 'Rename', _onRename ) )
+			return True
+			
+		
 		location = state['location']
 		pageLocation = _joinLocation( location, name )
-		
-		pageView, nameBox, nameElement = styleSheet.page( name, pageLocation, _pageContextMenuFactory, _dragSource, _pageDropDest )
-		return pageView
 
-	
+		link = Hyperlink( name, pageLocation )
+		link = link.addContextMenuFactory( _pageContextMenuFactory )
+		nameBox = _itemHoverHighlightStyle.applyTo( HBox( [ link ] ) )
+		nameBox = nameBox.addDragSource( _dragSource )
+		nameBox = nameBox.addDropDest( _pageDropDest )
+		
+		nameCell = LiteralCell( nameBox )
+		
+		return nameCell.genericPerspectiveValuePresInFragment()
 	
 
 
@@ -371,5 +425,5 @@ class ProjectEditorRelativeLocationResolver (GSymRelativeLocationResolver):
 	
 	
 
-perspective = GSymPerspective( ProjectView(), ProjectEditorStyleSheet.instance, AttributeTable.instance, None, ProjectEditorRelativeLocationResolver() )
+perspective = GSymPerspective( ProjectView(), StyleSheet2.instance, AttributeTable.instance, None, ProjectEditorRelativeLocationResolver() )
 	

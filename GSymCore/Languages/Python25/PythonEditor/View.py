@@ -254,7 +254,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# MISC
 	@DMObjectNodeDispatchMethod( Schema.PythonModule )
-	def PythonModule(self, ctx, styleSheet, state, node, suite):
+	def PythonModule(self, ctx, state, node, suite):
 		if len( suite ) == 0:
 			# Empty document - create a single blank line so that there is something to edit
 			lineViews = [ styleSheet.statementLine( styleSheet.blankLine() ) ]
@@ -269,13 +269,13 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 
 	@DMObjectNodeDispatchMethod( Schema.BlankLine )
-	def BlankLine(self, ctx, styleSheet, state, node):
+	def BlankLine(self, ctx, state, node):
 		return statementNodeEditor( self._parser, styleSheet, node,
 		                            styleSheet.blankLine() )
 
 
 	@DMObjectNodeDispatchMethod( Schema.UNPARSED )
-	def UNPARSED(self, ctx, styleSheet, state, node, value):
+	def UNPARSED(self, ctx, state, node, value):
 		def _viewItem(x):
 			if x is node:
 				raise ValueError, 'Python25View.UNPARSED: self-referential unparsed node'
@@ -295,7 +295,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Comment statement
 	@DMObjectNodeDispatchMethod( Schema.CommentStmt )
-	def CommentStmt(self, ctx, styleSheet, state, node, comment):
+	def CommentStmt(self, ctx, state, node, comment):
 		view = styleSheet.commentStmt( comment )
 		return statementNodeEditor( self._parser, styleSheet, node,
 		                            view )
@@ -308,7 +308,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	__strLit_fmtTable = { 'ascii' : None,  'unicode' : 'u',  'ascii-regex' : 'r',  'unicode-regex' : 'ur' }
 	
 	@DMObjectNodeDispatchMethod( Schema.StringLiteral )
-	def StringLiteral(self, ctx, styleSheet, state, node, format, quotation, value):
+	def StringLiteral(self, ctx, state, node, format, quotation, value):
 		fmt = self.__strLit_fmtTable[format]
 		
 		quote = "'"   if quotation == 'single'   else   '"'
@@ -320,7 +320,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Integer literal
 	@DMObjectNodeDispatchMethod( Schema.IntLiteral )
-	def IntLiteral(self, ctx, styleSheet, state, node, format, numType, value):
+	def IntLiteral(self, ctx, state, node, format, numType, value):
 		boxContents = []
 
 		if numType == 'int':
@@ -345,7 +345,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Float literal
 	@DMObjectNodeDispatchMethod( Schema.FloatLiteral )
-	def FloatLiteral(self, ctx, styleSheet, state, node, value):
+	def FloatLiteral(self, ctx, state, node, value):
 		return expressionNodeEditor( self._parser, styleSheet, node,
 					     PRECEDENCE_LITERALVALUE,
 					     styleSheet.floatLiteral( value ) )
@@ -354,7 +354,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Imaginary literal
 	@DMObjectNodeDispatchMethod( Schema.ImaginaryLiteral )
-	def ImaginaryLiteral(self, ctx, styleSheet, state, node, value):
+	def ImaginaryLiteral(self, ctx, state, node, value):
 		return expressionNodeEditor( self._parser, styleSheet, node,
 					     PRECEDENCE_LITERALVALUE,
 		                             styleSheet.imaginaryLiteral( value ) )
@@ -363,14 +363,14 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Targets
 	@DMObjectNodeDispatchMethod( Schema.SingleTarget )
-	def SingleTarget(self, ctx, styleSheet, state, node, name):
+	def SingleTarget(self, ctx, state, node, name):
 		return expressionNodeEditor( self._parser, styleSheet, node,
 					     PRECEDENCE_SINGLETARGET,
 					     styleSheet.singleTarget( name ) )
 
 
 	@DMObjectNodeDispatchMethod( Schema.TupleTarget )
-	def TupleTarget(self, ctx, styleSheet, state, node, targets, trailingSeparator):
+	def TupleTarget(self, ctx, state, node, targets, trailingSeparator):
 		elementViews = ctx.mapPresentFragment( targets, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT ) )
 		view = styleSheet.tupleTarget( elementViews, trailingSeparator is not None )
 		return expressionNodeEditor( self._parser, styleSheet, node,
@@ -378,7 +378,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		                             view )
 
 	@DMObjectNodeDispatchMethod( Schema.ListTarget )
-	def ListTarget(self, ctx, styleSheet, state, node, targets, trailingSeparator):
+	def ListTarget(self, ctx, state, node, targets, trailingSeparator):
 		elementViews = ctx.mapPresentFragment( targets, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT ) )
 		view = styleSheet.listTarget( elementViews, trailingSeparator is not None )
 		return expressionNodeEditor( self._parser, styleSheet, node,
@@ -390,7 +390,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Variable reference
 	@DMObjectNodeDispatchMethod( Schema.Load )
-	def Load(self, ctx, styleSheet, state, node, name):
+	def Load(self, ctx, state, node, name):
 		return expressionNodeEditor( self._parser, styleSheet, node,
 					     PRECEDENCE_LOAD,
 					     styleSheet.load( name ) )
@@ -399,7 +399,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Tuple literal
 	@DMObjectNodeDispatchMethod( Schema.TupleLiteral )
-	def TupleLiteral(self, ctx, styleSheet, state, node, values, trailingSeparator):
+	def TupleLiteral(self, ctx, state, node, values, trailingSeparator):
 		elementViews = ctx.mapPresentFragment( values, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT ) )
 		view = styleSheet.tupleLiteral( elementViews, trailingSeparator is not None )
 		return expressionNodeEditor( self._parser, styleSheet, node,
@@ -410,7 +410,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# List literal
 	@DMObjectNodeDispatchMethod( Schema.ListLiteral )
-	def ListLiteral(self, ctx, styleSheet, state, node, values, trailingSeparator):
+	def ListLiteral(self, ctx, state, node, values, trailingSeparator):
 		elementViews = ctx.mapPresentFragment( values, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT ) )
 		view = styleSheet.listLiteral( elementViews, trailingSeparator is not None )
 		return expressionNodeEditor( self._parser, styleSheet, node,
@@ -421,7 +421,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# List comprehension / generator expression
 	@DMObjectNodeDispatchMethod( Schema.ComprehensionFor )
-	def ComprehensionFor(self, ctx, styleSheet, state, node, target, source):
+	def ComprehensionFor(self, ctx, state, node, target, source):
 		targetView = ctx.presentFragment( target, styleSheet.withPythonState( PRECEDENCE_CONTAINER_COMPREHENSIONFOR) )
 		sourceView = ctx.presentFragment( source, styleSheet.withPythonState( PRECEDENCE_CONTAINER_COMPREHENSIONFOR ) )
 		view = styleSheet.comprehensionFor( targetView, sourceView )
@@ -430,7 +430,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		                             view )
 
 	@DMObjectNodeDispatchMethod( Schema.ComprehensionIf )
-	def ComprehensionIf(self, ctx, styleSheet, state, node, condition):
+	def ComprehensionIf(self, ctx, state, node, condition):
 		conditionView = ctx.presentFragment( condition, styleSheet.withPythonState( PRECEDENCE_CONTAINER_COMPREHENSIONIF ) )
 		view = styleSheet.comprehensionIf( conditionView )
 		return expressionNodeEditor( self._parser, styleSheet, node,
@@ -438,7 +438,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		                             view )
 
 	@DMObjectNodeDispatchMethod( Schema.ListComp )
-	def ListComp(self, ctx, styleSheet, state, node, resultExpr, comprehensionItems):
+	def ListComp(self, ctx, state, node, resultExpr, comprehensionItems):
 		exprView = ctx.presentFragment( resultExpr, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT ) )
 		itemViews = ctx.mapPresentFragment( comprehensionItems, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT ) )
 		view = styleSheet.listComp( exprView, itemViews )
@@ -448,7 +448,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 
 	@DMObjectNodeDispatchMethod( Schema.GeneratorExpr )
-	def GeneratorExpr(self, ctx, styleSheet, state, node, resultExpr, comprehensionItems):
+	def GeneratorExpr(self, ctx, state, node, resultExpr, comprehensionItems):
 		exprView = ctx.presentFragment( resultExpr, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT ) )
 		itemViews = ctx.mapPresentFragment( comprehensionItems, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT ) )
 		view = styleSheet.genExpr( exprView, itemViews )
@@ -461,7 +461,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Dictionary literal
 	@DMObjectNodeDispatchMethod( Schema.DictKeyValuePair )
-	def DictKeyValuePair(self, ctx, styleSheet, state, node, key, value):
+	def DictKeyValuePair(self, ctx, state, node, key, value):
 		keyView = ctx.presentFragment( key, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT ) )
 		valueView = ctx.presentFragment( value, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT ) )
 		view = styleSheet.dictKeyValuePair( keyView, valueView )
@@ -470,7 +470,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		                             view )
 
 	@DMObjectNodeDispatchMethod( Schema.DictLiteral )
-	def DictLiteral(self, ctx, styleSheet, state, node, values, trailingSeparator):
+	def DictLiteral(self, ctx, state, node, values, trailingSeparator):
 		elementViews = ctx.mapPresentFragment( values, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT ) )
 		view = styleSheet.dictLiteral( elementViews, trailingSeparator is not None )
 		return expressionNodeEditor( self._parser, styleSheet, node,
@@ -480,7 +480,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Yield expression
 	@DMObjectNodeDispatchMethod( Schema.YieldExpr )
-	def YieldExpr(self, ctx, styleSheet, state, node, value):
+	def YieldExpr(self, ctx, state, node, value):
 		valueView = ctx.presentFragment( value, styleSheet.withPythonState( PRECEDENCE_CONTAINER_YIELDEXPR ) )
 		view = styleSheet.yieldExpr( valueView )
 		return expressionNodeEditor( self._parser, styleSheet, node,
@@ -491,7 +491,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Attribute ref
 	@DMObjectNodeDispatchMethod( Schema.AttributeRef )
-	def AttributeRef(self, ctx, styleSheet, state, node, target, name):
+	def AttributeRef(self, ctx, state, node, target, name):
 		targetView = ctx.presentFragment( target, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ATTRIBUTEREFTARGET ) )
 		view = styleSheet.attributeRef( targetView, name )
 		return expressionNodeEditor( self._parser, styleSheet, node,
@@ -502,7 +502,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Subscript
 	@DMObjectNodeDispatchMethod( Schema.SubscriptSlice )
-	def SubscriptSlice(self, ctx, styleSheet, state, node, lower, upper):
+	def SubscriptSlice(self, ctx, state, node, lower, upper):
 		lowerView = ctx.presentFragment( lower, styleSheet.withPythonState( PRECEDENCE_CONTAINER_SUBSCRIPTINDEX ) )   if lower is not None   else None
 		upperView = ctx.presentFragment( upper, styleSheet.withPythonState( PRECEDENCE_CONTAINER_SUBSCRIPTINDEX ) )   if upper is not None   else None
 		view = styleSheet.subscriptSlice( lowerView, upperView )
@@ -511,7 +511,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		                             view )
 
 	@DMObjectNodeDispatchMethod( Schema.SubscriptLongSlice )
-	def SubscriptLongSlice(self, ctx, styleSheet, state, node, lower, upper, stride):
+	def SubscriptLongSlice(self, ctx, state, node, lower, upper, stride):
 		lowerView = ctx.presentFragment( lower, styleSheet.withPythonState( PRECEDENCE_CONTAINER_SUBSCRIPTINDEX ) )   if lower is not None   else None
 		upperView = ctx.presentFragment( upper, styleSheet.withPythonState( PRECEDENCE_CONTAINER_SUBSCRIPTINDEX ) )   if upper is not None   else None
 		strideView = ctx.presentFragment( stride, styleSheet.withPythonState( PRECEDENCE_CONTAINER_SUBSCRIPTINDEX ) )   if stride is not None   else None
@@ -521,14 +521,14 @@ class Python25View (GSymViewObjectNodeDispatch):
 		                             view )
 
 	@DMObjectNodeDispatchMethod( Schema.SubscriptEllipsis )
-	def SubscriptEllipsis(self, ctx, styleSheet, state, node):
+	def SubscriptEllipsis(self, ctx, state, node):
 		view = styleSheet.subscriptEllipsis()
 		return expressionNodeEditor( self._parser, styleSheet, node,
 			                     PRECEDENCE_NONE,
 		                             view )
 
 	@DMObjectNodeDispatchMethod( Schema.SubscriptTuple )
-	def SubscriptTuple(self, ctx, styleSheet, state, node, values, trailingSeparator):
+	def SubscriptTuple(self, ctx, state, node, values, trailingSeparator):
 		elementViews = ctx.mapPresentFragment( values, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT ) )
 		view = styleSheet.subscriptTuple( elementViews, trailingSeparator is not None )
 		return expressionNodeEditor( self._parser, styleSheet, node,
@@ -536,7 +536,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		                             view )
 
 	@DMObjectNodeDispatchMethod( Schema.Subscript )
-	def Subscript(self, ctx, styleSheet, state, node, target, index):
+	def Subscript(self, ctx, state, node, target, index):
 		targetView = ctx.presentFragment( target, styleSheet.withPythonState( PRECEDENCE_CONTAINER_SUBSCRIPTTARGET ) )
 		indexView = ctx.presentFragment( index, styleSheet.withPythonState( PRECEDENCE_CONTAINER_SUBSCRIPTINDEX ) )
 		view = styleSheet.subscript( targetView, indexView )
@@ -549,7 +549,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Call
 	@DMObjectNodeDispatchMethod( Schema.CallKWArg )
-	def CallKWArg(self, ctx, styleSheet, state, node, name, value):
+	def CallKWArg(self, ctx, state, node, name, value):
 		valueView = ctx.presentFragment( value, styleSheet.withPythonState( PRECEDENCE_CONTAINER_CALLARG ) )
 		view = styleSheet.callKWArg( name, valueView )
 		return expressionNodeEditor( self._parser, styleSheet, node,
@@ -557,7 +557,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		                             view )
 
 	@DMObjectNodeDispatchMethod( Schema.CallArgList )
-	def CallArgList(self, ctx, styleSheet, state, node, value):
+	def CallArgList(self, ctx, state, node, value):
 		valueView = ctx.presentFragment( value, styleSheet.withPythonState( PRECEDENCE_CONTAINER_CALLARG ) )
 		view = styleSheet.callArgList( valueView )
 		return expressionNodeEditor( self._parser, styleSheet, node,
@@ -565,7 +565,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		                             view )
 
 	@DMObjectNodeDispatchMethod( Schema.CallKWArgList )
-	def CallKWArgList(self, ctx, styleSheet, state, node, value):
+	def CallKWArgList(self, ctx, state, node, value):
 		valueView = ctx.presentFragment( value, styleSheet.withPythonState( PRECEDENCE_CONTAINER_CALLARG ) )
 		view = styleSheet.callKWArgList( valueView )
 		return expressionNodeEditor( self._parser, styleSheet, node,
@@ -573,7 +573,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		                             view )
 
 	@DMObjectNodeDispatchMethod( Schema.Call )
-	def Call(self, ctx, styleSheet, state, node, target, args, argsTrailingSeparator):
+	def Call(self, ctx, state, node, target, args, argsTrailingSeparator):
 		targetView = ctx.presentFragment( target, styleSheet.withPythonState( PRECEDENCE_CONTAINER_CALLTARGET ) )
 		argViews = ctx.mapPresentFragment( args, styleSheet.withPythonState( PRECEDENCE_CONTAINER_CALLARG ) )
 		view = styleSheet.call( targetView, argViews, argsTrailingSeparator is not None )
@@ -587,7 +587,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Operators
 	@DMObjectNodeDispatchMethod( Schema.Pow )
-	def Pow(self, ctx, styleSheet, state, node, x, y):
+	def Pow(self, ctx, state, node, x, y):
 		xPrec, yPrec = computeBinOpViewPrecedenceValues( PRECEDENCE_POW, True )
 		xView = ctx.presentFragment( x, styleSheet.withPythonState( xPrec ) )
 		yView = ctx.presentFragment( y, styleSheet.powExponentStyle().withPythonState( yPrec, PythonEditorStyleSheet.MODE_EDITEXPRESSION ) )
@@ -598,24 +598,24 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 
 	@DMObjectNodeDispatchMethod( Schema.Invert )
-	def Invert(self, ctx, styleSheet, state, node, x):
+	def Invert(self, ctx, state, node, x):
 		return spanPrefixOpView( ctx, self._parser, styleSheet, node, x, '~', PRECEDENCE_INVERT_NEGATE_POS )
 
 	@DMObjectNodeDispatchMethod( Schema.Negate )
-	def Negate(self, ctx, styleSheet, state, node, x):
+	def Negate(self, ctx, state, node, x):
 		return spanPrefixOpView( ctx, self._parser, styleSheet, node, x, '-', PRECEDENCE_INVERT_NEGATE_POS )
 
 	@DMObjectNodeDispatchMethod( Schema.Pos )
-	def Pos(self, ctx, styleSheet, state, node, x):
+	def Pos(self, ctx, state, node, x):
 		return spanPrefixOpView( ctx, self._parser, styleSheet, node, x, '+', PRECEDENCE_INVERT_NEGATE_POS )
 
 
 	@DMObjectNodeDispatchMethod( Schema.Mul )
-	def Mul(self, ctx, styleSheet, state, node, x, y):
+	def Mul(self, ctx, state, node, x, y):
 		return spanBinOpView( ctx, self._parser, styleSheet, node, x, y, '*', PRECEDENCE_MULDIVMOD, False )
 
 	@DMObjectNodeDispatchMethod( Schema.Div )
-	def Div(self, ctx, styleSheet, state, node, x, y):
+	def Div(self, ctx, state, node, x, y):
 		xPrec, yPrec = computeBinOpViewPrecedenceValues( PRECEDENCE_MULDIVMOD, False )
 		xView = ctx.presentFragment( x, styleSheet.divNumeratorStyle().withPythonState( xPrec, PythonEditorStyleSheet.MODE_EDITEXPRESSION ) )
 		yView = ctx.presentFragment( y, styleSheet.divDenominatorStyle().withPythonState( yPrec, PythonEditorStyleSheet.MODE_EDITEXPRESSION ) )
@@ -626,43 +626,43 @@ class Python25View (GSymViewObjectNodeDispatch):
 		                             view )
 
 	@DMObjectNodeDispatchMethod( Schema.Mod )
-	def Mod(self, ctx, styleSheet, state, node, x, y):
+	def Mod(self, ctx, state, node, x, y):
 		return spanBinOpView( ctx, self._parser, styleSheet, node, x, y, '%', PRECEDENCE_MULDIVMOD, False )
 
 
 	@DMObjectNodeDispatchMethod( Schema.Add )
-	def Add(self, ctx, styleSheet, state, node, x, y):
+	def Add(self, ctx, state, node, x, y):
 		return spanBinOpView( ctx, self._parser, styleSheet, node, x, y, '+', PRECEDENCE_ADDSUB, False )
 
 	@DMObjectNodeDispatchMethod( Schema.Sub )
-	def Sub(self, ctx, styleSheet, state, node, x, y):
+	def Sub(self, ctx, state, node, x, y):
 		return spanBinOpView( ctx, self._parser, styleSheet, node, x, y, '-', PRECEDENCE_ADDSUB, False )
 
 
 	@DMObjectNodeDispatchMethod( Schema.LShift )
-	def LShift(self, ctx, styleSheet, state, node, x, y):
+	def LShift(self, ctx, state, node, x, y):
 		return spanBinOpView( ctx, self._parser, styleSheet, node, x, y, '<<', PRECEDENCE_SHIFT, False )
 
 	@DMObjectNodeDispatchMethod( Schema.RShift )
-	def RShift(self, ctx, styleSheet, state, node, x, y):
+	def RShift(self, ctx, state, node, x, y):
 		return spanBinOpView( ctx, self._parser, styleSheet, node, x, y, '>>', PRECEDENCE_SHIFT, False )
 
 
 	@DMObjectNodeDispatchMethod( Schema.BitAnd )
-	def BitAnd(self, ctx, styleSheet, state, node, x, y):
+	def BitAnd(self, ctx, state, node, x, y):
 		return spanBinOpView( ctx, self._parser, styleSheet, node, x, y, '&', PRECEDENCE_BITAND, False )
 
 	@DMObjectNodeDispatchMethod( Schema.BitXor )
-	def BitXor(self, ctx, styleSheet, state, node, x, y):
+	def BitXor(self, ctx, state, node, x, y):
 		return spanBinOpView( ctx, self._parser, styleSheet, node, x, y, '^', PRECEDENCE_BITXOR, False )
 
 	@DMObjectNodeDispatchMethod( Schema.BitOr )
-	def BitOr(self, ctx, styleSheet, state, node, x, y):
+	def BitOr(self, ctx, state, node, x, y):
 		return spanBinOpView( ctx, self._parser, styleSheet, node, x, y, '|', PRECEDENCE_BITOR, False )
 
 
 	@DMObjectNodeDispatchMethod( Schema.Cmp )
-	def Cmp(self, ctx, styleSheet, state, node, x, ops):
+	def Cmp(self, ctx, state, node, x, ops):
 		xView = ctx.presentFragment( x, styleSheet.withPythonState( PRECEDENCE_CMP ) )
 		opViews = ctx.mapPresentFragment( ops, styleSheet.withPythonState( PRECEDENCE_CMP ) )
 		view = styleSheet.compare( xView, opViews )
@@ -671,57 +671,57 @@ class Python25View (GSymViewObjectNodeDispatch):
 		                             view )
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpLte )
-	def CmpOpLte(self, ctx, styleSheet, state, node, y):
+	def CmpOpLte(self, ctx, state, node, y):
 		return spanCmpOpView( ctx, self._parser, styleSheet, node, '<=', y, PRECEDENCE_CMP )
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpLt )
-	def CmpOpLt(self, ctx, styleSheet, state, node, y):
+	def CmpOpLt(self, ctx, state, node, y):
 		return spanCmpOpView( ctx, self._parser, styleSheet, node, '<', y, PRECEDENCE_CMP )
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpGte )
-	def CmpOpGte(self, ctx, styleSheet, state, node, y):
+	def CmpOpGte(self, ctx, state, node, y):
 		return spanCmpOpView( ctx, self._parser, styleSheet, node, '>=', y, PRECEDENCE_CMP )
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpGt )
-	def CmpOpGt(self, ctx, styleSheet, state, node, y):
+	def CmpOpGt(self, ctx, state, node, y):
 		return spanCmpOpView( ctx, self._parser, styleSheet, node, '>', y, PRECEDENCE_CMP )
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpEq )
-	def CmpOpEq(self, ctx, styleSheet, state, node, y):
+	def CmpOpEq(self, ctx, state, node, y):
 		return spanCmpOpView( ctx, self._parser, styleSheet, node, '==', y, PRECEDENCE_CMP )
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpNeq )
-	def CmpOpNeq(self, ctx, styleSheet, state, node, y):
+	def CmpOpNeq(self, ctx, state, node, y):
 		return spanCmpOpView( ctx, self._parser, styleSheet, node, '!=', y, PRECEDENCE_CMP )
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpIsNot )
-	def CmpOpIsNot(self, ctx, styleSheet, state, node, y):
+	def CmpOpIsNot(self, ctx, state, node, y):
 		return spanCmpOpView( ctx, self._parser, styleSheet, node, 'is not', y, PRECEDENCE_CMP )
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpIs )
-	def CmpOpIs(self, ctx, styleSheet, state, node, y):
+	def CmpOpIs(self, ctx, state, node, y):
 		return spanCmpOpView( ctx, self._parser, styleSheet, node, 'is', y, PRECEDENCE_CMP )
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpNotIn )
-	def CmpOpNotIn(self, ctx, styleSheet, state, node, y):
+	def CmpOpNotIn(self, ctx, state, node, y):
 		return spanCmpOpView( ctx, self._parser, styleSheet, node, 'not in', y, PRECEDENCE_CMP )
 
 	@DMObjectNodeDispatchMethod( Schema.CmpOpIn )
-	def CmpOpIn(self, ctx, styleSheet, state, node, y):
+	def CmpOpIn(self, ctx, state, node, y):
 		return spanCmpOpView( ctx, self._parser, styleSheet, node, 'in', y, PRECEDENCE_CMP )
 
 
 
 	@DMObjectNodeDispatchMethod( Schema.NotTest )
-	def NotTest(self, ctx, styleSheet, state, node, x):
+	def NotTest(self, ctx, state, node, x):
 		return spanPrefixOpView( ctx, self._parser, styleSheet, node, x, 'not ', PRECEDENCE_NOT )
 
 	@DMObjectNodeDispatchMethod( Schema.AndTest )
-	def AndTest(self, ctx, styleSheet, state, node, x, y):
+	def AndTest(self, ctx, state, node, x, y):
 		return spanBinOpView( ctx, self._parser, styleSheet, node, x, y, 'and', PRECEDENCE_AND, False )
 
 	@DMObjectNodeDispatchMethod( Schema.OrTest )
-	def OrTest(self, ctx, styleSheet, state, node, x, y):
+	def OrTest(self, ctx, state, node, x, y):
 		return spanBinOpView( ctx, self._parser, styleSheet, node, x, y, 'or', PRECEDENCE_OR, False )
 
 
@@ -730,14 +730,14 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Parameters
 	@DMObjectNodeDispatchMethod( Schema.SimpleParam )
-	def SimpleParam(self, ctx, styleSheet, state, node, name):
+	def SimpleParam(self, ctx, state, node, name):
 		view = styleSheet.simpleParam( name )
 		return expressionNodeEditor( self._parser, styleSheet, node,
 			                     PRECEDENCE_NONE,
 		                             view )
 
 	@DMObjectNodeDispatchMethod( Schema.DefaultValueParam )
-	def DefaultValueParam(self, ctx, styleSheet, state, node, name, defaultValue):
+	def DefaultValueParam(self, ctx, state, node, name, defaultValue):
 		valueView = ctx.presentFragment( defaultValue, styleSheet.withPythonState( PRECEDENCE_NONE ) )
 		view = styleSheet.defaultValueParam( name, valueView )
 		return expressionNodeEditor( self._parser, styleSheet, node,
@@ -745,14 +745,14 @@ class Python25View (GSymViewObjectNodeDispatch):
 		                             view )
 
 	@DMObjectNodeDispatchMethod( Schema.ParamList )
-	def ParamList(self, ctx, styleSheet, state, node, name):
+	def ParamList(self, ctx, state, node, name):
 		view = styleSheet.paramList( name )
 		return expressionNodeEditor( self._parser, styleSheet, node,
 			                     PRECEDENCE_NONE,
 		                             view )
 
 	@DMObjectNodeDispatchMethod( Schema.KWParamList )
-	def KWParamList(self, ctx, styleSheet, state, node, name):
+	def KWParamList(self, ctx, state, node, name):
 		view = styleSheet.kwParamList( name )
 		return expressionNodeEditor( self._parser, styleSheet, node,
 			                     PRECEDENCE_NONE,
@@ -762,7 +762,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Lambda expression
 	@DMObjectNodeDispatchMethod( Schema.LambdaExpr )
-	def LambdaExpr(self, ctx, styleSheet, state, node, params, paramsTrailingSeparator, expr):
+	def LambdaExpr(self, ctx, state, node, params, paramsTrailingSeparator, expr):
 		exprView = ctx.presentFragment( expr, styleSheet.withPythonState( PRECEDENCE_CONTAINER_LAMBDAEXPR ) )
 		paramViews = ctx.mapPresentFragment( params, styleSheet.withPythonState( PRECEDENCE_NONE ) )
 		
@@ -775,7 +775,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Conditional expression
 	@DMObjectNodeDispatchMethod( Schema.ConditionalExpr )
-	def ConditionalExpr(self, ctx, styleSheet, state, node, condition, expr, elseExpr):
+	def ConditionalExpr(self, ctx, state, node, condition, expr, elseExpr):
 		conditionView = ctx.presentFragment( condition, styleSheet.withPythonState( PRECEDENCE_CONTAINER_CONDITIONALEXPR ) )
 		exprView = ctx.presentFragment( expr, styleSheet.withPythonState( PRECEDENCE_CONTAINER_CONDITIONALEXPR ) )
 		elseExprView = ctx.presentFragment( elseExpr, styleSheet.withPythonState( PRECEDENCE_CONTAINER_CONDITIONALEXPR ) )
@@ -795,7 +795,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Expression statement
 	@DMObjectNodeDispatchMethod( Schema.ExprStmt )
-	def ExprStmt(self, ctx, styleSheet, state, node, expr):
+	def ExprStmt(self, ctx, state, node, expr):
 		exprView = ctx.presentFragment( expr, styleSheet.withPythonState( PRECEDENCE_STMT ) )
 		view = styleSheet.exprStmt( exprView )
 		return statementNodeEditor( self._parser, styleSheet, node,
@@ -805,7 +805,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Assert statement
 	@DMObjectNodeDispatchMethod( Schema.AssertStmt )
-	def AssertStmt(self, ctx, styleSheet, state, node, condition, fail):
+	def AssertStmt(self, ctx, state, node, condition, fail):
 		conditionView = ctx.presentFragment( condition, styleSheet.withPythonState( PRECEDENCE_STMT ) )
 		failView = ctx.presentFragment( fail, styleSheet.withPythonState( PRECEDENCE_STMT ) )   if fail is not None   else None
 		view = styleSheet.assertStmt( conditionView, failView )
@@ -815,7 +815,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Assignment statement
 	@DMObjectNodeDispatchMethod( Schema.AssignStmt )
-	def AssignStmt(self, ctx, styleSheet, state, node, targets, value):
+	def AssignStmt(self, ctx, state, node, targets, value):
 		targetViews = ctx.mapPresentFragment( targets, styleSheet.withPythonState( PRECEDENCE_STMT ) )
 		valueView = ctx.presentFragment( value, styleSheet.withPythonState( PRECEDENCE_STMT ) )
 		view = styleSheet.assignStmt( targetViews, valueView )
@@ -825,7 +825,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Augmented assignment statement
 	@DMObjectNodeDispatchMethod( Schema.AugAssignStmt )
-	def AugAssignStmt(self, ctx, styleSheet, state, node, op, target, value):
+	def AugAssignStmt(self, ctx, state, node, op, target, value):
 		targetView = ctx.presentFragment( target, styleSheet.withPythonState( PRECEDENCE_STMT ) )
 		valueView = ctx.presentFragment( value, styleSheet.withPythonState( PRECEDENCE_STMT ) )
 		view = styleSheet.augAssignStmt( op, targetView, valueView )
@@ -835,7 +835,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Pass statement
 	@DMObjectNodeDispatchMethod( Schema.PassStmt )
-	def PassStmt(self, ctx, styleSheet, state, node):
+	def PassStmt(self, ctx, state, node):
 		view = styleSheet.passStmt()
 		return statementNodeEditor( self._parser, styleSheet, node,
 		                            view )
@@ -843,7 +843,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Del statement
 	@DMObjectNodeDispatchMethod( Schema.DelStmt )
-	def DelStmt(self, ctx, styleSheet, state, node, target):
+	def DelStmt(self, ctx, state, node, target):
 		targetView = ctx.presentFragment( target, styleSheet.withPythonState( PRECEDENCE_STMT ) )
 		view = styleSheet.delStmt( targetView )
 		return statementNodeEditor( self._parser, styleSheet, node,
@@ -852,7 +852,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Return statement
 	@DMObjectNodeDispatchMethod( Schema.ReturnStmt )
-	def ReturnStmt(self, ctx, styleSheet, state, node, value):
+	def ReturnStmt(self, ctx, state, node, value):
 		valueView = ctx.presentFragment( value, styleSheet.withPythonState( PRECEDENCE_STMT ) )
 		view = styleSheet.returnStmt( valueView )
 		return statementNodeEditor( self._parser, styleSheet, node,
@@ -861,7 +861,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Yield statement
 	@DMObjectNodeDispatchMethod( Schema.YieldStmt )
-	def YieldStmt(self, ctx, styleSheet, state, node, value):
+	def YieldStmt(self, ctx, state, node, value):
 		valueView = ctx.presentFragment( value, styleSheet.withPythonState( PRECEDENCE_STMT ) )
 		view = styleSheet.yieldStmt( valueView )
 		return statementNodeEditor( self._parser, styleSheet, node,
@@ -870,7 +870,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Raise statement
 	@DMObjectNodeDispatchMethod( Schema.RaiseStmt )
-	def RaiseStmt(self, ctx, styleSheet, state, node, excType, excValue, traceback):
+	def RaiseStmt(self, ctx, state, node, excType, excValue, traceback):
 		excTypeView = ctx.presentFragment( excType, styleSheet.withPythonState( PRECEDENCE_STMT ) )   if excType is not None   else None
 		excValueView = ctx.presentFragment( excValue, styleSheet.withPythonState( PRECEDENCE_STMT ) )   if excValue is not None   else None
 		tracebackView = ctx.presentFragment( traceback, styleSheet.withPythonState( PRECEDENCE_STMT ) )   if traceback is not None   else None
@@ -881,7 +881,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Break statement
 	@DMObjectNodeDispatchMethod( Schema.BreakStmt )
-	def BreakStmt(self, ctx, styleSheet, state, node):
+	def BreakStmt(self, ctx, state, node):
 		view = styleSheet.breakStmt()
 		return statementNodeEditor( self._parser, styleSheet, node,
 		                            view )
@@ -889,7 +889,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Continue statement
 	@DMObjectNodeDispatchMethod( Schema.ContinueStmt )
-	def ContinueStmt(self, ctx, styleSheet, state, node):
+	def ContinueStmt(self, ctx, state, node):
 		view = styleSheet.continueStmt()
 		return statementNodeEditor( self._parser, styleSheet, node,
 		                            view )
@@ -897,44 +897,44 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Import statement
 	@DMObjectNodeDispatchMethod( Schema.RelativeModule )
-	def RelativeModule(self, ctx, styleSheet, state, node, name):
+	def RelativeModule(self, ctx, state, node, name):
 		view = styleSheet.relativeModule( name )
 		return expressionNodeEditor( self._parser, styleSheet, node, PRECEDENCE_IMPORTCONTENT,
 		                            view )
 
 	@DMObjectNodeDispatchMethod( Schema.ModuleImport )
-	def ModuleImport(self, ctx, styleSheet, state, node, name):
+	def ModuleImport(self, ctx, state, node, name):
 		view = styleSheet.moduleImport( name )
 		return expressionNodeEditor( self._parser, styleSheet, node, PRECEDENCE_IMPORTCONTENT,
 		                            view )
 
 	@DMObjectNodeDispatchMethod( Schema.ModuleImportAs )
-	def ModuleImportAs(self, ctx, styleSheet, state, node, name, asName):
+	def ModuleImportAs(self, ctx, state, node, name, asName):
 		view = styleSheet.moduleImportAs( name, asName )
 		return expressionNodeEditor( self._parser, styleSheet, node, PRECEDENCE_IMPORTCONTENT,
 		                            view )
 
 	@DMObjectNodeDispatchMethod( Schema.ModuleContentImport )
-	def ModuleContentImport(self, ctx, styleSheet, state, node, name):
+	def ModuleContentImport(self, ctx, state, node, name):
 		view = styleSheet.moduleContentImport( name )
 		return expressionNodeEditor( self._parser, styleSheet, node, PRECEDENCE_IMPORTCONTENT,
 		                            view )
 
 	@DMObjectNodeDispatchMethod( Schema.ModuleContentImportAs )
-	def ModuleContentImportAs(self, ctx, styleSheet, state, node, name, asName):
+	def ModuleContentImportAs(self, ctx, state, node, name, asName):
 		view = styleSheet.moduleContentImportAs( name, asName )
 		return expressionNodeEditor( self._parser, styleSheet, node, PRECEDENCE_IMPORTCONTENT,
 		                            view )
 
 	@DMObjectNodeDispatchMethod( Schema.ImportStmt )
-	def ImportStmt(self, ctx, styleSheet, state, node, modules):
+	def ImportStmt(self, ctx, state, node, modules):
 		moduleViews = ctx.mapPresentFragment( modules, styleSheet.withPythonState( PRECEDENCE_STMT ) )
 		view = styleSheet.importStmt( moduleViews )
 		return statementNodeEditor( self._parser, styleSheet, node,
 		                            view )
 
 	@DMObjectNodeDispatchMethod( Schema.FromImportStmt )
-	def FromImportStmt(self, ctx, styleSheet, state, node, module, imports):
+	def FromImportStmt(self, ctx, state, node, module, imports):
 		moduleView = ctx.presentFragment( module, styleSheet.withPythonState( PRECEDENCE_STMT ) )
 		importViews = ctx.mapPresentFragment( imports, styleSheet.withPythonState( PRECEDENCE_STMT ) )
 		view = styleSheet.fromImportStmt( moduleView, importViews )
@@ -942,7 +942,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		                            view )
 
 	@DMObjectNodeDispatchMethod( Schema.FromImportAllStmt )
-	def FromImportAllStmt(self, ctx, styleSheet, state, node, module):
+	def FromImportAllStmt(self, ctx, state, node, module):
 		moduleView = ctx.presentFragment( module, styleSheet.withPythonState( PRECEDENCE_STMT ) )
 		view = styleSheet.fromImportAllStmt( moduleView )
 		return statementNodeEditor( self._parser, styleSheet, node,
@@ -951,13 +951,13 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Global statement
 	@DMObjectNodeDispatchMethod( Schema.GlobalVar )
-	def GlobalVar(self, ctx, styleSheet, state, node, name):
+	def GlobalVar(self, ctx, state, node, name):
 		view = styleSheet.globalVar( name )
 		return expressionNodeEditor( self._parser, styleSheet, node, PRECEDENCE_NONE,
 		                             view )
 
 	@DMObjectNodeDispatchMethod( Schema.GlobalStmt )
-	def GlobalStmt(self, ctx, styleSheet, state, node, vars):
+	def GlobalStmt(self, ctx, state, node, vars):
 		varViews = ctx.mapPresentFragment( vars, styleSheet.withPythonState( PRECEDENCE_STMT ) )
 		view = styleSheet.globalStmt( varViews )
 		return statementNodeEditor( self._parser, styleSheet, node,
@@ -967,7 +967,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Exec statement
 	@DMObjectNodeDispatchMethod( Schema.ExecStmt )
-	def ExecStmt(self, ctx, styleSheet, state, node, source, globals, locals):
+	def ExecStmt(self, ctx, state, node, source, globals, locals):
 		sourceView = ctx.presentFragment( source, styleSheet.withPythonState( PRECEDENCE_STMT ) )
 		globalsView = ctx.presentFragment( globals, styleSheet.withPythonState( PRECEDENCE_STMT ) )    if globals is not None   else None
 		localsView = ctx.presentFragment( locals, styleSheet.withPythonState( PRECEDENCE_STMT ) )   if locals is not None   else None
@@ -982,7 +982,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Exec statement
 	@DMObjectNodeDispatchMethod( Schema.PrintStmt )
-	def PrintStmt(self, ctx, styleSheet, state, node, destination, values):
+	def PrintStmt(self, ctx, state, node, destination, values):
 		destView = ctx.presentFragment( destination, styleSheet.withPythonState( PRECEDENCE_STMT ) )   if destination is not None   else None
 		valueViews = ctx.mapPresentFragment( values, styleSheet.withPythonState( PRECEDENCE_STMT ) )
 		view = styleSheet.printStmt( destView, valueViews )
@@ -999,144 +999,144 @@ class Python25View (GSymViewObjectNodeDispatch):
 	#
 
 	# If statement
-	def _ifStmtHeaderElement(self, ctx, styleSheet, state, condition):
+	def _ifStmtHeaderElement(self, ctx, state, condition):
 		conditionView = ctx.presentFragment( condition, styleSheet.withPythonState( PRECEDENCE_STMT ) )
 		return styleSheet.ifStmtHeader( conditionView )
 
 	@DMObjectNodeDispatchMethod( Schema.IfStmtHeader )
-	def IfStmtHeader(self, ctx, styleSheet, state, node, condition):
+	def IfStmtHeader(self, ctx, state, node, condition):
 		return compoundStatementHeaderEditor( self._parser, styleSheet, node,
-					    self._ifStmtHeaderElement( ctx, styleSheet, state, condition ) )
+					    self._ifStmtHeaderElement( ctx, state, condition ) )
 
 
 	# Elif statement
-	def _elifStmtHeaderElement(self, ctx, styleSheet, state, condition):
+	def _elifStmtHeaderElement(self, ctx, state, condition):
 		conditionView = ctx.presentFragment( condition, styleSheet.withPythonState( PRECEDENCE_STMT ) )
 		return styleSheet.elifStmtHeader( conditionView )
 
 	@DMObjectNodeDispatchMethod( Schema.ElifStmtHeader )
-	def ElifStmtHeader(self, ctx, styleSheet, state, node, condition):
+	def ElifStmtHeader(self, ctx, state, node, condition):
 		return compoundStatementHeaderEditor( self._parser, styleSheet, node,
-					    self._elifStmtHeaderElement( ctx, styleSheet, state, condition ) )
+					    self._elifStmtHeaderElement( ctx, state, condition ) )
 
 
 
 	# Else statement
-	def _elseStmtHeaderElement(self, ctx, styleSheet, state):
+	def _elseStmtHeaderElement(self, ctx, state):
 		return styleSheet.elseStmtHeader()
 
 	@DMObjectNodeDispatchMethod( Schema.ElseStmtHeader )
-	def ElseStmtHeader(self, ctx, styleSheet, state, node):
+	def ElseStmtHeader(self, ctx, state, node):
 		return compoundStatementHeaderEditor( self._parser, styleSheet, node,
-					    self._elseStmtHeaderElement( ctx, styleSheet, state ) )
+					    self._elseStmtHeaderElement( ctx, state ) )
 
 
 	# While statement
-	def _whileStmtHeaderElement(self, ctx, styleSheet, state, condition):
+	def _whileStmtHeaderElement(self, ctx, state, condition):
 		conditionView = ctx.presentFragment( condition, styleSheet.withPythonState( PRECEDENCE_STMT ) )
 		return styleSheet.whileStmtHeader( conditionView )
 
 	@DMObjectNodeDispatchMethod( Schema.WhileStmtHeader )
-	def WhileStmtHeader(self, ctx, styleSheet, state, node, condition):
+	def WhileStmtHeader(self, ctx, state, node, condition):
 		return compoundStatementHeaderEditor( self._parser, styleSheet, node,
-					    self._whileStmtHeaderElement( ctx, styleSheet, state, condition ) )
+					    self._whileStmtHeaderElement( ctx, state, condition ) )
 
 
 	# For statement
-	def _forStmtHeaderElement(self, ctx, styleSheet, state, target, source):
+	def _forStmtHeaderElement(self, ctx, state, target, source):
 		targetView = ctx.presentFragment( target, styleSheet.withPythonState( PRECEDENCE_STMT ) )
 		sourceView = ctx.presentFragment( source, styleSheet.withPythonState( PRECEDENCE_STMT ) )
 		return styleSheet.forStmtHeader( targetView, sourceView )
 
 	@DMObjectNodeDispatchMethod( Schema.ForStmtHeader )
-	def ForStmtHeader(self, ctx, styleSheet, state, node, target, source):
+	def ForStmtHeader(self, ctx, state, node, target, source):
 		return compoundStatementHeaderEditor( self._parser, styleSheet, node,
-						self._forStmtHeaderElement( ctx, styleSheet, state, target, source ) )
+						self._forStmtHeaderElement( ctx, state, target, source ) )
 
 
 
 	# Try statement
-	def _tryStmtHeaderElement(self, ctx, styleSheet, state):
+	def _tryStmtHeaderElement(self, ctx, state):
 		return styleSheet.tryStmtHeader()
 
 	@DMObjectNodeDispatchMethod( Schema.TryStmtHeader )
-	def TryStmtHeader(self, ctx, styleSheet, state, node):
+	def TryStmtHeader(self, ctx, state, node):
 		return compoundStatementHeaderEditor( self._parser, styleSheet, node,
-					    self._tryStmtHeaderElement( ctx, styleSheet, state ) )
+					    self._tryStmtHeaderElement( ctx, state ) )
 
 
 
 	# Except statement
-	def _exceptStmtHeaderElement(self, ctx, styleSheet, state, exception, target):
+	def _exceptStmtHeaderElement(self, ctx, state, exception, target):
 		excView = ctx.presentFragment( exception, styleSheet.withPythonState( PRECEDENCE_STMT ) )   if exception is not None   else None
 		targetView = ctx.presentFragment( target, styleSheet.withPythonState( PRECEDENCE_STMT ) )   if target is not None   else None
 		return styleSheet.exceptStmtHeader( excView, targetView )
 
 	@DMObjectNodeDispatchMethod( Schema.ExceptStmtHeader )
-	def ExceptStmtHeader(self, ctx, styleSheet, state, node, exception, target):
+	def ExceptStmtHeader(self, ctx, state, node, exception, target):
 		return compoundStatementHeaderEditor( self._parser, styleSheet, node,
-					    self._exceptStmtHeaderElement( ctx, styleSheet, state, exception, target ) )
+					    self._exceptStmtHeaderElement( ctx, state, exception, target ) )
 
 
 
 	# Finally statement
-	def _finallyStmtHeaderElement(self, ctx, styleSheet, state):
+	def _finallyStmtHeaderElement(self, ctx, state):
 		return styleSheet.finallyStmtHeader()
 
 	@DMObjectNodeDispatchMethod( Schema.FinallyStmtHeader )
-	def FinallyStmtHeader(self, ctx, styleSheet, state, node):
+	def FinallyStmtHeader(self, ctx, state, node):
 		return compoundStatementHeaderEditor( self._parser, styleSheet, node,
-					    self._finallyStmtHeaderElement( ctx, styleSheet, state ) )
+					    self._finallyStmtHeaderElement( ctx, state ) )
 
 
 
 	# With statement
-	def _withStmtHeaderElement(self, ctx, styleSheet, state, expr, target):
+	def _withStmtHeaderElement(self, ctx, state, expr, target):
 		exprView = ctx.presentFragment( expr, styleSheet.withPythonState( PRECEDENCE_STMT ) )
 		targetView = ctx.presentFragment( target, styleSheet.withPythonState( PRECEDENCE_STMT ) )   if target is not None   else None
 		return styleSheet.withStmtHeader( exprView, targetView )
 
 	@DMObjectNodeDispatchMethod( Schema.WithStmtHeader )
-	def WithStmtHeader(self, ctx, styleSheet, state, node, expr, target):
+	def WithStmtHeader(self, ctx, state, node, expr, target):
 		return compoundStatementHeaderEditor( self._parser, styleSheet, node,
-					    self._withStmtHeaderElement( ctx, styleSheet, state, expr, target ) )
+					    self._withStmtHeaderElement( ctx, state, expr, target ) )
 
 
 
 	# Decorator statement
-	def _decoStmtHeaderElement(self, ctx, styleSheet, state, name, args, argsTrailingSeparator):
+	def _decoStmtHeaderElement(self, ctx, state, name, args, argsTrailingSeparator):
 		argViews = ctx.mapPresentFragment( args, styleSheet.withPythonState( PRECEDENCE_STMT ) )   if args is not None   else None
 		return styleSheet.decoStmtHeader( name, argViews, argsTrailingSeparator is not None )
 
 	@DMObjectNodeDispatchMethod( Schema.DecoStmtHeader )
-	def DecoStmtHeader(self, ctx, styleSheet, state, node, name, args, argsTrailingSeparator):
+	def DecoStmtHeader(self, ctx, state, node, name, args, argsTrailingSeparator):
 		return compoundStatementHeaderEditor( self._parser, styleSheet, node,
-					    self._decoStmtHeaderElement( ctx, styleSheet, state, name, args, argsTrailingSeparator ) )
+					    self._decoStmtHeaderElement( ctx, state, name, args, argsTrailingSeparator ) )
 
 
 
 	# Def statement
-	def _defStmtHeaderElement(self, ctx, styleSheet, state, name, params, paramsTrailingSeparator):
+	def _defStmtHeaderElement(self, ctx, state, name, params, paramsTrailingSeparator):
 		paramViews = ctx.mapPresentFragment( params, styleSheet.withPythonState( PRECEDENCE_STMT ) )
 		return styleSheet.defStmtHeader( name, paramViews, paramsTrailingSeparator is not None )
 
 	@DMObjectNodeDispatchMethod( Schema.DefStmtHeader )
-	def DefStmtHeader(self, ctx, styleSheet, state, node, name, params, paramsTrailingSeparator):
+	def DefStmtHeader(self, ctx, state, node, name, params, paramsTrailingSeparator):
 		editor = compoundStatementHeaderEditor( self._parser, styleSheet, node,
-					    self._defStmtHeaderElement( ctx, styleSheet, state, name, params, paramsTrailingSeparator ),
+					    self._defStmtHeaderElement( ctx, state, name, params, paramsTrailingSeparator ),
 					    lambda header: styleSheet.defStmtHeaderHighlight( header ) )
 		return styleSheet.defStmtHighlight( editor )
 
 
 	# Def statement
-	def _classStmtHeaderElement(self, ctx, styleSheet, state, name, bases, basesTrailingSeparator):
+	def _classStmtHeaderElement(self, ctx, state, name, bases, basesTrailingSeparator):
 		baseViews = ctx.mapPresentFragment( bases, styleSheet.withPythonState( PRECEDENCE_CONTAINER_ELEMENT ) )   if bases is not None   else None
 		return styleSheet.classStmtHeader( name, baseViews, basesTrailingSeparator is not None )
 
 	@DMObjectNodeDispatchMethod( Schema.ClassStmtHeader )
-	def ClassStmtHeader(self, ctx, styleSheet, state, node, name, bases, basesTrailingSeparator):
+	def ClassStmtHeader(self, ctx, state, node, name, bases, basesTrailingSeparator):
 		editor = compoundStatementHeaderEditor( self._parser, styleSheet, node,
-						  self._classStmtHeaderElement( ctx, styleSheet, state, name, bases, basesTrailingSeparator ),
+						  self._classStmtHeaderElement( ctx, state, name, bases, basesTrailingSeparator ),
 		                                  lambda header: styleSheet.classStmtHeaderHighlight( header ) )
 		return styleSheet.classStmtHighlight( editor )
 
@@ -1151,7 +1151,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Indented block
 	@DMObjectNodeDispatchMethod( Schema.IndentedBlock )
-	def IndentedBlock(self, ctx, styleSheet, state, node, suite):
+	def IndentedBlock(self, ctx, state, node, suite):
 		indent = styleSheet.indentElement()
 		indent.setFixedValue( Schema.Indent() )
 		
@@ -1179,14 +1179,14 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# If statement
 	@DMObjectNodeDispatchMethod( Schema.IfStmt )
-	def IfStmt(self, ctx, styleSheet, state, node, condition, suite, elifBlocks, elseSuite):
-		compoundBlocks = [ ( Schema.IfStmtHeader( condition=condition ), self._ifStmtHeaderElement( ctx, styleSheet, state, condition ), suite ) ]
+	def IfStmt(self, ctx, state, node, condition, suite, elifBlocks, elseSuite):
+		compoundBlocks = [ ( Schema.IfStmtHeader( condition=condition ), self._ifStmtHeaderElement( ctx, state, condition ), suite ) ]
 		for b in elifBlocks:
 			if not b.isInstanceOf( Schema.ElifBlock ):
 				raise TypeError, 'IfStmt elifBlocks should only contain ElifBlock instances'
-			compoundBlocks.append( ( Schema.ElifStmtHeader( condition=b['condition'] ), self._elifStmtHeaderElement( ctx, styleSheet, state, b['condition'] ),  b['suite'] ) )
+			compoundBlocks.append( ( Schema.ElifStmtHeader( condition=b['condition'] ), self._elifStmtHeaderElement( ctx, state, b['condition'] ),  b['suite'] ) )
 		if elseSuite is not None:
-			compoundBlocks.append( ( Schema.ElseStmtHeader(), self._elseStmtHeaderElement( ctx, styleSheet, state ),  elseSuite ) )
+			compoundBlocks.append( ( Schema.ElseStmtHeader(), self._elseStmtHeaderElement( ctx, state ),  elseSuite ) )
 		return compoundStatementEditor( ctx, self._parser, styleSheet, node, PRECEDENCE_STMT,
 						compoundBlocks,
 						state )
@@ -1195,10 +1195,10 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# While statement
 	@DMObjectNodeDispatchMethod( Schema.WhileStmt )
-	def WhileStmt(self, ctx, styleSheet, state, node, condition, suite, elseSuite):
-		compoundBlocks = [ ( Schema.WhileStmtHeader( condition=condition ), self._whileStmtHeaderElement( ctx, styleSheet, state, condition ), suite ) ]
+	def WhileStmt(self, ctx, state, node, condition, suite, elseSuite):
+		compoundBlocks = [ ( Schema.WhileStmtHeader( condition=condition ), self._whileStmtHeaderElement( ctx, state, condition ), suite ) ]
 		if elseSuite is not None:
-			compoundBlocks.append( ( Schema.ElseStmtHeader(), self._elseStmtHeaderElement( ctx, styleSheet, state ),  elseSuite ) )
+			compoundBlocks.append( ( Schema.ElseStmtHeader(), self._elseStmtHeaderElement( ctx, state ),  elseSuite ) )
 		return compoundStatementEditor( ctx, self._parser, styleSheet, node, PRECEDENCE_STMT,
 						compoundBlocks,
 						state )
@@ -1207,10 +1207,10 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# For statement
 	@DMObjectNodeDispatchMethod( Schema.ForStmt )
-	def ForStmt(self, ctx, styleSheet, state, node, target, source, suite, elseSuite):
-		compoundBlocks = [ ( Schema.ForStmtHeader( target=target, source=source ), self._forStmtHeaderElement( ctx, styleSheet, state, target, source ), suite ) ]
+	def ForStmt(self, ctx, state, node, target, source, suite, elseSuite):
+		compoundBlocks = [ ( Schema.ForStmtHeader( target=target, source=source ), self._forStmtHeaderElement( ctx, state, target, source ), suite ) ]
 		if elseSuite is not None:
-			compoundBlocks.append( ( Schema.ElseStmtHeader(), self._elseStmtHeaderElement( ctx, styleSheet, state ),  elseSuite ) )
+			compoundBlocks.append( ( Schema.ElseStmtHeader(), self._elseStmtHeaderElement( ctx, state ),  elseSuite ) )
 		return compoundStatementEditor( ctx, self._parser, styleSheet, node, PRECEDENCE_STMT,
 						compoundBlocks,
 						state )
@@ -1219,16 +1219,16 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Try statement
 	@DMObjectNodeDispatchMethod( Schema.TryStmt )
-	def TryStmt(self, ctx, styleSheet, state, node, suite, exceptBlocks, elseSuite, finallySuite):
-		compoundBlocks = [ ( Schema.TryStmtHeader(), self._tryStmtHeaderElement( ctx, styleSheet, state ), suite ) ]
+	def TryStmt(self, ctx, state, node, suite, exceptBlocks, elseSuite, finallySuite):
+		compoundBlocks = [ ( Schema.TryStmtHeader(), self._tryStmtHeaderElement( ctx, state ), suite ) ]
 		for b in exceptBlocks:
 			if not b.isInstanceOf( Schema.ExceptBlock ):
 				raise TypeError, 'TryStmt elifBlocks should only contain ExceptBlock instances'
-			compoundBlocks.append( ( Schema.ExceptStmtHeader( exception=b['exception'], target=b['target'] ), self._exceptStmtHeaderElement( ctx, styleSheet, state, b['exception'], b['target'] ),  b['suite'] ) )
+			compoundBlocks.append( ( Schema.ExceptStmtHeader( exception=b['exception'], target=b['target'] ), self._exceptStmtHeaderElement( ctx, state, b['exception'], b['target'] ),  b['suite'] ) )
 		if elseSuite is not None:
-			compoundBlocks.append( ( Schema.ElseStmtHeader(), self._elseStmtHeaderElement( ctx, styleSheet, state ),  elseSuite ) )
+			compoundBlocks.append( ( Schema.ElseStmtHeader(), self._elseStmtHeaderElement( ctx, state ),  elseSuite ) )
 		if finallySuite is not None:
-			compoundBlocks.append( ( Schema.FinallyStmtHeader(), self._finallyStmtHeaderElement( ctx, styleSheet, state ),  finallySuite ) )
+			compoundBlocks.append( ( Schema.FinallyStmtHeader(), self._finallyStmtHeaderElement( ctx, state ),  finallySuite ) )
 		return compoundStatementEditor( ctx, self._parser, styleSheet, node, PRECEDENCE_STMT,
 						compoundBlocks,
 						state )
@@ -1238,8 +1238,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# With statement
 	@DMObjectNodeDispatchMethod( Schema.WithStmt )
-	def WithStmt(self, ctx, styleSheet, state, node, expr, target, suite):
-		compoundBlocks = [ ( Schema.WithStmtHeader( expr=expr, target=target ), self._withStmtHeaderElement( ctx, styleSheet, state, expr, target ), suite ) ]
+	def WithStmt(self, ctx, state, node, expr, target, suite):
+		compoundBlocks = [ ( Schema.WithStmtHeader( expr=expr, target=target ), self._withStmtHeaderElement( ctx, state, expr, target ), suite ) ]
 		return compoundStatementEditor( ctx, self._parser, styleSheet, node, PRECEDENCE_STMT,
 						compoundBlocks,
 						state )
@@ -1248,16 +1248,16 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Def statement
 	@DMObjectNodeDispatchMethod( Schema.DefStmt )
-	def DefStmt(self, ctx, styleSheet, state, node, decorators, name, params, paramsTrailingSeparator, suite):
+	def DefStmt(self, ctx, state, node, decorators, name, params, paramsTrailingSeparator, suite):
 		compoundBlocks = []
 		for d in decorators:
 			if not d.isInstanceOf( Schema.Decorator ):
 				raise TypeError, 'DefStmt decorators should only contain Decorator instances'
 			compoundBlocks.append( ( Schema.DecoStmtHeader( name=d['name'], args=d['args'], argsTrailingSeparator=d['argsTrailingSeparator'] ), 
-						 self._decoStmtHeaderElement( ctx, styleSheet, state, d['name'], d['args'], d['argsTrailingSeparator'] ),  None ) )
+						 self._decoStmtHeaderElement( ctx, state, d['name'], d['args'], d['argsTrailingSeparator'] ),  None ) )
 			
 		compoundBlocks.append( ( Schema.DefStmtHeader( name=name, params=params, paramsTrailingSeparator=paramsTrailingSeparator ),
-					 self._defStmtHeaderElement( ctx, styleSheet, state, name, params, paramsTrailingSeparator ), suite,
+					 self._defStmtHeaderElement( ctx, state, name, params, paramsTrailingSeparator ), suite,
 		                         lambda header: styleSheet.defStmtHeaderHighlight( header ) ) )
 		editor = compoundStatementEditor( ctx, self._parser, styleSheet, node, PRECEDENCE_STMT,
 						compoundBlocks,
@@ -1267,9 +1267,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Class statement
 	@DMObjectNodeDispatchMethod( Schema.ClassStmt )
-	def ClassStmt(self, ctx, styleSheet, state, node, name, bases, basesTrailingSeparator, suite):
+	def ClassStmt(self, ctx, state, node, name, bases, basesTrailingSeparator, suite):
 		compoundBlocks = [ ( Schema.ClassStmtHeader( name=name, bases=bases, basesTrailingSeparator=basesTrailingSeparator ),
-				     self._classStmtHeaderElement( ctx, styleSheet, state, name, bases, basesTrailingSeparator ), suite,
+				     self._classStmtHeaderElement( ctx, state, name, bases, basesTrailingSeparator ), suite,
 		                     lambda header: styleSheet.classStmtHeaderHighlight( header ) ) ]
 		editor = compoundStatementEditor( ctx, self._parser, styleSheet, node, PRECEDENCE_STMT,
 						compoundBlocks,
@@ -1289,4 +1289,4 @@ class Python25EditorRelativeLocationResolver (GSymRelativeLocationResolver):
 
 	
 _parser = Python25Grammar()
-perspective = GSymPerspective( Python25View( _parser ), PythonEditorStyleSheet.instance, AttributeTable.instance, Python25EditHandler(), Python25EditorRelativeLocationResolver() )
+perspective = GSymPerspective( Python25View( _parser ), StyleSheet2.instance, AttributeTable.instance, Python25EditHandler(), Python25EditorRelativeLocationResolver() )

@@ -14,6 +14,7 @@ from BritefuryJ.DocPresent.StyleSheet import *
 from Britefury.AttributeTableUtils.DerivedAttributeMethod import DerivedAttributeMethod
 
 
+
 class TabbedBoxStyleSheet (StyleSheet):
 	class _Params (object):
 		def __init__(self, headerStyle, bodyStyle):

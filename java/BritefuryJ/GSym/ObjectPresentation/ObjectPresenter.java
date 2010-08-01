@@ -7,11 +7,11 @@
 package BritefuryJ.GSym.ObjectPresentation;
 
 import BritefuryJ.AttributeTable.AttributeTable;
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
 public interface ObjectPresenter<StyleSheetType extends StyleSheet>
 {
-	public DPElement presentObject(Object x, GSymFragmentView fragment, StyleSheetType styleSheet, AttributeTable inheritedState);
+	public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState);
 }

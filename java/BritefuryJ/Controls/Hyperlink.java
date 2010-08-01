@@ -90,8 +90,8 @@ public class Hyperlink extends ControlPres
 			};
 			
 			
-			menu.add( new MenuItem( "Open in new tab", openInNewTabListener ) );
-			menu.add( new MenuItem( "Open in new window", openInNewWindowListener ) );
+			menu.add( MenuItem.menuItemWithLabel( "Open in new tab", openInNewTabListener ) );
+			menu.add( MenuItem.menuItemWithLabel( "Open in new window", openInNewWindowListener ) );
 		}
 	}
 

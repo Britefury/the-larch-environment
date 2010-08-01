@@ -13,6 +13,7 @@ import java.awt.Paint;
 
 import BritefuryJ.AttributeTable.Attribute;
 import BritefuryJ.AttributeTable.AttributeNamespace;
+import BritefuryJ.AttributeTable.AttributeNonNull;
 import BritefuryJ.AttributeTable.AttributeTable2;
 import BritefuryJ.AttributeTable.DerivedValueTable;
 import BritefuryJ.AttributeTable.InheritedAttribute;
@@ -45,10 +46,10 @@ public class Primitive
 	public static final InheritedAttributeNonNull fontItalic = new InheritedAttributeNonNull( primitiveNamespace, "fontItalic", Boolean.class, false );
 	public static final InheritedAttributeNonNull fontSize = new InheritedAttributeNonNull( primitiveNamespace, "fontSize", Integer.class, 14 );
 	public static final InheritedAttributeNonNull fontScale = new InheritedAttributeNonNull( primitiveNamespace, "fontScale", Double.class, 1.0 );
-	public static final InheritedAttributeNonNull border = new InheritedAttributeNonNull( primitiveNamespace, "border", AbstractBorder.class, new SolidBorder( 1.0, 2.0, Color.black, null ) );
+	public static final AttributeNonNull border = new AttributeNonNull( primitiveNamespace, "border", AbstractBorder.class, new SolidBorder( 1.0, 2.0, Color.black, null ) );
 	public static final Attribute background = new Attribute( primitiveNamespace, "background", Painter.class, null );
 	public static final Attribute hoverBackground = new Attribute( primitiveNamespace, "hoverBackground", Painter.class, null );
-	public static final InheritedAttribute cursor = new InheritedAttribute( primitiveNamespace, "cursor", Cursor.class, null );
+	public static final Attribute cursor = new Attribute( primitiveNamespace, "cursor", Cursor.class, null );
 	public static final InheritedAttributeNonNull fractionVSpacing = new InheritedAttributeNonNull( primitiveNamespace, "fractionVSpacing", Double.class, 2.0 );
 	public static final InheritedAttributeNonNull fractionHPadding = new InheritedAttributeNonNull( primitiveNamespace, "fractionHPadding", Double.class, 3.0 );
 	public static final InheritedAttributeNonNull fractionRefYOffset = new InheritedAttributeNonNull( primitiveNamespace, "fractionRefYOffset", Double.class, 5.0 );
@@ -57,7 +58,7 @@ public class Primitive
 	public static final InheritedAttributeNonNull editable = new InheritedAttributeNonNull( primitiveNamespace, "editable", Boolean.class, true );
 	public static final InheritedAttributeNonNull foreground = new InheritedAttributeNonNull( primitiveNamespace, "foreground", Paint.class, Color.black );
 	public static final InheritedAttribute hoverForeground = new InheritedAttribute( primitiveNamespace, "hoverForeground", Paint.class, null );
-	public static final InheritedAttributeNonNull hboxSpacing = new InheritedAttributeNonNull( primitiveNamespace, "hboxSpacing", Double.class, 0.0 );
+	public static final AttributeNonNull hboxSpacing = new AttributeNonNull( primitiveNamespace, "hboxSpacing", Double.class, 0.0 );
 	public static final InheritedAttributeNonNull mathRootThickness = new InheritedAttributeNonNull( primitiveNamespace, "mathRootThickness", Double.class, 1.5 );
 	public static final InheritedAttributeNonNull paragraphSpacing = new InheritedAttributeNonNull( primitiveNamespace, "paragraphSpacing", Double.class, 0.0 );
 	public static final InheritedAttributeNonNull paragraphLineSpacing = new InheritedAttributeNonNull( primitiveNamespace, "paragraphLineSpacing", Double.class, 0.0 );
@@ -68,13 +69,13 @@ public class Primitive
 	public static final InheritedAttributeNonNull scriptRowSpacing = new InheritedAttributeNonNull( primitiveNamespace, "scriptRowSpacing", Double.class, 1.0 );
 	public static final InheritedAttributeNonNull scriptFontScale = new InheritedAttributeNonNull( primitiveNamespace, "scriptFontScale", Double.class, 0.9 );
 	public static final InheritedAttributeNonNull scriptMinFontScale = new InheritedAttributeNonNull( primitiveNamespace, "scriptMinFontScale", Double.class, 0.9 );
-	public static final InheritedAttributeNonNull tableColumnSpacing = new InheritedAttributeNonNull( primitiveNamespace, "tableColumnSpacing", Double.class, 0.0 );
-	public static final InheritedAttributeNonNull tableColumnExpand = new InheritedAttributeNonNull( primitiveNamespace, "tableColumnExpand", Boolean.class, false );
-	public static final InheritedAttributeNonNull tableRowSpacing = new InheritedAttributeNonNull( primitiveNamespace, "tableRowSpacing", Double.class, 0.0 );
-	public static final InheritedAttributeNonNull tableRowExpand = new InheritedAttributeNonNull( primitiveNamespace, "tableRowExpand", Boolean.class, false );
+	public static final AttributeNonNull tableColumnSpacing = new AttributeNonNull( primitiveNamespace, "tableColumnSpacing", Double.class, 0.0 );
+	public static final AttributeNonNull tableColumnExpand = new AttributeNonNull( primitiveNamespace, "tableColumnExpand", Boolean.class, false );
+	public static final AttributeNonNull tableRowSpacing = new AttributeNonNull( primitiveNamespace, "tableRowSpacing", Double.class, 0.0 );
+	public static final AttributeNonNull tableRowExpand = new AttributeNonNull( primitiveNamespace, "tableRowExpand", Boolean.class, false );
 	public static final InheritedAttribute textSquiggleUnderlinePaint = new InheritedAttribute( primitiveNamespace, "textSquiggleUnderlinePaint", Paint.class, null );
 	public static final InheritedAttributeNonNull textSmallCaps = new InheritedAttributeNonNull( primitiveNamespace, "textSmallCaps", Boolean.class, false );
-	public static final InheritedAttributeNonNull vboxSpacing = new InheritedAttributeNonNull( primitiveNamespace, "vboxSpacing", Double.class, 0.0 );
+	public static final AttributeNonNull vboxSpacing = new AttributeNonNull( primitiveNamespace, "vboxSpacing", Double.class, 0.0 );
 
 
 

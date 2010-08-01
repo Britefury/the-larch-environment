@@ -21,13 +21,10 @@ import time
 		
 		
 class GSymViewListNodeDispatch (GSymViewFragmentFunction):
-	def createViewFragment(self, xs, ctx, styleSheet, state):
+	def createViewFragment(self, xs, ctx, state):
 		element = None
-		try:
-			element, name = methodDispatchAndGetName( self, xs, ctx, styleSheet, state )
-			element.setDebugName( name )
-		except DispatchError:
-			element = ctx.errorElement( '<<VIEW LIST NODE DISPATCH ERROR>>' )
+		element, name = methodDispatchAndGetName( self, xs, ctx, state )
+		element = element.setDebugName( name )
 		return element
 	
 		
@@ -37,32 +34,24 @@ class GSymViewListNodeDispatch (GSymViewFragmentFunction):
 
 		
 class GSymViewObjectNodeDispatch (GSymViewFragmentFunction):
-	__dispatch_num_args__ = 3
+	__dispatch_num_args__ = 2
 	
-	def createViewFragment(self, node, ctx, styleSheet, state):
+	def createViewFragment(self, node, ctx, state):
 		element = None
-		try:
-			element, name = dmObjectNodeMethodDispatchAndGetName( self, node, ctx, styleSheet, state )
-			element.setDebugName( name )
-		except DispatchError:
-			print node
-			element = ctx.errorElement( '<<VIEW OBJECT NODE DISPATCH ERROR>>' )
+		element, name = dmObjectNodeMethodDispatchAndGetName( self, node, ctx, state )
+		element = element.setDebugName( name )
 		return element
 	
 		
 
 	
 class GSymViewObjectDispatch (GSymViewFragmentFunction):
-	__dispatch_num_args__ = 3
+	__dispatch_num_args__ = 2
 	
-	def createViewFragment(self, obj, ctx, styleSheet, state):
+	def createViewFragment(self, obj, ctx, state):
 		element = None
-		try:
-			element, name = objectMethodDispatchAndGetName( self, obj, ctx, styleSheet, state )
-			element.setDebugName( name )
-		except DispatchError:
-			print obj
-			element = ctx.errorElement( '<<VIEW OBJECT DISPATCH ERROR>>' )
+		element, name = objectMethodDispatchAndGetName( self, obj, ctx, state )
+		element = element.setDebugName( name )
 		return element
 
 

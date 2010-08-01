@@ -15,7 +15,6 @@ import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 
 public class CheckboxTestPage extends SystemPage
 {
@@ -59,11 +58,6 @@ public class CheckboxTestPage extends SystemPage
 
 	
 
-	protected DPElement colouredText(PrimitiveStyleSheet style)
-	{
-		return style.staticText( "Change the colour of this text using the buttons below." );
-	}
-	
 	protected Pres createContents()
 	{
 		ElementRef stateTextRef = new StaticText( "false" ).elementRef();

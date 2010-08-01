@@ -14,10 +14,10 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.ObjectPresentation.PresentationStateListenerList;
+import BritefuryJ.GSym.PresCom.InnerFragment;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
 public class LogView implements Presentable
@@ -84,7 +84,7 @@ public class LogView implements Presentable
 		int i = 1;
 		for (LogEntry entry: visibleEntries)
 		{
-			entryElements[i++] = Pres.elementToPres( fragment.presentFragment( entry, StyleSheet.instance ) );
+			entryElements[i++] = new InnerFragment( entry );
 		}
 		
 		return boxStyle.applyTo( new VBox( entryElements ) ).alignHExpand();

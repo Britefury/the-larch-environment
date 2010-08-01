@@ -7,12 +7,12 @@
 package BritefuryJ.GSym;
 
 import BritefuryJ.AttributeTable.AttributeTable;
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
+import BritefuryJ.GSym.PresCom.InnerFragment;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
 
@@ -20,29 +20,32 @@ public abstract class GSymAbstractPerspective
 {
 	private class ProjectionPresentable implements Presentable
 	{
-		private Object x;
-		private StyleSheet styleSheet;
-		private AttributeTable inheritedState;
+		private Object model;
+		private StyleSheet2 styleSheet;
 		
 		
-		public ProjectionPresentable(Object x, StyleSheet styleSheet, AttributeTable inheritedState)
+		public ProjectionPresentable(Object x, StyleSheet2 styleSheet)
 		{
-			this.x = x;
+			this.model = x;
 			this.styleSheet = styleSheet;
-			this.inheritedState = inheritedState;
 		}
 
 		
 		@Override
 		public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
 		{
-			return Pres.elementToPres( fragment.presentFragmentWithPerspectiveAndStyleSheet( x, GSymAbstractPerspective.this, this.styleSheet, this.inheritedState ) );
+			return styleSheet.applyTo( new InnerFragment( model ) );
 		}
 	}
 	
 	
-	public abstract DPElement present(Object x, GSymFragmentView fragment, StyleSheet styleSheet, AttributeTable inheritedState);
-	public abstract StyleSheet getStyleSheet();
+	public abstract Pres present(Object x, GSymFragmentView fragment, AttributeTable inheritedState);
+	
+	public StyleSheet2 getStyleSheet()
+	{
+		return StyleSheet2.instance;
+	}
+	
 	public abstract AttributeTable getInitialInheritedState();
 	public abstract EditHandler getEditHandler();
 
@@ -51,21 +54,11 @@ public abstract class GSymAbstractPerspective
 	
 	public Presentable project(Object x)
 	{
-		return new ProjectionPresentable( x, getStyleSheet(), getInitialInheritedState() );
+		return new ProjectionPresentable( x, getStyleSheet() );
 	}
 
-	public Presentable project(Object x, AttributeTable inheritedState)
+	public Presentable project(Object x, StyleSheet2 styleSheet)
 	{
-		return new ProjectionPresentable( x, getStyleSheet(), inheritedState );
-	}
-
-	public Presentable project(Object x, StyleSheet styleSheet)
-	{
-		return new ProjectionPresentable( x, styleSheet, getInitialInheritedState() );
-	}
-
-	public Presentable project(Object x, StyleSheet styleSheet, AttributeTable inheritedState)
-	{
-		return new ProjectionPresentable( x, styleSheet, inheritedState );
+		return new ProjectionPresentable( x, styleSheet );
 	}
 }

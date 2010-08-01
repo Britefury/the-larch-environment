@@ -26,6 +26,7 @@ import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
+import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.Controls.PopupMenu;
@@ -50,13 +51,11 @@ import BritefuryJ.DocPresent.Painter.Painter;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.GSym.GSymPerspective;
-import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.ObjectPresentation.PresentationStateListenerList;
+import BritefuryJ.GSym.PresCom.PerspectiveInnerFragment;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.GSym.View.GSymViewFragmentFunction;
 import BritefuryJ.Math.AABox2;
@@ -83,14 +82,14 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	private static class TreeExplorerViewFragmentFn implements GSymViewFragmentFunction
 	{
 		@Override
-		public DPElement createViewFragment(Object x, GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable inheritedState)
+		public Pres createViewFragment(Object x, GSymFragmentView ctx, AttributeTable inheritedState)
 		{
 			DPElement element = (DPElement)x;
-			return element.exploreTreePresent( ctx, (GenericPerspectiveStyleSheet)styleSheet, inheritedState );
+			return element.exploreTreePresent( ctx, inheritedState );
 		}
 	}
 	
-	private static GSymPerspective treeExplorerPerspective = new GSymPerspective( new TreeExplorerViewFragmentFn() );
+	protected static GSymPerspective treeExplorerPerspective = new GSymPerspective( new TreeExplorerViewFragmentFn() );
 	
 	public static class ElementTreeExplorer implements Presentable
 	{
@@ -112,7 +111,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		@Override
 		public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
 		{
-			return Pres.elementToPres( fragment.presentFragmentWithPerspective( element, treeExplorerPerspective ) );
+			return new PerspectiveInnerFragment( treeExplorerPerspective, element ); 
 		}
 	}
 
@@ -3142,46 +3141,46 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	// Meta-element
 	//
 	
-	protected static PrimitiveStyleSheet headerDebugTextStyle = PrimitiveStyleSheet.instance.withFontBold( true ).withForeground( new Color( 0.0f, 0.5f, 0.5f ) );
-	protected static PrimitiveStyleSheet headerDescriptionTextStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.0f, 0.0f, 0.75f ) );
-	protected static PrimitiveStyleSheet metaHeaderHBoxStyle = PrimitiveStyleSheet.instance.withHBoxSpacing( 10.0 );
-	protected static PrimitiveStyleSheet metaHeaderEmptyBorderStyle = PrimitiveStyleSheet.instance.withBorder( new FilledBorder() );
+	protected static StyleSheet2 headerDebugTextStyle = StyleSheet2.instance.withAttr( Primitive.fontBold, true ).withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.5f ) );
+	protected static StyleSheet2 headerDescriptionTextStyle = StyleSheet2.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.75f ) );
+	protected static StyleSheet2 metaHeaderHBoxStyle = StyleSheet2.instance.withAttr( Primitive.hboxSpacing, 10.0 );
+	protected static StyleSheet2 metaHeaderEmptyBorderStyle = StyleSheet2.instance.withAttr( Primitive.border, new FilledBorder() );
 
 
-	protected PrimitiveStyleSheet getDebugPresentationHeaderBorderStyle()
+	protected StyleSheet2 getDebugPresentationHeaderBorderStyle()
 	{
 		return metaHeaderEmptyBorderStyle;
 	}
 	
-	protected void createDebugPresentationHeaderContents(ArrayList<DPElement> elements)
+	protected void createDebugPresentationHeaderContents(ArrayList<Object> elements)
 	{
 		if ( debugName != null )
 		{
-			elements.add( headerDebugTextStyle.staticText( "<" + debugName + ">" ) );
+			elements.add( headerDebugTextStyle.applyTo( new StaticText( "<" + debugName + ">" ) ) );
 		}
 
 		String description = toString();
 		description = description.replace( "BritefuryJ.DocPresent.", "" );
-		elements.add( headerDescriptionTextStyle.staticText( description ) );
+		elements.add( headerDescriptionTextStyle.applyTo( new StaticText( description ) ) );
 	}
 	
-	public DPElement createDebugPresentationHeader()
+	public Pres createDebugPresentationHeader()
 	{
-		ArrayList<DPElement> elements = new ArrayList<DPElement>();
+		ArrayList<Object> elements = new ArrayList<Object>();
 		createDebugPresentationHeaderContents( elements );
-		DPElement box = metaHeaderHBoxStyle.hbox( elements.toArray( new DPElement[0] ) );
-		return getDebugPresentationHeaderBorderStyle().border( box );
+		Pres box = metaHeaderHBoxStyle.applyTo( new HBox( elements ) );
+		return getDebugPresentationHeaderBorderStyle().applyTo( new Border( box ) );
 	}
 	
-	public DPElement createMetaElement(GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable state)
+	public Pres createMetaElement(GSymFragmentView ctx, AttributeTable state)
 	{
 		return createDebugPresentationHeader();
 	}
 	
-	private DPElement exploreTreePresent(GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable state)
+	private Pres exploreTreePresent(GSymFragmentView ctx, AttributeTable state)
 	{
 		debugPresStateListeners = PresentationStateListenerList.addListener( debugPresStateListeners, ctx );
-		return createMetaElement( ctx, styleSheet, state );
+		return createMetaElement( ctx, state );
 	}
 	
 	public ElementTreeExplorer treeExplorer()

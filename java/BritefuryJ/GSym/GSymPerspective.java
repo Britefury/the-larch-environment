@@ -7,24 +7,23 @@
 package BritefuryJ.GSym;
 
 import BritefuryJ.AttributeTable.AttributeTable;
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Browser.Location.TokenIterator;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.GSym.View.GSymViewFragmentFunction;
 
 public class GSymPerspective extends GSymAbstractPerspective
 {
 	private GSymViewFragmentFunction fragmentViewFn;
-	private StyleSheet styleSheet;
+	private StyleSheet2 styleSheet;
 	private AttributeTable initialInheritedState;
 	private EditHandler editHandler;
 	private GSymRelativeLocationResolver locationResolver;
 	
 	
-	public GSymPerspective(GSymViewFragmentFunction fragmentViewFn, StyleSheet styleSheet, AttributeTable initialInheritedState, EditHandler editHandler,
+	public GSymPerspective(GSymViewFragmentFunction fragmentViewFn, StyleSheet2 styleSheet, AttributeTable initialInheritedState, EditHandler editHandler,
 			GSymRelativeLocationResolver locationResolver)
 	{
 		this.fragmentViewFn = fragmentViewFn;
@@ -36,24 +35,24 @@ public class GSymPerspective extends GSymAbstractPerspective
 	
 	public GSymPerspective(GSymViewFragmentFunction fragmentViewFn, GSymRelativeLocationResolver locationResolver)
 	{
-		this( fragmentViewFn, GenericPerspectiveStyleSheet.instance, AttributeTable.instance, null, locationResolver );
+		this( fragmentViewFn, StyleSheet2.instance, AttributeTable.instance, null, locationResolver );
 	}
 	
 	public GSymPerspective(GSymViewFragmentFunction fragmentViewFn)
 	{
-		this( fragmentViewFn, GenericPerspectiveStyleSheet.instance, AttributeTable.instance, null, null );
+		this( fragmentViewFn, StyleSheet2.instance, AttributeTable.instance, null, null );
 	}
 	
 	
 	
 	@Override
-	public DPElement present(Object x, GSymFragmentView fragment, StyleSheet styleSheet, AttributeTable inheritedState)
+	public Pres present(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 	{
-		return fragmentViewFn.createViewFragment( x, fragment, styleSheet, inheritedState );
+		return fragmentViewFn.createViewFragment( x, fragment, inheritedState );
 	}
 
 	@Override
-	public StyleSheet getStyleSheet()
+	public StyleSheet2 getStyleSheet()
 	{
 		return styleSheet;
 	}
