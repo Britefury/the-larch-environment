@@ -7,25 +7,27 @@
 package BritefuryJ.DocPresent.Combinators;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.TreeEventListener;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
-public class ApplyStyleSheet extends Pres
+public class AddTreeEventListener extends Pres
 {
-	private StyleSheet2 styleSheet;
+	private TreeEventListener listener;
 	private Pres child;
 	
 	
-	public ApplyStyleSheet(StyleSheet2 styleSheet, Object child)
+	public AddTreeEventListener(Pres child, TreeEventListener listener)
 	{
-		this.styleSheet = styleSheet;
-		this.child = coerce( child );
+		this.listener = listener;
+		this.child = child;
 	}
 	
-
+	
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		return child.present( ctx, style.withAttrs( styleSheet ) );
+		DPElement element = child.present( ctx, style );
+		element.addTreeEventListener( listener );
+		return element;
 	}
 }

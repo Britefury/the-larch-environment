@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.GSym.PresCom;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.AttributeTable;
@@ -44,7 +45,7 @@ public class InnerFragment extends Pres
 	
 	
 	
-	public static InnerFragment[] mapInnerFragments(Object models[])
+	public static InnerFragment[] map(Object models[])
 	{
 		InnerFragment fragments[] = new InnerFragment[models.length];
 		for (int i = 0; i < models.length; i++)
@@ -54,18 +55,19 @@ public class InnerFragment extends Pres
 		return fragments;
 	}
 
-	public static InnerFragment[] mapInnerFragments(List<Object> models)
+	public static List<InnerFragment> map(List<Object> models)
 	{
-		InnerFragment fragments[] = new InnerFragment[models.size()];
-		for (int i = 0; i < models.size(); i++)
+		ArrayList<InnerFragment> fragments = new ArrayList<InnerFragment>();
+		fragments.ensureCapacity( models.size() );
+		for (Object model: models)
 		{
-			fragments[i] = new InnerFragment( models.get( i ) );
+			fragments.add( new InnerFragment( model ) );
 		}
 		return fragments;
 	}
 
 	
-	public static InnerFragment[] mapInnerFragments(Object models[], AttributeTable inheritedState)
+	public static InnerFragment[] map(Object models[], AttributeTable inheritedState)
 	{
 		InnerFragment fragments[] = new InnerFragment[models.length];
 		for (int i = 0; i < models.length; i++)
@@ -75,12 +77,13 @@ public class InnerFragment extends Pres
 		return fragments;
 	}
 
-	public static InnerFragment[] mapInnerFragments(List<Object> models, AttributeTable inheritedState)
+	public static List<InnerFragment> map(List<Object> models, AttributeTable inheritedState)
 	{
-		InnerFragment fragments[] = new InnerFragment[models.size()];
-		for (int i = 0; i < models.size(); i++)
+		ArrayList<InnerFragment> fragments = new ArrayList<InnerFragment>();
+		fragments.ensureCapacity( models.size() );
+		for (Object model: models)
 		{
-			fragments[i] = new InnerFragment( models.get( i ), inheritedState );
+			fragments.add( new InnerFragment( model, inheritedState ) );
 		}
 		return fragments;
 	}

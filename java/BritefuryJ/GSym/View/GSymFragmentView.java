@@ -8,7 +8,6 @@ package BritefuryJ.GSym.View;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.List;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.DPElement;
@@ -21,7 +20,6 @@ import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 import BritefuryJ.GSym.GSymAbstractPerspective;
 import BritefuryJ.GSym.GSymBrowserContext;

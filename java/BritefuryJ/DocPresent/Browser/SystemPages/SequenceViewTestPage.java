@@ -17,9 +17,9 @@ import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
 import BritefuryJ.DocPresent.Combinators.RichText.Heading3;
 import BritefuryJ.DocPresent.Combinators.Sequence.HorizontalSequenceView;
 import BritefuryJ.DocPresent.Combinators.Sequence.ParagraphSequenceView;
+import BritefuryJ.DocPresent.Combinators.Sequence.TrailingSeparator;
 import BritefuryJ.DocPresent.Combinators.Sequence.VerticalInlineSequenceView;
 import BritefuryJ.DocPresent.Combinators.Sequence.VerticalSequenceView;
-import BritefuryJ.DocPresent.ListView.TrailingSeparator;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
 public class SequenceViewTestPage extends SystemPage

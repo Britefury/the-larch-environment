@@ -16,7 +16,6 @@ import BritefuryJ.DocPresent.Combinators.Primitive.LineBreak;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.ParagraphDedentMarker;
 import BritefuryJ.DocPresent.Combinators.Primitive.ParagraphIndentMarker;
-import BritefuryJ.DocPresent.ListView.TrailingSeparator;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class ParagraphSequenceView extends AbstractSequenceView

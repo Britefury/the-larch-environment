@@ -10,7 +10,6 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.SequentialPres;
-import BritefuryJ.DocPresent.ListView.TrailingSeparator;
 
 public abstract class AbstractSequenceView extends SequentialPres
 {

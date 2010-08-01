@@ -17,7 +17,6 @@ import BritefuryJ.DocPresent.Combinators.Primitive.LineBreakCostSpan;
 import BritefuryJ.DocPresent.Combinators.Primitive.ParagraphDedentMarker;
 import BritefuryJ.DocPresent.Combinators.Primitive.ParagraphIndentMarker;
 import BritefuryJ.DocPresent.Combinators.Primitive.Span;
-import BritefuryJ.DocPresent.ListView.TrailingSeparator;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class SpanSequenceView extends AbstractSequenceView
