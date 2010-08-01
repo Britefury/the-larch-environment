@@ -14,18 +14,17 @@ import java.util.List;
 import org.python.core.PySlice;
 
 import BritefuryJ.AttributeTable.AttributeTable;
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
 import BritefuryJ.GSym.GenericPerspective.PresCom.UnescapedStringAsSpan;
+import BritefuryJ.GSym.PresCom.InnerFragment;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
 public class StreamValue implements Presentable
@@ -223,8 +222,7 @@ public class StreamValue implements Presentable
 		@Override
 		public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
 		{
-			Pres valueView = Pres.elementToPres( fragment.presentFragment( structuralValue, StyleSheet.instance ) );
-			return borderStyle.applyTo( new Border( valueView ) );
+			return borderStyle.applyTo( new Border( new InnerFragment( structuralValue ) ) );
 		}
 
 	
@@ -577,8 +575,7 @@ public class StreamValue implements Presentable
 	@Override
 	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
 	{
-		List<DPElement> itemViews = fragment.mapPresentFragment( Arrays.asList( (Object[])items ), StyleSheet.instance );
-		Pres contents = new Paragraph( itemViews.toArray() );
+		Pres contents = new Paragraph( InnerFragment.mapInnerFragments( items ) );
 		
 		return streamValueStyle.applyTo( new ObjectBox( "BritefuryJ.DocPresent.StreamValue.StreamValue", contents ) );
 	}

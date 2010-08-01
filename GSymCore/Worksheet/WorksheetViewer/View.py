@@ -29,7 +29,7 @@ from Britefury.Util.InstanceCache import instanceCache
 from BritefuryJ.AttributeTable import *
 
 from BritefuryJ.DocPresent.Browser import Location
-from BritefuryJ.DocPresent.StyleSheet import PrimitiveStyleSheet
+from BritefuryJ.DocPresent.StyleSheet import StyleSheet2, PrimitiveStyleSheet
 from BritefuryJ.DocPresent import *
 
 from BritefuryJ.GSym import GSymPerspective, GSymSubject, GSymRelativeLocationResolver
@@ -168,6 +168,6 @@ class WorksheetViewerRelativeLocationResolver (GSymRelativeLocationResolver):
 	
 
 	
-perspective = GSymPerspective( WorksheetViewer(), WorksheetViewerStyleSheet.instance, AttributeTable.instance, None, WorksheetViewerRelativeLocationResolver() )
+perspective = GSymPerspective( WorksheetViewer(), StyleSheet2.instance, AttributeTable.instance, None, WorksheetViewerRelativeLocationResolver() )
 
 	

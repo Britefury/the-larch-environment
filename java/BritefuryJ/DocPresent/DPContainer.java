@@ -13,15 +13,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.AttributeTable;
-import BritefuryJ.DocPresent.Border.FilledBorder;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.LayoutTree.BranchLayoutNode;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
-import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.GSym.PresCom.PerspectiveInnerFragment;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
@@ -1063,33 +1063,25 @@ public abstract class DPContainer extends DPElement
 	// Meta-element
 	//
 	
-	static FilledBorder metaIndentBorder = new FilledBorder( 25.0, 0.0, 0.0, 0.0 );
-	static VBoxStyleParams metaVBoxStyle = new VBoxStyleParams( null, null, null, 0.0 );
-	
-	public DPElement createMetaElement(GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable state)
+	public Pres createMetaElement(GSymFragmentView ctx, AttributeTable state)
 	{
-		DPVBox metaChildrenVBox = new DPVBox( metaVBoxStyle );
+		ArrayList<Object> metaChildren = new ArrayList<Object>();
 		for (DPElement child: getChildren())
 		{
 			if ( child != null )
 			{
-				DPElement metaChild = ctx.presentFragmentWithGenericPerspective( child.treeExplorer(), state ); 
-				metaChildrenVBox.append( metaChild );
+				Pres metaChild = new PerspectiveInnerFragment( treeExplorerPerspective, child ); 
+				metaChildren.add( metaChild );
 			}
 			else
 			{
 				System.out.println( "DPContainer.createMetaElement(): null child in " + getClass().getName() );
 			}
 		}
-		metaChildrenVBox.setRefPointIndex( getChildren().size() - 1 );
+		Pres metaChildrenVBox = new VBox( metaChildren, metaChildren.size() - 1 );
 		
-		DPBorder indentMetaChildren = new DPBorder( metaIndentBorder );
-		indentMetaChildren.setChild( metaChildrenVBox );
+		Pres indentMetaChildren = metaChildrenVBox.padX( 25.0, 0.0 );
 		
-		DPVBox metaVBox = new DPVBox( metaVBoxStyle );
-		metaVBox.append( createDebugPresentationHeader() );
-		metaVBox.append( indentMetaChildren );
-		
-		return metaVBox;
+		return new VBox( new Pres[] { createDebugPresentationHeader(), indentMetaChildren } );
 	}
 }

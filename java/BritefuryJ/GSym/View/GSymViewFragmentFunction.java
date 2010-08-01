@@ -7,10 +7,9 @@
 package BritefuryJ.GSym.View;
 
 import BritefuryJ.AttributeTable.AttributeTable;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
 
 public interface GSymViewFragmentFunction
 {
-	public DPElement createViewFragment(Object x, GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable inheritedState);
+	public Pres createViewFragment(Object x, GSymFragmentView ctx, AttributeTable inheritedState);
 }

@@ -32,25 +32,19 @@ public class PresentObject extends Pres
 		
 		if ( perspective == null )
 		{
-			throw new RuntimeException( "Cannot present general object without valid perspective" );
+			throw new RuntimeException( "Cannot present general object without valid perspective (attempting to present " + value + ")" );
 		}
 		
 		if ( fragment == null )
 		{
-			throw new RuntimeException( "Cannot present general object without valid fragment" );
-		}
-		
-		if ( style == null )
-		{
-			throw new RuntimeException( "Cannot present general object without valid style" );
+			throw new RuntimeException( "Cannot present general object without valid fragment (attempting to present " + value + ")" );
 		}
 		
 		if ( inheritedState == null )
 		{
-			throw new RuntimeException( "Cannot present general object without valid inherited state" );
+			throw new RuntimeException( "Cannot present general object without valid inherited state (attempting to present " + value + ")" );
 		}
 		
-		throw new RuntimeException( "Not implemented" );
-		//return perspective.present( value, fragment, style, inheritedState );
+		return perspective.present( value, fragment, inheritedState ).present( ctx, style );
 	}
 }

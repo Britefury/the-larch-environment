@@ -7,6 +7,7 @@
 ##-*************************
 import os
 
+from java.awt import Color
 from java.awt.event import KeyEvent
 from java.util.regex import Pattern
 
@@ -27,9 +28,11 @@ from BritefuryJ.AttributeTable import *
 
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.StyleSheet import *
+from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.Browser import Location
 from BritefuryJ.DocPresent.Controls import TextEntry
 from BritefuryJ.DocPresent.Input import ObjectDndHandler
+from BritefuryJ.DocPresent.Combinators.Primitive import *
 
 from BritefuryJ.GSym import GSymPerspective, GSymSubject
 from BritefuryJ.GSym.View import GSymFragmentView
@@ -38,6 +41,7 @@ from GSymCore.Languages.Python25 import Python25
 
 from GSymCore.PythonConsole import ConsoleSchema as Schema
 from GSymCore.PythonConsole.ConsoleViewer.ConsoleViewerStyleSheet import ConsoleViewerStyleSheet
+from GSymCore.PythonConsole.ConsoleViewer.ConsoleViewerCombinators import ConsoleViewerStyle
 
 
 
@@ -68,6 +72,23 @@ class CurrentModuleInteractor (ElementInteractor):
 	
 	def onKeyRelease(self, element, event):
 		return False
+
+
+
+
+_labelStyle = StyleSheet2.instance.withAttr( Primitive.fontSize, 10 )
+
+_blockStyle = StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 2.0 ).withAttr( Primitive.border, SolidBorder( 1.0, 5.0, 15.0, 15.0, Color( 0.25, 0.25, 0.25 ), Color( 0.8, 0.8, 0.8 ) ) )
+
+_pythonModuleBorderStyle = StyleSheet2.instance.withAttr( Primitive.border, SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), Color.WHITE ) )
+_dropPromptStyle = StyleSheet2.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.0, 0.8, 0.0 ), None ) )
+
+_varAssignVarNameStyle = StyleSheet2.instance.withAttr( Primitive.fontItalic, True ).withAttr( Primitive.foreground, Color( 0.0, 0.0, 0.5 ) )
+_varAssignTypeNameStyle = StyleSheet2.instance.withAttr( Primitive.foreground, Color( 0.0, 0.125, 0.0 ) )
+_varAssignMsgStyle = StyleSheet2.instance.withAttr( Primitive.foreground, Color( 0.0, 0.125, 0.0 ) )
+
+_consoleBlockListStyle = StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 5.0 )
+_consoleStyle = StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 8.0 )
 
 
 
@@ -126,6 +147,23 @@ class ConsoleView (GSymViewObjectDispatch):
 		
 		return styleSheet.consoleBlock( moduleView, execResult.getStdOut(), execResult.getStdErr(), caughtExceptionView, resultView )
 
+	def consoleBlock(self, pythonModule, stdout, stderr, caughtException, result):
+		executionStyle = self['executionStyle']
+		blockStyle = self.blockStyle()
+		pythonModuleBorderStyle = self.pythonModuleBorderStyle()
+		
+		blockContents = []
+		blockContents.append( pythonModuleBorderStyle.border( pythonModule.alignHExpand() ).alignHExpand() )
+		if stderr is not None:
+			blockContents.append( executionStyle.stderr( stderr ) )
+		if caughtException is not None:
+			blockContents.append( executionStyle.exception( caughtException ) )
+		if stdout is not None:
+			blockContents.append( executionStyle.stdout( stdout ) )
+		if result is not None:
+			blockContents.append( executionStyle.result( result ) )
+		blockVBox = blockStyle.vbox( blockContents ).alignHExpand()
+		return blockStyle.border( blockVBox ).alignHExpand()
 
 
 	@ObjectDispatchMethod( Schema.ConsoleVarAssignment )
@@ -134,7 +172,13 @@ class ConsoleView (GSymViewObjectDispatch):
 		valueType = node.getValueType()
 		valueTypeName = valueType.__name__
 		
-		return styleSheet.varAssignment( varName, valueTypeName )
+		varNameView = _varAssignVarNameStyle.applyTo( StaticText( varName ) )
+		typeNameView = _varAssignTypeNameStyle.applyTo( StaticText( valueTypeName ) )
+		
+		return Paragraph( [ _varAssignMsgStyle.applyTo( StaticText( 'Variable ' ) ), LineBreak(),
+		                    varNameView, LineBreak(),
+		                    _varAssignMsgStyle.applyTo( StaticText( ' was assigned a ' ) ), LineBreak(),
+		                    typeNameView ] )
 
 
 
@@ -144,4 +188,4 @@ _docNameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*', 0 )
 
 	
 
-perspective = GSymPerspective( ConsoleView(), ConsoleViewerStyleSheet.instance, AttributeTable.instance, None, None )
+perspective = GSymPerspective( ConsoleView(), StyleSheet2.instance, AttributeTable.instance, None, None )

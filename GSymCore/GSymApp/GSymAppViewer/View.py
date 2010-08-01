@@ -7,6 +7,8 @@
 ##-*************************
 import os
 
+from java.awt import Color
+
 from java.awt.event import KeyEvent
 from java.util.regex import Pattern
 
@@ -29,14 +31,27 @@ from BritefuryJ.AttributeTable import *
 
 from BritefuryJ.DocPresent.StyleSheet import *
 from BritefuryJ.DocPresent.Browser import Location
+from BritefuryJ.DocPresent.Border import *
+
+from BritefuryJ.Controls import *
+from BritefuryJ.DocPresent.Combinators.Primitive import *
+from BritefuryJ.DocPresent.Combinators.RichText import *
 
 from BritefuryJ.GSym import GSymPerspective, GSymRelativeLocationResolver, GSymSubject
+from BritefuryJ.GSym.PresCom import *
 
 from GSymCore.GSymApp import Application
-from GSymCore.GSymApp.GSymAppViewer.GSymAppViewerStyleSheet import GSymAppViewerStyleSheet
+#from GSymCore.GSymApp.GSymAppViewer.GSymAppViewerCombinators import appState, appDocument, appConsole
 from GSymCore.GSymApp import DocumentManagement
 
 from GSymCore.PythonConsole import Console
+
+
+
+_appDocRightPadding = 30.0
+_controlsPadding = 5.0
+_appDocumentControlsStyle = StyleSheet2.instance.withAttr( Primitive.hboxSpacing, 20.0 ).withAttr( Primitive.border, FilledBorder( 5.0, 5.0, 5.0, 5.0, Color( 0.9, 0.9, 0.9 ) ) )
+_dcumentListTableStyle = StyleSheet2.instance.withAttr( Primitive.tableColumnSpacing, 15.0 ).withAttr( Primitive.tableRowSpacing, 5.0 )
 
 
 
@@ -106,13 +121,26 @@ def _uniqueDocumentLocation(docs, location):
 
 
 						
+def _contentsList(controls, contentsLists, title):
+	controlsBox = HBox( [ c.padX( _controlsPadding )   for c in controls ] )
+	controlsBorder = _appDocumentControlsStyle.applyTo( Border( controlsBox ) )
+
+	openDocumentsSeparator = HSeparator()
+	
+	docListBox = _dcumentListTableStyle.applyTo( RGrid( contentsLists ) )
+
+	contentsBox = VBox( [ controlsBorder.pad( 2.0, 2.0 ), openDocumentsSeparator, docListBox.pad( 10.0, 2.0 ) ] )
+	
+	heading = Heading3( title )
+	
+	return VBox( [ heading, contentsBox.padX( 5.0, 0.0 ) ] )
 						
 						
 						
 class AppView (GSymViewObjectDispatch):
 	@ObjectDispatchMethod( Application.AppState )
-	def AppState(self, ctx, styleSheet, state, node):
-		def _onNewDoc(element):
+	def AppState(self, ctx, state, node):
+		def _onNewDoc(link, event):
 			def handleNewDocumentFn(unit):
 				name = _newDocumentName( openDocuments )
 				
@@ -124,6 +152,7 @@ class AppView (GSymViewObjectDispatch):
 				appDoc = Application.AppDocument( name, location )
 				node.addOpenDocument( appDoc )
 				
+			element = link.getElement()
 			openDocuments = node.getOpenDocuments()
 			DocumentManagement.promptNewDocument( ctx.getSubjectContext()['world'], element, handleNewDocumentFn )
 			
@@ -131,7 +160,7 @@ class AppView (GSymViewObjectDispatch):
 		
 			
 			
-		def _onOpenDoc(element):
+		def _onOpenDoc(link, event):
 			def handleOpenedDocumentFn(fullPath, document):
 				head, documentName = os.path.split( fullPath )
 				documentName, ext = os.path.splitext( documentName )
@@ -144,12 +173,13 @@ class AppView (GSymViewObjectDispatch):
 				node.addOpenDocument( appDoc )
 
 				
+			element = link.getElement()
 			DocumentManagement.promptOpenDocument( ctx.getSubjectContext()['world'], element.getRootElement().getComponent(), handleOpenedDocumentFn )
 			
 			return True
 
 		
-		def _onNewConsole():
+		def _onNewConsole(link, event):
 			consoles = node.getConsoles()
 			name = _newConsoleName( consoles )
 			appConsole = Application.AppConsole( name )
@@ -159,16 +189,33 @@ class AppView (GSymViewObjectDispatch):
 		
 			
 			
-		openDocViews = ctx.mapPresentFragment( node.getOpenDocuments(), styleSheet, state.withAttrs( location='' ) )
-		consoles = ctx.mapPresentFragment( node.getConsoles(), styleSheet, state.withAttrs( location='' ) )
+		openDocViews = InnerFragment.mapInnerFragments( node.getOpenDocuments(), state.withAttrs( location='' ) )
+		consoles = InnerFragment.mapInnerFragments( node.getConsoles(), state.withAttrs( location='' ) )
 		
-		return styleSheet.appState( openDocViews, consoles, _onNewDoc, _onOpenDoc, _onNewConsole )
+		systemLink = Hyperlink( 'SYSTEM PAGE', Location( 'system' ) )
+		linkHeader = LinkHeaderBar( [ systemLink ] )
+		
+		title = TitleBar( 'gSym' )
+		
+		newLink = Hyperlink( 'NEW', _onNewDoc )
+		openLink = Hyperlink( 'OPEN', _onOpenDoc )
+		openDocumentsBox = _contentsList( [ newLink, openLink ], openDocViews, 'Documents' )
+		
+		
+		newConsoleLink = Hyperlink( 'NEW', _onNewConsole )
+		consolesBox = _contentsList( [ newConsoleLink ], consoles, 'Python consoles' )
+		
+		
+		head = Head( [ linkHeader, title ] )
+		body = Body( [ openDocumentsBox.pad( 10.0, 10.0 ).alignHLeft(), consolesBox.pad( 10.0, 10.0 ).alignHLeft() ] )
+		return Page( [ head, body ] )
 
 
 
 	@ObjectDispatchMethod( Application.AppDocument )
-	def AppDocument(self, ctx, styleSheet, state, node):
-		def _onSave(element):
+	def AppDocument(self, ctx, state, node):
+		def _onSave(link, event):
+			element = link.getElement()
 			world = ctx.getSubjectContext()['world']
 			document = world.getDocument( location )
 			
@@ -181,7 +228,8 @@ class AppView (GSymViewObjectDispatch):
 				document.save()
 				
 		
-		def _onSaveAs(element):
+		def _onSaveAs(link, event):
+			element = link.getElement()
 			world = ctx.getSubjectContext()['world']
 			document = world.getDocument( location )
 			
@@ -193,14 +241,23 @@ class AppView (GSymViewObjectDispatch):
 			
 		name = node.getName()
 		location = node.getLocation()
-		return styleSheet.appDocument( name, Location( location ), _onSave, _onSaveAs )
+			
+		
+		docLink = Hyperlink( name, Location( location ) ).padX( 0.0, _appDocRightPadding )
+		saveLink = Hyperlink( 'SAVE', _onSave )
+		saveAsLink = Hyperlink( 'SAVE AS', _onSaveAs )
+	
+		return GridRow( [ docLink, saveLink, saveAsLink ] )
 
 
 
 	@ObjectDispatchMethod( Application.AppConsole )
-	def AppConsole(self, ctx, styleSheet, state, node):
+	def AppConsole(self, ctx, state, node):
 		name = node.getName()
-		return styleSheet.appConsole( name, Location( '$consoles/' + name ) )
+		location = Location( '$consoles/' + name )
+		consoleLink = Hyperlink( name, location ).padX( 0.0, _appDocRightPadding )
+	
+		return GridRow( [ consoleLink ] )
 
 
 
@@ -241,7 +298,7 @@ class GSymAppRelativeLocationResolver (GSymRelativeLocationResolver):
 			return None
 
 
-perspective = GSymPerspective( AppView(), GSymAppViewerStyleSheet.instance, AttributeTable.instance, None, GSymAppRelativeLocationResolver() )
+perspective = GSymPerspective( AppView(), StyleSheet2.instance, AttributeTable.instance, None, GSymAppRelativeLocationResolver() )
 
 	
 	

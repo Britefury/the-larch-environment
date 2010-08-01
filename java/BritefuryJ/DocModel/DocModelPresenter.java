@@ -20,10 +20,10 @@ import BritefuryJ.DocPresent.Combinators.Sequence.ParagraphSequenceView;
 import BritefuryJ.DocPresent.Combinators.Sequence.VerticalInlineSequenceView;
 import BritefuryJ.DocPresent.Combinators.Sequence.VerticalSequenceView;
 import BritefuryJ.DocPresent.ListView.TrailingSeparator;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
 import BritefuryJ.GSym.GenericPerspective.PresCom.UnescapedStringAsHBox;
+import BritefuryJ.GSym.PresCom.InnerFragment;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
 public class DocModelPresenter
@@ -70,7 +70,7 @@ public class DocModelPresenter
 		}
 		else
 		{
-			return Pres.elementToPres( fragment.presentFragment( x, StyleSheet.instance, inheritedState ) );
+			return new InnerFragment( x ); 
 		}
 	}
 	

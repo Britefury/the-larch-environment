@@ -9,11 +9,11 @@ package BritefuryJ.GSym.ObjectPresentation;
 import org.python.core.PyObject;
 
 import BritefuryJ.AttributeTable.AttributeTable;
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
 public interface PyObjectPresenter<StyleSheetType extends StyleSheet>
 {
-	public DPElement presentObject(PyObject x, GSymFragmentView fragment, StyleSheetType styleSheet, AttributeTable inheritedState);
+	public Pres presentObject(PyObject x, GSymFragmentView fragment, AttributeTable inheritedState);
 }

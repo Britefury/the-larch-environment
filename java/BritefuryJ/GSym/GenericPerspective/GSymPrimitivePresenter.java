@@ -10,78 +10,84 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import BritefuryJ.AttributeTable.AttributeTable;
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.Script;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Painter.FillPainter;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.GSym.GenericPerspective.PresCom.UnescapedStringAsSpan;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
 public class GSymPrimitivePresenter
 {
-	public static DPElement presentChar(char c, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public static Pres presentChar(char c, GSymFragmentView fragment, AttributeTable inheritedState)
 	{
 		String str = Character.toString( c );
-		return PrimitiveStyleSheet.instance.hbox( new DPElement[] {
-				punctuationStyle.staticText(  "'" ),
-				charStyle.staticText( str ),
-				punctuationStyle.staticText(  "'" ) } );
+		return new HBox( new Pres[] {
+				punctuationStyle.applyTo( new StaticText(  "'" ) ),
+				charStyle.applyTo( new StaticText( str ) ),
+				punctuationStyle.applyTo( new StaticText(  "'" ) ) } );
 	}
 	
-	public static DPElement presentString(String str, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public static Pres presentString(String text, GSymFragmentView fragment, AttributeTable inheritedState)
 	{
-		String lines[] = str.split( "\n" );
-		if ( lines.length == 1 )
+		String textLines[] = text.split( "\n" );
+		if ( textLines.length == 1 )
 		{
-			ArrayList<DPElement> lineContent = new ArrayList<DPElement>();
-			lineContent.add( punctuationStyle.staticText(  "\"" ) );
-			lineContent.addAll( styleSheet.unescapedStringAsElementList( str ) );
-			lineContent.add( punctuationStyle.staticText(  "\"" ) );
-			return PrimitiveStyleSheet.instance.hbox( lineContent.toArray( new DPElement[0] ) );
+			ArrayList<Object> lineContent = new ArrayList<Object>();
+			lineContent.add( punctuationStyle.applyTo( new StaticText(  "\"" ) ) );
+			lineContent.add( new UnescapedStringAsSpan( text ) );
+			lineContent.add( punctuationStyle.applyTo( new StaticText(  "\"" ) ) );
+			return new HBox( lineContent );
 		}
 		else
 		{
-			ArrayList<DPElement> lineElements = new ArrayList<DPElement>();
+			ArrayList<Object> lines = new ArrayList<Object>();
 			int index = 0;
-			for (String line: lines)
+			for (String line: textLines)
 			{
-				ArrayList<DPElement> lineContent = new ArrayList<DPElement>();
+				ArrayList<Object> lineContent = new ArrayList<Object>();
 				if ( index == 0 )
 				{
-					lineContent.add( punctuationStyle.staticText(  "\"" ) );
+					lineContent.add( punctuationStyle.applyTo( new StaticText(  "\"" ) ) );
 				}
-				lineContent.addAll( styleSheet.unescapedStringAsElementList( line ) );
-				if ( index == lines.length - 1 )
+				lineContent.add( new UnescapedStringAsSpan( line ) );
+				if ( index == textLines.length - 1 )
 				{
-					lineContent.add( punctuationStyle.staticText(  "\"" ) );
+					lineContent.add( punctuationStyle.applyTo( new StaticText(  "\"" ) ) );
 				}
-				lineElements.add( PrimitiveStyleSheet.instance.hbox( lineContent.toArray( new DPElement[0]) ) );
+				lines.add( new HBox( lineContent ) );
 				index++;
 			}
-			return multiLineStringStyle.vbox( lineElements.toArray( new DPElement[0]) );
+			return multiLineStringStyle.applyTo( new VBox( lines ) );
 		}
 	}
 
-	public static DPElement presentByte(byte b, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public static Pres presentByte(byte b, GSymFragmentView fragment, AttributeTable inheritedState)
 	{
-		return integerStyle.staticText( Integer.toHexString( (int)b ) );
+		return integerStyle.applyTo( new StaticText( Integer.toHexString( (int)b ) ) );
 	}
 	
 	
-	public static DPElement presentShort(short x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public static Pres presentShort(short x, GSymFragmentView fragment, AttributeTable inheritedState)
 	{
-		return integerStyle.staticText( Short.toString( x ) );
+		return integerStyle.applyTo( new StaticText( Short.toString( x ) ) );
 	}
 	
-	public static DPElement presentInt(int x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public static Pres presentInt(int x, GSymFragmentView fragment, AttributeTable inheritedState)
 	{
-		return integerStyle.staticText( Integer.toString( x ) );
+		return integerStyle.applyTo( new StaticText( Integer.toString( x ) ) );
 	}
 	
-	public static DPElement presentLong(long x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public static Pres presentLong(long x, GSymFragmentView fragment, AttributeTable inheritedState)
 	{
-		return integerStyle.staticText( Long.toString( x ) );
+		return integerStyle.applyTo( new StaticText( Long.toString( x ) ) );
 	}
 	
-	public static DPElement presentDouble(double x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public static Pres presentDouble(double x, GSymFragmentView fragment, AttributeTable inheritedState)
 	{
 		String asText = Double.toString( x );
 		
@@ -95,44 +101,44 @@ public class GSymPrimitivePresenter
 		}
 		else
 		{
-			return floatStyle.staticText( asText );
+			return floatStyle.applyTo( new StaticText( asText ) );
 		}
 	}
 	
-	public static DPElement presentSIDouble(String textValue, int expIndex)
+	public static Pres presentSIDouble(String textValue, int expIndex)
 	{
-		DPElement mantissa = floatStyle.staticText( textValue.substring( 0, expIndex ) + "*10" );
-		DPElement exponent = floatStyle.staticText( textValue.substring( expIndex + 1, textValue.length() ) );
-		return PrimitiveStyleSheet.instance.scriptRSuper( mantissa, exponent );
+		Pres mantissa = floatStyle.applyTo( new StaticText( textValue.substring( 0, expIndex ) + "*10" ) );
+		Pres exponent = floatStyle.applyTo( new StaticText( textValue.substring( expIndex + 1, textValue.length() ) ) );
+		return Script.scriptRSuper( mantissa, exponent );
 	}
 	
-	public static DPElement presentNull()
+	public static Pres presentNull()
 	{
-		return nullStyle.staticText( "Null" );
+		return nullStyle.applyTo( new StaticText( "Null" ) );
 	}
 	
-	public static DPElement presentNone()
+	public static Pres presentNone()
 	{
-		return nullStyle.staticText( "None" );
+		return nullStyle.applyTo( new StaticText( "None" ) );
 	}
 	
-	public static DPElement presentBoolean(boolean b, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+	public static Pres presentBoolean(boolean b, GSymFragmentView fragment, AttributeTable inheritedState)
 	{
 		if ( b )
 		{
-			return booleanStyle.staticText( "True" );
+			return booleanStyle.applyTo( new StaticText( "True" ) );
 		}
 		else
 		{
-			return booleanStyle.staticText( "False" );
+			return booleanStyle.applyTo( new StaticText( "False" ) );
 		}
 	}
 	
-	private static final PrimitiveStyleSheet punctuationStyle = PrimitiveStyleSheet.instance.withForeground( Color.blue );
-	private static final PrimitiveStyleSheet charStyle = PrimitiveStyleSheet.instance; 
-	private static final PrimitiveStyleSheet multiLineStringStyle = PrimitiveStyleSheet.instance.withBackground( new FillPainter( new Color( 1.0f, 1.0f, 0.75f ) ) );
-	private static final PrimitiveStyleSheet integerStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.5f, 0.0f, 0.5f ) );
-	private static final PrimitiveStyleSheet floatStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.25f, 0.0f, 0.5f ) );
-	private static final PrimitiveStyleSheet booleanStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.0f, 0.5f, 0.0f ) ).withTextSmallCaps( true );
-	private static final PrimitiveStyleSheet nullStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.75f, 0.0f, 0.5f ) ).withTextSmallCaps( true );
+	private static final StyleSheet2 punctuationStyle = StyleSheet2.instance.withAttr( Primitive.foreground, Color.blue );
+	private static final StyleSheet2 charStyle = StyleSheet2.instance; 
+	private static final StyleSheet2 multiLineStringStyle = StyleSheet2.instance.withAttr( Primitive.background, new FillPainter( new Color( 1.0f, 1.0f, 0.75f ) ) );
+	private static final StyleSheet2 integerStyle = StyleSheet2.instance.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.5f ) );
+	private static final StyleSheet2 floatStyle = StyleSheet2.instance.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
+	private static final StyleSheet2 booleanStyle = StyleSheet2.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) ).withAttr( Primitive.textSmallCaps, true );
+	private static final StyleSheet2 nullStyle = StyleSheet2.instance.withAttr( Primitive.foreground, new Color( 0.75f, 0.0f, 0.5f ) ).withAttr( Primitive.textSmallCaps, true );
 }

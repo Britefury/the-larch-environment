@@ -16,7 +16,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
-abstract class UnescapedString extends Pres
+public abstract class UnescapedString extends Pres
 {
 	private String value;
 	

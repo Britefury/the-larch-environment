@@ -19,15 +19,21 @@ import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Browser.Page;
 import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 import BritefuryJ.GSym.GSymAbstractPerspective;
 import BritefuryJ.GSym.GSymBrowserContext;
 import BritefuryJ.GSym.GSymSubject;
-import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.GSym.GenericPerspective.PresCom.ErrorBox;
 import BritefuryJ.IncrementalTree.IncrementalTree;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 import BritefuryJ.IncrementalTree.IncrementalTreeNodeTable;
@@ -104,20 +110,20 @@ public class GSymView extends IncrementalTree
 		protected GSymView view;
 		protected GSymAbstractPerspective perspective;
 		protected AttributeTable subjectContext;
-		protected StyleSheet styleSheet;
+		protected StyleValues style;
 		protected AttributeTable inheritedState;
 		
-		public ViewFragmentContextAndResultFactory(GSymView view, GSymAbstractPerspective perspective, AttributeTable subjectContext, StyleSheet styleSheet, AttributeTable inheritedState)
+		public ViewFragmentContextAndResultFactory(GSymView view, GSymAbstractPerspective perspective, AttributeTable subjectContext, StyleValues style, AttributeTable inheritedState)
 		{
 			this.view = view;
 			this.perspective = perspective;
 			this.subjectContext = subjectContext;
-			this.styleSheet = styleSheet;
+			this.style = style;
 			this.inheritedState = inheritedState;
 		}
 
 
-		public Object createNodeResult(IncrementalTreeNode incrementalNode, Object docNode)
+		public Object createNodeResult(IncrementalTreeNode incrementalNode, Object model)
 		{
 			view.profile_startPython();
 
@@ -125,37 +131,36 @@ public class GSymView extends IncrementalTree
 			GSymFragmentView fragmentView = (GSymFragmentView)incrementalNode;
 			
 			// Create the view fragment
-			DPElement fragment;
+			Pres fragment;
 			try
 			{
-				fragment = perspective.present( docNode, fragmentView, styleSheet, inheritedState );
+				fragment = perspective.present( model, fragmentView, inheritedState );
 			}
 			catch (Exception e)
 			{
 				try
 				{
-					GenericPerspectiveStyleSheet gs = GenericPerspectiveStyleSheet.instance;
-					DPElement exceptionView = view.browserContext.getGenericPerspective().present( e, fragmentView, GenericPerspectiveStyleSheet.instance, inheritedState );
-					fragment = gs.errorBox( "Presentation error - exception during presentation", exceptionView );
+					Pres exceptionView = view.browserContext.getGenericPerspective().present( e, fragmentView, inheritedState );
+					fragment = new ErrorBox( "Presentation error - exception during presentation", exceptionView );
 				}
 				catch (Exception e2)
 				{
-					GenericPerspectiveStyleSheet gs = GenericPerspectiveStyleSheet.instance;
-					PrimitiveStyleSheet labelStyle = PrimitiveStyleSheet.instance;
-					PrimitiveStyleSheet exceptionStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 1.0f, 0.2f, 0.0f ) );
-					
-					fragment = gs.errorBox( "DOUBLE EXCEPTION!", PrimitiveStyleSheet.instance.vbox( new DPElement[] {
-							labelStyle.staticText( "Got exception:" ),
-							exceptionStyle.staticText( e2.toString() ).padX( 15.0, 0.0 ),
-							labelStyle.staticText( "While trying to display exception:" ),
-							exceptionStyle.staticText( e.toString() ).padX( 15.0, 0.0 )   } ) );
+					fragment = new ErrorBox( "DOUBLE EXCEPTION!", new VBox( new Pres[] {
+							labelStyle.applyTo( new StaticText( "Got exception:" ) ),
+							exceptionStyle.applyTo( new StaticText( e2.toString() ) ).padX( 15.0, 0.0 ),
+							labelStyle.applyTo( new StaticText( "While trying to display exception:" ) ),
+							exceptionStyle.applyTo( new StaticText( e.toString() ) ).padX( 15.0, 0.0 )   } ) );
 				}
 			}
 			
 			view.profile_stopPython();
 			
-			return fragment;
+			return fragment.present( new PresentationContext( fragmentView, perspective, inheritedState ), style );
 		}
+
+	
+		private static final StyleSheet2 labelStyle = StyleSheet2.instance;
+		private static final StyleSheet2 exceptionStyle = StyleSheet2.instance.withAttr( Primitive.foreground, new Color( 1.0f, 0.2f, 0.0f ) );
 	}
 	
 	
@@ -163,14 +168,14 @@ public class GSymView extends IncrementalTree
 	{
 		private GSymAbstractPerspective perspective;
 		private AttributeTable subjectContext;
-		private StyleSheet styleSheet;
+		private StyleValues style;
 		private AttributeTable inheritedState;
 		
 		
-		public ViewFragmentContextAndResultFactoryKey(GSymAbstractPerspective perspective, AttributeTable subjectContext, StyleSheet styleSheet, AttributeTable inheritedState)
+		public ViewFragmentContextAndResultFactoryKey(GSymAbstractPerspective perspective, AttributeTable subjectContext, StyleValues style, AttributeTable inheritedState)
 		{
 			this.perspective = perspective;
-			this.styleSheet = styleSheet;
+			this.style = style;
 			this.inheritedState = inheritedState;
 			this.subjectContext = subjectContext;
 		}
@@ -178,11 +183,11 @@ public class GSymView extends IncrementalTree
 		
 		public int hashCode()
 		{
-			if ( styleSheet == null )
+			if ( style == null )
 			{
-				throw new RuntimeException( "null?styleSheet=" + ( styleSheet == null ) );
+				throw new RuntimeException( "null?styleSheet=" + ( style == null ) );
 			}
-			return HashUtils.nHash( new int[] { System.identityHashCode( perspective ), styleSheet.hashCode(), inheritedState.hashCode(), subjectContext.hashCode() } );
+			return HashUtils.nHash( new int[] { System.identityHashCode( perspective ), style.hashCode(), inheritedState.hashCode(), subjectContext.hashCode() } );
 		}
 		
 		public boolean equals(Object x)
@@ -195,7 +200,7 @@ public class GSymView extends IncrementalTree
 			if ( x instanceof ViewFragmentContextAndResultFactoryKey )
 			{
 				ViewFragmentContextAndResultFactoryKey kx = (ViewFragmentContextAndResultFactoryKey)x;
-				return perspective == kx.perspective  &&  styleSheet.equals( kx.styleSheet )  &&  inheritedState == kx.inheritedState  &&  subjectContext == kx.subjectContext;
+				return perspective == kx.perspective  &&  style.equals( kx.style )  &&  inheritedState == kx.inheritedState  &&  subjectContext == kx.subjectContext;
 			}
 			else
 			{
@@ -245,7 +250,8 @@ public class GSymView extends IncrementalTree
 	public GSymView(GSymSubject subject, GSymBrowserContext browserContext, PersistentStateStore persistentState)
 	{
 		super( subject.getFocus(), DuplicatePolicy.ALLOW_DUPLICATES );
-		rootNodeResultFactory = makeNodeResultFactory( subject.getPerspective(), subject.getSubjectContext(), subject.getPerspective().getStyleSheet(), subject.getPerspective().getInitialInheritedState() );
+		rootNodeResultFactory = makeNodeResultFactory( subject.getPerspective(), subject.getSubjectContext(),
+				StyleValues.instance.withAttrs( subject.getPerspective().getStyleSheet() ), subject.getPerspective().getInitialInheritedState() );
 		
 		rootBox = null;
 		
@@ -285,16 +291,16 @@ public class GSymView extends IncrementalTree
 		return rootNodeResultFactory;
 	}
 
-	protected GSymFragmentView.NodeResultFactory makeNodeResultFactory(GSymAbstractPerspective perspective, AttributeTable subjectContext, StyleSheet styleSheet, AttributeTable inheritedState)
+	protected GSymFragmentView.NodeResultFactory makeNodeResultFactory(GSymAbstractPerspective perspective, AttributeTable subjectContext, StyleValues style, AttributeTable inheritedState)
 	{
 		// Memoise the contents factory, keyed by  @nodeViewFunction and @state
-		ViewFragmentContextAndResultFactoryKey key = new ViewFragmentContextAndResultFactoryKey( perspective, subjectContext, styleSheet, inheritedState );
+		ViewFragmentContextAndResultFactoryKey key = new ViewFragmentContextAndResultFactoryKey( perspective, subjectContext, style, inheritedState );
 		
 		ViewFragmentContextAndResultFactory factory = viewFragmentContextAndResultFactories.get( key );
 		
 		if ( factory == null )
 		{
-			factory = new ViewFragmentContextAndResultFactory( this, perspective, subjectContext, styleSheet, inheritedState );
+			factory = new ViewFragmentContextAndResultFactory( this, perspective, subjectContext, style, inheritedState );
 			viewFragmentContextAndResultFactories.put( key, factory );
 		}
 		

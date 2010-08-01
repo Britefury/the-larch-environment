@@ -17,16 +17,15 @@ import java.util.Set;
 import org.python.core.Py;
 import org.python.core.PyObject;
 
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.Table;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBoxWithFields;
 import BritefuryJ.GSym.GenericPerspective.PresCom.VerticalField;
+import BritefuryJ.GSym.PresCom.InnerFragment;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Utils.HashUtils;
 
@@ -496,8 +495,7 @@ public class AttributeTable implements Presentable
 		{
 			String name = names[i];
 			Object value = values.get( name );
-			DPElement valueView = ctx.presentFragment( value, StyleSheet.instance );
-			children[i+1] = new Pres[] { new StaticText( name ), Pres.elementToPres( valueView ) };
+			children[i+1] = new Pres[] { new StaticText( name ), new InnerFragment( value ) };
 		}
 		
 		return attrTableStyle.applyTo( new Table( children ) );

@@ -10,10 +10,13 @@ import org.python.core.PyObject;
 import org.python.core.PyType;
 
 import BritefuryJ.AttributeTable.AttributeTable;
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
 import BritefuryJ.GSym.ObjectPresentation.GSymObjectPresentationPerspective;
 import BritefuryJ.GSym.ObjectPresentation.ObjectPresentationLocationResolver;
 import BritefuryJ.GSym.ObjectPresentation.ObjectPresenter;
@@ -30,12 +33,12 @@ public class GSymGenericPerspective extends GSymObjectPresentationPerspective
 
 	
 
-	protected DPElement presentWithJavaInterface(Object x, GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable state)
+	protected Pres presentWithJavaInterface(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 	{
 		if ( x instanceof Presentable )
 		{
 			Presentable p = (Presentable)x;
-			return p.present( ctx, state ).present();
+			return p.present( fragment, inheritedState );
 		}
 		else
 		{
@@ -43,38 +46,32 @@ public class GSymGenericPerspective extends GSymObjectPresentationPerspective
 		}
 	}
 	
-	protected DPElement presentJavaObjectFallback(Object x, GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable state)
+	protected Pres presentJavaObjectFallback(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 	{
-		return presentJavaObjectAsString( x, ctx, GenericPerspectiveStyleSheet.asGenericPerspectiveStyleSheetOrDefault( styleSheet ), state );
+		return presentJavaObjectAsString( x, fragment, inheritedState );
 	}
 	
-	protected DPElement presentPyObjectFallback(PyObject x, GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable state)
+	protected Pres presentPyObjectFallback(PyObject x, GSymFragmentView fragment, AttributeTable inhritedState)
 	{
-		return presentPythonObjectAsString( x, ctx, GenericPerspectiveStyleSheet.asGenericPerspectiveStyleSheetOrDefault( styleSheet ), state );
+		return presentPythonObjectAsString( x, fragment, inhritedState );
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected DPElement invokeObjectPresenter(ObjectPresenter<? extends StyleSheet> presenter, Object x, GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable state)
+	protected Pres invokeObjectPresenter(ObjectPresenter<? extends StyleSheet> presenter, Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 	{
 		ObjectPresenter<GenericPerspectiveStyleSheet> genericPresenter = (ObjectPresenter<GenericPerspectiveStyleSheet>)presenter;
-		return genericPresenter.presentObject( x, ctx, GenericPerspectiveStyleSheet.asGenericPerspectiveStyleSheetOrDefault( styleSheet ), state );
+		return genericPresenter.presentObject( x, fragment, inheritedState );
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected DPElement invokePyObjectPresenter(PyObjectPresenter<? extends StyleSheet> presenter, PyObject x, GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable state)
+	protected Pres invokePyObjectPresenter(PyObjectPresenter<? extends StyleSheet> presenter, PyObject x, GSymFragmentView fragment, AttributeTable inheritedState)
 	{
 		PyObjectPresenter<GenericPerspectiveStyleSheet> genericPresenter = (PyObjectPresenter<GenericPerspectiveStyleSheet>)presenter;
-		return genericPresenter.presentObject( x, ctx, GenericPerspectiveStyleSheet.asGenericPerspectiveStyleSheetOrDefault( styleSheet ), state );
+		return genericPresenter.presentObject( x, fragment, inheritedState );
 	}
 	
 
 	
-	
-	@Override
-	public StyleSheet getStyleSheet()
-	{
-		return GenericPerspectiveStyleSheet.instance;
-	}
 	
 	@Override
 	public AttributeTable getInitialInheritedState()
@@ -91,20 +88,20 @@ public class GSymGenericPerspective extends GSymObjectPresentationPerspective
 
 	
 	
-	private static DPElement presentJavaObjectAsString(Object x, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+	private static Pres presentJavaObjectAsString(Object x, GSymFragmentView ctx, AttributeTable state)
 	{
-		return styleSheet.objectBox( x.getClass().getName(), asStringStyle.staticText( x.toString() ) );
+		return new ObjectBox( x.getClass().getName(), asStringStyle.applyTo( new StaticText( x.toString() ) ) );
 	}
 	
-	private static DPElement presentPythonObjectAsString(PyObject pyX, GSymFragmentView ctx, GenericPerspectiveStyleSheet styleSheet, AttributeTable state)
+	private static Pres presentPythonObjectAsString(PyObject pyX, GSymFragmentView ctx, AttributeTable state)
 	{
 		PyType typeX = pyX.getType();
-		return styleSheet.objectBox( typeX.getName(), asStringStyle.staticText( pyX.toString() ) );
+		return new ObjectBox( typeX.getName(), asStringStyle.applyTo( new StaticText( pyX.toString() ) ) );
 	}
 	
 	
 	
 	
 	
-	private static final PrimitiveStyleSheet asStringStyle = PrimitiveStyleSheet.instance.withFontItalic( true ).withFontSize( 14 );
+	private static final StyleSheet2 asStringStyle = StyleSheet2.instance.withAttr( Primitive.fontItalic, true ).withAttr( Primitive.fontSize, 14 );
 }

@@ -27,8 +27,6 @@ import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Head;
 import BritefuryJ.DocPresent.Combinators.RichText.TitleBar;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.GSym.GenericPerspective.GSymGenericObjectPresenterRegistry;
 import BritefuryJ.GSym.GenericPerspective.GSymGenericPerspective;
@@ -42,27 +40,27 @@ public class GSymBrowserContext
 {
 	private static class RootLocationFragmentViewFn implements GSymViewFragmentFunction
 	{
-		public DPElement createViewFragment(Object x, GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable state)
+		public Pres createViewFragment(Object x, GSymFragmentView ctx, AttributeTable state)
 		{
-			return PrimitiveStyleSheet.instance.staticText( "<<Root location>>" );
+			return rootLocationStyle.applyTo( new StaticText( "<<Root location>>" ) );
 		}
 	}
 	
 	private static class ResolveErrorFragmentViewFn implements GSymViewFragmentFunction
 	{
-		public DPElement createViewFragment(Object x, GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable state)
+		public Pres createViewFragment(Object x, GSymFragmentView ctx, AttributeTable state)
 		{
 			Location location = (Location)x;
-			return resolveErrorStyleSheet.staticText( "<<Could not resolve " + location.getLocationString() + ">>" );
+			return resolveErrorStyleSheet.applyTo( new StaticText( "<<Could not resolve " + location.getLocationString() + ">>" ) );
 		}
 	}
 	
 	private static class SystemPageFragmentViewFn implements GSymViewFragmentFunction
 	{
-		public DPElement createViewFragment(Object x, GSymFragmentView ctx, StyleSheet styleSheet, AttributeTable state)
+		public Pres createViewFragment(Object x, GSymFragmentView ctx, AttributeTable state)
 		{
 			Page p = (Page)x;
-			return p.getContentsElement();
+			return Pres.coerce( p.getContentsElement() );
 		}
 	}
 	
@@ -291,8 +289,9 @@ public class GSymBrowserContext
 	
 	
 	private static DefaultRootPage defaultRootPage = new DefaultRootPage();
-	private static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
-	private static PrimitiveStyleSheet resolveErrorStyleSheet = styleSheet.withFontSize( 14 ).withForeground( new Color( 0.8f, 0.0f, 0.0f ) );
+	private static StyleSheet2 styleSheet = StyleSheet2.instance;
+	private static final StyleSheet2 rootLocationStyle = StyleSheet2.instance; 
+	private static final StyleSheet2 resolveErrorStyleSheet = styleSheet.withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, new Color( 0.8f, 0.0f, 0.0f ) );
 	private static GSymPerspective rootLocationPerspective = new GSymPerspective( new RootLocationFragmentViewFn() );
 	private static GSymPerspective resolveErrorPerspective = new GSymPerspective( new ResolveErrorFragmentViewFn() );
 }

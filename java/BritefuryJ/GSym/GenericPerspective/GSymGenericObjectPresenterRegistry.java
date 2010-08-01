@@ -27,15 +27,29 @@ import org.python.core.PyTuple;
 import org.python.core.PyType;
 
 import BritefuryJ.AttributeTable.AttributeTable;
-import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.ElementFactory;
-import BritefuryJ.DocPresent.ListView.ListViewStyleSheet;
-import BritefuryJ.DocPresent.ListView.SeparatorElementFactory;
-import BritefuryJ.DocPresent.ListView.SpanListViewLayoutStyleSheet;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Box;
+import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
+import BritefuryJ.DocPresent.Combinators.Primitive.ParagraphDedentMarker;
+import BritefuryJ.DocPresent.Combinators.Primitive.ParagraphIndentMarker;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.Span;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Whitespace;
+import BritefuryJ.DocPresent.Combinators.Sequence.SpanSequenceView;
 import BritefuryJ.DocPresent.ListView.TrailingSeparator;
 import BritefuryJ.DocPresent.Painter.FillPainter;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.GSym.GenericPerspective.PresCom.ErrorBoxWithFields;
+import BritefuryJ.GSym.GenericPerspective.PresCom.GenericPerspectiveInnerFragment;
+import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
+import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBorder;
+import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
+import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBoxWithFields;
+import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectTitle;
+import BritefuryJ.GSym.GenericPerspective.PresCom.VerticalField;
 import BritefuryJ.GSym.ObjectPresentation.GSymObjectPresenterRegistry;
 import BritefuryJ.GSym.ObjectPresentation.ObjectPresenter;
 import BritefuryJ.GSym.ObjectPresentation.PyObjectPresenter;
@@ -75,73 +89,73 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Boolean = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
-		public DPElement presentObject(Object x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
-			return GSymPrimitivePresenter.presentBoolean( (Boolean)x, fragment, styleSheet, inheritedState );
+			return GSymPrimitivePresenter.presentBoolean( (Boolean)x, fragment, inheritedState );
 		}
 	};
 	
 	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Byte = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
-		public DPElement presentObject(Object x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
-			return GSymPrimitivePresenter.presentByte( (Byte)x, fragment, styleSheet, inheritedState );
+			return GSymPrimitivePresenter.presentByte( (Byte)x, fragment, inheritedState );
 		}
 	};
 	
 	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Character = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
-		public DPElement presentObject(Object x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
-			return GSymPrimitivePresenter.presentChar( (Character)x, fragment, styleSheet, inheritedState );
+			return GSymPrimitivePresenter.presentChar( (Character)x, fragment, inheritedState );
 		}
 	};
 	
 	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Short = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
-		public DPElement presentObject(Object x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
-			return GSymPrimitivePresenter.presentShort( (Short)x, fragment, styleSheet, inheritedState );
+			return GSymPrimitivePresenter.presentShort( (Short)x, fragment, inheritedState );
 		}
 	};
 	
 	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Integer = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
-		public DPElement presentObject(Object x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
-			return GSymPrimitivePresenter.presentInt( (Integer)x, fragment, styleSheet, inheritedState );
+			return GSymPrimitivePresenter.presentInt( (Integer)x, fragment, inheritedState );
 		}
 	};
 	
 	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Long = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
-		public DPElement presentObject(Object x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
-			return GSymPrimitivePresenter.presentLong( (Long)x, fragment, styleSheet, inheritedState );
+			return GSymPrimitivePresenter.presentLong( (Long)x, fragment, inheritedState );
 		}
 	};
 	
 	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Float = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
-		public DPElement presentObject(Object x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
-			return GSymPrimitivePresenter.presentDouble( ((Float)x).doubleValue(), fragment, styleSheet, inheritedState );
+			return GSymPrimitivePresenter.presentDouble( ((Float)x).doubleValue(), fragment, inheritedState );
 		}
 	};
 	
 	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Double = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
-		public DPElement presentObject(Object x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
-			return GSymPrimitivePresenter.presentDouble( (Double)x, fragment, styleSheet, inheritedState );
+			return GSymPrimitivePresenter.presentDouble( (Double)x, fragment, inheritedState );
 		}
 	};
 	
 	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_String = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
-		public DPElement presentObject(Object x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
-			return GSymPrimitivePresenter.presentString( (String)x, fragment, styleSheet, inheritedState );
+			return GSymPrimitivePresenter.presentString( (String)x, fragment, inheritedState );
 		}
 	};
 	
@@ -150,57 +164,57 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 
 	public static final PyObjectPresenter<GenericPerspectiveStyleSheet> presenter_PyTuple = new PyObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
-		public DPElement presentObject(PyObject x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public Pres presentObject(PyObject x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
 			PyTuple tuple = (PyTuple)x;
 			
-			ArrayList<DPElement> itemViews = new ArrayList<DPElement>();
+			ArrayList<Object> itemViews = new ArrayList<Object>();
 			for (Object item: tuple)
 			{
-				itemViews.add( fragment.presentFragmentWithGenericPerspective( item ) );
+				itemViews.add( new GenericPerspectiveInnerFragment( item ) );
 			}
 			
-			return tupleListViewStyle.createListElement( itemViews, TrailingSeparator.NEVER );
+			return tupleView( itemViews );
 		}
 	};
 
 	public static final PyObjectPresenter<GenericPerspectiveStyleSheet> presenter_PyType = new PyObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
-		public DPElement presentObject(PyObject x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public Pres presentObject(PyObject x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
 			PyType type = (PyType)x;
 			
-			ArrayList<DPElement> lines = new ArrayList<DPElement>();
+			ArrayList<Object> lines = new ArrayList<Object>();
 			
-			ArrayList<DPElement> header = new ArrayList<DPElement>();
-			header.add( classKeywordStyle.staticText( "Class " ) );
-			header.add( classNameStyle.staticText( type.getName() ) );
+			ArrayList<Object> header = new ArrayList<Object>();
+			header.add( classKeywordStyle.applyTo( new StaticText( "Class " ) ) );
+			header.add( classNameStyle.applyTo( new StaticText( type.getName() ) ) );
 			
 			PyTuple bases = (PyTuple)type.getBases();
 			
 			if ( bases.size() > 0 )
 			{
-				header.add( staticStyle.staticText( " " ) );
-				header.add( classPunctuationStyle.staticText( "(" ) );
-				header.add( staticStyle.paragraphIndentMarker() );
+				header.add( staticStyle.applyTo( new StaticText( " " ) ) );
+				header.add( classPunctuationStyle.applyTo( new StaticText( "(" ) ) );
+				header.add( staticStyle.applyTo( new ParagraphIndentMarker() ) );
 				boolean bFirst = true;
 				for (PyObject base: bases.getArray())
 				{
 					PyType baseType = (PyType)base;
 					if ( !bFirst )
 					{
-						header.add( classPunctuationStyle.staticText( ", " ) );
+						header.add( classPunctuationStyle.applyTo( new StaticText( ", " ) ) );
 					}
-					header.add( classNameStyle.staticText( baseType.getName() ) );
+					header.add( classNameStyle.applyTo( new StaticText( baseType.getName() ) ) );
 					bFirst = false;
 				}
-				header.add( staticStyle.paragraphDedentMarker() );
-				header.add( classPunctuationStyle.staticText( ")" ) );
+				header.add( staticStyle.applyTo( new ParagraphDedentMarker() ) );
+				header.add( classPunctuationStyle.applyTo( new StaticText( ")" ) ) );
 			}
 			
-			lines.add( staticStyle.paragraph( header ) );
+			lines.add( new Paragraph( header ) );
 			
-			return styleSheet.objectBoxWithFields( "Python Class", lines.toArray( new DPElement[0] ) );
+			return new ObjectBoxWithFields( "Python Class", lines );
 		}
 	};
 
@@ -251,7 +265,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		
 		
 		
-		public DPElement presentObject(PyObject x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public Pres presentObject(PyObject x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
 			PyFunction fun = (PyFunction)x;
 			
@@ -262,55 +276,55 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 			PyObject varkw = argSpec.getArray()[3];
 			
 			
-			ArrayList<DPElement> lines = new ArrayList<DPElement>();
+			ArrayList<Object> lines = new ArrayList<Object>();
 			
-			ArrayList<DPElement> header = new ArrayList<DPElement>();
-			header.add( fnNameStyle.staticText( fun.__name__.toString() ) );
-			header.add( fnPunctuationStyle.staticText( "(" ) );
+			ArrayList<Object> header = new ArrayList<Object>();
+			header.add( fnNameStyle.applyTo( new StaticText( fun.__name__.toString() ) ) );
+			header.add( fnPunctuationStyle.applyTo( new StaticText( "(" ) ) );
 			boolean bFirst = true;
 			for (PyObject arg: ((PyList)args).getArray())
 			{
 				if ( !bFirst )
 				{
-					header.add( fnPunctuationStyle.staticText( ", " ) );
+					header.add( fnPunctuationStyle.applyTo( new StaticText( ", " ) ) );
 				}
-				header.add( fnArgStyle.staticText( arg.toString() ) );
+				header.add( fnArgStyle.applyTo( new StaticText( arg.toString() ) ) );
 				bFirst = false;
 			}
 			for (PyObject arg: ((PyList)kwargs).getArray())
 			{
 				if ( !bFirst )
 				{
-					header.add( fnPunctuationStyle.staticText( ", " ) );
+					header.add( fnPunctuationStyle.applyTo( new StaticText( ", " ) ) );
 				}
-				header.add( fnKWArgStyle.staticText( arg.toString() ) );
+				header.add( fnKWArgStyle.applyTo( new StaticText( arg.toString() ) ) );
 				bFirst = false;
 			}
 			if ( varargs != Py.None )
 			{
 				if ( !bFirst )
 				{
-					header.add( fnPunctuationStyle.staticText( ", " ) );
+					header.add( fnPunctuationStyle.applyTo( new StaticText( ", " ) ) );
 				}
-				header.add( fnPunctuationStyle.staticText( "*" ) );
-				header.add( fnVarArgStyle.staticText( varargs.toString() ) );
+				header.add( fnPunctuationStyle.applyTo( new StaticText( "*" ) ) );
+				header.add( fnVarArgStyle.applyTo( new StaticText( varargs.toString() ) ) );
 				bFirst = false;
 			}
 			if ( varkw != Py.None )
 			{
 				if ( !bFirst )
 				{
-					header.add( fnPunctuationStyle.staticText( ", " ) );
+					header.add( fnPunctuationStyle.applyTo( new StaticText( ", " ) ) );
 				}
-				header.add( fnPunctuationStyle.staticText( "**" ) );
-				header.add( fnVarArgStyle.staticText( varkw.toString() ) );
+				header.add( fnPunctuationStyle.applyTo( new StaticText( "**" ) ) );
+				header.add( fnVarArgStyle.applyTo( new StaticText( varkw.toString() ) ) );
 				bFirst = false;
 			}
-			header.add( fnPunctuationStyle.staticText( ")" ) );
+			header.add( fnPunctuationStyle.applyTo( new StaticText( ")" ) ) );
 			
-			lines.add( staticStyle.paragraph( header ) );
+			lines.add( new Paragraph( header ) );
 			
-			return styleSheet.objectBoxWithFields( "Python Function", lines.toArray( new DPElement[0] ) );
+			return new ObjectBoxWithFields( "Python Function", lines );
 		}
 	};
 
@@ -319,7 +333,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_PyNone = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
-		public DPElement presentObject(Object x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
 			return GSymPrimitivePresenter.presentNone();
 		}
@@ -329,7 +343,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_PyException = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
-		public DPElement presentObject(Object x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
 			PyException e = (PyException)x;
 			
@@ -337,19 +351,19 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 			e.printStackTrace( new PrintStream( buf ) );
 			String stackTrace = e.toString();
 			String stackTraceLines[] = stackTrace.split( "\n" );
-			DPElement stackTraceElements[] = new DPElement[stackTraceLines.length];
+			Pres stackTraceElements[] = new Pres[stackTraceLines.length];
 			
 			for (int i = 0; i < stackTraceLines.length; i++)
 			{
-				stackTraceElements[i] = stackTraceStyle.staticText( stackTraceLines[i] );
+				stackTraceElements[i] = stackTraceStyle.applyTo( new StaticText( stackTraceLines[i] ) );
 			}
 			
-			DPElement fields[] = {
-					styleSheet.verticalObjectField( "Message", fragment.presentFragmentWithGenericPerspective( e.value ) ),
-					styleSheet.verticalObjectField( "Traceback", stackTraceStyle.vbox( stackTraceElements ) )
+			Pres fields[] = {
+					new VerticalField( "Message", new GenericPerspectiveInnerFragment( e.value ) ),
+					new VerticalField( "Traceback", new VBox( stackTraceElements ) )
 			};
 			
-			return styleSheet.errorBoxWithFields( "PYTHON EXCEPTION", fields );
+			return new ErrorBoxWithFields( "PYTHON EXCEPTION", fields );
 		}
 	};
 
@@ -357,7 +371,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Exception = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
-		public DPElement presentObject(Object x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
 			Exception e = (Exception)x;
 			
@@ -365,19 +379,19 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 			e.printStackTrace( new PrintStream( buf ) );
 			String stackTrace = e.toString();
 			String stackTraceLines[] = stackTrace.split( "\n" );
-			DPElement stackTraceElements[] = new DPElement[stackTraceLines.length];
+			Pres stackTraceElements[] = new Pres[stackTraceLines.length];
 			
 			for (int i = 0; i < stackTraceLines.length; i++)
 			{
-				stackTraceElements[i] = stackTraceStyle.staticText( stackTraceLines[i] );
+				stackTraceElements[i] = stackTraceStyle.applyTo( new StaticText( stackTraceLines[i] ) );
 			}
 			
-			DPElement fields[] = {
-					styleSheet.verticalObjectField( "Message", fragment.presentFragmentWithGenericPerspective( e.getMessage() ) ),
-					styleSheet.verticalObjectField( "Traceback", stackTraceStyle.vbox( stackTraceElements ) )
+			Pres fields[] = {
+					new VerticalField( "Message", new GenericPerspectiveInnerFragment( e.getMessage() ) ),
+					new VerticalField( "Traceback", new VBox( stackTraceElements ) )
 			};
 			
-			return styleSheet.errorBoxWithFields( "JAVA EXCEPTION", fields );
+			return new ErrorBoxWithFields( "JAVA EXCEPTION", fields );
 		}
 	};
 
@@ -385,41 +399,44 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_List = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
-		public DPElement presentObject(Object x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
 			List<?> list = (List<?>)x;
 			
-			ArrayList<DPElement> itemViews = new ArrayList<DPElement>();
+			ArrayList<Object> itemViews = new ArrayList<Object>();
 			for (Object item: list)
 			{
-				itemViews.add( fragment.presentFragmentWithGenericPerspective( item ) );
+				itemViews.add( new GenericPerspectiveInnerFragment( item ) );
 			}
 			
-			return listListViewStyle.createListElement( itemViews, TrailingSeparator.NEVER );
+			return listView( itemViews );
 		}
 	};
 	
 	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Map = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
-		public DPElement presentObject(Object x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
 			Map<?,?> map = (Map<?,?>)x;
 			
-			ArrayList<DPElement> itemViews = new ArrayList<DPElement>();
+			ArrayList<Object> itemViews = new ArrayList<Object>();
 			for (Map.Entry<?,?> entry: map.entrySet())
 			{
-				DPElement lineElems[] = { fragment.presentFragmentWithGenericPerspective( entry.getKey() ), staticStyle.whitespace( " ", 10.0 ), delimStyle.staticText( ":" ),
-						staticStyle.whitespace( " ", 10.0 ), fragment.presentFragmentWithGenericPerspective( entry.getValue() ) };
-				itemViews.add( staticStyle.span( lineElems ) );
+				Pres lineElems[] = { new GenericPerspectiveInnerFragment( entry.getKey() ),
+						staticStyle.applyTo( new Whitespace( " ", 10.0 ) ),
+						delimStyle.applyTo( new StaticText( ":" ) ),
+						staticStyle.applyTo( new Whitespace( " ", 10.0 ) ),
+						new GenericPerspectiveInnerFragment( entry.getValue() ) };
+				itemViews.add( new Span( lineElems ) );
 			}
 			
-			return mapListViewStyle.createListElement( itemViews, TrailingSeparator.NEVER );
+			return mapView( itemViews );
 		}
 	};
 	
 	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Shape = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
-		public DPElement presentObject(Object x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
 			Shape shape = (Shape)x;
 //			Rectangle2D bounds = shape.getBounds2D();
@@ -436,13 +453,13 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 //				scale = 96.0 / height;
 //			}
 			
-			return styleSheet.objectBox( x.getClass().getName(), staticStyle.shape( shape ) );
+			return new ObjectBox( x.getClass().getName(), new BritefuryJ.DocPresent.Combinators.Primitive.Shape( shape ) );
 		}
 	};
 
 	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_BufferedImage = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
-		public DPElement presentObject(Object x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
 			BufferedImage image = (BufferedImage)x;
 			double width = (double)image.getWidth();
@@ -459,195 +476,141 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 				height = 96.0;
 			}
 			
-			return staticStyle.image( image, width, height );
+			return new BritefuryJ.DocPresent.Combinators.Primitive.Image( image, width, height );
 		}
 	};
 
 	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Color = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
-		public DPElement presentObject(Object x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
 			Color colour = (Color)x;
 			
-			DPElement title = colourObjectBoxStyle.objectTitle( "java.awt.Color" );
+			Pres title = colourObjectBoxStyle.applyTo( new ObjectTitle( "java.awt.Color" ) );
 			
-			DPElement red = colourRedStyle.staticText( "R=" + String.valueOf( colour.getRed() ) );
-			DPElement green = colourGreenStyle.staticText( "G=" + String.valueOf( colour.getGreen() ) );
-			DPElement blue = colourBlueStyle.staticText( "B=" + String.valueOf( colour.getBlue() ) );
-			DPElement alpha = colourAlphaStyle.staticText( "A=" + String.valueOf( colour.getAlpha() ) );
+			Pres red = colourRedStyle.applyTo( new StaticText( "R=" + String.valueOf( colour.getRed() ) ) );
+			Pres green = colourGreenStyle.applyTo( new StaticText( "G=" + String.valueOf( colour.getGreen() ) ) );
+			Pres blue = colourBlueStyle.applyTo( new StaticText( "B=" + String.valueOf( colour.getBlue() ) ) );
+			Pres alpha = colourAlphaStyle.applyTo( new StaticText( "A=" + String.valueOf( colour.getAlpha() ) ) );
 			
-			DPElement components = colourBoxStyle.hbox( new DPElement[] { red, green, blue, alpha } );
+			Pres components = colourBoxStyle.applyTo( new HBox( new Pres[] { red, green, blue, alpha } ) );
 			
-			DPElement textBox = staticStyle.vbox( new DPElement[] { title, components } );
+			Pres textBox = new VBox( new Pres[] { title, components } );
 			
-			DPElement swatch = staticStyle.withShapePainter( new FillPainter( colour ) ).box( 50.0, 20.0 ).alignVExpand();
+			Pres swatch = staticStyle.withAttr( Primitive.shapePainter, new FillPainter( colour ) ).applyTo( new Box( 50.0, 20.0 ) ).alignVExpand();
 			
-			DPElement contents = colourBoxStyle.hbox( new DPElement[] { textBox, swatch } );
+			Pres contents = colourBoxStyle.applyTo( new HBox( new Pres[] { textBox, swatch } ) );
 			
-			return colourObjectBoxStyle.objectBorder( contents );
+			return colourObjectBoxStyle.applyTo( new ObjectBorder( contents ) );
 		}
 	};
 
 	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Class = new ObjectPresenter<GenericPerspectiveStyleSheet>()
 	{
-		public DPElement presentObject(Object x, GSymFragmentView fragment, GenericPerspectiveStyleSheet styleSheet, AttributeTable inheritedState)
+		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
 			Class<?> cls = (Class<?>)x;
 			Class<?> superClass = cls.getSuperclass();
 			Class<?> interfaces[] = cls.getInterfaces();
 			
-			ArrayList<DPElement> lines = new ArrayList<DPElement>();
+			ArrayList<Object> lines = new ArrayList<Object>();
 			
-			DPElement title = classKeywordStyle.staticText( "Class " );
-			DPElement name = classNameStyle.staticText( cls.getName() );
-			lines.add( staticStyle.hbox( new DPElement[] { title, name } ) );
+			Pres title = classKeywordStyle.applyTo( new StaticText( "Class " ) );
+			Pres name = classNameStyle.applyTo( new StaticText( cls.getName() ) );
+			lines.add( new HBox( new Pres[] { title, name } ) );
 			
 			if ( superClass != null  ||  interfaces.length > 0 )
 			{
-				ArrayList<DPElement> inheritance = new ArrayList<DPElement>();
+				ArrayList<Object> inheritance = new ArrayList<Object>();
 				if ( superClass != null )
 				{
-					inheritance.add( classKeywordStyle.staticText( "Extends " ) );
-					inheritance.add( classNameStyle.staticText( superClass.getName() ) );
+					inheritance.add( classKeywordStyle.applyTo( new StaticText( "Extends " ) ) );
+					inheritance.add( classNameStyle.applyTo( new StaticText( superClass.getName() ) ) );
 				}
 				
 				if ( interfaces.length > 0 )
 				{
 					if ( superClass != null )
 					{
-						inheritance.add( classKeywordStyle.staticText( " " ) );
+						inheritance.add( classKeywordStyle.applyTo( new StaticText( " " ) ) );
 					}
-					inheritance.add( classKeywordStyle.staticText( "Implements " ) );
+					inheritance.add( classKeywordStyle.applyTo( new StaticText( "Implements " ) ) );
 					boolean bFirst = true;
 					for (Class<?> iface: interfaces)
 					{
 						if ( !bFirst )
 						{
-							inheritance.add( classPunctuationStyle.staticText( ", " ) );
+							inheritance.add( classPunctuationStyle.applyTo( new StaticText( ", " ) ) );
 						}
-						inheritance.add( classNameStyle.staticText( iface.getName() ) );
+						inheritance.add( classNameStyle.applyTo( new StaticText( iface.getName() ) ) );
 						bFirst = false;
 					}
 				}
 				
-				DPElement para = staticStyle.paragraph( inheritance );
+				Pres para = new Paragraph( inheritance );
 				lines.add( para.padX( 45.0, 0.0 ) );
 			}
 			
-			return styleSheet.objectBoxWithFields( "Java Class", lines.toArray( new DPElement[0] ) );
+			return new ObjectBoxWithFields( "Java Class", lines );
 		}
 	};
 
 
 
 
-	private static final PrimitiveStyleSheet staticStyle = PrimitiveStyleSheet.instance.withNonEditable();
+	private static final StyleSheet2 staticStyle = StyleSheet2.instance.withAttr( Primitive.editable, false );
 	
 	
-	private static final PrimitiveStyleSheet punctuationStyle = staticStyle.withForeground( Color.blue );
-	private static final PrimitiveStyleSheet delimStyle = staticStyle.withForeground( new Color( 0.1f, 0.3f, 0.4f ) ).withFontBold( true ).withFontSize( 14 );
+	private static final StyleSheet2 punctuationStyle = staticStyle.withAttr( Primitive.foreground, Color.blue );
+	private static final StyleSheet2 delimStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.1f, 0.3f, 0.4f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 14 );
 	
 	
-	private static final PrimitiveStyleSheet stackTraceStyle = staticStyle.withForeground( new Color( 0.75f, 0.1f, 0.4f ) );
+	private static final StyleSheet2 stackTraceStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.75f, 0.1f, 0.4f ) );
 
 	
-	private static final GenericPerspectiveStyleSheet colourObjectBoxStyle = GenericPerspectiveStyleSheet.instance.withObjectBorderAndTitlePaint( new Color( 0.0f, 0.1f, 0.4f ) );
-	private static final PrimitiveStyleSheet colourRedStyle = staticStyle.withFontSize( 12 ).withForeground( new Color( 0.75f, 0.0f, 0.0f ) );
-	private static final PrimitiveStyleSheet colourGreenStyle = staticStyle.withFontSize( 12 ).withForeground( new Color( 0.0f, 0.75f, 0.0f ) );
-	private static final PrimitiveStyleSheet colourBlueStyle = staticStyle.withFontSize( 12 ).withForeground( new Color( 0.0f, 0.0f, 0.75f ) );
-	private static final PrimitiveStyleSheet colourAlphaStyle = staticStyle.withFontSize( 12 ).withForeground( new Color( 0.3f, 0.3f, 0.3f ) );
-	private static final PrimitiveStyleSheet colourBoxStyle = staticStyle.withHBoxSpacing( 5.0 );
+	private static final StyleSheet2 colourObjectBoxStyle = staticStyle.withAttr( GenericStyle.objectBorderPaint, new Color( 0.0f, 0.1f, 0.4f ) ).withAttr(
+			GenericStyle.objectTitlePaint, new Color( 0.0f, 0.1f, 0.4f ) );
+	private static final StyleSheet2 colourRedStyle = staticStyle.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.75f, 0.0f, 0.0f ) );
+	private static final StyleSheet2 colourGreenStyle = staticStyle.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.75f, 0.0f ) );
+	private static final StyleSheet2 colourBlueStyle = staticStyle.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.75f ) );
+	private static final StyleSheet2 colourAlphaStyle = staticStyle.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.3f, 0.3f, 0.3f ) );
+	private static final StyleSheet2 colourBoxStyle = staticStyle.withAttr( Primitive.hboxSpacing, 5.0 );
 
 	
-	private static final PrimitiveStyleSheet classKeywordStyle = staticStyle.withForeground( new Color( 0.0f, 0.0f, 0.5f ) ).withFontBold( true ).withTextSmallCaps( true );
-	private static final PrimitiveStyleSheet classPunctuationStyle = staticStyle.withForeground( new Color( 0.25f, 0.0f, 0.5f ) );
-	private static final PrimitiveStyleSheet classNameStyle = staticStyle.withForeground( new Color( 0.0f, 0.25f, 0.5f ) );
+	private static final StyleSheet2 classKeywordStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.textSmallCaps, true );
+	private static final StyleSheet2 classPunctuationStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
+	private static final StyleSheet2 classNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.25f, 0.5f ) );
 
-	private static final PrimitiveStyleSheet fnPunctuationStyle = staticStyle.withForeground( new Color( 0.25f, 0.0f, 0.5f ) );
-	private static final PrimitiveStyleSheet fnNameStyle = staticStyle.withForeground( new Color( 0.0f, 0.25f, 0.5f ) );
-	private static final PrimitiveStyleSheet fnArgStyle = staticStyle.withForeground( new Color( 0.0f, 0.5f, 0.25f ) );
-	private static final PrimitiveStyleSheet fnKWArgStyle = staticStyle.withForeground( new Color( 0.0f, 0.5f, 0.25f ) ).withFontItalic( true );
-	private static final PrimitiveStyleSheet fnVarArgStyle = staticStyle.withForeground( new Color( 0.0f, 0.5f, 0.25f ) );
+	private static final StyleSheet2 fnPunctuationStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
+	private static final StyleSheet2 fnNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.25f, 0.5f ) );
+	private static final StyleSheet2 fnArgStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.25f ) );
+	private static final StyleSheet2 fnKWArgStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.25f ) ).withAttr( Primitive.fontItalic, true );
+	private static final StyleSheet2 fnVarArgStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.25f ) );
 
 
-	private static final SeparatorElementFactory commaFactory = new SeparatorElementFactory()
+	private static final Pres comma = punctuationStyle.applyTo( new StaticText( "," ) );
+	private static final Pres space = staticStyle.applyTo( new StaticText( " " ) );
+	private static final Pres mapSpace = staticStyle.applyTo( new Whitespace( " ", 25.0 ) );
+	private static final Pres openBracket = delimStyle.applyTo( new StaticText( "[" ) );
+	private static final Pres closeBracket = delimStyle.applyTo( new StaticText( "]" ) );
+	private static final Pres openParen = delimStyle.applyTo( new StaticText( "(" ) );
+	private static final Pres closeParen = delimStyle.applyTo( new StaticText( ")" ) );
+	private static final Pres openBrace = delimStyle.applyTo( new StaticText( "{" ) );
+	private static final Pres closeBrace = delimStyle.applyTo( new StaticText( "}" ) );
+	
+
+	private static Pres listView(ArrayList<Object> children)
 	{
-		public DPElement createElement(StyleSheet styleSheet, int index, DPElement child)
-		{
-			return punctuationStyle.staticText( "," );
-		}
-	};
-
-	private static final ElementFactory spaceFactory = new ElementFactory()
+		return new SpanSequenceView( children, openBracket, closeBracket, comma, space, TrailingSeparator.NEVER );
+	}
+	
+	private static Pres tupleView(ArrayList<Object> children)
 	{
-		public DPElement createElement(StyleSheet styleSheet)
-		{
-			return staticStyle.staticText( " " );
-		}
-	};
+		return new SpanSequenceView( children, openParen, closeParen, comma, space, TrailingSeparator.ONE_ELEMENT );
+	}
 	
-	private static final ElementFactory mapSpaceFactory = new ElementFactory()
+	private static Pres mapView(ArrayList<Object> children)
 	{
-		public DPElement createElement(StyleSheet styleSheet)
-		{
-			return staticStyle.whitespace( " ", 25.0 );
-		}
-	};
-	
-	private static final ElementFactory openBracketFactory = new ElementFactory()
-	{
-		public DPElement createElement(StyleSheet styleSheet)
-		{
-			return delimStyle.staticText( "[ " );
-		}
-	};
-	
-	private static final ElementFactory closeBracketFactory = new ElementFactory()
-	{
-		public DPElement createElement(StyleSheet styleSheet)
-		{
-			return delimStyle.staticText( " ]" );
-		}
-	};
-	
-	private static final ElementFactory openParenFactory = new ElementFactory()
-	{
-		public DPElement createElement(StyleSheet styleSheet)
-		{
-			return delimStyle.staticText( "( " );
-		}
-	};
-	
-	private static final ElementFactory closeParenFactory = new ElementFactory()
-	{
-		public DPElement createElement(StyleSheet styleSheet)
-		{
-			return delimStyle.staticText( " )" );
-		}
-	};
-	
-	private static final ElementFactory openBraceFactory = new ElementFactory()
-	{
-		public DPElement createElement(StyleSheet styleSheet)
-		{
-			return delimStyle.staticText( "{ " );
-		}
-	};
-	
-	private static final ElementFactory closeBraceFactory = new ElementFactory()
-	{
-		public DPElement createElement(StyleSheet styleSheet)
-		{
-			return delimStyle.staticText( " }" );
-		}
-	};
-	
-	
-	private static SpanListViewLayoutStyleSheet span_listViewLayout = SpanListViewLayoutStyleSheet.instance.withAddLineBreaks( true ).withAddParagraphIndentMarkers( true ).withAddLineBreakCost( true );
-	private static ListViewStyleSheet listListViewStyle = ListViewStyleSheet.instance.withSeparatorFactory( commaFactory ).withSpacingFactory( spaceFactory )
-		.withBeginDelimFactory( openBracketFactory ).withEndDelimFactory( closeBracketFactory ).withListLayout( span_listViewLayout );
-	private static ListViewStyleSheet tupleListViewStyle = ListViewStyleSheet.instance.withSeparatorFactory( commaFactory ).withSpacingFactory( spaceFactory )
-		.withBeginDelimFactory( openParenFactory ).withEndDelimFactory( closeParenFactory ).withListLayout( span_listViewLayout );
-	private static ListViewStyleSheet mapListViewStyle = ListViewStyleSheet.instance.withSeparatorFactory( commaFactory ).withSpacingFactory( mapSpaceFactory )
-		.withBeginDelimFactory( openBraceFactory ).withEndDelimFactory( closeBraceFactory ).withListLayout( span_listViewLayout );
+		return new SpanSequenceView( children, openBrace, closeBrace, comma, mapSpace, TrailingSeparator.NEVER );
+	}
 }

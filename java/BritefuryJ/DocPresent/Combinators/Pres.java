@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent.Combinators;
 import java.awt.datatransfer.DataFlavor;
 import java.util.List;
 
+import BritefuryJ.DocPresent.ContextMenuFactory;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
@@ -205,6 +206,29 @@ public abstract class Pres
 	public AddInteractor addInteractor(ElementInteractor interactor)
 	{
 		return new AddInteractor( this, interactor );
+	}
+	
+	
+	
+	//
+	// Context menu factory methods
+	//
+	
+	public AddContextMenuFactory addContextMenuFactory(ContextMenuFactory menuFactory)
+	{
+		return new AddContextMenuFactory( this, menuFactory );
+	}
+	
+	
+	
+	
+	//
+	// Debug name methods
+	//
+	
+	public SetDebugName setDebugName(String debugName)
+	{
+		return new SetDebugName( this, debugName );
 	}
 	
 	
