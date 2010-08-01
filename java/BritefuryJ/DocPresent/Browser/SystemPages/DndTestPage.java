@@ -74,7 +74,7 @@ public class DndTestPage extends SystemPage
 			}
 		};
 		
-		return source.addDragSource( Pres.class, DndHandler.ASPECT_NORMAL, sourceDataFn );
+		return source.withDragSource( Pres.class, DndHandler.ASPECT_NORMAL, sourceDataFn );
 	}
 
 	protected Pres makeTextSource(final String text)
@@ -102,7 +102,7 @@ public class DndTestPage extends SystemPage
 			}
 		};
 
-		return placeHolder.addDropDest( Pres.class, dropFn );
+		return placeHolder.withDropDest( Pres.class, dropFn );
 	}
 	
 	

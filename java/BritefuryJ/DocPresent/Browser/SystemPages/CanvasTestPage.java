@@ -161,7 +161,7 @@ public class CanvasTestPage extends SystemPage
 			}
 		};
 		
-		return dest.addDropDest( Integer.class, dropFn );
+		return dest.withDropDest( Integer.class, dropFn );
 	}
 
 	
@@ -193,7 +193,7 @@ public class CanvasTestPage extends SystemPage
 			}
 		};
 		
-		return dest.addDropDest( Integer.class, canDropFn, dropFn );
+		return dest.withDropDest( Integer.class, canDropFn, dropFn );
 	}
 
 	

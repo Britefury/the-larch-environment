@@ -320,16 +320,16 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		location = state['location']
 		packageLocation = _joinLocation( location, name )
 		
-		items = InnerFragment.mapInnerFragments( contents, state.withAttrs( location=packageLocation ) )
+		items = InnerFragment.map( contents, state.withAttrs( location=packageLocation ) )
 		
 		world = ctx.getSubjectContext()['world']
 		
 		icon = Image( 'GSymCore/Project/icons/Package.png' )
 		nameElement = _packageNameStyle.applyTo( StaticText( name ) )
 		nameBox = _itemHoverHighlightStyle.applyTo( HBox( [ icon.padX( 5.0 ).alignVCentre(), nameElement.alignVCentre() ]  ) )
-		nameBox = nameBox.addContextMenuFactory( _packageContextMenuFactory )
-		nameBox = nameBox.addDragSource( _dragSource )
-		nameBox = nameBox.addDropDest( _packageDropDest )
+		nameBox = nameBox.withContextMenuFactory( _packageContextMenuFactory )
+		nameBox = nameBox.withDragSource( _dragSource )
+		nameBox = nameBox.withDropDest( _packageDropDest )
 		
 		nameCell = LiteralCell( nameBox )
 		
@@ -363,10 +363,10 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		pageLocation = _joinLocation( location, name )
 
 		link = Hyperlink( name, pageLocation )
-		link = link.addContextMenuFactory( _pageContextMenuFactory )
+		link = link.withContextMenuFactory( _pageContextMenuFactory )
 		nameBox = _itemHoverHighlightStyle.applyTo( HBox( [ link ] ) )
-		nameBox = nameBox.addDragSource( _dragSource )
-		nameBox = nameBox.addDropDest( _pageDropDest )
+		nameBox = nameBox.withDragSource( _dragSource )
+		nameBox = nameBox.withDropDest( _pageDropDest )
 		
 		nameCell = LiteralCell( nameBox )
 		

@@ -12,6 +12,7 @@ import java.util.List;
 import BritefuryJ.DocPresent.ContextMenuFactory;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementInteractor;
+import BritefuryJ.DocPresent.TreeEventListener;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
@@ -155,44 +156,44 @@ public abstract class Pres
 	// Drag and drop
 	//
 	
-	public AddDragSource addDragSource(ObjectDndHandler.DragSource source)
+	public AddDragSource withDragSource(ObjectDndHandler.DragSource source)
 	{
 		return new AddDragSource( this, source );
 	}
 	
-	public AddDragSource addDragSource(Class<?> dataType, int sourceAspects, ObjectDndHandler.SourceDataFn sourceDataFn, ObjectDndHandler.ExportDoneFn exportDoneFn)
+	public AddDragSource withDragSource(Class<?> dataType, int sourceAspects, ObjectDndHandler.SourceDataFn sourceDataFn, ObjectDndHandler.ExportDoneFn exportDoneFn)
 	{
 		return new AddDragSource( this, dataType, sourceAspects, sourceDataFn, exportDoneFn );
 	}
 	
-	public AddDragSource addDragSource(Class<?> dataType, int sourceAspects, ObjectDndHandler.SourceDataFn sourceDataFn)
+	public AddDragSource withDragSource(Class<?> dataType, int sourceAspects, ObjectDndHandler.SourceDataFn sourceDataFn)
 	{
 		return new AddDragSource( this, dataType, sourceAspects, sourceDataFn );
 	}
 	
 	
-	public AddDropDest addDropDest(ObjectDndHandler.DropDest dest)
+	public AddDropDest withDropDest(ObjectDndHandler.DropDest dest)
 	{
 		return new AddDropDest( this, dest );
 	}
 	
-	public AddDropDest addDropDest(Class<?> dataType, ObjectDndHandler.CanDropFn canDropFn, ObjectDndHandler.DropFn dropFn)
+	public AddDropDest withDropDest(Class<?> dataType, ObjectDndHandler.CanDropFn canDropFn, ObjectDndHandler.DropFn dropFn)
 	{
 		return new AddDropDest( this, dataType, canDropFn, dropFn );
 	}
 	
-	public AddDropDest addDropDest(Class<?> dataType, ObjectDndHandler.DropFn dropFn)
+	public AddDropDest withDropDest(Class<?> dataType, ObjectDndHandler.DropFn dropFn)
 	{
 		return new AddDropDest( this, dataType, dropFn );
 	}
 	
 	
-	public AddNonLocalDropDest addNonLocalDropDest(ObjectDndHandler.NonLocalDropDest dest)
+	public AddNonLocalDropDest withNonLocalDropDest(ObjectDndHandler.NonLocalDropDest dest)
 	{
 		return new AddNonLocalDropDest( this, dest );
 	}
 	
-	public AddNonLocalDropDest addNonLocalDropDest(DataFlavor dataFlavor, ObjectDndHandler.DropFn dropFn)
+	public AddNonLocalDropDest withNonLocalDropDest(DataFlavor dataFlavor, ObjectDndHandler.DropFn dropFn)
 	{
 		return new AddNonLocalDropDest( this, dataFlavor, dropFn );
 	}
@@ -203,9 +204,20 @@ public abstract class Pres
 	// Interactor methods
 	//
 	
-	public AddInteractor addInteractor(ElementInteractor interactor)
+	public AddInteractor withInteractor(ElementInteractor interactor)
 	{
 		return new AddInteractor( this, interactor );
+	}
+	
+	
+	
+	//
+	// Tree event methods
+	//
+	
+	public AddTreeEventListener withTreeEventListener(TreeEventListener listener)
+	{
+		return new AddTreeEventListener( this, listener );
 	}
 	
 	
@@ -214,9 +226,21 @@ public abstract class Pres
 	// Context menu factory methods
 	//
 	
-	public AddContextMenuFactory addContextMenuFactory(ContextMenuFactory menuFactory)
+	public AddContextMenuFactory withContextMenuFactory(ContextMenuFactory menuFactory)
 	{
 		return new AddContextMenuFactory( this, menuFactory );
+	}
+	
+	
+	
+	
+	//
+	// Value methods
+	//
+	
+	public SetFixedValue withFixedValue(Object value)
+	{
+		return new SetFixedValue( this, value );
 	}
 	
 	

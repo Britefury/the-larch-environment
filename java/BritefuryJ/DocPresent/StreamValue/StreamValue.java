@@ -575,7 +575,7 @@ public class StreamValue implements Presentable
 	@Override
 	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
 	{
-		Pres contents = new Paragraph( InnerFragment.mapInnerFragments( items ) );
+		Pres contents = new Paragraph( InnerFragment.map( items ) );
 		
 		return streamValueStyle.applyTo( new ObjectBox( "BritefuryJ.DocPresent.StreamValue.StreamValue", contents ) );
 	}

@@ -177,7 +177,7 @@ class WorksheetEditorStyleSheet (StyleSheet):
 		return pythonCodeEditorBorderStyle.border( box.alignHExpand() ).alignHExpand()
 	
 
-WorksheetEditorStyleSheet.instance = WorksheetEditorStyleSheet()
+#WorksheetEditorStyleSheet.instance = WorksheetEditorStyleSheet()
 	
 	
 	

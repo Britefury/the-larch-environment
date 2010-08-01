@@ -14,14 +14,40 @@ import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Fraction extends Pres
 {
-	private Pres numerator, denominator;
-	private String barContent;
+	public static class FractionBar extends Pres
+	{
+		private String textRepresentation;
+		
+		
+		public FractionBar(String textRepresentation)
+		{
+			this.textRepresentation = textRepresentation;
+		}
+		
+		
+		@Override
+		public DPElement present(PresentationContext ctx, StyleValues style)
+		{
+			return new DPFraction.DPFractionBar( Primitive.fractionBarParams.get( style ), textRepresentation );
+		}
+	}
 	
-	public Fraction(Object numerator, Object denominator, String barContent)
+	
+	
+	private Pres numerator, denominator, bar;
+	
+	public Fraction(Object numerator, Object denominator, String barTextRepresentation)
 	{
 		this.numerator = coerce( numerator );
 		this.denominator = coerce( denominator );
-		this.barContent = barContent;
+		this.bar = new FractionBar( barTextRepresentation );
+	}
+	
+	public Fraction(Object numerator, Object denominator, Object bar)
+	{
+		this.numerator = coerce( numerator );
+		this.denominator = coerce( denominator );
+		this.bar = coerce( bar );
 	}
 	
 
@@ -29,10 +55,12 @@ public class Fraction extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPFraction element = new DPFraction( Primitive.fractionParams.get( style ), Primitive.textParams.get( style ), barContent );
+		DPElement barElement = bar.present( ctx, style );
+		DPFraction element = new DPFraction( Primitive.fractionParams.get( style ), Primitive.textParams.get( style ), "/" );
 		StyleValues usedStyle = Primitive.useFractionParams( Primitive.useTextParams( style ) );
 		element.setNumeratorChild( numerator.present( ctx, fractionNumeratorStyle( usedStyle ) ) );
 		element.setDenominatorChild( denominator.present( ctx, fractionDenominatorStyle( usedStyle ) ) );
+		element.setBarChild( barElement );
 		return element;
 	}
 

@@ -6,26 +6,28 @@
 //##************************
 package BritefuryJ.DocPresent.Combinators;
 
+import BritefuryJ.AttributeTable.AttributeBase;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
-public class ApplyStyleSheet extends Pres
+public class ApplyStyleSheetFromAttribute extends Pres
 {
-	private StyleSheet2 styleSheet;
+	private AttributeBase attribute;
 	private Pres child;
 	
 	
-	public ApplyStyleSheet(StyleSheet2 styleSheet, Object child)
+	public ApplyStyleSheetFromAttribute(AttributeBase attribute, Pres child)
 	{
-		this.styleSheet = styleSheet;
-		this.child = coerce( child );
+		this.attribute = attribute;
+		this.child = child;
 	}
 	
 
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
+		StyleSheet2 styleSheet = style.get( attribute, StyleSheet2.class );
 		return child.present( ctx, style.withAttrs( styleSheet ) );
 	}
 }
