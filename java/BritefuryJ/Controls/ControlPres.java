@@ -34,19 +34,31 @@ public abstract class ControlPres extends Pres
 	}
 	
 	
+	public CustomControlActionPres withCustomControlAction(CustomControlActionPres.CustomControlAction action)
+	{
+		return new CustomControlActionPres( action, this );
+	}
+	
+	
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
 		Control control = createControl( ctx, style );
-		DPElement element = control.getElement();
-		controls.put( element, control );
-		return element;
+		registerControl( control );
+		return control.getElement();
 	}
 	
 	
 	public Control getControlForElement(DPElement element)
 	{
 		return controls.get( element );
+	}
+	
+	
+	protected void registerControl(Control control)
+	{
+		DPElement element = control.getElement();
+		controls.put( element, control );
 	}
 	
 	

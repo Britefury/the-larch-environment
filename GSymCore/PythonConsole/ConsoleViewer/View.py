@@ -28,11 +28,11 @@ from BritefuryJ.Cell import LiteralCell
 
 from BritefuryJ.AttributeTable import *
 
+from BritefuryJ.Controls import TextEntry
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.StyleSheet import *
 from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.Browser import Location
-from BritefuryJ.DocPresent.Controls import TextEntry
 from BritefuryJ.DocPresent.Input import ObjectDndHandler
 from BritefuryJ.DocPresent.Combinators.Primitive import *
 
@@ -100,10 +100,12 @@ _consoleStyle = StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 8.0 )
 def _dropPrompt(varNameTextEntryListener):
 	textEntry = TextEntry( 'var', varNameTextEntryListener )
 	prompt = StaticText( 'Place node into a variable named: ' )
-	# TODO
-	#textEntry.grabCaret()
-	#textEntry.selectAll()
-	return _dropPromptStyle.applyTo( Border( Paragraph( [ prompt.alignVCentre(), textEntry.getElement().alignVCentre() ] ) ) )
+	def _grab(textEntryControl, ctx, style):
+		textEntryControl.grabCaret()
+		# TODO - control must be realised before this can be done
+		# textEntryControl.selectAll()
+	textEntry = textEntry.withCustomControlAction( _grab )
+	return _dropPromptStyle.applyTo( Border( Paragraph( [ prompt.alignVCentre(), textEntry.alignVCentre() ] ) ) )
 	
 
 
@@ -124,7 +126,7 @@ class ConsoleView (GSymViewObjectDispatch):
 				
 			def _finish(entry):
 				caret.moveTo( marker )
-				dropPromptCell.setLiteralValue( HiddenContent() )
+				dropPromptCell.setLiteralValue( HiddenContent( '' ) )
 			
 			dropPrompt = _dropPrompt( _VarNameEntryListener() )
 			rootElement = element.getRootElement()
@@ -144,17 +146,18 @@ class ConsoleView (GSymViewObjectDispatch):
 		
 		m = _pythonModuleBorderStyle.applyTo( Border( currentModule.alignHExpand() ) ).alignHExpand()
 		m = m.withDropDest( dropDest )
-		# TODO
-		#m.ensureVisible()
+		def _ensureCurrentModuleVisible(element, ctx, style):
+			element.ensureVisible()
+		m = m.withCustomElementAction( _ensureCurrentModuleVisible )
 		
 		dropPromptCell = LiteralCell( HiddenContent( '' ) )
-		dropPrompt = dropPromptCell.genericPerspectiveValuePresInFragment()
+		dropPromptView = dropPromptCell.genericPerspectiveValuePresInFragment()
 		
 		if len( blocks ) > 0:
 			blockList = _consoleBlockListStyle.applyTo( VBox( blocks ) ).alignHExpand()
-			return _consoleStyle.applyTo( VBox( [ blockList.alignHExpand(), dropPrompt, m.alignHExpand() ] ) ).alignHExpand()
+			return _consoleStyle.applyTo( VBox( [ blockList.alignHExpand(), dropPromptView, m.alignHExpand() ] ) ).alignHExpand()
 		else:
-			return _consoleStyle.applyTo( VBox( [ dropPrompt, m.alignVTop().alignHExpand() ] ) ).alignHExpand()
+			return _consoleStyle.applyTo( VBox( [ dropPromptView, m.alignVTop().alignHExpand() ] ) ).alignHExpand()
 		
 
 		

@@ -18,11 +18,11 @@ import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
 public class StyleSheetBenchmark
 {
-//	private static final int RUN_LENGTH = 16;
-//	private static final int NUM_REPEATS = 65536;
+	private static final int RUN_LENGTH = 16;
+	private static final int NUM_REPEATS = 65536;
 	
-	private static final int RUN_LENGTH = 64;
-	private static final int NUM_REPEATS = 64;
+//	private static final int RUN_LENGTH = 64;
+//	private static final int NUM_REPEATS = 64;
 	
 	private static final PrimitiveStyleSheet oldStyle = PrimitiveStyleSheet.instance.withFontFace( "Serif" );
 	private static final StyleSheet2 newStyle = StyleSheet2.instance.withAttr( Primitive.fontFace, "Serif" );
@@ -156,38 +156,29 @@ public class StyleSheetBenchmark
 	
 	public static void main(final String[] args)
 	{
+		System.out.println( "BEGIN" );
 		// Direct construction test
-		System.out.println( "Direction construction" );
 		directConstructionTest();
-		System.out.println( "Initial run complete" );
 		double directTime = directConstructionTest();
 		System.out.println( "Direction construction time = " + directTime );
 
 		// Old test
-		System.out.println( "Old style sheets" );
 		oldStyleSheetTest();
-		System.out.println( "Initial run complete" );
 		double oldTime = oldStyleSheetTest();
 		System.out.println( "Old style sheets time = " + oldTime );
 
 		// Combinators only test
-		System.out.println( "Combinators only" );
 		combinatorsOnlyTest();
-		System.out.println( "Initial run complete" );
 		double combinatorsOnlyTime = combinatorsOnlyTest();
 		System.out.println( "Combinators only time = " + combinatorsOnlyTime );
 
 		// Combinator style sheet test
-		System.out.println( "Combinator style sheets" );
 		combinatorStyleSheetTest();
-		System.out.println( "Initial run complete" );
 		double combinatorTime = combinatorStyleSheetTest();
 		System.out.println( "Combinator style sheets time = " + combinatorTime );
 
 		// Repeated combinator style sheet test
-		System.out.println( "Repeated combinator style sheets" );
 		repeatedCombinatorStyleSheetTest();
-		System.out.println( "Initial run complete" );
 		double repeatedCombinatorTime = repeatedCombinatorStyleSheetTest();
 		System.out.println( "Repeated combinator style sheets time = " + repeatedCombinatorTime );
 	}
