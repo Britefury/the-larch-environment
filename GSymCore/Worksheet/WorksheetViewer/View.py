@@ -8,6 +8,8 @@
 import os
 from datetime import datetime
 
+from java.awt import Color
+
 from java.awt.event import KeyEvent
 
 from java.util.regex import Pattern
@@ -28,97 +30,101 @@ from Britefury.Util.InstanceCache import instanceCache
 
 from BritefuryJ.AttributeTable import *
 
-from BritefuryJ.DocPresent.Browser import Location
-from BritefuryJ.DocPresent.StyleSheet import StyleSheet2, PrimitiveStyleSheet
 from BritefuryJ.DocPresent import *
+from BritefuryJ.DocPresent.Border import *
+from BritefuryJ.DocPresent.Browser import Location
+from BritefuryJ.DocPresent.StyleSheet import StyleSheet2
+from BritefuryJ.Controls import *
+from BritefuryJ.DocPresent.Combinators import *
+from BritefuryJ.DocPresent.Combinators.Primitive import *
+from BritefuryJ.DocPresent.Combinators.RichText import *
+from BritefuryJ.DocPresent.Combinators.ContextMenu import *
 
 from BritefuryJ.GSym import GSymPerspective, GSymSubject, GSymRelativeLocationResolver
+from BritefuryJ.GSym.PresCom import InnerFragment, PerspectiveInnerFragment
 
 
 from GSymCore.Languages.Python25 import Python25
+from GSymCore.Languages.Python25.Execution.ExecutionPresCombinators import executionResultBox, minimalExecutionResultBox
 
 from GSymCore.Worksheet import Schema
 from GSymCore.Worksheet import ViewSchema
-from GSymCore.Worksheet.WorksheetViewer.WorksheetViewerStyleSheet import WorksheetViewerStyleSheet
 from GSymCore.Worksheet.WorksheetEditor.View import perspective as editorPerspective
 
 
 
-class WorkSheetContextMenuFactory (ContextMenuFactory):
-	def __init__(self, styleSheet):
-		self._styleSheet = styleSheet
-	
-	
-	def buildContextMenu(self, element, menu):
-		menuStyle = self._styleSheet['contextMenuStyle']
-		controlsStyle = menuStyle['controlsStyle']
-		
-		
-		def _onRefresh(button, event):
-			model.refreshResults()
-	
-		model = element.getFragmentContext().getModel()
+_pythonCodeBorderStyle = StyleSheet2.instance.withAttr( Primitive.border, SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) )
+_pythonCodeEditorBorderStyle = StyleSheet2.instance.withAttr( Primitive.border, SolidBorder( 2.0, 5.0, 20.0, 20.0, Color( 0.4, 0.5, 0.6 ), None ) )
 
-		refreshButton = controlsStyle.buttonWithLabel( 'Refresh', _onRefresh ).getElement()
-		worksheetControls = menuStyle.controlsHBox( [ refreshButton ] )
-		menu.add( menuStyle.sectionWithTitle( 'Worksheet', worksheetControls ).alignHExpand() )
+
+
+def _worksheetContextMenuFactory(element, menu):
+	def _onRefresh(button, event):
+		model.refreshResults()
+
+	model = element.getFragmentContext().getModel()
+
+	refreshButton = Button.buttonWithLabel( 'Refresh', _onRefresh )
+	worksheetControls = ControlsHBox( [ refreshButton ] )
+	menu.add( SectionVBox( [ SectionTitle( 'Worksheet' ), worksheetControls ] ).alignHExpand() )
+	return True
 
 
 
 
 class WorksheetViewer (GSymViewObjectDispatch):
 	@ObjectDispatchMethod( ViewSchema.WorksheetView )
-	def Worksheet(self, ctx, styleSheet, inheritedState, node):
-		bodyView = ctx.presentFragment( node.getBody(), styleSheet )
+	def Worksheet(self, ctx, inheritedState, node):
+		bodyView = InnerFragment( node.getBody() )
 		
-		w = styleSheet.worksheet( bodyView, ctx.getSubjectContext()['editLocation'] )
-		w.addContextMenuFactory( instanceCache( WorkSheetContextMenuFactory, styleSheet ) )
-		return w
-	
+		editLocation = ctx.getSubjectContext()['editLocation']
+		
+		homeLink = Hyperlink( 'HOME PAGE', Location( '' ) )
+		editLink = Hyperlink( 'Edit this worksheet', editLocation )
+		linkHeader = SplitLinkHeaderBar( [ editLink ], [ homeLink ] )
+		
+		w = Page( [ linkHeader, bodyView ] )
+		w = w.withContextMenuFactory( _worksheetContextMenuFactory )
+		return StyleSheet2.instance.withAttr( Primitive.editable, False ).applyTo( w )
 
 
 	@ObjectDispatchMethod( ViewSchema.BodyView )
-	def Body(self, ctx, styleSheet, inheritedState, node):
-		contentViews = ctx.mapPresentFragment( [ c    for c in node.getContents()   if c.isVisible() ], styleSheet, inheritedState )
-		
-		return styleSheet.body( contentViews )
+	def Body(self, ctx, inheritedState, node):
+		contentsView = InnerFragment.map( [ c    for c in node.getContents()   if c.isVisible() ] )
+		return Body( contentsView )
 	
 	
 	@ObjectDispatchMethod( ViewSchema.ParagraphView )
-	def Paragraph(self, ctx, styleSheet, inheritedState, node):
+	def Paragraph(self, ctx, inheritedState, node):
 		text = node.getText()
 		style = node.getStyle()
 		if style == 'normal':
-			p = styleSheet.paragraph( text )
+			p = NormalText( text )
 		elif style == 'h1':
-			p = styleSheet.h1( text )
+			p = Heading1( text )
 		elif style == 'h2':
-			p = styleSheet.h2( text )
+			p = Heading2( text )
 		elif style == 'h3':
-			p = styleSheet.h3( text )
+			p = Heading3( text )
 		elif style == 'h4':
-			p = styleSheet.h4( text )
+			p = Heading4( text )
 		elif style == 'h5':
-			p = styleSheet.h5( text )
+			p = Heading5( text )
 		elif style == 'h6':
-			p = styleSheet.h6( text )
+			p = Heading6( text )
 		elif style == 'title':
-			p = styleSheet.title( text )
+			p = TitleBar( text )
 		return p
 
 
 	
 	@ObjectDispatchMethod( ViewSchema.PythonCodeView )
-	def PythonCode(self, ctx, styleSheet, inheritedState, node):
+	def PythonCode(self, ctx, inheritedState, node):
 		if node.isVisible():
-			executionStyle = styleSheet['executionStyle']
-			
 			if node.isCodeVisible():
+				codeView = PerspectiveInnerFragment( Python25.python25EditorPerspective, node.getCode() )
 				if node.isCodeEditable():
-					codeView = ctx.presentFragmentWithPerspectiveAndStyleSheet( node.getCode(), Python25.python25EditorPerspective, styleSheet['pythonStyle'] )
-				else:
-					codeView = ctx.presentFragmentWithPerspectiveAndStyleSheet( node.getCode(), Python25.python25EditorPerspective, styleSheet['staticPythonStyle'] )
-					
+					codeView = StyleSheet2.instance.withAttr( Primitive.editable, True ).applyTo( codeView )
 			else:
 				codeView = None
 			
@@ -128,25 +134,28 @@ class WorksheetViewer (GSymViewObjectDispatch):
 				if node.isResultVisible():
 					stdout = executionResult.getStdOut()
 					result = executionResult.getResult()
-					resultView = ctx.presentFragmentWithGenericPerspective( result[0] )   if result is not None   else None
 				else:
 					stdout = None
-					resultView = None
+					result = None
 				exc = executionResult.getCaughtException()
-				excView = ctx.presentFragmentWithGenericPerspective( exc )   if exc is not None   else None
 				if node.isCodeVisible():
-					executionResultView = executionStyle.executionResult( stdout, executionResult.getStdErr(), excView, resultView )
+					executionResultView = executionResultBox( stdout, executionResult.getStdErr(), exc, result, True, True )
 				else:
-					executionResultView = executionStyle.minimalExecutionResult( stdout, executionResult.getStdErr(), excView, resultView )
+					executionResultView = minimalExecutionResultBox( stdout, executionResult.getStdErr(), exc, result, True, True )
 			
 			if node.isResultMinimal():
-				p = styleSheet.minimalPythonCodeResult( executionResultView )
+				return executionResultView.alignHExpand()   if executionResultView is not None   else HiddenContent( '' )
 			else:
-				p = styleSheet.pythonCode( codeView, executionResultView, node.isCodeVisible(), node.isResultVisible() )
-		
-			return p
+				boxContents = []
+				if node.isCodeVisible():
+					boxContents.append( _pythonCodeBorderStyle.applyTo( Border( codeView.alignHExpand() ).alignHExpand() ) )
+				if node.isResultVisible()  and  executionResultView is not None:
+					boxContents.append( executionResultView.alignHExpand() )
+				box = StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 5.0 ).applyTo( VBox( boxContents ) )
+				
+				return _pythonCodeEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
 		else:
-			return PrimitiveStyleSheet.instance.hiddenContent( '' )
+			return HiddenContent( '' )
 
 
 
