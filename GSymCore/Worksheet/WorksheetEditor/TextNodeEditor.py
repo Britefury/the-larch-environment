@@ -103,28 +103,22 @@ TextNodeEventListener.instance = TextNodeEventListener()
 
 
 class _ParagraphStreamValueFn (ElementValueFunction):
-	def __init__(self, innerFn, prefix):
-		self._innerFn = innerFn
+	def __init__(self, prefix):
 		self._prefix = prefix
 		
 	def computeElementValue(self, element):
-		return element.getValue( self._innerFn )
+		return element.getValue()
 	
 	def addStreamValuePrefixToStream(self, builder, element):
-		if self._innerFn is not None:
-			self._innerFn.addStreamValuePrefixToStream( builder, element )
 		if self._prefix is not None:
 			builder.append( self._prefix )
 		
 	def addStreamValueSuffixToStream(self, builder, element):
-		if self._innerFn is not None:
-			self._innerFn.addStreamValueSuffixToStream( builder, element )
+		pass
 			
 			
-def addParagraphStreamValueFnToElement(element, prefix):
-	oldFn = element.getValueFunction()
-	element.setValueFunction( _ParagraphStreamValueFn( oldFn, prefix ) )
-	return oldFn
+def withParagraphStreamValueFn(pres, prefix):
+	return pres.withValueFunction( _ParagraphStreamValueFn( prefix ) )
 
 
 

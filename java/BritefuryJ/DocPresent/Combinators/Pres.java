@@ -12,6 +12,7 @@ import java.util.List;
 import BritefuryJ.DocPresent.ContextMenuFactory;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementInteractor;
+import BritefuryJ.DocPresent.ElementValueFunction;
 import BritefuryJ.DocPresent.TreeEventListener;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Layout.HAlignment;
@@ -241,6 +242,11 @@ public abstract class Pres
 	public SetFixedValue withFixedValue(Object value)
 	{
 		return new SetFixedValue( this, value );
+	}
+	
+	public SetValueFunction withValueFunction(ElementValueFunction valueFn)
+	{
+		return new SetValueFunction( this, valueFn );
 	}
 	
 	

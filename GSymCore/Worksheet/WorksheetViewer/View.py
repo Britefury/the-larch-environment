@@ -90,8 +90,8 @@ class WorksheetViewer (GSymViewObjectDispatch):
 
 	@ObjectDispatchMethod( ViewSchema.BodyView )
 	def Body(self, ctx, inheritedState, node):
-		contentsView = InnerFragment.map( [ c    for c in node.getContents()   if c.isVisible() ] )
-		return Body( contentsView )
+		contentViews = InnerFragment.map( [ c    for c in node.getContents()   if c.isVisible() ] )
+		return Body( contentViews )
 	
 	
 	@ObjectDispatchMethod( ViewSchema.ParagraphView )
