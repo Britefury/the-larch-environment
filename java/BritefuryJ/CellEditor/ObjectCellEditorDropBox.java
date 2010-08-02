@@ -7,11 +7,11 @@
 package BritefuryJ.CellEditor;
 
 import BritefuryJ.Cell.LiteralCell;
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
-import BritefuryJ.GSym.GenericPerspective.GenericPerspectiveStyleSheet;
+import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Math.Point2;
 
@@ -37,28 +37,24 @@ public class ObjectCellEditorDropBox extends LiteralCellEditor
 		protected void refreshEditor()
 		{
 			Object value = getCellValue( Object.class );
-			DPElement e;
+			Pres p;
 			if ( value != null )
 			{
-				e =styleSheet.objectBox( "DocModel", PrimitiveStyleSheet.instance.staticText( "Value received" ) );
+				p = new ObjectBox( "DocModel", new StaticText( "Value received" ) );
 			}
 			else
 			{
-				e = styleSheet.objectBox( "DocModel", PrimitiveStyleSheet.instance.staticText( "null" ) );
+				p = new ObjectBox( "DocModel", new StaticText( "null" ) );
 			}
-			e.addDropDest( GSymFragmentView.FragmentModel.class, new Listener() );
-			setElement( e );
+			p = p.withDropDest( GSymFragmentView.FragmentModel.class, new Listener() );
+			setPres( p );
 		}
 	};
 	
 	
-	private GenericPerspectiveStyleSheet styleSheet;
-	
-	
-	public ObjectCellEditorDropBox(LiteralCell cell, GenericPerspectiveStyleSheet styleSheet)
+	public ObjectCellEditorDropBox(LiteralCell cell)
 	{
 		super( cell );
-		this.styleSheet = styleSheet;
 	}
 	
 	

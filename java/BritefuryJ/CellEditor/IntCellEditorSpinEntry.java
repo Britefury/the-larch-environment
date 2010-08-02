@@ -7,8 +7,7 @@
 package BritefuryJ.CellEditor;
 
 import BritefuryJ.Cell.LiteralCell;
-import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
-import BritefuryJ.DocPresent.Controls.IntSpinEntry;
+import BritefuryJ.Controls.IntSpinEntry;
 
 public class IntCellEditorSpinEntry extends LiteralCellEditor
 {
@@ -17,22 +16,19 @@ public class IntCellEditorSpinEntry extends LiteralCellEditor
 		protected class Listener implements IntSpinEntry.IntSpinEntryListener
 		{
 			@Override
-			public void onSpinEntryValueChanged(IntSpinEntry spinEntry, int value)
+			public void onSpinEntryValueChanged(IntSpinEntry.IntSpinEntryControl spinEntry, int value)
 			{
 				setCellValue( value );
 			}
 		}
 		
-		private IntSpinEntry spinEntry;
-		
 		public IntEditor()
 		{
 			Integer value = getCellValue( Integer.class );
 			int v = value != null  ?  value  :  0;
-			spinEntry = styleSheet.intSpinEntry( v, min, max, stepSize, pageSize, new Listener() );
 			if ( value != null )
 			{
-				setElement( spinEntry.getElement() );
+				setPres( new IntSpinEntry( v, min, max, stepSize, pageSize, new Listener() ) );
 			}
 			else
 			{
@@ -45,7 +41,7 @@ public class IntCellEditorSpinEntry extends LiteralCellEditor
 			Integer value = getCellValue( Integer.class );
 			if ( value != null )
 			{
-				spinEntry.setValue( value );
+				setPres( new IntSpinEntry( value, min, max, stepSize, pageSize, new Listener() ) );
 			}
 			else
 			{
@@ -55,14 +51,12 @@ public class IntCellEditorSpinEntry extends LiteralCellEditor
 	};
 	
 	
-	private ControlsStyleSheet styleSheet;
 	private int min, max, stepSize, pageSize;
 	
 	
-	public IntCellEditorSpinEntry(LiteralCell cell, ControlsStyleSheet styleSheet, int min, int max, int stepSize, int pageSize)
+	public IntCellEditorSpinEntry(LiteralCell cell, int min, int max, int stepSize, int pageSize)
 	{
 		super( cell );
-		this.styleSheet = styleSheet;
 		this.min = min;
 		this.max = max;
 		this.stepSize = stepSize;

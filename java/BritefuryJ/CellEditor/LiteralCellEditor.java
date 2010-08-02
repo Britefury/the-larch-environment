@@ -13,9 +13,10 @@ import javax.swing.SwingUtilities;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.Cell.LiteralCell;
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Incremental.IncrementalMonitor;
@@ -23,32 +24,33 @@ import BritefuryJ.Incremental.IncrementalMonitorListener;
 
 public abstract class LiteralCellEditor implements Presentable, IncrementalMonitorListener
 {
-	private static final PrimitiveStyleSheet errorStyle = PrimitiveStyleSheet.instance.withForeground( new Color( 0.8f, 0.0f, 0.0f ) );
+	private static final StyleSheet2 errorStyle = StyleSheet2.instance.withAttr( Primitive.foreground, new Color( 0.8f, 0.0f, 0.0f ) );
 	
 	protected abstract class Editor
 	{
 		private boolean bSettingCellValue = false;
-		private DPElement element;
+		private LiteralCell presCell = new LiteralCell();
+		private Pres pres = presCell.genericPerspectiveValuePresInFragment();
 
 		
 		
 		protected abstract void refreshEditor();
 		
 		
-		protected DPElement getElement()
+		protected Pres getPres()
 		{
-			return element;
+			return pres;
 		}
 		
 		
-		protected void setElement(DPElement e)
+		protected void setPres(Pres p)
 		{
-			element = e;
+			presCell.setLiteralValue( p );
 		}
 		
 		protected void error(String message)
 		{
-			element = errorStyle.staticText( "<" + message + ">" );
+			setPres( errorStyle.applyTo( new StaticText( "<" + message + ">" ) ) );
 		}
 		
 		
@@ -141,7 +143,7 @@ public abstract class LiteralCellEditor implements Presentable, IncrementalMonit
 	@Override
 	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
 	{
-		return Pres.elementToPres( createEditor().getElement() );
+		return createEditor().getPres();
 	}
 
 

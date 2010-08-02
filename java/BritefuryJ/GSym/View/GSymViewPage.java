@@ -9,15 +9,15 @@ package BritefuryJ.GSym.View;
 import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.CommandHistory.CommandHistoryController;
 import BritefuryJ.CommandHistory.CommandHistoryListener;
+import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.PageController;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.Page;
-import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
-import BritefuryJ.DocPresent.Controls.Hyperlink;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.GSym.GSymBrowserContext;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Logging.LogView;
@@ -45,7 +45,7 @@ public class GSymViewPage extends Page
 		Hyperlink.LinkListener listener = new Hyperlink.LinkListener()
 		{
 			@Override
-			public void onLinkClicked(Hyperlink link, PointerButtonEvent event)
+			public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonEvent event)
 			{
 				log.startRecording();
 				LogView view = new LogView( log );
@@ -54,8 +54,9 @@ public class GSymViewPage extends Page
 			}
 		};
 		
-		logLink = ControlsStyleSheet.instance.link( "Page log", listener );
-		pageElement = PrimitiveStyleSheet.instance.vbox( new DPElement[] { this.element.alignHExpand(), logLink.getElement().pad( 10, 10 ).alignHRight() } );
+		logLink = new Hyperlink( "Page log", listener );
+		Pres pagePres = new VBox( new Object[] { this.element.alignHExpand(), logLink.pad( 10, 10 ).alignHRight() } );
+		pageElement = pagePres.present();
 	}
 	
 	

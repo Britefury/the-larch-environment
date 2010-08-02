@@ -7,8 +7,7 @@
 package BritefuryJ.CellEditor;
 
 import BritefuryJ.Cell.LiteralCell;
-import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
-import BritefuryJ.DocPresent.Controls.TextArea;
+import BritefuryJ.Controls.TextArea;
 
 public class StringCellEditorTextArea extends LiteralCellEditor
 {
@@ -17,24 +16,20 @@ public class StringCellEditorTextArea extends LiteralCellEditor
 		protected class Listener extends TextArea.TextAreaListener
 		{
 			@Override
-			public void onAccept(TextArea textArea, String text)
+			public void onAccept(TextArea.TextAreaControl textArea, String text)
 			{
 				setCellValue( text );
 			}
 		}
 		
-		private TextArea textArea;
-		
-		
-		
+
 		public StringEditor()
 		{
 			String value = getCellValue( String.class );
 			String text = value != null  ?  value  :  "";
-			textArea = styleSheet.textArea( text, new Listener() );
 			if ( value != null )
 			{
-				setElement( textArea.getElement() );
+				setPres( new TextArea( text, new Listener() ) );
 			}
 			else
 			{
@@ -48,7 +43,7 @@ public class StringCellEditorTextArea extends LiteralCellEditor
 			String text = getCellValue( String.class );
 			if ( text != null )
 			{
-				textArea.setText( text );
+				setPres( new TextArea( text, new Listener() ) );
 			}
 			else
 			{
@@ -58,13 +53,9 @@ public class StringCellEditorTextArea extends LiteralCellEditor
 	};
 	
 	
-	private ControlsStyleSheet styleSheet;
-	
-	
-	public StringCellEditorTextArea(LiteralCell cell, ControlsStyleSheet styleSheet)
+	public StringCellEditorTextArea(LiteralCell cell)
 	{
 		super( cell );
-		this.styleSheet = styleSheet;
 	}
 	
 	

@@ -29,6 +29,7 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Region;
 import BritefuryJ.DocPresent.Combinators.Primitive.Segment;
 import BritefuryJ.DocPresent.Combinators.Primitive.Text;
@@ -433,6 +434,7 @@ public class TextArea extends ControlPres
 	@Override
 	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
+		style = style.withAttr( Primitive.editable, true );
 		StyleSheet2 textAreaStyleSheet = style.get( Controls.textAreaAttrs, StyleSheet2.class );
 		
 		StyleValues textAreaStyle = style.withAttrs( textAreaStyleSheet );
