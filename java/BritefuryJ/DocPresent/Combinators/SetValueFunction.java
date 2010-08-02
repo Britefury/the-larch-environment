@@ -7,24 +7,25 @@
 package BritefuryJ.DocPresent.Combinators;
 
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.ElementValueFunction;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
-public class SetFixedValue extends Pres
+public class SetValueFunction extends Pres
 {
 	private Pres child;
-	private Object value;
+	private ElementValueFunction valueFn;
 	
 	
-	public SetFixedValue(Object child, Object value)
+	public SetValueFunction(Object child, ElementValueFunction valueFn)
 	{
 		this.child = coerce( child );
-		this.value = value;
+		this.valueFn = valueFn;
 	}
 
 
-	public SetFixedValue withFixedValue(Object value)
+	public SetValueFunction withValueFunction(ElementValueFunction valueFn)
 	{
-		return new SetFixedValue( child, value );
+		return new SetValueFunction( child, valueFn );
 	}
 
 	
@@ -32,7 +33,7 @@ public class SetFixedValue extends Pres
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
 		DPElement element = child.present( ctx, style );
-		element.setFixedValue( value );
+		element.setValueFunction( valueFn );
 		return element;
 	}
 }
