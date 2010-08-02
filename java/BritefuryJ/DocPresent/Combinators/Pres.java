@@ -247,6 +247,20 @@ public abstract class Pres
 	
 	
 	//
+	//
+	// Custom action methods
+	//
+	//
+	
+	public CustomElementActionPres withCustomElementAction(CustomElementActionPres.CustomElementAction action)
+	{
+		return new CustomElementActionPres( action, this );
+	}
+	
+	
+	
+	
+	//
 	// Debug name methods
 	//
 	
