@@ -24,6 +24,8 @@ from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replac
 from Britefury.Util.NodeUtil import *
 
 
+from BritefuryJ.Cell import LiteralCell
+
 from BritefuryJ.AttributeTable import *
 
 from BritefuryJ.DocPresent import *
@@ -37,11 +39,14 @@ from BritefuryJ.DocPresent.Combinators.Primitive import *
 from BritefuryJ.GSym import GSymPerspective, GSymSubject
 from BritefuryJ.GSym.View import GSymFragmentView
 
+from BritefuryJ.GSym.GenericPerspective.PresCom import GenericPerspectiveInnerFragment
+from BritefuryJ.GSym.PresCom import InnerFragment, PerspectiveInnerFragment
+
 from GSymCore.Languages.Python25 import Python25
+from GSymCore.Languages.Python25.Execution.ExecutionPresCombinators import execStdout, execStdout, execException, execResult
 
 from GSymCore.PythonConsole import ConsoleSchema as Schema
-from GSymCore.PythonConsole.ConsoleViewer.ConsoleViewerStyleSheet import ConsoleViewerStyleSheet
-from GSymCore.PythonConsole.ConsoleViewer.ConsoleViewerCombinators import ConsoleViewerStyle
+
 
 
 
@@ -92,12 +97,21 @@ _consoleStyle = StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 8.0 )
 
 
 
+def _dropPrompt(varNameTextEntryListener):
+	textEntry = TextEntry( 'var', varNameTextEntryListener )
+	prompt = StaticText( 'Place node into a variable named: ' )
+	# TODO
+	#textEntry.grabCaret()
+	#textEntry.selectAll()
+	return _dropPromptStyle.applyTo( Border( Paragraph( [ prompt.alignVCentre(), textEntry.getElement().alignVCentre() ] ) ) )
+	
+
 
 class ConsoleView (GSymViewObjectDispatch):
 	@ObjectDispatchMethod( Schema.Console )
-	def Console(self, ctx, styleSheet, state, node):
-		blockViews = ctx.mapPresentFragment( node.getBlocks(), styleSheet )
-		currentModuleView = ctx.presentFragmentWithPerspectiveAndStyleSheet( node.getCurrentPythonModule(), Python25.python25EditorPerspective, styleSheet['pythonStyle'] )
+	def Console(self, ctx, state, node):
+		blocks = InnerFragment.map( node.getBlocks() )
+		currentModule = PerspectiveInnerFragment( Python25.python25EditorPerspective, node.getCurrentPythonModule() )
 	
 		def _onDrop(element, pos, data, action):
 			class _VarNameEntryListener (TextEntry.TextEntryListener):
@@ -110,15 +124,13 @@ class ConsoleView (GSymViewObjectDispatch):
 				
 			def _finish(entry):
 				caret.moveTo( marker )
-				dropPromptInsertionPoint.setChildren( [] )
+				dropPromptCell.setLiteralValue( HiddenContent() )
 			
-			dropPrompt, textEntry = styleSheet.dropPrompt( _VarNameEntryListener() )
+			dropPrompt = _dropPrompt( _VarNameEntryListener() )
 			rootElement = element.getRootElement()
 			caret = rootElement.getCaret()
 			marker = caret.getMarker().copy()
-			dropPromptInsertionPoint.setChildren( [ dropPrompt ] )
-			textEntry.grabCaret()
-			textEntry.selectAll()
+			dropPromptCell.setLiteralValue( dropPrompt )
 			rootElement.grabFocus()
 			
 			return True
@@ -126,48 +138,57 @@ class ConsoleView (GSymViewObjectDispatch):
 		
 		
 		dropDest = ObjectDndHandler.DropDest( GSymFragmentView.FragmentModel, _onDrop )
-		consoleView, dropPromptInsertionPoint = styleSheet.console( blockViews, currentModuleView, CurrentModuleInteractor( node ), dropDest )
-		return consoleView
 
-
-
-	@ObjectDispatchMethod( Schema.ConsoleBlock )
-	def ConsoleBlock(self, ctx, styleSheet, state, node):
-		pythonModule = node.getPythonModule()
-		execResult = node.getExecResult()
-		caughtException = execResult.getCaughtException()
-		result = execResult.getResult()
+		currentModule = Span( [ currentModule ] )
+		currentModule = currentModule.withInteractor( CurrentModuleInteractor( node ) )
 		
-		moduleView = ctx.presentFragmentWithPerspectiveAndStyleSheet( pythonModule, Python25.python25EditorPerspective, styleSheet.staticPythonStyle() )
-		caughtExceptionView = ctx.presentFragmentWithGenericPerspective( caughtException )   if caughtException is not None   else None
-		if result is not None:
-			resultView = ctx.presentFragmentWithGenericPerspective( result[0] )
+		m = _pythonModuleBorderStyle.applyTo( Border( currentModule.alignHExpand() ) ).alignHExpand()
+		m = m.withDropDest( dropDest )
+		# TODO
+		#m.ensureVisible()
+		
+		dropPromptCell = LiteralCell( HiddenContent( '' ) )
+		dropPrompt = dropPromptCell.genericPerspectiveValuePresInFragment()
+		
+		if len( blocks ) > 0:
+			blockList = _consoleBlockListStyle.applyTo( VBox( blocks ) ).alignHExpand()
+			return _consoleStyle.applyTo( VBox( [ blockList.alignHExpand(), dropPrompt, m.alignHExpand() ] ) ).alignHExpand()
 		else:
-			resultView = None
+			return _consoleStyle.applyTo( VBox( [ dropPrompt, m.alignVTop().alignHExpand() ] ) ).alignHExpand()
 		
-		return styleSheet.consoleBlock( moduleView, execResult.getStdOut(), execResult.getStdErr(), caughtExceptionView, resultView )
 
-	def consoleBlock(self, pythonModule, stdout, stderr, caughtException, result):
-		executionStyle = self['executionStyle']
-		blockStyle = self.blockStyle()
-		pythonModuleBorderStyle = self.pythonModuleBorderStyle()
 		
+	@ObjectDispatchMethod( Schema.ConsoleBlock )
+	def ConsoleBlock(self, ctx, state, node):
+		pythonModule = node.getPythonModule()
+
+		executionResult = node.getExecResult()
+		
+		caughtException = executionResult.getCaughtException()
+		result = executionResult.getResult()
+		stdout = executionResult.getStdOut()
+		stderr = executionResult.getStdErr()
+		
+		moduleView = StyleSheet2.instance.withAttr( Primitive.editable, False ).applyTo( PerspectiveInnerFragment( Python25.python25EditorPerspective, pythonModule ) )
+		caughtExceptionView = GenericPerspectiveInnerFragment( caughtException )   if caughtException is not None   else None
+		resultView = GenericPerspectiveInnerFragment( result[0] )   if result is not None   else None
+			
 		blockContents = []
-		blockContents.append( pythonModuleBorderStyle.border( pythonModule.alignHExpand() ).alignHExpand() )
+		blockContents.append( _pythonModuleBorderStyle.applyTo( Border( moduleView.alignHExpand() ).alignHExpand() ) )
 		if stderr is not None:
-			blockContents.append( executionStyle.stderr( stderr ) )
-		if caughtException is not None:
-			blockContents.append( executionStyle.exception( caughtException ) )
+			blockContents.append( execStderr( stderr ) )
+		if caughtExceptionView is not None:
+			blockContents.append( execException( caughtExceptionView ) )
 		if stdout is not None:
-			blockContents.append( executionStyle.stdout( stdout ) )
-		if result is not None:
-			blockContents.append( executionStyle.result( result ) )
-		blockVBox = blockStyle.vbox( blockContents ).alignHExpand()
-		return blockStyle.border( blockVBox ).alignHExpand()
+			blockContents.append( execStdout( stdout ) )
+		if resultView is not None:
+			blockContents.append( execResult( resultView ) )
+		blockVBox = VBox( blockContents ).alignHExpand()
+		return _blockStyle.applyTo( Border( blockVBox ).alignHExpand() )
 
 
 	@ObjectDispatchMethod( Schema.ConsoleVarAssignment )
-	def ConsoleVarAssignment(self, ctx, styleSheet, state, node):
+	def ConsoleVarAssignment(self, ctx, state, node):
 		varName = node.getVarName()
 		valueType = node.getValueType()
 		valueTypeName = valueType.__name__

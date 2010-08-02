@@ -53,32 +53,33 @@ def _textLines(labelText, text):
 	return VBox( [ label, lines.padX( 5.0, 0.0 ) ] )
 
 
-def stdout(text):
+def execStdout(text):
 	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdOutStyle, Border( _textLines( 'STDOUT:', text ).alignHExpand() ).alignHExpand() )
 
-def stderr(text):
+def execStderr(text):
 	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdErrStyle, Border( _textLines( 'STDERR:', text ).alignHExpand() ).alignHExpand() )
 	
-def exception(exceptionView):
+def execException(exceptionView):
 	exceptionBorderStyle = self.exceptionBorderStyle()
 	label = ApplyStyleSheetFromAttribute( ExecutionStyle.labelStyle, StaticText( 'EXCEPTION:' ) )
 	return ApplyStyleSheetFromAttribute( ExecutionStyle.exceptionBorderStyle, Border( VBox( [ label, exceptionView.padX( 5.0, 0.0 ).alignHExpand() ] ).alignHExpand() ).alignHExpand() )
 
-def result(resultView):
-	resultBorderStyle = self.resultBorderStyle()
+def execResult(resultView):
 	return ApplyStyleSheetFromAttribute( ExecutionStyle.resultBorderStyle, Border( Paragraph( [ resultView ] ).alignHExpand() ).alignHExpand() )
 
 
-def executionResult(ctx, style, stdoutText, stderrText, exceptionView, resultView):
+def executionResult(ctx, style, stdoutText, stderrText, exception, resultInTuple, bUseGenericPerspecitveForException, bUseGenericPerspectiveForResult):
 	boxContents = []
 	if stderrText is not None:
-		boxContents.append( stderr( stderrText ) )
-	if exceptionView is not None:
-		boxContents.append( exception( exceptionView ) )
+		boxContents.append( execStderr( stderrText ) )
+	if exception is not None:
+		exceptionView = GenericPerspectiveInnerFragment( exception )   if bUseGenericPerspecitveForException   else InnerFragment( exception )
+		boxContents.append( execException( exceptionView ) )
 	if stdoutText is not None:
-		boxContents.append( stdout( stdoutText ) )
-	if resultView is not None:
-		boxContents.append( result( resultView ) )
+		boxContents.append( execStdout( stdoutText ) )
+	if resultInTuple is not None:
+		resultView = GenericPerspectiveInnerFragment( resultInTuple[0] )   if bUseGenericPerspectiveForResult   else InnerFragment( resultInTuple[0] )
+		boxContents.append( execResult( resultView ) )
 	
 	if len( boxContents ) > 0:
 		return ApplyStyleSheetFromAttribute( ExecutionStyle.resultBoxStyle, VBox( boxContents ).alignHExpand() )
@@ -86,22 +87,25 @@ def executionResult(ctx, style, stdoutText, stderrText, exceptionView, resultVie
 		return None
 
 
-def minimalExecutionResult(ctx, style, stdoutText, stderrText, exceptionView, resultView):
-	if stdoutText is None  and  stderrText is None  and  exceptionView is None:
-		if resultView is None:
+def minimalExecutionResult(ctx, style, stdoutText, stderrText, exception, resultInTuple, bUseGenericPerspecitveForException, bUseGenericPerspectiveForResult):
+	if stdoutText is None  and  stderrText is None  and  exception is None:
+		if resultInTuple is None:
 			return None
 		else:
+			resultView = GenericPerspectiveInnerFragment( resultInTuple[0] )   if bUseGenericPerspectiveForResult   else InnerFragment( resultInTuple[0] )
 			return Paragraph( [ resultView ] ).alignHExpand()
 	else:
 		boxContents = []
 		if stderrText is not None:
-			boxContents.append( self.stderr( stderrText ) )
-		if exceptionView is not None:
-			boxContents.append( self.exception( exceptionView ) )
+			boxContents.append( execStderr( stderrText ) )
+		if exception is not None:
+			exceptionView = GenericPerspectiveInnerFragment( exception )   if bUseGenericPerspecitveForException   else InnerFragment( exception )
+			boxContents.append( execException( exceptionView ) )
 		if stdoutText is not None:
-			boxContents.append( self.stdout( stdoutText ) )
-		if resultView is not None:
-			boxContents.append( self.result( resultView ) )
+			boxContents.append( execStdout( stdoutText ) )
+		if resultInTuple is not None:
+			resultView = GenericPerspectiveInnerFragment( resultInTuple[0] )   if bUseGenericPerspectiveForResult   else InnerFragment( resultInTuple[0] )
+			boxContents.append( execResult( resultView ) )
 		
 		if len( boxContents ) > 0:
 			return ApplyStyleSheetFromAttribute( ExecutionStyle.resultBoxStyle, VBox( boxContents ).alignHExpand() )
