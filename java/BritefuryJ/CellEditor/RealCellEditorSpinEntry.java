@@ -7,8 +7,7 @@
 package BritefuryJ.CellEditor;
 
 import BritefuryJ.Cell.LiteralCell;
-import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
-import BritefuryJ.DocPresent.Controls.RealSpinEntry;
+import BritefuryJ.Controls.RealSpinEntry;
 
 public class RealCellEditorSpinEntry extends LiteralCellEditor
 {
@@ -17,22 +16,20 @@ public class RealCellEditorSpinEntry extends LiteralCellEditor
 		protected class Listener implements RealSpinEntry.RealSpinEntryListener
 		{
 			@Override
-			public void onSpinEntryValueChanged(RealSpinEntry spinEntry, double value)
+			public void onSpinEntryValueChanged(RealSpinEntry.RealSpinEntryControl spinEntry, double value)
 			{
 				setCellValue( value );
 			}
 		}
 		
-		private RealSpinEntry spinEntry;
-		
 		public RealEditor()
 		{
 			Double value = getCellValue( Double.class );
 			double v = value != null  ?  value  :  0.0;
-			spinEntry = styleSheet.realSpinEntry( v, min, max, stepSize, pageSize, new Listener() );
+			
 			if ( value != null )
 			{
-				setElement( spinEntry.getElement() );
+				setPres( new RealSpinEntry( v, min, max, stepSize, pageSize, new Listener() ) );
 			}
 			else
 			{
@@ -45,7 +42,7 @@ public class RealCellEditorSpinEntry extends LiteralCellEditor
 			Double value = getCellValue( Double.class );
 			if ( value != null )
 			{
-				spinEntry.setValue( value );
+				setPres( new RealSpinEntry( value, min, max, stepSize, pageSize, new Listener() ) );
 			}
 			else
 			{
@@ -55,14 +52,12 @@ public class RealCellEditorSpinEntry extends LiteralCellEditor
 	};
 	
 	
-	private ControlsStyleSheet styleSheet;
 	private double min, max, stepSize, pageSize;
 	
 	
-	public RealCellEditorSpinEntry(LiteralCell cell, ControlsStyleSheet styleSheet, double min, double max, double stepSize, double pageSize)
+	public RealCellEditorSpinEntry(LiteralCell cell, double min, double max, double stepSize, double pageSize)
 	{
 		super( cell );
-		this.styleSheet = styleSheet;
 		this.min = min;
 		this.max = max;
 		this.stepSize = stepSize;

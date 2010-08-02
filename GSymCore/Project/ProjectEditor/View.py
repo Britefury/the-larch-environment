@@ -37,7 +37,7 @@ from BritefuryJ.AttributeTable import *
 from BritefuryJ.DocPresent.Browser import Location
 from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.Painter import *
-from BritefuryJ.DocPresent.StyleSheet import StyleSheet2, PrimitiveStyleSheet, RichTextStyleSheet
+from BritefuryJ.DocPresent.StyleSheet import StyleSheet2
 from BritefuryJ.DocPresent.Input import ObjectDndHandler
 from BritefuryJ.Controls import *
 from BritefuryJ.DocPresent.Combinators.Primitive import *

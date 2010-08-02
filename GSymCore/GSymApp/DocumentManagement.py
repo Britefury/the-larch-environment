@@ -8,15 +8,13 @@
 import os
 
 from javax.swing import AbstractAction
-from javax.swing import JPopupMenu, JOptionPane, JFileChooser
+from javax.swing import JOptionPane, JFileChooser
 from javax.swing.filechooser import FileNameExtensionFilter
 
-from BritefuryJ.DocPresent.Controls import ControlsStyleSheet
+from BritefuryJ.Controls import *
 
 
 from Britefury.gSym.gSymDocument import GSymDocument
-
-_controlsStyle = ControlsStyleSheet.instance.withClosePopupOnActivate()
 
 
 
@@ -27,11 +25,10 @@ def promptNewDocument(world, element, handleNewDocumentFn):
 			unit = newUnitFn()
 			handleNewDocumentFn( unit )
 		return newDoc
-	newDocumentMenu = JPopupMenu( 'New document' )
 	items = []
 	for newUnitFactory in world.newUnitFactories:
-		items.append( _controlsStyle.menuItemWithLabel( newUnitFactory.menuLabelText, _make_newDocument( newUnitFactory.newDocumentFn ) ).getElement() )
-	newDocumentMenu = _controlsStyle.vpopupMenu( items )
+		items.append( MenuItem.menuItemWithLabel( newUnitFactory.menuLabelText, _make_newDocument( newUnitFactory.newDocumentFn ) ) )
+	newDocumentMenu = VPopupMenu( items )
 	
 	newDocumentMenu.popupToRightOf( element )
 
