@@ -60,7 +60,6 @@ def execStderr(text):
 	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdErrStyle, Border( _textLines( 'STDERR:', text ).alignHExpand() ).alignHExpand() )
 	
 def execException(exceptionView):
-	exceptionBorderStyle = self.exceptionBorderStyle()
 	label = ApplyStyleSheetFromAttribute( ExecutionStyle.labelStyle, StaticText( 'EXCEPTION:' ) )
 	return ApplyStyleSheetFromAttribute( ExecutionStyle.exceptionBorderStyle, Border( VBox( [ label, exceptionView.padX( 5.0, 0.0 ).alignHExpand() ] ).alignHExpand() ).alignHExpand() )
 
@@ -68,7 +67,7 @@ def execResult(resultView):
 	return ApplyStyleSheetFromAttribute( ExecutionStyle.resultBorderStyle, Border( Paragraph( [ resultView ] ).alignHExpand() ).alignHExpand() )
 
 
-def executionResult(ctx, style, stdoutText, stderrText, exception, resultInTuple, bUseGenericPerspecitveForException, bUseGenericPerspectiveForResult):
+def executionResultBox(stdoutText, stderrText, exception, resultInTuple, bUseGenericPerspecitveForException, bUseGenericPerspectiveForResult):
 	boxContents = []
 	if stderrText is not None:
 		boxContents.append( execStderr( stderrText ) )
@@ -87,7 +86,7 @@ def executionResult(ctx, style, stdoutText, stderrText, exception, resultInTuple
 		return None
 
 
-def minimalExecutionResult(ctx, style, stdoutText, stderrText, exception, resultInTuple, bUseGenericPerspecitveForException, bUseGenericPerspectiveForResult):
+def minimalExecutionResultBox(stdoutText, stderrText, exception, resultInTuple, bUseGenericPerspecitveForException, bUseGenericPerspectiveForResult):
 	if stdoutText is None  and  stderrText is None  and  exception is None:
 		if resultInTuple is None:
 			return None

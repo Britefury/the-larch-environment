@@ -208,7 +208,7 @@ class AppView (GSymViewObjectDispatch):
 		
 		head = Head( [ linkHeader, title ] )
 		body = Body( [ openDocumentsBox.pad( 10.0, 10.0 ).alignHLeft(), consolesBox.pad( 10.0, 10.0 ).alignHLeft() ] )
-		return Page( [ head, body ] )
+		return StyleSheet2.instance.withAttr( Primitive.editable, False ).applyTo( Page( [ head, body ] ) )
 
 
 

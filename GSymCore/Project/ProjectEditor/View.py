@@ -278,7 +278,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		head = Head( [ linkHeader, title ] )
 		body = Body( [ controlsBorder.pad( 5.0, 10.0 ).alignHLeft(), projectIndex ] )
 		
-		return Page( [ head, body ] )
+		return StyleSheet2.instance.withAttr( Primitive.editable, False ).applyTo( Page( [ head, body ] ) )
 
 
 	@DMObjectNodeDispatchMethod( Schema.Package )
