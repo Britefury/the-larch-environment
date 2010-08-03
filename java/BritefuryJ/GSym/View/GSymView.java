@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRegion;
@@ -108,11 +108,11 @@ public class GSymView extends IncrementalTree
 	{
 		protected GSymView view;
 		protected GSymAbstractPerspective perspective;
-		protected AttributeTable subjectContext;
+		protected SimpleAttributeTable subjectContext;
 		protected StyleValues style;
-		protected AttributeTable inheritedState;
+		protected SimpleAttributeTable inheritedState;
 		
-		public ViewFragmentContextAndResultFactory(GSymView view, GSymAbstractPerspective perspective, AttributeTable subjectContext, StyleValues style, AttributeTable inheritedState)
+		public ViewFragmentContextAndResultFactory(GSymView view, GSymAbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
 		{
 			this.view = view;
 			this.perspective = perspective;
@@ -166,12 +166,12 @@ public class GSymView extends IncrementalTree
 	protected static class ViewFragmentContextAndResultFactoryKey
 	{
 		private GSymAbstractPerspective perspective;
-		private AttributeTable subjectContext;
+		private SimpleAttributeTable subjectContext;
 		private StyleValues style;
-		private AttributeTable inheritedState;
+		private SimpleAttributeTable inheritedState;
 		
 		
-		public ViewFragmentContextAndResultFactoryKey(GSymAbstractPerspective perspective, AttributeTable subjectContext, StyleValues style, AttributeTable inheritedState)
+		public ViewFragmentContextAndResultFactoryKey(GSymAbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
 		{
 			this.perspective = perspective;
 			this.style = style;
@@ -289,7 +289,7 @@ public class GSymView extends IncrementalTree
 		return rootNodeResultFactory;
 	}
 
-	protected GSymFragmentView.NodeResultFactory makeNodeResultFactory(GSymAbstractPerspective perspective, AttributeTable subjectContext, StyleValues style, AttributeTable inheritedState)
+	protected GSymFragmentView.NodeResultFactory makeNodeResultFactory(GSymAbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
 	{
 		// Memoise the contents factory, keyed by  @nodeViewFunction and @state
 		ViewFragmentContextAndResultFactoryKey key = new ViewFragmentContextAndResultFactoryKey( perspective, subjectContext, style, inheritedState );

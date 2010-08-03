@@ -12,7 +12,7 @@ import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
@@ -1063,7 +1063,7 @@ public abstract class DPContainer extends DPElement
 	// Meta-element
 	//
 	
-	public Pres createMetaElement(GSymFragmentView ctx, AttributeTable state)
+	public Pres createMetaElement(GSymFragmentView ctx, SimpleAttributeTable state)
 	{
 		ArrayList<Object> metaChildren = new ArrayList<Object>();
 		for (DPElement child: getChildren())

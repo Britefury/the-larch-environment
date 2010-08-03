@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent.Combinators;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 import BritefuryJ.GSym.GSymAbstractPerspective;
@@ -14,11 +14,11 @@ import BritefuryJ.GSym.GSymAbstractPerspective;
 public class PerspectivePres extends Pres
 {
 	private GSymAbstractPerspective perspective;
-	private AttributeTable inheritedState;
+	private SimpleAttributeTable inheritedState;
 	private Pres child;
 	
 	
-	public PerspectivePres(GSymAbstractPerspective perspective, AttributeTable inheritedState, Object child)
+	public PerspectivePres(GSymAbstractPerspective perspective, SimpleAttributeTable inheritedState, Object child)
 	{
 		this.perspective = perspective;
 		this.inheritedState = inheritedState;

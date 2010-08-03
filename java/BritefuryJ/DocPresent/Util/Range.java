@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent.Util;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
@@ -174,7 +174,7 @@ public class Range implements IncrementalOwner, Presentable
 
 
 	@Override
-	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
+	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		incr.onAccess();
 		Pres rangeField = new HorizontalField( "Valid range:",

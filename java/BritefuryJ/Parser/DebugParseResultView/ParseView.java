@@ -12,7 +12,7 @@ import java.awt.geom.CubicCurve2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Controls.AspectRatioScrolledViewport;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementInteractor;
@@ -230,7 +230,7 @@ public class ParseView implements FragmentContext
 	
 	
 	
-	public static Pres presentDebugParseResult(DebugParseResultInterface x, GSymFragmentView fragment, AttributeTable inheritedState)
+	public static Pres presentDebugParseResult(DebugParseResultInterface x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		ParseView v = new ParseView( x, fragment.persistentState( "viewport " ) );
 		return v.pres.alignHExpand().alignVExpand();

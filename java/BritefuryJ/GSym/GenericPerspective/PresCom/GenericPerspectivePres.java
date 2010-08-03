@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.GSym.GenericPerspective.PresCom;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
@@ -16,11 +16,11 @@ import BritefuryJ.GSym.View.GSymFragmentView;
 
 public class GenericPerspectivePres extends Pres
 {
-	private AttributeTable inheritedState;
+	private SimpleAttributeTable inheritedState;
 	private Pres child;
 	
 	
-	public GenericPerspectivePres(AttributeTable inheritedState, Object child)
+	public GenericPerspectivePres(SimpleAttributeTable inheritedState, Object child)
 	{
 		this.inheritedState = inheritedState;
 		this.child = Pres.coerce( child );

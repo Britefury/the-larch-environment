@@ -8,11 +8,11 @@ package BritefuryJ.GSym.ObjectPresentation;
 
 import org.python.core.PyObject;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
 public interface PyObjectPresenter
 {
-	public Pres presentObject(PyObject x, GSymFragmentView fragment, AttributeTable inheritedState);
+	public Pres presentObject(PyObject x, GSymFragmentView fragment, SimpleAttributeTable inheritedState);
 }

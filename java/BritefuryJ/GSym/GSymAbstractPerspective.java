@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.GSym;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
@@ -32,21 +32,21 @@ public abstract class GSymAbstractPerspective
 
 		
 		@Override
-		public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
+		public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			return styleSheet.applyTo( new InnerFragment( model ) );
 		}
 	}
 	
 	
-	public abstract Pres present(Object x, GSymFragmentView fragment, AttributeTable inheritedState);
+	public abstract Pres present(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState);
 	
 	public StyleSheet2 getStyleSheet()
 	{
 		return StyleSheet2.instance;
 	}
 	
-	public abstract AttributeTable getInitialInheritedState();
+	public abstract SimpleAttributeTable getInitialInheritedState();
 	public abstract EditHandler getEditHandler();
 
 	public abstract GSymSubject resolveRelativeLocation(GSymSubject enclosingSubject, Location.TokenIterator locationIterator);

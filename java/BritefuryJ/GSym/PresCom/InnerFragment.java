@@ -9,7 +9,7 @@ package BritefuryJ.GSym.PresCom;
 import java.util.ArrayList;
 import java.util.List;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
@@ -19,7 +19,7 @@ import BritefuryJ.GSym.View.GSymFragmentView;
 public class InnerFragment extends Pres
 {
 	private Object model;
-	private AttributeTable inheritedState;
+	private SimpleAttributeTable inheritedState;
 	
 	
 	public InnerFragment(Object model)
@@ -28,7 +28,7 @@ public class InnerFragment extends Pres
 		this.inheritedState = null;
 	}
 	
-	public InnerFragment(Object model, AttributeTable inheritedState)
+	public InnerFragment(Object model, SimpleAttributeTable inheritedState)
 	{
 		this.model = model;
 		this.inheritedState = inheritedState;
@@ -67,7 +67,7 @@ public class InnerFragment extends Pres
 	}
 
 	
-	public static InnerFragment[] map(Object models[], AttributeTable inheritedState)
+	public static InnerFragment[] map(Object models[], SimpleAttributeTable inheritedState)
 	{
 		InnerFragment fragments[] = new InnerFragment[models.length];
 		for (int i = 0; i < models.length; i++)
@@ -77,7 +77,7 @@ public class InnerFragment extends Pres
 		return fragments;
 	}
 
-	public static List<InnerFragment> map(List<Object> models, AttributeTable inheritedState)
+	public static List<InnerFragment> map(List<Object> models, SimpleAttributeTable inheritedState)
 	{
 		ArrayList<InnerFragment> fragments = new ArrayList<InnerFragment>();
 		fragments.ensureCapacity( models.size() );

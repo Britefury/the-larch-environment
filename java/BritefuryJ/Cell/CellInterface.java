@@ -10,7 +10,7 @@ package BritefuryJ.Cell;
 
 import java.awt.Color;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
@@ -63,7 +63,7 @@ public abstract class CellInterface implements IncrementalOwner, Presentable
 	
 	
 	@Override
-	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
+	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return cellStyle.applyTo( new ObjectBox( getClass().getName(), new InnerFragment( getValue() ) ) );
 	}

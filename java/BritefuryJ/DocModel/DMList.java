@@ -22,7 +22,7 @@ import java.util.NoSuchElementException;
 import org.python.core.Py;
 import org.python.core.PySlice;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.CommandHistory.CommandTracker;
 import BritefuryJ.CommandHistory.CommandTrackerFactory;
 import BritefuryJ.CommandHistory.Trackable;
@@ -1169,7 +1169,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 
 
 	
-	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
+	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return DocModelPresenter.presentDMList( this, fragment, inheritedState );
 	}

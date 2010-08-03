@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent.Combinators;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.GSym.GSymAbstractPerspective;
 import BritefuryJ.GSym.View.GSymFragmentView;
@@ -15,14 +15,14 @@ public class PresentationContext
 {
 	private GSymFragmentView fragment = null;
 	private GSymAbstractPerspective perspective = null;
-	private AttributeTable inheritedState = null;
+	private SimpleAttributeTable inheritedState = null;
 	
 	
 	public PresentationContext()
 	{
 	}
 	
-	public PresentationContext(GSymFragmentView fragment, GSymAbstractPerspective perspective, AttributeTable inheritedState)
+	public PresentationContext(GSymFragmentView fragment, GSymAbstractPerspective perspective, SimpleAttributeTable inheritedState)
 	{
 		this.fragment = fragment;
 		this.perspective = perspective;
@@ -40,7 +40,7 @@ public class PresentationContext
 		return perspective;
 	}
 	
-	public AttributeTable getInheritedState()
+	public SimpleAttributeTable getInheritedState()
 	{
 		return inheritedState;
 	}

@@ -10,7 +10,7 @@ import java.awt.Color;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
@@ -132,7 +132,7 @@ public class Location implements Presentable
 
 
 		@Override
-		public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
+		public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			// TODO: Check for infinitely recursive nesting
 			return new LocationAsInnerFragement( loc );
@@ -217,7 +217,7 @@ public class Location implements Presentable
 	}
 
 
-	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
+	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return locationStyle.applyTo( new ObjectBox( "Location", new StaticText( locationString ) ) );
 	}

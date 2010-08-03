@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
@@ -252,7 +252,7 @@ public class ParseResult implements ParseResultInterface, Presentable
 
 
 	@Override
-	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
+	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		Pres fields[];
 		

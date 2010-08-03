@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.GSym.PresCom;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
@@ -18,7 +18,7 @@ public class PerspectiveInnerFragment extends Pres
 {
 	private GSymAbstractPerspective perspective;
 	private Object model;
-	private AttributeTable inheritedState;
+	private SimpleAttributeTable inheritedState;
 	
 	
 	public PerspectiveInnerFragment(GSymAbstractPerspective perspective, Object model)
@@ -28,7 +28,7 @@ public class PerspectiveInnerFragment extends Pres
 		this.inheritedState = null;
 	}
 	
-	public PerspectiveInnerFragment(GSymAbstractPerspective perspective, Object model, AttributeTable inheritedState)
+	public PerspectiveInnerFragment(GSymAbstractPerspective perspective, Object model, SimpleAttributeTable inheritedState)
 	{
 		this.perspective = perspective;
 		this.model = model;
