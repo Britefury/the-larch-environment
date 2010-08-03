@@ -10,7 +10,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class ErrorBorder extends Pres
@@ -27,7 +27,7 @@ public class ErrorBorder extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		StyleSheet2 borderStyle = style.get( GenericStyle.errorBorderStyle, StyleSheet2.class );
+		StyleSheet borderStyle = style.get( GenericStyle.errorBorderStyle, StyleSheet.class );
 		DPElement childElem = child.present( ctx, GenericStyle.useErrorBorderAttrs( style ) );
 		return borderStyle.applyTo( new Border( childElem ) ).present( ctx, style );
 	}

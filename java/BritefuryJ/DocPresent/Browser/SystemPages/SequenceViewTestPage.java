@@ -20,7 +20,7 @@ import BritefuryJ.DocPresent.Combinators.Sequence.ParagraphSequenceView;
 import BritefuryJ.DocPresent.Combinators.Sequence.TrailingSeparator;
 import BritefuryJ.DocPresent.Combinators.Sequence.VerticalInlineSequenceView;
 import BritefuryJ.DocPresent.Combinators.Sequence.VerticalSequenceView;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class SequenceViewTestPage extends SystemPage
 {
@@ -57,7 +57,7 @@ public class SequenceViewTestPage extends SystemPage
 		String[] texts = new String[] { "abcdef", "123456", "hello", "world", "this", "is", "a", "test", "of", "the", "list", "layout", "system" };
 		
 		
-		StyleSheet2 puncStyle = StyleSheet2.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
+		StyleSheet puncStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
 		Pres beginDelim = puncStyle.applyTo( new StaticText( "[" ) );
 		Pres endDelim = puncStyle.applyTo( new StaticText( "]" ) );
 		Pres separator = puncStyle.applyTo( new StaticText( "," ) );

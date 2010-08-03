@@ -24,19 +24,19 @@ from BritefuryJ.GSym.PresCom import InnerFragment
 class ExecutionStyle (object):
 	pythonExecution = AttributeNamespace( 'pythonExecution' )
 	
-	labelStyle = InheritedAttributeNonNull( pythonExecution, 'labelStyle', StyleSheet2,
-	                                          StyleSheet2.instance.withAttr( Primitive.fontSize, 10 ).withAttr( Primitive.foreground, Color.BLACK ) )
+	labelStyle = InheritedAttributeNonNull( pythonExecution, 'labelStyle', StyleSheet,
+	                                          StyleSheet.instance.withAttr( Primitive.fontSize, 10 ).withAttr( Primitive.foreground, Color.BLACK ) )
 	
-	stdOutStyle = InheritedAttributeNonNull( pythonExecution, 'stdOutStyle', StyleSheet2,
-	                                          StyleSheet2.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.0, 0.8, 0.0 ), Color.WHITE ) ).withAttr( Primitive.foreground, Color( 0.0, 0.5, 0.0 ) ) )
-	stdErrStyle = InheritedAttributeNonNull( pythonExecution, 'stdErrStyle', StyleSheet2,
-	                                          StyleSheet2.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 1.0, 0.5, 0.0 ), Color.WHITE ) ).withAttr( Primitive.foreground, Color( 0.75, 0.375, 0.0 ) ) )
-	exceptionBorderStyle = InheritedAttributeNonNull( pythonExecution, 'exceptionBorderStyle', StyleSheet2,
-	                                          StyleSheet2.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.8, 0.0, 0.0 ), Color( 1.0, 0.9, 0.9 ) ) ) )
-	resultBorderStyle = InheritedAttributeNonNull( pythonExecution, 'resultBorderStyle', StyleSheet2,
-	                                          StyleSheet2.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.0, 0.0, 0.8 ), Color.WHITE ) ) )
+	stdOutStyle = InheritedAttributeNonNull( pythonExecution, 'stdOutStyle', StyleSheet,
+	                                          StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.0, 0.8, 0.0 ), Color.WHITE ) ).withAttr( Primitive.foreground, Color( 0.0, 0.5, 0.0 ) ) )
+	stdErrStyle = InheritedAttributeNonNull( pythonExecution, 'stdErrStyle', StyleSheet,
+	                                          StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 1.0, 0.5, 0.0 ), Color.WHITE ) ).withAttr( Primitive.foreground, Color( 0.75, 0.375, 0.0 ) ) )
+	exceptionBorderStyle = InheritedAttributeNonNull( pythonExecution, 'exceptionBorderStyle', StyleSheet,
+	                                          StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.8, 0.0, 0.0 ), Color( 1.0, 0.9, 0.9 ) ) ) )
+	resultBorderStyle = InheritedAttributeNonNull( pythonExecution, 'resultBorderStyle', StyleSheet,
+	                                          StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.0, 0.0, 0.8 ), Color.WHITE ) ) )
 
-	resultBoxStyle = InheritedAttributeNonNull( pythonExecution, 'resultSpacing', StyleSheet2, StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 5.0 ) )
+	resultBoxStyle = InheritedAttributeNonNull( pythonExecution, 'resultSpacing', StyleSheet, StyleSheet.instance.withAttr( Primitive.vboxSpacing, 5.0 ) )
 
 
 	@PyDerivedValueTable( pythonExecution )

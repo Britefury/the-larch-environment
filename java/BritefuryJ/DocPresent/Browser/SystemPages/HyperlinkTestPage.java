@@ -21,7 +21,7 @@ import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
 import BritefuryJ.DocPresent.Combinators.RichText.NormalText;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class HyperlinkTestPage extends SystemPage
 {
@@ -67,15 +67,15 @@ public class HyperlinkTestPage extends SystemPage
 
 	
 
-	private static StyleSheet2 styleSheet = StyleSheet2.instance;
-	private static StyleSheet2 blackText = styleSheet.withAttr( Primitive.foreground, Color.black );
-	private static StyleSheet2 redText = styleSheet.withAttr( Primitive.foreground, Color.red );
-	private static StyleSheet2 greenText = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
+	private static StyleSheet styleSheet = StyleSheet.instance;
+	private static StyleSheet blackText = styleSheet.withAttr( Primitive.foreground, Color.black );
+	private static StyleSheet redText = styleSheet.withAttr( Primitive.foreground, Color.red );
+	private static StyleSheet greenText = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
 
 
 	
 	
-	private static Pres colouredText(StyleSheet2 style)
+	private static Pres colouredText(StyleSheet style)
 	{
 		return style.withAttr( Primitive.editable, false ).applyTo(
 				new NormalText( "Change the colour of this text, using the hyperlinks below." ) );

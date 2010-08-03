@@ -1282,4 +1282,4 @@ class Python25EditorRelativeLocationResolver (GSymRelativeLocationResolver):
 
 	
 _parser = Python25Grammar()
-perspective = GSymPerspective( Python25View( _parser ), StyleSheet2.instance, AttributeTable.instance, Python25EditHandler(), Python25EditorRelativeLocationResolver() )
+perspective = GSymPerspective( Python25View( _parser ), StyleSheet.instance, SimpleAttributeTable.instance, Python25EditHandler(), Python25EditorRelativeLocationResolver() )

@@ -15,7 +15,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.MathRoot;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class MathRootTestPage extends SystemPage
 {
@@ -36,9 +36,9 @@ public class MathRootTestPage extends SystemPage
 	}
 
 	
-	private static StyleSheet2 styleSheet = StyleSheet2.instance.withAttr( Primitive.editable, false );
-	private static StyleSheet2 rootStyleSheet = styleSheet.withAttr( Primitive.foreground, Color.black ).withAttr( Primitive.hoverForeground, new Color( 0.0f, 0.5f, 0.5f ) );
-	private static StyleSheet2 textStyleSheet = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) ).withAttr( Primitive.hoverForeground, null );
+	private static StyleSheet styleSheet = StyleSheet.instance.withAttr( Primitive.editable, false );
+	private static StyleSheet rootStyleSheet = styleSheet.withAttr( Primitive.foreground, Color.black ).withAttr( Primitive.hoverForeground, new Color( 0.0f, 0.5f, 0.5f ) );
+	private static StyleSheet textStyleSheet = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) ).withAttr( Primitive.hoverForeground, null );
 
 	
 	private Pres makeFraction(String numeratorText, String denominatorText)

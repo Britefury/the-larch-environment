@@ -16,7 +16,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Segment;
 import BritefuryJ.DocPresent.Combinators.Primitive.Span;
 import BritefuryJ.DocPresent.Combinators.Primitive.Text;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class SegmentTestPage extends SystemPage
 {
@@ -38,7 +38,7 @@ public class SegmentTestPage extends SystemPage
 	}
 
 
-	private static StyleSheet2 styleSheet = StyleSheet2.instance;
+	private static StyleSheet styleSheet = StyleSheet.instance;
 	
 	
 	

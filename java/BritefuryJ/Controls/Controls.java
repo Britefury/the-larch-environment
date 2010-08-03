@@ -12,7 +12,7 @@ import java.awt.Cursor;
 import java.awt.Paint;
 
 import BritefuryJ.AttributeTable.AttributeNamespace;
-import BritefuryJ.AttributeTable.AttributeTable2;
+import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.AttributeTable.DerivedValueTable;
 import BritefuryJ.AttributeTable.InheritedAttribute;
 import BritefuryJ.AttributeTable.InheritedAttributeNonNull;
@@ -24,7 +24,7 @@ import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.Painter.FilledOutlinePainter;
 import BritefuryJ.DocPresent.Painter.OutlinePainter;
 import BritefuryJ.DocPresent.Painter.Painter;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Controls
@@ -38,8 +38,8 @@ public class Controls
 			new SolidBorder( 1.0, 3.0, 10.0, 10.0, new Color( 0.0f, 0.5f, 0.5f ), new Color( 0.925f, 0.925f, 0.925f ) ) );
 	
 	
-	public static final InheritedAttributeNonNull hyperlinkAttrs = new InheritedAttributeNonNull( controlsNamespace, "hyperlinkAttrs", StyleSheet2.class,
-			StyleSheet2.instance.withAttr( Primitive.editable, false ).withAttr( Primitive.fontFace, "Sans serif" ).withAttr( Primitive.foreground, Color.blue )
+	public static final InheritedAttributeNonNull hyperlinkAttrs = new InheritedAttributeNonNull( controlsNamespace, "hyperlinkAttrs", StyleSheet.class,
+			StyleSheet.instance.withAttr( Primitive.editable, false ).withAttr( Primitive.fontFace, "Sans serif" ).withAttr( Primitive.foreground, Color.blue )
 			.withAttr( Primitive.hoverForeground, Color.red ).withAttr( Primitive.cursor, new Cursor( Cursor.HAND_CURSOR ) ) );
 
 	
@@ -68,13 +68,13 @@ public class Controls
 			new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.6f, 0.0f, 0.0f ), new Color( 1.0f, 0.85f, 0.85f ) ) );
 
 	
-	public static final InheritedAttributeNonNull textAreaAttrs = new InheritedAttributeNonNull( controlsNamespace, "textAreaAttrs", StyleSheet2.class,
-			StyleSheet2.instance.withAttr( Primitive.border, new SolidBorder( 2.0, 5.0, 3.0, 3.0, new Color( 0.3f, 0.3f, 0.3f ), null ) ) );
+	public static final InheritedAttributeNonNull textAreaAttrs = new InheritedAttributeNonNull( controlsNamespace, "textAreaAttrs", StyleSheet.class,
+			StyleSheet.instance.withAttr( Primitive.border, new SolidBorder( 2.0, 5.0, 3.0, 3.0, new Color( 0.3f, 0.3f, 0.3f ), null ) ) );
 
 	
 	public static final InheritedAttributeNonNull spinEntryArrowSize = new InheritedAttributeNonNull( controlsNamespace, "spinEntryArrowSize", Double.class, 16.0 );
-	public static final InheritedAttributeNonNull spinEntryArrowAttrs = new InheritedAttributeNonNull( controlsNamespace, "spinEntryArrowAttrs", StyleSheet2.class,
-			StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 2.0 ).
+	public static final InheritedAttributeNonNull spinEntryArrowAttrs = new InheritedAttributeNonNull( controlsNamespace, "spinEntryArrowAttrs", StyleSheet.class,
+			StyleSheet.instance.withAttr( Primitive.vboxSpacing, 2.0 ).
 			withAttr( Primitive.shapePainter, new FilledOutlinePainter( new Color( 0.7f, 0.85f, 0.7f ), new Color( 0.0f, 0.25f, 0.0f ), new BasicStroke( 1.0f ) ) ).
 			withAttr( Primitive.hoverShapePainter, new FilledOutlinePainter( new Color( 0.85f, 1.0f, 0.85f ), new Color( 0.0f, 0.45f, 0.0f ), new BasicStroke( 1.0f ) ) ) );
 	public static final InheritedAttributeNonNull spinEntryHSpacing = new InheritedAttributeNonNull( controlsNamespace, "spinEntryHSpacing", Double.class, 2.0 );
@@ -100,8 +100,8 @@ public class Controls
 			new FillPainter( new Color( 0.6f, 0.7f, 0.85f ) ) );
 	public static final InheritedAttributeNonNull menuItemXPadding = new InheritedAttributeNonNull( controlsNamespace, "menuItemXPadding", Double.class, 5.0 );
 	public static final InheritedAttributeNonNull menuItemYPadding = new InheritedAttributeNonNull( controlsNamespace, "menuItemYPadding", Double.class, 5.0 );
-	public static final InheritedAttributeNonNull popupMenuAttrs = new InheritedAttributeNonNull( controlsNamespace, "popupMenuAttrs", StyleSheet2.class,
-			StyleSheet2.instance.withAttr( Primitive.border, new SolidBorder( 1.0, 2.0, Color.black, null ) ).withAttr( Primitive.hboxSpacing, 10.0 ) );
+	public static final InheritedAttributeNonNull popupMenuAttrs = new InheritedAttributeNonNull( controlsNamespace, "popupMenuAttrs", StyleSheet.class,
+			StyleSheet.instance.withAttr( Primitive.border, new SolidBorder( 1.0, 2.0, Color.black, null ) ).withAttr( Primitive.hboxSpacing, 10.0 ) );
 
 	
 	public static final InheritedAttributeNonNull tooltipBorder = new InheritedAttributeNonNull( controlsNamespace, "tooltipBorder", AbstractBorder.class,
@@ -119,7 +119,7 @@ public class Controls
 	
 	public static StyleValues hyperlinkStyle(StyleValues style)
 	{
-		return style.withAttrs( style.get( hyperlinkAttrs, StyleSheet2.class ) );
+		return style.withAttrs( style.get( hyperlinkAttrs, StyleSheet.class ) );
 	}
 	
 	public static StyleValues useHyperlinkAttrs(StyleValues style)
@@ -128,13 +128,13 @@ public class Controls
 	}
 	
 	
-	protected static DerivedValueTable<StyleSheet2> checkboxStyle = new DerivedValueTable<StyleSheet2>( controlsNamespace )
+	protected static DerivedValueTable<StyleSheet> checkboxStyle = new DerivedValueTable<StyleSheet>( controlsNamespace )
 	{
-		protected StyleSheet2 evaluate(AttributeTable2 attribs)
+		protected StyleSheet evaluate(AttributeTable attribs)
 		{
 			double spacing = attribs.get( checkboxSpacing, Double.class );
 			Painter background = attribs.get( checkboxHoverBackground, Painter.class );
-			return StyleSheet2.instance.withAttr( Primitive.hoverBackground, background ).withAttr( Primitive.hboxSpacing, spacing );
+			return StyleSheet.instance.withAttr( Primitive.hoverBackground, background ).withAttr( Primitive.hboxSpacing, spacing );
 		}
 	};
 
@@ -159,13 +159,13 @@ public class Controls
 	
 	
 	
-	protected static DerivedValueTable<StyleSheet2> scrollBarDragBoxStyle = new DerivedValueTable<StyleSheet2>( controlsNamespace )
+	protected static DerivedValueTable<StyleSheet> scrollBarDragBoxStyle = new DerivedValueTable<StyleSheet>( controlsNamespace )
 	{
-		protected StyleSheet2 evaluate(AttributeTable2 attribs)
+		protected StyleSheet evaluate(AttributeTable attribs)
 		{
 			Painter backgroundPainter = attribs.get( scrollBarDragBarBackgroundPainter, Painter.class );
 			Painter backgroundHoverPainter = attribs.get( scrollBarDragBackgroundHoverPainter, Painter.class );
-			return StyleSheet2.instance.withAttr( Primitive.shapePainter, backgroundPainter ).withAttr( Primitive.hoverShapePainter, backgroundHoverPainter );
+			return StyleSheet.instance.withAttr( Primitive.shapePainter, backgroundPainter ).withAttr( Primitive.hoverShapePainter, backgroundHoverPainter );
 		}
 	};
 
@@ -179,7 +179,7 @@ public class Controls
 	
 	public static StyleValues popupMenuStyle(StyleValues style)
 	{
-		return style.withAttrs( style.get( popupMenuAttrs, StyleSheet2.class ) );
+		return style.withAttrs( style.get( popupMenuAttrs, StyleSheet.class ) );
 	}
 	
 	public static StyleValues usePopupMenuAttrs(StyleValues style)

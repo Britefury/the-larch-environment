@@ -25,16 +25,16 @@ import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Painter.FillPainter;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 import BritefuryJ.Math.Point2;
 
 public class NonLocalDndTestPage extends SystemPage
 {
-	private static StyleSheet2 styleSheet = StyleSheet2.instance;
-	private static StyleSheet2 textStyle = styleSheet.withAttr( Primitive.fontSize, 18 );
+	private static StyleSheet styleSheet = StyleSheet.instance;
+	private static StyleSheet textStyle = styleSheet.withAttr( Primitive.fontSize, 18 );
 	
-	private static StyleSheet2 placeHolderStyle = styleSheet.withAttr( Primitive.background, new FillPainter( new Color( 1.0f, 0.9f, 0.75f  ) ) );
+	private static StyleSheet placeHolderStyle = styleSheet.withAttr( Primitive.background, new FillPainter( new Color( 1.0f, 0.9f, 0.75f  ) ) );
 	
 	
 	protected NonLocalDndTestPage()

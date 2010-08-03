@@ -9,11 +9,11 @@ package BritefuryJ.DocPresent.StyleSheet;
 import java.util.HashMap;
 
 import BritefuryJ.AttributeTable.AttributeBase;
-import BritefuryJ.AttributeTable.AttributeTable2;
+import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.Combinators.ApplyStyleSheetValues;
 import BritefuryJ.DocPresent.Combinators.Pres;
 
-public class StyleValues extends AttributeTable2
+public class StyleValues extends AttributeTable
 {
 	public static StyleValues instance = new StyleValues();
 	
@@ -48,17 +48,17 @@ public class StyleValues extends AttributeTable2
 		return (StyleValues)super.withAttrs( valuesMap );
 	}
 		
-	public StyleValues withAttrs(AttributeTable2 attribs)
+	public StyleValues withAttrs(AttributeTable attribs)
 	{
 		return (StyleValues)super.withAttrs( attribs );
 	}
 		
-	public StyleValues withAttrFrom(AttributeBase destAttr, AttributeTable2 srcTable, AttributeBase srcAttr)
+	public StyleValues withAttrFrom(AttributeBase destAttr, AttributeTable srcTable, AttributeBase srcAttr)
 	{
 		return (StyleValues)super.withAttrFrom( destAttr, srcTable, srcAttr );
 	}
 	
-	public StyleValues withAttrsFrom(AttributeTable2 srcTable, AttributeBase srcAttr)
+	public StyleValues withAttrsFrom(AttributeTable srcTable, AttributeBase srcAttr)
 	{
 		return (StyleValues)super.withAttrsFrom( srcTable, srcAttr );
 	}

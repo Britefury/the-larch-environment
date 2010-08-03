@@ -12,21 +12,21 @@ import BritefuryJ.AttributeTable.AttributeNamespace;
 import BritefuryJ.AttributeTable.AttributeNonNull;
 import BritefuryJ.AttributeTable.AttributeUsageSet;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class ContextMenuStyle
 {
 	public static final AttributeNamespace contextMenuNamespace = new AttributeNamespace( "contextMenu" );
 	
 	
-	public static final AttributeNonNull sectionTitleStyle = new AttributeNonNull( contextMenuNamespace, "sectionTitleStyle", StyleSheet2.class,
-			StyleSheet2.instance.withAttr( Primitive.fontSize, 16 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.3f, 0.5f ) ).withAttr( Primitive.fontBold, true ) );
-	public static final AttributeNonNull sectionVBoxStyle = new AttributeNonNull( contextMenuNamespace, "sectionVBoxStyle", StyleSheet2.class,
-			StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 5.0 ) );
-	public static final AttributeNonNull controlsHBoxStyle = new AttributeNonNull( contextMenuNamespace, "controlsHBoxStyle", StyleSheet2.class,
-			StyleSheet2.instance.withAttr( Primitive.hboxSpacing, 10.0 ) );
-	public static final AttributeNonNull controlsVBoxStyle = new AttributeNonNull( contextMenuNamespace, "sectionVBoxStyle", StyleSheet2.class,
-			StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 2.0 ) );
+	public static final AttributeNonNull sectionTitleStyle = new AttributeNonNull( contextMenuNamespace, "sectionTitleStyle", StyleSheet.class,
+			StyleSheet.instance.withAttr( Primitive.fontSize, 16 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.3f, 0.5f ) ).withAttr( Primitive.fontBold, true ) );
+	public static final AttributeNonNull sectionVBoxStyle = new AttributeNonNull( contextMenuNamespace, "sectionVBoxStyle", StyleSheet.class,
+			StyleSheet.instance.withAttr( Primitive.vboxSpacing, 5.0 ) );
+	public static final AttributeNonNull controlsHBoxStyle = new AttributeNonNull( contextMenuNamespace, "controlsHBoxStyle", StyleSheet.class,
+			StyleSheet.instance.withAttr( Primitive.hboxSpacing, 10.0 ) );
+	public static final AttributeNonNull controlsVBoxStyle = new AttributeNonNull( contextMenuNamespace, "sectionVBoxStyle", StyleSheet.class,
+			StyleSheet.instance.withAttr( Primitive.vboxSpacing, 2.0 ) );
 	
 	
 	

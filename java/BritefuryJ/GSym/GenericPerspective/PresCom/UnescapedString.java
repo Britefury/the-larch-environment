@@ -13,7 +13,7 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.LineBreak;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public abstract class UnescapedString extends Pres
@@ -30,8 +30,8 @@ public abstract class UnescapedString extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		StyleSheet2 escapeStyle = style.get( GenericStyle.stringEscapeStyle, StyleSheet2.class );
-		StyleSheet2 contentStyle = style.get( GenericStyle.stringContentStyle, StyleSheet2.class );
+		StyleSheet escapeStyle = style.get( GenericStyle.stringEscapeStyle, StyleSheet.class );
+		StyleSheet contentStyle = style.get( GenericStyle.stringContentStyle, StyleSheet.class );
 
 		ArrayList<Object> elements = new ArrayList<Object>();
 		// Break the string up into escaped and not escaped items

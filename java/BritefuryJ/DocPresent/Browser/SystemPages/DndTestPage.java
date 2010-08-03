@@ -30,19 +30,19 @@ import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Painter.FillPainter;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.Math.Point2;
 
 public class DndTestPage extends SystemPage
 {
-	private static StyleSheet2 mainStyle = StyleSheet2.instance;
-	private static StyleSheet2 mathStyle = StyleSheet2.instance.withAttr( Primitive.fontSize, 16 ).withAttr( Primitive.editable, false );
-	private static StyleSheet2 paletteTitleStyle = mainStyle.withAttr( Primitive.fontFace, "Serif" ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 28 );
-	private static StyleSheet2 paletteSectionStyle = mainStyle.withAttr( Primitive.fontFace, "Serif" ).withAttr( Primitive.fontSize, 18 );
-	private static StyleSheet2 outlineStyle = mainStyle.withAttr( Primitive.border, new SolidBorder( 2.0, 10.0, new Color( 0.6f, 0.7f, 0.8f ), null ) );
+	private static StyleSheet mainStyle = StyleSheet.instance;
+	private static StyleSheet mathStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 16 ).withAttr( Primitive.editable, false );
+	private static StyleSheet paletteTitleStyle = mainStyle.withAttr( Primitive.fontFace, "Serif" ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 28 );
+	private static StyleSheet paletteSectionStyle = mainStyle.withAttr( Primitive.fontFace, "Serif" ).withAttr( Primitive.fontSize, 18 );
+	private static StyleSheet outlineStyle = mainStyle.withAttr( Primitive.border, new SolidBorder( 2.0, 10.0, new Color( 0.6f, 0.7f, 0.8f ), null ) );
 	
-	private static StyleSheet2 placeHolderStyle = mainStyle.withAttr( Primitive.background, new FillPainter( new Color( 1.0f, 0.9f, 0.75f  ) ) );
-	private static StyleSheet2 sourceStyle = mainStyle.withAttr( Primitive.background, new FillPainter( new Color( 0.75f, 0.85f, 1.0f ) ) );
+	private static StyleSheet placeHolderStyle = mainStyle.withAttr( Primitive.background, new FillPainter( new Color( 1.0f, 0.9f, 0.75f  ) ) );
+	private static StyleSheet sourceStyle = mainStyle.withAttr( Primitive.background, new FillPainter( new Color( 0.75f, 0.85f, 1.0f ) ) );
 
 	
 	protected DndTestPage()

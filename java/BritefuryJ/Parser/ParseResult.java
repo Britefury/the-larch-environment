@@ -16,7 +16,7 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
 import BritefuryJ.GSym.GenericPerspective.PresCom.HorizontalField;
@@ -278,8 +278,8 @@ public class ParseResult implements ParseResultInterface, Presentable
 	}
 
 
-	private static StyleSheet2 successStyle = StyleSheet2.instance.withAttr( Primitive.fontItalic, true ).withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
-	private static StyleSheet2 failStyle = StyleSheet2.instance.withAttr( Primitive.fontItalic, true ).withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.0f ) );
-	private static StyleSheet2 rangeStyle = StyleSheet2.instance.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.5f ) );
-	private static StyleSheet2 parseResultStyle = StyleSheet2.instance.withAttr( GenericStyle.objectTitlePaint, new Color( 0.4f, 0.4f, 0.4f ) ).withAttr( GenericStyle.objectBorderPaint, new Color( 0.6f, 0.6f, 0.6f ) );
+	private static StyleSheet successStyle = StyleSheet.instance.withAttr( Primitive.fontItalic, true ).withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
+	private static StyleSheet failStyle = StyleSheet.instance.withAttr( Primitive.fontItalic, true ).withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.0f ) );
+	private static StyleSheet rangeStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.5f ) );
+	private static StyleSheet parseResultStyle = StyleSheet.instance.withAttr( GenericStyle.objectTitlePaint, new Color( 0.4f, 0.4f, 0.4f ) ).withAttr( GenericStyle.objectBorderPaint, new Color( 0.6f, 0.6f, 0.6f ) );
 }

@@ -19,7 +19,7 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
@@ -226,7 +226,7 @@ public class StreamValue implements Presentable
 		}
 
 	
-		private static StyleSheet2 borderStyle = StyleSheet2.instance.withAttr( Primitive.border, new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.15f, 0.25f, 0.75f ), null ) ); 
+		private static StyleSheet borderStyle = StyleSheet.instance.withAttr( Primitive.border, new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.15f, 0.25f, 0.75f ), null ) ); 
 	}
 	
 	
@@ -581,5 +581,5 @@ public class StreamValue implements Presentable
 	}
 
 
-	private static StyleSheet2 streamValueStyle = StyleSheet2.instance.withAttr( GenericStyle.objectBorderPaint,new Color( 0.65f, 0.0f, 0.55f ) ).withAttr( GenericStyle.objectTitlePaint,new Color( 0.65f, 0.0f, 0.55f ) );
+	private static StyleSheet streamValueStyle = StyleSheet.instance.withAttr( GenericStyle.objectBorderPaint,new Color( 0.65f, 0.0f, 0.55f ) ).withAttr( GenericStyle.objectTitlePaint,new Color( 0.65f, 0.0f, 0.55f ) );
 }

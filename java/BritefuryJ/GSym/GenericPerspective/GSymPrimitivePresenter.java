@@ -17,7 +17,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Script;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Painter.FillPainter;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.PresCom.UnescapedStringAsSpan;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
@@ -134,11 +134,11 @@ public class GSymPrimitivePresenter
 		}
 	}
 	
-	private static final StyleSheet2 punctuationStyle = StyleSheet2.instance.withAttr( Primitive.foreground, Color.blue );
-	private static final StyleSheet2 charStyle = StyleSheet2.instance; 
-	private static final StyleSheet2 multiLineStringStyle = StyleSheet2.instance.withAttr( Primitive.background, new FillPainter( new Color( 1.0f, 1.0f, 0.75f ) ) );
-	private static final StyleSheet2 integerStyle = StyleSheet2.instance.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.5f ) );
-	private static final StyleSheet2 floatStyle = StyleSheet2.instance.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
-	private static final StyleSheet2 booleanStyle = StyleSheet2.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) ).withAttr( Primitive.textSmallCaps, true );
-	private static final StyleSheet2 nullStyle = StyleSheet2.instance.withAttr( Primitive.foreground, new Color( 0.75f, 0.0f, 0.5f ) ).withAttr( Primitive.textSmallCaps, true );
+	private static final StyleSheet punctuationStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color.blue );
+	private static final StyleSheet charStyle = StyleSheet.instance; 
+	private static final StyleSheet multiLineStringStyle = StyleSheet.instance.withAttr( Primitive.background, new FillPainter( new Color( 1.0f, 1.0f, 0.75f ) ) );
+	private static final StyleSheet integerStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.5f ) );
+	private static final StyleSheet floatStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
+	private static final StyleSheet booleanStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) ).withAttr( Primitive.textSmallCaps, true );
+	private static final StyleSheet nullStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.75f, 0.0f, 0.5f ) ).withAttr( Primitive.textSmallCaps, true );
 }

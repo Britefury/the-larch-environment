@@ -25,7 +25,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Text;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class ProxyAndSpanTestPage extends SystemPage
 {
@@ -47,11 +47,11 @@ public class ProxyAndSpanTestPage extends SystemPage
 
 	
 
-	private static StyleSheet2 styleSheet = StyleSheet2.instance;
-	private static StyleSheet2 blackText = styleSheet.withAttr( Primitive.foreground, Color.black );
-	private static StyleSheet2 redText = styleSheet.withAttr( Primitive.foreground, Color.red );
-	private static StyleSheet2 greenText = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
-	private static StyleSheet2 seaGreenText = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.5f ) );
+	private static StyleSheet styleSheet = StyleSheet.instance;
+	private static StyleSheet blackText = styleSheet.withAttr( Primitive.foreground, Color.black );
+	private static StyleSheet redText = styleSheet.withAttr( Primitive.foreground, Color.red );
+	private static StyleSheet greenText = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
+	private static StyleSheet seaGreenText = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.5f ) );
 
 	
 	protected ArrayList<Object> makeTextNodes(String text)

@@ -14,7 +14,7 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.GenericPerspective.PresCom.HorizontalField;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBoxWithFields;
@@ -190,6 +190,6 @@ public class Range implements IncrementalOwner, Presentable
 	}
 	
 	
-	private final static StyleSheet2 numValueStyle = StyleSheet2.instance.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.25f ) );
+	private final static StyleSheet numValueStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.25f ) );
 };
 

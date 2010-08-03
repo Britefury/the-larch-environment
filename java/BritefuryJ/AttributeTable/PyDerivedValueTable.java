@@ -25,7 +25,7 @@ public class PyDerivedValueTable
 
 
 		@Override
-		protected Object evaluate(AttributeTable2 attribs)
+		protected Object evaluate(AttributeTable attribs)
 		{
 			PyObject result = callable.__call__( Py.java2py( attribs ) );
 			return Py.tojava( result, Object.class );

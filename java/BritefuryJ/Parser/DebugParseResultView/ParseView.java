@@ -23,7 +23,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -238,5 +238,5 @@ public class ParseView implements FragmentContext
 
 
 
-	private final static StyleSheet2 viewportBorderStyle = StyleSheet2.instance.withAttr( Primitive.border, new SolidBorder( 2.0, 2.0, 5.0, 5.0, Color.black, null ) );
+	private final static StyleSheet viewportBorderStyle = StyleSheet.instance.withAttr( Primitive.border, new SolidBorder( 2.0, 2.0, 5.0, 5.0, Color.black, null ) );
 }

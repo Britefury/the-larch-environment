@@ -20,7 +20,7 @@ import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Head;
 import BritefuryJ.DocPresent.Combinators.RichText.TitleBar;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class BrowserContext
 {
@@ -100,7 +100,7 @@ public class BrowserContext
 			Pres linkHeader = SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_SYSTEMPAGE );
 			Pres title = new TitleBar( "Default Root Page" );
 			
-			Pres contents = StyleSheet2.instance.withAttr( Primitive.fontSize, 16 ).applyTo( new StaticText( "Empty document" ) ).alignHCentre();
+			Pres contents = StyleSheet.instance.withAttr( Primitive.fontSize, 16 ).applyTo( new StaticText( "Empty document" ) ).alignHCentre();
 			
 			Pres head = new Head( new Pres[] { linkHeader, title } );
 			
@@ -127,7 +127,7 @@ public class BrowserContext
 
 		public DPElement getContentsElement()
 		{
-			StyleSheet2 contentsStyle = StyleSheet2.instance.withAttr( Primitive.fontSize, 16 );
+			StyleSheet contentsStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 16 );
 			Pres linkHeader = SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_SYSTEMPAGE );
 			Pres title = new TitleBar( "Could Not Resolve Location" );
 			Pres head = new Head( new Pres[] { linkHeader, title } );

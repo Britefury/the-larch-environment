@@ -15,7 +15,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Text;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class ParagraphTestPage extends SystemPage
 {
@@ -65,7 +65,7 @@ public class ParagraphTestPage extends SystemPage
 	}
 	
 	
-	protected Pres makeParagraph(String title, int lineBreakStep, StyleSheet2 style)
+	protected Pres makeParagraph(String title, int lineBreakStep, StyleSheet style)
 	{
 		ArrayList<Object> children = makeTextNodes( title + ": " + textBlock );
 		if ( lineBreakStep > 0 )
@@ -75,7 +75,7 @@ public class ParagraphTestPage extends SystemPage
 		return style.applyTo( new Paragraph( children ) );
 	}
 	
-	protected Pres makeParagraphWithNestedPara(String title, int lineBreakStep, StyleSheet2 textStyle, StyleSheet2 nestedTextStyle)
+	protected Pres makeParagraphWithNestedPara(String title, int lineBreakStep, StyleSheet textStyle, StyleSheet nestedTextStyle)
 	{
 		ArrayList<Object> children = makeTextNodes( title + ": " + textBlock );
 		children = addLineBreaks( children, lineBreakStep );
@@ -86,8 +86,8 @@ public class ParagraphTestPage extends SystemPage
 	
 	protected Pres createContents()
 	{
-		StyleSheet2 blackText = StyleSheet2.instance.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, Color.black );
-		StyleSheet2 redText = StyleSheet2.instance.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, Color.red );
+		StyleSheet blackText = StyleSheet.instance.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, Color.black );
+		StyleSheet redText = StyleSheet.instance.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, Color.red );
 		
 		Pres b2 = makeParagraph( "PER-WORD", 1, blackText );
 		Pres b3 = makeParagraph( "EVERY-4-WORDS", 4, blackText);

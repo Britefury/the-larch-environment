@@ -12,7 +12,7 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Text;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class TextTestPage extends SystemPage
 {
@@ -34,10 +34,10 @@ public class TextTestPage extends SystemPage
 	
 	
 	
-	private static StyleSheet2 styleSheet = StyleSheet2.instance;
-	private static StyleSheet2 smallCapsStyle = styleSheet.withAttr( Primitive.textSmallCaps, true );
-	private static StyleSheet2 redUnderlineStyle = styleSheet.withAttr( Primitive.textSquiggleUnderlinePaint, Color.red );
-	private static StyleSheet2 hoverStyle = styleSheet.withAttr( Primitive.hoverForeground, new Color( 0.0f, 0.5f, 0.5f ) );
+	private static StyleSheet styleSheet = StyleSheet.instance;
+	private static StyleSheet smallCapsStyle = styleSheet.withAttr( Primitive.textSmallCaps, true );
+	private static StyleSheet redUnderlineStyle = styleSheet.withAttr( Primitive.textSquiggleUnderlinePaint, Color.red );
+	private static StyleSheet hoverStyle = styleSheet.withAttr( Primitive.hoverForeground, new Color( 0.0f, 0.5f, 0.5f ) );
 
 	
 	

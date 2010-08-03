@@ -50,8 +50,8 @@ from GSymCore.PythonConsole import Console
 
 _appDocRightPadding = 30.0
 _controlsPadding = 5.0
-_appDocumentControlsStyle = StyleSheet2.instance.withAttr( Primitive.hboxSpacing, 20.0 ).withAttr( Primitive.border, FilledBorder( 5.0, 5.0, 5.0, 5.0, Color( 0.9, 0.9, 0.9 ) ) )
-_dcumentListTableStyle = StyleSheet2.instance.withAttr( Primitive.tableColumnSpacing, 15.0 ).withAttr( Primitive.tableRowSpacing, 5.0 )
+_appDocumentControlsStyle = StyleSheet.instance.withAttr( Primitive.hboxSpacing, 20.0 ).withAttr( Primitive.border, FilledBorder( 5.0, 5.0, 5.0, 5.0, Color( 0.9, 0.9, 0.9 ) ) )
+_dcumentListTableStyle = StyleSheet.instance.withAttr( Primitive.tableColumnSpacing, 15.0 ).withAttr( Primitive.tableRowSpacing, 5.0 )
 
 
 
@@ -208,7 +208,7 @@ class AppView (GSymViewObjectDispatch):
 		
 		head = Head( [ linkHeader, title ] )
 		body = Body( [ openDocumentsBox.pad( 10.0, 10.0 ).alignHLeft(), consolesBox.pad( 10.0, 10.0 ).alignHLeft() ] )
-		return StyleSheet2.instance.withAttr( Primitive.editable, False ).applyTo( Page( [ head, body ] ) )
+		return StyleSheet.instance.withAttr( Primitive.editable, False ).applyTo( Page( [ head, body ] ) )
 
 
 
@@ -298,7 +298,7 @@ class GSymAppRelativeLocationResolver (GSymRelativeLocationResolver):
 			return None
 
 
-perspective = GSymPerspective( AppView(), StyleSheet2.instance, AttributeTable.instance, None, GSymAppRelativeLocationResolver() )
+perspective = GSymPerspective( AppView(), StyleSheet.instance, SimpleAttributeTable.instance, None, GSymAppRelativeLocationResolver() )
 
 	
 	

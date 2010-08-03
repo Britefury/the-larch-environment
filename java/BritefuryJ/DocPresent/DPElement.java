@@ -51,7 +51,7 @@ import BritefuryJ.DocPresent.Painter.Painter;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GSymPerspective;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.ObjectPresentation.PresentationStateListenerList;
@@ -3141,13 +3141,13 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	// Meta-element
 	//
 	
-	protected static StyleSheet2 headerDebugTextStyle = StyleSheet2.instance.withAttr( Primitive.fontBold, true ).withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.5f ) );
-	protected static StyleSheet2 headerDescriptionTextStyle = StyleSheet2.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.75f ) );
-	protected static StyleSheet2 metaHeaderHBoxStyle = StyleSheet2.instance.withAttr( Primitive.hboxSpacing, 10.0 );
-	protected static StyleSheet2 metaHeaderEmptyBorderStyle = StyleSheet2.instance.withAttr( Primitive.border, new FilledBorder() );
+	protected static StyleSheet headerDebugTextStyle = StyleSheet.instance.withAttr( Primitive.fontBold, true ).withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.5f ) );
+	protected static StyleSheet headerDescriptionTextStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.75f ) );
+	protected static StyleSheet metaHeaderHBoxStyle = StyleSheet.instance.withAttr( Primitive.hboxSpacing, 10.0 );
+	protected static StyleSheet metaHeaderEmptyBorderStyle = StyleSheet.instance.withAttr( Primitive.border, new FilledBorder() );
 
 
-	protected StyleSheet2 getDebugPresentationHeaderBorderStyle()
+	protected StyleSheet getDebugPresentationHeaderBorderStyle()
 	{
 		return metaHeaderEmptyBorderStyle;
 	}
@@ -3210,6 +3210,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	
 	
-	private static final StyleSheet2 alreadyInUseStyle = StyleSheet2.instance.withAttr( Primitive.foreground, new Color( 0.75f, 0.0f, 0.0f ) ).withAttr( Primitive.border,
+	private static final StyleSheet alreadyInUseStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.75f, 0.0f, 0.0f ) ).withAttr( Primitive.border,
 			new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.75f, 0.0f, 0.0f ), null ) );
 }

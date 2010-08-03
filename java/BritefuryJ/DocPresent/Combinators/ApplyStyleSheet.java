@@ -7,16 +7,16 @@
 package BritefuryJ.DocPresent.Combinators;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class ApplyStyleSheet extends Pres
 {
-	private StyleSheet2 styleSheet;
+	private StyleSheet styleSheet;
 	private Pres child;
 	
 	
-	public ApplyStyleSheet(StyleSheet2 styleSheet, Object child)
+	public ApplyStyleSheet(StyleSheet styleSheet, Object child)
 	{
 		this.styleSheet = styleSheet;
 		this.child = coerce( child );

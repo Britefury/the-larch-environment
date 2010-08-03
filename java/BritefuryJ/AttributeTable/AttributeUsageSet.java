@@ -36,7 +36,7 @@ public class AttributeUsageSet
 	
 	
 	@SuppressWarnings("unchecked")
-	public <T extends AttributeTable2> T useAttrs(T table)
+	public <T extends AttributeTable> T useAttrs(T table)
 	{
 		for (AttributeBase attr: attributes)
 		{

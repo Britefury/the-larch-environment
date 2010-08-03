@@ -26,7 +26,7 @@ import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
 import BritefuryJ.DocPresent.Combinators.RichText.Heading4;
 import BritefuryJ.DocPresent.Combinators.RichText.LinkHeaderBar;
 import BritefuryJ.DocPresent.Combinators.RichText.TitleBar;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class SystemRootPage extends Page
 {
@@ -50,7 +50,7 @@ public class SystemRootPage extends Page
 	
 
 	
-	private static StyleSheet2 outlineStyle = StyleSheet2.instance.withAttr( Primitive.border, new SolidBorder( 2.0, 10.0, new Color( 0.6f, 0.7f, 0.8f ), null ) );
+	private static StyleSheet outlineStyle = StyleSheet.instance.withAttr( Primitive.border, new SolidBorder( 2.0, 10.0, new Color( 0.6f, 0.7f, 0.8f ), null ) );
 
 	
 	

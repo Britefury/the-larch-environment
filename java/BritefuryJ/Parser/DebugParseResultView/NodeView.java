@@ -30,7 +30,7 @@ import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.ParserHelpers.DebugNode;
 import BritefuryJ.ParserHelpers.ParseResultInterface;
@@ -113,14 +113,14 @@ public class NodeView implements FragmentContext
 	
 	static int MAX_STRING_LENGTH = 64;
 	
-	private static final StyleSheet2 styleSheet = StyleSheet2.instance;
+	private static final StyleSheet styleSheet = StyleSheet.instance;
 
-	private static final StyleSheet2 debugNameStyle = styleSheet.withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 24 ).withAttr( Primitive.foreground,  Color.blue );
-	private static final StyleSheet2 classNameStyle = styleSheet.withAttr( Primitive.fontSize, 18 ).withAttr( Primitive.foreground,  new Color( 0.0f, 0.0f, 0.5f ) );
-	private static final StyleSheet2 rangeStyle = styleSheet.withAttr( Primitive.fontSize, 12 );
-	private static final StyleSheet2 inputStyle = styleSheet.withAttr( Primitive.fontSize, 12 );
-	private static final StyleSheet2 valueStyle = styleSheet.withAttr( Primitive.fontSize, 16 );
-	private static final StyleSheet2 failStyle = styleSheet.withAttr( Primitive.fontItalic,  true ).withAttr( Primitive.fontSize, 16 ).withAttr( Primitive.foreground,  new Color( 0.5f, 0.0f, 0.0f ) );
+	private static final StyleSheet debugNameStyle = styleSheet.withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 24 ).withAttr( Primitive.foreground,  Color.blue );
+	private static final StyleSheet classNameStyle = styleSheet.withAttr( Primitive.fontSize, 18 ).withAttr( Primitive.foreground,  new Color( 0.0f, 0.0f, 0.5f ) );
+	private static final StyleSheet rangeStyle = styleSheet.withAttr( Primitive.fontSize, 12 );
+	private static final StyleSheet inputStyle = styleSheet.withAttr( Primitive.fontSize, 12 );
+	private static final StyleSheet valueStyle = styleSheet.withAttr( Primitive.fontSize, 16 );
+	private static final StyleSheet failStyle = styleSheet.withAttr( Primitive.fontItalic,  true ).withAttr( Primitive.fontSize, 16 ).withAttr( Primitive.foreground,  new Color( 0.5f, 0.0f, 0.0f ) );
 	
 	private static final AbstractBorder titleSuccessBorder = new FilledBorder( 0.0, 0.0, 0.0, 0.0, new Color( 0.85f, 0.95f, 0.85f ) );
 	private static final AbstractBorder titleFailBorder = new FilledBorder( 0.0, 0.0, 0.0, 0.0, new Color( 1.0f, 0.85f, 0.85f ) );

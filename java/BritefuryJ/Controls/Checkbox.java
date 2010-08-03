@@ -18,7 +18,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
 import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Spacer;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Checkbox extends ControlPres
@@ -113,8 +113,8 @@ public class Checkbox extends ControlPres
 	@Override
 	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
-		StyleSheet2 checkStyle = StyleSheet2.instance.withAttr( Primitive.border, style.get( Controls.checkboxCheckBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class ) );
-		StyleSheet2 checkboxStyle = Controls.checkboxStyle.get( style );
+		StyleSheet checkStyle = StyleSheet.instance.withAttr( Primitive.border, style.get( Controls.checkboxCheckBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class ) );
+		StyleSheet checkboxStyle = Controls.checkboxStyle.get( style );
 		
 		double checkSize = style.get( Controls.checkboxCheckSize, Double.class );
 		Paint checkForeground = style.get( Controls.checkboxCheckForeground, Paint.class );

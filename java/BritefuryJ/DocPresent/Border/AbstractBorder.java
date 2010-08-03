@@ -16,7 +16,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.Box;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Painter.FilledOutlinePainter;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
 import BritefuryJ.GSym.View.GSymFragmentView;
@@ -43,18 +43,18 @@ public abstract class AbstractBorder implements Presentable
 	@Override
 	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return new ObjectBox( getClass().getName(), StyleSheet2.instance.withAttr( Primitive.border, this ).applyTo( new Border( presentationSwatch() ) ) );
+		return new ObjectBox( getClass().getName(), StyleSheet.instance.withAttr( Primitive.border, this ).applyTo( new Border( presentationSwatch() ) ) );
 	}
 	
 	
 	// We have to initialise this style sheet on request, otherwise we can end up with a circular class initialisation problem
-	private static StyleSheet2 _swatchStyle = null;
+	private static StyleSheet _swatchStyle = null;
 	
-	private static StyleSheet2 getSwatchStyle()
+	private static StyleSheet getSwatchStyle()
 	{
 		if ( _swatchStyle == null )
 		{
-			_swatchStyle = StyleSheet2.instance.withAttr( Primitive.shapePainter, 
+			_swatchStyle = StyleSheet.instance.withAttr( Primitive.shapePainter, 
 					new FilledOutlinePainter(
 							new LinearGradientPaint( 0.0f, 0.0f, 50.0f, 25.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 73, 69, 94 ), new Color( 24, 5, 7 ) } ),
 							new LinearGradientPaint( 0.0f, 0.0f, 50.0f, 25.0f, new float[] { 0.0f, 1.0f }, new Color[] { new Color( 98, 95, 115 ), new Color( 126, 125, 135 ) } ) ) );

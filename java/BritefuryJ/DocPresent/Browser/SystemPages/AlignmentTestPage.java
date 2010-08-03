@@ -19,7 +19,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.Painter.FilledOutlinePainter;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class AlignmentTestPage extends SystemPage
 {
@@ -41,10 +41,10 @@ public class AlignmentTestPage extends SystemPage
 
 	protected Pres createContents()
 	{
-		StyleSheet2 styleSheet = StyleSheet2.instance;
-		StyleSheet2 textStyleSheet = styleSheet.withAttr( Primitive.background, new FilledOutlinePainter( new Color( 1.0f, 1.0f, 0.7f ), new Color( 1.0f, 1.0f, 0.0f ) ) );
-		StyleSheet2 dividerStyleSheet = styleSheet.withAttr( Primitive.shapePainter, new FillPainter( new Color( 1.0f, 0.5f, 0.0f ) ) );
-		StyleSheet2 sectionStyleSheet = styleSheet.withAttr( Primitive.vboxSpacing, 5.0 );
+		StyleSheet styleSheet = StyleSheet.instance;
+		StyleSheet textStyleSheet = styleSheet.withAttr( Primitive.background, new FilledOutlinePainter( new Color( 1.0f, 1.0f, 0.7f ), new Color( 1.0f, 1.0f, 0.0f ) ) );
+		StyleSheet dividerStyleSheet = styleSheet.withAttr( Primitive.shapePainter, new FillPainter( new Color( 1.0f, 0.5f, 0.0f ) ) );
+		StyleSheet sectionStyleSheet = styleSheet.withAttr( Primitive.vboxSpacing, 5.0 );
 		
 		Pres halignTitle = new Heading2( "Horizontal alignment" ); 
 		Pres halignLeft = new Border( textStyleSheet.applyTo( new Label( "hAlign=LEFT" ).alignHLeft() ) );

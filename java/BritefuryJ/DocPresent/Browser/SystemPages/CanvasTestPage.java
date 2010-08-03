@@ -29,14 +29,14 @@ import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Painter.FillPainter;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.Math.Point2;
 
 public class CanvasTestPage extends SystemPage
 {
-	private static StyleSheet2 textStyle = StyleSheet2.instance.withAttr( Primitive.fontSize, 12 );
+	private static StyleSheet textStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 12 );
 	private static Color backgroundColour = new Color( 1.0f, 0.9f, 0.75f );
-	private static StyleSheet2 backgroundStyle = StyleSheet2.instance.withAttr( Primitive.background, new FillPainter( backgroundColour ) );
+	private static StyleSheet backgroundStyle = StyleSheet.instance.withAttr( Primitive.background, new FillPainter( backgroundColour ) );
 
 
 	protected CanvasTestPage()
@@ -200,14 +200,14 @@ public class CanvasTestPage extends SystemPage
 	protected Pres createContents()
 	{
 		Pres canvas = new Canvas( createClockFace().translate( 320.0, 240.0 ), 640.0, 480.0, false, false );
-		Pres diagram = StyleSheet2.instance.withAttr( Primitive.border, new SolidBorder( 1.0, 3.0, 2.0, 2.0, Color.black, null ) ).applyTo( new Border( canvas ) );
+		Pres diagram = StyleSheet.instance.withAttr( Primitive.border, new SolidBorder( 1.0, 3.0, 2.0, 2.0, Color.black, null ) ).applyTo( new Border( canvas ) );
 		
 		DataModel model = new DataModel();
 		
 		Pres dest0 = makeDestElement( "Number", model );
 		Pres dest1 = makeDestElement2( "Number", model );
 
-		Pres hbox = StyleSheet2.instance.withAttr( Primitive.hboxSpacing, 20.0 ).applyTo( new HBox( new Object[] { dest0, dest1 } ) );
+		Pres hbox = StyleSheet.instance.withAttr( Primitive.hboxSpacing, 20.0 ).applyTo( new HBox( new Object[] { dest0, dest1 } ) );
 		
 		return new Body( new Pres[] { diagram, hbox.padY( 10.0, 0.0 ) } );
 	}

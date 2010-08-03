@@ -13,7 +13,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 
 public class Tooltip extends TimedPopup
@@ -32,6 +32,6 @@ public class Tooltip extends TimedPopup
 		{
 			lines.add( new StaticText( line ) );
 		}
-		return StyleSheet2.instance.remapAttr( Primitive.border, Controls.tooltipBorder ).applyTo( new Border( new VBox( lines ) ) );
+		return StyleSheet.instance.remapAttr( Primitive.border, Controls.tooltipBorder ).applyTo( new Border( new VBox( lines ) ) );
 	}
 }

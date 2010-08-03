@@ -17,7 +17,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Span;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Painter.FilledOutlinePainter;
 import BritefuryJ.DocPresent.Painter.OutlinePainter;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class ParagraphWithSpanTestPage extends SystemPage
 {
@@ -42,7 +42,7 @@ public class ParagraphWithSpanTestPage extends SystemPage
 	static String textBlock = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 	
 	
-	protected Pres makeParagraph(String title, double indentation, int lineBreakStep, StyleSheet2 textStyle)
+	protected Pres makeParagraph(String title, double indentation, int lineBreakStep, StyleSheet textStyle)
 	{
 		ArrayList<Object> children = ParagraphTestPage.makeTextNodes( title + ": " + textBlock );
 		if ( lineBreakStep > 0 )
@@ -52,7 +52,7 @@ public class ParagraphWithSpanTestPage extends SystemPage
 		return textStyle.withAttr( Primitive.paragraphIndentation, indentation ).applyTo( new Paragraph( children ) );
 	}
 	
-	protected Pres makeSpan(String title, int lineBreakStep, StyleSheet2 spanStyle)
+	protected Pres makeSpan(String title, int lineBreakStep, StyleSheet spanStyle)
 	{
 		ArrayList<Object> children = ParagraphTestPage.makeTextNodes( title + ": " + textBlock );
 		if ( lineBreakStep > 0 )
@@ -62,7 +62,7 @@ public class ParagraphWithSpanTestPage extends SystemPage
 		return spanStyle.applyTo( new Span( children ) );
 	}
 	
-	protected Pres makeParagraphWithNestedSpan(String title, double indentation, int lineBreakStep, StyleSheet2 textStyle, StyleSheet2 nestedTextStyle, StyleSheet2 spanStyle)
+	protected Pres makeParagraphWithNestedSpan(String title, double indentation, int lineBreakStep, StyleSheet textStyle, StyleSheet nestedTextStyle, StyleSheet spanStyle)
 	{
 		ArrayList<Object> children = ParagraphTestPage.makeTextNodes( title + ": " + textBlock );
 		children = ParagraphTestPage.addLineBreaks( children, lineBreakStep );
@@ -73,9 +73,9 @@ public class ParagraphWithSpanTestPage extends SystemPage
 	
 	protected Pres createContents()
 	{
-		StyleSheet2 styleSheet = StyleSheet2.instance;
-		StyleSheet2 nestedTextStyleSheet = styleSheet.withAttr( Primitive.foreground, Color.red );
-		StyleSheet2 spanStyleSheet = styleSheet.withAttr( Primitive.background, new OutlinePainter( new Color( 1.0f, 0.7f, 0.3f ) ) ).withAttr(
+		StyleSheet styleSheet = StyleSheet.instance;
+		StyleSheet nestedTextStyleSheet = styleSheet.withAttr( Primitive.foreground, Color.red );
+		StyleSheet spanStyleSheet = styleSheet.withAttr( Primitive.background, new OutlinePainter( new Color( 1.0f, 0.7f, 0.3f ) ) ).withAttr(
 				Primitive.hoverBackground, new FilledOutlinePainter( new Color( 1.0f, 1.0f, 0.7f ), new Color( 1.0f, 1.0f, 0.0f ), new BasicStroke( 1.0f ) ) );
 		
 		Pres b2 = makeParagraph( "PER-WORD", 0.0, 1, styleSheet );

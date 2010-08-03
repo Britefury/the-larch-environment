@@ -22,7 +22,7 @@ import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
 import BritefuryJ.DocPresent.Combinators.RichText.NormalText;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class PopupTestPage extends SystemPage
 {
@@ -44,17 +44,17 @@ public class PopupTestPage extends SystemPage
 	
 	
 
-	private static StyleSheet2 styleSheet = StyleSheet2.instance;
-	private static StyleSheet2 blackText = styleSheet.withAttr( Primitive.foreground, Color.black );
-	private static StyleSheet2 redText = styleSheet.withAttr( Primitive.foreground, Color.red );
-	private static StyleSheet2 greenText = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
-	private static StyleSheet2 blueText = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) );
-	private static StyleSheet2 purpleText = styleSheet.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.5f ) );
-	private static StyleSheet2 cyanText = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.5f ) );
+	private static StyleSheet styleSheet = StyleSheet.instance;
+	private static StyleSheet blackText = styleSheet.withAttr( Primitive.foreground, Color.black );
+	private static StyleSheet redText = styleSheet.withAttr( Primitive.foreground, Color.red );
+	private static StyleSheet greenText = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
+	private static StyleSheet blueText = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) );
+	private static StyleSheet purpleText = styleSheet.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.5f ) );
+	private static StyleSheet cyanText = styleSheet.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.5f ) );
 
 	
 	
-	protected static Pres colouredText(StyleSheet2 style)
+	protected static Pres colouredText(StyleSheet style)
 	{
 		return style.withAttr( Primitive.editable, false ).applyTo(
 				new NormalText( "Change the colour of this text, using the hyperlinks within the popup activated by the hyperlink below. The last links in the embedded popups will close the popup chain." ) );

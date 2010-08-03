@@ -20,7 +20,7 @@ import BritefuryJ.DocPresent.Combinators.Sequence.ParagraphSequenceView;
 import BritefuryJ.DocPresent.Combinators.Sequence.TrailingSeparator;
 import BritefuryJ.DocPresent.Combinators.Sequence.VerticalInlineSequenceView;
 import BritefuryJ.DocPresent.Combinators.Sequence.VerticalSequenceView;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
 import BritefuryJ.GSym.GenericPerspective.PresCom.UnescapedStringAsHBox;
 import BritefuryJ.GSym.PresCom.InnerFragment;
@@ -35,18 +35,18 @@ public class DocModelPresenter
 	}
 
 
-	private static final StyleSheet2 defaultStyle = StyleSheet2.instance.withAttr( Primitive.fontFace, "Sans serif" ).withAttr( Primitive.fontSize, 14 )
+	private static final StyleSheet defaultStyle = StyleSheet.instance.withAttr( Primitive.fontFace, "Sans serif" ).withAttr( Primitive.fontSize, 14 )
 		.withAttr( Primitive.foreground, Color.black ).withAttr( Primitive.paragraphIndentation, 60.0 );
 
-	private static final StyleSheet2 nullStyle = defaultStyle.withAttr( Primitive.fontItalic, true ).withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.25f ) );
+	private static final StyleSheet nullStyle = defaultStyle.withAttr( Primitive.fontItalic, true ).withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.25f ) );
 
-	private static final StyleSheet2 stringStyle = defaultStyle.withAttr( GenericStyle.stringContentStyle, StyleSheet2.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.25f, 0.5f ) ) );
+	private static final StyleSheet stringStyle = defaultStyle.withAttr( GenericStyle.stringContentStyle, StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.25f, 0.5f ) ) );
 	
-	private static final StyleSheet2 punctuationStyle = defaultStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 1.0f ) );
+	private static final StyleSheet punctuationStyle = defaultStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 1.0f ) );
 
-	private static final StyleSheet2 classNameStyle = defaultStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
+	private static final StyleSheet classNameStyle = defaultStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
 
-	private static final StyleSheet2 fieldNameStyle = defaultStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.25f ) );
+	private static final StyleSheet fieldNameStyle = defaultStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.25f ) );
 
 	
 	

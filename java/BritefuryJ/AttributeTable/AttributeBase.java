@@ -71,7 +71,7 @@ public abstract class AttributeBase
 	abstract protected Object checkValue(Object value);
 	
 	
-	protected AttributeTable2 use(AttributeTable2 attributeTable)
+	protected AttributeTable use(AttributeTable attributeTable)
 	{
 		return attributeTable;
 	}
