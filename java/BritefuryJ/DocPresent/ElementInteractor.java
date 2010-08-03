@@ -10,7 +10,7 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 
 import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.DocPresent.Controls.PopupMenu;
+import BritefuryJ.Controls.PopupMenu;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;

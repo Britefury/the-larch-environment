@@ -13,7 +13,6 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Box;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 
 public class StyleSheetBenchmark
@@ -24,7 +23,6 @@ public class StyleSheetBenchmark
 //	private static final int RUN_LENGTH = 64;
 //	private static final int NUM_REPEATS = 64;
 	
-	private static final PrimitiveStyleSheet oldStyle = PrimitiveStyleSheet.instance.withFontFace( "Serif" );
 	private static final StyleSheet2 newStyle = StyleSheet2.instance.withAttr( Primitive.fontFace, "Serif" );
 
 	
@@ -54,31 +52,6 @@ public class StyleSheetBenchmark
 		return ( end - start ) * 1.0e-9;
 	}
 
-	
-	
-	public static DPElement oldStyleSheetRun()
-	{
-		DPElement elements[] = new DPElement[RUN_LENGTH];
-		for (int i = 0; i < elements.length; i++)
-		{
-			//elements[i] = oldStyle.staticText( "Hello world" );
-			elements[i] = oldStyle.box( 10.0, 10.0 );
-		}
-		
-		return PrimitiveStyleSheet.instance.vbox( elements );
-	}
-	
-	public static double oldStyleSheetTest()
-	{
-		long start = System.nanoTime();
-		for (int i = 0; i < NUM_REPEATS; i++)
-		{
-			oldStyleSheetRun();
-		}
-		long end = System.nanoTime();
-		return ( end - start ) * 1.0e-9;
-	}
-	
 	
 	
 	public static Pres combinatorsOnlyRun()
@@ -161,11 +134,6 @@ public class StyleSheetBenchmark
 		directConstructionTest();
 		double directTime = directConstructionTest();
 		System.out.println( "Direction construction time = " + directTime );
-
-		// Old test
-		oldStyleSheetTest();
-		double oldTime = oldStyleSheetTest();
-		System.out.println( "Old style sheets time = " + oldTime );
 
 		// Combinators only test
 		combinatorsOnlyTest();

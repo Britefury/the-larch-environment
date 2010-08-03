@@ -27,7 +27,6 @@ import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
 import BritefuryJ.DocPresent.Selection.Selection;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 import BritefuryJ.GSym.GSymAbstractPerspective;
@@ -233,7 +232,6 @@ public class GSymView extends IncrementalTree
 	private GSymFragmentView.NodeResultFactory rootNodeResultFactory;
 	
 	
-	private DPVBox vbox;
 	private DPRegion region;
 	
 	private GSymBrowserContext browserContext;
@@ -266,7 +264,7 @@ public class GSymView extends IncrementalTree
 		this.commandHistory = subject.getCommandHistory();
 		
 		region = new DPRegion();
-		vbox = PrimitiveStyleSheet.instance.vbox( new DPElement[] { region } );
+		DPElement vbox = new VBox( new Object[] { region } ).present();
 
 		page = new GSymViewPage( vbox.alignHExpand().alignVExpand(), subject.getTitle(), browserContext, commandHistory, this );
 		
@@ -317,9 +315,8 @@ public class GSymView extends IncrementalTree
 		{
 			performRefresh();
 			GSymFragmentView rootView = (GSymFragmentView)getRootIncrementalTreeNode();
-			rootView.getRefreshedFragmentElement().alignHExpand();
-			rootView.getRefreshedFragmentElement().alignVExpand();
-			rootBox = PrimitiveStyleSheet.instance.vbox( new DPElement[] { rootView.getRefreshedFragmentElement() } );
+			DPElement fragmentElement = rootView.getRefreshedFragmentElement();
+			rootBox = (DPVBox)new VBox( new Object[] { fragmentElement.alignHExpand().alignVExpand() } ).present();
 		}
 		return rootBox;
 	}

@@ -19,7 +19,7 @@ import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 import BritefuryJ.DocPresent.Util.Range;
 
-abstract class AbstractScrolledViewport extends ControlPres
+public abstract class AbstractScrolledViewport extends ControlPres
 {
 	public class ScrolledViewportControl extends Control
 	{
@@ -82,9 +82,9 @@ abstract class AbstractScrolledViewport extends ControlPres
 	private PersistentState state;
 	
 	
-	public AbstractScrolledViewport(Pres child, PersistentState state)
+	public AbstractScrolledViewport(Object child, PersistentState state)
 	{
-		this.child = child;
+		this.child = coerce( child );
 		this.state = state;
 	}
 

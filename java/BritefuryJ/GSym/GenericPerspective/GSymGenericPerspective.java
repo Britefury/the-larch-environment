@@ -14,7 +14,6 @@ import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
 import BritefuryJ.GSym.ObjectPresentation.GSymObjectPresentationPerspective;
@@ -56,18 +55,14 @@ public class GSymGenericPerspective extends GSymObjectPresentationPerspective
 		return presentPythonObjectAsString( x, fragment, inhritedState );
 	}
 	
-	@SuppressWarnings("unchecked")
-	protected Pres invokeObjectPresenter(ObjectPresenter<? extends StyleSheet> presenter, Object x, GSymFragmentView fragment, AttributeTable inheritedState)
+	protected Pres invokeObjectPresenter(ObjectPresenter presenter, Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 	{
-		ObjectPresenter<GenericPerspectiveStyleSheet> genericPresenter = (ObjectPresenter<GenericPerspectiveStyleSheet>)presenter;
-		return genericPresenter.presentObject( x, fragment, inheritedState );
+		return presenter.presentObject( x, fragment, inheritedState );
 	}
 	
-	@SuppressWarnings("unchecked")
-	protected Pres invokePyObjectPresenter(PyObjectPresenter<? extends StyleSheet> presenter, PyObject x, GSymFragmentView fragment, AttributeTable inheritedState)
+	protected Pres invokePyObjectPresenter(PyObjectPresenter presenter, PyObject x, GSymFragmentView fragment, AttributeTable inheritedState)
 	{
-		PyObjectPresenter<GenericPerspectiveStyleSheet> genericPresenter = (PyObjectPresenter<GenericPerspectiveStyleSheet>)presenter;
-		return genericPresenter.presentObject( x, fragment, inheritedState );
+		return presenter.presentObject( x, fragment, inheritedState );
 	}
 	
 

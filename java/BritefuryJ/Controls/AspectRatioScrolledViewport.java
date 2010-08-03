@@ -16,7 +16,7 @@ public class AspectRatioScrolledViewport extends AbstractScrolledViewport
 	private double minWidth, aspectRatio;
 	
 	
-	public AspectRatioScrolledViewport(Pres child, double minWidth, double aspectRatio, PersistentState state)
+	public AspectRatioScrolledViewport(Object child, double minWidth, double aspectRatio, PersistentState state)
 	{
 		super( child, state );
 		this.minWidth = minWidth;

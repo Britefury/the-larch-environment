@@ -13,16 +13,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import BritefuryJ.AttributeTable.AttributeTable;
-import BritefuryJ.DocPresent.DPBin;
+import BritefuryJ.Controls.AspectRatioScrolledViewport;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
-import BritefuryJ.DocPresent.Controls.ScrolledViewport;
+import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
+import BritefuryJ.DocPresent.Combinators.Primitive.Border;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -126,9 +127,8 @@ public class ParseView implements FragmentContext
 		public void onSelectionChanged(DebugNode selection);
 	}
 	
-	private DPElement element; 
-	private ScrolledViewport viewport;
-	private DPBin viewBin;
+	private Pres pres; 
+	private DPElement viewBin;
 	private HashMap<DebugNode, NodeView> nodeTable;
 	private ArrayList<Edge> callEdges, memoEdges;
 	private NodeView root;
@@ -150,11 +150,11 @@ public class ParseView implements FragmentContext
 		
 		root.registerEdges();
 		
-		viewBin = PrimitiveStyleSheet.instance.bin( root.getElement() );
+		viewBin = new Bin( root.getElement() ).present();
 		viewBin.addInteractor( new ParseViewInteractor( this ) );
 		
-		viewport = ControlsStyleSheet.instance.aspectRatioScrolledViewport( viewBin, 0.0, 1.333, viewportState );
-		element = viewportBorderStyle.border( viewport.getElement().alignHExpand().alignVExpand() ).alignHExpand().alignVExpand();
+		Pres viewport = new AspectRatioScrolledViewport( viewBin, 0.0, 1.333, viewportState );
+		pres = viewportBorderStyle.applyTo( new Border( viewport.alignHExpand().alignVExpand() ).alignHExpand().alignVExpand() );
 	}
 	
 	
@@ -233,10 +233,10 @@ public class ParseView implements FragmentContext
 	public static Pres presentDebugParseResult(DebugParseResultInterface x, GSymFragmentView fragment, AttributeTable inheritedState)
 	{
 		ParseView v = new ParseView( x, fragment.persistentState( "viewport " ) );
-		return Pres.elementToPres( v.element.alignHExpand().alignVExpand() );
+		return v.pres.alignHExpand().alignVExpand();
 	}
 
 
 
-	private final static PrimitiveStyleSheet viewportBorderStyle = PrimitiveStyleSheet.instance.withBorder( new SolidBorder( 2.0, 2.0, 5.0, 5.0, Color.black, null ) );
+	private final static StyleSheet2 viewportBorderStyle = StyleSheet2.instance.withAttr( Primitive.border, new SolidBorder( 2.0, 2.0, 5.0, 5.0, Color.black, null ) );
 }

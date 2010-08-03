@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.GSym.View;
 
-import java.awt.Color;
 import java.util.ArrayList;
 
 import BritefuryJ.AttributeTable.AttributeTable;
@@ -15,11 +14,11 @@ import BritefuryJ.DocPresent.DPFragment;
 import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.Combinators.Primitive.Region;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 import BritefuryJ.GSym.GSymAbstractPerspective;
 import BritefuryJ.GSym.GSymBrowserContext;
@@ -63,10 +62,6 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	
 
 	private static final ObjectDndHandler.DragSource fragmentDragSource = new ObjectDndHandler.DragSource( FragmentModel.class, ObjectDndHandler.ASPECT_DOC_NODE, fragmentDragSourceFn );
-	
-	
-	private static final PrimitiveStyleSheet viewError_textStyle = PrimitiveStyleSheet.instance.withFontBold( true ).withFontSize( 12 ).withForeground( new Color( 0.8f, 0.0f, 0.0f ) );
-
 	
 	
 	
@@ -258,13 +253,6 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	
 	
 	
-	public DPElement errorElement(String errorText)
-	{
-		return viewError_textStyle.staticText( errorText );
-	}
-	
-	
-	
 	protected void registerIncrementalNodeRelationship(IncrementalTreeNode childNode)
 	{
 		registerChild( childNode );
@@ -308,7 +296,7 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	
 	protected static DPElement perspectiveFragmentRegion(DPElement fragmentContents, GSymAbstractPerspective perspective)
 	{
-		return PrimitiveStyleSheet.instance.region( fragmentContents, perspective.getEditHandler() );
+		return new Region( fragmentContents, perspective.getEditHandler() ).present();
 	}
 	
 

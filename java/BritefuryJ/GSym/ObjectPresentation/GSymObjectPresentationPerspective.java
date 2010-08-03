@@ -14,7 +14,6 @@ import org.python.core.PyType;
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GSymAbstractPerspective;
 import BritefuryJ.GSym.GSymSubject;
 import BritefuryJ.GSym.View.GSymFragmentView;
@@ -39,11 +38,10 @@ public abstract class GSymObjectPresentationPerspective extends GSymAbstractPers
 	protected abstract Pres presentWithJavaInterface(Object x, GSymFragmentView fragment, AttributeTable inheritedState);
 	protected abstract Pres presentJavaObjectFallback(Object x, GSymFragmentView fragment, AttributeTable inheritedState);
 	protected abstract Pres presentPyObjectFallback(PyObject x, GSymFragmentView fragment, AttributeTable inhritedState);
-	protected abstract Pres invokeObjectPresenter(ObjectPresenter<? extends StyleSheet> presenter, Object x, GSymFragmentView fragment, AttributeTable inheritedState);
-	protected abstract Pres invokePyObjectPresenter(PyObjectPresenter<? extends StyleSheet> presenter, PyObject x, GSymFragmentView fragment, AttributeTable inheritedState);
+	protected abstract Pres invokeObjectPresenter(ObjectPresenter presenter, Object x, GSymFragmentView fragment, AttributeTable inheritedState);
+	protected abstract Pres invokePyObjectPresenter(PyObjectPresenter presenter, PyObject x, GSymFragmentView fragment, AttributeTable inheritedState);
 	
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Pres present(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 	{
@@ -88,7 +86,7 @@ public abstract class GSymObjectPresentationPerspective extends GSymAbstractPers
 				// Now try Python object presenters
 				PyType typeX = pyX.getType();
 				
-				PyObjectPresenter<? extends StyleSheet> presenter = (PyObjectPresenter<? extends StyleSheet>)objectPresenters.get( typeX );
+				PyObjectPresenter presenter = (PyObjectPresenter)objectPresenters.get( typeX );
 				if ( presenter != null )
 				{
 					result = invokePyObjectPresenter( presenter, pyX, fragment, inheritedState );
@@ -99,7 +97,7 @@ public abstract class GSymObjectPresentationPerspective extends GSymAbstractPers
 		// Java object presentation protocol - registered presenters
 		if ( result == null )
 		{
-			ObjectPresenter<? extends StyleSheet> presenter = (ObjectPresenter<? extends StyleSheet>)objectPresenters.get( x.getClass() );
+			ObjectPresenter presenter = (ObjectPresenter)objectPresenters.get( x.getClass() );
 			if ( presenter != null )
 			{
 				result = invokeObjectPresenter( presenter, x, fragment, inheritedState );
@@ -153,12 +151,12 @@ public abstract class GSymObjectPresentationPerspective extends GSymAbstractPers
 	
 	
 	
-	public void registerJavaObjectPresenter(Class<?> cls, ObjectPresenter<? extends StyleSheet> presenter)
+	public void registerJavaObjectPresenter(Class<?> cls, ObjectPresenter presenter)
 	{
 		objectPresenters.put( cls, presenter );
 	}
 	
-	public void registerPythonObjectPresenter(PyType type, PyObjectPresenter<? extends StyleSheet> presenter)
+	public void registerPythonObjectPresenter(PyType type, PyObjectPresenter presenter)
 	{
 		objectPresenters.put( type, presenter );
 	}

@@ -10,10 +10,9 @@ import org.python.core.PyObject;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
-public interface PyObjectPresenter<StyleSheetType extends StyleSheet>
+public interface PyObjectPresenter
 {
 	public Pres presentObject(PyObject x, GSymFragmentView fragment, AttributeTable inheritedState);
 }
