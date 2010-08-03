@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from BritefuryJ.AttributeTable import AttributeTable
+from BritefuryJ.AttributeTable import SimpleAttributeTable
 
 from BritefuryJ.DocPresent.Browser import Location
 
