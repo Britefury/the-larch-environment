@@ -20,7 +20,7 @@ import BritefuryJ.DocPresent.Painter.Painter;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
-class RichText
+public class RichText
 {
 	public static final AttributeNamespace richTextNamespace = new AttributeNamespace( "richtext" );
 	
