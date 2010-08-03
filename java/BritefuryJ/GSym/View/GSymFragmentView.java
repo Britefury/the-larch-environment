@@ -8,7 +8,7 @@ package BritefuryJ.GSym.View;
 
 import java.util.ArrayList;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPFragment;
 import BritefuryJ.DocPresent.FragmentContext;
@@ -239,7 +239,7 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	}
 	
 	
-	public AttributeTable getSubjectContext()
+	public SimpleAttributeTable getSubjectContext()
 	{
 		return getNodeResultFactory().subjectContext;
 	}
@@ -261,7 +261,7 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 
 
 	
-	private DPElement presentInnerFragment(Object model, GSymAbstractPerspective perspective, AttributeTable subjectContext, StyleValues style, AttributeTable inheritedState)
+	private DPElement presentInnerFragment(Object model, GSymAbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
 	{
 		if ( model == null )
 		{
@@ -300,7 +300,7 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	}
 	
 
-	public DPElement presentInnerFragment(Object x, GSymAbstractPerspective perspective, StyleValues style, AttributeTable inheritedState)
+	public DPElement presentInnerFragment(Object x, GSymAbstractPerspective perspective, StyleValues style, SimpleAttributeTable inheritedState)
 	{
 		GSymView.ViewFragmentContextAndResultFactory factory = getNodeResultFactory();
 		DPElement e = presentInnerFragment( x, perspective, factory.subjectContext, style, inheritedState );

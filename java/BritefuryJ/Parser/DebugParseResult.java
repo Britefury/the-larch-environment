@@ -8,7 +8,7 @@ package BritefuryJ.Parser;
 
 import java.util.Map;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentView;
@@ -35,7 +35,7 @@ public class DebugParseResult extends ParseResult implements DebugParseResultInt
 
 
 	@Override
-	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
+	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return ParseView.presentDebugParseResult( this, fragment, inheritedState );
 	}

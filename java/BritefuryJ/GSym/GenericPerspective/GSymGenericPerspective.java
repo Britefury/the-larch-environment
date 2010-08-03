@@ -9,7 +9,7 @@ package BritefuryJ.GSym.GenericPerspective;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
@@ -32,7 +32,7 @@ public class GSymGenericPerspective extends GSymObjectPresentationPerspective
 
 	
 
-	protected Pres presentWithJavaInterface(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
+	protected Pres presentWithJavaInterface(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		if ( x instanceof Presentable )
 		{
@@ -45,22 +45,22 @@ public class GSymGenericPerspective extends GSymObjectPresentationPerspective
 		}
 	}
 	
-	protected Pres presentJavaObjectFallback(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
+	protected Pres presentJavaObjectFallback(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return presentJavaObjectAsString( x, fragment, inheritedState );
 	}
 	
-	protected Pres presentPyObjectFallback(PyObject x, GSymFragmentView fragment, AttributeTable inhritedState)
+	protected Pres presentPyObjectFallback(PyObject x, GSymFragmentView fragment, SimpleAttributeTable inhritedState)
 	{
 		return presentPythonObjectAsString( x, fragment, inhritedState );
 	}
 	
-	protected Pres invokeObjectPresenter(ObjectPresenter presenter, Object x, GSymFragmentView fragment, AttributeTable inheritedState)
+	protected Pres invokeObjectPresenter(ObjectPresenter presenter, Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return presenter.presentObject( x, fragment, inheritedState );
 	}
 	
-	protected Pres invokePyObjectPresenter(PyObjectPresenter presenter, PyObject x, GSymFragmentView fragment, AttributeTable inheritedState)
+	protected Pres invokePyObjectPresenter(PyObjectPresenter presenter, PyObject x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return presenter.presentObject( x, fragment, inheritedState );
 	}
@@ -69,9 +69,9 @@ public class GSymGenericPerspective extends GSymObjectPresentationPerspective
 	
 	
 	@Override
-	public AttributeTable getInitialInheritedState()
+	public SimpleAttributeTable getInitialInheritedState()
 	{
-		return AttributeTable.instance;
+		return SimpleAttributeTable.instance;
 	}
 	
 	@Override
@@ -83,12 +83,12 @@ public class GSymGenericPerspective extends GSymObjectPresentationPerspective
 
 	
 	
-	private static Pres presentJavaObjectAsString(Object x, GSymFragmentView ctx, AttributeTable state)
+	private static Pres presentJavaObjectAsString(Object x, GSymFragmentView ctx, SimpleAttributeTable state)
 	{
 		return new ObjectBox( x.getClass().getName(), asStringStyle.applyTo( new StaticText( x.toString() ) ) );
 	}
 	
-	private static Pres presentPythonObjectAsString(PyObject pyX, GSymFragmentView ctx, AttributeTable state)
+	private static Pres presentPythonObjectAsString(PyObject pyX, GSymFragmentView ctx, SimpleAttributeTable state)
 	{
 		PyType typeX = pyX.getType();
 		return new ObjectBox( typeX.getName(), asStringStyle.applyTo( new StaticText( pyX.toString() ) ) );

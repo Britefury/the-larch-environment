@@ -11,7 +11,7 @@ import java.util.WeakHashMap;
 
 import javax.swing.SwingUtilities;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Cell.LiteralCell;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
@@ -141,7 +141,7 @@ public abstract class LiteralCellEditor implements Presentable, IncrementalMonit
 
 	
 	@Override
-	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
+	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return createEditor().getPres();
 	}

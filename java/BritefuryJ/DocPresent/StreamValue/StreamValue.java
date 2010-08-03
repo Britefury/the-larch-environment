@@ -13,7 +13,7 @@ import java.util.List;
 
 import org.python.core.PySlice;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
@@ -142,7 +142,7 @@ public class StreamValue implements Presentable
 
 
 		@Override
-		public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
+		public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			return new UnescapedStringAsSpan( textValue );
 		}
@@ -220,7 +220,7 @@ public class StreamValue implements Presentable
 
 
 		@Override
-		public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
+		public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			return borderStyle.applyTo( new Border( new InnerFragment( structuralValue ) ) );
 		}
@@ -573,7 +573,7 @@ public class StreamValue implements Presentable
 
 
 	@Override
-	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
+	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		Pres contents = new Paragraph( InnerFragment.map( items ) );
 		

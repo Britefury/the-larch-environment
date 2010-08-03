@@ -29,7 +29,7 @@ import BritefuryJ.GSym.PresCom.InnerFragment;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Utils.HashUtils;
 
-public class AttributeTable implements Presentable
+public class SimpleAttributeTable implements Presentable
 {
 	public static class AttributeDoesNotExistException extends RuntimeException
 	{
@@ -149,31 +149,31 @@ public class AttributeTable implements Presentable
 	
 	private static class AttributeTableSet 
 	{
-		private HashMap<AttributeValuesMultiple, WeakReference<AttributeTable>> attributeTableSet = new HashMap<AttributeValuesMultiple, WeakReference<AttributeTable>>();
+		private HashMap<AttributeValuesMultiple, WeakReference<SimpleAttributeTable>> attributeTableSet = new HashMap<AttributeValuesMultiple, WeakReference<SimpleAttributeTable>>();
 	}
 	
 	
-	protected static HashMap<Class<? extends AttributeTable>, AttributeTableSet> attributeTableSetsByClass = new HashMap<Class<? extends AttributeTable>, AttributeTableSet>();
+	protected static HashMap<Class<? extends SimpleAttributeTable>, AttributeTableSet> attributeTableSetsByClass = new HashMap<Class<? extends SimpleAttributeTable>, AttributeTableSet>();
 	
 	// 
 	protected HashMap<String, Object> values = new HashMap<String, Object>();
-	protected HashMap<AttributeValueSingle, WeakReference<AttributeTable>> singleValueDerivedAttributeTables = new HashMap<AttributeValueSingle, WeakReference<AttributeTable>>();
-	protected HashMap<AttributeValuesMultiple, WeakReference<AttributeTable>> multiValueDerivedAttributeTables = new HashMap<AttributeValuesMultiple, WeakReference<AttributeTable>>();
-	protected IdentityHashMap<AttributeTable, WeakReference<AttributeTable>> attribTableDerivedAttributeTables = new IdentityHashMap<AttributeTable, WeakReference<AttributeTable>>();
-	protected HashMap<DelAttribute, WeakReference<AttributeTable>> delDerivedAttributeTables = new HashMap<DelAttribute, WeakReference<AttributeTable>>();
+	protected HashMap<AttributeValueSingle, WeakReference<SimpleAttributeTable>> singleValueDerivedAttributeTables = new HashMap<AttributeValueSingle, WeakReference<SimpleAttributeTable>>();
+	protected HashMap<AttributeValuesMultiple, WeakReference<SimpleAttributeTable>> multiValueDerivedAttributeTables = new HashMap<AttributeValuesMultiple, WeakReference<SimpleAttributeTable>>();
+	protected IdentityHashMap<SimpleAttributeTable, WeakReference<SimpleAttributeTable>> attribTableDerivedAttributeTables = new IdentityHashMap<SimpleAttributeTable, WeakReference<SimpleAttributeTable>>();
+	protected HashMap<DelAttribute, WeakReference<SimpleAttributeTable>> delDerivedAttributeTables = new HashMap<DelAttribute, WeakReference<SimpleAttributeTable>>();
 	
 	
-	public static AttributeTable instance = new AttributeTable();
+	public static SimpleAttributeTable instance = new SimpleAttributeTable();
 	
 	
-	protected AttributeTable()
+	protected SimpleAttributeTable()
 	{
 	}
 	
 	
-	protected AttributeTable newInstance()
+	protected SimpleAttributeTable newInstance()
 	{
-		return new AttributeTable();
+		return new SimpleAttributeTable();
 	}
 	
 	
@@ -192,119 +192,6 @@ public class AttributeTable implements Presentable
 		return values.get( attrName );
 	}
 	
-	public <V extends Object> V get(String attrName, Class<V> valueClass, V defaultValue)
-	{
-		if ( !values.containsKey( attrName ) )
-		{
-			throw new AttributeDoesNotExistException();
-		}
-		
-		Object v = values.get( attrName );
-		
-		if ( v == null )
-		{
-			return null;
-		}
-		else
-		{
-			V typedV;
-			try
-			{
-				typedV = valueClass.cast( v );
-			}
-			catch (ClassCastException e)
-			{
-				notifyBadAttributeType( attrName, v, valueClass );
-				return defaultValue;
-			}
-			return typedV;
-		}
-	}
-	
-	public <V extends Object> V getOptional(String attrName, Class<V> valueClass, V defaultValue)
-	{
-		Object v = values.get( attrName );
-		
-		if ( v == null )
-		{
-			return null;
-		}
-		else
-		{
-			V typedV;
-			try
-			{
-				typedV = valueClass.cast( v );
-			}
-			catch (ClassCastException e)
-			{
-				notifyBadAttributeType( attrName, v, valueClass );
-				return defaultValue;
-			}
-			return typedV;
-		}
-	}
-	
-	public <V extends Object> V getNonNull(String attrName, Class<V> valueClass, V defaultValue)
-	{
-		if ( !values.containsKey( attrName ) )
-		{
-			throw new AttributeDoesNotExistException();
-		}
-		
-		Object v = values.get( attrName );
-		
-		if ( v == null )
-		{
-			notifyAttributeShouldNotBeNull( attrName, valueClass );
-			return defaultValue;
-		}
-		else
-		{
-			V typedV;
-			try
-			{
-				typedV = valueClass.cast( v );
-			}
-			catch (ClassCastException e)
-			{
-				notifyBadAttributeType( attrName, v, valueClass );
-				return defaultValue;
-			}
-			return typedV;
-		}
-	}
-	
-	public <V extends Object> V getOptionalNonNull(String attrName, Class<V> valueClass, V defaultValue)
-	{
-		if ( !values.containsKey( attrName ) )
-		{
-			return defaultValue;
-		}
-		
-		Object v = values.get( attrName );
-		
-		if ( v == null )
-		{
-			notifyAttributeShouldNotBeNull( attrName, valueClass );
-			return defaultValue;
-		}
-		else
-		{
-			V typedV;
-			try
-			{
-				typedV = valueClass.cast( v );
-			}
-			catch (ClassCastException e)
-			{
-				notifyBadAttributeType( attrName, v, valueClass );
-				return defaultValue;
-			}
-			return typedV;
-		}
-	}
-	
 	public Object __getitem__(String key)
 	{
 		if ( !values.containsKey( key ) )
@@ -318,23 +205,23 @@ public class AttributeTable implements Presentable
 	}
 	
 	
-	public AttributeTable withAttr(String fieldName, Object value)
+	public SimpleAttributeTable withAttr(String fieldName, Object value)
 	{
 		AttributeValueSingle v = new AttributeValueSingle( fieldName, value );
-		WeakReference<AttributeTable> derivedRef = singleValueDerivedAttributeTables.get( v );
+		WeakReference<SimpleAttributeTable> derivedRef = singleValueDerivedAttributeTables.get( v );
 		if ( derivedRef == null  ||  derivedRef.get() == null )
 		{
-			AttributeTable derived = newInstance();
+			SimpleAttributeTable derived = newInstance();
 			derived.values.putAll( values );
 			derived.values.put( fieldName, value );
 			derived = getUniqueAttributeTable( derived );
-			derivedRef = new WeakReference<AttributeTable>( derived );
+			derivedRef = new WeakReference<SimpleAttributeTable>( derived );
 			singleValueDerivedAttributeTables.put( v, derivedRef );
 		}
 		return derivedRef.get();
 	}
 	
-	public AttributeTable withAttrs(HashMap<String, Object> valuesMap)
+	public SimpleAttributeTable withAttrs(Map<String, Object> valuesMap)
 	{
 		if ( valuesMap.size() == 1 )
 		{
@@ -343,22 +230,24 @@ public class AttributeTable implements Presentable
 		}
 		else
 		{
-			AttributeValuesMultiple v = new AttributeValuesMultiple( valuesMap );
-			WeakReference<AttributeTable> derivedRef = multiValueDerivedAttributeTables.get( v );
+			HashMap<String, Object> valuesHashMap = new HashMap<String, Object>();
+			valuesHashMap.putAll( valuesMap );
+			AttributeValuesMultiple v = new AttributeValuesMultiple( valuesHashMap );
+			WeakReference<SimpleAttributeTable> derivedRef = multiValueDerivedAttributeTables.get( v );
 			if ( derivedRef == null  ||  derivedRef.get() == null )
 			{
-				AttributeTable derived = newInstance();
+				SimpleAttributeTable derived = newInstance();
 				derived.values.putAll( values );
-				derived.values.putAll( valuesMap );
+				derived.values.putAll( valuesHashMap );
 				derived = getUniqueAttributeTable( derived );
-				derivedRef = new WeakReference<AttributeTable>( derived );
+				derivedRef = new WeakReference<SimpleAttributeTable>( derived );
 				multiValueDerivedAttributeTables.put( v, derivedRef );
 			}
 			return derivedRef.get();
 		}
 	}
 		
-	public AttributeTable withAttrs(PyObject[] pyVals, String[] names)
+	public SimpleAttributeTable withAttrs(PyObject[] pyVals, String[] names)
 	{
 		if ( names.length != pyVals.length )
 		{
@@ -381,31 +270,31 @@ public class AttributeTable implements Presentable
 		}
 	}
 	
-	public AttributeTable withAttrs(AttributeTable attribs)
+	public SimpleAttributeTable withAttrs(SimpleAttributeTable attribs)
 	{
-		WeakReference<AttributeTable> derivedRef = attribTableDerivedAttributeTables.get( attribs );
+		WeakReference<SimpleAttributeTable> derivedRef = attribTableDerivedAttributeTables.get( attribs );
 		if ( derivedRef == null  ||  derivedRef.get() == null )
 		{
-			AttributeTable derived = withAttrs( attribs.values );
+			SimpleAttributeTable derived = withAttrs( attribs.values );
 			
-			derivedRef = new WeakReference<AttributeTable>( derived );
+			derivedRef = new WeakReference<SimpleAttributeTable>( derived );
 
 			attribTableDerivedAttributeTables.put( attribs, derivedRef );
 		}
 		return derivedRef.get();
 	}
 	
-	public AttributeTable withoutAttr(String fieldName)
+	public SimpleAttributeTable withoutAttr(String fieldName)
 	{
 		DelAttribute v = new DelAttribute( fieldName );
-		WeakReference<AttributeTable> derivedRef = delDerivedAttributeTables.get( v );
+		WeakReference<SimpleAttributeTable> derivedRef = delDerivedAttributeTables.get( v );
 		if ( derivedRef == null  ||  derivedRef.get() == null )
 		{
-			AttributeTable derived = newInstance();
+			SimpleAttributeTable derived = newInstance();
 			derived.values.putAll( values );
 			derived.values.remove( fieldName );
 			derived = getUniqueAttributeTable( derived );
-			derivedRef = new WeakReference<AttributeTable>( derived );
+			derivedRef = new WeakReference<SimpleAttributeTable>( derived );
 			delDerivedAttributeTables.put( v, derivedRef );
 		}
 		return derivedRef.get();
@@ -432,15 +321,15 @@ public class AttributeTable implements Presentable
 		return setsForClass;
 	}
 	
-	private AttributeTable getUniqueAttributeTable(AttributeTable attribTable)
+	private SimpleAttributeTable getUniqueAttributeTable(SimpleAttributeTable attribTable)
 	{
 		AttributeTableSet setsForClass = getAttributeTableTableForClass();
 		
 		AttributeValuesMultiple vals = attribTable.allValues();
-		WeakReference<AttributeTable> uniqueRef = setsForClass.attributeTableSet.get( vals );
+		WeakReference<SimpleAttributeTable> uniqueRef = setsForClass.attributeTableSet.get( vals );
 		if ( uniqueRef == null  ||  uniqueRef.get() == null )
 		{
-			uniqueRef = new WeakReference<AttributeTable>( attribTable );
+			uniqueRef = new WeakReference<SimpleAttributeTable>( attribTable );
 			setsForClass.attributeTableSet.put( vals, uniqueRef ); 
 		}
 		
@@ -468,7 +357,7 @@ public class AttributeTable implements Presentable
 
 	
 	
-	protected static Pres presentAttributeMap(GSymFragmentView ctx, AttributeTable inheritedState, HashMap<String, Object> values)
+	protected static Pres presentAttributeMap(GSymFragmentView ctx, SimpleAttributeTable inheritedState, HashMap<String, Object> values)
 	{
 		Set<String> nameSet = values.keySet();
 		String names[] = nameSet.toArray( new String[0] );
@@ -487,7 +376,7 @@ public class AttributeTable implements Presentable
 	}
 	
 	@Override
-	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
+	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		Pres valueField = new VerticalField( "Attributes:", presentAttributeMap( fragment, inheritedState, values ) );
 		return new ObjectBoxWithFields( getClass().getName(), new Pres[] { valueField } );

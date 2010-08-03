@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.GSym;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Browser.Location.TokenIterator;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
@@ -18,12 +18,12 @@ public class GSymPerspective extends GSymAbstractPerspective
 {
 	private GSymViewFragmentFunction fragmentViewFn;
 	private StyleSheet2 styleSheet;
-	private AttributeTable initialInheritedState;
+	private SimpleAttributeTable initialInheritedState;
 	private EditHandler editHandler;
 	private GSymRelativeLocationResolver locationResolver;
 	
 	
-	public GSymPerspective(GSymViewFragmentFunction fragmentViewFn, StyleSheet2 styleSheet, AttributeTable initialInheritedState, EditHandler editHandler,
+	public GSymPerspective(GSymViewFragmentFunction fragmentViewFn, StyleSheet2 styleSheet, SimpleAttributeTable initialInheritedState, EditHandler editHandler,
 			GSymRelativeLocationResolver locationResolver)
 	{
 		this.fragmentViewFn = fragmentViewFn;
@@ -35,18 +35,18 @@ public class GSymPerspective extends GSymAbstractPerspective
 	
 	public GSymPerspective(GSymViewFragmentFunction fragmentViewFn, GSymRelativeLocationResolver locationResolver)
 	{
-		this( fragmentViewFn, StyleSheet2.instance, AttributeTable.instance, null, locationResolver );
+		this( fragmentViewFn, StyleSheet2.instance, SimpleAttributeTable.instance, null, locationResolver );
 	}
 	
 	public GSymPerspective(GSymViewFragmentFunction fragmentViewFn)
 	{
-		this( fragmentViewFn, StyleSheet2.instance, AttributeTable.instance, null, null );
+		this( fragmentViewFn, StyleSheet2.instance, SimpleAttributeTable.instance, null, null );
 	}
 	
 	
 	
 	@Override
-	public Pres present(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
+	public Pres present(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return fragmentViewFn.createViewFragment( x, fragment, inheritedState );
 	}
@@ -58,7 +58,7 @@ public class GSymPerspective extends GSymAbstractPerspective
 	}
 
 	@Override
-	public AttributeTable getInitialInheritedState()
+	public SimpleAttributeTable getInitialInheritedState()
 	{
 		return initialInheritedState;
 	}

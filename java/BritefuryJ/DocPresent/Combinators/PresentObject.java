@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent.Combinators;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 import BritefuryJ.GSym.GSymAbstractPerspective;
@@ -28,7 +28,7 @@ public class PresentObject extends Pres
 	{
 		GSymAbstractPerspective perspective = ctx.getPerspective();
 		GSymFragmentView fragment = ctx.getFragment();
-		AttributeTable inheritedState = ctx.getInheritedState();
+		SimpleAttributeTable inheritedState = ctx.getInheritedState();
 		
 		if ( perspective == null )
 		{

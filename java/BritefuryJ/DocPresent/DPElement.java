@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.WeakHashMap;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
@@ -82,7 +82,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	private static class TreeExplorerViewFragmentFn implements GSymViewFragmentFunction
 	{
 		@Override
-		public Pres createViewFragment(Object x, GSymFragmentView ctx, AttributeTable inheritedState)
+		public Pres createViewFragment(Object x, GSymFragmentView ctx, SimpleAttributeTable inheritedState)
 		{
 			DPElement element = (DPElement)x;
 			return element.exploreTreePresent( ctx, inheritedState );
@@ -109,7 +109,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 
 		@Override
-		public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
+		public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			return new PerspectiveInnerFragment( treeExplorerPerspective, element ); 
 		}
@@ -3172,12 +3172,12 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		return getDebugPresentationHeaderBorderStyle().applyTo( new Border( box ) );
 	}
 	
-	public Pres createMetaElement(GSymFragmentView ctx, AttributeTable state)
+	public Pres createMetaElement(GSymFragmentView ctx, SimpleAttributeTable state)
 	{
 		return createDebugPresentationHeader();
 	}
 	
-	private Pres exploreTreePresent(GSymFragmentView ctx, AttributeTable state)
+	private Pres exploreTreePresent(GSymFragmentView ctx, SimpleAttributeTable state)
 	{
 		debugPresStateListeners = PresentationStateListenerList.addListener( debugPresStateListeners, ctx );
 		return createMetaElement( ctx, state );
@@ -3196,7 +3196,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 
 
-	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
+	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		if ( !isRealised() )
 		{

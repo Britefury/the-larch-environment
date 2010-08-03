@@ -10,7 +10,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
@@ -58,7 +58,7 @@ public class DocModelPresenter
 
 
 	
-	private static Pres present(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
+	private static Pres present(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		if ( x == null )
 		{
@@ -74,7 +74,7 @@ public class DocModelPresenter
 		}
 	}
 	
-	protected static Pres presentDMList(DMList node, GSymFragmentView fragment, AttributeTable inheritedState)
+	protected static Pres presentDMList(DMList node, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		List<Object> xViews = new ArrayList<Object>();
 		for (Object x: node)
@@ -100,7 +100,7 @@ public class DocModelPresenter
 	}
 	
 	
-	protected static Pres presentDMObject(DMObject node, GSymFragmentView fragment, AttributeTable inheritedState)
+	protected static Pres presentDMObject(DMObject node, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		DMObjectClass cls = node.getDMObjectClass();
 		

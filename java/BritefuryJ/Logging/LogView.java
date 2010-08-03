@@ -9,7 +9,7 @@ package BritefuryJ.Logging;
 import java.util.ArrayList;
 import java.util.List;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
@@ -75,7 +75,7 @@ public class LogView implements Presentable
 
 
 
-	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
+	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		stateListeners = PresentationStateListenerList.addListener( stateListeners, fragment );
 		

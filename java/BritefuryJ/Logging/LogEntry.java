@@ -13,7 +13,7 @@ import java.util.HashSet;
 
 import org.python.core.Py;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
@@ -185,7 +185,7 @@ public class LogEntry implements Presentable
 	
 
 
-	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
+	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		Pres fields[] = new Pres[items.size()];
 		for (int i = 0; i < items.size(); i++)

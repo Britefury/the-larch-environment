@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.GSym;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.CommandHistory.CommandHistory;
 
 public class GSymSubject
@@ -14,12 +14,12 @@ public class GSymSubject
 	private Object focus;
 	private GSymAbstractPerspective perspective;
 	private String title;
-	private AttributeTable subjectContext;
+	private SimpleAttributeTable subjectContext;
 	private CommandHistory commandHistory;
 
 	
 	
-	public GSymSubject(Object focus, GSymAbstractPerspective perspective, String title, AttributeTable subjectContext, CommandHistory commandHistory)
+	public GSymSubject(Object focus, GSymAbstractPerspective perspective, String title, SimpleAttributeTable subjectContext, CommandHistory commandHistory)
 	{
 		this.focus = focus;
 		this.perspective = perspective;
@@ -44,7 +44,7 @@ public class GSymSubject
 		return title;
 	}
 	
-	public AttributeTable getSubjectContext()
+	public SimpleAttributeTable getSubjectContext()
 	{
 		return subjectContext;
 	}
@@ -71,7 +71,7 @@ public class GSymSubject
 		return new GSymSubject( focus, perspective, title, subjectContext, commandHistory );
 	}
 	
-	public GSymSubject withSubjectContext(AttributeTable subjectContext)
+	public GSymSubject withSubjectContext(SimpleAttributeTable subjectContext)
 	{
 		return new GSymSubject( focus, perspective, title, subjectContext, commandHistory );
 	}

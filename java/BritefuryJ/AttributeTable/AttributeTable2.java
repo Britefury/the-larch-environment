@@ -385,7 +385,7 @@ public class AttributeTable2 implements Presentable
 	
 	
 	
-	protected static Pres presentAttributeMap(GSymFragmentView fragment, AttributeTable inheritedState, HashMap<AttributeBase, Object> values)
+	protected static Pres presentAttributeMap(GSymFragmentView fragment, SimpleAttributeTable inheritedState, HashMap<AttributeBase, Object> values)
 	{
 		Set<AttributeBase> attributeSet = values.keySet();
 		AttributeBase attributes[] = attributeSet.toArray( new AttributeBase[0] );
@@ -406,7 +406,7 @@ public class AttributeTable2 implements Presentable
 	}
 	
 	@Override
-	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
+	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		Pres valueField = new VerticalField( "Attributes:", presentAttributeMap( fragment, inheritedState, values ) );
 		return new ObjectBoxWithFields( getClass().getName(), new Pres[] { valueField } );

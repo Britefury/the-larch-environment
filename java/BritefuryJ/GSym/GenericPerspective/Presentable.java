@@ -6,11 +6,11 @@
 //##************************
 package BritefuryJ.GSym.GenericPerspective;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
 public interface Presentable
 {
-	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState);
+	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState);
 }

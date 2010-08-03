@@ -6,10 +6,10 @@
 //##************************
 package BritefuryJ.GSym.View;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
 
 public interface GSymViewFragmentFunction
 {
-	public Pres createViewFragment(Object x, GSymFragmentView ctx, AttributeTable inheritedState);
+	public Pres createViewFragment(Object x, GSymFragmentView ctx, SimpleAttributeTable inheritedState);
 }

@@ -29,10 +29,10 @@ class _AppLocationResolver (GSymLocationResolver):
 			iterAfterModel = iterator.consumeLiteral( 'model:' )
 			perspective = world.getAppStatePerspective()
 			if iterAfterModel is not None:
-				enclosingSubject = GSymSubject( appState, perspective, '[model]', AttributeTable.instance.withAttrs( world=world, document=None, location=Location( 'model:' ) ), None )
+				enclosingSubject = GSymSubject( appState, perspective, '[model]', SimpleAttributeTable.instance.withAttrs( world=world, document=None, location=Location( 'model:' ) ), None )
 				iterator = iterAfterModel
 			else:
-				enclosingSubject = GSymSubject( appState, perspective, '', AttributeTable.instance.withAttrs( world=world, document=None, location=Location( '' ) ), None )
+				enclosingSubject = GSymSubject( appState, perspective, '', SimpleAttributeTable.instance.withAttrs( world=world, document=None, location=Location( '' ) ), None )
 			subject = perspective.resolveRelativeLocation( enclosingSubject, iterator )
 			if subject is None:
 				return None

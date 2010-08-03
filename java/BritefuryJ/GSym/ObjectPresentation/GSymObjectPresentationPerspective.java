@@ -11,7 +11,7 @@ import org.python.core.PyException;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.GSym.GSymAbstractPerspective;
@@ -35,15 +35,15 @@ public abstract class GSymObjectPresentationPerspective extends GSymAbstractPers
 	
 
 	
-	protected abstract Pres presentWithJavaInterface(Object x, GSymFragmentView fragment, AttributeTable inheritedState);
-	protected abstract Pres presentJavaObjectFallback(Object x, GSymFragmentView fragment, AttributeTable inheritedState);
-	protected abstract Pres presentPyObjectFallback(PyObject x, GSymFragmentView fragment, AttributeTable inhritedState);
-	protected abstract Pres invokeObjectPresenter(ObjectPresenter presenter, Object x, GSymFragmentView fragment, AttributeTable inheritedState);
-	protected abstract Pres invokePyObjectPresenter(PyObjectPresenter presenter, PyObject x, GSymFragmentView fragment, AttributeTable inheritedState);
+	protected abstract Pres presentWithJavaInterface(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState);
+	protected abstract Pres presentJavaObjectFallback(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState);
+	protected abstract Pres presentPyObjectFallback(PyObject x, GSymFragmentView fragment, SimpleAttributeTable inhritedState);
+	protected abstract Pres invokeObjectPresenter(ObjectPresenter presenter, Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState);
+	protected abstract Pres invokePyObjectPresenter(PyObjectPresenter presenter, PyObject x, GSymFragmentView fragment, SimpleAttributeTable inheritedState);
 	
 
 	@Override
-	public Pres present(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
+	public Pres present(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		Pres result = null;
 		
@@ -129,7 +129,7 @@ public abstract class GSymObjectPresentationPerspective extends GSymAbstractPers
 		if ( x != null )
 		{
 			String title = x != null  ?  x.getClass().getName()  :  "<null>";
-			return new GSymSubject( x, this, title, AttributeTable.instance, null );
+			return new GSymSubject( x, this, title, SimpleAttributeTable.instance, null );
 		}
 		else
 		{

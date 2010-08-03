@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Browser.BrowserContext;
 import BritefuryJ.DocPresent.Browser.Location;
@@ -40,7 +40,7 @@ public class GSymBrowserContext
 {
 	private static class RootLocationFragmentViewFn implements GSymViewFragmentFunction
 	{
-		public Pres createViewFragment(Object x, GSymFragmentView ctx, AttributeTable state)
+		public Pres createViewFragment(Object x, GSymFragmentView ctx, SimpleAttributeTable state)
 		{
 			return rootLocationStyle.applyTo( new StaticText( "<<Root location>>" ) );
 		}
@@ -48,7 +48,7 @@ public class GSymBrowserContext
 	
 	private static class ResolveErrorFragmentViewFn implements GSymViewFragmentFunction
 	{
-		public Pres createViewFragment(Object x, GSymFragmentView ctx, AttributeTable state)
+		public Pres createViewFragment(Object x, GSymFragmentView ctx, SimpleAttributeTable state)
 		{
 			Location location = (Location)x;
 			return resolveErrorStyleSheet.applyTo( new StaticText( "<<Could not resolve " + location.getLocationString() + ">>" ) );
@@ -57,7 +57,7 @@ public class GSymBrowserContext
 	
 	private static class SystemPageFragmentViewFn implements GSymViewFragmentFunction
 	{
-		public Pres createViewFragment(Object x, GSymFragmentView ctx, AttributeTable state)
+		public Pres createViewFragment(Object x, GSymFragmentView ctx, SimpleAttributeTable state)
 		{
 			Page p = (Page)x;
 			return Pres.coerce( p.getContentsElement() );
@@ -104,7 +104,7 @@ public class GSymBrowserContext
 		@Override
 		public GSymSubject resolveLocationAsSubject(Location location)
 		{
-			return perspective.resolveRelativeLocation( new GSymSubject( null, perspective, "", AttributeTable.instance, null ), location.iterator() );
+			return perspective.resolveRelativeLocation( new GSymSubject( null, perspective, "", SimpleAttributeTable.instance, null ), location.iterator() );
 		}
 	}
 	
@@ -195,11 +195,11 @@ public class GSymBrowserContext
 		
 		if ( location.getLocationString().equals( "" ) )
 		{
-			return new GSymSubject( null, rootLocationPerspective, "Root page", AttributeTable.instance, null );
+			return new GSymSubject( null, rootLocationPerspective, "Root page", SimpleAttributeTable.instance, null );
 		}
 		else
 		{
-			return new GSymSubject( location, resolveErrorPerspective, "Resolve error", AttributeTable.instance, null );
+			return new GSymSubject( location, resolveErrorPerspective, "Resolve error", SimpleAttributeTable.instance, null );
 		}
 	}
 	

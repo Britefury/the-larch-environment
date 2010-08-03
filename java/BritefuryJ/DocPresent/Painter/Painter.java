@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent.Painter;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 
-import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.Box;
@@ -27,7 +27,7 @@ public abstract class Painter implements Presentable
 
 
 	@Override
-	public Pres present(GSymFragmentView fragment, AttributeTable inheritedState)
+	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return new ObjectBox( getClass().getName(), new Border( StyleSheet2.instance.withAttr( Primitive.shapePainter, this ).applyTo( new Box( 50.0, 25.0 ) ) ) );
 	}
