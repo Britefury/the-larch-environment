@@ -28,13 +28,15 @@ import javax.swing.TransferHandler;
 
 import BritefuryJ.CommandHistory.CommandHistoryController;
 import BritefuryJ.CommandHistory.CommandHistoryListener;
+import BritefuryJ.Controls.ScrolledViewport;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.PageController;
 import BritefuryJ.DocPresent.PresentationComponent;
-import BritefuryJ.DocPresent.Controls.ControlsStyleSheet;
-import BritefuryJ.DocPresent.Controls.ScrolledViewport;
+import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.Combinators.Primitive.HiddenContent;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
+import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Browser
 {
@@ -55,7 +57,7 @@ public class Browser
 	private JPanel locationPanel, panel;
 
 	private PresentationComponent presComponent;
-	private ScrolledViewport viewport;
+	private ScrolledViewport.ScrolledViewportControl viewport;
 	private BrowserHistory history;
 	
 	private BrowserContext context;
@@ -71,7 +73,7 @@ public class Browser
 		this.context = context;
 		history = new BrowserHistory( location );
 		
-		viewport = makeViewport( history.getCurrentState().getViewportState() );
+		viewport = makeViewport( new HiddenContent( "" ), history.getCurrentState().getViewportState() );
 		
 		presComponent = new PresentationComponent();
 		presComponent.setPageController( pageController );
@@ -242,9 +244,9 @@ public class Browser
 
 	
 	
-	private ScrolledViewport makeViewport(PersistentState state)
+	private ScrolledViewport.ScrolledViewportControl makeViewport(Object child, PersistentState state)
 	{
-		return ControlsStyleSheet.instance.scrolledViewport( null, 0.0, 0.0, state );
+		return (ScrolledViewport.ScrolledViewportControl)new ScrolledViewport( child, 0.0, 0.0, state ).createControl( new PresentationContext(), StyleValues.instance );
 	}
 	
 	
@@ -256,8 +258,7 @@ public class Browser
 		PersistentStateStore stateStore = history.getCurrentState().getPagePersistentState();
 		Page p = context.resolveLocationAsPage( location, stateStore );
 
-		viewport = makeViewport( history.getCurrentState().getViewportState() );
-		viewport.getViewportElement().setChild( p.getContentsElement().alignHExpand() );
+		viewport = makeViewport( p.getContentsElement().alignHExpand(), history.getCurrentState().getViewportState() );
 		presComponent.getRootElement().setChild( viewport.getElement().alignHExpand().alignVExpand() );
 		
 		// Set the page

@@ -87,7 +87,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 
 	
 	
-	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Boolean = new ObjectPresenter<GenericPerspectiveStyleSheet>()
+	public static final ObjectPresenter presenter_Boolean = new ObjectPresenter()
 	{
 		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
@@ -95,7 +95,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		}
 	};
 	
-	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Byte = new ObjectPresenter<GenericPerspectiveStyleSheet>()
+	public static final ObjectPresenter presenter_Byte = new ObjectPresenter()
 	{
 		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
@@ -103,7 +103,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		}
 	};
 	
-	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Character = new ObjectPresenter<GenericPerspectiveStyleSheet>()
+	public static final ObjectPresenter presenter_Character = new ObjectPresenter()
 	{
 		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
@@ -111,7 +111,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		}
 	};
 	
-	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Short = new ObjectPresenter<GenericPerspectiveStyleSheet>()
+	public static final ObjectPresenter presenter_Short = new ObjectPresenter()
 	{
 		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
@@ -119,7 +119,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		}
 	};
 	
-	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Integer = new ObjectPresenter<GenericPerspectiveStyleSheet>()
+	public static final ObjectPresenter presenter_Integer = new ObjectPresenter()
 	{
 		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
@@ -127,7 +127,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		}
 	};
 	
-	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Long = new ObjectPresenter<GenericPerspectiveStyleSheet>()
+	public static final ObjectPresenter presenter_Long = new ObjectPresenter()
 	{
 		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
@@ -135,7 +135,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		}
 	};
 	
-	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Float = new ObjectPresenter<GenericPerspectiveStyleSheet>()
+	public static final ObjectPresenter presenter_Float = new ObjectPresenter()
 	{
 		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
@@ -143,7 +143,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		}
 	};
 	
-	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Double = new ObjectPresenter<GenericPerspectiveStyleSheet>()
+	public static final ObjectPresenter presenter_Double = new ObjectPresenter()
 	{
 		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
@@ -151,7 +151,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		}
 	};
 	
-	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_String = new ObjectPresenter<GenericPerspectiveStyleSheet>()
+	public static final ObjectPresenter presenter_String = new ObjectPresenter()
 	{
 		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
@@ -162,7 +162,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	
 
-	public static final PyObjectPresenter<GenericPerspectiveStyleSheet> presenter_PyTuple = new PyObjectPresenter<GenericPerspectiveStyleSheet>()
+	public static final PyObjectPresenter presenter_PyTuple = new PyObjectPresenter()
 	{
 		public Pres presentObject(PyObject x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
@@ -178,7 +178,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		}
 	};
 
-	public static final PyObjectPresenter<GenericPerspectiveStyleSheet> presenter_PyType = new PyObjectPresenter<GenericPerspectiveStyleSheet>()
+	public static final PyObjectPresenter presenter_PyType = new PyObjectPresenter()
 	{
 		public Pres presentObject(PyObject x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
@@ -219,7 +219,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	};
 
 	private static PyFunction pyFunction_inspectFn = null;
-	public static final PyObjectPresenter<GenericPerspectiveStyleSheet> presenter_PyFunction = new PyObjectPresenter<GenericPerspectiveStyleSheet>()
+	public static final PyObjectPresenter presenter_PyFunction = new PyObjectPresenter()
 	{
 		
 		private PyFunction getInspectFunction()
@@ -331,7 +331,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 
 	
-	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_PyNone = new ObjectPresenter<GenericPerspectiveStyleSheet>()
+	public static final ObjectPresenter presenter_PyNone = new ObjectPresenter()
 	{
 		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
@@ -341,7 +341,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 
 	
 	
-	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_PyException = new ObjectPresenter<GenericPerspectiveStyleSheet>()
+	public static final ObjectPresenter presenter_PyException = new ObjectPresenter()
 	{
 		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
@@ -369,7 +369,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 
 	
 	
-	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Exception = new ObjectPresenter<GenericPerspectiveStyleSheet>()
+	public static final ObjectPresenter presenter_Exception = new ObjectPresenter()
 	{
 		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
@@ -397,7 +397,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 
 
 	
-	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_List = new ObjectPresenter<GenericPerspectiveStyleSheet>()
+	public static final ObjectPresenter presenter_List = new ObjectPresenter()
 	{
 		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
@@ -413,7 +413,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		}
 	};
 	
-	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Map = new ObjectPresenter<GenericPerspectiveStyleSheet>()
+	public static final ObjectPresenter presenter_Map = new ObjectPresenter()
 	{
 		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
@@ -434,7 +434,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		}
 	};
 	
-	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Shape = new ObjectPresenter<GenericPerspectiveStyleSheet>()
+	public static final ObjectPresenter presenter_Shape = new ObjectPresenter()
 	{
 		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
@@ -457,7 +457,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		}
 	};
 
-	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_BufferedImage = new ObjectPresenter<GenericPerspectiveStyleSheet>()
+	public static final ObjectPresenter presenter_BufferedImage = new ObjectPresenter()
 	{
 		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
@@ -480,7 +480,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		}
 	};
 
-	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Color = new ObjectPresenter<GenericPerspectiveStyleSheet>()
+	public static final ObjectPresenter presenter_Color = new ObjectPresenter()
 	{
 		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{
@@ -505,7 +505,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		}
 	};
 
-	public static final ObjectPresenter<GenericPerspectiveStyleSheet> presenter_Class = new ObjectPresenter<GenericPerspectiveStyleSheet>()
+	public static final ObjectPresenter presenter_Class = new ObjectPresenter()
 	{
 		public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState)
 		{

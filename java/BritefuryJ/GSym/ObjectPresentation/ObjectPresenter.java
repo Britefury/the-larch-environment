@@ -8,10 +8,9 @@ package BritefuryJ.GSym.ObjectPresentation;
 
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
-public interface ObjectPresenter<StyleSheetType extends StyleSheet>
+public interface ObjectPresenter
 {
 	public Pres presentObject(Object x, GSymFragmentView fragment, AttributeTable inheritedState);
 }

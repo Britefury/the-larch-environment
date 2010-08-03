@@ -16,7 +16,7 @@ public class ScrolledViewport extends AbstractScrolledViewport
 	private double minWidth, minHeight;
 	
 	
-	public ScrolledViewport(Pres child, double minWidth, double minHeight, PersistentState state)
+	public ScrolledViewport(Object child, double minWidth, double minHeight, PersistentState state)
 	{
 		super( child, state );
 		this.minWidth = minWidth;

@@ -13,19 +13,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
+import BritefuryJ.DocPresent.Combinators.Primitive.Border;
+import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
-import BritefuryJ.DocPresent.StyleSheet.PrimitiveStyleSheet;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.ParserHelpers.DebugNode;
 import BritefuryJ.ParserHelpers.ParseResultInterface;
@@ -35,15 +40,13 @@ public class NodeView implements FragmentContext
 	private static class NodeInteractor extends ElementInteractor
 	{
 		private NodeView nodeView;
-		private DPElement element;
 		private boolean bSelected, bHighlight;
 		
-		public NodeInteractor(NodeView nodeView, DPElement element)
+		public NodeInteractor(NodeView nodeView)
 		{
 			super();
 			
 			this.nodeView = nodeView;
-			this.element = element;
 			bSelected = false;
 			bHighlight = false;
 		}
@@ -55,7 +58,7 @@ public class NodeView implements FragmentContext
 			if ( !bSelected )
 			{
 				bSelected = true;
-				element.queueFullRedraw();
+				//element.queueFullRedraw();
 			}
 		}
 		
@@ -64,7 +67,7 @@ public class NodeView implements FragmentContext
 			if ( bSelected )
 			{
 				bSelected = false;
-				element.queueFullRedraw();
+				//element.queueFullRedraw();
 			}
 		}
 		
@@ -110,23 +113,22 @@ public class NodeView implements FragmentContext
 	
 	static int MAX_STRING_LENGTH = 64;
 	
-	static PrimitiveStyleSheet styleSheet = PrimitiveStyleSheet.instance;
+	private static final StyleSheet2 styleSheet = StyleSheet2.instance;
 
-	static PrimitiveStyleSheet debugNameStyle = styleSheet.withFontBold( true ).withFontSize( 24 ).withForeground( Color.blue );
-	static PrimitiveStyleSheet classNameStyle = styleSheet.withFontSize( 18 ).withForeground( new Color( 0.0f, 0.0f, 0.5f ) );
-	static PrimitiveStyleSheet rangeStyle = styleSheet.withFontSize( 12 );
-	static PrimitiveStyleSheet inputStyle = styleSheet.withFontSize( 12 );
-	static PrimitiveStyleSheet valueStyle = styleSheet.withFontSize( 16 );
-	static PrimitiveStyleSheet failStyle = styleSheet.withFontItalic( true ).withFontSize( 16 ).withForeground( new Color( 0.5f, 0.0f, 0.0f ) );;
+	private static final StyleSheet2 debugNameStyle = styleSheet.withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 24 ).withAttr( Primitive.foreground,  Color.blue );
+	private static final StyleSheet2 classNameStyle = styleSheet.withAttr( Primitive.fontSize, 18 ).withAttr( Primitive.foreground,  new Color( 0.0f, 0.0f, 0.5f ) );
+	private static final StyleSheet2 rangeStyle = styleSheet.withAttr( Primitive.fontSize, 12 );
+	private static final StyleSheet2 inputStyle = styleSheet.withAttr( Primitive.fontSize, 12 );
+	private static final StyleSheet2 valueStyle = styleSheet.withAttr( Primitive.fontSize, 16 );
+	private static final StyleSheet2 failStyle = styleSheet.withAttr( Primitive.fontItalic,  true ).withAttr( Primitive.fontSize, 16 ).withAttr( Primitive.foreground,  new Color( 0.5f, 0.0f, 0.0f ) );
 	
-	static AbstractBorder titleSuccessBorder = new FilledBorder( 0.0, 0.0, 0.0, 0.0, new Color( 0.85f, 0.95f, 0.85f ) );
-	static AbstractBorder titleFailBorder = new FilledBorder( 0.0, 0.0, 0.0, 0.0, new Color( 1.0f, 0.85f, 0.85f ) );
-	static AbstractBorder nodeBorder = new SolidBorder( 1.0, 1.0, Color.black, null );
+	private static final AbstractBorder titleSuccessBorder = new FilledBorder( 0.0, 0.0, 0.0, 0.0, new Color( 0.85f, 0.95f, 0.85f ) );
+	private static final AbstractBorder titleFailBorder = new FilledBorder( 0.0, 0.0, 0.0, 0.0, new Color( 1.0f, 0.85f, 0.85f ) );
+	private static final AbstractBorder nodeBorder = new SolidBorder( 1.0, 1.0, Color.black, null );
 	
 	
 	
-	private DPElement nodeElement, mainElement;
-	private DPBin nodeBinElement;
+	private DPElement mainElement, nodeElement;
 	private NodeInteractor nodeInteractor;
 	private ParseView parseView;
 	private ArrayList<NodeView> children;
@@ -139,7 +141,7 @@ public class NodeView implements FragmentContext
 		this.parseView = parseView;
 		this.data = data;
 		
-		nodeElement = makeNodeElement( data );
+		nodeElement = makeNodeElement( data ).present();
 		
 		ArrayList<DPElement> childElements = new ArrayList<DPElement>();
 		children = new ArrayList<NodeView>();
@@ -150,9 +152,9 @@ public class NodeView implements FragmentContext
 			childElements.add( childView.getElement().padY( 3.0 ) );
 		}
 		
-		DPElement childrenVBox = styleSheet.withVBoxSpacing( 3.0 ).vbox( childElements.toArray( new DPElement[0] ) );
+		Pres childrenVBox = styleSheet.withAttr( Primitive.vboxSpacing, 3.0 ).applyTo( new VBox( childElements.toArray( new DPElement[0] ) ) );
 		
-		mainElement = styleSheet.withHBoxSpacing( 80.0 ).hbox( new DPElement[] { nodeElement.alignVCentre(), childrenVBox.alignVCentre() } );
+		mainElement = styleSheet.withAttr( Primitive.hboxSpacing, 80.0 ).applyTo( new HBox( new Object[] { nodeElement.alignVCentre(), childrenVBox.alignVCentre() } ) ).present();
 	}
 	
 	
@@ -214,7 +216,7 @@ public class NodeView implements FragmentContext
 	
 	
 	
-	private DPElement makeTitleElement(DebugNode data)
+	private Pres makeTitleElement(DebugNode data)
 	{
 		ParserExpression expr = data.getExpression();
 		String exprName = expr.getExpressionName();
@@ -227,11 +229,11 @@ public class NodeView implements FragmentContext
 		}
 		
 		
-		DPElement classText = classNameStyle.staticText( "[" + className + "]" );
+		Pres classText = classNameStyle.applyTo( new StaticText( "[" + className + "]" ) );
 		if ( exprName != null )
 		{
-			DPElement exprText = debugNameStyle.staticText( exprName );
-			return styleSheet.withHBoxSpacing( 10.0 ).hbox( new DPElement[] { exprText, classText } );
+			Pres exprText = debugNameStyle.applyTo( new StaticText( exprName ) );
+			return styleSheet.withAttr( Primitive.hboxSpacing, 10.0 ).applyTo( new HBox( new Pres[] { exprText, classText } ) );
 		}
 		else
 		{
@@ -239,16 +241,16 @@ public class NodeView implements FragmentContext
 		}
 	}
 	
-	private DPElement makeTitleBoxElement(DebugNode data)
+	private Pres makeTitleBoxElement(DebugNode data)
 	{
-		DPElement titleElement = makeTitleElement( data );
+		Pres titleElement = makeTitleElement( data );
 		
 		AbstractBorder b = data.getResult().isValid()  ?  titleSuccessBorder  :  titleFailBorder;
 		
-		return styleSheet.withBorder( b ).border( titleElement.alignVCentre() );
+		return styleSheet.withAttr( Primitive.border, b ).applyTo( new Border( titleElement.alignVCentre() ) );
 	}
 	
-	private DPElement makeRangeElement(DebugNode data)
+	private Pres makeRangeElement(DebugNode data)
 	{
 		ParseResultInterface result = data.getResult();
 		String rangeText = "";
@@ -262,11 +264,11 @@ public class NodeView implements FragmentContext
 			rangeText = String.valueOf( data.getStart() ) + "   :   " + String.valueOf( result.getEnd() );
 		}
 
-		return rangeStyle.staticText( rangeText );
+		return rangeStyle.applyTo( new StaticText( rangeText ) );
 	}
 	
 	@SuppressWarnings("unchecked")
-	private DPElement makeInputElement(DebugNode data)
+	private Pres makeInputElement(DebugNode data)
 	{
 		Object inputObject = data.getInput();
 		String inputString;
@@ -296,10 +298,10 @@ public class NodeView implements FragmentContext
 			inputString = inputString.substring( 0, MAX_STRING_LENGTH )  +  "...";
 		}
 
-		return inputStyle.staticText( inputString );
+		return inputStyle.applyTo( new StaticText( inputString ) );
 	}
 
-	private DPElement makeValueElement(DebugNode data)
+	private Pres makeValueElement(DebugNode data)
 	{
 		ParseResultInterface result = data.getResult();
 		
@@ -311,35 +313,35 @@ public class NodeView implements FragmentContext
 			{
 				valueString = valueString.substring( 0, MAX_STRING_LENGTH )  +  "...";
 			}
-			return valueStyle.staticText( valueString );
+			return valueStyle.applyTo( new StaticText( valueString ) );
 		}
 		else
 		{
-			return failStyle.staticText( "<fail>" );
+			return failStyle.applyTo( new StaticText( "<fail>" ) );
 		}
 	}
 	
-	private DPElement makeContentBoxElement(DebugNode data)
+	private Pres makeContentBoxElement(DebugNode data)
 	{
-		DPElement rangeElement = makeRangeElement( data );
-		DPElement inputElement = makeInputElement( data );
-		DPElement valueElement = makeValueElement( data );
+		Pres rangeElement = makeRangeElement( data );
+		Pres inputElement = makeInputElement( data );
+		Pres valueElement = makeValueElement( data );
 		
-		return styleSheet.vbox( new DPElement[] { rangeElement, inputElement, valueElement } );
+		return new VBox( new Pres[] { rangeElement, inputElement, valueElement } );
 	}
 	
-	private DPElement makeNodeElement(DebugNode data)
+	private Pres makeNodeElement(DebugNode data)
 	{
-		DPElement titleBoxElement = makeTitleBoxElement( data );
-		DPElement contentBoxElement = makeContentBoxElement( data );
+		Pres titleBoxElement = makeTitleBoxElement( data );
+		Pres contentBoxElement = makeContentBoxElement( data );
 		
-		DPVBox nodeBoxElement = styleSheet.vbox( new DPElement[] { titleBoxElement.alignHExpand(), contentBoxElement.alignHExpand() } );
+		Pres nodeBoxElement = new VBox( new Pres[] { titleBoxElement.alignHExpand(), contentBoxElement.alignHExpand() } );
 		
-		nodeBinElement = styleSheet.bin( nodeBoxElement );
+		Pres nodeBinElement = new Bin( nodeBoxElement );
 		
-		nodeInteractor = new NodeInteractor( this, nodeBinElement );
-		nodeBinElement.addInteractor( nodeInteractor );
+		nodeInteractor = new NodeInteractor( this );
+		nodeBinElement = nodeBinElement.withInteractor( nodeInteractor );
 		
-		return styleSheet.withBorder( nodeBorder ).border( nodeBinElement );
+		return styleSheet.withAttr( Primitive.border, nodeBorder ).applyTo( new Border( nodeBinElement ) );
 	}
 }

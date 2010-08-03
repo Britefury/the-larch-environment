@@ -159,7 +159,6 @@ public class AttributeTable implements Presentable
 	protected HashMap<String, Object> values = new HashMap<String, Object>();
 	protected HashMap<AttributeValueSingle, WeakReference<AttributeTable>> singleValueDerivedAttributeTables = new HashMap<AttributeValueSingle, WeakReference<AttributeTable>>();
 	protected HashMap<AttributeValuesMultiple, WeakReference<AttributeTable>> multiValueDerivedAttributeTables = new HashMap<AttributeValuesMultiple, WeakReference<AttributeTable>>();
-	protected IdentityHashMap<AttributeValues, WeakReference<AttributeTable>> attribSetDerivedAttributeTables = new IdentityHashMap<AttributeValues, WeakReference<AttributeTable>>();
 	protected IdentityHashMap<AttributeTable, WeakReference<AttributeTable>> attribTableDerivedAttributeTables = new IdentityHashMap<AttributeTable, WeakReference<AttributeTable>>();
 	protected HashMap<DelAttribute, WeakReference<AttributeTable>> delDerivedAttributeTables = new HashMap<DelAttribute, WeakReference<AttributeTable>>();
 	
@@ -380,20 +379,6 @@ public class AttributeTable implements Presentable
 			
 			return withAttrs( valuesMap );
 		}
-	}
-	
-	public AttributeTable withAttrValues(AttributeValues attribs)
-	{
-		WeakReference<AttributeTable> derivedRef = attribSetDerivedAttributeTables.get( attribs );
-		if ( derivedRef == null  ||  derivedRef.get() == null )
-		{
-			AttributeTable derived = withAttrs( attribs.values );
-			
-			derivedRef = new WeakReference<AttributeTable>( derived );
-
-			attribSetDerivedAttributeTables.put( attribs, derivedRef );
-		}
-		return derivedRef.get();
 	}
 	
 	public AttributeTable withAttrs(AttributeTable attribs)

@@ -13,8 +13,6 @@ import java.util.WeakHashMap;
 
 import org.python.core.PyType;
 
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-
 public class GSymObjectPresenterRegistry
 {
 	public static class PresenterNotRegisteredException extends RuntimeException
@@ -34,10 +32,10 @@ public class GSymObjectPresenterRegistry
 	
 	
 	private WeakHashMap<GSymObjectPresentationPerspective, Object> perspectives = new WeakHashMap<GSymObjectPresentationPerspective, Object>();
-	private HashMap<Class<?>, ObjectPresenter<? extends StyleSheet>> registeredJavaPresenters = new HashMap<Class<?>, ObjectPresenter<? extends StyleSheet>>();
-	private HashMap<PyType, PyObjectPresenter<? extends StyleSheet>> registeredPythonPresenters = new HashMap<PyType, PyObjectPresenter<? extends StyleSheet>>();
-	private IdentityHashMap<ObjectPresenter<? extends StyleSheet>, Class<?>> javaPresenterToClass = new IdentityHashMap<ObjectPresenter<? extends StyleSheet>, Class<?>>();
-	private IdentityHashMap<PyObjectPresenter<? extends StyleSheet>, PyType> pythonPresenterToType = new IdentityHashMap<PyObjectPresenter<? extends StyleSheet>, PyType>();
+	private HashMap<Class<?>, ObjectPresenter> registeredJavaPresenters = new HashMap<Class<?>, ObjectPresenter>();
+	private HashMap<PyType, PyObjectPresenter> registeredPythonPresenters = new HashMap<PyType, PyObjectPresenter>();
+	private IdentityHashMap<ObjectPresenter, Class<?>> javaPresenterToClass = new IdentityHashMap<ObjectPresenter, Class<?>>();
+	private IdentityHashMap<PyObjectPresenter, PyType> pythonPresenterToType = new IdentityHashMap<PyObjectPresenter, PyType>();
 	
 	
 	public GSymObjectPresenterRegistry()
@@ -49,12 +47,12 @@ public class GSymObjectPresenterRegistry
 	{
 		perspectives.put( perspective, null );
 		
-		for (Map.Entry<Class<?>, ObjectPresenter<? extends StyleSheet>> entry: registeredJavaPresenters.entrySet())
+		for (Map.Entry<Class<?>, ObjectPresenter> entry: registeredJavaPresenters.entrySet())
 		{
 			perspective.registerJavaObjectPresenter( entry.getKey(), entry.getValue() );
 		}
 		
-		for (Map.Entry<PyType, PyObjectPresenter<? extends StyleSheet>> entry: registeredPythonPresenters.entrySet())
+		for (Map.Entry<PyType, PyObjectPresenter> entry: registeredPythonPresenters.entrySet())
 		{
 			perspective.registerPythonObjectPresenter( entry.getKey(), entry.getValue() );
 		}
@@ -62,18 +60,18 @@ public class GSymObjectPresenterRegistry
 	
 	
 	
-	public ObjectPresenter<? extends StyleSheet> getPresenter(Class<?> cls)
+	public ObjectPresenter getPresenter(Class<?> cls)
 	{
 		return registeredJavaPresenters.get( cls );
 	}
 	
-	public PyObjectPresenter<? extends StyleSheet> getPresenter(PyType type)
+	public PyObjectPresenter getPresenter(PyType type)
 	{
 		return registeredPythonPresenters.get( type );
 	}
 	
 	
-	public void registerJavaObjectPresenter(Class<?> cls, ObjectPresenter<? extends StyleSheet> presenter)
+	public void registerJavaObjectPresenter(Class<?> cls, ObjectPresenter presenter)
 	{
 		registeredJavaPresenters.put( cls, presenter );
 		javaPresenterToClass.put( presenter, cls );
@@ -84,7 +82,7 @@ public class GSymObjectPresenterRegistry
 		}
 	}
 	
-	public void registerPythonObjectPresenter(PyType type, PyObjectPresenter<? extends StyleSheet> presenter)
+	public void registerPythonObjectPresenter(PyType type, PyObjectPresenter presenter)
 	{
 		registeredPythonPresenters.put( type, presenter );
 		pythonPresenterToType.put( presenter, type );
@@ -98,7 +96,7 @@ public class GSymObjectPresenterRegistry
 
 	public void unregisterJavaObjectPresenter(Class<?> cls)
 	{
-		ObjectPresenter<? extends StyleSheet> presenter = registeredJavaPresenters.get( cls );
+		ObjectPresenter presenter = registeredJavaPresenters.get( cls );
 		if ( presenter == null )
 		{
 			throw new PresenterNotRegisteredException( "Presenter not registered for Java class " + cls );
@@ -114,7 +112,7 @@ public class GSymObjectPresenterRegistry
 	
 	public void unregisterPythonObjectPresenter(PyType type)
 	{
-		PyObjectPresenter<? extends StyleSheet> presenter = registeredPythonPresenters.get( type );
+		PyObjectPresenter presenter = registeredPythonPresenters.get( type );
 		if ( presenter == null )
 		{
 			throw new PresenterNotRegisteredException( "Presenter not registered for Python type " + type );
@@ -129,7 +127,7 @@ public class GSymObjectPresenterRegistry
 	}
 
 
-	public void unregisterJavaObjectPresenter(ObjectPresenter<? extends StyleSheet> presenter)
+	public void unregisterJavaObjectPresenter(ObjectPresenter presenter)
 	{
 		Class<?> cls = javaPresenterToClass.get( presenter );
 		if ( cls == null )
@@ -145,7 +143,7 @@ public class GSymObjectPresenterRegistry
 		}
 	}
 	
-	public void unregisterPythonObjectPresenter(PyObjectPresenter<? extends StyleSheet> presenter)
+	public void unregisterPythonObjectPresenter(PyObjectPresenter presenter)
 	{
 		PyType type = pythonPresenterToType.get( presenter );
 		if ( type == null )
