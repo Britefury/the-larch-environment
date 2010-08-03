@@ -64,6 +64,8 @@ _pythonCodeHeaderStyle = StyleSheet.instance.withAttr( Primitive.background, Fil
 _pythonCodeBorderStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) )
 _pythonCodeEditorBorderStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 2.0, 5.0, 20.0, 20.0, Color( 0.4, 0.5, 0.6 ), None ) )
 
+_paragraphStyle = StyleSheet.instance.withAttr( RichText.appendNewlineToParagraphs, True )
+
 		
 		
 def _worksheetContextMenuFactory(element, menu):
@@ -134,7 +136,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 	def Body(self, ctx, inheritedState, node):
 		emptyLine = Paragraph( [ Text( '' ) ] )
 		emptyLine = emptyLine.withTreeEventListener( EmptyEventListener.instance )
-		contentViews = list( InnerFragment.map( [ c    for c in node.getContents()   if c.isVisible() ] ) )  +  [ emptyLine ]
+		contentViews = list( InnerFragment.map( node.getContents() ) )  +  [ emptyLine ]
 		
 		w = Body( contentViews )
 		w = w.withTreeEventListener( BodyNodeEventListener.instance )
@@ -161,6 +163,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 			p = Heading6( text )
 		elif style == 'title':
 			p = TitleBar( text )
+		p = _paragraphStyle.applyTo( p )
 		p = withParagraphStreamValueFn( p, node.partialModel() )
 		w = Span( [ p ] )
 		w = w.withTreeEventListener( TextNodeEventListener.instance )
@@ -187,7 +190,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 			node.setStyle( style )
 			
 		def _onDeleteButton(button, event):
-			p.postTreeEvent( DeleteNodeOperation( node ) )
+			button.getElement().postTreeEvent( DeleteNodeOperation( node ) )
 
 		codeView = PerspectiveInnerFragment( Python25.python25EditorPerspective, node.getCode() )
 		
