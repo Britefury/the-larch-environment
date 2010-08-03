@@ -14,7 +14,7 @@ import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.GenericPerspective.PresCom.GenericPerspectiveInnerFragment;
@@ -91,5 +91,5 @@ public abstract class CellInterface implements IncrementalOwner, Presentable
 	}
 	
 	
-	private static StyleSheet2 cellStyle = StyleSheet2.instance.withAttr( GenericStyle.objectBorderPaint, new Color( 0.5f, 0.0f, 0.5f ) ).withAttr( GenericStyle.objectTitlePaint, new Color( 0.5f, 0.0f, 0.5f ) );
+	private static StyleSheet cellStyle = StyleSheet.instance.withAttr( GenericStyle.objectBorderPaint, new Color( 0.5f, 0.0f, 0.5f ) ).withAttr( GenericStyle.objectTitlePaint, new Color( 0.5f, 0.0f, 0.5f ) );
 }

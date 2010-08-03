@@ -15,7 +15,7 @@ import org.python.core.Py;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
 import BritefuryJ.GSym.GenericPerspective.PresCom.HorizontalField;
@@ -210,6 +210,6 @@ public class LogEntry implements Presentable
 	}
 
 
-	private static StyleSheet2 logEntryStyle = StyleSheet2.instance.withAttr( GenericStyle.objectBorderPaint, new Color( 0.45f, 0.65f, 0.0f ) ).withAttr( GenericStyle.objectTitlePaint,
+	private static StyleSheet logEntryStyle = StyleSheet.instance.withAttr( GenericStyle.objectBorderPaint, new Color( 0.45f, 0.65f, 0.0f ) ).withAttr( GenericStyle.objectTitlePaint,
 			new Color( 0.45f, 0.65f, 0.0f ) );
 }

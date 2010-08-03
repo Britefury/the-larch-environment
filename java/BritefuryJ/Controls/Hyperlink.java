@@ -17,7 +17,7 @@ import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Text;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Input.Modifier;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Hyperlink extends ControlPres
@@ -181,7 +181,7 @@ public class Hyperlink extends ControlPres
 	@Override
 	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
-		StyleSheet2 hyperlinkStyle = style.get( Controls.hyperlinkAttrs, StyleSheet2.class );
+		StyleSheet hyperlinkStyle = style.get( Controls.hyperlinkAttrs, StyleSheet.class );
 		Pres textElement = hyperlinkStyle.applyTo( new Text( text ) );
 		boolean bClosePopupOnActivate = hyperlinkStyle.get( Controls.bClosePopupOnActivate, Boolean.class );
 		

@@ -37,7 +37,7 @@ from BritefuryJ.AttributeTable import *
 from BritefuryJ.DocPresent.Browser import Location
 from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.Painter import *
-from BritefuryJ.DocPresent.StyleSheet import StyleSheet2
+from BritefuryJ.DocPresent.StyleSheet import StyleSheet
 from BritefuryJ.DocPresent.Input import ObjectDndHandler
 from BritefuryJ.Controls import *
 from BritefuryJ.DocPresent.Combinators.Primitive import *
@@ -221,10 +221,10 @@ _packageDropDest = ObjectDndHandler.DropDest( ProjectDrag, _packageCanDrop, _pac
 
 
 
-_controlsStyle = StyleSheet2.instance.withAttr( Controls.bClosePopupOnActivate, True )
-_projectControlsStyle = StyleSheet2.instance.withAttr( Primitive.border, SolidBorder( 2.0, 2.0, Color( 131, 149, 172 ), None ) ).withAttr( Primitive.hboxSpacing, 30.0 )
-_packageNameStyle = StyleSheet2.instance.withAttr( Primitive.foreground, Color( 0.0, 0.0, 0.5 ) ).withAttr( Primitive.fontBold, True ).withAttr( Primitive.fontSize, 14 )
-_itemHoverHighlightStyle = StyleSheet2.instance.withAttr( Primitive.hoverBackground, FilledOutlinePainter( Color( 0.8, 0.825, 0.9 ), Color( 0.125, 0.341, 0.574 ), BasicStroke( 1.0 ) ) )
+_controlsStyle = StyleSheet.instance.withAttr( Controls.bClosePopupOnActivate, True )
+_projectControlsStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 2.0, 2.0, Color( 131, 149, 172 ), None ) ).withAttr( Primitive.hboxSpacing, 30.0 )
+_packageNameStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.0, 0.5 ) ).withAttr( Primitive.fontBold, True ).withAttr( Primitive.fontSize, 14 )
+_itemHoverHighlightStyle = StyleSheet.instance.withAttr( Primitive.hoverBackground, FilledOutlinePainter( Color( 0.8, 0.825, 0.9 ), Color( 0.125, 0.341, 0.574 ), BasicStroke( 1.0 ) ) )
 
 _packageContentsIndentation = 20.0
 
@@ -278,7 +278,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		head = Head( [ linkHeader, title ] )
 		body = Body( [ controlsBorder.pad( 5.0, 10.0 ).alignHLeft(), projectIndex ] )
 		
-		return StyleSheet2.instance.withAttr( Primitive.editable, False ).applyTo( Page( [ head, body ] ) )
+		return StyleSheet.instance.withAttr( Primitive.editable, False ).applyTo( Page( [ head, body ] ) )
 
 
 	@DMObjectNodeDispatchMethod( Schema.Package )
@@ -425,5 +425,5 @@ class ProjectEditorRelativeLocationResolver (GSymRelativeLocationResolver):
 	
 	
 
-perspective = GSymPerspective( ProjectView(), StyleSheet2.instance, AttributeTable.instance, None, ProjectEditorRelativeLocationResolver() )
+perspective = GSymPerspective( ProjectView(), StyleSheet.instance, SimpleAttributeTable.instance, None, ProjectEditorRelativeLocationResolver() )
 	

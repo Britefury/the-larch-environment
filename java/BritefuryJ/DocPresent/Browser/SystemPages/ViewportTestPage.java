@@ -18,7 +18,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Combinators.Primitive.Viewport;
 import BritefuryJ.DocPresent.Combinators.RichText.NormalText;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class ViewportTestPage extends SystemPage
 {
@@ -43,15 +43,15 @@ public class ViewportTestPage extends SystemPage
 	
 	protected Pres createContents()
 	{
-		StyleSheet2 blackText = StyleSheet2.instance.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, Color.black );
+		StyleSheet blackText = StyleSheet.instance.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, Color.black );
 		
-		StyleSheet2 borderStyle = StyleSheet2.instance.withAttr( Primitive.border,  new SolidBorder( 2.0, 2.0, 5.0, 5.0, Color.black, null ) );
+		StyleSheet borderStyle = StyleSheet.instance.withAttr( Primitive.border,  new SolidBorder( 2.0, 2.0, 5.0, 5.0, Color.black, null ) );
 		
 		Pres b2 = blackText.applyTo( new NormalText( textBlock ) );
 		
 		Pres viewport = new SpaceBin( new Viewport( b2, new PersistentState() ).alignHExpand().alignVExpand(), 0.0, 200.0 );
 		Pres border = borderStyle.applyTo( new Border( viewport.alignHExpand().alignVExpand() ).alignHExpand().alignVExpand() );
-		Pres vbox = StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 5.0 ).applyTo( new VBox( new Pres[] { new StaticText( "Viewport:" ), border } ) ).alignHExpand().alignVExpand();
+		Pres vbox = StyleSheet.instance.withAttr( Primitive.vboxSpacing, 5.0 ).applyTo( new VBox( new Pres[] { new StaticText( "Viewport:" ), border } ) ).alignHExpand().alignVExpand();
 		return vbox.pad( 50.0, 50.0 );
 	}
 }

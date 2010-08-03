@@ -45,7 +45,7 @@ public class AttributeNonNull extends AttributeBase
 	}
 
 
-	protected AttributeTable2 use(AttributeTable2 attributeTable)
+	protected AttributeTable use(AttributeTable attributeTable)
 	{
 		return attributeTable.withoutAttr( this );
 	}

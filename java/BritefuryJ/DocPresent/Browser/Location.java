@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
@@ -229,6 +229,6 @@ public class Location implements Presentable
 	}
 
 
-	private static final StyleSheet2 locationStyle = StyleSheet2.instance.withAttr( GenericStyle.objectBorderPaint, new Color( 0.4f, 0.65f, 0.4f ) )
+	private static final StyleSheet locationStyle = StyleSheet.instance.withAttr( GenericStyle.objectBorderPaint, new Color( 0.4f, 0.65f, 0.4f ) )
 			.withAttr( GenericStyle.objectTitlePaint, new Color( 0.4f, 0.65f, 0.4f ) ); 
 }

@@ -17,7 +17,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class SpinEntryTestPage extends SystemPage
 {
@@ -86,9 +86,9 @@ public class SpinEntryTestPage extends SystemPage
 		IntSpinEntryTextChanger intListener = new IntSpinEntryTextChanger( intValueText );
 		RealSpinEntry realSpinEntry = new RealSpinEntry( 0.0, -100.0, 100.0, 1.0, 10.0, realListener );
 		IntSpinEntry intSpinEntry = new IntSpinEntry( 0, -100, 100, 1, 10, intListener );
-		Pres realLine = StyleSheet2.instance.withAttr( Primitive.hboxSpacing, 20.0 ).applyTo( new HBox( new Object[] { new StaticText( "Real number: " ),
+		Pres realLine = StyleSheet.instance.withAttr( Primitive.hboxSpacing, 20.0 ).applyTo( new HBox( new Object[] { new StaticText( "Real number: " ),
 				new SpaceBin( realSpinEntry.alignHExpand(), 100.0, -1.0 ), realValueText } ).padX( 5.0 ) );
-		Pres intLine = StyleSheet2.instance.withAttr( Primitive.hboxSpacing, 20.0 ).applyTo( new HBox( new Object[] { new StaticText( "Integer: " ),
+		Pres intLine = StyleSheet.instance.withAttr( Primitive.hboxSpacing, 20.0 ).applyTo( new HBox( new Object[] { new StaticText( "Integer: " ),
 				new SpaceBin( intSpinEntry.alignHExpand(), 100.0, -1.0 ), intValueText } ).padX( 5.0 ) );
 		Pres spinEntrySectionContents = new VBox( new Pres[] { realLine, intLine } );
 		

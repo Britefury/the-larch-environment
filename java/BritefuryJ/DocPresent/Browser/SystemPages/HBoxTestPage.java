@@ -16,7 +16,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class HBoxTestPage extends SystemPage
 {
@@ -37,13 +37,13 @@ public class HBoxTestPage extends SystemPage
 	}
 
 	
-	private static StyleSheet2 styleSheet = StyleSheet2.instance;
-	private static StyleSheet2 outlineStyleSheet = styleSheet.withAttr( Primitive.border, new SolidBorder( 1.0, 0.0, new Color( 0.0f, 0.3f, 0.7f ), null ) );
+	private static StyleSheet styleSheet = StyleSheet.instance;
+	private static StyleSheet outlineStyleSheet = styleSheet.withAttr( Primitive.border, new SolidBorder( 1.0, 0.0, new Color( 0.0f, 0.3f, 0.7f ), null ) );
 
 	
 	protected Pres makeText(String text, int size)
 	{
-		StyleSheet2 styleSheet = StyleSheet2.instance.withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, size );
+		StyleSheet styleSheet = StyleSheet.instance.withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, size );
 		return outlineStyleSheet.applyTo( new Border( styleSheet.applyTo( new StaticText( text ) ) ) );
 	}
 	

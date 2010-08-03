@@ -27,7 +27,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class TextEntryTestPage extends SystemPage
@@ -89,7 +89,7 @@ public class TextEntryTestPage extends SystemPage
 				{
 					status.setText( "" );
 					entry.setText( link.getText() );
-					proxy.setChild( StyleSheet2.instance.withAttr( Primitive.hboxSpacing, 10.0 ).applyTo( new HBox( new Object[] { entry.getElement(), status } ) ).present( ctx, style ) );
+					proxy.setChild( StyleSheet.instance.withAttr( Primitive.hboxSpacing, 10.0 ).applyTo( new HBox( new Object[] { entry.getElement(), status } ) ).present( ctx, style ) );
 					entry.grabCaret();
 				}
 			}

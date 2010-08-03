@@ -81,19 +81,19 @@ class CurrentModuleInteractor (ElementInteractor):
 
 
 
-_labelStyle = StyleSheet2.instance.withAttr( Primitive.fontSize, 10 )
+_labelStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 10 )
 
-_blockStyle = StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 2.0 ).withAttr( Primitive.border, SolidBorder( 1.0, 5.0, 15.0, 15.0, Color( 0.25, 0.25, 0.25 ), Color( 0.8, 0.8, 0.8 ) ) )
+_blockStyle = StyleSheet.instance.withAttr( Primitive.vboxSpacing, 2.0 ).withAttr( Primitive.border, SolidBorder( 1.0, 5.0, 15.0, 15.0, Color( 0.25, 0.25, 0.25 ), Color( 0.8, 0.8, 0.8 ) ) )
 
-_pythonModuleBorderStyle = StyleSheet2.instance.withAttr( Primitive.border, SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), Color.WHITE ) )
-_dropPromptStyle = StyleSheet2.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.0, 0.8, 0.0 ), None ) )
+_pythonModuleBorderStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), Color.WHITE ) )
+_dropPromptStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.0, 0.8, 0.0 ), None ) )
 
-_varAssignVarNameStyle = StyleSheet2.instance.withAttr( Primitive.fontItalic, True ).withAttr( Primitive.foreground, Color( 0.0, 0.0, 0.5 ) )
-_varAssignTypeNameStyle = StyleSheet2.instance.withAttr( Primitive.foreground, Color( 0.0, 0.125, 0.0 ) )
-_varAssignMsgStyle = StyleSheet2.instance.withAttr( Primitive.foreground, Color( 0.0, 0.125, 0.0 ) )
+_varAssignVarNameStyle = StyleSheet.instance.withAttr( Primitive.fontItalic, True ).withAttr( Primitive.foreground, Color( 0.0, 0.0, 0.5 ) )
+_varAssignTypeNameStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.125, 0.0 ) )
+_varAssignMsgStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.125, 0.0 ) )
 
-_consoleBlockListStyle = StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 5.0 )
-_consoleStyle = StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 8.0 )
+_consoleBlockListStyle = StyleSheet.instance.withAttr( Primitive.vboxSpacing, 5.0 )
+_consoleStyle = StyleSheet.instance.withAttr( Primitive.vboxSpacing, 8.0 )
 
 
 
@@ -172,7 +172,7 @@ class ConsoleView (GSymViewObjectDispatch):
 		stdout = executionResult.getStdOut()
 		stderr = executionResult.getStdErr()
 		
-		moduleView = StyleSheet2.instance.withAttr( Primitive.editable, False ).applyTo( PerspectiveInnerFragment( Python25.python25EditorPerspective, pythonModule ) )
+		moduleView = StyleSheet.instance.withAttr( Primitive.editable, False ).applyTo( PerspectiveInnerFragment( Python25.python25EditorPerspective, pythonModule ) )
 		caughtExceptionView = GenericPerspectiveInnerFragment( caughtException )   if caughtException is not None   else None
 		resultView = GenericPerspectiveInnerFragment( result[0] )   if result is not None   else None
 			
@@ -212,4 +212,4 @@ _docNameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*', 0 )
 
 	
 
-perspective = GSymPerspective( ConsoleView(), StyleSheet2.instance, AttributeTable.instance, None, None )
+perspective = GSymPerspective( ConsoleView(), StyleSheet.instance, SimpleAttributeTable.instance, None, None )

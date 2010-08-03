@@ -16,7 +16,7 @@ import BritefuryJ.Cell.LiteralCell;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Incremental.IncrementalMonitor;
@@ -24,7 +24,7 @@ import BritefuryJ.Incremental.IncrementalMonitorListener;
 
 public abstract class LiteralCellEditor implements Presentable, IncrementalMonitorListener
 {
-	private static final StyleSheet2 errorStyle = StyleSheet2.instance.withAttr( Primitive.foreground, new Color( 0.8f, 0.0f, 0.0f ) );
+	private static final StyleSheet errorStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.8f, 0.0f, 0.0f ) );
 	
 	protected abstract class Editor
 	{

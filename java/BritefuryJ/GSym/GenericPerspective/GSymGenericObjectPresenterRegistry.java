@@ -41,7 +41,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Whitespace;
 import BritefuryJ.DocPresent.Combinators.Sequence.SpanSequenceView;
 import BritefuryJ.DocPresent.Combinators.Sequence.TrailingSeparator;
 import BritefuryJ.DocPresent.Painter.FillPainter;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ErrorBoxWithFields;
 import BritefuryJ.GSym.GenericPerspective.PresCom.GenericPerspectiveInnerFragment;
 import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
@@ -558,34 +558,34 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 
 
 
-	private static final StyleSheet2 staticStyle = StyleSheet2.instance.withAttr( Primitive.editable, false );
+	private static final StyleSheet staticStyle = StyleSheet.instance.withAttr( Primitive.editable, false );
 	
 	
-	private static final StyleSheet2 punctuationStyle = staticStyle.withAttr( Primitive.foreground, Color.blue );
-	private static final StyleSheet2 delimStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.1f, 0.3f, 0.4f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 14 );
+	private static final StyleSheet punctuationStyle = staticStyle.withAttr( Primitive.foreground, Color.blue );
+	private static final StyleSheet delimStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.1f, 0.3f, 0.4f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 14 );
 	
 	
-	private static final StyleSheet2 stackTraceStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.75f, 0.1f, 0.4f ) );
+	private static final StyleSheet stackTraceStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.75f, 0.1f, 0.4f ) );
 
 	
-	private static final StyleSheet2 colourObjectBoxStyle = staticStyle.withAttr( GenericStyle.objectBorderPaint, new Color( 0.0f, 0.1f, 0.4f ) ).withAttr(
+	private static final StyleSheet colourObjectBoxStyle = staticStyle.withAttr( GenericStyle.objectBorderPaint, new Color( 0.0f, 0.1f, 0.4f ) ).withAttr(
 			GenericStyle.objectTitlePaint, new Color( 0.0f, 0.1f, 0.4f ) );
-	private static final StyleSheet2 colourRedStyle = staticStyle.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.75f, 0.0f, 0.0f ) );
-	private static final StyleSheet2 colourGreenStyle = staticStyle.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.75f, 0.0f ) );
-	private static final StyleSheet2 colourBlueStyle = staticStyle.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.75f ) );
-	private static final StyleSheet2 colourAlphaStyle = staticStyle.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.3f, 0.3f, 0.3f ) );
-	private static final StyleSheet2 colourBoxStyle = staticStyle.withAttr( Primitive.hboxSpacing, 5.0 );
+	private static final StyleSheet colourRedStyle = staticStyle.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.75f, 0.0f, 0.0f ) );
+	private static final StyleSheet colourGreenStyle = staticStyle.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.75f, 0.0f ) );
+	private static final StyleSheet colourBlueStyle = staticStyle.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.75f ) );
+	private static final StyleSheet colourAlphaStyle = staticStyle.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.3f, 0.3f, 0.3f ) );
+	private static final StyleSheet colourBoxStyle = staticStyle.withAttr( Primitive.hboxSpacing, 5.0 );
 
 	
-	private static final StyleSheet2 classKeywordStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.textSmallCaps, true );
-	private static final StyleSheet2 classPunctuationStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
-	private static final StyleSheet2 classNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.25f, 0.5f ) );
+	private static final StyleSheet classKeywordStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.textSmallCaps, true );
+	private static final StyleSheet classPunctuationStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
+	private static final StyleSheet classNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.25f, 0.5f ) );
 
-	private static final StyleSheet2 fnPunctuationStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
-	private static final StyleSheet2 fnNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.25f, 0.5f ) );
-	private static final StyleSheet2 fnArgStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.25f ) );
-	private static final StyleSheet2 fnKWArgStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.25f ) ).withAttr( Primitive.fontItalic, true );
-	private static final StyleSheet2 fnVarArgStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.25f ) );
+	private static final StyleSheet fnPunctuationStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
+	private static final StyleSheet fnNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.25f, 0.5f ) );
+	private static final StyleSheet fnArgStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.25f ) );
+	private static final StyleSheet fnKWArgStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.25f ) ).withAttr( Primitive.fontItalic, true );
+	private static final StyleSheet fnVarArgStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.25f ) );
 
 
 	private static final Pres comma = punctuationStyle.applyTo( new StaticText( "," ) );

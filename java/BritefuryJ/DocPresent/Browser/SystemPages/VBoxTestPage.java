@@ -17,7 +17,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Painter.FillPainter;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class VBoxTestPage extends SystemPage
 {
@@ -37,12 +37,12 @@ public class VBoxTestPage extends SystemPage
 	}
 
 	
-	StyleSheet2 styleSheet = StyleSheet2.instance;
-	StyleSheet2 outlineStyleSheet = styleSheet.withAttr( Primitive.border, new SolidBorder( 1.0, 0.0, new Color( 0.0f, 0.3f, 0.7f ), null ) );
-	StyleSheet2 textOnGreyStyle = styleSheet.withAttr( Primitive.background, new FillPainter( new Color( 0.8f, 0.8f, 0.8f ) ) );
-	StyleSheet2 t12Style = styleSheet.withAttr( Primitive.fontSize, 12 );
-	StyleSheet2 t18Style = styleSheet.withAttr( Primitive.fontSize, 18 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.3f, 0.6f ) );
-	StyleSheet2 t24Style = styleSheet.withAttr( Primitive.fontSize, 24 );
+	StyleSheet styleSheet = StyleSheet.instance;
+	StyleSheet outlineStyleSheet = styleSheet.withAttr( Primitive.border, new SolidBorder( 1.0, 0.0, new Color( 0.0f, 0.3f, 0.7f ), null ) );
+	StyleSheet textOnGreyStyle = styleSheet.withAttr( Primitive.background, new FillPainter( new Color( 0.8f, 0.8f, 0.8f ) ) );
+	StyleSheet t12Style = styleSheet.withAttr( Primitive.fontSize, 12 );
+	StyleSheet t18Style = styleSheet.withAttr( Primitive.fontSize, 18 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.3f, 0.6f ) );
+	StyleSheet t24Style = styleSheet.withAttr( Primitive.fontSize, 24 );
 
 	
 	

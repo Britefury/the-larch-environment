@@ -16,7 +16,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Script;
 import BritefuryJ.DocPresent.Combinators.Primitive.Text;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class ScriptTestPage extends SystemPage
 {
@@ -38,12 +38,12 @@ public class ScriptTestPage extends SystemPage
 	
 	
 	
-	private static StyleSheet2 styleSheet = StyleSheet2.instance;
-	private static StyleSheet2 scriptPreStyleSheet = styleSheet.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, Color.blue );
-	private static StyleSheet2 scriptPostStyleSheet = styleSheet.withAttr( Primitive.fontSize, 24 ).withAttr( Primitive.foreground, Color.red );
-	private static StyleSheet2 dividerStyleSheet = styleSheet.withAttr( Primitive.fontSize, 24 );
+	private static StyleSheet styleSheet = StyleSheet.instance;
+	private static StyleSheet scriptPreStyleSheet = styleSheet.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, Color.blue );
+	private static StyleSheet scriptPostStyleSheet = styleSheet.withAttr( Primitive.fontSize, 24 ).withAttr( Primitive.foreground, Color.red );
+	private static StyleSheet dividerStyleSheet = styleSheet.withAttr( Primitive.fontSize, 24 );
 
-	private static StyleSheet2 scriptStyleSheet = styleSheet.withAttr( Primitive.fontSize, 16 ).withAttr( Primitive.foreground, Color.black );
+	private static StyleSheet scriptStyleSheet = styleSheet.withAttr( Primitive.fontSize, 16 ).withAttr( Primitive.foreground, Color.black );
 
 	
 	

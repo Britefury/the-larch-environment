@@ -20,7 +20,7 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.Table;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBoxWithFields;
 import BritefuryJ.GSym.GenericPerspective.PresCom.VerticalField;
@@ -28,7 +28,7 @@ import BritefuryJ.GSym.PresCom.InnerFragment;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Utils.HashUtils;
 
-public class AttributeTable2 implements Presentable
+public class AttributeTable implements Presentable
 {
 	public static class AttributeDoesNotExistException extends RuntimeException
 	{
@@ -148,32 +148,32 @@ public class AttributeTable2 implements Presentable
 	
 	private static class AttributeTableSet 
 	{
-		private HashMap<AttributeValuesMultiple, WeakReference<AttributeTable2>> attributeTableSet = new HashMap<AttributeValuesMultiple, WeakReference<AttributeTable2>>();
+		private HashMap<AttributeValuesMultiple, WeakReference<AttributeTable>> attributeTableSet = new HashMap<AttributeValuesMultiple, WeakReference<AttributeTable>>();
 	}
 	
 	
 	
-	protected static HashMap<Class<? extends AttributeTable2>, AttributeTableSet> attributeTableSetsByClass = new HashMap<Class<? extends AttributeTable2>, AttributeTableSet>();
+	protected static HashMap<Class<? extends AttributeTable>, AttributeTableSet> attributeTableSetsByClass = new HashMap<Class<? extends AttributeTable>, AttributeTableSet>();
 	
 
 	protected HashMap<AttributeBase, Object> values = new HashMap<AttributeBase, Object>();
-	protected HashMap<AttributeValueSingle, WeakReference<AttributeTable2>> singleValueDerivedAttributeTables = new HashMap<AttributeValueSingle, WeakReference<AttributeTable2>>();
-	protected HashMap<AttributeValuesMultiple, WeakReference<AttributeTable2>> multiValueDerivedAttributeTables = new HashMap<AttributeValuesMultiple, WeakReference<AttributeTable2>>();
-	protected IdentityHashMap<AttributeTable2, WeakReference<AttributeTable2>> attribTableDerivedAttributeTables = new IdentityHashMap<AttributeTable2, WeakReference<AttributeTable2>>();
-	protected HashMap<DelAttribute, WeakReference<AttributeTable2>> delDerivedAttributeTables = new HashMap<DelAttribute, WeakReference<AttributeTable2>>();
+	protected HashMap<AttributeValueSingle, WeakReference<AttributeTable>> singleValueDerivedAttributeTables = new HashMap<AttributeValueSingle, WeakReference<AttributeTable>>();
+	protected HashMap<AttributeValuesMultiple, WeakReference<AttributeTable>> multiValueDerivedAttributeTables = new HashMap<AttributeValuesMultiple, WeakReference<AttributeTable>>();
+	protected IdentityHashMap<AttributeTable, WeakReference<AttributeTable>> attribTableDerivedAttributeTables = new IdentityHashMap<AttributeTable, WeakReference<AttributeTable>>();
+	protected HashMap<DelAttribute, WeakReference<AttributeTable>> delDerivedAttributeTables = new HashMap<DelAttribute, WeakReference<AttributeTable>>();
 	
 	
-	public static AttributeTable2 instance = new AttributeTable2();
+	public static AttributeTable instance = new AttributeTable();
 	
 	
-	protected AttributeTable2()
+	protected AttributeTable()
 	{
 	}
 	
 	
-	protected AttributeTable2 newInstance()
+	protected AttributeTable newInstance()
 	{
-		return new AttributeTable2();
+		return new AttributeTable();
 	}
 	
 	
@@ -233,23 +233,23 @@ public class AttributeTable2 implements Presentable
 	}
 	
 	
-	public AttributeTable2 withAttr(AttributeBase attribute, Object value)
+	public AttributeTable withAttr(AttributeBase attribute, Object value)
 	{
 		AttributeValueSingle v = new AttributeValueSingle( attribute, value );
-		WeakReference<AttributeTable2> derivedRef = singleValueDerivedAttributeTables.get( v );
+		WeakReference<AttributeTable> derivedRef = singleValueDerivedAttributeTables.get( v );
 		if ( derivedRef == null  ||  derivedRef.get() == null )
 		{
-			AttributeTable2 derived = newInstance();
+			AttributeTable derived = newInstance();
 			derived.values.putAll( values );
 			derived.values.put( attribute, attribute.checkValue( value ) );
 			derived = getUniqueAttributeTable( derived );
-			derivedRef = new WeakReference<AttributeTable2>( derived );
+			derivedRef = new WeakReference<AttributeTable>( derived );
 			singleValueDerivedAttributeTables.put( v, derivedRef );
 		}
 		return derivedRef.get();
 	}
 	
-	public AttributeTable2 withAttrs(HashMap<AttributeBase, Object> valuesMap)
+	public AttributeTable withAttrs(HashMap<AttributeBase, Object> valuesMap)
 	{
 		if ( valuesMap.size() == 1 )
 		{
@@ -259,10 +259,10 @@ public class AttributeTable2 implements Presentable
 		else
 		{
 			AttributeValuesMultiple v = new AttributeValuesMultiple( valuesMap );
-			WeakReference<AttributeTable2> derivedRef = multiValueDerivedAttributeTables.get( v );
+			WeakReference<AttributeTable> derivedRef = multiValueDerivedAttributeTables.get( v );
 			if ( derivedRef == null  ||  derivedRef.get() == null )
 			{
-				AttributeTable2 derived = newInstance();
+				AttributeTable derived = newInstance();
 				derived.values.putAll( values );
 				for (Map.Entry<AttributeBase, Object> entry: valuesMap.entrySet())
 				{
@@ -270,40 +270,40 @@ public class AttributeTable2 implements Presentable
 					derived.values.put( attribute, attribute.checkValue( entry.getValue() ) );
 				}
 				derived = getUniqueAttributeTable( derived );
-				derivedRef = new WeakReference<AttributeTable2>( derived );
+				derivedRef = new WeakReference<AttributeTable>( derived );
 				multiValueDerivedAttributeTables.put( v, derivedRef );
 			}
 			return derivedRef.get();
 		}
 	}
 		
-	public AttributeTable2 withAttrs(AttributeTable2 attribs)
+	public AttributeTable withAttrs(AttributeTable attribs)
 	{
-		WeakReference<AttributeTable2> derivedRef = attribTableDerivedAttributeTables.get( attribs );
+		WeakReference<AttributeTable> derivedRef = attribTableDerivedAttributeTables.get( attribs );
 		if ( derivedRef == null  ||  derivedRef.get() == null )
 		{
-			AttributeTable2 derived = newInstance();
+			AttributeTable derived = newInstance();
 			derived.values.putAll( values );
 			derived.values.putAll( attribs.values );
 			derived = getUniqueAttributeTable( derived );
-			derivedRef = new WeakReference<AttributeTable2>( derived );
+			derivedRef = new WeakReference<AttributeTable>( derived );
 			attribTableDerivedAttributeTables.put( attribs, derivedRef );
 		}
 		return derivedRef.get();
 	}
 	
-	public AttributeTable2 withAttrFrom(AttributeBase destAttr, AttributeTable2 srcTable, AttributeBase srcAttr)
+	public AttributeTable withAttrFrom(AttributeBase destAttr, AttributeTable srcTable, AttributeBase srcAttr)
 	{
 		return withAttr( destAttr, srcTable.get( srcAttr ) );
 	}
 	
-	public AttributeTable2 withAttrsFrom(AttributeTable2 srcTable, AttributeBase srcAttr)
+	public AttributeTable withAttrsFrom(AttributeTable srcTable, AttributeBase srcAttr)
 	{
-		AttributeTable2 attrs = srcTable.get( srcAttr, AttributeTable2.class );
+		AttributeTable attrs = srcTable.get( srcAttr, AttributeTable.class );
 		return withAttrs( attrs );
 	}
 	
-	public AttributeTable2 withoutAttr(AttributeBase attribute)
+	public AttributeTable withoutAttr(AttributeBase attribute)
 	{
 		if ( !values.containsKey( attribute ) )
 		{
@@ -312,36 +312,36 @@ public class AttributeTable2 implements Presentable
 		}
 		
 		DelAttribute v = new DelAttribute( attribute );
-		WeakReference<AttributeTable2> derivedRef = delDerivedAttributeTables.get( v );
+		WeakReference<AttributeTable> derivedRef = delDerivedAttributeTables.get( v );
 		if ( derivedRef == null  ||  derivedRef.get() == null )
 		{
-			AttributeTable2 derived = newInstance();
+			AttributeTable derived = newInstance();
 			derived.values.putAll( values );
 			derived.values.remove( attribute );
 			derived = getUniqueAttributeTable( derived );
-			derivedRef = new WeakReference<AttributeTable2>( derived );
+			derivedRef = new WeakReference<AttributeTable>( derived );
 			delDerivedAttributeTables.put( v, derivedRef );
 		}
 		return derivedRef.get();
 	}
 	
-	public AttributeTable2 useAttr(AttributeBase attribute)
+	public AttributeTable useAttr(AttributeBase attribute)
 	{
 		return attribute.use( this );
 	}
 	
-	public AttributeTable2 remapAttr(AttributeBase destAttribute, AttributeBase sourceAttribute)
+	public AttributeTable remapAttr(AttributeBase destAttribute, AttributeBase sourceAttribute)
 	{
 		Object value = get( sourceAttribute );
 		AttributeValueSingle v = new AttributeValueSingle( destAttribute, value );
-		WeakReference<AttributeTable2> derivedRef = singleValueDerivedAttributeTables.get( v );
+		WeakReference<AttributeTable> derivedRef = singleValueDerivedAttributeTables.get( v );
 		if ( derivedRef == null  ||  derivedRef.get() == null )
 		{
-			AttributeTable2 derived = newInstance();
+			AttributeTable derived = newInstance();
 			derived.values.putAll( values );
 			derived.values.put( destAttribute, destAttribute.checkValue( value ) );
 			derived = getUniqueAttributeTable( derived );
-			derivedRef = new WeakReference<AttributeTable2>( derived );
+			derivedRef = new WeakReference<AttributeTable>( derived );
 			singleValueDerivedAttributeTables.put( v, derivedRef );
 		}
 		return derivedRef.get();
@@ -362,15 +362,15 @@ public class AttributeTable2 implements Presentable
 		return setsForClass;
 	}
 	
-	private AttributeTable2 getUniqueAttributeTable(AttributeTable2 attribTable)
+	private AttributeTable getUniqueAttributeTable(AttributeTable attribTable)
 	{
 		AttributeTableSet setsForClass = getAttributeTableTableForClass();
 		
 		AttributeValuesMultiple vals = attribTable.allValues();
-		WeakReference<AttributeTable2> uniqueRef = setsForClass.attributeTableSet.get( vals );
+		WeakReference<AttributeTable> uniqueRef = setsForClass.attributeTableSet.get( vals );
 		if ( uniqueRef == null  ||  uniqueRef.get() == null )
 		{
-			uniqueRef = new WeakReference<AttributeTable2>( attribTable );
+			uniqueRef = new WeakReference<AttributeTable>( attribTable );
 			setsForClass.attributeTableSet.put( vals, uniqueRef ); 
 		}
 		
@@ -392,7 +392,7 @@ public class AttributeTable2 implements Presentable
 		Arrays.sort( attributes, new AttributeBase.AttributeNameComparator() );
 		Pres children[][] = new Pres[attributes.length+1][];
 		
-		StyleSheet2 attrTableStyle = getAttrTableStyle();
+		StyleSheet attrTableStyle = getAttrTableStyle();
 		
 		children[0] = new Pres[] { attrTableStyle.applyTo( new StaticText( "Name" ) ), attrTableStyle.applyTo( new StaticText( "Value" ) ) };
 		for (int i = 0; i < attributes.length; i++)
@@ -414,13 +414,13 @@ public class AttributeTable2 implements Presentable
 	
 	
 	// We have to initialise this style sheet on request, otherwise we can end up with a circular class initialisation problem
-	private static StyleSheet2 _attrTableStyle = null;
+	private static StyleSheet _attrTableStyle = null;
 	
-	private static StyleSheet2 getAttrTableStyle()
+	private static StyleSheet getAttrTableStyle()
 	{
 		if ( _attrTableStyle == null )
 		{
-			_attrTableStyle = StyleSheet2.instance.withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 14 )
+			_attrTableStyle = StyleSheet.instance.withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 14 )
 					.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.tableColumnSpacing, 10.0 );
 		}
 		return _attrTableStyle;

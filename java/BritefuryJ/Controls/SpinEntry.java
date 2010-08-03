@@ -19,7 +19,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Input.Modifier;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public abstract class SpinEntry extends ControlPres
@@ -125,7 +125,7 @@ public abstract class SpinEntry extends ControlPres
 	@Override
 	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
-		StyleSheet2 arrowStyleSheet = style.get( Controls.spinEntryArrowAttrs, StyleSheet2.class );
+		StyleSheet arrowStyleSheet = style.get( Controls.spinEntryArrowAttrs, StyleSheet.class );
 		StyleValues arrowStyle = style.withAttrs( arrowStyleSheet );
 		double arrowSize = style.get( Controls.spinEntryArrowSize, Double.class );
 		double hspacing = style.get( Controls.spinEntryHSpacing, Double.class );
@@ -141,7 +141,7 @@ public abstract class SpinEntry extends ControlPres
 		TextEntry entry = new TextEntry( getInitialValueString(), textListener, getValidationPattern(), getValidationFailMessage() );
 		TextEntry.TextEntryControl entryControl = (TextEntryControl)entry.createControl( ctx, style );
 		
-		Pres hbox = StyleSheet2.instance.withAttr( Primitive.hboxSpacing, hspacing ).applyTo( new HBox( new Object[] { entryControl.getElement().alignHExpand().alignVCentre(), arrowsBox.alignVCentre() } ) );
+		Pres hbox = StyleSheet.instance.withAttr( Primitive.hboxSpacing, hspacing ).applyTo( new HBox( new Object[] { entryControl.getElement().alignHExpand().alignVCentre(), arrowsBox.alignVCentre() } ) );
 		DPElement element = hbox.present( ctx, style );
 		
 		return createSpinEntryControl( ctx, style, element, entryControl, upArrowElement, downArrowElement, textListener );

@@ -11,7 +11,7 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Painter.Painter;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 import BritefuryJ.DocPresent.Util.Range;
 
@@ -74,8 +74,8 @@ public abstract class ScrollBar extends ControlPres
 		double arrowSize = scrollBarSize - arrowPadding * 2.0;
 		Painter dragBoxPainter = style.get( Controls.scrollBarDragBoxPainter, Painter.class );
 		
-		StyleSheet2 arrowStyle = StyleSheet2.instance.withAttr( Primitive.shapePainter, style.get( Controls.scrollBarArrowPainter ) );
-		StyleSheet2 dragBoxStyle = Controls.scrollBarDragBoxStyle.get( style );
+		StyleSheet arrowStyle = StyleSheet.instance.withAttr( Primitive.shapePainter, style.get( Controls.scrollBarArrowPainter ) );
+		StyleSheet dragBoxStyle = Controls.scrollBarDragBoxStyle.get( style );
 		
 		Pres decArrow = arrowStyle.applyTo( createDecArrow( arrowSize ) );
 		DPElement decArrowElement = decArrow.present( ctx, style );

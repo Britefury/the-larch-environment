@@ -14,7 +14,7 @@ import java.awt.Paint;
 import BritefuryJ.AttributeTable.Attribute;
 import BritefuryJ.AttributeTable.AttributeNamespace;
 import BritefuryJ.AttributeTable.AttributeNonNull;
-import BritefuryJ.AttributeTable.AttributeTable2;
+import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.AttributeTable.DerivedValueTable;
 import BritefuryJ.AttributeTable.InheritedAttribute;
 import BritefuryJ.AttributeTable.InheritedAttributeNonNull;
@@ -81,7 +81,7 @@ public class Primitive
 
 	protected static DerivedValueTable<Font> font = new DerivedValueTable<Font>( primitiveNamespace )
 	{
-		protected Font evaluate(AttributeTable2 attribs)
+		protected Font evaluate(AttributeTable attribs)
 		{
 			String face = attribs.get( fontFace, String.class );
 			boolean bBold = attribs.get( fontBold, Boolean.class );
@@ -95,7 +95,7 @@ public class Primitive
 	
 	protected static DerivedValueTable<StyleValues> useFont = new DerivedValueTable<StyleValues>( primitiveNamespace )
 	{
-		protected StyleValues evaluate(AttributeTable2 style)
+		protected StyleValues evaluate(AttributeTable style)
 		{
 			return (StyleValues)style.useAttr( fontFace ).useAttr( fontBold ).useAttr( fontItalic ).useAttr( fontSize ).useAttr( fontScale );
 		}
@@ -110,7 +110,7 @@ public class Primitive
 	
 	protected static DerivedValueTable<StyleValues> useBorderParams = new DerivedValueTable<StyleValues>( primitiveNamespace )
 	{
-		protected StyleValues evaluate(AttributeTable2 style)
+		protected StyleValues evaluate(AttributeTable style)
 		{
 			return (StyleValues)style.useAttr( border );
 		}
@@ -120,7 +120,7 @@ public class Primitive
 	
 	protected static DerivedValueTable<ContainerStyleParams> containerParams = new DerivedValueTable<ContainerStyleParams>( primitiveNamespace )
 	{
-		protected ContainerStyleParams evaluate(AttributeTable2 attribs)
+		protected ContainerStyleParams evaluate(AttributeTable attribs)
 		{
 			return new ContainerStyleParams(
 					attribs.get( background, Painter.class ),
@@ -131,7 +131,7 @@ public class Primitive
 	
 	protected static DerivedValueTable<StyleValues> useContainerParams = new DerivedValueTable<StyleValues>( primitiveNamespace )
 	{
-		protected StyleValues evaluate(AttributeTable2 style)
+		protected StyleValues evaluate(AttributeTable style)
 		{
 			return (StyleValues)style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor );
 		}
@@ -141,7 +141,7 @@ public class Primitive
 	
 	protected static DerivedValueTable<ContentLeafStyleParams> contentLeafParams = new DerivedValueTable<ContentLeafStyleParams>( primitiveNamespace )
 	{
-		protected ContentLeafStyleParams evaluate(AttributeTable2 attribs)
+		protected ContentLeafStyleParams evaluate(AttributeTable attribs)
 		{
 			return new ContentLeafStyleParams(
 					attribs.get( background, Painter.class ),
@@ -159,7 +159,7 @@ public class Primitive
 	
 	protected static DerivedValueTable<FractionStyleParams> fractionParams = new DerivedValueTable<FractionStyleParams>( primitiveNamespace )
 	{
-		protected FractionStyleParams evaluate(AttributeTable2 attribs)
+		protected FractionStyleParams evaluate(AttributeTable attribs)
 		{
 			return new FractionStyleParams(
 					attribs.get( background, Painter.class ),
@@ -182,7 +182,7 @@ public class Primitive
 	
 	protected static DerivedValueTable<FractionStyleParams.BarStyleParams> fractionBarParams = new DerivedValueTable<FractionStyleParams.BarStyleParams>( primitiveNamespace )
 	{
-		protected FractionStyleParams.BarStyleParams evaluate(AttributeTable2 attribs)
+		protected FractionStyleParams.BarStyleParams evaluate(AttributeTable attribs)
 		{
 			return new FractionStyleParams.BarStyleParams(
 					attribs.get( background, Painter.class ),
@@ -204,7 +204,7 @@ public class Primitive
 	
 	protected static DerivedValueTable<GridRowStyleParams> gridRowParams = new DerivedValueTable<GridRowStyleParams>( primitiveNamespace )
 	{
-		protected GridRowStyleParams evaluate(AttributeTable2 attribs)
+		protected GridRowStyleParams evaluate(AttributeTable attribs)
 		{
 			return new GridRowStyleParams(
 					attribs.get( background, Painter.class ),
@@ -222,7 +222,7 @@ public class Primitive
 	
 	protected static DerivedValueTable<HBoxStyleParams> hboxParams = new DerivedValueTable<HBoxStyleParams>( primitiveNamespace )
 	{
-		protected HBoxStyleParams evaluate(AttributeTable2 attribs)
+		protected HBoxStyleParams evaluate(AttributeTable attribs)
 		{
 			return new HBoxStyleParams(
 					attribs.get( background, Painter.class ),
@@ -241,7 +241,7 @@ public class Primitive
 	
 	protected static DerivedValueTable<MathRootStyleParams> mathRootParams = new DerivedValueTable<MathRootStyleParams>( primitiveNamespace )
 	{
-		protected MathRootStyleParams evaluate(AttributeTable2 attribs)
+		protected MathRootStyleParams evaluate(AttributeTable attribs)
 		{
 			return new MathRootStyleParams(
 					attribs.get( background, Painter.class ),
@@ -264,7 +264,7 @@ public class Primitive
 	
 	protected static DerivedValueTable<ParagraphStyleParams> paragraphParams = new DerivedValueTable<ParagraphStyleParams>( primitiveNamespace )
 	{
-		protected ParagraphStyleParams evaluate(AttributeTable2 attribs)
+		protected ParagraphStyleParams evaluate(AttributeTable attribs)
 		{
 			return new ParagraphStyleParams(
 					attribs.get( background, Painter.class ),
@@ -286,7 +286,7 @@ public class Primitive
 	
 	protected static DerivedValueTable<ShapeStyleParams> shapeParams = new DerivedValueTable<ShapeStyleParams>( primitiveNamespace )
 	{
-		protected ShapeStyleParams evaluate(AttributeTable2 attribs)
+		protected ShapeStyleParams evaluate(AttributeTable attribs)
 		{
 			return new ShapeStyleParams(
 					attribs.get( background, Painter.class ),
@@ -306,7 +306,7 @@ public class Primitive
 	
 	protected static DerivedValueTable<ScriptStyleParams> scriptParams = new DerivedValueTable<ScriptStyleParams>( primitiveNamespace )
 	{
-		protected ScriptStyleParams evaluate(AttributeTable2 attribs)
+		protected ScriptStyleParams evaluate(AttributeTable attribs)
 		{
 			return new ScriptStyleParams(
 					attribs.get( background, Painter.class ),
@@ -326,7 +326,7 @@ public class Primitive
 	
 	protected static DerivedValueTable<TextStyleParams> staticTextParams = new DerivedValueTable<TextStyleParams>( primitiveNamespace )
 	{
-		protected TextStyleParams evaluate(AttributeTable2 attribs)
+		protected TextStyleParams evaluate(AttributeTable attribs)
 		{
 			return new TextStyleParams(
 					attribs.get( background, Painter.class ),
@@ -343,7 +343,7 @@ public class Primitive
 	
 	protected static DerivedValueTable<StyleValues> useStaticTextParams = new DerivedValueTable<StyleValues>( primitiveNamespace )
 	{
-		protected StyleValues evaluate(AttributeTable2 style)
+		protected StyleValues evaluate(AttributeTable style)
 		{
 			return useFont.get( style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
 					.useAttr( foreground ).useAttr( hoverForeground ).useAttr( textSquiggleUnderlinePaint ).useAttr( textSmallCaps ) );
@@ -354,7 +354,7 @@ public class Primitive
 	
 	protected static DerivedValueTable<TextStyleParams> labelTextParams = new DerivedValueTable<TextStyleParams>( primitiveNamespace )
 	{
-		protected TextStyleParams evaluate(AttributeTable2 attribs)
+		protected TextStyleParams evaluate(AttributeTable attribs)
 		{
 			return new TextStyleParams(
 					attribs.get( background, Painter.class ),
@@ -379,7 +379,7 @@ public class Primitive
 	
 	protected static DerivedValueTable<TextStyleParams> textParams = new DerivedValueTable<TextStyleParams>( primitiveNamespace )
 	{
-		protected TextStyleParams evaluate(AttributeTable2 attribs)
+		protected TextStyleParams evaluate(AttributeTable attribs)
 		{
 			return new TextStyleParams(
 					attribs.get( background, Painter.class ),
@@ -405,7 +405,7 @@ public class Primitive
 	
 	protected static DerivedValueTable<TableStyleParams> tableParams = new DerivedValueTable<TableStyleParams>( primitiveNamespace )
 	{
-		protected TableStyleParams evaluate(AttributeTable2 attribs)
+		protected TableStyleParams evaluate(AttributeTable attribs)
 		{
 			return new TableStyleParams(
 					attribs.get( background, Painter.class ),
@@ -428,7 +428,7 @@ public class Primitive
 	
 	protected static DerivedValueTable<VBoxStyleParams> vboxParams = new DerivedValueTable<VBoxStyleParams>( primitiveNamespace )
 	{
-		protected VBoxStyleParams evaluate(AttributeTable2 attribs)
+		protected VBoxStyleParams evaluate(AttributeTable attribs)
 		{
 			return new VBoxStyleParams(
 					attribs.get( background, Painter.class ),

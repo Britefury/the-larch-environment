@@ -27,7 +27,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
 import BritefuryJ.DocPresent.Selection.Selection;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 import BritefuryJ.GSym.GSymAbstractPerspective;
 import BritefuryJ.GSym.GSymBrowserContext;
@@ -158,8 +158,8 @@ public class GSymView extends IncrementalTree
 		}
 
 	
-		private static final StyleSheet2 labelStyle = StyleSheet2.instance;
-		private static final StyleSheet2 exceptionStyle = StyleSheet2.instance.withAttr( Primitive.foreground, new Color( 1.0f, 0.2f, 0.0f ) );
+		private static final StyleSheet labelStyle = StyleSheet.instance;
+		private static final StyleSheet exceptionStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 1.0f, 0.2f, 0.0f ) );
 	}
 	
 	

@@ -27,7 +27,7 @@ import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Head;
 import BritefuryJ.DocPresent.Combinators.RichText.TitleBar;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.GSymGenericObjectPresenterRegistry;
 import BritefuryJ.GSym.GenericPerspective.GSymGenericPerspective;
 import BritefuryJ.GSym.ObjectPresentation.GSymObjectPresentationPerspective;
@@ -244,7 +244,7 @@ public class GSymBrowserContext
 			Pres linkHeader = SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_SYSTEMPAGE );
 			Pres title = new TitleBar( "Default Root Page" );
 			
-			Pres contents = StyleSheet2.instance.withAttr( Primitive.fontSize, 16 ).applyTo( new StaticText( "Empty document" ) ).alignHCentre();
+			Pres contents = StyleSheet.instance.withAttr( Primitive.fontSize, 16 ).applyTo( new StaticText( "Empty document" ) ).alignHCentre();
 			
 			Pres head = new Head( new Pres[] { linkHeader, title } );
 			
@@ -271,7 +271,7 @@ public class GSymBrowserContext
 
 		public DPElement getContentsElement()
 		{
-			StyleSheet2 contentsStyle = StyleSheet2.instance.withAttr( Primitive.fontSize, 16 );
+			StyleSheet contentsStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 16 );
 			Pres linkHeader = SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_SYSTEMPAGE );
 			Pres title = new TitleBar( "Could Not Resolve Location" );
 			Pres head = new Head( new Pres[] { linkHeader, title } );
@@ -289,9 +289,9 @@ public class GSymBrowserContext
 	
 	
 	private static DefaultRootPage defaultRootPage = new DefaultRootPage();
-	private static StyleSheet2 styleSheet = StyleSheet2.instance;
-	private static final StyleSheet2 rootLocationStyle = StyleSheet2.instance; 
-	private static final StyleSheet2 resolveErrorStyleSheet = styleSheet.withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, new Color( 0.8f, 0.0f, 0.0f ) );
+	private static StyleSheet styleSheet = StyleSheet.instance;
+	private static final StyleSheet rootLocationStyle = StyleSheet.instance; 
+	private static final StyleSheet resolveErrorStyleSheet = styleSheet.withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, new Color( 0.8f, 0.0f, 0.0f ) );
 	private static GSymPerspective rootLocationPerspective = new GSymPerspective( new RootLocationFragmentViewFn() );
 	private static GSymPerspective resolveErrorPerspective = new GSymPerspective( new ResolveErrorFragmentViewFn() );
 }

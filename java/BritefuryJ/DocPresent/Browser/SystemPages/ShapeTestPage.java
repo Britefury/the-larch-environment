@@ -15,7 +15,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Shape;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Painter.FillPainter;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class ShapeTestPage extends SystemPage
 {
@@ -37,7 +37,7 @@ public class ShapeTestPage extends SystemPage
 	
 	
 	
-	private static StyleSheet2 styleSheet = StyleSheet2.instance.withAttr( Primitive.shapePainter, new FillPainter( Color.black ) ).withAttr(
+	private static StyleSheet styleSheet = StyleSheet.instance.withAttr( Primitive.shapePainter, new FillPainter( Color.black ) ).withAttr(
 			Primitive.hoverShapePainter, new FillPainter( new Color( 0.0f, 0.5f, 0.5f ) ) );
 
 	

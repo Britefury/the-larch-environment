@@ -33,7 +33,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Text;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class TextEntry extends ControlPres
@@ -357,7 +357,7 @@ public class TextEntry extends ControlPres
 		BritefuryJ.DocPresent.Border.AbstractBorder validBorder = style.get( Controls.textEntryBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class ); 
 		BritefuryJ.DocPresent.Border.AbstractBorder invalidBorder = style.get( Controls.textEntryInvalidBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class );
 		
-		DPText textElement = (DPText)StyleSheet2.instance.withAttr( Primitive.editable, true ).applyTo( new Text( initialText ) ).present( ctx, style );
+		DPText textElement = (DPText)StyleSheet.instance.withAttr( Primitive.editable, true ).applyTo( new Text( initialText ) ).present( ctx, style );
 		Pres line = new HBox( new Pres[] { new Segment( false, false, textElement ) } );
 		Pres region = new Region( line );
 		DPRegion regionElement = (DPRegion)region.present( ctx, style );

@@ -19,7 +19,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Span;
 import BritefuryJ.DocPresent.Combinators.Primitive.Text;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class GridTestPage extends SystemPage
 {
@@ -39,10 +39,10 @@ public class GridTestPage extends SystemPage
 		return "The grid element arranges is children in a grid.";
 	}
 
-	private static final StyleSheet2 styleSheet = StyleSheet2.instance;
-	private static StyleSheet2 t12 = styleSheet.withAttr( Primitive.fontSize, 12 );
-	private static StyleSheet2 outlineStyle = styleSheet.withAttr( Primitive.border, new SolidBorder( 1.0, 0.0, new Color( 0.5f, 0.5f, 0.5f ), new Color( 0.9f, 0.9f, 0.9f ) ) );
-	private static StyleSheet2 tableStyle = styleSheet.withAttr( Primitive.tableColumnSpacing, 5.0 ).withAttr( Primitive.tableRowSpacing, 5.0 );
+	private static final StyleSheet styleSheet = StyleSheet.instance;
+	private static StyleSheet t12 = styleSheet.withAttr( Primitive.fontSize, 12 );
+	private static StyleSheet outlineStyle = styleSheet.withAttr( Primitive.border, new SolidBorder( 1.0, 0.0, new Color( 0.5f, 0.5f, 0.5f ), new Color( 0.9f, 0.9f, 0.9f ) ) );
+	private static StyleSheet tableStyle = styleSheet.withAttr( Primitive.tableColumnSpacing, 5.0 ).withAttr( Primitive.tableRowSpacing, 5.0 );
 
 	private Pres span(int row, int startCol, int endCol)
 	{

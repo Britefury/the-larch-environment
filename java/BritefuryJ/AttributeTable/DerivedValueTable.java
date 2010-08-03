@@ -11,7 +11,7 @@ import java.util.WeakHashMap;
 public abstract class DerivedValueTable <V extends Object>
 {
 	private AttributeNamespace namespace;
-	private WeakHashMap<AttributeTable2, Object[]> values = new WeakHashMap<AttributeTable2, Object[]>();
+	private WeakHashMap<AttributeTable, Object[]> values = new WeakHashMap<AttributeTable, Object[]>();
 	
 	
 	public DerivedValueTable(AttributeNamespace namespace)
@@ -27,7 +27,7 @@ public abstract class DerivedValueTable <V extends Object>
 	
 	
 	@SuppressWarnings("unchecked")
-	public V get(AttributeTable2 attribs)
+	public V get(AttributeTable attribs)
 	{
 		Object valueHolder[] = values.get( attribs );
 		if ( valueHolder != null )
@@ -43,5 +43,5 @@ public abstract class DerivedValueTable <V extends Object>
 	}
 	
 	
-	protected abstract V evaluate(AttributeTable2 attribs);
+	protected abstract V evaluate(AttributeTable attribs);
 }

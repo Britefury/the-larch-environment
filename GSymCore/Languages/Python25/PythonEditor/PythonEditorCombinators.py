@@ -30,44 +30,44 @@ EDITMODE_EDITSTATEMENT = 2
 class PythonEditorStyle (object):
 	pythonEditor = AttributeNamespace( 'pythonEditor' )
 	
-	keywordStyle = InheritedAttributeNonNull( pythonEditor, 'keywordStyle', StyleSheet2,
-	                                          StyleSheet2.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontBold, True ).withAttr( Primitive.fontSize, 14 )
+	keywordStyle = InheritedAttributeNonNull( pythonEditor, 'keywordStyle', StyleSheet,
+	                                          StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontBold, True ).withAttr( Primitive.fontSize, 14 )
 	                                          .withAttr( Primitive.foreground, Color( 0.25, 0.0, 0.5 ) ).withAttr( Primitive.textSmallCaps, True ) )
-	literalFormatStyle = InheritedAttributeNonNull( pythonEditor, 'literalFormatStyle', StyleSheet2,
-	                                                StyleSheet2.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color( 0.0, 0.25, 0.25 ) ) )
-	quotationStyle = InheritedAttributeNonNull( pythonEditor, 'quotationStyle', StyleSheet2,
-	                                            StyleSheet2.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color( 0.0, 0.0, 0.5 ) ) )
-	stringLiteralStyle = InheritedAttributeNonNull( pythonEditor, 'stringLiteralStyle', StyleSheet2,
-	                                                StyleSheet2.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color( 0.25, 0.0, 0.5 ) ) )
-	numLiteralStyle = InheritedAttributeNonNull( pythonEditor, 'numLiteralStyle', StyleSheet2,
-	                                             StyleSheet2.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color( 0.0, 0.5, 0.5 ) ) )
-	punctuationStyle = InheritedAttributeNonNull( pythonEditor, 'punctuationStyle', StyleSheet2,
-	                                              StyleSheet2.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color( 0.0, 0.0, 1.0 ) ) )
-	delimStyle = InheritedAttributeNonNull( pythonEditor, 'delimStyle', StyleSheet2,
-	                                        StyleSheet2.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color( 0.0, 0.0, 1.0 ) ) )
-	targetStyle = InheritedAttributeNonNull( pythonEditor, 'targetStyle', StyleSheet2,
-	                                         StyleSheet2.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color.black ) )
-	varStyle = InheritedAttributeNonNull( pythonEditor, 'varStyle', StyleSheet2,
-	                                      StyleSheet2.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color.black ) )
-	attributeStyle = InheritedAttributeNonNull( pythonEditor, 'attributeStyle', StyleSheet2,
-	                                            StyleSheet2.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color.black ) )
-	kwNameStyle = InheritedAttributeNonNull( pythonEditor, 'kwNameStyle', StyleSheet2,
-	                                         StyleSheet2.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color.black ) )
-	operatorStyle = InheritedAttributeNonNull( pythonEditor, 'operatorStyle', StyleSheet2,
-	                                           StyleSheet2.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontBold, True )
+	literalFormatStyle = InheritedAttributeNonNull( pythonEditor, 'literalFormatStyle', StyleSheet,
+	                                                StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color( 0.0, 0.25, 0.25 ) ) )
+	quotationStyle = InheritedAttributeNonNull( pythonEditor, 'quotationStyle', StyleSheet,
+	                                            StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color( 0.0, 0.0, 0.5 ) ) )
+	stringLiteralStyle = InheritedAttributeNonNull( pythonEditor, 'stringLiteralStyle', StyleSheet,
+	                                                StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color( 0.25, 0.0, 0.5 ) ) )
+	numLiteralStyle = InheritedAttributeNonNull( pythonEditor, 'numLiteralStyle', StyleSheet,
+	                                             StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color( 0.0, 0.5, 0.5 ) ) )
+	punctuationStyle = InheritedAttributeNonNull( pythonEditor, 'punctuationStyle', StyleSheet,
+	                                              StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color( 0.0, 0.0, 1.0 ) ) )
+	delimStyle = InheritedAttributeNonNull( pythonEditor, 'delimStyle', StyleSheet,
+	                                        StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color( 0.0, 0.0, 1.0 ) ) )
+	targetStyle = InheritedAttributeNonNull( pythonEditor, 'targetStyle', StyleSheet,
+	                                         StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color.black ) )
+	varStyle = InheritedAttributeNonNull( pythonEditor, 'varStyle', StyleSheet,
+	                                      StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color.black ) )
+	attributeStyle = InheritedAttributeNonNull( pythonEditor, 'attributeStyle', StyleSheet,
+	                                            StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color.black ) )
+	kwNameStyle = InheritedAttributeNonNull( pythonEditor, 'kwNameStyle', StyleSheet,
+	                                         StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color.black ) )
+	operatorStyle = InheritedAttributeNonNull( pythonEditor, 'operatorStyle', StyleSheet,
+	                                           StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontBold, True )
 	                                           .withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color( 0.0, 0.5, 0.0 ) ) )
-	paramStyle = InheritedAttributeNonNull( pythonEditor, 'paramStyle', StyleSheet2,
-	                                        StyleSheet2.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color.black ) )
-	importStyle = InheritedAttributeNonNull( pythonEditor, 'importStyle', StyleSheet2,
-	                                         StyleSheet2.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color.black ) )
-	commentStyle = InheritedAttributeNonNull( pythonEditor, 'commentStyle', StyleSheet2,
-	                                          StyleSheet2.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color( 0.4, 0.4, 0.4 ) ) )
-	unparseableStyle = InheritedAttributeNonNull( pythonEditor, 'unparseableStyle', StyleSheet2,
-	                                              StyleSheet2.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 )
+	paramStyle = InheritedAttributeNonNull( pythonEditor, 'paramStyle', StyleSheet,
+	                                        StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color.black ) )
+	importStyle = InheritedAttributeNonNull( pythonEditor, 'importStyle', StyleSheet,
+	                                         StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color.black ) )
+	commentStyle = InheritedAttributeNonNull( pythonEditor, 'commentStyle', StyleSheet,
+	                                          StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color( 0.4, 0.4, 0.4 ) ) )
+	unparseableStyle = InheritedAttributeNonNull( pythonEditor, 'unparseableStyle', StyleSheet,
+	                                              StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 )
 	                                              .withAttr( Primitive.foreground, Color.black ).withAttr( Primitive.textSquiggleUnderlinePaint, Color.red ) )
 	
-	sequenceStyle = InheritedAttributeNonNull( pythonEditor, 'sequenceStyle', StyleSheet2,
-	                                              StyleSheet2.instance.withAttr( Sequence.addLineBreaks, True ).withAttr( Sequence.addParagraphIndentMarkers, True ).withAttr( Sequence.addLineBreakCost, True ) )
+	sequenceStyle = InheritedAttributeNonNull( pythonEditor, 'sequenceStyle', StyleSheet,
+	                                              StyleSheet.instance.withAttr( Sequence.addLineBreaks, True ).withAttr( Sequence.addParagraphIndentMarkers, True ).withAttr( Sequence.addLineBreakCost, True ) )
 	
 	solidHighlightRounding = InheritedAttributeNonNull( pythonEditor, 'solidHighlightRounding', float, 3.0 )
 	outlineHighlightThickness = InheritedAttributeNonNull( pythonEditor, 'outlineHighlightThickness', float, 2.0 )

@@ -33,7 +33,7 @@ from BritefuryJ.AttributeTable import *
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.Browser import Location
-from BritefuryJ.DocPresent.StyleSheet import StyleSheet2
+from BritefuryJ.DocPresent.StyleSheet import StyleSheet
 from BritefuryJ.Controls import *
 from BritefuryJ.DocPresent.Combinators import *
 from BritefuryJ.DocPresent.Combinators.Primitive import *
@@ -53,8 +53,8 @@ from GSymCore.Worksheet.WorksheetEditor.View import perspective as editorPerspec
 
 
 
-_pythonCodeBorderStyle = StyleSheet2.instance.withAttr( Primitive.border, SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) )
-_pythonCodeEditorBorderStyle = StyleSheet2.instance.withAttr( Primitive.border, SolidBorder( 2.0, 5.0, 20.0, 20.0, Color( 0.4, 0.5, 0.6 ), None ) )
+_pythonCodeBorderStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) )
+_pythonCodeEditorBorderStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 2.0, 5.0, 20.0, 20.0, Color( 0.4, 0.5, 0.6 ), None ) )
 
 
 
@@ -85,7 +85,7 @@ class WorksheetViewer (GSymViewObjectDispatch):
 		
 		w = Page( [ linkHeader, bodyView ] )
 		w = w.withContextMenuFactory( _worksheetContextMenuFactory )
-		return StyleSheet2.instance.withAttr( Primitive.editable, False ).applyTo( w )
+		return StyleSheet.instance.withAttr( Primitive.editable, False ).applyTo( w )
 
 
 	@ObjectDispatchMethod( ViewSchema.BodyView )
@@ -124,7 +124,7 @@ class WorksheetViewer (GSymViewObjectDispatch):
 			if node.isCodeVisible():
 				codeView = PerspectiveInnerFragment( Python25.python25EditorPerspective, node.getCode() )
 				if node.isCodeEditable():
-					codeView = StyleSheet2.instance.withAttr( Primitive.editable, True ).applyTo( codeView )
+					codeView = StyleSheet.instance.withAttr( Primitive.editable, True ).applyTo( codeView )
 			else:
 				codeView = None
 			
@@ -151,7 +151,7 @@ class WorksheetViewer (GSymViewObjectDispatch):
 					boxContents.append( _pythonCodeBorderStyle.applyTo( Border( codeView.alignHExpand() ).alignHExpand() ) )
 				if node.isResultVisible()  and  executionResultView is not None:
 					boxContents.append( executionResultView.alignHExpand() )
-				box = StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 5.0 ).applyTo( VBox( boxContents ) )
+				box = StyleSheet.instance.withAttr( Primitive.vboxSpacing, 5.0 ).applyTo( VBox( boxContents ) )
 				
 				return _pythonCodeEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
 		else:
@@ -177,6 +177,6 @@ class WorksheetViewerRelativeLocationResolver (GSymRelativeLocationResolver):
 	
 
 	
-perspective = GSymPerspective( WorksheetViewer(), StyleSheet2.instance, AttributeTable.instance, None, WorksheetViewerRelativeLocationResolver() )
+perspective = GSymPerspective( WorksheetViewer(), StyleSheet.instance, SimpleAttributeTable.instance, None, WorksheetViewerRelativeLocationResolver() )
 
 	

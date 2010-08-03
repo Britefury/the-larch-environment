@@ -22,7 +22,7 @@ import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StyleParams.ContentLeafEditableStyleParams;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.Math.Point2;
 
 public abstract class DPContentLeafEditable extends DPContentLeaf
@@ -863,9 +863,9 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	// Meta element methods
 	//
 	
-	protected static StyleSheet2 metaHeaderHighlightBorderStyle = StyleSheet2.instance.withAttr( Primitive.border,
+	protected static StyleSheet metaHeaderHighlightBorderStyle = StyleSheet.instance.withAttr( Primitive.border,
 			new SolidBorder( 1.0, 1.0, 5.0, 5.0, new Color( 0.75f, 0.0f, 0.0f ), new Color( 1.0f, 0.9f, 0.8f ) ) );
-	protected static StyleSheet2 metaHeaderCaretPosStyle = StyleSheet2.instance.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
+	protected static StyleSheet metaHeaderCaretPosStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
 
 	protected void createDebugPresentationHeaderContents(ArrayList<Object> elements)
 	{
@@ -881,7 +881,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		}
 	}
 
-	protected StyleSheet2 getDebugPresentationHeaderBorderStyle()
+	protected StyleSheet getDebugPresentationHeaderBorderStyle()
 	{
 		Caret caret = rootElement != null  ?  rootElement.getCaret()  :  null;
 		if ( caret != null )

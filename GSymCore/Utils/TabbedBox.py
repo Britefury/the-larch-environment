@@ -22,7 +22,7 @@ class TabbedBoxStyle (object):
 	
 	tabbedBoxNamespace = AttributeNamespace( 'tabbedBox' )
 	
-	headerTextStyle = AttributeNonNull( tabbedBoxNamespace, 'headerTextStyle', StyleSheet2, StyleSheet2.instance.withAttr( Primitive.fontFace, 'SansSerif' ).withAttr( Primitive.fontBold, True )
+	headerTextStyle = AttributeNonNull( tabbedBoxNamespace, 'headerTextStyle', StyleSheet, StyleSheet.instance.withAttr( Primitive.fontFace, 'SansSerif' ).withAttr( Primitive.fontBold, True )
 	                                    .withAttr( Primitive.fontSize, 16 ).withAttr( Primitive.foreground, Color.BLACK ) )
 	headerPadding = AttributeNonNull( tabbedBoxNamespace, 'headerPadding', float, 2.0 )
 	bodyPadding = AttributeNonNull( tabbedBoxNamespace, 'bodyPadding', float, 2.0 )

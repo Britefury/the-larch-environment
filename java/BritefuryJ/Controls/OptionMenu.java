@@ -22,7 +22,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Painter.Painter;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class OptionMenu extends ControlPres
@@ -201,7 +201,7 @@ public class OptionMenu extends ControlPres
 	{
 		StyleValues usedStyle = Controls.useOptionMenuAttrs( style );
 		
-		StyleSheet2 arrowStyle = StyleSheet2.instance.withAttr( Primitive.shapePainter, style.get( Controls.optionMenuArrowPainter, Painter.class ) );
+		StyleSheet arrowStyle = StyleSheet.instance.withAttr( Primitive.shapePainter, style.get( Controls.optionMenuArrowPainter, Painter.class ) );
 		double arrowSize = style.get( Controls.optionMenuArrowSize, Double.class );
 		Pres arrow = arrowStyle.applyTo( new Arrow( Arrow.Direction.DOWN, arrowSize ) );
 		
@@ -210,7 +210,7 @@ public class OptionMenu extends ControlPres
 		
 		BritefuryJ.DocPresent.Border.AbstractBorder border = style.get( Controls.optionMenuBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class );
 		BritefuryJ.DocPresent.Border.AbstractBorder hoverBorder = style.get( Controls.optionMenuHoverBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class );
-		StyleSheet2 optionStyle = StyleSheet2.instance.withAttr( Primitive.hboxSpacing, style.get( Controls.optionMenuContentsSpacing, Double.class ) ).withAttr( Primitive.border, border );
+		StyleSheet optionStyle = StyleSheet.instance.withAttr( Primitive.hboxSpacing, style.get( Controls.optionMenuContentsSpacing, Double.class ) ).withAttr( Primitive.border, border );
 		Pres optionContents = new HBox( new Pres[] { coerce( choiceContainer ).alignHExpand().alignVCentre(), arrow.alignVCentre() } );
 		Pres optionMenu = optionStyle.applyTo( new Border( optionContents.alignHExpand() ) ); 
 		DPBorder optionMenuElement = (DPBorder)optionMenu.present( ctx, style );

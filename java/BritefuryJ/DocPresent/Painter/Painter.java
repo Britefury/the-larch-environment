@@ -14,7 +14,7 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.Box;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
 import BritefuryJ.GSym.View.GSymFragmentView;
@@ -29,6 +29,6 @@ public abstract class Painter implements Presentable
 	@Override
 	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return new ObjectBox( getClass().getName(), new Border( StyleSheet2.instance.withAttr( Primitive.shapePainter, this ).applyTo( new Box( 50.0, 25.0 ) ) ) );
+		return new ObjectBox( getClass().getName(), new Border( StyleSheet.instance.withAttr( Primitive.shapePainter, this ).applyTo( new Box( 50.0, 25.0 ) ) ) );
 	}
 }

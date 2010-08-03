@@ -8,7 +8,7 @@ package BritefuryJ.DocPresent.Combinators;
 
 import BritefuryJ.AttributeTable.AttributeBase;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class ApplyStyleSheetFromAttribute extends Pres
@@ -27,7 +27,7 @@ public class ApplyStyleSheetFromAttribute extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		StyleSheet2 styleSheet = style.get( attribute, StyleSheet2.class );
+		StyleSheet styleSheet = style.get( attribute, StyleSheet.class );
 		return child.present( ctx, style.withAttrs( styleSheet ) );
 	}
 }

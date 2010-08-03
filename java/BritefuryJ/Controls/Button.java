@@ -16,7 +16,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Button extends ControlPres
@@ -129,7 +129,7 @@ public class Button extends ControlPres
 		boolean bClosePopupOnActivate = style.get( Controls.bClosePopupOnActivate, Boolean.class );
 		
 		Pres childElement = presentAsCombinator( ctx, Controls.useButtonAttrs( style ), child );
-		DPBorder borderElement = (DPBorder)StyleSheet2.instance.withAttr( Primitive.border, border ).applyTo( new Border( childElement ) ).present( ctx, style );
+		DPBorder borderElement = (DPBorder)StyleSheet.instance.withAttr( Primitive.border, border ).applyTo( new Border( childElement ) ).present( ctx, style );
 		
 		return new ButtonControl( ctx, style, borderElement, border, highlightBorder, listener, bClosePopupOnActivate );
 	}

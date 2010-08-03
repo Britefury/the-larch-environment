@@ -14,7 +14,7 @@ import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
 import BritefuryJ.GSym.ObjectPresentation.GSymObjectPresentationPerspective;
 import BritefuryJ.GSym.ObjectPresentation.ObjectPresentationLocationResolver;
@@ -98,5 +98,5 @@ public class GSymGenericPerspective extends GSymObjectPresentationPerspective
 	
 	
 	
-	private static final StyleSheet2 asStringStyle = StyleSheet2.instance.withAttr( Primitive.fontItalic, true ).withAttr( Primitive.fontSize, 14 );
+	private static final StyleSheet asStringStyle = StyleSheet.instance.withAttr( Primitive.fontItalic, true ).withAttr( Primitive.fontSize, 14 );
 }

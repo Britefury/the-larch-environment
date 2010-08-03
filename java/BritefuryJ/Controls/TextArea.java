@@ -38,7 +38,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Whitespace;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class TextArea extends ControlPres
@@ -435,7 +435,7 @@ public class TextArea extends ControlPres
 	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
 		style = style.withAttr( Primitive.editable, true );
-		StyleSheet2 textAreaStyleSheet = style.get( Controls.textAreaAttrs, StyleSheet2.class );
+		StyleSheet textAreaStyleSheet = style.get( Controls.textAreaAttrs, StyleSheet.class );
 		
 		StyleValues textAreaStyle = style.withAttrs( textAreaStyleSheet );
 		

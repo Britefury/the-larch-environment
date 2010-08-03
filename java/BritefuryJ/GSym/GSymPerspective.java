@@ -10,20 +10,20 @@ import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Browser.Location.TokenIterator;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.GSym.View.GSymViewFragmentFunction;
 
 public class GSymPerspective extends GSymAbstractPerspective
 {
 	private GSymViewFragmentFunction fragmentViewFn;
-	private StyleSheet2 styleSheet;
+	private StyleSheet styleSheet;
 	private SimpleAttributeTable initialInheritedState;
 	private EditHandler editHandler;
 	private GSymRelativeLocationResolver locationResolver;
 	
 	
-	public GSymPerspective(GSymViewFragmentFunction fragmentViewFn, StyleSheet2 styleSheet, SimpleAttributeTable initialInheritedState, EditHandler editHandler,
+	public GSymPerspective(GSymViewFragmentFunction fragmentViewFn, StyleSheet styleSheet, SimpleAttributeTable initialInheritedState, EditHandler editHandler,
 			GSymRelativeLocationResolver locationResolver)
 	{
 		this.fragmentViewFn = fragmentViewFn;
@@ -35,12 +35,12 @@ public class GSymPerspective extends GSymAbstractPerspective
 	
 	public GSymPerspective(GSymViewFragmentFunction fragmentViewFn, GSymRelativeLocationResolver locationResolver)
 	{
-		this( fragmentViewFn, StyleSheet2.instance, SimpleAttributeTable.instance, null, locationResolver );
+		this( fragmentViewFn, StyleSheet.instance, SimpleAttributeTable.instance, null, locationResolver );
 	}
 	
 	public GSymPerspective(GSymViewFragmentFunction fragmentViewFn)
 	{
-		this( fragmentViewFn, StyleSheet2.instance, SimpleAttributeTable.instance, null, null );
+		this( fragmentViewFn, StyleSheet.instance, SimpleAttributeTable.instance, null, null );
 	}
 	
 	
@@ -52,7 +52,7 @@ public class GSymPerspective extends GSymAbstractPerspective
 	}
 
 	@Override
-	public StyleSheet2 getStyleSheet()
+	public StyleSheet getStyleSheet()
 	{
 		return styleSheet;
 	}

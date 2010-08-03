@@ -18,12 +18,12 @@ import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
 import BritefuryJ.DocPresent.Combinators.RichText.Heading6;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.Controls.TextArea;
 
 public class TextAreaTestPage extends SystemPage
 {
-	private static final StyleSheet2 redText = StyleSheet2.instance.withAttr( Primitive.foreground, Color.RED );
+	private static final StyleSheet redText = StyleSheet.instance.withAttr( Primitive.foreground, Color.RED );
 	
 	protected TextAreaTestPage()
 	{
@@ -125,11 +125,11 @@ public class TextAreaTestPage extends SystemPage
 	{
 		DPVBox resultArea = (DPVBox)new VBox( new Pres[] {} ).present();
 		DPVBox eventArea = (DPVBox)new VBox( new Pres[] {} ).present();
-		Pres resultBox = StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 5.0 ).applyTo( new VBox( new Object[] { new Heading6( "Text:" ), resultArea, new Heading6( "Event:" ), eventArea } ) );
+		Pres resultBox = StyleSheet.instance.withAttr( Primitive.vboxSpacing, 5.0 ).applyTo( new VBox( new Object[] { new Heading6( "Text:" ), resultArea, new Heading6( "Event:" ), eventArea } ) );
 		
 		TextArea area = new TextArea( testString, new AreaListener( resultArea, eventArea, testString ) );
 		
-		Pres areaBox = StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 10.0 ).applyTo( new VBox( new Object[] { area.alignHExpand(), resultBox.alignHExpand() } ) );
+		Pres areaBox = StyleSheet.instance.withAttr( Primitive.vboxSpacing, 10.0 ).applyTo( new VBox( new Object[] { area.alignHExpand(), resultBox.alignHExpand() } ) );
 		
 		return new Body( new Pres[] { new Heading2( "Text area" ), areaBox.alignHExpand() } ).alignHExpand();
 	}

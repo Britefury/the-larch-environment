@@ -13,7 +13,7 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Box;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet2;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class StyleSheetBenchmark
 {
@@ -23,7 +23,7 @@ public class StyleSheetBenchmark
 //	private static final int RUN_LENGTH = 64;
 //	private static final int NUM_REPEATS = 64;
 	
-	private static final StyleSheet2 newStyle = StyleSheet2.instance.withAttr( Primitive.fontFace, "Serif" );
+	private static final StyleSheet newStyle = StyleSheet.instance.withAttr( Primitive.fontFace, "Serif" );
 
 	
 	

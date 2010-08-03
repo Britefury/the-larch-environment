@@ -52,7 +52,7 @@ from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.Painter import *
 from BritefuryJ.DocPresent.Browser import Location
-from BritefuryJ.DocPresent.StyleSheet import StyleSheet2
+from BritefuryJ.DocPresent.StyleSheet import StyleSheet
 from BritefuryJ.DocPresent.Combinators import *
 from BritefuryJ.DocPresent.Combinators.Primitive import *
 from BritefuryJ.DocPresent.Combinators.RichText import *
@@ -60,9 +60,9 @@ from BritefuryJ.DocPresent.Combinators.ContextMenu import *
 
 
 
-_pythonCodeHeaderStyle = StyleSheet2.instance.withAttr( Primitive.background, FillPainter( Color( 0.75, 0.8, 0.925 ) ) )
-_pythonCodeBorderStyle = StyleSheet2.instance.withAttr( Primitive.border, SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) )
-_pythonCodeEditorBorderStyle = StyleSheet2.instance.withAttr( Primitive.border, SolidBorder( 2.0, 5.0, 20.0, 20.0, Color( 0.4, 0.5, 0.6 ), None ) )
+_pythonCodeHeaderStyle = StyleSheet.instance.withAttr( Primitive.background, FillPainter( Color( 0.75, 0.8, 0.925 ) ) )
+_pythonCodeBorderStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) )
+_pythonCodeEditorBorderStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 2.0, 5.0, 20.0, 20.0, Color( 0.4, 0.5, 0.6 ), None ) )
 
 		
 		
@@ -211,13 +211,13 @@ class WorksheetEditor (GSymViewObjectDispatch):
 		deleteButton = Button( Image.systemIcon( 'delete' ), _onDeleteButton )
 		
 		headerBox = _pythonCodeHeaderStyle.applyTo( Bin(
-		        StyleSheet2.instance.withAttr( Primitive.hboxSpacing, 20.0 ).applyTo( HBox( [ StaticText( 'Python code' ).alignHExpand(), styleOptionMenu, deleteButton ] ) ).alignHExpand().pad( 2.0, 2.0 ) ) )
+		        StyleSheet.instance.withAttr( Primitive.hboxSpacing, 20.0 ).applyTo( HBox( [ StaticText( 'Python code' ).alignHExpand(), styleOptionMenu, deleteButton ] ) ).alignHExpand().pad( 2.0, 2.0 ) ) )
 		
 		boxContents = [ headerBox.alignHExpand() ]
 		boxContents.append( _pythonCodeBorderStyle.applyTo( Border( codeView.alignHExpand() ).alignHExpand() ) )
 		if executionResultView is not None:
 			boxContents.append( executionResultView.alignHExpand() )
-		box = StyleSheet2.instance.withAttr( Primitive.vboxSpacing, 5.0 ).applyTo( VBox( boxContents ) )
+		box = StyleSheet.instance.withAttr( Primitive.vboxSpacing, 5.0 ).applyTo( VBox( boxContents ) )
 		
 		p = _pythonCodeEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
 
@@ -240,6 +240,6 @@ class WorksheetEditorRelativeLocationResolver (GSymRelativeLocationResolver):
 	
 
 	
-perspective = GSymPerspective( WorksheetEditor(), StyleSheet2.instance, AttributeTable.instance, WorksheetEditHandler(), WorksheetEditorRelativeLocationResolver() )
+perspective = GSymPerspective( WorksheetEditor(), StyleSheet.instance, SimpleAttributeTable.instance, WorksheetEditHandler(), WorksheetEditorRelativeLocationResolver() )
 
 	
