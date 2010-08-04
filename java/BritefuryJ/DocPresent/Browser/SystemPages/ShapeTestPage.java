@@ -21,7 +21,6 @@ public class ShapeTestPage extends SystemPage
 {
 	protected ShapeTestPage()
 	{
-		register( "tests.shape" );
 	}
 	
 	

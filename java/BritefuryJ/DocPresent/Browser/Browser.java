@@ -60,7 +60,7 @@ public class Browser
 	private ScrolledViewport.ScrolledViewportControl viewport;
 	private BrowserHistory history;
 	
-	private BrowserContext context;
+	private LocationResolver resolver;
 	private Page page;
 	private BrowserListener listener;
 	private CommandHistoryListener commandHistoryListener;
@@ -68,9 +68,9 @@ public class Browser
 	
 	
 	
-	public Browser(BrowserContext context, Location location, PageController pageController)
+	public Browser(LocationResolver resolver, Location location, PageController pageController)
 	{
-		this.context = context;
+		this.resolver = resolver;
 		history = new BrowserHistory( location );
 		
 		viewport = makeViewport( new HiddenContent( "" ), history.getCurrentState().getViewportState() );
@@ -256,7 +256,7 @@ public class Browser
 		Location location = history.getCurrentState().getLocation();
 		
 		PersistentStateStore stateStore = history.getCurrentState().getPagePersistentState();
-		Page p = context.resolveLocationAsPage( location, stateStore );
+		Page p = resolver.resolveLocationAsPage( location, stateStore );
 
 		viewport = makeViewport( p.getContentsElement().alignHExpand(), history.getCurrentState().getViewportState() );
 		presComponent.getRootElement().setChild( viewport.getElement().alignHExpand().alignVExpand() );

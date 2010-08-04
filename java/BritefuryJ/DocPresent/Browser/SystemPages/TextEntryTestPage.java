@@ -34,7 +34,6 @@ public class TextEntryTestPage extends SystemPage
 {
 	protected TextEntryTestPage()
 	{
-		register( "tests.controls.textentry" );
 	}
 	
 	

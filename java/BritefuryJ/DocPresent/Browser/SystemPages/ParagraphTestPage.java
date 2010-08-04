@@ -21,7 +21,6 @@ public class ParagraphTestPage extends SystemPage
 {
 	protected ParagraphTestPage()
 	{
-		register( "tests.paragraph" );
 	}
 	
 	

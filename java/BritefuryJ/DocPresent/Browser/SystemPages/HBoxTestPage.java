@@ -22,7 +22,6 @@ public class HBoxTestPage extends SystemPage
 {
 	protected HBoxTestPage()
 	{
-		register( "tests.hbox" );
 	}
 	
 	

@@ -2,91 +2,70 @@
 //##* under the terms of the GNU General Public License version 2 as published by the
 //##* Free Software Foundation. The full text of the GNU General Public License
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
-//##* program. This source code is (C)copyright Geoffrey French 2008.
+//##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
 package BritefuryJ.DocPresent.Browser;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import org.python.core.Py;
+import org.python.core.PyStringMap;
+import org.python.util.PythonInterpreter;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Browser.SystemPages.SystemLocationResolver;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Head;
 import BritefuryJ.DocPresent.Combinators.RichText.TitleBar;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
-public class BrowserContext
+public class PythonEvalLocationResolver implements LocationResolver
 {
-	private List<LocationResolver> resolvers = new ArrayList<LocationResolver>();
+	private PythonInterpreter interpreter;
 	
 	
-	public BrowserContext()
+	public PythonEvalLocationResolver()
 	{
-	}
-	
-	public BrowserContext(List<LocationResolver> resolvers)
-	{
-		this.resolvers.addAll( resolvers );
-	}
-	
-	
-	
-	public static BrowserContext browserContextWithSystemPages()
-	{
-		return new BrowserContext( Arrays.asList( new LocationResolver[] { SystemLocationResolver.getSystemResolver() } ) );
-	}
-	
-	public static BrowserContext browserContextWithSystemPages(List<LocationResolver> resolvers)
-	{
-		ArrayList<LocationResolver> rs = new ArrayList<LocationResolver>();
-		rs.add( SystemLocationResolver.getSystemResolver() );
-		rs.addAll( resolvers );
-		return new BrowserContext( rs );
+		PyStringMap locals = new PyStringMap();
+		locals.__setitem__( "system", Py.java2py( new SystemRootPage() ) );
+		
+		interpreter = new PythonInterpreter( locals );
 	}
 	
 	
-	
-	protected void addResolvers(List<LocationResolver> resolvers)
-	{
-		this.resolvers.addAll( resolvers );
-	}
-	
-	
+	@Override
 	public Page resolveLocationAsPage(Location location, PersistentStateStore persistentState)
 	{
-		for (LocationResolver resolver: resolvers)
-		{
-			Page p = resolver.resolveLocationAsPage( location, persistentState );
-			if ( p != null )
-			{
-				return p;
-			}
-		}
+		String locationString = location.getLocationString();
 		
-		if ( location.getLocationString().equals( "" ) )
+		if ( locationString.equals( "" ) )
 		{
 			return defaultRootPage;
 		}
 		else
 		{
-			return new ResolveErrorPage( location );
+			Page p;
+			try
+			{
+				p = Py.tojava( interpreter.eval( locationString ), Page.class );
+			}
+			catch (Exception e)
+			{
+				return new ResolveErrorPage( location, e );
+			}
+			
+			return p;
 		}
 	}
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
 	private static class DefaultRootPage extends Page
 	{
 		public String getTitle()
@@ -113,10 +92,12 @@ public class BrowserContext
 	private static class ResolveErrorPage extends Page
 	{
 		private String location;
+		private Exception exception;
 		
-		public ResolveErrorPage(Location location)
+		public ResolveErrorPage(Location location, Exception exception)
 		{
 			this.location = location.getLocationString();
+			this.exception = exception;
 		}
 		
 		
@@ -132,17 +113,23 @@ public class BrowserContext
 			Pres title = new TitleBar( "Could Not Resolve Location" );
 			Pres head = new Head( new Pres[] { linkHeader, title } );
 			
+			Pres errorTitle = contentsStyle.applyTo( new StaticText( "Could not resolve" ) ).alignHCentre();
 			Pres loc = contentsStyle.applyTo( new StaticText( location ) ).alignHCentre();
-			Pres error = contentsStyle.applyTo( new StaticText( "could not be resolved" ) ).alignHCentre();
-			Pres body = new Body( new Pres[] { loc, error } );
+			Pres excClass = contentsStyle.applyTo( new StaticText( "Caught exception of type '" + exception.getClass().getName() + "'" ) );
+			String excLines[] = exception.toString().split( "\n" );
+			Pres excLineTexts[] = new Pres[excLines.length];
+			for (int i = 0; i < excLines.length; i++)
+			{
+				excLineTexts[i] = new StaticText( excLines[i] );
+			}
+			Pres excText = contentsStyle.applyTo( new VBox( excLineTexts ) );
+			Pres body = new Body( new Pres[] { errorTitle, loc, excClass, excText } );
 			
 			
 			return new BritefuryJ.DocPresent.Combinators.RichText.Page( new Pres[] { head, body } ).present();
 		}
 	}
-	
-	
-	
-	
+
+
 	private static DefaultRootPage defaultRootPage = new DefaultRootPage();
 }

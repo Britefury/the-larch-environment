@@ -27,7 +27,6 @@ public class TextAreaTestPage extends SystemPage
 	
 	protected TextAreaTestPage()
 	{
-		register( "tests.controls.textarea" );
 	}
 	
 	

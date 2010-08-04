@@ -24,8 +24,8 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 
-import BritefuryJ.DocPresent.Browser.BrowserContext;
 import BritefuryJ.DocPresent.Browser.Location;
+import BritefuryJ.DocPresent.Browser.PythonEvalLocationResolver;
 import BritefuryJ.DocPresent.Browser.TabbedBrowser;
 
 public class BrowserTest implements TabbedBrowser.TabbedBrowserListener
@@ -96,7 +96,7 @@ public class BrowserTest implements TabbedBrowser.TabbedBrowserListener
 		JFrame frame = new JFrame( "Browser test" );
 		frame.setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
 		
-		TabbedBrowser browser = new TabbedBrowser( BrowserContext.browserContextWithSystemPages(), this, location );
+		TabbedBrowser browser = new TabbedBrowser( new PythonEvalLocationResolver(), this, location );
 		browser.getComponent().setPreferredSize( new Dimension( 800, 600 ) );
 		frame.setJMenuBar( menuBar );
 		frame.add( browser.getComponent() );
@@ -104,19 +104,3 @@ public class BrowserTest implements TabbedBrowser.TabbedBrowserListener
 		frame.setVisible(true);
 	}
 }
-
-/*
- * class _GSymTransferActionListener (ActionListener):
-	def __init__(self):
-		pass
-		
-	def actionPerformed(self, e):
-		manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-		focusOwner = manager.getPermanentFocusOwner()
-		if focusOwner is not None:
-			action = e.getActionCommand()
-			a = focusOwner.getActionMap().get( action )
-			if a is not None:
-				a.actionPerformed( ActionEvent( focusOwner, ActionEvent.ACTION_PERFORMED, None ) )
-
- */

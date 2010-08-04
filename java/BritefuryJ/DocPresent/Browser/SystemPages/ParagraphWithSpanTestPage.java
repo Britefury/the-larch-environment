@@ -23,7 +23,6 @@ public class ParagraphWithSpanTestPage extends SystemPage
 {
 	protected ParagraphWithSpanTestPage()
 	{
-		register( "tests.parawithspan" );
 	}
 	
 	

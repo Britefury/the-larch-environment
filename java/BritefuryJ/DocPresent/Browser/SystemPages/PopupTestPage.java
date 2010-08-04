@@ -28,7 +28,6 @@ public class PopupTestPage extends SystemPage
 {
 	protected PopupTestPage()
 	{
-		register( "tests.controls.popup" );
 	}
 	
 	

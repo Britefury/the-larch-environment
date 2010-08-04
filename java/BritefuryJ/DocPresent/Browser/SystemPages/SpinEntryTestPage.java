@@ -23,7 +23,6 @@ public class SpinEntryTestPage extends SystemPage
 {
 	protected SpinEntryTestPage()
 	{
-		register( "tests.controls.spinentry" );
 	}
 	
 	

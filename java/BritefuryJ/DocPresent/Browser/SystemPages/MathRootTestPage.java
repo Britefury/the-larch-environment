@@ -21,7 +21,6 @@ public class MathRootTestPage extends SystemPage
 {
 	protected MathRootTestPage()
 	{
-		register( "tests.mathroot" );
 	}
 	
 	

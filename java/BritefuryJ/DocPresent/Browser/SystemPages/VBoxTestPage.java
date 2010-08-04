@@ -23,7 +23,6 @@ public class VBoxTestPage extends SystemPage
 {
 	protected VBoxTestPage()
 	{
-		register( "tests.vbox" );
 	}
 	
 	public String getTitle()

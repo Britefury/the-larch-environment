@@ -11,6 +11,7 @@ import java.awt.Color;
 import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPProxy;
+import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Combinators.ElementRef;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
@@ -27,7 +28,6 @@ public class HyperlinkTestPage extends SystemPage
 {
 	protected HyperlinkTestPage()
 	{
-		register( "tests.controls.hyperlink" );
 	}
 	
 	
@@ -90,7 +90,7 @@ public class HyperlinkTestPage extends SystemPage
 		Pres colourLinks = styleSheet.withAttr( Primitive.hboxSpacing, 20.0 ).applyTo( new HBox( new Pres[] { blackLink, redLink, greenLink } ) ).padX( 5.0 );
 		Pres colourBox = new VBox( new Pres[] { colouredTextProxyRef, colourLinks } );
 		
-		Hyperlink locationLink = new Hyperlink( "To system page", SystemRootPage.getLocation() );
+		Hyperlink locationLink = new Hyperlink( "To home page", new Location( "" ) );
 		
 		return new Body( new Object[] { new Heading2( "Action hyperlinks" ), colourBox, new Heading2( "Location hyperlinks" ), locationLink } );
 	}

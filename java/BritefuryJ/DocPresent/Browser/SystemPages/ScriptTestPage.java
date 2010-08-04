@@ -22,7 +22,6 @@ public class ScriptTestPage extends SystemPage
 {
 	protected ScriptTestPage()
 	{
-		register( "tests.script" );
 	}
 	
 	

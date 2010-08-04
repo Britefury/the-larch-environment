@@ -21,7 +21,6 @@ public class ImageTestPage extends SystemPage
 {
 	protected ImageTestPage()
 	{
-		register( "tests.image" );
 	}
 	
 	

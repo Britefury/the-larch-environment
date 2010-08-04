@@ -27,7 +27,6 @@ public class ButtonTestPage extends SystemPage
 {
 	protected ButtonTestPage()
 	{
-		register( "tests.controls.button" );
 	}
 	
 	

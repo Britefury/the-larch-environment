@@ -26,7 +26,6 @@ public class SequenceViewTestPage extends SystemPage
 {
 	protected SequenceViewTestPage()
 	{
-		register( "tests.sequenceview" );
 	}
 	
 	

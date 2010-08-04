@@ -22,7 +22,6 @@ public class TableTestPage extends SystemPage
 {
 	protected TableTestPage()
 	{
-		register( "tests.table" );
 	}
 	
 	
