@@ -223,7 +223,6 @@ public class GSymView extends IncrementalTree
 	private boolean bProfilingEnabled = false;
 	private ProfileTimer pythonTimer = new ProfileTimer();
 	private ProfileTimer javaTimer = new ProfileTimer();
-	private ProfileTimer elementTimer = new ProfileTimer();
 	private ProfileTimer contentChangeTimer = new ProfileTimer();
 	private ProfileTimer updateNodeElementTimer = new ProfileTimer();
 	
@@ -386,7 +385,7 @@ public class GSymView extends IncrementalTree
 			ProfileTimer.shutdownProfiling();
 			double deltaT = ( t2 - t1 )  *  1.0e-9;
 			System.out.println( "DocView: REFRESH VIEW TIME = " + deltaT );
-			System.out.println( "DocView: REFRESH VIEW PROFILE: JAVA TIME = " + getJavaTime() + ", ELEMENT CREATE TIME = " + getElementTime() +
+			System.out.println( "DocView: REFRESH VIEW PROFILE: JAVA TIME = " + getJavaTime() +
 					", PYTHON TIME = " + getPythonTime() + ", CONTENT CHANGE TIME = " + getContentChangeTime() +
 					", UPDATE NODE ELEMENT TIME = " + getUpdateNodeElementTime() );
 		}
@@ -454,23 +453,6 @@ public class GSymView extends IncrementalTree
 	}
 	
 	
-	public void profile_startElement()
-	{
-		if ( bProfilingEnabled )
-		{
-			elementTimer.start();
-		}
-	}
-	
-	public void profile_stopElement()
-	{
-		if ( bProfilingEnabled )
-		{
-			elementTimer.stop();
-		}
-	}
-	
-	
 	public void profile_startContentChange()
 	{
 		if ( bProfilingEnabled )
@@ -513,7 +495,6 @@ public class GSymView extends IncrementalTree
 		bProfilingEnabled = true;
 		pythonTimer.reset();
 		javaTimer.reset();
-		elementTimer.reset();
 		contentChangeTimer.reset();
 		updateNodeElementTimer.reset();
 	}
@@ -533,11 +514,6 @@ public class GSymView extends IncrementalTree
 		return javaTimer.getTime();
 	}
 
-	public double getElementTime()
-	{
-		return elementTimer.getTime();
-	}
-	
 	public double getContentChangeTime()
 	{
 		return contentChangeTimer.getTime();

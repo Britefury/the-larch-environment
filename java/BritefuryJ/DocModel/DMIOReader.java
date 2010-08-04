@@ -81,6 +81,12 @@ public class DMIOReader
 		{
 			return schema.getReader( className, version );
 		}
+		
+		
+		public String toString()
+		{
+			return "SchemaRef( name='" + schema.getLocation() + "', version=" + version + " )";
+		}
 	}
 	
 	
@@ -658,7 +664,8 @@ public class DMIOReader
 					// We cannot load this.
 					throw new DMSchema.UnsupportedSchemaVersionException( value, schema.getVersion(), version );
 				}
-				moduleTable.put( key, new SchemaRef( schema, version ) );
+				SchemaRef schemaRef = new SchemaRef( schema, version );
+				moduleTable.put( key, schemaRef );
 				
 				
 				eatWhitespace();
