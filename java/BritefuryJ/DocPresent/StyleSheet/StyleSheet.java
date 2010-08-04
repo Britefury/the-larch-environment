@@ -35,6 +35,11 @@ public class StyleSheet extends AttributeTable
 		return new ApplyStyleSheet( this, child );
 	}
 
+	public ApplyStyleSheet __call__(Pres child)
+	{
+		return new ApplyStyleSheet( this, child );
+	}
+
 
 
 

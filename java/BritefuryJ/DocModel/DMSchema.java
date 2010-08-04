@@ -187,13 +187,10 @@ public class DMSchema
 			{
 				for (int i = readerCache.size(); i <= version; i++)
 				{
-					readerCache.add( reader );
+					readerCache.add( null );
 				}
 			}
-			else
-			{
-				readerCache.set( version, reader );
-			}
+			readerCache.set( version, reader );
 		}
 	}
 
