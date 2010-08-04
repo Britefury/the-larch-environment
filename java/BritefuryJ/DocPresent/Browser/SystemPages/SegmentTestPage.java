@@ -22,7 +22,6 @@ public class SegmentTestPage extends SystemPage
 {
 	protected SegmentTestPage()
 	{
-		register( "tests.segment" );
 	}
 	
 	

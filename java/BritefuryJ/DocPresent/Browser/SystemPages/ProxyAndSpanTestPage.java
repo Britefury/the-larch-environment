@@ -31,7 +31,6 @@ public class ProxyAndSpanTestPage extends SystemPage
 {
 	protected ProxyAndSpanTestPage()
 	{
-		register( "tests.proxyandspan" );
 	}
 	
 	

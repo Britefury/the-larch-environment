@@ -25,7 +25,6 @@ public class AlignmentTestPage extends SystemPage
 {
 	protected AlignmentTestPage()
 	{
-		register( "tests.alignment" );
 	}
 	
 	

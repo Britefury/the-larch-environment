@@ -21,7 +21,6 @@ public class OptionMenuTestPage extends SystemPage
 {
 	protected OptionMenuTestPage()
 	{
-		register( "tests.controls.optionmenu" );
 	}
 	
 	

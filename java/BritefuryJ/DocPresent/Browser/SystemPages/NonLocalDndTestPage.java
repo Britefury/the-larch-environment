@@ -39,7 +39,6 @@ public class NonLocalDndTestPage extends SystemPage
 	
 	protected NonLocalDndTestPage()
 	{
-		register( "tests.nonlocaldnd" );
 	}
 	
 	

@@ -47,7 +47,6 @@ public class DndTestPage extends SystemPage
 	
 	protected DndTestPage()
 	{
-		register( "tests.dnd" );
 	}
 	
 	

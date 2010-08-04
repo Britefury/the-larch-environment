@@ -41,7 +41,6 @@ public class CanvasTestPage extends SystemPage
 
 	protected CanvasTestPage()
 	{
-		register( "tests.canvas" );
 	}
 	
 	

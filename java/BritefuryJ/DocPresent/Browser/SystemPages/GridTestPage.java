@@ -25,7 +25,6 @@ public class GridTestPage extends SystemPage
 {
 	protected GridTestPage()
 	{
-		register( "tests.grid" );
 	}
 	
 	

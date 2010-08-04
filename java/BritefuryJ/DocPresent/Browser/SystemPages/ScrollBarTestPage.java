@@ -19,7 +19,6 @@ public class ScrollBarTestPage extends SystemPage
 {
 	protected ScrollBarTestPage()
 	{
-		register( "tests.controls.scrollbar" );
 	}
 	
 	

@@ -18,7 +18,6 @@ public class TextTestPage extends SystemPage
 {
 	protected TextTestPage()
 	{
-		register( "tests.text" );
 	}
 	
 	

@@ -8,9 +8,7 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.util.ArrayList;
 
-import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.Page;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.RichText.Head;
@@ -19,22 +17,6 @@ import BritefuryJ.DocPresent.Combinators.RichText.TitleBar;
 
 public abstract class SystemPage extends Page
 {
-	protected String systemLocation;
-	
-	
-	protected void register(String systemLocation) 
-	{
-		this.systemLocation = systemLocation;
-		SystemLocationResolver.getSystemResolver().registerPage( systemLocation, this );
-	}
-	
-	protected Location getLocation()
-	{
-		return new Location( SystemLocationResolver.systemLocationToLocation( systemLocation ) );
-	}
-	
-	
-
 	public DPElement getContentsElement()
 	{
 		Pres linkHeader = SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE | SystemRootPage.LINKHEADER_SYSTEMPAGE );
@@ -55,12 +37,6 @@ public abstract class SystemPage extends Page
 	}
 
 
-	protected Pres createLink()
-	{
-		return new Hyperlink( getTitle(), getLocation() );
-	}
-	
-	
 	protected String getDescription()
 	{
 		return null;

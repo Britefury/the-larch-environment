@@ -20,7 +20,6 @@ public class CheckboxTestPage extends SystemPage
 {
 	protected CheckboxTestPage()
 	{
-		register( "tests.controls.checkbox" );
 	}
 	
 	

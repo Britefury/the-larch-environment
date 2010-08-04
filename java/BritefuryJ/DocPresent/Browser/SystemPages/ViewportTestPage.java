@@ -24,7 +24,6 @@ public class ViewportTestPage extends SystemPage
 {
 	protected ViewportTestPage()
 	{
-		register( "tests.viewport" );
 	}
 	
 	

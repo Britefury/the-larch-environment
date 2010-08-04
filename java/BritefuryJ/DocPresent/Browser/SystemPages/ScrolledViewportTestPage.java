@@ -24,7 +24,6 @@ public class ScrolledViewportTestPage extends SystemPage
 {
 	protected ScrolledViewportTestPage()
 	{
-		register( "tests.controls.scrolledviewport" );
 	}
 	
 	

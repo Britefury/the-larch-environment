@@ -28,7 +28,6 @@ public class FractionTestPage extends SystemPage
 	
 	protected FractionTestPage()
 	{
-		register( "tests.fraction" );
 	}
 	
 	

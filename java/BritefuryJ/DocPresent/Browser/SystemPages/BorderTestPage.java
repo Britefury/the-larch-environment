@@ -21,7 +21,6 @@ public class BorderTestPage extends SystemPage
 {
 	protected BorderTestPage()
 	{
-		register( "tests.border" );
 	}
 	
 	
