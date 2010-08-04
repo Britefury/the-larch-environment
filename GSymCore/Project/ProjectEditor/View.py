@@ -295,12 +295,10 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		
 		def _onRename(menuItem):
 			textEntry = TextEntry( name, _RenameListener(), _nameRegex, 'Please enter a valid identifier' )
+			textEntry.grabCaretOnRealise()
 			nameCell.setLiteralValue( textEntry )
-			# TODO
-			# textEntry.grabCaret()
 			
 		def _addPage(pageUnit):
-			#contents.append( Schema.Page( name='New page', unit=pageUnit ) )
 			p = Schema.Page( name='NewPage', unit=pageUnit )
 			contents.append( p )
 		
@@ -350,9 +348,8 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 		def _onRename(menuItem):
 			textEntry = TextEntry( name, _RenameListener(), _nameRegex, 'Please enter a valid identifier' )
+			textEntry.grabCaretOnRealise()
 			nameCell.setLiteralValue( textEntry )
-			# TODO
-			# textEntry.grabCaret()
 			
 		def _pageContextMenuFactory(element, menu):
 			menu.add( MenuItem.menuItemWithLabel( 'Rename', _onRename ) )

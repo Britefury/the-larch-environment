@@ -132,6 +132,22 @@ public class TextEntry extends ControlPres
 			{
 				return event.getKeyChar() == KeyEvent.VK_ENTER  ||  event.getKeyChar() == KeyEvent.VK_ESCAPE;
 			}
+			
+			
+			public void onRealise(DPElement element)
+			{
+				if ( bGrabCaretOnRealise )
+				{
+					grabCaret();
+					bGrabCaretOnRealise = false;
+				}
+
+				if ( bSelectAllOnRealise )
+				{
+					selectAll();
+					bSelectAllOnRealise = false;
+				}
+			}
 		}
 		
 		
@@ -220,6 +236,7 @@ public class TextEntry extends ControlPres
 		private TextEntryListener listener;
 		private TextEntryValidator validator;
 		private String originalText;
+		private boolean bGrabCaretOnRealise, bSelectAllOnRealise;
 	
 	
 		
@@ -284,10 +301,20 @@ public class TextEntry extends ControlPres
 			}
 		}
 		
+		public void selectAllOnRealise()
+		{
+			bSelectAllOnRealise = true;
+		}
+		
 		
 		public void grabCaret()
 		{
 			textElement.grabCaret();
+		}
+		
+		public void grabCaretOnRealise()
+		{
+			bGrabCaretOnRealise = true;
 		}
 		
 		public void ungrabCaret()
@@ -330,6 +357,7 @@ public class TextEntry extends ControlPres
 	private String initialText;
 	private TextEntryListener listener;
 	private TextEntry.TextEntryValidator validator;
+	private boolean bGrabCaretOnRealise, bSelectAllOnRealise;
 	
 	
 	public TextEntry(String initialText, TextEntryListener listener)
@@ -351,6 +379,17 @@ public class TextEntry extends ControlPres
 	
 	
 	
+	public void selectAllOnRealise()
+	{
+		bSelectAllOnRealise = true;
+	}
+	
+	public void grabCaretOnRealise()
+	{
+		bGrabCaretOnRealise = true;
+	}
+
+	
 	@Override
 	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
@@ -364,6 +403,15 @@ public class TextEntry extends ControlPres
 		Pres outer = new Border( regionElement );
 		DPBorder outerElement = (DPBorder)outer.present( ctx, style );
 		
-		return new TextEntryControl( ctx, style, outerElement, regionElement, textElement, listener, validator, validBorder, invalidBorder );
+		TextEntryControl control = new TextEntryControl( ctx, style, outerElement, regionElement, textElement, listener, validator, validBorder, invalidBorder );
+		if ( bSelectAllOnRealise )
+		{
+			control.selectAllOnRealise();
+		}
+		if ( bGrabCaretOnRealise )
+		{
+			control.grabCaretOnRealise();
+		}
+		return control;
 	}
 }

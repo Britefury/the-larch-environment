@@ -85,6 +85,15 @@ public abstract class ElementInteractor
 	{
 		return false;
 	}
+	
+	
+	public void onRealise(DPElement element)
+	{
+	}
+
+	public void onUnrealise(DPElement element)
+	{
+	}
 
 	
 	public void drawBackground(DPElement element, Graphics2D graphics)

@@ -1637,6 +1637,16 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	{
 		setFlagRealised();
 		onRealise();
+		
+		List<ElementInteractor> interactors = getInteractors();
+		if ( interactors != null )
+		{
+			for (ElementInteractor interactor: interactors)
+			{
+				interactor.onRealise( this );
+			}
+		}
+		
 		if ( testFlag( FLAG_ENSURE_VISIBLE_QUEUED ) )
 		{
 			clearFlag( FLAG_ENSURE_VISIBLE_QUEUED );
@@ -1659,6 +1669,16 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		{
 			rootElement.elementUnrealised( this );
 		}
+		
+		List<ElementInteractor> interactors = getInteractors();
+		if ( interactors != null )
+		{
+			for (ElementInteractor interactor: interactors)
+			{
+				interactor.onUnrealise( this );
+			}
+		}
+		
 		onUnrealise( unrealiseRoot );
 		clearFlagRealised();
 	}
