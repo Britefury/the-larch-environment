@@ -100,11 +100,8 @@ _consoleStyle = StyleSheet.instance.withAttr( Primitive.vboxSpacing, 8.0 )
 def _dropPrompt(varNameTextEntryListener):
 	textEntry = TextEntry( 'var', varNameTextEntryListener )
 	prompt = StaticText( 'Place node into a variable named: ' )
-	def _grab(textEntryControl, ctx, style):
-		textEntryControl.grabCaret()
-		# TODO - control must be realised before this can be done
-		# textEntryControl.selectAll()
-	textEntry = textEntry.withCustomControlAction( _grab )
+	textEntry.grabCaretOnRealise()
+	textEntry.selectAllOnRealise()
 	return _dropPromptStyle.applyTo( Border( Paragraph( [ prompt.alignVCentre(), textEntry.alignVCentre() ] ) ) )
 	
 

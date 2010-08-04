@@ -76,11 +76,11 @@ public class MenuItem extends ControlPres
 			{
 				if ( element.isRealised() )
 				{
-					listener.onMenuItemClicked( MenuItemControl.this );
 					if ( bClosePopupOnActivate )
 					{
 						element.closeContainingPopupChain();
 					}
+					listener.onMenuItemClicked( MenuItemControl.this );
 					return true;
 				}
 				
