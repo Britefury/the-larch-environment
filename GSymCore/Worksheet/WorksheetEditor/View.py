@@ -29,7 +29,7 @@ from Britefury.Util.InstanceCache import instanceCache
 
 from BritefuryJ.AttributeTable import *
 
-from BritefuryJ.GSym import GSymPerspective, GSymSubject, GSymRelativeLocationResolver
+from BritefuryJ.GSym import GSymPerspective, GSymSubject
 from BritefuryJ.GSym.PresCom import InnerFragment, PerspectiveInnerFragment
 
 
@@ -233,16 +233,6 @@ class WorksheetEditor (GSymViewObjectDispatch):
 
 
 
-class WorksheetEditorRelativeLocationResolver (GSymRelativeLocationResolver):
-	def resolveRelativeLocation(self, enclosingSubject, locationIterator):
-		if locationIterator.getSuffix() == '':
-			view = ViewSchema.WorksheetView( None, enclosingSubject.getFocus() )
-			return enclosingSubject.withTitle( 'WS: ' + enclosingSubject.getTitle() ).withFocus( view )
-		else:
-			return None
-	
-
-	
 perspective = GSymPerspective( WorksheetEditor(), StyleSheet.instance, SimpleAttributeTable.instance, WorksheetEditHandler() )
 
 

@@ -44,7 +44,7 @@ from BritefuryJ.DocPresent.Combinators.Primitive import *
 from BritefuryJ.DocPresent.Combinators.RichText import *
 from BritefuryJ.GSym.PresCom import *
 
-from BritefuryJ.GSym import GSymPerspective, GSymSubject, GSymRelativeLocationResolver
+from BritefuryJ.GSym import GSymPerspective, GSymSubject
 
 
 from GSymCore.GSymApp import DocumentManagement
@@ -371,54 +371,6 @@ class ProjectView (GSymViewObjectNodeDispatch):
 	
 
 
-_nameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*', 0 )
-
-	
-class ProjectEditorRelativeLocationResolver (GSymRelativeLocationResolver):
-	def resolveRelativeLocation(self, enclosingSubject, locationIterator):
-		if locationIterator.getSuffix() == '':
-			return enclosingSubject
-		else:
-			# Attempt to enter the root package
-			docRootNode = enclosingSubject.getFocus()
-			package = docRootNode['rootPackage']
-			iterAfterRoot = locationIterator.consumeLiteral( '.' + package['name'] )
-			if iterAfterRoot is None:
-				return None
-			else:
-				locationIterator = iterAfterRoot
-			
-			while locationIterator.getSuffix() != '':
-				iterAfterDot = locationIterator.consumeLiteral( '.' )
-				name = None
-				if iterAfterDot is not None:
-					iterAfterName = iterAfterDot.consumeRegex( _nameRegex )
-					if iterAfterName is not None:
-						name = iterAfterName.lastToken()
-						locationIterator = iterAfterName
-
-				node = None
-				if name is not None:
-					for n in package['contents']:
-						if n['name'] == name:
-							node = n
-							break
-				if node is None:
-					return None
-				elif isinstance( node, DMObjectInterface ):
-					if node.isInstanceOf( Schema.Package ):
-						package = node
-					elif node.isInstanceOf( Schema.Page ):
-						subject = enclosingSubject.withFocus( node ).withTitle( enclosingSubject.getTitle() + ' ' + name )
-						subject = subject.withSubjectContext( enclosingSubject.getSubjectContext().withAttrs( location=locationIterator.getPrefix() ) )
-						document = enclosingSubject.getSubjectContext()['document']
-						return document.resolveUnitRelativeLocation( node['unit'], subject, locationIterator )
-					else:
-						return None
-				else:
-					return None
-			return None
-	
 	
 	
 

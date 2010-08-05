@@ -37,7 +37,7 @@ from BritefuryJ.Controls import *
 from BritefuryJ.DocPresent.Combinators.Primitive import *
 from BritefuryJ.DocPresent.Combinators.RichText import *
 
-from BritefuryJ.GSym import GSymPerspective, GSymRelativeLocationResolver, GSymSubject
+from BritefuryJ.GSym import GSymPerspective, GSymSubject
 from BritefuryJ.GSym.PresCom import *
 
 from GSymCore.GSymApp import Application

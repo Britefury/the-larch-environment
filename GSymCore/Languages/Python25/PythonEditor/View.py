@@ -43,7 +43,7 @@ from BritefuryJ.DocPresent import ElementInteractor
 from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder
 from BritefuryJ.GSym.PresCom import InnerFragment
 
-from BritefuryJ.GSym import GSymPerspective, GSymSubject, GSymRelativeLocationResolver
+from BritefuryJ.GSym import GSymPerspective, GSymSubject
 
 
 
@@ -1271,14 +1271,6 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 
 
-
-class Python25EditorRelativeLocationResolver (GSymRelativeLocationResolver):
-	def resolveRelativeLocation(self, enclosingSubject, locationIterator):
-		if locationIterator.getSuffix() == '':
-			return enclosingSubject.withTitle( 'Py2.5: ' + enclosingSubject.getTitle() )
-		else:
-			return None
-	
 
 	
 _parser = Python25Grammar()

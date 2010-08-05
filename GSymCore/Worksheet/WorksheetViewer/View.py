@@ -40,7 +40,7 @@ from BritefuryJ.DocPresent.Combinators.Primitive import *
 from BritefuryJ.DocPresent.Combinators.RichText import *
 from BritefuryJ.DocPresent.Combinators.ContextMenu import *
 
-from BritefuryJ.GSym import GSymPerspective, GSymSubject, GSymRelativeLocationResolver
+from BritefuryJ.GSym import GSymPerspective, GSymSubject
 from BritefuryJ.GSym.PresCom import InnerFragment, PerspectiveInnerFragment
 
 
@@ -161,22 +161,6 @@ class WorksheetViewer (GSymViewObjectDispatch):
 
 
 
-class WorksheetViewerRelativeLocationResolver (GSymRelativeLocationResolver):
-	def resolveRelativeLocation(self, enclosingSubject, locationIterator):
-		editIterator = locationIterator.consumeLiteral( ':edit' )
-		if editIterator is None  and  locationIterator.getSuffix() == '':
-			view = ViewSchema.WorksheetView( None, enclosingSubject.getFocus() )
-			subjectContext = enclosingSubject.getSubjectContext()
-			editLocation = Location( locationIterator.getLocation().getLocationString() + ':edit' )
-			return enclosingSubject.withTitle( 'WS: ' + enclosingSubject.getTitle() ).withFocus( view ).withSubjectContext( subjectContext.withAttrs( editLocation=editLocation ) )
-		elif editIterator is not None:
-			subjectContext = enclosingSubject.getSubjectContext()
-			viewLocation = Location( locationIterator.getPrefix() )
-			subject = enclosingSubject.withPerspective( editorPerspective ).withSubjectContext( subjectContext.withAttrs( viewLocation=viewLocation ) )
-			return editorPerspective.resolveRelativeLocation( subject, editIterator )
-	
-
-	
 perspective = GSymPerspective( WorksheetViewer(), StyleSheet.instance, SimpleAttributeTable.instance, None )
 
 
