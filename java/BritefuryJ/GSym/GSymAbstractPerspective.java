@@ -7,7 +7,6 @@
 package BritefuryJ.GSym;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
@@ -49,8 +48,6 @@ public abstract class GSymAbstractPerspective
 	public abstract SimpleAttributeTable getInitialInheritedState();
 	public abstract EditHandler getEditHandler();
 
-	public abstract GSymSubject resolveRelativeLocation(GSymSubject enclosingSubject, Location.TokenIterator locationIterator);
-	
 	
 	public Presentable project(Object x)
 	{

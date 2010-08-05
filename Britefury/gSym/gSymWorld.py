@@ -59,8 +59,7 @@ class GSymWorld (object):
 		self.newPageFactories = []
 		self.newUnitFactories = []
 		self.pageImporters = []
-		self._appState = None
-		self._appStatePerspective = None
+		self._appStateSubject = None
 		
 		
 		for plugin in self._plugins:
@@ -82,17 +81,13 @@ class GSymWorld (object):
 	def registerPageImporter(self, plugin, pageImporter):
 		self.pageImporters.append( pageImporter )
 		
-	def registerAppStateAndPerspective(self, plugin, appState, appStatePerspective):
-		assert self._appState is None
-		self._appState = appState
-		self._appStatePerspective = appStatePerspective
+	def registerAppStateSubject(self, plugin, appStateSubject):
+		assert self._appStateSubject is None
+		self._appStateSubject = appStateSubject
 		
 		
-	def getAppState(self):
-		return self._appState
-	
-	def getAppStatePerspective(self):
-		return self._appStatePerspective
+	def getAppStateSubject(self):
+		return self._appStateSubject
 		
 		
 	def addNewDocument(self, document):
@@ -108,15 +103,11 @@ class GSymWorld (object):
 	
 
 		
-	def resolveRelativeLocation(self, enclosingSubject, relativeLocation):
-		return self.resolveUnitRelativeLocation( self._unit, enclosingSubject, relativeLocation )
-	
-	
 	def getDocument(self, location):
 		try:
 			return self._locationToDocument[location]
 		except KeyError:
-			return None
+			raise KeyError, "no document named '%s'"  %  ( location, )
 		
 		
 		

@@ -16,45 +16,38 @@ from Britefury.MainApp.AppWindow import AppWindow
 
 		
 
-class _AppLocationResolver (GSymLocationResolver):
-	def __init__(self, app):
-		self._app = app
-		
-	
-	def resolveLocationAsSubject(self, location):
-		appState = self._app._appState
-		if appState is not None:
-			world = self._app._world
-			iterator = location.iterator()
-			iterAfterModel = iterator.consumeLiteral( 'model:' )
-			perspective = world.getAppStatePerspective()
-			if iterAfterModel is not None:
-				enclosingSubject = GSymSubject( appState, perspective, '[model]', SimpleAttributeTable.instance.withAttrs( world=world, document=None, location=Location( 'model:' ) ), None )
-				iterator = iterAfterModel
-			else:
-				enclosingSubject = GSymSubject( appState, perspective, '', SimpleAttributeTable.instance.withAttrs( world=world, document=None, location=Location( '' ) ), None )
-			subject = perspective.resolveRelativeLocation( enclosingSubject, iterator )
-			if subject is None:
-				return None
-			if iterAfterModel:
-				subject = subject.withPerspective( self._app._browserContext.getGenericPerspective() )
-			return subject
-		else:
-			return None
-		
-
-		
-
-
-
 class MainApp (object):
 	def __init__(self, world, location=Location( '' )):
+		class _ModelSubject (GSymSubject):
+			def __init__(self, innerSubject):
+				self._ctx = ctx
+				self._innerSubject = innerSubject
+		
+				
+			def getFocus(self):
+				return self._innerSubject.getFocus()
+			
+			def getPerspective(self):
+				return None
+			
+			def getTitle(self):
+				return '[model]'
+			
+			def getSubjectContext(self):
+				return self._innerSubject.getSubjectContext()
+			
+			def getCommandHistory(self):
+				return self._innerSubject.getCommandHistory()
+		
+		
+
 		self._world = world
 
-		self._resolver = _AppLocationResolver( self )
-		self._browserContext = GSymBrowserContext( genericPresenterRegistry, True, [ self._resolver ] )
+		self._browserContext = GSymBrowserContext( genericPresenterRegistry, True )
 		
-		self._appState = world.getAppState()
+		self._appState = world.getAppStateSubject().getFocus()
+		self._browserContext.registerMainSubject( world.getAppStateSubject() )
+		self._browserContext.registerNamedSubject( 'model', _ModelSubject )
 		
 		self._rootWindow = AppWindow( self, location )
 		

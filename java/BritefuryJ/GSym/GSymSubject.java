@@ -9,81 +9,25 @@ package BritefuryJ.GSym;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.CommandHistory.CommandHistory;
 
-public class GSymSubject
+public abstract class GSymSubject
 {
-	private Object focus;
-	private GSymAbstractPerspective perspective;
-	private String title;
-	private SimpleAttributeTable subjectContext;
-	private CommandHistory commandHistory;
-
+	public abstract Object getFocus();
 	
-	
-	public GSymSubject(Object focus, GSymAbstractPerspective perspective, String title, SimpleAttributeTable subjectContext, CommandHistory commandHistory)
-	{
-		this.focus = focus;
-		this.perspective = perspective;
-		this.title = title;
-		this.subjectContext = subjectContext;
-		this.commandHistory = commandHistory;
-	}
-	
-	
-	public Object getFocus()
-	{
-		return focus;
-	}
 	
 	public GSymAbstractPerspective getPerspective()
 	{
-		return perspective;
+		return null;
 	}
 	
-	public String getTitle()
-	{
-		return title;
-	}
-	
+	public abstract String getTitle();
+
 	public SimpleAttributeTable getSubjectContext()
 	{
-		return subjectContext;
+		return SimpleAttributeTable.instance;
 	}
 	
 	public CommandHistory getCommandHistory()
 	{
-		return commandHistory;
-	}
-	
-	
-	
-	public GSymSubject withFocus(Object focus)
-	{
-		return new GSymSubject( focus, perspective, title, subjectContext, commandHistory );
-	}
-	
-	public GSymSubject withPerspective(GSymAbstractPerspective perspective)
-	{
-		return new GSymSubject( focus, perspective, title, subjectContext, commandHistory );
-	}
-	
-	public GSymSubject withTitle(String title)
-	{
-		return new GSymSubject( focus, perspective, title, subjectContext, commandHistory );
-	}
-	
-	public GSymSubject withSubjectContext(SimpleAttributeTable subjectContext)
-	{
-		return new GSymSubject( focus, perspective, title, subjectContext, commandHistory );
-	}
-	
-	public GSymSubject withCommandHistory(CommandHistory commandHistory)
-	{
-		return new GSymSubject( focus, perspective, title, subjectContext, commandHistory );
-	}
-	
-	
-	public String toString()
-	{
-		return "GSymSubject( focus=" + focus + ", perspective=" + perspective + ", title=" + title + ", subjectContext=" + subjectContext + ", commandHistory=" + commandHistory + " )";
+		return null;
 	}
 }

@@ -66,58 +66,29 @@ def _joinLocation(x, y):
 
 	
 
-def _hasDocForName(docs, name):
-	for d in docs:
-		if name == d.getName():
-			return True
-	return False
-
 def _newDocumentName(docs):
+	usedNames = set( [ doc.getName()   for doc in docs ] )
+
 	name = 'Untitled'
-	if not _hasDocForName( docs, name ):
+	if name not in usedNames:
 		return name
 	
 	index = 2
 	name = 'Untitled' + str(index)
-	while _hasDocForName( docs, name ):
+	while name in usedNames:
 		index += 1
 		name = 'Untitled' + str(index)
 
 	return name
 
 
-def _newConsoleName(docs):
-	name = 'Console'
-	if not _hasDocForName( docs, name ):
-		return name
-	
-	index = 2
-	name = 'Console' + str(index)
-	while _hasDocForName( docs, name ):
+def _newConsoleIndex(consoles):
+	index = 1
+	usedIndices = set( [ con.getIndex()   for con in consoles ] )
+	while index in usedIndices:
 		index += 1
-		name = 'Console' + str(index)
+	return index
 
-	return name
-
-
-
-def _hasDocForLocation(docs, location):
-	for d in docs:
-		if location == d['location']:
-			return True
-	return False
-
-def _uniqueDocumentLocation(docs, location):
-	if not _hasDocForLocation( docs, location ):
-		return location
-	
-	index = 2
-	loc = 'Untitled_' + str(index)
-	while _hasDocForLocation( docs, loc ):
-		index += 1
-		loc = 'Untitled_' + str(index)
-
-	return loc
 
 
 						
@@ -181,8 +152,8 @@ class AppView (GSymViewObjectDispatch):
 		
 		def _onNewConsole(link, event):
 			consoles = node.getConsoles()
-			name = _newConsoleName( consoles )
-			appConsole = Application.AppConsole( name )
+			index = _newConsoleIndex( consoles )
+			appConsole = Application.AppConsole( index )
 			node.addConsole( appConsole )
 			
 			return True
@@ -243,7 +214,7 @@ class AppView (GSymViewObjectDispatch):
 		location = node.getLocation()
 			
 		
-		docLink = Hyperlink( name, Location( location ) ).padX( 0.0, _appDocRightPadding )
+		docLink = Hyperlink( name, Location( 'main.documents.' + location ) ).padX( 0.0, _appDocRightPadding )
 		saveLink = Hyperlink( 'SAVE', _onSave )
 		saveAsLink = Hyperlink( 'SAVE AS', _onSaveAs )
 	
@@ -253,8 +224,9 @@ class AppView (GSymViewObjectDispatch):
 
 	@ObjectDispatchMethod( Application.AppConsole )
 	def AppConsole(self, ctx, state, node):
-		name = node.getName()
-		location = Location( '$consoles/' + name )
+		index = node.getIndex()
+		name = 'Console %d'  %  ( index, )
+		location = Location( 'main.consoles[%d]'  %  ( index, ) )
 		consoleLink = Hyperlink( name, location ).padX( 0.0, _appDocRightPadding )
 	
 		return GridRow( [ consoleLink ] )
@@ -267,38 +239,64 @@ _docNameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*', 0 )
 
 
 
-class GSymAppRelativeLocationResolver (GSymRelativeLocationResolver):
-	def resolveRelativeLocation(self, enclosingSubject, locationIterator):
-		if locationIterator.getSuffix() == '':
-			return enclosingSubject.withTitle( 'gSym' )
+
+perspective = GSymPerspective( AppView(), StyleSheet.instance, SimpleAttributeTable.instance, None )
+
+
+
+class _ConsoleListSubject (object):
+	def __init__(self, appState, enclosingSubject):
+		self._appState = appState
+		self._enclosingSubject = enclosingSubject
 		
-		consolesIterator = locationIterator.consumeLiteral( '$consoles/' )
-		if consolesIterator is not None:
-			consoleName = consolesIterator.getSuffix()
-			for console in enclosingSubject.getFocus().getConsoles():
-				if consoleName == console.getName():
-					return enclosingSubject.withFocus( console.getConsole() ).withPerspective( Console.consoleViewerPerspective ).withTitle( consoleName ).withSubjectContext( 
-					        enclosingSubject.getSubjectContext().withAttrs( location=locationIterator.getLocation().getLocationString() ) )
-			
-			return None
-		else:
-			iterAfterDocName = locationIterator.consumeRegex( _docNameRegex )
-			if iterAfterDocName is not None:
-				documentName = iterAfterDocName.lastToken()
-					
-				world = enclosingSubject.getSubjectContext()['world']
-				doc = world.getDocument( documentName )
-				
-				if doc is not None:
-					subject = enclosingSubject.withFocus( doc ).withTitle( enclosingSubject.getTitle() + ' [' + documentName + ']' )
-					subject = subject.withSubjectContext( enclosingSubject.getSubjectContext().withAttrs( document=doc, location=iterAfterDocName.getPrefix() ) )
-					subject = subject.withCommandHistory( doc.getCommandHistory() )
-					return doc.resolveRelativeLocation( subject, iterAfterDocName )
+		
+	def __getitem__(self, key):
+		for console in self._appState.getConsoles():
+			if console.getIndex() == key:
+				return Console.newConsoleSubject( console.getConsole(), self._enclosingSubject )
+		raise KeyError, 'No console at index %s'  %  ( key, )
+		
 
-			return None
+class _DocumentListSubject (object):
+	def __init__(self, world, enclosingSubject):
+		self._world = world
+		self._enclosingSubject = enclosingSubject
+		
+		
+	def __getattr__(self, location):
+		try:
+			doc = self._world.getDocument( location )
+		except KeyError:
+			raise AttributeError, 'no document at %s'  %  ( location, )
+		
+		return doc.newSubject( self._enclosingSubject, 'main.documents.' + location )
+		
+
+class GSymAppSubject (GSymSubject):
+	def __init__(self, appState, world):
+		self._appState = appState
+		self._world = world
+		self.consoles = _ConsoleListSubject( self._appState, self )
+		self.documents = _DocumentListSubject( self._world, self )
+
+		
+	def getFocus(self):
+		return self._appState
+	
+	def getPerspective(self):
+		return perspective
+	
+	def getTitle(self):
+		return 'gSym'
+	
+	def getSubjectContext(self):
+		return SimpleAttributeTable.instance.withAttrs( world=self._world, document=None, location=Location( 'main' ) )
+	
+	def getCommandHistory(self):
+		return None
+	
 
 
-perspective = GSymPerspective( AppView(), StyleSheet.instance, SimpleAttributeTable.instance, None, GSymAppRelativeLocationResolver() )
 
 	
 	

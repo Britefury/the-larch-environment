@@ -25,7 +25,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 
 import BritefuryJ.DocPresent.Browser.Location;
-import BritefuryJ.DocPresent.Browser.PythonEvalLocationResolver;
+import BritefuryJ.DocPresent.Browser.PythonEvalPageLocationResolver;
 import BritefuryJ.DocPresent.Browser.TabbedBrowser;
 
 public class BrowserTest implements TabbedBrowser.TabbedBrowserListener
@@ -96,7 +96,7 @@ public class BrowserTest implements TabbedBrowser.TabbedBrowserListener
 		JFrame frame = new JFrame( "Browser test" );
 		frame.setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
 		
-		TabbedBrowser browser = new TabbedBrowser( new PythonEvalLocationResolver(), this, location );
+		TabbedBrowser browser = new TabbedBrowser( new PythonEvalPageLocationResolver(), this, location );
 		browser.getComponent().setPreferredSize( new Dimension( 800, 600 ) );
 		frame.setJMenuBar( menuBar );
 		frame.add( browser.getComponent() );

@@ -201,7 +201,7 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	
 	private JTabbedPane tabs;
 	
-	private LocationResolver resolver;
+	private PageLocationResolver resolver;
 	
 	TabbedBrowserListener listener;
 	
@@ -211,7 +211,7 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	
 	
 	
-	public TabbedBrowser(LocationResolver resolver, TabbedBrowserListener listener, Location location)
+	public TabbedBrowser(PageLocationResolver resolver, TabbedBrowserListener listener, Location location)
 	{
 		this.resolver = resolver;
 		this.listener = listener;

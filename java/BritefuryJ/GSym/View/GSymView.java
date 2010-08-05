@@ -247,8 +247,13 @@ public class GSymView extends IncrementalTree
 	public GSymView(GSymSubject subject, GSymBrowserContext browserContext, PersistentStateStore persistentState)
 	{
 		super( subject.getFocus(), DuplicatePolicy.ALLOW_DUPLICATES );
-		rootNodeResultFactory = makeNodeResultFactory( subject.getPerspective(), subject.getSubjectContext(),
-				StyleValues.instance.withAttrs( subject.getPerspective().getStyleSheet() ), subject.getPerspective().getInitialInheritedState() );
+		GSymAbstractPerspective perspective = subject.getPerspective();
+		if ( perspective == null )
+		{
+			perspective = browserContext.getGenericPerspective();
+		}
+		rootNodeResultFactory = makeNodeResultFactory( perspective, subject.getSubjectContext(),
+				StyleValues.instance.withAttrs( perspective.getStyleSheet() ), perspective.getInitialInheritedState() );
 		
 		rootBox = null;
 		
@@ -271,7 +276,7 @@ public class GSymView extends IncrementalTree
 		
 		// We need to do this last
 		region.setChild( getRootViewElement().alignHExpand().alignVExpand() );
-		region.setEditHandler( subject.getPerspective().getEditHandler() );
+		region.setEditHandler( perspective.getEditHandler() );
 	}
 	
 	

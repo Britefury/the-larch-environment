@@ -10,12 +10,12 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.WeakHashMap;
 
-import BritefuryJ.DocPresent.Browser.Location;
+import org.python.core.Py;
 
 public class GSymObjectViewLocationTable
 {
-	private WeakHashMap<Object, String> objectToLocation = new WeakHashMap<Object, String>();
-	private HashMap<String, WeakReference<Object>> locationToObject = new HashMap<String, WeakReference<Object>>();
+	private WeakHashMap<Object, Integer> objectToLocation = new WeakHashMap<Object, Integer>();
+	private HashMap<Integer, WeakReference<Object>> locationToObject = new HashMap<Integer, WeakReference<Object>>();
 	private int objectCount = 1;
 	
 	
@@ -25,34 +25,34 @@ public class GSymObjectViewLocationTable
 	}
 	
 	
-	public String getLocationForObject(Object x)
+	public String getRelativeLocationForObject(Object x)
 	{
-		String location = objectToLocation.get( x );
-		if ( location == null )
+		Integer key = objectToLocation.get( x );
+		if ( key == null )
 		{
-			location = x.getClass().getName() + objectCount++;
-			objectToLocation.put( x, location );
-			locationToObject.put( location, new WeakReference<Object>( x ) );
+			key = objectCount++;
+			objectToLocation.put( x, key );
+			locationToObject.put( key, new WeakReference<Object>( x ) );
 		}
+		String location = "[" + key + "]";
 		return location;
 	}
 	
-	public Object getObjectAtLocation(Location.TokenIterator location)
+	public Object __getitem__(int key)
 	{
-		String loc = location.getSuffix();
-		WeakReference<Object> ref = locationToObject.get( loc );
+		WeakReference<Object> ref = locationToObject.get( key );
 		if ( ref != null )
 		{
 			Object x = ref.get();
 			
 			if ( x == null )
 			{
-				locationToObject.remove( location );
+				locationToObject.remove( key );
 			}
 			
 			return x;
 		}
 		
-		return null;
+		throw Py.KeyError( "Object at " + key + " does not exist" );
 	}
 }

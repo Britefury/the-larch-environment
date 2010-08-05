@@ -8,12 +8,12 @@
 
 
 class GSymUnitClass (object):
-	def __init__(self, schema, unitPerspective, importHook=None):
+	def __init__(self, schema, unitPerspective, unitSubjectFactory):
 		super( GSymUnitClass, self ).__init__()
 		self._schema = schema
 		self.name = schema.getName()
 		self._unitPerspective = unitPerspective
-		self._importHook = importHook
+		self._unitSubjectFactory = unitSubjectFactory
 
 
 	def getSchema(self):
@@ -22,8 +22,8 @@ class GSymUnitClass (object):
 	def getUnitPerspective(self):
 		return self._unitPerspective
 
-	def getImportHook(self):
-		return self._importHook
+	def getUnitSubjectFactory(self):
+		return self._unitSubjectFactory
 
 
 

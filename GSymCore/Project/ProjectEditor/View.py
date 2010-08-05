@@ -422,5 +422,58 @@ class ProjectEditorRelativeLocationResolver (GSymRelativeLocationResolver):
 	
 	
 
-perspective = GSymPerspective( ProjectView(), StyleSheet.instance, SimpleAttributeTable.instance, None, ProjectEditorRelativeLocationResolver() )
+perspective = GSymPerspective( ProjectView(), StyleSheet.instance, SimpleAttributeTable.instance, None )
+
+
+class PackageSubject (object):
+	def __init__(self, projectSubject, model, location):
+		self._projectSubject = projectSubject
+		self._model = model
+		self._location = location
+		
+		
+	def __getattr__(self, name):
+		for item in self._model['contents']:
+			if name == item['name']:
+				itemLocation = self._location + '.' + name
+				if item.isInstanceOf( Schema.Package ):
+					return PackageSubject( self._projectSubject, item, itemLocation )
+				elif item.isInstanceOf( Schema.Page ):
+					return self._projectSubject._document.newUnitSubject( item['unit'], self._projectSubject, itemLocation )
+		raise AttributeError, "Did not find item for '%s'"  %  ( name, )
+			
+	                            
+
+
+class ProjectSubject (GSymSubject):
+	def __init__(self, document, model, enclosingSubject, location):
+		self._document = document
+		self._model = model
+		self._enclosingSubject = enclosingSubject
+		self._location = location
+
+
+	def getFocus(self):
+		return self._model
+	
+	def getPerspective(self):
+		return perspective
+	
+	def getTitle(self):
+		return 'Project'
+	
+	def getSubjectContext(self):
+		return self._enclosingSubject.getSubjectContext().withAttrs( document=self._document, location=self._location )
+	
+	def getCommandHistory(self):
+		return self._document.getCommandHistory()
+	
+	
+	
+	def __getattr__(self, name):
+		if name == self._model['rootPackage']['name']:
+			return PackageSubject( self, self._model['rootPackage'], self._location + '.' + name )
+		else:
+			raise AttributeError
+
 	

@@ -5,12 +5,17 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from GSymCore.PythonConsole.ConsoleViewer.View import perspective
+from GSymCore.PythonConsole.ConsoleViewer.View import perspective, ConsoleSubject
 from GSymCore.PythonConsole import ConsoleSchema
 
 
-def newAppState():
+def newConsole():
 	return ConsoleSchema.Console()
+
+
+def newConsoleSubject(console, enclosingSubject):
+	return ConsoleSubject( console, enclosingSubject )
+	
 
 
 consoleViewerPerspective = perspective

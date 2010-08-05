@@ -12,10 +12,8 @@ import org.python.core.PyObject;
 import org.python.core.PyType;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.GSym.GSymAbstractPerspective;
-import BritefuryJ.GSym.GSymSubject;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Utils.PolymorphicMap;
 
@@ -123,30 +121,10 @@ public abstract class GSymObjectPresentationPerspective extends GSymAbstractPers
 
 	
 	
-	public GSymSubject resolveRelativeLocation(GSymSubject enclosingSubject, Location.TokenIterator relativeLocation)
-	{
-		Object x = locationTable.getObjectAtLocation( relativeLocation );
-		if ( x != null )
-		{
-			String title = x != null  ?  x.getClass().getName()  :  "<null>";
-			return new GSymSubject( x, this, title, SimpleAttributeTable.instance, null );
-		}
-		else
-		{
-			return null;
-		}
-	}
 
-
-
-	protected String getRelativeLocationForObject(Object x)
+	protected GSymObjectViewLocationTable getObjectViewLocationTable()
 	{
-		return locationTable.getLocationForObject( x );
-	}
-	
-	protected Object getObjectAtRelativeLocation(Location.TokenIterator relativeLocation)
-	{
-		return locationTable.getObjectAtLocation( relativeLocation );
+		return locationTable;
 	}
 	
 	
