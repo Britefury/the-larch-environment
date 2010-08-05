@@ -9,7 +9,7 @@ from BritefuryJ.AttributeTable import SimpleAttributeTable
 
 from BritefuryJ.DocPresent.Browser import Location
 
-from BritefuryJ.GSym import GSymBrowserContext, GSymLocationResolver, GSymSubject
+from BritefuryJ.GSym import GSymBrowserContext, GSymSubject
 
 from Britefury.gSym.Presentation.GenericPresenterRegistry import genericPresenterRegistry
 from Britefury.MainApp.AppWindow import AppWindow
