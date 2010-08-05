@@ -119,7 +119,7 @@ public class GSymBrowserContext
 	}
 	
 	
-	private BrowserContext browserContext = new BrowserContext( Arrays.asList( new LocationResolver[] { new GSymBrowserContextLocationResolver() } ) );
+	private GSymBrowserContextLocationResolver pageLocationResolver = new GSymBrowserContextLocationResolver();
 	private ObjectPresentationLocationResolver objPresLocationResolver = new ObjectPresentationLocationResolver();
 	private GSymGenericPerspective genericPerspective;
 	private List<GSymLocationResolver> resolvers = new ArrayList<GSymLocationResolver>();
