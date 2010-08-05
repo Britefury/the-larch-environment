@@ -6,20 +6,17 @@
 //##************************
 package BritefuryJ.GSym;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import org.python.core.Py;
+import org.python.core.PyStringMap;
+import org.python.core.__builtin__;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Browser.BrowserContext;
 import BritefuryJ.DocPresent.Browser.Location;
-import BritefuryJ.DocPresent.Browser.Location.TokenIterator;
-import BritefuryJ.DocPresent.Browser.LocationResolver;
 import BritefuryJ.DocPresent.Browser.Page;
-import BritefuryJ.DocPresent.Browser.SystemPages.SystemLocationResolver;
+import BritefuryJ.DocPresent.Browser.PageLocationResolver;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
+import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
@@ -30,87 +27,72 @@ import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.GSymGenericObjectPresenterRegistry;
 import BritefuryJ.GSym.GenericPerspective.GSymGenericPerspective;
+import BritefuryJ.GSym.GenericPerspective.GenericSubject;
+import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.ObjectPresentation.GSymObjectPresentationPerspective;
 import BritefuryJ.GSym.ObjectPresentation.ObjectPresentationLocationResolver;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.GSym.View.GSymView;
-import BritefuryJ.GSym.View.GSymViewFragmentFunction;
 
 public class GSymBrowserContext
 {
-	private static class RootLocationFragmentViewFn implements GSymViewFragmentFunction
+	private static class PageSubject extends GSymSubject
 	{
-		public Pres createViewFragment(Object x, GSymFragmentView ctx, SimpleAttributeTable state)
+		private class PagePerspective extends GSymAbstractPerspective
 		{
-			return rootLocationStyle.applyTo( new StaticText( "<<Root location>>" ) );
-		}
-	}
-	
-	private static class ResolveErrorFragmentViewFn implements GSymViewFragmentFunction
-	{
-		public Pres createViewFragment(Object x, GSymFragmentView ctx, SimpleAttributeTable state)
-		{
-			Location location = (Location)x;
-			return resolveErrorStyleSheet.applyTo( new StaticText( "<<Could not resolve " + location.getLocationString() + ">>" ) );
-		}
-	}
-	
-	private static class SystemPageFragmentViewFn implements GSymViewFragmentFunction
-	{
-		public Pres createViewFragment(Object x, GSymFragmentView ctx, SimpleAttributeTable state)
-		{
-			Page p = (Page)x;
-			return Pres.coerce( p.getContentsElement() );
-		}
-	}
-	
-	private static class SystemPageRelativeLocationResolver implements GSymRelativeLocationResolver
-	{
-		private LocationResolver systemLocationResolver;
-		
-		public SystemPageRelativeLocationResolver(LocationResolver systemLocationResolver)
-		{
-			this.systemLocationResolver = systemLocationResolver;
-		}
-
-		
-		@Override
-		public GSymSubject resolveRelativeLocation(GSymSubject enclosingSubject, TokenIterator locationIterator)
-		{
-			Location location = new Location( locationIterator.getSuffix() );
-			Page p = systemLocationResolver.resolveLocationAsPage( location, null );
-			if ( p != null )
+			@Override
+			public Pres present(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 			{
-				return enclosingSubject.withFocus( p ).withTitle( p.getTitle() );
+				return Pres.coerce( page.getContentsElement() );
 			}
-			else
+
+			@Override
+			public SimpleAttributeTable getInitialInheritedState()
+			{
+				return SimpleAttributeTable.instance;
+			}
+
+			@Override
+			public EditHandler getEditHandler()
 			{
 				return null;
 			}
 		}
-	}
-	
-	private class SystemPageLocationResolver implements GSymLocationResolver
-	{
-		private GSymPerspective perspective;
 		
 		
-		public SystemPageLocationResolver(LocationResolver systemLocationResolver)
+		private Page page;
+		private PagePerspective perspective = new PagePerspective();
+		
+		
+		private PageSubject(Page page)
 		{
-			perspective = new GSymPerspective( new SystemPageFragmentViewFn(), new SystemPageRelativeLocationResolver( systemLocationResolver ) );
+			this.page = page;
 		}
 		
-		
+
 		@Override
-		public GSymSubject resolveLocationAsSubject(Location location)
+		public Object getFocus()
 		{
-			return perspective.resolveRelativeLocation( new GSymSubject( null, perspective, "", SimpleAttributeTable.instance, null ), location.iterator() );
+			return page;
+		}
+
+		@Override
+		public GSymAbstractPerspective getPerspective()
+		{
+			return perspective;
+		}
+
+		@Override
+		public String getTitle()
+		{
+			return page.getTitle();
 		}
 	}
 	
 	
 	
-	private class GSymBrowserContextLocationResolver implements LocationResolver
+	
+	private class GSymBrowserContextLocationResolver implements PageLocationResolver
 	{
 		public Page resolveLocationAsPage(Location location, PersistentStateStore persistentState)
 		{
@@ -122,7 +104,8 @@ public class GSymBrowserContext
 	private GSymBrowserContextLocationResolver pageLocationResolver = new GSymBrowserContextLocationResolver();
 	private ObjectPresentationLocationResolver objPresLocationResolver = new ObjectPresentationLocationResolver();
 	private GSymGenericPerspective genericPerspective;
-	private List<GSymLocationResolver> resolvers = new ArrayList<GSymLocationResolver>();
+	
+	private PyStringMap resolverLocals = new PyStringMap();
 	
 	
 	
@@ -132,29 +115,34 @@ public class GSymBrowserContext
 		genericPerspective = new GSymGenericPerspective( objPresLocationResolver, genericPresenterRegistry );
 		if ( bWithSystemPages )
 		{
-			addResolvers( Arrays.asList( new GSymLocationResolver[] { new SystemPageLocationResolver( SystemLocationResolver.getSystemResolver() ) } ) );
+			resolverLocals.__setitem__( "system", Py.java2py( new SystemRootPage() ) );
 		}
-		addResolvers( Arrays.asList( new GSymLocationResolver[] { objPresLocationResolver } ) );
-	}
-	
-	public GSymBrowserContext(GSymGenericObjectPresenterRegistry genericPresenterRegistry, boolean bWithSystemPages, List<GSymLocationResolver> resolvers)
-	{
-		this( genericPresenterRegistry, bWithSystemPages );
-		addResolvers( resolvers );
+		resolverLocals.__setitem__( "objects", Py.java2py( objPresLocationResolver ) );
+		
+		registerMainSubject( new DefaultRootPage() );
 	}
 	
 	
 	
-	
-	protected void addResolvers(List<GSymLocationResolver> resolvers)
+	public void registerMainSubject(Object subject)
 	{
-		this.resolvers.addAll( resolvers );
+		registerNamedSubject( "main", subject );
 	}
 	
 	
-	public BrowserContext getBrowserContext()
+	public void registerNamedSubject(String name, Object subject)
 	{
-		return browserContext;
+		if ( name.equals( "system" )  ||  name.equals( "objects" ) )
+		{
+			throw new RuntimeException( "Cannot register subject under name '" + name + "'" );
+		}
+		resolverLocals.__setitem__( name, Py.java2py( subject ) );
+	}
+	
+	
+	public PageLocationResolver getPageLocationResolver()
+	{
+		return pageLocationResolver;
 	}
 	
 	public GSymGenericPerspective getGenericPerspective()
@@ -163,70 +151,80 @@ public class GSymBrowserContext
 	}
 	
 	
+	public GenericSubject genericSubject(Object focus)
+	{
+		return new GenericSubject( focus );
+	}
+	
+	public GenericSubject genericSubject(Object focus, String title)
+	{
+		return new GenericSubject( focus, title );
+	}
+	
+	
 
 	public Location getLocationForObject(GSymObjectPresentationPerspective perspective, Object x)
 	{
-		return objPresLocationResolver.getLocationForObject( perspective, x );
+		String relative = objPresLocationResolver.getRelativeLocationForObject( perspective, x );
+		return new Location( "objects" + relative );
 	}
 	
 	public Location getLocationForObject(Object x)
 	{
-		return objPresLocationResolver.getLocationForObject( genericPerspective, x );
+		return getLocationForObject( genericPerspective, x );
 	}
 	
-	public Object getObjectAtLocation(Location location)
+	
+	
+	
+	private Object resolveLocationAsObject(Location location)
 	{
-		return objPresLocationResolver.getObjectAtLocation( location );
+		String locationString = location.getLocationString();
+		
+		if ( locationString.equals( "" ) )
+		{
+			locationString = "main";
+		}
+
+		try
+		{
+			return Py.tojava( __builtin__.eval( Py.newString( locationString ), resolverLocals ), Object.class );
+		}
+		catch (Exception e)
+		{
+			return new GenericSubject( new ResolveError( location, e ), "Resolve error" );
+		}
 	}
-	
-	
-	
-	
+
+
 	public GSymSubject resolveLocationAsSubject(Location location)
 	{
-		for (GSymLocationResolver resolver: resolvers)
-		{
-			GSymSubject e = resolver.resolveLocationAsSubject( location );
-			if ( e != null )
-			{
-				return e;
-			}
-		}
+		Object result = resolveLocationAsObject( location );
 		
-		if ( location.getLocationString().equals( "" ) )
+		if ( result instanceof GSymSubject )
 		{
-			return new GSymSubject( null, rootLocationPerspective, "Root page", SimpleAttributeTable.instance, null );
+			return (GSymSubject)result;
+		}
+		else if ( result instanceof Page )
+		{
+			return new PageSubject( (Page)result );
 		}
 		else
 		{
-			return new GSymSubject( location, resolveErrorPerspective, "Resolve error", SimpleAttributeTable.instance, null );
+			return genericSubject( result );
 		}
 	}
 	
 	
 	public Page resolveLocationAsPage(Location location, PersistentStateStore persistentState)
 	{
-		for (GSymLocationResolver resolver: resolvers)
-		{
-			GSymSubject subject = resolver.resolveLocationAsSubject( location );
-			if ( subject != null )
-			{
-				GSymView view = new GSymView( subject, this, persistentState );
-				return view.getPage();
-			}
-		}
-		
-		if ( location.getLocationString().equals( "" ) )
-		{
-			return defaultRootPage;
-		}
-		else
-		{
-			return new ResolveErrorPage( location );
-		}
+		GSymSubject subject = resolveLocationAsSubject( location );
+		GSymView view = new GSymView( subject, this, persistentState );
+		return view.getPage();
 	}
-
-
+	
+	
+	
 	
 	
 	
@@ -254,44 +252,31 @@ public class GSymBrowserContext
 	
 	
 	
-	private static class ResolveErrorPage extends Page
+	private static class ResolveError implements Presentable
 	{
 		private String location;
+		private Exception exception;
 		
-		public ResolveErrorPage(Location location)
+		public ResolveError(Location location, Exception exception)
 		{
 			this.location = location.getLocationString();
+			this.exception = exception;
 		}
 		
 		
-		public String getTitle()
+		@Override
+		public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 		{
-			return "Error";
-		}
-
-		public DPElement getContentsElement()
-		{
+			StyleSheet titleStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 24 );
 			StyleSheet contentsStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 16 );
-			Pres linkHeader = SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_SYSTEMPAGE );
-			Pres title = new TitleBar( "Could Not Resolve Location" );
-			Pres head = new Head( new Pres[] { linkHeader, title } );
 			
-			Pres loc = contentsStyle.applyTo( new StaticText( location ) ).alignHCentre();
-			Pres error = contentsStyle.applyTo( new StaticText( "could not be resolved" ) ).alignHCentre();
-			Pres body = new Body( new Pres[] { loc, error } );
+			Pres errorTitle = titleStyle.applyTo( new StaticText( "Could not resolve" ) );
+			Pres loc = contentsStyle.applyTo( new StaticText( location ) );
+			Pres exc = Pres.coerce( exception );
+			Pres body = new Body( new Pres[] { errorTitle.alignHCentre(), loc.alignHCentre(), exc.alignHCentre() } );
 			
 			
-			return new BritefuryJ.DocPresent.Combinators.RichText.Page( new Pres[] { head, body } ).present();
+			return body;
 		}
 	}
-	
-	
-	
-	
-	private static DefaultRootPage defaultRootPage = new DefaultRootPage();
-	private static StyleSheet styleSheet = StyleSheet.instance;
-	private static final StyleSheet rootLocationStyle = StyleSheet.instance; 
-	private static final StyleSheet resolveErrorStyleSheet = styleSheet.withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, new Color( 0.8f, 0.0f, 0.0f ) );
-	private static GSymPerspective rootLocationPerspective = new GSymPerspective( new RootLocationFragmentViewFn() );
-	private static GSymPerspective resolveErrorPerspective = new GSymPerspective( new ResolveErrorFragmentViewFn() );
 }

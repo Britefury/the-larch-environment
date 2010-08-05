@@ -10,7 +10,7 @@ from Britefury.gSym.gSymDocument import gSymUnit
 
 from GSymCore.Languages.Python25 import Schema
 from GSymCore.Languages.Python25.Python25Importer import importPy25File
-from GSymCore.Languages.Python25.PythonEditor.View import perspective
+from GSymCore.Languages.Python25.PythonEditor.View import perspective, Python25Subject
 
 
 
@@ -27,7 +27,7 @@ def _py25ImportFile(filename):
 
 
 python25EditorPerspective = perspective
-unitClass = GSymUnitClass( Schema.schema, python25EditorPerspective )
+unitClass = GSymUnitClass( Schema.schema, python25EditorPerspective, Python25Subject )
 
 
 newPageFactory = GSymPageFactory( 'Python 2.5', _py25NewUnit )

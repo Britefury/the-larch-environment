@@ -243,6 +243,30 @@ class WorksheetEditorRelativeLocationResolver (GSymRelativeLocationResolver):
 	
 
 	
-perspective = GSymPerspective( WorksheetEditor(), StyleSheet.instance, SimpleAttributeTable.instance, WorksheetEditHandler(), WorksheetEditorRelativeLocationResolver() )
+perspective = GSymPerspective( WorksheetEditor(), StyleSheet.instance, SimpleAttributeTable.instance, WorksheetEditHandler() )
+
+
+class WorksheetEditorSubject (GSymSubject):
+	def __init__(self, document, model, enclosingSubject, location):
+		self._document = document
+		self._modelView = ViewSchema.WorksheetView( None, model )
+		self._enclosingSubject = enclosingSubject
+		self._location = location
+
+
+	def getFocus(self):
+		return self._modelView
+	
+	def getPerspective(self):
+		return perspective
+	
+	def getTitle(self):
+		return 'Worksheet [view]'
+	
+	def getSubjectContext(self):
+		return self._enclosingSubject.getSubjectContext().withAttrs( location=self._location )
+	
+	def getCommandHistory(self):
+		return self._document.getCommandHistory()
 
 	

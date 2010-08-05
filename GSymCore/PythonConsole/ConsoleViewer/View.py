@@ -205,8 +205,27 @@ class ConsoleView (GSymViewObjectDispatch):
 
 	
 	
-_docNameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*', 0 )
+perspective = GSymPerspective( ConsoleView(), StyleSheet.instance, SimpleAttributeTable.instance, None )
 
+
+class ConsoleSubject (GSymSubject):
+	def __init__(self, console, enclosingSubject):
+		self._console = console
+		self._enclosingSubject = enclosingSubject
+
+		
+	def getFocus(self):
+		return self._console
 	
-
-perspective = GSymPerspective( ConsoleView(), StyleSheet.instance, SimpleAttributeTable.instance, None, None )
+	def getPerspective(self):
+		return perspective
+	
+	def getTitle(self):
+		return 'Python console'
+	
+	def getSubjectContext(self):
+		return self._enclosingSubject.getSubjectContext()
+	
+	def getCommandHistory(self):
+		return None
+	

@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent.Browser;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 
 
-public interface LocationResolver
+public interface PageLocationResolver
 {
 	public Page resolveLocationAsPage(Location location, PersistentStateStore persistentState);
 }

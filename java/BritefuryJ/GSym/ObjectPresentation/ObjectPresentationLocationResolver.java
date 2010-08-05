@@ -8,17 +8,27 @@ package BritefuryJ.GSym.ObjectPresentation;
 
 import java.util.HashMap;
 
-import BritefuryJ.DocPresent.Browser.Location;
-import BritefuryJ.GSym.GSymLocationResolver;
-import BritefuryJ.GSym.GSymSubject;
+import org.python.core.Py;
+import org.python.core.PyString;
 
-public class ObjectPresentationLocationResolver implements GSymLocationResolver
+public class ObjectPresentationLocationResolver
 {
 	private HashMap<String, GSymObjectPresentationPerspective> perspectiveTable = new HashMap<String, GSymObjectPresentationPerspective>();
 	
 	
 	public ObjectPresentationLocationResolver()
 	{
+	}
+	
+	
+	public GSymObjectViewLocationTable __getitem__(String key)
+	{
+		GSymObjectPresentationPerspective perspective = perspectiveTable.get( key );
+		if ( perspective == null )
+		{
+			throw Py.KeyError( "No perspective with class name '" + key + "'" );
+		}
+		return perspective.getObjectViewLocationTable();
 	}
 	
 	
@@ -32,70 +42,14 @@ public class ObjectPresentationLocationResolver implements GSymLocationResolver
 	}
 	
 	
-	public Location getLocationForObject(GSymObjectPresentationPerspective perspective, Object x)
+	public String getRelativeLocationForObject(GSymObjectPresentationPerspective perspective, Object x)
 	{
-		String relative = perspective.getRelativeLocationForObject( x );
-		return new Location( "$objects/" + perspective.getClass().getName() + "/" + relative );
-	}
-	
-	public Object getObjectAtLocation(Location location)
-	{
-		Location.TokenIterator iterator = location.iterator();
-		iterator = iterator.consumeLiteral( "$objects/" );
+		String relative = perspective.getObjectViewLocationTable().getRelativeLocationForObject( x );
 		
-		if ( iterator != null )
-		{
-			Location.TokenIterator afterClassNameIter = iterator.consumeUpTo( "/" );
-			if ( afterClassNameIter != null )
-			{
-				Location.TokenIterator afterSlashIter = afterClassNameIter.consumeLiteral( "/" );
-				
-				if ( afterSlashIter != null )
-				{
-					String className = afterClassNameIter.lastToken();
-					
-					GSymObjectPresentationPerspective perspective = perspectiveTable.get( className );
-					
-					if ( perspective != null )
-					{
-						return perspective.getObjectAtRelativeLocation( afterSlashIter );
-					}
-				}
-			}
-		}
+		PyString className = Py.newString( perspective.getClass().getName() );
 		
-		return null;
-	}
-	
-
-	
-	@Override
-	public GSymSubject resolveLocationAsSubject(Location location)
-	{
-		Location.TokenIterator iterator = location.iterator();
-		iterator = iterator.consumeLiteral( "$objects/" );
+		PyString key = className.__repr__();
 		
-		if ( iterator != null )
-		{
-			Location.TokenIterator afterClassNameIter = iterator.consumeUpTo( "/" );
-			if ( afterClassNameIter != null )
-			{
-				Location.TokenIterator afterSlashIter = afterClassNameIter.consumeLiteral( "/" );
-				
-				if ( afterSlashIter != null )
-				{
-					String className = afterClassNameIter.lastToken();
-					
-					GSymObjectPresentationPerspective perspective = perspectiveTable.get( className );
-					
-					if ( perspective != null )
-					{
-						return perspective.resolveRelativeLocation( null, afterSlashIter );
-					}
-				}
-			}
-		}
-		
-		return null;
+		return "[" + key + "]" + relative;
 	}
 }

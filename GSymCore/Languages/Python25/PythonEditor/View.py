@@ -1282,4 +1282,31 @@ class Python25EditorRelativeLocationResolver (GSymRelativeLocationResolver):
 
 	
 _parser = Python25Grammar()
-perspective = GSymPerspective( Python25View( _parser ), StyleSheet.instance, SimpleAttributeTable.instance, Python25EditHandler(), Python25EditorRelativeLocationResolver() )
+perspective = GSymPerspective( Python25View( _parser ), StyleSheet.instance, SimpleAttributeTable.instance, Python25EditHandler() )
+
+
+class Python25Subject (GSymSubject):
+	def __init__(self, document, model, enclosingSubject, location):
+		self._document = document
+		self._model = model
+		self._enclosingSubject = enclosingSubject
+		self._location = location
+
+
+	def getFocus(self):
+		return self._model
+	
+	def getPerspective(self):
+		return perspective
+	
+	def getTitle(self):
+		return 'Py 2.5: ' + self._enclosingSubject.getTitle()
+	
+	def getSubjectContext(self):
+		return self._enclosingSubject.getSubjectContext().withAttrs( location=self._location )
+	
+	def getCommandHistory(self):
+		return self._document.getCommandHistory()
+
+	
+	

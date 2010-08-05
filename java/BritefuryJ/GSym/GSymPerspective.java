@@ -7,7 +7,6 @@
 package BritefuryJ.GSym;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DocPresent.Browser.Location.TokenIterator;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
@@ -20,27 +19,19 @@ public class GSymPerspective extends GSymAbstractPerspective
 	private StyleSheet styleSheet;
 	private SimpleAttributeTable initialInheritedState;
 	private EditHandler editHandler;
-	private GSymRelativeLocationResolver locationResolver;
 	
 	
-	public GSymPerspective(GSymViewFragmentFunction fragmentViewFn, StyleSheet styleSheet, SimpleAttributeTable initialInheritedState, EditHandler editHandler,
-			GSymRelativeLocationResolver locationResolver)
+	public GSymPerspective(GSymViewFragmentFunction fragmentViewFn, StyleSheet styleSheet, SimpleAttributeTable initialInheritedState, EditHandler editHandler)
 	{
 		this.fragmentViewFn = fragmentViewFn;
 		this.styleSheet = styleSheet;
 		this.initialInheritedState = initialInheritedState;
 		this.editHandler = editHandler;
-		this.locationResolver = locationResolver;
-	}
-	
-	public GSymPerspective(GSymViewFragmentFunction fragmentViewFn, GSymRelativeLocationResolver locationResolver)
-	{
-		this( fragmentViewFn, StyleSheet.instance, SimpleAttributeTable.instance, null, locationResolver );
 	}
 	
 	public GSymPerspective(GSymViewFragmentFunction fragmentViewFn)
 	{
-		this( fragmentViewFn, StyleSheet.instance, SimpleAttributeTable.instance, null, null );
+		this( fragmentViewFn, StyleSheet.instance, SimpleAttributeTable.instance, null );
 	}
 	
 	
@@ -68,25 +59,4 @@ public class GSymPerspective extends GSymAbstractPerspective
 	{
 		return editHandler;
 	}
-
-	@Override
-	public GSymSubject resolveRelativeLocation(GSymSubject enclosingSubject, TokenIterator locationIterator)
-	{
-		if ( locationResolver != null )
-		{
-			return locationResolver.resolveRelativeLocation( enclosingSubject.withPerspective( this ), locationIterator );
-		}
-		else
-		{
-			if ( locationIterator.getSuffix().equals( "" ) )
-			{
-				return enclosingSubject.withPerspective( this );
-			}
-			else
-			{
-				return null;
-			}
-		}
-	}
-
 }

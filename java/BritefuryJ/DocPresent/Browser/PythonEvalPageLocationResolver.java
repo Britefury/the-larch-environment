@@ -22,12 +22,12 @@ import BritefuryJ.DocPresent.Combinators.RichText.TitleBar;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
-public class PythonEvalLocationResolver implements LocationResolver
+public class PythonEvalPageLocationResolver implements PageLocationResolver
 {
 	private PythonInterpreter interpreter;
 	
 	
-	public PythonEvalLocationResolver()
+	public PythonEvalPageLocationResolver()
 	{
 		PyStringMap locals = new PyStringMap();
 		locals.__setitem__( "system", Py.java2py( new SystemRootPage() ) );

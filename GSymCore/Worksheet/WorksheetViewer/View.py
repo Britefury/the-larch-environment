@@ -49,7 +49,7 @@ from GSymCore.Languages.Python25.Execution.ExecutionPresCombinators import execu
 
 from GSymCore.Worksheet import Schema
 from GSymCore.Worksheet import ViewSchema
-from GSymCore.Worksheet.WorksheetEditor.View import perspective as editorPerspective
+from GSymCore.Worksheet.WorksheetEditor.View import perspective as editorPerspective, WorksheetEditorSubject
 
 
 
@@ -177,6 +177,34 @@ class WorksheetViewerRelativeLocationResolver (GSymRelativeLocationResolver):
 	
 
 	
-perspective = GSymPerspective( WorksheetViewer(), StyleSheet.instance, SimpleAttributeTable.instance, None, WorksheetViewerRelativeLocationResolver() )
+perspective = GSymPerspective( WorksheetViewer(), StyleSheet.instance, SimpleAttributeTable.instance, None )
+
+
+
+class WorksheetViewerSubject (GSymSubject):
+	def __init__(self, document, model, enclosingSubject, location):
+		self._document = document
+		self._modelView = ViewSchema.WorksheetView( None, model )
+		self._enclosingSubject = enclosingSubject
+		self._location = location
+		self._editLocation = self._location + '.edit'
+		
+		self.edit = WorksheetEditorSubject( document, model, self, self._editLocation )
+
+
+	def getFocus(self):
+		return self._modelView
+	
+	def getPerspective(self):
+		return perspective
+	
+	def getTitle(self):
+		return 'Worksheet [view]'
+	
+	def getSubjectContext(self):
+		return self._enclosingSubject.getSubjectContext().withAttrs( location=self._location, editLocation=Location( self._editLocation ), viewLocation=Location( self._location ) )
+	
+	def getCommandHistory(self):
+		return self._document.getCommandHistory()
 
 	

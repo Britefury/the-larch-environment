@@ -65,17 +65,17 @@ class AppDocument (IncrementalOwner):
 	
 
 class AppConsole (IncrementalOwner):
-	def __init__(self, name):
+	def __init__(self, index):
 		self._incr = IncrementalValueMonitor( self )
 		
-		self._name = name
+		self._index = index
 		self._console = ConsoleSchema.Console()
 		
 		
 		
-	def getName(self):
+	def getIndex(self):
 		self._incr.onAccess()
-		return self._name
+		return self._index
 	
 	def getConsole(self):
 		self._incr.onAccess()

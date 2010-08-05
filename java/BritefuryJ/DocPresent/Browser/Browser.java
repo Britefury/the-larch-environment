@@ -60,7 +60,7 @@ public class Browser
 	private ScrolledViewport.ScrolledViewportControl viewport;
 	private BrowserHistory history;
 	
-	private LocationResolver resolver;
+	private PageLocationResolver resolver;
 	private Page page;
 	private BrowserListener listener;
 	private CommandHistoryListener commandHistoryListener;
@@ -68,7 +68,7 @@ public class Browser
 	
 	
 	
-	public Browser(LocationResolver resolver, Location location, PageController pageController)
+	public Browser(PageLocationResolver resolver, Location location, PageController pageController)
 	{
 		this.resolver = resolver;
 		history = new BrowserHistory( location );
