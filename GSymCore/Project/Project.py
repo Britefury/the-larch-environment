@@ -5,22 +5,27 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from Britefury.gSym.gSymUnitClass import GSymUnitClass, GSymUnitFactory
-from Britefury.gSym.gSymDocument import gSymUnit
+from Britefury.gSym.gSymUnitClass import GSymUnitClass, GSymDocumentFactory
+from Britefury.gSym.gSymDocument import gSymUnit, GSymDocument
 
-from GSymCore.Project.ProjectEditor.View import perspective, ProjectSubject
+from GSymCore.Project.ProjectEditor.View import perspective as projectEditorPerspective, ProjectSubject
 from GSymCore.Project import Schema
 
 
 def newProject():
 	package = Schema.Package( name='Root', contents=[] )
 	project = Schema.Project( rootPackage=package )
-	return gSymUnit( Schema.schema, project )
+	return project
+
+def _newProjectUnit():
+	return gSymUnit( Schema.schema, newProject() )
+
+def _newProjectDocment(world):
+	return GSymDocument( world, _newProjectUnit() )
 
 
-projectEditorPerspective = perspective
-unitClass = GSymUnitClass( Schema.schema, projectEditorPerspective, ProjectSubject )
+unitClass = GSymUnitClass( Schema.schema, ProjectSubject )
 
 
-newUnitFactory = GSymUnitFactory( 'gSym Document', newProject )
+newDocumentFactory = GSymDocumentFactory( 'gSym Document', _newProjectDocment )
 

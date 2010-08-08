@@ -57,7 +57,7 @@ class GSymWorld (object):
 		self._locationToDocument = {}
 		self._documentIDCounter = 1
 		self.newPageFactories = []
-		self.newUnitFactories = []
+		self.newDocumentFactories = []
 		self.pageImporters = []
 		self._appStateSubject = None
 		
@@ -75,8 +75,8 @@ class GSymWorld (object):
 	def registerNewPageFactory(self, plugin, newPageFactory):
 		self.newPageFactories.append( newPageFactory )
 		
-	def registerNewUnitFactory(self, plugin, newUnitFactory):
-		self.newUnitFactories.append( newUnitFactory )
+	def registerNewDocumentFactory(self, plugin, newDocumentFactory):
+		self.newDocumentFactories.append( newDocumentFactory )
 		
 	def registerPageImporter(self, plugin, pageImporter):
 		self.pageImporters.append( pageImporter )
