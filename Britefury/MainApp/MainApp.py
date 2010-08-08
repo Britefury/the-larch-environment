@@ -20,7 +20,6 @@ class MainApp (object):
 	def __init__(self, world, location=Location( '' )):
 		class _ModelSubject (GSymSubject):
 			def __init__(self, innerSubject):
-				self._ctx = ctx
 				self._innerSubject = innerSubject
 		
 				

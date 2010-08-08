@@ -265,8 +265,8 @@ class AppWindow (object):
 
 	def _onViewDocModel(self):
 		currentLoc = self._browser.getCurrentBrowserLocation().getLocationString()
-		if not currentLoc.startswith( 'model:' ):
-			currentLoc = 'model:' + currentLoc
+		if not ( currentLoc.startswith( 'model(' )  and  currentLoc.endswith( ')' ) ):
+			currentLoc = 'model( ' + currentLoc + ' )'
 		self._browser.openLocationInNewWindow( Location( currentLoc ) )
 	
 	

@@ -229,6 +229,9 @@ _itemHoverHighlightStyle = StyleSheet.instance.withAttr( Primitive.hoverBackgrou
 _packageContentsIndentation = 20.0
 
 
+_nameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*' )
+
+
 
 
 class ProjectView (GSymViewObjectNodeDispatch):
