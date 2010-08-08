@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from Britefury.gSym.gSymUnitClass import GSymUnitClass, GSymPageFactory
+from Britefury.gSym.gSymUnitClass import GSymUnitClass, GSymPageUnitFactory
 from Britefury.gSym.gSymDocument import gSymUnit
 
 from GSymCore.Worksheet.WorksheetViewer.View import perspective as worksheetViewerPerspective, WorksheetViewerSubject
@@ -19,8 +19,8 @@ def _worksheetNewUnit():
 	return gSymUnit( Schema.schema, newWorksheet() )
 
 
-unitClass = GSymUnitClass( Schema.schema, worksheetViewerPerspective, WorksheetViewerSubject )
+unitClass = GSymUnitClass( Schema.schema, WorksheetViewerSubject )
 
 
-newPageFactory = GSymPageFactory( 'Worksheet', _worksheetNewUnit )
+newPageFactory = GSymPageUnitFactory( 'Worksheet', _worksheetNewUnit )
 

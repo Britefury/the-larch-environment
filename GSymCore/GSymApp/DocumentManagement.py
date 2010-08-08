@@ -20,14 +20,14 @@ from Britefury.gSym.gSymDocument import GSymDocument
 
 # handleNewDocumentFn(unit)
 def promptNewDocument(world, element, handleNewDocumentFn):
-	def _make_newDocument(newUnitFn):
+	def _make_newDocument(newDocFn):
 		def newDoc(menuItem):
-			unit = newUnitFn()
-			handleNewDocumentFn( unit )
+			doc = newDocFn( world )
+			handleNewDocumentFn( doc )
 		return newDoc
 	items = []
-	for newUnitFactory in world.newUnitFactories:
-		items.append( MenuItem.menuItemWithLabel( newUnitFactory.menuLabelText, _make_newDocument( newUnitFactory.newDocumentFn ) ) )
+	for newDocumentFactory in world.newDocumentFactories:
+		items.append( MenuItem.menuItemWithLabel( newDocumentFactory.menuLabelText, _make_newDocument( newDocumentFactory.newDocumentFn ) ) )
 	newDocumentMenu = VPopupMenu( items )
 	
 	newDocumentMenu.popupToRightOf( element )

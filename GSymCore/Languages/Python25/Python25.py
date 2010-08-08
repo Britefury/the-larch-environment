@@ -5,12 +5,12 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from Britefury.gSym.gSymUnitClass import GSymUnitClass, GSymPageFactory, GSymPageImporter
+from Britefury.gSym.gSymUnitClass import GSymUnitClass, GSymPageUnitFactory, GSymPageUnitImporter
 from Britefury.gSym.gSymDocument import gSymUnit
 
 from GSymCore.Languages.Python25 import Schema
 from GSymCore.Languages.Python25.Python25Importer import importPy25File
-from GSymCore.Languages.Python25.PythonEditor.View import perspective, Python25Subject
+from GSymCore.Languages.Python25.PythonEditor.View import perspective as python25EditorPerspective, Python25Subject
 
 
 
@@ -26,12 +26,11 @@ def _py25ImportFile(filename):
 
 
 
-python25EditorPerspective = perspective
-unitClass = GSymUnitClass( Schema.schema, python25EditorPerspective, Python25Subject )
+unitClass = GSymUnitClass( Schema.schema, Python25Subject )
 
 
-newPageFactory = GSymPageFactory( 'Python 2.5', _py25NewUnit )
+newPageFactory = GSymPageUnitFactory( 'Python 2.5', _py25NewUnit )
 
 
-pageImporter = GSymPageImporter( 'Python 2.5', 'Python 2.5 source (*.py)', 'py', _py25ImportFile )
+pageImporter = GSymPageUnitImporter( 'Python 2.5', 'Python 2.5 source (*.py)', 'py', _py25ImportFile )
 

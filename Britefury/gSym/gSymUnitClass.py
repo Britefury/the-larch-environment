@@ -8,19 +8,15 @@
 
 
 class GSymUnitClass (object):
-	def __init__(self, schema, unitPerspective, unitSubjectFactory):
+	def __init__(self, schema, unitSubjectFactory):
 		super( GSymUnitClass, self ).__init__()
 		self._schema = schema
 		self.name = schema.getName()
-		self._unitPerspective = unitPerspective
 		self._unitSubjectFactory = unitSubjectFactory
 
 
 	def getSchema(self):
 		return self._schema
-
-	def getUnitPerspective(self):
-		return self._unitPerspective
 
 	def getUnitSubjectFactory(self):
 		return self._unitSubjectFactory
@@ -29,14 +25,14 @@ class GSymUnitClass (object):
 
 
 
-class GSymPageFactory (object):
+class GSymPageUnitFactory (object):
 	def __init__(self, menuLabelText, newPageFn):
 		self.menuLabelText = menuLabelText
 		self.newPageFn = newPageFn
 
 
 
-class GSymPageImporter (object):
+class GSymPageUnitImporter (object):
 	def __init__(self, menuLabelText, fileType, filePattern, importFn):
 		self.menuLabelText = menuLabelText
 		self.fileType = fileType
@@ -45,7 +41,7 @@ class GSymPageImporter (object):
 
 		
 		
-class GSymUnitFactory (object):
+class GSymDocumentFactory (object):
 	def __init__(self, menuLabelText, newDocumentFn):
 		self.menuLabelText = menuLabelText
 		self.newDocumentFn = newDocumentFn

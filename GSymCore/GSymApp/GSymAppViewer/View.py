@@ -112,12 +112,11 @@ class AppView (GSymViewObjectDispatch):
 	@ObjectDispatchMethod( Application.AppState )
 	def AppState(self, ctx, state, node):
 		def _onNewDoc(link, event):
-			def handleNewDocumentFn(unit):
+			def handleNewDocumentFn(doc):
 				name = _newDocumentName( openDocuments )
+				doc.setDocumentName( name )
 				
 				world = ctx.getSubjectContext()['world']
-				doc = GSymDocument( world, unit )
-				doc.setDocumentName( name )
 				location = world.addNewDocument( doc )
 
 				appDoc = Application.AppDocument( name, location )

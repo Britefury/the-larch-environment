@@ -128,15 +128,6 @@ class GSymDocument (CommandHistoryListener):
 		
 		
 	
-	def getSubjectFactory(self):
-		return self.getUnitSubjectFactory( self._unit )
-
-	def getUnitSubjectFactory(self, unit):
-		unitClass = self._world.getUnitClass( gSymUnit_getSchemaLocation( unit ) )
-		subjectFactory = unitClass.getUnitSubjectFactory()
-		return subjectFactory
-
-		
 	def newSubject(self, enclosingSubject, location):
 		return self.newUnitSubject( self._unit, enclosingSubject, location )
 
