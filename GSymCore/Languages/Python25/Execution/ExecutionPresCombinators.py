@@ -47,17 +47,17 @@ class ExecutionStyle (object):
 
 
 
-def _textLines(labelText, text):
+def _textLines(labelText, text, textStyleAttribute):
 	label = ApplyStyleSheetFromAttribute( ExecutionStyle.labelStyle, StaticText( labelText ) )
 	lines = ApplyStyleSheetFromAttribute( textStyleAttribute, VBox( [ StaticText( line )   for line in text.split( '\n' ) ] ) )
 	return VBox( [ label, lines.padX( 5.0, 0.0 ) ] )
 
 
 def execStdout(text):
-	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdOutStyle, Border( _textLines( 'STDOUT:', text ).alignHExpand() ).alignHExpand() )
+	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdOutStyle, Border( _textLines( 'STDOUT:', text, ExecutionStyle.stdOutStyle ).alignHExpand() ).alignHExpand() )
 
 def execStderr(text):
-	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdErrStyle, Border( _textLines( 'STDERR:', text ).alignHExpand() ).alignHExpand() )
+	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdErrStyle, Border( _textLines( 'STDERR:', text, ExecutionStyle.stdErrStyle ).alignHExpand() ).alignHExpand() )
 	
 def execException(exceptionView):
 	label = ApplyStyleSheetFromAttribute( ExecutionStyle.labelStyle, StaticText( 'EXCEPTION:' ) )

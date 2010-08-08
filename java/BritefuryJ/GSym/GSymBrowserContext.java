@@ -7,6 +7,7 @@
 package BritefuryJ.GSym;
 
 import org.python.core.Py;
+import org.python.core.PyObject;
 import org.python.core.PyStringMap;
 import org.python.core.__builtin__;
 
@@ -137,6 +138,15 @@ public class GSymBrowserContext
 			throw new RuntimeException( "Cannot register subject under name '" + name + "'" );
 		}
 		resolverLocals.__setitem__( name, Py.java2py( subject ) );
+	}
+	
+	public void registerNamedSubject(String name, PyObject subject)
+	{
+		if ( name.equals( "system" )  ||  name.equals( "objects" ) )
+		{
+			throw new RuntimeException( "Cannot register subject under name '" + name + "'" );
+		}
+		resolverLocals.__setitem__( name, subject );
 	}
 	
 	
