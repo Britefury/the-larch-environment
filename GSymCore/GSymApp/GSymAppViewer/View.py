@@ -112,15 +112,11 @@ class AppView (GSymViewObjectDispatch):
 	@ObjectDispatchMethod( Application.AppState )
 	def AppState(self, ctx, state, node):
 		def _onNewDoc(link, event):
-			def handleNewDocumentFn(doc):
+			def handleNewDocumentFn(document):
 				name = _newDocumentName( openDocuments )
-				doc.setDocumentName( name )
+				document.setDocumentName( name )
 				
-				world = ctx.getSubjectContext()['world']
-				location = world.addNewDocument( doc )
-
-				appDoc = Application.AppDocument( name, location )
-				node.addOpenDocument( appDoc )
+				appDoc = node.registerOpenDocument( document )
 				
 			element = link.getElement()
 			openDocuments = node.getOpenDocuments()
@@ -135,12 +131,8 @@ class AppView (GSymViewObjectDispatch):
 				head, documentName = os.path.split( fullPath )
 				documentName, ext = os.path.splitext( documentName )
 				
-				world = ctx.getSubjectContext()['world']
 				document.setDocumentName( documentName )
-				location = world.addNewDocument( document )
-				
-				appDoc = Application.AppDocument( documentName, location )
-				node.addOpenDocument( appDoc )
+				appDoc = node.registerOpenDocument( document )
 
 				
 			element = link.getElement()
@@ -187,9 +179,9 @@ class AppView (GSymViewObjectDispatch):
 		def _onSave(link, event):
 			element = link.getElement()
 			world = ctx.getSubjectContext()['world']
-			document = world.getDocument( location )
+			document = node.getDocument()
 			
-			if document._filename is None:
+			if document.hasFilename():
 				def handleSaveDocumentAsFn(filename):
 					document.saveAs( filename )
 				
@@ -201,7 +193,7 @@ class AppView (GSymViewObjectDispatch):
 		def _onSaveAs(link, event):
 			element = link.getElement()
 			world = ctx.getSubjectContext()['world']
-			document = world.getDocument( location )
+			document = node.getDocument()
 			
 			def handleSaveDocumentAsFn(filename):
 				document.saveAs( filename )
@@ -257,18 +249,17 @@ class _ConsoleListSubject (object):
 		
 
 class _DocumentListSubject (object):
-	def __init__(self, world, enclosingSubject):
-		self._world = world
+	def __init__(self, appState, enclosingSubject):
+		self._appState = appState
 		self._enclosingSubject = enclosingSubject
 		
 		
 	def __getattr__(self, location):
-		try:
-			doc = self._world.getDocument( location )
-		except KeyError:
-			raise AttributeError, 'no document at %s'  %  ( location, )
-		
-		return doc.newSubject( self._enclosingSubject, 'main.documents.' + location )
+		for appDocument in self._appState.getOpenDocuments():
+			if appDocument.getLocation() == location:
+				doc = appDocument.getDocument()
+				return doc.newSubject( self._enclosingSubject, 'main.documents.' + location )
+		raise AttributeError, 'no document at %s'  %  ( location, )
 		
 
 class GSymAppSubject (GSymSubject):
@@ -276,7 +267,7 @@ class GSymAppSubject (GSymSubject):
 		self._appState = appState
 		self._world = world
 		self.consoles = _ConsoleListSubject( self._appState, self )
-		self.documents = _DocumentListSubject( self._world, self )
+		self.documents = _DocumentListSubject( self._appState, self )
 
 		
 	def getFocus(self):

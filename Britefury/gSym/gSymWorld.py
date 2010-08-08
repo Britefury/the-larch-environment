@@ -54,8 +54,6 @@ class GSymWorld (object):
 		self.resolver = GSymDMSchemaResolver()
 		self._plugins = GSymPlugin.loadPlugins()
 		self._unitClasses = {}
-		self._locationToDocument = {}
-		self._documentIDCounter = 1
 		self.newPageFactories = []
 		self.newDocumentFactories = []
 		self.pageImporters = []
@@ -88,26 +86,6 @@ class GSymWorld (object):
 		
 	def getAppStateSubject(self):
 		return self._appStateSubject
-		
-		
-	def addNewDocument(self, document):
-		location = 'Doc%03d'  %  self._documentIDCounter
-		self._documentIDCounter += 1
-		if location in self._locationToDocument:
-			raise KeyError
-		else:
-			self._locationToDocument[location] = document
-		return location
-		
-		
-	
-
-		
-	def getDocument(self, location):
-		try:
-			return self._locationToDocument[location]
-		except KeyError:
-			raise KeyError, "no document named '%s'"  %  ( location, )
 		
 		
 		

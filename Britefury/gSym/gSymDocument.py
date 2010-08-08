@@ -99,6 +99,9 @@ class GSymDocument (CommandHistoryListener):
 	def getFilename(self):
 		return self._filename
 	
+	def hasFilename(self):
+		return self._filename is not None
+	
 	def getSaveTime(self):
 		return self._saveTime
 	

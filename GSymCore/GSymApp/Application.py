@@ -17,6 +17,7 @@ class AppState (IncrementalOwner):
 		self._incr = IncrementalValueMonitor( self )
 		
 		self._openDocuments = []
+		self._documentIDCounter = 1
 		self._consoles = []
 		self._configuration = AppConfiguration()
 		
@@ -24,12 +25,16 @@ class AppState (IncrementalOwner):
 	def getOpenDocuments(self):
 		self._incr.onAccess()
 		return copy( self._openDocuments )
-		
-	def addOpenDocument(self, doc):
-		self._openDocuments.append( doc )
+	
+	def registerOpenDocument(self, gsymDocument):
+		location = 'Doc%03d'  %  ( self._documentIDCounter, )
+		self._documentIDCounter += 1
+		appDocument = AppDocument( gsymDocument, location )
+		self._openDocuments.append( appDocument )
 		self._incr.onChanged()
 		
-		
+
+
 	def getConsoles(self):
 		self._incr.onAccess()
 		return copy( self._consoles )
@@ -46,17 +51,21 @@ class AppState (IncrementalOwner):
 		
 	
 class AppDocument (IncrementalOwner):
-	def __init__(self, name, location):
+	def __init__(self, doc, location):
 		self._incr = IncrementalValueMonitor( self )
 		
-		self._name = name
+		self._doc = doc
 		self._location = location
 		
 		
 		
 	def getName(self):
 		self._incr.onAccess()
-		return self._name
+		return self._doc.getDocumentName()
+	
+	def getDocument(self):
+		self._incr.onAccess()
+		return self._doc
 	
 	def getLocation(self):
 		self._incr.onAccess()
