@@ -377,7 +377,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 	
 	
 
-perspective = GSymPerspective( ProjectView(), StyleSheet.instance, SimpleAttributeTable.instance, None )
+perspective = GSymPerspective( ProjectView(), None )
 
 
 class PackageSubject (object):

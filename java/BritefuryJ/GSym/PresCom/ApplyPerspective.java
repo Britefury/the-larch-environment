@@ -50,7 +50,7 @@ public class ApplyPerspective extends Pres
 			p = ctx.getFragment().getBrowserContext().getGenericPerspective();
 		}
 		
-		SimpleAttributeTable s = inheritedState != null  ?  inheritedState  :  p.getInitialInheritedState();
+		SimpleAttributeTable s = inheritedState != null  ?  ctx.getInheritedState().withAttrs( inheritedState )  :  ctx.getInheritedState();
 		
 		return child.present( new PresentationContext( ctx.getFragment(), p, s ), style );
 	}

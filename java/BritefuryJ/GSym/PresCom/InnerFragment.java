@@ -40,7 +40,10 @@ public class InnerFragment extends Pres
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
 		GSymFragmentView fragment = ctx.getFragment();
-		return fragment.presentInnerFragment( model, ctx.getPerspective(), style, inheritedState != null  ?  inheritedState  :  ctx.getInheritedState() );
+		
+		SimpleAttributeTable s = inheritedState != null  ?  ctx.getInheritedState().withAttrs( inheritedState )  :  ctx.getInheritedState();
+		
+		return fragment.presentInnerFragment( model, ctx.getPerspective(), style, s );
 	}
 	
 	

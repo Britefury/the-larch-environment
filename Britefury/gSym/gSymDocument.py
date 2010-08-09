@@ -11,8 +11,6 @@ from BritefuryJ.CommandHistory import CommandHistory, CommandHistoryListener
 
 from BritefuryJ.DocModel import DMNode, DMSchema, DMIOReader, DMIOWriter
 
-from BritefuryJ.GSym import GSymPerspective, GSymSubject
-
 from Britefury.Kernel.Abstract import abstractmethod
 
 from Britefury.Util.NodeUtil import isObjectNode

@@ -233,7 +233,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 
 
 
-perspective = GSymPerspective( WorksheetEditor(), StyleSheet.instance, SimpleAttributeTable.instance, WorksheetEditHandler() )
+perspective = GSymPerspective( WorksheetEditor(), WorksheetEditHandler() )
 
 
 class WorksheetEditorSubject (GSymSubject):
