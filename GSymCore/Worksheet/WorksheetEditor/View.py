@@ -30,7 +30,7 @@ from Britefury.Util.InstanceCache import instanceCache
 from BritefuryJ.AttributeTable import *
 
 from BritefuryJ.GSym import GSymPerspective, GSymSubject
-from BritefuryJ.GSym.PresCom import InnerFragment, PerspectiveInnerFragment
+from BritefuryJ.GSym.PresCom import InnerFragment
 
 
 from GSymCore.Languages.Python25 import Python25
@@ -192,7 +192,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 		def _onDeleteButton(button, event):
 			button.getElement().postTreeEvent( DeleteNodeOperation( node ) )
 
-		codeView = PerspectiveInnerFragment( Python25.python25EditorPerspective, node.getCode() )
+		codeView = Python25.python25EditorPerspective.applyTo( InnerFragment( node.getCode() ) )
 		
 		executionResultView = None
 		executionResult = node.getResult()

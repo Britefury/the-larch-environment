@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.WeakHashMap;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.Controls.PopupMenu;
 import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
@@ -29,7 +30,6 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.Controls.PopupMenu;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerEvent;
@@ -55,7 +55,7 @@ import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GSymPerspective;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.ObjectPresentation.PresentationStateListenerList;
-import BritefuryJ.GSym.PresCom.PerspectiveInnerFragment;
+import BritefuryJ.GSym.PresCom.InnerFragment;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.GSym.View.GSymViewFragmentFunction;
 import BritefuryJ.Math.AABox2;
@@ -111,7 +111,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		@Override
 		public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 		{
-			return new PerspectiveInnerFragment( treeExplorerPerspective, element ); 
+			return treeExplorerPerspective.applyTo( new InnerFragment( element ) ); 
 		}
 	}
 
