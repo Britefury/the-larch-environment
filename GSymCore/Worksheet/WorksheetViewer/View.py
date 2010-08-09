@@ -161,7 +161,7 @@ class WorksheetViewer (GSymViewObjectDispatch):
 
 
 
-perspective = GSymPerspective( WorksheetViewer(), StyleSheet.instance, SimpleAttributeTable.instance, None )
+perspective = GSymPerspective( WorksheetViewer(), None )
 
 
 

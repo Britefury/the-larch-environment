@@ -69,12 +69,6 @@ public class GSymGenericPerspective extends GSymObjectPresentationPerspective
 	
 	
 	@Override
-	public SimpleAttributeTable getInitialInheritedState()
-	{
-		return SimpleAttributeTable.instance;
-	}
-	
-	@Override
 	public EditHandler getEditHandler()
 	{
 		return null;

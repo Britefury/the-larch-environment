@@ -204,7 +204,7 @@ class ConsoleView (GSymViewObjectDispatch):
 
 	
 	
-perspective = GSymPerspective( ConsoleView(), StyleSheet.instance, SimpleAttributeTable.instance, None )
+perspective = GSymPerspective( ConsoleView(), None )
 
 
 class ConsoleSubject (GSymSubject):

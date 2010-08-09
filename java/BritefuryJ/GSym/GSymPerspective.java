@@ -9,29 +9,24 @@ package BritefuryJ.GSym;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.GSym.View.GSymViewFragmentFunction;
 
 public class GSymPerspective extends GSymAbstractPerspective
 {
 	private GSymViewFragmentFunction fragmentViewFn;
-	private StyleSheet styleSheet;
-	private SimpleAttributeTable initialInheritedState;
 	private EditHandler editHandler;
 	
 	
-	public GSymPerspective(GSymViewFragmentFunction fragmentViewFn, StyleSheet styleSheet, SimpleAttributeTable initialInheritedState, EditHandler editHandler)
+	public GSymPerspective(GSymViewFragmentFunction fragmentViewFn, EditHandler editHandler)
 	{
 		this.fragmentViewFn = fragmentViewFn;
-		this.styleSheet = styleSheet;
-		this.initialInheritedState = initialInheritedState;
 		this.editHandler = editHandler;
 	}
 	
 	public GSymPerspective(GSymViewFragmentFunction fragmentViewFn)
 	{
-		this( fragmentViewFn, StyleSheet.instance, SimpleAttributeTable.instance, null );
+		this( fragmentViewFn, null );
 	}
 	
 	
@@ -42,17 +37,6 @@ public class GSymPerspective extends GSymAbstractPerspective
 		return fragmentViewFn.createViewFragment( x, fragment, inheritedState );
 	}
 
-	@Override
-	public StyleSheet getStyleSheet()
-	{
-		return styleSheet;
-	}
-
-	@Override
-	public SimpleAttributeTable getInitialInheritedState()
-	{
-		return initialInheritedState;
-	}
 
 	@Override
 	public EditHandler getEditHandler()

@@ -231,7 +231,7 @@ _docNameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*', 0 )
 
 
 
-perspective = GSymPerspective( AppView(), StyleSheet.instance, SimpleAttributeTable.instance, None )
+perspective = GSymPerspective( AppView(), None )
 
 
 

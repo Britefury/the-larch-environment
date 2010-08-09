@@ -1274,7 +1274,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	
 _parser = Python25Grammar()
-perspective = GSymPerspective( Python25View( _parser ), StyleSheet.instance, SimpleAttributeTable.instance, Python25EditHandler() )
+perspective = GSymPerspective( Python25View( _parser ), Python25EditHandler() )
 
 
 class Python25Subject (GSymSubject):

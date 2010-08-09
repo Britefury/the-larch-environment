@@ -252,8 +252,7 @@ public class GSymView extends IncrementalTree
 		{
 			perspective = browserContext.getGenericPerspective();
 		}
-		rootNodeResultFactory = makeNodeResultFactory( perspective, subject.getSubjectContext(),
-				StyleValues.instance.withAttrs( perspective.getStyleSheet() ), perspective.getInitialInheritedState() );
+		rootNodeResultFactory = makeNodeResultFactory( perspective, subject.getSubjectContext(), StyleValues.instance, SimpleAttributeTable.instance );
 		
 		rootBox = null;
 		
