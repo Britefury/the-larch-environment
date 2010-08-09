@@ -21,7 +21,7 @@ import BritefuryJ.DocPresent.LayoutTree.BranchLayoutNode;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
-import BritefuryJ.GSym.PresCom.PerspectiveInnerFragment;
+import BritefuryJ.GSym.PresCom.InnerFragment;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
@@ -1070,7 +1070,7 @@ public abstract class DPContainer extends DPElement
 		{
 			if ( child != null )
 			{
-				Pres metaChild = new PerspectiveInnerFragment( treeExplorerPerspective, child ); 
+				Pres metaChild = new InnerFragment( child ); 
 				metaChildren.add( metaChild );
 			}
 			else

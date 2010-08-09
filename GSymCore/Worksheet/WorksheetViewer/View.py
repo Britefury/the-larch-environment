@@ -41,7 +41,7 @@ from BritefuryJ.DocPresent.Combinators.RichText import *
 from BritefuryJ.DocPresent.Combinators.ContextMenu import *
 
 from BritefuryJ.GSym import GSymPerspective, GSymSubject
-from BritefuryJ.GSym.PresCom import InnerFragment, PerspectiveInnerFragment
+from BritefuryJ.GSym.PresCom import InnerFragment
 
 
 from GSymCore.Languages.Python25 import Python25
@@ -122,7 +122,7 @@ class WorksheetViewer (GSymViewObjectDispatch):
 	def PythonCode(self, ctx, inheritedState, node):
 		if node.isVisible():
 			if node.isCodeVisible():
-				codeView = PerspectiveInnerFragment( Python25.python25EditorPerspective, node.getCode() )
+				codeView = Python25.python25EditorPerspective.applyTo( InnerFragment( node.getCode() ) )
 				if node.isCodeEditable():
 					codeView = StyleSheet.instance.withAttr( Primitive.editable, True ).applyTo( codeView )
 			else:
