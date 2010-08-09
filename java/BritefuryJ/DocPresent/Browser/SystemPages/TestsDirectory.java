@@ -13,7 +13,7 @@ import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Browser.Location;
-import BritefuryJ.DocPresent.Browser.Page;
+import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
@@ -24,7 +24,7 @@ import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
 import BritefuryJ.DocPresent.Combinators.RichText.Heading4;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
-public class TestsDirectory extends Page
+public class TestsDirectory extends BrowserPage
 {
 	public static final AlignmentTestPage alignment = new AlignmentTestPage();
 	public static final BorderTestPage border = new BorderTestPage();

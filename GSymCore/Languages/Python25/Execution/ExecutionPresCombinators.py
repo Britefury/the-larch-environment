@@ -15,8 +15,7 @@ from BritefuryJ.DocPresent.Combinators.Primitive import *
 from BritefuryJ.DocPresent.Combinators.RichText import *
 from BritefuryJ.DocPresent.Combinators.Sequence import *
 
-from BritefuryJ.GSym.GenericPerspective.PresCom import GenericPerspectiveInnerFragment
-from BritefuryJ.GSym.PresCom import InnerFragment
+from BritefuryJ.GSym.PresCom import InnerFragment, ApplyPerspective
 
 
 
@@ -72,12 +71,16 @@ def executionResultBox(stdoutText, stderrText, exception, resultInTuple, bUseGen
 	if stderrText is not None:
 		boxContents.append( execStderr( stderrText ) )
 	if exception is not None:
-		exceptionView = GenericPerspectiveInnerFragment( exception )   if bUseGenericPerspecitveForException   else InnerFragment( exception )
+		exceptionView = InnerFragment( exception )
+		if bUseGenericPerspecitveForException:
+			exceptionView = ApplyPerspective.generic( exceptionView )
 		boxContents.append( execException( exceptionView ) )
 	if stdoutText is not None:
 		boxContents.append( execStdout( stdoutText ) )
 	if resultInTuple is not None:
-		resultView = GenericPerspectiveInnerFragment( resultInTuple[0] )   if bUseGenericPerspectiveForResult   else InnerFragment( resultInTuple[0] )
+		resultView = InnerFragment( resultInTuple[0] )
+		if bUseGenericPerspectiveForResult:
+			resultView = ApplyPerspective.generic( resultView )
 		boxContents.append( execResult( resultView ) )
 	
 	if len( boxContents ) > 0:
@@ -91,19 +94,25 @@ def minimalExecutionResultBox(stdoutText, stderrText, exception, resultInTuple, 
 		if resultInTuple is None:
 			return None
 		else:
-			resultView = GenericPerspectiveInnerFragment( resultInTuple[0] )   if bUseGenericPerspectiveForResult   else InnerFragment( resultInTuple[0] )
+			resultView = InnerFragment( resultInTuple[0] )
+			if bUseGenericPerspectiveForResult:
+				resultView = ApplyPerspective.generic( resultView )
 			return Paragraph( [ resultView ] ).alignHExpand()
 	else:
 		boxContents = []
 		if stderrText is not None:
 			boxContents.append( execStderr( stderrText ) )
 		if exception is not None:
-			exceptionView = GenericPerspectiveInnerFragment( exception )   if bUseGenericPerspecitveForException   else InnerFragment( exception )
+			exceptionView = InnerFragment( exception )
+			if bUseGenericPerspecitveForException:
+				exceptionView = ApplyPerspective.generic( exceptionView )
 			boxContents.append( execException( exceptionView ) )
 		if stdoutText is not None:
 			boxContents.append( execStdout( stdoutText ) )
 		if resultInTuple is not None:
-			resultView = GenericPerspectiveInnerFragment( resultInTuple[0] )   if bUseGenericPerspectiveForResult   else InnerFragment( resultInTuple[0] )
+			resultView = InnerFragment( resultInTuple[0] )
+			if bUseGenericPerspectiveForResult:
+				resultView = ApplyPerspective.generic( resultView )
 			boxContents.append( execResult( resultView ) )
 		
 		if len( boxContents ) > 0:

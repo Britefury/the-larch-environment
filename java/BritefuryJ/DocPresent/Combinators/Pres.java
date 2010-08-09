@@ -18,6 +18,7 @@ import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
+import BritefuryJ.GSym.PresCom.InnerFragment;
 import BritefuryJ.Math.Point2;
 
 public abstract class Pres
@@ -355,7 +356,7 @@ public abstract class Pres
 		}
 		else
 		{
-			return new PresentObject( x );
+			return new InnerFragment( x );
 		}
 	}
 

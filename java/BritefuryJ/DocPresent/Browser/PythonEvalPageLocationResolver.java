@@ -18,6 +18,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Head;
+import BritefuryJ.DocPresent.Combinators.RichText.Page;
 import BritefuryJ.DocPresent.Combinators.RichText.TitleBar;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
@@ -37,7 +38,7 @@ public class PythonEvalPageLocationResolver implements PageLocationResolver
 	
 	
 	@Override
-	public Page resolveLocationAsPage(Location location, PersistentStateStore persistentState)
+	public BrowserPage resolveLocationAsPage(Location location, PersistentStateStore persistentState)
 	{
 		String locationString = location.getLocationString();
 		
@@ -47,10 +48,10 @@ public class PythonEvalPageLocationResolver implements PageLocationResolver
 		}
 		else
 		{
-			Page p;
+			BrowserPage p;
 			try
 			{
-				p = Py.tojava( interpreter.eval( locationString ), Page.class );
+				p = Py.tojava( interpreter.eval( locationString ), BrowserPage.class );
 			}
 			catch (Exception e)
 			{
@@ -66,7 +67,7 @@ public class PythonEvalPageLocationResolver implements PageLocationResolver
 
 
 
-	private static class DefaultRootPage extends Page
+	private static class DefaultRootPage extends BrowserPage
 	{
 		public String getTitle()
 		{
@@ -83,13 +84,13 @@ public class PythonEvalPageLocationResolver implements PageLocationResolver
 			
 			Pres head = new Head( new Pres[] { linkHeader, title } );
 			
-			return new BritefuryJ.DocPresent.Combinators.RichText.Page( new Pres[] { head, contents } ).present();
+			return new Page( new Pres[] { head, contents } ).present();
 		}
 	}
 	
 	
 	
-	private static class ResolveErrorPage extends Page
+	private static class ResolveErrorPage extends BrowserPage
 	{
 		private String location;
 		private Exception exception;
@@ -126,7 +127,7 @@ public class PythonEvalPageLocationResolver implements PageLocationResolver
 			Pres body = new Body( new Pres[] { errorTitle, loc, excClass, excText } );
 			
 			
-			return new BritefuryJ.DocPresent.Combinators.RichText.Page( new Pres[] { head, body } ).present();
+			return new Page( new Pres[] { head, body } ).present();
 		}
 	}
 

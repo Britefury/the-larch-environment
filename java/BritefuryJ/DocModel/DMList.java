@@ -23,6 +23,7 @@ import org.python.core.Py;
 import org.python.core.PySlice;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.CommandHistory.CommandTracker;
 import BritefuryJ.CommandHistory.CommandTrackerFactory;
 import BritefuryJ.CommandHistory.Trackable;
@@ -1136,6 +1137,11 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	public void setTracker(CommandTracker tracker)
 	{
 		commandTracker = (DMListCommandTracker)tracker;
+	}
+	
+	public CommandHistory getCommandHistory()
+	{
+		return commandTracker.getCommandHistory();
 	}
 	
 	

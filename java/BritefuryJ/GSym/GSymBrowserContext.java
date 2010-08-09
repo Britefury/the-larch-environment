@@ -14,7 +14,7 @@ import org.python.core.__builtin__;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Browser.Location;
-import BritefuryJ.DocPresent.Browser.Page;
+import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.DocPresent.Browser.PageLocationResolver;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
@@ -23,6 +23,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Head;
+import BritefuryJ.DocPresent.Combinators.RichText.Page;
 import BritefuryJ.DocPresent.Combinators.RichText.TitleBar;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
@@ -61,11 +62,11 @@ public class GSymBrowserContext
 		}
 		
 		
-		private Page page;
+		private BrowserPage page;
 		private PagePerspective perspective = new PagePerspective();
 		
 		
-		private PageSubject(Page page)
+		private PageSubject(BrowserPage page)
 		{
 			this.page = page;
 		}
@@ -95,7 +96,7 @@ public class GSymBrowserContext
 	
 	private class GSymBrowserContextLocationResolver implements PageLocationResolver
 	{
-		public Page resolveLocationAsPage(Location location, PersistentStateStore persistentState)
+		public BrowserPage resolveLocationAsPage(Location location, PersistentStateStore persistentState)
 		{
 			return GSymBrowserContext.this.resolveLocationAsPage( location, persistentState );
 		}
@@ -187,7 +188,7 @@ public class GSymBrowserContext
 	
 	
 	
-	private Object resolveLocationAsObject(Location location)
+	public Object resolveLocationAsObject(Location location)
 	{
 		String locationString = location.getLocationString();
 		
@@ -215,9 +216,9 @@ public class GSymBrowserContext
 		{
 			return (GSymSubject)result;
 		}
-		else if ( result instanceof Page )
+		else if ( result instanceof BrowserPage )
 		{
-			return new PageSubject( (Page)result );
+			return new PageSubject( (BrowserPage)result );
 		}
 		else
 		{
@@ -226,7 +227,7 @@ public class GSymBrowserContext
 	}
 	
 	
-	public Page resolveLocationAsPage(Location location, PersistentStateStore persistentState)
+	public BrowserPage resolveLocationAsPage(Location location, PersistentStateStore persistentState)
 	{
 		GSymSubject subject = resolveLocationAsSubject( location );
 		GSymView view = new GSymView( subject, this, persistentState );
@@ -239,7 +240,7 @@ public class GSymBrowserContext
 	
 	
 
-	private static class DefaultRootPage extends Page
+	private static class DefaultRootPage extends BrowserPage
 	{
 		public String getTitle()
 		{
@@ -256,7 +257,7 @@ public class GSymBrowserContext
 			
 			Pres head = new Head( new Pres[] { linkHeader, title } );
 			
-			return new BritefuryJ.DocPresent.Combinators.RichText.Page( new Pres[] { head, contents } ).present();
+			return new Page( new Pres[] { head, contents } ).present();
 		}
 	}
 	

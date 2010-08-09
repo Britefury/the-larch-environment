@@ -43,7 +43,6 @@ import BritefuryJ.DocPresent.Combinators.Sequence.TrailingSeparator;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ErrorBoxWithFields;
-import BritefuryJ.GSym.GenericPerspective.PresCom.GenericPerspectiveInnerFragment;
 import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBorder;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
@@ -53,6 +52,7 @@ import BritefuryJ.GSym.GenericPerspective.PresCom.VerticalField;
 import BritefuryJ.GSym.ObjectPresentation.GSymObjectPresenterRegistry;
 import BritefuryJ.GSym.ObjectPresentation.ObjectPresenter;
 import BritefuryJ.GSym.ObjectPresentation.PyObjectPresenter;
+import BritefuryJ.GSym.PresCom.InnerFragment;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
 public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegistry
@@ -171,7 +171,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 			ArrayList<Object> itemViews = new ArrayList<Object>();
 			for (Object item: tuple)
 			{
-				itemViews.add( new GenericPerspectiveInnerFragment( item ) );
+				itemViews.add( new InnerFragment( item ) );
 			}
 			
 			return tupleView( itemViews );
@@ -359,7 +359,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 			}
 			
 			Pres fields[] = {
-					new VerticalField( "Message", new GenericPerspectiveInnerFragment( e.value ) ),
+					new VerticalField( "Message", new InnerFragment( e.value ) ),
 					new VerticalField( "Traceback", new VBox( stackTraceElements ) )
 			};
 			
@@ -387,7 +387,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 			}
 			
 			Pres fields[] = {
-					new VerticalField( "Message", new GenericPerspectiveInnerFragment( e.getMessage() ) ),
+					new VerticalField( "Message", new InnerFragment( e.getMessage() ) ),
 					new VerticalField( "Traceback", new VBox( stackTraceElements ) )
 			};
 			
@@ -406,7 +406,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 			ArrayList<Object> itemViews = new ArrayList<Object>();
 			for (Object item: list)
 			{
-				itemViews.add( new GenericPerspectiveInnerFragment( item ) );
+				itemViews.add( new InnerFragment( item ) );
 			}
 			
 			return listView( itemViews );
@@ -422,11 +422,11 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 			ArrayList<Object> itemViews = new ArrayList<Object>();
 			for (Map.Entry<?,?> entry: map.entrySet())
 			{
-				Pres lineElems[] = { new GenericPerspectiveInnerFragment( entry.getKey() ),
+				Pres lineElems[] = { new InnerFragment( entry.getKey() ),
 						staticStyle.applyTo( new Whitespace( " ", 10.0 ) ),
 						delimStyle.applyTo( new StaticText( ":" ) ),
 						staticStyle.applyTo( new Whitespace( " ", 10.0 ) ),
-						new GenericPerspectiveInnerFragment( entry.getValue() ) };
+						new InnerFragment( entry.getValue() ) };
 				itemViews.add( new Span( lineElems ) );
 			}
 			

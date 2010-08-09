@@ -39,8 +39,7 @@ from BritefuryJ.DocPresent.Combinators.Primitive import *
 from BritefuryJ.GSym import GSymPerspective, GSymSubject
 from BritefuryJ.GSym.View import GSymFragmentView
 
-from BritefuryJ.GSym.GenericPerspective.PresCom import GenericPerspectiveInnerFragment
-from BritefuryJ.GSym.PresCom import InnerFragment, PerspectiveInnerFragment
+from BritefuryJ.GSym.PresCom import InnerFragment, ApplyPerspective, PerspectiveInnerFragment
 
 from GSymCore.Languages.Python25 import Python25
 from GSymCore.Languages.Python25.Execution.ExecutionPresCombinators import execStdout, execStdout, execException, execResult
@@ -169,9 +168,9 @@ class ConsoleView (GSymViewObjectDispatch):
 		stdout = executionResult.getStdOut()
 		stderr = executionResult.getStdErr()
 		
-		moduleView = StyleSheet.instance.withAttr( Primitive.editable, False ).applyTo( PerspectiveInnerFragment( Python25.python25EditorPerspective, pythonModule ) )
-		caughtExceptionView = GenericPerspectiveInnerFragment( caughtException )   if caughtException is not None   else None
-		resultView = GenericPerspectiveInnerFragment( result[0] )   if result is not None   else None
+		moduleView = StyleSheet.instance.withAttr( Primitive.editable, False ).applyTo( Python25.python25EditorPerspective( pythonModule ) )
+		caughtExceptionView = ApplyPerspective.generic( InnerFragment( caughtException ) )   if caughtException is not None   else None
+		resultView = ApplyPerspective.generic( InnerFragment( result[0] ) )   if result is not None   else None
 			
 		blockContents = []
 		blockContents.append( _pythonModuleBorderStyle.applyTo( Border( moduleView.alignHExpand() ).alignHExpand() ) )

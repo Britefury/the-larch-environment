@@ -11,5 +11,5 @@ import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 
 public interface PageLocationResolver
 {
-	public Page resolveLocationAsPage(Location location, PersistentStateStore persistentState);
+	public BrowserPage resolveLocationAsPage(Location location, PersistentStateStore persistentState);
 }
