@@ -23,6 +23,7 @@ import org.python.core.PyString;
 import org.python.core.PyUnicode;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.CommandHistory.CommandTracker;
 import BritefuryJ.CommandHistory.CommandTrackerFactory;
 import BritefuryJ.CommandHistory.Trackable;
@@ -719,6 +720,11 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	public void setTracker(CommandTracker tracker)
 	{
 		commandTracker = (DMObjectCommandTracker)tracker;
+	}
+	
+	public CommandHistory getCommandHistory()
+	{
+		return commandTracker.getCommandHistory();
 	}
 	
 	

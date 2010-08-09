@@ -61,7 +61,7 @@ public class Browser
 	private BrowserHistory history;
 	
 	private PageLocationResolver resolver;
-	private Page page;
+	private BrowserPage page;
 	private BrowserListener listener;
 	private CommandHistoryListener commandHistoryListener;
 	
@@ -256,7 +256,7 @@ public class Browser
 		Location location = history.getCurrentState().getLocation();
 		
 		PersistentStateStore stateStore = history.getCurrentState().getPagePersistentState();
-		Page p = resolver.resolveLocationAsPage( location, stateStore );
+		BrowserPage p = resolver.resolveLocationAsPage( location, stateStore );
 
 		viewport = makeViewport( p.getContentsElement().alignHExpand(), history.getCurrentState().getViewportState() );
 		presComponent.getRootElement().setChild( viewport.getElement().alignHExpand().alignVExpand() );
@@ -265,7 +265,7 @@ public class Browser
 		setPage( p );
 	}
 	
-	private void setPage(Page p)
+	private void setPage(BrowserPage p)
 	{
 		if ( p != page )
 		{

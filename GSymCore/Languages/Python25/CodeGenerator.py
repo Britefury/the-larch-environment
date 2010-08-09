@@ -679,7 +679,7 @@ def compileForExecution(pythonModule, filename):
 	source = python25CodeGeneratorWithErrorChecking( pythonModule )
 	return compile( source, filename, 'exec' )
 
-	
+
 def compileForExecutionAndEvaluation(pythonModule, filename):
 	execModule = None
 	evalExpr = None

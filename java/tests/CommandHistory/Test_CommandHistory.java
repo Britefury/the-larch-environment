@@ -164,6 +164,11 @@ public class Test_CommandHistory extends TestCase
 		{
 			this.tracker = (DataCommandTracker)tracker;
 		}
+		
+		public CommandHistory getCommandHistory()
+		{
+			return tracker.getCommandHistory();
+		}
 	}
 	
 	

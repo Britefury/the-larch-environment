@@ -17,7 +17,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.DPVBox;
 import BritefuryJ.DocPresent.PresentationComponent;
-import BritefuryJ.DocPresent.Browser.Page;
+import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
@@ -594,7 +594,7 @@ public class GSymView extends IncrementalTree
 		return browserContext;
 	}
 	
-	public Page getPage()
+	public BrowserPage getPage()
 	{
 		return page;
 	}

@@ -13,7 +13,7 @@ import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.PageController;
 import BritefuryJ.DocPresent.Browser.Location;
-import BritefuryJ.DocPresent.Browser.Page;
+import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
@@ -22,7 +22,7 @@ import BritefuryJ.GSym.GSymBrowserContext;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Logging.LogView;
 
-public class GSymViewPage extends Page
+public class GSymViewPage extends BrowserPage
 {
 	private DPElement element;
 	private Hyperlink logLink;

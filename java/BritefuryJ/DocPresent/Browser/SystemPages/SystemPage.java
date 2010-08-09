@@ -9,13 +9,14 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Browser.Page;
+import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.RichText.Head;
 import BritefuryJ.DocPresent.Combinators.RichText.NormalText;
+import BritefuryJ.DocPresent.Combinators.RichText.Page;
 import BritefuryJ.DocPresent.Combinators.RichText.TitleBar;
 
-public abstract class SystemPage extends Page
+public abstract class SystemPage extends BrowserPage
 {
 	public DPElement getContentsElement()
 	{
@@ -33,7 +34,7 @@ public abstract class SystemPage extends Page
 		}
 		pageChildren.add( createContents().alignHExpand() );
 		
-		return new BritefuryJ.DocPresent.Combinators.RichText.Page( pageChildren ).present();
+		return new Page( pageChildren ).present();
 	}
 
 

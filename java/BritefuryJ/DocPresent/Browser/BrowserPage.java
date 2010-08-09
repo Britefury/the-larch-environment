@@ -11,7 +11,7 @@ import BritefuryJ.CommandHistory.CommandHistoryListener;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 
-public abstract class Page
+public abstract class BrowserPage
 {
 	public abstract String getTitle();
 	public abstract DPElement getContentsElement();

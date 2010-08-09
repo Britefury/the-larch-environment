@@ -10,34 +10,12 @@ import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.GSym.GenericPerspective.Presentable;
-import BritefuryJ.GSym.PresCom.InnerFragment;
+import BritefuryJ.GSym.PresCom.ApplyPerspective;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
 
 public abstract class GSymAbstractPerspective
 {
-	private class ProjectionPresentable implements Presentable
-	{
-		private Object model;
-		private StyleSheet styleSheet;
-		
-		
-		public ProjectionPresentable(Object x, StyleSheet styleSheet)
-		{
-			this.model = x;
-			this.styleSheet = styleSheet;
-		}
-
-		
-		@Override
-		public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
-		{
-			return styleSheet.applyTo( new InnerFragment( model ) );
-		}
-	}
-	
-	
 	public abstract Pres present(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState);
 	
 	public StyleSheet getStyleSheet()
@@ -49,13 +27,13 @@ public abstract class GSymAbstractPerspective
 	public abstract EditHandler getEditHandler();
 
 	
-	public Presentable project(Object x)
+	public ApplyPerspective applyTo(Object x)
 	{
-		return new ProjectionPresentable( x, getStyleSheet() );
+		return new ApplyPerspective( this, x );
 	}
-
-	public Presentable project(Object x, StyleSheet styleSheet)
+	
+	public ApplyPerspective __call__(Object x)
 	{
-		return new ProjectionPresentable( x, styleSheet );
+		return new ApplyPerspective( this, x );
 	}
 }

@@ -17,10 +17,9 @@ import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
-import BritefuryJ.GSym.GenericPerspective.PresCom.GenericPerspectiveInnerFragment;
-import BritefuryJ.GSym.GenericPerspective.PresCom.GenericPerspectivePres;
 import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
+import BritefuryJ.GSym.PresCom.ApplyPerspective;
 import BritefuryJ.GSym.PresCom.InnerFragment;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
@@ -70,16 +69,6 @@ public abstract class CellInterface implements IncrementalOwner, Presentable
 	
 	
 	
-	public ValuePres valuePres()
-	{
-		return new ValuePres( this );
-	}
-	
-	public Pres genericPerspecitveValuePres()
-	{
-		return new GenericPerspectivePres( new ValuePres( this ) );
-	}
-	
 	public Pres valuePresInFragment()
 	{
 		return new InnerFragment( new ValuePres( this ) );
@@ -87,7 +76,7 @@ public abstract class CellInterface implements IncrementalOwner, Presentable
 	
 	public Pres genericPerspectiveValuePresInFragment()
 	{
-		return new GenericPerspectiveInnerFragment( new ValuePres( this ) );
+		return ApplyPerspective.generic( new InnerFragment( new ValuePres( this ) ) );
 	}
 	
 	

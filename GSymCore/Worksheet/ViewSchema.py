@@ -10,7 +10,7 @@ from weakref import WeakKeyDictionary
 from BritefuryJ.Incremental import IncrementalOwner, IncrementalValueMonitor
 from BritefuryJ.Cell import Cell
 
-from BritefuryJ.GSym.GenericPerspective.PresCom import GenericPerspectiveInnerFragment
+from BritefuryJ.GSym.PresCom import InnerFragment
 
 
 from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod, dmObjectNodeMethodDispatch
@@ -63,7 +63,7 @@ class NodeView (object):
 		return True
 	
 	def __present__(self, fragment, inheritedState):
-		return GenericPerspectiveInnerFragment( self._model )
+		return InnerFragment( self._model )
 	
 	def _viewOf(self, model):
 		return self._worksheet._viewOf( model )

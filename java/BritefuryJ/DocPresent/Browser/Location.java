@@ -7,8 +7,6 @@
 package BritefuryJ.DocPresent.Browser;
 
 import java.awt.Color;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
@@ -22,98 +20,6 @@ import BritefuryJ.GSym.View.GSymFragmentView;
 
 public class Location implements Presentable
 {
-	public static class TokenIterator
-	{
-		private Location loc;
-		private TokenIterator parent;
-		private int position;
-		
-		
-		protected TokenIterator(Location loc, TokenIterator parent, int pos)
-		{
-			this.loc = loc;
-			this.parent = parent;
-			this.position = pos;
-		}
-		
-		
-		public Location getLocation()
-		{
-			return loc;
-		}
-		
-		public String getPrefix()
-		{
-			return loc.locationString.substring( 0, position );
-		}
-		
-		public String getSuffix()
-		{
-			return loc.locationString.substring( position, loc.locationString.length() );
-		}
-		
-		public String lastToken()
-		{
-			int start = parent != null  ?  parent.position  :  0;
-			return loc.locationString.substring( start, position );
-		}
-		
-		public TokenIterator back()
-		{
-			return parent;
-		}
-		
-		public TokenIterator consumeLiteral(String value)
-		{
-			if ( ( ( position + value.length() ) <= loc.locationString.length() )  &&  loc.locationString.subSequence( position, position + value.length()).equals( value ) )
-			{
-				return new TokenIterator( loc, this, position + value.length() );
-			}
-			else
-			{
-				return null;
-			}
-		}
-		
-		public TokenIterator consumeUpTo(String pattern)
-		{
-			String suffix = getSuffix();
-			int index = suffix.indexOf( pattern );
-			if ( index == -1 )
-			{
-				return new TokenIterator( loc, this, loc.locationString.length() );
-			}
-			else
-			{
-				return new TokenIterator( loc, this, position + index );
-			}
-		}
-
-		public TokenIterator consumeRegex(Pattern pattern)
-		{
-			String input = loc.locationString;
-			Matcher m = pattern.matcher( input.subSequence( position, input.length() ) );
-			
-			boolean bFound = m.find();
-			if ( bFound  &&  m.start() == 0  &&  m.end() > 0 )
-			{
-				String match = m.group();
-				return new TokenIterator( loc, this, position + match.length() );
-			}
-			else
-			{
-				return null;
-			}
-		}
-		
-		public TokenIterator consumeRemainder()
-		{
-			return new TokenIterator( loc, this, loc.locationString.length() );
-		}
-	}
-	
-	
-	
 	//
 	//
 	// PRESENTABLE
@@ -148,12 +54,6 @@ public class Location implements Presentable
 	public Location(String loc)
 	{
 		this.locationString = loc;
-	}
-	
-	
-	public TokenIterator iterator()
-	{
-		return new TokenIterator( this, null, 0 );
 	}
 	
 	

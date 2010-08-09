@@ -11,13 +11,14 @@ import java.util.ArrayList;
 import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Browser.Location;
-import BritefuryJ.DocPresent.Browser.Page;
+import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.RichText.Head;
 import BritefuryJ.DocPresent.Combinators.RichText.LinkHeaderBar;
+import BritefuryJ.DocPresent.Combinators.RichText.Page;
 import BritefuryJ.DocPresent.Combinators.RichText.TitleBar;
 
-public class SystemRootPage extends Page
+public class SystemRootPage extends BrowserPage
 {
 	public static final TestsDirectory tests = new TestsDirectory();
 	
@@ -41,7 +42,7 @@ public class SystemRootPage extends Page
 		
 		Pres head = new Head( new Pres[] { createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE ), title } );
 		
-		return new BritefuryJ.DocPresent.Combinators.RichText.Page( new Pres[] { head, tests.createContents() } ).present();
+		return new Page( new Pres[] { head, tests.createContents() } ).present();
 	}
 
 	
