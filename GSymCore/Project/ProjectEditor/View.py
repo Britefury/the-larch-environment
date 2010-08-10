@@ -503,9 +503,13 @@ class ProjectSubject (GSymSubject):
 	
 	
 	def __getattr__(self, name):
-		if name == self._model['rootPackage']['name']:
-			return PackageSubject( self, self._model['rootPackage'], self._location + '.' + name )
-		else:
-			raise AttributeError
+		for item in self._model['contents']:
+			if name == item['name']:
+				itemLocation = self._location + '.' + name
+				if item.isInstanceOf( Schema.Package ):
+					return PackageSubject( self, item, itemLocation )
+				elif item.isInstanceOf( Schema.Page ):
+					return self._document.newUnitSubject( item['unit'], self, itemLocation )
+		raise AttributeError, "Did not find item for '%s'"  %  ( name, )
 
 	
