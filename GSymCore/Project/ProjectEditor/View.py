@@ -215,14 +215,43 @@ def _packageDrop(element, targetPos, data, action):
 	return False
 
 
+def _projectIndexDrop(element, targetPos, data, action):
+	if action & ObjectDndHandler.COPY_OR_MOVE  !=  0:
+		return False
+		
+		#targetPackage = element.getFragmentContext().getModel()
+		#if targetPos.x > ( element.getWidth() * 0.5 ):
+			#pass
+		#else:
+			#parent = targetPackage.getValidParents()[0]
+			#index = parent.indexOfById( targetPackage )
+			#if targetPos.y > ( element.getHeight() * 0.5 ):
+				#index += 1
+			
+			#source = data.source.deepCopy()   if action == ObjectDndHandler.COPY   else data.source
+			
+			#if action == ObjectDndHandler.MOVE:
+				#sourceParent = data.source.getValidParents()[0]
+				#indexOfSource = sourceParent.indexOfById( data.source )
+				#del sourceParent[indexOfSource]
+				#if parent is sourceParent  and  index > indexOfSource:
+					#index -= 1
+
+		#parent.insert( index, source )
+		#return True
+	return False
+
+
 _pageDropDest = ObjectDndHandler.DropDest( ProjectDrag, _pageCanDrop, _pageDrop )
 _packageDropDest = ObjectDndHandler.DropDest( ProjectDrag, _packageCanDrop, _packageDrop )
+_projectIndexDropDest = ObjectDndHandler.DropDest( ProjectDrag, _projectIndexDrop )
 
 
 
 
 _controlsStyle = StyleSheet.instance.withAttr( Controls.bClosePopupOnActivate, True )
 _projectControlsStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 2.0, 2.0, Color( 131, 149, 172 ), None ) ).withAttr( Primitive.hboxSpacing, 30.0 )
+_projectIndexNameStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.25, 0.5 ) ).withAttr( Primitive.fontBold, True ).withAttr( Primitive.fontSize, 14 )
 _packageNameStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.0, 0.5 ) ).withAttr( Primitive.fontBold, True ).withAttr( Primitive.fontSize, 14 )
 _itemHoverHighlightStyle = StyleSheet.instance.withAttr( Primitive.hoverBackground, FilledOutlinePainter( Color( 0.8, 0.825, 0.9 ), Color( 0.125, 0.341, 0.574 ), BasicStroke( 1.0 ) ) )
 
@@ -236,7 +265,8 @@ _nameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*' )
 
 class ProjectView (GSymViewObjectNodeDispatch):
 	@DMObjectNodeDispatchMethod( Schema.Project )
-	def Project(self, ctx, state, node, rootPackage):
+	def Project(self, ctx, state, node, contents):
+		# Save and Save As
 		def _onSave(link, buttonEvent):
 			if document._filename is None:
 				def handleSaveDocumentAsFn(filename):
@@ -253,31 +283,78 @@ class ProjectView (GSymViewObjectNodeDispatch):
 			
 			DocumentManagement.promptSaveDocumentAs( ctx.getSubjectContext()['world'], link.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn )
 		
+			
+
+		# Project index
+		def _addPackage(menuItem):
+			contents.append( Schema.Package( name='NewPackage', contents=[] ) )
+
+		def _addPage(pageUnit):
+			p = Schema.Page( name='NewPage', unit=pageUnit )
+			contents.append( p )
 		
+		def _importPage(name, pageUnit):
+			contents.append( Schema.Page( name=name, unit=pageUnit ) )
+
+		def _projectIndexContextMenuFactory(element, menu):
+			menu.add( MenuItem.menuItemWithLabel( 'New package', _addPackage ) )
+			newPageMenu = _newPageMenu( world, _addPage )
+			importPageMenu = _importPageMenu( world, element.getRootElement().getComponent(), _importPage )
+			menu.add( MenuItem.menuItemWithLabel( 'New page', newPageMenu, MenuItem.SubmenuPopupDirection.RIGHT ) )
+			menu.add( MenuItem.menuItemWithLabel( 'Import page', importPageMenu, MenuItem.SubmenuPopupDirection.RIGHT ) )
+			return True
+
+		
+		
+		# Get some initial variables
 		subjectContext = ctx.getSubjectContext()
 		document = subjectContext['document']
 		location = subjectContext['location']
 		
 		name = document.getDocumentName()
 		
+		# Set location attribute of state
 		state = state.withAttrs( location=location )
-		rootView = InnerFragment( rootPackage, state.withAttrs( projectRootPackage=True ) ).alignHExpand()
-		
 
+		# Link to home page, in link header bar
 		homeLink = Hyperlink( 'HOME PAGE', Location( '' ) )
 		linkHeader = LinkHeaderBar( [ homeLink ] )
 		
+		# Title
 		title = TitleBarWithSubtitle( 'DOCUMENT', name )
 		
 		
+		# Controls for 'save' and 'save as'
 		saveLink = Hyperlink( 'SAVE', _onSave )
 		saveAsLink = Hyperlink( 'SAVE AS', _onSaveAs )
 		controlsBox = HBox( [ saveLink.padX( 10.0 ), saveAsLink.padX( 10.0 ) ] )
 		controlsBorder = _projectControlsStyle.applyTo( Border( controlsBox ) )
 		
-		indexHeader = Heading3( 'Project Index' )
-		projectIndex = VBox( [ indexHeader, rootView.alignHExpand() ] )
 		
+		# Project index
+		indexHeader = Heading3( 'Project Index' )
+		
+		
+		# Project contents
+		items = InnerFragment.map( contents, state )
+		
+		world = ctx.getSubjectContext()['world']
+		
+		nameElement = _projectIndexNameStyle.applyTo( StaticText( 'Project' ) )
+		nameBox = _itemHoverHighlightStyle.applyTo( nameElement.alignVCentre() )
+		nameBox = nameBox.withContextMenuFactory( _projectIndexContextMenuFactory )
+		nameBox = nameBox.withDropDest( _projectIndexDropDest )
+		
+		itemsBox = VBox( items )
+		
+		contentsView = VBox( [ nameBox, itemsBox.padX( _packageContentsIndentation, 0.0 ).alignHExpand() ] )
+		
+		
+		# Project index box
+		projectIndex = VBox( [ indexHeader, contentsView.alignHExpand() ] )
+		
+		
+		# The page
 		head = Head( [ linkHeader, title ] )
 		body = Body( [ controlsBorder.pad( 5.0, 10.0 ).alignHLeft(), projectIndex ] )
 		

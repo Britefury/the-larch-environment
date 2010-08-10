@@ -137,10 +137,12 @@ public class GSymView extends IncrementalTree
 			}
 			catch (Exception e)
 			{
+				GSymAbstractPerspective genericPerspective = view.browserContext.getGenericPerspective();
 				try
 				{
-					Pres exceptionView = view.browserContext.getGenericPerspective().present( e, fragmentView, inheritedState );
+					Pres exceptionView = genericPerspective.present( e, fragmentView, inheritedState );
 					fragment = new ErrorBox( "Presentation error - exception during presentation", exceptionView );
+					return fragment.present( new PresentationContext( fragmentView, genericPerspective, inheritedState ), style );
 				}
 				catch (Exception e2)
 				{
@@ -149,6 +151,7 @@ public class GSymView extends IncrementalTree
 							exceptionStyle.applyTo( new StaticText( e2.toString() ) ).padX( 15.0, 0.0 ),
 							labelStyle.applyTo( new StaticText( "While trying to display exception:" ) ),
 							exceptionStyle.applyTo( new StaticText( e.toString() ) ).padX( 15.0, 0.0 )   } ) );
+					return fragment.present( new PresentationContext( fragmentView, genericPerspective, inheritedState ), style );
 				}
 			}
 			

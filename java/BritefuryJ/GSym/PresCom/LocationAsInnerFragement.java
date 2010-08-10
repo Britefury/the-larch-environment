@@ -29,6 +29,6 @@ public class LocationAsInnerFragement extends Pres
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
 		GSymFragmentView fragment = ctx.getFragment();
-		return fragment.presentLocationAsElement( location, ctx.getPerspective(), style, ctx.getInheritedState() );
+		return fragment.presentLocationAsElement( location, style, ctx.getInheritedState() );
 	}
 }
