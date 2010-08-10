@@ -313,9 +313,10 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	
 	
 	
-	public DPElement presentLocationAsElement(Location location, GSymAbstractPerspective perspective, StyleValues style, SimpleAttributeTable inheritedState)
+	public DPElement presentLocationAsElement(Location location, StyleValues style, SimpleAttributeTable inheritedState)
 	{
 		GSymSubject subject = getBrowserContext().resolveLocationAsSubject( location );
+		GSymAbstractPerspective perspective = subject.getPerspective();
 		DPElement e = presentInnerFragment( subject.getFocus(), perspective, subject.getSubjectContext(), style, inheritedState );
 		return perspectiveFragmentRegion( e, perspective );
 	}

@@ -10,12 +10,27 @@ from BritefuryJ.DocModel import DMSchema, DMObjectClass
 
 
 
-schema = DMSchema( 'GSymProject', 'prj', 'GSymCore.Project' )
+schema = DMSchema( 'GSymProject', 'prj', 'GSymCore.Project', 2 )
 
 
 
-Project = schema.newClass( 'Project', [ 'rootPackage' ] )
+Project = schema.newClass( 'Project', [ 'contents' ] )
 
 Package = schema.newClass( 'Package', [ 'name', 'contents' ] )
 Page = schema.newClass( 'Page', [ 'name', 'unit' ] )
 
+
+
+#
+#
+# Version 1 backwards compatibility
+#
+#
+
+def _readProject_v1(fieldValues):
+	# V1 included the title as a field in the worksheet node. Create a title paragraph to replace it.
+	rootPackage = fieldValues['rootPackage']
+	
+	return Project( contents=rootPackage['contents'] )
+
+schema.registerReader( 'Project', 1, _readProject_v1 )

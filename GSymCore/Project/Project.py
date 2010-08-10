@@ -13,8 +13,7 @@ from GSymCore.Project import Schema
 
 
 def newProject():
-	package = Schema.Package( name='Root', contents=[] )
-	project = Schema.Project( rootPackage=package )
+	project = Schema.Project( contents=[] )
 	return project
 
 def _newProjectUnit():

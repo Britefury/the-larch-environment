@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.GSym.PresCom;
 
-import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
@@ -16,21 +15,12 @@ import BritefuryJ.GSym.GSymAbstractPerspective;
 public class ApplyPerspective extends Pres
 {
 	private GSymAbstractPerspective perspective;
-	private SimpleAttributeTable inheritedState;
 	private Pres child;
 	
-	
-	public ApplyPerspective(GSymAbstractPerspective perspective, SimpleAttributeTable inheritedState, Object child)
-	{
-		this.perspective = perspective;
-		this.inheritedState = inheritedState;
-		this.child = coerce( child );
-	}
 	
 	public ApplyPerspective(GSymAbstractPerspective perspective, Object child)
 	{
 		this.perspective = perspective;
-		this.inheritedState = null;
 		this.child = coerce( child );
 	}
 	
@@ -50,8 +40,6 @@ public class ApplyPerspective extends Pres
 			p = ctx.getFragment().getBrowserContext().getGenericPerspective();
 		}
 		
-		SimpleAttributeTable s = inheritedState != null  ?  ctx.getInheritedState().withAttrs( inheritedState )  :  ctx.getInheritedState();
-		
-		return child.present( new PresentationContext( ctx.getFragment(), p, s ), style );
+		return child.present( new PresentationContext( ctx.getFragment(), p, ctx.getInheritedState() ), style );
 	}
 }
