@@ -15,7 +15,19 @@ import BritefuryJ.GSym.View.GSymFragmentView;
 
 public abstract class GSymAbstractPerspective
 {
-	public abstract Pres present(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState);
+	protected abstract Pres presentModel(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState);
+	
+	public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	{
+		if ( x instanceof Pres )
+		{
+			return (Pres)x;
+		}
+		else
+		{
+			return presentModel( x, fragment, inheritedState );
+		}
+	}
 	
 	public abstract EditHandler getEditHandler();
 

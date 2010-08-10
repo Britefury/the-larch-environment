@@ -41,19 +41,13 @@ public abstract class GSymObjectPresentationPerspective extends GSymAbstractPers
 	
 
 	@Override
-	public Pres present(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	protected Pres presentModel(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		Pres result = null;
 		
 		
 		PyObject pyX = null;
 		
-		// First, see if is a subclass of Pres, if so, just return it:
-		if ( x instanceof Pres )
-		{
-			return (Pres)x;
-		}
-
 		// Java object presentation protocol - Java interface
 		result = presentWithJavaInterface( x, fragment, inheritedState );
 		

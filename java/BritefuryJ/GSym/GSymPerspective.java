@@ -32,7 +32,7 @@ public class GSymPerspective extends GSymAbstractPerspective
 	
 	
 	@Override
-	public Pres present(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	protected Pres presentModel(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return fragmentViewFn.createViewFragment( x, fragment, inheritedState );
 	}
