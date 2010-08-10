@@ -43,7 +43,7 @@ public class GSymBrowserContext
 		private class PagePerspective extends GSymAbstractPerspective
 		{
 			@Override
-			public Pres present(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+			protected Pres presentModel(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 			{
 				return Pres.coerce( page.getContentsElement() );
 			}

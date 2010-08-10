@@ -133,14 +133,14 @@ public class GSymView extends IncrementalTree
 			Pres fragment;
 			try
 			{
-				fragment = perspective.present( model, fragmentView, inheritedState );
+				fragment = perspective.presentObject( model, fragmentView, inheritedState );
 			}
 			catch (Exception e)
 			{
 				GSymAbstractPerspective genericPerspective = view.browserContext.getGenericPerspective();
 				try
 				{
-					Pres exceptionView = genericPerspective.present( e, fragmentView, inheritedState );
+					Pres exceptionView = genericPerspective.presentObject( e, fragmentView, inheritedState );
 					fragment = new ErrorBox( "Presentation error - exception during presentation", exceptionView );
 					return fragment.present( new PresentationContext( fragmentView, genericPerspective, inheritedState ), style );
 				}
