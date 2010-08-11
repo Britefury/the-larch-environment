@@ -26,7 +26,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
+import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
@@ -84,7 +84,7 @@ public class TextEntryTestPage extends SystemPage
 			private class LinkListener implements Hyperlink.LinkListener
 			{
 				
-				public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonEvent event)
+				public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonClickedEvent event)
 				{
 					status.setText( "" );
 					entry.setText( link.getText() );

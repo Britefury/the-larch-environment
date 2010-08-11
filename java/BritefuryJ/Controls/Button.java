@@ -14,7 +14,7 @@ import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
+import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
@@ -23,7 +23,7 @@ public class Button extends ControlPres
 {
 	public static interface ButtonListener
 	{
-		public void onButtonClicked(ButtonControl button, PointerButtonEvent event);
+		public void onButtonClicked(ButtonControl button, PointerButtonClickedEvent event);
 	}
 	
 	
@@ -36,12 +36,7 @@ public class Button extends ControlPres
 			}
 			
 			
-			public boolean onButtonDown(DPElement element, PointerButtonEvent event)
-			{
-				return true;
-			}
-	
-			public boolean onButtonUp(DPElement element, PointerButtonEvent event)
+			public boolean onButtonClicked(DPElement element, PointerButtonClickedEvent event)
 			{
 				if ( element.isRealised() )
 				{

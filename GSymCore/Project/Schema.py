@@ -14,7 +14,7 @@ schema = DMSchema( 'GSymProject', 'prj', 'GSymCore.Project', 2 )
 
 
 
-Project = schema.newClass( 'Project', [ 'contents' ] )
+Project = schema.newClass( 'Project', [ 'pythonPackageName', 'contents' ] )
 
 Package = schema.newClass( 'Package', [ 'name', 'contents' ] )
 Page = schema.newClass( 'Page', [ 'name', 'unit' ] )

@@ -24,7 +24,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Span;
 import BritefuryJ.DocPresent.Combinators.Primitive.Text;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
+import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class ProxyAndSpanTestPage extends SystemPage
@@ -102,7 +102,7 @@ public class ProxyAndSpanTestPage extends SystemPage
 		
 		Hyperlink.LinkListener onModifySpanLink = new Hyperlink.LinkListener()
 		{
-			public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonEvent buttonEvent)
+			public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonClickedEvent buttonEvent)
 			{
 				for (DPElement element: spanRef.getElements())
 				{
@@ -138,7 +138,7 @@ public class ProxyAndSpanTestPage extends SystemPage
 		
 		Hyperlink.LinkListener onModifySpanLink = new Hyperlink.LinkListener()
 		{
-			public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonEvent buttonEvent)
+			public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonClickedEvent buttonEvent)
 			{
 				for (DPElement element: spanRef.getElements())
 				{
@@ -157,7 +157,7 @@ public class ProxyAndSpanTestPage extends SystemPage
 		
 		Hyperlink.LinkListener onModifyProxyLink = new Hyperlink.LinkListener()
 		{
-			public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonEvent buttonEvent)
+			public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonClickedEvent buttonEvent)
 			{
 				for (DPElement element: proxyRef.getElements())
 				{

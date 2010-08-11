@@ -285,6 +285,22 @@ class GSymAppSubject (GSymSubject):
 	def getCommandHistory(self):
 		return None
 	
+	
+	def find_module(self, fullname, path=None):
+		for appDocument in self._appState.getOpenDocuments():
+			doc = appDocument.getDocument()
+			subject = doc.newSubject( self, 'main.documents.' + appDocument.getLocation() )
+			try:
+				f = subject.find_module
+			except AttributeError:
+				pass
+			else:
+				result = f( fullname, path )
+				if result is not None:
+					return result
+		return None
+		
+	
 
 
 

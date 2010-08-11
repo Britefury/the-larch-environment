@@ -12,11 +12,11 @@ import BritefuryJ.CommandHistory.CommandHistoryListener;
 import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.PageController;
-import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.BrowserPage;
+import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
+import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.GSym.GSymBrowserContext;
 import BritefuryJ.Logging.Log;
@@ -45,7 +45,7 @@ public class GSymViewPage extends BrowserPage
 		Hyperlink.LinkListener listener = new Hyperlink.LinkListener()
 		{
 			@Override
-			public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonEvent event)
+			public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonClickedEvent event)
 			{
 				log.startRecording();
 				LogView view = new LogView( log );

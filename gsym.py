@@ -30,6 +30,7 @@ def main():
 	UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
 
 	world = GSymWorld()
+	world.enableImportHooks()
 
 	if len( sys.argv ) == 2:
 		filename = sys.argv[1]

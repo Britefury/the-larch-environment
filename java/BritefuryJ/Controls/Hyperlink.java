@@ -15,7 +15,7 @@ import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Text;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
+import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Input.Modifier;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
@@ -24,7 +24,7 @@ public class Hyperlink extends ControlPres
 {
 	public interface LinkListener
 	{
-		public void onLinkClicked(HyperlinkControl link, PointerButtonEvent event);
+		public void onLinkClicked(HyperlinkControl link, PointerButtonClickedEvent event);
 	}
 	
 	private static class LinkTargetListener implements LinkListener
@@ -37,7 +37,7 @@ public class Hyperlink extends ControlPres
 			this.targetLocation = targetLocation;
 		}
 		
-		public void onLinkClicked(HyperlinkControl link, PointerButtonEvent buttonEvent)
+		public void onLinkClicked(HyperlinkControl link, PointerButtonClickedEvent buttonEvent)
 		{
 			PageController pageController = link.getElement().getRootElement().getPageController();
 			if ( ( buttonEvent.getPointer().getModifiers() & Modifier.CTRL ) != 0 )
@@ -104,12 +104,7 @@ public class Hyperlink extends ControlPres
 			{	
 			}
 			
-			public boolean onButtonDown(DPElement element, PointerButtonEvent event)
-			{
-				return true;
-			}
-	
-			public boolean onButtonUp(DPElement element, PointerButtonEvent event)
+			public boolean onButtonClicked(DPElement element, PointerButtonClickedEvent event)
 			{
 				if ( element.isRealised() )
 				{

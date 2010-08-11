@@ -21,7 +21,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
 import BritefuryJ.DocPresent.Combinators.RichText.NormalText;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
+import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class PopupTestPage extends SystemPage
@@ -81,7 +81,7 @@ public class PopupTestPage extends SystemPage
 		
 		Hyperlink.LinkListener popupListener = new Hyperlink.LinkListener()
 		{
-			public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonEvent event)
+			public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonClickedEvent event)
 			{
 				mainMenu.popupToRightOf( link.getElement() );
 			}
