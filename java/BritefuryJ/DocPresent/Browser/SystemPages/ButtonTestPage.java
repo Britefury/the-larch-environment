@@ -20,7 +20,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
 import BritefuryJ.DocPresent.Combinators.RichText.NormalText;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
+import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class ButtonTestPage extends SystemPage
@@ -54,7 +54,7 @@ public class ButtonTestPage extends SystemPage
 		}
 
 
-		public void onButtonClicked(Button.ButtonControl button, PointerButtonEvent event)
+		public void onButtonClicked(Button.ButtonControl button, PointerButtonClickedEvent event)
 		{
 			for (DPElement element: parentElement.getElements())
 			{

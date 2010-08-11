@@ -982,6 +982,8 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			
 			boolean bHandled = rootSpaceMouse.buttonDown( windowPos, button );
 
+			bLastMousePressPositionedCaret = false;
+
 			if ( !bHandled  &&  button == 1  &&  ( modifiers & ( Modifier.ALT | Modifier.ALT_GRAPH | Modifier.CTRL | Modifier.SHIFT ) )  ==  0 )
 			{
 				DPContentLeafEditable leaf = (DPContentLeafEditable)getLeafClosestToLocalPoint( windowPos, new DPContentLeafEditable.EditableLeafElementFilter() );
@@ -993,13 +995,8 @@ public class PresentationComponent extends JComponent implements ComponentListen
 					Marker marker = leaf.markerAtPoint( x.transform( windowPos ) );
 					caret.moveTo( marker );
 					selectionManager.mouseSelectionBegin( marker );
+					bLastMousePressPositionedCaret = true;
 				}
-				
-				bLastMousePressPositionedCaret = true;
-			}
-			else
-			{
-				bLastMousePressPositionedCaret = false;
 			}
 
 			emitImmediateEvents();
@@ -1029,6 +1026,8 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			
 			int modifiers = rootSpaceMouse.getModifiers();
 			
+			boolean bHandled = false;
+			
 			if ( bLastMousePressPositionedCaret  &&  button == 1  &&  ( modifiers & ( Modifier.ALT | Modifier.ALT_GRAPH | Modifier.CTRL | Modifier.SHIFT ) )  ==  0 )
 			{
 				DPContentLeafEditable leaf = (DPContentLeafEditable)getLeafClosestToLocalPoint( windowPos, new DPContentLeafEditable.EditableLeafElementFilter() );
@@ -1049,10 +1048,12 @@ public class PresentationComponent extends JComponent implements ComponentListen
 					{
 						selectionManager.mouseSelectionReset();
 						selectionManager.selectElement( elementToSelect );
+						bHandled = true;
 					}
 				}
 			}
-			else
+
+			if ( !bHandled )
 			{
 				rootSpaceMouse.buttonClicked( windowPos, button, clickCount );
 			}

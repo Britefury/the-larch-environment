@@ -6,6 +6,10 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 import os
+import sys
+import imp
+
+
 from datetime import datetime
 
 from java.lang import Object
@@ -34,6 +38,7 @@ from BritefuryJ.Cell import LiteralCell
 
 from BritefuryJ.AttributeTable import *
 
+from BritefuryJ.DocPresent import ElementInteractor
 from BritefuryJ.DocPresent.Browser import Location
 from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.Painter import *
@@ -254,18 +259,22 @@ _projectControlsStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBor
 _projectIndexNameStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.25, 0.5 ) ).withAttr( Primitive.fontBold, True ).withAttr( Primitive.fontSize, 14 )
 _packageNameStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.0, 0.5 ) ).withAttr( Primitive.fontBold, True ).withAttr( Primitive.fontSize, 14 )
 _itemHoverHighlightStyle = StyleSheet.instance.withAttr( Primitive.hoverBackground, FilledOutlinePainter( Color( 0.8, 0.825, 0.9 ), Color( 0.125, 0.341, 0.574 ), BasicStroke( 1.0 ) ) )
+_pythonPackageNameStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.0, 0.5 ) )
+_pythonPackageNameNotSetStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.5, 0.0, 0.0 ) )
 
 _packageContentsIndentation = 20.0
 
 
 _nameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*' )
+_pythonPackageNameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*(\\.[a-zA-Z_][a-zA-Z0-9_]*)*' )
+
 
 
 
 
 class ProjectView (GSymViewObjectNodeDispatch):
 	@DMObjectNodeDispatchMethod( Schema.Project )
-	def Project(self, ctx, state, node, contents):
+	def Project(self, ctx, state, node, pythonPackageName, contents):
 		# Save and Save As
 		def _onSave(link, buttonEvent):
 			if document._filename is None:
@@ -283,8 +292,32 @@ class ProjectView (GSymViewObjectNodeDispatch):
 			
 			DocumentManagement.promptSaveDocumentAs( ctx.getSubjectContext()['world'], link.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn )
 		
+		
+			
+			
 			
 
+		# Python package name
+		class _PythonPackageNameListener (TextEntry.TextEntryListener):
+			def onAccept(self, textEntry, text):
+				node['pythonPackageName'] = text
+				
+			def onCancel(self, textEntry, originalText):
+				pythonPackageCell.setLiteralValue( pythonPackageNameLabel )
+		
+
+		class _PythonPackageNameInteractor (ElementInteractor):
+			def onButtonClicked(self, element, event):
+				if event.getButton() == 1:
+					n = pythonPackageName   if pythonPackageName is not None   else 'Untitled'
+					textEntry = TextEntry( n, _PythonPackageNameListener(), _pythonPackageNameRegex, 'Please enter a valid dotted identifier' )
+					textEntry.grabCaretOnRealise()
+					pythonPackageCell.setLiteralValue( textEntry )
+					return True
+				else:
+					return False
+			
+			
 		# Project index
 		def _addPackage(menuItem):
 			contents.append( Schema.Package( name='NewPackage', contents=[] ) )
@@ -331,6 +364,18 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		controlsBorder = _projectControlsStyle.applyTo( Border( controlsBox ) )
 		
 		
+		
+		# Python package name
+		pythonPackageNamePrompt = Label( 'Root Python package name: ' )
+		if pythonPackageName is None:
+			pythonPackageNameLabel = _itemHoverHighlightStyle.applyTo( _pythonPackageNameNotSetStyle.applyTo( Label( '<not set>' ) ) )
+		else:
+			pythonPackageNameLabel = _itemHoverHighlightStyle.applyTo( _pythonPackageNameStyle.applyTo( Label( pythonPackageName ) ) )
+		pythonPackageNameLabel = pythonPackageNameLabel.withInteractor( _PythonPackageNameInteractor() )
+		pythonPackageCell = LiteralCell( pythonPackageNameLabel )
+		pythonPackageNameBox = HBox( [ pythonPackageNamePrompt, pythonPackageCell.genericPerspectiveValuePresInFragment() ] )
+		
+		
 		# Project index
 		indexHeader = Heading3( 'Project Index' )
 		
@@ -356,7 +401,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		
 		# The page
 		head = Head( [ linkHeader, title ] )
-		body = Body( [ controlsBorder.pad( 5.0, 10.0 ).alignHLeft(), projectIndex ] )
+		body = Body( [ controlsBorder.pad( 5.0, 10.0 ).alignHLeft(), pythonPackageNameBox, projectIndex ] )
 		
 		return StyleSheet.instance.withAttr( Primitive.editable, False ).applyTo( Page( [ head, body ] ) )
 
@@ -477,12 +522,89 @@ class PackageSubject (object):
 	                            
 
 
+class _ModuleFinder (object):
+	def __init__(self, projectSubject):
+		self._projectSubject = projectSubject
+	
+	def find_module(self, fullname, namesuffix, path):
+		suffix = namesuffix
+		model = self._projectSubject._model
+		modelLocation = self._projectSubject._location
+		while suffix != '':
+			prefix, dot, suffix = suffix.partition( '.' )
+			for item in model['contents']:
+				if prefix == item['name']:
+					modelLocation = modelLocation + '.' + prefix
+					model = item
+					
+					if model.isInstanceOf( Schema.Page ):
+						if suffix == '':
+							# We have found a page: load it
+							pageSubject = self._projectSubject._document.newUnitSubject( model['unit'], self._projectSubject, modelLocation )
+							try:
+								l = pageSubject.load_module
+							except AttributeError:
+								return None
+							else:
+								return pageSubject
+						else:
+							# Still path to consume; loop over
+							break
+					elif model.isInstanceOf( Schema.Package ):
+						# Loop over
+						break
+					else:
+						raise TypeError, 'unreckognised model type'
+			return None
+		
+		# Ran out of name to comsume, load as a package
+		return self
+		
+	def load_module(self, fullname):
+		mod = sys.modules.setdefault( fullname, imp.new_module( fullname ) )
+		mod.__file__ = fullname
+		mod.__loader__ = self
+		mod.__path__ = fullname.split( '.' )
+		return mod
+
+
+class _RootFinder (object):
+	def __init__(self, projectSubject):
+		self._projectSubject = projectSubject
+	
+	def find_module(self, fullname, path):
+		pythonPackageName = self._projectSubject._model['pythonPackageName']
+		if pythonPackageName is not None:
+			pythonPackageName = pythonPackageName.split( '.' )
+			suffix = fullname
+			index = 0
+			while suffix != '':
+				prefix, dot, suffix = suffix.partition( '.' )
+				if prefix == pythonPackageName[index]:
+					index += 1
+					if index == len( pythonPackageName )  and  suffix != '':
+						return self._projectSubject._moduleFinder.find_module( fullname, suffix, path )
+				else:
+					return None
+		return self
+		
+	def load_module(self, fullname):
+		mod = sys.modules.setdefault( fullname, imp.new_module( fullname ) )
+		mod.__file__ = fullname
+		mod.__loader__ = self
+		mod.__path__ = fullname.split( '.' )
+		return mod
+
+	
+
 class ProjectSubject (GSymSubject):
 	def __init__(self, document, model, enclosingSubject, location):
 		self._document = document
 		self._model = model
 		self._enclosingSubject = enclosingSubject
 		self._location = location
+		self._moduleFinder = _ModuleFinder( self )
+		self._rootFinder = _RootFinder( self )
 
 
 	def getFocus(self):
@@ -511,5 +633,10 @@ class ProjectSubject (GSymSubject):
 				elif item.isInstanceOf( Schema.Page ):
 					return self._document.newUnitSubject( item['unit'], self, itemLocation )
 		raise AttributeError, "Did not find item for '%s'"  %  ( name, )
+	
+	
+	
+	def find_module(self, fullname, path=None):
+		return self._rootFinder.find_module( fullname, path )
 
 	

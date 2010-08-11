@@ -14,7 +14,7 @@ import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
 import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
+import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Painter.Painter;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
@@ -67,12 +67,7 @@ public class MenuItem extends ControlPres
 			{	
 			}
 			
-			public boolean onButtonDown(DPElement element, PointerButtonEvent event)
-			{
-				return true;
-			}
-	
-			public boolean onButtonUp(DPElement element, PointerButtonEvent event)
+			public boolean onButtonClicked(DPElement element, PointerButtonClickedEvent event)
 			{
 				if ( element.isRealised() )
 				{

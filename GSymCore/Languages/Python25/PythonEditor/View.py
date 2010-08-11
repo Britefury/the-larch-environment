@@ -22,6 +22,9 @@
 #
 
 
+import sys
+import imp
+
 from java.awt.event import KeyEvent
 
 from BritefuryJ.Parser import ParserExpression
@@ -48,6 +51,7 @@ from BritefuryJ.GSym import GSymPerspective, GSymSubject
 
 
 from GSymCore.Languages.Python25 import Schema
+from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
 
 from GSymCore.Languages.Python25.PythonEditor.Parser import Python25Grammar
 from GSymCore.Languages.Python25.PythonEditor.PythonEditOperations import *
@@ -1277,6 +1281,9 @@ _parser = Python25Grammar()
 perspective = GSymPerspective( Python25View( _parser ), Python25EditHandler() )
 
 
+_importCodeGen = Python25CodeGenerator()
+
+
 class Python25Subject (GSymSubject):
 	def __init__(self, document, model, enclosingSubject, location):
 		self._document = document
@@ -1300,5 +1307,15 @@ class Python25Subject (GSymSubject):
 	def getCommandHistory(self):
 		return self._document.getCommandHistory()
 
+	
+	def load_module(self, fullname):
+		mod = sys.modules.setdefault( fullname, imp.new_module( fullname ) )
+		mod.__file__ = fullname
+		mod.__loader__ = self
+		mod.__path__ = fullname.split( '.' )
+		source = _importCodeGen( self._model )
+		code = compile( source, fullname, 'exec' )
+		exec code in mod.__dict__
+		return mod
 	
 	

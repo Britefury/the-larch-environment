@@ -14,7 +14,7 @@ import java.awt.geom.Line2D;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementInteractor;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
+import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 
 class CheckboxHelper
 {
@@ -67,7 +67,7 @@ class CheckboxHelper
 		
 		
 		@Override
-		public boolean onButtonDown(DPElement element, PointerButtonEvent event)
+		public boolean onButtonClicked(DPElement element, PointerButtonClickedEvent event)
 		{
 			if ( event.getButton() == 1 )
 			{

@@ -6,6 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 import os
+import sys
 
 from BritefuryJ.DocModel import DMSchema, DMSchemaResolver
 
@@ -86,6 +87,20 @@ class GSymWorld (object):
 		
 	def getAppStateSubject(self):
 		return self._appStateSubject
+	
+	
+	
+	def enableImportHooks(self):
+		sys.meta_path.append( self )
+		
+		
+		
+	def find_module(self, fullname, path=None):
+		try:
+			app_find_module = self._appStateSubject.find_module
+		except AttributeError:
+			return None
+		return app_find_module( fullname, path )
 		
 		
 		
