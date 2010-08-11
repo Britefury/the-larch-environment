@@ -214,7 +214,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 		deleteButton = Button( Image.systemIcon( 'delete' ), _onDeleteButton )
 		
 		headerBox = _pythonCodeHeaderStyle.applyTo( Bin(
-		        StyleSheet.instance.withAttr( Primitive.hboxSpacing, 20.0 ).applyTo( HBox( [ StaticText( 'Python code' ).alignHExpand(), styleOptionMenu, deleteButton ] ) ).alignHExpand().pad( 2.0, 2.0 ) ) )
+		        StyleSheet.instance.withAttr( Primitive.hboxSpacing, 20.0 ).applyTo( HBox( [ StaticText( 'Python code' ).alignHExpand(), styleOptionMenu, deleteButton.alignVCentre() ] ) ).alignHExpand().pad( 2.0, 2.0 ) ) )
 		
 		boxContents = [ headerBox.alignHExpand() ]
 		boxContents.append( _pythonCodeBorderStyle.applyTo( Border( codeView.alignHExpand() ).alignHExpand() ) )
