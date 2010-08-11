@@ -674,6 +674,7 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 	{
 		req_height += ( topMargin + bottomMargin );
 		req_vSpacing = Math.max( req_vSpacing - bottomMargin, 0.0 );
+		req_refY += topMargin;
 	}
 	
 

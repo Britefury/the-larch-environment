@@ -45,7 +45,7 @@ public class LAllocV
 	
 	public LAllocV borderY(double topMargin, double bottomMargin)
 	{
-		return new LAllocV( height - ( topMargin + bottomMargin ), refY );
+		return new LAllocV( height - ( topMargin + bottomMargin ), refY - topMargin );
 	}
 	
 	public LAllocV expandToHeight(double h)
