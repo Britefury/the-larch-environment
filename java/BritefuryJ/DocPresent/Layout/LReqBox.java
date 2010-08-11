@@ -297,6 +297,7 @@ public class LReqBox implements LReqBoxInterface
 	{
 		reqHeight += ( topMargin + bottomMargin );
 		reqVSpacing = Math.max( reqVSpacing - bottomMargin, 0.0 );
+		refY += topMargin;
 	}
 	
 	public boolean equals(Object x)
