@@ -6,6 +6,10 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 import os
+import sys
+import imp
+
+
 from datetime import datetime
 
 from java.awt import Color
@@ -45,6 +49,7 @@ from BritefuryJ.GSym.PresCom import InnerFragment
 
 
 from GSymCore.Languages.Python25 import Python25
+from GSymCore.Languages.Python25.CodeGenerator import compileForExecution
 from GSymCore.Languages.Python25.Execution.ExecutionPresCombinators import executionResultBox, minimalExecutionResultBox
 
 from GSymCore.Worksheet import Schema
@@ -164,10 +169,10 @@ class WorksheetViewer (GSymViewObjectDispatch):
 perspective = GSymPerspective( WorksheetViewer(), None )
 
 
-
 class WorksheetViewerSubject (GSymSubject):
 	def __init__(self, document, model, enclosingSubject, location):
 		self._document = document
+		self._model = model
 		self._modelView = ViewSchema.WorksheetView( None, model )
 		self._enclosingSubject = enclosingSubject
 		self._location = location
@@ -191,4 +196,23 @@ class WorksheetViewerSubject (GSymSubject):
 	def getCommandHistory(self):
 		return self._document.getCommandHistory()
 
+	
+
+	
+	def load_module(self, fullname):
+		mod = sys.modules.setdefault( fullname, imp.new_module( fullname ) )
+		mod.__file__ = fullname
+		mod.__loader__ = self
+		mod.__path__ = fullname.split( '.' )
+		
+		sources = []
+		
+		worksheet = self._model
+		body = worksheet['body']
+		
+		for i, node in enumerate( body['contents'] ):
+			if node.isInstanceOf( Schema.PythonCode ):
+				code = compileForExecution( node['code'], fullname + '_' + str( i ) )
+				exec code in mod.__dict__
+		return mod
 	
