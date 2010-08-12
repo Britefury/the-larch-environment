@@ -46,6 +46,10 @@ class _Projection (object):
 	@DMObjectNodeDispatchMethod( Schema.PythonCode )
 	def pythonCode(self, worksheet, node):
 		return PythonCodeView( worksheet, node )
+	
+	@DMObjectNodeDispatchMethod( Schema.QuoteLocation )
+	def quoteLocation(self, worksheet, node):
+		return QuoteLocationView( worksheet, node )
 
 _projection = _Projection()
 
@@ -294,4 +298,57 @@ class PythonCodeView (IncrementalOwner, NodeView):
 	@staticmethod
 	def newPythonCodeModel():
 		return Schema.PythonCode( style='code_result', code=Python25.py25NewModule() )
+
 	
+	
+class QuoteLocationView (IncrementalOwner, NodeView):
+	STYLE_MINIMAL = 0
+	STYLE_NORMAL = 1
+	
+	_styleToName  = { STYLE_MINIMAL : 'minimal',
+	                    STYLE_NORMAL : 'normal' }
+	
+	_nameToStyle  = { 'minimal' : STYLE_MINIMAL,
+	                  'normal' : STYLE_NORMAL }
+	
+	
+	def __init__(self, worksheet, model):
+		NodeView.__init__( self, worksheet, model )
+		self._incr = IncrementalValueMonitor( self )
+		self._result = None
+		
+		
+	def getLocation(self):
+		return self._model['location']
+	
+	def setLocation(self, location):
+		self._model['location'] = location
+		
+		
+		
+	def getStyle(self):
+		name = self._model['style']
+		try:
+			return self._nameToStyle[name]
+		except KeyError:
+			return self.STYLE_NORMAL
+	
+	def setStyle(self, style):
+		try:
+			name = self._styleToName[style]
+		except KeyError:
+			raise ValueError, 'invalid style'
+		self._model['style'] = name
+		
+		
+	def isMinimal(self):
+		style = self.getStyle()
+		return style == self.STYLE_MINIMAL
+		
+		
+	def _refreshResults(self, env):
+		pass
+		
+	@staticmethod
+	def newQuoteLocationModel():
+		return Schema.QuoteLocation( location='', style='normal' )

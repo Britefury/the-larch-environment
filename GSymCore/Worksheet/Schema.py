@@ -29,6 +29,9 @@ PartialParagraph = schema.newClass( 'PartialParagraph', WorksheetPartialNode, [ 
 PythonCode = schema.newClass( 'PythonCode', WorksheetNode, [ 'code', 'style' ] )
 
 
+QuoteLocation = schema.newClass( 'QuoteLocation', WorksheetNode, [ 'location', 'style' ] )
+
+
 
 
 #
