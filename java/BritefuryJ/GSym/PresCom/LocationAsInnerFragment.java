@@ -13,12 +13,12 @@ import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
-public class LocationAsInnerFragement extends Pres
+public class LocationAsInnerFragment extends Pres
 {
 	private Location location;
 	
 	
-	public LocationAsInnerFragement(Location location)
+	public LocationAsInnerFragment(Location location)
 	{
 		this.location = location;
 	}

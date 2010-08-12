@@ -30,7 +30,7 @@ from Britefury.Util.InstanceCache import instanceCache
 from BritefuryJ.AttributeTable import *
 
 from BritefuryJ.GSym import GSymPerspective, GSymSubject
-from BritefuryJ.GSym.PresCom import InnerFragment
+from BritefuryJ.GSym.PresCom import InnerFragment, LocationAsInnerFragment
 
 
 from GSymCore.Languages.Python25 import Python25
@@ -40,6 +40,7 @@ from GSymCore.Worksheet import Schema
 from GSymCore.Worksheet import ViewSchema
 
 from GSymCore.Worksheet.WorksheetEditor.PythonCode import *
+from GSymCore.Worksheet.WorksheetEditor.QuoteLocation import *
 
 from GSymCore.Worksheet.WorksheetEditor.TextNodeEditor import *
 from GSymCore.Worksheet.WorksheetEditor.BodyNodeEditor import *
@@ -63,6 +64,10 @@ from BritefuryJ.DocPresent.Combinators.ContextMenu import *
 _pythonCodeHeaderStyle = StyleSheet.instance.withAttr( Primitive.background, FillPainter( Color( 0.75, 0.8, 0.925 ) ) )
 _pythonCodeBorderStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) )
 _pythonCodeEditorBorderStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 2.0, 5.0, 20.0, 20.0, Color( 0.4, 0.5, 0.6 ), None ) )
+
+_quoteLocationHeaderStyle = StyleSheet.instance.withAttr( Primitive.background, FillPainter( Color( 0.75, 0.8, 0.925 ) ) )
+_quoteLocationBorderStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) )
+_quoteLocationEditorBorderStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 2.0, 5.0, 20.0, 20.0, Color( 0.4, 0.5, 0.6 ), None ) )
 
 _paragraphStyle = StyleSheet.instance.withAttr( RichText.appendNewlineToParagraphs, True )
 
@@ -99,6 +104,16 @@ def _worksheetContextMenuFactory(element, menu):
 	newCode = Hyperlink( 'Python code', _onPythonCode )
 	codeControls = ControlsHBox( [ newCode ] )
 	menu.add( SectionVBox( [ SectionTitle( 'Code' ), codeControls ] ).alignHExpand() )
+	
+	
+	def _onQuoteLocation(link, event):
+		caret = rootElement.getCaret()
+		if caret.isValid():
+			caret.getElement().postTreeEvent( QuoteLocationRequest() )
+
+	newQuoteLocation = Hyperlink( 'View of Location', _onQuoteLocation )
+	quoteLocationControls = ControlsHBox( [ newQuoteLocation ] )
+	menu.add( SectionVBox( [ SectionTitle( 'Location' ), quoteLocationControls ] ).alignHExpand() )
 	
 	
 	def _onRefresh(button, event):
@@ -227,6 +242,52 @@ class WorksheetEditor (GSymViewObjectDispatch):
 		
 		p = p.withFixedValue( node.getModel() )
 		p = p.withTreeEventListener( PythonCodeNodeEventListener.instance )
+		return p
+
+
+	
+	@ObjectDispatchMethod( ViewSchema.QuoteLocationView )
+	def QuoteLocation(self, ctx, inheritedState, node):
+		choiceValues = [
+		        ViewSchema.QuoteLocationView.STYLE_MINIMAL,
+		        ViewSchema.QuoteLocationView.STYLE_NORMAL ]
+		
+		
+		class _LocationEntryListener (TextEntry.TextEntryListener):
+			def onAccept(self, entry, location):
+				node.setLocation( location )
+
+		
+		def _onStyleOptionMenu(optionMenu, prevChoice, choice):
+			style = choiceValues[choice]
+			node.setStyle( style )
+			
+		def _onDeleteButton(button, event):
+			button.getElement().postTreeEvent( DeleteNodeOperation( node ) )
+
+		targetView = StyleSheet.instance.withAttr( Primitive.editable, True ).applyTo( LocationAsInnerFragment( Location( node.getLocation() ) ) )
+		
+		optionTexts = [ 'Minimal', 'Normal' ]
+		optionChoices = [ StaticText( text )   for text in optionTexts ]
+		styleOptionMenu = OptionMenu( optionChoices, choiceValues.index( node.getStyle() ), _onStyleOptionMenu )
+		
+		deleteButton = Button( Image.systemIcon( 'delete' ), _onDeleteButton )
+		
+		locationEditor = TextEntry( node.getLocation(), _LocationEntryListener() )
+		
+		headerBox = _quoteLocationHeaderStyle.applyTo( Bin(
+		        StyleSheet.instance.withAttr( Primitive.hboxSpacing, 20.0 ).applyTo( HBox( 
+		                [ StaticText( 'Location: ' ), locationEditor, HiddenContent( '' ).alignHExpand(), styleOptionMenu, deleteButton.alignVCentre() ] ) ).alignHExpand().pad( 2.0, 2.0 ) ) )
+		
+		boxContents = [ headerBox.alignHExpand() ]
+		boxContents.append( _quoteLocationBorderStyle.applyTo( Border( targetView.alignHExpand() ).alignHExpand() ) )
+		box = StyleSheet.instance.withAttr( Primitive.vboxSpacing, 5.0 ).applyTo( VBox( boxContents ) )
+		
+		p = _quoteLocationEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
+
+		
+		p = p.withFixedValue( node.getModel() )
+		p = p.withTreeEventListener( QuoteLocationNodeEventListener.instance )
 		return p
 
 

@@ -38,6 +38,7 @@ from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.Browser import Location
 from BritefuryJ.DocPresent.StyleSheet import StyleSheet
+from BritefuryJ.DocPresent.Painter import *
 from BritefuryJ.Controls import *
 from BritefuryJ.DocPresent.Combinators import *
 from BritefuryJ.DocPresent.Combinators.Primitive import *
@@ -45,7 +46,7 @@ from BritefuryJ.DocPresent.Combinators.RichText import *
 from BritefuryJ.DocPresent.Combinators.ContextMenu import *
 
 from BritefuryJ.GSym import GSymPerspective, GSymSubject
-from BritefuryJ.GSym.PresCom import InnerFragment
+from BritefuryJ.GSym.PresCom import InnerFragment, LocationAsInnerFragment
 
 
 from GSymCore.Languages.Python25 import Python25
@@ -61,6 +62,9 @@ from GSymCore.Worksheet.WorksheetEditor.View import perspective as editorPerspec
 _pythonCodeBorderStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) )
 _pythonCodeEditorBorderStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 2.0, 5.0, 20.0, 20.0, Color( 0.4, 0.5, 0.6 ), None ) )
 
+_quoteLocationHeaderStyle = StyleSheet.instance.withAttr( Primitive.background, FillPainter( Color( 0.75, 0.8, 0.925 ) ) )
+_quoteLocationBorderStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), None ) )
+_quoteLocationEditorBorderStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 2.0, 5.0, 20.0, 20.0, Color( 0.4, 0.5, 0.6 ), None ) )
 
 
 def _worksheetContextMenuFactory(element, menu):
@@ -161,6 +165,25 @@ class WorksheetViewer (GSymViewObjectDispatch):
 				return _pythonCodeEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
 		else:
 			return HiddenContent( '' )
+
+
+	
+	@ObjectDispatchMethod( ViewSchema.QuoteLocationView )
+	def QuoteLocation(self, ctx, inheritedState, node):
+		targetView = StyleSheet.instance.withAttr( Primitive.editable, True ).applyTo( LocationAsInnerFragment( Location( node.getLocation() ) ) )
+		
+		if node.isMinimal():
+			return targetView.alignHExpand()
+		else:
+			headerBox = _quoteLocationHeaderStyle.applyTo( Bin(
+				StyleSheet.instance.withAttr( Primitive.hboxSpacing, 20.0 ).applyTo( HBox(
+			                [ StaticText( 'Location: ' ).alignHExpand(), StaticText( node.getLocation() ) ] ) ).alignHExpand().pad( 2.0, 2.0 ) ) )
+			
+			boxContents = [ headerBox.alignHExpand() ]
+			boxContents.append( _quoteLocationBorderStyle.applyTo( Border( targetView.alignHExpand() ).alignHExpand() ) )
+			box = StyleSheet.instance.withAttr( Primitive.vboxSpacing, 5.0 ).applyTo( VBox( boxContents ) )
+			
+			return _quoteLocationEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
 
 
 
