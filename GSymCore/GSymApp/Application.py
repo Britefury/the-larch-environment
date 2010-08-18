@@ -78,7 +78,7 @@ class AppConsole (IncrementalOwner):
 		self._incr = IncrementalValueMonitor( self )
 		
 		self._index = index
-		self._console = ConsoleSchema.Console()
+		self._console = ConsoleSchema.Console( '<console%d>'  %  ( index, ) )
 		
 		
 		

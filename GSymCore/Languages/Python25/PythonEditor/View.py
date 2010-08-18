@@ -41,9 +41,10 @@ from Britefury.Util.InstanceCache import instanceCache
 
 
 from BritefuryJ.AttributeTable import *
-from BritefuryJ.DocPresent import ElementInteractor
-#from BritefuryJ.DocPresent.Combinators import InnerFragment
+from BritefuryJ.Controls import *
+from BritefuryJ.DocPresent import ElementInteractor, ElementValueFunction, TextEditEvent, DPText
 from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder
+from BritefuryJ.DocPresent.Combinators.Primitive import Paragraph, Segment
 from BritefuryJ.GSym.PresCom import InnerFragment
 
 from BritefuryJ.GSym import GSymPerspective, GSymSubject
@@ -52,6 +53,8 @@ from BritefuryJ.GSym import GSymPerspective, GSymSubject
 
 from GSymCore.Languages.Python25 import Schema
 from GSymCore.Languages.Python25.CodeGenerator import compileForExecution
+from GSymCore.Languages.Python25 import ExternalExpression
+
 
 from GSymCore.Languages.Python25.PythonEditor.Parser import Python25Grammar
 from GSymCore.Languages.Python25.PythonEditor.PythonEditOperations import *
@@ -250,17 +253,62 @@ def spanCmpOpView(ctx, grammar, inheritedState, node, op, y, precedence):
 	
 	
 	
+class _InsertExternalExpressionValueFn (ElementValueFunction):
+	def __init__(self, expr, index):
+		self._expr = expr
+		self._index = index
+		
+	def computeElementValue(self, element):
+		value = element.getDefaultValue()
+		builder = StreamValueBuilder()
+		builder.append( value[:self._index] )
+		builder.appendStructuralValue( self._expr )
+		builder.append( value[self._index:] )
+		return builder.stream()
+		
+	def addStreamValuePrefixToStream(self, builder, element):
+		pass
+	
+	def addStreamValueSuffixToStream(self, builder, element):
+		pass
 	
 	
+class _InsertExternalExpressionTreeEvent (TextEditEvent):
+	def __init__(self):
+		pass
 	
-def printElem(elem, level):
-	print '  ' * level, elem, elem.getTextRepresentation()
-	if isinstance( elem, BranchElement ):
-		for x in elem.getChildren():
-			printElem( x, level + 1 )
+
+def _insertExternalExpression(caret, expr):
+	element = caret.getElement()
+	assert isinstance( element, DPText )
+	element.setValueFunction( _InsertExternalExpressionValueFn( expr, caret.getIndex() ) )
+	element.postTreeEvent( _InsertExternalExpressionTreeEvent() )
+	
+	
+def _pythonModuleContextMenuFactory(element, menu):
+	rootElement = element.getRootElement()
+	
+	
+	extExprItems = []
+	
+	def _makeExtExprFn(factory):
+		def _onMenuItem(item):
+			caret = rootElement.getCaret()
+			if caret.isValid():
+				expr = factory()
+				pyExpr = Schema.ExternalExpr( expr=expr )
+				_insertExternalExpression( caret, pyExpr )
+		return _onMenuItem
+		
+	extExprItems = [ MenuItem.menuItemWithLabel( labelText, _makeExtExprFn( factory ) )   for labelText, factory in ExternalExpression.getExternalExpressionFactories() ]
+	extExprMenu = VPopupMenu( extExprItems )
+	
+	insertExprMenuItem = MenuItem.menuItemWithLabel( 'Insert expression', extExprMenu, MenuItem.SubmenuPopupDirection.RIGHT )
+	menu.add( insertExprMenuItem )
+	return True
 
 
-			
+
 def _withPythonState(state, precedence, mode=EDITMODE_DISPLAYCONTENTS):
 	return state.withAttrs( outerPrecedence=precedence, editMode=mode )
 			
@@ -270,7 +318,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		self._parser = parser
 
 
-	# MISC
+	# OUTER NODES
 	@DMObjectNodeDispatchMethod( Schema.PythonModule )
 	def PythonModule(self, ctx, state, node, suite):
 		if len( suite ) == 0:
@@ -282,7 +330,24 @@ class Python25View (GSymViewObjectNodeDispatch):
 		s = s.withFixedValue( suite )
 		suiteListener = SuiteTreeEventListener( self._parser.suite(), suite )
 		s = s.withTreeEventListener( suiteListener )
+		s = s.withContextMenuFactory( _pythonModuleContextMenuFactory )
 		return s
+
+
+
+	@DMObjectNodeDispatchMethod( Schema.PythonExpression )
+	def PythonExpression(self, ctx, state, node, expr):
+		if expr is None:
+			# Empty document - create a single blank line so that there is something to edit
+			exprView = blankLine()
+			seg = exprView
+		else:
+			exprView = InnerFragment( expr, _withPythonState( state, PRECEDENCE_NONE, EDITMODE_DISPLAYCONTENTS ) )
+			seg = Segment( True, True, exprView )
+		e = Paragraph( [ seg ] )
+		e = e.withTreeEventListener( instanceCache( PythonExpressionTreeEventListener, self._parser.expression(), PRECEDENCE_NONE ) )
+		e = e.withContextMenuFactory( _pythonModuleContextMenuFactory )
+		return e
 
 
 
@@ -813,16 +878,21 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# External expression
 	@DMObjectNodeDispatchMethod( Schema.ExternalExpr )
 	def ExternalExpr(self, ctx, state, node, expr):
-		#exprView = InnerFragment( expr, _withPythonState( state, PRECEDENCE_CONTAINER_CONDITIONALEXPR ) )
-		exprView = Label( '<expr>' )
+		if isinstance( expr, DMObject ):
+			schema = expr.getDMObjectClass().getSchema()
+			presenter, title = ExternalExpression.getExternalExpressionPresenterAndTitle( schema )
+			exprView = presenter( expr, _withPythonState( state, PRECEDENCE_CONTAINER_CONDITIONALEXPR ) )
+		else:
+			exprView = Label( '<expr>' )
+			title = 'ext'
 		
 		def _onDeleteButton(button, event):
 			button.getElement().postTreeEvent( DeleteExternalExpressionTreeEvent( node ) )
 
 		
-		deleteButton = Button( Image.systemIcon( 'delete_8x8' ), _onDeleteButton )
+		deleteButton = Button( Image.systemIcon( 'delete_tiny' ), _onDeleteButton )
 
-		view = externalExpr( exprView, 'ext', deleteButton )
+		view = externalExpr( exprView, title, deleteButton )
 		return externalExpressionNodeEditor( self._parser, state, node,
 		                             view )
 

@@ -5,10 +5,13 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
+from BritefuryJ.DocModel import DMObject
+
 from Britefury.gSym.gSymCodeGenerator import GSymCodeGeneratorObjectNodeDispatch
 from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod
 
 from GSymCore.Languages.Python25 import Schema
+from GSymCore.Languages.Python25 import ExternalExpression
 
 
 def _indent(x):
@@ -399,6 +402,20 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 
 	
 	
+	
+	# External expression
+	@DMObjectNodeDispatchMethod( Schema.ExternalExpr )
+	def ExternalExpr(self, node, expr):
+		if isinstance( expr, DMObject ):
+			schema = expr.getDMObjectClass().getSchema()
+			codeGenFac = ExternalExpression.getExternalExpressionCodeGeneratorFactory( schema )
+			codeGen = codeGenFac( self )
+			return codeGen( expr )
+		else:
+			return 'None'
+		
+	
+	
 	# Expression statement
 	@DMObjectNodeDispatchMethod( Schema.ExprStmt )
 	def ExprStmt(self, node, expr):
@@ -669,7 +686,15 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 		return '\n'.join( [ self( line )   for line in suite ] )
 
 	
-	
+	# Expression
+	@DMObjectNodeDispatchMethod( Schema.PythonExpression )
+	def PythonExpression(self, node, expr):
+		if expr is None:
+			return 'None'
+		else:
+			return self( expr )
+
+		
 python25CodeGeneratorWithErrorChecking = Python25CodeGenerator()
 python25CodeGeneratorWithoutErrorChecking = Python25CodeGenerator( False )
 

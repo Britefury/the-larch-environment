@@ -22,7 +22,7 @@ Stmt = schema.newClass( 'Stmt', Node, [] )
 
 
 #
-# Blank line, comment, unparsed
+# Blank line, blank expr, comment, unparsed
 #
 BlankLine = schema.newClass( 'BlankLine', Node, [] )
 CommentStmt = schema.newClass( 'CommentStmt', Stmt, [ 'comment' ] )
@@ -211,9 +211,10 @@ IndentedBlock = schema.newClass( 'IndentedBlock', CompoundStmt, [ 'suite' ] )
 
 
 #
-# Module
+# Module and expression - outer nodes
 #
 PythonModule = schema.newClass( 'PythonModule', CompoundStmt, [ 'suite' ] )
+PythonExpression = schema.newClass( 'PythonExpression', Node, [ 'expr' ] )
 
 
 

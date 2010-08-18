@@ -45,6 +45,7 @@ public class DocModelPresenter
 	private static final StyleSheet punctuationStyle = defaultStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 1.0f ) );
 
 	private static final StyleSheet classNameStyle = defaultStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
+	private static final StyleSheet schemaNameStyle = defaultStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) );
 
 	private static final StyleSheet fieldNameStyle = defaultStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.25f ) );
 
@@ -122,14 +123,18 @@ public class DocModelPresenter
 		}
 		
 		// Header
-		Pres className;
+		Pres header;
+		Pres schemaName = schemaNameStyle.applyTo( new StaticText( cls.getSchema().getShortName() ) );
+		Pres className = classNameStyle.applyTo( new StaticText( cls.getName() ) );
 		if ( mode == ObjectPresentMode.HORIZONTAL )
 		{
-			className = defaultStyle.applyTo( new Span( new Object[] { classNameStyle.applyTo( new StaticText( cls.getName() ) ), new StaticText( " " ), punctuationStyle.applyTo( new StaticText( ":" ) ) } ) );
+			header = defaultStyle.applyTo( new Span( new Object[] { schemaName, punctuationStyle.applyTo( new StaticText( "." ) ), className,
+					new StaticText( " " ), punctuationStyle.applyTo( new StaticText( ":" ) ) } ) );
 		}
 		else if ( mode == ObjectPresentMode.VERTICALINLINE )
 		{
-			className = defaultStyle.applyTo( new Paragraph( new Object[] { classNameStyle.applyTo( new StaticText( cls.getName() ) ), new StaticText( " " ), punctuationStyle.applyTo( new StaticText( ":" ) ) } ) );
+			header = defaultStyle.applyTo( new Paragraph( new Object[] { schemaName, punctuationStyle.applyTo( new StaticText( "." ) ), className,
+					new StaticText( " " ), punctuationStyle.applyTo( new StaticText( ":" ) ) } ) );
 		}
 		else
 		{
@@ -137,7 +142,7 @@ public class DocModelPresenter
 		}
 		
 		ArrayList<Object> itemViews = new ArrayList<Object>();
-		itemViews.add( className );
+		itemViews.add( header );
 		// Create views of each item
 		for (int i = 0; i < cls.getNumFields(); i++)
 		{

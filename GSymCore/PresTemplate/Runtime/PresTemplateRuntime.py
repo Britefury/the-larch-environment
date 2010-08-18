@@ -5,17 +5,5 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from GSymCore.PythonConsole.ConsoleViewer.View import perspective, ConsoleSubject
-from GSymCore.PythonConsole import ConsoleSchema
-
-
-def newConsole(name):
-	return ConsoleSchema.Console( name )
-
-
-def newConsoleSubject(console, enclosingSubject):
-	return ConsoleSubject( console, enclosingSubject )
-	
-
-
-consoleViewerPerspective = perspective
+from BritefuryJ.DocPresent.Combinators.Primitive import Paragraph
+from BritefuryJ.DocPresent.Combinators.RichText import Body, NormalText, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, TitleBar

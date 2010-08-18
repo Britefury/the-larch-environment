@@ -511,7 +511,11 @@ def externalExpr(ctx, style, exprView, title, deleteButton):
 	titleLabel = externalExprTitleStyle.applyTo( Label( title ) )
 	
 	header = HBox( [ titleLabel.alignHLeft(), deleteButton.alignHRight().alignVCentre() ] )
-	return externalExprBorderStyle.applyTo( Border( VBox( [ header, expr.pad( 3.0, 3.0 ) ] ) ) )
+	box = externalExprBorderStyle.applyTo( Border( VBox( [ header.alignHExpand(), exprView.pad( 3.0, 3.0 ) ] ) ) )
+
+	segment = Segment( True, True, box )
+	return segment.present( ctx, style )
+
 
 
 def exprStmt(expr):
