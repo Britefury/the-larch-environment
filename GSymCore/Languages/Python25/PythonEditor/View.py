@@ -128,6 +128,16 @@ def expressionNodeEditor(grammar, inheritedState, node, precedence, contents):
 		raise ValueError, 'invalid mode %d'  %  mode
 
 
+def externalExpressionNodeEditor(grammar, inheritedState, node, contents):
+	mode = inheritedState['editMode']
+	if mode == EDITMODE_DISPLAYCONTENTS  or  mode == EDITMODE_EDITEXPRESSION:
+		contents = contents.withTreeEventListener( ExternalExpressionTreeEventListener.instance )
+		contents = contents.withFixedValue( node )
+		return contents
+	else:
+		raise ValueError, 'invalid mode %d'  %  mode
+
+
 def structuralExpressionNodeEditor(inheritedState, node, precedence, contents):
 	mode = inheritedState['editMode']
 	if mode == EDITMODE_DISPLAYCONTENTS  or  mode == EDITMODE_EDITEXPRESSION:
@@ -790,7 +800,31 @@ class Python25View (GSymViewObjectNodeDispatch):
 		return expressionNodeEditor( self._parser, state, node,
 			                     PRECEDENCE_CONDITIONAL,
 		                             view )
+	
+	
+	
+	
+	#
+	#
+	# EXTERNAL EXPRESSION
+	#
+	#
 
+	# External expression
+	@DMObjectNodeDispatchMethod( Schema.ExternalExpr )
+	def ExternalExpr(self, ctx, state, node, expr):
+		#exprView = InnerFragment( expr, _withPythonState( state, PRECEDENCE_CONTAINER_CONDITIONALEXPR ) )
+		exprView = Label( '<expr>' )
+		
+		def _onDeleteButton(button, event):
+			button.getElement().postTreeEvent( DeleteExternalExpressionTreeEvent( node ) )
+
+		
+		deleteButton = Button( Image.systemIcon( 'delete_8x8' ), _onDeleteButton )
+
+		view = externalExpr( exprView, 'ext', deleteButton )
+		return externalExpressionNodeEditor( self._parser, state, node,
+		                             view )
 
 
 

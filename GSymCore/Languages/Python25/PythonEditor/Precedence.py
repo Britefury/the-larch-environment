@@ -37,6 +37,8 @@ PRECEDENCE_YIELDEXPR = 200
 
 PRECEDENCE_CONDITIONAL = 100
 
+PRECEDENCE_EXTERNALEXPR = 1000
+
 PRECEDENCE_LAMBDAEXPR = 50
 
 PRECEDENCE_OR = 14
@@ -128,6 +130,7 @@ precedence[Schema.AndTest] = PRECEDENCE_AND
 precedence[Schema.OrTest] = PRECEDENCE_OR
 precedence[Schema.LambdaExpr] = PRECEDENCE_LAMBDAEXPR
 precedence[Schema.ConditionalExpr] = PRECEDENCE_CONDITIONAL
+precedence[Schema.ExternalExpr] = PRECEDENCE_EXTERNALEXPR
 precedence.commit()
 
 	

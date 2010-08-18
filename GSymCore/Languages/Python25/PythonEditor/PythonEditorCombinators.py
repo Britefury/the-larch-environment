@@ -69,6 +69,11 @@ class PythonEditorStyle (object):
 	sequenceStyle = InheritedAttributeNonNull( pythonEditor, 'sequenceStyle', StyleSheet,
 	                                              StyleSheet.instance.withAttr( Sequence.addLineBreaks, True ).withAttr( Sequence.addParagraphIndentMarkers, True ).withAttr( Sequence.addLineBreakCost, True ) )
 	
+	externalExprBorderStyle = InheritedAttributeNonNull( pythonEditor, 'externalExprBorderStyle', StyleSheet,
+	                                                     StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.3, 0.7, 1.0 ), None ) ) )
+	externalExprTitleStyle = InheritedAttributeNonNull( pythonEditor, 'externalExprTitleStyle', StyleSheet,
+	                                                     StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.5, 1.0 ) ).withAttr( Primitive.fontSize, 10 ) )
+	
 	solidHighlightRounding = InheritedAttributeNonNull( pythonEditor, 'solidHighlightRounding', float, 3.0 )
 	outlineHighlightThickness = InheritedAttributeNonNull( pythonEditor, 'outlineHighlightThickness', float, 2.0 )
 	outlineHighlightInset = InheritedAttributeNonNull( pythonEditor, 'outlineHighlightInset', float, 2.0 )
@@ -496,6 +501,17 @@ def conditionalExpr(ctx, style, condition, expr, elseExpr):
 	return LineBreakCostSpan( [ expr,   Whitespace( '  ', conditionalSpacing ),  _lineBreak,
                                                  _keyword( 'if' ), _space, condition,   Whitespace( '  ', conditionalSpacing ),  _lineBreak,
                                                  _keyword( 'else' ), _space, elseExpr ] ).present( ctx, style )
+
+
+@PyPresCombinatorFn
+def externalExpr(ctx, style, exprView, title, deleteButton):
+	externalExprBorderStyle = style.get( PythonEditorStyle.externalExprBorderStyle )
+	externalExprTitleStyle = style.get( PythonEditorStyle.externalExprTitleStyle )
+	
+	titleLabel = externalExprTitleStyle.applyTo( Label( title ) )
+	
+	header = HBox( [ titleLabel.alignHLeft(), deleteButton.alignHRight().alignVCentre() ] )
+	return externalExprBorderStyle.applyTo( Border( VBox( [ header, expr.pad( 3.0, 3.0 ) ] ) ) )
 
 
 def exprStmt(expr):
