@@ -90,7 +90,7 @@ public class GenericStyle
 		protected StyleSheet evaluate(AttributeTable attribs)
 		{
 			double spacing = attribs.get( objectFieldSpacing, Double.class );
-			return StyleSheet.instance.withAttr( Primitive.vboxSpacing, spacing );
+			return StyleSheet.instance.withAttr( Primitive.columnSpacing, spacing );
 		}
 	};
 	

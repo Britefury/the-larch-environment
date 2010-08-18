@@ -12,7 +12,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.SequentialPres;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class ObjectBoxWithFields extends SequentialPres
@@ -40,10 +40,10 @@ public class ObjectBoxWithFields extends SequentialPres
 		StyleValues childStyle = GenericStyle.useObjectBorderAttrs( GenericStyle.useObjectBoxAttrs( GenericStyle.useObjectFieldListAttrs( style ) ) );
 		
 		DPElement childElems[] = mapPresent( ctx, childStyle, children );
-		Pres contents = GenericStyle.objectBoxFieldListStyle.get( style ).applyTo( new VBox( childElems ) );
+		Pres contents = GenericStyle.objectBoxFieldListStyle.get( style ).applyTo( new Column( childElems ) );
 		
 		Pres titlePres = new ObjectTitle( title );
 		
-		return new ObjectBorder( new VBox( new Pres[] { titlePres, contents.padX( padding ) } ) ).present( ctx, style );
+		return new ObjectBorder( new Column( new Pres[] { titlePres, contents.padX( padding ) } ) ).present( ctx, style );
 	}
 }

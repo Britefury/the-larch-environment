@@ -7,11 +7,11 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import BritefuryJ.DocPresent.LayoutTree.LayoutNodeVBox;
-import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
+import BritefuryJ.DocPresent.LayoutTree.LayoutNodeColumn;
+import BritefuryJ.DocPresent.StyleParams.ColumnStyleParams;
 
 
-public class DPVBox extends DPAbstractBox
+public class DPColumn extends DPAbstractBox
 {
 	public static class InvalidTypesettingException extends RuntimeException
 	{
@@ -22,7 +22,7 @@ public class DPVBox extends DPAbstractBox
 	
 	protected final static int FLAG_HAS_REFPOINT_INDEX = FLAGS_CONTAINER_END * 0x1;
 	
-	protected final static int FLAGS_VBOX_END = FLAGS_CONTAINER_END << 1;
+	protected final static int FLAGS_COLUMN_END = FLAGS_CONTAINER_END << 1;
 
 	
 	
@@ -30,24 +30,24 @@ public class DPVBox extends DPAbstractBox
 	
 
 	
-	public DPVBox()
+	public DPColumn()
 	{
-		this( VBoxStyleParams.defaultStyleParams);
+		this( ColumnStyleParams.defaultStyleParams);
 	}
 	
-	public DPVBox(VBoxStyleParams styleParams)
+	public DPColumn(ColumnStyleParams styleParams)
 	{
 		super(styleParams);
 		
-		layoutNode = new LayoutNodeVBox( this );
+		layoutNode = new LayoutNodeColumn( this );
 		clearFlag( FLAG_HAS_REFPOINT_INDEX );
 	}
 	
-	protected DPVBox(DPVBox element)
+	protected DPColumn(DPColumn element)
 	{
 		super( element );
 		
-		layoutNode = new LayoutNodeVBox( this );
+		layoutNode = new LayoutNodeColumn( this );
 		setFlagValue( FLAG_HAS_REFPOINT_INDEX, element.testFlag( FLAG_HAS_REFPOINT_INDEX ) );
 		refPointIndex = element.refPointIndex;
 	}
@@ -62,7 +62,7 @@ public class DPVBox extends DPAbstractBox
 	
 	public DPElement clonePresentationSubtree()
 	{
-		DPVBox clone = new DPVBox( this );
+		DPColumn clone = new DPColumn( this );
 		clone.clonePostConstuct( this );
 		return clone;
 	}

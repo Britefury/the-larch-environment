@@ -26,14 +26,14 @@ import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ContentLeafStyleParams;
 import BritefuryJ.DocPresent.StyleParams.FractionStyleParams;
 import BritefuryJ.DocPresent.StyleParams.GridRowStyleParams;
-import BritefuryJ.DocPresent.StyleParams.HBoxStyleParams;
+import BritefuryJ.DocPresent.StyleParams.RowStyleParams;
 import BritefuryJ.DocPresent.StyleParams.MathRootStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ParagraphStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ScriptStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ShapeStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
-import BritefuryJ.DocPresent.StyleParams.VBoxStyleParams;
+import BritefuryJ.DocPresent.StyleParams.ColumnStyleParams;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Primitive
@@ -50,6 +50,8 @@ public class Primitive
 	public static final Attribute background = new Attribute( primitiveNamespace, "background", Painter.class, null );
 	public static final Attribute hoverBackground = new Attribute( primitiveNamespace, "hoverBackground", Painter.class, null );
 	public static final Attribute cursor = new Attribute( primitiveNamespace, "cursor", Cursor.class, null );
+	public static final AttributeNonNull columnSpacing = new AttributeNonNull( primitiveNamespace, "columnSpacing", Double.class, 0.0 );
+	public static final AttributeNonNull rowSpacing = new AttributeNonNull( primitiveNamespace, "rowSpacing", Double.class, 0.0 );
 	public static final InheritedAttributeNonNull fractionVSpacing = new InheritedAttributeNonNull( primitiveNamespace, "fractionVSpacing", Double.class, 2.0 );
 	public static final InheritedAttributeNonNull fractionHPadding = new InheritedAttributeNonNull( primitiveNamespace, "fractionHPadding", Double.class, 3.0 );
 	public static final InheritedAttributeNonNull fractionRefYOffset = new InheritedAttributeNonNull( primitiveNamespace, "fractionRefYOffset", Double.class, 5.0 );
@@ -58,7 +60,6 @@ public class Primitive
 	public static final InheritedAttributeNonNull editable = new InheritedAttributeNonNull( primitiveNamespace, "editable", Boolean.class, true );
 	public static final InheritedAttributeNonNull foreground = new InheritedAttributeNonNull( primitiveNamespace, "foreground", Paint.class, Color.black );
 	public static final InheritedAttribute hoverForeground = new InheritedAttribute( primitiveNamespace, "hoverForeground", Paint.class, null );
-	public static final AttributeNonNull hboxSpacing = new AttributeNonNull( primitiveNamespace, "hboxSpacing", Double.class, 0.0 );
 	public static final InheritedAttributeNonNull mathRootThickness = new InheritedAttributeNonNull( primitiveNamespace, "mathRootThickness", Double.class, 1.5 );
 	public static final InheritedAttributeNonNull paragraphSpacing = new InheritedAttributeNonNull( primitiveNamespace, "paragraphSpacing", Double.class, 0.0 );
 	public static final InheritedAttributeNonNull paragraphLineSpacing = new InheritedAttributeNonNull( primitiveNamespace, "paragraphLineSpacing", Double.class, 0.0 );
@@ -75,7 +76,6 @@ public class Primitive
 	public static final AttributeNonNull tableRowExpand = new AttributeNonNull( primitiveNamespace, "tableRowExpand", Boolean.class, false );
 	public static final InheritedAttribute textSquiggleUnderlinePaint = new InheritedAttribute( primitiveNamespace, "textSquiggleUnderlinePaint", Paint.class, null );
 	public static final InheritedAttributeNonNull textSmallCaps = new InheritedAttributeNonNull( primitiveNamespace, "textSmallCaps", Boolean.class, false );
-	public static final AttributeNonNull vboxSpacing = new AttributeNonNull( primitiveNamespace, "vboxSpacing", Double.class, 0.0 );
 
 
 
@@ -220,21 +220,21 @@ public class Primitive
 	
 	
 	
-	protected static DerivedValueTable<HBoxStyleParams> hboxParams = new DerivedValueTable<HBoxStyleParams>( primitiveNamespace )
+	protected static DerivedValueTable<RowStyleParams> rowParams = new DerivedValueTable<RowStyleParams>( primitiveNamespace )
 	{
-		protected HBoxStyleParams evaluate(AttributeTable attribs)
+		protected RowStyleParams evaluate(AttributeTable attribs)
 		{
-			return new HBoxStyleParams(
+			return new RowStyleParams(
 					attribs.get( background, Painter.class ),
 					attribs.get( hoverBackground, Painter.class ),
 					attribs.get( cursor, Cursor.class ),
-					attribs.get( hboxSpacing, Double.class ) );
+					attribs.get( rowSpacing, Double.class ) );
 		}
 	};
 	
-	protected static StyleValues useHBoxParams(StyleValues style)
+	protected static StyleValues useRowParams(StyleValues style)
 	{
-		return style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor ).useAttr( hboxSpacing );
+		return style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor ).useAttr( rowSpacing );
 	}
 
 	
@@ -426,21 +426,21 @@ public class Primitive
 	
 	
 	
-	protected static DerivedValueTable<VBoxStyleParams> vboxParams = new DerivedValueTable<VBoxStyleParams>( primitiveNamespace )
+	protected static DerivedValueTable<ColumnStyleParams> columnParams = new DerivedValueTable<ColumnStyleParams>( primitiveNamespace )
 	{
-		protected VBoxStyleParams evaluate(AttributeTable attribs)
+		protected ColumnStyleParams evaluate(AttributeTable attribs)
 		{
-			return new VBoxStyleParams(
+			return new ColumnStyleParams(
 					attribs.get( background, Painter.class ),
 					attribs.get( hoverBackground, Painter.class ),
 					attribs.get( cursor, Cursor.class ),
-					attribs.get( vboxSpacing, Double.class ) );
+					attribs.get( columnSpacing, Double.class ) );
 		}
 	};
 	
-	protected static StyleValues useVBoxParams(StyleValues style)
+	protected static StyleValues useColumnParams(StyleValues style)
 	{
-		return style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor ).useAttr( vboxSpacing );
+		return style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor ).useAttr( columnSpacing );
 	}
 	
 	

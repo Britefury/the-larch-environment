@@ -17,7 +17,7 @@ import BritefuryJ.DocPresent.Combinators.ElementRef;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Proxy;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
 import BritefuryJ.DocPresent.Combinators.RichText.NormalText;
@@ -88,7 +88,7 @@ public class PopupTestPage extends SystemPage
 		};
 		
 		Hyperlink popupLink = new Hyperlink( "Popup", popupListener );
-		Pres colourBox = new VBox( new Pres[] { colouredTextProxyRef, popupLink } );
+		Pres colourBox = new Column( new Pres[] { colouredTextProxyRef, popupLink } );
 		
 		return new Body( new Object[] { new Heading2( "Action hyperlinks" ), colourBox } );
 	}

@@ -11,11 +11,11 @@ import java.util.ArrayList;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Script;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.PresCom.UnescapedStringAsSpan;
@@ -26,7 +26,7 @@ public class GSymPrimitivePresenter
 	public static Pres presentChar(char c, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		String str = Character.toString( c );
-		return new HBox( new Pres[] {
+		return new Row( new Pres[] {
 				punctuationStyle.applyTo( new StaticText(  "'" ) ),
 				charStyle.applyTo( new StaticText( str ) ),
 				punctuationStyle.applyTo( new StaticText(  "'" ) ) } );
@@ -41,7 +41,7 @@ public class GSymPrimitivePresenter
 			lineContent.add( punctuationStyle.applyTo( new StaticText(  "\"" ) ) );
 			lineContent.add( new UnescapedStringAsSpan( text ) );
 			lineContent.add( punctuationStyle.applyTo( new StaticText(  "\"" ) ) );
-			return new HBox( lineContent );
+			return new Row( lineContent );
 		}
 		else
 		{
@@ -59,10 +59,10 @@ public class GSymPrimitivePresenter
 				{
 					lineContent.add( punctuationStyle.applyTo( new StaticText(  "\"" ) ) );
 				}
-				lines.add( new HBox( lineContent ) );
+				lines.add( new Row( lineContent ) );
 				index++;
 			}
-			return multiLineStringStyle.applyTo( new VBox( lines ) );
+			return multiLineStringStyle.applyTo( new Column( lines ) );
 		}
 	}
 

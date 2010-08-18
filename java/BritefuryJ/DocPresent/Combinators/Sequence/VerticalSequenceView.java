@@ -13,7 +13,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class VerticalSequenceView extends AbstractSequenceView
@@ -66,8 +66,8 @@ public class VerticalSequenceView extends AbstractSequenceView
 			}
 		}
 
-		Pres vbox = new VBox( childElems );
-		Pres indented = vbox.padX( indentation, 0.0 );
+		Pres column = new Column( childElems );
+		Pres indented = column.padX( indentation, 0.0 );
 		
 		
 		if ( beginDelim != null  ||  endDelim != null )
@@ -87,7 +87,7 @@ public class VerticalSequenceView extends AbstractSequenceView
 				outerChildElems.add(  endDelim );
 			}
 			
-			return new VBox( outerChildElems, 0 ).present( ctx, style );
+			return new Column( outerChildElems, 0 ).present( ctx, style );
 		}
 		else
 		{

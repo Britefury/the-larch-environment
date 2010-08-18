@@ -12,7 +12,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.SequentialPres;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class ErrorBoxWithFields extends SequentialPres
@@ -40,10 +40,10 @@ public class ErrorBoxWithFields extends SequentialPres
 		StyleValues childStyle = GenericStyle.useErrorBorderAttrs( GenericStyle.useErrorBoxAttrs( GenericStyle.useObjectFieldListAttrs( style ) ) );
 		
 		DPElement childElems[] = mapPresent( ctx, childStyle, children );
-		Pres contents = GenericStyle.objectBoxFieldListStyle.get( style ).applyTo( new VBox( childElems ) );
+		Pres contents = GenericStyle.objectBoxFieldListStyle.get( style ).applyTo( new Column( childElems ) );
 		
 		Pres titlePres = new ObjectTitle( title );
 		
-		return new ErrorBorder( new VBox( new Pres[] { titlePres, contents.padX( padding ) } ) ).present( ctx, style );
+		return new ErrorBorder( new Column( new Pres[] { titlePres, contents.padX( padding ) } ) ).present( ctx, style );
 	}
 }

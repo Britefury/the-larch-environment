@@ -29,7 +29,7 @@ public class RichText
 	public static final InheritedAttributeNonNull headSpacing = new InheritedAttributeNonNull( richTextNamespace, "headSpacing", Double.class, 1.0 );
 	public static final InheritedAttributeNonNull bodySpacing = new InheritedAttributeNonNull( richTextNamespace, "bodySpacing", Double.class, 10.0 );
 	public static final InheritedAttributeNonNull linkHeaderAttrs = new InheritedAttributeNonNull( richTextNamespace, "linkHeaderAttrs", StyleSheet.class,
-			StyleSheet.instance.withAttr( Primitive.hboxSpacing, 25.0 ).withAttr( Primitive.border, new FilledBorder( 5.0, 5.0, 5.0, 5.0, new Color( 184, 206, 203 ) ) ) );
+			StyleSheet.instance.withAttr( Primitive.rowSpacing, 25.0 ).withAttr( Primitive.border, new FilledBorder( 5.0, 5.0, 5.0, 5.0, new Color( 184, 206, 203 ) ) ) );
 	public static final InheritedAttributeNonNull linkHeaderPadding = new InheritedAttributeNonNull( richTextNamespace, "linkHeaderPadding", Double.class, 5.0 );
 	public static final InheritedAttributeNonNull titleTextAttrs = new InheritedAttributeNonNull( richTextNamespace, "titleTextAttrs", StyleSheet.class,
 			StyleSheet.instance.withAttr( Primitive.fontFace, "Serif" ).withAttr( Primitive.fontSize, 36 ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.textSmallCaps, true ) );
@@ -63,7 +63,7 @@ public class RichText
 	
 	public static StyleSheet pageStyle(StyleValues style)
 	{
-		return StyleSheet.instance.withAttrFrom( Primitive.vboxSpacing, style, pageSpacing );
+		return StyleSheet.instance.withAttrFrom( Primitive.columnSpacing, style, pageSpacing );
 	}
 
 	public static StyleValues usePageAttrs(StyleValues style)
@@ -75,7 +75,7 @@ public class RichText
 
 	public static StyleSheet headStyle(StyleValues style)
 	{
-		return StyleSheet.instance.withAttrFrom( Primitive.vboxSpacing, style, headSpacing );
+		return StyleSheet.instance.withAttrFrom( Primitive.columnSpacing, style, headSpacing );
 	}
 	
 	public static StyleValues useHeadAttrs(StyleValues style)
@@ -87,7 +87,7 @@ public class RichText
 
 	public static StyleSheet bodyStyle(StyleValues style)
 	{
-		return StyleSheet.instance.withAttrFrom( Primitive.vboxSpacing, style, bodySpacing );
+		return StyleSheet.instance.withAttrFrom( Primitive.columnSpacing, style, bodySpacing );
 	}
 	
 	public static StyleValues useBodyAttrs(StyleValues style)

@@ -12,7 +12,7 @@ import java.util.List;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
-import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class HorizontalSequenceView extends AbstractSequenceView
@@ -71,6 +71,6 @@ public class HorizontalSequenceView extends AbstractSequenceView
 		}
 		
 		
-		return new HBox( childElems ).present( ctx, style );
+		return new Row( childElems ).present( ctx, style );
 	}
 }

@@ -15,14 +15,14 @@ import BritefuryJ.DocPresent.DPProxy;
 import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.Combinators.ElementRef;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.Primitive.LineBreak;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Proxy;
 import BritefuryJ.DocPresent.Combinators.Primitive.Span;
 import BritefuryJ.DocPresent.Combinators.Primitive.Text;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
@@ -119,7 +119,7 @@ public class ProxyAndSpanTestPage extends SystemPage
 		};
 		Hyperlink modifySpanLink = new Hyperlink( "Place secondary text into span", onModifySpanLink );
 		
-		return styleSheet.withAttr( Primitive.vboxSpacing, 5.0 ).applyTo( new VBox( new Pres[] { paragraph, modifySpanLink } ) );
+		return styleSheet.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( new Column( new Pres[] { paragraph, modifySpanLink } ) );
 	}
 	
 	protected Pres createParagraph3()
@@ -169,8 +169,8 @@ public class ProxyAndSpanTestPage extends SystemPage
 		};
 		Hyperlink modifyProxyLink = new Hyperlink( "Place new span into proxy", onModifyProxyLink );
 
-		return styleSheet.withAttr( Primitive.vboxSpacing, 5.0 ).applyTo( new VBox( new Pres[] { paragraph,
-				styleSheet.withAttr( Primitive.hboxSpacing, 15.0 ).applyTo( new HBox( new Pres[] { modifySpanLink, modifyProxyLink } ) ) } ) );
+		return styleSheet.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( new Column( new Pres[] { paragraph,
+				styleSheet.withAttr( Primitive.rowSpacing, 15.0 ).applyTo( new Row( new Pres[] { modifySpanLink, modifyProxyLink } ) ) } ) );
 	}
 	
 	protected Pres createContents()

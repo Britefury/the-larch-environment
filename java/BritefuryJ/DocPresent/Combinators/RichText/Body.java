@@ -11,7 +11,7 @@ import java.util.List;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.SequentialPres;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class Body extends SequentialPres
@@ -31,6 +31,6 @@ public class Body extends SequentialPres
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
 		DPElement xs[] = mapPresent( ctx, RichText.useBodyAttrs( style ), children );
-		return RichText.bodyStyle( style ).applyTo( new VBox( xs ).alignHExpand() ).present( ctx, style );
+		return RichText.bodyStyle( style ).applyTo( new Column( xs ).alignHExpand() ).present( ctx, style );
 	}
 }

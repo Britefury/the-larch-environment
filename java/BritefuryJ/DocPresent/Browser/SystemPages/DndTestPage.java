@@ -17,14 +17,14 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.Fraction;
-import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Proxy;
 import BritefuryJ.DocPresent.Combinators.Primitive.Script;
 import BritefuryJ.DocPresent.Combinators.Primitive.Spacer;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
@@ -132,18 +132,18 @@ public class DndTestPage extends SystemPage
 		{
 			textElements.add( makeTextSource( texts.substring( i, i+1 ) ) );
 		}
-		Pres textSection = mainStyle.withAttr( Primitive.hboxSpacing, 3.0 ).applyTo( new HBox( textElements ) );
+		Pres textSection = mainStyle.withAttr( Primitive.rowSpacing, 3.0 ).applyTo( new Row( textElements ) );
 		
 		Pres mathTitle = paletteSectionStyle.applyTo( new StaticText( "Math:" ) );
 		ArrayList<Object> mathElements = new ArrayList<Object>();
 		mathElements.add( mathTitle.padX( 0.0, 20.0 ) );
 		mathElements.add( makeFractionSource() );
 		mathElements.add( makeScriptSource() );
-		Pres mathSection = mainStyle.withAttr( Primitive.hboxSpacing, 3.0 ).applyTo( new HBox( mathElements ) );
+		Pres mathSection = mainStyle.withAttr( Primitive.rowSpacing, 3.0 ).applyTo( new Row( mathElements ) );
 		
-		Pres vbox = mainStyle.withAttr( Primitive.vboxSpacing, 10.0 ).applyTo( new VBox( new Pres[] { title, textSection, mathSection } ) );
+		Pres column = mainStyle.withAttr( Primitive.columnSpacing, 10.0 ).applyTo( new Column( new Pres[] { title, textSection, mathSection } ) );
 		
-		return outlineStyle.applyTo( new Border( vbox.alignHExpand() ) ).alignHExpand().pad( 20.0, 5.0 ).alignHExpand();
+		return outlineStyle.applyTo( new Border( column.alignHExpand() ) ).alignHExpand().pad( 20.0, 5.0 ).alignHExpand();
 	}
 	
 	protected Pres makeFormula()
@@ -152,9 +152,9 @@ public class DndTestPage extends SystemPage
 		Pres formula = mathStyle.applyTo( makePlaceHolder() );
 		Pres formulaPara = mainStyle.applyTo( new Paragraph( new Pres[] { formula } ) );
 		
-		Pres vbox = mainStyle.withAttr( Primitive.vboxSpacing, 10.0 ).applyTo( new VBox( new Pres[] { title, formulaPara } ) ).alignHExpand();
+		Pres column = mainStyle.withAttr( Primitive.columnSpacing, 10.0 ).applyTo( new Column( new Pres[] { title, formulaPara } ) ).alignHExpand();
 		
-		return vbox.pad( 20.0, 5.0 );
+		return column.pad( 20.0, 5.0 );
 	}
 	
 	

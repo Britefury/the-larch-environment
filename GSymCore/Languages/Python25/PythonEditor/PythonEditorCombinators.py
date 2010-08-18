@@ -201,7 +201,7 @@ def getOuterPrecedence(inheritedState):
 #
 
 def suiteView(statements):
-	return VBox( statements )
+	return Column( statements )
 
 
 def blankLine():
@@ -239,7 +239,7 @@ def stringLiteral(format, quotation, value):
 	valuePres = ApplyStyleSheetFromAttribute( PythonEditorStyle.stringLiteralStyle, Text( value ) )
 	boxContents.extend( [ quotationPres,  valuePres,  quotationPres ] )
 	
-	return HBox( boxContents )
+	return Row( boxContents )
 
 
 def intLiteral(format, value):
@@ -248,7 +248,7 @@ def intLiteral(format, value):
 	if format is not None:
 		boxContents.append( ApplyStyleSheetFromAttribute( PythonEditorStyle.literalFormatStyle, Text( format ) ) )
 	
-	return HBox( boxContents )
+	return Row( boxContents )
 	
 	
 def floatLiteral(value):
@@ -510,8 +510,8 @@ def externalExpr(ctx, style, exprView, title, deleteButton):
 	
 	titleLabel = externalExprTitleStyle.applyTo( Label( title ) )
 	
-	header = HBox( [ titleLabel.alignHLeft(), deleteButton.alignHRight().alignVCentre() ] )
-	box = externalExprBorderStyle.applyTo( Border( VBox( [ header.alignHExpand(), exprView.pad( 3.0, 3.0 ) ] ) ) )
+	header = Row( [ titleLabel.alignHLeft(), deleteButton.alignHRight().alignVCentre() ] )
+	box = externalExprBorderStyle.applyTo( Border( Column( [ header.alignHExpand(), exprView.pad( 3.0, 3.0 ) ] ) ) )
 
 	segment = Segment( True, True, box )
 	return segment.present( ctx, style )
@@ -835,10 +835,10 @@ def dedentElement():
 @PyPresCombinatorFn
 def indentedBlock(ctx, style, indentElement, lines, dedentElement):
 	blockIndentation = style.get( PythonEditorStyle.blockIndentation )
-	return VBox( [ indentElement ]  +  lines  +  [ dedentElement ] ).padX( blockIndentation, 0.0 ).present( ctx, style )
+	return Column( [ indentElement ]  +  lines  +  [ dedentElement ] ).padX( blockIndentation, 0.0 ).present( ctx, style )
 
 def compoundStmt(components):
-	return VBox( components )
+	return Column( components )
 
 
 

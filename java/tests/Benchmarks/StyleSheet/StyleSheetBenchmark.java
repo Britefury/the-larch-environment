@@ -8,11 +8,11 @@ package tests.Benchmarks.StyleSheet;
 
 import BritefuryJ.DocPresent.DPBox;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPVBox;
+import BritefuryJ.DocPresent.DPColumn;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Box;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public class StyleSheetBenchmark
@@ -36,7 +36,7 @@ public class StyleSheetBenchmark
 			elements[i] = new DPBox( "", 10.0, 10.0 );
 		}
 		
-		DPVBox box = new DPVBox();
+		DPColumn box = new DPColumn();
 		box.setChildren( elements );
 		return box;
 	}
@@ -63,7 +63,7 @@ public class StyleSheetBenchmark
 			elements[i] = newStyle.applyTo( new Box( 10.0, 10.0 ) );
 		}
 		
-		return new VBox( elements );
+		return new Column( elements );
 	}
 	
 	public static double combinatorsOnlyTest()
@@ -87,7 +87,7 @@ public class StyleSheetBenchmark
 			elements[i] = newStyle.applyTo( new Box( 10.0, 10.0 ) );
 		}
 		
-		return new VBox( elements ).present();
+		return new Column( elements ).present();
 	}
 	
 	public static double combinatorStyleSheetTest()
@@ -111,7 +111,7 @@ public class StyleSheetBenchmark
 			elements[i] = newStyle.applyTo( new Box( 10.0, 10.0 ) );
 		}
 		
-		return new VBox( elements );
+		return new Column( elements );
 	}
 	
 	public static double repeatedCombinatorStyleSheetTest()

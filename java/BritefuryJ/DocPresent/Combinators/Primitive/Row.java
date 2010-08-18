@@ -4,25 +4,23 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.DocPresent.Combinators.ContextMenu;
+package BritefuryJ.DocPresent.Combinators.Primitive;
 
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Combinators.ApplyStyleSheetFromAttribute;
+import BritefuryJ.DocPresent.DPRow;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
-import BritefuryJ.DocPresent.Combinators.SequentialPres;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
-public class SectionVBox extends SequentialPres
+public class Row extends AbstractBox
 {
-	public SectionVBox(Object children[])
+	public Row(Object children[])
 	{
 		super( children );
 	}
 	
-	public SectionVBox(List<Object> children)
+	public Row(List<Object> children)
 	{
 		super( children );
 	}
@@ -31,7 +29,8 @@ public class SectionVBox extends SequentialPres
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPElement xs[] = mapPresent( ctx, ContextMenuStyle.sectionVBoxUsage.useAttrs( style ), children );
-		return new ApplyStyleSheetFromAttribute( ContextMenuStyle.sectionVBoxStyle, new VBox( xs ) ).present( ctx, style );
+		DPRow element = new DPRow( Primitive.rowParams.get( style ) );
+		element.setChildren( mapPresent( ctx, Primitive.useRowParams( style ), children ) );
+		return element;
 	}
 }

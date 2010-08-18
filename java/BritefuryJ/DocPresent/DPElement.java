@@ -27,7 +27,7 @@ import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
-import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
@@ -636,10 +636,10 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		}
 		else
 		{
-			DPHBox hbox = new DPHBox();
-			hbox.setChildren( new DPElement[] { this } );
-			hbox.copyAlignmentFlagsFrom( this );
-			return hbox;
+			DPRow row = new DPRow();
+			row.setChildren( new DPElement[] { this } );
+			row.copyAlignmentFlagsFrom( this );
+			return row;
 		}
 	}
 	
@@ -3163,7 +3163,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	protected static StyleSheet headerDebugTextStyle = StyleSheet.instance.withAttr( Primitive.fontBold, true ).withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.5f ) );
 	protected static StyleSheet headerDescriptionTextStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.75f ) );
-	protected static StyleSheet metaHeaderHBoxStyle = StyleSheet.instance.withAttr( Primitive.hboxSpacing, 10.0 );
+	protected static StyleSheet metaHeaderRowStyle = StyleSheet.instance.withAttr( Primitive.rowSpacing, 10.0 );
 	protected static StyleSheet metaHeaderEmptyBorderStyle = StyleSheet.instance.withAttr( Primitive.border, new FilledBorder() );
 
 
@@ -3188,7 +3188,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	{
 		ArrayList<Object> elements = new ArrayList<Object>();
 		createDebugPresentationHeaderContents( elements );
-		Pres box = metaHeaderHBoxStyle.applyTo( new HBox( elements ) );
+		Pres box = metaHeaderRowStyle.applyTo( new Row( elements ) );
 		return getDebugPresentationHeaderBorderStyle().applyTo( new Border( box ) );
 	}
 	

@@ -12,7 +12,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
-import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class SplitLinkHeaderBar extends Pres
@@ -40,6 +40,6 @@ public class SplitLinkHeaderBar extends Pres
 		Pres left[] = mapCoerce( mapPresent( ctx, RichText.useBodyAttrs( style ), leftChildren ) );
 		Pres right[] = mapCoerce( mapPresent( ctx, RichText.useBodyAttrs( style ), rightChildren ) );
 		return RichText.linkHeaderStyle( style ).applyTo( 
-				new Border( new HBox( new Pres[] { new HBox( left ).alignHLeft(), new HBox( right ).alignHRight() } ).alignHExpand()).alignHExpand().pad( padding, padding ) ).present( ctx, style );
+				new Border( new Row( new Pres[] { new Row( left ).alignHLeft(), new Row( right ).alignHRight() } ).alignHExpand()).alignHExpand().pad( padding, padding ) ).present( ctx, style );
 	}
 }

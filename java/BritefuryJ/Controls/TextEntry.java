@@ -25,7 +25,7 @@ import BritefuryJ.DocPresent.Clipboard.TextEditHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
-import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Region;
 import BritefuryJ.DocPresent.Combinators.Primitive.Segment;
@@ -397,7 +397,7 @@ public class TextEntry extends ControlPres
 		BritefuryJ.DocPresent.Border.AbstractBorder invalidBorder = style.get( Controls.textEntryInvalidBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class );
 		
 		DPText textElement = (DPText)StyleSheet.instance.withAttr( Primitive.editable, true ).applyTo( new Text( initialText ) ).present( ctx, style );
-		Pres line = new HBox( new Pres[] { new Segment( false, false, textElement ) } );
+		Pres line = new Row( new Pres[] { new Segment( false, false, textElement ) } );
 		Pres region = new Region( line );
 		DPRegion regionElement = (DPRegion)region.present( ctx, style );
 		Pres outer = new Border( regionElement );

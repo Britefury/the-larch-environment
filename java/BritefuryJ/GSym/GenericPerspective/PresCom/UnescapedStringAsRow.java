@@ -9,11 +9,11 @@ package BritefuryJ.GSym.GenericPerspective.PresCom;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 
-public class UnescapedStringAsHBox extends UnescapedString
+public class UnescapedStringAsRow extends UnescapedString
 {
-	public UnescapedStringAsHBox(String value)
+	public UnescapedStringAsRow(String value)
 	{
 		super( value );
 	}
@@ -22,6 +22,6 @@ public class UnescapedStringAsHBox extends UnescapedString
 	@Override
 	protected Pres createContainer(ArrayList<Object> contents)
 	{
-		return new HBox( contents );
+		return new Row( contents );
 	}
 }

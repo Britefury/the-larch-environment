@@ -13,7 +13,7 @@ import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.ObjectPresentation.PresentationStateListenerList;
@@ -87,11 +87,11 @@ public class LogView implements Presentable
 			entryElements[i++] = new InnerFragment( entry );
 		}
 		
-		return boxStyle.applyTo( new VBox( entryElements ) ).alignHExpand();
+		return boxStyle.applyTo( new Column( entryElements ) ).alignHExpand();
 	}
 
 
 
 	static StyleSheet titleStyle = StyleSheet.instance.withAttr( Primitive.fontFace, "Serif" ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 28 );
-	static StyleSheet boxStyle = StyleSheet.instance.withAttr( Primitive.vboxSpacing, 5.0 );
+	static StyleSheet boxStyle = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 );
 }

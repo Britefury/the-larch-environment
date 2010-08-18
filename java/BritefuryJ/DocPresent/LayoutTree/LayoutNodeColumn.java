@@ -8,45 +8,81 @@ package BritefuryJ.DocPresent.LayoutTree;
 
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPHBox;
+import BritefuryJ.DocPresent.DPColumn;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementFilter;
-import BritefuryJ.DocPresent.Layout.HorizontalLayout;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
+import BritefuryJ.DocPresent.Layout.VerticalLayout;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 
-public class LayoutNodeHBox extends LayoutNodeAbstractBox
+public class LayoutNodeColumn extends LayoutNodeAbstractBox
 {
-	public LayoutNodeHBox(DPHBox element)
+	public LayoutNodeColumn(DPColumn element)
 	{
 		super( element );
 	}
 
 	
+	protected int getRefPointIndex()
+	{
+		return ((DPColumn)element).getRefPointIndex();
+	}
+	
+	protected boolean hasRefPointIndex()
+	{
+		return ((DPColumn)element).hasRefPointIndex();
+	}
+	
+	
+	protected int clampRefPointIndex(int refPointIndex)
+	{
+		int numLeaves = getNumLeaves();
+		refPointIndex = Math.min( refPointIndex, numLeaves - 1 );
+		if ( refPointIndex < 0 )
+		{
+			refPointIndex = numLeaves + refPointIndex;
+			refPointIndex = Math.max( refPointIndex, 0 );
+		}
+		return refPointIndex;
+	}
+	
+
 	
 	protected void updateRequisitionX()
 	{
 		refreshSubtree();
 		
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
-		HorizontalLayout.computeRequisitionX( layoutReqBox, getLeavesRefreshedRequisitonXBoxes(), getSpacing() );
+		VerticalLayout.computeRequisitionX( layoutReqBox, getLeavesRefreshedRequisitonXBoxes() );
 	}
 
 	protected void updateRequisitionY()
 	{
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
-		HorizontalLayout.computeRequisitionY( layoutReqBox, getLeavesRefreshedRequistionYBoxes(), getLeavesAlignmentFlags() );
+		
+		int refPointIndex = getRefPointIndex();
+		boolean bHasRefPointIndex = hasRefPointIndex();
+		if ( bHasRefPointIndex )
+		{
+			refPointIndex = clampRefPointIndex( refPointIndex );
+		}
+		else
+		{
+			refPointIndex = -1;
+		}
+		
+		VerticalLayout.computeRequisitionY( layoutReqBox, getLeavesRefreshedRequistionYBoxes(), refPointIndex, getSpacing() );
 	}
-	
 
-	
+
+
 
 	protected void updateAllocationX()
 	{
-		super.updateAllocationX();
+		super.updateAllocationX( );
 		
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		LReqBoxInterface childBoxes[] = getLeavesRequisitionBoxes();
@@ -54,16 +90,14 @@ public class LayoutNodeHBox extends LayoutNodeAbstractBox
 		int childAllocFlags[] = getLeavesAlignmentFlags();
 		double prevWidth[] = getLeavesAllocationX();
 		
-		HorizontalLayout.allocateX( layoutReqBox, childBoxes, getAllocationBox(), childAllocBoxes, childAllocFlags, getSpacing() );
+		VerticalLayout.allocateX( layoutReqBox, childBoxes, getAllocationBox(), childAllocBoxes, childAllocFlags );
 		
 		refreshLeavesAllocationX( prevWidth );
 	}
-	
-	
-	
+
 	protected void updateAllocationY()
 	{
-		super.updateAllocationY();
+		super.updateAllocationY( );
 		
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		LReqBoxInterface childBoxes[] = getLeavesRequisitionBoxes();
@@ -71,7 +105,18 @@ public class LayoutNodeHBox extends LayoutNodeAbstractBox
 		int childAllocFlags[] = getLeavesAlignmentFlags();
 		LAllocV prevAllocV[] = getLeavesAllocV();
 		
-		HorizontalLayout.allocateY( layoutReqBox, childBoxes, getAllocationBox(), childAllocBoxes, childAllocFlags );
+		int refPointIndex = getRefPointIndex();
+		boolean bHasRefPointIndex = hasRefPointIndex();
+		if ( bHasRefPointIndex )
+		{
+			refPointIndex = clampRefPointIndex( refPointIndex );
+		}
+		else
+		{
+			refPointIndex = -1;
+		}
+
+		VerticalLayout.allocateY( layoutReqBox, childBoxes, getAllocationBox(), childAllocBoxes, childAllocFlags, refPointIndex, getSpacing() );
 		
 		refreshLeavesAllocationY( prevAllocV );
 	}
@@ -80,11 +125,11 @@ public class LayoutNodeHBox extends LayoutNodeAbstractBox
 	
 	protected DPElement getChildLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
 	{
-		return getChildLeafClosestToLocalPointHorizontal( getLeaves(), localPos, filter );
+		return getChildLeafClosestToLocalPointVertical( getLeaves(), localPos, filter );
 	}
 
 
-
+	
 	protected AABox2[] computeCollatedBranchBoundsBoxes(int rangeStart, int rangeEnd)
 	{
 		refreshSubtree();
@@ -97,9 +142,9 @@ public class LayoutNodeHBox extends LayoutNodeAbstractBox
 		{
 			DPElement startLeaf = leaves[rangeStart];
 			DPElement endLeaf = leaves[rangeEnd-1];
-			double xStart = startLeaf.getPositionInParentSpaceX();
-			double xEnd = endLeaf.getPositionInParentSpaceX()  +  endLeaf.getWidthInParentSpace();
-			AABox2 box = new AABox2( xStart, 0.0, xEnd, getAllocationY() );
+			double yStart = startLeaf.getPositionInParentSpaceY();
+			double yEnd = endLeaf.getPositionInParentSpaceY()  +  endLeaf.getHeightInParentSpace();
+			AABox2 box = new AABox2( 0.0, yStart, getAllocationX(), yEnd );
 			return new AABox2[] { box };
 		}
 	}
@@ -111,6 +156,11 @@ public class LayoutNodeHBox extends LayoutNodeAbstractBox
 	//
 	
 	public List<DPElement> horizontalNavigationList()
+	{
+		return getLeaves();
+	}
+	
+	public List<DPElement> verticalNavigationList()
 	{
 		return getLeaves();
 	}

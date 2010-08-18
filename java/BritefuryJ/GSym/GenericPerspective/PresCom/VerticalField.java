@@ -10,7 +10,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
@@ -35,6 +35,6 @@ public class VerticalField extends Pres
 		
 		DPElement valueElement = value.present( ctx, GenericStyle.useObjectFieldAttrs( style ) );
 		
-		return fieldStyle.applyTo( new VBox( new Object[] { new StaticText( title ), valueElement.padX( indentation, 0.0 ) } ) ).present( ctx, style );
+		return fieldStyle.applyTo( new Column( new Object[] { new StaticText( title ), valueElement.padX( indentation, 0.0 ) } ) ).present( ctx, style );
 	}
 }

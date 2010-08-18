@@ -15,7 +15,7 @@ import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Head;
 import BritefuryJ.DocPresent.Combinators.RichText.Page;
@@ -123,7 +123,7 @@ public class PythonEvalPageLocationResolver implements PageLocationResolver
 			{
 				excLineTexts[i] = new StaticText( excLines[i] );
 			}
-			Pres excText = contentsStyle.applyTo( new VBox( excLineTexts ) );
+			Pres excText = contentsStyle.applyTo( new Column( excLineTexts ) );
 			Pres body = new Body( new Pres[] { errorTitle, loc, excClass, excText } );
 			
 			

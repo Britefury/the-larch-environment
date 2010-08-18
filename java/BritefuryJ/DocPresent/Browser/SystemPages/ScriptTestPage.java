@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Fraction;
-import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Script;
 import BritefuryJ.DocPresent.Combinators.Primitive.Text;
@@ -48,7 +48,7 @@ public class ScriptTestPage extends SystemPage
 	
 	protected Pres makeScriptLine(Pres main, Pres leftSuper, Pres leftSub, Pres rightSuper, Pres rightSub)
 	{
-		return new HBox( new Pres[] { scriptPreStyleSheet.applyTo( new Text( "<<Left<<" ) ),
+		return new Row( new Pres[] { scriptPreStyleSheet.applyTo( new Text( "<<Left<<" ) ),
 				scriptStyleSheet.applyTo( new Script( main, leftSuper, leftSub, rightSuper, rightSub ) ),
 				scriptPostStyleSheet.applyTo( new Text( ">>Right>>" ) ) } );
 	}
@@ -60,7 +60,7 @@ public class ScriptTestPage extends SystemPage
 		Pres fraction = new Fraction( new Text( numText ), new Text( denomText ), "/" );
 		Pres script = new Script( new Text( mainText ), null, null, fraction, null );
 		
-		return new HBox( new Pres[] { scriptPreStyleSheet.applyTo( new Text( "Label A yYgGjJpPqQ" ) ),
+		return new Row( new Pres[] { scriptPreStyleSheet.applyTo( new Text( "Label A yYgGjJpPqQ" ) ),
 				scriptStyleSheet.applyTo( script ),
 				scriptPostStyleSheet.applyTo( new Text( "Label B yYgGjJpPqQ" ) ) } );
 	}

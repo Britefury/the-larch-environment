@@ -7,7 +7,7 @@
 package BritefuryJ.Controls;
 
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 
 public class VPopupMenu extends PopupMenu
 {
@@ -24,6 +24,6 @@ public class VPopupMenu extends PopupMenu
 	@Override
 	protected Pres createMenuBox(Pres boxItems[])
 	{
-		return new VBox( boxItems );
+		return new Column( boxItems );
 	}
 }

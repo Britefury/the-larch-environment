@@ -14,7 +14,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class VerticalInlineSequenceView extends AbstractSequenceView
@@ -113,17 +113,17 @@ public class VerticalInlineSequenceView extends AbstractSequenceView
 				childElems.add( createLineParagraph( children[children.length-1], null ) );
 			}
 			
-			Pres middleVBox = new VBox( childElems );
-			Pres indent = middleVBox.padX( indentation );
+			Pres middleColumn = new Column( childElems );
+			Pres indent = middleColumn.padX( indentation );
 			
 			
 			if ( endDelim != null )
 			{
-				return new VBox( new Pres[] { first, indent, endDelim }, 0 ).present( ctx, style );
+				return new Column( new Pres[] { first, indent, endDelim }, 0 ).present( ctx, style );
 			}
 			else
 			{
-				return new VBox( new Pres[] { first, indent }, 0 ).present( ctx, style );
+				return new Column( new Pres[] { first, indent }, 0 ).present( ctx, style );
 			}
 		}
 	}

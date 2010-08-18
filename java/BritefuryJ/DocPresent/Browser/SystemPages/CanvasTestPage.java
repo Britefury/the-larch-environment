@@ -21,7 +21,7 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.Canvas;
-import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
@@ -206,8 +206,8 @@ public class CanvasTestPage extends SystemPage
 		Pres dest0 = makeDestElement( "Number", model );
 		Pres dest1 = makeDestElement2( "Number", model );
 
-		Pres hbox = StyleSheet.instance.withAttr( Primitive.hboxSpacing, 20.0 ).applyTo( new HBox( new Object[] { dest0, dest1 } ) );
+		Pres row = StyleSheet.instance.withAttr( Primitive.rowSpacing, 20.0 ).applyTo( new Row( new Object[] { dest0, dest1 } ) );
 		
-		return new Body( new Pres[] { diagram, hbox.padY( 10.0, 0.0 ) } );
+		return new Body( new Pres[] { diagram, row.padY( 10.0, 0.0 ) } );
 	}
 }

@@ -18,12 +18,12 @@ import BritefuryJ.DocPresent.DPProxy;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
-import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Proxy;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
@@ -88,7 +88,7 @@ public class TextEntryTestPage extends SystemPage
 				{
 					status.setText( "" );
 					entry.setText( link.getText() );
-					proxy.setChild( StyleSheet.instance.withAttr( Primitive.hboxSpacing, 10.0 ).applyTo( new HBox( new Object[] { entry.getElement(), status } ) ).present( ctx, style ) );
+					proxy.setChild( StyleSheet.instance.withAttr( Primitive.rowSpacing, 10.0 ).applyTo( new Row( new Object[] { entry.getElement(), status } ) ).present( ctx, style ) );
 					entry.grabCaret();
 				}
 			}
@@ -191,7 +191,7 @@ public class TextEntryTestPage extends SystemPage
 		Pres identifierLine = new Paragraph( new Pres[] { new StaticText( "Identifier: "), identifier } );
 		Pres integerLine = new Paragraph( new Pres[] { new StaticText( "Integer: "), integer } );
 		
-		Pres entriesBox = new VBox( new Pres[] { hello, world, identifierLine, integerLine } );
+		Pres entriesBox = new Column( new Pres[] { hello, world, identifierLine, integerLine } );
 		
 		return new Body( new Pres[] { new Heading2( "Text entries" ), entriesBox } );
 	}

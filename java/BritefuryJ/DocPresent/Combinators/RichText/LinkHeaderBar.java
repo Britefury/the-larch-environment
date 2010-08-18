@@ -13,7 +13,7 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.SequentialPres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
-import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class LinkHeaderBar extends SequentialPres
@@ -35,6 +35,6 @@ public class LinkHeaderBar extends SequentialPres
 		double padding = style.get( RichText.linkHeaderPadding, Double.class );
 		Pres xs[] = mapCoerce( mapPresent( ctx, RichText.useBodyAttrs( style ), children ) );
 		return RichText.linkHeaderStyle( style ).applyTo(
-				new Border( new HBox( xs ).alignHRight() ).alignHExpand().pad( padding, padding ) ).present( ctx, style );
+				new Border( new Row( xs ).alignHRight() ).alignHExpand().pad( padding, padding ) ).present( ctx, style );
 	}
 }

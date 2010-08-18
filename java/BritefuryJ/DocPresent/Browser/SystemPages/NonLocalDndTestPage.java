@@ -16,11 +16,11 @@ import BritefuryJ.DocPresent.DPProxy;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
-import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Proxy;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
@@ -63,7 +63,7 @@ public class NonLocalDndTestPage extends SystemPage
 	{
 		Pres titleElem = textStyle.applyTo( new StaticText( title ) );
 		
-		return styleSheet.withAttr( Primitive.hboxSpacing, 20.0 ).applyTo( new HBox( new Pres[] { titleElem, dest } ) );
+		return styleSheet.withAttr( Primitive.rowSpacing, 20.0 ).applyTo( new Row( new Pres[] { titleElem, dest } ) );
 	}
 	
 	protected Pres makeFileReceiver()
@@ -89,7 +89,7 @@ public class NonLocalDndTestPage extends SystemPage
 						{
 							elements.add( new StaticText( x.toString() ) );
 						}
-						DPElement e = new VBox( elements ).present( ctx, style );
+						DPElement e = new Column( elements ).present( ctx, style );
 						
 						((DPProxy)element).setChild( e );
 						

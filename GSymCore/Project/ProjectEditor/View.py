@@ -255,7 +255,7 @@ _projectIndexDropDest = ObjectDndHandler.DropDest( ProjectDrag, _projectIndexDro
 
 
 _controlsStyle = StyleSheet.instance.withAttr( Controls.bClosePopupOnActivate, True )
-_projectControlsStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 2.0, 2.0, Color( 131, 149, 172 ), None ) ).withAttr( Primitive.hboxSpacing, 30.0 )
+_projectControlsStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 2.0, 2.0, Color( 131, 149, 172 ), None ) ).withAttr( Primitive.rowSpacing, 30.0 )
 _projectIndexNameStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.25, 0.5 ) ).withAttr( Primitive.fontBold, True ).withAttr( Primitive.fontSize, 14 )
 _packageNameStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.0, 0.5 ) ).withAttr( Primitive.fontBold, True ).withAttr( Primitive.fontSize, 14 )
 _itemHoverHighlightStyle = StyleSheet.instance.withAttr( Primitive.hoverBackground, FilledOutlinePainter( Color( 0.8, 0.825, 0.9 ), Color( 0.125, 0.341, 0.574 ), BasicStroke( 1.0 ) ) )
@@ -360,7 +360,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		# Controls for 'save' and 'save as'
 		saveLink = Hyperlink( 'SAVE', _onSave )
 		saveAsLink = Hyperlink( 'SAVE AS', _onSaveAs )
-		controlsBox = HBox( [ saveLink.padX( 10.0 ), saveAsLink.padX( 10.0 ) ] )
+		controlsBox = Row( [ saveLink.padX( 10.0 ), saveAsLink.padX( 10.0 ) ] )
 		controlsBorder = _projectControlsStyle.applyTo( Border( controlsBox ) )
 		
 		
@@ -373,7 +373,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 			pythonPackageNameLabel = _itemHoverHighlightStyle.applyTo( _pythonPackageNameStyle.applyTo( Label( pythonPackageName ) ) )
 		pythonPackageNameLabel = pythonPackageNameLabel.withInteractor( _PythonPackageNameInteractor() )
 		pythonPackageCell = LiteralCell( pythonPackageNameLabel )
-		pythonPackageNameBox = HBox( [ pythonPackageNamePrompt, pythonPackageCell.genericPerspectiveValuePresInFragment() ] )
+		pythonPackageNameBox = Row( [ pythonPackageNamePrompt, pythonPackageCell.genericPerspectiveValuePresInFragment() ] )
 		
 		
 		# Project index
@@ -390,13 +390,13 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		nameBox = nameBox.withContextMenuFactory( _projectIndexContextMenuFactory )
 		nameBox = nameBox.withDropDest( _projectIndexDropDest )
 		
-		itemsBox = VBox( items )
+		itemsBox = Column( items )
 		
-		contentsView = VBox( [ nameBox, itemsBox.padX( _packageContentsIndentation, 0.0 ).alignHExpand() ] )
+		contentsView = Column( [ nameBox, itemsBox.padX( _packageContentsIndentation, 0.0 ).alignHExpand() ] )
 		
 		
 		# Project index box
-		projectIndex = VBox( [ indexHeader, contentsView.alignHExpand() ] )
+		projectIndex = Column( [ indexHeader, contentsView.alignHExpand() ] )
 		
 		
 		# The page
@@ -449,16 +449,16 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		
 		icon = Image( 'GSymCore/Project/icons/Package.png' )
 		nameElement = _packageNameStyle.applyTo( StaticText( name ) )
-		nameBox = _itemHoverHighlightStyle.applyTo( HBox( [ icon.padX( 5.0 ).alignVCentre(), nameElement.alignVCentre() ]  ) )
+		nameBox = _itemHoverHighlightStyle.applyTo( Row( [ icon.padX( 5.0 ).alignVCentre(), nameElement.alignVCentre() ]  ) )
 		nameBox = nameBox.withContextMenuFactory( _packageContextMenuFactory )
 		nameBox = nameBox.withDragSource( _dragSource )
 		nameBox = nameBox.withDropDest( _packageDropDest )
 		
 		nameCell = LiteralCell( nameBox )
 		
-		itemsBox = VBox( items )
+		itemsBox = Column( items )
 		
-		return VBox( [ nameCell.genericPerspectiveValuePresInFragment(), itemsBox.padX( _packageContentsIndentation, 0.0 ).alignHExpand() ] )
+		return Column( [ nameCell.genericPerspectiveValuePresInFragment(), itemsBox.padX( _packageContentsIndentation, 0.0 ).alignHExpand() ] )
 		
 		
 
@@ -486,7 +486,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 		link = Hyperlink( name, pageLocation )
 		link = link.withContextMenuFactory( _pageContextMenuFactory )
-		nameBox = _itemHoverHighlightStyle.applyTo( HBox( [ link ] ) )
+		nameBox = _itemHoverHighlightStyle.applyTo( Row( [ link ] ) )
 		nameBox = nameBox.withDragSource( _dragSource )
 		nameBox = nameBox.withDropDest( _pageDropDest )
 		

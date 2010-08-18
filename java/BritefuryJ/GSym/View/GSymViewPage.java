@@ -15,7 +15,7 @@ import BritefuryJ.DocPresent.PageController;
 import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.GSym.GSymBrowserContext;
@@ -55,7 +55,7 @@ public class GSymViewPage extends BrowserPage
 		};
 		
 		logLink = new Hyperlink( "Page log", listener );
-		Pres pagePres = new VBox( new Object[] { this.element.alignHExpand(), logLink.pad( 10, 10 ).alignHRight() } );
+		Pres pagePres = new Column( new Object[] { this.element.alignHExpand(), logLink.pad( 10, 10 ).alignHRight() } );
 		pageElement = pagePres.present();
 	}
 	

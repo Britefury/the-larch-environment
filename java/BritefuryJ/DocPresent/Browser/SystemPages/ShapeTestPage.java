@@ -13,7 +13,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Box;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Shape;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
@@ -43,7 +43,7 @@ public class ShapeTestPage extends SystemPage
 	
 	protected Pres createContents()
 	{
-		return styleSheet.applyTo( new VBox( new Pres[] {
+		return styleSheet.applyTo( new Column( new Pres[] {
 				new StaticText( "Box 50x10; 1 pixel padding" ),
 				new Box( 50.0, 10.0 ).pad( 1.0, 1.0 ),
 				new StaticText( "Box 50x10; 10 pixel padding" ),

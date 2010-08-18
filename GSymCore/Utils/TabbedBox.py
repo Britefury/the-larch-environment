@@ -54,5 +54,5 @@ class TabbedBox (Pres):
 		contentsElement = contents.present( ctx, style )
 		header = Border( StaticText( self._tabTitle ) ).present( ctx, headerStyle )
 		body = Border( contentsElement )
-		return VBox( [ header, body.alignHExpand() ] ).present( ctx, headerStyle )
+		return Column( [ header, body.alignHExpand() ] ).present( ctx, headerStyle )
 

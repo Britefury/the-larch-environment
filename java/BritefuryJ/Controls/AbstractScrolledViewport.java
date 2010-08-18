@@ -11,9 +11,9 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPViewport;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
-import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.Primitive.Spacer;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.Primitive.Viewport;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
@@ -106,10 +106,10 @@ public abstract class AbstractScrolledViewport extends ControlPres
 		VScrollBar yScroll = new VScrollBar( yRange );
 		ScrollBar.ScrollBarControl yScrollCtl = (ScrollBarControl)yScroll.createControl( ctx, style );
 		
-		Pres hbox0 = new HBox( new Object[] { bin.alignHExpand().alignVExpand(), yScrollCtl.getElement().alignVExpand() } );
-		Pres hbox1 = new HBox( new Object[] { xScrollCtl.getElement().alignHExpand(), new Spacer( scrollBarSize, scrollBarSize ) } );
-		Pres vbox = new VBox( new Pres[] { hbox0.alignHExpand().alignVExpand(), hbox1.alignHExpand() } );
-		DPElement element = vbox.present( ctx, style );
+		Pres row0 = new Row( new Object[] { bin.alignHExpand().alignVExpand(), yScrollCtl.getElement().alignVExpand() } );
+		Pres row1 = new Row( new Object[] { xScrollCtl.getElement().alignHExpand(), new Spacer( scrollBarSize, scrollBarSize ) } );
+		Pres col = new Column( new Pres[] { row0.alignHExpand().alignVExpand(), row1.alignHExpand() } );
+		DPElement element = col.present( ctx, style );
 		
 		return new ScrolledViewportControl( ctx, style, viewportElement, element, xScrollCtl, yScrollCtl, xRange, yRange );
 	}

@@ -22,7 +22,7 @@ import BritefuryJ.DocPresent.Combinators.Sequence.VerticalInlineSequenceView;
 import BritefuryJ.DocPresent.Combinators.Sequence.VerticalSequenceView;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
-import BritefuryJ.GSym.GenericPerspective.PresCom.UnescapedStringAsHBox;
+import BritefuryJ.GSym.GenericPerspective.PresCom.UnescapedStringAsRow;
 import BritefuryJ.GSym.PresCom.InnerFragment;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
@@ -67,7 +67,7 @@ public class DocModelPresenter
 		}
 		else if ( x instanceof String )
 		{
-			return stringStyle.applyTo( new UnescapedStringAsHBox( (String )x ) );
+			return stringStyle.applyTo( new UnescapedStringAsRow( (String )x ) );
 		}
 		else
 		{

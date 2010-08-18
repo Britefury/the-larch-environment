@@ -9,7 +9,7 @@ package BritefuryJ.GSym.GenericPerspective.PresCom;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class ErrorBox extends Pres
@@ -34,6 +34,6 @@ public class ErrorBox extends Pres
 		
 		Pres titlePres = new ObjectTitle( title );
 		
-		return new ErrorBorder( new VBox( new Object[] { titlePres, contentsElement.padX( padding ) } ) ).present( ctx, style );
+		return new ErrorBorder( new Column( new Object[] { titlePres, contentsElement.padX( padding ) } ) ).present( ctx, style );
 	}
 }

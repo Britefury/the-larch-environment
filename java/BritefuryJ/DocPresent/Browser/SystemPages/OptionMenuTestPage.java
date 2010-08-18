@@ -13,7 +13,7 @@ import BritefuryJ.DocPresent.Combinators.ElementRef;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.SpaceBin;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
 
@@ -64,7 +64,7 @@ public class OptionMenuTestPage extends SystemPage
 		OptionMenuTextChanger listener = new OptionMenuTextChanger( choiceTextRef );
 		OptionMenu optionMenu = new OptionMenu( choices, 0, listener );
 		Pres optionMenuBox = new SpaceBin( optionMenu.alignHExpand(), 100.0, -1.0 ).padX( 5.0 );
-		Pres optionMenuSectionContents = new VBox( new Pres[] { choiceTextRef, optionMenuBox } );
+		Pres optionMenuSectionContents = new Column( new Pres[] { choiceTextRef, optionMenuBox } );
 		
 		return new Body( new Pres[] { new Heading2( "Option menu" ), optionMenuSectionContents } );
 	}

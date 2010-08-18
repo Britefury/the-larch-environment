@@ -86,8 +86,8 @@ def _templateContextMenuFactory(element, menu):
 	h5Style = Hyperlink( 'H5', makeStyleFn( 'h5' ) )
 	h6Style = Hyperlink( 'H6', makeStyleFn( 'h6' ) )
 	titleStyle = Hyperlink( 'Title', makeStyleFn( 'title' ) )
-	styles = ControlsHBox( [ normalStyle, h1Style, h2Style, h3Style, h4Style, h5Style, h6Style, titleStyle ] )
-	menu.add( SectionVBox( [ SectionTitle( 'Style' ), styles ] ).alignHExpand() )
+	styles = ControlsRow( [ normalStyle, h1Style, h2Style, h3Style, h4Style, h5Style, h6Style, titleStyle ] )
+	menu.add( SectionColumn( [ SectionTitle( 'Style' ), styles ] ).alignHExpand() )
 	
 	
 	def _onPythonExpr(link, event):
@@ -96,8 +96,8 @@ def _templateContextMenuFactory(element, menu):
 			caret.getElement().postTreeEvent( PythonExprRequest() )
 
 	newExpr = Hyperlink( 'Python expression', _onPythonExpr )
-	codeControls = ControlsHBox( [ newExpr ] )
-	menu.add( SectionVBox( [ SectionTitle( 'Code' ), codeControls ] ).alignHExpand() )
+	codeControls = ControlsRow( [ newExpr ] )
+	menu.add( SectionColumn( [ SectionTitle( 'Code' ), codeControls ] ).alignHExpand() )
 
 	return True
 
@@ -161,11 +161,11 @@ class TemplateEditor (GSymViewObjectDispatch):
 			button.getElement().postTreeEvent( DeleteNodeOperation( node ) )
 
 		deleteButton = Button( Image.systemIcon( 'delete_tiny' ), _onDeleteButton )
-		headerBox = _pythonExprHeaderStyle.applyTo( HBox( [ Label( 'Py expr' ).alignHLeft(), deleteButton.alignHRight() ] ) )
+		headerBox = _pythonExprHeaderStyle.applyTo( Row( [ Label( 'Py expr' ).alignHLeft(), deleteButton.alignHRight() ] ) )
 		
 		codeView = Python25.python25EditorPerspective.applyTo( InnerFragment( node.getCode() ) )
 		
-		box = StyleSheet.instance.withAttr( Primitive.vboxSpacing, 5.0 ).applyTo( VBox( [ headerBox.alignHExpand(), codeView.alignHExpand() ] ) )
+		box = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( Column( [ headerBox.alignHExpand(), codeView.alignHExpand() ] ) )
 		
 		p = _pythonExprBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
 
