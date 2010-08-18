@@ -123,6 +123,12 @@ LambdaExpr = schema.newClass( 'LambdaExpr', Expr, [ 'params', 'expr', 'paramsTra
 ConditionalExpr = schema.newClass( 'ConditionalExpr', Expr, [ 'condition', 'expr', 'elseExpr' ] )
 
 
+# Special externally provided expression
+ExternalExpr = schema.newClass( 'ExternalExpr', Expr, [ 'expr' ] )
+
+
+
+
 #
 # Simple statements
 #
