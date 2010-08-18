@@ -65,6 +65,8 @@ class GSymWorld (object):
 			plugin.initialise( self )
 	
 
+	def registerSchema(self, schema):
+		self.resolver._registerDMSchema( schema )
 			
 	def registerUnitClass(self, plugin, unitClass):
 		schema = unitClass.getSchema()

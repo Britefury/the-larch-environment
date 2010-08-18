@@ -55,11 +55,11 @@ class ExecutionResult (object):
 
 
 
-def executePythonModule(pythonModule, filename, globalVars, bEvaluate):
+def executePythonModule(pythonModule, module, bEvaluate):
 	if bEvaluate:
-		execCode, evalCode = CodeGenerator.compileForExecutionAndEvaluation( pythonModule, '<console>' )
+		execCode, evalCode = CodeGenerator.compileForExecutionAndEvaluation( pythonModule, module.__name__ )
 	else:
-		execCode = CodeGenerator.compileForExecution( pythonModule, '<console>' )
+		execCode = CodeGenerator.compileForExecution( pythonModule, module.__name__ )
 		evalCode = None
 		
 	caughtException = None
@@ -71,9 +71,9 @@ def executePythonModule(pythonModule, filename, globalVars, bEvaluate):
 	sys.stderr = stderr
 	
 	try:
-		exec execCode in globalVars
+		exec execCode in module.__dict__
 		if evalCode is not None:
-			result = [ eval( evalCode, globalVars ) ]
+			result = [ eval( evalCode, module.__dict__ ) ]
 		else:
 			result = None
 	except Exception, exc:

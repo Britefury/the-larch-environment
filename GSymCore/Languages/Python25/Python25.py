@@ -17,6 +17,9 @@ from GSymCore.Languages.Python25.PythonEditor.View import perspective as python2
 def py25NewModule():
 	return Schema.PythonModule( suite=[] )
 
+def py25NewExpr():
+	return Schema.PythonExpression( expr=None )
+
 def _py25NewUnit():
 	return gSymUnit( Schema.schema, py25NewModule() )
 

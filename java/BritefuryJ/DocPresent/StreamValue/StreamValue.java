@@ -315,6 +315,11 @@ public class StreamValue implements Presentable
 		return items.length == 1 &&  items[0] instanceof TextItem;
 	}
 	
+	public boolean isEmpty()
+	{
+		return length == 0;
+	}
+	
 	public int length()
 	{
 		return length;

@@ -101,6 +101,67 @@ class ParsedExpressionTreeEventListener (TreeEventListenerObjectDispatch):
 		
 
 
+class PythonExpressionTreeEventListener (TreeEventListenerObjectDispatch):
+	__slots__ = [ '_parser' ]
+	
+	def __init__(self, parser, outerPrecedence):
+		#super( ParsedExpressionTreeEventListener, self ).__init__()
+		self._parser = parser
+		self._outerPrecedence = outerPrecedence
+
+
+	@ObjectDispatchMethod( TextEditEvent, PythonSelectionEditTreeEvent )
+	def editEvent(self, element, sourceElement, event):
+		# if @event is a @PythonSelectionEditTreeEvent, and its source element is @element, then @element has had its
+		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it.
+		# Otherwise, clear the structural represnetation of all elements on the path from the source element to @element
+		if not ( isinstance( event, PythonSelectionEditTreeEvent )  and  event.getSourceElement() is element ):
+			sourceElement.clearFixedValuesOnPathUpTo( element )
+			element.clearFixedValue()
+		value = element.getStreamValue()
+		ctx = element.getFragmentContext()
+		node = ctx.getModel()
+		nodeExpr = node['expr']
+		if '\n' not in value:
+			if value.isEmpty():
+				node['expr'] = None
+				return True
+			else:
+				parsed = parseStream( self._parser, value, self._outerPrecedence )
+				if parsed is not None:
+					log = ctx.getView().getPageLog()
+					if log.isRecording():
+						log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - success' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
+					if parsed != nodeExpr:
+						if nodeExpr is None:
+							node['expr'] = parsed
+						else:
+							pyReplaceExpression( ctx, nodeExpr, parsed )
+				else:
+					if value.isTextual():
+						if value.textualValue().strip() == '':
+							# Expression content has been deleted entirely
+							log = ctx.getView().getPageLog()
+							if log.isRecording():
+								log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - deleted' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
+							return False
+					unparsed = Schema.UNPARSED( value=value.getItemValues() )
+					log = ctx.getView().getPageLog()
+					if log.isRecording():
+						log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - unparsed' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', unparsed ) )
+					if nodeExpr is None:
+						node['expr'] = unparsed
+					else:
+						pyReplaceExpression( ctx, nodeExpr, unparsed )
+				return True
+		else:
+			return False
+		
+	
+		
+		
+
+
 class StructuralExpressionTreeEventListener (TreeEventListenerObjectDispatch):
 	@ObjectDispatchMethod( TextEditEvent )
 	def onTextEditEvent(self, element, sourceElement, event):

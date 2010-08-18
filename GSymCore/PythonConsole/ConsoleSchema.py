@@ -8,6 +8,7 @@
 from java.lang import StringBuilder
 
 import sys
+import imp
 from copy import copy
 
 from BritefuryJ.Incremental import IncrementalOwner, IncrementalValueMonitor
@@ -16,6 +17,7 @@ from GSymCore.Languages.Python25 import Python25
 from GSymCore.Languages.Python25 import CodeGenerator
 from GSymCore.Languages.Python25 import Schema as PySchema
 from GSymCore.Languages.Python25.Execution import Execution
+from GSymCore.Languages.Python25 import Prelude
 
 
 _codeGen = CodeGenerator.Python25CodeGenerator()
@@ -41,14 +43,15 @@ class Console (IncrementalOwner):
 
 
 			
-	def __init__(self):
+	def __init__(self, name):
 		self._incr = IncrementalValueMonitor( self )
 		
 		self._blocks = []
 		self._currentPythonModule = Python25.py25NewModule()
 		self._before = []
 		self._after = []
-		self._globalVars = {}
+		self._module = imp.new_module( name )
+		Prelude.executePrelude( self._module )
 		
 		
 	def getBlocks(self):
@@ -87,7 +90,7 @@ class Console (IncrementalOwner):
 		
 		
 	def assignVariable(self, name, value):
-		self._globalVars[name] = value
+		setattr( self._module, name, value )
 		self._blocks.append( ConsoleVarAssignment( name, type( value ) ) )
 		self._incr.onChanged()
 		
@@ -108,7 +111,7 @@ class Console (IncrementalOwner):
 	def execute(self, bEvaluate):
 		module = self.getCurrentPythonModule()
 		if module != Python25.py25NewModule():
-			execResult = Execution.executePythonModule( module, '<console>', self._globalVars, bEvaluate )
+			execResult = Execution.executePythonModule( module, self._module, bEvaluate )
 			self.commit( execResult )
 					
 		

@@ -7,6 +7,8 @@
 ##-*************************
 from weakref import WeakKeyDictionary
 
+import imp
+
 from BritefuryJ.Incremental import IncrementalOwner, IncrementalValueMonitor
 from BritefuryJ.Cell import Cell
 
@@ -17,6 +19,7 @@ from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMe
 
 from GSymCore.Languages.Python25 import Python25
 from GSymCore.Languages.Python25.Execution import Execution
+from GSymCore.Languages.Python25 import Prelude
 
 from GSymCore.Worksheet import Schema
 
@@ -79,14 +82,18 @@ class WorksheetView (NodeView):
 	def __init__(self, worksheet, model):
 		super( WorksheetView, self ).__init__( worksheet, model )
 		self._modelToView = WeakKeyDictionary()
-		self._executionEnvironment = {}
 		self.refreshResults()
 		
 		
+	def _initModule(self):
+		self._module = imp.new_module( 'worksheet' )
+		Prelude.executePrelude( self._module )
+		
+		
 	def refreshResults(self):
-		self._executionEnvironment = {}
+		self._initModule()
 		body = self.getBody()
-		body.refreshResults( self._executionEnvironment )
+		body.refreshResults( self._module )
 		
 		
 	def getBody(self):
@@ -110,9 +117,9 @@ class BodyView (NodeView):
 		self._contentsCell = Cell( self._computeContents )
 		
 		
-	def refreshResults(self, executionEnvironment):
+	def refreshResults(self, module):
 		for v in self.getContents():
-			v._refreshResults( executionEnvironment )
+			v._refreshResults( module )
 		
 		
 	def getContents(self):
@@ -197,7 +204,7 @@ class ParagraphView (NodeView):
 		return Schema.PartialParagraph( style=self._model['style'] )
 		
 		
-	def _refreshResults(self, env):
+	def _refreshResults(self, module):
 		pass
 	
 	
@@ -290,8 +297,8 @@ class PythonCodeView (IncrementalOwner, NodeView):
 		
 		
 		
-	def _refreshResults(self, env):
-		self._result = Execution.executePythonModule( self.getCode(), '<worksheet>', env, self.isResultVisible() )
+	def _refreshResults(self, module):
+		self._result = Execution.executePythonModule( self.getCode(), module, self.isResultVisible() )
 		self._incr.onChanged()
 		
 		
@@ -346,7 +353,7 @@ class QuoteLocationView (IncrementalOwner, NodeView):
 		return style == self.STYLE_MINIMAL
 		
 		
-	def _refreshResults(self, env):
+	def _refreshResults(self, module):
 		pass
 		
 	@staticmethod
