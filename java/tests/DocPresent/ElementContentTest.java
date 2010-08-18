@@ -11,7 +11,7 @@ import java.util.Arrays;
 
 import junit.framework.TestCase;
 import BritefuryJ.DocPresent.DPBin;
-import BritefuryJ.DocPresent.DPHBox;
+import BritefuryJ.DocPresent.DPRow;
 import BritefuryJ.DocPresent.DPHiddenContent;
 import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPText;
@@ -56,7 +56,7 @@ public class ElementContentTest extends TestCase
 		DPText t2 = new DPText( "mno" );
 		DPText t3 = new DPText( "stu" );
 		
-		DPHBox p = new DPHBox( );
+		DPRow p = new DPRow( );
 		DPElement[] t = { t0, t1, t2, t3 };
 		
 		p.setChildren( Arrays.asList( t ) );
@@ -75,7 +75,7 @@ public class ElementContentTest extends TestCase
 		DPText ta2 = new DPText( "mno" );
 		DPText ta3 = new DPText( "stu" );
 
-		DPHBox pa = new DPHBox( );
+		DPRow pa = new DPRow( );
 		DPElement[] ta = { ta0, ta1, ta2, ta3 };
 		pa.setChildren( Arrays.asList( ta ) );
 		
@@ -87,7 +87,7 @@ public class ElementContentTest extends TestCase
 		DPText tb1 = new DPText( "xy" );
 		DPText tb2 = new DPText( "z" );
 
-		DPHBox pb = new DPHBox( );
+		DPRow pb = new DPRow( );
 		DPElement[] tb = { tb0, tb1, tb2 };
 		pb.setChildren( Arrays.asList( tb ) );
 		
@@ -100,7 +100,7 @@ public class ElementContentTest extends TestCase
 		DPText ty = new DPText( "22" );
 		
 		
-		DPHBox root = new DPHBox( );
+		DPRow root = new DPRow( );
 		DPElement[] rootChildren = { pa, e, b, tx, ty };
 		root.setChildren( Arrays.asList( rootChildren ) );
 		

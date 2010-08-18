@@ -11,7 +11,7 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Arrow;
 import BritefuryJ.DocPresent.Combinators.Primitive.Box;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.Util.Range;
 
@@ -45,7 +45,7 @@ public class VScrollBar extends ScrollBar
 
 	protected Pres createScrollBarPres(double spacing, DPElement decArrowElement, DPElement dragBarElement, DPElement incArrowElement)
 	{
-		return StyleSheet.instance.withAttr( Primitive.vboxSpacing, spacing ).applyTo( new VBox( new Object[] {
+		return StyleSheet.instance.withAttr( Primitive.columnSpacing, spacing ).applyTo( new Column( new Object[] {
 				decArrowElement.alignHCentre(), dragBarElement.alignVExpand().alignHCentre(), incArrowElement.alignHCentre() } ) );
 	}
 }

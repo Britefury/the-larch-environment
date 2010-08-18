@@ -29,14 +29,14 @@ import org.python.core.PyType;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Box;
-import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.ParagraphDedentMarker;
 import BritefuryJ.DocPresent.Combinators.Primitive.ParagraphIndentMarker;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Span;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.Primitive.Whitespace;
 import BritefuryJ.DocPresent.Combinators.Sequence.SpanSequenceView;
 import BritefuryJ.DocPresent.Combinators.Sequence.TrailingSeparator;
@@ -360,7 +360,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 			
 			Pres fields[] = {
 					new VerticalField( "Message", new InnerFragment( e.value ) ),
-					new VerticalField( "Traceback", new VBox( stackTraceElements ) )
+					new VerticalField( "Traceback", new Column( stackTraceElements ) )
 			};
 			
 			return new ErrorBoxWithFields( "PYTHON EXCEPTION", fields );
@@ -388,7 +388,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 			
 			Pres fields[] = {
 					new VerticalField( "Message", new InnerFragment( e.getMessage() ) ),
-					new VerticalField( "Traceback", new VBox( stackTraceElements ) )
+					new VerticalField( "Traceback", new Column( stackTraceElements ) )
 			};
 			
 			return new ErrorBoxWithFields( "JAVA EXCEPTION", fields );
@@ -493,13 +493,13 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 			Pres blue = colourBlueStyle.applyTo( new StaticText( "B=" + String.valueOf( colour.getBlue() ) ) );
 			Pres alpha = colourAlphaStyle.applyTo( new StaticText( "A=" + String.valueOf( colour.getAlpha() ) ) );
 			
-			Pres components = colourBoxStyle.applyTo( new HBox( new Pres[] { red, green, blue, alpha } ) );
+			Pres components = colourBoxStyle.applyTo( new Row( new Pres[] { red, green, blue, alpha } ) );
 			
-			Pres textBox = new VBox( new Pres[] { title, components } );
+			Pres textBox = new Column( new Pres[] { title, components } );
 			
 			Pres swatch = staticStyle.withAttr( Primitive.shapePainter, new FillPainter( colour ) ).applyTo( new Box( 50.0, 20.0 ) ).alignVExpand();
 			
-			Pres contents = colourBoxStyle.applyTo( new HBox( new Pres[] { textBox, swatch } ) );
+			Pres contents = colourBoxStyle.applyTo( new Row( new Pres[] { textBox, swatch } ) );
 			
 			return colourObjectBoxStyle.applyTo( new ObjectBorder( contents ) );
 		}
@@ -517,7 +517,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 			
 			Pres title = classKeywordStyle.applyTo( new StaticText( "Class " ) );
 			Pres name = classNameStyle.applyTo( new StaticText( cls.getName() ) );
-			lines.add( new HBox( new Pres[] { title, name } ) );
+			lines.add( new Row( new Pres[] { title, name } ) );
 			
 			if ( superClass != null  ||  interfaces.length > 0 )
 			{
@@ -574,7 +574,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	private static final StyleSheet colourGreenStyle = staticStyle.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.75f, 0.0f ) );
 	private static final StyleSheet colourBlueStyle = staticStyle.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.75f ) );
 	private static final StyleSheet colourAlphaStyle = staticStyle.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.3f, 0.3f, 0.3f ) );
-	private static final StyleSheet colourBoxStyle = staticStyle.withAttr( Primitive.hboxSpacing, 5.0 );
+	private static final StyleSheet colourBoxStyle = staticStyle.withAttr( Primitive.rowSpacing, 5.0 );
 
 	
 	private static final StyleSheet classKeywordStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.textSmallCaps, true );

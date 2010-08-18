@@ -35,21 +35,21 @@ class ExecutionStyle (object):
 	resultBorderStyle = InheritedAttributeNonNull( pythonExecution, 'resultBorderStyle', StyleSheet,
 	                                          StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.0, 0.0, 0.8 ), Color.WHITE ) ) )
 
-	resultBoxStyle = InheritedAttributeNonNull( pythonExecution, 'resultSpacing', StyleSheet, StyleSheet.instance.withAttr( Primitive.vboxSpacing, 5.0 ) )
+	resultBoxStyle = InheritedAttributeNonNull( pythonExecution, 'resultSpacing', StyleSheet, StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 ) )
 
 
 	@PyDerivedValueTable( pythonExecution )
 	def _resultBoxStyle(style):
 		resultSpacing = style.get( ExecutionStyle.resultSpacing )
-		return style.withAttr( Primitive.vboxSpacing, resultSpacing )
+		return style.withAttr( Primitive.columnSpacing, resultSpacing )
 
 
 
 
 def _textLines(labelText, text, textStyleAttribute):
 	label = ApplyStyleSheetFromAttribute( ExecutionStyle.labelStyle, StaticText( labelText ) )
-	lines = ApplyStyleSheetFromAttribute( textStyleAttribute, VBox( [ StaticText( line )   for line in text.split( '\n' ) ] ) )
-	return VBox( [ label, lines.padX( 5.0, 0.0 ) ] )
+	lines = ApplyStyleSheetFromAttribute( textStyleAttribute, Column( [ StaticText( line )   for line in text.split( '\n' ) ] ) )
+	return Column( [ label, lines.padX( 5.0, 0.0 ) ] )
 
 
 def execStdout(text):
@@ -60,7 +60,7 @@ def execStderr(text):
 	
 def execException(exceptionView):
 	label = ApplyStyleSheetFromAttribute( ExecutionStyle.labelStyle, StaticText( 'EXCEPTION:' ) )
-	return ApplyStyleSheetFromAttribute( ExecutionStyle.exceptionBorderStyle, Border( VBox( [ label, exceptionView.padX( 5.0, 0.0 ).alignHExpand() ] ).alignHExpand() ).alignHExpand() )
+	return ApplyStyleSheetFromAttribute( ExecutionStyle.exceptionBorderStyle, Border( Column( [ label, exceptionView.padX( 5.0, 0.0 ).alignHExpand() ] ).alignHExpand() ).alignHExpand() )
 
 def execResult(resultView):
 	return ApplyStyleSheetFromAttribute( ExecutionStyle.resultBorderStyle, Border( Paragraph( [ resultView ] ).alignHExpand() ).alignHExpand() )
@@ -84,7 +84,7 @@ def executionResultBox(stdoutText, stderrText, exception, resultInTuple, bUseGen
 		boxContents.append( execResult( resultView ) )
 	
 	if len( boxContents ) > 0:
-		return ApplyStyleSheetFromAttribute( ExecutionStyle.resultBoxStyle, VBox( boxContents ).alignHExpand() )
+		return ApplyStyleSheetFromAttribute( ExecutionStyle.resultBoxStyle, Column( boxContents ).alignHExpand() )
 	else:
 		return None
 
@@ -116,7 +116,7 @@ def minimalExecutionResultBox(stdoutText, stderrText, exception, resultInTuple, 
 			boxContents.append( execResult( resultView ) )
 		
 		if len( boxContents ) > 0:
-			return ApplyStyleSheetFromAttribute( ExecutionStyle.resultBoxStyle, VBox( boxContents ).alignHExpand() )
+			return ApplyStyleSheetFromAttribute( ExecutionStyle.resultBoxStyle, Column( boxContents ).alignHExpand() )
 		else:
 			return None
 

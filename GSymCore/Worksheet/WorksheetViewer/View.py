@@ -74,8 +74,8 @@ def _worksheetContextMenuFactory(element, menu):
 	model = element.getFragmentContext().getModel()
 
 	refreshButton = Button.buttonWithLabel( 'Refresh', _onRefresh )
-	worksheetControls = ControlsHBox( [ refreshButton ] )
-	menu.add( SectionVBox( [ SectionTitle( 'Worksheet' ), worksheetControls ] ).alignHExpand() )
+	worksheetControls = ControlsRow( [ refreshButton ] )
+	menu.add( SectionColumn( [ SectionTitle( 'Worksheet' ), worksheetControls ] ).alignHExpand() )
 	return True
 
 
@@ -160,7 +160,7 @@ class WorksheetViewer (GSymViewObjectDispatch):
 					boxContents.append( _pythonCodeBorderStyle.applyTo( Border( codeView.alignHExpand() ).alignHExpand() ) )
 				if node.isResultVisible()  and  executionResultView is not None:
 					boxContents.append( executionResultView.alignHExpand() )
-				box = StyleSheet.instance.withAttr( Primitive.vboxSpacing, 5.0 ).applyTo( VBox( boxContents ) )
+				box = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( Column( boxContents ) )
 				
 				return _pythonCodeEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
 		else:
@@ -176,12 +176,12 @@ class WorksheetViewer (GSymViewObjectDispatch):
 			return targetView.alignHExpand()
 		else:
 			headerBox = _quoteLocationHeaderStyle.applyTo( Bin(
-				StyleSheet.instance.withAttr( Primitive.hboxSpacing, 20.0 ).applyTo( HBox(
+				StyleSheet.instance.withAttr( Primitive.rowSpacing, 20.0 ).applyTo( Row(
 			                [ StaticText( 'Location: ' ).alignHExpand(), StaticText( node.getLocation() ) ] ) ).alignHExpand().pad( 2.0, 2.0 ) ) )
 			
 			boxContents = [ headerBox.alignHExpand() ]
 			boxContents.append( _quoteLocationBorderStyle.applyTo( Border( targetView.alignHExpand() ).alignHExpand() ) )
-			box = StyleSheet.instance.withAttr( Primitive.vboxSpacing, 5.0 ).applyTo( VBox( boxContents ) )
+			box = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( Column( boxContents ) )
 			
 			return _quoteLocationEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
 

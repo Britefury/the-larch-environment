@@ -14,7 +14,7 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
-import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Spacer;
@@ -124,13 +124,13 @@ public class Checkbox extends ControlPres
 		Pres checkBorder = checkStyle.applyTo( new Border( checkElement ) );
 		
 		Pres childElement = presentAsCombinator( ctx, Controls.useCheckboxAttrs( style ), child );
-		Pres hbox = checkboxStyle.applyTo( new HBox( new Pres[] { checkBorder.alignVCentre(), childElement.alignVCentre() } ) );
-		DPElement hboxElement = hbox.present( ctx, style);
+		Pres row = checkboxStyle.applyTo( new Row( new Pres[] { checkBorder.alignVCentre(), childElement.alignVCentre() } ) );
+		DPElement rowElement = row.present( ctx, style);
 		
-		Pres bin = new Bin( hboxElement );
+		Pres bin = new Bin( rowElement );
 		DPElement element = bin.present( ctx, style );
 		elements.put( element, null );
 		element.setFixedValue( initialState );
-		return new CheckboxControl( ctx, style, element, hboxElement, checkElement, initialState, listener, checkForeground );
+		return new CheckboxControl( ctx, style, element, rowElement, checkElement, initialState, listener, checkForeground );
 	}
 }

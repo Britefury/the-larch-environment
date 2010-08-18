@@ -7,29 +7,29 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import BritefuryJ.DocPresent.LayoutTree.LayoutNodeHBox;
-import BritefuryJ.DocPresent.StyleParams.HBoxStyleParams;
+import BritefuryJ.DocPresent.LayoutTree.LayoutNodeRow;
+import BritefuryJ.DocPresent.StyleParams.RowStyleParams;
 
 
-public class DPHBox extends DPAbstractBox
+public class DPRow extends DPAbstractBox
 {
-	public DPHBox()
+	public DPRow()
 	{
-		this( HBoxStyleParams.defaultStyleParams);
+		this( RowStyleParams.defaultStyleParams);
 	}
 	
-	public DPHBox(HBoxStyleParams styleParams)
+	public DPRow(RowStyleParams styleParams)
 	{
 		super(styleParams);
 		
-		layoutNode = new LayoutNodeHBox( this );
+		layoutNode = new LayoutNodeRow( this );
 	}
 	
-	protected DPHBox(DPHBox element)
+	protected DPRow(DPRow element)
 	{
 		super( element );
 		
-		layoutNode = new LayoutNodeHBox( this );
+		layoutNode = new LayoutNodeRow( this );
 	}
 	
 	
@@ -42,7 +42,7 @@ public class DPHBox extends DPAbstractBox
 	
 	public DPElement clonePresentationSubtree()
 	{
-		DPHBox clone = new DPHBox( this );
+		DPRow clone = new DPRow( this );
 		clone.clonePostConstuct( this );
 		return clone;
 	}

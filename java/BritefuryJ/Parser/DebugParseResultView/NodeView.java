@@ -22,10 +22,10 @@ import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
-import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
@@ -152,9 +152,9 @@ public class NodeView implements FragmentContext
 			childElements.add( childView.getElement().padY( 3.0 ) );
 		}
 		
-		Pres childrenVBox = styleSheet.withAttr( Primitive.vboxSpacing, 3.0 ).applyTo( new VBox( childElements.toArray( new DPElement[0] ) ) );
+		Pres childrenColumn = styleSheet.withAttr( Primitive.columnSpacing, 3.0 ).applyTo( new Column( childElements.toArray( new DPElement[0] ) ) );
 		
-		mainElement = styleSheet.withAttr( Primitive.hboxSpacing, 80.0 ).applyTo( new HBox( new Object[] { nodeElement.alignVCentre(), childrenVBox.alignVCentre() } ) ).present();
+		mainElement = styleSheet.withAttr( Primitive.rowSpacing, 80.0 ).applyTo( new Row( new Object[] { nodeElement.alignVCentre(), childrenColumn.alignVCentre() } ) ).present();
 	}
 	
 	
@@ -233,7 +233,7 @@ public class NodeView implements FragmentContext
 		if ( exprName != null )
 		{
 			Pres exprText = debugNameStyle.applyTo( new StaticText( exprName ) );
-			return styleSheet.withAttr( Primitive.hboxSpacing, 10.0 ).applyTo( new HBox( new Pres[] { exprText, classText } ) );
+			return styleSheet.withAttr( Primitive.rowSpacing, 10.0 ).applyTo( new Row( new Pres[] { exprText, classText } ) );
 		}
 		else
 		{
@@ -327,7 +327,7 @@ public class NodeView implements FragmentContext
 		Pres inputElement = makeInputElement( data );
 		Pres valueElement = makeValueElement( data );
 		
-		return new VBox( new Pres[] { rangeElement, inputElement, valueElement } );
+		return new Column( new Pres[] { rangeElement, inputElement, valueElement } );
 	}
 	
 	private Pres makeNodeElement(DebugNode data)
@@ -335,7 +335,7 @@ public class NodeView implements FragmentContext
 		Pres titleBoxElement = makeTitleBoxElement( data );
 		Pres contentBoxElement = makeContentBoxElement( data );
 		
-		Pres nodeBoxElement = new VBox( new Pres[] { titleBoxElement.alignHExpand(), contentBoxElement.alignHExpand() } );
+		Pres nodeBoxElement = new Column( new Pres[] { titleBoxElement.alignHExpand(), contentBoxElement.alignHExpand() } );
 		
 		Pres nodeBinElement = new Bin( nodeBoxElement );
 		

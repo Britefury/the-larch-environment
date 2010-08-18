@@ -82,7 +82,7 @@ class CurrentModuleInteractor (ElementInteractor):
 
 _labelStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 10 )
 
-_blockStyle = StyleSheet.instance.withAttr( Primitive.vboxSpacing, 2.0 ).withAttr( Primitive.border, SolidBorder( 1.0, 5.0, 15.0, 15.0, Color( 0.25, 0.25, 0.25 ), Color( 0.8, 0.8, 0.8 ) ) )
+_blockStyle = StyleSheet.instance.withAttr( Primitive.columnSpacing, 2.0 ).withAttr( Primitive.border, SolidBorder( 1.0, 5.0, 15.0, 15.0, Color( 0.25, 0.25, 0.25 ), Color( 0.8, 0.8, 0.8 ) ) )
 
 _pythonModuleBorderStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 5.0, 10.0, 10.0, Color( 0.2, 0.4, 0.8 ), Color.WHITE ) )
 _dropPromptStyle = StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 10.0, 10.0, Color( 0.0, 0.8, 0.0 ), None ) )
@@ -91,8 +91,8 @@ _varAssignVarNameStyle = StyleSheet.instance.withAttr( Primitive.fontItalic, Tru
 _varAssignTypeNameStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.125, 0.0 ) )
 _varAssignMsgStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.125, 0.0 ) )
 
-_consoleBlockListStyle = StyleSheet.instance.withAttr( Primitive.vboxSpacing, 5.0 )
-_consoleStyle = StyleSheet.instance.withAttr( Primitive.vboxSpacing, 8.0 )
+_consoleBlockListStyle = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 )
+_consoleStyle = StyleSheet.instance.withAttr( Primitive.columnSpacing, 8.0 )
 
 
 
@@ -150,10 +150,10 @@ class ConsoleView (GSymViewObjectDispatch):
 		dropPromptView = dropPromptCell.genericPerspectiveValuePresInFragment()
 		
 		if len( blocks ) > 0:
-			blockList = _consoleBlockListStyle.applyTo( VBox( blocks ) ).alignHExpand()
-			return _consoleStyle.applyTo( VBox( [ blockList.alignHExpand(), dropPromptView, m.alignHExpand() ] ) ).alignHExpand()
+			blockList = _consoleBlockListStyle.applyTo( Column( blocks ) ).alignHExpand()
+			return _consoleStyle.applyTo( Column( [ blockList.alignHExpand(), dropPromptView, m.alignHExpand() ] ) ).alignHExpand()
 		else:
-			return _consoleStyle.applyTo( VBox( [ dropPromptView, m.alignVTop().alignHExpand() ] ) ).alignHExpand()
+			return _consoleStyle.applyTo( Column( [ dropPromptView, m.alignVTop().alignHExpand() ] ) ).alignHExpand()
 		
 
 		
@@ -182,8 +182,8 @@ class ConsoleView (GSymViewObjectDispatch):
 			blockContents.append( execStdout( stdout ) )
 		if resultView is not None:
 			blockContents.append( execResult( resultView ) )
-		blockVBox = VBox( blockContents ).alignHExpand()
-		return _blockStyle.applyTo( Border( blockVBox ).alignHExpand() )
+		blockColumn = Column( blockContents ).alignHExpand()
+		return _blockStyle.applyTo( Border( blockColumn ).alignHExpand() )
 
 
 	@ObjectDispatchMethod( Schema.ConsoleVarAssignment )

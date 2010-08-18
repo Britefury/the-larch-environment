@@ -50,7 +50,7 @@ from GSymCore.PythonConsole import Console
 
 _appDocRightPadding = 30.0
 _controlsPadding = 5.0
-_appDocumentControlsStyle = StyleSheet.instance.withAttr( Primitive.hboxSpacing, 20.0 ).withAttr( Primitive.border, FilledBorder( 5.0, 5.0, 5.0, 5.0, Color( 0.9, 0.9, 0.9 ) ) )
+_appDocumentControlsStyle = StyleSheet.instance.withAttr( Primitive.rowSpacing, 20.0 ).withAttr( Primitive.border, FilledBorder( 5.0, 5.0, 5.0, 5.0, Color( 0.9, 0.9, 0.9 ) ) )
 _dcumentListTableStyle = StyleSheet.instance.withAttr( Primitive.tableColumnSpacing, 15.0 ).withAttr( Primitive.tableRowSpacing, 5.0 )
 
 
@@ -93,18 +93,18 @@ def _newConsoleIndex(consoles):
 
 						
 def _contentsList(controls, contentsLists, title):
-	controlsBox = HBox( [ c.padX( _controlsPadding )   for c in controls ] )
+	controlsBox = Row( [ c.padX( _controlsPadding )   for c in controls ] )
 	controlsBorder = _appDocumentControlsStyle.applyTo( Border( controlsBox ) )
 
 	openDocumentsSeparator = HSeparator()
 	
 	docListBox = _dcumentListTableStyle.applyTo( RGrid( contentsLists ) )
 
-	contentsBox = VBox( [ controlsBorder.pad( 2.0, 2.0 ), openDocumentsSeparator, docListBox.pad( 10.0, 2.0 ) ] )
+	contentsBox = Column( [ controlsBorder.pad( 2.0, 2.0 ), openDocumentsSeparator, docListBox.pad( 10.0, 2.0 ) ] )
 	
 	heading = Heading3( title )
 	
-	return VBox( [ heading, contentsBox.padX( 5.0, 0.0 ) ] )
+	return Column( [ heading, contentsBox.padX( 5.0, 0.0 ) ] )
 						
 						
 						

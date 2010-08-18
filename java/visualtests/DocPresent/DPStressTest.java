@@ -17,7 +17,7 @@ import javax.swing.JFrame;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPParagraph;
 import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.DPVBox;
+import BritefuryJ.DocPresent.DPColumn;
 import BritefuryJ.DocPresent.DPViewport;
 import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
@@ -129,7 +129,7 @@ public class DPStressTest
 	
 	protected DPElement createContentNode()
 	{
-		DPVBox box = new DPVBox( );
+		DPColumn box = new DPColumn( );
 		ArrayList<DPElement> children = new ArrayList<DPElement>();
 		
 		for (int i = 0; i < NUMLINES; i++)

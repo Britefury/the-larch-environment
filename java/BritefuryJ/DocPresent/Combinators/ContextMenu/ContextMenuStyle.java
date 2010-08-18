@@ -21,16 +21,16 @@ public class ContextMenuStyle
 	
 	public static final AttributeNonNull sectionTitleStyle = new AttributeNonNull( contextMenuNamespace, "sectionTitleStyle", StyleSheet.class,
 			StyleSheet.instance.withAttr( Primitive.fontSize, 16 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.3f, 0.5f ) ).withAttr( Primitive.fontBold, true ) );
-	public static final AttributeNonNull sectionVBoxStyle = new AttributeNonNull( contextMenuNamespace, "sectionVBoxStyle", StyleSheet.class,
-			StyleSheet.instance.withAttr( Primitive.vboxSpacing, 5.0 ) );
-	public static final AttributeNonNull controlsHBoxStyle = new AttributeNonNull( contextMenuNamespace, "controlsHBoxStyle", StyleSheet.class,
-			StyleSheet.instance.withAttr( Primitive.hboxSpacing, 10.0 ) );
-	public static final AttributeNonNull controlsVBoxStyle = new AttributeNonNull( contextMenuNamespace, "sectionVBoxStyle", StyleSheet.class,
-			StyleSheet.instance.withAttr( Primitive.vboxSpacing, 2.0 ) );
+	public static final AttributeNonNull sectionColumnStyle = new AttributeNonNull( contextMenuNamespace, "sectionColumnStyle", StyleSheet.class,
+			StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 ) );
+	public static final AttributeNonNull controlsRowStyle = new AttributeNonNull( contextMenuNamespace, "controlsRowStyle", StyleSheet.class,
+			StyleSheet.instance.withAttr( Primitive.rowSpacing, 10.0 ) );
+	public static final AttributeNonNull controlsColumnStyle = new AttributeNonNull( contextMenuNamespace, "controlsColumnStyle", StyleSheet.class,
+			StyleSheet.instance.withAttr( Primitive.columnSpacing, 2.0 ) );
 	
 	
 	
-	protected static final AttributeUsageSet sectionVBoxUsage = new AttributeUsageSet( sectionVBoxStyle );
-	protected static final AttributeUsageSet controlsHBoxUsage = new AttributeUsageSet( controlsHBoxStyle );
-	protected static final AttributeUsageSet controlsVBoxUsage = new AttributeUsageSet( controlsVBoxStyle );
+	protected static final AttributeUsageSet sectionColumnUsage = new AttributeUsageSet( sectionColumnStyle );
+	protected static final AttributeUsageSet controlsRowUsage = new AttributeUsageSet( controlsRowStyle );
+	protected static final AttributeUsageSet controlsColumnUsage = new AttributeUsageSet( controlsColumnStyle );
 }

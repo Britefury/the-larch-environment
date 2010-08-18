@@ -14,7 +14,7 @@ import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.DPVBox;
+import BritefuryJ.DocPresent.DPColumn;
 import BritefuryJ.DocPresent.DPWhitespace;
 import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.ElementValueFunction;
@@ -28,12 +28,12 @@ import BritefuryJ.DocPresent.Clipboard.TextEditHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
-import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Region;
 import BritefuryJ.DocPresent.Combinators.Primitive.Segment;
 import BritefuryJ.DocPresent.Combinators.Primitive.Text;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.Primitive.Whitespace;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
@@ -242,7 +242,7 @@ public class TextArea extends ControlPres
 		
 		
 		private DPElement element;
-		private DPVBox textBox;
+		private DPColumn textBox;
 		private TextAreaListener listener;
 		private TextAreaTextLineTreeEventListener textLineTreeEventListener = new TextAreaTextLineTreeEventListener();
 		private TextAreaNewlineTreeEventListener newlineTreeEventListener = new TextAreaNewlineTreeEventListener();
@@ -251,7 +251,7 @@ public class TextArea extends ControlPres
 		
 		
 		
-		protected TextAreaControl(PresentationContext ctx, StyleValues style, DPElement element, DPRegion region, DPVBox textBox, TextAreaListener listener, String text)
+		protected TextAreaControl(PresentationContext ctx, StyleValues style, DPElement element, DPRegion region, DPColumn textBox, TextAreaListener listener, String text)
 		{
 			super( ctx, style );
 			
@@ -404,7 +404,7 @@ public class TextArea extends ControlPres
 				textElement.addTreeEventListener( textLineTreeEventListener );
 				newlineElement.addTreeEventListener( newlineTreeEventListener );
 				
-				Pres linePres = new HBox( new Object[] { seg, newlineElement } );
+				Pres linePres = new Row( new Object[] { seg, newlineElement } );
 				DPElement lineElement = linePres.present( ctx, style );
 				lineElements.add( lineElement );
 			}
@@ -439,8 +439,8 @@ public class TextArea extends ControlPres
 		
 		StyleValues textAreaStyle = style.withAttrs( textAreaStyleSheet );
 		
-		Pres textBoxPres = new VBox( new Pres[] {} );
-		DPVBox textBox = (DPVBox)textBoxPres.present( ctx, textAreaStyle );
+		Pres textBoxPres = new Column( new Pres[] {} );
+		DPColumn textBox = (DPColumn)textBoxPres.present( ctx, textAreaStyle );
 		Pres regionPres = new Region( textBox );
 		DPRegion region = (DPRegion)regionPres.present( ctx, textAreaStyle );
 		Pres elementPres = new Border( region );

@@ -74,7 +74,7 @@ public class Controls
 	
 	public static final InheritedAttributeNonNull spinEntryArrowSize = new InheritedAttributeNonNull( controlsNamespace, "spinEntryArrowSize", Double.class, 16.0 );
 	public static final InheritedAttributeNonNull spinEntryArrowAttrs = new InheritedAttributeNonNull( controlsNamespace, "spinEntryArrowAttrs", StyleSheet.class,
-			StyleSheet.instance.withAttr( Primitive.vboxSpacing, 2.0 ).
+			StyleSheet.instance.withAttr( Primitive.columnSpacing, 2.0 ).
 			withAttr( Primitive.shapePainter, new FilledOutlinePainter( new Color( 0.7f, 0.85f, 0.7f ), new Color( 0.0f, 0.25f, 0.0f ), new BasicStroke( 1.0f ) ) ).
 			withAttr( Primitive.hoverShapePainter, new FilledOutlinePainter( new Color( 0.85f, 1.0f, 0.85f ), new Color( 0.0f, 0.45f, 0.0f ), new BasicStroke( 1.0f ) ) ) );
 	public static final InheritedAttributeNonNull spinEntryHSpacing = new InheritedAttributeNonNull( controlsNamespace, "spinEntryHSpacing", Double.class, 2.0 );
@@ -101,7 +101,7 @@ public class Controls
 	public static final InheritedAttributeNonNull menuItemXPadding = new InheritedAttributeNonNull( controlsNamespace, "menuItemXPadding", Double.class, 5.0 );
 	public static final InheritedAttributeNonNull menuItemYPadding = new InheritedAttributeNonNull( controlsNamespace, "menuItemYPadding", Double.class, 5.0 );
 	public static final InheritedAttributeNonNull popupMenuAttrs = new InheritedAttributeNonNull( controlsNamespace, "popupMenuAttrs", StyleSheet.class,
-			StyleSheet.instance.withAttr( Primitive.border, new SolidBorder( 1.0, 2.0, Color.black, null ) ).withAttr( Primitive.hboxSpacing, 10.0 ) );
+			StyleSheet.instance.withAttr( Primitive.border, new SolidBorder( 1.0, 2.0, Color.black, null ) ).withAttr( Primitive.rowSpacing, 10.0 ) );
 
 	
 	public static final InheritedAttributeNonNull tooltipBorder = new InheritedAttributeNonNull( controlsNamespace, "tooltipBorder", AbstractBorder.class,
@@ -134,7 +134,7 @@ public class Controls
 		{
 			double spacing = attribs.get( checkboxSpacing, Double.class );
 			Painter background = attribs.get( checkboxHoverBackground, Painter.class );
-			return StyleSheet.instance.withAttr( Primitive.hoverBackground, background ).withAttr( Primitive.hboxSpacing, spacing );
+			return StyleSheet.instance.withAttr( Primitive.hoverBackground, background ).withAttr( Primitive.rowSpacing, spacing );
 		}
 	};
 

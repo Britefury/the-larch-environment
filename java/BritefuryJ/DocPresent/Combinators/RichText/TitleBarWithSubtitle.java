@@ -10,7 +10,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class TitleBarWithSubtitle extends Pres
@@ -30,8 +30,8 @@ public class TitleBarWithSubtitle extends Pres
 	{
 		Title title = new Title( text );
 		Subtitle subtitle = new Subtitle( subtitleText );
-		Pres titleVBox = new VBox( new Pres[] { title.alignHCentre(), subtitle.alignHCentre() } );
-		Pres titleBackground = new Border( titleVBox.alignHCentre() );
+		Pres titleColumn = new Column( new Pres[] { title.alignHCentre(), subtitle.alignHCentre() } );
+		Pres titleBackground = new Border( titleColumn.alignHCentre() );
 		double borderWidth = style.get( RichText.titleBorderWidth, Double.class );
 		return RichText.titleStyle.get( style ).applyTo(
 				titleBackground.alignHExpand().pad( borderWidth, borderWidth ).alignHExpand() ).present( ctx, style );

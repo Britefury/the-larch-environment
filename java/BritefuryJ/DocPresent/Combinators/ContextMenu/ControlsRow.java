@@ -4,24 +4,25 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.DocPresent.Combinators.RichText;
+package BritefuryJ.DocPresent.Combinators.ContextMenu;
 
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Combinators.ApplyStyleSheetFromAttribute;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.SequentialPres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Column;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
-public class Page extends SequentialPres
+public class ControlsRow extends SequentialPres
 {
-	public Page(Object children[])
+	public ControlsRow(Object children[])
 	{
 		super( children );
 	}
 	
-	public Page(List<Object> children)
+	public ControlsRow(List<Object> children)
 	{
 		super( children );
 	}
@@ -30,7 +31,7 @@ public class Page extends SequentialPres
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPElement xs[] = mapPresent( ctx, RichText.usePageAttrs( style ), children );
-		return RichText.pageStyle( style ).applyTo( new Column( xs ).alignHExpand() ).present( ctx, style );
+		DPElement xs[] = mapPresent( ctx, ContextMenuStyle.controlsRowUsage.useAttrs( style ), children );
+		return new ApplyStyleSheetFromAttribute( ContextMenuStyle.controlsRowStyle, new Row( xs ) ).present( ctx, style );
 	}
 }

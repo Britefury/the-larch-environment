@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Fraction;
-import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Span;
 import BritefuryJ.DocPresent.Combinators.Primitive.Text;
@@ -56,7 +56,7 @@ public class FractionTestPage extends SystemPage
 	private Pres makeFractionLine(Pres num, Pres denom)
 	{
 		Pres fractionFac = fractionOf( num, denom, "/" );
-		return styleSheet.applyTo( new HBox( new Pres[] { smallStyle.applyTo( new Text( "<<Left<<" ) ), fractionFac, largeStyle.applyTo( new Text( ">>Right>>" ) ) } ) );
+		return styleSheet.applyTo( new Row( new Pres[] { smallStyle.applyTo( new Text( "<<Left<<" ) ), fractionFac, largeStyle.applyTo( new Text( ">>Right>>" ) ) } ) );
 	}
 	
 	protected Pres createContents()

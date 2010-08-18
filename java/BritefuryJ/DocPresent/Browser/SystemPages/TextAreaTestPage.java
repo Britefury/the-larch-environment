@@ -10,11 +10,11 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPVBox;
+import BritefuryJ.DocPresent.DPColumn;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
 import BritefuryJ.DocPresent.Combinators.RichText.Heading6;
@@ -44,10 +44,10 @@ public class TextAreaTestPage extends SystemPage
 
 	private class AreaListener extends TextArea.TextAreaListener
 	{
-		private DPVBox resultArea, eventArea;
+		private DPColumn resultArea, eventArea;
 		private String prevText;
 		
-		public AreaListener(DPVBox resultArea, DPVBox eventArea, String text)
+		public AreaListener(DPColumn resultArea, DPColumn eventArea, String text)
 		{
 			this.resultArea = resultArea;
 			this.eventArea = eventArea;
@@ -122,13 +122,13 @@ public class TextAreaTestPage extends SystemPage
 	
 	protected Pres createContents()
 	{
-		DPVBox resultArea = (DPVBox)new VBox( new Pres[] {} ).present();
-		DPVBox eventArea = (DPVBox)new VBox( new Pres[] {} ).present();
-		Pres resultBox = StyleSheet.instance.withAttr( Primitive.vboxSpacing, 5.0 ).applyTo( new VBox( new Object[] { new Heading6( "Text:" ), resultArea, new Heading6( "Event:" ), eventArea } ) );
+		DPColumn resultArea = (DPColumn)new Column( new Pres[] {} ).present();
+		DPColumn eventArea = (DPColumn)new Column( new Pres[] {} ).present();
+		Pres resultBox = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( new Column( new Object[] { new Heading6( "Text:" ), resultArea, new Heading6( "Event:" ), eventArea } ) );
 		
 		TextArea area = new TextArea( testString, new AreaListener( resultArea, eventArea, testString ) );
 		
-		Pres areaBox = StyleSheet.instance.withAttr( Primitive.vboxSpacing, 10.0 ).applyTo( new VBox( new Object[] { area.alignHExpand(), resultBox.alignHExpand() } ) );
+		Pres areaBox = StyleSheet.instance.withAttr( Primitive.columnSpacing, 10.0 ).applyTo( new Column( new Object[] { area.alignHExpand(), resultBox.alignHExpand() } ) );
 		
 		return new Body( new Pres[] { new Heading2( "Text area" ), areaBox.alignHExpand() } ).alignHExpand();
 	}

@@ -14,9 +14,9 @@ import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Arrow;
-import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Input.Modifier;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
@@ -134,15 +134,15 @@ public abstract class SpinEntry extends ControlPres
 		DPElement upArrowElement = arrowStyle.applyTo( upArrow ).present( ctx, style );
 		Pres downArrow = new Arrow( Arrow.Direction.DOWN, arrowSize );
 		DPElement downArrowElement = arrowStyle.applyTo( downArrow ).present( ctx, style );
-		Pres arrowsBox = arrowStyle.applyTo( new VBox( new Object[] { upArrowElement, downArrowElement } ) );
+		Pres arrowsBox = arrowStyle.applyTo( new Column( new Object[] { upArrowElement, downArrowElement } ) );
 		
 		SpinEntryControl.SpinEntryTextListener textListener = new SpinEntryControl.SpinEntryTextListener();
 		
 		TextEntry entry = new TextEntry( getInitialValueString(), textListener, getValidationPattern(), getValidationFailMessage() );
 		TextEntry.TextEntryControl entryControl = (TextEntryControl)entry.createControl( ctx, style );
 		
-		Pres hbox = StyleSheet.instance.withAttr( Primitive.hboxSpacing, hspacing ).applyTo( new HBox( new Object[] { entryControl.getElement().alignHExpand().alignVCentre(), arrowsBox.alignVCentre() } ) );
-		DPElement element = hbox.present( ctx, style );
+		Pres row = StyleSheet.instance.withAttr( Primitive.rowSpacing, hspacing ).applyTo( new Row( new Object[] { entryControl.getElement().alignHExpand().alignVCentre(), arrowsBox.alignVCentre() } ) );
+		DPElement element = row.present( ctx, style );
 		
 		return createSpinEntryControl( ctx, style, element, entryControl, upArrowElement, downArrowElement, textListener );
 	}

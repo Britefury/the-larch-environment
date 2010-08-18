@@ -12,12 +12,12 @@ import java.awt.Cursor;
 import BritefuryJ.DocPresent.Painter.Painter;
 
 
-public class HBoxStyleParams extends AbstractBoxStyleParams
+public class ColumnStyleParams extends AbstractBoxStyleParams
 {
-	public static final HBoxStyleParams defaultStyleParams = new HBoxStyleParams( null, null, null, 0.0 );
+	public static final ColumnStyleParams defaultStyleParams = new ColumnStyleParams( null, null, null, 0.0 );
 
 
-	public HBoxStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, double spacing)
+	public ColumnStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, double spacing)
 	{
 		super( background, hoverBackground, pointerCursor, spacing );
 	}

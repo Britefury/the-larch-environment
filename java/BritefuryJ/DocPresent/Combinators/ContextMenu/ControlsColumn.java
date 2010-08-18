@@ -12,17 +12,17 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.ApplyStyleSheetFromAttribute;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.SequentialPres;
-import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
-public class ControlsHBox extends SequentialPres
+public class ControlsColumn extends SequentialPres
 {
-	public ControlsHBox(Object children[])
+	public ControlsColumn(Object children[])
 	{
 		super( children );
 	}
 	
-	public ControlsHBox(List<Object> children)
+	public ControlsColumn(List<Object> children)
 	{
 		super( children );
 	}
@@ -31,7 +31,7 @@ public class ControlsHBox extends SequentialPres
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPElement xs[] = mapPresent( ctx, ContextMenuStyle.controlsHBoxUsage.useAttrs( style ), children );
-		return new ApplyStyleSheetFromAttribute( ContextMenuStyle.controlsHBoxStyle, new HBox( xs ) ).present( ctx, style );
+		DPElement xs[] = mapPresent( ctx, ContextMenuStyle.controlsColumnUsage.useAttrs( style ), children );
+		return new ApplyStyleSheetFromAttribute( ContextMenuStyle.controlsColumnStyle, new Column( xs ) ).present( ctx, style );
 	}
 }

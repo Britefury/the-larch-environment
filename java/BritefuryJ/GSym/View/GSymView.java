@@ -15,7 +15,7 @@ import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRegion;
-import BritefuryJ.DocPresent.DPVBox;
+import BritefuryJ.DocPresent.DPColumn;
 import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.DocPresent.Caret.Caret;
@@ -23,7 +23,7 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
 import BritefuryJ.DocPresent.Selection.Selection;
@@ -146,7 +146,7 @@ public class GSymView extends IncrementalTree
 				}
 				catch (Exception e2)
 				{
-					fragment = new ErrorBox( "DOUBLE EXCEPTION!", new VBox( new Pres[] {
+					fragment = new ErrorBox( "DOUBLE EXCEPTION!", new Column( new Pres[] {
 							labelStyle.applyTo( new StaticText( "Got exception:" ) ),
 							exceptionStyle.applyTo( new StaticText( e2.toString() ) ).padX( 15.0, 0.0 ),
 							labelStyle.applyTo( new StaticText( "While trying to display exception:" ) ),
@@ -218,7 +218,7 @@ public class GSymView extends IncrementalTree
 	
 	
 	private NodeElementChangeListener elementChangeListener = null;
-	private DPVBox rootBox = null;
+	private DPColumn rootBox = null;
 	
 	private StateStore stateStoreToLoad;
 	
@@ -270,9 +270,9 @@ public class GSymView extends IncrementalTree
 		this.commandHistory = subject.getCommandHistory();
 		
 		region = new DPRegion();
-		DPElement vbox = new VBox( new Object[] { region } ).present();
+		DPElement column = new Column( new Object[] { region } ).present();
 
-		page = new GSymViewPage( vbox.alignHExpand().alignVExpand(), subject.getTitle(), browserContext, commandHistory, this );
+		page = new GSymViewPage( column.alignHExpand().alignVExpand(), subject.getTitle(), browserContext, commandHistory, this );
 		
 		setElementChangeListener( new NodeElementChangeListenerDiff() );
 		
@@ -322,7 +322,7 @@ public class GSymView extends IncrementalTree
 			performRefresh();
 			GSymFragmentView rootView = (GSymFragmentView)getRootIncrementalTreeNode();
 			DPElement fragmentElement = rootView.getRefreshedFragmentElement();
-			rootBox = (DPVBox)new VBox( new Object[] { fragmentElement.alignHExpand().alignVExpand() } ).present();
+			rootBox = (DPColumn)new Column( new Object[] { fragmentElement.alignHExpand().alignVExpand() } ).present();
 		}
 		return rootBox;
 	}

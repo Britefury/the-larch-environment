@@ -7,7 +7,7 @@
 package BritefuryJ.Controls;
 
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 
 public class HPopupMenu extends PopupMenu
 {
@@ -24,6 +24,6 @@ public class HPopupMenu extends PopupMenu
 	@Override
 	protected Pres createMenuBox(Pres boxItems[])
 	{
-		return new HBox( boxItems );
+		return new Row( boxItems );
 	}
 }

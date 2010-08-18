@@ -10,7 +10,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Arrow;
 import BritefuryJ.DocPresent.Combinators.Primitive.Box;
-import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.Util.Range;
@@ -45,7 +45,7 @@ public class HScrollBar extends ScrollBar
 
 	protected Pres createScrollBarPres(double spacing, DPElement decArrowElement, DPElement dragBarElement, DPElement incArrowElement)
 	{
-		return StyleSheet.instance.withAttr( Primitive.hboxSpacing, spacing ).applyTo( new HBox( new Object[] {
+		return StyleSheet.instance.withAttr( Primitive.rowSpacing, spacing ).applyTo( new Row( new Object[] {
 				decArrowElement.alignVCentre(), dragBarElement.alignHExpand().alignVCentre(), incArrowElement.alignVCentre() } ) );
 	}
 }

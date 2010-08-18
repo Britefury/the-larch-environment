@@ -9,28 +9,49 @@ package BritefuryJ.DocPresent.Combinators.Primitive;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPHBox;
+import BritefuryJ.DocPresent.DPColumn;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
-public class HBox extends AbstractBox
+public class Column extends AbstractBox
 {
-	public HBox(Object children[])
+	private int refPointIndex;
+	
+	
+	public Column(Object children[])
 	{
 		super( children );
+		this.refPointIndex = -1;
 	}
 	
-	public HBox(List<Object> children)
+	public Column(Object children[], int refPointIndex)
 	{
 		super( children );
+		this.refPointIndex = refPointIndex;
 	}
 	
+	public Column(List<Object> children)
+	{
+		super( children );
+		this.refPointIndex = -1;
+	}
+
+	public Column(List<Object> children, int refPointIndex)
+	{
+		super( children );
+		this.refPointIndex = refPointIndex;
+	}
+
 	
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPHBox element = new DPHBox( Primitive.hboxParams.get( style ) );
-		element.setChildren( mapPresent( ctx, Primitive.useHBoxParams( style ), children ) );
+		DPColumn element = new DPColumn( Primitive.columnParams.get( style ) );
+		element.setChildren( mapPresent( ctx, Primitive.useColumnParams( style ), children ) );
+		if ( refPointIndex != -1 )
+		{
+			element.setRefPointIndex( refPointIndex );
+		}
 		return element;
 	}
 }

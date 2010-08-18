@@ -92,8 +92,8 @@ def _worksheetContextMenuFactory(element, menu):
 	h5Style = Hyperlink( 'H5', makeStyleFn( 'h5' ) )
 	h6Style = Hyperlink( 'H6', makeStyleFn( 'h6' ) )
 	titleStyle = Hyperlink( 'Title', makeStyleFn( 'title' ) )
-	styles = ControlsHBox( [ normalStyle, h1Style, h2Style, h3Style, h4Style, h5Style, h6Style, titleStyle ] )
-	menu.add( SectionVBox( [ SectionTitle( 'Style' ), styles ] ).alignHExpand() )
+	styles = ControlsRow( [ normalStyle, h1Style, h2Style, h3Style, h4Style, h5Style, h6Style, titleStyle ] )
+	menu.add( SectionColumn( [ SectionTitle( 'Style' ), styles ] ).alignHExpand() )
 	
 	
 	def _onPythonCode(link, event):
@@ -102,8 +102,8 @@ def _worksheetContextMenuFactory(element, menu):
 			caret.getElement().postTreeEvent( PythonCodeRequest() )
 
 	newCode = Hyperlink( 'Python code', _onPythonCode )
-	codeControls = ControlsHBox( [ newCode ] )
-	menu.add( SectionVBox( [ SectionTitle( 'Code' ), codeControls ] ).alignHExpand() )
+	codeControls = ControlsRow( [ newCode ] )
+	menu.add( SectionColumn( [ SectionTitle( 'Code' ), codeControls ] ).alignHExpand() )
 	
 	
 	def _onQuoteLocation(link, event):
@@ -112,8 +112,8 @@ def _worksheetContextMenuFactory(element, menu):
 			caret.getElement().postTreeEvent( QuoteLocationRequest() )
 
 	newQuoteLocation = Hyperlink( 'View of Location', _onQuoteLocation )
-	quoteLocationControls = ControlsHBox( [ newQuoteLocation ] )
-	menu.add( SectionVBox( [ SectionTitle( 'Location' ), quoteLocationControls ] ).alignHExpand() )
+	quoteLocationControls = ControlsRow( [ newQuoteLocation ] )
+	menu.add( SectionColumn( [ SectionTitle( 'Location' ), quoteLocationControls ] ).alignHExpand() )
 	
 	
 	def _onRefresh(button, event):
@@ -122,8 +122,8 @@ def _worksheetContextMenuFactory(element, menu):
 	model = element.getFragmentContext().getModel()
 
 	refreshButton = Button.buttonWithLabel( 'Refresh', _onRefresh )
-	worksheetControls = ControlsHBox( [ refreshButton ] )
-	menu.add( SectionVBox( [ SectionTitle( 'Worksheet' ), worksheetControls ] ).alignHExpand() )
+	worksheetControls = ControlsRow( [ refreshButton ] )
+	menu.add( SectionColumn( [ SectionTitle( 'Worksheet' ), worksheetControls ] ).alignHExpand() )
 	return True
 
 
@@ -229,13 +229,13 @@ class WorksheetEditor (GSymViewObjectDispatch):
 		deleteButton = Button( Image.systemIcon( 'delete' ), _onDeleteButton )
 		
 		headerBox = _pythonCodeHeaderStyle.applyTo( Bin(
-		        StyleSheet.instance.withAttr( Primitive.hboxSpacing, 20.0 ).applyTo( HBox( [ StaticText( 'Python code' ).alignHExpand(), styleOptionMenu, deleteButton.alignVCentre() ] ) ).alignHExpand().pad( 2.0, 2.0 ) ) )
+		        StyleSheet.instance.withAttr( Primitive.rowSpacing, 20.0 ).applyTo( Row( [ StaticText( 'Python code' ).alignHExpand(), styleOptionMenu, deleteButton.alignVCentre() ] ) ).alignHExpand().pad( 2.0, 2.0 ) ) )
 		
 		boxContents = [ headerBox.alignHExpand() ]
 		boxContents.append( _pythonCodeBorderStyle.applyTo( Border( codeView.alignHExpand() ).alignHExpand() ) )
 		if executionResultView is not None:
 			boxContents.append( executionResultView.alignHExpand() )
-		box = StyleSheet.instance.withAttr( Primitive.vboxSpacing, 5.0 ).applyTo( VBox( boxContents ) )
+		box = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( Column( boxContents ) )
 		
 		p = _pythonCodeEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
 
@@ -276,12 +276,12 @@ class WorksheetEditor (GSymViewObjectDispatch):
 		locationEditor = TextEntry( node.getLocation(), _LocationEntryListener() )
 		
 		headerBox = _quoteLocationHeaderStyle.applyTo( Bin(
-		        StyleSheet.instance.withAttr( Primitive.hboxSpacing, 20.0 ).applyTo( HBox( 
+		        StyleSheet.instance.withAttr( Primitive.rowSpacing, 20.0 ).applyTo( Row( 
 		                [ StaticText( 'Location: ' ), locationEditor, HiddenContent( '' ).alignHExpand(), styleOptionMenu, deleteButton.alignVCentre() ] ) ).alignHExpand().pad( 2.0, 2.0 ) ) )
 		
 		boxContents = [ headerBox.alignHExpand() ]
 		boxContents.append( _quoteLocationBorderStyle.applyTo( Border( targetView.alignHExpand() ).alignHExpand() ) )
-		box = StyleSheet.instance.withAttr( Primitive.vboxSpacing, 5.0 ).applyTo( VBox( boxContents ) )
+		box = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( Column( boxContents ) )
 		
 		p = _quoteLocationEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
 

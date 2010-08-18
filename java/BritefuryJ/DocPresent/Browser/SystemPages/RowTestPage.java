@@ -12,27 +12,27 @@ import java.util.ArrayList;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
-import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
-public class HBoxTestPage extends SystemPage
+public class RowTestPage extends SystemPage
 {
-	protected HBoxTestPage()
+	protected RowTestPage()
 	{
 	}
 	
 	
 	public String getTitle()
 	{
-		return "H-Box test";
+		return "Row test";
 	}
 	
 	protected String getDescription()
 	{
-		return "The HBox element arranges its child elements in a horizontal box."; 
+		return "The row element arranges its child elements in a horizontal box."; 
 	}
 
 	
@@ -47,7 +47,7 @@ public class HBoxTestPage extends SystemPage
 	}
 	
 	
-	protected Pres createHBox1()
+	protected Pres createRow1()
 	{
 		ArrayList<Object> children = new ArrayList<Object>();
 		children.add( makeText( "a", 24 ).alignVRefY() );
@@ -60,10 +60,10 @@ public class HBoxTestPage extends SystemPage
 		children.add( makeText( "v_bottom", 18 ).alignVBottom() );
 		children.add( makeText( "v_expand", 18 ).alignVExpand() );
 		
-		return outlineStyleSheet.applyTo( new Border( new HBox( children ).alignHExpand() ) ).alignHExpand().pad( 10.0, 20.0 );
+		return outlineStyleSheet.applyTo( new Border( new Row( children ).alignHExpand() ) ).alignHExpand().pad( 10.0, 20.0 );
 	}
 
-	protected Pres createHBox2()
+	protected Pres createRow2()
 	{
 		ArrayList<Object> children = new ArrayList<Object>();
 		children.add( makeText( "h_pack", 18 ).alignVRefY() );
@@ -72,12 +72,12 @@ public class HBoxTestPage extends SystemPage
 		children.add( makeText( "h_right", 18 ).alignHRight() );
 		children.add( makeText( "h_expand", 18 ).alignHExpand() );
 		
-		return outlineStyleSheet.applyTo( new Border( new HBox( children ).alignHExpand() ) ).alignHExpand().pad( 10.0, 20.0 );
+		return outlineStyleSheet.applyTo( new Border( new Row( children ).alignHExpand() ) ).alignHExpand().pad( 10.0, 20.0 );
 	}
 
 	
 	protected Pres createContents()
 	{
-		return new Body( new Pres[] { createHBox1().alignHExpand(), createHBox2().alignHExpand() } ).alignHExpand();
+		return new Body( new Pres[] { createRow1().alignHExpand(), createRow2().alignHExpand() } ).alignHExpand();
 	}
 }

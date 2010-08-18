@@ -14,7 +14,7 @@ import java.util.List;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.LayoutTree.BranchLayoutNode;
@@ -1078,10 +1078,10 @@ public abstract class DPContainer extends DPElement
 				System.out.println( "DPContainer.createMetaElement(): null child in " + getClass().getName() );
 			}
 		}
-		Pres metaChildrenVBox = new VBox( metaChildren, metaChildren.size() - 1 );
+		Pres metaChildrenColumn = new Column( metaChildren, metaChildren.size() - 1 );
 		
-		Pres indentMetaChildren = metaChildrenVBox.padX( 25.0, 0.0 );
+		Pres indentMetaChildren = metaChildrenColumn.padX( 25.0, 0.0 );
 		
-		return new VBox( new Pres[] { createDebugPresentationHeader(), indentMetaChildren } );
+		return new Column( new Pres[] { createDebugPresentationHeader(), indentMetaChildren } );
 	}
 }

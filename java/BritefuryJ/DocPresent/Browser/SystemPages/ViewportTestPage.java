@@ -14,7 +14,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.SpaceBin;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.Primitive.VBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.Primitive.Viewport;
 import BritefuryJ.DocPresent.Combinators.RichText.NormalText;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
@@ -50,7 +50,7 @@ public class ViewportTestPage extends SystemPage
 		
 		Pres viewport = new SpaceBin( new Viewport( b2, new PersistentState() ).alignHExpand().alignVExpand(), 0.0, 200.0 );
 		Pres border = borderStyle.applyTo( new Border( viewport.alignHExpand().alignVExpand() ).alignHExpand().alignVExpand() );
-		Pres vbox = StyleSheet.instance.withAttr( Primitive.vboxSpacing, 5.0 ).applyTo( new VBox( new Pres[] { new StaticText( "Viewport:" ), border } ) ).alignHExpand().alignVExpand();
-		return vbox.pad( 50.0, 50.0 );
+		Pres column = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( new Column( new Pres[] { new StaticText( "Viewport:" ), border } ) ).alignHExpand().alignVExpand();
+		return column.pad( 50.0, 50.0 );
 	}
 }

@@ -17,7 +17,7 @@ import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Arrow;
 import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
-import BritefuryJ.DocPresent.Combinators.Primitive.HBox;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
@@ -210,8 +210,8 @@ public class OptionMenu extends ControlPres
 		
 		BritefuryJ.DocPresent.Border.AbstractBorder border = style.get( Controls.optionMenuBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class );
 		BritefuryJ.DocPresent.Border.AbstractBorder hoverBorder = style.get( Controls.optionMenuHoverBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class );
-		StyleSheet optionStyle = StyleSheet.instance.withAttr( Primitive.hboxSpacing, style.get( Controls.optionMenuContentsSpacing, Double.class ) ).withAttr( Primitive.border, border );
-		Pres optionContents = new HBox( new Pres[] { coerce( choiceContainer ).alignHExpand(), arrow.alignVCentre() } );
+		StyleSheet optionStyle = StyleSheet.instance.withAttr( Primitive.rowSpacing, style.get( Controls.optionMenuContentsSpacing, Double.class ) ).withAttr( Primitive.border, border );
+		Pres optionContents = new Row( new Pres[] { coerce( choiceContainer ).alignHExpand(), arrow.alignVCentre() } );
 		Pres optionMenu = optionStyle.applyTo( new Border( optionContents.alignHExpand() ) ); 
 		DPBorder optionMenuElement = (DPBorder)optionMenu.present( ctx, style );
 		
