@@ -82,7 +82,7 @@ class GSymDocument (CommandHistoryListener):
 		self._commandHistory.setCommandHistoryListener( self )
 		self._docName = ''
 		
-		self._bHasUnsavedData = False
+		self._bHasUnsavedData = True
 		self._filename = None
 		self._saveTime = None
 	
@@ -126,6 +126,9 @@ class GSymDocument (CommandHistoryListener):
 
 	def setUnsavedDataListener(self, listener):
 		self._unsavedDataListener = listener
+		
+	def hasUnsavedData(self):
+		return self._bHasUnsavedData
 		
 		
 	

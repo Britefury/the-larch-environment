@@ -100,6 +100,9 @@ class AppWindow (object):
 		self._browser.setCommandHistoryListener( _CommandHistoryListener() )
 		
 		
+		self.onCloseRequest = None
+		
+		
 		
 		# NEW MENU
 		
@@ -175,7 +178,7 @@ class AppWindow (object):
 
 		
 		
-		# WINDOW
+		# MAIN PANEL
 		
 		windowPanel = JPanel()
 		windowPanel.setLayout( BoxLayout( windowPanel, BoxLayout.Y_AXIS ) )
@@ -183,6 +186,32 @@ class AppWindow (object):
 		
 		
 		
+		
+		# WINDOW
+		
+		class _AppWindowLister (WindowListener):
+			def windowActivated(listenerSelf, event):
+				pass
+
+			def windowClosed(listenerSelf, event):
+				pass
+
+			def windowClosing(listenerSelf, event):
+				if self.onCloseRequest is not None:
+					self.onCloseRequest( self )
+			
+			def windowDeactivated(listenerSelf, event):
+				pass
+			
+			def windowDeiconified(listenerSelf, event):
+				pass
+			
+			def windowIconified(listenerSelf, event):
+				pass
+			
+			def windowOpened(listenerSelf, event):
+				pass
+			
 
 		self._frame = JFrame( 'gSym' )
 		self._frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
@@ -190,6 +219,8 @@ class AppWindow (object):
 		self._frame.setJMenuBar( menuBar )
 		
 		self._frame.add( windowPanel )
+		self._frame.addWindowListener( _AppWindowLister() )
+		self._frame.setDefaultCloseOperation( JFrame.DO_NOTHING_ON_CLOSE )
 		
 		self._frame.pack()
 		
@@ -206,6 +237,14 @@ class AppWindow (object):
 		
 	def getFrame(self):
 		return self._frame
+	
+	
+	def close(self):
+		self._frame.dispose()
+		
+		
+	def setCloseRequestListener(self, listener):
+		self.onCloseRequest = listener
 
 		
 		
