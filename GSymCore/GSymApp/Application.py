@@ -33,6 +33,13 @@ class AppState (IncrementalOwner):
 		self._openDocuments.append( appDocument )
 		self._incr.onChanged()
 		
+		
+	def hasUnsavedData(self):
+		for doc in self._openDocuments:
+			if doc.hasUnsavedData():
+				return True
+		return False
+		
 
 
 	def getConsoles(self):
@@ -70,6 +77,10 @@ class AppDocument (IncrementalOwner):
 	def getLocation(self):
 		self._incr.onAccess()
 		return self._location
+	
+	
+	def hasUnsavedData(self):
+		return self._doc.hasUnsavedData()
 		
 	
 

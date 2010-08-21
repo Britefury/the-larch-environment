@@ -18,6 +18,7 @@ from BritefuryJ.DocModel import DMIOReader, DMNode
 
 from Britefury.gSym.gSymWorld import GSymWorld
 from Britefury.gSym.gSymDocument import GSymDocument
+from Britefury.gSymConfig import UserConfig
 
 from Britefury.MainApp.MainApp import MainApp
 
@@ -28,6 +29,7 @@ from GSymCore.GSymApp import GSymApp
 
 def main():
 	UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+	UserConfig.userConfig.load()
 
 	world = GSymWorld()
 	world.enableImportHooks()
@@ -36,7 +38,11 @@ def main():
 		filename = sys.argv[1]
 		assert False, 'Load file from command line not implemented yet'
 		
+	def _onClose(app):
+		UserConfig.userConfig.save()
+	
 	app = MainApp( world )
+	app.setCloseListener( _onClose )
 
 	app.show()
 
