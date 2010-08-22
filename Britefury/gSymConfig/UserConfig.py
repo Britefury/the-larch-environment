@@ -81,7 +81,8 @@ class GSymUserConfig (object):
 			f.close()
 
 
-	pluginPaths = ConfigProperty( 'Paths', 'configPaths', str, '' )
+	pluginPaths = ConfigProperty( 'Paths', 'pluginPaths', str, '' )
+	pluginRootPaths = ConfigProperty( 'Paths', 'pluginRootPaths', str, '' )
 
 
 

@@ -7,10 +7,14 @@
 ##-*************************
 import os
 
+import sys
+
+from Britefury.gSymConfig import UserConfig
 
 
 
-_pluginDirectories = [ 'GSymCore' ]
+
+_localPluginDirectories = [ 'GSymCore' ]
 
 
 def _splitPath(path):
@@ -27,8 +31,45 @@ def _splitPath(path):
 def _pathToDottedName(path):
 	return '.'.join( _splitPath( path ) )
 
+
+def _commaSeparatedPathsToList(paths):
+	if paths == '':
+		return []
+	else:
+		l = [ p.strip()   for p in paths.split( ',' ) ]
+		return [ p   for p in l   if p != '' ]
+
+
+def _getUserPluginDirs():
+	return _commaSeparatedPathsToList( UserConfig.userConfig.pluginPaths )
+
+def _getUserPluginRootPaths():
+	return _commaSeparatedPathsToList( UserConfig.userConfig.pluginRootPaths )
+
 	
+def _loadPluginsInDir(plugins, pluginDir):
+	for dirpath, dirnames, filenames in os.walk( pluginDir ):
+		for filename in filenames:
+			if filename == 'gsymplugin.py':
+				fn, ext = os.path.splitext( filename )
+
+				pluginName = _pathToDottedName( dirpath )
+				
+				pathComponents = _splitPath( dirpath )
+				pathComponents.append( fn )
+				importName = '.'.join( pathComponents )
+				
+				mod = __import__( importName )
+				components = importName.split( '.' )
+				for comp in components[1:]:
+					mod = getattr( mod, comp )
 					
+				initPluginFn = getattr( mod, 'initPlugin' )
+
+				plugins.append( GSymPlugin( pluginName, initPluginFn ) )
+
+				
+
 class GSymPlugin (object):
 	def __init__(self, name, initFn):
 		self.name = name
@@ -41,29 +82,19 @@ class GSymPlugin (object):
 		
 	@staticmethod
 	def loadPlugins():
+		# Add import paths to sys.paths:
+		sys.path.extend( _getUserPluginRootPaths() )
+		
+		
 		plugins = []
-		for pluginDir in _pluginDirectories:
-			for dirpath, dirnames, filenames in os.walk( pluginDir ):
-				for filename in filenames:
-					if filename == 'gsymplugin.py':
-						fn, ext = os.path.splitext( filename )
-
-						pluginName = _pathToDottedName( dirpath )
-						
-						pathComponents = _splitPath( dirpath )
-						pathComponents.append( fn )
-						importName = '.'.join( pathComponents )
-						
-						mod = __import__( importName )
-						components = importName.split( '.' )
-						for comp in components[1:]:
-							mod = getattr( mod, comp )
-							
-						initPluginFn = getattr( mod, 'initPlugin' )
-
-						plugins.append( GSymPlugin( pluginName, initPluginFn ) )
+		
+		for pluginDir in _localPluginDirectories:
+			_loadPluginsInDir( plugins, pluginDir )
+		
+		for pluginDir in _getUserPluginDirs():
+			_loadPluginsInDir( plugins, pluginDir )
 		
 		return plugins
 
 
-
+		

@@ -18,9 +18,9 @@ import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.GenericPerspective.PresCom.HorizontalField;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBoxWithFields;
+import BritefuryJ.GSym.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Incremental.IncrementalOwner;
-import BritefuryJ.Incremental.IncrementalValueMonitor;
 
 
 public class Range implements IncrementalOwner, Presentable
@@ -31,7 +31,7 @@ public class Range implements IncrementalOwner, Presentable
 	}
 	
 	
-	private IncrementalValueMonitor incr = new IncrementalValueMonitor( this );
+	private PresentationStateListenerList presStateListeners = null;
 	private double min, max;
 	private double begin, end;
 	private double stepSize;
@@ -73,37 +73,31 @@ public class Range implements IncrementalOwner, Presentable
 	
 	public double getMin()
 	{
-		incr.onAccess();
 		return min;
 	}
 
 	public double getMax()
 	{
-		incr.onAccess();
 		return max;
 	}
 
 	public double getBegin()
 	{
-		incr.onAccess();
 		return begin;
 	}
 
 	public double getEnd()
 	{
-		incr.onAccess();
 		return end;
 	}
 	
 	public double getPageSize()
 	{
-		incr.onAccess();
 		return end - begin;
 	}
 	
 	public double getStepSize()
 	{
-		incr.onAccess();
 		return stepSize;
 	}
 	
@@ -130,7 +124,6 @@ public class Range implements IncrementalOwner, Presentable
 	
 	public void move(double delta)
 	{
-		incr.onAccess();
 		if ( delta < 0.0 )
 		{
 			delta = Math.max( delta, min - begin );
@@ -156,7 +149,7 @@ public class Range implements IncrementalOwner, Presentable
 	
 	private void onModified()
 	{
-		incr.onChanged();
+		presStateListeners = PresentationStateListenerList.onPresentationStateChanged( presStateListeners, this );
 		if ( listeners != null )
 		{
 			for (RangeListener listener: listeners)
@@ -176,7 +169,7 @@ public class Range implements IncrementalOwner, Presentable
 	@Override
 	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		incr.onAccess();
+		presStateListeners = PresentationStateListenerList.addListener( presStateListeners, fragment );
 		Pres rangeField = new HorizontalField( "Valid range:",
 				new Paragraph( new Pres[] { numValueStyle.applyTo( new StaticText( String.valueOf( min ) ) ),
 						new StaticText( " to " ),

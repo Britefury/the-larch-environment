@@ -9,8 +9,6 @@ package BritefuryJ.Controls;
 import java.awt.Graphics2D;
 import java.awt.geom.RoundRectangle2D;
 
-import BritefuryJ.Cell.Cell;
-import BritefuryJ.Cell.CellEvaluator;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
@@ -18,8 +16,6 @@ import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.Painter.Painter;
 import BritefuryJ.DocPresent.Util.Range;
-import BritefuryJ.Incremental.IncrementalMonitor;
-import BritefuryJ.Incremental.IncrementalMonitorListener;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -79,7 +75,7 @@ class ScrollBarHelper
 		}
 	}
 
-	protected static class ScrollBarDragBarInteractor extends ElementInteractor implements IncrementalMonitorListener
+	protected static class ScrollBarDragBarInteractor extends ElementInteractor implements Range.RangeListener
 	{
 		private DPElement element;
 		private Axis axis;
@@ -89,7 +85,7 @@ class ScrollBarHelper
 		private PointerInterface dragPointer = null;
 		private Point2 dragStartPos = null;
 		private double dragStartValue = 0.0;
-		private Cell dragBoxCell = new Cell();
+		private AABox2 dragBox = null;
 		
 		
 		public ScrollBarDragBarInteractor(DPElement element, Axis axis, Range range, double padding, double rounding, Painter dragBoxPainter)
@@ -100,17 +96,7 @@ class ScrollBarHelper
 			this.padding = padding;
 			this.rounding = rounding;
 			this.dragBoxPainter = dragBoxPainter;
-			
-			CellEvaluator dragBoxCellEval = new CellEvaluator()
-			{
-				@Override
-				public Object evaluate()
-				{
-					return computeDragBox( ScrollBarDragBarInteractor.this.element );
-				}
-			};
-			dragBoxCell.setEvaluator( dragBoxCellEval );
-			dragBoxCell.addListener( this );
+			range.addListener( this );
 		}
 		
 		
@@ -119,7 +105,7 @@ class ScrollBarHelper
 		{
 			if ( event.getButton() == 1 )
 			{
-				AABox2 dragBox = (AABox2)dragBoxCell.getValue();
+				AABox2 dragBox = getRefreshedDragBox();
 				
 				Point2 localPos = event.getPointer().getLocalPos();
 				
@@ -188,7 +174,7 @@ class ScrollBarHelper
 	
 		public void draw(DPElement element, Graphics2D graphics)
 		{
-			AABox2 dragBox = (AABox2)dragBoxCell.getValue();
+			AABox2 dragBox = getRefreshedDragBox();
 			
 			RoundRectangle2D.Double shape = new RoundRectangle2D.Double( dragBox.getLowerX(), dragBox.getLowerY(), dragBox.getWidth(), dragBox.getHeight(), rounding, rounding );
 			
@@ -196,34 +182,39 @@ class ScrollBarHelper
 		}
 		
 		
-		private AABox2 computeDragBox(DPElement element)
+		private AABox2 getRefreshedDragBox()
 		{
-			AABox2 box = element.getLocalAABox();
-			double value = Math.min( Math.max( range.getBegin(), range.getMin() ), range.getMax() );
-			double end = Math.min( Math.max( range.getEnd(), range.getMin() ), range.getMax() );
-			if ( axis == Axis.HORIZONTAL )
+			if ( dragBox == null )
 			{
-				double visibleRange = box.getWidth()  -  padding * 2.0;
-				double scaleFactor = visibleRange / ( range.getMax() - range.getMin() );
-				return new AABox2( padding + value * scaleFactor, padding, padding + end * scaleFactor, box.getUpperY() - padding );
+				AABox2 box = element.getLocalAABox();
+				double value = Math.min( Math.max( range.getBegin(), range.getMin() ), range.getMax() );
+				double end = Math.min( Math.max( range.getEnd(), range.getMin() ), range.getMax() );
+				if ( axis == Axis.HORIZONTAL )
+				{
+					double visibleRange = box.getWidth()  -  padding * 2.0;
+					double scaleFactor = visibleRange / ( range.getMax() - range.getMin() );
+					dragBox = new AABox2( padding + value * scaleFactor, padding, padding + end * scaleFactor, box.getUpperY() - padding );
+				}
+				else if ( axis == Axis.VERTICAL )
+				{
+					double visibleRange = box.getHeight()  -  padding * 2.0;
+					double scaleFactor = visibleRange / ( range.getMax() - range.getMin() );
+					dragBox = new AABox2( padding, padding + value * scaleFactor, box.getUpperX() - padding, padding + end * scaleFactor );
+				}
+				else
+				{
+					throw new RuntimeException( "Invalid direction" );
+				}
 			}
-			else if ( axis == Axis.VERTICAL )
-			{
-				double visibleRange = box.getHeight()  -  padding * 2.0;
-				double scaleFactor = visibleRange / ( range.getMax() - range.getMin() );
-				return new AABox2( padding, padding + value * scaleFactor, box.getUpperX() - padding, padding + end * scaleFactor );
-			}
-			else
-			{
-				throw new RuntimeException( "Invalid direction" );
-			}
+			return dragBox;
 		}
 	
 	
 	
 		@Override
-		public void onIncrementalMonitorChanged(IncrementalMonitor inc)
+		public void onRangeModified(Range r)
 		{
+			dragBox = null;
 			element.queueFullRedraw();
 		}
 	}
