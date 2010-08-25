@@ -44,6 +44,7 @@ public class Primitive
 	public static final InheritedAttributeNonNull fontFace = new InheritedAttributeNonNull( primitiveNamespace, "fontFace", String.class, "Sans serif" );
 	public static final InheritedAttributeNonNull fontBold = new InheritedAttributeNonNull( primitiveNamespace, "fontBold", Boolean.class, false );
 	public static final InheritedAttributeNonNull fontItalic = new InheritedAttributeNonNull( primitiveNamespace, "fontItalic", Boolean.class, false );
+	public static final InheritedAttributeNonNull fontSmallCaps = new InheritedAttributeNonNull( primitiveNamespace, "fontSmallCaps", Boolean.class, false );
 	public static final InheritedAttributeNonNull fontSize = new InheritedAttributeNonNull( primitiveNamespace, "fontSize", Integer.class, 14 );
 	public static final InheritedAttributeNonNull fontScale = new InheritedAttributeNonNull( primitiveNamespace, "fontScale", Double.class, 1.0 );
 	public static final AttributeNonNull border = new AttributeNonNull( primitiveNamespace, "border", AbstractBorder.class, new SolidBorder( 1.0, 2.0, Color.black, null ) );
@@ -75,7 +76,6 @@ public class Primitive
 	public static final AttributeNonNull tableRowSpacing = new AttributeNonNull( primitiveNamespace, "tableRowSpacing", Double.class, 0.0 );
 	public static final AttributeNonNull tableRowExpand = new AttributeNonNull( primitiveNamespace, "tableRowExpand", Boolean.class, false );
 	public static final InheritedAttribute textSquiggleUnderlinePaint = new InheritedAttribute( primitiveNamespace, "textSquiggleUnderlinePaint", Paint.class, null );
-	public static final InheritedAttributeNonNull textSmallCaps = new InheritedAttributeNonNull( primitiveNamespace, "textSmallCaps", Boolean.class, false );
 
 
 
@@ -337,7 +337,7 @@ public class Primitive
 					attribs.get( foreground, Paint.class ),
 					attribs.get( hoverForeground, Paint.class ),
 					attribs.get( textSquiggleUnderlinePaint, Paint.class ),
-					attribs.get( textSmallCaps, Boolean.class ) );
+					attribs.get( fontSmallCaps, Boolean.class ) );
 		}
 	};
 	
@@ -346,7 +346,7 @@ public class Primitive
 		protected StyleValues evaluate(AttributeTable style)
 		{
 			return useFont.get( style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
-					.useAttr( foreground ).useAttr( hoverForeground ).useAttr( textSquiggleUnderlinePaint ).useAttr( textSmallCaps ) );
+					.useAttr( foreground ).useAttr( hoverForeground ).useAttr( textSquiggleUnderlinePaint ).useAttr( fontSmallCaps ) );
 		}
 	};
 
@@ -365,14 +365,14 @@ public class Primitive
 					attribs.get( foreground, Paint.class ),
 					attribs.get( hoverForeground, Paint.class ),
 					attribs.get( textSquiggleUnderlinePaint, Paint.class ),
-					attribs.get( textSmallCaps, Boolean.class ) );
+					attribs.get( fontSmallCaps, Boolean.class ) );
 		}
 	};
 	
 	protected static StyleValues useLabelTextParams(StyleValues style)
 	{
 		return useFont.get( style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
-				.useAttr( foreground ).useAttr( hoverForeground ).useAttr( textSquiggleUnderlinePaint ).useAttr( textSmallCaps ) );
+				.useAttr( foreground ).useAttr( hoverForeground ).useAttr( textSquiggleUnderlinePaint ).useAttr( fontSmallCaps ) );
 	}
 	
 	
@@ -390,7 +390,7 @@ public class Primitive
 					attribs.get( foreground, Paint.class ),
 					attribs.get( hoverForeground, Paint.class ),
 					attribs.get( textSquiggleUnderlinePaint, Paint.class ),
-					attribs.get( textSmallCaps, Boolean.class ) );
+					attribs.get( fontSmallCaps, Boolean.class ) );
 		}
 	};
 	
@@ -398,7 +398,7 @@ public class Primitive
 	{
 		return useFont.get( style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
 				.useAttr( editable ).useAttr( foreground ).useAttr( hoverForeground ).useAttr( textSquiggleUnderlinePaint )
-				.useAttr( textSmallCaps ) );
+				.useAttr( fontSmallCaps ) );
 	}
 	
 	
