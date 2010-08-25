@@ -32,7 +32,7 @@ class PythonEditorStyle (object):
 	
 	keywordStyle = InheritedAttributeNonNull( pythonEditor, 'keywordStyle', StyleSheet,
 	                                          StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontBold, True ).withAttr( Primitive.fontSize, 14 )
-	                                          .withAttr( Primitive.foreground, Color( 0.25, 0.0, 0.5 ) ).withAttr( Primitive.textSmallCaps, True ) )
+	                                          .withAttr( Primitive.foreground, Color( 0.25, 0.0, 0.5 ) ).withAttr( Primitive.fontSmallCaps, True ) )
 	literalFormatStyle = InheritedAttributeNonNull( pythonEditor, 'literalFormatStyle', StyleSheet,
 	                                                StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, Color( 0.0, 0.25, 0.25 ) ) )
 	quotationStyle = InheritedAttributeNonNull( pythonEditor, 'quotationStyle', StyleSheet,
