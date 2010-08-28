@@ -1,5 +1,0 @@
-{gsw=org.Britefury.gSym.Internal.GSymWorld :
-	[
-		(gsw GSymPlugin location=GSymCore.Languages.Python25.Python25Plugin)
-	]
-}
