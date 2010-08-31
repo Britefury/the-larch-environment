@@ -44,4 +44,10 @@ public class PointerMotionEvent extends PointerEvent
 	{
 		return new PointerMotionEvent( pointer.transformed( xToLocal ), action );
 	}
+	
+	
+	public PointerMotionEvent withAction(Action action)
+	{
+		return new PointerMotionEvent( pointer, action );
+	}
 }
