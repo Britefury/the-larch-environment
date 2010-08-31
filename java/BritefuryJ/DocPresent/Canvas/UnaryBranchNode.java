@@ -35,51 +35,51 @@ public abstract class UnaryBranchNode extends DrawingNode
 		child.unrealise();
 		super.unrealise();
 	}
+	
+	
+	protected DrawingNode getVisibleChild()
+	{
+		return child;
+	}
 
 	
 	public void draw(Graphics2D graphics, DrawContext context)
 	{
-		child.draw( graphics, context );
+		getVisibleChild().draw( graphics, context );
 	}
 
 	
 	public AABox2 getParentSpaceBoundingBox()
 	{
-		return child.getParentSpaceBoundingBox();
+		return getVisibleChild().getParentSpaceBoundingBox();
 	}
 
 
 	
 	protected PointerInputElement getFirstPointerChildAtLocalPoint(Point2 localPos)
 	{
-		return child;
+		return getVisibleChild();
 	}
 	
 	protected PointerInputElement getLastPointerChildAtLocalPoint(Point2 localPos)
 	{
-		return child;
+		return getVisibleChild();
 	}
 	
 
 	public boolean containsLocalSpacePoint(Point2 localPos)
 	{
-		return child.containsParentSpacePoint( localPos );
+		return getVisibleChild().containsParentSpacePoint( localPos );
 	}
 
 	public boolean containsParentSpacePoint(Point2 parentPos)
 	{
-		return child.containsParentSpacePoint( parentPos );
+		return getVisibleChild().containsParentSpacePoint( parentPos );
 	}
 
 
 	public PointerInputElement getDndElement(Point2 localPos, Point2 targetPos[])				// targetPos is an output parameter
 	{
-		PointerInputElement element = child.getDndElement( localPos, targetPos );
-		if ( element != null )
-		{
-			return element;
-		}
-		
-		return null;
+		return getVisibleChild().getDndElement( localPos, targetPos );
 	}
 }

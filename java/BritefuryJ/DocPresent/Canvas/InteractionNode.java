@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.DocPresent.Canvas;
 
-import java.awt.Graphics2D;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
@@ -140,25 +139,26 @@ public class InteractionNode extends UnaryBranchNode
 	}
 	
 	
-	public void draw(Graphics2D graphics, DrawContext context)
+	protected DrawingNode getVisibleChild()
 	{
 		if ( hoverHighlight != null )
 		{
 			ArrayList<PointerInterface> pointers = owner != null  ?  owner.getPointersWithinDrawingNodeBounds( this )  :  null;
 			if ( pointers != null  &&  pointers.size() > 0 )
 			{
-				hoverHighlight.draw( graphics, context );
+				return hoverHighlight;
 			}
 			else
 			{
-				child.draw( graphics, context );
+				return child;
 			}
 		}
 		else
 		{
-			child.draw( graphics, context );
+			return child;
 		}
 	}
+
 
 
 
@@ -278,25 +278,7 @@ public class InteractionNode extends UnaryBranchNode
 
 	public PointerInputElement getDndElement(Point2 localPos, Point2 targetPos[])				// targetPos is an output parameter
 	{
-		DrawingNode childNode = null;
-		if ( hoverHighlight != null )
-		{
-			ArrayList<PointerInterface> pointers = owner != null  ?  owner.getPointersWithinDrawingNodeBounds( this )  :  null;
-			if ( pointers != null  &&  pointers.size() > 0 )
-			{
-				childNode = hoverHighlight;
-			}
-			else
-			{
-				childNode = child;
-			}
-		}
-		else
-		{
-			childNode = child;
-		}
-
-		PointerInputElement element = childNode.getDndElement( localPos, targetPos );
+		PointerInputElement element = getVisibleChild().getDndElement( localPos, targetPos );
 		if ( element != null )
 		{
 			return element;
