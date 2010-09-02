@@ -7,7 +7,6 @@
 //##************************
 package BritefuryJ.DocPresent.Input;
 
-import java.awt.datatransfer.Transferable;
 import java.awt.event.MouseEvent;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
@@ -16,8 +15,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-
-import javax.swing.TransferHandler;
 
 import BritefuryJ.Controls.PopupMenu;
 import BritefuryJ.Controls.VPopupMenu;
@@ -491,7 +488,7 @@ public class Pointer extends PointerInterface
 	protected ElementEntry rootEntry;
 	protected InputTable inputTable;
 	protected DndDropLocal dndDrop;
-	protected PointerDndController dndController;
+	protected DndInteractor dndInteractor;
 	protected PresentationComponent component;
 	
 	protected ReferenceQueue<ElementEntry> refQueue = new ReferenceQueue<ElementEntry>();
@@ -500,7 +497,7 @@ public class Pointer extends PointerInterface
 	public Pointer(InputTable inputTable, PointerInputElement rootElement, PointerDndController dndController, PresentationComponent component)
 	{
 		this.inputTable = inputTable;
-		this.dndController = dndController;
+		this.dndInteractor = new DndInteractor( rootElement, dndController );
 		this.component = component;
 		
 		rootEntry = getEntryForElement( rootElement );
@@ -585,7 +582,7 @@ public class Pointer extends PointerInterface
 		}
 		else
 		{
-			dndButtonDownEvent( event );
+			dndInteractor.buttonDown( event );
 			return rootEntry.handleButtonDown( this, event );
 		}
 	}
@@ -593,7 +590,7 @@ public class Pointer extends PointerInterface
 	public boolean buttonUp(Point2 pos, int button)
 	{
 		PointerButtonEvent event = new PointerButtonEvent( this, button, PointerButtonEvent.Action.UP );
-		boolean bHandled = dndButtonUpEvent( event );
+		boolean bHandled = dndInteractor.buttonUp( event );
 		if ( bHandled )
 		{
 			return true;
@@ -618,7 +615,7 @@ public class Pointer extends PointerInterface
 	public void drag(Point2 pos, MouseEvent mouseEvent)
 	{
 		PointerMotionEvent event = new PointerMotionEvent( this, PointerMotionEvent.Action.MOTION );
-		boolean bHandled = dndDragEvent( event, mouseEvent );
+		boolean bHandled = dndInteractor.drag( event, mouseEvent );
 		if ( !bHandled )
 		{
 			rootEntry.handleDrag( this, event );
@@ -643,114 +640,6 @@ public class Pointer extends PointerInterface
 
 
 
-	
-	private void dndButtonDownEvent(PointerButtonEvent event)
-	{
-		if ( dndController != null )
-		{
-			PointerInputElement sourceElement = rootEntry.element.getDndElement( event.getPointer().getLocalPos(), null );
-			
-			if ( sourceElement != null )
-			{
-				dndDrop = new DndDropLocal( sourceElement, event.getButton() );
-			}
-		}
-	}
-	
-	private boolean dndDragEvent(PointerMotionEvent event, MouseEvent mouseEvent)
-	{
-		if ( dndController != null )
-		{
-			DndDropLocal drop = dndDrop;
-	
-			if ( drop != null )
-			{
-				if ( !drop.bInProgress )
-				{
-					if ( mouseEvent != null )
-					{
-						int requestedAction = drop.sourceElement.getDndHandler().getSourceRequestedAction( drop.sourceElement, event.getPointer(), drop.sourceButton );
-						if ( requestedAction != TransferHandler.NONE )
-						{
-							int requestedAspect = drop.sourceElement.getDndHandler().getSourceRequestedAspect( drop.sourceElement, event.getPointer(), drop.sourceButton );
-							if ( requestedAspect != DndHandler.ASPECT_NONE )
-							{
-								Transferable transferable = drop.sourceElement.getDndHandler().createTransferable( drop.sourceElement, requestedAspect );
-								if ( transferable != null )
-								{
-									drop.bInProgress = true;
-									drop.initialise( transferable, requestedAction );
-								
-									dndController.pointerDndInitiateDrag( this, drop, mouseEvent, requestedAction );
-									
-									return true;
-								}
-							}
-						}
-					}
-				}
-				else
-				{
-					Point2 targetPos[] = new Point2[] { null };
-					PointerInputElement targetElement = rootEntry.element.getDndElement( event.getPointer().getLocalPos(), targetPos );
-					if ( targetElement != null )
-					{
-						drop.setTarget( targetElement, targetPos[0] );
-						targetElement.getDndHandler().canDrop( targetElement, drop );
-					}
-					
-					return true;
-				}
-				
-				return false;
-			}
-			else
-			{
-				return false;
-			}
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-	private boolean dndButtonUpEvent(PointerButtonEvent event)
-	{
-		if ( dndController != null )
-		{
-			DndDropLocal drop = dndDrop;
-			
-			if ( drop != null  &&  drop.bInProgress )
-			{
-				Point2 targetPos[] = new Point2[] { null };
-				PointerInputElement targetElement = rootEntry.element.getDndElement( event.getPointer().getLocalPos(), targetPos );
-				if ( targetElement != null )
-				{
-					drop.setTarget( targetElement, targetPos[0] );
-					if ( targetElement.getDndHandler().canDrop( targetElement, drop ) )
-					{
-						targetElement.getDndHandler().acceptDrop( targetElement, drop );
-					}
-				}
-				
-				drop.bInProgress = false;
-				dndDrop = null;
-				
-				return true;
-			}
-			else
-			{
-				dndDrop = null;
-				return false;
-			}
-		}
-		else
-		{
-			return false;
-		}
-	}
-	
 	
 	
 	private ElementEntry getEntryForElement(PointerInputElement element)
