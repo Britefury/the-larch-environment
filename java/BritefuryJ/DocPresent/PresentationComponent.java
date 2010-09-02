@@ -50,7 +50,6 @@ import BritefuryJ.DocPresent.Input.DndDropSwing;
 import BritefuryJ.DocPresent.Input.InputTable;
 import BritefuryJ.DocPresent.Input.Modifier;
 import BritefuryJ.DocPresent.Input.MousePointer;
-import BritefuryJ.DocPresent.Input.Pointer;
 import BritefuryJ.DocPresent.Input.PointerDndController;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Layout.LAllocV;
@@ -1388,7 +1387,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		}
 		
 		
-		public void pointerDndInitiateDrag(Pointer pointer, DndDropLocal drop, MouseEvent mouseEvent, int requestedAction)
+		public void dndInitiateDrag(DndDropLocal drop, MouseEvent mouseEvent, int requestedAction)
 		{
 			PresentationComponent.PresAreaTransferHandler xferHandler = getDndTransferHandler();
 			xferHandler.beginExportDnd( drop );
