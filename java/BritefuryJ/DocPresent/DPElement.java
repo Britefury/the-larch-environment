@@ -17,7 +17,9 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.WeakHashMap;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
@@ -40,6 +42,7 @@ import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
 import BritefuryJ.DocPresent.Layout.ElementAlignment;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.LAllocV;
@@ -240,6 +243,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		private ObjectDndHandler dndHandler;
 		
 		private ArrayList<ElementInteractor> interactors;
+		private ArrayList<AbstractElementInteractor> elementInteractors;
 		private ArrayList<ContextMenuFactory> contextFactories;
 		private ArrayList<TreeEventListener> treeEventListeners;
 		
@@ -258,6 +262,11 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 			{
 				f.interactors = new ArrayList<ElementInteractor>();
 				f.interactors.addAll( interactors );
+			}
+			if ( elementInteractors != null )
+			{
+				f.elementInteractors = new ArrayList<AbstractElementInteractor>();
+				f.elementInteractors.addAll( elementInteractors );
 			}
 			if ( contextFactories != null )
 			{
@@ -290,6 +299,28 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 				if ( interactors.isEmpty() )
 				{
 					interactors = null;
+				}
+			}
+		}
+		
+		
+		public void addElementInteractor(AbstractElementInteractor interactor)
+		{
+			if ( elementInteractors == null )
+			{
+				elementInteractors = new ArrayList<AbstractElementInteractor>();
+			}
+			elementInteractors.add( interactor );
+		}
+		
+		public void removeElementInteractor(AbstractElementInteractor interactor)
+		{
+			if ( elementInteractors != null )
+			{
+				elementInteractors.remove( interactor );
+				if ( elementInteractors.isEmpty() )
+				{
+					elementInteractors = null;
 				}
 			}
 		}
@@ -345,7 +376,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		
 		public boolean isIdentity()
 		{
-			return dndHandler == null  &&  treeEventListeners == null  &&  interactors == null  &&  contextFactories == null;
+			return dndHandler == null  &&  treeEventListeners == null  &&  interactors == null  &&  contextFactories == null  &&  elementInteractors == null;
 		}
 	}
 
@@ -1971,22 +2002,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		}
 		return bResult;
 	}
-	
-	
-	protected boolean handlePointerNavigationGestureBegin(PointerButtonEvent event)
-	{
-		return false;
-	}
-	
-	protected boolean handlePointerNavigationGestureEnd(PointerButtonEvent event)
-	{
-		return false;
-	}
-
-	protected boolean handlePointerNavigationGesture(PointerNavigationEvent event)
-	{
-		return false;
-	}
 
 	
 	
@@ -2242,6 +2257,106 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	public ArrayList<ElementInteractor> getInteractors()
 	{
 		return interactionFields != null  ?  interactionFields.interactors  :  null;
+	}
+	
+	
+	
+	
+	//
+	//
+	// ELEMENT INTERACTOR METHODS
+	//
+	//
+	
+	public void addElementInteractor(AbstractElementInteractor interactor)
+	{
+		ensureValidInteractionFields();
+		interactionFields.addElementInteractor( interactor );
+		notifyInteractionFieldsModified();
+	}
+	
+	public void removeElementInteractor(AbstractElementInteractor interactor)
+	{
+		if ( interactionFields != null )
+		{
+			interactionFields.removeElementInteractor( interactor );
+			notifyInteractionFieldsModified();
+		}
+	}
+	
+	public Iterable<AbstractElementInteractor> getElementInteractors()
+	{
+		return interactionFields != null  ?  interactionFields.elementInteractors  :  null;
+	}
+	
+	public Iterable<AbstractElementInteractor> getElementInteractors(final Class<?> interactorClass)
+	{
+		final ArrayList<AbstractElementInteractor> interactors = interactionFields != null  ?  interactionFields.elementInteractors  :  null;
+		
+		if ( interactors != null )
+		{
+			Iterable<AbstractElementInteractor> iterable = new Iterable<AbstractElementInteractor>()
+			{
+				public Iterator<AbstractElementInteractor> iterator()
+				{
+					Iterator<AbstractElementInteractor> iter = new Iterator<AbstractElementInteractor>()
+					{
+						private int index = nextIndex( 0 );
+						
+						
+						@Override
+						public boolean hasNext()
+						{
+							return index != -1;
+						}
+	
+						@Override
+						public AbstractElementInteractor next()
+						{
+							if ( index == -1 )
+							{
+								throw new NoSuchElementException();
+							}
+							else
+							{
+								AbstractElementInteractor interactor = interactors.get( index );
+								index = nextIndex( index + 1 );
+								return interactor;
+							}
+						}
+	
+						@Override
+						public void remove()
+						{
+							throw new UnsupportedOperationException();
+						}
+						
+						
+						private int nextIndex(int current)
+						{
+							for (int i = current; i < interactors.size(); i++)
+							{
+								AbstractElementInteractor interactor = interactors.get( i );
+								if ( interactorClass.isInstance( interactor ) )
+								{
+									return i;
+								}
+							}
+							
+							return -1;
+						}
+					};
+					
+					return iter;
+				}
+			};
+			
+			return iterable;
+		}
+		else
+		{
+			return null;
+		}
 	}
 	
 	

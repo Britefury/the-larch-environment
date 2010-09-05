@@ -49,8 +49,8 @@ import BritefuryJ.DocPresent.Input.DndDropLocal;
 import BritefuryJ.DocPresent.Input.DndDropSwing;
 import BritefuryJ.DocPresent.Input.InputTable;
 import BritefuryJ.DocPresent.Input.Modifier;
-import BritefuryJ.DocPresent.Input.MousePointer;
-import BritefuryJ.DocPresent.Input.PointerDndController;
+import BritefuryJ.DocPresent.Input.Pointer;
+import BritefuryJ.DocPresent.Input.DndController;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
@@ -375,13 +375,13 @@ public class PresentationComponent extends JComponent implements ComponentListen
 
 	
 	
-	public static class RootElement extends DPBin implements CaretListener, SelectionListener, PointerDndController
+	public static class RootElement extends DPBin implements CaretListener, SelectionListener, DndController
 	{
 		private PresentationComponent component;
 		
 		private Vector2 windowSize;
 		
-		private MousePointer rootSpaceMouse;
+		private Pointer rootSpaceMouse;
 		private InputTable inputTable;
 		
 		private WeakHashMap<StateKeyListener, Object> stateKeyListeners;

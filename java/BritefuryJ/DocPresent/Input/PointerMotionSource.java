@@ -35,12 +35,12 @@ public class PointerMotionSource
 		handleMotion( event );
 	}
 	
-	public void enter(Point2 pos)
+	public void enter(Point2 pos, MouseEvent mouseEvent)
 	{
 		handleEnter( rootElement, new PointerMotionEvent( pointer, PointerMotionEvent.Action.ENTER ) );
 	}
 
-	public void leave(Point2 pos)
+	public void leave(Point2 pos, MouseEvent mouseEvent)
 	{
 		handleLeave( 0, new PointerMotionEvent( pointer, PointerMotionEvent.Action.LEAVE ) );
 	}

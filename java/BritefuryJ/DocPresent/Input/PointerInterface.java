@@ -34,14 +34,14 @@ public abstract class PointerInterface
 	
 	public LocalPointerInterface transformed(Xform2 parentToX)
 	{
-		return new LocalPointerInterface( this, parentToX );
+		return new LocalPointerInterface( this, concretePointer(), parentToX );
 	}
 	
 	public AffineTransformedPointer transformed(AffineTransform parentToX)
 	{
-		return new AffineTransformedPointer( this, parentToX );
+		return new AffineTransformedPointer( this, concretePointer(), parentToX );
 	}
 
 	
-	abstract public PointerInterface concretePointer();
+	abstract public Pointer concretePointer();
 }

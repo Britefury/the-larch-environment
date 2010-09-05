@@ -11,8 +11,8 @@ import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
-import BritefuryJ.DocPresent.Event.PointerNavigationEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
+import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
 import BritefuryJ.Math.Point2;
 
 public abstract class PointerInputElement
@@ -29,16 +29,16 @@ public abstract class PointerInputElement
 	protected abstract void handlePointerLeaveIntoChild(PointerMotionEvent event, PointerInputElement childElement);
 	protected abstract boolean handlePointerScroll(PointerScrollEvent event);
 	
-	protected abstract boolean handlePointerNavigationGestureBegin(PointerButtonEvent event);
-	protected abstract boolean handlePointerNavigationGestureEnd(PointerButtonEvent event);
-	protected abstract boolean handlePointerNavigationGesture(PointerNavigationEvent event);
-	
 	protected abstract PointerInputElement getFirstPointerChildAtLocalPoint(Point2 localPos);
 	protected abstract PointerInputElement getLastPointerChildAtLocalPoint(Point2 localPos);
 	protected abstract PointerEvent transformParentToLocalEvent(PointerEvent event);
 	protected abstract PointerInterface transformParentToLocalPointer(PointerInterface pointer);
 	public abstract Point2 transformParentToLocalPoint(Point2 parentPos);
 	
+	
+	public abstract Iterable<AbstractElementInteractor> getElementInteractors();
+	public abstract Iterable<AbstractElementInteractor> getElementInteractors(Class<?> interactorClass);
+
 	
 	protected abstract boolean isPointerInputElementRealised();
 	public abstract boolean containsParentSpacePoint(Point2 parentPos);
