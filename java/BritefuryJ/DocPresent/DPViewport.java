@@ -12,7 +12,8 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerNavigationEvent;
-import BritefuryJ.DocPresent.Event.PointerScrollEvent;
+import BritefuryJ.DocPresent.Input.PointerInputElement;
+import BritefuryJ.DocPresent.Interactor.NavigationElementInteractor;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeViewport;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
@@ -24,6 +25,32 @@ import BritefuryJ.Math.Xform2;
 
 public class DPViewport extends DPContainer implements Range.RangeListener
 {
+	private static class ViewportNavigationInteractor implements NavigationElementInteractor
+	{
+		@Override
+		public boolean navigationGestureBegin(PointerInputElement element, PointerButtonEvent event)
+		{
+			return true;
+		}
+
+		@Override
+		public void navigationGestureEnd(PointerInputElement element, PointerButtonEvent event)
+		{
+		}
+
+		@Override
+		public void navigationGesture(PointerInputElement element, PointerNavigationEvent event)
+		{
+			DPViewport viewport = (DPViewport)element;
+			Xform2 xform = event.createXform();
+			viewport.applyLocalSpaceXform( xform );
+		}
+	}
+	
+	
+	private static ViewportNavigationInteractor interactor = new ViewportNavigationInteractor();
+	
+	
 	protected final static int FLAG_IGNORE_RANGE_EVENTS = FLAGS_CONTAINER_END * 0x1;
 
 	protected final static int FLAGS_VIEWPORT_END = FLAGS_CONTAINER_END  <<  1;
@@ -65,6 +92,8 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 			state.setValue( x );
 		}
 		allocationSpaceToLocalSpace = x;
+		
+		addElementInteractor( interactor );
 	}
 	
 	private DPViewport(DPViewport element)
@@ -76,6 +105,8 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 		layoutNode = new LayoutNodeViewport( this );
 		this.state = element.state;
 		allocationSpaceToLocalSpace = element.allocationSpaceToLocalSpace;
+		
+		addElementInteractor( interactor );
 	}
 	
 	
@@ -353,33 +384,6 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 		return true;
 	}
 
-	
-	
-	
-	protected boolean handlePointerNavigationGestureBegin(PointerButtonEvent event)
-	{
-		return true;
-	}
-	
-	protected boolean handlePointerNavigationGestureEnd(PointerButtonEvent event)
-	{
-		return true;
-	}
-
-	protected boolean handlePointerNavigationGesture(PointerNavigationEvent event)
-	{
-		Xform2 xform = event.createXform();
-		applyLocalSpaceXform( xform );
-		return true;
-	}
-	
-	protected boolean handlePointerScroll(PointerScrollEvent event)
-	{
-		double delta = (double)event.getScrollY();
-		Xform2 xform = new Xform2( new Vector2( 0.0, delta * 75.0 ) );
-		applyLocalSpaceXform( xform );
-		return true;
-	}
 	
 	
 	

@@ -23,6 +23,7 @@ import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -254,22 +255,6 @@ public abstract class DrawingNode extends PointerInputElement
 	}
 	
 	
-	protected boolean handlePointerNavigationGestureBegin(PointerButtonEvent event)
-	{
-		return false;
-	}
-	
-	protected boolean handlePointerNavigationGestureEnd(PointerButtonEvent event)
-	{
-		return false;
-	}
-
-	protected boolean handlePointerNavigationGesture(PointerNavigationEvent event)
-	{
-		return false;
-	}
-	
-	
 	protected PointerInputElement getFirstPointerChildAtLocalPoint(Point2 localPos)
 	{
 		return null;
@@ -294,6 +279,19 @@ public abstract class DrawingNode extends PointerInputElement
 	{
 		return parentPos;
 	}
+	
+	
+
+	public Iterable<AbstractElementInteractor> getElementInteractors()
+	{
+		return null;
+	}
+
+	public Iterable<AbstractElementInteractor> getElementInteractors(Class<?> interactorClass)
+	{
+		return null;
+	}
+	
 	
 
 	protected boolean isPointerInputElementRealised()

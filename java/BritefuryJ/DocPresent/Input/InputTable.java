@@ -21,21 +21,21 @@ public class InputTable
 {
 	private WeakHashMap<PointerInputElement, ArrayList<PointerInterface>> pointersWithinBoundsByElement;
 
-	protected MousePointer mouse;
+	protected Pointer mouse;
 	protected PointerInputElement rootElement;
 	protected JComponent component;
 	
 	
-	public InputTable(PointerInputElement rootElement, PointerDndController dndController, PresentationComponent component)
+	public InputTable(PointerInputElement rootElement, DndController dndController, PresentationComponent component)
 	{
 		pointersWithinBoundsByElement = new WeakHashMap<PointerInputElement, ArrayList<PointerInterface>>();
 		this.rootElement = rootElement;
 		this.component = component;
-		mouse = new MousePointer( this, rootElement, dndController, component );
+		mouse = new Pointer( this, rootElement, dndController, component );
 	}
 	
 	
-	public MousePointer getMouse()
+	public Pointer getMouse()
 	{
 		return mouse;
 	}

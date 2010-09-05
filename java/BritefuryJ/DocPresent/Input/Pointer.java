@@ -15,16 +15,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Stack;
 
 import BritefuryJ.Controls.PopupMenu;
 import BritefuryJ.Controls.VPopupMenu;
 import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
+import BritefuryJ.DocPresent.Event.PointerEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
-import BritefuryJ.DocPresent.Event.PointerNavigationEvent;
 import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 import BritefuryJ.Math.Point2;
+import BritefuryJ.Utils.PriorityList;
 
 
 
@@ -324,119 +326,6 @@ public class Pointer extends PointerInterface
 		
 		
 		
-		protected boolean handleNavigationGestureBegin(Pointer pointer, PointerButtonEvent event)
-		{
-			if ( navigationChild == null )
-			{
-				PointerInputElement childElement = element.getFirstPointerChildAtLocalPoint( event.getPointer().getLocalPos() );
-				if ( childElement != null )
-				{
-					ElementEntry childEntry = pointer.getEntryForElement( childElement );
-					boolean bHandled = childEntry.handleNavigationGestureBegin( pointer, (PointerButtonEvent)childElement.transformParentToLocalEvent( event ) );
-					if ( bHandled  &&  element.isPointerInputElementRealised() )
-					{
-						navigationChild = childEntry;
-						navigationChild.parents.add( this );
-						return true;
-					}
-				}
-				
-				if ( navigationChild == null )
-				{
-					return element.handlePointerNavigationGestureBegin( event );
-				}
-				else
-				{
-					return false;
-				}
-			}
-			else
-			{
-				throw new RuntimeException( "Navigation gesture already started" );
-			}
-		}
-		
-		protected boolean handleNavigationGestureEnd(Pointer pointer, PointerButtonEvent event)
-		{
-			if ( navigationChild != null )
-			{
-				PointerButtonEvent childSpaceEvent = (PointerButtonEvent)navigationChild.element.transformParentToLocalEvent( event );
-				Point2 localPos = event.getPointer().getLocalPos();
-				if ( !navigationChild.element.containsParentSpacePoint( localPos ) )
-				{
-					navigationChild.handleLeave( pointer, new PointerMotionEvent( childSpaceEvent.getPointer(), PointerMotionEvent.Action.LEAVE ) );
-				}
-				
-				boolean bHandled = navigationChild.handleNavigationGestureEnd( pointer, childSpaceEvent );
-				ElementEntry savedNavigationChild = navigationChild;
-				navigationChild.parents.remove( this );
-				navigationChild = null;
-				
-				if ( element.isPointerInputElementRealised()  &&  element.containsLocalSpacePoint( localPos ) )
-				{
-					PointerInputElement childElement = element.getFirstPointerChildAtLocalPoint( localPos );
-					if ( childElement != null )
-					{
-						ElementEntry childEntry = pointer.getEntryForElement( childElement );
-						PointerInputElement savedNavigationChildElement = savedNavigationChild != null  ?  savedNavigationChild.element  :  null;
-						if ( childElement != savedNavigationChildElement )
-						{
-							childEntry.handleEnter( pointer, new PointerMotionEvent( childSpaceEvent.getPointer(), PointerMotionEvent.Action.ENTER ) );
-						}
-						childUnderPointer = childEntry;
-						childUnderPointer.parents.add( this );
-					}
-					else
-					{
-						if ( childUnderPointer != null )
-						{
-							childUnderPointer.parents.remove( this );
-						}
-						childUnderPointer = null;
-						element.handlePointerEnter( new PointerMotionEvent( event.getPointer(), PointerMotionEvent.Action.ENTER ) );
-					}
-				}
-				
-				return bHandled;
-			}
-			else
-			{
-				return element.handlePointerNavigationGestureEnd( event );
-			}
-		}
-		
-		protected boolean handleNavigationGestureDrag(Pointer pointer, PointerNavigationEvent event)
-		{
-			if ( navigationChild != null )
-			{
-				boolean bHandled = navigationChild.handleNavigationGestureDrag( pointer, (PointerNavigationEvent)navigationChild.element.transformParentToLocalEvent( event ) );
-				if ( bHandled )
-				{
-					return true;
-				}
-			}
-			
-			return element.handlePointerNavigationGesture( event );
-		}
-		
-		protected boolean handleNavigationGestureClick(Pointer pointer, PointerNavigationEvent event)
-		{
-			if ( childUnderPointer != null )
-			{
-				boolean bHandled = childUnderPointer.handleNavigationGestureClick( pointer, (PointerNavigationEvent)childUnderPointer.element.transformParentToLocalEvent( event ) );
-				if ( bHandled )
-				{
-					return true;
-				}
-			}
-			
-			return element.handlePointerNavigationGesture( event );
-		}
-		
-		
-		
-		
-		
 		protected void notifyUnrealise(Pointer pointer)
 		{
 			if ( pressGrabChild != null )
@@ -483,28 +372,66 @@ public class Pointer extends PointerInterface
 	
 	
 	
+	private static int NAVIGATION_INTERACTOR_PRIORITY = -1000;
+	private static int DND_INTERACTOR_PRIORITY = -500;
+	
+	
+	
 	protected Point2 localPos = new Point2();
 	protected int modifiers = 0;
 	protected ElementEntry rootEntry;
 	protected InputTable inputTable;
 	protected DndDropLocal dndDrop;
-	protected DndInteractor dndInteractor;
+	protected PointerDragInteractor dragSource;
 	protected PresentationComponent component;
+	protected PriorityList<PointerInteractor> interactors = new PriorityList<PointerInteractor>();
 	
 	protected ReferenceQueue<ElementEntry> refQueue = new ReferenceQueue<ElementEntry>();
 	protected HashMap<PointerInputElement, WeakReference<ElementEntry> > elementToEntryTable = new HashMap<PointerInputElement, WeakReference<ElementEntry> >();
 	
-	public Pointer(InputTable inputTable, PointerInputElement rootElement, PointerDndController dndController, PresentationComponent component)
+	public Pointer(InputTable inputTable, PointerInputElement rootElement, DndController dndController, PresentationComponent component)
 	{
 		this.inputTable = inputTable;
-		this.dndInteractor = new DndInteractor( rootElement, dndController );
 		this.component = component;
+		dragSource = new PointerDragInteractor();
 		
 		rootEntry = getEntryForElement( rootElement );
+		
+		
+		interactors.add( NAVIGATION_INTERACTOR_PRIORITY, new PointerNavigationInteractor() );
+		interactors.add( DND_INTERACTOR_PRIORITY, new PointerDndInteractor( rootElement, dndController ) );
 	}
 	
 	
 
+	protected void addInteractor(PointerInteractor interactor)
+	{
+		interactors.add( interactor );
+	}
+	
+	protected void addInteractor(int priority, PointerInteractor interactor)
+	{
+		interactors.add( priority, interactor );
+	}
+	
+	protected void removeInteractor(PointerInteractor interactor)
+	{
+		interactors.remove( interactor );
+	}
+	
+	protected void interactorGrab(PointerInteractor interactor)
+	{
+		interactors.grab( interactor );
+	}
+	
+	protected void interactorUngrab(PointerInteractor interactor)
+	{
+		interactors.ungrab( interactor );
+	}
+	
+	
+
+	
 	public void setLocalPos(Point2 pos)
 	{
 		localPos = pos;
@@ -521,7 +448,7 @@ public class Pointer extends PointerInterface
 	}
 
 
-	public PointerInterface concretePointer()
+	public Pointer concretePointer()
 	{
 		return this;
 	}
@@ -543,6 +470,12 @@ public class Pointer extends PointerInterface
 	
 	protected void onElementUnrealised(PointerInputElement element)
 	{
+		for (PointerInteractor interactor: interactors)
+		{
+			interactor.elementUnrealised( this, element );
+		}
+		
+		
 		WeakReference<ElementEntry> entryRef = elementToEntryTable.get( element );
 		if ( entryRef != null )
 		{
@@ -557,11 +490,19 @@ public class Pointer extends PointerInterface
 
 	public void onRootElementReallocate()
 	{
+		for (PointerInteractor interactor: interactors)
+		{
+			if ( interactor.motion( this, new PointerMotionEvent( this, PointerMotionEvent.Action.MOTION ), null ) )
+			{
+				break;
+			}
+		}
+
 		ArrayList<PointerInterface> pointers = inputTable.getPointersWithinBoundsOfElement( rootEntry.element );
 		if ( dndDrop == null  &&  pointers != null  &&  pointers.contains( this ) )
 		{
 			motion( localPos, null );
-		}			
+		}		
 	}
 	
 	
@@ -569,6 +510,15 @@ public class Pointer extends PointerInterface
 	public boolean buttonDown(Point2 pos, int button)
 	{
 		PointerButtonEvent event = new PointerButtonEvent( this, button, PointerButtonEvent.Action.DOWN );
+
+		for (PointerInteractor interactor: interactors)
+		{
+			if ( interactor.buttonDown( this, event ) )
+			{
+				break;
+			}
+		}
+
 		if ( button == 3  &&  getModifiers() == Modifier.BUTTON3 )
 		{
 			VPopupMenu menu = new VPopupMenu();
@@ -582,7 +532,6 @@ public class Pointer extends PointerInterface
 		}
 		else
 		{
-			dndInteractor.buttonDown( event );
 			return rootEntry.handleButtonDown( this, event );
 		}
 	}
@@ -590,51 +539,106 @@ public class Pointer extends PointerInterface
 	public boolean buttonUp(Point2 pos, int button)
 	{
 		PointerButtonEvent event = new PointerButtonEvent( this, button, PointerButtonEvent.Action.UP );
-		boolean bHandled = dndInteractor.buttonUp( event );
-		if ( bHandled )
+
+		for (PointerInteractor interactor: interactors)
 		{
-			return true;
+			if ( interactor.buttonUp( this, event ) )
+			{
+				return true;
+			}
 		}
-		else
-		{
-			return rootEntry.handleButtonUp( this, event );
-		}
+
+		return rootEntry.handleButtonUp( this, event );
 	}
 	
 	public boolean buttonClicked(Point2 pos, int button, int clickCount)
 	{
-		return rootEntry.handleButtonClicked( this, new PointerButtonClickedEvent( this, button, clickCount ) );
+		PointerButtonClickedEvent event = new PointerButtonClickedEvent( this, button, clickCount );
+
+		for (PointerInteractor interactor: interactors)
+		{
+			if ( interactor.buttonClicked( this, event ) )
+			{
+				break;
+			}
+		}
+
+		return rootEntry.handleButtonClicked( this, event );
 	}
 	
 	public void motion(Point2 pos, MouseEvent mouseEvent)
 	{
 		PointerMotionEvent event = new PointerMotionEvent( this, PointerMotionEvent.Action.MOTION );
+
+		for (PointerInteractor interactor: interactors)
+		{
+			if ( interactor.motion( this, event, mouseEvent ) )
+			{
+				break;
+			}
+		}
+
 		rootEntry.handleMotion( this, event );
 	}
 
 	public void drag(Point2 pos, MouseEvent mouseEvent)
 	{
 		PointerMotionEvent event = new PointerMotionEvent( this, PointerMotionEvent.Action.MOTION );
-		boolean bHandled = dndInteractor.drag( event, mouseEvent );
-		if ( !bHandled )
+
+		for (PointerInteractor interactor: interactors)
 		{
-			rootEntry.handleDrag( this, event );
+			if ( interactor.drag( this, event, mouseEvent ) )
+			{
+				return;
+			}
 		}
+
+		rootEntry.handleDrag( this, event );
 	}
 
 	public void enter(Point2 pos)
 	{
-		rootEntry.handleEnter( this, new PointerMotionEvent( this, PointerMotionEvent.Action.ENTER ) );
+		PointerMotionEvent event = new PointerMotionEvent( this, PointerMotionEvent.Action.ENTER );
+
+		for (PointerInteractor interactor: interactors)
+		{
+			if ( interactor.enter( this, event ) )
+			{
+				break;
+			}
+		}
+
+		rootEntry.handleEnter( this, event );
 	}
 
 	public void leave(Point2 pos)
 	{
-		rootEntry.handleLeave( this, new PointerMotionEvent( this, PointerMotionEvent.Action.LEAVE ) );
+		PointerMotionEvent event = new PointerMotionEvent( this, PointerMotionEvent.Action.LEAVE );
+
+		for (PointerInteractor interactor: interactors)
+		{
+			if ( interactor.leave( this, event ) )
+			{
+				break;
+			}
+		}
+
+		rootEntry.handleLeave( this, event);
 	}
 
 	public boolean scroll(int scrollX, int scrollY)
 	{
-		return rootEntry.handleScroll( this, new PointerScrollEvent( this, scrollX, scrollY ) );
+		PointerScrollEvent event = new PointerScrollEvent( this, scrollX, scrollY );
+
+		for (PointerInteractor interactor: interactors)
+		{
+			if ( interactor.scroll( this, event ) )
+			{
+				break;
+			}
+		}
+
+		return rootEntry.handleScroll( this, event );
 	}
 
 
@@ -696,6 +700,125 @@ public class Pointer extends PointerInterface
 			{
 				elementToEntryTable.remove( element );
 			}
+		}
+	}
+	
+	
+	
+	
+	protected <E extends PointerEvent> PointerInputElement getFirstElementUnderPoint(Point2 p)
+	{
+		PointerInputElement element = rootEntry.element;
+		
+		while ( element != null )
+		{
+			PointerInputElement childElement = element.getFirstPointerChildAtLocalPoint( p );
+			if ( childElement == null )
+			{
+				return element;
+			}
+			else
+			{
+				element = childElement;
+			}
+		}
+		
+		return null;
+	}
+
+	protected <E extends PointerEvent> PointerInputElement getLastElementUnderPoint(Point2 p)
+	{
+		PointerInputElement element = rootEntry.element;
+		
+		while ( element != null )
+		{
+			PointerInputElement childElement = element.getLastPointerChildAtLocalPoint( p );
+			if ( childElement == null )
+			{
+				return element;
+			}
+			else
+			{
+				element = childElement;
+			}
+		}
+		
+		return null;
+	}
+
+	
+	
+	
+	@SuppressWarnings("unchecked")
+	protected <E extends PointerEvent> void getFirstElementPathUnderPoint(E event, Stack<E> eventStack, Stack<PointerInputElement> elements, Point2 p)
+	{
+		PointerInputElement element = rootEntry.element;
+		eventStack.push( event );
+		elements.push( element );
+		
+		while ( element != null )
+		{
+			PointerInputElement childElement = element.getFirstPointerChildAtLocalPoint( p );
+			if ( childElement != null )
+			{
+				event = (E)childElement.transformParentToLocalEvent( event );
+				eventStack.push( event );
+				elements.push( childElement );
+			}
+			element = childElement;
+		}
+	}
+
+	protected void getFirstElementPathUnderPoint(Stack<PointerInputElement> elements, Point2 p)
+	{
+		PointerInputElement element = rootEntry.element;
+		elements.push( element );
+		
+		while ( element != null )
+		{
+			PointerInputElement childElement = element.getFirstPointerChildAtLocalPoint( p );
+			if ( childElement != null )
+			{
+				elements.push( childElement );
+			}
+			element = childElement;
+		}
+	}
+
+	
+	@SuppressWarnings("unchecked")
+	protected <E extends PointerEvent> void getLastElementPathUnderPoint(E event, Stack<E> eventStack, Stack<PointerInputElement> elements, Point2 p)
+	{
+		PointerInputElement element = rootEntry.element;
+		eventStack.push( event );
+		elements.push( element );
+		
+		while ( element != null )
+		{
+			PointerInputElement childElement = element.getLastPointerChildAtLocalPoint( p );
+			if ( childElement != null )
+			{
+				event = (E)childElement.transformParentToLocalEvent( event );
+				eventStack.push( event );
+				elements.push( childElement );
+			}
+			element = childElement;
+		}
+	}
+	
+	protected void getLastElementPathUnderPoint(Stack<PointerInputElement> elements, Point2 p)
+	{
+		PointerInputElement element = rootEntry.element;
+		elements.push( element );
+		
+		while ( element != null )
+		{
+			PointerInputElement childElement = element.getLastPointerChildAtLocalPoint( p );
+			if ( childElement != null )
+			{
+				elements.push( childElement );
+			}
+			element = childElement;
 		}
 	}
 }

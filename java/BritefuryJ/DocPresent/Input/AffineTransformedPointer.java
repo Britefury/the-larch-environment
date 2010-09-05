@@ -15,12 +15,14 @@ import BritefuryJ.Math.Point2;
 public class AffineTransformedPointer extends PointerInterface
 {
 	protected final PointerInterface pointer;
+	protected final Pointer concretePointer;
 	protected AffineTransform globalToLocal, localToGlobal;
 	
 
-	public AffineTransformedPointer(PointerInterface pointer, AffineTransform globalToLocal)
+	public AffineTransformedPointer(PointerInterface pointer, Pointer concretePointer, AffineTransform globalToLocal)
 	{
 		this.pointer = pointer;
+		this.concretePointer = concretePointer;
 		this.globalToLocal = globalToLocal;
 		try
 		{
@@ -51,13 +53,13 @@ public class AffineTransformedPointer extends PointerInterface
 	{
 		AffineTransform x = (AffineTransform)parentToX.clone();
 		x.concatenate( globalToLocal );
-		return new AffineTransformedPointer( pointer, x );
+		return new AffineTransformedPointer( pointer, concretePointer, x );
 	}
 
 
 
-	public PointerInterface concretePointer()
+	public Pointer concretePointer()
 	{
-		return pointer;
+		return concretePointer;
 	}
 }

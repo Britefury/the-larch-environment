@@ -15,12 +15,14 @@ import BritefuryJ.Math.Xform2;
 public class LocalPointerInterface extends PointerInterface
 {
 	protected PointerInterface pointer;
+	protected Pointer concretePointer;
 	protected Xform2 globalToLocal, localToGlobal;
 	
 
-	public LocalPointerInterface(PointerInterface pointer, Xform2 globalToLocal)
+	public LocalPointerInterface(PointerInterface pointer, Pointer concretePointer, Xform2 globalToLocal)
 	{
 		this.pointer = pointer;
+		this.concretePointer = concretePointer;
 		this.globalToLocal = globalToLocal;
 		this.localToGlobal = globalToLocal.inverse();
 	}
@@ -39,19 +41,19 @@ public class LocalPointerInterface extends PointerInterface
 
 	public LocalPointerInterface transformed(Xform2 parentToX)
 	{
-		return new LocalPointerInterface( pointer, globalToLocal.concat( parentToX ) );
+		return new LocalPointerInterface( pointer, concretePointer, globalToLocal.concat( parentToX ) );
 	}
 
 	public AffineTransformedPointer transformed(AffineTransform parentToX)
 	{
 		AffineTransform x = globalToLocal.toAffineTransform();
 		x.concatenate( parentToX );
-		return new AffineTransformedPointer( pointer, x );
+		return new AffineTransformedPointer( pointer, concretePointer, x );
 	}
 
 
-	public PointerInterface concretePointer()
+	public Pointer concretePointer()
 	{
-		return pointer;
+		return concretePointer;
 	}
 }
