@@ -80,7 +80,7 @@ class ScrollBarHelper
 		private DPElement element;
 		private Axis axis;
 		private Range range;
-		private double padding, rounding;
+		private double padding, rounding, minSize;
 		private Painter dragBoxPainter;
 		private PointerInterface dragPointer = null;
 		private Point2 dragStartPos = null;
@@ -88,13 +88,14 @@ class ScrollBarHelper
 		private AABox2 dragBox = null;
 		
 		
-		public ScrollBarDragBarInteractor(DPElement element, Axis axis, Range range, double padding, double rounding, Painter dragBoxPainter)
+		public ScrollBarDragBarInteractor(DPElement element, Axis axis, Range range, double padding, double rounding, double minSize, Painter dragBoxPainter)
 		{
 			this.element = element;
 			this.axis = axis;
 			this.range = range;
 			this.padding = padding;
 			this.rounding = rounding;
+			this.minSize = minSize;
 			this.dragBoxPainter = dragBoxPainter;
 			range.addListener( this );
 		}
@@ -186,20 +187,19 @@ class ScrollBarHelper
 		{
 			if ( dragBox == null )
 			{
-				AABox2 box = element.getLocalAABox();
-				double value = Math.min( Math.max( range.getBegin(), range.getMin() ), range.getMax() );
-				double end = Math.min( Math.max( range.getEnd(), range.getMin() ), range.getMax() );
+				AABox2 dragBarBox = element.getLocalAABox();
+				double bounds[] = { 0.0, 0.0 };
 				if ( axis == Axis.HORIZONTAL )
 				{
-					double visibleRange = box.getWidth()  -  padding * 2.0;
-					double scaleFactor = visibleRange / ( range.getMax() - range.getMin() );
-					dragBox = new AABox2( padding + value * scaleFactor, padding, padding + end * scaleFactor, box.getUpperY() - padding );
+					double visibleRange = dragBarBox.getWidth()  -  padding * 2.0;
+					computeDragBoxBounds( visibleRange, bounds );
+					dragBox = new AABox2( padding + bounds[0], padding, padding + bounds[1], dragBarBox.getUpperY() - padding );
 				}
 				else if ( axis == Axis.VERTICAL )
 				{
-					double visibleRange = box.getHeight()  -  padding * 2.0;
-					double scaleFactor = visibleRange / ( range.getMax() - range.getMin() );
-					dragBox = new AABox2( padding, padding + value * scaleFactor, box.getUpperX() - padding, padding + end * scaleFactor );
+					double visibleRange = dragBarBox.getHeight()  -  padding * 2.0;
+					computeDragBoxBounds( visibleRange, bounds );
+					dragBox = new AABox2( padding, padding + bounds[0], dragBarBox.getUpperX() - padding, padding + bounds[1] );
 				}
 				else
 				{
@@ -207,6 +207,31 @@ class ScrollBarHelper
 				}
 			}
 			return dragBox;
+		}
+		
+		
+		private void computeDragBoxBounds(double visibleRange, double bounds[])
+		{
+			double naturalScaleFactor = visibleRange / ( range.getMax() - range.getMin() );
+			double value = Math.min( Math.max( range.getBegin(), range.getMin() ), range.getMax() );
+			double end = Math.min( Math.max( range.getEnd(), range.getMin() ), range.getMax() );
+			double dragBoxSize = ( end - value ) * naturalScaleFactor;
+			if ( dragBoxSize < minSize )
+			{
+				dragBoxSize = Math.max( dragBoxSize, minSize );
+				double rangeSize = ( range.getMax() - range.getMin() ) - ( end - value );
+				if ( rangeSize > 0.0 )
+				{
+					double actualScaleFactor = ( visibleRange - dragBoxSize )  /  rangeSize;
+					bounds[0] = value * actualScaleFactor;
+					bounds[1] = bounds[0] + dragBoxSize;
+					return;
+				}
+			}
+
+			// Fallback - use natural scale factor
+			bounds[0] = value * naturalScaleFactor;
+			bounds[1] = end * naturalScaleFactor;
 		}
 	
 	

@@ -82,7 +82,6 @@ class GSymPlugin (object):
 		
 	@staticmethod
 	def loadPlugins():
-		# Add import paths to sys.paths:
 		sys.path.extend( _getUserPluginRootPaths() )
 		
 		

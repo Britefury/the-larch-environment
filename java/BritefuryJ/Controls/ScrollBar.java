@@ -25,7 +25,7 @@ public abstract class ScrollBar extends ControlPres
 		
 		
 		public ScrollBarControl(PresentationContext ctx, StyleValues style, Range range, DPElement element, DPElement decArrow, DPElement incArrow, DPElement dragBox, ScrollBarHelper.Axis axis,
-				double dragBoxPadding, double dragBoxRounding, Painter dragBoxPainter)
+				double dragBoxPadding, double dragBoxRounding, double dragBoxMinSize, Painter dragBoxPainter)
 		{
 			super( ctx, style );
 			
@@ -35,7 +35,7 @@ public abstract class ScrollBar extends ControlPres
 			
 			decArrow.addInteractor( new ScrollBarHelper.ScrollBarArrowInteractor( ScrollBarHelper.ScrollBarArrowInteractor.Direction.DECREASE, range ) );
 			incArrow.addInteractor( new ScrollBarHelper.ScrollBarArrowInteractor( ScrollBarHelper.ScrollBarArrowInteractor.Direction.INCREASE, range ) );
-			dragBox.addInteractor( new ScrollBarHelper.ScrollBarDragBarInteractor( dragBox, axis, range, dragBoxPadding, dragBoxRounding, dragBoxPainter ) );
+			dragBox.addInteractor( new ScrollBarHelper.ScrollBarDragBarInteractor( dragBox, axis, range, dragBoxPadding, dragBoxRounding, dragBoxMinSize, dragBoxPainter ) );
 		}
 		
 		
@@ -70,6 +70,7 @@ public abstract class ScrollBar extends ControlPres
 		double scrollBarSize = style.get( Controls.scrollBarSize, Double.class ); 
 		double dragBoxPadding = style.get( Controls.scrollBarArrowDragboxPadding, Double.class ); 
 		double dragBoxRounding = style.get( Controls.scrollBarArrowDragboxRounding, Double.class );
+		double dragBoxMinSize = style.get( Controls.scrollBarArrowDragboxMinSize, Double.class );
 		double arrowSize = scrollBarSize - arrowPadding * 2.0;
 		Painter dragBoxPainter = style.get( Controls.scrollBarDragBoxPainter, Painter.class );
 		
@@ -88,7 +89,7 @@ public abstract class ScrollBar extends ControlPres
 		
 		DPElement element = p.present( ctx, style );
 		
-		return new ScrollBarControl( ctx, style, range, element, decArrowElement, incArrowElement, dragBarElement, getAxis(), dragBoxPadding, dragBoxRounding, dragBoxPainter );
+		return new ScrollBarControl( ctx, style, range, element, decArrowElement, incArrowElement, dragBarElement, getAxis(), dragBoxPadding, dragBoxRounding, dragBoxMinSize, dragBoxPainter );
 	}
 	
 	
