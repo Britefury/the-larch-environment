@@ -6,19 +6,19 @@
 //##************************
 package BritefuryJ.DocPresent.Combinators;
 
-import BritefuryJ.DocPresent.ContextMenuFactory;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
-public class AddContextMenuFactory extends Pres
+public class AddElementInteractor extends Pres
 {
-	private ContextMenuFactory menuFactory;
+	private AbstractElementInteractor interactor;
 	private Pres child;
 	
 	
-	public AddContextMenuFactory(Pres child, ContextMenuFactory menuFactory)
+	public AddElementInteractor(Pres child, AbstractElementInteractor interactor)
 	{
-		this.menuFactory = menuFactory;
+		this.interactor = interactor;
 		this.child = child;
 	}
 	
@@ -27,7 +27,7 @@ public class AddContextMenuFactory extends Pres
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
 		DPElement element = child.present( ctx, style );
-		element.addContextMenuFactory( menuFactory );
+		element.addElementInteractor( interactor );
 		return element;
 	}
 }

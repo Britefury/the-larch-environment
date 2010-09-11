@@ -17,8 +17,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Stack;
 
-import BritefuryJ.Controls.PopupMenu;
-import BritefuryJ.Controls.VPopupMenu;
 import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
@@ -153,22 +151,6 @@ public class Pointer extends PointerInterface
 			{
 				return element.handlePointerButtonUp( event );
 			}
-		}
-
-		protected boolean handleContextButton(Pointer pointer, PointerButtonEvent event, PopupMenu menu)
-		{
-			PointerInputElement childElement = element.getFirstPointerChildAtLocalPoint( event.getPointer().getLocalPos() );
-			if ( childElement != null )
-			{
-				ElementEntry childEntry = pointer.getEntryForElement( childElement );
-				boolean bHandled = childEntry.handleContextButton( pointer, (PointerButtonEvent)childElement.transformParentToLocalEvent( event ), menu );
-				if ( bHandled  &&  element.isPointerInputElementRealised() )
-				{
-					return true;
-				}
-			}
-			
-			return element.handlePointerContextButton( menu );
 		}
 		
 
@@ -374,6 +356,7 @@ public class Pointer extends PointerInterface
 	
 	private static int NAVIGATION_INTERACTOR_PRIORITY = -1000;
 	private static int DND_INTERACTOR_PRIORITY = -500;
+	private static int CONTEXTMENU_INTERACTOR_PRIORITY = -400;
 	
 	
 	
@@ -400,6 +383,7 @@ public class Pointer extends PointerInterface
 		
 		interactors.add( NAVIGATION_INTERACTOR_PRIORITY, new PointerNavigationInteractor() );
 		interactors.add( DND_INTERACTOR_PRIORITY, new PointerDndInteractor( rootElement, dndController ) );
+		interactors.add( CONTEXTMENU_INTERACTOR_PRIORITY, new PointerContextMenuInteractor() );
 	}
 	
 	
@@ -445,6 +429,11 @@ public class Pointer extends PointerInterface
 	public int getModifiers()
 	{
 		return modifiers;
+	}
+	
+	public PresentationComponent getComponent()
+	{
+		return component;
 	}
 
 
@@ -519,21 +508,7 @@ public class Pointer extends PointerInterface
 			}
 		}
 
-		if ( button == 3  &&  getModifiers() == Modifier.BUTTON3 )
-		{
-			VPopupMenu menu = new VPopupMenu();
-			rootEntry.handleContextButton( this, event, menu );
-			if ( !menu.isEmpty() )
-			{
-				menu.popupAtMousePosition( component.getRootElement() );
-				return true;
-			}
-			return false;
-		}
-		else
-		{
-			return rootEntry.handleButtonDown( this, event );
-		}
+		return rootEntry.handleButtonDown( this, event );
 	}
 	
 	public boolean buttonUp(Point2 pos, int button)
@@ -719,6 +694,7 @@ public class Pointer extends PointerInterface
 			}
 			else
 			{
+				p = childElement.transformParentToLocalPoint( p );
 				element = childElement;
 			}
 		}
@@ -739,6 +715,7 @@ public class Pointer extends PointerInterface
 			}
 			else
 			{
+				p = childElement.transformParentToLocalPoint( p );
 				element = childElement;
 			}
 		}
@@ -761,6 +738,7 @@ public class Pointer extends PointerInterface
 			PointerInputElement childElement = element.getFirstPointerChildAtLocalPoint( p );
 			if ( childElement != null )
 			{
+				p = childElement.transformParentToLocalPoint( p );
 				event = (E)childElement.transformParentToLocalEvent( event );
 				eventStack.push( event );
 				elements.push( childElement );
@@ -779,6 +757,7 @@ public class Pointer extends PointerInterface
 			PointerInputElement childElement = element.getFirstPointerChildAtLocalPoint( p );
 			if ( childElement != null )
 			{
+				p = childElement.transformParentToLocalPoint( p );
 				elements.push( childElement );
 			}
 			element = childElement;
@@ -798,6 +777,7 @@ public class Pointer extends PointerInterface
 			PointerInputElement childElement = element.getLastPointerChildAtLocalPoint( p );
 			if ( childElement != null )
 			{
+				p = childElement.transformParentToLocalPoint( p );
 				event = (E)childElement.transformParentToLocalEvent( event );
 				eventStack.push( event );
 				elements.push( childElement );
@@ -816,6 +796,7 @@ public class Pointer extends PointerInterface
 			PointerInputElement childElement = element.getLastPointerChildAtLocalPoint( p );
 			if ( childElement != null )
 			{
+				p = childElement.transformParentToLocalPoint( p );
 				elements.push( childElement );
 			}
 			element = childElement;

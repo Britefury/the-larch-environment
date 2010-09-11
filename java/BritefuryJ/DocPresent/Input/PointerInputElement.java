@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.DocPresent.Input;
 
-import BritefuryJ.Controls.PopupMenu;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerEvent;
@@ -20,7 +19,6 @@ public abstract class PointerInputElement
 	protected abstract boolean handlePointerButtonDown(PointerButtonEvent event);
 	protected abstract boolean handlePointerButtonUp(PointerButtonEvent event);
 	protected abstract boolean handlePointerButtonClicked(PointerButtonClickedEvent event);
-	protected abstract boolean handlePointerContextButton(PopupMenu menu);
 	protected abstract void handlePointerMotion(PointerMotionEvent event);
 	protected abstract void handlePointerDrag(PointerMotionEvent event);
 	protected abstract void handlePointerEnter(PointerMotionEvent event);

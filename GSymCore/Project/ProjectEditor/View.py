@@ -387,7 +387,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		
 		nameElement = _projectIndexNameStyle.applyTo( StaticText( 'Project' ) )
 		nameBox = _itemHoverHighlightStyle.applyTo( nameElement.alignVCentre() )
-		nameBox = nameBox.withContextMenuFactory( _projectIndexContextMenuFactory )
+		nameBox = nameBox.withContextMenuInteractor( _projectIndexContextMenuFactory )
 		nameBox = nameBox.withDropDest( _projectIndexDropDest )
 		
 		itemsBox = Column( items )
@@ -450,7 +450,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		icon = Image( 'GSymCore/Project/icons/Package.png' )
 		nameElement = _packageNameStyle.applyTo( StaticText( name ) )
 		nameBox = _itemHoverHighlightStyle.applyTo( Row( [ icon.padX( 5.0 ).alignVCentre(), nameElement.alignVCentre() ]  ) )
-		nameBox = nameBox.withContextMenuFactory( _packageContextMenuFactory )
+		nameBox = nameBox.withContextMenuInteractor( _packageContextMenuFactory )
 		nameBox = nameBox.withDragSource( _dragSource )
 		nameBox = nameBox.withDropDest( _packageDropDest )
 		
@@ -485,7 +485,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		pageLocation = _joinLocation( location, name )
 
 		link = Hyperlink( name, pageLocation )
-		link = link.withContextMenuFactory( _pageContextMenuFactory )
+		link = link.withContextMenuInteractor( _pageContextMenuFactory )
 		nameBox = _itemHoverHighlightStyle.applyTo( Row( [ link ] ) )
 		nameBox = nameBox.withDragSource( _dragSource )
 		nameBox = nameBox.withDropDest( _pageDropDest )

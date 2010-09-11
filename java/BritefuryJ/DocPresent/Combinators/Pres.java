@@ -9,12 +9,13 @@ package BritefuryJ.DocPresent.Combinators;
 import java.awt.datatransfer.DataFlavor;
 import java.util.List;
 
-import BritefuryJ.DocPresent.ContextMenuFactory;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.ElementValueFunction;
 import BritefuryJ.DocPresent.TreeEventListener;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
+import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
+import BritefuryJ.DocPresent.Interactor.ContextMenuElementInteractor;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
@@ -214,6 +215,17 @@ public abstract class Pres
 	
 	
 	//
+	// Interactor methods
+	//
+	
+	public AddElementInteractor withElementInteractor(AbstractElementInteractor interactor)
+	{
+		return new AddElementInteractor( this, interactor );
+	}
+	
+	
+	
+	//
 	// Tree event methods
 	//
 	
@@ -228,9 +240,9 @@ public abstract class Pres
 	// Context menu factory methods
 	//
 	
-	public AddContextMenuFactory withContextMenuFactory(ContextMenuFactory menuFactory)
+	public AddElementInteractor withContextMenuInteractor(ContextMenuElementInteractor menuFactory)
 	{
-		return new AddContextMenuFactory( this, menuFactory );
+		return withElementInteractor( menuFactory );
 	}
 	
 	

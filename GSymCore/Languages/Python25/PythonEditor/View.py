@@ -330,7 +330,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		s = s.withFixedValue( suite )
 		suiteListener = SuiteTreeEventListener( self._parser.suite(), suite )
 		s = s.withTreeEventListener( suiteListener )
-		s = s.withContextMenuFactory( _pythonModuleContextMenuFactory )
+		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		return s
 
 
@@ -346,7 +346,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			seg = Segment( True, True, exprView )
 		e = Paragraph( [ seg ] )
 		e = e.withTreeEventListener( instanceCache( PythonExpressionTreeEventListener, self._parser.expression(), PRECEDENCE_NONE ) )
-		e = e.withContextMenuFactory( _pythonModuleContextMenuFactory )
+		e = e.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		return e
 
 

@@ -110,7 +110,7 @@ class TemplateEditor (GSymViewObjectDispatch):
 		
 		w = bodyView
 		w = w.withTreeEventListener( TemplateNodeEventListener.instance )
-		w = w.withContextMenuFactory( _templateContextMenuFactory )
+		w = w.withContextMenuInteractor( _templateContextMenuFactory )
 		return w
 	
 	

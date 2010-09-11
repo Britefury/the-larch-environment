@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.Controls;
 
-import BritefuryJ.DocPresent.ContextMenuFactory;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.ElementInteractor;
@@ -17,6 +16,8 @@ import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Text;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Input.Modifier;
+import BritefuryJ.DocPresent.Input.PointerInputElement;
+import BritefuryJ.DocPresent.Interactor.ContextMenuElementInteractor;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
@@ -63,12 +64,13 @@ public class Hyperlink extends ControlPres
 	
 	
 	
-	private class LinkContextMenuFactory implements ContextMenuFactory
+	private class LinkContextMenuFactory implements ContextMenuElementInteractor
 	{
 		@Override
-		public void buildContextMenu(final DPElement element, PopupMenu menu)
+		public boolean contextMenu(PointerInputElement element, PopupMenu menu)
 		{
-			final PageController pageController = element.getRootElement().getPageController();
+			final DPElement linkElement = (DPElement)element;
+			final PageController pageController = linkElement.getRootElement().getPageController();
 			final LinkTargetListener targetListener = (LinkTargetListener)listener;
 
 			MenuItem.MenuItemListener openInNewTabListener = new MenuItem.MenuItemListener()
@@ -92,6 +94,8 @@ public class Hyperlink extends ControlPres
 			
 			menu.add( MenuItem.menuItemWithLabel( "Open in new tab", openInNewTabListener ) );
 			menu.add( MenuItem.menuItemWithLabel( "Open in new window", openInNewWindowListener ) );
+			
+			return true;
 		}
 	}
 
@@ -157,7 +161,7 @@ public class Hyperlink extends ControlPres
 	
 	private String text;
 	private LinkListener listener;
-	private ContextMenuFactory menuFactory;
+	private ContextMenuElementInteractor menuFactory;
 	
 	
 	public Hyperlink(String text, LinkListener listener)
@@ -183,7 +187,7 @@ public class Hyperlink extends ControlPres
 		DPText element = (DPText)textElement.present( ctx, style );
 		if ( menuFactory != null )
 		{
-			element.addContextMenuFactory( menuFactory );
+			element.addContextMenuInteractor( menuFactory );
 		}
 		
 		return new HyperlinkControl( ctx, style, element, listener, bClosePopupOnActivate );
