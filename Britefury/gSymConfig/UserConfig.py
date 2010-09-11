@@ -71,14 +71,16 @@ class GSymUserConfig (object):
 
 
 	def save(self):
-		makeSettingsDir()
-		try:
-			f = open( _userConfigFilePath, 'w' )
-		except IOError:
-			print 'Could not open user config file for writing'
-		else:
-			self._config.write( f )
-			f.close()
+		print 'Britefury.gSymConfig.UserConfig.oy: GSymUserConfig.save():'
+		print '\tNot saving configuration file -- functionality currently broken.'
+		#makeSettingsDir()
+		#try:
+			#f = open( _userConfigFilePath, 'w' )
+		#except IOError:
+			#print 'Could not open user config file for writing'
+		#else:
+			#self._config.write( f )
+			#f.close()
 
 
 	pluginPaths = ConfigProperty( 'Paths', 'pluginPaths', str, '' )
