@@ -93,7 +93,7 @@ class WorksheetViewer (GSymViewObjectDispatch):
 		linkHeader = SplitLinkHeaderBar( [ editLink ], [ homeLink ] )
 		
 		w = Page( [ linkHeader, bodyView ] )
-		w = w.withContextMenuFactory( _worksheetContextMenuFactory )
+		w = w.withContextMenuInteractor( _worksheetContextMenuFactory )
 		return StyleSheet.instance.withAttr( Primitive.editable, False ).applyTo( w )
 
 

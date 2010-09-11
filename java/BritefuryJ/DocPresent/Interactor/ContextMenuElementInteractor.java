@@ -2,13 +2,14 @@
 //##* under the terms of the GNU General Public License version 2 as published by the
 //##* Free Software Foundation. The full text of the GNU General Public License
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
-//##* program. This source code is (C)copyright Geoffrey French 2008.
+//##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.DocPresent;
+package BritefuryJ.DocPresent.Interactor;
 
 import BritefuryJ.Controls.PopupMenu;
+import BritefuryJ.DocPresent.Input.PointerInputElement;
 
-public interface ContextMenuFactory
+public interface ContextMenuElementInteractor extends AbstractElementInteractor
 {
-	public void buildContextMenu(DPElement element, PopupMenu menu);
+	boolean contextMenu(PointerInputElement element, PopupMenu menu);
 }

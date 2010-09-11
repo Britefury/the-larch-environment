@@ -23,7 +23,6 @@ import java.util.NoSuchElementException;
 import java.util.WeakHashMap;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.Controls.PopupMenu;
 import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
@@ -42,6 +41,7 @@ import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
+import BritefuryJ.DocPresent.Interactor.ContextMenuElementInteractor;
 import BritefuryJ.DocPresent.Layout.ElementAlignment;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.LAllocV;
@@ -243,7 +243,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		
 		private ArrayList<ElementInteractor> interactors;
 		private ArrayList<AbstractElementInteractor> elementInteractors;
-		private ArrayList<ContextMenuFactory> contextFactories;
 		private ArrayList<TreeEventListener> treeEventListeners;
 		
 		
@@ -266,11 +265,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 			{
 				f.elementInteractors = new ArrayList<AbstractElementInteractor>();
 				f.elementInteractors.addAll( elementInteractors );
-			}
-			if ( contextFactories != null )
-			{
-				f.contextFactories = new ArrayList<ContextMenuFactory>();
-				f.contextFactories.addAll( contextFactories );
 			}
 			if ( treeEventListeners != null )
 			{
@@ -325,28 +319,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		}
 		
 		
-		public void addContextMenuFactory(ContextMenuFactory contextFactory)
-		{
-			if ( contextFactories == null )
-			{
-				contextFactories = new ArrayList<ContextMenuFactory>();
-			}
-			contextFactories.add( contextFactory );
-		}
-		
-		public void removeContextMenuFactory(ContextMenuFactory contextFactory)
-		{
-			if ( contextFactories != null )
-			{
-				contextFactories.remove( contextFactory );
-				if ( contextFactories.isEmpty() )
-				{
-					contextFactories = null;
-				}
-			}
-		}
-		
-		
 		
 		public void addTreeEventListener(TreeEventListener listener)
 		{
@@ -375,7 +347,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		
 		public boolean isIdentity()
 		{
-			return dndHandler == null  &&  treeEventListeners == null  &&  interactors == null  &&  contextFactories == null  &&  elementInteractors == null;
+			return dndHandler == null  &&  treeEventListeners == null  &&  interactors == null  &&  elementInteractors == null;
 		}
 	}
 
@@ -1866,21 +1838,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		return bResult;
 	}
 	
-	protected boolean handlePointerContextButton(PopupMenu menu)
-	{
-		List<ContextMenuFactory> contextFactories = getContextMenuFactories();
-		boolean bResult = false;
-		if ( contextFactories != null )
-		{
-			for (ContextMenuFactory contextFactory: contextFactories)
-			{
-				contextFactory.buildContextMenu( this, menu );
-				bResult = true;
-			}
-		}
-		return bResult;
-	}
-	
 	protected void handlePointerMotion(PointerMotionEvent event)
 	{
 		onMotion( event );
@@ -2367,25 +2324,14 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	//
 	//
 	
-	public void addContextMenuFactory(ContextMenuFactory contextFactory)
+	public void addContextMenuInteractor(ContextMenuElementInteractor interactor)
 	{
-		ensureValidInteractionFields();
-		interactionFields.addContextMenuFactory( contextFactory );
-		notifyInteractionFieldsModified();
+		addElementInteractor( interactor );
 	}
 	
-	public void removeContextMenuFactory(ContextMenuFactory contextFactory)
+	public void removeContextMenuInteractor(ContextMenuElementInteractor interactor)
 	{
-		if ( interactionFields != null )
-		{
-			interactionFields.removeContextMenuFactory( contextFactory );
-			notifyInteractionFieldsModified();
-		}
-	}
-	
-	public ArrayList<ContextMenuFactory> getContextMenuFactories()
-	{
-		return interactionFields != null  ?  interactionFields.contextFactories  :  null;
+		removeElementInteractor( interactor );
 	}
 	
 	
