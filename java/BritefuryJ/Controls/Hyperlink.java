@@ -8,15 +8,16 @@ package BritefuryJ.Controls;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.PageController;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Text;
+import BritefuryJ.DocPresent.Event.AbstractPointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Input.Modifier;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
+import BritefuryJ.DocPresent.Interactor.ClickElementInteractor;
 import BritefuryJ.DocPresent.Interactor.ContextMenuElementInteractor;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
@@ -102,20 +103,27 @@ public class Hyperlink extends ControlPres
 	
 	public static class HyperlinkControl extends Control
 	{
-		private class LinkInteractor extends ElementInteractor
+		private class LinkInteractor implements ClickElementInteractor
 		{
 			public LinkInteractor()
 			{	
 			}
 			
-			public boolean onButtonClicked(DPElement element, PointerButtonClickedEvent event)
+			@Override
+			public boolean testClickEvent(PointerInputElement element, AbstractPointerButtonEvent event)
 			{
-				if ( element.isRealised() )
+				return true;
+			}
+
+			public boolean buttonClicked(PointerInputElement element, PointerButtonClickedEvent event)
+			{
+				DPElement hyperlinkElement = (DPElement)element;
+				if ( hyperlinkElement.isRealised() )
 				{
 					listener.onLinkClicked( HyperlinkControl.this, event );
 					if ( bClosePopupOnActivate )
 					{
-						element.closeContainingPopupChain();
+						hyperlinkElement.closeContainingPopupChain();
 					}
 				}
 				
@@ -135,7 +143,7 @@ public class Hyperlink extends ControlPres
 			super( ctx, style );
 			this.element = element;
 			this.listener = listener;
-			this.element.addInteractor( new LinkInteractor() );
+			this.element.addElementInteractor( new LinkInteractor() );
 			this.bClosePopupOnActivate = bClosePopupOnActivate;
 		}
 		

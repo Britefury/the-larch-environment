@@ -43,9 +43,9 @@ public class Checkbox extends ControlPres
 			
 			this.element = element;
 			this.box = box;
-			this.box.addInteractor( new CheckboxHelper.CheckboxCheckInteractor( this ) );
+			this.box.addElementInteractor( new CheckboxHelper.CheckboxCheckInteractor( this ) );
 			this.check = check;
-			check.addInteractor( new CheckboxHelper.CheckboxCheckPainterInteractor( checkForeground, this ) );
+			check.addPainter( new CheckboxHelper.CheckboxCheckPainter( checkForeground, this ) );
 			this.listener = listener;
 			this.state = state;
 			element.setFixedValue( state );

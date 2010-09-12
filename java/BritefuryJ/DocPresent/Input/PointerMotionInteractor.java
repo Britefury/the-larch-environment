@@ -10,45 +10,48 @@ import java.awt.event.MouseEvent;
 import java.util.Stack;
 
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
+import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
+import BritefuryJ.DocPresent.Interactor.HoverElementInteractor;
+import BritefuryJ.DocPresent.Interactor.MotionElementInteractor;
 import BritefuryJ.Math.Point2;
 
-public class PointerMotionSource
+public class PointerMotionInteractor extends PointerInteractor
 {
 	private Stack<PointerInputElement> elementsUnderPointer = new Stack<PointerInputElement>();
 	private PointerInputElement rootElement;
-	private PointerInterface pointer;
 	
 	
 	
-	public PointerMotionSource(PointerInterface pointer, PointerInputElement rootElement)
+	public PointerMotionInteractor(PointerInputElement rootElement)
 	{
-		this.pointer = pointer;
 		this.rootElement = rootElement;
 	}
 
 
 
 
-	public void motion(Point2 pos, MouseEvent mouseEvent)
+	public boolean motion(Pointer pointer, PointerMotionEvent event, MouseEvent mouseEvent)
 	{
-		PointerMotionEvent event = new PointerMotionEvent( pointer, PointerMotionEvent.Action.MOTION );
 		handleMotion( event );
+		return true;
 	}
 	
-	public void enter(Point2 pos, MouseEvent mouseEvent)
+	public boolean enter(Pointer pointer, PointerMotionEvent event)
 	{
-		handleEnter( rootElement, new PointerMotionEvent( pointer, PointerMotionEvent.Action.ENTER ) );
+		handleEnter( rootElement, event );
+		return true;
 	}
 
-	public void leave(Point2 pos, MouseEvent mouseEvent)
+	public boolean leave(Pointer pointer, PointerMotionEvent event)
 	{
-		handleLeave( 0, new PointerMotionEvent( pointer, PointerMotionEvent.Action.LEAVE ) );
+		handleLeave( 0, event );
+		return true;
 	}
 
 	
 	
 
-	private void handleMotion(PointerMotionEvent event)
+	public void handleMotion(PointerMotionEvent event)
 	{
 		PointerInputElement elementUnderPointer = rootElement;
 		
@@ -74,6 +77,8 @@ public class PointerMotionSource
 			
 			index++;
 		}
+		
+		handleEnter( elementUnderPointer, event );
 	}
 
 	private void handleEnter(PointerInputElement element, PointerMotionEvent event)
@@ -125,26 +130,81 @@ public class PointerMotionSource
 	
 	private void sendMotionEvent(PointerInputElement element, PointerMotionEvent event)
 	{
-		// TODO
+		if ( element.isPointerInputElementRealised() )
+		{
+			Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( MotionElementInteractor.class );
+			if ( interactors != null )
+			{
+				for (AbstractElementInteractor interactor: interactors )
+				{
+					MotionElementInteractor motionInt = (MotionElementInteractor)interactor;
+					motionInt.pointerMotion( element, event );
+				}
+			}
+		}
 	}
 	
 	private void sendEnterEvent(PointerInputElement element, PointerMotionEvent event)
 	{
-		// TODO
+		if ( element.isPointerInputElementRealised() )
+		{
+			Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( HoverElementInteractor.class );
+			if ( interactors != null )
+			{
+				for (AbstractElementInteractor interactor: interactors )
+				{
+					HoverElementInteractor motionInt = (HoverElementInteractor)interactor;
+					motionInt.pointerEnter( element, event );
+				}
+			}
+		}
 	}
 	
 	private void sendLeaveEvent(PointerInputElement element, PointerMotionEvent event)
 	{
-		// TODO
+		if ( element.isPointerInputElementRealised() )
+		{
+			Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( HoverElementInteractor.class );
+			if ( interactors != null )
+			{
+				for (AbstractElementInteractor interactor: interactors )
+				{
+					HoverElementInteractor motionInt = (HoverElementInteractor)interactor;
+					motionInt.pointerLeave( element, event );
+				}
+			}
+		}
 	}
 	
 	private void sendLeaveIntoChildEvent(PointerInputElement element, PointerMotionEvent event)
 	{
-		// TODO
+		if ( element.isPointerInputElementRealised() )
+		{
+			Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( MotionElementInteractor.class );
+			if ( interactors != null )
+			{
+				for (AbstractElementInteractor interactor: interactors )
+				{
+					MotionElementInteractor motionInt = (MotionElementInteractor)interactor;
+					motionInt.pointerLeaveIntoChild( element, event );
+				}
+			}
+		}
 	}
 	
 	private void sendEnterFromChildEvent(PointerInputElement element, PointerMotionEvent event)
 	{
-		// TODO
+		if ( element.isPointerInputElementRealised() )
+		{
+			Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( MotionElementInteractor.class );
+			if ( interactors != null )
+			{
+				for (AbstractElementInteractor interactor: interactors )
+				{
+					MotionElementInteractor motionInt = (MotionElementInteractor)interactor;
+					motionInt.pointerEnterFromChild( element, event );
+				}
+			}
+		}
 	}
 }

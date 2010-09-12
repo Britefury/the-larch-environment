@@ -14,7 +14,7 @@ import BritefuryJ.Math.Xform2;
 
 
 
-public class PointerButtonEvent extends PointerEvent
+public class PointerButtonEvent extends AbstractPointerButtonEvent
 {
 	public enum Action
 	{
@@ -24,23 +24,16 @@ public class PointerButtonEvent extends PointerEvent
 		UP
 	}
 	
-	protected int button;
 	protected Action action;
 	
 	
 	public PointerButtonEvent(PointerInterface pointer, int button, Action action)
 	{
-		super( pointer );
+		super( pointer, button );
 		
-		this.button = button;
 		this.action = action;
 	}
 	
-	
-	public int getButton()
-	{
-		return button;
-	}
 	
 	public Action getAction()
 	{

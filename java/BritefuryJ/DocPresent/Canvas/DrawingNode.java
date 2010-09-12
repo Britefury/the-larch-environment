@@ -287,7 +287,7 @@ public abstract class DrawingNode extends PointerInputElement
 	
 	
 
-	protected boolean isPointerInputElementRealised()
+	public boolean isPointerInputElementRealised()
 	{
 		return true;
 	}

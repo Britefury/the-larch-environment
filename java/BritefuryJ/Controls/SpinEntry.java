@@ -10,15 +10,16 @@ import java.util.regex.Pattern;
 
 import BritefuryJ.Controls.TextEntry.TextEntryControl;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Arrow;
-import BritefuryJ.DocPresent.Combinators.Primitive.Row;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Column;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Input.Modifier;
+import BritefuryJ.DocPresent.Input.PointerInputElement;
+import BritefuryJ.DocPresent.Interactor.PressAndHoldElementInteractor;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
@@ -43,7 +44,7 @@ public abstract class SpinEntry extends ControlPres
 			}
 		}
 		
-		private class SpinButtonInteractor extends ElementInteractor
+		private class SpinButtonInteractor implements PressAndHoldElementInteractor
 		{
 			private boolean bUp;
 			
@@ -53,14 +54,11 @@ public abstract class SpinEntry extends ControlPres
 			}
 			
 			
-			public boolean onButtonDown(DPElement element, PointerButtonEvent event)
+			@Override
+			public boolean buttonPress(PointerInputElement element, PointerButtonEvent event)
 			{
-				return true;
-			}
-	
-			public boolean onButtonUp(DPElement element, PointerButtonEvent event)
-			{
-				if ( element.isRealised() )
+				DPElement spinElement = (DPElement)element;
+				if ( spinElement.isRealised() )
 				{
 					if ( event.getButton() == 1 )
 					{
@@ -83,6 +81,11 @@ public abstract class SpinEntry extends ControlPres
 				
 				return false;
 			}
+
+			@Override
+			public void buttonRelease(PointerInputElement element, PointerButtonEvent event)
+			{
+			}
 		}
 		
 		
@@ -96,8 +99,8 @@ public abstract class SpinEntry extends ControlPres
 			this.textEntry = textEntry;
 			this.upSpinButton = upSpinButton;
 			this.downSpinButton = downSpinButton;
-			this.upSpinButton.addInteractor( new SpinButtonInteractor( true ) );
-			this.downSpinButton.addInteractor( new SpinButtonInteractor( false ) );
+			this.upSpinButton.addElementInteractor( new SpinButtonInteractor( true ) );
+			this.downSpinButton.addElementInteractor( new SpinButtonInteractor( false ) );
 			textListener.spinEntry = this;
 		}
 		

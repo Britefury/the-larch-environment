@@ -8,25 +8,22 @@ package BritefuryJ.DocPresent.Input;
 
 import java.util.Stack;
 
+import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
-import BritefuryJ.DocPresent.Interactor.DragElementInteractor;
-import BritefuryJ.Math.Point2;
+import BritefuryJ.DocPresent.Interactor.PressAndHoldElementInteractor;
 
-public class PointerDragInteractor extends AbstractPointerDragInteractor
+public class PointerPressAndHoldInteractor extends PointerInteractor
 {
-	private PointerInputElement dragElement = null;
-	private DragElementInteractor dragInteractor = null;
-
+	private PointerInputElement pressedElement;
+	private PressAndHoldElementInteractor pressedInteractor;
+	private int pressedButton;
 	
 	
-	@Override
-	public boolean dragBegin(PointerButtonEvent event)
+	public boolean buttonDown(Pointer pointer, PointerButtonEvent event)
 	{
 		Stack<PointerInputElement> elements = new Stack<PointerInputElement>();
 		
-		PointerInterface pointer = event.getPointer();
 		pointer.concretePointer().getLastElementPathUnderPoint( elements, pointer.getLocalPos() );
 		
 		while ( !elements.isEmpty() )
@@ -35,17 +32,18 @@ public class PointerDragInteractor extends AbstractPointerDragInteractor
 			
 			if ( element.isPointerInputElementRealised() )
 			{
-				Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( DragElementInteractor.class );
+				Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( PressAndHoldElementInteractor.class );
 				if ( interactors != null )
 				{
 					for (AbstractElementInteractor interactor: interactors )
 					{
-						DragElementInteractor pressInt = (DragElementInteractor)interactor;
-						boolean bHandled = pressInt.dragBegin( element, event );
+						PressAndHoldElementInteractor pressInt = (PressAndHoldElementInteractor)interactor;
+						boolean bHandled = pressInt.buttonPress( element, event );
 						if ( bHandled )
 						{
-							dragElement = element;
-							dragInteractor = pressInt;
+							pressedElement = element;
+							pressedInteractor = pressInt;
+							pressedButton = event.getButton();
 							return true;
 						}
 					}
@@ -56,22 +54,20 @@ public class PointerDragInteractor extends AbstractPointerDragInteractor
 		return false;
 	}
 
-	@Override
-	public void dragEnd(PointerButtonEvent event, Point2 dragStartPos, int dragButton)
+	public boolean buttonUp(Pointer pointer, PointerButtonEvent event)
 	{
-		if ( dragElement != null )
+		if ( pressedElement != null  &&  event.getButton() == pressedButton )
 		{
-			dragInteractor.dragEnd( dragElement, event, dragStartPos, dragButton );
-			dragElement = null;
+			pressedInteractor.buttonRelease( pressedElement, event );
+			return true;
 		}
+		return false;
 	}
 
-	@Override
-	public void dragMotion(PointerMotionEvent event, Point2 dragStartPos, int dragButton)
+	
+	
+	public boolean buttonClicked(Pointer pointer, PointerButtonClickedEvent event)
 	{
-		if ( dragElement != null )
-		{
-			dragInteractor.dragMotion( dragElement, event, dragStartPos, dragButton );
-		}
+		return pressedElement != null  &&  event.getButton() == pressedButton;
 	}
 }

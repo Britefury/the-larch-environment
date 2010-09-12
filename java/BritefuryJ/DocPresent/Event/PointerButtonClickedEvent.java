@@ -11,24 +11,18 @@ import java.awt.geom.AffineTransform;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.Math.Xform2;
 
-public class PointerButtonClickedEvent extends PointerEvent
+public class PointerButtonClickedEvent extends AbstractPointerButtonEvent
 {
-	protected int button, clickCount;
+	protected int clickCount;
 	
 	
 	public PointerButtonClickedEvent(PointerInterface pointer, int button, int clickCount)
 	{
-		super( pointer );
+		super( pointer, button );
 		
-		this.button = button;
 		this.clickCount = clickCount;
 	}
 	
-	
-	public int getButton()
-	{
-		return button;
-	}
 	
 	public int getClickCount()
 	{

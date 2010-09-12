@@ -8,14 +8,17 @@ package BritefuryJ.Controls;
 
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Event.AbstractPointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
+import BritefuryJ.DocPresent.Input.PointerInputElement;
+import BritefuryJ.DocPresent.Interactor.ClickElementInteractor;
+import BritefuryJ.DocPresent.Interactor.HoverElementInteractor;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
@@ -29,35 +32,45 @@ public class Button extends ControlPres
 	
 	public static class ButtonControl extends Control
 	{
-		private class ButtonInteractor extends ElementInteractor
+		private class ButtonInteractor implements ClickElementInteractor, HoverElementInteractor
 		{
 			private ButtonInteractor()
 			{
 			}
 			
 			
-			public boolean onButtonClicked(DPElement element, PointerButtonClickedEvent event)
+			@Override
+			public boolean testClickEvent(PointerInputElement element, AbstractPointerButtonEvent event)
 			{
-				if ( element.isRealised() )
+				return true;
+			}
+
+			@Override
+			public boolean buttonClicked(PointerInputElement element, PointerButtonClickedEvent event)
+			{
+				DPElement buttonElement = (DPElement)element;
+				if ( buttonElement.isRealised() )
 				{
 					listener.onButtonClicked( ButtonControl.this, event );
 					if ( bClosePopupOnActivate )
 					{
-						element.closeContainingPopupChain();
+						buttonElement.closeContainingPopupChain();
 					}
 					return true;
 				}
 				
 				return false;
 			}
-			
-			
-			public void onEnter(DPElement element, PointerMotionEvent event)
+
+
+			@Override
+			public void pointerEnter(PointerInputElement element, PointerMotionEvent event)
 			{
 				buttonElement.setBorder( highlightBorder );
 			}
-	
-			public void onLeave(DPElement element, PointerMotionEvent event)
+
+			@Override
+			public void pointerLeave(PointerInputElement element, PointerMotionEvent event)
 			{
 				buttonElement.setBorder( buttonBorder );
 			}
@@ -80,7 +93,7 @@ public class Button extends ControlPres
 			this.buttonBorder = buttonBorder;
 			this.highlightBorder = highlightBorder;
 			this.listener = listener;
-			this.buttonElement.addInteractor( new ButtonInteractor() );
+			this.buttonElement.addElementInteractor( new ButtonInteractor() );
 		}
 		
 		

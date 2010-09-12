@@ -13,22 +13,29 @@ import java.awt.Stroke;
 import java.awt.geom.Line2D;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.ElementInteractor;
-import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
+import BritefuryJ.DocPresent.ElementPainter;
+import BritefuryJ.DocPresent.Event.PointerButtonEvent;
+import BritefuryJ.DocPresent.Input.PointerInputElement;
+import BritefuryJ.DocPresent.Interactor.PressAndHoldElementInteractor;
 
 class CheckboxHelper
 {
-	protected static class CheckboxCheckPainterInteractor extends ElementInteractor
+	protected static class CheckboxCheckPainter implements ElementPainter
 	{
 		private Paint paint;
 		private Checkbox.CheckboxControl checkbox;
 		private static final Stroke stroke = new BasicStroke( 2.0f );
 		
 		
-		public CheckboxCheckPainterInteractor(Paint paint, Checkbox.CheckboxControl checkbox)
+		public CheckboxCheckPainter(Paint paint, Checkbox.CheckboxControl checkbox)
 		{
 			this.paint = paint;
 			this.checkbox = checkbox;
+		}
+		
+		@Override
+		public void drawBackground(DPElement element, Graphics2D graphics)
+		{
 		}
 		
 		@Override
@@ -54,7 +61,7 @@ class CheckboxHelper
 	}
 
 
-	protected static class CheckboxCheckInteractor extends ElementInteractor
+	protected static class CheckboxCheckInteractor implements PressAndHoldElementInteractor
 	{
 		private Checkbox.CheckboxControl checkbox;
 		
@@ -67,7 +74,7 @@ class CheckboxHelper
 		
 		
 		@Override
-		public boolean onButtonClicked(DPElement element, PointerButtonClickedEvent event)
+		public boolean buttonPress(PointerInputElement element, PointerButtonEvent event)
 		{
 			if ( event.getButton() == 1 )
 			{
@@ -78,6 +85,11 @@ class CheckboxHelper
 			{
 				return false;
 			}
+		}
+
+		@Override
+		public void buttonRelease(PointerInputElement element, PointerButtonEvent event)
+		{
 		}
 	}
 }
