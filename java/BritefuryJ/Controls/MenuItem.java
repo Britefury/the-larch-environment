@@ -8,13 +8,15 @@ package BritefuryJ.Controls;
 
 import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
 import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Event.AbstractPointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
+import BritefuryJ.DocPresent.Input.PointerInputElement;
+import BritefuryJ.DocPresent.Interactor.ClickElementInteractor;
 import BritefuryJ.DocPresent.Painter.Painter;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
@@ -61,19 +63,27 @@ public class MenuItem extends ControlPres
 		}
 		
 	
-		private class MenuItemInteractor extends ElementInteractor
+		private class MenuItemInteractor implements ClickElementInteractor
 		{
 			public MenuItemInteractor()
 			{	
 			}
 			
-			public boolean onButtonClicked(DPElement element, PointerButtonClickedEvent event)
+			@Override
+			public boolean testClickEvent(PointerInputElement element, AbstractPointerButtonEvent event)
 			{
-				if ( element.isRealised() )
+				return event.getButton() == 1;
+			}
+
+			@Override
+			public boolean buttonClicked(PointerInputElement element, PointerButtonClickedEvent event)
+			{
+				DPElement menuItemElement = (DPElement)element;
+				if ( menuItemElement.isRealised() )
 				{
 					if ( bClosePopupOnActivate )
 					{
-						element.closeContainingPopupChain();
+						menuItemElement.closeContainingPopupChain();
 					}
 					listener.onMenuItemClicked( MenuItemControl.this );
 					return true;
@@ -95,7 +105,7 @@ public class MenuItem extends ControlPres
 			super( ctx, style );
 			this.element = element;
 			this.listener = listener;
-			this.element.addInteractor( new MenuItemInteractor() );
+			this.element.addElementInteractor( new MenuItemInteractor() );
 			this.bClosePopupOnActivate = bClosePopupOnActivate;
 		}
 		
@@ -104,7 +114,7 @@ public class MenuItem extends ControlPres
 			super( ctx, style );
 			this.element = element;
 			this.listener = new SubMenuItemListener( subMenu, direction );
-			this.element.addInteractor( new MenuItemInteractor() );
+			this.element.addElementInteractor( new MenuItemInteractor() );
 			this.bClosePopupOnActivate = bClosePopupOnActivate;
 		}
 		

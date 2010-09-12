@@ -243,6 +243,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		
 		private ArrayList<ElementInteractor> interactors;
 		private ArrayList<AbstractElementInteractor> elementInteractors;
+		private ArrayList<ElementPainter> painters;
 		private ArrayList<TreeEventListener> treeEventListeners;
 		
 		
@@ -265,6 +266,11 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 			{
 				f.elementInteractors = new ArrayList<AbstractElementInteractor>();
 				f.elementInteractors.addAll( elementInteractors );
+			}
+			if ( painters != null )
+			{
+				f.painters = new ArrayList<ElementPainter>();
+				f.painters.addAll( painters );
 			}
 			if ( treeEventListeners != null )
 			{
@@ -320,6 +326,29 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		
 		
 		
+		public void addPainter(ElementPainter painter)
+		{
+			if ( painters == null )
+			{
+				painters = new ArrayList<ElementPainter>();
+			}
+			painters.add( painter );
+		}
+		
+		public void removePainter(ElementPainter painter)
+		{
+			if ( painters != null )
+			{
+				painters.remove( painter );
+				if ( painters.isEmpty() )
+				{
+					painters = null;
+				}
+			}
+		}
+		
+		
+		
 		public void addTreeEventListener(TreeEventListener listener)
 		{
 			if ( treeEventListeners == null )
@@ -347,7 +376,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		
 		public boolean isIdentity()
 		{
-			return dndHandler == null  &&  treeEventListeners == null  &&  interactors == null  &&  elementInteractors == null;
+			return dndHandler == null  &&  treeEventListeners == null  &&  interactors == null  &&  elementInteractors == null  &&  painters == null;
 		}
 	}
 
@@ -1716,6 +1745,14 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 				interactor.drawBackground( this, graphics );
 			}
 		}
+		List<ElementPainter> painters = getPainters();
+		if ( painters != null )
+		{
+			for (ElementPainter painter: painters)
+			{
+				painter.drawBackground( this, graphics );
+			}
+		}
 	}
 	
 	protected void handleDraw(Graphics2D graphics, AABox2 areaBox)
@@ -1727,6 +1764,14 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 			for (ElementInteractor interactor: interactors)
 			{
 				interactor.draw( this, graphics );
+			}
+		}
+		List<ElementPainter> painters = getPainters();
+		if ( painters != null )
+		{
+			for (ElementPainter painter: painters)
+			{
+				painter.draw( this, graphics );
 			}
 		}
 	}
@@ -1986,7 +2031,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		return getParentToLocalXform().transform( parentPos );
 	}
 	
-	protected boolean isPointerInputElementRealised()
+	public boolean isPointerInputElementRealised()
 	{
 		return isRealised();
 	}
@@ -2320,7 +2365,37 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	//
 	//
-	// CONTEXT MENU FACTORY METHODS
+	// PAINTER METHODS
+	//
+	//
+	
+	public void addPainter(ElementPainter interactor)
+	{
+		ensureValidInteractionFields();
+		interactionFields.addPainter( interactor );
+		notifyInteractionFieldsModified();
+	}
+	
+	public void removePainter(ElementPainter interactor)
+	{
+		if ( interactionFields != null )
+		{
+			interactionFields.removePainter( interactor );
+			notifyInteractionFieldsModified();
+		}
+	}
+	
+	public ArrayList<ElementPainter> getPainters()
+	{
+		return interactionFields != null  ?  interactionFields.painters  :  null;
+	}
+	
+	
+	
+	
+	//
+	//
+	// CONTEXT MENU INTERACTOR METHODS
 	//
 	//
 	

@@ -38,7 +38,7 @@ public abstract class PointerInputElement
 	public abstract Iterable<AbstractElementInteractor> getElementInteractors(Class<?> interactorClass);
 
 	
-	protected abstract boolean isPointerInputElementRealised();
+	public abstract boolean isPointerInputElementRealised();
 	public abstract boolean containsParentSpacePoint(Point2 parentPos);
 	public abstract boolean containsLocalSpacePoint(Point2 localPos);
 	

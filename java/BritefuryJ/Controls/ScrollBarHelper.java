@@ -13,7 +13,9 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
+import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.DocPresent.Interactor.PressAndHoldElementInteractor;
 import BritefuryJ.DocPresent.Painter.Painter;
 import BritefuryJ.DocPresent.Util.Range;
 import BritefuryJ.Math.AABox2;
@@ -29,7 +31,7 @@ class ScrollBarHelper
 	};
 	
 	
-	protected static class ScrollBarArrowInteractor extends ElementInteractor
+	protected static class ScrollBarArrowInteractor implements PressAndHoldElementInteractor
 	{
 		public enum Direction
 		{
@@ -49,7 +51,7 @@ class ScrollBarHelper
 		}
 		
 		
-		public boolean onButtonDown(DPElement element, PointerButtonEvent event)
+		public boolean buttonPress(PointerInputElement element, PointerButtonEvent event)
 		{
 			if ( event.getButton() == 1 )
 			{
@@ -68,10 +70,10 @@ class ScrollBarHelper
 				return false;
 			}
 		}
-		
-		public boolean onButtonUp(DPElement element, PointerButtonEvent event)
+
+		@Override
+		public void buttonRelease(PointerInputElement element, PointerButtonEvent event)
 		{
-			return event.getButton() == 1;
 		}
 	}
 

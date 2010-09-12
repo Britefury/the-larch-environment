@@ -19,7 +19,7 @@ import BritefuryJ.DocPresent.Interactor.NavigationElementInteractor;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 
-public class PointerNavigationInteractor extends PointerDragInteractor
+public class PointerNavigationInteractor extends AbstractPointerDragInteractor
 {
 	private int navigationButton = 0;
 	private Point2 navigationDragStartPos = new Point2();
@@ -47,23 +47,25 @@ public class PointerNavigationInteractor extends PointerDragInteractor
 	
 	
 	
-	public boolean canStartDrag(PointerButtonEvent event)
+	public boolean dragBegin(PointerButtonEvent event)
 	{
 		PointerInterface pointer = event.getPointer();
-		return testNavigationModifiers( pointer );
-	}
-	
-	public void dragBegin(PointerButtonEvent event)
-	{
-		PointerInterface pointer = event.getPointer();
-		if ( !bNavigationDragInProgress )
+		if ( testNavigationModifiers( pointer ) )
 		{
-			Point2 pos = pointer.getLocalPos();
-			navigationButton = event.getButton();
-			navigationDragStartPos = pos.clone();
-			navigationDragCurrentPos = pos.clone();
-			bNavigationDragInProgress = true;
-			handleNavigationGestureBegin( pointer, event );
+			if ( !bNavigationDragInProgress )
+			{
+				Point2 pos = pointer.getLocalPos();
+				navigationButton = event.getButton();
+				navigationDragStartPos = pos.clone();
+				navigationDragCurrentPos = pos.clone();
+				bNavigationDragInProgress = true;
+				handleNavigationGestureBegin( pointer, event );
+			}
+			return true;
+		}
+		else
+		{
+			return false;
 		}
 	}
 

@@ -357,6 +357,9 @@ public class Pointer extends PointerInterface
 	private static int NAVIGATION_INTERACTOR_PRIORITY = -1000;
 	private static int DND_INTERACTOR_PRIORITY = -500;
 	private static int CONTEXTMENU_INTERACTOR_PRIORITY = -400;
+	private static int PRESSANDHOLD_INTERACTOR_PRIORITY = 0;
+	private static int CLICK_INTERACTOR_PRIORITY = 0;
+	private static int MOTION_INTERACTOR_PRIORITY = 100;
 	
 	
 	
@@ -365,7 +368,6 @@ public class Pointer extends PointerInterface
 	protected ElementEntry rootEntry;
 	protected InputTable inputTable;
 	protected DndDropLocal dndDrop;
-	protected PointerDragInteractor dragSource;
 	protected PresentationComponent component;
 	protected PriorityList<PointerInteractor> interactors = new PriorityList<PointerInteractor>();
 	
@@ -376,7 +378,6 @@ public class Pointer extends PointerInterface
 	{
 		this.inputTable = inputTable;
 		this.component = component;
-		dragSource = new PointerDragInteractor();
 		
 		rootEntry = getEntryForElement( rootElement );
 		
@@ -384,6 +385,9 @@ public class Pointer extends PointerInterface
 		interactors.add( NAVIGATION_INTERACTOR_PRIORITY, new PointerNavigationInteractor() );
 		interactors.add( DND_INTERACTOR_PRIORITY, new PointerDndInteractor( rootElement, dndController ) );
 		interactors.add( CONTEXTMENU_INTERACTOR_PRIORITY, new PointerContextMenuInteractor() );
+		interactors.add( PRESSANDHOLD_INTERACTOR_PRIORITY, new PointerPressAndHoldInteractor() );
+		interactors.add( CLICK_INTERACTOR_PRIORITY, new PointerClickInteractor() );
+		interactors.add( MOTION_INTERACTOR_PRIORITY, new PointerMotionInteractor( rootElement ) );
 	}
 	
 	
@@ -504,7 +508,7 @@ public class Pointer extends PointerInterface
 		{
 			if ( interactor.buttonDown( this, event ) )
 			{
-				break;
+				return true;
 			}
 		}
 
@@ -534,7 +538,7 @@ public class Pointer extends PointerInterface
 		{
 			if ( interactor.buttonClicked( this, event ) )
 			{
-				break;
+				return true;
 			}
 		}
 

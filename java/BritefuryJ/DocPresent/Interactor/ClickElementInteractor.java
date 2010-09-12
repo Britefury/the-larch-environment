@@ -6,15 +6,12 @@
 //##************************
 package BritefuryJ.DocPresent.Interactor;
 
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.Event.PointerMotionEvent;
+import BritefuryJ.DocPresent.Event.AbstractPointerButtonEvent;
+import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.Math.Point2;
 
-
-public interface DragElementInteractor extends AbstractElementInteractor
+public interface ClickElementInteractor extends AbstractElementInteractor
 {
-	boolean dragBegin(PointerInputElement element, PointerButtonEvent event);
-	void dragEnd(PointerInputElement element, PointerButtonEvent event, Point2 dragStartPos, int dragButton);
-	void dragMotion(PointerInputElement element, PointerMotionEvent event, Point2 dragStartPos, int dragButton);
+	public boolean testClickEvent(PointerInputElement element, AbstractPointerButtonEvent event);
+	public boolean buttonClicked(PointerInputElement element, PointerButtonClickedEvent event);
 }

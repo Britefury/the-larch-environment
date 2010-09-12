@@ -19,9 +19,7 @@ public class PointerContextMenuInteractor extends PointerInteractor
 {
 	public boolean buttonDown(Pointer pointer, PointerButtonEvent event)
 	{
-		int button = event.getButton();
-		int modifiers = pointer.getModifiers();
-		if ( button == 3  &&  modifiers == Modifier.BUTTON3 )
+		if ( event.getButton() == 3  &&  ( pointer.getModifiers() & Modifier.KEYS_MASK  ) ==  0 )
 		{
 			VPopupMenu menu = new VPopupMenu();
 			
@@ -39,12 +37,12 @@ public class PointerContextMenuInteractor extends PointerInteractor
 	
 	public boolean buttonUp(Pointer pointer, PointerButtonEvent event)
 	{
-		return false;
+		return event.getButton() == 3  &&  ( pointer.getModifiers() & Modifier.KEYS_MASK  ) ==  0;
 	}
 	
 	public boolean buttonClicked(Pointer pointer, PointerButtonClickedEvent event)
 	{
-		return false;
+		return event.getButton() == 3  &&  ( pointer.getModifiers() & Modifier.KEYS_MASK  ) ==  0;
 	}
 	
 	
@@ -52,7 +50,7 @@ public class PointerContextMenuInteractor extends PointerInteractor
 	{
 		Stack<PointerInputElement> elements = new Stack<PointerInputElement>();
 		
-		pointer.concretePointer().getFirstElementPathUnderPoint( elements, pointer.getLocalPos() );
+		pointer.concretePointer().getLastElementPathUnderPoint( elements, pointer.getLocalPos() );
 		
 		while ( !elements.isEmpty() )
 		{
