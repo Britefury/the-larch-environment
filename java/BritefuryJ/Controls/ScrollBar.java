@@ -35,7 +35,10 @@ public abstract class ScrollBar extends ControlPres
 			
 			decArrow.addElementInteractor( new ScrollBarHelper.ScrollBarArrowInteractor( ScrollBarHelper.ScrollBarArrowInteractor.Direction.DECREASE, range ) );
 			incArrow.addElementInteractor( new ScrollBarHelper.ScrollBarArrowInteractor( ScrollBarHelper.ScrollBarArrowInteractor.Direction.INCREASE, range ) );
-			dragBox.addInteractor( new ScrollBarHelper.ScrollBarDragBarInteractor( dragBox, axis, range, dragBoxPadding, dragBoxRounding, dragBoxMinSize, dragBoxPainter ) );
+			ScrollBarHelper.ScrollBarDragBarInteractor dragBoxInteractor = new ScrollBarHelper.ScrollBarDragBarInteractor( dragBox, axis, range,
+					dragBoxPadding, dragBoxRounding, dragBoxMinSize, dragBoxPainter );
+			dragBox.addElementInteractor( dragBoxInteractor );
+			dragBox.addPainter( dragBoxInteractor );
 		}
 		
 		

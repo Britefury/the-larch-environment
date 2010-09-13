@@ -360,6 +360,7 @@ public class Pointer extends PointerInterface
 	private static int CONTEXTMENU_INTERACTOR_PRIORITY = -400;
 	private static int PRESSANDHOLD_INTERACTOR_PRIORITY = 0;
 	private static int CLICK_INTERACTOR_PRIORITY = 0;
+	private static int DRAG_INTERACTOR_PRIORITY = 50;
 	private static int MOTION_INTERACTOR_PRIORITY = 100;
 	
 	
@@ -388,6 +389,7 @@ public class Pointer extends PointerInterface
 		interactors.add( CONTEXTMENU_INTERACTOR_PRIORITY, new PointerContextMenuInteractor() );
 		interactors.add( PRESSANDHOLD_INTERACTOR_PRIORITY, new PointerPressAndHoldInteractor() );
 		interactors.add( CLICK_INTERACTOR_PRIORITY, new PointerClickInteractor() );
+		interactors.add( DRAG_INTERACTOR_PRIORITY, new PointerDragInteractor() );
 		interactors.add( MOTION_INTERACTOR_PRIORITY, new PointerMotionInteractor( rootElement ) );
 	}
 	

@@ -14,7 +14,7 @@ import BritefuryJ.Math.Point2;
 
 public interface DragElementInteractor extends AbstractElementInteractor
 {
-	boolean dragBegin(PointerInputElement element, PointerButtonEvent event);
-	void dragEnd(PointerInputElement element, PointerButtonEvent event, Point2 dragStartPos, int dragButton);
-	void dragMotion(PointerInputElement element, PointerMotionEvent event, Point2 dragStartPos, int dragButton);
+	public boolean dragBegin(PointerInputElement element, PointerButtonEvent event);
+	public void dragEnd(PointerInputElement element, PointerButtonEvent event, Point2 dragStartPos, int dragButton);
+	public void dragMotion(PointerInputElement element, PointerMotionEvent event, Point2 dragStartPos, int dragButton);
 }

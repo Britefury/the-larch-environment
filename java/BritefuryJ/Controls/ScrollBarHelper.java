@@ -10,11 +10,11 @@ import java.awt.Graphics2D;
 import java.awt.geom.RoundRectangle2D;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.ElementInteractor;
+import BritefuryJ.DocPresent.ElementPainter;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.DocPresent.Interactor.DragElementInteractor;
 import BritefuryJ.DocPresent.Interactor.PressAndHoldElementInteractor;
 import BritefuryJ.DocPresent.Painter.Painter;
 import BritefuryJ.DocPresent.Util.Range;
@@ -77,15 +77,13 @@ class ScrollBarHelper
 		}
 	}
 
-	protected static class ScrollBarDragBarInteractor extends ElementInteractor implements Range.RangeListener
+	protected static class ScrollBarDragBarInteractor implements PressAndHoldElementInteractor, DragElementInteractor, ElementPainter, Range.RangeListener
 	{
 		private DPElement element;
 		private Axis axis;
 		private Range range;
 		private double padding, rounding, minSize;
 		private Painter dragBoxPainter;
-		private PointerInterface dragPointer = null;
-		private Point2 dragStartPos = null;
 		private double dragStartValue = 0.0;
 		private AABox2 dragBox = null;
 		
@@ -104,7 +102,8 @@ class ScrollBarHelper
 		
 		
 	
-		public boolean onButtonDown(DPElement element, PointerButtonEvent event)
+		@Override
+		public boolean buttonPress(PointerInputElement element, PointerButtonEvent event)
 		{
 			if ( event.getButton() == 1 )
 			{
@@ -115,66 +114,85 @@ class ScrollBarHelper
 				if ( axis == Axis.HORIZONTAL  &&  localPos.x < dragBox.getLowerX()    ||  axis == Axis.VERTICAL  &&  localPos.y < dragBox.getLowerY() )
 				{
 					range.move( -range.getPageSize() );
+					return true;
 				}
 				else if ( axis == Axis.HORIZONTAL  &&  localPos.x > dragBox.getUpperX()    ||  axis == Axis.VERTICAL  &&  localPos.y > dragBox.getUpperY() )
 				{
 					range.move( range.getPageSize() );
+					return true;
 				}
-				else
-				{
-					dragPointer = event.getPointer().concretePointer();
-					dragStartPos = event.getPointer().getLocalPos();
-					dragStartValue = range.getBegin();
-				}
+			}
+
+			return false;
+		}
+
+		@Override
+		public void buttonRelease(PointerInputElement element, PointerButtonEvent event)
+		{
+		}
+
+		
+		
+		@Override
+		public boolean dragBegin(PointerInputElement element, PointerButtonEvent event)
+		{
+			if ( event.getButton() == 1 )
+			{
+				AABox2 dragBox = getRefreshedDragBox();
 				
-				return true;
+				Point2 localPos = event.getPointer().getLocalPos();
+				
+				if ( dragBox.containsPoint( localPos ) )
+				{
+					dragStartValue = range.getBegin();
+					return true;
+				}
+			}
+
+			return false;
+		}
+		
+		@Override
+		public void dragEnd(PointerInputElement element, PointerButtonEvent event, Point2 dragStartPos, int dragButton)
+		{
+		}
+		
+		@Override
+		public void dragMotion(PointerInputElement element, PointerMotionEvent event, Point2 dragStartPos, int dragButton)
+		{
+			DPElement dragbarElement = (DPElement)element;
+			AABox2 box = dragbarElement.getLocalAABox();
+			Point2 localPos = event.getPointer().getLocalPos();
+			Vector2 deltaPos = localPos.sub( dragStartPos );
+			
+			double visibleRange, delta;
+			if ( axis == Axis.HORIZONTAL )
+			{
+				visibleRange = box.getWidth()  -  padding * 2.0;
+				delta = deltaPos.x;
+			}
+			else if ( axis == Axis.VERTICAL )
+			{
+				visibleRange = box.getHeight()  -  padding * 2.0;
+				delta = deltaPos.y;
 			}
 			else
 			{
-				return false;
+				throw new RuntimeException( "Invalid direction" );
 			}
+
+			double scaleFactor = ( range.getMax() - range.getMin() ) / visibleRange;
+			range.moveBeginTo( dragStartValue  +  delta * scaleFactor );
 		}
-		
-		public boolean onButtonUp(DPElement element, PointerButtonEvent event)
-		{
-			dragPointer = null;
-			return event.getButton() == 1;
-		}
-		
-		public void onDrag(DPElement element, PointerMotionEvent event)
-		{
-			if ( event.getPointer().concretePointer() == dragPointer )
-			{
-				AABox2 box = element.getLocalAABox();
-				Point2 localPos = event.getPointer().getLocalPos();
-				Vector2 deltaPos = localPos.sub( dragStartPos );
-				
-				double visibleRange, delta;
-				if ( axis == Axis.HORIZONTAL )
-				{
-					visibleRange = box.getWidth()  -  padding * 2.0;
-					delta = deltaPos.x;
-				}
-				else if ( axis == Axis.VERTICAL )
-				{
-					visibleRange = box.getHeight()  -  padding * 2.0;
-					delta = deltaPos.y;
-				}
-				else
-				{
-					throw new RuntimeException( "Invalid direction" );
-				}
-	
-				double scaleFactor = ( range.getMax() - range.getMin() ) / visibleRange;
-				range.moveBeginTo( dragStartValue  +  delta * scaleFactor );
-			}
-		}
+
 		
 		
+		@Override
 		public void drawBackground(DPElement element, Graphics2D graphics)
 		{
 		}
 	
+		@Override
 		public void draw(DPElement element, Graphics2D graphics)
 		{
 			AABox2 dragBox = getRefreshedDragBox();
