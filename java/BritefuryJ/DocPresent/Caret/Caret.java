@@ -7,6 +7,8 @@
 //##************************
 package BritefuryJ.DocPresent.Caret;
 
+import java.util.ArrayList;
+
 import BritefuryJ.DocPresent.DPContentLeaf;
 import BritefuryJ.DocPresent.DPContentLeafEditable;
 import BritefuryJ.DocPresent.DPElement;
@@ -18,7 +20,7 @@ import BritefuryJ.Math.Point2;
 public class Caret implements MarkerListener
 {
 	protected Marker marker;
-	protected CaretListener listener;
+	protected ArrayList<CaretListener> listeners = new ArrayList<CaretListener>();;
 	protected DPElement grabElement = null;
 	
 	
@@ -30,9 +32,14 @@ public class Caret implements MarkerListener
 	}
 	
 	
-	public void setCaretListener(CaretListener listener)
+	public void addCaretListener(CaretListener listener)
 	{
-		this.listener = listener;
+		listeners.add( listener );
+	}
+	
+	public void removeCaretListener(CaretListener listener)
+	{
+		listeners.remove( listener );
 	}
 	
 	
@@ -96,7 +103,7 @@ public class Caret implements MarkerListener
 	
 	protected void changed()
 	{
-		if ( listener != null )
+		for (CaretListener listener: listeners)
 		{
 			listener.caretChanged( this );
 		}

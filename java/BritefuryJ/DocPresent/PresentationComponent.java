@@ -392,7 +392,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		protected WeakHashMap<DPContentLeafEditable, WeakHashMap<Marker, Object>> markersByLeaf = new WeakHashMap<DPContentLeafEditable, WeakHashMap<Marker, Object>>();
 		private Caret caret;
-		private DPContentLeafEditable currentCaretLeaf;
+		private DPContentLeafEditable currentCaretLeaf = null;
 		private boolean bLastMousePressPositionedCaret = false;
 		
 		private SelectionManager selectionManager;
@@ -436,10 +436,8 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			bAllocationRequired = true;
 			
 			caret = new Caret();
-			caret.setCaretListener( this );
+			caret.addCaretListener( this );
 			
-			currentCaretLeaf = null;
-
 			selection = new Selection();
 			selection.addSelectionListener( this );
 			selectionManager = new SelectionManager( selection );

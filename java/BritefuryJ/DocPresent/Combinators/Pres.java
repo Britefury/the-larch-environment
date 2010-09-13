@@ -10,7 +10,6 @@ import java.awt.datatransfer.DataFlavor;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.ElementPainter;
 import BritefuryJ.DocPresent.ElementValueFunction;
 import BritefuryJ.DocPresent.TreeEventListener;
@@ -200,17 +199,6 @@ public abstract class Pres
 	public AddNonLocalDropDest withNonLocalDropDest(DataFlavor dataFlavor, ObjectDndHandler.DropFn dropFn)
 	{
 		return new AddNonLocalDropDest( this, dataFlavor, dropFn );
-	}
-	
-	
-	
-	//
-	// Interactor methods
-	//
-	
-	public AddInteractor withInteractor(ElementInteractor interactor)
-	{
-		return new AddInteractor( this, interactor );
 	}
 	
 	
