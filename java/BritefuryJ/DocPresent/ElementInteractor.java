@@ -6,62 +6,12 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 
 import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.Controls.PopupMenu;
-import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
-import BritefuryJ.DocPresent.Event.PointerMotionEvent;
-import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 
 public abstract class ElementInteractor
 {
-	public boolean onButtonDown(DPElement element, PointerButtonEvent event)
-	{
-		return false;
-	}
-	
-	public boolean onButtonUp(DPElement element, PointerButtonEvent event)
-	{
-		return false;
-	}
-	
-	public boolean onButtonClicked(DPElement element, PointerButtonClickedEvent event)
-	{
-		return false;
-	}
-	
-	public boolean onContextButton(DPElement element, PopupMenu menu)
-	{
-		return false;
-	}
-	
-
-	public void onMotion(DPElement element, PointerMotionEvent event)
-	{
-	}
-	
-	public void onDrag(DPElement element, PointerMotionEvent event)
-	{
-	}
-	
-	public void onEnter(DPElement element, PointerMotionEvent event)
-	{
-	}
-	
-	public void onLeave(DPElement element, PointerMotionEvent event)
-	{
-	}
-	
-	
-	public boolean onScroll(DPElement element, PointerScrollEvent event)
-	{
-		return false;
-	}
-
-	
 	public void onCaretEnter(DPElement element, Caret c)
 	{
 	}
@@ -92,15 +42,6 @@ public abstract class ElementInteractor
 	}
 
 	public void onUnrealise(DPElement element)
-	{
-	}
-
-	
-	public void drawBackground(DPElement element, Graphics2D graphics)
-	{
-	}
-
-	public void draw(DPElement element, Graphics2D graphics)
 	{
 	}
 }

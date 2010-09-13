@@ -11,6 +11,7 @@ import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementInteractor;
+import BritefuryJ.DocPresent.ElementPainter;
 import BritefuryJ.DocPresent.ElementValueFunction;
 import BritefuryJ.DocPresent.TreeEventListener;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
@@ -221,6 +222,17 @@ public abstract class Pres
 	public AddElementInteractor withElementInteractor(AbstractElementInteractor interactor)
 	{
 		return new AddElementInteractor( this, interactor );
+	}
+	
+	
+	
+	//
+	// Painter methods
+	//
+	
+	public AddElementPainter withPainter(ElementPainter painter)
+	{
+		return new AddElementPainter( this, painter );
 	}
 	
 	

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.ElementInteractor;
+import BritefuryJ.DocPresent.ElementPainter;
 import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.Border.FilledBorder;
@@ -22,12 +22,16 @@ import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
-import BritefuryJ.DocPresent.Combinators.Primitive.Row;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.Column;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.Event.AbstractPointerButtonEvent;
+import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
+import BritefuryJ.DocPresent.Input.PointerInputElement;
+import BritefuryJ.DocPresent.Interactor.ClickElementInteractor;
+import BritefuryJ.DocPresent.Interactor.HoverElementInteractor;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
@@ -37,7 +41,7 @@ import BritefuryJ.ParserHelpers.ParseResultInterface;
 
 public class NodeView implements FragmentContext
 {
-	private static class NodeInteractor extends ElementInteractor
+	private static class NodeInteractor implements ClickElementInteractor, HoverElementInteractor, ElementPainter
 	{
 		private NodeView nodeView;
 		private boolean bSelected, bHighlight;
@@ -53,59 +57,69 @@ public class NodeView implements FragmentContext
 		
 		
 		
-		void select()
+		void select(DPElement element)
 		{
 			if ( !bSelected )
 			{
 				bSelected = true;
-				//element.queueFullRedraw();
+				element.queueFullRedraw();
 			}
 		}
 		
-		void unselect()
+		void unselect(DPElement element)
 		{
 			if ( bSelected )
 			{
 				bSelected = false;
-				//element.queueFullRedraw();
+				element.queueFullRedraw();
 			}
 		}
 		
 		
 		
-		public boolean onButtonDown(DPElement element, PointerButtonEvent event)
+		@Override
+		public boolean testClickEvent(PointerInputElement element, AbstractPointerButtonEvent event)
 		{
-			if ( event.getButton() == 1 )
-			{
-				nodeView.onClicked();
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			return event.getButton() == 1;
 		}
 		
-		public void onEnter(DPElement element, PointerMotionEvent event)
+		@Override
+		public boolean buttonClicked(PointerInputElement element, PointerButtonClickedEvent event)
+		{
+			nodeView.onClicked();
+			return true;
+		}
+
+
+		
+		@Override
+		public void pointerEnter(PointerInputElement element, PointerMotionEvent event)
 		{
 			bHighlight = true;
-			element.queueFullRedraw();
+			((DPElement)element).queueFullRedraw();
 		}
 
-		public void onLeave(DPElement element, PointerMotionEvent event)
+		@Override
+		public void pointerLeave(PointerInputElement element, PointerMotionEvent event)
 		{
 			bHighlight = false;
-			element.queueFullRedraw();
+			((DPElement)element).queueFullRedraw();
 		}
 
 
 		
+		@Override
 		public void drawBackground(DPElement element, Graphics2D graphics)
 		{
 			Color backgroundColour = bHighlight  ?  new Color( 0.7f, 0.85f, 1.0f )  :  Color.white;
 			backgroundColour = bSelected  ?  new Color( 1.0f, 1.0f, 0.6f )  :  backgroundColour;
 			graphics.setColor( backgroundColour );
 			graphics.fill( new Rectangle2D.Double( 0.0, 0.0, element.getWidth(), element.getHeight() ) );
+		}
+		
+		@Override
+		public void draw(DPElement element, Graphics2D graphics)
+		{
 		}
 	}
 
@@ -203,12 +217,12 @@ public class NodeView implements FragmentContext
 	
 	protected void select()
 	{
-		nodeInteractor.select();
+		nodeInteractor.select( nodeElement );
 	}
 	
 	protected void unselect()
 	{
-		nodeInteractor.unselect();
+		nodeInteractor.unselect( nodeElement );
 	}
 	
 	
@@ -332,6 +346,7 @@ public class NodeView implements FragmentContext
 	
 	private Pres makeNodeElement(DebugNode data)
 	{
+		// Called within the constructor...
 		Pres titleBoxElement = makeTitleBoxElement( data );
 		Pres contentBoxElement = makeContentBoxElement( data );
 		
@@ -340,7 +355,7 @@ public class NodeView implements FragmentContext
 		Pres nodeBinElement = new Bin( nodeBoxElement );
 		
 		nodeInteractor = new NodeInteractor( this );
-		nodeBinElement = nodeBinElement.withInteractor( nodeInteractor );
+		nodeBinElement = nodeBinElement.withElementInteractor( nodeInteractor ).withPainter( nodeInteractor );
 		
 		return styleSheet.withAttr( Primitive.border, nodeBorder ).applyTo( new Border( nodeBinElement ) );
 	}

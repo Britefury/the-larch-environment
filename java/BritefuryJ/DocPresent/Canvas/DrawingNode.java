@@ -121,11 +121,6 @@ public abstract class DrawingNode extends PointerInputElement
 		return new InteractionNode( this, highlight );
 	}
 	
-	public DrawingNode onInteraction(InteractionListener listener)
-	{
-		return new InteractionNode( this, listener );
-	}
-
 	public DrawingNode enableDnd(DndHandler dndHandler)
 	{
 		return new InteractionNode( this, dndHandler );
