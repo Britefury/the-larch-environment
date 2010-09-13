@@ -384,8 +384,6 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		private Pointer rootSpaceMouse;
 		private InputTable inputTable;
 		
-		private WeakHashMap<StateKeyListener, Object> stateKeyListeners;
-		
 		private Runnable immediateEventDispatcher;
 		
 		private boolean bAllocationRequired;
@@ -432,8 +430,6 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			
 			inputTable = new InputTable( this, this, component );
 			rootSpaceMouse = inputTable.getMouse();
-			
-			stateKeyListeners = new WeakHashMap<StateKeyListener, Object>();
 			
 			bAllocationRequired = true;
 			
@@ -671,24 +667,6 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				waitingImmediateEvents = null;
 			}
 		}
-		
-		
-		
-		//
-		// State key listeners
-		//
-		
-		public void addStateKeyListener(StateKeyListener listener)
-		{
-			stateKeyListeners.put( listener, null );
-		}
-
-		public void removeStateKeyListener(StateKeyListener listener)
-		{
-			stateKeyListeners.remove( listener );
-		}
-		
-		
 		
 		
 		
@@ -1143,10 +1121,6 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			{
 				if ( isModifierKey( event ) )
 				{
-					for (StateKeyListener listener: stateKeyListeners.keySet())
-					{
-						listener.onStateKeyPress( event );
-					}
 					return false;
 				}
 				else
@@ -1188,10 +1162,6 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			{
 				if ( isModifierKey( event ) )
 				{
-					for (StateKeyListener listener: stateKeyListeners.keySet())
-					{
-						listener.onStateKeyRelease( event );
-					}
 					return false;
 				}
 				else
@@ -1239,10 +1209,6 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			{
 				if ( isModifierKey( event ) )
 				{
-					for (StateKeyListener listener: stateKeyListeners.keySet())
-					{
-						listener.onStateKeyTyped( event );
-					}
 					return false;
 				}
 				else
