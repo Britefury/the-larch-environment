@@ -39,6 +39,7 @@ import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
 import BritefuryJ.DocPresent.Interactor.ContextMenuElementInteractor;
+import BritefuryJ.DocPresent.Interactor.RealiseElementInteractor;
 import BritefuryJ.DocPresent.Layout.ElementAlignment;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.LAllocV;
@@ -1626,12 +1627,13 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		setFlagRealised();
 		onRealise();
 		
-		List<ElementInteractor> interactors = getInteractors();
+		Iterable<AbstractElementInteractor> interactors = getElementInteractors( RealiseElementInteractor.class );
 		if ( interactors != null )
 		{
-			for (ElementInteractor interactor: interactors)
+			for (AbstractElementInteractor interactor: interactors )
 			{
-				interactor.onRealise( this );
+				RealiseElementInteractor realiseInt = (RealiseElementInteractor)interactor;
+				realiseInt.elementRealised( this );
 			}
 		}
 		
@@ -1658,15 +1660,16 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 			rootElement.elementUnrealised( this );
 		}
 		
-		List<ElementInteractor> interactors = getInteractors();
+		Iterable<AbstractElementInteractor> interactors = getElementInteractors( RealiseElementInteractor.class );
 		if ( interactors != null )
 		{
-			for (ElementInteractor interactor: interactors)
+			for (AbstractElementInteractor interactor: interactors )
 			{
-				interactor.onUnrealise( this );
+				RealiseElementInteractor realiseInt = (RealiseElementInteractor)interactor;
+				realiseInt.elementUnrealised( this );
 			}
 		}
-		
+
 		onUnrealise( unrealiseRoot );
 		clearFlagRealised();
 	}
@@ -2901,94 +2904,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		{
 			return null;
 		}
-	}
-	
-	
-	
-	
-	
-	//
-	//
-	// KEYBOARD EVENTS
-	//
-	//
-
-	// Sent directly to caret leaf, from root element, hence pass on to parent
-	protected boolean onKeyPress(KeyEvent event)
-	{
-		boolean bHandled = false;
-		List<ElementInteractor> interactors = getInteractors();
-		if ( interactors != null )
-		{
-			for (ElementInteractor interactor: interactors)
-			{
-				bHandled = bHandled  ||  interactor.onKeyPress( this, event );
-			}
-		}
-		
-		if ( bHandled )
-		{
-			return true;
-		}
-
-		if ( parent != null )
-		{
-			return parent.onKeyPress( event );
-		}
-		
-		return false;
-	}
-
-	// Sent directly to caret leaf, from root element, hence pass on to parent
-	protected boolean onKeyRelease(KeyEvent event)
-	{
-		boolean bHandled = false;
-		List<ElementInteractor> interactors = getInteractors();
-		if ( interactors != null )
-		{
-			for (ElementInteractor interactor: interactors)
-			{
-				bHandled = bHandled  ||  interactor.onKeyRelease( this, event );
-			}
-		}
-		
-		if ( bHandled )
-		{
-			return true;
-		}
-
-		if ( parent != null )
-		{
-			return parent.onKeyRelease( event );
-		}
-		
-		return false;
-	}
-
-	// Sent directly to caret leaf, from root element, hence pass on to parent
-	protected boolean onKeyTyped(KeyEvent event)
-	{
-		boolean bHandled = false;
-		List<ElementInteractor> interactors = getInteractors();
-		if ( interactors != null )
-		{
-			for (ElementInteractor interactor: interactors)
-			{
-				bHandled = bHandled  ||  interactor.onKeyTyped( this, event );
-			}
-		}
-		
-		if ( bHandled )
-		{
-			return true;
-		}
-
-		if ( parent != null )
-		{
-			return parent.onKeyTyped( event );
-		}
-		
-		return false;
 	}
 	
 	

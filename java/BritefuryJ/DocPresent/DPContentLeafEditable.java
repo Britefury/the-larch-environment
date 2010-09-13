@@ -788,7 +788,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		}
 	}
 	
-	protected boolean onContentKeyPress(Caret caret, KeyEvent event)
+	public boolean onContentKeyPress(Caret caret, KeyEvent event)
 	{
 		if ( event.getKeyCode() == KeyEvent.VK_BACK_SPACE )
 		{
@@ -801,12 +801,12 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		return false;
 	}
 
-	protected boolean onContentKeyRelease(Caret caret, KeyEvent event)
+	public boolean onContentKeyRelease(Caret caret, KeyEvent event)
 	{
 		return false;
 	}
 
-	protected boolean onContentKeyTyped(Caret caret, KeyEvent event)
+	public boolean onContentKeyTyped(Caret caret, KeyEvent event)
 	{
 		if ( event.getKeyChar() != KeyEvent.VK_BACK_SPACE  &&  event.getKeyChar() != KeyEvent.VK_DELETE )
 		{

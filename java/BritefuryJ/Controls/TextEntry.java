@@ -13,7 +13,6 @@ import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.ElementValueFunction;
 import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.TextEditEventInsert;
@@ -25,11 +24,13 @@ import BritefuryJ.DocPresent.Clipboard.TextEditHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
-import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Region;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.Primitive.Segment;
 import BritefuryJ.DocPresent.Combinators.Primitive.Text;
+import BritefuryJ.DocPresent.Interactor.KeyElementInteractor;
+import BritefuryJ.DocPresent.Interactor.RealiseElementInteractor;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
@@ -101,19 +102,21 @@ public class TextEntry extends ControlPres
 	
 	public static class TextEntryControl extends Control
 	{
-		private class TextEntryInteractor extends ElementInteractor
+		private class TextEntryInteractor implements KeyElementInteractor, RealiseElementInteractor
 		{
 			private TextEntryInteractor()
 			{
 			}
 			
 			
-			public boolean onKeyPress(DPElement element, KeyEvent event)
+			@Override
+			public boolean keyPressed(DPElement element, KeyEvent event)
 			{
 				return event.getKeyCode() == KeyEvent.VK_ENTER  ||  event.getKeyCode() == KeyEvent.VK_ESCAPE;
 			}
 	
-			public boolean onKeyRelease(DPElement element, KeyEvent event)
+			@Override
+			public boolean keyReleased(DPElement element, KeyEvent event)
 			{
 				if ( event.getKeyCode() == KeyEvent.VK_ENTER )
 				{
@@ -128,13 +131,15 @@ public class TextEntry extends ControlPres
 				return false;
 			}
 	
-			public boolean onKeyTyped(DPElement element, KeyEvent event)
+			@Override
+			public boolean keyTyped(DPElement element, KeyEvent event)
 			{
 				return event.getKeyChar() == KeyEvent.VK_ENTER  ||  event.getKeyChar() == KeyEvent.VK_ESCAPE;
 			}
 			
 			
-			public void onRealise(DPElement element)
+			@Override
+			public void elementRealised(DPElement element)
 			{
 				if ( bGrabCaretOnRealise )
 				{
@@ -147,6 +152,11 @@ public class TextEntry extends ControlPres
 					selectAll();
 					bSelectAllOnRealise = false;
 				}
+			}
+
+			@Override
+			public void elementUnrealised(DPElement element)
+			{
 			}
 		}
 		
@@ -253,7 +263,7 @@ public class TextEntry extends ControlPres
 			this.validBorder = validBorder;
 			this.invalidBorder = invalidBorder;
 	
-			this.textElement.addInteractor( new TextEntryInteractor() );
+			this.textElement.addElementInteractor( new TextEntryInteractor() );
 			this.textElement.addTreeEventListener( new TextEntryTreeEventListener() );
 			originalText = textElement.getText();
 			

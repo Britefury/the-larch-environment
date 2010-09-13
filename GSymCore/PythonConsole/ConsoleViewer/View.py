@@ -29,7 +29,7 @@ from BritefuryJ.Cell import LiteralCell
 from BritefuryJ.AttributeTable import *
 
 from BritefuryJ.Controls import TextEntry
-from BritefuryJ.DocPresent import *
+from BritefuryJ.DocPresent.Interactor import KeyElementInteractor
 from BritefuryJ.DocPresent.StyleSheet import *
 from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.Browser import Location
@@ -49,16 +49,16 @@ from GSymCore.PythonConsole import ConsoleSchema as Schema
 
 
 
-class CurrentModuleInteractor (ElementInteractor):
+class CurrentModuleInteractor (KeyElementInteractor):
 	def __init__(self, console):
 		self._console = console
 		
 		
-	def onKeyTyped(self, element, event):
+	def keyTyped(self, element, event):
 		return False
 		
 		
-	def onKeyPress(self, element, event):
+	def keyPressed(self, element, event):
 		if event.getKeyCode() == KeyEvent.VK_ENTER:
 			if event.getModifiers() & KeyEvent.CTRL_MASK  !=  0:
 				bEvaluate = event.getModifiers() & KeyEvent.SHIFT_MASK  ==  0
@@ -74,7 +74,7 @@ class CurrentModuleInteractor (ElementInteractor):
 				return True
 		return False
 	
-	def onKeyRelease(self, element, event):
+	def keyReleasedw(self, element, event):
 		return False
 
 
@@ -138,7 +138,7 @@ class ConsoleView (GSymViewObjectDispatch):
 		dropDest = ObjectDndHandler.DropDest( GSymFragmentView.FragmentModel, _onDrop )
 
 		currentModule = Span( [ currentModule ] )
-		currentModule = currentModule.withInteractor( CurrentModuleInteractor( node ) )
+		currentModule = currentModule.withElementInteractor( CurrentModuleInteractor( node ) )
 		
 		m = _pythonModuleBorderStyle.applyTo( Border( currentModule.alignHExpand() ) ).alignHExpand()
 		m = m.withDropDest( dropDest )

@@ -42,7 +42,8 @@ from Britefury.Util.InstanceCache import instanceCache
 
 from BritefuryJ.AttributeTable import *
 from BritefuryJ.Controls import *
-from BritefuryJ.DocPresent import ElementInteractor, ElementValueFunction, TextEditEvent, DPText
+from BritefuryJ.DocPresent import ElementValueFunction, TextEditEvent, DPText
+from BritefuryJ.DocPresent.Interactor import KeyElementInteractor
 from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder
 from BritefuryJ.DocPresent.Combinators.Primitive import Paragraph, Segment
 from BritefuryJ.GSym.PresCom import InnerFragment
@@ -167,7 +168,7 @@ def statementNodeEditor(grammar, inheritedState, node, contents):
 		else:
 			s = s.withFixedValue( node )
 		s = s.withTreeEventListener( instanceCache( StatementTreeEventListener, grammar.singleLineStatement() ) )
-		s = s.withInteractor( _statementIndentationInteractor )
+		s = s.withElementInteractor( _statementIndentationInteractor )
 		return s
 	else:
 		raise ValueError, 'invalid mode %d'  %  mode
@@ -178,7 +179,7 @@ def compoundStatementHeaderEditor(grammar, inheritedState, node, headerContents,
 	
 	headerStatementLine = headerStatementLine.withFixedValue( node )
 	headerStatementLine = headerStatementLine.withTreeEventListener( instanceCache( StatementTreeEventListener, grammar.singleLineStatement() ) )
-	headerStatementLine = headerStatementLine.withInteractor( _statementIndentationInteractor )
+	headerStatementLine = headerStatementLine.withElementInteractor( _statementIndentationInteractor )
 	if headerContainerFn is not None:
 		headerStatementLine = headerContainerFn( headerStatementLine )
 	return headerStatementLine
@@ -202,7 +203,7 @@ def compoundStatementEditor(ctx, grammar, inheritedState, node, precedence, comp
 		headerStatementLine = statementLine( headerContents )
 		headerStatementLine = headerStatementLine.withFixedValue( headerNode )
 		headerStatementLine = headerStatementLine.withTreeEventListener( instanceCache( CompoundHeaderTreeEventListener, statementParser ) )
-		headerStatementLine = headerStatementLine.withInteractor( _statementIndentationInteractor )
+		headerStatementLine = headerStatementLine.withElementInteractor( _statementIndentationInteractor )
 		
 		if headerContainerFn is not None:
 			headerStatementLine = headerContainerFn( headerStatementLine )

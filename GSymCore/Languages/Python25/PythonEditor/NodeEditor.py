@@ -21,6 +21,7 @@ from BritefuryJ.DocModel import DMList, DMObject, DMObjectInterface
 from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent.StyleSheet import *
 from BritefuryJ.DocPresent import *
+from BritefuryJ.DocPresent.Interactor import KeyElementInteractor
 
 
 from BritefuryJ.Logging import LogEntry
@@ -348,12 +349,12 @@ class SuiteTreeEventListener (TreeEventListenerObjectDispatch):
 			
 	
 
-class StatementIndentationInteractor (ElementInteractor):
+class StatementIndentationInteractor (KeyElementInteractor):
 	def __init__(self):
 		pass
 		
 		
-	def onKeyTyped(self, element, event):
+	def keyTyped(self, element, event):
 		if event.getKeyChar() == '\t':
 			context = element.getFragmentContext()
 			node = context.getModel()
@@ -369,10 +370,10 @@ class StatementIndentationInteractor (ElementInteractor):
 			return False
 		
 		
-	def onKeyPress(self, element, event):
+	def keyPressed(self, element, event):
 		return False
 	
-	def onKeyRelease(self, element, event):
+	def keyReleased(self, element, event):
 		return False
 	
 	

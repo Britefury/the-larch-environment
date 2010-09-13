@@ -11,12 +11,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPBorder;
+import BritefuryJ.DocPresent.DPColumn;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.DPColumn;
 import BritefuryJ.DocPresent.DPWhitespace;
-import BritefuryJ.DocPresent.ElementInteractor;
 import BritefuryJ.DocPresent.ElementValueFunction;
 import BritefuryJ.DocPresent.TextEditEvent;
 import BritefuryJ.DocPresent.TextEditEventInsert;
@@ -28,13 +27,14 @@ import BritefuryJ.DocPresent.Clipboard.TextEditHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
-import BritefuryJ.DocPresent.Combinators.Primitive.Row;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Region;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.Primitive.Segment;
 import BritefuryJ.DocPresent.Combinators.Primitive.Text;
-import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.Primitive.Whitespace;
+import BritefuryJ.DocPresent.Interactor.KeyElementInteractor;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
@@ -65,19 +65,21 @@ public class TextArea extends ControlPres
 	
 	public static class TextAreaControl extends Control
 	{
-		private class TextAreaInteractor extends ElementInteractor
+		private class TextAreaInteractor implements KeyElementInteractor
 		{
 			private TextAreaInteractor()
 			{
 			}
 			
 			
-			public boolean onKeyPress(DPElement element, KeyEvent event)
+			@Override
+			public boolean keyPressed(DPElement element, KeyEvent event)
 			{
 				return event.isControlDown()  &&  event.getKeyCode() == KeyEvent.VK_ENTER;
 			}
 	
-			public boolean onKeyRelease(DPElement element, KeyEvent event)
+			@Override
+			public boolean keyReleased(DPElement element, KeyEvent event)
 			{
 				if ( event.isControlDown()  &&  event.getKeyCode() == KeyEvent.VK_ENTER )
 				{
@@ -87,7 +89,8 @@ public class TextArea extends ControlPres
 				return false;
 			}
 	
-			public boolean onKeyTyped(DPElement element, KeyEvent event)
+			@Override
+			public boolean keyTyped(DPElement element, KeyEvent event)
 			{
 				return event.isControlDown()  &&  event.getKeyChar() == KeyEvent.VK_ENTER;
 			}
@@ -261,7 +264,7 @@ public class TextArea extends ControlPres
 		
 			element.setValueFunction( new ValueFn() );
 			
-			this.textBox.addInteractor( new TextAreaInteractor() );
+			this.textBox.addElementInteractor( new TextAreaInteractor() );
 			region.setEditHandler( new TextAreaEditHandler() );
 			
 			changeText( text, -1 );
