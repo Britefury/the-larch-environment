@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent.Input;
 
+import java.awt.geom.AffineTransform;
 import java.util.Stack;
 
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
@@ -17,6 +18,7 @@ import BritefuryJ.Math.Point2;
 public class PointerDragInteractor extends AbstractPointerDragInteractor
 {
 	private PointerInputElement dragElement = null;
+	private AffineTransform dragElementRootToLocalXform = null;
 	private DragElementInteractor dragInteractor = null;
 
 	
@@ -24,14 +26,14 @@ public class PointerDragInteractor extends AbstractPointerDragInteractor
 	@Override
 	public boolean dragBegin(PointerButtonEvent event)
 	{
-		Stack<PointerInputElement> elements = new Stack<PointerInputElement>();
-		
 		PointerInterface pointer = event.getPointer();
-		pointer.concretePointer().getLastElementPathUnderPoint( elements, pointer.getLocalPos() );
+		Stack<PointerInputElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
+		Stack<PointerButtonEvent> events = Pointer.eventStack( event, elements );
 		
 		while ( !elements.isEmpty() )
 		{
-			PointerInputElement element = elements.pop();
+			PointerInputElement element = elements.peek();
+			PointerButtonEvent elementSpaceEvent = events.peek();
 			
 			if ( element.isPointerInputElementRealised() )
 			{
@@ -41,16 +43,20 @@ public class PointerDragInteractor extends AbstractPointerDragInteractor
 					for (AbstractElementInteractor interactor: interactors )
 					{
 						DragElementInteractor pressInt = (DragElementInteractor)interactor;
-						boolean bHandled = pressInt.dragBegin( element, event );
+						boolean bHandled = pressInt.dragBegin( element, elementSpaceEvent );
 						if ( bHandled )
 						{
 							dragElement = element;
+							dragElementRootToLocalXform = Pointer.rootToLocalTransform( elements );
 							dragInteractor = pressInt;
 							return true;
 						}
 					}
 				}
 			}
+			
+			elements.pop();
+			events.pop();
 		}
 		
 		return false;
@@ -61,8 +67,10 @@ public class PointerDragInteractor extends AbstractPointerDragInteractor
 	{
 		if ( dragElement != null )
 		{
-			dragInteractor.dragEnd( dragElement, event, dragStartPos, dragButton );
+			dragInteractor.dragEnd( dragElement, (PointerButtonEvent)event.transformed( dragElementRootToLocalXform ), dragStartPos, dragButton );
 			dragElement = null;
+			dragElementRootToLocalXform = null;
+			dragInteractor = null;
 		}
 	}
 
@@ -71,7 +79,7 @@ public class PointerDragInteractor extends AbstractPointerDragInteractor
 	{
 		if ( dragElement != null )
 		{
-			dragInteractor.dragMotion( dragElement, event, dragStartPos, dragButton );
+			dragInteractor.dragMotion( dragElement, (PointerMotionEvent)event.transformed( dragElementRootToLocalXform ), dragStartPos, dragButton );
 		}
 	}
 }

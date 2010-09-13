@@ -273,6 +273,16 @@ public abstract class DrawingNode extends PointerInputElement
 		return parentPos;
 	}
 	
+	public AffineTransform getLocalToParentAffineTransform()
+	{
+		return new AffineTransform();
+	}
+
+	public AffineTransform getParentToLocalAffineTransform()
+	{
+		return new AffineTransform();
+	}
+	
 	
 
 	public Iterable<AbstractElementInteractor> getElementInteractors()

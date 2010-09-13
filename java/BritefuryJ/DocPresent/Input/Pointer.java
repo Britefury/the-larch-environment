@@ -8,6 +8,7 @@
 package BritefuryJ.DocPresent.Input;
 
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -731,10 +732,52 @@ public class Pointer extends PointerInterface
 	
 	
 	@SuppressWarnings("unchecked")
-	protected <E extends PointerEvent> void getFirstElementPathUnderPoint(E event, Stack<E> eventStack, Stack<PointerInputElement> elements, Point2 p)
+	protected static <E extends PointerEvent> Stack<E> eventStack(E event, Stack<PointerInputElement> elements)
 	{
+		Stack<E> eventStack = new Stack<E>();
+		eventStack.ensureCapacity( elements.size() );
+		
+		for (PointerInputElement element: elements)
+		{
+			event = (E)element.transformParentToLocalEvent( event );
+			eventStack.add( event );
+		}
+		
+		return eventStack;
+	}
+	
+	protected static Stack<AffineTransform> rootToLocalTransformStack(Stack<PointerInputElement> elements)
+	{
+		AffineTransform xform = new AffineTransform();
+		Stack<AffineTransform> xformStack = new Stack<AffineTransform>();
+		xformStack.ensureCapacity( elements.size() );
+		
+		for (PointerInputElement element: elements)
+		{
+			xform.concatenate( element.getParentToLocalAffineTransform() );
+			xformStack.add( (AffineTransform)xform.clone() );
+		}
+		
+		return xformStack;
+	}
+	
+	protected static AffineTransform rootToLocalTransform(Stack<PointerInputElement> elements)
+	{
+		AffineTransform xform = new AffineTransform();
+		
+		for (PointerInputElement element: elements)
+		{
+			xform.concatenate( element.getParentToLocalAffineTransform() );
+		}
+		
+		return xform;
+	}
+	
+	
+	protected Stack<PointerInputElement> getFirstElementPathUnderPoint(Point2 p)
+	{
+		Stack<PointerInputElement> elements = new Stack<PointerInputElement>();
 		PointerInputElement element = rootEntry.element;
-		eventStack.push( event );
 		elements.push( element );
 		
 		while ( element != null )
@@ -743,55 +786,18 @@ public class Pointer extends PointerInterface
 			if ( childElement != null )
 			{
 				p = childElement.transformParentToLocalPoint( p );
-				event = (E)childElement.transformParentToLocalEvent( event );
-				eventStack.push( event );
 				elements.push( childElement );
 			}
 			element = childElement;
 		}
-	}
-
-	protected void getFirstElementPathUnderPoint(Stack<PointerInputElement> elements, Point2 p)
-	{
-		PointerInputElement element = rootEntry.element;
-		elements.push( element );
 		
-		while ( element != null )
-		{
-			PointerInputElement childElement = element.getFirstPointerChildAtLocalPoint( p );
-			if ( childElement != null )
-			{
-				p = childElement.transformParentToLocalPoint( p );
-				elements.push( childElement );
-			}
-			element = childElement;
-		}
+		return elements;
 	}
 
 	
-	@SuppressWarnings("unchecked")
-	protected <E extends PointerEvent> void getLastElementPathUnderPoint(E event, Stack<E> eventStack, Stack<PointerInputElement> elements, Point2 p)
+	protected Stack<PointerInputElement> getLastElementPathUnderPoint(Point2 p)
 	{
-		PointerInputElement element = rootEntry.element;
-		eventStack.push( event );
-		elements.push( element );
-		
-		while ( element != null )
-		{
-			PointerInputElement childElement = element.getLastPointerChildAtLocalPoint( p );
-			if ( childElement != null )
-			{
-				p = childElement.transformParentToLocalPoint( p );
-				event = (E)childElement.transformParentToLocalEvent( event );
-				eventStack.push( event );
-				elements.push( childElement );
-			}
-			element = childElement;
-		}
-	}
-	
-	protected void getLastElementPathUnderPoint(Stack<PointerInputElement> elements, Point2 p)
-	{
+		Stack<PointerInputElement> elements = new Stack<PointerInputElement>();
 		PointerInputElement element = rootEntry.element;
 		elements.push( element );
 		
@@ -805,5 +811,7 @@ public class Pointer extends PointerInterface
 			}
 			element = childElement;
 		}
+		
+		return elements;
 	}
 }

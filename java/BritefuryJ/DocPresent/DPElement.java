@@ -854,6 +854,18 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	
 	
+	public AffineTransform getLocalToParentAffineTransform()
+	{
+		return getLocalToParentXform().toAffineTransform();
+	}
+
+	public AffineTransform getParentToLocalAffineTransform()
+	{
+		return getParentToLocalXform().toAffineTransform();
+	}
+	
+	
+	
 	public Xform2 getLocalToRootXform(Xform2 x)
 	{
 		return getLocalToAncestorXform( null, x );
