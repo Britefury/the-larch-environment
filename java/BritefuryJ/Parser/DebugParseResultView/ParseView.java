@@ -15,7 +15,7 @@ import java.util.HashMap;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Controls.AspectRatioScrolledViewport;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.ElementInteractor;
+import BritefuryJ.DocPresent.ElementPainter;
 import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Combinators.Pres;
@@ -32,17 +32,18 @@ import BritefuryJ.ParserHelpers.DebugParseResultInterface;
 
 public class ParseView implements FragmentContext
 {
-	private static class ParseViewInteractor extends ElementInteractor
+	private static class ParseViewPainter implements ElementPainter
 	{
 		private ParseView parseView;
 		
-		public ParseViewInteractor(ParseView parseView)
+		public ParseViewPainter(ParseView parseView)
 		{
 			this.parseView = parseView;
 		}
 		
 		
 		
+		@Override
 		public void drawBackground(DPElement element, Graphics2D graphics)
 		{
 			graphics.setColor( Color.black );
@@ -56,6 +57,11 @@ public class ParseView implements FragmentContext
 			{
 				e.draw( graphics );
 			}
+		}
+
+		@Override
+		public void draw(DPElement element, Graphics2D graphics)
+		{
 		}
 	}
 	
@@ -151,7 +157,7 @@ public class ParseView implements FragmentContext
 		root.registerEdges();
 		
 		viewBin = new Bin( root.getElement() ).present();
-		viewBin.addInteractor( new ParseViewInteractor( this ) );
+		viewBin.addPainter( new ParseViewPainter( this ) );
 		
 		Pres viewport = new AspectRatioScrolledViewport( viewBin, 0.0, 1.333, viewportState );
 		pres = viewportBorderStyle.applyTo( new Border( viewport.alignHExpand().alignVExpand() ).alignHExpand().alignVExpand() );

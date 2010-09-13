@@ -8,26 +8,15 @@ package BritefuryJ.DocPresent.Input;
 
 import java.awt.geom.AffineTransform;
 
-import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
-import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
 import BritefuryJ.Math.Point2;
 
 public abstract class PointerInputElement
 {
-	protected abstract boolean handlePointerButtonDown(PointerButtonEvent event);
-	protected abstract boolean handlePointerButtonUp(PointerButtonEvent event);
-	protected abstract boolean handlePointerButtonClicked(PointerButtonClickedEvent event);
-	protected abstract void handlePointerMotion(PointerMotionEvent event);
-	protected abstract void handlePointerDrag(PointerMotionEvent event);
 	protected abstract void handlePointerEnter(PointerMotionEvent event);
 	protected abstract void handlePointerLeave(PointerMotionEvent event);
-	protected abstract void handlePointerEnterFromChild(PointerMotionEvent event, PointerInputElement childElement);
-	protected abstract void handlePointerLeaveIntoChild(PointerMotionEvent event, PointerInputElement childElement);
-	protected abstract boolean handlePointerScroll(PointerScrollEvent event);
 	
 	protected abstract PointerInputElement getFirstPointerChildAtLocalPoint(Point2 localPos);
 	protected abstract PointerInputElement getLastPointerChildAtLocalPoint(Point2 localPos);

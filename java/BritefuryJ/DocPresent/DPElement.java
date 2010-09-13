@@ -31,11 +31,8 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
-import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
-import BritefuryJ.DocPresent.Event.PointerScrollEvent;
 import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
@@ -1532,58 +1529,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	// General event methods
 	//
 	
-	protected boolean onButtonDown(PointerButtonEvent event)
-	{
-		return false;
-	}
-
-	protected boolean onButtonDown3(PointerButtonEvent event)
-	{
-		return false;
-	}
-
-	protected boolean onButtonUp(PointerButtonEvent event)
-	{
-		return false;
-	}
-
-	protected boolean onButtonClicked(PointerButtonClickedEvent event)
-	{
-		return false;
-	}
-	
-
-	protected void onMotion(PointerMotionEvent event)
-	{
-	}
-
-	protected void onDrag(PointerMotionEvent event)
-	{
-	}
-
-	protected void onEnter(PointerMotionEvent event)
-	{
-	}
-
-	protected void onLeave(PointerMotionEvent event)
-	{
-	}
-	
-	protected void onLeaveIntoChild(PointerMotionEvent event, PointerInputElement child)
-	{
-	}
-	
-	protected void onEnterFromChild(PointerMotionEvent event, PointerInputElement child)
-	{
-	}
-	
-	
-	protected boolean onScroll(PointerScrollEvent event)
-	{
-		return false;
-	}
-	
-	
 	protected void onRealise()
 	{
 	}
@@ -1749,14 +1694,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	protected void handleDrawBackground(Graphics2D graphics, AABox2 areaBox)
 	{
 		drawBackground( graphics );
-		List<ElementInteractor> interactors = getInteractors();
-		if ( interactors != null )
-		{
-			for (ElementInteractor interactor: interactors)
-			{
-				interactor.drawBackground( this, graphics );
-			}
-		}
 		List<ElementPainter> painters = getPainters();
 		if ( painters != null )
 		{
@@ -1770,14 +1707,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	protected void handleDraw(Graphics2D graphics, AABox2 areaBox)
 	{
 		draw( graphics );
-		List<ElementInteractor> interactors = getInteractors();
-		if ( interactors != null )
-		{
-			for (ElementInteractor interactor: interactors)
-			{
-				interactor.draw( this, graphics );
-			}
-		}
 		List<ElementPainter> painters = getPainters();
 		if ( painters != null )
 		{
@@ -1841,86 +1770,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	}
 	
 
-	protected boolean handlePointerButtonDown(PointerButtonEvent event)
-	{
-		if ( onButtonDown( event ) )
-		{
-			return true;
-		}
-		List<ElementInteractor> interactors = getInteractors();
-		boolean bResult = false;
-		if ( interactors != null )
-		{
-			for (ElementInteractor interactor: interactors)
-			{
-				bResult = bResult || interactor.onButtonDown( this, event );
-			}
-		}
-		return bResult;
-	}
-	
-	protected boolean handlePointerButtonUp(PointerButtonEvent event)
-	{
-		if ( onButtonUp( event ) )
-		{
-			return true;
-		}
-		List<ElementInteractor> interactors = getInteractors();
-		boolean bResult = false;
-		if ( interactors != null )
-		{
-			for (ElementInteractor interactor: interactors)
-			{
-				bResult = bResult || interactor.onButtonUp( this, event );
-			}
-		}
-		return bResult;
-	}
-	
-	protected boolean handlePointerButtonClicked(PointerButtonClickedEvent event)
-	{
-		if ( onButtonClicked( event ) )
-		{
-			return true;
-		}
-		List<ElementInteractor> interactors = getInteractors();
-		boolean bResult = false;
-		if ( interactors != null )
-		{
-			for (ElementInteractor interactor: interactors)
-			{
-				bResult = bResult || interactor.onButtonClicked( this, event );
-			}
-		}
-		return bResult;
-	}
-	
-	protected void handlePointerMotion(PointerMotionEvent event)
-	{
-		onMotion( event );
-		List<ElementInteractor> interactors = getInteractors();
-		if ( interactors != null )
-		{
-			for (ElementInteractor interactor: interactors)
-			{
-				interactor.onMotion( this, event );
-			}
-		}
-	}
-	
-	protected void handlePointerDrag(PointerMotionEvent event)
-	{
-		onDrag( event );
-		List<ElementInteractor> interactors = getInteractors();
-		if ( interactors != null )
-		{
-			for (ElementInteractor interactor: interactors)
-			{
-				interactor.onDrag( this, event );
-			}
-		}
-	}
-	
 	protected void handlePointerEnter(PointerMotionEvent event)
 	{
 		handleHover();
@@ -1929,15 +1778,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		if ( cursor != null  &&  rootElement != null )
 		{
 			rootElement.setPointerCursor( cursor );
-		}
-		onEnter( event );
-		List<ElementInteractor> interactors = getInteractors();
-		if ( interactors != null )
-		{
-			for (ElementInteractor interactor: interactors)
-			{
-				interactor.onEnter( this, event );
-			}
 		}
 	}
 	
@@ -1956,15 +1796,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 			else
 			{
 				getRootElement().setPointerCursorDefault();
-			}
-		}
-		onLeave( event );
-		List<ElementInteractor> interactors = getInteractors();
-		if ( interactors != null )
-		{
-			for (ElementInteractor interactor: interactors)
-			{
-				interactor.onLeave( this, event );
 			}
 		}
 	}
@@ -1987,34 +1818,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		}
 	}
 	
-
-	protected void handlePointerEnterFromChild(PointerMotionEvent event, PointerInputElement childElement)
-	{
-		onEnterFromChild( event, childElement );
-	}
-	
-	protected void handlePointerLeaveIntoChild(PointerMotionEvent event, PointerInputElement childElement)
-	{
-		onLeaveIntoChild( event, childElement );
-	}
-	
-	protected boolean handlePointerScroll(PointerScrollEvent event)
-	{
-		if ( onScroll( event ) )
-		{
-			return true;
-		}
-		List<ElementInteractor> interactors = getInteractors();
-		boolean bResult = false;
-		if ( interactors != null )
-		{
-			for (ElementInteractor interactor: interactors)
-			{
-				bResult = bResult || interactor.onScroll( this, event );
-			}
-		}
-		return bResult;
-	}
 
 	
 	

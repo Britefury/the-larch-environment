@@ -38,12 +38,12 @@ from BritefuryJ.Cell import LiteralCell
 
 from BritefuryJ.AttributeTable import *
 
-from BritefuryJ.DocPresent import ElementInteractor
 from BritefuryJ.DocPresent.Browser import Location
 from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.Painter import *
 from BritefuryJ.DocPresent.StyleSheet import StyleSheet
 from BritefuryJ.DocPresent.Input import ObjectDndHandler
+from BritefuryJ.DocPresent.Interactor import ClickElementInteractor
 from BritefuryJ.Controls import *
 from BritefuryJ.DocPresent.Combinators.Primitive import *
 from BritefuryJ.DocPresent.Combinators.RichText import *
@@ -306,16 +306,16 @@ class ProjectView (GSymViewObjectNodeDispatch):
 				pythonPackageCell.setLiteralValue( pythonPackageNameLabel )
 		
 
-		class _PythonPackageNameInteractor (ElementInteractor):
-			def onButtonClicked(self, element, event):
-				if event.getButton() == 1:
-					n = pythonPackageName   if pythonPackageName is not None   else 'Untitled'
-					textEntry = TextEntry( n, _PythonPackageNameListener(), _pythonPackageNameRegex, 'Please enter a valid dotted identifier' )
-					textEntry.grabCaretOnRealise()
-					pythonPackageCell.setLiteralValue( textEntry )
-					return True
-				else:
-					return False
+		class _PythonPackageNameInteractor (ClickElementInteractor):
+			def testClickEvent(self, element, event):
+				return event.getButton() == 1
+			
+			def buttonClicked(self, element, event):
+				n = pythonPackageName   if pythonPackageName is not None   else 'Untitled'
+				textEntry = TextEntry( n, _PythonPackageNameListener(), _pythonPackageNameRegex, 'Please enter a valid dotted identifier' )
+				textEntry.grabCaretOnRealise()
+				pythonPackageCell.setLiteralValue( textEntry )
+				return True
 			
 			
 		# Project index
@@ -371,7 +371,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 			pythonPackageNameLabel = _itemHoverHighlightStyle.applyTo( _pythonPackageNameNotSetStyle.applyTo( Label( '<not set>' ) ) )
 		else:
 			pythonPackageNameLabel = _itemHoverHighlightStyle.applyTo( _pythonPackageNameStyle.applyTo( Label( pythonPackageName ) ) )
-		pythonPackageNameLabel = pythonPackageNameLabel.withInteractor( _PythonPackageNameInteractor() )
+		pythonPackageNameLabel = pythonPackageNameLabel.withElementInteractor( _PythonPackageNameInteractor() )
 		pythonPackageCell = LiteralCell( pythonPackageNameLabel )
 		pythonPackageNameBox = Row( [ pythonPackageNamePrompt, pythonPackageCell.genericPerspectiveValuePresInFragment() ] )
 		

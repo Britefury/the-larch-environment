@@ -34,7 +34,7 @@ public class Pointer extends PointerInterface
 	static class ElementEntry
 	{
 		public PointerInputElement element;
-		public ElementEntry pressGrabChild, childUnderPointer, navigationChild;
+		public ElementEntry childUnderPointer;
 		private HashSet<ElementEntry> parents = new HashSet<ElementEntry>();
 		
 		
@@ -44,163 +44,32 @@ public class Pointer extends PointerInterface
 		}
 
 	
-		protected boolean handleButtonDown(Pointer pointer, PointerButtonEvent event)
+		protected void handleMotion(Pointer pointer, PointerMotionEvent event)
 		{
-			if ( pressGrabChild == null )
+			// Handle child elements
+			if ( childUnderPointer != null )
+			{
+				if ( !childUnderPointer.element.containsParentSpacePoint( event.getPointer().getLocalPos() ) )
+				{
+					childUnderPointer.handleLeave( pointer, new PointerMotionEvent( childUnderPointer.element.transformParentToLocalPointer( event.getPointer() ), PointerMotionEvent.Action.LEAVE ) );
+					childUnderPointer.parents.remove( this );
+					childUnderPointer = null;
+				}
+				else
+				{
+					childUnderPointer.handleMotion( pointer, (PointerMotionEvent)childUnderPointer.element.transformParentToLocalEvent( event ) ); 
+				}
+			}
+			
+			if ( childUnderPointer == null )
 			{
 				PointerInputElement childElement = element.getFirstPointerChildAtLocalPoint( event.getPointer().getLocalPos() );
 				if ( childElement != null )
 				{
 					ElementEntry childEntry = pointer.getEntryForElement( childElement );
-					boolean bHandled = childEntry.handleButtonDown( pointer, (PointerButtonEvent)childElement.transformParentToLocalEvent( event ) );
-					if ( bHandled  &&  element.isPointerInputElementRealised() )
-					{
-						pressGrabChild = childEntry;
-						pressGrabChild.parents.add( this );
-						return true;
-					}
-				}
-				
-				if ( pressGrabChild == null )
-				{
-					return element.handlePointerButtonDown( event );
-				}
-				else
-				{
-					return false;
-				}
-			}
-			else
-			{
-				return pressGrabChild.handleButtonDown( pointer, (PointerButtonEvent)pressGrabChild.element.transformParentToLocalEvent( event ) );
-			}
-		}
-		
-		protected boolean handleButtonClicked(Pointer pointer, PointerButtonClickedEvent event)
-		{
-			boolean bHandled = false;
-			
-			PointerInputElement childElement = element.getFirstPointerChildAtLocalPoint( event.getPointer().getLocalPos() );
-			if ( childElement != null )
-			{
-				ElementEntry childEntry = pointer.getEntryForElement( childElement );
-				bHandled = childEntry.handleButtonClicked( pointer, (PointerButtonClickedEvent)childEntry.element.transformParentToLocalEvent( event ) );
-			}
-			
-			if ( !bHandled )
-			{
-				bHandled = element.handlePointerButtonClicked( event );
-			}
-			
-			return bHandled;
-		}
-		
-		protected boolean handleButtonUp(Pointer pointer, PointerButtonEvent event)
-		{
-			if ( pressGrabChild != null )
-			{
-				PointerButtonEvent childSpaceEvent = (PointerButtonEvent)pressGrabChild.element.transformParentToLocalEvent( event );
-				if ( pointer.isAButtonPressed() )
-				{
-					return pressGrabChild.handleButtonUp( pointer, childSpaceEvent );
-				}
-				else
-				{
-					Point2 localPos = event.getPointer().getLocalPos();
-					if ( !pressGrabChild.element.containsParentSpacePoint( localPos ) )
-					{
-						pressGrabChild.handleLeave( pointer, new PointerMotionEvent( childSpaceEvent.getPointer(), PointerMotionEvent.Action.LEAVE ) );
-					}
-					
-					boolean bHandled = pressGrabChild.handleButtonUp( pointer, childSpaceEvent );
-					ElementEntry savedPressGrabChild = pressGrabChild;
-					if ( pressGrabChild != null )
-					{
-						pressGrabChild.parents.remove( this );
-					}
-					pressGrabChild = null;
-					
-					if ( element.isPointerInputElementRealised()  &&  element.containsLocalSpacePoint( localPos ) )
-					{
-						PointerInputElement childElement = element.getFirstPointerChildAtLocalPoint( localPos );
-						if ( childElement != null )
-						{
-							ElementEntry childEntry = pointer.getEntryForElement( childElement );
-							PointerInputElement savedPressGrabChildElement = savedPressGrabChild != null  ?  savedPressGrabChild.element  :  null;
-							if ( childElement != savedPressGrabChildElement )
-							{
-								childEntry.handleEnter( pointer, new PointerMotionEvent( childSpaceEvent.getPointer(), PointerMotionEvent.Action.ENTER ) );
-							}
-							childUnderPointer = childEntry;
-							childUnderPointer.parents.add( this );
-						}
-						else
-						{
-							if ( childUnderPointer != null )
-							{
-								childUnderPointer.parents.remove( this );
-							}
-							childUnderPointer = null;
-							element.handlePointerEnter( new PointerMotionEvent( event.getPointer(), PointerMotionEvent.Action.ENTER ) );
-						}
-					}
-					
-					return bHandled;
-				}
-			}
-			else
-			{
-				return element.handlePointerButtonUp( event );
-			}
-		}
-		
-
-
-	
-		protected void handleMotion(Pointer pointer, PointerMotionEvent event)
-		{
-			// Handle child elements
-			if ( pressGrabChild != null )
-			{
-				pressGrabChild.handleMotion( pointer, (PointerMotionEvent)pressGrabChild.element.transformParentToLocalEvent( event ) );
-			}
-			else
-			{
-				ElementEntry oldPointerChild = childUnderPointer;
-				
-				if ( childUnderPointer != null )
-				{
-					if ( !childUnderPointer.element.containsParentSpacePoint( event.getPointer().getLocalPos() ) )
-					{
-						childUnderPointer.handleLeave( pointer, new PointerMotionEvent( childUnderPointer.element.transformParentToLocalPointer( event.getPointer() ), PointerMotionEvent.Action.LEAVE ) );
-						childUnderPointer.parents.remove( this );
-						childUnderPointer = null;
-					}
-					else
-					{
-						childUnderPointer.handleMotion( pointer, (PointerMotionEvent)childUnderPointer.element.transformParentToLocalEvent( event ) ); 
-					}
-				}
-				
-				if ( childUnderPointer == null )
-				{
-					PointerInputElement childElement = element.getFirstPointerChildAtLocalPoint( event.getPointer().getLocalPos() );
-					if ( childElement != null )
-					{
-						ElementEntry childEntry = pointer.getEntryForElement( childElement );
-						childEntry.handleEnter( pointer, (PointerMotionEvent)childElement.transformParentToLocalEvent( event ) );
-						childUnderPointer = childEntry;
-						childUnderPointer.parents.add( this );
-					}
-				}
-				
-				if ( oldPointerChild == null  &&  childUnderPointer != null )
-				{
-					element.handlePointerLeaveIntoChild( new PointerMotionEvent( event.getPointer(), PointerMotionEvent.Action.LEAVE ), childUnderPointer.element );
-				}
-				else if ( oldPointerChild != null  &&  childUnderPointer == null )
-				{
-					element.handlePointerEnterFromChild( new PointerMotionEvent( event.getPointer(), PointerMotionEvent.Action.ENTER ), oldPointerChild.element );
+					childEntry.handleEnter( pointer, (PointerMotionEvent)childElement.transformParentToLocalEvent( event ) );
+					childUnderPointer = childEntry;
+					childUnderPointer.parents.add( this );
 				}
 			}
 			
@@ -210,22 +79,6 @@ public class Pointer extends PointerInterface
 			{
 				pointer.inputTable.addPointerWithinElementBounds( pointer, element );
 			}
-			
-			
-			element.handlePointerMotion( event );
-		}
-		
-		
-		
-		protected void handleDrag(Pointer pointer, PointerMotionEvent event)
-		{
-			if ( pressGrabChild != null )
-			{
-				pressGrabChild.handleDrag( pointer, (PointerMotionEvent)pressGrabChild.element.transformParentToLocalEvent( event ) );
-			}
-			
-			
-			element.handlePointerDrag( event );
 		}
 		
 		
@@ -255,22 +108,17 @@ public class Pointer extends PointerInterface
 				childEntry.handleEnter( pointer, (PointerMotionEvent)childElement.transformParentToLocalEvent( event ) );
 				childUnderPointer = childEntry;
 				childUnderPointer.parents.add( this );
-				element.handlePointerLeaveIntoChild( new PointerMotionEvent( event.getPointer(), PointerMotionEvent.Action.LEAVE ), childElement );
 			}
 		}
 		
 		protected void handleLeave(Pointer pointer, PointerMotionEvent event)
 		{
 			// Handle child elements
-			if ( pressGrabChild == null )
+			if ( childUnderPointer != null )
 			{
-				if ( childUnderPointer != null )
-				{
-					childUnderPointer.handleLeave( pointer, (PointerMotionEvent)childUnderPointer.element.transformParentToLocalEvent( event ) );
-					element.handlePointerEnterFromChild( new PointerMotionEvent( event.getPointer(), PointerMotionEvent.Action.ENTER ), childUnderPointer.element );
-					childUnderPointer.parents.remove( this );
-					childUnderPointer = null;
-				}
+				childUnderPointer.handleLeave( pointer, (PointerMotionEvent)childUnderPointer.element.transformParentToLocalEvent( event ) );
+				childUnderPointer.parents.remove( this );
+				childUnderPointer = null;
 			}
 			
 			
@@ -285,45 +133,11 @@ public class Pointer extends PointerInterface
 		
 		
 		
-		protected boolean handleScroll(Pointer pointer, PointerScrollEvent event)
-		{
-			boolean bHandled = false;
-			if ( pressGrabChild != null )
-			{
-				bHandled = pressGrabChild.handleScroll( pointer, (PointerScrollEvent)pressGrabChild.element.transformParentToLocalEvent( event ) );
-				if ( bHandled )
-				{
-					return true;
-				}
-			}
-			else if ( childUnderPointer != null )
-			{
-				bHandled = childUnderPointer.handleScroll( pointer, (PointerScrollEvent)childUnderPointer.element.transformParentToLocalEvent( event ) );
-				if ( bHandled )
-				{
-					return true;
-				}
-			}
-			return element.handlePointerScroll( event );
-		}
-		
-		
-		
 		protected void notifyUnrealise(Pointer pointer)
 		{
-			if ( pressGrabChild != null )
-			{
-				pressGrabChild = null;
-			}
-			
 			if ( childUnderPointer != null )
 			{
 				childUnderPointer = null;
-			}
-			
-			if ( navigationChild != null )
-			{
-				navigationChild = null;
 			}
 			
 			for (ElementEntry parent: parents)
@@ -336,19 +150,9 @@ public class Pointer extends PointerInterface
 
 		private void notifyChildUnrealised(ElementEntry childEntry)
 		{
-			if ( childEntry == pressGrabChild )
-			{
-				pressGrabChild = null;
-			}
-
 			if ( childEntry == childUnderPointer )
 			{
 				childUnderPointer = null;
-			}
-
-			if ( childEntry == navigationChild )
-			{
-				navigationChild = null;
 			}
 		}
 	}
@@ -515,7 +319,7 @@ public class Pointer extends PointerInterface
 			}
 		}
 
-		return rootEntry.handleButtonDown( this, event );
+		return false;
 	}
 	
 	public boolean buttonUp(Point2 pos, int button)
@@ -530,7 +334,7 @@ public class Pointer extends PointerInterface
 			}
 		}
 
-		return rootEntry.handleButtonUp( this, event );
+		return false;
 	}
 	
 	public boolean buttonClicked(Point2 pos, int button, int clickCount)
@@ -545,7 +349,7 @@ public class Pointer extends PointerInterface
 			}
 		}
 
-		return rootEntry.handleButtonClicked( this, event );
+		return false;
 	}
 	
 	public void motion(Point2 pos, MouseEvent mouseEvent)
@@ -574,8 +378,6 @@ public class Pointer extends PointerInterface
 				return;
 			}
 		}
-
-		rootEntry.handleDrag( this, event );
 	}
 
 	public void enter(Point2 pos)
@@ -616,11 +418,11 @@ public class Pointer extends PointerInterface
 		{
 			if ( interactor.scroll( this, event ) )
 			{
-				break;
+				return true;
 			}
 		}
 
-		return rootEntry.handleScroll( this, event );
+		return false;
 	}
 
 
