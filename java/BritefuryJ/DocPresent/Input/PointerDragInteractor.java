@@ -67,7 +67,7 @@ public class PointerDragInteractor extends AbstractPointerDragInteractor
 	{
 		if ( dragElement != null )
 		{
-			dragInteractor.dragEnd( dragElement, (PointerButtonEvent)event.transformed( dragElementRootToLocalXform ), dragStartPos, dragButton );
+			dragInteractor.dragEnd( dragElement, (PointerButtonEvent)event.transformed( dragElementRootToLocalXform ), dragStartPos.transform( dragElementRootToLocalXform ), dragButton );
 			dragElement = null;
 			dragElementRootToLocalXform = null;
 			dragInteractor = null;
@@ -79,7 +79,7 @@ public class PointerDragInteractor extends AbstractPointerDragInteractor
 	{
 		if ( dragElement != null )
 		{
-			dragInteractor.dragMotion( dragElement, (PointerMotionEvent)event.transformed( dragElementRootToLocalXform ), dragStartPos, dragButton );
+			dragInteractor.dragMotion( dragElement, (PointerMotionEvent)event.transformed( dragElementRootToLocalXform ), dragStartPos.transform( dragElementRootToLocalXform ), dragButton );
 		}
 	}
 }
