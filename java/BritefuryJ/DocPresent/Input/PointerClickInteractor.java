@@ -17,9 +17,7 @@ public class PointerClickInteractor extends PointerInteractor
 {
 	public boolean buttonDown(Pointer pointer, PointerButtonEvent event)
 	{
-		Stack<PointerInputElement> elements = new Stack<PointerInputElement>();
-		
-		pointer.concretePointer().getLastElementPathUnderPoint( elements, pointer.getLocalPos() );
+		Stack<PointerInputElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
 		
 		while ( !elements.isEmpty() )
 		{
@@ -47,9 +45,7 @@ public class PointerClickInteractor extends PointerInteractor
 
 	public boolean buttonUp(Pointer pointer, PointerButtonEvent event)
 	{
-		Stack<PointerInputElement> elements = new Stack<PointerInputElement>();
-		
-		pointer.concretePointer().getLastElementPathUnderPoint( elements, pointer.getLocalPos() );
+		Stack<PointerInputElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
 		
 		while ( !elements.isEmpty() )
 		{
@@ -79,9 +75,7 @@ public class PointerClickInteractor extends PointerInteractor
 	
 	public boolean buttonClicked(Pointer pointer, PointerButtonClickedEvent event)
 	{
-		Stack<PointerInputElement> elements = new Stack<PointerInputElement>();
-		
-		pointer.concretePointer().getLastElementPathUnderPoint( elements, pointer.getLocalPos() );
+		Stack<PointerInputElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
 		
 		while ( !elements.isEmpty() )
 		{

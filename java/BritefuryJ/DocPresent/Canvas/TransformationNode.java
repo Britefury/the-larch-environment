@@ -124,6 +124,16 @@ public class TransformationNode extends UnaryBranchNode
 		parentToLocal.transform( localPos, localPos );
 		return new Point2( localPos.x, localPos.y );
 	}
+	
+	public AffineTransform getLocalToParentAffineTransform()
+	{
+		return (AffineTransform)localToParent.clone();
+	}
+
+	public AffineTransform getParentToLocalAffineTransform()
+	{
+		return (AffineTransform)parentToLocal.clone();
+	}
 
 
 

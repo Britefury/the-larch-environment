@@ -48,9 +48,7 @@ public class PointerContextMenuInteractor extends PointerInteractor
 	
 	private static void handleContextButton(Pointer pointer, PopupMenu menu)
 	{
-		Stack<PointerInputElement> elements = new Stack<PointerInputElement>();
-		
-		pointer.concretePointer().getLastElementPathUnderPoint( elements, pointer.getLocalPos() );
+		Stack<PointerInputElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
 		
 		while ( !elements.isEmpty() )
 		{

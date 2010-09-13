@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.DocPresent.Input;
 
+import java.awt.geom.AffineTransform;
+
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerEvent;
@@ -32,6 +34,8 @@ public abstract class PointerInputElement
 	protected abstract PointerEvent transformParentToLocalEvent(PointerEvent event);
 	protected abstract PointerInterface transformParentToLocalPointer(PointerInterface pointer);
 	public abstract Point2 transformParentToLocalPoint(Point2 parentPos);
+	public abstract AffineTransform getLocalToParentAffineTransform();
+	public abstract AffineTransform getParentToLocalAffineTransform();
 	
 	
 	public abstract Iterable<AbstractElementInteractor> getElementInteractors();

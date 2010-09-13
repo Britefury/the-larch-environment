@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent.Input;
 
+import java.awt.geom.AffineTransform;
 import java.util.Stack;
 
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
@@ -16,19 +17,20 @@ import BritefuryJ.DocPresent.Interactor.PressAndHoldElementInteractor;
 public class PointerPressAndHoldInteractor extends PointerInteractor
 {
 	private PointerInputElement pressedElement;
+	private AffineTransform pressedElementRootToLocalXform;
 	private PressAndHoldElementInteractor pressedInteractor;
 	private int pressedButton;
 	
 	
 	public boolean buttonDown(Pointer pointer, PointerButtonEvent event)
 	{
-		Stack<PointerInputElement> elements = new Stack<PointerInputElement>();
-		
-		pointer.concretePointer().getLastElementPathUnderPoint( elements, pointer.getLocalPos() );
+		Stack<PointerInputElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
+		Stack<PointerButtonEvent> events = Pointer.eventStack( event, elements );
 		
 		while ( !elements.isEmpty() )
 		{
-			PointerInputElement element = elements.pop();
+			PointerInputElement element = elements.peek();
+			PointerButtonEvent elementSpaceEvent = events.peek();
 			
 			if ( element.isPointerInputElementRealised() )
 			{
@@ -38,10 +40,11 @@ public class PointerPressAndHoldInteractor extends PointerInteractor
 					for (AbstractElementInteractor interactor: interactors )
 					{
 						PressAndHoldElementInteractor pressInt = (PressAndHoldElementInteractor)interactor;
-						boolean bHandled = pressInt.buttonPress( element, event );
+						boolean bHandled = pressInt.buttonPress( element, elementSpaceEvent );
 						if ( bHandled )
 						{
 							pressedElement = element;
+							pressedElementRootToLocalXform = Pointer.rootToLocalTransform( elements );
 							pressedInteractor = pressInt;
 							pressedButton = event.getButton();
 							return true;
@@ -49,6 +52,9 @@ public class PointerPressAndHoldInteractor extends PointerInteractor
 					}
 				}
 			}
+			
+			elements.pop();
+			events.pop();
 		}
 		
 		return false;
@@ -58,7 +64,11 @@ public class PointerPressAndHoldInteractor extends PointerInteractor
 	{
 		if ( pressedElement != null  &&  event.getButton() == pressedButton )
 		{
-			pressedInteractor.buttonRelease( pressedElement, event );
+			pressedInteractor.buttonRelease( pressedElement, (PointerButtonEvent)event.transformed( pressedElementRootToLocalXform ) );
+			pressedElement = null;
+			pressedElementRootToLocalXform = null;
+			pressedInteractor = null;
+			pressedButton = -1;
 			return true;
 		}
 		return false;

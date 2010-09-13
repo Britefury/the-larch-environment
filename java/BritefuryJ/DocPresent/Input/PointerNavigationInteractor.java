@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent.Input;
 
+import java.awt.geom.AffineTransform;
 import java.util.Stack;
 
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
@@ -22,6 +23,7 @@ import BritefuryJ.Math.Vector2;
 public class PointerNavigationInteractor extends AbstractPointerDragInteractor
 {
 	private int navigationButton = 0;
+	private AffineTransform navigationDragElementRootToLocalXform = null;
 	private Point2 navigationDragStartPos = new Point2();
 	private Point2 navigationDragCurrentPos = new Point2();
 	private boolean bNavigationDragInProgress = false;
@@ -135,15 +137,13 @@ public class PointerNavigationInteractor extends AbstractPointerDragInteractor
 	
 	private void handleNavigationGestureBegin(PointerInterface pointer, PointerButtonEvent event)
 	{
-		Stack<PointerButtonEvent> events = new Stack<PointerButtonEvent>();
-		Stack<PointerInputElement> elements = new Stack<PointerInputElement>();
-		
-		pointer.concretePointer().getLastElementPathUnderPoint( event, events, elements, pointer.getLocalPos() );
+		Stack<PointerInputElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
+		Stack<PointerButtonEvent> events = Pointer.eventStack( event, elements );
 		
 		while ( !elements.isEmpty() )
 		{
-			PointerInputElement element = elements.pop();
-			PointerButtonEvent elementSpaceEvent = events.pop();
+			PointerInputElement element = elements.peek();
+			PointerButtonEvent elementSpaceEvent = events.peek();
 			
 			Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( NavigationElementInteractor.class );
 			if ( interactors != null )
@@ -154,11 +154,15 @@ public class PointerNavigationInteractor extends AbstractPointerDragInteractor
 					if ( navInt.navigationGestureBegin( element, elementSpaceEvent ) )
 					{
 						navElement = element;
+						navigationDragElementRootToLocalXform = Pointer.rootToLocalTransform( elements );
 						navInteractor = navInt;
 						return;
 					}
 				}
 			}
+			
+			elements.pop();
+			events.pop();
 		}
 	}
 
@@ -166,7 +170,7 @@ public class PointerNavigationInteractor extends AbstractPointerDragInteractor
 	{
 		if ( navInteractor != null )
 		{
-			navInteractor.navigationGestureEnd( navElement, event );
+			navInteractor.navigationGestureEnd( navElement, (PointerButtonEvent)event.transformed( navigationDragElementRootToLocalXform ) );
 		}
 	}
 
@@ -174,19 +178,19 @@ public class PointerNavigationInteractor extends AbstractPointerDragInteractor
 	{
 		if ( navInteractor != null )
 		{
-			navInteractor.navigationGesture( navElement, event );
+			navInteractor.navigationGesture( navElement, (PointerNavigationEvent)event.transformed( navigationDragElementRootToLocalXform ) );
 		}
 	}
 
 	private static void handleNavigationGestureClick(PointerInterface pointer, PointerNavigationEvent event)
 	{
-		Stack<PointerInputElement> elements = new Stack<PointerInputElement>();
-		
-		pointer.concretePointer().getLastElementPathUnderPoint( elements, pointer.getLocalPos() );
+		Stack<PointerInputElement> elements = pointer.concretePointer().getLastElementPathUnderPoint( pointer.getLocalPos() );
+		Stack<PointerNavigationEvent> events = Pointer.eventStack( event, elements );
 		
 		while ( !elements.isEmpty() )
 		{
 			PointerInputElement element = elements.pop();
+			PointerNavigationEvent elementSpaceEvent = events.pop();
 			
 			Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( NavigationElementInteractor.class );
 			if ( interactors != null )
@@ -194,7 +198,7 @@ public class PointerNavigationInteractor extends AbstractPointerDragInteractor
 				for (AbstractElementInteractor interactor: interactors )
 				{
 					NavigationElementInteractor navInt = (NavigationElementInteractor)interactor;
-					navInt.navigationGesture( element, event );
+					navInt.navigationGesture( element, elementSpaceEvent );
 					return;
 				}
 			}
