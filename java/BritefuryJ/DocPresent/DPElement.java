@@ -38,6 +38,7 @@ import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
+import BritefuryJ.DocPresent.Interactor.CaretCrossingElementInteractor;
 import BritefuryJ.DocPresent.Interactor.ContextMenuElementInteractor;
 import BritefuryJ.DocPresent.Interactor.RealiseElementInteractor;
 import BritefuryJ.DocPresent.Layout.ElementAlignment;
@@ -239,7 +240,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	{
 		private ObjectDndHandler dndHandler;
 		
-		private ArrayList<ElementInteractor> interactors;
 		private ArrayList<AbstractElementInteractor> elementInteractors;
 		private ArrayList<ElementPainter> painters;
 		private ArrayList<TreeEventListener> treeEventListeners;
@@ -255,11 +255,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		{
 			InteractionFields f = new InteractionFields();
 			f.dndHandler = dndHandler;
-			if ( interactors != null )
-			{
-				f.interactors = new ArrayList<ElementInteractor>();
-				f.interactors.addAll( interactors );
-			}
 			if ( elementInteractors != null )
 			{
 				f.elementInteractors = new ArrayList<AbstractElementInteractor>();
@@ -276,28 +271,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 				f.treeEventListeners.addAll( treeEventListeners );
 			}
 			return f;
-		}
-		
-		
-		public void addInteractor(ElementInteractor interactor)
-		{
-			if ( interactors == null )
-			{
-				interactors = new ArrayList<ElementInteractor>();
-			}
-			interactors.add( interactor );
-		}
-		
-		public void removeInteractor(ElementInteractor interactor)
-		{
-			if ( interactors != null )
-			{
-				interactors.remove( interactor );
-				if ( interactors.isEmpty() )
-				{
-					interactors = null;
-				}
-			}
 		}
 		
 		
@@ -374,7 +347,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		
 		public boolean isIdentity()
 		{
-			return dndHandler == null  &&  treeEventListeners == null  &&  interactors == null  &&  elementInteractors == null  &&  painters == null;
+			return dndHandler == null  &&  treeEventListeners == null  &&  elementInteractors == null  &&  painters == null;
 		}
 	}
 
@@ -1885,12 +1858,13 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	protected void handleCaretEnter(Caret c)
 	{
 		onCaretEnter( c );
-		List<ElementInteractor> interactors = getInteractors();
+		Iterable<AbstractElementInteractor> interactors = getElementInteractors( CaretCrossingElementInteractor.class );
 		if ( interactors != null )
 		{
-			for (ElementInteractor interactor: interactors)
+			for (AbstractElementInteractor interactor: interactors )
 			{
-				interactor.onCaretEnter( this, c );
+				CaretCrossingElementInteractor caretCrossInt = (CaretCrossingElementInteractor)interactor;
+				caretCrossInt.caretEnter( this, c );
 			}
 		}
 	}
@@ -1898,12 +1872,13 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	protected void handleCaretLeave(Caret c)
 	{
 		onCaretLeave( c );
-		List<ElementInteractor> interactors = getInteractors();
+		Iterable<AbstractElementInteractor> interactors = getElementInteractors( CaretCrossingElementInteractor.class );
 		if ( interactors != null )
 		{
-			for (ElementInteractor interactor: interactors)
+			for (AbstractElementInteractor interactor: interactors )
 			{
-				interactor.onCaretLeave( this, c );
+				CaretCrossingElementInteractor caretCrossInt = (CaretCrossingElementInteractor)interactor;
+				caretCrossInt.caretLeave( this, c );
 			}
 		}
 	}
@@ -2046,36 +2021,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	public DndHandler getDndHandler()
 	{
 		return interactionFields != null  ?  interactionFields.dndHandler  :  null;
-	}
-	
-	
-	
-	
-	//
-	//
-	// INTERACTOR METHODS
-	//
-	//
-	
-	public void addInteractor(ElementInteractor interactor)
-	{
-		ensureValidInteractionFields();
-		interactionFields.addInteractor( interactor );
-		notifyInteractionFieldsModified();
-	}
-	
-	public void removeInteractor(ElementInteractor interactor)
-	{
-		if ( interactionFields != null )
-		{
-			interactionFields.removeInteractor( interactor );
-			notifyInteractionFieldsModified();
-		}
-	}
-	
-	public ArrayList<ElementInteractor> getInteractors()
-	{
-		return interactionFields != null  ?  interactionFields.interactors  :  null;
 	}
 	
 	
