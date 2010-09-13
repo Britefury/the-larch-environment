@@ -8,6 +8,7 @@
 from java.awt.event import KeyEvent
 
 from BritefuryJ.DocPresent import *
+from BritefuryJ.DocPresent.Interactor import *
 
 
 from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
@@ -123,16 +124,16 @@ def withParagraphStreamValueFn(pres, prefix):
 
 
 
-class TextNodeInteractor (ElementInteractor):
+class TextNodeInteractor (KeyElementInteractor):
 	def __init__(self):
 		pass
 		
 		
-	def onKeyTyped(self, element, event):
+	def keyTyped(self, element, event):
 		return False
 		
 		
-	def onKeyPress(self, element, event):
+	def keyPressed(self, element, event):
 		if event.getModifiers() & KeyEvent.ALT_MASK  !=  0:
 			ctx = element.getFragmentContext()
 			node = ctx.getModel()
@@ -165,7 +166,7 @@ class TextNodeInteractor (ElementInteractor):
 	
 	
 	
-	def onKeyRelease(self, element, event):
+	def keyReleased(self, element, event):
 		return False
 
 

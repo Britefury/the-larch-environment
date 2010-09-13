@@ -7,7 +7,7 @@
 ##-*************************
 from java.awt.event import KeyEvent
 
-from BritefuryJ.DocPresent import *
+from BritefuryJ.DocPresent.Interactor import KeyElementInteractor
 
 
 from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
@@ -33,16 +33,24 @@ WorksheetNodeEventListener.instance = WorksheetNodeEventListener()
 
 
 
-class WorksheetNodeInteractor (ElementInteractor):
+class WorksheetNodeInteractor (KeyElementInteractor):
 	def __init__(self):
 		pass
 		
 		
-	def onKeyPress(self, element, event):
+	def keyPressed(self, element, event):
 		if event.getKeyCode() == KeyEvent.VK_F5:
 			ctx = element.getFragmentContext()
 			node = ctx.getModel()
 			node.refreshResults()
 			return True
+		else:
+			return False
+		
+	def keyReleased(self, element, event):
+		return False
+		
+	def keyTyped(self, element, event):
+		return False
 		
 WorksheetNodeInteractor.instance = WorksheetNodeInteractor()		

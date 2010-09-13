@@ -52,6 +52,7 @@ import BritefuryJ.DocPresent.Input.Modifier;
 import BritefuryJ.DocPresent.Input.Pointer;
 import BritefuryJ.DocPresent.Input.DndController;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
+import BritefuryJ.DocPresent.Input.Keyboard.Keyboard;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeRootElement;
@@ -382,6 +383,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		private Vector2 windowSize;
 		
 		private Pointer rootSpaceMouse;
+		private Keyboard keyboard;
 		private InputTable inputTable;
 		
 		private Runnable immediateEventDispatcher;
@@ -442,6 +444,8 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			selection.addSelectionListener( this );
 			selectionManager = new SelectionManager( selection );
 			
+			keyboard = new Keyboard( caret, selectionManager );
+
 			bStructureRefreshQueued = false;
 		}
 		
@@ -1111,83 +1115,19 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		protected boolean keyPressEvent(KeyEvent event, int keyModifiers)
 		{
 			rootSpaceMouse.setKeyModifiers( keyModifiers );
-			
-			if ( handleNavigationKeyPress( event ) )
-			{
-				emitImmediateEvents();
-				return true;
-			}
-			else
-			{
-				if ( isModifierKey( event ) )
-				{
-					return false;
-				}
-				else
-				{
-					if ( caret.isValid() )
-					{
-						DPContentLeafEditable leaf = caret.getElement();
-						if ( leaf.onKeyPress( event ) )
-						{
-							return true;
-						}
-						
-						if ( leaf.isEditable() )
-						{
-							leaf.onContentKeyPress( caret, event );
-						}
-						emitImmediateEvents();
-						return true;
-					}
-					else
-					{
-						emitImmediateEvents();
-						return false;
-					}
-				}
-			}
+
+			boolean bHandled = keyboard.keyPressed( event );
+			emitImmediateEvents();
+			return bHandled;
 		}
 		
 		protected boolean keyReleaseEvent(KeyEvent event, int keyModifiers)
 		{
 			rootSpaceMouse.setKeyModifiers( keyModifiers );
-			
-			if ( isNavigationKey( event ) )
-			{
-				emitImmediateEvents();
-				return true;
-			}
-			else
-			{
-				if ( isModifierKey( event ) )
-				{
-					return false;
-				}
-				else
-				{
-					if ( caret.isValid() )
-					{
-						DPContentLeafEditable leaf = caret.getElement();
-						if ( leaf.onKeyRelease( event ) )
-						{
-							return true;
-						}
-						
-						if ( leaf.isEditable() )
-						{
-							leaf.onContentKeyRelease( caret, event );
-						}
-						emitImmediateEvents();
-						return true;
-					}
-					else
-					{
-						emitImmediateEvents();
-						return false;
-					}
-				}
-			}
+
+			boolean bHandled = keyboard.keyReleased( event );
+			emitImmediateEvents();
+			return bHandled;
 		}
 		
 		
@@ -1195,120 +1135,14 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		protected boolean keyTypedEvent(KeyEvent event, int keyModifiers)
 		{
 			rootSpaceMouse.setKeyModifiers( keyModifiers );
-			int modifiers = rootSpaceMouse.getModifiers();
-			
-			boolean bCtrl = ( modifiers & Modifier.KEYS_MASK )  ==  Modifier.CTRL;
-			boolean bAlt = ( modifiers & Modifier.KEYS_MASK )  ==  Modifier.ALT;
 
-			if ( isNavigationKey( event ) )
-			{
-				emitImmediateEvents();
-				return true;
-			}
-			else
-			{
-				if ( isModifierKey( event ) )
-				{
-					return false;
-				}
-				else
-				{
-					if ( caret.isValid()  &&  !bCtrl  &&  !bAlt )
-					{
-						DPContentLeafEditable leaf = caret.getElement();
-						if ( leaf.onKeyTyped( event ) )
-						{
-							return true;
-						}
-						
-						if ( leaf.isEditable() )
-						{
-							leaf.onContentKeyTyped( caret, event );
-						}
-						emitImmediateEvents();
-						return true;
-					}
-					else
-					{
-						emitImmediateEvents();
-						return false;
-					}
-				}
-			}
+			boolean bHandled = keyboard.keyTyped( event );
+			emitImmediateEvents();
+			return bHandled;
 		}
 		
 		
 		
-		
-		protected boolean isNavigationKey(KeyEvent event)
-		{
-			int modifiers = rootSpaceMouse.getModifiers();
-			int keyMods = modifiers & Modifier.KEYS_MASK;
-			if  ( keyMods == Modifier.SHIFT  ||  keyMods == 0 )
-			{
-				int keyCode = event.getKeyCode();
-				return keyCode == KeyEvent.VK_LEFT  ||  keyCode == KeyEvent.VK_RIGHT  ||  keyCode == KeyEvent.VK_UP  ||  keyCode == KeyEvent.VK_DOWN  ||
-					keyCode == KeyEvent.VK_HOME  ||  keyCode == KeyEvent.VK_END;
-			}
-			else
-			{
-				return false;
-			}
-		}
-		
-		protected boolean isModifierKey(KeyEvent event)
-		{
-			int keyCode = event.getKeyCode();
-			return keyCode == KeyEvent.VK_CONTROL  ||  keyCode == KeyEvent.VK_SHIFT  ||  keyCode == KeyEvent.VK_ALT  ||  keyCode == KeyEvent.VK_ALT_GRAPH;
-		}
-		
-		protected boolean handleNavigationKeyPress(KeyEvent event)
-		{
-			int modifiers = rootSpaceMouse.getModifiers();
-			if ( isNavigationKey( event ) )
-			{
-				if ( caret.isValid() )
-				{
-					Marker prevPos = caret.getMarker().copy();
-					if ( event.getKeyCode() == KeyEvent.VK_LEFT )
-					{
-						caret.moveLeft();
-					}
-					else if ( event.getKeyCode() == KeyEvent.VK_RIGHT )
-					{
-						caret.moveRight();
-					}
-					else if ( event.getKeyCode() == KeyEvent.VK_UP )
-					{
-						caret.moveUp();
-					}
-					else if ( event.getKeyCode() == KeyEvent.VK_DOWN )
-					{
-						caret.moveDown();
-					}
-					else if ( event.getKeyCode() == KeyEvent.VK_HOME )
-					{
-						caret.moveToHome();
-					}
-					else if ( event.getKeyCode() == KeyEvent.VK_END )
-					{
-						caret.moveToEnd();
-					}
-					
-					if ( !caret.getMarker().equals( prevPos ) )
-					{
-						selectionManager.onCaretMove( caret, prevPos, ( modifiers & Modifier.SHIFT ) != 0 );
-					}
-					
-					caret.ensureVisible();
-				}
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
 		
 
 		protected void realiseEvent()

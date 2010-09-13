@@ -149,7 +149,7 @@ class TemplateEditor (GSymViewObjectDispatch):
 		p = withParagraphStreamValueFn( p, node.partialModel() )
 		w = Span( [ p ] )
 		w = w.withTreeEventListener( TextNodeEventListener.instance )
-		w = w.withInteractor( TextNodeInteractor.instance )
+		w = w.withElementInteractor( TextNodeInteractor.instance )
 		w = w.withFixedValue( node.getModel() )
 		return w
 

@@ -142,7 +142,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 		
 		w = Page( [ linkHeader, bodyView ] )
 		w = w.withTreeEventListener( WorksheetNodeEventListener.instance )
-		w = w.withInteractor( WorksheetNodeInteractor.instance )
+		w = w.withElementInteractor( WorksheetNodeInteractor.instance )
 		w = w.withContextMenuInteractor( _worksheetContextMenuFactory )
 		return w
 	
@@ -182,7 +182,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 		p = withParagraphStreamValueFn( p, node.partialModel() )
 		w = Span( [ p ] )
 		w = w.withTreeEventListener( TextNodeEventListener.instance )
-		w = w.withInteractor( TextNodeInteractor.instance )
+		w = w.withElementInteractor( TextNodeInteractor.instance )
 		w = w.withFixedValue( node.getModel() )
 		return w
 
