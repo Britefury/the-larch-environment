@@ -33,6 +33,23 @@ public abstract class AbstractBorder implements Presentable
 	}
 	
 	
+	private static StyleSheet style = null;
+	
+	public Pres surround(Object x)
+	{
+		if ( style == null )
+		{
+			style = StyleSheet.instance.withAttr( Primitive.border, this );
+		}
+		return style.applyTo( new Border( x ) );
+	}
+	
+	public Pres __call__(Object x)
+	{
+		return surround( x );
+	}
+	
+	
 	
 	protected Pres presentationSwatch()
 	{

@@ -62,6 +62,17 @@ public class Controls
 			new FilledOutlinePainter( new Color( 0.7f, 0.85f, 0.7f ), new Color( 0.0f, 0.25f, 0.0f ), new BasicStroke( 1.0f ) ) );
 
 	
+	public static final InheritedAttributeNonNull expanderHeaderBorder = new InheritedAttributeNonNull( controlsNamespace, "expanderHeaderBorder", AbstractBorder.class,
+			new SolidBorder( 1.0, 3.0, 5.0, 5.0, Color.BLACK, new Color( 0.9f, 0.95f, 0.9f ) ) );
+	public static final InheritedAttributeNonNull expanderHeaderHoverBorder = new InheritedAttributeNonNull( controlsNamespace, "expanderHeaderHoverBorder", AbstractBorder.class,
+			new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.0f, 0.3f, 0.0f ), new Color( 0.95f, 1.0f, 0.95f ) ) );
+	public static final InheritedAttributeNonNull expanderHeaderContentsSpacing = new InheritedAttributeNonNull( controlsNamespace, "expanderHeaderContentsSpacing", Double.class, 5.0 );
+	public static final InheritedAttributeNonNull expanderHeaderArrowSize = new InheritedAttributeNonNull( controlsNamespace, "expanderHeaderArrowSize", Double.class, 16.0 );
+	public static final InheritedAttributeNonNull expanderHeaderArrowPainter = new InheritedAttributeNonNull( controlsNamespace, "expanderHeaderArrowPainter", Painter.class,
+			new FilledOutlinePainter( new Color( 0.7f, 0.85f, 0.7f ), new Color( 0.0f, 0.25f, 0.0f ), new BasicStroke( 1.0f ) ) );
+	public static final InheritedAttributeNonNull expanderPadding = new InheritedAttributeNonNull( controlsNamespace, "expanderPadding", Double.class, 5.0 );
+
+	
 	public static final InheritedAttributeNonNull textEntryBorder = new InheritedAttributeNonNull( controlsNamespace, "textEntryBorder", AbstractBorder.class,
 			new SolidBorder( 1.0, 3.0, 5.0, 5.0, new Color( 0.0f, 0.3f, 0.0f ), new Color( 0.9f, 0.95f, 0.9f ) ) );
 	public static final InheritedAttributeNonNull textEntryInvalidBorder = new InheritedAttributeNonNull( controlsNamespace, "textEntryInvalidBorder", AbstractBorder.class,
@@ -152,6 +163,14 @@ public class Controls
 	public static StyleValues useOptionMenuAttrs(StyleValues style)
 	{
 		return style.useAttr( optionMenuBorder ).useAttr( optionMenuHoverBorder ).useAttr( optionMenuContentsSpacing ).useAttr( optionMenuArrowSize ).useAttr( optionMenuArrowPainter );
+	}
+	
+	
+	
+	public static StyleValues useExpanderAttrs(StyleValues style)
+	{
+		return style.useAttr( expanderHeaderBorder ).useAttr( expanderHeaderHoverBorder ).useAttr( expanderHeaderContentsSpacing ).useAttr( expanderHeaderArrowSize ).useAttr( expanderHeaderArrowPainter )
+			.useAttr( expanderPadding );
 	}
 	
 	

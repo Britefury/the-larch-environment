@@ -55,13 +55,8 @@ public class OptionMenu extends ControlPres
 			@Override
 			public boolean buttonClicked(PointerInputElement element, PointerButtonClickedEvent event)
 			{
-				if ( element.isPointerInputElementRealised() )
-				{
-					displayDropdown();
-					return true;
-				}
-				
-				return false;
+				displayDropdown();
+				return true;
 			}
 			
 			
