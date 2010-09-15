@@ -8,12 +8,10 @@ package BritefuryJ.Controls;
 
 import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Arrow;
 import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
-import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Row;
@@ -166,17 +164,15 @@ public class Expander extends ControlPres
 		StyleSheet arrowStyle = StyleSheet.instance.withAttr( Primitive.shapePainter, style.get( Controls.expanderHeaderArrowPainter, Painter.class ) );
 		double arrowSize = style.get( Controls.expanderHeaderArrowSize, Double.class );
 		double padding = style.get( Controls.expanderPadding, Double.class );
-		Pres expandedArrow = arrowStyle.applyTo( new Arrow( Arrow.Direction.RIGHT, arrowSize ) );
-		Pres contractedArrow = arrowStyle.applyTo( new Arrow( Arrow.Direction.DOWN, arrowSize ) );
+		Pres expandedArrow = arrowStyle.applyTo( new Arrow( Arrow.Direction.DOWN, arrowSize ) );
+		Pres contractedArrow = arrowStyle.applyTo( new Arrow( Arrow.Direction.RIGHT, arrowSize ) );
 		
 		ExpanderInteractor headerInteractor = new ExpanderInteractor();
 		
-		AbstractBorder border = style.get( Controls.expanderHeaderBorder, AbstractBorder.class );
-		//AbstractBorder hoverBorder = style.get( Controls.expanderHeaderHoverBorder, AbstractBorder.class );
-		StyleSheet headerStyle = StyleSheet.instance.withAttr( Primitive.rowSpacing, style.get( Controls.expanderHeaderContentsSpacing, Double.class ) ).withAttr( Primitive.border, border );
+		StyleSheet headerStyle = StyleSheet.instance.withAttr( Primitive.rowSpacing, style.get( Controls.expanderHeaderContentsSpacing, Double.class ) );
 		
-		Pres expandedHeader = headerStyle.applyTo( new Border( new Row( new Pres[] { expandedArrow.alignVCentre(), header.alignHExpand() } ) ) ).withElementInteractor( headerInteractor );
-		Pres contractedHeader = headerStyle.applyTo( new Border( new Row( new Pres[] { contractedArrow.alignVCentre(), header.alignHExpand() } ) ) ).withElementInteractor( headerInteractor );
+		Pres expandedHeader = headerStyle.applyTo( new Row( new Pres[] { expandedArrow.alignVCentre(), header.alignHExpand() } ) ).withElementInteractor( headerInteractor );
+		Pres contractedHeader = headerStyle.applyTo( new Row( new Pres[] { contractedArrow.alignVCentre(), header.alignHExpand() } ) ).withElementInteractor( headerInteractor );
 		
 		
 		Pres expanded = new Column( new Pres[] { expandedHeader, contents.padX( padding ) } );
