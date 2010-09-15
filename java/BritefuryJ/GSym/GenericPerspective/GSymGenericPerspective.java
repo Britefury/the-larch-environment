@@ -6,6 +6,9 @@
 //##************************
 package BritefuryJ.GSym.GenericPerspective;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+
 import org.python.core.PyObject;
 import org.python.core.PyType;
 
@@ -20,6 +23,7 @@ import BritefuryJ.GSym.ObjectPresentation.GSymObjectPresentationPerspective;
 import BritefuryJ.GSym.ObjectPresentation.ObjectPresentationLocationResolver;
 import BritefuryJ.GSym.ObjectPresentation.ObjectPresenter;
 import BritefuryJ.GSym.ObjectPresentation.PyObjectPresenter;
+import BritefuryJ.GSym.PresCom.InnerFragment;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
 public class GSymGenericPerspective extends GSymObjectPresentationPerspective
@@ -43,6 +47,17 @@ public class GSymGenericPerspective extends GSymObjectPresentationPerspective
 		{
 			return null;
 		}
+	}
+	
+	protected Pres presentJavaArray(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	{
+		int length = Array.getLength( x );
+		Object members[] = new Object[length];
+		for (int i = 0; i < length; i++)
+		{
+			members[i] = new InnerFragment( Array.get( x, i ) );
+		}
+		return GSymGenericObjectPresenterRegistry.arrayView( Arrays.asList( members ) );
 	}
 	
 	protected Pres presentJavaObjectFallback(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)

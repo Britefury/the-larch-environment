@@ -11,6 +11,7 @@ import java.awt.Shape;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,8 @@ import org.python.core.PyType;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Box;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
+import BritefuryJ.DocPresent.Combinators.Primitive.LineBreak;
 import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.ParagraphDedentMarker;
@@ -83,6 +86,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		registerJavaObjectPresenter( Shape.class,  presenter_Shape );
 		registerJavaObjectPresenter( Color.class,  presenter_Color );
 		registerJavaObjectPresenter( Class.class,  presenter_Class );
+		registerJavaObjectPresenter( Method.class,  presenter_Method );
 	}
 
 	
@@ -504,6 +508,19 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 			return colourObjectBoxStyle.applyTo( new ObjectBorder( contents ) );
 		}
 	};
+	
+	private static Pres presentClassName(Class<?> c, StyleSheet classNameStyle)
+	{
+		if ( c.isArray() )
+		{
+			c = c.getComponentType();
+			return new Span( new Pres[] { classNameStyle.applyTo( new Label( c.getName() ) ), typePunctuationStyle.applyTo( new Label( "[]" ) ) } );
+		}
+		else
+		{
+			return classNameStyle.applyTo( new Label( c.getName() ) );
+		}
+	}
 
 	public static final ObjectPresenter presenter_Class = new ObjectPresenter()
 	{
@@ -516,7 +533,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 			ArrayList<Object> lines = new ArrayList<Object>();
 			
 			Pres title = classKeywordStyle.applyTo( new StaticText( "Class " ) );
-			Pres name = classNameStyle.applyTo( new StaticText( cls.getName() ) );
+			Pres name = presentClassName( cls, classNameStyle );
 			lines.add( new Row( new Pres[] { title, name } ) );
 			
 			if ( superClass != null  ||  interfaces.length > 0 )
@@ -525,7 +542,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 				if ( superClass != null )
 				{
 					inheritance.add( classKeywordStyle.applyTo( new StaticText( "Extends " ) ) );
-					inheritance.add( classNameStyle.applyTo( new StaticText( superClass.getName() ) ) );
+					inheritance.add( presentClassName( superClass, classNameStyle ) );
 				}
 				
 				if ( interfaces.length > 0 )
@@ -542,7 +559,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 						{
 							inheritance.add( classPunctuationStyle.applyTo( new StaticText( ", " ) ) );
 						}
-						inheritance.add( classNameStyle.applyTo( new StaticText( iface.getName() ) ) );
+						inheritance.add( presentClassName( iface, classNameStyle ) );
 						bFirst = false;
 					}
 				}
@@ -552,6 +569,47 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 			}
 			
 			return new ObjectBoxWithFields( "Java Class", lines );
+		}
+	};
+	
+	private static Pres presentMethodDeclaration(Method method)
+	{
+		ArrayList<Object> words = new ArrayList<Object>();
+		
+		// return type
+		words.add( presentClassName( method.getReturnType(), typeNameStyle ) );
+		words.add( new Label( " " ) );
+		words.add( new LineBreak() );
+		// name
+		words.add( methodNameStyle.applyTo( new Label( method.getName() ) ) );
+		// open paren
+		words.add( delimStyle.applyTo( new Label( "(" ) ) );
+		words.add( new ParagraphIndentMarker() );
+		boolean bFirst = true;
+		for (Class<?> paramClass: method.getParameterTypes())
+		{
+			if ( !bFirst )
+			{
+				words.add( fnPunctuationStyle.applyTo( new Label( "," ) ) );
+				words.add( new Label( " " ) );
+				words.add( new LineBreak() );
+			}
+			words.add( presentClassName( paramClass, typeNameStyle ) );
+			bFirst = false;
+		}
+		// close paren
+		words.add( delimStyle.applyTo( new Label( ")" ) ) );
+		words.add( new ParagraphDedentMarker() );
+		
+		return new Paragraph( words );
+	}
+
+	public static final ObjectPresenter presenter_Method = new ObjectPresenter()
+	{
+		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		{
+			Method method = (Method)x;
+			return new ObjectBox( "Java Method", presentMethodDeclaration( method ) );
 		}
 	};
 
@@ -579,7 +637,13 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	private static final StyleSheet classKeywordStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSmallCaps, true );
 	private static final StyleSheet classPunctuationStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
+	
 	private static final StyleSheet classNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.25f, 0.5f ) );
+
+	private static final StyleSheet typeNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.4f ) );
+	private static final StyleSheet typePunctuationStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
+
+	private static final StyleSheet methodNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.35f ) );
 
 	private static final StyleSheet fnPunctuationStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
 	private static final StyleSheet fnNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.25f, 0.5f ) );
@@ -599,17 +663,22 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	private static final Pres closeBrace = delimStyle.applyTo( new StaticText( "}" ) );
 	
 
-	private static Pres listView(ArrayList<Object> children)
+	protected static Pres arrayView(List<Object> children)
 	{
 		return new SpanSequenceView( children, openBracket, closeBracket, comma, space, TrailingSeparator.NEVER );
 	}
 	
-	private static Pres tupleView(ArrayList<Object> children)
+	private static Pres listView(List<Object> children)
+	{
+		return new SpanSequenceView( children, openBracket, closeBracket, comma, space, TrailingSeparator.NEVER );
+	}
+	
+	private static Pres tupleView(List<Object> children)
 	{
 		return new SpanSequenceView( children, openParen, closeParen, comma, space, TrailingSeparator.ONE_ELEMENT );
 	}
 	
-	private static Pres mapView(ArrayList<Object> children)
+	private static Pres mapView(List<Object> children)
 	{
 		return new SpanSequenceView( children, openBrace, closeBrace, comma, mapSpace, TrailingSeparator.NEVER );
 	}
