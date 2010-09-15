@@ -11,8 +11,11 @@ import java.awt.Shape;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -24,10 +27,12 @@ import org.python.core.PyList;
 import org.python.core.PyNone;
 import org.python.core.PyObject;
 import org.python.core.PyString;
+import org.python.core.PyStringMap;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.Controls.Expander;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Box;
 import BritefuryJ.DocPresent.Combinators.Primitive.Label;
@@ -188,147 +193,180 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		{
 			PyType type = (PyType)x;
 			
-			ArrayList<Object> lines = new ArrayList<Object>();
 			
-			ArrayList<Object> header = new ArrayList<Object>();
-			header.add( classKeywordStyle.applyTo( new StaticText( "Class " ) ) );
-			header.add( classNameStyle.applyTo( new StaticText( type.getName() ) ) );
+			// Header
+			ArrayList<Object> headerItems = new ArrayList<Object>();
+			headerItems.add( pythonKeywordStyle.applyTo( new StaticText( "Class " ) ) );
+			headerItems.add( classNameStyle.applyTo( new StaticText( type.getName() ) ) );
 			
 			PyTuple bases = (PyTuple)type.getBases();
 			
 			if ( bases.size() > 0 )
 			{
-				header.add( staticStyle.applyTo( new StaticText( " " ) ) );
-				header.add( classPunctuationStyle.applyTo( new StaticText( "(" ) ) );
-				header.add( staticStyle.applyTo( new ParagraphIndentMarker() ) );
-				boolean bFirst = true;
+				headerItems.add( staticStyle.applyTo( new StaticText( " " ) ) );
+				headerItems.add( classPunctuationStyle.applyTo( new StaticText( "(" ) ) );
+				headerItems.add( new ParagraphIndentMarker() );
+				Object baseNames[] = new Object[bases.getArray().length];
+				int index = 0;
 				for (PyObject base: bases.getArray())
 				{
 					PyType baseType = (PyType)base;
-					if ( !bFirst )
-					{
-						header.add( classPunctuationStyle.applyTo( new StaticText( ", " ) ) );
-					}
-					header.add( classNameStyle.applyTo( new StaticText( baseType.getName() ) ) );
-					bFirst = false;
+					baseNames[index++] = classNameStyle.applyTo( new StaticText( baseType.getName() ) );
 				}
-				header.add( staticStyle.applyTo( new ParagraphDedentMarker() ) );
-				header.add( classPunctuationStyle.applyTo( new StaticText( ")" ) ) );
+				headerItems.add( commaSeparatedListView( Arrays.asList( baseNames ) ) );
+				headerItems.add( new ParagraphDedentMarker() );
+				headerItems.add( classPunctuationStyle.applyTo( new StaticText( ")" ) ) );
 			}
 			
-			lines.add( new Paragraph( header ) );
+			Pres header = new Paragraph( headerItems );
 			
-			return new ObjectBoxWithFields( "Python Class", lines );
+			
+			// Attributes
+			PyObject dict = type.fastGetDict();
+			PyList dictItems;
+			if ( dict instanceof PyDictionary )
+			{
+				dictItems = ((PyDictionary)dict).items();
+			}
+			else if ( dict instanceof PyStringMap )
+			{
+				dictItems = ((PyStringMap)dict).items();
+			}
+			else
+			{
+				throw new RuntimeException( "Expected a PyDictionary or a PyStringMap when acquiring __dict__ from a PyType" );
+			}
+			
+			
+			ArrayList<Object> attrElements = new ArrayList<Object>();
+			for (Object dictItem: dictItems)
+			{
+				PyTuple pair = (PyTuple)dictItem;
+				PyObject key = pair.getArray()[0];
+				PyObject value = pair.getArray()[1];
+				Pres name = attributeNameStyle.applyTo( new Label( key.toString() ) );
+				Pres valueView = new InnerFragment( value ).padX( 15.0, 0.0 );
+				attrElements.add( name );
+				attrElements.add( valueView );
+			}
+			
+			Pres attributesHeader = sectionHeadingStyle.applyTo( new Label( "Attributes" ) );
+			
+			Pres attributes = new Expander( attributesHeader, new Column( attrElements ) );
+			
+			
+			return new ObjectBox( "Python Class", new Column( new Pres[] { header, attributes } ) );
 		}
 	};
 
 	private static PyFunction pyFunction_inspectFn = null;
+	private static PyFunction getPythonInspectFunction()
+	{
+		if ( pyFunction_inspectFn == null )
+		{
+			String code = "import inspect\n" +
+			"\n" +
+			"def _flatten(xs):\n" +
+			"	ys = []\n" +
+			"	for x in xs:\n" +
+			"		if isinstance( x, list ):\n" +
+			"			ys.extend( _flatten( x ) )\n" +
+			"		else:\n" +
+			"			ys.append( x )\n" +
+			"	return ys\n" +
+			"\n" +
+			"def inspectFunction(f):\n" +
+			"	args, varargs, varkw, defaults = inspect.getargspec( f )\n" +
+			"	args = _flatten( args )\n" +
+			"	kwargs = []\n" + 
+			"	if defaults is not None:\n" +
+			"		kwargs = args[-len(defaults):]\n" +
+			"		del args[-len(defaults):]\n" +
+			"	return args, kwargs, varargs, varkw\n";
+			
+			PyDictionary locals = new PyDictionary();
+			
+			Py.exec( new PyString( code ), locals, locals );
+			
+			pyFunction_inspectFn = (PyFunction)locals.get( new PyString( "inspectFunction" ) );
+		}
+		
+		return pyFunction_inspectFn;
+	}
+	
+	private static PyTuple inspectPyFunction(PyFunction fun)
+	{
+		return (PyTuple)getPythonInspectFunction().__call__( fun );
+	}
+	
+	
+	private static Pres presentPyFunctionHeader(PyFunction fun)
+	{
+		PyTuple argSpec = inspectPyFunction( fun );
+		PyObject args = argSpec.getArray()[0];
+		PyObject kwargs = argSpec.getArray()[1];
+		PyObject varargs = argSpec.getArray()[2];
+		PyObject varkw = argSpec.getArray()[3];
+		
+		
+		ArrayList<Object> header = new ArrayList<Object>();
+		header.add( fnNameStyle.applyTo( new StaticText( fun.__name__.toString() ) ) );
+		header.add( fnPunctuationStyle.applyTo( new StaticText( "(" ) ) );
+		boolean bFirst = true;
+		for (PyObject arg: ((PyList)args).getArray())
+		{
+			if ( !bFirst )
+			{
+				header.add( fnPunctuationStyle.applyTo( new StaticText( ", " ) ) );
+			}
+			header.add( fnArgStyle.applyTo( new StaticText( arg.toString() ) ) );
+			bFirst = false;
+		}
+		for (PyObject arg: ((PyList)kwargs).getArray())
+		{
+			if ( !bFirst )
+			{
+				header.add( fnPunctuationStyle.applyTo( new StaticText( ", " ) ) );
+			}
+			header.add( fnKWArgStyle.applyTo( new StaticText( arg.toString() ) ) );
+			bFirst = false;
+		}
+		if ( varargs != Py.None )
+		{
+			if ( !bFirst )
+			{
+				header.add( fnPunctuationStyle.applyTo( new StaticText( ", " ) ) );
+			}
+			header.add( fnPunctuationStyle.applyTo( new StaticText( "*" ) ) );
+			header.add( fnVarArgStyle.applyTo( new StaticText( varargs.toString() ) ) );
+			bFirst = false;
+		}
+		if ( varkw != Py.None )
+		{
+			if ( !bFirst )
+			{
+				header.add( fnPunctuationStyle.applyTo( new StaticText( ", " ) ) );
+			}
+			header.add( fnPunctuationStyle.applyTo( new StaticText( "**" ) ) );
+			header.add( fnVarArgStyle.applyTo( new StaticText( varkw.toString() ) ) );
+			bFirst = false;
+		}
+		header.add( fnPunctuationStyle.applyTo( new StaticText( ")" ) ) );
+		
+		return new Paragraph( header );
+	}
+
+	
+	
 	public static final PyObjectPresenter presenter_PyFunction = new PyObjectPresenter()
 	{
-		
-		private PyFunction getInspectFunction()
-		{
-			if ( pyFunction_inspectFn == null )
-			{
-				String code = "import inspect\n" +
-				"\n" +
-				"def _flatten(xs):\n" +
-				"	ys = []\n" +
-				"	for x in xs:\n" +
-				"		if isinstance( x, list ):\n" +
-				"			ys.extend( _flatten( x ) )\n" +
-				"		else:\n" +
-				"			ys.append( x )\n" +
-				"	return ys\n" +
-				"\n" +
-				"def inspectFunction(f):\n" +
-				"	args, varargs, varkw, defaults = inspect.getargspec( f )\n" +
-				"	args = _flatten( args )\n" +
-				"	kwargs = []\n" + 
-				"	if defaults is not None:\n" +
-				"		kwargs = args[-len(defaults):]\n" +
-				"		del args[-len(defaults):]\n" +
-				"	return args, kwargs, varargs, varkw\n";
-				
-				PyDictionary locals = new PyDictionary();
-				
-				Py.exec( new PyString( code ), locals, locals );
-				
-				pyFunction_inspectFn = (PyFunction)locals.get( new PyString( "inspectFunction" ) );
-			}
-			
-			return pyFunction_inspectFn;
-		}
-		
-		private PyTuple inspectFunction(PyFunction fun)
-		{
-			return (PyTuple)getInspectFunction().__call__( fun );
-		}
-		
-		
-		
-		
-		
 		public Pres presentObject(PyObject x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			PyFunction fun = (PyFunction)x;
 			
-			PyTuple argSpec = inspectFunction( fun );
-			PyObject args = argSpec.getArray()[0];
-			PyObject kwargs = argSpec.getArray()[1];
-			PyObject varargs = argSpec.getArray()[2];
-			PyObject varkw = argSpec.getArray()[3];
+			Pres header = presentPyFunctionHeader( fun );
 			
-			
-			ArrayList<Object> lines = new ArrayList<Object>();
-			
-			ArrayList<Object> header = new ArrayList<Object>();
-			header.add( fnNameStyle.applyTo( new StaticText( fun.__name__.toString() ) ) );
-			header.add( fnPunctuationStyle.applyTo( new StaticText( "(" ) ) );
-			boolean bFirst = true;
-			for (PyObject arg: ((PyList)args).getArray())
-			{
-				if ( !bFirst )
-				{
-					header.add( fnPunctuationStyle.applyTo( new StaticText( ", " ) ) );
-				}
-				header.add( fnArgStyle.applyTo( new StaticText( arg.toString() ) ) );
-				bFirst = false;
-			}
-			for (PyObject arg: ((PyList)kwargs).getArray())
-			{
-				if ( !bFirst )
-				{
-					header.add( fnPunctuationStyle.applyTo( new StaticText( ", " ) ) );
-				}
-				header.add( fnKWArgStyle.applyTo( new StaticText( arg.toString() ) ) );
-				bFirst = false;
-			}
-			if ( varargs != Py.None )
-			{
-				if ( !bFirst )
-				{
-					header.add( fnPunctuationStyle.applyTo( new StaticText( ", " ) ) );
-				}
-				header.add( fnPunctuationStyle.applyTo( new StaticText( "*" ) ) );
-				header.add( fnVarArgStyle.applyTo( new StaticText( varargs.toString() ) ) );
-				bFirst = false;
-			}
-			if ( varkw != Py.None )
-			{
-				if ( !bFirst )
-				{
-					header.add( fnPunctuationStyle.applyTo( new StaticText( ", " ) ) );
-				}
-				header.add( fnPunctuationStyle.applyTo( new StaticText( "**" ) ) );
-				header.add( fnVarArgStyle.applyTo( new StaticText( varkw.toString() ) ) );
-				bFirst = false;
-			}
-			header.add( fnPunctuationStyle.applyTo( new StaticText( ")" ) ) );
-			
-			lines.add( new Paragraph( header ) );
-			
-			return new ObjectBoxWithFields( "Python Function", lines );
+			return new ObjectBox( "Python Function", header );
 		}
 	};
 
@@ -521,56 +559,146 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 			return classNameStyle.applyTo( new Label( c.getName() ) );
 		}
 	}
+	
+	
+	private static Pres presentClassHeader(Class<?> cls)
+	{
+		Class<?> superClass = cls.getSuperclass();
+		Class<?> interfaces[] = cls.getInterfaces();
+		
+		ArrayList<Object> lines = new ArrayList<Object>();
+		
+		Pres headerName = new Row( new Pres[] { javaKeywordStyle.applyTo( new StaticText( "Class " ) ), 
+				presentClassName( cls, classNameStyle ) } );
+		
+		lines.add( headerName );
+		
+		if ( superClass != null  ||  interfaces.length > 0 )
+		{
+			ArrayList<Object> inheritanceItems = new ArrayList<Object>();
+			if ( superClass != null )
+			{
+				inheritanceItems.add( javaKeywordStyle.applyTo( new StaticText( "Extends " ) ) );
+				inheritanceItems.add( presentClassName( superClass, classNameStyle ) );
+			}
+			
+			if ( interfaces.length > 0 )
+			{
+				if ( superClass != null )
+				{
+					inheritanceItems.add( javaKeywordStyle.applyTo( new StaticText( " " ) ) );
+				}
+				inheritanceItems.add( javaKeywordStyle.applyTo( new StaticText( "Implements " ) ) );
+				boolean bFirst = true;
+				for (Class<?> iface: interfaces)
+				{
+					if ( !bFirst )
+					{
+						inheritanceItems.add( classPunctuationStyle.applyTo( new StaticText( ", " ) ) );
+					}
+					inheritanceItems.add( presentClassName( iface, classNameStyle ) );
+					bFirst = false;
+				}
+			}
+			
+			Pres inheritance = new Paragraph( inheritanceItems );
+			
+			return new Column( new Pres[] { headerName, inheritance.padX( 45.0, 0.0 ) } );
+		}
+		else
+		{
+			return headerName;
+		}
+	}
 
 	public static final ObjectPresenter presenter_Class = new ObjectPresenter()
 	{
 		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			Class<?> cls = (Class<?>)x;
-			Class<?> superClass = cls.getSuperclass();
-			Class<?> interfaces[] = cls.getInterfaces();
+			Field declaredFields[] = cls.getDeclaredFields();
+			Method declaredMethods[] = cls.getDeclaredMethods();
 			
-			ArrayList<Object> lines = new ArrayList<Object>();
+			Pres header = presentClassHeader( cls );
 			
-			Pres title = classKeywordStyle.applyTo( new StaticText( "Class " ) );
-			Pres name = presentClassName( cls, classNameStyle );
-			lines.add( new Row( new Pres[] { title, name } ) );
-			
-			if ( superClass != null  ||  interfaces.length > 0 )
+			// Fields
+			ArrayList<Object> staticFieldDeclarations = new ArrayList<Object>();
+			ArrayList<Object> fieldDeclarations = new ArrayList<Object>();
+			for (int i = 0; i < declaredFields.length; i++)
 			{
-				ArrayList<Object> inheritance = new ArrayList<Object>();
-				if ( superClass != null )
+				if ( Modifier.isStatic( declaredFields[i].getModifiers() ) )
 				{
-					inheritance.add( classKeywordStyle.applyTo( new StaticText( "Extends " ) ) );
-					inheritance.add( presentClassName( superClass, classNameStyle ) );
+					staticFieldDeclarations.add( presentFieldDeclaration( declaredFields[i] ) );
 				}
-				
-				if ( interfaces.length > 0 )
+				else
 				{
-					if ( superClass != null )
-					{
-						inheritance.add( classKeywordStyle.applyTo( new StaticText( " " ) ) );
-					}
-					inheritance.add( classKeywordStyle.applyTo( new StaticText( "Implements " ) ) );
-					boolean bFirst = true;
-					for (Class<?> iface: interfaces)
-					{
-						if ( !bFirst )
-						{
-							inheritance.add( classPunctuationStyle.applyTo( new StaticText( ", " ) ) );
-						}
-						inheritance.add( presentClassName( iface, classNameStyle ) );
-						bFirst = false;
-					}
+					fieldDeclarations.add( presentFieldDeclaration( declaredFields[i] ) );
 				}
-				
-				Pres para = new Paragraph( inheritance );
-				lines.add( para.padX( 45.0, 0.0 ) );
 			}
+			Pres staticFieldsHeader = sectionHeadingStyle.applyTo( new Label( "Static Fields" ) );
+			Pres staticFieldsContents = new Column( staticFieldDeclarations );
+			Pres staticFields = new Expander( staticFieldsHeader, staticFieldsContents );
+			Pres fieldsHeader = sectionHeadingStyle.applyTo( new Label( "Fields" ) );
+			Pres fieldsContents = new Column( fieldDeclarations );
+			Pres fields = new Expander( fieldsHeader, fieldsContents );
+			
+			// Methods
+			ArrayList<Object> staticMethodDeclarations = new ArrayList<Object>();
+			ArrayList<Object> methodDeclarations = new ArrayList<Object>();
+			for (int i = 0; i < declaredMethods.length; i++)
+			{
+				if ( Modifier.isStatic( declaredMethods[i].getModifiers() ) )
+				{
+					staticMethodDeclarations.add( presentMethodDeclaration( declaredMethods[i] ) );
+				}
+				else
+				{
+					methodDeclarations.add( presentMethodDeclaration( declaredMethods[i] ) );
+				}
+			}
+			Pres staticMethodsHeader = sectionHeadingStyle.applyTo( new Label( "Static Methods" ) );
+			Pres staticMethodsContents = new Column( staticMethodDeclarations );
+			Pres staticMethods = new Expander( staticMethodsHeader, staticMethodsContents );
+			Pres methodsHeader = sectionHeadingStyle.applyTo( new Label( "Methods" ) );
+			Pres methodsContents = new Column( methodDeclarations );
+			Pres methods = new Expander( methodsHeader, methodsContents );
+			
+			
+			Pres lines[] = new Pres[] { header, staticMethods, methods, staticFields, fields };
 			
 			return new ObjectBoxWithFields( "Java Class", lines );
 		}
 	};
+	
+
+	
+	
+	
+	private static Pres presentFieldDeclaration(Field field)
+	{
+		ArrayList<Object> words = new ArrayList<Object>();
+		
+		// type
+		words.add( presentClassName( field.getType(), typeNameStyle ) );
+		words.add( space );
+		words.add( new LineBreak() );
+		// name
+		words.add( fieldNameStyle.applyTo( new Label( field.getName() ) ) );
+		
+		return new Paragraph( words );
+	}
+
+	public static final ObjectPresenter presenter_Field = new ObjectPresenter()
+	{
+		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		{
+			Field field = (Field)x;
+			return new ObjectBox( "Java Field", presentFieldDeclaration( field ) );
+		}
+	};
+
+	
+	
 	
 	private static Pres presentMethodDeclaration(Method method)
 	{
@@ -578,28 +706,36 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		
 		// return type
 		words.add( presentClassName( method.getReturnType(), typeNameStyle ) );
-		words.add( new Label( " " ) );
+		words.add( space );
 		words.add( new LineBreak() );
 		// name
 		words.add( methodNameStyle.applyTo( new Label( method.getName() ) ) );
 		// open paren
 		words.add( delimStyle.applyTo( new Label( "(" ) ) );
-		words.add( new ParagraphIndentMarker() );
-		boolean bFirst = true;
-		for (Class<?> paramClass: method.getParameterTypes())
+		Class<?> paramTypes[] = method.getParameterTypes(); 
+		Object params[] = new Object[paramTypes.length];
+		for (int i = 0; i < params.length; i++)
 		{
-			if ( !bFirst )
-			{
-				words.add( fnPunctuationStyle.applyTo( new Label( "," ) ) );
-				words.add( new Label( " " ) );
-				words.add( new LineBreak() );
-			}
-			words.add( presentClassName( paramClass, typeNameStyle ) );
-			bFirst = false;
+			params[i] = presentClassName( paramTypes[i], typeNameStyle );
 		}
+		words.add( commaSeparatedListView( Arrays.asList( params ) ) );
 		// close paren
 		words.add( delimStyle.applyTo( new Label( ")" ) ) );
-		words.add( new ParagraphDedentMarker() );
+		
+		Class<?> exceptionTypes[] = method.getExceptionTypes();
+		if ( exceptionTypes.length > 0 )
+		{
+			words.add( space );
+			words.add( new LineBreak() );
+			words.add( javaKeywordStyle.applyTo( new Label( "Throws" ) ) );
+			words.add( space );
+			Object exceptions[] = new Object[exceptionTypes.length];
+			for (int i = 0; i < params.length; i++)
+			{
+				exceptions[i] = presentClassName( exceptionTypes[i], typeNameStyle );
+			}
+			words.add( commaSeparatedListView( Arrays.asList( exceptions ) ) );
+		}
 		
 		return new Paragraph( words );
 	}
@@ -621,6 +757,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	private static final StyleSheet punctuationStyle = staticStyle.withAttr( Primitive.foreground, Color.blue );
 	private static final StyleSheet delimStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.1f, 0.3f, 0.4f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 14 );
+	private static final StyleSheet sectionHeadingStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontFace, "Serif" );
 	
 	
 	private static final StyleSheet stackTraceStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.75f, 0.1f, 0.4f ) );
@@ -635,7 +772,9 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	private static final StyleSheet colourBoxStyle = staticStyle.withAttr( Primitive.rowSpacing, 5.0 );
 
 	
-	private static final StyleSheet classKeywordStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSmallCaps, true );
+	private static final StyleSheet javaKeywordStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSmallCaps, true );
+	private static final StyleSheet pythonKeywordStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSmallCaps, true );
+	
 	private static final StyleSheet classPunctuationStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
 	
 	private static final StyleSheet classNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.25f, 0.5f ) );
@@ -643,7 +782,9 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	private static final StyleSheet typeNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.4f ) );
 	private static final StyleSheet typePunctuationStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
 
+	private static final StyleSheet fieldNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.5f ) );
 	private static final StyleSheet methodNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.35f ) );
+	private static final StyleSheet attributeNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.5f ) );
 
 	private static final StyleSheet fnPunctuationStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
 	private static final StyleSheet fnNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.25f, 0.5f ) );
@@ -661,11 +802,13 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	private static final Pres closeParen = delimStyle.applyTo( new StaticText( ")" ) );
 	private static final Pres openBrace = delimStyle.applyTo( new StaticText( "{" ) );
 	private static final Pres closeBrace = delimStyle.applyTo( new StaticText( "}" ) );
+	private static final Pres openChevronBracket = delimStyle.applyTo( new StaticText( "<[" ) );
+	private static final Pres closeChevronBracket = delimStyle.applyTo( new StaticText( "]>" ) );
 	
 
 	protected static Pres arrayView(List<Object> children)
 	{
-		return new SpanSequenceView( children, openBracket, closeBracket, comma, space, TrailingSeparator.NEVER );
+		return new SpanSequenceView( children, openChevronBracket, closeChevronBracket, comma, space, TrailingSeparator.NEVER );
 	}
 	
 	private static Pres listView(List<Object> children)
@@ -682,4 +825,10 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	{
 		return new SpanSequenceView( children, openBrace, closeBrace, comma, mapSpace, TrailingSeparator.NEVER );
 	}
+
+	private static Pres commaSeparatedListView(List<Object> children)
+	{
+		return new SpanSequenceView( children, null, null, comma, space, TrailingSeparator.NEVER );
+	}
+	
 }
