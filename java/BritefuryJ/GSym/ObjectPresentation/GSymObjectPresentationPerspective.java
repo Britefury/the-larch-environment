@@ -34,6 +34,7 @@ public abstract class GSymObjectPresentationPerspective extends GSymAbstractPers
 
 	
 	protected abstract Pres presentWithJavaInterface(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState);
+	protected abstract Pres presentJavaArray(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState);
 	protected abstract Pres presentJavaObjectFallback(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState);
 	protected abstract Pres presentPyObjectFallback(PyObject x, GSymFragmentView fragment, SimpleAttributeTable inhritedState);
 	protected abstract Pres invokeObjectPresenter(ObjectPresenter presenter, Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState);
@@ -84,6 +85,12 @@ public abstract class GSymObjectPresentationPerspective extends GSymAbstractPers
 					result = invokePyObjectPresenter( presenter, pyX, fragment, inheritedState );
 				}
 			}
+		}
+		
+		// Java object presentation protocol - array
+		if ( result == null  &&  x.getClass().isArray() )
+		{
+			result = presentJavaArray( x, fragment, inheritedState );
 		}
 		
 		// Java object presentation protocol - registered presenters
