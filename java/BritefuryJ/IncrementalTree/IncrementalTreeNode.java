@@ -269,13 +269,6 @@ public abstract class IncrementalTreeNode implements IncrementalMonitorListener,
 		{
 			Object r = resultFactory.createNodeResult( this, model );
 			
-			// Register new child relationships
-			child = childrenHead;
-			while ( child != null )
-			{
-				incrementalTree.nodeTable.refIncrementalNode( child );
-				child = child.nextSibling;
-			}
 			onComputeNodeResultEnd();
 			return r;
 		}
@@ -324,6 +317,9 @@ public abstract class IncrementalTreeNode implements IncrementalMonitorListener,
 		childrenTail = child;
 
 		child.parent = this;
+
+		// Ref the node, so that it is kept around
+		incrementalTree.nodeTable.refIncrementalNode( child );
 	}
 	
 
