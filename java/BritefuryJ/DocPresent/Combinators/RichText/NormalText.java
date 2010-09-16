@@ -22,4 +22,18 @@ public class NormalText extends RichParagraph
 	{
 		return presentParagraph( ctx, style.withAttrs( RichText.normalTextStyle( style ) ) );
 	}
+	
+	
+	public static NormalText[] paragraphs(String text)
+	{
+		String lines[] = text.split( "\n" );
+		NormalText paras[] = new NormalText[lines.length];
+		
+		for (int i = 0; i < lines.length; i++)
+		{
+			paras[i] = new NormalText( lines[i] );
+		}
+		
+		return paras;
+	}
 }
