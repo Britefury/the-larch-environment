@@ -11,6 +11,7 @@ import java.awt.Shape;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -20,12 +21,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.python.core.Py;
+import org.python.core.PyBoolean;
 import org.python.core.PyDictionary;
 import org.python.core.PyException;
+import org.python.core.PyFloat;
 import org.python.core.PyFunction;
+import org.python.core.PyInteger;
 import org.python.core.PyList;
+import org.python.core.PyModule;
 import org.python.core.PyNone;
 import org.python.core.PyObject;
+import org.python.core.PyProperty;
 import org.python.core.PyString;
 import org.python.core.PyStringMap;
 import org.python.core.PyTuple;
@@ -35,17 +41,18 @@ import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Controls.Expander;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Box;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.LineBreak;
-import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.ParagraphDedentMarker;
 import BritefuryJ.DocPresent.Combinators.Primitive.ParagraphIndentMarker;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.Primitive.Span;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.Primitive.Whitespace;
+import BritefuryJ.DocPresent.Combinators.RichText.NormalText;
 import BritefuryJ.DocPresent.Combinators.Sequence.SpanSequenceView;
 import BritefuryJ.DocPresent.Combinators.Sequence.TrailingSeparator;
 import BritefuryJ.DocPresent.Painter.FillPainter;
@@ -77,12 +84,17 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		registerJavaObjectPresenter( Double.class,  presenter_Double );
 		registerJavaObjectPresenter( Boolean.class,  presenter_Boolean );
 
+		registerPythonObjectPresenter( PyInteger.TYPE,  presenter_PyInteger );
+		registerPythonObjectPresenter( PyFloat.TYPE,  presenter_PyFloat );
+		registerPythonObjectPresenter( PyBoolean.TYPE,  presenter_PyBoolean );
 		registerPythonObjectPresenter( PyTuple.TYPE,  presenter_PyTuple );
 		registerPythonObjectPresenter( PyType.TYPE,  presenter_PyType );
 		registerPythonObjectPresenter( PyFunction.TYPE,  presenter_PyFunction );
+		registerPythonObjectPresenter( PyProperty.TYPE,  presenter_PyProperty );
 		
 		registerJavaObjectPresenter( PyNone.class,  presenter_PyNone );
 		registerJavaObjectPresenter( PyException.class,  presenter_PyException );
+		registerJavaObjectPresenter( PyModule.class,  presenter_PyModule );
 
 		registerJavaObjectPresenter( Exception.class,  presenter_Exception );
 		registerJavaObjectPresenter( List.class,  presenter_List );
@@ -91,6 +103,8 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		registerJavaObjectPresenter( Shape.class,  presenter_Shape );
 		registerJavaObjectPresenter( Color.class,  presenter_Color );
 		registerJavaObjectPresenter( Class.class,  presenter_Class );
+		registerJavaObjectPresenter( Field.class,  presenter_Field );
+		registerJavaObjectPresenter( Constructor.class,  presenter_Constructor );
 		registerJavaObjectPresenter( Method.class,  presenter_Method );
 	}
 
@@ -171,6 +185,34 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	
 
+	public static final PyObjectPresenter presenter_PyInteger = new PyObjectPresenter()
+	{
+		public Pres presentObject(PyObject x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		{
+			PyInteger value = (PyInteger)x;
+			return GSymPrimitivePresenter.presentInt( value.getValue(), fragment, inheritedState );
+		}
+	};
+	
+	public static final PyObjectPresenter presenter_PyFloat = new PyObjectPresenter()
+	{
+		public Pres presentObject(PyObject x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		{
+			PyFloat value = (PyFloat)x;
+			return GSymPrimitivePresenter.presentDouble( value.getValue(), fragment, inheritedState );
+		}
+	};
+	
+	public static final PyObjectPresenter presenter_PyBoolean = new PyObjectPresenter()
+	{
+		public Pres presentObject(PyObject x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		{
+			PyBoolean value = (PyBoolean)x;
+			return GSymPrimitivePresenter.presentBoolean( value.getBooleanValue(), fragment, inheritedState );
+		}
+	};
+	
+	
 	public static final PyObjectPresenter presenter_PyTuple = new PyObjectPresenter()
 	{
 		public Pres presentObject(PyObject x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
@@ -186,6 +228,115 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 			return tupleView( itemViews );
 		}
 	};
+	
+	
+	private static Pres presentPyType(PyType type, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	{
+
+		ArrayList<Object> contents = new ArrayList<Object>();
+		
+		
+		// Header
+		ArrayList<Object> headerItems = new ArrayList<Object>();
+		headerItems.add( pythonKeywordStyle.applyTo( new StaticText( "Class " ) ) );
+		headerItems.add( classNameStyle.applyTo( new StaticText( type.getName() ) ) );
+		
+		PyTuple bases = (PyTuple)type.getBases();
+		
+		if ( bases.size() > 0 )
+		{
+			headerItems.add( staticStyle.applyTo( new StaticText( " " ) ) );
+			headerItems.add( classPunctuationStyle.applyTo( new StaticText( "(" ) ) );
+			headerItems.add( new ParagraphIndentMarker() );
+			Object baseNames[] = new Object[bases.getArray().length];
+			int index = 0;
+			for (PyObject base: bases.getArray())
+			{
+				PyType baseType = (PyType)base;
+				baseNames[index++] = classNameStyle.applyTo( new StaticText( baseType.getName() ) );
+			}
+			headerItems.add( commaSeparatedListView( Arrays.asList( baseNames ) ) );
+			headerItems.add( new ParagraphDedentMarker() );
+			headerItems.add( classPunctuationStyle.applyTo( new StaticText( ")" ) ) );
+		}
+		
+		contents.add( new Paragraph( headerItems ) );
+		
+		
+		// Documentation
+		PyObject doc = type.getDoc();
+		if ( doc != null  &&  doc != Py.None )
+		{
+			Pres docPres = new Column( NormalText.paragraphs( doc.toString() ) );
+			contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Documentation" ) ), docPres ) );
+		}
+		
+		
+		ArrayList<Object> attributes = new ArrayList<Object>();
+		ArrayList<Object> methods = new ArrayList<Object>();
+		ArrayList<Object> properties = new ArrayList<Object>();
+		// Attributes
+		PyObject dict = type.fastGetDict();
+		PyList dictItems;
+		if ( dict instanceof PyDictionary )
+		{
+			dictItems = ((PyDictionary)dict).items();
+		}
+		else if ( dict instanceof PyStringMap )
+		{
+			dictItems = ((PyStringMap)dict).items();
+		}
+		else
+		{
+			throw new RuntimeException( "Expected a PyDictionary or a PyStringMap when acquiring __dict__ from a PyType" );
+		}
+		
+		
+		for (Object dictItem: dictItems)
+		{
+			PyTuple pair = (PyTuple)dictItem;
+			PyObject key = pair.getArray()[0];
+			PyObject value = pair.getArray()[1];
+			String name = key.toString();
+			
+			if ( name.equals( "__dict__" )  ||  name.equals( "__module__" )  ||  name.equals(  "__doc__" ) )
+			{
+				break;
+			}
+			
+			if ( value instanceof PyFunction )
+			{
+				methods.add( presentPyFunctionHeader( (PyFunction)value, name ) );
+			}
+			else if ( value instanceof PyProperty )
+			{
+				properties.add( presentPyPropertyHeader( (PyProperty)value, name ) );
+			}
+			else
+			{
+				Pres namePres = attributeNameStyle.applyTo( new Label( name ) );
+				Pres valueView = new InnerFragment( value ).padX( 15.0, 0.0 );
+				attributes.add( new Column( new Pres[] { namePres, valueView } ) );
+			}
+		}
+		
+		if ( methods.size() > 0 )
+		{
+			contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Methods" ) ),   new Column( methods ) ) );
+		}
+		if ( properties.size() > 0 )
+		{
+			contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Properties" ) ),   new Column( properties ) ) );
+		}
+		if ( attributes.size() > 0 )
+		{
+			contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Attributes" ) ),   new Column( attributes ) ) );
+		}
+		
+		
+		return new Column( contents );
+	}
+	
 
 	public static final PyObjectPresenter presenter_PyType = new PyObjectPresenter()
 	{
@@ -193,71 +344,13 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		{
 			PyType type = (PyType)x;
 			
+			Pres classPres = presentPyType( type, fragment, inheritedState );
 			
-			// Header
-			ArrayList<Object> headerItems = new ArrayList<Object>();
-			headerItems.add( pythonKeywordStyle.applyTo( new StaticText( "Class " ) ) );
-			headerItems.add( classNameStyle.applyTo( new StaticText( type.getName() ) ) );
-			
-			PyTuple bases = (PyTuple)type.getBases();
-			
-			if ( bases.size() > 0 )
-			{
-				headerItems.add( staticStyle.applyTo( new StaticText( " " ) ) );
-				headerItems.add( classPunctuationStyle.applyTo( new StaticText( "(" ) ) );
-				headerItems.add( new ParagraphIndentMarker() );
-				Object baseNames[] = new Object[bases.getArray().length];
-				int index = 0;
-				for (PyObject base: bases.getArray())
-				{
-					PyType baseType = (PyType)base;
-					baseNames[index++] = classNameStyle.applyTo( new StaticText( baseType.getName() ) );
-				}
-				headerItems.add( commaSeparatedListView( Arrays.asList( baseNames ) ) );
-				headerItems.add( new ParagraphDedentMarker() );
-				headerItems.add( classPunctuationStyle.applyTo( new StaticText( ")" ) ) );
-			}
-			
-			Pres header = new Paragraph( headerItems );
-			
-			
-			// Attributes
-			PyObject dict = type.fastGetDict();
-			PyList dictItems;
-			if ( dict instanceof PyDictionary )
-			{
-				dictItems = ((PyDictionary)dict).items();
-			}
-			else if ( dict instanceof PyStringMap )
-			{
-				dictItems = ((PyStringMap)dict).items();
-			}
-			else
-			{
-				throw new RuntimeException( "Expected a PyDictionary or a PyStringMap when acquiring __dict__ from a PyType" );
-			}
-			
-			
-			ArrayList<Object> attrElements = new ArrayList<Object>();
-			for (Object dictItem: dictItems)
-			{
-				PyTuple pair = (PyTuple)dictItem;
-				PyObject key = pair.getArray()[0];
-				PyObject value = pair.getArray()[1];
-				Pres name = attributeNameStyle.applyTo( new Label( key.toString() ) );
-				Pres valueView = new InnerFragment( value ).padX( 15.0, 0.0 );
-				attrElements.add( name );
-				attrElements.add( valueView );
-			}
-			
-			Pres attributesHeader = sectionHeadingStyle.applyTo( new Label( "Attributes" ) );
-			
-			Pres attributes = new Expander( attributesHeader, new Column( attrElements ) );
-			
-			
-			return new ObjectBox( "Python Class", new Column( new Pres[] { header, attributes } ) );
+			return new ObjectBox( "Python Class", classPres );
 		}
 	};
+	
+	
 
 	private static PyFunction pyFunction_inspectFn = null;
 	private static PyFunction getPythonInspectFunction()
@@ -300,7 +393,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	}
 	
 	
-	private static Pres presentPyFunctionHeader(PyFunction fun)
+	private static Pres presentPyFunctionHeader(PyFunction fun, String name)
 	{
 		PyTuple argSpec = inspectPyFunction( fun );
 		PyObject args = argSpec.getArray()[0];
@@ -309,8 +402,14 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		PyObject varkw = argSpec.getArray()[3];
 		
 		
+		if ( name == null )
+		{
+			name = fun.__name__.toString();
+		}
+		
+		
 		ArrayList<Object> header = new ArrayList<Object>();
-		header.add( fnNameStyle.applyTo( new StaticText( fun.__name__.toString() ) ) );
+		header.add( fnNameStyle.applyTo( new StaticText( name ) ) );
 		header.add( fnPunctuationStyle.applyTo( new StaticText( "(" ) ) );
 		boolean bFirst = true;
 		for (PyObject arg: ((PyList)args).getArray())
@@ -364,7 +463,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		{
 			PyFunction fun = (PyFunction)x;
 			
-			Pres header = presentPyFunctionHeader( fun );
+			Pres header = presentPyFunctionHeader( fun, null );
 			
 			return new ObjectBox( "Python Function", header );
 		}
@@ -372,6 +471,122 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 
 	
 
+	
+	private static Pres presentPyPropertyHeader(PyProperty prop, String name)
+	{
+		ArrayList<Object> header = new ArrayList<Object>();
+		header.add( propertyNameStyle.applyTo( new StaticText( name ) ) );
+		return new Paragraph( header );
+	}
+
+	
+	
+	public static final PyObjectPresenter presenter_PyProperty = new PyObjectPresenter()
+	{
+		public Pres presentObject(PyObject x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		{
+			PyProperty prop = (PyProperty)x;
+			
+			Pres header = presentPyPropertyHeader( prop, null );
+			
+			return new ObjectBox( "Python property", header );
+		}
+	};
+
+	
+
+	
+	public static final ObjectPresenter presenter_PyModule = new ObjectPresenter()
+	{
+		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		{
+			PyModule module = (PyModule)x;
+			PyObject dict = module.fastGetDict();
+			
+			
+			ArrayList<Object> contents = new ArrayList<Object>();
+			
+			
+			// Header
+			String moduleName = dict.__getitem__( new PyString( "__name__" ) ).toString();
+			contents.add( pythonKeywordStyle.applyTo( new StaticText( "Module" ) ).alignHCentre() );
+			contents.add( moduleNameStyle.applyTo( new StaticText( moduleName ) ).alignHCentre() );
+			
+			
+			// Documentation
+			PyObject doc = null;
+			try
+			{
+				doc = dict.__getitem__( new PyString( "__doc__" ) );
+			}
+			catch (PyException e)
+			{
+			}
+			
+			if ( doc != null  &&  doc != Py.None )
+			{
+				Pres docPres = new Column( NormalText.paragraphs( doc.toString() ) );
+				contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Documentation" ) ), docPres ) );
+			}
+			
+			
+			ArrayList<Object> attributes = new ArrayList<Object>();
+			// Attributes
+			PyList dictItems;
+			if ( dict instanceof PyDictionary )
+			{
+				dictItems = ((PyDictionary)dict).items();
+			}
+			else if ( dict instanceof PyStringMap )
+			{
+				dictItems = ((PyStringMap)dict).items();
+			}
+			else
+			{
+				throw new RuntimeException( "Expected a PyDictionary or a PyStringMap when acquiring __dict__ from a PyType" );
+			}
+			
+			
+			for (Object dictItem: dictItems)
+			{
+				PyTuple pair = (PyTuple)dictItem;
+				PyObject key = pair.getArray()[0];
+				PyObject value = pair.getArray()[1];
+				String name = key.toString();
+				
+				if ( name.equals( "__dict__" )  ||  name.equals(  "__doc__" ) )
+				{
+					break;
+				}
+				
+				Pres attrPres = null;
+				
+				if ( value instanceof PyFunction )
+				{
+					attrPres = presentPyFunctionHeader( (PyFunction)value, name );
+				}
+				else
+				{
+					Pres namePres = attributeNameStyle.applyTo( new Label( name ) );
+					Pres valueView = new InnerFragment( value ).padX( 15.0, 0.0 );
+					attrPres = new Column( new Pres[] { namePres, valueView } );
+				}
+				
+				attributes.add( attrPres );
+			}
+			
+			if ( attributes.size() > 0 )
+			{
+				contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Attributes" ) ),   new Column( attributes ) ) );
+			}
+			
+			
+			return new ObjectBox( "Python Module", new Column( contents ) );
+		}
+	};
+
+	
+	
 	
 	public static final ObjectPresenter presenter_PyNone = new ObjectPresenter()
 	{
@@ -616,14 +831,24 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			Class<?> cls = (Class<?>)x;
-			Field declaredFields[] = cls.getDeclaredFields();
+			Constructor<?> declaredConstructors[] = cls.getDeclaredConstructors();
 			Method declaredMethods[] = cls.getDeclaredMethods();
+			Field declaredFields[] = cls.getDeclaredFields();
 			
-			Pres header = presentClassHeader( cls );
+			ArrayList<Object> contents = new ArrayList<Object>();
 			
-			// Fields
+			contents.add( presentClassHeader( cls ) );
+			
+			// Members
+			ArrayList<Object> constructorDeclarations = new ArrayList<Object>();
 			ArrayList<Object> staticFieldDeclarations = new ArrayList<Object>();
 			ArrayList<Object> fieldDeclarations = new ArrayList<Object>();
+			ArrayList<Object> staticMethodDeclarations = new ArrayList<Object>();
+			ArrayList<Object> methodDeclarations = new ArrayList<Object>();
+			for (int i = 0; i < declaredConstructors.length; i++)
+			{
+				constructorDeclarations.add( presentConstructorDeclaration( declaredConstructors[i] ) );
+			}
 			for (int i = 0; i < declaredFields.length; i++)
 			{
 				if ( Modifier.isStatic( declaredFields[i].getModifiers() ) )
@@ -635,16 +860,6 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 					fieldDeclarations.add( presentFieldDeclaration( declaredFields[i] ) );
 				}
 			}
-			Pres staticFieldsHeader = sectionHeadingStyle.applyTo( new Label( "Static Fields" ) );
-			Pres staticFieldsContents = new Column( staticFieldDeclarations );
-			Pres staticFields = new Expander( staticFieldsHeader, staticFieldsContents );
-			Pres fieldsHeader = sectionHeadingStyle.applyTo( new Label( "Fields" ) );
-			Pres fieldsContents = new Column( fieldDeclarations );
-			Pres fields = new Expander( fieldsHeader, fieldsContents );
-			
-			// Methods
-			ArrayList<Object> staticMethodDeclarations = new ArrayList<Object>();
-			ArrayList<Object> methodDeclarations = new ArrayList<Object>();
 			for (int i = 0; i < declaredMethods.length; i++)
 			{
 				if ( Modifier.isStatic( declaredMethods[i].getModifiers() ) )
@@ -656,17 +871,34 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 					methodDeclarations.add( presentMethodDeclaration( declaredMethods[i] ) );
 				}
 			}
-			Pres staticMethodsHeader = sectionHeadingStyle.applyTo( new Label( "Static Methods" ) );
-			Pres staticMethodsContents = new Column( staticMethodDeclarations );
-			Pres staticMethods = new Expander( staticMethodsHeader, staticMethodsContents );
-			Pres methodsHeader = sectionHeadingStyle.applyTo( new Label( "Methods" ) );
-			Pres methodsContents = new Column( methodDeclarations );
-			Pres methods = new Expander( methodsHeader, methodsContents );
+			
+			if ( constructorDeclarations.size() > 0 )
+			{
+				contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Constructors" ) ),   new Column( constructorDeclarations ) ) );
+			}
+
+			if ( methodDeclarations.size() > 0 )
+			{
+				contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Methods" ) ),   new Column( methodDeclarations ) ) );
+			}
+
+			if ( staticMethodDeclarations.size() > 0 )
+			{
+				contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Static methods" ) ),   new Column( staticMethodDeclarations ) ) );
+			}
+
+			if ( fieldDeclarations.size() > 0 )
+			{
+				contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Fields" ) ),   new Column( fieldDeclarations ) ) );
+			}
+
+			if ( staticFieldDeclarations.size() > 0 )
+			{
+				contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Static fields" ) ),   new Column( staticFieldDeclarations ) ) );
+			}
 			
 			
-			Pres lines[] = new Pres[] { header, staticMethods, methods, staticFields, fields };
-			
-			return new ObjectBoxWithFields( "Java Class", lines );
+			return new ObjectBoxWithFields( "Java Class", contents );
 		}
 	};
 	
@@ -694,6 +926,54 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		{
 			Field field = (Field)x;
 			return new ObjectBox( "Java Field", presentFieldDeclaration( field ) );
+		}
+	};
+
+	
+	
+	
+	private static Pres presentConstructorDeclaration(Constructor<?> constructor)
+	{
+		ArrayList<Object> words = new ArrayList<Object>();
+		
+		// type
+		words.add( presentClassName( constructor.getDeclaringClass(), methodNameStyle ) );
+		// open paren
+		words.add( delimStyle.applyTo( new Label( "(" ) ) );
+		Class<?> paramTypes[] = constructor.getParameterTypes(); 
+		Object params[] = new Object[paramTypes.length];
+		for (int i = 0; i < params.length; i++)
+		{
+			params[i] = presentClassName( paramTypes[i], typeNameStyle );
+		}
+		words.add( commaSeparatedListView( Arrays.asList( params ) ) );
+		// close paren
+		words.add( delimStyle.applyTo( new Label( ")" ) ) );
+		
+		Class<?> exceptionTypes[] = constructor.getExceptionTypes();
+		if ( exceptionTypes.length > 0 )
+		{
+			words.add( space );
+			words.add( new LineBreak() );
+			words.add( javaKeywordStyle.applyTo( new Label( "Throws" ) ) );
+			words.add( space );
+			Object exceptions[] = new Object[exceptionTypes.length];
+			for (int i = 0; i < params.length; i++)
+			{
+				exceptions[i] = presentClassName( exceptionTypes[i], typeNameStyle );
+			}
+			words.add( commaSeparatedListView( Arrays.asList( exceptions ) ) );
+		}
+		
+		return new Paragraph( words );
+	}
+
+	public static final ObjectPresenter presenter_Constructor = new ObjectPresenter()
+	{
+		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		{
+			Constructor<?> constructor = (Constructor<?>)x;
+			return new ObjectBox( "Java Constructor", presentConstructorDeclaration( constructor ) );
 		}
 	};
 
@@ -784,7 +1064,9 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 
 	private static final StyleSheet fieldNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.5f ) );
 	private static final StyleSheet methodNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.35f ) );
-	private static final StyleSheet attributeNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.5f ) );
+	private static final StyleSheet attributeNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.25f ) );
+	private static final StyleSheet propertyNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.15f ) );
+	private static final StyleSheet moduleNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) ).withAttr( Primitive.fontSize, 18 ).withAttr( Primitive.fontBold, true );;
 
 	private static final StyleSheet fnPunctuationStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
 	private static final StyleSheet fnNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.25f, 0.5f ) );
