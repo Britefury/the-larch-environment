@@ -154,6 +154,8 @@ class GSymDocument (CommandHistoryListener):
 		f = open( self._filename, 'w' )
 		if f is not None:
 			f.write( DMIOWriter.writeAsString( self._write() ) )
+			# Sometimes, failing to flush the file can result in truncated data
+			f.flush()
 			f.close()
 			if self._bHasUnsavedData:
 				self._bHasUnsavedData = False

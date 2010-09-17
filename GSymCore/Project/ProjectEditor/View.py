@@ -532,8 +532,10 @@ class _ModuleFinder (object):
 		modelLocation = self._projectSubject._location
 		while suffix != '':
 			prefix, dot, suffix = suffix.partition( '.' )
+			bFoundItem = False
 			for item in model['contents']:
 				if prefix == item['name']:
+					bFoundItem = True
 					modelLocation = modelLocation + '.' + prefix
 					model = item
 					
@@ -548,14 +550,18 @@ class _ModuleFinder (object):
 							else:
 								return pageSubject
 						else:
+							# Still path to consume; cannot go further
+							return None
+					elif model.isInstanceOf( Schema.Package ):
+						if suffix == '':
+							return self
+						else:
 							# Still path to consume; loop over
 							break
-					elif model.isInstanceOf( Schema.Package ):
-						# Loop over
-						break
 					else:
 						raise TypeError, 'unreckognised model type'
-			return None
+			if not bFoundItem:
+				return None
 		
 		# Ran out of name to comsume, load as a package
 		return self

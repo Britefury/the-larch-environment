@@ -34,7 +34,7 @@ public abstract class CellInterface implements IncrementalOwner, Presentable
 		private CellInterface cell;
 		
 		
-		public ValuePres(CellInterface cell)
+		private ValuePres(CellInterface cell)
 		{
 			this.cell = cell;
 		}
