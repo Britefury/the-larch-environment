@@ -143,7 +143,7 @@ public class DMIOReader
 
 	
 	public static String unquotedStringPunctuationChars = "+-*/%^&|!$@.~";
-	public static String quotedStringPunctuationChars = "+-*/%^&|!$@.,<>=[]{}~'()` ";
+	public static String quotedStringPunctuationChars = "+-*/%^&|!$@.~,<>=[]{}~'()` ";
 	public static String inStringUnescapedChars = "[0-9A-Za-z_" + Pattern.quote( quotedStringPunctuationChars ) + "]";
 	
 	public static String hexCharEscape = Pattern.quote( "\\x" ) + "[0-9A-Fa-f]+" + Pattern.quote( "x" );
@@ -384,7 +384,7 @@ public class DMIOReader
 		Object item = getTopOfStack();
 		if ( !( item instanceof ArrayList<?> ) )
 		{
-			throw new ParseErrorException( pos, "']' attempting to close non-list" );
+			throw new ParseErrorException( pos, "']' attempting to close " + item.getClass().getName() );
 		}
 		
 		// Pop off stack
@@ -461,7 +461,7 @@ public class DMIOReader
 		Object builder = getTopOfStack();
 		if ( !( builder instanceof ObjectBuilder ) )
 		{
-			throw new ParseErrorException( pos, "')' attempting to close non-object" );
+			throw new ParseErrorException( pos, "')' attempting to close " + builder.getClass().getName() );
 		}
 		
 		// Pop off stack
@@ -561,7 +561,12 @@ public class DMIOReader
 		
 		if ( stack.size() != 0 )
 		{
-			throw new ParseErrorException( pos, "List or object remains to be closed" );
+			StringBuilder unclosedItemClasses = new StringBuilder();
+			for (Object item: stack)
+			{
+				unclosedItemClasses.append( item.getClass().getName() + "\n" );
+			}
+			throw new ParseErrorException( pos, "Unclosed items:\n" + unclosedItemClasses.toString() );
 		}
 
 		return result;
