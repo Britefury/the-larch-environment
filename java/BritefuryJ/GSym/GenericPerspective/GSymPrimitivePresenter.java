@@ -7,6 +7,8 @@
 package BritefuryJ.GSym.GenericPerspective;
 
 import java.awt.Color;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
@@ -85,6 +87,16 @@ public class GSymPrimitivePresenter
 	public static Pres presentLong(long x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return integerStyle.applyTo( new StaticText( Long.toString( x ) ) );
+	}
+	
+	public static Pres presentBigInteger(BigInteger x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	{
+		return integerStyle.applyTo( new StaticText( x.toString() + "L" ) );
+	}
+	
+	public static Pres presentBigDecimal(BigDecimal x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	{
+		return integerStyle.applyTo( new StaticText( x.toString() + "LD" ) );
 	}
 	
 	public static Pres presentDouble(double x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)

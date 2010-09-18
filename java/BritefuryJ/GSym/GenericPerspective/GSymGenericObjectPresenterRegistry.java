@@ -15,6 +15,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -83,6 +85,8 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		registerJavaObjectPresenter( Integer.class,  presenter_Integer );
 		registerJavaObjectPresenter( Short.class,  presenter_Short );
 		registerJavaObjectPresenter( Long.class,  presenter_Long );
+		registerJavaObjectPresenter( BigInteger.class,  presenter_BigInteger );
+		registerJavaObjectPresenter( BigDecimal.class,  presenter_BigDecimal );
 		registerJavaObjectPresenter( Byte.class,  presenter_Byte );
 		registerJavaObjectPresenter( Float.class,  presenter_Float );
 		registerJavaObjectPresenter( Double.class,  presenter_Double );
@@ -165,6 +169,22 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			return GSymPrimitivePresenter.presentLong( (Long)x, fragment, inheritedState );
+		}
+	};
+	
+	public static final ObjectPresenter presenter_BigInteger = new ObjectPresenter()
+	{
+		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		{
+			return GSymPrimitivePresenter.presentBigInteger( (BigInteger)x, fragment, inheritedState );
+		}
+	};
+	
+	public static final ObjectPresenter presenter_BigDecimal = new ObjectPresenter()
+	{
+		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		{
+			return GSymPrimitivePresenter.presentBigDecimal( (BigDecimal)x, fragment, inheritedState );
 		}
 	};
 	
