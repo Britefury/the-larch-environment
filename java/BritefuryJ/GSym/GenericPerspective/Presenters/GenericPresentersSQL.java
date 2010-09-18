@@ -7,18 +7,23 @@
 package BritefuryJ.GSym.GenericPerspective.Presenters;
 
 import java.awt.Color;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.Controls.Expander;
 import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Table;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ErrorBox;
+import BritefuryJ.GSym.GenericPerspective.PresCom.HorizontalField;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
 import BritefuryJ.GSym.ObjectPresentation.GSymObjectPresenterRegistry;
 import BritefuryJ.GSym.ObjectPresentation.ObjectPresenter;
@@ -28,11 +33,78 @@ public class GenericPresentersSQL extends GSymObjectPresenterRegistry
 {
 	public GenericPresentersSQL()
 	{
+		registerJavaObjectPresenter( Connection.class,  presenter_Connection );
 		registerJavaObjectPresenter( ResultSet.class,  presenter_ResultSet );
 	}
 
 
 
+	public static final ObjectPresenter presenter_Connection = new ObjectPresenter()
+	{
+		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		{
+			Connection connection = (Connection)x;
+			
+			try
+			{
+				DatabaseMetaData dbMeta = connection.getMetaData();
+				ResultSet results = dbMeta.getTables( null, null, null, null );
+				
+				Pres url = new HorizontalField( "URL", new Label( dbMeta.getURL() ) );
+				
+				Pres tablesPres = null;
+				try
+				{
+					tablesPres = present_ResultSet( results );
+				}
+				catch (SQLException e)
+				{
+					tablesPres = Pres.coerce( e );
+				}
+				Pres tables = new Expander( sectionHeadingStyle.applyTo( new Label( "Tables" ) ),  tablesPres );
+				
+				return new ObjectBox( "Connection", new Column( new Object[] { url, tables } ) );
+			}
+			catch (SQLException e)
+			{
+				return new ErrorBox( "SQL: Error presenting ResultSet", Pres.coerce( e ) );
+			}
+		}
+	};
+
+	
+	private static Pres present_ResultSet(ResultSet results) throws SQLException
+	{
+		ResultSetMetaData metaData = results.getMetaData();
+		int numColumns = metaData.getColumnCount();
+		
+		ArrayList<Object[]> cells = new ArrayList<Object[]>();
+		
+		Object header[] = new Object[numColumns];
+		cells.add( header );
+		for (int column = 0; column < numColumns; column++)
+		{
+			header[column] = columnStyle.applyTo( new Label( metaData.getColumnName( column + 1 ) ) );
+		}
+		
+		
+		while ( results.next() )
+		{
+			Object row[] = new Object[numColumns];
+			cells.add( row );
+			for (int column = 0; column < numColumns; column++)
+			{
+				row[column] = results.getObject( column + 1 );
+			}
+		}
+		
+		Object tableCells[][] = cells.toArray( new Object[0][] );
+		Pres table = resultStyle.applyTo( new Table( tableCells ) );
+		
+		return table;
+	}
+	
+	
 	public static final ObjectPresenter presenter_ResultSet = new ObjectPresenter()
 	{
 		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
@@ -41,33 +113,9 @@ public class GenericPresentersSQL extends GSymObjectPresenterRegistry
 			
 			try
 			{
-				ResultSetMetaData metaData = results.getMetaData();
-				int numColumns = metaData.getColumnCount();
+				Pres r = present_ResultSet( results );
 				
-				ArrayList<Object[]> cells = new ArrayList<Object[]>();
-				
-				Object header[] = new Object[numColumns];
-				cells.add( header );
-				for (int column = 0; column < numColumns; column++)
-				{
-					header[column] = columnStyle.applyTo( new Label( metaData.getColumnName( column + 1 ) ) );
-				}
-				
-				
-				while ( results.next() )
-				{
-					Object row[] = new Object[numColumns];
-					cells.add( row );
-					for (int column = 0; column < numColumns; column++)
-					{
-						row[column] = results.getObject( column + 1 );
-					}
-				}
-				
-				Object tableCells[][] = cells.toArray( new Object[0][] );
-				Pres table = resultStyle.applyTo( new Table( tableCells ) );
-				
-				return new ObjectBox( "ResultSet", table );
+				return new ObjectBox( "ResultSet", r );
 			}
 			catch (SQLException e)
 			{
@@ -81,9 +129,12 @@ public class GenericPresentersSQL extends GSymObjectPresenterRegistry
 	private static final StyleSheet staticStyle = StyleSheet.instance.withAttr( Primitive.editable, false );
 	
 	
+	private static final StyleSheet sectionHeadingStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontFace, "Serif" );
+
+	
 	private static final StyleSheet columnStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.fontBold, true );
 	
 	
-	private static final StyleSheet resultStyle = staticStyle.withAttr( Primitive.tableRowSpacing, 2.0 ).withAttr( Primitive.tableColumnSpacing, 10.0 );
+	private static final StyleSheet resultStyle = staticStyle.withAttr( Primitive.tableRowSpacing, 1.0 ).withAttr( Primitive.tableColumnSpacing, 25.0 );
 }
 
