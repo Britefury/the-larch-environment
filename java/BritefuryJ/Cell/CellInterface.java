@@ -16,6 +16,7 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
+import BritefuryJ.GSym.GenericPerspective.GSymPrimitivePresenter;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
@@ -43,7 +44,15 @@ public abstract class CellInterface implements IncrementalOwner, Presentable
 		@Override
 		public DPElement present(PresentationContext ctx, StyleValues style)
 		{
-			return Pres.coerce( cell.getValue() ).present( ctx, style );
+			Object value = cell.getValue();
+			if ( value != null )
+			{
+				return Pres.coerce( value ).present( ctx, style );
+			}
+			else
+			{
+				return GSymPrimitivePresenter.presentNull().present( ctx, style );
+			}
 		}
 	}
 	

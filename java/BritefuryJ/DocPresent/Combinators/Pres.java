@@ -356,7 +356,7 @@ public abstract class Pres
 	{
 		if ( x == null )
 		{
-			return new NullPres();
+			return null;
 		}
 		else if ( x instanceof Pres )
 		{
