@@ -64,6 +64,8 @@ import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBoxWithFields;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectTitle;
 import BritefuryJ.GSym.GenericPerspective.PresCom.VerticalField;
+import BritefuryJ.GSym.GenericPerspective.Presenters.GenericPresentersSQL;
+import BritefuryJ.GSym.ObjectPresentation.GSymObjectPresentationPerspective;
 import BritefuryJ.GSym.ObjectPresentation.GSymObjectPresenterRegistry;
 import BritefuryJ.GSym.ObjectPresentation.ObjectPresenter;
 import BritefuryJ.GSym.ObjectPresentation.PyObjectPresenter;
@@ -72,6 +74,8 @@ import BritefuryJ.GSym.View.GSymFragmentView;
 
 public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegistry
 {
+	private GenericPresentersSQL sql = new GenericPresentersSQL();
+	
 	public GSymGenericObjectPresenterRegistry()
 	{
 		registerJavaObjectPresenter( Character.class, presenter_Character );
@@ -109,6 +113,12 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	}
 
 	
+	public void registerPerspective(GSymObjectPresentationPerspective perspective)
+	{
+		super.registerPerspective( perspective );
+		
+		sql.registerPerspective( perspective );
+	}
 	
 	public static final ObjectPresenter presenter_Boolean = new ObjectPresenter()
 	{
