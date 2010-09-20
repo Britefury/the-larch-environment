@@ -388,7 +388,7 @@ public abstract class Pres
 	}
 	
 
-	public static Pres[] mapCoerce(List<Object> children)
+	public static Pres[] mapCoerce(List<?> children)
 	{
 		Pres result[] = new Pres[children.size()];
 		for (int i = 0; i < children.size(); i++)

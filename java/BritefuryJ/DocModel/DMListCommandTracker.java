@@ -39,6 +39,11 @@ class DMListCommandTracker extends CommandTracker
 		{
 			xls.remove( xls.size() - 1 );
 		}
+
+		protected String getDescription()
+		{
+			return "List add";
+		}
 	}
 
 	
@@ -66,6 +71,11 @@ class DMListCommandTracker extends CommandTracker
 		{
 			ls.remove( i );
 		}
+
+		protected String getDescription()
+		{
+			return "List insert (" + i + ")";
+		}
 	}
 
 	
@@ -90,6 +100,11 @@ class DMListCommandTracker extends CommandTracker
 		protected void unexecute()
 		{
 			ls.removeLast( x.size() );
+		}
+
+		protected String getDescription()
+		{
+			return "List add all";
 		}
 	}
 
@@ -118,6 +133,11 @@ class DMListCommandTracker extends CommandTracker
 		{
 			ls.removeRange( i, x.size() );
 		}
+
+		protected String getDescription()
+		{
+			return "List insert all (" + i + ")";
+		}
 	}
 
 	
@@ -142,6 +162,11 @@ class DMListCommandTracker extends CommandTracker
 		protected void unexecute()
 		{
 			ls.addAll( contents );
+		}
+
+		protected String getDescription()
+		{
+			return "List clear";
 		}
 	}
 
@@ -168,6 +193,11 @@ class DMListCommandTracker extends CommandTracker
 		protected void unexecute()
 		{
 			ls.add( i, x );
+		}
+
+		protected String getDescription()
+		{
+			return "List remove (" + i + ")";
 		}
 	}
 
@@ -197,6 +227,11 @@ class DMListCommandTracker extends CommandTracker
 		{
 			ls.set( i, oldX );
 		}
+
+		protected String getDescription()
+		{
+			return "List set (" + i + ")";
+		}
 	}
 
 	
@@ -223,6 +258,11 @@ class DMListCommandTracker extends CommandTracker
 		protected void unexecute()
 		{
 			ls.setContents( oldContents );
+		}
+
+		protected String getDescription()
+		{
+			return "List set contents";
 		}
 	}
 
