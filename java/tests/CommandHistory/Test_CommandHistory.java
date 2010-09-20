@@ -36,6 +36,11 @@ public class Test_CommandHistory extends TestCase
 		{
 			d.setX( oldX );
 		}
+
+		protected String getDescription()
+		{
+			return "Test: DataX";
+		}
 	}
 	
 
@@ -60,7 +65,12 @@ public class Test_CommandHistory extends TestCase
 		{
 			d.setY( oldY );
 		}
-		
+
+		protected String getDescription()
+		{
+			return "Test: DataY";
+		}
+	
 		protected boolean canMergeFrom(Command command)
 		{
 			return command instanceof DataYCommand;

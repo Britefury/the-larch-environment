@@ -130,7 +130,7 @@ class AppWindow (object):
 		redoAction = _action( 'redo', self._onRedo )
 		self._editRedoItem.setActionCommand( redoAction.getValue( Action.NAME ) )
 		self._editRedoItem.addActionListener( redoAction )
-		self._editRedoItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_Z, ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK ) )
+		self._editRedoItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_Y, ActionEvent.CTRL_MASK ) )
 		self._editRedoItem.setMnemonic( KeyEvent.VK_R )
 		editMenu.add( self._editRedoItem )
 
@@ -166,6 +166,7 @@ class AppWindow (object):
 		viewMenu = JMenu( 'View' )
 		viewMenu.add( _action( 'View document model', self._onViewDocModel ) )
 		viewMenu.add( _action( 'Show element tree explorer', self._onShowElementTreeExplorer ) )
+		viewMenu.add( _action( 'Show undo history', self._onShowCommandHistory ) )
 		viewMenu.add( _action( 'Reset', self._onReset ) )
 		viewMenu.add( _action( '1:1', self._onOneToOne ) )
 		
@@ -314,6 +315,13 @@ class AppWindow (object):
 		treeExplorer = currentTab.getRootElement().treeExplorer()
 		location = self._app._browserContext.getLocationForObject( treeExplorer )
 		self._browser.openLocationInNewWindow( location )
+
+
+	def _onShowCommandHistory(self):
+		commandHistoryController = self._browser.getCommandHistoryController()
+		if commandHistoryController is not None:
+			location = self._app._browserContext.getLocationForObject( commandHistoryController )
+			self._browser.openLocationInNewWindow( location )
 
 
 	def _onReset(self):

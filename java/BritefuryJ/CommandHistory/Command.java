@@ -6,7 +6,13 @@
 //##************************
 package BritefuryJ.CommandHistory;
 
-public abstract class Command
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
+import BritefuryJ.GSym.GenericPerspective.Presentable;
+import BritefuryJ.GSym.View.GSymFragmentView;
+
+public abstract class Command implements Presentable
 {
 	public static class CannotJoinCommandException extends RuntimeException
 	{
@@ -16,6 +22,7 @@ public abstract class Command
 	
 	protected abstract void execute();
 	protected abstract void unexecute();
+	protected abstract String getDescription();
 	
 	
 	protected boolean canMergeFrom(Command command)
@@ -26,5 +33,12 @@ public abstract class Command
 	protected void mergeFrom(Command command)
 	{
 		throw new CannotJoinCommandException();
+	}
+
+	
+	@Override
+	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	{
+		return new Label( getDescription() );
 	}
 }

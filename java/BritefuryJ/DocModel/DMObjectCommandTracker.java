@@ -38,6 +38,11 @@ public class DMObjectCommandTracker extends CommandTracker
 		{
 			obj.set( i, oldX );
 		}
+
+		protected String getDescription()
+		{
+			return "Object set (" + i + ")";
+		}
 	}
 
 	
@@ -66,6 +71,11 @@ public class DMObjectCommandTracker extends CommandTracker
 		protected void unexecute()
 		{
 			obj.update( indices, oldContents );
+		}
+
+		protected String getDescription()
+		{
+			return "Object update";
 		}
 	}
 
@@ -97,6 +107,11 @@ public class DMObjectCommandTracker extends CommandTracker
 		protected void unexecute()
 		{
 			obj.become( oldClass, oldFieldData );
+		}
+
+		protected String getDescription()
+		{
+			return "Object become";
 		}
 	}
 

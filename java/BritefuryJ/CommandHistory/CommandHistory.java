@@ -6,12 +6,30 @@
 //##************************
 package BritefuryJ.CommandHistory;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class CommandHistory implements CommandHistoryController
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.DocPresent.Border.SolidBorder;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Arrow;
+import BritefuryJ.DocPresent.Combinators.Primitive.Border;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
+import BritefuryJ.DocPresent.Painter.FillPainter;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.GSym.GenericPerspective.Presentable;
+import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
+import BritefuryJ.GSym.ObjectPresentation.PresentationStateListenerList;
+import BritefuryJ.GSym.PresCom.InnerFragment;
+import BritefuryJ.GSym.View.GSymFragmentView;
+
+public class CommandHistory implements CommandHistoryController, Presentable
 {
-	private static abstract class Entry
+	private static abstract class Entry implements Presentable
 	{
 		public abstract void execute();
 		public abstract void unexecute();
@@ -46,6 +64,13 @@ public class CommandHistory implements CommandHistoryController
 		public Command top()
 		{
 			return command;
+		}
+
+		
+		@Override
+		public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		{
+			return new InnerFragment( command );
 		}
 	}
 
@@ -96,6 +121,13 @@ public class CommandHistory implements CommandHistoryController
 		{
 			commands.add( command );
 		}
+
+		
+		@Override
+		public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		{
+			return new ObjectBox( "Command group", new Column( Pres.mapCoerce( commands ) ) );
+		}
 	}
 	
 	
@@ -105,6 +137,7 @@ public class CommandHistory implements CommandHistoryController
 	private boolean bCommandsBlocked, bFrozen;
 	private int freezeCount;
 	private CommandHistoryListener listener;
+	private PresentationStateListenerList presStateListeners = null;
 	
 	
 	
@@ -160,6 +193,8 @@ public class CommandHistory implements CommandHistoryController
 			{
 				listener.onCommandHistoryChanged( this );
 			}
+			
+			onModified();
 		}
 	}
 	
@@ -183,6 +218,8 @@ public class CommandHistory implements CommandHistoryController
 			{
 				listener.onCommandHistoryChanged( this );
 			}
+
+			onModified();
 		}
 	}
 	
@@ -205,6 +242,8 @@ public class CommandHistory implements CommandHistoryController
 			{
 				listener.onCommandHistoryChanged( this );
 			}
+
+			onModified();
 		}
 	}
 	
@@ -218,6 +257,8 @@ public class CommandHistory implements CommandHistoryController
 		{
 			listener.onCommandHistoryChanged( this );
 		}
+		
+		onModified();
 	}
 	
 	
@@ -356,4 +397,44 @@ public class CommandHistory implements CommandHistoryController
 		entry.unexecute();
 		unblockCommands();
 	}
+	
+	
+	private void onModified()
+	{
+		presStateListeners = PresentationStateListenerList.onPresentationStateChanged( presStateListeners, this );
+	}
+
+
+
+	@Override
+	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	{
+		presStateListeners = PresentationStateListenerList.addListener( presStateListeners, fragment );
+
+		Pres pastTitleTop = pastTitleStyle.applyTo( new Row( new Pres[] { new Arrow( Arrow.Direction.DOWN, 14.0 ).alignVCentre(), new Label( "Past" ) } ) );
+		Pres pastContents = new Column( Pres.mapCoerce( past ) );
+		Pres pastTitleBottom = pastTitleStyle.applyTo( new Row( new Pres[] { new Arrow( Arrow.Direction.UP, 14.0 ).alignVCentre(), new Label( "Past" ) } ) );
+		Pres pastBox = pastBorderStyle.applyTo( new Border( listBoxStyle.applyTo( new Column( new Pres[] { pastTitleTop, pastContents, pastTitleBottom } ) ) ) );
+
+		Pres futureTitleTop = futureTitleStyle.applyTo( new Row( new Pres[] { new Arrow( Arrow.Direction.DOWN, 14.0 ).alignVCentre(), new Label( "Future" ) } ) );
+		Pres futureContents = new Column( Pres.mapCoerce( future ) );
+		Pres futureTitleBottom = futureTitleStyle.applyTo( new Row( new Pres[] { new Arrow( Arrow.Direction.UP, 14.0 ).alignVCentre(), new Label( "Future" ) } ) );
+		Pres futureBox = futureBorderStyle.applyTo( new Border( listBoxStyle.applyTo( new Column( new Pres[] { futureTitleTop, futureContents, futureTitleBottom } ) ) ) );
+		
+		Pres mainBox = commandHistoryColumnStyle.applyTo( new Column( new Pres[] { pastBox, futureBox } ) );
+		
+		return new ObjectBox( "CommandHistory", mainBox );
+	}
+	
+	
+	private static final StyleSheet pastTitleStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.5f ) )
+			.withAttr( Primitive.shapePainter, new FillPainter( new Color( 0.5f, 0.0f, 0.5f ) ) )
+			.withAttr( Primitive.fontFace, "Serif" ).withAttr( Primitive.fontSmallCaps, true );
+	private static final StyleSheet futureTitleStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.25f, 0.5f ) )
+			.withAttr( Primitive.shapePainter, new FillPainter( new Color( 0.0f, 0.25f, 0.5f ) ) )
+			.withAttr( Primitive.fontFace, "Serif" ).withAttr( Primitive.fontSmallCaps, true );
+	private static final StyleSheet pastBorderStyle = StyleSheet.instance.withAttr( Primitive.border, new SolidBorder( 2.0, 3.0, 10.0, 10.0, new Color( 0.5f, 0.0f, 0.5f ), null ) );
+	private static final StyleSheet futureBorderStyle = StyleSheet.instance.withAttr( Primitive.border, new SolidBorder( 2.0, 3.0, 10.0, 10.0, new Color( 0.0f, 0.25f, 0.5f ), null ) );
+	private static final StyleSheet listBoxStyle = StyleSheet.instance.withAttr( Primitive.columnSpacing, 10.0 );
+	private static final StyleSheet commandHistoryColumnStyle = StyleSheet.instance.withAttr( Primitive.columnSpacing, 20.0 );
 }
