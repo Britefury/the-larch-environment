@@ -5,9 +5,9 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2010.
 ##-*************************
-from java.lang import StringBuilder
-
 import sys
+
+from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder
 
 from GSymCore.Languages.Python25 import CodeGenerator
 
@@ -20,14 +20,17 @@ class _OutputStream (object):
 		if not ( isinstance( text, str )  or  isinstance( text, unicode ) ):
 			raise TypeError, 'argument 1 must be string, not %s' % type( text )
 		if self._builder is None:
-			self._builder = StringBuilder()
-		self._builder.append( text )
+			self._builder = StreamValueBuilder()
+		self._builder.appendTextValue( text )
+	
+	def display(self, value):
+		if self._builder is None:
+			self._builder = StreamValueBuilder()
+		self._builder.appendStructuralValue( value )
 		
-	def getText(self):
-		if self._builder is not None:
-			return self._builder.toString()
-		else:
-			return None
+		
+	def getStream(self):
+		return self._builder.stream()   if self._builder is not None   else None
 
 		
 		
@@ -69,6 +72,8 @@ def executePythonModule(pythonModule, module, bEvaluate):
 	stderr = _OutputStream()
 	sys.stdout = stdout
 	sys.stderr = stderr
+	setattr( module, 'display', stdout.display )
+	setattr( module, 'displayerr', stderr.display )
 	
 	try:
 		exec execCode in module.__dict__
@@ -82,5 +87,5 @@ def executePythonModule(pythonModule, module, bEvaluate):
 	
 	sys.stdout, sys.stderr = savedStdout, savedStderr
 	
-	return ExecutionResult( stdout.getText(), stderr.getText(), caughtException, result )
+	return ExecutionResult( stdout.getStream(), stderr.getStream(), caughtException, result )
 	

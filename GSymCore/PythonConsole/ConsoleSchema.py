@@ -95,18 +95,6 @@ class Console (IncrementalOwner):
 		self._incr.onChanged()
 		
 		
-	def _initStdOutErr(self):
-		stdout, stderr = sys.stdout, sys.stderr
-		sys.stdout = self.Output()
-		sys.stderr = self.Output()
-		return stdout, stderr
-
-	def _shutdownStdOurErr(self, stdout, stderr):
-		outout, outerr = sys.stdout, sys.stderr
-		sys.stdout, sys.stderr = stdout, stderr
-		return outout, outerr
-	
-		
 		
 	def execute(self, bEvaluate):
 		module = self.getCurrentPythonModule()
