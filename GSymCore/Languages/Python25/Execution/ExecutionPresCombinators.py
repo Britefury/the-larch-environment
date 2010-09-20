@@ -46,17 +46,29 @@ class ExecutionStyle (object):
 
 
 
-def _textLines(labelText, text, textStyleAttribute):
+def _textLines(text, textStyleAttribute):
+	return ApplyStyleSheetFromAttribute( textStyleAttribute, Column( [ StaticText( line )   for line in text.split( '\n' ) ] ) )
+
+def _streamItem(item, textStyleAttribute, bUseGenericPerspectiveForResult):
+	if item.isStructural():
+		resultView = InnerFragment( item.getStructuralValue() )
+		if bUseGenericPerspectiveForResult:
+			resultView = ApplyPerspective.generic( resultView )
+		return resultView
+	else:
+		return _textLines( item.getTextValue(), textStyleAttribute )
+
+def _streamLines(labelText, stream, textStyleAttribute, bUseGenericPerspectiveForResult):
 	label = ApplyStyleSheetFromAttribute( ExecutionStyle.labelStyle, StaticText( labelText ) )
-	lines = ApplyStyleSheetFromAttribute( textStyleAttribute, Column( [ StaticText( line )   for line in text.split( '\n' ) ] ) )
-	return Column( [ label, lines.padX( 5.0, 0.0 ) ] )
+	lines = [ _streamItem( item, textStyleAttribute, bUseGenericPerspectiveForResult )   for item in stream.getItems() ]
+	return Column( [ label, Column( lines ).padX( 5.0, 0.0 ) ] )
 
 
-def execStdout(text):
-	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdOutStyle, Border( _textLines( 'STDOUT:', text, ExecutionStyle.stdOutStyle ).alignHExpand() ).alignHExpand() )
+def execStdout(text, bUseGenericPerspectiveForResult):
+	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdOutStyle, Border( _streamLines( 'STDOUT:', text, ExecutionStyle.stdOutStyle, bUseGenericPerspectiveForResult ).alignHExpand() ).alignHExpand() )
 
-def execStderr(text):
-	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdErrStyle, Border( _textLines( 'STDERR:', text, ExecutionStyle.stdErrStyle ).alignHExpand() ).alignHExpand() )
+def execStderr(text, bUseGenericPerspectiveForResult):
+	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdErrStyle, Border( _streamLines( 'STDERR:', text, ExecutionStyle.stdErrStyle, bUseGenericPerspectiveForResult ).alignHExpand() ).alignHExpand() )
 	
 def execException(exceptionView):
 	label = ApplyStyleSheetFromAttribute( ExecutionStyle.labelStyle, StaticText( 'EXCEPTION:' ) )
@@ -66,17 +78,17 @@ def execResult(resultView):
 	return ApplyStyleSheetFromAttribute( ExecutionStyle.resultBorderStyle, Border( Paragraph( [ resultView ] ).alignHExpand() ).alignHExpand() )
 
 
-def executionResultBox(stdoutText, stderrText, exception, resultInTuple, bUseGenericPerspecitveForException, bUseGenericPerspectiveForResult):
+def executionResultBox(stdoutStream, stderrStream, exception, resultInTuple, bUseGenericPerspecitveForException, bUseGenericPerspectiveForResult):
 	boxContents = []
-	if stderrText is not None:
-		boxContents.append( execStderr( stderrText ) )
+	if stderrStream is not None:
+		boxContents.append( execStderr( stderrStream, bUseGenericPerspectiveForResult ) )
 	if exception is not None:
 		exceptionView = InnerFragment( exception )
 		if bUseGenericPerspecitveForException:
 			exceptionView = ApplyPerspective.generic( exceptionView )
 		boxContents.append( execException( exceptionView ) )
-	if stdoutText is not None:
-		boxContents.append( execStdout( stdoutText ) )
+	if stdoutStream is not None:
+		boxContents.append( execStdout( stdoutStream, bUseGenericPerspectiveForResult ) )
 	if resultInTuple is not None:
 		resultView = InnerFragment( resultInTuple[0] )
 		if bUseGenericPerspectiveForResult:

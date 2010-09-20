@@ -42,7 +42,7 @@ from BritefuryJ.GSym.View import GSymFragmentView
 from BritefuryJ.GSym.PresCom import InnerFragment, ApplyPerspective
 
 from GSymCore.Languages.Python25 import Python25
-from GSymCore.Languages.Python25.Execution.ExecutionPresCombinators import execStdout, execStdout, execException, execResult
+from GSymCore.Languages.Python25.Execution.ExecutionPresCombinators import execStdout, execStderr, execException, execResult
 
 from GSymCore.PythonConsole import ConsoleSchema as Schema
 
@@ -175,11 +175,11 @@ class ConsoleView (GSymViewObjectDispatch):
 		blockContents = []
 		blockContents.append( _pythonModuleBorderStyle.applyTo( Border( moduleView.alignHExpand() ).alignHExpand() ) )
 		if stderr is not None:
-			blockContents.append( execStderr( stderr ) )
+			blockContents.append( execStderr( stderr, True ) )
 		if caughtExceptionView is not None:
 			blockContents.append( execException( caughtExceptionView ) )
 		if stdout is not None:
-			blockContents.append( execStdout( stdout ) )
+			blockContents.append( execStdout( stdout, True ) )
 		if resultView is not None:
 			blockContents.append( execResult( resultView ) )
 		blockColumn = Column( blockContents ).alignHExpand()

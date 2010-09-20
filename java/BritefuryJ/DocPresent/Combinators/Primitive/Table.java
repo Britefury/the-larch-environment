@@ -52,7 +52,14 @@ public class Table extends Pres
 			childCells[y] = new TableCell[row.length];
 			for (int x = 0; x < row.length; x++)
 			{
-				childCells[y][x] = new TableCell( coerce( row[x] ), 1, 1 );
+				if ( row[x] != null )
+				{
+					childCells[y][x] = new TableCell( coerce( row[x] ), 1, 1 );
+				}
+				else
+				{
+					childCells[y][x] = null;
+				}
 			}
 		}
 	}
