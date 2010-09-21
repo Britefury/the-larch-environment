@@ -79,6 +79,12 @@ public abstract class IncrementalTreeNode implements IncrementalMonitorListener,
 	
 
 	
+	protected final static int FLAG_SUBTREE_REFRESH_REQUIRED = 0x1;
+	protected final static int FLAG_NODE_REFRESH_REQUIRED = 0x2;
+	
+	protected final static int FLAGS_INCREMENTALTREENODE_END = 0x4;
+
+	
 	
 	private IncrementalTree incrementalTree;
 	private Object model;
@@ -89,13 +95,16 @@ public abstract class IncrementalTreeNode implements IncrementalMonitorListener,
 	private IncrementalTreeNode parent, nextSibling;
 	private IncrementalTreeNode childrenHead, childrenTail;
 	
-	private boolean bSubtreeRefreshRequired = true, bNodeRefreshRequired = true;
+	private int flags;
 	
 	
 	
 	
 	public IncrementalTreeNode(IncrementalTree incrementalTree, Object model)
 	{
+		setFlag( FLAG_SUBTREE_REFRESH_REQUIRED );
+		setFlag( FLAG_NODE_REFRESH_REQUIRED );
+
 		this.incrementalTree = incrementalTree;
 		this.model = model;
 		
@@ -201,7 +210,7 @@ public abstract class IncrementalTreeNode implements IncrementalMonitorListener,
 		incrementalTree.onResultChangeFrom( this, result );
 
 		Object r = result;
-		if ( bNodeRefreshRequired )
+		if ( testFlag( FLAG_NODE_REFRESH_REQUIRED ) )
 		{
 			// Compute the result for this node, and refresh all children
 			Object refreshState = incr.onRefreshBegin();
@@ -220,7 +229,7 @@ public abstract class IncrementalTreeNode implements IncrementalMonitorListener,
 			child = child.nextSibling;
 		}
 		
-		if ( bNodeRefreshRequired )
+		if ( testFlag( FLAG_NODE_REFRESH_REQUIRED ) )
 		{
 			incr.onAccess();
 			// Set the node result
@@ -229,16 +238,16 @@ public abstract class IncrementalTreeNode implements IncrementalMonitorListener,
 		
 		
 		incrementalTree.onResultChangeTo( this, result );
-		bNodeRefreshRequired = false;
+		clearFlag( FLAG_NODE_REFRESH_REQUIRED );
 	}
 	
 	
 	public void refresh()
 	{
-		if ( bSubtreeRefreshRequired )
+		if ( testFlag( FLAG_SUBTREE_REFRESH_REQUIRED ) )
 		{
 			refreshSubtree();
-			bSubtreeRefreshRequired = false;
+			clearFlag( FLAG_SUBTREE_REFRESH_REQUIRED );
 		}
 	}
 	
@@ -334,9 +343,9 @@ public abstract class IncrementalTreeNode implements IncrementalMonitorListener,
 	
 	public void onIncrementalMonitorChanged(IncrementalMonitor inc)
 	{
-		if ( !bNodeRefreshRequired )
+		if ( !testFlag( FLAG_NODE_REFRESH_REQUIRED ) )
 		{
-			bNodeRefreshRequired = true;
+			setFlag( FLAG_NODE_REFRESH_REQUIRED );
 			requestSubtreeRefresh();
 		}
 	}
@@ -351,9 +360,9 @@ public abstract class IncrementalTreeNode implements IncrementalMonitorListener,
 	
 	protected void requestSubtreeRefresh()
 	{
-		if ( !bSubtreeRefreshRequired )
+		if ( !testFlag( FLAG_SUBTREE_REFRESH_REQUIRED ) )
 		{
-			bSubtreeRefreshRequired = true;
+			setFlag( FLAG_SUBTREE_REFRESH_REQUIRED );
 			if ( parent != null )
 			{
 				parent.requestSubtreeRefresh();
@@ -361,5 +370,41 @@ public abstract class IncrementalTreeNode implements IncrementalMonitorListener,
 			
 			incrementalTree.onNodeRequestRefresh( this );
 		}
+	}
+
+
+
+
+	//
+	//
+	// Flag methods
+	//
+	//
+	
+	protected void clearFlag(int flag)
+	{
+		flags &= ~flag;
+	}
+	
+	protected void setFlag(int flag)
+	{
+		flags |= flag;
+	}
+	
+	protected void setFlagValue(int flag, boolean value)
+	{
+		if ( value )
+		{
+			flags |= flag;
+		}
+		else
+		{
+			flags &= ~flag;
+		}
+	}
+	
+	protected boolean testFlag(int flag)
+	{
+		return ( flags & flag )  !=  0;
 	}
 }

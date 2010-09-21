@@ -279,6 +279,9 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 		GSymFragmentView incrementalNode = (GSymFragmentView)view.buildIncrementalTreeNodeResult( model, view.makeNodeResultFactory( perspective, subjectContext, style, inheritedState ) );
 		
 		
+		// Register the parent <-> child relationship before refreshing the node, so that the relationship is 'available' during (re-computation)
+		registerIncrementalNodeRelationship( incrementalNode );
+		
 		// Block access tracking to prevent the contents of this node being dependent upon the child node being refreshed,
 		// and refresh the view node
 		// Refreshing the child node will ensure that when its contents are inserted into outer elements, its full element tree
@@ -288,8 +291,6 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 		IncrementalFunctionMonitor currentComputation = IncrementalMonitor.blockAccessTracking();
 		incrementalNode.refresh();
 		IncrementalMonitor.unblockAccessTracking( currentComputation );
-		
-		registerIncrementalNodeRelationship( incrementalNode );
 		
 		return incrementalNode.getFragmentElement();
 	}
