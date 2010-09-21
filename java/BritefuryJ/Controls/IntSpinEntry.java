@@ -88,6 +88,17 @@ public class IntSpinEntry extends SpinEntry
 		{
 			setValue( value   +   ( bUp  ?  pageSize  :  -pageSize ) ); 
 		}
+		
+		protected void onDrag(Object startValue, double delta)
+		{
+			Integer start = (Integer)startValue;
+			setValue( start + (int)( delta + 0.5 ) );
+		}
+		
+		protected Object storeValue()
+		{
+			return value;
+		}
 	}
 
 
