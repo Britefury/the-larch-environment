@@ -1546,7 +1546,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	}
 	
 	
-	protected void clip(Graphics2D graphics)
+	public void clip(Graphics2D graphics)
 	{
 		graphics.clip( new Rectangle2D.Double( 0.0, 0.0, getWidth(), getHeight() ) );
 	}
@@ -1675,7 +1675,14 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		{
 			for (ElementPainter painter: painters)
 			{
-				painter.drawBackground( this, graphics );
+				try
+				{
+					painter.drawBackground( this, graphics );
+				}
+				catch (Exception e)
+				{
+					notifyExceptionDuringEventHandler( painter, "drawBackground", e );
+				}
 			}
 		}
 	}
@@ -1688,7 +1695,14 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		{
 			for (ElementPainter painter: painters)
 			{
-				painter.draw( this, graphics );
+				try
+				{
+					painter.draw( this, graphics );
+				}
+				catch (Exception e)
+				{
+					notifyExceptionDuringEventHandler( painter, "draw", e );
+				}
 			}
 		}
 	}
@@ -3036,6 +3050,14 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		{
 			return alreadyInUseStyle.applyTo( new Border( new StaticText( "Element already in use (element is realised)." ) ) );
 		}
+	}
+	
+	
+	
+	public void notifyExceptionDuringEventHandler(Object eventHandler, String event, Exception e)
+	{
+		System.err.println( "Exception during element event handler:" );
+		e.printStackTrace();
 	}
 	
 	
