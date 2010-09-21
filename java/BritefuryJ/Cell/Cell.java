@@ -108,11 +108,17 @@ public class Cell extends CellInterface
 	private void refreshValue()
 	{
 		Object refreshState = inc.onRefreshBegin();
-		if ( refreshState != null )
+		try
 		{
-			valueCache = evaluator.evaluate();
+			if ( refreshState != null )
+			{
+				valueCache = evaluator.evaluate();
+			}
 		}
-		inc.onRefreshEnd( refreshState );
+		finally
+		{
+			inc.onRefreshEnd( refreshState );
+		}
 	}
 	
 	
