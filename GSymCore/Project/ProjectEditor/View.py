@@ -119,9 +119,16 @@ class ProjectDrag (Object):
 	def __init__(self, source):
 		self.source = source
 		
+		
+def _getModelOfPackageOrPageNameElement(element):
+	return element.getFragmentContext().getParent().getModel()
+		
+def _getModelOfProjectNameElement(element):
+	return element.getFragmentContext().getModel()
+		
 
 def _dragSourceCreateSourceData(element, aspect):
-	return ProjectDrag( element.getFragmentContext().getModel() )
+	return ProjectDrag( _getModelOfPackageOrPageNameElement( element ) )
 
 
 _dragSource = ObjectDndHandler.DragSource( ProjectDrag, ObjectDndHandler.ASPECT_NORMAL, _dragSourceCreateSourceData )
@@ -139,37 +146,46 @@ def _isChildOf(node, package):
 	return False
 
 
+def _performDrop(data, action, newParent, index):
+	source = data.source.deepCopy()   if action == ObjectDndHandler.COPY   else data.source
+	
+	if action == ObjectDndHandler.MOVE:
+                sourceParent = data.source.getValidParents()[0]
+                indexOfSource = sourceParent.indexOfById( data.source )
+                del sourceParent[indexOfSource]
+                if index is not None  and  newParent is sourceParent  and  index > indexOfSource:
+                        index -= 1
+	
+	if index is None:
+		newParent.append( source )
+	else:
+		newParent.insert( index, source )
+	
+
+
+
 def _pageCanDrop(element, targetPos, data, action):
 	if action & ObjectDndHandler.COPY_OR_MOVE  !=  0:
-		model = element.getFragmentContext().getModel()
+		model = _getModelOfPackageOrPageNameElement( element )
 		return model is not data.source
 	return False
 
 def _pageDrop(element, targetPos, data, action):
 	if action & ObjectDndHandler.COPY_OR_MOVE  !=  0:
-		destPage = element.getFragmentContext().getModel()
+		destPage = _getModelOfPackageOrPageNameElement( element )
 		parent = destPage.getValidParents()[0]
 		index = parent.indexOfById( destPage )
 		if targetPos.y > ( element.getHeight() * 0.5 ):
 			index += 1
-		
-		source = data.source.deepCopy()   if action == ObjectDndHandler.COPY   else data.source
-		
-		if action == ObjectDndHandler.MOVE:
-			sourceParent = data.source.getValidParents()[0]
-			indexOfSource = sourceParent.indexOfById( data.source )
-			del sourceParent[indexOfSource]
-			if parent is sourceParent  and  index > indexOfSource:
-				index -= 1
-
-		parent.insert( index, source )
+			
+		_performDrop( data, action, parent, index )
 		return True
 	return False
 			
 
 
 def _getDestPackageAndIndex(element, targetPos):
-	targetPackage = element.getFragmentContext().getModel()
+	targetPackage = _getModelOfPackageOrPageNameElement( element )
 	if targetPos.x > ( element.getWidth() * 0.5 ):
 		return targetPackage, len( targetPackage['contents'] )
 	else:
@@ -180,7 +196,6 @@ def _getDestPackageAndIndex(element, targetPos):
 			index += 1
 		return parent2, index
 	
-
 
 def _packageCanDrop(element, targetPos, data, action):
 	if action & ObjectDndHandler.COPY_OR_MOVE  !=  0:
@@ -197,53 +212,26 @@ def _packageDrop(element, targetPos, data, action):
 		
 		
 		
-		#targetPackage = element.getFragmentContext().getModel()
-		#if targetPos.x > ( element.getWidth() * 0.5 ):
-			#pass
-		#else:
-			#parent = targetPackage.getValidParents()[0]
-			#index = parent.indexOfById( targetPackage )
-			#if targetPos.y > ( element.getHeight() * 0.5 ):
-				#index += 1
-			
-			#source = data.source.deepCopy()   if action == ObjectDndHandler.COPY   else data.source
-			
-			#if action == ObjectDndHandler.MOVE:
-				#sourceParent = data.source.getValidParents()[0]
-				#indexOfSource = sourceParent.indexOfById( data.source )
-				#del sourceParent[indexOfSource]
-				#if parent is sourceParent  and  index > indexOfSource:
-					#index -= 1
-
-		#parent.insert( index, source )
-		#return True
+		targetPackage = _getModelOfPackageOrPageNameElement( element )
+		if targetPos.x > ( element.getWidth() * 0.5 ):
+			_performDrop( data, action, targetPackage['contents'], None )
+			return True
+		else:
+			parent = targetPackage.getValidParents()[0]
+			index = parent.indexOfById( targetPackage )
+			if targetPos.y > ( element.getHeight() * 0.5 ):
+				index += 1
+				
+			_performDrop( data, action, parent, index )
+			return True
 	return False
 
 
 def _projectIndexDrop(element, targetPos, data, action):
 	if action & ObjectDndHandler.COPY_OR_MOVE  !=  0:
-		return False
-		
-		#targetPackage = element.getFragmentContext().getModel()
-		#if targetPos.x > ( element.getWidth() * 0.5 ):
-			#pass
-		#else:
-			#parent = targetPackage.getValidParents()[0]
-			#index = parent.indexOfById( targetPackage )
-			#if targetPos.y > ( element.getHeight() * 0.5 ):
-				#index += 1
-			
-			#source = data.source.deepCopy()   if action == ObjectDndHandler.COPY   else data.source
-			
-			#if action == ObjectDndHandler.MOVE:
-				#sourceParent = data.source.getValidParents()[0]
-				#indexOfSource = sourceParent.indexOfById( data.source )
-				#del sourceParent[indexOfSource]
-				#if parent is sourceParent  and  index > indexOfSource:
-					#index -= 1
-
-		#parent.insert( index, source )
-		#return True
+		project = _getModelOfProjectNameElement( element )
+		_performDrop( data, action, project['contents'], None )
+		return True
 	return False
 
 
