@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.python.core.Py;
+import org.python.core.PyBaseException;
 import org.python.core.PyBoolean;
 import org.python.core.PyDictionary;
 import org.python.core.PyException;
@@ -59,11 +60,11 @@ import BritefuryJ.DocPresent.Combinators.Sequence.SpanSequenceView;
 import BritefuryJ.DocPresent.Combinators.Sequence.TrailingSeparator;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.GSym.GenericPerspective.PresCom.ErrorBox;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ErrorBoxWithFields;
 import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBorder;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
-import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBoxWithFields;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectTitle;
 import BritefuryJ.GSym.GenericPerspective.PresCom.VerticalField;
 import BritefuryJ.GSym.GenericPerspective.Presenters.GenericPresentersSQL;
@@ -102,6 +103,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		
 		registerJavaObjectPresenter( PyNone.class,  presenter_PyNone );
 		registerJavaObjectPresenter( PyException.class,  presenter_PyException );
+		registerJavaObjectPresenter( PyBaseException.class,  presenter_PyBaseException );
 		registerJavaObjectPresenter( PyModule.class,  presenter_PyModule );
 
 		registerJavaObjectPresenter( Exception.class,  presenter_Exception );
@@ -656,6 +658,28 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 
 	
 	
+	public static final ObjectPresenter presenter_PyBaseException = new ObjectPresenter()
+	{
+		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		{
+			PyBaseException e = (PyBaseException)x;
+			
+			String lines[] = e.toString().split( "\n" );
+			Pres lineTexts[] = new Pres[lines.length];
+			
+			for (int i = 0; i < lines.length; i++)
+			{
+				lineTexts[i] = new Label( lines[i] );
+			}
+			
+			Pres contents = new Column( lineTexts );
+			
+			return new ErrorBox( "PYTHON EXCEPTION", contents );
+		}
+	};
+
+	
+	
 	public static final ObjectPresenter presenter_Exception = new ObjectPresenter()
 	{
 		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
@@ -792,19 +816,6 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		}
 	};
 	
-	private static Pres presentClassName(Class<?> c, StyleSheet classNameStyle)
-	{
-		if ( c.isArray() )
-		{
-			c = c.getComponentType();
-			return new Span( new Pres[] { classNameStyle.applyTo( new Label( c.getName() ) ), typePunctuationStyle.applyTo( new Label( "[]" ) ) } );
-		}
-		else
-		{
-			return classNameStyle.applyTo( new Label( c.getName() ) );
-		}
-	}
-	
 	
 	private static Pres presentClassHeader(Class<?> cls)
 	{
@@ -814,7 +825,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		ArrayList<Object> lines = new ArrayList<Object>();
 		
 		Pres headerName = new Row( new Pres[] { javaKeywordStyle.applyTo( new StaticText( "Class " ) ), 
-				presentClassName( cls, classNameStyle ) } );
+				GSymPrimitivePresenter.presentJavaClassName( cls, classNameStyle ) } );
 		
 		lines.add( headerName );
 		
@@ -824,7 +835,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 			if ( superClass != null )
 			{
 				inheritanceItems.add( javaKeywordStyle.applyTo( new StaticText( "Extends " ) ) );
-				inheritanceItems.add( presentClassName( superClass, classNameStyle ) );
+				inheritanceItems.add( GSymPrimitivePresenter.presentJavaClassName( superClass, classNameStyle ) );
 			}
 			
 			if ( interfaces.length > 0 )
@@ -841,7 +852,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 					{
 						inheritanceItems.add( classPunctuationStyle.applyTo( new StaticText( ", " ) ) );
 					}
-					inheritanceItems.add( presentClassName( iface, classNameStyle ) );
+					inheritanceItems.add( GSymPrimitivePresenter.presentJavaClassName( iface, classNameStyle ) );
 					bFirst = false;
 				}
 			}
@@ -856,79 +867,100 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		}
 	}
 
+
+	private static Pres presentClassDeclaration(Class<?> cls)
+	{
+		Constructor<?> declaredConstructors[] = cls.getDeclaredConstructors();
+		Method declaredMethods[] = cls.getDeclaredMethods();
+		Field declaredFields[] = cls.getDeclaredFields();
+		Class<?> declaredClasses[] = cls.getDeclaredClasses();
+		
+		ArrayList<Object> contents = new ArrayList<Object>();
+		
+		contents.add( presentClassHeader( cls ) );
+		
+		// Members
+		ArrayList<Object> constructorDeclarations = new ArrayList<Object>();
+		ArrayList<Object> staticFieldDeclarations = new ArrayList<Object>();
+		ArrayList<Object> fieldDeclarations = new ArrayList<Object>();
+		ArrayList<Object> staticMethodDeclarations = new ArrayList<Object>();
+		ArrayList<Object> methodDeclarations = new ArrayList<Object>();
+		ArrayList<Object> classDeclarations = new ArrayList<Object>();
+		for (int i = 0; i < declaredConstructors.length; i++)
+		{
+			constructorDeclarations.add( presentConstructorDeclaration( declaredConstructors[i] ) );
+		}
+		for (int i = 0; i < declaredFields.length; i++)
+		{
+			if ( Modifier.isStatic( declaredFields[i].getModifiers() ) )
+			{
+				staticFieldDeclarations.add( presentFieldDeclaration( declaredFields[i] ) );
+			}
+			else
+			{
+				fieldDeclarations.add( presentFieldDeclaration( declaredFields[i] ) );
+			}
+		}
+		for (int i = 0; i < declaredMethods.length; i++)
+		{
+			if ( Modifier.isStatic( declaredMethods[i].getModifiers() ) )
+			{
+				staticMethodDeclarations.add( presentMethodDeclaration( declaredMethods[i] ) );
+			}
+			else
+			{
+				methodDeclarations.add( presentMethodDeclaration( declaredMethods[i] ) );
+			}
+		}
+		for (int i = 0; i < declaredClasses.length; i++)
+		{
+			classDeclarations.add( new InnerFragment( declaredClasses[i] ) );
+		}
+		
+		if ( constructorDeclarations.size() > 0 )
+		{
+			contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Constructors" ) ),   new Column( constructorDeclarations ) ) );
+		}
+
+		if ( methodDeclarations.size() > 0 )
+		{
+			contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Methods" ) ),   new Column( methodDeclarations ) ) );
+		}
+
+		if ( staticMethodDeclarations.size() > 0 )
+		{
+			contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Static methods" ) ),   new Column( staticMethodDeclarations ) ) );
+		}
+
+		if ( fieldDeclarations.size() > 0 )
+		{
+			contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Fields" ) ),   new Column( fieldDeclarations ) ) );
+		}
+
+		if ( staticFieldDeclarations.size() > 0 )
+		{
+			contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Static fields" ) ),   new Column( staticFieldDeclarations ) ) );
+		}
+
+		if ( classDeclarations.size() > 0 )
+		{
+			contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Classes" ) ),   new Column( classDeclarations ) ) );
+		}
+		
+		return new Column( contents );
+	}
+
+	
+	
 	public static final ObjectPresenter presenter_Class = new ObjectPresenter()
 	{
 		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			Class<?> cls = (Class<?>)x;
-			Constructor<?> declaredConstructors[] = cls.getDeclaredConstructors();
-			Method declaredMethods[] = cls.getDeclaredMethods();
-			Field declaredFields[] = cls.getDeclaredFields();
 			
-			ArrayList<Object> contents = new ArrayList<Object>();
+			Pres clsPres = presentClassDeclaration( cls );
 			
-			contents.add( presentClassHeader( cls ) );
-			
-			// Members
-			ArrayList<Object> constructorDeclarations = new ArrayList<Object>();
-			ArrayList<Object> staticFieldDeclarations = new ArrayList<Object>();
-			ArrayList<Object> fieldDeclarations = new ArrayList<Object>();
-			ArrayList<Object> staticMethodDeclarations = new ArrayList<Object>();
-			ArrayList<Object> methodDeclarations = new ArrayList<Object>();
-			for (int i = 0; i < declaredConstructors.length; i++)
-			{
-				constructorDeclarations.add( presentConstructorDeclaration( declaredConstructors[i] ) );
-			}
-			for (int i = 0; i < declaredFields.length; i++)
-			{
-				if ( Modifier.isStatic( declaredFields[i].getModifiers() ) )
-				{
-					staticFieldDeclarations.add( presentFieldDeclaration( declaredFields[i] ) );
-				}
-				else
-				{
-					fieldDeclarations.add( presentFieldDeclaration( declaredFields[i] ) );
-				}
-			}
-			for (int i = 0; i < declaredMethods.length; i++)
-			{
-				if ( Modifier.isStatic( declaredMethods[i].getModifiers() ) )
-				{
-					staticMethodDeclarations.add( presentMethodDeclaration( declaredMethods[i] ) );
-				}
-				else
-				{
-					methodDeclarations.add( presentMethodDeclaration( declaredMethods[i] ) );
-				}
-			}
-			
-			if ( constructorDeclarations.size() > 0 )
-			{
-				contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Constructors" ) ),   new Column( constructorDeclarations ) ) );
-			}
-
-			if ( methodDeclarations.size() > 0 )
-			{
-				contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Methods" ) ),   new Column( methodDeclarations ) ) );
-			}
-
-			if ( staticMethodDeclarations.size() > 0 )
-			{
-				contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Static methods" ) ),   new Column( staticMethodDeclarations ) ) );
-			}
-
-			if ( fieldDeclarations.size() > 0 )
-			{
-				contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Fields" ) ),   new Column( fieldDeclarations ) ) );
-			}
-
-			if ( staticFieldDeclarations.size() > 0 )
-			{
-				contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Static fields" ) ),   new Column( staticFieldDeclarations ) ) );
-			}
-			
-			
-			return new ObjectBoxWithFields( "Java Class", contents );
+			return new ObjectBox( "Java Class", clsPres );
 		}
 	};
 	
@@ -941,11 +973,11 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		ArrayList<Object> words = new ArrayList<Object>();
 		
 		// type
-		words.add( presentClassName( field.getType(), typeNameStyle ) );
+		words.add( GSymPrimitivePresenter.presentJavaClassName( field.getType(), typeNameStyle ) );
 		words.add( space );
 		words.add( new LineBreak() );
 		// name
-		words.add( fieldNameStyle.applyTo( new Label( field.getName() ) ) );
+		words.add( GSymPrimitivePresenter.getAccessNameStyle( field.getModifiers() ).applyTo( new Label( field.getName() ) ) );
 		
 		return new Paragraph( words );
 	}
@@ -967,14 +999,14 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		ArrayList<Object> words = new ArrayList<Object>();
 		
 		// type
-		words.add( presentClassName( constructor.getDeclaringClass(), methodNameStyle ) );
+		words.add( GSymPrimitivePresenter.presentJavaClassName( constructor.getDeclaringClass(), GSymPrimitivePresenter.getAccessNameStyle( constructor.getModifiers() ) ) );
 		// open paren
 		words.add( delimStyle.applyTo( new Label( "(" ) ) );
 		Class<?> paramTypes[] = constructor.getParameterTypes(); 
 		Object params[] = new Object[paramTypes.length];
 		for (int i = 0; i < params.length; i++)
 		{
-			params[i] = presentClassName( paramTypes[i], typeNameStyle );
+			params[i] = GSymPrimitivePresenter.presentJavaClassName( paramTypes[i], typeNameStyle );
 		}
 		words.add( commaSeparatedListView( Arrays.asList( params ) ) );
 		// close paren
@@ -990,7 +1022,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 			Object exceptions[] = new Object[exceptionTypes.length];
 			for (int i = 0; i < params.length; i++)
 			{
-				exceptions[i] = presentClassName( exceptionTypes[i], typeNameStyle );
+				exceptions[i] = GSymPrimitivePresenter.presentJavaClassName( exceptionTypes[i], typeNameStyle );
 			}
 			words.add( commaSeparatedListView( Arrays.asList( exceptions ) ) );
 		}
@@ -1009,24 +1041,23 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 
 	
 	
-	
 	private static Pres presentMethodDeclaration(Method method)
 	{
 		ArrayList<Object> words = new ArrayList<Object>();
 		
 		// return type
-		words.add( presentClassName( method.getReturnType(), typeNameStyle ) );
+		words.add( GSymPrimitivePresenter.presentJavaClassName( method.getReturnType(), typeNameStyle ) );
 		words.add( space );
 		words.add( new LineBreak() );
 		// name
-		words.add( methodNameStyle.applyTo( new Label( method.getName() ) ) );
+		words.add( GSymPrimitivePresenter.getAccessNameStyle( method.getModifiers() ).applyTo( new Label( method.getName() ) ) );
 		// open paren
 		words.add( delimStyle.applyTo( new Label( "(" ) ) );
 		Class<?> paramTypes[] = method.getParameterTypes(); 
 		Object params[] = new Object[paramTypes.length];
-		for (int i = 0; i < params.length; i++)
+		for (int i = 0; i < paramTypes.length; i++)
 		{
-			params[i] = presentClassName( paramTypes[i], typeNameStyle );
+			params[i] = GSymPrimitivePresenter.presentJavaClassName( paramTypes[i], typeNameStyle );
 		}
 		words.add( commaSeparatedListView( Arrays.asList( params ) ) );
 		// close paren
@@ -1040,9 +1071,9 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 			words.add( javaKeywordStyle.applyTo( new Label( "Throws" ) ) );
 			words.add( space );
 			Object exceptions[] = new Object[exceptionTypes.length];
-			for (int i = 0; i < params.length; i++)
+			for (int i = 0; i < exceptionTypes.length; i++)
 			{
-				exceptions[i] = presentClassName( exceptionTypes[i], typeNameStyle );
+				exceptions[i] = GSymPrimitivePresenter.presentJavaClassName( exceptionTypes[i], typeNameStyle );
 			}
 			words.add( commaSeparatedListView( Arrays.asList( exceptions ) ) );
 		}
@@ -1090,10 +1121,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	private static final StyleSheet classNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.25f, 0.5f ) );
 
 	private static final StyleSheet typeNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.4f ) );
-	private static final StyleSheet typePunctuationStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
 
-	private static final StyleSheet fieldNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.5f ) );
-	private static final StyleSheet methodNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.35f ) );
 	private static final StyleSheet attributeNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.25f ) );
 	private static final StyleSheet propertyNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.15f ) );
 	private static final StyleSheet moduleNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) ).withAttr( Primitive.fontSize, 18 ).withAttr( Primitive.fontBold, true );;

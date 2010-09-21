@@ -15,9 +15,6 @@ import org.python.core.PyType;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
 import BritefuryJ.GSym.ObjectPresentation.GSymObjectPresentationPerspective;
 import BritefuryJ.GSym.ObjectPresentation.ObjectPresentationLocationResolver;
@@ -62,12 +59,13 @@ public class GSymGenericPerspective extends GSymObjectPresentationPerspective
 	
 	protected Pres presentJavaObjectFallback(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return presentJavaObjectAsString( x, fragment, inheritedState );
+		return new ObjectBox( x.getClass().getName(), GSymPrimitivePresenter.presentJavaObjectInspector( x, fragment, inheritedState ) );
 	}
 	
-	protected Pres presentPyObjectFallback(PyObject x, GSymFragmentView fragment, SimpleAttributeTable inhritedState)
+	protected Pres presentPyObjectFallback(PyObject x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return presentPythonObjectAsString( x, fragment, inhritedState );
+		PyType typeX = x.getType();
+		return new ObjectBox( typeX.getName(), GSymPrimitivePresenter.presentPythonObjectInspector( x, fragment, inheritedState ) );
 	}
 	
 	protected Pres invokeObjectPresenter(ObjectPresenter presenter, Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
@@ -88,24 +86,4 @@ public class GSymGenericPerspective extends GSymObjectPresentationPerspective
 	{
 		return null;
 	}
-
-
-	
-	
-	private static Pres presentJavaObjectAsString(Object x, GSymFragmentView ctx, SimpleAttributeTable state)
-	{
-		return new ObjectBox( x.getClass().getName(), asStringStyle.applyTo( new StaticText( x.toString() ) ) );
-	}
-	
-	private static Pres presentPythonObjectAsString(PyObject pyX, GSymFragmentView ctx, SimpleAttributeTable state)
-	{
-		PyType typeX = pyX.getType();
-		return new ObjectBox( typeX.getName(), asStringStyle.applyTo( new StaticText( pyX.toString() ) ) );
-	}
-	
-	
-	
-	
-	
-	private static final StyleSheet asStringStyle = StyleSheet.instance.withAttr( Primitive.fontItalic, true ).withAttr( Primitive.fontSize, 14 );
 }
