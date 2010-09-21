@@ -172,7 +172,7 @@ public abstract class SpinEntry extends ControlPres
 		TextEntry entry = new TextEntry( getInitialValueString(), textListener, getValidationPattern(), getValidationFailMessage() );
 		TextEntry.TextEntryControl entryControl = (TextEntryControl)entry.createControl( ctx, style );
 		
-		Pres row = StyleSheet.instance.withAttr( Primitive.rowSpacing, hspacing ).applyTo( new Row( new Object[] { entryControl.getElement().alignHExpand().alignVCentre(), arrowsBox.alignVCentre() } ) );
+		Pres row = StyleSheet.instance.withAttr( Primitive.rowSpacing, hspacing ).applyTo( new Row( new Object[] { entryControl.getElement().alignHExpand().alignVRefYExpand(), arrowsBox.alignVCentre() } ) );
 		DPElement element = row.present( ctx, style );
 		
 		return createSpinEntryControl( ctx, style, element, entryControl, upArrowElement, downArrowElement, textListener );
