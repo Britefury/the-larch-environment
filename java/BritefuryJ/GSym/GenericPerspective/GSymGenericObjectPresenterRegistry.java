@@ -7,8 +7,6 @@
 package BritefuryJ.GSym.GenericPerspective;
 
 import java.awt.Color;
-import java.awt.Shape;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Constructor;
@@ -43,7 +41,6 @@ import org.python.core.PyType;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Controls.Expander;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Box;
 import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.LineBreak;
@@ -58,15 +55,12 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Whitespace;
 import BritefuryJ.DocPresent.Combinators.RichText.NormalText;
 import BritefuryJ.DocPresent.Combinators.Sequence.SpanSequenceView;
 import BritefuryJ.DocPresent.Combinators.Sequence.TrailingSeparator;
-import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ErrorBox;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ErrorBoxWithFields;
-import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
-import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBorder;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
-import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectTitle;
 import BritefuryJ.GSym.GenericPerspective.PresCom.VerticalField;
+import BritefuryJ.GSym.GenericPerspective.Presenters.GenericPresentersAWT;
 import BritefuryJ.GSym.GenericPerspective.Presenters.GenericPresentersSQL;
 import BritefuryJ.GSym.ObjectPresentation.GSymObjectPresentationPerspective;
 import BritefuryJ.GSym.ObjectPresentation.GSymObjectPresenterRegistry;
@@ -78,6 +72,7 @@ import BritefuryJ.GSym.View.GSymFragmentView;
 public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegistry
 {
 	private GenericPresentersSQL sql = new GenericPresentersSQL();
+	private GenericPresentersAWT awt = new GenericPresentersAWT();
 	
 	public GSymGenericObjectPresenterRegistry()
 	{
@@ -109,9 +104,6 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		registerJavaObjectPresenter( Exception.class,  presenter_Exception );
 		registerJavaObjectPresenter( List.class,  presenter_List );
 		registerJavaObjectPresenter( Map.class,  presenter_Map );
-		registerJavaObjectPresenter( BufferedImage.class,  presenter_BufferedImage );
-		registerJavaObjectPresenter( Shape.class,  presenter_Shape );
-		registerJavaObjectPresenter( Color.class,  presenter_Color );
 		registerJavaObjectPresenter( Class.class,  presenter_Class );
 		registerJavaObjectPresenter( Field.class,  presenter_Field );
 		registerJavaObjectPresenter( Constructor.class,  presenter_Constructor );
@@ -124,6 +116,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		super.registerPerspective( perspective );
 		
 		sql.registerPerspective( perspective );
+		awt.registerPerspective( perspective );
 	}
 	
 	public static final ObjectPresenter presenter_Boolean = new ObjectPresenter()
@@ -745,76 +738,6 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		}
 	};
 	
-	public static final ObjectPresenter presenter_Shape = new ObjectPresenter()
-	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
-		{
-			Shape shape = (Shape)x;
-//			Rectangle2D bounds = shape.getBounds2D();
-//			double offsetX = -bounds.getMinX(), offsetY = -bounds.getMinY();
-//			double width = bounds.getWidth(), height = bounds.getHeight();
-//			
-//			double scale = 1.0;
-//			if ( width > height  &&  width > 96.0 )
-//			{
-//				scale = 96.0 / width;
-//			}
-//			else if ( height > width  &&  height > 96.0 )
-//			{
-//				scale = 96.0 / height;
-//			}
-			
-			return new ObjectBox( x.getClass().getName(), new BritefuryJ.DocPresent.Combinators.Primitive.Shape( shape ) );
-		}
-	};
-
-	public static final ObjectPresenter presenter_BufferedImage = new ObjectPresenter()
-	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
-		{
-			BufferedImage image = (BufferedImage)x;
-			double width = (double)image.getWidth();
-			double height = (double)image.getHeight();
-			
-			if ( width > height  &&  width > 96.0 )
-			{
-				height *= ( 96.0 / width );
-				width = 96.0;
-			}
-			else if ( height > width  &&  height > 96.0 )
-			{
-				width *= ( 96.0 / height );
-				height = 96.0;
-			}
-			
-			return new BritefuryJ.DocPresent.Combinators.Primitive.Image( image, width, height );
-		}
-	};
-
-	public static final ObjectPresenter presenter_Color = new ObjectPresenter()
-	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
-		{
-			Color colour = (Color)x;
-			
-			Pres title = colourObjectBoxStyle.applyTo( new ObjectTitle( "java.awt.Color" ) );
-			
-			Pres red = colourRedStyle.applyTo( new StaticText( "R=" + String.valueOf( colour.getRed() ) ) );
-			Pres green = colourGreenStyle.applyTo( new StaticText( "G=" + String.valueOf( colour.getGreen() ) ) );
-			Pres blue = colourBlueStyle.applyTo( new StaticText( "B=" + String.valueOf( colour.getBlue() ) ) );
-			Pres alpha = colourAlphaStyle.applyTo( new StaticText( "A=" + String.valueOf( colour.getAlpha() ) ) );
-			
-			Pres components = colourBoxStyle.applyTo( new Row( new Pres[] { red, green, blue, alpha } ) );
-			
-			Pres textBox = new Column( new Pres[] { title, components } );
-			
-			Pres swatch = staticStyle.withAttr( Primitive.shapePainter, new FillPainter( colour ) ).applyTo( new Box( 50.0, 20.0 ) ).alignVExpand();
-			
-			Pres contents = colourBoxStyle.applyTo( new Row( new Pres[] { textBox, swatch } ) );
-			
-			return colourObjectBoxStyle.applyTo( new ObjectBorder( contents ) );
-		}
-	};
 	
 	
 	private static Pres presentClassHeader(Class<?> cls)
@@ -1102,15 +1025,6 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	
 	private static final StyleSheet stackTraceStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.75f, 0.1f, 0.4f ) );
-
-	
-	private static final StyleSheet colourObjectBoxStyle = staticStyle.withAttr( GenericStyle.objectBorderPaint, new Color( 0.0f, 0.1f, 0.4f ) ).withAttr(
-			GenericStyle.objectTitlePaint, new Color( 0.0f, 0.1f, 0.4f ) );
-	private static final StyleSheet colourRedStyle = staticStyle.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.75f, 0.0f, 0.0f ) );
-	private static final StyleSheet colourGreenStyle = staticStyle.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.75f, 0.0f ) );
-	private static final StyleSheet colourBlueStyle = staticStyle.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.75f ) );
-	private static final StyleSheet colourAlphaStyle = staticStyle.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.3f, 0.3f, 0.3f ) );
-	private static final StyleSheet colourBoxStyle = staticStyle.withAttr( Primitive.rowSpacing, 5.0 );
 
 	
 	private static final StyleSheet javaKeywordStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSmallCaps, true );
