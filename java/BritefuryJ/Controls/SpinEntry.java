@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.Controls;
 
+import java.util.HashMap;
 import java.util.regex.Pattern;
 
 import BritefuryJ.Controls.TextEntry.TextEntryControl;
@@ -17,11 +18,14 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
+import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.Modifier;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.Interactor.PressAndHoldElementInteractor;
+import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.DocPresent.Interactor.DragElementInteractor;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
+import BritefuryJ.Math.Point2;
 
 public abstract class SpinEntry extends ControlPres
 {
@@ -44,9 +48,12 @@ public abstract class SpinEntry extends ControlPres
 			}
 		}
 		
-		private class SpinButtonInteractor implements PressAndHoldElementInteractor
+		
+		
+		private class SpinButtonInteractor implements DragElementInteractor
 		{
 			private boolean bUp;
+			private HashMap<PointerInterface,Object> pointerToDragStartValue = new HashMap<PointerInterface,Object>();
 			
 			private SpinButtonInteractor(boolean bUp)
 			{
@@ -55,11 +62,13 @@ public abstract class SpinEntry extends ControlPres
 			
 			
 			@Override
-			public boolean buttonPress(PointerInputElement element, PointerButtonEvent event)
+			public boolean dragBegin(PointerInputElement element, PointerButtonEvent event)
 			{
-				DPElement spinElement = (DPElement)element;
-				if ( spinElement.isRealised() )
+				if ( event.getButton() == 1  ||  event.getButton() == 2 )
 				{
+					pointerToDragStartValue.put( event.getPointer().concretePointer(), storeValue() );
+					
+					
 					if ( event.getButton() == 1 )
 					{
 						if ( ( event.getPointer().getModifiers() & Modifier.CTRL ) != 0 )
@@ -77,14 +86,31 @@ public abstract class SpinEntry extends ControlPres
 						onPage( bUp );
 						return true;
 					}
+					
+					return false;
 				}
 				
 				return false;
 			}
 
+
 			@Override
-			public void buttonRelease(PointerInputElement element, PointerButtonEvent event)
+			public void dragEnd(PointerInputElement element, PointerButtonEvent event, Point2 dragStartPos, int dragButton)
 			{
+				pointerToDragStartValue.remove( event.getPointer().concretePointer() );
+			}
+
+
+			@Override
+			public void dragMotion(PointerInputElement element, PointerMotionEvent event, Point2 dragStartPos, int dragButton)
+			{
+				double delta = event.getPointer().getLocalPos().y - dragStartPos.y;
+				
+				Object startValue = pointerToDragStartValue.get( event.getPointer().concretePointer() );
+				if ( startValue != null )
+				{
+					onDrag( startValue, delta );
+				}
 			}
 		}
 		
@@ -108,6 +134,8 @@ public abstract class SpinEntry extends ControlPres
 		protected abstract void onTextChanged(String text);
 		protected abstract void onStep(boolean bUp);
 		protected abstract void onPage(boolean bUp);
+		protected abstract void onDrag(Object startValue, double delta);
+		protected abstract Object storeValue();
 		
 		
 		

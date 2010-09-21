@@ -86,6 +86,17 @@ public class RealSpinEntry extends SpinEntry
 		{
 			setValue( value   +   ( bUp  ?  pageSize  :  -pageSize ) ); 
 		}
+		
+		protected void onDrag(Object startValue, double delta)
+		{
+			Double start = (Double)startValue;
+			setValue( start + delta );
+		}
+		
+		protected Object storeValue()
+		{
+			return value;
+		}
 	}
 
 
