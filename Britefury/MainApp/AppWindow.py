@@ -166,7 +166,9 @@ class AppWindow (object):
 		viewMenu = JMenu( 'View' )
 		viewMenu.add( _action( 'View document model', self._onViewDocModel ) )
 		viewMenu.add( _action( 'Show element tree explorer', self._onShowElementTreeExplorer ) )
-		viewMenu.add( _action( 'Show undo history', self._onShowCommandHistory ) )
+		self._showUndoHistoryItem = JMenuItem( 'Show undo history' )
+		self._showUndoHistoryItem.addActionListener( _action( 'Show undo history', self._onShowUndoHistory ) )
+		viewMenu.add( self._showUndoHistoryItem )
 		viewMenu.add( _action( 'Reset', self._onReset ) )
 		viewMenu.add( _action( '1:1', self._onOneToOne ) )
 		
@@ -255,9 +257,11 @@ class AppWindow (object):
 		if commandHistory is not None:
 			self._editUndoItem.setEnabled( commandHistory.canUndo() )
 			self._editRedoItem.setEnabled( commandHistory.canRedo() )
+			self._showUndoHistoryItem.setEnabled( True )
 		else:
 			self._editUndoItem.setEnabled( False )
 			self._editRedoItem.setEnabled( False )
+			self._showUndoHistoryItem.setEnabled( False )
 			
 		
 		
@@ -317,7 +321,7 @@ class AppWindow (object):
 		self._browser.openLocationInNewWindow( location )
 
 
-	def _onShowCommandHistory(self):
+	def _onShowUndoHistory(self):
 		commandHistoryController = self._browser.getCommandHistoryController()
 		if commandHistoryController is not None:
 			location = self._app._browserContext.getLocationForObject( commandHistoryController )
