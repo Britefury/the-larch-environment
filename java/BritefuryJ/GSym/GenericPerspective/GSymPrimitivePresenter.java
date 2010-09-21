@@ -7,20 +7,33 @@
 package BritefuryJ.GSym.GenericPerspective;
 
 import java.awt.Color;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
+import org.python.core.PyDictionary;
+import org.python.core.PyList;
+import org.python.core.PyObject;
+import org.python.core.PyStringMap;
+import org.python.core.PyTuple;
+
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.Controls.Expander;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Row;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.Script;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.Column;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
+import BritefuryJ.DocPresent.Combinators.Primitive.Script;
+import BritefuryJ.DocPresent.Combinators.Primitive.Span;
+import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.Combinators.RichText.NormalText;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.PresCom.UnescapedStringAsSpan;
+import BritefuryJ.GSym.PresCom.InnerFragment;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
 public class GSymPrimitivePresenter
@@ -146,6 +159,161 @@ public class GSymPrimitivePresenter
 		}
 	}
 	
+	
+	
+	public static Pres presentObjectAsString(Object x)
+	{
+		String lines[] = x.toString().split( "\n" );
+		Pres linePres[] = new Pres[lines.length];
+		for (int i = 0; i < lines.length; i++)
+		{
+			linePres[i] = new NormalText( lines[i] );
+		}
+		return staticStyle.applyTo( new Column( linePres ) );
+	}
+	
+	
+	public static Pres presentJavaObjectInspector(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	{
+		Pres asString = presentObjectAsString( x );
+
+		ArrayList<Object> contents = new ArrayList<Object>();
+		
+		// Type
+		Pres type = new Expander( sectionHeadingStyle.applyTo( new Label( "Type" ) ), new InnerFragment( x.getClass() ) );
+		contents.add( type );
+		
+		
+		ArrayList<Object> fields = new ArrayList<Object>();
+		Class<?> cls = x.getClass();
+		for (Field field: cls.getFields())
+		{
+			Pres header = new Row( new Pres[] {
+					presentJavaClassName( field.getType(), typeNameStyle ),
+					space,
+					getAccessNameStyle( field.getModifiers() ).applyTo( new Label( field.getName() ) ) } );
+			Pres value;
+			try
+			{
+				value = new InnerFragment( field.get( x ) );
+			}
+			catch (IllegalArgumentException e)
+			{
+				value = errorStyle.applyTo( new Label( "<Illegal argument>" ) );
+			}
+			catch (IllegalAccessException e)
+			{
+				value = errorStyle.applyTo( new Label( "<Cannot access>" ) );
+			}
+			fields.add( new Column( new Pres[] { header, value.padX( 45.0, 0.0 ) } ) );
+		}
+		if ( fields.size() > 0 )
+		{
+			contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Fields" ) ), new Column( fields ) ) );
+		}
+		
+		Pres inspector = new Column( contents );
+		return new Expander( asString, inspector );
+	}
+	
+	public static Pres presentPythonObjectInspector(PyObject x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	{
+		Pres asString = presentObjectAsString( x );
+
+		ArrayList<Object> contents = new ArrayList<Object>();
+		
+		// Type
+		Pres type = new Expander( sectionHeadingStyle.applyTo( new Label( "Type" ) ), new InnerFragment( x.getType() ) );
+		contents.add( type );
+		
+		
+		// Attributes
+		ArrayList<Object> attributes = new ArrayList<Object>();
+		PyObject dict = x.fastGetDict();
+		if ( dict != null )
+		{
+			PyList dictItems;
+			if ( dict instanceof PyDictionary )
+			{
+				dictItems = ((PyDictionary)dict).items();
+			}
+			else if ( dict instanceof PyStringMap )
+			{
+				dictItems = ((PyStringMap)dict).items();
+			}
+			else
+			{
+				throw new RuntimeException( "Expected a PyDictionary or a PyStringMap when acquiring __dict__ from a PyObject" );
+			}
+			
+			
+			for (Object dictItem: dictItems)
+			{
+				PyTuple pair = (PyTuple)dictItem;
+				PyObject key = pair.getArray()[0];
+				PyObject value = pair.getArray()[1];
+				String name = key.toString();
+				
+				if ( name.equals( "__dict__" ) )
+				{
+					break;
+				}
+				
+				Pres namePres = attributeNameStyle.applyTo( new Label( name ) );
+				Pres valueView = new InnerFragment( value ).padX( 15.0, 0.0 );
+				attributes.add( new Column( new Pres[] { namePres, valueView } ) );
+			}
+		}
+		
+		if ( attributes.size() > 0 )
+		{
+			contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Attributes" ) ),   new Column( attributes ) ) );
+		}
+		
+		
+		Pres inspector = new Column( contents );
+		return new Expander( asString, inspector );
+	}
+	
+	
+	
+	
+	public static StyleSheet getAccessNameStyle(int modifiers)
+	{
+		if ( Modifier.isPrivate( modifiers ) )
+		{
+			return privateNameStyle;
+		}
+		else if ( Modifier.isProtected( modifiers ) )
+		{
+			return protectedNameStyle;
+		}
+		else if ( Modifier.isPublic( modifiers ) )
+		{
+			return publicNameStyle;
+		}
+		else
+		{
+			return defaultNameStyle;
+		}
+	}
+	
+	
+
+	public static Pres presentJavaClassName(Class<?> c, StyleSheet classNameStyle)
+	{
+		if ( c.isArray() )
+		{
+			c = c.getComponentType();
+			return new Span( new Pres[] { classNameStyle.applyTo( new Label( c.getName() ) ), typePunctuationStyle.applyTo( new Label( "[]" ) ) } );
+		}
+		else
+		{
+			return classNameStyle.applyTo( new Label( c.getName() ) );
+		}
+	}
+	
+	
 	private static final StyleSheet punctuationStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color.blue );
 	private static final StyleSheet charStyle = StyleSheet.instance; 
 	private static final StyleSheet multiLineStringStyle = StyleSheet.instance.withAttr( Primitive.background, new FillPainter( new Color( 1.0f, 1.0f, 0.75f ) ) );
@@ -153,4 +321,24 @@ public class GSymPrimitivePresenter
 	private static final StyleSheet floatStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
 	private static final StyleSheet booleanStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) ).withAttr( Primitive.fontSmallCaps, true );
 	private static final StyleSheet nullStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.75f, 0.0f, 0.5f ) ).withAttr( Primitive.fontSmallCaps, true );
+
+
+
+	private static final StyleSheet staticStyle = StyleSheet.instance.withAttr( Primitive.editable, false );
+	
+	
+	private static final StyleSheet sectionHeadingStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontFace, "Serif" );
+	private static final StyleSheet attributeNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.25f ) );
+
+	private static final StyleSheet typePunctuationStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
+	private static final StyleSheet typeNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.4f ) );
+
+	private static final StyleSheet privateNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.0f ) );
+	private static final StyleSheet protectedNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.35f, 0.35f, 0.0f ) );
+	private static final StyleSheet publicNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
+	private static final StyleSheet defaultNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.35f, 0.35f, 0.15f ) );
+
+	private static final StyleSheet errorStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.0f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontFace, "Serif" );
+
+	private static final Pres space = staticStyle.applyTo( new StaticText( " " ) );
 }
