@@ -136,7 +136,9 @@ class RootFinder (object):
 						return self._projectSubject._moduleFinder.find_module( fullname, suffix, path, world )
 				else:
 					return None
-		return _RootModuleLoader( world )
+			return _RootModuleLoader( world )
+		else:
+			return None
 
 
 
