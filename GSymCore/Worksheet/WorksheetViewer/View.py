@@ -192,6 +192,31 @@ class WorksheetViewer (GSymViewObjectDispatch):
 perspective = GSymPerspective( WorksheetViewer(), None )
 
 
+class _WorksheetModuleLoader (object):
+	def __init__(self, model, world):
+		self._model = model
+		self._world = world
+		
+	def load_module(self, fullname):
+		mod = sys.modules.setdefault( fullname, imp.new_module( fullname ) )
+		self._world.registerImportedModule( fullname )
+		mod.__file__ = fullname
+		mod.__loader__ = self
+		mod.__path__ = fullname.split( '.' )
+		
+		sources = []
+		
+		worksheet = self._model
+		body = worksheet['body']
+		
+		for i, node in enumerate( body['contents'] ):
+			if node.isInstanceOf( Schema.PythonCode ):
+				code = compileForExecution( node['code'], fullname + '_' + str( i ) )
+				exec code in mod.__dict__
+		return mod
+
+
+
 class WorksheetViewerSubject (GSymSubject):
 	def __init__(self, document, model, enclosingSubject, location):
 		self._document = document
@@ -218,24 +243,11 @@ class WorksheetViewerSubject (GSymSubject):
 	
 	def getCommandHistory(self):
 		return self._document.getCommandHistory()
+	
+	def createModuleLoader(self, world):
+		return _WorksheetModuleLoader( self._model, world )
 
 	
 
 	
-	def load_module(self, fullname):
-		mod = sys.modules.setdefault( fullname, imp.new_module( fullname ) )
-		mod.__file__ = fullname
-		mod.__loader__ = self
-		mod.__path__ = fullname.split( '.' )
-		
-		sources = []
-		
-		worksheet = self._model
-		body = worksheet['body']
-		
-		for i, node in enumerate( body['contents'] ):
-			if node.isInstanceOf( Schema.PythonCode ):
-				code = compileForExecution( node['code'], fullname + '_' + str( i ) )
-				exec code in mod.__dict__
-		return mod
 	

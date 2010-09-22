@@ -59,6 +59,7 @@ class GSymWorld (object):
 		self.newDocumentFactories = []
 		self.pageImporters = []
 		self._appStateSubject = None
+		self._importedModuleRegistry = set()
 		
 		
 		for plugin in self._plugins:
@@ -87,6 +88,19 @@ class GSymWorld (object):
 		self._appStateSubject = appStateSubject
 		
 		
+		
+	def registerImportedModule(self, fullname):
+		self._importedModuleRegistry.add( fullname )
+		
+	def unloadImportedModules(self, moduleFullnames):
+		modules = set( moduleFullnames )
+		modulesToRemove = self._importedModuleRegistry & modules
+		for moduleFullname in modulesToRemove:
+			del sys.modules[moduleFullname]
+		self._importedModuleRegistry -= modulesToRemove
+		return modulesToRemove
+		
+		
 	def getAppStateSubject(self):
 		return self._appStateSubject
 	
@@ -102,7 +116,7 @@ class GSymWorld (object):
 			app_find_module = self._appStateSubject.find_module
 		except AttributeError:
 			return None
-		return app_find_module( fullname, path )
+		return app_find_module( fullname, path, self )
 		
 		
 		

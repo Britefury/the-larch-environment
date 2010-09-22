@@ -52,7 +52,7 @@ from BritefuryJ.GSym import GSymPerspective
 from GSymCore.GSymApp import DocumentManagement
 
 from GSymCore.Project import Schema
-#from GSymCore.Project.ProjectEditor.ProjectEditorStyleSheet import ProjectEditorStyleSheet
+from GSymCore.Project.ProjectEditor import ModuleFinder
 
 
 
@@ -328,6 +328,8 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		subjectContext = ctx.getSubjectContext()
 		document = subjectContext['document']
 		location = subjectContext['location']
+		world = subjectContext['world']
+
 
 		name = document.getDocumentName()
 
@@ -359,6 +361,14 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		pythonPackageNameLabel = pythonPackageNameLabel.withElementInteractor( _PythonPackageNameInteractor() )
 		pythonPackageCell = LiteralCell( pythonPackageNameLabel )
 		pythonPackageNameBox = Row( [ pythonPackageNamePrompt, pythonPackageCell.genericPerspectiveValuePresInFragment() ] )
+		
+		
+		# Clear imported modules
+		def _onUnloadImportedModules(button, event):
+			ModuleFinder.unloadImportedModules( world, node )
+		unloadImportedModulesPrompt = Label( 'Unload imported modules: ' )
+		unloadImportedModulesButton = Button.buttonWithLabel( 'Unload', _onUnloadImportedModules )
+		unloadImportedModules = Row( [ unloadImportedModulesPrompt, unloadImportedModulesButton ] )
 
 
 		# Project index
@@ -367,8 +377,6 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 		# Project contents
 		items = InnerFragment.map( contents, state )
-
-		world = ctx.getSubjectContext()['world']
 
 		nameElement = _projectIndexNameStyle.applyTo( StaticText( 'Project' ) )
 		nameBox = _itemHoverHighlightStyle.applyTo( nameElement.alignVCentre() )
@@ -386,7 +394,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 		# The page
 		head = Head( [ linkHeader, title ] )
-		body = Body( [ controlsBorder.pad( 5.0, 10.0 ).alignHLeft(), pythonPackageNameBox, projectIndex ] )
+		body = Body( [ controlsBorder.pad( 5.0, 10.0 ).alignHLeft(), pythonPackageNameBox, unloadImportedModules, projectIndex ] )
 
 		return StyleSheet.instance.withAttr( Primitive.editable, False ).applyTo( Page( [ head, body ] ) )
 
