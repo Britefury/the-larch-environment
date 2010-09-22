@@ -12,8 +12,9 @@ from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListene
 
 from GSymCore.Languages.Python25 import Python25
 
-from GSymCore.PresTemplate import Schema, ViewSchema
+from GSymCore.PresTemplate import Schema
 from GSymCore.PresTemplate.TemplateEditor.NodeOperations import NodeRequest
+from GSymCore.PresTemplate.TemplateEditor.PythonExprView import PythonExprView
 
 
 
@@ -26,7 +27,7 @@ class PythonExprRequest (NodeRequest):
 		return self._insertAfter( pythonExpr, element )
 	
 	def _createModel(self):
-		return ViewSchema.PythonExprView.newPythonExprModel()
+		return PythonExprView.newPythonExprModel()
 
 
 

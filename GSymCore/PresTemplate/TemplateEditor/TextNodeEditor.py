@@ -13,9 +13,10 @@ from BritefuryJ.DocPresent.Interactor import *
 
 from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
 
-from GSymCore.PresTemplate import Schema, ViewSchema
+from GSymCore.PresTemplate import Schema
 from GSymCore.PresTemplate.TemplateEditor.SelectionEditor import TemplateSelectionEditTreeEvent
 from GSymCore.PresTemplate.TemplateEditor.NodeOperations import NodeRequest
+from GSymCore.PresTemplate.TemplateEditor.ParagraphView import ParagraphView
 
 
 
@@ -53,7 +54,7 @@ class PargraphRequest (NodeRequest):
 		return self._insertAfter( pythonExpr, element )
 	
 	def _createModel(self):
-		return ViewSchema.ParagraphView.newParagraphModel( '', self._style )
+		return ParagraphView.newParagraphModel( '', self._style )
 
 
 
