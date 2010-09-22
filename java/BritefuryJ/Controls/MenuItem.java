@@ -200,7 +200,7 @@ public class MenuItem extends ControlPres
 		boolean bClosePopupOnActivate = style.get( Controls.bClosePopupOnActivate, Boolean.class );
 		
 		StyleValues menuItemStyle = style.withAttr( Primitive.hoverBackground, hoverBackground );
-		Pres menuItem = new Bin( childElem.alignHExpand().pad( padX, padY ) );
+		Pres menuItem = new Bin( childElem.alignHExpand().pad( padX, padY ) ).alignHExpand();
 
 		DPBin element = (DPBin)menuItem.present( ctx, menuItemStyle );
 		
