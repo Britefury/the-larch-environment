@@ -5,7 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from GSymCore.GSymApp.GSymAppViewer.View import perspective, GSymAppSubject
+from GSymCore.GSymApp.GSymAppViewer.View import perspective as gSymAppViewerPerspective
+from GSymCore.GSymApp.GSymAppViewer.Subject import GSymAppSubject
 from GSymCore.GSymApp import Application
 
 
@@ -15,7 +16,5 @@ def newAppState():
 def newAppStateSubject(world):
 	return GSymAppSubject( newAppState(), world )
 
-
-gSymAppViewerPerspective = perspective
 
 

@@ -8,7 +8,8 @@
 from Britefury.gSym.gSymUnitClass import GSymUnitClass, GSymDocumentFactory
 from Britefury.gSym.gSymDocument import gSymUnit, GSymDocument
 
-from GSymCore.Project.ProjectEditor.View import perspective as projectEditorPerspective, ProjectSubject
+from GSymCore.Project.ProjectEditor.View import perspective as projectEditorPerspective
+from GSymCore.Project.ProjectEditor.Subject import ProjectSubject
 from GSymCore.Project import Schema
 
 
