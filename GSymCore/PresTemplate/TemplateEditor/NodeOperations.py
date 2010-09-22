@@ -16,12 +16,6 @@ from GSymCore.PresTemplate import Schema
 
 
 
-class AddNodeOperation (object):
-	def __init__(self, nodeFactory):
-		self._nodeFactory = nodeFactory
-
-		
-
 class DeleteNodeOperation (object):
 	def __init__(self, node):
 		self._node = node
@@ -29,6 +23,12 @@ class DeleteNodeOperation (object):
 	def apply(self, bodyNode):
 		return bodyNode.deleteNode( self._node )
 
+
+class AddNodeOperation (object):
+	def __init__(self, nodeFactory):
+		self._nodeFactory = nodeFactory
+
+		
 
 class AppendNodeOperation (AddNodeOperation):
 	def apply(self, body):

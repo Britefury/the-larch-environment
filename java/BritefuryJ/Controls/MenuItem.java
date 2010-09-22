@@ -10,14 +10,17 @@ import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.Combinators.Primitive.Arrow;
 import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
 import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Event.AbstractPointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Interactor.ClickElementInteractor;
 import BritefuryJ.DocPresent.Painter.Painter;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class MenuItem extends ControlPres
@@ -161,7 +164,35 @@ public class MenuItem extends ControlPres
 	@Override
 	public Control createControl(PresentationContext ctx, StyleValues style)
 	{
-		Pres childElem = presentAsCombinator( ctx, Controls.useMenuItemAttrs( style ), child );
+		StyleValues usedStyle = Controls.useMenuItemAttrs( style );
+		Pres childElem;
+		if ( subMenu != null )
+		{
+			double spacing = style.get( Controls.menuItemSubmenuArrowSpacing, Double.class );
+			double arrowSize = style.get( Controls.menuItemSubmenuArrowSize, Double.class );
+			Painter arrowPainter = style.get( Controls.menuItemSubmenuArrowPainter, Painter.class );
+			Arrow.Direction arrowDirection;
+			if ( direction == SubmenuPopupDirection.RIGHT )
+			{
+				arrowDirection = Arrow.Direction.RIGHT;
+			}
+			else if ( direction == SubmenuPopupDirection.DOWN )
+			{
+				arrowDirection = Arrow.Direction.DOWN;
+			}
+			else
+			{
+				throw new RuntimeException( "Invalid submenu popup direction" );
+			}
+			Pres childWithArrow = StyleSheet.instance.withAttr( Primitive.rowSpacing, spacing ).applyTo( 
+					new Row( new Pres[] { child.alignHExpand().alignVRefYExpand(),
+					StyleSheet.instance.withAttr( Primitive.shapePainter, arrowPainter ).applyTo( new Arrow( arrowDirection, arrowSize ).alignVCentre() ) } ) );
+			childElem = presentAsCombinator( ctx, usedStyle, childWithArrow );
+		}
+		else
+		{
+			childElem = presentAsCombinator( ctx, usedStyle, child );
+		}
 		
 		Painter hoverBackground = style.get( Controls.menuItemHoverBackground, Painter.class );
 		double padX = style.get( Controls.menuItemXPadding, Double.class );

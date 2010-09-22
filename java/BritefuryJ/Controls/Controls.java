@@ -111,6 +111,11 @@ public class Controls
 			new FillPainter( new Color( 0.6f, 0.7f, 0.85f ) ) );
 	public static final InheritedAttributeNonNull menuItemXPadding = new InheritedAttributeNonNull( controlsNamespace, "menuItemXPadding", Double.class, 5.0 );
 	public static final InheritedAttributeNonNull menuItemYPadding = new InheritedAttributeNonNull( controlsNamespace, "menuItemYPadding", Double.class, 5.0 );
+	public static final InheritedAttributeNonNull menuItemSubmenuArrowSize = new InheritedAttributeNonNull( controlsNamespace, "menuItemSubmenuArrowSize", Double.class, 12.0 );
+	public static final InheritedAttributeNonNull menuItemSubmenuArrowSpacing = new InheritedAttributeNonNull( controlsNamespace, "menuItemSubmenuArrowSpacing", Double.class, 5.0 );
+	public static final InheritedAttributeNonNull menuItemSubmenuArrowPainter = new InheritedAttributeNonNull( controlsNamespace, "menuItemSubmenuArrowPainter", Painter.class,
+			new FilledOutlinePainter( new Color( 0.7f, 0.85f, 1.0f ), new Color( 0.0f, 0.5f, 1.0f ), new BasicStroke( 1.0f ) ) );
+	
 	public static final InheritedAttributeNonNull popupMenuAttrs = new InheritedAttributeNonNull( controlsNamespace, "popupMenuAttrs", StyleSheet.class,
 			StyleSheet.instance.withAttr( Primitive.border, new SolidBorder( 1.0, 2.0, Color.black, null ) ).withAttr( Primitive.rowSpacing, 10.0 ) );
 
@@ -203,9 +208,9 @@ public class Controls
 	
 	public static StyleValues useMenuItemAttrs(StyleValues style)
 	{
-		return style.useAttr( checkboxHoverBackground ).useAttr( checkboxCheckBorder ).useAttr( checkboxCheckForeground ).useAttr( checkboxCheckSize ).useAttr( checkboxSpacing );
+		return style.useAttr( menuItemHoverBackground ).useAttr( menuItemXPadding ).useAttr( menuItemYPadding ).useAttr( menuItemSubmenuArrowSpacing )
+				.useAttr( menuItemSubmenuArrowPainter ).useAttr( menuItemSubmenuArrowSize );
 	}
-	
 	
 	public static StyleValues popupMenuStyle(StyleValues style)
 	{

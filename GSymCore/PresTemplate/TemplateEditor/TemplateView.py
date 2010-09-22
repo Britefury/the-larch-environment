@@ -60,26 +60,6 @@ _projection = _Projection()
 
 
 
-class TemplateNodeEventListener (TreeEventListenerObjectDispatch):
-	"""
-	Event listener for template node
-	"""
-	def __init__(self):
-		pass
-
-	
-	@ObjectDispatchMethod( AddNodeOperation )
-	def onAddNode(self, element, sourceElement, event):
-		ctx = element.getFragmentContext()
-		node = ctx.getModel()
-		
-		return event.apply( node.getBody() )
-
-
-TemplateNodeEventListener.instance = TemplateNodeEventListener()
-
-
-
 class TemplateView (NodeView):
 	def __init__(self, template, model):
 		super( TemplateView, self ).__init__( template, model )
@@ -109,6 +89,26 @@ class TemplateView (NodeView):
 		
 
 	
+class TemplateNodeEventListener (TreeEventListenerObjectDispatch):
+	"""
+	Event listener for template node
+	"""
+	def __init__(self):
+		pass
+
+	
+	@ObjectDispatchMethod( AddNodeOperation )
+	def onAddNode(self, element, sourceElement, event):
+		ctx = element.getFragmentContext()
+		node = ctx.getModel()
+		
+		return event.apply( node.getBody() )
+
+
+TemplateNodeEventListener.instance = TemplateNodeEventListener()
+
+
+
 def _templateContextMenuFactory(element, menu):
 	rootElement = element.getRootElement()
 

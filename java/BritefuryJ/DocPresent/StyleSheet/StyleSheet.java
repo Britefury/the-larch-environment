@@ -77,4 +77,11 @@ public class StyleSheet extends AttributeTable
 	{
 		return (StyleSheet)super.remapAttr( destAttribute, sourceAttribute );
 	}
+	
+	
+	
+	public static StyleSheet fromAttrs(HashMap<AttributeBase, Object> valuesMap)
+	{
+		return instance.withAttrs( valuesMap );
+	}
 }
