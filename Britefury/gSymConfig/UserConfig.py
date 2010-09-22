@@ -71,7 +71,7 @@ class GSymUserConfig (object):
 
 
 	def save(self):
-		print 'Britefury.gSymConfig.UserConfig.oy: GSymUserConfig.save():'
+		print 'Britefury.gSymConfig.UserConfig.py: GSymUserConfig.save():'
 		print '\tNot saving configuration file -- functionality currently broken.'
 		#makeSettingsDir()
 		#try:
