@@ -10,7 +10,8 @@ from Britefury.gSym.gSymDocument import gSymUnit
 
 from GSymCore.Languages.Python25 import Schema
 from GSymCore.Languages.Python25.Python25Importer import importPy25File
-from GSymCore.Languages.Python25.PythonEditor.View import perspective as python25EditorPerspective, Python25Subject
+from GSymCore.Languages.Python25.PythonEditor.View import perspective as python25EditorPerspective
+from GSymCore.Languages.Python25.PythonEditor.Subject import Python25Subject
 
 
 
