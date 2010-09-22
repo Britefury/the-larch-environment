@@ -5,118 +5,36 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2010.
 ##-*************************
-import sys
-import imp
-
 from BritefuryJ.DocPresent.Browser import Location
 
 from BritefuryJ.GSym import GSymSubject
 
 from GSymCore.Project import Schema
 from GSymCore.Project.ProjectEditor.View import perspective
+from GSymCore.Project.ProjectEditor.ModuleFinder import RootFinder, ModuleFinder
 
 
 
-
-
-class PackageSubject (object):
-	def __init__(self, projectSubject, model, location):
-		self._projectSubject = projectSubject
-		self._model = model
-		self._location = location
-
-
-	def __getattr__(self, name):
-		for item in self._model['contents']:
-			if name == item['name']:
-				itemLocation = self._location + '.' + name
-				if item.isInstanceOf( Schema.Package ):
-					return PackageSubject( self._projectSubject, item, itemLocation )
-				elif item.isInstanceOf( Schema.Page ):
-					return self._projectSubject._document.newUnitSubject( item['unit'], self._projectSubject, itemLocation )
-		raise AttributeError, "Did not find item for '%s'"  %  ( name, )
-
-
-
-
-class _ModuleFinder (object):
-	def __init__(self, projectSubject):
-		self._projectSubject = projectSubject
-
-	def find_module(self, fullname, namesuffix, path):
-		suffix = namesuffix
-		model = self._projectSubject._model
-		modelLocation = self._projectSubject._location
-		while suffix != '':
-			prefix, dot, suffix = suffix.partition( '.' )
-			bFoundItem = False
+def _packageSubject(projectSubject, model, location):
+	"""
+	Create a package subject
+	This is done using a function, that declares a class within its body, as the subject class must used __getattribute__; __getattr__ will prevent
+	certain package/page names from being usable (e.g. __init__).
+	Unfortunately, __getattribute__ also makes it hard to access instance attributes, so we have it access them from the surrounding scope
+	(this function)
+	"""
+	class _PackageSubject (object):
+		# We use __getattribute__ rather than __getattr__, otherwise the __init__ method can prevent some item names from being accessible
+		def __getattribute__(self, name):
 			for item in model['contents']:
-				if prefix == item['name']:
-					bFoundItem = True
-					modelLocation = modelLocation + '.' + prefix
-					model = item
-
-					if model.isInstanceOf( Schema.Page ):
-						if suffix == '':
-							# We have found a page: load it
-							pageSubject = self._projectSubject._document.newUnitSubject( model['unit'], self._projectSubject, modelLocation )
-							try:
-								l = pageSubject.load_module
-							except AttributeError:
-								return None
-							else:
-								return pageSubject
-						else:
-							# Still path to consume; cannot go further
-							return None
-					elif model.isInstanceOf( Schema.Package ):
-						if suffix == '':
-							return self
-						else:
-							# Still path to consume; loop over
-							break
-					else:
-						raise TypeError, 'unreckognised model type'
-			if not bFoundItem:
-				return None
-
-		# Ran out of name to comsume, load as a package
-		return self
-
-	def load_module(self, fullname):
-		mod = sys.modules.setdefault( fullname, imp.new_module( fullname ) )
-		mod.__file__ = fullname
-		mod.__loader__ = self
-		mod.__path__ = fullname.split( '.' )
-		return mod
-
-
-class _RootFinder (object):
-	def __init__(self, projectSubject):
-		self._projectSubject = projectSubject
-
-	def find_module(self, fullname, path):
-		pythonPackageName = self._projectSubject._model['pythonPackageName']
-		if pythonPackageName is not None:
-			pythonPackageName = pythonPackageName.split( '.' )
-			suffix = fullname
-			index = 0
-			while suffix != '':
-				prefix, dot, suffix = suffix.partition( '.' )
-				if prefix == pythonPackageName[index]:
-					index += 1
-					if index == len( pythonPackageName )  and  suffix != '':
-						return self._projectSubject._moduleFinder.find_module( fullname, suffix, path )
-				else:
-					return None
-		return self
-
-	def load_module(self, fullname):
-		mod = sys.modules.setdefault( fullname, imp.new_module( fullname ) )
-		mod.__file__ = fullname
-		mod.__loader__ = self
-		mod.__path__ = fullname.split( '.' )
-		return mod
+				if name == item['name']:
+					itemLocation = location + '.' + name
+					if item.isInstanceOf( Schema.Package ):
+						return _packageSubject( projectSubject, item, itemLocation )
+					elif item.isInstanceOf( Schema.Page ):
+						return projectSubject._document.newUnitSubject( item['unit'], projectSubject, itemLocation )
+			raise AttributeError, "Did not find item for '%s'"  %  ( name, )
+	return _PackageSubject()
 
 
 
@@ -126,8 +44,8 @@ class ProjectSubject (GSymSubject):
 		self._model = model
 		self._enclosingSubject = enclosingSubject
 		self._location = location
-		self._moduleFinder = _ModuleFinder( self )
-		self._rootFinder = _RootFinder( self )
+		self._moduleFinder = ModuleFinder( self )
+		self._rootFinder = RootFinder( self )
 
 
 	def getFocus(self):
@@ -152,13 +70,13 @@ class ProjectSubject (GSymSubject):
 			if name == item['name']:
 				itemLocation = self._location + '.' + name
 				if item.isInstanceOf( Schema.Package ):
-					return PackageSubject( self, item, itemLocation )
+					return _packageSubject( self, item, itemLocation )
 				elif item.isInstanceOf( Schema.Page ):
 					return self._document.newUnitSubject( item['unit'], self, itemLocation )
 		raise AttributeError, "Did not find item for '%s'"  %  ( name, )
 
 
 
-	def find_module(self, fullname, path=None):
-		return self._rootFinder.find_module( fullname, path )
+	def find_module(self, fullname, path, world):
+		return self._rootFinder.find_module( fullname, path, world )
 

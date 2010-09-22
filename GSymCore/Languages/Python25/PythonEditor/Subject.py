@@ -65,6 +65,24 @@ class _ClassSubject (_MemberSubject):
 		raise AttributeError, 'Could not find class or function called ' + name
 
 
+	
+class _Python25ModuleLoader (object):
+	def __init__(self, model, world):
+		self._model = model
+		self._world = world
+		
+	def load_module(self, fullname):
+		mod = sys.modules.setdefault( fullname, imp.new_module( fullname ) )
+		self._world.registerImportedModule( fullname )
+		mod.__file__ = fullname
+		mod.__loader__ = self
+		mod.__path__ = fullname.split( '.' )
+		code = compileForExecution( self._model, fullname )
+		exec code in mod.__dict__
+		return mod
+	
+	
+	
 class Python25Subject (GSymSubject):
 	def __init__(self, document, model, enclosingSubject, location):
 		self._document = document
@@ -99,13 +117,8 @@ class Python25Subject (GSymSubject):
 		raise AttributeError, 'Could not find class or function called ' + name
 
 	
-	def load_module(self, fullname):
-		mod = sys.modules.setdefault( fullname, imp.new_module( fullname ) )
-		mod.__file__ = fullname
-		mod.__loader__ = self
-		mod.__path__ = fullname.split( '.' )
-		code = compileForExecution( self._model, fullname )
-		exec code in mod.__dict__
-		return mod
+	
+	def createModuleLoader(self, world):
+		return _Python25ModuleLoader( self._model, world )
 	
 	
