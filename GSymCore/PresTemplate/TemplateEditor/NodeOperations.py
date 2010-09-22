@@ -22,6 +22,14 @@ class AddNodeOperation (object):
 
 		
 
+class DeleteNodeOperation (object):
+	def __init__(self, node):
+		self._node = node
+		
+	def apply(self, bodyNode):
+		return bodyNode.deleteNode( self._node )
+
+
 class AppendNodeOperation (AddNodeOperation):
 	def apply(self, body):
 		node = self._nodeFactory()
@@ -67,6 +75,44 @@ class NodeRequest (object):
 
 	
 	
+class TextNodeJoinOperation (object):
+	def __init__(self, textNode):
+		self._textNode = textNode
+		
+
+	def apply(self, bodyNode):
+		return bodyNode.joinConsecutiveTextNodes( self._textNode )
+
+
+
+class TextNodeSplitOperation (object):
+	def __init__(self, textNode, textLines):
+		self._textNode = textNode
+		self._textLines = textLines
+		
+
+	def apply(self, bodyNode):
+		return bodyNode.splitTextNodes( self._textNode, self._textLines )
+
+
+
+class PargraphRequest (NodeRequest):
+	def __init__(self, style):
+		self._style = style
+		
+	def applyToParagraphNode(self, paragraph, element):
+		paragraph.setStyle( self._style )
+		return True
+		
+	def applyToPythonExprNode(self, pythonExpr, element):
+		return self._insertAfter( pythonExpr, element )
 	
+	def _createModel(self):
+		return ParagraphView.newParagraphModel( '', self._style )
+
+
+
+
+
 	
 	

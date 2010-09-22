@@ -10,6 +10,8 @@ from weakref import WeakKeyDictionary
 from BritefuryJ.Incremental import IncrementalOwner, IncrementalValueMonitor
 from BritefuryJ.Cell import Cell
 
+from Britefury.Kernel.Abstract import abstractmethod
+
 from BritefuryJ.GSym.PresCom import InnerFragment
 
 from GSymCore.PresTemplate import Schema
@@ -31,3 +33,9 @@ class NodeView (object):
 	
 	def _viewOf(self, model):
 		return self._template._viewOf( model )
+	
+	
+	@abstractmethod
+	def templateEditorPresent(self, fragment, inheritedState):
+		pass
+		
