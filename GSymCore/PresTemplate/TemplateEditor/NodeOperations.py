@@ -11,7 +11,7 @@ from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListene
 
 from Britefury.Kernel.Abstract import abstractmethod
 
-from GSymCore.PresTemplate import Schema, ViewSchema
+from GSymCore.PresTemplate import Schema
 
 
 

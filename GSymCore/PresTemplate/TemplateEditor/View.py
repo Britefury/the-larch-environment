@@ -37,7 +37,6 @@ from GSymCore.Languages.Python25 import Python25
 from GSymCore.Languages.Python25.Execution.ExecutionPresCombinators import executionResultBox, minimalExecutionResultBox
 
 from GSymCore.PresTemplate import Schema
-from GSymCore.PresTemplate import ViewSchema
 
 from GSymCore.PresTemplate.TemplateEditor.PythonExpr import *
 
@@ -46,6 +45,12 @@ from GSymCore.PresTemplate.TemplateEditor.BodyNodeEditor import *
 from GSymCore.PresTemplate.TemplateEditor.TemplateNodeEditor import *
 
 from GSymCore.PresTemplate.TemplateEditor.SelectionEditor import *
+
+from GSymCore.PresTemplate.TemplateEditor.BodyView import BodyView
+from GSymCore.PresTemplate.TemplateEditor.ParagraphView import ParagraphView
+from GSymCore.PresTemplate.TemplateEditor.PythonExprView import PythonExprView
+from GSymCore.PresTemplate.TemplateEditor.TemplateView import TemplateView
+from GSymCore.PresTemplate.TemplateEditor.ContextMenu import templateContextMenuFactory
 
 from BritefuryJ.Controls import *
 from BritefuryJ.DocPresent import *
@@ -67,54 +72,18 @@ _paragraphStyle = StyleSheet.instance.withAttr( RichText.appendNewlineToParagrap
 
 		
 		
-def _templateContextMenuFactory(element, menu):
-	rootElement = element.getRootElement()
-
-	
-	def makeStyleFn(style):
-		def _onLink(link, event):
-			caret = rootElement.getCaret()
-			if caret.isValid():
-				caret.getElement().postTreeEvent( PargraphRequest( style ) )
-		return _onLink
-	
-	normalStyle = Hyperlink( 'Normal', makeStyleFn( 'normal' ) )
-	h1Style = Hyperlink( 'H1', makeStyleFn( 'h1' ) )
-	h2Style = Hyperlink( 'H2', makeStyleFn( 'h2' ) )
-	h3Style = Hyperlink( 'H3', makeStyleFn( 'h3' ) )
-	h4Style = Hyperlink( 'H4', makeStyleFn( 'h4' ) )
-	h5Style = Hyperlink( 'H5', makeStyleFn( 'h5' ) )
-	h6Style = Hyperlink( 'H6', makeStyleFn( 'h6' ) )
-	titleStyle = Hyperlink( 'Title', makeStyleFn( 'title' ) )
-	styles = ControlsRow( [ normalStyle, h1Style, h2Style, h3Style, h4Style, h5Style, h6Style, titleStyle ] )
-	menu.add( SectionColumn( [ SectionTitle( 'Style' ), styles ] ).alignHExpand() )
-	
-	
-	def _onPythonExpr(link, event):
-		caret = rootElement.getCaret()
-		if caret.isValid():
-			caret.getElement().postTreeEvent( PythonExprRequest() )
-
-	newExpr = Hyperlink( 'Python expression', _onPythonExpr )
-	codeControls = ControlsRow( [ newExpr ] )
-	menu.add( SectionColumn( [ SectionTitle( 'Code' ), codeControls ] ).alignHExpand() )
-
-	return True
-
-
-
 class TemplateEditor (GSymViewObjectDispatch):
-	@ObjectDispatchMethod( ViewSchema.TemplateView )
+	@ObjectDispatchMethod( TemplateView )
 	def Template(self, ctx, inheritedState, node):
 		bodyView = InnerFragment( node.getBody() )
 		
 		w = bodyView
 		w = w.withTreeEventListener( TemplateNodeEventListener.instance )
-		w = w.withContextMenuInteractor( _templateContextMenuFactory )
+		w = w.withContextMenuInteractor( templateContextMenuFactory )
 		return w
 	
 	
-	@ObjectDispatchMethod( ViewSchema.BodyView )
+	@ObjectDispatchMethod( BodyView )
 	def Body(self, ctx, inheritedState, node):
 		emptyLine = Paragraph( [ Text( '' ) ] )
 		emptyLine = emptyLine.withTreeEventListener( EmptyEventListener.instance )
@@ -125,7 +94,7 @@ class TemplateEditor (GSymViewObjectDispatch):
 		return w
 	
 	
-	@ObjectDispatchMethod( ViewSchema.ParagraphView )
+	@ObjectDispatchMethod( ParagraphView )
 	def Paragraph(self, ctx, inheritedState, node):
 		text = node.getText()
 		style = node.getStyle()
@@ -155,7 +124,7 @@ class TemplateEditor (GSymViewObjectDispatch):
 
 
 	
-	@ObjectDispatchMethod( ViewSchema.PythonExprView )
+	@ObjectDispatchMethod( PythonExprView )
 	def PythonExpr(self, ctx, inheritedState, node):
 		def _onDeleteButton(button, event):
 			button.getElement().postTreeEvent( DeleteNodeOperation( node ) )

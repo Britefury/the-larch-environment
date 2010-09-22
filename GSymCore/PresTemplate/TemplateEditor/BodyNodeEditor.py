@@ -14,7 +14,8 @@ from BritefuryJ.Logging import LogEntry
 
 from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
 
-from GSymCore.PresTemplate import Schema, ViewSchema
+from GSymCore.PresTemplate import Schema
+from GSymCore.PresTemplate.TemplateEditor.ParagraphView import ParagraphView
 from GSymCore.PresTemplate.TemplateEditor.TextNodeEditor import TextNodeJoinOperation, TextNodeSplitOperation
 from GSymCore.PresTemplate.TemplateEditor.SelectionEditor import TemplateSelectionEditTreeEvent
 from GSymCore.PresTemplate.TemplateEditor.NodeOperations import AddNodeOperation, NodeRequest
@@ -135,7 +136,7 @@ class EmptyEventListener (TreeEventListenerObjectDispatch):
 		if lines[-1] == ''  and  len( lines ) > 1:
 			del lines[-1]
 		for line in lines:
-			node.appendModel( ViewSchema.ParagraphView.newParagraphModel( text=line, style='normal' ) )
+			node.appendModel( ParagraphView.newParagraphModel( text=line, style='normal' ) )
 		return True
 
 	

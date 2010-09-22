@@ -12,7 +12,7 @@ from BritefuryJ.DocPresent import *
 
 from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
 
-from GSymCore.PresTemplate import Schema, ViewSchema
+from GSymCore.PresTemplate import Schema
 from GSymCore.PresTemplate.TemplateEditor.NodeOperations import AddNodeOperation
 
 

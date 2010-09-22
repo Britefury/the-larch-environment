@@ -14,7 +14,7 @@ presTemplatePrelude = 'from GSymCore.PresTemplate.Runtime import PresTemplateRun
 
 from GSymCore.PresTemplate.TemplateEditor.View import perspective as templateEditorPerspective
 from GSymCore.PresTemplate import Schema
-from GSymCore.PresTemplate import ViewSchema
+from GSymCore.PresTemplate.TemplateEditor import TemplateView
 from GSymCore.PresTemplate import CodeGenerator
 
 
@@ -23,7 +23,7 @@ def newTemplate():
 	return Schema.Template( body=Schema.Body( contents=[] ) )
 
 def pythonExternalExpressionPresenter(model, inheritedState):
-	viewModel = ViewSchema.TemplateView( None, model )
+	viewModel = TemplateView.TemplateView( None, model )
 	return templateEditorPerspective.applyTo( InnerFragment( viewModel, inheritedState ) )
 
 def pythonExternalExpressionCodeGeneratorFactory(pythonCodeGen):
