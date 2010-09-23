@@ -7,9 +7,37 @@
 package BritefuryJ.AttributeTable;
 
 import java.util.Comparator;
+import java.util.regex.Pattern;
 
 public abstract class AttributeBase
 {
+	protected static Pattern validNamePattern = Pattern.compile( "[a-zA-Z_][a-zA-Z0-9_]*" );
+
+	
+	public static class AttributeAlreadyExistsException extends RuntimeException
+	{
+		private static final long serialVersionUID = 1L;
+		
+		public AttributeAlreadyExistsException(String message)
+		{
+			super( message );
+		}
+	};
+	
+
+	
+	public static class InvalidAttributeNameException extends RuntimeException
+	{
+		private static final long serialVersionUID = 1L;
+		
+		public InvalidAttributeNameException(String message)
+		{
+			super( message );
+		}
+	}
+
+	
+	
 	public static class AttributeNameComparator implements Comparator<AttributeBase>
 	{
 		@Override
@@ -33,10 +61,15 @@ public abstract class AttributeBase
 	
 	public AttributeBase(AttributeNamespace namespace, String name, Class<?> valueClass, Object defaultValue)
 	{
+		if ( !validNamePattern.matcher( name ).matches() )
+		{
+			throw new InvalidAttributeNameException( "Invalid attribute name '" + name + "'; name should be an identifier" );
+		}
 		this.namespace = namespace;
 		this.name = name;
 		this.valueClass = valueClass;
 		this.defaultValue = defaultValue;
+		this.namespace.registerAttribute( this );
 	}
 	
 	

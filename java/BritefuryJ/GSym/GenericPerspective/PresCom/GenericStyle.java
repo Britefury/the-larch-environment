@@ -42,7 +42,7 @@ public class GenericStyle
 			StyleSheet.instance.withAttr( Primitive.border, new SolidBorder( 1.0, 3.0, 10.0, 10.0, new Color( 0.8f, 0.0f, 0.0f ), new Color( 1.0f, 0.9f, 0.9f ) ) ) );
 	public static final InheritedAttributeNonNull stringContentStyle = new InheritedAttributeNonNull( genericPerspectiveNamespace, "stringContentStyle", StyleSheet.class, 
 			StyleSheet.instance );
-	public static final InheritedAttributeNonNull stringEscapeStyle = new InheritedAttributeNonNull( genericPerspectiveNamespace, "stringContentStyle", StyleSheet.class, 
+	public static final InheritedAttributeNonNull stringEscapeStyle = new InheritedAttributeNonNull( genericPerspectiveNamespace, "stringEscapeStyle", StyleSheet.class, 
 			StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.15f, 0.35f ) ).withAttr( Primitive.background, new FillPainter( new Color( 0.8f, 0.8f, 1.0f ) ) ) );
 
 
