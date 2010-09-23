@@ -60,6 +60,7 @@ import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ErrorBox;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ErrorBoxWithFields;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
+import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBoxWithFields;
 import BritefuryJ.GSym.GenericPerspective.PresCom.VerticalField;
 import BritefuryJ.GSym.GenericPerspective.Presenters.GenericPresentersAWT;
 import BritefuryJ.GSym.GenericPerspective.Presenters.GenericPresentersSQL;
@@ -102,6 +103,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		registerJavaObjectPresenter( PyBaseException.class,  presenter_PyBaseException );
 		registerJavaObjectPresenter( PyModule.class,  presenter_PyModule );
 
+		registerJavaObjectPresenter( Throwable.class,  presenter_Throwable );
 		registerJavaObjectPresenter( Exception.class,  presenter_Exception );
 		registerJavaObjectPresenter( List.class,  presenter_List );
 		registerJavaObjectPresenter( Set.class,  presenter_Set );
@@ -674,6 +676,34 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	};
 
 	
+	
+	public static final ObjectPresenter presenter_Throwable = new ObjectPresenter()
+	{
+		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		{
+			Throwable t = (Throwable)x;
+			
+			ByteArrayOutputStream buf = new ByteArrayOutputStream();
+			t.printStackTrace( new PrintStream( buf ) );
+			String stackTrace = t.toString();
+			String stackTraceLines[] = stackTrace.split( "\n" );
+			Pres stackTraceElements[] = new Pres[stackTraceLines.length];
+			
+			for (int i = 0; i < stackTraceLines.length; i++)
+			{
+				stackTraceElements[i] = stackTraceStyle.applyTo( new StaticText( stackTraceLines[i] ) );
+			}
+			
+			Pres fields[] = {
+					new VerticalField( "Message", new InnerFragment( t.getMessage() ) ),
+					new VerticalField( "Traceback", new Column( stackTraceElements ) )
+			};
+			
+			return new ObjectBoxWithFields( "JAVA THROWABLE", fields );
+		}
+	};
+
+
 	
 	public static final ObjectPresenter presenter_Exception = new ObjectPresenter()
 	{
