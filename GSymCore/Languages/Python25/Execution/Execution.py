@@ -7,6 +7,8 @@
 ##-*************************
 import sys
 
+from java.lang import Throwable
+
 from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder
 
 from GSymCore.Languages.Python25 import CodeGenerator
@@ -82,6 +84,9 @@ def executePythonModule(pythonModule, module, bEvaluate):
 		else:
 			result = None
 	except Exception, exc:
+		caughtException = exc
+		result = None
+	except Throwable, exc:
 		caughtException = exc
 		result = None
 	
