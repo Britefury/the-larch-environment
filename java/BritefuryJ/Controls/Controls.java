@@ -34,7 +34,7 @@ public class Controls
 	
 	public static final InheritedAttributeNonNull buttonBorder = new InheritedAttributeNonNull( controlsNamespace, "buttonBorder", AbstractBorder.class,
 			new SolidBorder( 1.0, 3.0, 10.0, 10.0, new Color( 0.55f, 0.525f, 0.5f ), new Color( 0.85f, 0.85f, 0.85f ) ) );
-	public static final InheritedAttributeNonNull buttonHighlightBorder = new InheritedAttributeNonNull( controlsNamespace, "buttonBorder", AbstractBorder.class,
+	public static final InheritedAttributeNonNull buttonHighlightBorder = new InheritedAttributeNonNull( controlsNamespace, "buttonHighlightBorder", AbstractBorder.class,
 			new SolidBorder( 1.0, 3.0, 10.0, 10.0, new Color( 0.0f, 0.5f, 0.5f ), new Color( 0.925f, 0.925f, 0.925f ) ) );
 	
 	
@@ -97,12 +97,12 @@ public class Controls
 			new FilledOutlinePainter( new Color( 0.9f, 0.9f, 0.9f ), new Color( 0.75f, 0.75f, 0.75f ), new BasicStroke( 1.0f ) ) );
 	public static final InheritedAttribute scrollBarDragBackgroundHoverPainter = new InheritedAttribute( controlsNamespace, "scrollBarDragBackgroundHoverPainter", Painter.class,
 			new FilledOutlinePainter( new Color( 1.0f, 1.0f, 1.0f ), new Color( 0.5f, 0.5f, 0.5f ), new BasicStroke( 1.0f ) ) );
-	public static final InheritedAttributeNonNull scrollBarArrowPadding = new InheritedAttributeNonNull( controlsNamespace, "scrollBarArrowPainter", Double.class, 0.0 );
+	public static final InheritedAttributeNonNull scrollBarArrowPadding = new InheritedAttributeNonNull( controlsNamespace, "scrollBarArrowPadding", Double.class, 0.0 );
 	public static final InheritedAttributeNonNull scrollBarArrowSpacing = new InheritedAttributeNonNull( controlsNamespace, "scrollBarArrowSpacing", Double.class, 2.0 );
 	public static final InheritedAttributeNonNull scrollBarArrowDragboxPadding = new InheritedAttributeNonNull( controlsNamespace, "scrollBarArrowDragboxPadding", Double.class, 3.0 );
 	public static final InheritedAttributeNonNull scrollBarArrowDragboxRounding = new InheritedAttributeNonNull( controlsNamespace, "scrollBarArrowDragboxRounding", Double.class, 4.0 );
 	public static final InheritedAttributeNonNull scrollBarArrowDragboxMinSize = new InheritedAttributeNonNull( controlsNamespace, "scrollBarArrowDragboxMinSize", Double.class, 9.0 );
-	public static final InheritedAttributeNonNull scrollBarSize = new InheritedAttributeNonNull( controlsNamespace, "scrollBarArrowPainter", Double.class, 20.0 );
+	public static final InheritedAttributeNonNull scrollBarSize = new InheritedAttributeNonNull( controlsNamespace, "scrollBarSize", Double.class, 20.0 );
 
 	
 	public static final InheritedAttributeNonNull bClosePopupOnActivate = new InheritedAttributeNonNull( controlsNamespace, "bClosePopupOnActivate", Boolean.class, false );
