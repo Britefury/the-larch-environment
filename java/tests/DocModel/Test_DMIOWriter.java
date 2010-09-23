@@ -202,6 +202,7 @@ public class Test_DMIOWriter extends TestCase
 		writeTest( "abcd\refgh", "\"abcd\\refgh\"" );
 		writeTest( "abcd\tefgh", "\"abcd\\tefgh\"" );
 		writeTest( "abcd\\efgh", "\"abcd\\\\efgh\"" );
+		writeTest( "abc\\ndef", "\"abc\\\\ndef\"" );
 		writeTest( "abcd" + new Character( (char)0x1258 ).toString() + "efgh", "\"abcd\\x1258xefgh\"" );
 	}
 	

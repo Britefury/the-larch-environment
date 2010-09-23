@@ -185,29 +185,81 @@ public class DMIOReader
 		
 		s = s.substring( 1, s.length() - 1 );
 		
-		s = s.replace( "\\n", "\n" ).replace( "\\r", "\r" ).replace( "\\t", "\t" ).replace( "\\\\", "\\" );
+		StringBuilder result = new StringBuilder();
 		
-		boolean bScanAgain = true;
-		while ( bScanAgain )
+		int index = 0;
+		while ( index < s.length() )
 		{
-			Matcher m = hexChar.matcher( s );
-			
-			bScanAgain = false;
-			
-			if ( m.find() )
+			char c = s.charAt( index );
+			if ( c == '\\'  &&  index < s.length() )
 			{
-				if ( m.end() > m.start() )
+				char escapeCode = s.charAt( index + 1 );
+				if ( escapeCode == 'n' )
 				{
-					String hexString = m.group();
-					hexString = hexString.substring( 2, hexString.length() - 1 );
-					char c = (char)Integer.valueOf( hexString, 16 ).intValue();
-					s = s.substring( 0, m.start() ) + Character.toString( c ) + s.substring( m.end(), s.length() );
-					bScanAgain = true;
+					result.append( '\n' );
+					index += 2;
+				}
+				else if ( escapeCode == 'r' )
+				{
+					result.append( '\r' );
+					index += 2;
+				}
+				else if ( escapeCode == 't' )
+				{
+					result.append( '\t' );
+					index += 2;
+				}
+				else if ( escapeCode == '\\' )
+				{
+					result.append( '\\' );
+					index += 2;
+				}
+				else if ( escapeCode == 'x' )
+				{
+					StringBuilder hexString = new StringBuilder();
+					int hexIndex = index + 2;
+					char h = '0';
+					while ( hexIndex < s.length() )
+					{
+						h = s.charAt( hexIndex );
+						if ( ( h >= '0' && h <= '9' )  ||  ( h >= 'A' && h <= 'F' )  ||  ( h >= 'a' && h <= 'f' ) )
+						{
+							hexString.append( h );
+							hexIndex++;
+						}
+						else
+						{
+							break;
+						}
+					}
+					if ( h == 'x'  &&  hexString.length() > 0 )
+					{
+						// Found the terminating 'x' character
+						char hexChar = (char)Integer.valueOf( hexString.toString(), 16 ).intValue();
+						result.append( hexChar );
+						index = hexIndex + 1;
+					}
+					else
+					{
+						result.append( c );
+						index++;
+					}
+				}
+				else
+				{
+					// Did not recognise the escape sequence - just add the character
+					result.append( c );
+					index++;
 				}
 			}
+			else
+			{
+				result.append( c );
+				index++;
+			}
 		}
-		
-		return s;
+
+		return result.toString();
 	}
 	
 	

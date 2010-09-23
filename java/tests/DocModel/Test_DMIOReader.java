@@ -310,7 +310,9 @@ public class Test_DMIOReader extends TestCase
 		readTest( "\"ab\\tcd\"", "ab\tcd" );
 		readTest( "\"ab\\rcd\"", "ab\rcd" );
 		readTest( "\"ab\\\\cd\"", "ab\\cd" );
-		readTest( "\"ab\\x0107xcd\"", "ab" + new Character( (char)Integer.valueOf( "107", 16 ).intValue() ).toString() + "cd" );
+		readTest( "\"abc\\\\ndef\"", "abc\\ndef" );
+		readTest( "\"ab\\x010axcd\"", "ab\u010acd" );
+		readTest( "\"ab\\xffffxcd\"", "ab\uffffcd" );
 	}
 
 	public void testReadEmptyString()
