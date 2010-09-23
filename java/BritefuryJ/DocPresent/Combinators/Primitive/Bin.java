@@ -28,7 +28,10 @@ public class Bin extends Pres
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
 		DPBin element = new DPBin( Primitive.containerParams.get( style ) );
-		element.setChild( child.present( ctx, Primitive.useContainerParams.get( style ) ).layoutWrap() );
+		if ( child != null )
+		{
+			element.setChild( child.present( ctx, Primitive.useContainerParams.get( style ) ).layoutWrap() );
+		}
 		return element;
 	}
 }
