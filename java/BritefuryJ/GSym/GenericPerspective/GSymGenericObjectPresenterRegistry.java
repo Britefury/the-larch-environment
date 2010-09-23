@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.python.core.Py;
 import org.python.core.PyBaseException;
@@ -103,6 +104,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 
 		registerJavaObjectPresenter( Exception.class,  presenter_Exception );
 		registerJavaObjectPresenter( List.class,  presenter_List );
+		registerJavaObjectPresenter( Set.class,  presenter_Set );
 		registerJavaObjectPresenter( Map.class,  presenter_Map );
 		registerJavaObjectPresenter( Class.class,  presenter_Class );
 		registerJavaObjectPresenter( Field.class,  presenter_Field );
@@ -717,6 +719,22 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		}
 	};
 	
+	public static final ObjectPresenter presenter_Set = new ObjectPresenter()
+	{
+		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		{
+			Set<?> set = (Set<?>)x;
+			
+			ArrayList<Object> itemViews = new ArrayList<Object>();
+			for (Object item: set)
+			{
+				itemViews.add( new InnerFragment( item ) );
+			}
+			
+			return setView( itemViews );
+		}
+	};
+	
 	public static final ObjectPresenter presenter_Map = new ObjectPresenter()
 	{
 		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
@@ -1029,6 +1047,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	private static final StyleSheet javaKeywordStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSmallCaps, true );
 	private static final StyleSheet pythonKeywordStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSmallCaps, true );
+	private static final StyleSheet typeKeywordStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.3f, 0.5f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSmallCaps, true );
 	
 	private static final StyleSheet classPunctuationStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
 	
@@ -1056,8 +1075,10 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	private static final Pres closeParen = delimStyle.applyTo( new StaticText( ")" ) );
 	private static final Pres openBrace = delimStyle.applyTo( new StaticText( "{" ) );
 	private static final Pres closeBrace = delimStyle.applyTo( new StaticText( "}" ) );
-	private static final Pres openChevronBracket = delimStyle.applyTo( new StaticText( "<[" ) );
-	private static final Pres closeChevronBracket = delimStyle.applyTo( new StaticText( "]>" ) );
+	private static final Pres openChevronBracket = delimStyle.applyTo( new Label( "<[" ) );
+	private static final Pres closeChevronBracket = delimStyle.applyTo( new Label( "]>" ) );
+	private static final Pres setOpenDelim = new Row( new Pres[] { typeKeywordStyle.applyTo( new StaticText( "Set", "set" ) ),  delimStyle.applyTo( new StaticText( "(" ) ) } );
+	private static final Pres setCloseDelim = delimStyle.applyTo( new StaticText( ")" ) );
 	
 
 	protected static Pres arrayView(List<Object> children)
@@ -1075,6 +1096,11 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		return new SpanSequenceView( children, openParen, closeParen, comma, space, TrailingSeparator.ONE_ELEMENT );
 	}
 	
+	private static Pres setView(List<Object> children)
+	{
+		return new SpanSequenceView( children, setOpenDelim, setCloseDelim, comma, space, TrailingSeparator.NEVER );
+	}
+	
 	private static Pres mapView(List<Object> children)
 	{
 		return new SpanSequenceView( children, openBrace, closeBrace, comma, mapSpace, TrailingSeparator.NEVER );
@@ -1084,5 +1110,4 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	{
 		return new SpanSequenceView( children, null, null, comma, space, TrailingSeparator.NEVER );
 	}
-	
 }
