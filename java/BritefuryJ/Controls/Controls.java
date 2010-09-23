@@ -105,6 +105,9 @@ public class Controls
 	public static final InheritedAttributeNonNull scrollBarSize = new InheritedAttributeNonNull( controlsNamespace, "scrollBarSize", Double.class, 20.0 );
 
 	
+	public static final InheritedAttributeNonNull presentationButtonSpacing = new InheritedAttributeNonNull( controlsNamespace, "presentationButtonSpacing", Double.class, 2.0 );
+
+	
 	public static final InheritedAttributeNonNull bClosePopupOnActivate = new InheritedAttributeNonNull( controlsNamespace, "bClosePopupOnActivate", Boolean.class, false );
 	
 	public static final InheritedAttributeNonNull menuItemHoverBackground = new InheritedAttributeNonNull( controlsNamespace, "menuItemHoverBackground", Painter.class,
@@ -205,6 +208,14 @@ public class Controls
 	};
 
 
+	
+	public static StyleValues usePresentationButtonAttrs(StyleValues style)
+	{
+		return style.useAttr( presentationButtonSpacing );
+	}
+	
+
+	
 	
 	public static StyleValues useMenuItemAttrs(StyleValues style)
 	{
