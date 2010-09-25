@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.GSym.View;
 
+import java.awt.Color;
 import java.util.ArrayList;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
@@ -13,23 +14,30 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPFragment;
 import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.Browser.Location;
+import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Region;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 import BritefuryJ.GSym.GSymAbstractPerspective;
 import BritefuryJ.GSym.GSymBrowserContext;
 import BritefuryJ.GSym.GSymSubject;
 import BritefuryJ.GSym.GenericPerspective.GSymPrimitivePresenter;
+import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.ObjectPresentation.PresentationStateListener;
+import BritefuryJ.GSym.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.Incremental.IncrementalFunctionMonitor;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 
-public class GSymFragmentView extends IncrementalTreeNode implements FragmentContext, PresentationStateListener
+public class GSymFragmentView extends IncrementalTreeNode implements FragmentContext, PresentationStateListener, Presentable
 {
 	public static class FragmentModel
 	{
@@ -75,6 +83,7 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	private DPFragment fragmentElement;
 	private DPElement element;
 	private PersistentStateTable persistentState;
+	private PresentationStateListenerList stateListeners;
 	
 
 	
@@ -183,6 +192,7 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 				fragmentElement.setChild( null );
 				fragmentElement.alignHLeft().alignVRefY();
 			}
+			stateListeners = PresentationStateListenerList.onPresentationStateChanged( stateListeners, this );
 		}
 		getView().profile_stopUpdateNodeElement();
 	}
@@ -446,4 +456,40 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 			return pathA.get( pathA.size() - commonLength );
 		}
 	}
+
+
+
+	@Override
+	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	{
+		stateListeners = PresentationStateListenerList.addListener( stateListeners, fragment );
+		
+		
+		String debugName = element != null  ?  element.getDebugName()  :  null;
+		Pres name;
+		if ( debugName != null )
+		{
+			name = nameStyle.applyTo( new Label( debugName ) );
+		}
+		else
+		{
+			name = noNameStyle.applyTo( new Label( "<fragment>" ) );
+		}
+		
+		
+		ArrayList<Object> childNodes = new ArrayList<Object>();
+		for (IncrementalTreeNode childTreeNode: getChildren())
+		{
+			childNodes.add( childTreeNode );
+		}
+		
+		
+		Pres childrenPres = new Column( childNodes ).padX( 20.0, 0.0 );
+		
+		return new Column( new Pres[] { name, childrenPres } );
+	}
+	
+	
+	private static final StyleSheet nameStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
+	private static final StyleSheet noNameStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) );
 }
