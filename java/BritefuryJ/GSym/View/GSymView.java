@@ -21,6 +21,7 @@ import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.Column;
@@ -32,7 +33,9 @@ import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 import BritefuryJ.GSym.GSymAbstractPerspective;
 import BritefuryJ.GSym.GSymBrowserContext;
 import BritefuryJ.GSym.GSymSubject;
+import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ErrorBox;
+import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBorder;
 import BritefuryJ.IncrementalTree.IncrementalTree;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 import BritefuryJ.IncrementalTree.IncrementalTreeNodeTable;
@@ -40,7 +43,7 @@ import BritefuryJ.Logging.Log;
 import BritefuryJ.Utils.HashUtils;
 import BritefuryJ.Utils.Profile.ProfileTimer;
 
-public class GSymView extends IncrementalTree
+public class GSymView extends IncrementalTree implements Presentable
 {
 	//
 	//
@@ -135,12 +138,12 @@ public class GSymView extends IncrementalTree
 			{
 				fragment = perspective.presentObject( model, fragmentView, inheritedState );
 			}
-			catch (Exception e)
+			catch (Throwable t)
 			{
 				GSymAbstractPerspective genericPerspective = view.browserContext.getGenericPerspective();
 				try
 				{
-					Pres exceptionView = genericPerspective.presentObject( e, fragmentView, inheritedState );
+					Pres exceptionView = genericPerspective.presentObject( t, fragmentView, inheritedState );
 					fragment = new ErrorBox( "Presentation error - exception during presentation", exceptionView );
 					return fragment.present( new PresentationContext( fragmentView, genericPerspective, inheritedState ), style );
 				}
@@ -150,7 +153,7 @@ public class GSymView extends IncrementalTree
 							labelStyle.applyTo( new StaticText( "Got exception:" ) ),
 							exceptionStyle.applyTo( new StaticText( e2.toString() ) ).padX( 15.0, 0.0 ),
 							labelStyle.applyTo( new StaticText( "While trying to display exception:" ) ),
-							exceptionStyle.applyTo( new StaticText( e.toString() ) ).padX( 15.0, 0.0 )   } ) );
+							exceptionStyle.applyTo( new StaticText( t.toString() ) ).padX( 15.0, 0.0 )   } ) );
 					return fragment.present( new PresentationContext( fragmentView, genericPerspective, inheritedState ), style );
 				}
 			}
@@ -624,4 +627,22 @@ public class GSymView extends IncrementalTree
 		};
 		region.queueImmediateEvent( r );
 	}
+
+
+
+	@Override
+	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	{
+		Pres title = titleStyle.applyTo( new Label( "View" ) );
+		
+		GSymFragmentView rootFragment = (GSymFragmentView)getRootIncrementalTreeNode();
+		
+		Pres boxContents = contentsStyle.applyTo( new Column( new Object[] { title, rootFragment } ) );
+
+		return new ObjectBorder( boxContents );
+	}
+	
+	
+	private static final StyleSheet titleStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.fontBold, true );
+	private static final StyleSheet contentsStyle = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 );
 }

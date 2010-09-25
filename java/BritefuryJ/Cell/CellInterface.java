@@ -18,6 +18,7 @@ import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 import BritefuryJ.GSym.GenericPerspective.GSymPrimitivePresenter;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
+import BritefuryJ.GSym.GenericPerspective.PresCom.ErrorBox;
 import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
 import BritefuryJ.GSym.PresCom.ApplyPerspective;
@@ -44,7 +45,17 @@ public abstract class CellInterface implements IncrementalOwner, Presentable
 		@Override
 		public DPElement present(PresentationContext ctx, StyleValues style)
 		{
-			Object value = cell.getValue();
+			Object value = null;
+			try
+			{
+				value = cell.getValue();
+			}
+			catch (Throwable t)
+			{
+				Pres exceptionView = new ApplyPerspective( null, t );
+				return new ErrorBox( "CellInterface.ValuePres presentation error - exception during cell evaluation", exceptionView ).present( ctx, style );
+			}
+
 			if ( value != null )
 			{
 				return Pres.coerce( value ).present( ctx, style );
