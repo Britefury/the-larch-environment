@@ -13,7 +13,7 @@ import BritefuryJ.DocModel.DMIOReader;
 import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
 import BritefuryJ.Parser.AnyNode;
 import BritefuryJ.Parser.Choice;
-import BritefuryJ.Parser.DebugParseResult;
+import BritefuryJ.Parser.TracedParseResult;
 import BritefuryJ.Parser.ListNode;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
@@ -27,12 +27,12 @@ public class TreeParserDebugViewerTest
 	static ParserExpression identifier = new RegEx( "[A-Za-z_][A-Za-z0-9_]*" );
 
 	
-	public static DebugParseResult treeParseDebugResultTest() throws ParseErrorException, CannotOverwriteProductionExpressionException, ParserCoerceException
+	public static TracedParseResult treeParseDebugResultTest() throws ParseErrorException, CannotOverwriteProductionExpressionException, ParserCoerceException
 	{
 		String inputSX = "[call [getAttr [getAttr [call [getAttr [load x] blah] [params]] foo] blah] [params]]";
 		Object input = DMIOReader.readFromString( inputSX, null );
 		ParserExpression parser = buildParser();
-		return parser.debugParseNode( input );
+		return parser.traceParseNode( input );
 	}
 	
 	

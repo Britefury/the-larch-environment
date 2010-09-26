@@ -13,7 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
-import BritefuryJ.ParserHelpers.DebugNode;
+import BritefuryJ.ParserHelpers.TraceNode;
 import BritefuryJ.Utils.HashUtils;
 
 
@@ -137,8 +137,8 @@ public class ParserState
 	
 	private Pattern junkPattern;
 	private HashSet<MemoEntry> dependencies;
-	protected DebugNode debugStack;
-	protected boolean bDebuggingEnabled;
+	protected TraceNode traceStack;
+	protected boolean bTracingEnabled;
 	protected ParseAction delegateAction;
 	
 	
@@ -179,10 +179,10 @@ public class ParserState
 	}
 	
 	
-	protected void enableDebugging()
+	protected void enableTrace()
 	{
-		bDebuggingEnabled = true;
-		debugStack = null;
+		bTracingEnabled = true;
+		traceStack = null;
 	}
 	
 

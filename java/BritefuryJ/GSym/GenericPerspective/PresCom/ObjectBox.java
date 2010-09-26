@@ -34,6 +34,6 @@ public class ObjectBox extends Pres
 		
 		Pres titlePres = new ObjectTitle( title );
 		
-		return new ObjectBorder( new Column( new Object[] { titlePres, contentsElement.padX( padding ) } ) ).present( ctx, style );
+		return new ObjectBorder( new Column( new Object[] { titlePres, contentsElement.padX( padding ) } ).alignHExpand() ).present( ctx, style );
 	}
 }

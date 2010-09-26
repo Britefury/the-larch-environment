@@ -34,6 +34,6 @@ public class ErrorBox extends Pres
 		
 		Pres titlePres = new ObjectTitle( title );
 		
-		return new ErrorBorder( new Column( new Object[] { titlePres, contentsElement.padX( padding ) } ) ).present( ctx, style );
+		return new ErrorBorder( new Column( new Object[] { titlePres, contentsElement.alignHExpand().padX( padding ) } ) ).present( ctx, style );
 	}
 }

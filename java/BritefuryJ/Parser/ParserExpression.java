@@ -13,7 +13,7 @@ import org.python.core.PyObject;
 
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
-import BritefuryJ.ParserHelpers.DebugNode;
+import BritefuryJ.ParserHelpers.TraceNode;
 
 public abstract class ParserExpression
 {
@@ -79,38 +79,38 @@ public abstract class ParserExpression
 	}
 
 	
-	public DebugParseResult debugParseNode(Object input)
+	public TracedParseResult traceParseNode(Object input)
 	{
-		return debugParseNode( input, "[ ]*", (ParseAction)null );
+		return traceParseNode( input, "[ ]*", (ParseAction)null );
 	}
 
-	public DebugParseResult debugParseNode(Object input, String junkRegex)
+	public TracedParseResult traceParseNode(Object input, String junkRegex)
 	{
-		return debugParseNode( input, junkRegex, (ParseAction)null );
+		return traceParseNode( input, junkRegex, (ParseAction)null );
 	}
 
-	public DebugParseResult debugParseNode(Object input, ParseAction delegateAction)
+	public TracedParseResult traceParseNode(Object input, ParseAction delegateAction)
 	{
-		return debugParseNode( input, "[ ]*", delegateAction );
+		return traceParseNode( input, "[ ]*", delegateAction );
 	}
 
-	public DebugParseResult debugParseNode(Object input, String junkRegex, ParseAction delegateAction)
+	public TracedParseResult traceParseNode(Object input, String junkRegex, ParseAction delegateAction)
 	{
 		ParserState state = new ParserState( junkRegex, delegateAction );
-		state.enableDebugging();
-		DebugParseResult result = (DebugParseResult)handleNode( state, input );
+		state.enableTrace();
+		TracedParseResult result = (TracedParseResult)handleNode( state, input );
 		
 		return result;
 	}
 
-	public DebugParseResult debugParseNode(Object input, PyObject delegateAction)
+	public TracedParseResult traceParseNode(Object input, PyObject delegateAction)
 	{
-		return debugParseNode( input, "[ ]*", new Action.PyAction( delegateAction ) );
+		return traceParseNode( input, "[ ]*", new Action.PyAction( delegateAction ) );
 	}
 
-	public DebugParseResult debugParseNode(Object input, String junkRegex, PyObject delegateAction)
+	public TracedParseResult traceParseNode(Object input, String junkRegex, PyObject delegateAction)
 	{
-		return debugParseNode( input, junkRegex, new Action.PyAction( delegateAction ) );
+		return traceParseNode( input, junkRegex, new Action.PyAction( delegateAction ) );
 	}
 
 	
@@ -157,26 +157,26 @@ public abstract class ParserExpression
 	}
 
 	
-	public DebugParseResult debugParseStringChars(String input)
+	public TracedParseResult traceParseStringChars(String input)
 	{
-		return debugParseStringChars( input, "[ ]*", (ParseAction)null );
+		return traceParseStreamItems( input, "[ ]*", (ParseAction)null );
 	}
 
-	public DebugParseResult debugParseStringChars(String input, String junkRegex)
+	public TracedParseResult traceParseStreamItems(String input, String junkRegex)
 	{
-		return debugParseStringChars( input, junkRegex, (ParseAction)null );
+		return traceParseStreamItems( input, junkRegex, (ParseAction)null );
 	}
 
-	public DebugParseResult debugParseStringChars(String input, ParseAction delegateAction)
+	public TracedParseResult traceParseStreamItems(String input, ParseAction delegateAction)
 	{
-		return debugParseStringChars( input, "[ ]*", delegateAction );
+		return traceParseStreamItems( input, "[ ]*", delegateAction );
 	}
 
-	public DebugParseResult debugParseStringChars(String input, String junkRegex, ParseAction delegateAction)
+	public TracedParseResult traceParseStreamItems(String input, String junkRegex, ParseAction delegateAction)
 	{
 		ParserState state = new ParserState( junkRegex, delegateAction );
-		state.enableDebugging();
-		DebugParseResult result = (DebugParseResult)handleStringChars( state, input, 0 );
+		state.enableTrace();
+		TracedParseResult result = (TracedParseResult)handleStringChars( state, input, 0 );
 		if ( result.isValid() )
 		{
 			result.end = state.skipJunkChars( input, result.end );
@@ -185,14 +185,14 @@ public abstract class ParserExpression
 		return result;
 	}
 
-	public DebugParseResult debugParseStringChars(String input, PyObject delegateAction)
+	public TracedParseResult traceParseStreamItems(String input, PyObject delegateAction)
 	{
-		return debugParseStringChars( input, "[ ]*", new Action.PyAction( delegateAction ) );
+		return traceParseStreamItems( input, "[ ]*", new Action.PyAction( delegateAction ) );
 	}
 
-	public DebugParseResult debugParseStringChars(String input, String junkRegex, PyObject delegateAction)
+	public TracedParseResult traceParseStreamItems(String input, String junkRegex, PyObject delegateAction)
 	{
-		return debugParseStringChars( input, junkRegex, new Action.PyAction( delegateAction ) );
+		return traceParseStreamItems( input, junkRegex, new Action.PyAction( delegateAction ) );
 	}
 
 	
@@ -241,41 +241,41 @@ public abstract class ParserExpression
 	}
 	
 	
-	public DebugParseResult debugParseStreamItems(StreamValue input)
+	public TracedParseResult traceParseStreamItems(StreamValue input)
 	{
-		return debugParseStreamItems( input.accessor(), "[ ]*", null );
+		return traceParseStreamItems( input.accessor(), "[ ]*", null );
 	}
 
-	public DebugParseResult debugParseStreamItems(StreamValue input, String junkRegex)
+	public TracedParseResult traceParseStreamItems(StreamValue input, String junkRegex)
 	{
-		return debugParseStreamItems( input.accessor(), junkRegex, null );
+		return traceParseStreamItems( input.accessor(), junkRegex, null );
 	}
 
-	public DebugParseResult debugParseStreamItems(StreamValue input, ParseAction delegateAction)
+	public TracedParseResult traceParseStreamItems(StreamValue input, ParseAction delegateAction)
 	{
-		return debugParseStreamItems( input.accessor(), "[ ]*", delegateAction );
+		return traceParseStreamItems( input.accessor(), "[ ]*", delegateAction );
 	}
 
-	public DebugParseResult debugParseStreamItems(StreamValue input, String junkRegex, ParseAction delegateAction)
+	public TracedParseResult traceParseStreamItems(StreamValue input, String junkRegex, ParseAction delegateAction)
 	{
-		return debugParseStreamItems( input.accessor(), junkRegex, delegateAction );
+		return traceParseStreamItems( input.accessor(), junkRegex, delegateAction );
 	}
 
-	public DebugParseResult debugParseStreamItems(StreamValue input, PyObject delegateAction)
+	public TracedParseResult traceParseStreamItems(StreamValue input, PyObject delegateAction)
 	{
-		return debugParseStreamItems( input.accessor(), "[ ]*", new Action.PyAction( delegateAction ) );
+		return traceParseStreamItems( input.accessor(), "[ ]*", new Action.PyAction( delegateAction ) );
 	}
 
-	public DebugParseResult debugParseStreamItems(StreamValue input, String junkRegex, PyObject delegateAction)
+	public TracedParseResult traceParseStreamItems(StreamValue input, String junkRegex, PyObject delegateAction)
 	{
-		return debugParseStreamItems( input.accessor(), junkRegex, new Action.PyAction( delegateAction ) );
+		return traceParseStreamItems( input.accessor(), junkRegex, new Action.PyAction( delegateAction ) );
 	}
 
-	private DebugParseResult debugParseStreamItems(StreamValueAccessor input, String junkRegex, ParseAction delegateAction)
+	private TracedParseResult traceParseStreamItems(StreamValueAccessor input, String junkRegex, ParseAction delegateAction)
 	{
 		ParserState state = new ParserState( junkRegex, delegateAction );
-		state.enableDebugging();
-		DebugParseResult result = (DebugParseResult)handleStreamItems( state, input, 0 );
+		state.enableTrace();
+		TracedParseResult result = (TracedParseResult)handleStreamItems( state, input, 0 );
 		if ( result.isValid() )
 		{
 			result.end = state.skipJunkChars( input, result.end );
@@ -321,58 +321,58 @@ public abstract class ParserExpression
 	}
 
 	
-	public DebugParseResult debugParseListItems(List<Object> input)
+	public TracedParseResult traceParseListItems(List<Object> input)
 	{
-		return debugParseListItems( input, "[ ]*", (ParseAction)null );
+		return traceParseListItems( input, "[ ]*", (ParseAction)null );
 	}
 
-	public DebugParseResult debugParseListItems(List<Object> input, String junkRegex)
+	public TracedParseResult traceParseListItems(List<Object> input, String junkRegex)
 	{
-		return debugParseListItems( input, junkRegex, (ParseAction)null );
+		return traceParseListItems( input, junkRegex, (ParseAction)null );
 	}
 
-	public DebugParseResult debugParseListItems(List<Object> input, ParseAction delegateAction)
+	public TracedParseResult traceParseListItems(List<Object> input, ParseAction delegateAction)
 	{
-		return debugParseListItems( input, "[ ]*", delegateAction );
+		return traceParseListItems( input, "[ ]*", delegateAction );
 	}
 
-	public DebugParseResult debugParseListItems(List<Object> input, String junkRegex, ParseAction delegateAction)
+	public TracedParseResult traceParseListItems(List<Object> input, String junkRegex, ParseAction delegateAction)
 	{
 		ParserState state = new ParserState( junkRegex, delegateAction );
-		state.enableDebugging();
-		DebugParseResult result = (DebugParseResult)handleListItems( state, input, 0 );
+		state.enableTrace();
+		TracedParseResult result = (TracedParseResult)handleListItems( state, input, 0 );
 		
 		return result;
 	}
 
-	public DebugParseResult debugParseListItems(List<Object> input, PyObject delegateAction)
+	public TracedParseResult traceParseListItems(List<Object> input, PyObject delegateAction)
 	{
-		return debugParseListItems( input, "[ ]*", new Action.PyAction( delegateAction ) );
+		return traceParseListItems( input, "[ ]*", new Action.PyAction( delegateAction ) );
 	}
 
-	public DebugParseResult debugParseListItems(List<Object> input, String junkRegex, PyObject delegateAction)
+	public TracedParseResult traceParseListItems(List<Object> input, String junkRegex, PyObject delegateAction)
 	{
-		return debugParseListItems( input, junkRegex, new Action.PyAction( delegateAction ) );
+		return traceParseListItems( input, junkRegex, new Action.PyAction( delegateAction ) );
 	}
 
 	
 	
 	
-	private void debugBegin(ParserState state, Object input, int start)
+	private void traceBegin(ParserState state, Object input, int start)
 	{
 		// Get the current top of the debug stack (outer call)
-		DebugNode prev = state.debugStack;
+		TraceNode prev = state.traceStack;
 		// Create the debug info node
-		DebugNode node = new DebugNode( prev, this, input, start );
+		TraceNode node = new TraceNode( prev, this, input, start );
 
 		// Push @node onto the debug stack
-		state.debugStack = node;
+		state.traceStack = node;
 	}
 	
-	private ParseResult debugEnd(ParserState state, Object input, ParseResult result)
+	private ParseResult traceEnd(ParserState state, Object input, ParseResult result)
 	{
-		DebugNode node = state.debugStack;
-		DebugNode prev = node.getPrev();
+		TraceNode node = state.traceStack;
+		TraceNode prev = node.getPrev();
 		
 		node.setResult( result );
 		
@@ -383,15 +383,15 @@ public abstract class ParserExpression
 		}
 		
 		// Pop @node off the debug stack
-		state.debugStack = prev;
+		state.traceStack = prev;
 		
 		
-		if ( result instanceof DebugParseResult )
+		if ( result instanceof TracedParseResult )
 		{
-			DebugParseResult debugResult = (DebugParseResult)result;
+			TracedParseResult debugResult = (TracedParseResult)result;
 			
-			DebugNode fromNode = node;
-			DebugNode toNode = debugResult.debugNode;
+			TraceNode fromNode = node;
+			TraceNode toNode = debugResult.traceNode;
 			
 			if ( !fromNode.getCallChildren().contains( toNode ) )
 			{
@@ -406,12 +406,12 @@ public abstract class ParserExpression
 	
 	protected ParseResult handleNode(ParserState state, Object input)
 	{
-		if ( state.bDebuggingEnabled )
+		if ( state.bTracingEnabled )
 		{
-			debugBegin( state, input, 0 );
+			traceBegin( state, input, 0 );
 			// Get the parse result
 			ParseResult result = evaluateNode( state, input );
-			return debugEnd( state, input, result );
+			return traceEnd( state, input, result );
 		}
 		else
 		{
@@ -421,12 +421,12 @@ public abstract class ParserExpression
 	
 	protected ParseResult handleStringChars(ParserState state, String input, int start)
 	{
-		if ( state.bDebuggingEnabled )
+		if ( state.bTracingEnabled )
 		{
-			debugBegin( state, input, start );
+			traceBegin( state, input, start );
 			// Get the parse result
 			ParseResult result = evaluateStringChars( state, input, start );
-			return debugEnd( state, input, result );
+			return traceEnd( state, input, result );
 		}
 		else
 		{
@@ -436,12 +436,12 @@ public abstract class ParserExpression
 	
 	protected ParseResult handleStreamItems(ParserState state, StreamValueAccessor input, int start)
 	{
-		if ( state.bDebuggingEnabled )
+		if ( state.bTracingEnabled )
 		{
-			debugBegin( state, input, start );
+			traceBegin( state, input, start );
 			// Get the parse result
 			ParseResult result = evaluateStreamItems( state, input, start );
-			return debugEnd( state, input, result );
+			return traceEnd( state, input, result );
 		}
 		else
 		{
@@ -451,12 +451,12 @@ public abstract class ParserExpression
 	
 	protected ParseResult handleListItems(ParserState state, List<Object> input, int start)
 	{
-		if ( state.bDebuggingEnabled )
+		if ( state.bTracingEnabled )
 		{
-			debugBegin( state, input, start );
+			traceBegin( state, input, start );
 			// Get the parse result
 			ParseResult result = evaluateListItems( state, input, start );
-			return debugEnd( state, input, result );
+			return traceEnd( state, input, result );
 		}
 		else
 		{

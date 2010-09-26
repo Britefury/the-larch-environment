@@ -35,6 +35,6 @@ public class HorizontalField extends Pres
 		
 		DPElement valueElement = value.present( ctx, GenericStyle.useObjectFieldAttrs( style ) );
 		
-		return fieldStyle.applyTo( new Paragraph( new Object[] { new StaticText( title ), new StaticText( " " ), new LineBreak(), valueElement } ) ).present( ctx, style );
+		return fieldStyle.applyTo( new Paragraph( new Object[] { new StaticText( title ), new StaticText( " " ), new LineBreak(), valueElement.alignHExpand() } ) ).present( ctx, style );
 	}
 }

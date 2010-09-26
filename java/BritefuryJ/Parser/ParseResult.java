@@ -24,7 +24,7 @@ import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBoxWithFields;
 import BritefuryJ.GSym.GenericPerspective.PresCom.VerticalField;
 import BritefuryJ.GSym.PresCom.InnerFragment;
 import BritefuryJ.GSym.View.GSymFragmentView;
-import BritefuryJ.ParserHelpers.DebugNode;
+import BritefuryJ.ParserHelpers.TraceNode;
 import BritefuryJ.ParserHelpers.ParseResultInterface;
 
 public class ParseResult implements ParseResultInterface, Presentable
@@ -190,9 +190,9 @@ public class ParseResult implements ParseResultInterface, Presentable
 	}
 	
 	
-	protected DebugParseResult debug(DebugNode debugNode)
+	protected TracedParseResult debug(TraceNode debugNode)
 	{
-		return new DebugParseResult( value, begin, end, bSuppressed, bValid, bMerge, bindings, debugNode );
+		return new TracedParseResult( value, begin, end, bSuppressed, bValid, bMerge, bindings, debugNode );
 	}
 	
 	
@@ -278,8 +278,8 @@ public class ParseResult implements ParseResultInterface, Presentable
 	}
 
 
-	private static StyleSheet successStyle = StyleSheet.instance.withAttr( Primitive.fontItalic, true ).withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
-	private static StyleSheet failStyle = StyleSheet.instance.withAttr( Primitive.fontItalic, true ).withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.0f ) );
-	private static StyleSheet rangeStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.5f ) );
-	private static StyleSheet parseResultStyle = StyleSheet.instance.withAttr( GenericStyle.objectTitlePaint, new Color( 0.4f, 0.4f, 0.4f ) ).withAttr( GenericStyle.objectBorderPaint, new Color( 0.6f, 0.6f, 0.6f ) );
+	protected static final StyleSheet successStyle = StyleSheet.instance.withAttr( Primitive.fontItalic, true ).withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
+	protected static final StyleSheet failStyle = StyleSheet.instance.withAttr( Primitive.fontItalic, true ).withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.0f ) );
+	protected static final StyleSheet rangeStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.5f ) );
+	protected static final StyleSheet parseResultStyle = StyleSheet.instance.withAttr( GenericStyle.objectTitlePaint, new Color( 0.4f, 0.4f, 0.4f ) ).withAttr( GenericStyle.objectBorderPaint, new Color( 0.6f, 0.6f, 0.6f ) );
 }

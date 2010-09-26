@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.Parser.DebugParseResultView;
+package BritefuryJ.Parser.TracedParseResultView;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -36,7 +36,7 @@ import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.Parser.ParserExpression;
-import BritefuryJ.ParserHelpers.DebugNode;
+import BritefuryJ.ParserHelpers.TraceNode;
 import BritefuryJ.ParserHelpers.ParseResultInterface;
 
 public class NodeView implements FragmentContext
@@ -146,11 +146,11 @@ public class NodeView implements FragmentContext
 	private NodeInteractor nodeInteractor;
 	private ParseView parseView;
 	private ArrayList<NodeView> children;
-	private DebugNode data;
+	private TraceNode data;
 
 	
 	
-	public NodeView(ParseView parseView, DebugNode data)
+	public NodeView(ParseView parseView, TraceNode data)
 	{
 		this.parseView = parseView;
 		this.data = data;
@@ -159,7 +159,7 @@ public class NodeView implements FragmentContext
 		
 		ArrayList<DPElement> childElements = new ArrayList<DPElement>();
 		children = new ArrayList<NodeView>();
-		for (DebugNode child: data.getCallChildren())
+		for (TraceNode child: data.getCallChildren())
 		{
 			NodeView childView = parseView.buildNodeView( child );
 			children.add( childView );
@@ -183,7 +183,7 @@ public class NodeView implements FragmentContext
 	}
 	
 	
-	protected DebugNode getDebugNode()
+	protected TraceNode getDebugNode()
 	{
 		return data;
 	}
@@ -196,7 +196,7 @@ public class NodeView implements FragmentContext
 			parseView.addCallEdge( this, child );
 		}
 		
-		for (DebugNode child: data.getMemoChildren())
+		for (TraceNode child: data.getMemoChildren())
 		{
 			parseView.addMemoEdge( this, parseView.getNodeView( child ) );
 		}
@@ -230,7 +230,7 @@ public class NodeView implements FragmentContext
 	
 	
 	
-	private Pres makeTitleElement(DebugNode data)
+	private Pres makeTitleElement(TraceNode data)
 	{
 		ParserExpression expr = data.getExpression();
 		String exprName = expr.getExpressionName();
@@ -255,7 +255,7 @@ public class NodeView implements FragmentContext
 		}
 	}
 	
-	private Pres makeTitleBoxElement(DebugNode data)
+	private Pres makeTitleBoxElement(TraceNode data)
 	{
 		Pres titleElement = makeTitleElement( data );
 		
@@ -264,7 +264,7 @@ public class NodeView implements FragmentContext
 		return styleSheet.withAttr( Primitive.border, b ).applyTo( new Border( titleElement.alignVCentre() ) );
 	}
 	
-	private Pres makeRangeElement(DebugNode data)
+	private Pres makeRangeElement(TraceNode data)
 	{
 		ParseResultInterface result = data.getResult();
 		String rangeText = "";
@@ -282,7 +282,7 @@ public class NodeView implements FragmentContext
 	}
 	
 	@SuppressWarnings("unchecked")
-	private Pres makeInputElement(DebugNode data)
+	private Pres makeInputElement(TraceNode data)
 	{
 		Object inputObject = data.getInput();
 		String inputString;
@@ -315,7 +315,7 @@ public class NodeView implements FragmentContext
 		return inputStyle.applyTo( new StaticText( inputString ) );
 	}
 
-	private Pres makeValueElement(DebugNode data)
+	private Pres makeValueElement(TraceNode data)
 	{
 		ParseResultInterface result = data.getResult();
 		
@@ -335,7 +335,7 @@ public class NodeView implements FragmentContext
 		}
 	}
 	
-	private Pres makeContentBoxElement(DebugNode data)
+	private Pres makeContentBoxElement(TraceNode data)
 	{
 		Pres rangeElement = makeRangeElement( data );
 		Pres inputElement = makeInputElement( data );
@@ -344,7 +344,7 @@ public class NodeView implements FragmentContext
 		return new Column( new Pres[] { rangeElement, inputElement, valueElement } );
 	}
 	
-	private Pres makeNodeElement(DebugNode data)
+	private Pres makeNodeElement(TraceNode data)
 	{
 		// Called within the constructor...
 		Pres titleBoxElement = makeTitleBoxElement( data );

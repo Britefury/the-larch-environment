@@ -40,10 +40,10 @@ public class ErrorBoxWithFields extends SequentialPres
 		StyleValues childStyle = GenericStyle.useErrorBorderAttrs( GenericStyle.useErrorBoxAttrs( GenericStyle.useObjectFieldListAttrs( style ) ) );
 		
 		DPElement childElems[] = mapPresent( ctx, childStyle, children );
-		Pres contents = GenericStyle.objectBoxFieldListStyle.get( style ).applyTo( new Column( childElems ) );
+		Pres contents = GenericStyle.objectBoxFieldListStyle.get( style ).applyTo( new Column( childElems ).alignHExpand() );
 		
 		Pres titlePres = new ObjectTitle( title );
 		
-		return new ErrorBorder( new Column( new Pres[] { titlePres, contents.padX( padding ) } ) ).present( ctx, style );
+		return new ErrorBorder( new Column( new Pres[] { titlePres, contents.padX( padding ) } ).alignHExpand() ).present( ctx, style );
 	}
 }

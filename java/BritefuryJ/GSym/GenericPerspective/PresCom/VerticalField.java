@@ -35,6 +35,6 @@ public class VerticalField extends Pres
 		
 		DPElement valueElement = value.present( ctx, GenericStyle.useObjectFieldAttrs( style ) );
 		
-		return fieldStyle.applyTo( new Column( new Object[] { new StaticText( title ), valueElement.padX( indentation, 0.0 ) } ) ).present( ctx, style );
+		return fieldStyle.applyTo( new Column( new Object[] { new StaticText( title ), valueElement.alignHExpand().padX( indentation, 0.0 ) } ).alignHExpand() ).present( ctx, style );
 	}
 }

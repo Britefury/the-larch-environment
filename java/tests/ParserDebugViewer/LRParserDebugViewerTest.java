@@ -6,14 +6,14 @@
 //##************************
 package tests.ParserDebugViewer;
 
-import BritefuryJ.Parser.DebugParseResult;
+import BritefuryJ.Parser.TracedParseResult;
 import BritefuryJ.Parser.Literal;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.Production;
 
 public class LRParserDebugViewerTest
 {
-	public static DebugParseResult lrDebugParseResultTest() throws ParserExpression.ParserCoerceException, Production.CannotOverwriteProductionExpressionException
+	public static TracedParseResult lrDebugParseResultTest() throws ParserExpression.ParserCoerceException, Production.CannotOverwriteProductionExpressionException
 	{
 		String testSource = "";
 		for (int i = 0; i < 100; i++)
@@ -21,7 +21,7 @@ public class LRParserDebugViewerTest
 			testSource += "x";
 		}
 		ParserExpression parser = buildParser();
-		return parser.debugParseStringChars( testSource );
+		return parser.traceParseStringChars( testSource );
 	}
 	
 	
