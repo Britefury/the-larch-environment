@@ -12,7 +12,7 @@ import java.util.Map;
 
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.Parser.AnyNode;
-import BritefuryJ.Parser.DebugParseResult;
+import BritefuryJ.Parser.TracedParseResult;
 import BritefuryJ.Parser.Literal;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
@@ -20,7 +20,7 @@ import BritefuryJ.Parser.Production;
 
 public class StreamParserDebugViewerTest
 {
-	public static DebugParseResult streamParseDebugResultTest() throws ParserExpression.ParserCoerceException, Production.CannotOverwriteProductionExpressionException
+	public static TracedParseResult streamParseDebugResultTest() throws ParserExpression.ParserCoerceException, Production.CannotOverwriteProductionExpressionException
 	{
 		StreamValueBuilder builder1 = new StreamValueBuilder();
 		builder1.appendTextValue( "this[" );
@@ -30,7 +30,7 @@ public class StreamParserDebugViewerTest
 
 		
 		ParserExpression parser = buildParser();
-		return parser.debugParseStreamItems( builder1.stream() );
+		return parser.traceParseStreamItems( builder1.stream() );
 	}
 	
 	

@@ -23,7 +23,7 @@ import BritefuryJ.Parser.AnyString;
 import BritefuryJ.Parser.Choice;
 import BritefuryJ.Parser.Combine;
 import BritefuryJ.Parser.Condition;
-import BritefuryJ.Parser.DebugParseResult;
+import BritefuryJ.Parser.TracedParseResult;
 import BritefuryJ.Parser.Delegate;
 import BritefuryJ.Parser.Keyword;
 import BritefuryJ.Parser.ListNode;
@@ -1504,7 +1504,7 @@ public class Test_Parser extends ParserTestCase
 	}
 	
 	
-	public static DebugParseResult getJavaPrimaryTestDebugParseResult() throws ParserCoerceException, Production.CannotOverwriteProductionExpressionException
+	public static TracedParseResult getJavaPrimaryTestDebugParseResult() throws ParserCoerceException, Production.CannotOverwriteProductionExpressionException
 	{
 		ParseAction arrayAccessAction = new ParseAction()
 		{
@@ -1579,7 +1579,7 @@ public class Test_Parser extends ParserTestCase
 		primary.setExpression( primaryNoNewArray );
 
 		
-		return fieldAccessOrArrayAccess.debugParseStringChars( "this[i]" );
+		return fieldAccessOrArrayAccess.traceParseStringChars( "this[i]" );
 	}
 
 

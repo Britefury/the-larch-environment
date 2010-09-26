@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.Parser.DebugParseResult;
+import BritefuryJ.Parser.TracedParseResult;
 import BritefuryJ.Parser.Literal;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.Production;
@@ -82,7 +82,7 @@ public class OperatorTable
 	
 	
 	
-	public static DebugParseResult getOperatorTableTestDebugParseResult() throws BritefuryJ.Parser.Production.CannotOverwriteProductionExpressionException
+	public static TracedParseResult getOperatorTableTestDebugParseResult() throws BritefuryJ.Parser.Production.CannotOverwriteProductionExpressionException
 	{
 		BinaryOperatorParseAction mulAction = new BinaryOperatorParseAction()
 		{
@@ -112,7 +112,7 @@ public class OperatorTable
 		List<ParserExpression> parsers = t.buildParsers();
 		ParserExpression e = parsers.get( parsers.size() - 1 );
 		
-		return e.debugParseStringChars( "a * b * c!" );
+		return e.traceParseStringChars( "a * b * c!" );
 //		DebugParseResult r = e.debugParseString( "a!!!" );
 	}
 }

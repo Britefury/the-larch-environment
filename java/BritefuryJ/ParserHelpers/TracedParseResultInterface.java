@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.ParserHelpers;
 
-public interface DebugParseResultInterface
+public interface TracedParseResultInterface
 {
-	public DebugNode getDebugNode();
+	public TraceNode getDebugNode();
 }

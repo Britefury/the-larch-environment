@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import BritefuryJ.Parser.DebugParseResult;
+import BritefuryJ.Parser.TracedParseResult;
 import BritefuryJ.Parser.Literal;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
@@ -18,11 +18,11 @@ import BritefuryJ.Parser.Production;
 
 public class DebugViewerTest
 {
-	public static DebugParseResult debugParseResultTest() throws ParserExpression.ParserCoerceException, Production.CannotOverwriteProductionExpressionException
+	public static TracedParseResult debugParseResultTest() throws ParserExpression.ParserCoerceException, Production.CannotOverwriteProductionExpressionException
 	{
 		String input = "this[i][j].x.m()";
 		ParserExpression parser = buildParser();
-		return parser.debugParseStringChars( input );
+		return parser.traceParseStringChars( input );
 	}
 	
 	

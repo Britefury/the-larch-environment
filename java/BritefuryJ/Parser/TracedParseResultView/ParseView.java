@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.Parser.DebugParseResultView;
+package BritefuryJ.Parser.TracedParseResultView;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -27,8 +27,8 @@ import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
-import BritefuryJ.ParserHelpers.DebugNode;
-import BritefuryJ.ParserHelpers.DebugParseResultInterface;
+import BritefuryJ.ParserHelpers.TraceNode;
+import BritefuryJ.ParserHelpers.TracedParseResultInterface;
 
 public class ParseView implements FragmentContext
 {
@@ -130,12 +130,12 @@ public class ParseView implements FragmentContext
 	
 	public static interface ParseViewListener
 	{
-		public void onSelectionChanged(DebugNode selection);
+		public void onSelectionChanged(TraceNode selection);
 	}
 	
 	private Pres pres; 
 	private DPElement viewBin;
-	private HashMap<DebugNode, NodeView> nodeTable;
+	private HashMap<TraceNode, NodeView> nodeTable;
 	private ArrayList<Edge> callEdges, memoEdges;
 	private NodeView root;
 	private NodeView selection;
@@ -144,11 +144,11 @@ public class ParseView implements FragmentContext
 	
 	
 	
-	private ParseView(DebugParseResultInterface result, PersistentState viewportState)
+	private ParseView(TracedParseResultInterface result, PersistentState viewportState)
 	{
 		selection = null;
 		
-		nodeTable = new HashMap<DebugNode, NodeView>();
+		nodeTable = new HashMap<TraceNode, NodeView>();
 		callEdges = new ArrayList<Edge>();
 		memoEdges = new ArrayList<Edge>();
 		
@@ -172,7 +172,7 @@ public class ParseView implements FragmentContext
 	
 	
 	
-	protected NodeView buildNodeView(DebugNode node)
+	protected NodeView buildNodeView(TraceNode node)
 	{
 		NodeView view = nodeTable.get( node );
 		
@@ -190,7 +190,7 @@ public class ParseView implements FragmentContext
 	}
 	
 
-	protected NodeView getNodeView(DebugNode node)
+	protected NodeView getNodeView(TraceNode node)
 	{
 		return nodeTable.get( node );
 	}
@@ -218,7 +218,7 @@ public class ParseView implements FragmentContext
 			}
 			
 			selection = node;
-			DebugNode d = null;
+			TraceNode d = null;
 
 			if ( selection != null )
 			{
@@ -236,7 +236,7 @@ public class ParseView implements FragmentContext
 	
 	
 	
-	public static Pres presentDebugParseResult(DebugParseResultInterface x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public static Pres presentTracedParseResult(TracedParseResultInterface x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		ParseView v = new ParseView( x, fragment.persistentState( "viewport " ) );
 		return v.pres.alignHExpand().alignVExpand();

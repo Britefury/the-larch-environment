@@ -10,10 +10,10 @@ import java.util.ArrayList;
 
 import BritefuryJ.Parser.ParserExpression;
 
-public class DebugNode
+public class TraceNode
 {
-	private DebugNode prev;
-	private ArrayList<DebugNode> callChildren, memoChildren;
+	private TraceNode prev;
+	private ArrayList<TraceNode> callChildren, memoChildren;
 
 	private ParserExpression expression;
 	private ParseResultInterface result;
@@ -22,10 +22,10 @@ public class DebugNode
 	private int start;
 	
 	
-	public DebugNode(DebugNode prev, ParserExpression expression, Object input, int start)
+	public TraceNode(TraceNode prev, ParserExpression expression, Object input, int start)
 	{
-		callChildren = new ArrayList<DebugNode>();
-		memoChildren = new ArrayList<DebugNode>();
+		callChildren = new ArrayList<TraceNode>();
+		memoChildren = new ArrayList<TraceNode>();
 		this.prev = prev;
 		this.expression = expression;
 		this.result = null;
@@ -39,29 +39,29 @@ public class DebugNode
 		this.result = result;
 	}
 	
-	public void addCallChild(DebugNode node)
+	public void addCallChild(TraceNode node)
 	{
 		callChildren.add( node );
 	}
 			
-	public void addMemoChild(DebugNode node)
+	public void addMemoChild(TraceNode node)
 	{
 		memoChildren.add( node );
 	}
 			
 	
-	public DebugNode getPrev()
+	public TraceNode getPrev()
 	{
 		return prev;
 	}
 
 
-	public ArrayList<DebugNode> getCallChildren()
+	public ArrayList<TraceNode> getCallChildren()
 	{
 		return callChildren;
 	}
 
-	public ArrayList<DebugNode> getMemoChildren()
+	public ArrayList<TraceNode> getMemoChildren()
 	{
 		return memoChildren;
 	}
