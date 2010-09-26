@@ -33,7 +33,7 @@ public abstract class AbstractBorder implements Presentable
 	}
 	
 	
-	private static StyleSheet style = null;
+	private StyleSheet style = null;
 	
 	public Pres surround(Object x)
 	{

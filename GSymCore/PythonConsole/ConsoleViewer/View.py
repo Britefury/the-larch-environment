@@ -6,6 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 import os
+import sys
 
 from java.awt import Color
 from java.awt.event import KeyEvent
@@ -35,6 +36,7 @@ from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.Browser import Location
 from BritefuryJ.DocPresent.Input import ObjectDndHandler
 from BritefuryJ.DocPresent.Combinators.Primitive import *
+from BritefuryJ.DocPresent.Combinators.RichText import *
 
 from BritefuryJ.GSym import GSymPerspective, GSymSubject
 from BritefuryJ.GSym.View import GSymFragmentView
@@ -78,6 +80,10 @@ class CurrentModuleInteractor (KeyElementInteractor):
 		return False
 
 
+
+
+_bannerTextStyle = StyleSheet.instance.withAttr( Primitive.fontFace, 'Serif' ).withAttr( Primitive.fontSmallCaps, True )
+_bannerBorder = SolidBorder( 2.0, 5.0, 8.0, 8.0, Color( 0.3, 0.5, 0.3 ), Color( 0.875, 0.9, 0.875 ) )
 
 
 _labelStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 10 )
@@ -135,6 +141,12 @@ class ConsoleView (GSymViewObjectDispatch):
 			
 		
 		
+		# Header
+		bannerText = _bannerTextStyle.applyTo( Column( [ NormalText( v )   for v in sys.version.split( '\n' ) ] ) )
+		
+		banner = _bannerBorder.surround( bannerText )
+		
+		
 		dropDest = ObjectDndHandler.DropDest( GSymFragmentView.FragmentModel, _onDrop )
 
 		currentModule = Span( [ currentModule ] )
@@ -151,9 +163,9 @@ class ConsoleView (GSymViewObjectDispatch):
 		
 		if len( blocks ) > 0:
 			blockList = _consoleBlockListStyle.applyTo( Column( blocks ) ).alignHExpand()
-			return _consoleStyle.applyTo( Column( [ blockList.alignHExpand(), dropPromptView, m.alignHExpand() ] ) ).alignHExpand()
+			return _consoleStyle.applyTo( Column( [ banner.alignHExpand(), blockList.alignHExpand(), dropPromptView, m.alignHExpand() ] ) ).alignHExpand()
 		else:
-			return _consoleStyle.applyTo( Column( [ dropPromptView, m.alignVTop().alignHExpand() ] ) ).alignHExpand()
+			return _consoleStyle.applyTo( Column( [ banner.alignHExpand(), dropPromptView, m.alignVTop().alignHExpand() ] ) ).alignHExpand()
 		
 
 		

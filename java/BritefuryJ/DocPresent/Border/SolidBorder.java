@@ -94,4 +94,10 @@ public class SolidBorder extends AbstractBorder
 		graphics.setStroke( prevStroke );
 		graphics.setPaint( prevPaint );
 	}
+	
+	
+	public String toString()
+	{
+		return "FilledBorder( " + thickness + ", " + inset + ", " + roundingX + ", " + roundingY + ", " + borderPaint + ", " + backgroundPaint + " )";
+	}
 }
