@@ -97,4 +97,10 @@ public class FilledBorder extends AbstractBorder
 			graphics.setPaint( prevPaint );
 		}
 	}
+	
+	
+	public String toString()
+	{
+		return "FilledBorder( " + leftMargin + ", " + rightMargin + ", " + topMargin + ", " + bottomMargin + ", " + roundingX + ", " + roundingY + ", " + backgroundPaint + " )";
+	}
 }
