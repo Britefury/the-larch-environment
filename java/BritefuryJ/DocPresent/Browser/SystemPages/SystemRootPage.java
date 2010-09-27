@@ -55,7 +55,7 @@ public class SystemRootPage extends BrowserPage
 		
 		if ( ( linkHeaderFlags & LINKHEADER_ROOTPAGE )  !=  0 )
 		{
-			links.add( new Hyperlink( "GSYM ROOT PAGE", new Location( "" ) ) );
+			links.add( new Hyperlink( "HOME PAGE", new Location( "" ) ) );
 		}
 		
 		if ( ( linkHeaderFlags & LINKHEADER_SYSTEMPAGE )  !=  0 )

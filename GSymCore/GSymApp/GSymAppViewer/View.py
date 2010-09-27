@@ -155,7 +155,8 @@ class AppView (GSymViewObjectDispatch):
 		consoles = InnerFragment.map( node.getConsoles(), state.withAttrs( location='' ) )
 		
 		systemLink = Hyperlink( 'SYSTEM PAGE', Location( 'system' ) )
-		linkHeader = LinkHeaderBar( [ systemLink ] )
+		configurationLink = Hyperlink( 'CONFIGURATION PAGE', Location( 'config' ) )
+		linkHeader = LinkHeaderBar( [ configurationLink, systemLink ] )
 		
 		title = TitleBar( 'gSym' )
 		

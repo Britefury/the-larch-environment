@@ -44,6 +44,7 @@ class MainApp (object):
 		self._world = world
 
 		self._browserContext = GSymBrowserContext( genericPresenterRegistry, True )
+		self._world.registerBrowserContext( self._browserContext )
 		
 		self._appState = world.getAppStateSubject().getFocus()
 		self._browserContext.registerMainSubject( world.getAppStateSubject() )
