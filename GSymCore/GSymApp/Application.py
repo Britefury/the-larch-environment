@@ -7,9 +7,12 @@
 ##-*************************
 from copy import copy
 
+from BritefuryJ.DocPresent.Browser import Location
+
 from BritefuryJ.Incremental import IncrementalOwner, IncrementalValueMonitor
 
 from GSymCore.PythonConsole import ConsoleSchema
+
 
 
 class AppState (IncrementalOwner):
@@ -19,7 +22,6 @@ class AppState (IncrementalOwner):
 		self._openDocuments = []
 		self._documentIDCounter = 1
 		self._consoles = []
-		self._configuration = AppConfiguration()
 		
 		
 	def getOpenDocuments(self):
@@ -49,11 +51,6 @@ class AppState (IncrementalOwner):
 	def addConsole(self, console):
 		self._consoles.append( console )
 		self._incr.onChanged()
-
-		
-	def getConfiguration(self):
-		self._incr.onAccess()
-		return self._configuration
 	
 		
 	
@@ -100,12 +97,6 @@ class AppConsole (IncrementalOwner):
 	def getConsole(self):
 		self._incr.onAccess()
 		return self._console
-		
-	
-
-class AppConfiguration (IncrementalOwner):
-	def __init__(self):
-		self._incr = IncrementalValueMonitor( self )
 		
 
 

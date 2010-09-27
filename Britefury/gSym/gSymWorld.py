@@ -11,6 +11,7 @@ import sys
 from BritefuryJ.DocModel import DMSchema, DMSchemaResolver
 
 from Britefury.gSym.gSymPlugin import GSymPlugin
+from Britefury.gSym.Configuration import Configuration
 
 
 
@@ -60,6 +61,7 @@ class GSymWorld (object):
 		self.pageImporters = []
 		self._appStateSubject = None
 		self._importedModuleRegistry = set()
+		self.configuration = Configuration.Configuration()
 		
 		
 		for plugin in self._plugins:
@@ -103,6 +105,12 @@ class GSymWorld (object):
 		
 	def getAppStateSubject(self):
 		return self._appStateSubject
+	
+	
+	
+	
+	def registerBrowserContext(self, browserContext):
+		browserContext.registerNamedSubject( 'config', self.configuration.subject )
 	
 	
 	

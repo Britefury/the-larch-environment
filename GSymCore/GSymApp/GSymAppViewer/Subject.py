@@ -17,6 +17,7 @@ from GSymCore.GSymApp.GSymAppViewer.View import perspective
 
 
 
+
 class _ConsoleListSubject (object):
 	def __init__(self, appState, enclosingSubject):
 		self._appState = appState
