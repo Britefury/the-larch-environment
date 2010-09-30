@@ -15,6 +15,7 @@ import javax.swing.Timer;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPSpacer;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.Interactor.RealiseElementInteractor;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class AnimatedDrawing extends Drawing
@@ -25,17 +26,19 @@ public class AnimatedDrawing extends Drawing
 	}
 	
 	
-	private static class AbstractStepper
+	private static class AbstractStepper implements RealiseElementInteractor
 	{
 		private DPElement element;
 		private Stepper stepper;
 		private double startTime;
+		protected boolean bRunning;
 		
 		private AbstractStepper(DPElement element, Stepper stepper)
 		{
 			this.element = element;
 			this.stepper = stepper;
 			this.startTime = (double)System.nanoTime() * 1.0e-9;
+			bRunning = false;
 		}
 		
 		
@@ -45,6 +48,20 @@ public class AnimatedDrawing extends Drawing
 			this.stepper.step( element, time );
 			element.queueFullRedraw();
 		}
+
+
+		@Override
+		public void elementRealised(DPElement element)
+		{
+			bRunning = true;
+		}
+
+
+		@Override
+		public void elementUnrealised(DPElement element)
+		{
+			bRunning = false;
+		}
 	}
 	
 	private static class ContinuousStepper extends AbstractStepper implements Runnable
@@ -52,7 +69,6 @@ public class AnimatedDrawing extends Drawing
 		private ContinuousStepper(DPElement element, Stepper stepper)
 		{
 			super( element, stepper );
-			SwingUtilities.invokeLater( this );
 		}
 		
 		
@@ -60,19 +76,37 @@ public class AnimatedDrawing extends Drawing
 		public void run()
 		{
 			step();
+			if ( bRunning )
+			{
+				SwingUtilities.invokeLater( this );
+			}
+		}
+
+
+		@Override
+		public void elementRealised(DPElement element)
+		{
 			SwingUtilities.invokeLater( this );
+		}
+
+
+		@Override
+		public void elementUnrealised(DPElement element)
+		{
 		}
 	}
 	
 	private static class TimedStepper extends AbstractStepper implements ActionListener
 	{
+		private Timer timer;
+		
+		
 		private TimedStepper(DPElement element, Stepper stepper, double interval)
 		{
 			super( element, stepper );
 			int delay = (int)( interval * 1000.0 + 0.5 );
-			Timer timer = new Timer( delay, this );
+			timer = new Timer( delay, this );
 			timer.setRepeats( true );
-			timer.start();
 		}
 		
 		
@@ -80,6 +114,20 @@ public class AnimatedDrawing extends Drawing
 		public void actionPerformed(ActionEvent e)
 		{
 			step();
+		}
+
+
+		@Override
+		public void elementRealised(DPElement element)
+		{
+			timer.start();
+		}
+
+
+		@Override
+		public void elementUnrealised(DPElement element)
+		{
+			timer.stop();
 		}
 	}
 	
@@ -106,14 +154,16 @@ public class AnimatedDrawing extends Drawing
 		DPSpacer element = new DPSpacer( minWidth, minHeight );
 		element.addPainter( new DrawingPainter( painter ) );
 		
+		AbstractStepper s;
 		if ( interval <= 0.0 )
 		{
-			new ContinuousStepper( element, stepper );
+			s = new ContinuousStepper( element, stepper );
 		}
 		else
 		{
-			new TimedStepper( element, stepper, interval );
+			s = new TimedStepper( element, stepper, interval );
 		}
+		element.addElementInteractor( s );
 		
 		return element;
 	}
