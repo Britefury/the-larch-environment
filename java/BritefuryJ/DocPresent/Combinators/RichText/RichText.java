@@ -39,6 +39,8 @@ public class RichText
 	public static final InheritedAttributeNonNull subtitleTextAttrs = new InheritedAttributeNonNull( richTextNamespace, "subtitleTextAttrs", StyleSheet.class,
 			StyleSheet.instance.withAttr( Primitive.fontFace, "Sans serif" ).withAttr( Primitive.fontSize, 14 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.05f ) ) );
 	public static final InheritedAttributeNonNull normalTextAttrs = new InheritedAttributeNonNull( richTextNamespace, "normalTextAttrs", StyleSheet.class, StyleSheet.instance );
+	public static final InheritedAttributeNonNull captionTextAttrs = new InheritedAttributeNonNull( richTextNamespace, "captionTextAttrs", StyleSheet.class,
+			StyleSheet.instance.withAttr( Primitive.fontSize, 10 ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.foreground, new Color( 0.25f, 0.5f, 0.75f ) ) );
 	public static final InheritedAttributeNonNull headingTextAttrs = new InheritedAttributeNonNull( richTextNamespace, "headingTextAttrs", StyleSheet.class,
 			StyleSheet.instance.withAttr( Primitive.fontFace, "Serif" ) );
 	public static final InheritedAttributeNonNull h1TextAttrs = new InheritedAttributeNonNull( richTextNamespace, "h1TextAttrs", StyleSheet.class,
@@ -159,6 +161,18 @@ public class RichText
 	public static StyleValues useNormalTextAttrs(StyleValues style)
 	{
 		return style.useAttr( normalTextAttrs );
+	}
+
+	
+
+	public static StyleSheet captionTextStyle(StyleValues style)
+	{
+		return style.get( captionTextAttrs, StyleSheet.class );
+	}
+	
+	public static StyleValues useCaptionTextAttrs(StyleValues style)
+	{
+		return style.useAttr( normalTextAttrs ).useAttr( captionTextAttrs );
 	}
 
 	
