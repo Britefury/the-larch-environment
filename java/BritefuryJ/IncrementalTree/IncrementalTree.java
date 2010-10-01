@@ -115,7 +115,11 @@ public abstract class IncrementalTree
 	protected void performRefresh()
 	{
 		onResultChangeTreeRefresh();
-		getRootIncrementalTreeNode().refresh();
+		IncrementalTreeNode node = getRootIncrementalTreeNode();
+		if ( node != null )
+		{
+			node.refresh();
+		}
 		
 		// Clear unused entries from the node table
 		nodeTable.clean();

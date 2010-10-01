@@ -107,7 +107,6 @@ public class GSymBrowserContext
 	
 	public GSymBrowserContext(GSymGenericObjectPresenterRegistry genericPresenterRegistry, boolean bWithSystemPages)
 	{
-		super();
 		genericPerspective = new GSymGenericPerspective( objPresLocationResolver, genericPresenterRegistry );
 		if ( bWithSystemPages )
 		{
