@@ -23,4 +23,4 @@ class Python25ConfigurationPage (ConfigurationPage):
 		return 'Python 2.5 editor'
 
 	def __present_contents__(self, fragment, inheritedState):
-		return Label( 'Hello world' )
+		return Label( '<NOT YET IMPLEMENTED>' )
