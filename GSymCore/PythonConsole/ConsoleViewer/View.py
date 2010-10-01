@@ -82,7 +82,7 @@ class CurrentModuleInteractor (KeyElementInteractor):
 
 
 
-_bannerTextStyle = StyleSheet.instance.withAttr( Primitive.fontFace, 'Serif' ).withAttr( Primitive.fontSmallCaps, True )
+_bannerTextStyle = StyleSheet.instance.withAttr( Primitive.fontFace, 'Serif' ).withAttr( Primitive.fontSmallCaps, True ).withAttr( Primitive.editable, False )
 _bannerBorder = SolidBorder( 2.0, 5.0, 8.0, 8.0, Color( 0.3, 0.5, 0.3 ), Color( 0.875, 0.9, 0.875 ) )
 
 
