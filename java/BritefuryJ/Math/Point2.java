@@ -10,8 +10,18 @@ package BritefuryJ.Math;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.GSym.GenericPerspective.Presentable;
+import BritefuryJ.GSym.View.GSymFragmentView;
 
-public class Point2 implements Cloneable
+
+public class Point2 implements Cloneable, Presentable
 {
 	public double x, y;
 	
@@ -65,12 +75,27 @@ public class Point2 implements Cloneable
 		return new Point2( x+b.x, y+b.y );
 	}
 	
+	public Point2 __add__(Vector2 b)
+	{
+		return new Point2( x+b.x, y+b.y );
+	}
+	
 	public Vector2 sub(Point2 b)
 	{
 		return new Vector2( x-b.x, y-b.y );
 	}
 	
+	public Vector2 __sub__(Point2 b)
+	{
+		return new Vector2( x-b.x, y-b.y );
+	}
+	
 	public Point2 sub(Vector2 b)
+	{
+		return new Point2( x-b.x, y-b.y );
+	}
+	
+	public Point2 __sub__(Vector2 b)
 	{
 		return new Point2( x-b.x, y-b.y );
 	}
@@ -107,4 +132,17 @@ public class Point2 implements Cloneable
 	{
 		return "Point2(" + Double.toString( x ) + "," + Double.toString( y ) + ")";
 	}
+
+	
+	
+	@Override
+	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	{
+		return new Row( new Pres[] { delimStyle.applyTo( new Label( "(" ) ).alignVCentre(),
+				vectorStyle.applyTo( new Column( new Pres[] { new Label( String.valueOf( x ) ), new Label( String.valueOf( x ) ) } ) ),
+				delimStyle.applyTo( new Label( ")" ) ).alignVCentre() } );
+	}
+	
+	private static StyleSheet vectorStyle = StyleSheet.instance.withAttr( Primitive.fontFace, "Serif" ).withAttr( Primitive.columnSpacing, 2.0 );
+	private static StyleSheet delimStyle = StyleSheet.instance.withAttr( Primitive.fontScale, 2.1 );
 }
