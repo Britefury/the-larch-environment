@@ -39,7 +39,7 @@ def replace(ctx, target, replacement):
 def replaceNodeContents(ctx, node, replacement):
 	if isinstance( node, DMNode ):
 		if isinstance( node, DMObject )  and  isinstance( replacement, DMObject ):
-			node.become( replacement.deepCopy() )
+			node.become( replacement )
 		elif isinstance( node, DMList )  and  isinstance( replacement, DMListInterface ):
 			node[:] = replacement
 		else:

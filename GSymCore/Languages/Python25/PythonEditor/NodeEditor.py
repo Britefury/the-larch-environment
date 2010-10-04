@@ -74,6 +74,8 @@ class ParsedExpressionTreeEventListener (TreeEventListenerObjectDispatch):
 		node = ctx.getModel()
 		if '\n' not in value:
 			parsed = parseStream( self._parser, value, self._outerPrecedence )
+			if isinstance( event, PythonSelectionEditTreeEvent ):
+				parsed = parsed.deepCopy()
 			if parsed is not None:
 				log = ctx.getView().getPageLog()
 				if log.isRecording():
@@ -129,6 +131,8 @@ class PythonExpressionTreeEventListener (TreeEventListenerObjectDispatch):
 				return True
 			else:
 				parsed = parseStream( self._parser, value, self._outerPrecedence )
+				if isinstance( event, PythonSelectionEditTreeEvent ):
+					parsed = parsed.deepCopy()
 				if parsed is not None:
 					log = ctx.getView().getPageLog()
 					if log.isRecording():
@@ -214,6 +218,8 @@ class StatementTreeEventListener (TreeEventListenerObjectDispatch):
 		value = element.getStreamValue()
 		parsed = parseStream( self._parser, value )
 		if parsed is not None:
+			if isinstance( event, PythonSelectionEditTreeEvent ):
+				parsed = parsed.deepCopy()
 			return self.handleParsed( element, sourceElement, ctx, node, value, parsed, event )
 		else:
 			log = ctx.getView().getPageLog()
