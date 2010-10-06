@@ -159,20 +159,20 @@ public abstract class ParserExpression
 	
 	public TracedParseResult traceParseStringChars(String input)
 	{
-		return traceParseStreamItems( input, "[ ]*", (ParseAction)null );
+		return traceParseStringChars( input, "[ ]*", (ParseAction)null );
 	}
 
-	public TracedParseResult traceParseStreamItems(String input, String junkRegex)
+	public TracedParseResult traceParseStringChars(String input, String junkRegex)
 	{
-		return traceParseStreamItems( input, junkRegex, (ParseAction)null );
+		return traceParseStringChars( input, junkRegex, (ParseAction)null );
 	}
 
-	public TracedParseResult traceParseStreamItems(String input, ParseAction delegateAction)
+	public TracedParseResult traceParseStringChars(String input, ParseAction delegateAction)
 	{
-		return traceParseStreamItems( input, "[ ]*", delegateAction );
+		return traceParseStringChars( input, "[ ]*", delegateAction );
 	}
 
-	public TracedParseResult traceParseStreamItems(String input, String junkRegex, ParseAction delegateAction)
+	public TracedParseResult traceParseStringChars(String input, String junkRegex, ParseAction delegateAction)
 	{
 		ParserState state = new ParserState( junkRegex, delegateAction );
 		state.enableTrace();
@@ -185,14 +185,14 @@ public abstract class ParserExpression
 		return result;
 	}
 
-	public TracedParseResult traceParseStreamItems(String input, PyObject delegateAction)
+	public TracedParseResult traceParseStringChars(String input, PyObject delegateAction)
 	{
-		return traceParseStreamItems( input, "[ ]*", new Action.PyAction( delegateAction ) );
+		return traceParseStringChars( input, "[ ]*", new Action.PyAction( delegateAction ) );
 	}
 
-	public TracedParseResult traceParseStreamItems(String input, String junkRegex, PyObject delegateAction)
+	public TracedParseResult traceParseStringChars(String input, String junkRegex, PyObject delegateAction)
 	{
-		return traceParseStreamItems( input, junkRegex, new Action.PyAction( delegateAction ) );
+		return traceParseStringChars( input, junkRegex, new Action.PyAction( delegateAction ) );
 	}
 
 	

@@ -178,8 +178,8 @@ def _getMethodForNode(dispatchInstance, node):
 	
 	# Try to get the dispatch table. If it does not exist, initialise it
 	try:
-		dispatchTable = dispatchClass.__dispatch_table__
-	except AttributeError:
+		dispatchTable = dispatchClass.__dict__['__dispatch_table__']
+	except KeyError:
 		dispatchTable = _initDispatchTableForClass( dispatchClass )
 
 	# First, try to get a method for the class of @node

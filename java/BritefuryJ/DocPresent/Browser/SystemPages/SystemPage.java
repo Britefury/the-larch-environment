@@ -11,10 +11,12 @@ import java.util.ArrayList;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.RichText.Head;
 import BritefuryJ.DocPresent.Combinators.RichText.NormalText;
 import BritefuryJ.DocPresent.Combinators.RichText.Page;
 import BritefuryJ.DocPresent.Combinators.RichText.TitleBar;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 public abstract class SystemPage extends BrowserPage
 {
@@ -30,7 +32,7 @@ public abstract class SystemPage extends BrowserPage
 		String description = getDescription();
 		if ( description != null )
 		{
-			pageChildren.add( new NormalText( description ) );
+			pageChildren.add( staticStyle.applyTo( new NormalText( description ) ) );
 		}
 		pageChildren.add( createContents().alignHExpand() );
 		
@@ -44,4 +46,7 @@ public abstract class SystemPage extends BrowserPage
 	}
 	
 	protected abstract Pres createContents();
+	
+	
+	private static final StyleSheet staticStyle = StyleSheet.instance.withAttr( Primitive.editable, false );
 }
