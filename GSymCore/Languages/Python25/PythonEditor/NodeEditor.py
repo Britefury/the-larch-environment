@@ -46,20 +46,6 @@ from GSymCore.Languages.Python25.PythonEditor.SelectionEditor import PythonSelec
 
 
 #
-# UNPARSED NODE
-#
-
-def _copy(x):
-	if isinstance( x, DMNode ):
-		return x.deepCopy()
-	else:
-		return x
-
-def _newUNPARSED(value):
-	return Schema.UNPARSED( value=[ _copy( x )   for x in value ] )
-	
-
-#
 #
 # EDIT LISTENERS
 #
@@ -87,8 +73,6 @@ class ParsedExpressionTreeEventListener (TreeEventListenerObjectDispatch):
 		node = ctx.getModel()
 		if '\n' not in value:
 			parsed = parseStream( self._parser, value, self._outerPrecedence )
-			if isinstance( event, PythonSelectionEditTreeEvent ):
-				parsed = parsed.deepCopy()
 			if parsed is not None:
 				log = ctx.getView().getPageLog()
 				if log.isRecording():
@@ -103,7 +87,7 @@ class ParsedExpressionTreeEventListener (TreeEventListenerObjectDispatch):
 						if log.isRecording():
 							log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - deleted' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
 						return False
-				unparsed = _newUNPARSED( value=value.getItemValues() )
+				unparsed = Schema.UNPARSED( value=value.getItemValues() )
 				log = ctx.getView().getPageLog()
 				if log.isRecording():
 					log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - unparsed' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', unparsed ) )
@@ -144,8 +128,6 @@ class PythonExpressionTreeEventListener (TreeEventListenerObjectDispatch):
 				return True
 			else:
 				parsed = parseStream( self._parser, value, self._outerPrecedence )
-				if isinstance( event, PythonSelectionEditTreeEvent ):
-					parsed = parsed.deepCopy()
 				if parsed is not None:
 					log = ctx.getView().getPageLog()
 					if log.isRecording():
@@ -163,7 +145,7 @@ class PythonExpressionTreeEventListener (TreeEventListenerObjectDispatch):
 							if log.isRecording():
 								log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - deleted' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
 							return False
-					unparsed = _newUNPARSED( value=value.getItemValues() )
+					unparsed = Schema.UNPARSED( value=value.getItemValues() )
 					log = ctx.getView().getPageLog()
 					if log.isRecording():
 						log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - unparsed' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', unparsed ) )
@@ -231,8 +213,6 @@ class StatementTreeEventListener (TreeEventListenerObjectDispatch):
 		value = element.getStreamValue()
 		parsed = parseStream( self._parser, value )
 		if parsed is not None:
-			if isinstance( event, PythonSelectionEditTreeEvent ):
-				parsed = parsed.deepCopy()
 			return self.handleParsed( element, sourceElement, ctx, node, value, parsed, event )
 		else:
 			log = ctx.getView().getPageLog()
@@ -279,7 +259,7 @@ class StatementTreeEventListener (TreeEventListenerObjectDispatch):
 							pyReplaceStmt( ctx, node, parsed )
 							return True
 					
-					unparsed = _newUNPARSED( value=sourceValue.getItemValues() )
+					unparsed = Schema.UNPARSED( value=sourceValue.getItemValues() )
 					log = ctx.getView().getPageLog()
 					if log.isRecording():
 						log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - unparsed, sub-node replaced' ).vItem( 'editedStream', sourceValue ).hItem( 'parser', self._parser ).vItem( 'parsedResult', unparsed ) )
