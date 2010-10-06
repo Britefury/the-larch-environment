@@ -44,6 +44,19 @@ from GSymCore.Languages.Python25.PythonEditor.SelectionEditor import PythonSelec
 
 
 
+
+#
+# UNPARSED NODE
+#
+
+def _copy(x):
+	if isinstance( x, DMNode ):
+		return x.deepCopy()
+	else:
+		return x
+
+def _newUNPARSED(value):
+	return Schema.UNPARSED( value=[ _copy( x )   for x in value ] )
 	
 
 #
@@ -90,7 +103,7 @@ class ParsedExpressionTreeEventListener (TreeEventListenerObjectDispatch):
 						if log.isRecording():
 							log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - deleted' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
 						return False
-				unparsed = Schema.UNPARSED( value=value.getItemValues() )
+				unparsed = _newUNPARSED( value=value.getItemValues() )
 				log = ctx.getView().getPageLog()
 				if log.isRecording():
 					log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - unparsed' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', unparsed ) )
@@ -150,7 +163,7 @@ class PythonExpressionTreeEventListener (TreeEventListenerObjectDispatch):
 							if log.isRecording():
 								log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - deleted' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
 							return False
-					unparsed = Schema.UNPARSED( value=value.getItemValues() )
+					unparsed = _newUNPARSED( value=value.getItemValues() )
 					log = ctx.getView().getPageLog()
 					if log.isRecording():
 						log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - unparsed' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', unparsed ) )
@@ -266,7 +279,7 @@ class StatementTreeEventListener (TreeEventListenerObjectDispatch):
 							pyReplaceStmt( ctx, node, parsed )
 							return True
 					
-					unparsed = Schema.UNPARSED( value=sourceValue.getItemValues() )
+					unparsed = _newUNPARSED( value=sourceValue.getItemValues() )
 					log = ctx.getView().getPageLog()
 					if log.isRecording():
 						log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - unparsed, sub-node replaced' ).vItem( 'editedStream', sourceValue ).hItem( 'parser', self._parser ).vItem( 'parsedResult', unparsed ) )

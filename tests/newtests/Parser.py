@@ -939,6 +939,6 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 
 if __name__ == '__main__':
-	#result, pos, dot = targetList.debugParseString( 'a.b' )
-	result, pos, dot = subscript.debugParseString( 'a.b' )
+	#result, pos, dot = targetList.traceParseStringChars( 'a.b' )
+	result, pos, dot = subscript.traceParseStringChars( 'a.b' )
 	print dot

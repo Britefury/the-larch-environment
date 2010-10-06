@@ -41,7 +41,7 @@ class ParserTestCase (unittest.TestCase):
 	
 	
 	def _parseStringTest(self, parser, input, expected, ignoreChars=_whitespaceRegex):
-		result = parser.debugParseStringChars( input, ignoreChars )
+		result = parser.traceParseStringChars( input, ignoreChars )
 		
 		if not result.isValid():
 			print 'PARSE FAILURE while parsing %s, stopped at %d: %s'  %  ( input, result.end, input[:result.end] )
@@ -77,7 +77,7 @@ class ParserTestCase (unittest.TestCase):
 
 
 	def _parseStringTestSX(self, parser, input, expectedSX, ignoreChars=_whitespaceRegex):
-		result = parser.debugParseStringChars( input, ignoreChars )
+		result = parser.traceParseStringChars( input, ignoreChars )
 
 		expected = DMIOReader.readFromString( expectedSX, self.resolver )
 		
@@ -114,7 +114,7 @@ class ParserTestCase (unittest.TestCase):
 
 		
 	def _parseStringFailTest(self, parser, input, ignoreChars=_whitespaceRegex):
-		result = parser.debugParseStringChars( input, ignoreChars )
+		result = parser.traceParseStringChars( input, ignoreChars )
 		
 		if result.isValid()   and   result.end == len( input ):
 			print 'While parsing', input
@@ -131,7 +131,7 @@ class ParserTestCase (unittest.TestCase):
 		
 		
 	def _parseNodeTest(self, parser, input, expected, ignoreChars=_whitespaceRegex):
-		result = parser.debugParseNode( input, ignoreChars )
+		result = parser.traceParseNode( input, ignoreChars )
 		
 		if not result.isValid():
 			print 'PARSE FAILURE while parsing %s'  %  ( input, )
@@ -160,7 +160,7 @@ class ParserTestCase (unittest.TestCase):
 		input = DMIOReader.readFromString( inputXS, self.resolver )
 		expected = DMIOReader.readFromString( expectedSX, self.resolver )
 		
-		result = parser.debugParseNode( input, ignoreChars )
+		result = parser.traceParseNode( input, ignoreChars )
 
 		if not result.isValid():
 			print 'PARSE FAILURE while parsing', input
@@ -185,7 +185,7 @@ class ParserTestCase (unittest.TestCase):
 
 		
 	def _parseNodeFailTest(self, parser, input, ignoreChars=_whitespaceRegex):
-		result = parser.debugParseNode( input, ignoreChars )
+		result = parser.traceParseNode( input, ignoreChars )
 		
 		if result.isValid()   and   result.end == len( input ):
 			print 'While parsing', input
@@ -202,7 +202,7 @@ class ParserTestCase (unittest.TestCase):
 	def _parseNodeFailTestSX(self, parser, inputSX, ignoreChars=_whitespaceRegex):
 		input = DMIOReader.readFromString( inputXS, self.resolver )
 	
-		result = parser.debugParseNode( input, ignoreChars )
+		result = parser.traceParseNode( input, ignoreChars )
 		
 		if result.isValid()   and   result.end == len( input ):
 			print 'While parsing', input
@@ -220,7 +220,7 @@ class ParserTestCase (unittest.TestCase):
 		
 		
 	def _parseListTest(self, parser, input, expected, ignoreChars=_whitespaceRegex):
-		result = parser.debugParseListItems( input, ignoreChars )
+		result = parser.traceParseListItems( input, ignoreChars )
 		
 		if not result.isValid():
 			print 'PARSE FAILURE while parsing %s, stopped at %d: %s'  %  ( input, result.end, input[:result.end] )
@@ -259,7 +259,7 @@ class ParserTestCase (unittest.TestCase):
 		input = DMIOReader.readFromString( inputSX, self.resolver )
 		expected = DMIOReader.readFromString( expectedSX, self.resolver )
 		
-		result = parser.debugParseListItems( input, ignoreChars )
+		result = parser.traceParseListItems( input, ignoreChars )
 
 		if not result.isValid():
 			print 'PARSE FAILURE while parsing', input
@@ -294,7 +294,7 @@ class ParserTestCase (unittest.TestCase):
 
 		
 	def _parseListFailTest(self, parser, input, ignoreChars=_whitespaceRegex):
-		result = parser.debugParseListItems( input, ignoreChars )
+		result = parser.traceParseListItems( input, ignoreChars )
 		
 		if result.isValid()   and   result.end == len( input ):
 			print 'While parsing', input
@@ -312,7 +312,7 @@ class ParserTestCase (unittest.TestCase):
 	def _parseListFailTestSX(self, parser, inputSX, ignoreChars=_whitespaceRegex):
 		input = DMIOReader.readFromString( inputSX, self.resolver )
 
-		result = parser.debugParseListItems( input, ignoreChars )
+		result = parser.traceParseListItems( input, ignoreChars )
 		
 		if result.isValid()   and   result.end == len( input ):
 			print 'While parsing', input
@@ -332,7 +332,7 @@ class ParserTestCase (unittest.TestCase):
 		
 		
 	def _parseStreamTest(self, parser, input, expected, ignoreChars=_whitespaceRegex):
-		result = parser.debugParseStreamItems( input, ignoreChars )
+		result = parser.traceParseStreamItems( input, ignoreChars )
 		
 		if not result.isValid():
 			print 'PARSE FAILURE while parsing %s, stopped at %d: %s'  %  ( input, result.end, input[:result.end] )
@@ -370,7 +370,7 @@ class ParserTestCase (unittest.TestCase):
 	def _parseStreamTestSX(self, parser, input, expectedSX, ignoreChars=_whitespaceRegex):
 		expected = DMIOReader.readFromString( expectedSX, self.resolver )
 		
-		result = parser.debugParseListItems( input, ignoreChars )
+		result = parser.traceParseListItems( input, ignoreChars )
 
 		if not result.isValid():
 			print 'PARSE FAILURE while parsing', input
@@ -405,7 +405,7 @@ class ParserTestCase (unittest.TestCase):
 
 		
 	def _parseStreamFailTest(self, parser, input, ignoreChars=_whitespaceRegex):
-		result = parser.debugParseListItems( input, ignoreChars )
+		result = parser.traceParseListItems( input, ignoreChars )
 		
 		if result.isValid()   and   result.end == len( input ):
 			print 'While parsing', input

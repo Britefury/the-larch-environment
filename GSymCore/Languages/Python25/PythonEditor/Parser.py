@@ -2360,8 +2360,8 @@ class TestCase_Python25Parser (ParserTestCase):
 
 
 def parserViewTest():
-	#result, pos, dot = targetListOrTargetItem.debugParseString( 'a.b' )
-	#result, pos, dot = subscript.debugParseString( 'a.b' )
+	#result, pos, dot = targetListOrTargetItem.traceParseStringChars( 'a.b' )
+	#result, pos, dot = subscript.traceParseStringChars( 'a.b' )
 	#print dot
 
 	#g = Python25Grammar()
@@ -2370,5 +2370,5 @@ def parserViewTest():
 	from BritefuryJ.ParserDebugViewer import ParseViewFrame
 
 	g = Python25Grammar()
-	result = g.expression().debugParseStringChars( '[i for i in a]' )
+	result = g.expression().traceParseStringChars( '[i for i in a]' )
 	ParseViewFrame( result )

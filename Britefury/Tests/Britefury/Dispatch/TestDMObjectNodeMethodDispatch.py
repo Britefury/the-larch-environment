@@ -29,10 +29,15 @@ class TestCase_objectNodeMethodDispatch (unittest.TestCase):
 			def A(self, node, x, y):
 				return x + y
 		
-			#def B(self, node, x, y, p, q):
-			#	return x + y + p + q
+		class DispatchTestDerived (object):
+			__dispatch_num_args__ = 0
+			
+			@DMObjectNodeDispatchMethod( self.A )
+			def A(self, node, x, y):
+				return x + '.' + y
 		
 		self.DispatchTest = DispatchTest
+		self.DispatchTestDerived = DispatchTestDerived
 		
 		
 	def tearDown(self):
@@ -50,3 +55,8 @@ class TestCase_objectNodeMethodDispatch (unittest.TestCase):
 	def testDispatchNoClass(self):
 		d = self.DispatchTest()
 		self.assertRaises( DispatchError, lambda: dmObjectNodeMethodDispatch( d, self.c ) )
+
+	def testDispatchDerived(self):
+		d = self.DispatchTestDerived()
+		self.assert_( dmObjectNodeMethodDispatch( d, self.a )  ==  'a.b' )
+
