@@ -12,8 +12,11 @@ import java.awt.Paint;
 import BritefuryJ.AttributeTable.AttributeNamespace;
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.AttributeTable.DerivedValueTable;
+import BritefuryJ.AttributeTable.InheritedAttribute;
 import BritefuryJ.AttributeTable.InheritedAttributeNonNull;
+import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.Border.FilledBorder;
+import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.Painter.Painter;
@@ -58,6 +61,7 @@ public class RichText
 	public static final InheritedAttributeNonNull separatorPainter = new InheritedAttributeNonNull( richTextNamespace, "separatorPainter", Painter.class, new FillPainter( new Color( 32, 87, 147 ) ) );
 	public static final InheritedAttributeNonNull separatorMajorPadding = new InheritedAttributeNonNull( richTextNamespace, "separatorMajorPadding", Double.class, 15.0 );
 	public static final InheritedAttributeNonNull separatorMinorPadding = new InheritedAttributeNonNull( richTextNamespace, "separatorMinorPadding", Double.class, 3.0 );
+	public static final InheritedAttribute figureBorder = new InheritedAttribute( richTextNamespace, "figureBorder", AbstractBorder.class, new SolidBorder( 1.0, 2.0, Color.black, null ) );
 
 	
 	public static final InheritedAttributeNonNull appendNewlineToParagraphs = new InheritedAttributeNonNull( richTextNamespace, "appendNewlineToParagraphs", Boolean.class, false );
@@ -257,5 +261,17 @@ public class RichText
 	public static StyleValues useSeparatorAttrs(StyleValues style)
 	{
 		return style.useAttr( separatorPainter );
+	}
+
+
+
+	public static StyleSheet figureStyle(StyleValues style)
+	{
+		return StyleSheet.instance.withAttrFrom( Primitive.border, style, figureBorder );
+	}
+	
+	public static StyleValues useFigureAttrs(StyleValues style)
+	{
+		return style.useAttr( figureBorder );
 	}
 }
