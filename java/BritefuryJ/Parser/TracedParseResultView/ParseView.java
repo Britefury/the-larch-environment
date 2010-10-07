@@ -152,7 +152,7 @@ public class ParseView implements FragmentContext
 		callEdges = new ArrayList<Edge>();
 		memoEdges = new ArrayList<Edge>();
 		
-		root = buildNodeView( result.getDebugNode() );
+		root = buildNodeView( result.getTraceNode() );
 		
 		root.registerEdges();
 		

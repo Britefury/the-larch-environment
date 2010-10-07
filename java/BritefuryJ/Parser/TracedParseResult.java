@@ -22,23 +22,52 @@ import BritefuryJ.Parser.TracedParseResultView.ParseView;
 import BritefuryJ.ParserHelpers.TraceNode;
 import BritefuryJ.ParserHelpers.TracedParseResultInterface;
 
-public class TracedParseResult extends ParseResult implements TracedParseResultInterface, Presentable
+public class TracedParseResult extends ParseResult implements Presentable
 {
-	public TraceNode traceNode;
+	public static class ParseTrace implements TracedParseResultInterface, Presentable
+	{
+		private TracedParseResult parseResult;
+		
+		
+		private ParseTrace(TracedParseResult parseResult)
+		{
+			this.parseResult = parseResult;
+		}
+
+		
+		@Override
+		public TraceNode getTraceNode()
+		{
+			return parseResult.traceNode;
+		}
+
+
+		@Override
+		public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		{
+			return ParseView.presentTracedParseResult( this, fragment, inheritedState );
+		}
+	}
+
+	
+	protected TraceNode traceNode;
+	private ParseTrace trace;
 	
 	
 	protected TracedParseResult(Object value, int begin, int end, boolean bSuppressed, boolean bValid, boolean bMerge, Map<String, Object> bindings, TraceNode traceNode)
 	{
 		super( value, begin, end, bSuppressed, bValid, bMerge, bindings );
 		this.traceNode = traceNode;
+		trace = new ParseTrace( this );
 	}
 	
-
-	public TraceNode getDebugNode()
+	
+	
+	public ParseTrace getTrace()
 	{
-		return traceNode;
+		return trace;
 	}
-
+	
 
 	@Override
 	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
@@ -56,13 +85,13 @@ public class TracedParseResult extends ParseResult implements TracedParseResultI
 			
 			Pres valueView = new InnerFragment( getValue() );
 			Pres value = parseResultStyle.applyTo( new VerticalField( "Value:", valueView ) );
-			Pres trace = parseResultStyle.applyTo( new VerticalField( "Trace:", ParseView.presentTracedParseResult( this, fragment, inheritedState ) ) );
+			Pres trace = parseResultStyle.applyTo( new VerticalField( "Trace:", ParseView.presentTracedParseResult( this.trace, fragment, inheritedState ) ) );
 			fields = new Pres[] { status, range, value, trace.alignHExpand().alignVExpand() };
 		}
 		else
 		{
 			Pres status = parseResultStyle.applyTo( new HorizontalField( "Status:", failStyle.applyTo( new StaticText( "Fail" ) ) ) );
-			Pres trace = parseResultStyle.applyTo( new VerticalField( "Trace:", ParseView.presentTracedParseResult( this, fragment, inheritedState ) ) );
+			Pres trace = parseResultStyle.applyTo( new VerticalField( "Trace:", ParseView.presentTracedParseResult( this.trace, fragment, inheritedState ) ) );
 			fields = new Pres[] { status, trace.alignHExpand().alignVExpand() };
 		}
 		

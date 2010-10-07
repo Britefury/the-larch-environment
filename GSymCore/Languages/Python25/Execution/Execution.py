@@ -61,36 +61,43 @@ class ExecutionResult (object):
 
 
 def executePythonModule(pythonModule, module, bEvaluate):
-	if bEvaluate:
-		execCode, evalCode = CodeGenerator.compileForExecutionAndEvaluation( pythonModule, module.__name__ )
-	else:
-		execCode = CodeGenerator.compileForExecution( pythonModule, module.__name__ )
-		evalCode = None
-		
-	caughtException = None
-	
-	savedStdout, savedStderr = sys.stdout, sys.stderr
 	stdout = _OutputStream()
 	stderr = _OutputStream()
-	sys.stdout = stdout
-	sys.stderr = stderr
-	setattr( module, 'display', stdout.display )
-	setattr( module, 'displayerr', stderr.display )
+	caughtException = None
 	
 	try:
-		exec execCode in module.__dict__
-		if evalCode is not None:
-			result = [ eval( evalCode, module.__dict__ ) ]
+		if bEvaluate:
+			execCode, evalCode = CodeGenerator.compileForExecutionAndEvaluation( pythonModule, module.__name__ )
 		else:
-			result = None
+			execCode = CodeGenerator.compileForExecution( pythonModule, module.__name__ )
+			evalCode = None
 	except Exception, exc:
 		caughtException = exc
 		result = None
 	except Throwable, exc:
 		caughtException = exc
 		result = None
+	else:
+		savedStdout, savedStderr = sys.stdout, sys.stderr
+		sys.stdout = stdout
+		sys.stderr = stderr
+		setattr( module, 'display', stdout.display )
+		setattr( module, 'displayerr', stderr.display )
+		
+		try:
+			exec execCode in module.__dict__
+			if evalCode is not None:
+				result = [ eval( evalCode, module.__dict__ ) ]
+			else:
+				result = None
+		except Exception, exc:
+			caughtException = exc
+			result = None
+		except Throwable, exc:
+			caughtException = exc
+			result = None
 	
-	sys.stdout, sys.stderr = savedStdout, savedStderr
+		sys.stdout, sys.stderr = savedStdout, savedStderr
 	
 	return ExecutionResult( stdout.getStream(), stderr.getStream(), caughtException, result )
 	

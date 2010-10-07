@@ -8,5 +8,5 @@ package BritefuryJ.ParserHelpers;
 
 public interface TracedParseResultInterface
 {
-	public TraceNode getDebugNode();
+	public TraceNode getTraceNode();
 }
