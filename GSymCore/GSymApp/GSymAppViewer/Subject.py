@@ -5,11 +5,14 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2010.
 ##-*************************
+import os
+
 from BritefuryJ.AttributeTable import SimpleAttributeTable
 
 from BritefuryJ.DocPresent.Browser import Location
 
 from BritefuryJ.GSym import GSymSubject
+from Britefury.gSym.gSymDocument import GSymDocument
 
 from GSymCore.PythonConsole import Console
 
@@ -67,6 +70,17 @@ class GSymAppSubject (GSymSubject):
 	
 	def getCommandHistory(self):
 		return None
+	
+	
+	def loadDocument(self, filename):
+		document = GSymDocument.readFile( self._world, filename )
+		if document is not None:
+			head, documentName = os.path.split( filename )
+			documentName, ext = os.path.splitext( documentName )
+			
+			document.setDocumentName( documentName )
+			appDoc = self._appState.registerOpenDocument( document )
+		
 	
 	
 	def find_module(self, fullname, path, world):
