@@ -34,9 +34,11 @@ def main():
 	world = GSymWorld()
 	world.enableImportHooks()
 
-	if len( sys.argv ) == 2:
-		filename = sys.argv[1]
-		assert False, 'Load file from command line not implemented yet'
+	if len( sys.argv ) > 1:
+		filenames = sys.argv[1:]
+		appStateSubject = world.getAppStateSubject()
+		for filename in filenames:
+			appStateSubject.loadDocument( filename )
 		
 	def _onClose(app):
 		UserConfig.userConfig.save()
