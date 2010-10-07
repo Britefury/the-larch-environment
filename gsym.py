@@ -38,7 +38,8 @@ def main():
 		filenames = sys.argv[1:]
 		appStateSubject = world.getAppStateSubject()
 		for filename in filenames:
-			appStateSubject.loadDocument( filename )
+			if not appStateSubject.loadDocument( filename ):
+				print 'Failed to load %s'  %  filename
 		
 	def _onClose(app):
 		UserConfig.userConfig.save()
