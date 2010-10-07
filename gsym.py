@@ -38,7 +38,10 @@ def main():
 		filenames = sys.argv[1:]
 		appStateSubject = world.getAppStateSubject()
 		for filename in filenames:
-			if not appStateSubject.loadDocument( filename ):
+			try:
+				if not appStateSubject.loadDocument( filename ):
+					print 'Failed to load document from %s'  %  filename
+			except:
 				print 'Failed to load %s'  %  filename
 		
 	def _onClose(app):
