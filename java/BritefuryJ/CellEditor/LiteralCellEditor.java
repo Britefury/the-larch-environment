@@ -14,8 +14,8 @@ import javax.swing.SwingUtilities;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Cell.LiteralCell;
 import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentView;
@@ -50,7 +50,7 @@ public abstract class LiteralCellEditor implements Presentable, IncrementalMonit
 		
 		protected void error(String message)
 		{
-			setPres( errorStyle.applyTo( new StaticText( "<" + message + ">" ) ) );
+			setPres( errorStyle.applyTo( new Label( "<" + message + ">" ) ) );
 		}
 		
 		

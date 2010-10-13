@@ -17,8 +17,8 @@ import java.util.Set;
 import org.python.core.Py;
 
 import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.Table;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
@@ -394,12 +394,12 @@ public class AttributeTable implements Presentable
 		
 		StyleSheet attrTableStyle = getAttrTableStyle();
 		
-		children[0] = new Pres[] { attrTableStyle.applyTo( new StaticText( "Name" ) ), attrTableStyle.applyTo( new StaticText( "Value" ) ) };
+		children[0] = new Pres[] { attrTableStyle.applyTo( new Label( "Name" ) ), attrTableStyle.applyTo( new Label( "Value" ) ) };
 		for (int i = 0; i < attributes.length; i++)
 		{
 			AttributeBase attribute = attributes[i];
 			Object value = values.get( attribute );
-			children[i+1] = new Pres[] { new StaticText( attribute.getFullName() ), new InnerFragment( value ) };
+			children[i+1] = new Pres[] { new Label( attribute.getFullName() ), new InnerFragment( value ) };
 		}
 		
 		return attrTableStyle.applyTo( new Table( children ) );

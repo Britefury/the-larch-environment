@@ -11,8 +11,8 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.Combinators.ElementRef;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.Column;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
 
@@ -59,7 +59,7 @@ public class CheckboxTestPage extends SystemPage
 
 	protected Pres createContents()
 	{
-		ElementRef stateTextRef = new StaticText( "false" ).elementRef();
+		ElementRef stateTextRef = new Label( "false" ).elementRef();
 		Checkbox checkbox = Checkbox.checkboxWithLabel( "State", false, new CheckboxTextChanger( stateTextRef ) );
 		Pres checkboxSectionContents = new Column( new Pres[] { stateTextRef, checkbox.padX( 5.0 ) } );
 		

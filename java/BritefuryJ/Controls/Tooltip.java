@@ -10,9 +10,9 @@ import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.Column;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
 
@@ -30,7 +30,7 @@ public class Tooltip extends TimedPopup
 		ArrayList<Object> lines = new ArrayList<Object>();
 		for (String line: lineTexts)
 		{
-			lines.add( new StaticText( line ) );
+			lines.add( new Label( line ) );
 		}
 		return StyleSheet.instance.remapAttr( Primitive.border, Controls.tooltipBorder ).applyTo( new Border( new Column( lines ) ) );
 	}

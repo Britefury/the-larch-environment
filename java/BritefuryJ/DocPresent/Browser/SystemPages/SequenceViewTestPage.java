@@ -9,8 +9,8 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 
 import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.Whitespace;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
@@ -45,7 +45,7 @@ public class SequenceViewTestPage extends SystemPage
 		Pres p[] = new Pres[texts.length];
 		for (int i = 0; i < texts.length; i++)
 		{
-			p[i] = new StaticText( texts[i] );
+			p[i] = new Label( texts[i] );
 		}
 		return p;
 	}
@@ -57,9 +57,9 @@ public class SequenceViewTestPage extends SystemPage
 		
 		
 		StyleSheet puncStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
-		Pres beginDelim = puncStyle.applyTo( new StaticText( "[" ) );
-		Pres endDelim = puncStyle.applyTo( new StaticText( "]" ) );
-		Pres separator = puncStyle.applyTo( new StaticText( "," ) );
+		Pres beginDelim = puncStyle.applyTo( new Label( "[" ) );
+		Pres endDelim = puncStyle.applyTo( new Label( "]" ) );
+		Pres separator = puncStyle.applyTo( new Label( "," ) );
 		Pres whitespace = new Whitespace( " " );
 		
 		return new Body( new Pres[] { new Heading2( "Sequence views" ),

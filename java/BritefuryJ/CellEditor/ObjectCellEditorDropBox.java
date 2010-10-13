@@ -8,7 +8,7 @@ package BritefuryJ.CellEditor;
 
 import BritefuryJ.Cell.LiteralCell;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
@@ -40,11 +40,11 @@ public class ObjectCellEditorDropBox extends LiteralCellEditor
 			Pres p;
 			if ( value != null )
 			{
-				p = new ObjectBox( "DocModel", new StaticText( "Value received" ) );
+				p = new ObjectBox( "DocModel", new Label( "Value received" ) );
 			}
 			else
 			{
-				p = new ObjectBox( "DocModel", new StaticText( "null" ) );
+				p = new ObjectBox( "DocModel", new Label( "null" ) );
 			}
 			p = p.withDropDest( GSymFragmentView.FragmentModel.class, new Listener() );
 			setPres( p );

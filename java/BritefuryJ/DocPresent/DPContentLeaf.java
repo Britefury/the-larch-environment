@@ -18,6 +18,38 @@ import BritefuryJ.Math.Point2;
 
 public abstract class DPContentLeaf extends DPElement
 {
+	public static class EditableLeafElementFilter implements ElementFilter
+	{
+		public boolean testElement(DPElement element)
+		{
+			if ( element instanceof DPContentLeaf )
+			{
+				return ((DPContentLeaf)element).isEditable();
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+	
+	public static class SelectableLeafElementFilter implements ElementFilter
+	{
+		public boolean testElement(DPElement element)
+		{
+			if ( element instanceof DPContentLeaf )
+			{
+				return ((DPContentLeaf)element).isSelectable();
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+	
+	
+	
 	public static class CannotCreateMarkerWithEmptyContent extends RuntimeException
 	{
 		static final long serialVersionUID = 0L;
@@ -146,6 +178,28 @@ public abstract class DPContentLeaf extends DPElement
 	public DPContentLeaf getNextEditableLeaf()
 	{
 		return getNextEditableLeaf( null, null );
+	}
+
+	
+	public DPContentLeaf getPreviousSelectableLeaf(ElementFilter subtreeRootFilter, ElementFilter branchFilter)
+	{
+		return getPreviousLeaf( subtreeRootFilter, branchFilter, new DPContentLeafEditable.SelectableLeafElementFilter() );
+	}
+
+	public DPContentLeaf getNextSelectableLeaf(ElementFilter subtreeRootFilter, ElementFilter branchFilter)
+	{
+		return getNextLeaf( subtreeRootFilter, branchFilter, new DPContentLeafEditable.SelectableLeafElementFilter() );
+	}
+
+
+	public DPContentLeaf getPreviousSelectableLeaf()
+	{
+		return getPreviousSelectableLeaf( null, null );
+	}
+
+	public DPContentLeaf getNextSelectableLeaf()
+	{
+		return getNextSelectableLeaf( null, null );
 	}
 
 	
@@ -310,6 +364,20 @@ public abstract class DPContentLeaf extends DPElement
 		return false;
 	}
 
+	
+	
+	
+	//
+	//
+	// SELECTABILITY METHODS
+	//
+	//
+	
+	public boolean isSelectable()
+	{
+		return false;
+	}
+	
 	
 	
 	

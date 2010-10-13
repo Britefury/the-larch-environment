@@ -28,9 +28,9 @@ import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Row;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Event.PointerEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.DndHandler;
@@ -3000,12 +3000,12 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	{
 		if ( debugName != null )
 		{
-			elements.add( headerDebugTextStyle.applyTo( new StaticText( "<" + debugName + ">" ) ) );
+			elements.add( headerDebugTextStyle.applyTo( new Label( "<" + debugName + ">" ) ) );
 		}
 
 		String description = toString();
 		description = description.replace( "BritefuryJ.DocPresent.", "" );
-		elements.add( headerDescriptionTextStyle.applyTo( new StaticText( description ) ) );
+		elements.add( headerDescriptionTextStyle.applyTo( new Label( description ) ) );
 	}
 	
 	public Pres createDebugPresentationHeader()
@@ -3048,7 +3048,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		}
 		else
 		{
-			return alreadyInUseStyle.applyTo( new Border( new StaticText( "Element already in use (element is realised)." ) ) );
+			return alreadyInUseStyle.applyTo( new Border( new Label( "Element already in use (element is realised)." ) ) );
 		}
 	}
 	

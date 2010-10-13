@@ -10,10 +10,10 @@ import java.awt.Color;
 
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Box;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Shape;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
@@ -44,17 +44,17 @@ public class ShapeTestPage extends SystemPage
 	protected Pres createContents()
 	{
 		return styleSheet.applyTo( new Column( new Pres[] {
-				new StaticText( "Box 50x10; 1 pixel padding" ),
+				new Label( "Box 50x10; 1 pixel padding" ),
 				new Box( 50.0, 10.0 ).pad( 1.0, 1.0 ),
-				new StaticText( "Box 50x10; 10 pixel padding" ),
+				new Label( "Box 50x10; 10 pixel padding" ),
 				new Box( 50.0, 10.0 ).pad( 10.0, 10.0 ),
-				new StaticText( "Box 50x10; 10 pixel padding, h-expand" ),
+				new Label( "Box 50x10; 10 pixel padding, h-expand" ),
 				new Box( 50.0, 10.0 ).alignHExpand().pad( 10.0, 10.0 ).alignHExpand(),
-				new StaticText( "Rectangle 50x20  @  0,0; 1 pixel padding" ),
+				new Label( "Rectangle 50x20  @  0,0; 1 pixel padding" ),
 				Shape.rectangle( 0.0, 0.0, 50.0, 20.0 ).pad( 1.0, 1.0 ),
-				new StaticText( "Rectangle 50x20  @  -10,-10; 1 pixel padding" ),
+				new Label( "Rectangle 50x20  @  -10,-10; 1 pixel padding" ),
 				Shape.rectangle( -10.0, -10.0, 50.0, 20.0 ).pad( 1.0, 1.0 ),
-				new StaticText( "Ellipse 25x25  @  0,0; 1 pixel padding" ),
+				new Label( "Ellipse 25x25  @  0,0; 1 pixel padding" ),
 				Shape.ellipse( 0.0, 0.0, 25.0, 25.0 ).pad( 1.0, 1.0 ),
 				} ) );
 	}

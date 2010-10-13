@@ -13,9 +13,10 @@ import org.python.util.PythonInterpreter;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
 import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Head;
 import BritefuryJ.DocPresent.Combinators.RichText.Page;
@@ -80,7 +81,7 @@ public class PythonEvalPageLocationResolver implements PageLocationResolver
 			Pres linkHeader = SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_SYSTEMPAGE );
 			Pres title = new TitleBar( "Default Root Page" );
 			
-			Pres contents = StyleSheet.instance.withAttr( Primitive.fontSize, 16 ).applyTo( new StaticText( "Empty document" ) ).alignHCentre();
+			Pres contents = StyleSheet.instance.withAttr( Primitive.fontSize, 16 ).applyTo( new Label( "Empty document" ) ).alignHCentre();
 			
 			Pres head = new Head( new Pres[] { linkHeader, title } );
 			
@@ -114,7 +115,7 @@ public class PythonEvalPageLocationResolver implements PageLocationResolver
 			Pres title = new TitleBar( "Could Not Resolve Location" );
 			Pres head = new Head( new Pres[] { linkHeader, title } );
 			
-			Pres errorTitle = contentsStyle.applyTo( new StaticText( "Could not resolve" ) ).alignHCentre();
+			Pres errorTitle = contentsStyle.applyTo( new Label( "Could not resolve" ) ).alignHCentre();
 			Pres loc = contentsStyle.applyTo( new StaticText( location ) ).alignHCentre();
 			Pres excClass = contentsStyle.applyTo( new StaticText( "Caught exception of type '" + exception.getClass().getName() + "'" ) );
 			String excLines[] = exception.toString().split( "\n" );

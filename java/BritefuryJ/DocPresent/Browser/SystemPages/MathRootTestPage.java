@@ -11,9 +11,9 @@ import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Fraction;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.MathRoot;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
@@ -42,7 +42,7 @@ public class MathRootTestPage extends SystemPage
 	
 	private Pres makeFraction(String numeratorText, String denominatorText)
 	{
-		return new Fraction( textStyleSheet.applyTo( new StaticText( numeratorText ) ), textStyleSheet.applyTo( new StaticText( denominatorText ) ), "/" );
+		return new Fraction( textStyleSheet.applyTo( new Label( numeratorText ) ), textStyleSheet.applyTo( new Label( denominatorText ) ), "/" );
 	}
 
 	
@@ -50,8 +50,8 @@ public class MathRootTestPage extends SystemPage
 	{
 		ArrayList<Object> children = new ArrayList<Object>( );
 		
-		children.add( rootStyleSheet.applyTo( new MathRoot( textStyleSheet.applyTo( new StaticText( "a" ) ) ) ) );
-		children.add( rootStyleSheet.applyTo( new MathRoot( textStyleSheet.applyTo( new StaticText( "a+p" ) ) ) ) );
+		children.add( rootStyleSheet.applyTo( new MathRoot( textStyleSheet.applyTo( new Label( "a" ) ) ) ) );
+		children.add( rootStyleSheet.applyTo( new MathRoot( textStyleSheet.applyTo( new Label( "a+p" ) ) ) ) );
 		children.add( rootStyleSheet.applyTo( new MathRoot( makeFraction( "a", "p+q" ) ) ) );
 		
 		return new Body( children );

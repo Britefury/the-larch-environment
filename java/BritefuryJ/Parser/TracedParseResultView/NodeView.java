@@ -23,9 +23,9 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.Column;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Row;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Event.AbstractPointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
@@ -36,8 +36,8 @@ import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.Parser.ParserExpression;
-import BritefuryJ.ParserHelpers.TraceNode;
 import BritefuryJ.ParserHelpers.ParseResultInterface;
+import BritefuryJ.ParserHelpers.TraceNode;
 
 public class NodeView implements FragmentContext
 {
@@ -243,10 +243,10 @@ public class NodeView implements FragmentContext
 		}
 		
 		
-		Pres classText = classNameStyle.applyTo( new StaticText( "[" + className + "]" ) );
+		Pres classText = classNameStyle.applyTo( new Label( "[" + className + "]" ) );
 		if ( exprName != null )
 		{
-			Pres exprText = debugNameStyle.applyTo( new StaticText( exprName ) );
+			Pres exprText = debugNameStyle.applyTo( new Label( exprName ) );
 			return styleSheet.withAttr( Primitive.rowSpacing, 10.0 ).applyTo( new Row( new Pres[] { exprText, classText } ) );
 		}
 		else
@@ -278,7 +278,7 @@ public class NodeView implements FragmentContext
 			rangeText = String.valueOf( data.getStart() ) + "   :   " + String.valueOf( result.getEnd() );
 		}
 
-		return rangeStyle.applyTo( new StaticText( rangeText ) );
+		return rangeStyle.applyTo( new Label( rangeText ) );
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -312,7 +312,7 @@ public class NodeView implements FragmentContext
 			inputString = inputString.substring( 0, MAX_STRING_LENGTH )  +  "...";
 		}
 
-		return inputStyle.applyTo( new StaticText( inputString ) );
+		return inputStyle.applyTo( new Label( inputString ) );
 	}
 
 	private Pres makeValueElement(TraceNode data)
@@ -327,11 +327,11 @@ public class NodeView implements FragmentContext
 			{
 				valueString = valueString.substring( 0, MAX_STRING_LENGTH )  +  "...";
 			}
-			return valueStyle.applyTo( new StaticText( valueString ) );
+			return valueStyle.applyTo( new Label( valueString ) );
 		}
 		else
 		{
-			return failStyle.applyTo( new StaticText( "<fail>" ) );
+			return failStyle.applyTo( new Label( "<fail>" ) );
 		}
 	}
 	

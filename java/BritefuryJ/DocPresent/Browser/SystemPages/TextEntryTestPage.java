@@ -18,12 +18,12 @@ import BritefuryJ.DocPresent.DPProxy;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
-import BritefuryJ.DocPresent.Combinators.Primitive.Row;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Proxy;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.Primitive.Column;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
@@ -151,7 +151,7 @@ public class TextEntryTestPage extends SystemPage
 		{
 			EditableLinkControl ctl = new EditableLinkControl( ctx, style );
 			
-			StaticText status = new StaticText( "" );
+			Label status = new Label( "" );
 			DPText statusElement = (DPText)status.present( ctx, style );
 			
 			Hyperlink link = new Hyperlink( initialText, ctl.linkListener() );
@@ -188,8 +188,8 @@ public class TextEntryTestPage extends SystemPage
 		EditableLink identifier = new EditableLink( "abc", Pattern.compile( "[a-zA-Z_][a-zA-Z0-9_]*" ), "Please enter a valid identifier.\n(alphabetic or underscore, followed by alphanumeric or underscore)" );
 		EditableLink integer = new EditableLink( "123", Pattern.compile( "[0-9]+" ), "Please enter a valid integer." );
 		
-		Pres identifierLine = new Paragraph( new Pres[] { new StaticText( "Identifier: "), identifier } );
-		Pres integerLine = new Paragraph( new Pres[] { new StaticText( "Integer: "), integer } );
+		Pres identifierLine = new Paragraph( new Pres[] { new Label( "Identifier: "), identifier } );
+		Pres integerLine = new Paragraph( new Pres[] { new Label( "Integer: "), integer } );
 		
 		Pres entriesBox = new Column( new Pres[] { hello, world, identifierLine, integerLine } );
 		

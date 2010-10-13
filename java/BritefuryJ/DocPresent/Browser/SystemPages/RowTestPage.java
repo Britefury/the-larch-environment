@@ -12,9 +12,9 @@ import java.util.ArrayList;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
-import BritefuryJ.DocPresent.Combinators.Primitive.Row;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 
@@ -43,7 +43,7 @@ public class RowTestPage extends SystemPage
 	protected Pres makeText(String text, int size)
 	{
 		StyleSheet styleSheet = StyleSheet.instance.withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, size );
-		return outlineStyleSheet.applyTo( new Border( styleSheet.applyTo( new StaticText( text ) ) ) );
+		return outlineStyleSheet.applyTo( new Border( styleSheet.applyTo( new Label( text ) ) ) );
 	}
 	
 	

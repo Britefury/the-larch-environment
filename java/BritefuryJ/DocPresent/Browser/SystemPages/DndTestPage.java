@@ -16,15 +16,16 @@ import BritefuryJ.DocPresent.Combinators.ElementRef;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.Primitive.Fraction;
-import BritefuryJ.DocPresent.Combinators.Primitive.Row;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Proxy;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.Primitive.Script;
 import BritefuryJ.DocPresent.Combinators.Primitive.Spacer;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
@@ -122,9 +123,9 @@ public class DndTestPage extends SystemPage
 	
 	protected Pres makePalette()
 	{
-		Pres title = paletteTitleStyle.applyTo( new StaticText( "Palette" ) ).alignHCentre();
+		Pres title = paletteTitleStyle.applyTo( new Label( "Palette" ) ).alignHCentre();
 		
-		Pres textsTitle = paletteSectionStyle.applyTo( new StaticText( "Text:" ) );
+		Pres textsTitle = paletteSectionStyle.applyTo( new Label( "Text:" ) );
 		ArrayList<Object> textElements = new ArrayList<Object>();
 		textElements.add( textsTitle.padX( 0.0, 20.0 ) );
 		String texts = "abcdefghijklmnopqrstuvwxyz";
@@ -134,7 +135,7 @@ public class DndTestPage extends SystemPage
 		}
 		Pres textSection = mainStyle.withAttr( Primitive.rowSpacing, 3.0 ).applyTo( new Row( textElements ) );
 		
-		Pres mathTitle = paletteSectionStyle.applyTo( new StaticText( "Math:" ) );
+		Pres mathTitle = paletteSectionStyle.applyTo( new Label( "Math:" ) );
 		ArrayList<Object> mathElements = new ArrayList<Object>();
 		mathElements.add( mathTitle.padX( 0.0, 20.0 ) );
 		mathElements.add( makeFractionSource() );
@@ -148,7 +149,7 @@ public class DndTestPage extends SystemPage
 	
 	protected Pres makeFormula()
 	{
-		Pres title = paletteTitleStyle.applyTo( new StaticText( "Formula" ) ).alignHCentre();
+		Pres title = paletteTitleStyle.applyTo( new Label( "Formula" ) ).alignHCentre();
 		Pres formula = mathStyle.applyTo( makePlaceHolder() );
 		Pres formulaPara = mainStyle.applyTo( new Paragraph( new Pres[] { formula } ) );
 		

@@ -9,9 +9,9 @@ package BritefuryJ.GSym.GenericPerspective.PresCom;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.LineBreak;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
@@ -35,6 +35,6 @@ public class HorizontalField extends Pres
 		
 		DPElement valueElement = value.present( ctx, GenericStyle.useObjectFieldAttrs( style ) );
 		
-		return fieldStyle.applyTo( new Paragraph( new Object[] { new StaticText( title ), new StaticText( " " ), new LineBreak(), valueElement.alignHExpand() } ) ).present( ctx, style );
+		return fieldStyle.applyTo( new Paragraph( new Object[] { new Label( title ), new Label( " " ), new LineBreak(), valueElement.alignHExpand() } ) ).present( ctx, style );
 	}
 }

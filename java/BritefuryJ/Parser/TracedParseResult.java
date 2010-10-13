@@ -10,6 +10,7 @@ import java.util.Map;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
@@ -76,7 +77,7 @@ public class TracedParseResult extends ParseResult implements Presentable
 		
 		if ( isValid() )
 		{
-			Pres status = parseResultStyle.applyTo( new HorizontalField( "Status:", successStyle.applyTo( new StaticText( "Success" ) ) ) );
+			Pres status = parseResultStyle.applyTo( new HorizontalField( "Status:", successStyle.applyTo( new Label( "Success" ) ) ) );
 			Pres range = parseResultStyle.applyTo( new HorizontalField( "Range:",
 					new Paragraph( new Pres[] { 
 							rangeStyle.applyTo( new StaticText( String.valueOf( getBegin() ) ) ),

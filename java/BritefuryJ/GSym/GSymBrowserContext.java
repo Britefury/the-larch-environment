@@ -13,12 +13,13 @@ import org.python.core.__builtin__;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.BrowserPage;
+import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.PageLocationResolver;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
@@ -246,7 +247,7 @@ public class GSymBrowserContext
 			Pres linkHeader = SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_SYSTEMPAGE );
 			Pres title = new TitleBar( "Default Root Page" );
 			
-			Pres contents = StyleSheet.instance.withAttr( Primitive.fontSize, 16 ).applyTo( new StaticText( "Empty document" ) ).alignHCentre();
+			Pres contents = StyleSheet.instance.withAttr( Primitive.fontSize, 16 ).applyTo( new Label( "Empty document" ) ).alignHCentre();
 			
 			Pres head = new Head( new Pres[] { linkHeader, title } );
 			
@@ -274,7 +275,7 @@ public class GSymBrowserContext
 			StyleSheet titleStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 24 );
 			StyleSheet contentsStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 16 );
 			
-			Pres errorTitle = titleStyle.applyTo( new StaticText( "Could not resolve" ) );
+			Pres errorTitle = titleStyle.applyTo( new Label( "Could not resolve" ) );
 			Pres loc = contentsStyle.applyTo( new StaticText( location ) );
 			Pres exc = Pres.coerce( exception );
 			Pres body = new Body( new Pres[] { errorTitle.alignHCentre(), loc.alignHCentre(), exc.alignHCentre() } );

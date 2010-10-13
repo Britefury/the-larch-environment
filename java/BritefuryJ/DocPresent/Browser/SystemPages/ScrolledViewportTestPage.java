@@ -12,10 +12,10 @@ import BritefuryJ.Controls.ScrolledViewport;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
+import BritefuryJ.DocPresent.Combinators.Primitive.Column;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.SpaceBin;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.RichText.NormalText;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
@@ -50,7 +50,7 @@ public class ScrolledViewportTestPage extends SystemPage
 		
 		Pres viewport = new SpaceBin( new ScrolledViewport( b2, 0.0, 0.0, new PersistentState() ).alignHExpand().alignVExpand(), 0.0, 200.0 );
 		Pres border = borderStyle.applyTo( new Border( viewport.alignHExpand().alignVExpand() ).alignHExpand().alignVExpand() );
-		Pres column = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( new Column( new Pres[] { new StaticText( "Viewport:" ), border } ) ).alignHExpand().alignVExpand();
+		Pres column = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( new Column( new Pres[] { new Label( "Viewport:" ), border } ) ).alignHExpand().alignVExpand();
 		return column.pad( 50.0, 50.0 );
 	}
 }

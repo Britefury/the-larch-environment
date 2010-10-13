@@ -16,15 +16,15 @@ public class FractionStyleParams extends ContainerStyleParams
 {
 	public static class BarStyleParams extends ContentLeafEditableStyleParams
 	{
-		public static final BarStyleParams defaultStyleParams = new BarStyleParams( null, null, null, true, Color.black, null );
+		public static final BarStyleParams defaultStyleParams = new BarStyleParams( null, null, null, true, true, Color.black, null );
 		
 		
 		protected final Paint barPaint, hoverBarPaint;
 
 
-		public BarStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, boolean bEditable, Paint barPaint, Paint hoverBarPaint)
+		public BarStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, boolean bEditable, boolean bSelectable, Paint barPaint, Paint hoverBarPaint)
 		{
-			super( background, hoverBackground, pointerCursor, bEditable );
+			super( background, hoverBackground, pointerCursor, bEditable, bSelectable );
 			
 			this.barPaint = barPaint;
 			this.hoverBarPaint = hoverBarPaint;

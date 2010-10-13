@@ -9,7 +9,7 @@ package BritefuryJ.GSym.GenericPerspective.PresCom;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
@@ -28,6 +28,6 @@ public class ObjectTitle extends Pres
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
 		StyleSheet titleStyle = GenericStyle.objectTitleStyle.get( style );
-		return titleStyle.applyTo( new StaticText( title ) ).present( ctx, style );
+		return titleStyle.applyTo( new Label( title ) ).present( ctx, style );
 	}
 }
