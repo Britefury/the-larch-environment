@@ -15,6 +15,7 @@ import BritefuryJ.DocPresent.DPContentLeafEditable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPSegment;
 import BritefuryJ.DocPresent.DPElement.IsNotInSubtreeException;
+import BritefuryJ.DocPresent.ElementFilter;
 
 public class Marker
 {
@@ -346,7 +347,7 @@ public class Marker
 	
 	
 	
-	public void moveToPositionAndBiasWithinSubtree(DPElement subtree, int newPosition, Bias newBias)
+	public void moveToPositionAndBiasWithinSubtree(DPElement subtree, int newPosition, Bias newBias, ElementFilter leafFilter)
 	{
 		int subtreeTextRepLength = subtree.getTextRepresentationLength();
 		
@@ -379,7 +380,7 @@ public class Marker
 			int leafPosition = newPosition - leafOffset;
 			
 			
-			if ( leaf.isEditable() )
+			if ( leafFilter == null  ||  leafFilter.testElement( leaf ) )
 			{
 				moveTo( ((DPContentLeafEditable)leaf).marker( leafPosition, newBias ) );
 			}
@@ -430,7 +431,7 @@ public class Marker
 				if ( direction == Direction.BACKWARD )
 				{
 					// Search backwards
-					DPContentLeaf left = leaf.getPreviousEditableLeaf( segFilter, null );
+					DPContentLeaf left = leaf.getPreviousLeaf( segFilter, null, leafFilter );
 					if ( left != null )
 					{
 						moveTo( left.markerAtEnd() );
@@ -438,7 +439,7 @@ public class Marker
 					else
 					{
 						// Searching backwards failed; search forwards
-						DPContentLeaf right = leaf.getNextEditableLeaf( segFilter, null );
+						DPContentLeaf right = leaf.getNextLeaf( segFilter, null, leafFilter );
 						if ( right != null )
 						{
 							moveTo( right.markerAtStart() );
@@ -446,7 +447,7 @@ public class Marker
 						else
 						{
 							// Search backwards, this time potentially leaving the segment
-							left = leaf.getPreviousEditableLeaf( null, null );
+							left = leaf.getPreviousLeaf( null, null, leafFilter );
 							if ( left != null )
 							{
 								moveTo( left.markerAtEnd() );
@@ -454,7 +455,7 @@ public class Marker
 							else
 							{
 								// Searching backwards failed; search forwards
-								right = leaf.getNextEditableLeaf( null, null );
+								right = leaf.getNextLeaf( null, null, leafFilter );
 								if ( right != null )
 								{
 									moveTo( right.markerAtStart() );
@@ -471,7 +472,7 @@ public class Marker
 				else if ( direction == Direction.FORWARD )
 				{
 					// Search forwards
-					DPContentLeaf right = leaf.getNextEditableLeaf( segFilter, null );
+					DPContentLeaf right = leaf.getNextLeaf( segFilter, null, leafFilter );
 					if ( right != null )
 					{
 						moveTo( right.markerAtStart() );
@@ -479,7 +480,7 @@ public class Marker
 					else
 					{
 						// Searching forwards failed; search backwards
-						DPContentLeaf left = leaf.getPreviousEditableLeaf( segFilter, null );
+						DPContentLeaf left = leaf.getPreviousLeaf( segFilter, null, leafFilter );
 						if ( left != null )
 						{
 							moveTo( left.markerAtEnd() );
@@ -487,7 +488,7 @@ public class Marker
 						else
 						{
 							// Search forwards, this time potentially leaving the segment
-							right = leaf.getNextEditableLeaf( null, null );
+							right = leaf.getNextLeaf( null, null, leafFilter );
 							if ( right != null )
 							{
 								moveTo( right.markerAtStart() );
@@ -495,7 +496,7 @@ public class Marker
 							else
 							{
 								// Searching forwards failed; search backwards
-								left = leaf.getPreviousEditableLeaf( null, null );
+								left = leaf.getPreviousLeaf( null, null, leafFilter );
 								if ( left != null )
 								{
 									moveTo( left.markerAtEnd() );

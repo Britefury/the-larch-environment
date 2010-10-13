@@ -10,7 +10,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.ApplyStyleSheetFromAttribute;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class SectionTitle extends Pres
@@ -27,6 +27,6 @@ public class SectionTitle extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		return new ApplyStyleSheetFromAttribute( ContextMenuStyle.sectionTitleStyle, new StaticText( text ) ).present( ctx, style );
+		return new ApplyStyleSheetFromAttribute( ContextMenuStyle.sectionTitleStyle, new Label( text ) ).present( ctx, style );
 	}
 }

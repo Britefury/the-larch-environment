@@ -16,8 +16,8 @@ import java.util.WeakHashMap;
 
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
@@ -27,27 +27,11 @@ import BritefuryJ.Math.Point2;
 
 public abstract class DPContentLeafEditable extends DPContentLeaf
 {
-	public static class EditableLeafElementFilter implements ElementFilter
-	{
-		public boolean testElement(DPElement element)
-		{
-			if ( element instanceof DPContentLeafEditable )
-			{
-				return ((DPContentLeafEditable)element).isEditable();
-			}
-			else
-			{
-				return false;
-			}
-		}
-	}
-	
-	
-	
 	public static final int FLAG_EDITABLE = FLAGS_CONTENTLEAF_END * 0x1;
+	public static final int FLAG_SELECTABLE = FLAGS_CONTENTLEAF_END * 0x2;
 	
 	
-	protected final static int FLAGS_CONTENTLEAFEDITABLE_END = FLAGS_CONTENTLEAF_END;
+	protected final static int FLAGS_CONTENTLEAFEDITABLE_END = FLAGS_CONTENTLEAF_END * 0x4;
 
 	
 	
@@ -66,6 +50,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		super(styleParams, textRepresentation );
 		
 		setFlagValue( FLAG_EDITABLE, styleParams.getEditable() );
+		setFlagValue( FLAG_SELECTABLE, styleParams.getSelectable() );
 	}
 	
 	protected DPContentLeafEditable(DPContentLeafEditable element)
@@ -73,6 +58,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		super( element );
 		
 		setFlagValue( FLAG_EDITABLE, element.testFlag( FLAG_EDITABLE ) );
+		setFlagValue( FLAG_SELECTABLE, element.testFlag( FLAG_SELECTABLE ) );
 	}
 	
 	
@@ -860,6 +846,30 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	
 	//
+	//
+	// SELECTABILITY METHODS
+	//
+	//
+	
+	public void setSelectable()
+	{
+		setFlag( FLAG_SELECTABLE );
+	}
+	
+	public void setUnselectable()
+	{
+		clearFlag( FLAG_SELECTABLE );
+	}
+	
+	public boolean isSelectable()
+	{
+		return testFlag( FLAG_SELECTABLE );
+	}
+	
+	
+	
+	
+	//
 	// Meta element methods
 	//
 	
@@ -876,7 +886,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 			DPContentLeaf e = caret.getElement();
 			if ( e == this )
 			{
-				elements.add( metaHeaderCaretPosStyle.applyTo( new StaticText( "@[" + caret.getPosition() + ":" + caret.getBias() + "]" ) ) );
+				elements.add( metaHeaderCaretPosStyle.applyTo( new Label( "@[" + caret.getPosition() + ":" + caret.getBias() + "]" ) ) );
 			}
 		}
 	}

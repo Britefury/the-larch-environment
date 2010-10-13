@@ -11,9 +11,9 @@ import java.util.List;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.Column;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.ObjectPresentation.PresentationStateListenerList;
@@ -80,7 +80,7 @@ public class LogView implements Presentable
 		stateListeners = PresentationStateListenerList.addListener( stateListeners, fragment );
 		
 		Pres entryElements[] = new Pres[visibleEntries.size()+1];
-		entryElements[0] = titleStyle.applyTo( new StaticText( log.getTitle() ) ).pad( 0.0, 20.0 ).alignHCentre();
+		entryElements[0] = titleStyle.applyTo( new Label( log.getTitle() ) ).pad( 0.0, 20.0 ).alignHCentre();
 		int i = 1;
 		for (LogEntry entry: visibleEntries)
 		{

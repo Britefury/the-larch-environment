@@ -9,8 +9,8 @@ package BritefuryJ.GSym.GenericPerspective.PresCom;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.Column;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
@@ -35,6 +35,6 @@ public class VerticalField extends Pres
 		
 		DPElement valueElement = value.present( ctx, GenericStyle.useObjectFieldAttrs( style ) );
 		
-		return fieldStyle.applyTo( new Column( new Object[] { new StaticText( title ), valueElement.alignHExpand().padX( indentation, 0.0 ) } ).alignHExpand() ).present( ctx, style );
+		return fieldStyle.applyTo( new Column( new Object[] { new Label( title ), valueElement.alignHExpand().padX( indentation, 0.0 ) } ).alignHExpand() ).present( ctx, style );
 	}
 }

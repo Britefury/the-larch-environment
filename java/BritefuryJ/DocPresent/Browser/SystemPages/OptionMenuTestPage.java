@@ -11,9 +11,9 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.Combinators.ElementRef;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.SpaceBin;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.Column;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
+import BritefuryJ.DocPresent.Combinators.Primitive.SpaceBin;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
 
@@ -59,8 +59,8 @@ public class OptionMenuTestPage extends SystemPage
 
 	protected Pres createContents()
 	{
-		ElementRef choiceTextRef = new StaticText( "0" ).elementRef();
-		Pres choices[] = new Pres[] { new StaticText( "Zero" ), new StaticText( "One" ), new StaticText( "Two" ), new StaticText( "Three" ), new StaticText( "Four" ) };
+		ElementRef choiceTextRef = new Label( "0" ).elementRef();
+		Pres choices[] = new Pres[] { new Label( "Zero" ), new Label( "One" ), new Label( "Two" ), new Label( "Three" ), new Label( "Four" ) };
 		OptionMenuTextChanger listener = new OptionMenuTextChanger( choiceTextRef );
 		OptionMenu optionMenu = new OptionMenu( choices, 0, listener );
 		Pres optionMenuBox = new SpaceBin( optionMenu.alignHExpand(), 100.0, -1.0 ).padX( 5.0 );

@@ -965,16 +965,25 @@ public class PresentationComponent extends JComponent implements ComponentListen
 
 			if ( !bHandled  &&  button == 1  &&  ( modifiers & ( Modifier.ALT | Modifier.ALT_GRAPH | Modifier.CTRL | Modifier.SHIFT ) )  ==  0 )
 			{
-				DPContentLeafEditable leaf = (DPContentLeafEditable)getLeafClosestToLocalPoint( windowPos, new DPContentLeafEditable.EditableLeafElementFilter() );
-				if ( leaf != null )
+				DPContentLeafEditable editableLeaf = (DPContentLeafEditable)getLeafClosestToLocalPoint( windowPos, new DPContentLeafEditable.EditableLeafElementFilter() );
+				if ( editableLeaf != null )
 				{
-					Xform2 x = leaf.getLocalToRootXform();
+					Xform2 x = editableLeaf.getLocalToRootXform();
 					x = x.inverse();
 					
-					Marker marker = leaf.markerAtPoint( x.transform( windowPos ) );
+					Marker marker = editableLeaf.markerAtPoint( x.transform( windowPos ) );
 					caret.moveTo( marker );
-					selectionManager.mouseSelectionBegin( marker );
 					bLastMousePressPositionedCaret = true;
+				}
+
+				DPContentLeafEditable selectableLeaf = (DPContentLeafEditable)getLeafClosestToLocalPoint( windowPos, new DPContentLeafEditable.SelectableLeafElementFilter() );
+				if ( selectableLeaf != null )
+				{
+					Xform2 x = selectableLeaf.getLocalToRootXform();
+					x = x.inverse();
+					
+					Marker marker = selectableLeaf.markerAtPoint( x.transform( windowPos ) );
+					selectionManager.mouseSelectionBegin( marker );
 				}
 			}
 
@@ -1009,18 +1018,18 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			
 			if ( bLastMousePressPositionedCaret  &&  button == 1  &&  ( modifiers & ( Modifier.ALT | Modifier.ALT_GRAPH | Modifier.CTRL | Modifier.SHIFT ) )  ==  0 )
 			{
-				DPContentLeafEditable leaf = (DPContentLeafEditable)getLeafClosestToLocalPoint( windowPos, new DPContentLeafEditable.EditableLeafElementFilter() );
-				if ( leaf != null )
+				DPContentLeafEditable selectableLeaf = (DPContentLeafEditable)getLeafClosestToLocalPoint( windowPos, new DPContentLeafEditable.SelectableLeafElementFilter() );
+				if ( selectableLeaf != null )
 				{
 					DPElement elementToSelect = null;
 					
 					if ( clickCount == 2 )
 					{
-						elementToSelect = leaf;
+						elementToSelect = selectableLeaf;
 					}
 					else if ( clickCount >= 3 )
 					{
-						elementToSelect = leaf.getSegment();
+						elementToSelect = selectableLeaf.getSegment();
 					}
 						
 					if ( elementToSelect != null )
@@ -1057,15 +1066,27 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			
 			if ( selectionManager.isMouseDragInProgress() )
 			{
-				DPContentLeafEditable leaf = (DPContentLeafEditable)getLeafClosestToLocalPoint( windowPos, new DPContentLeafEditable.EditableLeafElementFilter() );
-				Xform2 x = leaf.getLocalToRootXform();
-				x = x.inverse();
+				DPContentLeafEditable editableLeaf = (DPContentLeafEditable)getLeafClosestToLocalPoint( windowPos, new DPContentLeafEditable.EditableLeafElementFilter() );
+				if ( editableLeaf != null )
+				{
+					Xform2 x = editableLeaf.getLocalToRootXform();
+					x = x.inverse();
+	
+					Marker marker = editableLeaf.markerAtPoint( x.transform( windowPos ) );
+					
+					caret.moveTo( marker );
+				}
 
-				Marker marker = leaf.markerAtPoint( x.transform( windowPos ) );
-				
-				caret.moveTo( marker );
-				
-				selectionManager.mouseSelectionDrag( marker );
+				DPContentLeafEditable selectableLeaf = (DPContentLeafEditable)getLeafClosestToLocalPoint( windowPos, new DPContentLeafEditable.SelectableLeafElementFilter() );
+				if ( selectableLeaf != null )
+				{
+					Xform2 x = selectableLeaf.getLocalToRootXform();
+					x = x.inverse();
+	
+					Marker marker = selectableLeaf.markerAtPoint( x.transform( windowPos ) );
+					
+					selectionManager.mouseSelectionDrag( marker );
+				}
 			}
 			
 			rootSpaceMouse.drag( windowPos, mouseEvent );

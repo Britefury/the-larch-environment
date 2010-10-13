@@ -347,6 +347,6 @@ public class Caret implements MarkerListener
 
 	public void moveToPositionAndBiasWithinSubtree(DPElement subtree, int newPosition, Marker.Bias newBias)
 	{
-		marker.moveToPositionAndBiasWithinSubtree( subtree, newPosition, newBias );
+		marker.moveToPositionAndBiasWithinSubtree( subtree, newPosition, newBias, new DPContentLeaf.EditableLeafElementFilter() );
 	}
 }

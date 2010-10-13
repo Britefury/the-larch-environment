@@ -94,7 +94,7 @@ public class SelectionManager
 					Marker markerBInSameRegion = null;
 					if ( order == 1 )
 					{
-						DPContentLeafEditable leaf = (DPContentLeafEditable)elementB.getPreviousEditableLeaf( filter, filter );
+						DPContentLeafEditable leaf = (DPContentLeafEditable)elementB.getPreviousSelectableLeaf( filter, filter );
 						if ( leaf != null )
 						{
 							markerBInSameRegion = leaf.markerAtEnd();
@@ -102,7 +102,7 @@ public class SelectionManager
 					}
 					else
 					{
-						DPContentLeafEditable leaf = (DPContentLeafEditable)elementB.getNextEditableLeaf( filter, filter );
+						DPContentLeafEditable leaf = (DPContentLeafEditable)elementB.getNextSelectableLeaf( filter, filter );
 						if ( leaf != null )
 						{
 							markerBInSameRegion = leaf.markerAtStart();

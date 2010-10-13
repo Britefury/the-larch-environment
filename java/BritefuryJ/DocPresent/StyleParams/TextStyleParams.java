@@ -19,7 +19,7 @@ public class TextStyleParams extends ContentLeafEditableStyleParams
 	public static final Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
 
 	
-	public static final TextStyleParams defaultStyleParams = new TextStyleParams( null, null, null, true, defaultFont, Color.black, null, null, false );
+	public static final TextStyleParams defaultStyleParams = new TextStyleParams( null, null, null, true, true, defaultFont, Color.black, null, null, false );
 	
 	
 	
@@ -28,10 +28,10 @@ public class TextStyleParams extends ContentLeafEditableStyleParams
 	protected final boolean bMixedSizeCaps;
 
 
-	public TextStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, boolean bEditable, Font font, Paint textPaint, Paint hoverTextPaint,
+	public TextStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, boolean bEditable, boolean bSelectable, Font font, Paint textPaint, Paint hoverTextPaint,
 			Paint squiggleUnderlinePaint, boolean bMixedSizeCaps)
 	{
-		super( background, hoverBackground, pointerCursor, bEditable );
+		super( background, hoverBackground, pointerCursor, bEditable, bSelectable );
 		
 		this.font = font;
 		this.textPaint = textPaint;

@@ -9,17 +9,17 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.Controls.TextArea;
 import BritefuryJ.DocPresent.DPColumn;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.Column;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
 import BritefuryJ.DocPresent.Combinators.RichText.Heading6;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.Controls.TextArea;
 
 public class TextAreaTestPage extends SystemPage
 {
@@ -61,7 +61,7 @@ public class TextAreaTestPage extends SystemPage
 			ArrayList<DPElement> lineElements = new ArrayList<DPElement>();
 			for (String line: lines)
 			{
-				lineElements.add( new StaticText( line ).present() );
+				lineElements.add( new Label( line ).present() );
 			}
 			
 			resultArea.setChildren( lineElements );
@@ -74,7 +74,7 @@ public class TextAreaTestPage extends SystemPage
 			prevText = prevText.substring( 0, position ) + textInserted + prevText.substring( position );
 			if ( !prevText.equals( textArea.getText() ) )
 			{
-				eventArea.append( redText.applyTo( new StaticText( "Insert event was invalid" ) ).present() );
+				eventArea.append( redText.applyTo( new Label( "Insert event was invalid" ) ).present() );
 			}
 		}
 
@@ -85,7 +85,7 @@ public class TextAreaTestPage extends SystemPage
 			prevText = prevText.substring( 0, position ) + prevText.substring( position + length );
 			if ( !prevText.equals( textArea.getText() ) )
 			{
-				eventArea.append( redText.applyTo( new StaticText( "Insert event was invalid" ) ).present() );
+				eventArea.append( redText.applyTo( new Label( "Insert event was invalid" ) ).present() );
 			}
 		}
 		
@@ -96,7 +96,7 @@ public class TextAreaTestPage extends SystemPage
 			prevText = prevText.substring( 0, position ) + replacementText + prevText.substring( position + length );
 			if ( !prevText.equals( textArea.getText() ) )
 			{
-				eventArea.append( redText.applyTo( new StaticText( "Insert event was invalid" ) ).present() );
+				eventArea.append( redText.applyTo( new Label( "Insert event was invalid" ) ).present() );
 			}
 		}
 		
@@ -107,7 +107,7 @@ public class TextAreaTestPage extends SystemPage
 			ArrayList<DPElement> lineElements = new ArrayList<DPElement>();
 			for (String line: lines)
 			{
-				lineElements.add( new StaticText( line ).present() );
+				lineElements.add( new Label( line ).present() );
 			}
 			
 			eventArea.setChildren( lineElements );

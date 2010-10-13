@@ -59,6 +59,7 @@ public class Primitive
 	public static final InheritedAttributeNonNull fractionFontScale = new InheritedAttributeNonNull( primitiveNamespace, "fractionFontScale", Double.class, 0.9 );
 	public static final InheritedAttributeNonNull fractionMinFontScale = new InheritedAttributeNonNull( primitiveNamespace, "fractionMinFontScale", Double.class, 0.9 );
 	public static final InheritedAttributeNonNull editable = new InheritedAttributeNonNull( primitiveNamespace, "editable", Boolean.class, true );
+	public static final InheritedAttributeNonNull selectable = new InheritedAttributeNonNull( primitiveNamespace, "selectable", Boolean.class, true );
 	public static final InheritedAttributeNonNull foreground = new InheritedAttributeNonNull( primitiveNamespace, "foreground", Paint.class, Color.black );
 	public static final InheritedAttribute hoverForeground = new InheritedAttribute( primitiveNamespace, "hoverForeground", Paint.class, null );
 	public static final InheritedAttributeNonNull mathRootThickness = new InheritedAttributeNonNull( primitiveNamespace, "mathRootThickness", Double.class, 1.5 );
@@ -189,6 +190,7 @@ public class Primitive
 					attribs.get( hoverBackground, Painter.class ),
 					attribs.get( cursor, Cursor.class ),
 					attribs.get( editable, Boolean.class ),
+					attribs.get( selectable, Boolean.class ),
 					attribs.get( foreground, Paint.class ),
 					attribs.get( hoverForeground, Paint.class ) );
 		}
@@ -333,6 +335,7 @@ public class Primitive
 					attribs.get( hoverBackground, Painter.class ),
 					attribs.get( cursor, Cursor.class ),
 					false,
+					attribs.get( selectable, Boolean.class ),
 					font.get( attribs ),
 					attribs.get( foreground, Paint.class ),
 					attribs.get( hoverForeground, Paint.class ),
@@ -345,7 +348,7 @@ public class Primitive
 	{
 		protected StyleValues evaluate(AttributeTable style)
 		{
-			return useFont.get( style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
+			return useFont.get( style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor ).useAttr( selectable )
 					.useAttr( foreground ).useAttr( hoverForeground ).useAttr( textSquiggleUnderlinePaint ).useAttr( fontSmallCaps ) );
 		}
 	};
@@ -360,6 +363,7 @@ public class Primitive
 					attribs.get( background, Painter.class ),
 					attribs.get( hoverBackground, Painter.class ),
 					attribs.get( cursor, Cursor.class ),
+					false,
 					false,
 					font.get( attribs ),
 					attribs.get( foreground, Paint.class ),
@@ -386,6 +390,7 @@ public class Primitive
 					attribs.get( hoverBackground, Painter.class ),
 					attribs.get( cursor, Cursor.class ),
 					attribs.get( editable, Boolean.class ),
+					attribs.get( selectable, Boolean.class ),
 					font.get( attribs ),
 					attribs.get( foreground, Paint.class ),
 					attribs.get( hoverForeground, Paint.class ),
@@ -397,7 +402,7 @@ public class Primitive
 	protected static StyleValues useTextParams(StyleValues style)
 	{
 		return useFont.get( style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
-				.useAttr( editable ).useAttr( foreground ).useAttr( hoverForeground ).useAttr( textSquiggleUnderlinePaint )
+				.useAttr( editable ).useAttr( selectable ).useAttr( foreground ).useAttr( hoverForeground ).useAttr( textSquiggleUnderlinePaint )
 				.useAttr( fontSmallCaps ) );
 	}
 	

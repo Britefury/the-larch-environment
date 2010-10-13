@@ -21,9 +21,9 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.Canvas;
-import BritefuryJ.DocPresent.Combinators.Primitive.Row;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Input.DndHandler;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
@@ -143,7 +143,7 @@ public class CanvasTestPage extends SystemPage
 	
 	protected Pres makeDestElement(final String title, final DataModel model)
 	{
-		final ElementRef text = textStyle.applyTo( new StaticText( title ) ).elementRef();
+		final ElementRef text = textStyle.applyTo( new Label( title ) ).elementRef();
 		Pres dest = backgroundStyle.applyTo( new Bin( text.pad( 10.0, 10.0 ) ) ); 
 		
 		ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()
@@ -166,7 +166,7 @@ public class CanvasTestPage extends SystemPage
 	
 	protected Pres makeDestElement2(final String title, final DataModel model)
 	{
-		final ElementRef text = textStyle.applyTo( new StaticText( title ) ).elementRef();
+		final ElementRef text = textStyle.applyTo( new Label( title ) ).elementRef();
 		Pres dest = backgroundStyle.applyTo( new Bin( text.pad( 10.0, 10.0 ) ) ); 
 		
 		ObjectDndHandler.DropFn dropFn = new ObjectDndHandler.DropFn()

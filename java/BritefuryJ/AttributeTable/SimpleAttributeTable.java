@@ -18,8 +18,8 @@ import org.python.core.Py;
 import org.python.core.PyObject;
 
 import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.Table;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
@@ -364,12 +364,12 @@ public class SimpleAttributeTable implements Presentable
 		Arrays.sort( names );
 		Pres children[][] = new Pres[names.length+1][];
 		
-		children[0] = new Pres[] { attrTableStyle.applyTo( new StaticText( "Name" ) ), attrTableStyle.applyTo( new StaticText( "Value" ) ) };
+		children[0] = new Pres[] { attrTableStyle.applyTo( new Label( "Name" ) ), attrTableStyle.applyTo( new Label( "Value" ) ) };
 		for (int i = 0; i < names.length; i++)
 		{
 			String name = names[i];
 			Object value = values.get( name );
-			children[i+1] = new Pres[] { new StaticText( name ), new InnerFragment( value ) };
+			children[i+1] = new Pres[] { new Label( name ), new InnerFragment( value ) };
 		}
 		
 		return attrTableStyle.applyTo( new Table( children ) );

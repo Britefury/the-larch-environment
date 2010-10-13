@@ -150,9 +150,9 @@ public class GSymView extends IncrementalTree implements Presentable
 				catch (Exception e2)
 				{
 					fragment = new ErrorBox( "DOUBLE EXCEPTION!", new Column( new Pres[] {
-							labelStyle.applyTo( new StaticText( "Got exception:" ) ),
+							labelStyle.applyTo( new Label( "Got exception:" ) ),
 							exceptionStyle.applyTo( new StaticText( e2.toString() ) ).padX( 15.0, 0.0 ),
-							labelStyle.applyTo( new StaticText( "While trying to display exception:" ) ),
+							labelStyle.applyTo( new Label( "While trying to display exception:" ) ),
 							exceptionStyle.applyTo( new StaticText( t.toString() ) ).padX( 15.0, 0.0 )   } ) );
 					return fragment.present( new PresentationContext( fragmentView, genericPerspective, inheritedState ), style );
 				}

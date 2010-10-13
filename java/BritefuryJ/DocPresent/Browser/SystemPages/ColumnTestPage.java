@@ -11,10 +11,10 @@ import java.awt.Color;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
-import BritefuryJ.DocPresent.Combinators.Primitive.Row;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.Column;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
+import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
+import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Combinators.RichText.Body;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
@@ -47,31 +47,31 @@ public class ColumnTestPage extends SystemPage
 	
 	private Pres makeRefAlignedRow(int refPointIndex, String header)
 	{
-		Pres v = new Column( new Pres[] { styleSheet.applyTo( new StaticText( "First item" ) ), styleSheet.applyTo( new StaticText( "Second item" ) ),
-				styleSheet.applyTo( new StaticText( "Third item" ) ), styleSheet.applyTo( new StaticText( "Fourth item item" ) ) }, refPointIndex );
+		Pres v = new Column( new Pres[] { styleSheet.applyTo( new Label( "First item" ) ), styleSheet.applyTo( new Label( "Second item" ) ),
+				styleSheet.applyTo( new Label( "Third item" ) ), styleSheet.applyTo( new Label( "Fourth item item" ) ) }, refPointIndex );
 		v = styleSheet.withAttr( Primitive.columnSpacing, 0.0 ).applyTo( v );
-		return new Row( new Pres[] { t18Style.applyTo( new StaticText( header ) ), v, t18Style.applyTo( new StaticText( "After" ) ) } );
+		return new Row( new Pres[] { t18Style.applyTo( new Label( header ) ), v, t18Style.applyTo( new Label( "After" ) ) } );
 	}
 	
 	
 
 	protected Pres createContents()
 	{
-		Pres columnTest = new Column( new Pres[] { t24Style.applyTo( new StaticText( "Column" ) ),
-				t12Style.applyTo( new StaticText( "First item" ) ),
-				t12Style.applyTo( new StaticText( "Second item" ) ),
-				t12Style.applyTo( new StaticText( "Third item" ) ) } );
+		Pres columnTest = new Column( new Pres[] { t24Style.applyTo( new Label( "Column" ) ),
+				t12Style.applyTo( new Label( "First item" ) ),
+				t12Style.applyTo( new Label( "Second item" ) ),
+				t12Style.applyTo( new Label( "Third item" ) ) } );
 		
 		Pres hAlignTest = styleSheet.withAttr( Primitive.columnSpacing, 10.0 ).applyTo( new Column( new Pres[] {
-				t24Style.applyTo( new StaticText( "Horizontal alignment" ) ),
-				textOnGreyStyle.applyTo( new StaticText( "Left" ) ).alignHLeft(),
-				textOnGreyStyle.applyTo( new StaticText( "Centre" ) ).alignHCentre(),
-				textOnGreyStyle.applyTo( new StaticText( "Right" ) ).alignHRight(),
-				textOnGreyStyle.applyTo( new StaticText( "Expand" ) ).alignHExpand() } ) );
+				t24Style.applyTo( new Label( "Horizontal alignment" ) ),
+				textOnGreyStyle.applyTo( new Label( "Left" ) ).alignHLeft(),
+				textOnGreyStyle.applyTo( new Label( "Centre" ) ).alignHCentre(),
+				textOnGreyStyle.applyTo( new Label( "Right" ) ).alignHRight(),
+				textOnGreyStyle.applyTo( new Label( "Expand" ) ).alignHExpand() } ) );
 		
 		
 		Pres refPointAlignTest = styleSheet.withAttr( Primitive.columnSpacing, 20.0 ).applyTo( new Column( new Pres[] {
-				t24Style.applyTo( new StaticText( "Column reference point alignment" ) ),
+				t24Style.applyTo( new Label( "Column reference point alignment" ) ),
 				makeRefAlignedRow( 0, "ALIGN_WITH_0" ),
 				makeRefAlignedRow( 1, "ALIGN_WITH_1" ),
 				makeRefAlignedRow( 2, "ALIGN_WITH_2" ),

@@ -18,7 +18,6 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Row;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.Combinators.Primitive.Table;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
@@ -77,10 +76,10 @@ public class GenericPresentersAWT extends GSymObjectPresenterRegistry
 			
 			Pres title = colourObjectBoxStyle.applyTo( new ObjectTitle( "java.awt.Color" ) );
 			
-			Pres red = colourRedStyle.applyTo( new StaticText( "R=" + String.valueOf( colour.getRed() ) ) );
-			Pres green = colourGreenStyle.applyTo( new StaticText( "G=" + String.valueOf( colour.getGreen() ) ) );
-			Pres blue = colourBlueStyle.applyTo( new StaticText( "B=" + String.valueOf( colour.getBlue() ) ) );
-			Pres alpha = colourAlphaStyle.applyTo( new StaticText( "A=" + String.valueOf( colour.getAlpha() ) ) );
+			Pres red = colourRedStyle.applyTo( new Label( "R=" + String.valueOf( colour.getRed() ) ) );
+			Pres green = colourGreenStyle.applyTo( new Label( "G=" + String.valueOf( colour.getGreen() ) ) );
+			Pres blue = colourBlueStyle.applyTo( new Label( "B=" + String.valueOf( colour.getBlue() ) ) );
+			Pres alpha = colourAlphaStyle.applyTo( new Label( "A=" + String.valueOf( colour.getAlpha() ) ) );
 			
 			Pres components = colourBoxStyle.applyTo( new Row( new Pres[] { red, green, blue, alpha } ) );
 			

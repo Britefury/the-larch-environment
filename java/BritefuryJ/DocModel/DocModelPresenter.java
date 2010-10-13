@@ -12,6 +12,7 @@ import java.util.List;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Span;
@@ -51,11 +52,11 @@ public class DocModelPresenter
 
 	
 	
-	private static final Pres space = new StaticText( " " );
-	private static final Pres openBracket = punctuationStyle.applyTo( new StaticText( "[" ) );
-	private static final Pres closeBracket = punctuationStyle.applyTo( new StaticText( "]" ) );
-	private static final Pres openParen = punctuationStyle.applyTo( new StaticText( "(" ) );
-	private static final Pres closeParen = punctuationStyle.applyTo( new StaticText( ")" ) );
+	private static final Pres space = new Label( " " );
+	private static final Pres openBracket = punctuationStyle.applyTo( new Label( "[" ) );
+	private static final Pres closeBracket = punctuationStyle.applyTo( new Label( "]" ) );
+	private static final Pres openParen = punctuationStyle.applyTo( new Label( "(" ) );
+	private static final Pres closeParen = punctuationStyle.applyTo( new Label( ")" ) );
 
 
 	
@@ -63,7 +64,7 @@ public class DocModelPresenter
 	{
 		if ( x == null )
 		{
-			return nullStyle.applyTo( new StaticText( "<null>" ) );
+			return nullStyle.applyTo( new Label( "<null>" ) );
 		}
 		else if ( x instanceof String )
 		{
@@ -124,17 +125,17 @@ public class DocModelPresenter
 		
 		// Header
 		Pres header;
-		Pres schemaName = schemaNameStyle.applyTo( new StaticText( cls.getSchema().getShortName() ) );
-		Pres className = classNameStyle.applyTo( new StaticText( cls.getName() ) );
+		Pres schemaName = schemaNameStyle.applyTo( new Label( cls.getSchema().getShortName() ) );
+		Pres className = classNameStyle.applyTo( new Label( cls.getName() ) );
 		if ( mode == ObjectPresentMode.HORIZONTAL )
 		{
-			header = defaultStyle.applyTo( new Span( new Object[] { schemaName, punctuationStyle.applyTo( new StaticText( "." ) ), className,
-					new StaticText( " " ), punctuationStyle.applyTo( new StaticText( ":" ) ) } ) );
+			header = defaultStyle.applyTo( new Span( new Object[] { schemaName, punctuationStyle.applyTo( new Label( "." ) ), className,
+					new Label( " " ), punctuationStyle.applyTo( new Label( ":" ) ) } ) );
 		}
 		else if ( mode == ObjectPresentMode.VERTICALINLINE )
 		{
-			header = defaultStyle.applyTo( new Paragraph( new Object[] { schemaName, punctuationStyle.applyTo( new StaticText( "." ) ), className,
-					new StaticText( " " ), punctuationStyle.applyTo( new StaticText( ":" ) ) } ) );
+			header = defaultStyle.applyTo( new Paragraph( new Object[] { schemaName, punctuationStyle.applyTo( new Label( "." ) ), className,
+					new Label( " " ), punctuationStyle.applyTo( new Label( ":" ) ) } ) );
 		}
 		else
 		{
