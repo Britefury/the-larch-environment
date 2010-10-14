@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import BritefuryJ.DocModel.Resource.DMJavaResource;
+
 
 public class DMIOReader
 {
@@ -525,6 +527,7 @@ public class DMIOReader
 	}
 	
 	
+	
 	public Object read() throws ParseErrorException
 	{
 		while ( pos < source.length() )
@@ -555,6 +558,48 @@ public class DMIOReader
 			{
 				pos++;
 				closeObject();
+			}
+			else if ( source.charAt( pos ) == '<' )
+			{
+				try
+				{
+					if ( source.substring( pos, pos+4 ).equals( "<<J:" ) )
+					{
+						pos += 4;
+		
+						MatchResult res;
+		
+						// Whitespace
+						res = match( whitespace, source, pos );
+						if ( res == null )
+						{
+							throw new ParseErrorException( pos, "Expected whitespace after opening Java resource" );
+						}
+						pos = res.position;
+		
+						// Atom
+						res = matchAtom( source, pos );
+						if ( res == null )
+						{
+							throw new ParseErrorException( pos, "Expected content after opening Java resource" );
+						}
+						pos = res.position;
+						String serialised = res.value;
+						
+						if ( !source.substring( pos, pos+2 ).equals( ">>" ) )
+						{
+							throw new ParseErrorException( pos, "Expected >> to close Java resource" );
+						}
+						pos += 2;
+						
+						DMJavaResource resource = DMJavaResource.serialisedResource( serialised );
+						closeItem( resource );
+					}
+				}
+				catch (StringIndexOutOfBoundsException e)
+				{
+					throw new ParseErrorException( pos, "Insufficient data for Java resource" );
+				}
 			}
 			else
 			{

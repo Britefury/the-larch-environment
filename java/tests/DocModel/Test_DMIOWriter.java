@@ -6,6 +6,8 @@
 //##************************
 package tests.DocModel;
 
+import java.awt.Color;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -16,6 +18,7 @@ import BritefuryJ.DocModel.DMIOWriter;
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMSchema;
+import BritefuryJ.DocModel.Resource.DMJavaResource;
 
 public class Test_DMIOWriter extends TestCase
 {
@@ -251,6 +254,14 @@ public class Test_DMIOWriter extends TestCase
 		DMObject a1 = A.newInstance( new Object[] { "0" } );
 		writeTest( a1, "{m=test.schema : (m A x=0)}" );
 	}
+	
+	
+	
+	public void testWriteJavaResource() throws IOException
+	{
+		DMJavaResource r = new DMJavaResource( Color.RED );
+		writeTest( r, "<<J: " + DMIOWriter.stringAsAtom( DMJavaResource.serialise( Color.RED ) ) + ">>" );
+	}
 
 
 	public void testWriteNestedObject()
@@ -275,5 +286,13 @@ public class Test_DMIOWriter extends TestCase
 		DMObject b = A2.newInstance( new Object[] { "0", "1" } );
 		List<Object> l = Arrays.asList( new Object[] { a, b } );
 		writeTest( l, "{m=test.schema m2=test.module2 : [(m A x=0 y=1) (m2 A2 x=0 y=1)]}" );
+	}
+
+
+	public void testWriteNestedResource() throws IOException
+	{
+		DMJavaResource r = new DMJavaResource( Color.RED );
+		List<Object> x = Arrays.asList( new Object[] { r, "abc" } );
+		writeTest( x, "[<<J: " + DMIOWriter.stringAsAtom( DMJavaResource.serialise( Color.RED ) ) + ">> abc]" );
 	}
 }
