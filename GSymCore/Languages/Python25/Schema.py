@@ -127,6 +127,9 @@ ConditionalExpr = schema.newClass( 'ConditionalExpr', Expr, [ 'condition', 'expr
 ExternalExpr = schema.newClass( 'ExternalExpr', Expr, [ 'expr' ] )
 
 
+# Inline object
+InlineObject = schema.newClass( 'InlineObject', Expr, [ 'resource' ] )
+
 
 
 #

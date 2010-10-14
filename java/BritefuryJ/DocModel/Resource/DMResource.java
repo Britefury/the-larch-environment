@@ -69,5 +69,8 @@ public abstract class DMResource extends DMNode implements Serializable
 
 
 
+	public abstract Object getValue();
+
+	
 	public abstract String getSerialisedForm();
 }

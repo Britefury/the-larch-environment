@@ -45,10 +45,12 @@ from BritefuryJ.Controls import *
 from BritefuryJ.DocPresent import ElementValueFunction, TextEditEvent, DPText
 from BritefuryJ.DocPresent.Interactor import KeyElementInteractor
 from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder
+from BritefuryJ.DocPresent.Input import ObjectDndHandler
 from BritefuryJ.DocPresent.Combinators.Primitive import Paragraph, Segment
-from BritefuryJ.GSym.PresCom import InnerFragment
+from BritefuryJ.GSym.PresCom import InnerFragment, ApplyPerspective
 
 from BritefuryJ.GSym import GSymPerspective, GSymSubject
+from BritefuryJ.GSym.View import GSymFragmentView
 
 
 
@@ -135,6 +137,16 @@ def externalExpressionNodeEditor(grammar, inheritedState, node, contents):
 	mode = inheritedState['editMode']
 	if mode == EDITMODE_DISPLAYCONTENTS  or  mode == EDITMODE_EDITEXPRESSION:
 		contents = contents.withTreeEventListener( ExternalExpressionTreeEventListener.instance )
+		contents = contents.withFixedValue( node )
+		return contents
+	else:
+		raise ValueError, 'invalid mode %d'  %  mode
+
+
+def inlineObjectNodeEditor(grammar, inheritedState, node, contents):
+	mode = inheritedState['editMode']
+	if mode == EDITMODE_DISPLAYCONTENTS  or  mode == EDITMODE_EDITEXPRESSION:
+		contents = contents.withTreeEventListener( InlineObjectTreeEventListener.instance )
 		contents = contents.withFixedValue( node )
 		return contents
 	else:
@@ -253,7 +265,7 @@ def spanCmpOpView(ctx, grammar, inheritedState, node, op, y, precedence):
 	
 	
 	
-class _InsertExternalExpressionValueFn (ElementValueFunction):
+class _InsertStructuralExpressionValueFn (ElementValueFunction):
 	def __init__(self, expr, index):
 		self._expr = expr
 		self._index = index
@@ -273,18 +285,32 @@ class _InsertExternalExpressionValueFn (ElementValueFunction):
 		pass
 	
 	
-class _InsertExternalExpressionTreeEvent (TextEditEvent):
+class _InsertStructuralExpressionTreeEvent (TextEditEvent):
 	def __init__(self):
 		pass
 	
 
-def _insertExternalExpression(caret, expr):
+def _insertStructuralExpression(caret, expr):
 	element = caret.getElement()
 	assert isinstance( element, DPText )
-	element.setValueFunction( _InsertExternalExpressionValueFn( expr, caret.getIndex() ) )
-	element.postTreeEvent( _InsertExternalExpressionTreeEvent() )
+	element.setValueFunction( _InsertStructuralExpressionValueFn( expr, caret.getIndex() ) )
+	element.postTreeEvent( _InsertStructuralExpressionTreeEvent() )
 	
 	
+
+
+def _onDrop_inlineObject(element, pos, data, action):
+	rootElement = element.getRootElement()
+	caret = rootElement.getCaret()
+	if caret.isValid():
+		expr = Schema.InlineObject( resource=DMNode.resource( data.getModel() ) )
+		print 'Dropping inline object %s, %s'  %  ( data, expr )
+		_insertStructuralExpression( caret, expr )
+	return True
+
+
+
+
 def _pythonModuleContextMenuFactory(element, menu):
 	rootElement = element.getRootElement()
 	
@@ -297,7 +323,7 @@ def _pythonModuleContextMenuFactory(element, menu):
 			if caret.isValid():
 				expr = factory()
 				pyExpr = Schema.ExternalExpr( expr=expr )
-				_insertExternalExpression( caret, pyExpr )
+				_insertStructuralExpression( caret, pyExpr )
 		return _onMenuItem
 		
 	extExprItems = [ MenuItem.menuItemWithLabel( labelText, _makeExtExprFn( factory ) )   for labelText, factory in ExternalExpression.getExternalExpressionFactories() ]
@@ -327,6 +353,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 		else:
 			lineViews = InnerFragment.map( suite, _withPythonState( state, PRECEDENCE_NONE, EDITMODE_EDITSTATEMENT ) )
 		s = suiteView( lineViews )
+		_inlineObject_dropDest = ObjectDndHandler.DropDest( GSymFragmentView.FragmentModel, _onDrop_inlineObject )
+		s = s.withDropDest( _inlineObject_dropDest )
 		s = s.withFixedValue( suite )
 		suiteListener = SuiteTreeEventListener( self._parser.suite(), suite )
 		s = s.withTreeEventListener( suiteListener )
@@ -345,6 +373,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 			exprView = InnerFragment( expr, _withPythonState( state, PRECEDENCE_NONE, EDITMODE_DISPLAYCONTENTS ) )
 			seg = Segment( True, True, exprView )
 		e = Paragraph( [ seg ] )
+		_inlineObject_dropDest = ObjectDndHandler.DropDest( GSymFragmentView.FragmentModel, _onDrop_inlineObject )
+		e = e.withDropDest( _inlineObject_dropDest )
 		e = e.withTreeEventListener( instanceCache( PythonExpressionTreeEventListener, self._parser.expression(), PRECEDENCE_NONE ) )
 		e = e.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		return e
@@ -894,6 +924,30 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 		view = externalExpr( exprView, title, deleteButton )
 		return externalExpressionNodeEditor( self._parser, state, node,
+		                             view )
+
+
+
+	#
+	#
+	# INLINE OBJECT
+	#
+	#
+
+	# Inline object
+	@DMObjectNodeDispatchMethod( Schema.InlineObject )
+	def InlineObject(self, ctx, state, node, resource):
+		value = resource.getValue()
+		valueView = ApplyPerspective( None, value )
+		
+		def _onDeleteButton(button, event):
+			button.getElement().postTreeEvent( DeleteInlineObjectTreeEvent( node ) )
+
+		
+		deleteButton = Button( Image.systemIcon( 'delete_tiny' ), _onDeleteButton )
+
+		view = inlineObject( valueView, deleteButton )
+		return inlineObjectNodeEditor( self._parser, state, node,
 		                             view )
 
 
