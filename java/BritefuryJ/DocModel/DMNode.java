@@ -407,4 +407,9 @@ public abstract class DMNode implements Cloneable
 	{
 		return new DMJavaResource( x );
 	}
+
+	public static DMResource resource(Object x)
+	{
+		return javaResource( x );
+	}
 }

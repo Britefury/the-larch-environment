@@ -38,6 +38,7 @@ PRECEDENCE_YIELDEXPR = 200
 PRECEDENCE_CONDITIONAL = 100
 
 PRECEDENCE_EXTERNALEXPR = 1000
+PRECEDENCE_INLINEOBJECT = 1000
 
 PRECEDENCE_LAMBDAEXPR = 50
 
@@ -131,6 +132,7 @@ precedence[Schema.OrTest] = PRECEDENCE_OR
 precedence[Schema.LambdaExpr] = PRECEDENCE_LAMBDAEXPR
 precedence[Schema.ConditionalExpr] = PRECEDENCE_CONDITIONAL
 precedence[Schema.ExternalExpr] = PRECEDENCE_EXTERNALEXPR
+precedence[Schema.InlineObject] = PRECEDENCE_INLINEOBJECT
 precedence.commit()
 
 	

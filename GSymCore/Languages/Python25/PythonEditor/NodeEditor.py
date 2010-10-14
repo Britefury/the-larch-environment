@@ -191,6 +191,23 @@ ExternalExpressionTreeEventListener.instance = ExternalExpressionTreeEventListen
 
 
 
+class DeleteInlineObjectTreeEvent (object):
+	def __init__(self, inlineObj):
+		self._inlineObj = inlineObj
+
+		
+class InlineObjectTreeEventListener (TreeEventListenerObjectDispatch):
+	@ObjectDispatchMethod( DeleteInlineObjectTreeEvent )
+	def onDeleteInlineObject(self, element, sourceElement, event):
+		pyReplaceExpression( element.getFragmentContext(), event._inlineObj, Schema.Load( name='None' ) )
+		return True
+		
+	
+InlineObjectTreeEventListener.instance = InlineObjectTreeEventListener()
+
+
+
+
 class StatementTreeEventListener (TreeEventListenerObjectDispatch):
 	__slots__ = [ '_parser' ]
 
