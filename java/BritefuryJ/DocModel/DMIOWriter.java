@@ -16,6 +16,8 @@ import java.util.regex.Pattern;
 import org.python.core.PyString;
 import org.python.core.PyUnicode;
 
+import BritefuryJ.DocModel.Resource.DMJavaResource;
+
 public class DMIOWriter
 {
 	public static class InvalidDataTypeException extends Exception
@@ -55,15 +57,20 @@ public class DMIOWriter
 	
 	private static void writeString(StringBuilder builder, String content)
 	{
+		builder.append( stringAsAtom( content ) );
+	}
+	
+	public static String stringAsAtom(String content)
+	{
 		Matcher m = unquotedString.matcher( content );
 		boolean bFound = m.find();
 		if ( bFound  &&  m.start() == 0  &&  m.end() == content.length() )
 		{
-			builder.append( content );
+			return content;
 		}
 		else
 		{
-			builder.append( quoteString( content ) );
+			return quoteString( content );
 		}
 	}
 	
@@ -125,6 +132,15 @@ public class DMIOWriter
 	}
 	
 	
+	private void writeJavaResource(StringBuilder builder, DMJavaResource resource) throws InvalidDataTypeException
+	{
+		builder.append( "<<J: " );
+		writeString( builder, resource.getSerialisedForm() );
+		builder.append( ">>" );
+	}
+	
+
+	
 	@SuppressWarnings("unchecked")
 	private void writeItem(StringBuilder builder, Object content) throws InvalidDataTypeException
 	{
@@ -151,6 +167,10 @@ public class DMIOWriter
 		else if ( content instanceof DMObject )
 		{
 			writeObject( builder, (DMObject)content );
+		}
+		else if ( content instanceof DMJavaResource )
+		{
+			writeJavaResource( builder, (DMJavaResource)content );
 		}
 		else
 		{

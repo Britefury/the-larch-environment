@@ -12,6 +12,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.IdentityHashMap;
+
+import BritefuryJ.DocModel.DMNodeClass;
 
 public class DMJavaResource extends DMResource
 {
@@ -21,12 +24,34 @@ public class DMJavaResource extends DMResource
 	private static final long serialVersionUID = 1L;
 	
 	
+	protected static DMNodeClass javaResourceNodeClass = new DMNodeClass( "DMJavaResource" );
+
+	
 	private Object value[] = null;
 	
 	
 	public DMJavaResource(Object value)
 	{
-		this.value = new Object[] { value };
+		try
+		{
+			this.serialised = serialise( value );
+		}
+		catch (IOException e)
+		{
+			throw new RuntimeException( "IOException while creating serialised form" );
+		}
+	}
+	
+	private DMJavaResource(String serialised)
+	{
+		super( serialised );
+	}
+	
+	
+	
+	public static DMJavaResource serialisedResource(String serialised)
+	{
+		return new DMJavaResource( serialised );
 	}
 	
 	
@@ -37,7 +62,7 @@ public class DMJavaResource extends DMResource
 			byte bytes[];
 			try
 			{
-				bytes = serialised.getBytes( "UTF-8" );
+				bytes = serialised.getBytes( "ISO-8859-1" );
 				ByteArrayInputStream inStream = new ByteArrayInputStream( bytes );
 				ObjectInputStream objIn = new ObjectInputStream( inStream );
 				Object v = objIn.readObject();
@@ -50,7 +75,7 @@ public class DMJavaResource extends DMResource
 			}
 			catch (IOException e)
 			{
-				throw new RuntimeException( "IOError while reading from serialised form" );
+				throw new RuntimeException( "IOException while reading from serialised form: " + e.toString() );
 			}
 			catch (ClassNotFoundException e)
 			{
@@ -63,18 +88,84 @@ public class DMJavaResource extends DMResource
 	
 	
 	
-	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	public String getSerialisedForm()
+	{
+		try
+		{
+			return serialise( getValue() );
+		}
+		catch (IOException e)
+		{
+			throw new RuntimeException( "IOException while creating serialised form" );
+		}
+	}
+	
+	
+	public static String serialise(Object x) throws IOException
 	{
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 		ObjectOutputStream objOut = new ObjectOutputStream( outStream );
-		objOut.writeObject( getValue() );
-		String serialised = outStream.toString();
-		out.writeUTF( serialised );
+		objOut.writeObject( x );
+		return new String( outStream.toByteArray(), "ISO-8859-1" );
+	}
+	
+	
+	public boolean equals(Object x)
+	{
+		if ( x == this )
+		{
+			return true;
+		}
+		else if ( x instanceof DMJavaResource )
+		{
+			DMJavaResource r = (DMJavaResource)x;
+			return getSerialisedForm().equals( r.getSerialisedForm() );
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+
+
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	{
+		String s = serialise( getValue() );
+		out.writeUTF( s );
 	}
 
 	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
 	{
 		serialised = in.readUTF();
 		value = null;
+	}
+	
+	
+	@Override
+	protected Object createDeepCopy(IdentityHashMap<Object, Object> memo)
+	{
+		if ( serialised != null )
+		{
+			return new DMJavaResource( serialised );
+		}
+		else
+		{
+			return new DMJavaResource( getValue() );
+		}
+	}
+
+
+	@Override
+	public DMNodeClass getDMNodeClass()
+	{
+		return javaResourceNodeClass;
+	}
+
+
+	@Override
+	public Iterable<Object> getChildren()
+	{
+		return childrenIterable;
 	}
 }

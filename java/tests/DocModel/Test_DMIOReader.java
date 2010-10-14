@@ -6,6 +6,8 @@
 //##************************
 package tests.DocModel;
 
+import java.awt.Color;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,6 +23,7 @@ import BritefuryJ.DocModel.DMObjectReader;
 import BritefuryJ.DocModel.DMSchema;
 import BritefuryJ.DocModel.DMSchemaResolver;
 import BritefuryJ.DocModel.DMIOWriter.InvalidDataTypeException;
+import BritefuryJ.DocModel.Resource.DMJavaResource;
 
 public class Test_DMIOReader extends TestCase
 {
@@ -353,6 +356,12 @@ public class Test_DMIOReader extends TestCase
 		readTest( "{m=test.schemaA : (m A x=0 y=1)}", a );
 	}
 
+	public void testReadJavaResource() throws IOException
+	{
+		DMJavaResource r = new DMJavaResource( Color.RED );
+		readTest( "<<J: " + DMIOWriter.stringAsAtom( DMJavaResource.serialise( Color.RED ) ) + ">>", r );
+	}
+
 	public void testReadNestedObject()
 	{
 		DMObject a = A.newInstance( new Object[] { "0", "1" } );
@@ -368,6 +377,13 @@ public class Test_DMIOReader extends TestCase
 		readTest( "{m=test.schemaA : (m A x=[(m A x=0 y=1) xyz] y=1)}", c );
 	}
 	
+	public void testReadNestedResource() throws IOException
+	{
+		DMJavaResource r = new DMJavaResource( Color.RED );
+		List<Object> x = Arrays.asList( new Object[] { r, "abc" } );
+		readTest( "[<<J: " + DMIOWriter.stringAsAtom( DMJavaResource.serialise( Color.RED ) ) + ">> abc]", x );
+	}
+
 	
 	public void testVersioning()
 	{

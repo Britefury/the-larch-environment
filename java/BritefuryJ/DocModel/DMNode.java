@@ -18,6 +18,9 @@ import org.python.core.PyJavaType;
 import org.python.core.PyObject;
 import org.python.core.PyObjectDerived;
 
+import BritefuryJ.DocModel.Resource.DMJavaResource;
+import BritefuryJ.DocModel.Resource.DMResource;
+
 
 public abstract class DMNode implements Cloneable
 {
@@ -396,5 +399,12 @@ public abstract class DMNode implements Cloneable
 			//throw new RuntimeException();
 			return x;
 		}
+	}
+	
+	
+	
+	public static DMResource javaResource(Object x)
+	{
+		return new DMJavaResource( x );
 	}
 }

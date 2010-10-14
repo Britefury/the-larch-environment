@@ -7,9 +7,48 @@
 package BritefuryJ.DocModel.Resource;
 
 import java.io.Serializable;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
-public abstract class DMResource implements Serializable
+import BritefuryJ.DocModel.DMNode;
+
+public abstract class DMResource extends DMNode implements Serializable
 {
+	protected static class ChildrenIterator implements Iterator<Object>
+	{
+		@Override
+		public boolean hasNext()
+		{
+			return false;
+		}
+
+		@Override
+		public Object next()
+		{
+			throw new NoSuchElementException();
+		}
+
+		@Override
+		public void remove()
+		{
+			throw new UnsupportedOperationException();
+		}
+	}
+
+	protected static class ChildrenIterable implements Iterable<Object>
+	{
+		private static ChildrenIterator iter = new ChildrenIterator();
+		
+		@Override
+		public Iterator<Object> iterator()
+		{
+			return iter;
+		}
+	}
+	
+	protected static ChildrenIterable childrenIterable = new ChildrenIterable();
+	
+	
 	/**
 	 * 
 	 */
@@ -27,4 +66,8 @@ public abstract class DMResource implements Serializable
 	{
 		this.serialised = serialised;
 	}
+
+
+
+	public abstract String getSerialisedForm();
 }
