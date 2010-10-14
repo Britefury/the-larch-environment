@@ -7,6 +7,7 @@
 package BritefuryJ.DocPresent.Combinators.Visual;
 
 import java.awt.Graphics2D;
+import java.awt.Shape;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPSpacer;
@@ -41,7 +42,10 @@ public class Drawing extends Pres
 		@Override
 		public void draw(DPElement element, Graphics2D graphics)
 		{
+			Shape prevClip = graphics.getClip();
+			element.clip( graphics );
 			painter.draw( element, graphics );
+			graphics.setClip( prevClip );
 		}
 	}
 	
