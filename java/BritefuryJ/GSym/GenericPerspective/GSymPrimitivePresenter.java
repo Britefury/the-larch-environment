@@ -83,7 +83,7 @@ public class GSymPrimitivePresenter
 
 	public static Pres presentByte(byte b, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return integerStyle.applyTo( new StaticText( Integer.toHexString( (int)b ) ) );
+		return integerStyle.applyTo( new StaticText( Integer.toHexString( ((int)b) & 0xff ) ) );
 	}
 	
 	
