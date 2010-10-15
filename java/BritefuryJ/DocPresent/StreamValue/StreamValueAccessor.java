@@ -63,8 +63,8 @@ public class StreamValueAccessor
 			int offset = start - t.start;
 			Matcher m = pattern.matcher( t.textValue.substring( offset, t.stop - t.start ) );
 			
-			boolean bFound = m.find();
-			if ( bFound  &&  m.start() == 0  &&  m.end() > 0 )
+			boolean bFound = m.lookingAt();
+			if ( bFound  &&  m.end() > 0 )
 			{
 				return start + m.group().length();
 			}
@@ -84,8 +84,8 @@ public class StreamValueAccessor
 				int offset = start - t.start;
 				Matcher m = pattern.matcher( t.textValue.substring( offset, t.stop - t.start ) );
 				
-				boolean bFound = m.find();
-				if ( bFound  &&  m.start() == 0  &&  m.end() > 0 )
+				boolean bFound = m.lookingAt();
+				if ( bFound  &&  m.end() > 0 )
 				{
 					return start + m.group().length();
 				}
@@ -105,8 +105,8 @@ public class StreamValueAccessor
 			int offset = start - t.start;
 			Matcher m = pattern.matcher( t.textValue.substring( offset, t.stop - t.start ) );
 			
-			boolean bFound = m.find();
-			if ( bFound  &&  m.start() == 0  &&  m.end() > 0 )
+			boolean bFound = m.lookingAt();
+			if ( bFound  &&  m.end() > 0 )
 			{
 				return m.group();
 			}

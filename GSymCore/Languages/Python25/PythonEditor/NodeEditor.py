@@ -105,7 +105,7 @@ class PythonExpressionTreeEventListener (TreeEventListenerObjectDispatch):
 	__slots__ = [ '_parser' ]
 	
 	def __init__(self, parser, outerPrecedence):
-		#super( ParsedExpressionTreeEventListener, self ).__init__()
+		super( PythonExpressionTreeEventListener, self ).__init__()
 		self._parser = parser
 		self._outerPrecedence = outerPrecedence
 
@@ -174,36 +174,19 @@ StructuralExpressionTreeEventListener.instance = StructuralExpressionTreeEventLi
 
 
 
-class DeleteExternalExpressionTreeEvent (object):
+class DeleteSpecialFormExpressionTreeEvent (object):
 	def __init__(self, expr):
 		self._expr = expr
 
 		
-class ExternalExpressionTreeEventListener (TreeEventListenerObjectDispatch):
-	@ObjectDispatchMethod( DeleteExternalExpressionTreeEvent )
+class SpecialFormExpressionTreeEventListener (TreeEventListenerObjectDispatch):
+	@ObjectDispatchMethod( DeleteSpecialFormExpressionTreeEvent )
 	def onDeleteExtExpr(self, element, sourceElement, event):
 		pyReplaceExpression( element.getFragmentContext(), event._expr, Schema.Load( name='None' ) )
 		return True
 		
 	
-ExternalExpressionTreeEventListener.instance = ExternalExpressionTreeEventListener()
-
-
-
-
-class DeleteInlineObjectTreeEvent (object):
-	def __init__(self, inlineObj):
-		self._inlineObj = inlineObj
-
-		
-class InlineObjectTreeEventListener (TreeEventListenerObjectDispatch):
-	@ObjectDispatchMethod( DeleteInlineObjectTreeEvent )
-	def onDeleteInlineObject(self, element, sourceElement, event):
-		pyReplaceExpression( element.getFragmentContext(), event._inlineObj, Schema.Load( name='None' ) )
-		return True
-		
-	
-InlineObjectTreeEventListener.instance = InlineObjectTreeEventListener()
+SpecialFormExpressionTreeEventListener.instance = SpecialFormExpressionTreeEventListener()
 
 
 

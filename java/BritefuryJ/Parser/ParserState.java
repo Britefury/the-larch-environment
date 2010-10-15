@@ -157,7 +157,7 @@ public class ParserState
 		if ( start < input.length() )
 		{
 			Matcher m = junkPattern.matcher( input.subSequence( start, input.length() ) );
-			if ( m.find() )
+			if ( m.lookingAt() )
 			{
 				return start + m.end();
 			}

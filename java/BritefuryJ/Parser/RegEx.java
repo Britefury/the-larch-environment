@@ -57,8 +57,8 @@ public class RegEx extends TerminalString
 	{
 		Matcher m = pattern.matcher( input.subSequence( start, input.length() ) );
 		
-		boolean bFound = m.find();
-		if ( bFound  &&  m.start() == 0  &&  m.end() > 0 )
+		boolean bFound = m.lookingAt();
+		if ( bFound  &&  m.end() > 0 )
 		{
 			String match = m.group();
 			return new ParseResult( match, start, start + match.length() );

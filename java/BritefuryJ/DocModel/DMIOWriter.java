@@ -63,8 +63,7 @@ public class DMIOWriter
 	public static String stringAsAtom(String content)
 	{
 		Matcher m = unquotedString.matcher( content );
-		boolean bFound = m.find();
-		if ( bFound  &&  m.start() == 0  &&  m.end() == content.length() )
+		if ( m.matches() )
 		{
 			return content;
 		}

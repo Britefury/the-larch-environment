@@ -13,6 +13,7 @@ import org.python.core.PyUnicode;
 
 import BritefuryJ.DocModel.DMList;
 import BritefuryJ.DocModel.DMObject;
+import BritefuryJ.DocModel.Resource.DMResource;
 
 public class DefaultIdentityTransformationFunction extends TransformationFunction
 {
@@ -56,6 +57,10 @@ public class DefaultIdentityTransformationFunction extends TransformationFunctio
 			{
 				return x;
 			}
+		}
+		else if ( x instanceof DMResource )
+		{
+			return x;
 		}
 		else
 		{

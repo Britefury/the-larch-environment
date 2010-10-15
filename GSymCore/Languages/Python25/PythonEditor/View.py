@@ -133,20 +133,10 @@ def expressionNodeEditor(grammar, inheritedState, node, precedence, contents):
 		raise ValueError, 'invalid mode %d'  %  mode
 
 
-def externalExpressionNodeEditor(grammar, inheritedState, node, contents):
+def specialFormExpressionNodeEditor(grammar, inheritedState, node, contents):
 	mode = inheritedState['editMode']
 	if mode == EDITMODE_DISPLAYCONTENTS  or  mode == EDITMODE_EDITEXPRESSION:
-		contents = contents.withTreeEventListener( ExternalExpressionTreeEventListener.instance )
-		contents = contents.withFixedValue( node )
-		return contents
-	else:
-		raise ValueError, 'invalid mode %d'  %  mode
-
-
-def inlineObjectNodeEditor(grammar, inheritedState, node, contents):
-	mode = inheritedState['editMode']
-	if mode == EDITMODE_DISPLAYCONTENTS  or  mode == EDITMODE_EDITEXPRESSION:
-		contents = contents.withTreeEventListener( InlineObjectTreeEventListener.instance )
+		contents = contents.withTreeEventListener( SpecialFormExpressionTreeEventListener.instance )
 		contents = contents.withFixedValue( node )
 		return contents
 	else:
@@ -265,7 +255,7 @@ def spanCmpOpView(ctx, grammar, inheritedState, node, op, y, precedence):
 	
 	
 	
-class _InsertStructuralExpressionValueFn (ElementValueFunction):
+class _InsertSpecialFormExpressionValueFn (ElementValueFunction):
 	def __init__(self, expr, index):
 		self._expr = expr
 		self._index = index
@@ -285,16 +275,16 @@ class _InsertStructuralExpressionValueFn (ElementValueFunction):
 		pass
 	
 	
-class _InsertStructuralExpressionTreeEvent (TextEditEvent):
+class _InsertSpecialFormExpressionTreeEvent (TextEditEvent):
 	def __init__(self):
 		pass
 	
 
-def _insertStructuralExpression(caret, expr):
+def _insertSpecialFormExpression(caret, expr):
 	element = caret.getElement()
 	assert isinstance( element, DPText )
-	element.setValueFunction( _InsertStructuralExpressionValueFn( expr, caret.getIndex() ) )
-	element.postTreeEvent( _InsertStructuralExpressionTreeEvent() )
+	element.setValueFunction( _InsertSpecialFormExpressionValueFn( expr, caret.getIndex() ) )
+	element.postTreeEvent( _InsertSpecialFormExpressionTreeEvent() )
 	
 	
 
@@ -304,8 +294,7 @@ def _onDrop_inlineObject(element, pos, data, action):
 	caret = rootElement.getCaret()
 	if caret.isValid():
 		expr = Schema.InlineObject( resource=DMNode.resource( data.getModel() ) )
-		print 'Dropping inline object %s, %s'  %  ( data, expr )
-		_insertStructuralExpression( caret, expr )
+		_insertSpecialFormExpression( caret, expr )
 	return True
 
 
@@ -323,7 +312,7 @@ def _pythonModuleContextMenuFactory(element, menu):
 			if caret.isValid():
 				expr = factory()
 				pyExpr = Schema.ExternalExpr( expr=expr )
-				_insertStructuralExpression( caret, pyExpr )
+				_insertSpecialFormExpression( caret, pyExpr )
 		return _onMenuItem
 		
 	extExprItems = [ MenuItem.menuItemWithLabel( labelText, _makeExtExprFn( factory ) )   for labelText, factory in ExternalExpression.getExternalExpressionFactories() ]
@@ -917,13 +906,13 @@ class Python25View (GSymViewObjectNodeDispatch):
 			title = 'ext'
 		
 		def _onDeleteButton(button, event):
-			button.getElement().postTreeEvent( DeleteExternalExpressionTreeEvent( node ) )
+			button.getElement().postTreeEvent( DeleteSpecialFormExpressionTreeEvent( node ) )
 
 		
 		deleteButton = Button( Image.systemIcon( 'delete_tiny' ), _onDeleteButton )
 
 		view = externalExpr( exprView, title, deleteButton )
-		return externalExpressionNodeEditor( self._parser, state, node,
+		return specialFormExpressionNodeEditor( self._parser, state, node,
 		                             view )
 
 
@@ -941,13 +930,13 @@ class Python25View (GSymViewObjectNodeDispatch):
 		valueView = ApplyPerspective( None, value )
 		
 		def _onDeleteButton(button, event):
-			button.getElement().postTreeEvent( DeleteInlineObjectTreeEvent( node ) )
+			button.getElement().postTreeEvent( DeleteSpecialFormExpressionTreeEvent( node ) )
 
 		
 		deleteButton = Button( Image.systemIcon( 'delete_tiny' ), _onDeleteButton )
 
 		view = inlineObject( valueView, deleteButton )
-		return inlineObjectNodeEditor( self._parser, state, node,
+		return specialFormExpressionNodeEditor( self._parser, state, node,
 		                             view )
 
 
