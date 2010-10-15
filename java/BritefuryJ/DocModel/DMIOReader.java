@@ -167,8 +167,8 @@ public class DMIOReader
 	{
 		Matcher m = pattern.matcher( source.substring( position, source.length() ) );
 		
-		boolean bFound = m.find();
-		if ( bFound  &&  m.start() == 0  &&  m.end() > 0 )
+		boolean bFound = m.lookingAt();
+		if ( bFound  &&  m.end() > 0 )
 		{
 			String matchString = m.group();
 			int end = position + matchString.length();
