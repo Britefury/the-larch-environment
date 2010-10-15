@@ -8,6 +8,7 @@ package BritefuryJ.DocPresent.Input;
 
 import java.awt.datatransfer.Transferable;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
 import javax.swing.TransferHandler;
 
@@ -47,35 +48,9 @@ public class PointerDndInteractor extends PointerInteractor
 
 	
 	
-	private PointerInputElement getDndElement(Point2 localPos, Point2 targetPos[])
+	public ArrayList<PointerInputElement.DndTarget> getDndTargets(Point2 localPos)
 	{
-		return getDndElement( rootElement, localPos, targetPos );
-	}
-
-	private PointerInputElement getDndElement(PointerInputElement element, Point2 localPos, Point2 targetPos[])
-	{
-		PointerInputElement child = element.getFirstPointerChildAtLocalPoint( localPos );
-		if ( child != null )
-		{
-			PointerInputElement e = getDndElement( child, child.transformParentToLocalPoint( localPos ), targetPos );
-			if ( e != null )
-			{
-				return e;
-			}
-		}
-		
-		if ( element.getDndHandler() != null )
-		{
-			if ( targetPos != null )
-			{
-				targetPos[0] = localPos;
-			}
-			return element;
-		}
-		else
-		{
-			return null;
-		}
+		return PointerInputElement.getDndTargets( rootElement, localPos );
 	}
 
 
@@ -84,11 +59,14 @@ public class PointerDndInteractor extends PointerInteractor
 	{
 		if ( dndController != null )
 		{
-			PointerInputElement sourceElement = getDndElement( event.getPointer().getLocalPos(), null );
-			
-			if ( sourceElement != null )
+			ArrayList<PointerInputElement.DndTarget> targets = getDndTargets( event.getPointer().getLocalPos() );
+			for (PointerInputElement.DndTarget target: targets)
 			{
-				dndDrop = new DndDropLocal( sourceElement, event.getButton() );
+				if ( target.isSource() )
+				{
+					dndDrop = new DndDropLocal( target.getElement(), event.getButton() );
+					return;
+				}
 			}
 		}
 	}
@@ -127,12 +105,21 @@ public class PointerDndInteractor extends PointerInteractor
 				}
 				else
 				{
-					Point2 targetPos[] = new Point2[] { null };
-					PointerInputElement targetElement = getDndElement( event.getPointer().getLocalPos(), targetPos );
-					if ( targetElement != null )
+					ArrayList<PointerInputElement.DndTarget> targets = getDndTargets( event.getPointer().getLocalPos() );
+					for (PointerInputElement.DndTarget target: targets)
 					{
-						drop.setTarget( targetElement, targetPos[0] );
-						targetElement.getDndHandler().canDrop( targetElement, drop );
+						if ( target.isDest() )
+						{
+							PointerInputElement targetElement = target.getElement();
+							DndHandler targetDndHandler = target.getDndHandler();
+							Point2 targetPos = target.getElementSpacePos();
+							
+							drop.setTarget( targetElement, targetPos );
+							if ( targetDndHandler.canDrop( targetElement, drop ) )
+							{
+								break;
+							}
+						}
 					}
 					
 					return true;
@@ -159,14 +146,21 @@ public class PointerDndInteractor extends PointerInteractor
 			
 			if ( drop != null  &&  drop.bInProgress )
 			{
-				Point2 targetPos[] = new Point2[] { null };
-				PointerInputElement targetElement = getDndElement( event.getPointer().getLocalPos(), targetPos );
-				if ( targetElement != null )
+				ArrayList<PointerInputElement.DndTarget> targets = getDndTargets( event.getPointer().getLocalPos() );
+				for (PointerInputElement.DndTarget target: targets)
 				{
-					drop.setTarget( targetElement, targetPos[0] );
-					if ( targetElement.getDndHandler().canDrop( targetElement, drop ) )
+					if ( target.isDest() )
 					{
-						targetElement.getDndHandler().acceptDrop( targetElement, drop );
+						PointerInputElement targetElement = target.getElement();
+						DndHandler targetDndHandler = target.getDndHandler();
+						Point2 targetPos = target.getElementSpacePos();
+
+						drop.setTarget( targetElement, targetPos );
+						if ( targetDndHandler.canDrop( targetElement, drop ) )
+						{
+							targetDndHandler.acceptDrop( targetElement, drop );
+							break;
+						}
 					}
 				}
 				

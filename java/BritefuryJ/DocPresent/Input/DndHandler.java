@@ -24,6 +24,8 @@ public abstract class DndHandler
 
 	
 	
+	public abstract boolean isSource(PointerInputElement sourceElement);
+
 	public int getSourceRequestedAction(PointerInputElement sourceElement, PointerInterface pointer, int button)
 	{
 		return COPY;
@@ -42,10 +44,13 @@ public abstract class DndHandler
 	public void exportDone(PointerInputElement sourceElement, Transferable data, int action)
 	{
 	}
+	
 
 	
 	
 	
+	public abstract boolean isDest(PointerInputElement sourceElement);
+
 	public boolean canDrop(PointerInputElement destElement, DndDrop drop)
 	{
 		return false;
