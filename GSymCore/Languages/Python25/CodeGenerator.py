@@ -22,6 +22,9 @@ def _indent(x):
 	return '\n'.join( lines )
 
 
+_runtime_resourceMap_Name = '__gsym_resourceMap__'
+
+
 class Python25CodeGeneratorError (Exception):
 	pass
 
@@ -49,6 +52,8 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	def __init__(self, bErrorChecking=True):
 		super( Python25CodeGenerator, self ).__init__()
 		self._bErrorChecking = bErrorChecking
+			
+		
 	
 	
 	# Misc
@@ -419,6 +424,13 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 		
 	
 	
+	# Inline object
+	@DMObjectNodeDispatchMethod( Schema.InlineObject )
+	def InlineObject(self, node, resource):
+		raise ValueError, 'Python25CodeGenerator does not support inline objects; a Python25ModuleCodeGenerator must be used'
+		
+	
+	
 	# Expression statement
 	@DMObjectNodeDispatchMethod( Schema.ExprStmt )
 	def ExprStmt(self, node, expr):
@@ -698,17 +710,34 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 			return self( expr )
 
 		
-python25CodeGeneratorWithErrorChecking = Python25CodeGenerator()
-python25CodeGeneratorWithoutErrorChecking = Python25CodeGenerator( False )
+
+class Python25ModuleCodeGenerator (Python25CodeGenerator):
+	def __init__(self, module, bErrorChecking=True):
+		super( Python25ModuleCodeGenerator, self ).__init__( bErrorChecking )
+		
+		try:
+			self._resourceMap = getattr( module, _runtime_resourceMap_Name )
+		except AttributeError:
+			self._resourceMap = []
+			setattr( module, _runtime_resourceMap_Name, self._resourceMap )
 
 
+	# Inline object
+	@DMObjectNodeDispatchMethod( Schema.InlineObject )
+	def InlineObject(self, node, resource):
+		index = len( self._resourceMap )
+		self._resourceMap.append( resource.getValue() )
+		return _runtime_resourceMap_Name + '[%d]'  %  ( index, )
+		
+	
+	
 
-def compileForExecution(pythonModule, filename):
-	source = python25CodeGeneratorWithErrorChecking( pythonModule )
+def _compileForExecution(codeGen, pythonModule, filename):
+	source = codeGen( pythonModule )
 	return compile( source, filename, 'exec' )
 
 
-def compileForExecutionAndEvaluation(pythonModule, filename):
+def _compileForExecutionAndEvaluation(codeGen, pythonModule, filename):
 	execModule = None
 	evalExpr = None
 	for i, stmt in reversed( list( enumerate( pythonModule['suite'] ) ) ):
@@ -722,8 +751,8 @@ def compileForExecutionAndEvaluation(pythonModule, filename):
 			break
 	
 	if execModule is not None  and  evalExpr is not None:
-		execSource = python25CodeGeneratorWithErrorChecking( execModule )
-		evalSource = python25CodeGeneratorWithErrorChecking( evalExpr )
+		execSource = codeGen( execModule )
+		evalSource = codeGen( evalExpr )
 		
 		execCode = compile( execSource, filename, 'exec' )
 		evalCode = compile( evalSource, filename, 'eval' )
@@ -731,6 +760,29 @@ def compileForExecutionAndEvaluation(pythonModule, filename):
 		return execCode, evalCode
 	else:
 		return compileForExecution( pythonModule, filename ),  None
+
+				
+				
+				
+
+	
+	
+def compileForExecution(pythonModule, filename):
+	return _compileForExecution( Python25CodeGenerator(), pythonModule, filename )
+
+
+def compileForExecutionAndEvaluation(pythonModule, filename):
+	return _compileForExecutionAndEvaluation( Python25CodeGenerator(), pythonModule, filename )
+
+				
+				
+				
+def compileForModuleExecution(module, pythonModule, filename):
+	return _compileForExecution( Python25ModuleCodeGenerator( module ), pythonModule, filename )
+
+
+def compileForModuleExecutionAndEvaluation(module, pythonModule, filename):
+	return _compileForExecutionAndEvaluation( Python25ModuleCodeGenerator( module ), pythonModule, filename )
 
 				
 				

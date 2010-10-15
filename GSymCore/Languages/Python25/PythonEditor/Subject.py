@@ -13,7 +13,7 @@ from BritefuryJ.DocPresent.Browser import Location
 from BritefuryJ.GSym import GSymSubject
 
 from GSymCore.Languages.Python25 import Schema
-from GSymCore.Languages.Python25.CodeGenerator import compileForExecution
+from GSymCore.Languages.Python25.CodeGenerator import compileForModuleExecution
 from GSymCore.Languages.Python25.PythonEditor.View import perspective
 
 
@@ -77,7 +77,7 @@ class _Python25ModuleLoader (object):
 		mod.__file__ = fullname
 		mod.__loader__ = self
 		mod.__path__ = fullname.split( '.' )
-		code = compileForExecution( self._model, fullname )
+		code = compileForModuleExecution( mod, self._model, fullname )
 		exec code in mod.__dict__
 		return mod
 	

@@ -50,7 +50,7 @@ from BritefuryJ.GSym.PresCom import InnerFragment, LocationAsInnerFragment
 
 
 from GSymCore.Languages.Python25 import Python25
-from GSymCore.Languages.Python25.CodeGenerator import compileForExecution
+from GSymCore.Languages.Python25.CodeGenerator import compileForModuleExecution
 from GSymCore.Languages.Python25.Execution.ExecutionPresCombinators import executionResultBox, minimalExecutionResultBox
 
 from GSymCore.Worksheet import Schema
@@ -211,7 +211,7 @@ class _WorksheetModuleLoader (object):
 		
 		for i, node in enumerate( body['contents'] ):
 			if node.isInstanceOf( Schema.PythonCode ):
-				code = compileForExecution( node['code'], fullname + '_' + str( i ) )
+				code = compileForModuleExecution( mod, node['code'], fullname + '_' + str( i ) )
 				exec code in mod.__dict__
 		return mod
 
