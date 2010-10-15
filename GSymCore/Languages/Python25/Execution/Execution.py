@@ -67,9 +67,9 @@ def executePythonModule(pythonModule, module, bEvaluate):
 	
 	try:
 		if bEvaluate:
-			execCode, evalCode = CodeGenerator.compileForExecutionAndEvaluation( pythonModule, module.__name__ )
+			execCode, evalCode = CodeGenerator.compileForModuleExecutionAndEvaluation( module, pythonModule, module.__name__ )
 		else:
-			execCode = CodeGenerator.compileForExecution( pythonModule, module.__name__ )
+			execCode = CodeGenerator.compileForModuleExecution( module, pythonModule, module.__name__ )
 			evalCode = None
 	except Exception, exc:
 		caughtException = exc
