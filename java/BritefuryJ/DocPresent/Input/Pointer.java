@@ -171,6 +171,7 @@ public class Pointer extends PointerInterface
 	
 	protected Point2 localPos = new Point2();
 	protected int modifiers = 0;
+	protected PointerInputElement rootElement;
 	protected ElementEntry rootEntry;
 	protected InputTable inputTable;
 	protected DndDropLocal dndDrop;
@@ -185,6 +186,7 @@ public class Pointer extends PointerInterface
 		this.inputTable = inputTable;
 		this.component = component;
 		
+		this.rootElement = rootElement;
 		rootEntry = getEntryForElement( rootElement );
 		
 		

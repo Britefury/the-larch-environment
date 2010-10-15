@@ -156,32 +156,6 @@ public class DPCanvas extends DPContentLeaf implements DrawingOwner
 	
 	//
 	//
-	// DRAG AND DROP METHODS
-	//
-	//
-	
-	public PointerInputElement getDndElement(Point2 localPos, Point2 targetPos[])
-	{
-		if ( drawing != null )
-		{
-			PointerInputElement element = drawing.getDndElement( localPos, targetPos );
-			if ( element != null )
-			{
-				if ( targetPos != null )
-				{
-					targetPos[0] = localPos;
-				}
-				return element;
-			}
-		}
-		
-		return null;
-	}
-
-	
-	
-	//
-	//
 	// DIAGRAM OWNER METHODS
 	//
 	//

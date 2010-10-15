@@ -45,12 +45,12 @@ import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Caret.CaretListener;
 import BritefuryJ.DocPresent.Clipboard.DataTransfer;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
+import BritefuryJ.DocPresent.Input.DndController;
 import BritefuryJ.DocPresent.Input.DndDropLocal;
 import BritefuryJ.DocPresent.Input.DndDropSwing;
 import BritefuryJ.DocPresent.Input.InputTable;
 import BritefuryJ.DocPresent.Input.Modifier;
 import BritefuryJ.DocPresent.Input.Pointer;
-import BritefuryJ.DocPresent.Input.DndController;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.Keyboard.Keyboard;
 import BritefuryJ.DocPresent.Layout.LAllocV;
@@ -1219,34 +1219,38 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		{
 			Point windowPos = transfer.getDropLocation().getDropPoint();
 			Point2 rootPos = new Point2( windowPos.x, windowPos.y );
-			Point2 targetPos[] = new Point2[] { null };
-			PointerInputElement targetElement = getDndElement( rootPos, targetPos );
-			if ( targetElement != null )
+			List<PointerInputElement.DndTarget> targets = PointerInputElement.getDndTargets( this, rootPos );
+			for (PointerInputElement.DndTarget target: targets)
 			{
-				DndDropSwing drop = new DndDropSwing( targetElement, targetPos[0], transfer );
-				return targetElement.getDndHandler().canDrop( targetElement, drop );
+				if ( target.isDest() )
+				{
+					PointerInputElement targetElement = target.getElement();
+					Point2 targetPos = target.getElementSpacePos();
+
+					DndDropSwing drop = new DndDropSwing( targetElement, targetPos, transfer );
+					return targetElement.getDndHandler().canDrop( targetElement, drop );
+				}
 			}
-			else
-			{
-				return false;
-			}
+			return false;
 		}
 		
 		private boolean swingDndImportData(TransferHandler.TransferSupport transfer)
 		{
 			Point windowPos = transfer.getDropLocation().getDropPoint();
 			Point2 rootPos = new Point2( windowPos.x, windowPos.y );
-			Point2 targetPos[] = new Point2[] { null };
-			PointerInputElement targetElement = getDndElement( rootPos, targetPos );
-			if ( targetElement != null )
+			List<PointerInputElement.DndTarget> targets = PointerInputElement.getDndTargets( this, rootPos );
+			for (PointerInputElement.DndTarget target: targets)
 			{
-				DndDropSwing drop = new DndDropSwing( targetElement, targetPos[0], transfer );
-				return targetElement.getDndHandler().acceptDrop( targetElement, drop );
+				if ( target.isDest() )
+				{
+					PointerInputElement targetElement = target.getElement();
+					Point2 targetPos = target.getElementSpacePos();
+
+					DndDropSwing drop = new DndDropSwing( targetElement, targetPos, transfer );
+					return targetElement.getDndHandler().acceptDrop( targetElement, drop );
+				}
 			}
-			else
-			{
-				return false;
-			}
+			return false;
 		}
 		
 		

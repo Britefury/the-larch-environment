@@ -10,9 +10,7 @@ import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.DndHandler;
-import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
-import BritefuryJ.Math.Point2;
 
 public class InteractionNode extends UnaryBranchNode
 {
@@ -161,28 +159,6 @@ public class InteractionNode extends UnaryBranchNode
 	
 
 
-	public PointerInputElement getDndElement(Point2 localPos, Point2 targetPos[])				// targetPos is an output parameter
-	{
-		PointerInputElement element = getVisibleChild().getDndElement( localPos, targetPos );
-		if ( element != null )
-		{
-			return element;
-		}
-		
-		if ( dndHandler != null )
-		{
-			if ( targetPos != null )
-			{
-				targetPos[0] = localPos;
-			}
-			return this;
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
 	public DndHandler getDndHandler()
 	{
 		return dndHandler;

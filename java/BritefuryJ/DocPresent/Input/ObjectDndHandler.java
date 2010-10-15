@@ -409,6 +409,11 @@ public class ObjectDndHandler extends DndHandler
 	
 	
 	
+	public boolean isSource(PointerInputElement sourceElement)
+	{
+		return sources != null;
+	}
+
 	public int getSourceRequestedAction(PointerInputElement sourceElement, PointerInterface pointer, int button)
 	{
 		int modifiers = pointer.getModifiers();
@@ -497,6 +502,11 @@ public class ObjectDndHandler extends DndHandler
 
 	
 	
+	public boolean isDest(PointerInputElement sourceElement)
+	{
+		return dests != null;
+	}
+
 	public boolean canDrop(PointerInputElement destElement, DndDrop drop)
 	{
 		Transferable transferable = drop.getTransferable();

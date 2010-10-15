@@ -16,7 +16,6 @@ import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
-import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.LayoutTree.BranchLayoutNode;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
@@ -410,30 +409,6 @@ public abstract class DPContainer extends DPElement
 		}
 		
 		return x;
-	}
-	
-	
-	
-	
-	//
-	//
-	// DRAG AND DROP METHODS
-	//
-	//
-	
-	public PointerInputElement getDndElement(Point2 localPos, Point2 targetPos[])
-	{
-		DPElement child = getFirstChildAtLocalPoint( localPos );
-		if ( child != null )
-		{
-			PointerInputElement element = child.getDndElement( child.getParentToLocalXform().transform( localPos ), targetPos );
-			if ( element != null )
-			{
-				return element;
-			}
-		}
-		
-		return super.getDndElement( localPos, targetPos );
 	}
 
 	

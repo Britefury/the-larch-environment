@@ -76,10 +76,4 @@ public abstract class UnaryBranchNode extends DrawingNode
 	{
 		return getVisibleChild().containsParentSpacePoint( parentPos );
 	}
-
-
-	public PointerInputElement getDndElement(Point2 localPos, Point2 targetPos[])				// targetPos is an output parameter
-	{
-		return getVisibleChild().getDndElement( localPos, targetPos );
-	}
 }

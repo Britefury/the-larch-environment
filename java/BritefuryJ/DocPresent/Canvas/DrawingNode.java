@@ -301,11 +301,6 @@ public abstract class DrawingNode extends PointerInputElement
 	public abstract boolean containsLocalSpacePoint(Point2 localPos);
 	
 	
-	public PointerInputElement getDndElement(Point2 localPos, Point2 targetPos[])				// targetPos is an output parameter
-	{
-		return null;
-	}
-	
 	public DndHandler getDndHandler()
 	{
 		return null;

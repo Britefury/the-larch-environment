@@ -2016,22 +2016,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	
 	
-	public PointerInputElement getDndElement(Point2 localPos, Point2 targetPos[])
-	{
-		if ( getDndHandler() != null )
-		{
-			if ( targetPos != null )
-			{
-				targetPos[0] = localPos;
-			}
-			return this;
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
 	public DndHandler getDndHandler()
 	{
 		return interactionFields != null  ?  interactionFields.dndHandler  :  null;

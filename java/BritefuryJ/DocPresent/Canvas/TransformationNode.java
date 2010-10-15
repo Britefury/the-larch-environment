@@ -12,7 +12,6 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 
 import BritefuryJ.DocPresent.Event.PointerEvent;
-import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
@@ -148,20 +147,5 @@ public class TransformationNode extends UnaryBranchNode
 	public boolean containsLocalSpacePoint(Point2 localPos)
 	{
 		return child.containsParentSpacePoint( localPos );
-	}
-
-
-
-	public PointerInputElement getDndElement(Point2 localPos, Point2 targetPos[])				// targetPos is an output parameter
-	{
-		Point2D.Double childPos = new Point2D.Double( localPos.x, localPos.y );
-		parentToLocal.transform( childPos, childPos );
-		PointerInputElement element = child.getDndElement( new Point2( childPos.x, childPos.y ), targetPos );
-		if ( element != null )
-		{
-			return element;
-		}
-		
-		return null;
 	}
 }
