@@ -320,42 +320,58 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		public boolean canImport(TransferHandler.TransferSupport transfer)
 		{
-			if ( transfer.isDrop() )
+			try
 			{
-				return swingDndCanImport( transfer );
-			}
-			else
-			{
-				DPRegion region = rootElement.getCaretRegion();
-				if ( region != null )
+				if ( transfer.isDrop() )
 				{
-					EditHandler editHandler = region.getEditHandler();
-					if ( editHandler != null )
-					{
-						return editHandler.canImport( rootElement.caret, rootElement.selection, new DataTransfer( transfer ) );
-					}
+					return swingDndCanImport( transfer );
 				}
+				else
+				{
+					DPRegion region = rootElement.getCaretRegion();
+					if ( region != null )
+					{
+						EditHandler editHandler = region.getEditHandler();
+						if ( editHandler != null )
+						{
+							return editHandler.canImport( rootElement.caret, rootElement.selection, new DataTransfer( transfer ) );
+						}
+					}
+					return false;
+				}
+			}
+			catch (Throwable e)
+			{
+				rootElement.notifyExceptionDuringEventHandler( "PresTransferHandler", "canImport", e );
 				return false;
 			}
 		}
 
 		public boolean importData(TransferHandler.TransferSupport transfer)
 		{
-			if ( transfer.isDrop() )
+			try
 			{
-				return swingDndImportData( transfer );
-			}
-			else
-			{
-				DPRegion region = rootElement.getCaretRegion();
-				if ( region != null )
+				if ( transfer.isDrop() )
 				{
-					EditHandler editHandler = region.getEditHandler();
-					if ( editHandler != null )
-					{
-						return editHandler.importData( rootElement.caret, rootElement.selection, new DataTransfer( transfer ) );
-					}
+					return swingDndImportData( transfer );
 				}
+				else
+				{
+					DPRegion region = rootElement.getCaretRegion();
+					if ( region != null )
+					{
+						EditHandler editHandler = region.getEditHandler();
+						if ( editHandler != null )
+						{
+							return editHandler.importData( rootElement.caret, rootElement.selection, new DataTransfer( transfer ) );
+						}
+					}
+					return false;
+				}
+			}
+			catch (Throwable e)
+			{
+				rootElement.notifyExceptionDuringEventHandler( "PresTransferHandler", "importData", e );
 				return false;
 			}
 		}

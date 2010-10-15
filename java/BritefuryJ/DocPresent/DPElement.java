@@ -1679,7 +1679,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 				{
 					painter.drawBackground( this, graphics );
 				}
-				catch (Exception e)
+				catch (Throwable e)
 				{
 					notifyExceptionDuringEventHandler( painter, "drawBackground", e );
 				}
@@ -1699,7 +1699,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 				{
 					painter.draw( this, graphics );
 				}
-				catch (Exception e)
+				catch (Throwable e)
 				{
 					notifyExceptionDuringEventHandler( painter, "draw", e );
 				}
@@ -3038,7 +3038,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	
 	
-	public void notifyExceptionDuringEventHandler(Object eventHandler, String event, Exception e)
+	public void notifyExceptionDuringEventHandler(Object eventHandler, String event, Throwable e)
 	{
 		System.err.println( "Exception during element event handler:" );
 		e.printStackTrace();
