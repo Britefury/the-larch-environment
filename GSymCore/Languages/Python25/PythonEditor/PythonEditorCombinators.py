@@ -519,10 +519,10 @@ def externalExpr(ctx, style, exprView, title, deleteButton):
 
 
 @PyPresCombinatorFn
-def inlineObject(ctx, style, valueView, deleteButton):
+def inlineObject(ctx, style, valueView):
 	externalExprBorderStyle = style.get( PythonEditorStyle.externalExprBorderStyle )
 	
-	box = externalExprBorderStyle.applyTo( Border( Row( [ valueView.pad( 3.0, 3.0 ), deleteButton.alignHRight().alignVCentre() ] ) ) )
+	box = externalExprBorderStyle.applyTo( Border( valueView.pad( 3.0, 3.0 ) ) )
 
 	segment = Segment( True, True, box )
 	return segment.present( ctx, style )

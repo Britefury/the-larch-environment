@@ -300,6 +300,20 @@ def _onDrop_inlineObject(element, pos, data, action):
 
 
 
+def _inlineObjectContextMenuFactory(element, menu):
+	fragment = element.getFragmentContext()
+	model = fragment.getModel()
+	
+	def _onDelete(item):
+		pyReplaceExpression( fragment, model, Schema.Load( name='None' ) )
+
+	deleteItem = MenuItem.menuItemWithLabel( 'Delete inline object', _onDelete )
+	menu.add( deleteItem )
+
+	return False
+
+
+
 def _pythonModuleContextMenuFactory(element, menu):
 	rootElement = element.getRootElement()
 	
@@ -929,13 +943,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 		value = resource.getValue()
 		valueView = ApplyPerspective( None, value )
 		
-		def _onDeleteButton(button, event):
-			button.getElement().postTreeEvent( DeleteSpecialFormExpressionTreeEvent( node ) )
-
-		
-		deleteButton = Button( Image.systemIcon( 'delete_tiny' ), _onDeleteButton )
-
-		view = inlineObject( valueView, deleteButton )
+		view = inlineObject( valueView )
+		view = view.withContextMenuInteractor( _inlineObjectContextMenuFactory )
 		return specialFormExpressionNodeEditor( self._parser, state, node,
 		                             view )
 
