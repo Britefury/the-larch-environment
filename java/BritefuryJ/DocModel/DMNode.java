@@ -19,6 +19,7 @@ import org.python.core.PyObject;
 import org.python.core.PyObjectDerived;
 
 import BritefuryJ.DocModel.Resource.DMJavaResource;
+import BritefuryJ.DocModel.Resource.DMPyResource;
 import BritefuryJ.DocModel.Resource.DMResource;
 
 
@@ -408,8 +409,20 @@ public abstract class DMNode implements Cloneable
 		return new DMJavaResource( x );
 	}
 
+	public static DMResource pyResource(PyObject x)
+	{
+		return new DMPyResource( x );
+	}
+
 	public static DMResource resource(Object x)
 	{
-		return javaResource( x );
+		if ( x instanceof PyObject )
+		{
+			return pyResource( (PyObject)x );
+		}
+		else
+		{
+			return javaResource( x );
+		}
 	}
 }

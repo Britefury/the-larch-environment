@@ -395,6 +395,7 @@ def _makeTestMethod(parserSpec, name, tests):
 	def m(self):
 		parser = buildOperatorParser( eval( parserSpec ), identifier )
 		for input, result in tests:
+			print 'Testing ', input
 			if result is None:
 				self._parseStringFailTest( parser, input )
 			else:

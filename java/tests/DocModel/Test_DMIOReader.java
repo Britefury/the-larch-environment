@@ -14,6 +14,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.python.core.PyInteger;
+import org.python.core.PyObject;
+import org.python.core.PyTuple;
+
 import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMIOReader;
 import BritefuryJ.DocModel.DMIOWriter;
@@ -24,6 +28,7 @@ import BritefuryJ.DocModel.DMSchema;
 import BritefuryJ.DocModel.DMSchemaResolver;
 import BritefuryJ.DocModel.DMIOWriter.InvalidDataTypeException;
 import BritefuryJ.DocModel.Resource.DMJavaResource;
+import BritefuryJ.DocModel.Resource.DMPyResource;
 
 public class Test_DMIOReader extends TestCase
 {
@@ -358,8 +363,15 @@ public class Test_DMIOReader extends TestCase
 
 	public void testReadJavaResource() throws IOException
 	{
-		DMJavaResource r = new DMJavaResource( Color.RED );
-		readTest( "<<J: " + DMIOWriter.stringAsAtom( DMJavaResource.serialise( Color.RED ) ) + ">>", r );
+		DMJavaResource jr = new DMJavaResource( Color.RED );
+		readTest( "<<Ja: " + DMIOWriter.stringAsAtom( DMJavaResource.serialise( Color.RED ) ) + ">>", jr );
+	}
+
+	public void testReadPyResource() throws IOException
+	{
+		PyObject pyValue = new PyTuple( new PyInteger( 1 ), new PyInteger( 2 ), new PyInteger( 3 ) );
+		DMPyResource pr = new DMPyResource( pyValue );
+		readTest( "<<Py: " + DMIOWriter.stringAsAtom( DMPyResource.serialise( pyValue ) ) + ">>", pr );
 	}
 
 	public void testReadNestedObject()
@@ -379,9 +391,11 @@ public class Test_DMIOReader extends TestCase
 	
 	public void testReadNestedResource() throws IOException
 	{
-		DMJavaResource r = new DMJavaResource( Color.RED );
-		List<Object> x = Arrays.asList( new Object[] { r, "abc" } );
-		readTest( "[<<J: " + DMIOWriter.stringAsAtom( DMJavaResource.serialise( Color.RED ) ) + ">> abc]", x );
+		DMJavaResource jr = new DMJavaResource( Color.RED );
+		PyObject pyValue = new PyTuple( new PyInteger( 1 ), new PyInteger( 2 ), new PyInteger( 3 ) );
+		DMPyResource pr = new DMPyResource( pyValue );
+		List<Object> x = Arrays.asList( new Object[] { jr, pr, "abc" } );
+		readTest( "[<<Ja: " + DMIOWriter.stringAsAtom( DMJavaResource.serialise( Color.RED ) ) + ">> <<Py: " + DMIOWriter.stringAsAtom( DMPyResource.serialise( pyValue ) ) + ">> abc]", x );
 	}
 
 	

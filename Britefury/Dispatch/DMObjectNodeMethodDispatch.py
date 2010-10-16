@@ -133,7 +133,25 @@ def DMObjectNodeDispatchMethod(nodeClass):
 		return DMObjectNodeDispatchMethodWrapper( nodeClass, fn )
 	return decorator
 		
-	
+
+_methodTables = {}
+
+def _getMethodTableForClass(cls, numArgs):
+	try:
+		return _methodTables[cls]
+	except KeyError:
+		# Gather the relevant methods for this class
+		methodTable = {}
+		# Add entries to the method table
+		for k, v in cls.__dict__.items():
+			if isinstance( v, DMObjectNodeDispatchMethodWrapper ):
+				method = v
+				nodeClass = v._nodeClass
+				method._init( numArgs )
+				methodTable[nodeClass] = method
+		_methodTables[cls] = methodTable
+		return methodTable
+		
 	
 		
 def _initDispatchTableForClass (cls):
@@ -146,29 +164,19 @@ def _initDispatchTableForClass (cls):
 	# The method table stores entries only for methods that were declared
 	# The dispatch table stores those, in addition to mappings for subclasses of the node class
 	# The method table is copied from base classes
-
-	# Initialise method table with entries from base classes
-	cls.__method_table__ = {}
+	
+	# Gather methods from base classes
+	fullMethodTable = {}
 	for base in cls.mro():
-		try:
-			cls.__method_table__.update( base.__method_table__ )
-		except AttributeError:
-			pass
+		fullMethodTable.update( _getMethodTableForClass( base, numArgs ) )
+		
+	# Incorporate methods from @cls
+	fullMethodTable.update( _getMethodTableForClass( cls, numArgs ) )
 
-	# Add entries to the method table
-	for k, v in cls.__dict__.items():
-		if isinstance( v, DMObjectNodeDispatchMethodWrapper ):
-			method = v
-			nodeClass = v._nodeClass
-			method._init( numArgs )
-			cls.__method_table__[nodeClass] = method
-
-			
-	# Initialise the dispatch table to a copy of the method table
-	cls.__dispatch_table__ = copy.copy( cls.__method_table__ )
+	# Initialise the dispatch table
+	cls.__dispatch_table__ = fullMethodTable
 	return cls.__dispatch_table__
 		
-
 
 		
 		
