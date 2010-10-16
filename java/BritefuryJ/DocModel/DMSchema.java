@@ -15,6 +15,16 @@ import org.python.core.Py;
 
 public class DMSchema
 {
+	public static class UnknownSchemaException extends RuntimeException
+	{
+		private static final long serialVersionUID = 1L;
+		
+		public UnknownSchemaException(String schemaLocation)
+		{
+			super( "Unknown schema '" + schemaLocation + "'" );
+		}
+	}
+
 	public static class UnknownClassException extends RuntimeException
 	{
 		private static final long serialVersionUID = 1L;

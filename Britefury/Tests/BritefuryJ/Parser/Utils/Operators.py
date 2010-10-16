@@ -373,16 +373,16 @@ _unitTestSpecification = """
 		       
 		       
 -- infix_chain :				[ self._infixChainLvl( 'ic',    [ self._chainOp( '<' ), self._chainOp( '>' ), self._chainOp( '<>' ) ]    ) ]
-			a < b					->	[ic a [< b]]
-			a > b					->	[ic a [> b]]
-			a <> b				->	[ic a [<> b]]
-			a < b < c				->	[ic a [< b] [< c]]
-			a < b > c				->	[ic a [< b] [> c]]
-			a > b < c				->	[ic a [> b] [< c]]
-			a <> b < c				->	[ic a [<> b] [< c]]
-			a < b <> c				->	[ic a [< b] [<> c]]
-			a < b > c <> d			->	[ic a [< b] [> c] [<> d]]
-			a <> b > c < d			->	[ic a [<> b] [> c] [< d]]
+			a < b					->	[ic a ["<" b]]
+			a > b					->	[ic a [">" b]]
+			a <> b				->	[ic a ["<>" b]]
+			a < b < c				->	[ic a ["<" b] ["<" c]]
+			a < b > c				->	[ic a ["<" b] [">" c]]
+			a > b < c				->	[ic a [">" b] ["<" c]]
+			a <> b < c				->	[ic a ["<>" b] ["<" c]]
+			a < b <> c				->	[ic a ["<" b] ["<>" c]]
+			a < b > c <> d			->	[ic a ["<" b] [">" c] ["<>" d]]
+			a <> b > c < d			->	[ic a ["<>" b] [">" c] ["<" d]]
 """
 
 
@@ -395,7 +395,6 @@ def _makeTestMethod(parserSpec, name, tests):
 	def m(self):
 		parser = buildOperatorParser( eval( parserSpec ), identifier )
 		for input, result in tests:
-			print 'Testing ', input
 			if result is None:
 				self._parseStringFailTest( parser, input )
 			else:

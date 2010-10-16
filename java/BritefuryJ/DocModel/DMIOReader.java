@@ -15,7 +15,7 @@ import BritefuryJ.DocModel.Resource.DMJavaResource;
 import BritefuryJ.DocModel.Resource.DMPyResource;
 
 
-public class DMIOReader
+public class DMIOReader extends DMIO
 {
 	public static class ParseErrorException extends Exception
 	{
@@ -145,22 +145,19 @@ public class DMIOReader
 	
 
 	
-	public static String unquotedStringPunctuationChars = "+-*/%^&|!$@.~";
-	public static String quotedStringPunctuationChars = "+-*/%^&|!$@.~,<>=[]{}~'()` ";
-	public static String inStringUnescapedChars = "[0-9A-Za-z_" + Pattern.quote( quotedStringPunctuationChars ) + "]";
+	public static final String inStringUnescapedChars = "[0-9A-Za-z_" + Pattern.quote( quotedStringPunctuationChars ) + "]";
 	
-	public static String hexCharEscape = Pattern.quote( "\\x" ) + "[0-9A-Fa-f]+" + Pattern.quote( "x" );
-	public static String whitespaceEscape = Pattern.quote( "\\" ) + "[nrt" + Pattern.quote( "\\" ) + "]";
+	public static final String hexCharEscape = Pattern.quote( "\\x" ) + "[0-9A-Fa-f]+" + Pattern.quote( "x" );
+	public static final String whitespaceEscape = Pattern.quote( "\\" ) + "[nrt" + Pattern.quote( "\\" ) + "]";
 	
-	public static String escapeSequence = "(?:" + hexCharEscape + ")|(?:" + whitespaceEscape + ")";
+	public static final String escapeSequence = "(?:" + hexCharEscape + ")|(?:" + whitespaceEscape + ")";
 	
 
-	public static Pattern whitespace = Pattern.compile( "[" + Pattern.quote( " \t\n\r" ) + "]+" );
-	public static Pattern unquotedString = Pattern.compile( "[0-9A-Za-z_" + Pattern.quote( unquotedStringPunctuationChars ) + "]+" );
-	public static Pattern quotedString = Pattern.compile( Pattern.quote( "\"" ) + "(?:" + inStringUnescapedChars + "|" + escapeSequence + ")*" + Pattern.quote( "\"" ) );
-	public static Pattern hexChar = Pattern.compile( hexCharEscape );
-	public static Pattern identifier = Pattern.compile( "[A-Za-z_][0-9A-Za-z_]*" );
-	public static Pattern positiveDecimalInteger = Pattern.compile( "[0-9]+" );
+	public static final Pattern whitespace = Pattern.compile( "[" + Pattern.quote( " \t\n\r" ) + "]+" );
+	public static final Pattern quotedString = Pattern.compile( Pattern.quote( "\"" ) + "(?:" + inStringUnescapedChars + "|" + escapeSequence + ")*" + Pattern.quote( "\"" ) );
+	public static final Pattern hexChar = Pattern.compile( hexCharEscape );
+	public static final Pattern identifier = Pattern.compile( "[A-Za-z_][0-9A-Za-z_]*" );
+	public static final Pattern positiveDecimalInteger = Pattern.compile( "[0-9]+" );
 	
 	
 	
@@ -621,7 +618,7 @@ public class DMIOReader
 						
 						if ( !source.substring( pos, pos+2 ).equals( ">>" ) )
 						{
-							throw new ParseErrorException( pos, "Expected >> to close Java resource" );
+							throw new ParseErrorException( pos, "Expected >> to close Python resource" );
 						}
 						pos += 2;
 						
@@ -796,6 +793,12 @@ public class DMIOReader
 				
 				// Get the schema, and add to the schema table
 				DMSchema schema = resolver.getSchema( value );
+				
+				if ( schema == null )
+				{
+					throw new DMSchema.UnknownSchemaException( value );
+				}
+				
 				// Ensure that the requested version is supported
 				if ( version > schema.getVersion() )
 				{
