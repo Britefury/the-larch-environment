@@ -19,7 +19,7 @@ import org.python.core.PyUnicode;
 import BritefuryJ.DocModel.Resource.DMJavaResource;
 import BritefuryJ.DocModel.Resource.DMPyResource;
 
-public class DMIOWriter
+public class DMIOWriter extends DMIO
 {
 	public static class InvalidDataTypeException extends Exception
 	{
@@ -27,10 +27,7 @@ public class DMIOWriter
 	}
 	
 	
-	public static String unquotedStringPunctuationChars = "+-*/%^&|!$@.~";
-	public static String quotedStringPunctuationChars = "+-*/%^&|!$@.~,<>=[]{}~'()` ";
-	public static Pattern unquotedString = Pattern.compile( "[0-9A-Za-z_" + Pattern.quote( unquotedStringPunctuationChars ) + "]+" );
-	public static Pattern quotedStringContents = Pattern.compile( "[0-9A-Za-z_" + Pattern.quote( quotedStringPunctuationChars ) + "]+" );
+	public static final Pattern quotedStringContents = Pattern.compile( "[0-9A-Za-z_" + Pattern.quote( quotedStringPunctuationChars ) + "]+" );
 	
 	
 	
