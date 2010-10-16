@@ -17,6 +17,7 @@ import org.python.core.PyString;
 import org.python.core.PyUnicode;
 
 import BritefuryJ.DocModel.Resource.DMJavaResource;
+import BritefuryJ.DocModel.Resource.DMPyResource;
 
 public class DMIOWriter
 {
@@ -133,7 +134,15 @@ public class DMIOWriter
 	
 	private void writeJavaResource(StringBuilder builder, DMJavaResource resource) throws InvalidDataTypeException
 	{
-		builder.append( "<<J: " );
+		builder.append( "<<Ja: " );
+		writeString( builder, resource.getSerialisedForm() );
+		builder.append( ">>" );
+	}
+	
+
+	private void writePyResource(StringBuilder builder, DMPyResource resource) throws InvalidDataTypeException
+	{
+		builder.append( "<<Py: " );
 		writeString( builder, resource.getSerialisedForm() );
 		builder.append( ">>" );
 	}
@@ -170,6 +179,10 @@ public class DMIOWriter
 		else if ( content instanceof DMJavaResource )
 		{
 			writeJavaResource( builder, (DMJavaResource)content );
+		}
+		else if ( content instanceof DMPyResource )
+		{
+			writePyResource( builder, (DMPyResource)content );
 		}
 		else
 		{

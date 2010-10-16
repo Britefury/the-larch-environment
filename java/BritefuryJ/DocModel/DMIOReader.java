@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import BritefuryJ.DocModel.Resource.DMJavaResource;
+import BritefuryJ.DocModel.Resource.DMPyResource;
 
 
 public class DMIOReader
@@ -563,9 +564,9 @@ public class DMIOReader
 			{
 				try
 				{
-					if ( source.substring( pos, pos+4 ).equals( "<<J:" ) )
+					if ( source.substring( pos, pos+5 ).equals( "<<Ja:" ) )
 					{
-						pos += 4;
+						pos += 5;
 		
 						MatchResult res;
 		
@@ -595,10 +596,46 @@ public class DMIOReader
 						DMJavaResource resource = DMJavaResource.serialisedResource( serialised );
 						closeItem( resource );
 					}
+					else if ( source.substring( pos, pos+5 ).equals( "<<Py:" ) )
+					{
+						pos += 5;
+		
+						MatchResult res;
+		
+						// Whitespace
+						res = match( whitespace, source, pos );
+						if ( res == null )
+						{
+							throw new ParseErrorException( pos, "Expected whitespace after opening Python resource" );
+						}
+						pos = res.position;
+		
+						// Atom
+						res = matchAtom( source, pos );
+						if ( res == null )
+						{
+							throw new ParseErrorException( pos, "Expected content after opening Python resource" );
+						}
+						pos = res.position;
+						String serialised = res.value;
+						
+						if ( !source.substring( pos, pos+2 ).equals( ">>" ) )
+						{
+							throw new ParseErrorException( pos, "Expected >> to close Java resource" );
+						}
+						pos += 2;
+						
+						DMPyResource resource = DMPyResource.serialisedResource( serialised );
+						closeItem( resource );
+					}
+					else
+					{
+						throw new ParseErrorException( pos, "Invalid resource" );
+					}
 				}
 				catch (StringIndexOutOfBoundsException e)
 				{
-					throw new ParseErrorException( pos, "Insufficient data for Java resource" );
+					throw new ParseErrorException( pos, "Insufficient data for resource" );
 				}
 			}
 			else

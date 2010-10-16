@@ -104,6 +104,25 @@ def ObjectDispatchMethod(*classes):
 		
 
 		
+_methodTables = {}
+
+def _getMethodTableForClass(cls):
+	try:
+		return _methodTables[cls]
+	except KeyError:
+		# Gather the relevant methods for this class
+		methodTable = {}
+		# Add entries to the method table
+		for k, v in cls.__dict__.items():
+			if isinstance( v, ObjectDispatchMethodWrapper ):
+				method = v
+				for c in v._classes:
+					methodTable[c] = method
+		_methodTables[cls] = methodTable
+		return methodTable
+
+
+
 def _initDispatchTableForClass(cls):
 	try:
 		numArgs = cls.__dispatch_num_args__
@@ -115,24 +134,16 @@ def _initDispatchTableForClass(cls):
 	# The dispatch table stores those, in addition to mappings for subclasses of the object class
 	# The method table is copied from base classes
 
-	# Initialise method table with entries from base classes
-	cls.__method_table__ = {}
+	# Gather methods from base classes
+	fullMethodTable = {}
 	for base in cls.mro():
-		try:
-			cls.__method_table__.update( base.__method_table__ )
-		except AttributeError:
-			pass
+		fullMethodTable.update( _getMethodTableForClass( base ) )
+		
+	# Incorporate methods from @cls
+	fullMethodTable.update( _getMethodTableForClass( cls ) )
 
-	# Add entries to the method table
-	for k, v in cls.__dict__.items():
-		if isinstance( v, ObjectDispatchMethodWrapper ):
-			method = v
-			for c in v._classes:
-				cls.__method_table__[c] = method
-
-			
-	# Initialise the dispatch table to a copy of the method table
-	cls.__dispatch_table__ = copy.copy( cls.__method_table__ )
+	# Initialise the dispatch table
+	cls.__dispatch_table__ = fullMethodTable
 	return cls.__dispatch_table__
 
 		

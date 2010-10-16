@@ -5,19 +5,12 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from Britefury.Dispatch.MethodDispatch import methodDispatch
 from Britefury.Dispatch.DMObjectNodeMethodDispatch import dmObjectNodeMethodDispatch
 
 
 
 
 
-class GSymCodeGeneratorListNodeDispatch (object):
-	def __call__(self, xs):
-		return methodDispatch( self, xs )
-
-	
-	
 class GSymCodeGeneratorObjectNodeDispatch (object):
 	def __call__(self, xs):
 		return dmObjectNodeMethodDispatch( self, xs )

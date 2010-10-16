@@ -12,6 +12,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.python.core.PyInteger;
+import org.python.core.PyObject;
+import org.python.core.PyTuple;
+
 import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMIOReader;
 import BritefuryJ.DocModel.DMIOWriter;
@@ -19,6 +23,7 @@ import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMSchema;
 import BritefuryJ.DocModel.Resource.DMJavaResource;
+import BritefuryJ.DocModel.Resource.DMPyResource;
 
 public class Test_DMIOWriter extends TestCase
 {
@@ -259,8 +264,16 @@ public class Test_DMIOWriter extends TestCase
 	
 	public void testWriteJavaResource() throws IOException
 	{
-		DMJavaResource r = new DMJavaResource( Color.RED );
-		writeTest( r, "<<J: " + DMIOWriter.stringAsAtom( DMJavaResource.serialise( Color.RED ) ) + ">>" );
+		DMJavaResource jr = new DMJavaResource( Color.RED );
+		writeTest( jr, "<<Ja: " + DMIOWriter.stringAsAtom( DMJavaResource.serialise( Color.RED ) ) + ">>" );
+	}
+
+
+	public void testWritePyResource() throws IOException
+	{
+		PyObject pyValue = new PyTuple( new PyInteger( 1 ), new PyInteger( 2 ), new PyInteger( 3 ) );
+		DMPyResource pr = new DMPyResource( pyValue );
+		writeTest( pr, "<<Py: " + DMIOWriter.stringAsAtom( DMPyResource.serialise( pyValue ) ) + ">>" );
 	}
 
 
@@ -291,8 +304,10 @@ public class Test_DMIOWriter extends TestCase
 
 	public void testWriteNestedResource() throws IOException
 	{
-		DMJavaResource r = new DMJavaResource( Color.RED );
-		List<Object> x = Arrays.asList( new Object[] { r, "abc" } );
-		writeTest( x, "[<<J: " + DMIOWriter.stringAsAtom( DMJavaResource.serialise( Color.RED ) ) + ">> abc]" );
+		DMJavaResource jr = new DMJavaResource( Color.RED );
+		PyObject pyValue = new PyTuple( new PyInteger( 1 ), new PyInteger( 2 ), new PyInteger( 3 ) );
+		DMPyResource pr = new DMPyResource( pyValue );
+		List<Object> x = Arrays.asList( new Object[] { jr, pr, "abc" } );
+		writeTest( x, "[<<Ja: " + DMIOWriter.stringAsAtom( DMJavaResource.serialise( Color.RED ) ) + ">> <<Py: " + DMIOWriter.stringAsAtom( DMPyResource.serialise( pyValue ) ) + ">> abc]" );
 	}
 }
