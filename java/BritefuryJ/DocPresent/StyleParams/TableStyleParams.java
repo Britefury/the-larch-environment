@@ -6,14 +6,18 @@
 //##************************
 package BritefuryJ.DocPresent.StyleParams;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Paint;
+import java.awt.Stroke;
 
 import BritefuryJ.DocPresent.Painter.Painter;
 
 
 public class TableStyleParams extends ContainerStyleParams
 {
-	public static final TableStyleParams defaultStyleParams = new TableStyleParams( null, null, null, 0.0, false, 0.0, false );
+	public static final TableStyleParams defaultStyleParams = new TableStyleParams( null, null, null, 3.0, false, 3.0, false, new BasicStroke( 1.0f ), Color.BLACK );
 	
 	
 	protected final double columnSpacing;
@@ -21,9 +25,13 @@ public class TableStyleParams extends ContainerStyleParams
 
 	protected final double rowSpacing;
 	protected final boolean rowExpand;
+	
+	protected final Stroke cellStroke;
+	protected final Paint cellPaint;
 
 
-	public TableStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, double columnSpacing, boolean columnExpand, double rowSpacing, boolean rowExpand)
+	public TableStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, double columnSpacing, boolean columnExpand, double rowSpacing, boolean rowExpand,
+			Stroke cellStroke, Paint cellPaint)
 	{
 		super( background, hoverBackground, pointerCursor );
 		
@@ -32,6 +40,9 @@ public class TableStyleParams extends ContainerStyleParams
 
 		this.rowSpacing = rowSpacing;
 		this.rowExpand = rowExpand;
+		
+		this.cellStroke = cellStroke;
+		this.cellPaint = cellPaint;
 	}
 
 
@@ -54,5 +65,16 @@ public class TableStyleParams extends ContainerStyleParams
 	public boolean getRowExpand()
 	{
 		return rowExpand;
+	}
+
+
+	public Stroke getCellStroke()
+	{
+		return cellStroke;
+	}
+	
+	public Paint getCellPaint()
+	{
+		return cellPaint;
 	}
 }

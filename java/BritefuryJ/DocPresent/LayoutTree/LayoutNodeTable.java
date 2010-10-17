@@ -317,6 +317,38 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 			return null;
 		}
 	}
+	
+	
+	
+	//
+	//
+	// COLUMN AND ROW QUERY METHODS
+	//
+	//
+	
+	public double getColumnLeft(int column)
+	{
+		LAllocBox box = columnAllocBoxes[column];
+		return box.getPositionInParentSpace().x;
+	}
+
+	public double getColumnRight(int column)
+	{
+		LAllocBox box = columnAllocBoxes[column];
+		return box.getPositionInParentSpace().x + box.getWidth();
+	}
+
+	public double getRowTop(int row)
+	{
+		LAllocBox box = rowAllocBoxes[row];
+		return box.getPositionInParentSpace().y;
+	}
+
+	public double getRowBottom(int row)
+	{
+		LAllocBox box = rowAllocBoxes[row];
+		return box.getPositionInParentSpace().y + box.getHeight();
+	}
 
 
 	
