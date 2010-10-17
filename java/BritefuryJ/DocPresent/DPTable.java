@@ -6,6 +6,10 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Stroke;
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -50,6 +54,7 @@ public class DPTable extends DPContainer
 
 	private TableChildEntry[][] childEntryTable;
 	private ArrayList<TableChildEntry> childEntries;
+	private double columnLines[][], rowLines[][];
 	private int rowStartIndices[];			// Indices into @childEntries, where each row starts
 	private int numColumns, numRows;		// Can be -1, indicating that these values must be refreshed
 
@@ -316,7 +321,7 @@ public class DPTable extends DPContainer
 		{
 			// Empty; initialise from blank
 			numColumns = 0;
-			numRows = cellTable.length;
+			numRows = 0;
 
 			// - Count children
 			// - Generate row positions
@@ -328,27 +333,16 @@ public class DPTable extends DPContainer
 			for (TableCell[] row: cellTable)
 			{
 				rowStartIndices[rowI] = n;
-				int numColumnsForThisRow = 0;
-				if ( row.length > 0 )
-				{
-					numColumnsForThisRow = row.length;
-					TableCell lastCell = row[row.length-1];
-					if ( lastCell != null )
-					{
-						if ( lastCell.colSpan > 1 )
-						{
-							numColumnsForThisRow += lastCell.colSpan - 1;
-						}
-					}
-				}
-				numColumns = Math.max( numColumns, numColumnsForThisRow );
-				
+				int colI = 0;
 				for (TableCell cell: row)
 				{
 					if ( cell != null )
 					{
+						numColumns = Math.max( numColumns, colI + cell.colSpan );
+						numRows = Math.max( numRows, rowI + cell.rowSpan );
 						n++;
 					}
+					colI++;
 				}
 				rowI++;
 			}
@@ -362,11 +356,10 @@ public class DPTable extends DPContainer
 			childEntries.ensureCapacity( n );
 			for (TableCell[] row: cellTable)
 			{
-				TableChildEntry destRow[] = new TableChildEntry[row.length];
+				TableChildEntry destRow[] = new TableChildEntry[numColumns];
 				childEntryTable[rowI] = destRow;
 
 				rowStartIndices[rowI] = registeredChildren.size();
-				numColumns = Math.max( numColumns, row.length );
 				
 				int columnI = 0;
 				for (TableCell cell: row)
@@ -389,7 +382,7 @@ public class DPTable extends DPContainer
 			HashSet<DPElement> items, added, removed;
 			
 			numColumns = 0;
-			numRows = cellTable.length;
+			numRows = 0;
 			// Get a set of items being introduced
 			items = new HashSet<DPElement>();
 			for (TableCell[] row: cellTable)
@@ -425,28 +418,16 @@ public class DPTable extends DPContainer
 			for (TableCell[] row: cellTable)
 			{
 				rowStartIndices[rowI] = n;
-				
-				int numColumnsForThisRow = 0;
-				if ( row.length > 0 )
-				{
-					numColumnsForThisRow = row.length;
-					TableCell lastCell = row[row.length-1];
-					if ( lastCell != null )
-					{
-						if ( lastCell.colSpan > 1 )
-						{
-							numColumnsForThisRow += lastCell.colSpan - 1;
-						}
-					}
-				}
-				numColumns = Math.max( numColumns, numColumnsForThisRow );
-				
+				int colI = 0;
 				for (TableCell cell: row)
 				{
 					if ( cell != null )
 					{
+						numColumns = Math.max( numColumns, colI + cell.colSpan );
+						numRows = Math.max( numRows, rowI + cell.rowSpan );
 						n++;
 					}
+					colI++;
 				}
 				rowI++;
 			}
@@ -464,7 +445,6 @@ public class DPTable extends DPContainer
 				childEntryTable[rowI] = destRow;
 
 				rowStartIndices[rowI] = registeredChildren.size();
-				numColumns = Math.max( numColumns, row.length );
 				
 				int columnI = 0;
 				for (TableCell cell: row)
@@ -842,6 +822,191 @@ public class DPTable extends DPContainer
 	}
 	
 	
+	
+	
+
+	//
+	//
+	// QUEUE RESIZE
+	//
+	//
+	
+	@Override
+	protected void queueResize()
+	{
+		super.queueResize();
+		
+		// Reset column and row lines
+		columnLines = null;
+		rowLines = null;
+	}
+	
+	
+	
+	
+	//
+	//
+	// CELL BOUNDARY LINES
+	//
+	//
+	
+	private int[] getColumnLineSpanStartingAt(int columnLine, int row)
+	{
+		int start;
+		for (start = row; start < numRows; start++)
+		{
+			if ( childEntryTable[start][columnLine] != null  &&  childEntryTable[start][columnLine+1] != null )
+			{
+				break;
+			}
+		}
+		
+		int end;
+		for (end = start; end < numRows; end++)
+		{
+			if ( childEntryTable[end][columnLine] == null  ||  childEntryTable[end][columnLine+1] == null )
+			{
+				break;
+			}
+		}
+		return new int[] { start, end - 1 };
+	}
+	
+	private int[] getRowLineSpanStartingAt(int rowLine, int column)
+	{
+		int start;
+		for (start = column; start < numColumns; start++)
+		{
+			if ( childEntryTable[rowLine][start] != null  &&  childEntryTable[rowLine+1][start] != null )
+			{
+				break;
+			}
+		}
+		
+		int end;
+		for (end = start; end < numRows; end++)
+		{
+			if ( childEntryTable[rowLine][end] == null  ||  childEntryTable[rowLine+1][end] == null )
+			{
+				break;
+			}
+		}
+		return new int[] { start, end - 1 };
+	}
+	
+	
+	private void refreshBoundaries()
+	{
+		if ( ( columnLines == null  ||  rowLines == null )  &&  getCellPaint() != null )
+		{
+			refreshSize();
+			columnLines = new double[numColumns-1][];
+			rowLines = new double[numRows-1][];
+			LayoutNodeTable layout = (LayoutNodeTable)getLayoutNode();
+			
+			ArrayList<Double> spanStarts = new ArrayList<Double>();
+			ArrayList<Double> spanEnds = new ArrayList<Double>();
+
+			for (int columnLine = 0; columnLine < numColumns-1; columnLine++)
+			{
+				spanStarts.clear();
+				spanEnds.clear();
+				int y = 0;
+				while ( y < numRows )
+				{
+					int spanIndices[] = getColumnLineSpanStartingAt( columnLine, y );
+					spanStarts.add( layout.getRowTop( spanIndices[0] ) );
+					spanEnds.add( layout.getRowBottom( spanIndices[1] ) );
+					y = spanIndices[1] + 1;
+				}
+				
+				double col[] = new double[spanStarts.size()*2+1];
+				col[0] = layout.getColumnRight( columnLine )  +  getColumnSpacing() * 0.5;
+				for (int i = 0; i < spanStarts.size(); i++)
+				{
+					col[i*2+1] = spanStarts.get( i );
+					col[i*2+2] = spanEnds.get( i );
+				}
+				columnLines[columnLine] = col;
+			}
+			
+			for (int rowLine = 0; rowLine < numRows-1; rowLine++)
+			{
+				spanStarts.clear();
+				spanEnds.clear();
+				int x = 0;
+				while ( x < numColumns )
+				{
+					int spanIndices[] = getRowLineSpanStartingAt( rowLine, x );
+					spanStarts.add( layout.getColumnLeft( spanIndices[0] ) );
+					spanEnds.add( layout.getColumnRight( spanIndices[1] ) );
+					x = spanIndices[1] + 1;
+				}
+				
+				double row[] = new double[spanStarts.size()*2+1];
+				row[0] = layout.getRowBottom( rowLine )  +  getRowSpacing() * 0.5;
+				for (int i = 0; i < spanStarts.size(); i++)
+				{
+					row[i*2+1] = spanStarts.get( i );
+					row[i*2+2] = spanEnds.get( i );
+				}
+				rowLines[rowLine] = row;
+			}
+		}
+	}
+
+	
+	//
+	//
+	// DRAW BACKGROUND
+	//
+	//
+	
+	@Override
+	protected void drawBackground(Graphics2D graphics)
+	{
+		super.drawBackground( graphics );
+		
+		Paint cellPaint = getCellPaint();
+		if ( cellPaint != null )
+		{
+			refreshBoundaries();
+			
+			Paint prevPaint = graphics.getPaint();
+			graphics.setPaint( cellPaint );
+			Stroke prevStroke = graphics.getStroke();
+			graphics.setStroke( getCellStroke() );
+			
+			for (double col[]: columnLines)
+			{
+				double x = col[0];
+				for (int i = 1; i < col.length; i += 2)
+				{
+					double y1 = col[i], y2 = col[i+1];
+					Line2D.Double line = new Line2D.Double( x, y1, x, y2 );
+					graphics.draw( line );
+				}
+			}
+			
+			for (double row[]: rowLines)
+			{
+				double y = row[0];
+				for (int i = 1; i < row.length; i += 2)
+				{
+					double x1 = row[i], x2 = row[i+1];
+					Line2D.Double line = new Line2D.Double( x1, y, x2, y );
+					graphics.draw( line );
+				}
+			}
+			
+			graphics.setPaint( prevPaint );
+			graphics.setStroke( prevStroke );
+		}
+	}
+
+	
+	
+	
 
 	//
 	//
@@ -868,5 +1033,16 @@ public class DPTable extends DPContainer
 	protected boolean getRowExpand()
 	{
 		return ((TableStyleParams) styleParams).getRowExpand();
+	}
+
+
+	public Stroke getCellStroke()
+	{
+		return ((TableStyleParams) styleParams).getCellStroke();
+	}
+	
+	public Paint getCellPaint()
+	{
+		return ((TableStyleParams) styleParams).getCellPaint();
 	}
 }
