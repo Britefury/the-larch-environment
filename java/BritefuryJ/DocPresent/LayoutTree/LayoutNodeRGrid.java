@@ -44,6 +44,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 		int numRows = leaves.length;
 		int numColumns = grid.width();
 		LReqBoxInterface childBoxes[][] = new LReqBoxInterface[numRows][];
+		boolean bRowIsGridRow[] = new boolean[numRows];
 		for (int i = 0; i < leaves.length; i++)
 		{
 			DPElement child = leaves[i];
@@ -51,14 +52,16 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 			{
 				DPGridRow row = (DPGridRow)child;
 				childBoxes[i] = ((LayoutNodeGridRow)row.getLayoutNode()).getLeavesRefreshedRequisitonXBoxes();
+				bRowIsGridRow[i] = true;
 			}
 			else
 			{
 				childBoxes[i] = new LReqBoxInterface[] { child.getLayoutNode().refreshRequisitionX() };
+				bRowIsGridRow[i] = false;
 			}
 		}
 		
-		columnBoxes = GridLayout.computeRequisitionX( layoutReqBox, childBoxes, numColumns, numRows, getColumnSpacing(), getRowSpacing() );
+		columnBoxes = GridLayout.computeRequisitionX( layoutReqBox, childBoxes, bRowIsGridRow, numColumns, numRows, getColumnSpacing(), getRowSpacing() );
 
 		// Copy the X-requisition to the child rows
 		for (int i = 0; i < leaves.length; i++)
@@ -112,6 +115,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 		LAllocBoxInterface childAllocBoxes[][] = new LAllocBoxInterface[numRows][];
 		double prevWidths[][] = new double[numRows][];
 		int childAlignmentFlags[][] = new int[numRows][];
+		boolean bRowIsGridRow[] = new boolean[numRows];
 		for (int i = 0; i < leaves.length; i++)
 		{
 			DPElement child = leaves[i];
@@ -125,6 +129,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 				childAlignmentFlags[i] = rowLayoutNode.getLeavesAlignmentFlags();
 				// Copy grid x-allocation to row x-allocation
 				LAllocHelper.allocateX( rowLayoutNode.getAllocationBox(), getAllocationBox() );
+				bRowIsGridRow[i] = true;
 			}
 			else
 			{
@@ -133,10 +138,11 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 				childAllocBoxes[i] = new LAllocBoxInterface[] { childLayoutNode.getAllocationBox() };
 				prevWidths[i] = new double[] { child.getAllocationX() };
 				childAlignmentFlags[i] = new int[] { child.getAlignmentFlags() };
+				bRowIsGridRow[i] = false;
 			}
 		}
 
-		GridLayout.allocateX( layoutReqBox, columnBoxes, childBoxes, getAllocationBox(), columnAllocBoxes, childAllocBoxes, childAlignmentFlags, grid.width(), numRows,
+		GridLayout.allocateX( layoutReqBox, columnBoxes, childBoxes, getAllocationBox(), columnAllocBoxes, childAllocBoxes, childAlignmentFlags, bRowIsGridRow, grid.width(), numRows,
 				getColumnSpacing(), getRowSpacing(), getColumnExpand(), getRowExpand() );
 		
 		for (int r = 0; r < leaves.length; r++)
