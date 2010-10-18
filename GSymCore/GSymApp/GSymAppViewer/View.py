@@ -51,7 +51,7 @@ from GSymCore.PythonConsole import Console
 _appDocRightPadding = 30.0
 _controlsPadding = 5.0
 _appDocumentControlsStyle = StyleSheet.instance.withAttr( Primitive.rowSpacing, 20.0 ).withAttr( Primitive.border, FilledBorder( 5.0, 5.0, 5.0, 5.0, Color( 0.9, 0.9, 0.9 ) ) )
-_dcumentListTableStyle = StyleSheet.instance.withAttr( Primitive.tableColumnSpacing, 15.0 ).withAttr( Primitive.tableRowSpacing, 5.0 )
+_documentListTableStyle = StyleSheet.instance.withAttr( Primitive.tableColumnSpacing, 15.0 ).withAttr( Primitive.tableRowSpacing, 5.0 ).withAttr( Primitive.tableBorder, None ).withAttr( Primitive.tableCellBoundaryPaint, None )
 
 
 
@@ -98,7 +98,7 @@ def _contentsList(controls, contentsLists, title):
 
 	openDocumentsSeparator = HSeparator()
 	
-	docListBox = _dcumentListTableStyle.applyTo( RGrid( contentsLists ) )
+	docListBox = _documentListTableStyle.applyTo( RGrid( contentsLists ) )
 
 	contentsBox = Column( [ controlsBorder.pad( 2.0, 2.0 ), openDocumentsSeparator, docListBox.pad( 10.0, 2.0 ) ] )
 	
