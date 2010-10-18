@@ -38,7 +38,7 @@ public class DMJavaResource extends DMResource
 		}
 		catch (IOException e)
 		{
-			throw new RuntimeException( "IOException while creating serialised form" );
+			throw new RuntimeException( "IOException while creating serialised form: " + e.getMessage() );
 		}
 	}
 	
@@ -71,15 +71,15 @@ public class DMJavaResource extends DMResource
 			}
 			catch (UnsupportedEncodingException e)
 			{
-				throw new RuntimeException( "Cannot get UTF-8 encoding" );
+				throw new RuntimeException( "Cannot get UTF-8 encoding: " + e.getMessage() );
 			}
 			catch (IOException e)
 			{
-				throw new RuntimeException( "IOException while reading from serialised form: " + e.toString() );
+				throw new RuntimeException( "IOException while reading from serialised form: " + e.getMessage() );
 			}
 			catch (ClassNotFoundException e)
 			{
-				throw new RuntimeException( "Cannot read object; class not found" );
+				throw new RuntimeException( "Cannot read object; class not found: " + e.getMessage() );
 			}
 		}
 		
@@ -96,7 +96,7 @@ public class DMJavaResource extends DMResource
 		}
 		catch (IOException e)
 		{
-			throw new RuntimeException( "IOException while creating serialised form" );
+			throw new RuntimeException( "IOException while creating serialised form: " + e.getMessage() );
 		}
 	}
 	

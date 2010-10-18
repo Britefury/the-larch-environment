@@ -9,6 +9,7 @@ package BritefuryJ.Math;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.io.Serializable;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
@@ -20,8 +21,10 @@ import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
-public class Vector2 implements Cloneable, Presentable
+public class Vector2 implements Cloneable, Presentable, Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	public double x, y;
 	
 	

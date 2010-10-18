@@ -6,12 +6,16 @@
 //##************************
 package BritefuryJ.Utils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class PriorityList <T> implements Iterable<T>
+public class PriorityList <T> implements Iterable<T>, Serializable
 {
+	private static final long serialVersionUID = 1L;
+
+	
 	private static class Entry <T>
 	{
 		private int priority;

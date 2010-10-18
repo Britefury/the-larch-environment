@@ -7,9 +7,13 @@
 //##************************
 package BritefuryJ.Math;
 
+import java.io.Serializable;
 
-public class AABox2 implements Cloneable
+
+public class AABox2 implements Cloneable, Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	private double lowerX, lowerY, upperX, upperY;
 	
 	

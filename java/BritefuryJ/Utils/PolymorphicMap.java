@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.Utils;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Stack;
@@ -14,8 +15,11 @@ import org.python.core.PyObject;
 import org.python.core.PyTuple;
 import org.python.core.PyType;
 
-public class PolymorphicMap <ValueType extends Object>
+public class PolymorphicMap <ValueType extends Object> implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
+
 	private static class Entry <ValueType extends Object>
 	{
 		private ValueType value;
