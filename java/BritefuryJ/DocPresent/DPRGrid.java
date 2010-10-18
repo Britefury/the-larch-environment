@@ -6,6 +6,12 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Stroke;
+import java.awt.geom.Line2D;
+import java.util.BitSet;
+
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeGridRow;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeRGrid;
 import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
@@ -81,7 +87,83 @@ public class DPRGrid extends DPContainerSequence
 	
 	
 
+	//
+	//
+	// CELL BOUNDARY LINES
+	//
+	//
+	
+	protected static int[] getSpanFromBitSet(BitSet bits, int startIndex)
+	{
+		int start = bits.nextSetBit( startIndex );
+		if ( start == -1 )
+		{
+			return new int[] { -1, -1 };
+		}
+		int end = bits.nextClearBit( start );
+		if ( end == -1 )
+		{
+			end = bits.length();
+		}
+		return new int[] { start, end - 1 };
+	}
+	
+	
 
+
+	//
+	//
+	// DRAW BACKGROUND
+	//
+	//
+	
+	@Override
+	protected void drawBackground(Graphics2D graphics)
+	{
+		super.drawBackground( graphics );
+		
+		Paint cellPaint = getCellPaint();
+		if ( cellPaint != null )
+		{
+			LayoutNodeRGrid layout = (LayoutNodeRGrid)getLayoutNode();
+			double columnLines[][] = layout.getColumnLines();
+			double rowLines[][] = layout.getRowLines();
+			
+			Paint prevPaint = graphics.getPaint();
+			graphics.setPaint( cellPaint );
+			Stroke prevStroke = graphics.getStroke();
+			graphics.setStroke( getCellStroke() );
+			
+			for (double col[]: columnLines)
+			{
+				double x = col[0];
+				for (int i = 1; i < col.length; i += 2)
+				{
+					double y1 = col[i], y2 = col[i+1];
+					Line2D.Double line = new Line2D.Double( x, y1, x, y2 );
+					graphics.draw( line );
+				}
+			}
+			
+			for (double row[]: rowLines)
+			{
+				double y = row[0];
+				for (int i = 1; i < row.length; i += 2)
+				{
+					double x1 = row[i], x2 = row[i+1];
+					Line2D.Double line = new Line2D.Double( x1, y, x2, y );
+					graphics.draw( line );
+				}
+			}
+			
+			graphics.setPaint( prevPaint );
+			graphics.setStroke( prevStroke );
+		}
+	}
+
+	
+	
+	
 
 	//
 	//
@@ -108,5 +190,16 @@ public class DPRGrid extends DPContainerSequence
 	protected boolean getRowExpand()
 	{
 		return ((TableStyleParams) styleParams).getRowExpand();
+	}
+
+
+	public Stroke getCellStroke()
+	{
+		return ((TableStyleParams) styleParams).getCellStroke();
+	}
+	
+	public Paint getCellPaint()
+	{
+		return ((TableStyleParams) styleParams).getCellPaint();
 	}
 }

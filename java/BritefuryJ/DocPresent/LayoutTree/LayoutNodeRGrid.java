@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.DocPresent.LayoutTree;
 
+import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPGridRow;
@@ -26,6 +28,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 {
 	private LReqBoxInterface columnBoxes[], rowBoxes[];
 	private LAllocBoxInterface columnAllocBoxes[], rowAllocBoxes[];
+	private double columnLines[][], rowLines[][];
 
 
 	public LayoutNodeRGrid(DPRGrid element)
@@ -189,7 +192,8 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 		}
 		
 		columnBoxes = rowBoxes = null;
-		columnAllocBoxes = rowAllocBoxes = null;
+		rowAllocBoxes = null;
+		// Do not clear columnAllocBoxes - they are needed
 	}
 	
 	
@@ -223,6 +227,179 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 
 	
 	
+
+	//
+	//
+	// CELL BOUNDARY LINES
+	//
+	//
+	
+	protected static int[] getSpanFromBitSet(BitSet bits, int startIndex)
+	{
+		int start = bits.nextSetBit( startIndex );
+		if ( start == -1 )
+		{
+			return new int[] { -1, -1 };
+		}
+		int end = bits.nextClearBit( start );
+		if ( end == -1 )
+		{
+			end = bits.length();
+		}
+		return new int[] { start, end - 1 };
+	}
+	
+	
+	
+	public void queueResize()
+	{
+		super.queueResize();
+		
+		columnLines = null;
+		rowLines = null;
+	}
+	
+	private void refreshBoundaries()
+	{
+		DPRGrid grid = (DPRGrid)element;
+		if ( ( columnLines == null  ||  rowLines == null )  &&  grid.getCellPaint() != null )
+		{
+			int numColumns = grid.width();
+			int numRows = leaves.length;
+			int numColLines = Math.max( numColumns - 1, 0 );
+			int numRowLines = Math.max( numRows - 1, 0 );
+			columnLines = new double[numColLines][];
+			rowLines = new double[numRowLines][];
+			
+			
+			// Create and initialise bitsets for the column and row lines
+			BitSet columnBits[] = new BitSet[numColLines];
+			BitSet rowBits[] = new BitSet[numRowLines];
+			
+			for (int i = 0; i < columnBits.length; i++)
+			{
+				columnBits[i] = new BitSet( numRows );
+			}
+			for (int i = 0; i < rowBits.length; i++)
+			{
+				rowBits[i] = new BitSet( numColumns );
+			}
+			
+			
+			// For each cell, set the bits that mark its boundary
+			int r = 0;
+			for (DPElement rowElement: leaves)
+			{
+				if ( rowElement instanceof DPGridRow )
+				{
+					// A grid row
+					DPGridRow row = (DPGridRow)rowElement;
+					LayoutNodeGridRow rowLayout = (LayoutNodeGridRow)row.getLayoutNode();
+					int rowSize = rowLayout.getLeaves().size();
+					
+					// Set 
+					for (int c = 0; c < rowSize; c++)
+					{
+						if ( r > 0 )
+						{
+							rowBits[r-1].set( c );
+						}
+						if ( r < numRowLines )
+						{
+							rowBits[r].set( c );
+						}
+						if ( c < numColLines )
+						{
+							columnBits[c].set( r );
+						}
+					}
+				}
+				else
+				{
+					// Not a GridRow; expands to fill full width - activate all lines on surrounding rows
+					for (int c = 0; c < numColumns; c++)
+					{
+						if ( r > 0 )
+						{
+							rowBits[r-1].set( c );
+						}
+						if ( r < numRowLines )
+						{
+							rowBits[r].set( c );
+						}
+					}
+				}
+				r++;
+			}
+			
+			ArrayList<Double> spanStarts = new ArrayList<Double>();
+			ArrayList<Double> spanEnds = new ArrayList<Double>();
+			
+			double halfColumnSpacing = getColumnSpacing() * 0.5;
+			double halfRowSpacing = getRowSpacing() * 0.5;
+
+			for (int columnLine = 0; columnLine < numColLines; columnLine++)
+			{
+				spanStarts.clear();
+				spanEnds.clear();
+				int y = 0;
+				while ( y < numRows )
+				{
+					int spanIndices[] = getSpanFromBitSet( columnBits[columnLine], y );
+					if ( spanIndices[0] == -1  ||  spanIndices[1] == -1 )
+					{
+						break;
+					}
+					double topSpacing = spanIndices[0] == 0  ?  0.0  :  halfRowSpacing;
+					double bottomSpacing = spanIndices[1] == numRows-1  ?  0.0  :  halfRowSpacing;
+					spanStarts.add( getRowTop( spanIndices[0] ) - topSpacing );
+					spanEnds.add( getRowBottom( spanIndices[1] ) + bottomSpacing );
+					y = spanIndices[1] + 1;
+				}
+				
+				double col[] = new double[spanStarts.size()*2+1];
+				col[0] = getColumnRight( columnLine )  +  halfColumnSpacing;
+				for (int i = 0; i < spanStarts.size(); i++)
+				{
+					col[i*2+1] = spanStarts.get( i );
+					col[i*2+2] = spanEnds.get( i );
+				}
+				columnLines[columnLine] = col;
+			}
+			
+			for (int rowLine = 0; rowLine < numRowLines; rowLine++)
+			{
+				spanStarts.clear();
+				spanEnds.clear();
+				int x = 0;
+				while ( x < numColumns )
+				{
+					int spanIndices[] = getSpanFromBitSet( rowBits[rowLine], x );
+					if ( spanIndices[0] == -1  ||  spanIndices[1] == -1 )
+					{
+						break;
+					}
+					double leftSpacing = spanIndices[0] == 0  ?  0.0  :  halfColumnSpacing;
+					double rightSpacing = spanIndices[1] == numColumns-1  ?  0.0  :  halfColumnSpacing;
+					spanStarts.add( getColumnLeft( spanIndices[0] ) - leftSpacing );
+					spanEnds.add( getColumnRight( spanIndices[1] ) + rightSpacing );
+					x = spanIndices[1] + 1;
+				}
+				
+				double row[] = new double[spanStarts.size()*2+1];
+				row[0] = getRowBottom( rowLine )  +  halfRowSpacing;
+				for (int i = 0; i < spanStarts.size(); i++)
+				{
+					row[i*2+1] = spanStarts.get( i );
+					row[i*2+2] = spanEnds.get( i );
+				}
+				rowLines[rowLine] = row;
+			}
+		}
+	}
+
+	
+
 	//
 	// Focus navigation methods
 	//
@@ -239,6 +416,51 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 
 
 
+	//
+	//
+	// COLUMN AND ROW QUERY METHODS
+	//
+	//
+	
+	public double getColumnLeft(int column)
+	{
+		LAllocBoxInterface box = columnAllocBoxes[column];
+		return box.getAllocPositionInParentSpaceX();
+	}
+
+	public double getColumnRight(int column)
+	{
+		LAllocBoxInterface box = columnAllocBoxes[column];
+		return box.getAllocPositionInParentSpaceX() + box.getWidth();
+	}
+
+	public double getRowTop(int row)
+	{
+		LAllocBoxInterface box = leaves[row].getLayoutNode().getAllocationBox();
+		return box.getAllocPositionInParentSpaceY();
+	}
+
+	public double getRowBottom(int row)
+	{
+		LAllocBoxInterface box = leaves[row].getLayoutNode().getAllocationBox();
+		return box.getAllocPositionInParentSpaceY() + box.getHeight();
+	}
+	
+	public double[][] getColumnLines()
+	{
+		refreshBoundaries();
+		return columnLines;
+	}
+
+	public double[][] getRowLines()
+	{
+		refreshBoundaries();
+		return rowLines;
+	}
+
+	
+	
+	
 	//
 	//
 	// STYLE METHODS
