@@ -328,26 +328,26 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 	
 	public double getColumnLeft(int column)
 	{
-		LAllocBox box = columnAllocBoxes[column];
-		return box.getPositionInParentSpace().x;
+		LAllocBoxInterface box = columnAllocBoxes[column];
+		return box.getAllocPositionInParentSpaceX();
 	}
 
 	public double getColumnRight(int column)
 	{
-		LAllocBox box = columnAllocBoxes[column];
-		return box.getPositionInParentSpace().x + box.getWidth();
+		LAllocBoxInterface box = columnAllocBoxes[column];
+		return box.getAllocPositionInParentSpaceX() + box.getWidth();
 	}
 
 	public double getRowTop(int row)
 	{
-		LAllocBox box = rowAllocBoxes[row];
-		return box.getPositionInParentSpace().y;
+		LAllocBoxInterface box = rowAllocBoxes[row];
+		return box.getAllocPositionInParentSpaceY();
 	}
 
 	public double getRowBottom(int row)
 	{
-		LAllocBox box = rowAllocBoxes[row];
-		return box.getPositionInParentSpace().y + box.getHeight();
+		LAllocBoxInterface box = rowAllocBoxes[row];
+		return box.getAllocPositionInParentSpaceY() + box.getHeight();
 	}
 
 
