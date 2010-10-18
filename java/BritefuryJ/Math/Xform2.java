@@ -9,9 +9,12 @@ package BritefuryJ.Math;
 
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.io.Serializable;
 
-public class Xform2 implements Cloneable
+public class Xform2 implements Cloneable, Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final Xform2 identity = new Xform2();
 	
 	

@@ -416,13 +416,14 @@ public abstract class DMNode implements Cloneable
 
 	public static DMResource resource(Object x)
 	{
-		if ( x instanceof PyObject )
-		{
-			return pyResource( (PyObject)x );
-		}
-		else
-		{
-			return javaResource( x );
-		}
+//		if ( x instanceof PyObject )
+//		{
+//			return pyResource( (PyObject)x );
+//		}
+//		else
+//		{
+//			return javaResource( x );
+//		}
+		return javaResource( x );
 	}
 }
