@@ -851,7 +851,7 @@ public class DPTable extends DPContainer
 	//
 	//
 	
-	private static int[] getSpanFromBitSet(BitSet bits, int startIndex)
+	protected static int[] getSpanFromBitSet(BitSet bits, int startIndex)
 	{
 		int start = bits.nextSetBit( startIndex );
 		int end = bits.nextClearBit( start );
@@ -948,8 +948,10 @@ public class DPTable extends DPContainer
 				while ( y < numRows )
 				{
 					int spanIndices[] = getSpanFromBitSet( columnBits[columnLine], y );
-					spanStarts.add( layout.getRowTop( spanIndices[0] ) - halfRowSpacing );
-					spanEnds.add( layout.getRowBottom( spanIndices[1] ) + halfRowSpacing );
+					double topSpacing = spanIndices[0] == 0  ?  0.0  :  halfRowSpacing;
+					double bottomSpacing = spanIndices[1] == numRows-1  ?  0.0  :  halfRowSpacing;
+					spanStarts.add( layout.getRowTop( spanIndices[0] ) - topSpacing );
+					spanEnds.add( layout.getRowBottom( spanIndices[1] ) + bottomSpacing );
 					y = spanIndices[1] + 1;
 				}
 				
@@ -971,8 +973,10 @@ public class DPTable extends DPContainer
 				while ( x < numColumns )
 				{
 					int spanIndices[] = getSpanFromBitSet( rowBits[rowLine], x );
-					spanStarts.add( layout.getColumnLeft( spanIndices[0] ) - halfColumnSpacing );
-					spanEnds.add( layout.getColumnRight( spanIndices[1] ) + halfColumnSpacing );
+					double leftSpacing = spanIndices[0] == 0  ?  0.0  :  halfColumnSpacing;
+					double rightSpacing = spanIndices[1] == numColumns-1  ?  0.0  :  halfColumnSpacing;
+					spanStarts.add( layout.getColumnLeft( spanIndices[0] ) - leftSpacing );
+					spanEnds.add( layout.getColumnRight( spanIndices[1] ) + rightSpacing );
 					x = spanIndices[1] + 1;
 				}
 				

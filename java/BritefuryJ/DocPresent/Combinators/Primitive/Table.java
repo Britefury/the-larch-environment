@@ -6,8 +6,10 @@
 //##************************
 package BritefuryJ.DocPresent.Combinators.Primitive;
 
+import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPTable;
+import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
@@ -164,8 +166,8 @@ public class Table extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		StyleValues childStyle = Primitive.useContainerParams.get( style );		
-		DPTable element = new DPTable( Primitive.tableParams.get( style ) );
+		StyleValues childStyle = Primitive.useTableParams( style );		
+		DPTable table = new DPTable( Primitive.tableParams.get( style ) );
 		if ( childCells != null )
 		{
 			DPTable.TableCell elemCells[][] = new DPTable.TableCell[childCells.length][];
@@ -180,8 +182,18 @@ public class Table extends Pres
 					elemRow[x] = cell != null  ?  new DPTable.TableCell( cell.child.present( ctx, childStyle ).layoutWrap(), cell.colSpan, cell.rowSpan )  :  null;  
 				}
 			}
-			element.setCells( elemCells );
+			table.setCells( elemCells );
 		}
-		return element;
+		AbstractBorder tableBorder = style.get( Primitive.tableBorder, AbstractBorder.class );
+		if ( tableBorder != null )
+		{
+			DPBorder border = new DPBorder( tableBorder );
+			border.setChild( table );
+			return border;
+		}
+		else
+		{
+			return table;
+		}
 	}
 }

@@ -49,7 +49,7 @@ public class TableTestPage extends SystemPage
 		{
 			for (int col = 0; col < 6; col++)
 			{
-				table.put( col, row, outlineStyle.applyTo( t12.applyTo( new Border( new Text( ("<" + col + "_" + row + ">") ) ) ) ) );
+				table.put( col, row, new Text( ("<" + col + "_" + row + ">") ) );
 			}
 		}
 		return table;
@@ -57,7 +57,20 @@ public class TableTestPage extends SystemPage
 	
 	private Table makeTable1()
 	{
-		Table table = makeTable0();
+		Table table = new Table();
+		for (int row = 0; row < 6; row++)
+		{
+			for (int col = 0; col < 6; col++)
+			{
+				table.put( col, row, outlineStyle.applyTo( t12.applyTo( new Border( new Text( ("<" + col + "_" + row + ">") ) ) ) ) );
+			}
+		}
+		return table;
+	}
+	
+	private Table makeTable2()
+	{
+		Table table = makeTable1();
 		table.put( 2, 2, null );
 		table.put( 3, 2, null );
 		table.put( 4, 2, null );
@@ -65,9 +78,9 @@ public class TableTestPage extends SystemPage
 		return table;
 	}
 	
-	private Table makeTable2()
+	private Table makeTable3()
 	{
-		Table table = makeTable0();
+		Table table = makeTable1();
 		table.put( 2, 2, null );
 		table.put( 2, 3, null );
 		table.put( 2, 4, null );
@@ -75,9 +88,9 @@ public class TableTestPage extends SystemPage
 		return table;
 	}
 	
-	private Table makeTable3()
+	private Table makeTable4()
 	{
-		Table table = makeTable0();
+		Table table = makeTable1();
 		table.put( 2, 2, null );
 		table.put( 2, 3, null );
 		table.put( 2, 4, null );
@@ -96,10 +109,11 @@ public class TableTestPage extends SystemPage
 	protected Pres createContents()
 	{
 		ArrayList<Object> children = new ArrayList<Object>();
-		children.add( sectionStyle.applyTo( new Border( tableStyle.applyTo( makeTable0() ) ) ) );
+		children.add( tableStyle.applyTo( makeTable0() ) );
 		children.add( sectionStyle.applyTo( new Border( tableStyle.applyTo( makeTable1() ) ) ) );
 		children.add( sectionStyle.applyTo( new Border( tableStyle.applyTo( makeTable2() ) ) ) );
 		children.add( sectionStyle.applyTo( new Border( tableStyle.applyTo( makeTable3() ) ) ) );
+		children.add( sectionStyle.applyTo( new Border( tableStyle.applyTo( makeTable4() ) ) ) );
 		
 		return new Body( children );
 	}
