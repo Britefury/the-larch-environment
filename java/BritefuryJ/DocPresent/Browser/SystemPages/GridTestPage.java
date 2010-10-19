@@ -11,7 +11,6 @@ import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.GridRow;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.RGrid;
@@ -40,15 +39,15 @@ public class GridTestPage extends SystemPage
 
 	private static final StyleSheet styleSheet = StyleSheet.instance;
 	private static StyleSheet t12 = styleSheet.withAttr( Primitive.fontSize, 12 );
-	private static StyleSheet outlineStyle = styleSheet.withAttr( Primitive.border, new SolidBorder( 1.0, 0.0, new Color( 0.5f, 0.5f, 0.5f ), new Color( 0.9f, 0.9f, 0.9f ) ) );
-	private static StyleSheet tableStyle = styleSheet.withAttr( Primitive.tableColumnSpacing, 5.0 ).withAttr( Primitive.tableRowSpacing, 5.0 );
+	private static StyleSheet tableStyle = styleSheet.withAttr( Primitive.tableColumnSpacing, 5.0 ).withAttr( Primitive.tableRowSpacing, 5.0 )
+		.withAttr( Primitive.tableBorder, new SolidBorder( 1.0, 0.0, Color.BLACK, null ) ).withAttr( Primitive.tableCellBoundaryPaint, new Color( 0.5f, 0.5f, 0.5f ) );
 
 	private Pres span(int row, int startCol, int endCol)
 	{
 		ArrayList<Object> children = new ArrayList<Object>();
 		for (int col = startCol; col < endCol; col++)
 		{
-			children.add( outlineStyle.applyTo( new Border( t12.applyTo( new Text( "<" + col + "_" + row + ">" ) ) ) ) );
+			children.add(t12.applyTo( new Text( "<" + col + "_" + row + ">" ) ) );
 		}
 		return styleSheet.applyTo( new Span( children ) );
 	}
@@ -59,7 +58,7 @@ public class GridTestPage extends SystemPage
 		ArrayList<Object> children = new ArrayList<Object>();
 		for (int col = 0; col < length; col++)
 		{
-			children.add( outlineStyle.applyTo( new Border( t12.applyTo( new Text( "<" + col + "_" + row + ">" ) ) ) ) );
+			children.add( t12.applyTo( new Text( "<" + col + "_" + row + ">" ) ) );
 		}
 		return new GridRow( children );
 	}
@@ -69,10 +68,10 @@ public class GridTestPage extends SystemPage
 		ArrayList<Object> children = new ArrayList<Object>();
 		for (int col = 0; col < 2; col++)
 		{
-			children.add( outlineStyle.applyTo( new Border( t12.applyTo( new Text( "<" + col + "_" + row + ">" ) ) ) ) );
+			children.add( t12.applyTo( new Text( "<" + col + "_" + row + ">" ) ) );
 		}
 		children.add( span( row, 2, 5 ) );
-		children.add( outlineStyle.applyTo( new Border( t12.applyTo( new Text( "<" + 5 + "_" + row + ">" ) ) ) ) );
+		children.add( t12.applyTo( new Text( "<" + 5 + "_" + row + ">" ) ) );
 		return new GridRow( children );
 	}
 	
@@ -137,11 +136,11 @@ public class GridTestPage extends SystemPage
 		{
 			columns.add( makeGridRowCollated( row ) );
 		}
-		columns.add( outlineStyle.applyTo( new Border( t12.applyTo( new Text( "Non-row in a span" ) ) ) ) );
+		columns.add( t12.applyTo( new Text( "Non-row in a span" ) ) );
 		
 		rows.add( new Span( columns ) );
 		rows.add( makeGridRowCollated( 5 ) );
-		rows.add( outlineStyle.applyTo( new Border( t12.applyTo( new Text( "Non-row in the grid" ) ) ) ) );
+		rows.add( t12.applyTo( new Text( "Non-row in the grid" ) ) );
 		return tableStyle.applyTo( new RGrid( rows ) );
 	}
 	

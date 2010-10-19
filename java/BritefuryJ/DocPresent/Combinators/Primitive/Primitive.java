@@ -78,8 +78,8 @@ public class Primitive
 	public static final AttributeNonNull tableRowSpacing = new AttributeNonNull( primitiveNamespace, "tableRowSpacing", Double.class, 0.0 );
 	public static final AttributeNonNull tableRowExpand = new AttributeNonNull( primitiveNamespace, "tableRowExpand", Boolean.class, false );
 	public static final AttributeNonNull tableCellBoundaryWidth = new AttributeNonNull( primitiveNamespace, "tableCellBoundaryWidth", Double.class, 1.0 );
-	public static final Attribute tableCellBoundaryPaint = new Attribute( primitiveNamespace, "tableCellBoundaryPaint", Paint.class, Color.black );
-	public static final Attribute tableBorder = new Attribute( primitiveNamespace, "tableBorder", AbstractBorder.class, new SolidBorder( 1.0, 0.0, Color.BLACK, null ) );
+	public static final Attribute tableCellBoundaryPaint = new Attribute( primitiveNamespace, "tableCellBoundaryPaint", Paint.class, null );
+	public static final Attribute tableBorder = new Attribute( primitiveNamespace, "tableBorder", AbstractBorder.class, null );
 	public static final InheritedAttribute textSquiggleUnderlinePaint = new InheritedAttribute( primitiveNamespace, "textSquiggleUnderlinePaint", Paint.class, null );
 
 

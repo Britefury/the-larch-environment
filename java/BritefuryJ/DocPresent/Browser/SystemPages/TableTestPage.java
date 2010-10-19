@@ -39,8 +39,8 @@ public class TableTestPage extends SystemPage
 	private static StyleSheet t12 = styleSheet.withAttr( Primitive.fontSize, 12 );
 	private static StyleSheet t18 = styleSheet.withAttr( Primitive.fontSize, 18 );
 	private static StyleSheet sectionStyle = styleSheet.withAttr( Primitive.columnSpacing, 5.0 ).withAttr( Primitive.border, new SolidBorder( 2.0, 3.0, new Color( 0.0f, 0.3f, 0.7f ), new Color( 0.95f, 0.975f, 1.0f  ) ) );
-	private static StyleSheet outlineStyle = styleSheet.withAttr( Primitive.border, new SolidBorder( 1.0, 0.0, new Color( 0.5f, 0.5f, 0.5f ), new Color( 0.9f, 0.9f, 0.9f ) ) );
-	private static StyleSheet tableStyle = styleSheet.withAttr( Primitive.tableColumnSpacing, 5.0 ).withAttr( Primitive.tableRowSpacing, 5.0 );
+	private static StyleSheet tableStyle = styleSheet.withAttr( Primitive.tableColumnSpacing, 5.0 ).withAttr( Primitive.tableRowSpacing, 5.0 )
+		.withAttr( Primitive.tableBorder, new SolidBorder( 1.0, 0.0, Color.BLACK, null ) ).withAttr( Primitive.tableCellBoundaryPaint, new Color( 0.5f, 0.5f, 0.5f ) );
 
 	private Table makeTable0()
 	{
@@ -62,7 +62,7 @@ public class TableTestPage extends SystemPage
 		{
 			for (int col = 0; col < 6; col++)
 			{
-				table.put( col, row, outlineStyle.applyTo( t12.applyTo( new Border( new Text( ("<" + col + "_" + row + ">") ) ) ) ) );
+				table.put( col, row, t12.applyTo( new Text( ("<" + col + "_" + row + ">") ) ) );
 			}
 		}
 		return table;
@@ -74,7 +74,7 @@ public class TableTestPage extends SystemPage
 		table.put( 2, 2, null );
 		table.put( 3, 2, null );
 		table.put( 4, 2, null );
-		table.put( 2, 2, 3, 1, outlineStyle.applyTo( new Border( t12.applyTo( new Text( "<<wide>>" ) ).alignHCentre() ) ) );
+		table.put( 2, 2, 3, 1,t12.applyTo( new Text( "<<wide>>" ) ).alignHCentre() );
 		return table;
 	}
 	
@@ -84,7 +84,7 @@ public class TableTestPage extends SystemPage
 		table.put( 2, 2, null );
 		table.put( 2, 3, null );
 		table.put( 2, 4, null );
-		table.put( 2, 2, 1, 3, outlineStyle.applyTo( new Border( t18.applyTo( new Text( "T" ) ).alignHCentre() ) ) );
+		table.put( 2, 2, 1, 3, t18.applyTo( new Text( "T" ) ).alignHCentre() );
 		return table;
 	}
 	
@@ -100,7 +100,7 @@ public class TableTestPage extends SystemPage
 		table.put( 4, 2, null );
 		table.put( 4, 3, null );
 		table.put( 4, 4, null );
-		table.put( 2, 2, 3, 3, outlineStyle.applyTo( new Border( t18.applyTo( new Text( "T" ) ).alignHCentre() ) ) );
+		table.put( 2, 2, 3, 3, t18.applyTo( new Text( "T" ) ).alignHCentre() );
 		return table;
 	}
 	
