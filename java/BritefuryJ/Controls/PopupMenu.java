@@ -10,14 +10,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
+import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public abstract class PopupMenu extends Pres
 {
-	private static final StyleValues defaultPopupMenuContentsStyle = StyleValues.instance.withAttr( Controls.bClosePopupOnActivate, true );
+	private static final StyleValues defaultPopupMenuContentsStyleValues = StyleValues.instance.withAttr( Controls.bClosePopupOnActivate, true );
+	private static final StyleSheet popupMenuContentsStyle = StyleSheet.instance.withAttr( Controls.bClosePopupOnActivate, true );
 	
 	protected ArrayList<Pres> items = new ArrayList<Pres>();
 	private boolean bEmpty;
@@ -54,7 +57,15 @@ public abstract class PopupMenu extends Pres
 	
 	public void popupToRightOf(DPElement element)
 	{
-		popupToRightOf( element, new PresentationContext(), defaultPopupMenuContentsStyle );
+		FragmentContext ctx = element.getFragmentContext();
+		if ( ctx != null )
+		{
+			popupToRightOf( element, ctx.createPresentationContext(), ctx.getStyleValues().withAttrs( popupMenuContentsStyle ) );
+		}
+		else
+		{
+			popupToRightOf( element, new PresentationContext(), defaultPopupMenuContentsStyleValues );
+		}
 	}
 	
 	public void popupBelow(DPElement element, PresentationContext ctx, StyleValues style)
@@ -64,7 +75,15 @@ public abstract class PopupMenu extends Pres
 	
 	public void popupBelow(DPElement element)
 	{
-		popupBelow( element, new PresentationContext(), defaultPopupMenuContentsStyle );
+		FragmentContext ctx = element.getFragmentContext();
+		if ( ctx != null )
+		{
+			popupBelow( element, ctx.createPresentationContext(), ctx.getStyleValues().withAttrs( popupMenuContentsStyle ) );
+		}
+		else
+		{
+			popupBelow( element, new PresentationContext(), defaultPopupMenuContentsStyleValues );
+		}
 	}
 	
 	public void popupAtMousePosition(DPElement element, PresentationContext ctx, StyleValues style)
@@ -74,7 +93,15 @@ public abstract class PopupMenu extends Pres
 	
 	public void popupAtMousePosition(DPElement element)
 	{
-		popupAtMousePosition( element, new PresentationContext(), defaultPopupMenuContentsStyle );
+		FragmentContext ctx = element.getFragmentContext();
+		if ( ctx != null )
+		{
+			popupAtMousePosition( element, ctx.createPresentationContext(), ctx.getStyleValues().withAttrs( popupMenuContentsStyle ) );
+		}
+		else
+		{
+			popupAtMousePosition( element, new PresentationContext(), defaultPopupMenuContentsStyleValues );
+		}
 	}
 
 	

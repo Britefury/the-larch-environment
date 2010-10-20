@@ -12,6 +12,7 @@ import java.util.List;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementPainter;
 import BritefuryJ.DocPresent.ElementValueFunction;
+import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.TreeEventListener;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
@@ -317,6 +318,62 @@ public abstract class Pres
 	{
 		DPElement popupElement = present( ctx, style );
 		element.getRootElement().createPopupAtMousePosition( popupElement, bCloseOnLoseFocus, bRequestFocus );
+	}
+	
+
+	
+	
+	
+	public void popupToRightOf(DPElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		FragmentContext ctx = element.getFragmentContext();
+		if ( ctx != null )
+		{
+			popupToRightOf( element, ctx.createPresentationContext(), ctx.getStyleValues(), bCloseOnLoseFocus, bRequestFocus );
+		}
+		else
+		{
+			popupToRightOf( element, new PresentationContext(), StyleValues.instance, bCloseOnLoseFocus, bRequestFocus );
+		}
+	}
+	
+	public void popupBelow(DPElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		FragmentContext ctx = element.getFragmentContext();
+		if ( ctx != null )
+		{
+			popupBelow( element, ctx.createPresentationContext(), ctx.getStyleValues(), bCloseOnLoseFocus, bRequestFocus );
+		}
+		else
+		{
+			popupBelow( element, new PresentationContext(), StyleValues.instance, bCloseOnLoseFocus, bRequestFocus );
+		}
+	}
+	
+	public void popupOver(DPElement element, Point2 targetLocalPos, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		FragmentContext ctx = element.getFragmentContext();
+		if ( ctx != null )
+		{
+			popupOver( element, targetLocalPos, ctx.createPresentationContext(), ctx.getStyleValues(), bCloseOnLoseFocus, bRequestFocus );
+		}
+		else
+		{
+			popupOver( element, targetLocalPos, new PresentationContext(), StyleValues.instance, bCloseOnLoseFocus, bRequestFocus );
+		}
+	}
+	
+	public void popupAtMousePosition(DPElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		FragmentContext ctx = element.getFragmentContext();
+		if ( ctx != null )
+		{
+			popupAtMousePosition( element, ctx.createPresentationContext(), ctx.getStyleValues(), bCloseOnLoseFocus, bRequestFocus );
+		}
+		else
+		{
+			popupAtMousePosition( element, new PresentationContext(), StyleValues.instance, bCloseOnLoseFocus, bRequestFocus );
+		}
 	}
 	
 	
