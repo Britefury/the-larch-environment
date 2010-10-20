@@ -295,15 +295,12 @@ def _onDrop_inlineObject(element, pos, data, action):
 	rootElement = element.getRootElement()
 	caret = rootElement.getCaret()
 	if caret.isValid():
-		def _displayException(e):
-			x = Pres.coerce( e )
-			x.popupBelow( element, True, True )
 		try:
 			resource = DMNode.pyResource( data.getModel() )
 		except Exception, e:
-			_displayException( e )
+			Pres.coerce( e ).popupBelow( element, True, True )
 		except Throwable, t:
-			_displayException( t )
+			Pres.coerce( t ).popupBelow( element, True, True )
 		else:
 			expr = Schema.InlineObject( resource=resource )
 			_insertSpecialFormExpression( caret, expr )
