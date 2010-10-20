@@ -127,11 +127,6 @@ ConditionalExpr = schema.newClass( 'ConditionalExpr', Expr, [ 'condition', 'expr
 ExternalExpr = schema.newClass( 'ExternalExpr', Expr, [ 'expr' ] )
 
 
-# Inline object
-InlineObject = schema.newClass( 'InlineObject', Expr, [ 'resource' ] )
-
-
-
 #
 # Simple statements
 #
@@ -213,6 +208,12 @@ Dedent = schema.newClass( 'Dedent', Node, [] )
 IndentedBlock = schema.newClass( 'IndentedBlock', CompoundStmt, [ 'suite' ] )
 
 
+# Inline object
+InlineObjectExpr = schema.newClass( 'InlineObjectExpr', Expr, [ 'resource' ] )
+InlineObjectStmt = schema.newClass( 'InlineObjectStmt', SimpleStmt, [ 'resource' ] )
+
+
+
 #
 # Module and expression - outer nodes
 #
@@ -221,3 +222,23 @@ PythonExpression = schema.newClass( 'PythonExpression', Node, [ 'expr' ] )
 
 
 
+
+
+def getInlineObjectModelType(value):
+	try:
+		modelType = value.__py_model_type__
+	except AttributeError:
+		modelType = Expr
+	else:
+		if isinstance( modelType, str )  or  isinstance( modelType, unicode ):
+			if modelType == 'stmt'  or  modelType == 'statement':
+				modelType = Stmt
+			elif modelType == 'expr'  or  modelType == 'expression':
+				modelType = Expr
+			else:
+				raise TypeError, '__py_model_type__ should be \'stmt\', \'statement\', \'expr\', or \'expression\''
+	if not isinstance( modelType, DMObjectClass ):
+		raise TypeError, '__py_model_type__ should be a string, or a Python node class'
+	if modelType is not Expr  and  modelType is not Stmt:
+		raise TypeError, '__py_model_type__ should be Expr or Stmt'
+	return modelType

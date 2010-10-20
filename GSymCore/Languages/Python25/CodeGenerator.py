@@ -425,9 +425,14 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 	
 	# Inline object
-	@DMObjectNodeDispatchMethod( Schema.InlineObject )
-	def InlineObject(self, node, resource):
-		raise ValueError, 'Python25CodeGenerator does not support inline objects; a Python25ModuleCodeGenerator must be used'
+	@DMObjectNodeDispatchMethod( Schema.InlineObjectExpr )
+	def InlineObjectExpr(self, node, resource):
+		raise ValueError, 'Python25CodeGenerator does not support inline object expressions; a Python25ModuleCodeGenerator must be used'
+	
+	
+	@DMObjectNodeDispatchMethod( Schema.InlineObjectStmt )
+	def InlineObjectStmt (self, node, resource):
+		raise ValueError, 'Python25CodeGenerator does not support inline object statements; a Python25ModuleCodeGenerator must be used'
 		
 	
 	
@@ -722,16 +727,40 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 			setattr( module, _runtime_resourceMap_Name, self._resourceMap )
 
 
-	# Inline object
-	@DMObjectNodeDispatchMethod( Schema.InlineObject )
-	def InlineObject(self, node, resource):
+	# Inline object expression
+	@DMObjectNodeDispatchMethod( Schema.InlineObjectExpr )
+	def InlineObjectExpr(self, node, resource):
 		index = len( self._resourceMap )
 		self._resourceMap.append( resource.getValue() )
 		return _runtime_resourceMap_Name + '[%d]'  %  ( index, )
 		
 	
 	
+	# Inline object
+	@DMObjectNodeDispatchMethod( Schema.InlineObjectStmt )
+	def InlineObjectStmt(self, node, resource):
+		value = resource.getValue()
+		
+		modelType = Schema.getInlineObjectModelType( value )
+		
+		if modelType is Schema.Stmt:
+			try:
+				modelFn = value.__py_model__
+			except AttributeError:
+				pass
+			else:
+				model = modelFn()
+				return self( model )
+		
+		
+		index = len( self._resourceMap )
+		self._resourceMap.append( resource.getValue() )
+		return _runtime_resourceMap_Name + '[%d]'  %  ( index, )
+			
 
+	
+	
+	
 def _compileForExecution(codeGen, pythonModule, filename):
 	source = codeGen( pythonModule )
 	return compile( source, filename, 'exec' )
@@ -759,7 +788,7 @@ def _compileForExecutionAndEvaluation(codeGen, pythonModule, filename):
 		
 		return execCode, evalCode
 	else:
-		return compileForExecution( pythonModule, filename ),  None
+		return _compileForExecution( codeGen, pythonModule, filename ),  None
 
 				
 				
