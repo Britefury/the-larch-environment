@@ -8,6 +8,7 @@
 from java.util import List
 
 from BritefuryJ.DocModel import DMListInterface, DMObjectInterface, DMNode
+from BritefuryJ.DocModel.Resource import DMResource
 
 
 
@@ -19,6 +20,9 @@ def isListNode(xs):
 
 def isObjectNode(xs):
 	return isinstance( xs, DMObjectInterface )
+
+def isResourceNode(xs):
+	return isinstance( xs, DMResource )
 
 
 
@@ -37,6 +41,8 @@ def nodeToSXString(x, level=3):
 			return '(...)'
 		else:
 			return '( ' + x.getDMObjectClass().getName() + ' : ' + ' '.join( [ x.getDMObjectClass().getField( i ).getName() + '=' + nodeToSXString( x.get( i ), level - 1 )  for i in xrange( 0, x.getDMObjectClass().getNumFields() ) ] ) + ')'
+	elif isResourceNode( x ):
+		return '<<Resource>>'
 	else:
 		raise TypeError, '%s'  %  ( x.__class__, )
 
