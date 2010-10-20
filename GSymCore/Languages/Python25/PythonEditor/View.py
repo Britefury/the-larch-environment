@@ -25,6 +25,8 @@
 import sys
 import imp
 
+from java.lang import Throwable
+
 from java.awt.event import KeyEvent
 
 from BritefuryJ.Parser import ParserExpression
@@ -293,8 +295,18 @@ def _onDrop_inlineObject(element, pos, data, action):
 	rootElement = element.getRootElement()
 	caret = rootElement.getCaret()
 	if caret.isValid():
-		expr = Schema.InlineObject( resource=DMNode.resource( data.getModel() ) )
-		_insertSpecialFormExpression( caret, expr )
+		def _displayException(e):
+			x = Pres.coerce( e )
+			x.popupBelow( element, True, True )
+		try:
+			resource = DMNode.pyResource( data.getModel() )
+		except Exception, e:
+			_displayException( e )
+		except Throwable, t:
+			_displayException( t )
+		else:
+			expr = Schema.InlineObject( resource=resource )
+			_insertSpecialFormExpression( caret, expr )
 	return True
 
 

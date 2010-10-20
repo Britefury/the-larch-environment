@@ -114,7 +114,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			
 			// Create a presentation component for the popup contents, and add them
 			popupComponent = new PresentationComponent( this );
-			popupComponent.getRootElement().setChild( popupContents );
+			popupComponent.getRootElement().setChild( popupContents.layoutWrap() );
 			
 			popupWindow.add( popupComponent );
 			popupWindow.setLocation( x, y );

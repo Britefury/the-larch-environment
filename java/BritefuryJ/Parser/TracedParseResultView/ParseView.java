@@ -16,7 +16,6 @@ import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Controls.AspectRatioScrolledViewport;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementPainter;
-import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
@@ -30,7 +29,7 @@ import BritefuryJ.Math.Vector2;
 import BritefuryJ.ParserHelpers.TraceNode;
 import BritefuryJ.ParserHelpers.TracedParseResultInterface;
 
-public class ParseView implements FragmentContext
+public class ParseView
 {
 	private static class ParseViewPainter implements ElementPainter
 	{

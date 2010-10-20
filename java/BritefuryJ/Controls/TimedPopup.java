@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import javax.swing.Timer;
 
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
@@ -51,6 +52,47 @@ public class TimedPopup
 		DPElement childElement = child.present( ctx, style );
 		element.getRootElement().createPopupAtMousePosition( childElement, true, bRequestFocus );
 		initialiseTimeout( childElement );
+	}
+	
+	
+	
+	public void popupToRightOf(DPElement element)
+	{
+		FragmentContext ctx = element.getFragmentContext();
+		if ( ctx != null )
+		{
+			popupToRightOf( element, ctx.createPresentationContext(), ctx.getStyleValues() );
+		}
+		else
+		{
+			popupToRightOf( element, new PresentationContext(), StyleValues.instance );
+		}
+	}
+	
+	public void popupBelow(DPElement element)
+	{
+		FragmentContext ctx = element.getFragmentContext();
+		if ( ctx != null )
+		{
+			popupBelow( element, ctx.createPresentationContext(), ctx.getStyleValues() );
+		}
+		else
+		{
+			popupBelow( element, new PresentationContext(), StyleValues.instance );
+		}
+	}
+	
+	public void popupAtMousePosition(DPElement element)
+	{
+		FragmentContext ctx = element.getFragmentContext();
+		if ( ctx != null )
+		{
+			popupAtMousePosition( element, ctx.createPresentationContext(), ctx.getStyleValues() );
+		}
+		else
+		{
+			popupAtMousePosition( element, new PresentationContext(), StyleValues.instance );
+		}
 	}
 	
 	

@@ -163,6 +163,29 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	
 	//
 	//
+	// Fragment context methods
+	//
+	//
+	
+	@Override
+	public PresentationContext createPresentationContext()
+	{
+		GSymView.ViewFragmentContextAndResultFactory f = getNodeResultFactory();
+		return new PresentationContext( this, f.perspective, f.inheritedState );
+	}
+	
+	@Override
+	public StyleValues getStyleValues()
+	{
+		GSymView.ViewFragmentContextAndResultFactory f = getNodeResultFactory();
+		return f.style;
+	}
+	
+	
+	
+	
+	//
+	//
 	// Refresh methods
 	//
 	//

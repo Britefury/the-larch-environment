@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementPainter;
-import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
@@ -39,7 +38,7 @@ import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.ParserHelpers.ParseResultInterface;
 import BritefuryJ.ParserHelpers.TraceNode;
 
-public class NodeView implements FragmentContext
+public class NodeView
 {
 	private static class NodeInteractor implements ClickElementInteractor, HoverElementInteractor, ElementPainter
 	{
