@@ -298,9 +298,9 @@ def _onDrop_inlineObject(element, pos, data, action):
 		try:
 			resource = DMNode.pyResource( data.getModel() )
 		except Exception, e:
-			Pres.coerce( e ).popupBelow( element, True, True )
+			ApplyPerspective( None, Pres.coerce( e ) ).popupBelow( element, True, True )
 		except Throwable, t:
-			Pres.coerce( t ).popupBelow( element, True, True )
+			ApplyPerspective( None, Pres.coerce( t ) ).popupBelow( element, True, True )
 		else:
 			expr = Schema.InlineObject( resource=resource )
 			_insertSpecialFormExpression( caret, expr )
