@@ -174,23 +174,6 @@ StructuralExpressionTreeEventListener.instance = StructuralExpressionTreeEventLi
 
 
 
-class DeleteSpecialFormExpressionTreeEvent (object):
-	def __init__(self, expr):
-		self._expr = expr
-
-		
-class SpecialFormExpressionTreeEventListener (TreeEventListenerObjectDispatch):
-	@ObjectDispatchMethod( DeleteSpecialFormExpressionTreeEvent )
-	def onDeleteExtExpr(self, element, sourceElement, event):
-		pyReplaceExpression( element.getFragmentContext(), event._expr, Schema.Load( name='None' ) )
-		return True
-		
-	
-SpecialFormExpressionTreeEventListener.instance = SpecialFormExpressionTreeEventListener()
-
-
-
-
 class StatementTreeEventListener (TreeEventListenerObjectDispatch):
 	__slots__ = [ '_parser' ]
 

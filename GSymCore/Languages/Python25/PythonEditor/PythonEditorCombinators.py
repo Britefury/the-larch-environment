@@ -869,6 +869,10 @@ def statementLine(statement):
 	newLine = Whitespace( '\n' )
 	return Paragraph( [ segment, newLine ] )
 
+def specialFormStatementLine(statement):
+	segment = Segment( True, True, statement )
+	return Paragraph( [ segment ] )
+
 
 	
 	

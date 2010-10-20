@@ -274,6 +274,7 @@ public class LayoutNodeParagraph extends ArrangedSequenceLayoutNode
 				int lineRangeStart = line.getRangeStart();
 				int startInLine = Math.min( rangeStart - lineRangeStart, lineChildAllocBoxes.length - 1 );
 				int endInLine = Math.min( ( rangeEnd - 1 ) - lineRangeStart, lineChildAllocBoxes.length - 1 );
+				endInLine = Math.max( endInLine, 0 );
 				LAllocBoxInterface startBox = lineChildAllocBoxes[startInLine];
 				LAllocBoxInterface endBox = lineChildAllocBoxes[endInLine];
 				LAllocBox lineBox = line.getLineAllocBox();

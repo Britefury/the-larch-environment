@@ -42,6 +42,8 @@ from Britefury.Util.NodeUtil import *
 from Britefury.Util.InstanceCache import instanceCache
 
 
+from BritefuryJ.DocModel import DMObjectClass
+
 from BritefuryJ.AttributeTable import *
 from BritefuryJ.Controls import *
 from BritefuryJ.DocPresent import ElementValueFunction, TextEditEvent, DPText
@@ -138,7 +140,6 @@ def expressionNodeEditor(grammar, inheritedState, node, precedence, contents):
 def specialFormExpressionNodeEditor(grammar, inheritedState, node, contents):
 	mode = inheritedState['editMode']
 	if mode == EDITMODE_DISPLAYCONTENTS  or  mode == EDITMODE_EDITEXPRESSION:
-		contents = contents.withTreeEventListener( SpecialFormExpressionTreeEventListener.instance )
 		contents = contents.withFixedValue( node )
 		return contents
 	else:
@@ -170,6 +171,18 @@ def statementNodeEditor(grammar, inheritedState, node, contents):
 			s = s.withFixedValue( builder.stream() )
 		else:
 			s = s.withFixedValue( node )
+		s = s.withTreeEventListener( instanceCache( StatementTreeEventListener, grammar.singleLineStatement() ) )
+		s = s.withElementInteractor( _statementIndentationInteractor )
+		return s
+	else:
+		raise ValueError, 'invalid mode %d'  %  mode
+
+
+def specialFormStatementNodeEditor(grammar, inheritedState, node, contents):
+	mode = inheritedState['editMode']
+	if mode == EDITMODE_EDITSTATEMENT:
+		s = specialFormStatementLine( contents )
+		s = s.withFixedValue( node )
 		s = s.withTreeEventListener( instanceCache( StatementTreeEventListener, grammar.singleLineStatement() ) )
 		s = s.withElementInteractor( _statementIndentationInteractor )
 		return s
@@ -257,16 +270,16 @@ def spanCmpOpView(ctx, grammar, inheritedState, node, op, y, precedence):
 	
 	
 	
-class _InsertSpecialFormExpressionValueFn (ElementValueFunction):
-	def __init__(self, expr, index):
-		self._expr = expr
+class _InsertSpecialFormValueFn (ElementValueFunction):
+	def __init__(self, specialForm, index):
+		self._specialForm = specialForm
 		self._index = index
 		
 	def computeElementValue(self, element):
 		value = element.getDefaultValue()
 		builder = StreamValueBuilder()
 		builder.append( value[:self._index] )
-		builder.appendStructuralValue( self._expr )
+		builder.appendStructuralValue( self._specialForm )
 		builder.append( value[self._index:] )
 		return builder.stream()
 		
@@ -277,44 +290,72 @@ class _InsertSpecialFormExpressionValueFn (ElementValueFunction):
 		pass
 	
 	
-class _InsertSpecialFormExpressionTreeEvent (TextEditEvent):
+class _InsertSpecialFormTreeEvent (TextEditEvent):
 	def __init__(self):
 		pass
 	
 
-def _insertSpecialFormExpression(caret, expr):
+def _insertSpecialForm(caret, form):
 	element = caret.getElement()
 	assert isinstance( element, DPText )
-	element.setValueFunction( _InsertSpecialFormExpressionValueFn( expr, caret.getIndex() ) )
-	element.postTreeEvent( _InsertSpecialFormExpressionTreeEvent() )
+	element.setValueFunction( _InsertSpecialFormValueFn( form, caret.getIndex() ) )
+	element.postTreeEvent( _InsertSpecialFormTreeEvent() )
 	
 	
 
 
 def _onDrop_inlineObject(element, pos, data, action):
+	def _displayResourceException(e):
+		ApplyPerspective( None, Pres.coerce( e ) ).popupAtMousePosition( element, True, True )
+	def _displayModelException(e):
+		ApplyPerspective( None, Pres.coerce( e ) ).popupAtMousePosition( element, True, True )
+	
 	rootElement = element.getRootElement()
 	caret = rootElement.getCaret()
 	if caret.isValid():
+		model = data.getModel()
 		try:
-			resource = DMNode.pyResource( data.getModel() )
+			resource = DMNode.pyResource( model )
 		except Exception, e:
-			ApplyPerspective( None, Pres.coerce( e ) ).popupBelow( element, True, True )
+			_displayResourceException( e )
 		except Throwable, t:
-			ApplyPerspective( None, Pres.coerce( t ) ).popupBelow( element, True, True )
+			_displayResourceException( t )
 		else:
-			expr = Schema.InlineObject( resource=resource )
-			_insertSpecialFormExpression( caret, expr )
+			try:
+				modelType = Schema.getInlineObjectModelType( model )
+			except Exception, e:
+				_displayModelException( e )
+			else:
+				if modelType is Schema.Expr:
+					expr = Schema.InlineObjectExpr( resource=resource )
+					_insertSpecialForm( caret, expr )
+				elif modelType is Schema.Stmt:
+					stmt = Schema.InlineObjectStmt( resource=resource )
+					_insertSpecialForm( caret, stmt )
 	return True
 
 
 
 
-def _inlineObjectContextMenuFactory(element, menu):
+def _inlineObjectExprContextMenuFactory(element, menu):
 	fragment = element.getFragmentContext()
 	model = fragment.getModel()
 	
 	def _onDelete(item):
 		pyReplaceExpression( fragment, model, Schema.Load( name='None' ) )
+
+	deleteItem = MenuItem.menuItemWithLabel( 'Delete inline object', _onDelete )
+	menu.add( deleteItem )
+
+	return False
+
+
+def _inlineObjectStmtContextMenuFactory(element, menu):
+	fragment = element.getFragmentContext()
+	model = fragment.getModel()
+	
+	def _onDelete(item):
+		pyReplaceStmt( fragment, model, Schema.BlankLine() )
 
 	deleteItem = MenuItem.menuItemWithLabel( 'Delete inline object', _onDelete )
 	menu.add( deleteItem )
@@ -335,7 +376,7 @@ def _pythonModuleContextMenuFactory(element, menu):
 			if caret.isValid():
 				expr = factory()
 				pyExpr = Schema.ExternalExpr( expr=expr )
-				_insertSpecialFormExpression( caret, pyExpr )
+				_insertSpecialForm( caret, pyExpr )
 		return _onMenuItem
 		
 	extExprItems = [ MenuItem.menuItemWithLabel( labelText, _makeExtExprFn( factory ) )   for labelText, factory in ExternalExpression.getExternalExpressionFactories() ]
@@ -929,7 +970,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			title = 'ext'
 		
 		def _onDeleteButton(button, event):
-			button.getElement().postTreeEvent( DeleteSpecialFormExpressionTreeEvent( node ) )
+			pyReplaceExpression( ctx, node, Schema.Load( name='None' ) )
 
 		
 		deleteButton = Button( Image.systemIcon( 'delete_tiny' ), _onDeleteButton )
@@ -946,15 +987,28 @@ class Python25View (GSymViewObjectNodeDispatch):
 	#
 	#
 
-	# Inline object
-	@DMObjectNodeDispatchMethod( Schema.InlineObject )
-	def InlineObject(self, ctx, state, node, resource):
+	# Inline object expression
+	@DMObjectNodeDispatchMethod( Schema.InlineObjectExpr )
+	def InlineObjectExpr(self, ctx, state, node, resource):
 		value = resource.getValue()
 		valueView = ApplyPerspective( None, value )
 		
 		view = inlineObject( valueView )
-		view = view.withContextMenuInteractor( _inlineObjectContextMenuFactory )
+		view = view.withContextMenuInteractor( _inlineObjectExprContextMenuFactory )
 		return specialFormExpressionNodeEditor( self._parser, state, node,
+		                             view )
+
+
+
+	# Inline object statement
+	@DMObjectNodeDispatchMethod( Schema.InlineObjectStmt )
+	def InlineObjectStmt(self, ctx, state, node, resource):
+		value = resource.getValue()
+		valueView = ApplyPerspective( None, value )
+		
+		view = inlineObject( valueView )
+		view = view.withContextMenuInteractor( _inlineObjectStmtContextMenuFactory )
+		return specialFormStatementNodeEditor( self._parser, state, node,
 		                             view )
 
 
