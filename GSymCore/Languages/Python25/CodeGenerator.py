@@ -730,6 +730,20 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 	# Inline object expression
 	@DMObjectNodeDispatchMethod( Schema.InlineObjectExpr )
 	def InlineObjectExpr(self, node, resource):
+		value = resource.getValue()
+		
+		modelType = Schema.getInlineObjectModelType( value )
+		
+		if modelType is Schema.Expr:
+			try:
+				modelFn = value.__py_model__
+			except AttributeError:
+				pass
+			else:
+				model = modelFn()
+				return self( model )
+		
+		
 		index = len( self._resourceMap )
 		self._resourceMap.append( resource.getValue() )
 		return _runtime_resourceMap_Name + '[%d]'  %  ( index, )
