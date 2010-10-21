@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
+import BritefuryJ.Controls.DropDownExpander;
 import BritefuryJ.Controls.Expander;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPText;
@@ -32,11 +33,11 @@ public class ExpanderTestPage extends SystemPage
 	
 	protected String getDescription()
 	{
-		return "Expander control: show or hides content";
+		return "Expander control: show or hide content";
 	}
 	
 	
-	private class ExpanderTextChanger implements Expander.ExpanderListener
+	private class ExpanderTextChanger implements DropDownExpander.ExpanderListener
 	{
 		private ElementRef textElementRef;
 		
@@ -47,7 +48,7 @@ public class ExpanderTestPage extends SystemPage
 		}
 
 
-		public void onExpander(Expander.ExpanderControl expander, boolean bExpanded)
+		public void onExpander(DropDownExpander.ExpanderControl expander, boolean bExpanded)
 		{
 			String text = bExpanded  ?  "expanded"  :  "collapsed";
 			for (DPElement element: textElementRef.getElements())
@@ -65,7 +66,7 @@ public class ExpanderTestPage extends SystemPage
 		Pres contents = new Border( new Heading3( "The contents of the expander control" ) );
 		ElementRef expandedTextRef = new Label( "Collapsed" ).elementRef();
 		ExpanderTextChanger listener = new ExpanderTextChanger( expandedTextRef );
-		Expander expander = new Expander( heading, contents, listener );
+		Expander expander = new DropDownExpander( heading, contents, listener );
 		Pres optionMenuSectionContents = new Column( new Pres[] { expandedTextRef, expander } );
 		
 		return new Body( new Pres[] { new Heading2( "Expander" ), optionMenuSectionContents } );

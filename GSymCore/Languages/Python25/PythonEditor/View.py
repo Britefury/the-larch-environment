@@ -993,11 +993,21 @@ class Python25View (GSymViewObjectNodeDispatch):
 		value = resource.getValue()
 		valueView = ApplyPerspective( None, value )
 		
-		view = inlineObject( valueView )
-		view = view.withContextMenuInteractor( _inlineObjectExprContextMenuFactory )
-		return specialFormExpressionNodeEditor( self._parser, state, node,
-		                             view )
-
+		try:
+			modelFn = value.__py_model__
+		except AttributeError:
+			# Standard view
+			view = inlineObject( valueView )
+			view = view.withContextMenuInteractor( _inlineObjectExprContextMenuFactory )
+			return specialFormExpressionNodeEditor( self._parser, state, node,
+				                     view )
+		else:
+			# Macro view
+			modelView = Pres.coerce( modelFn() )
+			view = inlineObjectMacro( valueView, modelView )
+			view = view.withContextMenuInteractor( _inlineObjectExprContextMenuFactory )
+			return specialFormExpressionNodeEditor( self._parser, state, node,
+				                     view )
 
 
 	# Inline object statement
@@ -1006,10 +1016,21 @@ class Python25View (GSymViewObjectNodeDispatch):
 		value = resource.getValue()
 		valueView = ApplyPerspective( None, value )
 		
-		view = inlineObject( valueView )
-		view = view.withContextMenuInteractor( _inlineObjectStmtContextMenuFactory )
-		return specialFormStatementNodeEditor( self._parser, state, node,
-		                             view )
+		try:
+			modelFn = value.__py_model__
+		except AttributeError:
+			# Standard view
+			view = inlineObject( valueView )
+			view = view.withContextMenuInteractor( _inlineObjectStmtContextMenuFactory )
+			return specialFormStatementNodeEditor( self._parser, state, node,
+				                     view )
+		else:
+			# Macro view
+			modelView = Pres.coerce( modelFn() )
+			view = inlineObjectMacro( valueView, modelView )
+			view = view.withContextMenuInteractor( _inlineObjectStmtContextMenuFactory )
+			return specialFormStatementNodeEditor( self._parser, state, node,
+				                     view )
 
 
 

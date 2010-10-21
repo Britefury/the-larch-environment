@@ -10,8 +10,10 @@ from java.awt import Color
 from Britefury.Kernel.Lerp import lerp, lerpColour
 
 from BritefuryJ.AttributeTable import *
+from BritefuryJ.Controls import *
 from BritefuryJ.DocPresent.StyleSheet import *
 from BritefuryJ.DocPresent.Border import *
+from BritefuryJ.DocPresent.Painter import *
 from BritefuryJ.DocPresent.Combinators import *
 from BritefuryJ.DocPresent.Combinators.Primitive import *
 from BritefuryJ.DocPresent.Combinators.RichText import *
@@ -73,6 +75,12 @@ class PythonEditorStyle (object):
 	                                                     StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.3, 0.7, 1.0 ), None ) ) )
 	externalExprTitleStyle = InheritedAttributeNonNull( pythonEditor, 'externalExprTitleStyle', StyleSheet,
 	                                                     StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.5, 1.0 ) ).withAttr( Primitive.fontSize, 10 ) )
+	
+	inlineObjectLineStyle = InheritedAttributeNonNull( pythonEditor, 'inlineObjectLineStyle', StyleSheet,
+	                                                     StyleSheet.instance.withAttr( Primitive.shapePainter, FillPainter( Color( 0.1, 0.2, 0.3 ) ) ) )
+	inlineObjectButtonStyle = InheritedAttributeNonNull( pythonEditor, 'inlineObjectButtonStyle', StyleSheet,
+	                                                     StyleSheet.instance.withAttr( Primitive.background, FillPainter( Color( 0.85, 0.85, 0.85 ) ) ).withAttr( Primitive.hoverBackground, FillPainter( Color( 0.7, 0.7, 0.7 ) ) ) )
+
 	
 	solidHighlightRounding = InheritedAttributeNonNull( pythonEditor, 'solidHighlightRounding', float, 3.0 )
 	outlineHighlightThickness = InheritedAttributeNonNull( pythonEditor, 'outlineHighlightThickness', float, 2.0 )
@@ -525,6 +533,26 @@ def inlineObject(ctx, style, valueView):
 	box = externalExprBorderStyle.applyTo( Border( valueView.pad( 3.0, 3.0 ) ) )
 
 	segment = Segment( True, True, box )
+	return segment.present( ctx, style )
+
+
+
+@PyPresCombinatorFn
+def inlineObjectMacro(ctx, style, valueView, modelView):
+	externalExprBorderStyle = style.get( PythonEditorStyle.externalExprBorderStyle )
+	inlineObjectLineStyle = style.get( PythonEditorStyle.inlineObjectLineStyle )
+	inlineObjectButtonStyle = style.get( PythonEditorStyle.inlineObjectButtonStyle )
+	
+	hLine = inlineObjectLineStyle.applyTo( Box( 1, 1 ).alignHExpand() ).pad( 8.0, 5.0 ).alignHExpand()
+	vLine = inlineObjectLineStyle.applyTo( Box( 1, 1 ).alignVExpand() ).pad( 5.0, 8.0 ).alignVExpand()
+	expandButton = CustomExpander.expanderButton( inlineObjectButtonStyle.applyTo( Image.systemIcon( 'expand_plus' ) ) )
+	contractButton = CustomExpander.expanderButton( inlineObjectButtonStyle.applyTo( Image.systemIcon( 'expand_minus' ) ) )
+	
+	contracted = externalExprBorderStyle.applyTo( Border( Row( [ valueView, vLine, expandButton.alignVBottom() ] ).pad( 3.0, 3.0 ) ) )
+	expanded = externalExprBorderStyle.applyTo( Border( Column( [ Row( [ valueView, vLine, contractButton.alignVBottom() ] ), hLine, modelView ] ).pad( 3.0, 3.0 ) ) )
+	expander = CustomExpander( contracted, expanded )
+	
+	segment = Segment( True, True, expander )
 	return segment.present( ctx, style )
 
 

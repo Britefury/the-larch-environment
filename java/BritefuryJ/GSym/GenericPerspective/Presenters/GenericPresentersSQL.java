@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.Controls.Expander;
+import BritefuryJ.Controls.DropDownExpander;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.Primitive.Label;
@@ -61,7 +61,7 @@ public class GenericPresentersSQL extends GSymObjectPresenterRegistry
 				{
 					tablesPres = Pres.coerce( e );
 				}
-				Pres tables = new Expander( sectionHeadingStyle.applyTo( new Label( "Tables" ) ),  tablesPres );
+				Pres tables = new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Tables" ) ),  tablesPres );
 				
 				return new ObjectBox( "Connection", new Column( new Object[] { url, tables } ) );
 			}
