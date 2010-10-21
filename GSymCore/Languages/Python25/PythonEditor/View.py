@@ -1003,8 +1003,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 				                     view )
 		else:
 			# Macro view
-			modelView = Pres.coerce( modelFn() )
-			view = inlineObjectMacro( valueView, modelView )
+			def createModelView():
+				return Pres.coerce( modelFn() )
+			view = inlineObjectMacro( valueView, LazyPres( createModelView ) )
 			view = view.withContextMenuInteractor( _inlineObjectExprContextMenuFactory )
 			return specialFormExpressionNodeEditor( self._parser, state, node,
 				                     view )
@@ -1026,8 +1027,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 				                     view )
 		else:
 			# Macro view
-			modelView = Pres.coerce( modelFn() )
-			view = inlineObjectMacro( valueView, modelView )
+			def createModelView():
+				return Pres.coerce( modelFn() )
+			view = inlineObjectMacro( valueView, LazyPres( createModelView ) )
 			view = view.withContextMenuInteractor( _inlineObjectStmtContextMenuFactory )
 			return specialFormStatementNodeEditor( self._parser, state, node,
 				                     view )
