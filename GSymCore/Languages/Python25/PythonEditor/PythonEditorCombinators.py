@@ -519,7 +519,7 @@ def externalExpr(ctx, style, exprView, title, deleteButton):
 	titleLabel = externalExprTitleStyle.applyTo( Label( title ) )
 	
 	header = Row( [ titleLabel.alignHLeft(), deleteButton.alignHRight().alignVCentre() ] )
-	box = externalExprBorderStyle.applyTo( Border( Column( [ header.alignHExpand(), exprView.pad( 3.0, 3.0 ) ] ) ) )
+	box = externalExprBorderStyle.applyTo( Border( Column( [ header.alignHExpand(), exprView.pad( 3.0, 3.0 ) ] ) ) ).pad( 1.0, 1.0 )
 
 	segment = Segment( True, True, box )
 	return segment.present( ctx, style )
@@ -530,7 +530,7 @@ def externalExpr(ctx, style, exprView, title, deleteButton):
 def inlineObject(ctx, style, valueView):
 	externalExprBorderStyle = style.get( PythonEditorStyle.externalExprBorderStyle )
 	
-	box = externalExprBorderStyle.applyTo( Border( valueView.pad( 3.0, 3.0 ) ) )
+	box = externalExprBorderStyle.applyTo( Border( valueView.pad( 3.0, 3.0 ) ) ).pad( 1.0, 1.0 )
 
 	segment = Segment( True, True, box )
 	return segment.present( ctx, style )
@@ -539,6 +539,8 @@ def inlineObject(ctx, style, valueView):
 
 @PyPresCombinatorFn
 def inlineObjectMacro(ctx, style, valueView, modelView):
+	modelView = StyleSheet.instance.withAttr( Primitive.editable, False ).applyTo( modelView )
+	
 	externalExprBorderStyle = style.get( PythonEditorStyle.externalExprBorderStyle )
 	inlineObjectLineStyle = style.get( PythonEditorStyle.inlineObjectLineStyle )
 	inlineObjectButtonStyle = style.get( PythonEditorStyle.inlineObjectButtonStyle )
@@ -548,8 +550,8 @@ def inlineObjectMacro(ctx, style, valueView, modelView):
 	expandButton = CustomExpander.expanderButton( inlineObjectButtonStyle.applyTo( Image.systemIcon( 'expand_plus' ) ) )
 	contractButton = CustomExpander.expanderButton( inlineObjectButtonStyle.applyTo( Image.systemIcon( 'expand_minus' ) ) )
 	
-	contracted = externalExprBorderStyle.applyTo( Border( Row( [ valueView, vLine, expandButton.alignVBottom() ] ).pad( 3.0, 3.0 ) ) )
-	expanded = externalExprBorderStyle.applyTo( Border( Column( [ Row( [ valueView, vLine, contractButton.alignVBottom() ] ), hLine, modelView ] ).pad( 3.0, 3.0 ) ) )
+	contracted = externalExprBorderStyle.applyTo( Border( Row( [ valueView, vLine, expandButton.alignVBottom() ] ).pad( 3.0, 3.0 ) ) ).pad( 1.0, 1.0 )
+	expanded = externalExprBorderStyle.applyTo( Border( Column( [ Row( [ valueView, vLine, contractButton.alignVBottom() ] ), hLine, modelView ] ).pad( 3.0, 3.0 ) ) ).pad( 1.0, 1.0 )
 	expander = CustomExpander( contracted, expanded )
 	
 	segment = Segment( True, True, expander )
