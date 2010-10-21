@@ -966,13 +966,14 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		//
 		
 		
-		protected void mouseDownEvent(int button, Point2 windowPos, int buttonModifiers)
+		protected void mouseDownEvent(int button, Point2 windowPos, int buttonModifiers, int keyModifiers)
 		{
 			selectionManager.mouseSelectionReset();
 			
 			component.grabFocus();
 			rootSpaceMouse.setLocalPos( windowPos );
 			rootSpaceMouse.setButtonModifiers( buttonModifiers );
+			rootSpaceMouse.setKeyModifiers( keyModifiers );
 			int modifiers = rootSpaceMouse.getModifiers();
 			
 			boolean bHandled = rootSpaceMouse.buttonDown( windowPos, button );
@@ -1006,10 +1007,11 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			emitImmediateEvents();
 		}
 		
-		protected void mouseUpEvent(int button, Point2 windowPos, int buttonModifiers)
+		protected void mouseUpEvent(int button, Point2 windowPos, int buttonModifiers, int keyModifiers)
 		{
 			rootSpaceMouse.setLocalPos( windowPos );
 			rootSpaceMouse.setButtonModifiers( buttonModifiers );
+			rootSpaceMouse.setKeyModifiers( keyModifiers );
 
 			
 			rootSpaceMouse.buttonUp( windowPos, button );
@@ -1065,20 +1067,22 @@ public class PresentationComponent extends JComponent implements ComponentListen
 
 
 		
-		protected void mouseMotionEvent(Point2 windowPos, int buttonModifiers, MouseEvent mouseEvent)
+		protected void mouseMotionEvent(Point2 windowPos, int buttonModifiers, int keyModifiers, MouseEvent mouseEvent)
 		{
 			rootSpaceMouse.setLocalPos( windowPos );
 			rootSpaceMouse.setButtonModifiers( buttonModifiers );
+			rootSpaceMouse.setKeyModifiers( keyModifiers );
 			
 			rootSpaceMouse.motion( windowPos, mouseEvent );
 
 			emitImmediateEvents();
 		}
 
-		protected void mouseDragEvent(Point2 windowPos, int buttonModifiers, MouseEvent mouseEvent)
+		protected void mouseDragEvent(Point2 windowPos, int buttonModifiers, int keyModifiers, MouseEvent mouseEvent)
 		{
 			rootSpaceMouse.setLocalPos( windowPos );
 			rootSpaceMouse.setButtonModifiers( buttonModifiers );
+			rootSpaceMouse.setKeyModifiers( keyModifiers );
 			
 			if ( selectionManager.isMouseDragInProgress() )
 			{
@@ -1113,20 +1117,22 @@ public class PresentationComponent extends JComponent implements ComponentListen
 
 
 		
-		protected void mouseEnterEvent(Point2 windowPos, int buttonModifiers)
+		protected void mouseEnterEvent(Point2 windowPos, int buttonModifiers, int keyModifiers)
 		{
 			rootSpaceMouse.setLocalPos( windowPos );
 			rootSpaceMouse.setButtonModifiers( buttonModifiers );
+			rootSpaceMouse.setKeyModifiers( keyModifiers );
 			
 			rootSpaceMouse.enter( windowPos );
 			
 			emitImmediateEvents();
 		}
 
-		protected void mouseLeaveEvent(Point2 windowPos, int buttonModifiers)
+		protected void mouseLeaveEvent(Point2 windowPos, int buttonModifiers, int keyModifiers)
 		{
 			rootSpaceMouse.setLocalPos( windowPos );
 			rootSpaceMouse.setButtonModifiers( buttonModifiers );
+			rootSpaceMouse.setKeyModifiers( keyModifiers );
 			
 			rootSpaceMouse.leave( windowPos );
 			
@@ -1138,7 +1144,6 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		{
 			rootSpaceMouse.setLocalPos( windowPos );
 			rootSpaceMouse.setButtonModifiers( buttonModifiers );
-
 			
 			rootSpaceMouse.scroll( 0, -wheelClicks );
 			emitImmediateEvents();
@@ -1584,12 +1589,12 @@ public class PresentationComponent extends JComponent implements ComponentListen
 
 	public void mousePressed(MouseEvent e)
 	{
-		rootElement.mouseDownEvent( getButton( e ), new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ) );
+		rootElement.mouseDownEvent( getButton( e ), new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), getKeyModifiers( e ) );
 	}
 
 	public void mouseReleased(MouseEvent e)
 	{
-		rootElement.mouseUpEvent( getButton( e ), new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ) );
+		rootElement.mouseUpEvent( getButton( e ), new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), getKeyModifiers( e ) );
 	}
 
 	
@@ -1601,22 +1606,22 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	
 	public void mouseMoved(MouseEvent e)
 	{
-		rootElement.mouseMotionEvent( new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), e );
+		rootElement.mouseMotionEvent( new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), getKeyModifiers( e ), e );
 	}
 
 	public void mouseDragged(MouseEvent e)
 	{
-		rootElement.mouseDragEvent( new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), e );
+		rootElement.mouseDragEvent( new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), getKeyModifiers( e ), e );
 	}
 
 	public void mouseEntered(MouseEvent e)
 	{
-		rootElement.mouseEnterEvent( new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ) );
+		rootElement.mouseEnterEvent( new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), getKeyModifiers( e ) );
 	}
 
 	public void mouseExited(MouseEvent e)
 	{
-		rootElement.mouseLeaveEvent( new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ) );
+		rootElement.mouseLeaveEvent( new Point2( (double)e.getX(), (double)e.getY() ), getButtonModifiers( e ), getKeyModifiers( e ) );
 	}
 
 
