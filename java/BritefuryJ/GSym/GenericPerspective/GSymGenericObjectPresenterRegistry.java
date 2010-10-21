@@ -40,7 +40,7 @@ import org.python.core.PyTuple;
 import org.python.core.PyType;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.Controls.Expander;
+import BritefuryJ.Controls.DropDownExpander;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.Primitive.Label;
@@ -297,7 +297,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		if ( doc != null  &&  doc != Py.None )
 		{
 			Pres docPres = new Column( NormalText.paragraphs( doc.toString() ) );
-			contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Documentation" ) ), docPres ) );
+			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Documentation" ) ), docPres ) );
 		}
 		
 		
@@ -351,15 +351,15 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		
 		if ( methods.size() > 0 )
 		{
-			contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Methods" ) ),   new Column( methods ) ) );
+			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Methods" ) ),   new Column( methods ) ) );
 		}
 		if ( properties.size() > 0 )
 		{
-			contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Properties" ) ),   new Column( properties ) ) );
+			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Properties" ) ),   new Column( properties ) ) );
 		}
 		if ( attributes.size() > 0 )
 		{
-			contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Attributes" ) ),   new Column( attributes ) ) );
+			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Attributes" ) ),   new Column( attributes ) ) );
 		}
 		
 		
@@ -555,7 +555,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 			if ( doc != null  &&  doc != Py.None )
 			{
 				Pres docPres = new Column( NormalText.paragraphs( doc.toString() ) );
-				contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Documentation" ) ), docPres ) );
+				contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Documentation" ) ), docPres ) );
 			}
 			
 			
@@ -606,7 +606,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 			
 			if ( attributes.size() > 0 )
 			{
-				contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Attributes" ) ),   new Column( attributes ) ) );
+				contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Attributes" ) ),   new Column( attributes ) ) );
 			}
 			
 			
@@ -890,32 +890,32 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 		
 		if ( constructorDeclarations.size() > 0 )
 		{
-			contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Constructors" ) ),   new Column( constructorDeclarations ) ) );
+			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Constructors" ) ),   new Column( constructorDeclarations ) ) );
 		}
 
 		if ( methodDeclarations.size() > 0 )
 		{
-			contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Methods" ) ),   new Column( methodDeclarations ) ) );
+			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Methods" ) ),   new Column( methodDeclarations ) ) );
 		}
 
 		if ( staticMethodDeclarations.size() > 0 )
 		{
-			contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Static methods" ) ),   new Column( staticMethodDeclarations ) ) );
+			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Static methods" ) ),   new Column( staticMethodDeclarations ) ) );
 		}
 
 		if ( fieldDeclarations.size() > 0 )
 		{
-			contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Fields" ) ),   new Column( fieldDeclarations ) ) );
+			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Fields" ) ),   new Column( fieldDeclarations ) ) );
 		}
 
 		if ( staticFieldDeclarations.size() > 0 )
 		{
-			contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Static fields" ) ),   new Column( staticFieldDeclarations ) ) );
+			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Static fields" ) ),   new Column( staticFieldDeclarations ) ) );
 		}
 
 		if ( classDeclarations.size() > 0 )
 		{
-			contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Classes" ) ),   new Column( classDeclarations ) ) );
+			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Classes" ) ),   new Column( classDeclarations ) ) );
 		}
 		
 		return new Column( contents );

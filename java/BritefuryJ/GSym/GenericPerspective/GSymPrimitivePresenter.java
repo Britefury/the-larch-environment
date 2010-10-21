@@ -20,7 +20,7 @@ import org.python.core.PyStringMap;
 import org.python.core.PyTuple;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.Controls.Expander;
+import BritefuryJ.Controls.DropDownExpander;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.Primitive.Label;
@@ -180,7 +180,7 @@ public class GSymPrimitivePresenter
 		ArrayList<Object> contents = new ArrayList<Object>();
 		
 		// Type
-		Pres type = new Expander( sectionHeadingStyle.applyTo( new Label( "Type" ) ), new InnerFragment( x.getClass() ) );
+		Pres type = new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Type" ) ), new InnerFragment( x.getClass() ) );
 		contents.add( type );
 		
 		
@@ -209,11 +209,11 @@ public class GSymPrimitivePresenter
 		}
 		if ( fields.size() > 0 )
 		{
-			contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Fields" ) ), new Column( fields ) ) );
+			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Fields" ) ), new Column( fields ) ) );
 		}
 		
 		Pres inspector = new Column( contents );
-		return new Expander( asString, inspector );
+		return new DropDownExpander( asString, inspector );
 	}
 	
 	public static Pres presentPythonObjectInspector(PyObject x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
@@ -223,7 +223,7 @@ public class GSymPrimitivePresenter
 		ArrayList<Object> contents = new ArrayList<Object>();
 		
 		// Type
-		Pres type = new Expander( sectionHeadingStyle.applyTo( new Label( "Type" ) ), new InnerFragment( x.getType() ) );
+		Pres type = new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Type" ) ), new InnerFragment( x.getType() ) );
 		contents.add( type );
 		
 		
@@ -267,12 +267,12 @@ public class GSymPrimitivePresenter
 		
 		if ( attributes.size() > 0 )
 		{
-			contents.add( new Expander( sectionHeadingStyle.applyTo( new Label( "Attributes" ) ),   new Column( attributes ) ) );
+			contents.add( new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Attributes" ) ),   new Column( attributes ) ) );
 		}
 		
 		
 		Pres inspector = new Column( contents );
-		return new Expander( asString, inspector );
+		return new DropDownExpander( asString, inspector );
 	}
 	
 	
