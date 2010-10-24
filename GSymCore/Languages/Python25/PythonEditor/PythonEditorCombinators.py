@@ -71,6 +71,16 @@ class PythonEditorStyle (object):
 	sequenceStyle = InheritedAttributeNonNull( pythonEditor, 'sequenceStyle', StyleSheet,
 	                                              StyleSheet.instance.withAttr( Sequence.addLineBreaks, True ).withAttr( Sequence.addParagraphIndentMarkers, True ).withAttr( Sequence.addLineBreakCost, True ) )
 	
+	quoteBorderStyle = InheritedAttributeNonNull( pythonEditor, 'quoteBorderStyle', StyleSheet,
+	                                                     StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.5, 0.3, 0.7 ), None ) ) )
+	quoteTitleStyle = InheritedAttributeNonNull( pythonEditor, 'quoteTitleStyle', StyleSheet,
+	                                                     StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.3, 0.1, 0.5 ) ).withAttr( Primitive.fontSize, 10 ) )
+	
+	unquoteBorderStyle = InheritedAttributeNonNull( pythonEditor, 'unquoteBorderStyle', StyleSheet,
+	                                                     StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 1.0, 0.5, 0.3 ), None ) ) )
+	unquoteTitleStyle = InheritedAttributeNonNull( pythonEditor, 'unquoteTitleStyle', StyleSheet,
+	                                                     StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.7, 0.35, 0.0 ) ).withAttr( Primitive.fontSize, 10 ) )
+	
 	externalExprBorderStyle = InheritedAttributeNonNull( pythonEditor, 'externalExprBorderStyle', StyleSheet,
 	                                                     StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.3, 0.7, 1.0 ), None ) ) )
 	externalExprTitleStyle = InheritedAttributeNonNull( pythonEditor, 'externalExprTitleStyle', StyleSheet,
@@ -509,6 +519,41 @@ def conditionalExpr(ctx, style, condition, expr, elseExpr):
 	return LineBreakCostSpan( [ expr,   Whitespace( '  ', conditionalSpacing ),  _lineBreak,
                                                  _keyword( 'if' ), _space, condition,   Whitespace( '  ', conditionalSpacing ),  _lineBreak,
                                                  _keyword( 'else' ), _space, elseExpr ] ).present( ctx, style )
+
+
+
+@PyPresCombinatorFn
+def quote(ctx, style, valueView, title, editHandler):
+	quoteBorderStyle = style.get( PythonEditorStyle.quoteBorderStyle )
+	quoteTitleStyle = style.get( PythonEditorStyle.quoteTitleStyle )
+	
+	titleLabel = quoteTitleStyle.applyTo( Label( title ) )
+	
+	region = Region( valueView, editHandler )
+	
+	header = titleLabel.alignHLeft()
+	box = quoteBorderStyle.applyTo( Border( Column( [ header.alignHExpand(), region.pad( 3.0, 3.0 ) ] ) ) ).pad( 1.0, 1.0 )
+
+	segment = Segment( True, True, box )
+	return segment.present( ctx, style )
+
+
+
+@PyPresCombinatorFn
+def unquote(ctx, style, valueView, title, editHandler):
+	unquoteBorderStyle = style.get( PythonEditorStyle.unquoteBorderStyle )
+	unquoteTitleStyle = style.get( PythonEditorStyle.unquoteTitleStyle )
+	
+	titleLabel = unquoteTitleStyle.applyTo( Label( title ) )
+	
+	region = Region( valueView, editHandler )
+	
+	header = titleLabel.alignHLeft()
+	box = unquoteBorderStyle.applyTo( Border( Column( [ header.alignHExpand(), region.pad( 3.0, 3.0 ) ] ) ) ).pad( 1.0, 1.0 )
+
+	segment = Segment( True, True, box )
+	return segment.present( ctx, style )
+
 
 
 @PyPresCombinatorFn

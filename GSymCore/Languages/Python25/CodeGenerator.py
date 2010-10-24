@@ -5,7 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from BritefuryJ.DocModel import DMObject
+from BritefuryJ.DocModel import DMObject, DMList
+from BritefuryJ.DocModel.Resource import DMPyResource
 
 from Britefury.gSym.gSymCodeGenerator import GSymCodeGeneratorObjectNodeDispatch
 from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod
@@ -21,8 +22,6 @@ def _indent(x):
 		lines[-1] = ''
 	return '\n'.join( lines )
 
-
-_runtime_resourceMap_Name = '__gsym_resourceMap__'
 
 
 class Python25CodeGeneratorError (Exception):
@@ -411,17 +410,16 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 	
 	
-	# External expression
-	@DMObjectNodeDispatchMethod( Schema.ExternalExpr )
-	def ExternalExpr(self, node, expr):
-		if isinstance( expr, DMObject ):
-			schema = expr.getDMObjectClass().getSchema()
-			codeGenFac = ExternalExpression.getExternalExpressionCodeGeneratorFactory( schema )
-			codeGen = codeGenFac( self )
-			return codeGen( expr )
-		else:
-			return 'None'
-		
+	# Quote and Unquote
+	@DMObjectNodeDispatchMethod( Schema.Quote )
+	def Quote(self, node, value):
+		raise ValueError, 'Python25CodeGenerator does not support quote expressions; a Python25ModuleCodeGenerator must be used'
+	
+	@DMObjectNodeDispatchMethod( Schema.Unquote )
+	def Unquote(self, node, value):
+		raise ValueError, 'Python25CodeGenerator does not support unquote expressions; a Python25ModuleCodeGenerator must be used'
+	
+	
 	
 	
 	# Inline object
@@ -433,6 +431,19 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	@DMObjectNodeDispatchMethod( Schema.InlineObjectStmt )
 	def InlineObjectStmt (self, node, resource):
 		raise ValueError, 'Python25CodeGenerator does not support inline object statements; a Python25ModuleCodeGenerator must be used'
+		
+	
+	
+	# External expression
+	@DMObjectNodeDispatchMethod( Schema.ExternalExpr )
+	def ExternalExpr(self, node, expr):
+		if isinstance( expr, DMObject ):
+			schema = expr.getDMObjectClass().getSchema()
+			codeGenFac = ExternalExpression.getExternalExpressionCodeGeneratorFactory( schema )
+			codeGen = codeGenFac( self )
+			return codeGen( expr )
+		else:
+			return 'None'
 		
 	
 	
@@ -716,6 +727,13 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 
 		
 
+_runtime_resourceMap_Name = '__gsym_resourceMap__'
+_runtime_astMap_Name = '__gsym_astMap__'
+_runtime_revAstMap_Name = '__gsym_revAstMap__'
+_runtime_DMList_Name = '__gsym_DMList__'
+_runtime_DMPyResource_Name = '__gsym_DMPyResource__'
+
+
 class Python25ModuleCodeGenerator (Python25CodeGenerator):
 	def __init__(self, module, bErrorChecking=True):
 		super( Python25ModuleCodeGenerator, self ).__init__( bErrorChecking )
@@ -725,8 +743,89 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 		except AttributeError:
 			self._resourceMap = []
 			setattr( module, _runtime_resourceMap_Name, self._resourceMap )
+			
+		try:
+			self._astMap = getattr( module, _runtime_astMap_Name )
+		except AttributeError:
+			self._astMap = []
+			setattr( module, _runtime_astMap_Name, self._astMap )
+		
+		try:
+			self._revAstMap = getattr( module, _runtime_revAstMap_Name )
+		except AttributeError:
+			self._revAstMap = {}
+			setattr( module, _runtime_revAstMap_Name, self._revAstMap )
+			
+		setattr( module, _runtime_DMList_Name, DMList )
+		setattr( module, _runtime_DMPyResource_Name, DMPyResource )
+			
+			
+			
+	def _getIndexForAstClass(self, cls):
+		try:
+			return self._revAstMap[cls]
+		except KeyError:
+			index = len( self._astMap )
+			self._astMap.append( cls )
+			self._revAstMap[cls] = index
+			return index
+		
+		
+		
+	def _quotedNode(self, node):
+		if isinstance( node, str )  or  isinstance( node, unicode ):
+			return repr( node )
+		elif isinstance( node, DMObject ):
+			if node.isInstanceOf( Schema.Unquote ):
+				return '(' + self( node ) + ')'
+			else:
+				cls = node.getDMObjectClass()
+				clsIndex = self._getIndexForAstClass( cls )
+				
+				astMapExpr = _runtime_astMap_Name + '[%d]' % clsIndex
+				
+				args = []
+				for i, field in enumerate( cls.getFields() ):
+					value = node.get( i )
+					if value is not None:
+						args.append( ( field.getName(), self._quotedNode( value ) ) )
+				return astMapExpr + '(' + ', '.join( [ '%s=%s' % ( k,v )   for k,v in args ] ) + ')'
+		elif isinstance( node, DMList ):
+			return _runtime_DMList_Name + '( [' + ', '.join( [ self._quotedNode( v )   for v in node ] ) + '] )'
+		elif isinstance( node, DMPyResource ):
+			index = len( self._resourceMap )
+			self._resourceMap.append( node.deepCopy() )
+			return _runtime_resourceMap_Name + '[%d]'  %  ( index, )
+		else:
+			raise TypeError, 'Cannot quote a %s'  %  type( node )
+		
+		
+		
 
 
+	# Quote and Unquote
+	@DMObjectNodeDispatchMethod( Schema.Quote )
+	def Quote(self, node, value):
+		if isinstance( value, DMObject ):
+			if value.isInstanceOf( Schema.PythonExpression ):
+				value = value['expr']
+			elif value.isInstanceOf( Schema.PythonSuite ):
+				value = value['suite']
+			else:
+				raise TypeError, 'Contents of \'quote\' should be a PythonExpression or a PythonSuite'
+		else:
+			raise TypeError, 'Value of \'quote\' should be a DMObject'
+
+		return self._quotedNode( value )
+	
+	
+	
+	@DMObjectNodeDispatchMethod( Schema.Unquote )
+	def Unquote(self, node, value):
+		return self( value )
+		
+		
+		
 	# Inline object expression
 	@DMObjectNodeDispatchMethod( Schema.InlineObjectExpr )
 	def InlineObjectExpr(self, node, resource):

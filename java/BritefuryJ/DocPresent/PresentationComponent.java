@@ -763,7 +763,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				inputTable.onRootElementReallocate();
 				long t2 = System.nanoTime();
 				double typesetTime = (double)(t2-t1) * 1.0e-9;
-				System.out.println( "DPPresentationArea.performAllocation(): TYPESET TIME = " + typesetTime  +  ", used memory = "  + ( Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() ) );
+				System.out.println( "RootElement.performAllocation(): TYPESET TIME = " + typesetTime  +  ", used memory = "  + ( Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() ) );
 				if ( log != null  &&  log.isRecording() )
 				{
 					log.log( new LogEntry( "PresentationTypesetPerformance" ).hItem( "typesetTime", typesetTime ) );

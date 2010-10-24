@@ -123,6 +123,11 @@ LambdaExpr = schema.newClass( 'LambdaExpr', Expr, [ 'params', 'expr', 'paramsTra
 ConditionalExpr = schema.newClass( 'ConditionalExpr', Expr, [ 'condition', 'expr', 'elseExpr' ] )
 
 
+# Quote and Unquote
+Quote = schema.newClass( 'Quote', Expr, [ 'value' ] )
+Unquote = schema.newClass( 'Unquote', Expr, [ 'value' ] )
+
+
 # Special externally provided expression
 ExternalExpr = schema.newClass( 'ExternalExpr', Expr, [ 'expr' ] )
 
@@ -218,6 +223,7 @@ InlineObjectStmt = schema.newClass( 'InlineObjectStmt', SimpleStmt, [ 'resource'
 # Module and expression - outer nodes
 #
 PythonModule = schema.newClass( 'PythonModule', CompoundStmt, [ 'suite' ] )
+PythonSuite = schema.newClass( 'PythonSuite', CompoundStmt, [ 'suite' ] )
 PythonExpression = schema.newClass( 'PythonExpression', Node, [ 'expr' ] )
 
 
