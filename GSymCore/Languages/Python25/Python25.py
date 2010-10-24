@@ -18,6 +18,9 @@ from GSymCore.Languages.Python25.PythonEditor.Subject import Python25Subject
 def py25NewModule():
 	return Schema.PythonModule( suite=[] )
 
+def py25NewSuite():
+	return Schema.PythonSuite( suite=[] )
+
 def py25NewExpr():
 	return Schema.PythonExpression( expr=None )
 

@@ -378,9 +378,35 @@ def _pythonModuleContextMenuFactory(element, menu):
 				pyExpr = Schema.ExternalExpr( expr=expr )
 				_insertSpecialForm( caret, pyExpr )
 		return _onMenuItem
+	
+	def _onQuoteExpr(item):
+		caret = rootElement.getCaret()
+		if caret.isValid():
+			pyExpr = Schema.Quote( value=Schema.PythonExpression( expr=Schema.Load( name='None' ) ) )
+			_insertSpecialForm( caret, pyExpr )
+	
+	def _onQuoteSuite(item):
+		caret = rootElement.getCaret()
+		if caret.isValid():
+			pyExpr = Schema.Quote( value=Schema.PythonSuite( suite=[] ) )
+			_insertSpecialForm( caret, pyExpr )
+		
+	def _onUnquote(item):
+		caret = rootElement.getCaret()
+		if caret.isValid():
+			pyExpr = Schema.Unquote( value=Schema.PythonExpression( expr=Schema.Load( name='None' ) ) )
+			_insertSpecialForm( caret, pyExpr )
+	
 		
 	extExprItems = [ MenuItem.menuItemWithLabel( labelText, _makeExtExprFn( factory ) )   for labelText, factory in ExternalExpression.getExternalExpressionFactories() ]
 	extExprMenu = VPopupMenu( extExprItems )
+	
+	quoteExprMenuItem = MenuItem.menuItemWithLabel( 'Quote expression', _onQuoteExpr )
+	menu.add( quoteExprMenuItem )
+	quoteSuiteMenuItem = MenuItem.menuItemWithLabel( 'Quote suite', _onQuoteSuite )
+	menu.add( quoteSuiteMenuItem )
+	unquoteMenuItem = MenuItem.menuItemWithLabel( 'Unquote', _onUnquote )
+	menu.add( unquoteMenuItem )
 	
 	insertExprMenuItem = MenuItem.menuItemWithLabel( 'Insert expression', extExprMenu, MenuItem.SubmenuPopupDirection.RIGHT )
 	menu.add( insertExprMenuItem )
@@ -400,6 +426,24 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# OUTER NODES
 	@DMObjectNodeDispatchMethod( Schema.PythonModule )
 	def PythonModule(self, ctx, state, node, suite):
+		if len( suite ) == 0:
+			# Empty document - create a single blank line so that there is something to edit
+			lineViews = [ statementLine( blankLine() ) ]
+		else:
+			lineViews = InnerFragment.map( suite, _withPythonState( state, PRECEDENCE_NONE, EDITMODE_EDITSTATEMENT ) )
+		s = suiteView( lineViews )
+		_inlineObject_dropDest = ObjectDndHandler.DropDest( GSymFragmentView.FragmentModel, _onDrop_inlineObject )
+		s = s.withDropDest( _inlineObject_dropDest )
+		s = s.withFixedValue( suite )
+		suiteListener = SuiteTreeEventListener( self._parser.suite(), suite )
+		s = s.withTreeEventListener( suiteListener )
+		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
+		return s
+
+
+
+	@DMObjectNodeDispatchMethod( Schema.PythonSuite )
+	def PythonSuite(self, ctx, state, node, suite):
 		if len( suite ) == 0:
 			# Empty document - create a single blank line so that there is something to edit
 			lineViews = [ statementLine( blankLine() ) ]
@@ -954,6 +998,49 @@ class Python25View (GSymViewObjectNodeDispatch):
 	
 	#
 	#
+	# QUOTE AND UNQUOTE
+	#
+	#
+
+	# Quote
+	@DMObjectNodeDispatchMethod( Schema.Quote )
+	def Quote(self, ctx, state, node, value):
+		if isinstance( value, DMObject ):
+			if value.isInstanceOf( Schema.PythonExpression ):
+				title = 'QUOTE - Expr'
+			elif value.isInstanceOf( Schema.PythonSuite ):
+				title = 'QUOTE - Suite'
+			else:
+				raise TypeError, 'Contents of \'quote\' should be a PythonExpression or a PythonSuite'
+			
+			valueView = perspective.applyTo( InnerFragment( value, _withPythonState( state, PRECEDENCE_CONTAINER_QUOTE ) ) )
+		else:
+			raise TypeError, 'Value of \'quote\' should be a DMObject'
+		
+		
+		view = quote( valueView, title, _editHandler )
+		return specialFormExpressionNodeEditor( self._parser, state, node,
+		                             view )
+
+
+
+	# Unquote
+	@DMObjectNodeDispatchMethod( Schema.Unquote )
+	def Unquote(self, ctx, state, node, value):
+		if isinstance( value, DMObject ):
+			valueView = perspective.applyTo( InnerFragment( value, _withPythonState( state, PRECEDENCE_CONTAINER_QUOTE ) ) )
+		else:
+			raise TypeError, 'Value of \'unquote\' should be a DMObject'
+		
+		
+		view = unquote( valueView, 'UNQUOTE', _editHandler )
+		return specialFormExpressionNodeEditor( self._parser, state, node,
+		                             view )
+
+
+
+	#
+	#
 	# EXTERNAL EXPRESSION
 	#
 	#
@@ -964,7 +1051,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		if isinstance( expr, DMObject ):
 			schema = expr.getDMObjectClass().getSchema()
 			presenter, title = ExternalExpression.getExternalExpressionPresenterAndTitle( schema )
-			exprView = presenter( expr, _withPythonState( state, PRECEDENCE_CONTAINER_CONDITIONALEXPR ) )
+			exprView = presenter( expr, _withPythonState( state, PRECEDENCE_CONTAINER_EXTERNALEXPR ) )
 		else:
 			exprView = Label( '<expr>' )
 			title = 'ext'
@@ -1520,7 +1607,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	
 _parser = Python25Grammar()
-perspective = GSymPerspective( Python25View( _parser ), Python25EditHandler() )
+_editHandler = Python25EditHandler()
+perspective = GSymPerspective( Python25View( _parser ), _editHandler )
 
 
 
