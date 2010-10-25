@@ -122,6 +122,9 @@ class PythonExpressionTreeEventListener (TreeEventListenerObjectDispatch):
 		ctx = element.getFragmentContext()
 		node = ctx.getModel()
 		nodeExpr = node['expr']
+		log = ctx.getView().getPageLog()
+		if log.isRecording():
+			log.log( LogEntry( 'Py25ExprEdit' ).hItem( 'description', 'Top level expression' ).vItem( 'editedStream', value ) )
 		if '\n' not in value:
 			if value.isEmpty():
 				node['expr'] = None
@@ -131,24 +134,17 @@ class PythonExpressionTreeEventListener (TreeEventListenerObjectDispatch):
 				if parsed is not None:
 					log = ctx.getView().getPageLog()
 					if log.isRecording():
-						log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - success' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
+						log.log( LogEntry( 'Py25ExprEdit' ).hItem( 'description', 'Top level expression - success' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
 					if parsed != nodeExpr:
 						if nodeExpr is None:
 							node['expr'] = parsed
 						else:
 							pyReplaceExpression( ctx, nodeExpr, parsed )
 				else:
-					if value.isTextual():
-						if value.textualValue().strip() == '':
-							# Expression content has been deleted entirely
-							log = ctx.getView().getPageLog()
-							if log.isRecording():
-								log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - deleted' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
-							return False
 					unparsed = Schema.UNPARSED( value=value.getItemValues() )
 					log = ctx.getView().getPageLog()
 					if log.isRecording():
-						log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - unparsed' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', unparsed ) )
+						log.log( LogEntry( 'Py25ExprEdit' ).hItem( 'description', 'Top level expression - unparsed' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', unparsed ) )
 					if nodeExpr is None:
 						node['expr'] = unparsed
 					else:
@@ -361,3 +357,35 @@ class StatementIndentationInteractor (KeyElementInteractor):
 	
 	
 	
+class PythonModuleTopLevelTreeEventListener (TreeEventListenerObjectDispatch):
+	@ObjectDispatchMethod( PythonSelectionEditTreeEvent, PythonIndentationTreeEvent, TextEditEvent )
+	def onEditEvent(self, element, sourceElement, event):
+		return True
+
+PythonModuleTopLevelTreeEventListener.instance = PythonModuleTopLevelTreeEventListener()
+
+
+
+
+class PythonSuiteTopLevelTreeEventListener (TreeEventListenerObjectDispatch):
+	@ObjectDispatchMethod( PythonSelectionEditTreeEvent, PythonIndentationTreeEvent, TextEditEvent )
+	def onEditEvent(self, element, sourceElement, event):
+		return True
+
+PythonSuiteTopLevelTreeEventListener.instance = PythonSuiteTopLevelTreeEventListener()
+
+
+
+
+class PythonExpressionTopLevelTreeEventListener (TreeEventListenerObjectDispatch):
+	@ObjectDispatchMethod( PythonSelectionEditTreeEvent, TextEditEvent )
+	def onEditEvent(self, element, sourceElement, event):
+		return True
+
+PythonExpressionTopLevelTreeEventListener.instance = PythonExpressionTopLevelTreeEventListener()
+
+
+
+
+
+

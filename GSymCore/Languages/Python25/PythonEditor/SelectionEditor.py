@@ -102,7 +102,7 @@ class Python25EditHandler (SequentialEditHandler):
 		
 		
 	def isEditLevelFragmentView(self, fragment):
-		return isStmtFragment( fragment )
+		return isStmtFragment( fragment )  or  isTopLevelFragment( fragment )
 	
 	
 	def createSelectionBuffer(self, stream):

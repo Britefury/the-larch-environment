@@ -437,6 +437,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		s = s.withFixedValue( suite )
 		suiteListener = SuiteTreeEventListener( self._parser.suite(), suite )
 		s = s.withTreeEventListener( suiteListener )
+		s = s.withTreeEventListener( PythonModuleTopLevelTreeEventListener.instance )
 		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		return s
 
@@ -455,6 +456,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		s = s.withFixedValue( suite )
 		suiteListener = SuiteTreeEventListener( self._parser.suite(), suite )
 		s = s.withTreeEventListener( suiteListener )
+		s = s.withTreeEventListener( PythonSuiteTopLevelTreeEventListener.instance )
 		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		return s
 
@@ -473,6 +475,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		_inlineObject_dropDest = ObjectDndHandler.DropDest( GSymFragmentView.FragmentModel, _onDrop_inlineObject )
 		e = e.withDropDest( _inlineObject_dropDest )
 		e = e.withTreeEventListener( instanceCache( PythonExpressionTreeEventListener, self._parser.expression(), PRECEDENCE_NONE ) )
+		e = e.withTreeEventListener( PythonExpressionTopLevelTreeEventListener.instance )
 		e = e.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		return e
 
