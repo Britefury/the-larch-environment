@@ -773,7 +773,9 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 		
 		
 	def _quotedNode(self, node):
-		if isinstance( node, str )  or  isinstance( node, unicode ):
+		if node is None:
+			return 'None'
+		elif isinstance( node, str )  or  isinstance( node, unicode ):
 			return repr( node )
 		elif isinstance( node, DMObject ):
 			if node.isInstanceOf( Schema.Unquote ):

@@ -70,6 +70,9 @@ def isCompoundStmtOrCompoundHeader(node):
 def isUnparsed(node):
 	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Schema.UNPARSED )
 
+def isTopLevel(node):
+	return isinstance( node, DMObjectInterface )  and  ( node.isInstanceOf( Schema.PythonModule )  or  node.isInstanceOf( Schema.PythonSuite )  or  node.isInstanceOf( Schema.PythonExpression ) )
+
 def isPythonModule(node):
 	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Schema.PythonModule )
 
@@ -88,6 +91,9 @@ def isIndentedBlock(node):
 
 def isStmtFragment(fragment):
 	return isStmt( fragment.getModel() )
+
+def isTopLevelFragment(fragment):
+	return isTopLevel( fragment.getModel() )
 
 
 

@@ -220,7 +220,7 @@ InlineObjectStmt = schema.newClass( 'InlineObjectStmt', SimpleStmt, [ 'resource'
 
 
 #
-# Module and expression - outer nodes
+# Top level nodes
 #
 PythonModule = schema.newClass( 'PythonModule', CompoundStmt, [ 'suite' ] )
 PythonSuite = schema.newClass( 'PythonSuite', CompoundStmt, [ 'suite' ] )
