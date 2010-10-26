@@ -315,7 +315,7 @@ def _onDrop_inlineObject(element, pos, data, action):
 	if caret.isValid():
 		model = data.getModel()
 		try:
-			resource = DMNode.pyResource( model )
+			resource = DMNode.resource( model )
 		except Exception, e:
 			_displayResourceException( e )
 		except Throwable, t:

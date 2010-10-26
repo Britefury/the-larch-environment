@@ -13,14 +13,14 @@ import BritefuryJ.DocModel.DMIOReader;
 import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
 import BritefuryJ.Parser.AnyNode;
 import BritefuryJ.Parser.Choice;
-import BritefuryJ.Parser.TracedParseResult;
 import BritefuryJ.Parser.ListNode;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParserExpression;
-import BritefuryJ.Parser.Production;
-import BritefuryJ.Parser.RegEx;
 import BritefuryJ.Parser.ParserExpression.ParserCoerceException;
+import BritefuryJ.Parser.Production;
 import BritefuryJ.Parser.Production.CannotOverwriteProductionExpressionException;
+import BritefuryJ.Parser.RegEx;
+import BritefuryJ.Parser.TracedParseResult;
 
 public class TreeParserDebugViewerTest
 {
@@ -30,7 +30,7 @@ public class TreeParserDebugViewerTest
 	public static TracedParseResult treeParseDebugResultTest() throws ParseErrorException, CannotOverwriteProductionExpressionException, ParserCoerceException
 	{
 		String inputSX = "[call [getAttr [getAttr [call [getAttr [load x] blah] [params]] foo] blah] [params]]";
-		Object input = DMIOReader.readFromString( inputSX, null );
+		Object input = DMIOReader.readFromString( inputSX );
 		ParserExpression parser = buildParser();
 		return parser.traceParseNode( input );
 	}

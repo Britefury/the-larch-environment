@@ -14,7 +14,6 @@ from GSymCore.PresTemplate import Schema
 
 
 def initPlugin(plugin, world):
-	world.registerSchema( Schema.schema )
 	ExternalExpression.registerExternalExpressionFactory( 'Presenation template', PresTemplate.newTemplate )
 	ExternalExpression.registerExternalExpressionPresenterAndTitle( Schema.schema, PresTemplate.pythonExternalExpressionPresenter, 'Pres template' )
 	ExternalExpression.registerExternalExpressionCodeGeneratorFactory( Schema.schema, PresTemplate.pythonExternalExpressionCodeGeneratorFactory )

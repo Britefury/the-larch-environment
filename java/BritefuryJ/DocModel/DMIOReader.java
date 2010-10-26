@@ -324,16 +324,14 @@ public class DMIOReader extends DMIO
 	private HashMap<String, SchemaRef> moduleTable = new HashMap<String, SchemaRef>();
 	private String source;
 	private int pos;
-	DMSchemaResolver resolver;
 	
 	
-	protected DMIOReader(String source, DMSchemaResolver resolver)
+	protected DMIOReader(String source)
 	{
 		stack = new ArrayList<Object>();
 		result = null;
 		this.source = source;
 		pos = 0;
-		this.resolver = resolver;
 	}
 	
 	
@@ -792,7 +790,7 @@ public class DMIOReader extends DMIO
 				
 				
 				// Get the schema, and add to the schema table
-				DMSchema schema = resolver.getSchema( value );
+				DMSchema schema = DMSchemaResolver.getSchema( value );
 				
 				if ( schema == null )
 				{
@@ -845,9 +843,9 @@ public class DMIOReader extends DMIO
 	}
 	
 	
-	public static Object readFromString(String source, DMSchemaResolver resolver) throws ParseErrorException, BadModuleNameException
+	public static Object readFromString(String source) throws ParseErrorException, BadModuleNameException
 	{
-		DMIOReader reader = new DMIOReader( source, resolver );
+		DMIOReader reader = new DMIOReader( source );
 		return reader.readDocument();
 	}
 }

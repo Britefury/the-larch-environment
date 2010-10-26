@@ -922,21 +922,13 @@ def compileForModuleExecutionAndEvaluation(module, pythonModule, filename):
 				
 				
 				
-				
+from BritefuryJ.DocModel import DMIOReader
 import unittest
-from BritefuryJ.DocModel import DMIOReader, DMSchemaResolver
 
 class TestCase_Python25CodeGenerator (unittest.TestCase):
-	class _Resolver (DMSchemaResolver):
-		def getSchema(self, location):
-			return Schema.schema
-		
-	_resolver = _Resolver()
-	
-		
 	def _testSX(self, sx, expected):
-		sx = '{ py=org.Britefury.gSym.Languages.Python25 : ' + sx + ' }'
-		data = DMIOReader.readFromString( sx, self._resolver )
+		sx = '{ py=GSymCore.Languages.Python25 : ' + sx + ' }'
+		data = DMIOReader.readFromString( sx )
 		
 		gen = Python25CodeGenerator()
 		result = gen( data )
@@ -952,8 +944,8 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		
 		
 	def _testGenSX(self, gen, sx, expected):
-		sx = '{ py=org.Britefury.gSym.Languages.Python25 : ' + sx + ' }'
-		data = DMIOReader.readFromString( sx, self._resolver )
+		sx = '{ py=GSymCore.Languages.Python25 : ' + sx + ' }'
+		data = DMIOReader.readFromString( sx )
 		
 		result = gen( data )
 		

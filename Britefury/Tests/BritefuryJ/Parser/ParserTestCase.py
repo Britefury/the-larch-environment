@@ -6,7 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 from BritefuryJ.DocModel import DMNode
-from BritefuryJ.DocModel import DMIOReader, DMIOWriter, DMSchemaResolver
+from BritefuryJ.DocModel import DMIOReader, DMIOWriter
 
 import string
 import unittest
@@ -23,17 +23,6 @@ def _deepList(xs):
 		return xs
 
 class ParserTestCase (unittest.TestCase):
-	class Resolver (DMSchemaResolver):
-		def __init__(self):
-			self.schemas = {}
-			
-		def getSchema(self, location):
-			return self.schemas[location]
-		
-	resolver = Resolver()
-	
-	
-	
 	def __init__(self, *args, **kwargs):
 		super( ParserTestCase, self ).__init__( *args, **kwargs )
 				
@@ -79,7 +68,7 @@ class ParserTestCase (unittest.TestCase):
 	def _parseStringTestSX(self, parser, input, expectedSX, ignoreChars=_whitespaceRegex):
 		result = parser.traceParseStringChars( input, ignoreChars )
 
-		expected = DMIOReader.readFromString( expectedSX, self.resolver )
+		expected = DMIOReader.readFromString( expectedSX )
 		
 		if not result.isValid():
 			print 'PARSE FAILURE while parsing', input
@@ -157,8 +146,8 @@ class ParserTestCase (unittest.TestCase):
 
 
 	def _parseNodeTestSX(self, parser, inputXS, expectedSX, ignoreChars=_whitespaceRegex):
-		input = DMIOReader.readFromString( inputXS, self.resolver )
-		expected = DMIOReader.readFromString( expectedSX, self.resolver )
+		input = DMIOReader.readFromString( inputXS )
+		expected = DMIOReader.readFromString( expectedSX )
 		
 		result = parser.traceParseNode( input, ignoreChars )
 
@@ -200,7 +189,7 @@ class ParserTestCase (unittest.TestCase):
 
 		
 	def _parseNodeFailTestSX(self, parser, inputSX, ignoreChars=_whitespaceRegex):
-		input = DMIOReader.readFromString( inputXS, self.resolver )
+		input = DMIOReader.readFromString( inputXS )
 	
 		result = parser.traceParseNode( input, ignoreChars )
 		
@@ -256,8 +245,8 @@ class ParserTestCase (unittest.TestCase):
 
 
 	def _parseListTestSX(self, parser, inputSX, expectedSX, ignoreChars=_whitespaceRegex):
-		input = DMIOReader.readFromString( inputSX, self.resolver )
-		expected = DMIOReader.readFromString( expectedSX, self.resolver )
+		input = DMIOReader.readFromString( inputSX )
+		expected = DMIOReader.readFromString( expectedSX )
 		
 		result = parser.traceParseListItems( input, ignoreChars )
 
@@ -310,7 +299,7 @@ class ParserTestCase (unittest.TestCase):
 		
 		
 	def _parseListFailTestSX(self, parser, inputSX, ignoreChars=_whitespaceRegex):
-		input = DMIOReader.readFromString( inputSX, self.resolver )
+		input = DMIOReader.readFromString( inputSX )
 
 		result = parser.traceParseListItems( input, ignoreChars )
 		
@@ -368,7 +357,7 @@ class ParserTestCase (unittest.TestCase):
 
 
 	def _parseStreamTestSX(self, parser, input, expectedSX, ignoreChars=_whitespaceRegex):
-		expected = DMIOReader.readFromString( expectedSX, self.resolver )
+		expected = DMIOReader.readFromString( expectedSX )
 		
 		result = parser.traceParseListItems( input, ignoreChars )
 

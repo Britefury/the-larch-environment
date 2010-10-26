@@ -392,6 +392,21 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	}
 	
 	
+	public void become(DMNode node)
+	{
+		if ( node instanceof DMList )
+		{
+			DMList ls = (DMList)node;
+			ls.onAccess();
+			setContents( ls.value );
+		}
+		else
+		{
+			throw new CannotChangeNodeClassException( node.getClass(), getClass() );
+		}
+	}
+	
+	
 	public Object clone()
 	{
 		return new DMList( this );

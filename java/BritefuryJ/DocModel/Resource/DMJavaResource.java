@@ -14,6 +14,7 @@ import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.IdentityHashMap;
 
+import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocModel.DMNodeClass;
 
 public class DMJavaResource extends DMResource
@@ -49,6 +50,22 @@ public class DMJavaResource extends DMResource
 	
 	
 	
+	public void become(DMNode node)
+	{
+		if ( node instanceof DMJavaResource )
+		{
+			DMJavaResource rsc = (DMJavaResource)node;
+			serialised = rsc.getSerialisedForm();
+			value = null;
+		}
+		else
+		{
+			throw new CannotChangeNodeClassException( node.getClass(), getClass() );
+		}
+	}
+
+
+	
 	public static DMJavaResource serialisedResource(String serialised)
 	{
 		return new DMJavaResource( serialised );
@@ -59,10 +76,9 @@ public class DMJavaResource extends DMResource
 	{
 		if ( value == null )
 		{
-			byte bytes[];
 			try
 			{
-				bytes = serialised.getBytes( "ISO-8859-1" );
+				byte bytes[] = serialised.getBytes( "ISO-8859-1" );
 				ByteArrayInputStream inStream = new ByteArrayInputStream( bytes );
 				ObjectInputStream objIn = new ObjectInputStream( inStream );
 				Object v = objIn.readObject();

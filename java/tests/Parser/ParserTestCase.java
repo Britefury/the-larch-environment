@@ -12,7 +12,6 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMIOReader;
-import BritefuryJ.DocModel.DMSchemaResolver;
 import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
@@ -22,16 +21,12 @@ import BritefuryJ.Parser.ParserExpression;
 
 abstract public class ParserTestCase extends TestCase
 {
-	abstract protected DMSchemaResolver getModuleResolver();
-
-	
-	
 	protected Object readInputSX(String expectedSX)
 	{
 		Object expected = null;
 		try
 		{
-			expected = DMIOReader.readFromString( expectedSX, getModuleResolver() );
+			expected = DMIOReader.readFromString( expectedSX );
 		}
 		catch (ParseErrorException e)
 		{
@@ -47,7 +42,7 @@ abstract public class ParserTestCase extends TestCase
 		Object expected = null;
 		try
 		{
-			expected = DMIOReader.readFromString( expectedSX, getModuleResolver() );
+			expected = DMIOReader.readFromString( expectedSX );
 		}
 		catch (ParseErrorException e)
 		{

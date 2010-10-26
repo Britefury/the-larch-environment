@@ -8,7 +8,7 @@
 import os
 import sys
 
-from BritefuryJ.DocModel import DMSchema, DMSchemaResolver
+from BritefuryJ.DocModel import DMSchema
 
 from Britefury.gSym.gSymPlugin import GSymPlugin
 from Britefury.gSym.Configuration import Configuration
@@ -18,29 +18,6 @@ from Britefury.gSym.Configuration import Configuration
 _internalSchemas = {}
 
 
-class GSymDMSchemaResolver (DMSchemaResolver):
-	def __init__(self):
-		self._locationToSchema = {}
-		
-		
-	def getSchema(self, location):
-		try:
-			return _internalSchemas[location]
-		except KeyError:
-			try:
-				return self._locationToSchema[location]
-			except KeyError:
-				raise DMSchemaResolver.CouldNotResolveSchemaException( location )
-			
-	
-	
-	def _registerDMSchema(self, mod):
-		self._locationToSchema[mod.getLocation()] = mod
-		
-
-		
-		
-		
 		
 #
 #
@@ -53,7 +30,6 @@ class GSymDMSchemaResolver (DMSchemaResolver):
 class GSymWorld (object):
 	def __init__(self):
 		super( GSymWorld, self ).__init__()
-		self.resolver = GSymDMSchemaResolver()
 		self._plugins = GSymPlugin.loadPlugins()
 		self._unitClasses = {}
 		self.newPageFactories = []
@@ -68,12 +44,8 @@ class GSymWorld (object):
 			plugin.initialise( self )
 	
 
-	def registerSchema(self, schema):
-		self.resolver._registerDMSchema( schema )
-			
 	def registerUnitClass(self, plugin, unitClass):
 		schema = unitClass.getSchema()
-		self.resolver._registerDMSchema( schema )
 		self._unitClasses[schema.getLocation()] = unitClass
 	
 	def registerNewPageFactory(self, plugin, newPageFactory):
@@ -137,18 +109,6 @@ class GSymWorld (object):
 			return None
 		
 	
-
-	@staticmethod
-	def registerInternalDMSchema(schema):
-		_internalSchemas[schema.getLocation()] = schema
-		
-		
-	@staticmethod
-	def getInternalResolver():
-		return _internalResolver
-
-	
-_internalResolver = GSymDMSchemaResolver()
 	
 
 

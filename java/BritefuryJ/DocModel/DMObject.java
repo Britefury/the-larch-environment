@@ -528,10 +528,18 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 
 	
 	
-	public void become(DMObject obj)
+	public void become(DMNode node)
 	{
-		obj.onAccess();
-		become( obj.objClass, obj.fieldData );
+		if ( node instanceof DMObject )
+		{
+			DMObject obj = (DMObject)node;
+			obj.onAccess();
+			become( obj.objClass, obj.fieldData );
+		}
+		else
+		{
+			throw new CannotChangeNodeClassException( node.getClass(), getClass() );
+		}
 	}
 
 	protected void become(DMObjectClass cls, Object[] data)

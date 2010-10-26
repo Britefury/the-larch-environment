@@ -6,6 +6,10 @@
 //##************************
 package BritefuryJ.DocModel;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,6 +21,7 @@ import org.python.core.Py;
 import org.python.core.PyJavaType;
 import org.python.core.PyObject;
 import org.python.core.PyObjectDerived;
+import org.python.core.PyString;
 
 import BritefuryJ.DocModel.Resource.DMJavaResource;
 import BritefuryJ.DocModel.Resource.DMPyResource;
@@ -25,6 +30,35 @@ import BritefuryJ.DocModel.Resource.DMResource;
 
 public abstract class DMNode implements Cloneable
 {
+	public static class CannotChangeNodeClassException extends RuntimeException
+	{
+		private static final long serialVersionUID = 1L;
+		
+		
+		private Class<?> sourceClass, destClass;
+		
+		
+		public CannotChangeNodeClassException(Class<?> sourceClass, Class<?> destClass)
+		{
+			super( "Cannot change node class from " + destClass.getName() + " to " + sourceClass.getName() );
+			this.sourceClass = sourceClass;
+			this.destClass = destClass;
+		}
+
+
+		public Class<?> getSourceClass()
+		{
+			return sourceClass;
+		}
+
+
+		public Class<?> getDestClass()
+		{
+			return destClass;
+		}
+	}
+	
+	
 	public static class ParentListIterator implements Iterator<DMNode>
 	{
 		Iterator<WeakReference<DMNode>> iter;
@@ -245,6 +279,62 @@ public abstract class DMNode implements Cloneable
 	{
 		parents = new ArrayList<WeakReference<DMNode>>();
 	}
+	
+	
+	
+	public PyObject __getstate__()
+	{
+		try
+		{
+			ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+			DMObjectOutputStream objOut = new DMObjectOutputStream( outStream );
+			objOut.writeObject( this );
+			return new PyString( new String( outStream.toByteArray(), "ISO-8859-1" ) );
+		}
+		catch (UnsupportedEncodingException e)
+		{
+			throw new RuntimeException( "UnsupportedEncodingException while creating serialised form: " + e.getMessage() );
+		}
+		catch (IOException e)
+		{
+			throw new RuntimeException( "IOException while creating serialised form: " + e.getMessage() );
+		}
+	}
+	
+	public void __setstate__(PyObject state)
+	{
+		if ( state instanceof PyString )
+		{
+			try
+			{
+				String serialised = state.asString();
+				byte bytes[] = serialised.getBytes( "ISO-8859-1" );
+				ByteArrayInputStream inStream = new ByteArrayInputStream( bytes );
+				DMObjectInputStream objIn = new DMObjectInputStream( inStream );
+				DMNode node = (DMNode)objIn.readObject();
+				become( node );
+			}
+			catch (UnsupportedEncodingException e)
+			{
+				throw new RuntimeException( "Cannot get UTF-8 encoding: " + e.getMessage() );
+			}
+			catch (IOException e)
+			{
+				throw new RuntimeException( "IOException while reading from serialised form: " + e.getMessage() );
+			}
+			catch (ClassNotFoundException e)
+			{
+				throw new RuntimeException( "Cannot read object; class not found: " + e.getMessage() );
+			}
+		}
+		else
+		{
+			throw Py.TypeError( "Pickle state should be a Python string" );
+		}
+	}
+	
+	
+	public abstract void become(DMNode node);
 	
 	
 	
