@@ -9,6 +9,8 @@ package BritefuryJ.DocModel;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -22,6 +24,7 @@ import org.python.core.PyJavaType;
 import org.python.core.PyObject;
 import org.python.core.PyObjectDerived;
 import org.python.core.PyString;
+import org.python.core.PyTuple;
 
 import BritefuryJ.DocModel.Resource.DMJavaResource;
 import BritefuryJ.DocModel.Resource.DMPyResource;
@@ -282,12 +285,21 @@ public abstract class DMNode implements Cloneable
 	
 	
 	
+	protected abstract PyObject getPyFactory();
+	
+	
+	public PyObject __reduce__()
+	{
+		return new PyTuple( getPyFactory(), new PyTuple(), __getstate__() );
+	}
+	
+	
 	public PyObject __getstate__()
 	{
 		try
 		{
 			ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-			DMObjectOutputStream objOut = new DMObjectOutputStream( outStream );
+			ObjectOutputStream objOut = new ObjectOutputStream( outStream );
 			objOut.writeObject( this );
 			return new PyString( new String( outStream.toByteArray(), "ISO-8859-1" ) );
 		}
@@ -310,7 +322,7 @@ public abstract class DMNode implements Cloneable
 				String serialised = state.asString();
 				byte bytes[] = serialised.getBytes( "ISO-8859-1" );
 				ByteArrayInputStream inStream = new ByteArrayInputStream( bytes );
-				DMObjectInputStream objIn = new DMObjectInputStream( inStream );
+				ObjectInputStream objIn = new ObjectInputStream( inStream );
 				DMNode node = (DMNode)objIn.readObject();
 				become( node );
 			}

@@ -14,8 +14,11 @@ import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.IdentityHashMap;
 
+import org.python.core.PyObject;
+
 import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocModel.DMNodeClass;
+import BritefuryJ.DocModel.DMPickleHelper;
 
 public class DMJavaResource extends DMResource
 {
@@ -30,6 +33,11 @@ public class DMJavaResource extends DMResource
 	
 	private Object value[] = null;
 	
+	
+	public DMJavaResource()
+	{
+		super();
+	}
 	
 	public DMJavaResource(Object value)
 	{
@@ -48,6 +56,12 @@ public class DMJavaResource extends DMResource
 		super( serialised );
 	}
 	
+	
+	
+	public PyObject getPyFactory()
+	{
+		return DMPickleHelper.getDMJavaResourceFactory();
+	}
 	
 	
 	public void become(DMNode node)

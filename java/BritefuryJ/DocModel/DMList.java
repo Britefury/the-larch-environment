@@ -20,6 +20,7 @@ import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
 import org.python.core.Py;
+import org.python.core.PyObject;
 import org.python.core.PySlice;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
@@ -389,6 +390,12 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		}
 		
 		commandTracker = null;
+	}
+	
+	
+	public PyObject getPyFactory()
+	{
+		return DMPickleHelper.getDMListFactory();
 	}
 	
 	

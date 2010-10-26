@@ -8,60 +8,70 @@ package BritefuryJ.DocModel;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.WeakHashMap;
 
-public class DMObjectOutputStream extends ObjectOutputStream
+public class DMObjectOutputStream
 {
-	private HashMap<DMSchema, String> moduleToName;
-	private HashSet<String> names;
-	
-	
-	
-	public DMObjectOutputStream(OutputStream out) throws IOException
+	private static class State
 	{
-		super( out );
-		
-		moduleToName = new HashMap<DMSchema, String>();
-		names = new HashSet<String>();
+		private HashMap<DMSchema, String> moduleToName = new HashMap<DMSchema, String>();
+		private HashSet<String> names = new HashSet<String>();
 	}
 	
 	
-	private void writeSchemaRef(DMSchema schema) throws IOException
+	private static WeakHashMap<ObjectOutputStream, State> stateTable = new WeakHashMap<ObjectOutputStream, State>();
+	
+	
+	private static State getState(ObjectOutputStream stream)
 	{
-		String modName = moduleToName.get( schema );
+		State state = stateTable.get( stream );
+		if ( state == null )
+		{
+			state = new State();
+			stateTable.put( stream, state );
+		}
+		return state;
+	}
+	
+	
+	
+	private static void writeSchemaRef(ObjectOutputStream stream, DMSchema schema) throws IOException
+	{
+		State state = getState( stream );
+		String modName = state.moduleToName.get( schema );
 		if ( modName == null )
 		{
 			String shortName = schema.getShortName();
 			modName = shortName;
 			int index = 2;
-			while ( names.contains( modName ) )
+			while ( state.names.contains( modName ) )
 			{
 				modName = shortName + index;
 				index++;
 			}
 			
-			moduleToName.put( schema, modName );
-			names.add( modName );
+			state.moduleToName.put( schema, modName );
+			state.names.add( modName );
 			
 			
 			
-			writeBoolean( true );
-			writeObject( modName );
-			writeObject( schema.getLocation() );
-			writeObject( (Integer)schema.getVersion() );
+			stream.writeBoolean( true );
+			stream.writeObject( modName );
+			stream.writeObject( schema.getLocation() );
+			stream.writeObject( (Integer)schema.getVersion() );
 		}
 		else
 		{
-			writeBoolean( false );
-			writeObject( modName );
+			stream.writeBoolean( false );
+			stream.writeObject( modName );
 		}
 	}
 
-	public void writeDMObjectClass(DMObjectClass cls) throws IOException
+	public static void writeDMObjectClass(ObjectOutputStream stream, DMObjectClass cls) throws IOException
 	{
-		writeSchemaRef( cls.getSchema() );
-		writeObject( cls.getName() );
+		writeSchemaRef( stream, cls.getSchema() );
+		stream.writeObject( cls.getName() );
 	}
 }

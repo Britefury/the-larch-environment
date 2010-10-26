@@ -9,14 +9,14 @@ package tests.DocModel;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Arrays;
 
 import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMList;
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
-import BritefuryJ.DocModel.DMObjectInputStream;
-import BritefuryJ.DocModel.DMObjectOutputStream;
 import BritefuryJ.DocModel.DMSchema;
 
 public class Test_DocModelSerialisation extends TestCase
@@ -39,11 +39,11 @@ public class Test_DocModelSerialisation extends TestCase
 		DMObject obj = A.newInstance( new Object[] { "a", new DMList( Arrays.asList( new Object[]{ "x" } ) ) } );
 		
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-		DMObjectOutputStream outDM = new DMObjectOutputStream( outStream );
+		ObjectOutputStream outDM = new ObjectOutputStream( outStream );
 		outDM.writeObject( obj );
 		
 		ByteArrayInputStream inStream = new ByteArrayInputStream( outStream.toByteArray() );
-		DMObjectInputStream inDM = new DMObjectInputStream( inStream );
+		ObjectInputStream inDM = new ObjectInputStream( inStream );
 		DMObject obj2 = (DMObject)inDM.readObject();
 		
 		assertNotSame( obj, obj2 );
