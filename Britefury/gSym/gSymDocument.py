@@ -44,8 +44,6 @@ nodeClass_GSymUnit = schema.newClass( 'GSymUnit', [ 'schemaLocation', 'content' 
 nodeClass_GSymDocument = schema.newClass( 'GSymDocument', [ 'version', 'content' ] )
 
 
-GSymWorld.registerInternalDMSchema( schema )
-
 
 
 
@@ -199,7 +197,7 @@ class GSymDocument (CommandHistoryListener):
 		f = open( filename, 'r' )
 		if f is not None:
 			try:
-				documentRoot = DMIOReader.readFromString( f.read(), world.resolver )
+				documentRoot = DMIOReader.readFromString( f.read() )
 				documentRoot = DMNode.coerce( documentRoot )
 				document = GSymDocument.read( world, documentRoot )
 				document._filename = filename

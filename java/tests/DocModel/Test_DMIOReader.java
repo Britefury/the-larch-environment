@@ -14,19 +14,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import junit.framework.TestCase;
+
 import org.python.core.PyInteger;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 
-import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMIOReader;
 import BritefuryJ.DocModel.DMIOWriter;
+import BritefuryJ.DocModel.DMIOWriter.InvalidDataTypeException;
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectReader;
 import BritefuryJ.DocModel.DMSchema;
-import BritefuryJ.DocModel.DMSchemaResolver;
-import BritefuryJ.DocModel.DMIOWriter.InvalidDataTypeException;
 import BritefuryJ.DocModel.Resource.DMJavaResource;
 import BritefuryJ.DocModel.Resource.DMPyResource;
 
@@ -34,9 +34,9 @@ public class Test_DMIOReader extends TestCase
 {
 	protected static class TestReader extends DMIOReader
 	{
-		protected TestReader(String source, DMSchemaResolver resolver)
+		protected TestReader(String source)
 		{
-			super( source, resolver );
+			super( source );
 		}
 
 		protected static MatchResult test_match(Pattern pattern, String source, int position)
@@ -46,25 +46,23 @@ public class Test_DMIOReader extends TestCase
 	}
 
 	
-	private DMSchema schemaA;
-	private DMObjectClass A;
+	private static DMSchema schemaA;
+	private static DMObjectClass A;
 	
-	private DMSchema schemaBv1, schemaBv7;
-	private DMObjectClass B1, B7;
+	private static DMSchema schemaBv1, schemaBv7;
+	private static DMObjectClass B1, B7;
 	
-	private DMSchemaResolver resolver1, resolver2;
+	private static DMObjectReader b1ReaderForV7, b4ReaderForV7;
 	
-	private DMObjectReader b1ReaderForV7, b4ReaderForV7;
-	
-	public void setUp()
+	static
 	{
-		schemaA = new DMSchema( "schema", "m", "test.schemaA" );
+		schemaA = new DMSchema( "schema", "m", "test.DocModel.Test_DMIOReader.schemaA" );
 		A = schemaA.newClass( "A", new String[] { "x", "y" } );
 		
-		schemaBv1 = new DMSchema( "schema", "m", "test.schemaB" );
+		schemaBv1 = new DMSchema( "schema", "m", "test.DocModel.Test_DMIOReader.schemaB1" );
 		B1 = schemaBv1.newClass( "B", new String[] { "x", "y" } );
 
-		schemaBv7 = new DMSchema( "schema", "m", "test.schemaB", 7 );
+		schemaBv7 = new DMSchema( "schema", "m", "test.DocModel.Test_DMIOReader.schemaB7", 7 );
 		B7 = schemaBv7.newClass( "B", new String[] { "x", "z" } );
 		b1ReaderForV7 = new DMObjectReader()
 		{
@@ -90,65 +88,8 @@ public class Test_DMIOReader extends TestCase
 		};
 		schemaBv7.registerReader( "B", 1, b1ReaderForV7 );
 		schemaBv7.registerReader( "B", 4, b4ReaderForV7 );
-		
-		
-		resolver1 = new DMSchemaResolver()
-		{
-			public DMSchema getSchema(String location)
-			{
-				if ( location.equals( "test.schemaA" ) )
-				{
-					return schemaA;
-				}
-				if ( location.equals( "test.schemaB" ) )
-				{
-					return schemaBv1;
-				}
-				else
-				{
-					return null;
-				}
-			}
-		};
-
-		resolver2 = new DMSchemaResolver()
-		{
-			public DMSchema getSchema(String location)
-			{
-				if ( location.equals( "test.schemaA" ) )
-				{
-					return schemaA;
-				}
-				if ( location.equals( "test.schemaB" ) )
-				{
-					return schemaBv7;
-				}
-				else
-				{
-					return null;
-				}
-			}
-		};
 	}
 	
-	
-	public void tearDown()
-	{
-		schemaA = null;
-		A = null;
-
-		schemaBv1 = null;
-		B1 = null;
-		schemaBv7 = null;
-		B7 = null;
-
-		resolver1 = null;
-		resolver2 = null;
-		
-		b1ReaderForV7 = null;
-		b4ReaderForV7 = null;
-	}
-
 	
 	
 	
@@ -195,15 +136,10 @@ public class Test_DMIOReader extends TestCase
 
 	public void readTest(String input, Object expected)
 	{
-		readTest( resolver1, input, expected );
-	}
-
-	public void readTest(DMSchemaResolver resolver, String input, Object expected)
-	{
 		Object res = null;
 		try
 		{
-			res = DMIOReader.readFromString( input, resolver );
+			res = DMIOReader.readFromString( input );
 		}
 		catch (DMIOReader.ParseErrorException e)
 		{
@@ -358,7 +294,7 @@ public class Test_DMIOReader extends TestCase
 	public void testReadObject()
 	{
 		DMObject a = A.newInstance( new Object[] { "0", "1" } );
-		readTest( "{m=test.schemaA : (m A x=0 y=1)}", a );
+		readTest( "{m=test.DocModel.Test_DMIOReader.schemaA : (m A x=0 y=1)}", a );
 	}
 
 	public void testReadJavaResource() throws IOException
@@ -378,7 +314,7 @@ public class Test_DMIOReader extends TestCase
 	{
 		DMObject a = A.newInstance( new Object[] { "0", "1" } );
 		DMObject b = A.newInstance( new Object[] { a, "1" } );
-		readTest( "{m=test.schemaA : (m A x=(m A x=0 y=1) y=1)}", b );
+		readTest( "{m=test.DocModel.Test_DMIOReader.schemaA : (m A x=(m A x=0 y=1) y=1)}", b );
 	}
 
 	public void testReadObjectInListInObject()
@@ -386,7 +322,7 @@ public class Test_DMIOReader extends TestCase
 		DMObject a = A.newInstance( new Object[] { "0", "1" } );
 		List<Object> b = Arrays.asList( new Object[] { a, "xyz" } );
 		DMObject c = A.newInstance( new Object[] { b, "1" } );
-		readTest( "{m=test.schemaA : (m A x=[(m A x=0 y=1) xyz] y=1)}", c );
+		readTest( "{m=test.DocModel.Test_DMIOReader.schemaA : (m A x=[(m A x=0 y=1) xyz] y=1)}", c );
 	}
 	
 	public void testReadNestedResource() throws IOException
@@ -404,16 +340,16 @@ public class Test_DMIOReader extends TestCase
 		DMObject b;
 		// Try old schema, v1
 		b = B1.newInstance( new Object[] { "0", "1" } );
-		readTest( resolver1, "{m=test.schemaB : (m B x=0 y=1)}", b );
+		readTest( "{m=test.DocModel.Test_DMIOReader.schemaB1 : (m B x=0 y=1)}", b );
 
 		// Try new schema, v1-7
 		b = B7.newInstance( new Object[] { "0", "1" } );
-		readTest( resolver2, "{m=test.schemaB : (m B x=0 y=1)}", b );
-		readTest( resolver2, "{m=test.schemaB<2> : (m B x=0 w=1)}", b );
-		readTest( resolver2, "{m=test.schemaB<3> : (m B x=0 w=1)}", b );
-		readTest( resolver2, "{m=test.schemaB<4> : (m B x=0 w=1)}", b );
-		readTest( resolver2, "{m=test.schemaB<5> : (m B x=0 z=1)}", b );
-		readTest( resolver2, "{m=test.schemaB<6> : (m B x=0 z=1)}", b );
-		readTest( resolver2, "{m=test.schemaB<7> : (m B x=0 z=1)}", b );
+		readTest( "{m=test.DocModel.Test_DMIOReader.schemaB7 : (m B x=0 y=1)}", b );
+		readTest( "{m=test.DocModel.Test_DMIOReader.schemaB7<2> : (m B x=0 w=1)}", b );
+		readTest( "{m=test.DocModel.Test_DMIOReader.schemaB7<3> : (m B x=0 w=1)}", b );
+		readTest( "{m=test.DocModel.Test_DMIOReader.schemaB7<4> : (m B x=0 w=1)}", b );
+		readTest( "{m=test.DocModel.Test_DMIOReader.schemaB7<5> : (m B x=0 z=1)}", b );
+		readTest( "{m=test.DocModel.Test_DMIOReader.schemaB7<6> : (m B x=0 z=1)}", b );
+		readTest( "{m=test.DocModel.Test_DMIOReader.schemaB7<7> : (m B x=0 z=1)}", b );
 	}
 }

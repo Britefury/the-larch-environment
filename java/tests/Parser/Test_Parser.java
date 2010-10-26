@@ -13,7 +13,6 @@ import java.util.Map;
 
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMSchema;
-import BritefuryJ.DocModel.DMSchemaResolver;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.Parser.Action;
 import BritefuryJ.Parser.AnyList;
@@ -23,7 +22,6 @@ import BritefuryJ.Parser.AnyString;
 import BritefuryJ.Parser.Choice;
 import BritefuryJ.Parser.Combine;
 import BritefuryJ.Parser.Condition;
-import BritefuryJ.Parser.TracedParseResult;
 import BritefuryJ.Parser.Delegate;
 import BritefuryJ.Parser.Keyword;
 import BritefuryJ.Parser.ListNode;
@@ -35,49 +33,37 @@ import BritefuryJ.Parser.Optional;
 import BritefuryJ.Parser.ParseAction;
 import BritefuryJ.Parser.ParseCondition;
 import BritefuryJ.Parser.ParserExpression;
+import BritefuryJ.Parser.ParserExpression.ParserCoerceException;
 import BritefuryJ.Parser.Peek;
 import BritefuryJ.Parser.PeekNot;
 import BritefuryJ.Parser.Production;
+import BritefuryJ.Parser.Production.CannotOverwriteProductionExpressionException;
 import BritefuryJ.Parser.RegEx;
 import BritefuryJ.Parser.Repetition;
 import BritefuryJ.Parser.SeparatedList;
-import BritefuryJ.Parser.Sequence;
-import BritefuryJ.Parser.StringNode;
-import BritefuryJ.Parser.Suppress;
-import BritefuryJ.Parser.Word;
-import BritefuryJ.Parser.ZeroOrMore;
-import BritefuryJ.Parser.ParserExpression.ParserCoerceException;
-import BritefuryJ.Parser.Production.CannotOverwriteProductionExpressionException;
 import BritefuryJ.Parser.SeparatedList.CannotApplyConditionAfterActionException;
 import BritefuryJ.Parser.SeparatedList.CannotApplyMoreThanOneActionException;
 import BritefuryJ.Parser.SeparatedList.CannotApplyMoreThanOneConditionException;
+import BritefuryJ.Parser.Sequence;
+import BritefuryJ.Parser.StringNode;
+import BritefuryJ.Parser.Suppress;
+import BritefuryJ.Parser.TracedParseResult;
+import BritefuryJ.Parser.Word;
+import BritefuryJ.Parser.ZeroOrMore;
 
 public class Test_Parser extends ParserTestCase
 {
 	public static ParserExpression identifier = new RegEx( "[A-Za-z_][A-Za-z0-9_]*" );
 	public ParserExpression foo, bar, bar2;
 
-	protected DMSchema s;
-	protected DMObjectClass Foo, Bar, Bar2, A, Add, Sub, Mul;
-	protected DMSchemaResolver resolver = new DMSchemaResolver()
-	{
-		public DMSchema getSchema(String location)
-		{
-			return location.equals( "s" )  ? s :  null;
-		}
-	};
-
-
-	protected DMSchemaResolver getModuleResolver()
-	{
-		return resolver;
-	}
+	protected static DMSchema s;
+	protected static DMObjectClass Foo, Bar, Bar2, A, Add, Sub, Mul;
 	
 
 	
-	public void setUp()
+	static
 	{
-		s = new DMSchema( "s", "m", "s" );
+		s = new DMSchema( "s", "m", "tests.Parser.Test_Parser.s" );
 		Foo = s.newClass( "Foo", new String[] { "a" } );
 		Bar = s.newClass( "Bar", new String[] { "b" } );
 		Bar2 = s.newClass( "Bar2", Bar, new String[] { "c" } );
@@ -85,11 +71,6 @@ public class Test_Parser extends ParserTestCase
 		Add = s.newClass( "Add", new String[] { "a", "b" } );
 		Sub = s.newClass( "Sub", new String[] { "a", "b" } );
 		Mul = s.newClass( "Mul", new String[] { "a", "b" } );
-	}
-	
-	public void tearDown()
-	{
-		s = null;
 	}
 
 	
@@ -224,14 +205,14 @@ public class Test_Parser extends ParserTestCase
 	
 		matchFailTestStringAndStream( new AnyObject(), "abc" );
 		
-		matchTestStreamSX( new AnyObject(), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "{m=s : (m Foo a=xyz)}" ) ) } ).stream(), "{m=s : (m Foo a=xyz)}" );
+		matchTestStreamSX( new AnyObject(), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "{m=tests.Parser.Test_Parser.s : (m Foo a=xyz)}" ) ) } ).stream(), "{m=tests.Parser.Test_Parser.s : (m Foo a=xyz)}" );
 		matchFailTestStream( new AnyObject(), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "a" ) ) } ).stream() );
 		
-		matchTestNodeSX( new AnyObject(), "{m=s : (m Foo a=xyz)}", "{m=s : (m Foo a=xyz)}" );
+		matchTestNodeSX( new AnyObject(), "{m=tests.Parser.Test_Parser.s : (m Foo a=xyz)}", "{m=tests.Parser.Test_Parser.s : (m Foo a=xyz)}" );
 		matchFailTestNodeSX( new AnyObject(), "[a]" );
 		matchFailTestNodeSX( new AnyObject(), "a" );
 		
-		matchTestListSX( new AnyObject(), "{m=s : [(m Foo a=xyz)]}", "{m=s : (m Foo a=xyz)}" );
+		matchTestListSX( new AnyObject(), "{m=tests.Parser.Test_Parser.s : [(m Foo a=xyz)]}", "{m=tests.Parser.Test_Parser.s : (m Foo a=xyz)}" );
 		matchFailTestListSX( new AnyObject(), "[a]", "a" );
 		matchFailTestListSX( new AnyObject(), "[[a b c]]" );
 	}
@@ -265,8 +246,8 @@ public class Test_Parser extends ParserTestCase
 		matchTestStringAndStreamSX( parser2, "abc", "abc" );
 		bindingsTestStringAndStreamSX( parser2, "abc", "[[x abc] [y abc]]" );
 		
-		bindingsTestNodeSX( new ObjectNode( Foo ).bindTo( "x" ),"{m=s : (m Foo a=a)}", "{m=s : [[x (m Foo a=a)]]}" );
-		bindingsTestListSX( new AnyString().bindTo( "x" ),"[a]", "{m=s : [[x a]]}" );
+		bindingsTestNodeSX( new ObjectNode( Foo ).bindTo( "x" ),"{m=tests.Parser.Test_Parser.s : (m Foo a=a)}", "{m=tests.Parser.Test_Parser.s : [[x (m Foo a=a)]]}" );
+		bindingsTestListSX( new AnyString().bindTo( "x" ),"[a]", "{m=tests.Parser.Test_Parser.s : [[x a]]}" );
 	}
 
 	
@@ -302,12 +283,12 @@ public class Test_Parser extends ParserTestCase
 		ParserExpression nodeParser = new Choice( new Object[] { new ObjectNode( Foo ), new ObjectNode( Bar2 ) } );
 		ParserExpression nodeParserWithBindings = new Choice( new Object[] { new ObjectNode( Foo ).bindTo( "x" ), new ObjectNode( Bar2 ).bindTo( "y" ) } );
 
-		matchTestNodeSX( nodeParser, "{m=s : (m Foo a=x)}", "{m=s : (m Foo a=x)}" );
-		matchTestNodeSX( nodeParser, "{m=s : (m Bar2 b=x c=y)}", "{m=s : (m Bar2 b=x c=y)}" );
-		matchFailTestNodeSX( nodeParser, "{m=s : (m Bar b=x)}" );
+		matchTestNodeSX( nodeParser, "{m=tests.Parser.Test_Parser.s : (m Foo a=x)}", "{m=tests.Parser.Test_Parser.s : (m Foo a=x)}" );
+		matchTestNodeSX( nodeParser, "{m=tests.Parser.Test_Parser.s : (m Bar2 b=x c=y)}", "{m=tests.Parser.Test_Parser.s : (m Bar2 b=x c=y)}" );
+		matchFailTestNodeSX( nodeParser, "{m=tests.Parser.Test_Parser.s : (m Bar b=x)}" );
 		
-		bindingsTestNodeSX( nodeParserWithBindings, "{m=s : (m Foo a=x)}", "{m=s : [[x (m Foo a=x)]]}" );
-		bindingsTestNodeSX( nodeParserWithBindings, "{m=s : (m Bar2 b=x c=y)}", "{m=s : [[y (m Bar2 b=x c=y)]]}" );
+		bindingsTestNodeSX( nodeParserWithBindings, "{m=tests.Parser.Test_Parser.s : (m Foo a=x)}", "{m=tests.Parser.Test_Parser.s : [[x (m Foo a=x)]]}" );
+		bindingsTestNodeSX( nodeParserWithBindings, "{m=tests.Parser.Test_Parser.s : (m Bar2 b=x c=y)}", "{m=tests.Parser.Test_Parser.s : [[y (m Bar2 b=x c=y)]]}" );
 		
 		
 		matchTestListSX( parser, "[ab]", "ab" );
@@ -334,8 +315,8 @@ public class Test_Parser extends ParserTestCase
 		bindingsTestStringAndStreamSX( parser2, "abc", "[]" );
 		
 		
-		matchTestNodeSX( new ObjectNode( Foo ).bindTo( "x" ).clearBindings(), "{m=s : (m Foo a=x)}", "{m=s : (m Foo a=x)}" );
-		bindingsTestNodeSX( new ObjectNode( Foo ).bindTo( "x" ).clearBindings(), "{m=s : (m Foo a=x)}", "[]" );
+		matchTestNodeSX( new ObjectNode( Foo ).bindTo( "x" ).clearBindings(), "{m=tests.Parser.Test_Parser.s : (m Foo a=x)}", "{m=tests.Parser.Test_Parser.s : (m Foo a=x)}" );
+		bindingsTestNodeSX( new ObjectNode( Foo ).bindTo( "x" ).clearBindings(), "{m=tests.Parser.Test_Parser.s : (m Foo a=x)}", "[]" );
 
 		matchTestListSX( new AnyString().bindTo( "x" ).clearBindings(), "[a]", "a" );
 		bindingsTestListSX( new AnyString().bindTo( "x" ).clearBindings(), "[a]", "[]" );
@@ -384,7 +365,7 @@ public class Test_Parser extends ParserTestCase
 	
 	
 		ParserExpression objectParserWithBindings = new Combine( new Object[] { new ObjectNode( Foo ).bindTo( "x" ), new ObjectNode( Bar ).bindTo( "y" ), new ObjectNode( Foo ).bindTo( "x" ) } );
-		matchFailTestNodeSX( objectParserWithBindings, "{m=s : [(m Foo a=x) (m Bar b=y) (m Foo a=z)]}" );
+		matchFailTestNodeSX( objectParserWithBindings, "{m=tests.Parser.Test_Parser.s : [(m Foo a=x) (m Bar b=y) (m Foo a=z)]}" );
 
 		ParserExpression listParserWithBindings = new Combine( new Object[] { new AnyList().bindTo( "x" ), new AnyList().bindTo( "y" ), new AnyList().bindTo( "x" ) } );
 		matchTestListSX( listParserWithBindings, "[[a] [b] [c]]", "[a b c]" );
@@ -569,60 +550,60 @@ public class Test_Parser extends ParserTestCase
 		matchTestStream( new LiteralNode( "hello" ), new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( "hello" ) } ).stream(), "hello" );
 		matchTestListSX( new LiteralNode( "hello" ), "[hello]", "hello" );
 
-		matchTestNodeSX( new LiteralNode( Foo.newInstance( new Object[] { "x" } ) ), "{m=s : (m Foo a=x)}", "{m=s : (m Foo a=x)}" );
+		matchTestNodeSX( new LiteralNode( Foo.newInstance( new Object[] { "x" } ) ), "{m=tests.Parser.Test_Parser.s : (m Foo a=x)}", "{m=tests.Parser.Test_Parser.s : (m Foo a=x)}" );
 		matchTestStreamSX( new LiteralNode( Foo.newInstance( new Object[] { "x" } ) ),
-				new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "{m=s : (m Foo a=x)}" ) ) } ).stream(), "{m=s : (m Foo a=x)}" );
-		matchTestListSX( new LiteralNode( Foo.newInstance( new Object[] { "x" } ) ), "{m=s : [(m Foo a=x)]}", "{m=s : (m Foo a=x)}" );
+				new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "{m=tests.Parser.Test_Parser.s : (m Foo a=x)}" ) ) } ).stream(), "{m=tests.Parser.Test_Parser.s : (m Foo a=x)}" );
+		matchTestListSX( new LiteralNode( Foo.newInstance( new Object[] { "x" } ) ), "{m=tests.Parser.Test_Parser.s : [(m Foo a=x)]}", "{m=tests.Parser.Test_Parser.s : (m Foo a=x)}" );
 	}
 
 
 	public void testObjectNode() throws ParserCoerceException
 	{
 		ParserExpression parser1 = new ObjectNode( A, new String[] { "x" }, new Object[] { new Literal( "abc" ) } );
-		matchTestNodeSX( parser1, "{m=s : (m A x=abc y=xyz)}", "{m=s : (m A x=abc y=xyz)}" );
-		matchTestNodeSX( parser1, "{m=s : (m A x=abc y=pqr)}", "{m=s : (m A x=abc y=pqr)}" );
-		matchFailTestNodeSX( parser1, "{m=s : (m A x=pqr y=xyz)}" );
+		matchTestNodeSX( parser1, "{m=tests.Parser.Test_Parser.s : (m A x=abc y=xyz)}", "{m=tests.Parser.Test_Parser.s : (m A x=abc y=xyz)}" );
+		matchTestNodeSX( parser1, "{m=tests.Parser.Test_Parser.s : (m A x=abc y=pqr)}", "{m=tests.Parser.Test_Parser.s : (m A x=abc y=pqr)}" );
+		matchFailTestNodeSX( parser1, "{m=tests.Parser.Test_Parser.s : (m A x=pqr y=xyz)}" );
 		matchFailTestString( parser1, "abc" );
-		matchTestStreamSX( parser1, new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "{m=s : (m A x=abc y=xyz)}" ) ) } ).stream(),
-				"{m=s : (m A x=abc y=xyz)}" );
-		matchTestListSX( parser1, "{m=s : [(m A x=abc y=xyz)]}", "{m=s : (m A x=abc y=xyz)}" );
+		matchTestStreamSX( parser1, new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "{m=tests.Parser.Test_Parser.s : (m A x=abc y=xyz)}" ) ) } ).stream(),
+				"{m=tests.Parser.Test_Parser.s : (m A x=abc y=xyz)}" );
+		matchTestListSX( parser1, "{m=tests.Parser.Test_Parser.s : [(m A x=abc y=xyz)]}", "{m=tests.Parser.Test_Parser.s : (m A x=abc y=xyz)}" );
 		
 		ParserExpression parser2 = new ObjectNode( A, new String[] { "y" }, new Object[] { new Literal( "xyz" ) } );
-		matchTestNodeSX( parser2, "{m=s : (m A x=abc y=xyz)}", "{m=s : (m A x=abc y=xyz)}" );
-		matchTestNodeSX( parser2, "{m=s : (m A x=pqr y=xyz)}", "{m=s : (m A x=pqr y=xyz)}" );
-		matchFailTestNodeSX( parser2, "{m=s : (m A x=abc y=pqr)}" );
+		matchTestNodeSX( parser2, "{m=tests.Parser.Test_Parser.s : (m A x=abc y=xyz)}", "{m=tests.Parser.Test_Parser.s : (m A x=abc y=xyz)}" );
+		matchTestNodeSX( parser2, "{m=tests.Parser.Test_Parser.s : (m A x=pqr y=xyz)}", "{m=tests.Parser.Test_Parser.s : (m A x=pqr y=xyz)}" );
+		matchFailTestNodeSX( parser2, "{m=tests.Parser.Test_Parser.s : (m A x=abc y=pqr)}" );
 		
 		ParserExpression parser3 = new ObjectNode( A, new String[] { "x", "y" }, new Object[] { new Literal( "abc" ), new Literal( "xyz" ) } );
-		matchTestNodeSX( parser3, "{m=s : (m A x=abc y=xyz)}", "{m=s : (m A x=abc y=xyz)}" );
-		matchFailTestNodeSX( parser3, "{m=s : (m A x=pqr y=xyz)}" );
-		matchFailTestNodeSX( parser3, "{m=s : (m A x=abc y=pqr)}" );
+		matchTestNodeSX( parser3, "{m=tests.Parser.Test_Parser.s : (m A x=abc y=xyz)}", "{m=tests.Parser.Test_Parser.s : (m A x=abc y=xyz)}" );
+		matchFailTestNodeSX( parser3, "{m=tests.Parser.Test_Parser.s : (m A x=pqr y=xyz)}" );
+		matchFailTestNodeSX( parser3, "{m=tests.Parser.Test_Parser.s : (m A x=abc y=pqr)}" );
 		
 		ParserExpression parser4 = new ObjectNode( A, new String[] { "x", "y" }, new Object[] { new Literal( "abc" ), new ListNode( new Object[] { new Literal( "d" ), new Literal( "e" ) } ) } );
-		matchTestNodeSX( parser4, "{m=s : (m A x=abc y=[d e])}", "{m=s : (m A x=abc y=[d e])}" );
-		matchFailTestNodeSX( parser4, "{m=s : (m A x=pqr y=xyz)}" );
-		matchFailTestNodeSX( parser4, "{m=s : (m A x=abc y=[p q])}" );
+		matchTestNodeSX( parser4, "{m=tests.Parser.Test_Parser.s : (m A x=abc y=[d e])}", "{m=tests.Parser.Test_Parser.s : (m A x=abc y=[d e])}" );
+		matchFailTestNodeSX( parser4, "{m=tests.Parser.Test_Parser.s : (m A x=pqr y=xyz)}" );
+		matchFailTestNodeSX( parser4, "{m=tests.Parser.Test_Parser.s : (m A x=abc y=[p q])}" );
 		
 		ParserExpression parser5 = new ObjectNode( A, new String[] { "x", "y" }, new Object[] { new Literal( "abc" ), new ListNode( new Object[] { new Literal( "d" ) } ).bindTo( "x" ) } );
-		matchTestNodeSX( parser5, "{m=s : (m A x=abc y=[d])}", "{m=s : (m A x=abc y=[d])}" );
-		bindingsTestNodeSX( parser5, "{m=s : (m A x=abc y=[d])}", "[[x [d]]]" );
+		matchTestNodeSX( parser5, "{m=tests.Parser.Test_Parser.s : (m A x=abc y=[d])}", "{m=tests.Parser.Test_Parser.s : (m A x=abc y=[d])}" );
+		bindingsTestNodeSX( parser5, "{m=tests.Parser.Test_Parser.s : (m A x=abc y=[d])}", "[[x [d]]]" );
 		
 		ParserExpression parser6 = new ObjectNode( A, new String[] { "x", "y" }, new Object[] { identifier.bindTo( "x" ), identifier.bindTo( "x" ) } );
-		matchTestNodeSX( parser6, "{m=s : (m A x=abc y=abc)}", "{m=s : (m A x=abc y=abc)}" );
-		matchTestNodeSX( parser6, "{m=s : (m A x=def y=def)}", "{m=s : (m A x=def y=def)}" );
-		bindingsTestNodeSX( parser6, "{m=s : (m A x=abc y=abc)}", "[[x abc]]" );
-		bindingsTestNodeSX( parser6, "{m=s : (m A x=abc y=def)}", "[[x def]]" );
-		bindingsTestStreamSX( parser6, new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "{m=s : (m A x=abc y=def)}" ) ) } ).stream(),
+		matchTestNodeSX( parser6, "{m=tests.Parser.Test_Parser.s : (m A x=abc y=abc)}", "{m=tests.Parser.Test_Parser.s : (m A x=abc y=abc)}" );
+		matchTestNodeSX( parser6, "{m=tests.Parser.Test_Parser.s : (m A x=def y=def)}", "{m=tests.Parser.Test_Parser.s : (m A x=def y=def)}" );
+		bindingsTestNodeSX( parser6, "{m=tests.Parser.Test_Parser.s : (m A x=abc y=abc)}", "[[x abc]]" );
+		bindingsTestNodeSX( parser6, "{m=tests.Parser.Test_Parser.s : (m A x=abc y=def)}", "[[x def]]" );
+		bindingsTestStreamSX( parser6, new StreamValueBuilder( new StreamValueBuilder.Item[] { new StreamValueBuilder.StructuralItem( readInputSX( "{m=tests.Parser.Test_Parser.s : (m A x=abc y=def)}" ) ) } ).stream(),
 		"[[x def]]" );
-		bindingsTestListSX( parser6, "{m=s : [(m A x=abc y=def)]}", "[[x def]]" );
+		bindingsTestListSX( parser6, "{m=tests.Parser.Test_Parser.s : [(m A x=abc y=def)]}", "[[x def]]" );
 		
 		ParserExpression parser7 = new ObjectNode( Bar, new String[] { "b" }, new Object[] { identifier } );
-		matchTestNodeSX( parser7, "{m=s : (m Bar b=abc)}", "{m=s : (m Bar b=abc)}" );
-		matchTestNodeSX( parser7, "{m=s : (m Bar2 b=abc c=def)}", "{m=s : (m Bar2 b=abc c=def)}" );
+		matchTestNodeSX( parser7, "{m=tests.Parser.Test_Parser.s : (m Bar b=abc)}", "{m=tests.Parser.Test_Parser.s : (m Bar b=abc)}" );
+		matchTestNodeSX( parser7, "{m=tests.Parser.Test_Parser.s : (m Bar2 b=abc c=def)}", "{m=tests.Parser.Test_Parser.s : (m Bar2 b=abc c=def)}" );
 
 		ParserExpression parser8 = new ObjectNode( A, new String[] { "y" }, new Object[] { null } );
-		matchTestNodeSX( parser8, "{m=s : (m A x=abc y=`null`)}", "{m=s : (m A x=abc y=`null`)}" );
-		matchTestNodeSX( parser8, "{m=s : (m A x=pqr y=`null`)}", "{m=s : (m A x=pqr y=`null`)}" );
-		matchFailTestNodeSX( parser8, "{m=s : (m A x=abc y=pqr)}" );
+		matchTestNodeSX( parser8, "{m=tests.Parser.Test_Parser.s : (m A x=abc y=`null`)}", "{m=tests.Parser.Test_Parser.s : (m A x=abc y=`null`)}" );
+		matchTestNodeSX( parser8, "{m=tests.Parser.Test_Parser.s : (m A x=pqr y=`null`)}", "{m=tests.Parser.Test_Parser.s : (m A x=pqr y=`null`)}" );
+		matchFailTestNodeSX( parser8, "{m=tests.Parser.Test_Parser.s : (m A x=abc y=pqr)}" );
 	}
 
 
@@ -1091,14 +1072,14 @@ public class Test_Parser extends ParserTestCase
 		
 		
 		ParserExpression parserList = new SeparatedList( identifier, "/", "<", ">", 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL );
-		matchTestListSX( parserList, "[< >]", "[]"  );
-		matchFailTestListSX( parserList, "[< / >]" );
-		matchTestListSX( parserList, "[< ab >]", "[ab]" );
-		matchTestListSX( parserList, "[< ab / >]", "[ab]" );
-		matchTestListSX( parserList, "[< ab / cd > ]", "[ab cd]" );
-		matchTestListSX( parserList, "[< ab / cd / >]", "[ab cd]" );
-		matchTestListSX( parserList, "[< ab / cd / ef >]", "[ab cd ef]" );
-		matchTestListSX( parserList, "[< ab / cd / ef / >]", "[ab cd ef]" );
+		matchTestListSX( parserList, "[\"<\" \">\"]", "[]"  );
+		matchFailTestListSX( parserList, "[\"<\" / \">\"]" );
+		matchTestListSX( parserList, "[\"<\" ab \">\"]", "[ab]" );
+		matchTestListSX( parserList, "[\"<\" ab / \">\"]", "[ab]" );
+		matchTestListSX( parserList, "[\"<\" ab / cd \">\" ]", "[ab cd]" );
+		matchTestListSX( parserList, "[\"<\" ab / cd / \">\"]", "[ab cd]" );
+		matchTestListSX( parserList, "[\"<\" ab / cd / ef \">\"]", "[ab cd ef]" );
+		matchTestListSX( parserList, "[\"<\" ab / cd / ef / \">\"]", "[ab cd ef]" );
 	}
 
 
@@ -1398,9 +1379,9 @@ public class Test_Parser extends ParserTestCase
 		builder3.appendStructuralValue( Num.newInstance( new Object[] { "2" } ) );
 		builder3.appendTextValue( "*3+4" );
 
-		matchTestStreamSX( parser, builder1.stream(), "{m=s : [1 + [[(m Num x=2) * 3] * 4]]}" );
-		matchTestStreamSX( parser, builder2.stream(), "{m=s : [[1 * (m Num x=2)] + [3 * 4]]}" );
-		matchTestStreamSX( parser, builder3.stream(), "{m=s : [[[1 * (m Num x=2)] * 3] + 4]}" );
+		matchTestStreamSX( parser, builder1.stream(), "{m=tests.Parser.Test_Parser.s : [1 + [[(m Num x=2) * 3] * 4]]}" );
+		matchTestStreamSX( parser, builder2.stream(), "{m=tests.Parser.Test_Parser.s : [[1 * (m Num x=2)] + [3 * 4]]}" );
+		matchTestStreamSX( parser, builder3.stream(), "{m=tests.Parser.Test_Parser.s : [[[1 * (m Num x=2)] * 3] + 4]}" );
 	}
 
 
@@ -1665,19 +1646,19 @@ public class Test_Parser extends ParserTestCase
 		};
 		
 		ParserExpression oneMinusT = new ObjectNode( Sub, new Object[] { "1.0", new AnyNode().bindTo( "t1" ) } );
-		bindingsTestNodeSX( oneMinusT, "{m=s : (m Sub a=1.0 b=x)}", "[[t1 x]]" );
+		bindingsTestNodeSX( oneMinusT, "{m=tests.Parser.Test_Parser.s : (m Sub a=1.0 b=x)}", "[[t1 x]]" );
 
 		ParserExpression bTimesT = new ObjectNode( Mul, new Object[] { new AnyNode().bindTo( "b" ), new AnyNode().bindTo( "t2" ) } );
-		bindingsTestNodeSX( bTimesT, "{m=s : (m Mul a=q b=x)}", "[[b q] [t2 x]]" );
+		bindingsTestNodeSX( bTimesT, "{m=tests.Parser.Test_Parser.s : (m Mul a=q b=x)}", "[[b q] [t2 x]]" );
 
 		ParserExpression aTimesOneMinusT = new ObjectNode( Mul, new Object[] { new AnyNode().bindTo( "a" ), oneMinusT } );
-		bindingsTestNodeSX( aTimesOneMinusT, "{m=s : (m Mul a=p b=(m Sub a=1.0 b=x))}", "[[a p] [t1 x]]" );
+		bindingsTestNodeSX( aTimesOneMinusT, "{m=tests.Parser.Test_Parser.s : (m Mul a=p b=(m Sub a=1.0 b=x))}", "[[a p] [t1 x]]" );
 		
 		ParserExpression lerp = new ObjectNode( Add, new Object[] { aTimesOneMinusT, bTimesT } ).condition( lerpCondition );
-		bindingsTestNodeSX( lerp, "{m=s : (m Add a=(m Mul a=p b=(m Sub a=1.0 b=x)) b=(m Mul a=q b=x))}", "[[a p] [b q] [t1 x] [t2 x]]" );
+		bindingsTestNodeSX( lerp, "{m=tests.Parser.Test_Parser.s : (m Add a=(m Mul a=p b=(m Sub a=1.0 b=x)) b=(m Mul a=q b=x))}", "[[a p] [b q] [t1 x] [t2 x]]" );
 
 		ParserExpression lerpRefactor = lerp.action( lerpAction );
-		matchTestNodeSX( lerpRefactor, "{m=s : (m Add a=(m Mul a=p b=(m Sub a=1.0 b=x)) b=(m Mul a=q b=x))}", "{m=s : (m Add a=p b=(m Mul a=(m Sub a=q b=p) b=x))}" );
+		matchTestNodeSX( lerpRefactor, "{m=tests.Parser.Test_Parser.s : (m Add a=(m Mul a=p b=(m Sub a=1.0 b=x)) b=(m Mul a=q b=x))}", "{m=tests.Parser.Test_Parser.s : (m Add a=p b=(m Mul a=(m Sub a=q b=p) b=x))}" );
 	}
 
 	

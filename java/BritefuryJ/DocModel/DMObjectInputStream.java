@@ -33,15 +33,13 @@ public class DMObjectInputStream extends ObjectInputStream
 	}
 
 	
-	private DMSchemaResolver resolver;
 	private HashMap<String, SchemaRef> moduleTable;
 	
 	
-	public DMObjectInputStream(InputStream stream, DMSchemaResolver resolver) throws IOException
+	public DMObjectInputStream(InputStream stream) throws IOException
 	{
 		super( stream );
 		
-		this.resolver = resolver;
 		moduleTable = new HashMap<String, SchemaRef>();
 	}
 	
@@ -57,7 +55,7 @@ public class DMObjectInputStream extends ObjectInputStream
 			String location = (String)readObject();
 			Integer version = (Integer)readObject();
 			
-			DMSchema schema = resolver.getSchema( location );
+			DMSchema schema = DMSchemaResolver.getSchema( location );
 			
 			// Ensure that the requested version is supported
 			if ( version > schema.getVersion() )

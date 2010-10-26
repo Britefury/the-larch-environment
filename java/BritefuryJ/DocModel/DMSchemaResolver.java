@@ -6,8 +6,13 @@
 //##************************
 package BritefuryJ.DocModel;
 
-public interface DMSchemaResolver
+import java.util.HashMap;
+
+public class DMSchemaResolver
 {
+	private static HashMap<String, DMSchema> schemaTable = new HashMap<String, DMSchema>();
+	
+	
 	public static class CouldNotResolveSchemaException extends RuntimeException
 	{
 		private static final long serialVersionUID = 1L;
@@ -18,5 +23,35 @@ public interface DMSchemaResolver
 		}
 	}
 	
-	public DMSchema getSchema(String location) throws CouldNotResolveSchemaException;
+	public static class DuplicateSchemaLocationException extends RuntimeException
+	{
+		private static final long serialVersionUID = 1L;
+		
+		public DuplicateSchemaLocationException(String schemaLocation)
+		{
+			super( "Duplicate schema location: " + schemaLocation );
+		}
+	}
+	
+	
+	public static DMSchema getSchema(String location) throws CouldNotResolveSchemaException
+	{
+		DMSchema schema = schemaTable.get( location );
+		if ( schema == null )
+		{
+			throw new CouldNotResolveSchemaException( location );
+		}
+		return schema;
+	}
+	
+	
+	
+	protected static void registerSchema(DMSchema schema)
+	{
+		if ( schemaTable.containsKey( schema.getLocation() ) )
+		{
+			throw new DuplicateSchemaLocationException( schema.getLocation() );
+		}
+		schemaTable.put( schema.getLocation(), schema );
+	}
 }

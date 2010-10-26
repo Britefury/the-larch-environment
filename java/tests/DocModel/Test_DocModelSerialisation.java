@@ -18,44 +18,19 @@ import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectInputStream;
 import BritefuryJ.DocModel.DMObjectOutputStream;
 import BritefuryJ.DocModel.DMSchema;
-import BritefuryJ.DocModel.DMSchemaResolver;
 
 public class Test_DocModelSerialisation extends TestCase
 {
-	private DMSchema schema;
-	private DMSchemaResolver resolver;
-	private DMObjectClass A;
+	private static DMSchema schema;
+	private static DMObjectClass A;
 
 
-	public void setUp()
+	static
 	{
-		schema = new DMSchema( "schema", "m", "test.schema" );
+		schema = new DMSchema( "schema", "m", "test.DocModel.Test_DocModelSerialisation.schema" );
 		A = schema.newClass( "A", new String[] { "x", "y" } );
-		
-		
-		resolver = new DMSchemaResolver()
-		{
-			public DMSchema getSchema(String location)
-			{
-				if ( location.equals( "test.schema" ) )
-				{
-					return schema;
-				}
-				else
-				{
-					return null;
-				}
-			}
-		};
 	}
 	
-	
-	public void tearDown()
-	{
-		schema = null;
-		resolver = null;
-		A = null;
-	}
 	
 	
 	
@@ -68,7 +43,7 @@ public class Test_DocModelSerialisation extends TestCase
 		outDM.writeObject( obj );
 		
 		ByteArrayInputStream inStream = new ByteArrayInputStream( outStream.toByteArray() );
-		DMObjectInputStream inDM = new DMObjectInputStream( inStream, resolver );
+		DMObjectInputStream inDM = new DMObjectInputStream( inStream );
 		DMObject obj2 = (DMObject)inDM.readObject();
 		
 		assertNotSame( obj, obj2 );

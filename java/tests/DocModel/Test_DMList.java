@@ -43,7 +43,7 @@ public class Test_DMList extends Test_DMNode_base
 	{
 		try
 		{
-			Object expected = DMIOReader.readFromString( expectedSX, null );
+			Object expected = DMIOReader.readFromString( expectedSX );
 			assertEquals( expected, xs );
 		}
 		catch (ParseErrorException e)
@@ -58,7 +58,7 @@ public class Test_DMList extends Test_DMNode_base
 	{
 		try
 		{
-			List<Object> xs = (List<Object>)DMIOReader.readFromString( sx, null );
+			List<Object> xs = (List<Object>)DMIOReader.readFromString( sx );
 			return new DMList( xs );
 		}
 		catch (ParseErrorException e)

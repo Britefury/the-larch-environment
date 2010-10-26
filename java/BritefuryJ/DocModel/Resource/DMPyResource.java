@@ -13,6 +13,7 @@ import org.python.core.PyObject;
 import org.python.core.PyString;
 import org.python.modules.cPickle;
 
+import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocModel.DMNodeClass;
 
 public class DMPyResource extends DMResource
@@ -40,6 +41,22 @@ public class DMPyResource extends DMResource
 	}
 	
 	
+	
+	public void become(DMNode node)
+	{
+		if ( node instanceof DMPyResource )
+		{
+			DMPyResource rsc = (DMPyResource)node;
+			serialised = rsc.getSerialisedForm();
+			value = null;
+		}
+		else
+		{
+			throw new CannotChangeNodeClassException( node.getClass(), getClass() );
+		}
+	}
+
+
 	
 	public static DMPyResource serialisedResource(String serialised)
 	{

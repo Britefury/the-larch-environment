@@ -8,47 +8,19 @@ package tests.Parser.Utils;
 
 import tests.Parser.ParserTestCase;
 import BritefuryJ.DocModel.DMSchema;
-import BritefuryJ.DocModel.DMSchemaResolver;
-import BritefuryJ.DocModel.DMSchema.InvalidSchemaNameException;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Parser.Utils.Tokens;
 
 public class Test_Tokens extends ParserTestCase
 {
-	protected DMSchema s;
-	protected DMSchemaResolver resolver = new DMSchemaResolver()
-	{
-		public DMSchema getSchema(String location)
-		{
-			return location.equals( "Tests.Parser.Tokens" )  ? s :  null;
-		}
-	};
+	protected static DMSchema s;
 
 
-	protected DMSchemaResolver getModuleResolver()
+	static
 	{
-		return resolver;
+		s = new DMSchema( "Tokens", "m", "tests.Parser.Utils.Tokens.Tokens" );
 	}
 	
-
-	
-	public void setUp()
-	{
-		try
-		{
-			s = new DMSchema( "Tokens", "m", "Tests.Parser.Tokens" );
-		}
-		catch (InvalidSchemaNameException e)
-		{
-			throw new RuntimeException( e.toString() );
-		}
-	}
-	
-	public void tearDown()
-	{
-		s = null;
-	}
-
 	
 	public void testIdentifier()
 	{

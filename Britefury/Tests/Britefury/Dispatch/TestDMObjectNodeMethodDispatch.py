@@ -13,11 +13,12 @@ from BritefuryJ.DocModel import DMSchema
 
 
 class TestCase_objectNodeMethodDispatch (unittest.TestCase):
+	schema = DMSchema( 'NodeMethodDispatch', 'dispatch', 'Britefury.Tests.Dispatch.TestDMObjectNodeMethodDispatch' )
+	A = schema.newClass( 'A', [ 'x', 'y' ] )
+	B = schema.newClass( 'B', A, [ 'p', 'q' ] )
+	C = schema.newClass( 'C', [ 's', 't' ] )
+	
 	def setUp(self):
-		self.schema = DMSchema( 'NodeMethodDispatch', 'dispatch', 'Tests.NodeMethodDispatch' )
-		self.A = self.schema.newClass( 'A', [ 'x', 'y' ] )
-		self.B = self.schema.newClass( 'B', self.A, [ 'p', 'q' ] )
-		self.C = self.schema.newClass( 'C', [ 's', 't' ] )
 		self.a = self.A( x='a', y='b' )
 		self.b = self.B( x='a', y='b', p='c', q='d' )
 		self.c = self.C( s='a', t='b' )

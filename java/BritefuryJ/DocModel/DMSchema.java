@@ -226,6 +226,7 @@ public class DMSchema
 		this.shortName = shortName;
 		this.moduleLocation = location;
 		this.version = version;
+		DMSchemaResolver.registerSchema( this );
 	}
 	
 	
