@@ -36,14 +36,6 @@ import BritefuryJ.Incremental.IncrementalValueMonitor;
 
 public class DMObject extends DMNode implements DMObjectInterface, Trackable, Serializable, Cloneable, IncrementalOwner, Presentable
 {
-	public static class NotADMObjectStreamClassException extends RuntimeException
-	{
-		private static final long serialVersionUID = 1L;
-	}
-	
-
-	
-	
 	private static final long serialVersionUID = 1L;
 
 	
@@ -297,6 +289,12 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 		commandTracker = null;
 	}
 	
+	
+	
+	public PyObject getPyFactory()
+	{
+		return DMPickleHelper.getDMObjectFactory();
+	}
 	
 	
 	public Object clone()
@@ -780,48 +778,34 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	
 	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException
 	{
-		if ( stream instanceof DMObjectInputStream )
-		{
-			DMObjectReader objReader = ((DMObjectInputStream)stream).readDMObjectReader();
+		DMObjectReader objReader = DMObjectInputStream.readDMObjectReader( stream );
 
-			String keys[] = (String[])stream.readObject();
-			Object values[] = (Object[])stream.readObject();
-			
-			HashMap<String, Object> fieldValues = new HashMap<String, Object>();
-			for (int i = 0; i < keys.length; i++)
-			{
-				fieldValues.put( keys[i], values[i] );
-			}
-			
-			DMObject val = objReader.readObject( fieldValues );
-			objClass = val.objClass;
-			fieldData = val.fieldData;
-			
-			incr = new IncrementalValueMonitor( this );
-			incr.onChanged();
-			commandTracker = null;
-		}
-		else
+		String keys[] = (String[])stream.readObject();
+		Object values[] = (Object[])stream.readObject();
+		
+		HashMap<String, Object> fieldValues = new HashMap<String, Object>();
+		for (int i = 0; i < keys.length; i++)
 		{
-			throw new NotADMObjectStreamClassException();
+			fieldValues.put( keys[i], values[i] );
 		}
+		
+		DMObject val = objReader.readObject( fieldValues );
+		objClass = val.objClass;
+		fieldData = val.fieldData;
+		
+		incr = new IncrementalValueMonitor( this );
+		incr.onChanged();
+		commandTracker = null;
 	}
 	
 	private void writeObject(ObjectOutputStream stream) throws IOException
 	{
-		if ( stream instanceof DMObjectOutputStream )
-		{
-			((DMObjectOutputStream)stream).writeDMObjectClass( objClass );
-			
-			String fieldNames[] = objClass.getFieldNames();
-			
-			stream.writeObject( fieldNames );
-			stream.writeObject( fieldData );
-		}
-		else
-		{
-			throw new NotADMObjectStreamClassException();
-		}
+		DMObjectOutputStream.writeDMObjectClass( stream, objClass );
+		
+		String fieldNames[] = objClass.getFieldNames();
+		
+		stream.writeObject( fieldNames );
+		stream.writeObject( fieldData );
 	}
 
 

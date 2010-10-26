@@ -15,6 +15,7 @@ import org.python.modules.cPickle;
 
 import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocModel.DMNodeClass;
+import BritefuryJ.DocModel.DMPickleHelper;
 
 public class DMPyResource extends DMResource
 {
@@ -30,6 +31,11 @@ public class DMPyResource extends DMResource
 	private PyObject value[] = null;
 	
 	
+	public DMPyResource()
+	{
+		super();
+	}
+	
 	public DMPyResource(PyObject value)
 	{
 		this.serialised = serialise( value );
@@ -40,6 +46,12 @@ public class DMPyResource extends DMResource
 		super( serialised );
 	}
 	
+	
+	
+	public PyObject getPyFactory()
+	{
+		return DMPickleHelper.getDMPyResourceFactory();
+	}
 	
 	
 	public void become(DMNode node)

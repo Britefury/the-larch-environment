@@ -7,13 +7,13 @@
 package BritefuryJ.DocModel;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.HashMap;
+import java.util.WeakHashMap;
 
-public class DMObjectInputStream extends ObjectInputStream
+public class DMObjectInputStream
 {
-	protected static class SchemaRef
+	private static class SchemaRef
 	{
 		private DMSchema schema;
 		private int version;
@@ -33,27 +33,39 @@ public class DMObjectInputStream extends ObjectInputStream
 	}
 
 	
-	private HashMap<String, SchemaRef> moduleTable;
-	
-	
-	public DMObjectInputStream(InputStream stream) throws IOException
+	private static class State
 	{
-		super( stream );
-		
-		moduleTable = new HashMap<String, SchemaRef>();
+		private HashMap<String, SchemaRef> moduleTable = new HashMap<String, SchemaRef>();
 	}
 	
 	
 	
-	protected SchemaRef readSchemaRef() throws IOException, ClassNotFoundException
+	
+	private static WeakHashMap<ObjectInputStream, State> stateTable = new WeakHashMap<ObjectInputStream, State>();
+
+	
+	private static State getState(ObjectInputStream stream)
 	{
-		boolean bNewModule = readBoolean();
+		State state = stateTable.get( stream );
+		if ( state == null )
+		{
+			state = new State();
+			stateTable.put( stream, state );
+		}
+		return state;
+	}
+	
+	
+	private static SchemaRef readSchemaRef(ObjectInputStream stream) throws IOException, ClassNotFoundException
+	{
+		State state = getState( stream );
+		boolean bNewModule = stream.readBoolean();
 		
 		if ( bNewModule )
 		{
-			String shortName = (String)readObject();
-			String location = (String)readObject();
-			Integer version = (Integer)readObject();
+			String shortName = (String)stream.readObject();
+			String location = (String)stream.readObject();
+			Integer version = (Integer)stream.readObject();
 			
 			DMSchema schema = DMSchemaResolver.getSchema( location );
 			
@@ -66,21 +78,21 @@ public class DMObjectInputStream extends ObjectInputStream
 			}
 			
 			SchemaRef schemaRef = new SchemaRef( schema, version );
-			moduleTable.put( shortName, schemaRef );
+			state.moduleTable.put( shortName, schemaRef );
 			return schemaRef;
 		}
 		else
 		{
-			String shortName = (String)readObject();
-			return moduleTable.get( shortName );
+			String shortName = (String)stream.readObject();
+			return state.moduleTable.get( shortName );
 		}
 	}
 	
-	protected DMObjectReader readDMObjectReader() throws IOException, ClassNotFoundException
+	protected static DMObjectReader readDMObjectReader(ObjectInputStream stream) throws IOException, ClassNotFoundException
 	{
-		SchemaRef schemaRef = readSchemaRef();
+		SchemaRef schemaRef = readSchemaRef( stream );
 		
-		String className = (String)readObject();
+		String className = (String)stream.readObject();
 		
 		return schemaRef.getReader( className );
 	}
