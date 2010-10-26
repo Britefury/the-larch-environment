@@ -222,9 +222,10 @@ InlineObjectStmt = schema.newClass( 'InlineObjectStmt', SimpleStmt, [ 'resource'
 #
 # Top level nodes
 #
-PythonModule = schema.newClass( 'PythonModule', CompoundStmt, [ 'suite' ] )
-PythonSuite = schema.newClass( 'PythonSuite', CompoundStmt, [ 'suite' ] )
-PythonExpression = schema.newClass( 'PythonExpression', Node, [ 'expr' ] )
+TopLevel = schema.newClass( 'TopLevel', Node, [] )
+PythonModule = schema.newClass( 'PythonModule', TopLevel, [ 'suite' ] )
+PythonSuite = schema.newClass( 'PythonSuite', TopLevel, [ 'suite' ] )
+PythonExpression = schema.newClass( 'PythonExpression', TopLevel, [ 'expr' ] )
 
 
 

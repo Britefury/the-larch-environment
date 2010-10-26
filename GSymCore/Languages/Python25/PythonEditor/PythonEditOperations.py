@@ -71,10 +71,7 @@ def isUnparsed(node):
 	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Schema.UNPARSED )
 
 def isTopLevel(node):
-	return isinstance( node, DMObjectInterface )  and  ( node.isInstanceOf( Schema.PythonModule )  or  node.isInstanceOf( Schema.PythonSuite )  or  node.isInstanceOf( Schema.PythonExpression ) )
-
-def isPythonModule(node):
-	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Schema.PythonModule )
+	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Schema.TopLevel )
 
 def isIndentedBlock(node):
 	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Schema.IndentedBlock )
@@ -115,7 +112,7 @@ def getStatementContextFromElement(element):
 
 def getParentStatementContext(ctx):
 	ctx = ctx.getParent()
-	while ctx is not None  and  not isStmt( ctx.getModel() )  and  not isPythonModule( ctx.getModel() ):
+	while ctx is not None  and  not isStmt( ctx.getModel() )  and  not isTopLevel( ctx.getModel() ):
 		ctx = ctx.getParent()
 	return ctx
 

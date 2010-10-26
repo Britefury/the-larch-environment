@@ -8,12 +8,14 @@ package BritefuryJ.DocModel;
 
 import org.python.core.Py;
 import org.python.core.PyDictionary;
+import org.python.core.PyModule;
 import org.python.core.PyObject;
 import org.python.core.PyString;
 
 public class DMPickleHelper
 {
-	private static PyDictionary locals = new PyDictionary();
+	private static PyDictionary locals = null;
+	private static PyModule mod = null;
 	
 	
 	private static PyDictionary getLocals()
@@ -37,13 +39,13 @@ public class DMPickleHelper
 			"	return DMList()\n" +
 			"\n" +
 			"def makeDMObject():\n" +
-			"	return DMList()\n" +
+			"	return DMObject()\n" +
 			"\n" +
 			"def makeDMJavaResource():\n" +
-			"	return DMList()\n" +
+			"	return DMJavaResource()\n" +
 			"\n" +
 			"def makeDMPyResource():\n" +
-			"	return DMList()'''\n" +
+			"	return DMPyResource()'''\n" +
 			"\n" +
 			"\n" +
 			"mod = sys.modules.setdefault( fullname, imp.new_module( fullname ) )\n" +
@@ -59,24 +61,36 @@ public class DMPickleHelper
 		return locals;
 	}
 	
+	private static PyModule getMod()
+	{
+		if ( mod == null )
+		{
+			PyDictionary l = getLocals();
+
+			mod = (PyModule)l.__getitem__( new PyString( "mod" ) );
+		}
+		
+		return mod;
+	}
+	
 	
 	protected static PyObject getDMListFactory()
 	{
-		return getLocals().__getitem__( new PyString( "makeDMList" ) );
+		return getMod().__getattr__( "makeDMList" );
 	}
 
 	protected static PyObject getDMObjectFactory()
 	{
-		return getLocals().__getitem__( new PyString( "makeDMObject" ) );
+		return getMod().__getattr__( "makeDMObject" );
 	}
 
 	public static PyObject getDMJavaResourceFactory()
 	{
-		return getLocals().__getitem__( new PyString( "makeDMJavaResource" ) );
+		return getMod().__getattr__( "makeDMJavaResource" );
 	}
 
 	public static PyObject getDMPyResourceFactory()
 	{
-		return getLocals().__getitem__( new PyString( "makeDMPyResource" ) );
+		return getMod().__getattr__( "makeDMPyResource" );
 	}
 }
