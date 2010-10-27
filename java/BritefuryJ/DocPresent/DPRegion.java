@@ -34,7 +34,7 @@ public class DPRegion extends DPProxy
 			}
 			else
 			{
-				EditHandler handlerB = regionB.getEditHandler();
+				EditHandler handlerB = regionB != null  ?  regionB.getEditHandler()  :  null;
 				if ( handlerA != null )
 				{
 					return handlerA.canShareSelectionWith( handlerB );

@@ -528,6 +528,11 @@ public class TextVisual
 	
 	public static TextVisual getTextVisual(PresentationComponent.RootElement root, String text, Font font, boolean bMixedSizeCaps)
 	{
+		if ( text == null )
+		{
+			throw new RuntimeException( "Text cannot be null" );
+		}
+		
 		TextVisualTable table = visualTables.get( root );
 		if ( table == null )
 		{

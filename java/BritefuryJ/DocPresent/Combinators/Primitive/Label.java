@@ -19,6 +19,11 @@ public class Label extends Pres
 	
 	public Label(String text)
 	{
+		if ( text == null )
+		{
+			throw new RuntimeException( "Text cannot be null" );
+		}
+
 		this.text = text;
 	}
 
