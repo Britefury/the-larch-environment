@@ -19,12 +19,27 @@ public class Text extends Pres
 	
 	public Text(String text)
 	{
+		if ( text == null )
+		{
+			throw new RuntimeException( "Text cannot be null" );
+		}
+
 		this.text = text;
 		this.textRepresentation = text;
 	}
 	
 	public Text(String text, String textRepresentation)
 	{
+		if ( text == null )
+		{
+			throw new RuntimeException( "Text cannot be null" );
+		}
+
+		if ( textRepresentation == null )
+		{
+			throw new RuntimeException( "Text representation cannot be null" );
+		}
+
 		this.text = text;
 		this.textRepresentation = textRepresentation;
 	}

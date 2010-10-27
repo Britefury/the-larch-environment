@@ -598,6 +598,11 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	public void setTextRepresentation(String newTextRepresentation)
 	{
+		if ( newTextRepresentation == null )
+		{
+			throw new RuntimeException( "Text representation cannot be null" );
+		}
+		
 		int oldLength = textRepresentation.length();
 		int newLength = newTextRepresentation.length();
 		

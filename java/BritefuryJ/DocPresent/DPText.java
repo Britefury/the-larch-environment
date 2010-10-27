@@ -45,6 +45,11 @@ public class DPText extends DPContentLeafEditable
 	{
 		super(styleParams, textRepresentation );
 		
+		if ( text == null )
+		{
+			throw new RuntimeException( "Text cannot be null" );
+		}
+
 		this.text = text;
 		
 		visual = TextVisual.getTextVisual( getRootElement(), this.text, styleParams.getFont(), styleParams.getMixedSizeCaps() );
@@ -88,6 +93,11 @@ public class DPText extends DPContentLeafEditable
 	
 	public void setText(String text, String textRepresentation)
 	{
+		if ( text == null )
+		{
+			throw new RuntimeException( "Text cannot be null" );
+		}
+
 		this.text = text;
 		setTextRepresentation( textRepresentation );
 		onTextModified();

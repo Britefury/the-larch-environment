@@ -78,6 +78,11 @@ public abstract class DPContentLeaf extends DPElement
 	{
 		super(styleParams);
 		
+		if ( textRepresentation == null )
+		{
+			throw new RuntimeException( "Text representation cannot be null" );
+		}
+		
 		this.textRepresentation = textRepresentation;
 	}
 	
