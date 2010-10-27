@@ -181,6 +181,7 @@ def statementNodeEditor(grammar, inheritedState, node, contents):
 def specialFormStatementNodeEditor(grammar, inheritedState, node, contents):
 	mode = inheritedState['editMode']
 	if mode == EDITMODE_EDITSTATEMENT:
+		contents = contents.withFixedValue( node )
 		s = specialFormStatementLine( contents )
 		s = s.withFixedValue( node )
 		s = s.withTreeEventListener( instanceCache( StatementTreeEventListener, grammar.singleLineStatement() ) )
