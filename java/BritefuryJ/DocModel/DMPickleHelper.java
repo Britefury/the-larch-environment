@@ -93,4 +93,10 @@ public class DMPickleHelper
 	{
 		return getMod().__getattr__( "makeDMPyResource" );
 	}
+	
+	
+	public static void initialise()
+	{
+		getMod();
+	}
 }

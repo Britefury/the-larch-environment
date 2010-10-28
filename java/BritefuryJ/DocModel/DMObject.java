@@ -47,6 +47,14 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	
 	
 	
+	public DMObject()
+	{
+		incr = new IncrementalValueMonitor( this );
+		this.objClass = null;
+		fieldData = new Object[0];
+		commandTracker = null;
+	}
+	
 	public DMObject(DMObjectClass objClass)
 	{
 		incr = new IncrementalValueMonitor( this );
@@ -194,31 +202,44 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 
 	public DMObject(PyObject values[], String names[])
 	{
-		assert values.length == ( names.length + 1 );
-		
-		incr = new IncrementalValueMonitor( this );
-		objClass = Py.tojava( values[0], DMObjectClass.class );
-		fieldData = new Object[objClass.getNumFields()];
-		
-		for (int i = 0; i < names.length; i++)
+		if ( values.length == 0  &&  names.length == 0 )
 		{
-			int index = objClass.getFieldIndex( names[i] );
-			if ( index == -1 )
-			{
-				throw Py.KeyError( names[i] );
-			}
-			else
-			{
-				Object x = coerce( Py.tojava( values[i+1], Object.class ) );
-				if ( x instanceof DMNode )
-				{
-					((DMNode)x).addParent( this );
-				}
-				fieldData[index] = x;
-			}
+			incr = new IncrementalValueMonitor( this );
+			this.objClass = null;
+			fieldData = new Object[0];
+			commandTracker = null;
 		}
+		else
+		{
+			if ( values.length != ( names.length + 1 ) )
+			{
+				throw new RuntimeException( "DMObject constructor takes parameters of form (obj_class, fieldname0=value0, fieldname1=value1, ... fieldnameN=valueN)" );
+			}
+			
+			incr = new IncrementalValueMonitor( this );
+			objClass = Py.tojava( values[0], DMObjectClass.class );
+			fieldData = new Object[objClass.getNumFields()];
+			
+			for (int i = 0; i < names.length; i++)
+			{
+				int index = objClass.getFieldIndex( names[i] );
+				if ( index == -1 )
+				{
+					throw Py.KeyError( names[i] );
+				}
+				else
+				{
+					Object x = coerce( Py.tojava( values[i+1], Object.class ) );
+					if ( x instanceof DMNode )
+					{
+						((DMNode)x).addParent( this );
+					}
+					fieldData[index] = x;
+				}
+			}
 
-		commandTracker = null;
+			commandTracker = null;
+		}
 	}
 
 	public DMObject(DMObjectClass objClass, Map<String, Object> data)

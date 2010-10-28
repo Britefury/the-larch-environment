@@ -290,12 +290,14 @@ public abstract class DMNode implements Cloneable
 	
 	public PyObject __reduce__()
 	{
+		DMPickleHelper.initialise();
 		return new PyTuple( getPyFactory(), new PyTuple(), __getstate__() );
 	}
 	
 	
 	public PyObject __getstate__()
 	{
+		DMPickleHelper.initialise();
 		try
 		{
 			ByteArrayOutputStream outStream = new ByteArrayOutputStream();
@@ -315,6 +317,7 @@ public abstract class DMNode implements Cloneable
 	
 	public void __setstate__(PyObject state)
 	{
+		DMPickleHelper.initialise();
 		if ( state instanceof PyString )
 		{
 			try
