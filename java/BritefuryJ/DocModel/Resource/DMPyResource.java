@@ -80,6 +80,7 @@ public class DMPyResource extends DMResource
 	{
 		if ( value == null )
 		{
+			DMPickleHelper.initialise();
 			PyObject v = (PyObject)cPickle.loads( new PyString( serialised ) );
 			this.value = new PyObject[] { v };
 			this.serialised = null;
@@ -98,6 +99,7 @@ public class DMPyResource extends DMResource
 	
 	public static String serialise(PyObject x)
 	{
+		DMPickleHelper.initialise();
 		PyString s = cPickle.dumps( x );
 		return s.getString();
 	}
