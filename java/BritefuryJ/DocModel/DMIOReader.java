@@ -6,6 +6,9 @@
 //##************************
 package BritefuryJ.DocModel;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Matcher;
@@ -25,6 +28,11 @@ public class DMIOReader extends DMIO
 		{
 			super( "at " + pos + ": " + description );
 		}
+	}
+	
+	public static class InvalidEscapeSequenceException extends RuntimeException
+	{
+		private static final long serialVersionUID = 1L;
 	}
 
 	public static class ParseStackException extends RuntimeException
@@ -145,21 +153,32 @@ public class DMIOReader extends DMIO
 	
 
 	
-	public static final String inStringUnescapedChars = "[0-9A-Za-z_" + Pattern.quote( quotedStringPunctuationChars ) + "]";
-	
-	public static final String hexCharEscape = Pattern.quote( "\\x" ) + "[0-9A-Fa-f]+" + Pattern.quote( "x" );
-	public static final String whitespaceEscape = Pattern.quote( "\\" ) + "[nrt" + Pattern.quote( "\\" ) + "]";
-	
-	public static final String escapeSequence = "(?:" + hexCharEscape + ")|(?:" + whitespaceEscape + ")";
-	
-
-	public static final Pattern whitespace = Pattern.compile( "[" + Pattern.quote( " \t\n\r" ) + "]+" );
-	public static final Pattern quotedString = Pattern.compile( Pattern.quote( "\"" ) + "(?:" + inStringUnescapedChars + "|" + escapeSequence + ")*" + Pattern.quote( "\"" ) );
-	public static final Pattern hexChar = Pattern.compile( hexCharEscape );
-	public static final Pattern identifier = Pattern.compile( "[A-Za-z_][0-9A-Za-z_]*" );
-	public static final Pattern positiveDecimalInteger = Pattern.compile( "[0-9]+" );
-	
-	
+	protected static MatchResult matchWhitespace(String s, int pos)
+	{
+		StringBuilder result = new StringBuilder();
+		while ( pos < s.length() )
+		{
+			char c = s.charAt( pos );
+			if ( c == ' ' || c == '\t' || c == '\r' || c == '\n' )
+			{
+				result.append( c );
+				pos++;
+			}
+			else
+			{
+				break;
+			}
+		}
+		
+		if ( result.length() > 0 )
+		{
+			return new MatchResult( result.toString(), pos );
+		}
+		else
+		{
+			return null;
+		}
+	}
 	
 	protected static MatchResult match(Pattern pattern, String source, int position)
 	{
@@ -168,9 +187,8 @@ public class DMIOReader extends DMIO
 		boolean bFound = m.lookingAt();
 		if ( bFound  &&  m.end() > 0 )
 		{
-			String matchString = m.group();
-			int end = position + matchString.length();
-			return new MatchResult( matchString, end );
+			int end = position + m.end();
+			return new MatchResult( source.substring( position, end ), end );
 		}
 		else
 		{
@@ -178,103 +196,130 @@ public class DMIOReader extends DMIO
 		}
 	}
 	
-	private static String evalString(String s)
+	private static MatchResult matchQuotedString(String s, int pos)
 	{
-		assert( s.charAt( 0 ) == '\"' );
-		assert( s.charAt( s.length() - 1 ) == '\"');
-		
-		s = s.substring( 1, s.length() - 1 );
-		
-		StringBuilder result = new StringBuilder();
-		
-		int index = 0;
-		while ( index < s.length() )
+		if ( s.charAt( pos ) == '\"' )
 		{
-			char c = s.charAt( index );
-			if ( c == '\\'  &&  index < s.length() )
+			StringBuilder result = new StringBuilder();
+			pos++;
+			while ( pos < s.length() )
 			{
-				char escapeCode = s.charAt( index + 1 );
-				if ( escapeCode == 'n' )
+				char c = s.charAt( pos );
+				if ( quotedCharBits.get( (int)c ) )
 				{
-					result.append( '\n' );
-					index += 2;
+					result.append( c );
+					pos++;
 				}
-				else if ( escapeCode == 'r' )
+				else if ( c == '\\'  &&  pos < s.length()-1 )
 				{
-					result.append( '\r' );
-					index += 2;
-				}
-				else if ( escapeCode == 't' )
-				{
-					result.append( '\t' );
-					index += 2;
-				}
-				else if ( escapeCode == '\\' )
-				{
-					result.append( '\\' );
-					index += 2;
-				}
-				else if ( escapeCode == 'x' )
-				{
-					StringBuilder hexString = new StringBuilder();
-					int hexIndex = index + 2;
-					char h = '0';
-					while ( hexIndex < s.length() )
+					char escapeCode = s.charAt( pos + 1 );
+					if ( escapeCode == 'n' )
 					{
-						h = s.charAt( hexIndex );
-						if ( ( h >= '0' && h <= '9' )  ||  ( h >= 'A' && h <= 'F' )  ||  ( h >= 'a' && h <= 'f' ) )
+						result.append( '\n' );
+						pos += 2;
+					}
+					else if ( escapeCode == 'r' )
+					{
+						result.append( '\r' );
+						pos += 2;
+					}
+					else if ( escapeCode == 't' )
+					{
+						result.append( '\t' );
+						pos += 2;
+					}
+					else if ( escapeCode == '\\' )
+					{
+						result.append( '\\' );
+						pos += 2;
+					}
+					else if ( escapeCode == 'x' )
+					{
+						StringBuilder hexString = new StringBuilder();
+						int hexIndex = pos + 2;
+						char h = '0';
+						while ( hexIndex < s.length() )
 						{
-							hexString.append( h );
-							hexIndex++;
+							h = s.charAt( hexIndex );
+							if ( ( h >= '0' && h <= '9' )  ||  ( h >= 'A' && h <= 'F' )  ||  ( h >= 'a' && h <= 'f' ) )
+							{
+								hexString.append( h );
+								hexIndex++;
+							}
+							else
+							{
+								break;
+							}
+						}
+						if ( h == 'x'  &&  hexString.length() > 0 )
+						{
+							// Found the terminating 'x' character
+							char hexChar = (char)Integer.valueOf( hexString.toString(), 16 ).intValue();
+							result.append( hexChar );
+							pos = hexIndex + 1;
 						}
 						else
 						{
-							break;
+							throw new InvalidEscapeSequenceException();
 						}
-					}
-					if ( h == 'x'  &&  hexString.length() > 0 )
-					{
-						// Found the terminating 'x' character
-						char hexChar = (char)Integer.valueOf( hexString.toString(), 16 ).intValue();
-						result.append( hexChar );
-						index = hexIndex + 1;
 					}
 					else
 					{
-						result.append( c );
-						index++;
+						// Did not recognise the escape sequence
+						throw new InvalidEscapeSequenceException();
 					}
 				}
-				else
+				else if ( c == '\"' )
 				{
-					// Did not recognise the escape sequence - just add the character
-					result.append( c );
-					index++;
+					pos++;
+					return new MatchResult( result.toString(), pos );
 				}
-			}
-			else
-			{
-				result.append( c );
-				index++;
 			}
 		}
 
-		return result.toString();
+		return null;
+	}
+	
+	
+	private static MatchResult matchUnquotedString(String s, int pos)
+	{
+		StringBuilder result = new StringBuilder();
+		while ( pos < s.length() )
+		{
+			char c = s.charAt( pos );
+			if ( unquotedCharBits.get( (int)c ) )
+			{
+				result.append( c );
+				pos++;
+			}
+			else
+			{
+				break;
+			}
+		}
+		
+		if ( result.length() > 0 )
+		{
+			return new MatchResult( result.toString(), pos );
+		}
+		else
+		{
+			return null;
+		}
 	}
 	
 	
 	private static MatchResult matchAtom(String source, int position)
 	{
 		// Quoted string
-		MatchResult res = match( quotedString, source, position );
+		MatchResult res = matchQuotedString( source, position );
 		if ( res != null )
 		{
-			res.value = evalString( res.value );
 			return res;
 		}
 		
 		// Unquoted string
-		res = match( unquotedString, source, position );
+		res = matchUnquotedString( source, position );
 		if ( res != null )
 		{
 			return res;
@@ -284,9 +329,71 @@ public class DMIOReader extends DMIO
 	}
 	
 	
-	private static MatchResult matchPositiveDecimalInteger(String source, int position)
+	private static MatchResult matchPositiveDecimalInteger(String s, int pos)
 	{
-		return match( positiveDecimalInteger, source, position );
+		StringBuilder result = new StringBuilder();
+		while ( pos < s.length() )
+		{
+			char c = s.charAt( pos );
+			if ( c >= '0' && c <= '9' )
+			{
+				result.append( c );
+				pos++;
+			}
+			else
+			{
+				break;
+			}
+		}
+		
+		if ( result.length() > 0 )
+		{
+			return new MatchResult( result.toString(), pos );
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	private static MatchResult matchIdentifier(String s, int pos)
+	{
+		StringBuilder result = new StringBuilder();
+		if ( pos < s.length() )
+		{
+			char c = s.charAt( pos );
+			if ( c >= 'A' && c <= 'Z'  ||  c >= 'a' && c <= 'z'  ||  c == '_' )
+			{
+				result.append( c );
+				pos++;
+			}
+			else
+			{
+				return null;
+			}
+		}
+		while ( pos < s.length() )
+		{
+			char c = s.charAt( pos );
+			if ( c >= 'A' && c <= 'Z'  ||  c >= 'a' && c <= 'z'  ||  c == '_'  ||  c >= '0' && c <= '9' )
+			{
+				result.append( c );
+				pos++;
+			}
+			else
+			{
+				break;
+			}
+		}
+		
+		if ( result.length() > 0 )
+		{
+			return new MatchResult( result.toString(), pos );
+		}
+		else
+		{
+			return null;
+		}
 	}
 	
 	
@@ -307,8 +414,7 @@ public class DMIOReader extends DMIO
 	
 	private void eatWhitespace()
 	{
-		// Whitespace
-		MatchResult res = match( whitespace, source, pos );
+		MatchResult res = matchWhitespace( source, pos );
 		if ( res != null )
 		{
 			pos = res.position;
@@ -351,7 +457,7 @@ public class DMIOReader extends DMIO
 		{
 			// Get the field name
 			String fieldName;
-			MatchResult res = match( identifier, source, pos );
+			MatchResult res = matchIdentifier( source, pos );
 			if ( res == null )
 			{
 				throw new ParseErrorException( pos, "Could not get field name in object key-value pair" );
@@ -449,7 +555,7 @@ public class DMIOReader extends DMIO
 		
 		// Get the schema name
 		String moduleName = null;
-		res = match( identifier, source, pos );
+		res = matchIdentifier( source, pos );
 		if ( res == null )
 		{
 			throw new ParseErrorException( pos, "Expected schema name for object" );
@@ -468,19 +574,16 @@ public class DMIOReader extends DMIO
 		}
 		
 		// Need whitespace
-		res = match( whitespace, source, pos );
+		res = matchWhitespace( source, pos );
 		if ( res == null )
 		{
 			throw new ParseErrorException( pos, "Expected whitespace after schema name for object" );
 		}
-		else
-		{
-			pos = res.position;
-		}
+		pos = res.position;
 		
 		// Get class name
 		String className = null;
-		res = match( identifier, source, pos );
+		res = matchIdentifier( source, pos );
 		if ( res == null )
 		{
 			throw new ParseErrorException( pos, "Expected class name for object" );
@@ -566,7 +669,7 @@ public class DMIOReader extends DMIO
 						MatchResult res;
 		
 						// Whitespace
-						res = match( whitespace, source, pos );
+						res = matchWhitespace( source, pos );
 						if ( res == null )
 						{
 							throw new ParseErrorException( pos, "Expected whitespace after opening Java resource" );
@@ -598,7 +701,7 @@ public class DMIOReader extends DMIO
 						MatchResult res;
 		
 						// Whitespace
-						res = match( whitespace, source, pos );
+						res = matchWhitespace( source, pos );
 						if ( res == null )
 						{
 							throw new ParseErrorException( pos, "Expected whitespace after opening Python resource" );
@@ -637,12 +740,11 @@ public class DMIOReader extends DMIO
 			{
 				MatchResult res;
 				
-				// Whitespace
-				res = match( whitespace, source, pos );
+				// Consume any whitespace
+				res = matchWhitespace( source, pos );
 				if ( res != null )
 				{
 					pos = res.position;
-					continue;
 				}
 				
 				// Atom
@@ -724,7 +826,7 @@ public class DMIOReader extends DMIO
 				MatchResult res = null;
 				
 				// Get key
-				res = match( identifier, source, pos );
+				res = matchIdentifier( source, pos );
 				if ( res != null )
 				{
 					key = res.value;
@@ -845,7 +947,30 @@ public class DMIOReader extends DMIO
 	
 	public static Object readFromString(String source) throws ParseErrorException, BadModuleNameException
 	{
-		DMIOReader reader = new DMIOReader( source );
-		return reader.readDocument();
+		try
+		{
+			DMIOReader reader = new DMIOReader( source );
+			return reader.readDocument();
+		}
+		catch (StackOverflowError e)
+		{
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public static Object readFromFile(File file) throws ParseErrorException, BadModuleNameException, IOException
+	{
+		FileInputStream stream = new FileInputStream( file );
+		int length = (int)file.length();
+		byte bytes[] = new byte[length];
+		stream.read( bytes );
+		String content = new String( bytes, "ISO-8859-1" );
+		return readFromString( content );
+	}
+
+	public static Object readFromFile(String filename) throws ParseErrorException, BadModuleNameException, IOException
+	{
+		return readFromFile( new File( filename ) );
 	}
 }

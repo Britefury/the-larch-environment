@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
 
@@ -32,20 +31,6 @@ import BritefuryJ.DocModel.Resource.DMPyResource;
 
 public class Test_DMIOReader extends TestCase
 {
-	protected static class TestReader extends DMIOReader
-	{
-		protected TestReader(String source)
-		{
-			super( source );
-		}
-
-		protected static MatchResult test_match(Pattern pattern, String source, int position)
-		{
-			return match( pattern, source, position );
-		}
-	}
-
-	
 	private static DMSchema schemaA;
 	private static DMObjectClass A;
 	
@@ -93,10 +78,8 @@ public class Test_DMIOReader extends TestCase
 	
 	
 	
-	public void matchTest(Pattern pattern, String input, String expected)
+	public void matchTest(DMIOReader.MatchResult res, String expected)
 	{
-		DMIOReader.MatchResult res = TestReader.test_match( pattern, input, 0 );
-		
 		if ( res.value == null )
 		{
 			System.out.println( "MATCH FAILURE" );
@@ -117,18 +100,16 @@ public class Test_DMIOReader extends TestCase
 		assertTrue( res.value.equals( expected ) );
 	}
 
-	public void matchFailTest(Pattern pattern, String input)
+	public void matchFailTest(DMIOReader.MatchResult res)
 	{
-		DMIOReader.MatchResult res = TestReader.test_match( pattern, input, 0 );
-		
-		if ( res != null  &&  res.value.equals( input ) )
+		if ( res != null )
 		{
 			System.out.println( "MATCH SHOULD HAVE FAILED" );
 			System.out.println( "RESULT: " + res.value );
 		}
 		
 
-		assertTrue( res == null  ||  !res.value.equals( input ) );
+		assertTrue( res == null );
 	}
 	
 	
@@ -169,76 +150,6 @@ public class Test_DMIOReader extends TestCase
 
 
 
-	
-	public void testWhitespace()
-	{
-		matchTest( DMIOReader.whitespace, " \t\n", " \t\n" );
-	}
-
-	public void testUnquotedString()
-	{
-		matchTest( DMIOReader.unquotedString, "abc123ABC_", "abc123ABC_" );
-		matchTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.~", "abc123ABC_+-*/%^&|!$@.~" );
-		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,=[]~(" );
-		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,=[]~)" );
-		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,=[]~<" );
-		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,=[]~>" );
-		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,=[]~\"" );
-		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,=[]~ " );
-		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,=[]~\t" );
-		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,=[]~\n" );
-		matchFailTest( DMIOReader.unquotedString, "abc123ABC_+-*/%^&|!$@.,=[]~\\" );
-		matchFailTest( DMIOReader.unquotedString, "abc123ABC_`" );
-	}
-
-	public void testQuotedString()
-	{
-		matchTest( DMIOReader.quotedString, "\"abc123ABC_\"", "\"abc123ABC_\"" );
-		matchTest( DMIOReader.quotedString, "\"abc123ABC_`\"", "\"abc123ABC_`\"" );
-		matchTest( DMIOReader.quotedString, "\"abc123()ABC_\"", "\"abc123()ABC_\"" );
-		matchTest( DMIOReader.quotedString, "\"abc123( )ABC_\"", "\"abc123( )ABC_\"" );
-		matchTest( DMIOReader.quotedString, "\"abc123(\\\\)ABC_\"", "\"abc123(\\\\)ABC_\"" );
-		matchTest( DMIOReader.quotedString, "\"abc123(\\n)ABC_\"", "\"abc123(\\n)ABC_\"" );
-		matchTest( DMIOReader.quotedString, "\"abc123(\\r)ABC_\"", "\"abc123(\\r)ABC_\"" );
-		matchTest( DMIOReader.quotedString, "\"abc123(\\t)ABC_\"", "\"abc123(\\t)ABC_\"" );
-		matchTest( DMIOReader.quotedString, "\"abc123(\\x123abcx)ABC_\"", "\"abc123(\\x123abcx)ABC_\"" );
-		matchFailTest( DMIOReader.quotedString, "\"abc123(\\x)ABC_\"" );
-		matchFailTest( DMIOReader.quotedString, "\"abc123(\\x123)ABC_\"" );
-	}
-	
-	public void testHexCharEscape()
-	{
-		Pattern pat = Pattern.compile( DMIOReader.hexCharEscape );
-		matchFailTest( pat, "x" );
-		matchTest( pat, "\\x0x", "\\x0x" );
-		matchTest( pat, "\\xAx", "\\xAx" );
-		matchFailTest( pat, "\\xx" );
-		matchFailTest( pat, "\\xA" );
-		matchFailTest( pat, "\\xG" );
-	}
-
-	public void testWhitespaceEscape()
-	{
-		Pattern pat = Pattern.compile( DMIOReader.whitespaceEscape );
-		matchFailTest( pat, "\\x" );
-		matchTest( pat, "\\n", "\\n" );
-		matchTest( pat, "\\r", "\\r" );
-		matchTest( pat, "\\t", "\\t" );
-		matchTest( pat, "\\\\", "\\\\" );
-	}
-
-	public void testEscapeSequence()
-	{
-		Pattern pat = Pattern.compile( DMIOReader.escapeSequence );
-		matchTest( pat, "\\n", "\\n" );
-		matchTest( pat, "\\r", "\\r" );
-		matchTest( pat, "\\t", "\\t" );
-		matchTest( pat, "\\\\", "\\\\" );
-		matchFailTest( pat, "\\q" );
-		matchTest( pat, "\\x0x", "\\x0x" );
-		matchTest( pat, "\\xAx", "\\xAx" );
-	}
-	
 	
 	public void testReadUnquotedString()
 	{
