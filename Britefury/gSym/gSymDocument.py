@@ -5,6 +5,10 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
+import os
+
+from java.io import IOException
+
 from datetime import datetime
 
 from BritefuryJ.CommandHistory import CommandHistory, CommandHistoryListener
@@ -149,12 +153,8 @@ class GSymDocument (CommandHistoryListener):
 		
 		
 	def save(self):
-		f = open( self._filename, 'w' )
-		if f is not None:
-			f.write( DMIOWriter.writeAsString( self._write() ) )
-			# Sometimes, failing to flush the file can result in truncated data
-			f.flush()
-			f.close()
+		if os.path.exists( self._filename ):
+			DMIOWriter.writeToFile( self._filename, self._write() )
 			if self._bHasUnsavedData:
 				self._bHasUnsavedData = False
 				if self._unsavedDataListener is not None:
@@ -194,16 +194,15 @@ class GSymDocument (CommandHistoryListener):
 
 	@staticmethod
 	def readFile(world, filename):
-		f = open( filename, 'r' )
-		if f is not None:
+		if os.path.exists( filename ):
 			try:
-				documentRoot = DMIOReader.readFromString( f.read() )
+				documentRoot = DMIOReader.readFromFile( filename )
 				documentRoot = DMNode.coerce( documentRoot )
 				document = GSymDocument.read( world, documentRoot )
 				document._filename = filename
 				document._saveTime = datetime.now()
 				return document
-			except IOError:
+			except IOException:
 				return None
 		
 			

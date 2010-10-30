@@ -6,11 +6,13 @@
 //##************************
 package BritefuryJ.DocModel;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.python.core.PyString;
@@ -58,10 +60,28 @@ public class DMIOWriter extends DMIO
 		builder.append( stringAsAtom( content ) );
 	}
 	
+	private static boolean canUnquoteString(String s)
+	{
+		if ( s.length() == 0 )
+		{
+			return false;
+		}
+		
+		for (int i = 0; i < s.length(); i++)
+		{
+			char c = s.charAt( i );
+			if ( !unquotedCharBits.get( (int)c ) )
+			{
+				return false;
+			}
+		}
+		
+		return true;
+	}
+
 	public static String stringAsAtom(String content)
 	{
-		Matcher m = unquotedString.matcher( content );
-		if ( m.matches() )
+		if ( canUnquoteString( content ) )
 		{
 			return content;
 		}
@@ -236,45 +256,52 @@ public class DMIOWriter extends DMIO
 		return writer.writeDocument( content );
 	}
 
-
-
-
-
-
-
-
-
-
-
-
-	protected static void escape(StringBuilder builder, String x)
+	public static void writeToFile(File file, Object content) throws InvalidDataTypeException, IOException
 	{
-		for (int i = 0; i < x.length(); i++)
+		FileOutputStream stream = new FileOutputStream( file );
+		byte bytes[] = writeAsString( content ).getBytes( "ISO-8859-1" );
+		stream.write( bytes );
+	}
+
+	public static void writeToFile(String filename, Object content) throws InvalidDataTypeException, IOException
+	{
+		writeToFile( new File( filename ), content );
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+	protected static void escape(StringBuilder builder, char c)
+	{
+		if ( c == '\\' )
 		{
-			char c = x.charAt( i );
-			
-			if ( c == '\\' )
-			{
-				builder.append( "\\\\" );
-			}
-			else if ( c == '\n' )
-			{
-				builder.append( "\\n" );
-			}
-			else if ( c == '\r' )
-			{
-				builder.append( "\\r" );
-			}
-			else if ( c == '\t' )
-			{
-				builder.append( "\\t" );
-			}
-			else
-			{
-				builder.append(  "\\x" );
-                                builder.append(  Integer.toString( (int)c, 16 ) );
-                                builder.append(  "x" );
-			}
+			builder.append( "\\\\" );
+		}
+		else if ( c == '\n' )
+		{
+			builder.append( "\\n" );
+		}
+		else if ( c == '\r' )
+		{
+			builder.append( "\\r" );
+		}
+		else if ( c == '\t' )
+		{
+			builder.append( "\\t" );
+		}
+		else
+		{
+			builder.append(  "\\x" );
+                        builder.append(  Integer.toString( (int)c, 16 ) );
+                        builder.append(  "x" );
 		}
 	}
 	
@@ -284,26 +311,18 @@ public class DMIOWriter extends DMIO
 		
 		builder.append( "\"" );
 		// Escape newlines, CRs, tabs, and backslashes
-		int pos = 0;
 		
-		while ( pos < s.length() )
+		for (int i = 0; i < s.length(); i++)
 		{
-			Matcher m = quotedStringContents.matcher( s.substring( pos ) );
+			char c = s.charAt( i );
 			
-			if ( m.find()  &&  m.end() > m.start() )
+			if ( quotedCharBits.get( (int)c ) )
 			{
-				if ( m.start() > 0 )
-				{
-					escape( builder, s.substring( pos, pos+m.start() ) );
-				}
-				String x = m.group();
-				builder.append( x );
-				pos += m.end();
+				builder.append( c );
 			}
 			else
 			{
-				escape( builder, s.substring( pos ) );
-				break;
+				escape( builder, c );
 			}
 		}
 		

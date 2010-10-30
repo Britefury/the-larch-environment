@@ -6,6 +6,9 @@
 //##************************
 package tests.Parser;
 
+import java.awt.Color;
+import java.awt.LinearGradientPaint;
+import java.awt.Paint;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,6 +49,7 @@ import BritefuryJ.Parser.SeparatedList.CannotApplyMoreThanOneActionException;
 import BritefuryJ.Parser.SeparatedList.CannotApplyMoreThanOneConditionException;
 import BritefuryJ.Parser.Sequence;
 import BritefuryJ.Parser.StringNode;
+import BritefuryJ.Parser.StructuralObject;
 import BritefuryJ.Parser.Suppress;
 import BritefuryJ.Parser.TracedParseResult;
 import BritefuryJ.Parser.Word;
@@ -1131,6 +1135,19 @@ public class Test_Parser extends ParserTestCase
 		matchFailTestListSX( new StringNode( "hello" ), "[hellothere]" );
 	}
 
+
+	public void testStructuralObject() throws ParserCoerceException
+	{
+		ParserExpression parser1 = new StructuralObject( Color.class );
+		matchTestNode( parser1, Color.RED, Color.RED );
+		matchFailTestNode( parser1, parser1 );
+
+		ParserExpression parser2 = new StructuralObject( Paint.class );
+		matchTestNode( parser2, Color.RED, Color.RED );
+		LinearGradientPaint linearPaint = new LinearGradientPaint( 0.0f, 0.0f, 1.0f, 1.0f, new float[] { 0.0f, 1.0f }, new Color[] { Color.RED, Color.GREEN } );
+		matchTestNode( parser2, linearPaint, linearPaint );
+		matchFailTestNode( parser2, parser1 );
+	}
 
 
 	public void testSuppress() throws ParserExpression.ParserCoerceException

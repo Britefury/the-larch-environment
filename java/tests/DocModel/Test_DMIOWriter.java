@@ -10,14 +10,13 @@ import java.awt.Color;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
+
+import junit.framework.TestCase;
 
 import org.python.core.PyInteger;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 
-import junit.framework.TestCase;
-import BritefuryJ.DocModel.DMIOReader;
 import BritefuryJ.DocModel.DMIOWriter;
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
@@ -29,9 +28,9 @@ public class Test_DMIOWriter extends TestCase
 {
 	protected static class TestWriter extends DMIOWriter
 	{
-		protected static void test_escape(StringBuilder builder, String x)
+		protected static void test_escape(StringBuilder builder, char c)
 		{
-			escape( builder, x );
+			escape( builder, c );
 		}
 		
 		protected static String test_quoteString(String s)
@@ -40,11 +39,11 @@ public class Test_DMIOWriter extends TestCase
 		}
 	}
 	
-	private DMSchema schema, module2;
-	private DMObjectClass A, A2;
+	private static DMSchema schema, module2;
+	private static DMObjectClass A, A2;
 	
 	
-	public void setUp()
+	static
 	{
 		schema = new DMSchema( "schema", "m", "test.schema" );
 		module2 = new DMSchema( "module2", "m", "test.module2" );
@@ -52,57 +51,10 @@ public class Test_DMIOWriter extends TestCase
 		A2 = module2.newClass( "A2", new String[] { "x", "y" } );
 	}
 	
-	public void tearDown()
-	{
-		schema = null;
-		module2 = null;
-		A = null;
-		A2 = null;
-	}
 	
 	
 	
-	
-	public void matchTest(Pattern pattern, String input, String expected)
-	{
-		DMIOReader.MatchResult res = Test_DMIOReader.TestReader.test_match( pattern, input, 0 );
-		
-		if ( res.value == null )
-		{
-			System.out.println( "MATCH FAILURE" );
-			System.out.println( "EXPECTED: " + expected );
-		}
-		
-
-		assertNotNull( res.value );
-		
-		if ( !res.value.equals( expected ) )
-		{
-			System.out.println( "VALUES ARE NOT THE SAME" );
-			System.out.println( "EXPECTED: " + expected );
-			System.out.println( "RESULT: " + res.value );
-		}
-		
-		
-		assertTrue( res.value.equals( expected ) );
-	}
-
-	public void matchFailTest(Pattern pattern, String input)
-	{
-		DMIOReader.MatchResult res = Test_DMIOReader.TestReader.test_match( pattern, input, 0 );
-		
-		if ( res.value != null  &&  res.value.equals( input ) )
-		{
-			System.out.println( "MATCH SHOULD HAVE FAILED" );
-			System.out.println( "RESULT: " + res.value );
-		}
-		
-
-		assertTrue( res.value == null  ||  !res.value.equals( input ) );
-	}
-	
-	
-	public void escapeTest(String input, String expected)
+	public void escapeTest(char input, String expected)
 	{
 		StringBuilder builder = new StringBuilder();
 		TestWriter.test_escape( builder, input );
@@ -139,39 +91,14 @@ public class Test_DMIOWriter extends TestCase
 
 
 	
-	public void testUnquotedString()
-	{
-		matchTest( DMIOWriter.unquotedString, "abc123ABC_", "abc123ABC_" );
-		matchTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.~", "abc123ABC_+-*/%^&|!$@.~" );
-		matchFailTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.~(" );
-		matchFailTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.~)" );
-		matchFailTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.~\"" );
-		matchFailTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.~ " );
-		matchFailTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.~\t" );
-		matchFailTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.~\n" );
-		matchFailTest( DMIOWriter.unquotedString, "abc123ABC_+-*/%^&|!$@.~\\" );
-	}
-
-	public void testQuotedStringContents()
-	{
-		matchTest( DMIOWriter.quotedStringContents, "abc123ABC_", "abc123ABC_" );
-		matchTest( DMIOWriter.quotedStringContents, "abc123ABC_`", "abc123ABC_`" );
-		matchTest( DMIOWriter.quotedStringContents, "abc123()ABC_", "abc123()ABC_" );
-		matchTest( DMIOWriter.quotedStringContents, "abc123( )ABC_", "abc123( )ABC_" );
-		matchFailTest( DMIOWriter.quotedStringContents, "abc123(\\)ABC_" );
-		matchFailTest( DMIOWriter.quotedStringContents, "abc123(\n)ABC_" );
-		matchFailTest( DMIOWriter.quotedStringContents, "abc123(\r)ABC_" );
-		matchFailTest( DMIOWriter.quotedStringContents, "abc123(\t)ABC_" );
-	}
-	
 	public void testEscape()
 	{
-		escapeTest( "\n", "\\n" );
-		escapeTest( "\r", "\\r" );
-		escapeTest( "\t", "\\t" );
-		escapeTest( "\\", "\\\\" );
-		escapeTest( new Character( (char)8 ).toString(), "\\x8x" );
-		escapeTest( new Character( (char)0x1258 ).toString(), "\\x1258x" );
+		escapeTest( '\n', "\\n" );
+		escapeTest( '\r', "\\r" );
+		escapeTest( '\t', "\\t" );
+		escapeTest( '\\', "\\\\" );
+		escapeTest( (char)8, "\\x8x" );
+		escapeTest( (char)0x1258, "\\x1258x" );
 	}
 	
 	public void testQuoteString()
