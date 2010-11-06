@@ -377,10 +377,24 @@ PythonSuiteTopLevelTreeEventListener.instance = PythonSuiteTopLevelTreeEventList
 
 
 
+class PythonExpressionNewLineEvent (object):
+	def __init__(self, model):
+		self.model = model
+
+
 class PythonExpressionTopLevelTreeEventListener (TreeEventListenerObjectDispatch):
-	@ObjectDispatchMethod( PythonSelectionEditTreeEvent, TextEditEvent )
-	def onEditEvent(self, element, sourceElement, event):
+	@ObjectDispatchMethod( PythonSelectionEditTreeEvent )
+	def onSelectionEditEvent(self, element, sourceElement, event):
 		return True
+
+	@ObjectDispatchMethod( TextEditEvent )
+	def onTextEditEvent(self, element, sourceElement, event):
+		value = element.getStreamValue()
+		if '\n' in value:
+			element.postTreeEvent( PythonExpressionNewLineEvent( element.getFragmentContext().getModel() ) )
+			return True
+		else:
+			return True
 
 PythonExpressionTopLevelTreeEventListener.instance = PythonExpressionTopLevelTreeEventListener()
 

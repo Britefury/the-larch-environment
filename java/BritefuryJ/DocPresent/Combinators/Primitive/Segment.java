@@ -25,6 +25,11 @@ public class Segment extends Pres
 		this.bGuardEnd = bGuardEnd;
 	}
 	
+	public Segment(Object child)
+	{
+		this( true, true, child );
+	}
+	
 
 	
 	@Override

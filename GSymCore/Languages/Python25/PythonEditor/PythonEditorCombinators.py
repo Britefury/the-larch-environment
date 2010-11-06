@@ -534,7 +534,7 @@ def quote(ctx, style, valueView, title, editHandler):
 	header = titleLabel.alignHLeft()
 	box = quoteBorderStyle.applyTo( Border( Column( [ header.alignHExpand(), region.pad( 3.0, 3.0 ) ] ) ) ).pad( 1.0, 1.0 )
 
-	segment = Segment( True, True, box )
+	segment = Segment( box )
 	return segment.present( ctx, style )
 
 
@@ -551,7 +551,7 @@ def unquote(ctx, style, valueView, title, editHandler):
 	header = titleLabel.alignHLeft()
 	box = unquoteBorderStyle.applyTo( Border( Column( [ header.alignHExpand(), region.pad( 3.0, 3.0 ) ] ) ) ).pad( 1.0, 1.0 )
 
-	segment = Segment( True, True, box )
+	segment = Segment( box )
 	return segment.present( ctx, style )
 
 
@@ -566,7 +566,7 @@ def externalExpr(ctx, style, exprView, title, deleteButton):
 	header = Row( [ titleLabel.alignHLeft(), deleteButton.alignHRight().alignVCentre() ] )
 	box = externalExprBorderStyle.applyTo( Border( Column( [ header.alignHExpand(), exprView.pad( 3.0, 3.0 ) ] ) ) ).pad( 1.0, 1.0 )
 
-	segment = Segment( True, True, box )
+	segment = Segment( box )
 	return segment.present( ctx, style )
 
 
@@ -577,7 +577,7 @@ def inlineObject(ctx, style, valueView):
 	
 	box = externalExprBorderStyle.applyTo( Border( valueView.pad( 3.0, 3.0 ) ) ).pad( 1.0, 1.0 )
 
-	segment = Segment( True, True, box )
+	segment = Segment( box )
 	return segment.present( ctx, style )
 
 
@@ -599,7 +599,7 @@ def inlineObjectMacro(ctx, style, valueView, modelView):
 	expanded = externalExprBorderStyle.applyTo( Border( Column( [ Row( [ valueView, vLine, contractButton.alignVBottom() ] ), hLine, modelView ] ).pad( 3.0, 3.0 ) ) ).pad( 1.0, 1.0 )
 	expander = CustomExpander( contracted, expanded )
 	
-	segment = Segment( True, True, expander )
+	segment = Segment( expander )
 	return segment.present( ctx, style )
 
 
@@ -940,12 +940,12 @@ def badIndentation(ctx, style, child):
 	return badIndentationStyle.applyTo( Border( child ) ).present( ctx, style )
 
 def statementLine(statement):
-	segment = Segment( True, True, statement )
+	segment = Segment( statement )
 	newLine = Whitespace( '\n' )
 	return Paragraph( [ segment, newLine ] )
 
 def specialFormStatementLine(statement):
-	segment = Segment( True, True, statement )
+	segment = Segment( statement )
 	return Paragraph( [ segment ] )
 
 
