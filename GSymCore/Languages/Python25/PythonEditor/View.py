@@ -471,7 +471,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			seg = exprView
 		else:
 			exprView = InnerFragment( expr, _withPythonState( state, PRECEDENCE_NONE, EDITMODE_DISPLAYCONTENTS ) )
-			seg = Segment( True, True, exprView )
+			seg = Segment( exprView )
 		e = Paragraph( [ seg ] )
 		_inlineObject_dropDest = ObjectDndHandler.DropDest( GSymFragmentView.FragmentModel, _onDrop_inlineObject )
 		e = e.withDropDest( _inlineObject_dropDest )
