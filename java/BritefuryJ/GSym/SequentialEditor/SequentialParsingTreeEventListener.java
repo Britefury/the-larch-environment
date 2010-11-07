@@ -30,14 +30,6 @@ public abstract class SequentialParsingTreeEventListener implements TreeEventLis
 	}
 	
 	
-	protected boolean handleEmptyValue(DPElement element, GSymFragmentView fragment, Object event, Object model)
-	{
-		return false;
-	}
-	
-	protected abstract boolean handleParseSuccess(DPElement element, GSymFragmentView fragment, Object event, Object model, StreamValue value, Object parseResult);
-	protected abstract boolean handleParseFailure(DPElement element, GSymFragmentView fragment, Object event, Object model, StreamValue value);
-	
 	protected abstract ParserExpression getParser();
 	
 	protected Object postParseResult(Object value)
@@ -45,6 +37,15 @@ public abstract class SequentialParsingTreeEventListener implements TreeEventLis
 		return value;
 	}
 
+
+	protected boolean handleEmptyValue(DPElement element, GSymFragmentView fragment, Object event, Object model)
+	{
+		return false;
+	}
+	
+	protected abstract boolean handleParseSuccess(DPElement element, GSymFragmentView fragment, Object event, Object model, StreamValue value, Object parsed);
+	protected abstract boolean handleParseFailure(DPElement element, GSymFragmentView fragment, Object event, Object model, StreamValue value);
+	
 	
 	
 	@Override

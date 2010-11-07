@@ -48,114 +48,116 @@ from GSymCore.Languages.Python25.PythonEditor.SelectionEditor import PythonSelec
 
 
 
+class PythonParsingTreeEventListener (SequentialParsingTreeEventListener):
+	_outerPrecedence = None
+	
+	def getSelectionEditTreeEventClass(self):
+		return PythonSelectionEditTreeEvent
+	
+	def postParseResult(self, value):
+		return removeUnNeededParens( value, self._outerPrecedence )
 #
 #
 # EDIT LISTENERS
 #
 #
 
-class ParsedExpressionTreeEventListener (TreeEventListenerObjectDispatch):
+class ParsedExpressionTreeEventListener (PythonParsingTreeEventListener):
 	__slots__ = [ '_parser', '_outerPrecedence' ]
 	
 	def __init__(self, parser, outerPrecedence, node=None):
-		#super( ParsedExpressionTreeEventListener, self ).__init__()
+		super( ParsedExpressionTreeEventListener, self ).__init__()
 		self._parser = parser
 		self._outerPrecedence = outerPrecedence
-
-
-	@ObjectDispatchMethod( TextEditEvent, PythonSelectionEditTreeEvent )
-	def editEvent(self, element, sourceElement, event):
-		# if @event is a @PythonSelectionEditTreeEvent, and its source element is @element, then @element has had its
-		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it.
-		# Otherwise, clear the structural represnetation of all elements on the path from the source element to @element
-		if not ( isinstance( event, PythonSelectionEditTreeEvent )  and  event.getSourceElement() is element ):
-			sourceElement.clearFixedValuesOnPathUpTo( element )
-			element.clearFixedValue()
-		value = element.getStreamValue()
-		fragment = element.getFragmentContext()
-		node = fragment.getModel()
-		if '\n' not in value:
-			parsed = parseStream( self._parser, value, self._outerPrecedence )
-			if parsed is not None:
-				log = fragment.getView().getPageLog()
-				if log.isRecording():
-					log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - success' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
-				if parsed != node:
-					pyReplaceExpression( fragment, node, parsed )
-			else:
-				if value.isTextual():
-					if value.textualValue().strip() == '':
-						# Expression content has been deleted entirely
-						log = fragment.getView().getPageLog()
-						if log.isRecording():
-							log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - deleted' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
-						return False
-				unparsed = Schema.UNPARSED( value=value.getItemValues() )
-				log = fragment.getView().getPageLog()
-				if log.isRecording():
-					log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - unparsed' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', unparsed ) )
-				pyReplaceExpression( fragment, node, unparsed )
-			return True
-		else:
-			return False
-		
 	
 		
+	def testValueEmpty(self, element, fragment, model, value):
+		return value.isTextual()  and  value.textualValue().strip() == ''
+
+	def testValue(self, element, fragment, model, value):
+		return '\n' not in value
+	
+	
+	def getParser(self):
+		return self._parser
+	
+	
+	def handleEmptyValue(self, element, fragment, event, model):
+		log = fragment.getView().getPageLog()
+		if log.isRecording():
+			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - deleted' ).hItem( 'parser', self._parser ) )
+		return False
+	
+	def handleParseSuccess(self, element, fragment, event, model, value, parsed):
+		log = fragment.getView().getPageLog()
+		if log.isRecording():
+			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - success' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
+		if parsed != model:
+			pyReplaceExpression( fragment, model, parsed )
+		return True
+		
+	def handleParseFailure(self, element, fragment, event, model, value):
+		unparsed = Schema.UNPARSED( value=value.getItemValues() )
+		log = fragment.getView().getPageLog()
+		if log.isRecording():
+			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - unparsed' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', unparsed ) )
+		pyReplaceExpression( fragment, model, unparsed )
+		return True
+
+		
+		
 		
 
 
-class PythonExpressionTreeEventListener (TreeEventListenerObjectDispatch):
-	__slots__ = [ '_parser' ]
+class PythonExpressionTreeEventListener (PythonParsingTreeEventListener):
+	__slots__ = [ '_parser', '_outerPrecedence' ]
 	
 	def __init__(self, parser, outerPrecedence):
 		super( PythonExpressionTreeEventListener, self ).__init__()
 		self._parser = parser
 		self._outerPrecedence = outerPrecedence
-
-
-	@ObjectDispatchMethod( TextEditEvent, PythonSelectionEditTreeEvent )
-	def editEvent(self, element, sourceElement, event):
-		# if @event is a @PythonSelectionEditTreeEvent, and its source element is @element, then @element has had its
-		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it.
-		# Otherwise, clear the structural represnetation of all elements on the path from the source element to @element
-		if not ( isinstance( event, PythonSelectionEditTreeEvent )  and  event.getSourceElement() is element ):
-			sourceElement.clearFixedValuesOnPathUpTo( element )
-			element.clearFixedValue()
-		value = element.getStreamValue()
-		fragment = element.getFragmentContext()
-		node = fragment.getModel()
-		nodeExpr = node['expr']
+	
+		
+	def testValue(self, element, fragment, model, value):
+		return '\n' not in value
+	
+	
+	def getParser(self):
+		return self._parser
+	
+	
+	def handleEmptyValue(self, element, fragment, event, model):
 		log = fragment.getView().getPageLog()
 		if log.isRecording():
-			log.log( LogEntry( 'Py25ExprEdit' ).hItem( 'description', 'Top level expression' ).vItem( 'editedStream', value ) )
-		if '\n' not in value:
-			if value.isEmpty():
-				node['expr'] = None
-				return True
+			log.log( LogEntry( 'Py25ExprEdit' ).hItem( 'description', 'Expression - deleted' ).hItem( 'parser', self._parser ) )
+		model['expr'] = None
+		return True
+	
+	def handleParseSuccess(self, element, fragment, event, model, value, parsed):
+		log = fragment.getView().getPageLog()
+		if log.isRecording():
+			log.log( LogEntry( 'Py25ExprEdit' ).hItem( 'description', 'Top level expression - success' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
+		expr = model['expr']
+		if parsed != expr:
+			if expr is None:
+				model['expr'] = parsed
 			else:
-				parsed = parseStream( self._parser, value, self._outerPrecedence )
-				if parsed is not None:
-					log = fragment.getView().getPageLog()
-					if log.isRecording():
-						log.log( LogEntry( 'Py25ExprEdit' ).hItem( 'description', 'Top level expression - success' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
-					if parsed != nodeExpr:
-						if nodeExpr is None:
-							node['expr'] = parsed
-						else:
-							pyReplaceExpression( fragment, nodeExpr, parsed )
-				else:
-					unparsed = Schema.UNPARSED( value=value.getItemValues() )
-					log = fragment.getView().getPageLog()
-					if log.isRecording():
-						log.log( LogEntry( 'Py25ExprEdit' ).hItem( 'description', 'Top level expression - unparsed' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', unparsed ) )
-					if nodeExpr is None:
-						node['expr'] = unparsed
-					else:
-						pyReplaceExpression( fragment, nodeExpr, unparsed )
-				return True
-		else:
-			return False
+				pyReplaceExpression( fragment, expr, parsed )
+		return True
 		
+	def handleParseFailure(self, element, fragment, event, model, value):
+		unparsed = Schema.UNPARSED( value=value.getItemValues() )
+		log = fragment.getView().getPageLog()
+		if log.isRecording():
+			log.log( LogEntry( 'Py25ExprEdit' ).hItem( 'description', 'Top level expression - unparsed' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', unparsed ) )
+		expr = model['expr']
+		if expr is None:
+			model['expr'] = unparsed
+		else:
+			pyReplaceExpression( fragment, expr, unparsed )
+		return True
+
+
 	
 		
 		
@@ -279,13 +281,7 @@ class CompoundHeaderTreeEventListener (TreeEventListenerObjectDispatch):
 		value = element.getStreamValue()
 		parsed = parseStream( self._parser, value )
 		if parsed is not None:
-			return self.handleParsed( element, value, parsed, event )
-		else:
-			return element.postTreeEventToParent( event )
-
-		
-	def handleParsed(self, element, value, parsed, event):
-		element.setFixedValue( parsed )
+			element.setFixedValue( parsed )
 		return element.postTreeEventToParent( event )
 			
 

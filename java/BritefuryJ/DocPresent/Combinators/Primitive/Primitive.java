@@ -58,7 +58,7 @@ public class Primitive
 	public static final InheritedAttributeNonNull fractionHPadding = new InheritedAttributeNonNull( primitiveNamespace, "fractionHPadding", Double.class, 3.0 );
 	public static final InheritedAttributeNonNull fractionRefYOffset = new InheritedAttributeNonNull( primitiveNamespace, "fractionRefYOffset", Double.class, 5.0 );
 	public static final InheritedAttributeNonNull fractionFontScale = new InheritedAttributeNonNull( primitiveNamespace, "fractionFontScale", Double.class, 0.9 );
-	public static final InheritedAttributeNonNull fractionMinFontScale = new InheritedAttributeNonNull( primitiveNamespace, "fractionMinFontScale", Double.class, 0.9 );
+	public static final InheritedAttributeNonNull fractionMinFontScale = new InheritedAttributeNonNull( primitiveNamespace, "fractionMinFontScale", Double.class, 0.85 );
 	public static final InheritedAttributeNonNull editable = new InheritedAttributeNonNull( primitiveNamespace, "editable", Boolean.class, true );
 	public static final InheritedAttributeNonNull selectable = new InheritedAttributeNonNull( primitiveNamespace, "selectable", Boolean.class, true );
 	public static final InheritedAttributeNonNull foreground = new InheritedAttributeNonNull( primitiveNamespace, "foreground", Paint.class, Color.black );
@@ -71,8 +71,8 @@ public class Primitive
 	public static final InheritedAttribute hoverShapePainter = new InheritedAttribute( primitiveNamespace, "hoverShapePainter", Painter.class, null );
 	public static final InheritedAttributeNonNull scriptColumnSpacing = new InheritedAttributeNonNull( primitiveNamespace, "scriptColumnSpacing", Double.class, 1.0 );
 	public static final InheritedAttributeNonNull scriptRowSpacing = new InheritedAttributeNonNull( primitiveNamespace, "scriptRowSpacing", Double.class, 1.0 );
-	public static final InheritedAttributeNonNull scriptFontScale = new InheritedAttributeNonNull( primitiveNamespace, "scriptFontScale", Double.class, 0.9 );
-	public static final InheritedAttributeNonNull scriptMinFontScale = new InheritedAttributeNonNull( primitiveNamespace, "scriptMinFontScale", Double.class, 0.9 );
+	public static final InheritedAttributeNonNull scriptFontScale = new InheritedAttributeNonNull( primitiveNamespace, "scriptFontScale", Double.class, 0.75 );
+	public static final InheritedAttributeNonNull scriptMinFontScale = new InheritedAttributeNonNull( primitiveNamespace, "scriptMinFontScale", Double.class, 0.7 );
 	public static final AttributeNonNull tableColumnSpacing = new AttributeNonNull( primitiveNamespace, "tableColumnSpacing", Double.class, 0.0 );
 	public static final AttributeNonNull tableColumnExpand = new AttributeNonNull( primitiveNamespace, "tableColumnExpand", Boolean.class, false );
 	public static final AttributeNonNull tableRowSpacing = new AttributeNonNull( primitiveNamespace, "tableRowSpacing", Double.class, 0.0 );
