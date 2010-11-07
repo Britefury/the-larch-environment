@@ -26,6 +26,8 @@ from BritefuryJ.DocPresent.Interactor import KeyElementInteractor
 
 from BritefuryJ.Logging import LogEntry
 
+from BritefuryJ.GSym.SequentialEditor import SequentialParsingTreeEventListener
+
 
 from Britefury.Util.NodeUtil import *
 
@@ -33,7 +35,6 @@ from Britefury.Util.NodeUtil import *
 from Britefury.gSym.View import EditOperations
 from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
 
-from Britefury.gSym.SequentialEditor import SequentialParsingTreeEventListener
 
 
 from GSymCore.Languages.Python25 import Schema
