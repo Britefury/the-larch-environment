@@ -63,14 +63,14 @@ class Console (IncrementalOwner):
 		return self._currentPythonModule
 	
 		
-	def commit(self, execResult):
-		self._blocks.append( ConsoleBlock( self._currentPythonModule, execResult ) )
+	def _commit(self, module, execResult):
+		self._blocks.append( ConsoleBlock( module, execResult ) )
 		blank = Python25.py25NewModule()
 		for a in self._after:
 			if a != blank:
 				self._before.append( a )
-		if self._currentPythonModule != blank:
-			self._before.append( self._currentPythonModule.deepCopy() )
+		if module != blank:
+			self._before.append( module.deepCopy() )
 		self._after = []
 		self._currentPythonModule = Python25.py25NewModule()
 		self._incr.onChanged()
@@ -96,11 +96,16 @@ class Console (IncrementalOwner):
 		
 		
 		
-	def execute(self, bEvaluate):
+	def execute(self, bEvaluate=True):
 		module = self.getCurrentPythonModule()
 		if module != Python25.py25NewModule():
 			execResult = Execution.executePythonModule( module, self._module, bEvaluate )
-			self.commit( execResult )
+			self._commit( module, execResult )
+					
+	def executeModule(self, module, bEvaluate=True):
+		if module != Python25.py25NewModule():
+			execResult = Execution.executePythonModule( module, self._module, bEvaluate )
+			self._commit( module, execResult )
 					
 		
 		

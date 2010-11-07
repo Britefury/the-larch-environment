@@ -10,5 +10,5 @@ from GSymCore.GSymApp import GSymApp
 
 
 def initPlugin(plugin, world):
-	world.registerAppStateSubject( plugin, GSymApp.newAppStateSubject( world ) )
+	world.setAppStateSubject( plugin, GSymApp.newAppStateSubject( world ) )
 

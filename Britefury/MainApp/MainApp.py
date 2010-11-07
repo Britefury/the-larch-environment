@@ -83,14 +83,19 @@ class MainApp (object):
 		
 	def _onWindowCloseRequest(self, window):
 		if len( self._openWindows ) == 1:
-			if self._appState.hasUnsavedData():
-				# Dialog here
-				response = JOptionPane.showOptionDialog( window.getFrame(),
-				                                         'You have not saved your work. Close anyway?', 'Unsaved data', JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'Close', 'Cancel' ], 'Cancel' )
-				if response == JOptionPane.YES_OPTION:
-					pass
-				else:
-					return
+			try:
+				hasUnsavedDataFn = self._appState.hasUnsavedData
+			except AttributeError:
+				pass
+			else:
+				if hasUnsavedDataFn():
+					# Dialog here
+					response = JOptionPane.showOptionDialog( window.getFrame(),
+						                                 'You have not saved your work. Close anyway?', 'Unsaved data', JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, None, [ 'Close', 'Cancel' ], 'Cancel' )
+					if response == JOptionPane.YES_OPTION:
+						pass
+					else:
+						return
 				
 		window.close()
 		self._openWindows.remove( window )
