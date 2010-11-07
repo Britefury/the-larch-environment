@@ -23,6 +23,11 @@ from Britefury.gSymConfig import UserConfig
 from Britefury.MainApp.MainApp import MainApp
 
 
+from GSymCore.PythonConsole import Console
+
+from GSymCore.Languages.Python25.Python25Importer import importPy25File
+
+
 
 def main():
 	UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
@@ -30,16 +35,23 @@ def main():
 
 	world = GSymWorld()
 	world.enableImportHooks()
+	console = Console.newConsole( 'Console' )
+	world.setAppStateSubject( None, Console.newConsoleSubject( console, world.getAppStateSubject() ) )
+	
 
 	if len( sys.argv ) > 1:
-		filenames = sys.argv[1:]
-		appStateSubject = world.getAppStateSubject()
-		for filename in filenames:
-			try:
-				if not appStateSubject.loadDocument( filename ):
-					print 'Failed to load document from %s'  %  filename
-			except:
-				print 'Failed to load %s'  %  filename
+		if len( sys.argv ) > 2:
+			print 'Usage:'
+			print '\t %s <python_script>'  %  ( sys.argv[0], )
+			sys.exit( -1 )
+			
+		filename = sys.argv[1]
+		if filename.lower().endswith( '.py' ):
+			m = importPy25File( filename )
+			console.executeModule( m, True )
+		else:
+			print 'Python script filename must end with .py'
+			sys.exit( -1 )
 		
 	def _onClose(app):
 		UserConfig.userConfig.save()

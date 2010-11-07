@@ -56,11 +56,14 @@ class GSymWorld (object):
 		
 	def registerPageImporter(self, plugin, pageImporter):
 		self.pageImporters.append( pageImporter )
-		
-	def registerAppStateSubject(self, plugin, appStateSubject):
-		assert self._appStateSubject is None
+	
+	
+	def setAppStateSubject(self, plugin, appStateSubject):
 		self._appStateSubject = appStateSubject
 		
+	def getAppStateSubject(self):
+		return self._appStateSubject
+	
 		
 		
 	def registerImportedModule(self, fullname):
@@ -75,9 +78,6 @@ class GSymWorld (object):
 		return modulesToRemove
 		
 		
-	def getAppStateSubject(self):
-		return self._appStateSubject
-	
 	
 	
 	
