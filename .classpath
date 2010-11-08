@@ -15,7 +15,6 @@
 	<classpathentry kind="lib" path="C:/code/jython/extlibs/mockrunner-0.4.1/jar/jdom.jar"/>
 	<classpathentry kind="lib" path="C:/code/jython/extlibs/mockrunner-0.4.1/lib/jdk1.5/j2ee1.3/mockrunner-servlet.jar"/>
 	<classpathentry kind="lib" path="C:/code/jython/dist/jython-dev.jar"/>
-	<classpathentry kind="lib" path="C:/code/jython/dist/javalib/guava-r05.jar"/>
 	<classpathentry kind="lib" path="C:/code/jython/dist/javalib/constantine.jar"/>
 	<classpathentry kind="lib" path="C:/code/jython/dist/javalib/jnr-posix.jar"/>
 	<classpathentry kind="lib" path="C:/code/jython/dist/javalib/jaffl.jar"/>

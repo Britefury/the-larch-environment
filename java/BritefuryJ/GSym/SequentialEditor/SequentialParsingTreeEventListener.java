@@ -44,7 +44,12 @@ public abstract class SequentialParsingTreeEventListener implements TreeEventLis
 	}
 	
 	protected abstract boolean handleParseSuccess(DPElement element, GSymFragmentView fragment, Object event, Object model, StreamValue value, Object parsed);
-	protected abstract boolean handleParseFailure(DPElement element, GSymFragmentView fragment, Object event, Object model, StreamValue value);
+	
+	
+	protected boolean handleParseFailure(DPElement element, GSymFragmentView fragment, Object event, Object model, StreamValue value)
+	{
+		return false;
+	}
 	
 	
 	
