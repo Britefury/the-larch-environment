@@ -106,15 +106,8 @@ def unparsedNodeEditor(grammar, inheritedState, node, precedence, contents):
 		return contents
 	elif mode == EDITMODE_EDITSTATEMENT:
 		s = statementLine( contents )
-		
-		builder = StreamValueBuilder()
-		for x in node['value']:
-			if isinstance( x, str )  or  isinstance( x, unicode )  or  isinstance( x, DMObjectInterface ):
-				builder.append( x )
-			else:
-				raise TypeError, 'UNPARSED node should only contain strings or objects, not %s'  %  ( type( x ), )
-		s = s.withFixedValue( builder.stream() )
 		s = s.withTreeEventListener( instanceCache( StatementTreeEventListener, grammar.singleLineStatement() ) )
+		s = s.withElementInteractor( _statementIndentationInteractor )
 		return s
 	else:
 		raise ValueError, 'invalid mode %d'  %  mode
@@ -146,30 +139,12 @@ def specialFormExpressionNodeEditor(grammar, inheritedState, node, contents):
 		raise ValueError, 'invalid mode %d'  %  mode
 
 
-def structuralExpressionNodeEditor(inheritedState, node, precedence, contents):
-	mode = inheritedState['editMode']
-	if mode == EDITMODE_DISPLAYCONTENTS  or  mode == EDITMODE_EDITEXPRESSION:
-		contents = applyPythonParens( contents, _nodeRequiresParens( node ), precedence, getNumParens( node ), inheritedState )
-		contents = contents.withTreeEventListener( StructuralExpressionTreeEventListener.instance )
-		return contents
-	else:
-		raise ValueError, 'invalid mode %d'  %  mode
-
-
 def statementNodeEditor(grammar, inheritedState, node, contents):
 	mode = inheritedState['editMode']
 	if mode == EDITMODE_EDITSTATEMENT:
 		s = statementLine( contents )
 		
-		if node.isInstanceOf( Schema.UNPARSED ):
-			builder = StreamValueBuilder()
-			for x in node['value']:
-				if isinstance( x, str )  or  isinstance( x, unicode )  or  isinstance( x, DMObjectInterface ):
-					builder.append( x )
-				else:
-					raise TypeError, 'UNPARSED node should only contain strings or objects, not %s'  %  ( type( x ), )
-			s = s.withFixedValue( builder.stream() )
-		else:
+		if not node.isInstanceOf( Schema.UNPARSED ):
 			s = s.withFixedValue( node )
 		s = s.withTreeEventListener( instanceCache( StatementTreeEventListener, grammar.singleLineStatement() ) )
 		s = s.withElementInteractor( _statementIndentationInteractor )
@@ -236,8 +211,7 @@ def compoundStatementEditor(ctx, grammar, inheritedState, node, precedence, comp
 			
 			suiteElement = indentedBlock( indent, lineViews, dedent )
 			suiteElement = suiteElement.withFixedValue( Schema.IndentedBlock( suite=suite ) )
-			suiteListener = SuiteTreeEventListener( suiteParser, suite )
-			suiteElement = suiteElement.withTreeEventListener( suiteListener )
+			suiteElement = suiteElement.withTreeEventListener( SuiteTreeEventListener( suiteParser, suite ) )
 			
 			statementContents.extend( [ headerStatementLine.alignHExpand(), suiteElement.alignHExpand() ] )
 		else:
@@ -436,8 +410,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		_inlineObject_dropDest = ObjectDndHandler.DropDest( GSymFragmentView.FragmentModel, _onDrop_inlineObject )
 		s = s.withDropDest( _inlineObject_dropDest )
 		s = s.withFixedValue( suite )
-		suiteListener = SuiteTreeEventListener( self._parser.suite(), suite )
-		s = s.withTreeEventListener( suiteListener )
+		s = s.withTreeEventListener( SuiteTreeEventListener( self._parser.suite(), suite ) )
 		s = s.withTreeEventListener( PythonModuleTopLevelTreeEventListener.instance )
 		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		return s
@@ -455,8 +428,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		_inlineObject_dropDest = ObjectDndHandler.DropDest( GSymFragmentView.FragmentModel, _onDrop_inlineObject )
 		s = s.withDropDest( _inlineObject_dropDest )
 		s = s.withFixedValue( suite )
-		suiteListener = SuiteTreeEventListener( self._parser.suite(), suite )
-		s = s.withTreeEventListener( suiteListener )
+		s = s.withTreeEventListener( SuiteTreeEventListener( self._parser.suite(), suite ) )
 		s = s.withTreeEventListener( PythonSuiteTopLevelTreeEventListener.instance )
 		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		return s
@@ -475,6 +447,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		e = Paragraph( [ seg ] )
 		_inlineObject_dropDest = ObjectDndHandler.DropDest( GSymFragmentView.FragmentModel, _onDrop_inlineObject )
 		e = e.withDropDest( _inlineObject_dropDest )
+		e = e.withFixedValue( node )
 		e = e.withTreeEventListener( instanceCache( PythonExpressionTreeEventListener, self._parser.expression(), PRECEDENCE_NONE ) )
 		e = e.withTreeEventListener( PythonExpressionTopLevelTreeEventListener.instance )
 		e = e.withContextMenuInteractor( _pythonModuleContextMenuFactory )
@@ -494,9 +467,12 @@ class Python25View (GSymViewObjectNodeDispatch):
 			if x is node:
 				raise ValueError, 'Python25View.UNPARSED: self-referential unparsed node'
 			if isinstance( x, str )  or  isinstance( x, unicode ):
-				return unparseableText( x )
+				v = unparseableText( x )
+				return v
 			elif isinstance( x, DMObjectInterface ):
-				return InnerFragment( x, _withPythonState( state, PRECEDENCE_CONTAINER_UNPARSED ) )
+				v = InnerFragment( x, _withPythonState( state, PRECEDENCE_CONTAINER_UNPARSED, EDITMODE_DISPLAYCONTENTS ) )
+				v = v.withFixedValue( x )
+				return v
 			else:
 				raise TypeError, 'UNPARSED should contain a list of only strings or nodes, not a %s'  %  ( type( x ), )
 		views = [ _viewItem( x )   for x in value ]
@@ -1499,8 +1475,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		dedent = dedentElement().withFixedValue( Schema.Dedent() )
 		
 		suiteElement = indentedBlock( indent, lineViews, dedent ).withFixedValue( node )
-		suiteListener = SuiteTreeEventListener( self._parser.compoundSuite(), suite )
-		suiteElement = suiteElement.withTreeEventListener( suiteListener )
+		suiteElement = suiteElement.withTreeEventListener( SuiteTreeEventListener( self._parser.compoundSuite(), suite ) )
 		
 		return badIndentation( suiteElement )
 
