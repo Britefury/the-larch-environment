@@ -156,21 +156,21 @@ def getStatementDepth(ctx):
 #
 
 
-def pyReplaceNode(ctx, data, replacement):
-	return EditOperations.replaceNodeContents( ctx, data, replacement )
+def pyReplaceNode(fragment, data, replacement):
+	return EditOperations.replaceNodeContents( fragment, data, replacement )
 
-def pyReplaceExpression(ctx, data, replacement):
-	return EditOperations.replaceNodeContents( ctx, data, replacement )
+def pyReplaceExpression(fragment, data, replacement):
+	return EditOperations.replaceNodeContents( fragment, data, replacement )
 
 
 	
-def pyReplaceStmt(ctx, target, replacement, bDontReplaceIfEqual=True):
+def pyReplaceStmt(fragment, target, replacement, bDontReplaceIfEqual=True):
 	if isinstance( target, DMNode ):
 		if target == replacement  and  bDontReplaceIfEqual:
 			# Same content; ignore
 			return target
 		else:
-			return EditOperations.replaceNodeContents( ctx, target, replacement )
+			return EditOperations.replaceNodeContents( fragment, target, replacement )
 	else:
 		raise TypeError, 'PythonEditOperations:pyReplaceStmt(): @target must be a DMNode'
 			
