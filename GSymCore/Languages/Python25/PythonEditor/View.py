@@ -471,6 +471,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 				return v
 			elif isinstance( x, DMObjectInterface ):
 				v = InnerFragment( x, _withPythonState( state, PRECEDENCE_CONTAINER_UNPARSED, EDITMODE_DISPLAYCONTENTS ) )
+				#<NO_TREE_EVENT_LISTENER>
 				v = v.withFixedValue( x )
 				return v
 			else:
@@ -809,6 +810,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		xPrec, yPrec = computeBinOpViewPrecedenceValues( PRECEDENCE_MULDIVMOD, False )
 		xView = InnerFragment( x, _withPythonState( state, xPrec, EDITMODE_EDITEXPRESSION ) )
 		yView = InnerFragment( y, _withPythonState( state, yPrec, EDITMODE_EDITEXPRESSION ) )
+		#<NO_TREE_EVENT_LISTENER>
 		view = div( xView, yView, '/' ).withFixedValue( node )
 		return expressionNodeEditor( self._parser, state, node,
 			                     PRECEDENCE_MULDIVMOD,
