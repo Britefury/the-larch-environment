@@ -65,7 +65,7 @@ class PythonParsingTreeEventListener (SequentialParsingTreeEventListener):
 class ParsedExpressionTreeEventListener (PythonParsingTreeEventListener):
 	__slots__ = [ '_parser', '_outerPrecedence' ]
 	
-	def __init__(self, parser, outerPrecedence, node=None):
+	def __init__(self, parser, outerPrecedence):
 		super( ParsedExpressionTreeEventListener, self ).__init__()
 		self._parser = parser
 		self._outerPrecedence = outerPrecedence
@@ -248,69 +248,67 @@ class StatementTreeEventListener (TreeEventListenerObjectDispatch):
 			
 			
 
-class CompoundHeaderTreeEventListener (TreeEventListenerObjectDispatch):
+class CompoundHeaderTreeEventListener (PythonParsingTreeEventListener):
 	__slots__ = [ '_parser' ]
-
 	
 	def __init__(self, parser):
+		super( CompoundHeaderTreeEventListener, self ).__init__()
 		self._parser = parser
-
-
-	@ObjectDispatchMethod( PythonSelectionEditTreeEvent, TextEditEvent )
-	def onEditEvent(self, element, sourceElement, event):
-		# if @event is a @PythonSelectionEditTreeEvent, and its source element is @element, then @element has had its
-		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it
-		if not isinstance( event, PythonSelectionEditTreeEvent )  or  event.getSourceElement() is not element:
-			element.clearFixedValue()
-		fragment = element.getFragmentContext()
-		# Get the content
-		value = element.getStreamValue()
-		parsed = parseStream( self._parser, value )
-		if parsed is not None:
-			element.setFixedValue( parsed )
-		return element.postTreeEventToParent( event )
-			
-
 	
+		
+	def getParser(self):
+		return self._parser
+	
+	
+	def handleParseSuccess(self, element, fragment, event, model, value, parsed):
+		element.setFixedValue( parsed )
+		# Only partially handled - pass it up
+		return False
 
-			
-class SuiteTreeEventListener (TreeEventListenerObjectDispatch):
+
+
+
+
+class SuiteTreeEventListener (PythonParsingTreeEventListener):
 	__slots__ = [ '_parser', '_suite' ]
 
 	
 	def __init__(self, parser, suite):
+		super( SuiteTreeEventListener, self ).__init__()
 		self._parser = parser
 		self._suite = suite
-
 	
-	@ObjectDispatchMethod( PythonSelectionEditTreeEvent, PythonIndentationTreeEvent, TextEditEvent )
-	def onEditEvent(self, element, sourceElement, event):
-		# if @event is a @PythonSelectionEditTreeEvent, and its source element is @element, then @element has had its
-		# structural representation set to a value, in an inner invokation of a linearRepresentationModified method, so don't clear it
-		if not isinstance( event, PythonSelectionEditTreeEvent )  or  event.getSourceElement() is not element:
-			element.clearFixedValue()
-		fragment = element.getFragmentContext()
-		# Get the content
-		value = element.getStreamValue()
-		parsed = parseStream( self._parser, value )
-		if parsed is not None:
-			log = fragment.getView().getPageLog()
-			if log.isRecording():
-				log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Suite - parse SUCCESS' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
-			# Alter the value of the existing suite so that it becomes the same as the parsed result, but minimise the number of changes required to do so
-			modifySuiteMinimisingChanges( self._suite, parsed )
-			return True
-		else:
-			log = fragment.getView().getPageLog()
-			if log.isRecording():
-				log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Suite - parse FAIL - passing to parent' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ) )
-			return element.postTreeEventToParent( event )
-
-			
-			
-			
-			
+		
+	def getParser(self):
+		return self._parser
 	
+	def clearFixedValuesOnPath(self):
+		return False
+	
+	
+	def isEditEvent(self, event):
+		return isinstance( event, PythonIndentationTreeEvent )
+	
+	
+	def handleParseSuccess(self, element, fragment, event, model, value, parsed):
+		log = fragment.getView().getPageLog()
+		if log.isRecording():
+			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Suite - parse SUCCESS' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
+		# Alter the value of the existing suite so that it becomes the same as the parsed result, but minimise the number of changes required to do so
+		modifySuiteMinimisingChanges( self._suite, parsed )
+		return True
+	
+	def handleParseFailure(self, element, fragment, event, model, value):
+		log = fragment.getView().getPageLog()
+		if log.isRecording():
+			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Suite - parse FAIL - passing to parent' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ) )
+		return False
+
+
+
+
+
+
 
 class StatementIndentationInteractor (KeyElementInteractor):
 	def __init__(self):

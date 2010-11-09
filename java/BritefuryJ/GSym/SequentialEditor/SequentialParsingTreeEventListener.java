@@ -18,6 +18,11 @@ public abstract class SequentialParsingTreeEventListener implements TreeEventLis
 {
 	protected abstract Class<? extends SelectionEditTreeEvent> getSelectionEditTreeEventClass();
 	
+	protected boolean isEditEvent(Object event)
+	{
+		return false;
+	}
+	
 	
 	protected boolean testValueEmpty(DPElement element, GSymFragmentView fragment, Object model, StreamValue value)
 	{
@@ -37,6 +42,11 @@ public abstract class SequentialParsingTreeEventListener implements TreeEventLis
 		return value;
 	}
 
+	
+	protected boolean clearFixedValuesOnPath()
+	{
+		return true;
+	}
 
 	protected boolean handleEmptyValue(DPElement element, GSymFragmentView fragment, Object event, Object model)
 	{
@@ -56,14 +66,17 @@ public abstract class SequentialParsingTreeEventListener implements TreeEventLis
 	@Override
 	public boolean onTreeEvent(DPElement element, DPElement sourceElement, Object event)
 	{
-		if ( event instanceof TextEditEvent  ||  isSelectionEditEvent( event ) )
+		if ( event instanceof TextEditEvent  ||  isSelectionEditEvent( event )  ||  isEditEvent( event ) )
 		{
 			// If event is a selection edit event, and its source element is @element, then @element has had its fixed value
 			// set by a SequentialEditHandler - so don't clear it.
 			// Otherwise, clear all fixed values on a path from @sourceElement to @element
 			if ( !( isSelectionEditEvent( event )  &&  getEventSourceElement( event ) == element ) )
 			{
-				sourceElement.clearFixedValuesOnPathUpTo( element );
+				if ( clearFixedValuesOnPath() )
+				{
+					sourceElement.clearFixedValuesOnPathUpTo( element );
+				}
 				element.clearFixedValue();
 			}
 			
