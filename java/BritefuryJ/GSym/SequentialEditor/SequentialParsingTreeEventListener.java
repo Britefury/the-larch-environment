@@ -16,6 +16,15 @@ import BritefuryJ.Parser.ParserExpression;
 
 public abstract class SequentialParsingTreeEventListener implements TreeEventListener
 {
+	protected ParserExpression parser;
+	
+	
+	public SequentialParsingTreeEventListener(ParserExpression parser)
+	{
+		this.parser = parser;
+	}
+	
+	
 	protected abstract Class<? extends SelectionEditTreeEvent> getSelectionEditTreeEventClass();
 	
 	protected boolean isEditEvent(Object event)
@@ -34,8 +43,6 @@ public abstract class SequentialParsingTreeEventListener implements TreeEventLis
 		return true;
 	}
 	
-	
-	protected abstract ParserExpression getParser();
 	
 	protected Object postParseResult(Object value)
 	{
@@ -115,7 +122,7 @@ public abstract class SequentialParsingTreeEventListener implements TreeEventLis
 	
 	private Object[] parseStream(StreamValue value)
 	{
-		ParseResult res = getParser().parseStreamItems( value );
+		ParseResult res = parser.parseStreamItems( value );
 		if ( res.isValid() )
 		{
 			if ( res.getEnd() == value.length() )

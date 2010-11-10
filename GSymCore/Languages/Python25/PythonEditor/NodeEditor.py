@@ -32,7 +32,6 @@ from BritefuryJ.GSym.SequentialEditor import SequentialParsingTreeEventListener
 from Britefury.Util.NodeUtil import *
 
 
-from Britefury.gSym.View import EditOperations
 from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
 
 
@@ -63,11 +62,10 @@ class PythonParsingTreeEventListener (SequentialParsingTreeEventListener):
 #
 
 class ParsedExpressionTreeEventListener (PythonParsingTreeEventListener):
-	__slots__ = [ '_parser', '_outerPrecedence' ]
+	__slots__ = [ '_outerPrecedence' ]
 	
 	def __init__(self, parser, outerPrecedence):
-		super( ParsedExpressionTreeEventListener, self ).__init__()
-		self._parser = parser
+		super( ParsedExpressionTreeEventListener, self ).__init__( parser )
 		self._outerPrecedence = outerPrecedence
 	
 		
@@ -75,20 +73,16 @@ class ParsedExpressionTreeEventListener (PythonParsingTreeEventListener):
 		return value.isTextual()  and  value.textualValue().strip() == ''
 	
 	
-	def getParser(self):
-		return self._parser
-	
-	
 	def handleEmptyValue(self, element, fragment, event, model):
 		log = fragment.getView().getPageLog()
 		if log.isRecording():
-			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - deleted' ).hItem( 'parser', self._parser ) )
+			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - deleted' ).hItem( 'parser', self.parser ) )
 		return False
 	
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
 		log = fragment.getView().getPageLog()
 		if log.isRecording():
-			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - success' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
+			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - success' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ).vItem( 'parsedResult', parsed ) )
 		if parsed != model:
 			pyReplaceExpression( fragment, model, parsed )
 		return True
@@ -98,29 +92,24 @@ class ParsedExpressionTreeEventListener (PythonParsingTreeEventListener):
 
 
 class PythonExpressionTreeEventListener (PythonParsingTreeEventListener):
-	__slots__ = [ '_parser', '_outerPrecedence' ]
+	__slots__ = [ '_outerPrecedence' ]
 	
 	def __init__(self, parser, outerPrecedence):
-		super( PythonExpressionTreeEventListener, self ).__init__()
-		self._parser = parser
+		super( PythonExpressionTreeEventListener, self ).__init__( parser )
 		self._outerPrecedence = outerPrecedence
 	
 		
-	def getParser(self):
-		return self._parser
-	
-	
 	def handleEmptyValue(self, element, fragment, event, model):
 		log = fragment.getView().getPageLog()
 		if log.isRecording():
-			log.log( LogEntry( 'Py25ExprEdit' ).hItem( 'description', 'Expression - deleted' ).hItem( 'parser', self._parser ) )
+			log.log( LogEntry( 'Py25ExprEdit' ).hItem( 'description', 'Expression - deleted' ).hItem( 'parser', self.parser ) )
 		model['expr'] = None
 		return True
 	
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
 		log = fragment.getView().getPageLog()
 		if log.isRecording():
-			log.log( LogEntry( 'Py25ExprEdit' ).hItem( 'description', 'Top level expression - success' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
+			log.log( LogEntry( 'Py25ExprEdit' ).hItem( 'description', 'Top level expression - success' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ).vItem( 'parsedResult', parsed ) )
 		expr = model['expr']
 		if parsed != expr:
 			if expr is None:
@@ -133,7 +122,7 @@ class PythonExpressionTreeEventListener (PythonParsingTreeEventListener):
 		unparsed = Schema.UNPARSED( value=value.getItemValues() )
 		log = fragment.getView().getPageLog()
 		if log.isRecording():
-			log.log( LogEntry( 'Py25ExprEdit' ).hItem( 'description', 'Top level expression - unparsed' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', unparsed ) )
+			log.log( LogEntry( 'Py25ExprEdit' ).hItem( 'description', 'Top level expression - unparsed' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ).vItem( 'parsedResult', unparsed ) )
 		expr = model['expr']
 		if expr is None:
 			model['expr'] = unparsed
@@ -160,24 +149,11 @@ StructuralExpressionTreeEventListener.instance = StructuralExpressionTreeEventLi
 
 
 class StatementTreeEventListener (PythonParsingTreeEventListener):
-	__slots__ = [ '_parser' ]
-	
-	
-	def __init__(self, parser):
-		super( StatementTreeEventListener, self ).__init__()
-		self._parser = parser
-	
-		
-	def getParser(self):
-		return self._parser
-	
-	
-	
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
 		if not isCompoundStmtHeader( model )  and  not isCompoundStmtHeader( parsed ):
 			log = fragment.getView().getPageLog()
 			if log.isRecording():
-				log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
+				log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ).vItem( 'parsedResult', parsed ) )
 			pyReplaceStmt( fragment, model, parsed )
 			return True
 		else:
@@ -190,23 +166,10 @@ class StatementTreeEventListener (PythonParsingTreeEventListener):
 
 
 class StatementUnparsedTreeEventListener (PythonParsingTreeEventListener):
-	__slots__ = [ '_parser' ]
-	
-	
-	def __init__(self, parser):
-		super( StatementUnparsedTreeEventListener, self ).__init__()
-		self._parser = parser
-	
-		
-	def getParser(self):
-		return self._parser
-	
-	
-	
 	def handleParseFailure(self, element, sourceElement, fragment, event, model, value):
 		log = fragment.getView().getPageLog()
 		if log.isRecording():
-			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement (unparsed) - could not parse - passing up' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ) )
+			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement (unparsed) - could not parse - passing up' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ) )
 		# Pass further up:
 
 		# Replacing the node with itself ensures that the view of this node will be rebuilt,
@@ -230,7 +193,7 @@ class StatementUnparsedTreeEventListener (PythonParsingTreeEventListener):
 		if sourceFragment is fragment:
 			log = fragment.getView().getPageLog()
 			if log.isRecording():
-				log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - unparsed, node replaced' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
+				log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - unparsed, node replaced' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ).vItem( 'parsedResult', parsed ) )
 			pyReplaceNode( fragment, model, parsed )
 			return True
 		else:
@@ -243,14 +206,14 @@ class StatementUnparsedTreeEventListener (PythonParsingTreeEventListener):
 					# The content within @sourceFragmentElement has been deleted entirely, replace the whole statement
 					log = fragment.getView().getPageLog()
 					if log.isRecording():
-						log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - unparsed, sub-node deleted' ).vItem( 'editedStream', sourceValue ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ).vItem( 'sourceNode', sourceNode ) )
+						log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - unparsed, sub-node deleted' ).vItem( 'editedStream', sourceValue ).hItem( 'parser', self.parser ).vItem( 'parsedResult', parsed ).vItem( 'sourceNode', sourceNode ) )
 					pyReplaceStmt( fragment, model, parsed )
 					return True
 			
 			unparsed = Schema.UNPARSED( value=sourceValue.getItemValues() )
 			log = fragment.getView().getPageLog()
 			if log.isRecording():
-				log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - unparsed, sub-node replaced' ).vItem( 'editedStream', sourceValue ).hItem( 'parser', self._parser ).vItem( 'parsedResult', unparsed ) )
+				log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - unparsed, sub-node replaced' ).vItem( 'editedStream', sourceValue ).hItem( 'parser', self.parser ).vItem( 'parsedResult', unparsed ) )
 			pyReplaceNode( sourceFragment, sourceNode, unparsed )
 			return True
 
@@ -260,17 +223,6 @@ class StatementUnparsedTreeEventListener (PythonParsingTreeEventListener):
 
 
 class CompoundHeaderTreeEventListener (PythonParsingTreeEventListener):
-	__slots__ = [ '_parser' ]
-	
-	def __init__(self, parser):
-		super( CompoundHeaderTreeEventListener, self ).__init__()
-		self._parser = parser
-	
-		
-	def getParser(self):
-		return self._parser
-	
-	
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
 		element.setFixedValue( parsed )
 		# Only partially handled - pass it up
@@ -281,18 +233,14 @@ class CompoundHeaderTreeEventListener (PythonParsingTreeEventListener):
 
 
 class SuiteTreeEventListener (PythonParsingTreeEventListener):
-	__slots__ = [ '_parser', '_suite' ]
+	__slots__ = [ '_suite' ]
 
 	
 	def __init__(self, parser, suite):
-		super( SuiteTreeEventListener, self ).__init__()
-		self._parser = parser
+		super( SuiteTreeEventListener, self ).__init__( parser )
 		self._suite = suite
 	
 		
-	def getParser(self):
-		return self._parser
-	
 	def clearFixedValuesOnPath(self):
 		return False
 	
@@ -304,7 +252,7 @@ class SuiteTreeEventListener (PythonParsingTreeEventListener):
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
 		log = fragment.getView().getPageLog()
 		if log.isRecording():
-			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Suite - parse SUCCESS' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
+			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Suite - parse SUCCESS' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ).vItem( 'parsedResult', parsed ) )
 		# Alter the value of the existing suite so that it becomes the same as the parsed result, but minimise the number of changes required to do so
 		modifySuiteMinimisingChanges( self._suite, parsed )
 		return True
@@ -312,7 +260,7 @@ class SuiteTreeEventListener (PythonParsingTreeEventListener):
 	def handleParseFailure(self, element, sourceElement, fragment, event, model, value):
 		log = fragment.getView().getPageLog()
 		if log.isRecording():
-			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Suite - parse FAIL - passing to parent' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ) )
+			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Suite - parse FAIL - passing to parent' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ) )
 		return False
 
 
