@@ -31,9 +31,6 @@ from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder, StreamValue
 from Britefury.Util.NodeUtil import *
 
 
-from Britefury.gSym.View import EditOperations
-
-
 
 
 from GSymCore.Languages.Python25 import Schema
@@ -157,22 +154,19 @@ def getStatementDepth(ctx):
 
 
 def pyReplaceNode(fragment, data, replacement):
-	return EditOperations.replaceNodeContents( fragment, data, replacement )
+	data.become( replacement.deepCopy() )
 
 def pyReplaceExpression(fragment, data, replacement):
-	return EditOperations.replaceNodeContents( fragment, data, replacement )
+	data.become( replacement.deepCopy() )
 
 
 	
 def pyReplaceStmt(fragment, target, replacement, bDontReplaceIfEqual=True):
-	if isinstance( target, DMNode ):
-		if target == replacement  and  bDontReplaceIfEqual:
-			# Same content; ignore
-			return target
-		else:
-			return EditOperations.replaceNodeContents( fragment, target, replacement )
+	if target == replacement  and  bDontReplaceIfEqual:
+		# Same content; ignore
+		pass
 	else:
-		raise TypeError, 'PythonEditOperations:pyReplaceStmt(): @target must be a DMNode'
+		target.become( replacement.deepCopy() )
 			
 def modifySuiteMinimisingChanges(target, modified):
 	commonPrefixLen = 0
@@ -229,7 +223,6 @@ def parseText(parser, text, outerPrecedence=None):
 
 
 def parseStream(parser, input, outerPrecedence=None):
-	#f = open( 'parselog.txt', 'a+' )
 	res = parser.parseStreamItems( input )
 	pos = res.getEnd()
 	if res.isValid():
@@ -237,15 +230,8 @@ def parseStream(parser, input, outerPrecedence=None):
 			value = res.getValue()
 			return removeUnNeededParens( value, outerPrecedence )
 		else:
-			#f.write( '<INCOMPLETE> %s\n'  %  ( parser.getExpressionName(), ) )
-			#f.write( 'FULL TEXT: ' + input.toString() + '\n' )
-			#f.write( 'PARSED: ' + input[:pos].toString() + '\n' )
-			#f.close()
 			return None
 	else:
-		#f.write( '<FAIL> %s\n'  %  ( parser.getExpressionName(), ) )
-		#f.write( 'FULL TEXT:' + input.toString() + '\n' )
-		#f.close()
 		return None
 
 

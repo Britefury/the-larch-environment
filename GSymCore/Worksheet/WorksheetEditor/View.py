@@ -21,8 +21,6 @@ from Britefury.Dispatch.ObjectMethodDispatch import ObjectDispatchMethod
 
 from Britefury.gSym.View.GSymView import GSymViewObjectDispatch
 
-from Britefury.gSym.View.EditOperations import replace, replaceWithRange, replaceNodeContents, append, prepend, insertElement, insertRange, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
-
 
 from Britefury.Util.NodeUtil import *
 from Britefury.Util.InstanceCache import instanceCache

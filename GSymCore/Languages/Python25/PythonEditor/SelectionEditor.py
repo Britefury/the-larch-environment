@@ -15,9 +15,6 @@ from BritefuryJ.GSym.SequentialEditor import SequentialEditHandler, SequentialBu
 from Britefury.Util.NodeUtil import *
 
 
-from Britefury.gSym.View import EditOperations
-
-
 
 from GSymCore.Languages.Python25 import Schema
 from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
