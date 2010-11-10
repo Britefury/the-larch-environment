@@ -106,7 +106,8 @@ def unparsedNodeEditor(grammar, inheritedState, node, precedence, contents):
 		return contents
 	elif mode == EDITMODE_EDITSTATEMENT:
 		s = statementLine( contents )
-		s = s.withTreeEventListener( instanceCache( StatementTreeEventListener, grammar.singleLineStatement() ) )
+		s = s.withTreeEventListener( instanceCache( StatementTreeEventListener, grammar.singleLineStatementValid() ) )
+		s = s.withTreeEventListener( instanceCache( StatementUnparsedTreeEventListener, grammar.unparsed() ) )
 		s = s.withElementInteractor( _statementIndentationInteractor )
 		return s
 	else:
@@ -146,7 +147,8 @@ def statementNodeEditor(grammar, inheritedState, node, contents):
 		
 		if not node.isInstanceOf( Schema.UNPARSED ):
 			s = s.withFixedValue( node )
-		s = s.withTreeEventListener( instanceCache( StatementTreeEventListener, grammar.singleLineStatement() ) )
+		s = s.withTreeEventListener( instanceCache( StatementTreeEventListener, grammar.singleLineStatementValid() ) )
+		s = s.withTreeEventListener( instanceCache( StatementUnparsedTreeEventListener, grammar.unparsed() ) )
 		s = s.withElementInteractor( _statementIndentationInteractor )
 		return s
 	else:
@@ -159,7 +161,8 @@ def specialFormStatementNodeEditor(grammar, inheritedState, node, contents):
 		contents = contents.withFixedValue( node )
 		s = specialFormStatementLine( contents )
 		s = s.withFixedValue( node )
-		s = s.withTreeEventListener( instanceCache( StatementTreeEventListener, grammar.singleLineStatement() ) )
+		s = s.withTreeEventListener( instanceCache( StatementTreeEventListener, grammar.singleLineStatementValid() ) )
+		s = s.withTreeEventListener( instanceCache( StatementUnparsedTreeEventListener, grammar.unparsed() ) )
 		s = s.withElementInteractor( _statementIndentationInteractor )
 		return s
 	else:
@@ -170,7 +173,8 @@ def compoundStatementHeaderEditor(grammar, inheritedState, node, headerContents,
 	headerStatementLine = statementLine( headerContents )
 	
 	headerStatementLine = headerStatementLine.withFixedValue( node )
-	headerStatementLine = headerStatementLine.withTreeEventListener( instanceCache( StatementTreeEventListener, grammar.singleLineStatement() ) )
+	headerStatementLine = headerStatementLine.withTreeEventListener( instanceCache( StatementTreeEventListener, grammar.singleLineStatementValid() ) )
+	headerStatementLine = headerStatementLine.withTreeEventListener( instanceCache( StatementUnparsedTreeEventListener, grammar.unparsed() ) )
 	headerStatementLine = headerStatementLine.withElementInteractor( _statementIndentationInteractor )
 	if headerContainerFn is not None:
 		headerStatementLine = headerContainerFn( headerStatementLine )

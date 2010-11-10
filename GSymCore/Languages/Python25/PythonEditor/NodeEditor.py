@@ -173,10 +173,40 @@ class StatementTreeEventListener (PythonParsingTreeEventListener):
 	
 	
 	
+	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
+		if not isCompoundStmtHeader( model )  and  not isCompoundStmtHeader( parsed ):
+			log = fragment.getView().getPageLog()
+			if log.isRecording():
+				log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
+			pyReplaceStmt( fragment, model, parsed )
+			return True
+		else:
+			if isCompoundStmt( model )  or isCompoundStmt( parsed ):
+				print 'StatementTreeEventListener attempted to handle a compound node'
+			element.setFixedValue( parsed )
+			return element.postTreeEventToParent( event )
+
+
+
+
+class StatementUnparsedTreeEventListener (PythonParsingTreeEventListener):
+	__slots__ = [ '_parser' ]
+	
+	
+	def __init__(self, parser):
+		super( StatementUnparsedTreeEventListener, self ).__init__()
+		self._parser = parser
+	
+		
+	def getParser(self):
+		return self._parser
+	
+	
+	
 	def handleParseFailure(self, element, sourceElement, fragment, event, model, value):
 		log = fragment.getView().getPageLog()
 		if log.isRecording():
-			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - could not parse - passing up' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ) )
+			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement (unparsed) - could not parse - passing up' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ) )
 		# Pass further up:
 
 		# Replacing the node with itself ensures that the view of this node will be rebuilt,
@@ -192,50 +222,39 @@ class StatementTreeEventListener (PythonParsingTreeEventListener):
 	
 	
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
-		if not isCompoundStmtHeader( model )  and  not isCompoundStmtHeader( parsed ):
-			if isUnparsed( parsed ):
-				# Statement has been replaced by unparsed content
-				# Only edit the innermost node around the element that is the source of the event
-				sourceFragment = sourceElement.getFragmentContext()
-				if sourceFragment is None:
-					print 'NULL SOURCE CONTEXT: ', sourceElement
-				if sourceFragment is fragment:
-					log = fragment.getView().getPageLog()
-					if log.isRecording():
-						log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - unparsed, node replaced' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
-					pyReplaceNode( fragment, model, parsed )
-					return True
-				else:
-					sourceFragmentElement = sourceFragment.getFragmentContentElement()
-					sourceNode = sourceFragment.getModel()
-					sourceValue = sourceFragmentElement.getStreamValue()
-					
-					if sourceValue.isTextual():
-						if sourceValue.textualValue().strip() == '':
-							# The content within @sourceFragmentElement has been deleted entirely, replace the whole statement
-							log = fragment.getView().getPageLog()
-							if log.isRecording():
-								log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - unparsed, sub-node deleted' ).vItem( 'editedStream', sourceValue ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ).vItem( 'sourceNode', sourceNode ) )
-							pyReplaceStmt( fragment, model, parsed )
-							return True
-					
-					unparsed = Schema.UNPARSED( value=sourceValue.getItemValues() )
-					log = fragment.getView().getPageLog()
-					if log.isRecording():
-						log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - unparsed, sub-node replaced' ).vItem( 'editedStream', sourceValue ).hItem( 'parser', self._parser ).vItem( 'parsedResult', unparsed ) )
-					pyReplaceNode( sourceFragment, sourceNode, unparsed )
-					return True
-			else:
-				log = fragment.getView().getPageLog()
-				if log.isRecording():
-					log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
-				pyReplaceStmt( fragment, model, parsed )
-				return True
+		# Statement has been replaced by unparsed content
+		# Only edit the innermost node around the element that is the source of the event
+		sourceFragment = sourceElement.getFragmentContext()
+		if sourceFragment is None:
+			print 'NULL SOURCE CONTEXT: ', sourceElement
+		if sourceFragment is fragment:
+			log = fragment.getView().getPageLog()
+			if log.isRecording():
+				log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - unparsed, node replaced' ).vItem( 'editedStream', value ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ) )
+			pyReplaceNode( fragment, model, parsed )
+			return True
 		else:
-			if isCompoundStmt( model )  or isCompoundStmt( parsed ):
-				print 'StatementTreeEventListener attempted to handle a compound node'
-			element.setFixedValue( parsed )
-			return element.postTreeEventToParent( event )
+			sourceFragmentElement = sourceFragment.getFragmentContentElement()
+			sourceNode = sourceFragment.getModel()
+			sourceValue = sourceFragmentElement.getStreamValue()
+			
+			if sourceValue.isTextual():
+				if sourceValue.textualValue().strip() == '':
+					# The content within @sourceFragmentElement has been deleted entirely, replace the whole statement
+					log = fragment.getView().getPageLog()
+					if log.isRecording():
+						log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - unparsed, sub-node deleted' ).vItem( 'editedStream', sourceValue ).hItem( 'parser', self._parser ).vItem( 'parsedResult', parsed ).vItem( 'sourceNode', sourceNode ) )
+					pyReplaceStmt( fragment, model, parsed )
+					return True
+			
+			unparsed = Schema.UNPARSED( value=sourceValue.getItemValues() )
+			log = fragment.getView().getPageLog()
+			if log.isRecording():
+				log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - unparsed, sub-node replaced' ).vItem( 'editedStream', sourceValue ).hItem( 'parser', self._parser ).vItem( 'parsedResult', unparsed ) )
+			pyReplaceNode( sourceFragment, sourceNode, unparsed )
+			return True
+
+
 
 
 
