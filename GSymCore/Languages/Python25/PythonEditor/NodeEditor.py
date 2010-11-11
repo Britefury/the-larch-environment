@@ -157,8 +157,6 @@ class StatementTreeEventListener (PythonParsingTreeEventListener):
 			pyReplaceStmt( fragment, model, parsed )
 			return True
 		else:
-			if isCompoundStmt( model )  or isCompoundStmt( parsed ):
-				print 'StatementTreeEventListener attempted to handle a compound node'
 			element.setFixedValue( parsed )
 			return element.postTreeEventToParent( event )
 

@@ -190,54 +190,7 @@ def modifySuiteMinimisingChanges(target, modified):
 	
 
 
-#
-#
-# PARSE TEXT
-#
-#
 
-def parseText(parser, text, outerPrecedence=None):
-	res = parser.parseStringChars( text )
-	pos = res.getEnd()
-	if res.isValid():
-		if pos == len( text ):
-			value = res.getValue()
-			return removeUnNeededParens( value, outerPrecedence )
-		else:
-			print '<INCOMPLETE>'
-			print 'FULL TEXT:', text
-			print 'PARSED:', text[:pos]
-			return None
-	else:
-		print 'FULL TEXT:', text
-		print '<FAIL>'
-		return None
-
-
-
-#
-#
-# PARSE STREAM
-#
-#
-
-
-def parseStream(parser, input, outerPrecedence=None):
-	res = parser.parseStreamItems( input )
-	pos = res.getEnd()
-	if res.isValid():
-		if pos == len( input ):
-			value = res.getValue()
-			return removeUnNeededParens( value, outerPrecedence )
-		else:
-			return None
-	else:
-		return None
-
-
-
-	
-	
 #
 #
 # STREAM OPERATIONS

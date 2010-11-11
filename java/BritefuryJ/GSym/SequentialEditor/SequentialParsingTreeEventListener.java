@@ -7,14 +7,12 @@
 package BritefuryJ.GSym.SequentialEditor;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.TextEditEvent;
-import BritefuryJ.DocPresent.TreeEventListener;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Parser.ParseResult;
 import BritefuryJ.Parser.ParserExpression;
 
-public abstract class SequentialParsingTreeEventListener implements TreeEventListener
+public abstract class SequentialParsingTreeEventListener extends EditListener
 {
 	protected ParserExpression parser;
 	
@@ -22,14 +20,6 @@ public abstract class SequentialParsingTreeEventListener implements TreeEventLis
 	public SequentialParsingTreeEventListener(ParserExpression parser)
 	{
 		this.parser = parser;
-	}
-	
-	
-	protected abstract Class<? extends SelectionEditTreeEvent> getSelectionEditTreeEventClass();
-	
-	protected boolean isEditEvent(Object event)
-	{
-		return false;
 	}
 	
 	
@@ -70,47 +60,23 @@ public abstract class SequentialParsingTreeEventListener implements TreeEventLis
 	
 	
 	
-	@Override
-	public boolean onTreeEvent(DPElement element, DPElement sourceElement, Object event)
+	protected boolean handleValue(DPElement element, DPElement sourceElement, GSymFragmentView fragment, Object event, Object model, StreamValue value)
 	{
-		if ( event instanceof TextEditEvent  ||  isSelectionEditEvent( event )  ||  isEditEvent( event ) )
+		if ( value.isEmpty()  ||  testValueEmpty( element, fragment, model, value ) )
 		{
-			// If event is a selection edit event, and its source element is @element, then @element has had its fixed value
-			// set by a SequentialEditHandler - so don't clear it.
-			// Otherwise, clear all fixed values on a path from @sourceElement to @element
-			if ( !( isSelectionEditEvent( event )  &&  getEventSourceElement( event ) == element ) )
-			{
-				if ( clearFixedValuesOnPath() )
-				{
-					sourceElement.clearFixedValuesOnPathUpTo( element );
-				}
-				element.clearFixedValue();
-			}
+			return handleEmptyValue( element, fragment, event, model );
+		}
+		else if ( testValue( element, fragment, model, value ) )
+		{
+			Object parsed[] = parseStream( value );
 			
-			StreamValue value = element.getStreamValue();
-			GSymFragmentView fragment = (GSymFragmentView)element.getFragmentContext();
-			Object model = fragment.getModel();
-			
-			if ( value.isEmpty()  ||  testValueEmpty( element, fragment, model, value ) )
+			if ( parsed != null )
 			{
-				return handleEmptyValue( element, fragment, event, model );
-			}
-			else if ( testValue( element, fragment, model, value ) )
-			{
-				Object parsed[] = parseStream( value );
-				
-				if ( parsed != null )
-				{
-					return handleParseSuccess( element, sourceElement, fragment, event, model, value, parsed[0] );
-				}
-				else
-				{
-					return handleParseFailure( element, sourceElement, fragment, event, model, value );
-				}
+				return handleParseSuccess( element, sourceElement, fragment, event, model, value, parsed[0] );
 			}
 			else
 			{
-				return false;
+				return handleParseFailure( element, sourceElement, fragment, event, model, value );
 			}
 		}
 		else
@@ -118,6 +84,7 @@ public abstract class SequentialParsingTreeEventListener implements TreeEventLis
 			return false;
 		}
 	}
+
 	
 	
 	private Object[] parseStream(StreamValue value)
@@ -131,23 +98,5 @@ public abstract class SequentialParsingTreeEventListener implements TreeEventLis
 			}
 		}
 		return null;
-	}
-	
-	
-	private boolean isSelectionEditEvent(Object event)
-	{
-		return getSelectionEditTreeEventClass().isInstance( event );
-	}
-	
-	private DPElement getEventSourceElement(Object event)
-	{
-		if ( event instanceof SelectionEditTreeEvent )
-		{
-			return ((SelectionEditTreeEvent)event).getSourceElement();
-		}
-		else
-		{
-			throw new RuntimeException( "Cannot get event source element for an event that is not a SelectionEditTreeEvent" );
-		}
 	}
 }
