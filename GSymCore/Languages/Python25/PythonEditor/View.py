@@ -100,12 +100,12 @@ def unparsedNodeEditor(grammar, inheritedState, node, precedence, contents):
 		return contents
 	elif mode == EDITMODE_EDITEXPRESSION:
 		outerPrecedence = getOuterPrecedence( inheritedState )
-		contents = contents.withTreeEventListener( instanceCache( ParsedExpressionTreeEventListener, grammar.expression(), outerPrecedence ) )
+		contents = contents.withTreeEventListener( instanceCache( ParsedExpressionEditListener, grammar.expression(), outerPrecedence ) )
 		return contents
 	elif mode == EDITMODE_EDITSTATEMENT:
 		s = statementLine( contents )
-		s = s.withTreeEventListener( instanceCache( StatementTreeEventListener, grammar.singleLineStatementValid() ) )
-		s = s.withTreeEventListener( instanceCache( StatementUnparsedTreeEventListener, grammar.unparsed() ) )
+		s = s.withTreeEventListener( instanceCache( StatementEditListener, grammar.singleLineStatementValid() ) )
+		s = s.withTreeEventListener( instanceCache( StatementUnparsedEditListener, grammar.unparsed() ) )
 		s = s.withElementInteractor( _statementIndentationInteractor )
 		return s
 	else:
@@ -123,7 +123,7 @@ def expressionNodeEditor(grammar, inheritedState, node, precedence, contents):
 		
 		if _nodeRequiresParens( node ):
 			contents = applyPythonParens( contents, precedence, getNumParens( node ), inheritedState )
-		contents = contents.withTreeEventListener( instanceCache( ParsedExpressionTreeEventListener, grammar.expression(), outerPrecedence ) )
+		contents = contents.withTreeEventListener( instanceCache( ParsedExpressionEditListener, grammar.expression(), outerPrecedence ) )
 		return contents
 	else:
 		raise ValueError, 'invalid mode %d'  %  mode
@@ -145,8 +145,8 @@ def statementNodeEditor(grammar, inheritedState, node, contents):
 		
 		if not node.isInstanceOf( Schema.UNPARSED ):
 			s = s.withFixedValue( node )
-		s = s.withTreeEventListener( instanceCache( StatementTreeEventListener, grammar.singleLineStatementValid() ) )
-		s = s.withTreeEventListener( instanceCache( StatementUnparsedTreeEventListener, grammar.unparsed() ) )
+		s = s.withTreeEventListener( instanceCache( StatementEditListener, grammar.singleLineStatementValid() ) )
+		s = s.withTreeEventListener( instanceCache( StatementUnparsedEditListener, grammar.unparsed() ) )
 		s = s.withElementInteractor( _statementIndentationInteractor )
 		return s
 	else:
@@ -159,8 +159,8 @@ def specialFormStatementNodeEditor(grammar, inheritedState, node, contents):
 		contents = contents.withFixedValue( node )
 		s = specialFormStatementLine( contents )
 		s = s.withFixedValue( node )
-		s = s.withTreeEventListener( instanceCache( StatementTreeEventListener, grammar.singleLineStatementValid() ) )
-		s = s.withTreeEventListener( instanceCache( StatementUnparsedTreeEventListener, grammar.unparsed() ) )
+		s = s.withTreeEventListener( instanceCache( StatementEditListener, grammar.singleLineStatementValid() ) )
+		s = s.withTreeEventListener( instanceCache( StatementUnparsedEditListener, grammar.unparsed() ) )
 		s = s.withElementInteractor( _statementIndentationInteractor )
 		return s
 	else:
@@ -171,8 +171,8 @@ def compoundStatementHeaderEditor(grammar, inheritedState, node, headerContents,
 	headerStatementLine = statementLine( headerContents )
 	
 	headerStatementLine = headerStatementLine.withFixedValue( node )
-	headerStatementLine = headerStatementLine.withTreeEventListener( instanceCache( StatementTreeEventListener, grammar.singleLineStatementValid() ) )
-	headerStatementLine = headerStatementLine.withTreeEventListener( instanceCache( StatementUnparsedTreeEventListener, grammar.unparsed() ) )
+	headerStatementLine = headerStatementLine.withTreeEventListener( instanceCache( StatementEditListener, grammar.singleLineStatementValid() ) )
+	headerStatementLine = headerStatementLine.withTreeEventListener( instanceCache( StatementUnparsedEditListener, grammar.unparsed() ) )
 	headerStatementLine = headerStatementLine.withElementInteractor( _statementIndentationInteractor )
 	if headerContainerFn is not None:
 		headerStatementLine = headerContainerFn( headerStatementLine )
@@ -196,7 +196,7 @@ def compoundStatementEditor(ctx, grammar, inheritedState, node, precedence, comp
 		
 		headerStatementLine = statementLine( headerContents )
 		headerStatementLine = headerStatementLine.withFixedValue( headerNode )
-		headerStatementLine = headerStatementLine.withTreeEventListener( instanceCache( CompoundHeaderTreeEventListener, statementParser ) )
+		headerStatementLine = headerStatementLine.withTreeEventListener( instanceCache( CompoundHeaderEditListener, statementParser ) )
 		headerStatementLine = headerStatementLine.withElementInteractor( _statementIndentationInteractor )
 		
 		if headerContainerFn is not None:
@@ -213,7 +213,7 @@ def compoundStatementEditor(ctx, grammar, inheritedState, node, precedence, comp
 			
 			suiteElement = indentedBlock( indent, lineViews, dedent )
 			suiteElement = suiteElement.withFixedValue( Schema.IndentedBlock( suite=suite ) )
-			suiteElement = suiteElement.withTreeEventListener( SuiteTreeEventListener( suiteParser, suite ) )
+			suiteElement = suiteElement.withTreeEventListener( SuiteEditListener( suiteParser, suite ) )
 			
 			statementContents.extend( [ headerStatementLine.alignHExpand(), suiteElement.alignHExpand() ] )
 		else:
@@ -412,8 +412,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 		_inlineObject_dropDest = ObjectDndHandler.DropDest( GSymFragmentView.FragmentModel, _onDrop_inlineObject )
 		s = s.withDropDest( _inlineObject_dropDest )
 		s = s.withFixedValue( suite )
-		s = s.withTreeEventListener( SuiteTreeEventListener( self._parser.suite(), suite ) )
-		s = s.withTreeEventListener( PythonModuleTopLevelTreeEventListener.instance )
+		s = s.withTreeEventListener( SuiteEditListener( self._parser.suite(), suite ) )
+		s = s.withTreeEventListener( PythonModuleTopLevelEditListener.instance )
 		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		return s
 
@@ -430,8 +430,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 		_inlineObject_dropDest = ObjectDndHandler.DropDest( GSymFragmentView.FragmentModel, _onDrop_inlineObject )
 		s = s.withDropDest( _inlineObject_dropDest )
 		s = s.withFixedValue( suite )
-		s = s.withTreeEventListener( SuiteTreeEventListener( self._parser.suite(), suite ) )
-		s = s.withTreeEventListener( PythonSuiteTopLevelTreeEventListener.instance )
+		s = s.withTreeEventListener( SuiteEditListener( self._parser.suite(), suite ) )
+		s = s.withTreeEventListener( PythonSuiteTopLevelEditListener.instance )
 		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		return s
 
@@ -450,8 +450,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 		_inlineObject_dropDest = ObjectDndHandler.DropDest( GSymFragmentView.FragmentModel, _onDrop_inlineObject )
 		e = e.withDropDest( _inlineObject_dropDest )
 		e = e.withFixedValue( node )
-		e = e.withTreeEventListener( instanceCache( PythonExpressionTreeEventListener, self._parser.expression(), PRECEDENCE_NONE ) )
-		e = e.withTreeEventListener( PythonExpressionTopLevelTreeEventListener.instance )
+		e = e.withTreeEventListener( instanceCache( PythonExpressionEditListener, self._parser.expression(), PRECEDENCE_NONE ) )
+		e = e.withTreeEventListener( PythonExpressionTopLevelEditListener.instance )
 		e = e.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		return e
 
@@ -1479,7 +1479,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		dedent = dedentElement().withFixedValue( Schema.Dedent() )
 		
 		suiteElement = indentedBlock( indent, lineViews, dedent ).withFixedValue( node )
-		suiteElement = suiteElement.withTreeEventListener( SuiteTreeEventListener( self._parser.compoundSuite(), suite ) )
+		suiteElement = suiteElement.withTreeEventListener( SuiteEditListener( self._parser.compoundSuite(), suite ) )
 		
 		return badIndentation( suiteElement )
 

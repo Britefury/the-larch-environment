@@ -9,7 +9,7 @@ from BritefuryJ.DocPresent.Clipboard import *
 from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent import *
 
-from BritefuryJ.GSym.SequentialEditor import SequentialEditHandler, SequentialBuffer, SelectionEditTreeEvent
+from BritefuryJ.SequentialEditor import SequentialEditHandler, SequentialBuffer, SelectionEditTreeEvent
 
 
 from Britefury.Util.NodeUtil import *
