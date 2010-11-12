@@ -54,7 +54,7 @@ class PythonSequentialEditor (SequentialEditor):
 		return isinstance( event, PythonIndentationTreeEvent )
 	
 	
-_seqEditor = PythonSequentialEditor()
+pythonSequentialEditor = PythonSequentialEditor()
 
 
 
@@ -62,7 +62,7 @@ class PythonEditListener (ParsingEditListener):
 	_outerPrecedence = None
 	
 	def getSequentialEditor(self):
-		return _seqEditor
+		return pythonSequentialEditor
 	
 	def postParseResult(self, value):
 		return removeUnNeededParens( value, self._outerPrecedence )

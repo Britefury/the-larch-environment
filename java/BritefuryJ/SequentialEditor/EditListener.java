@@ -22,6 +22,11 @@ public abstract class EditListener implements TreeEventListener
 		return getSequentialEditor().getSelectionEditTreeEventClass();
 	}
 	
+	private boolean isSelectionEditEvent(Object event)
+	{
+		return getSequentialEditor().isSelectionEditEvent( event );
+	}
+	
 	protected boolean isEditEvent(Object event)
 	{
 		return getSequentialEditor().isEditEvent( event );
@@ -40,7 +45,7 @@ public abstract class EditListener implements TreeEventListener
 			// If event is a selection edit event, and its source element is @element, then @element has had its fixed value
 			// set by a SequentialEditHandler - so don't clear it.
 			// Otherwise, clear all fixed values on a path from @sourceElement to @element
-			if ( !( isSelectionEditEvent( event )  &&  getEventSourceElement( event ) == element ) )
+			if ( !( isSelectionEditEvent( event )  &&  SequentialEditor.getEventSourceElement( event ) == element ) )
 			{
 				element.clearFixedValue();
 			}
@@ -54,24 +59,6 @@ public abstract class EditListener implements TreeEventListener
 		else
 		{
 			return false;
-		}
-	}
-	
-	
-	private boolean isSelectionEditEvent(Object event)
-	{
-		return getSelectionEditTreeEventClass().isInstance( event );
-	}
-	
-	private DPElement getEventSourceElement(Object event)
-	{
-		if ( event instanceof SelectionEditTreeEvent )
-		{
-			return ((SelectionEditTreeEvent)event).getSourceElement();
-		}
-		else
-		{
-			throw new RuntimeException( "Cannot get event source element for an event that is not a SelectionEditTreeEvent" );
 		}
 	}
 }
