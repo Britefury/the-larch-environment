@@ -4,38 +4,23 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.SequentialEditor.EditorFragment;
+package BritefuryJ.SequentialEditor.Item;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.TreeEventListener;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
-public class StructuralValue extends Pres
+public class StructuralItem extends Pres
 {
-	protected static class ClearStructuralValueListener implements TreeEventListener
-	{
-		@Override
-		public boolean onTreeEvent(DPElement element, DPElement sourceElement, Object event)
-		{
-			element.clearFixedValue();
-			return false;
-		}
-	}
-	
-	
-	protected static ClearStructuralValueListener listener = new ClearStructuralValueListener();
-	
-	
-	private Pres child;
 	private Object value;
+	private Pres child;
 	
 	
-	public StructuralValue(Object child, Object value)
+	public StructuralItem(Object value, Object child)
 	{
-		this.child = coerce( child );
 		this.value = value;
+		this.child = coerce( child );
 	}
 
 
@@ -44,7 +29,6 @@ public class StructuralValue extends Pres
 	{
 		DPElement element = child.present( ctx, style );
 		element.setFixedValue( value );
-		element.addTreeEventListener( listener );
 		return element;
 	}
 }

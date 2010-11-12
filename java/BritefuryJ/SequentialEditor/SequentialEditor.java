@@ -6,12 +6,64 @@
 //##************************
 package BritefuryJ.SequentialEditor;
 
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.TextEditEvent;
+import BritefuryJ.DocPresent.TreeEventListener;
+
 public abstract class SequentialEditor
 {
+	protected class ClearStructuralValueListener implements TreeEventListener
+	{
+		@Override
+		public boolean onTreeEvent(DPElement element, DPElement sourceElement, Object event)
+		{
+			if ( event instanceof TextEditEvent  ||  isSelectionEditEvent( event )  ||  isEditEvent( event ) )
+			{
+				if ( !( isSelectionEditEvent( event )  &&  getEventSourceElement( event ) == element ) )
+				{
+					element.clearFixedValue();
+				}
+			}
+			return false;
+		}
+	}
+	
+	
+	protected ClearStructuralValueListener clearListener = new ClearStructuralValueListener();
+	
+	
+	
+	public ClearStructuralValueListener getClearStructuralValueListener()
+	{
+		return clearListener;
+	}
+	
+	
+
+	
 	protected abstract Class<? extends SelectionEditTreeEvent> getSelectionEditTreeEventClass();
 	
 	protected boolean isEditEvent(Object event)
 	{
 		return false;
+	}
+
+	protected boolean isSelectionEditEvent(Object event)
+	{
+		return getSelectionEditTreeEventClass().isInstance( event );
+	}
+
+
+
+	protected static DPElement getEventSourceElement(Object event)
+	{
+		if ( event instanceof SelectionEditTreeEvent )
+		{
+			return ((SelectionEditTreeEvent)event).getSourceElement();
+		}
+		else
+		{
+			throw new RuntimeException( "Cannot get event source element for an event that is not a SelectionEditTreeEvent" );
+		}
 	}
 }
