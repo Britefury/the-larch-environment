@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.GSym.SequentialEditor;
+package BritefuryJ.SequentialEditor;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.TextEditEvent;
@@ -14,11 +14,17 @@ import BritefuryJ.GSym.View.GSymFragmentView;
 
 public abstract class EditListener implements TreeEventListener
 {
-	protected abstract Class<? extends SelectionEditTreeEvent> getSelectionEditTreeEventClass();
+	protected abstract SequentialEditor getSequentialEditor();
+	
+	
+	protected Class<? extends SelectionEditTreeEvent> getSelectionEditTreeEventClass()
+	{
+		return getSequentialEditor().getSelectionEditTreeEventClass();
+	}
 	
 	protected boolean isEditEvent(Object event)
 	{
-		return false;
+		return getSequentialEditor().isEditEvent( event );
 	}
 	
 	

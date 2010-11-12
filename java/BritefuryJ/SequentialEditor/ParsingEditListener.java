@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.GSym.SequentialEditor;
+package BritefuryJ.SequentialEditor;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
@@ -12,12 +12,12 @@ import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Parser.ParseResult;
 import BritefuryJ.Parser.ParserExpression;
 
-public abstract class SequentialParsingTreeEventListener extends EditListener
+public abstract class ParsingEditListener extends EditListener
 {
 	protected ParserExpression parser;
 	
 	
-	public SequentialParsingTreeEventListener(ParserExpression parser)
+	public ParsingEditListener(ParserExpression parser)
 	{
 		this.parser = parser;
 	}
