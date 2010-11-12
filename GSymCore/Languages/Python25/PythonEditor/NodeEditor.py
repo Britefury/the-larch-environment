@@ -27,6 +27,8 @@ from BritefuryJ.DocPresent.Interactor import KeyElementInteractor
 from BritefuryJ.Logging import LogEntry
 
 from BritefuryJ.SequentialEditor import SequentialEditor, ParsingEditListener
+from BritefuryJ.SequentialEditor.EditListener import 	HandleEditResult
+
 
 
 from Britefury.Util.NodeUtil import *
@@ -88,7 +90,7 @@ class ParsedExpressionEditListener (PythonEditListener):
 		log = fragment.getView().getPageLog()
 		if log.isRecording():
 			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - deleted' ).hItem( 'parser', self.parser ) )
-		return False
+		return HandleEditResult.NOT_HANDLED
 	
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
 		log = fragment.getView().getPageLog()
@@ -96,7 +98,7 @@ class ParsedExpressionEditListener (PythonEditListener):
 			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - success' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ).vItem( 'parsedResult', parsed ) )
 		if parsed != model:
 			pyReplaceExpression( fragment, model, parsed )
-		return True
+		return HandleEditResult.HANDLED
 		
 		
 		
@@ -115,7 +117,7 @@ class PythonExpressionEditListener (PythonEditListener):
 		if log.isRecording():
 			log.log( LogEntry( 'Py25ExprEdit' ).hItem( 'description', 'Expression - deleted' ).hItem( 'parser', self.parser ) )
 		model['expr'] = None
-		return True
+		return HandleEditResult.HANDLED
 	
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
 		log = fragment.getView().getPageLog()
@@ -127,7 +129,7 @@ class PythonExpressionEditListener (PythonEditListener):
 				model['expr'] = parsed
 			else:
 				pyReplaceExpression( fragment, expr, parsed )
-		return True
+		return HandleEditResult.HANDLED
 		
 	def handleParseFailure(self, element, sourceElement, fragment, event, model, value):
 		unparsed = Schema.UNPARSED( value=value.getItemValues() )
@@ -139,7 +141,7 @@ class PythonExpressionEditListener (PythonEditListener):
 			model['expr'] = unparsed
 		else:
 			pyReplaceExpression( fragment, expr, unparsed )
-		return True
+		return HandleEditResult.HANDLED
 
 
 	
@@ -166,10 +168,10 @@ class StatementEditListener (PythonEditListener):
 			if log.isRecording():
 				log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ).vItem( 'parsedResult', parsed ) )
 			pyReplaceStmt( fragment, model, parsed )
-			return True
+			return HandleEditResult.HANDLED
 		else:
 			element.setFixedValue( parsed )
-			return element.postTreeEventToParent( event )
+			return HandleEditResult.PASS_TO_PARENT
 
 
 
@@ -189,7 +191,7 @@ class StatementUnparsedEditListener (PythonEditListener):
 		# This normally leads to blank lines doubling on each press of the return key
 		pyReplaceStmt( fragment, model, model, False )
 		
-		return False
+		return HandleEditResult.NOT_HANDLED
 
 	
 	
@@ -204,7 +206,7 @@ class StatementUnparsedEditListener (PythonEditListener):
 			if log.isRecording():
 				log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - unparsed, node replaced' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ).vItem( 'parsedResult', parsed ) )
 			pyReplaceNode( fragment, model, parsed )
-			return True
+			return HandleEditResult.HANDLED
 		else:
 			sourceFragmentElement = sourceFragment.getFragmentContentElement()
 			sourceNode = sourceFragment.getModel()
@@ -217,14 +219,14 @@ class StatementUnparsedEditListener (PythonEditListener):
 					if log.isRecording():
 						log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - unparsed, sub-node deleted' ).vItem( 'editedStream', sourceValue ).hItem( 'parser', self.parser ).vItem( 'parsedResult', parsed ).vItem( 'sourceNode', sourceNode ) )
 					pyReplaceStmt( fragment, model, parsed )
-					return True
+					return HandleEditResult.HANDLED
 			
 			unparsed = Schema.UNPARSED( value=sourceValue.getItemValues() )
 			log = fragment.getView().getPageLog()
 			if log.isRecording():
 				log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - unparsed, sub-node replaced' ).vItem( 'editedStream', sourceValue ).hItem( 'parser', self.parser ).vItem( 'parsedResult', unparsed ) )
 			pyReplaceNode( sourceFragment, sourceNode, unparsed )
-			return True
+			return HandleEditResult.HANDLED
 
 
 
@@ -235,7 +237,7 @@ class CompoundHeaderEditListener (PythonEditListener):
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
 		element.setFixedValue( parsed )
 		# Only partially handled - pass it up
-		return False
+		return HandleEditResult.NOT_HANDLED
 
 
 
@@ -260,13 +262,13 @@ class SuiteEditListener (PythonEditListener):
 			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Suite - parse SUCCESS' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ).vItem( 'parsedResult', parsed ) )
 		# Alter the value of the existing suite so that it becomes the same as the parsed result, but minimise the number of changes required to do so
 		modifySuiteMinimisingChanges( self._suite, parsed )
-		return True
+		return HandleEditResult.HANDLED
 	
 	def handleParseFailure(self, element, sourceElement, fragment, event, model, value):
 		log = fragment.getView().getPageLog()
 		if log.isRecording():
 			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Suite - parse FAIL - passing to parent' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ) )
-		return False
+		return HandleEditResult.NOT_HANDLED
 
 
 

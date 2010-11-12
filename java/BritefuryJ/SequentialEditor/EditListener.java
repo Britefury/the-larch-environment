@@ -14,6 +14,14 @@ import BritefuryJ.GSym.View.GSymFragmentView;
 
 public abstract class EditListener implements TreeEventListener
 {
+	public enum HandleEditResult
+	{
+		HANDLED,
+		NOT_HANDLED,
+		PASS_TO_PARENT
+	};
+	
+	
 	protected abstract SequentialEditor getSequentialEditor();
 	
 	
@@ -33,7 +41,7 @@ public abstract class EditListener implements TreeEventListener
 	}
 	
 	
-	protected abstract boolean handleValue(DPElement element, DPElement sourceElement, GSymFragmentView fragment, Object event, Object model, StreamValue value);
+	protected abstract HandleEditResult handleValue(DPElement element, DPElement sourceElement, GSymFragmentView fragment, Object event, Object model, StreamValue value);
 	
 	
 	
@@ -54,7 +62,24 @@ public abstract class EditListener implements TreeEventListener
 			GSymFragmentView fragment = (GSymFragmentView)element.getFragmentContext();
 			Object model = fragment.getModel();
 			
-			return handleValue( element, sourceElement, fragment, event, model, value );
+			HandleEditResult res = handleValue( element, sourceElement, fragment, event, model, value );
+			if ( res == HandleEditResult.HANDLED )
+			{
+				return true;
+			}
+			else if ( res == HandleEditResult.NOT_HANDLED )
+			{
+				return false;
+			}
+			else if ( res == HandleEditResult.PASS_TO_PARENT )
+			{
+				element.postTreeEventToParent( event );
+				return true;
+			}
+			else
+			{
+				throw new RuntimeException( "Invalid HandleEditResult" );
+			}
 		}
 		else
 		{

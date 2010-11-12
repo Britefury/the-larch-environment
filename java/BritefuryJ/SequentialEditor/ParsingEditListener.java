@@ -45,22 +45,22 @@ public abstract class ParsingEditListener extends EditListener
 		return true;
 	}
 
-	protected boolean handleEmptyValue(DPElement element, GSymFragmentView fragment, Object event, Object model)
+	protected HandleEditResult handleEmptyValue(DPElement element, GSymFragmentView fragment, Object event, Object model)
 	{
-		return false;
+		return HandleEditResult.NOT_HANDLED;
 	}
 	
-	protected abstract boolean handleParseSuccess(DPElement element, DPElement sourceElement, GSymFragmentView fragment, Object event, Object model, StreamValue value, Object parsed);
+	protected abstract HandleEditResult handleParseSuccess(DPElement element, DPElement sourceElement, GSymFragmentView fragment, Object event, Object model, StreamValue value, Object parsed);
 	
 	
-	protected boolean handleParseFailure(DPElement element, DPElement sourceElement, GSymFragmentView fragment, Object event, Object model, StreamValue value)
+	protected HandleEditResult handleParseFailure(DPElement element, DPElement sourceElement, GSymFragmentView fragment, Object event, Object model, StreamValue value)
 	{
-		return false;
+		return HandleEditResult.NOT_HANDLED;
 	}
 	
 	
 	
-	protected boolean handleValue(DPElement element, DPElement sourceElement, GSymFragmentView fragment, Object event, Object model, StreamValue value)
+	protected HandleEditResult handleValue(DPElement element, DPElement sourceElement, GSymFragmentView fragment, Object event, Object model, StreamValue value)
 	{
 		if ( value.isEmpty()  ||  testValueEmpty( element, fragment, model, value ) )
 		{
@@ -81,7 +81,7 @@ public abstract class ParsingEditListener extends EditListener
 		}
 		else
 		{
-			return false;
+			return HandleEditResult.NOT_HANDLED;
 		}
 	}
 
