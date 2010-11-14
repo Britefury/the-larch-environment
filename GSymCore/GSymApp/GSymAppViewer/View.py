@@ -181,12 +181,12 @@ class AppView (GSymViewObjectDispatch):
 			document = node.getDocument()
 			
 			if document.hasFilename():
+				document.save()
+			else:
 				def handleSaveDocumentAsFn(filename):
 					document.saveAs( filename )
 				
 				DocumentManagement.promptSaveDocumentAs( world, element.getRootElement().getComponent(), handleSaveDocumentAsFn )
-			else:
-				document.save()
 				
 		
 		def _onSaveAs(link, event):

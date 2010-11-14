@@ -153,13 +153,12 @@ class GSymDocument (CommandHistoryListener):
 		
 		
 	def save(self):
-		if os.path.exists( self._filename ):
-			DMIOWriter.writeToFile( self._filename, self._write() )
-			if self._bHasUnsavedData:
-				self._bHasUnsavedData = False
-				if self._unsavedDataListener is not None:
-					self._unsavedDataListener( self )
-			self._saveTime = datetime.now()
+		DMIOWriter.writeToFile( self._filename, self._write() )
+		if self._bHasUnsavedData:
+			self._bHasUnsavedData = False
+			if self._unsavedDataListener is not None:
+				self._unsavedDataListener( self )
+		self._saveTime = datetime.now()
 		
 	
 	

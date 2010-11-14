@@ -1474,7 +1474,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		dedent = StructuralItem( Schema.Dedent(), dedentElement() )
 
 		suiteElement = indentedBlock( indent, lineViews, dedent )
-		suiteElement = EditableStructuralValue( SuiteEditListener( self._parser.compoundSuite(), suite ), node, suiteElement )
+		suiteElement = EditableStructuralItem( SuiteEditListener( self._parser.compoundSuite(), suite ), node, suiteElement )
 
 		return badIndentation( suiteElement )
 
