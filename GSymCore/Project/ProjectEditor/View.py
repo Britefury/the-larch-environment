@@ -260,13 +260,13 @@ class ProjectView (GSymViewObjectNodeDispatch):
 	def Project(self, ctx, state, node, pythonPackageName, contents):
 		# Save and Save As
 		def _onSave(link, buttonEvent):
-			if document._filename is None:
+			if document.hasFilename():
+				document.save()
+			else:
 				def handleSaveDocumentAsFn(filename):
 					document.saveAs( filename )
 
 				DocumentManagement.promptSaveDocumentAs( ctx.getSubjectContext()['world'], link.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn )
-			else:
-				document.save()
 
 
 		def _onSaveAs(link, buttonEvent):
