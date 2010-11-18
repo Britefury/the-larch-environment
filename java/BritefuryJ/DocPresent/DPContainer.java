@@ -18,7 +18,6 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.LayoutTree.BranchLayoutNode;
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.GSym.PresCom.InnerFragment;
 import BritefuryJ.GSym.View.GSymFragmentView;
@@ -907,124 +906,9 @@ public abstract class DPContainer extends DPElement
 	//
 	//
 	
-	protected void buildDefaultStreamValue(StreamValueBuilder builder)
+	public List<DPElement> getStreamValueChildren()
 	{
-		for (DPElement child: getInternalChildren())
-		{
-			child.buildStreamValue( builder );
-		}
-	}
-	
-	
-	
-
-	protected void buildStreamValueFromStartToPath(StreamValueBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
-	{
-		super.buildStreamValueFromStartToPath( builder, marker, path, pathMyIndex );
-
-		DPElement pathChild = path.get( pathMyIndex + 1 );
-		for (DPElement child: getInternalChildren())
-		{
-			if ( child != pathChild )
-			{
-				child.buildStreamValue( builder );
-			}
-			else
-			{
-				child.buildStreamValueFromStartToPath( builder, marker, path, pathMyIndex + 1 );
-				break;
-			}
-		}
-	}
-	
-	protected void buildStreamValueFromPathToEnd(StreamValueBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
-	{
-		List<DPElement> children = getInternalChildren();
-		int pathChildIndex = pathMyIndex + 1;
-		DPElement pathChild = path.get( pathChildIndex );
-		int childIndex = children.indexOf( pathChild );
-		
-		pathChild.buildStreamValueFromPathToEnd( builder, marker, path, pathChildIndex );
-
-		if ( (childIndex + 1) < children.size() )
-		{
-			for (DPElement child: children.subList( childIndex + 1, children.size() ))
-			{
-				child.buildStreamValue( builder );
-			}
-		}
-		
-		super.buildStreamValueFromPathToEnd( builder, marker, path, pathMyIndex );
-	}
-
-	protected void buildStreamValueBetweenPaths(StreamValueBuilder builder, Marker startMarker, ArrayList<DPElement> startPath, int startPathMyIndex,
-			Marker endMarker, ArrayList<DPElement> endPath, int endPathMyIndex)
-	{
-		List<DPElement> children = getInternalChildren();
-		
-	
-		int startPathChildIndex = startPathMyIndex + 1;
-		int endPathChildIndex = endPathMyIndex + 1;
-		
-		DPElement startChild = startPath.get( startPathChildIndex );
-		DPElement endChild = endPath.get( endPathChildIndex );
-		
-		int startIndex = children.indexOf( startChild );
-		int endIndex = children.indexOf( endChild );
-	
-		
-		startChild.buildStreamValueFromPathToEnd( builder, startMarker, startPath, startPathChildIndex );
-		
-		for (int i = startIndex + 1; i < endIndex; i++)
-		{
-			children.get( i ).buildStreamValue( builder );
-		}
-
-		endChild.buildStreamValueFromStartToPath( builder, endMarker, endPath, endPathChildIndex );
-	}
-
-
-	protected void buildStreamValueFromStartOfRootToMarkerFromChild(StreamValueBuilder builder, Marker marker, DPElement root, DPElement fromChild)
-	{
-		if ( root != this  &&  parent != null )
-		{
-			parent.buildStreamValueFromStartOfRootToMarkerFromChild( builder, marker, root, this );
-		}
-		
-		appendStreamValuePrefix( builder );
-
-		for (DPElement child: getInternalChildren())
-		{
-			if ( child != fromChild )
-			{
-				child.buildStreamValue( builder );
-			}
-			else
-			{
-				break;
-			}
-		}
-	}
-	
-	protected void buildStreamValueFromMarkerToEndOfRootFromChild(StreamValueBuilder builder, Marker marker, DPElement root, DPElement fromChild)
-	{
-		List<DPElement> children = getInternalChildren();
-		int childIndex = children.indexOf( fromChild );
-		
-		if ( (childIndex + 1) < children.size() )
-		{
-			for (DPElement child: children.subList( childIndex + 1, children.size() ))
-			{
-				child.buildStreamValue( builder );
-			}
-		}
-
-		appendStreamValueSuffix( builder );
-
-		if ( root != this  &&  parent != null )
-		{
-			parent.buildStreamValueFromMarkerToEndOfRootFromChild( builder, marker, root, this );
-		}
+		return getInternalChildren();
 	}
 
 	

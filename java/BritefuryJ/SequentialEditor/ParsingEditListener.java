@@ -99,4 +99,10 @@ public abstract class ParsingEditListener extends EditListener
 		}
 		return null;
 	}
+	
+	
+	public ParserExpression getParser()
+	{
+		return parser;
+	}
 }

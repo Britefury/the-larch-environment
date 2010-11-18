@@ -112,7 +112,7 @@ public class DPHiddenContent extends DPElement
 	
 	// Stream value computation
 	
-	protected void buildDefaultStreamValue(StreamValueBuilder builder)
+	public void addToStreamValue(StreamValueBuilder builder)
 	{
 		builder.appendTextValue( textRepresentation );
 	}

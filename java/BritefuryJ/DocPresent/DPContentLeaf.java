@@ -298,9 +298,12 @@ public abstract class DPContentLeaf extends DPElement
 		return textRepresentation;
 	}
 	
+	
+	
+	
 	// Stream value computation
 	
-	protected void buildDefaultStreamValue(StreamValueBuilder builder)
+	public void addToStreamValue(StreamValueBuilder builder)
 	{
 		builder.appendTextValue( textRepresentation );
 	}
