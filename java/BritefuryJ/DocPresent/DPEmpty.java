@@ -9,7 +9,6 @@ package BritefuryJ.DocPresent;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
 
 public abstract class DPEmpty extends DPElement
@@ -71,11 +70,5 @@ public abstract class DPEmpty extends DPElement
 	public Object getDefaultValue()
 	{
 		return null;
-	}
-	
-	// Stream value computation
-	
-	protected void buildDefaultStreamValue(StreamValueBuilder builder)
-	{
 	}
 }

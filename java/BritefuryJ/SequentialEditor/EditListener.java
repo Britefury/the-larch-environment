@@ -10,6 +10,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.TextEditEvent;
 import BritefuryJ.DocPresent.TreeEventListener;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
+import BritefuryJ.DocPresent.StreamValue.StreamValueVisitor;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
 public abstract class EditListener implements TreeEventListener
@@ -58,7 +59,8 @@ public abstract class EditListener implements TreeEventListener
 				element.clearFixedValue();
 			}
 			
-			StreamValue value = element.getStreamValue();
+			StreamValueVisitor visitor = new StreamValueVisitor();
+			StreamValue value = visitor.getStreamValue( element );
 			GSymFragmentView fragment = (GSymFragmentView)element.getFragmentContext();
 			Object model = fragment.getModel();
 			

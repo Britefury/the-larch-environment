@@ -60,8 +60,6 @@ import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Selection.SelectionListener;
 import BritefuryJ.DocPresent.Selection.SelectionManager;
-import BritefuryJ.DocPresent.StreamValue.StreamValue;
-import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Logging.LogEntry;
 import BritefuryJ.Math.AABox2;
@@ -586,35 +584,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			}
 		}
 
-		
-		public StreamValue getStreamValueInSelection(Selection s)
-		{
-			if ( s.isEmpty() )
-			{
-				return null;
-			}
-			else
-			{
-				DPContainer commonRoot = s.getCommonRootContainer();
-				ArrayList<DPElement> startPath = s.getStartPathFromCommonRoot();
-				ArrayList<DPElement> endPath = s.getEndPathFromCommonRoot();
 				
-				if ( commonRoot != null )
-				{
-					StreamValueBuilder builder = new StreamValueBuilder();
-
-					commonRoot.buildStreamValueBetweenPaths( builder, s.getStartMarker(), startPath, 0, s.getEndMarker(), endPath, 0 );
-				
-					return builder.stream();
-				}
-				else
-				{
-					return ((DPContentLeafEditable)startPath.get( 0 )).getStreamValueBetweenMarkers( s.getStartMarker(), s.getEndMarker() );
-				}
-			}
-		}
-
-		
 		
 		
 		//

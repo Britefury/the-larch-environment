@@ -12,7 +12,6 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Clipboard.DataTransfer;
 import BritefuryJ.DocPresent.Clipboard.EditHandler;
@@ -20,6 +19,7 @@ import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
+import BritefuryJ.DocPresent.StreamValue.StreamValueVisitor;
 import BritefuryJ.GSym.View.FragmentViewFilter;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
@@ -132,8 +132,9 @@ public abstract class SequentialEditHandler implements EditHandler
 				if ( replacementStream != null )
 				{
 					// Get the item streams for the root element content, before and after the selected region
-					StreamValue before = editRootFragmentElement.getStreamValueFromStartToMarker( startMarker );
-					StreamValue after = editRootFragmentElement.getStreamValueFromMarkerToEnd( endMarker );
+					StreamValueVisitor visitor = new StreamValueVisitor();
+					StreamValue before = visitor.getStreamValueFromStartToMarker( editRootFragmentElement, startMarker );
+					StreamValue after = visitor.getStreamValueFromMarkerToEnd( editRootFragmentElement, endMarker );
 					
 					// Join
 					StreamValue joinedStream = joinStreamsForInsertion( editRootFragment, before, replacementStream, after );
@@ -149,8 +150,9 @@ public abstract class SequentialEditHandler implements EditHandler
 			else
 			{
 				// Get the item streams for the root element content, before and after the selected region
-				StreamValue before = editRootFragmentElement.getStreamValueFromStartToMarker( startMarker );
-				StreamValue after = editRootFragmentElement.getStreamValueFromMarkerToEnd( endMarker );
+				StreamValueVisitor visitor = new StreamValueVisitor();
+				StreamValue before = visitor.getStreamValueFromStartToMarker( editRootFragmentElement, startMarker );
+				StreamValue after = visitor.getStreamValueFromMarkerToEnd( editRootFragmentElement, endMarker );
 				
 				StreamValue joinedStream = joinStreamsForDeletion( editRootFragment, before, after );
 				
@@ -190,8 +192,9 @@ public abstract class SequentialEditHandler implements EditHandler
 			DPElement insertionPointElement = insertionPointFragment.getFragmentContentElement();
 			
 			// Get the item streams for the root element content, before and after the selected region
-			StreamValue before = insertionPointElement.getStreamValueFromStartToMarker( marker );
-			StreamValue after = insertionPointElement.getStreamValueFromMarkerToEnd( marker );
+			StreamValueVisitor visitor = new StreamValueVisitor();
+			StreamValue before = visitor.getStreamValueFromStartToMarker( insertionPointElement, marker );
+			StreamValue after = visitor.getStreamValueFromMarkerToEnd( insertionPointElement, marker );
 			
 			StreamValue joinedStream = joinStreamsForInsertion( insertionPointFragment, before, stream, after );
 			
@@ -215,12 +218,8 @@ public abstract class SequentialEditHandler implements EditHandler
 	{
 		if ( !selection.isEmpty() )
 		{
-			Marker startMarker = selection.getStartMarker();
-			GSymFragmentView startFragment = GSymFragmentView.getEnclosingFragment( startMarker.getElement(), editLevelFragmentFilter );
-			
-			
-			PresentationComponent.RootElement rootElement = startFragment.getFragmentContentElement().getRootElement();
-			StreamValue stream = rootElement.getStreamValueInSelection( selection );
+			StreamValueVisitor visitor = new StreamValueVisitor();
+			StreamValue stream = visitor.getStreamValueInSelection( selection );
 			
 			StreamValueBuilder builder = new StreamValueBuilder();
 			for (StreamValue.Item item: stream.getItems())

@@ -16,6 +16,7 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -51,6 +52,7 @@ import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Painter.Painter;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
+import BritefuryJ.DocPresent.StreamValue.StreamValueVisitor;
 import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GSymPerspective;
@@ -2689,103 +2691,30 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	//
 	//
 	
+	public void addToStreamValue(StreamValueBuilder builder)
+	{
+	}
+	
+	private static List<DPElement> emptyChildList = Arrays.asList( new DPElement[] {} );
+	
+	public List<DPElement> getStreamValueChildren()
+	{
+		return emptyChildList;
+	}
+	
+	
+
 	public StreamValue getStreamValue()
 	{
-		StreamValueBuilder builder = new StreamValueBuilder();
-		buildStreamValue( builder );
-		return builder.stream();
+		StreamValueVisitor visitor = new StreamValueVisitor();
+		return getStreamValue( visitor );
 	}
 	
-	public StreamValue getStreamValue(ElementValueFunction fn)
+	public StreamValue getStreamValue(StreamValueVisitor visitor)
 	{
-		StreamValueBuilder builder = new StreamValueBuilder();
-		buildStreamValue( builder, fn );
-		return builder.stream();
+		return visitor.getStreamValue( this );
 	}
 	
-	public StreamValue getDefaultStreamValue()
-	{
-		StreamValueBuilder builder = new StreamValueBuilder();
-		buildDefaultStreamValue( builder );
-		return builder.stream();
-	}
-	
-	protected void buildStreamValue(StreamValueBuilder builder)
-	{
-		buildStreamValue( builder, valueFn );
-	}
-	
-	protected void buildStreamValue(StreamValueBuilder builder, ElementValueFunction fn)
-	{
-		appendStreamValuePrefix( builder );
-		if ( hasFixedValue() )
-		{
-			builder.append( fixedValue );
-		}
-		else
-		{
-			if ( fn != null )
-			{
-				builder.append( fn.computeElementValue( this ) );
-			}
-			else
-			{
-				buildDefaultStreamValue( builder );
-			}
-		}
-		appendStreamValueSuffix( builder );
-	}
-	
-	protected abstract void buildDefaultStreamValue(StreamValueBuilder builder);
-	
-	
-	protected void appendStreamValuePrefix(StreamValueBuilder builder)
-	{
-		if ( valueFn != null )
-		{
-			valueFn.addStreamValuePrefixToStream( builder, this );
-		}
-	}
-	
-	protected void appendStreamValueSuffix(StreamValueBuilder builder)
-	{
-		if ( valueFn != null )
-		{
-			valueFn.addStreamValueSuffixToStream( builder, this );
-		}
-	}
-
-	
-	
-	// Stream value within range
-	
-	public StreamValue getStreamValueFromStartToMarker(Marker marker)
-	{
-		StreamValueBuilder builder = new StreamValueBuilder();
-		marker.getElement().buildStreamValueFromStartOfRootToMarker( builder, marker, this );
-		return builder.stream();
-	}
-	
-	public StreamValue getStreamValueFromMarkerToEnd(Marker marker)
-	{
-		StreamValueBuilder builder = new StreamValueBuilder();
-		marker.getElement().buildStreamValueFromMarkerToEndOfRoot( builder, marker, this );
-		return builder.stream();
-	}
-
-	
-	
-	protected void buildStreamValueFromStartToPath(StreamValueBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
-	{
-		appendStreamValuePrefix( builder );
-	}
-	
-	
-	protected void buildStreamValueFromPathToEnd(StreamValueBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
-	{
-		appendStreamValueSuffix( builder );
-	}
-
 	
 	
 	// Value function

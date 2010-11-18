@@ -19,8 +19,6 @@ import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.StreamValue.StreamValue;
-import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StyleParams.ContentLeafEditableStyleParams;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.Math.Point2;
@@ -533,58 +531,6 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		}
 	}
 	
-	
-	
-	
-	
-	
-	//
-	//
-	// VALUE METHODS
-	//
-	//
-	
-	protected void buildStreamValueFromStartToPath(StreamValueBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
-	{
-		super.buildStreamValueFromStartToPath( builder, marker, path, pathMyIndex );
-		builder.appendTextValue( textRepresentation.substring( 0, marker.getClampedIndex() ) );
-	}
-
-	protected void buildStreamValueFromPathToEnd(StreamValueBuilder builder, Marker marker, ArrayList<DPElement> path, int pathMyIndex)
-	{
-		builder.appendTextValue( textRepresentation.substring( marker.getClampedIndex() ) );
-		super.buildStreamValueFromPathToEnd( builder, marker, path, pathMyIndex );
-	}
-
-	public StreamValue getStreamValueBetweenMarkers(Marker startMarker, Marker endMarker)
-	{
-		if ( startMarker.getElement() != this  ||  endMarker.getElement() != this )
-		{
-			throw new RuntimeException();
-		}
-		StreamValueBuilder builder = new StreamValueBuilder();
-		builder.appendTextValue( textRepresentation.substring( startMarker.getClampedIndex(), endMarker.getClampedIndex() ) );
-		return builder.stream();
-	}
-
-	protected void buildStreamValueFromStartOfRootToMarker(StreamValueBuilder builder, Marker marker, DPElement root)
-	{
-		if ( this != root  &&  parent != null )
-		{
-			parent.buildStreamValueFromStartOfRootToMarkerFromChild( builder, marker, root, this );
-		}
-		builder.appendTextValue( textRepresentation.substring( 0, marker.getClampedIndex() ) );
-	}
-	
-	protected void buildStreamValueFromMarkerToEndOfRoot(StreamValueBuilder builder, Marker marker, DPElement root)
-	{
-		builder.appendTextValue( textRepresentation.substring( marker.getClampedIndex() ) );
-		if ( this != root  &&  parent != null )
-		{
-			parent.buildStreamValueFromMarkerToEndOfRootFromChild( builder, marker, root, this );
-		}
-	}
-
 	
 	
 	
