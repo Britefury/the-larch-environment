@@ -8,14 +8,15 @@ package BritefuryJ.DocPresent;
 
 public class TextEditEventRemove extends TextEditEvent
 {
-	protected int position, length;
+	protected int position;
+	protected String textRemoved;
 	
-	public TextEditEventRemove(int position, int length)
+	public TextEditEventRemove(DPContentLeaf leaf, int position, String textRemoved)
 	{
-		super();
+		super( leaf );
 		
 		this.position = position;
-		this.length = length;
+		this.textRemoved = textRemoved;
 	}
 	
 	
@@ -24,8 +25,27 @@ public class TextEditEventRemove extends TextEditEvent
 		return position;
 	}
 	
+	public String getTextRemoved()
+	{
+		return textRemoved;
+	}
+	
 	public int getLength()
 	{
-		return length;
+		return textRemoved.length();
+	}
+	
+	
+	public boolean revert()
+	{
+		if ( leaf.isRealised() )
+		{
+			leaf.revert_insert( position, textRemoved );
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 }

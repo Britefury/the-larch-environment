@@ -11,9 +11,9 @@ public class TextEditEventInsert extends TextEditEvent
 	protected int position;
 	protected String textInserted;
 	
-	public TextEditEventInsert(int position, String textInserted)
+	public TextEditEventInsert(DPContentLeaf leaf, int position, String textInserted)
 	{
-		super();
+		super( leaf );
 		
 		this.position = position;
 		this.textInserted = textInserted;
@@ -28,5 +28,19 @@ public class TextEditEventInsert extends TextEditEvent
 	public String getTextInserted()
 	{
 		return textInserted;
+	}
+	
+	
+	public boolean revert()
+	{
+		if ( leaf.isRealised() )
+		{
+			leaf.revert_remove( position, textInserted.length() );
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 }

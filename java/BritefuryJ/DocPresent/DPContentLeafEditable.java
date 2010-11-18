@@ -549,30 +549,21 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 			throw new RuntimeException( "Text representation cannot be null" );
 		}
 		
-		int oldLength = textRepresentation.length();
+		String oldText = textRepresentation;
+		int oldLength = oldText.length();
 		int newLength = newTextRepresentation.length();
 		
 		textRepresentation = newTextRepresentation;
 
-		if ( newLength > oldLength )
-		{
-			markerInsert( oldLength, newLength - oldLength );
-		}
-		else if ( newLength < oldLength )
-		{
-			markerRemove( newLength, oldLength - newLength );
-		}
+		notifyTextReplaced( 0, oldLength, newLength );
 		
-		textRepresentationChanged( new TextEditEventReplace( 0, oldLength, newTextRepresentation ) );
+		textRepresentationChanged( new TextEditEventReplace( this, 0, oldText, newTextRepresentation ) );
 	}
 	
 	
 	public void insertText(Marker marker, String x)
 	{
-		int index = marker.getClampedIndex();
-		markerInsert( index, x.length() );
-		textRepresentation = textRepresentation.substring( 0, index ) + x + textRepresentation.substring( index );
-		textRepresentationChanged( new TextEditEventInsert( index, x ) );
+		insertText( marker.getClampedIndex(), x );
 	}
 
 	public void removeText(Marker marker, int length)
@@ -588,29 +579,37 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	public void replaceText(Marker marker, int length, String x)
 	{
 		int index = marker.getClampedIndex();
-		textRepresentation = textRepresentation.substring( 0, index )  +  x  +  textRepresentation.substring( index + length );
-		
-		if ( x.length() > length )
-		{
-			markerInsert( index + length, x.length() - length );
-		}
-		else if ( x.length() < length )
-		{
-			markerRemove( index + x.length(), length - x.length() );
-		}
-		textRepresentationChanged( new TextEditEventReplace( index, length, x ) );
+		replaceText( index, length, x );
 	}
 	
 	public void replaceText(Marker startMarker, Marker endMarker, String x)
 	{
 		int start = startMarker.getClampedIndex();
 		int end = endMarker.getClampedIndex();
-		replaceText( startMarker, end - start, x );
+		replaceText( start, end - start, x );
 	}
+
 	
+	protected void notifyTextInserted(int index, int length)
+	{
+		markerInsert( index, length );
+	}
+
 	protected void notifyTextRemoved(int index, int length)
 	{
 		markerRemove( index, length );
+	}
+	
+	protected void notifyTextReplaced(int index, int originalLength, int newLength)
+	{
+		if ( newLength > originalLength )
+		{
+			markerInsert( originalLength, newLength - originalLength );
+		}
+		else if ( newLength < originalLength )
+		{
+			markerRemove( newLength, originalLength - newLength );
+		}
 	}
 
 	

@@ -7,6 +7,7 @@
 package BritefuryJ.SequentialEditor;
 
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.EditEvent;
 import BritefuryJ.DocPresent.TextEditEvent;
 import BritefuryJ.DocPresent.TreeEventListener;
 
@@ -17,11 +18,15 @@ public abstract class SequentialEditor
 		@Override
 		public boolean onTreeEvent(DPElement element, DPElement sourceElement, Object event)
 		{
-			if ( event instanceof TextEditEvent  ||  isSelectionEditEvent( event )  ||  isEditEvent( event ) )
+			if ( event instanceof EditEvent )
 			{
-				if ( !( isSelectionEditEvent( event )  &&  getEventSourceElement( event ) == element ) )
+				EditEvent editEvent = (EditEvent)event;
+				if ( event instanceof TextEditEvent  ||  isSelectionEditEvent( editEvent )  ||  isEditEvent( editEvent ) )
 				{
-					element.clearFixedValue();
+					if ( !( isSelectionEditEvent( editEvent )  &&  getEventSourceElement( editEvent ) == element ) )
+					{
+						editEvent.getStreamValueVisitor().ignoreElementFixedValue( element );
+					}
 				}
 			}
 			return false;
@@ -43,19 +48,19 @@ public abstract class SequentialEditor
 	
 	protected abstract Class<? extends SelectionEditTreeEvent> getSelectionEditTreeEventClass();
 	
-	protected boolean isEditEvent(Object event)
+	protected boolean isEditEvent(EditEvent event)
 	{
 		return false;
 	}
 
-	protected boolean isSelectionEditEvent(Object event)
+	protected boolean isSelectionEditEvent(EditEvent event)
 	{
 		return getSelectionEditTreeEventClass().isInstance( event );
 	}
 
 
 
-	protected static DPElement getEventSourceElement(Object event)
+	protected static DPElement getEventSourceElement(EditEvent event)
 	{
 		if ( event instanceof SelectionEditTreeEvent )
 		{

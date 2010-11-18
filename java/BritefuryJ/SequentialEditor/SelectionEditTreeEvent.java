@@ -7,8 +7,9 @@
 package BritefuryJ.SequentialEditor;
 
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.EditEvent;
 
-public class SelectionEditTreeEvent
+public class SelectionEditTreeEvent extends EditEvent
 {
 	protected SequentialEditHandler editHandler;
 	protected DPElement sourceElement;

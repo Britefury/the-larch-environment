@@ -139,12 +139,14 @@ public abstract class SequentialEditHandler implements EditHandler
 					// Join
 					StreamValue joinedStream = joinStreamsForInsertion( editRootFragment, before, replacementStream, after );
 					
+					// Create the event
+					SelectionEditTreeEvent event = createSelectionEditTreeEvent( editRootFragmentElement );
 					// Store the joined stream in the structural value of the root element
-					editRootFragmentElement.setFixedValue( joinedStream );
+					event.getStreamValueVisitor().setElementFixedValue( editRootFragmentElement, joinedStream );
 					// Clear the selection
 					selection.clear();
 					// Post a tree event
-					editRootFragmentElement.postTreeEvent( createSelectionEditTreeEvent( editRootFragmentElement ) );
+					editRootFragmentElement.postTreeEvent( event );
 				}
 			}
 			else
@@ -156,12 +158,14 @@ public abstract class SequentialEditHandler implements EditHandler
 				
 				StreamValue joinedStream = joinStreamsForDeletion( editRootFragment, before, after );
 				
+				// Create the event
+				SelectionEditTreeEvent event = createSelectionEditTreeEvent( editRootFragmentElement );
 				// Store the joined stream in the structural value of the root element
-				editRootFragmentElement.setFixedValue( joinedStream );
+				event.getStreamValueVisitor().setElementFixedValue( editRootFragmentElement, joinedStream );
 				// Clear the selection
 				selection.clear();
 				// Post a tree event
-				editRootFragmentElement.postTreeEvent( createSelectionEditTreeEvent( editRootFragmentElement ) );
+				editRootFragmentElement.postTreeEvent( event );
 			}
 		}
 	}
@@ -199,9 +203,10 @@ public abstract class SequentialEditHandler implements EditHandler
 			StreamValue joinedStream = joinStreamsForInsertion( insertionPointFragment, before, stream, after );
 			
 			// Store the joined stream in the structural value of the root element
-			insertionPointElement.setFixedValue( joinedStream );
+			SelectionEditTreeEvent event = createSelectionEditTreeEvent( insertionPointElement );
+			event.getStreamValueVisitor().setElementFixedValue( insertionPointElement, joinedStream );
 			// Post a tree event
-			insertionPointElement.postTreeEvent( createSelectionEditTreeEvent( insertionPointElement ) );
+			insertionPointElement.postTreeEvent( event );
 		};
 	}
 	

@@ -149,18 +149,6 @@ class PythonExpressionEditListener (PythonEditListener):
 		
 
 
-class StructuralExpressionEditListener (TreeEventListenerObjectDispatch):
-	@ObjectDispatchMethod( TextEditEvent )
-	def onTextEditEvent(self, element, sourceElement, event):
-		element.clearFixedValue()
-		return False
-		
-	
-StructuralExpressionEditListener.instance = StructuralExpressionEditListener()
-
-
-
-
 class StatementEditListener (PythonEditListener):
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
 		if not isCompoundStmtHeader( model )  and  not isCompoundStmtHeader( parsed ):
@@ -170,7 +158,7 @@ class StatementEditListener (PythonEditListener):
 			pyReplaceStmt( fragment, model, parsed )
 			return HandleEditResult.HANDLED
 		else:
-			element.setFixedValue( parsed )
+			event.getStreamValueVisitor().setElementFixedValue( element, parsed )
 			return HandleEditResult.PASS_TO_PARENT
 
 
@@ -235,7 +223,7 @@ class StatementUnparsedEditListener (PythonEditListener):
 
 class CompoundHeaderEditListener (PythonEditListener):
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
-		element.setFixedValue( parsed )
+		event.getStreamValueVisitor().setElementFixedValue( element, parsed )
 		# Only partially handled - pass it up
 		return HandleEditResult.NOT_HANDLED
 
