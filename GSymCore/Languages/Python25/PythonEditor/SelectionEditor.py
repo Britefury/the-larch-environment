@@ -40,7 +40,7 @@ _python25BufferDataFlavor = LocalDataFlavor( Python25Buffer )
 
 
 		
-class PythonIndentationTreeEvent (object):
+class PythonIndentationTreeEvent (EditEvent):
 	pass
 
 class PythonIndentTreeEvent (PythonIndentationTreeEvent):
@@ -62,35 +62,6 @@ class DedentPythonSelectionTreeEvent (PythonSelectionEditTreeEvent):
 		super( DedentPythonSelectionTreeEvent, self ).__init__( editHandler, sourceElement )
 
 
-
-class _IndentationStreamValueFn (ElementValueFunction):
-	def __init__(self, innerFn, prefix, suffix):
-		self._innerFn = innerFn
-		self._prefix = prefix
-		self._suffix = suffix
-		
-	def computeElementValue(self, element):
-		return element.getValue( self._innerFn )
-	
-	def addStreamValuePrefixToStream(self, builder, element):
-		if self._innerFn is not None:
-			self._innerFn.addStreamValuePrefixToStream( builder, element )
-		if self._prefix is not None:
-			builder.append( self._prefix )
-		
-	def addStreamValueSuffixToStream(self, builder, element):
-		if self._suffix is not None:
-			builder.append( self._suffix )
-		if self._innerFn is not None:
-			self._innerFn.addStreamValueSuffixToStream( builder, element )
-			
-			
-def _addIndentationStreamValueFnToElement(element, prefix, suffix):
-	oldFn = element.getValueFunction()
-	element.setValueFunction( _IndentationStreamValueFn( oldFn, prefix, suffix ) )
-	return oldFn
-		
-		
 
 class Python25EditHandler (SequentialEditHandler):
 	def __init__(self):
@@ -154,11 +125,13 @@ class Python25EditHandler (SequentialEditHandler):
 			
 			
 	def _indentLine(self, element, context, node):
-		oldFn = _addIndentationStreamValueFnToElement( element, Schema.Indent(), Schema.Dedent() )
-		bSuccess = element.postTreeEventToParent( PythonIndentTreeEvent() )
+		event = PythonIndentTreeEvent()
+		visitor = event.getStreamValueVisitor()
+		visitor.setElementPrefix( element, Schema.Indent() )
+		visitor.setElementSuffix( element, Schema.Dedent() )
+		bSuccess = element.postTreeEventToParent( event )
 		if not bSuccess:
 			print 'Python25EditHandler._indentLine(): INDENT LINE FAILED'
-			element.setValueFunction( oldFn )
 			
 	
 	
@@ -167,11 +140,13 @@ class Python25EditHandler (SequentialEditHandler):
 		suiteParent = suite.getValidParents()[0]
 		if not suiteParent.isInstanceOf( Schema.PythonModule ):
 			# This statement is not in the root node
-			oldFn = _addIndentationStreamValueFnToElement( element, Schema.Dedent(), Schema.Indent() )
-			bSuccess = element.postTreeEventToParent( PythonDedentTreeEvent() )
+			event = PythonDedentTreeEvent()
+			visitor = event.getStreamValueVisitor()
+			visitor.setElementPrefix( element, Schema.Dedent() )
+			visitor.setElementSuffix( element, Schema.Indent() )
+			bSuccess = element.postTreeEventToParent( event )
 			if not bSuccess:
 				print 'Python25EditHandler._dedentLine(): DEDENT LINE FAILED'
-				element.setValueFunction( oldFn )
 		else:
 			print 'Python25EditHandler._dedentLine(): Attempted to dedent line in top-level module'
 			
@@ -199,14 +174,14 @@ class Python25EditHandler (SequentialEditHandler):
 		startContext.getFragmentContentElement().clearFixedValuesOnPathUpTo( rootElement )
 		endContext.getFragmentContentElement().clearFixedValuesOnPathUpTo( rootElement )
 		
-		oldStartFn = _addIndentationStreamValueFnToElement( startStmtElement, Schema.Indent(), None )
-		oldEndFn = _addIndentationStreamValueFnToElement( endStmtElement, None, Schema.Dedent() )
+		event = IndentPythonSelectionTreeEvent( self, rootElement )
+		visitor = event.getStreamValueVisitor()
+		visitor.setElementPrefix( startStmtElement, Schema.Indent() )
+		visitor.setElementSuffix( endStmtElement, Schema.Dedent() )
 		
-		bSuccess = root.getFragmentContentElement().postTreeEvent( IndentPythonSelectionTreeEvent( self, rootElement ) )
+		bSuccess = root.getFragmentContentElement().postTreeEvent( event )
 		if not bSuccess:
 			print 'Python25EditHandler._indentSelection(): INDENT SELECTION FAILED'
-			startStmtElement.setValueFunction( oldStartFn )
-			endStmtElement.setValueFunction( oldEndFn )
 			
 				
 	
@@ -232,14 +207,14 @@ class Python25EditHandler (SequentialEditHandler):
 		startContext.getFragmentContentElement().clearFixedValuesOnPathUpTo( rootElement )
 		endContext.getFragmentContentElement().clearFixedValuesOnPathUpTo( rootElement )
 		
-		oldStartFn = _addIndentationStreamValueFnToElement( startStmtElement, Schema.Dedent(), None )
-		oldEndFn = _addIndentationStreamValueFnToElement( endStmtElement, None, Schema.Indent() )
-
-		bSuccess = rootElement.postTreeEvent( DedentPythonSelectionTreeEvent( self, rootElement ) )
+		event = DedentPythonSelectionTreeEvent( self, rootElement )
+		visitor = event.getStreamValueVisitor()
+		visitor.setElementPrefix( startStmtElement, Schema.Dedent() )
+		visitor.setElementSuffix( endStmtElement, Schema.Indent() )
+		
+		bSuccess = rootElement.postTreeEvent( event )
 		if not bSuccess:
 			print 'Python25EditHandler._dedentSelection(): DEDENT SELECTION FAILED'
-			startStmtElement.setValueFunction( oldStartFn )
-			endStmtElement.setValueFunction( oldEndFn )
 
 			
 		

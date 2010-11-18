@@ -2,26 +2,19 @@
 //##* under the terms of the GNU General Public License version 2 as published by the
 //##* Free Software Foundation. The full text of the GNU General Public License
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
-//##* program. This source code is (C)copyright Geoffrey French 2008.
+//##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
 package BritefuryJ.DocPresent;
 
-public abstract class TextEditEvent extends EditEvent
+import BritefuryJ.DocPresent.StreamValue.StreamValueVisitor;
+
+public abstract class EditEvent
 {
-	protected DPContentLeaf leaf;
+	private StreamValueVisitor streamValueVisitor = new StreamValueVisitor();
 	
 	
-	public TextEditEvent(DPContentLeaf leaf)
+	public StreamValueVisitor getStreamValueVisitor()
 	{
-		this.leaf = leaf;
+		return streamValueVisitor;
 	}
-	
-	
-	public DPContentLeaf getLeaf()
-	{
-		return leaf;
-	}
-	
-	
-	public abstract boolean revert();
 }

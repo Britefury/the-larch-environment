@@ -244,36 +244,28 @@ def spanCmpOpView(ctx, grammar, inheritedState, node, op, y, precedence):
 
 
 
-class _InsertSpecialFormValueFn (ElementValueFunction):
-	def __init__(self, specialForm, index):
-		self._specialForm = specialForm
-		self._index = index
-
-	def computeElementValue(self, element):
-		value = element.getDefaultValue()
-		builder = StreamValueBuilder()
-		builder.append( value[:self._index] )
-		builder.appendStructuralValue( self._specialForm )
-		builder.append( value[self._index:] )
-		return builder.stream()
-
-	def addStreamValuePrefixToStream(self, builder, element):
-		pass
-
-	def addStreamValueSuffixToStream(self, builder, element):
-		pass
-
-
 class _InsertSpecialFormTreeEvent (TextEditEvent):
-	def __init__(self):
-		pass
+	def __init__(self, leaf):
+		super( _InsertSpecialFormTreeEvent, self ).__init__( leaf )
 
 
-def _insertSpecialForm(caret, form):
+def _insertSpecialForm(caret, specialForm):
 	element = caret.getElement()
+	index = caret.getIndex()
 	assert isinstance( element, DPText )
-	element.setValueFunction( _InsertSpecialFormValueFn( form, caret.getIndex() ) )
-	element.postTreeEvent( _InsertSpecialFormTreeEvent() )
+	
+	value = element.getStreamValue()
+	builder = StreamValueBuilder()
+	builder.append( value[:index] )
+	builder.appendStructuralValue( specialForm )
+	builder.append( value[index:] )
+	modifiedValue = builder.stream()
+	
+	event = _InsertSpecialFormTreeEvent( element )
+	visitor = event.getStreamValueVisitor()
+	visitor.setElementFixedValue( element, modifiedValue )
+
+	element.postTreeEvent( event )
 
 
 

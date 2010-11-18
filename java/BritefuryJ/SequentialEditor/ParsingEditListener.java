@@ -7,6 +7,7 @@
 package BritefuryJ.SequentialEditor;
 
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.EditEvent;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Parser.ParseResult;
@@ -45,22 +46,22 @@ public abstract class ParsingEditListener extends EditListener
 		return true;
 	}
 
-	protected HandleEditResult handleEmptyValue(DPElement element, GSymFragmentView fragment, Object event, Object model)
+	protected HandleEditResult handleEmptyValue(DPElement element, GSymFragmentView fragment, EditEvent event, Object model)
 	{
 		return HandleEditResult.NOT_HANDLED;
 	}
 	
-	protected abstract HandleEditResult handleParseSuccess(DPElement element, DPElement sourceElement, GSymFragmentView fragment, Object event, Object model, StreamValue value, Object parsed);
+	protected abstract HandleEditResult handleParseSuccess(DPElement element, DPElement sourceElement, GSymFragmentView fragment, EditEvent event, Object model, StreamValue value, Object parsed);
 	
 	
-	protected HandleEditResult handleParseFailure(DPElement element, DPElement sourceElement, GSymFragmentView fragment, Object event, Object model, StreamValue value)
+	protected HandleEditResult handleParseFailure(DPElement element, DPElement sourceElement, GSymFragmentView fragment, EditEvent event, Object model, StreamValue value)
 	{
 		return HandleEditResult.NOT_HANDLED;
 	}
 	
 	
 	
-	protected HandleEditResult handleValue(DPElement element, DPElement sourceElement, GSymFragmentView fragment, Object event, Object model, StreamValue value)
+	protected HandleEditResult handleValue(DPElement element, DPElement sourceElement, GSymFragmentView fragment, EditEvent event, Object model, StreamValue value)
 	{
 		if ( value.isEmpty()  ||  testValueEmpty( element, fragment, model, value ) )
 		{

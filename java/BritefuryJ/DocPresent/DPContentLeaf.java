@@ -317,14 +317,31 @@ public abstract class DPContentLeaf extends DPElement
 	//
 	//
 	
+	public void insertText(int index, String x)
+	{
+		textRepresentation = textRepresentation.substring( 0, index ) + x + textRepresentation.substring( index );
+		notifyTextInserted( index, x.length() );
+		textRepresentationChanged( new TextEditEventInsert( this, index, x ) );
+	}
+
 	public void removeText(int index, int length)
 	{
-		index = Math.min( Math.max( index, 0 ), textRepresentation.length() );
-		length = Math.min( length, getTextRepresentationLength() - index );
+		String textRemoved = textRepresentation.substring( index, index + length );
 		textRepresentation = textRepresentation.substring( 0, index ) + textRepresentation.substring( index + length );
 		notifyTextRemoved( index, length );
-		textRepresentationChanged( new TextEditEventRemove( index, length ) );
+		textRepresentationChanged( new TextEditEventRemove( this, index, textRemoved ) );
 	}
+	
+	public void replaceText(int index, int length, String x)
+	{
+		String oldText = textRepresentation.substring( index, index + length );
+		textRepresentation = textRepresentation.substring( 0, index )  +  x  +  textRepresentation.substring( index + length );
+		notifyTextReplaced( index, length, x.length() );
+		textRepresentationChanged( new TextEditEventReplace( this, index, oldText, x ) );
+	}
+	
+	
+	
 	
 	public void removeTextFromStart(int length)
 	{
@@ -343,9 +360,10 @@ public abstract class DPContentLeaf extends DPElement
 		int length = textRepresentation.length();
 		if ( length > 0 )
 		{
+			String oldText = textRepresentation;
 			textRepresentation = "";
 			notifyTextRemoved( 0, length );
-			textRepresentationChanged( new TextEditEventRemove( 0, length ) );
+			textRepresentationChanged( new TextEditEventRemove( this, 0, oldText ) );
 			return true;
 		}
 		else
@@ -355,8 +373,36 @@ public abstract class DPContentLeaf extends DPElement
 	}
 	
 	
+	protected void notifyTextInserted(int index, int length)
+	{
+		
+	}
+	
 	protected void notifyTextRemoved(int index, int length)
 	{
+	}
+	
+	protected void notifyTextReplaced(int index, int oldLength, int newLength)
+	{
+	}
+	
+	
+	protected void revert_insert(int index, String x)
+	{
+		textRepresentation = textRepresentation.substring( 0, index ) + x + textRepresentation.substring( index );
+		notifyTextInserted( index, x.length() );
+	}
+	
+	protected void revert_remove(int index, int length)
+	{
+		textRepresentation = textRepresentation.substring( 0, index ) + textRepresentation.substring( index + length );
+		notifyTextRemoved( index, length );
+	}
+	
+	protected void revert_replace(int index, int length, String x)
+	{
+		textRepresentation = textRepresentation.substring( 0, index )  +  x  +  textRepresentation.substring( index + length );
+		notifyTextReplaced( index, length, x.length() );
 	}
 	
 

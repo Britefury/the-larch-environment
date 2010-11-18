@@ -8,15 +8,15 @@ package BritefuryJ.DocPresent;
 
 public class TextEditEventReplace extends TextEditEvent
 {
-	protected int position, length;
-	protected String replacement;
+	protected int position;
+	protected String originalText, replacement;
 	
-	public TextEditEventReplace(int position, int length, String replacement)
+	public TextEditEventReplace(DPContentLeaf leaf, int position, String originalText, String replacement)
 	{
-		super();
+		super( leaf );
 		
 		this.position = position;
-		this.length = length;
+		this.originalText = originalText;
 		this.replacement = replacement;
 	}
 	
@@ -26,13 +26,32 @@ public class TextEditEventReplace extends TextEditEvent
 		return position;
 	}
 	
+	public String getOriginalText()
+	{
+		return originalText;
+	}
+	
 	public int getLength()
 	{
-		return length;
+		return originalText.length();
 	}
 	
 	public String getReplacement()
 	{
 		return replacement;
+	}
+	
+	
+	public boolean revert()
+	{
+		if ( leaf.isRealised() )
+		{
+			leaf.revert_replace( position, replacement.length(), originalText );
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 }
