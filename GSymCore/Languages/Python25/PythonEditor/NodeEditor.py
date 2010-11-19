@@ -177,6 +177,8 @@ class StatementUnparsedEditListener (PythonEditListener):
 		# leaving the existing view intact will result in the parent node reparsing the
 		# modified text.
 		# This normally leads to blank lines doubling on each press of the return key
+		#
+		# TODO: IMPROVE THIS TECHNIQUE - THIS IS A HACK
 		pyReplaceStmt( fragment, model, model, False )
 		
 		return HandleEditResult.NOT_HANDLED
@@ -297,6 +299,8 @@ class StatementIndentationInteractor (KeyElementInteractor):
 class PythonModuleTopLevelEditListener (TreeEventListenerObjectDispatch):
 	@ObjectDispatchMethod( PythonSelectionEditTreeEvent, PythonIndentationTreeEvent, TextEditEvent )
 	def onEditEvent(self, element, sourceElement, event):
+		if isinstance( event, TextEditEvent ):
+			event.revert()
 		return True
 
 PythonModuleTopLevelEditListener.instance = PythonModuleTopLevelEditListener()
@@ -307,6 +311,8 @@ PythonModuleTopLevelEditListener.instance = PythonModuleTopLevelEditListener()
 class PythonSuiteTopLevelEditListener (TreeEventListenerObjectDispatch):
 	@ObjectDispatchMethod( PythonSelectionEditTreeEvent, PythonIndentationTreeEvent, TextEditEvent )
 	def onEditEvent(self, element, sourceElement, event):
+		if isinstance( event, TextEditEvent ):
+			event.revert()
 		return True
 
 PythonSuiteTopLevelEditListener.instance = PythonSuiteTopLevelEditListener()
@@ -329,8 +335,10 @@ class PythonExpressionTopLevelEditListener (TreeEventListenerObjectDispatch):
 		value = element.getStreamValue()
 		if '\n' in value:
 			element.postTreeEvent( PythonExpressionNewLineEvent( element.getFragmentContext().getModel() ) )
+			event.revert()
 			return True
 		else:
+			event.revert()
 			return True
 
 PythonExpressionTopLevelEditListener.instance = PythonExpressionTopLevelEditListener()
