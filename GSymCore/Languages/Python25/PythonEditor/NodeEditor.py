@@ -132,16 +132,19 @@ class PythonExpressionEditListener (PythonEditListener):
 		return HandleEditResult.HANDLED
 		
 	def handleParseFailure(self, element, sourceElement, fragment, event, model, value):
-		unparsed = Schema.UNPARSED( value=value.getItemValues() )
-		log = fragment.getView().getPageLog()
-		if log.isRecording():
-			log.log( LogEntry( 'Py25ExprEdit' ).hItem( 'description', 'Top level expression - unparsed' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ).vItem( 'parsedResult', unparsed ) )
-		expr = model['expr']
-		if expr is None:
-			model['expr'] = unparsed
+		if '\n' not in value:
+			unparsed = Schema.UNPARSED( value=value.getItemValues() )
+			log = fragment.getView().getPageLog()
+			if log.isRecording():
+				log.log( LogEntry( 'Py25ExprEdit' ).hItem( 'description', 'Top level expression - unparsed' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ).vItem( 'parsedResult', unparsed ) )
+			expr = model['expr']
+			if expr is None:
+				model['expr'] = unparsed
+			else:
+				pyReplaceExpression( fragment, expr, unparsed )
+			return HandleEditResult.HANDLED
 		else:
-			pyReplaceExpression( fragment, expr, unparsed )
-		return HandleEditResult.HANDLED
+			return HandleEditResult.NOT_HANDLED
 
 
 	
@@ -333,11 +336,15 @@ class PythonExpressionTopLevelEditListener (TreeEventListenerObjectDispatch):
 	@ObjectDispatchMethod( TextEditEvent )
 	def onTextEditEvent(self, element, sourceElement, event):
 		value = element.getStreamValue()
+		fragment = element.getFragmentContext()
+		model = fragment.getModel()
 		if '\n' in value:
-			element.postTreeEvent( PythonExpressionNewLineEvent( element.getFragmentContext().getModel() ) )
+			element.postTreeEvent( PythonExpressionNewLineEvent( model ) )
+			pyReplaceExpression( fragment, model, model )
 			event.revert()
 			return True
 		else:
+			pyReplaceExpression( fragment, model, model )
 			event.revert()
 			return True
 
