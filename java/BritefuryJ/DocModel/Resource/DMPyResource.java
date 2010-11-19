@@ -9,6 +9,7 @@ package BritefuryJ.DocModel.Resource;
 import java.io.IOException;
 import java.util.IdentityHashMap;
 
+import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyString;
 import org.python.modules.cPickle;
@@ -100,7 +101,15 @@ public class DMPyResource extends DMResource
 	public static String serialise(PyObject x)
 	{
 		DMPickleHelper.initialise();
-		PyString s = cPickle.dumps( x );
+		PyString s;
+		try
+		{
+			s = cPickle.dumps( x );
+		}
+		catch (Throwable t)
+		{
+			s = cPickle.dumps( Py.None );
+		}
 		return s.getString();
 	}
 	
