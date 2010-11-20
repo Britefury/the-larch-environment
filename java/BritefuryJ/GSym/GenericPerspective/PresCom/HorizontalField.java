@@ -24,7 +24,7 @@ public class HorizontalField extends Pres
 	public HorizontalField(String title, Object value)
 	{
 		this.title = title;
-		this.value = coerce( value );
+		this.value = coerceNonNull( value );
 	}
 	
 	

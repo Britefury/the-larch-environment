@@ -20,7 +20,7 @@ public class StructuralItem extends Pres
 	public StructuralItem(Object value, Object child)
 	{
 		this.value = value;
-		this.child = coerce( child );
+		this.child = coerceNonNull( child );
 	}
 
 

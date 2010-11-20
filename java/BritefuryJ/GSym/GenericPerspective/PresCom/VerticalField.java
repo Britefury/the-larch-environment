@@ -23,7 +23,7 @@ public class VerticalField extends Pres
 	public VerticalField(String title, Object value)
 	{
 		this.title = title;
-		this.value = coerce( value );
+		this.value = coerceNonNull( value );
 	}
 	
 	

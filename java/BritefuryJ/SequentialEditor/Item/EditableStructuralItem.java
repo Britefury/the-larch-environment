@@ -24,7 +24,7 @@ public class EditableStructuralItem extends Pres
 	public EditableStructuralItem(TreeEventListener editListener, Object value, Object child)
 	{
 		this.editListeners = new TreeEventListener[] { editListener };
-		this.child = coerce( child );
+		this.child = coerceNonNull( child );
 		this.value = value;
 	}
 
@@ -32,7 +32,7 @@ public class EditableStructuralItem extends Pres
 	{
 		this.editListeners = editListeners.toArray( new TreeEventListener[] {} );
 		this.value = value;
-		this.child = coerce( child );
+		this.child = coerceNonNull( child );
 	}
 
 

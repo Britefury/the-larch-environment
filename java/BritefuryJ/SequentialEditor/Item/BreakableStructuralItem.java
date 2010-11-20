@@ -23,7 +23,7 @@ public class BreakableStructuralItem extends Pres
 	{
 		this.editor = editor;
 		this.value = value;
-		this.child = coerce( child );
+		this.child = coerceNonNull( child );
 	}
 
 

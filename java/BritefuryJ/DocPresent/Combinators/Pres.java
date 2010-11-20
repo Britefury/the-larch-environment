@@ -429,6 +429,26 @@ public abstract class Pres
 		}
 	}
 
+	public static Pres coerceNonNull(Object x)
+	{
+		if ( x == null )
+		{
+			return new InnerFragment( null );
+		}
+		else if ( x instanceof Pres )
+		{
+			return (Pres)x;
+		}
+		else if ( x instanceof DPElement )
+		{
+			return new PresentElement( (DPElement)x );
+		}
+		else
+		{
+			return new InnerFragment( x );
+		}
+	}
+
 	public static Pres elementToPres(DPElement e)
 	{
 		return new PresentElement( e );

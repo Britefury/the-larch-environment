@@ -21,7 +21,7 @@ public class ObjectBox extends Pres
 	public ObjectBox(String title, Object contents)
 	{
 		this.title = title;
-		this.contents = coerce( contents );
+		this.contents = coerceNonNull( contents );
 	}
 	
 	

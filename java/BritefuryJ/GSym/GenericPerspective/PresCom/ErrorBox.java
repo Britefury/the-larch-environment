@@ -21,7 +21,7 @@ public class ErrorBox extends Pres
 	public ErrorBox(String title, Object contents)
 	{
 		this.title = title;
-		this.contents = coerce( contents );
+		this.contents = coerceNonNull( contents );
 	}
 	
 	
