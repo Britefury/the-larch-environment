@@ -82,7 +82,15 @@ public class DMPyResource extends DMResource
 		if ( value == null )
 		{
 			DMPickleHelper.initialise();
-			PyObject v = (PyObject)cPickle.loads( new PyString( serialised ) );
+			PyObject v;
+			try
+			{
+				v = (PyObject)cPickle.loads( new PyString( serialised ) );
+			}
+			catch (Throwable t)
+			{
+				v = Py.None;
+			}
 			this.value = new PyObject[] { v };
 			this.serialised = null;
 		}

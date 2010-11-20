@@ -31,10 +31,10 @@ EDITMODE_EDITSTATEMENT = 2
 
 class PythonEditorStyle (object):
 	pythonEditor = AttributeNamespace( 'pythonEditor' )
-	
+
 	#keywordStyle = InheritedAttributeNonNull( pythonEditor, 'keywordStyle', StyleSheet,
-	                                          #StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontBold, True ).withAttr( Primitive.fontSize, 14 )
-	                                          #.withAttr( Primitive.foreground, Color( 0.25, 0.0, 0.5 ) ).withAttr( Primitive.fontSmallCaps, True ) )
+							#StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontBold, True ).withAttr( Primitive.fontSize, 14 )
+							#.withAttr( Primitive.foreground, Color( 0.25, 0.0, 0.5 ) ).withAttr( Primitive.fontSmallCaps, True ) )
 	keywordStyle = InheritedAttributeNonNull( pythonEditor, 'keywordStyle', StyleSheet,
 	                                          StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontBold, True ).withAttr( Primitive.fontSize, 14 )
 	                                          .withAttr( Primitive.foreground, Color( 0.25, 0.0, 0.5 ) ) )
@@ -70,45 +70,45 @@ class PythonEditorStyle (object):
 	unparseableStyle = InheritedAttributeNonNull( pythonEditor, 'unparseableStyle', StyleSheet,
 	                                              StyleSheet.instance.withAttr( Primitive.fontFace, 'Sans serif' ).withAttr( Primitive.fontSize, 14 )
 	                                              .withAttr( Primitive.foreground, Color.black ).withAttr( Primitive.textSquiggleUnderlinePaint, Color.red ) )
-	
+
 	sequenceStyle = InheritedAttributeNonNull( pythonEditor, 'sequenceStyle', StyleSheet,
-	                                              StyleSheet.instance.withAttr( Sequence.addLineBreaks, True ).withAttr( Sequence.addParagraphIndentMarkers, True ).withAttr( Sequence.addLineBreakCost, True ) )
-	
+	                                           StyleSheet.instance.withAttr( Sequence.addLineBreaks, True ).withAttr( Sequence.addParagraphIndentMarkers, True ).withAttr( Sequence.addLineBreakCost, True ) )
+
 	quoteBorderStyle = InheritedAttributeNonNull( pythonEditor, 'quoteBorderStyle', StyleSheet,
-	                                                     StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.5, 0.3, 0.7 ), None ) ) )
+	                                              StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.5, 0.3, 0.7 ), None ) ) )
 	quoteTitleStyle = InheritedAttributeNonNull( pythonEditor, 'quoteTitleStyle', StyleSheet,
-	                                                     StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.3, 0.1, 0.5 ) ).withAttr( Primitive.fontSize, 10 ) )
-	
+	                                             StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.3, 0.1, 0.5 ) ).withAttr( Primitive.fontSize, 10 ) )
+
 	unquoteBorderStyle = InheritedAttributeNonNull( pythonEditor, 'unquoteBorderStyle', StyleSheet,
-	                                                     StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 1.0, 0.5, 0.3 ), None ) ) )
+	                                                StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 1.0, 0.5, 0.3 ), None ) ) )
 	unquoteTitleStyle = InheritedAttributeNonNull( pythonEditor, 'unquoteTitleStyle', StyleSheet,
-	                                                     StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.7, 0.35, 0.0 ) ).withAttr( Primitive.fontSize, 10 ) )
-	
+	                                               StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.7, 0.35, 0.0 ) ).withAttr( Primitive.fontSize, 10 ) )
+
 	externalExprBorderStyle = InheritedAttributeNonNull( pythonEditor, 'externalExprBorderStyle', StyleSheet,
 	                                                     StyleSheet.instance.withAttr( Primitive.border, SolidBorder( 1.0, 3.0, 5.0, 5.0, Color( 0.3, 0.7, 1.0 ), None ) ) )
 	externalExprTitleStyle = InheritedAttributeNonNull( pythonEditor, 'externalExprTitleStyle', StyleSheet,
-	                                                     StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.5, 1.0 ) ).withAttr( Primitive.fontSize, 10 ) )
-	
+	                                                    StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.5, 1.0 ) ).withAttr( Primitive.fontSize, 10 ) )
+
 	inlineObjectLineStyle = InheritedAttributeNonNull( pythonEditor, 'inlineObjectLineStyle', StyleSheet,
-	                                                     StyleSheet.instance.withAttr( Primitive.shapePainter, FillPainter( Color( 0.1, 0.2, 0.3 ) ) ) )
+	                                                   StyleSheet.instance.withAttr( Primitive.shapePainter, FillPainter( Color( 0.1, 0.2, 0.3 ) ) ) )
 	inlineObjectButtonStyle = InheritedAttributeNonNull( pythonEditor, 'inlineObjectButtonStyle', StyleSheet,
 	                                                     StyleSheet.instance.withAttr( Primitive.background, FillPainter( Color( 0.85, 0.85, 0.85 ) ) ).withAttr( Primitive.hoverBackground, FillPainter( Color( 0.7, 0.7, 0.7 ) ) ) )
 
-	
+
 	solidHighlightRounding = InheritedAttributeNonNull( pythonEditor, 'solidHighlightRounding', float, 3.0 )
 	outlineHighlightThickness = InheritedAttributeNonNull( pythonEditor, 'outlineHighlightThickness', float, 2.0 )
 	outlineHighlightInset = InheritedAttributeNonNull( pythonEditor, 'outlineHighlightInset', float, 2.0 )
 	outlineHighlightRounding = InheritedAttributeNonNull( pythonEditor, 'outlineHighlightRounding', float, 5.0 )
-	
+
 	defStmtHighlightColour = InheritedAttributeNonNull( pythonEditor, 'defStmtHighlightColour', Color, Color( 0.420, 0.620, 0.522 ) )
 	classStmtHighlightColour = InheritedAttributeNonNull( pythonEditor, 'classStmtHighlightColour', Color, Color( 0.522, 0.420, 0.620 ) )
 	badIndentationHighlightColour = InheritedAttributeNonNull( pythonEditor, 'badIndentationHighlightColour', Color, Color.red )
-	                                              
+
 	comprehensionSpacing = InheritedAttributeNonNull( pythonEditor, 'comprehensionSpacing', float, 15.0 )
 	conditionalSpacing = InheritedAttributeNonNull( pythonEditor, 'conditionalSpacing', float, 15.0 )
 	blockIndentation = InheritedAttributeNonNull( pythonEditor, 'blockIndentation', float, 30.0 )
-	
-	
+
+
 	@PyDerivedValueTable( pythonEditor )
 	def _defStmtHeaderHighlightStyle(style):
 		border = _solidHighlightBorder( style, style.get( PythonEditorStyle.defStmtHighlightColour ) )
@@ -137,11 +137,11 @@ class PythonEditorStyle (object):
 
 
 
-	
+
 _keywordMap = {}
-	
-	
-	
+
+
+
 def _initKeywords(keywords):
 	for keyword in keywords:
 		#keyword = keyword[0].upper() + keyword[1:]
@@ -212,7 +212,7 @@ def applyPythonParens(expr, precedence, numAdditionalParens, inheritedState):
 
 def getOuterPrecedence(inheritedState):
 	return inheritedState['outerPrecedence']
-	
+
 
 
 #
@@ -252,14 +252,14 @@ def unparsedElements(components):
 
 def stringLiteral(format, quotation, value):
 	boxContents = []
-	
+
 	if format is not None:
 		boxContents.append( ApplyStyleSheetFromAttribute( PythonEditorStyle.literalFormatStyle, Text( format ) ) )
-	
+
 	quotationPres = ApplyStyleSheetFromAttribute( PythonEditorStyle.quotationStyle, Text( quotation ) )
 	valuePres = ApplyStyleSheetFromAttribute( PythonEditorStyle.stringLiteralStyle, Text( value ) )
 	boxContents.extend( [ quotationPres,  valuePres,  quotationPres ] )
-	
+
 	return Row( boxContents )
 
 
@@ -268,10 +268,10 @@ def intLiteral(format, value):
 	boxContents = [ valuePres ]
 	if format is not None:
 		boxContents.append( ApplyStyleSheetFromAttribute( PythonEditorStyle.literalFormatStyle, Text( format ) ) )
-	
+
 	return Row( boxContents )
-	
-	
+
+
 def floatLiteral(value):
 	return ApplyStyleSheetFromAttribute( PythonEditorStyle.numLiteralStyle, Text( value ) )
 
@@ -323,19 +323,19 @@ def listLiteral(items, bTrailingSeparator):
 
 def comprehensionFor(target, source):
 	return Span( [ _keyword( 'for' ),
-                                      _space,
-                                      target,
-                                      _space,
-                                      _lineBreak,
-                                      _keyword( 'in' ),
-                                      _space,
-                                      source ] )
+	               _space,
+	               target,
+	               _space,
+	               _lineBreak,
+	               _keyword( 'in' ),
+	               _space,
+	               source ] )
 
 
 def comprehensionIf(condition):
 	return Span( [ _keyword( 'if' ),
-                                      _space,
-                                      condition ] )
+	               _space,
+	               condition ] )
 
 @PyPresCombinatorFn
 def listComp(ctx, style, resultExpr, comprehensionItems):
@@ -374,15 +374,15 @@ def dictLiteral(items, bTrailingSeparator):
 
 def yieldExpr(value):
 	return Span( [ _keyword( 'yield' ),
-                                      _space,
-                                      value ] )
+	               _space,
+	               value ] )
 
 
 def attributeRef(target, name):
 	attribView = ApplyStyleSheetFromAttribute( PythonEditorStyle.attributeStyle, Text( name ) )
 	return Span( [ target, _dot, attribView ] )
-	
-	
+
+
 def subscriptSlice(lower, upper):
 	lower = [ lower ]   if lower is not None   else []
 	upper = [ upper ]   if upper is not None   else []
@@ -407,7 +407,7 @@ def subscriptTuple(items, bTrailingSeparator):
 
 def subscript(target, index):
 	return Span( [ target, _lineBreak, _openBracket, index, _closeBracket ] )
-	
+
 
 
 def callKWArg(name, value):
@@ -474,8 +474,8 @@ def div(x, y, fractionBarContent):
 
 def compare(x, cmpOps):
 	return LineBreakCostSpan( [ x ]  +  cmpOps )
-	
-	
+
+
 def simpleParam(name):
 	return ApplyStyleSheetFromAttribute( PythonEditorStyle.paramStyle, Text( name ) )
 
@@ -510,18 +510,18 @@ def lambdaExpr(params, bParamsTrailingSeparator, expr):
 			elements.append( _space )
 			elements.append( _lineBreak )
 		elements.append( ParagraphDedentMarker() )
-	
+
 	return LineBreakCostSpan( [ _keyword( 'lambda' ),  _space ]  +  elements  +  \
-                                    [ _colon,  _space, _lineBreak, expr ] )
+	                          [ _colon,  _space, _lineBreak, expr ] )
 
 
 @PyPresCombinatorFn
 def conditionalExpr(ctx, style, condition, expr, elseExpr):
 	conditionalSpacing = style.get( PythonEditorStyle.conditionalSpacing )
-	
+
 	return LineBreakCostSpan( [ expr,   Whitespace( '  ', conditionalSpacing ),  _lineBreak,
-                                                 _keyword( 'if' ), _space, condition,   Whitespace( '  ', conditionalSpacing ),  _lineBreak,
-                                                 _keyword( 'else' ), _space, elseExpr ] ).present( ctx, style )
+	                            _keyword( 'if' ), _space, condition,   Whitespace( '  ', conditionalSpacing ),  _lineBreak,
+	                            _keyword( 'else' ), _space, elseExpr ] ).present( ctx, style )
 
 
 
@@ -529,11 +529,11 @@ def conditionalExpr(ctx, style, condition, expr, elseExpr):
 def quote(ctx, style, valueView, title, editHandler):
 	quoteBorderStyle = style.get( PythonEditorStyle.quoteBorderStyle )
 	quoteTitleStyle = style.get( PythonEditorStyle.quoteTitleStyle )
-	
+
 	titleLabel = quoteTitleStyle.applyTo( Label( title ) )
-	
+
 	region = Region( valueView, editHandler )
-	
+
 	header = titleLabel.alignHLeft()
 	box = quoteBorderStyle.applyTo( Border( Column( [ header.alignHExpand(), region.pad( 3.0, 3.0 ) ] ) ) ).pad( 1.0, 1.0 )
 
@@ -546,11 +546,11 @@ def quote(ctx, style, valueView, title, editHandler):
 def unquote(ctx, style, valueView, title, editHandler):
 	unquoteBorderStyle = style.get( PythonEditorStyle.unquoteBorderStyle )
 	unquoteTitleStyle = style.get( PythonEditorStyle.unquoteTitleStyle )
-	
+
 	titleLabel = unquoteTitleStyle.applyTo( Label( title ) )
-	
+
 	region = Region( valueView, editHandler )
-	
+
 	header = titleLabel.alignHLeft()
 	box = unquoteBorderStyle.applyTo( Border( Column( [ header.alignHExpand(), region.pad( 3.0, 3.0 ) ] ) ) ).pad( 1.0, 1.0 )
 
@@ -563,9 +563,9 @@ def unquote(ctx, style, valueView, title, editHandler):
 def externalExpr(ctx, style, exprView, title, deleteButton):
 	externalExprBorderStyle = style.get( PythonEditorStyle.externalExprBorderStyle )
 	externalExprTitleStyle = style.get( PythonEditorStyle.externalExprTitleStyle )
-	
+
 	titleLabel = externalExprTitleStyle.applyTo( Label( title ) )
-	
+
 	header = Row( [ titleLabel.alignHLeft(), deleteButton.alignHRight().alignVCentre() ] )
 	box = externalExprBorderStyle.applyTo( Border( Column( [ header.alignHExpand(), exprView.pad( 3.0, 3.0 ) ] ) ) ).pad( 1.0, 1.0 )
 
@@ -577,7 +577,7 @@ def externalExpr(ctx, style, exprView, title, deleteButton):
 @PyPresCombinatorFn
 def inlineObject(ctx, style, valueView):
 	externalExprBorderStyle = style.get( PythonEditorStyle.externalExprBorderStyle )
-	
+
 	box = externalExprBorderStyle.applyTo( Border( valueView.pad( 3.0, 3.0 ) ) ).pad( 1.0, 1.0 )
 
 	segment = Segment( box )
@@ -588,20 +588,20 @@ def inlineObject(ctx, style, valueView):
 @PyPresCombinatorFn
 def inlineObjectMacro(ctx, style, valueView, modelView):
 	modelView = StyleSheet.instance.withAttr( Primitive.editable, False ).applyTo( modelView )
-	
+
 	externalExprBorderStyle = style.get( PythonEditorStyle.externalExprBorderStyle )
 	inlineObjectLineStyle = style.get( PythonEditorStyle.inlineObjectLineStyle )
 	inlineObjectButtonStyle = style.get( PythonEditorStyle.inlineObjectButtonStyle )
-	
+
 	hLine = inlineObjectLineStyle.applyTo( Box( 1, 1 ).alignHExpand() ).pad( 8.0, 5.0 ).alignHExpand()
 	vLine = inlineObjectLineStyle.applyTo( Box( 1, 1 ).alignVExpand() ).pad( 5.0, 8.0 ).alignVExpand()
 	expandButton = CustomExpander.expanderButton( inlineObjectButtonStyle.applyTo( Image.systemIcon( 'expand_plus' ) ) )
 	contractButton = CustomExpander.expanderButton( inlineObjectButtonStyle.applyTo( Image.systemIcon( 'expand_minus' ) ) )
-	
+
 	contracted = externalExprBorderStyle.applyTo( Border( Row( [ valueView, vLine, expandButton.alignVBottom() ] ).pad( 3.0, 3.0 ) ) ).pad( 1.0, 1.0 )
 	expanded = externalExprBorderStyle.applyTo( Border( Column( [ Row( [ valueView, vLine, contractButton.alignVBottom() ] ), hLine, modelView ] ).pad( 3.0, 3.0 ) ) ).pad( 1.0, 1.0 )
 	expander = CustomExpander( contracted, expanded )
-	
+
 	segment = Segment( expander )
 	return segment.present( ctx, style )
 
@@ -654,7 +654,7 @@ def raiseStmt(excType, excValue, traceback):
 		for x in xs[:-1]:
 			xElements.extend( [ x,  _comma,  _space ] )
 		xElements.append( xs[-1] )
-	
+
 	return Span( [ _keyword( 'raise' ),  _space ] + xElements )
 
 
@@ -708,12 +708,12 @@ def fromImportStmt(module, imports):
 		importElements.append( imports[-1] )
 	importElements.append( ParagraphDedentMarker() )
 	return Span( [ _keyword( 'from' ), _space, module, _space,
-                                                _keyword( 'import' ), _space ]  +  importElements )
+	               _keyword( 'import' ), _space ]  +  importElements )
 
 
 def fromImportAllStmt(module):
 	return Span( [ _keyword( 'from' ), _space, module, _space,
-                                                _keyword( 'import' ), _space,  _asterisk ] )
+	               _keyword( 'import' ), _space,  _asterisk ] )
 
 
 def globalVar(name):
@@ -794,8 +794,8 @@ def whileStmtHeader(condition):
 # For statement
 def forStmtHeader(target, source):
 	return Span( [ _keyword( 'for' ),  _space,  target,  _space,
-                                                    _keyword( 'in' ),  _space,  _lineBreak,
-                                                    source,  _colon ] )
+	               _keyword( 'in' ),  _space,  _lineBreak,
+	               source,  _colon ] )
 
 
 def tryStmtHeader():
@@ -826,7 +826,7 @@ def withStmtHeader(expr, target):
 
 def decoStmtHeader(name, args, bArgsTrailingSeparator):
 	nameView = ApplyStyleSheetFromAttribute( PythonEditorStyle.varStyle, Text( name ) )
-	
+
 	elements = [ _at, nameView ]
 	if args is not None:
 		elements.append( _openParen )
@@ -936,7 +936,7 @@ def compoundStmt(components):
 # MISC
 #
 #
-	
+
 @PyPresCombinatorFn
 def badIndentation(ctx, style, child):
 	badIndentationStyle = PythonEditorStyle._badIndentationHighlightStyle.get( style )
@@ -952,7 +952,7 @@ def specialFormStatementLine(statement):
 	return Paragraph( [ segment ] )
 
 
-	
-	
-	
-	
+
+
+
+

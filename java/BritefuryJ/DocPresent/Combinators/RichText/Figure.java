@@ -22,7 +22,7 @@ public class Figure extends Pres
 	
 	public Figure(Object content, String captionText)
 	{
-		this.content = coerce( content );
+		this.content = coerceNonNull( content );
 		this.captionText = captionText;
 	}
 

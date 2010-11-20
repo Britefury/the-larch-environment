@@ -59,7 +59,7 @@ public class GenericPresentersSQL extends GSymObjectPresenterRegistry
 				}
 				catch (SQLException e)
 				{
-					tablesPres = Pres.coerce( e );
+					tablesPres = Pres.coerceNonNull( e );
 				}
 				Pres tables = new DropDownExpander( sectionHeadingStyle.applyTo( new Label( "Tables" ) ),  tablesPres );
 				
@@ -67,7 +67,7 @@ public class GenericPresentersSQL extends GSymObjectPresenterRegistry
 			}
 			catch (SQLException e)
 			{
-				return new ErrorBox( "SQL: Error presenting ResultSet", Pres.coerce( e ) );
+				return new ErrorBox( "SQL: Error presenting ResultSet", Pres.coerceNonNull( e ) );
 			}
 		}
 	};
@@ -119,7 +119,7 @@ public class GenericPresentersSQL extends GSymObjectPresenterRegistry
 			}
 			catch (SQLException e)
 			{
-				return new ErrorBox( "SQL: Error presenting ResultSet", Pres.coerce( e ) );
+				return new ErrorBox( "SQL: Error presenting ResultSet", Pres.coerceNonNull( e ) );
 			}
 		}
 	};

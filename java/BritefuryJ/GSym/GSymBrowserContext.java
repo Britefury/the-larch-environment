@@ -46,7 +46,7 @@ public class GSymBrowserContext
 			@Override
 			protected Pres presentModel(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
 			{
-				return Pres.coerce( page.getContentsElement() );
+				return Pres.coerceNonNull( page.getContentsElement() );
 			}
 
 			@Override
@@ -195,7 +195,7 @@ public class GSymBrowserContext
 		{
 			return Py.tojava( __builtin__.eval( Py.newString( locationString ), resolverLocals ), Object.class );
 		}
-		catch (Exception e)
+		catch (Throwable e)
 		{
 			return new GenericSubject( new ResolveError( location, e ), "Resolve error" );
 		}
@@ -260,9 +260,9 @@ public class GSymBrowserContext
 	private static class ResolveError implements Presentable
 	{
 		private String location;
-		private Exception exception;
+		private Throwable exception;
 		
-		public ResolveError(Location location, Exception exception)
+		public ResolveError(Location location, Throwable exception)
 		{
 			this.location = location.getLocationString();
 			this.exception = exception;
@@ -277,7 +277,7 @@ public class GSymBrowserContext
 			
 			Pres errorTitle = titleStyle.applyTo( new Label( "Could not resolve" ) );
 			Pres loc = contentsStyle.applyTo( new StaticText( location ) );
-			Pres exc = Pres.coerce( exception );
+			Pres exc = Pres.coerceNonNull( exception );
 			Pres body = new Body( new Pres[] { errorTitle.alignHCentre(), loc.alignHCentre(), exc.alignHCentre() } );
 			
 			

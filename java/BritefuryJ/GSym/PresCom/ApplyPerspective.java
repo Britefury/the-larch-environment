@@ -21,7 +21,7 @@ public class ApplyPerspective extends Pres
 	public ApplyPerspective(GSymAbstractPerspective perspective, Object child)
 	{
 		this.perspective = perspective;
-		this.child = coerce( child );
+		this.child = coerceNonNull( child );
 	}
 	
 	

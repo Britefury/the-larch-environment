@@ -23,13 +23,13 @@ public class EditableSequentialItem extends Pres
 	public EditableSequentialItem(TreeEventListener editListener, Object child)
 	{
 		this.editListeners = new TreeEventListener[] { editListener };
-		this.child = coerce( child );
+		this.child = coerceNonNull( child );
 	}
 
 	public EditableSequentialItem(List<TreeEventListener> editListeners, Object child)
 	{
 		this.editListeners = editListeners.toArray( new TreeEventListener[] {} );
-		this.child = coerce( child );
+		this.child = coerceNonNull( child );
 	}
 
 
