@@ -16,7 +16,7 @@ import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
 
-public abstract class TextClipboardHandler implements ClipboardHandler
+public abstract class TextClipboardHandler extends ClipboardHandler
 {
 	protected abstract void deleteText(Selection selection);
 	protected abstract void insertText(Marker marker, String text);

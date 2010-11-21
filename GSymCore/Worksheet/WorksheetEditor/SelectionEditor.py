@@ -9,7 +9,7 @@ from BritefuryJ.DocPresent.Clipboard import *
 from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent import *
 
-from BritefuryJ.SequentialEditor import SequentialClipboardHandler, SequentialBuffer, SelectionEditTreeEvent
+from BritefuryJ.SequentialEditor import SequentialClipboardHandler, SelectionEditTreeEvent
 
 from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder, StreamValue
 
@@ -18,16 +18,6 @@ from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListene
 
 
 
-class WorksheetBuffer (SequentialBuffer):
-	pass
-
-
-
-_worksheetBufferDataFlavor = LocalDataFlavor( WorksheetBuffer )
-
-
-
-		
 class WorksheetSelectionEditTreeEvent (SelectionEditTreeEvent):
 	def __init__(self, clipboardHandler, sourceElement):
 		super( WorksheetSelectionEditTreeEvent, self ).__init__( clipboardHandler, sourceElement )
@@ -37,29 +27,17 @@ class WorksheetSelectionEditTreeEvent (SelectionEditTreeEvent):
 
 class WorksheetClipboardHandler (SequentialClipboardHandler):
 	def __init__(self):
-		super( WorksheetClipboardHandler, self ).__init__( _worksheetBufferDataFlavor )
+		super( WorksheetClipboardHandler, self ).__init__()
 		
 		
 	def isEditLevelFragmentView(self, fragment):
 		return True
 	
 	
-	def createSelectionBuffer(self, stream):
-		return WorksheetBuffer( stream )
-	
-	
-	def filterTextForImport(self, text):
-		return text
-		
-		
 	def copyStructuralValue(self, x):
 		return x.deepCopy()
 	
 	
 	def createSelectionEditTreeEvent(self, sourceElement):
 		return WorksheetSelectionEditTreeEvent( self, sourceElement )
-	
-	
-	def canShareSelectionWith(self, clipboardHandler):
-		return False
 

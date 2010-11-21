@@ -561,27 +561,34 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	}
 	
 	
+	// Insert text at marker
 	public void insertText(Marker marker, String x)
 	{
 		insertText( marker.getClampedIndex(), x );
 	}
 
+	
+	// Remove text at marker
 	public void removeText(Marker marker, int length)
 	{
-		removeText( marker.getIndex(), length );
+		removeText( marker.getClampedIndex(), length );
 	}
 	
+	// Remove text between markers
 	public void removeText(Marker start, Marker end)
 	{
-		removeText( start.getIndex(), end.getIndex() - start.getIndex() );
+		removeText( start.getClampedIndex(), end.getClampedIndex() - start.getIndex() );
 	}
 	
+	// Replace range of text at marker
 	public void replaceText(Marker marker, int length, String x)
 	{
 		int index = marker.getClampedIndex();
+		length = Math.min( length, getTextRepresentationLength() - index );
 		replaceText( index, length, x );
 	}
 	
+	// Replace range of text between markers
 	public void replaceText(Marker startMarker, Marker endMarker, String x)
 	{
 		int start = startMarker.getClampedIndex();

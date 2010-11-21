@@ -19,7 +19,6 @@ import BritefuryJ.DocPresent.TextEditEventInsert;
 import BritefuryJ.DocPresent.TextEditEventRemove;
 import BritefuryJ.DocPresent.TextEditEventReplace;
 import BritefuryJ.DocPresent.TreeEventListener;
-import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
 import BritefuryJ.DocPresent.Clipboard.TextClipboardHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
@@ -206,18 +205,12 @@ public class TextEntry extends ControlPres
 			
 			protected void replaceText(Selection selection, String replacement)
 			{
-				textElement.replaceText(selection.getStartMarker(), selection.getEndMarker(), replacement );
+				textElement.replaceText( selection.getStartMarker(), selection.getEndMarker(), replacement );
 			}
 			
 			protected String getText(Selection selection)
 			{
 				return textElement.getTextRepresentationBetweenMarkers( selection.getStartMarker(), selection.getEndMarker() );
-			}
-	
-			@Override
-			public boolean canShareSelectionWith(ClipboardHandler clipboardHandler)
-			{
-				return false;
 			}
 		}
 		

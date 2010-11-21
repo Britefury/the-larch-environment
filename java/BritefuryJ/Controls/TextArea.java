@@ -22,7 +22,6 @@ import BritefuryJ.DocPresent.TextEditEventInsert;
 import BritefuryJ.DocPresent.TextEditEventRemove;
 import BritefuryJ.DocPresent.TextEditEventReplace;
 import BritefuryJ.DocPresent.TreeEventListener;
-import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
 import BritefuryJ.DocPresent.Clipboard.TextClipboardHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
@@ -215,13 +214,6 @@ public class TextArea extends ControlPres
 			protected String getText(Selection selection)
 			{
 				return textBox.getRootElement().getTextRepresentationInSelection( selection );
-			}
-	
-	
-			@Override
-			public boolean canShareSelectionWith(ClipboardHandler clipboardHandler)
-			{
-				return false;
 			}
 		}
 		

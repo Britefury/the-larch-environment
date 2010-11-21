@@ -14,10 +14,13 @@ public class SequentialBuffer
 	public static final LocalDataFlavor dataFlavor = new LocalDataFlavor( SequentialBuffer.class );
 	
 	protected StreamValue stream;
+	protected SequentialClipboardHandler clipboardHandler;
 	
-	public SequentialBuffer(StreamValue stream)
+	
+	public SequentialBuffer(StreamValue stream, SequentialClipboardHandler clipboardHandler)
 	{
 		this.stream = stream;
+		this.clipboardHandler = clipboardHandler;
 	}
 	
 	

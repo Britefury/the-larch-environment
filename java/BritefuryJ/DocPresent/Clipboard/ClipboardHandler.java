@@ -14,7 +14,7 @@ import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Selection.Selection;
 
 
-public interface ClipboardHandler
+public abstract class ClipboardHandler
 {
 	public static int COPY = TransferHandler.COPY;
 	public static int COPY_OR_MOVE = TransferHandler.COPY_OR_MOVE;
@@ -23,17 +23,20 @@ public interface ClipboardHandler
 	public static int NONE = TransferHandler.NONE;
 	
 	
-	public void deleteSelection(Selection selection);
-	public void replaceSelectionWithText(Selection selection, Caret caret, String replacement);
+	public abstract void deleteSelection(Selection selection);
+	public abstract void replaceSelectionWithText(Selection selection, Caret caret, String replacement);
 	
 
-	public int getExportActions(Selection selection);
-	public Transferable createExportTransferable(Selection selection);
-	public void exportDone(Selection selection, Transferable transferable, int action);
+	public abstract int getExportActions(Selection selection);
+	public abstract Transferable createExportTransferable(Selection selection);
+	public abstract void exportDone(Selection selection, Transferable transferable, int action);
 	
-	public boolean canImport(Caret caret, Selection selection, DataTransfer dataTransfer);
-	public boolean importData(Caret caret, Selection selection, DataTransfer dataTransfer);
+	public abstract boolean canImport(Caret caret, Selection selection, DataTransfer dataTransfer);
+	public abstract boolean importData(Caret caret, Selection selection, DataTransfer dataTransfer);
 	
 	
-	public boolean canShareSelectionWith(ClipboardHandler clipboardHandler);
+	public boolean canShareSelectionWith(ClipboardHandler clipboardHandler)
+	{
+		return false;
+	}
 }
