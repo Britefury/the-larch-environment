@@ -14,7 +14,7 @@ import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Selection.Selection;
 
 
-public interface EditHandler
+public interface ClipboardHandler
 {
 	public static int COPY = TransferHandler.COPY;
 	public static int COPY_OR_MOVE = TransferHandler.COPY_OR_MOVE;
@@ -35,5 +35,5 @@ public interface EditHandler
 	public boolean importData(Caret caret, Selection selection, DataTransfer dataTransfer);
 	
 	
-	public boolean canShareSelectionWith(EditHandler editHandler);
+	public boolean canShareSelectionWith(ClipboardHandler clipboardHandler);
 }

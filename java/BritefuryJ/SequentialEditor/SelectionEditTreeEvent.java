@@ -11,20 +11,20 @@ import BritefuryJ.DocPresent.EditEvent;
 
 public class SelectionEditTreeEvent extends EditEvent
 {
-	protected SequentialEditHandler editHandler;
+	protected SequentialClipboardHandler clipboardHandler;
 	protected DPElement sourceElement;
 	
 	
-	protected SelectionEditTreeEvent(SequentialEditHandler editHandler, DPElement sourceElement)
+	protected SelectionEditTreeEvent(SequentialClipboardHandler clipboardHandler, DPElement sourceElement)
 	{
-		this.editHandler = editHandler;
+		this.clipboardHandler = clipboardHandler;
 		this.sourceElement = sourceElement;
 	}
 	
 	
-	public SequentialEditHandler getEditHandler()
+	public SequentialClipboardHandler getClipboardHandler()
 	{
-		return editHandler;
+		return clipboardHandler;
 	}
 	
 	public DPElement getSourceElement()

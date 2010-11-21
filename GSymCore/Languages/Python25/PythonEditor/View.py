@@ -989,7 +989,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			raise TypeError, 'Value of \'quote\' should be a DMObject'
 
 
-		view = quote( valueView, title, _editHandler )
+		view = quote( valueView, title, _clipboardHandler )
 		return specialFormExpressionNodeEditor( self._parser, state, node,
 		                                        view )
 
@@ -1004,7 +1004,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			raise TypeError, 'Value of \'unquote\' should be a DMObject'
 
 
-		view = unquote( valueView, 'UNQUOTE', _editHandler )
+		view = unquote( valueView, 'UNQUOTE', _clipboardHandler )
 		return specialFormExpressionNodeEditor( self._parser, state, node,
 		                                        view )
 
@@ -1577,8 +1577,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 
 _parser = Python25Grammar()
-_editHandler = Python25EditHandler()
-perspective = GSymPerspective( Python25View( _parser ), _editHandler )
+_clipboardHandler = Python25ClipboardHandler()
+perspective = GSymPerspective( Python25View( _parser ), _clipboardHandler )
 
 
 

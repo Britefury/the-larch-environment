@@ -281,7 +281,7 @@ public class GSymView extends IncrementalTree implements Presentable
 		
 		// We need to do this last
 		region.setChild( getRootViewElement().alignHExpand().alignVExpand() );
-		region.setEditHandler( perspective.getEditHandler() );
+		region.setClipboardHandler( perspective.getClipboardHandler() );
 	}
 	
 	

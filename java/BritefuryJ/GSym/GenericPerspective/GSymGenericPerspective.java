@@ -13,7 +13,7 @@ import org.python.core.PyObject;
 import org.python.core.PyType;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DocPresent.Clipboard.EditHandler;
+import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
 import BritefuryJ.GSym.ObjectPresentation.GSymObjectPresentationPerspective;
@@ -82,7 +82,7 @@ public class GSymGenericPerspective extends GSymObjectPresentationPerspective
 	
 	
 	@Override
-	public EditHandler getEditHandler()
+	public ClipboardHandler getClipboardHandler()
 	{
 		return null;
 	}

@@ -9,7 +9,7 @@ from BritefuryJ.DocPresent.Clipboard import *
 from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent import *
 
-from BritefuryJ.SequentialEditor import SequentialEditHandler, SequentialBuffer, SelectionEditTreeEvent
+from BritefuryJ.SequentialEditor import SequentialClipboardHandler, SequentialBuffer, SelectionEditTreeEvent
 
 
 from Britefury.Util.NodeUtil import *
@@ -50,22 +50,22 @@ class PythonDedentTreeEvent (PythonIndentationTreeEvent):
 	pass
 
 class PythonSelectionEditTreeEvent (SelectionEditTreeEvent):
-	def __init__(self, editHandler, sourceElement):
-		super( PythonSelectionEditTreeEvent, self ).__init__( editHandler, sourceElement )
+	def __init__(self, clipboardHandler, sourceElement):
+		super( PythonSelectionEditTreeEvent, self ).__init__( clipboardHandler, sourceElement )
 
 class IndentPythonSelectionTreeEvent (PythonSelectionEditTreeEvent):
-	def __init__(self, editHandler, sourceElement):
-		super( IndentPythonSelectionTreeEvent, self ).__init__( editHandler, sourceElement )
+	def __init__(self, clipboardHandler, sourceElement):
+		super( IndentPythonSelectionTreeEvent, self ).__init__( clipboardHandler, sourceElement )
 
 class DedentPythonSelectionTreeEvent (PythonSelectionEditTreeEvent):
-	def __init__(self, editHandler, sourceElement):
-		super( DedentPythonSelectionTreeEvent, self ).__init__( editHandler, sourceElement )
+	def __init__(self, clipboardHandler, sourceElement):
+		super( DedentPythonSelectionTreeEvent, self ).__init__( clipboardHandler, sourceElement )
 
 
 
-class Python25EditHandler (SequentialEditHandler):
+class Python25ClipboardHandler (SequentialClipboardHandler):
 	def __init__(self):
-		super( Python25EditHandler, self ).__init__( _python25BufferDataFlavor )
+		super( Python25ClipboardHandler, self ).__init__( _python25BufferDataFlavor )
 		self._grammar = Python25Grammar()
 		
 		
@@ -131,7 +131,7 @@ class Python25EditHandler (SequentialEditHandler):
 		visitor.setElementSuffix( element, Schema.Dedent() )
 		bSuccess = element.postTreeEventToParent( event )
 		if not bSuccess:
-			print 'Python25EditHandler._indentLine(): INDENT LINE FAILED'
+			print 'Python25ClipboardHandler._indentLine(): INDENT LINE FAILED'
 			
 	
 	
@@ -146,9 +146,9 @@ class Python25EditHandler (SequentialEditHandler):
 			visitor.setElementSuffix( element, Schema.Indent() )
 			bSuccess = element.postTreeEventToParent( event )
 			if not bSuccess:
-				print 'Python25EditHandler._dedentLine(): DEDENT LINE FAILED'
+				print 'Python25ClipboardHandler._dedentLine(): DEDENT LINE FAILED'
 		else:
-			print 'Python25EditHandler._dedentLine(): Attempted to dedent line in top-level module'
+			print 'Python25ClipboardHandler._dedentLine(): Attempted to dedent line in top-level module'
 			
 				
 				
@@ -181,7 +181,7 @@ class Python25EditHandler (SequentialEditHandler):
 		
 		bSuccess = root.getFragmentContentElement().postTreeEvent( event )
 		if not bSuccess:
-			print 'Python25EditHandler._indentSelection(): INDENT SELECTION FAILED'
+			print 'Python25ClipboardHandler._indentSelection(): INDENT SELECTION FAILED'
 			
 				
 	
@@ -214,7 +214,7 @@ class Python25EditHandler (SequentialEditHandler):
 		
 		bSuccess = rootElement.postTreeEvent( event )
 		if not bSuccess:
-			print 'Python25EditHandler._dedentSelection(): DEDENT SELECTION FAILED'
+			print 'Python25ClipboardHandler._dedentSelection(): DEDENT SELECTION FAILED'
 
 			
 		
@@ -234,6 +234,6 @@ class Python25EditHandler (SequentialEditHandler):
 	
 	
 	
-	def canShareSelectionWith(self, editHandler):
+	def canShareSelectionWith(self, clipboardHandler):
 		return False
 

@@ -14,4 +14,4 @@ from GSymCore.PresTemplate.TemplateEditor.SelectionEditor import *
 def _templateEditor(x, fragment, inheritedState):
 	return x.templateEditorPresent( fragment, inheritedState )
 
-perspective = GSymPerspective( _templateEditor, TemplateEditHandler() )
+perspective = GSymPerspective( _templateEditor, TemplateClipboardHandler() )
