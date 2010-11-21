@@ -44,7 +44,7 @@ import javax.swing.TransferHandler;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Caret.CaretListener;
 import BritefuryJ.DocPresent.Clipboard.DataTransfer;
-import BritefuryJ.DocPresent.Clipboard.EditHandler;
+import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
 import BritefuryJ.DocPresent.Input.DndController;
 import BritefuryJ.DocPresent.Input.DndDropLocal;
 import BritefuryJ.DocPresent.Input.DndDropSwing;
@@ -262,10 +262,10 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				DPRegion region = rootElement.getSelectionRegion();
 				if ( region != null )
 				{
-					EditHandler editHandler = region.getEditHandler();
-					if ( editHandler != null )
+					ClipboardHandler clipboardHandler = region.getClipboardHandler();
+					if ( clipboardHandler != null )
 					{	
-						return editHandler.getExportActions( rootElement.selection );
+						return clipboardHandler.getExportActions( rootElement.selection );
 					}
 				}
 				return NONE;
@@ -283,10 +283,10 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				DPRegion region = rootElement.getSelectionRegion();
 				if ( region != null )
 				{
-					EditHandler editHandler = region.getEditHandler();
-					if ( editHandler != null )
+					ClipboardHandler clipboardHandler = region.getClipboardHandler();
+					if ( clipboardHandler != null )
 					{
-						return editHandler.createExportTransferable( rootElement.selection );
+						return clipboardHandler.createExportTransferable( rootElement.selection );
 					}
 				}
 				return null;
@@ -304,10 +304,10 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				DPRegion region = rootElement.getSelectionRegion();
 				if ( region != null )
 				{
-					EditHandler editHandler = region.getEditHandler();
-					if ( editHandler != null )
+					ClipboardHandler clipboardHandler = region.getClipboardHandler();
+					if ( clipboardHandler != null )
 					{
-						editHandler.exportDone( rootElement.selection, data, action );
+						clipboardHandler.exportDone( rootElement.selection, data, action );
 					}
 				}
 			}
@@ -329,10 +329,10 @@ public class PresentationComponent extends JComponent implements ComponentListen
 					DPRegion region = rootElement.getCaretRegion();
 					if ( region != null )
 					{
-						EditHandler editHandler = region.getEditHandler();
-						if ( editHandler != null )
+						ClipboardHandler clipboardHandler = region.getClipboardHandler();
+						if ( clipboardHandler != null )
 						{
-							return editHandler.canImport( rootElement.caret, rootElement.selection, new DataTransfer( transfer ) );
+							return clipboardHandler.canImport( rootElement.caret, rootElement.selection, new DataTransfer( transfer ) );
 						}
 					}
 					return false;
@@ -358,10 +358,10 @@ public class PresentationComponent extends JComponent implements ComponentListen
 					DPRegion region = rootElement.getCaretRegion();
 					if ( region != null )
 					{
-						EditHandler editHandler = region.getEditHandler();
-						if ( editHandler != null )
+						ClipboardHandler clipboardHandler = region.getClipboardHandler();
+						if ( clipboardHandler != null )
 						{
-							return editHandler.importData( rootElement.caret, rootElement.selection, new DataTransfer( transfer ) );
+							return clipboardHandler.importData( rootElement.caret, rootElement.selection, new DataTransfer( transfer ) );
 						}
 					}
 					return false;
@@ -1414,14 +1414,14 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			DPRegion selectionRegion = getSelectionRegion();
 			if ( selectionRegion != null  &&  !selection.isEmpty() )
 			{
-				EditHandler editHandler = selectionRegion.getEditHandler();
-				if ( editHandler != null )
+				ClipboardHandler clipboardHandler = selectionRegion.getClipboardHandler();
+				if ( clipboardHandler != null )
 				{
 					if ( caret.getMarker().equals( selection.getEndMarker() ) )
 					{
 						caret.moveTo( selection.getStartMarker() );
 					}
-					editHandler.deleteSelection( selection );
+					clipboardHandler.deleteSelection( selection );
 				}
 			}
 		}
@@ -1431,10 +1431,10 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			DPRegion selectionRegion = getSelectionRegion();
 			if ( selectionRegion != null )
 			{
-				EditHandler editHandler = selectionRegion.getEditHandler();
-				if ( editHandler != null )
+				ClipboardHandler clipboardHandler = selectionRegion.getClipboardHandler();
+				if ( clipboardHandler != null )
 				{
-					editHandler.replaceSelectionWithText( selection, caret, replacement );
+					clipboardHandler.replaceSelectionWithText( selection, caret, replacement );
 				}
 			}
 		}

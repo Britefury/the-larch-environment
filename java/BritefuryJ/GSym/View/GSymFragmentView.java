@@ -330,7 +330,7 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	
 	protected static DPElement perspectiveFragmentRegion(DPElement fragmentContents, GSymAbstractPerspective perspective)
 	{
-		return new Region( fragmentContents, perspective.getEditHandler() ).present();
+		return new Region( fragmentContents, perspective.getClipboardHandler() ).present();
 	}
 	
 

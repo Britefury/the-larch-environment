@@ -7,7 +7,7 @@
 package BritefuryJ.GSym;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DocPresent.Clipboard.EditHandler;
+import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.GSym.View.GSymViewFragmentFunction;
@@ -15,13 +15,13 @@ import BritefuryJ.GSym.View.GSymViewFragmentFunction;
 public class GSymPerspective extends GSymAbstractPerspective
 {
 	private GSymViewFragmentFunction fragmentViewFn;
-	private EditHandler editHandler;
+	private ClipboardHandler clipboardHandler;
 	
 	
-	public GSymPerspective(GSymViewFragmentFunction fragmentViewFn, EditHandler editHandler)
+	public GSymPerspective(GSymViewFragmentFunction fragmentViewFn, ClipboardHandler clipboardHandler)
 	{
 		this.fragmentViewFn = fragmentViewFn;
-		this.editHandler = editHandler;
+		this.clipboardHandler = clipboardHandler;
 	}
 	
 	public GSymPerspective(GSymViewFragmentFunction fragmentViewFn)
@@ -39,8 +39,8 @@ public class GSymPerspective extends GSymAbstractPerspective
 
 
 	@Override
-	public EditHandler getEditHandler()
+	public ClipboardHandler getClipboardHandler()
 	{
-		return editHandler;
+		return clipboardHandler;
 	}
 }

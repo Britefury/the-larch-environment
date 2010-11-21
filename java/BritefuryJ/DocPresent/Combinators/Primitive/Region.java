@@ -8,7 +8,7 @@ package BritefuryJ.DocPresent.Combinators.Primitive;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRegion;
-import BritefuryJ.DocPresent.Clipboard.EditHandler;
+import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
@@ -16,7 +16,7 @@ import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 public class Region extends Pres
 {
 	private Pres child;
-	private EditHandler editHandler = null;
+	private ClipboardHandler clipboardHandler = null;
 	
 	
 	public Region(Object child)
@@ -24,10 +24,10 @@ public class Region extends Pres
 		this.child = coerce( child );
 	}
 	
-	public Region(Object child, EditHandler editHandler)
+	public Region(Object child, ClipboardHandler clipboardHandler)
 	{
 		this.child = coerce( child );
-		this.editHandler = editHandler;
+		this.clipboardHandler = clipboardHandler;
 	}
 	
 
@@ -38,9 +38,9 @@ public class Region extends Pres
 		DPElement childElement = child.present( ctx, style );
 		DPRegion element = new DPRegion();
 		element.setChild( childElement );
-		if ( editHandler != null )
+		if ( clipboardHandler != null )
 		{
-			element.setEditHandler( editHandler );
+			element.setClipboardHandler( clipboardHandler );
 		}
 		element.copyAlignmentFlagsFrom( childElement );
 		return element;

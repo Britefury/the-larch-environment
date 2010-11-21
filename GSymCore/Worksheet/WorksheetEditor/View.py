@@ -292,7 +292,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 
 
 
-perspective = GSymPerspective( WorksheetEditor(), WorksheetEditHandler() )
+perspective = GSymPerspective( WorksheetEditor(), WorksheetClipboardHandler() )
 
 
 class WorksheetEditorSubject (GSymSubject):

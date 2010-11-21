@@ -22,8 +22,8 @@ import BritefuryJ.DocPresent.TextEditEventInsert;
 import BritefuryJ.DocPresent.TextEditEventRemove;
 import BritefuryJ.DocPresent.TextEditEventReplace;
 import BritefuryJ.DocPresent.TreeEventListener;
-import BritefuryJ.DocPresent.Clipboard.EditHandler;
-import BritefuryJ.DocPresent.Clipboard.TextEditHandler;
+import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
+import BritefuryJ.DocPresent.Clipboard.TextClipboardHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.Combinators.Primitive.Border;
@@ -179,7 +179,7 @@ public class TextArea extends ControlPres
 		}
 		
 		
-		private class TextAreaEditHandler extends TextEditHandler
+		private class TextAreaClipboardHandler extends TextClipboardHandler
 		{
 			protected void deleteText(Selection selection)
 			{
@@ -219,7 +219,7 @@ public class TextArea extends ControlPres
 	
 	
 			@Override
-			public boolean canShareSelectionWith(EditHandler editHandler)
+			public boolean canShareSelectionWith(ClipboardHandler clipboardHandler)
 			{
 				return false;
 			}
@@ -265,7 +265,7 @@ public class TextArea extends ControlPres
 			element.setValueFunction( new ValueFn() );
 			
 			this.textBox.addElementInteractor( new TextAreaInteractor() );
-			region.setEditHandler( new TextAreaEditHandler() );
+			region.setClipboardHandler( new TextAreaClipboardHandler() );
 			
 			changeText( text, -1 );
 		}

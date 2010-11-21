@@ -279,11 +279,11 @@ class StatementIndentationInteractor (KeyElementInteractor):
 			context = element.getFragmentContext()
 			node = context.getModel()
 			
-			editHandler = element.getRegion().getEditHandler()
+			clipboardHandler = element.getRegion().getClipboardHandler()
 			if event.getModifiers() & KeyEvent.SHIFT_MASK  !=  0:
-				editHandler.dedent( element, context, node )
+				clipboardHandler.dedent( element, context, node )
 			else:
-				editHandler.indent( element, context, node )
+				clipboardHandler.indent( element, context, node )
 			
 			return True
 		else:

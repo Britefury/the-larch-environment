@@ -14,7 +14,7 @@ import java.io.IOException;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Clipboard.DataTransfer;
-import BritefuryJ.DocPresent.Clipboard.EditHandler;
+import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
@@ -23,7 +23,7 @@ import BritefuryJ.DocPresent.StreamValue.StreamValueVisitor;
 import BritefuryJ.GSym.View.FragmentViewFilter;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
-public abstract class SequentialEditHandler implements EditHandler
+public abstract class SequentialClipboardHandler implements ClipboardHandler
 {
 	private FragmentViewFilter editLevelFragmentFilter = new FragmentViewFilter()
 	{
@@ -48,7 +48,7 @@ public abstract class SequentialEditHandler implements EditHandler
 	private DataFlavor bufferFlavor;
 	
 	
-	public SequentialEditHandler(DataFlavor bufferFlavor)
+	public SequentialClipboardHandler(DataFlavor bufferFlavor)
 	{
 		this.bufferFlavor = bufferFlavor;
 	}

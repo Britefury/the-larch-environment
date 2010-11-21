@@ -9,7 +9,7 @@ from BritefuryJ.DocPresent.Clipboard import *
 from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent import *
 
-from BritefuryJ.SequentialEditor import SequentialEditHandler, SequentialBuffer, SelectionEditTreeEvent
+from BritefuryJ.SequentialEditor import SequentialClipboardHandler, SequentialBuffer, SelectionEditTreeEvent
 
 from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder, StreamValue
 
@@ -29,15 +29,15 @@ _worksheetBufferDataFlavor = LocalDataFlavor( WorksheetBuffer )
 
 		
 class WorksheetSelectionEditTreeEvent (SelectionEditTreeEvent):
-	def __init__(self, editHandler, sourceElement):
-		super( WorksheetSelectionEditTreeEvent, self ).__init__( editHandler, sourceElement )
+	def __init__(self, clipboardHandler, sourceElement):
+		super( WorksheetSelectionEditTreeEvent, self ).__init__( clipboardHandler, sourceElement )
 
 		
 
 
-class WorksheetEditHandler (SequentialEditHandler):
+class WorksheetClipboardHandler (SequentialClipboardHandler):
 	def __init__(self):
-		super( WorksheetEditHandler, self ).__init__( _worksheetBufferDataFlavor )
+		super( WorksheetClipboardHandler, self ).__init__( _worksheetBufferDataFlavor )
 		
 		
 	def isEditLevelFragmentView(self, fragment):
@@ -60,6 +60,6 @@ class WorksheetEditHandler (SequentialEditHandler):
 		return WorksheetSelectionEditTreeEvent( self, sourceElement )
 	
 	
-	def canShareSelectionWith(self, editHandler):
+	def canShareSelectionWith(self, clipboardHandler):
 		return False
 

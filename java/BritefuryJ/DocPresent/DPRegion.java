@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import BritefuryJ.DocPresent.Clipboard.EditHandler;
+import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 
 public class DPRegion extends DPProxy
@@ -14,13 +14,13 @@ public class DPRegion extends DPProxy
 	public static class SharableSelectionFilter implements ElementFilter
 	{
 		private DPRegion regionA;
-		private EditHandler handlerA;
+		private ClipboardHandler handlerA;
 		
 		
 		public SharableSelectionFilter(DPRegion regionA)
 		{
 			this.regionA = regionA;
-			handlerA = regionA.getEditHandler();
+			handlerA = regionA.getClipboardHandler();
 		}
 		
 		
@@ -34,7 +34,7 @@ public class DPRegion extends DPProxy
 			}
 			else
 			{
-				EditHandler handlerB = regionB != null  ?  regionB.getEditHandler()  :  null;
+				ClipboardHandler handlerB = regionB != null  ?  regionB.getClipboardHandler()  :  null;
 				if ( handlerA != null )
 				{
 					return handlerA.canShareSelectionWith( handlerB );
@@ -49,7 +49,7 @@ public class DPRegion extends DPProxy
 
 	
 	
-	private EditHandler editHandler;
+	private ClipboardHandler clipboardHandler;
 
 	
 	
@@ -68,7 +68,7 @@ public class DPRegion extends DPProxy
 	{
 		super( element );
 		
-		editHandler = element.editHandler;
+		clipboardHandler = element.clipboardHandler;
 	}
 	
 	
@@ -90,18 +90,18 @@ public class DPRegion extends DPProxy
 
 	//
 	//
-	// EDIT HANDLER
+	// CLIPBOARD HANDLER
 	//
 	//
 	
-	public void setEditHandler(EditHandler handler)
+	public void setClipboardHandler(ClipboardHandler handler)
 	{
-		editHandler = handler;
+		clipboardHandler = handler;
 	}
 	
-	public EditHandler getEditHandler()
+	public ClipboardHandler getClipboardHandler()
 	{
-		return editHandler;
+		return clipboardHandler;
 	}
 	
 	

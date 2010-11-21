@@ -17,7 +17,7 @@ import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.PageLocationResolver;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
-import BritefuryJ.DocPresent.Clipboard.EditHandler;
+import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
@@ -50,7 +50,7 @@ public class GSymBrowserContext
 			}
 
 			@Override
-			public EditHandler getEditHandler()
+			public ClipboardHandler getClipboardHandler()
 			{
 				return null;
 			}

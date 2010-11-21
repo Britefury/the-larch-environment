@@ -7,7 +7,7 @@
 package BritefuryJ.GSym;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DocPresent.Clipboard.EditHandler;
+import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.GSym.PresCom.ApplyPerspective;
 import BritefuryJ.GSym.View.GSymFragmentView;
@@ -29,7 +29,7 @@ public abstract class GSymAbstractPerspective
 		}
 	}
 	
-	public abstract EditHandler getEditHandler();
+	public abstract ClipboardHandler getClipboardHandler();
 
 	
 	public ApplyPerspective applyTo(Object x)
