@@ -27,11 +27,6 @@ public abstract class EditListener implements TreeEventListener
 	protected abstract SequentialEditor getSequentialEditor();
 	
 	
-	protected Class<? extends SelectionEditTreeEvent> getSelectionEditTreeEventClass()
-	{
-		return getSequentialEditor().getSelectionEditTreeEventClass();
-	}
-	
 	private boolean isSelectionEditEvent(EditEvent event)
 	{
 		return getSequentialEditor().isSelectionEditEvent( event );

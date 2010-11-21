@@ -9,7 +9,7 @@ from BritefuryJ.DocPresent.Clipboard import *
 from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent import *
 
-from BritefuryJ.SequentialEditor import SequentialClipboardHandler, SequentialBuffer, SelectionEditTreeEvent
+from BritefuryJ.SequentialEditor import SequentialClipboardHandler, SelectionEditTreeEvent
 
 from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder, StreamValue
 
@@ -18,16 +18,6 @@ from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListene
 
 
 
-class TemplateBuffer (SequentialBuffer):
-	pass
-
-
-
-_templateBufferDataFlavor = LocalDataFlavor( TemplateBuffer )
-
-
-
-		
 class TemplateSelectionEditTreeEvent (SelectionEditTreeEvent):
 	def __init__(self, clipboardHandler, sourceElement):
 		super( TemplateSelectionEditTreeEvent, self ).__init__( clipboardHandler, sourceElement )
@@ -37,29 +27,17 @@ class TemplateSelectionEditTreeEvent (SelectionEditTreeEvent):
 
 class TemplateClipboardHandler (SequentialClipboardHandler):
 	def __init__(self):
-		super( TemplateClipboardHandler, self ).__init__( _templateBufferDataFlavor )
+		super( TemplateClipboardHandler, self ).__init__()
 		
 		
 	def isEditLevelFragmentView(self, fragment):
 		return True
 	
 	
-	def createSelectionBuffer(self, stream):
-		return TemplateBuffer( stream )
-	
-	
-	def filterTextForImport(self, text):
-		return text
-		
-		
 	def copyStructuralValue(self, x):
 		return x.deepCopy()
 	
 	
 	def createSelectionEditTreeEvent(self, sourceElement):
 		return TemplateSelectionEditTreeEvent( self, sourceElement )
-	
-	
-	def canShareSelectionWith(self, clipboardHandler):
-		return False
 

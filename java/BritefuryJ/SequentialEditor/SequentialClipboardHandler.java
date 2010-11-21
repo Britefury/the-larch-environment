@@ -23,7 +23,7 @@ import BritefuryJ.DocPresent.StreamValue.StreamValueVisitor;
 import BritefuryJ.GSym.View.FragmentViewFilter;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
-public abstract class SequentialClipboardHandler implements ClipboardHandler
+public abstract class SequentialClipboardHandler extends ClipboardHandler
 {
 	private FragmentViewFilter editLevelFragmentFilter = new FragmentViewFilter()
 	{
@@ -48,6 +48,11 @@ public abstract class SequentialClipboardHandler implements ClipboardHandler
 	private DataFlavor bufferFlavor;
 	
 	
+	public SequentialClipboardHandler()
+	{
+		this.bufferFlavor = SequentialBuffer.dataFlavor;
+	}
+	
 	public SequentialClipboardHandler(DataFlavor bufferFlavor)
 	{
 		this.bufferFlavor = bufferFlavor;
@@ -56,25 +61,13 @@ public abstract class SequentialClipboardHandler implements ClipboardHandler
 	
 	
 	
-	protected abstract boolean isEditLevelFragmentView(GSymFragmentView fragment);
-	
-	
 	protected boolean isCommonRootEditLevelFragmentView(GSymFragmentView fragment)
 	{
 		return isEditLevelFragmentView( fragment );
 	}
 	
 	
-	protected abstract SequentialBuffer createSelectionBuffer(StreamValue stream);
-	
-	protected String filterTextForImport(String text)
-	{
-		return null;
-	}
-	
 
-	
-	
 	@Override
 	public void deleteSelection(Selection selection)
 	{
@@ -292,6 +285,15 @@ public abstract class SequentialClipboardHandler implements ClipboardHandler
 			catch (IOException e)
 			{
 			}
+			
+			if ( data != null )
+			{
+				SequentialBuffer buffer = (SequentialBuffer)data;
+				if ( !canImportFromClipboardHandler( buffer.clipboardHandler ) )
+				{
+					data = null;
+				}
+			}
 		}
 		
 		
@@ -338,6 +340,13 @@ public abstract class SequentialClipboardHandler implements ClipboardHandler
 	
 	
 	
+
+	//
+	//
+	// OVERRIDE THESE METHODS
+	//
+	//
+	
 	public StreamValue joinStreamsForInsertion(GSymFragmentView subtreeRootFragment, StreamValue before, StreamValue insertion, StreamValue after)
 	{
 		StreamValueBuilder builder = new StreamValueBuilder();
@@ -354,7 +363,33 @@ public abstract class SequentialClipboardHandler implements ClipboardHandler
 		builder.extend( after );
 		return builder.stream();
 	}
+	
+	
+	
+	
+	
+	protected abstract boolean isEditLevelFragmentView(GSymFragmentView fragment);
+	
+	
+	protected SequentialBuffer createSelectionBuffer(StreamValue stream)
+	{
+		return new SequentialBuffer( stream, this );
+	}
+	
+	protected String filterTextForImport(String text)
+	{
+		return text;
+	}
+	
 
+	
+	public boolean canImportFromClipboardHandler(SequentialClipboardHandler clipboardHandler)
+	{
+		return clipboardHandler == this;
+	}
+	
+	
 	public abstract Object copyStructuralValue(Object x);
+	
 	public abstract SelectionEditTreeEvent createSelectionEditTreeEvent(DPElement sourceElement);
 }

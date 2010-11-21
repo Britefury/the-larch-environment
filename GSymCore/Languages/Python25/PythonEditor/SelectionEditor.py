@@ -9,7 +9,7 @@ from BritefuryJ.DocPresent.Clipboard import *
 from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent import *
 
-from BritefuryJ.SequentialEditor import SequentialClipboardHandler, SequentialBuffer, SelectionEditTreeEvent
+from BritefuryJ.SequentialEditor import SequentialClipboardHandler, SelectionEditTreeEvent
 
 
 from Britefury.Util.NodeUtil import *
@@ -28,15 +28,6 @@ from GSymCore.Languages.Python25.PythonEditor.PythonEditOperations import *
 
 class NotImplementedError (Exception):
 	pass
-
-
-class Python25Buffer (SequentialBuffer):
-	pass
-
-
-
-_python25BufferDataFlavor = LocalDataFlavor( Python25Buffer )
-
 
 
 		
@@ -65,16 +56,12 @@ class DedentPythonSelectionTreeEvent (PythonSelectionEditTreeEvent):
 
 class Python25ClipboardHandler (SequentialClipboardHandler):
 	def __init__(self):
-		super( Python25ClipboardHandler, self ).__init__( _python25BufferDataFlavor )
+		super( Python25ClipboardHandler, self ).__init__()
 		self._grammar = Python25Grammar()
 		
 		
 	def isEditLevelFragmentView(self, fragment):
 		return isStmtFragment( fragment )  or  isTopLevelFragment( fragment )
-	
-	
-	def createSelectionBuffer(self, stream):
-		return Python25Buffer( stream )
 	
 	
 	def filterTextForImport(self, text):
@@ -231,9 +218,4 @@ class Python25ClipboardHandler (SequentialClipboardHandler):
 	
 	def createSelectionEditTreeEvent(self, sourceElement):
 		return PythonSelectionEditTreeEvent( self, sourceElement )
-	
-	
-	
-	def canShareSelectionWith(self, clipboardHandler):
-		return False
 
