@@ -139,7 +139,6 @@ class WorksheetEditor (GSymViewObjectDispatch):
 
 		
 		w = Page( [ linkHeader, bodyView ] )
-		w = w.withTreeEventListener( WorksheetNodeEventListener.instance )
 		w = w.withElementInteractor( WorksheetNodeInteractor.instance )
 		w = w.withContextMenuInteractor( _worksheetContextMenuFactory )
 		return w

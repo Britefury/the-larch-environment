@@ -16,28 +16,11 @@ from GSymCore.Worksheet import Schema, ViewSchema
 from GSymCore.Worksheet.WorksheetEditor.NodeOperations import AddNodeOperation
 
 
-class WorksheetNodeEventListener (TreeEventListenerObjectDispatch):
-	def __init__(self):
-		pass
-
-	
-	@ObjectDispatchMethod( AddNodeOperation )
-	def onAddNode(self, element, sourceElement, event):
-		ctx = element.getFragmentContext()
-		node = ctx.getModel()
-		
-		return event.apply( node.getBody() )
-
-
-WorksheetNodeEventListener.instance = WorksheetNodeEventListener()
-
-
-
 class WorksheetNodeInteractor (KeyElementInteractor):
 	def __init__(self):
 		pass
-		
-		
+
+
 	def keyPressed(self, element, event):
 		if event.getKeyCode() == KeyEvent.VK_F5:
 			ctx = element.getFragmentContext()
@@ -46,11 +29,11 @@ class WorksheetNodeInteractor (KeyElementInteractor):
 			return True
 		else:
 			return False
-		
+
 	def keyReleased(self, element, event):
 		return False
-		
+
 	def keyTyped(self, element, event):
 		return False
-		
+
 WorksheetNodeInteractor.instance = WorksheetNodeInteractor()		

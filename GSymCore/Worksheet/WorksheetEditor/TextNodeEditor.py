@@ -23,7 +23,7 @@ from GSymCore.Worksheet.WorksheetEditor.NodeOperations import NodeRequest
 class TextNodeJoinOperation (object):
 	def __init__(self, textNode):
 		self._textNode = textNode
-		
+
 
 	def apply(self, bodyNode):
 		return bodyNode.joinConsecutiveTextNodes( self._textNode )
@@ -34,7 +34,7 @@ class TextNodeSplitOperation (object):
 	def __init__(self, textNode, textLines):
 		self._textNode = textNode
 		self._textLines = textLines
-		
+
 
 	def apply(self, bodyNode):
 		return bodyNode.splitTextNodes( self._textNode, self._textLines )
@@ -44,14 +44,14 @@ class TextNodeSplitOperation (object):
 class PargraphRequest (NodeRequest):
 	def __init__(self, style):
 		self._style = style
-		
+
 	def applyToParagraphNode(self, paragraph, element):
 		paragraph.setStyle( self._style )
 		return True
-		
+
 	def applyToPythonCodeNode(self, pythonCode, element):
 		return self._insertAfter( pythonCode, element )
-	
+
 	def _createModel(self):
 		return ViewSchema.ParagraphView.newParagraphModel( '', self._style )
 
@@ -106,18 +106,18 @@ TextNodeEventListener.instance = TextNodeEventListener()
 class _ParagraphStreamValueFn (ElementValueFunction):
 	def __init__(self, prefix):
 		self._prefix = prefix
-		
+
 	def computeElementValue(self, element):
 		return element.getValue()
-	
+
 	def addStreamValuePrefixToStream(self, builder, element):
 		if self._prefix is not None:
 			builder.append( self._prefix )
-		
+
 	def addStreamValueSuffixToStream(self, builder, element):
 		pass
-			
-			
+
+
 def withParagraphStreamValueFn(pres, prefix):
 	return pres.withValueFunction( _ParagraphStreamValueFn( prefix ) )
 
@@ -127,12 +127,12 @@ def withParagraphStreamValueFn(pres, prefix):
 class TextNodeInteractor (KeyElementInteractor):
 	def __init__(self):
 		pass
-		
-		
+
+
 	def keyTyped(self, element, event):
 		return False
-		
-		
+
+
 	def keyPressed(self, element, event):
 		if event.getModifiers() & KeyEvent.ALT_MASK  !=  0:
 			ctx = element.getFragmentContext()
@@ -159,13 +159,13 @@ class TextNodeInteractor (KeyElementInteractor):
 				return True
 			else:
 				return False
-			
+
 			return True
-			
+
 		return False
-	
-	
-	
+
+
+
 	def keyReleased(self, element, event):
 		return False
 
@@ -174,5 +174,5 @@ class TextNodeInteractor (KeyElementInteractor):
 	def _insertPythonCode(self, ctx, element, node):
 		#return element.postTreeEvent( InsertPythonCodeOperation( node.getModel() ) )
 		return True
-		
+
 TextNodeInteractor.instance = TextNodeInteractor()	

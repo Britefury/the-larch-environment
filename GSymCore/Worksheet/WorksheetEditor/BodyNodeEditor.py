@@ -35,38 +35,14 @@ class BodyNodeEventListener (TreeEventListenerObjectDispatch):
 
 	
 	
-	@ObjectDispatchMethod( DeleteNodeOperation )
+	@ObjectDispatchMethod( DeleteNodeOperation, AddNodeOperation, TextNodeJoinOperation, TextNodeSplitOperation )
 	def onDeleteNode(self, element, sourceElement, event):
 		ctx = element.getFragmentContext()
 		node = ctx.getModel()
 		
 		return event.apply( node )
-	
-
-	@ObjectDispatchMethod( AddNodeOperation )
-	def onAddNode(self, element, sourceElement, event):
-		ctx = element.getFragmentContext()
-		node = ctx.getModel()
-		
-		return event.apply( node )
-	
-	
-	@ObjectDispatchMethod( TextNodeJoinOperation )
-	def onTextJoin(self, element, sourceElement, event):
-		ctx = element.getFragmentContext()
-		node = ctx.getModel()
-		
-		return event.apply( node )
 
 	
-	@ObjectDispatchMethod( TextNodeSplitOperation )
-	def onTextSplit(self, element, sourceElement, event):
-		ctx = element.getFragmentContext()
-		node = ctx.getModel()
-		
-		return event.apply( node )
-
-
 	@ObjectDispatchMethod( WorksheetSelectionEditTreeEvent )
 	def onSelectionEdit(self, element, sourceElement, event):
 		value = element.getStreamValue()
