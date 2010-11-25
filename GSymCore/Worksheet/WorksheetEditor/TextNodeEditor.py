@@ -10,10 +10,13 @@ from java.awt.event import KeyEvent
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.Interactor import *
 
+from BritefuryJ.SequentialEditor import EditListener
+
 
 from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
 
 from GSymCore.Worksheet import Schema, ViewSchema
+from GSymCore.Worksheet.WorksheetEditor.SequentialEditor import WorksheetSequentialEditor
 from GSymCore.Worksheet.WorksheetEditor.SelectionEditor import WorksheetSelectionEditTreeEvent
 from GSymCore.Worksheet.WorksheetEditor.NodeOperations import NodeRequest
 
@@ -58,33 +61,16 @@ class PargraphRequest (NodeRequest):
 
 
 
-class TextNodeEventListener (TreeEventListenerObjectDispatch):
+class TextNodeEditListener (EditListener):
 	def __init__(self):
-		pass
-
-
-	@ObjectDispatchMethod( TextEditEvent )
-	def onTextEdit(self, element, sourceElement, event):
-		value = element.getTextRepresentation()
-		ctx = element.getFragmentContext()
-		node = ctx.getModel()
-		return self._performTextEdit( element, node, value )
-
-
-	@ObjectDispatchMethod( NodeRequest )
-	def onNodeRequest(self, element, sourceElement, event):
-		return event.applyToParagraphNode( element.getFragmentContext().getModel(), element )
-
-
-	@ObjectDispatchMethod( WorksheetSelectionEditTreeEvent )
-	def onSelectionEdit(self, element, sourceElement, event):
-		value = element.getStreamValue()
-		node = element.getFragmentContext().getModel()
-		if value.isTextual():
-			return self._performTextEdit( element, node, value.textualValue() )
-		else:
-			return False
-
+		super( TextNodeEditListener, self ).__init__()
+	
+	def getSequentialEditor(self):
+		return WorksheetSequentialEditor.instance
+	
+	def handleValue(self, element, sourceElement, fragment, event, model, value):
+		bHandled = self._performTextEdit( element, model, value.textualValue() )
+		return EditListener.HandleEditResult.HANDLED   if bHandled   else EditListener.HandleEditResult.NOT_HANDLED
 
 	def _performTextEdit(self, element, node, value):
 		if value.endswith( '\n' ):
@@ -97,29 +83,20 @@ class TextNodeEventListener (TreeEventListenerObjectDispatch):
 		else:
 			return element.postTreeEvent( TextNodeJoinOperation( node ) )
 
-
-TextNodeEventListener.instance = TextNodeEventListener()		
-
+TextNodeEditListener.instance = TextNodeEditListener()
 
 
-
-class _ParagraphStreamValueFn (ElementValueFunction):
-	def __init__(self, prefix):
-		self._prefix = prefix
-
-	def computeElementValue(self, element):
-		return element.getValue()
-
-	def addStreamValuePrefixToStream(self, builder, element):
-		if self._prefix is not None:
-			builder.append( self._prefix )
-
-	def addStreamValueSuffixToStream(self, builder, element):
+class TextNodeEventListener (TreeEventListenerObjectDispatch):
+	def __init__(self):
 		pass
 
 
-def withParagraphStreamValueFn(pres, prefix):
-	return pres.withValueFunction( _ParagraphStreamValueFn( prefix ) )
+	@ObjectDispatchMethod( NodeRequest )
+	def onNodeRequest(self, element, sourceElement, event):
+		return event.applyToParagraphNode( element.getFragmentContext().getModel(), element )
+
+
+TextNodeEventListener.instance = TextNodeEventListener()		
 
 
 

@@ -147,10 +147,12 @@ class WorksheetEditor (GSymViewObjectDispatch):
 	@ObjectDispatchMethod( ViewSchema.BodyView )
 	def Body(self, ctx, inheritedState, node):
 		emptyLine = Paragraph( [ Text( '' ) ] )
+		emptyLine = emptyLine.withTreeEventListener( EmptyEditListener.instance )
 		emptyLine = emptyLine.withTreeEventListener( EmptyEventListener.instance )
 		contentViews = list( InnerFragment.map( node.getContents() ) )  +  [ emptyLine ]
 		
 		w = Body( contentViews )
+		w = w.withTreeEventListener( BodyNodeEditListener.instance )
 		w = w.withTreeEventListener( BodyNodeEventListener.instance )
 		return w
 	
@@ -176,8 +178,8 @@ class WorksheetEditor (GSymViewObjectDispatch):
 		elif style == 'title':
 			p = TitleBar( text )
 		p = _paragraphStyle.applyTo( p )
-		p = withParagraphStreamValueFn( p, node.partialModel() )
-		w = Span( [ p ] )
+		p = p.withTreeEventListener( TextNodeEditListener.instance )
+		w = Span( [ HiddenContent( '' ).withFixedValue( node.partialModel() ), p ] )
 		w = w.withTreeEventListener( TextNodeEventListener.instance )
 		w = w.withElementInteractor( TextNodeInteractor.instance )
 		w = w.withFixedValue( node.getModel() )
