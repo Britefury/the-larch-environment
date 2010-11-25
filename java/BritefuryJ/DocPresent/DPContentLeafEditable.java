@@ -368,13 +368,16 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		{
 			for (Marker m: markers.keySet())
 			{
-				if ( m.getClampedIndex() > position )
+				if ( m.isValid() )
 				{
-					m.setPosition( m.getPosition() + length );
-				}
-				else if ( m.getClampedIndex() == position )
-				{
-					m.setPositionAndBias( position + length - 1, Marker.Bias.END );
+					if ( m.getClampedIndex() > position )
+					{
+						m.setPosition( m.getPosition() + length );
+					}
+					else if ( m.getClampedIndex() == position )
+					{
+						m.setPositionAndBias( position + length - 1, Marker.Bias.END );
+					}
 				}
 			}
 		}
@@ -389,15 +392,18 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 			for (Marker m: markers.keySet())
 			{
-				if ( m.getClampedIndex() >= position )
+				if ( m.isValid() )
 				{
-					if ( m.getClampedIndex() > end )
+					if ( m.getClampedIndex() >= position )
 					{
-						m.setPosition( m.getPosition() - length );
-					}
-					else
-					{
-						m.setPositionAndBias( position, Marker.Bias.START );
+						if ( m.getClampedIndex() > end )
+						{
+							m.setPosition( m.getPosition() - length );
+						}
+						else
+						{
+							m.setPositionAndBias( position, Marker.Bias.START );
+						}
 					}
 				}
 			}

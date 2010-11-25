@@ -314,7 +314,8 @@ public class Marker
 	
 	public int hashCode()
 	{
-		return HashUtils.tripleHash( element.hashCode(), position, bias.hashCode() );
+		int elementHash = element != null  ?  element.hashCode()  :  0;
+		return HashUtils.tripleHash( elementHash, position, bias.hashCode() );
 	}
 	
 	
