@@ -57,6 +57,8 @@ from BritefuryJ.DocPresent.Combinators.Primitive import *
 from BritefuryJ.DocPresent.Combinators.RichText import *
 from BritefuryJ.DocPresent.Combinators.ContextMenu import *
 
+from BritefuryJ.SequentialEditor.Item import *
+
 
 
 _pythonCodeHeaderStyle = StyleSheet.instance.withAttr( Primitive.background, FillPainter( Color( 0.75, 0.8, 0.925 ) ) )
@@ -147,13 +149,11 @@ class WorksheetEditor (GSymViewObjectDispatch):
 	@ObjectDispatchMethod( ViewSchema.BodyView )
 	def Body(self, ctx, inheritedState, node):
 		emptyLine = Paragraph( [ Text( '' ) ] )
-		emptyLine = emptyLine.withTreeEventListener( EmptyEditListener.instance )
-		emptyLine = emptyLine.withTreeEventListener( EmptyEventListener.instance )
+		emptyLine = EditableSequentialItem( [ EmptyEditListener.instance, EmptyEventListener.instance ],  emptyLine )
 		contentViews = list( InnerFragment.map( node.getContents() ) )  +  [ emptyLine ]
 		
 		w = Body( contentViews )
-		w = w.withTreeEventListener( BodyNodeEditListener.instance )
-		w = w.withTreeEventListener( BodyNodeEventListener.instance )
+		w = EditableSequentialItem( [ BodyNodeEditListener.instance, BodyNodeEventListener.instance ],  w )
 		return w
 	
 	
@@ -178,11 +178,10 @@ class WorksheetEditor (GSymViewObjectDispatch):
 		elif style == 'title':
 			p = TitleBar( text )
 		p = _paragraphStyle.applyTo( p )
-		p = p.withTreeEventListener( TextNodeEditListener.instance )
+		p = EditableSequentialItem( [ TextNodeEditListener.instance, TextNodeEventListener.instance ],  p )
 		w = Span( [ HiddenContent( '' ).withFixedValue( node.partialModel() ), p ] )
-		w = w.withTreeEventListener( TextNodeEventListener.instance )
 		w = w.withElementInteractor( TextNodeInteractor.instance )
-		w = w.withFixedValue( node.getModel() )
+		w = StructuralItem( node.getModel(), w )
 		return w
 
 
@@ -239,8 +238,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 		p = _pythonCodeEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
 
 		
-		p = p.withFixedValue( node.getModel() )
-		p = p.withTreeEventListener( PythonCodeNodeEventListener.instance )
+		p = EditableStructuralItem( PythonCodeNodeEventListener.instance, node.getModel(), p )
 		return p
 
 
@@ -285,8 +283,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 		p = _quoteLocationEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
 
 		
-		p = p.withFixedValue( node.getModel() )
-		p = p.withTreeEventListener( QuoteLocationNodeEventListener.instance )
+		p = EditableStructuralItem( QuoteLocationNodeEventListener.instance, node.getModel(), p )
 		return p
 
 
