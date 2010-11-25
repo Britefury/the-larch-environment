@@ -11,6 +11,8 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.io.Serializable;
 
+import BritefuryJ.Utils.HashUtils;
+
 public class Xform2 implements Cloneable, Serializable
 {
 	private static final long serialVersionUID = 1L;
@@ -69,6 +71,11 @@ public class Xform2 implements Cloneable, Serializable
 		}
 		
 		return scale == b.scale  &&  translation.equals( b.translation );
+	}
+	
+	public int hashCode()
+	{
+		return HashUtils.doubleHash( new Double( scale ).hashCode(), translation.hashCode() );
 	}
 
 	

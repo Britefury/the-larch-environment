@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent.Input;
 
 public class InputState
 {
-	public class InvalidPointerException extends RuntimeException
+	public static class InvalidPointerException extends RuntimeException
 	{
 		private static final long serialVersionUID = 1L;
 	}

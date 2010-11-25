@@ -37,7 +37,7 @@ public class ExpanderTestPage extends SystemPage
 	}
 	
 	
-	private class ExpanderTextChanger implements DropDownExpander.ExpanderListener
+	private static class ExpanderTextChanger implements DropDownExpander.ExpanderListener
 	{
 		private ElementRef textElementRef;
 		

@@ -212,10 +212,13 @@ public abstract class IncrementalMonitor
 
 	protected void removeOutgoingDependency(IncrementalFunctionMonitor dep)
 	{
-		outgoingDependencies.put( dep, null );
-		if ( outgoingDependencies == null )
+		if ( outgoingDependencies != null )
 		{
-			outgoingDependencies = new WeakHashMap<IncrementalFunctionMonitor, Object>();
+			outgoingDependencies.remove( dep );
+			if ( outgoingDependencies.isEmpty() )
+			{
+				outgoingDependencies = null;
+			}
 		}
 	}
 }

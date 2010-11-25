@@ -73,20 +73,20 @@ public abstract class BranchExpression extends ParserExpression
 	
 	protected String subexpsToString()
 	{
-		String result = "";
+		StringBuilder result = new StringBuilder();
 		
 		if ( subexps.length > 0 )
 		{
-			result = subexps[0].toString();
+			result.append( subexps[0].toString() );
 			
 			for (int i = 1; i < subexps.length; i++)
 			{
-				result += ", ";
-				result += subexps[i].toString();
+				result.append( ", " );
+				result.append( subexps[i].toString() );
 			}
 		}
 		
-		return result;
+		return result.toString();
 	}
 	
 	protected ParserExpression[] appendToSubexps(ParserExpression x)
