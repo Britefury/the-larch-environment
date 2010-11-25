@@ -966,7 +966,9 @@ public class DMIOReader extends DMIO
 		byte bytes[] = new byte[length];
 		stream.read( bytes );
 		String content = new String( bytes, "ISO-8859-1" );
-		return readFromString( content );
+		Object v = readFromString( content );
+		stream.close();
+		return v;
 	}
 
 	public static Object readFromFile(String filename) throws ParseErrorException, BadModuleNameException, IOException

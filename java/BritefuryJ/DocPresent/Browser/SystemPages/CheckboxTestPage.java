@@ -34,7 +34,7 @@ public class CheckboxTestPage extends SystemPage
 	}
 	
 	
-	private class CheckboxTextChanger implements Checkbox.CheckboxListener
+	private static class CheckboxTextChanger implements Checkbox.CheckboxListener
 	{
 		private ElementRef textElements;
 		

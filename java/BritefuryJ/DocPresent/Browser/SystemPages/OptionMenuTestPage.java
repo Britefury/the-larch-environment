@@ -35,7 +35,7 @@ public class OptionMenuTestPage extends SystemPage
 	}
 	
 	
-	private class OptionMenuTextChanger implements OptionMenu.OptionMenuListener
+	private static class OptionMenuTextChanger implements OptionMenu.OptionMenuListener
 	{
 		private ElementRef textElementRef;
 		

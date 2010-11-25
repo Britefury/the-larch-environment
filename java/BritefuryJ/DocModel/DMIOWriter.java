@@ -261,6 +261,7 @@ public class DMIOWriter extends DMIO
 		FileOutputStream stream = new FileOutputStream( file );
 		byte bytes[] = writeAsString( content ).getBytes( "ISO-8859-1" );
 		stream.write( bytes );
+		stream.close();
 	}
 
 	public static void writeToFile(String filename, Object content) throws InvalidDataTypeException, IOException

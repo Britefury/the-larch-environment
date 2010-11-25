@@ -285,7 +285,7 @@ abstract public class DPContainerSequence extends DPContainer
 	
 	public void __delitem__(PySlice slice)
 	{
-		DPElement[] in = (DPElement[])registeredChildren.toArray();
+		DPElement[] in = registeredChildren.toArray( new DPElement[] {} );
 		
 		DPElement[] removedArray = (DPElement[])JythonSlice.arrayGetSlice( in, slice );
 		

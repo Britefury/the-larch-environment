@@ -67,14 +67,13 @@ public class Combine extends BranchExpression
 		
 		if ( bFinalValueIsString )
 		{
-			String value = "";
+			StringBuilder value = new StringBuilder();
 			for (Object v: values)
 			{
-				String s = (String)v;
-				value += s;
+				value.append( (String)v );
 			}
 			
-			return new ParseResult( value, start, pos, bindings );
+			return new ParseResult( value.toString(), start, pos, bindings );
 		}
 		else
 		{
@@ -133,14 +132,13 @@ public class Combine extends BranchExpression
 		
 		if ( bFinalValueIsString )
 		{
-			String value = "";
+			StringBuilder value = new StringBuilder();
 			for (Object v: values)
 			{
-				String s = (String)v;
-				value += s;
+				value.append( (String)v );
 			}
 			
-			return new ParseResult( value, start, pos, bindings );
+			return new ParseResult( value.toString(), start, pos, bindings );
 		}
 		else
 		{
@@ -199,14 +197,13 @@ public class Combine extends BranchExpression
 		
 		if ( bFinalValueIsString )
 		{
-			String value = "";
+			StringBuilder value = new StringBuilder();
 			for (Object v: values)
 			{
-				String s = (String)v;
-				value += s;
+				value.append( (String)v );
 			}
 			
-			return new ParseResult( value, start, pos, bindings );
+			return new ParseResult( value.toString(), start, pos, bindings );
 		}
 		else
 		{

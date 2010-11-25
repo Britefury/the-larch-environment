@@ -16,6 +16,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPSegment;
 import BritefuryJ.DocPresent.DPElement.IsNotInSubtreeException;
 import BritefuryJ.DocPresent.ElementFilter;
+import BritefuryJ.Utils.HashUtils;
 
 public class Marker
 {
@@ -309,6 +310,11 @@ public class Marker
 		{
 			return element == m.element  &&  position == m.position  &&  bias == m.bias;
 		}
+	}
+	
+	public int hashCode()
+	{
+		return HashUtils.tripleHash( element.hashCode(), position, bias.hashCode() );
 	}
 	
 	

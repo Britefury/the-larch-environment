@@ -20,6 +20,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.Utils.HashUtils;
 
 public class Vector2 implements Cloneable, Presentable, Serializable
 {
@@ -62,6 +63,11 @@ public class Vector2 implements Cloneable, Presentable, Serializable
 		}
 		
 		return x == b.x  &&  y == b.y;
+	}
+	
+	public int hashCode()
+	{
+		return HashUtils.doubleHash( new Double( x ).hashCode(), new Double( y ).hashCode() );
 	}
 	
 	

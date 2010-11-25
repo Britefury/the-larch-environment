@@ -37,7 +37,7 @@ public class SpinEntryTestPage extends SystemPage
 	}
 	
 	
-	private class RealSpinEntryTextChanger implements RealSpinEntry.RealSpinEntryListener
+	private static class RealSpinEntryTextChanger implements RealSpinEntry.RealSpinEntryListener
 	{
 		private DPText textElement;
 		
@@ -56,7 +56,7 @@ public class SpinEntryTestPage extends SystemPage
 
 	
 
-	private class IntSpinEntryTextChanger implements IntSpinEntry.IntSpinEntryListener
+	private static class IntSpinEntryTextChanger implements IntSpinEntry.IntSpinEntryListener
 	{
 		private DPText textElement;
 		

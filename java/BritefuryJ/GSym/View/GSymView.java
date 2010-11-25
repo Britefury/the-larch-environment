@@ -190,7 +190,7 @@ public class GSymView extends IncrementalTree implements Presentable
 		{
 			if ( style == null )
 			{
-				throw new RuntimeException( "null?styleSheet=" + ( style == null ) );
+				throw new RuntimeException( "style == null" );
 			}
 			return HashUtils.nHash( new int[] { System.identityHashCode( perspective ), style.hashCode(), inheritedState.hashCode(), subjectContext.hashCode() } );
 		}

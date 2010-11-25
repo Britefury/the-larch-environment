@@ -66,6 +66,7 @@ public class TextVisual
 		}
 		
 		
+		@Override
 		public Set<Attribute> getAllAttributeKeys()
 		{
 			if ( attribKeys == null )
@@ -187,7 +188,7 @@ public class TextVisual
 			this.text = text;
 			this.font = font;
 			this.bMixedSizeCaps = bMixedSizeCaps;
-			this.hash = HashUtils.tripleHash( text.hashCode(), font.hashCode(), new Boolean( bMixedSizeCaps ).hashCode() );
+			this.hash = HashUtils.tripleHash( text.hashCode(), font.hashCode(), Boolean.valueOf( bMixedSizeCaps ).hashCode() );
 		}
 		
 		
