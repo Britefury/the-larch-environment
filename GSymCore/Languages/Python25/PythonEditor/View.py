@@ -54,6 +54,7 @@ from BritefuryJ.GSym.PresCom import InnerFragment, ApplyPerspective
 from BritefuryJ.GSym import GSymPerspective, GSymSubject
 from BritefuryJ.GSym.View import GSymFragmentView
 
+from BritefuryJ.SequentialEditor import SequentialEditorPerspective
 from BritefuryJ.SequentialEditor.Item import *
 
 
@@ -65,7 +66,7 @@ from GSymCore.Languages.Python25 import ExternalExpression
 from GSymCore.Languages.Python25.PythonEditor.Parser import Python25Grammar
 from GSymCore.Languages.Python25.PythonEditor.PythonEditOperations import *
 from GSymCore.Languages.Python25.PythonEditor.NodeEditor import *
-from GSymCore.Languages.Python25.PythonEditor.SelectionEditor import *
+from GSymCore.Languages.Python25.PythonEditor.SequentialEditor import *
 from GSymCore.Languages.Python25.PythonEditor.Keywords import *
 from GSymCore.Languages.Python25.PythonEditor.Precedence import *
 from GSymCore.Languages.Python25.PythonEditor.PythonEditorCombinators import *
@@ -800,7 +801,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		yView = InnerFragment( y, _withPythonState( state, yPrec, EDITMODE_EDITEXPRESSION ) )
 		#<NO_TREE_EVENT_LISTENER>
 		view = div( xView, yView, '/' )
-		view = BreakableStructuralItem( pythonSequentialEditor, node, view )
+		view = BreakableStructuralItem( PythonSequentialEditor.instance, node, view )
 		return expressionNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_MULDIVMOD,
 		                             view )
@@ -1577,8 +1578,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 
 _parser = Python25Grammar()
-_clipboardHandler = Python25ClipboardHandler()
-perspective = GSymPerspective( Python25View( _parser ), _clipboardHandler )
+perspective = SequentialEditorPerspective( Python25View( _parser ), PythonSequentialEditor.instance )
 
 
 

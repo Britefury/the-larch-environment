@@ -26,7 +26,7 @@ from BritefuryJ.DocPresent.Interactor import KeyElementInteractor
 
 from BritefuryJ.Logging import LogEntry
 
-from BritefuryJ.SequentialEditor import SequentialEditor, ParsingEditListener
+from BritefuryJ.SequentialEditor import SequentialEditor, ParsingEditListener, SelectionEditTreeEvent
 from BritefuryJ.SequentialEditor.EditListener import 	HandleEditResult
 
 
@@ -44,19 +44,7 @@ from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
 from GSymCore.Languages.Python25.PythonEditor.Parser import Python25Grammar
 from GSymCore.Languages.Python25.PythonEditor.Precedence import *
 from GSymCore.Languages.Python25.PythonEditor.PythonEditOperations import *
-from GSymCore.Languages.Python25.PythonEditor.SelectionEditor import PythonSelectionEditTreeEvent, PythonIndentationTreeEvent
-
-
-
-class PythonSequentialEditor (SequentialEditor):
-	def getSelectionEditTreeEventClass(self):
-		return PythonSelectionEditTreeEvent
-	
-	def isEditEvent(self, event):
-		return isinstance( event, PythonIndentationTreeEvent )
-	
-	
-pythonSequentialEditor = PythonSequentialEditor()
+from GSymCore.Languages.Python25.PythonEditor.SequentialEditor import PythonSequentialEditor, PythonSelectionEditTreeEvent, PythonIndentationTreeEvent
 
 
 
@@ -64,7 +52,7 @@ class PythonEditListener (ParsingEditListener):
 	_outerPrecedence = None
 	
 	def getSequentialEditor(self):
-		return pythonSequentialEditor
+		return PythonSequentialEditor.instance
 	
 	def postParseResult(self, value):
 		return removeUnNeededParens( value, self._outerPrecedence )
@@ -279,11 +267,11 @@ class StatementIndentationInteractor (KeyElementInteractor):
 			context = element.getFragmentContext()
 			node = context.getModel()
 			
-			clipboardHandler = element.getRegion().getClipboardHandler()
+			editor = element.getRegion().getClipboardHandler().getSequentialEditor()
 			if event.getModifiers() & KeyEvent.SHIFT_MASK  !=  0:
-				clipboardHandler.dedent( element, context, node )
+				editor.dedent( element, context, node )
 			else:
-				clipboardHandler.indent( element, context, node )
+				editor.indent( element, context, node )
 			
 			return True
 		else:

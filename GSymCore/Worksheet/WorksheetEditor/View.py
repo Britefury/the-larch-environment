@@ -44,7 +44,7 @@ from GSymCore.Worksheet.WorksheetEditor.TextNodeEditor import *
 from GSymCore.Worksheet.WorksheetEditor.BodyNodeEditor import *
 from GSymCore.Worksheet.WorksheetEditor.WorksheetNodeEditor import *
 
-from GSymCore.Worksheet.WorksheetEditor.SelectionEditor import *
+from GSymCore.Worksheet.WorksheetEditor.SequentialEditor import *
 
 from BritefuryJ.Controls import *
 from BritefuryJ.DocPresent import *
@@ -57,6 +57,7 @@ from BritefuryJ.DocPresent.Combinators.Primitive import *
 from BritefuryJ.DocPresent.Combinators.RichText import *
 from BritefuryJ.DocPresent.Combinators.ContextMenu import *
 
+from BritefuryJ.SequentialEditor import SequentialEditorPerspective
 from BritefuryJ.SequentialEditor.Item import *
 
 
@@ -290,7 +291,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 
 
 
-perspective = GSymPerspective( WorksheetEditor(), WorksheetClipboardHandler() )
+perspective = SequentialEditorPerspective( WorksheetEditor(), WorksheetSequentialEditor.instance )
 
 
 class WorksheetEditorSubject (GSymSubject):

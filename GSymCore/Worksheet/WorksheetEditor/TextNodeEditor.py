@@ -16,8 +16,7 @@ from BritefuryJ.SequentialEditor import EditListener
 from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
 
 from GSymCore.Worksheet import Schema, ViewSchema
-from GSymCore.Worksheet.WorksheetEditor.SequentialEditor import WorksheetSequentialEditor
-from GSymCore.Worksheet.WorksheetEditor.SelectionEditor import WorksheetSelectionEditTreeEvent
+from GSymCore.Worksheet.WorksheetEditor.SequentialEditor import WorksheetSelectionEditTreeEvent, WorksheetSequentialEditor
 from GSymCore.Worksheet.WorksheetEditor.NodeOperations import NodeRequest
 
 
