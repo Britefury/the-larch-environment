@@ -12,6 +12,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.EditEvent;
 import BritefuryJ.DocPresent.TextEditEvent;
 import BritefuryJ.DocPresent.TreeEventListener;
+import BritefuryJ.DocPresent.Combinators.Primitive.Region;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.GSym.View.GSymFragmentView;
@@ -66,6 +67,13 @@ public abstract class SequentialEditor
 	public ClearStructuralValueListener getClearStructuralValueListener()
 	{
 		return clearListener;
+	}
+	
+	
+	
+	public Region region(Object child)
+	{
+		return new Region( child, clipboardHandler );
 	}
 	
 	

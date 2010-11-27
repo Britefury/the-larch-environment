@@ -526,13 +526,13 @@ def conditionalExpr(ctx, style, condition, expr, elseExpr):
 
 
 @PyPresCombinatorFn
-def quote(ctx, style, valueView, title, clipboardHandler):
+def quote(ctx, style, valueView, title, sequentialEditor):
 	quoteBorderStyle = style.get( PythonEditorStyle.quoteBorderStyle )
 	quoteTitleStyle = style.get( PythonEditorStyle.quoteTitleStyle )
 
 	titleLabel = quoteTitleStyle.applyTo( Label( title ) )
 
-	region = Region( valueView, clipboardHandler )
+	region = sequentialEditor.region( valueView )
 
 	header = titleLabel.alignHLeft()
 	box = quoteBorderStyle.applyTo( Border( Column( [ header.alignHExpand(), region.pad( 3.0, 3.0 ) ] ) ) ).pad( 1.0, 1.0 )
@@ -543,13 +543,13 @@ def quote(ctx, style, valueView, title, clipboardHandler):
 
 
 @PyPresCombinatorFn
-def unquote(ctx, style, valueView, title, clipboardHandler):
+def unquote(ctx, style, valueView, title, sequentialEditor):
 	unquoteBorderStyle = style.get( PythonEditorStyle.unquoteBorderStyle )
 	unquoteTitleStyle = style.get( PythonEditorStyle.unquoteTitleStyle )
 
 	titleLabel = unquoteTitleStyle.applyTo( Label( title ) )
 
-	region = Region( valueView, clipboardHandler )
+	region = sequentialEditor.region( valueView )
 
 	header = titleLabel.alignHLeft()
 	box = unquoteBorderStyle.applyTo( Border( Column( [ header.alignHExpand(), region.pad( 3.0, 3.0 ) ] ) ) ).pad( 1.0, 1.0 )
