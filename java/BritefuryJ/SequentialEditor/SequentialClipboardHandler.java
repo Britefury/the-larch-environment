@@ -13,8 +13,8 @@ import java.io.IOException;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.DocPresent.Clipboard.DataTransfer;
 import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
+import BritefuryJ.DocPresent.Clipboard.DataTransfer;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
@@ -23,7 +23,7 @@ import BritefuryJ.DocPresent.StreamValue.StreamValueVisitor;
 import BritefuryJ.GSym.View.FragmentViewFilter;
 import BritefuryJ.GSym.View.GSymFragmentView;
 
-public abstract class SequentialClipboardHandler extends ClipboardHandler
+public class SequentialClipboardHandler extends ClipboardHandler
 {
 	private FragmentViewFilter editLevelFragmentFilter = new FragmentViewFilter()
 	{
@@ -46,19 +46,27 @@ public abstract class SequentialClipboardHandler extends ClipboardHandler
 	
 	
 	private DataFlavor bufferFlavor;
+	private SequentialEditor sequentialEditor;
 	
 	
-	public SequentialClipboardHandler()
+	public SequentialClipboardHandler(SequentialEditor sequentialEditor)
 	{
+		this.sequentialEditor = sequentialEditor;
 		this.bufferFlavor = SequentialBuffer.dataFlavor;
 	}
 	
-	public SequentialClipboardHandler(DataFlavor bufferFlavor)
+	public SequentialClipboardHandler(SequentialEditor sequentialEditor, DataFlavor bufferFlavor)
 	{
+		this.sequentialEditor = sequentialEditor;
 		this.bufferFlavor = bufferFlavor;
 	}
 	
 	
+	
+	public SequentialEditor getSequentialEditor()
+	{
+		return sequentialEditor;
+	}
 	
 	
 	protected boolean isCommonRootEditLevelFragmentView(GSymFragmentView fragment)
@@ -349,47 +357,49 @@ public abstract class SequentialClipboardHandler extends ClipboardHandler
 	
 	public StreamValue joinStreamsForInsertion(GSymFragmentView subtreeRootFragment, StreamValue before, StreamValue insertion, StreamValue after)
 	{
-		StreamValueBuilder builder = new StreamValueBuilder();
-		builder.extend( before );
-		builder.extend( insertion );
-		builder.extend( after );
-		return builder.stream();
+		return sequentialEditor.joinStreamsForInsertion( subtreeRootFragment, before, insertion, after );
 	}
 	
 	public StreamValue joinStreamsForDeletion(GSymFragmentView subtreeRootFragment, StreamValue before, StreamValue after)
 	{
-		StreamValueBuilder builder = new StreamValueBuilder();
-		builder.extend( before );
-		builder.extend( after );
-		return builder.stream();
+		return sequentialEditor.joinStreamsForDeletion( subtreeRootFragment, before, after );
 	}
 	
 	
 	
 	
 	
-	protected abstract boolean isEditLevelFragmentView(GSymFragmentView fragment);
+	protected boolean isEditLevelFragmentView(GSymFragmentView fragment)
+	{
+		return sequentialEditor.isClipboardEditLevelFragmentView( fragment );
+	}
 	
 	
 	protected SequentialBuffer createSelectionBuffer(StreamValue stream)
 	{
-		return new SequentialBuffer( stream, this );
+		return sequentialEditor.createSelectionBuffer( stream );
 	}
 	
 	protected String filterTextForImport(String text)
 	{
-		return text;
+		return sequentialEditor.filterTextForImport( text );
 	}
 	
 
 	
 	public boolean canImportFromClipboardHandler(SequentialClipboardHandler clipboardHandler)
 	{
-		return clipboardHandler == this;
+		return sequentialEditor.canImportFromSequentialEditor( clipboardHandler.sequentialEditor );
 	}
 	
 	
-	public abstract Object copyStructuralValue(Object x);
+	public Object copyStructuralValue(Object x)
+	{
+		return sequentialEditor.copyStructuralValue( x );
+	}
 	
-	public abstract SelectionEditTreeEvent createSelectionEditTreeEvent(DPElement sourceElement);
+	public SelectionEditTreeEvent createSelectionEditTreeEvent(DPElement sourceElement)
+	{
+		return sequentialEditor.createSelectionEditTreeEvent( sourceElement );
+	}
 }

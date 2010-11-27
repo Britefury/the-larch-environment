@@ -6,10 +6,15 @@
 //##************************
 package BritefuryJ.SequentialEditor;
 
+import java.awt.datatransfer.DataFlavor;
+
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.EditEvent;
 import BritefuryJ.DocPresent.TextEditEvent;
 import BritefuryJ.DocPresent.TreeEventListener;
+import BritefuryJ.DocPresent.StreamValue.StreamValue;
+import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
+import BritefuryJ.GSym.View.GSymFragmentView;
 
 public abstract class SequentialEditor
 {
@@ -35,6 +40,26 @@ public abstract class SequentialEditor
 	
 	
 	protected ClearStructuralValueListener clearListener = new ClearStructuralValueListener();
+	protected SequentialClipboardHandler clipboardHandler;
+	
+	
+	
+	public SequentialEditor()
+	{
+		this.clipboardHandler = new SequentialClipboardHandler( this );
+	}
+	
+	public SequentialEditor(DataFlavor bufferFlavor)
+	{
+		this.clipboardHandler = new SequentialClipboardHandler( this, bufferFlavor );
+	}
+	
+	
+	
+	public SequentialClipboardHandler getClipboardHandler()
+	{
+		return clipboardHandler;
+	}
 	
 	
 	
@@ -46,8 +71,6 @@ public abstract class SequentialEditor
 	
 
 	
-	protected abstract Class<? extends SelectionEditTreeEvent> getSelectionEditTreeEventClass();
-	
 	protected boolean isEditEvent(EditEvent event)
 	{
 		return false;
@@ -57,6 +80,59 @@ public abstract class SequentialEditor
 	{
 		return getSelectionEditTreeEventClass().isInstance( event );
 	}
+
+
+
+	
+	//
+	//
+	// CLIPBOARD EDIT METHODS  --  CAN OVERRIDE
+	//
+	//
+	
+	protected abstract Class<? extends SelectionEditTreeEvent> getSelectionEditTreeEventClass();
+	
+	protected boolean isClipboardEditLevelFragmentView(GSymFragmentView fragment)
+	{
+		return true;
+	}
+
+	protected String filterTextForImport(String text)
+	{
+		return text;
+	}
+
+	protected SequentialBuffer createSelectionBuffer(StreamValue stream)
+	{
+		return new SequentialBuffer( stream, clipboardHandler );
+	}
+	
+	public boolean canImportFromSequentialEditor(SequentialEditor editor)
+	{
+		return editor == this;
+	}
+	
+	public abstract Object copyStructuralValue(Object x);
+
+	public StreamValue joinStreamsForInsertion(GSymFragmentView subtreeRootFragment, StreamValue before, StreamValue insertion, StreamValue after)
+	{
+		StreamValueBuilder builder = new StreamValueBuilder();
+		builder.extend( before );
+		builder.extend( insertion );
+		builder.extend( after );
+		return builder.stream();
+	}
+	
+	public StreamValue joinStreamsForDeletion(GSymFragmentView subtreeRootFragment, StreamValue before, StreamValue after)
+	{
+		StreamValueBuilder builder = new StreamValueBuilder();
+		builder.extend( before );
+		builder.extend( after );
+		return builder.stream();
+	}
+
+
+	protected abstract SelectionEditTreeEvent createSelectionEditTreeEvent(DPElement sourceElement);
 
 
 

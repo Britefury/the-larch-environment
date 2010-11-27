@@ -3,7 +3,7 @@
 ##-* under the terms of the GNU General Public License version 2 as published by the
 ##-* Free Software Foundation. The full text of the GNU General Public License
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
-##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
+##-* program. This source code is (C)copyright Geoffrey French 1999-2010.
 ##-*************************
 from BritefuryJ.DocPresent.Clipboard import *
 from BritefuryJ.DocPresent.StyleParams import *
@@ -15,22 +15,17 @@ from BritefuryJ.SequentialEditor import SequentialClipboardHandler, SelectionEdi
 from Britefury.Util.NodeUtil import *
 
 
+from BritefuryJ.SequentialEditor import SequentialEditor
 
 from GSymCore.Languages.Python25 import Schema
-from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
 
-from GSymCore.Languages.Python25.PythonEditor.Parser import Python25Grammar
 from GSymCore.Languages.Python25.PythonEditor.Precedence import *
 from GSymCore.Languages.Python25.PythonEditor.PythonEditOperations import *
 
 
 
 
-class NotImplementedError (Exception):
-	pass
 
-
-		
 class PythonIndentationTreeEvent (EditEvent):
 	pass
 
@@ -41,34 +36,64 @@ class PythonDedentTreeEvent (PythonIndentationTreeEvent):
 	pass
 
 class PythonSelectionEditTreeEvent (SelectionEditTreeEvent):
-	def __init__(self, clipboardHandler, sourceElement):
-		super( PythonSelectionEditTreeEvent, self ).__init__( clipboardHandler, sourceElement )
+	pass
 
 class IndentPythonSelectionTreeEvent (PythonSelectionEditTreeEvent):
-	def __init__(self, clipboardHandler, sourceElement):
-		super( IndentPythonSelectionTreeEvent, self ).__init__( clipboardHandler, sourceElement )
+	def __init__(self, sequentialEditor, sourceElement):
+		super( IndentPythonSelectionTreeEvent, self ).__init__( sequentialEditor, sourceElement )
 
 class DedentPythonSelectionTreeEvent (PythonSelectionEditTreeEvent):
-	def __init__(self, clipboardHandler, sourceElement):
-		super( DedentPythonSelectionTreeEvent, self ).__init__( clipboardHandler, sourceElement )
+	def __init__(self, sequentialEditor, sourceElement):
+		super( DedentPythonSelectionTreeEvent, self ).__init__( sequentialEditor, sourceElement )
 
-
-
-class Python25ClipboardHandler (SequentialClipboardHandler):
+		
+		
+		
+		
+class PythonSequentialEditor (SequentialEditor):
 	def __init__(self):
-		super( Python25ClipboardHandler, self ).__init__()
-		self._grammar = Python25Grammar()
-		
-		
-	def isEditLevelFragmentView(self, fragment):
-		return isStmtFragment( fragment )  or  isTopLevelFragment( fragment )
+		super( PythonSequentialEditor, self ).__init__()
 	
+	
+	def isEditEvent(self, event):
+		return isinstance( event, PythonIndentationTreeEvent )
+	
+	
+	def getSelectionEditTreeEventClass(self):
+		return PythonSelectionEditTreeEvent
+	
+	def createSelectionEditTreeEvent(self, sourceElement):
+		return PythonSelectionEditTreeEvent( self, sourceElement )
+	
+	
+	
+	
+	def isClipboardEditLevelFragmentView(self, fragment):
+		return isStmtFragment( fragment )  or  isTopLevelFragment( fragment )
+		
 	
 	def filterTextForImport(self, text):
 		return text.replace( '\t', '' )
-		
-		
-			
+
+	
+	def joinStreamsForInsertion(self, subtreeRootFragment, before, insertion, after):
+		return joinStreamsForInsertion( subtreeRootFragment, before, insertion, after )
+	
+	def joinStreamsForDeletion(self, subtreeRootFragment, before, after):
+		return joinStreamsAroundDeletionPoint( before, after )
+	
+	def copyStructuralValue(self, x):
+		return x.deepCopy()
+
+	
+	
+	
+	#
+	#
+	# INDENT AND DEDENT METHODS
+	#
+	#
+	
 	def indent(self, element, context, node):
 		viewContext = context.getView()
 		selection = viewContext.getSelection()
@@ -118,7 +143,7 @@ class Python25ClipboardHandler (SequentialClipboardHandler):
 		visitor.setElementSuffix( element, Schema.Dedent() )
 		bSuccess = element.postTreeEventToParent( event )
 		if not bSuccess:
-			print 'Python25ClipboardHandler._indentLine(): INDENT LINE FAILED'
+			print 'PythonSequentialEditor._indentLine(): INDENT LINE FAILED'
 			
 	
 	
@@ -133,9 +158,9 @@ class Python25ClipboardHandler (SequentialClipboardHandler):
 			visitor.setElementSuffix( element, Schema.Indent() )
 			bSuccess = element.postTreeEventToParent( event )
 			if not bSuccess:
-				print 'Python25ClipboardHandler._dedentLine(): DEDENT LINE FAILED'
+				print 'PythonSequentialEditor._dedentLine(): DEDENT LINE FAILED'
 		else:
-			print 'Python25ClipboardHandler._dedentLine(): Attempted to dedent line in top-level module'
+			print 'PythonSequentialEditor._dedentLine(): Attempted to dedent line in top-level module'
 			
 				
 				
@@ -168,7 +193,7 @@ class Python25ClipboardHandler (SequentialClipboardHandler):
 		
 		bSuccess = root.getFragmentContentElement().postTreeEvent( event )
 		if not bSuccess:
-			print 'Python25ClipboardHandler._indentSelection(): INDENT SELECTION FAILED'
+			print 'PythonSequentialEditor._indentSelection(): INDENT SELECTION FAILED'
 			
 				
 	
@@ -201,21 +226,10 @@ class Python25ClipboardHandler (SequentialClipboardHandler):
 		
 		bSuccess = rootElement.postTreeEvent( event )
 		if not bSuccess:
-			print 'Python25ClipboardHandler._dedentSelection(): DEDENT SELECTION FAILED'
+			print 'PythonSequentialEditor._dedentSelection(): DEDENT SELECTION FAILED'
+	
+	
+	
+PythonSequentialEditor.instance = PythonSequentialEditor()
 
-			
-		
-			
-	def joinStreamsForInsertion(self, subtreeRootFragment, before, insertion, after):
-		return joinStreamsForInsertion( subtreeRootFragment, before, insertion, after )
-	
-	def joinStreamsForDeletion(self, subtreeRootFragment, before, after):
-		return joinStreamsAroundDeletionPoint( before, after )
-	
-	def copyStructuralValue(self, x):
-		return x.deepCopy()
-	
-	
-	def createSelectionEditTreeEvent(self, sourceElement):
-		return PythonSelectionEditTreeEvent( self, sourceElement )
 
