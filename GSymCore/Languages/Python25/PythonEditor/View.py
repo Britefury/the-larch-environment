@@ -990,7 +990,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			raise TypeError, 'Value of \'quote\' should be a DMObject'
 
 
-		view = quote( valueView, title, _clipboardHandler )
+		view = quote( valueView, title, PythonSequentialEditor.instance )
 		return specialFormExpressionNodeEditor( self._parser, state, node,
 		                                        view )
 
@@ -1005,7 +1005,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			raise TypeError, 'Value of \'unquote\' should be a DMObject'
 
 
-		view = unquote( valueView, 'UNQUOTE', _clipboardHandler )
+		view = unquote( valueView, 'UNQUOTE', PythonSequentialEditor.instance )
 		return specialFormExpressionNodeEditor( self._parser, state, node,
 		                                        view )
 
