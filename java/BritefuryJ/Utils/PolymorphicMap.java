@@ -67,7 +67,7 @@ public class PolymorphicMap <ValueType extends Object> implements Serializable
 		cachedPythonValues.clear();
 	}
 	
-	public void copyFrom(PolymorphicMap<ValueType> values)
+	public void update(PolymorphicMap<ValueType> values)
 	{
 		registeredJavaValues.putAll( values.registeredJavaValues );
 		cachedJavaValues.clear();
