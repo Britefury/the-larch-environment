@@ -7,6 +7,8 @@
 ##-*************************
 import copy
 
+from BritefuryJ.Utils import PolymorphicMap
+
 from Britefury.Dispatch.Dispatch import DispatchError, DispatchDataError
 
 import inspect
@@ -111,13 +113,13 @@ def _getMethodTableForClass(cls):
 		return _methodTables[cls]
 	except KeyError:
 		# Gather the relevant methods for this class
-		methodTable = {}
+		methodTable = PolymorphicMap()
 		# Add entries to the method table
 		for k, v in cls.__dict__.items():
 			if isinstance( v, ObjectDispatchMethodWrapper ):
 				method = v
 				for c in v._classes:
-					methodTable[c] = method
+					methodTable.put( c, method )
 		_methodTables[cls] = methodTable
 		return methodTable
 
@@ -135,7 +137,7 @@ def _initDispatchTableForClass(cls):
 	# The method table is copied from base classes
 
 	# Gather methods from base classes
-	fullMethodTable = {}
+	fullMethodTable = PolymorphicMap()
 	for base in cls.mro():
 		fullMethodTable.update( _getMethodTableForClass( base ) )
 		
@@ -157,27 +159,7 @@ def _getMethodForObject(dispatchInstance, obj):
 	except KeyError:
 		dispatchTable = _initDispatchTableForClass( dispatchClass )
 		
-	
-	# First, try to get a method for the class of @obj
-	objClass = type( obj )
-	try:
-		return dispatchTable[objClass]
-	except KeyError:
-		# Did not find a suitable method
-		# Try looking for one declared for a superclass
-		
-		# Iterate through mro of class
-		method = None
-		for superClass in objClass.mro():
-			# Try to get a method for cls
-			try:
-				method = dispatchTable[superClass]
-				break
-			except KeyError:
-				pass
-		# Cache the result so that any lookups in the future will be faster
-		dispatchTable[objClass] = method
-		return method
+	return dispatchTable.getForInstance( obj )
 		
 		
 def objectMethodDispatch(dispatchInstance, obj, *args):

@@ -7,6 +7,8 @@
 ##-*************************
 import copy
 
+from BritefuryJ.DocModel import DMPolymorphicMap
+
 from Britefury.Util.NodeUtil import isObjectNode, nodeToSXString
 
 from Britefury.Dispatch.Dispatch import DispatchError, DispatchDataError
@@ -141,14 +143,14 @@ def _getMethodTableForClass(cls, numArgs):
 		return _methodTables[cls]
 	except KeyError:
 		# Gather the relevant methods for this class
-		methodTable = {}
+		methodTable = DMPolymorphicMap()
 		# Add entries to the method table
 		for k, v in cls.__dict__.items():
 			if isinstance( v, DMObjectNodeDispatchMethodWrapper ):
 				method = v
 				nodeClass = v._nodeClass
 				method._init( numArgs )
-				methodTable[nodeClass] = method
+				methodTable.put( nodeClass, method )
 		_methodTables[cls] = methodTable
 		return methodTable
 		
@@ -166,7 +168,7 @@ def _initDispatchTableForClass (cls):
 	# The method table is copied from base classes
 	
 	# Gather methods from base classes
-	fullMethodTable = {}
+	fullMethodTable = DMPolymorphicMap()
 	for base in cls.mro():
 		fullMethodTable.update( _getMethodTableForClass( base, numArgs ) )
 		
@@ -189,29 +191,8 @@ def _getMethodForNode(dispatchInstance, node):
 		dispatchTable = dispatchClass.__dict__['__dispatch_table__']
 	except KeyError:
 		dispatchTable = _initDispatchTableForClass( dispatchClass )
-
-	# First, try to get a method for the class of @node
-	try:
-		return dispatchTable[node.getDMNodeClass()]
-	except KeyError:
-		# Did not find a suitable method
-		# Try looking for one declared for a superclass
-		nodeClass = node.getDMNodeClass()
-		
-		# Iterate over all superclasses of @nodeClass, until we hit one that has an entry
-		superClass = nodeClass.getSuperclass()
-		method = None
-		while superClass is not None:
-			# Try to get a method for a superclass of @node
-			try:
-				method = dispatchTable[superClass]
-				break
-			except KeyError:
-				pass
-			superClass = superClass.getSuperclass()
-		# Cache the result so that any lookups in the future will be faster
-		dispatchTable[nodeClass] = method
-		return method
+	
+	return dispatchTable.get( node )
 		
 		
 
