@@ -9,13 +9,13 @@ from BritefuryJ.DocPresent.Clipboard import *
 from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent import *
 
-from BritefuryJ.SequentialEditor import SequentialClipboardHandler, SelectionEditTreeEvent
+from BritefuryJ.Editor.Sequential import SequentialClipboardHandler, SelectionEditTreeEvent
 
 
 from Britefury.Util.NodeUtil import *
 
 
-from BritefuryJ.SequentialEditor import SequentialEditor
+from BritefuryJ.Editor.Sequential import SequentialEditor
 
 from GSymCore.Languages.Python25 import Schema
 

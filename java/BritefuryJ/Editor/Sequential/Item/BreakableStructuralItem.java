@@ -4,13 +4,13 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.SequentialEditor.Item;
+package BritefuryJ.Editor.Sequential.Item;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
-import BritefuryJ.SequentialEditor.SequentialEditor;
+import BritefuryJ.Editor.Sequential.SequentialEditor;
 
 public class BreakableStructuralItem extends Pres
 {
