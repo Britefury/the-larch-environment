@@ -1,1 +1,1 @@
-LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PWD python gsym.py $@
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PWD jython -i gsym.py $@
