@@ -11,7 +11,7 @@ from BritefuryJ.DocPresent import *
 
 from BritefuryJ.Logging import LogEntry
 
-from BritefuryJ.SequentialEditor import EditListener
+from BritefuryJ.SequentialEditor import StreamEditListener
 
 
 from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
@@ -34,7 +34,7 @@ class DeleteNodeOperation (object):
 
 
 
-class BodyNodeEditListener (EditListener):
+class BodyNodeEditListener (StreamEditListener):
 	def __init__(self):
 		super( BodyNodeEditListener, self ).__init__()
 	
@@ -83,7 +83,7 @@ class BodyNodeEditListener (EditListener):
 		
 		model.getModel()['contents'] = xs
 		
-		return EditListener.HandleEditResult.HANDLED
+		return StreamEditListener.HandleEditResult.HANDLED
 
 	
 	
@@ -109,7 +109,7 @@ BodyNodeEventListener.instance = BodyNodeEventListener()
 
 
 
-class EmptyEditListener (EditListener):
+class EmptyEditListener (StreamEditListener):
 	def __init__(self):
 		super( EmptyEditListener, self ).__init__()
 	
@@ -122,7 +122,7 @@ class EmptyEditListener (EditListener):
 			del lines[-1]
 		for line in lines:
 			model.appendModel( ViewSchema.ParagraphView.newParagraphModel( text=line, style='normal' ) )
-		return EditListener.HandleEditResult.HANDLED
+		return StreamEditListener.HandleEditResult.HANDLED
 
 EmptyEditListener.instance = EmptyEditListener()
 

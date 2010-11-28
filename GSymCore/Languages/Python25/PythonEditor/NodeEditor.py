@@ -26,8 +26,8 @@ from BritefuryJ.DocPresent.Interactor import KeyElementInteractor
 
 from BritefuryJ.Logging import LogEntry
 
-from BritefuryJ.SequentialEditor import SequentialEditor, ParsingEditListener, SelectionEditTreeEvent
-from BritefuryJ.SequentialEditor.EditListener import 	HandleEditResult
+from BritefuryJ.SequentialEditor import SequentialEditor, SelectionEditTreeEvent, EditListener, ParsingEditListener
+from BritefuryJ.SequentialEditor.StreamEditListener import HandleEditResult
 
 
 
@@ -44,11 +44,11 @@ from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
 from GSymCore.Languages.Python25.PythonEditor.Parser import Python25Grammar
 from GSymCore.Languages.Python25.PythonEditor.Precedence import *
 from GSymCore.Languages.Python25.PythonEditor.PythonEditOperations import *
-from GSymCore.Languages.Python25.PythonEditor.SequentialEditor import PythonSequentialEditor, PythonSelectionEditTreeEvent, PythonIndentationTreeEvent
+from GSymCore.Languages.Python25.PythonEditor.SequentialEditor import PythonSequentialEditor, PythonIndentationTreeEvent
 
 
 
-class PythonEditListener (ParsingEditListener):
+class PythonParsingEditListener (ParsingEditListener):
 	_outerPrecedence = None
 	
 	def getSequentialEditor(self):
@@ -56,13 +56,21 @@ class PythonEditListener (ParsingEditListener):
 	
 	def postParseResult(self, value):
 		return removeUnNeededParens( value, self._outerPrecedence )
+
+
+
+class PythonEditListener (EditListener):
+	def getSequentialEditor(self):
+		return PythonSequentialEditor.instance
+
+
 #
 #
 # EDIT LISTENERS
 #
 #
 
-class ParsedExpressionEditListener (PythonEditListener):
+class ParsedExpressionEditListener (PythonParsingEditListener):
 	__slots__ = [ '_outerPrecedence' ]
 	
 	def __init__(self, parser, outerPrecedence):
@@ -92,7 +100,7 @@ class ParsedExpressionEditListener (PythonEditListener):
 		
 
 
-class PythonExpressionEditListener (PythonEditListener):
+class PythonExpressionEditListener (PythonParsingEditListener):
 	__slots__ = [ '_outerPrecedence' ]
 	
 	def __init__(self, parser, outerPrecedence):
@@ -140,7 +148,7 @@ class PythonExpressionEditListener (PythonEditListener):
 		
 
 
-class StatementEditListener (PythonEditListener):
+class StatementEditListener (PythonParsingEditListener):
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
 		if not isCompoundStmtHeader( model )  and  not isCompoundStmtHeader( parsed ):
 			log = fragment.getView().getPageLog()
@@ -155,7 +163,7 @@ class StatementEditListener (PythonEditListener):
 
 
 
-class StatementUnparsedEditListener (PythonEditListener):
+class StatementUnparsedEditListener (PythonParsingEditListener):
 	def handleParseFailure(self, element, sourceElement, fragment, event, model, value):
 		log = fragment.getView().getPageLog()
 		if log.isRecording():
@@ -214,7 +222,7 @@ class StatementUnparsedEditListener (PythonEditListener):
 
 
 
-class CompoundHeaderEditListener (PythonEditListener):
+class CompoundHeaderEditListener (PythonParsingEditListener):
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
 		event.getStreamValueVisitor().setElementFixedValue( element, parsed )
 		# Only partially handled - pass it up
@@ -224,7 +232,7 @@ class CompoundHeaderEditListener (PythonEditListener):
 
 
 
-class SuiteEditListener (PythonEditListener):
+class SuiteEditListener (PythonParsingEditListener):
 	__slots__ = [ '_suite' ]
 
 	
@@ -287,9 +295,8 @@ class StatementIndentationInteractor (KeyElementInteractor):
 	
 	
 	
-class PythonModuleTopLevelEditListener (TreeEventListenerObjectDispatch):
-	@ObjectDispatchMethod( PythonSelectionEditTreeEvent, PythonIndentationTreeEvent, TextEditEvent )
-	def onEditEvent(self, element, sourceElement, event):
+class PythonModuleTopLevelEditListener (PythonEditListener):
+	def handleEditEvent(self, element, sourceElement, event):
 		if isinstance( event, TextEditEvent ):
 			event.revert()
 		return True
@@ -299,9 +306,8 @@ PythonModuleTopLevelEditListener.instance = PythonModuleTopLevelEditListener()
 
 
 
-class PythonSuiteTopLevelEditListener (TreeEventListenerObjectDispatch):
-	@ObjectDispatchMethod( PythonSelectionEditTreeEvent, PythonIndentationTreeEvent, TextEditEvent )
-	def onEditEvent(self, element, sourceElement, event):
+class PythonSuiteTopLevelEditListener (PythonEditListener):
+	def handleEditEvent(self, element, sourceElement, event):
 		if isinstance( event, TextEditEvent ):
 			event.revert()
 		return True
@@ -316,25 +322,25 @@ class PythonExpressionNewLineEvent (object):
 		self.model = model
 
 
-class PythonExpressionTopLevelEditListener (TreeEventListenerObjectDispatch):
-	@ObjectDispatchMethod( PythonSelectionEditTreeEvent )
-	def onSelectionEditEvent(self, element, sourceElement, event):
-		return True
-
-	@ObjectDispatchMethod( TextEditEvent )
-	def onTextEditEvent(self, element, sourceElement, event):
-		value = element.getStreamValue()
-		fragment = element.getFragmentContext()
-		model = fragment.getModel()
-		if '\n' in value:
-			element.postTreeEvent( PythonExpressionNewLineEvent( model ) )
-			pyReplaceExpression( fragment, model, model )
-			event.revert()
+class PythonExpressionTopLevelEditListener (PythonEditListener):
+	def handleEditEvent(self, element, sourceElement, event):
+		if isinstance( event, TextEditEvent ):
+			value = element.getStreamValue()
+			fragment = element.getFragmentContext()
+			model = fragment.getModel()
+			if '\n' in value:
+				element.postTreeEvent( PythonExpressionNewLineEvent( model ) )
+				pyReplaceExpression( fragment, model, model )
+				event.revert()
+				return True
+			else:
+				pyReplaceExpression( fragment, model, model )
+				event.revert()
+				return True
+		elif isinstance( event, SelectionEditTreeEvent ):
 			return True
 		else:
-			pyReplaceExpression( fragment, model, model )
-			event.revert()
-			return True
+			return False
 
 PythonExpressionTopLevelEditListener.instance = PythonExpressionTopLevelEditListener()
 

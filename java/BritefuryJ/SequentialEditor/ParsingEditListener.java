@@ -13,7 +13,7 @@ import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Parser.ParseResult;
 import BritefuryJ.Parser.ParserExpression;
 
-public abstract class ParsingEditListener extends EditListener
+public abstract class ParsingEditListener extends StreamEditListener
 {
 	protected ParserExpression parser;
 	

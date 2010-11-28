@@ -10,13 +10,13 @@ from java.awt.event import KeyEvent
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.Interactor import *
 
-from BritefuryJ.SequentialEditor import EditListener
+from BritefuryJ.SequentialEditor import StreamEditListener
 
 
 from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
 
 from GSymCore.Worksheet import Schema, ViewSchema
-from GSymCore.Worksheet.WorksheetEditor.SequentialEditor import WorksheetSelectionEditTreeEvent, WorksheetSequentialEditor
+from GSymCore.Worksheet.WorksheetEditor.SequentialEditor import WorksheetSequentialEditor
 from GSymCore.Worksheet.WorksheetEditor.NodeOperations import NodeRequest
 
 
@@ -60,7 +60,7 @@ class PargraphRequest (NodeRequest):
 
 
 
-class TextNodeEditListener (EditListener):
+class TextNodeEditListener (StreamEditListener):
 	def __init__(self):
 		super( TextNodeEditListener, self ).__init__()
 	
@@ -69,7 +69,7 @@ class TextNodeEditListener (EditListener):
 	
 	def handleValue(self, element, sourceElement, fragment, event, model, value):
 		bHandled = self._performTextEdit( element, model, value.textualValue() )
-		return EditListener.HandleEditResult.HANDLED   if bHandled   else EditListener.HandleEditResult.NOT_HANDLED
+		return StreamEditListener.HandleEditResult.HANDLED   if bHandled   else StreamEditListener.HandleEditResult.NOT_HANDLED
 
 	def _performTextEdit(self, element, node, value):
 		if value.endswith( '\n' ):

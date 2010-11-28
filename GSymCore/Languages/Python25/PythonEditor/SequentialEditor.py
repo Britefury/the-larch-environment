@@ -183,11 +183,10 @@ class PythonSequentialEditor (SequentialEditor):
 		# Get the content element, not the fragment itself, otherwise editing operations that involve the module (top level) will trigger events that will NOT be caught
 		rootElement = root.getFragmentContentElement()
 				
-		startContext.getFragmentContentElement().clearFixedValuesOnPathUpTo( rootElement )
-		endContext.getFragmentContentElement().clearFixedValuesOnPathUpTo( rootElement )
-		
 		event = IndentPythonSelectionTreeEvent( self, rootElement )
 		visitor = event.getStreamValueVisitor()
+		visitor.ignoreElementFixedValuesOnPath( startContext.getFragmentContentElement(), rootElement )
+		visitor.ignoreElementFixedValuesOnPath( endContext.getFragmentContentElement(), rootElement )
 		visitor.setElementPrefix( startStmtElement, Schema.Indent() )
 		visitor.setElementSuffix( endStmtElement, Schema.Dedent() )
 		
@@ -221,6 +220,8 @@ class PythonSequentialEditor (SequentialEditor):
 		
 		event = DedentPythonSelectionTreeEvent( self, rootElement )
 		visitor = event.getStreamValueVisitor()
+		visitor.ignoreElementFixedValuesOnPath( startContext.getFragmentContentElement(), rootElement )
+		visitor.ignoreElementFixedValuesOnPath( endContext.getFragmentContentElement(), rootElement )
 		visitor.setElementPrefix( startStmtElement, Schema.Dedent() )
 		visitor.setElementSuffix( endStmtElement, Schema.Indent() )
 		

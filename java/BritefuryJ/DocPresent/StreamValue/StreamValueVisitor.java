@@ -302,6 +302,26 @@ public class StreamValueVisitor
 		addElementModification( element ).ignoreFixedValue();
 	}
 	
+	public void ignoreElementFixedValuesOnPathUpTo(DPElement element, DPElement rootElement)
+	{
+		if ( !element.isInSubtreeRootedAt( rootElement ) )
+		{
+			throw new RuntimeException( "@element is not in sub-tree rooted at @rootElement" );
+		}
+		
+		while ( element != rootElement )
+		{
+			ignoreElementFixedValue( element );
+			element = element.getParent();
+		}
+	}
+	
+	public void ignoreElementFixedValuesOnPath(DPElement element, DPElement rootElement)
+	{
+		ignoreElementFixedValuesOnPathUpTo( element, rootElement );
+		ignoreElementFixedValue( rootElement );
+	}
+	
 	public void setElementFixedValue(DPElement element, Object value)
 	{
 		addElementModification( element ).setFixedValue( value );
