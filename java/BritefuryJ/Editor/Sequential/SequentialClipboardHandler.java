@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.SequentialEditor;
+package BritefuryJ.Editor.Sequential;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;

@@ -54,8 +54,8 @@ from BritefuryJ.GSym.PresCom import InnerFragment, ApplyPerspective
 from BritefuryJ.GSym import GSymPerspective, GSymSubject
 from BritefuryJ.GSym.View import GSymFragmentView
 
-from BritefuryJ.SequentialEditor import SequentialEditorPerspective
-from BritefuryJ.SequentialEditor.Item import *
+from BritefuryJ.Editor.Sequential import SequentialEditorPerspective
+from BritefuryJ.Editor.Sequential.Item import *
 
 
 

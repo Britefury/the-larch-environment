@@ -57,8 +57,8 @@ from BritefuryJ.DocPresent.Combinators.Primitive import *
 from BritefuryJ.DocPresent.Combinators.RichText import *
 from BritefuryJ.DocPresent.Combinators.ContextMenu import *
 
-from BritefuryJ.SequentialEditor import SequentialEditorPerspective
-from BritefuryJ.SequentialEditor.Item import *
+from BritefuryJ.Editor.Sequential import SequentialEditorPerspective
+from BritefuryJ.Editor.Sequential.Item import *
 
 
 

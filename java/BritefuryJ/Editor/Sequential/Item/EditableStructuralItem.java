@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.SequentialEditor.Item;
+package BritefuryJ.Editor.Sequential.Item;
 
 import java.util.List;
 
@@ -14,21 +14,24 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
-public class EditableSequentialItem extends Pres
+public class EditableStructuralItem extends Pres
 {
 	private TreeEventListener editListeners[];
 	private Pres child;
+	private Object value;
 	
 	
-	public EditableSequentialItem(TreeEventListener editListener, Object child)
+	public EditableStructuralItem(TreeEventListener editListener, Object value, Object child)
 	{
 		this.editListeners = new TreeEventListener[] { editListener };
 		this.child = coerceNonNull( child );
+		this.value = value;
 	}
 
-	public EditableSequentialItem(List<TreeEventListener> editListeners, Object child)
+	public EditableStructuralItem(List<TreeEventListener> editListeners, Object value, Object child)
 	{
 		this.editListeners = editListeners.toArray( new TreeEventListener[] {} );
+		this.value = value;
 		this.child = coerceNonNull( child );
 	}
 
@@ -37,6 +40,7 @@ public class EditableSequentialItem extends Pres
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
 		DPElement element = child.present( ctx, style );
+		element.setFixedValue( value );
 		for (TreeEventListener listener: editListeners)
 		{
 			element.addTreeEventListener( listener );

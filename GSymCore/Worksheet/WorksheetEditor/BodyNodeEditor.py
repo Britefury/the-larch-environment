@@ -11,7 +11,7 @@ from BritefuryJ.DocPresent import *
 
 from BritefuryJ.Logging import LogEntry
 
-from BritefuryJ.SequentialEditor import StreamEditListener
+from BritefuryJ.Editor.Sequential import StreamEditListener
 
 
 from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod

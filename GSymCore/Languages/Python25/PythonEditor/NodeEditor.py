@@ -26,8 +26,8 @@ from BritefuryJ.DocPresent.Interactor import KeyElementInteractor
 
 from BritefuryJ.Logging import LogEntry
 
-from BritefuryJ.SequentialEditor import SequentialEditor, SelectionEditTreeEvent, EditListener, ParsingEditListener
-from BritefuryJ.SequentialEditor.StreamEditListener import HandleEditResult
+from BritefuryJ.Editor.Sequential import SequentialEditor, SelectionEditTreeEvent, EditListener, ParsingEditListener
+from BritefuryJ.Editor.Sequential.StreamEditListener import HandleEditResult
 
 
 
