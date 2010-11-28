@@ -22,7 +22,7 @@ public class SelectionEditTreeEvent extends EditEvent
 	}
 	
 	
-	public SequentialEditor getClipboardHandler()
+	public SequentialEditor getSequentialEditor()
 	{
 		return sequentialEditor;
 	}

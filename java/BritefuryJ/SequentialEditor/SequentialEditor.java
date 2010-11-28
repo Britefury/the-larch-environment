@@ -86,7 +86,15 @@ public abstract class SequentialEditor
 
 	protected boolean isSelectionEditEvent(EditEvent event)
 	{
-		return getSelectionEditTreeEventClass().isInstance( event );
+		if ( event instanceof SelectionEditTreeEvent )
+		{
+			SelectionEditTreeEvent selEvent = (SelectionEditTreeEvent)event;
+			return selEvent.getSequentialEditor() == this;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 
@@ -97,8 +105,6 @@ public abstract class SequentialEditor
 	// CLIPBOARD EDIT METHODS  --  CAN OVERRIDE
 	//
 	//
-	
-	protected abstract Class<? extends SelectionEditTreeEvent> getSelectionEditTreeEventClass();
 	
 	protected boolean isClipboardEditLevelFragmentView(GSymFragmentView fragment)
 	{
@@ -140,7 +146,10 @@ public abstract class SequentialEditor
 	}
 
 
-	protected abstract SelectionEditTreeEvent createSelectionEditTreeEvent(DPElement sourceElement);
+	protected SelectionEditTreeEvent createSelectionEditTreeEvent(DPElement sourceElement)
+	{
+		return new SelectionEditTreeEvent( this, sourceElement );
+	}
 
 
 

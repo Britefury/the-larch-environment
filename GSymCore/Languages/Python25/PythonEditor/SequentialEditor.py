@@ -35,14 +35,11 @@ class PythonIndentTreeEvent (PythonIndentationTreeEvent):
 class PythonDedentTreeEvent (PythonIndentationTreeEvent):
 	pass
 
-class PythonSelectionEditTreeEvent (SelectionEditTreeEvent):
-	pass
-
-class IndentPythonSelectionTreeEvent (PythonSelectionEditTreeEvent):
+class IndentPythonSelectionTreeEvent (SelectionEditTreeEvent):
 	def __init__(self, sequentialEditor, sourceElement):
 		super( IndentPythonSelectionTreeEvent, self ).__init__( sequentialEditor, sourceElement )
 
-class DedentPythonSelectionTreeEvent (PythonSelectionEditTreeEvent):
+class DedentPythonSelectionTreeEvent (SelectionEditTreeEvent):
 	def __init__(self, sequentialEditor, sourceElement):
 		super( DedentPythonSelectionTreeEvent, self ).__init__( sequentialEditor, sourceElement )
 
@@ -57,15 +54,6 @@ class PythonSequentialEditor (SequentialEditor):
 	
 	def isEditEvent(self, event):
 		return isinstance( event, PythonIndentationTreeEvent )
-	
-	
-	def getSelectionEditTreeEventClass(self):
-		return PythonSelectionEditTreeEvent
-	
-	def createSelectionEditTreeEvent(self, sourceElement):
-		return PythonSelectionEditTreeEvent( self, sourceElement )
-	
-	
 	
 	
 	def isClipboardEditLevelFragmentView(self, fragment):
