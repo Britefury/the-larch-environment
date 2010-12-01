@@ -19,7 +19,7 @@ from BritefuryJ.DocPresent.Combinators.Primitive import *
 from BritefuryJ.DocPresent.Combinators.RichText import *
 from BritefuryJ.DocPresent.Combinators.Sequence import *
 
-from GSymCore.Languages.Utils.Precedence import applyParens
+from BritefuryJ.Editor.Language import PrecedenceBrackets
 
 
 EDITMODE_DISPLAYCONTENTS = 0
@@ -208,7 +208,7 @@ def _keyword(keyword):
 
 def applyPythonParens(expr, precedence, numAdditionalParens, inheritedState):
 	outerPrecedence = inheritedState['outerPrecedence']
-	return applyParens( expr, precedence, outerPrecedence, numAdditionalParens, _openParen, _closeParen )
+	return PrecedenceBrackets( expr, precedence, outerPrecedence, numAdditionalParens, _openParen, _closeParen )
 
 def getOuterPrecedence(inheritedState):
 	return inheritedState['outerPrecedence']
