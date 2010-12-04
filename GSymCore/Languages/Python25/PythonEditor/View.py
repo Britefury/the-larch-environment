@@ -103,7 +103,7 @@ def unparsedNodeEditor(grammar, inheritedState, node, precedence, contents):
 		return contents
 	elif mode == EDITMODE_EDITEXPRESSION:
 		outerPrecedence = getOuterPrecedence( inheritedState )
-		contents = EditableSequentialItem( instanceCache( ParsedExpressionEditListener, grammar.expression(), outerPrecedence ),  contents )
+		contents = EditableSequentialItem( instanceCache( ParsedExpressionEditListener, grammar.expression() ),  contents )
 		return contents
 	elif mode == EDITMODE_EDITSTATEMENT:
 		s = statementLine( contents )
@@ -126,7 +126,7 @@ def expressionNodeEditor(grammar, inheritedState, node, precedence, contents):
 
 		if _nodeRequiresParens( node ):
 			contents = applyPythonParens( contents, precedence, getNumParens( node ), inheritedState )
-		contents = EditableSequentialItem( instanceCache( ParsedExpressionEditListener, grammar.expression(), outerPrecedence ),  contents )
+		contents = EditableSequentialItem( instanceCache( ParsedExpressionEditListener, grammar.expression() ),  contents )
 		return contents
 	else:
 		raise ValueError, 'invalid mode %d'  %  mode
@@ -437,7 +437,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		e = Paragraph( [ seg ] )
 		_inlineObject_dropDest = ObjectDndHandler.DropDest( GSymFragmentView.FragmentModel, _onDrop_inlineObject )
 		e = e.withDropDest( _inlineObject_dropDest )
-		e = EditableStructuralItem( [ instanceCache( PythonExpressionEditListener, self._parser.expression(), PRECEDENCE_NONE ),
+		e = EditableStructuralItem( [ instanceCache( PythonExpressionEditListener, self._parser.expression() ),
 		                              PythonExpressionTopLevelEditListener.instance ],  node,  e )
 		e = e.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		return e

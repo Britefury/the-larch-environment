@@ -49,13 +49,8 @@ from GSymCore.Languages.Python25.PythonEditor.SequentialEditor import PythonSequ
 
 
 class PythonParsingEditListener (ParsingEditListener):
-	_outerPrecedence = None
-	
 	def getSequentialEditor(self):
 		return PythonSequentialEditor.instance
-	
-	def postParseResult(self, value):
-		return removeUnNeededParens( value, self._outerPrecedence )
 
 
 
@@ -71,13 +66,6 @@ class PythonEditListener (EditListener):
 #
 
 class ParsedExpressionEditListener (PythonParsingEditListener):
-	__slots__ = [ '_outerPrecedence' ]
-	
-	def __init__(self, parser, outerPrecedence):
-		super( ParsedExpressionEditListener, self ).__init__( parser )
-		self._outerPrecedence = outerPrecedence
-	
-		
 	def testValueEmpty(self, element, fragment, model, value):
 		return value.isTextual()  and  value.textualValue().strip() == ''
 	
@@ -101,13 +89,6 @@ class ParsedExpressionEditListener (PythonParsingEditListener):
 
 
 class PythonExpressionEditListener (PythonParsingEditListener):
-	__slots__ = [ '_outerPrecedence' ]
-	
-	def __init__(self, parser, outerPrecedence):
-		super( PythonExpressionEditListener, self ).__init__( parser )
-		self._outerPrecedence = outerPrecedence
-	
-		
 	def handleEmptyValue(self, element, fragment, event, model):
 		log = fragment.getView().getPageLog()
 		if log.isRecording():

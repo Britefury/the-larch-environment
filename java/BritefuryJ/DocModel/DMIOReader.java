@@ -631,6 +631,13 @@ public class DMIOReader extends DMIO
 	{
 		while ( pos < source.length() )
 		{
+			eatWhitespace();
+			
+			if ( pos >= source.length() )
+			{
+				break;
+			}
+			
 			if ( source.charAt( pos ) == '}' )
 			{
 				// This character is used to close the bindings; the objects are contained *within* this bindings list,
