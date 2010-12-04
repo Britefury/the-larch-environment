@@ -17,7 +17,6 @@ import Britefury.Tests.Britefury.Dispatch.TestDMObjectNodeMethodDispatch
 #import Britefury.Tests.Britefury.AttributeVisitor.TestAttributeVisitor
 import GSymCore.Languages.Python25.CodeGenerator
 import GSymCore.Languages.Python25.Python25Importer
-import GSymCore.Languages.Python25.PythonEditor.Precedence
 import GSymCore.Languages.Python25.PythonEditor.Parser
 import GSymCore.Languages.Java.JavaEditor.Parser
 
@@ -31,7 +30,6 @@ testModules = [ Britefury.Dispatch.Dispatch,
 		#Britefury.Tests.Britefury.AttributeVisitor.TestAttributeVisitor,
 		GSymCore.Languages.Python25.CodeGenerator,
 		GSymCore.Languages.Python25.Python25Importer,
-		GSymCore.Languages.Python25.PythonEditor.Precedence,
 		GSymCore.Languages.Python25.PythonEditor.Parser,
 		GSymCore.Languages.Java.JavaEditor.Parser
 		]

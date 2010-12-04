@@ -22,11 +22,11 @@ public class PrecedenceBrackets extends CompositePres
 	
 	
 	
-	public PrecedenceBrackets(Object child, int precedence, int outerPrecedence, int numAdditionalBrackets, Object openBracket, Object closeBracket)
+	public PrecedenceBrackets(Object child, int precedence, int outerPrecedence, int numBrackets, Object openBracket, Object closeBracket)
 	{
 		this.child = Pres.coerce( child );
 		int required = numBracketsRequired( precedence, outerPrecedence );
-		numBrackets = required + numAdditionalBrackets;
+		this.numBrackets = Math.max( numBrackets, required );
 		this.openBracket = Pres.coerce( openBracket );
 		this.closeBracket = Pres.coerce( closeBracket );
 	}

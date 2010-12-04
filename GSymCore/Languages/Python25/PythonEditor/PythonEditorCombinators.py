@@ -206,9 +206,9 @@ def _keyword(keyword):
 #
 #
 
-def applyPythonParens(expr, precedence, numAdditionalParens, inheritedState):
+def applyPythonParens(expr, precedence, numParens, inheritedState):
 	outerPrecedence = inheritedState['outerPrecedence']
-	return PrecedenceBrackets( expr, precedence, outerPrecedence, numAdditionalParens, _openParen, _closeParen )
+	return PrecedenceBrackets( expr, precedence, outerPrecedence, numParens, _openParen, _closeParen )
 
 def getOuterPrecedence(inheritedState):
 	return inheritedState['outerPrecedence']
