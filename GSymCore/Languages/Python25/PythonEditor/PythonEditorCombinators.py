@@ -19,8 +19,6 @@ from BritefuryJ.DocPresent.Combinators.Primitive import *
 from BritefuryJ.DocPresent.Combinators.RichText import *
 from BritefuryJ.DocPresent.Combinators.Sequence import *
 
-from BritefuryJ.Editor.Language import PrecedenceBrackets
-
 
 EDITMODE_DISPLAYCONTENTS = 0
 EDITMODE_EDITEXPRESSION = 1
@@ -175,6 +173,9 @@ _space = Text( ' ' )
 _lineBreak = LineBreak()
 
 
+openParen = ApplyStyleSheetFromAttribute( PythonEditorStyle.delimStyle, Text( '(' ) )
+closeParen = ApplyStyleSheetFromAttribute( PythonEditorStyle.delimStyle, Text( ')' ) )
+
 _openParen = ApplyStyleSheetFromAttribute( PythonEditorStyle.delimStyle, Text( '(' ) )
 _closeParen = ApplyStyleSheetFromAttribute( PythonEditorStyle.delimStyle, Text( ')' ) )
 _openBracket = ApplyStyleSheetFromAttribute( PythonEditorStyle.delimStyle, Text( '[' ) )
@@ -205,6 +206,7 @@ def _keyword(keyword):
 # Precedence
 #
 #
+
 
 def applyPythonParens(expr, precedence, numParens, inheritedState):
 	return PrecedenceBrackets.editorPrecedenceBrackets( expr, precedence, numParens, inheritedState, _openParen, _closeParen )

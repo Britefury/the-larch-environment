@@ -56,7 +56,9 @@ from BritefuryJ.GSym.View import GSymFragmentView
 
 from BritefuryJ.Editor.Sequential import SequentialEditorPerspective
 from BritefuryJ.Editor.Sequential.Item import *
-from BritefuryJ.Editor.Language import PrecedenceBrackets
+from BritefuryJ.Editor.Language.Precedence import PrecedenceHandler
+
+from BritefuryJ.ModelAccess.DocModel import *
 
 
 
@@ -83,9 +85,9 @@ _statementIndentationInteractor = StatementIndentationInteractor()
 
 
 
+_pythonPrecedenceHandler = PrecedenceHandler( ClassAttributeReader( parensRequired ), ObjectFieldReader( 'parens' ).stringToInteger( -1 ), openParen, closeParen )
 
-def _nodeRequiresParens(node):
-	return node.isInstanceOf( Schema.Expr )  or  node.isInstanceOf( Schema.Target )
+
 
 def computeBinOpViewPrecedenceValues(precedence, bRightAssociative):
 	if bRightAssociative:
@@ -99,8 +101,7 @@ def computeBinOpViewPrecedenceValues(precedence, bRightAssociative):
 def unparsedNodeEditor(grammar, inheritedState, node, precedence, contents):
 	mode = inheritedState['editMode']
 	if mode == EDITMODE_DISPLAYCONTENTS:
-		if parensRequired[node]:
-			contents = applyPythonParens( contents, precedence, getNumParens( node ), inheritedState )
+		contents = _pythonPrecedenceHandler.applyPrecedenceBrackets( node, contents, precedence   if precedence is not None   else -1, inheritedState )
 		return contents
 	elif mode == EDITMODE_EDITEXPRESSION:
 		contents = EditableSequentialItem( instanceCache( ParsedExpressionEditListener, grammar.expression() ),  contents )
@@ -118,12 +119,10 @@ def unparsedNodeEditor(grammar, inheritedState, node, precedence, contents):
 def expressionNodeEditor(grammar, inheritedState, node, precedence, contents):
 	mode = inheritedState['editMode']
 	if mode == EDITMODE_DISPLAYCONTENTS:
-		if parensRequired[node]:
-			contents = applyPythonParens( contents, precedence, getNumParens( node ), inheritedState )
+		contents = _pythonPrecedenceHandler.applyPrecedenceBrackets( node, contents, precedence   if precedence is not None   else -1, inheritedState )
 		return contents
 	elif mode == EDITMODE_EDITEXPRESSION:
-		if parensRequired[node]:
-			contents = applyPythonParens( contents, precedence, getNumParens( node ), inheritedState )
+		contents = _pythonPrecedenceHandler.applyPrecedenceBrackets( node, contents, precedence   if precedence is not None   else -1, inheritedState )
 		contents = EditableSequentialItem( instanceCache( ParsedExpressionEditListener, grammar.expression() ),  contents )
 		return contents
 	else:
