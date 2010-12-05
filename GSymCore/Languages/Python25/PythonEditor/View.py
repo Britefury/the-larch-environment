@@ -306,7 +306,7 @@ def _inlineObjectExprContextMenuFactory(element, menu):
 	model = fragment.getModel()
 
 	def _onDelete(item):
-		pyReplaceExpression( fragment, model, Schema.Load( name='None' ) )
+		pyReplaceNode( model, Schema.Load( name='None' ) )
 
 	deleteItem = MenuItem.menuItemWithLabel( 'Delete inline object', _onDelete )
 	menu.add( deleteItem )
@@ -319,7 +319,7 @@ def _inlineObjectStmtContextMenuFactory(element, menu):
 	model = fragment.getModel()
 
 	def _onDelete(item):
-		pyReplaceStmt( fragment, model, Schema.BlankLine() )
+		pyReplaceNode( model, Schema.BlankLine() )
 
 	deleteItem = MenuItem.menuItemWithLabel( 'Delete inline object', _onDelete )
 	menu.add( deleteItem )
@@ -1026,7 +1026,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			title = 'ext'
 
 		def _onDeleteButton(button, event):
-			pyReplaceExpression( ctx, node, Schema.Load( name='None' ) )
+			pyReplaceNode( node, Schema.Load( name='None' ) )
 
 
 		deleteButton = Button( Image.systemIcon( 'delete_tiny' ), _onDeleteButton )

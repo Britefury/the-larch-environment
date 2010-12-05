@@ -153,21 +153,19 @@ def getStatementDepth(ctx):
 #
 
 
-def pyReplaceNode(fragment, data, replacement):
+def pyForceNodeRefresh(data):
+	pyReplaceNode( data, data )
+
+def pyReplaceNode(data, replacement):
 	data.become( replacement.deepCopy() )
 
-def pyReplaceExpression(fragment, data, replacement):
-	data.become( replacement.deepCopy() )
-
-
-	
-def pyReplaceStmt(fragment, target, replacement, bDontReplaceIfEqual=True):
-	if target == replacement  and  bDontReplaceIfEqual:
-		# Same content; ignore
+def pyReplaceNodeIfNotEqual(target, replacement):
+	if target == replacement:
 		pass
 	else:
 		target.become( replacement.deepCopy() )
-			
+
+		
 def modifySuiteMinimisingChanges(target, modified):
 	commonPrefixLen = 0
 	for i, (t, m) in enumerate( zip( target, modified ) ):
