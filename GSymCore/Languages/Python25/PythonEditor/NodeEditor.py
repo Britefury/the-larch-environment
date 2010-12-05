@@ -81,7 +81,7 @@ class ParsedExpressionEditListener (PythonParsingEditListener):
 		if log.isRecording():
 			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - success' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ).vItem( 'parsedResult', parsed ) )
 		if parsed != model:
-			pyReplaceExpression( fragment, model, parsed )
+			pyReplaceNodeIfNotEqual( model, parsed )
 		return HandleEditResult.HANDLED
 		
 		
@@ -105,7 +105,7 @@ class PythonExpressionEditListener (PythonParsingEditListener):
 			if expr is None:
 				model['expr'] = parsed
 			else:
-				pyReplaceExpression( fragment, expr, parsed )
+				pyReplaceNode( expr, parsed )
 		return HandleEditResult.HANDLED
 		
 	def handleParseFailure(self, element, sourceElement, fragment, event, model, value):
@@ -118,7 +118,7 @@ class PythonExpressionEditListener (PythonParsingEditListener):
 			if expr is None:
 				model['expr'] = unparsed
 			else:
-				pyReplaceExpression( fragment, expr, unparsed )
+				pyReplaceNodeIfNotEqual( expr, unparsed )
 			return HandleEditResult.HANDLED
 		else:
 			return HandleEditResult.NOT_HANDLED
@@ -135,7 +135,7 @@ class StatementEditListener (PythonParsingEditListener):
 			log = fragment.getView().getPageLog()
 			if log.isRecording():
 				log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ).vItem( 'parsedResult', parsed ) )
-			pyReplaceStmt( fragment, model, parsed )
+			pyReplaceNodeIfNotEqual( model, parsed )
 			return HandleEditResult.HANDLED
 		else:
 			event.getStreamValueVisitor().setElementFixedValue( element, parsed )
@@ -159,7 +159,7 @@ class StatementUnparsedEditListener (PythonParsingEditListener):
 		# This normally leads to blank lines doubling on each press of the return key
 		#
 		# TODO: IMPROVE THIS TECHNIQUE - THIS IS A HACK
-		pyReplaceStmt( fragment, model, model, False )
+		pyForceNodeRefresh( model )
 		
 		return HandleEditResult.NOT_HANDLED
 
@@ -175,7 +175,7 @@ class StatementUnparsedEditListener (PythonParsingEditListener):
 			log = fragment.getView().getPageLog()
 			if log.isRecording():
 				log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - unparsed, node replaced' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ).vItem( 'parsedResult', parsed ) )
-			pyReplaceNode( fragment, model, parsed )
+			pyReplaceNode( model, parsed )
 			return HandleEditResult.HANDLED
 		else:
 			sourceFragmentElement = sourceFragment.getFragmentContentElement()
@@ -188,14 +188,14 @@ class StatementUnparsedEditListener (PythonParsingEditListener):
 					log = fragment.getView().getPageLog()
 					if log.isRecording():
 						log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - unparsed, sub-node deleted' ).vItem( 'editedStream', sourceValue ).hItem( 'parser', self.parser ).vItem( 'parsedResult', parsed ).vItem( 'sourceNode', sourceNode ) )
-					pyReplaceStmt( fragment, model, parsed )
+					pyReplaceNodeIfNotEqual( model, parsed )
 					return HandleEditResult.HANDLED
 			
 			unparsed = Schema.UNPARSED( value=sourceValue.getItemValues() )
 			log = fragment.getView().getPageLog()
 			if log.isRecording():
 				log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - unparsed, sub-node replaced' ).vItem( 'editedStream', sourceValue ).hItem( 'parser', self.parser ).vItem( 'parsedResult', unparsed ) )
-			pyReplaceNode( sourceFragment, sourceNode, unparsed )
+			pyReplaceNode( sourceNode, unparsed )
 			return HandleEditResult.HANDLED
 
 
@@ -311,11 +311,11 @@ class PythonExpressionTopLevelEditListener (PythonEditListener):
 			model = fragment.getModel()
 			if '\n' in value:
 				element.postTreeEvent( PythonExpressionNewLineEvent( model ) )
-				pyReplaceExpression( fragment, model, model )
+				pyForceNodeRefresh( model )
 				event.revert()
 				return True
 			else:
-				pyReplaceExpression( fragment, model, model )
+				pyForceNodeRefresh( model )
 				event.revert()
 				return True
 		elif isinstance( event, SelectionEditTreeEvent ):
