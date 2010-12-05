@@ -56,6 +56,7 @@ from BritefuryJ.GSym.View import GSymFragmentView
 
 from BritefuryJ.Editor.Sequential import SequentialEditorPerspective
 from BritefuryJ.Editor.Sequential.Item import *
+from BritefuryJ.Editor.Language import PrecedenceBrackets
 
 
 
@@ -98,11 +99,10 @@ def computeBinOpViewPrecedenceValues(precedence, bRightAssociative):
 def unparsedNodeEditor(grammar, inheritedState, node, precedence, contents):
 	mode = inheritedState['editMode']
 	if mode == EDITMODE_DISPLAYCONTENTS:
-		if _nodeRequiresParens( node ):
+		if parensRequired[node]:
 			contents = applyPythonParens( contents, precedence, getNumParens( node ), inheritedState )
 		return contents
 	elif mode == EDITMODE_EDITEXPRESSION:
-		outerPrecedence = getOuterPrecedence( inheritedState )
 		contents = EditableSequentialItem( instanceCache( ParsedExpressionEditListener, grammar.expression() ),  contents )
 		return contents
 	elif mode == EDITMODE_EDITSTATEMENT:
@@ -118,13 +118,11 @@ def unparsedNodeEditor(grammar, inheritedState, node, precedence, contents):
 def expressionNodeEditor(grammar, inheritedState, node, precedence, contents):
 	mode = inheritedState['editMode']
 	if mode == EDITMODE_DISPLAYCONTENTS:
-		if _nodeRequiresParens( node ):
+		if parensRequired[node]:
 			contents = applyPythonParens( contents, precedence, getNumParens( node ), inheritedState )
 		return contents
 	elif mode == EDITMODE_EDITEXPRESSION:
-		outerPrecedence = getOuterPrecedence( inheritedState )
-
-		if _nodeRequiresParens( node ):
+		if parensRequired[node]:
 			contents = applyPythonParens( contents, precedence, getNumParens( node ), inheritedState )
 		contents = EditableSequentialItem( instanceCache( ParsedExpressionEditListener, grammar.expression() ),  contents )
 		return contents

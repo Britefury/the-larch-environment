@@ -152,6 +152,14 @@ rightAssociative.commit()
 
 
 
+parensRequired = DMClassAttribute( 'parensRequired', Schema.Node )
+parensRequired[Schema.Node] = False
+parensRequired[Schema.Expr] = True
+parensRequired[Schema.Target] = True
+parensRequired.commit()
+
+
+
 def getNumParens(node):
 	try:
 		p = node['parens']

@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.Editor.Language;
 
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.CompositePres;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
@@ -22,9 +23,9 @@ public class PrecedenceBrackets extends CompositePres
 	
 	
 	
-	public PrecedenceBrackets(Object child, int precedence, int outerPrecedence, int numBrackets, Object openBracket, Object closeBracket)
+	public PrecedenceBrackets(Object contents, int precedence, int outerPrecedence, int numBrackets, Object openBracket, Object closeBracket)
 	{
-		this.child = Pres.coerce( child );
+		this.child = Pres.coerce( contents );
 		int required = numBracketsRequired( precedence, outerPrecedence );
 		this.numBrackets = Math.max( numBrackets, required );
 		this.openBracket = Pres.coerce( openBracket );
@@ -73,5 +74,37 @@ public class PrecedenceBrackets extends CompositePres
 			x[numBrackets] = child;
 			return new Span( x );
 		}
+	}
+	
+	
+	private static int getOuterPredecence(SimpleAttributeTable inheritedState)
+	{
+		Object outerPrec = inheritedState.get( "outerPrecedence" );
+		if ( outerPrec != null  &&  outerPrec instanceof Integer )
+		{
+			return (Integer)outerPrec;
+		}
+		else
+		{
+			return -1;
+		}
+	}
+	
+	
+	
+	public static PrecedenceBrackets editorPrecedenceBrackets(Object contents, int precedence, int numBrackets, SimpleAttributeTable inheritedState, Object openBracket, Object closeBracket)
+	{
+		return new PrecedenceBrackets( contents, precedence, getOuterPredecence( inheritedState ), numBrackets, openBracket, closeBracket );
+	}
+	
+	public static PrecedenceBrackets editorPrecedenceBrackets(Object contents, int precedence, int numBrackets, SimpleAttributeTable inheritedState,
+			String openBracket, String closeBracket, StyleSheet bracketStyle)
+	{
+		return new PrecedenceBrackets( contents, precedence, getOuterPredecence( inheritedState ), numBrackets, openBracket, closeBracket, bracketStyle );
+	}
+	
+	public static PrecedenceBrackets editorPrecedenceBrackets(Object contents, int precedence, int numBrackets, SimpleAttributeTable inheritedState, StyleSheet bracketStyle)
+	{
+		return new PrecedenceBrackets( contents, precedence, getOuterPredecence( inheritedState ), numBrackets, bracketStyle );
 	}
 }
