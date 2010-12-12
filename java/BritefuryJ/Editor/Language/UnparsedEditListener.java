@@ -57,7 +57,7 @@ public abstract class UnparsedEditListener extends StreamEditListener
 					Log log = fragment.getView().getPageLog();
 					if ( log.isRecording() )
 					{
-						log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " (unparsed) - apply to node" ).vItem( "editedStream", value ) );
+						log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " (unparsed) - apply to model" ).vItem( "editedStream", value ) );
 					}
 				}
 				return handleUnparsed( element, sourceElement, fragment, event, model, value );
@@ -77,7 +77,7 @@ public abstract class UnparsedEditListener extends StreamEditListener
 							Log log = fragment.getView().getPageLog();
 							if ( log.isRecording() )
 							{
-								log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " (unparsed) - sub-node deleted" ).vItem( "editedStream", value ) );
+								log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " (unparsed) - sub-model deleted" ).vItem( "editedStream", value ) );
 							}
 						}
 						return handleUnparsed( element, sourceElement, fragment, event, model, value );
@@ -89,7 +89,7 @@ public abstract class UnparsedEditListener extends StreamEditListener
 					Log log = fragment.getView().getPageLog();
 					if ( log.isRecording() )
 					{
-						log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " (unparsed) - apply to sub-node" ).vItem( "editedStream", value ) );
+						log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " (unparsed) - apply to sub-model" ).vItem( "editedStream", value ) );
 					}
 				}
 				return handleUnparsed( sourceFragmentElement, sourceElement, sourceFragment, event, sourceModel, sourceValue );

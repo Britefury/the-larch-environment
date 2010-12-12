@@ -10,6 +10,8 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.EditEvent;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.Logging.Log;
+import BritefuryJ.Logging.LogEntry;
 import BritefuryJ.Parser.ParseResult;
 import BritefuryJ.Parser.ParserExpression;
 
@@ -24,6 +26,12 @@ public abstract class ParsingEditListener extends StreamEditListener
 	}
 	
 	
+	protected String getLogName()
+	{
+		return null;
+	}
+	
+
 	protected boolean testValueEmpty(DPElement element, GSymFragmentView fragment, Object model, StreamValue value)
 	{
 		return false;
@@ -63,8 +71,17 @@ public abstract class ParsingEditListener extends StreamEditListener
 	
 	protected HandleEditResult handleValue(DPElement element, DPElement sourceElement, GSymFragmentView fragment, EditEvent event, Object model, StreamValue value)
 	{
+		String logName = getLogName();
 		if ( value.isEmpty()  ||  testValueEmpty( element, fragment, model, value ) )
 		{
+			if ( logName != null )
+			{
+				Log log = fragment.getView().getPageLog();
+				if ( log.isRecording() )
+				{
+					log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " - deleted" ).vItem( "editedStream", value ) );
+				}
+			}
 			return handleEmptyValue( element, fragment, event, model );
 		}
 		else if ( testValue( element, fragment, model, value ) )
@@ -73,10 +90,26 @@ public abstract class ParsingEditListener extends StreamEditListener
 			
 			if ( parsed != null )
 			{
+				if ( logName != null )
+				{
+					Log log = fragment.getView().getPageLog();
+					if ( log.isRecording() )
+					{
+						log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " - parse succeeded" ).vItem( "editedStream", value ).hItem( "parser", parser ).vItem( "parsed", parsed[0] ) );
+					}
+				}
 				return handleParseSuccess( element, sourceElement, fragment, event, model, value, parsed[0] );
 			}
 			else
 			{
+				if ( logName != null )
+				{
+					Log log = fragment.getView().getPageLog();
+					if ( log.isRecording() )
+					{
+						log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " - parse failed" ).vItem( "editedStream", value ).hItem( "parser", parser ) );
+					}
+				}
 				return handleParseFailure( element, sourceElement, fragment, event, model, value );
 			}
 		}
