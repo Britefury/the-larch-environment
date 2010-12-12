@@ -9,6 +9,10 @@ from BritefuryJ.Editor.Sequential import SequentialEditor
 
 
 class WorksheetSequentialEditor (SequentialEditor):
+	def getName(self):
+		return 'WsEdit'
+	
+	
 	def copyStructuralValue(self, x):
 		return x.deepCopy()
 
