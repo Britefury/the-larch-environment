@@ -382,6 +382,43 @@ public class StreamValue implements Presentable
 		return false;
 	}
 	
+	public int indexOf(String sub)
+	{
+		int n = 0;
+		for (Item item: items)
+		{
+			if ( item instanceof TextItem )
+			{
+				int i = ((TextItem)item).textValue.indexOf( sub );
+				if ( i != -1 )
+				{
+					return i + n;
+				}
+			}
+			
+			n += item.getLength();
+		}
+		return -1;
+	}
+	
+	public int indexOf(Object sub)
+	{
+		int n = 0;
+		for (Item item: items)
+		{
+			if ( item instanceof StructuralItem )
+			{
+				if ( sub == ((StructuralItem)item).structuralValue )
+				{
+					return n;
+				}
+			}
+			
+			n += item.getLength();
+		}
+		return -1;
+	}
+	
 	public boolean __contains__(String sub)
 	{
 		return contains( sub );

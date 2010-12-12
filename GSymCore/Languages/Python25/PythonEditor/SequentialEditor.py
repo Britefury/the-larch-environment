@@ -50,6 +50,10 @@ class DedentPythonSelectionTreeEvent (SelectionEditTreeEvent):
 class PythonSequentialEditor (SequentialEditor):
 	def __init__(self):
 		super( PythonSequentialEditor, self ).__init__()
+		
+		
+	def getName(self):
+		return 'Py25Edit'
 	
 	
 	def isEditEvent(self, event):

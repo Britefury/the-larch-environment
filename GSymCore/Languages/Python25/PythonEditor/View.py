@@ -109,7 +109,7 @@ def unparsedNodeEditor(grammar, inheritedState, node, precedence, contents):
 	elif mode == EDITMODE_EDITSTATEMENT:
 		s = statementLine( contents )
 		s = EditableSequentialItem( [ instanceCache( StatementEditListener, grammar.singleLineStatementValid() ),
-		                              instanceCache( StatementUnparsedEditListener, grammar.unparsed() ) ],  s )
+		                              StatementUnparsedEditListener() ],  s )
 		s = s.withElementInteractor( _statementIndentationInteractor )
 		return s
 	else:
@@ -145,7 +145,7 @@ def statementNodeEditor(grammar, inheritedState, node, contents):
 
 		assert not node.isInstanceOf( Schema.UNPARSED )
 		s = EditableStructuralItem( [ instanceCache( StatementEditListener, grammar.singleLineStatementValid() ),
-		                              instanceCache( StatementUnparsedEditListener, grammar.unparsed() ) ], node, s )
+		                              StatementUnparsedEditListener() ], node, s )
 		s = s.withElementInteractor( _statementIndentationInteractor )
 		return s
 	else:
@@ -158,7 +158,7 @@ def specialFormStatementNodeEditor(grammar, inheritedState, node, contents):
 		contents = StructuralItem( node, contents )
 		s = specialFormStatementLine( contents )
 		s = EditableStructuralItem( [ instanceCache( StatementEditListener, grammar.singleLineStatementValid() ),
-		                              instanceCache( StatementUnparsedEditListener, grammar.unparsed() ) ], node, s )
+		                              StatementUnparsedEditListener() ], node, s )
 		s = s.withElementInteractor( _statementIndentationInteractor )
 		return s
 	else:
@@ -169,7 +169,7 @@ def compoundStatementHeaderEditor(grammar, inheritedState, node, headerContents,
 	headerStatementLine = statementLine( headerContents )
 
 	headerStatementLine = EditableStructuralItem( [ instanceCache( StatementEditListener, grammar.singleLineStatementValid() ),
-	                                                instanceCache( StatementUnparsedEditListener, grammar.unparsed() ) ],  node,  headerStatementLine )
+	                                                StatementUnparsedEditListener() ],  node,  headerStatementLine )
 	headerStatementLine = headerStatementLine.withElementInteractor( _statementIndentationInteractor )
 	if headerContainerFn is not None:
 		headerStatementLine = headerContainerFn( headerStatementLine )

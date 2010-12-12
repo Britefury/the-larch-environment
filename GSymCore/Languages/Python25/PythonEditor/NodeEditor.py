@@ -28,6 +28,7 @@ from BritefuryJ.Logging import LogEntry
 
 from BritefuryJ.Editor.Sequential import SequentialEditor, SelectionEditTreeEvent, EditListener, ParsingEditListener
 from BritefuryJ.Editor.Sequential.StreamEditListener import HandleEditResult
+from BritefuryJ.Editor.Language import UnparsedEditListener
 
 
 
@@ -52,6 +53,11 @@ class PythonParsingEditListener (ParsingEditListener):
 	def getSequentialEditor(self):
 		return PythonSequentialEditor.instance
 
+
+
+class PythonUnparsedEditListener (UnparsedEditListener):
+	def getSequentialEditor(self):
+		return PythonSequentialEditor.instance
 
 
 class PythonEditListener (EditListener):
@@ -80,8 +86,7 @@ class ParsedExpressionEditListener (PythonParsingEditListener):
 		log = fragment.getView().getPageLog()
 		if log.isRecording():
 			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - success' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ).vItem( 'parsedResult', parsed ) )
-		if parsed != model:
-			pyReplaceNodeIfNotEqual( model, parsed )
+		pyReplaceNodeIfNotEqual( model, parsed )
 		return HandleEditResult.HANDLED
 		
 		
@@ -144,11 +149,18 @@ class StatementEditListener (PythonParsingEditListener):
 
 
 
-class StatementUnparsedEditListener (PythonParsingEditListener):
-	def handleParseFailure(self, element, sourceElement, fragment, event, model, value):
-		log = fragment.getView().getPageLog()
-		if log.isRecording():
-			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement (unparsed) - could not parse - passing up' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ) )
+class StatementUnparsedEditListener (PythonUnparsedEditListener):
+	def getLogName(self):
+		return 'Statement'
+	
+	def testValue(self, element, sourceElement, fragment, event, model, value):
+		i = value.indexOf( '\n' )
+		return i != -1   and   i == len( value ) - 1
+	
+	def testValueEmpty(self, element, sourceElement, fragment, event, model, value):
+		return value.isTextual()  and  value.textualValue().strip() == ''
+	
+	def handleInvalidValue(self, element, sourceElement, fragment, event, model, value):
 		# Pass further up:
 
 		# Replacing the node with itself ensures that the view of this node will be rebuilt,
@@ -162,41 +174,12 @@ class StatementUnparsedEditListener (PythonParsingEditListener):
 		pyForceNodeRefresh( model )
 		
 		return HandleEditResult.NOT_HANDLED
-
 	
 	
-	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
-		# Statement has been replaced by unparsed content
-		# Only edit the innermost node around the element that is the source of the event
-		sourceFragment = sourceElement.getFragmentContext()
-		if sourceFragment is None:
-			print 'NULL SOURCE CONTEXT: ', sourceElement
-		if sourceFragment is fragment:
-			log = fragment.getView().getPageLog()
-			if log.isRecording():
-				log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - unparsed, node replaced' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ).vItem( 'parsedResult', parsed ) )
-			pyReplaceNode( model, parsed )
-			return HandleEditResult.HANDLED
-		else:
-			sourceFragmentElement = sourceFragment.getFragmentContentElement()
-			sourceNode = sourceFragment.getModel()
-			sourceValue = sourceFragmentElement.getStreamValue()
-			
-			if sourceValue.isTextual():
-				if sourceValue.textualValue().strip() == '':
-					# The content within @sourceFragmentElement has been deleted entirely, replace the whole statement
-					log = fragment.getView().getPageLog()
-					if log.isRecording():
-						log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - unparsed, sub-node deleted' ).vItem( 'editedStream', sourceValue ).hItem( 'parser', self.parser ).vItem( 'parsedResult', parsed ).vItem( 'sourceNode', sourceNode ) )
-					pyReplaceNodeIfNotEqual( model, parsed )
-					return HandleEditResult.HANDLED
-			
-			unparsed = Schema.UNPARSED( value=sourceValue.getItemValues() )
-			log = fragment.getView().getPageLog()
-			if log.isRecording():
-				log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement - unparsed, sub-node replaced' ).vItem( 'editedStream', sourceValue ).hItem( 'parser', self.parser ).vItem( 'parsedResult', unparsed ) )
-			pyReplaceNode( sourceNode, unparsed )
-			return HandleEditResult.HANDLED
+	def handleUnparsed(self, element, sourceElement, fragment, event, model, value):
+		unparsed = Schema.UNPARSED( value=value.getItemValues() )
+		pyReplaceNode( model, unparsed )
+		return HandleEditResult.HANDLED
 
 
 

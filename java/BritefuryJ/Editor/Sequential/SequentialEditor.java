@@ -57,6 +57,10 @@ public abstract class SequentialEditor
 	
 	
 	
+	public abstract String getName();
+	
+	
+	
 	public SequentialClipboardHandler getClipboardHandler()
 	{
 		return clipboardHandler;
