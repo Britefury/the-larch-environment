@@ -72,20 +72,15 @@ class PythonEditListener (EditListener):
 #
 
 class ParsedExpressionEditListener (PythonParsingEditListener):
+	def getLogName(self):
+		return 'Expression'
+	
+	
 	def testValueEmpty(self, element, fragment, model, value):
 		return value.isTextual()  and  value.textualValue().strip() == ''
 	
 	
-	def handleEmptyValue(self, element, fragment, event, model):
-		log = fragment.getView().getPageLog()
-		if log.isRecording():
-			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - deleted' ).hItem( 'parser', self.parser ) )
-		return HandleEditResult.NOT_HANDLED
-	
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
-		log = fragment.getView().getPageLog()
-		if log.isRecording():
-			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Expression - success' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ).vItem( 'parsedResult', parsed ) )
 		pyReplaceNodeIfNotEqual( model, parsed )
 		return HandleEditResult.HANDLED
 		
@@ -94,17 +89,15 @@ class ParsedExpressionEditListener (PythonParsingEditListener):
 
 
 class PythonExpressionEditListener (PythonParsingEditListener):
+	def getLogName(self):
+		return 'Top level expression'
+	
+	
 	def handleEmptyValue(self, element, fragment, event, model):
-		log = fragment.getView().getPageLog()
-		if log.isRecording():
-			log.log( LogEntry( 'Py25ExprEdit' ).hItem( 'description', 'Expression - deleted' ).hItem( 'parser', self.parser ) )
 		model['expr'] = None
 		return HandleEditResult.HANDLED
 	
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
-		log = fragment.getView().getPageLog()
-		if log.isRecording():
-			log.log( LogEntry( 'Py25ExprEdit' ).hItem( 'description', 'Top level expression - success' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ).vItem( 'parsedResult', parsed ) )
 		expr = model['expr']
 		if parsed != expr:
 			if expr is None:
@@ -203,6 +196,10 @@ class SuiteEditListener (PythonParsingEditListener):
 	def __init__(self, parser, suite):
 		super( SuiteEditListener, self ).__init__( parser )
 		self._suite = suite
+		
+		
+	def getLogName(self):
+		return 'Suite'
 	
 		
 	def clearFixedValuesOnPath(self):
@@ -210,18 +207,9 @@ class SuiteEditListener (PythonParsingEditListener):
 	
 	
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
-		log = fragment.getView().getPageLog()
-		if log.isRecording():
-			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Suite - parse SUCCESS' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ).vItem( 'parsedResult', parsed ) )
 		# Alter the value of the existing suite so that it becomes the same as the parsed result, but minimise the number of changes required to do so
 		modifySuiteMinimisingChanges( self._suite, parsed )
 		return HandleEditResult.HANDLED
-	
-	def handleParseFailure(self, element, sourceElement, fragment, event, model, value):
-		log = fragment.getView().getPageLog()
-		if log.isRecording():
-			log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Suite - parse FAIL - passing to parent' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ) )
-		return HandleEditResult.NOT_HANDLED
 
 
 
