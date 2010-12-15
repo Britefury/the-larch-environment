@@ -49,11 +49,6 @@ public abstract class ParsingEditListener extends StreamEditListener
 	}
 
 	
-	protected boolean clearFixedValuesOnPath()
-	{
-		return true;
-	}
-
 	protected HandleEditResult handleEmptyValue(DPElement element, GSymFragmentView fragment, EditEvent event, Object model)
 	{
 		return HandleEditResult.NOT_HANDLED;
