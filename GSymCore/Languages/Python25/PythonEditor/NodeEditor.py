@@ -88,48 +88,9 @@ class ParsedExpressionEditListener (PythonParsingEditListener):
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
 		pyReplaceNodeIfNotEqual( model, parsed )
 		return HandleEditResult.HANDLED
-		
-		
-		
 
 
-class PythonExpressionEditListener (PythonParsingEditListener):
-	def getLogName(self):
-		return 'Top level expression'
-	
-	
-	def handleEmptyValue(self, element, fragment, event, model):
-		model['expr'] = None
-		return HandleEditResult.HANDLED
-	
-	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
-		expr = model['expr']
-		if parsed != expr:
-			if expr is None:
-				model['expr'] = parsed
-			else:
-				pyReplaceNode( expr, parsed )
-		return HandleEditResult.HANDLED
-		
-	def handleParseFailure(self, element, sourceElement, fragment, event, model, value):
-		if '\n' not in value:
-			unparsed = Schema.UNPARSED( value=value.getItemValues() )
-			log = fragment.getView().getPageLog()
-			if log.isRecording():
-				log.log( LogEntry( 'Py25ExprEdit' ).hItem( 'description', 'Top level expression - unparsed' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ).vItem( 'parsedResult', unparsed ) )
-			expr = model['expr']
-			if expr is None:
-				model['expr'] = unparsed
-			else:
-				pyReplaceNodeIfNotEqual( expr, unparsed )
-			return HandleEditResult.HANDLED
-		else:
-			return HandleEditResult.NOT_HANDLED
 
-
-	
-		
-		
 
 
 class StatementEditListener (PythonParsingEditListener):
@@ -141,7 +102,7 @@ class StatementEditListener (PythonParsingEditListener):
 
 class CompoundStatementHeaderEditListener (PythonPartialParsingEditListener):
 	pass
-		
+
 
 class StatementUnparsedEditListener (PythonUnparsedEditListener):
 	def getLogName(self):
@@ -198,9 +159,47 @@ class SuiteEditListener (PythonParsingEditListener):
 	
 	
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
-		# Alter the value of the existing suite so that it becomes the same as the parsed result, but minimise the number of changes required to do so
-		modifySuiteMinimisingChanges( self._suite, parsed )
+		self._suite[:] = parsed
 		return HandleEditResult.HANDLED
+
+
+
+
+
+
+
+class PythonExpressionEditListener (PythonParsingEditListener):
+	def getLogName(self):
+		return 'Top level expression'
+	
+	
+	def handleEmptyValue(self, element, fragment, event, model):
+		model['expr'] = None
+		return HandleEditResult.HANDLED
+	
+	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
+		expr = model['expr']
+		if parsed != expr:
+			if expr is None:
+				model['expr'] = parsed
+			else:
+				pyReplaceNode( expr, parsed )
+		return HandleEditResult.HANDLED
+		
+	def handleParseFailure(self, element, sourceElement, fragment, event, model, value):
+		if '\n' not in value:
+			unparsed = Schema.UNPARSED( value=value.getItemValues() )
+			log = fragment.getView().getPageLog()
+			if log.isRecording():
+				log.log( LogEntry( 'Py25ExprEdit' ).hItem( 'description', 'Top level expression - unparsed' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ).vItem( 'parsedResult', unparsed ) )
+			expr = model['expr']
+			if expr is None:
+				model['expr'] = unparsed
+			else:
+				pyReplaceNodeIfNotEqual( expr, unparsed )
+			return HandleEditResult.HANDLED
+		else:
+			return HandleEditResult.NOT_HANDLED
 
 
 
