@@ -26,7 +26,7 @@ from BritefuryJ.DocPresent.Interactor import KeyElementInteractor
 
 from BritefuryJ.Logging import LogEntry
 
-from BritefuryJ.Editor.Sequential import SequentialEditor, SelectionEditTreeEvent, EditListener, ParsingEditListener
+from BritefuryJ.Editor.Sequential import SequentialEditor, SelectionEditTreeEvent, EditListener, ParsingEditListener, PartialParsingEditListener
 from BritefuryJ.Editor.Sequential.StreamEditListener import HandleEditResult
 from BritefuryJ.Editor.Language import UnparsedEditListener
 
@@ -50,6 +50,11 @@ from GSymCore.Languages.Python25.PythonEditor.SequentialEditor import PythonSequ
 
 
 class PythonParsingEditListener (ParsingEditListener):
+	def getSequentialEditor(self):
+		return PythonSequentialEditor.instance
+
+	
+class PythonPartialParsingEditListener (PartialParsingEditListener):
 	def getSequentialEditor(self):
 		return PythonSequentialEditor.instance
 
@@ -129,18 +134,14 @@ class PythonExpressionEditListener (PythonParsingEditListener):
 
 class StatementEditListener (PythonParsingEditListener):
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
-		if not isCompoundStmtHeader( model )  and  not isCompoundStmtHeader( parsed ):
-			log = fragment.getView().getPageLog()
-			if log.isRecording():
-				log.log( LogEntry( 'Py25Edit' ).hItem( 'description', 'Statement' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ).vItem( 'parsedResult', parsed ) )
-			pyReplaceNodeIfNotEqual( model, parsed )
-			return HandleEditResult.HANDLED
-		else:
-			event.getStreamValueVisitor().setElementFixedValue( element, parsed )
-			return HandleEditResult.PASS_TO_PARENT
+		pyReplaceNodeIfNotEqual( model, parsed )
+		return HandleEditResult.HANDLED
 
 
 
+class CompoundStatementHeaderEditListener (PythonPartialParsingEditListener):
+	pass
+		
 
 class StatementUnparsedEditListener (PythonUnparsedEditListener):
 	def getLogName(self):
@@ -174,16 +175,6 @@ class StatementUnparsedEditListener (PythonUnparsedEditListener):
 		pyReplaceNode( model, unparsed )
 		return HandleEditResult.HANDLED
 
-
-
-
-
-
-class CompoundHeaderEditListener (PythonParsingEditListener):
-	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
-		event.getStreamValueVisitor().setElementFixedValue( element, parsed )
-		# Only partially handled - pass it up
-		return HandleEditResult.NOT_HANDLED
 
 
 

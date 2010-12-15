@@ -1177,6 +1177,10 @@ class Python25Grammar (Grammar):
 		return self.simpleStmt() | self.compoundStmtHeader() | self.commentStmt() | self.blankLine()
 
 	@Rule
+	def simpleSingleLineStatementValid(self):
+		return self.simpleStmt() | self.commentStmt() | self.blankLine()
+
+	@Rule
 	def singleLineStatement(self):
 		return self.singleLineStatementValid() | self.unparsed()
 

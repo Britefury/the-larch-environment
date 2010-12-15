@@ -108,7 +108,8 @@ def unparsedNodeEditor(grammar, inheritedState, node, precedence, contents):
 		return contents
 	elif mode == EDITMODE_EDITSTATEMENT:
 		s = statementLine( contents )
-		s = EditableSequentialItem( [ instanceCache( StatementEditListener, grammar.singleLineStatementValid() ),
+		s = EditableSequentialItem( [ instanceCache( StatementEditListener, grammar.simpleSingleLineStatementValid() ),
+		                              instanceCache( CompoundStatementHeaderEditListener, grammar.compoundStmtHeader() ),
 		                              StatementUnparsedEditListener() ],  s )
 		s = s.withElementInteractor( _statementIndentationInteractor )
 		return s
@@ -144,7 +145,8 @@ def statementNodeEditor(grammar, inheritedState, node, contents):
 		s = statementLine( contents )
 
 		assert not node.isInstanceOf( Schema.UNPARSED )
-		s = EditableStructuralItem( [ instanceCache( StatementEditListener, grammar.singleLineStatementValid() ),
+		s = EditableStructuralItem( [ instanceCache( StatementEditListener, grammar.simpleSingleLineStatementValid() ),
+		                              instanceCache( CompoundStatementHeaderEditListener, grammar.compoundStmtHeader() ),
 		                              StatementUnparsedEditListener() ], node, s )
 		s = s.withElementInteractor( _statementIndentationInteractor )
 		return s
@@ -157,7 +159,8 @@ def specialFormStatementNodeEditor(grammar, inheritedState, node, contents):
 	if mode == EDITMODE_EDITSTATEMENT:
 		contents = StructuralItem( node, contents )
 		s = specialFormStatementLine( contents )
-		s = EditableStructuralItem( [ instanceCache( StatementEditListener, grammar.singleLineStatementValid() ),
+		s = EditableStructuralItem( [ instanceCache( StatementEditListener, grammar.simpleSingleLineStatementValid() ),
+		                              instanceCache( CompoundStatementHeaderEditListener, grammar.compoundStmtHeader() ),
 		                              StatementUnparsedEditListener() ], node, s )
 		s = s.withElementInteractor( _statementIndentationInteractor )
 		return s
@@ -168,8 +171,8 @@ def specialFormStatementNodeEditor(grammar, inheritedState, node, contents):
 def compoundStatementHeaderEditor(grammar, inheritedState, node, headerContents, headerContainerFn=None):
 	headerStatementLine = statementLine( headerContents )
 
-	headerStatementLine = EditableStructuralItem( [ instanceCache( StatementEditListener, grammar.singleLineStatementValid() ),
-	                                                StatementUnparsedEditListener() ],  node,  headerStatementLine )
+	headerStatementLine = EditableStructuralItem( [ instanceCache( CompoundStatementHeaderEditListener, grammar.compoundStmtHeader() ),
+	                                                StatementUnparsedEditListener() ], node, headerStatementLine )
 	headerStatementLine = headerStatementLine.withElementInteractor( _statementIndentationInteractor )
 	if headerContainerFn is not None:
 		headerStatementLine = headerContainerFn( headerStatementLine )
@@ -192,7 +195,7 @@ def compoundStatementEditor(ctx, grammar, inheritedState, node, precedence, comp
 			raise TypeError, 'Compound block should be of the form (headerNode, headerContents, suite)  or  (headerNode, headerContents, suite, headerContainerFn)'
 
 		headerStatementLine = statementLine( headerContents )
-		headerStatementLine = EditableStructuralItem( instanceCache( CompoundHeaderEditListener, statementParser ), headerNode, headerStatementLine )
+		headerStatementLine = BreakableStructuralItem( PythonSequentialEditor.instance, headerNode, headerStatementLine )
 		headerStatementLine = headerStatementLine.withElementInteractor( _statementIndentationInteractor )
 
 		if headerContainerFn is not None:
