@@ -115,22 +115,6 @@ class StatementUnparsedEditListener (PythonUnparsedEditListener):
 	def testValueEmpty(self, element, sourceElement, fragment, event, model, value):
 		return value.isTextual()  and  value.textualValue().strip() == ''
 	
-	def handleInvalidValue(self, element, sourceElement, fragment, event, model, value):
-		# Pass further up:
-
-		# Replacing the node with itself ensures that the view of this node will be rebuilt,
-		# due to the modification event being sent.
-		# It is necessary to do this, as the text of the statement has been edited;
-		# leaving the existing view intact will result in the parent node reparsing the
-		# modified text.
-		# This normally leads to blank lines doubling on each press of the return key
-		#
-		# TODO: IMPROVE THIS TECHNIQUE - THIS IS A HACK
-		pyForceNodeRefresh( model )
-		
-		return HandleEditResult.NOT_HANDLED
-	
-	
 	def handleUnparsed(self, element, sourceElement, fragment, event, model, value):
 		unparsed = Schema.UNPARSED( value=value.getItemValues() )
 		pyReplaceNode( model, unparsed )
@@ -154,10 +138,6 @@ class SuiteEditListener (PythonParsingEditListener):
 		return 'Suite'
 	
 		
-	def clearFixedValuesOnPath(self):
-		return False
-	
-	
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
 		self._suite[:] = parsed
 		return HandleEditResult.HANDLED
