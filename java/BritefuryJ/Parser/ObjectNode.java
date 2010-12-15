@@ -180,41 +180,48 @@ public class ObjectNode extends ParserExpression
 	{
 		if ( input.isInstanceOf( objClass ) )
 		{
-			DMObjectClass inputClass = input.getDMObjectClass();
-			DMObject value = inputClass.newInstance();
-			Map<String, Object> bindings = null;
-			
-			for (int i = 0; i < fieldExpTable.length; i++)
+			if ( fieldExpTable != null )
 			{
-				ParserExpression expr = fieldExpTable[i];
-				if ( expr != null )
+				DMObjectClass inputClass = input.getDMObjectClass();
+				DMObject value = inputClass.newInstance();
+				Map<String, Object> bindings = null;
+				
+				for (int i = 0; i < fieldExpTable.length; i++)
 				{
-					ParseResult result = expr.handleNode( state, input.get( i ) );
-					
-					if ( !result.isValid() )
+					ParserExpression expr = fieldExpTable[i];
+					if ( expr != null )
 					{
-						return ParseResult.failure( 0 );
+						ParseResult result = expr.handleNode( state, input.get( i ) );
+						
+						if ( !result.isValid() )
+						{
+							return ParseResult.failure( 0 );
+						}
+						else
+						{
+							bindings = ParseResult.addBindings( bindings, result.getBindings() );
+		
+							value.set( i, result.value );
+						}
 					}
 					else
 					{
-						bindings = ParseResult.addBindings( bindings, result.getBindings() );
-	
-						value.set( i, result.value );
+						value.set( i, input.get( i ) );
 					}
 				}
-				else
+				
+				int clsSize = inputClass.getNumFields();			
+				for (int i = fieldExpTable.length; i < clsSize; i++)
 				{
 					value.set( i, input.get( i ) );
 				}
+				
+				return new ParseResult( value, 0, 1, bindings );
 			}
-			
-			int clsSize = inputClass.getNumFields();			
-			for (int i = fieldExpTable.length; i < clsSize; i++)
+			else
 			{
-				value.set( i, input.get( i ) );
+				return new ParseResult( input, 0, 1, null );
 			}
-			
-			return new ParseResult( value, 0, 1, bindings );
 		}
 		
 		return ParseResult.failure( 0 );
@@ -353,15 +360,22 @@ public class ObjectNode extends ParserExpression
 	
 	private void initialise()
 	{
-		fieldExpTable = new ParserExpression[objClass.getNumFields()];
-		for (int i = 0; i < fieldNames.length; i++)
+		if ( fieldNames.length > 0 )
 		{
-			int fieldIndex = objClass.getFieldIndex( fieldNames[i] );
-			if ( fieldIndex == -1 )
+			fieldExpTable = new ParserExpression[objClass.getNumFields()];
+			for (int i = 0; i < fieldNames.length; i++)
 			{
-				throw new DMObjectClass.UnknownFieldNameException( fieldNames[i] );
+				int fieldIndex = objClass.getFieldIndex( fieldNames[i] );
+				if ( fieldIndex == -1 )
+				{
+					throw new DMObjectClass.UnknownFieldNameException( fieldNames[i] );
+				}
+				fieldExpTable[fieldIndex] = fieldExps[i];
 			}
-			fieldExpTable[fieldIndex] = fieldExps[i];
+		}
+		else
+		{
+			fieldExpTable = null;
 		}
 	}
 }

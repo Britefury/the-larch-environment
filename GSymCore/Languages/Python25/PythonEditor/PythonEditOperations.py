@@ -166,27 +166,6 @@ def pyReplaceNodeIfNotEqual(target, replacement):
 		target.become( replacement.deepCopy() )
 
 		
-def modifySuiteMinimisingChanges(target, modified):
-	commonPrefixLen = 0
-	for i, (t, m) in enumerate( zip( target, modified ) ):
-		if t != m:
-			commonPrefixLen = i
-			break
-	
-	commonSuffixLen = 0
-	for i, (t, m) in enumerate( zip( reversed( target ), reversed( modified ) ) ):
-		if t != m:
-			commonSuffixLen = i
-			break
-		
-	minLength = min( len( target ), len( modified ) )
-	remaining = minLength - commonPrefixLen
-	commonSuffixLen = min( commonSuffixLen, remaining )
-	
-	target[commonPrefixLen:len(target)-commonSuffixLen] = modified[commonPrefixLen:len(modified)-commonSuffixLen]
-	return target[commonPrefixLen:len(target)-commonSuffixLen]
-	
-
 
 
 #
