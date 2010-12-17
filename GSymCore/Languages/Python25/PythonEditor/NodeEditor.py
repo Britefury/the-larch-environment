@@ -101,7 +101,8 @@ class StatementEditListener (PythonParsingEditListener):
 
 
 class CompoundStatementHeaderEditListener (PythonPartialParsingEditListener):
-	pass
+	def getLogName(self):
+		return 'Compound statement header'
 
 
 class StatementUnparsedEditListener (PythonUnparsedEditListener):

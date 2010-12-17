@@ -33,8 +33,11 @@ public abstract class UnparsedEditListener extends StreamEditListener
 		return false;
 	}
 	
-	protected abstract HandleEditResult handleInvalidValue(DPElement element, DPElement sourceElement, GSymFragmentView fragment,
-			EditEvent event, Object model, StreamValue value);
+	protected HandleEditResult handleInvalidValue(DPElement element, DPElement sourceElement, GSymFragmentView fragment,
+			EditEvent event, Object model, StreamValue value)
+	{
+		return HandleEditResult.NOT_HANDLED;
+	}
 	
 	protected abstract HandleEditResult handleUnparsed(DPElement element, DPElement sourceElement, GSymFragmentView fragment,
 			EditEvent event, Object model, StreamValue value);
