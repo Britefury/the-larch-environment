@@ -462,6 +462,14 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 		return objClass.getFieldNames();
 	}
 	
+	public Object[] getFieldValues()
+	{
+		onAccess();
+		Object d[] = new Object[fieldData.length];
+		System.arraycopy( fieldData, 0, d, 0, fieldData.length );
+		return d;
+	}
+	
 	public Object[] getFieldValuesImmutable()
 	{
 		onAccess();
@@ -547,17 +555,16 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 
 	
 	
-	public void become(DMNode node)
+	public void become(Object x)
 	{
-		if ( node instanceof DMObject )
+		if ( x instanceof DMObjectInterface )
 		{
-			DMObject obj = (DMObject)node;
-			obj.onAccess();
-			become( obj.objClass, obj.fieldData );
+			DMObjectInterface obj = (DMObjectInterface)x;
+			become( obj.getDMObjectClass(), obj.getFieldValues() );
 		}
 		else
 		{
-			throw new CannotChangeNodeClassException( node.getClass(), getClass() );
+			throw new CannotChangeNodeClassException( x.getClass(), getClass() );
 		}
 	}
 

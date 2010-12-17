@@ -157,13 +157,11 @@ def pyForceNodeRefresh(data):
 	pyReplaceNode( data, data )
 
 def pyReplaceNode(data, replacement):
-	data.become( replacement.deepCopy() )
+	data.become( replacement )
 
 def pyReplaceNodeIfNotEqual(target, replacement):
-	if target == replacement:
-		pass
-	else:
-		target.become( replacement.deepCopy() )
+	if target != replacement:
+		target.become( replacement )
 
 		
 

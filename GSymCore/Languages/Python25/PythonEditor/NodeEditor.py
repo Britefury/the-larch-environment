@@ -140,7 +140,7 @@ class SuiteEditListener (PythonParsingEditListener):
 	
 		
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
-		self._suite[:] = parsed
+		self._suite.become( parsed )
 		return HandleEditResult.HANDLED
 
 

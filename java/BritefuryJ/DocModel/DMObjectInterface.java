@@ -23,6 +23,7 @@ public interface DMObjectInterface extends DMNodeInterface
 	
 	
 	public String[] getFieldNames();
+	public Object[] getFieldValues();
 	
 	public void update(Map<String, Object> table);
 	

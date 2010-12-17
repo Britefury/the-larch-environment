@@ -7,7 +7,6 @@
 package BritefuryJ.DocModel;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import BritefuryJ.CommandHistory.Command;
@@ -239,10 +238,10 @@ class DMListCommandTracker extends CommandTracker
 	private static class SetContentsCommand extends Command
 	{
 		private DMList ls;
-		private List<Object> oldContents;
+		private Object[] oldContents;
 		private Object[] newContents;
 		
-		public SetContentsCommand(DMList ls, List<Object> oldContents, Object[] newContents)
+		public SetContentsCommand(DMList ls, Object[] oldContents, Object[] newContents)
 		{
 			this.ls = ls;
 			this.oldContents = oldContents;
@@ -252,12 +251,12 @@ class DMListCommandTracker extends CommandTracker
 		
 		protected void execute()
 		{
-			ls.setContents( Arrays.asList( newContents ) );
+			ls.commandTracker_setContents( newContents );
 		}
 
 		protected void unexecute()
 		{
-			ls.setContents( oldContents );
+			ls.commandTracker_setContents( oldContents );
 		}
 
 		protected String getDescription()
@@ -383,7 +382,7 @@ class DMListCommandTracker extends CommandTracker
 		}
 	}
 
-	protected void onSetContents(DMList ls, List<Object> oldContents, Object[] newContents)
+	protected void onSetContents(DMList ls, Object[] oldContents, Object[] newContents)
 	{
 		for (Object x: newContents)
 		{
