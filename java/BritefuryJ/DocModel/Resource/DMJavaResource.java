@@ -16,7 +16,6 @@ import java.util.IdentityHashMap;
 
 import org.python.core.PyObject;
 
-import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocModel.DMNodeClass;
 import BritefuryJ.DocModel.DMPickleHelper;
 
@@ -64,17 +63,17 @@ public class DMJavaResource extends DMResource
 	}
 	
 	
-	public void become(DMNode node)
+	public void become(Object x)
 	{
-		if ( node instanceof DMJavaResource )
+		if ( x instanceof DMJavaResource )
 		{
-			DMJavaResource rsc = (DMJavaResource)node;
+			DMJavaResource rsc = (DMJavaResource)x;
 			serialised = rsc.getSerialisedForm();
 			value = null;
 		}
 		else
 		{
-			throw new CannotChangeNodeClassException( node.getClass(), getClass() );
+			throw new CannotChangeNodeClassException( x.getClass(), getClass() );
 		}
 	}
 

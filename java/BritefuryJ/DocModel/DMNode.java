@@ -349,7 +349,7 @@ public abstract class DMNode implements Cloneable
 	}
 	
 	
-	public abstract void become(DMNode node);
+	public abstract void become(Object x);
 	
 	
 	

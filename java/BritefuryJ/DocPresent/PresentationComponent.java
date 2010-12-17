@@ -1126,7 +1126,15 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		{
 			rootSpaceMouse.setKeyModifiers( keyModifiers );
 
-			boolean bHandled = keyboard.keyPressed( event );
+			boolean bHandled = false;
+			try
+			{
+				bHandled = keyboard.keyPressed( event );
+			}
+			catch (Throwable e)
+			{
+				notifyExceptionDuringEventHandler( keyboard, "keyPressed", e );
+			}
 			emitImmediateEvents();
 			return bHandled;
 		}
@@ -1135,7 +1143,15 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		{
 			rootSpaceMouse.setKeyModifiers( keyModifiers );
 
-			boolean bHandled = keyboard.keyReleased( event );
+			boolean bHandled = false;
+			try
+			{
+				bHandled = keyboard.keyReleased( event );
+			}
+			catch (Throwable e)
+			{
+				notifyExceptionDuringEventHandler( keyboard, "keyReleased", e );
+			}
 			emitImmediateEvents();
 			return bHandled;
 		}
@@ -1146,7 +1162,15 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		{
 			rootSpaceMouse.setKeyModifiers( keyModifiers );
 
-			boolean bHandled = keyboard.keyTyped( event );
+			boolean bHandled = false;
+			try
+			{
+				bHandled = keyboard.keyTyped( event );
+			}
+			catch (Throwable e)
+			{
+				notifyExceptionDuringEventHandler( keyboard, "keyTyped", e );
+			}
 			emitImmediateEvents();
 			return bHandled;
 		}

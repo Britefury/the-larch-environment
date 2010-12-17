@@ -2969,7 +2969,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	public void notifyExceptionDuringEventHandler(Object eventHandler, String event, Throwable e)
 	{
-		System.err.println( "Exception during element event handler:" );
+		System.err.println( "Exception during element event handler " + eventHandler + ":" );
 		e.printStackTrace();
 	}
 	

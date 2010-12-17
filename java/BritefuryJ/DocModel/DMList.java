@@ -399,17 +399,22 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	}
 	
 	
-	public void become(DMNode node)
+	@SuppressWarnings("unchecked")
+	public void become(Object x)
 	{
-		if ( node instanceof DMList )
+		if ( x instanceof DMList )
 		{
-			DMList ls = (DMList)node;
+			DMList ls = (DMList)x;
 			ls.onAccess();
 			setContents( ls.value );
 		}
+		else if ( x instanceof List )
+		{
+			setContents( (List<Object>)x );
+		}
 		else
 		{
-			throw new CannotChangeNodeClassException( node.getClass(), getClass() );
+			throw new CannotChangeNodeClassException( x.getClass(), getClass() );
 		}
 	}
 	
@@ -794,10 +799,9 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		set( i, x );
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void __setitem__(PySlice i, List<Object> xs)
 	{
-		ArrayList<Object> oldContents = (ArrayList<Object>)value.clone();
+		Object oldContents[] = value.toArray();
 		
 		ArrayList<Object> cxs = new ArrayList<Object>();
 		cxs.ensureCapacity( xs.size() );
@@ -840,10 +844,9 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		remove( i );
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void __delitem__(PySlice i)
 	{
-		ArrayList<Object> oldContents = (ArrayList<Object>)value.clone();
+		Object oldContents[] = value.toArray();
 		
 		Object[] dest = value.toArray();
 		
@@ -1100,10 +1103,30 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	}
 
 
+	public void setContents(List<?> xs)
+	{
+		Object oldContents[] = value.toArray();
+		Object newContents[] = new Object[xs.size()];
+		int i = 0;
+		for (Object x: xs)
+		{
+			newContents[i] = coerce( x );
+			i++;
+		}
+		
+		commandTracker_setContents( newContents );
+
+		if ( commandTracker != null )
+		{
+			commandTracker.onSetContents( this, oldContents, newContents );
+		}
+	}
+	
+
 	/*
 	 * Only call from DMListCommandTracker
 	 */
-	protected void setContents(List<Object> xs)
+	protected void commandTracker_setContents(Object xs[])
 	{
 		for (Object x: value)
 		{
@@ -1113,7 +1136,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 			}
 		}
 		value.clear();
-		value.addAll( xs );
+		value.addAll( Arrays.asList( xs ) );
 		for (Object x: value)
 		{
 			if ( x instanceof DMNode )
