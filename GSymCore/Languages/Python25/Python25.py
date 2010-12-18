@@ -22,7 +22,7 @@ def py25NewSuite():
 	return Schema.PythonSuite( suite=[] )
 
 def py25NewExpr():
-	return Schema.PythonExpression( expr=None )
+	return Schema.PythonExpression( expr=Schema.UNPARSED( value=[ '' ] ) )
 
 def _py25NewUnit():
 	return gSymUnit( Schema.schema, py25NewModule() )

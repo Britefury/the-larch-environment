@@ -641,10 +641,7 @@ class Python25Grammar (Grammar):
 	@Rule
 	def tupleOrExpressionOrYieldExpression(self):
 		return self.tupleOrExpression()  |  self.yieldExpression()
-
-
-
-
+	
 	
 	
 	
