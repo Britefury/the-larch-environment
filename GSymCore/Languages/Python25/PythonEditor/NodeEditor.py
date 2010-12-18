@@ -49,27 +49,6 @@ from GSymCore.Languages.Python25.PythonEditor.SREditor import PythonSyntaxRecogn
 
 
 
-class PythonParsingEditListener (ParsingEditListener):
-	def getSyntaxRecognizingEditor(self):
-		return PythonSyntaxRecognizingEditor.instance
-
-	
-class PythonPartialParsingEditListener (PartialParsingEditListener):
-	def getSyntaxRecognizingEditor(self):
-		return PythonSyntaxRecognizingEditor.instance
-
-
-
-class PythonUnparsedEditListener (UnparsedEditListener):
-	def getSyntaxRecognizingEditor(self):
-		return PythonSyntaxRecognizingEditor.instance
-
-
-class PythonTopLevelEditListener (TopLevelEditListener):
-	def getSyntaxRecognizingEditor(self):
-		return PythonSyntaxRecognizingEditor.instance
-	
-
 
 #
 #
@@ -77,83 +56,10 @@ class PythonTopLevelEditListener (TopLevelEditListener):
 #
 #
 
-class ParsedExpressionEditListener (PythonParsingEditListener):
-	def getLogName(self):
-		return 'Expression'
-	
-	
-	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
-		if parsed != model:
-			pyReplaceNode( model, parsed )
-			return HandleEditResult.HANDLED
-		else:
-			return HandleEditResult.NO_CHANGE
+class PythonExpressionEditListener (ParsingEditListener):
+	def getSyntaxRecognizingEditor(self):
+		return PythonSyntaxRecognizingEditor.instance
 
-
-
-
-
-class StatementEditListener (PythonParsingEditListener):
-	def getLogName(self):
-		return 'Statement'
-	
-	
-	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
-		if parsed != model:
-			pyReplaceNode( model, parsed )
-			return HandleEditResult.HANDLED
-		else:
-			return HandleEditResult.NO_CHANGE
-
-
-
-class CompoundStatementHeaderEditListener (PythonPartialParsingEditListener):
-	def getLogName(self):
-		return 'Compound statement header'
-
-
-class StatementUnparsedEditListener (PythonUnparsedEditListener):
-	def getLogName(self):
-		return 'Statement'
-	
-	def isValueValid(self, element, sourceElement, fragment, event, model, value):
-		i = value.indexOf( '\n' )
-		return i != -1   and   i == len( value ) - 1
-	
-	def handleUnparsed(self, element, sourceElement, fragment, event, model, value):
-		unparsed = Schema.UNPARSED( value=value.getItemValues() )
-		pyReplaceNode( model, unparsed )
-		return HandleEditResult.HANDLED
-
-
-
-
-
-
-class SuiteEditListener (PythonParsingEditListener):
-	__slots__ = [ '_suite' ]
-
-	
-	def __init__(self, parser, suite):
-		super( SuiteEditListener, self ).__init__( parser )
-		self._suite = suite
-		
-		
-	def getLogName(self):
-		return 'Suite'
-	
-		
-	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
-		modifySuiteMinimisingChanges( self._suite, parsed )
-		return HandleEditResult.HANDLED
-
-
-
-
-
-
-
-class PythonExpressionEditListener (PythonParsingEditListener):
 	def getLogName(self):
 		return 'Top level expression'
 	
@@ -184,30 +90,15 @@ class PythonExpressionEditListener (PythonParsingEditListener):
 
 
 
-class PythonModuleTopLevelEditListener (PythonTopLevelEditListener):
-	def canCatchEditEvent(self, event):
-		return isinstance( event, PythonIndentationTreeEvent )
-
-PythonModuleTopLevelEditListener.instance = PythonModuleTopLevelEditListener()
-
-
-
-
-class PythonSuiteTopLevelEditListener (PythonTopLevelEditListener):
-	def canCatchEditEvent(self, event):
-		return isinstance( event, PythonIndentationTreeEvent )
-
-PythonSuiteTopLevelEditListener.instance = PythonSuiteTopLevelEditListener()
-
-
-
-
 class PythonExpressionNewLineEvent (object):
 	def __init__(self, model):
 		self.model = model
 
 
-class PythonExpressionTopLevelEditListener (PythonTopLevelEditListener):
+class PythonExpressionTopLevelEditListener (TopLevelEditListener):
+	def getSyntaxRecognizingEditor(self):
+		return PythonSyntaxRecognizingEditor.instance
+	
 	def handleEditEvent(self, element, sourceElement, event):
 		if isinstance( event, TextEditEvent ):
 			fragment = element.getFragmentContext()
@@ -250,7 +141,5 @@ class StatementIndentationInteractor (KeyElementInteractor):
 	
 	def keyReleased(self, element, event):
 		return False
-	
-	
-	
-	
+
+
