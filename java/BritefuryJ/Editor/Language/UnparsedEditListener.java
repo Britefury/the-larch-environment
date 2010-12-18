@@ -51,10 +51,12 @@ public abstract class UnparsedEditListener extends StreamEditListener
 		String logName = getLogName();
 		if ( testValue( element, sourceElement, fragment, event, model, value ) )
 		{
-			// Only edit the innermost node around the element that is the source of the event
+			// Attempt to create an unparsed node to replace only the node corresponding to the innermost fragment surrounding
+			// the element that sent the edit event
 			GSymFragmentView sourceFragment = (GSymFragmentView)sourceElement.getFragmentContext();
 			if ( sourceFragment == fragment )
 			{
+				// Source fragment is this fragment - replace this node with an unparsed node
 				if ( logName != null )
 				{
 					Log log = fragment.getView().getPageLog();
@@ -71,22 +73,21 @@ public abstract class UnparsedEditListener extends StreamEditListener
 				Object sourceModel = sourceFragment.getModel();
 				StreamValue sourceValue = sourceFragmentElement.getStreamValue();
 				
-				if ( sourceValue.isTextual() )
+				if ( value.isEmpty()  ||  testValueEmpty( sourceFragmentElement, sourceElement, sourceFragment, event, sourceModel, sourceValue ) )
 				{
-					if ( testValueEmpty( sourceFragmentElement, sourceElement, sourceFragment, event, sourceModel, sourceValue ) )
+					// Value is empty - replace this node with an unparsed node
+					if ( logName != null )
 					{
-						if ( logName != null )
+						Log log = fragment.getView().getPageLog();
+						if ( log.isRecording() )
 						{
-							Log log = fragment.getView().getPageLog();
-							if ( log.isRecording() )
-							{
-								log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " (unparsed) - sub-model deleted" ).vItem( "editedStream", value ) );
-							}
+							log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " (unparsed) - sub-model deleted" ).vItem( "editedStream", value ) );
 						}
-						return handleUnparsed( element, sourceElement, fragment, event, model, value );
 					}
+					return handleUnparsed( element, sourceElement, fragment, event, model, value );
 				}
 				
+				// Value is valid - replace the innermost node with an unparsed node
 				if ( logName != null )
 				{
 					Log log = fragment.getView().getPageLog();

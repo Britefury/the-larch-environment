@@ -10,12 +10,14 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.EditEvent;
 import BritefuryJ.DocPresent.TextEditEvent;
 import BritefuryJ.DocPresent.TreeEventListener;
+import BritefuryJ.GSym.View.GSymFragmentView;
 
 public abstract class EditListener implements TreeEventListener
 {
 	public enum HandleEditResult
 	{
 		HANDLED,
+		NO_CHANGE,
 		NOT_HANDLED,
 		PASS_TO_PARENT
 	};
@@ -35,7 +37,7 @@ public abstract class EditListener implements TreeEventListener
 	}
 	
 	
-	protected abstract boolean handleEditEvent(DPElement element, DPElement sourceElement, EditEvent event);
+	protected abstract HandleEditResult handleEditEvent(DPElement element, DPElement sourceElement, EditEvent event);
 	
 	
 	
@@ -48,7 +50,31 @@ public abstract class EditListener implements TreeEventListener
 			
 			if ( editEvent instanceof TextEditEvent  ||  isSelectionEditEvent( editEvent )  ||  isEditEvent( editEvent ) )
 			{
-				return handleEditEvent( element, sourceElement, editEvent );
+				HandleEditResult res = handleEditEvent( element, sourceElement, editEvent );
+				
+				if ( res == HandleEditResult.HANDLED )
+				{
+					GSymFragmentView sourceFragment = (GSymFragmentView)sourceElement.getFragmentContext();
+					sourceFragment.queueRefresh();
+					return true;
+				}
+				else if ( res == HandleEditResult.NO_CHANGE )
+				{
+					return true;
+				}
+				else if ( res == HandleEditResult.NOT_HANDLED )
+				{
+					return false;
+				}
+				else if ( res == HandleEditResult.PASS_TO_PARENT )
+				{
+					element.postTreeEventToParent( editEvent );
+					return true;
+				}
+				else
+				{
+					throw new RuntimeException( "Invalid HandleEditResult" );
+				}
 			}
 		}
 		return false;
