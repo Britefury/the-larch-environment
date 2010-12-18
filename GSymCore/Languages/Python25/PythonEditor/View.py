@@ -437,7 +437,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		e = Paragraph( [ seg ] )
 		_inlineObject_dropDest = ObjectDndHandler.DropDest( GSymFragmentView.FragmentModel, _onDrop_inlineObject )
 		e = e.withDropDest( _inlineObject_dropDest )
-		e = EditableStructuralItem( [ instanceCache( PythonExpressionEditListener, self._parser.expression() ),
+		e = EditableStructuralItem( [ instanceCache( PythonExpressionEditListener, self._parser.tupleOrExpression() ),
 		                              PythonExpressionTopLevelEditListener.instance ],  node,  e )
 		e = e.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		return e

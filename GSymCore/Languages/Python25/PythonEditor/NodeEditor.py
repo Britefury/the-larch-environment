@@ -170,7 +170,10 @@ class PythonExpressionEditListener (PythonParsingEditListener):
 		
 	def handleParseFailure(self, element, sourceElement, fragment, event, model, value):
 		if '\n' not in value:
-			model['expr'] = Schema.UNPARSED( value=value.getItemValues() )
+			values = value.getItemValues()
+			if values == []:
+				values = [ '' ]
+			model['expr'] = Schema.UNPARSED( value=values )
 			return HandleEditResult.HANDLED
 		else:
 			return HandleEditResult.NOT_HANDLED
@@ -182,7 +185,8 @@ class PythonExpressionEditListener (PythonParsingEditListener):
 
 
 class PythonModuleTopLevelEditListener (PythonTopLevelEditListener):
-	pass
+	def canCatchEditEvent(self, event):
+		return isinstance( event, PythonIndentationTreeEvent )
 
 PythonModuleTopLevelEditListener.instance = PythonModuleTopLevelEditListener()
 
@@ -190,7 +194,8 @@ PythonModuleTopLevelEditListener.instance = PythonModuleTopLevelEditListener()
 
 
 class PythonSuiteTopLevelEditListener (PythonTopLevelEditListener):
-	pass
+	def canCatchEditEvent(self, event):
+		return isinstance( event, PythonIndentationTreeEvent )
 
 PythonSuiteTopLevelEditListener.instance = PythonSuiteTopLevelEditListener()
 
@@ -205,13 +210,12 @@ class PythonExpressionNewLineEvent (object):
 class PythonExpressionTopLevelEditListener (PythonTopLevelEditListener):
 	def handleEditEvent(self, element, sourceElement, event):
 		if isinstance( event, TextEditEvent ):
-			value = element.getStreamValue()
 			fragment = element.getFragmentContext()
 			model = fragment.getModel()
-			if '\n' in value:
+			if isinstance( event, TextEditEventInsert )   and   '\n' in event.getTextInserted():
 				element.postTreeEvent( PythonExpressionNewLineEvent( model ) )
 				
-		return super( PythonExpressionTopLevelEditListener, self ).handleEditEvent( element, sourceElement, event )
+		return PythonTopLevelEditListener.handleEditEvent( self, element, sourceElement, event )
 
 PythonExpressionTopLevelEditListener.instance = PythonExpressionTopLevelEditListener()
 
