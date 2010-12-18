@@ -15,7 +15,7 @@ from BritefuryJ.Editor.Sequential import SequentialClipboardHandler, SelectionEd
 from Britefury.Util.NodeUtil import *
 
 
-from BritefuryJ.Editor.Sequential import SequentialEditor
+from BritefuryJ.Editor.SyntaxRecognizing import SyntaxRecognizingEditor
 
 from GSymCore.Languages.Python25 import Schema
 
@@ -47,9 +47,9 @@ class DedentPythonSelectionTreeEvent (SelectionEditTreeEvent):
 		
 		
 		
-class PythonSequentialEditor (SequentialEditor):
+class PythonSyntaxRecognizingEditor (SyntaxRecognizingEditor):
 	def __init__(self):
-		super( PythonSequentialEditor, self ).__init__()
+		super( PythonSyntaxRecognizingEditor, self ).__init__()
 		
 		
 	def getName(self):
@@ -135,7 +135,7 @@ class PythonSequentialEditor (SequentialEditor):
 		visitor.setElementSuffix( element, Schema.Dedent() )
 		bSuccess = element.postTreeEventToParent( event )
 		if not bSuccess:
-			print 'PythonSequentialEditor._indentLine(): INDENT LINE FAILED'
+			print 'PythonSyntaxRecognizingEditor._indentLine(): INDENT LINE FAILED'
 			
 	
 	
@@ -150,9 +150,9 @@ class PythonSequentialEditor (SequentialEditor):
 			visitor.setElementSuffix( element, Schema.Indent() )
 			bSuccess = element.postTreeEventToParent( event )
 			if not bSuccess:
-				print 'PythonSequentialEditor._dedentLine(): DEDENT LINE FAILED'
+				print 'PythonSyntaxRecognizingEditor._dedentLine(): DEDENT LINE FAILED'
 		else:
-			print 'PythonSequentialEditor._dedentLine(): Attempted to dedent line in top-level module'
+			print 'PythonSyntaxRecognizingEditor._dedentLine(): Attempted to dedent line in top-level module'
 			
 				
 				
@@ -184,7 +184,7 @@ class PythonSequentialEditor (SequentialEditor):
 		
 		bSuccess = root.getFragmentContentElement().postTreeEvent( event )
 		if not bSuccess:
-			print 'PythonSequentialEditor._indentSelection(): INDENT SELECTION FAILED'
+			print 'PythonSyntaxRecognizingEditor._indentSelection(): INDENT SELECTION FAILED'
 			
 				
 	
@@ -219,10 +219,10 @@ class PythonSequentialEditor (SequentialEditor):
 		
 		bSuccess = rootElement.postTreeEvent( event )
 		if not bSuccess:
-			print 'PythonSequentialEditor._dedentSelection(): DEDENT SELECTION FAILED'
+			print 'PythonSyntaxRecognizingEditor._dedentSelection(): DEDENT SELECTION FAILED'
 	
 	
 	
-PythonSequentialEditor.instance = PythonSequentialEditor()
+PythonSyntaxRecognizingEditor.instance = PythonSyntaxRecognizingEditor()
 
 

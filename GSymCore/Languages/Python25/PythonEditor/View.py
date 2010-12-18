@@ -56,7 +56,7 @@ from BritefuryJ.GSym.View import GSymFragmentView
 
 from BritefuryJ.Editor.Sequential import SequentialEditorPerspective
 from BritefuryJ.Editor.Sequential.Item import *
-from BritefuryJ.Editor.Language.Precedence import PrecedenceHandler
+from BritefuryJ.Editor.SyntaxRecognizing.Precedence import PrecedenceHandler
 
 from BritefuryJ.ModelAccess.DocModel import *
 
@@ -69,7 +69,7 @@ from GSymCore.Languages.Python25 import ExternalExpression
 from GSymCore.Languages.Python25.PythonEditor.Parser import Python25Grammar
 from GSymCore.Languages.Python25.PythonEditor.PythonEditOperations import *
 from GSymCore.Languages.Python25.PythonEditor.NodeEditor import *
-from GSymCore.Languages.Python25.PythonEditor.SequentialEditor import *
+from GSymCore.Languages.Python25.PythonEditor.SREditor import *
 from GSymCore.Languages.Python25.PythonEditor.Keywords import *
 from GSymCore.Languages.Python25.PythonEditor.Precedence import *
 from GSymCore.Languages.Python25.PythonEditor.PythonEditorCombinators import *
@@ -195,7 +195,7 @@ def compoundStatementEditor(ctx, grammar, inheritedState, node, precedence, comp
 			raise TypeError, 'Compound block should be of the form (headerNode, headerContents, suite)  or  (headerNode, headerContents, suite, headerContainerFn)'
 
 		headerStatementLine = statementLine( headerContents )
-		headerStatementLine = BreakableStructuralItem( PythonSequentialEditor.instance, headerNode, headerStatementLine )
+		headerStatementLine = BreakableStructuralItem( PythonSyntaxRecognizingEditor.instance, headerNode, headerStatementLine )
 		headerStatementLine = headerStatementLine.withElementInteractor( _statementIndentationInteractor )
 
 		if headerContainerFn is not None:
@@ -801,7 +801,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		yView = InnerFragment( y, _withPythonState( state, yPrec, EDITMODE_EDITEXPRESSION ) )
 		#<NO_TREE_EVENT_LISTENER>
 		view = div( xView, yView, '/' )
-		view = BreakableStructuralItem( PythonSequentialEditor.instance, node, view )
+		view = BreakableStructuralItem( PythonSyntaxRecognizingEditor.instance, node, view )
 		return expressionNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_MULDIVMOD,
 		                             view )
@@ -990,7 +990,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			raise TypeError, 'Value of \'quote\' should be a DMObject'
 
 
-		view = quote( valueView, title, PythonSequentialEditor.instance )
+		view = quote( valueView, title, PythonSyntaxRecognizingEditor.instance )
 		return specialFormExpressionNodeEditor( self._parser, state, node,
 		                                        view )
 
@@ -1005,7 +1005,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			raise TypeError, 'Value of \'unquote\' should be a DMObject'
 
 
-		view = unquote( valueView, 'UNQUOTE', PythonSequentialEditor.instance )
+		view = unquote( valueView, 'UNQUOTE', PythonSyntaxRecognizingEditor.instance )
 		return specialFormExpressionNodeEditor( self._parser, state, node,
 		                                        view )
 
@@ -1578,7 +1578,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 
 _parser = Python25Grammar()
-perspective = SequentialEditorPerspective( Python25View( _parser ), PythonSequentialEditor.instance )
+perspective = SequentialEditorPerspective( Python25View( _parser ), PythonSyntaxRecognizingEditor.instance )
 
 
 

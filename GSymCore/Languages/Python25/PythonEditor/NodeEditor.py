@@ -26,9 +26,9 @@ from BritefuryJ.DocPresent.Interactor import KeyElementInteractor
 
 from BritefuryJ.Logging import LogEntry
 
-from BritefuryJ.Editor.Sequential import SequentialEditor, SelectionEditTreeEvent, EditListener, ParsingEditListener, PartialParsingEditListener
+from BritefuryJ.Editor.Sequential import SequentialEditor, SelectionEditTreeEvent, EditListener
 from BritefuryJ.Editor.Sequential.StreamEditListener import HandleEditResult
-from BritefuryJ.Editor.Language import UnparsedEditListener
+from BritefuryJ.Editor.SyntaxRecognizing import ParsingEditListener, PartialParsingEditListener, UnparsedEditListener
 
 
 
@@ -45,29 +45,29 @@ from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
 from GSymCore.Languages.Python25.PythonEditor.Parser import Python25Grammar
 from GSymCore.Languages.Python25.PythonEditor.Precedence import *
 from GSymCore.Languages.Python25.PythonEditor.PythonEditOperations import *
-from GSymCore.Languages.Python25.PythonEditor.SequentialEditor import PythonSequentialEditor, PythonIndentationTreeEvent
+from GSymCore.Languages.Python25.PythonEditor.SREditor import PythonSyntaxRecognizingEditor, PythonIndentationTreeEvent
 
 
 
 class PythonParsingEditListener (ParsingEditListener):
 	def getSequentialEditor(self):
-		return PythonSequentialEditor.instance
+		return PythonSyntaxRecognizingEditor.instance
 
 	
 class PythonPartialParsingEditListener (PartialParsingEditListener):
 	def getSequentialEditor(self):
-		return PythonSequentialEditor.instance
+		return PythonSyntaxRecognizingEditor.instance
 
 
 
 class PythonUnparsedEditListener (UnparsedEditListener):
 	def getSequentialEditor(self):
-		return PythonSequentialEditor.instance
+		return PythonSyntaxRecognizingEditor.instance
 
 
 class PythonEditListener (EditListener):
 	def getSequentialEditor(self):
-		return PythonSequentialEditor.instance
+		return PythonSyntaxRecognizingEditor.instance
 
 
 #

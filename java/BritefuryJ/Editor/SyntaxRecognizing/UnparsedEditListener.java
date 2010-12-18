@@ -4,17 +4,16 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.Editor.Language;
+package BritefuryJ.Editor.SyntaxRecognizing;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.EditEvent;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
-import BritefuryJ.Editor.Sequential.StreamEditListener;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Logging.LogEntry;
 
-public abstract class UnparsedEditListener extends StreamEditListener
+public abstract class UnparsedEditListener extends SREditListener
 {
 	protected String getLogName()
 	{

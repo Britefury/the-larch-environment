@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.Editor.Sequential;
+package BritefuryJ.Editor.SyntaxRecognizing;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.EditEvent;
@@ -15,7 +15,7 @@ import BritefuryJ.Logging.LogEntry;
 import BritefuryJ.Parser.ParseResult;
 import BritefuryJ.Parser.ParserExpression;
 
-public abstract class ParsingEditListener extends StreamEditListener
+public abstract class ParsingEditListener extends SREditListener
 {
 	protected ParserExpression parser;
 	
