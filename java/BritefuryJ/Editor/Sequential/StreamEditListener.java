@@ -14,20 +14,12 @@ import BritefuryJ.GSym.View.GSymFragmentView;
 
 public abstract class StreamEditListener extends EditListener
 {
-	public enum HandleEditResult
-	{
-		HANDLED,
-		NOT_HANDLED,
-		PASS_TO_PARENT
-	};
-	
-	
 	protected abstract HandleEditResult handleValue(DPElement element, DPElement sourceElement, GSymFragmentView fragment, EditEvent event, Object model, StreamValue value);
 	
 	
 	
 	@Override
-	protected boolean handleEditEvent(DPElement element, DPElement sourceElement, EditEvent editEvent)
+	protected HandleEditResult handleEditEvent(DPElement element, DPElement sourceElement, EditEvent editEvent)
 	{
 		StreamValueVisitor visitor = editEvent.getStreamValueVisitor();
 		// If event is a selection edit event, and its source element is @element, then @element has had its fixed value
@@ -42,23 +34,6 @@ public abstract class StreamEditListener extends EditListener
 		GSymFragmentView fragment = (GSymFragmentView)element.getFragmentContext();
 		Object model = fragment.getModel();
 		
-		HandleEditResult res = handleValue( element, sourceElement, fragment, editEvent, model, value );
-		if ( res == HandleEditResult.HANDLED )
-		{
-			return true;
-		}
-		else if ( res == HandleEditResult.NOT_HANDLED )
-		{
-			return false;
-		}
-		else if ( res == HandleEditResult.PASS_TO_PARENT )
-		{
-			element.postTreeEventToParent( editEvent );
-			return true;
-		}
-		else
-		{
-			throw new RuntimeException( "Invalid HandleEditResult" );
-		}
+		return handleValue( element, sourceElement, fragment, editEvent, model, value );
 	}
 }

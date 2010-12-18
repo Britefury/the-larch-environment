@@ -7,6 +7,8 @@
 ##-*************************
 from weakref import WeakValueDictionary
 
+import copy
+
 import cPickle
 
 
@@ -159,11 +161,33 @@ def pyForceNodeRefresh(data):
 def pyReplaceNode(data, replacement):
 	data.become( replacement )
 
-def pyReplaceNodeIfNotEqual(target, replacement):
-	if target != replacement:
-		target.become( replacement )
-
+def modifySuiteMinimisingChanges(target, modified):
+	commonPrefixLen = 0
+	for i, (t, m) in enumerate( zip( target, modified ) ):
+		if t != m:
+			commonPrefixLen = i
+			break
+	
+	commonSuffixLen = 0
+	for i, (t, m) in enumerate( zip( reversed( target ), reversed( modified ) ) ):
+		if t != m:
+			commonSuffixLen = i
+			break
 		
+	minLength = min( len( target ), len( modified ) )
+	remaining = minLength - commonPrefixLen
+	commonSuffixLen = min( commonSuffixLen, remaining )
+	
+	xs = modified
+	for i, x in enumerate( modified[commonPrefixLen:len(modified)-commonSuffixLen] ):
+		if x in target[:commonPrefixLen]  or  x in target[len(target)-commonSuffixLen:]:
+			if xs is modified:
+				xs = copy.copy( modified )
+			xs[commonPrefixLen+i] = x.deepCopy()
+	
+	target[commonPrefixLen:len(target)-commonSuffixLen] = xs[commonPrefixLen:len(modified)-commonSuffixLen]
+
+	
 
 
 #

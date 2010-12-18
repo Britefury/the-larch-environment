@@ -202,7 +202,7 @@ public class ObjectNode extends ParserExpression
 						{
 							bindings = ParseResult.addBindings( bindings, result.getBindings() );
 							
-							bModified = result.value != input.get( i );
+							bModified |= result.value != input.get( i );
 		
 							value.set( i, result.value );
 						}

@@ -82,12 +82,15 @@ class ParsedExpressionEditListener (PythonParsingEditListener):
 	
 	
 	def testValueEmpty(self, element, fragment, model, value):
-		return value.isTextual()  and  value.textualValue().strip() == ''
+		return value.isTextual()  and  value.textualValue().strip( ' ' ) == ''
 	
 	
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
-		pyReplaceNodeIfNotEqual( model, parsed )
-		return HandleEditResult.HANDLED
+		if parsed != model:
+			pyReplaceNode( model, parsed )
+			return HandleEditResult.HANDLED
+		else:
+			return HandleEditResult.NO_CHANGE
 
 
 
@@ -95,8 +98,11 @@ class ParsedExpressionEditListener (PythonParsingEditListener):
 
 class StatementEditListener (PythonParsingEditListener):
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
-		pyReplaceNodeIfNotEqual( model, parsed )
-		return HandleEditResult.HANDLED
+		if parsed != model:
+			pyReplaceNode( model, parsed )
+			return HandleEditResult.HANDLED
+		else:
+			return HandleEditResult.NO_CHANGE
 
 
 
@@ -114,7 +120,7 @@ class StatementUnparsedEditListener (PythonUnparsedEditListener):
 		return i != -1   and   i == len( value ) - 1
 	
 	def testValueEmpty(self, element, sourceElement, fragment, event, model, value):
-		return value.isTextual()  and  value.textualValue().strip() == ''
+		return value.isTextual()  and  value.textualValue().strip( ' ' ) == ''
 	
 	def handleUnparsed(self, element, sourceElement, fragment, event, model, value):
 		unparsed = Schema.UNPARSED( value=value.getItemValues() )
@@ -140,7 +146,8 @@ class SuiteEditListener (PythonParsingEditListener):
 	
 		
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
-		self._suite.become( parsed )
+		#self._suite.become( parsed )
+		modifySuiteMinimisingChanges( self._suite, parsed )
 		return HandleEditResult.HANDLED
 
 
@@ -177,7 +184,7 @@ class PythonExpressionEditListener (PythonParsingEditListener):
 			if expr is None:
 				model['expr'] = unparsed
 			else:
-				pyReplaceNodeIfNotEqual( expr, unparsed )
+				pyReplaceNode( expr, unparsed )
 			return HandleEditResult.HANDLED
 		else:
 			return HandleEditResult.NOT_HANDLED
@@ -222,7 +229,7 @@ class PythonModuleTopLevelEditListener (PythonEditListener):
 	def handleEditEvent(self, element, sourceElement, event):
 		if isinstance( event, TextEditEvent ):
 			event.revert()
-		return True
+		return HandleEditResult.HANDLED
 
 PythonModuleTopLevelEditListener.instance = PythonModuleTopLevelEditListener()
 
@@ -233,7 +240,7 @@ class PythonSuiteTopLevelEditListener (PythonEditListener):
 	def handleEditEvent(self, element, sourceElement, event):
 		if isinstance( event, TextEditEvent ):
 			event.revert()
-		return True
+		return HandleEditResult.HANDLED
 
 PythonSuiteTopLevelEditListener.instance = PythonSuiteTopLevelEditListener()
 
@@ -253,17 +260,13 @@ class PythonExpressionTopLevelEditListener (PythonEditListener):
 			model = fragment.getModel()
 			if '\n' in value:
 				element.postTreeEvent( PythonExpressionNewLineEvent( model ) )
-				pyForceNodeRefresh( model )
-				event.revert()
-				return True
-			else:
-				pyForceNodeRefresh( model )
-				event.revert()
-				return True
+			pyForceNodeRefresh( model )
+			event.revert()
+			return HandleEditResult.HANDLED
 		elif isinstance( event, SelectionEditTreeEvent ):
-			return True
+			return HandleEditResult.HANDLED
 		else:
-			return False
+			return HandleEditResult.NOT_HANDLED
 
 PythonExpressionTopLevelEditListener.instance = PythonExpressionTopLevelEditListener()
 
