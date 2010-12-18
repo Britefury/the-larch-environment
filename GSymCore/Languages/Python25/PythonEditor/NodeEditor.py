@@ -28,7 +28,7 @@ from BritefuryJ.Logging import LogEntry
 
 from BritefuryJ.Editor.Sequential import SequentialEditor, SelectionEditTreeEvent, EditListener
 from BritefuryJ.Editor.Sequential.StreamEditListener import HandleEditResult
-from BritefuryJ.Editor.SyntaxRecognizing import ParsingEditListener, PartialParsingEditListener, UnparsedEditListener
+from BritefuryJ.Editor.SyntaxRecognizing import ParsingEditListener, PartialParsingEditListener, UnparsedEditListener, TopLevelEditListener
 
 
 
@@ -50,24 +50,25 @@ from GSymCore.Languages.Python25.PythonEditor.SREditor import PythonSyntaxRecogn
 
 
 class PythonParsingEditListener (ParsingEditListener):
-	def getSequentialEditor(self):
+	def getSyntaxRecognizingEditor(self):
 		return PythonSyntaxRecognizingEditor.instance
 
 	
 class PythonPartialParsingEditListener (PartialParsingEditListener):
-	def getSequentialEditor(self):
+	def getSyntaxRecognizingEditor(self):
 		return PythonSyntaxRecognizingEditor.instance
 
 
 
 class PythonUnparsedEditListener (UnparsedEditListener):
-	def getSequentialEditor(self):
+	def getSyntaxRecognizingEditor(self):
 		return PythonSyntaxRecognizingEditor.instance
 
 
-class PythonEditListener (EditListener):
-	def getSequentialEditor(self):
+class PythonTopLevelEditListener (TopLevelEditListener):
+	def getSyntaxRecognizingEditor(self):
 		return PythonSyntaxRecognizingEditor.instance
+	
 
 
 #
@@ -79,10 +80,6 @@ class PythonEditListener (EditListener):
 class ParsedExpressionEditListener (PythonParsingEditListener):
 	def getLogName(self):
 		return 'Expression'
-	
-	
-	def testValueEmpty(self, element, fragment, model, value):
-		return value.isTextual()  and  value.textualValue().strip( ' ' ) == ''
 	
 	
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
@@ -97,6 +94,10 @@ class ParsedExpressionEditListener (PythonParsingEditListener):
 
 
 class StatementEditListener (PythonParsingEditListener):
+	def getLogName(self):
+		return 'Statement'
+	
+	
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
 		if parsed != model:
 			pyReplaceNode( model, parsed )
@@ -115,12 +116,9 @@ class StatementUnparsedEditListener (PythonUnparsedEditListener):
 	def getLogName(self):
 		return 'Statement'
 	
-	def testValue(self, element, sourceElement, fragment, event, model, value):
+	def isValueValid(self, element, sourceElement, fragment, event, model, value):
 		i = value.indexOf( '\n' )
 		return i != -1   and   i == len( value ) - 1
-	
-	def testValueEmpty(self, element, sourceElement, fragment, event, model, value):
-		return value.isTextual()  and  value.textualValue().strip( ' ' ) == ''
 	
 	def handleUnparsed(self, element, sourceElement, fragment, event, model, value):
 		unparsed = Schema.UNPARSED( value=value.getItemValues() )
@@ -146,7 +144,6 @@ class SuiteEditListener (PythonParsingEditListener):
 	
 		
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
-		#self._suite.become( parsed )
 		modifySuiteMinimisingChanges( self._suite, parsed )
 		return HandleEditResult.HANDLED
 
@@ -162,33 +159,61 @@ class PythonExpressionEditListener (PythonParsingEditListener):
 	
 	
 	def handleEmptyValue(self, element, fragment, event, model):
-		model['expr'] = None
+		model['expr'] = Schema.UNPARSED( value=[ '' ] )
 		return HandleEditResult.HANDLED
 	
 	def handleParseSuccess(self, element, sourceElement, fragment, event, model, value, parsed):
 		expr = model['expr']
 		if parsed != expr:
-			if expr is None:
-				model['expr'] = parsed
-			else:
-				pyReplaceNode( expr, parsed )
+			model['expr'] = parsed
 		return HandleEditResult.HANDLED
 		
 	def handleParseFailure(self, element, sourceElement, fragment, event, model, value):
 		if '\n' not in value:
-			unparsed = Schema.UNPARSED( value=value.getItemValues() )
-			log = fragment.getView().getPageLog()
-			if log.isRecording():
-				log.log( LogEntry( 'Py25ExprEdit' ).hItem( 'description', 'Top level expression - unparsed' ).vItem( 'editedStream', value ).hItem( 'parser', self.parser ).vItem( 'parsedResult', unparsed ) )
-			expr = model['expr']
-			if expr is None:
-				model['expr'] = unparsed
-			else:
-				pyReplaceNode( expr, unparsed )
+			model['expr'] = Schema.UNPARSED( value=value.getItemValues() )
 			return HandleEditResult.HANDLED
 		else:
 			return HandleEditResult.NOT_HANDLED
 
+
+
+
+
+
+
+class PythonModuleTopLevelEditListener (PythonTopLevelEditListener):
+	pass
+
+PythonModuleTopLevelEditListener.instance = PythonModuleTopLevelEditListener()
+
+
+
+
+class PythonSuiteTopLevelEditListener (PythonTopLevelEditListener):
+	pass
+
+PythonSuiteTopLevelEditListener.instance = PythonSuiteTopLevelEditListener()
+
+
+
+
+class PythonExpressionNewLineEvent (object):
+	def __init__(self, model):
+		self.model = model
+
+
+class PythonExpressionTopLevelEditListener (PythonTopLevelEditListener):
+	def handleEditEvent(self, element, sourceElement, event):
+		if isinstance( event, TextEditEvent ):
+			value = element.getStreamValue()
+			fragment = element.getFragmentContext()
+			model = fragment.getModel()
+			if '\n' in value:
+				element.postTreeEvent( PythonExpressionNewLineEvent( model ) )
+				
+		return super( PythonExpressionTopLevelEditListener, self ).handleEditEvent( element, sourceElement, event )
+
+PythonExpressionTopLevelEditListener.instance = PythonExpressionTopLevelEditListener()
 
 
 
@@ -205,7 +230,7 @@ class StatementIndentationInteractor (KeyElementInteractor):
 			context = element.getFragmentContext()
 			node = context.getModel()
 			
-			editor = element.getRegion().getClipboardHandler().getSequentialEditor()
+			editor = SequentialEditor.getEditorForElement( element )
 			if event.getModifiers() & KeyEvent.SHIFT_MASK  !=  0:
 				editor.dedent( element, context, node )
 			else:
@@ -225,53 +250,3 @@ class StatementIndentationInteractor (KeyElementInteractor):
 	
 	
 	
-class PythonModuleTopLevelEditListener (PythonEditListener):
-	def handleEditEvent(self, element, sourceElement, event):
-		if isinstance( event, TextEditEvent ):
-			event.revert()
-		return HandleEditResult.HANDLED
-
-PythonModuleTopLevelEditListener.instance = PythonModuleTopLevelEditListener()
-
-
-
-
-class PythonSuiteTopLevelEditListener (PythonEditListener):
-	def handleEditEvent(self, element, sourceElement, event):
-		if isinstance( event, TextEditEvent ):
-			event.revert()
-		return HandleEditResult.HANDLED
-
-PythonSuiteTopLevelEditListener.instance = PythonSuiteTopLevelEditListener()
-
-
-
-
-class PythonExpressionNewLineEvent (object):
-	def __init__(self, model):
-		self.model = model
-
-
-class PythonExpressionTopLevelEditListener (PythonEditListener):
-	def handleEditEvent(self, element, sourceElement, event):
-		if isinstance( event, TextEditEvent ):
-			value = element.getStreamValue()
-			fragment = element.getFragmentContext()
-			model = fragment.getModel()
-			if '\n' in value:
-				element.postTreeEvent( PythonExpressionNewLineEvent( model ) )
-			pyForceNodeRefresh( model )
-			event.revert()
-			return HandleEditResult.HANDLED
-		elif isinstance( event, SelectionEditTreeEvent ):
-			return HandleEditResult.HANDLED
-		else:
-			return HandleEditResult.NOT_HANDLED
-
-PythonExpressionTopLevelEditListener.instance = PythonExpressionTopLevelEditListener()
-
-
-
-
-
-

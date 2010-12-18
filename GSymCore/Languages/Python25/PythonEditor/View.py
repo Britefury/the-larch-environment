@@ -567,7 +567,6 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 
 
-
 	# Variable reference
 	@DMObjectNodeDispatchMethod( Schema.Load )
 	def Load(self, ctx, state, node, name):

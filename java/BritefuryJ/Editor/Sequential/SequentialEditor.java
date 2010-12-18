@@ -81,6 +81,14 @@ public abstract class SequentialEditor
 	}
 	
 	
+	
+	public static SequentialEditor getEditorForElement(DPElement element)
+	{
+		SequentialClipboardHandler clipboardHandler = (SequentialClipboardHandler)element.getRegion().getClipboardHandler();
+		return clipboardHandler.getSequentialEditor();
+	}
+	
+	
 
 	
 	protected boolean isEditEvent(EditEvent event)

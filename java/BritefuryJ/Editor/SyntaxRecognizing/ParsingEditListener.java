@@ -15,7 +15,7 @@ import BritefuryJ.Logging.LogEntry;
 import BritefuryJ.Parser.ParseResult;
 import BritefuryJ.Parser.ParserExpression;
 
-public abstract class ParsingEditListener extends SREditListener
+public abstract class ParsingEditListener extends SRStreamEditListener
 {
 	protected ParserExpression parser;
 	
@@ -32,12 +32,12 @@ public abstract class ParsingEditListener extends SREditListener
 	}
 	
 
-	protected boolean testValueEmpty(DPElement element, GSymFragmentView fragment, Object model, StreamValue value)
+	protected boolean isValueEmpty(DPElement element, GSymFragmentView fragment, Object model, StreamValue value)
 	{
-		return false;
+		return getSyntaxRecognizingEditor().isValueEmpty( value );
 	}
 	
-	protected boolean testValue(DPElement element, GSymFragmentView fragment, Object model, StreamValue value)
+	protected boolean isValueValid(DPElement element, GSymFragmentView fragment, Object model, StreamValue value)
 	{
 		return true;
 	}
@@ -67,7 +67,7 @@ public abstract class ParsingEditListener extends SREditListener
 	protected HandleEditResult handleValue(DPElement element, DPElement sourceElement, GSymFragmentView fragment, EditEvent event, Object model, StreamValue value)
 	{
 		String logName = getLogName();
-		if ( value.isEmpty()  ||  testValueEmpty( element, fragment, model, value ) )
+		if ( value.isEmpty()  ||  isValueEmpty( element, fragment, model, value ) )
 		{
 			if ( logName != null )
 			{
@@ -79,7 +79,7 @@ public abstract class ParsingEditListener extends SREditListener
 			}
 			return handleEmptyValue( element, fragment, event, model );
 		}
-		else if ( testValue( element, fragment, model, value ) )
+		else if ( isValueValid( element, fragment, model, value ) )
 		{
 			Object parsed[] = parseStream( value );
 			

@@ -13,23 +13,23 @@ import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Logging.LogEntry;
 
-public abstract class UnparsedEditListener extends SREditListener
+public abstract class UnparsedEditListener extends SRStreamEditListener
 {
 	protected String getLogName()
 	{
 		return null;
 	}
 	
-	protected boolean testValue(DPElement element, DPElement sourceElement, GSymFragmentView fragment,
+	protected boolean isValueValid(DPElement element, DPElement sourceElement, GSymFragmentView fragment,
 			EditEvent event, Object model, StreamValue value)
 	{
 		return true;
 	}
 	
-	protected boolean testValueEmpty(DPElement element, DPElement sourceElement, GSymFragmentView fragment,
+	protected boolean isValueEmpty(DPElement element, DPElement sourceElement, GSymFragmentView fragment,
 			EditEvent event, Object model, StreamValue value)
 	{
-		return false;
+		return getSyntaxRecognizingEditor().isValueEmpty( value );
 	}
 	
 	protected HandleEditResult handleInvalidValue(DPElement element, DPElement sourceElement, GSymFragmentView fragment,
@@ -48,7 +48,7 @@ public abstract class UnparsedEditListener extends SREditListener
 			EditEvent event, Object model, StreamValue value)
 	{
 		String logName = getLogName();
-		if ( testValue( element, sourceElement, fragment, event, model, value ) )
+		if ( isValueValid( element, sourceElement, fragment, event, model, value ) )
 		{
 			// Attempt to create an unparsed node to replace only the node corresponding to the innermost fragment surrounding
 			// the element that sent the edit event
@@ -72,7 +72,7 @@ public abstract class UnparsedEditListener extends SREditListener
 				Object sourceModel = sourceFragment.getModel();
 				StreamValue sourceValue = sourceFragmentElement.getStreamValue();
 				
-				if ( value.isEmpty()  ||  testValueEmpty( sourceFragmentElement, sourceElement, sourceFragment, event, sourceModel, sourceValue ) )
+				if ( value.isEmpty()  ||  isValueEmpty( sourceFragmentElement, sourceElement, sourceFragment, event, sourceModel, sourceValue ) )
 				{
 					// Value is empty - replace this node with an unparsed node
 					if ( logName != null )
