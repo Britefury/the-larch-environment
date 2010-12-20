@@ -55,7 +55,7 @@ class NotImplementedError (Exception):
 #
 
 def isStmt(node):
-	return isinstance( node, DMObjectInterface )  and  ( node.isInstanceOf( Schema.Stmt )  or  node.isInstanceOf( Schema.BlankLine )  or  node.isInstanceOf( Schema.UNPARSED ) )
+	return isinstance( node, DMObjectInterface )  and  ( node.isInstanceOf( Schema.Stmt )  or  node.isInstanceOf( Schema.UNPARSED ) )
 
 def isCompoundStmt(node):
 	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Schema.CompoundStmt )
@@ -65,9 +65,6 @@ def isCompoundStmtHeader(node):
 
 def isCompoundStmtOrCompoundHeader(node):
 	return isinstance( node, DMObjectInterface )  and  ( node.isInstanceOf( Schema.CompoundStmt )  or  node.isInstanceOf( Schema.CompountStmtHeader ) )
-
-def isUnparsed(node):
-	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Schema.UNPARSED )
 
 def isTopLevel(node):
 	return isinstance( node, DMObjectInterface )  and  node.isInstanceOf( Schema.TopLevel )

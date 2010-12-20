@@ -19,9 +19,15 @@ public abstract class TopLevelEditListener extends SREditListener
 	}
 	
 	
+	protected void handleTopLevelEditEvent(DPElement element, DPElement sourceElement, EditEvent event)
+	{
+	}
+	
+	
 	@Override
 	protected HandleEditResult handleEditEvent(DPElement element, DPElement sourceElement, EditEvent event)
 	{
+		handleTopLevelEditEvent( element, sourceElement, event );
 		if ( event instanceof TextEditEvent  ||  event instanceof SelectionEditTreeEvent  ||  canCatchEditEvent( event ) )
 		{
 			return HandleEditResult.HANDLED;
