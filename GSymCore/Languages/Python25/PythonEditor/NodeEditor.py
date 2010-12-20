@@ -99,14 +99,12 @@ class PythonExpressionTopLevelEditListener (TopLevelEditListener):
 	def getSyntaxRecognizingEditor(self):
 		return PythonSyntaxRecognizingEditor.instance
 	
-	def handleEditEvent(self, element, sourceElement, event):
+	def handleTopLevelEditEvent(self, element, sourceElement, event):
 		if isinstance( event, TextEditEvent ):
 			fragment = element.getFragmentContext()
 			model = fragment.getModel()
 			if isinstance( event, TextEditEventInsert )   and   '\n' in event.getTextInserted():
 				element.postTreeEvent( PythonExpressionNewLineEvent( model ) )
-				
-		return PythonTopLevelEditListener.handleEditEvent( self, element, sourceElement, event )
 
 PythonExpressionTopLevelEditListener.instance = PythonExpressionTopLevelEditListener()
 

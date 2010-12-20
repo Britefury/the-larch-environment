@@ -77,6 +77,12 @@ from GSymCore.Languages.Python25.PythonEditor.PythonEditorCombinators import *
 
 
 
+EDITMODE_DISPLAYCONTENTS = 0
+EDITMODE_EDITEXPRESSION = 1
+EDITMODE_EDITSTATEMENT = 2
+
+
+
 DEFAULT_LINE_BREAK_PRIORITY = 100
 
 

@@ -20,12 +20,6 @@ from BritefuryJ.DocPresent.Combinators.RichText import *
 from BritefuryJ.DocPresent.Combinators.Sequence import *
 
 
-EDITMODE_DISPLAYCONTENTS = 0
-EDITMODE_EDITEXPRESSION = 1
-EDITMODE_EDITSTATEMENT = 2
-
-
-
 
 class PythonEditorStyle (object):
 	pythonEditor = AttributeNamespace( 'pythonEditor' )
