@@ -118,10 +118,11 @@ def _commitUnparsedStatment(model, value):
 
 
 
+
+
 def unparsedNodeEditor(grammar, inheritedState, node, precedence, contents):
 	mode = inheritedState['editMode']
 	if mode == EDITMODE_DISPLAYCONTENTS:
-		contents = _pythonPrecedenceHandler.applyPrecedenceBrackets( node, contents, precedence   if precedence is not None   else -1, inheritedState )
 		return contents
 	elif mode == EDITMODE_EDITEXPRESSION:
 		contents = EditableSequentialItem( PythonSyntaxRecognizingEditor.instance.parsingNodeEditListener( 'Expression', grammar.expression(), pyReplaceNode ),  contents )
@@ -137,53 +138,19 @@ def unparsedNodeEditor(grammar, inheritedState, node, precedence, contents):
 		raise ValueError, 'invalid mode %d'  %  mode
 
 
-def expressionNodeEditor(grammar, inheritedState, node, precedence, contents):
+def standardNodeEditor(grammar, inheritedState, node, precedence, contents):
 	mode = inheritedState['editMode']
 	if mode == EDITMODE_DISPLAYCONTENTS:
-		contents = _pythonPrecedenceHandler.applyPrecedenceBrackets( node, contents, precedence   if precedence is not None   else -1, inheritedState )
-		return contents
+		return _pythonPrecedenceHandler.applyPrecedenceBrackets( node, contents, precedence   if precedence is not None   else -1, inheritedState )
 	elif mode == EDITMODE_EDITEXPRESSION:
 		contents = _pythonPrecedenceHandler.applyPrecedenceBrackets( node, contents, precedence   if precedence is not None   else -1, inheritedState )
-		contents = EditableSequentialItem( PythonSyntaxRecognizingEditor.instance.parsingNodeEditListener( 'Expression', grammar.expression(), pyReplaceNode ),  contents )
-		return contents
-	else:
-		raise ValueError, 'invalid mode %d'  %  mode
-
-
-def specialFormExpressionNodeEditor(grammar, inheritedState, node, contents):
-	mode = inheritedState['editMode']
-	if mode == EDITMODE_DISPLAYCONTENTS  or  mode == EDITMODE_EDITEXPRESSION:
-		contents = StructuralItem( node, contents )
-		return contents
-	else:
-		raise ValueError, 'invalid mode %d'  %  mode
-
-
-def statementNodeEditor(grammar, inheritedState, node, contents):
-	mode = inheritedState['editMode']
-	if mode == EDITMODE_EDITSTATEMENT:
+		return EditableSequentialItem( PythonSyntaxRecognizingEditor.instance.parsingNodeEditListener( 'Expression', grammar.expression(), pyReplaceNode ),  contents )
+	elif mode == EDITMODE_EDITSTATEMENT:
 		s = statementLine( contents )
-
-		assert not node.isInstanceOf( Schema.UNPARSED )
 		s = EditableStructuralItem( [ PythonSyntaxRecognizingEditor.instance.parsingNodeEditListener( 'Statement', grammar.simpleSingleLineStatementValid(), pyReplaceNode ),
 		                              PythonSyntaxRecognizingEditor.instance.partialParsingNodeEditListener( 'Compound header', grammar.compoundStmtHeader() ),
 		                              PythonSyntaxRecognizingEditor.instance.unparsedNodeEditListener( 'Statement', _isValidUnparsedStatementValue, _commitUnparsedStatment ) ], node, s )
-		s = s.withElementInteractor( _statementIndentationInteractor )
-		return s
-	else:
-		raise ValueError, 'invalid mode %d'  %  mode
-
-
-def specialFormStatementNodeEditor(grammar, inheritedState, node, contents):
-	mode = inheritedState['editMode']
-	if mode == EDITMODE_EDITSTATEMENT:
-		contents = StructuralItem( node, contents )
-		s = specialFormStatementLine( contents )
-		s = EditableStructuralItem( [ PythonSyntaxRecognizingEditor.instance.parsingNodeEditListener( 'Statement', grammar.simpleSingleLineStatementValid(), pyReplaceNode ),
-		                              PythonSyntaxRecognizingEditor.instance.partialParsingNodeEditListener( 'Compound header', grammar.compoundStmtHeader() ),
-		                              PythonSyntaxRecognizingEditor.instance.unparsedNodeEditListener( 'Statement', _isValidUnparsedStatementValue, _commitUnparsedStatment ) ], node, s )
-		s = s.withElementInteractor( _statementIndentationInteractor )
-		return s
+		return s.withElementInteractor( _statementIndentationInteractor )
 	else:
 		raise ValueError, 'invalid mode %d'  %  mode
 
@@ -243,10 +210,35 @@ def compoundStatementEditor(ctx, grammar, inheritedState, node, precedence, comp
 
 
 
+def specialFormExpressionNodeEditor(grammar, inheritedState, node, contents):
+	mode = inheritedState['editMode']
+	if mode == EDITMODE_DISPLAYCONTENTS  or  mode == EDITMODE_EDITEXPRESSION:
+		contents = StructuralItem( node, contents )
+		return contents
+	else:
+		raise ValueError, 'invalid mode %d'  %  mode
+
+
+def specialFormStatementNodeEditor(grammar, inheritedState, node, contents):
+	mode = inheritedState['editMode']
+	if mode == EDITMODE_EDITSTATEMENT:
+		contents = StructuralItem( node, contents )
+		s = specialFormStatementLine( contents )
+		s = EditableStructuralItem( [ PythonSyntaxRecognizingEditor.instance.parsingNodeEditListener( 'Statement', grammar.simpleSingleLineStatementValid(), pyReplaceNode ),
+		                              PythonSyntaxRecognizingEditor.instance.partialParsingNodeEditListener( 'Compound header', grammar.compoundStmtHeader() ),
+		                              PythonSyntaxRecognizingEditor.instance.unparsedNodeEditListener( 'Statement', _isValidUnparsedStatementValue, _commitUnparsedStatment ) ], node, s )
+		s = s.withElementInteractor( _statementIndentationInteractor )
+		return s
+	else:
+		raise ValueError, 'invalid mode %d'  %  mode
+
+
+
+
 def spanPrefixOpView(ctx, grammar, inheritedState, node, x, op, precedence):
 	xView = InnerFragment( x, _withPythonState( inheritedState, precedence, EDITMODE_DISPLAYCONTENTS ) )
 	view = spanPrefixOp( xView, op )
-	return expressionNodeEditor( grammar, inheritedState, node, precedence,
+	return standardNodeEditor( grammar, inheritedState, node, precedence,
 	                             view )
 
 
@@ -255,14 +247,14 @@ def spanBinOpView(ctx, grammar, inheritedState, node, x, y, op, precedence, bRig
 	xView = InnerFragment( x, _withPythonState( inheritedState, xPrec, EDITMODE_DISPLAYCONTENTS ) )
 	yView = InnerFragment( y, _withPythonState( inheritedState, yPrec, EDITMODE_DISPLAYCONTENTS ) )
 	view = spanBinOp( xView, yView, op )
-	return expressionNodeEditor( grammar, inheritedState, node, precedence,
+	return standardNodeEditor( grammar, inheritedState, node, precedence,
 	                             view )
 
 
 def spanCmpOpView(ctx, grammar, inheritedState, node, op, y, precedence):
 	yView = InnerFragment( y, _withPythonState( inheritedState, precedence, EDITMODE_DISPLAYCONTENTS ) )
 	view = spanCmpOp( op, yView )
-	return expressionNodeEditor( grammar, inheritedState, node, precedence,
+	return standardNodeEditor( grammar, inheritedState, node, precedence,
 	                             view )
 
 
@@ -468,7 +460,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@DMObjectNodeDispatchMethod( Schema.BlankLine )
 	def BlankLine(self, ctx, state, node):
-		return statementNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node, PRECEDENCE_STMT,
 		                            blankLine() )
 
 
@@ -499,7 +491,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@DMObjectNodeDispatchMethod( Schema.CommentStmt )
 	def CommentStmt(self, ctx, state, node, comment):
 		view = commentStmt( comment )
-		return statementNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node, PRECEDENCE_STMT,
 		                            view )
 
 
@@ -517,7 +509,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 		view = stringLiteral( fmt, quote, value )
 
-		return expressionNodeEditor( self._parser, state, node, PRECEDENCE_LITERALVALUE,
+		return standardNodeEditor( self._parser, state, node, PRECEDENCE_LITERALVALUE,
 		                             view )
 
 	# Integer literal
@@ -540,7 +532,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 		view = intLiteral( fmt, valueString )
 
-		return expressionNodeEditor( self._parser, state, node, PRECEDENCE_LITERALVALUE,
+		return standardNodeEditor( self._parser, state, node, PRECEDENCE_LITERALVALUE,
 		                             view )
 
 
@@ -548,7 +540,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Float literal
 	@DMObjectNodeDispatchMethod( Schema.FloatLiteral )
 	def FloatLiteral(self, ctx, state, node, value):
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_LITERALVALUE,
 		                             floatLiteral( value ) )
 
@@ -557,7 +549,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Imaginary literal
 	@DMObjectNodeDispatchMethod( Schema.ImaginaryLiteral )
 	def ImaginaryLiteral(self, ctx, state, node, value):
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_LITERALVALUE,
 		                             imaginaryLiteral( value ) )
 
@@ -566,7 +558,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Targets
 	@DMObjectNodeDispatchMethod( Schema.SingleTarget )
 	def SingleTarget(self, ctx, state, node, name):
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_SINGLETARGET,
 		                             singleTarget( name ) )
 
@@ -575,7 +567,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def TupleTarget(self, ctx, state, node, targets, trailingSeparator):
 		elementViews = InnerFragment.map( targets, _withPythonState( state, PRECEDENCE_CONTAINER_ELEMENT ) )
 		view = tupleTarget( elementViews, trailingSeparator is not None )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_TUPLE,
 		                             view )
 
@@ -583,7 +575,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def ListTarget(self, ctx, state, node, targets, trailingSeparator):
 		elementViews = InnerFragment.map( targets, _withPythonState( state, PRECEDENCE_CONTAINER_ELEMENT ) )
 		view = listTarget( elementViews, trailingSeparator is not None )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_LISTDISPLAY,
 		                             view )
 
@@ -592,7 +584,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Variable reference
 	@DMObjectNodeDispatchMethod( Schema.Load )
 	def Load(self, ctx, state, node, name):
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_LOAD,
 		                             load( name ) )
 
@@ -603,7 +595,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def TupleLiteral(self, ctx, state, node, values, trailingSeparator):
 		elementViews = InnerFragment.map( values, _withPythonState( state, PRECEDENCE_CONTAINER_ELEMENT ) )
 		view = tupleLiteral( elementViews, trailingSeparator is not None )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_TUPLE,
 		                             view )
 
@@ -614,7 +606,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def ListLiteral(self, ctx, state, node, values, trailingSeparator):
 		elementViews = InnerFragment.map( values, _withPythonState( state, PRECEDENCE_CONTAINER_ELEMENT ) )
 		view = listLiteral( elementViews, trailingSeparator is not None )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_LISTDISPLAY,
 		                             view )
 
@@ -626,7 +618,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		targetView = InnerFragment( target, _withPythonState( state, PRECEDENCE_CONTAINER_COMPREHENSIONFOR) )
 		sourceView = InnerFragment( source, _withPythonState( state, PRECEDENCE_CONTAINER_COMPREHENSIONFOR ) )
 		view = comprehensionFor( targetView, sourceView )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_NONE,
 		                             view )
 
@@ -634,7 +626,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def ComprehensionIf(self, ctx, state, node, condition):
 		conditionView = InnerFragment( condition, _withPythonState( state, PRECEDENCE_CONTAINER_COMPREHENSIONIF ) )
 		view = comprehensionIf( conditionView )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_NONE,
 		                             view )
 
@@ -643,7 +635,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		exprView = InnerFragment( resultExpr, _withPythonState( state, PRECEDENCE_CONTAINER_ELEMENT ) )
 		itemViews = InnerFragment.map( comprehensionItems, _withPythonState( state, PRECEDENCE_CONTAINER_ELEMENT ) )
 		view = listComp( exprView, itemViews )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_LISTDISPLAY,
 		                             view )
 
@@ -653,7 +645,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		exprView = InnerFragment( resultExpr, _withPythonState( state, PRECEDENCE_CONTAINER_ELEMENT ) )
 		itemViews = InnerFragment.map( comprehensionItems, _withPythonState( state, PRECEDENCE_CONTAINER_ELEMENT ) )
 		view = genExpr( exprView, itemViews )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_LISTDISPLAY,
 		                             view )
 
@@ -666,7 +658,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		keyView = InnerFragment( key, _withPythonState( state, PRECEDENCE_CONTAINER_ELEMENT ) )
 		valueView = InnerFragment( value, _withPythonState( state, PRECEDENCE_CONTAINER_ELEMENT ) )
 		view = dictKeyValuePair( keyView, valueView )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_NONE,
 		                             view )
 
@@ -674,7 +666,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def DictLiteral(self, ctx, state, node, values, trailingSeparator):
 		elementViews = InnerFragment.map( values, _withPythonState( state, PRECEDENCE_CONTAINER_ELEMENT ) )
 		view = dictLiteral( elementViews, trailingSeparator is not None )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_DICTDISPLAY,
 		                             view )
 
@@ -684,7 +676,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def YieldExpr(self, ctx, state, node, value):
 		valueView = InnerFragment( value, _withPythonState( state, PRECEDENCE_CONTAINER_YIELDEXPR ) )
 		view = yieldExpr( valueView )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_YIELDEXPR,
 		                             view )
 
@@ -695,7 +687,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def AttributeRef(self, ctx, state, node, target, name):
 		targetView = InnerFragment( target, _withPythonState( state, PRECEDENCE_CONTAINER_ATTRIBUTEREFTARGET ) )
 		view = attributeRef( targetView, name )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_ATTR,
 		                             view )
 
@@ -707,7 +699,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		lowerView = InnerFragment( lower, _withPythonState( state, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX ) )   if lower is not None   else None
 		upperView = InnerFragment( upper, _withPythonState( state, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX ) )   if upper is not None   else None
 		view = subscriptSlice( lowerView, upperView )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_NONE,
 		                             view )
 
@@ -717,14 +709,14 @@ class Python25View (GSymViewObjectNodeDispatch):
 		upperView = InnerFragment( upper, _withPythonState( state, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX ) )   if upper is not None   else None
 		strideView = InnerFragment( stride, _withPythonState( state, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX ) )   if stride is not None   else None
 		view = subscriptLongSlice( lowerView, upperView, strideView )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_NONE,
 		                             view )
 
 	@DMObjectNodeDispatchMethod( Schema.SubscriptEllipsis )
 	def SubscriptEllipsis(self, ctx, state, node):
 		view = subscriptEllipsis()
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_NONE,
 		                             view )
 
@@ -732,7 +724,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def SubscriptTuple(self, ctx, state, node, values, trailingSeparator):
 		elementViews = InnerFragment.map( values, _withPythonState( state, PRECEDENCE_CONTAINER_ELEMENT ) )
 		view = subscriptTuple( elementViews, trailingSeparator is not None )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_TUPLE,
 		                             view )
 
@@ -741,7 +733,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		targetView = InnerFragment( target, _withPythonState( state, PRECEDENCE_CONTAINER_SUBSCRIPTTARGET ) )
 		indexView = InnerFragment( index, _withPythonState( state, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX ) )
 		view = subscript( targetView, indexView )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_SUBSCRIPT,
 		                             view )
 
@@ -753,7 +745,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def CallKWArg(self, ctx, state, node, name, value):
 		valueView = InnerFragment( value, _withPythonState( state, PRECEDENCE_CONTAINER_CALLARG ) )
 		view = callKWArg( name, valueView )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_NONE,
 		                             view )
 
@@ -761,7 +753,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def CallArgList(self, ctx, state, node, value):
 		valueView = InnerFragment( value, _withPythonState( state, PRECEDENCE_CONTAINER_CALLARG ) )
 		view = callArgList( valueView )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_NONE,
 		                             view )
 
@@ -769,7 +761,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def CallKWArgList(self, ctx, state, node, value):
 		valueView = InnerFragment( value, _withPythonState( state, PRECEDENCE_CONTAINER_CALLARG ) )
 		view = callKWArgList( valueView )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_NONE,
 		                             view )
 
@@ -778,7 +770,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		targetView = InnerFragment( target, _withPythonState( state, PRECEDENCE_CONTAINER_CALLTARGET ) )
 		argViews = InnerFragment.map( args, _withPythonState( state, PRECEDENCE_CONTAINER_CALLARG ) )
 		view = call( targetView, argViews, argsTrailingSeparator is not None )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_CALL,
 		                             view )
 
@@ -793,7 +785,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		xView = InnerFragment( x, _withPythonState( state, xPrec ) )
 		yView = InnerFragment( y, _withPythonState( state, yPrec, EDITMODE_EDITEXPRESSION ) )
 		view = exponent( xView, yView )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_POW,
 		                             view )
 
@@ -823,7 +815,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		#<NO_TREE_EVENT_LISTENER>
 		view = div( xView, yView, '/' )
 		view = BreakableStructuralItem( PythonSyntaxRecognizingEditor.instance, node, view )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_MULDIVMOD,
 		                             view )
 
@@ -868,7 +860,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		xView = InnerFragment( x, _withPythonState( state, PRECEDENCE_CMP ) )
 		opViews = InnerFragment.map( ops, _withPythonState( state, PRECEDENCE_CMP ) )
 		view = compare( xView, opViews )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_CMP,
 		                             view )
 
@@ -934,7 +926,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@DMObjectNodeDispatchMethod( Schema.SimpleParam )
 	def SimpleParam(self, ctx, state, node, name):
 		view = simpleParam( name )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_NONE,
 		                             view )
 
@@ -942,21 +934,21 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def DefaultValueParam(self, ctx, state, node, name, defaultValue):
 		valueView = InnerFragment( defaultValue, _withPythonState( state, PRECEDENCE_NONE ) )
 		view = defaultValueParam( name, valueView )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_NONE,
 		                             view )
 
 	@DMObjectNodeDispatchMethod( Schema.ParamList )
 	def ParamList(self, ctx, state, node, name):
 		view = paramList( name )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_NONE,
 		                             view )
 
 	@DMObjectNodeDispatchMethod( Schema.KWParamList )
 	def KWParamList(self, ctx, state, node, name):
 		view = kwParamList( name )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_NONE,
 		                             view )
 
@@ -969,7 +961,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		paramViews = InnerFragment.map( params, _withPythonState( state, PRECEDENCE_NONE ) )
 
 		view = lambdaExpr( paramViews, paramsTrailingSeparator is not None, exprView )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_LAMBDAEXPR,
 		                             view )
 
@@ -982,7 +974,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		exprView = InnerFragment( expr, _withPythonState( state, PRECEDENCE_CONTAINER_CONDITIONALEXPR ) )
 		elseExprView = InnerFragment( elseExpr, _withPythonState( state, PRECEDENCE_CONTAINER_CONDITIONALEXPR ) )
 		view = conditionalExpr( conditionView, exprView, elseExprView )
-		return expressionNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node,
 		                             PRECEDENCE_CONDITIONAL,
 		                             view )
 
@@ -1127,7 +1119,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def ExprStmt(self, ctx, state, node, expr):
 		exprView = InnerFragment( expr, _withPythonState( state, PRECEDENCE_STMT ) )
 		view = exprStmt( exprView )
-		return statementNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node, PRECEDENCE_STMT,
 		                            view )
 
 
@@ -1138,7 +1130,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		conditionView = InnerFragment( condition, _withPythonState( state, PRECEDENCE_STMT ) )
 		failView = InnerFragment( fail, _withPythonState( state, PRECEDENCE_STMT ) )   if fail is not None   else None
 		view = assertStmt( conditionView, failView )
-		return statementNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node, PRECEDENCE_STMT,
 		                            view )
 
 
@@ -1148,7 +1140,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		targetViews = InnerFragment.map( targets, _withPythonState( state, PRECEDENCE_STMT ) )
 		valueView = InnerFragment( value, _withPythonState( state, PRECEDENCE_STMT ) )
 		view = assignStmt( targetViews, valueView )
-		return statementNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node, PRECEDENCE_STMT,
 		                            view )
 
 
@@ -1158,7 +1150,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		targetView = InnerFragment( target, _withPythonState( state, PRECEDENCE_STMT ) )
 		valueView = InnerFragment( value, _withPythonState( state, PRECEDENCE_STMT ) )
 		view = augAssignStmt( op, targetView, valueView )
-		return statementNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node, PRECEDENCE_STMT,
 		                            view )
 
 
@@ -1166,7 +1158,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@DMObjectNodeDispatchMethod( Schema.PassStmt )
 	def PassStmt(self, ctx, state, node):
 		view = passStmt()
-		return statementNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node, PRECEDENCE_STMT,
 		                            view )
 
 
@@ -1175,7 +1167,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def DelStmt(self, ctx, state, node, target):
 		targetView = InnerFragment( target, _withPythonState( state, PRECEDENCE_STMT ) )
 		view = delStmt( targetView )
-		return statementNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node, PRECEDENCE_STMT,
 		                            view )
 
 
@@ -1184,7 +1176,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def ReturnStmt(self, ctx, state, node, value):
 		valueView = InnerFragment( value, _withPythonState( state, PRECEDENCE_STMT ) )
 		view = returnStmt( valueView )
-		return statementNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node, PRECEDENCE_STMT,
 		                            view )
 
 
@@ -1193,7 +1185,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def YieldStmt(self, ctx, state, node, value):
 		valueView = InnerFragment( value, _withPythonState( state, PRECEDENCE_STMT ) )
 		view = yieldStmt( valueView )
-		return statementNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node, PRECEDENCE_STMT,
 		                            view )
 
 
@@ -1204,7 +1196,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		excValueView = InnerFragment( excValue, _withPythonState( state, PRECEDENCE_STMT ) )   if excValue is not None   else None
 		tracebackView = InnerFragment( traceback, _withPythonState( state, PRECEDENCE_STMT ) )   if traceback is not None   else None
 		view = raiseStmt( excTypeView, excValueView, tracebackView )
-		return statementNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node, PRECEDENCE_STMT,
 		                            view )
 
 
@@ -1212,7 +1204,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@DMObjectNodeDispatchMethod( Schema.BreakStmt )
 	def BreakStmt(self, ctx, state, node):
 		view = breakStmt()
-		return statementNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node, PRECEDENCE_STMT,
 		                            view )
 
 
@@ -1220,7 +1212,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@DMObjectNodeDispatchMethod( Schema.ContinueStmt )
 	def ContinueStmt(self, ctx, state, node):
 		view = continueStmt()
-		return statementNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node, PRECEDENCE_STMT,
 		                            view )
 
 
@@ -1228,38 +1220,38 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@DMObjectNodeDispatchMethod( Schema.RelativeModule )
 	def RelativeModule(self, ctx, state, node, name):
 		view = relativeModule( name )
-		return expressionNodeEditor( self._parser, state, node, PRECEDENCE_IMPORTCONTENT,
+		return standardNodeEditor( self._parser, state, node, PRECEDENCE_IMPORTCONTENT,
 		                             view )
 
 	@DMObjectNodeDispatchMethod( Schema.ModuleImport )
 	def ModuleImport(self, ctx, state, node, name):
 		view = moduleImport( name )
-		return expressionNodeEditor( self._parser, state, node, PRECEDENCE_IMPORTCONTENT,
+		return standardNodeEditor( self._parser, state, node, PRECEDENCE_IMPORTCONTENT,
 		                             view )
 
 	@DMObjectNodeDispatchMethod( Schema.ModuleImportAs )
 	def ModuleImportAs(self, ctx, state, node, name, asName):
 		view = moduleImportAs( name, asName )
-		return expressionNodeEditor( self._parser, state, node, PRECEDENCE_IMPORTCONTENT,
+		return standardNodeEditor( self._parser, state, node, PRECEDENCE_IMPORTCONTENT,
 		                             view )
 
 	@DMObjectNodeDispatchMethod( Schema.ModuleContentImport )
 	def ModuleContentImport(self, ctx, state, node, name):
 		view = moduleContentImport( name )
-		return expressionNodeEditor( self._parser, state, node, PRECEDENCE_IMPORTCONTENT,
+		return standardNodeEditor( self._parser, state, node, PRECEDENCE_IMPORTCONTENT,
 		                             view )
 
 	@DMObjectNodeDispatchMethod( Schema.ModuleContentImportAs )
 	def ModuleContentImportAs(self, ctx, state, node, name, asName):
 		view = moduleContentImportAs( name, asName )
-		return expressionNodeEditor( self._parser, state, node, PRECEDENCE_IMPORTCONTENT,
+		return standardNodeEditor( self._parser, state, node, PRECEDENCE_IMPORTCONTENT,
 		                             view )
 
 	@DMObjectNodeDispatchMethod( Schema.ImportStmt )
 	def ImportStmt(self, ctx, state, node, modules):
 		moduleViews = InnerFragment.map( modules, _withPythonState( state, PRECEDENCE_STMT ) )
 		view = importStmt( moduleViews )
-		return statementNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node, PRECEDENCE_STMT,
 		                            view )
 
 	@DMObjectNodeDispatchMethod( Schema.FromImportStmt )
@@ -1267,14 +1259,14 @@ class Python25View (GSymViewObjectNodeDispatch):
 		moduleView = InnerFragment( module, _withPythonState( state, PRECEDENCE_STMT ) )
 		importViews = InnerFragment.map( imports, _withPythonState( state, PRECEDENCE_STMT ) )
 		view = fromImportStmt( moduleView, importViews )
-		return statementNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node, PRECEDENCE_STMT,
 		                            view )
 
 	@DMObjectNodeDispatchMethod( Schema.FromImportAllStmt )
 	def FromImportAllStmt(self, ctx, state, node, module):
 		moduleView = InnerFragment( module, _withPythonState( state, PRECEDENCE_STMT ) )
 		view = fromImportAllStmt( moduleView )
-		return statementNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node, PRECEDENCE_STMT,
 		                            view )
 
 
@@ -1282,14 +1274,14 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@DMObjectNodeDispatchMethod( Schema.GlobalVar )
 	def GlobalVar(self, ctx, state, node, name):
 		view = globalVar( name )
-		return expressionNodeEditor( self._parser, state, node, PRECEDENCE_NONE,
+		return standardNodeEditor( self._parser, state, node, PRECEDENCE_NONE,
 		                             view )
 
 	@DMObjectNodeDispatchMethod( Schema.GlobalStmt )
 	def GlobalStmt(self, ctx, state, node, vars):
 		varViews = InnerFragment.map( vars, _withPythonState( state, PRECEDENCE_STMT ) )
 		view = globalStmt( varViews )
-		return statementNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node, PRECEDENCE_STMT,
 		                            view )
 
 
@@ -1301,7 +1293,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		globalsView = InnerFragment( globals, _withPythonState( state, PRECEDENCE_STMT ) )    if globals is not None   else None
 		localsView = InnerFragment( locals, _withPythonState( state, PRECEDENCE_STMT ) )   if locals is not None   else None
 		view = execStmt( sourceView, globalsView, localsView )
-		return statementNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node, PRECEDENCE_STMT,
 		                            view )
 
 
@@ -1315,7 +1307,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		destView = InnerFragment( destination, _withPythonState( state, PRECEDENCE_STMT ) )   if destination is not None   else None
 		valueViews = InnerFragment.map( values, _withPythonState( state, PRECEDENCE_STMT ) )
 		view = printStmt( destView, valueViews )
-		return statementNodeEditor( self._parser, state, node,
+		return standardNodeEditor( self._parser, state, node, PRECEDENCE_STMT,
 		                            view )
 
 
