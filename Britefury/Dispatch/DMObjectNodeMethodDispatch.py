@@ -106,18 +106,6 @@ class DMObjectNodeDispatchMethodWrapper (object):
 			return self._function( dispatchSelf, *callArgs, **kwargs )
 		
 		
-	def callNoArgs(self, object, dispatchSelf):
-		callArgs = tuple( [ object ] + [ object.get( index )   for index in self._indices ] )
-		
-		if self._varKWTable is None:
-			return self._function( dispatchSelf, *callArgs )
-		else:
-			kwargs = {}
-			for name, index in self._varKWTable:
-				kwargs[name] = object.get( index )
-			return self._function( dispatchSelf, *callArgs, **kwargs )
-		
-		
 	def getName(self):
 		return self._function.__name__
 		
