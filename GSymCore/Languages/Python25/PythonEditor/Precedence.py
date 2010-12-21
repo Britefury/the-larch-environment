@@ -88,60 +88,60 @@ PRECEDENCE_CONTAINER_QUOTE = None
 PRECEDENCE_CONTAINER_UNPARSED = None
 
 
-PRECEDENCE_IMPORTCONTENT = 0
 
 
 
+nodePrecedence = DMClassAttribute( 'nodePrecedence', Schema.Node )
+nodePrecedence[Schema.Node] = PRECEDENCE_NONE
 
-precedence = DMClassAttribute( 'precedence', Schema.Node )
-precedence[Schema.CommentStmt] = PRECEDENCE_COMMENT
-precedence[Schema.BlankLine] = PRECEDENCE_COMMENT
-precedence[Schema.UNPARSED] = PRECEDENCE_UNPARSED
-precedence[Schema.Target] = PRECEDENCE_TARGET
+nodePrecedence[Schema.CommentStmt] = PRECEDENCE_COMMENT
+nodePrecedence[Schema.BlankLine] = PRECEDENCE_COMMENT
+nodePrecedence[Schema.UNPARSED] = PRECEDENCE_UNPARSED
+nodePrecedence[Schema.Target] = PRECEDENCE_TARGET
 
-precedence[Schema.Stmt] = PRECEDENCE_STMT
-precedence[Schema.Expr] = PRECEDENCE_EXPR
-
-
-precedence[Schema.Literal] = PRECEDENCE_LITERALVALUE
-precedence[Schema.Load] = PRECEDENCE_LOAD
-precedence[Schema.SingleTarget] = PRECEDENCE_SINGLETARGET
-precedence[Schema.TupleLiteral] = PRECEDENCE_TUPLE
-precedence[Schema.TupleTarget] = PRECEDENCE_TUPLE
-precedence[Schema.ListLiteral] = PRECEDENCE_LISTDISPLAY
-precedence[Schema.ListTarget] = PRECEDENCE_LISTDISPLAY
-precedence[Schema.ListComp] = PRECEDENCE_LISTDISPLAY
-precedence[Schema.GeneratorExpr] = PRECEDENCE_GENERATOREXPRESSION
-precedence[Schema.DictLiteral] = PRECEDENCE_DICTDISPLAY
-precedence[Schema.YieldExpr] = PRECEDENCE_YIELDEXPR
-
-precedence[Schema.Pow] = PRECEDENCE_POW
-precedence[Schema.Invert] = PRECEDENCE_INVERT_NEGATE_POS
-precedence[Schema.Negate] = PRECEDENCE_INVERT_NEGATE_POS
-precedence[Schema.Pos] = PRECEDENCE_INVERT_NEGATE_POS
-precedence[Schema.Mul] = PRECEDENCE_MULDIVMOD
-precedence[Schema.Div] = PRECEDENCE_MULDIVMOD
-precedence[Schema.Mod] = PRECEDENCE_MULDIVMOD
-precedence[Schema.Add] = PRECEDENCE_ADDSUB
-precedence[Schema.Sub] = PRECEDENCE_ADDSUB
-precedence[Schema.LShift] = PRECEDENCE_SHIFT
-precedence[Schema.RShift] = PRECEDENCE_SHIFT
-precedence[Schema.BitAnd] = PRECEDENCE_BITAND
-precedence[Schema.BitXor] = PRECEDENCE_BITXOR
-precedence[Schema.BitOr] = PRECEDENCE_BITOR
-precedence[Schema.Cmp] = PRECEDENCE_CMP
-precedence[Schema.NotTest] = PRECEDENCE_NOT
-precedence[Schema.AndTest] = PRECEDENCE_AND
-precedence[Schema.OrTest] = PRECEDENCE_OR
-precedence[Schema.LambdaExpr] = PRECEDENCE_LAMBDAEXPR
-precedence[Schema.ConditionalExpr] = PRECEDENCE_CONDITIONAL
-precedence[Schema.ExternalExpr] = PRECEDENCE_EXTERNALEXPR
-
-precedence[Schema.InlineObjectExpr] = PRECEDENCE_INLINEOBJECTEXPR
-precedence[Schema.InlineObjectStmt] = PRECEDENCE_STMT
+nodePrecedence[Schema.Stmt] = PRECEDENCE_STMT
+nodePrecedence[Schema.Expr] = PRECEDENCE_EXPR
 
 
-precedence.commit()
+nodePrecedence[Schema.Literal] = PRECEDENCE_LITERALVALUE
+nodePrecedence[Schema.Load] = PRECEDENCE_LOAD
+nodePrecedence[Schema.SingleTarget] = PRECEDENCE_SINGLETARGET
+nodePrecedence[Schema.TupleLiteral] = PRECEDENCE_TUPLE
+nodePrecedence[Schema.TupleTarget] = PRECEDENCE_TUPLE
+nodePrecedence[Schema.ListLiteral] = PRECEDENCE_LISTDISPLAY
+nodePrecedence[Schema.ListTarget] = PRECEDENCE_LISTDISPLAY
+nodePrecedence[Schema.ListComp] = PRECEDENCE_LISTDISPLAY
+nodePrecedence[Schema.GeneratorExpr] = PRECEDENCE_GENERATOREXPRESSION
+nodePrecedence[Schema.DictLiteral] = PRECEDENCE_DICTDISPLAY
+nodePrecedence[Schema.YieldExpr] = PRECEDENCE_YIELDEXPR
+
+nodePrecedence[Schema.Pow] = PRECEDENCE_POW
+nodePrecedence[Schema.Invert] = PRECEDENCE_INVERT_NEGATE_POS
+nodePrecedence[Schema.Negate] = PRECEDENCE_INVERT_NEGATE_POS
+nodePrecedence[Schema.Pos] = PRECEDENCE_INVERT_NEGATE_POS
+nodePrecedence[Schema.Mul] = PRECEDENCE_MULDIVMOD
+nodePrecedence[Schema.Div] = PRECEDENCE_MULDIVMOD
+nodePrecedence[Schema.Mod] = PRECEDENCE_MULDIVMOD
+nodePrecedence[Schema.Add] = PRECEDENCE_ADDSUB
+nodePrecedence[Schema.Sub] = PRECEDENCE_ADDSUB
+nodePrecedence[Schema.LShift] = PRECEDENCE_SHIFT
+nodePrecedence[Schema.RShift] = PRECEDENCE_SHIFT
+nodePrecedence[Schema.BitAnd] = PRECEDENCE_BITAND
+nodePrecedence[Schema.BitXor] = PRECEDENCE_BITXOR
+nodePrecedence[Schema.BitOr] = PRECEDENCE_BITOR
+nodePrecedence[Schema.Cmp] = PRECEDENCE_CMP
+nodePrecedence[Schema.NotTest] = PRECEDENCE_NOT
+nodePrecedence[Schema.AndTest] = PRECEDENCE_AND
+nodePrecedence[Schema.OrTest] = PRECEDENCE_OR
+nodePrecedence[Schema.LambdaExpr] = PRECEDENCE_LAMBDAEXPR
+nodePrecedence[Schema.ConditionalExpr] = PRECEDENCE_CONDITIONAL
+nodePrecedence[Schema.ExternalExpr] = PRECEDENCE_EXTERNALEXPR
+
+nodePrecedence[Schema.InlineObjectExpr] = PRECEDENCE_INLINEOBJECTEXPR
+nodePrecedence[Schema.InlineObjectStmt] = PRECEDENCE_STMT
+
+
+nodePrecedence.commit()
 
 	
 	
