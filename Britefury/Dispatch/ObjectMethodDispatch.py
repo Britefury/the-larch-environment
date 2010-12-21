@@ -87,10 +87,6 @@ class ObjectDispatchMethodWrapper (object):
 		return self._function( dispatchInstance, *callArgs )
 		
 		
-	def callNoArgs(self, object, dispatchInstance):
-		return self._function( dispatchInstance, object )
-		
-		
 	def getName(self):
 		return self._function.__name__
 	

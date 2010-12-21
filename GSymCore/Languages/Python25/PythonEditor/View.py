@@ -31,7 +31,7 @@ from java.awt.event import KeyEvent
 
 from BritefuryJ.Parser import ParserExpression
 
-from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod
+from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod, DMObjectNodeDispatchMethodWrapper
 
 from Britefury.gSym.View.GSymView import GSymViewObjectNodeDispatch
 
@@ -245,25 +245,19 @@ def specialFormStatementNodeEditor(grammar, inheritedState, model, contents):
 
 def spanPrefixOpView(grammar, inheritedState, model, x, op):
 	xView = InnerFragment( x, _withPythonState( inheritedState, nodePrecedence[model], EDITMODE_DISPLAYCONTENTS ) )
-	view = spanPrefixOp( xView, op )
-	return expressionNodeEditor( grammar, inheritedState, model,
-	                             view )
+	return spanPrefixOp( xView, op )
 
 
 def spanBinOpView(grammar, inheritedState, model, x, y, op, bRightAssociative):
 	xPrec, yPrec = computeBinOpViewPrecedenceValues( nodePrecedence[model], bRightAssociative )
 	xView = InnerFragment( x, _withPythonState( inheritedState, xPrec, EDITMODE_DISPLAYCONTENTS ) )
 	yView = InnerFragment( y, _withPythonState( inheritedState, yPrec, EDITMODE_DISPLAYCONTENTS ) )
-	view = spanBinOp( xView, yView, op )
-	return expressionNodeEditor( grammar, inheritedState, model,
-	                             view )
+	return spanBinOp( xView, yView, op )
 
 
 def spanCmpOpView(grammar, inheritedState, model, op, y):
 	yView = InnerFragment( y, _withPythonState( inheritedState, nodePrecedence[model], EDITMODE_DISPLAYCONTENTS ) )
-	view = spanCmpOp( op, yView )
-	return expressionNodeEditor( grammar, inheritedState, model,
-	                             view )
+	return spanCmpOp( op, yView )
 
 
 
@@ -407,6 +401,116 @@ def _withPythonState(inheritedState, precedence, mode=EDITMODE_DISPLAYCONTENTS):
 	return inheritedState.withAttrs( outerPrecedence=precedence, editMode=mode )
 
 
+
+
+
+class UnparsedWrapper (DMObjectNodeDispatchMethodWrapper):
+	def call(self, object, dispatchSelf, args):
+		v = super( UnparsedWrapper, self ).call( object, dispatchSelf, args )
+		return unparsedNodeEditor( dispatchSelf._parser, args[1], object, v )
+
+def Unparsed(nodeClass):
+	def decorator(fn):
+		return UnparsedWrapper( nodeClass, fn )
+	return decorator
+
+
+
+class GenericWrapper (DMObjectNodeDispatchMethodWrapper):
+	pass
+
+def Generic(nodeClass):
+	def decorator(fn):
+		return GenericWrapper( nodeClass, fn )
+	return decorator
+
+
+
+class ExpressionWrapper (DMObjectNodeDispatchMethodWrapper):
+	def call(self, object, dispatchSelf, args):
+		v = super( ExpressionWrapper, self ).call( object, dispatchSelf, args )
+		return expressionNodeEditor( dispatchSelf._parser, args[1], object, v )
+
+def Expression(nodeClass):
+	def decorator(fn):
+		return ExpressionWrapper( nodeClass, fn )
+	return decorator
+
+
+
+class StatementWrapper (DMObjectNodeDispatchMethodWrapper):
+	def call(self, object, dispatchSelf, args):
+		v = super( StatementWrapper, self ).call( object, dispatchSelf, args )
+		return statementNodeEditor( dispatchSelf._parser, args[1], object, v )
+
+def Statement(nodeClass):
+	def decorator(fn):
+		return StatementWrapper( nodeClass, fn )
+	return decorator
+
+
+
+class CompoundStatementHeaderWrapper (DMObjectNodeDispatchMethodWrapper):
+	def call(self, object, dispatchSelf, args):
+		v = super( CompoundStatementHeaderWrapper, self ).call( object, dispatchSelf, args )
+		if isinstance( v, tuple ):
+			e = compoundStatementHeaderEditor( dispatchSelf._parser, args[1], object, v[0], v[1] )
+			if len( v ) > 2:
+				f = v[2]
+				e = f( e )
+			return e
+		else:
+			return compoundStatementHeaderEditor( dispatchSelf._parser, args[1], object, v )
+			
+
+def CompoundStatementHeader(nodeClass):
+	def decorator(fn):
+		return CompoundStatementHeaderWrapper( nodeClass, fn )
+	return decorator
+
+
+
+class CompoundStatementWrapper (DMObjectNodeDispatchMethodWrapper):
+	def call(self, object, dispatchSelf, args):
+		v = super( CompoundStatementWrapper, self ).call( object, dispatchSelf, args )
+		if isinstance( v, tuple ):
+			f = v[1]
+			return f( compoundStatementEditor( dispatchSelf._parser, args[1], object, v[0] ) )
+		else:
+			return compoundStatementEditor( dispatchSelf._parser, args[1], object, v )
+
+def CompoundStatement(nodeClass):
+	def decorator(fn):
+		return CompoundStatementWrapper( nodeClass, fn )
+	return decorator
+
+
+
+class SpecialFormExpressionWrapper (DMObjectNodeDispatchMethodWrapper):
+	def call(self, object, dispatchSelf, args):
+		v = super( SpecialFormExpressionWrapper, self ).call( object, dispatchSelf, args )
+		return specialFormExpressionNodeEditor( dispatchSelf._parser, args[1], object, v )
+
+def SpecialFormExpression(nodeClass):
+	def decorator(fn):
+		return SpecialFormExpressionWrapper( nodeClass, fn )
+	return decorator
+
+
+
+class SpecialFormStatementWrapper (DMObjectNodeDispatchMethodWrapper):
+	def call(self, object, dispatchSelf, args):
+		v = super( SpecialFormStatementWrapper, self ).call( object, dispatchSelf, args )
+		return specialFormStatementNodeEditor( dispatchSelf._parser, args[1], object, v )
+
+def SpecialFormStatement(nodeClass):
+	def decorator(fn):
+		return SpecialFormStatementWrapper( nodeClass, fn )
+	return decorator
+
+
+
+
 class Python25View (GSymViewObjectNodeDispatch):
 	def __init__(self, parser):
 		self._parser = parser
@@ -466,13 +570,12 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 
 
-	@DMObjectNodeDispatchMethod( Schema.BlankLine )
+	@Statement( Schema.BlankLine )
 	def BlankLine(self, fragment, inheritedState, model):
-		return statementNodeEditor( self._parser, inheritedState, model,
-		                            blankLine() )
+		return blankLine()
 
 
-	@DMObjectNodeDispatchMethod( Schema.UNPARSED )
+	@Unparsed( Schema.UNPARSED )
 	def UNPARSED(self, fragment, inheritedState, model, value):
 		def _viewItem(x):
 			if x is model:
@@ -488,19 +591,16 @@ class Python25View (GSymViewObjectNodeDispatch):
 			else:
 				raise TypeError, 'UNPARSED should contain a list of only strings or nodes, not a %s'  %  ( type( x ), )
 		views = [ _viewItem( x )   for x in value ]
-		return unparsedNodeEditor( self._parser, inheritedState, model,
-		                           unparsedElements( views ) )
+		return unparsedElements( views )
 
 
 
 
 
 	# Comment statement
-	@DMObjectNodeDispatchMethod( Schema.CommentStmt )
+	@Statement( Schema.CommentStmt )
 	def CommentStmt(self, fragment, inheritedState, model, comment):
-		view = commentStmt( comment )
-		return statementNodeEditor( self._parser, inheritedState, model,
-		                            view )
+		return commentStmt( comment )
 
 
 
@@ -509,19 +609,16 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# String literal
 	__strLit_fmtTable = { 'ascii' : None,  'unicode' : 'u',  'ascii-regex' : 'r',  'unicode-regex' : 'ur' }
 
-	@DMObjectNodeDispatchMethod( Schema.StringLiteral )
+	@Expression( Schema.StringLiteral )
 	def StringLiteral(self, fragment, inheritedState, model, format, quotation, value):
 		fmt = self.__strLit_fmtTable[format]
 
 		quote = "'"   if quotation == 'single'   else   '"'
 
-		view = stringLiteral( fmt, quote, value )
-
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return stringLiteral( fmt, quote, value )
 
 	# Integer literal
-	@DMObjectNodeDispatchMethod( Schema.IntLiteral )
+	@Expression( Schema.IntLiteral )
 	def IntLiteral(self, fragment, inheritedState, model, format, numType, value):
 		boxContents = []
 
@@ -538,363 +635,308 @@ class Python25View (GSymViewObjectNodeDispatch):
 				valueString = '%x'  %  long( value, 16 )
 			fmt = 'L'
 
-		view = intLiteral( fmt, valueString )
-
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return intLiteral( fmt, valueString )
 
 
 
 	# Float literal
-	@DMObjectNodeDispatchMethod( Schema.FloatLiteral )
+	@Expression( Schema.FloatLiteral )
 	def FloatLiteral(self, fragment, inheritedState, model, value):
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             floatLiteral( value ) )
+		return floatLiteral( value )
 
 
 
 	# Imaginary literal
-	@DMObjectNodeDispatchMethod( Schema.ImaginaryLiteral )
+	@Expression( Schema.ImaginaryLiteral )
 	def ImaginaryLiteral(self, fragment, inheritedState, model, value):
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             imaginaryLiteral( value ) )
+		return imaginaryLiteral( value )
 
 
 
 	# Targets
-	@DMObjectNodeDispatchMethod( Schema.SingleTarget )
+	@Expression( Schema.SingleTarget )
 	def SingleTarget(self, fragment, inheritedState, model, name):
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             singleTarget( name ) )
+		return singleTarget( name )
 
 
-	@DMObjectNodeDispatchMethod( Schema.TupleTarget )
+	@Expression( Schema.TupleTarget )
 	def TupleTarget(self, fragment, inheritedState, model, targets, trailingSeparator):
 		elementViews = InnerFragment.map( targets, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ELEMENT ) )
-		view = tupleTarget( elementViews, trailingSeparator is not None )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return tupleTarget( elementViews, trailingSeparator is not None )
 
-	@DMObjectNodeDispatchMethod( Schema.ListTarget )
+	@Expression( Schema.ListTarget )
 	def ListTarget(self, fragment, inheritedState, model, targets, trailingSeparator):
 		elementViews = InnerFragment.map( targets, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ELEMENT ) )
-		view = listTarget( elementViews, trailingSeparator is not None )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return listTarget( elementViews, trailingSeparator is not None )
 
 
 
 	# Variable reference
-	@DMObjectNodeDispatchMethod( Schema.Load )
+	@Expression( Schema.Load )
 	def Load(self, fragment, inheritedState, model, name):
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             load( name ) )
+		return load( name )
 
 
 
 	# Tuple literal
-	@DMObjectNodeDispatchMethod( Schema.TupleLiteral )
+	@Expression( Schema.TupleLiteral )
 	def TupleLiteral(self, fragment, inheritedState, model, values, trailingSeparator):
 		elementViews = InnerFragment.map( values, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ELEMENT ) )
-		view = tupleLiteral( elementViews, trailingSeparator is not None )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return tupleLiteral( elementViews, trailingSeparator is not None )
 
 
 
 	# List literal
-	@DMObjectNodeDispatchMethod( Schema.ListLiteral )
+	@Expression( Schema.ListLiteral )
 	def ListLiteral(self, fragment, inheritedState, model, values, trailingSeparator):
 		elementViews = InnerFragment.map( values, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ELEMENT ) )
-		view = listLiteral( elementViews, trailingSeparator is not None )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return listLiteral( elementViews, trailingSeparator is not None )
 
 
 
 	# List comprehension / generator expression
-	@DMObjectNodeDispatchMethod( Schema.ComprehensionFor )
+	@Generic( Schema.ComprehensionFor )
 	def ComprehensionFor(self, fragment, inheritedState, model, target, source):
 		targetView = InnerFragment( target, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_COMPREHENSIONFOR) )
 		sourceView = InnerFragment( source, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_COMPREHENSIONFOR ) )
-		view = comprehensionFor( targetView, sourceView )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return comprehensionFor( targetView, sourceView )
 
-	@DMObjectNodeDispatchMethod( Schema.ComprehensionIf )
+	@Generic( Schema.ComprehensionIf )
 	def ComprehensionIf(self, fragment, inheritedState, model, condition):
 		conditionView = InnerFragment( condition, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_COMPREHENSIONIF ) )
-		view = comprehensionIf( conditionView )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return comprehensionIf( conditionView )
 
-	@DMObjectNodeDispatchMethod( Schema.ListComp )
+	@Expression( Schema.ListComp )
 	def ListComp(self, fragment, inheritedState, model, resultExpr, comprehensionItems):
 		exprView = InnerFragment( resultExpr, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ELEMENT ) )
 		itemViews = InnerFragment.map( comprehensionItems, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ELEMENT ) )
-		view = listComp( exprView, itemViews )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return listComp( exprView, itemViews )
 
 
-	@DMObjectNodeDispatchMethod( Schema.GeneratorExpr )
+	@Expression( Schema.GeneratorExpr )
 	def GeneratorExpr(self, fragment, inheritedState, model, resultExpr, comprehensionItems):
 		exprView = InnerFragment( resultExpr, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ELEMENT ) )
 		itemViews = InnerFragment.map( comprehensionItems, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ELEMENT ) )
-		view = genExpr( exprView, itemViews )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return genExpr( exprView, itemViews )
 
 
 
 
 	# Dictionary literal
-	@DMObjectNodeDispatchMethod( Schema.DictKeyValuePair )
+	@Generic( Schema.DictKeyValuePair )
 	def DictKeyValuePair(self, fragment, inheritedState, model, key, value):
 		keyView = InnerFragment( key, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ELEMENT ) )
 		valueView = InnerFragment( value, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ELEMENT ) )
-		view = dictKeyValuePair( keyView, valueView )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return dictKeyValuePair( keyView, valueView )
 
-	@DMObjectNodeDispatchMethod( Schema.DictLiteral )
+	@Expression( Schema.DictLiteral )
 	def DictLiteral(self, fragment, inheritedState, model, values, trailingSeparator):
 		elementViews = InnerFragment.map( values, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ELEMENT ) )
-		view = dictLiteral( elementViews, trailingSeparator is not None )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return dictLiteral( elementViews, trailingSeparator is not None )
 
 
 	# Yield expression
-	@DMObjectNodeDispatchMethod( Schema.YieldExpr )
+	@Expression( Schema.YieldExpr )
 	def YieldExpr(self, fragment, inheritedState, model, value):
 		valueView = InnerFragment( value, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_YIELDEXPR ) )
-		view = yieldExpr( valueView )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return yieldExpr( valueView )
 
 
 
 	# Attribute ref
-	@DMObjectNodeDispatchMethod( Schema.AttributeRef )
+	@Expression( Schema.AttributeRef )
 	def AttributeRef(self, fragment, inheritedState, model, target, name):
 		targetView = InnerFragment( target, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ATTRIBUTEREFTARGET ) )
-		view = attributeRef( targetView, name )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return attributeRef( targetView, name )
 
 
 
 	# Subscript
-	@DMObjectNodeDispatchMethod( Schema.SubscriptSlice )
+	@Generic( Schema.SubscriptSlice )
 	def SubscriptSlice(self, fragment, inheritedState, model, lower, upper):
 		lowerView = InnerFragment( lower, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX ) )   if lower is not None   else None
 		upperView = InnerFragment( upper, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX ) )   if upper is not None   else None
-		view = subscriptSlice( lowerView, upperView )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return subscriptSlice( lowerView, upperView )
 
-	@DMObjectNodeDispatchMethod( Schema.SubscriptLongSlice )
+	@Generic( Schema.SubscriptLongSlice )
 	def SubscriptLongSlice(self, fragment, inheritedState, model, lower, upper, stride):
 		lowerView = InnerFragment( lower, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX ) )   if lower is not None   else None
 		upperView = InnerFragment( upper, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX ) )   if upper is not None   else None
 		strideView = InnerFragment( stride, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX ) )   if stride is not None   else None
-		view = subscriptLongSlice( lowerView, upperView, strideView )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return subscriptLongSlice( lowerView, upperView, strideView )
 
-	@DMObjectNodeDispatchMethod( Schema.SubscriptEllipsis )
+	@Generic( Schema.SubscriptEllipsis )
 	def SubscriptEllipsis(self, fragment, inheritedState, model):
-		view = subscriptEllipsis()
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return subscriptEllipsis()
 
-	@DMObjectNodeDispatchMethod( Schema.SubscriptTuple )
+	@Expression( Schema.SubscriptTuple )
 	def SubscriptTuple(self, fragment, inheritedState, model, values, trailingSeparator):
 		elementViews = InnerFragment.map( values, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ELEMENT ) )
-		view = subscriptTuple( elementViews, trailingSeparator is not None )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return subscriptTuple( elementViews, trailingSeparator is not None )
 
-	@DMObjectNodeDispatchMethod( Schema.Subscript )
+	@Expression( Schema.Subscript )
 	def Subscript(self, fragment, inheritedState, model, target, index):
 		targetView = InnerFragment( target, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_SUBSCRIPTTARGET ) )
 		indexView = InnerFragment( index, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX ) )
-		view = subscript( targetView, indexView )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return subscript( targetView, indexView )
 
 
 
 
 	# Call
-	@DMObjectNodeDispatchMethod( Schema.CallKWArg )
+	@Generic( Schema.CallKWArg )
 	def CallKWArg(self, fragment, inheritedState, model, name, value):
 		valueView = InnerFragment( value, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_CALLARG ) )
-		view = callKWArg( name, valueView )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return callKWArg( name, valueView )
 
-	@DMObjectNodeDispatchMethod( Schema.CallArgList )
+	@Generic( Schema.CallArgList )
 	def CallArgList(self, fragment, inheritedState, model, value):
 		valueView = InnerFragment( value, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_CALLARG ) )
-		view = callArgList( valueView )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return callArgList( valueView )
 
-	@DMObjectNodeDispatchMethod( Schema.CallKWArgList )
+	@Generic( Schema.CallKWArgList )
 	def CallKWArgList(self, fragment, inheritedState, model, value):
 		valueView = InnerFragment( value, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_CALLARG ) )
-		view = callKWArgList( valueView )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return callKWArgList( valueView )
 
-	@DMObjectNodeDispatchMethod( Schema.Call )
+	@Expression( Schema.Call )
 	def Call(self, fragment, inheritedState, model, target, args, argsTrailingSeparator):
 		targetView = InnerFragment( target, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_CALLTARGET ) )
 		argViews = InnerFragment.map( args, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_CALLARG ) )
-		view = call( targetView, argViews, argsTrailingSeparator is not None )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return call( targetView, argViews, argsTrailingSeparator is not None )
 
 
 
 
 
 	# Operators
-	@DMObjectNodeDispatchMethod( Schema.Pow )
+	@Expression( Schema.Pow )
 	def Pow(self, fragment, inheritedState, model, x, y):
 		xPrec, yPrec = computeBinOpViewPrecedenceValues( PRECEDENCE_POW, True )
 		xView = InnerFragment( x, _withPythonState( inheritedState, xPrec ) )
 		yView = InnerFragment( y, _withPythonState( inheritedState, yPrec, EDITMODE_EDITEXPRESSION ) )
-		view = exponent( xView, yView )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return exponent( xView, yView )
 
 
-	@DMObjectNodeDispatchMethod( Schema.Invert )
+	@Expression( Schema.Invert )
 	def Invert(self, fragment, inheritedState, model, x):
 		return spanPrefixOpView( self._parser, inheritedState, model, x, '~' )
 
-	@DMObjectNodeDispatchMethod( Schema.Negate )
+	@Expression( Schema.Negate )
 	def Negate(self, fragment, inheritedState, model, x):
 		return spanPrefixOpView( self._parser, inheritedState, model, x, '-' )
 
-	@DMObjectNodeDispatchMethod( Schema.Pos )
+	@Expression( Schema.Pos )
 	def Pos(self, fragment, inheritedState, model, x):
 		return spanPrefixOpView( self._parser, inheritedState, model, x, '+' )
 
 
-	@DMObjectNodeDispatchMethod( Schema.Mul )
+	@Expression( Schema.Mul )
 	def Mul(self, fragment, inheritedState, model, x, y):
 		return spanBinOpView( self._parser, inheritedState, model, x, y, '*', False )
 
-	@DMObjectNodeDispatchMethod( Schema.Div )
+	@Expression( Schema.Div )
 	def Div(self, fragment, inheritedState, model, x, y):
 		xPrec, yPrec = computeBinOpViewPrecedenceValues( PRECEDENCE_MULDIVMOD, False )
 		xView = InnerFragment( x, _withPythonState( inheritedState, xPrec, EDITMODE_EDITEXPRESSION ) )
 		yView = InnerFragment( y, _withPythonState( inheritedState, yPrec, EDITMODE_EDITEXPRESSION ) )
 		#<NO_TREE_EVENT_LISTENER>
 		view = div( xView, yView, '/' )
-		view = BreakableStructuralItem( PythonSyntaxRecognizingEditor.instance, model, view )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return BreakableStructuralItem( PythonSyntaxRecognizingEditor.instance, model, view )
 
-	@DMObjectNodeDispatchMethod( Schema.Mod )
+	@Expression( Schema.Mod )
 	def Mod(self, fragment, inheritedState, model, x, y):
 		return spanBinOpView( self._parser, inheritedState, model, x, y, '%', False )
 
 
-	@DMObjectNodeDispatchMethod( Schema.Add )
+	@Expression( Schema.Add )
 	def Add(self, fragment, inheritedState, model, x, y):
 		return spanBinOpView( self._parser, inheritedState, model, x, y, '+', False )
 
-	@DMObjectNodeDispatchMethod( Schema.Sub )
+	@Expression( Schema.Sub )
 	def Sub(self, fragment, inheritedState, model, x, y):
 		return spanBinOpView( self._parser, inheritedState, model, x, y, '-', False )
 
 
-	@DMObjectNodeDispatchMethod( Schema.LShift )
+	@Expression( Schema.LShift )
 	def LShift(self, fragment, inheritedState, model, x, y):
 		return spanBinOpView( self._parser, inheritedState, model, x, y, '<<', False )
 
-	@DMObjectNodeDispatchMethod( Schema.RShift )
+	@Expression( Schema.RShift )
 	def RShift(self, fragment, inheritedState, model, x, y):
 		return spanBinOpView( self._parser, inheritedState, model, x, y, '>>', False )
 
 
-	@DMObjectNodeDispatchMethod( Schema.BitAnd )
+	@Expression( Schema.BitAnd )
 	def BitAnd(self, fragment, inheritedState, model, x, y):
 		return spanBinOpView( self._parser, inheritedState, model, x, y, '&', False )
 
-	@DMObjectNodeDispatchMethod( Schema.BitXor )
+	@Expression( Schema.BitXor )
 	def BitXor(self, fragment, inheritedState, model, x, y):
 		return spanBinOpView( self._parser, inheritedState, model, x, y, '^', False )
 
-	@DMObjectNodeDispatchMethod( Schema.BitOr )
+	@Expression( Schema.BitOr )
 	def BitOr(self, fragment, inheritedState, model, x, y):
 		return spanBinOpView( self._parser, inheritedState, model, x, y, '|', False )
 
 
-	@DMObjectNodeDispatchMethod( Schema.Cmp )
+	@Expression( Schema.Cmp )
 	def Cmp(self, fragment, inheritedState, model, x, ops):
 		xView = InnerFragment( x, _withPythonState( inheritedState, PRECEDENCE_CMP ) )
 		opViews = InnerFragment.map( ops, _withPythonState( inheritedState, PRECEDENCE_CMP ) )
-		view = compare( xView, opViews )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return compare( xView, opViews )
 
-	@DMObjectNodeDispatchMethod( Schema.CmpOpLte )
+	@Generic( Schema.CmpOpLte )
 	def CmpOpLte(self, fragment, inheritedState, model, y):
 		return spanCmpOpView( self._parser, inheritedState, model, '<=', y )
 
-	@DMObjectNodeDispatchMethod( Schema.CmpOpLt )
+	@Generic( Schema.CmpOpLt )
 	def CmpOpLt(self, fragment, inheritedState, model, y):
 		return spanCmpOpView( self._parser, inheritedState, model, '<', y )
 
-	@DMObjectNodeDispatchMethod( Schema.CmpOpGte )
+	@Generic( Schema.CmpOpGte )
 	def CmpOpGte(self, fragment, inheritedState, model, y):
 		return spanCmpOpView( self._parser, inheritedState, model, '>=', y )
 
-	@DMObjectNodeDispatchMethod( Schema.CmpOpGt )
+	@Generic( Schema.CmpOpGt )
 	def CmpOpGt(self, fragment, inheritedState, model, y):
 		return spanCmpOpView( self._parser, inheritedState, model, '>', y )
 
-	@DMObjectNodeDispatchMethod( Schema.CmpOpEq )
+	@Generic( Schema.CmpOpEq )
 	def CmpOpEq(self, fragment, inheritedState, model, y):
 		return spanCmpOpView( self._parser, inheritedState, model, '==', y )
 
-	@DMObjectNodeDispatchMethod( Schema.CmpOpNeq )
+	@Generic( Schema.CmpOpNeq )
 	def CmpOpNeq(self, fragment, inheritedState, model, y):
 		return spanCmpOpView( self._parser, inheritedState, model, '!=', y )
 
-	@DMObjectNodeDispatchMethod( Schema.CmpOpIsNot )
+	@Generic( Schema.CmpOpIsNot )
 	def CmpOpIsNot(self, fragment, inheritedState, model, y):
 		return spanCmpOpView( self._parser, inheritedState, model, 'is not', y )
 
-	@DMObjectNodeDispatchMethod( Schema.CmpOpIs )
+	@Generic( Schema.CmpOpIs )
 	def CmpOpIs(self, fragment, inheritedState, model, y):
 		return spanCmpOpView( self._parser, inheritedState, model, 'is', y )
 
-	@DMObjectNodeDispatchMethod( Schema.CmpOpNotIn )
+	@Generic( Schema.CmpOpNotIn )
 	def CmpOpNotIn(self, fragment, inheritedState, model, y):
 		return spanCmpOpView( self._parser, inheritedState, model, 'not in', y )
 
-	@DMObjectNodeDispatchMethod( Schema.CmpOpIn )
+	@Generic( Schema.CmpOpIn )
 	def CmpOpIn(self, fragment, inheritedState, model, y):
 		return spanCmpOpView( self._parser, inheritedState, model, 'in', y )
 
 
 
-	@DMObjectNodeDispatchMethod( Schema.NotTest )
+	@Generic( Schema.NotTest )
 	def NotTest(self, fragment, inheritedState, model, x):
 		return spanPrefixOpView( self._parser, inheritedState, model, x, 'not ' )
 
-	@DMObjectNodeDispatchMethod( Schema.AndTest )
+	@Generic( Schema.AndTest )
 	def AndTest(self, fragment, inheritedState, model, x, y):
 		return spanBinOpView( self._parser, inheritedState, model, x, y, 'and', False )
 
-	@DMObjectNodeDispatchMethod( Schema.OrTest )
+	@Generic( Schema.OrTest )
 	def OrTest(self, fragment, inheritedState, model, x, y):
 		return spanBinOpView( self._parser, inheritedState, model, x, y, 'or', False )
 
@@ -903,54 +945,42 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 
 	# Parameters
-	@DMObjectNodeDispatchMethod( Schema.SimpleParam )
+	@Generic( Schema.SimpleParam )
 	def SimpleParam(self, fragment, inheritedState, model, name):
-		view = simpleParam( name )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return simpleParam( name )
 
-	@DMObjectNodeDispatchMethod( Schema.DefaultValueParam )
+	@Generic( Schema.DefaultValueParam )
 	def DefaultValueParam(self, fragment, inheritedState, model, name, defaultValue):
 		valueView = InnerFragment( defaultValue, _withPythonState( inheritedState, PRECEDENCE_NONE ) )
-		view = defaultValueParam( name, valueView )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return defaultValueParam( name, valueView )
 
-	@DMObjectNodeDispatchMethod( Schema.ParamList )
+	@Generic( Schema.ParamList )
 	def ParamList(self, fragment, inheritedState, model, name):
-		view = paramList( name )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return paramList( name )
 
-	@DMObjectNodeDispatchMethod( Schema.KWParamList )
+	@Generic( Schema.KWParamList )
 	def KWParamList(self, fragment, inheritedState, model, name):
-		view = kwParamList( name )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return kwParamList( name )
 
 
 
 	# Lambda expression
-	@DMObjectNodeDispatchMethod( Schema.LambdaExpr )
+	@Expression( Schema.LambdaExpr )
 	def LambdaExpr(self, fragment, inheritedState, model, params, paramsTrailingSeparator, expr):
 		exprView = InnerFragment( expr, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_LAMBDAEXPR ) )
 		paramViews = InnerFragment.map( params, _withPythonState( inheritedState, PRECEDENCE_NONE ) )
 
-		view = lambdaExpr( paramViews, paramsTrailingSeparator is not None, exprView )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return lambdaExpr( paramViews, paramsTrailingSeparator is not None, exprView )
 
 
 
 	# Conditional expression
-	@DMObjectNodeDispatchMethod( Schema.ConditionalExpr )
+	@Expression( Schema.ConditionalExpr )
 	def ConditionalExpr(self, fragment, inheritedState, model, condition, expr, elseExpr):
 		conditionView = InnerFragment( condition, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_CONDITIONALEXPR ) )
 		exprView = InnerFragment( expr, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_CONDITIONALEXPR ) )
 		elseExprView = InnerFragment( elseExpr, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_CONDITIONALEXPR ) )
-		view = conditionalExpr( conditionView, exprView, elseExprView )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return conditionalExpr( conditionView, exprView, elseExprView )
 
 
 
@@ -962,7 +992,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	#
 
 	# Quote
-	@DMObjectNodeDispatchMethod( Schema.Quote )
+	@SpecialFormExpression( Schema.Quote )
 	def Quote(self, fragment, inheritedState, model, value):
 		if isinstance( value, DMObject ):
 			if value.isInstanceOf( Schema.PythonExpression ):
@@ -977,14 +1007,12 @@ class Python25View (GSymViewObjectNodeDispatch):
 			raise TypeError, 'Value of \'quote\' should be a DMObject'
 
 
-		view = quote( valueView, title, PythonSyntaxRecognizingEditor.instance )
-		return specialFormExpressionNodeEditor( self._parser, inheritedState, model,
-		                                        view )
+		return quote( valueView, title, PythonSyntaxRecognizingEditor.instance )
 
 
 
 	# Unquote
-	@DMObjectNodeDispatchMethod( Schema.Unquote )
+	@SpecialFormExpression( Schema.Unquote )
 	def Unquote(self, fragment, inheritedState, model, value):
 		if isinstance( value, DMObject ):
 			valueView = perspective.applyTo( InnerFragment( value, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_QUOTE ) ) )
@@ -992,9 +1020,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			raise TypeError, 'Value of \'unquote\' should be a DMObject'
 
 
-		view = unquote( valueView, 'UNQUOTE', PythonSyntaxRecognizingEditor.instance )
-		return specialFormExpressionNodeEditor( self._parser, inheritedState, model,
-		                                        view )
+		return unquote( valueView, 'UNQUOTE', PythonSyntaxRecognizingEditor.instance )
 
 
 
@@ -1005,7 +1031,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	#
 
 	# External expression
-	@DMObjectNodeDispatchMethod( Schema.ExternalExpr )
+	@SpecialFormExpression( Schema.ExternalExpr )
 	def ExternalExpr(self, fragment, inheritedState, model, expr):
 		if isinstance( expr, DMObject ):
 			schema = expr.getDMObjectClass().getSchema()
@@ -1021,9 +1047,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 		deleteButton = Button( Image.systemIcon( 'delete_tiny' ), _onDeleteButton )
 
-		view = externalExpr( exprView, title, deleteButton )
-		return specialFormExpressionNodeEditor( self._parser, inheritedState, model,
-		                                        view )
+		return externalExpr( exprView, title, deleteButton )
 
 
 
@@ -1034,7 +1058,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	#
 
 	# Inline object expression
-	@DMObjectNodeDispatchMethod( Schema.InlineObjectExpr )
+	@SpecialFormExpression( Schema.InlineObjectExpr )
 	def InlineObjectExpr(self, fragment, inheritedState, model, resource):
 		value = resource.getValue()
 		valueView = ApplyPerspective( None, value )
@@ -1044,21 +1068,17 @@ class Python25View (GSymViewObjectNodeDispatch):
 		except AttributeError:
 			# Standard view
 			view = inlineObject( valueView )
-			view = view.withContextMenuInteractor( _inlineObjectExprContextMenuFactory )
-			return specialFormExpressionNodeEditor( self._parser, inheritedState, model,
-			                                        view )
+			return view.withContextMenuInteractor( _inlineObjectExprContextMenuFactory )
 		else:
 			# Macro view
 			def createModelView():
 				return Pres.coerce( modelFn() )
 			view = inlineObjectMacro( valueView, LazyPres( createModelView ) )
-			view = view.withContextMenuInteractor( _inlineObjectExprContextMenuFactory )
-			return specialFormExpressionNodeEditor( self._parser, inheritedState, model,
-			                                        view )
+			return view.withContextMenuInteractor( _inlineObjectExprContextMenuFactory )
 
 
 	# Inline object statement
-	@DMObjectNodeDispatchMethod( Schema.InlineObjectStmt )
+	@SpecialFormStatement( Schema.InlineObjectStmt )
 	def InlineObjectStmt(self, fragment, inheritedState, model, resource):
 		value = resource.getValue()
 		valueView = ApplyPerspective( None, value )
@@ -1068,17 +1088,13 @@ class Python25View (GSymViewObjectNodeDispatch):
 		except AttributeError:
 			# Standard view
 			view = inlineObject( valueView )
-			view = view.withContextMenuInteractor( _inlineObjectStmtContextMenuFactory )
-			return specialFormStatementNodeEditor( self._parser, inheritedState, model,
-			                                       view )
+			return view.withContextMenuInteractor( _inlineObjectStmtContextMenuFactory )
 		else:
 			# Macro view
 			def createModelView():
 				return Pres.coerce( modelFn() )
 			view = inlineObjectMacro( valueView, LazyPres( createModelView ) )
-			view = view.withContextMenuInteractor( _inlineObjectStmtContextMenuFactory )
-			return specialFormStatementNodeEditor( self._parser, inheritedState, model,
-			                                       view )
+			return view.withContextMenuInteractor( _inlineObjectStmtContextMenuFactory )
 
 
 
@@ -1089,186 +1105,142 @@ class Python25View (GSymViewObjectNodeDispatch):
 	#
 
 	# Expression statement
-	@DMObjectNodeDispatchMethod( Schema.ExprStmt )
+	@Statement( Schema.ExprStmt )
 	def ExprStmt(self, fragment, inheritedState, model, expr):
 		exprView = InnerFragment( expr, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
-		view = exprStmt( exprView )
-		return statementNodeEditor( self._parser, inheritedState, model,
-		                            view )
+		return exprStmt( exprView )
 
 
 
 	# Assert statement
-	@DMObjectNodeDispatchMethod( Schema.AssertStmt )
+	@Statement( Schema.AssertStmt )
 	def AssertStmt(self, fragment, inheritedState, model, condition, fail):
 		conditionView = InnerFragment( condition, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
 		failView = InnerFragment( fail, _withPythonState( inheritedState, PRECEDENCE_STMT ) )   if fail is not None   else None
-		view = assertStmt( conditionView, failView )
-		return statementNodeEditor( self._parser, inheritedState, model,
-		                            view )
+		return assertStmt( conditionView, failView )
 
 
 	# Assignment statement
-	@DMObjectNodeDispatchMethod( Schema.AssignStmt )
+	@Statement( Schema.AssignStmt )
 	def AssignStmt(self, fragment, inheritedState, model, targets, value):
 		targetViews = InnerFragment.map( targets, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
 		valueView = InnerFragment( value, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
-		view = assignStmt( targetViews, valueView )
-		return statementNodeEditor( self._parser, inheritedState, model,
-		                            view )
+		return assignStmt( targetViews, valueView )
 
 
 	# Augmented assignment statement
-	@DMObjectNodeDispatchMethod( Schema.AugAssignStmt )
+	@Statement( Schema.AugAssignStmt )
 	def AugAssignStmt(self, fragment, inheritedState, model, op, target, value):
 		targetView = InnerFragment( target, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
 		valueView = InnerFragment( value, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
-		view = augAssignStmt( op, targetView, valueView )
-		return statementNodeEditor( self._parser, inheritedState, model,
-		                            view )
+		return augAssignStmt( op, targetView, valueView )
 
 
 	# Pass statement
-	@DMObjectNodeDispatchMethod( Schema.PassStmt )
+	@Statement( Schema.PassStmt )
 	def PassStmt(self, fragment, inheritedState, model):
-		view = passStmt()
-		return statementNodeEditor( self._parser, inheritedState, model,
-		                            view )
+		return passStmt()
 
 
 	# Del statement
-	@DMObjectNodeDispatchMethod( Schema.DelStmt )
+	@Statement( Schema.DelStmt )
 	def DelStmt(self, fragment, inheritedState, model, target):
 		targetView = InnerFragment( target, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
-		view = delStmt( targetView )
-		return statementNodeEditor( self._parser, inheritedState, model,
-		                            view )
+		return delStmt( targetView )
 
 
 	# Return statement
-	@DMObjectNodeDispatchMethod( Schema.ReturnStmt )
+	@Statement( Schema.ReturnStmt )
 	def ReturnStmt(self, fragment, inheritedState, model, value):
 		valueView = InnerFragment( value, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
-		view = returnStmt( valueView )
-		return statementNodeEditor( self._parser, inheritedState, model,
-		                            view )
+		return returnStmt( valueView )
 
 
 	# Yield statement
-	@DMObjectNodeDispatchMethod( Schema.YieldStmt )
+	@Statement( Schema.YieldStmt )
 	def YieldStmt(self, fragment, inheritedState, model, value):
 		valueView = InnerFragment( value, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
-		view = yieldStmt( valueView )
-		return statementNodeEditor( self._parser, inheritedState, model,
-		                            view )
+		return yieldStmt( valueView )
 
 
 	# Raise statement
-	@DMObjectNodeDispatchMethod( Schema.RaiseStmt )
+	@Statement( Schema.RaiseStmt )
 	def RaiseStmt(self, fragment, inheritedState, model, excType, excValue, traceback):
 		excTypeView = InnerFragment( excType, _withPythonState( inheritedState, PRECEDENCE_STMT ) )   if excType is not None   else None
 		excValueView = InnerFragment( excValue, _withPythonState( inheritedState, PRECEDENCE_STMT ) )   if excValue is not None   else None
 		tracebackView = InnerFragment( traceback, _withPythonState( inheritedState, PRECEDENCE_STMT ) )   if traceback is not None   else None
-		view = raiseStmt( excTypeView, excValueView, tracebackView )
-		return statementNodeEditor( self._parser, inheritedState, model,
-		                            view )
+		return raiseStmt( excTypeView, excValueView, tracebackView )
 
 
 	# Break statement
-	@DMObjectNodeDispatchMethod( Schema.BreakStmt )
+	@Statement( Schema.BreakStmt )
 	def BreakStmt(self, fragment, inheritedState, model):
-		view = breakStmt()
-		return statementNodeEditor( self._parser, inheritedState, model,
-		                            view )
+		return breakStmt()
 
 
 	# Continue statement
-	@DMObjectNodeDispatchMethod( Schema.ContinueStmt )
+	@Statement( Schema.ContinueStmt )
 	def ContinueStmt(self, fragment, inheritedState, model):
-		view = continueStmt()
-		return statementNodeEditor( self._parser, inheritedState, model,
-		                            view )
+		return continueStmt()
 
 
 	# Import statement
-	@DMObjectNodeDispatchMethod( Schema.RelativeModule )
+	@Generic( Schema.RelativeModule )
 	def RelativeModule(self, fragment, inheritedState, model, name):
-		view = relativeModule( name )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return relativeModule( name )
 
-	@DMObjectNodeDispatchMethod( Schema.ModuleImport )
+	@Generic( Schema.ModuleImport )
 	def ModuleImport(self, fragment, inheritedState, model, name):
-		view = moduleImport( name )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return moduleImport( name )
 
-	@DMObjectNodeDispatchMethod( Schema.ModuleImportAs )
+	@Generic( Schema.ModuleImportAs )
 	def ModuleImportAs(self, fragment, inheritedState, model, name, asName):
-		view = moduleImportAs( name, asName )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return moduleImportAs( name, asName )
 
-	@DMObjectNodeDispatchMethod( Schema.ModuleContentImport )
+	@Generic( Schema.ModuleContentImport )
 	def ModuleContentImport(self, fragment, inheritedState, model, name):
-		view = moduleContentImport( name )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return moduleContentImport( name )
 
-	@DMObjectNodeDispatchMethod( Schema.ModuleContentImportAs )
+	@Generic( Schema.ModuleContentImportAs )
 	def ModuleContentImportAs(self, fragment, inheritedState, model, name, asName):
-		view = moduleContentImportAs( name, asName )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return moduleContentImportAs( name, asName )
 
-	@DMObjectNodeDispatchMethod( Schema.ImportStmt )
+	@Statement( Schema.ImportStmt )
 	def ImportStmt(self, fragment, inheritedState, model, modules):
 		moduleViews = InnerFragment.map( modules, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
-		view = importStmt( moduleViews )
-		return statementNodeEditor( self._parser, inheritedState, model,
-		                            view )
+		return importStmt( moduleViews )
 
-	@DMObjectNodeDispatchMethod( Schema.FromImportStmt )
+	@Statement( Schema.FromImportStmt )
 	def FromImportStmt(self, fragment, inheritedState, model, module, imports):
 		moduleView = InnerFragment( module, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
 		importViews = InnerFragment.map( imports, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
-		view = fromImportStmt( moduleView, importViews )
-		return statementNodeEditor( self._parser, inheritedState, model,
-		                            view )
+		return fromImportStmt( moduleView, importViews )
 
-	@DMObjectNodeDispatchMethod( Schema.FromImportAllStmt )
+	@Statement( Schema.FromImportAllStmt )
 	def FromImportAllStmt(self, fragment, inheritedState, model, module):
 		moduleView = InnerFragment( module, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
-		view = fromImportAllStmt( moduleView )
-		return statementNodeEditor( self._parser, inheritedState, model,
-		                            view )
+		return fromImportAllStmt( moduleView )
 
 
 	# Global statement
-	@DMObjectNodeDispatchMethod( Schema.GlobalVar )
+	@Generic( Schema.GlobalVar )
 	def GlobalVar(self, fragment, inheritedState, model, name):
-		view = globalVar( name )
-		return expressionNodeEditor( self._parser, inheritedState, model,
-		                             view )
+		return globalVar( name )
 
-	@DMObjectNodeDispatchMethod( Schema.GlobalStmt )
+	@Statement( Schema.GlobalStmt )
 	def GlobalStmt(self, fragment, inheritedState, model, vars):
 		varViews = InnerFragment.map( vars, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
-		view = globalStmt( varViews )
-		return statementNodeEditor( self._parser, inheritedState, model,
-		                            view )
+		return globalStmt( varViews )
 
 
 
 	# Exec statement
-	@DMObjectNodeDispatchMethod( Schema.ExecStmt )
+	@Statement( Schema.ExecStmt )
 	def ExecStmt(self, fragment, inheritedState, model, source, globals, locals):
 		sourceView = InnerFragment( source, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
 		globalsView = InnerFragment( globals, _withPythonState( inheritedState, PRECEDENCE_STMT ) )    if globals is not None   else None
 		localsView = InnerFragment( locals, _withPythonState( inheritedState, PRECEDENCE_STMT ) )   if locals is not None   else None
-		view = execStmt( sourceView, globalsView, localsView )
-		return statementNodeEditor( self._parser, inheritedState, model,
-		                            view )
+		return execStmt( sourceView, globalsView, localsView )
 
 
 
@@ -1276,13 +1248,11 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 
 	# Exec statement
-	@DMObjectNodeDispatchMethod( Schema.PrintStmt )
+	@Statement( Schema.PrintStmt )
 	def PrintStmt(self, fragment, inheritedState, model, destination, values):
 		destView = InnerFragment( destination, _withPythonState( inheritedState, PRECEDENCE_STMT ) )   if destination is not None   else None
 		valueViews = InnerFragment.map( values, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
-		view = printStmt( destView, valueViews )
-		return statementNodeEditor( self._parser, inheritedState, model,
-		                            view )
+		return printStmt( destView, valueViews )
 
 
 
@@ -1298,10 +1268,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 		conditionView = InnerFragment( condition, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
 		return ifStmtHeader( conditionView )
 
-	@DMObjectNodeDispatchMethod( Schema.IfStmtHeader )
+	@CompoundStatementHeader( Schema.IfStmtHeader )
 	def IfStmtHeader(self, fragment, inheritedState, model, condition):
-		return compoundStatementHeaderEditor( self._parser, inheritedState, model,
-		                                      self._ifStmtHeaderElement( inheritedState, condition ) )
+		return self._ifStmtHeaderElement( inheritedState, condition )
 
 
 	# Elif statement
@@ -1309,10 +1278,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 		conditionView = InnerFragment( condition, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
 		return elifStmtHeader( conditionView )
 
-	@DMObjectNodeDispatchMethod( Schema.ElifStmtHeader )
+	@CompoundStatementHeader( Schema.ElifStmtHeader )
 	def ElifStmtHeader(self, fragment, inheritedState, model, condition):
-		return compoundStatementHeaderEditor( self._parser, inheritedState, model,
-		                                      self._elifStmtHeaderElement( inheritedState, condition ) )
+		return self._elifStmtHeaderElement( inheritedState, condition )
 
 
 
@@ -1320,10 +1288,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def _elseStmtHeaderElement(self, inheritedState):
 		return elseStmtHeader()
 
-	@DMObjectNodeDispatchMethod( Schema.ElseStmtHeader )
+	@CompoundStatementHeader( Schema.ElseStmtHeader )
 	def ElseStmtHeader(self, fragment, inheritedState, model):
-		return compoundStatementHeaderEditor( self._parser, inheritedState, model,
-		                                      self._elseStmtHeaderElement( inheritedState ) )
+		return self._elseStmtHeaderElement( inheritedState )
 
 
 	# While statement
@@ -1331,10 +1298,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 		conditionView = InnerFragment( condition, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
 		return whileStmtHeader( conditionView )
 
-	@DMObjectNodeDispatchMethod( Schema.WhileStmtHeader )
+	@CompoundStatementHeader( Schema.WhileStmtHeader )
 	def WhileStmtHeader(self, fragment, inheritedState, model, condition):
-		return compoundStatementHeaderEditor( self._parser, inheritedState, model,
-		                                      self._whileStmtHeaderElement( inheritedState, condition ) )
+		return self._whileStmtHeaderElement( inheritedState, condition )
 
 
 	# For statement
@@ -1343,10 +1309,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 		sourceView = InnerFragment( source, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
 		return forStmtHeader( targetView, sourceView )
 
-	@DMObjectNodeDispatchMethod( Schema.ForStmtHeader )
+	@CompoundStatementHeader( Schema.ForStmtHeader )
 	def ForStmtHeader(self, fragment, inheritedState, model, target, source):
-		return compoundStatementHeaderEditor( self._parser, inheritedState, model,
-		                                      self._forStmtHeaderElement( inheritedState, target, source ) )
+		return self._forStmtHeaderElement( inheritedState, target, source )
 
 
 
@@ -1354,10 +1319,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def _tryStmtHeaderElement(self, inheritedState):
 		return tryStmtHeader()
 
-	@DMObjectNodeDispatchMethod( Schema.TryStmtHeader )
+	@CompoundStatementHeader( Schema.TryStmtHeader )
 	def TryStmtHeader(self, fragment, inheritedState, model):
-		return compoundStatementHeaderEditor( self._parser, inheritedState, model,
-		                                      self._tryStmtHeaderElement( inheritedState ) )
+		return self._tryStmtHeaderElement( inheritedState )
 
 
 
@@ -1367,10 +1331,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 		targetView = InnerFragment( target, _withPythonState( inheritedState, PRECEDENCE_STMT ) )   if target is not None   else None
 		return exceptStmtHeader( excView, targetView )
 
-	@DMObjectNodeDispatchMethod( Schema.ExceptStmtHeader )
+	@CompoundStatementHeader( Schema.ExceptStmtHeader )
 	def ExceptStmtHeader(self, fragment, inheritedState, model, exception, target):
-		return compoundStatementHeaderEditor( self._parser, inheritedState, model,
-		                                      self._exceptStmtHeaderElement( inheritedState, exception, target ) )
+		return self._exceptStmtHeaderElement( inheritedState, exception, target )
 
 
 
@@ -1378,10 +1341,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def _finallyStmtHeaderElement(self, inheritedState):
 		return finallyStmtHeader()
 
-	@DMObjectNodeDispatchMethod( Schema.FinallyStmtHeader )
+	@CompoundStatementHeader( Schema.FinallyStmtHeader )
 	def FinallyStmtHeader(self, fragment, inheritedState, model):
-		return compoundStatementHeaderEditor( self._parser, inheritedState, model,
-		                                      self._finallyStmtHeaderElement( inheritedState ) )
+		return self._finallyStmtHeaderElement( inheritedState )
 
 
 
@@ -1391,10 +1353,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 		targetView = InnerFragment( target, _withPythonState( inheritedState, PRECEDENCE_STMT ) )   if target is not None   else None
 		return withStmtHeader( exprView, targetView )
 
-	@DMObjectNodeDispatchMethod( Schema.WithStmtHeader )
+	@CompoundStatementHeader( Schema.WithStmtHeader )
 	def WithStmtHeader(self, fragment, inheritedState, model, expr, target):
-		return compoundStatementHeaderEditor( self._parser, inheritedState, model,
-		                                      self._withStmtHeaderElement( inheritedState, expr, target ) )
+		return self._withStmtHeaderElement( inheritedState, expr, target )
 
 
 
@@ -1403,10 +1364,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 		argViews = InnerFragment.map( args, _withPythonState( inheritedState, PRECEDENCE_STMT ) )   if args is not None   else None
 		return decoStmtHeader( name, argViews, argsTrailingSeparator is not None )
 
-	@DMObjectNodeDispatchMethod( Schema.DecoStmtHeader )
+	@CompoundStatementHeader( Schema.DecoStmtHeader )
 	def DecoStmtHeader(self, fragment, inheritedState, model, name, args, argsTrailingSeparator):
-		return compoundStatementHeaderEditor( self._parser, inheritedState, model,
-		                                      self._decoStmtHeaderElement( inheritedState, name, args, argsTrailingSeparator ) )
+		return self._decoStmtHeaderElement( inheritedState, name, args, argsTrailingSeparator )
 
 
 
@@ -1415,12 +1375,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 		paramViews = InnerFragment.map( params, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
 		return defStmtHeader( name, paramViews, paramsTrailingSeparator is not None )
 
-	@DMObjectNodeDispatchMethod( Schema.DefStmtHeader )
+	@CompoundStatementHeader( Schema.DefStmtHeader )
 	def DefStmtHeader(self, fragment, inheritedState, model, name, params, paramsTrailingSeparator):
-		editor = compoundStatementHeaderEditor( self._parser, inheritedState, model,
-		                                        self._defStmtHeaderElement( inheritedState, name, params, paramsTrailingSeparator ),
-		                                        lambda header: defStmtHeaderHighlight( header ) )
-		return defStmtHighlight( editor )
+		return self._defStmtHeaderElement( inheritedState, name, params, paramsTrailingSeparator ), defStmtHeaderHighlight, defStmtHighlight
 
 
 	# Def statement
@@ -1428,12 +1385,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 		baseViews = InnerFragment.map( bases, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ELEMENT ) )   if bases is not None   else None
 		return classStmtHeader( name, baseViews, basesTrailingSeparator is not None )
 
-	@DMObjectNodeDispatchMethod( Schema.ClassStmtHeader )
+	@CompoundStatementHeader( Schema.ClassStmtHeader )
 	def ClassStmtHeader(self, fragment, inheritedState, model, name, bases, basesTrailingSeparator):
-		editor = compoundStatementHeaderEditor( self._parser, inheritedState, model,
-		                                        self._classStmtHeaderElement( inheritedState, name, bases, basesTrailingSeparator ),
-		                                        lambda header: classStmtHeaderHighlight( header ) )
-		return classStmtHighlight( editor )
+		return self._classStmtHeaderElement( inheritedState, name, bases, basesTrailingSeparator ), classStmtHeaderHighlight, classStmtHighlight
 
 
 
@@ -1470,7 +1424,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	#
 
 	# If statement
-	@DMObjectNodeDispatchMethod( Schema.IfStmt )
+	@CompoundStatement( Schema.IfStmt )
 	def IfStmt(self, fragment, inheritedState, model, condition, suite, elifBlocks, elseSuite):
 		compoundBlocks = [ ( Schema.IfStmtHeader( condition=condition ), self._ifStmtHeaderElement( inheritedState, condition ), suite ) ]
 		for b in elifBlocks:
@@ -1479,35 +1433,32 @@ class Python25View (GSymViewObjectNodeDispatch):
 			compoundBlocks.append( ( Schema.ElifStmtHeader( condition=b['condition'] ), self._elifStmtHeaderElement( inheritedState, b['condition'] ),  b['suite'] ) )
 		if elseSuite is not None:
 			compoundBlocks.append( ( Schema.ElseStmtHeader(), self._elseStmtHeaderElement( inheritedState ),  elseSuite ) )
-		return compoundStatementEditor( self._parser, inheritedState, model,
-		                                compoundBlocks )
+		return compoundBlocks
 
 
 
 	# While statement
-	@DMObjectNodeDispatchMethod( Schema.WhileStmt )
+	@CompoundStatement( Schema.WhileStmt )
 	def WhileStmt(self, fragment, inheritedState, model, condition, suite, elseSuite):
 		compoundBlocks = [ ( Schema.WhileStmtHeader( condition=condition ), self._whileStmtHeaderElement( inheritedState, condition ), suite ) ]
 		if elseSuite is not None:
 			compoundBlocks.append( ( Schema.ElseStmtHeader(), self._elseStmtHeaderElement( inheritedState ),  elseSuite ) )
-		return compoundStatementEditor( self._parser, inheritedState, model,
-		                                compoundBlocks )
+		return compoundBlocks
 
 
 
 	# For statement
-	@DMObjectNodeDispatchMethod( Schema.ForStmt )
+	@CompoundStatement( Schema.ForStmt )
 	def ForStmt(self, fragment, inheritedState, model, target, source, suite, elseSuite):
 		compoundBlocks = [ ( Schema.ForStmtHeader( target=target, source=source ), self._forStmtHeaderElement( inheritedState, target, source ), suite ) ]
 		if elseSuite is not None:
 			compoundBlocks.append( ( Schema.ElseStmtHeader(), self._elseStmtHeaderElement( inheritedState ),  elseSuite ) )
-		return compoundStatementEditor( self._parser, inheritedState, model,
-		                                compoundBlocks )
+		return compoundBlocks
 
 
 
 	# Try statement
-	@DMObjectNodeDispatchMethod( Schema.TryStmt )
+	@CompoundStatement( Schema.TryStmt )
 	def TryStmt(self, fragment, inheritedState, model, suite, exceptBlocks, elseSuite, finallySuite):
 		compoundBlocks = [ ( Schema.TryStmtHeader(), self._tryStmtHeaderElement( inheritedState ), suite ) ]
 		for b in exceptBlocks:
@@ -1518,23 +1469,20 @@ class Python25View (GSymViewObjectNodeDispatch):
 			compoundBlocks.append( ( Schema.ElseStmtHeader(), self._elseStmtHeaderElement( inheritedState ),  elseSuite ) )
 		if finallySuite is not None:
 			compoundBlocks.append( ( Schema.FinallyStmtHeader(), self._finallyStmtHeaderElement( inheritedState ),  finallySuite ) )
-		return compoundStatementEditor( self._parser, inheritedState, model,
-		                                compoundBlocks )
+		return compoundBlocks
 
 
 
 
 	# With statement
-	@DMObjectNodeDispatchMethod( Schema.WithStmt )
+	@CompoundStatement( Schema.WithStmt )
 	def WithStmt(self, fragment, inheritedState, model, expr, target, suite):
-		compoundBlocks = [ ( Schema.WithStmtHeader( expr=expr, target=target ), self._withStmtHeaderElement( inheritedState, expr, target ), suite ) ]
-		return compoundStatementEditor( self._parser, inheritedState, model,
-		                                compoundBlocks )
+		return [ ( Schema.WithStmtHeader( expr=expr, target=target ), self._withStmtHeaderElement( inheritedState, expr, target ), suite ) ]
 
 
 
 	# Def statement
-	@DMObjectNodeDispatchMethod( Schema.DefStmt )
+	@CompoundStatement( Schema.DefStmt )
 	def DefStmt(self, fragment, inheritedState, model, decorators, name, params, paramsTrailingSeparator, suite):
 		compoundBlocks = []
 		for d in decorators:
@@ -1545,21 +1493,17 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 		compoundBlocks.append( ( Schema.DefStmtHeader( name=name, params=params, paramsTrailingSeparator=paramsTrailingSeparator ),
 		                         self._defStmtHeaderElement( inheritedState, name, params, paramsTrailingSeparator ), suite,
-		                         lambda header: defStmtHeaderHighlight( header ) ) )
-		editor = compoundStatementEditor( self._parser, inheritedState, model,
-		                                  compoundBlocks )
-		return defStmtHighlight( editor )
+		                         defStmtHeaderHighlight ) )
+		return compoundBlocks, defStmtHighlight
 
 
 	# Class statement
-	@DMObjectNodeDispatchMethod( Schema.ClassStmt )
+	@CompoundStatement( Schema.ClassStmt )
 	def ClassStmt(self, fragment, inheritedState, model, name, bases, basesTrailingSeparator, suite):
 		compoundBlocks = [ ( Schema.ClassStmtHeader( name=name, bases=bases, basesTrailingSeparator=basesTrailingSeparator ),
 		                     self._classStmtHeaderElement( inheritedState, name, bases, basesTrailingSeparator ), suite,
-		                     lambda header: classStmtHeaderHighlight( header ) ) ]
-		editor = compoundStatementEditor( self._parser, inheritedState, model,
-		                                  compoundBlocks )
-		return classStmtHighlight( editor )
+		                     classStmtHeaderHighlight ) ]
+		return compoundBlocks, classStmtHighlight
 
 
 
