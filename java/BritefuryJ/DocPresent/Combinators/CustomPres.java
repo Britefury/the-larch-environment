@@ -11,16 +11,16 @@ import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 
 public class CustomPres extends Pres
 {
-	public static interface PresFn
+	public static interface PresentationFn
 	{
 		public DPElement present(PresentationContext ctx);
 	}
 	
 	
-	private PresFn presFn;
+	private PresentationFn presFn;
 	
 	
-	public CustomPres(PresFn presFn)
+	public CustomPres(PresentationFn presFn)
 	{
 		super();
 		this.presFn = presFn;

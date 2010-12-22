@@ -117,11 +117,17 @@ class DMObjectNodeDispatchMethodWrapper (object):
 		return index
 	
 	
+	@classmethod
+	def decorator(cls):
+		def decoFactory(nodeClass):
+			def deco(method):
+				return cls( nodeClass, method )
+			return deco
+		return decoFactory
 	
-def DMObjectNodeDispatchMethod(nodeClass):
-	def decorator(fn):
-		return DMObjectNodeDispatchMethodWrapper( nodeClass, fn )
-	return decorator
+	
+
+DMObjectNodeDispatchMethod = DMObjectNodeDispatchMethodWrapper.decorator()
 		
 
 _methodTables = {}

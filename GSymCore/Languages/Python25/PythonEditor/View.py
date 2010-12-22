@@ -56,6 +56,7 @@ from BritefuryJ.GSym.View import GSymFragmentView
 
 from BritefuryJ.Editor.Sequential import SequentialEditorPerspective
 from BritefuryJ.Editor.Sequential.Item import *
+from BritefuryJ.Editor.SyntaxRecognizing import SRFragmentEditor
 from BritefuryJ.Editor.SyntaxRecognizing.Precedence import PrecedenceHandler
 
 from BritefuryJ.ModelAccess.DocModel import *
@@ -77,8 +78,8 @@ from GSymCore.Languages.Python25.PythonEditor.PythonEditorCombinators import *
 
 
 
-EDITMODE_DISPLAY = 0
-EDITMODE_EDIT = 1
+EDITMODE_DISPLAY = False
+EDITMODE_EDIT = True
 
 
 
@@ -111,83 +112,23 @@ def _isValidUnparsedStatementValue(value):
 	i = value.indexOf( '\n' )
 	return i != -1   and   i == len( value ) - 1
 
+def _deepCopyUnparsedItem(x):
+	if isinstance( x, DMNode ):
+		return x.deepCopy()
+	else:
+		return x
+	
+def _deepCopyUnparsedItems(xs):
+	return [ _deepCopyUnparsedItem( x )   for x in xs ]
+
 def _commitUnparsedStatment(model, value):
-	unparsed = Schema.UnparsedStmt( value=Schema.UNPARSED( value=value.getItemValues() ) )
+	unparsed = Schema.UnparsedStmt( value=Schema.UNPARSED( value=_deepCopyUnparsedItems( value.getItemValues() ) ) )
 	pyReplaceNode( model, unparsed )
 
 def _commitInnerUnparsed(model, value):
-	unparsed = Schema.UNPARSED( value=value.getItemValues() )
+	unparsed = Schema.UNPARSED( value=_deepCopyUnparsedItems( value.getItemValues() ) )
 	pyReplaceNode( model, unparsed )
 
-
-
-def unparsedNodeEditor(grammar, inheritedState, model, contents):
-	mode = inheritedState['editMode']
-	if mode == EDITMODE_DISPLAY:
-		return contents
-	elif mode == EDITMODE_EDIT:
-		return EditableSequentialItem( PythonSyntaxRecognizingEditor.instance.parsingNodeEditListener( 'Expression', grammar.expression(), pyReplaceNode ),  contents )
-	else:
-		raise ValueError, 'invalid mode %d'  %  mode
-
-
-def unparsedStatementNodeEditor(grammar, inheritedState, model, contents):
-	mode = inheritedState['editMode']
-
-	s = statementLine( contents )
-
-	if mode == EDITMODE_EDIT:
-		assert not model.isInstanceOf( Schema.UNPARSED )
-		s = EditableSequentialItem( [ PythonSyntaxRecognizingEditor.instance.parsingNodeEditListener( 'Statement', grammar.simpleSingleLineStatementValid(), pyReplaceNode ),
-		                              PythonSyntaxRecognizingEditor.instance.partialParsingNodeEditListener( 'Compound header', grammar.compoundStmtHeader() ),
-		                              PythonSyntaxRecognizingEditor.instance.unparsedNodeEditListener( 'Statement', _isValidUnparsedStatementValue, _commitUnparsedStatment, _commitInnerUnparsed ) ], s )
-		s = s.withElementInteractor( _statementIndentationInteractor )
-
-	return s
-
-
-def expressionNodeEditor(grammar, inheritedState, model, contents):
-	mode = inheritedState['editMode']
-	if mode == EDITMODE_DISPLAY:
-		contents = _pythonPrecedenceHandler.applyPrecedenceBrackets( model, contents, inheritedState )
-		return contents
-	elif mode == EDITMODE_EDIT:
-		contents = _pythonPrecedenceHandler.applyPrecedenceBrackets( model, contents, inheritedState )
-		contents = EditableSequentialItem( PythonSyntaxRecognizingEditor.instance.parsingNodeEditListener( 'Expression', grammar.expression(), pyReplaceNode ),  contents )
-		return contents
-	else:
-		raise ValueError, 'invalid mode %d'  %  mode
-
-
-def statementNodeEditor(grammar, inheritedState, model, contents):
-	mode = inheritedState['editMode']
-
-	s = statementLine( contents )
-
-	if mode == EDITMODE_EDIT:
-		assert not model.isInstanceOf( Schema.UNPARSED )
-		s = EditableStructuralItem( [ PythonSyntaxRecognizingEditor.instance.parsingNodeEditListener( 'Statement', grammar.simpleSingleLineStatementValid(), pyReplaceNode ),
-		                              PythonSyntaxRecognizingEditor.instance.partialParsingNodeEditListener( 'Compound header', grammar.compoundStmtHeader() ),
-		                              PythonSyntaxRecognizingEditor.instance.unparsedNodeEditListener( 'Statement', _isValidUnparsedStatementValue, _commitUnparsedStatment, _commitInnerUnparsed ) ], model, s )
-		s = s.withElementInteractor( _statementIndentationInteractor )
-
-	return s
-
-
-def compoundStatementHeaderEditor(grammar, inheritedState, model, headerContents, headerContainerFn=None):
-	mode = inheritedState['editMode']
-
-	headerStatementLine = statementLine( headerContents )
-
-	if mode == EDITMODE_EDIT:
-		headerStatementLine = EditableStructuralItem( [
-			                              PythonSyntaxRecognizingEditor.instance.partialParsingNodeEditListener( 'Compound header', grammar.compoundStmtHeader() ),
-			                              PythonSyntaxRecognizingEditor.instance.unparsedNodeEditListener( 'Statement', _isValidUnparsedStatementValue, _commitUnparsedStatment, _commitInnerUnparsed ) ], model, headerStatementLine )
-		headerStatementLine = headerStatementLine.withElementInteractor( _statementIndentationInteractor )
-	
-	if headerContainerFn is not None:
-		headerStatementLine = headerContainerFn( headerStatementLine )
-	return headerStatementLine
 
 
 def compoundStatementEditor(grammar, inheritedState, model, compoundBlocks):
@@ -233,14 +174,8 @@ def compoundStatementEditor(grammar, inheritedState, model, compoundBlocks):
 
 
 
-def specialFormExpressionNodeEditor(grammar, inheritedState, model, contents):
-	mode = inheritedState['editMode']
-	contents = StructuralItem( model, contents )
-	return contents
-
-
 def specialFormStatementNodeEditor(grammar, inheritedState, model, contents):
-	mode = inheritedState['editMode']
+	mode = inheritedState['gSym_SREditor_edit']
 	contents = StructuralItem( model, contents )
 	s = specialFormStatementLine( contents )
 	s = EditableStructuralItem( [ PythonSyntaxRecognizingEditor.instance.parsingNodeEditListener( 'Statement', grammar.simpleSingleLineStatementValid(), pyReplaceNode ),
@@ -406,136 +341,123 @@ def _pythonModuleContextMenuFactory(element, menu):
 
 
 def _withPythonState(inheritedState, precedence, mode=EDITMODE_DISPLAY):
-	return inheritedState.withAttrs( outerPrecedence=precedence, editMode=mode )
+	return inheritedState.withAttrs( outerPrecedence=precedence, gSym_SREditor_edit=mode )
 
 
 
 
 
 class UnparsedWrapper (DMObjectNodeDispatchMethodWrapper):
-	def call(self, object, dispatchSelf, args):
-		v = super( UnparsedWrapper, self ).call( object, dispatchSelf, args )
-		return unparsedNodeEditor( dispatchSelf._parser, args[1], object, v )
+	def call(self, model, pythonView, args):
+		v = super( UnparsedWrapper, self ).call( model, pythonView, args )
+		return pythonView._unparsedFragmentEditor.editFragment( v, model, args[1] )
 
-def Unparsed(nodeClass):
-	def decorator(fn):
-		return UnparsedWrapper( nodeClass, fn )
-	return decorator
+Unparsed = UnparsedWrapper.decorator()
 
 
 
 class UnparsedStatementWrapper (DMObjectNodeDispatchMethodWrapper):
-	def call(self, object, dispatchSelf, args):
-		v = super( UnparsedStatementWrapper, self ).call( object, dispatchSelf, args )
-		return unparsedStatementNodeEditor( dispatchSelf._parser, args[1], object, v )
+	def call(self, model, pythonView, args):
+		v = super( UnparsedStatementWrapper, self ).call( model, pythonView, args )
+		return pythonView._unparsedStatementFragmentEditor.editFragment( statementLine( v ), model, args[1] )
 
-def UnparsedStatement(nodeClass):
-	def decorator(fn):
-		return UnparsedStatementWrapper( nodeClass, fn )
-	return decorator
+UnparsedStatement = UnparsedStatementWrapper.decorator()
 
 
 
 class GenericWrapper (DMObjectNodeDispatchMethodWrapper):
 	pass
 
-def Generic(nodeClass):
-	def decorator(fn):
-		return GenericWrapper( nodeClass, fn )
-	return decorator
+Generic = GenericWrapper.decorator()
 
 
 
 class ExpressionWrapper (DMObjectNodeDispatchMethodWrapper):
-	def call(self, object, dispatchSelf, args):
-		v = super( ExpressionWrapper, self ).call( object, dispatchSelf, args )
-		return expressionNodeEditor( dispatchSelf._parser, args[1], object, v )
+	def call(self, model, pythonView, args):
+		v = super( ExpressionWrapper, self ).call( model, pythonView, args )
+		return pythonView._expressionFragmentEditor.editFragment( v, model, args[1] )
 
-def Expression(nodeClass):
-	def decorator(fn):
-		return ExpressionWrapper( nodeClass, fn )
-	return decorator
+Expression = ExpressionWrapper.decorator()
 
 
 
 class StatementWrapper (DMObjectNodeDispatchMethodWrapper):
-	def call(self, object, dispatchSelf, args):
-		v = super( StatementWrapper, self ).call( object, dispatchSelf, args )
-		return statementNodeEditor( dispatchSelf._parser, args[1], object, v )
+	def call(self, model, pythonView, args):
+		v = super( StatementWrapper, self ).call( model, pythonView, args )
+		return pythonView._statementFragmentEditor.editFragment( statementLine( v ), model, args[1] )
 
-def Statement(nodeClass):
-	def decorator(fn):
-		return StatementWrapper( nodeClass, fn )
-	return decorator
+Statement = StatementWrapper.decorator()
 
 
 
 class CompoundStatementHeaderWrapper (DMObjectNodeDispatchMethodWrapper):
-	def call(self, object, dispatchSelf, args):
-		v = super( CompoundStatementHeaderWrapper, self ).call( object, dispatchSelf, args )
+	def call(self, model, pythonView, args):
+		v = super( CompoundStatementHeaderWrapper, self ).call( model, pythonView, args )
 		if isinstance( v, tuple ):
-			e = compoundStatementHeaderEditor( dispatchSelf._parser, args[1], object, v[0], v[1] )
-			if len( v ) > 2:
-				f = v[2]
+			e = pythonView._compoundStatementHeaderFragmentEditor.editFragment( statementLine( v[0] ), model, args[1] )
+			for f in v[1:]:
 				e = f( e )
 			return e
 		else:
-			return compoundStatementHeaderEditor( dispatchSelf._parser, args[1], object, v )
-			
+			return pythonView._compoundStatementHeaderFragmentEditor.editFragment( statementLine( v ), model, args[1] )
 
-def CompoundStatementHeader(nodeClass):
-	def decorator(fn):
-		return CompoundStatementHeaderWrapper( nodeClass, fn )
-	return decorator
+CompoundStatementHeader = CompoundStatementHeaderWrapper.decorator()
 
 
 
 class CompoundStatementWrapper (DMObjectNodeDispatchMethodWrapper):
-	def call(self, object, dispatchSelf, args):
-		v = super( CompoundStatementWrapper, self ).call( object, dispatchSelf, args )
+	def call(self, model, pythonView, args):
+		v = super( CompoundStatementWrapper, self ).call( model, pythonView, args )
 		if isinstance( v, tuple ):
 			f = v[1]
-			return f( compoundStatementEditor( dispatchSelf._parser, args[1], object, v[0] ) )
+			return f( compoundStatementEditor( pythonView._parser, args[1], model, v[0] ) )
 		else:
-			return compoundStatementEditor( dispatchSelf._parser, args[1], object, v )
+			return compoundStatementEditor( pythonView._parser, args[1], model, v )
 
-def CompoundStatement(nodeClass):
-	def decorator(fn):
-		return CompoundStatementWrapper( nodeClass, fn )
-	return decorator
+CompoundStatement = CompoundStatementWrapper.decorator()
 
 
 
 class SpecialFormExpressionWrapper (DMObjectNodeDispatchMethodWrapper):
-	def call(self, object, dispatchSelf, args):
-		v = super( SpecialFormExpressionWrapper, self ).call( object, dispatchSelf, args )
-		return specialFormExpressionNodeEditor( dispatchSelf._parser, args[1], object, v )
+	def call(self, model, pythonView, args):
+		v = super( SpecialFormExpressionWrapper, self ).call( model, pythonView, args )
+		return StructuralItem( model, v )
 
-def SpecialFormExpression(nodeClass):
-	def decorator(fn):
-		return SpecialFormExpressionWrapper( nodeClass, fn )
-	return decorator
+SpecialFormExpression = SpecialFormExpressionWrapper.decorator()
 
 
 
 class SpecialFormStatementWrapper (DMObjectNodeDispatchMethodWrapper):
-	def call(self, object, dispatchSelf, args):
-		v = super( SpecialFormStatementWrapper, self ).call( object, dispatchSelf, args )
-		return specialFormStatementNodeEditor( dispatchSelf._parser, args[1], object, v )
+	def call(self, model, pythonView, args):
+		v = super( SpecialFormStatementWrapper, self ).call( model, pythonView, args )
+		v = StructuralItem( model, v )
+		v = specialFormStatementLine( v )
+		return pythonView._specialFormStatementFragmentEditor.editFragment( v, model, args[1] )
 
-def SpecialFormStatement(nodeClass):
-	def decorator(fn):
-		return SpecialFormStatementWrapper( nodeClass, fn )
-	return decorator
-
+SpecialFormStatement = SpecialFormStatementWrapper.decorator()
 
 
 
 class Python25View (GSymViewObjectNodeDispatch):
-	def __init__(self, parser):
-		self._parser = parser
+	def __init__(self, grammar):
+		self._parser = grammar
+		
+		expr = PythonSyntaxRecognizingEditor.instance.parsingNodeEditListener( 'Expression', grammar.expression(), pyReplaceNode )
+		stmt = PythonSyntaxRecognizingEditor.instance.parsingNodeEditListener( 'Statement', grammar.simpleSingleLineStatementValid(), pyReplaceNode )
+		compHdr = PythonSyntaxRecognizingEditor.instance.partialParsingNodeEditListener( 'Compound header', grammar.compoundStmtHeader() )
+		stmtUnparsed = PythonSyntaxRecognizingEditor.instance.unparsedNodeEditListener( 'Statement', _isValidUnparsedStatementValue, _commitUnparsedStatment, _commitInnerUnparsed )
+		
+		self._unparsedFragmentEditor = SRFragmentEditor( False, [ expr ] )
+		self._unparsedStatementFragmentEditor = SRFragmentEditor( False, [ stmt, compHdr, stmtUnparsed ], [ _statementIndentationInteractor ] )
+		self._expressionFragmentEditor = SRFragmentEditor( False, _pythonPrecedenceHandler, [ expr ] )
+		self._statementFragmentEditor = SRFragmentEditor( True, [ stmt, compHdr, stmtUnparsed ], [ _statementIndentationInteractor ] )
+		self._compoundStatementHeaderFragmentEditor = SRFragmentEditor( True, [ compHdr, stmtUnparsed ], [ _statementIndentationInteractor ] )
+		self._specialFormStatementFragmentEditor = SRFragmentEditor( True, [ stmt, compHdr, stmtUnparsed ], [ _statementIndentationInteractor ] )
 
 
+		
+		
+		
 	# OUTER NODES
 	@DMObjectNodeDispatchMethod( Schema.PythonModule )
 	def PythonModule(self, fragment, inheritedState, model, suite):
