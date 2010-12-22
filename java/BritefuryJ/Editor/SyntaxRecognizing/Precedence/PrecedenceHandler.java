@@ -14,35 +14,38 @@ import BritefuryJ.ModelAccess.ModelReader;
 
 public class PrecedenceHandler
 {
-	private ModelReader requiresBracketsReader, numBracketsReader;
+	private ModelReader requiresBracketsReader, numBracketsReader, precedenceReader;
 	private Pres openBracket, closeBracket;
 	
-	public PrecedenceHandler(ModelReader requiresBracketsReader, ModelReader numBracketsReader, Object openBracket, Object closeBracket)
+	public PrecedenceHandler(ModelReader requiresBracketsReader, ModelReader numBracketsReader, ModelReader precedenceReader, Object openBracket, Object closeBracket)
 	{
 		this.requiresBracketsReader = requiresBracketsReader;
 		this.numBracketsReader = numBracketsReader;
+		this.precedenceReader = precedenceReader;
 		this.openBracket = Pres.coerce( openBracket );
 		this.closeBracket = Pres.coerce( closeBracket );
 	}
 	
-	public PrecedenceHandler(ModelReader requiresBracketsReader, ModelReader numBracketsReader, String openBracket, String closeBracket, StyleSheet bracketStyle)
+	public PrecedenceHandler(ModelReader requiresBracketsReader, ModelReader numBracketsReader, ModelReader precedenceReader, String openBracket, String closeBracket, StyleSheet bracketStyle)
 	{
-		this( requiresBracketsReader, numBracketsReader, bracketStyle.applyTo( new Text( openBracket ) ), bracketStyle.applyTo( new Text( closeBracket ) ) );
+		this( requiresBracketsReader, numBracketsReader, precedenceReader, bracketStyle.applyTo( new Text( openBracket ) ), bracketStyle.applyTo( new Text( closeBracket ) ) );
 	}
 	
-	public PrecedenceHandler(ModelReader requiresBracketsReader, ModelReader numBracketsReader, StyleSheet bracketStyle)
+	public PrecedenceHandler(ModelReader requiresBracketsReader, ModelReader numBracketsReader, ModelReader precedenceReader, StyleSheet bracketStyle)
 	{
-		this( requiresBracketsReader, numBracketsReader, "(", ")", bracketStyle );
+		this( requiresBracketsReader, numBracketsReader, precedenceReader, "(", ")", bracketStyle );
 	}
 	
 	
-	public Pres applyPrecedenceBrackets(Object model, Object view, int precedence, SimpleAttributeTable inheritedState)
+	public Pres applyPrecedenceBrackets(Object model, Object view, SimpleAttributeTable inheritedState)
 	{
 		Object requiresBrackets = requiresBracketsReader.readFromModel( model );
 		boolean bRequiresBrackets = ( requiresBrackets != null  &&  requiresBrackets instanceof Boolean )  ?  (Boolean)requiresBrackets  :  false;
 		if ( bRequiresBrackets )
 		{
 			int numBrackets = (Integer)numBracketsReader.readFromModel( model );
+			Object prec = precedenceReader.readFromModel( model );
+			int precedence = prec != null  ?  (Integer)prec  :  -1;
 			return PrecedenceBrackets.editorPrecedenceBrackets( view, precedence, numBrackets, inheritedState, openBracket, closeBracket );
 		}
 		else

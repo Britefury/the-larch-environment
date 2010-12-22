@@ -90,7 +90,7 @@ _statementIndentationInteractor = StatementIndentationInteractor()
 
 
 
-_pythonPrecedenceHandler = PrecedenceHandler( ClassAttributeReader( parensRequired ), ObjectFieldReader( 'parens' ).stringToInteger( -1 ), openParen, closeParen )
+_pythonPrecedenceHandler = PrecedenceHandler( ClassAttributeReader( parensRequired ), ObjectFieldReader( 'parens' ).stringToInteger( -1 ), ClassAttributeReader( nodePrecedence ), openParen, closeParen )
 
 
 
@@ -112,7 +112,7 @@ def _isValidUnparsedStatementValue(value):
 	return i != -1   and   i == len( value ) - 1
 
 def _commitUnparsedStatment(model, value):
-	unparsed = Schema.ExprStmt( expr=Schema.UNPARSED( value=value.getItemValues() ) )
+	unparsed = Schema.UnparsedStmt( value=Schema.UNPARSED( value=value.getItemValues() ) )
 	pyReplaceNode( model, unparsed )
 
 def _commitInnerUnparsed(model, value):
@@ -131,14 +131,28 @@ def unparsedNodeEditor(grammar, inheritedState, model, contents):
 		raise ValueError, 'invalid mode %d'  %  mode
 
 
+def unparsedStatementNodeEditor(grammar, inheritedState, model, contents):
+	mode = inheritedState['editMode']
+
+	s = statementLine( contents )
+
+	if mode == EDITMODE_EDIT:
+		assert not model.isInstanceOf( Schema.UNPARSED )
+		s = EditableSequentialItem( [ PythonSyntaxRecognizingEditor.instance.parsingNodeEditListener( 'Statement', grammar.simpleSingleLineStatementValid(), pyReplaceNode ),
+		                              PythonSyntaxRecognizingEditor.instance.partialParsingNodeEditListener( 'Compound header', grammar.compoundStmtHeader() ),
+		                              PythonSyntaxRecognizingEditor.instance.unparsedNodeEditListener( 'Statement', _isValidUnparsedStatementValue, _commitUnparsedStatment, _commitInnerUnparsed ) ], s )
+		s = s.withElementInteractor( _statementIndentationInteractor )
+
+	return s
+
+
 def expressionNodeEditor(grammar, inheritedState, model, contents):
 	mode = inheritedState['editMode']
-	precedence = nodePrecedence[model]
 	if mode == EDITMODE_DISPLAY:
-		contents = _pythonPrecedenceHandler.applyPrecedenceBrackets( model, contents, precedence   if precedence is not None   else -1, inheritedState )
+		contents = _pythonPrecedenceHandler.applyPrecedenceBrackets( model, contents, inheritedState )
 		return contents
 	elif mode == EDITMODE_EDIT:
-		contents = _pythonPrecedenceHandler.applyPrecedenceBrackets( model, contents, precedence   if precedence is not None   else -1, inheritedState )
+		contents = _pythonPrecedenceHandler.applyPrecedenceBrackets( model, contents, inheritedState )
 		contents = EditableSequentialItem( PythonSyntaxRecognizingEditor.instance.parsingNodeEditListener( 'Expression', grammar.expression(), pyReplaceNode ),  contents )
 		return contents
 	else:
@@ -406,6 +420,18 @@ class UnparsedWrapper (DMObjectNodeDispatchMethodWrapper):
 def Unparsed(nodeClass):
 	def decorator(fn):
 		return UnparsedWrapper( nodeClass, fn )
+	return decorator
+
+
+
+class UnparsedStatementWrapper (DMObjectNodeDispatchMethodWrapper):
+	def call(self, object, dispatchSelf, args):
+		v = super( UnparsedStatementWrapper, self ).call( object, dispatchSelf, args )
+		return unparsedStatementNodeEditor( dispatchSelf._parser, args[1], object, v )
+
+def UnparsedStatement(nodeClass):
+	def decorator(fn):
+		return UnparsedStatementWrapper( nodeClass, fn )
 	return decorator
 
 
@@ -1097,6 +1123,14 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# SIMPLE STATEMENTS
 	#
 	#
+
+	# Unparsed statement
+	@UnparsedStatement( Schema.UnparsedStmt )
+	def UnparsedStmt(self, fragment, inheritedState, model, value):
+		valueView = InnerFragment( value, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
+		return unparsedStmt( valueView )
+
+
 
 	# Expression statement
 	@Statement( Schema.ExprStmt )

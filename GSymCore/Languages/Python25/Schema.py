@@ -135,6 +135,9 @@ ExternalExpr = schema.newClass( 'ExternalExpr', Expr, [ 'expr' ] )
 #
 # Simple statements
 #
+# Unparsed statement
+UnparsedStmt = schema.newClass( 'UnparsedStmt', Stmt, [ 'value' ] )
+# Simple statement
 SimpleStmt = schema.newClass( 'SimpleStmt', Stmt, [] )
 # Expression statement
 ExprStmt = schema.newClass( 'ExprStmt', SimpleStmt, [ 'expr' ] )

@@ -599,6 +599,10 @@ def inlineObjectMacro(ctx, style, valueView, modelView):
 
 
 
+def unparsedStmt(value):
+	return value
+
+
 def exprStmt(expr):
 	return expr
 
