@@ -31,7 +31,7 @@ class _Importer (object):
 			try:
 				method = getattr( self, name )
 			except AttributeError:
-				return Schema.UNPARSED( value=name )
+				raise ValueError, 'Cannot find method to import node of class %s'  %  ( name, )
 		return method( node )
 
 
@@ -186,7 +186,7 @@ class _ExprImporter (_Importer):
 				try:
 					method = getattr( self, name )
 				except AttributeError:
-					return Schema.UNPARSED( value=name )
+					raise ValueError, 'Cannot find method to import node of class %s'  %  ( name, )
 			return method( node )
 
 	
@@ -465,7 +465,7 @@ class _ExceptHandlerImporter (_Importer):
 			try:
 				method = getattr( self, name )
 			except AttributeError:
-				return Schema.UNPARSED( value=name )
+				raise ValueError, 'Cannot find method to import node of class %s'  %  ( name, )
 		return method( structTab, node )
 	
 	# Except block
@@ -588,7 +588,7 @@ class _ModuleImporter (_Importer):
 			try:
 				method = getattr( self, name )
 			except AttributeError:
-				return Schema.UNPARSED( value=name )
+				raise ValueError, 'Cannot find method to import node of class %s'  %  ( name, )
 		return method( structTab, node )
 
 	

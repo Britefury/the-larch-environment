@@ -41,6 +41,9 @@ public abstract class UnparsedEditListener extends SRStreamEditListener
 	protected abstract HandleEditResult handleUnparsed(DPElement element, DPElement sourceElement, GSymFragmentView fragment,
 			EditEvent event, Object model, StreamValue value);
 	
+	protected abstract HandleEditResult handleInnerUnparsed(DPElement element, DPElement sourceElement, GSymFragmentView fragment,
+			EditEvent event, Object model, StreamValue value);
+	
 	
 
 	@Override
@@ -95,7 +98,7 @@ public abstract class UnparsedEditListener extends SRStreamEditListener
 						log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " (unparsed) - apply to sub-model" ).vItem( "editedStream", value ) );
 					}
 				}
-				return handleUnparsed( sourceFragmentElement, sourceElement, sourceFragment, event, sourceModel, sourceValue );
+				return handleInnerUnparsed( sourceFragmentElement, sourceElement, sourceFragment, event, sourceModel, sourceValue );
 			}
 		}
 		else

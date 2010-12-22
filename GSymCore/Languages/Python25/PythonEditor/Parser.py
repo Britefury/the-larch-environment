@@ -653,7 +653,7 @@ class Python25Grammar (Grammar):
 	
 	@Rule
 	def unparsed(self):
-		return ObjectNode( Schema.UNPARSED )  |  ( ( ( RegEx( '[^\n]*' ) | ObjectNode( Schema.Expr ) ).oneOrMore()  +  Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.UNPARSED( value=xs[0] ) ) )
+		return ObjectNode( Schema.UNPARSED )  |  ( ( ( RegEx( '[^\n]*' ) | ObjectNode( Schema.Expr ) ).oneOrMore()  +  Literal( '\n' ) ).action( lambda input, begin, end, xs, bindings: Schema.ExprStmt( expr=Schema.UNPARSED( value=xs[0] ) ) ) )
 	
 	
 	
@@ -1854,9 +1854,9 @@ class TestCase_Python25Parser (ParserTestCase):
 		
 	def test_unparsed(self):
 		g = Python25Grammar()
-		self._parseStringTest( g.singleLineStatement(), 'foo bar xyz\n', Schema.UNPARSED( value=[ 'foo bar xyz' ] ) )
-		self._parseStringTest( g.singleLineStatement(), 'as\n', Schema.UNPARSED( value=[ 'as' ] ) )
-		self._parseStringTest( g.suite(), 'as\n', [ Schema.UNPARSED( value=[ 'as' ] ) ] )
+		self._parseStringTest( g.singleLineStatement(), 'foo bar xyz\n', Schema.ExprStmt( expr=Schema.UNPARSED( value=[ 'foo bar xyz' ] ) ) )
+		self._parseStringTest( g.singleLineStatement(), 'as\n', Schema.ExprStmt( expr=Schema.UNPARSED( value=[ 'as' ] ) ) )
+		self._parseStringTest( g.suite(), 'as\n', [ Schema.ExprStmt( expr=Schema.UNPARSED( value=[ 'as' ] ) ) ] )
 		
 
 
