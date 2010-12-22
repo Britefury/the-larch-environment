@@ -135,13 +135,14 @@ public abstract class SyntaxRecognizingEditor extends SequentialEditor
 	{
 		private String logName;
 		private UnparseableContentTest test;
-		private UnparseableCommitFn commit;
+		private UnparseableCommitFn commit, innerCommit;
 		
 		
-		public UnparsedNodeEditListener(UnparseableContentTest test, UnparseableCommitFn commit, String logName)
+		public UnparsedNodeEditListener(UnparseableContentTest test, UnparseableCommitFn commit, UnparseableCommitFn innerCommit, String logName)
 		{
 			this.test = test;
 			this.commit = commit;
+			this.innerCommit = innerCommit;
 			this.logName = logName;
 		}
 		
@@ -175,6 +176,13 @@ public abstract class SyntaxRecognizingEditor extends SequentialEditor
 		protected HandleEditResult handleUnparsed(DPElement element, DPElement sourceElement, GSymFragmentView fragment, EditEvent event, Object model, StreamValue value)
 		{
 			commit.commit( model, value );
+			return HandleEditResult.HANDLED;
+		}
+
+		@Override
+		protected HandleEditResult handleInnerUnparsed(DPElement element, DPElement sourceElement, GSymFragmentView fragment, EditEvent event, Object model, StreamValue value)
+		{
+			innerCommit.commit( model, value );
 			return HandleEditResult.HANDLED;
 		}
 	}
@@ -256,9 +264,9 @@ public abstract class SyntaxRecognizingEditor extends SequentialEditor
 	
 	
 	
-	public UnparsedEditListener unparsedNodeEditListener(String logName, UnparseableContentTest test, UnparseableCommitFn commit)
+	public UnparsedEditListener unparsedNodeEditListener(String logName, UnparseableContentTest test, UnparseableCommitFn commit, UnparseableCommitFn innerCommit)
 	{
-		UnparsedNodeEditListener listener = new UnparsedNodeEditListener( test, commit, logName );
+		UnparsedNodeEditListener listener = new UnparsedNodeEditListener( test, commit, innerCommit, logName );
 		WeakReference<UnparsedNodeEditListener> x = unparsedCache.get( listener );
 		if ( x == null  ||  x.get() == null )
 		{
