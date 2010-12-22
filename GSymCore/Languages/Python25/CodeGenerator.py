@@ -453,6 +453,12 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 		return self( expr )
 	
 	
+	# Expression statement
+	@DMObjectNodeDispatchMethod( Schema.UnparsedStmt )
+	def UnparsedStmt(self, node, value):
+		raise Python25CodeGeneratorUnparsedError
+	
+	
 	# Assert statement
 	@DMObjectNodeDispatchMethod( Schema.AssertStmt )
 	def AssertStmt(self, node, condition, fail):
