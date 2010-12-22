@@ -9,6 +9,7 @@ package BritefuryJ.Editor.SyntaxRecognizing;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.EditEvent;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
+import BritefuryJ.DocPresent.StreamValue.StreamValueVisitor;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Logging.LogEntry;
@@ -73,7 +74,8 @@ public abstract class UnparsedEditListener extends SRStreamEditListener
 			{
 				DPElement sourceFragmentElement = sourceFragment.getFragmentContentElement();
 				Object sourceModel = sourceFragment.getModel();
-				StreamValue sourceValue = sourceFragmentElement.getStreamValue();
+				StreamValueVisitor visitor = event.getStreamValueVisitor();
+				StreamValue sourceValue = visitor.getStreamValue( sourceFragmentElement );
 				
 				if ( value.isEmpty()  ||  isValueEmpty( sourceFragmentElement, sourceElement, sourceFragment, event, sourceModel, sourceValue ) )
 				{
@@ -95,7 +97,7 @@ public abstract class UnparsedEditListener extends SRStreamEditListener
 					Log log = fragment.getView().getPageLog();
 					if ( log.isRecording() )
 					{
-						log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " (unparsed) - apply to sub-model" ).vItem( "editedStream", value ) );
+						log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " (unparsed) - apply to sub-model" ).vItem( "editedStream", sourceValue ) );
 					}
 				}
 				return handleInnerUnparsed( sourceFragmentElement, sourceElement, sourceFragment, event, sourceModel, sourceValue );
