@@ -239,7 +239,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 		p = _pythonCodeEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
 
 		
-		p = EditableStructuralItem( PythonCodeNodeEventListener.instance, node.getModel(), p )
+		p = StructuralItem( PythonCodeNodeEventListener.instance, node.getModel(), p )
 		return p
 
 
@@ -284,7 +284,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 		p = _quoteLocationEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
 
 		
-		p = EditableStructuralItem( QuoteLocationNodeEventListener.instance, node.getModel(), p )
+		p = StructuralItem( QuoteLocationNodeEventListener.instance, node.getModel(), p )
 		return p
 
 

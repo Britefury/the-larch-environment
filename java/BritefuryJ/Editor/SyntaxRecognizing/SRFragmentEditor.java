@@ -19,14 +19,17 @@ import BritefuryJ.Editor.SyntaxRecognizing.Precedence.PrecedenceHandler;
 
 public class SRFragmentEditor
 {
+	private SyntaxRecognizingEditor editor;
 	private boolean bStructural;
 	private PrecedenceHandler precedenceHandler;
 	private List<TreeEventListener> editListeners;
 	private List<AbstractElementInteractor> elementInteractors;	
 	
 	
-	public SRFragmentEditor(boolean bStructural, PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners, List<AbstractElementInteractor> elementInteractors)
+	public SRFragmentEditor(SyntaxRecognizingEditor editor, boolean bStructural, PrecedenceHandler precedenceHandler,
+			List<TreeEventListener> editListeners, List<AbstractElementInteractor> elementInteractors)
 	{
+		this.editor = editor;
 		this.bStructural = bStructural;
 		this.precedenceHandler = precedenceHandler;
 		this.editListeners = new ArrayList<TreeEventListener>();
@@ -38,19 +41,19 @@ public class SRFragmentEditor
 		}
 	}
 	
-	public SRFragmentEditor(boolean bStructural, List<TreeEventListener> editListeners, List<AbstractElementInteractor> elementInteractors)
+	public SRFragmentEditor(SyntaxRecognizingEditor editor, boolean bStructural, List<TreeEventListener> editListeners, List<AbstractElementInteractor> elementInteractors)
 	{
-		this( bStructural, null, editListeners, elementInteractors );
+		this( editor, bStructural, null, editListeners, elementInteractors );
 	}
 	
-	public SRFragmentEditor(boolean bStructural, PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners)
+	public SRFragmentEditor(SyntaxRecognizingEditor editor, boolean bStructural, PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners)
 	{
-		this( bStructural, precedenceHandler, editListeners, null );
+		this( editor, bStructural, precedenceHandler, editListeners, null );
 	}
 	
-	public SRFragmentEditor(boolean bStructural, List<TreeEventListener> editListeners)
+	public SRFragmentEditor(SyntaxRecognizingEditor editor, boolean bStructural, List<TreeEventListener> editListeners)
 	{
-		this( bStructural, null, editListeners, null );
+		this( editor, bStructural, null, editListeners, null );
 	}
 
 	
@@ -68,7 +71,7 @@ public class SRFragmentEditor
 		{
 			if ( bStructural )
 			{
-				view = new EditableStructuralItem( editListeners, model, view );
+				view = new EditableStructuralItem( editor, editListeners, model, view );
 			}
 			else
 			{
