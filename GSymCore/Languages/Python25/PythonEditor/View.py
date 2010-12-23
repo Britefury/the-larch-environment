@@ -56,7 +56,6 @@ from BritefuryJ.GSym.View import GSymFragmentView
 
 from BritefuryJ.Editor.Sequential import SequentialEditorPerspective
 from BritefuryJ.Editor.Sequential.Item import *
-from BritefuryJ.Editor.SyntaxRecognizing import SRFragmentEditor
 from BritefuryJ.Editor.SyntaxRecognizing.Precedence import PrecedenceHandler
 
 from BritefuryJ.ModelAccess.DocModel import *
@@ -131,11 +130,8 @@ def _commitInnerUnparsed(model, value):
 
 
 
-def compoundStatementEditor(grammar, inheritedState, model, compoundBlocks):
+def compoundStatementEditor(pythonView, inheritedState, model, compoundBlocks):
 	statementContents = []
-
-	statementParser = grammar.singleLineStatement()
-	suiteParser = grammar.compoundSuite()
 
 	for i, block in enumerate( compoundBlocks ):
 		if len( block ) == 3:
@@ -163,26 +159,13 @@ def compoundStatementEditor(grammar, inheritedState, model, compoundBlocks):
 			dedent = StructuralItem( Schema.Dedent(), dedentElement() )
 
 			suiteElement = indentedBlock( indent, lineViews, dedent )
-			suiteElement = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance.parsingNodeEditListener( 'Suite', suiteParser, _makeSuiteCommitFn( suite ) ),
-			                                       Schema.IndentedBlock( suite=suite ), suiteElement )
+			suiteElement = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, pythonView._makeCompoundSuiteEditListener( suite ), Schema.IndentedBlock( suite=suite ), suiteElement )
 
 			statementContents.extend( [ headerStatementLine.alignHExpand(), suiteElement.alignHExpand() ] )
 		else:
 			statementContents.append( headerStatementLine.alignHExpand() )
 
 	return compoundStmt( statementContents )
-
-
-
-def specialFormStatementNodeEditor(grammar, inheritedState, model, contents):
-	mode = inheritedState['gSym_SREditor_edit']
-	contents = StructuralItem( model, contents )
-	s = specialFormStatementLine( contents )
-	s = EditableStructuralItem( [ PythonSyntaxRecognizingEditor.instance.parsingNodeEditListener( 'Statement', grammar.simpleSingleLineStatementValid(), pyReplaceNode ),
-                                      PythonSyntaxRecognizingEditor.instance.partialParsingNodeEditListener( 'Compound header', grammar.compoundStmtHeader() ),
-                                      PythonSyntaxRecognizingEditor.instance.unparsedNodeEditListener( 'Statement', _isValidUnparsedStatementValue, _commitUnparsedStatment, _commitInnerUnparsed ) ], model, s )
-	s = s.withElementInteractor( _statementIndentationInteractor )
-	return s
 
 
 
@@ -410,9 +393,9 @@ class CompoundStatementWrapper (DMObjectNodeDispatchMethodWrapper):
 		v = super( CompoundStatementWrapper, self ).call( model, pythonView, args )
 		if isinstance( v, tuple ):
 			f = v[1]
-			return f( compoundStatementEditor( pythonView._parser, args[1], model, v[0] ) )
+			return f( compoundStatementEditor( pythonView, args[1], model, v[0] ) )
 		else:
-			return compoundStatementEditor( pythonView._parser, args[1], model, v )
+			return compoundStatementEditor( pythonView, args[1], model, v )
 
 CompoundStatement = CompoundStatementWrapper.decorator()
 
@@ -442,18 +425,29 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def __init__(self, grammar):
 		self._parser = grammar
 		
-		expr = PythonSyntaxRecognizingEditor.instance.parsingNodeEditListener( 'Expression', grammar.expression(), pyReplaceNode )
-		stmt = PythonSyntaxRecognizingEditor.instance.parsingNodeEditListener( 'Statement', grammar.simpleSingleLineStatementValid(), pyReplaceNode )
-		compHdr = PythonSyntaxRecognizingEditor.instance.partialParsingNodeEditListener( 'Compound header', grammar.compoundStmtHeader() )
-		stmtUnparsed = PythonSyntaxRecognizingEditor.instance.unparsedNodeEditListener( 'Statement', _isValidUnparsedStatementValue, _commitUnparsedStatment, _commitInnerUnparsed )
+		editor = PythonSyntaxRecognizingEditor.instance
 		
-		self._unparsedFragmentEditor = SRFragmentEditor( False, [ expr ] )
-		self._unparsedStatementFragmentEditor = SRFragmentEditor( False, [ stmt, compHdr, stmtUnparsed ], [ _statementIndentationInteractor ] )
-		self._expressionFragmentEditor = SRFragmentEditor( False, _pythonPrecedenceHandler, [ expr ] )
-		self._statementFragmentEditor = SRFragmentEditor( True, [ stmt, compHdr, stmtUnparsed ], [ _statementIndentationInteractor ] )
-		self._compoundStatementHeaderFragmentEditor = SRFragmentEditor( True, [ compHdr, stmtUnparsed ], [ _statementIndentationInteractor ] )
-		self._specialFormStatementFragmentEditor = SRFragmentEditor( True, [ stmt, compHdr, stmtUnparsed ], [ _statementIndentationInteractor ] )
+		self._expr = editor.parsingNodeEditListener( 'Expression', grammar.expression(), pyReplaceNode )
+		self._stmt = editor.parsingNodeEditListener( 'Statement', grammar.simpleSingleLineStatementValid(), pyReplaceNode )
+		self._compHdr = editor.partialParsingNodeEditListener( 'Compound header', grammar.compoundStmtHeader() )
+		self._stmtUnparsed = editor.unparsedNodeEditListener( 'Statement', _isValidUnparsedStatementValue, _commitUnparsedStatment, _commitInnerUnparsed )
+		self._topLevel = editor.topLevelNodeEditListener()
+		self._exprOuter = PythonExpressionEditListener( grammar.tupleOrExpression() )
+		self._exprTopLevel = PythonExpressionTopLevelEditListener()
+		
+		self._expressionFragmentEditor = editor.fragmentEditor( False, _pythonPrecedenceHandler, [ self._expr ] )
+		self._unparsedFragmentEditor = editor.fragmentEditor( False, [ self._expr ] )
+		self._statementFragmentEditor = editor.fragmentEditor( True, [ self._stmt, self._compHdr, self._stmtUnparsed ], [ _statementIndentationInteractor ] )
+		self._unparsedStatementFragmentEditor = editor.fragmentEditor( False, [ self._stmt, self._compHdr, self._stmtUnparsed ], [ _statementIndentationInteractor ] )
+		self._compoundStatementHeaderFragmentEditor = editor.fragmentEditor( True, [ self._compHdr, self._stmtUnparsed ], [ _statementIndentationInteractor ] )
+		self._specialFormStatementFragmentEditor = editor.fragmentEditor( True, [ self._stmt, self._compHdr, self._stmtUnparsed ], [ _statementIndentationInteractor ] )
 
+		
+	def _makeSuiteEditListener(self, suite):
+		return PythonSyntaxRecognizingEditor.instance.parsingNodeEditListener( 'Suite', self._parser.suite(), _makeSuiteCommitFn( suite ) )
+
+	def _makeCompoundSuiteEditListener(self, suite):
+		return PythonSyntaxRecognizingEditor.instance.parsingNodeEditListener( 'Suite', self._parser.compoundSuite(), _makeSuiteCommitFn( suite ) )
 
 		
 		
@@ -469,8 +463,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		s = suiteView( lineViews )
 		_inlineObject_dropDest = ObjectDndHandler.DropDest( GSymFragmentView.FragmentModel, _onDrop_inlineObject )
 		s = s.withDropDest( _inlineObject_dropDest )
-		s = EditableStructuralItem( [ PythonSyntaxRecognizingEditor.instance.parsingNodeEditListener( 'Suite', self._parser.suite(), _makeSuiteCommitFn( suite ) ),
-		                              PythonSyntaxRecognizingEditor.instance.topLevelNodeEditListener() ], suite, s )
+		s = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditListener( suite ), self._topLevel ], suite, s )
 		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		return s
 
@@ -486,8 +479,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		s = suiteView( lineViews )
 		_inlineObject_dropDest = ObjectDndHandler.DropDest( GSymFragmentView.FragmentModel, _onDrop_inlineObject )
 		s = s.withDropDest( _inlineObject_dropDest )
-		s = EditableStructuralItem( [ PythonSyntaxRecognizingEditor.instance.parsingNodeEditListener( 'Suite', self._parser.suite(), _makeSuiteCommitFn( suite ) ),
-		                              PythonSyntaxRecognizingEditor.instance.topLevelNodeEditListener() ], suite, s )
+		s = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditListener( suite ), self._topLevel ], suite, s )
 		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		return s
 
@@ -505,8 +497,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		e = Paragraph( [ seg ] )
 		_inlineObject_dropDest = ObjectDndHandler.DropDest( GSymFragmentView.FragmentModel, _onDrop_inlineObject )
 		e = e.withDropDest( _inlineObject_dropDest )
-		e = EditableStructuralItem( [ instanceCache( PythonExpressionEditListener, self._parser.tupleOrExpression() ),
-		                              PythonExpressionTopLevelEditListener.instance ],  model,  e )
+		e = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._exprOuter, self._exprTopLevel ],  model,  e )
 		e = e.withContextMenuInteractor( _pythonModuleContextMenuFactory )
 		return e
 
@@ -1358,7 +1349,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 		dedent = StructuralItem( Schema.Dedent(), dedentElement() )
 
 		suiteElement = indentedBlock( indent, lineViews, dedent )
-		suiteElement = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance.parsingNodeEditListener( 'Suite', self._parser.compoundSuite(), _makeSuiteCommitFn( suite ) ),
+		suiteElement = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance,
+		                                       PythonSyntaxRecognizingEditor.instance.parsingNodeEditListener( 'Suite', self._parser.compoundSuite(), _makeSuiteCommitFn( suite ) ),
 		                                       model, suiteElement )
 
 		return badIndentation( suiteElement )

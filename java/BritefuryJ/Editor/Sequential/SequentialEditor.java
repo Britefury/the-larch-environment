@@ -29,6 +29,9 @@ public abstract class SequentialEditor
 				EditEvent editEvent = (EditEvent)event;
 				if ( event instanceof TextEditEvent  ||  isSelectionEditEvent( editEvent )  ||  isEditEvent( editEvent ) )
 				{
+					// If event is a selection edit event, and its source element is @element, then @element has had its fixed value
+					// set by a SequentialClipboardHandler - so don't clear it.
+					// Otherwise, clear it
 					if ( !( isSelectionEditEvent( editEvent )  &&  getEventSourceElement( editEvent ) == element ) )
 					{
 						editEvent.getStreamValueVisitor().ignoreElementFixedValue( element );

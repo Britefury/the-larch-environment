@@ -106,8 +106,6 @@ class PythonExpressionTopLevelEditListener (TopLevelEditListener):
 			if isinstance( event, TextEditEventInsert )   and   '\n' in event.getTextInserted():
 				element.postTreeEvent( PythonExpressionNewLineEvent( model ) )
 
-PythonExpressionTopLevelEditListener.instance = PythonExpressionTopLevelEditListener()
-
 
 
 

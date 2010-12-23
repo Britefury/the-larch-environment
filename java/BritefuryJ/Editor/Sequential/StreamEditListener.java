@@ -22,13 +22,6 @@ public abstract class StreamEditListener extends EditListener
 	protected HandleEditResult handleEditEvent(DPElement element, DPElement sourceElement, EditEvent editEvent)
 	{
 		StreamValueVisitor visitor = editEvent.getStreamValueVisitor();
-		// If event is a selection edit event, and its source element is @element, then @element has had its fixed value
-		// set by a SequentialClipboardHandler - so don't clear it.
-		// Otherwise, clear all fixed values on a path from @sourceElement to @element
-		if ( !( isSelectionEditEvent( editEvent )  &&  SequentialEditor.getEventSourceElement( editEvent ) == element ) )
-		{
-			editEvent.getStreamValueVisitor().ignoreElementFixedValue( element );
-		}
 		
 		StreamValue value = visitor.getStreamValue( element );
 		GSymFragmentView fragment = (GSymFragmentView)element.getFragmentContext();

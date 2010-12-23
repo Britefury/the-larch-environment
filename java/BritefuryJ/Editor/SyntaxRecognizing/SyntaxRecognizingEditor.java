@@ -8,13 +8,17 @@ package BritefuryJ.Editor.SyntaxRecognizing;
 
 import java.awt.datatransfer.DataFlavor;
 import java.lang.ref.WeakReference;
+import java.util.List;
 import java.util.WeakHashMap;
 import java.util.regex.Pattern;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.EditEvent;
+import BritefuryJ.DocPresent.TreeEventListener;
+import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.Editor.Sequential.SequentialEditor;
+import BritefuryJ.Editor.SyntaxRecognizing.Precedence.PrecedenceHandler;
 import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Utils.HashUtils;
@@ -277,6 +281,28 @@ public abstract class SyntaxRecognizingEditor extends SequentialEditor
 		{
 			return x.get();
 		}
+	}
+	
+	
+	
+	public SRFragmentEditor fragmentEditor(boolean bStructural, PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners, List<AbstractElementInteractor> elementInteractors)
+	{
+		return new SRFragmentEditor( this, bStructural, precedenceHandler, editListeners, elementInteractors );
+	}
+	
+	public SRFragmentEditor fragmentEditor(boolean bStructural, List<TreeEventListener> editListeners, List<AbstractElementInteractor> elementInteractors)
+	{
+		return new SRFragmentEditor( this, bStructural, editListeners, elementInteractors );
+	}
+	
+	public SRFragmentEditor fragmentEditor(boolean bStructural, PrecedenceHandler precedenceHandler, List<TreeEventListener> editListeners)
+	{
+		return new SRFragmentEditor( this, bStructural, precedenceHandler, editListeners );
+	}
+	
+	public SRFragmentEditor fragmentEditor(boolean bStructural, List<TreeEventListener> editListeners)
+	{
+		return new SRFragmentEditor( this, bStructural, editListeners );
 	}
 	
 	
