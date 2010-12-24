@@ -1139,8 +1139,16 @@ class Python25Grammar (Grammar):
 	
 	@Rule
 	def classStmt(self):
-		return ( self.classStmtHeader()  +  self.compoundSuite() ).action(
-			lambda input, begin, end, xs, bindings: Schema.ClassStmt( name=xs[0]['name'], bases=xs[0]['bases'], basesTrailingSeparator=xs[0]['basesTrailingSeparator'] , suite=xs[1] ) )
+		byLine = ( self.decorator().zeroOrMore()  +  self.classStmtHeader()  +  self.compoundSuite() ).action(
+			lambda input, begin, end, xs, bindings: Schema.ClassStmt( decorators=xs[0], name=xs[1]['name'], bases=xs[1]['bases'], basesTrailingSeparator=xs[1]['basesTrailingSeparator'] , suite=xs[2] ) )
+		join = ( self.decorator().oneOrMore()  +  ObjectNode( Schema.ClassStmt ) ).action(
+			lambda input, begin, end, xs, bindings: Schema.ClassStmt( decorators=list(xs[0]) + list(xs[1]['decorators']), name=xs[1]['name'], bases=xs[1]['bases'], basesTrailingSeparator=xs[1]['basesTrailingSeparator'],
+									       suite=xs[1]['suite'] ) )
+		return byLine  |  join
+
+	
+	#return ( self.classStmtHeader()  +  self.compoundSuite() ).action(
+			#lambda input, begin, end, xs, bindings: Schema.ClassStmt( name=xs[0]['name'], bases=xs[0]['bases'], basesTrailingSeparator=xs[0]['basesTrailingSeparator'] , suite=xs[1] ) )
 
 	
 	
@@ -2285,7 +2293,31 @@ class TestCase_Python25Parser (ParserTestCase):
 					     Schema.Indent(),
 					     	Schema.BlankLine(),
 					     Schema.Dedent() ],
-				     Schema.ClassStmt( name='A', bases=[ Schema.Load( name='x' ) ], suite=[ Schema.BlankLine() ] ) )
+				     Schema.ClassStmt( decorators=[], name='A', bases=[ Schema.Load( name='x' ) ], suite=[ Schema.BlankLine() ] ) )
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Schema.DecoStmtHeader( name='a', args=[ Schema.Load( name='x' ) ] ),
+					     Schema.ClassStmtHeader( name='A', bases=[ Schema.Load( name='x' ) ] ),
+					     Schema.Indent(),
+					     	Schema.BlankLine(),
+					     Schema.Dedent() ],
+				     Schema.ClassStmt( decorators=[ Schema.Decorator( name='a', args=[ Schema.Load( name='x' ) ] ) ], name='A', bases=[ Schema.Load( name='x' ) ], suite=[ Schema.BlankLine() ] ) )
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Schema.DecoStmtHeader( name='a', args=[ Schema.Load( name='x' ) ] ),
+					     Schema.DecoStmtHeader( name='b', args=[ Schema.Load( name='y' ) ] ),
+					     Schema.ClassStmtHeader( name='A', bases=[ Schema.Load( name='x' ) ] ),
+					     Schema.Indent(),
+					     	Schema.BlankLine(),
+					     Schema.Dedent() ],
+				     Schema.ClassStmt( decorators=[ Schema.Decorator( name='a', args=[ Schema.Load( name='x' ) ] ), Schema.Decorator( name='b', args=[ Schema.Load( name='y' ) ] ) ],
+		                                       name='A', bases=[ Schema.Load( name='x' ) ], suite=[ Schema.BlankLine() ] ) )
+		self._parseListTest( g.suiteItem(),
+				     [
+					     Schema.DecoStmtHeader( name='a', args=[ Schema.Load( name='x' ) ] ),
+					     Schema.ClassStmt( decorators=[ Schema.Decorator( name='b', args=[ Schema.Load( name='y' ) ] ) ], name='A', bases=[ Schema.Load( name='x' ) ], suite=[ Schema.BlankLine() ] ) ],
+				     Schema.ClassStmt( decorators=[ Schema.Decorator( name='a', args=[ Schema.Load( name='x' ) ] ), Schema.Decorator( name='b', args=[ Schema.Load( name='y' ) ] ) ],
+		                                       name='A', bases=[ Schema.Load( name='x' ) ], suite=[ Schema.BlankLine() ] ) )
 		
 		
 	def test_nestedStructure(self):
@@ -2302,7 +2334,7 @@ class TestCase_Python25Parser (ParserTestCase):
 					     		Schema.Dedent(),
 						Schema.Dedent(),
 					     Schema.Dedent() ],
-				     Schema.ClassStmt( name='A', bases=[ Schema.Load( name='x' ) ], suite=[
+				     Schema.ClassStmt( decorators=[], name='A', bases=[ Schema.Load( name='x' ) ], suite=[
 					     Schema.DefStmt( decorators=[], name='f', params=[ Schema.SimpleParam( name='x' ) ], suite=[ Schema.WhileStmt( condition=Schema.Load( name='a' ), suite=[ Schema.BlankLine() ] ) ] ) ] ) )
 	
 		

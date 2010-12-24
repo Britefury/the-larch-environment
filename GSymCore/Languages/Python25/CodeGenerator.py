@@ -692,9 +692,9 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 
 	# Class statement
 	@DMObjectNodeDispatchMethod( Schema.ClassStmt )
-	def ClassStmt(self, node, name, bases, suite):
+	def ClassStmt(self, node, decorators, name, bases, suite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
-		text = 'class '  +  name
+		text = self._decoratorsToText( decorators )  +  'class '  +  name
 		if bases is not None:
 			text += ' ('  +  ', '.join( [ self( h )   for h in bases ] )  +  ')'
 		return text  +  ':\n'  +  _indent( suiteText )
@@ -933,7 +933,7 @@ import unittest
 
 class TestCase_Python25CodeGenerator (unittest.TestCase):
 	def _testSX(self, sx, expected):
-		sx = '{ py=GSymCore.Languages.Python25 : ' + sx + ' }'
+		sx = '{ py=GSymCore.Languages.Python25<2> : ' + sx + ' }'
 		data = DMIOReader.readFromString( sx )
 		
 		gen = Python25CodeGenerator()
@@ -941,6 +941,8 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		
 		if result != expected:
 			print 'UNEXPECTED RESULT'
+			print 'INPUT:'
+			print data
 			print 'EXPECTED:'
 			print expected.replace( '\n', '\\n' ) + '<<'
 			print 'RESULT:'
@@ -1277,9 +1279,10 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 
 
 	def test_classStmt(self):
-		self._testSX( '(py ClassStmt name=A bases=`null` suite=[(py Load name=b)])', 'class A:\n\tb\n' )
-		self._testSX( '(py ClassStmt name=A bases=[(py Load name=object)] suite=[(py Load name=b)])', 'class A (object):\n\tb\n' )
-		self._testSX( '(py ClassStmt name=A bases=[(py Load name=object) (py Load name=Q)] suite=[(py Load name=b)])', 'class A (object, Q):\n\tb\n' )
+		self._testSX( '(py ClassStmt decorators=[] name=A bases=`null` suite=[(py Load name=b)])', 'class A:\n\tb\n' )
+		self._testSX( '(py ClassStmt decorators=[] name=A bases=[(py Load name=object)] suite=[(py Load name=b)])', 'class A (object):\n\tb\n' )
+		self._testSX( '(py ClassStmt decorators=[] name=A bases=[(py Load name=object) (py Load name=Q)] suite=[(py Load name=b)])', 'class A (object, Q):\n\tb\n' )
+		self._testSX( '(py ClassStmt decorators=[(py Decorator name=f)] name=A bases=[(py Load name=object)] suite=[(py Load name=b)])', '@f\nclass A (object):\n\tb\n' )
 
 
 	def test_IndentedBlock(self):
