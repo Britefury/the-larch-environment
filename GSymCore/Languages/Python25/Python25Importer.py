@@ -570,13 +570,14 @@ class _CompoundStmtImporter (_Importer):
 
 	# Class
 	def ClassDef(self, structTab, node):
+		decorators = [ _decorator( dec )   for dec in node.decorator_list ]
 		if len( node.bases ) == 0:
 			bases = None
 		elif len( node.bases ) == 1:
 			bases = [ _expr( node.bases[0] ) ]
 		else:
 			bases = [ _expr( b )   for b in node.bases ]
-		return [ Schema.ClassStmt( name=node.name, bases=bases, suite=_flattenedCompound( structTab, node.body ) ) ]
+		return [ Schema.ClassStmt( decorators=decorators, name=node.name, bases=bases, suite=_flattenedCompound( structTab, node.body ) ) ]
 	
 
 
@@ -1335,9 +1336,15 @@ class Q (object):
 class Q (a,b):
 	x
 """
-		self._compStmtTest( src1, [ Schema.BlankLine(), Schema.ClassStmt( name='Q', bases=None, suite=[ Schema.ExprStmt( expr=Schema.Load( name='x' ) ) ] ) ] )
-		self._compStmtTest( src2, [ Schema.BlankLine(), Schema.ClassStmt( name='Q', bases=[ Schema.Load( name='object' ) ], suite=[ Schema.ExprStmt( expr=Schema.Load( name='x' ) ) ] ) ] )
-		self._compStmtTest( src3, [ Schema.BlankLine(), Schema.ClassStmt( name='Q', bases=[ Schema.Load( name='a' ), Schema.Load( name='b' ) ], suite=[ Schema.ExprStmt( expr=Schema.Load( name='x' ) ) ] ) ] )
+		src4 = \
+"""
+@f
+class Q (a,b):
+	x"""
+		self._compStmtTest( src1, [ Schema.BlankLine(), Schema.ClassStmt( decorators=[], name='Q', bases=None, suite=[ Schema.ExprStmt( expr=Schema.Load( name='x' ) ) ] ) ] )
+		self._compStmtTest( src2, [ Schema.BlankLine(), Schema.ClassStmt( decorators=[], name='Q', bases=[ Schema.Load( name='object' ) ], suite=[ Schema.ExprStmt( expr=Schema.Load( name='x' ) ) ] ) ] )
+		self._compStmtTest( src3, [ Schema.BlankLine(), Schema.ClassStmt( decorators=[], name='Q', bases=[ Schema.Load( name='a' ), Schema.Load( name='b' ) ], suite=[ Schema.ExprStmt( expr=Schema.Load( name='x' ) ) ] ) ] )
+		self._compStmtTest( src4, [ Schema.BlankLine(), Schema.ClassStmt( decorators=[ Schema.Decorator( name='f', args=None ) ], name='Q', bases=[ Schema.Load( name='a' ), Schema.Load( name='b' ) ], suite=[ Schema.ExprStmt( expr=Schema.Load( name='x' ) ) ] ) ] )
 
 		
 if __name__ == '__main__':

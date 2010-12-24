@@ -111,22 +111,13 @@ def _isValidUnparsedStatementValue(value):
 	i = value.indexOf( '\n' )
 	return i != -1   and   i == len( value ) - 1
 
-def _deepCopyUnparsedItem(x):
-	if isinstance( x, DMNode ):
-		return x.deepCopy()
-	else:
-		return x
-	
-def _deepCopyUnparsedItems(xs):
-	return [ _deepCopyUnparsedItem( x )   for x in xs ]
-
 def _commitUnparsedStatment(model, value):
-	unparsed = Schema.UnparsedStmt( value=Schema.UNPARSED( value=_deepCopyUnparsedItems( value.getItemValues() ) ) )
-	pyReplaceNode( model, unparsed )
+	unparsed = Schema.UnparsedStmt( value=Schema.UNPARSED( value=value.getItemValues() ) )
+	pyReplaceNode( model, unparsed.deepCopy() )
 
 def _commitInnerUnparsed(model, value):
-	unparsed = Schema.UNPARSED( value=_deepCopyUnparsedItems( value.getItemValues() ) )
-	pyReplaceNode( model, unparsed )
+	unparsed = Schema.UNPARSED( value=value.getItemValues() )
+	pyReplaceNode( model, unparsed.deepCopy() )
 
 
 
@@ -1441,10 +1432,17 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Class statement
 	@CompoundStatement( Schema.ClassStmt )
-	def ClassStmt(self, fragment, inheritedState, model, name, bases, basesTrailingSeparator, suite):
-		compoundBlocks = [ ( Schema.ClassStmtHeader( name=name, bases=bases, basesTrailingSeparator=basesTrailingSeparator ),
+	def ClassStmt(self, fragment, inheritedState, model, decorators, name, bases, basesTrailingSeparator, suite):
+		compoundBlocks = []
+		for d in decorators:
+			if not d.isInstanceOf( Schema.Decorator ):
+				raise TypeError, 'DefStmt decorators should only contain Decorator instances'
+			compoundBlocks.append( ( Schema.DecoStmtHeader( name=d['name'], args=d['args'], argsTrailingSeparator=d['argsTrailingSeparator'] ), 
+			                         self._decoStmtHeaderElement( inheritedState, d['name'], d['args'], d['argsTrailingSeparator'] ),  None ) )
+
+		compoundBlocks.append( ( Schema.ClassStmtHeader( name=name, bases=bases, basesTrailingSeparator=basesTrailingSeparator ),
 		                     self._classStmtHeaderElement( inheritedState, name, bases, basesTrailingSeparator ), suite,
-		                     classStmtHeaderHighlight ) ]
+		                     classStmtHeaderHighlight ) )
 		return compoundBlocks, classStmtHighlight
 
 

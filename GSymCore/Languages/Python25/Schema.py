@@ -10,7 +10,7 @@ from BritefuryJ.DocModel import DMSchema, DMObjectClass
 
 
 
-schema = DMSchema( 'Python25', 'py', 'GSymCore.Languages.Python25' )
+schema = DMSchema( 'Python25', 'py', 'GSymCore.Languages.Python25', 2 )
 
 
 #
@@ -203,7 +203,7 @@ ExceptBlock = schema.newClass( 'ExceptBlock', CompoundComponent, [ 'exception', 
 WithStmt = schema.newClass( 'WithStmt', CompoundStmt, [ 'expr', 'target', 'suite' ] )
 Decorator = schema.newClass( 'Decorator', CompoundComponent, [ 'name', 'args', 'argsTrailingSeparator' ] )
 DefStmt = schema.newClass( 'DefStmt', CompoundStmt, [ 'decorators', 'name', 'params', 'paramsTrailingSeparator', 'suite' ] )
-ClassStmt = schema.newClass( 'ClassStmt', CompoundStmt, [ 'name', 'bases', 'basesTrailingSeparator', 'suite' ] )
+ClassStmt = schema.newClass( 'ClassStmt', CompoundStmt, [ 'decorators', 'name', 'bases', 'basesTrailingSeparator', 'suite' ] )
 
 
 
@@ -229,6 +229,28 @@ TopLevel = schema.newClass( 'TopLevel', Node, [] )
 PythonModule = schema.newClass( 'PythonModule', TopLevel, [ 'suite' ] )
 PythonSuite = schema.newClass( 'PythonSuite', TopLevel, [ 'suite' ] )
 PythonExpression = schema.newClass( 'PythonExpression', TopLevel, [ 'expr' ] )
+
+
+
+
+
+#
+#
+# Version 1 backwards compatibility
+#
+#
+
+def _readClassStmtHeader_v1(fieldValues):
+	# V1 did not have a decorators field; initialise it to []
+	return ClassStmtHeader( decorators=[], name=fieldValues['name'], bases=fieldValues['bases'], basesTrailingSeparator=fieldValues['basesTrailingSeparator'] )
+
+def _readClassStmt_v1(fieldValues):
+	# V1 did not have a decorators field; initialise it to []
+	return ClassStmt( decorators=[], name=fieldValues['name'], bases=fieldValues['bases'], basesTrailingSeparator=fieldValues['basesTrailingSeparator'], suite=fieldValues['suite'] )
+
+schema.registerReader( 'ClassStmtHeader', 1, _readClassStmtHeader_v1 )
+schema.registerReader( 'ClassStmt', 1, _readClassStmt_v1 )
+
 
 
 
