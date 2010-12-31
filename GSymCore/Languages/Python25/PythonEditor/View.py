@@ -32,7 +32,7 @@ from BritefuryJ.DocPresent.Interactor import KeyElementInteractor
 from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder
 from BritefuryJ.DocPresent.Input import ObjectDndHandler
 from BritefuryJ.DocPresent.Combinators.Primitive import Paragraph, Segment
-from BritefuryJ.GSym.PresCom import InnerFragment, ApplyPerspective
+from BritefuryJ.GSym.PresCom import ApplyPerspective
 
 from BritefuryJ.GSym import GSymPerspective, GSymSubject
 from BritefuryJ.GSym.View import GSymFragmentView
@@ -40,6 +40,8 @@ from BritefuryJ.GSym.View import GSymFragmentView
 from BritefuryJ.Editor.Sequential import SequentialEditorPerspective
 from BritefuryJ.Editor.Sequential.Item import *
 from BritefuryJ.Editor.SyntaxRecognizing.Precedence import PrecedenceHandler
+from BritefuryJ.Editor.SyntaxRecognizing import SREInnerFragment
+from BritefuryJ.Editor.SyntaxRecognizing.SRFragmentEditor import EditMode
 
 from BritefuryJ.ModelAccess.DocModel import *
 
@@ -57,15 +59,6 @@ from GSymCore.Languages.Python25.PythonEditor.Keywords import *
 from GSymCore.Languages.Python25.PythonEditor.Precedence import *
 from GSymCore.Languages.Python25.PythonEditor.PythonEditorCombinators import *
 
-
-
-
-EDITMODE_DISPLAY = False
-EDITMODE_EDIT = True
-
-
-
-DEFAULT_LINE_BREAK_PRIORITY = 100
 
 
 
@@ -128,7 +121,7 @@ def compoundStatementEditor(pythonView, inheritedState, model, compoundBlocks):
 		if suite is not None:
 			indent = StructuralItem( Schema.Indent(), indentElement() )
 
-			lineViews = InnerFragment.map( suite, _withPythonState( inheritedState, PRECEDENCE_NONE, EDITMODE_EDIT ) )
+			lineViews = SREInnerFragment.map( suite, PRECEDENCE_NONE, EditMode.EDIT )
 
 			dedent = StructuralItem( Schema.Dedent(), dedentElement() )
 
@@ -144,19 +137,19 @@ def compoundStatementEditor(pythonView, inheritedState, model, compoundBlocks):
 
 
 def spanPrefixOpView(grammar, inheritedState, model, x, op):
-	xView = InnerFragment( x, _withPythonState( inheritedState, nodePrecedence[model], EDITMODE_DISPLAY ) )
+	xView = SREInnerFragment( x, nodePrecedence[model], EditMode.DISPLAY )
 	return spanPrefixOp( xView, op )
 
 
-def spanBinOpView(grammar, inheritedState, model, x, y, op, bRightAssociative):
-	xPrec, yPrec = computeBinOpViewPrecedenceValues( nodePrecedence[model], bRightAssociative )
-	xView = InnerFragment( x, _withPythonState( inheritedState, xPrec, EDITMODE_DISPLAY ) )
-	yView = InnerFragment( y, _withPythonState( inheritedState, yPrec, EDITMODE_DISPLAY ) )
+def spanBinOpView(grammar, inheritedState, model, x, y, op):
+	xPrec, yPrec = computeBinOpViewPrecedenceValues( nodePrecedence[model], rightAssociative[model] )
+	xView = SREInnerFragment( x, xPrec, EditMode.DISPLAY )
+	yView = SREInnerFragment( y, yPrec, EditMode.DISPLAY )
 	return spanBinOp( xView, yView, op )
 
 
 def spanCmpOpView(grammar, inheritedState, model, op, y):
-	yView = InnerFragment( y, _withPythonState( inheritedState, nodePrecedence[model], EDITMODE_DISPLAY ) )
+	yView = SREInnerFragment( y, nodePrecedence[model], EditMode.DISPLAY )
 	return spanCmpOp( op, yView )
 
 
@@ -227,8 +220,7 @@ def _inlineObjectExprContextMenuFactory(element, menu):
 	def _onDelete(item):
 		pyReplaceNode( model, Schema.Load( name='None' ) )
 
-	deleteItem = MenuItem.menuItemWithLabel( 'Delete inline object', _onDelete )
-	menu.add( deleteItem )
+	menu.add( MenuItem.menuItemWithLabel( 'Delete inline object', _onDelete ) )
 
 	return False
 
@@ -240,8 +232,7 @@ def _inlineObjectStmtContextMenuFactory(element, menu):
 	def _onDelete(item):
 		pyReplaceNode( model, Schema.BlankLine() )
 
-	deleteItem = MenuItem.menuItemWithLabel( 'Delete inline object', _onDelete )
-	menu.add( deleteItem )
+	menu.add( MenuItem.menuItemWithLabel( 'Delete inline object', _onDelete ) )
 
 	return False
 
@@ -284,21 +275,12 @@ def _pythonModuleContextMenuFactory(element, menu):
 	extExprItems = [ MenuItem.menuItemWithLabel( labelText, _makeExtExprFn( factory ) )   for labelText, factory in ExternalExpression.getExternalExpressionFactories() ]
 	extExprMenu = VPopupMenu( extExprItems )
 
-	quoteExprMenuItem = MenuItem.menuItemWithLabel( 'Quote expression', _onQuoteExpr )
-	menu.add( quoteExprMenuItem )
-	quoteSuiteMenuItem = MenuItem.menuItemWithLabel( 'Quote suite', _onQuoteSuite )
-	menu.add( quoteSuiteMenuItem )
-	unquoteMenuItem = MenuItem.menuItemWithLabel( 'Unquote', _onUnquote )
-	menu.add( unquoteMenuItem )
+	menu.add( MenuItem.menuItemWithLabel( 'Quote expression', _onQuoteExpr ) )
+	menu.add( MenuItem.menuItemWithLabel( 'Quote suite', _onQuoteSuite ) )
+	menu.add( MenuItem.menuItemWithLabel( 'Unquote', _onUnquote ) )
 
-	insertExprMenuItem = MenuItem.menuItemWithLabel( 'Insert expression', extExprMenu, MenuItem.SubmenuPopupDirection.RIGHT )
-	menu.add( insertExprMenuItem )
+	menu.add( MenuItem.menuItemWithLabel( 'Insert expression', extExprMenu, MenuItem.SubmenuPopupDirection.RIGHT ) )
 	return True
-
-
-
-def _withPythonState(inheritedState, precedence, mode=EDITMODE_DISPLAY):
-	return inheritedState.withAttrs( outerPrecedence=precedence, gSym_SREditor_edit=mode )
 
 
 
@@ -433,7 +415,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			# Empty document - create a single blank line so that there is something to edit
 			lineViews = [ statementLine( blankLine() ) ]
 		else:
-			lineViews = InnerFragment.map( suite, _withPythonState( inheritedState, PRECEDENCE_NONE, EDITMODE_EDIT ) )
+			lineViews = SREInnerFragment.map( suite, PRECEDENCE_NONE, EditMode.EDIT )
 		s = suiteView( lineViews )
 		_inlineObject_dropDest = ObjectDndHandler.DropDest( GSymFragmentView.FragmentModel, _onDrop_inlineObject )
 		s = s.withDropDest( _inlineObject_dropDest )
@@ -449,7 +431,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			# Empty document - create a single blank line so that there is something to edit
 			lineViews = [ statementLine( blankLine() ) ]
 		else:
-			lineViews = InnerFragment.map( suite, _withPythonState( inheritedState, PRECEDENCE_NONE, EDITMODE_EDIT ) )
+			lineViews = SREInnerFragment.map( suite, PRECEDENCE_NONE, EditMode.EDIT )
 		s = suiteView( lineViews )
 		_inlineObject_dropDest = ObjectDndHandler.DropDest( GSymFragmentView.FragmentModel, _onDrop_inlineObject )
 		s = s.withDropDest( _inlineObject_dropDest )
@@ -466,7 +448,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			exprView = blankLine()
 			seg = exprView
 		else:
-			exprView = InnerFragment( expr, _withPythonState( inheritedState, PRECEDENCE_NONE, EDITMODE_DISPLAY ) )
+			exprView = SREInnerFragment( expr, PRECEDENCE_NONE, EditMode.DISPLAY )
 			seg = Segment( exprView )
 		e = Paragraph( [ seg ] )
 		_inlineObject_dropDest = ObjectDndHandler.DropDest( GSymFragmentView.FragmentModel, _onDrop_inlineObject )
@@ -491,7 +473,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 				view = unparseableText( x )
 				return view
 			elif isinstance( x, DMObjectInterface ):
-				view = InnerFragment( x, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_UNPARSED, EDITMODE_DISPLAY ) )
+				view = SREInnerFragment( x, PRECEDENCE_CONTAINER_UNPARSED, EditMode.DISPLAY )
 				#<NO_TREE_EVENT_LISTENER>
 				view = StructuralItem( x, view )
 				return view
@@ -568,12 +550,12 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@Expression( Schema.TupleTarget )
 	def TupleTarget(self, fragment, inheritedState, model, targets, trailingSeparator):
-		elementViews = InnerFragment.map( targets, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ELEMENT ) )
+		elementViews = SREInnerFragment.map( targets, PRECEDENCE_CONTAINER_ELEMENT )
 		return tupleTarget( elementViews, trailingSeparator is not None )
 
 	@Expression( Schema.ListTarget )
 	def ListTarget(self, fragment, inheritedState, model, targets, trailingSeparator):
-		elementViews = InnerFragment.map( targets, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ELEMENT ) )
+		elementViews = SREInnerFragment.map( targets, PRECEDENCE_CONTAINER_ELEMENT )
 		return listTarget( elementViews, trailingSeparator is not None )
 
 
@@ -588,7 +570,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Tuple literal
 	@Expression( Schema.TupleLiteral )
 	def TupleLiteral(self, fragment, inheritedState, model, values, trailingSeparator):
-		elementViews = InnerFragment.map( values, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ELEMENT ) )
+		elementViews = SREInnerFragment.map( values, PRECEDENCE_CONTAINER_ELEMENT )
 		return tupleLiteral( elementViews, trailingSeparator is not None )
 
 
@@ -596,7 +578,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# List literal
 	@Expression( Schema.ListLiteral )
 	def ListLiteral(self, fragment, inheritedState, model, values, trailingSeparator):
-		elementViews = InnerFragment.map( values, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ELEMENT ) )
+		elementViews = SREInnerFragment.map( values, PRECEDENCE_CONTAINER_ELEMENT )
 		return listLiteral( elementViews, trailingSeparator is not None )
 
 
@@ -604,26 +586,26 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# List comprehension / generator expression
 	@Generic( Schema.ComprehensionFor )
 	def ComprehensionFor(self, fragment, inheritedState, model, target, source):
-		targetView = InnerFragment( target, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_COMPREHENSIONFOR) )
-		sourceView = InnerFragment( source, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_COMPREHENSIONFOR ) )
+		targetView = SREInnerFragment( target, PRECEDENCE_CONTAINER_COMPREHENSIONFOR)
+		sourceView = SREInnerFragment( source, PRECEDENCE_CONTAINER_COMPREHENSIONFOR )
 		return comprehensionFor( targetView, sourceView )
 
 	@Generic( Schema.ComprehensionIf )
 	def ComprehensionIf(self, fragment, inheritedState, model, condition):
-		conditionView = InnerFragment( condition, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_COMPREHENSIONIF ) )
+		conditionView = SREInnerFragment( condition, PRECEDENCE_CONTAINER_COMPREHENSIONIF )
 		return comprehensionIf( conditionView )
 
 	@Expression( Schema.ListComp )
 	def ListComp(self, fragment, inheritedState, model, resultExpr, comprehensionItems):
-		exprView = InnerFragment( resultExpr, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ELEMENT ) )
-		itemViews = InnerFragment.map( comprehensionItems, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ELEMENT ) )
+		exprView = SREInnerFragment( resultExpr, PRECEDENCE_CONTAINER_ELEMENT )
+		itemViews = SREInnerFragment.map( comprehensionItems, PRECEDENCE_CONTAINER_ELEMENT )
 		return listComp( exprView, itemViews )
 
 
 	@Expression( Schema.GeneratorExpr )
 	def GeneratorExpr(self, fragment, inheritedState, model, resultExpr, comprehensionItems):
-		exprView = InnerFragment( resultExpr, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ELEMENT ) )
-		itemViews = InnerFragment.map( comprehensionItems, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ELEMENT ) )
+		exprView = SREInnerFragment( resultExpr, PRECEDENCE_CONTAINER_ELEMENT )
+		itemViews = SREInnerFragment.map( comprehensionItems, PRECEDENCE_CONTAINER_ELEMENT )
 		return genExpr( exprView, itemViews )
 
 
@@ -632,20 +614,20 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Dictionary literal
 	@Generic( Schema.DictKeyValuePair )
 	def DictKeyValuePair(self, fragment, inheritedState, model, key, value):
-		keyView = InnerFragment( key, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ELEMENT ) )
-		valueView = InnerFragment( value, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ELEMENT ) )
+		keyView = SREInnerFragment( key, PRECEDENCE_CONTAINER_ELEMENT )
+		valueView = SREInnerFragment( value, PRECEDENCE_CONTAINER_ELEMENT )
 		return dictKeyValuePair( keyView, valueView )
 
 	@Expression( Schema.DictLiteral )
 	def DictLiteral(self, fragment, inheritedState, model, values, trailingSeparator):
-		elementViews = InnerFragment.map( values, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ELEMENT ) )
+		elementViews = SREInnerFragment.map( values, PRECEDENCE_CONTAINER_ELEMENT )
 		return dictLiteral( elementViews, trailingSeparator is not None )
 
 
 	# Yield expression
 	@Expression( Schema.YieldExpr )
 	def YieldExpr(self, fragment, inheritedState, model, value):
-		valueView = InnerFragment( value, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_YIELDEXPR ) )
+		valueView = SREInnerFragment( value, PRECEDENCE_CONTAINER_YIELDEXPR )
 		return yieldExpr( valueView )
 
 
@@ -653,7 +635,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Attribute ref
 	@Expression( Schema.AttributeRef )
 	def AttributeRef(self, fragment, inheritedState, model, target, name):
-		targetView = InnerFragment( target, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ATTRIBUTEREFTARGET ) )
+		targetView = SREInnerFragment( target, PRECEDENCE_CONTAINER_ATTRIBUTEREFTARGET )
 		return attributeRef( targetView, name )
 
 
@@ -661,15 +643,15 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Subscript
 	@Generic( Schema.SubscriptSlice )
 	def SubscriptSlice(self, fragment, inheritedState, model, lower, upper):
-		lowerView = InnerFragment( lower, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX ) )   if lower is not None   else None
-		upperView = InnerFragment( upper, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX ) )   if upper is not None   else None
+		lowerView = SREInnerFragment( lower, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX )   if lower is not None   else None
+		upperView = SREInnerFragment( upper, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX )   if upper is not None   else None
 		return subscriptSlice( lowerView, upperView )
 
 	@Generic( Schema.SubscriptLongSlice )
 	def SubscriptLongSlice(self, fragment, inheritedState, model, lower, upper, stride):
-		lowerView = InnerFragment( lower, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX ) )   if lower is not None   else None
-		upperView = InnerFragment( upper, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX ) )   if upper is not None   else None
-		strideView = InnerFragment( stride, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX ) )   if stride is not None   else None
+		lowerView = SREInnerFragment( lower, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX )   if lower is not None   else None
+		upperView = SREInnerFragment( upper, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX )   if upper is not None   else None
+		strideView = SREInnerFragment( stride, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX )   if stride is not None   else None
 		return subscriptLongSlice( lowerView, upperView, strideView )
 
 	@Generic( Schema.SubscriptEllipsis )
@@ -678,13 +660,13 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@Expression( Schema.SubscriptTuple )
 	def SubscriptTuple(self, fragment, inheritedState, model, values, trailingSeparator):
-		elementViews = InnerFragment.map( values, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ELEMENT ) )
+		elementViews = SREInnerFragment.map( values, PRECEDENCE_CONTAINER_ELEMENT )
 		return subscriptTuple( elementViews, trailingSeparator is not None )
 
 	@Expression( Schema.Subscript )
 	def Subscript(self, fragment, inheritedState, model, target, index):
-		targetView = InnerFragment( target, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_SUBSCRIPTTARGET ) )
-		indexView = InnerFragment( index, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX ) )
+		targetView = SREInnerFragment( target, PRECEDENCE_CONTAINER_SUBSCRIPTTARGET )
+		indexView = SREInnerFragment( index, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX )
 		return subscript( targetView, indexView )
 
 
@@ -693,23 +675,23 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Call
 	@Generic( Schema.CallKWArg )
 	def CallKWArg(self, fragment, inheritedState, model, name, value):
-		valueView = InnerFragment( value, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_CALLARG ) )
+		valueView = SREInnerFragment( value, PRECEDENCE_CONTAINER_CALLARG )
 		return callKWArg( name, valueView )
 
 	@Generic( Schema.CallArgList )
 	def CallArgList(self, fragment, inheritedState, model, value):
-		valueView = InnerFragment( value, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_CALLARG ) )
+		valueView = SREInnerFragment( value, PRECEDENCE_CONTAINER_CALLARG )
 		return callArgList( valueView )
 
 	@Generic( Schema.CallKWArgList )
 	def CallKWArgList(self, fragment, inheritedState, model, value):
-		valueView = InnerFragment( value, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_CALLARG ) )
+		valueView = SREInnerFragment( value, PRECEDENCE_CONTAINER_CALLARG )
 		return callKWArgList( valueView )
 
 	@Expression( Schema.Call )
 	def Call(self, fragment, inheritedState, model, target, args, argsTrailingSeparator):
-		targetView = InnerFragment( target, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_CALLTARGET ) )
-		argViews = InnerFragment.map( args, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_CALLARG ) )
+		targetView = SREInnerFragment( target, PRECEDENCE_CONTAINER_CALLTARGET )
+		argViews = SREInnerFragment.map( args, PRECEDENCE_CONTAINER_CALLARG )
 		return call( targetView, argViews, argsTrailingSeparator is not None )
 
 
@@ -720,8 +702,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@Expression( Schema.Pow )
 	def Pow(self, fragment, inheritedState, model, x, y):
 		xPrec, yPrec = computeBinOpViewPrecedenceValues( PRECEDENCE_POW, True )
-		xView = InnerFragment( x, _withPythonState( inheritedState, xPrec ) )
-		yView = InnerFragment( y, _withPythonState( inheritedState, yPrec, EDITMODE_EDIT ) )
+		xView = SREInnerFragment( x, xPrec )
+		yView = SREInnerFragment( y, yPrec, EditMode.EDIT )
 		return exponent( xView, yView )
 
 
@@ -740,57 +722,57 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@Expression( Schema.Mul )
 	def Mul(self, fragment, inheritedState, model, x, y):
-		return spanBinOpView( self._parser, inheritedState, model, x, y, '*', False )
+		return spanBinOpView( self._parser, inheritedState, model, x, y, '*' )
 
 	@Expression( Schema.Div )
 	def Div(self, fragment, inheritedState, model, x, y):
 		xPrec, yPrec = computeBinOpViewPrecedenceValues( PRECEDENCE_MULDIVMOD, False )
-		xView = InnerFragment( x, _withPythonState( inheritedState, xPrec, EDITMODE_EDIT ) )
-		yView = InnerFragment( y, _withPythonState( inheritedState, yPrec, EDITMODE_EDIT ) )
+		xView = SREInnerFragment( x, xPrec, EditMode.EDIT )
+		yView = SREInnerFragment( y, yPrec, EditMode.EDIT )
 		#<NO_TREE_EVENT_LISTENER>
 		view = div( xView, yView, '/' )
 		return BreakableStructuralItem( PythonSyntaxRecognizingEditor.instance, model, view )
 
 	@Expression( Schema.Mod )
 	def Mod(self, fragment, inheritedState, model, x, y):
-		return spanBinOpView( self._parser, inheritedState, model, x, y, '%', False )
+		return spanBinOpView( self._parser, inheritedState, model, x, y, '%' )
 
 
 	@Expression( Schema.Add )
 	def Add(self, fragment, inheritedState, model, x, y):
-		return spanBinOpView( self._parser, inheritedState, model, x, y, '+', False )
+		return spanBinOpView( self._parser, inheritedState, model, x, y, '+' )
 
 	@Expression( Schema.Sub )
 	def Sub(self, fragment, inheritedState, model, x, y):
-		return spanBinOpView( self._parser, inheritedState, model, x, y, '-', False )
+		return spanBinOpView( self._parser, inheritedState, model, x, y, '-' )
 
 
 	@Expression( Schema.LShift )
 	def LShift(self, fragment, inheritedState, model, x, y):
-		return spanBinOpView( self._parser, inheritedState, model, x, y, '<<', False )
+		return spanBinOpView( self._parser, inheritedState, model, x, y, '<<' )
 
 	@Expression( Schema.RShift )
 	def RShift(self, fragment, inheritedState, model, x, y):
-		return spanBinOpView( self._parser, inheritedState, model, x, y, '>>', False )
+		return spanBinOpView( self._parser, inheritedState, model, x, y, '>>' )
 
 
 	@Expression( Schema.BitAnd )
 	def BitAnd(self, fragment, inheritedState, model, x, y):
-		return spanBinOpView( self._parser, inheritedState, model, x, y, '&', False )
+		return spanBinOpView( self._parser, inheritedState, model, x, y, '&' )
 
 	@Expression( Schema.BitXor )
 	def BitXor(self, fragment, inheritedState, model, x, y):
-		return spanBinOpView( self._parser, inheritedState, model, x, y, '^', False )
+		return spanBinOpView( self._parser, inheritedState, model, x, y, '^' )
 
 	@Expression( Schema.BitOr )
 	def BitOr(self, fragment, inheritedState, model, x, y):
-		return spanBinOpView( self._parser, inheritedState, model, x, y, '|', False )
+		return spanBinOpView( self._parser, inheritedState, model, x, y, '|' )
 
 
 	@Expression( Schema.Cmp )
 	def Cmp(self, fragment, inheritedState, model, x, ops):
-		xView = InnerFragment( x, _withPythonState( inheritedState, PRECEDENCE_CMP ) )
-		opViews = InnerFragment.map( ops, _withPythonState( inheritedState, PRECEDENCE_CMP ) )
+		xView = SREInnerFragment( x, PRECEDENCE_CMP )
+		opViews = SREInnerFragment.map( ops, PRECEDENCE_CMP )
 		return compare( xView, opViews )
 
 	@Generic( Schema.CmpOpLte )
@@ -841,11 +823,11 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@Generic( Schema.AndTest )
 	def AndTest(self, fragment, inheritedState, model, x, y):
-		return spanBinOpView( self._parser, inheritedState, model, x, y, 'and', False )
+		return spanBinOpView( self._parser, inheritedState, model, x, y, 'and' )
 
 	@Generic( Schema.OrTest )
 	def OrTest(self, fragment, inheritedState, model, x, y):
-		return spanBinOpView( self._parser, inheritedState, model, x, y, 'or', False )
+		return spanBinOpView( self._parser, inheritedState, model, x, y, 'or' )
 
 
 
@@ -858,7 +840,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@Generic( Schema.DefaultValueParam )
 	def DefaultValueParam(self, fragment, inheritedState, model, name, defaultValue):
-		valueView = InnerFragment( defaultValue, _withPythonState( inheritedState, PRECEDENCE_NONE ) )
+		valueView = SREInnerFragment( defaultValue, PRECEDENCE_NONE )
 		return defaultValueParam( name, valueView )
 
 	@Generic( Schema.ParamList )
@@ -874,8 +856,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Lambda expression
 	@Expression( Schema.LambdaExpr )
 	def LambdaExpr(self, fragment, inheritedState, model, params, paramsTrailingSeparator, expr):
-		exprView = InnerFragment( expr, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_LAMBDAEXPR ) )
-		paramViews = InnerFragment.map( params, _withPythonState( inheritedState, PRECEDENCE_NONE ) )
+		exprView = SREInnerFragment( expr, PRECEDENCE_CONTAINER_LAMBDAEXPR )
+		paramViews = SREInnerFragment.map( params, PRECEDENCE_NONE )
 
 		return lambdaExpr( paramViews, paramsTrailingSeparator is not None, exprView )
 
@@ -884,9 +866,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Conditional expression
 	@Expression( Schema.ConditionalExpr )
 	def ConditionalExpr(self, fragment, inheritedState, model, condition, expr, elseExpr):
-		conditionView = InnerFragment( condition, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_CONDITIONALEXPR ) )
-		exprView = InnerFragment( expr, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_CONDITIONALEXPR ) )
-		elseExprView = InnerFragment( elseExpr, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_CONDITIONALEXPR ) )
+		conditionView = SREInnerFragment( condition, PRECEDENCE_CONTAINER_CONDITIONALEXPR )
+		exprView = SREInnerFragment( expr, PRECEDENCE_CONTAINER_CONDITIONALEXPR )
+		elseExprView = SREInnerFragment( elseExpr, PRECEDENCE_CONTAINER_CONDITIONALEXPR )
 		return conditionalExpr( conditionView, exprView, elseExprView )
 
 
@@ -909,7 +891,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			else:
 				raise TypeError, 'Contents of \'quote\' should be a PythonExpression or a PythonSuite'
 
-			valueView = perspective.applyTo( InnerFragment( value, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_QUOTE ) ) )
+			valueView = perspective.applyTo( SREInnerFragment( value, PRECEDENCE_CONTAINER_QUOTE ) )
 		else:
 			raise TypeError, 'Value of \'quote\' should be a DMObject'
 
@@ -922,7 +904,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	@SpecialFormExpression( Schema.Unquote )
 	def Unquote(self, fragment, inheritedState, model, value):
 		if isinstance( value, DMObject ):
-			valueView = perspective.applyTo( InnerFragment( value, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_QUOTE ) ) )
+			valueView = perspective.applyTo( SREInnerFragment( value, PRECEDENCE_CONTAINER_QUOTE ) )
 		else:
 			raise TypeError, 'Value of \'unquote\' should be a DMObject'
 
@@ -943,7 +925,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		if isinstance( expr, DMObject ):
 			schema = expr.getDMObjectClass().getSchema()
 			presenter, title = ExternalExpression.getExternalExpressionPresenterAndTitle( schema )
-			exprView = presenter( expr, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_EXTERNALEXPR ) )
+			exprView = presenter( expr )
 		else:
 			exprView = Label( '<expr>' )
 			title = 'ext'
@@ -1014,7 +996,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Unparsed statement
 	@UnparsedStatement( Schema.UnparsedStmt )
 	def UnparsedStmt(self, fragment, inheritedState, model, value):
-		valueView = InnerFragment( value, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
+		valueView = SREInnerFragment( value, PRECEDENCE_STMT )
 		return unparsedStmt( valueView )
 
 
@@ -1022,7 +1004,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Expression statement
 	@Statement( Schema.ExprStmt )
 	def ExprStmt(self, fragment, inheritedState, model, expr):
-		exprView = InnerFragment( expr, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
+		exprView = SREInnerFragment( expr, PRECEDENCE_STMT )
 		return exprStmt( exprView )
 
 
@@ -1030,24 +1012,24 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Assert statement
 	@Statement( Schema.AssertStmt )
 	def AssertStmt(self, fragment, inheritedState, model, condition, fail):
-		conditionView = InnerFragment( condition, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
-		failView = InnerFragment( fail, _withPythonState( inheritedState, PRECEDENCE_STMT ) )   if fail is not None   else None
+		conditionView = SREInnerFragment( condition, PRECEDENCE_STMT )
+		failView = SREInnerFragment( fail, PRECEDENCE_STMT )   if fail is not None   else None
 		return assertStmt( conditionView, failView )
 
 
 	# Assignment statement
 	@Statement( Schema.AssignStmt )
 	def AssignStmt(self, fragment, inheritedState, model, targets, value):
-		targetViews = InnerFragment.map( targets, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
-		valueView = InnerFragment( value, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
+		targetViews = SREInnerFragment.map( targets, PRECEDENCE_STMT )
+		valueView = SREInnerFragment( value, PRECEDENCE_STMT )
 		return assignStmt( targetViews, valueView )
 
 
 	# Augmented assignment statement
 	@Statement( Schema.AugAssignStmt )
 	def AugAssignStmt(self, fragment, inheritedState, model, op, target, value):
-		targetView = InnerFragment( target, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
-		valueView = InnerFragment( value, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
+		targetView = SREInnerFragment( target, PRECEDENCE_STMT )
+		valueView = SREInnerFragment( value, PRECEDENCE_STMT )
 		return augAssignStmt( op, targetView, valueView )
 
 
@@ -1060,30 +1042,30 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Del statement
 	@Statement( Schema.DelStmt )
 	def DelStmt(self, fragment, inheritedState, model, target):
-		targetView = InnerFragment( target, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
+		targetView = SREInnerFragment( target, PRECEDENCE_STMT )
 		return delStmt( targetView )
 
 
 	# Return statement
 	@Statement( Schema.ReturnStmt )
 	def ReturnStmt(self, fragment, inheritedState, model, value):
-		valueView = InnerFragment( value, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
+		valueView = SREInnerFragment( value, PRECEDENCE_STMT )
 		return returnStmt( valueView )
 
 
 	# Yield statement
 	@Statement( Schema.YieldStmt )
 	def YieldStmt(self, fragment, inheritedState, model, value):
-		valueView = InnerFragment( value, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
+		valueView = SREInnerFragment( value, PRECEDENCE_STMT )
 		return yieldStmt( valueView )
 
 
 	# Raise statement
 	@Statement( Schema.RaiseStmt )
 	def RaiseStmt(self, fragment, inheritedState, model, excType, excValue, traceback):
-		excTypeView = InnerFragment( excType, _withPythonState( inheritedState, PRECEDENCE_STMT ) )   if excType is not None   else None
-		excValueView = InnerFragment( excValue, _withPythonState( inheritedState, PRECEDENCE_STMT ) )   if excValue is not None   else None
-		tracebackView = InnerFragment( traceback, _withPythonState( inheritedState, PRECEDENCE_STMT ) )   if traceback is not None   else None
+		excTypeView = SREInnerFragment( excType, PRECEDENCE_STMT )   if excType is not None   else None
+		excValueView = SREInnerFragment( excValue, PRECEDENCE_STMT )   if excValue is not None   else None
+		tracebackView = SREInnerFragment( traceback, PRECEDENCE_STMT )   if traceback is not None   else None
 		return raiseStmt( excTypeView, excValueView, tracebackView )
 
 
@@ -1122,18 +1104,18 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@Statement( Schema.ImportStmt )
 	def ImportStmt(self, fragment, inheritedState, model, modules):
-		moduleViews = InnerFragment.map( modules, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
+		moduleViews = SREInnerFragment.map( modules, PRECEDENCE_STMT )
 		return importStmt( moduleViews )
 
 	@Statement( Schema.FromImportStmt )
 	def FromImportStmt(self, fragment, inheritedState, model, module, imports):
-		moduleView = InnerFragment( module, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
-		importViews = InnerFragment.map( imports, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
+		moduleView = SREInnerFragment( module, PRECEDENCE_STMT )
+		importViews = SREInnerFragment.map( imports, PRECEDENCE_STMT )
 		return fromImportStmt( moduleView, importViews )
 
 	@Statement( Schema.FromImportAllStmt )
 	def FromImportAllStmt(self, fragment, inheritedState, model, module):
-		moduleView = InnerFragment( module, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
+		moduleView = SREInnerFragment( module, PRECEDENCE_STMT )
 		return fromImportAllStmt( moduleView )
 
 
@@ -1144,7 +1126,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	@Statement( Schema.GlobalStmt )
 	def GlobalStmt(self, fragment, inheritedState, model, vars):
-		varViews = InnerFragment.map( vars, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
+		varViews = SREInnerFragment.map( vars, PRECEDENCE_STMT )
 		return globalStmt( varViews )
 
 
@@ -1152,9 +1134,9 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Exec statement
 	@Statement( Schema.ExecStmt )
 	def ExecStmt(self, fragment, inheritedState, model, source, globals, locals):
-		sourceView = InnerFragment( source, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
-		globalsView = InnerFragment( globals, _withPythonState( inheritedState, PRECEDENCE_STMT ) )    if globals is not None   else None
-		localsView = InnerFragment( locals, _withPythonState( inheritedState, PRECEDENCE_STMT ) )   if locals is not None   else None
+		sourceView = SREInnerFragment( source, PRECEDENCE_STMT )
+		globalsView = SREInnerFragment( globals, PRECEDENCE_STMT )    if globals is not None   else None
+		localsView = SREInnerFragment( locals, PRECEDENCE_STMT )   if locals is not None   else None
 		return execStmt( sourceView, globalsView, localsView )
 
 
@@ -1165,8 +1147,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 	# Exec statement
 	@Statement( Schema.PrintStmt )
 	def PrintStmt(self, fragment, inheritedState, model, destination, values):
-		destView = InnerFragment( destination, _withPythonState( inheritedState, PRECEDENCE_STMT ) )   if destination is not None   else None
-		valueViews = InnerFragment.map( values, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
+		destView = SREInnerFragment( destination, PRECEDENCE_STMT )   if destination is not None   else None
+		valueViews = SREInnerFragment.map( values, PRECEDENCE_STMT )
 		return printStmt( destView, valueViews )
 
 
@@ -1180,7 +1162,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# If statement
 	def _ifStmtHeaderElement(self, inheritedState, condition):
-		conditionView = InnerFragment( condition, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
+		conditionView = SREInnerFragment( condition, PRECEDENCE_STMT )
 		return ifStmtHeader( conditionView )
 
 	@CompoundStatementHeader( Schema.IfStmtHeader )
@@ -1190,7 +1172,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Elif statement
 	def _elifStmtHeaderElement(self, inheritedState, condition):
-		conditionView = InnerFragment( condition, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
+		conditionView = SREInnerFragment( condition, PRECEDENCE_STMT )
 		return elifStmtHeader( conditionView )
 
 	@CompoundStatementHeader( Schema.ElifStmtHeader )
@@ -1210,7 +1192,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# While statement
 	def _whileStmtHeaderElement(self, inheritedState, condition):
-		conditionView = InnerFragment( condition, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
+		conditionView = SREInnerFragment( condition, PRECEDENCE_STMT )
 		return whileStmtHeader( conditionView )
 
 	@CompoundStatementHeader( Schema.WhileStmtHeader )
@@ -1220,8 +1202,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# For statement
 	def _forStmtHeaderElement(self, inheritedState, target, source):
-		targetView = InnerFragment( target, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
-		sourceView = InnerFragment( source, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
+		targetView = SREInnerFragment( target, PRECEDENCE_STMT )
+		sourceView = SREInnerFragment( source, PRECEDENCE_STMT )
 		return forStmtHeader( targetView, sourceView )
 
 	@CompoundStatementHeader( Schema.ForStmtHeader )
@@ -1242,8 +1224,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Except statement
 	def _exceptStmtHeaderElement(self, inheritedState, exception, target):
-		excView = InnerFragment( exception, _withPythonState( inheritedState, PRECEDENCE_STMT ) )   if exception is not None   else None
-		targetView = InnerFragment( target, _withPythonState( inheritedState, PRECEDENCE_STMT ) )   if target is not None   else None
+		excView = SREInnerFragment( exception, PRECEDENCE_STMT )   if exception is not None   else None
+		targetView = SREInnerFragment( target, PRECEDENCE_STMT )   if target is not None   else None
 		return exceptStmtHeader( excView, targetView )
 
 	@CompoundStatementHeader( Schema.ExceptStmtHeader )
@@ -1264,8 +1246,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# With statement
 	def _withStmtHeaderElement(self, inheritedState, expr, target):
-		exprView = InnerFragment( expr, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
-		targetView = InnerFragment( target, _withPythonState( inheritedState, PRECEDENCE_STMT ) )   if target is not None   else None
+		exprView = SREInnerFragment( expr, PRECEDENCE_STMT )
+		targetView = SREInnerFragment( target, PRECEDENCE_STMT )   if target is not None   else None
 		return withStmtHeader( exprView, targetView )
 
 	@CompoundStatementHeader( Schema.WithStmtHeader )
@@ -1276,7 +1258,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Decorator statement
 	def _decoStmtHeaderElement(self, inheritedState, name, args, argsTrailingSeparator):
-		argViews = InnerFragment.map( args, _withPythonState( inheritedState, PRECEDENCE_STMT ) )   if args is not None   else None
+		argViews = SREInnerFragment.map( args, PRECEDENCE_STMT )   if args is not None   else None
 		return decoStmtHeader( name, argViews, argsTrailingSeparator is not None )
 
 	@CompoundStatementHeader( Schema.DecoStmtHeader )
@@ -1287,7 +1269,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Def statement
 	def _defStmtHeaderElement(self, inheritedState, name, params, paramsTrailingSeparator):
-		paramViews = InnerFragment.map( params, _withPythonState( inheritedState, PRECEDENCE_STMT ) )
+		paramViews = SREInnerFragment.map( params, PRECEDENCE_STMT )
 		return defStmtHeader( name, paramViews, paramsTrailingSeparator is not None )
 
 	@CompoundStatementHeader( Schema.DefStmtHeader )
@@ -1297,7 +1279,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Def statement
 	def _classStmtHeaderElement(self, inheritedState, name, bases, basesTrailingSeparator):
-		baseViews = InnerFragment.map( bases, _withPythonState( inheritedState, PRECEDENCE_CONTAINER_ELEMENT ) )   if bases is not None   else None
+		baseViews = SREInnerFragment.map( bases, PRECEDENCE_CONTAINER_ELEMENT )   if bases is not None   else None
 		return classStmtHeader( name, baseViews, basesTrailingSeparator is not None )
 
 	@CompoundStatementHeader( Schema.ClassStmtHeader )
@@ -1318,7 +1300,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 	def IndentedBlock(self, fragment, inheritedState, model, suite):
 		indent = StructuralItem( Schema.Indent(), indentElement() )
 
-		lineViews = InnerFragment.map( suite, _withPythonState( inheritedState, PRECEDENCE_NONE, EDITMODE_EDIT ) )
+		lineViews = SREInnerFragment.map( suite, PRECEDENCE_NONE, EditMode.EDIT )
 
 		dedent = StructuralItem( Schema.Dedent(), dedentElement() )
 
