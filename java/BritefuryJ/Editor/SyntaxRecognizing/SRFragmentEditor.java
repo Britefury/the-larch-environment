@@ -19,6 +19,12 @@ import BritefuryJ.Editor.SyntaxRecognizing.Precedence.PrecedenceHandler;
 
 public class SRFragmentEditor
 {
+	public static enum EditMode
+	{
+		DISPLAY,
+		EDIT
+	}
+	
 	private SyntaxRecognizingEditor editor;
 	private boolean bStructural;
 	private PrecedenceHandler precedenceHandler;
@@ -59,15 +65,15 @@ public class SRFragmentEditor
 	
 	public Pres editFragment(Pres view, Object model, SimpleAttributeTable inheritedState)
 	{
-		Object enableEditing = inheritedState.getOptional( "gSym_SREditor_edit" );
-		boolean bEdit = enableEditing instanceof Boolean  ?  (Boolean)enableEditing  :  false;
+		Object editModeObj = inheritedState.getOptional( "gSym_SREditor_edit" );
+		EditMode editMode = editModeObj instanceof EditMode  ?  (EditMode)editModeObj  :  EditMode.DISPLAY;
 		
 		if ( precedenceHandler != null )
 		{
 			view = precedenceHandler.applyPrecedenceBrackets( model, view, inheritedState );
 		}
 		
-		if ( bEdit )
+		if ( editMode == EditMode.EDIT )
 		{
 			if ( bStructural )
 			{

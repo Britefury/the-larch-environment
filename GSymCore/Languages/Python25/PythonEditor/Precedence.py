@@ -18,9 +18,9 @@ from Britefury.Util.NodeUtil import isStringNode
 from GSymCore.Languages.Python25 import Schema
 
 
-PRECEDENCE_NONE = None
-PRECEDENCE_UNPARSED = None
-PRECEDENCE_COMMENT = None
+PRECEDENCE_NONE = -1
+PRECEDENCE_UNPARSED = PRECEDENCE_NONE
+PRECEDENCE_COMMENT = PRECEDENCE_NONE
 PRECEDENCE_STMT = 10000
 PRECEDENCE_EXPR = 0
 PRECEDENCE_TARGET = 0
@@ -82,10 +82,10 @@ PRECEDENCE_CONTAINER_COMPREHENSIONIF = 50
 
 
 # 
-PRECEDENCE_CONTAINER_EXTERNALEXPR = None
-PRECEDENCE_CONTAINER_QUOTE = None
+PRECEDENCE_CONTAINER_EXTERNALEXPR = PRECEDENCE_NONE
+PRECEDENCE_CONTAINER_QUOTE = PRECEDENCE_NONE
 
-PRECEDENCE_CONTAINER_UNPARSED = None
+PRECEDENCE_CONTAINER_UNPARSED = PRECEDENCE_NONE
 
 
 
@@ -157,21 +157,3 @@ parensRequired[Schema.Node] = False
 parensRequired[Schema.Expr] = True
 parensRequired[Schema.Target] = True
 parensRequired.commit()
-
-
-
-def getNumParens(node):
-	try:
-		p = node['parens']
-	except KeyError:
-		print 'Attempted to get number of parens for %s'  %  node
-		raise
-	
-	numParens = 0
-	if p is not None   and   isStringNode( p ):
-		p = str( p )
-		try:
-			numParens = int( p )
-		except ValueError:
-			pass
-	return numParens
