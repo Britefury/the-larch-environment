@@ -73,9 +73,9 @@ public class Primitive
 	public static final InheritedAttributeNonNull scriptRowSpacing = new InheritedAttributeNonNull( primitiveNamespace, "scriptRowSpacing", Double.class, 1.0 );
 	public static final InheritedAttributeNonNull scriptFontScale = new InheritedAttributeNonNull( primitiveNamespace, "scriptFontScale", Double.class, 0.75 );
 	public static final InheritedAttributeNonNull scriptMinFontScale = new InheritedAttributeNonNull( primitiveNamespace, "scriptMinFontScale", Double.class, 0.7 );
-	public static final AttributeNonNull tableColumnSpacing = new AttributeNonNull( primitiveNamespace, "tableColumnSpacing", Double.class, 0.0 );
+	public static final AttributeNonNull tableColumnSpacing = new AttributeNonNull( primitiveNamespace, "tableColumnSpacing", Double.class, 3.0 );
 	public static final AttributeNonNull tableColumnExpand = new AttributeNonNull( primitiveNamespace, "tableColumnExpand", Boolean.class, false );
-	public static final AttributeNonNull tableRowSpacing = new AttributeNonNull( primitiveNamespace, "tableRowSpacing", Double.class, 0.0 );
+	public static final AttributeNonNull tableRowSpacing = new AttributeNonNull( primitiveNamespace, "tableRowSpacing", Double.class, 3.0 );
 	public static final AttributeNonNull tableRowExpand = new AttributeNonNull( primitiveNamespace, "tableRowExpand", Boolean.class, false );
 	public static final AttributeNonNull tableCellBoundaryWidth = new AttributeNonNull( primitiveNamespace, "tableCellBoundaryWidth", Double.class, 1.0 );
 	public static final Attribute tableCellBoundaryPaint = new Attribute( primitiveNamespace, "tableCellBoundaryPaint", Paint.class, null );

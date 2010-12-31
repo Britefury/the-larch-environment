@@ -11,6 +11,8 @@ from java.lang import Throwable
 
 from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder
 
+from BritefuryJ.Utils import InvokePyFunction
+
 from GSymCore.Languages.Python25 import CodeGenerator
 
 
@@ -60,42 +62,44 @@ class ExecutionResult (object):
 
 
 
+	
+	
+	
 def executePythonModule(pythonModule, module, bEvaluate):
 	stdout = _OutputStream()
 	stderr = _OutputStream()
-	caughtException = None
 	
-	try:
-		if bEvaluate:
-			execCode, evalCode = CodeGenerator.compileForModuleExecutionAndEvaluation( module, pythonModule, module.__name__ )
-		else:
-			execCode = CodeGenerator.compileForModuleExecution( module, pythonModule, module.__name__ )
-			evalCode = None
-	except Exception, exc:
-		caughtException = exc
-		result = None
-	except Throwable, exc:
-		caughtException = exc
-		result = None
+	def _compileForEval():
+		return CodeGenerator.compileForModuleExecutionAndEvaluation( module, pythonModule, module.__name__ )
+	
+	def _compileForExec():
+		return CodeGenerator.compileForModuleExecution( module, pythonModule, module.__name__ )
+	
+	evalCode = execCode = None
+	caughtException = None
+	result = None
+	if bEvaluate:
+		r, caughtException = InvokePyFunction.invoke( _compileForEval )
+		if r is not None:
+			execCode, evalCode = r
 	else:
+		execCode, caughtException = InvokePyFunction.invoke( _compileForExec )
+	
+	if execCode is not None  or  evalCode is not None:
 		savedStdout, savedStderr = sys.stdout, sys.stderr
 		sys.stdout = stdout
 		sys.stderr = stderr
 		setattr( module, 'display', stdout.display )
 		setattr( module, 'displayerr', stderr.display )
 		
-		try:
+		def _exec():
 			exec execCode in module.__dict__
 			if evalCode is not None:
-				result = [ eval( evalCode, module.__dict__ ) ]
+				return [ eval( evalCode, module.__dict__ ) ]
 			else:
-				result = None
-		except Exception, exc:
-			caughtException = exc
-			result = None
-		except Throwable, exc:
-			caughtException = exc
-			result = None
+				return None
+
+		result, caughtException = InvokePyFunction.invoke( _exec )
 	
 		sys.stdout, sys.stderr = savedStdout, savedStderr
 	
