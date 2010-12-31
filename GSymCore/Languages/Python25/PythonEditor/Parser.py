@@ -375,17 +375,14 @@ class Python25Grammar (Grammar):
 
 
 	# Subscript and slice
-	def _sliceItem(self, x):
-		return x   if x is not None   else   None
-
 	@Rule
 	def subscriptSlice(self):
-		return ( ( Optional( self.expression() ) + ':' + Optional( self.expression() )  ).action( lambda input, begin, end, xs, bindings: Schema.SubscriptSlice( lower=self._sliceItem( xs[0] ), upper=self._sliceItem( xs[2] ) ) ) )
+		return ( ( Optional( self.expression() ) + ':' + Optional( self.expression() )  ).action( lambda input, begin, end, xs, bindings: Schema.SubscriptSlice( lower=xs[0], upper=xs[2] ) ) )
 
 	@Rule
 	def subscriptLongSlice(self):
 		return ( ( Optional( self.expression() )  + ':' + Optional( self.expression() )  + ':' + Optional( self.expression() )  ).action( \
-			lambda input, begin, end, xs, bindings: Schema.SubscriptLongSlice( lower=self._sliceItem( xs[0] ), upper=self._sliceItem( xs[2] ), stride=self._sliceItem( xs[4] ) ) ) )
+			lambda input, begin, end, xs, bindings: Schema.SubscriptLongSlice( lower=xs[0], upper=xs[2], stride=xs[4] ) ) )
 
 	@Rule
 	def subscriptEllipsis(self):
