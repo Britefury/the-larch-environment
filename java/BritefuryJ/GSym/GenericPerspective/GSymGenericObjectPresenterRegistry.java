@@ -63,6 +63,7 @@ import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBoxWithFields;
 import BritefuryJ.GSym.GenericPerspective.PresCom.VerticalField;
 import BritefuryJ.GSym.GenericPerspective.Presenters.GenericPresentersAWT;
+import BritefuryJ.GSym.GenericPerspective.Presenters.GenericPresentersConcurrency;
 import BritefuryJ.GSym.GenericPerspective.Presenters.GenericPresentersSQL;
 import BritefuryJ.GSym.ObjectPresentation.GSymObjectPresentationPerspective;
 import BritefuryJ.GSym.ObjectPresentation.GSymObjectPresenterRegistry;
@@ -73,8 +74,9 @@ import BritefuryJ.GSym.View.GSymFragmentView;
 
 public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegistry
 {
-	private GenericPresentersSQL sql = new GenericPresentersSQL();
 	private GenericPresentersAWT awt = new GenericPresentersAWT();
+	private GenericPresentersSQL sql = new GenericPresentersSQL();
+	private GenericPresentersConcurrency concurrency = new GenericPresentersConcurrency();
 	
 	public GSymGenericObjectPresenterRegistry()
 	{
@@ -119,8 +121,9 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	{
 		super.registerPerspective( perspective );
 		
-		sql.registerPerspective( perspective );
 		awt.registerPerspective( perspective );
+		sql.registerPerspective( perspective );
+		concurrency.registerPerspective( perspective );
 	}
 	
 	public static final ObjectPresenter presenter_Boolean = new ObjectPresenter()
