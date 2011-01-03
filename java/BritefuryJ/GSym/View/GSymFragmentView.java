@@ -134,6 +134,11 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 
 	
 	
+	public boolean isActive()
+	{
+		return getParent() != null;
+	}
+	
 	protected ChildrenIterable getChildren()
 	{
 		return super.getChildren();

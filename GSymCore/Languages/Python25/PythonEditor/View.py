@@ -88,7 +88,8 @@ def _isValidUnparsedStatementValue(value):
 	return i != -1   and   i == len( value ) - 1
 
 def _commitUnparsedStatment(model, value):
-	unparsed = Schema.UnparsedStmt( value=Schema.UNPARSED( value=value.getItemValues() ) )
+	withoutNewline = value[:-1]
+	unparsed = Schema.UnparsedStmt( value=Schema.UNPARSED( value=withoutNewline.getItemValues() ) )
 	pyReplaceNode( model, unparsed.deepCopy() )
 
 def _commitInnerUnparsed(model, value):
