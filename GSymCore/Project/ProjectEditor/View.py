@@ -413,6 +413,10 @@ class ProjectView (GSymViewObjectNodeDispatch):
 			textEntry = TextEntry( name, _RenameListener(), _nameRegex, 'Please enter a valid identifier' )
 			textEntry.grabCaretOnRealise()
 			nameCell.setLiteralValue( textEntry )
+		
+		def _onDelete(menuItem):
+			for parent in node.getValidParents():
+				parent.remove( node )
 
 		def _addPage(pageUnit):
 			p = Schema.Page( name='NewPage', unit=pageUnit )
@@ -429,6 +433,8 @@ class ProjectView (GSymViewObjectNodeDispatch):
 			menu.add( MenuItem.menuItemWithLabel( 'Import page', importPageMenu, MenuItem.SubmenuPopupDirection.RIGHT ) )
 			menu.add( HSeparator() )
 			menu.add( MenuItem.menuItemWithLabel( 'Rename', _onRename ) )
+			menu.add( HSeparator() )
+			menu.add( MenuItem.menuItemWithLabel( 'Delete', _onDelete ) )
 			return True
 
 		location = state['location']
@@ -467,8 +473,14 @@ class ProjectView (GSymViewObjectNodeDispatch):
 			textEntry.grabCaretOnRealise()
 			nameCell.setLiteralValue( textEntry )
 
+		def _onDelete(menuItem):
+			for parent in node.getValidParents():
+				parent.remove( node )
+
 		def _pageContextMenuFactory(element, menu):
 			menu.add( MenuItem.menuItemWithLabel( 'Rename', _onRename ) )
+			menu.add( HSeparator() )
+			menu.add( MenuItem.menuItemWithLabel( 'Delete', _onDelete ) )
 			return True
 
 
