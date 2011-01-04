@@ -77,19 +77,19 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	
 
 	@Override
-	public void deleteSelection(Selection selection)
+	public void deleteSelection(Selection selection, Caret caret)
 	{
-		replaceSelection( selection, null );
+		replaceSelection( selection, caret, null );
 	}
 	
 	@Override
 	public void replaceSelectionWithText(Selection selection, Caret caret, String replacement)
 	{
-		replaceSelection( selection, replacement );
+		replaceSelection( selection, caret, replacement );
 	}
 	
 	
-	private void replaceSelection(Selection selection, Object replacement)
+	private void replaceSelection(Selection selection, Caret caret, Object replacement)
 	{
 		if ( !selection.isEmpty() )
 		{
@@ -144,8 +144,12 @@ public class SequentialClipboardHandler extends ClipboardHandler
 					SelectionEditTreeEvent event = createSelectionEditTreeEvent( editRootFragmentElement );
 					// Store the joined stream in the structural value of the root element
 					event.getStreamValueVisitor().setElementFixedValue( editRootFragmentElement, joinedStream );
+					// Take a copy of the end marker
+					Marker end = endMarker.copy();
 					// Clear the selection
 					selection.clear();
+					// Move the caret to the end
+					caret.moveTo( end );
 					// Post a tree event
 					editRootFragmentElement.postTreeEvent( event );
 				}
@@ -163,8 +167,12 @@ public class SequentialClipboardHandler extends ClipboardHandler
 				SelectionEditTreeEvent event = createSelectionEditTreeEvent( editRootFragmentElement );
 				// Store the joined stream in the structural value of the root element
 				event.getStreamValueVisitor().setElementFixedValue( editRootFragmentElement, joinedStream );
+				// Take a copy of the end marker
+				Marker end = endMarker.copy();
 				// Clear the selection
 				selection.clear();
+				// Move the caret to the end
+				caret.moveTo( end );
 				// Post a tree event
 				editRootFragmentElement.postTreeEvent( event );
 			}
@@ -253,11 +261,11 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	
 	
 	@Override
-	public void exportDone(Selection selection, Transferable transferable, int action)
+	public void exportDone(Selection selection, Caret caret, Transferable transferable, int action)
 	{
 		if ( action == MOVE )
 		{
-			deleteSelection( selection );
+			deleteSelection( selection, caret );
 		}
 	}
 	
@@ -336,7 +344,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 			}
 			else
 			{
-				replaceSelection( selection, data );
+				replaceSelection( selection, caret, data );
 				return true;
 			}
 		}

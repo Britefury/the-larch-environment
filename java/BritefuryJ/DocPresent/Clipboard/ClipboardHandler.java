@@ -23,13 +23,13 @@ public abstract class ClipboardHandler
 	public static int NONE = TransferHandler.NONE;
 	
 	
-	public abstract void deleteSelection(Selection selection);
+	public abstract void deleteSelection(Selection selection, Caret caret);
 	public abstract void replaceSelectionWithText(Selection selection, Caret caret, String replacement);
 	
 
 	public abstract int getExportActions(Selection selection);
 	public abstract Transferable createExportTransferable(Selection selection);
-	public abstract void exportDone(Selection selection, Transferable transferable, int action);
+	public abstract void exportDone(Selection selection, Caret caret, Transferable transferable, int action);
 	
 	public abstract boolean canImport(Caret caret, Selection selection, DataTransfer dataTransfer);
 	public abstract boolean importData(Caret caret, Selection selection, DataTransfer dataTransfer);

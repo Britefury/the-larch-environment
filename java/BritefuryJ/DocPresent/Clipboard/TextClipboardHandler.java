@@ -18,25 +18,27 @@ import BritefuryJ.DocPresent.Selection.Selection;
 
 public abstract class TextClipboardHandler extends ClipboardHandler
 {
-	protected abstract void deleteText(Selection selection);
+	protected abstract void deleteText(Selection selection, Caret caret);
 	protected abstract void insertText(Marker marker, String text);
-	protected abstract void replaceText(Selection selection, String replacement);
+	protected abstract void replaceText(Selection selection, Caret caret, String replacement);
 	protected abstract String getText(Selection selection);
 	
 	
-	public void deleteSelection(Selection selection)
+	@Override
+	public void deleteSelection(Selection selection, Caret caret)
 	{
 		if ( !selection.isEmpty() )
 		{
-			deleteText( selection );
+			deleteText( selection, caret );
 		}
 	}
 
+	@Override
 	public void replaceSelectionWithText(Selection selection, Caret caret, String replacement)
 	{
 		if ( !selection.isEmpty() )
 		{
-			replaceText( selection, replacement );
+			replaceText( selection, caret, replacement );
 			selection.clear();
 		}
 		else
@@ -47,11 +49,13 @@ public abstract class TextClipboardHandler extends ClipboardHandler
 
 
 
+	@Override
 	public int getExportActions(Selection selection)
 	{
 		return COPY_OR_MOVE;
 	}
 
+	@Override
 	public Transferable createExportTransferable(Selection selection)
 	{
 		if ( !selection.isEmpty() )
@@ -65,24 +69,27 @@ public abstract class TextClipboardHandler extends ClipboardHandler
 		}
 	}
 
-	public void exportDone(Selection selection, Transferable transferable, int action)
+	@Override
+	public void exportDone(Selection selection, Caret caret, Transferable transferable, int action)
 	{
 		if ( action == MOVE )
 		{
 			if ( !selection.isEmpty() )
 			{
-				deleteText( selection );
+				deleteText( selection, caret );
 				selection.clear();
 			}
 		}
 	}
 
 	
+	@Override
 	public boolean canImport(Caret caret, Selection selection, DataTransfer dataTransfer)
 	{
 		return dataTransfer.isDataFlavorSupported( DataFlavor.stringFlavor );
 	}
 
+	@Override
 	public boolean importData(Caret caret, Selection selection, DataTransfer dataTransfer)
 	{
 		if ( canImport( caret, selection, dataTransfer ) )
@@ -93,7 +100,7 @@ public abstract class TextClipboardHandler extends ClipboardHandler
 				
 				if ( !selection.isEmpty() )
 				{
-					replaceText( selection, data );
+					replaceText( selection, caret, data );
 					selection.clear();
 				}
 				else

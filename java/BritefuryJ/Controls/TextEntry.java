@@ -19,6 +19,7 @@ import BritefuryJ.DocPresent.TextEditEventInsert;
 import BritefuryJ.DocPresent.TextEditEventRemove;
 import BritefuryJ.DocPresent.TextEditEventReplace;
 import BritefuryJ.DocPresent.TreeEventListener;
+import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Clipboard.TextClipboardHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
@@ -193,21 +194,25 @@ public class TextEntry extends ControlPres
 		
 		private class TextEntryClipboardHandler extends TextClipboardHandler
 		{
-			protected void deleteText(Selection selection)
+			@Override
+			protected void deleteText(Selection selection, Caret caret)
 			{
 				textElement.removeText( selection.getStartMarker(), selection.getEndMarker() );
 			}
 	
+			@Override
 			protected void insertText(Marker marker, String text)
 			{
 				textElement.insertText( marker, text );
 			}
 			
-			protected void replaceText(Selection selection, String replacement)
+			@Override
+			protected void replaceText(Selection selection, Caret caret, String replacement)
 			{
 				textElement.replaceText( selection.getStartMarker(), selection.getEndMarker(), replacement );
 			}
 			
+			@Override
 			protected String getText(Selection selection)
 			{
 				return textElement.getTextRepresentationBetweenMarkers( selection.getStartMarker(), selection.getEndMarker() );
