@@ -13,21 +13,16 @@ import BritefuryJ.DocModel.DMSchema;
 
 public class Test_DMModule extends TestCase
 {
+	private static DMSchema m = new DMSchema( "m", "m", "tests.DocModel.Test_DMSchema.m" );
+	private static DMObjectClass c = new DMObjectClass( m, "c", new String[] {} );
+	
 	public void test_get()
 	{
-		DMSchema m = new DMSchema( "m", "m", "test.m" );
-		
-		DMObjectClass c = new DMObjectClass( m, "c", new String[] {} );
-		
 		assertSame( m.get( "c" ), c );
 	}
 
 	public void test_getitem()
 	{
-		DMSchema m = new DMSchema( "m", "m", "test.m" );
-		
-		DMObjectClass c = new DMObjectClass( m, "c", new String[] {} );
-		
 		assertSame( m.__getitem__( "c" ), c );
 	}
 	
@@ -35,7 +30,6 @@ public class Test_DMModule extends TestCase
 	{
 		DMObjectField f1[] = { new DMObjectField( "x" ) };
 
-		DMSchema m = new DMSchema( "m", "m", "test.m" );
 		DMObjectClass A = m.newClass( "A", f1 );
 		DMObjectClass B = m.newClass( "B", new String[] { "x" } );
 		DMObjectClass C = m.newClass( "C", A, f1 );

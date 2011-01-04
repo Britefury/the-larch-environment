@@ -11,7 +11,7 @@ import java.util.Arrays;
 import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMNode;
 
-public class Test_DMNode_base extends TestCase
+public abstract class Test_DMNode_base extends TestCase
 {
 	public void cmpNodeParentsLive(DMNode node, DMNode expectedParents[])
 	{

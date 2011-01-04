@@ -13,7 +13,7 @@ import junit.framework.TestCase;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
 
-public class CellTest_base extends TestCase
+public abstract class CellTest_base extends TestCase
 {
 	private HashMap<String, Integer> sigs;
 	

@@ -17,38 +17,29 @@ import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMSchema;
-import BritefuryJ.DocModel.DMSchema.InvalidSchemaNameException;
 
 public class Test_DMObject extends Test_DMNode_base
 {
 	private CommandHistory history;
-	private DMSchema m;
+	private static DMSchema m = new DMSchema( "m", "m", "tests.DocModel.Test_DMObject.m" );
+	private static DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
+	private static DMObjectClass B = m.newClass( "B", new String[] { "p", "q", "r" } );
 	
 	
 	public void setUp()
 	{
 		history = new CommandHistory();
-		try
-		{
-			m = new DMSchema( "m", "m", "test.m" );
-		}
-		catch (InvalidSchemaNameException e)
-		{
-			throw new RuntimeException( e.toString() );
-		}
 	}
 	
 	public void tearDown()
 	{
 		history = null;
-		m = null;
 	}
 
 	
 	
 	public void test_getDMClass()
 	{
-		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
 		DMObject a = A.newInstance( new Object[] { "a", "p" } );
 		history.track( a );
 		
@@ -58,7 +49,6 @@ public class Test_DMObject extends Test_DMNode_base
 		
 	public void test_getFieldIndex()
 	{
-		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
 		DMObject a = A.newInstance( new Object[] { "a", "p" } );
 		history.track( a );
 		
@@ -69,7 +59,6 @@ public class Test_DMObject extends Test_DMNode_base
 
 	public void test_DMObject_getFieldNames()
 	{
-		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
 		DMObject a = A.newInstance( new Object[] { "a", "p" } );
 		history.track( a );
 		
@@ -79,7 +68,6 @@ public class Test_DMObject extends Test_DMNode_base
 		
 	public void test_DMObject_getFieldValuesImmutable()
 	{
-		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
 		DMObject a = A.newInstance( new Object[] { "a", null } );
 		history.track( a );
 		
@@ -89,7 +77,6 @@ public class Test_DMObject extends Test_DMNode_base
 	
 	public void test_get()
 	{
-		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
 		DMObject a = A.newInstance( new Object[] { "a", null } );
 		history.track( a );
 		
@@ -102,7 +89,6 @@ public class Test_DMObject extends Test_DMNode_base
 
 	public void test_getitem()
 	{
-		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
 		DMObject a = A.newInstance( new Object[] { "a", null } );
 		history.track( a );
 		
@@ -120,7 +106,6 @@ public class Test_DMObject extends Test_DMNode_base
 		DMList pq = new DMList();
 		pq.extend( Arrays.asList( new Object[] { "p", "q" } ) );
 		
-		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
 		DMObject a = A.newInstance( new Object[] { ij, "p" } );
 		history.track( a );
 		
@@ -189,7 +174,6 @@ public class Test_DMObject extends Test_DMNode_base
 		DMList pq = new DMList();
 		pq.extend( Arrays.asList( new Object[] { "p", "q" } ) );
 		
-		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
 		DMObject a = A.newInstance( new Object[] { "a", ij } );
 		history.track( a );
 		
@@ -225,8 +209,6 @@ public class Test_DMObject extends Test_DMNode_base
 		DMList pq = new DMList();
 		pq.extend( Arrays.asList( new Object[] { "p", "q" } ) );
 
-		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
-		DMObjectClass B = m.newClass( "B", new String[] { "p", "q", "r" } );
 		DMObject a = A.newInstance( new Object[] { "a", ij } );
 		DMObject b = B.newInstance( new Object[] { "c", "d", pq } );
 		history.track( a );
@@ -259,7 +241,6 @@ public class Test_DMObject extends Test_DMNode_base
 
 	public void test_setitem()
 	{
-		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
 		DMObject a = A.newInstance( new Object[] { "a", "p" } );
 		history.track( a );
 		
@@ -271,7 +252,6 @@ public class Test_DMObject extends Test_DMNode_base
 
 	public void test_getChildren()
 	{
-		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
 		DMObject a = A.newInstance( new Object[] { "a", "p" } );
 		history.track( a );
 		
@@ -292,7 +272,6 @@ public class Test_DMObject extends Test_DMNode_base
 		data.put( "x", "d" );
 		data.put( "y", "s" );
 
-		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
 		DMObject a0 = new DMObject( A, new Object[] { "a", "b" } );
 		DMObject a1 = new DMObject( A, new String[] { "y", "x" }, new Object[] { "a", "b" } );
 		DMObject a2 = new DMObject( A, data );
@@ -314,7 +293,6 @@ public class Test_DMObject extends Test_DMNode_base
 	
 	public void test_trackTree()
 	{
-		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
 		DMObject c = A.newInstance( new Object[] { "c", "r" } );
 		DMObject b = A.newInstance( new Object[] { "b", "q" } );
 		DMObject a = A.newInstance( new Object[] { "a", b } );
@@ -375,8 +353,6 @@ public class Test_DMObject extends Test_DMNode_base
 	
 	public void test_equals()
 	{
-		DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
-		
 		DMObject c0 = A.newInstance( new Object[] { "c", null } );
 		DMObject c0D = A.newInstance( new Object[] { "c", null } );
 		

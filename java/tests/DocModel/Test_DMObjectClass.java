@@ -12,39 +12,20 @@ import junit.framework.TestCase;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectField;
 import BritefuryJ.DocModel.DMSchema;
-import BritefuryJ.DocModel.DMSchema.InvalidSchemaNameException;
 
 public class Test_DMObjectClass extends TestCase
 {
-	private DMSchema m;
-	
-	
-	public void setUp()
-	{
-		try
-		{
-			m = new DMSchema( "m", "m", "test.m" );
-		}
-		catch (InvalidSchemaNameException e)
-		{
-			throw new RuntimeException( e.toString() );
-		}
-	}
-	
-	public void tearDown()
-	{
-		m = null;
-	}
+	private static DMSchema m = new DMSchema( "m", "m", "tests.DocModel.Test_DMObjectClass" );
 	
 	
 	public void test_Constructor_fields()
 	{
 		DMObjectField f1[] = { new DMObjectField( "x" ) };
-		DMObjectClass a0 = m.newClass( "A", new DMObjectField[] { } );
-		DMObjectClass a1 = m.newClass( "AA", f1 );
+		DMObjectClass a0 = m.newClass( "A0", new DMObjectField[] { } );
+		DMObjectClass a1 = m.newClass( "AA0", f1 );
 		
-		assertEquals( a0.getName(), "A" );
-		assertEquals( a1.getName(), "AA" );
+		assertEquals( a0.getName(), "A0" );
+		assertEquals( a1.getName(), "AA0" );
 
 		assertSame( a0.getSuperclass(), null );
 		assertSame( a1.getSuperclass(), null );
@@ -74,11 +55,11 @@ public class Test_DMObjectClass extends TestCase
 	public void test_Constructor_names()
 	{
 		String f1[] = { "x" };
-		DMObjectClass a0 = m.newClass( "A", new String[] { } );
-		DMObjectClass a1 = m.newClass( "AA", f1 );
+		DMObjectClass a0 = m.newClass( "A1", new String[] { } );
+		DMObjectClass a1 = m.newClass( "AA1", f1 );
 		
-		assertEquals( a0.getName(), "A" );
-		assertEquals( a1.getName(), "AA" );
+		assertEquals( a0.getName(), "A1" );
+		assertEquals( a1.getName(), "AA1" );
 
 		assertSame( a0.getSuperclass(), null );
 		assertSame( a1.getSuperclass(), null );
@@ -108,12 +89,12 @@ public class Test_DMObjectClass extends TestCase
 	public void test_Constructor_superclass_fields()
 	{
 		DMObjectField af[] = { new DMObjectField( "x" ) };
-		DMObjectClass a = m.newClass( "A", af );
+		DMObjectClass a = m.newClass( "A2", af );
 
 		DMObjectField bf[] = { new DMObjectField( "y" ) };
-		DMObjectClass b = m.newClass( "B", a, bf );
+		DMObjectClass b = m.newClass( "B2", a, bf );
 		
-		assertEquals( b.getName(), "B" );
+		assertEquals( b.getName(), "B2" );
 
 		assertSame( b.getSuperclass(), a );
 
