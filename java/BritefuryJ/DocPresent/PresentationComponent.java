@@ -307,7 +307,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 					ClipboardHandler clipboardHandler = region.getClipboardHandler();
 					if ( clipboardHandler != null )
 					{
-						clipboardHandler.exportDone( rootElement.selection, data, action );
+						clipboardHandler.exportDone( rootElement.selection, rootElement.caret, data, action );
 					}
 				}
 			}
@@ -1022,6 +1022,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 						
 					if ( elementToSelect != null )
 					{
+						caret.moveTo( elementToSelect.markerAtEnd() );
 						selectionManager.mouseSelectionReset();
 						selectionManager.selectElement( elementToSelect );
 						bHandled = true;
@@ -1445,7 +1446,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 					{
 						caret.moveTo( selection.getStartMarker() );
 					}
-					clipboardHandler.deleteSelection( selection );
+					clipboardHandler.deleteSelection( selection, caret );
 				}
 			}
 		}
