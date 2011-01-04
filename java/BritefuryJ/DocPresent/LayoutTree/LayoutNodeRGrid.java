@@ -220,7 +220,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 			DPElement endLeaf = leaves[rangeEnd-1];
 			double yStart = startLeaf.getPositionInParentSpaceY();
 			double yEnd = endLeaf.getPositionInParentSpaceY()  +  endLeaf.getHeightInParentSpace();
-			AABox2 box = new AABox2( 0.0, yStart, getAllocationX(), yEnd );
+			AABox2 box = new AABox2( 0.0, yStart, getWidth(), yEnd );
 			return new AABox2[] { box };
 		}
 	}
