@@ -11,7 +11,7 @@ import BritefuryJ.DocPresent.Layout.ElementAlignment;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 
-public class Test_Layout_base extends TestCase
+public abstract class Test_Layout_base extends TestCase
 {
 	protected static int HLEFT = ElementAlignment.HALIGN_LEFT;
 	protected static int HCENTRE = ElementAlignment.HALIGN_CENTRE;

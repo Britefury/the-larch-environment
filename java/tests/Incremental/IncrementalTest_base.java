@@ -16,7 +16,7 @@ import BritefuryJ.Incremental.IncrementalFunctionMonitor;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
 
-public class IncrementalTest_base extends TestCase
+public abstract class IncrementalTest_base extends TestCase
 {
 	private HashMap<String, Integer> sigs;
 	

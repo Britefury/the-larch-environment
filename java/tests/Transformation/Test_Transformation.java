@@ -16,20 +16,16 @@ import BritefuryJ.Transformation.TransformationFunction;
 
 public class Test_Transformation extends TestCase
 {
-	private DMSchema m;
-	private DMObjectClass TwoStrings, TwoNodes, StringNode;
+	private static DMSchema m= new DMSchema( "m", "m", "tests.Transformation.Teste_Transformation.m" );
+	private static DMObjectClass TwoStrings = m.newClass( "TwoStrings", new String[] { "s", "t" } );
+	private static DMObjectClass TwoNodes = m.newClass( "TwoNodes", new String[] { "m", "n" } );
+	private static DMObjectClass StringNode = m.newClass( "StringNode", new String[] { "s", "n" } );
 	private TransformationFunction x1, x2, x3;
 	private DMObject data_s, data_nss, data_bs, data_bs_x1, data_bs_x2, data_bs_x12, data_nbss, data_nbss_x1, data_nbss_x2, data_nbss_x12;
 
 
 	public void setUp()
 	{
-		m = new DMSchema( "m", "m", "test.m" );
-		TwoStrings = m.newClass( "TwoStrings", new String[] { "s", "t" } );
-		TwoNodes = m.newClass( "TwoNodes", new String[] { "m", "n" } );
-		StringNode = m.newClass( "StringNode", new String[] { "s", "n" } );
-		
-		
 		data_s = TwoStrings.newInstance( new Object[] { "a", "b" } );
 		
 		data_nss = TwoNodes.newInstance( new Object[] { TwoStrings.newInstance( new Object[] { "a", "b" } ), TwoStrings.newInstance( new Object[] { "c", "d" } ) } );
@@ -105,8 +101,6 @@ public class Test_Transformation extends TestCase
 	
 	public void tearDown()
 	{
-		m = null;
-		TwoStrings = TwoNodes = StringNode = null;
 	}
 
 	
