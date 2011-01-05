@@ -133,10 +133,7 @@ public class DMObjectCommandTracker extends CommandTracker
 		DMObject obj = (DMObject)t;
 		for (Object x: obj.getFieldValuesImmutable())
 		{
-			if ( x instanceof Trackable )
-			{
-				commandHistory.track( (Trackable)x );
-			}
+			commandHistory.track( x );
 		}
 	}
 	
@@ -145,10 +142,7 @@ public class DMObjectCommandTracker extends CommandTracker
 		DMObject obj = (DMObject)t;
 		for (Object x: obj.getFieldValuesImmutable())
 		{
-			if ( x instanceof Trackable )
-			{
-				commandHistory.stopTracking( (Trackable)x );
-			}
+			commandHistory.stopTracking( x );
 		}
 
 		super.stopTracking( t );
@@ -158,33 +152,21 @@ public class DMObjectCommandTracker extends CommandTracker
 	
 	protected void onSet(DMObject obj, int i, Object oldX, Object x)
 	{
-		if ( x instanceof Trackable )
-		{
-			commandHistory.track( (Trackable)x );
-		}
+		commandHistory.track( x );
 		commandHistory.addCommand( new SetCommand( obj, i, oldX, x ) );
-		if ( oldX instanceof Trackable )
-		{
-			commandHistory.stopTracking( (Trackable)oldX );
-		}
+		commandHistory.stopTracking( oldX );
 	}
 
 	protected void onUpdate(DMObject obj, int[] indices, Object[] oldContents, Object[] newContents)
 	{
 		for (Object x: newContents)
 		{
-			if ( x instanceof Trackable )
-			{
-				commandHistory.track( (Trackable)x );
-			}
+			commandHistory.track( x );
 		}
 		commandHistory.addCommand( new UpdateCommand( obj, indices, oldContents, newContents ) );
 		for (Object oldX: oldContents)
 		{
-			if ( oldX instanceof Trackable )
-			{
-				commandHistory.stopTracking( (Trackable)oldX );
-			}
+			commandHistory.stopTracking( oldX );
 		}
 	}
 	
@@ -192,18 +174,12 @@ public class DMObjectCommandTracker extends CommandTracker
 	{
 		for (Object x: newFieldData)
 		{
-			if ( x instanceof Trackable )
-			{
-				commandHistory.track( (Trackable)x );
-			}
+			commandHistory.track( x );
 		}
 		commandHistory.addCommand( new BecomeCommand( obj, oldClass, oldFieldData, newClass, newFieldData ) );
 		for (Object oldX: oldFieldData)
 		{
-			if ( oldX instanceof Trackable )
-			{
-				commandHistory.stopTracking( (Trackable)oldX );
-			}
+			commandHistory.stopTracking( oldX );
 		}
 	}
 	

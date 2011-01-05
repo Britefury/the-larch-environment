@@ -19,9 +19,9 @@ import BritefuryJ.Cell.Cell;
 import BritefuryJ.Cell.CellEvaluator;
 import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.DocModel.DMIOReader;
+import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
 import BritefuryJ.DocModel.DMList;
 import BritefuryJ.DocModel.DMNode;
-import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
 
 public class Test_DMList extends Test_DMNode_base
 {
@@ -90,6 +90,17 @@ public class Test_DMList extends Test_DMNode_base
 	}
 	
 	
+	public void assertTracked(DMList xs)
+	{
+		assertSame( xs.getCommandHistory(), history );
+	}
+	
+	public void assertNotTracked(DMList xs)
+	{
+		assertNull( xs.getCommandHistory() );
+	}
+	
+	
 	
 	public void testConstructor()
 	{
@@ -138,6 +149,8 @@ public class Test_DMList extends Test_DMNode_base
 	{
 		DMList xs = readTrackedDMListSX( "[a b c]" );
 		DMList ys = readDMListSX( "[x y z]" );
+		assertTracked( xs );
+		assertNotTracked( ys );
 		xs.add( "xyz" );
 		cmpListSX( xs, "[a b c xyz]" );
 		xs.add( null );
@@ -146,10 +159,14 @@ public class Test_DMList extends Test_DMNode_base
 		xs.add( ys );
 		cmpListSX( xs, "[a b c xyz `null` [x y z]]" );
 		cmpNodeParentsLive( ys, new DMNode[] { xs } );
+		assertTracked( xs );
+		assertTracked( ys );
 		
 		history.undo();
 		cmpListSX( xs, "[a b c xyz `null`]" );
 		cmpNodeParentsLive( ys, new DMNode[] {} );
+		assertTracked( xs );
+		assertNotTracked( ys );
 		history.undo();
 		cmpListSX( xs, "[a b c xyz]" );
 		history.undo();
@@ -161,6 +178,8 @@ public class Test_DMList extends Test_DMNode_base
 		history.redo();
 		cmpListSX( xs, "[a b c xyz `null` [x y z]]" );
 		cmpNodeParentsLive( ys, new DMNode[] { xs } );
+		assertTracked( xs );
+		assertTracked( ys );
 	}
 
 
@@ -169,6 +188,8 @@ public class Test_DMList extends Test_DMNode_base
 	{
 		DMList xs = readTrackedDMListSX( "[a b c]" );
 		DMList ys = readDMListSX( "[x y z]" );
+		assertTracked( xs );
+		assertNotTracked( ys );
 		xs.add( 2, "xyz" );
 		cmpListSX( xs, "[a b xyz c]" );
 		xs.add( 2, null );
@@ -177,10 +198,14 @@ public class Test_DMList extends Test_DMNode_base
 		xs.add( 2, ys );
 		cmpListSX( xs, "[a b [x y z] `null` xyz c]" );
 		cmpNodeParentsLive( ys, new DMNode[] { xs } );
+		assertTracked( xs );
+		assertTracked( ys );
 		
 		history.undo();
 		cmpListSX( xs, "[a b `null` xyz c]" );
 		cmpNodeParentsLive( ys, new DMNode[] {} );
+		assertTracked( xs );
+		assertNotTracked( ys );
 		history.undo();
 		cmpListSX( xs, "[a b xyz c]" );
 		history.undo();
@@ -192,6 +217,8 @@ public class Test_DMList extends Test_DMNode_base
 		history.redo();
 		cmpListSX( xs, "[a b [x y z] `null` xyz c]" );
 		cmpNodeParentsLive( ys, new DMNode[] { xs } );
+		assertTracked( xs );
+		assertTracked( ys );
 	}
 
 
@@ -201,23 +228,44 @@ public class Test_DMList extends Test_DMNode_base
 		DMList xs = readTrackedDMListSX( "[a b c]" );
 		DMList ys = readDMListSX( "[x y z `null`]" );
 		DMList zs = readDMListSX( "[i j [k l] m n]" );
+		assertTracked( xs );
+		assertNotTracked( ys );
+		assertNotTracked( zs );
 		xs.addAll( ys );
 		cmpListSX( xs, "[a b c x y z `null`]" );
 		cmpNodeParentsLive( (DMNode)zs.get( 2 ), new DMNode[] { zs } );
+		assertTracked( xs );
+		assertNotTracked( ys );
+		assertNotTracked( zs );
 		xs.addAll( zs );
 		cmpListSX( xs, "[a b c x y z `null` i j [k l] m n]" );
 		cmpNodeParentsLive( (DMNode)zs.get( 2 ), new DMNode[] { xs, zs } );
+		assertTracked( xs );
+		assertNotTracked( ys );
+		assertNotTracked( zs );
 		
 		history.undo();
 		cmpListSX( xs, "[a b c x y z `null`]" );
 		cmpNodeParentsLive( (DMNode)zs.get( 2 ), new DMNode[] { zs } );
+		assertTracked( xs );
+		assertNotTracked( ys );
+		assertNotTracked( zs );
 		history.undo();
 		cmpListSX( xs, "[a b c]" );
+		assertTracked( xs );
+		assertNotTracked( ys );
+		assertNotTracked( zs );
 		history.redo();
 		cmpListSX( xs, "[a b c x y z `null`]" );
+		assertTracked( xs );
+		assertNotTracked( ys );
+		assertNotTracked( zs );
 		history.redo();
 		cmpListSX( xs, "[a b c x y z `null` i j [k l] m n]" );
 		cmpNodeParentsLive( (DMNode)zs.get( 2 ), new DMNode[] { xs, zs } );
+		assertTracked( xs );
+		assertNotTracked( ys );
+		assertNotTracked( zs );
 	}
 
 
@@ -226,23 +274,44 @@ public class Test_DMList extends Test_DMNode_base
 		DMList xs = readTrackedDMListSX( "[a b c]" );
 		DMList ys = readDMListSX( "[x y z `null`]" );
 		DMList zs = readDMListSX( "[i j [k l] m n]" );
+		assertTracked( xs );
+		assertNotTracked( ys );
+		assertNotTracked( zs );
 		xs.addAll( 2, ys );
 		cmpListSX( xs, "[a b x y z `null` c]" );
 		cmpNodeParentsLive( (DMNode)zs.get( 2 ), new DMNode[] { zs } );
+		assertTracked( xs );
+		assertNotTracked( ys );
+		assertNotTracked( zs );
 		xs.addAll( 2, zs );
 		cmpListSX( xs, "[a b i j [k l] m n x y z `null` c]" );
 		cmpNodeParentsLive( (DMNode)zs.get( 2 ), new DMNode[] { xs, zs } );
+		assertTracked( xs );
+		assertNotTracked( ys );
+		assertNotTracked( zs );
 		
 		history.undo();
 		cmpListSX( xs, "[a b x y z `null` c]" );
 		cmpNodeParentsLive( (DMNode)zs.get( 2 ), new DMNode[] { zs } );
+		assertTracked( xs );
+		assertNotTracked( ys );
+		assertNotTracked( zs );
 		history.undo();
 		cmpListSX( xs, "[a b c]" );
+		assertTracked( xs );
+		assertNotTracked( ys );
+		assertNotTracked( zs );
 		history.redo();
 		cmpListSX( xs, "[a b x y z `null` c]" );
+		assertTracked( xs );
+		assertNotTracked( ys );
+		assertNotTracked( zs );
 		history.redo();
 		cmpListSX( xs, "[a b i j [k l] m n x y z `null` c]" );
 		cmpNodeParentsLive( (DMNode)zs.get( 2 ), new DMNode[] { xs, zs } );
+		assertTracked( xs );
+		assertNotTracked( ys );
+		assertNotTracked( zs );
 	}
 
 
@@ -251,16 +320,24 @@ public class Test_DMList extends Test_DMNode_base
 		DMList xs = readTrackedDMListSX( "[a b c [x y]]" );
 		DMNode zs = (DMNode)xs.get( 3 );
 		cmpNodeParentsLive( zs, new DMNode[] { xs } );
+		assertTracked( xs );
+		assertTracked( (DMList)zs );
 		xs.clear();
 		cmpListSX( xs, "[]" );
 		cmpNodeParentsLive( zs, new DMNode[] {} );
+		assertTracked( xs );
+		assertNotTracked( (DMList)zs );
 		
 		history.undo();
 		cmpListSX( xs, "[a b c [x y]]" );
 		cmpNodeParentsLive( zs, new DMNode[] { xs } );
+		assertTracked( xs );
+		assertTracked( (DMList)zs );
 		history.redo();
 		cmpListSX( xs, "[]" );
 		cmpNodeParentsLive( zs, new DMNode[] {} );
+		assertTracked( xs );
+		assertNotTracked( (DMList)zs );
 	}
 
 
@@ -365,6 +442,8 @@ public class Test_DMList extends Test_DMNode_base
 	{
 		DMList xs = readTrackedDMListSX( "[a b c `null` [x y]]" );
 		DMNode zs = (DMNode)xs.get( 4 );
+		assertTracked( xs );
+		assertTracked( (DMList)zs );
 		cmpNodeParentsLive( zs, new DMNode[] { xs } );
 		xs.remove( 1 );
 		cmpListSX( xs, "[a c `null` [x y]]" );
@@ -372,10 +451,14 @@ public class Test_DMList extends Test_DMNode_base
 		xs.remove( 3 );
 		cmpListSX( xs, "[a c `null`]" );
 		cmpNodeParentsLive( zs, new DMNode[] {} );
+		assertTracked( xs );
+		assertNotTracked( (DMList)zs );
 		
 		history.undo();
 		cmpListSX( xs, "[a c `null` [x y]]" );
 		cmpNodeParentsLive( zs, new DMNode[] { xs } );
+		assertTracked( xs );
+		assertTracked( (DMList)zs );
 		history.undo();
 		cmpListSX( xs, "[a b c `null` [x y]]" );
 		cmpNodeParentsLive( zs, new DMNode[] { xs } );
@@ -385,12 +468,16 @@ public class Test_DMList extends Test_DMNode_base
 		history.redo();
 		cmpListSX( xs, "[a c `null`]" );
 		cmpNodeParentsLive( zs, new DMNode[] {} );
+		assertTracked( xs );
+		assertNotTracked( (DMList)zs );
 	}
 
 	public void testRemoveObject()
 	{
 		DMList xs = readTrackedDMListSX( "[a b c `null` [x y]]" );
 		DMNode zs = (DMNode)xs.get( 4 );
+		assertTracked( xs );
+		assertTracked( (DMList)zs );
 		cmpNodeParentsLive( zs, new DMNode[] { xs } );
 		xs.remove( "b" );
 		cmpListSX( xs, "[a c `null` [x y]]" );
@@ -401,10 +488,14 @@ public class Test_DMList extends Test_DMNode_base
 		xs.remove( zs );
 		cmpListSX( xs, "[a c]" );
 		cmpNodeParentsLive( zs, new DMNode[] {} );
+		assertTracked( xs );
+		assertNotTracked( (DMList)zs );
 		
 		history.undo();
 		cmpListSX( xs, "[a c [x y]]" );
 		cmpNodeParentsLive( zs, new DMNode[] { xs } );
+		assertTracked( xs );
+		assertTracked( (DMList)zs );
 		history.undo();
 		cmpListSX( xs, "[a c `null` [x y]]" );
 		cmpNodeParentsLive( zs, new DMNode[] { xs } );
@@ -420,6 +511,8 @@ public class Test_DMList extends Test_DMNode_base
 		history.redo();
 		cmpListSX( xs, "[a c]" );
 		cmpNodeParentsLive( zs, new DMNode[] {} );
+		assertTracked( xs );
+		assertNotTracked( (DMList)zs );
 	}
 
 
@@ -427,36 +520,63 @@ public class Test_DMList extends Test_DMNode_base
 	{
 		DMList xs = readTrackedDMListSX( "[a [i j] c]" );
 		DMNode ij = (DMNode)xs.get( 1 );
-		DMList pq = readTrackedDMListSX( "[p q]" );
+		DMList pq = readDMListSX( "[p q]" );
 
 		cmpListSX( xs, "[a [i j] c]" );
 		cmpNodeParentsLive( ij, new DMNode[] { xs } );
 		cmpNodeParentsLive( pq, new DMNode[] {} );
+		assertTracked( xs );
+		assertTracked( (DMList)ij );
+		assertNotTracked( pq );
+
 		xs.set( 1, null );
 		cmpListSX( xs, "[a `null` c]" );
 		cmpNodeParentsLive( ij, new DMNode[] {} );
 		cmpNodeParentsLive( pq, new DMNode[] {} );
+		assertTracked( xs );
+		assertNotTracked( (DMList)ij );
+		assertNotTracked( pq );
+		
 		xs.set( 1, pq );
 		cmpListSX( xs, "[a [p q] c]" );
 		cmpNodeParentsLive( ij, new DMNode[] {} );
 		cmpNodeParentsLive( pq, new DMNode[] { xs } );
+		assertTracked( xs );
+		assertNotTracked( (DMList)ij );
+		assertTracked( pq );
+		
 		
 		history.undo();
 		cmpListSX( xs, "[a `null` c]" );
 		cmpNodeParentsLive( ij, new DMNode[] {} );
 		cmpNodeParentsLive( pq, new DMNode[] {} );
+		assertTracked( xs );
+		assertNotTracked( (DMList)ij );
+		assertNotTracked( pq );
+		
 		history.undo();
 		cmpListSX( xs, "[a [i j] c]" );
 		cmpNodeParentsLive( ij, new DMNode[] { xs } );
 		cmpNodeParentsLive( pq, new DMNode[] {} );
+		assertTracked( xs );
+		assertTracked( (DMList)ij );
+		assertNotTracked( pq );
+		
 		history.redo();
 		cmpListSX( xs, "[a `null` c]" );
 		cmpNodeParentsLive( ij, new DMNode[] {} );
 		cmpNodeParentsLive( pq, new DMNode[] {} );
+		assertTracked( xs );
+		assertNotTracked( (DMList)ij );
+		assertNotTracked( pq );
+		
 		history.redo();
 		cmpListSX( xs, "[a [p q] c]" );
 		cmpNodeParentsLive( ij, new DMNode[] {} );
 		cmpNodeParentsLive( pq, new DMNode[] { xs } );
+		assertTracked( xs );
+		assertNotTracked( (DMList)ij );
+		assertTracked( pq );
 	}
 
 
@@ -464,35 +584,72 @@ public class Test_DMList extends Test_DMNode_base
 	{
 		DMList xs = readTrackedDMListSX( "[a b [i j] c]" );
 		DMNode ij = (DMNode)xs.get( 2 );
-		DMList pq = readTrackedDMListSX( "[p q]" );
+		DMList pq = readDMListSX( "[[p] q]" );
+		DMList p = (DMList)pq.get( 0 );
+		
+		
 		cmpListSX( xs, "[a b [i j] c]" );
 		cmpNodeParentsLive( ij, new DMNode[] { xs } );
 		cmpNodeParentsLive( pq, new DMNode[] {} );
+		assertTracked( xs );
+		assertTracked( (DMList)ij );
+		assertNotTracked( pq );
+		assertNotTracked( p );
+
 		xs.__setitem__( new PySlice( new PyInteger( 1 ), new PyInteger( -1 ), Py.None ), Arrays.asList( new Object[] { null } ) );
 		cmpListSX( xs, "[a `null` c]" );
 		cmpNodeParentsLive( ij, new DMNode[] {} );
 		cmpNodeParentsLive( pq, new DMNode[] {} );
+		assertTracked( xs );
+		assertNotTracked( (DMList)ij );
+		assertNotTracked( pq );
+		assertNotTracked( p );
+		
 		xs.__setitem__( new PySlice( new PyInteger( 1 ), new PyInteger( -1 ), Py.None ), Arrays.asList( new Object[] { pq } ) );
-		cmpListSX( xs, "[a [p q] c]" );
+		cmpListSX( xs, "[a [[p] q] c]" );
 		cmpNodeParentsLive( ij, new DMNode[] {} );
 		cmpNodeParentsLive( pq, new DMNode[] { xs } );
+		assertTracked( xs );
+		assertNotTracked( (DMList)ij );
+		assertTracked( pq );
+		assertTracked( p );
+
 		
 		history.undo();
 		cmpListSX( xs, "[a `null` c]" );
 		cmpNodeParentsLive( ij, new DMNode[] {} );
 		cmpNodeParentsLive( pq, new DMNode[] {} );
+		assertTracked( xs );
+		assertNotTracked( (DMList)ij );
+		assertNotTracked( pq );
+		assertNotTracked( p );
+		
 		history.undo();
 		cmpListSX( xs, "[a b [i j] c]" );
 		cmpNodeParentsLive( ij, new DMNode[] { xs } );
 		cmpNodeParentsLive( pq, new DMNode[] {} );
+		assertTracked( xs );
+		assertTracked( (DMList)ij );
+		assertNotTracked( pq );
+		assertNotTracked( p );
+		
 		history.redo();
 		cmpListSX( xs, "[a `null` c]" );
 		cmpNodeParentsLive( ij, new DMNode[] {} );
 		cmpNodeParentsLive( pq, new DMNode[] {} );
+		assertTracked( xs );
+		assertNotTracked( (DMList)ij );
+		assertNotTracked( pq );
+		assertNotTracked( p );
+		
 		history.redo();
-		cmpListSX( xs, "[a [p q] c]" );
+		cmpListSX( xs, "[a [[p] q] c]" );
 		cmpNodeParentsLive( ij, new DMNode[] {} );
 		cmpNodeParentsLive( pq, new DMNode[] { xs } );
+		assertTracked( xs );
+		assertNotTracked( (DMList)ij );
+		assertTracked( pq );
+		assertTracked( p );
 	}
 
 

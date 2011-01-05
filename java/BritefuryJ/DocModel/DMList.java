@@ -1067,11 +1067,10 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	
 	
 	
-	/*
-	 * Only call from DMListCommandTracker
-	 */
 	protected void removeLast(int numElements)
 	{
+		Object removedValues[] = value.subList( value.size() - numElements, value.size() ).toArray();
+		
 		for (int i = 0, j = value.size() - 1; i < numElements; i++, j--)
 		{
 			Object x = value.get( j );
@@ -1082,14 +1081,18 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 			value.remove( j );
 		}
 		incr.onChanged();
+	
+		if ( commandTracker != null )
+		{
+			commandTracker.onRemoveLast( this, removedValues );
+		}
 	}
 
 
-	/*
-	 * Only call from DMListCommandTracker
-	 */
 	protected void removeRange(int start, int num)
 	{
+		Object removedValues[] = value.subList( start, start + num ).toArray();
+		
 		for (int i = 0; i < num; i++)
 		{
 			Object x = value.get( start );
@@ -1100,12 +1103,16 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 			value.remove( start );
 		}
 		incr.onChanged();
+		
+		if ( commandTracker != null )
+		{
+			commandTracker.onRemoveRange( this, start, removedValues );
+		}
 	}
 
 
 	public void setContents(List<?> xs)
 	{
-		Object oldContents[] = value.toArray();
 		Object newContents[] = new Object[xs.size()];
 		int i = 0;
 		for (Object x: xs)
@@ -1115,11 +1122,6 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		}
 		
 		commandTracker_setContents( newContents );
-
-		if ( commandTracker != null )
-		{
-			commandTracker.onSetContents( this, oldContents, newContents );
-		}
 	}
 	
 
@@ -1128,6 +1130,10 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	 */
 	protected void commandTracker_setContents(Object xs[])
 	{
+		Object oldContents[] = value.toArray();
+		Object newContents[] = new Object[xs.length];
+		System.arraycopy( xs, 0, newContents, 0, xs.length );
+
 		for (Object x: value)
 		{
 			if ( x instanceof DMNode )
@@ -1145,6 +1151,11 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 			}
 		}
 		incr.onChanged();
+	
+		if ( commandTracker != null )
+		{
+			commandTracker.onSetContents( this, oldContents, newContents );
+		}
 	}
 
 
@@ -1174,11 +1185,13 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	// Trackable interface
 	//
 
+	@Override
 	public CommandTrackerFactory getTrackerFactory()
 	{
 		return DMListCommandTracker.factory;
 	}
 
+	@Override
 	public void setTracker(CommandTracker tracker)
 	{
 		commandTracker = (DMListCommandTracker)tracker;
@@ -1186,7 +1199,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	
 	public CommandHistory getCommandHistory()
 	{
-		return commandTracker.getCommandHistory();
+		return commandTracker != null  ?  commandTracker.getCommandHistory()  :  null;
 	}
 	
 	

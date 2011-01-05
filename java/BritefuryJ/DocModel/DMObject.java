@@ -570,9 +570,18 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 
 	protected void become(DMObjectClass cls, Object[] data)
 	{
-		Object oldFieldData[] = fieldData;
-		fieldData = new Object[data.length];
+		Object oldFieldData[] = new Object[fieldData.length];
+		System.arraycopy( fieldData, 0, oldFieldData, 0, fieldData.length );
+		
+		Object newData[] = new Object[data.length];
+		System.arraycopy( data, 0, newData, 0, data.length );
+
+		if ( fieldData.length != data.length )
+		{
+			fieldData = new Object[data.length];
+		}
 		System.arraycopy( data, 0, fieldData, 0, data.length );
+		
 		for (Object x: oldFieldData)
 		{
 			if ( x instanceof DMNode )
@@ -580,7 +589,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 				((DMNode)x).removeParent( this );
 			}
 		}
-		for (Object x: fieldData)
+		for (Object x: data)
 		{
 			if ( x instanceof DMNode )
 			{
@@ -592,7 +601,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 		incr.onChanged();
 		if ( commandTracker != null )
 		{
-			commandTracker.onBecome( this, oldClass, oldFieldData, cls, data );
+			commandTracker.onBecome( this, oldClass, oldFieldData, cls, newData );
 		}
 	}
 
@@ -746,11 +755,13 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	// Trackable interface
 	//
 	
+	@Override
 	public CommandTrackerFactory getTrackerFactory()
 	{
 		return DMObjectCommandTracker.factory;
 	}
 
+	@Override
 	public void setTracker(CommandTracker tracker)
 	{
 		commandTracker = (DMObjectCommandTracker)tracker;
@@ -758,7 +769,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	
 	public CommandHistory getCommandHistory()
 	{
-		return commandTracker.getCommandHistory();
+		return commandTracker != null  ?  commandTracker.getCommandHistory()  :  null;
 	}
 	
 	
