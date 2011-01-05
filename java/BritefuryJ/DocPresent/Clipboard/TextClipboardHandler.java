@@ -43,6 +43,7 @@ public abstract class TextClipboardHandler extends ClipboardHandler
 		}
 		else
 		{
+			caret.moveToStartOfNextItem();
 			insertText( caret.getMarker(), replacement );
 		}
 	}
@@ -105,6 +106,7 @@ public abstract class TextClipboardHandler extends ClipboardHandler
 				}
 				else
 				{
+					caret.moveToStartOfNextItem();
 					insertText( caret.getMarker(), data );
 				}
 			}

@@ -181,7 +181,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	
 	
 
-	private void insertAtMarker(Marker marker, Object data)
+	private void insertAtCaret(Caret caret, Object data)
 	{
 		StreamValue stream = null;
 		
@@ -201,19 +201,22 @@ public class SequentialClipboardHandler extends ClipboardHandler
 			
 		if ( stream != null )
 		{
-			GSymFragmentView insertionPointFragment = GSymFragmentView.getEnclosingFragment( marker.getElement(), editLevelFragmentFilter );
+			Marker caretMarker = caret.getMarker();
+			GSymFragmentView insertionPointFragment = GSymFragmentView.getEnclosingFragment( caretMarker.getElement(), editLevelFragmentFilter );
 			DPElement insertionPointElement = insertionPointFragment.getFragmentContentElement();
 			
 			// Get the item streams for the root element content, before and after the selected region
 			StreamValueVisitor visitor = new StreamValueVisitor();
-			StreamValue before = visitor.getStreamValueFromStartToMarker( insertionPointElement, marker );
-			StreamValue after = visitor.getStreamValueFromMarkerToEnd( insertionPointElement, marker );
+			StreamValue before = visitor.getStreamValueFromStartToMarker( insertionPointElement, caretMarker );
+			StreamValue after = visitor.getStreamValueFromMarkerToEnd( insertionPointElement, caretMarker );
 			
 			StreamValue joinedStream = joinStreamsForInsertion( insertionPointFragment, before, stream, after );
 			
 			// Store the joined stream in the structural value of the root element
 			SelectionEditTreeEvent event = createSelectionEditTreeEvent( insertionPointElement );
 			event.getStreamValueVisitor().setElementFixedValue( insertionPointElement, joinedStream );
+			// Move the caret to the start of the next item, to ensure that it is placed *after* the inserted content, once the insertion is done.
+			caret.moveToStartOfNextItem();
 			// Post a tree event
 			insertionPointElement.postTreeEvent( event );
 		};
@@ -334,10 +337,9 @@ public class SequentialClipboardHandler extends ClipboardHandler
 			// Paste
 			if ( selection.isEmpty() )
 			{
-				Marker caretMarker = caret.getMarker();
-				if ( caretMarker.isValid() )
+				if ( caret.isValid() )
 				{
-					insertAtMarker( caretMarker, data );
+					insertAtCaret( caret, data );
 					return true;
 				}
 				return false;

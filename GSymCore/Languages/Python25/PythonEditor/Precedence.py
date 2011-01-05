@@ -7,8 +7,6 @@
 ##-*************************
 from java.util import List
 
-from BritefuryJ.Transformation import DefaultIdentityTransformationFunction, Transformation, TransformationFunction
-
 from BritefuryJ.DocModel import DMObjectInterface, DMListInterface, DMClassAttribute
 
 from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod, dmObjectNodeMethodDispatch
