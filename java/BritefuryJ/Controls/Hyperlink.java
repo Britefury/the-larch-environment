@@ -115,6 +115,7 @@ public class Hyperlink extends ControlPres
 				return true;
 			}
 
+			@Override
 			public boolean buttonClicked(PointerInputElement element, PointerButtonClickedEvent event)
 			{
 				DPElement hyperlinkElement = (DPElement)element;
@@ -125,6 +126,7 @@ public class Hyperlink extends ControlPres
 					{
 						hyperlinkElement.closeContainingPopupChain();
 					}
+					return true;
 				}
 				
 				return false;

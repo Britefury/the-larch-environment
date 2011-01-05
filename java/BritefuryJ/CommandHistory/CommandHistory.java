@@ -330,7 +330,6 @@ public class CommandHistory implements CommandHistoryController, Presentable
 		tracker.track( t );
 	}
 
-	
 	public void stopTracking(Trackable t)
 	{
 		CommandTrackerFactory factory = t.getTrackerFactory();
@@ -339,6 +338,23 @@ public class CommandHistory implements CommandHistoryController, Presentable
 		
 		tracker.stopTracking( t );
 		t.setTracker( null );
+	}
+	
+	
+	public void track(Object x)
+	{
+		if ( x instanceof Trackable )
+		{
+			track( (Trackable)x );
+		}
+	}
+
+	public void stopTracking(Object x)
+	{
+		if ( x instanceof Trackable )
+		{
+			stopTracking( (Trackable)x );
+		}
 	}
 	
 	
