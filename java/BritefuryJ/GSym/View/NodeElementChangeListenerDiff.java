@@ -52,22 +52,25 @@ public class NodeElementChangeListenerDiff implements GSymView.NodeElementChange
 			DPElement nodeElement = node.getFragmentContentElement();
 			if ( nodeElement != null )
 			{
-				PresentationComponent.RootElement tree = nodeElement.getRootElement();
-				Caret caret = tree.getCaret();
-	
-				String text = nodeElement.getTextRepresentation();
-				int pos = -1;
-				
-				try
+				PresentationComponent.RootElement root = nodeElement.getRootElement();
+				if ( root != null )
 				{
-					pos = caret.getPositionInSubtree( nodeElement );
-					caretNode = node;
-					textRepresentation = text;
-					bias = caret.getBias();
-					position = pos;
-				}
-				catch (DPElement.IsNotInSubtreeException e)
-				{
+					Caret caret = root.getCaret();
+		
+					String text = nodeElement.getTextRepresentation();
+					int pos = -1;
+					
+					try
+					{
+						pos = caret.getPositionInSubtree( nodeElement );
+						caretNode = node;
+						textRepresentation = text;
+						bias = caret.getBias();
+						position = pos;
+					}
+					catch (DPElement.IsNotInSubtreeException e)
+					{
+					}
 				}
 			}
 		}
