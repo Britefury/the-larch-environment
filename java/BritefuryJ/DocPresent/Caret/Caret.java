@@ -349,4 +349,34 @@ public class Caret implements MarkerListener
 	{
 		marker.moveToPositionAndBiasWithinSubtree( subtree, newPosition, newBias, new DPContentLeaf.EditableLeafElementFilter() );
 	}
+
+
+	public void moveToStartOfNextItem()
+	{
+		if ( marker.getBias() == Marker.Bias.END )
+		{
+			DPContentLeafEditable leaf = marker.getElement();
+			
+			if ( leaf.isMarkerAtEnd( marker ) )
+			{
+				DPContentLeaf right = leaf.getContentLeafToRight();
+				
+				while ( right != null  &&  !right.isEditable() )
+				{
+					right = right.getContentLeafToRight();
+				}
+	
+				if ( right != null  &&  isElementWithinGrabSubtree( right ) )
+				{
+					DPContentLeafEditable editableRight = (DPContentLeafEditable)right;
+					editableRight.moveMarkerToStart( marker );
+				}
+			}
+			else
+			{
+				leaf.moveMarker( marker, marker.getIndex(), Marker.Bias.START );
+			}
+		}
+	}
+	
 }
