@@ -7,7 +7,7 @@
 ##-*************************
 
 
-gSymVersion = '0.1-alpha'
+gSymVersion = '0.1.3-alpha'
 
 
 

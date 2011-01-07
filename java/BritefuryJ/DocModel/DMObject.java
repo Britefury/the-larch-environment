@@ -24,8 +24,6 @@ import org.python.core.PyUnicode;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.CommandHistory.CommandHistory;
-import BritefuryJ.CommandHistory.CommandTracker;
-import BritefuryJ.CommandHistory.CommandTrackerFactory;
 import BritefuryJ.CommandHistory.Trackable;
 import BritefuryJ.DocModel.DMObjectClass.UnknownFieldNameException;
 import BritefuryJ.DocPresent.Combinators.Pres;
@@ -42,7 +40,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	private IncrementalValueMonitor incr;
 	private DMObjectClass objClass;
 	private Object fieldData[];
-	private DMObjectCommandTracker commandTracker;
+	private CommandHistory commandHistory = null;
 	
 	
 	
@@ -52,7 +50,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 		incr = new IncrementalValueMonitor( this );
 		this.objClass = null;
 		fieldData = new Object[0];
-		commandTracker = null;
 	}
 	
 	public DMObject(DMObjectClass objClass)
@@ -60,7 +57,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 		incr = new IncrementalValueMonitor( this );
 		this.objClass = objClass;
 		fieldData = new Object[objClass.getNumFields()];
-		commandTracker = null;
 	}
 	
 	public DMObject(DMObjectClass objClass, Object values[])
@@ -79,8 +75,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			}
 			fieldData[i] = coerce( x );
 		}
-
-		commandTracker = null;
 	}
 	
 	public DMObject(DMObjectClass objClass, PyObject values[])
@@ -99,8 +93,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			}
 			fieldData[i] = x;
 		}
-
-		commandTracker = null;
 	}
 	
 	public DMObject(DMObjectClass objClass, String[] keys, Object[] values)
@@ -128,8 +120,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 				fieldData[index] = x;
 			}
 		}
-
-		commandTracker = null;
 	}
 
 	public DMObject(DMObjectClass objClass, String[] names, PyObject[] values)
@@ -157,8 +147,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 				fieldData[index] = x;
 			}
 		}
-
-		commandTracker = null;
 	}
 	
 	public DMObject(DMObjectInterface obj)
@@ -176,8 +164,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			}
 			fieldData[i] = x;
 		}
-
-		commandTracker = null;
 	}
 
 	public DMObject(PyObject values[])
@@ -196,8 +182,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			}
 			fieldData[i] = x;
 		}
-
-		commandTracker = null;
 	}
 
 	public DMObject(PyObject values[], String names[])
@@ -207,7 +191,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			incr = new IncrementalValueMonitor( this );
 			this.objClass = null;
 			fieldData = new Object[0];
-			commandTracker = null;
 		}
 		else
 		{
@@ -237,8 +220,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 					fieldData[index] = x;
 				}
 			}
-
-			commandTracker = null;
 		}
 	}
 
@@ -265,8 +246,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 				fieldData[index] = x;
 			}
 		}
-
-		commandTracker = null;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -306,8 +285,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 				fieldData[index] = x;
 			}
 		}
-
-		commandTracker = null;
 	}
 	
 	
@@ -434,10 +411,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			}
 		}
 		incr.onChanged();
-		if ( commandTracker != null )
-		{
-			commandTracker.onSet( this, index, oldX, x );
-		}
+		DMObjectCommandTracker.onSet( commandHistory, this, index, oldX, x );
 	}
 	
 	public void set(String key, Object x)
@@ -514,10 +488,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			}
 		}
 		incr.onChanged();
-		if ( commandTracker != null )
-		{
-			commandTracker.onUpdate( this, indices, oldContents, newContents );
-		}
+		DMObjectCommandTracker.onUpdate( commandHistory, this, indices, oldContents, newContents );
 	}
 
 	protected void update(int indices[], Object xs[])
@@ -547,10 +518,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			fieldData[index] = x;
 		}
 		incr.onChanged();
-		if ( commandTracker != null )
-		{
-			commandTracker.onUpdate( this, indices, oldContents, newContents );
-		}
+		DMObjectCommandTracker.onUpdate( commandHistory, this, indices, oldContents, newContents );
 	}
 
 	
@@ -599,10 +567,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 		DMObjectClass oldClass = objClass;
 		objClass = cls;
 		incr.onChanged();
-		if ( commandTracker != null )
-		{
-			commandTracker.onBecome( this, oldClass, oldFieldData, cls, newData );
-		}
+		DMObjectCommandTracker.onBecome( commandHistory, this, oldClass, oldFieldData, cls, newData );
 	}
 
 	
@@ -756,20 +721,34 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	//
 	
 	@Override
-	public CommandTrackerFactory getTrackerFactory()
+	public void setCommandHistory(CommandHistory h)
 	{
-		return DMObjectCommandTracker.factory;
+		commandHistory = h;
+	}
+	
+	@Override
+	public CommandHistory getCommandHistory()
+	{
+		return commandHistory;
+	}
+	
+	
+	@Override
+	public void trackContents(CommandHistory history)
+	{
+		for (Object x: getFieldValuesImmutable())
+		{
+			history.track( x );
+		}
 	}
 
 	@Override
-	public void setTracker(CommandTracker tracker)
+	public void stopTrackingContents(CommandHistory history)
 	{
-		commandTracker = (DMObjectCommandTracker)tracker;
-	}
-	
-	public CommandHistory getCommandHistory()
-	{
-		return commandTracker != null  ?  commandTracker.getCommandHistory()  :  null;
+		for (Object x: getFieldValuesImmutable())
+		{
+			history.stopTracking( x );
+		}
 	}
 	
 	
@@ -834,7 +813,8 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 		
 		incr = new IncrementalValueMonitor( this );
 		incr.onChanged();
-		commandTracker = null;
+		
+		commandHistory = null;
 	}
 	
 	private void writeObject(ObjectOutputStream stream) throws IOException
