@@ -316,12 +316,12 @@ public class CommandHistory implements CommandHistoryController, Presentable
 	public void track(Trackable t)
 	{
 		CommandHistory h = t.getCommandHistory();
-		if ( h == null  ||  h == this )
+		if ( h == null )
 		{
 			t.setCommandHistory( this );
 			t.trackContents( this );
 		}
-		else
+		else if ( h != this )
 		{
 			throw new RuntimeException( "Trackable object is already being tracked by a different command history" );
 		}
