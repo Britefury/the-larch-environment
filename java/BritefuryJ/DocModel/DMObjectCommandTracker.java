@@ -8,11 +8,8 @@ package BritefuryJ.DocModel;
 
 import BritefuryJ.CommandHistory.Command;
 import BritefuryJ.CommandHistory.CommandHistory;
-import BritefuryJ.CommandHistory.CommandTracker;
-import BritefuryJ.CommandHistory.CommandTrackerFactory;
-import BritefuryJ.CommandHistory.Trackable;
 
-public class DMObjectCommandTracker extends CommandTracker
+public class DMObjectCommandTracker
 {
 	private static class SetCommand extends Command
 	{
@@ -119,77 +116,45 @@ public class DMObjectCommandTracker extends CommandTracker
 	
 	
 	
-	public DMObjectCommandTracker(CommandHistory commandHistory)
+	protected static void onSet(CommandHistory commandHistory, DMObject obj, int i, Object oldX, Object x)
 	{
-		super( commandHistory );
-	}
-	
-	
-	
-	protected void track(Trackable t)
-	{
-		super.track( t );
-		
-		DMObject obj = (DMObject)t;
-		for (Object x: obj.getFieldValuesImmutable())
-		{
-			commandHistory.track( x );
-		}
-	}
-	
-	protected void stopTracking(Trackable t)
-	{
-		DMObject obj = (DMObject)t;
-		for (Object x: obj.getFieldValuesImmutable())
-		{
-			commandHistory.stopTracking( x );
-		}
-
-		super.stopTracking( t );
-	}
-
-	
-	
-	protected void onSet(DMObject obj, int i, Object oldX, Object x)
-	{
-		commandHistory.track( x );
-		commandHistory.addCommand( new SetCommand( obj, i, oldX, x ) );
-		commandHistory.stopTracking( oldX );
-	}
-
-	protected void onUpdate(DMObject obj, int[] indices, Object[] oldContents, Object[] newContents)
-	{
-		for (Object x: newContents)
-		{
-			commandHistory.track( x );
-		}
-		commandHistory.addCommand( new UpdateCommand( obj, indices, oldContents, newContents ) );
-		for (Object oldX: oldContents)
+		if ( commandHistory != null )
 		{
 			commandHistory.stopTracking( oldX );
-		}
-	}
-	
-	protected void onBecome(DMObject obj, DMObjectClass oldClass, Object oldFieldData[], DMObjectClass newClass, Object newFieldData[])
-	{
-		for (Object x: newFieldData)
-		{
+			commandHistory.addCommand( new SetCommand( obj, i, oldX, x ) );
 			commandHistory.track( x );
 		}
-		commandHistory.addCommand( new BecomeCommand( obj, oldClass, oldFieldData, newClass, newFieldData ) );
-		for (Object oldX: oldFieldData)
+	}
+
+	protected static void onUpdate(CommandHistory commandHistory, DMObject obj, int[] indices, Object[] oldContents, Object[] newContents)
+	{
+		if ( commandHistory != null )
 		{
-			commandHistory.stopTracking( oldX );
+			for (Object oldX: oldContents)
+			{
+				commandHistory.stopTracking( oldX );
+			}
+			commandHistory.addCommand( new UpdateCommand( obj, indices, oldContents, newContents ) );
+			for (Object x: newContents)
+			{
+				commandHistory.track( x );
+			}
 		}
 	}
 	
-	
-	public static CommandTrackerFactory factory = new CommandTrackerFactory()
+	protected static void onBecome(CommandHistory commandHistory, DMObject obj, DMObjectClass oldClass, Object oldFieldData[], DMObjectClass newClass, Object newFieldData[])
 	{
-		@Override
-		public CommandTracker createTracker(CommandHistory history)
+		if ( commandHistory != null )
 		{
-			return new DMObjectCommandTracker( history );
+			for (Object oldX: oldFieldData)
+			{
+				commandHistory.stopTracking( oldX );
+			}
+			commandHistory.addCommand( new BecomeCommand( obj, oldClass, oldFieldData, newClass, newFieldData ) );
+			for (Object x: newFieldData)
+			{
+				commandHistory.track( x );
+			}
 		}
-	};
+	}
 }

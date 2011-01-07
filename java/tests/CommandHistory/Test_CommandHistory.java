@@ -9,8 +9,6 @@ package tests.CommandHistory;
 import junit.framework.TestCase;
 import BritefuryJ.CommandHistory.Command;
 import BritefuryJ.CommandHistory.CommandHistory;
-import BritefuryJ.CommandHistory.CommandTracker;
-import BritefuryJ.CommandHistory.CommandTrackerFactory;
 import BritefuryJ.CommandHistory.Trackable;
 
 public class Test_CommandHistory extends TestCase
@@ -89,39 +87,29 @@ public class Test_CommandHistory extends TestCase
 		}
 	}
 	
-	private static class DataCommandTracker extends CommandTracker
+	private static class DataCommandTracker
 	{
-		public DataCommandTracker(CommandHistory commandHistory)
+		protected static void onX(CommandHistory commandHistory, Data d, int oldX, int x)
 		{
-			super( commandHistory );
-		}
-		
-		
-		protected void onX(Data d, int oldX, int x)
-		{
-			commandHistory.addCommand( new DataXCommand( d, oldX, x ) );
-		}
-
-		protected void onY(Data d, int oldY, int y)
-		{
-			commandHistory.addCommand( new DataYCommand( d, oldY, y ) );
-		}
-
-		
-		private static CommandTrackerFactory factory = new CommandTrackerFactory()
-		{
-			@Override
-			public CommandTracker createTracker(CommandHistory history)
+			if ( commandHistory != null )
 			{
-				return new DataCommandTracker( history );
+				commandHistory.addCommand( new DataXCommand( d, oldX, x ) );
 			}
-		};
+		}
+
+		protected static void onY(CommandHistory commandHistory, Data d, int oldY, int y)
+		{
+			if ( commandHistory != null )
+			{
+				commandHistory.addCommand( new DataYCommand( d, oldY, y ) );
+			}
+		}
 	}
 	
 	private static class Data implements Trackable
 	{
 		private int x, y;
-		DataCommandTracker tracker;
+		CommandHistory commandHistory;
 		
 		
 		public Data(int x, int y)
@@ -141,10 +129,7 @@ public class Test_CommandHistory extends TestCase
 			int oldX = this.x;
 			this.x = x;
 			
-			if ( tracker != null )
-			{
-				tracker.onX( this, oldX, x );
-			}
+			DataCommandTracker.onX( commandHistory, this, oldX, x );
 		}
 
 
@@ -158,26 +143,31 @@ public class Test_CommandHistory extends TestCase
 			int oldY = this.y;
 			this.y = y;
 			
-			if ( tracker != null )
-			{
-				tracker.onY( this, oldY, y );
-			}
+			DataCommandTracker.onY( commandHistory, this, oldY, y );
 		}
 
-
-		public CommandTrackerFactory getTrackerFactory()
-		{
-			return DataCommandTracker.factory;
-		}
-
-		public void setTracker(CommandTracker tracker)
-		{
-			this.tracker = (DataCommandTracker)tracker;
-		}
 		
+		@Override
 		public CommandHistory getCommandHistory()
 		{
-			return tracker.getCommandHistory();
+			return commandHistory;
+		}
+
+		@Override
+		public void setCommandHistory(CommandHistory h)
+		{
+			commandHistory = h;
+		}
+
+		
+		@Override
+		public void trackContents(CommandHistory history)
+		{
+		}
+		
+		@Override
+		public void stopTrackingContents(CommandHistory history)
+		{
 		}
 	}
 	

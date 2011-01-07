@@ -25,8 +25,6 @@ import org.python.core.PySlice;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.CommandHistory.CommandHistory;
-import BritefuryJ.CommandHistory.CommandTracker;
-import BritefuryJ.CommandHistory.CommandTrackerFactory;
 import BritefuryJ.CommandHistory.Trackable;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
@@ -362,7 +360,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	
 	private IncrementalValueMonitor incr;
 	ArrayList<Object> value;
-	private DMListCommandTracker commandTracker;
+	private CommandHistory commandHistory;
 	
 	
 	public DMList()
@@ -388,8 +386,6 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 				value.add( x );
 			}
 		}
-		
-		commandTracker = null;
 	}
 	
 	
@@ -469,10 +465,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		}
 		boolean bResult = value.add( x );
 		incr.onChanged();
-		if ( commandTracker != null )
-		{
-			commandTracker.onAdd( this, x );
-		}
+		DMListCommandTracker.onAdd( commandHistory, this, x );
 		return bResult;
 	}
 	
@@ -485,10 +478,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		}
 		value.add( index, x );
 		incr.onChanged();
-		if ( commandTracker != null )
-		{
-			commandTracker.onInsert( this, index, x );
-		}
+		DMListCommandTracker.onInsert( commandHistory, this, index, x );
 	}
 	
 	public boolean addAll(Collection<?> xs)
@@ -507,10 +497,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		
 		value.addAll( cxs );
 		incr.onChanged();
-		if ( commandTracker != null )
-		{
-			commandTracker.onAddAll( this, cxs );
-		}
+		DMListCommandTracker.onAddAll( commandHistory, this, cxs );
 		return true;
 	}
 	
@@ -530,10 +517,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		
 		value.addAll( index, cxs );
 		incr.onChanged();
-		if ( commandTracker != null )
-		{
-			commandTracker.onInsertAll( this, index, cxs );
-		}
+		DMListCommandTracker.onInsertAll( commandHistory, this, index, cxs );
 		return true;
 	}
 	
@@ -552,10 +536,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 				((DMNode)x).removeParent( this );
 			}
 		}
-		if ( commandTracker != null )
-		{
-			commandTracker.onClear( this, copy );
-		}
+		DMListCommandTracker.onClear( commandHistory, this, copy );
 	}
 	
 	
@@ -662,10 +643,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 			((DMNode)x).removeParent( this );
 		}
 		incr.onChanged();
-		if ( commandTracker != null )
-		{
-			commandTracker.onRemove( this, i, x );
-		}
+		DMListCommandTracker.onRemove( commandHistory, this, i, x );
 		return x;
 	}
 	
@@ -680,10 +658,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 				((DMNode)x).removeParent( this );
 			}
 			incr.onChanged();
-			if ( commandTracker != null )
-			{
-				commandTracker.onRemove( this, i, x );
-			}
+			DMListCommandTracker.onRemove( commandHistory, this, i, x );
 		}
 		return i != -1;
 	}
@@ -714,10 +689,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 			}
 		}
 		incr.onChanged();
-		if ( commandTracker != null )
-		{
-			commandTracker.onSet( this, index, oldX, x );
-		}
+		DMListCommandTracker.onSet( commandHistory, this, index, oldX, x );
 		return oldX;
 	}
 	
@@ -832,10 +804,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 			}
 		}
 		incr.onChanged();
-		if ( commandTracker != null )
-		{
-			commandTracker.onSetContents( this, oldContents, result );
-		}
+		DMListCommandTracker.onSetContents( commandHistory, this, oldContents, result );
 	}
 	
 	public void __delitem__(int i)
@@ -869,10 +838,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 			}
 		}
 		incr.onChanged();
-		if ( commandTracker != null )
-		{
-			commandTracker.onSetContents( this, oldContents, result );
-		}
+		DMListCommandTracker.onSetContents( commandHistory, this, oldContents, result );
 	}
 	
 	public Object pop()
@@ -1082,10 +1048,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		}
 		incr.onChanged();
 	
-		if ( commandTracker != null )
-		{
-			commandTracker.onRemoveLast( this, removedValues );
-		}
+		DMListCommandTracker.onRemoveLast( commandHistory, this, removedValues );
 	}
 
 
@@ -1104,10 +1067,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		}
 		incr.onChanged();
 		
-		if ( commandTracker != null )
-		{
-			commandTracker.onRemoveRange( this, start, removedValues );
-		}
+		DMListCommandTracker.onRemoveRange( commandHistory, this, start, removedValues );
 	}
 
 
@@ -1152,10 +1112,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		}
 		incr.onChanged();
 	
-		if ( commandTracker != null )
-		{
-			commandTracker.onSetContents( this, oldContents, newContents );
-		}
+		DMListCommandTracker.onSetContents( commandHistory, this, oldContents, newContents );
 	}
 
 
@@ -1186,22 +1143,35 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	//
 
 	@Override
-	public CommandTrackerFactory getTrackerFactory()
+	public void setCommandHistory(CommandHistory h)
 	{
-		return DMListCommandTracker.factory;
+		commandHistory = h;
+	}
+	
+	@Override
+	public CommandHistory getCommandHistory()
+	{
+		return commandHistory;
+	}
+	
+	
+	@Override
+	public void trackContents(CommandHistory history)
+	{
+		for (Object x: this)
+		{
+			history.track( x );
+		}
 	}
 
 	@Override
-	public void setTracker(CommandTracker tracker)
+	public void stopTrackingContents(CommandHistory history)
 	{
-		commandTracker = (DMListCommandTracker)tracker;
+		for (Object x: this)
+		{
+			history.stopTracking( x );
+		}
 	}
-	
-	public CommandHistory getCommandHistory()
-	{
-		return commandTracker != null  ?  commandTracker.getCommandHistory()  :  null;
-	}
-	
 	
 	
 	
@@ -1223,7 +1193,7 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		}
 		incr.onChanged();
 		
-		commandTracker = null;
+		commandHistory = null;
 	}
 	
 	private void writeObject(ObjectOutputStream stream) throws IOException

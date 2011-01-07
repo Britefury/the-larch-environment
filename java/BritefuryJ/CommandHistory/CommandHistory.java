@@ -8,7 +8,6 @@ package BritefuryJ.CommandHistory;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Border.SolidBorder;
@@ -133,7 +132,6 @@ public class CommandHistory implements CommandHistoryController, Presentable
 	
 	
 	private ArrayList<Entry> past, future;
-	private HashMap<CommandTrackerFactory, CommandTracker> trackers;
 	private boolean bCommandsBlocked, bFrozen;
 	private int freezeCount;
 	private CommandHistoryListener listener;
@@ -151,7 +149,6 @@ public class CommandHistory implements CommandHistoryController, Presentable
 	{
 		past = new ArrayList<Entry>();
 		future = new ArrayList<Entry>();
-		trackers = new HashMap<CommandTrackerFactory, CommandTracker>();
 		bCommandsBlocked = false;
 		bFrozen = false;
 		freezeCount = 0;
@@ -318,32 +315,28 @@ public class CommandHistory implements CommandHistoryController, Presentable
 	
 	public void track(Trackable t)
 	{
-		CommandTrackerFactory factory = t.getTrackerFactory();
-		CommandTracker tracker = trackers.get( factory );
-		if ( tracker == null )
+		CommandHistory h = t.getCommandHistory();
+		if ( h == null  ||  h == this )
 		{
-			tracker = factory.createTracker( this );
-			trackers.put( factory, tracker );
+			t.setCommandHistory( this );
+			t.trackContents( this );
 		}
-		
-		t.setTracker( tracker );
-		tracker.track( t );
+		else
+		{
+			throw new RuntimeException( "Trackable object is already being tracked by a different command history" );
+		}
 	}
 
 	public void stopTracking(Trackable t)
 	{
-		CommandTrackerFactory factory = t.getTrackerFactory();
-		CommandTracker tracker = trackers.get( factory );
-		assert tracker != null;
-		
-		tracker.stopTracking( t );
-		t.setTracker( null );
+		t.stopTrackingContents( this );
+		t.setCommandHistory( null );
 	}
 	
 	
 	public void track(Object x)
 	{
-		if ( x instanceof Trackable )
+		if ( x != null  &&  x instanceof Trackable )
 		{
 			track( (Trackable)x );
 		}
@@ -351,7 +344,7 @@ public class CommandHistory implements CommandHistoryController, Presentable
 
 	public void stopTracking(Object x)
 	{
-		if ( x instanceof Trackable )
+		if ( x != null  &&  x instanceof Trackable )
 		{
 			stopTracking( (Trackable)x );
 		}
