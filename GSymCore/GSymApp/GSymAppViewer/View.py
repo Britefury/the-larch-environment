@@ -108,17 +108,17 @@ def _contentsList(controls, contentsLists, title):
 						
 class AppView (GSymViewObjectDispatch):
 	@ObjectDispatchMethod( Application.AppState )
-	def AppState(self, ctx, state, node):
+	def AppState(self, fragment, state, node):
 		def _onNewDoc(link, event):
 			def handleNewDocumentFn(document):
 				name = _newDocumentName( openDocuments )
 				document.setDocumentName( name )
 				
-				appDoc = node.registerOpenDocument( document )
+				appDoc = node.registerOpenDocument( document, fragment.getSubjectContext()['location'].getLocationString() + '.documents' )
 				
 			element = link.getElement()
 			openDocuments = node.getOpenDocuments()
-			DocumentManagement.promptNewDocument( ctx.getSubjectContext()['world'], element, handleNewDocumentFn )
+			DocumentManagement.promptNewDocument( fragment.getSubjectContext()['world'], element, handleNewDocumentFn )
 			
 			return True
 		
@@ -130,11 +130,11 @@ class AppView (GSymViewObjectDispatch):
 				documentName, ext = os.path.splitext( documentName )
 				
 				document.setDocumentName( documentName )
-				appDoc = node.registerOpenDocument( document )
+				appDoc = node.registerOpenDocument( document, fragment.getSubjectContext()['location'].getLocationString() + '.documents' )
 
 				
 			element = link.getElement()
-			DocumentManagement.promptOpenDocument( ctx.getSubjectContext()['world'], element.getRootElement().getComponent(), handleOpenedDocumentFn )
+			DocumentManagement.promptOpenDocument( fragment.getSubjectContext()['world'], element.getRootElement().getComponent(), handleOpenedDocumentFn )
 			
 			return True
 
@@ -174,10 +174,10 @@ class AppView (GSymViewObjectDispatch):
 
 
 	@ObjectDispatchMethod( Application.AppDocument )
-	def AppDocument(self, ctx, state, node):
+	def AppDocument(self, fragment, state, node):
 		def _onSave(link, event):
 			element = link.getElement()
-			world = ctx.getSubjectContext()['world']
+			world = fragment.getSubjectContext()['world']
 			document = node.getDocument()
 			
 			if document.hasFilename():
@@ -191,7 +191,7 @@ class AppView (GSymViewObjectDispatch):
 		
 		def _onSaveAs(link, event):
 			element = link.getElement()
-			world = ctx.getSubjectContext()['world']
+			world = fragment.getSubjectContext()['world']
 			document = node.getDocument()
 			
 			def handleSaveDocumentAsFn(filename):
@@ -201,10 +201,11 @@ class AppView (GSymViewObjectDispatch):
 
 			
 		name = node.getName()
-		location = node.getLocation()
+		relLocation = node.getRelativeLocation()
 			
 		
-		docLink = Hyperlink( name, Location( 'main.documents.' + location ) ).padX( 0.0, _appDocRightPadding )
+		location = fragment.getSubjectContext()['location'] + '.documents.' + relLocation
+		docLink = Hyperlink( name, location ).padX( 0.0, _appDocRightPadding )
 		saveLink = Hyperlink( 'SAVE', _onSave )
 		saveAsLink = Hyperlink( 'SAVE AS', _onSaveAs )
 	
@@ -213,10 +214,10 @@ class AppView (GSymViewObjectDispatch):
 
 
 	@ObjectDispatchMethod( Application.AppConsole )
-	def AppConsole(self, ctx, state, node):
+	def AppConsole(self, fragment, state, node):
 		index = node.getIndex()
 		name = 'Console %d'  %  ( index, )
-		location = Location( 'main.consoles[%d]'  %  ( index, ) )
+		location = fragment.getSubjectContext()['location'] + '.consoles[%d]'  %  ( index, )
 		consoleLink = Hyperlink( name, location ).padX( 0.0, _appDocRightPadding )
 	
 		return GridRow( [ consoleLink ] )

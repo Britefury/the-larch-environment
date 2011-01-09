@@ -28,12 +28,15 @@ class AppState (IncrementalOwner):
 		self._incr.onAccess()
 		return copy( self._openDocuments )
 	
-	def registerOpenDocument(self, gsymDocument):
-		location = 'Doc%03d'  %  ( self._documentIDCounter, )
+	def registerOpenDocument(self, gsymDocument, documentCollectionLocation):
+		relativeLocation = 'Doc%03d'  %  ( self._documentIDCounter, )
+		location = Location( documentCollectionLocation + '.' + relativeLocation )
 		self._documentIDCounter += 1
-		appDocument = AppDocument( gsymDocument, location )
+		appDocument = AppDocument( gsymDocument, relativeLocation )
+		gsymDocument.setLocation( location )
 		self._openDocuments.append( appDocument )
 		self._incr.onChanged()
+		return appDocument
 		
 		
 	def hasUnsavedData(self):
@@ -55,11 +58,11 @@ class AppState (IncrementalOwner):
 		
 	
 class AppDocument (IncrementalOwner):
-	def __init__(self, doc, location):
+	def __init__(self, doc, relativeLocation):
 		self._incr = IncrementalValueMonitor( self )
 		
 		self._doc = doc
-		self._location = location
+		self._relativeLocation = relativeLocation
 		
 		
 		
@@ -71,9 +74,9 @@ class AppDocument (IncrementalOwner):
 		self._incr.onAccess()
 		return self._doc
 	
-	def getLocation(self):
+	def getRelativeLocation(self):
 		self._incr.onAccess()
-		return self._location
+		return self._relativeLocation
 	
 	
 	def hasUnsavedData(self):

@@ -83,6 +83,7 @@ class GSymDocument (CommandHistoryListener):
 		self._commandHistory.track( self._unit )
 		self._commandHistory.setCommandHistoryListener( self )
 		self._docName = ''
+		self._location = None
 		
 		self._bHasUnsavedData = True
 		self._filename = None
@@ -116,6 +117,16 @@ class GSymDocument (CommandHistoryListener):
 	def setDocumentName(self, name):
 		self._docName = name
 		
+		
+	def setLocation(self, location):
+		self._location = location
+	
+	def getLocation(self):
+		return self._location
+	
+	def relativeToAbsoluteLocation(self, relativeLocation):
+		return self._location + relativeLocation
+	
 		
 	def getCommandHistory(self):
 		return self._commandHistory
