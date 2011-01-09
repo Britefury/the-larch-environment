@@ -40,18 +40,19 @@ class _DocumentListSubject (object):
 		self._enclosingSubject = enclosingSubject
 		
 		
-	def __getattr__(self, location):
+	def __getattr__(self, relativeLocation):
 		for appDocument in self._appState.getOpenDocuments():
-			if appDocument.getLocation() == location:
+			if appDocument.getRelativeLocation() == relativeLocation:
 				doc = appDocument.getDocument()
-				return doc.newSubject( self._enclosingSubject, 'main.documents.' + location )
+				return doc.newSubject( self._enclosingSubject, self._enclosingSubject._rootLocation.getLocationString() + '.documents.' + relativeLocation )
 		raise AttributeError, 'no document at %s'  %  ( location, )
 		
 
 class GSymAppSubject (GSymSubject):
-	def __init__(self, appState, world):
+	def __init__(self, appState, world, rootLocation):
 		self._appState = appState
 		self._world = world
+		self._rootLocation = rootLocation
 		self.consoles = _ConsoleListSubject( self._appState, self )
 		self.documents = _DocumentListSubject( self._appState, self )
 
@@ -66,7 +67,7 @@ class GSymAppSubject (GSymSubject):
 		return 'gSym'
 	
 	def getSubjectContext(self):
-		return SimpleAttributeTable.instance.withAttrs( world=self._world, document=None, documentLocation=None, location=Location( 'main' ) )
+		return SimpleAttributeTable.instance.withAttrs( world=self._world, document=None, documentLocation=None, location=self._rootLocation )
 	
 	def getCommandHistory(self):
 		return None
@@ -79,7 +80,7 @@ class GSymAppSubject (GSymSubject):
 			documentName, ext = os.path.splitext( documentName )
 			
 			document.setDocumentName( documentName )
-			appDoc = self._appState.registerOpenDocument( document )
+			self._appState.registerOpenDocument( document, self._rootLocation.getLocationString() + '.documents' )
 			return True
 		return False
 		
@@ -88,7 +89,7 @@ class GSymAppSubject (GSymSubject):
 	def find_module(self, fullname, path, world):
 		for appDocument in self._appState.getOpenDocuments():
 			doc = appDocument.getDocument()
-			subject = doc.newSubject( self, 'main.documents.' + appDocument.getLocation() )
+			subject = doc.newSubject( self, self._rootLocation.getLocationString() + '.documents.' + appDocument.getRelativeLocation() )
 			try:
 				f = subject.find_module
 			except AttributeError:

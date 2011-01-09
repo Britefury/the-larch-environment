@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
+from BritefuryJ.DocPresent.Browser import Location
+
 from GSymCore.GSymApp.GSymAppViewer.View import perspective as gSymAppViewerPerspective
 from GSymCore.GSymApp.GSymAppViewer.Subject import GSymAppSubject
 from GSymCore.GSymApp import Application
@@ -14,7 +16,7 @@ def newAppState():
 	return Application.AppState()
 
 def newAppStateSubject(world):
-	return GSymAppSubject( newAppState(), world )
+	return GSymAppSubject( newAppState(), world, Location( 'main' ) )
 
 
 

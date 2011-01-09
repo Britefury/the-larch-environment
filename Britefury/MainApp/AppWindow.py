@@ -36,9 +36,6 @@ from BritefuryJ.DocPresent.StyleParams import *
 from Britefury.Kernel.Abstract import abstractmethod
 
 
-from Britefury.Event.QueuedEvent import queueEvent
-
-
 from Britefury.gSym.gSymWorld import GSymWorld
 from Britefury.gSym.gSymDocument import GSymDocument
 
