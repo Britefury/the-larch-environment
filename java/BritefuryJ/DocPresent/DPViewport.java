@@ -406,7 +406,50 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 	private void applyLocalSpaceXform(Xform2 x)
 	{
 		allocationSpaceToLocalSpace = allocationSpaceToLocalSpace.concat( x );
+		clampXform( allocationSpaceToLocalSpace );
 		onXformModified();
+	}
+	
+	
+	private void clampXform(Xform2 allocToLocal)
+	{
+		DPElement child = getChild();
+
+		double scale = allocToLocal.scale;
+		Xform2 localToAlloc = allocToLocal.inverse();
+		Point2 topLeftInAlloc = localToAlloc.transform( new Point2() );
+		Point2 bottomRightInAlloc = localToAlloc.transform( new Point2( getWidth(), getHeight() ) );
+		
+		Vector2 allocSize = new Vector2( child != null  ?  child.getWidth()  :  1.0,  child != null  ?  child.getHeight() : 1.0 );
+		Vector2 viewportSizeInAlloc = bottomRightInAlloc.sub( topLeftInAlloc );
+		
+		if ( viewportSizeInAlloc.x > allocSize.x )
+		{
+			// Viewport wider than contents
+			allocToLocal.translation.x = 0.0;
+		}
+		else if ( topLeftInAlloc.x < 0.0 )
+		{
+			allocToLocal.translation.x = 0.0;
+		}
+		else if ( bottomRightInAlloc.x > allocSize.x )
+		{
+			allocToLocal.translation.x = ( viewportSizeInAlloc.x - allocSize.x ) * scale;
+		}
+		
+		if ( viewportSizeInAlloc.y > allocSize.y )
+		{
+			// Viewport higher than contents
+			allocToLocal.translation.y = 0.0;
+		}
+		else if ( topLeftInAlloc.y < 0.0 )
+		{
+			allocToLocal.translation.y = 0.0;
+		}
+		else if ( bottomRightInAlloc.y > allocSize.y )
+		{
+			allocToLocal.translation.y = ( viewportSizeInAlloc.y - allocSize.y ) * scale;
+		}
 	}
 	
 	
