@@ -94,7 +94,7 @@ class PythonEditorStyle (object):
 
 	defStmtHighlightColour = InheritedAttributeNonNull( pythonEditor, 'defStmtHighlightColour', Color, Color( 0.420, 0.620, 0.522 ) )
 	classStmtHighlightColour = InheritedAttributeNonNull( pythonEditor, 'classStmtHighlightColour', Color, Color( 0.522, 0.420, 0.620 ) )
-	badIndentationHighlightColour = InheritedAttributeNonNull( pythonEditor, 'badIndentationHighlightColour', Color, Color.red )
+	badIndentationRectanglePainter = InheritedAttributeNonNull( pythonEditor, 'badIndentationRectanglePainter', Painter, FilledOutlinePainter( lerpColour( Color.RED, Color.WHITE, 0.75 ), lerpColour( Color.RED, Color.WHITE, 0.5 ) ) )
 
 	comprehensionSpacing = InheritedAttributeNonNull( pythonEditor, 'comprehensionSpacing', float, 15.0 )
 	conditionalSpacing = InheritedAttributeNonNull( pythonEditor, 'conditionalSpacing', float, 15.0 )
@@ -122,9 +122,9 @@ class PythonEditorStyle (object):
 		return style.withAttr( Primitive.border, border )
 
 	@PyDerivedValueTable( pythonEditor )
-	def _badIndentationHighlightStyle(style):
-		border = _outlineHighlightBorder( style, style.get( PythonEditorStyle.badIndentationHighlightColour ) )
-		return style.withAttr( Primitive.border, border )
+	def _badIndentationRectangleStyle(style):
+		painter = style.get( PythonEditorStyle.badIndentationRectanglePainter )
+		return style.withAttr( Primitive.shapePainter, painter )
 
 
 
@@ -934,9 +934,13 @@ def compoundStmt(components):
 #
 
 @PyPresCombinatorFn
-def badIndentation(ctx, style, child):
-	badIndentationStyle = PythonEditorStyle._badIndentationHighlightStyle.get( style )
-	return badIndentationStyle.applyTo( Border( child ) ).present( ctx, style )
+def badIndentedBlock(ctx, style, indentElement, lines, dedentElement):
+	rectStyle = PythonEditorStyle._badIndentationRectangleStyle.get( style )
+	blockIndentation = style.get( PythonEditorStyle.blockIndentation )
+	
+	block = Column( [ indentElement ]  +  lines  +  [ dedentElement ] )
+
+	return Row( [ rectStyle.applyTo( Box( blockIndentation, 0.0 ).alignVExpand() ), block ] ).present( ctx, style )
 
 def statementLine(statement):
 	segment = Segment( statement )
