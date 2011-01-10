@@ -39,7 +39,7 @@ public class Controls
 	
 	
 	public static final InheritedAttributeNonNull hyperlinkAttrs = new InheritedAttributeNonNull( controlsNamespace, "hyperlinkAttrs", StyleSheet.class,
-			StyleSheet.instance.withAttr( Primitive.editable, false ).withAttr( Primitive.fontFace, "Sans serif" ).withAttr( Primitive.foreground, Color.blue )
+			StyleSheet.instance.withAttr( Primitive.editable, false ).withAttr( Primitive.foreground, Color.blue )
 			.withAttr( Primitive.hoverForeground, Color.red ).withAttr( Primitive.cursor, new Cursor( Cursor.HAND_CURSOR ) ) );
 
 	

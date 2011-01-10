@@ -107,7 +107,29 @@ public class Xform2 implements Cloneable, Serializable
 	{
 		return new AABox2( transform( b.getLower() ), transform( b.getUpper() ) );
 	}
+
 	
+	public double transformPointX(double x)
+	{
+		return x * scale + translation.x;
+	}
+	
+	public double transformPointY(double y)
+	{
+		return y * scale + translation.y;
+	}
+
+	public double transformVectorX(double x)
+	{
+		return x * scale;
+	}
+	
+	public double transformVectorY(double y)
+	{
+		return y * scale;
+	}
+
+
 	
 	public double scale(double x)
 	{
