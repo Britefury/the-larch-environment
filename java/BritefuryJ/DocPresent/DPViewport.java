@@ -306,6 +306,7 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 	// Geometry methods
 	//
 	
+	@Override
 	protected Xform2 getAllocationSpaceToLocalSpaceXform(DPElement child)
 	{
 		return allocationSpaceToLocalSpace;

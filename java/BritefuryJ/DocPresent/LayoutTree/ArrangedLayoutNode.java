@@ -750,17 +750,22 @@ public abstract class ArrangedLayoutNode extends BranchLayoutNode implements LRe
 	
 	public Point2 getPositionInParentSpace()
 	{
-		return new Point2( alloc_positionInParentAllocationSpaceX, alloc_positionInParentAllocationSpaceY );
+		return getLocalToParentAllocationSpaceXform().transform( new Point2( alloc_positionInParentAllocationSpaceX, alloc_positionInParentAllocationSpaceY ) );
 	}
 	
 	public double getAllocPositionInParentSpaceX()
 	{
-		return alloc_positionInParentAllocationSpaceX;
+		return getLocalToParentAllocationSpaceXform().transformPointX( alloc_positionInParentAllocationSpaceX );
 	}
 	
 	public double getAllocPositionInParentSpaceY()
 	{
-		return alloc_positionInParentAllocationSpaceY;
+		return getLocalToParentAllocationSpaceXform().transformPointY( alloc_positionInParentAllocationSpaceY );
+	}
+	
+	public Point2 getPositionInParentAllocationSpace()
+	{
+		return new Point2( alloc_positionInParentAllocationSpaceX, alloc_positionInParentAllocationSpaceY );
 	}
 	
 	public double getWidth()

@@ -728,6 +728,11 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		return layoutNode != null  ?  layoutNode.getAllocPositionInParentSpaceY()  :  0.0;
 	}
 	
+	public Point2 getPositionInParentAllocationSpace()
+	{
+		return layoutNode != null  ?  layoutNode.getPositionInParentAllocationSpace()  :  new Point2();
+	}
+	
 	public double getWidth()
 	{
 		return layoutNode != null  ?  layoutNode.getWidth()  :  ( parent != null  ?  parent.getWidth()  :  0.0 );
@@ -817,7 +822,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	public Xform2 getLocalToParentXform()
 	{
-		return getLocalToParentAllocationSpaceXform().concat( new Xform2( getPositionInParentSpace().toVector2() ) );
+		return getLocalToParentAllocationSpaceXform().concat( new Xform2( getPositionInParentAllocationSpace().toVector2() ) );
 	}
 	
 	public Xform2 getParentToLocalXform()

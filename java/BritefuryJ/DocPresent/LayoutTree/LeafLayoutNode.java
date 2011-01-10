@@ -55,19 +55,24 @@ public abstract class LeafLayoutNode extends LayoutNode
 	
 	public Point2 getPositionInParentSpace()
 	{
-		return layoutAllocBox.getPositionInParentSpace();
+		return getLocalToParentAllocationSpaceXform().transform( layoutAllocBox.getPositionInParentSpace() );
 	}
 	
 	public double getAllocPositionInParentSpaceX()
 	{
-		return layoutAllocBox.getAllocPositionInParentSpaceX();
+		return getLocalToParentAllocationSpaceXform().transformPointX( layoutAllocBox.getAllocPositionInParentSpaceX() );
 	}
 	
 	public double getAllocPositionInParentSpaceY()
 	{
-		return layoutAllocBox.getAllocPositionInParentSpaceY();
+		return getLocalToParentAllocationSpaceXform().transformPointY( layoutAllocBox.getAllocPositionInParentSpaceY() );
 	}
 
+	public Point2 getPositionInParentAllocationSpace()
+	{
+		return layoutAllocBox.getPositionInParentSpace();
+	}
+	
 	public double getWidth()
 	{
 		return layoutAllocBox.getWidth();
