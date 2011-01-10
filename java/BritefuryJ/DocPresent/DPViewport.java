@@ -426,29 +426,49 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 		if ( viewportSizeInAlloc.x > allocSize.x )
 		{
 			// Viewport wider than contents
-			allocToLocal.translation.x = 0.0;
+			if ( topLeftInAlloc.x > 0.0 )
+			{
+				allocToLocal.translation.x = 0.0;
+			}
+			else if ( bottomRightInAlloc.x < allocSize.x )
+			{
+				allocToLocal.translation.x = ( viewportSizeInAlloc.x - allocSize.x ) * scale;
+			}
 		}
-		else if ( topLeftInAlloc.x < 0.0 )
+		else
 		{
-			allocToLocal.translation.x = 0.0;
-		}
-		else if ( bottomRightInAlloc.x > allocSize.x )
-		{
-			allocToLocal.translation.x = ( viewportSizeInAlloc.x - allocSize.x ) * scale;
+			if ( topLeftInAlloc.x < 0.0 )
+			{
+				allocToLocal.translation.x = 0.0;
+			}
+			else if ( bottomRightInAlloc.x > allocSize.x )
+			{
+				allocToLocal.translation.x = ( viewportSizeInAlloc.x - allocSize.x ) * scale;
+			}
 		}
 		
 		if ( viewportSizeInAlloc.y > allocSize.y )
 		{
 			// Viewport higher than contents
-			allocToLocal.translation.y = 0.0;
+			if ( topLeftInAlloc.y > 0.0 )
+			{
+				allocToLocal.translation.y = 0.0;
+			}
+			else if ( bottomRightInAlloc.y < allocSize.y )
+			{
+				allocToLocal.translation.y = ( viewportSizeInAlloc.y - allocSize.y ) * scale;
+			}
 		}
-		else if ( topLeftInAlloc.y < 0.0 )
+		else
 		{
-			allocToLocal.translation.y = 0.0;
-		}
-		else if ( bottomRightInAlloc.y > allocSize.y )
-		{
-			allocToLocal.translation.y = ( viewportSizeInAlloc.y - allocSize.y ) * scale;
+			if ( topLeftInAlloc.y < 0.0 )
+			{
+				allocToLocal.translation.y = 0.0;
+			}
+			else if ( bottomRightInAlloc.y > allocSize.y )
+			{
+				allocToLocal.translation.y = ( viewportSizeInAlloc.y - allocSize.y ) * scale;
+			}
 		}
 	}
 	
@@ -495,25 +515,49 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 		
 		setFlag( FLAG_IGNORE_RANGE_EVENTS );
 		
-		double invScale = 1.0 / allocationSpaceToLocalSpace.scale;
-		Xform2 localSpaceToAllocationSpace = allocationSpaceToLocalSpace.inverse();
-		Point2 topLeftInAllocationSpace = localSpaceToAllocationSpace.transform( new Point2() );
-		Point2 bottomRightInAllocationSpace = localSpaceToAllocationSpace.transform( new Point2( getWidth(), getHeight() ) );
+		double scale = allocationSpaceToLocalSpace.scale;
+		double invScale = 1.0 / scale;
+		Xform2 localToAlloc = allocationSpaceToLocalSpace.inverse();
+		Point2 topLeftInAlloc = localToAlloc.transform( new Point2() );
+		Point2 bottomRightInAlloc = localToAlloc.transform( new Point2( getWidth(), getHeight() ) );
+		
+		Vector2 allocSize = new Vector2( child != null  ?  child.getWidth()  :  1.0,  child != null  ?  child.getHeight() : 1.0 );
+		Vector2 viewportSizeInAlloc = bottomRightInAlloc.sub( topLeftInAlloc );
 
 		if ( xRange != null )
 		{
-			double min = 0.0;
-			double max = child != null  ?  child.getWidth()  :  1.0;
+			double min, max;
 			
-			updateRange( xRange, min, max, topLeftInAllocationSpace.x, bottomRightInAllocationSpace.x, 10.0 * invScale );
+			if ( viewportSizeInAlloc.x > allocSize.x )
+			{
+				min = allocSize.x - viewportSizeInAlloc.x;
+				max = viewportSizeInAlloc.x;
+			}
+			else
+			{
+				min = 0.0;
+				max = allocSize.x;
+			}
+
+			updateRange( xRange, min, max, topLeftInAlloc.x, bottomRightInAlloc.x, 10.0 * invScale );
 		}
 
 		if ( yRange != null )
 		{
-			double min = 0.0;
-			double max = child != null  ?  child.getHeight()  :  1.0;
+			double min, max;
+			
+			if ( viewportSizeInAlloc.y > allocSize.y )
+			{
+				min = allocSize.y - viewportSizeInAlloc.y;
+				max = viewportSizeInAlloc.y;
+			}
+			else
+			{
+				min = 0.0;
+				max = allocSize.y;
+			}
 
-			updateRange( yRange, min, max, topLeftInAllocationSpace.y, bottomRightInAllocationSpace.y, 10.0 * invScale );
+			updateRange( yRange, min, max, topLeftInAlloc.y, bottomRightInAlloc.y, 10.0 * invScale );
 		}
 
 		clearFlag( FLAG_IGNORE_RANGE_EVENTS );

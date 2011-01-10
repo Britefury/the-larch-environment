@@ -238,20 +238,20 @@ class ScrollBarHelper
 			double dragBoxSize = ( end - value ) * naturalScaleFactor;
 			if ( dragBoxSize < minSize )
 			{
-				dragBoxSize = Math.max( dragBoxSize, minSize );
+				dragBoxSize = minSize;
 				double rangeSize = ( range.getMax() - range.getMin() ) - ( end - value );
 				if ( rangeSize > 0.0 )
 				{
 					double actualScaleFactor = ( visibleRange - dragBoxSize )  /  rangeSize;
-					bounds[0] = value * actualScaleFactor;
+					bounds[0] = ( value - range.getMin() ) * actualScaleFactor;
 					bounds[1] = bounds[0] + dragBoxSize;
 					return;
 				}
 			}
 
 			// Fallback - use natural scale factor
-			bounds[0] = value * naturalScaleFactor;
-			bounds[1] = end * naturalScaleFactor;
+			bounds[0] = ( value - range.getMin() ) * naturalScaleFactor;
+			bounds[1] = ( end - range.getMin() ) * naturalScaleFactor;
 		}
 	
 	
