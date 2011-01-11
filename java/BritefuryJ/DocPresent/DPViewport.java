@@ -17,13 +17,14 @@ import BritefuryJ.DocPresent.Interactor.NavigationElementInteractor;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeViewport;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
+import BritefuryJ.DocPresent.Util.FiniteViewportBehaviour;
 import BritefuryJ.DocPresent.Util.Range;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 import BritefuryJ.Math.Xform2;
 
-public class DPViewport extends DPContainer implements Range.RangeListener
+public class DPViewport extends DPContainer implements FiniteViewportBehaviour.FiniteViewport
 {
 	private static class ViewportNavigationInteractor implements NavigationElementInteractor
 	{
@@ -43,7 +44,7 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 		{
 			DPViewport viewport = (DPViewport)element;
 			Xform2 xform = event.createXform();
-			viewport.applyLocalSpaceXform( xform );
+			viewport.viewportBehaviour.applyViewportSpaceXform( xform );
 		}
 	}
 	
@@ -57,9 +58,8 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 
 	
 	
-	private Range xRange, yRange;
-	private Xform2 allocationSpaceToLocalSpace;
 	private PersistentState state;
+	private FiniteViewportBehaviour viewportBehaviour;
 	
 	
 	public DPViewport(PersistentState state)
@@ -81,8 +81,6 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 	{
 		super(styleParams);
 		
-		this.xRange = xRange;
-		this.yRange = yRange;
 		layoutNode = new LayoutNodeViewport( this );
 		this.state = state;
 		Xform2 x = state.getValueAsType( Xform2.class );
@@ -91,7 +89,8 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 			x = new Xform2();
 			state.setValue( x );
 		}
-		allocationSpaceToLocalSpace = x;
+
+		viewportBehaviour = new FiniteViewportBehaviour( this, xRange, yRange, x );
 		
 		addElementInteractor( interactor );
 	}
@@ -100,11 +99,10 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 	{
 		super( element );
 		
-		this.xRange = element.xRange;
-		this.yRange = element.yRange;
 		layoutNode = new LayoutNodeViewport( this );
 		this.state = element.state;
-		allocationSpaceToLocalSpace = element.allocationSpaceToLocalSpace;
+		
+		viewportBehaviour = new FiniteViewportBehaviour( this, element.getXRange(), element.getYRange(), element.getViewportXform() );
 		
 		addElementInteractor( interactor );
 	}
@@ -141,137 +139,65 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 	
 	public Range getXRange()
 	{
-		return xRange;
+		return viewportBehaviour.getXRange();
 	}
 	
 	public Range getYRange()
 	{
-		return yRange;
+		return viewportBehaviour.getYRange();
 	}
 	
 	
 	public Xform2 getViewportXform()
 	{
-		return allocationSpaceToLocalSpace.clone();
+		return viewportBehaviour.getWorldToViewXform();
 	}
 	
 	public void setViewportXform(Xform2 x)
 	{
-		allocationSpaceToLocalSpace = x.clone();
-		onXformModified();
+		viewportBehaviour.setWorldToViewXform( x );
+	}
+	
+	
+	public void applyViewportSpaceXform(Xform2 x)
+	{
+		viewportBehaviour.applyViewportSpaceXform( x );
 	}
 	
 	
 	public void oneToOne()
 	{
-		allocationSpaceToLocalSpace.scale = 1.0;
-		onXformModified();
+		viewportBehaviour.oneToOne();
 	}
 	
 	public void resetXform()
 	{
-		allocationSpaceToLocalSpace = new Xform2();
-		onXformModified();
+		viewportBehaviour.oneToOne();
 	}
 	
 	
 	public void focusOn(DPElement element)
 	{
-		allocationSpaceToLocalSpace.scale = 1.0;
 		Point2 topLeft = element.getLocalPointRelativeToAncestor( this, new Point2( 0.0, 0.0 ) );
 		Point2 bottomRight = element.getLocalPointRelativeToAncestor( this, new Point2( element.getSize() ) );
-		Point2 centre = Point2.average( topLeft, bottomRight );
-		Point2 topLeftCorner = centre.sub( getSize().mul( 0.5 ) );
-		allocationSpaceToLocalSpace.translation = topLeftCorner.toVector2().negate();
-		onXformModified();
+		viewportBehaviour.focusOn( new AABox2( topLeft, bottomRight ) );
 	}
 	
 	public void zoomToFit()
 	{
-		DPElement child = getChild();
-		double width = child != null  ?  child.getWidth()  :  1.0;
-		double height = child != null  ?  child.getHeight()  :  1.0;
-
-		double ax = width == 0.0  ?  1.0  :  width;
-		double ay = height == 0.0  ?  1.0  :  height;
-		
-		allocationSpaceToLocalSpace.translation = new Vector2();
-		allocationSpaceToLocalSpace.scale = Math.min( getWidth() / ax, getHeight() / ay );
-		allocationSpaceToLocalSpace.scale = allocationSpaceToLocalSpace.scale == 0.0  ?  1.0  :  allocationSpaceToLocalSpace.scale;
-		onXformModified();
+		viewportBehaviour.zoomToFit();
 	}
 	
 	
 	protected void ensureRegionVisible(AABox2 box)
 	{
-		AABox2 localBox = getLocalAABox();
-		
-		boolean bScroll = !box.intersects( localBox );
-		
-		if ( !bScroll )
-		{
-			if ( box.getWidth() < localBox.getWidth() )
-			{
-				if ( box.getLowerX() < localBox.getLowerX()  ||  box.getUpperX() > localBox.getUpperX() )
-				{
-					bScroll = true;
-				}
-			}
-			else
-			{
-				if ( box.getUpperX() < localBox.getLowerX()  ||  box.getLowerX() > localBox.getUpperX() )
-				{
-					bScroll = true;
-				}
-			}
-		}
-		
-		if ( !bScroll )
-		{
-			if ( box.getHeight() < localBox.getHeight() )
-			{
-				if ( box.getLowerY() < localBox.getLowerY()  ||  box.getUpperY() > localBox.getUpperY() )
-				{
-					bScroll = true;
-				}
-			}
-			else
-			{
-				if ( box.getUpperY() < localBox.getLowerY()  ||  box.getLowerY() > localBox.getUpperY() )
-				{
-					bScroll = true;
-				}
-			}
-		}
-		
-		if ( bScroll )
-		{
-			double deltaX = 0.0, deltaY = 0.0;
-			
-			if ( box.getUpperX() < localBox.getLowerX() )
-			{
-				deltaX = localBox.getLowerX() - box.getLowerX();
-			}
-			else if ( box.getLowerX() > localBox.getUpperX() )
-			{
-				deltaX = localBox.getUpperX() - box.getUpperX();
-			}
+		Xform2 x = viewportBehaviour.ensureRegionVisible( box );
 
-			if ( box.getUpperY() < localBox.getLowerY() )
-			{
-				deltaY = localBox.getLowerY() - box.getLowerY();
-			}
-			else if ( box.getLowerY() > localBox.getUpperY() )
-			{
-				deltaY = localBox.getUpperY() - box.getUpperY();
-			}
-			
-			Xform2 translation = new Xform2( new Vector2( deltaX, deltaY ) );
-			applyLocalSpaceXform( translation );
-
+		if ( x != null )
+		{
 			if ( parent != null )
 			{
-				box = translation.transform( box );
+				box = x.transform( box );
 				parent.ensureRegionVisible( getLocalToParentXform().transform( box ) );
 			}
 		}
@@ -281,6 +207,7 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 		}
 	}
 	
+	@Override
 	protected boolean isLocalSpacePointVisible(Point2 point)
 	{
 		if ( getLocalAABox().containsPoint( point ) )
@@ -309,7 +236,7 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 	@Override
 	protected Xform2 getAllocationSpaceToLocalSpaceXform(DPElement child)
 	{
-		return allocationSpaceToLocalSpace;
+		return viewportBehaviour.getWorldToViewXform();
 	}
 	
 	public AABox2 getLocalClipBox()
@@ -404,220 +331,38 @@ public class DPViewport extends DPContainer implements Range.RangeListener
 
 	
 	
-	private void applyLocalSpaceXform(Xform2 x)
+	@Override
+	public Vector2 getFiniteViewportSize()
 	{
-		allocationSpaceToLocalSpace = allocationSpaceToLocalSpace.concat( x );
-		clampXform( allocationSpaceToLocalSpace );
-		onXformModified();
+		return getSize();
 	}
 	
-	
-	private void clampXform(Xform2 allocToLocal)
+	@Override
+	public Vector2 getFiniteWorldSize()
 	{
 		DPElement child = getChild();
-
-		double scale = allocToLocal.scale;
-		Xform2 localToAlloc = allocToLocal.inverse();
-		Point2 topLeftInAlloc = localToAlloc.transform( new Point2() );
-		Point2 bottomRightInAlloc = localToAlloc.transform( new Point2( getWidth(), getHeight() ) );
 		
-		Vector2 allocSize = new Vector2( child != null  ?  child.getWidth()  :  1.0,  child != null  ?  child.getHeight() : 1.0 );
-		Vector2 viewportSizeInAlloc = bottomRightInAlloc.sub( topLeftInAlloc );
-		
-		if ( viewportSizeInAlloc.x > allocSize.x )
-		{
-			// Viewport wider than contents
-			if ( topLeftInAlloc.x > 0.0 )
-			{
-				allocToLocal.translation.x = 0.0;
-			}
-			else if ( bottomRightInAlloc.x < allocSize.x )
-			{
-				allocToLocal.translation.x = ( viewportSizeInAlloc.x - allocSize.x ) * scale;
-			}
-		}
-		else
-		{
-			if ( topLeftInAlloc.x < 0.0 )
-			{
-				allocToLocal.translation.x = 0.0;
-			}
-			else if ( bottomRightInAlloc.x > allocSize.x )
-			{
-				allocToLocal.translation.x = ( viewportSizeInAlloc.x - allocSize.x ) * scale;
-			}
-		}
-		
-		if ( viewportSizeInAlloc.y > allocSize.y )
-		{
-			// Viewport higher than contents
-			if ( topLeftInAlloc.y > 0.0 )
-			{
-				allocToLocal.translation.y = 0.0;
-			}
-			else if ( bottomRightInAlloc.y < allocSize.y )
-			{
-				allocToLocal.translation.y = ( viewportSizeInAlloc.y - allocSize.y ) * scale;
-			}
-		}
-		else
-		{
-			if ( topLeftInAlloc.y < 0.0 )
-			{
-				allocToLocal.translation.y = 0.0;
-			}
-			else if ( bottomRightInAlloc.y > allocSize.y )
-			{
-				allocToLocal.translation.y = ( viewportSizeInAlloc.y - allocSize.y ) * scale;
-			}
-		}
+		return child != null  ?  child.getSize()  :  new Vector2( 1.0, 1.0 );
 	}
 	
-	
-	public void onXformModified()
+	@Override
+	public void onFiniteViewportXformModified()
 	{
-		state.setValue( allocationSpaceToLocalSpace );
-		refreshRangesFromXform();
+		state.setValue( viewportBehaviour.getWorldToViewXform() );
 		queueFullRedraw();
 	}
-	
-	
-	
-	@Override
-	protected void onRealise()
-	{
-		if ( xRange != null )
-		{
-			xRange.addListener( this );
-		}
-		if ( yRange != null )
-		{
-			yRange.addListener( this );
-		}
-	}
-	
-	@Override
-	protected void onUnrealise(DPElement unrealiseRoot)
-	{
-		if ( xRange != null )
-		{
-			xRange.removeListener( this );
-		}
-		if ( yRange != null )
-		{
-			yRange.removeListener( this );
-		}
-	}
-	
-	
-	private void refreshRangesFromXform()
-	{
-		DPElement child = getChild();
-		
-		setFlag( FLAG_IGNORE_RANGE_EVENTS );
-		
-		double scale = allocationSpaceToLocalSpace.scale;
-		double invScale = 1.0 / scale;
-		Xform2 localToAlloc = allocationSpaceToLocalSpace.inverse();
-		Point2 topLeftInAlloc = localToAlloc.transform( new Point2() );
-		Point2 bottomRightInAlloc = localToAlloc.transform( new Point2( getWidth(), getHeight() ) );
-		
-		Vector2 allocSize = new Vector2( child != null  ?  child.getWidth()  :  1.0,  child != null  ?  child.getHeight() : 1.0 );
-		Vector2 viewportSizeInAlloc = bottomRightInAlloc.sub( topLeftInAlloc );
 
-		if ( xRange != null )
-		{
-			double min, max;
-			
-			if ( viewportSizeInAlloc.x > allocSize.x )
-			{
-				min = allocSize.x - viewportSizeInAlloc.x;
-				max = viewportSizeInAlloc.x;
-			}
-			else
-			{
-				min = 0.0;
-				max = allocSize.x;
-			}
-
-			updateRange( xRange, min, max, topLeftInAlloc.x, bottomRightInAlloc.x, 10.0 * invScale );
-		}
-
-		if ( yRange != null )
-		{
-			double min, max;
-			
-			if ( viewportSizeInAlloc.y > allocSize.y )
-			{
-				min = allocSize.y - viewportSizeInAlloc.y;
-				max = viewportSizeInAlloc.y;
-			}
-			else
-			{
-				min = 0.0;
-				max = allocSize.y;
-			}
-
-			updateRange( yRange, min, max, topLeftInAlloc.y, bottomRightInAlloc.y, 10.0 * invScale );
-		}
-
-		clearFlag( FLAG_IGNORE_RANGE_EVENTS );
-	}
-	
-	
-	private static void updateRange(Range range, double min, double max, double begin, double end, double stepSize)
-	{
-		double size = end - begin;
-		
-		if ( begin < min )
-		{
-			begin = min;
-			end = Math.min( begin + size, max );
-		}
-		if ( end > max )
-		{
-			end = max;
-			begin = Math.max( end - size, min );
-		}
-
-		range.setBounds( min, max );
-		range.setValue( begin, end );
-		range.setStepSize( stepSize );
-	}
 	
 	
 	
 	public void onAllocationRefreshed()
 	{
-		refreshRangesFromXform();
+		viewportBehaviour.onWorldSizeChanged();
 	}
 	
 	
 	
 
-	@Override
-	public void onRangeModified(Range r)
-	{
-		if ( !testFlag( FLAG_IGNORE_RANGE_EVENTS ) )
-		{
-			Xform2 xform = allocationSpaceToLocalSpace.clone();
-			
-			if ( r == xRange )
-			{
-				xform.translation.x = -xRange.getBegin() * xform.scale;
-			}
-			else if ( r == yRange )
-			{
-				xform.translation.y = -yRange.getBegin() * xform.scale;
-			}
-			
-			allocationSpaceToLocalSpace = xform;
-			state.setValue( allocationSpaceToLocalSpace );
-			queueFullRedraw();
-		}
-	}
-
-	
 	//
 	// Text representation methods
 	//
