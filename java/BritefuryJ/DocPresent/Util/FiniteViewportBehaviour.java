@@ -205,11 +205,12 @@ public class FiniteViewportBehaviour implements Range.RangeListener
 	private void clampXform(Xform2 worldToView)
 	{
 		Vector2 worldSize = viewport.getFiniteWorldSize();
+		Vector2 viewportSize = viewport.getFiniteViewportSize();
 
 		double scale = worldToView.scale;
 		Xform2 viewToWorld = worldToView.inverse();
 		Point2 topLeftInWorld = viewToWorld.transform( new Point2() );
-		Point2 bottomRightInWorld = viewToWorld.transform( new Point2( worldSize.x, worldSize.y ) );
+		Point2 bottomRightInWorld = viewToWorld.transform( new Point2( viewportSize.x, viewportSize.y ) );
 		
 		Vector2 viewportSizeInWorld = bottomRightInWorld.sub( topLeftInWorld );
 		
