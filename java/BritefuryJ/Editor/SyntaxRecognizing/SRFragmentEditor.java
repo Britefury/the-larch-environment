@@ -66,7 +66,7 @@ public class SRFragmentEditor
 	public Pres editFragment(Pres view, Object model, SimpleAttributeTable inheritedState)
 	{
 		Object editModeObj = inheritedState.getOptional( "gSym_SREditor_edit" );
-		EditMode editMode = editModeObj instanceof EditMode  ?  (EditMode)editModeObj  :  EditMode.DISPLAY;
+		EditMode editMode = editModeObj instanceof EditMode  ?  (EditMode)editModeObj  :  EditMode.EDIT;
 		
 		if ( precedenceHandler != null )
 		{
