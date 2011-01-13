@@ -244,6 +244,17 @@ class WorksheetViewerSubject (GSymSubject):
 	
 	def createModuleLoader(self, world):
 		return _WorksheetModuleLoader( self._model, world )
+	
+	
+	def __getattr__(self, name):
+		module = self._modelView.getModule()
+		try:
+			subjectFactory = module.__subject__
+		except AttributeError:
+			return getattr( module, name )
+		else:
+			subject = subjectFactory( self._document, module, self, self._location )
+			return getattr( subject, name )
 
 	
 
