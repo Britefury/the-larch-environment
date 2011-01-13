@@ -1,1 +1,1 @@
-jython -i gsconsole.py
+jython gsconsole.py

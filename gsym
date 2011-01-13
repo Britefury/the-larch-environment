@@ -1,1 +1,1 @@
-jython -i gsym.py $@
+jython gsym.py $@
