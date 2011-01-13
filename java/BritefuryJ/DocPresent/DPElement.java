@@ -7,6 +7,19 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+/*
+ * Layout spaces:
+ * 
+ * Local space - local to element
+ * Allocation space - space in which children are positioned
+ * 
+ * 
+ * Transformations:
+ * Child local space to allocation space - the position allocated to the child by this element
+ * Allocation space to local space - normally identity, but the viewport transformation for viewport elements
+ * Child local space to local space - the concatenation of child local space to allocation space, and allocation space to local space
+ */
+
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics2D;

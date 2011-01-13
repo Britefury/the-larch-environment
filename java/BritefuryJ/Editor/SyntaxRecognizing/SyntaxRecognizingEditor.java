@@ -33,15 +33,16 @@ public abstract class SyntaxRecognizingEditor extends SequentialEditor
 	
 	private class ParsingNodeEditListener extends ParsingEditListener
 	{
-		private CommitFn commit;
+		private CommitFn commit, emptyCommit;
 		private String logName;
 		
 		
-		public ParsingNodeEditListener(ParserExpression parser, CommitFn commit, String logName)
+		public ParsingNodeEditListener(ParserExpression parser, CommitFn commit, CommitFn emptyCommit, String logName)
 		{
 			super( parser );
 			
 			this.commit = commit;
+			this.emptyCommit = emptyCommit;
 			this.logName = logName;
 		}
 		
@@ -56,6 +57,21 @@ public abstract class SyntaxRecognizingEditor extends SequentialEditor
 		public String getLogName()
 		{
 			return logName;
+		}
+
+		
+		@Override
+		protected HandleEditResult handleEmptyValue(DPElement element, GSymFragmentView fragment, EditEvent event, Object model)
+		{
+			if ( emptyCommit == null )
+			{
+				return HandleEditResult.NOT_HANDLED;
+			}
+			else
+			{
+				emptyCommit.commit( model, null );
+				return HandleEditResult.HANDLED;
+			}
 		}
 
 		@Override
@@ -234,9 +250,9 @@ public abstract class SyntaxRecognizingEditor extends SequentialEditor
 	
 	
 	
-	public ParsingEditListener parsingNodeEditListener(String logName, ParserExpression parser, CommitFn commit)
+	public ParsingEditListener parsingNodeEditListener(String logName, ParserExpression parser, CommitFn commit, CommitFn emptyCommit)
 	{
-		ParsingNodeEditListener listener = new ParsingNodeEditListener( parser, commit, logName );
+		ParsingNodeEditListener listener = new ParsingNodeEditListener( parser, commit, emptyCommit, logName );
 		WeakReference<ParsingNodeEditListener> x = parsingCache.get( listener );
 		if ( x == null  ||  x.get() == null )
 		{
@@ -247,6 +263,11 @@ public abstract class SyntaxRecognizingEditor extends SequentialEditor
 		{
 			return x.get();
 		}
+	}
+	
+	public ParsingEditListener parsingNodeEditListener(String logName, ParserExpression parser, CommitFn commit)
+	{
+		return parsingNodeEditListener( logName, parser, commit, null );
 	}
 	
 	
