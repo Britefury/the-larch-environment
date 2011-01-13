@@ -1,3 +1,3 @@
 @echo off
 
-call jython -i gsym.py %1
+call jython gsym.py %1
