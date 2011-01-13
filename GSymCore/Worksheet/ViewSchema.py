@@ -94,6 +94,10 @@ class WorksheetView (NodeView):
 		self._initModule()
 		body = self.getBody()
 		body.refreshResults( self._module )
+	
+		
+	def getModule(self):
+		return self._module
 		
 		
 	def getBody(self):
