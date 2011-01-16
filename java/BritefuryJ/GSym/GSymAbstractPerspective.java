@@ -36,4 +36,9 @@ public abstract class GSymAbstractPerspective
 	{
 		return new ApplyPerspective( this, x );
 	}
+	
+	public ApplyPerspective __call__(Object x)
+	{
+		return new ApplyPerspective( this, x );
+	}
 }

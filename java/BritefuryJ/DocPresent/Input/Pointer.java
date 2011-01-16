@@ -9,13 +9,6 @@ package BritefuryJ.DocPresent.Input;
 
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
-import java.lang.ref.Reference;
-import java.lang.ref.ReferenceQueue;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Stack;
 
 import BritefuryJ.DocPresent.PresentationComponent;
@@ -31,134 +24,6 @@ import BritefuryJ.Utils.PriorityList;
 
 public class Pointer extends PointerInterface
 {
-	static class ElementEntry
-	{
-		public PointerInputElement element;
-		public ElementEntry childUnderPointer;
-		private HashSet<ElementEntry> parents = new HashSet<ElementEntry>();
-		
-		
-		public ElementEntry(PointerInputElement element)
-		{
-			this.element = element;
-		}
-
-	
-		protected void handleMotion(Pointer pointer, PointerMotionEvent event)
-		{
-			// Handle child elements
-			if ( childUnderPointer != null )
-			{
-				if ( !childUnderPointer.element.containsParentSpacePoint( event.getPointer().getLocalPos() ) )
-				{
-					childUnderPointer.handleLeave( pointer, new PointerMotionEvent( childUnderPointer.element.transformParentToLocalPointer( event.getPointer() ), PointerMotionEvent.Action.LEAVE ) );
-					childUnderPointer.parents.remove( this );
-					childUnderPointer = null;
-				}
-				else
-				{
-					childUnderPointer.handleMotion( pointer, (PointerMotionEvent)childUnderPointer.element.transformParentToLocalEvent( event ) ); 
-				}
-			}
-			
-			if ( childUnderPointer == null )
-			{
-				PointerInputElement childElement = element.getFirstPointerChildAtLocalPoint( event.getPointer().getLocalPos() );
-				if ( childElement != null )
-				{
-					ElementEntry childEntry = pointer.getEntryForElement( childElement );
-					childEntry.handleEnter( pointer, (PointerMotionEvent)childElement.transformParentToLocalEvent( event ) );
-					childUnderPointer = childEntry;
-					childUnderPointer.parents.add( this );
-				}
-			}
-			
-			
-			// Handle @element
-			if ( pointer.inputTable != null )
-			{
-				pointer.inputTable.addPointerWithinElementBounds( pointer, element );
-			}
-		}
-		
-		
-		
-		
-		
-		protected void handleEnter(Pointer pointer, PointerMotionEvent event)
-		{
-			// Handle @element
-			if ( pointer.inputTable != null )
-			{
-				pointer.inputTable.addPointerWithinElementBounds( pointer, element );
-			}
-			
-			element.handlePointerEnter( event );
-
-			
-			
-			// Handle child elements
-			Point2 localPos = event.getPointer().getLocalPos();
-			
-			PointerInputElement childElement = element.getFirstPointerChildAtLocalPoint( localPos );
-			if ( childElement != null )
-			{
-				ElementEntry childEntry = pointer.getEntryForElement( childElement );
-			
-				childEntry.handleEnter( pointer, (PointerMotionEvent)childElement.transformParentToLocalEvent( event ) );
-				childUnderPointer = childEntry;
-				childUnderPointer.parents.add( this );
-			}
-		}
-		
-		protected void handleLeave(Pointer pointer, PointerMotionEvent event)
-		{
-			// Handle child elements
-			if ( childUnderPointer != null )
-			{
-				childUnderPointer.handleLeave( pointer, (PointerMotionEvent)childUnderPointer.element.transformParentToLocalEvent( event ) );
-				childUnderPointer.parents.remove( this );
-				childUnderPointer = null;
-			}
-			
-			
-			// Handle @element
-			if ( pointer.inputTable != null )
-			{
-				pointer.inputTable.removePointerWithinElementBounds( pointer, element );
-			}
-			
-			element.handlePointerLeave( event );
-		}
-		
-		
-		
-		protected void notifyUnrealise(Pointer pointer)
-		{
-			if ( childUnderPointer != null )
-			{
-				childUnderPointer = null;
-			}
-			
-			for (ElementEntry parent: parents)
-			{
-				parent.notifyChildUnrealised( this );
-			}
-			
-			pointer.inputTable.removePointerWithinElementBounds( pointer, element );
-		}
-
-		private void notifyChildUnrealised(ElementEntry childEntry)
-		{
-			if ( childEntry == childUnderPointer )
-			{
-				childUnderPointer = null;
-			}
-		}
-	}
-	
-	
-	
 	private static int NAVIGATION_INTERACTOR_PRIORITY = -1000;
 	private static int DND_INTERACTOR_PRIORITY = -500;
 	private static int CONTEXTMENU_INTERACTOR_PRIORITY = -400;
@@ -172,14 +37,10 @@ public class Pointer extends PointerInterface
 	protected Point2 localPos = new Point2();
 	protected int modifiers = 0;
 	protected PointerInputElement rootElement;
-	protected ElementEntry rootEntry;
 	protected InputTable inputTable;
 	protected DndDropLocal dndDrop;
 	protected PresentationComponent component;
 	protected PriorityList<PointerInteractor> interactors = new PriorityList<PointerInteractor>();
-	
-	protected ReferenceQueue<ElementEntry> refQueue = new ReferenceQueue<ElementEntry>();
-	protected HashMap<PointerInputElement, WeakReference<ElementEntry> > elementToEntryTable = new HashMap<PointerInputElement, WeakReference<ElementEntry> >();
 	
 	public Pointer(InputTable inputTable, PointerInputElement rootElement, DndController dndController, PresentationComponent component)
 	{
@@ -187,7 +48,6 @@ public class Pointer extends PointerInterface
 		this.component = component;
 		
 		this.rootElement = rootElement;
-		rootEntry = getEntryForElement( rootElement );
 		
 		
 		interactors.add( NAVIGATION_INTERACTOR_PRIORITY, new PointerNavigationInteractor() );
@@ -276,18 +136,6 @@ public class Pointer extends PointerInterface
 		{
 			interactor.elementUnrealised( this, element );
 		}
-		
-		
-		WeakReference<ElementEntry> entryRef = elementToEntryTable.get( element );
-		if ( entryRef != null )
-		{
-			ElementEntry entry = entryRef.get();
-			if ( entry != null )
-			{
-				entry.handleLeave( this, new PointerMotionEvent( this, PointerMotionEvent.Action.LEAVE ) );
-				entry.notifyUnrealise( this );
-			}
-		}
 	}
 
 	public void onRootElementReallocate()
@@ -299,12 +147,6 @@ public class Pointer extends PointerInterface
 				break;
 			}
 		}
-
-		ArrayList<PointerInterface> pointers = inputTable.getPointersWithinBoundsOfElement( rootEntry.element );
-		if ( dndDrop == null  &&  pointers != null  &&  pointers.contains( this ) )
-		{
-			motion( localPos, null );
-		}		
 	}
 	
 	
@@ -365,8 +207,6 @@ public class Pointer extends PointerInterface
 				break;
 			}
 		}
-
-		rootEntry.handleMotion( this, event );
 	}
 
 	public void drag(Point2 pos, MouseEvent mouseEvent)
@@ -393,8 +233,6 @@ public class Pointer extends PointerInterface
 				break;
 			}
 		}
-
-		rootEntry.handleEnter( this, event );
 	}
 
 	public void leave(Point2 pos)
@@ -408,8 +246,6 @@ public class Pointer extends PointerInterface
 				break;
 			}
 		}
-
-		rootEntry.handleLeave( this, event);
 	}
 
 	public boolean scroll(int scrollX, int scrollY)
@@ -429,72 +265,22 @@ public class Pointer extends PointerInterface
 
 
 
+	
+	public void notifyEnterElement(PointerInputElement element)
+	{
+		inputTable.addPointerWithinElementBounds( this, element );
+	}
 
-	
-	
-	private ElementEntry getEntryForElement(PointerInputElement element)
+	public void notifyLeaveElement(PointerInputElement element)
 	{
-		cleanEntryTable();
-		WeakReference<ElementEntry> ref = elementToEntryTable.get( element );
-		
-		if ( ref == null )
-		{
-			ElementEntry entry = new ElementEntry( element );
-			ref = new WeakReference<ElementEntry>( entry, refQueue );
-			elementToEntryTable.put( element, ref );
-			return entry;
-		}
-		else
-		{
-			ElementEntry entry = ref.get();
-			if ( entry == null )
-			{
-				entry = new ElementEntry( element );
-				ref = new WeakReference<ElementEntry>( entry, refQueue );
-				elementToEntryTable.put( element, ref );
-				return entry;
-			}
-			else
-			{
-				return entry;
-			}
-		}
+		inputTable.removePointerWithinElementBounds( this, element );
 	}
-	
-	private void cleanEntryTable()
-	{
-		Reference<? extends ElementEntry> ref = refQueue.poll();
-		if ( ref != null )
-		{
-			HashSet<Reference<? extends ElementEntry>> references = new HashSet<Reference<? extends ElementEntry>>();
-			while ( ref != null )
-			{
-				references.add( ref );
-				ref = refQueue.poll();
-			}
-		
-			HashSet<PointerInputElement> elements = new HashSet<PointerInputElement>();
-			for (Map.Entry<PointerInputElement, WeakReference<ElementEntry> > entry: elementToEntryTable.entrySet())
-			{
-				if ( references.contains( entry.getValue() ) )
-				{
-					elements.add( entry.getKey() );
-				}
-			}
-			
-			for (PointerInputElement element: elements)
-			{
-				elementToEntryTable.remove( element );
-			}
-		}
-	}
-	
-	
+
 	
 	
 	protected <E extends PointerEvent> PointerInputElement getFirstElementUnderPoint(Point2 p)
 	{
-		PointerInputElement element = rootEntry.element;
+		PointerInputElement element = rootElement;
 		
 		while ( element != null )
 		{
@@ -515,7 +301,7 @@ public class Pointer extends PointerInterface
 
 	protected <E extends PointerEvent> PointerInputElement getLastElementUnderPoint(Point2 p)
 	{
-		PointerInputElement element = rootEntry.element;
+		PointerInputElement element = rootElement;
 		
 		while ( element != null )
 		{
@@ -583,7 +369,7 @@ public class Pointer extends PointerInterface
 	protected Stack<PointerInputElement> getFirstElementPathUnderPoint(Point2 p)
 	{
 		Stack<PointerInputElement> elements = new Stack<PointerInputElement>();
-		PointerInputElement element = rootEntry.element;
+		PointerInputElement element = rootElement;
 		elements.push( element );
 		
 		while ( element != null )
@@ -604,7 +390,7 @@ public class Pointer extends PointerInterface
 	protected Stack<PointerInputElement> getLastElementPathUnderPoint(Point2 p)
 	{
 		Stack<PointerInputElement> elements = new Stack<PointerInputElement>();
-		PointerInputElement element = rootEntry.element;
+		PointerInputElement element = rootElement;
 		elements.push( element );
 		
 		while ( element != null )

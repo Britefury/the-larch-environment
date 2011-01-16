@@ -11,7 +11,6 @@ import java.util.HashMap;
 import BritefuryJ.AttributeTable.AttributeBase;
 import BritefuryJ.AttributeTable.AttributeTable;
 import BritefuryJ.DocPresent.Combinators.ApplyStyleSheet;
-import BritefuryJ.DocPresent.Combinators.Pres;
 
 public class StyleSheet extends AttributeTable
 {
@@ -30,12 +29,12 @@ public class StyleSheet extends AttributeTable
 	}
 	
 	
-	public ApplyStyleSheet applyTo(Pres child)
+	public ApplyStyleSheet applyTo(Object child)
 	{
 		return new ApplyStyleSheet( this, child );
 	}
 
-	public ApplyStyleSheet __call__(Pres child)
+	public ApplyStyleSheet __call__(Object child)
 	{
 		return new ApplyStyleSheet( this, child );
 	}
