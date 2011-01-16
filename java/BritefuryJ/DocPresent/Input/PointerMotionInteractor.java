@@ -157,6 +157,9 @@ public class PointerMotionInteractor extends PointerInteractor
 					motionInt.pointerEnter( element, event );
 				}
 			}
+			
+			event.getPointer().concretePointer().notifyEnterElement( element );
+			element.handlePointerEnter( event );
 		}
 	}
 	
@@ -164,6 +167,9 @@ public class PointerMotionInteractor extends PointerInteractor
 	{
 		if ( element.isPointerInputElementRealised() )
 		{
+			event.getPointer().concretePointer().notifyLeaveElement( element );
+			element.handlePointerLeave( event );
+
 			Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( HoverElementInteractor.class );
 			if ( interactors != null )
 			{
