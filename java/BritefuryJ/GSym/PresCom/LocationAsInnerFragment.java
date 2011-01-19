@@ -11,7 +11,7 @@ import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 
 public class LocationAsInnerFragment extends Pres
 {
@@ -28,7 +28,7 @@ public class LocationAsInnerFragment extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		GSymFragmentView fragment = ctx.getFragment();
+		FragmentView fragment = ctx.getFragment();
 		return fragment.presentLocationAsElement( location, style, ctx.getInheritedState() );
 	}
 }

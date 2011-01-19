@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.GSym.View;
+package BritefuryJ.IncrementalView;
 
 import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.CommandHistory.CommandHistoryController;
@@ -22,7 +22,7 @@ import BritefuryJ.GSym.GSymBrowserContext;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Logging.LogView;
 
-public class GSymViewPage extends BrowserPage
+public class IncrementalViewPage extends BrowserPage
 {
 	private DPElement element;
 	private Hyperlink logLink;
@@ -30,11 +30,11 @@ public class GSymViewPage extends BrowserPage
 	private String title;
 	private Log log;
 	private CommandHistory commandHistory;
-	private GSymView view;
+	private IncrementalView view;
 	
 	
 	
-	public GSymViewPage(DPElement element, String title, final GSymBrowserContext browserContext, CommandHistory commandHistory, GSymView view)
+	public IncrementalViewPage(DPElement element, String title, final GSymBrowserContext browserContext, CommandHistory commandHistory, IncrementalView view)
 	{
 		this.element = element;
 		this.title = title;

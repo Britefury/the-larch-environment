@@ -20,7 +20,7 @@ import BritefuryJ.DocPresent.LayoutTree.BranchLayoutNode;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.GSym.PresCom.InnerFragment;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Xform2;
@@ -922,7 +922,7 @@ public abstract class DPContainer extends DPElement
 	// Meta-element
 	//
 	
-	public Pres createMetaElement(GSymFragmentView ctx, SimpleAttributeTable state)
+	public Pres createMetaElement(FragmentView ctx, SimpleAttributeTable state)
 	{
 		ArrayList<Object> metaChildren = new ArrayList<Object>();
 		for (DPElement child: getChildren())

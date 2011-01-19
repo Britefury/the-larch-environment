@@ -14,7 +14,7 @@ import org.python.core.PyType;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.GSym.GSymAbstractPerspective;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Utils.PolymorphicMap;
 
 public abstract class GSymObjectPresentationPerspective extends GSymAbstractPerspective
@@ -33,16 +33,16 @@ public abstract class GSymObjectPresentationPerspective extends GSymAbstractPers
 	
 
 	
-	protected abstract Pres presentWithJavaInterface(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState);
-	protected abstract Pres presentJavaArray(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState);
-	protected abstract Pres presentJavaObjectFallback(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState);
-	protected abstract Pres presentPyObjectFallback(PyObject x, GSymFragmentView fragment, SimpleAttributeTable inhritedState);
-	protected abstract Pres invokeObjectPresenter(ObjectPresenter presenter, Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState);
-	protected abstract Pres invokePyObjectPresenter(PyObjectPresenter presenter, PyObject x, GSymFragmentView fragment, SimpleAttributeTable inheritedState);
+	protected abstract Pres presentWithJavaInterface(Object x, FragmentView fragment, SimpleAttributeTable inheritedState);
+	protected abstract Pres presentJavaArray(Object x, FragmentView fragment, SimpleAttributeTable inheritedState);
+	protected abstract Pres presentJavaObjectFallback(Object x, FragmentView fragment, SimpleAttributeTable inheritedState);
+	protected abstract Pres presentPyObjectFallback(PyObject x, FragmentView fragment, SimpleAttributeTable inhritedState);
+	protected abstract Pres invokeObjectPresenter(ObjectPresenter presenter, Object x, FragmentView fragment, SimpleAttributeTable inheritedState);
+	protected abstract Pres invokePyObjectPresenter(PyObjectPresenter presenter, PyObject x, FragmentView fragment, SimpleAttributeTable inheritedState);
 	
 
 	@Override
-	protected Pres presentModel(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	protected Pres presentModel(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		Pres result = null;
 		

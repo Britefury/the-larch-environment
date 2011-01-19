@@ -4,12 +4,12 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.GSym.View;
+package BritefuryJ.IncrementalView;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
 
-public interface GSymViewFragmentFunction
+public interface ViewFragmentFunction
 {
-	public Pres createViewFragment(Object x, GSymFragmentView ctx, SimpleAttributeTable inheritedState);
+	public Pres createViewFragment(Object x, FragmentView ctx, SimpleAttributeTable inheritedState);
 }

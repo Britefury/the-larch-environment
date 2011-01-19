@@ -20,15 +20,15 @@ import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StreamValue.StreamValueVisitor;
-import BritefuryJ.GSym.View.FragmentViewFilter;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentViewFilter;
+import BritefuryJ.IncrementalView.FragmentView;
 
 public class SequentialClipboardHandler extends ClipboardHandler
 {
 	private FragmentViewFilter editLevelFragmentFilter = new FragmentViewFilter()
 	{
 		@Override
-		public boolean testFragmentView(GSymFragmentView fragment)
+		public boolean testFragmentView(FragmentView fragment)
 		{
 			return isEditLevelFragmentView( fragment );
 		}
@@ -38,7 +38,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	private FragmentViewFilter commonRootEditLevelFragmentFilter = new FragmentViewFilter()
 	{
 		@Override
-		public boolean testFragmentView(GSymFragmentView fragment)
+		public boolean testFragmentView(FragmentView fragment)
 		{
 			return isCommonRootEditLevelFragmentView( fragment );
 		}
@@ -69,7 +69,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	}
 	
 	
-	protected boolean isCommonRootEditLevelFragmentView(GSymFragmentView fragment)
+	protected boolean isCommonRootEditLevelFragmentView(FragmentView fragment)
 	{
 		return isEditLevelFragmentView( fragment );
 	}
@@ -97,11 +97,11 @@ public class SequentialClipboardHandler extends ClipboardHandler
 			Marker endMarker = selection.getEndMarker();
 			
 			// Get the edit-level fragments that contain the start and end markers
-			GSymFragmentView startFragment = GSymFragmentView.getEnclosingFragment( startMarker.getElement(), editLevelFragmentFilter );
-			GSymFragmentView endFragment = GSymFragmentView.getEnclosingFragment( endMarker.getElement(), editLevelFragmentFilter );
+			FragmentView startFragment = FragmentView.getEnclosingFragment( startMarker.getElement(), editLevelFragmentFilter );
+			FragmentView endFragment = FragmentView.getEnclosingFragment( endMarker.getElement(), editLevelFragmentFilter );
 			
 			// Determine the 
-			GSymFragmentView editRootFragment = null;
+			FragmentView editRootFragment = null;
 			DPElement editRootFragmentElement = null;
 			if ( startFragment == endFragment )
 			{
@@ -110,7 +110,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 			else
 			{
 				// Get the common root edit-level fragment, and its content element
-				editRootFragment = GSymFragmentView.getCommonRootFragment( startFragment, endFragment, commonRootEditLevelFragmentFilter );
+				editRootFragment = FragmentView.getCommonRootFragment( startFragment, endFragment, commonRootEditLevelFragmentFilter );
 			}
 			editRootFragmentElement = editRootFragment.getFragmentContentElement();
 
@@ -202,7 +202,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 		if ( stream != null )
 		{
 			Marker caretMarker = caret.getMarker();
-			GSymFragmentView insertionPointFragment = GSymFragmentView.getEnclosingFragment( caretMarker.getElement(), editLevelFragmentFilter );
+			FragmentView insertionPointFragment = FragmentView.getEnclosingFragment( caretMarker.getElement(), editLevelFragmentFilter );
 			DPElement insertionPointElement = insertionPointFragment.getFragmentContentElement();
 			
 			// Get the item streams for the root element content, before and after the selected region
@@ -365,12 +365,12 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	//
 	//
 	
-	public StreamValue joinStreamsForInsertion(GSymFragmentView subtreeRootFragment, StreamValue before, StreamValue insertion, StreamValue after)
+	public StreamValue joinStreamsForInsertion(FragmentView subtreeRootFragment, StreamValue before, StreamValue insertion, StreamValue after)
 	{
 		return sequentialEditor.joinStreamsForInsertion( subtreeRootFragment, before, insertion, after );
 	}
 	
-	public StreamValue joinStreamsForDeletion(GSymFragmentView subtreeRootFragment, StreamValue before, StreamValue after)
+	public StreamValue joinStreamsForDeletion(FragmentView subtreeRootFragment, StreamValue before, StreamValue after)
 	{
 		return sequentialEditor.joinStreamsForDeletion( subtreeRootFragment, before, after );
 	}
@@ -379,7 +379,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	
 	
 	
-	protected boolean isEditLevelFragmentView(GSymFragmentView fragment)
+	protected boolean isEditLevelFragmentView(FragmentView fragment)
 	{
 		return sequentialEditor.isClipboardEditLevelFragmentView( fragment );
 	}

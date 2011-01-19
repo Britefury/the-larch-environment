@@ -9,11 +9,11 @@ package BritefuryJ.DocPresent.Combinators;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.GSym.GSymAbstractPerspective;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 
 public class PresentationContext
 {
-	private GSymFragmentView fragment = null;
+	private FragmentView fragment = null;
 	private GSymAbstractPerspective perspective = null;
 	private SimpleAttributeTable inheritedState = null;
 	
@@ -22,7 +22,7 @@ public class PresentationContext
 	{
 	}
 	
-	public PresentationContext(GSymFragmentView fragment, GSymAbstractPerspective perspective, SimpleAttributeTable inheritedState)
+	public PresentationContext(FragmentView fragment, GSymAbstractPerspective perspective, SimpleAttributeTable inheritedState)
 	{
 		this.fragment = fragment;
 		this.perspective = perspective;
@@ -30,7 +30,7 @@ public class PresentationContext
 	}
 	
 	
-	public GSymFragmentView getFragment()
+	public FragmentView getFragment()
 	{
 		return fragment;
 	}

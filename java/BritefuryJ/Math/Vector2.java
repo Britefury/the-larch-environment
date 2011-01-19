@@ -19,7 +19,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Utils.HashUtils;
 
 public class Vector2 implements Cloneable, Presentable, Serializable
@@ -154,7 +154,7 @@ public class Vector2 implements Cloneable, Presentable, Serializable
 	
 	
 	@Override
-	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return new Row( new Pres[] { delimStyle.applyTo( new Label( "[" ) ).alignVCentre(),
 				vectorStyle.applyTo( new Column( new Pres[] { new Label( String.valueOf( x ) ), new Label( String.valueOf( x ) ) } ) ),

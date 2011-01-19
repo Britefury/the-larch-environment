@@ -10,14 +10,14 @@ import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.GSym.PresCom.ApplyPerspective;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 
 
 public abstract class GSymAbstractPerspective
 {
-	protected abstract Pres presentModel(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState);
+	protected abstract Pres presentModel(Object x, FragmentView fragment, SimpleAttributeTable inheritedState);
 	
-	public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		if ( x instanceof Pres )
 		{

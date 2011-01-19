@@ -24,7 +24,7 @@ import BritefuryJ.GSym.GenericPerspective.PresCom.HorizontalField;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBoxWithFields;
 import BritefuryJ.GSym.GenericPerspective.PresCom.VerticalField;
 import BritefuryJ.GSym.PresCom.InnerFragment;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.ParserHelpers.TraceNode;
 import BritefuryJ.ParserHelpers.ParseResultInterface;
 
@@ -253,7 +253,7 @@ public class ParseResult implements ParseResultInterface, Presentable
 
 
 	@Override
-	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		Pres fields[];
 		

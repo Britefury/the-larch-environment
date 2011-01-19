@@ -15,7 +15,7 @@ import BritefuryJ.DocPresent.TreeEventListener;
 import BritefuryJ.DocPresent.Combinators.Primitive.Region;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 
 public abstract class SequentialEditor
 {
@@ -121,7 +121,7 @@ public abstract class SequentialEditor
 	//
 	//
 	
-	protected boolean isClipboardEditLevelFragmentView(GSymFragmentView fragment)
+	protected boolean isClipboardEditLevelFragmentView(FragmentView fragment)
 	{
 		return true;
 	}
@@ -143,7 +143,7 @@ public abstract class SequentialEditor
 	
 	public abstract Object copyStructuralValue(Object x);
 
-	public StreamValue joinStreamsForInsertion(GSymFragmentView subtreeRootFragment, StreamValue before, StreamValue insertion, StreamValue after)
+	public StreamValue joinStreamsForInsertion(FragmentView subtreeRootFragment, StreamValue before, StreamValue insertion, StreamValue after)
 	{
 		StreamValueBuilder builder = new StreamValueBuilder();
 		builder.extend( before );
@@ -152,7 +152,7 @@ public abstract class SequentialEditor
 		return builder.stream();
 	}
 	
-	public StreamValue joinStreamsForDeletion(GSymFragmentView subtreeRootFragment, StreamValue before, StreamValue after)
+	public StreamValue joinStreamsForDeletion(FragmentView subtreeRootFragment, StreamValue before, StreamValue after)
 	{
 		StreamValueBuilder builder = new StreamValueBuilder();
 		builder.extend( before );

@@ -18,9 +18,9 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
-import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
+import BritefuryJ.IncrementalView.FragmentView;
 
 public abstract class LiteralCellEditor implements Presentable, IncrementalMonitorListener
 {
@@ -141,7 +141,7 @@ public abstract class LiteralCellEditor implements Presentable, IncrementalMonit
 
 	
 	@Override
-	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return createEditor().getPres();
 	}

@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.GSym.View;
+package BritefuryJ.IncrementalView;
 
 import java.util.ArrayList;
 
@@ -15,12 +15,12 @@ import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Marker.Marker.Bias;
 import BritefuryJ.Utils.StringDiff;
 
-public class NodeElementChangeListenerDiff implements GSymView.NodeElementChangeListener
+public class NodeElementChangeListenerDiff implements IncrementalView.NodeElementChangeListener
 {
 	private static int DIFF_THRESHHOLD = 65536;
 	
 	
-	private GSymFragmentView caretNode;
+	private FragmentView caretNode;
 	private String textRepresentation;
 	private Marker.Bias bias;
 	private int position;
@@ -35,7 +35,7 @@ public class NodeElementChangeListenerDiff implements GSymView.NodeElementChange
 	}
 	
 	
-	public void reset(GSymView view)
+	public void reset(IncrementalView view)
 	{
 		caretNode = null;
 		textRepresentation = null;
@@ -44,7 +44,7 @@ public class NodeElementChangeListenerDiff implements GSymView.NodeElementChange
 	}
 
 	
-	public void elementChangeFrom(GSymFragmentView node, DPElement element)
+	public void elementChangeFrom(FragmentView node, DPElement element)
 	{
 		if ( caretNode == null )
 		{
@@ -76,7 +76,7 @@ public class NodeElementChangeListenerDiff implements GSymView.NodeElementChange
 		}
 	}
 
-	public void elementChangeTo(GSymFragmentView node, DPElement element)
+	public void elementChangeTo(FragmentView node, DPElement element)
 	{
 		if ( caretNode == node )
 		{

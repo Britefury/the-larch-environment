@@ -10,7 +10,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.EditEvent;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueVisitor;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Logging.LogEntry;
 
@@ -21,34 +21,34 @@ public abstract class UnparsedEditListener extends SRStreamEditListener
 		return null;
 	}
 	
-	protected boolean isValueValid(DPElement element, DPElement sourceElement, GSymFragmentView fragment,
+	protected boolean isValueValid(DPElement element, DPElement sourceElement, FragmentView fragment,
 			EditEvent event, Object model, StreamValue value)
 	{
 		return true;
 	}
 	
-	protected boolean isValueEmpty(DPElement element, DPElement sourceElement, GSymFragmentView fragment,
+	protected boolean isValueEmpty(DPElement element, DPElement sourceElement, FragmentView fragment,
 			EditEvent event, Object model, StreamValue value)
 	{
 		return getSyntaxRecognizingEditor().isValueEmpty( value );
 	}
 	
-	protected HandleEditResult handleInvalidValue(DPElement element, DPElement sourceElement, GSymFragmentView fragment,
+	protected HandleEditResult handleInvalidValue(DPElement element, DPElement sourceElement, FragmentView fragment,
 			EditEvent event, Object model, StreamValue value)
 	{
 		return HandleEditResult.NOT_HANDLED;
 	}
 	
-	protected abstract HandleEditResult handleUnparsed(DPElement element, DPElement sourceElement, GSymFragmentView fragment,
+	protected abstract HandleEditResult handleUnparsed(DPElement element, DPElement sourceElement, FragmentView fragment,
 			EditEvent event, Object model, StreamValue value);
 	
-	protected abstract HandleEditResult handleInnerUnparsed(DPElement element, DPElement sourceElement, GSymFragmentView fragment,
+	protected abstract HandleEditResult handleInnerUnparsed(DPElement element, DPElement sourceElement, FragmentView fragment,
 			EditEvent event, Object model, StreamValue value);
 	
 	
 
 	@Override
-	protected HandleEditResult handleValue(DPElement element, DPElement sourceElement, GSymFragmentView fragment,
+	protected HandleEditResult handleValue(DPElement element, DPElement sourceElement, FragmentView fragment,
 			EditEvent event, Object model, StreamValue value)
 	{
 		String logName = getLogName();
@@ -56,7 +56,7 @@ public abstract class UnparsedEditListener extends SRStreamEditListener
 		{
 			// Attempt to create an unparsed node to replace only the node corresponding to the innermost fragment surrounding
 			// the element that sent the edit event
-			GSymFragmentView sourceFragment = (GSymFragmentView)sourceElement.getFragmentContext();
+			FragmentView sourceFragment = (FragmentView)sourceElement.getFragmentContext();
 			if ( sourceFragment == fragment )
 			{
 				// Source fragment is this fragment - replace this node with an unparsed node

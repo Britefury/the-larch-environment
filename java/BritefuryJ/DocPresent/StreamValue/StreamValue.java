@@ -25,7 +25,7 @@ import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
 import BritefuryJ.GSym.GenericPerspective.PresCom.UnescapedStringAsSpan;
 import BritefuryJ.GSym.PresCom.InnerFragment;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 
 public class StreamValue implements Presentable
 {
@@ -142,7 +142,7 @@ public class StreamValue implements Presentable
 
 
 		@Override
-		public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			return new UnescapedStringAsSpan( textValue );
 		}
@@ -220,7 +220,7 @@ public class StreamValue implements Presentable
 
 
 		@Override
-		public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			return borderStyle.applyTo( new Border( new InnerFragment( structuralValue ) ) );
 		}
@@ -615,7 +615,7 @@ public class StreamValue implements Presentable
 
 
 	@Override
-	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		Pres contents = new Paragraph( InnerFragment.map( items ) );
 		

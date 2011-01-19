@@ -10,11 +10,11 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.EditEvent;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueVisitor;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 
 public abstract class StreamEditListener extends EditListener
 {
-	protected abstract HandleEditResult handleValue(DPElement element, DPElement sourceElement, GSymFragmentView fragment, EditEvent event, Object model, StreamValue value);
+	protected abstract HandleEditResult handleValue(DPElement element, DPElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value);
 	
 	
 	
@@ -24,7 +24,7 @@ public abstract class StreamEditListener extends EditListener
 		StreamValueVisitor visitor = editEvent.getStreamValueVisitor();
 		
 		StreamValue value = visitor.getStreamValue( element );
-		GSymFragmentView fragment = (GSymFragmentView)element.getFragmentContext();
+		FragmentView fragment = (FragmentView)element.getFragmentContext();
 		Object model = fragment.getModel();
 		
 		return handleValue( element, sourceElement, fragment, editEvent, model, value );

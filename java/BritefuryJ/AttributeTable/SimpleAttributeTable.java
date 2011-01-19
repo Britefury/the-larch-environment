@@ -26,7 +26,7 @@ import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBoxWithFields;
 import BritefuryJ.GSym.GenericPerspective.PresCom.VerticalField;
 import BritefuryJ.GSym.PresCom.InnerFragment;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Utils.HashUtils;
 
 public class SimpleAttributeTable implements Presentable
@@ -357,7 +357,7 @@ public class SimpleAttributeTable implements Presentable
 
 	
 	
-	protected static Pres presentAttributeMap(GSymFragmentView ctx, SimpleAttributeTable inheritedState, HashMap<String, Object> values)
+	protected static Pres presentAttributeMap(FragmentView ctx, SimpleAttributeTable inheritedState, HashMap<String, Object> values)
 	{
 		Set<String> nameSet = values.keySet();
 		String names[] = nameSet.toArray( new String[0] );
@@ -376,7 +376,7 @@ public class SimpleAttributeTable implements Presentable
 	}
 	
 	@Override
-	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		Pres valueField = new VerticalField( "Attributes:", presentAttributeMap( fragment, inheritedState, values ) );
 		return new ObjectBoxWithFields( getClass().getName(), new Pres[] { valueField } );

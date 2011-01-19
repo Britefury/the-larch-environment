@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.GSym.View;
+package BritefuryJ.IncrementalView;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ import BritefuryJ.Incremental.IncrementalFunctionMonitor;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 
-public class GSymFragmentView extends IncrementalTreeNode implements FragmentContext, PresentationStateListener, Presentable
+public class FragmentView extends IncrementalTreeNode implements FragmentContext, PresentationStateListener, Presentable
 {
 	public static class FragmentModel
 	{
@@ -63,7 +63,7 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 		public Object createSourceData(PointerInputElement sourceElement, int aspect)
 		{
 			DPElement element = (DPElement)sourceElement;
-			GSymFragmentView ctx = (GSymFragmentView)element.getFragmentContext();
+			FragmentView ctx = (FragmentView)element.getFragmentContext();
 			return new FragmentModel( ctx.getModel() );
 		}
 	};
@@ -89,7 +89,7 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	
 	
 	
-	public GSymFragmentView(Object modelNode, GSymView view, PersistentStateTable persistentState)
+	public FragmentView(Object modelNode, IncrementalView view, PersistentStateTable persistentState)
 	{
 		super( view, modelNode );
 		
@@ -145,9 +145,9 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	}
 
 	
-	protected GSymView.ViewFragmentContextAndResultFactory getNodeResultFactory()
+	protected IncrementalView.ViewFragmentContextAndResultFactory getNodeResultFactory()
 	{
-		return (GSymView.ViewFragmentContextAndResultFactory)resultFactory;
+		return (IncrementalView.ViewFragmentContextAndResultFactory)resultFactory;
 	}
 
 	
@@ -158,9 +158,9 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	//
 	//
 	
-	public GSymView getView()
+	public IncrementalView getView()
 	{
-		return (GSymView)getIncrementalTree();
+		return (IncrementalView)getIncrementalTree();
 	}
 	
 	
@@ -175,14 +175,14 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	@Override
 	public PresentationContext createPresentationContext()
 	{
-		GSymView.ViewFragmentContextAndResultFactory f = getNodeResultFactory();
+		IncrementalView.ViewFragmentContextAndResultFactory f = getNodeResultFactory();
 		return new PresentationContext( this, f.perspective, f.inheritedState );
 	}
 	
 	@Override
 	public StyleValues getStyleValues()
 	{
-		GSymView.ViewFragmentContextAndResultFactory f = getNodeResultFactory();
+		IncrementalView.ViewFragmentContextAndResultFactory f = getNodeResultFactory();
 		return f.style;
 	}
 	
@@ -313,8 +313,8 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 		}
 
 		// A call to DocNode.buildNodeView builds the view, and puts it in the DocView's table
-		GSymView view = getView();
-		GSymFragmentView incrementalNode = (GSymFragmentView)view.buildIncrementalTreeNodeResult( model, view.makeNodeResultFactory( perspective, subjectContext, style, inheritedState ) );
+		IncrementalView view = getView();
+		FragmentView incrementalNode = (FragmentView)view.buildIncrementalTreeNodeResult( model, view.makeNodeResultFactory( perspective, subjectContext, style, inheritedState ) );
 		
 		
 		// Register the parent <-> child relationship before refreshing the node, so that the relationship is 'available' during (re-computation)
@@ -341,7 +341,7 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 
 	public DPElement presentInnerFragment(Object x, GSymAbstractPerspective perspective, StyleValues style, SimpleAttributeTable inheritedState)
 	{
-		GSymView.ViewFragmentContextAndResultFactory factory = getNodeResultFactory();
+		IncrementalView.ViewFragmentContextAndResultFactory factory = getNodeResultFactory();
 		DPElement e = presentInnerFragment( x, perspective, factory.subjectContext, style, inheritedState );
 		if ( perspective != factory.perspective )
 		{
@@ -371,25 +371,25 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	
 	
 	
-	public ArrayList<GSymFragmentView> getNodeViewInstancePathFromRoot()
+	public ArrayList<FragmentView> getNodeViewInstancePathFromRoot()
 	{
-		ArrayList<GSymFragmentView> path = new ArrayList<GSymFragmentView>();
+		ArrayList<FragmentView> path = new ArrayList<FragmentView>();
 		
-		GSymFragmentView n = this;
+		FragmentView n = this;
 		while ( n != null )
 		{
 			path.add( 0, n );
-			n = (GSymFragmentView)n.getParent();
+			n = (FragmentView)n.getParent();
 		}
 		
 		return path;
 	}
 	
-	public ArrayList<GSymFragmentView> getNodeViewInstancePathFromSubtreeRoot(GSymFragmentView root)
+	public ArrayList<FragmentView> getNodeViewInstancePathFromSubtreeRoot(FragmentView root)
 	{
-		ArrayList<GSymFragmentView> path = new ArrayList<GSymFragmentView>();
+		ArrayList<FragmentView> path = new ArrayList<FragmentView>();
 		
-		GSymFragmentView n = this;
+		FragmentView n = this;
 		while ( n != null )
 		{
 			path.add( 0, n );
@@ -397,7 +397,7 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 			{
 				return path;
 			}
-			n = (GSymFragmentView)n.getParent();
+			n = (FragmentView)n.getParent();
 		}
 
 		return null;
@@ -412,19 +412,19 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	
 	
 	
-	public static GSymFragmentView getEnclosingFragment(DPElement element, FragmentViewFilter filter)
+	public static FragmentView getEnclosingFragment(DPElement element, FragmentViewFilter filter)
 	{
 		if ( filter == null )
 		{
-			return (GSymFragmentView)element.getFragmentContext();
+			return (FragmentView)element.getFragmentContext();
 		}
 		else
 		{
-			GSymFragmentView fragment = (GSymFragmentView)element.getFragmentContext();
+			FragmentView fragment = (FragmentView)element.getFragmentContext();
 			
 			while ( !filter.testFragmentView( fragment ) )
 			{
-				fragment = (GSymFragmentView)fragment.getParent();
+				fragment = (FragmentView)fragment.getParent();
 				if ( fragment == null )
 				{
 					return null;
@@ -436,11 +436,11 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 	}
 	
 	
-	public static GSymFragmentView getCommonRootFragment(GSymFragmentView a, GSymFragmentView b, FragmentViewFilter filter)
+	public static FragmentView getCommonRootFragment(FragmentView a, FragmentView b, FragmentViewFilter filter)
 	{
-		ArrayList<GSymFragmentView> pathA = new ArrayList<GSymFragmentView>();
-		ArrayList<GSymFragmentView> pathB = new ArrayList<GSymFragmentView>();
-		GSymFragmentView f = null;
+		ArrayList<FragmentView> pathA = new ArrayList<FragmentView>();
+		ArrayList<FragmentView> pathB = new ArrayList<FragmentView>();
+		FragmentView f = null;
 		
 		f = a;
 		while ( f != null )
@@ -449,7 +449,7 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 			{
 				pathA.add( f );
 			}
-			f = (GSymFragmentView)f.getParent();
+			f = (FragmentView)f.getParent();
 		}
 
 		f = b;
@@ -459,15 +459,15 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 			{
 				pathB.add( f );
 			}
-			f = (GSymFragmentView)f.getParent();
+			f = (FragmentView)f.getParent();
 		}
 		
 		int top = Math.min( pathA.size(), pathB.size() );
 		int commonLength = top;
 		for (int i = 0; i < top; i++)
 		{
-			GSymFragmentView x = pathA.get( pathA.size() - 1 - i );
-			GSymFragmentView y = pathB.get( pathB.size() - 1 - i );
+			FragmentView x = pathA.get( pathA.size() - 1 - i );
+			FragmentView y = pathB.get( pathB.size() - 1 - i );
 			if ( x != y )
 			{
 				commonLength = i;
@@ -488,7 +488,7 @@ public class GSymFragmentView extends IncrementalTreeNode implements FragmentCon
 
 
 	@Override
-	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		stateListeners = PresentationStateListenerList.addListener( stateListeners, fragment );
 		

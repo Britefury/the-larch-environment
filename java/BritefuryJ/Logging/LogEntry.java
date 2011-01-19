@@ -22,7 +22,7 @@ import BritefuryJ.GSym.GenericPerspective.PresCom.HorizontalField;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBoxWithFields;
 import BritefuryJ.GSym.GenericPerspective.PresCom.VerticalField;
 import BritefuryJ.GSym.PresCom.InnerFragment;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 
 public class LogEntry implements Presentable
 {
@@ -185,7 +185,7 @@ public class LogEntry implements Presentable
 	
 
 
-	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		Pres fields[] = new Pres[items.size()];
 		for (int i = 0; i < items.size(); i++)

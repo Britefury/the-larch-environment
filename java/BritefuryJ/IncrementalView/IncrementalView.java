@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.GSym.View;
+package BritefuryJ.IncrementalView;
 
 import java.awt.Color;
 import java.util.HashMap;
@@ -43,7 +43,7 @@ import BritefuryJ.Logging.Log;
 import BritefuryJ.Utils.HashUtils;
 import BritefuryJ.Utils.Profile.ProfileTimer;
 
-public class GSymView extends IncrementalTree implements Presentable
+public class IncrementalView extends IncrementalTree implements Presentable
 {
 	//
 	//
@@ -57,9 +57,9 @@ public class GSymView extends IncrementalTree implements Presentable
 	
 	public interface NodeElementChangeListener
 	{
-		public void reset(GSymView view);
-		public void elementChangeFrom(GSymFragmentView node, DPElement e);
-		public void elementChangeTo(GSymFragmentView node, DPElement e);
+		public void reset(IncrementalView view);
+		public void elementChangeFrom(FragmentView node, DPElement e);
+		public void elementChangeTo(FragmentView node, DPElement e);
 	}
 	
 	
@@ -109,13 +109,13 @@ public class GSymView extends IncrementalTree implements Presentable
 	
 	protected static class ViewFragmentContextAndResultFactory implements IncrementalTreeNode.NodeResultFactory
 	{
-		protected GSymView view;
+		protected IncrementalView view;
 		protected GSymAbstractPerspective perspective;
 		protected SimpleAttributeTable subjectContext;
 		protected StyleValues style;
 		protected SimpleAttributeTable inheritedState;
 		
-		public ViewFragmentContextAndResultFactory(GSymView view, GSymAbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
+		public ViewFragmentContextAndResultFactory(IncrementalView view, GSymAbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
 		{
 			this.view = view;
 			this.perspective = perspective;
@@ -130,7 +130,7 @@ public class GSymView extends IncrementalTree implements Presentable
 			view.profile_startPython();
 
 			// Create the node context
-			GSymFragmentView fragmentView = (GSymFragmentView)incrementalNode;
+			FragmentView fragmentView = (FragmentView)incrementalNode;
 			
 			// Create the view fragment
 			Pres fragment;
@@ -234,13 +234,13 @@ public class GSymView extends IncrementalTree implements Presentable
 	
 	
 	
-	private GSymFragmentView.NodeResultFactory rootNodeResultFactory;
+	private FragmentView.NodeResultFactory rootNodeResultFactory;
 	
 	
 	private DPRegion region;
 	
 	private GSymBrowserContext browserContext;
-	private GSymViewPage page;
+	private IncrementalViewPage page;
 	
 	private CommandHistory commandHistory;
 
@@ -250,7 +250,7 @@ public class GSymView extends IncrementalTree implements Presentable
 	
 	
 	
-	public GSymView(GSymSubject subject, GSymBrowserContext browserContext, PersistentStateStore persistentState)
+	public IncrementalView(GSymSubject subject, GSymBrowserContext browserContext, PersistentStateStore persistentState)
 	{
 		super( subject.getFocus(), DuplicatePolicy.ALLOW_DUPLICATES );
 		GSymAbstractPerspective perspective = subject.getPerspective();
@@ -275,7 +275,7 @@ public class GSymView extends IncrementalTree implements Presentable
 		region = new DPRegion();
 		DPElement column = new Column( new Object[] { region } ).present();
 
-		page = new GSymViewPage( column.alignHExpand().alignVExpand(), subject.getTitle(), browserContext, commandHistory, this );
+		page = new IncrementalViewPage( column.alignHExpand().alignVExpand(), subject.getTitle(), browserContext, commandHistory, this );
 		
 		setElementChangeListener( new NodeElementChangeListenerDiff() );
 		
@@ -298,7 +298,7 @@ public class GSymView extends IncrementalTree implements Presentable
 		return rootNodeResultFactory;
 	}
 
-	protected GSymFragmentView.NodeResultFactory makeNodeResultFactory(GSymAbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
+	protected FragmentView.NodeResultFactory makeNodeResultFactory(GSymAbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
 	{
 		// Memoise the contents factory, keyed by  @nodeViewFunction and @state
 		ViewFragmentContextAndResultFactoryKey key = new ViewFragmentContextAndResultFactoryKey( perspective, subjectContext, style, inheritedState );
@@ -323,7 +323,7 @@ public class GSymView extends IncrementalTree implements Presentable
 		if ( rootBox == null )
 		{
 			performRefresh();
-			GSymFragmentView rootView = (GSymFragmentView)getRootIncrementalTreeNode();
+			FragmentView rootView = (FragmentView)getRootIncrementalTreeNode();
 			DPElement fragmentElement = rootView.getRefreshedFragmentElement();
 			rootBox = (DPColumn)new Column( new Object[] { fragmentElement.alignHExpand().alignVExpand() } ).present();
 		}
@@ -344,7 +344,7 @@ public class GSymView extends IncrementalTree implements Presentable
 			IncrementalTreeNode node = nodeQueue.removeFirst();
 			
 			// Get the persistent state, if any, and store it
-			GSymFragmentView viewNode = (GSymFragmentView)node;
+			FragmentView viewNode = (FragmentView)node;
 			PersistentStateTable stateTable = viewNode.getValidPersistentStateTable();
 			if ( stateTable != null )
 			{
@@ -354,7 +354,7 @@ public class GSymView extends IncrementalTree implements Presentable
 			// Add the children using an interator; that means that they will be inserted at the beginning
 			// of the queue so that they appear *in order*, hence they will be removed in order.
 			ListIterator<IncrementalTreeNode> iterator = nodeQueue.listIterator();
-			for (IncrementalTreeNode child: ((GSymFragmentView)node).getChildren())
+			for (IncrementalTreeNode child: ((FragmentView)node).getChildren())
 			{
 				iterator.add( child );
 			}
@@ -402,7 +402,7 @@ public class GSymView extends IncrementalTree implements Presentable
 		
 		if ( ENABLE_DISPLAY_TREESIZES )
 		{
-			GSymFragmentView rootView = (GSymFragmentView)getRootIncrementalTreeNode();
+			FragmentView rootView = (FragmentView)getRootIncrementalTreeNode();
 			int presTreeSize = rootView.getRefreshedFragmentElement().computeSubtreeSize();
 			int numFragments = rootView.computeSubtreeSize();
 			System.out.println( "DocView.performRefresh(): presentation tree size=" + presTreeSize + ", # fragments=" + numFragments );
@@ -423,7 +423,7 @@ public class GSymView extends IncrementalTree implements Presentable
 	
 	protected IncrementalTreeNode createIncrementalTreeNode(Object node)
 	{
-		return new GSymFragmentView( node, this, persistentStateForNode( node ) );
+		return new FragmentView( node, this, persistentStateForNode( node ) );
 	}
 
 	
@@ -550,7 +550,7 @@ public class GSymView extends IncrementalTree implements Presentable
 		if ( elementChangeListener != null )
 		{
 			profile_startContentChange();
-			elementChangeListener.elementChangeFrom( (GSymFragmentView)node, (DPElement)result );
+			elementChangeListener.elementChangeFrom( (FragmentView)node, (DPElement)result );
 			profile_stopContentChange();
 		}
 	}
@@ -560,7 +560,7 @@ public class GSymView extends IncrementalTree implements Presentable
 		if ( elementChangeListener != null )
 		{
 			profile_startContentChange();
-			elementChangeListener.elementChangeTo( (GSymFragmentView)node, (DPElement)result );
+			elementChangeListener.elementChangeTo( (FragmentView)node, (DPElement)result );
 			profile_stopContentChange();
 		}
 	}
@@ -631,11 +631,11 @@ public class GSymView extends IncrementalTree implements Presentable
 
 
 	@Override
-	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		Pres title = titleStyle.applyTo( new Label( "View" ) );
 		
-		GSymFragmentView rootFragment = (GSymFragmentView)getRootIncrementalTreeNode();
+		FragmentView rootFragment = (FragmentView)getRootIncrementalTreeNode();
 		
 		Pres boxContents = contentsStyle.applyTo( new Column( new Object[] { title, rootFragment } ) );
 

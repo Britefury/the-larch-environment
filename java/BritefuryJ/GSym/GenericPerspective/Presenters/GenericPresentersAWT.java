@@ -27,7 +27,7 @@ import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectTitle;
 import BritefuryJ.GSym.ObjectPresentation.GSymObjectPresenterRegistry;
 import BritefuryJ.GSym.ObjectPresentation.ObjectPresenter;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 
 public class GenericPresentersAWT extends GSymObjectPresenterRegistry
 {
@@ -42,7 +42,7 @@ public class GenericPresentersAWT extends GSymObjectPresenterRegistry
 
 	public static final ObjectPresenter presenter_AffineTransform = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			AffineTransform xform = (AffineTransform)x;
 			
@@ -70,7 +70,7 @@ public class GenericPresentersAWT extends GSymObjectPresenterRegistry
 	
 	public static final ObjectPresenter presenter_Color = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			Color colour = (Color)x;
 			
@@ -95,7 +95,7 @@ public class GenericPresentersAWT extends GSymObjectPresenterRegistry
 
 	public static final ObjectPresenter presenter_Shape = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			Shape shape = (Shape)x;
 //			Rectangle2D bounds = shape.getBounds2D();
@@ -118,7 +118,7 @@ public class GenericPresentersAWT extends GSymObjectPresenterRegistry
 
 	public static final ObjectPresenter presenter_BufferedImage = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			BufferedImage image = (BufferedImage)x;
 			double width = (double)image.getWidth();

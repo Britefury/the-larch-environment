@@ -19,8 +19,8 @@ import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.GenericPerspective.PresCom.HorizontalField;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBoxWithFields;
 import BritefuryJ.GSym.ObjectPresentation.PresentationStateListenerList;
-import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Incremental.IncrementalOwner;
+import BritefuryJ.IncrementalView.FragmentView;
 
 
 public class Range implements IncrementalOwner, Presentable
@@ -167,7 +167,7 @@ public class Range implements IncrementalOwner, Presentable
 
 
 	@Override
-	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		presStateListeners = PresentationStateListenerList.addListener( presStateListeners, fragment );
 		Pres rangeField = new HorizontalField( "Valid range:",

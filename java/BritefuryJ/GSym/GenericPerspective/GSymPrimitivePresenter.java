@@ -34,11 +34,11 @@ import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.PresCom.UnescapedStringAsSpan;
 import BritefuryJ.GSym.PresCom.InnerFragment;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 
 public class GSymPrimitivePresenter
 {
-	public static Pres presentChar(char c, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public static Pres presentChar(char c, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		String str = Character.toString( c );
 		return new Row( new Pres[] {
@@ -47,7 +47,7 @@ public class GSymPrimitivePresenter
 				punctuationStyle.applyTo( new StaticText(  "'" ) ) } );
 	}
 	
-	public static Pres presentString(String text, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public static Pres presentString(String text, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		String textLines[] = text.split( "\n" );
 		if ( textLines.length == 1 )
@@ -81,38 +81,38 @@ public class GSymPrimitivePresenter
 		}
 	}
 
-	public static Pres presentByte(byte b, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public static Pres presentByte(byte b, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return integerStyle.applyTo( new StaticText( Integer.toHexString( ((int)b) & 0xff ) ) );
 	}
 	
 	
-	public static Pres presentShort(short x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public static Pres presentShort(short x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return integerStyle.applyTo( new StaticText( Short.toString( x ) ) );
 	}
 	
-	public static Pres presentInt(int x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public static Pres presentInt(int x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return integerStyle.applyTo( new StaticText( Integer.toString( x ) ) );
 	}
 	
-	public static Pres presentLong(long x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public static Pres presentLong(long x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return integerStyle.applyTo( new StaticText( Long.toString( x ) ) );
 	}
 	
-	public static Pres presentBigInteger(BigInteger x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public static Pres presentBigInteger(BigInteger x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return integerStyle.applyTo( new StaticText( x.toString() + "L" ) );
 	}
 	
-	public static Pres presentBigDecimal(BigDecimal x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public static Pres presentBigDecimal(BigDecimal x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return integerStyle.applyTo( new StaticText( x.toString() + "LD" ) );
 	}
 	
-	public static Pres presentDouble(double x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public static Pres presentDouble(double x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		String asText = Double.toString( x );
 		
@@ -147,7 +147,7 @@ public class GSymPrimitivePresenter
 		return nullStyle.applyTo( new StaticText( "None" ) );
 	}
 	
-	public static Pres presentBoolean(boolean b, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public static Pres presentBoolean(boolean b, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		if ( b )
 		{
@@ -173,7 +173,7 @@ public class GSymPrimitivePresenter
 	}
 	
 	
-	public static Pres presentJavaObjectInspector(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public static Pres presentJavaObjectInspector(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		Pres asString = presentObjectAsString( x );
 
@@ -216,7 +216,7 @@ public class GSymPrimitivePresenter
 		return new DropDownExpander( asString, inspector );
 	}
 	
-	public static Pres presentPythonObjectInspector(PyObject x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public static Pres presentPythonObjectInspector(PyObject x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		Pres asString = presentObjectAsString( x );
 

@@ -26,7 +26,7 @@ import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBorder;
 import BritefuryJ.GSym.ObjectPresentation.GSymObjectPresenterRegistry;
 import BritefuryJ.GSym.ObjectPresentation.ObjectPresenter;
 import BritefuryJ.GSym.PresCom.InnerFragment;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 
 public class GenericPresentersConcurrency extends GSymObjectPresenterRegistry
 {
@@ -37,8 +37,8 @@ public class GenericPresentersConcurrency extends GSymObjectPresenterRegistry
 	
 	
 	private static Timer watchTimer;
-	private static HashSet<GSymFragmentView> watches = new HashSet<GSymFragmentView>();
-	private static LinkedList<GSymFragmentView> watchList = new LinkedList<GSymFragmentView>();
+	private static HashSet<FragmentView> watches = new HashSet<FragmentView>();
+	private static LinkedList<FragmentView> watchList = new LinkedList<FragmentView>();
 	
 	
 	public GenericPresentersConcurrency()
@@ -76,7 +76,7 @@ public class GenericPresentersConcurrency extends GSymObjectPresenterRegistry
 		{
 			int numScans = 0, numRefreshed = 0;
 			
-			LinkedList<GSymFragmentView> unchanged = new LinkedList<GSymFragmentView>();
+			LinkedList<FragmentView> unchanged = new LinkedList<FragmentView>();
 			
 			while (!watchList.isEmpty())
 			{
@@ -86,7 +86,7 @@ public class GenericPresentersConcurrency extends GSymObjectPresenterRegistry
 				}
 				
 				
-				GSymFragmentView fragment = watchList.remove();
+				FragmentView fragment = watchList.remove();
 	
 				@SuppressWarnings("unchecked")
 				Future<Object> future = (Future<Object>)fragment.getModel();
@@ -120,7 +120,7 @@ public class GenericPresentersConcurrency extends GSymObjectPresenterRegistry
 		watchTimer.stop();
 	}
 	
-	private static void watchFutureFragment(GSymFragmentView fragment)
+	private static void watchFutureFragment(FragmentView fragment)
 	{
 		if ( watchList.isEmpty() )
 		{
@@ -140,7 +140,7 @@ public class GenericPresentersConcurrency extends GSymObjectPresenterRegistry
 
 	public static final ObjectPresenter presenter_Future = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			@SuppressWarnings("unchecked")
 			Future<Object> f = (Future<Object>)x;

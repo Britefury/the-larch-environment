@@ -27,7 +27,7 @@ import BritefuryJ.GSym.GenericPerspective.PresCom.HorizontalField;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
 import BritefuryJ.GSym.ObjectPresentation.GSymObjectPresenterRegistry;
 import BritefuryJ.GSym.ObjectPresentation.ObjectPresenter;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 
 public class GenericPresentersSQL extends GSymObjectPresenterRegistry
 {
@@ -41,7 +41,7 @@ public class GenericPresentersSQL extends GSymObjectPresenterRegistry
 
 	public static final ObjectPresenter presenter_Connection = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			Connection connection = (Connection)x;
 			
@@ -107,7 +107,7 @@ public class GenericPresentersSQL extends GSymObjectPresenterRegistry
 	
 	public static final ObjectPresenter presenter_ResultSet = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			ResultSet results = (ResultSet)x;
 			

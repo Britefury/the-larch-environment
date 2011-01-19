@@ -72,8 +72,8 @@ import BritefuryJ.GSym.GSymPerspective;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.GSym.PresCom.InnerFragment;
-import BritefuryJ.GSym.View.GSymFragmentView;
-import BritefuryJ.GSym.View.GSymViewFragmentFunction;
+import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.IncrementalView.ViewFragmentFunction;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
@@ -95,10 +95,10 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	//
 	//
 	
-	private static class TreeExplorerViewFragmentFn implements GSymViewFragmentFunction
+	private static class TreeExplorerViewFragmentFn implements ViewFragmentFunction
 	{
 		@Override
-		public Pres createViewFragment(Object x, GSymFragmentView ctx, SimpleAttributeTable inheritedState)
+		public Pres createViewFragment(Object x, FragmentView ctx, SimpleAttributeTable inheritedState)
 		{
 			DPElement element = (DPElement)x;
 			return element.exploreTreePresent( ctx, inheritedState );
@@ -125,7 +125,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 
 		@Override
-		public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			return treeExplorerPerspective.applyTo( new InnerFragment( element ) ); 
 		}
@@ -2947,12 +2947,12 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		return getDebugPresentationHeaderBorderStyle().applyTo( new Border( box ) );
 	}
 	
-	public Pres createMetaElement(GSymFragmentView ctx, SimpleAttributeTable state)
+	public Pres createMetaElement(FragmentView ctx, SimpleAttributeTable state)
 	{
 		return createDebugPresentationHeader();
 	}
 	
-	private Pres exploreTreePresent(GSymFragmentView ctx, SimpleAttributeTable state)
+	private Pres exploreTreePresent(FragmentView ctx, SimpleAttributeTable state)
 	{
 		debugPresStateListeners = PresentationStateListenerList.addListener( debugPresStateListeners, ctx );
 		return createMetaElement( ctx, state );
@@ -2971,7 +2971,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 
 
-	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		if ( !isRealised() )
 		{

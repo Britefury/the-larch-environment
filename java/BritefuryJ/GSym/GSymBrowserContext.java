@@ -34,8 +34,8 @@ import BritefuryJ.GSym.GenericPerspective.GenericSubject;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.ObjectPresentation.GSymObjectPresentationPerspective;
 import BritefuryJ.GSym.ObjectPresentation.ObjectPresentationLocationResolver;
-import BritefuryJ.GSym.View.GSymFragmentView;
-import BritefuryJ.GSym.View.GSymView;
+import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.IncrementalView.IncrementalView;
 
 public class GSymBrowserContext
 {
@@ -44,7 +44,7 @@ public class GSymBrowserContext
 		private class PagePerspective extends GSymAbstractPerspective
 		{
 			@Override
-			protected Pres presentModel(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+			protected Pres presentModel(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 			{
 				return Pres.coerceNonNull( page.getContentsElement() );
 			}
@@ -224,7 +224,7 @@ public class GSymBrowserContext
 	public BrowserPage resolveLocationAsPage(Location location, PersistentStateStore persistentState)
 	{
 		GSymSubject subject = resolveLocationAsSubject( location );
-		GSymView view = new GSymView( subject, this, persistentState );
+		IncrementalView view = new IncrementalView( subject, this, persistentState );
 		return view.getPage();
 	}
 	
@@ -270,7 +270,7 @@ public class GSymBrowserContext
 		
 		
 		@Override
-		public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			StyleSheet titleStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 24 );
 			StyleSheet contentsStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 16 );
