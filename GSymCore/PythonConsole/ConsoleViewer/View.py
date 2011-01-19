@@ -37,7 +37,7 @@ from BritefuryJ.DocPresent.Combinators.Primitive import *
 from BritefuryJ.DocPresent.Combinators.RichText import *
 
 from BritefuryJ.GSym import GSymPerspective, GSymSubject
-from BritefuryJ.GSym.View import GSymFragmentView
+from BritefuryJ.IncrementalView import FragmentView
 
 from BritefuryJ.GSym.PresCom import InnerFragment, ApplyPerspective
 
@@ -145,7 +145,7 @@ class ConsoleView (GSymViewObjectDispatch):
 		banner = _bannerBorder.surround( bannerText )
 		
 		
-		dropDest = ObjectDndHandler.DropDest( GSymFragmentView.FragmentModel, _onDrop )
+		dropDest = ObjectDndHandler.DropDest( FragmentView.FragmentModel, _onDrop )
 
 		currentModule = Span( [ currentModule ] )
 		currentModule = currentModule.withElementInteractor( CurrentModuleInteractor( node ) )

@@ -10,9 +10,9 @@ import org.python.core.PyObject;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 
 public interface PyObjectPresenter
 {
-	public Pres presentObject(PyObject x, GSymFragmentView fragment, SimpleAttributeTable inheritedState);
+	public Pres presentObject(PyObject x, FragmentView fragment, SimpleAttributeTable inheritedState);
 }

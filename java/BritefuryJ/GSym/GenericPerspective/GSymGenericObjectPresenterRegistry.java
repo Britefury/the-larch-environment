@@ -70,7 +70,7 @@ import BritefuryJ.GSym.ObjectPresentation.GSymObjectPresenterRegistry;
 import BritefuryJ.GSym.ObjectPresentation.ObjectPresenter;
 import BritefuryJ.GSym.ObjectPresentation.PyObjectPresenter;
 import BritefuryJ.GSym.PresCom.InnerFragment;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 
 public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegistry
 {
@@ -128,7 +128,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final ObjectPresenter presenter_Boolean = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			return GSymPrimitivePresenter.presentBoolean( (Boolean)x, fragment, inheritedState );
 		}
@@ -136,7 +136,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final ObjectPresenter presenter_Byte = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			return GSymPrimitivePresenter.presentByte( (Byte)x, fragment, inheritedState );
 		}
@@ -144,7 +144,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final ObjectPresenter presenter_Character = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			return GSymPrimitivePresenter.presentChar( (Character)x, fragment, inheritedState );
 		}
@@ -152,7 +152,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final ObjectPresenter presenter_Short = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			return GSymPrimitivePresenter.presentShort( (Short)x, fragment, inheritedState );
 		}
@@ -160,7 +160,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final ObjectPresenter presenter_Integer = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			return GSymPrimitivePresenter.presentInt( (Integer)x, fragment, inheritedState );
 		}
@@ -168,7 +168,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final ObjectPresenter presenter_Long = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			return GSymPrimitivePresenter.presentLong( (Long)x, fragment, inheritedState );
 		}
@@ -176,7 +176,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final ObjectPresenter presenter_BigInteger = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			return GSymPrimitivePresenter.presentBigInteger( (BigInteger)x, fragment, inheritedState );
 		}
@@ -184,7 +184,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final ObjectPresenter presenter_BigDecimal = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			return GSymPrimitivePresenter.presentBigDecimal( (BigDecimal)x, fragment, inheritedState );
 		}
@@ -192,7 +192,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final ObjectPresenter presenter_Float = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			return GSymPrimitivePresenter.presentDouble( ((Float)x).doubleValue(), fragment, inheritedState );
 		}
@@ -200,7 +200,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final ObjectPresenter presenter_Double = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			return GSymPrimitivePresenter.presentDouble( (Double)x, fragment, inheritedState );
 		}
@@ -208,7 +208,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final ObjectPresenter presenter_String = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			return GSymPrimitivePresenter.presentString( (String)x, fragment, inheritedState );
 		}
@@ -219,7 +219,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 
 	public static final PyObjectPresenter presenter_PyInteger = new PyObjectPresenter()
 	{
-		public Pres presentObject(PyObject x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(PyObject x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			PyInteger value = (PyInteger)x;
 			return GSymPrimitivePresenter.presentInt( value.getValue(), fragment, inheritedState );
@@ -228,7 +228,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final PyObjectPresenter presenter_PyFloat = new PyObjectPresenter()
 	{
-		public Pres presentObject(PyObject x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(PyObject x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			PyFloat value = (PyFloat)x;
 			return GSymPrimitivePresenter.presentDouble( value.getValue(), fragment, inheritedState );
@@ -237,7 +237,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final PyObjectPresenter presenter_PyBoolean = new PyObjectPresenter()
 	{
-		public Pres presentObject(PyObject x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(PyObject x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			PyBoolean value = (PyBoolean)x;
 			return GSymPrimitivePresenter.presentBoolean( value.getBooleanValue(), fragment, inheritedState );
@@ -247,7 +247,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final PyObjectPresenter presenter_PyTuple = new PyObjectPresenter()
 	{
-		public Pres presentObject(PyObject x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(PyObject x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			PyTuple tuple = (PyTuple)x;
 			
@@ -262,7 +262,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	};
 	
 	
-	private static Pres presentPyType(PyType type, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	private static Pres presentPyType(PyType type, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 
 		ArrayList<Object> contents = new ArrayList<Object>();
@@ -372,7 +372,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 
 	public static final PyObjectPresenter presenter_PyType = new PyObjectPresenter()
 	{
-		public Pres presentObject(PyObject x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(PyObject x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			PyType type = (PyType)x;
 			
@@ -491,7 +491,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final PyObjectPresenter presenter_PyFunction = new PyObjectPresenter()
 	{
-		public Pres presentObject(PyObject x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(PyObject x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			PyFunction fun = (PyFunction)x;
 			
@@ -515,7 +515,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final PyObjectPresenter presenter_PyProperty = new PyObjectPresenter()
 	{
-		public Pres presentObject(PyObject x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(PyObject x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			PyProperty prop = (PyProperty)x;
 			
@@ -530,7 +530,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final ObjectPresenter presenter_PyModule = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			PyModule module = (PyModule)x;
 			PyObject dict = module.fastGetDict();
@@ -622,7 +622,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final ObjectPresenter presenter_PyNone = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			return GSymPrimitivePresenter.presentNone();
 		}
@@ -632,7 +632,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final ObjectPresenter presenter_PyException = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			PyException e = (PyException)x;
 			
@@ -660,7 +660,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final ObjectPresenter presenter_PyBaseException = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			PyBaseException e = (PyBaseException)x;
 			
@@ -682,7 +682,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final ObjectPresenter presenter_Throwable = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			Throwable t = (Throwable)x;
 			
@@ -710,7 +710,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final ObjectPresenter presenter_Exception = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			Exception e = (Exception)x;
 			
@@ -738,7 +738,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final ObjectPresenter presenter_List = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			List<?> list = (List<?>)x;
 			
@@ -754,7 +754,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final ObjectPresenter presenter_Set = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			Set<?> set = (Set<?>)x;
 			
@@ -770,7 +770,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final ObjectPresenter presenter_Map = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			Map<?,?> map = (Map<?,?>)x;
 			
@@ -928,7 +928,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 	
 	public static final ObjectPresenter presenter_Class = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			Class<?> cls = (Class<?>)x;
 			
@@ -958,7 +958,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 
 	public static final ObjectPresenter presenter_Field = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			Field field = (Field)x;
 			return new ObjectBox( "Java Field", presentFieldDeclaration( field ) );
@@ -1006,7 +1006,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 
 	public static final ObjectPresenter presenter_Constructor = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			Constructor<?> constructor = (Constructor<?>)x;
 			return new ObjectBox( "Java Constructor", presentConstructorDeclaration( constructor ) );
@@ -1057,7 +1057,7 @@ public class GSymGenericObjectPresenterRegistry extends GSymObjectPresenterRegis
 
 	public static final ObjectPresenter presenter_Method = new ObjectPresenter()
 	{
-		public Pres presentObject(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres presentObject(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			Method method = (Method)x;
 			return new ObjectBox( "Java Method", presentMethodDeclaration( method ) );

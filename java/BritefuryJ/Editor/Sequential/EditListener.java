@@ -10,7 +10,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.EditEvent;
 import BritefuryJ.DocPresent.TextEditEvent;
 import BritefuryJ.DocPresent.TreeEventListener;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 
 public abstract class EditListener implements TreeEventListener
 {
@@ -54,7 +54,7 @@ public abstract class EditListener implements TreeEventListener
 				
 				if ( res == HandleEditResult.HANDLED )
 				{
-					GSymFragmentView sourceFragment = (GSymFragmentView)sourceElement.getFragmentContext();
+					FragmentView sourceFragment = (FragmentView)sourceElement.getFragmentContext();
 					sourceFragment.queueRefresh();
 					return true;
 				}

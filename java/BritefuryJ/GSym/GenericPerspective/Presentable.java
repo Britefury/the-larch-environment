@@ -8,9 +8,9 @@ package BritefuryJ.GSym.GenericPerspective;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 
 public interface Presentable
 {
-	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState);
+	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState);
 }

@@ -16,7 +16,7 @@ import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
 import BritefuryJ.GSym.PresCom.LocationAsInnerFragment;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 
 public class Location implements Presentable
 {
@@ -38,7 +38,7 @@ public class Location implements Presentable
 
 
 		@Override
-		public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			// TODO: Check for infinitely recursive nesting
 			return new LocationAsInnerFragment( loc );
@@ -117,7 +117,7 @@ public class Location implements Presentable
 	}
 
 
-	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return locationStyle.applyTo( new ObjectBox( "Location", new StaticText( locationString ) ) );
 	}

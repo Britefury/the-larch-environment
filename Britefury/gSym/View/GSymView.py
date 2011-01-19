@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from BritefuryJ.GSym.View import GSymViewFragmentFunction
+from BritefuryJ.IncrementalView import ViewFragmentFunction
 
 from Britefury.Dispatch.Dispatch import DispatchError
 from Britefury.Dispatch.MethodDispatch import methodDispatch, methodDispatchAndGetName
@@ -18,7 +18,7 @@ import time
 			
 		
 		
-class GSymViewListNodeDispatch (GSymViewFragmentFunction):
+class GSymViewListNodeDispatch (ViewFragmentFunction):
 	def createViewFragment(self, xs, ctx, state):
 		element = None
 		element, name = methodDispatchAndGetName( self, xs, ctx, state )
@@ -31,7 +31,7 @@ class GSymViewListNodeDispatch (GSymViewFragmentFunction):
 
 
 		
-class GSymViewObjectNodeDispatch (GSymViewFragmentFunction):
+class GSymViewObjectNodeDispatch (ViewFragmentFunction):
 	__dispatch_num_args__ = 2
 	
 	def createViewFragment(self, node, ctx, state):
@@ -43,7 +43,7 @@ class GSymViewObjectNodeDispatch (GSymViewFragmentFunction):
 		
 
 	
-class GSymViewObjectDispatch (GSymViewFragmentFunction):
+class GSymViewObjectDispatch (ViewFragmentFunction):
 	__dispatch_num_args__ = 2
 	
 	def createViewFragment(self, obj, ctx, state):

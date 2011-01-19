@@ -12,7 +12,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Math.Point2;
 
 public class ObjectCellEditorDropBox extends LiteralCellEditor
@@ -24,7 +24,7 @@ public class ObjectCellEditorDropBox extends LiteralCellEditor
 			@Override
 			public boolean acceptDrop(PointerInputElement destElement, Point2 targetPosition, Object data, int action)
 			{
-				setCellValue( ((GSymFragmentView.FragmentModel)data).getModel() );
+				setCellValue( ((FragmentView.FragmentModel)data).getModel() );
 				return true;
 			}
 		}
@@ -46,7 +46,7 @@ public class ObjectCellEditorDropBox extends LiteralCellEditor
 			{
 				p = new ObjectBox( "DocModel", new Label( "null" ) );
 			}
-			p = p.withDropDest( GSymFragmentView.FragmentModel.class, new Listener() );
+			p = p.withDropDest( FragmentView.FragmentModel.class, new Listener() );
 			setPres( p );
 		}
 	};

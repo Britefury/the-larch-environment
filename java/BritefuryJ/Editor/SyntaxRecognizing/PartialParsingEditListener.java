@@ -9,7 +9,7 @@ package BritefuryJ.Editor.SyntaxRecognizing;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.EditEvent;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Parser.ParserExpression;
 
 public abstract class PartialParsingEditListener extends ParsingEditListener
@@ -21,7 +21,7 @@ public abstract class PartialParsingEditListener extends ParsingEditListener
 
 	
 	@Override
-	protected HandleEditResult handleParseSuccess(DPElement element, DPElement sourceElement, GSymFragmentView fragment, EditEvent event, Object model, StreamValue value, Object parsed)
+	protected HandleEditResult handleParseSuccess(DPElement element, DPElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value, Object parsed)
 	{
 		event.getStreamValueVisitor().setElementFixedValue( element, parsed );
 		return HandleEditResult.PASS_TO_PARENT;

@@ -19,7 +19,7 @@ import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.Editor.Sequential.SequentialEditor;
 import BritefuryJ.Editor.SyntaxRecognizing.Precedence.PrecedenceHandler;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.Utils.HashUtils;
 
@@ -61,7 +61,7 @@ public abstract class SyntaxRecognizingEditor extends SequentialEditor
 
 		
 		@Override
-		protected HandleEditResult handleEmptyValue(DPElement element, GSymFragmentView fragment, EditEvent event, Object model)
+		protected HandleEditResult handleEmptyValue(DPElement element, FragmentView fragment, EditEvent event, Object model)
 		{
 			if ( emptyCommit == null )
 			{
@@ -76,7 +76,7 @@ public abstract class SyntaxRecognizingEditor extends SequentialEditor
 
 		@Override
 		protected HandleEditResult handleParseSuccess(DPElement element, DPElement sourceElement,
-				GSymFragmentView fragment, EditEvent event, Object model, StreamValue value,
+				FragmentView fragment, EditEvent event, Object model, StreamValue value,
 				Object parsed)
 		{
 			if ( parsed.equals( model ) )
@@ -180,7 +180,7 @@ public abstract class SyntaxRecognizingEditor extends SequentialEditor
 		}
 
 
-		protected boolean isValueValid(DPElement element, DPElement sourceElement, GSymFragmentView fragment, EditEvent event, Object model, StreamValue value)
+		protected boolean isValueValid(DPElement element, DPElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
 		{
 			if ( test != null )
 			{
@@ -193,14 +193,14 @@ public abstract class SyntaxRecognizingEditor extends SequentialEditor
 		}
 
 		@Override
-		protected HandleEditResult handleUnparsed(DPElement element, DPElement sourceElement, GSymFragmentView fragment, EditEvent event, Object model, StreamValue value)
+		protected HandleEditResult handleUnparsed(DPElement element, DPElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
 		{
 			commit.commit( model, value );
 			return HandleEditResult.HANDLED;
 		}
 
 		@Override
-		protected HandleEditResult handleInnerUnparsed(DPElement element, DPElement sourceElement, GSymFragmentView fragment, EditEvent event, Object model, StreamValue value)
+		protected HandleEditResult handleInnerUnparsed(DPElement element, DPElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
 		{
 			innerCommit.commit( model, value );
 			return HandleEditResult.HANDLED;

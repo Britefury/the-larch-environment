@@ -25,7 +25,7 @@ import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
 import BritefuryJ.GSym.GenericPerspective.PresCom.UnescapedStringAsRow;
 import BritefuryJ.GSym.PresCom.InnerFragment;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 
 public class DocModelPresenter
 {
@@ -60,7 +60,7 @@ public class DocModelPresenter
 
 
 	
-	private static Pres present(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	private static Pres present(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		if ( x == null )
 		{
@@ -76,7 +76,7 @@ public class DocModelPresenter
 		}
 	}
 	
-	protected static Pres presentDMList(DMList node, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	protected static Pres presentDMList(DMList node, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		List<Object> xViews = new ArrayList<Object>();
 		for (Object x: node)
@@ -102,7 +102,7 @@ public class DocModelPresenter
 	}
 	
 	
-	protected static Pres presentDMObject(DMObject node, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	protected static Pres presentDMObject(DMObject node, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		DMObjectClass cls = node.getDMObjectClass();
 		

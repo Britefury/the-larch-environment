@@ -23,7 +23,7 @@ import BritefuryJ.DocPresent.Combinators.Primitive.Border;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 import BritefuryJ.ParserHelpers.TraceNode;
@@ -235,7 +235,7 @@ public class ParseView
 	
 	
 	
-	public static Pres presentTracedParseResult(TracedParseResultInterface x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public static Pres presentTracedParseResult(TracedParseResultInterface x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		ParseView v = new ParseView( x, fragment.persistentState( "viewport " ) );
 		return v.pres.alignHExpand().alignVExpand();

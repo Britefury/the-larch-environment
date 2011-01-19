@@ -48,6 +48,10 @@ public class PointerMotionInteractor extends PointerInteractor
 		return true;
 	}
 
+	public void elementUnrealised(Pointer pointer, PointerInputElement element)
+	{
+		handleUnrealise( pointer, element );
+	}
 	
 	
 
@@ -124,6 +128,26 @@ public class PointerMotionInteractor extends PointerInteractor
 			{
 				sendEnterFromChildEvent( elementsUnderPointer.lastElement(), events.lastElement().withAction( PointerMotionEvent.Action.ENTER ) );
 			}
+		}
+	}
+
+	private void handleUnrealise(Pointer pointer, PointerInputElement element)
+	{
+		int index = 0;
+		PointerMotionEvent event = new PointerMotionEvent( pointer, PointerMotionEvent.Action.LEAVE );
+		for (PointerInputElement e: elementsUnderPointer)
+		{
+			if ( e == element )
+			{
+				handleLeave( index, event );
+				return;
+			}
+			else
+			{
+				event = (PointerMotionEvent)element.transformParentToLocalEvent( event );
+			}
+			
+			index++;
 		}
 	}
 	

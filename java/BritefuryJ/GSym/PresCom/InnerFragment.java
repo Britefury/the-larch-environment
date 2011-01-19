@@ -14,7 +14,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 
 public class InnerFragment extends Pres
 {
@@ -39,7 +39,7 @@ public class InnerFragment extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		GSymFragmentView fragment = ctx.getFragment();
+		FragmentView fragment = ctx.getFragment();
 		
 		SimpleAttributeTable s = inheritedState != null  ?  ctx.getInheritedState().withAttrs( inheritedState )  :  ctx.getInheritedState();
 		

@@ -19,7 +19,7 @@ import BritefuryJ.DocPresent.Painter.FilledOutlinePainter;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 
 public abstract class AbstractBorder implements Presentable
 {
@@ -58,7 +58,7 @@ public abstract class AbstractBorder implements Presentable
 	
 
 	@Override
-	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return new ObjectBox( getClass().getName(), StyleSheet.instance.withAttr( Primitive.border, this ).applyTo( new Border( presentationSwatch() ) ) );
 	}

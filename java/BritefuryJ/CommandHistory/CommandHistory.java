@@ -24,7 +24,7 @@ import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
 import BritefuryJ.GSym.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.GSym.PresCom.InnerFragment;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 
 public class CommandHistory implements CommandHistoryController, Presentable
 {
@@ -67,7 +67,7 @@ public class CommandHistory implements CommandHistoryController, Presentable
 
 		
 		@Override
-		public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			return new InnerFragment( command );
 		}
@@ -123,7 +123,7 @@ public class CommandHistory implements CommandHistoryController, Presentable
 
 		
 		@Override
-		public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
 			return new ObjectBox( "Command group", new Column( Pres.mapCoerce( commands ) ) );
 		}
@@ -416,7 +416,7 @@ public class CommandHistory implements CommandHistoryController, Presentable
 
 
 	@Override
-	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		presStateListeners = PresentationStateListenerList.addListener( presStateListeners, fragment );
 

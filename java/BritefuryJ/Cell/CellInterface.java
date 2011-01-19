@@ -23,9 +23,9 @@ import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
 import BritefuryJ.GSym.PresCom.ApplyPerspective;
 import BritefuryJ.GSym.PresCom.InnerFragment;
-import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
 import BritefuryJ.Incremental.IncrementalOwner;
+import BritefuryJ.IncrementalView.FragmentView;
 
 
 
@@ -82,7 +82,7 @@ public abstract class CellInterface implements IncrementalOwner, Presentable
 	
 	
 	@Override
-	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return cellStyle.applyTo( new ObjectBox( getClass().getName(), new InnerFragment( getValue() ) ) );
 	}

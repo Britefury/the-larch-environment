@@ -28,9 +28,9 @@ import BritefuryJ.CommandHistory.Trackable;
 import BritefuryJ.DocModel.DMObjectClass.UnknownFieldNameException;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
-import BritefuryJ.GSym.View.GSymFragmentView;
 import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.Incremental.IncrementalValueMonitor;
+import BritefuryJ.IncrementalView.FragmentView;
 
 public class DMObject extends DMNode implements DMObjectInterface, Trackable, Serializable, Cloneable, IncrementalOwner, Presentable
 {
@@ -829,7 +829,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 
 
 	
-	public Pres present(GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return DocModelPresenter.presentDMObject( this, fragment, inheritedState );
 	}

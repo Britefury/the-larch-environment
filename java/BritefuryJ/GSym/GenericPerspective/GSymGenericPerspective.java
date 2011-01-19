@@ -21,7 +21,7 @@ import BritefuryJ.GSym.ObjectPresentation.ObjectPresentationLocationResolver;
 import BritefuryJ.GSym.ObjectPresentation.ObjectPresenter;
 import BritefuryJ.GSym.ObjectPresentation.PyObjectPresenter;
 import BritefuryJ.GSym.PresCom.InnerFragment;
-import BritefuryJ.GSym.View.GSymFragmentView;
+import BritefuryJ.IncrementalView.FragmentView;
 
 public class GSymGenericPerspective extends GSymObjectPresentationPerspective
 {
@@ -33,7 +33,7 @@ public class GSymGenericPerspective extends GSymObjectPresentationPerspective
 
 	
 
-	protected Pres presentWithJavaInterface(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	protected Pres presentWithJavaInterface(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		if ( x instanceof Presentable )
 		{
@@ -46,7 +46,7 @@ public class GSymGenericPerspective extends GSymObjectPresentationPerspective
 		}
 	}
 	
-	protected Pres presentJavaArray(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	protected Pres presentJavaArray(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		int length = Array.getLength( x );
 		Object members[] = new Object[length];
@@ -57,23 +57,23 @@ public class GSymGenericPerspective extends GSymObjectPresentationPerspective
 		return GSymGenericObjectPresenterRegistry.arrayView( Arrays.asList( members ) );
 	}
 	
-	protected Pres presentJavaObjectFallback(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	protected Pres presentJavaObjectFallback(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return new ObjectBox( x.getClass().getName(), GSymPrimitivePresenter.presentJavaObjectInspector( x, fragment, inheritedState ) );
 	}
 	
-	protected Pres presentPyObjectFallback(PyObject x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	protected Pres presentPyObjectFallback(PyObject x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		PyType typeX = x.getType();
 		return new ObjectBox( typeX.getName(), GSymPrimitivePresenter.presentPythonObjectInspector( x, fragment, inheritedState ) );
 	}
 	
-	protected Pres invokeObjectPresenter(ObjectPresenter presenter, Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	protected Pres invokeObjectPresenter(ObjectPresenter presenter, Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return presenter.presentObject( x, fragment, inheritedState );
 	}
 	
-	protected Pres invokePyObjectPresenter(PyObjectPresenter presenter, PyObject x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	protected Pres invokePyObjectPresenter(PyObjectPresenter presenter, PyObject x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return presenter.presentObject( x, fragment, inheritedState );
 	}

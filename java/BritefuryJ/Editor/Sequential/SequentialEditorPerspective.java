@@ -7,11 +7,11 @@
 package BritefuryJ.Editor.Sequential;
 
 import BritefuryJ.GSym.GSymPerspective;
-import BritefuryJ.GSym.View.GSymViewFragmentFunction;
+import BritefuryJ.IncrementalView.ViewFragmentFunction;
 
 public class SequentialEditorPerspective extends GSymPerspective
 {
-	public SequentialEditorPerspective(GSymViewFragmentFunction fragmentViewFn, SequentialEditor sequentialEditor)
+	public SequentialEditorPerspective(ViewFragmentFunction fragmentViewFn, SequentialEditor sequentialEditor)
 	{
 		super( fragmentViewFn, sequentialEditor.getClipboardHandler() );
 	}

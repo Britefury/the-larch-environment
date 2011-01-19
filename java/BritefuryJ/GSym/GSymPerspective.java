@@ -9,22 +9,22 @@ package BritefuryJ.GSym;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.GSym.View.GSymFragmentView;
-import BritefuryJ.GSym.View.GSymViewFragmentFunction;
+import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.IncrementalView.ViewFragmentFunction;
 
 public class GSymPerspective extends GSymAbstractPerspective
 {
-	private GSymViewFragmentFunction fragmentViewFn;
+	private ViewFragmentFunction fragmentViewFn;
 	private ClipboardHandler clipboardHandler;
 	
 	
-	public GSymPerspective(GSymViewFragmentFunction fragmentViewFn, ClipboardHandler clipboardHandler)
+	public GSymPerspective(ViewFragmentFunction fragmentViewFn, ClipboardHandler clipboardHandler)
 	{
 		this.fragmentViewFn = fragmentViewFn;
 		this.clipboardHandler = clipboardHandler;
 	}
 	
-	public GSymPerspective(GSymViewFragmentFunction fragmentViewFn)
+	public GSymPerspective(ViewFragmentFunction fragmentViewFn)
 	{
 		this( fragmentViewFn, null );
 	}
@@ -32,7 +32,7 @@ public class GSymPerspective extends GSymAbstractPerspective
 	
 	
 	@Override
-	protected Pres presentModel(Object x, GSymFragmentView fragment, SimpleAttributeTable inheritedState)
+	protected Pres presentModel(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
 		return fragmentViewFn.createViewFragment( x, fragment, inheritedState );
 	}
