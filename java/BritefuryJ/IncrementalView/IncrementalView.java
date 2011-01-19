@@ -30,9 +30,6 @@ import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
-import BritefuryJ.GSym.GSymAbstractPerspective;
-import BritefuryJ.GSym.GSymBrowserContext;
-import BritefuryJ.GSym.GSymSubject;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ErrorBox;
 import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBorder;
@@ -40,6 +37,9 @@ import BritefuryJ.IncrementalTree.IncrementalTree;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 import BritefuryJ.IncrementalTree.IncrementalTreeNodeTable;
 import BritefuryJ.Logging.Log;
+import BritefuryJ.Projection.AbstractPerspective;
+import BritefuryJ.Projection.ProjectiveBrowserContext;
+import BritefuryJ.Projection.Subject;
 import BritefuryJ.Utils.HashUtils;
 import BritefuryJ.Utils.Profile.ProfileTimer;
 
@@ -110,12 +110,12 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	protected static class ViewFragmentContextAndResultFactory implements IncrementalTreeNode.NodeResultFactory
 	{
 		protected IncrementalView view;
-		protected GSymAbstractPerspective perspective;
+		protected AbstractPerspective perspective;
 		protected SimpleAttributeTable subjectContext;
 		protected StyleValues style;
 		protected SimpleAttributeTable inheritedState;
 		
-		public ViewFragmentContextAndResultFactory(IncrementalView view, GSymAbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
+		public ViewFragmentContextAndResultFactory(IncrementalView view, AbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
 		{
 			this.view = view;
 			this.perspective = perspective;
@@ -140,7 +140,7 @@ public class IncrementalView extends IncrementalTree implements Presentable
 			}
 			catch (Throwable t)
 			{
-				GSymAbstractPerspective genericPerspective = view.browserContext.getGenericPerspective();
+				AbstractPerspective genericPerspective = view.browserContext.getGenericPerspective();
 				try
 				{
 					Pres exceptionView = genericPerspective.presentObject( t, fragmentView, inheritedState );
@@ -171,13 +171,13 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	
 	protected static class ViewFragmentContextAndResultFactoryKey
 	{
-		private GSymAbstractPerspective perspective;
+		private AbstractPerspective perspective;
 		private SimpleAttributeTable subjectContext;
 		private StyleValues style;
 		private SimpleAttributeTable inheritedState;
 		
 		
-		public ViewFragmentContextAndResultFactoryKey(GSymAbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
+		public ViewFragmentContextAndResultFactoryKey(AbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
 		{
 			this.perspective = perspective;
 			this.style = style;
@@ -239,7 +239,7 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	
 	private DPRegion region;
 	
-	private GSymBrowserContext browserContext;
+	private ProjectiveBrowserContext browserContext;
 	private IncrementalViewPage page;
 	
 	private CommandHistory commandHistory;
@@ -250,10 +250,10 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	
 	
 	
-	public IncrementalView(GSymSubject subject, GSymBrowserContext browserContext, PersistentStateStore persistentState)
+	public IncrementalView(Subject subject, ProjectiveBrowserContext browserContext, PersistentStateStore persistentState)
 	{
 		super( subject.getFocus(), DuplicatePolicy.ALLOW_DUPLICATES );
-		GSymAbstractPerspective perspective = subject.getPerspective();
+		AbstractPerspective perspective = subject.getPerspective();
 		if ( perspective == null )
 		{
 			perspective = browserContext.getGenericPerspective();
@@ -298,7 +298,7 @@ public class IncrementalView extends IncrementalTree implements Presentable
 		return rootNodeResultFactory;
 	}
 
-	protected FragmentView.NodeResultFactory makeNodeResultFactory(GSymAbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
+	protected FragmentView.NodeResultFactory makeNodeResultFactory(AbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
 	{
 		// Memoise the contents factory, keyed by  @nodeViewFunction and @state
 		ViewFragmentContextAndResultFactoryKey key = new ViewFragmentContextAndResultFactoryKey( perspective, subjectContext, style, inheritedState );
@@ -594,7 +594,7 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	
 	
 	
-	public GSymBrowserContext getBrowserContext()
+	public ProjectiveBrowserContext getBrowserContext()
 	{
 		return browserContext;
 	}

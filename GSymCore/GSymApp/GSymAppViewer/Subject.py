@@ -11,7 +11,7 @@ from BritefuryJ.AttributeTable import SimpleAttributeTable
 
 from BritefuryJ.DocPresent.Browser import Location
 
-from BritefuryJ.GSym import GSymSubject
+from BritefuryJ.Projection import Subject
 from Britefury.gSym.gSymDocument import GSymDocument
 
 from GSymCore.PythonConsole import Console
@@ -48,7 +48,7 @@ class _DocumentListSubject (object):
 		raise AttributeError, 'no document at %s'  %  ( location, )
 		
 
-class GSymAppSubject (GSymSubject):
+class GSymAppSubject (Subject):
 	def __init__(self, appState, world, rootLocation):
 		self._appState = appState
 		self._world = world

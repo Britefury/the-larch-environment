@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.GSym;
+package BritefuryJ.Projection;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
@@ -13,7 +13,7 @@ import BritefuryJ.GSym.PresCom.ApplyPerspective;
 import BritefuryJ.IncrementalView.FragmentView;
 
 
-public abstract class GSymAbstractPerspective
+public abstract class AbstractPerspective
 {
 	protected abstract Pres presentModel(Object x, FragmentView fragment, SimpleAttributeTable inheritedState);
 	

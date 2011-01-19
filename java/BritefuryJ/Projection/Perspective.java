@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.GSym;
+package BritefuryJ.Projection;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
@@ -12,19 +12,19 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.IncrementalView.ViewFragmentFunction;
 
-public class GSymPerspective extends GSymAbstractPerspective
+public class Perspective extends AbstractPerspective
 {
 	private ViewFragmentFunction fragmentViewFn;
 	private ClipboardHandler clipboardHandler;
 	
 	
-	public GSymPerspective(ViewFragmentFunction fragmentViewFn, ClipboardHandler clipboardHandler)
+	public Perspective(ViewFragmentFunction fragmentViewFn, ClipboardHandler clipboardHandler)
 	{
 		this.fragmentViewFn = fragmentViewFn;
 		this.clipboardHandler = clipboardHandler;
 	}
 	
-	public GSymPerspective(ViewFragmentFunction fragmentViewFn)
+	public Perspective(ViewFragmentFunction fragmentViewFn)
 	{
 		this( fragmentViewFn, null );
 	}

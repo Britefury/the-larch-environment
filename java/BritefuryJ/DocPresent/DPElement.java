@@ -68,7 +68,6 @@ import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StreamValue.StreamValueVisitor;
 import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.GSym.GSymPerspective;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.GSym.PresCom.InnerFragment;
@@ -78,6 +77,7 @@ import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 import BritefuryJ.Math.Xform2;
+import BritefuryJ.Projection.Perspective;
 import BritefuryJ.Utils.HashUtils;
 
 
@@ -105,7 +105,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		}
 	}
 	
-	protected static GSymPerspective treeExplorerPerspective = new GSymPerspective( new TreeExplorerViewFragmentFn() );
+	protected static Perspective treeExplorerPerspective = new Perspective( new TreeExplorerViewFragmentFn() );
 	
 	public static class ElementTreeExplorer implements Presentable
 	{

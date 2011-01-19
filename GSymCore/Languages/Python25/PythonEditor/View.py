@@ -34,7 +34,7 @@ from BritefuryJ.DocPresent.Input import ObjectDndHandler
 from BritefuryJ.DocPresent.Combinators.Primitive import Paragraph, Segment
 from BritefuryJ.GSym.PresCom import ApplyPerspective
 
-from BritefuryJ.GSym import GSymPerspective, GSymSubject
+from BritefuryJ.Projection import Perspective, Subject
 from BritefuryJ.IncrementalView import FragmentView
 
 from BritefuryJ.Editor.Sequential import SequentialEditorPerspective

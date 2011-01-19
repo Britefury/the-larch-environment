@@ -27,7 +27,7 @@ from Britefury.Util.InstanceCache import instanceCache
 
 from BritefuryJ.AttributeTable import *
 
-from BritefuryJ.GSym import GSymPerspective, GSymSubject
+from BritefuryJ.Projection import Perspective, Subject
 from BritefuryJ.GSym.PresCom import InnerFragment, LocationAsInnerFragment
 
 
@@ -294,7 +294,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 perspective = SequentialEditorPerspective( WorksheetEditor(), WorksheetSequentialEditor.instance )
 
 
-class WorksheetEditorSubject (GSymSubject):
+class WorksheetEditorSubject (Subject):
 	def __init__(self, document, model, enclosingSubject, location):
 		self._document = document
 		self._modelView = ViewSchema.WorksheetView( None, model )

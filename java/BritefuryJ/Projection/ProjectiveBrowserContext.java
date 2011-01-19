@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.GSym;
+package BritefuryJ.Projection;
 
 import org.python.core.Py;
 import org.python.core.PyObject;
@@ -37,11 +37,11 @@ import BritefuryJ.GSym.ObjectPresentation.ObjectPresentationLocationResolver;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.IncrementalView.IncrementalView;
 
-public class GSymBrowserContext
+public class ProjectiveBrowserContext
 {
-	private static class PageSubject extends GSymSubject
+	private static class PageSubject extends Subject
 	{
-		private class PagePerspective extends GSymAbstractPerspective
+		private class PagePerspective extends AbstractPerspective
 		{
 			@Override
 			protected Pres presentModel(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
@@ -74,7 +74,7 @@ public class GSymBrowserContext
 		}
 
 		@Override
-		public GSymAbstractPerspective getPerspective()
+		public AbstractPerspective getPerspective()
 		{
 			return perspective;
 		}
@@ -93,7 +93,7 @@ public class GSymBrowserContext
 	{
 		public BrowserPage resolveLocationAsPage(Location location, PersistentStateStore persistentState)
 		{
-			return GSymBrowserContext.this.resolveLocationAsPage( location, persistentState );
+			return ProjectiveBrowserContext.this.resolveLocationAsPage( location, persistentState );
 		}
 	}
 	
@@ -106,7 +106,7 @@ public class GSymBrowserContext
 	
 	
 	
-	public GSymBrowserContext(GSymGenericObjectPresenterRegistry genericPresenterRegistry, boolean bWithSystemPages)
+	public ProjectiveBrowserContext(GSymGenericObjectPresenterRegistry genericPresenterRegistry, boolean bWithSystemPages)
 	{
 		genericPerspective = new GSymGenericPerspective( objPresLocationResolver, genericPresenterRegistry );
 		if ( bWithSystemPages )
@@ -202,13 +202,13 @@ public class GSymBrowserContext
 	}
 
 
-	public GSymSubject resolveLocationAsSubject(Location location)
+	public Subject resolveLocationAsSubject(Location location)
 	{
 		Object result = resolveLocationAsObject( location );
 		
-		if ( result instanceof GSymSubject )
+		if ( result instanceof Subject )
 		{
-			return (GSymSubject)result;
+			return (Subject)result;
 		}
 		else if ( result instanceof BrowserPage )
 		{
@@ -223,7 +223,7 @@ public class GSymBrowserContext
 	
 	public BrowserPage resolveLocationAsPage(Location location, PersistentStateStore persistentState)
 	{
-		GSymSubject subject = resolveLocationAsSubject( location );
+		Subject subject = resolveLocationAsSubject( location );
 		IncrementalView view = new IncrementalView( subject, this, persistentState );
 		return view.getPage();
 	}

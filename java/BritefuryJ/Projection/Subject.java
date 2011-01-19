@@ -4,17 +4,17 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.GSym;
+package BritefuryJ.Projection;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.CommandHistory.CommandHistory;
 
-public abstract class GSymSubject
+public abstract class Subject
 {
 	public abstract Object getFocus();
 	
 	
-	public GSymAbstractPerspective getPerspective()
+	public AbstractPerspective getPerspective()
 	{
 		return null;
 	}

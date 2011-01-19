@@ -10,15 +10,15 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
-import BritefuryJ.GSym.GSymAbstractPerspective;
+import BritefuryJ.Projection.AbstractPerspective;
 
 public class ApplyPerspective extends Pres
 {
-	private GSymAbstractPerspective perspective;
+	private AbstractPerspective perspective;
 	private Pres child;
 	
 	
-	public ApplyPerspective(GSymAbstractPerspective perspective, Object child)
+	public ApplyPerspective(AbstractPerspective perspective, Object child)
 	{
 		this.perspective = perspective;
 		this.child = coerceNonNull( child );
@@ -34,7 +34,7 @@ public class ApplyPerspective extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		GSymAbstractPerspective p = perspective;
+		AbstractPerspective p = perspective;
 		if ( p == null )
 		{
 			p = ctx.getFragment().getBrowserContext().getGenericPerspective();

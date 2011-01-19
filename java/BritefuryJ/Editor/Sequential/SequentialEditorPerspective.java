@@ -6,10 +6,10 @@
 //##************************
 package BritefuryJ.Editor.Sequential;
 
-import BritefuryJ.GSym.GSymPerspective;
 import BritefuryJ.IncrementalView.ViewFragmentFunction;
+import BritefuryJ.Projection.Perspective;
 
-public class SequentialEditorPerspective extends GSymPerspective
+public class SequentialEditorPerspective extends Perspective
 {
 	public SequentialEditorPerspective(ViewFragmentFunction fragmentViewFn, SequentialEditor sequentialEditor)
 	{

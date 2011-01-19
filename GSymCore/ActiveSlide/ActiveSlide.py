@@ -18,7 +18,7 @@ from BritefuryJ.DocPresent.Interactor import *
 from BritefuryJ.DocPresent.Input import Modifier
 
 
-from BritefuryJ.GSym import GSymSubject
+from BritefuryJ.Projection import Subject
 
 
 
@@ -110,7 +110,7 @@ class SlideShow (object):
 	
 
 		
-class _SlideSubject (GSymSubject):
+class _SlideSubject (Subject):
 	def __init__(self, slideShowSubject, slide, index):
 		self._slideShowSubject = slideShowSubject
 		self._slide = slide

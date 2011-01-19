@@ -110,23 +110,26 @@ public class PointerMotionInteractor extends PointerInteractor
 	{
 		Stack<PointerMotionEvent> events = new Stack<PointerMotionEvent>();
 		
-		events.push( event );
-		for (PointerInputElement element: elementsUnderPointer.subList( index + 1, elementsUnderPointer.size() ))
+		if ( index < elementsUnderPointer.size() )
 		{
-			event = (PointerMotionEvent)element.transformParentToLocalEvent( event );
 			events.push( event );
-		}
-		
-		while ( elementsUnderPointer.size() > index )
-		{
-			PointerInputElement element = elementsUnderPointer.pop();
-			event = events.pop();
-			
-			sendLeaveEvent( element, event );
-			
-			if ( elementsUnderPointer.size() > index )
+			for (PointerInputElement element: elementsUnderPointer.subList( index + 1, elementsUnderPointer.size() ))
 			{
-				sendEnterFromChildEvent( elementsUnderPointer.lastElement(), events.lastElement().withAction( PointerMotionEvent.Action.ENTER ) );
+				event = (PointerMotionEvent)element.transformParentToLocalEvent( event );
+				events.push( event );
+			}
+			
+			while ( elementsUnderPointer.size() > index )
+			{
+				PointerInputElement element = elementsUnderPointer.pop();
+				event = events.pop();
+				
+				sendLeaveEvent( element, event );
+				
+				if ( elementsUnderPointer.size() > index )
+				{
+					sendEnterFromChildEvent( elementsUnderPointer.lastElement(), events.lastElement().withAction( PointerMotionEvent.Action.ENTER ) );
+				}
 			}
 		}
 	}

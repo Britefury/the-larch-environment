@@ -10,7 +10,7 @@ from BritefuryJ.AttributeTable import SimpleAttributeTable
 
 from BritefuryJ.DocPresent.Browser import Location
 
-from BritefuryJ.GSym import GSymBrowserContext, GSymSubject
+from BritefuryJ.Projection import ProjectiveBrowserContext, Subject
 
 from Britefury.gSym.Presentation.GenericPresenterRegistry import genericPresenterRegistry
 from Britefury.MainApp.AppWindow import AppWindow
@@ -19,7 +19,7 @@ from Britefury.MainApp.AppWindow import AppWindow
 
 class MainApp (object):
 	def __init__(self, world, location=Location( '' )):
-		class _ModelSubject (GSymSubject):
+		class _ModelSubject (Subject):
 			def __init__(self, innerSubject):
 				self._innerSubject = innerSubject
 		
@@ -43,7 +43,7 @@ class MainApp (object):
 
 		self._world = world
 
-		self._browserContext = GSymBrowserContext( genericPresenterRegistry, True )
+		self._browserContext = ProjectiveBrowserContext( genericPresenterRegistry, True )
 		self._world.registerBrowserContext( self._browserContext )
 		
 		self._appState = world.getAppStateSubject().getFocus()
