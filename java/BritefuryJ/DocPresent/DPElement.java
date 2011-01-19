@@ -37,6 +37,7 @@ import java.util.NoSuchElementException;
 import java.util.WeakHashMap;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
@@ -68,8 +69,6 @@ import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StreamValue.StreamValueVisitor;
 import BritefuryJ.DocPresent.StyleParams.ElementStyleParams;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.GSym.GenericPerspective.Presentable;
-import BritefuryJ.GSym.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.GSym.PresCom.InnerFragment;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.IncrementalView.ViewFragmentFunction;
@@ -77,6 +76,7 @@ import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 import BritefuryJ.Math.Xform2;
+import BritefuryJ.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.Projection.Perspective;
 import BritefuryJ.Utils.HashUtils;
 

@@ -10,15 +10,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.GSym.GenericPerspective.Presentable;
-import BritefuryJ.GSym.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.GSym.PresCom.InnerFragment;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.ObjectPresentation.PresentationStateListenerList;
 
 public class LogView implements Presentable
 {

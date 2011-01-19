@@ -157,7 +157,7 @@ class ConsoleView (GSymViewObjectDispatch):
 		m = m.withCustomElementAction( _ensureCurrentModuleVisible )
 		
 		dropPromptCell = LiteralCell( HiddenContent( '' ) )
-		dropPromptView = dropPromptCell.genericPerspectiveValuePresInFragment()
+		dropPromptView = dropPromptCell.defaultPerspectiveValuePresInFragment()
 		
 		if len( blocks ) > 0:
 			blockList = _consoleBlockListStyle.applyTo( Column( blocks ) ).alignHExpand()
@@ -179,8 +179,8 @@ class ConsoleView (GSymViewObjectDispatch):
 		stderr = executionResult.getStdErr()
 		
 		moduleView = StyleSheet.instance.withAttr( Primitive.editable, False ).applyTo( Python25.python25EditorPerspective.applyTo( InnerFragment( pythonModule ) ) )
-		caughtExceptionView = ApplyPerspective.generic( InnerFragment( caughtException ) )   if caughtException is not None   else None
-		resultView = ApplyPerspective.generic( InnerFragment( result[0] ) )   if result is not None   else None
+		caughtExceptionView = ApplyPerspective.defaultPerspective( InnerFragment( caughtException ) )   if caughtException is not None   else None
+		resultView = ApplyPerspective.defaultPerspective( InnerFragment( result[0] ) )   if result is not None   else None
 			
 		blockContents = []
 		blockContents.append( _pythonModuleBorderStyle.applyTo( Border( moduleView.alignHExpand() ).alignHExpand() ) )

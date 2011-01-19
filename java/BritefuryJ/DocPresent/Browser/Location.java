@@ -9,12 +9,12 @@ package BritefuryJ.DocPresent.Browser;
 import java.awt.Color;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.DefaultPerspective.Presentable;
+import BritefuryJ.DefaultPerspective.PresCom.GenericStyle;
+import BritefuryJ.DefaultPerspective.PresCom.ObjectBox;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.GSym.GenericPerspective.Presentable;
-import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
-import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
 import BritefuryJ.GSym.PresCom.LocationAsInnerFragment;
 import BritefuryJ.IncrementalView.FragmentView;
 

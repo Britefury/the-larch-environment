@@ -14,13 +14,13 @@ import java.util.HashSet;
 import org.python.core.Py;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.DefaultPerspective.Presentable;
+import BritefuryJ.DefaultPerspective.PresCom.GenericStyle;
+import BritefuryJ.DefaultPerspective.PresCom.HorizontalField;
+import BritefuryJ.DefaultPerspective.PresCom.ObjectBoxWithFields;
+import BritefuryJ.DefaultPerspective.PresCom.VerticalField;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.GSym.GenericPerspective.Presentable;
-import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
-import BritefuryJ.GSym.GenericPerspective.PresCom.HorizontalField;
-import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBoxWithFields;
-import BritefuryJ.GSym.GenericPerspective.PresCom.VerticalField;
 import BritefuryJ.GSym.PresCom.InnerFragment;
 import BritefuryJ.IncrementalView.FragmentView;
 

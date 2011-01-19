@@ -358,7 +358,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 			pythonPackageNameLabel = _itemHoverHighlightStyle.applyTo( _pythonPackageNameStyle.applyTo( Label( pythonPackageName ) ) )
 		pythonPackageNameLabel = pythonPackageNameLabel.withElementInteractor( _PythonPackageNameInteractor() )
 		pythonPackageCell = LiteralCell( pythonPackageNameLabel )
-		pythonPackageNameBox = Row( [ pythonPackageNamePrompt, pythonPackageCell.genericPerspectiveValuePresInFragment() ] )
+		pythonPackageNameBox = Row( [ pythonPackageNamePrompt, pythonPackageCell.defaultPerspectiveValuePresInFragment() ] )
 		
 		
 		# Clear imported modules
@@ -455,7 +455,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 		itemsBox = Column( items )
 
-		return Column( [ nameCell.genericPerspectiveValuePresInFragment(), itemsBox.padX( _packageContentsIndentation, 0.0 ).alignHExpand() ] )
+		return Column( [ nameCell.defaultPerspectiveValuePresInFragment(), itemsBox.padX( _packageContentsIndentation, 0.0 ).alignHExpand() ] )
 
 
 
@@ -495,7 +495,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 		nameCell = LiteralCell( nameBox )
 
-		return nameCell.genericPerspectiveValuePresInFragment()
+		return nameCell.defaultPerspectiveValuePresInFragment()
 
 
 

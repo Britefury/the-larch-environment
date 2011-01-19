@@ -9,11 +9,11 @@ package BritefuryJ.DocPresent;
 
 import java.util.ArrayList;
 
+import BritefuryJ.DefaultPerspective.PresCom.UnescapedStringAsRow;
 import BritefuryJ.DocPresent.LayoutTree.ContentLeafLayoutNodeInterface;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StyleParams.ContentLeafStyleParams;
-import BritefuryJ.GSym.GenericPerspective.PresCom.UnescapedStringAsRow;
 import BritefuryJ.Math.Point2;
 
 public abstract class DPContentLeaf extends DPElement

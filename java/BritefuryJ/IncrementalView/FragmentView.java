@@ -10,6 +10,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.DefaultPerspective.PrimitivePresenter;
+import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPFragment;
 import BritefuryJ.DocPresent.FragmentContext;
@@ -26,13 +28,11 @@ import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
-import BritefuryJ.GSym.GenericPerspective.GSymPrimitivePresenter;
-import BritefuryJ.GSym.GenericPerspective.Presentable;
-import BritefuryJ.GSym.ObjectPresentation.PresentationStateListener;
-import BritefuryJ.GSym.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.Incremental.IncrementalFunctionMonitor;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
+import BritefuryJ.ObjectPresentation.PresentationStateListener;
+import BritefuryJ.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.Projection.AbstractPerspective;
 import BritefuryJ.Projection.ProjectiveBrowserContext;
 import BritefuryJ.Projection.Subject;
@@ -303,7 +303,7 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 	{
 		if ( model == null )
 		{
-			return GSymPrimitivePresenter.presentNull().present( new PresentationContext( this, perspective, inheritedState ), style );
+			return PrimitivePresenter.presentNull().present( new PresentationContext( this, perspective, inheritedState ), style );
 		}
 		
 		

@@ -25,7 +25,7 @@ public class ApplyPerspective extends Pres
 	}
 	
 	
-	public static ApplyPerspective generic(Object child)
+	public static ApplyPerspective defaultPerspective(Object child)
 	{
 		return new ApplyPerspective( null, child );
 	}

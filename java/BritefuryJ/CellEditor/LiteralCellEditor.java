@@ -13,11 +13,11 @@ import javax.swing.SwingUtilities;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Cell.LiteralCell;
+import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
 import BritefuryJ.IncrementalView.FragmentView;
@@ -30,7 +30,7 @@ public abstract class LiteralCellEditor implements Presentable, IncrementalMonit
 	{
 		private boolean bSettingCellValue = false;
 		private LiteralCell presCell = new LiteralCell();
-		private Pres pres = presCell.genericPerspectiveValuePresInFragment();
+		private Pres pres = presCell.defaultPerspectiveValuePresInFragment();
 
 		
 		

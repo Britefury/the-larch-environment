@@ -7,11 +7,11 @@
 package BritefuryJ.CellEditor;
 
 import BritefuryJ.Cell.LiteralCell;
+import BritefuryJ.DefaultPerspective.PresCom.ObjectBox;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Math.Point2;
 

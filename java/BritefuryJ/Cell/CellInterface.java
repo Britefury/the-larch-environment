@@ -11,16 +11,16 @@ package BritefuryJ.Cell;
 import java.awt.Color;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.DefaultPerspective.PrimitivePresenter;
+import BritefuryJ.DefaultPerspective.Presentable;
+import BritefuryJ.DefaultPerspective.PresCom.ErrorBox;
+import BritefuryJ.DefaultPerspective.PresCom.GenericStyle;
+import BritefuryJ.DefaultPerspective.PresCom.ObjectBox;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.PresentationContext;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
-import BritefuryJ.GSym.GenericPerspective.GSymPrimitivePresenter;
-import BritefuryJ.GSym.GenericPerspective.Presentable;
-import BritefuryJ.GSym.GenericPerspective.PresCom.ErrorBox;
-import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
-import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBox;
 import BritefuryJ.GSym.PresCom.ApplyPerspective;
 import BritefuryJ.GSym.PresCom.InnerFragment;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
@@ -62,7 +62,7 @@ public abstract class CellInterface implements IncrementalOwner, Presentable
 			}
 			else
 			{
-				return GSymPrimitivePresenter.presentNull().present( ctx, style );
+				return PrimitivePresenter.presentNull().present( ctx, style );
 			}
 		}
 	}
@@ -94,9 +94,9 @@ public abstract class CellInterface implements IncrementalOwner, Presentable
 		return new InnerFragment( new ValuePres( this ) );
 	}
 	
-	public Pres genericPerspectiveValuePresInFragment()
+	public Pres defaultPerspectiveValuePresInFragment()
 	{
-		return ApplyPerspective.generic( new InnerFragment( new ValuePres( this ) ) );
+		return ApplyPerspective.defaultPerspective( new InnerFragment( new ValuePres( this ) ) );
 	}
 	
 	

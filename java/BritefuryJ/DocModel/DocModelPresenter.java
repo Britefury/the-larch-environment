@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.DefaultPerspective.PresCom.GenericStyle;
+import BritefuryJ.DefaultPerspective.PresCom.UnescapedStringAsRow;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
@@ -22,8 +24,6 @@ import BritefuryJ.DocPresent.Combinators.Sequence.TrailingSeparator;
 import BritefuryJ.DocPresent.Combinators.Sequence.VerticalInlineSequenceView;
 import BritefuryJ.DocPresent.Combinators.Sequence.VerticalSequenceView;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.GSym.GenericPerspective.PresCom.GenericStyle;
-import BritefuryJ.GSym.GenericPerspective.PresCom.UnescapedStringAsRow;
 import BritefuryJ.GSym.PresCom.InnerFragment;
 import BritefuryJ.IncrementalView.FragmentView;
 
