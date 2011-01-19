@@ -15,14 +15,14 @@ import org.python.core.Py;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.DefaultPerspective.PresCom.GenericStyle;
-import BritefuryJ.DefaultPerspective.PresCom.HorizontalField;
-import BritefuryJ.DefaultPerspective.PresCom.ObjectBoxWithFields;
-import BritefuryJ.DefaultPerspective.PresCom.VerticalField;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.GSym.PresCom.InnerFragment;
+import BritefuryJ.DefaultPerspective.Pres.GenericStyle;
+import BritefuryJ.DefaultPerspective.Pres.HorizontalField;
+import BritefuryJ.DefaultPerspective.Pres.ObjectBoxWithFields;
+import BritefuryJ.DefaultPerspective.Pres.VerticalField;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.Pres.InnerFragment;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.StyleSheet.StyleSheet;
 
 public class LogEntry implements Presentable
 {

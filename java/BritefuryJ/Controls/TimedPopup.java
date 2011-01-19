@@ -13,9 +13,9 @@ import javax.swing.Timer;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.FragmentContext;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.PresentationContext;
-import BritefuryJ.DocPresent.StyleSheet.StyleValues;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.PresentationContext;
+import BritefuryJ.StyleSheet.StyleValues;
 
 public class TimedPopup
 {

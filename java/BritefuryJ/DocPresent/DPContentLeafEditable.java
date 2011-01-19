@@ -16,12 +16,12 @@ import java.util.WeakHashMap;
 
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.DocPresent.Combinators.Primitive.Label;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StyleParams.ContentLeafEditableStyleParams;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.Math.Point2;
+import BritefuryJ.Pres.Primitive.Label;
+import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.StyleSheet.StyleSheet;
 
 public abstract class DPContentLeafEditable extends DPContentLeaf
 {

@@ -10,13 +10,13 @@ import java.awt.Color;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.DefaultPerspective.PresCom.GenericStyle;
-import BritefuryJ.DefaultPerspective.PresCom.ObjectBox;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.GSym.PresCom.LocationAsInnerFragment;
+import BritefuryJ.DefaultPerspective.Pres.GenericStyle;
+import BritefuryJ.DefaultPerspective.Pres.ObjectBox;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.Pres.LocationAsInnerFragment;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.StaticText;
+import BritefuryJ.StyleSheet.StyleSheet;
 
 public class Location implements Presentable
 {

@@ -12,10 +12,10 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Image;
-import BritefuryJ.DocPresent.Combinators.RichText.Body;
-import BritefuryJ.DocPresent.Combinators.RichText.NormalText;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Image;
+import BritefuryJ.Pres.RichText.Body;
+import BritefuryJ.Pres.RichText.NormalText;
 
 public class ImageTestPage extends SystemPage
 {

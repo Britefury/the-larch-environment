@@ -11,11 +11,11 @@ import java.util.List;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.TreeEventListener;
-import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
 import BritefuryJ.Editor.Sequential.Item.EditableSequentialItem;
 import BritefuryJ.Editor.Sequential.Item.EditableStructuralItem;
 import BritefuryJ.Editor.SyntaxRecognizing.Precedence.PrecedenceHandler;
+import BritefuryJ.Pres.Pres;
 
 public class SRFragmentEditor
 {

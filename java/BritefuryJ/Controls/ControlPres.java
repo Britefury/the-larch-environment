@@ -9,9 +9,9 @@ package BritefuryJ.Controls;
 import java.util.WeakHashMap;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.PresentationContext;
-import BritefuryJ.DocPresent.StyleSheet.StyleValues;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.PresentationContext;
+import BritefuryJ.StyleSheet.StyleValues;
 
 public abstract class ControlPres extends Pres
 {

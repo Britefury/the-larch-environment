@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.GSym.PresCom.InnerFragment;
+import BritefuryJ.Pres.InnerFragment;
 
 public class SREInnerFragment extends InnerFragment
 {

@@ -27,12 +27,12 @@ import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.CommandHistory.Trackable;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.Incremental.IncrementalValueMonitor;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.JythonInterface.JythonIndex;
 import BritefuryJ.JythonInterface.JythonSlice;
+import BritefuryJ.Pres.Pres;
 
 public class DMList extends DMNode implements DMListInterface, Trackable, Serializable, Cloneable, IncrementalOwner, Presentable
 {

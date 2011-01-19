@@ -13,13 +13,13 @@ import java.io.Serializable;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Column;
-import BritefuryJ.DocPresent.Combinators.Primitive.Label;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.Row;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Column;
+import BritefuryJ.Pres.Primitive.Label;
+import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.Pres.Primitive.Row;
+import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.Utils.HashUtils;
 
 public class Vector2 implements Cloneable, Presentable, Serializable

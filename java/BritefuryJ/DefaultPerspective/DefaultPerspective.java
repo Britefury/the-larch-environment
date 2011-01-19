@@ -13,15 +13,15 @@ import org.python.core.PyObject;
 import org.python.core.PyType;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DefaultPerspective.PresCom.ObjectBox;
+import BritefuryJ.DefaultPerspective.Pres.ObjectBox;
 import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.GSym.PresCom.InnerFragment;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.ObjectPresentation.ObjectPresentationPerspective;
 import BritefuryJ.ObjectPresentation.ObjectPresentationLocationResolver;
 import BritefuryJ.ObjectPresentation.ObjectPresenter;
 import BritefuryJ.ObjectPresentation.PyObjectPresenter;
+import BritefuryJ.Pres.InnerFragment;
+import BritefuryJ.Pres.Pres;
 
 public class DefaultPerspective extends ObjectPresentationPerspective
 {

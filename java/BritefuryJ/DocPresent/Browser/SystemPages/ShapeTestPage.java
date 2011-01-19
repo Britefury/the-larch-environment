@@ -8,14 +8,14 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Box;
-import BritefuryJ.DocPresent.Combinators.Primitive.Column;
-import BritefuryJ.DocPresent.Combinators.Primitive.Label;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.Shape;
 import BritefuryJ.DocPresent.Painter.FillPainter;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Box;
+import BritefuryJ.Pres.Primitive.Column;
+import BritefuryJ.Pres.Primitive.Label;
+import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.Pres.Primitive.Shape;
+import BritefuryJ.StyleSheet.StyleSheet;
 
 public class ShapeTestPage extends SystemPage
 {

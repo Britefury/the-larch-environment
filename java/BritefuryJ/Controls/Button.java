@@ -8,19 +8,19 @@ package BritefuryJ.Controls;
 
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.PresentationContext;
-import BritefuryJ.DocPresent.Combinators.Primitive.Border;
-import BritefuryJ.DocPresent.Combinators.Primitive.Label;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.Event.AbstractPointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Interactor.ClickElementInteractor;
 import BritefuryJ.DocPresent.Interactor.HoverElementInteractor;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.DocPresent.StyleSheet.StyleValues;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.PresentationContext;
+import BritefuryJ.Pres.Primitive.Border;
+import BritefuryJ.Pres.Primitive.Label;
+import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.StyleSheet.StyleSheet;
+import BritefuryJ.StyleSheet.StyleValues;
 
 public class Button extends ControlPres
 {

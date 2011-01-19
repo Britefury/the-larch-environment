@@ -14,13 +14,13 @@ import javax.swing.SwingUtilities;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Cell.LiteralCell;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Label;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Label;
+import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.StyleSheet.StyleSheet;
 
 public abstract class LiteralCellEditor implements Presentable, IncrementalMonitorListener
 {

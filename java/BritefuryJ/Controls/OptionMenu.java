@@ -11,13 +11,6 @@ import java.util.List;
 import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.PresentationContext;
-import BritefuryJ.DocPresent.Combinators.Primitive.Arrow;
-import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
-import BritefuryJ.DocPresent.Combinators.Primitive.Border;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.Row;
 import BritefuryJ.DocPresent.Event.AbstractPointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
@@ -25,8 +18,15 @@ import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Interactor.ClickElementInteractor;
 import BritefuryJ.DocPresent.Interactor.HoverElementInteractor;
 import BritefuryJ.DocPresent.Painter.Painter;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.DocPresent.StyleSheet.StyleValues;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.PresentationContext;
+import BritefuryJ.Pres.Primitive.Arrow;
+import BritefuryJ.Pres.Primitive.Bin;
+import BritefuryJ.Pres.Primitive.Border;
+import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.Pres.Primitive.Row;
+import BritefuryJ.StyleSheet.StyleSheet;
+import BritefuryJ.StyleSheet.StyleValues;
 
 public class OptionMenu extends ControlPres
 {

@@ -7,13 +7,13 @@
 package BritefuryJ.Controls;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Arrow;
-import BritefuryJ.DocPresent.Combinators.Primitive.Box;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.Column;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.Util.Range;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Arrow;
+import BritefuryJ.Pres.Primitive.Box;
+import BritefuryJ.Pres.Primitive.Column;
+import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.StyleSheet.StyleSheet;
 
 public class VScrollBar extends ScrollBar
 {

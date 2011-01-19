@@ -13,19 +13,19 @@ import java.awt.Color;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.PrimitivePresenter;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.DefaultPerspective.PresCom.ErrorBox;
-import BritefuryJ.DefaultPerspective.PresCom.GenericStyle;
-import BritefuryJ.DefaultPerspective.PresCom.ObjectBox;
+import BritefuryJ.DefaultPerspective.Pres.ErrorBox;
+import BritefuryJ.DefaultPerspective.Pres.GenericStyle;
+import BritefuryJ.DefaultPerspective.Pres.ObjectBox;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.PresentationContext;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.DocPresent.StyleSheet.StyleValues;
-import BritefuryJ.GSym.PresCom.ApplyPerspective;
-import BritefuryJ.GSym.PresCom.InnerFragment;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
 import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.Pres.ApplyPerspective;
+import BritefuryJ.Pres.InnerFragment;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.PresentationContext;
+import BritefuryJ.StyleSheet.StyleSheet;
+import BritefuryJ.StyleSheet.StyleValues;
 
 
 

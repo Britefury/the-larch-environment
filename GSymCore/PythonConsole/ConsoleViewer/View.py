@@ -29,17 +29,18 @@ from BritefuryJ.AttributeTable import *
 
 from BritefuryJ.Controls import TextEntry
 from BritefuryJ.DocPresent.Interactor import KeyElementInteractor
-from BritefuryJ.DocPresent.StyleSheet import *
+from BritefuryJ.StyleSheet import *
 from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.Browser import Location
 from BritefuryJ.DocPresent.Input import ObjectDndHandler
-from BritefuryJ.DocPresent.Combinators.Primitive import *
-from BritefuryJ.DocPresent.Combinators.RichText import *
+
+from BritefuryJ.Pres import InnerFragment, ApplyPerspective
+from BritefuryJ.Pres.Primitive import *
+from BritefuryJ.Pres.RichText import *
 
 from BritefuryJ.Projection import Perspective, Subject
 from BritefuryJ.IncrementalView import FragmentView
 
-from BritefuryJ.GSym.PresCom import InnerFragment, ApplyPerspective
 
 from GSymCore.Languages.Python25 import Python25
 from GSymCore.Languages.Python25.Execution.ExecutionPresCombinators import execStdout, execStderr, execException, execResult

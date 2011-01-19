@@ -12,17 +12,17 @@ import org.python.util.PythonInterpreter;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Column;
-import BritefuryJ.DocPresent.Combinators.Primitive.Label;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.RichText.Body;
-import BritefuryJ.DocPresent.Combinators.RichText.Head;
-import BritefuryJ.DocPresent.Combinators.RichText.Page;
-import BritefuryJ.DocPresent.Combinators.RichText.TitleBar;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Column;
+import BritefuryJ.Pres.Primitive.Label;
+import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.Pres.Primitive.StaticText;
+import BritefuryJ.Pres.RichText.Body;
+import BritefuryJ.Pres.RichText.Head;
+import BritefuryJ.Pres.RichText.Page;
+import BritefuryJ.Pres.RichText.TitleBar;
+import BritefuryJ.StyleSheet.StyleSheet;
 
 public class PythonEvalPageLocationResolver implements PageLocationResolver
 {

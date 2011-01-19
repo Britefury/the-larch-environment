@@ -11,16 +11,16 @@ import java.util.ArrayList;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.DefaultPerspective.PresCom.HorizontalField;
-import BritefuryJ.DefaultPerspective.PresCom.ObjectBoxWithFields;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.DefaultPerspective.Pres.HorizontalField;
+import BritefuryJ.DefaultPerspective.Pres.ObjectBoxWithFields;
 import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.ObjectPresentation.PresentationStateListenerList;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Paragraph;
+import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.Pres.Primitive.StaticText;
+import BritefuryJ.StyleSheet.StyleSheet;
 
 
 public class Range implements IncrementalOwner, Presentable

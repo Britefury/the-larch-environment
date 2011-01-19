@@ -31,8 +31,9 @@ from BritefuryJ.DocPresent import ElementValueFunction, TextEditEvent, DPText
 from BritefuryJ.DocPresent.Interactor import KeyElementInteractor
 from BritefuryJ.DocPresent.StreamValue import StreamValueBuilder
 from BritefuryJ.DocPresent.Input import ObjectDndHandler
-from BritefuryJ.DocPresent.Combinators.Primitive import Paragraph, Segment
-from BritefuryJ.GSym.PresCom import ApplyPerspective
+
+from BritefuryJ.Pres import ApplyPerspective
+from BritefuryJ.Pres.Primitive import Paragraph, Segment
 
 from BritefuryJ.Projection import Perspective, Subject
 from BritefuryJ.IncrementalView import FragmentView

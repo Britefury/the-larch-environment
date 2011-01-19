@@ -13,20 +13,20 @@ import java.util.Map;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.DefaultPerspective.PresCom.GenericStyle;
-import BritefuryJ.DefaultPerspective.PresCom.HorizontalField;
-import BritefuryJ.DefaultPerspective.PresCom.ObjectBoxWithFields;
-import BritefuryJ.DefaultPerspective.PresCom.VerticalField;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Label;
-import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.GSym.PresCom.InnerFragment;
+import BritefuryJ.DefaultPerspective.Pres.GenericStyle;
+import BritefuryJ.DefaultPerspective.Pres.HorizontalField;
+import BritefuryJ.DefaultPerspective.Pres.ObjectBoxWithFields;
+import BritefuryJ.DefaultPerspective.Pres.VerticalField;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.ParserHelpers.TraceNode;
 import BritefuryJ.ParserHelpers.ParseResultInterface;
+import BritefuryJ.Pres.InnerFragment;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Label;
+import BritefuryJ.Pres.Primitive.Paragraph;
+import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.Pres.Primitive.StaticText;
+import BritefuryJ.StyleSheet.StyleSheet;
 
 public class ParseResult implements ParseResultInterface, Presentable
 {

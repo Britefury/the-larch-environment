@@ -27,16 +27,16 @@ from Britefury.Util.NodeUtil import *
 
 from BritefuryJ.AttributeTable import *
 
-from BritefuryJ.DocPresent.StyleSheet import *
+from BritefuryJ.StyleSheet import *
 from BritefuryJ.DocPresent.Browser import Location
 from BritefuryJ.DocPresent.Border import *
 
 from BritefuryJ.Controls import *
-from BritefuryJ.DocPresent.Combinators.Primitive import *
-from BritefuryJ.DocPresent.Combinators.RichText import *
+from BritefuryJ.Pres import *
+from BritefuryJ.Pres.Primitive import *
+from BritefuryJ.Pres.RichText import *
 
 from BritefuryJ.Projection import Perspective, Subject
-from BritefuryJ.GSym.PresCom import *
 
 from GSymCore.GSymApp import Application
 #from GSymCore.GSymApp.GSymAppViewer.GSymAppViewerCombinators import appState, appDocument, appConsole

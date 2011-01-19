@@ -14,12 +14,12 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.PageController;
 import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.DocPresent.Browser.Location;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Logging.LogView;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Projection.ProjectiveBrowserContext;
 
 public class IncrementalViewPage extends BrowserPage

@@ -8,9 +8,9 @@ package BritefuryJ.Projection;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
-import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.IncrementalView.ViewFragmentFunction;
+import BritefuryJ.Pres.Pres;
 
 public class Perspective extends AbstractPerspective
 {

@@ -22,20 +22,20 @@ import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.PageLocationResolver;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
 import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Label;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.RichText.Body;
-import BritefuryJ.DocPresent.Combinators.RichText.Head;
-import BritefuryJ.DocPresent.Combinators.RichText.Page;
-import BritefuryJ.DocPresent.Combinators.RichText.TitleBar;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.IncrementalView.IncrementalView;
 import BritefuryJ.ObjectPresentation.ObjectPresentationPerspective;
 import BritefuryJ.ObjectPresentation.ObjectPresentationLocationResolver;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Label;
+import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.Pres.Primitive.StaticText;
+import BritefuryJ.Pres.RichText.Body;
+import BritefuryJ.Pres.RichText.Head;
+import BritefuryJ.Pres.RichText.Page;
+import BritefuryJ.Pres.RichText.TitleBar;
+import BritefuryJ.StyleSheet.StyleSheet;
 
 public class ProjectiveBrowserContext
 {

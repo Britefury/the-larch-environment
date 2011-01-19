@@ -17,17 +17,17 @@ import BritefuryJ.Controls.AspectRatioScrolledViewport;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementPainter;
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Bin;
-import BritefuryJ.DocPresent.Combinators.Primitive.Border;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 import BritefuryJ.ParserHelpers.TraceNode;
 import BritefuryJ.ParserHelpers.TracedParseResultInterface;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Bin;
+import BritefuryJ.Pres.Primitive.Border;
+import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.StyleSheet.StyleSheet;
 
 public class ParseView
 {

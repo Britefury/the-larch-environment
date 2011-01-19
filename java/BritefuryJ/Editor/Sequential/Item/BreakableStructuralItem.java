@@ -7,10 +7,10 @@
 package BritefuryJ.Editor.Sequential.Item;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.PresentationContext;
-import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 import BritefuryJ.Editor.Sequential.SequentialEditor;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.PresentationContext;
+import BritefuryJ.StyleSheet.StyleValues;
 
 public class BreakableStructuralItem extends Pres
 {

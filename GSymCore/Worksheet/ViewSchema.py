@@ -12,7 +12,7 @@ import imp
 from BritefuryJ.Incremental import IncrementalOwner, IncrementalValueMonitor
 from BritefuryJ.Cell import Cell
 
-from BritefuryJ.GSym.PresCom import InnerFragment
+from BritefuryJ.Pres import InnerFragment
 
 
 from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod, dmObjectNodeMethodDispatch

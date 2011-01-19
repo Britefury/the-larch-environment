@@ -9,16 +9,16 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.awt.Color;
 
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Border;
-import BritefuryJ.DocPresent.Combinators.Primitive.Column;
-import BritefuryJ.DocPresent.Combinators.Primitive.Label;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.SpaceBin;
-import BritefuryJ.DocPresent.Combinators.Primitive.Viewport;
-import BritefuryJ.DocPresent.Combinators.RichText.NormalText;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Border;
+import BritefuryJ.Pres.Primitive.Column;
+import BritefuryJ.Pres.Primitive.Label;
+import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.Pres.Primitive.SpaceBin;
+import BritefuryJ.Pres.Primitive.Viewport;
+import BritefuryJ.Pres.RichText.NormalText;
+import BritefuryJ.StyleSheet.StyleSheet;
 
 public class ViewportTestPage extends SystemPage
 {

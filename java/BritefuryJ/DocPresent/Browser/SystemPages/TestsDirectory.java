@@ -14,15 +14,15 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.BrowserPage;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Border;
-import BritefuryJ.DocPresent.Combinators.Primitive.Row;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.Column;
-import BritefuryJ.DocPresent.Combinators.RichText.Body;
-import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
-import BritefuryJ.DocPresent.Combinators.RichText.Heading4;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Border;
+import BritefuryJ.Pres.Primitive.Column;
+import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.Pres.Primitive.Row;
+import BritefuryJ.Pres.RichText.Body;
+import BritefuryJ.Pres.RichText.Heading2;
+import BritefuryJ.Pres.RichText.Heading4;
+import BritefuryJ.StyleSheet.StyleSheet;
 
 public class TestsDirectory extends BrowserPage
 {

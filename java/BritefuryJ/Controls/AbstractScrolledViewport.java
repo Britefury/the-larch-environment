@@ -9,15 +9,15 @@ package BritefuryJ.Controls;
 import BritefuryJ.Controls.ScrollBar.ScrollBarControl;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPViewport;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.PresentationContext;
-import BritefuryJ.DocPresent.Combinators.Primitive.Row;
-import BritefuryJ.DocPresent.Combinators.Primitive.Spacer;
-import BritefuryJ.DocPresent.Combinators.Primitive.Column;
-import BritefuryJ.DocPresent.Combinators.Primitive.Viewport;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
-import BritefuryJ.DocPresent.StyleSheet.StyleValues;
 import BritefuryJ.DocPresent.Util.Range;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.PresentationContext;
+import BritefuryJ.Pres.Primitive.Column;
+import BritefuryJ.Pres.Primitive.Row;
+import BritefuryJ.Pres.Primitive.Spacer;
+import BritefuryJ.Pres.Primitive.Viewport;
+import BritefuryJ.StyleSheet.StyleValues;
 
 public abstract class AbstractScrolledViewport extends ControlPres
 {

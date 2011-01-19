@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import BritefuryJ.DocPresent.Combinators.PresentationContext;
-import BritefuryJ.DocPresent.StyleSheet.StyleValues;
+import BritefuryJ.Pres.PresentationContext;
+import BritefuryJ.StyleSheet.StyleValues;
 
 public interface FragmentContext
 {

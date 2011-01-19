@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent;
 
 import java.util.ArrayList;
 
-import BritefuryJ.DefaultPerspective.PresCom.UnescapedStringAsRow;
+import BritefuryJ.DefaultPerspective.Pres.UnescapedStringAsRow;
 import BritefuryJ.DocPresent.LayoutTree.ContentLeafLayoutNodeInterface;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;

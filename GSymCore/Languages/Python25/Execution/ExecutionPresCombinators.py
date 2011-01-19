@@ -8,14 +8,12 @@
 from java.awt import Color
 
 from BritefuryJ.AttributeTable import *
-from BritefuryJ.DocPresent.StyleSheet import *
+from BritefuryJ.StyleSheet import *
 from BritefuryJ.DocPresent.Border import *
-from BritefuryJ.DocPresent.Combinators import *
-from BritefuryJ.DocPresent.Combinators.Primitive import *
-from BritefuryJ.DocPresent.Combinators.RichText import *
-from BritefuryJ.DocPresent.Combinators.Sequence import *
-
-from BritefuryJ.GSym.PresCom import InnerFragment, ApplyPerspective
+from BritefuryJ.Pres import *
+from BritefuryJ.Pres.Primitive import *
+from BritefuryJ.Pres.RichText import *
+from BritefuryJ.Pres.Sequence import *
 
 
 

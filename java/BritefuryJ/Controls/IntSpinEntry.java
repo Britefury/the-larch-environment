@@ -9,8 +9,8 @@ package BritefuryJ.Controls;
 import java.util.regex.Pattern;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Combinators.PresentationContext;
-import BritefuryJ.DocPresent.StyleSheet.StyleValues;
+import BritefuryJ.Pres.PresentationContext;
+import BritefuryJ.StyleSheet.StyleValues;
 
 public class IntSpinEntry extends SpinEntry
 {
