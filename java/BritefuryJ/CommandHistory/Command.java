@@ -7,9 +7,9 @@
 package BritefuryJ.CommandHistory;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Label;
-import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.IncrementalView.FragmentView;
 
 public abstract class Command implements Presentable

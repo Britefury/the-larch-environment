@@ -49,26 +49,26 @@ class ExecutionStyle (object):
 def _textLines(text, textStyleAttribute):
 	return ApplyStyleSheetFromAttribute( textStyleAttribute, Column( [ StaticText( line )   for line in text.split( '\n' ) ] ) )
 
-def _streamItem(item, textStyleAttribute, bUseGenericPerspectiveForResult):
+def _streamItem(item, textStyleAttribute, bUseDefaultPerspectiveForResult):
 	if item.isStructural():
 		resultView = InnerFragment( item.getStructuralValue() )
-		if bUseGenericPerspectiveForResult:
-			resultView = ApplyPerspective.generic( resultView )
+		if bUseDefaultPerspectiveForResult:
+			resultView = ApplyPerspective.defaultPerspective( resultView )
 		return resultView
 	else:
 		return _textLines( item.getTextValue(), textStyleAttribute )
 
-def _streamLines(labelText, stream, textStyleAttribute, bUseGenericPerspectiveForResult):
+def _streamLines(labelText, stream, textStyleAttribute, bUseDefaultPerspectiveForResult):
 	label = ApplyStyleSheetFromAttribute( ExecutionStyle.labelStyle, StaticText( labelText ) )
-	lines = [ _streamItem( item, textStyleAttribute, bUseGenericPerspectiveForResult )   for item in stream.getItems() ]
+	lines = [ _streamItem( item, textStyleAttribute, bUseDefaultPerspectiveForResult )   for item in stream.getItems() ]
 	return Column( [ label, Column( lines ).padX( 5.0, 0.0 ) ] )
 
 
-def execStdout(text, bUseGenericPerspectiveForResult):
-	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdOutStyle, Border( _streamLines( 'STDOUT:', text, ExecutionStyle.stdOutStyle, bUseGenericPerspectiveForResult ).alignHExpand() ).alignHExpand() )
+def execStdout(text, bUseDefaultPerspectiveForResult):
+	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdOutStyle, Border( _streamLines( 'STDOUT:', text, ExecutionStyle.stdOutStyle, bUseDefaultPerspectiveForResult ).alignHExpand() ).alignHExpand() )
 
-def execStderr(text, bUseGenericPerspectiveForResult):
-	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdErrStyle, Border( _streamLines( 'STDERR:', text, ExecutionStyle.stdErrStyle, bUseGenericPerspectiveForResult ).alignHExpand() ).alignHExpand() )
+def execStderr(text, bUseDefaultPerspectiveForResult):
+	return ApplyStyleSheetFromAttribute( ExecutionStyle.stdErrStyle, Border( _streamLines( 'STDERR:', text, ExecutionStyle.stdErrStyle, bUseDefaultPerspectiveForResult ).alignHExpand() ).alignHExpand() )
 	
 def execException(exceptionView):
 	label = ApplyStyleSheetFromAttribute( ExecutionStyle.labelStyle, StaticText( 'EXCEPTION:' ) )
@@ -78,21 +78,21 @@ def execResult(resultView):
 	return ApplyStyleSheetFromAttribute( ExecutionStyle.resultBorderStyle, Border( Paragraph( [ resultView ] ).alignHExpand() ).alignHExpand() )
 
 
-def executionResultBox(stdoutStream, stderrStream, exception, resultInTuple, bUseGenericPerspecitveForException, bUseGenericPerspectiveForResult):
+def executionResultBox(stdoutStream, stderrStream, exception, resultInTuple, bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult):
 	boxContents = []
 	if stderrStream is not None:
-		boxContents.append( execStderr( stderrStream, bUseGenericPerspectiveForResult ) )
+		boxContents.append( execStderr( stderrStream, bUseDefaultPerspectiveForResult ) )
 	if exception is not None:
 		exceptionView = InnerFragment( exception )
-		if bUseGenericPerspecitveForException:
-			exceptionView = ApplyPerspective.generic( exceptionView )
+		if bUseDefaultPerspecitveForException:
+			exceptionView = ApplyPerspective.defaultPerspective( exceptionView )
 		boxContents.append( execException( exceptionView ) )
 	if stdoutStream is not None:
-		boxContents.append( execStdout( stdoutStream, bUseGenericPerspectiveForResult ) )
+		boxContents.append( execStdout( stdoutStream, bUseDefaultPerspectiveForResult ) )
 	if resultInTuple is not None:
 		resultView = InnerFragment( resultInTuple[0] )
-		if bUseGenericPerspectiveForResult:
-			resultView = ApplyPerspective.generic( resultView )
+		if bUseDefaultPerspectiveForResult:
+			resultView = ApplyPerspective.defaultPerspective( resultView )
 		boxContents.append( execResult( resultView ) )
 	
 	if len( boxContents ) > 0:
@@ -101,14 +101,14 @@ def executionResultBox(stdoutStream, stderrStream, exception, resultInTuple, bUs
 		return None
 
 
-def minimalExecutionResultBox(stdoutText, stderrText, exception, resultInTuple, bUseGenericPerspecitveForException, bUseGenericPerspectiveForResult):
+def minimalExecutionResultBox(stdoutText, stderrText, exception, resultInTuple, bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult):
 	if stdoutText is None  and  stderrText is None  and  exception is None:
 		if resultInTuple is None:
 			return None
 		else:
 			resultView = InnerFragment( resultInTuple[0] )
-			if bUseGenericPerspectiveForResult:
-				resultView = ApplyPerspective.generic( resultView )
+			if bUseDefaultPerspectiveForResult:
+				resultView = ApplyPerspective.defaultPerspective( resultView )
 			return Paragraph( [ resultView ] ).alignHExpand()
 	else:
 		boxContents = []
@@ -116,15 +116,15 @@ def minimalExecutionResultBox(stdoutText, stderrText, exception, resultInTuple, 
 			boxContents.append( execStderr( stderrText ) )
 		if exception is not None:
 			exceptionView = InnerFragment( exception )
-			if bUseGenericPerspecitveForException:
-				exceptionView = ApplyPerspective.generic( exceptionView )
+			if bUseDefaultPerspecitveForException:
+				exceptionView = ApplyPerspective.defaultPerspective( exceptionView )
 			boxContents.append( execException( exceptionView ) )
 		if stdoutText is not None:
 			boxContents.append( execStdout( stdoutText ) )
 		if resultInTuple is not None:
 			resultView = InnerFragment( resultInTuple[0] )
-			if bUseGenericPerspectiveForResult:
-				resultView = ApplyPerspective.generic( resultView )
+			if bUseDefaultPerspectiveForResult:
+				resultView = ApplyPerspective.defaultPerspective( resultView )
 			boxContents.append( execResult( resultView ) )
 		
 		if len( boxContents ) > 0:

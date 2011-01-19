@@ -677,7 +677,7 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 	
 	
 	def _decoratorsToText(self, decorators):
-		if len( decorators ) == 0:
+		if decorators is None  or  len( decorators ) == 0:
 			return ''
 		else:
 			return '\n'.join( [ self( deco )   for deco in decorators ] ) + '\n'

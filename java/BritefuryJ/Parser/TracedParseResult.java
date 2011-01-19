@@ -9,14 +9,14 @@ package BritefuryJ.Parser;
 import java.util.Map;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.DefaultPerspective.Presentable;
+import BritefuryJ.DefaultPerspective.PresCom.HorizontalField;
+import BritefuryJ.DefaultPerspective.PresCom.ObjectBoxWithFields;
+import BritefuryJ.DefaultPerspective.PresCom.VerticalField;
 import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Label;
 import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
 import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.GSym.GenericPerspective.Presentable;
-import BritefuryJ.GSym.GenericPerspective.PresCom.HorizontalField;
-import BritefuryJ.GSym.GenericPerspective.PresCom.ObjectBoxWithFields;
-import BritefuryJ.GSym.GenericPerspective.PresCom.VerticalField;
 import BritefuryJ.GSym.PresCom.InnerFragment;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Parser.TracedParseResultView.ParseView;

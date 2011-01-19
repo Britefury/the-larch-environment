@@ -12,6 +12,10 @@ import org.python.core.PyStringMap;
 import org.python.core.__builtin__;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.DefaultPerspective.DefaultObjectPresenterRegistry;
+import BritefuryJ.DefaultPerspective.DefaultPerspective;
+import BritefuryJ.DefaultPerspective.GenericSubject;
+import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.DocPresent.Browser.Location;
@@ -28,14 +32,10 @@ import BritefuryJ.DocPresent.Combinators.RichText.Page;
 import BritefuryJ.DocPresent.Combinators.RichText.TitleBar;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.GSym.GenericPerspective.GSymGenericObjectPresenterRegistry;
-import BritefuryJ.GSym.GenericPerspective.GSymGenericPerspective;
-import BritefuryJ.GSym.GenericPerspective.GenericSubject;
-import BritefuryJ.GSym.GenericPerspective.Presentable;
-import BritefuryJ.GSym.ObjectPresentation.GSymObjectPresentationPerspective;
-import BritefuryJ.GSym.ObjectPresentation.ObjectPresentationLocationResolver;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.IncrementalView.IncrementalView;
+import BritefuryJ.ObjectPresentation.ObjectPresentationPerspective;
+import BritefuryJ.ObjectPresentation.ObjectPresentationLocationResolver;
 
 public class ProjectiveBrowserContext
 {
@@ -100,15 +100,15 @@ public class ProjectiveBrowserContext
 	
 	private GSymBrowserContextLocationResolver pageLocationResolver = new GSymBrowserContextLocationResolver();
 	private ObjectPresentationLocationResolver objPresLocationResolver = new ObjectPresentationLocationResolver();
-	private GSymGenericPerspective genericPerspective;
+	private DefaultPerspective genericPerspective;
 	
 	private PyStringMap resolverLocals = new PyStringMap();
 	
 	
 	
-	public ProjectiveBrowserContext(GSymGenericObjectPresenterRegistry genericPresenterRegistry, boolean bWithSystemPages)
+	public ProjectiveBrowserContext(DefaultObjectPresenterRegistry genericPresenterRegistry, boolean bWithSystemPages)
 	{
-		genericPerspective = new GSymGenericPerspective( objPresLocationResolver, genericPresenterRegistry );
+		genericPerspective = new DefaultPerspective( objPresLocationResolver, genericPresenterRegistry );
 		if ( bWithSystemPages )
 		{
 			resolverLocals.__setitem__( "system", Py.java2py( new SystemRootPage() ) );
@@ -150,7 +150,7 @@ public class ProjectiveBrowserContext
 		return pageLocationResolver;
 	}
 	
-	public GSymGenericPerspective getGenericPerspective()
+	public DefaultPerspective getGenericPerspective()
 	{
 		return genericPerspective;
 	}
@@ -168,7 +168,7 @@ public class ProjectiveBrowserContext
 	
 	
 
-	public Location getLocationForObject(GSymObjectPresentationPerspective perspective, Object x)
+	public Location getLocationForObject(ObjectPresentationPerspective perspective, Object x)
 	{
 		String relative = objPresLocationResolver.getRelativeLocationForObject( perspective, x );
 		return new Location( "objects" + relative );

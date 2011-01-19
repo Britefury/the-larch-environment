@@ -12,7 +12,7 @@ from BritefuryJ.DocPresent.Browser import Location
 
 from BritefuryJ.Projection import ProjectiveBrowserContext, Subject
 
-from Britefury.gSym.Presentation.GenericPresenterRegistry import genericPresenterRegistry
+from Britefury.gSym.Presentation.DefaultPresenterRegistry import defaultPresenterRegistry
 from Britefury.MainApp.AppWindow import AppWindow
 
 		
@@ -43,7 +43,7 @@ class MainApp (object):
 
 		self._world = world
 
-		self._browserContext = ProjectiveBrowserContext( genericPresenterRegistry, True )
+		self._browserContext = ProjectiveBrowserContext( defaultPresenterRegistry, True )
 		self._world.registerBrowserContext( self._browserContext )
 		
 		self._appState = world.getAppStateSubject().getFocus()
