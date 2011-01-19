@@ -9,7 +9,7 @@ from java.awt import Color, Paint
 
 from BritefuryJ.AttributeTable import *
 from BritefuryJ.DocPresent.Border import *
-from BritefuryJ.DocPresent.StyleSheet import *
+from BritefuryJ.StyleSheet import *
 
 from Britefury.AttributeTableUtils.DerivedAttributeMethod import DerivedAttributeMethod
 

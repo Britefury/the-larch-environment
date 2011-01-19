@@ -13,7 +13,7 @@ from BritefuryJ.DocPresent import ElementPainter, PageController
 
 from BritefuryJ.DocPresent.Browser import Location
 
-from BritefuryJ.DocPresent.Combinators.Primitive import *
+from BritefuryJ.Pres.Primitive import *
 from BritefuryJ.DocPresent.Interactor import *
 from BritefuryJ.DocPresent.Input import Modifier
 

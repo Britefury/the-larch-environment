@@ -7,10 +7,10 @@
 package BritefuryJ.Editor.SyntaxRecognizing.Precedence;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Text;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.ModelAccess.ModelReader;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Text;
+import BritefuryJ.StyleSheet.StyleSheet;
 
 public class PrecedenceHandler
 {

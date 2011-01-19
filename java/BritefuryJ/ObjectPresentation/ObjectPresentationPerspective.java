@@ -12,8 +12,8 @@ import org.python.core.PyObject;
 import org.python.core.PyType;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.Pres.Pres;
 import BritefuryJ.Projection.AbstractPerspective;
 import BritefuryJ.Utils.PolymorphicMap;
 

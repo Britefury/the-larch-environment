@@ -27,10 +27,10 @@ import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.CommandHistory.Trackable;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DocModel.DMObjectClass.UnknownFieldNameException;
-import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.Incremental.IncrementalValueMonitor;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.Pres.Pres;
 
 public class DMObject extends DMNode implements DMObjectInterface, Trackable, Serializable, Cloneable, IncrementalOwner, Presentable
 {

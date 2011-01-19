@@ -12,22 +12,22 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DefaultPerspective.PresCom.GenericStyle;
-import BritefuryJ.DefaultPerspective.PresCom.ObjectBorder;
-import BritefuryJ.DefaultPerspective.PresCom.ObjectBox;
-import BritefuryJ.DefaultPerspective.PresCom.ObjectTitle;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Box;
-import BritefuryJ.DocPresent.Combinators.Primitive.Column;
-import BritefuryJ.DocPresent.Combinators.Primitive.Label;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.Row;
-import BritefuryJ.DocPresent.Combinators.Primitive.Table;
+import BritefuryJ.DefaultPerspective.Pres.GenericStyle;
+import BritefuryJ.DefaultPerspective.Pres.ObjectBorder;
+import BritefuryJ.DefaultPerspective.Pres.ObjectBox;
+import BritefuryJ.DefaultPerspective.Pres.ObjectTitle;
 import BritefuryJ.DocPresent.Painter.FillPainter;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.ObjectPresentation.ObjectPresenterRegistry;
 import BritefuryJ.ObjectPresentation.ObjectPresenter;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Box;
+import BritefuryJ.Pres.Primitive.Column;
+import BritefuryJ.Pres.Primitive.Label;
+import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.Pres.Primitive.Row;
+import BritefuryJ.Pres.Primitive.Table;
+import BritefuryJ.StyleSheet.StyleSheet;
 
 public class PresentersAWT extends ObjectPresenterRegistry
 {
@@ -112,7 +112,7 @@ public class PresentersAWT extends ObjectPresenterRegistry
 //				scale = 96.0 / height;
 //			}
 			
-			return new ObjectBox( x.getClass().getName(), new BritefuryJ.DocPresent.Combinators.Primitive.Shape( shape ) );
+			return new ObjectBox( x.getClass().getName(), new BritefuryJ.Pres.Primitive.Shape( shape ) );
 		}
 	};
 
@@ -135,7 +135,7 @@ public class PresentersAWT extends ObjectPresenterRegistry
 				height = 96.0;
 			}
 			
-			return new BritefuryJ.DocPresent.Combinators.Primitive.Image( image, width, height );
+			return new BritefuryJ.Pres.Primitive.Image( image, width, height );
 		}
 	};
 

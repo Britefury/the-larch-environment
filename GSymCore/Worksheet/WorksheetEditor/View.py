@@ -28,7 +28,7 @@ from Britefury.Util.InstanceCache import instanceCache
 from BritefuryJ.AttributeTable import *
 
 from BritefuryJ.Projection import Perspective, Subject
-from BritefuryJ.GSym.PresCom import InnerFragment, LocationAsInnerFragment
+from BritefuryJ.Pres import InnerFragment, LocationAsInnerFragment
 
 
 from GSymCore.Languages.Python25 import Python25
@@ -51,11 +51,11 @@ from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.Border import *
 from BritefuryJ.DocPresent.Painter import *
 from BritefuryJ.DocPresent.Browser import Location
-from BritefuryJ.DocPresent.StyleSheet import StyleSheet
-from BritefuryJ.DocPresent.Combinators import *
-from BritefuryJ.DocPresent.Combinators.Primitive import *
-from BritefuryJ.DocPresent.Combinators.RichText import *
-from BritefuryJ.DocPresent.Combinators.ContextMenu import *
+from BritefuryJ.StyleSheet import StyleSheet
+from BritefuryJ.Pres import *
+from BritefuryJ.Pres.Primitive import *
+from BritefuryJ.Pres.RichText import *
+from BritefuryJ.Pres.ContextMenu import *
 
 from BritefuryJ.Editor.Sequential import SequentialEditorPerspective
 from BritefuryJ.Editor.Sequential.Item import *

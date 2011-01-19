@@ -7,7 +7,7 @@
 package BritefuryJ.IncrementalView;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DocPresent.Combinators.Pres;
+import BritefuryJ.Pres.Pres;
 
 public interface ViewFragmentFunction
 {

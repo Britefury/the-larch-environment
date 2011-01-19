@@ -8,19 +8,19 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
 
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Label;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.Whitespace;
-import BritefuryJ.DocPresent.Combinators.RichText.Body;
-import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
-import BritefuryJ.DocPresent.Combinators.RichText.Heading3;
-import BritefuryJ.DocPresent.Combinators.Sequence.HorizontalSequenceView;
-import BritefuryJ.DocPresent.Combinators.Sequence.ParagraphSequenceView;
-import BritefuryJ.DocPresent.Combinators.Sequence.TrailingSeparator;
-import BritefuryJ.DocPresent.Combinators.Sequence.VerticalInlineSequenceView;
-import BritefuryJ.DocPresent.Combinators.Sequence.VerticalSequenceView;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Label;
+import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.Pres.Primitive.Whitespace;
+import BritefuryJ.Pres.RichText.Body;
+import BritefuryJ.Pres.RichText.Heading2;
+import BritefuryJ.Pres.RichText.Heading3;
+import BritefuryJ.Pres.Sequence.HorizontalSequenceView;
+import BritefuryJ.Pres.Sequence.ParagraphSequenceView;
+import BritefuryJ.Pres.Sequence.TrailingSeparator;
+import BritefuryJ.Pres.Sequence.VerticalInlineSequenceView;
+import BritefuryJ.Pres.Sequence.VerticalSequenceView;
+import BritefuryJ.StyleSheet.StyleSheet;
 
 public class SequenceViewTestPage extends SystemPage
 {

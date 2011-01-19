@@ -9,15 +9,15 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import BritefuryJ.Controls.IntSpinEntry;
 import BritefuryJ.Controls.RealSpinEntry;
 import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Column;
-import BritefuryJ.DocPresent.Combinators.Primitive.Label;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.Row;
-import BritefuryJ.DocPresent.Combinators.Primitive.SpaceBin;
-import BritefuryJ.DocPresent.Combinators.RichText.Body;
-import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Column;
+import BritefuryJ.Pres.Primitive.Label;
+import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.Pres.Primitive.Row;
+import BritefuryJ.Pres.Primitive.SpaceBin;
+import BritefuryJ.Pres.RichText.Body;
+import BritefuryJ.Pres.RichText.Heading2;
+import BritefuryJ.StyleSheet.StyleSheet;
 
 public class SpinEntryTestPage extends SystemPage
 {

@@ -10,14 +10,14 @@ import BritefuryJ.Controls.DropDownExpander;
 import BritefuryJ.Controls.Expander;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPText;
-import BritefuryJ.DocPresent.Combinators.ElementRef;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Border;
-import BritefuryJ.DocPresent.Combinators.Primitive.Column;
-import BritefuryJ.DocPresent.Combinators.Primitive.Label;
-import BritefuryJ.DocPresent.Combinators.RichText.Body;
-import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
-import BritefuryJ.DocPresent.Combinators.RichText.Heading3;
+import BritefuryJ.Pres.ElementRef;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Border;
+import BritefuryJ.Pres.Primitive.Column;
+import BritefuryJ.Pres.Primitive.Label;
+import BritefuryJ.Pres.RichText.Body;
+import BritefuryJ.Pres.RichText.Heading2;
+import BritefuryJ.Pres.RichText.Heading3;
 
 public class ExpanderTestPage extends SystemPage
 {

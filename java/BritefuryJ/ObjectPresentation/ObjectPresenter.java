@@ -7,8 +7,8 @@
 package BritefuryJ.ObjectPresentation;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.Pres.Pres;
 
 public interface ObjectPresenter
 {

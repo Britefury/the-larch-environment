@@ -12,11 +12,11 @@ import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.BrowserPage;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.RichText.Head;
-import BritefuryJ.DocPresent.Combinators.RichText.LinkHeaderBar;
-import BritefuryJ.DocPresent.Combinators.RichText.Page;
-import BritefuryJ.DocPresent.Combinators.RichText.TitleBar;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.RichText.Head;
+import BritefuryJ.Pres.RichText.LinkHeaderBar;
+import BritefuryJ.Pres.RichText.Page;
+import BritefuryJ.Pres.RichText.TitleBar;
 
 public class SystemRootPage extends BrowserPage
 {

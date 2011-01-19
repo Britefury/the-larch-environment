@@ -19,7 +19,7 @@ from BritefuryJ.DocModel import DMList, DMObject, DMObjectInterface
 
 
 from BritefuryJ.DocPresent.StyleParams import *
-from BritefuryJ.DocPresent.StyleSheet import *
+from BritefuryJ.StyleSheet import *
 from BritefuryJ.DocPresent import *
 from BritefuryJ.DocPresent.Interactor import KeyElementInteractor
 

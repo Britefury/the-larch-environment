@@ -7,9 +7,9 @@
 package BritefuryJ.Controls;
 
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.AspectRatioBin;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.AspectRatioBin;
 
 public class AspectRatioScrolledViewport extends AbstractScrolledViewport
 {

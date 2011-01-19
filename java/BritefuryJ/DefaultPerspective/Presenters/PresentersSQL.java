@@ -16,18 +16,18 @@ import java.util.ArrayList;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Controls.DropDownExpander;
-import BritefuryJ.DefaultPerspective.PresCom.ErrorBox;
-import BritefuryJ.DefaultPerspective.PresCom.HorizontalField;
-import BritefuryJ.DefaultPerspective.PresCom.ObjectBox;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Column;
-import BritefuryJ.DocPresent.Combinators.Primitive.Label;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.Table;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.DefaultPerspective.Pres.ErrorBox;
+import BritefuryJ.DefaultPerspective.Pres.HorizontalField;
+import BritefuryJ.DefaultPerspective.Pres.ObjectBox;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.ObjectPresentation.ObjectPresenterRegistry;
 import BritefuryJ.ObjectPresentation.ObjectPresenter;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Column;
+import BritefuryJ.Pres.Primitive.Label;
+import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.Pres.Primitive.Table;
+import BritefuryJ.StyleSheet.StyleSheet;
 
 public class PresentersSQL extends ObjectPresenterRegistry
 {

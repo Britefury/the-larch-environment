@@ -9,8 +9,8 @@ package BritefuryJ.ObjectPresentation;
 import org.python.core.PyObject;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.Pres.Pres;
 
 public interface PyObjectPresenter
 {

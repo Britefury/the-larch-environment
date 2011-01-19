@@ -11,21 +11,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DefaultPerspective.PresCom.GenericStyle;
-import BritefuryJ.DefaultPerspective.PresCom.UnescapedStringAsRow;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Label;
-import BritefuryJ.DocPresent.Combinators.Primitive.Paragraph;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.Primitive.Span;
-import BritefuryJ.DocPresent.Combinators.Primitive.StaticText;
-import BritefuryJ.DocPresent.Combinators.Sequence.ParagraphSequenceView;
-import BritefuryJ.DocPresent.Combinators.Sequence.TrailingSeparator;
-import BritefuryJ.DocPresent.Combinators.Sequence.VerticalInlineSequenceView;
-import BritefuryJ.DocPresent.Combinators.Sequence.VerticalSequenceView;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.GSym.PresCom.InnerFragment;
+import BritefuryJ.DefaultPerspective.Pres.GenericStyle;
+import BritefuryJ.DefaultPerspective.Pres.UnescapedStringAsRow;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.Pres.InnerFragment;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Label;
+import BritefuryJ.Pres.Primitive.Paragraph;
+import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.Pres.Primitive.Span;
+import BritefuryJ.Pres.Primitive.StaticText;
+import BritefuryJ.Pres.Sequence.ParagraphSequenceView;
+import BritefuryJ.Pres.Sequence.TrailingSeparator;
+import BritefuryJ.Pres.Sequence.VerticalInlineSequenceView;
+import BritefuryJ.Pres.Sequence.VerticalSequenceView;
+import BritefuryJ.StyleSheet.StyleSheet;
 
 public class DocModelPresenter
 {

@@ -9,11 +9,11 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import BritefuryJ.Controls.HScrollBar;
 import BritefuryJ.Controls.ScrollBar;
 import BritefuryJ.Controls.VScrollBar;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.SpaceBin;
-import BritefuryJ.DocPresent.Combinators.RichText.Body;
-import BritefuryJ.DocPresent.Combinators.RichText.Heading2;
 import BritefuryJ.DocPresent.Util.Range;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.SpaceBin;
+import BritefuryJ.Pres.RichText.Body;
+import BritefuryJ.Pres.RichText.Heading2;
 
 public class ScrollBarTestPage extends SystemPage
 {

@@ -17,16 +17,16 @@ import java.util.concurrent.Future;
 import javax.swing.Timer;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DefaultPerspective.PresCom.ErrorBox;
-import BritefuryJ.DefaultPerspective.PresCom.ObjectBorder;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Label;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
-import BritefuryJ.GSym.PresCom.InnerFragment;
+import BritefuryJ.DefaultPerspective.Pres.ErrorBox;
+import BritefuryJ.DefaultPerspective.Pres.ObjectBorder;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.ObjectPresentation.ObjectPresenterRegistry;
 import BritefuryJ.ObjectPresentation.ObjectPresenter;
+import BritefuryJ.Pres.InnerFragment;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Label;
+import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.StyleSheet.StyleSheet;
 
 public class PresentersConcurrency extends ObjectPresenterRegistry
 {

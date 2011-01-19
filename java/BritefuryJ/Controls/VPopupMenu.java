@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Controls;
 
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Column;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Column;
 
 public class VPopupMenu extends PopupMenu
 {

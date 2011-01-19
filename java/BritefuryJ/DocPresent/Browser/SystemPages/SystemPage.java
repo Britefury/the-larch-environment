@@ -10,13 +10,13 @@ import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Browser.BrowserPage;
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Primitive;
-import BritefuryJ.DocPresent.Combinators.RichText.Head;
-import BritefuryJ.DocPresent.Combinators.RichText.NormalText;
-import BritefuryJ.DocPresent.Combinators.RichText.Page;
-import BritefuryJ.DocPresent.Combinators.RichText.TitleBar;
-import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.Pres.RichText.Head;
+import BritefuryJ.Pres.RichText.NormalText;
+import BritefuryJ.Pres.RichText.Page;
+import BritefuryJ.Pres.RichText.TitleBar;
+import BritefuryJ.StyleSheet.StyleSheet;
 
 public abstract class SystemPage extends BrowserPage
 {

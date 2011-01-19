@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.Controls;
 
-import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.DocPresent.Combinators.Primitive.Row;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Row;
 
 public class HPopupMenu extends PopupMenu
 {
