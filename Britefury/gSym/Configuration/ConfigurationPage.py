@@ -12,7 +12,7 @@ from BritefuryJ.DocPresent.Combinators.RichText import *
 from BritefuryJ.DocPresent.Browser import Location
 from BritefuryJ.DocPresent.StyleSheet import StyleSheet
 
-from BritefuryJ.GSym import GSymSubject
+from BritefuryJ.Projection import Subject
 
 from Britefury.Kernel.Abstract import abstractmethod
 
@@ -22,7 +22,7 @@ _staticStyle = StyleSheet.instance.withAttr( Primitive.editable, False )
 
 
 class ConfigurationPage (object):
-	class _ConfigPageSubject (GSymSubject):
+	class _ConfigPageSubject (Subject):
 		def __init__(self, page):
 			self._page = page
 		

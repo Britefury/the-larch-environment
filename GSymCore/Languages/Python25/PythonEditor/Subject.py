@@ -10,7 +10,7 @@ import imp
 
 from BritefuryJ.DocPresent.Browser import Location
 
-from BritefuryJ.GSym import GSymSubject
+from BritefuryJ.Projection import Subject
 
 from GSymCore.Languages.Python25 import Schema
 from GSymCore.Languages.Python25.CodeGenerator import compileForModuleExecution
@@ -26,7 +26,7 @@ def _getSuiteStmtByName(suite, name):
 
 
 
-class _MemberSubject (GSymSubject):
+class _MemberSubject (Subject):
 	def __init__(self, model, pythonSubject, location, name):
 		self._model = model
 		self._pythonSubject = pythonSubject
@@ -83,7 +83,7 @@ class _Python25ModuleLoader (object):
 	
 	
 	
-class Python25Subject (GSymSubject):
+class Python25Subject (Subject):
 	def __init__(self, document, model, enclosingSubject, location):
 		self._document = document
 		self._model = model

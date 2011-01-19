@@ -26,9 +26,6 @@ import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
 import BritefuryJ.DocPresent.StyleSheet.StyleSheet;
 import BritefuryJ.DocPresent.StyleSheet.StyleValues;
-import BritefuryJ.GSym.GSymAbstractPerspective;
-import BritefuryJ.GSym.GSymBrowserContext;
-import BritefuryJ.GSym.GSymSubject;
 import BritefuryJ.GSym.GenericPerspective.GSymPrimitivePresenter;
 import BritefuryJ.GSym.GenericPerspective.Presentable;
 import BritefuryJ.GSym.ObjectPresentation.PresentationStateListener;
@@ -36,6 +33,9 @@ import BritefuryJ.GSym.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.Incremental.IncrementalFunctionMonitor;
 import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
+import BritefuryJ.Projection.AbstractPerspective;
+import BritefuryJ.Projection.ProjectiveBrowserContext;
+import BritefuryJ.Projection.Subject;
 
 public class FragmentView extends IncrementalTreeNode implements FragmentContext, PresentationStateListener, Presentable
 {
@@ -271,7 +271,7 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 
 
 
-	public GSymBrowserContext getBrowserContext()
+	public ProjectiveBrowserContext getBrowserContext()
 	{
 		return getView().getBrowserContext();
 	}
@@ -283,7 +283,7 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 	}
 	
 	
-	public GSymAbstractPerspective getPerspective()
+	public AbstractPerspective getPerspective()
 	{
 		return getNodeResultFactory().perspective;
 	}
@@ -299,7 +299,7 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 
 
 	
-	private DPElement presentInnerFragment(Object model, GSymAbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
+	private DPElement presentInnerFragment(Object model, AbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
 	{
 		if ( model == null )
 		{
@@ -333,13 +333,13 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 		return incrementalNode.getFragmentElement();
 	}
 	
-	protected static DPElement perspectiveFragmentRegion(DPElement fragmentContents, GSymAbstractPerspective perspective)
+	protected static DPElement perspectiveFragmentRegion(DPElement fragmentContents, AbstractPerspective perspective)
 	{
 		return new Region( fragmentContents, perspective.getClipboardHandler() ).present();
 	}
 	
 
-	public DPElement presentInnerFragment(Object x, GSymAbstractPerspective perspective, StyleValues style, SimpleAttributeTable inheritedState)
+	public DPElement presentInnerFragment(Object x, AbstractPerspective perspective, StyleValues style, SimpleAttributeTable inheritedState)
 	{
 		IncrementalView.ViewFragmentContextAndResultFactory factory = getNodeResultFactory();
 		DPElement e = presentInnerFragment( x, perspective, factory.subjectContext, style, inheritedState );
@@ -354,8 +354,8 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 	
 	public DPElement presentLocationAsElement(Location location, StyleValues style, SimpleAttributeTable inheritedState)
 	{
-		GSymSubject subject = getBrowserContext().resolveLocationAsSubject( location );
-		GSymAbstractPerspective perspective = subject.getPerspective();
+		Subject subject = getBrowserContext().resolveLocationAsSubject( location );
+		AbstractPerspective perspective = subject.getPerspective();
 		if ( perspective == null )
 		{
 			perspective = getBrowserContext().getGenericPerspective();

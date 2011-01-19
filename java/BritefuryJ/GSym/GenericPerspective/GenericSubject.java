@@ -6,9 +6,9 @@
 //##************************
 package BritefuryJ.GSym.GenericPerspective;
 
-import BritefuryJ.GSym.GSymSubject;
+import BritefuryJ.Projection.Subject;
 
-public class GenericSubject extends GSymSubject
+public class GenericSubject extends Subject
 {
 	private Object focus;
 	private String title;

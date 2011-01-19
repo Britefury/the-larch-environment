@@ -13,11 +13,11 @@ import org.python.core.PyType;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.Combinators.Pres;
-import BritefuryJ.GSym.GSymAbstractPerspective;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.Projection.AbstractPerspective;
 import BritefuryJ.Utils.PolymorphicMap;
 
-public abstract class GSymObjectPresentationPerspective extends GSymAbstractPerspective
+public abstract class GSymObjectPresentationPerspective extends AbstractPerspective
 {
 	private String pythonPresentMethodName;
 	private GSymObjectViewLocationTable locationTable = new GSymObjectViewLocationTable();

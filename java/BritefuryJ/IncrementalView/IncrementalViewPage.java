@@ -18,9 +18,9 @@ import BritefuryJ.DocPresent.Combinators.Pres;
 import BritefuryJ.DocPresent.Combinators.Primitive.Column;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
-import BritefuryJ.GSym.GSymBrowserContext;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Logging.LogView;
+import BritefuryJ.Projection.ProjectiveBrowserContext;
 
 public class IncrementalViewPage extends BrowserPage
 {
@@ -34,7 +34,7 @@ public class IncrementalViewPage extends BrowserPage
 	
 	
 	
-	public IncrementalViewPage(DPElement element, String title, final GSymBrowserContext browserContext, CommandHistory commandHistory, IncrementalView view)
+	public IncrementalViewPage(DPElement element, String title, final ProjectiveBrowserContext browserContext, CommandHistory commandHistory, IncrementalView view)
 	{
 		this.element = element;
 		this.title = title;

@@ -44,7 +44,7 @@ from BritefuryJ.DocPresent.Combinators.Primitive import *
 from BritefuryJ.DocPresent.Combinators.RichText import *
 from BritefuryJ.GSym.PresCom import *
 
-from BritefuryJ.GSym import GSymPerspective
+from BritefuryJ.Projection import Perspective
 
 
 from GSymCore.GSymApp import DocumentManagement
@@ -502,5 +502,5 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 
 
-perspective = GSymPerspective( ProjectView(), None )
+perspective = Perspective( ProjectView(), None )
 

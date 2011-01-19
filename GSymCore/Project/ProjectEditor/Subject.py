@@ -7,7 +7,7 @@
 ##-*************************
 from BritefuryJ.DocPresent.Browser import Location
 
-from BritefuryJ.GSym import GSymSubject
+from BritefuryJ.Projection import Subject
 
 from GSymCore.Project import Schema
 from GSymCore.Project.ProjectEditor.View import perspective
@@ -38,7 +38,7 @@ def _packageSubject(projectSubject, model, location):
 
 
 
-class ProjectSubject (GSymSubject):
+class ProjectSubject (Subject):
 	def __init__(self, document, model, enclosingSubject, location):
 		self._document = document
 		self._model = model

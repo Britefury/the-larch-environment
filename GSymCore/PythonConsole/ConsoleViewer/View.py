@@ -36,7 +36,7 @@ from BritefuryJ.DocPresent.Input import ObjectDndHandler
 from BritefuryJ.DocPresent.Combinators.Primitive import *
 from BritefuryJ.DocPresent.Combinators.RichText import *
 
-from BritefuryJ.GSym import GSymPerspective, GSymSubject
+from BritefuryJ.Projection import Perspective, Subject
 from BritefuryJ.IncrementalView import FragmentView
 
 from BritefuryJ.GSym.PresCom import InnerFragment, ApplyPerspective
@@ -214,10 +214,10 @@ class ConsoleView (GSymViewObjectDispatch):
 
 	
 	
-perspective = GSymPerspective( ConsoleView(), None )
+perspective = Perspective( ConsoleView(), None )
 
 
-class ConsoleSubject (GSymSubject):
+class ConsoleSubject (Subject):
 	def __init__(self, console, enclosingSubject):
 		self._console = console
 		self._enclosingSubject = enclosingSubject

@@ -35,7 +35,7 @@ from BritefuryJ.Controls import *
 from BritefuryJ.DocPresent.Combinators.Primitive import *
 from BritefuryJ.DocPresent.Combinators.RichText import *
 
-from BritefuryJ.GSym import GSymPerspective, GSymSubject
+from BritefuryJ.Projection import Perspective, Subject
 from BritefuryJ.GSym.PresCom import *
 
 from GSymCore.GSymApp import Application
@@ -231,5 +231,5 @@ _docNameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*', 0 )
 
 
 
-perspective = GSymPerspective( AppView(), None )
+perspective = Perspective( AppView(), None )
 

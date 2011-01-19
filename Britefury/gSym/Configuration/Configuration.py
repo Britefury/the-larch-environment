@@ -12,14 +12,14 @@ from BritefuryJ.DocPresent.Combinators.RichText import *
 from BritefuryJ.DocPresent.Browser import Location
 from BritefuryJ.DocPresent.StyleSheet import StyleSheet
 
-from BritefuryJ.GSym import GSymSubject
+from BritefuryJ.Projection import Subject
 
 
 _staticStyle = StyleSheet.instance.withAttr( Primitive.editable, False )
 
 
 class Configuration (object):
-	class _ConfigurationSubject (GSymSubject):
+	class _ConfigurationSubject (Subject):
 		def __init__(self, config):
 			self._config = config
 	

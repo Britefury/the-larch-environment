@@ -43,7 +43,7 @@ from BritefuryJ.DocPresent.Combinators.Primitive import *
 from BritefuryJ.DocPresent.Combinators.RichText import *
 from BritefuryJ.DocPresent.Combinators.ContextMenu import *
 
-from BritefuryJ.GSym import GSymPerspective, GSymSubject
+from BritefuryJ.Projection import Perspective, Subject
 from BritefuryJ.GSym.PresCom import InnerFragment, LocationAsInnerFragment
 
 
@@ -187,7 +187,7 @@ class WorksheetViewer (GSymViewObjectDispatch):
 
 
 
-perspective = GSymPerspective( WorksheetViewer(), None )
+perspective = Perspective( WorksheetViewer(), None )
 
 
 class _WorksheetModuleLoader (object):
@@ -215,7 +215,7 @@ class _WorksheetModuleLoader (object):
 
 
 
-class WorksheetViewerSubject (GSymSubject):
+class WorksheetViewerSubject (Subject):
 	def __init__(self, document, model, enclosingSubject, location):
 		self._document = document
 		self._model = model
