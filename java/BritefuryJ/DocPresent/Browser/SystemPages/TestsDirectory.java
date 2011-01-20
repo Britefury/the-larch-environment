@@ -30,6 +30,7 @@ public class TestsDirectory extends BrowserPage
 	public static final BorderTestPage border = new BorderTestPage();
 	public static final CanvasTestPage canvas = new CanvasTestPage();
 	public static final ColumnTestPage column = new ColumnTestPage();
+	public static final ClipboardTestPage clipboard = new ClipboardTestPage();
 	public static final DndTestPage dnd = new DndTestPage();
 	public static final FractionTestPage fraction = new FractionTestPage();
 	public static final GridTestPage grid = new GridTestPage();
@@ -53,6 +54,7 @@ public class TestsDirectory extends BrowserPage
 		new Hyperlink( "Border", new Location( "system.tests.border" ) ),
 		new Hyperlink( "Canvas", new Location( "system.tests.canvas" ) ),
 		new Hyperlink( "Column", new Location( "system.tests.column" ) ),
+		new Hyperlink( "Clipboard", new Location( "system.tests.clipboard" ) ),
 		new Hyperlink( "Drag and drop", new Location( "system.tests.dnd" ) ),
 		new Hyperlink( "Fraction", new Location( "system.tests.fraction" ) ),
 		new Hyperlink( "Grid", new Location( "system.tests.grid" ) ),
