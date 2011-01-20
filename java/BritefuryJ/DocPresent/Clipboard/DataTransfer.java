@@ -29,6 +29,11 @@ public class DataTransfer
 		return support.isDataFlavorSupported( flavor );
 	}
 	
+	public DataFlavor[] getDataFlavors()
+	{
+		return support.getDataFlavors();
+	}
+	
 	public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException
 	{
 		return support.getTransferable().getTransferData( flavor );

@@ -115,22 +115,24 @@ public class TextArea extends ControlPres
 						recomputeText( caretPos );
 					}
 	
-					if ( event instanceof TextEditEventInsert )
+					if ( listener != null )
 					{
-						TextEditEventInsert insert = (TextEditEventInsert)event;
-						listener.onTextInserted( TextAreaControl.this, lineOffset + insert.getPosition(), insert.getTextInserted() );
+						if ( event instanceof TextEditEventInsert )
+						{
+							TextEditEventInsert insert = (TextEditEventInsert)event;
+							listener.onTextInserted( TextAreaControl.this, lineOffset + insert.getPosition(), insert.getTextInserted() );
+						}
+						else if ( event instanceof TextEditEventRemove )
+						{
+							TextEditEventRemove remove = (TextEditEventRemove)event;
+							listener.onTextRemoved( TextAreaControl.this, lineOffset + remove.getPosition(), remove.getLength() );
+						}
+						else if ( event instanceof TextEditEventReplace )
+						{
+							TextEditEventReplace replace = (TextEditEventReplace)event;
+							listener.onTextReplaced( TextAreaControl.this, lineOffset + replace.getPosition(), replace.getLength(), replace.getReplacement() );
+						}
 					}
-					else if ( event instanceof TextEditEventRemove )
-					{
-						TextEditEventRemove remove = (TextEditEventRemove)event;
-						listener.onTextRemoved( TextAreaControl.this, lineOffset + remove.getPosition(), remove.getLength() );
-					}
-					else if ( event instanceof TextEditEventReplace )
-					{
-						TextEditEventReplace replace = (TextEditEventReplace)event;
-						listener.onTextReplaced( TextAreaControl.this, lineOffset + replace.getPosition(), replace.getLength(), replace.getReplacement() );
-					}
-					
 					
 					return true;
 				}
@@ -156,20 +158,23 @@ public class TextArea extends ControlPres
 						recomputeText( caretPos );
 					}
 	
-					if ( event instanceof TextEditEventInsert )
+					if ( listener != null )
 					{
-						TextEditEventInsert insert = (TextEditEventInsert)event;
-						listener.onTextInserted( TextAreaControl.this, lineOffset + insert.getPosition(), insert.getTextInserted() );
-					}
-					else if ( event instanceof TextEditEventRemove )
-					{
-						TextEditEventRemove remove = (TextEditEventRemove)event;
-						listener.onTextRemoved( TextAreaControl.this, lineOffset + remove.getPosition(), remove.getLength() );
-					}
-					else if ( event instanceof TextEditEventReplace )
-					{
-						TextEditEventReplace replace = (TextEditEventReplace)event;
-						listener.onTextReplaced( TextAreaControl.this, lineOffset + replace.getPosition(), replace.getLength(), replace.getReplacement() );
+						if ( event instanceof TextEditEventInsert )
+						{
+							TextEditEventInsert insert = (TextEditEventInsert)event;
+							listener.onTextInserted( TextAreaControl.this, lineOffset + insert.getPosition(), insert.getTextInserted() );
+						}
+						else if ( event instanceof TextEditEventRemove )
+						{
+							TextEditEventRemove remove = (TextEditEventRemove)event;
+							listener.onTextRemoved( TextAreaControl.this, lineOffset + remove.getPosition(), remove.getLength() );
+						}
+						else if ( event instanceof TextEditEventReplace )
+						{
+							TextEditEventReplace replace = (TextEditEventReplace)event;
+							listener.onTextReplaced( TextAreaControl.this, lineOffset + replace.getPosition(), replace.getLength(), replace.getReplacement() );
+						}
 					}
 	
 					return true;
@@ -191,7 +196,10 @@ public class TextArea extends ControlPres
 				String newText = textBox.getTextRepresentationFromStartToMarker( selection.getStartMarker() )  +  textBox.getTextRepresentationFromMarkerToEnd( selection.getEndMarker() );
 				changeText( newText, caretPos );
 				
-				listener.onTextRemoved( TextAreaControl.this, startPosition, endPosition - startPosition );
+				if ( listener != null )
+				{
+					listener.onTextRemoved( TextAreaControl.this, startPosition, endPosition - startPosition );
+				}
 			}
 			
 			@Override
@@ -212,7 +220,10 @@ public class TextArea extends ControlPres
 				String newText = textBox.getTextRepresentationFromStartToMarker( selection.getStartMarker() )  +  replacement  +  textBox.getTextRepresentationFromMarkerToEnd( selection.getEndMarker() );
 				changeText( newText, caretPos );
 				
-				listener.onTextReplaced( TextAreaControl.this, startPosition, endPosition - startPosition, replacement );
+				if ( listener != null )
+				{
+					listener.onTextReplaced( TextAreaControl.this, startPosition, endPosition - startPosition, replacement );
+				}
 			}
 			
 			@Override
@@ -301,7 +312,10 @@ public class TextArea extends ControlPres
 		public void accept()
 		{
 			ungrabCaret();
-			listener.onAccept( this, getText() );
+			if ( listener != null )
+			{
+				listener.onAccept( this, getText() );
+			}
 		}
 	
 	
