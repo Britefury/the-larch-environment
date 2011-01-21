@@ -358,7 +358,7 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 		AbstractPerspective perspective = subject.getPerspective();
 		if ( perspective == null )
 		{
-			perspective = getBrowserContext().getGenericPerspective();
+			perspective = getBrowserContext().getDefaultPerspective();
 		}
 		DPElement e = presentInnerFragment( subject.getFocus(), perspective, subject.getSubjectContext(), style, inheritedState );
 		return perspectiveFragmentRegion( e, perspective );

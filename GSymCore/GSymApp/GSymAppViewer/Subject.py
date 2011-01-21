@@ -44,7 +44,7 @@ class _DocumentListSubject (object):
 		for appDocument in self._appState.getOpenDocuments():
 			if appDocument.getRelativeLocation() == relativeLocation:
 				doc = appDocument.getDocument()
-				return doc.newSubject( self._enclosingSubject, self._enclosingSubject._rootLocation.getLocationString() + '.documents.' + relativeLocation )
+				return doc.newSubject( self._enclosingSubject, self._enclosingSubject._rootLocation.getLocationString() + '.documents.' + relativeLocation, appDocument.getName() )
 		raise AttributeError, 'no document at %s'  %  ( location, )
 		
 
@@ -89,7 +89,7 @@ class GSymAppSubject (Subject):
 	def find_module(self, fullname, path, world):
 		for appDocument in self._appState.getOpenDocuments():
 			doc = appDocument.getDocument()
-			subject = doc.newSubject( self, self._rootLocation.getLocationString() + '.documents.' + appDocument.getRelativeLocation() )
+			subject = doc.newSubject( self, self._rootLocation.getLocationString() + '.documents.' + appDocument.getRelativeLocation(), appDocument.getName() )
 			try:
 				f = subject.find_module
 			except AttributeError:

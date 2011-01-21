@@ -140,7 +140,7 @@ public class IncrementalView extends IncrementalTree implements Presentable
 			}
 			catch (Throwable t)
 			{
-				AbstractPerspective genericPerspective = view.browserContext.getGenericPerspective();
+				AbstractPerspective genericPerspective = view.browserContext.getDefaultPerspective();
 				try
 				{
 					Pres exceptionView = genericPerspective.presentObject( t, fragmentView, inheritedState );
@@ -256,7 +256,7 @@ public class IncrementalView extends IncrementalTree implements Presentable
 		AbstractPerspective perspective = subject.getPerspective();
 		if ( perspective == null )
 		{
-			perspective = browserContext.getGenericPerspective();
+			perspective = browserContext.getDefaultPerspective();
 		}
 		rootNodeResultFactory = makeNodeResultFactory( perspective, subject.getSubjectContext(), StyleValues.instance, SimpleAttributeTable.instance );
 		

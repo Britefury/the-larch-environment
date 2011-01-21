@@ -295,11 +295,12 @@ perspective = SequentialEditorPerspective( WorksheetEditor(), WorksheetSequentia
 
 
 class WorksheetEditorSubject (Subject):
-	def __init__(self, document, model, enclosingSubject, location):
+	def __init__(self, document, model, enclosingSubject, location, title):
 		self._document = document
 		self._modelView = ViewSchema.WorksheetView( None, model )
 		self._enclosingSubject = enclosingSubject
 		self._location = location
+		self._title = title
 
 
 	def getFocus(self):
@@ -309,7 +310,7 @@ class WorksheetEditorSubject (Subject):
 		return perspective
 	
 	def getTitle(self):
-		return 'Worksheet [view]'
+		return self._title + ' [WsEdit]'
 	
 	def getSubjectContext(self):
 		return self._enclosingSubject.getSubjectContext().withAttrs( location=self._location )

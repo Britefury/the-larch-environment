@@ -84,11 +84,12 @@ class _Python25ModuleLoader (object):
 	
 	
 class Python25Subject (Subject):
-	def __init__(self, document, model, enclosingSubject, location):
+	def __init__(self, document, model, enclosingSubject, location, title):
 		self._document = document
 		self._model = model
 		self._enclosingSubject = enclosingSubject
 		self._location = location
+		self._title = title
 
 
 	def getFocus(self):
@@ -98,7 +99,7 @@ class Python25Subject (Subject):
 		return perspective
 	
 	def getTitle(self):
-		return 'Py 2.5: ' + self._enclosingSubject.getTitle()
+		return self._title + ' [Py25]'
 	
 	def getSubjectContext(self):
 		return self._enclosingSubject.getSubjectContext().withAttrs( location=self._location )

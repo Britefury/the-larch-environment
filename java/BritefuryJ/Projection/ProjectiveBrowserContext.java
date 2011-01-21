@@ -14,7 +14,7 @@ import org.python.core.__builtin__;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.DefaultObjectPresenterRegistry;
 import BritefuryJ.DefaultPerspective.DefaultPerspective;
-import BritefuryJ.DefaultPerspective.GenericSubject;
+import BritefuryJ.DefaultPerspective.DefaultPerspectiveSubject;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Browser.BrowserPage;
@@ -100,15 +100,15 @@ public class ProjectiveBrowserContext
 	
 	private GSymBrowserContextLocationResolver pageLocationResolver = new GSymBrowserContextLocationResolver();
 	private ObjectPresentationLocationResolver objPresLocationResolver = new ObjectPresentationLocationResolver();
-	private DefaultPerspective genericPerspective;
+	private DefaultPerspective defaultPerspective;
 	
 	private PyStringMap resolverLocals = new PyStringMap();
 	
 	
 	
-	public ProjectiveBrowserContext(DefaultObjectPresenterRegistry genericPresenterRegistry, boolean bWithSystemPages)
+	public ProjectiveBrowserContext(DefaultObjectPresenterRegistry defaultPresenterRegistry, boolean bWithSystemPages)
 	{
-		genericPerspective = new DefaultPerspective( objPresLocationResolver, genericPresenterRegistry );
+		defaultPerspective = new DefaultPerspective( objPresLocationResolver, defaultPresenterRegistry );
 		if ( bWithSystemPages )
 		{
 			resolverLocals.__setitem__( "system", Py.java2py( new SystemRootPage() ) );
@@ -150,20 +150,20 @@ public class ProjectiveBrowserContext
 		return pageLocationResolver;
 	}
 	
-	public DefaultPerspective getGenericPerspective()
+	public DefaultPerspective getDefaultPerspective()
 	{
-		return genericPerspective;
+		return defaultPerspective;
 	}
 	
 	
-	public GenericSubject genericSubject(Object focus)
+	public DefaultPerspectiveSubject defaultSubject(Object focus)
 	{
-		return new GenericSubject( focus );
+		return new DefaultPerspectiveSubject( focus );
 	}
 	
-	public GenericSubject genericSubject(Object focus, String title)
+	public DefaultPerspectiveSubject defaultSubject(Object focus, String title)
 	{
-		return new GenericSubject( focus, title );
+		return new DefaultPerspectiveSubject( focus, title );
 	}
 	
 	
@@ -176,7 +176,7 @@ public class ProjectiveBrowserContext
 	
 	public Location getLocationForObject(Object x)
 	{
-		return getLocationForObject( genericPerspective, x );
+		return getLocationForObject( defaultPerspective, x );
 	}
 	
 	
@@ -197,7 +197,7 @@ public class ProjectiveBrowserContext
 		}
 		catch (Throwable e)
 		{
-			return new GenericSubject( new ResolveError( location, e ), "Resolve error" );
+			return new DefaultPerspectiveSubject( new ResolveError( location, e ), "Resolve error" );
 		}
 	}
 
@@ -216,7 +216,7 @@ public class ProjectiveBrowserContext
 		}
 		else
 		{
-			return genericSubject( result );
+			return defaultSubject( result );
 		}
 	}
 	
