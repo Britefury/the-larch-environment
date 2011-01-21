@@ -32,20 +32,21 @@ def _packageSubject(projectSubject, model, location):
 					if item.isInstanceOf( Schema.Package ):
 						return _packageSubject( projectSubject, item, itemLocation )
 					elif item.isInstanceOf( Schema.Page ):
-						return projectSubject._document.newUnitSubject( item['unit'], projectSubject, itemLocation )
+						return projectSubject._document.newUnitSubject( item['unit'], projectSubject, itemLocation, name )
 			raise AttributeError, "Did not find item for '%s'"  %  ( name, )
 	return _PackageSubject()
 
 
 
 class ProjectSubject (Subject):
-	def __init__(self, document, model, enclosingSubject, location):
+	def __init__(self, document, model, enclosingSubject, location, title):
 		self._document = document
 		self._model = model
 		self._enclosingSubject = enclosingSubject
 		self._location = location
 		self._moduleFinder = ModuleFinder( self )
 		self._rootFinder = RootFinder( self )
+		self._title = title
 
 
 	def getFocus(self):
@@ -55,7 +56,7 @@ class ProjectSubject (Subject):
 		return perspective
 
 	def getTitle(self):
-		return 'Project'
+		return self._title + ' [Prj]'
 
 	def getSubjectContext(self):
 		return self._enclosingSubject.getSubjectContext().withAttrs( document=self._document, documentLocation=Location( self._location ), location=Location( self._location ) )
@@ -72,7 +73,7 @@ class ProjectSubject (Subject):
 				if item.isInstanceOf( Schema.Package ):
 					return _packageSubject( self, item, itemLocation )
 				elif item.isInstanceOf( Schema.Page ):
-					return self._document.newUnitSubject( item['unit'], self, itemLocation )
+					return self._document.newUnitSubject( item['unit'], self, itemLocation, name )
 		raise AttributeError, "Did not find item for '%s'"  %  ( name, )
 
 

@@ -215,15 +215,16 @@ class _WorksheetModuleLoader (object):
 
 
 class WorksheetViewerSubject (Subject):
-	def __init__(self, document, model, enclosingSubject, location):
+	def __init__(self, document, model, enclosingSubject, location, title):
 		self._document = document
 		self._model = model
 		self._modelView = ViewSchema.WorksheetView( None, model )
 		self._enclosingSubject = enclosingSubject
 		self._location = location
 		self._editLocation = self._location + '.edit'
+		self._title = title
 		
-		self.edit = WorksheetEditorSubject( document, model, self, self._editLocation )
+		self.edit = WorksheetEditorSubject( document, model, self, self._editLocation, title )
 
 
 	def getFocus(self):
@@ -233,7 +234,7 @@ class WorksheetViewerSubject (Subject):
 		return perspective
 	
 	def getTitle(self):
-		return 'Worksheet [view]'
+		return self._title + ' [WsView]'
 	
 	def getSubjectContext(self):
 		return self._enclosingSubject.getSubjectContext().withAttrs( location=self._location, editLocation=Location( self._editLocation ), viewLocation=Location( self._location ) )

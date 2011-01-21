@@ -8,19 +8,19 @@ package BritefuryJ.DefaultPerspective;
 
 import BritefuryJ.Projection.Subject;
 
-public class GenericSubject extends Subject
+public class DefaultPerspectiveSubject extends Subject
 {
 	private Object focus;
 	private String title;
 	
 	
-	public GenericSubject(Object focus, String title)
+	public DefaultPerspectiveSubject(Object focus, String title)
 	{
 		this.focus = focus;
 		this.title = title;
 	}
 	
-	public GenericSubject(Object focus)
+	public DefaultPerspectiveSubject(Object focus)
 	{
 		this.focus = focus;
 		this.title = focus.getClass().getName();

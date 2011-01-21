@@ -35,7 +35,7 @@ public class ApplyPerspective extends Pres
 		AbstractPerspective p = perspective;
 		if ( p == null )
 		{
-			p = ctx.getFragment().getBrowserContext().getGenericPerspective();
+			p = ctx.getFragment().getBrowserContext().getDefaultPerspective();
 		}
 		
 		return child.present( new PresentationContext( ctx.getFragment(), p, ctx.getInheritedState() ), style );

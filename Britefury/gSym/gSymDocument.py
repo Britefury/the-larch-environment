@@ -145,15 +145,15 @@ class GSymDocument (CommandHistoryListener):
 		
 		
 	
-	def newSubject(self, enclosingSubject, location):
-		return self.newUnitSubject( self._unit, enclosingSubject, location )
+	def newSubject(self, enclosingSubject, location, title):
+		return self.newUnitSubject( self._unit, enclosingSubject, location, title )
 
-	def newUnitSubject(self, unit, enclosingSubject, location):
+	def newUnitSubject(self, unit, enclosingSubject, location,  title):
 		unitClass = self._world.getUnitClass( gSymUnit_getSchemaLocation( unit ) )
 		subjectFactory = unitClass.getUnitSubjectFactory()
 		if subjectFactory is None:
 			raise TypeError, 'cannot create subject for schema ' + gSymUnit_getSchemaLocation( unit )
-		return subjectFactory( self, gSymUnit_getContent( unit ), enclosingSubject, location )
+		return subjectFactory( self, gSymUnit_getContent( unit ), enclosingSubject, location,  title )
 
 		
 	

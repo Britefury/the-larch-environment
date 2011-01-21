@@ -30,7 +30,7 @@ class _PackageLoader (object):
 				if model.isInstanceOf( Schema.Page ):
 					# We have found a page called '__init__' - get its subject
 					modelLocation = self._packageLocation + '.__init__'
-					pageSubject = self._projectSubject._document.newUnitSubject( model['unit'], self._projectSubject, modelLocation )
+					pageSubject = self._projectSubject._document.newUnitSubject( model['unit'], self._projectSubject, modelLocation, '__init__' )
 					# Now, check if it has a 'createModuleLoader' method - if it has, then we can use it. Otherwise, use the default
 					try:
 						createModuleLoader = pageSubject.createModuleLoader
@@ -72,7 +72,7 @@ class ModuleFinder (object):
 					if model.isInstanceOf( Schema.Page ):
 						if suffix == '':
 							# We have found a page: get its subject
-							pageSubject = self._projectSubject._document.newUnitSubject( model['unit'], self._projectSubject, modelLocation )
+							pageSubject = self._projectSubject._document.newUnitSubject( model['unit'], self._projectSubject, modelLocation, prefix )
 							# Now, check if it has a 'createModuleLoader' method - if it has, then we can use it. Otherwise, we can't
 							try:
 								createModuleLoader = pageSubject.createModuleLoader
