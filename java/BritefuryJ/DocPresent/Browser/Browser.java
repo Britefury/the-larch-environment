@@ -246,7 +246,7 @@ public class Browser
 	
 	private ScrolledViewport.ScrolledViewportControl makeViewport(Object child, PersistentState state)
 	{
-		return (ScrolledViewport.ScrolledViewportControl)new ScrolledViewport( child, 0.0, 0.0, state ).createControl( new PresentationContext(), StyleValues.instance );
+		return (ScrolledViewport.ScrolledViewportControl)new ScrolledViewport( child, 0.0, 0.0, state ).createControl( PresentationContext.defaultCtx, StyleValues.instance );
 	}
 	
 	

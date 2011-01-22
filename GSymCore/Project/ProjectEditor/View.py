@@ -257,7 +257,7 @@ _pythonPackageNameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*(\\.[a-zA-Z_][
 
 class ProjectView (GSymViewObjectNodeDispatch):
 	@DMObjectNodeDispatchMethod( Schema.Project )
-	def Project(self, ctx, state, node, pythonPackageName, contents):
+	def Project(self, fragment, state, node, pythonPackageName, contents):
 		# Save and Save As
 		def _onSave(link, buttonEvent):
 			if document.hasFilename():
@@ -266,14 +266,14 @@ class ProjectView (GSymViewObjectNodeDispatch):
 				def handleSaveDocumentAsFn(filename):
 					document.saveAs( filename )
 
-				DocumentManagement.promptSaveDocumentAs( ctx.getSubjectContext()['world'], link.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn )
+				DocumentManagement.promptSaveDocumentAs( fragment.getSubjectContext()['world'], link.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn )
 
 
 		def _onSaveAs(link, buttonEvent):
 			def handleSaveDocumentAsFn(filename):
 				document.saveAs( filename )
 
-			DocumentManagement.promptSaveDocumentAs( ctx.getSubjectContext()['world'], link.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn )
+			DocumentManagement.promptSaveDocumentAs( fragment.getSubjectContext()['world'], link.getElement().getRootElement().getComponent(), handleSaveDocumentAsFn )
 
 
 
@@ -323,7 +323,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 
 		# Get some initial variables
-		subjectContext = ctx.getSubjectContext()
+		subjectContext = fragment.getSubjectContext()
 		document = subjectContext['document']
 		location = subjectContext['location']
 		world = subjectContext['world']
@@ -398,7 +398,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 
 	@DMObjectNodeDispatchMethod( Schema.Package )
-	def Package(self, ctx, state, node, name, contents):
+	def Package(self, fragment, state, node, name, contents):
 		def _addPackage(menuItem):
 			contents.append( Schema.Package( name='NewPackage', contents=[] ) )
 
@@ -442,7 +442,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 		items = InnerFragment.map( contents, state.withAttrs( location=packageLocation ) )
 
-		world = ctx.getSubjectContext()['world']
+		world = fragment.getSubjectContext()['world']
 
 		icon = Image( 'GSymCore/Project/icons/Package.png' )
 		nameElement = _packageNameStyle.applyTo( StaticText( name ) )
@@ -460,7 +460,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 
 	@DMObjectNodeDispatchMethod( Schema.Page )
-	def Page(self, ctx, state, node, name, unit):
+	def Page(self, fragment, state, node, name, unit):
 		class _RenameListener (TextEntry.TextEntryListener):
 			def onAccept(self, textEntry, text):
 				node['name'] = text

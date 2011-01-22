@@ -26,7 +26,7 @@ public abstract class Pres
 {
 	public DPElement present()
 	{
-		return present( new PresentationContext(), StyleValues.instance );
+		return present( PresentationContext.defaultCtx, StyleValues.instance );
 	}
 
 	public abstract DPElement present(PresentationContext ctx, StyleValues style);
@@ -332,7 +332,7 @@ public abstract class Pres
 		}
 		else
 		{
-			popupToRightOf( element, new PresentationContext(), StyleValues.instance, bCloseOnLoseFocus, bRequestFocus );
+			popupToRightOf( element, PresentationContext.defaultCtx, StyleValues.instance, bCloseOnLoseFocus, bRequestFocus );
 		}
 	}
 	
@@ -345,7 +345,7 @@ public abstract class Pres
 		}
 		else
 		{
-			popupBelow( element, new PresentationContext(), StyleValues.instance, bCloseOnLoseFocus, bRequestFocus );
+			popupBelow( element, PresentationContext.defaultCtx, StyleValues.instance, bCloseOnLoseFocus, bRequestFocus );
 		}
 	}
 	
@@ -358,7 +358,7 @@ public abstract class Pres
 		}
 		else
 		{
-			popupOver( element, targetLocalPos, new PresentationContext(), StyleValues.instance, bCloseOnLoseFocus, bRequestFocus );
+			popupOver( element, targetLocalPos, PresentationContext.defaultCtx, StyleValues.instance, bCloseOnLoseFocus, bRequestFocus );
 		}
 	}
 	
@@ -371,7 +371,7 @@ public abstract class Pres
 		}
 		else
 		{
-			popupAtMousePosition( element, new PresentationContext(), StyleValues.instance, bCloseOnLoseFocus, bRequestFocus );
+			popupAtMousePosition( element, PresentationContext.defaultCtx, StyleValues.instance, bCloseOnLoseFocus, bRequestFocus );
 		}
 	}
 	

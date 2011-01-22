@@ -80,10 +80,10 @@ def _worksheetContextMenuFactory(element, menu):
 
 class WorksheetViewer (GSymViewObjectDispatch):
 	@ObjectDispatchMethod( ViewSchema.WorksheetView )
-	def Worksheet(self, ctx, inheritedState, node):
+	def Worksheet(self, fragment, inheritedState, node):
 		bodyView = InnerFragment( node.getBody() )
 		
-		editLocation = ctx.getSubjectContext()['editLocation']
+		editLocation = fragment.getSubjectContext()['editLocation']
 		
 		homeLink = Hyperlink( 'HOME PAGE', Location( '' ) )
 		editLink = Hyperlink( 'Edit this worksheet', editLocation )
@@ -95,13 +95,13 @@ class WorksheetViewer (GSymViewObjectDispatch):
 
 
 	@ObjectDispatchMethod( ViewSchema.BodyView )
-	def Body(self, ctx, inheritedState, node):
+	def Body(self, fragment, inheritedState, node):
 		contentViews = InnerFragment.map( [ c    for c in node.getContents()   if c.isVisible() ] )
 		return Body( contentViews )
 	
 	
 	@ObjectDispatchMethod( ViewSchema.ParagraphView )
-	def Paragraph(self, ctx, inheritedState, node):
+	def Paragraph(self, fragment, inheritedState, node):
 		text = node.getText()
 		style = node.getStyle()
 		if style == 'normal':
@@ -125,7 +125,7 @@ class WorksheetViewer (GSymViewObjectDispatch):
 
 	
 	@ObjectDispatchMethod( ViewSchema.PythonCodeView )
-	def PythonCode(self, ctx, inheritedState, node):
+	def PythonCode(self, fragment, inheritedState, node):
 		if node.isVisible():
 			if node.isCodeVisible():
 				codeView = Python25.python25EditorPerspective.applyTo( InnerFragment( node.getCode() ) )
@@ -166,7 +166,7 @@ class WorksheetViewer (GSymViewObjectDispatch):
 
 	
 	@ObjectDispatchMethod( ViewSchema.QuoteLocationView )
-	def QuoteLocation(self, ctx, inheritedState, node):
+	def QuoteLocation(self, fragment, inheritedState, node):
 		targetView = StyleSheet.instance.withAttr( Primitive.editable, True ).applyTo( LocationAsInnerFragment( Location( node.getLocation() ) ) )
 		
 		if node.isMinimal():

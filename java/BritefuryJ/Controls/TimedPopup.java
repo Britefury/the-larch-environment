@@ -65,7 +65,7 @@ public class TimedPopup
 		}
 		else
 		{
-			popupToRightOf( element, new PresentationContext(), StyleValues.instance );
+			popupToRightOf( element, PresentationContext.defaultCtx, StyleValues.instance );
 		}
 	}
 	
@@ -78,7 +78,7 @@ public class TimedPopup
 		}
 		else
 		{
-			popupBelow( element, new PresentationContext(), StyleValues.instance );
+			popupBelow( element, PresentationContext.defaultCtx, StyleValues.instance );
 		}
 	}
 	
@@ -91,7 +91,7 @@ public class TimedPopup
 		}
 		else
 		{
-			popupAtMousePosition( element, new PresentationContext(), StyleValues.instance );
+			popupAtMousePosition( element, PresentationContext.defaultCtx, StyleValues.instance );
 		}
 	}
 	

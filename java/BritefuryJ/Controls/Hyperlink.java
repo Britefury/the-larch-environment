@@ -6,6 +6,9 @@
 //##************************
 package BritefuryJ.Controls;
 
+import java.util.regex.Matcher;
+
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.PageController;
@@ -64,22 +67,29 @@ public class Hyperlink extends ControlPres
 	}
 	
 	
-	
-	private class LinkContextMenuFactory implements ContextMenuElementInteractor
+	private static class LinkContextMenuFactory implements ContextMenuElementInteractor
 	{
+		private LinkTargetListener listener;
+		
+		
+		public LinkContextMenuFactory(LinkTargetListener listener)
+		{
+			this.listener = listener;
+		}
+		
+		
 		@Override
 		public boolean contextMenu(PointerInputElement element, PopupMenu menu)
 		{
 			final DPElement linkElement = (DPElement)element;
 			final PageController pageController = linkElement.getRootElement().getPageController();
-			final LinkTargetListener targetListener = (LinkTargetListener)listener;
 
 			MenuItem.MenuItemListener openInNewTabListener = new MenuItem.MenuItemListener()
 			{
 				@Override
 				public void onMenuItemClicked(MenuItem.MenuItemControl menuItem)
 				{
-					pageController.openLocation( targetListener.targetLocation, PageController.OpenOperation.OPEN_IN_NEW_TAB );
+					pageController.openLocation( listener.targetLocation, PageController.OpenOperation.OPEN_IN_NEW_TAB );
 				}
 			};
 
@@ -88,7 +98,7 @@ public class Hyperlink extends ControlPres
 				@Override
 				public void onMenuItemClicked(MenuItem.MenuItemControl menuItem)
 				{
-					pageController.openLocation( targetListener.targetLocation, PageController.OpenOperation.OPEN_IN_NEW_WINDOW );
+					pageController.openLocation( listener.targetLocation, PageController.OpenOperation.OPEN_IN_NEW_WINDOW );
 				}
 			};
 			
@@ -100,6 +110,66 @@ public class Hyperlink extends ControlPres
 		}
 	}
 
+	
+
+	private static interface LocationFn
+	{
+		public Location apply(Location location);
+	}
+	
+	private static interface LinkListenerFactory
+	{
+		public LinkListener createLinkListener(LocationFn locFn);
+		public ContextMenuElementInteractor createContextMenuInteractor(LinkListener listener);
+	}
+	
+	private static class FixedLinkListenerFactory implements LinkListenerFactory
+	{
+		private LinkListener linkListener;
+		
+		
+		public FixedLinkListenerFactory(LinkListener linkListener)
+		{
+			this.linkListener = linkListener; 
+		}
+		
+		
+		public LinkListener createLinkListener(LocationFn locFn)
+		{
+			return linkListener;
+		}
+		
+		public ContextMenuElementInteractor createContextMenuInteractor(LinkListener listener)
+		{
+			return null;
+		}
+	}
+	
+	
+	private static class LocationLinkListenerFactory implements LinkListenerFactory
+	{
+		private Location location;
+		
+		
+		public LocationLinkListenerFactory(Location location)
+		{
+			this.location = location; 
+		}
+		
+		
+		public LinkListener createLinkListener(LocationFn locFn)
+		{
+			return new LinkTargetListener( locFn.apply( location ) );
+		}
+		
+		public ContextMenuElementInteractor createContextMenuInteractor(LinkListener listener)
+		{
+			return new LinkContextMenuFactory( (LinkTargetListener)listener );
+		}
+	}
+	
+	
+	
 	
 	public static class HyperlinkControl extends Control
 	{
@@ -170,20 +240,23 @@ public class Hyperlink extends ControlPres
 	
 	
 	private String text;
-	private LinkListener listener;
-	private ContextMenuElementInteractor menuFactory;
+	private LinkListenerFactory listenerFactory;
 	
 	
 	public Hyperlink(String text, LinkListener listener)
 	{
-		this.text = text;
-		this.listener = listener;
+		this( text, new FixedLinkListenerFactory( listener ) );
 	}
 	
 	public Hyperlink(String text, Location targetLocation)
 	{
-		this( text, new LinkTargetListener( targetLocation ) );
-		this.menuFactory = new LinkContextMenuFactory();
+		this( text, new LocationLinkListenerFactory( targetLocation ) );
+	}
+	
+	private Hyperlink(String text, LinkListenerFactory listenerFactory)
+	{
+		this.text = text;
+		this.listenerFactory = listenerFactory;
 	}
 	
 	
@@ -194,10 +267,54 @@ public class Hyperlink extends ControlPres
 		Pres textElement = hyperlinkStyle.applyTo( new Text( text ) );
 		boolean bClosePopupOnActivate = hyperlinkStyle.get( Controls.bClosePopupOnActivate, Boolean.class );
 		
-		DPText element = (DPText)textElement.present( ctx, style );
-		if ( menuFactory != null )
+		final SimpleAttributeTable subjectContext = ctx.getSubjectContext();
+		LocationFn locFn = new LocationFn()
 		{
-			element.addContextMenuInteractor( menuFactory );
+			@Override
+			public Location apply(Location location)
+			{
+				if ( subjectContext != null )
+				{
+					String loc = location.getLocationString();
+					Matcher m;
+					
+					m = Location.locationVarPattern.matcher( loc );
+					while ( m.find( 0 ) )
+					{
+						String varName = loc.substring( m.start()+1, m.end() );
+						
+						Object value = subjectContext.getOptional( varName );
+						String valueLoc = "None";
+						
+						if ( value instanceof String )
+						{
+							valueLoc = (String)value;
+						}
+						else if ( value instanceof Location )
+						{
+							valueLoc = ((Location)value).getLocationString();
+						}
+						
+						loc = loc.replace( "$" + varName, valueLoc );
+						m = Location.locationVarPattern.matcher( loc );
+					}
+					
+					return new Location( loc );
+				}
+				else
+				{
+					return location;
+				}
+			}
+		};
+		
+		LinkListener listener = listenerFactory.createLinkListener( locFn );
+		ContextMenuElementInteractor contextMenuInteractor = listenerFactory.createContextMenuInteractor( listener );
+		
+		DPText element = (DPText)textElement.present( ctx, style );
+		if ( contextMenuInteractor != null )
+		{
+			element.addContextMenuInteractor( contextMenuInteractor );
 		}
 		
 		return new HyperlinkControl( ctx, style, element, listener, bClosePopupOnActivate );
