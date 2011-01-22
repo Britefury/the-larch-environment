@@ -7,6 +7,7 @@
 package BritefuryJ.DocPresent.Browser;
 
 import java.awt.Color;
+import java.util.regex.Pattern;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
@@ -20,6 +21,10 @@ import BritefuryJ.StyleSheet.StyleSheet;
 
 public class Location implements Presentable
 {
+	public static Pattern locationVarPattern = Pattern.compile( Pattern.quote( "$" ) + "[a-zA-Z_][a-zA-Z0-9_]*" );
+	
+	
+	
 	//
 	//
 	// PRESENTABLE

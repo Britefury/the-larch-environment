@@ -131,10 +131,10 @@ def _worksheetContextMenuFactory(element, menu):
 
 class WorksheetEditor (GSymViewObjectDispatch):
 	@ObjectDispatchMethod( ViewSchema.WorksheetView )
-	def Worksheet(self, ctx, inheritedState, node):
+	def Worksheet(self, fragment, inheritedState, node):
 		bodyView = InnerFragment( node.getBody() )
 		
-		viewLocation = ctx.getSubjectContext()['viewLocation']
+		viewLocation = fragment.getSubjectContext()['viewLocation']
 		
 		homeLink = Hyperlink( 'HOME PAGE', Location( '' ) )
 		viewLink = Hyperlink( 'View this worksheet', viewLocation )
@@ -148,7 +148,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 	
 	
 	@ObjectDispatchMethod( ViewSchema.BodyView )
-	def Body(self, ctx, inheritedState, node):
+	def Body(self, fragment, inheritedState, node):
 		emptyLine = Paragraph( [ Text( '' ) ] )
 		emptyLine = EditableSequentialItem( [ EmptyEditListener.instance, EmptyEventListener.instance ],  emptyLine )
 		contentViews = list( InnerFragment.map( node.getContents() ) )  +  [ emptyLine ]
@@ -159,7 +159,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 	
 	
 	@ObjectDispatchMethod( ViewSchema.ParagraphView )
-	def Paragraph(self, ctx, inheritedState, node):
+	def Paragraph(self, fragment, inheritedState, node):
 		text = node.getText()
 		style = node.getStyle()
 		if style == 'normal':
@@ -188,7 +188,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 
 	
 	@ObjectDispatchMethod( ViewSchema.PythonCodeView )
-	def PythonCode(self, ctx, inheritedState, node):
+	def PythonCode(self, fragment, inheritedState, node):
 		choiceValues = [
 		        ViewSchema.PythonCodeView.STYLE_MINIMAL_RESULT,
 		        ViewSchema.PythonCodeView.STYLE_RESULT,
@@ -245,7 +245,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 
 	
 	@ObjectDispatchMethod( ViewSchema.QuoteLocationView )
-	def QuoteLocation(self, ctx, inheritedState, node):
+	def QuoteLocation(self, fragment, inheritedState, node):
 		choiceValues = [
 		        ViewSchema.QuoteLocationView.STYLE_MINIMAL,
 		        ViewSchema.QuoteLocationView.STYLE_NORMAL ]

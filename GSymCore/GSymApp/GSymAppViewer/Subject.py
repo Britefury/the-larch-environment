@@ -67,7 +67,7 @@ class GSymAppSubject (Subject):
 		return 'gSym'
 	
 	def getSubjectContext(self):
-		return SimpleAttributeTable.instance.withAttrs( world=self._world, document=None, documentLocation=None, location=self._rootLocation )
+		return SimpleAttributeTable.instance.withAttrs( world=self._world, document=None, docLocation=None, location=self._rootLocation )
 	
 	def getCommandHistory(self):
 		return None

@@ -13,12 +13,15 @@ import BritefuryJ.Projection.AbstractPerspective;
 
 public class PresentationContext
 {
+	public static final PresentationContext defaultCtx = new PresentationContext();
+	
+	
 	private FragmentView fragment = null;
 	private AbstractPerspective perspective = null;
 	private SimpleAttributeTable inheritedState = null;
 	
 	
-	public PresentationContext()
+	private PresentationContext()
 	{
 	}
 	
@@ -43,6 +46,11 @@ public class PresentationContext
 	public SimpleAttributeTable getInheritedState()
 	{
 		return inheritedState;
+	}
+	
+	public SimpleAttributeTable getSubjectContext()
+	{
+		return fragment != null  ?  fragment.getSubjectContext()  :  null;
 	}
 	
 	

@@ -104,7 +104,7 @@ public abstract class SpinEntry extends ControlPres
 			@Override
 			public void dragMotion(PointerInputElement element, PointerMotionEvent event, Point2 dragStartPos, int dragButton)
 			{
-				double delta = event.getPointer().getLocalPos().y - dragStartPos.y;
+				double delta = dragStartPos.y - event.getPointer().getLocalPos().y;
 				
 				Object startValue = pointerToDragStartValue.get( event.getPointer().concretePointer() );
 				if ( startValue != null )

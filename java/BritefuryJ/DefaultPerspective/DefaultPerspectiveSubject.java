@@ -23,7 +23,7 @@ public class DefaultPerspectiveSubject extends Subject
 	public DefaultPerspectiveSubject(Object focus)
 	{
 		this.focus = focus;
-		this.title = focus.getClass().getName();
+		this.title = focus != null  ?  focus.getClass().getName()  :  "<null>";
 	}
 	
 

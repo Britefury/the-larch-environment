@@ -64,7 +64,7 @@ public abstract class PopupMenu extends Pres
 		}
 		else
 		{
-			popupToRightOf( element, new PresentationContext(), defaultPopupMenuContentsStyleValues );
+			popupToRightOf( element, PresentationContext.defaultCtx, defaultPopupMenuContentsStyleValues );
 		}
 	}
 	
@@ -82,7 +82,7 @@ public abstract class PopupMenu extends Pres
 		}
 		else
 		{
-			popupBelow( element, new PresentationContext(), defaultPopupMenuContentsStyleValues );
+			popupBelow( element, PresentationContext.defaultCtx, defaultPopupMenuContentsStyleValues );
 		}
 	}
 	
@@ -100,7 +100,7 @@ public abstract class PopupMenu extends Pres
 		}
 		else
 		{
-			popupAtMousePosition( element, new PresentationContext(), defaultPopupMenuContentsStyleValues );
+			popupAtMousePosition( element, PresentationContext.defaultCtx, defaultPopupMenuContentsStyleValues );
 		}
 	}
 

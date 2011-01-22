@@ -59,7 +59,7 @@ class ProjectSubject (Subject):
 		return self._title + ' [Prj]'
 
 	def getSubjectContext(self):
-		return self._enclosingSubject.getSubjectContext().withAttrs( document=self._document, documentLocation=Location( self._location ), location=Location( self._location ) )
+		return self._enclosingSubject.getSubjectContext().withAttrs( document=self._document, docLocation=Location( self._location ), location=Location( self._location ) )
 
 	def getCommandHistory(self):
 		return self._document.getCommandHistory()
