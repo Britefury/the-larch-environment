@@ -48,6 +48,7 @@ public class Browser
 	
 	private static final String COMMAND_BACK = "back";
 	private static final String COMMAND_FORWARD = "forward";
+	private static final String COMMAND_RELOAD = "reload";
 	
 
 	
@@ -241,6 +242,11 @@ public class Browser
 			resolve();
 		}
 	}
+	
+	protected void reload()
+	{
+		resolve();
+	}
 
 	
 	
@@ -336,9 +342,18 @@ public class Browser
 			}
 		};
 		
+		ActionListener reloadListener = new ActionListener()
+		{
+			public void actionPerformed(ActionEvent event)
+			{
+				reload();
+			}
+		};
+		
 		
 		toolbar.add( makeToolButton( "back arrow.png", COMMAND_BACK, "Go back", "Back", backListener ) );
 		toolbar.add( makeToolButton( "forward arrow.png", COMMAND_FORWARD, "Go forward", "Forward", forwardListener ) );
+		toolbar.add( makeToolButton( "reload.png", COMMAND_RELOAD, "Reload page", "Reload", reloadListener ) );
 	}
 	
 	private JButton makeToolButton(String imageFilename, String actionCommand, String tooltipText, String altText, ActionListener listener)
