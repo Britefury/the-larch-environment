@@ -16,11 +16,9 @@ import java.awt.event.ActionListener;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
@@ -55,7 +53,7 @@ public class Browser
 	private JToolBar toolbar;
 
 	private JTextField locationField;
-	private JPanel locationPanel, panel;
+	private JPanel panel;
 
 	private PresentationComponent presComponent;
 	private ScrolledViewport.ScrolledViewportControl viewport;
@@ -91,13 +89,11 @@ public class Browser
 		initialiseToolbar( toolbar );
 		
 		
-		JLabel locationLabel = new JLabel( "Location:" );
-		locationLabel.setBorder( BorderFactory.createEmptyBorder( 0, 5, 0, 10 ) );
 		locationField = new JTextField( location.getLocationString() );
 		locationField.setMaximumSize( new Dimension( locationField.getMaximumSize().width, locationField.getMinimumSize().height ) );
 		locationField.setBorder( BorderFactory.createLineBorder( Color.black, 1 ) );
 		locationField.setDragEnabled( true );
-	
+		
 		ActionListener locationActionListener = new ActionListener()
 		{
 			public void actionPerformed(ActionEvent event)
@@ -107,18 +103,11 @@ public class Browser
 		};
 		
 		locationField.addActionListener( locationActionListener );
+		toolbar.add( locationField );
 		
-		
-		locationPanel = new JPanel();
-		locationPanel.setLayout( new BoxLayout( locationPanel, BoxLayout.X_AXIS ) );
-		locationPanel.add( locationLabel );
-		locationPanel.add( locationField );
-		locationPanel.setBorder( BorderFactory.createEmptyBorder( 5, 0, 5, 5 ) );
-
 		
 		JPanel header = new JPanel( new BorderLayout() );
 		header.add( toolbar, BorderLayout.PAGE_START );
-		header.add( locationPanel, BorderLayout.PAGE_END );
 		
 		
 		panel = new JPanel();
