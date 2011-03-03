@@ -842,10 +842,10 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 		try:
 			modelFn = value.__py_model__
 		except AttributeError:
-			index = len( self._resourceMap )
-			self._resourceMap.append( resource.getValue() )
-			return _runtime_resourceMap_Name + '[%d]'  %  ( index, )
+			# Use the object itself as the value
+			return self._resource( resource.getValue() )
 		else:
+			# Got a 'model' function - invoke to create AST nodes, then convert them to code
 			model = modelFn()
 			return self( model )
 		
@@ -861,12 +861,32 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 		try:
 			modelFn = value.__py_model__
 		except AttributeError:
-			index = len( self._resourceMap )
-			self._resourceMap.append( resource.getValue() )
-			return _runtime_resourceMap_Name + '[%d]'  %  ( index, )
+			try:
+				attrNamesFn = value.__py_attrnames__
+				attrValuesFn = value.__py_attrvalues__
+			except AttributeError:
+				# Get the object as a value
+				return self._resource( resource.getValue() )
+			else:
+				# Get the attribute name list
+				names = attrNamesFn()
+				valuesCallSource = self._resource( attrValuesFn ) + '( locals(), globals() )'
+				if isinstance( names, str )  or  isinstance( names, unicode ):
+					return names + ' = ' + valuesCallSource
+				else:
+					return ', '.join( names ) + ',' + ' = ' + valuesCallSource
 		else:
+			# Got a 'model' function - invoke to create AST nodes, then convert them to code
 			model = modelFn()
 			return self( model )
+	
+		
+		
+	def _resource(self, resourceValue):
+		index = len( self._resourceMap )
+		self._resourceMap.append( resource.getValue() )
+		return _runtime_resourceMap_Name + '[%d]'  %  ( index, )
+		
 		
 			
 
