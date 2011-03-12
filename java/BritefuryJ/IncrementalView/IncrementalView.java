@@ -87,7 +87,7 @@ public class IncrementalView extends IncrementalTree implements Presentable
 		private PersistentStateTable usePersistentState(Object node)
 		{
 			LinkedList<PersistentStateTable> entryList = table.get( new IncrementalTreeNodeTable.Key( node ) );
-			if ( entryList != null )
+			if ( entryList != null  &&  !entryList.isEmpty() )
 			{
 				return entryList.removeFirst();
 			}
