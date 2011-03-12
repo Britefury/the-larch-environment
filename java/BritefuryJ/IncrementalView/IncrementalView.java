@@ -160,7 +160,33 @@ public class IncrementalView extends IncrementalTree implements Presentable
 			
 			view.profile_stopPython();
 			
-			return fragment.present( new PresentationContext( fragmentView, perspective, inheritedState ), style );
+			Object nodeResult;
+			
+			try
+			{
+				nodeResult = fragment.present( new PresentationContext( fragmentView, perspective, inheritedState ), style );
+			}
+			catch (Throwable t)
+			{
+				AbstractPerspective genericPerspective = view.browserContext.getDefaultPerspective();
+				try
+				{
+					Pres exceptionView = genericPerspective.presentObject( t, fragmentView, inheritedState );
+					fragment = new ErrorBox( "Presentation realisation error - exception during presentation realisation", exceptionView );
+					return fragment.present( new PresentationContext( fragmentView, genericPerspective, inheritedState ), style );
+				}
+				catch (Exception e2)
+				{
+					fragment = new ErrorBox( "DOUBLE EXCEPTION!", new Column( new Pres[] {
+							labelStyle.applyTo( new Label( "Got exception:" ) ),
+							exceptionStyle.applyTo( new StaticText( e2.toString() ) ).padX( 15.0, 0.0 ),
+							labelStyle.applyTo( new Label( "While trying to display exception:" ) ),
+							exceptionStyle.applyTo( new StaticText( t.toString() ) ).padX( 15.0, 0.0 )   } ) );
+					return fragment.present( new PresentationContext( fragmentView, genericPerspective, inheritedState ), style );
+				}
+			}
+			
+			return nodeResult;
 		}
 
 	

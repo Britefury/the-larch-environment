@@ -473,4 +473,25 @@ public abstract class Pres
 		}
 		return result;
 	}
+
+	public static Pres[] mapCoerceNonNull(Object children[])
+	{
+		Pres result[] = new Pres[children.length];
+		for (int i = 0; i < children.length; i++)
+		{
+			result[i] = coerceNonNull( children[i] );
+		}
+		return result;
+	}
+	
+
+	public static Pres[] mapCoerceNonNull(List<?> children)
+	{
+		Pres result[] = new Pres[children.size()];
+		for (int i = 0; i < children.size(); i++)
+		{
+			result[i] = coerceNonNull( children.get( i ) );
+		}
+		return result;
+	}
 }
