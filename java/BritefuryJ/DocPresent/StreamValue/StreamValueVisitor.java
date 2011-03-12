@@ -330,7 +330,7 @@ public class StreamValueVisitor
 	
 	
 	//
-	// Subtree
+	// Stream value building
 	//
 	
 	public StreamValue getStreamValue(DPElement root)

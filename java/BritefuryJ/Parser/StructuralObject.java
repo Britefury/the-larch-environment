@@ -42,7 +42,7 @@ public class StructuralObject extends ParserExpression
 	
 	private boolean testObject(Object x)
 	{
-		if ( x instanceof PyObject  &&  pyType != null )
+		if ( pyType != null  &&  x instanceof PyObject )
 		{
 			return Py.isInstance( (PyObject)x, pyType );
 		}
