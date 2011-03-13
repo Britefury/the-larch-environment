@@ -366,6 +366,7 @@ public class Tokens
 	public static final ParserExpression decimalIntegerNoOctal = new RegEx( "(?:[1-9][0-9]*)|0" );
 	
 	public static final ParserExpression hexInteger = new RegEx( "0(x|X)[0-9A-Fa-f]+" );
+	public static final ParserExpression hexIntegerWithoutPrefix = new RegEx( "[0-9A-Fa-f]+" );
 
 	public static final ParserExpression octalInteger = new RegEx( "0[0-7]+" );
 

@@ -23,10 +23,13 @@ import BritefuryJ.DocPresent.StreamValue.StreamValueAccessor;
  */
 public class RegEx extends TerminalString
 {
-	protected String re;
-	protected int flags;
 	protected Pattern pattern;
 	
+	
+	public RegEx(Pattern pattern)
+	{
+		this.pattern = pattern;
+	}
 	
 	public RegEx(String re)
 	{
@@ -35,20 +38,18 @@ public class RegEx extends TerminalString
 	
 	public RegEx(String re, int flags)
 	{
-		pattern = Pattern.compile( re, flags );
-		this.re = re;
-		this.flags = flags;
+		this( Pattern.compile( re, flags ) );
 	}
 	
 	
 	public String getRE()
 	{
-		return re;
+		return pattern.pattern();
 	}
 	
 	public int getREFlags()
 	{
-		return flags;
+		return pattern.flags();
 	}
 	
 	
@@ -88,7 +89,7 @@ public class RegEx extends TerminalString
 		if ( x instanceof RegEx )
 		{
 			RegEx xr = (RegEx)x;
-			return re.equals( xr.re )  &&  flags == xr.flags;
+			return pattern.equals( xr.pattern );
 		}
 		else
 		{
@@ -98,6 +99,6 @@ public class RegEx extends TerminalString
 	
 	public String toString()
 	{
-		return "RegEx( \"" + re + "\", " + String.valueOf( flags ) + "  )";
+		return "RegEx( \"" + pattern + "\" )";
 	}
 }
