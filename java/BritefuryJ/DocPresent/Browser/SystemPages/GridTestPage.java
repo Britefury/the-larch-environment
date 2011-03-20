@@ -40,7 +40,8 @@ public class GridTestPage extends SystemPage
 	private static final StyleSheet styleSheet = StyleSheet.instance;
 	private static StyleSheet t12 = styleSheet.withAttr( Primitive.fontSize, 12 );
 	private static StyleSheet tableStyle = styleSheet.withAttr( Primitive.tableColumnSpacing, 5.0 ).withAttr( Primitive.tableRowSpacing, 5.0 )
-		.withAttr( Primitive.tableBorder, new SolidBorder( 1.0, 0.0, Color.BLACK, null ) ).withAttr( Primitive.tableCellBoundaryPaint, new Color( 0.5f, 0.5f, 0.5f ) );
+		.withAttr( Primitive.tableBorder, new SolidBorder( 1.0, 0.0, Color.BLACK, null ) ).withAttr( Primitive.tableCellBoundaryPaint, new Color( 0.5f, 0.5f, 0.5f ) )
+		.withAttr( Primitive.tableBackgroundPainter, TableTestPage.checkeredTableBackgroundPainter );
 
 	private Pres span(int row, int startCol, int endCol)
 	{
@@ -140,6 +141,7 @@ public class GridTestPage extends SystemPage
 		
 		rows.add( new Span( columns ) );
 		rows.add( makeGridRowCollated( 5 ) );
+		rows.add( makeGridRowCollated( 6 ) );
 		rows.add( t12.applyTo( new Text( "Non-row in the grid" ) ) );
 		return tableStyle.applyTo( new RGrid( rows ) );
 	}

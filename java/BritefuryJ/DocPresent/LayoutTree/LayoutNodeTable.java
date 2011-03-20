@@ -49,7 +49,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 			childBoxes[i] = child.getLayoutNode().refreshRequisitionX();
 		}
 
-		columnBoxes = TableLayout.computeRequisitionX( layoutReqBox, childBoxes, packingParams, table.width(), table.height(), getColumnSpacing(), getRowSpacing() );
+		columnBoxes = TableLayout.computeRequisitionX( layoutReqBox, childBoxes, packingParams, table.getNumColumns(), table.getNumRows(), getColumnSpacing(), getRowSpacing() );
 		columnAllocBoxes = new LAllocBox[columnBoxes.length];
 		for (int i = 0; i < columnAllocBoxes.length; i++)
 		{
@@ -73,7 +73,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 			childAlignmentFlags[i] = child.getAlignmentFlags();
 		}
 
-		rowBoxes = TableLayout.computeRequisitionY( layoutReqBox, childBoxes, packingParams, childAlignmentFlags, table.width(), table.height(), getColumnSpacing(), getRowSpacing() );
+		rowBoxes = TableLayout.computeRequisitionY( layoutReqBox, childBoxes, packingParams, childAlignmentFlags, table.getNumColumns(), table.getNumRows(), getColumnSpacing(), getRowSpacing() );
 		rowAllocBoxes = new LAllocBox[rowBoxes.length];
 		for (int i = 0; i < rowAllocBoxes.length; i++)
 		{
@@ -108,7 +108,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 			childAlignmentFlags[i] = child.getAlignmentFlags();
 		}
 		
-		TableLayout.allocateX( layoutReqBox, columnBoxes, childBoxes, getAllocationBox(), columnAllocBoxes, childAllocBoxes, packingParams, childAlignmentFlags, table.width(), table.height(), getColumnSpacing(), getRowSpacing(), getColumnExpand(), getRowExpand() );
+		TableLayout.allocateX( layoutReqBox, columnBoxes, childBoxes, getAllocationBox(), columnAllocBoxes, childAllocBoxes, packingParams, childAlignmentFlags, table.getNumColumns(), table.getNumRows(), getColumnSpacing(), getRowSpacing(), getColumnExpand(), getRowExpand() );
 		
 		int i = 0;
 		for (DPElement child: layoutChildren)
@@ -143,7 +143,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 			childAlignmentFlags[i] = child.getAlignmentFlags();
 		}
 		
-		TableLayout.allocateY( layoutReqBox, rowBoxes, childBoxes, getAllocationBox(), rowAllocBoxes, childAllocBoxes, packingParams, childAlignmentFlags, table.width(), table.height(), getColumnSpacing(), getRowSpacing(), getColumnExpand(), getRowExpand() );
+		TableLayout.allocateY( layoutReqBox, rowBoxes, childBoxes, getAllocationBox(), rowAllocBoxes, childAllocBoxes, packingParams, childAlignmentFlags, table.getNumColumns(), table.getNumRows(), getColumnSpacing(), getRowSpacing(), getColumnExpand(), getRowExpand() );
 		
 		int i = 0;
 		for (DPElement child: layoutChildren)

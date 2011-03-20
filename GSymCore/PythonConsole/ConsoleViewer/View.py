@@ -82,6 +82,8 @@ class CurrentModuleInteractor (KeyElementInteractor):
 
 
 _bannerTextStyle = StyleSheet.instance.withAttr( Primitive.fontFace, 'Serif' ).withAttr( Primitive.fontSmallCaps, True ).withAttr( Primitive.editable, False )
+_bannerHelpKeyTextStyle = StyleSheet.instance.withAttr( Primitive.fontFace, 'Serif' ).withAttr( Primitive.fontSmallCaps, True ).withAttr( Primitive.fontItalic, True ).withAttr( Primitive.foreground, Color( 0.25, 0.25, 0.25 ) )
+_bannerHelpTextStyle = StyleSheet.instance.withAttr( Primitive.fontFace, 'Serif' ).withAttr( Primitive.fontItalic, True ).withAttr( Primitive.foreground, Color( 0.25, 0.25, 0.25 ) )
 _bannerBorder = SolidBorder( 2.0, 5.0, 8.0, 8.0, Color( 0.3, 0.5, 0.3 ), Color( 0.875, 0.9, 0.875 ) )
 
 
@@ -141,7 +143,12 @@ class ConsoleView (GSymViewObjectDispatch):
 		
 		
 		# Header
-		bannerText = _bannerTextStyle.applyTo( Column( [ NormalText( v )   for v in sys.version.split( '\n' ) ] ) )
+		bannerVersionText = [ _bannerTextStyle.applyTo( NormalText( v ) )   for v in sys.version.split( '\n' ) ]
+		helpText = Row( [ _bannerHelpKeyTextStyle.applyTo( Label( 'Ctrl+Enter' ) ),
+		                  _bannerHelpTextStyle.applyTo( Label( ' - execute and evaluate, ' ) ),
+		                  _bannerHelpKeyTextStyle.applyTo( Label( 'Ctrl+Shift+Enter' ) ),
+		                  _bannerHelpTextStyle.applyTo( Label( ' - execute only' ) ) ] )
+		bannerText = Column( bannerVersionText + [ helpText ] )
 		
 		banner = _bannerBorder.surround( bannerText )
 		

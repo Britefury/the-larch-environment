@@ -11,12 +11,13 @@ import java.awt.Paint;
 import java.awt.Stroke;
 import java.awt.geom.Line2D;
 import java.util.BitSet;
+import java.util.List;
 
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeGridRow;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeRGrid;
 import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
 
-public class DPRGrid extends DPContainerSequence
+public class DPRGrid extends DPContainerSequence implements TableElement
 {
 	private int numColumns;
 
@@ -78,12 +79,69 @@ public class DPRGrid extends DPContainerSequence
 	}
 	
 	
-	public int width()
+	public int getNumColumns()
 	{
 		refreshSize();
 		return numColumns;
 	}
 	
+	public int getNumRows()
+	{
+		LayoutNodeRGrid gridLayout = (LayoutNodeRGrid)getLayoutNode();
+		return gridLayout.getLeaves().size();
+	}
+	
+	
+	public boolean hasChildAt(int x, int y)
+	{
+		LayoutNodeRGrid gridLayout = (LayoutNodeRGrid)getLayoutNode();
+		
+		List<DPElement> rows = gridLayout.getLeaves();
+		if ( y < rows.size() )
+		{
+			DPElement rowElem = rows.get( y );
+			if ( rowElem instanceof DPGridRow )
+			{
+				DPGridRow row = (DPGridRow)rowElem;
+				LayoutNodeGridRow rowLayout = (LayoutNodeGridRow)row.getLayoutNode();
+				return x < rowLayout.getLeaves().size();
+			}
+			else
+			{
+				return x == 0;
+			}
+		}
+		
+		return false;
+	}
+	
+	public int getChildColSpan(int x, int y)
+	{
+		LayoutNodeRGrid gridLayout = (LayoutNodeRGrid)getLayoutNode();
+		
+		List<DPElement> rows = gridLayout.getLeaves();
+		if ( y < rows.size() )
+		{
+			DPElement rowElem = rows.get( y );
+			if ( rowElem instanceof DPGridRow )
+			{
+				DPGridRow row = (DPGridRow)rowElem;
+				LayoutNodeGridRow rowLayout = (LayoutNodeGridRow)row.getLayoutNode();
+				return x < rowLayout.getLeaves().size()  ?  1  :  -1;
+			}
+			else
+			{
+				return x == 0  ?  getNumColumns()  :  -1;
+			}
+		}
+		
+		return -1;
+	}
+
+	public int getChildRowSpan(int x, int y)
+	{
+		return hasChildAt( x, y )  ?  1  :  -1;
+	}
 	
 	
 
@@ -92,6 +150,19 @@ public class DPRGrid extends DPContainerSequence
 	// CELL BOUNDARY LINES
 	//
 	//
+	
+	public double getColumnBoundaryX(int column)
+	{
+		LayoutNodeRGrid layout = (LayoutNodeRGrid)getLayoutNode();
+		return layout.getColumnBoundaryX( column );
+	}
+	
+	public double getRowBoundaryY(int row)
+	{
+		LayoutNodeRGrid layout = (LayoutNodeRGrid)getLayoutNode();
+		return layout.getRowBoundaryY( row );
+	}
+
 	
 	protected static int[] getSpanFromBitSet(BitSet bits, int startIndex)
 	{
@@ -122,7 +193,13 @@ public class DPRGrid extends DPContainerSequence
 	{
 		super.drawBackground( graphics );
 		
-		Paint cellPaint = getCellPaint();
+		TableBackgroundPainter backgroundPainter = getTableBackgroundPainter();
+		if ( backgroundPainter != null )
+		{
+			backgroundPainter.paintTableBackground( this, graphics );
+		}
+		
+		Paint cellPaint = getCellBoundaryPaint();
 		if ( cellPaint != null )
 		{
 			LayoutNodeRGrid layout = (LayoutNodeRGrid)getLayoutNode();
@@ -132,7 +209,7 @@ public class DPRGrid extends DPContainerSequence
 			Paint prevPaint = graphics.getPaint();
 			graphics.setPaint( cellPaint );
 			Stroke prevStroke = graphics.getStroke();
-			graphics.setStroke( getCellStroke() );
+			graphics.setStroke( getCellBoundaryStroke() );
 			
 			for (double col[]: columnLines)
 			{
@@ -193,13 +270,18 @@ public class DPRGrid extends DPContainerSequence
 	}
 
 
-	public Stroke getCellStroke()
+	public Stroke getCellBoundaryStroke()
 	{
-		return ((TableStyleParams) styleParams).getCellStroke();
+		return ((TableStyleParams) styleParams).getCellBoundaryStroke();
 	}
 	
-	public Paint getCellPaint()
+	public Paint getCellBoundaryPaint()
 	{
-		return ((TableStyleParams) styleParams).getCellPaint();
+		return ((TableStyleParams) styleParams).getCellBoundaryPaint();
+	}
+	
+	public TableBackgroundPainter getTableBackgroundPainter()
+	{
+		return ((TableStyleParams) styleParams).getTableBackgroundPainter();
 	}
 }
