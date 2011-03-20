@@ -28,6 +28,10 @@ public class StructuralObject extends ParserExpression
 
 	
 	
+	public StructuralObject()
+	{
+	}
+
 	public StructuralObject(Class<?> objClass)
 	{
 		this.objClass = objClass;
@@ -42,6 +46,11 @@ public class StructuralObject extends ParserExpression
 	
 	private boolean testObject(Object x)
 	{
+		if ( pyType == null  &&  objClass == null )
+		{
+			return true;
+		}
+		
 		if ( pyType != null  &&  x instanceof PyObject )
 		{
 			return Py.isInstance( (PyObject)x, pyType );
@@ -83,7 +92,7 @@ public class StructuralObject extends ParserExpression
 			{
 				if ( testObject( valueArray[0] ) )
 				{
-					return new ParseResult( input, start, start + 1 );
+					return new ParseResult( valueArray[0], start, start + 1 );
 				}
 			}
 		}

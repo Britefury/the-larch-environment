@@ -193,6 +193,13 @@ public abstract class SyntaxRecognizingEditor extends SequentialEditor
 		}
 
 		@Override
+		protected boolean applyToInnerFragment(DPElement element, DPElement sourceElement, FragmentView fragment,
+				EditEvent event, Object model, StreamValue value)
+		{
+			return innerCommit != null;
+		}
+		
+		@Override
 		protected HandleEditResult handleUnparsed(DPElement element, DPElement sourceElement, FragmentView fragment, EditEvent event, Object model, StreamValue value)
 		{
 			commit.commit( model, value );
@@ -288,6 +295,11 @@ public abstract class SyntaxRecognizingEditor extends SequentialEditor
 	}
 	
 	
+	
+	public UnparsedEditListener unparsedNodeEditListener(String logName, UnparseableContentTest test, UnparseableCommitFn commit)
+	{
+		return unparsedNodeEditListener( logName, test, commit, null );
+	}
 	
 	public UnparsedEditListener unparsedNodeEditListener(String logName, UnparseableContentTest test, UnparseableCommitFn commit, UnparseableCommitFn innerCommit)
 	{

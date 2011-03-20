@@ -169,7 +169,7 @@ public class PrimitivePresenter
 		{
 			linePres[i] = new NormalText( lines[i] );
 		}
-		return staticStyle.applyTo( new Column( linePres ) );
+		return labelStyle.applyTo( new Column( linePres ) );
 	}
 	
 	
@@ -325,20 +325,21 @@ public class PrimitivePresenter
 
 
 	private static final StyleSheet staticStyle = StyleSheet.instance.withAttr( Primitive.editable, false );
+	private static final StyleSheet labelStyle = StyleSheet.instance.withAttr( Primitive.editable, false ).withAttr( Primitive.selectable, false );
 	
 	
-	private static final StyleSheet sectionHeadingStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontFace, "Serif" );
-	private static final StyleSheet attributeNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.25f ) );
+	private static final StyleSheet sectionHeadingStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontFace, "Serif" );
+	private static final StyleSheet attributeNameStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.25f ) );
 
-	private static final StyleSheet typePunctuationStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
-	private static final StyleSheet typeNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.4f ) );
+	private static final StyleSheet typePunctuationStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) );
+	private static final StyleSheet typeNameStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.4f ) );
 
-	private static final StyleSheet privateNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.0f ) );
-	private static final StyleSheet protectedNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.35f, 0.35f, 0.0f ) );
-	private static final StyleSheet publicNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
-	private static final StyleSheet defaultNameStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.35f, 0.35f, 0.15f ) );
+	private static final StyleSheet privateNameStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.0f ) );
+	private static final StyleSheet protectedNameStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.35f, 0.35f, 0.0f ) );
+	private static final StyleSheet publicNameStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
+	private static final StyleSheet defaultNameStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.35f, 0.35f, 0.15f ) );
 
-	private static final StyleSheet errorStyle = staticStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.0f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontFace, "Serif" );
+	private static final StyleSheet errorStyle = labelStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.0f ) ).withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontFace, "Serif" );
 
 	private static final Pres space = staticStyle.applyTo( new StaticText( " " ) );
 }
