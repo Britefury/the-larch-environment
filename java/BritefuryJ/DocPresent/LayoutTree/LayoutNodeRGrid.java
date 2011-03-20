@@ -198,6 +198,84 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 	
 	
 	
+	private int getColumnForLocalPoint(Point2 localPos)
+	{
+		if ( columnBoxes.length == 0 )
+		{
+			return -1;
+		}
+		else if ( columnBoxes.length == 1 )
+		{
+			return 0;
+		}
+		else
+		{
+			LAllocBoxInterface columnI = columnAllocBoxes[0];
+			for (int i = 0; i < columnBoxes.length - 1; i++)
+			{
+				LAllocBoxInterface columnJ = columnAllocBoxes[i+1];
+				double iUpperX = columnI.getAllocPositionInParentSpaceX() + columnI.getAllocationX();
+				double jLowerX = columnJ.getAllocPositionInParentSpaceX();
+				
+				double midX = ( iUpperX + jLowerX ) * 0.5;
+				
+				if ( localPos.x < midX )
+				{
+					return i;
+				}
+				
+				columnI = columnJ;
+			}
+			
+			return columnBoxes.length-1;
+		}
+	}
+
+	
+	
+	private int getRowForLocalPoint(Point2 localPos)
+	{
+		if ( rowBoxes.length == 0 )
+		{
+			return -1;
+		}
+		else if ( rowBoxes.length == 1 )
+		{
+			return 0;
+		}
+		else
+		{
+			LAllocBoxInterface rowI = rowAllocBoxes[0];
+			for (int i = 0; i < rowBoxes.length - 1; i++)
+			{
+				LAllocBoxInterface rowJ = rowAllocBoxes[i+1];
+				double iUpperY = rowI.getAllocPositionInParentSpaceY() + rowI.getAllocationY();
+				double jLowerY = rowJ.getAllocPositionInParentSpaceY();
+				
+				double midY = ( iUpperY + jLowerY ) * 0.5;
+				
+				if ( localPos.y < midY )
+				{
+					return i;
+				}
+				
+				rowI = rowJ;
+			}
+			
+			return rowBoxes.length-1;
+		}
+	}
+
+
+	
+	public int[] getCellPositionUnder(Point2 localPos)
+	{
+		int x = getColumnForLocalPoint( localPos );
+		int y = getRowForLocalPoint( localPos );
+		return new int[] { x, y };
+	}
+	
+
 	protected DPElement getChildLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
 	{
 		return getChildLeafClosestToLocalPointVertical( getLeaves(), localPos, filter );

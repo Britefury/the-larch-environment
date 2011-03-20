@@ -16,6 +16,7 @@ import java.util.List;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeGridRow;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeRGrid;
 import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
+import BritefuryJ.Math.Point2;
 
 public class DPRGrid extends DPContainerSequence implements TableElement
 {
@@ -143,6 +144,34 @@ public class DPRGrid extends DPContainerSequence implements TableElement
 		return hasChildAt( x, y )  ?  1  :  -1;
 	}
 	
+	public int[] getPositionOfChildCoveringCell(int x, int y)
+	{
+		LayoutNodeRGrid gridLayout = (LayoutNodeRGrid)getLayoutNode();
+		
+		List<DPElement> rows = gridLayout.getLeaves();
+		if ( y < rows.size() )
+		{
+			DPElement rowElem = rows.get( y );
+			if ( rowElem instanceof DPGridRow )
+			{
+				DPGridRow row = (DPGridRow)rowElem;
+				LayoutNodeGridRow rowLayout = (LayoutNodeGridRow)row.getLayoutNode();
+				return x < rowLayout.getLeaves().size()  ?  new int[] { x, y }  :  null;
+			}
+			else
+			{
+				return x < getNumColumns()  ?  new int[] { 0, y }  :  null;
+			}
+		}
+		
+		return null;
+	}
+
+	public int[] getCellPositionUnder(Point2 localPos)
+	{
+		LayoutNodeRGrid layout = (LayoutNodeRGrid)getLayoutNode();
+		return layout.getCellPositionUnder( localPos );
+	}
 	
 
 	//

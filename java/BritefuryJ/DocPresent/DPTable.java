@@ -22,6 +22,7 @@ import org.python.core.PyTuple;
 import BritefuryJ.DocPresent.Layout.TableLayout;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeTable;
 import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
+import BritefuryJ.Math.Point2;
 
 public class DPTable extends DPContainer implements TableElement
 {
@@ -815,6 +816,18 @@ public class DPTable extends DPContainer implements TableElement
 	{
 		TableChildEntry childEntry = getChildEntry( x, y );
 		return childEntry != null  ?  childEntry.rowSpan  :  -1;
+	}
+	
+	public int[] getPositionOfChildCoveringCell(int x, int y)
+	{
+		LayoutNodeTable layout = (LayoutNodeTable)getLayoutNode();
+		return layout.getPositionOfChildCoveringCell( x, y );
+	}
+
+	public int[] getCellPositionUnder(Point2 localPos)
+	{
+		LayoutNodeTable layout = (LayoutNodeTable)getLayoutNode();
+		return layout.getCellPositionUnder( localPos );
 	}
 
 	public boolean isSingleElementContainer()
