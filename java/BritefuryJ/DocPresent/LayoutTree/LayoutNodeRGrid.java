@@ -45,7 +45,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 		
 		LReqBoxInterface layoutReqBox = getRequisitionBox();
 		int numRows = leaves.length;
-		int numColumns = grid.width();
+		int numColumns = grid.getNumColumns();
 		LReqBoxInterface childBoxes[][] = new LReqBoxInterface[numRows][];
 		boolean bRowIsGridRow[] = new boolean[numRows];
 		for (int i = 0; i < leaves.length; i++)
@@ -145,7 +145,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 			}
 		}
 
-		GridLayout.allocateX( layoutReqBox, columnBoxes, childBoxes, getAllocationBox(), columnAllocBoxes, childAllocBoxes, childAlignmentFlags, bRowIsGridRow, grid.width(), numRows,
+		GridLayout.allocateX( layoutReqBox, columnBoxes, childBoxes, getAllocationBox(), columnAllocBoxes, childAllocBoxes, childAlignmentFlags, bRowIsGridRow, grid.getNumColumns(), numRows,
 				getColumnSpacing(), getRowSpacing(), getColumnExpand(), getRowExpand() );
 		
 		for (int r = 0; r < leaves.length; r++)
@@ -262,9 +262,9 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 	private void refreshBoundaries()
 	{
 		DPRGrid grid = (DPRGrid)element;
-		if ( ( columnLines == null  ||  rowLines == null )  &&  grid.getCellPaint() != null )
+		if ( ( columnLines == null  ||  rowLines == null ) )
 		{
-			int numColumns = grid.width();
+			int numColumns = grid.getNumColumns();
 			int numRows = leaves.length;
 			int numColLines = Math.max( numColumns - 1, 0 );
 			int numRowLines = Math.max( numRows - 1, 0 );
@@ -445,6 +445,47 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 		LAllocBoxInterface box = leaves[row].getLayoutNode().getAllocationBox();
 		return box.getAllocPositionInParentSpaceY() + box.getHeight();
 	}
+	
+	
+	public double getColumnBoundaryX(int column)
+	{
+		DPRGrid grid = (DPRGrid)element;
+		int numColumns = grid.getNumColumns();
+
+		if ( column == 0 )
+		{
+			return getColumnLeft( 0 );
+		}
+		else if ( column == numColumns )
+		{
+			return getColumnRight( column - 1 );
+		}
+		else
+		{
+			double halfColumnSpacing = getColumnSpacing() * 0.5;
+			return getColumnRight( column - 1 )  +  halfColumnSpacing;
+		}
+	}
+	
+	public double getRowBoundaryY(int row)
+	{
+		int numRows = leaves.length;
+
+		if ( row == 0 )
+		{
+			return getRowTop( 0 );
+		}
+		else if ( row == numRows )
+		{
+			return getRowBottom( row - 1 );
+		}
+		else
+		{
+			double halfRowSpacing = getRowSpacing() * 0.5;
+			return getRowBottom( row - 1 )  +  halfRowSpacing;
+		}
+	}
+
 	
 	public double[][] getColumnLines()
 	{

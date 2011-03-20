@@ -7,8 +7,12 @@
 package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
+import BritefuryJ.DocPresent.TableBackgroundPainter;
+import BritefuryJ.DocPresent.TableElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Border;
@@ -34,13 +38,42 @@ public class TableTestPage extends SystemPage
 	{
 		return "The table element arranges is children in a table layout. Holes can be present. Child elements may span multiple columns and rows.";
 	}
+	
+	protected static final TableBackgroundPainter checkeredTableBackgroundPainter = new TableBackgroundPainter()
+	{
+		@Override
+		public void paintTableBackground(TableElement table, Graphics2D graphics)
+		{
+			graphics.setPaint( new Color( 0.85f, 0.85f, 0.85f ) );
+			for (int y = 0; y < table.getNumRows(); y++)
+			{
+				for (int x = 0; x < table.getNumColumns(); x++)
+				{
+					if ( ( ( x + y ) & 1 ) == 0  &&  table.hasChildAt( x, y ) )
+					{
+						int colSpan = table.getChildColSpan( x, y );
+						int rowSpan = table.getChildRowSpan( x, y );
+						double y0 = table.getRowBoundaryY( y );
+						double y1 = table.getRowBoundaryY( y + rowSpan );
+						double x0 = table.getColumnBoundaryX( x );
+						double x1 = table.getColumnBoundaryX( x + colSpan );
+						
+						Rectangle2D.Double r = new Rectangle2D.Double( x0, y0, x1-x0, y1-y0 );
+						
+						graphics.fill( r );
+					}
+				}
+			}
+		}
+	};
 
 	private static final StyleSheet styleSheet = StyleSheet.instance;
 	private static StyleSheet t12 = styleSheet.withAttr( Primitive.fontSize, 12 );
 	private static StyleSheet t18 = styleSheet.withAttr( Primitive.fontSize, 18 );
 	private static StyleSheet sectionStyle = styleSheet.withAttr( Primitive.columnSpacing, 5.0 ).withAttr( Primitive.border, new SolidBorder( 2.0, 3.0, new Color( 0.0f, 0.3f, 0.7f ), new Color( 0.95f, 0.975f, 1.0f  ) ) );
 	private static StyleSheet tableStyle = styleSheet.withAttr( Primitive.tableColumnSpacing, 5.0 ).withAttr( Primitive.tableRowSpacing, 5.0 )
-		.withAttr( Primitive.tableBorder, new SolidBorder( 1.0, 0.0, Color.BLACK, null ) ).withAttr( Primitive.tableCellBoundaryPaint, new Color( 0.5f, 0.5f, 0.5f ) );
+		.withAttr( Primitive.tableBorder, new SolidBorder( 1.0, 0.0, Color.BLACK, null ) ).withAttr( Primitive.tableCellBoundaryPaint, new Color( 0.5f, 0.5f, 0.5f ) )
+		.withAttr( Primitive.tableBackgroundPainter, checkeredTableBackgroundPainter );
 
 	private Table makeTable0()
 	{

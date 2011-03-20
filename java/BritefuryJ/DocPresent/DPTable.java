@@ -23,7 +23,7 @@ import BritefuryJ.DocPresent.Layout.TableLayout;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeTable;
 import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
 
-public class DPTable extends DPContainer
+public class DPTable extends DPContainer implements TableElement
 {
 	private static class TableChildEntry extends TableLayout.TablePackingParams
 	{
@@ -55,7 +55,7 @@ public class DPTable extends DPContainer
 
 	private TableChildEntry[][] childEntryTable;
 	private ArrayList<TableChildEntry> childEntries;
-	private double columnLines[][], rowLines[][];
+	private double columnLines[][], rowLines[][];		// Format: one array per column/row. First element is the x/y position. Subsequent element PAIRS are start and end y/x of line segments.
 	private int rowStartIndices[];			// Indices into @childEntries, where each row starts
 	private int numColumns, numRows;		// Can be -1, indicating that these values must be refreshed
 
@@ -476,13 +476,13 @@ public class DPTable extends DPContainer
 
 	
 	
-	public int width()
+	public int getNumColumns()
 	{
 		refreshSize();
 		return numColumns;
 	}
 	
-	public int height()
+	public int getNumRows()
 	{
 		refreshSize();
 		return numRows;
@@ -490,6 +490,18 @@ public class DPTable extends DPContainer
 	
 	
 	public DPElement get(int x, int y)
+	{
+		TableChildEntry childEntry = getChildEntry( x, y );
+		return childEntry != null  ?  childEntry.child  :  null;
+	}
+	
+	public boolean hasChildAt(int x, int y)
+	{
+		TableChildEntry childEntry = getChildEntry( x, y );
+		return childEntry != null;
+	}
+	
+	private TableChildEntry getChildEntry(int x, int y)
 	{
 		if ( x >= numColumns )
 		{
@@ -504,7 +516,7 @@ public class DPTable extends DPContainer
 		{
 			if ( x < row.length )
 			{
-				return row[x].child;
+				return row[x];
 			}
 		}
 		
@@ -793,7 +805,18 @@ public class DPTable extends DPContainer
 		return entry.rowSpan;
 	}
 
+	public int getChildColSpan(int x, int y)
+	{
+		TableChildEntry childEntry = getChildEntry( x, y );
+		return childEntry != null  ?  childEntry.colSpan  :  -1;
+	}
 	
+	public int getChildRowSpan(int x, int y)
+	{
+		TableChildEntry childEntry = getChildEntry( x, y );
+		return childEntry != null  ?  childEntry.rowSpan  :  -1;
+	}
+
 	public boolean isSingleElementContainer()
 	{
 		return false;
@@ -851,6 +874,45 @@ public class DPTable extends DPContainer
 	//
 	//
 	
+	public double getColumnBoundaryX(int column)
+	{
+		LayoutNodeTable layout = (LayoutNodeTable)getLayoutNode();
+		
+		if ( column == 0 )
+		{
+			return layout.getColumnLeft( 0 );
+		}
+		else if ( column == getNumColumns() )
+		{
+			return layout.getColumnRight( column - 1 );
+		}
+		else
+		{
+			double halfColumnSpacing = getColumnSpacing() * 0.5;
+			return layout.getColumnRight( column - 1 )  +  halfColumnSpacing;
+		}
+	}
+	
+	public double getRowBoundaryY(int row)
+	{
+		LayoutNodeTable layout = (LayoutNodeTable)getLayoutNode();
+
+		if ( row == 0 )
+		{
+			return layout.getRowTop( 0 );
+		}
+		else if ( row == getNumRows() )
+		{
+			return layout.getRowBottom( row - 1 );
+		}
+		else
+		{
+			double halfRowSpacing = getRowSpacing() * 0.5;
+			return layout.getRowBottom( row - 1 )  +  halfRowSpacing;
+		}
+	}
+	
+
 	protected static int[] getSpanFromBitSet(BitSet bits, int startIndex)
 	{
 		int start = bits.nextSetBit( startIndex );
@@ -869,7 +931,7 @@ public class DPTable extends DPContainer
 	
 	private void refreshBoundaries()
 	{
-		if ( ( columnLines == null  ||  rowLines == null )  &&  getCellPaint() != null )
+		if ( ( columnLines == null  ||  rowLines == null ) )
 		{
 			refreshSize();
 			int numColLines = Math.max( numColumns - 1, 0 );
@@ -1020,7 +1082,13 @@ public class DPTable extends DPContainer
 	{
 		super.drawBackground( graphics );
 		
-		Paint cellPaint = getCellPaint();
+		TableBackgroundPainter backgroundPainter = getTableBackgroundPainter();
+		if ( backgroundPainter != null )
+		{
+			backgroundPainter.paintTableBackground( this, graphics );
+		}
+		
+		Paint cellPaint = getCellBoundaryPaint();
 		if ( cellPaint != null )
 		{
 			refreshBoundaries();
@@ -1028,7 +1096,7 @@ public class DPTable extends DPContainer
 			Paint prevPaint = graphics.getPaint();
 			graphics.setPaint( cellPaint );
 			Stroke prevStroke = graphics.getStroke();
-			graphics.setStroke( getCellStroke() );
+			graphics.setStroke( getCellBoundaryStroke() );
 			
 			for (double col[]: columnLines)
 			{
@@ -1089,13 +1157,18 @@ public class DPTable extends DPContainer
 	}
 
 
-	public Stroke getCellStroke()
+	public Stroke getCellBoundaryStroke()
 	{
-		return ((TableStyleParams) styleParams).getCellStroke();
+		return ((TableStyleParams) styleParams).getCellBoundaryStroke();
 	}
 	
-	public Paint getCellPaint()
+	public Paint getCellBoundaryPaint()
 	{
-		return ((TableStyleParams) styleParams).getCellPaint();
+		return ((TableStyleParams) styleParams).getCellBoundaryPaint();
+	}
+	
+	public TableBackgroundPainter getTableBackgroundPainter()
+	{
+		return ((TableStyleParams) styleParams).getTableBackgroundPainter();
 	}
 }

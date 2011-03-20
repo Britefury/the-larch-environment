@@ -244,6 +244,7 @@ _packageNameStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0
 _itemHoverHighlightStyle = StyleSheet.instance.withAttr( Primitive.hoverBackground, FilledOutlinePainter( Color( 0.8, 0.825, 0.9 ), Color( 0.125, 0.341, 0.574 ), BasicStroke( 1.0 ) ) )
 _pythonPackageNameStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.0, 0.0, 0.5 ) )
 _pythonPackageNameNotSetStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.5, 0.0, 0.0 ) )
+_pythonPackageNameNotSetCommentStyle = StyleSheet.instance.withAttr( Primitive.foreground, Color( 0.2, 0.2, 0.2 ) ).withAttr( Primitive.fontItalic, True )
 
 _packageContentsIndentation = 20.0
 
@@ -357,7 +358,12 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		else:
 			pythonPackageNameLabel = _itemHoverHighlightStyle.applyTo( _pythonPackageNameStyle.applyTo( Label( pythonPackageName ) ) )
 		pythonPackageNameLabel = pythonPackageNameLabel.withElementInteractor( _PythonPackageNameInteractor() )
-		pythonPackageCell = LiteralCell( pythonPackageNameLabel )
+		if pythonPackageName is None:
+			comment = _pythonPackageNameNotSetCommentStyle.applyTo( Label( '(pages will not be importable until this is set)' ) )
+			pythonPackageNameLabelBox = Row( [ pythonPackageNameLabel, Spacer( 25.0, 0.0 ), comment ] )
+		else:
+			pythonPackageNameLabelBox = Row( [ pythonPackageNameLabel ] )
+		pythonPackageCell = LiteralCell( pythonPackageNameLabelBox )
 		pythonPackageNameBox = Row( [ pythonPackageNamePrompt, pythonPackageCell.defaultPerspectiveValuePresInFragment() ] )
 		
 		

@@ -12,12 +12,13 @@ import java.awt.Cursor;
 import java.awt.Paint;
 import java.awt.Stroke;
 
+import BritefuryJ.DocPresent.TableBackgroundPainter;
 import BritefuryJ.DocPresent.Painter.Painter;
 
 
 public class TableStyleParams extends ContainerStyleParams
 {
-	public static final TableStyleParams defaultStyleParams = new TableStyleParams( null, null, null, 3.0, false, 3.0, false, new BasicStroke( 1.0f ), Color.BLACK );
+	public static final TableStyleParams defaultStyleParams = new TableStyleParams( null, null, null, 3.0, false, 3.0, false, null, new BasicStroke( 1.0f ), Color.BLACK );
 	
 	
 	protected final double columnSpacing;
@@ -26,12 +27,14 @@ public class TableStyleParams extends ContainerStyleParams
 	protected final double rowSpacing;
 	protected final boolean rowExpand;
 	
-	protected final Stroke cellStroke;
-	protected final Paint cellPaint;
+	protected final Stroke cellBoundaryStroke;
+	protected final Paint cellBoundaryPaint;
+	
+	protected final TableBackgroundPainter tableBackgroundPainter;
 
 
 	public TableStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, double columnSpacing, boolean columnExpand, double rowSpacing, boolean rowExpand,
-			Stroke cellStroke, Paint cellPaint)
+			TableBackgroundPainter tableBackgroundPainter, Stroke cellBoundaryStroke, Paint cellBoundaryPaint)
 	{
 		super( background, hoverBackground, pointerCursor );
 		
@@ -41,8 +44,10 @@ public class TableStyleParams extends ContainerStyleParams
 		this.rowSpacing = rowSpacing;
 		this.rowExpand = rowExpand;
 		
-		this.cellStroke = cellStroke;
-		this.cellPaint = cellPaint;
+		this.cellBoundaryStroke = cellBoundaryStroke;
+		this.cellBoundaryPaint = cellBoundaryPaint;
+		
+		this.tableBackgroundPainter = tableBackgroundPainter;
 	}
 
 
@@ -68,13 +73,19 @@ public class TableStyleParams extends ContainerStyleParams
 	}
 
 
-	public Stroke getCellStroke()
+	public Stroke getCellBoundaryStroke()
 	{
-		return cellStroke;
+		return cellBoundaryStroke;
 	}
 	
-	public Paint getCellPaint()
+	public Paint getCellBoundaryPaint()
 	{
-		return cellPaint;
+		return cellBoundaryPaint;
+	}
+	
+	
+	public TableBackgroundPainter getTableBackgroundPainter()
+	{
+		return tableBackgroundPainter;
 	}
 }
