@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.DocPresent;
 
+import BritefuryJ.Math.Point2;
+
 
 public interface TableElement
 {
@@ -15,6 +17,8 @@ public interface TableElement
 	public boolean hasChildAt(int x, int y);
 	public int getChildColSpan(int x, int y);
 	public int getChildRowSpan(int x, int y);
+	public int[] getPositionOfChildCoveringCell(int x, int y);
+	public int[] getCellPositionUnder(Point2 localPos);
 	
 	public double getColumnBoundaryX(int column);
 	public double getRowBoundaryY(int row);

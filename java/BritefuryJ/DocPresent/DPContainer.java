@@ -194,6 +194,14 @@ public abstract class DPContainer extends DPElement
 	
 	
 	
+	protected List<DPElement> getSearchChildren()
+	{
+		return getChildren();
+	}
+
+	
+	
+	
 	
 	protected void onSubtreeStructureChanged()
 	{

@@ -168,12 +168,19 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 	private DPElement getChildCoveringCell(int x, int y)
 	{
 		DPTable table = (DPTable)element;
+		int pos[] = getPositionOfChildCoveringCell( x, y );
+		return pos != null  ?  table.get( pos[0], pos[1] )  :  null;
+	}
+
+	public int[] getPositionOfChildCoveringCell(int x, int y)
+	{
+		DPTable table = (DPTable)element;
 
 		DPElement child = table.get( x, y );
 		
 		if ( child != null )
 		{
-			return child;
+			return new int[] { x, y };
 		}
 		else
 		{
@@ -192,7 +199,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 							child = table.get( colX, searchY );
 							if ( child != null  &&  doesChildCoverCell( child, x, y ) )
 							{
-								return child;
+								return new int[] { colX, searchY };
 							}
 						}
 					}
@@ -210,7 +217,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 							child = table.get( searchX, rowY );
 							if ( child != null  &&  doesChildCoverCell( child, x, y ) )
 							{
-								return child;
+								return new int[] { searchX, rowY };
 							}
 						}
 					}
@@ -222,7 +229,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 					child = table.get( x - radius, y - radius );
 					if ( child != null  &&  doesChildCoverCell( child, x, y ) )
 					{
-						return child;
+						return new int[] { x - radius, y - radius };
 					}
 				}
 			}
@@ -231,7 +238,6 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 		}
 	}
 
-	
 	
 	private int getColumnForLocalPoint(Point2 localPos)
 	{
@@ -302,6 +308,13 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 	}
 
 	
+	
+	public int[] getCellPositionUnder(Point2 localPos)
+	{
+		int x = getColumnForLocalPoint( localPos );
+		int y = getRowForLocalPoint( localPos );
+		return new int[] { x, y };
+	}
 	
 	protected DPElement getChildLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
 	{
