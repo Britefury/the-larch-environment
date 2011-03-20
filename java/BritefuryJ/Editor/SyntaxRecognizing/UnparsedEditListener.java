@@ -33,6 +33,12 @@ public abstract class UnparsedEditListener extends SRStreamEditListener
 		return getSyntaxRecognizingEditor().isValueEmpty( value );
 	}
 	
+	protected boolean applyToInnerFragment(DPElement element, DPElement sourceElement, FragmentView fragment,
+			EditEvent event, Object model, StreamValue value)
+	{
+		return true;
+	}
+	
 	protected HandleEditResult handleInvalidValue(DPElement element, DPElement sourceElement, FragmentView fragment,
 			EditEvent event, Object model, StreamValue value)
 	{
@@ -57,7 +63,7 @@ public abstract class UnparsedEditListener extends SRStreamEditListener
 			// Attempt to create an unparsed node to replace only the node corresponding to the innermost fragment surrounding
 			// the element that sent the edit event
 			FragmentView sourceFragment = (FragmentView)sourceElement.getFragmentContext();
-			if ( sourceFragment == fragment )
+			if ( sourceFragment == fragment  ||  !applyToInnerFragment( element, sourceElement, fragment, event, model, value ) )
 			{
 				// Source fragment is this fragment - replace this node with an unparsed node
 				if ( logName != null )
