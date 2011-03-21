@@ -2534,7 +2534,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 
 
 
-	protected DPElement getLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
+	public DPElement getLeafClosestToLocalPoint(Point2 localPos, ElementFilter filter)
 	{
 		if ( layoutNode != null )
 		{
@@ -2545,6 +2545,16 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 			ArrangedSequenceLayoutNode branchLayout = (ArrangedSequenceLayoutNode)getValidLayoutNodeOfClass( ArrangedSequenceLayoutNode.class );
 			return branchLayout.getLeafClosestToLocalPointWithinElement( this, localPos, filter );
 		}
+	}
+	
+	public DPElement getEditableLeafClosestToLocalPoint(Point2 localPos)
+	{
+		return getLeafClosestToLocalPoint( localPos, new DPContentLeafEditable.EditableLeafElementFilter() );
+	}
+
+	public DPElement getSelectableLeafClosestToLocalPoint(Point2 localPos)
+	{
+		return getLeafClosestToLocalPoint( localPos, new DPContentLeafEditable.SelectableLeafElementFilter() );
 	}
 
 	
@@ -2629,6 +2639,31 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	public void moveMarkerToEnd(Marker m)
 	{
 		moveMarkerToStart( m );
+	}
+	
+	public Marker getMarkerClosestToLocalPoint(Point2 localPos, ElementFilter filter)
+	{
+		DPContentLeafEditable leaf = (DPContentLeafEditable)getLeafClosestToLocalPoint( localPos, filter );
+		if ( leaf != null )
+		{
+			Xform2 x = leaf.getAncestorToLocalXform( this );
+			
+			return leaf.markerAtPoint( x.transform( localPos ) );
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	public Marker getEditableMarkerClosestToLocalPoint(Point2 localPos)
+	{
+		return getMarkerClosestToLocalPoint( localPos, new DPContentLeafEditable.EditableLeafElementFilter() );
+	}
+	
+	public Marker getSelectableMarkerClosestToLocalPoint(Point2 localPos)
+	{
+		return getMarkerClosestToLocalPoint( localPos, new DPContentLeafEditable.SelectableLeafElementFilter() );
 	}
 	
 	
