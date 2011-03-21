@@ -10,6 +10,7 @@ package BritefuryJ.DocPresent.Event;
 import java.awt.geom.AffineTransform;
 
 import BritefuryJ.DocPresent.Input.PointerInterface;
+import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Xform2;
 
 
@@ -39,5 +40,11 @@ public class PointerEvent extends Event
 	public PointerEvent transformed(AffineTransform xToLocal)
 	{
 		return new PointerEvent( pointer.transformed( xToLocal ) );
+	}
+	
+	
+	public Point2 getLocalPointerPos()
+	{
+		return pointer.getLocalPos();
 	}
 }

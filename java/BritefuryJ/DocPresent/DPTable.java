@@ -1100,6 +1100,13 @@ public class DPTable extends DPContainer implements TableElement
 		{
 			backgroundPainter.paintTableBackground( this, graphics );
 		}
+	}
+		
+
+	@Override
+	protected void draw(Graphics2D graphics)
+	{
+		super.draw( graphics );
 		
 		Paint cellPaint = getCellBoundaryPaint();
 		if ( cellPaint != null )

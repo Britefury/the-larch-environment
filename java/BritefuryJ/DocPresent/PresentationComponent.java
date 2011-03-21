@@ -43,8 +43,8 @@ import javax.swing.TransferHandler;
 
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Caret.CaretListener;
-import BritefuryJ.DocPresent.Clipboard.DataTransfer;
 import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
+import BritefuryJ.DocPresent.Clipboard.DataTransfer;
 import BritefuryJ.DocPresent.Input.DndController;
 import BritefuryJ.DocPresent.Input.DndDropLocal;
 import BritefuryJ.DocPresent.Input.DndDropSwing;
@@ -65,7 +65,6 @@ import BritefuryJ.Logging.LogEntry;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
-import BritefuryJ.Math.Xform2;
 
 public class PresentationComponent extends JComponent implements ComponentListener, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, HierarchyListener
 {
@@ -952,25 +951,17 @@ public class PresentationComponent extends JComponent implements ComponentListen
 
 			if ( !bHandled  &&  button == 1  &&  ( modifiers & ( Modifier.ALT | Modifier.ALT_GRAPH | Modifier.CTRL | Modifier.SHIFT ) )  ==  0 )
 			{
-				DPContentLeafEditable editableLeaf = (DPContentLeafEditable)getLeafClosestToLocalPoint( windowPos, new DPContentLeafEditable.EditableLeafElementFilter() );
-				if ( editableLeaf != null )
+				Marker editableMarker = getEditableMarkerClosestToLocalPoint( windowPos );
+				if ( editableMarker != null )
 				{
-					Xform2 x = editableLeaf.getLocalToRootXform();
-					x = x.inverse();
-					
-					Marker marker = editableLeaf.markerAtPoint( x.transform( windowPos ) );
-					caret.moveTo( marker );
+					caret.moveTo( editableMarker );
 					bLastMousePressPositionedCaret = true;
 				}
 
-				DPContentLeafEditable selectableLeaf = (DPContentLeafEditable)getLeafClosestToLocalPoint( windowPos, new DPContentLeafEditable.SelectableLeafElementFilter() );
-				if ( selectableLeaf != null )
+				Marker selectableMarker = getSelectableMarkerClosestToLocalPoint( windowPos );
+				if ( selectableMarker != null )
 				{
-					Xform2 x = selectableLeaf.getLocalToRootXform();
-					x = x.inverse();
-					
-					Marker marker = selectableLeaf.markerAtPoint( x.transform( windowPos ) );
-					selectionManager.mouseSelectionBegin( marker );
+					selectionManager.mouseSelectionBegin( selectableMarker );
 				}
 			}
 
@@ -1006,7 +997,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			
 			if ( bLastMousePressPositionedCaret  &&  button == 1  &&  ( modifiers & ( Modifier.ALT | Modifier.ALT_GRAPH | Modifier.CTRL | Modifier.SHIFT ) )  ==  0 )
 			{
-				DPContentLeafEditable selectableLeaf = (DPContentLeafEditable)getLeafClosestToLocalPoint( windowPos, new DPContentLeafEditable.SelectableLeafElementFilter() );
+				DPContentLeafEditable selectableLeaf = (DPContentLeafEditable)getSelectableLeafClosestToLocalPoint( windowPos );
 				if ( selectableLeaf != null )
 				{
 					DPElement elementToSelect = null;
@@ -1057,26 +1048,16 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			
 			if ( selectionManager.isMouseDragInProgress() )
 			{
-				DPContentLeafEditable editableLeaf = (DPContentLeafEditable)getLeafClosestToLocalPoint( windowPos, new DPContentLeafEditable.EditableLeafElementFilter() );
-				if ( editableLeaf != null )
+				Marker editableMarker = getEditableMarkerClosestToLocalPoint( windowPos );
+				if ( editableMarker != null )
 				{
-					Xform2 x = editableLeaf.getLocalToRootXform();
-					x = x.inverse();
-	
-					Marker marker = editableLeaf.markerAtPoint( x.transform( windowPos ) );
-					
-					caret.moveTo( marker );
+					caret.moveTo( editableMarker );
 				}
 
-				DPContentLeafEditable selectableLeaf = (DPContentLeafEditable)getLeafClosestToLocalPoint( windowPos, new DPContentLeafEditable.SelectableLeafElementFilter() );
-				if ( selectableLeaf != null )
+				Marker selectableMarker = getSelectableMarkerClosestToLocalPoint( windowPos );
+				if ( selectableMarker != null )
 				{
-					Xform2 x = selectableLeaf.getLocalToRootXform();
-					x = x.inverse();
-	
-					Marker marker = selectableLeaf.markerAtPoint( x.transform( windowPos ) );
-					
-					selectionManager.mouseSelectionDrag( marker );
+					selectionManager.mouseSelectionDrag( selectableMarker );
 				}
 			}
 			
