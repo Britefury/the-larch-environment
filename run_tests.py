@@ -14,6 +14,7 @@ import Britefury.Tests.BritefuryJ.Parser.Utils.Operators
 import Britefury.Tests.Britefury.Grammar.Grammar
 import Britefury.Tests.Britefury.Dispatch.TestObjectMethodDispatch
 import Britefury.Tests.Britefury.Dispatch.TestDMObjectNodeMethodDispatch
+import Britefury.Tests.Britefury.Util.Test_TrackedList
 #import Britefury.Tests.Britefury.AttributeVisitor.TestAttributeVisitor
 import GSymCore.Languages.Python25.CodeGenerator
 import GSymCore.Languages.Python25.Python25Importer
@@ -27,6 +28,7 @@ testModules = [ Britefury.Dispatch.Dispatch,
 		Britefury.Tests.Britefury.Grammar.Grammar,
 		Britefury.Tests.Britefury.Dispatch.TestObjectMethodDispatch,
 		Britefury.Tests.Britefury.Dispatch.TestDMObjectNodeMethodDispatch,
+		Britefury.Tests.Britefury.Util.Test_TrackedList,
 		#Britefury.Tests.Britefury.AttributeVisitor.TestAttributeVisitor,
 		GSymCore.Languages.Python25.CodeGenerator,
 		GSymCore.Languages.Python25.Python25Importer,

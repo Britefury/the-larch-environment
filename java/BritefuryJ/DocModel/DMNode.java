@@ -26,6 +26,9 @@ import org.python.core.PyObjectDerived;
 import org.python.core.PyString;
 import org.python.core.PyTuple;
 
+import BritefuryJ.DocModel.DMIOReader.BadModuleNameException;
+import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
+import BritefuryJ.DocModel.DMIOWriter.InvalidDataTypeException;
 import BritefuryJ.DocModel.Resource.DMJavaResource;
 import BritefuryJ.DocModel.Resource.DMPyResource;
 import BritefuryJ.DocModel.Resource.DMResource;
@@ -298,20 +301,36 @@ public abstract class DMNode implements Cloneable
 	public PyObject __getstate__()
 	{
 		DMPickleHelper.initialise();
-		try
+		if ( useDMSerialisationForPickling )
 		{
-			ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-			ObjectOutputStream objOut = new ObjectOutputStream( outStream );
-			objOut.writeObject( this );
-			return new PyString( new String( outStream.toByteArray(), "ISO-8859-1" ) );
+			String str;
+			try
+			{
+				str = DMIOWriter.writeAsString( this );
+			}
+			catch (InvalidDataTypeException e)
+			{
+				throw new RuntimeException( "InvalidDataTypeException while creating serialised form: " + e.getMessage() );
+			}
+			return new PyString( str );
 		}
-		catch (UnsupportedEncodingException e)
+		else
 		{
-			throw new RuntimeException( "UnsupportedEncodingException while creating serialised form: " + e.getMessage() );
-		}
-		catch (IOException e)
-		{
-			throw new RuntimeException( "IOException while creating serialised form: " + e.getMessage() );
+			try
+			{
+				ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+				ObjectOutputStream objOut = new ObjectOutputStream( outStream );
+				objOut.writeObject( this );
+				return new PyString( new String( outStream.toByteArray(), "ISO-8859-1" ) );
+			}
+			catch (UnsupportedEncodingException e)
+			{
+				throw new RuntimeException( "UnsupportedEncodingException while creating serialised form: " + e.getMessage() );
+			}
+			catch (IOException e)
+			{
+				throw new RuntimeException( "IOException while creating serialised form: " + e.getMessage() );
+			}
 		}
 	}
 	
@@ -320,26 +339,47 @@ public abstract class DMNode implements Cloneable
 		DMPickleHelper.initialise();
 		if ( state instanceof PyString )
 		{
-			try
+			if ( useDMSerialisationForPickling )
 			{
 				String serialised = state.asString();
-				byte bytes[] = serialised.getBytes( "ISO-8859-1" );
-				ByteArrayInputStream inStream = new ByteArrayInputStream( bytes );
-				ObjectInputStream objIn = new ObjectInputStream( inStream );
-				DMNode node = (DMNode)objIn.readObject();
+				DMNode node;
+				try
+				{
+					node = (DMNode)DMIOReader.readFromString( serialised );
+				}
+				catch (BadModuleNameException e)
+				{
+					throw new RuntimeException( "BadModuleNameException while creating serialised form: " + e.getMessage() );
+				}
+				catch (ParseErrorException e)
+				{
+					throw new RuntimeException( "ParseErrorException while creating serialised form: " + e.getMessage() );
+				}
 				become( node );
 			}
-			catch (UnsupportedEncodingException e)
+			else
 			{
-				throw new RuntimeException( "Cannot get UTF-8 encoding: " + e.getMessage() );
-			}
-			catch (IOException e)
-			{
-				throw new RuntimeException( "IOException while reading from serialised form: " + e.getMessage() );
-			}
-			catch (ClassNotFoundException e)
-			{
-				throw new RuntimeException( "Cannot read object; class not found: " + e.getMessage() );
+				try
+				{
+					String serialised = state.asString();
+					byte bytes[] = serialised.getBytes( "ISO-8859-1" );
+					ByteArrayInputStream inStream = new ByteArrayInputStream( bytes );
+					ObjectInputStream objIn = new ObjectInputStream( inStream );
+					DMNode node = (DMNode)objIn.readObject();
+					become( node );
+				}
+				catch (UnsupportedEncodingException e)
+				{
+					throw new RuntimeException( "Cannot get UTF-8 encoding: " + e.getMessage() );
+				}
+				catch (IOException e)
+				{
+					throw new RuntimeException( "IOException while reading from serialised form: " + e.getMessage() );
+				}
+				catch (ClassNotFoundException e)
+				{
+					throw new RuntimeException( "Cannot read object; class not found: " + e.getMessage() );
+				}
 			}
 		}
 		else
@@ -530,4 +570,7 @@ public abstract class DMNode implements Cloneable
 			return javaResource( x );
 		}
 	}
+	
+	
+	public static boolean useDMSerialisationForPickling = false;
 }

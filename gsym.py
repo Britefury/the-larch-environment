@@ -23,6 +23,10 @@ from Britefury.gSymConfig import UserConfig
 from Britefury.MainApp.MainApp import MainApp
 
 
+from BritefuryJ.DocModel import DMPickleHelper
+DMPickleHelper.initialise()
+
+
 
 def main():
 	UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );

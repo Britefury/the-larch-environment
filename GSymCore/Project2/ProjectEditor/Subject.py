@@ -9,9 +9,10 @@ from BritefuryJ.DocPresent.Browser import Location
 
 from BritefuryJ.Projection import Subject
 
-from GSymCore.Project import Schema
-from GSymCore.Project.ProjectEditor.View import perspective
-from GSymCore.Project.ProjectEditor.ModuleFinder import RootFinder, ModuleFinder
+from GSymCore.Project2.ProjectPage import ProjectPage
+from GSymCore.Project2.ProjectPackage import ProjectPackage
+from GSymCore.Project2.ProjectEditor.View import perspective
+from GSymCore.Project2.ProjectEditor.ModuleFinder import RootFinder, ModuleFinder
 
 
 
@@ -26,13 +27,13 @@ def _packageSubject(projectSubject, model, location):
 	class _PackageSubject (object):
 		# We use __getattribute__ rather than __getattr__, otherwise the __init__ method can prevent some item names from being accessible
 		def __getattribute__(self, name):
-			for item in model['contents']:
-				if name == item['name']:
-					itemLocation = location + '.' + name
-					if item.isInstanceOf( Schema.Package ):
-						return _packageSubject( projectSubject, item, itemLocation )
-					elif item.isInstanceOf( Schema.Page ):
-						return projectSubject._document.newModelSubject( item['unit'], projectSubject, itemLocation, name )
+			item = model.contentsMap.get( name )
+			if item is not None:
+				itemLocation = location + '.' + name
+				if isinstance( item, ProjectPackage ):
+					return _packageSubject( projectSubject, item, itemLocation )
+				elif isinstance( item, ProjectPage ):
+					return projectSubject._document.newModelSubject( item.data, projectSubject, itemLocation, name )
 			raise AttributeError, "Did not find item for '%s'"  %  ( name, )
 	return _PackageSubject()
 
@@ -67,13 +68,13 @@ class ProjectSubject (Subject):
 
 
 	def __getattr__(self, name):
-		for item in self._model['contents']:
-			if name == item['name']:
-				itemLocation = self._location + '.' + name
-				if item.isInstanceOf( Schema.Package ):
-					return _packageSubject( self, item, itemLocation )
-				elif item.isInstanceOf( Schema.Page ):
-					return self._document.newModelSubject( item['unit'], self, itemLocation, name )
+		item = self._model.contentsMap.get( name )
+		if item is not None:
+			itemLocation = self._location + '.' + name
+			if isinstance( item, ProjectPackage ):
+				return _packageSubject( self, item, itemLocation )
+			elif isinstance( item, ProjectPage ):
+				return self._document.newModelSubject( item.data, self, itemLocation, name )
 		raise AttributeError, "Did not find item for '%s'"  %  ( name, )
 
 

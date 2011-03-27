@@ -3,13 +3,5 @@
 ##-* under the terms of the GNU General Public License version 2 as published by the
 ##-* Free Software Foundation. The full text of the GNU General Public License
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
-##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
+##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
-from GSymCore.Worksheet import Worksheet
-
-
-
-def initPlugin(plugin, world):
-	world.registerUnitClass( plugin, Worksheet.unitClass )
-	plugin.pageUnitFactories = [ Worksheet.pageUnitFactory ]
-	

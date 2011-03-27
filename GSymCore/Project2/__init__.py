@@ -5,11 +5,3 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from GSymCore.Worksheet import Worksheet
-
-
-
-def initPlugin(plugin, world):
-	world.registerUnitClass( plugin, Worksheet.unitClass )
-	plugin.pageUnitFactories = [ Worksheet.pageUnitFactory ]
-	

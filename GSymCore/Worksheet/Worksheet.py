@@ -11,6 +11,9 @@ from Britefury.gSym.gSymDocument import gSymUnit
 from GSymCore.Worksheet.WorksheetViewer.View import perspective as worksheetViewerPerspective, WorksheetViewerSubject
 from GSymCore.Worksheet import Schema
 
+from GSymCore.Project2.PageData import PageData, registerPageFactory, registerPageImporter
+
+
 
 def newWorksheet():
 	return Schema.Worksheet( body=Schema.Body( contents=[] ) )
@@ -19,8 +22,22 @@ def _worksheetNewUnit():
 	return gSymUnit( Schema.schema, newWorksheet() )
 
 
+
+class WorksheetPageData (PageData):
+	def makeEmptyContents(self):
+		return newWorksheet()
+	
+	def __new_subject__(self, document, enclosingSubject, location, title):
+		return WorksheetViewerSubject( document, self.contents, enclosingSubject, location, title )
+
+	
+registerPageFactory( 'Worksheet', WorksheetPageData, 'Worksheet' )
+
+
+
+
 unitClass = GSymUnitClass( Schema.schema, WorksheetViewerSubject )
 
 
-newPageFactory = GSymPageUnitFactory( 'Worksheet', _worksheetNewUnit )
+pageUnitFactory = GSymPageUnitFactory( 'Worksheet', _worksheetNewUnit )
 
