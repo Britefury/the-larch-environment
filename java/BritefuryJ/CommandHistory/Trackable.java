@@ -8,6 +8,7 @@ package BritefuryJ.CommandHistory;
 
 public interface Trackable extends HasCommandHistory
 {
+	//public void getCommandHistory();					// Defined in HasCommandHistory
 	public void setCommandHistory(CommandHistory h);
 	
 	public void trackContents(CommandHistory history);

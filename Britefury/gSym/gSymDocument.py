@@ -7,6 +7,8 @@
 ##-*************************
 import os
 
+import cPickle
+
 from java.io import IOException
 
 from datetime import datetime
@@ -71,16 +73,18 @@ def gSymUnit_getContent(unit):
 		raise GSymDocumentInvalidStructure
 	return unit['content']
 	
+def isUnit(model):
+	return isinstance( model, DMNode )  and  model.isInstanceOf( nodeClass_GSymUnit )
 
 
 
 
 class GSymDocument (CommandHistoryListener):
-	def __init__(self, world, unit):
+	def __init__(self, world, contents):
 		self._world = world
-		self._unit = DMNode.coerce( unit )
+		self._contents = contents
 		self._commandHistory = CommandHistory()
-		self._commandHistory.track( self._unit )
+		self._commandHistory.track( self._contents )
 		self._commandHistory.setCommandHistoryListener( self )
 		self._docName = ''
 		self._location = None
@@ -143,17 +147,23 @@ class GSymDocument (CommandHistoryListener):
 	def hasUnsavedData(self):
 		return self._bHasUnsavedData
 		
-		
+	
+	def _isUnit(self, ):
+		return isinstance( self._contents, DMNode )  and  self._contents.isInstanceOf( nodeClass_GSymUnit )
 	
 	def newSubject(self, enclosingSubject, location, title):
-		return self.newUnitSubject( self._unit, enclosingSubject, location, title )
+		return self.newModelSubject( self._contents, enclosingSubject, location, title )
 
-	def newUnitSubject(self, unit, enclosingSubject, location,  title):
-		unitClass = self._world.getUnitClass( gSymUnit_getSchemaLocation( unit ) )
-		subjectFactory = unitClass.getUnitSubjectFactory()
-		if subjectFactory is None:
-			raise TypeError, 'cannot create subject for schema ' + gSymUnit_getSchemaLocation( unit )
-		return subjectFactory( self, gSymUnit_getContent( unit ), enclosingSubject, location,  title )
+
+	def newModelSubject(self, model, enclosingSubject, location, title):
+		if isUnit( model ):
+			unitClass = self._world.getUnitClass( gSymUnit_getSchemaLocation( model ) )
+			subjectFactory = unitClass.getUnitSubjectFactory()
+			if subjectFactory is None:
+				raise TypeError, 'cannot create subject for schema ' + gSymUnit_getSchemaLocation( model )
+			return subjectFactory( self, gSymUnit_getContent( model ), enclosingSubject, location, title )
+		else:
+			return model.__new_subject__( self, enclosingSubject, location, title )
 
 		
 	
@@ -164,22 +174,35 @@ class GSymDocument (CommandHistoryListener):
 		
 		
 	def save(self):
-		DMIOWriter.writeToFile( self._filename, self._write() )
-		if self._bHasUnsavedData:
-			self._bHasUnsavedData = False
-			if self._unsavedDataListener is not None:
-				self._unsavedDataListener( self )
-		self._saveTime = datetime.now()
+		ext = os.path.splitext( self._filename )[1].lower()
+		if ext == '.gsym':
+			DMIOWriter.writeToFile( self._filename, self._writeDM() )
+			if self._bHasUnsavedData:
+				self._bHasUnsavedData = False
+				if self._unsavedDataListener is not None:
+					self._unsavedDataListener( self )
+			self._saveTime = datetime.now()
+		elif ext == '.gsp':
+			f = open( self._filename, 'w' )
+			cPickle.dump( self._contents, f )
+			f.close()
+			if self._bHasUnsavedData:
+				self._bHasUnsavedData = False
+				if self._unsavedDataListener is not None:
+					self._unsavedDataListener( self )
+			self._saveTime = datetime.now()
+		else:
+			raise ValueError, 'unreckognised file extension'
 		
 	
 	
-	def _write(self):
-		return nodeClass_GSymDocument( version='0.1-alpha', content=self._unit )
+	def _writeDM(self):
+		return nodeClass_GSymDocument( version='0.1-alpha', content=self._contents )
 
 	
 
 	@staticmethod
-	def read(world, doc):
+	def readDM(world, doc):
 		if not isObjectNode( doc ):
 			raise GSymDocumentInvalidStructure
 		
@@ -205,15 +228,32 @@ class GSymDocument (CommandHistoryListener):
 	@staticmethod
 	def readFile(world, filename):
 		if os.path.exists( filename ):
-			try:
-				documentRoot = DMIOReader.readFromFile( filename )
-				documentRoot = DMNode.coerce( documentRoot )
-				document = GSymDocument.read( world, documentRoot )
-				document._filename = filename
-				document._saveTime = datetime.now()
-				return document
-			except IOException:
-				return None
+			ext = os.path.splitext( filename )[1].lower()
+			if ext == '.gsym':
+				try:
+					documentRoot = DMIOReader.readFromFile( filename )
+					documentRoot = DMNode.coerce( documentRoot )
+					document = GSymDocument.readDM( world, documentRoot )
+					document._filename = filename
+					document._saveTime = datetime.now()
+					return document
+				except IOException:
+					return None
+			elif ext == '.gsp':
+				try:
+					f = open( filename )
+					documentRoot = cPickle.load( f )
+					f.close()
+	
+					document = GSymDocument( world, documentRoot )
+					document._filename = filename
+					document._saveTime = datetime.now()
+					return document
+				except IOError:
+					return None
+			else:
+				raise ValueError, 'unreckognised file extension'
+				
 		
 			
 			

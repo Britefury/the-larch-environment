@@ -103,7 +103,7 @@ public abstract class ObjectPresentationPerspective extends AbstractPerspective
 			}
 		}
 		
-		// Fallback - use Java or Python toString() / __str__() methods
+		// Fallback
 		if ( result == null )
 		{
 			if ( pyX != null )

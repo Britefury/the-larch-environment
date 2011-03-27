@@ -13,6 +13,8 @@ from GSymCore.Languages.Python25.Python25Importer import importPy25File
 from GSymCore.Languages.Python25.PythonEditor.View import perspective as python25EditorPerspective
 from GSymCore.Languages.Python25.PythonEditor.Subject import Python25Subject
 
+from GSymCore.Project2.PageData import PageData, registerPageFactory, registerPageImporter
+
 
 
 def py25NewModule():
@@ -33,11 +35,27 @@ def _py25ImportFile(filename):
 
 
 
+class Python25PageData (PageData):
+	def makeEmptyContents(self):
+		return py25NewModule()
+	
+	def __new_subject__(self, document, enclosingSubject, location, title):
+		return Python25Subject( document, self.contents, enclosingSubject, location, title )
+	
+def _py25ImportPage(filename):
+	content = importPy25File( filename )
+	return Python25PageData( content )	
+	
+
+registerPageFactory( 'Python 2.5', Python25PageData, 'Python' )
+registerPageImporter( 'Python 2.5', 'Python 2.5 source (*.py)', 'py', _py25ImportPage )
+
+
 unitClass = GSymUnitClass( Schema.schema, Python25Subject )
 
 
-newPageFactory = GSymPageUnitFactory( 'Python 2.5', _py25NewUnit )
+pageUnitFactory = GSymPageUnitFactory( 'Python 2.5', _py25NewUnit )
 
 
-pageImporter = GSymPageUnitImporter( 'Python 2.5', 'Python 2.5 source (*.py)', 'py', _py25ImportFile )
+pageUnitImporter = GSymPageUnitImporter( 'Python 2.5', 'Python 2.5 source (*.py)', 'py', _py25ImportFile )
 

@@ -28,6 +28,48 @@ import BritefuryJ.StyleSheet.StyleSheet;
 
 public class CommandHistory implements CommandHistoryController, Presentable
 {
+	public interface CommandAction
+	{
+		void invoke();
+	}
+	
+	
+	
+	private static class ActionCommand extends Command
+	{
+		private CommandAction executeAction, unexecuteAction;
+		private String description;
+		
+		
+		public ActionCommand(CommandAction executeAction, CommandAction unexecuteAction, String description)
+		{
+			this.executeAction = executeAction;
+			this.unexecuteAction = unexecuteAction;
+			this.description = description;
+		}
+		
+		
+		@Override
+		protected void execute()
+		{
+			executeAction.invoke();
+		}
+
+		@Override
+		protected void unexecute()
+		{
+			unexecuteAction.invoke();
+		}
+
+		@Override
+		protected String getDescription()
+		{
+			return description;
+		}
+	}
+	
+	
+	
 	private static abstract class Entry implements Presentable
 	{
 		public abstract void execute();
@@ -195,7 +237,10 @@ public class CommandHistory implements CommandHistoryController, Presentable
 		}
 	}
 	
-	
+	public void addCommand(CommandAction executeAction, CommandAction unexecuteAction, String description)
+	{
+		addCommand( new ActionCommand( executeAction, unexecuteAction, description ) );
+	}
 	
 	public void undo()
 	{

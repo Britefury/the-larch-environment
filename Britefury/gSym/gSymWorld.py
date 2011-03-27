@@ -27,6 +27,15 @@ _internalSchemas = {}
 #
 #
 
+
+def _get_attr(x, attrName, default=None):
+	try:
+		return getattr( x, attrName )
+	except AttributeError:
+		return default
+
+	
+	
 class GSymWorld (object):
 	def __init__(self):
 		super( GSymWorld, self ).__init__()
@@ -42,21 +51,20 @@ class GSymWorld (object):
 		
 		for plugin in self._plugins:
 			plugin.initialise( self )
-	
+			
+			self.newPageFactories.extend( _get_attr( plugin, 'pageUnitFactories', [] ) )
+			self.pageImporters.extend( _get_attr( plugin, 'pageUnitImporters', [] ) )
+			
+				
+		
 
 	def registerUnitClass(self, plugin, unitClass):
 		schema = unitClass.getSchema()
 		self._unitClasses[schema.getLocation()] = unitClass
 	
-	def registerNewPageFactory(self, plugin, newPageFactory):
-		self.newPageFactories.append( newPageFactory )
-		
 	def registerNewDocumentFactory(self, plugin, newDocumentFactory):
 		self.newDocumentFactories.append( newDocumentFactory )
 		
-	def registerPageImporter(self, plugin, pageImporter):
-		self.pageImporters.append( pageImporter )
-	
 	
 	def setAppStateSubject(self, plugin, appStateSubject):
 		self._appStateSubject = appStateSubject

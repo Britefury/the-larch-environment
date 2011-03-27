@@ -24,6 +24,26 @@ public class DMPickleHelper
 		{
 			locals = new PyDictionary();
 
+			String moduleCode =
+				"from BritefuryJ.DocModel import DMList, DMObject\n" +
+				"from BritefuryJ.DocModel.Resource import DMJavaResource, DMPyResource\n" +
+				"\n" +
+				"def makeDMList():\n" +
+				"	return DMList()\n" +
+				"\n" +
+				"def makeDMObject():\n" +
+				"	return DMObject()\n" +
+				"\n" +
+				"def makeDMJavaResource():\n" +
+				"	return DMJavaResource()\n" +
+				"\n" +
+				"def makeDMPyResource():\n" +
+				"	return DMPyResource()\n" +
+				"\n" +
+				"def makeDMEmbeddedObject():\n" +
+				"	return DMEmbeddedObject()\n";
+				
+			
 			String code = 
 			"import imp\n" +
 			"import sys\n" +
@@ -31,21 +51,7 @@ public class DMPickleHelper
 			"fullname = 'BritefuryJ.DocModel.PyDMPickleHelper'\n" +
 			"\n" +
 			"\n" +
-			"moduleCode = '''\n" +
-			"from BritefuryJ.DocModel import DMList, DMObject\n" +
-			"from BritefuryJ.DocModel.Resource import DMJavaResource, DMPyResource\n" +
-			"\n" +
-			"def makeDMList():\n" +
-			"	return DMList()\n" +
-			"\n" +
-			"def makeDMObject():\n" +
-			"	return DMObject()\n" +
-			"\n" +
-			"def makeDMJavaResource():\n" +
-			"	return DMJavaResource()\n" +
-			"\n" +
-			"def makeDMPyResource():\n" +
-			"	return DMPyResource()'''\n" +
+			"moduleCode = '''" + moduleCode + "'''\n" +
 			"\n" +
 			"\n" +
 			"mod = sys.modules.setdefault( fullname, imp.new_module( fullname ) )\n" +
@@ -92,6 +98,11 @@ public class DMPickleHelper
 	public static PyObject getDMPyResourceFactory()
 	{
 		return getMod().__getattr__( "makeDMPyResource" );
+	}
+	
+	public static PyObject getDMEmbeddedObjectFactory()
+	{
+		return getMod().__getattr__( "makeDMEmbeddedObject" );
 	}
 	
 	
