@@ -5,15 +5,12 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2010.
 ##-*************************
-from Britefury.gSym.gSymUnitClass import GSymUnitClass, GSymPageUnitFactory, GSymPageUnitImporter
-from Britefury.gSym.gSymDocument import gSymUnit
-
 from GSymCore.Languages.Python25 import Schema
 from GSymCore.Languages.Python25.Python25Importer import importPy25File
 from GSymCore.Languages.Python25.PythonEditor.View import perspective as python25EditorPerspective
 from GSymCore.Languages.Python25.PythonEditor.Subject import Python25Subject
 
-from GSymCore.Project2.PageData import PageData, registerPageFactory, registerPageImporter
+from GSymCore.Project.PageData import PageData, registerPageFactory, registerPageImporter
 
 
 
@@ -25,13 +22,6 @@ def py25NewSuite():
 
 def py25NewExpr():
 	return Schema.PythonExpression( expr=Schema.UNPARSED( value=[ '' ] ) )
-
-def _py25NewUnit():
-	return gSymUnit( Schema.schema, py25NewModule() )
-
-def _py25ImportFile(filename):
-	content = importPy25File( filename )
-	return gSymUnit( Schema.schema, content )
 
 
 
@@ -50,12 +40,4 @@ def _py25ImportPage(filename):
 registerPageFactory( 'Python 2.5', Python25PageData, 'Python' )
 registerPageImporter( 'Python 2.5', 'Python 2.5 source (*.py)', 'py', _py25ImportPage )
 
-
-unitClass = GSymUnitClass( Schema.schema, Python25Subject )
-
-
-pageUnitFactory = GSymPageUnitFactory( 'Python 2.5', _py25NewUnit )
-
-
-pageUnitImporter = GSymPageUnitImporter( 'Python 2.5', 'Python 2.5 source (*.py)', 'py', _py25ImportFile )
 

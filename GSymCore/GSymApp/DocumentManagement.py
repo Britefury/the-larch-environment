@@ -18,7 +18,7 @@ from Britefury.gSym.gSymDocument import GSymDocument
 
 
 
-# handleNewDocumentFn(unit)
+# handleNewDocumentFn(document)
 def promptNewDocument(world, element, handleNewDocumentFn):
 	def _make_newDocument(newDocFn):
 		def newDoc(menuItem):

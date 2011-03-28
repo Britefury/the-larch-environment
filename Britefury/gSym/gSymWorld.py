@@ -5,10 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-import os
 import sys
-
-from BritefuryJ.DocModel import DMSchema
 
 from Britefury.gSym.gSymPlugin import GSymPlugin
 from Britefury.gSym.Configuration import Configuration
@@ -40,10 +37,7 @@ class GSymWorld (object):
 	def __init__(self):
 		super( GSymWorld, self ).__init__()
 		self._plugins = GSymPlugin.loadPlugins()
-		self._unitClasses = {}
-		self.newPageFactories = []
 		self.newDocumentFactories = []
-		self.pageImporters = []
 		self._appStateSubject = None
 		self._importedModuleRegistry = set()
 		self.configuration = Configuration.Configuration()
@@ -52,16 +46,9 @@ class GSymWorld (object):
 		for plugin in self._plugins:
 			plugin.initialise( self )
 			
-			self.newPageFactories.extend( _get_attr( plugin, 'pageUnitFactories', [] ) )
-			self.pageImporters.extend( _get_attr( plugin, 'pageUnitImporters', [] ) )
-			
 				
 		
 
-	def registerUnitClass(self, plugin, unitClass):
-		schema = unitClass.getSchema()
-		self._unitClasses[schema.getLocation()] = unitClass
-	
 	def registerNewDocumentFactory(self, plugin, newDocumentFactory):
 		self.newDocumentFactories.append( newDocumentFactory )
 		
@@ -105,18 +92,10 @@ class GSymWorld (object):
 		except AttributeError:
 			return None
 		return app_find_module( fullname, path, self )
-		
-		
-		
-	
-	def getUnitClass(self, schemaLocation):
-		try:
-			return self._unitClasses[schemaLocation]
-		except KeyError:
-			print 'Could not get unit class %s; registered classes: %s'  %  ( schemaLocation, self._unitClasses.keys() )
-			return None
-		
-	
-	
 
-
+	
+	
+class GSymDocumentFactory (object):
+	def __init__(self, menuLabelText, newDocumentFn):
+		self.menuLabelText = menuLabelText
+		self.newDocumentFn = newDocumentFn

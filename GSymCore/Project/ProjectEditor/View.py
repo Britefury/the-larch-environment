@@ -5,9 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2010.
 ##-*************************
-import os
-
-from datetime import datetime
+import copy
 
 from java.lang import Object
 
@@ -18,13 +16,9 @@ from java.awt.event import KeyEvent
 
 from java.util.regex import Pattern
 
-from javax.swing import AbstractAction
-from javax.swing import JPopupMenu, JOptionPane, JFileChooser
-from javax.swing.filechooser import FileNameExtensionFilter
+from Britefury.Dispatch.ObjectMethodDispatch import ObjectDispatchMethod
 
-from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod
-
-from Britefury.gSym.View.GSymView import GSymViewObjectNodeDispatch
+from Britefury.gSym.View.GSymView import GSymViewObjectDispatch
 
 
 from Britefury.Util.NodeUtil import *
@@ -49,51 +43,13 @@ from BritefuryJ.Projection import Perspective
 
 from GSymCore.GSymApp import DocumentManagement
 
-from GSymCore.Project import Schema
+from GSymCore.Project.ProjectRoot import ProjectRoot
+from GSymCore.Project.ProjectPackage import ProjectPackage
+from GSymCore.Project.ProjectPage import ProjectPage
 from GSymCore.Project.ProjectEditor import ModuleFinder
+from GSymCore.Project import PageData
 
 
-
-# handleNewPageFn(unit)
-def _newPageMenu(world, handleNewPageFn):
-	def _make_newPage(newPageFn):
-		def newPage(menuItem):
-			unit = newPageFn()
-			handleNewPageFn( unit )
-		return newPage
-	items = []
-	for newPageFactory in world.newPageFactories:
-		items.append( MenuItem.menuItemWithLabel( newPageFactory.menuLabelText, _make_newPage( newPageFactory.newPageFn ) ) )
-	return VPopupMenu( items )
-
-
-
-# handleImportedPageFn(name, unit)
-def _importPageMenu(world, component, handleImportedPageFn):
-	def _make_importPage(fileType, filePattern, importUnitFn):
-		def _import(actionEvent):
-			openDialog = JFileChooser()
-			openDialog.setFileFilter( FileNameExtensionFilter( fileType, [ filePattern ] ) )
-			response = openDialog.showDialog( component, 'Import' )
-			if response == JFileChooser.APPROVE_OPTION:
-				sf = openDialog.getSelectedFile()
-				if sf is not None:
-					filename = sf.getPath()
-					if filename is not None:
-						t1 = datetime.now()
-						unit = importUnitFn( filename )
-						t2 = datetime.now()
-						if unit is not None:
-							unitName = os.path.splitext( filename )[0]
-							unitName = os.path.split( unitName )[1]
-							print 'ProjectEditor.View: IMPORT TIME = %s'  %  ( t2 - t1, )
-							handleImportedPageFn( unitName, unit )
-		return _import
-
-	items = []
-	for pageImporter in world.pageImporters:
-		items.append( MenuItem.menuItemWithLabel( pageImporter.menuLabelText, _make_importPage( pageImporter.fileType, pageImporter.filePattern, pageImporter.importFn ) ) )
-	return VPopupMenu( items )
 
 
 
@@ -134,18 +90,20 @@ def _isChildOf(node, package):
 	if node is package:
 		return True
 
-	if package.isInstanceOf( Schema.Package ):
-		for child in package['contents']:
+	if isinstance( package, ProjectPackage ):
+		for child in package:
 			if _isChildOf( node, child ):
 				return True
 	return False
 
 
 def _performDrop(data, action, newParent, index):
-	source = data.source.deepCopy()   if action == ObjectDndHandler.COPY   else data.source
+	commandHistory = newParent.getCommandHistory()
+	commandHistory.freeze()
+	source = copy.deepcopy( data.source )   if action == ObjectDndHandler.COPY   else data.source
 
 	if action == ObjectDndHandler.MOVE:
-		sourceParent = data.source.getValidParents()[0]
+		sourceParent = data.source.parent
 		indexOfSource = sourceParent.indexOfById( data.source )
 		del sourceParent[indexOfSource]
 		if index is not None  and  newParent is sourceParent  and  index > indexOfSource:
@@ -155,6 +113,7 @@ def _performDrop(data, action, newParent, index):
 		newParent.append( source )
 	else:
 		newParent.insert( index, source )
+	commandHistory.thaw()
 
 
 
@@ -168,7 +127,7 @@ def _pageCanDrop(element, targetPos, data, action):
 def _pageDrop(element, targetPos, data, action):
 	if action & ObjectDndHandler.COPY_OR_MOVE  !=  0:
 		destPage = _getModelOfPackageOrPageNameElement( element )
-		parent = destPage.getValidParents()[0]
+		parent = destPage.parent
 		index = parent.indexOfById( destPage )
 		if targetPos.y > ( element.getHeight() * 0.5 ):
 			index += 1
@@ -182,10 +141,10 @@ def _pageDrop(element, targetPos, data, action):
 def _getDestPackageAndIndex(element, targetPos):
 	targetPackage = _getModelOfPackageOrPageNameElement( element )
 	if targetPos.x > ( element.getWidth() * 0.5 ):
-		return targetPackage, len( targetPackage['contents'] )
+		return targetPackage, len( targetPackage )
 	else:
-		parent1 = targetPackage.getValidParents()[0]
-		parent2 = parent1.getValidParents()[0]
+		parent1 = targetPackage.parent
+		parent2 = parent1.parent
 		index = parent1.indexOfById( targetPackage )
 		if targetPos.y > ( element.getHeight() * 0.5 ):
 			index += 1
@@ -209,10 +168,10 @@ def _packageDrop(element, targetPos, data, action):
 
 		targetPackage = _getModelOfPackageOrPageNameElement( element )
 		if targetPos.x > ( element.getWidth() * 0.5 ):
-			_performDrop( data, action, targetPackage['contents'], None )
+			_performDrop( data, action, targetPackage, None )
 			return True
 		else:
-			parent = targetPackage.getValidParents()[0]
+			parent = targetPackage.parent
 			index = parent.indexOfById( targetPackage )
 			if targetPos.y > ( element.getHeight() * 0.5 ):
 				index += 1
@@ -225,7 +184,7 @@ def _packageDrop(element, targetPos, data, action):
 def _projectIndexDrop(element, targetPos, data, action):
 	if action & ObjectDndHandler.COPY_OR_MOVE  !=  0:
 		project = _getModelOfProjectNameElement( element )
-		_performDrop( data, action, project['contents'], None )
+		_performDrop( data, action, project, None )
 		return True
 	return False
 
@@ -256,9 +215,9 @@ _pythonPackageNameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*(\\.[a-zA-Z_][
 
 
 
-class ProjectView (GSymViewObjectNodeDispatch):
-	@DMObjectNodeDispatchMethod( Schema.Project )
-	def Project(self, fragment, state, node, pythonPackageName, contents):
+class ProjectView (GSymViewObjectDispatch):
+	@ObjectDispatchMethod( ProjectRoot )
+	def ProjectRoot(self, fragment, inheritedState, project):
 		# Save and Save As
 		def _onSave(link, buttonEvent):
 			if document.hasFilename():
@@ -284,7 +243,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		# Python package name
 		class _PythonPackageNameListener (TextEntry.TextEntryListener):
 			def onAccept(self, textEntry, text):
-				node['pythonPackageName'] = text
+				project.pythonPackageName = text
 
 			def onCancel(self, textEntry, originalText):
 				pythonPackageCell.setLiteralValue( pythonPackageNameLabel )
@@ -295,7 +254,8 @@ class ProjectView (GSymViewObjectNodeDispatch):
 				return event.getButton() == 1
 
 			def buttonClicked(self, element, event):
-				n = pythonPackageName   if pythonPackageName is not None   else 'Untitled'
+				n = project.pythonPackageName
+				n = n   if n is not None   else 'Untitled'
 				textEntry = TextEntry( n, _PythonPackageNameListener(), _pythonPackageNameRegex, 'Please enter a valid dotted identifier' )
 				textEntry.grabCaretOnRealise()
 				pythonPackageCell.setLiteralValue( textEntry )
@@ -304,19 +264,15 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 		# Project index
 		def _addPackage(menuItem):
-			contents.append( Schema.Package( name='NewPackage', contents=[] ) )
+			project.append( ProjectPackage( 'NewPackage' ) )
 
-		def _addPage(pageUnit):
-			p = Schema.Page( name='NewPage', unit=pageUnit )
-			contents.append( p )
-
-		def _importPage(name, pageUnit):
-			contents.append( Schema.Page( name=name, unit=pageUnit ) )
+		def _addPage(page):
+			project.append( page )
 
 		def _projectIndexContextMenuFactory(element, menu):
 			menu.add( MenuItem.menuItemWithLabel( 'New package', _addPackage ) )
-			newPageMenu = _newPageMenu( world, _addPage )
-			importPageMenu = _importPageMenu( world, element.getRootElement().getComponent(), _importPage )
+			newPageMenu = PageData.newPageMenu( _addPage )
+			importPageMenu = PageData.importPageMenu( element.getRootElement().getComponent(), _addPage )
 			menu.add( MenuItem.menuItemWithLabel( 'New page', newPageMenu, MenuItem.SubmenuPopupDirection.RIGHT ) )
 			menu.add( MenuItem.menuItemWithLabel( 'Import page', importPageMenu, MenuItem.SubmenuPopupDirection.RIGHT ) )
 			return True
@@ -330,17 +286,15 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		world = subjectContext['world']
 
 
-		name = document.getDocumentName()
-
-		# Set location attribute of state
-		state = state.withAttrs( location=location )
+		# Set location attribute of inheritedState
+		inheritedState = inheritedState.withAttrs( location=location )
 
 		# Link to home page, in link header bar
 		homeLink = Hyperlink( 'HOME PAGE', Location( '' ) )
 		linkHeader = LinkHeaderBar( [ homeLink ] )
 
 		# Title
-		title = TitleBarWithSubtitle( 'DOCUMENT', name )
+		title = TitleBarWithSubtitle( 'DOCUMENT', document.getDocumentName() )
 
 
 		# Controls for 'save' and 'save as'
@@ -353,15 +307,14 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 		# Python package name
 		pythonPackageNamePrompt = Label( 'Root Python package name: ' )
-		if pythonPackageName is None:
+		if project.pythonPackageName is None:
 			pythonPackageNameLabel = _itemHoverHighlightStyle.applyTo( _pythonPackageNameNotSetStyle.applyTo( Label( '<not set>' ) ) )
-		else:
-			pythonPackageNameLabel = _itemHoverHighlightStyle.applyTo( _pythonPackageNameStyle.applyTo( Label( pythonPackageName ) ) )
-		pythonPackageNameLabel = pythonPackageNameLabel.withElementInteractor( _PythonPackageNameInteractor() )
-		if pythonPackageName is None:
+			pythonPackageNameLabel = pythonPackageNameLabel.withElementInteractor( _PythonPackageNameInteractor() )
 			comment = _pythonPackageNameNotSetCommentStyle.applyTo( Label( '(pages will not be importable until this is set)' ) )
 			pythonPackageNameLabelBox = Row( [ pythonPackageNameLabel, Spacer( 25.0, 0.0 ), comment ] )
 		else:
+			pythonPackageNameLabel = _itemHoverHighlightStyle.applyTo( _pythonPackageNameStyle.applyTo( Label( project.pythonPackageName ) ) )
+			pythonPackageNameLabel = pythonPackageNameLabel.withElementInteractor( _PythonPackageNameInteractor() )
 			pythonPackageNameLabelBox = Row( [ pythonPackageNameLabel ] )
 		pythonPackageCell = LiteralCell( pythonPackageNameLabelBox )
 		pythonPackageNameBox = Row( [ pythonPackageNamePrompt, pythonPackageCell.defaultPerspectiveValuePresInFragment() ] )
@@ -369,7 +322,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		
 		# Clear imported modules
 		def _onUnloadImportedModules(button, event):
-			ModuleFinder.unloadImportedModules( world, node )
+			ModuleFinder.unloadImportedModules( world, project )
 		unloadImportedModulesPrompt = Label( 'Unload imported modules: ' )
 		unloadImportedModulesButton = Button.buttonWithLabel( 'Unload', _onUnloadImportedModules )
 		unloadImportedModules = Row( [ unloadImportedModulesPrompt, unloadImportedModulesButton ] )
@@ -380,7 +333,7 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 
 		# Project contents
-		items = InnerFragment.map( contents, state )
+		items = InnerFragment.map( project[:], inheritedState )
 
 		nameElement = _projectIndexNameStyle.applyTo( StaticText( 'Project' ) )
 		nameBox = _itemHoverHighlightStyle.applyTo( nameElement.alignVCentre() )
@@ -403,38 +356,34 @@ class ProjectView (GSymViewObjectNodeDispatch):
 		return StyleSheet.instance.withAttr( Primitive.editable, False ).applyTo( Page( [ head, body ] ) )
 
 
-	@DMObjectNodeDispatchMethod( Schema.Package )
-	def Package(self, fragment, state, node, name, contents):
+	@ObjectDispatchMethod( ProjectPackage )
+	def Package(self, fragment, inheritedState, package):
 		def _addPackage(menuItem):
-			contents.append( Schema.Package( name='NewPackage', contents=[] ) )
+			package.append( ProjectPackage( 'NewPackage' ) )
 
 		class _RenameListener (TextEntry.TextEntryListener):
 			def onAccept(self, textEntry, text):
-				node['name'] = text
+				package.name = text
 
 			def onCancel(self, textEntry, originalText):
 				nameCell.setLiteralValue( nameBox )
 
 		def _onRename(menuItem):
-			textEntry = TextEntry( name, _RenameListener(), _nameRegex, 'Please enter a valid identifier' )
+			textEntry = TextEntry( package.name, _RenameListener(), _nameRegex, 'Please enter a valid identifier' )
 			textEntry.grabCaretOnRealise()
 			nameCell.setLiteralValue( textEntry )
 		
 		def _onDelete(menuItem):
-			for parent in node.getValidParents():
-				parent.remove( node )
+			if package.parent is not None:
+				package.parent.remove( package )
 
-		def _addPage(pageUnit):
-			p = Schema.Page( name='NewPage', unit=pageUnit )
-			contents.append( p )
-
-		def _importPage(name, pageUnit):
-			contents.append( Schema.Page( name=name, unit=pageUnit ) )
+		def _addPage(page):
+			package.append( page )
 
 		def _packageContextMenuFactory(element, menu):
 			menu.add( MenuItem.menuItemWithLabel( 'New package', _addPackage ) )
-			newPageMenu = _newPageMenu( world, _addPage )
-			importPageMenu = _importPageMenu( world, element.getRootElement().getComponent(), _importPage )
+			newPageMenu = PageData.newPageMenu( _addPage )
+			importPageMenu = PageData.importPageMenu( element.getRootElement().getComponent(), _addPage )
 			menu.add( MenuItem.menuItemWithLabel( 'New page', newPageMenu, MenuItem.SubmenuPopupDirection.RIGHT ) )
 			menu.add( MenuItem.menuItemWithLabel( 'Import page', importPageMenu, MenuItem.SubmenuPopupDirection.RIGHT ) )
 			menu.add( HSeparator() )
@@ -443,15 +392,15 @@ class ProjectView (GSymViewObjectNodeDispatch):
 			menu.add( MenuItem.menuItemWithLabel( 'Delete', _onDelete ) )
 			return True
 
-		location = state['location']
-		packageLocation = _joinLocation( location, name )
+		location = inheritedState['location']
+		packageLocation = _joinLocation( location, package.name )
 
-		items = InnerFragment.map( contents, state.withAttrs( location=packageLocation ) )
+		items = InnerFragment.map( package[:], inheritedState.withAttrs( location=packageLocation ) )
 
 		world = fragment.getSubjectContext()['world']
 
 		icon = Image( 'GSymCore/Project/icons/Package.png' )
-		nameElement = _packageNameStyle.applyTo( StaticText( name ) )
+		nameElement = _packageNameStyle.applyTo( StaticText( package.name ) )
 		nameBox = _itemHoverHighlightStyle.applyTo( Row( [ icon.padX( 5.0 ).alignVCentre(), nameElement.alignVCentre() ]  ) )
 		nameBox = nameBox.withContextMenuInteractor( _packageContextMenuFactory )
 		nameBox = nameBox.withDragSource( _dragSource )
@@ -465,23 +414,23 @@ class ProjectView (GSymViewObjectNodeDispatch):
 
 
 
-	@DMObjectNodeDispatchMethod( Schema.Page )
-	def Page(self, fragment, state, node, name, unit):
+	@ObjectDispatchMethod( ProjectPage )
+	def Page(self, fragment, inheritedState, page):
 		class _RenameListener (TextEntry.TextEntryListener):
 			def onAccept(self, textEntry, text):
-				node['name'] = text
+				page.name = text
 
 			def onCancel(self, textEntry, originalText):
 				nameCell.setLiteralValue( nameBox )
 
 		def _onRename(menuItem):
-			textEntry = TextEntry( name, _RenameListener(), _nameRegex, 'Please enter a valid identifier' )
+			textEntry = TextEntry( page.name, _RenameListener(), _nameRegex, 'Please enter a valid identifier' )
 			textEntry.grabCaretOnRealise()
 			nameCell.setLiteralValue( textEntry )
 
 		def _onDelete(menuItem):
-			for parent in node.getValidParents():
-				parent.remove( node )
+			if page.parent is not None:
+				page.parent.remove( page )
 
 		def _pageContextMenuFactory(element, menu):
 			menu.add( MenuItem.menuItemWithLabel( 'Rename', _onRename ) )
@@ -490,10 +439,10 @@ class ProjectView (GSymViewObjectNodeDispatch):
 			return True
 
 
-		location = state['location']
-		pageLocation = _joinLocation( location, name )
+		location = inheritedState['location']
+		pageLocation = _joinLocation( location, page.name )
 
-		link = Hyperlink( name, pageLocation )
+		link = Hyperlink( page.name, pageLocation )
 		link = link.withContextMenuInteractor( _pageContextMenuFactory )
 		nameBox = _itemHoverHighlightStyle.applyTo( Row( [ link ] ) )
 		nameBox = nameBox.withDragSource( _dragSource )

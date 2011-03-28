@@ -10,6 +10,5 @@ from GSymCore.Project import Project
 
 
 def initPlugin(plugin, world):
-	world.registerUnitClass( plugin, Project.unitClass )
 	world.registerNewDocumentFactory( plugin, Project.newDocumentFactory )
 

@@ -8,7 +8,8 @@
 import sys
 import imp
 
-from GSymCore.Project import Schema
+from GSymCore.Project.ProjectPackage import ProjectPackage
+from GSymCore.Project.ProjectPage import ProjectPage
 
 
 class _PackageLoader (object):
@@ -25,20 +26,20 @@ class _PackageLoader (object):
 
 	def load_module(self, fullname):
 		# First, see if there is an '__init__; page
-		for model in self._package['contents']:
-			if model['name'] == '__init__':
-				if model.isInstanceOf( Schema.Page ):
-					# We have found a page called '__init__' - get its subject
-					modelLocation = self._packageLocation + '.__init__'
-					pageSubject = self._projectSubject._document.newModelSubject( model['unit'], self._projectSubject, modelLocation, '__init__' )
-					# Now, check if it has a 'createModuleLoader' method - if it has, then we can use it. Otherwise, use the default
-					try:
-						createModuleLoader = pageSubject.createModuleLoader
-					except AttributeError:
-						return self._default_load_module( fullname )
-					else:
-						loader = createModuleLoader( self._world )
-						return loader.load_module( fullname )
+		initPage = self._package.contentsMap.get( '__init__' )
+		
+		if initPage is not None and initPage.isInstanceOf( Schema.Page ):
+			# We have found a page called '__init__' - get its subject
+			modelLocation = self._packageLocation + '.__init__'
+			pageSubject = self._projectSubject._document.newModelSubject( initPage.data, self._projectSubject, modelLocation, '__init__' )
+			# Now, check if it has a 'createModuleLoader' method - if it has, then we can use it. Otherwise, use the default
+			try:
+				createModuleLoader = pageSubject.createModuleLoader
+			except AttributeError:
+				return self._default_load_module( fullname )
+			else:
+				loader = createModuleLoader( self._world )
+				return loader.load_module( fullname )
 		
 		return self._default_load_module( fullname )
 
@@ -60,44 +61,46 @@ class ModuleFinder (object):
 		suffix = namesuffix
 		model = self._projectSubject._model
 		modelLocation = self._projectSubject._location
+		
 		while suffix != '':
 			prefix, dot, suffix = suffix.partition( '.' )
 			bFoundItem = False
-			for item in model['contents']:
-				if prefix == item['name']:
-					bFoundItem = True
-					modelLocation = modelLocation + '.' + prefix
-					model = item
+			
+			item = model.contentsMap.get( prefix )
 
-					if model.isInstanceOf( Schema.Page ):
-						if suffix == '':
-							# We have found a page: get its subject
-							pageSubject = self._projectSubject._document.newModelSubject( model['unit'], self._projectSubject, modelLocation, prefix )
-							# Now, check if it has a 'createModuleLoader' method - if it has, then we can use it. Otherwise, we can't
-							try:
-								createModuleLoader = pageSubject.createModuleLoader
-							except AttributeError:
-								return None
-							else:
-								# The subject has a 'createModuleLoader' attribute - invoke it to create the module loader, for the module import system to use
-								return createModuleLoader( world )
-						else:
-							# Still path to consume; cannot go further
+			if item is not None:
+				modelLocation = modelLocation + '.' + prefix
+				model = item
+
+				if isinstance( model, ProjectPage ):
+					if suffix == '':
+						# We have found a page: get its subject
+						pageSubject = self._projectSubject._document.newModelSubject( model.data, self._projectSubject, modelLocation, prefix )
+						# Now, check if it has a 'createModuleLoader' method - if it has, then we can use it. Otherwise, we can't
+						try:
+							createModuleLoader = pageSubject.createModuleLoader
+						except AttributeError:
 							return None
-					elif model.isInstanceOf( Schema.Package ):
-						if suffix == '':
-							# The import statement is attempting to import this package
-							return _PackageLoader( self._projectSubject, modelLocation, model, world )
 						else:
-							# Still path to consume; exit the name search for-loop, into the traversal while-loop
-							break
+							# The subject has a 'createModuleLoader' attribute - invoke it to create the module loader, for the module import system to use
+							return createModuleLoader( world )
 					else:
-						raise TypeError, 'unreckognised model type'
-			if not bFoundItem:
+						# Still path to consume; cannot go further
+						return None
+				elif isinstance( model, ProjectPackage ):
+					if suffix == '':
+						# The import statement is attempting to import this package
+						return _PackageLoader( self._projectSubject, modelLocation, model, world )
+					else:
+						# Still path to consume; exit into the traversal while-loop
+						continue
+				else:
+					raise TypeError, 'unreckognised model type'
+			else:
 				return None
 
 		# Ran out of name to comsume, ERROR
-		raise ValueError, 'Name consumed, target not found'
+		raise ValueError, 'Name \'%s\' consumed, target not found' % namesuffix
 
 
 	
@@ -123,7 +126,7 @@ class RootFinder (object):
 		self._projectSubject = projectSubject
 
 	def find_module(self, fullname, path, world):
-		pythonPackageName = self._projectSubject._model['pythonPackageName']
+		pythonPackageName = self._projectSubject._model.pythonPackageName
 		if pythonPackageName is not None:
 			pythonPackageName = pythonPackageName.split( '.' )
 			suffix = fullname
@@ -144,24 +147,27 @@ class RootFinder (object):
 
 def _getImportedModulesToUnloadFromPackage(world, package, fullname):
 	modules = []
-	for item in package['contents']:
-		name = item['name']
+	for item in package:
+		name = item.name
 		itemFullname = fullname + '.' + name
-		if item.isInstanceOf( Schema.Package ):
+		if isinstance( item, ProjectPackage ):
 			modules.append( itemFullname )
 			modules.extend( _getImportedModulesToUnloadFromPackage( world, item, itemFullname ) )
-		elif item.isInstanceOf( Schema.Page ):
+		elif isinstance( item, ProjectPage ):
 			modules.append( itemFullname )
 		else:
 			raise TypeError, 'unknown project item type'
 	return modules
 
 def unloadImportedModules(world, project):
-	fullname = project['pythonPackageName']
-	modules = [ fullname ]
-	modules.extend( _getImportedModulesToUnloadFromPackage( world, project, project['pythonPackageName'] ) )
-	print 'GSymCore.Project.ProjectEditor.ModuleFinder.unloadImportedModules: removing:'
-	for module in modules:
-		print '\t' + module
-	return world.unloadImportedModules( modules )
+	fullname = project.pythonPackageName
+	if fullname is not None:
+		modules = [ fullname ]
+		modules.extend( _getImportedModulesToUnloadFromPackage( world, project, project.pythonPackageName ) )
+		print 'GSymCore.Project.ProjectEditor.ModuleFinder.unloadImportedModules: removing:'
+		for module in modules:
+			print '\t' + module
+		return world.unloadImportedModules( modules )
+	else:
+		return []
 
