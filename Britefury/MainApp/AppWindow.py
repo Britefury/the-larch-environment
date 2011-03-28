@@ -40,7 +40,6 @@ from Britefury.gSym.gSymWorld import GSymWorld
 from Britefury.gSym.gSymDocument import GSymDocument
 
 from GSymCore.GSymApp import GSymApp
-from GSymCore.Project import Project
 
 
 

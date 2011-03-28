@@ -11,8 +11,5 @@ from GSymCore.Languages.Python25 import Python25
 
 
 def initPlugin(plugin, world):
-	world.registerUnitClass( plugin, Python25.unitClass )
-	plugin.pageUnitFactories = [ Python25.pageUnitFactory ]
-	plugin.pageUnitImporters = [ Python25.pageUnitImporter ]
 	world.configuration.registerConfigurationPage( Python25ConfigurationPage() )
 

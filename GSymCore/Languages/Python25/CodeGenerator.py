@@ -8,8 +8,7 @@
 from BritefuryJ.DocModel import DMObject, DMList
 from BritefuryJ.DocModel.Resource import DMPyResource
 
-from Britefury.gSym.gSymCodeGenerator import GSymCodeGeneratorObjectNodeDispatch
-from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod
+from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod, dmObjectNodeMethodDispatch
 
 from GSymCore.Languages.Python25 import Schema
 from GSymCore.Languages.Python25 import ExternalExpression
@@ -44,7 +43,7 @@ class Python25CodeGeneratorSyntaxError (Python25CodeGeneratorError):
 
 
 
-class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
+class Python25CodeGenerator (object):
 	__dispatch_num_args__ = 0
 	
 	
@@ -53,6 +52,10 @@ class Python25CodeGenerator (GSymCodeGeneratorObjectNodeDispatch):
 		self._bErrorChecking = bErrorChecking
 			
 		
+	# Callable - use document model node method dispatch mechanism
+	def __call__(self, xs):
+		return dmObjectNodeMethodDispatch( self, xs )
+
 	
 	
 	# Misc
@@ -843,7 +846,7 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 			modelFn = value.__py_model__
 		except AttributeError:
 			# Use the object itself as the value
-			return self._resource( resource.getValue() )
+			return self._resource( value )
 		else:
 			# Got a 'model' function - invoke to create AST nodes, then convert them to code
 			model = modelFn()
@@ -857,6 +860,7 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 	@DMObjectNodeDispatchMethod( Schema.InlineObjectStmt )
 	def InlineObjectStmt(self, node, resource):
 		value = resource.getValue()
+		print value
 		
 		try:
 			modelFn = value.__py_model__
@@ -866,7 +870,7 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 				attrValuesFn = value.__py_attrvalues__
 			except AttributeError:
 				# Get the object as a value
-				return self._resource( resource.getValue() )
+				return self._resource( value )
 			else:
 				# Get the attribute name list
 				names = attrNamesFn()
@@ -884,7 +888,7 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 		
 	def _resource(self, resourceValue):
 		index = len( self._resourceMap )
-		self._resourceMap.append( resource.getValue() )
+		self._resourceMap.append( resourceValue )
 		return _runtime_resourceMap_Name + '[%d]'  %  ( index, )
 		
 		

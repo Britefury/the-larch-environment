@@ -10,7 +10,7 @@ from Britefury.Util.TrackedList import TrackedListProperty
 from BritefuryJ.CommandHistory import Trackable
 from BritefuryJ.Cell import Cell
 
-from GSymCore.Project2.ProjectNode import ProjectNode
+from GSymCore.Project.ProjectNode import ProjectNode
 
 
 

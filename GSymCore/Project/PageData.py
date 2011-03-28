@@ -18,7 +18,7 @@ from BritefuryJ.CommandHistory import Trackable
 
 from Britefury.Kernel.Abstract import abstractmethod
 
-from GSymCore.Project2.ProjectPage import ProjectPage
+from GSymCore.Project.ProjectPage import ProjectPage
 
 
 

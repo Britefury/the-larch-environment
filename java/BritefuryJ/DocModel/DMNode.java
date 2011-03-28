@@ -6,12 +6,6 @@
 //##************************
 package BritefuryJ.DocModel;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -301,37 +295,16 @@ public abstract class DMNode implements Cloneable
 	public PyObject __getstate__()
 	{
 		DMPickleHelper.initialise();
-		if ( useDMSerialisationForPickling )
+		String str;
+		try
 		{
-			String str;
-			try
-			{
-				str = DMIOWriter.writeAsString( this );
-			}
-			catch (InvalidDataTypeException e)
-			{
-				throw new RuntimeException( "InvalidDataTypeException while creating serialised form: " + e.getMessage() );
-			}
-			return new PyString( str );
+			str = DMIOWriter.writeAsString( this );
 		}
-		else
+		catch (InvalidDataTypeException e)
 		{
-			try
-			{
-				ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-				ObjectOutputStream objOut = new ObjectOutputStream( outStream );
-				objOut.writeObject( this );
-				return new PyString( new String( outStream.toByteArray(), "ISO-8859-1" ) );
-			}
-			catch (UnsupportedEncodingException e)
-			{
-				throw new RuntimeException( "UnsupportedEncodingException while creating serialised form: " + e.getMessage() );
-			}
-			catch (IOException e)
-			{
-				throw new RuntimeException( "IOException while creating serialised form: " + e.getMessage() );
-			}
+			throw new RuntimeException( "InvalidDataTypeException while creating serialised form: " + e.getMessage() );
 		}
+		return new PyString( str );
 	}
 	
 	public void __setstate__(PyObject state)
@@ -339,48 +312,21 @@ public abstract class DMNode implements Cloneable
 		DMPickleHelper.initialise();
 		if ( state instanceof PyString )
 		{
-			if ( useDMSerialisationForPickling )
+			String serialised = state.asString();
+			DMNode node;
+			try
 			{
-				String serialised = state.asString();
-				DMNode node;
-				try
-				{
-					node = (DMNode)DMIOReader.readFromString( serialised );
-				}
-				catch (BadModuleNameException e)
-				{
-					throw new RuntimeException( "BadModuleNameException while creating serialised form: " + e.getMessage() );
-				}
-				catch (ParseErrorException e)
-				{
-					throw new RuntimeException( "ParseErrorException while creating serialised form: " + e.getMessage() );
-				}
-				become( node );
+				node = (DMNode)DMIOReader.readFromString( serialised );
 			}
-			else
+			catch (BadModuleNameException e)
 			{
-				try
-				{
-					String serialised = state.asString();
-					byte bytes[] = serialised.getBytes( "ISO-8859-1" );
-					ByteArrayInputStream inStream = new ByteArrayInputStream( bytes );
-					ObjectInputStream objIn = new ObjectInputStream( inStream );
-					DMNode node = (DMNode)objIn.readObject();
-					become( node );
-				}
-				catch (UnsupportedEncodingException e)
-				{
-					throw new RuntimeException( "Cannot get UTF-8 encoding: " + e.getMessage() );
-				}
-				catch (IOException e)
-				{
-					throw new RuntimeException( "IOException while reading from serialised form: " + e.getMessage() );
-				}
-				catch (ClassNotFoundException e)
-				{
-					throw new RuntimeException( "Cannot read object; class not found: " + e.getMessage() );
-				}
+				throw new RuntimeException( "BadModuleNameException while creating serialised form: " + e.getMessage() );
 			}
+			catch (ParseErrorException e)
+			{
+				throw new RuntimeException( "ParseErrorException while creating serialised form: " + e.getMessage() );
+			}
+			become( node );
 		}
 		else
 		{
@@ -570,7 +516,4 @@ public abstract class DMNode implements Cloneable
 			return javaResource( x );
 		}
 	}
-	
-	
-	public static boolean useDMSerialisationForPickling = false;
 }

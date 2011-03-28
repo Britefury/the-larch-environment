@@ -8,8 +8,8 @@
 from BritefuryJ.CommandHistory import Trackable
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
-from GSymCore.Project2.ProjectContainer import ProjectContainer
-from GSymCore.Project2 import ProjectEditor
+from GSymCore.Project.ProjectContainer import ProjectContainer
+from GSymCore.Project import ProjectEditor
 
 
 

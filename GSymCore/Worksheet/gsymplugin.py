@@ -10,6 +10,5 @@ from GSymCore.Worksheet import Worksheet
 
 
 def initPlugin(plugin, world):
-	world.registerUnitClass( plugin, Worksheet.unitClass )
-	plugin.pageUnitFactories = [ Worksheet.pageUnitFactory ]
+	pass
 	

@@ -8,25 +8,27 @@
 from BritefuryJ.CommandHistory import Trackable
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
-from GSymCore.Project2.ProjectContainer import ProjectContainer
+from GSymCore.Project.ProjectNode import ProjectNode
 
 
 
-
-class ProjectPackage (ProjectContainer):
-	def __init__(self, name=''):
-		super( ProjectPackage, self ).__init__()
+class ProjectPage (ProjectNode):
+	def __init__(self, name='', data=None):
+		super( ProjectPage, self ).__init__()
 		self._name = name
-		
-
+		self._data = data
+	
+	
 	def __getstate__(self):
-		state = super( ProjectPackage, self ).__getstate__()
+		state = super( ProjectPage, self ).__getstate__()
 		state['name'] = self._name
+		state['data'] = self._data
 		return state
 	
 	def __setstate__(self, state):
-		super( ProjectPackage, self ).__setstate__( state )
+		super( ProjectPage, self ).__setstate__( state )
 		self._name = state['name']
+		self._data = state['data']
 	
 	
 	def getName(self):
@@ -38,7 +40,14 @@ class ProjectPackage (ProjectContainer):
 		self._name = name
 		self._incr.onChanged()
 		if self._commandHistory is not None:
-			self._commandHistory.addCommand( lambda: self.setName( name ), lambda: self.setName( oldName ), 'Package set name' )
+			self._commandHistory.addCommand( lambda: self.setName( name ), lambda: self.setName( oldName ), 'Page set name' )
+		
+		
+	def getData(self):
+		self._incr.onAccess()
+		return self._data
+	
 	
 	
 	name = property( getName, setName )
+	data = property( getData )
