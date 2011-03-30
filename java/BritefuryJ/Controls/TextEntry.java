@@ -25,6 +25,7 @@ import BritefuryJ.DocPresent.Interactor.KeyElementInteractor;
 import BritefuryJ.DocPresent.Interactor.RealiseElementInteractor;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
+import BritefuryJ.DocPresent.Selection.TextSelection;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
@@ -195,7 +196,7 @@ public class TextEntry extends ControlPres
 		private class TextEntryClipboardHandler extends TextClipboardHandler
 		{
 			@Override
-			protected void deleteText(Selection selection, Caret caret)
+			protected void deleteText(TextSelection selection, Caret caret)
 			{
 				textElement.removeText( selection.getStartMarker(), selection.getEndMarker() );
 			}
@@ -207,13 +208,13 @@ public class TextEntry extends ControlPres
 			}
 			
 			@Override
-			protected void replaceText(Selection selection, Caret caret, String replacement)
+			protected void replaceText(TextSelection selection, Caret caret, String replacement)
 			{
 				textElement.replaceText( selection.getStartMarker(), selection.getEndMarker(), replacement );
 			}
 			
 			@Override
-			protected String getText(Selection selection)
+			protected String getText(TextSelection selection)
 			{
 				return textElement.getTextRepresentationBetweenMarkers( selection.getStartMarker(), selection.getEndMarker() );
 			}
@@ -301,7 +302,11 @@ public class TextEntry extends ControlPres
 			if ( root != null )
 			{
 				Selection selection = root.getSelection();
-				selection.setSelection( textElement.markerAtStart(), textElement.markerAtEnd() );
+				if ( selection instanceof TextSelection )
+				{
+					TextSelection ts = (TextSelection)selection;
+					ts.setSelection( textElement.markerAtStart(), textElement.markerAtEnd() );
+				}
 			}
 			else
 			{

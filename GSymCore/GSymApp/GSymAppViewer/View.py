@@ -126,10 +126,6 @@ class AppView (GSymViewObjectDispatch):
 			
 		def _onOpenDoc(link, event):
 			def handleOpenedDocumentFn(fullPath, document):
-				head, documentName = os.path.split( fullPath )
-				documentName, ext = os.path.splitext( documentName )
-				
-				document.setDocumentName( documentName )
 				appDoc = node.registerOpenDocument( document, fragment.getSubjectContext()['location'].getLocationString() + '.documents' )
 
 				

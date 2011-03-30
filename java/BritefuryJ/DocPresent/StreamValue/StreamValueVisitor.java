@@ -17,7 +17,7 @@ import BritefuryJ.DocPresent.DPContentLeafEditable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementValueFunction;
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.Selection.Selection;
+import BritefuryJ.DocPresent.Selection.TextSelection;
 
 public class StreamValueVisitor
 {
@@ -356,41 +356,34 @@ public class StreamValueVisitor
 		return builder.stream();
 	}
 	
-	public StreamValue getStreamValueInSelection(Selection s)
+	public StreamValue getStreamValueInTextSelection(TextSelection s)
 	{
-		if ( s.isEmpty() )
+		DPContainer commonRoot = s.getCommonRootContainer();
+		
+		if ( commonRoot != null )
 		{
-			return null;
+			ArrayList<DPElement> startPath = s.getStartPathFromCommonRoot();
+			ArrayList<DPElement> endPath = s.getEndPathFromCommonRoot();
+
+			StreamValueBuilder builder = new StreamValueBuilder();
+
+			buildStreamValueBetweenPaths( builder, commonRoot, s.getStartMarker(), startPath, s.getEndMarker(), endPath );
+		
+			return builder.stream();
 		}
 		else
 		{
-			DPContainer commonRoot = s.getCommonRootContainer();
-			
-			if ( commonRoot != null )
+			Marker startMarker = s.getStartMarker();
+			Marker endMarker = s.getEndMarker();
+			DPContentLeafEditable leaf = startMarker.getElement();
+			if ( endMarker.getElement() != leaf )
 			{
-				ArrayList<DPElement> startPath = s.getStartPathFromCommonRoot();
-				ArrayList<DPElement> endPath = s.getEndPathFromCommonRoot();
-
-				StreamValueBuilder builder = new StreamValueBuilder();
-
-				buildStreamValueBetweenPaths( builder, commonRoot, s.getStartMarker(), startPath, s.getEndMarker(), endPath );
+				throw new RuntimeException( "No common root, but leaf elements do not match" );
+			}
 			
-				return builder.stream();
-			}
-			else
-			{
-				Marker startMarker = s.getStartMarker();
-				Marker endMarker = s.getEndMarker();
-				DPContentLeafEditable leaf = startMarker.getElement();
-				if ( endMarker.getElement() != leaf )
-				{
-					throw new RuntimeException( "No common root, but leaf elements do not match" );
-				}
-				
-				StreamValueBuilder builder = new StreamValueBuilder();
-				builder.appendTextValue( leaf.getTextRepresentation().substring( startMarker.getClampedIndex(), endMarker.getClampedIndex() ) );
-				return builder.stream();
-			}
+			StreamValueBuilder builder = new StreamValueBuilder();
+			builder.appendTextValue( leaf.getTextRepresentation().substring( startMarker.getClampedIndex(), endMarker.getClampedIndex() ) );
+			return builder.stream();
 		}
 	}
 	

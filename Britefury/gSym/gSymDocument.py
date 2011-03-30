@@ -98,7 +98,7 @@ class GSymDocument (CommandHistoryListener):
 	
 	
 	def saveAs(self, filename):
-		self._filename = filename
+		self._setFilename( filename )
 		self.save()
 		
 		
@@ -112,6 +112,13 @@ class GSymDocument (CommandHistoryListener):
 				self._unsavedDataListener( self )
 		self._saveTime = datetime.now()
 
+		
+		
+	def _setFilename(self, filename):
+		self._filename = filename
+		head, documentName = os.path.split( filename )
+		documentName, ext = os.path.splitext( documentName )
+		self._docName = documentName
 	
 
 	@staticmethod
@@ -123,7 +130,7 @@ class GSymDocument (CommandHistoryListener):
 				f.close()
 
 				document = GSymDocument( world, documentRoot )
-				document._filename = filename
+				document._setFilename( filename )
 				document._saveTime = datetime.now()
 				return document
 			except IOError:

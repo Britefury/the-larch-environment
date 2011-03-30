@@ -15,31 +15,34 @@ import java.io.IOException;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
+import BritefuryJ.DocPresent.Selection.TextSelection;
 
 public abstract class TextClipboardHandler extends ClipboardHandler
 {
-	protected abstract void deleteText(Selection selection, Caret caret);
+	protected abstract void deleteText(TextSelection selection, Caret caret);
 	protected abstract void insertText(Marker marker, String text);
-	protected abstract void replaceText(Selection selection, Caret caret, String replacement);
-	protected abstract String getText(Selection selection);
+	protected abstract void replaceText(TextSelection selection, Caret caret, String replacement);
+	protected abstract String getText(TextSelection selection);
 	
 	
 	@Override
 	public void deleteSelection(Selection selection, Caret caret)
 	{
-		if ( !selection.isEmpty() )
+		if ( selection instanceof TextSelection )
 		{
-			deleteText( selection, caret );
+			TextSelection ts = (TextSelection)selection;
+			deleteText( ts, caret );
 		}
 	}
 
 	@Override
 	public void replaceSelectionWithText(Selection selection, Caret caret, String replacement)
 	{
-		if ( !selection.isEmpty() )
+		if ( selection instanceof TextSelection )
 		{
-			replaceText( selection, caret, replacement );
-			selection.clear();
+			TextSelection ts = (TextSelection)selection;
+			replaceText( ts, caret, replacement );
+			ts.clear();
 		}
 		else
 		{
@@ -59,15 +62,13 @@ public abstract class TextClipboardHandler extends ClipboardHandler
 	@Override
 	public Transferable createExportTransferable(Selection selection)
 	{
-		if ( !selection.isEmpty() )
+		if ( selection instanceof TextSelection )
 		{
-			String selectedText = getText( selection );
+			TextSelection ts = (TextSelection)selection;
+			String selectedText = getText( ts );
 			return new StringSelection( selectedText );
 		}
-		else
-		{
-			return null;
-		}
+		return null;
 	}
 
 	@Override
@@ -75,10 +76,11 @@ public abstract class TextClipboardHandler extends ClipboardHandler
 	{
 		if ( action == MOVE )
 		{
-			if ( !selection.isEmpty() )
+			if ( selection instanceof TextSelection )
 			{
-				deleteText( selection, caret );
-				selection.clear();
+				TextSelection ts = (TextSelection)selection;
+				deleteText( ts, caret );
+				ts.clear();
 			}
 		}
 	}
@@ -93,16 +95,22 @@ public abstract class TextClipboardHandler extends ClipboardHandler
 	@Override
 	public boolean importData(Caret caret, Selection selection, DataTransfer dataTransfer)
 	{
+		TextSelection ts = null;
+		if ( selection instanceof TextSelection )
+		{
+			ts = (TextSelection)selection;
+		}
+		
 		if ( canImport( caret, selection, dataTransfer ) )
 		{
 			try
 			{
 				String data = (String)dataTransfer.getTransferData( DataFlavor.stringFlavor );
 				
-				if ( !selection.isEmpty() )
+				if ( ts != null )
 				{
-					replaceText( selection, caret, data );
-					selection.clear();
+					replaceText( ts, caret, data );
+					ts.clear();
 				}
 				else
 				{

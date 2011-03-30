@@ -16,16 +16,16 @@ import BritefuryJ.DocPresent.Input.Modifier;
 import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
 import BritefuryJ.DocPresent.Interactor.KeyElementInteractor;
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.Selection.SelectionManager;
+import BritefuryJ.DocPresent.Selection.TextSelectionManager;
 
 public class KeyboardCaretInteractor extends KeyboardInteractor
 {
 	private Caret caret;
-	private SelectionManager selectionManager;
+	private TextSelectionManager selectionManager;
 	
 	
 	
-	public KeyboardCaretInteractor(Caret caret, SelectionManager selectionManager)
+	public KeyboardCaretInteractor(Caret caret, TextSelectionManager selectionManager)
 	{
 		this.caret = caret;
 		this.selectionManager = selectionManager;

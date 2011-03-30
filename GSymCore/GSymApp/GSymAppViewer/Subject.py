@@ -76,10 +76,6 @@ class GSymAppSubject (Subject):
 	def loadDocument(self, filename):
 		document = GSymDocument.readFile( self._world, filename )
 		if document is not None:
-			head, documentName = os.path.split( filename )
-			documentName, ext = os.path.splitext( documentName )
-			
-			document.setDocumentName( documentName )
 			self._appState.registerOpenDocument( document, self._rootLocation.getLocationString() + '.documents' )
 			return True
 		return False

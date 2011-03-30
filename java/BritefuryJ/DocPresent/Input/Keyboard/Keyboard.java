@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent.Input.Keyboard;
 import java.awt.event.KeyEvent;
 
 import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.DocPresent.Selection.SelectionManager;
+import BritefuryJ.DocPresent.Selection.TextSelectionManager;
 import BritefuryJ.Utils.PriorityList;
 
 public class Keyboard
@@ -22,7 +22,7 @@ public class Keyboard
 
 
 
-	public Keyboard(Caret caret, SelectionManager selectionManager)
+	public Keyboard(Caret caret, TextSelectionManager selectionManager)
 	{
 		interactors.add( CARET_INTERACTOR_PRIORITY, new KeyboardCaretInteractor( caret, selectionManager ) );
 	}

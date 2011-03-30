@@ -9,19 +9,22 @@ package BritefuryJ.DocPresent.Selection;
 import BritefuryJ.DocPresent.DPContentLeafEditable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRegion;
+import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Marker.Marker;
 
-public class SelectionManager
+public class TextSelectionManager
 {
 	private boolean bMouseDragInProgress;
 	private Marker initialMarker = null;
-	private Selection selection;
+	private TextSelection selection;
+	private PresentationComponent.RootElement rootElement;
 	
 	
-	public SelectionManager(Selection selection)
+	public TextSelectionManager(TextSelection selection, PresentationComponent.RootElement rootElement)
 	{
 		this.selection = selection;
+		this.rootElement = rootElement;
 	}
 	
 	
@@ -32,12 +35,12 @@ public class SelectionManager
 		{
 			if ( !bDragSelection )
 			{
-				selection.clear();
+				clearTextSelection();
 				initialMarker = null;
 			}
 			else
 			{
-				if ( selection.isEmpty() )
+				if ( !rootElement.isSelectionATextSelection() )
 				{
 					initialMarker = prevPos.copy();
 				}
@@ -55,7 +58,7 @@ public class SelectionManager
 	
 	public void mouseSelectionBegin(Marker pos)
 	{
-		selection.clear();
+		clearTextSelection();
 		bMouseDragInProgress = true;
 		initialMarker = pos.copy();
 	}
@@ -112,21 +115,41 @@ public class SelectionManager
 					if ( markerBInSameRegion != null )
 					{
 						selection.setSelection( markerA, markerBInSameRegion );
+						selectTextSelection();
 					}
 				}
 				else
 				{
 					selection.setSelection( markerA, markerB );
+					selectTextSelection();
 				}
 			}
 			else
 			{
-				selection.clear();
+				clearSelection();
 			}
 		}
 		else
 		{
-			selection.clear();
+			clearSelection();
+		}
+	}
+	
+	void selectTextSelection()
+	{
+		rootElement.setSelection( selection );
+	}
+	
+	void clearSelection()
+	{
+		rootElement.setSelection( null );
+	}
+	
+	void clearTextSelection()
+	{
+		if ( rootElement.getSelection() == selection )
+		{
+			rootElement.setSelection( null );
 		}
 	}
 	
