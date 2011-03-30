@@ -26,7 +26,7 @@ import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Clipboard.TextClipboardHandler;
 import BritefuryJ.DocPresent.Interactor.KeyElementInteractor;
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.Selection.Selection;
+import BritefuryJ.DocPresent.Selection.TextSelection;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
@@ -187,7 +187,7 @@ public class TextArea extends ControlPres
 		private class TextAreaClipboardHandler extends TextClipboardHandler
 		{
 			@Override
-			protected void deleteText(Selection selection, Caret caret)
+			protected void deleteText(TextSelection selection, Caret caret)
 			{
 				int startPosition = selection.getStartMarker().getClampedIndexInSubtree( textBox );
 				int endPosition = selection.getEndMarker().getClampedIndexInSubtree( textBox );
@@ -211,7 +211,7 @@ public class TextArea extends ControlPres
 			}
 			
 			@Override
-			protected void replaceText(Selection selection, Caret caret, String replacement)
+			protected void replaceText(TextSelection selection, Caret caret, String replacement)
 			{
 				int startPosition = selection.getStartMarker().getClampedIndexInSubtree( textBox );
 				int endPosition = selection.getEndMarker().getClampedIndexInSubtree( textBox );
@@ -227,7 +227,7 @@ public class TextArea extends ControlPres
 			}
 			
 			@Override
-			protected String getText(Selection selection)
+			protected String getText(TextSelection selection)
 			{
 				return textBox.getRootElement().getTextRepresentationInSelection( selection );
 			}

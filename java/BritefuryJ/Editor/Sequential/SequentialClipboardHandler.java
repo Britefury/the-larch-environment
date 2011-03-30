@@ -17,6 +17,7 @@ import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
 import BritefuryJ.DocPresent.Clipboard.DataTransfer;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
+import BritefuryJ.DocPresent.Selection.TextSelection;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StreamValue.StreamValueVisitor;
@@ -91,10 +92,11 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	
 	private void replaceSelection(Selection selection, Caret caret, Object replacement)
 	{
-		if ( !selection.isEmpty() )
+		if ( selection instanceof TextSelection )
 		{
-			Marker startMarker = selection.getStartMarker();
-			Marker endMarker = selection.getEndMarker();
+			TextSelection ts = (TextSelection)selection;
+			Marker startMarker = ts.getStartMarker();
+			Marker endMarker = ts.getEndMarker();
 			
 			// Get the edit-level fragments that contain the start and end markers
 			FragmentView startFragment = FragmentView.getEnclosingFragment( startMarker.getElement(), editLevelFragmentFilter );
@@ -147,7 +149,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 					// Take a copy of the end marker
 					Marker end = endMarker.copy();
 					// Clear the selection
-					selection.clear();
+					ts.clear();
 					// Move the caret to the end
 					caret.moveTo( end );
 					// Post a tree event
@@ -170,7 +172,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 				// Take a copy of the end marker
 				Marker end = endMarker.copy();
 				// Clear the selection
-				selection.clear();
+				ts.clear();
 				// Move the caret to the end
 				caret.moveTo( end );
 				// Post a tree event
@@ -233,10 +235,11 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	@Override
 	public Transferable createExportTransferable(Selection selection)
 	{
-		if ( !selection.isEmpty() )
+		if ( selection instanceof TextSelection )
 		{
+			TextSelection ts = (TextSelection)selection;
 			StreamValueVisitor visitor = new StreamValueVisitor();
-			StreamValue stream = visitor.getStreamValueInSelection( selection );
+			StreamValue stream = visitor.getStreamValueInTextSelection( ts );
 			
 			StreamValueBuilder builder = new StreamValueBuilder();
 			for (StreamValue.Item item: stream.getItems())
@@ -335,7 +338,7 @@ public class SequentialClipboardHandler extends ClipboardHandler
 		if ( data != null )
 		{
 			// Paste
-			if ( selection.isEmpty() )
+			if ( !( selection instanceof TextSelection ) )
 			{
 				if ( caret.isValid() )
 				{

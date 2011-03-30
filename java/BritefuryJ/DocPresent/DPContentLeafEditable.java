@@ -637,7 +637,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	protected boolean handleBackspace(Caret caret)
 	{
-		if ( rootElement.isSelectionValid() )
+		if ( rootElement.isSelectionATextSelection() )
 		{
 			rootElement.deleteSelection();
 			return true;
@@ -688,7 +688,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	protected boolean handleDelete(Caret caret)
 	{
-		if ( rootElement.isSelectionValid() )
+		if ( rootElement.isSelectionATextSelection() )
 		{
 			rootElement.deleteSelection();
 			return true;
@@ -762,7 +762,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 			String str = String.valueOf( event.getKeyChar() );
 			if ( str.length() > 0 )
 			{
-				if ( rootElement.isSelectionValid() )
+				if ( rootElement.isSelectionATextSelection() )
 				{
 					rootElement.replaceSelectionWithText( str );
 				}

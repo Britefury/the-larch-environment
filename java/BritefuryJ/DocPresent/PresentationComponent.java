@@ -59,7 +59,8 @@ import BritefuryJ.DocPresent.LayoutTree.LayoutNodeRootElement;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Selection.SelectionListener;
-import BritefuryJ.DocPresent.Selection.SelectionManager;
+import BritefuryJ.DocPresent.Selection.TextSelection;
+import BritefuryJ.DocPresent.Selection.TextSelectionManager;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Logging.LogEntry;
 import BritefuryJ.Math.AABox2;
@@ -408,7 +409,8 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		private DPContentLeafEditable currentCaretLeaf = null;
 		private boolean bLastMousePressPositionedCaret = false;
 		
-		private SelectionManager selectionManager;
+		private TextSelectionManager selectionManager;
+		private TextSelection textSelection;
 		private Selection selection;
 		
 		
@@ -451,9 +453,8 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			caret = new Caret();
 			caret.addCaretListener( this );
 			
-			selection = new Selection();
-			selection.addSelectionListener( this );
-			selectionManager = new SelectionManager( selection );
+			textSelection = new TextSelection( this );
+			selectionManager = new TextSelectionManager( textSelection, this );
 			
 			keyboard = new Keyboard( caret, selectionManager );
 
@@ -540,46 +541,47 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		{
 			return selection;
 		}
-
-
-		public void clearSelection()
+		
+		public void setSelection(Selection s)
 		{
-			selection.clear();
-		}
-		
-		
-		public boolean isSelectionValid()
-		{
-			return !selection.isEmpty();
-		}
-		
-		
-		
-		public String getTextRepresentationInSelection(Selection s)
-		{
-			if ( s.isEmpty() )
+			if ( selection != null ) 
 			{
-				return null;
+				selection.removeSelectionListener( this );
+			}
+			selection = s;
+			if ( selection != null ) 
+			{
+				selection.addSelectionListener( this );
+			}
+			selectionChanged( selection );
+		}
+
+
+		public boolean isSelectionATextSelection()
+		{
+			return selection == textSelection;
+		}
+		
+		
+		
+		public String getTextRepresentationInSelection(TextSelection s)
+		{
+			DPContainer commonRootContainer = s.getCommonRootContainer();
+			ArrayList<DPElement> startPath = s.getStartPathFromCommonRoot();
+			ArrayList<DPElement> endPath = s.getEndPathFromCommonRoot();
+			
+			if ( commonRootContainer != null )
+			{
+				StringBuilder builder = new StringBuilder();
+
+				commonRootContainer.getTextRepresentationBetweenPaths( builder, s.getStartMarker(), startPath, 0, s.getEndMarker(), endPath, 0 );
+			
+				return builder.toString();
 			}
 			else
 			{
-				DPContainer commonRootContainer = s.getCommonRootContainer();
-				ArrayList<DPElement> startPath = s.getStartPathFromCommonRoot();
-				ArrayList<DPElement> endPath = s.getEndPathFromCommonRoot();
-				
-				if ( commonRootContainer != null )
-				{
-					StringBuilder builder = new StringBuilder();
-
-					commonRootContainer.getTextRepresentationBetweenPaths( builder, s.getStartMarker(), startPath, 0, s.getEndMarker(), endPath, 0 );
-				
-					return builder.toString();
-				}
-				else
-				{
-					DPContentLeafEditable commonRoot = (DPContentLeafEditable)s.getCommonRoot();
-					return commonRoot.getTextRepresentationBetweenMarkers( s.getStartMarker(), s.getEndMarker() );
-				}
+				DPContentLeafEditable commonRoot = (DPContentLeafEditable)s.getCommonRoot();
+				return commonRoot.getTextRepresentationBetweenMarkers( s.getStartMarker(), s.getEndMarker() );
 			}
 		}
 
@@ -837,7 +839,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 					
 					
 					// Handle selections
-					selection.onStructureChanged();
+					textSelection.onStructureChanged();
 				}
 			}
 		}
@@ -911,18 +913,16 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		private void drawSelection(Graphics2D graphics)
 		{
-			if ( !selection.isEmpty() )
+			if ( selection != null )
 			{
-				Marker startMarker = selection.getStartMarker();
-				Marker endMarker = selection.getEndMarker();
-				List<DPElement> startPath = selection.getStartPathFromCommonRoot();
-				List<DPElement> endPath = selection.getEndPathFromCommonRoot();
-
-				Color prevColour = graphics.getColor();
-				graphics.setColor( Color.yellow );
-				startPath.get( 0 ).drawSubtreeSelection( graphics, startMarker, startPath, endMarker, endPath );
-				graphics.setColor( prevColour );
+				selection.draw( graphics );
 			}
+		}
+		
+		
+		public void drawTextRange(Graphics2D graphics, Marker startMarker, List<DPElement> startPath, Marker endMarker, List<DPElement> endPath)
+		{
+			startPath.get( 0 ).drawSubtreeSelection( graphics, startMarker, startPath, endMarker, endPath );
 		}
 		
 		
@@ -1418,14 +1418,17 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		protected void deleteSelection()
 		{
 			DPRegion selectionRegion = getSelectionRegion();
-			if ( selectionRegion != null  &&  !selection.isEmpty() )
+			if ( selectionRegion != null )
 			{
 				ClipboardHandler clipboardHandler = selectionRegion.getClipboardHandler();
 				if ( clipboardHandler != null )
 				{
-					if ( caret.getMarker().equals( selection.getEndMarker() ) )
+					if ( selection == textSelection )
 					{
-						caret.moveTo( selection.getStartMarker() );
+						if ( caret.getMarker().equals( textSelection.getEndMarker() ) )
+						{
+							caret.moveTo( textSelection.getStartMarker() );
+						}
 					}
 					clipboardHandler.deleteSelection( selection, caret );
 				}
@@ -1450,7 +1453,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		//
 		//
-		// FRAME METHODS
+		// REGION METHODS
 		//
 		//
 		
@@ -1468,14 +1471,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		protected DPRegion getSelectionRegion()
 		{
-			if ( !selection.isEmpty() )
-			{
-				return selection.getRegion();
-			}
-			else
-			{
-				return null;
-			}
+			return selection != null  ?  selection.getRegion()  :  null;
 		}
 	}
 
