@@ -24,7 +24,6 @@ import BritefuryJ.DocPresent.Clipboard.TextClipboardHandler;
 import BritefuryJ.DocPresent.Interactor.KeyElementInteractor;
 import BritefuryJ.DocPresent.Interactor.RealiseElementInteractor;
 import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Selection.TextSelection;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.Pres.Pres;
@@ -301,12 +300,7 @@ public class TextEntry extends ControlPres
 			PresentationComponent.RootElement root = textElement.getRootElement();
 			if ( root != null )
 			{
-				Selection selection = root.getSelection();
-				if ( selection instanceof TextSelection )
-				{
-					TextSelection ts = (TextSelection)selection;
-					ts.setSelection( textElement.markerAtStart(), textElement.markerAtEnd() );
-				}
+				root.setSelection( new TextSelection( root, textElement.markerAtStart(), textElement.markerAtEnd() ) );
 			}
 			else
 			{

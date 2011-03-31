@@ -6,6 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2010.
 ##-*************************
 from BritefuryJ.DocPresent.Clipboard import *
+from BritefuryJ.DocPresent.Selection import TextSelection
 from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.DocPresent import *
 
@@ -86,12 +87,12 @@ class PythonSyntaxRecognizingEditor (SyntaxRecognizingEditor):
 	#
 	#
 	
-	def indent(self, element, context, node):
-		viewContext = context.getView()
+	def indent(self, element, fragment, node):
+		viewContext = fragment.getView()
 		selection = viewContext.getSelection()
 		
-		if selection.isEmpty():
-			self._indentLine( element, context, node )
+		if selection is None  or  not isinstance( selection, TextSelection ):
+			self._indentLine( element, fragment, node )
 		else:
 			startMarker = selection.getStartMarker()
 			endMarker = selection.getEndMarker()
@@ -101,18 +102,18 @@ class PythonSyntaxRecognizingEditor (SyntaxRecognizingEditor):
 			endContext = getStatementContextFromElement( endMarker.getElement() )
 			
 			if startContext is endContext:
-				self._indentLine( element, context, node )
+				self._indentLine( element, fragment, node )
 			else:
 				self._indentSelection( selection )
 			
 			
 			
-	def dedent(self, element, context, node):
-		viewContext = context.getView()
+	def dedent(self, element, fragment, node):
+		viewContext = fragment.getView()
 		selection = viewContext.getSelection()
 		
-		if selection.isEmpty():
-			self._dedentLine( element, context, node )
+		if selection is None  or  not isinstance( selection, TextSelection ):
+			self._dedentLine( element, fragment, node )
 		else:
 			startMarker = selection.getStartMarker()
 			endMarker = selection.getEndMarker()
@@ -122,13 +123,13 @@ class PythonSyntaxRecognizingEditor (SyntaxRecognizingEditor):
 			endContext = getStatementContextFromElement( endMarker.getElement() )
 			
 			if startContext is endContext:
-				self._dedentLine( element, context, node )
+				self._dedentLine( element, fragment, node )
 			else:
 				self._dedentSelection( selection )
 				
 			
 			
-	def _indentLine(self, element, context, node):
+	def _indentLine(self, element, fragment, node):
 		event = PythonIndentTreeEvent()
 		visitor = event.getStreamValueVisitor()
 		visitor.setElementPrefix( element, Schema.Indent() )
@@ -139,7 +140,7 @@ class PythonSyntaxRecognizingEditor (SyntaxRecognizingEditor):
 			
 	
 	
-	def _dedentLine(self, element, context, node):
+	def _dedentLine(self, element, fragment, node):
 		suite = node.getValidParents()[0]
 		suiteParent = suite.getValidParents()[0]
 		if not suiteParent.isInstanceOf( Schema.PythonModule ):

@@ -17,13 +17,11 @@ public class TextSelectionManager
 {
 	private boolean bMouseDragInProgress;
 	private Marker initialMarker = null;
-	private TextSelection selection;
 	private PresentationComponent.RootElement rootElement;
 	
 	
-	public TextSelectionManager(TextSelection selection, PresentationComponent.RootElement rootElement)
+	public TextSelectionManager(PresentationComponent.RootElement rootElement)
 	{
-		this.selection = selection;
 		this.rootElement = rootElement;
 	}
 	
@@ -40,7 +38,7 @@ public class TextSelectionManager
 			}
 			else
 			{
-				if ( !rootElement.isSelectionATextSelection() )
+				if ( !( rootElement.getSelection() instanceof TextSelection ) )
 				{
 					initialMarker = prevPos.copy();
 				}
@@ -114,14 +112,12 @@ public class TextSelectionManager
 					
 					if ( markerBInSameRegion != null )
 					{
-						selection.setSelection( markerA, markerBInSameRegion );
-						selectTextSelection();
+						rootElement.setSelection( new TextSelection( rootElement, markerA, markerBInSameRegion ) );
 					}
 				}
 				else
 				{
-					selection.setSelection( markerA, markerB );
-					selectTextSelection();
+					rootElement.setSelection( new TextSelection( rootElement, markerA, markerB ) );
 				}
 			}
 			else
@@ -135,19 +131,14 @@ public class TextSelectionManager
 		}
 	}
 	
-	void selectTextSelection()
-	{
-		rootElement.setSelection( selection );
-	}
-	
-	void clearSelection()
+	private void clearSelection()
 	{
 		rootElement.setSelection( null );
 	}
 	
-	void clearTextSelection()
+	private void clearTextSelection()
 	{
-		if ( rootElement.getSelection() == selection )
+		if ( rootElement.getSelection() instanceof TextSelection )
 		{
 			rootElement.setSelection( null );
 		}
