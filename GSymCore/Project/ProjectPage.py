@@ -48,6 +48,13 @@ class ProjectPage (ProjectNode):
 		return self._data
 	
 	
+	def trackContents(self, history):
+		history.track( self.data )
+	
+	def stopTrackingContents(self, history):
+		history.stopTracking( self.data )
+
+	
 	
 	name = property( getName, setName )
 	data = property( getData )
