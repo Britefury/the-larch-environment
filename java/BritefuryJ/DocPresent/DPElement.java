@@ -1021,14 +1021,14 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	}
 	
 	
-	protected AffineTransform pushGraphicsTransform(Graphics2D graphics)
+	public AffineTransform pushGraphicsTransform(Graphics2D graphics)
 	{
 		AffineTransform current = graphics.getTransform();
 		getLocalToRootXform().apply( graphics );
 		return current;
 	}
 	
-	protected void popGraphicsTransform(Graphics2D graphics, AffineTransform x)
+	public void popGraphicsTransform(Graphics2D graphics, AffineTransform x)
 	{
 		graphics.setTransform( x );
 	}
@@ -1480,7 +1480,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 				return e;
 			}
 			
-			List<DPElement> children = getSearchChildren();
+			List<DPElement> children = e.getSearchChildren();
 			
 			if ( bForwards )
 			{
@@ -1498,6 +1498,12 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		return null;
 	}
 
+	public DPElement preOrderDepthFirstSearch(ElementFilter filter)
+	{
+		return preOrderDepthFirstSearch( filter, true );
+	}
+	
+	
 	public DPElement bredthFirstSearch(ElementFilter filter, boolean bForwards)
 	{
 		ArrayDeque<DPElement> queue = new ArrayDeque<DPElement>();
@@ -1514,7 +1520,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 				return e;
 			}
 			
-			List<DPElement> children = getSearchChildren();
+			List<DPElement> children = e.getSearchChildren();
 			
 			if ( bForwards )
 			{
@@ -1532,6 +1538,12 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		return null;
 	}
 	
+	public DPElement bredthFirstSearch(ElementFilter filter)
+	{
+		return bredthFirstSearch( filter, true );
+	}
+
+	
 	
 	public DPElement preOrderDepthFirstSearchByType(final Class<?> elementClass, boolean bForwards)
 	{
@@ -1547,6 +1559,12 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		return preOrderDepthFirstSearch( filter, bForwards );
 	}
 
+	public DPElement preOrderDepthFirstSearchByType(final Class<?> elementClass)
+	{
+		return preOrderDepthFirstSearchByType( elementClass, true );
+	}
+
+	
 	public DPElement bredthFirstSearchByType(final Class<?> elementClass, boolean bForwards)
 	{
 		ElementFilter filter = new ElementFilter()
@@ -1559,6 +1577,11 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		};
 		
 		return bredthFirstSearch( filter, bForwards );
+	}
+
+	public DPElement bredthFirstSearchByType(final Class<?> elementClass)
+	{
+		return bredthFirstSearchByType( elementClass, true );
 	}
 
 	

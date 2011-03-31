@@ -410,7 +410,6 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		private boolean bLastMousePressPositionedCaret = false;
 		
 		private TextSelectionManager selectionManager;
-		private TextSelection textSelection;
 		private Selection selection;
 		
 		
@@ -453,8 +452,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			caret = new Caret();
 			caret.addCaretListener( this );
 			
-			textSelection = new TextSelection( this );
-			selectionManager = new TextSelectionManager( textSelection, this );
+			selectionManager = new TextSelectionManager( this );
 			
 			keyboard = new Keyboard( caret, selectionManager );
 
@@ -553,14 +551,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			{
 				selection.addSelectionListener( this );
 			}
-			selectionChanged( selection );
+			queueFullRedraw();
 		}
 
-
-		public boolean isSelectionATextSelection()
-		{
-			return selection == textSelection;
-		}
 		
 		
 		
@@ -839,7 +832,10 @@ public class PresentationComponent extends JComponent implements ComponentListen
 					
 					
 					// Handle selections
-					textSelection.onStructureChanged();
+					if ( selection != null )
+					{
+						selection.onPresentationTreeStructureChanged();
+					}
 				}
 			}
 		}
@@ -1423,11 +1419,12 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				ClipboardHandler clipboardHandler = selectionRegion.getClipboardHandler();
 				if ( clipboardHandler != null )
 				{
-					if ( selection == textSelection )
+					if ( selection instanceof TextSelection )
 					{
-						if ( caret.getMarker().equals( textSelection.getEndMarker() ) )
+						TextSelection ts = (TextSelection)selection;
+						if ( caret.getMarker().equals( ts.getEndMarker() ) )
 						{
-							caret.moveTo( textSelection.getStartMarker() );
+							caret.moveTo( ts.getStartMarker() );
 						}
 					}
 					clipboardHandler.deleteSelection( selection, caret );

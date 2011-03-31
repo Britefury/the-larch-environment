@@ -524,4 +524,11 @@ public class Marker
 			}
 		}
 	}
+	
+	
+	@Override
+	public String toString()
+	{
+		return "Marker( element=" + element + ", position=" + position + ", bias=" + bias + " )";
+	}
 }

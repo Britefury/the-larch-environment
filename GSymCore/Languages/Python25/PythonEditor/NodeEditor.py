@@ -118,14 +118,14 @@ class StatementIndentationInteractor (KeyElementInteractor):
 		
 	def keyTyped(self, element, event):
 		if event.getKeyChar() == '\t':
-			context = element.getFragmentContext()
-			node = context.getModel()
+			fragment = element.getFragmentContext()
+			node = fragment.getModel()
 			
 			editor = SequentialEditor.getEditorForElement( element )
 			if event.getModifiers() & KeyEvent.SHIFT_MASK  !=  0:
-				editor.dedent( element, context, node )
+				editor.dedent( element, fragment, node )
 			else:
-				editor.indent( element, context, node )
+				editor.indent( element, fragment, node )
 			
 			return True
 		else:

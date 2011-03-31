@@ -26,17 +26,18 @@ public class TextSelection extends Selection implements MarkerListener
 	private ArrayList<DPElement> startPathFromCommonRoot, endPathFromCommonRoot;
 	private DPContainer commonRootContainer;
 	private DPElement commonRoot;
-	private PresentationComponent.RootElement rootElement;
 	
 	private boolean  bRefreshRequired;
 	
 	
-	public TextSelection(PresentationComponent.RootElement rootElement)
+	public TextSelection(PresentationComponent.RootElement rootElement, Marker m0, Marker m1)
 	{
-		bRefreshRequired = false;
+		super( rootElement );
 		
-		marker0 = new Marker();
-		marker1 = new Marker();
+		bRefreshRequired = true;
+		
+		marker0 = m0.copy();
+		marker1 = m1.copy();
 		
 		marker0.addMarkerListener( this );
 		marker1.addMarkerListener( this );
@@ -48,14 +49,6 @@ public class TextSelection extends Selection implements MarkerListener
 	public void clear()
 	{
 		rootElement.setSelection( null );
-	}
-	
-	
-	
-	public void setSelection(Marker m0, Marker m1)
-	{
-		marker0.moveTo( m0 );
-		marker1.moveTo( m1 );
 	}
 	
 	
@@ -96,6 +89,12 @@ public class TextSelection extends Selection implements MarkerListener
 		return commonRoot;
 	}
 	
+	public boolean isValid()
+	{
+		refresh();
+		return commonRoot != null;
+	}
+	
 	
 	@Override
 	public DPRegion getRegion()
@@ -113,7 +112,7 @@ public class TextSelection extends Selection implements MarkerListener
 	
 	
 	
-	public void onStructureChanged()
+	public void onPresentationTreeStructureChanged()
 	{
 		modified();
 	}
@@ -192,14 +191,17 @@ public class TextSelection extends Selection implements MarkerListener
 	
 	public void draw(Graphics2D graphics)
 	{
-		Marker startMarker = getStartMarker();
-		Marker endMarker = getEndMarker();
-		List<DPElement> startPath = getStartPathFromCommonRoot();
-		List<DPElement> endPath = getEndPathFromCommonRoot();
-
-		Color prevColour = graphics.getColor();
-		graphics.setColor( Color.yellow );
-		getCommonRoot().getRootElement().drawTextRange( graphics, startMarker, startPath, endMarker, endPath );
-		graphics.setColor( prevColour );
+		if ( isValid() )
+		{
+			Marker startMarker = getStartMarker();
+			Marker endMarker = getEndMarker();
+			List<DPElement> startPath = getStartPathFromCommonRoot();
+			List<DPElement> endPath = getEndPathFromCommonRoot();
+	
+			Color prevColour = graphics.getColor();
+			graphics.setColor( Color.yellow );
+			getCommonRoot().getRootElement().drawTextRange( graphics, startMarker, startPath, endMarker, endPath );
+			graphics.setColor( prevColour );
+		}
 	}
 }

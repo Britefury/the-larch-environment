@@ -232,7 +232,11 @@ class Python25CodeGenerator (object):
 
 	@DMObjectNodeDispatchMethod( Schema.Subscript )
 	def Subscript(self, node, target, index):
-		return self( target ) + '[' + self( index ) + ']'
+		if index.isInstanceOf( Schema.SubscriptTuple ):
+			indexSrc = ','.join( [ self( i )   for i in index['values'] ] )
+		else:
+			indexSrc = self( index )
+		return self( target ) + '[' + indexSrc + ']'
 	
 
 	

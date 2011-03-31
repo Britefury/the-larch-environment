@@ -10,13 +10,15 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 
 import BritefuryJ.DocPresent.DPRegion;
+import BritefuryJ.DocPresent.PresentationComponent;
 
 public abstract class Selection
 {
 	private ArrayList<SelectionListener> listeners;
+	protected PresentationComponent.RootElement rootElement;
 	
 	
-	public Selection()
+	public Selection(PresentationComponent.RootElement rootElement)
 	{
 	}
 	
@@ -25,10 +27,23 @@ public abstract class Selection
 	abstract public DPRegion getRegion();
 	
 	
+	public void onPresentationTreeStructureChanged()
+	{
+	}
+	
+	
 	
 	abstract public void draw(Graphics2D graphics);
 	
 	
+	
+	public PresentationComponent.RootElement getRootElement()
+	{
+		return rootElement;
+	}
+	
+	
+
 	public void addSelectionListener(SelectionListener listener)
 	{
 		if ( listeners == null )
