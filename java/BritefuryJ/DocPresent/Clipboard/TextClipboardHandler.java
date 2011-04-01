@@ -16,6 +16,7 @@ import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Selection.TextSelection;
+import BritefuryJ.DocPresent.Target.Target;
 
 public abstract class TextClipboardHandler extends ClipboardHandler
 {
@@ -25,29 +26,44 @@ public abstract class TextClipboardHandler extends ClipboardHandler
 	protected abstract String getText(TextSelection selection);
 	
 	
-	@Override
-	public void deleteSelection(Selection selection, Caret caret)
+	public Class<? extends Selection> getSelectionClass()
 	{
-		if ( selection instanceof TextSelection )
+		return TextSelection.class;
+	}
+	
+	public Class<? extends Target> getTargetClass()
+	{
+		return Caret.class;
+	}
+	
+	
+	@Override
+	public void deleteSelection(Selection selection, Target target)
+	{
+		if ( selection instanceof TextSelection  &&  target instanceof Caret )
 		{
 			TextSelection ts = (TextSelection)selection;
-			deleteText( ts, caret );
+			deleteText( ts, (Caret)target );
 		}
 	}
 
 	@Override
-	public void replaceSelectionWithText(Selection selection, Caret caret, String replacement)
+	public void replaceSelectionWithText(Selection selection, Target target, String replacement)
 	{
-		if ( selection instanceof TextSelection )
+		if ( target instanceof Caret )
 		{
-			TextSelection ts = (TextSelection)selection;
-			replaceText( ts, caret, replacement );
-			ts.clear();
-		}
-		else
-		{
-			caret.moveToStartOfNextItem();
-			insertText( caret.getMarker(), replacement );
+			Caret caret = (Caret)target;
+			if ( selection instanceof TextSelection )
+			{
+				TextSelection ts = (TextSelection)selection;
+				replaceText( ts, caret, replacement );
+				ts.clear();
+			}
+			else
+			{
+				caret.moveToStartOfNextItem();
+				insertText( caret.getMarker(), replacement );
+			}
 		}
 	}
 
@@ -72,14 +88,14 @@ public abstract class TextClipboardHandler extends ClipboardHandler
 	}
 
 	@Override
-	public void exportDone(Selection selection, Caret caret, Transferable transferable, int action)
+	public void exportDone(Selection selection, Target target, Transferable transferable, int action)
 	{
 		if ( action == MOVE )
 		{
-			if ( selection instanceof TextSelection )
+			if ( selection instanceof TextSelection  &&  target instanceof Caret )
 			{
 				TextSelection ts = (TextSelection)selection;
-				deleteText( ts, caret );
+				deleteText( ts, (Caret)target );
 				ts.clear();
 			}
 		}
@@ -87,13 +103,13 @@ public abstract class TextClipboardHandler extends ClipboardHandler
 
 	
 	@Override
-	public boolean canImport(Caret caret, Selection selection, DataTransfer dataTransfer)
+	public boolean canImport(Target target, Selection selection, DataTransfer dataTransfer)
 	{
-		return dataTransfer.isDataFlavorSupported( DataFlavor.stringFlavor );
+		return target instanceof Caret  &&  dataTransfer.isDataFlavorSupported( DataFlavor.stringFlavor );
 	}
 
 	@Override
-	public boolean importData(Caret caret, Selection selection, DataTransfer dataTransfer)
+	public boolean importData(Target target, Selection selection, DataTransfer dataTransfer)
 	{
 		TextSelection ts = null;
 		if ( selection instanceof TextSelection )
@@ -101,30 +117,35 @@ public abstract class TextClipboardHandler extends ClipboardHandler
 			ts = (TextSelection)selection;
 		}
 		
-		if ( canImport( caret, selection, dataTransfer ) )
+		if ( target instanceof Caret )
 		{
-			try
+			Caret caret = (Caret)target;
+
+			if ( canImport( target, selection, dataTransfer ) )
 			{
-				String data = (String)dataTransfer.getTransferData( DataFlavor.stringFlavor );
-				
-				if ( ts != null )
+				try
 				{
-					replaceText( ts, caret, data );
-					ts.clear();
+					String data = (String)dataTransfer.getTransferData( DataFlavor.stringFlavor );
+					
+					if ( ts != null )
+					{
+						replaceText( ts, caret, data );
+						ts.clear();
+					}
+					else
+					{
+						caret.moveToStartOfNextItem();
+						insertText( caret.getMarker(), data );
+					}
 				}
-				else
+				catch (UnsupportedFlavorException e)
 				{
-					caret.moveToStartOfNextItem();
-					insertText( caret.getMarker(), data );
+					return false;
 				}
-			}
-			catch (UnsupportedFlavorException e)
-			{
-				return false;
-			}
-			catch (IOException e)
-			{
-				return false;
+				catch (IOException e)
+				{
+					return false;
+				}
 			}
 		}
 		
