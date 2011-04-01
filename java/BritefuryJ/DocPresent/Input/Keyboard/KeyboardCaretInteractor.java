@@ -186,6 +186,7 @@ public class KeyboardCaretInteractor extends KeyboardInteractor
 				
 				if ( !caret.getMarker().equals( prevPos ) )
 				{
+					caret.makeCurrentTarget();
 					selectionManager.onCaretMove( caret, prevPos, ( modifiers & Modifier.SHIFT ) != 0 );
 				}
 				

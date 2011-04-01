@@ -7,20 +7,22 @@
 //##************************
 package BritefuryJ.DocPresent.Caret;
 
-import java.util.ArrayList;
+import java.awt.Color;
+import java.awt.Graphics2D;
 
 import BritefuryJ.DocPresent.DPContentLeaf;
 import BritefuryJ.DocPresent.DPContentLeafEditable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPSegment;
+import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Marker.MarkerListener;
+import BritefuryJ.DocPresent.Target.Target;
 import BritefuryJ.Math.Point2;
 
-public class Caret implements MarkerListener
+public class Caret extends Target implements MarkerListener
 {
 	protected Marker marker;
-	protected ArrayList<CaretListener> listeners = new ArrayList<CaretListener>();;
 	protected DPElement grabElement = null;
 	
 	
@@ -32,14 +34,20 @@ public class Caret implements MarkerListener
 	}
 	
 	
-	public void addCaretListener(CaretListener listener)
+	public void draw(Graphics2D graphics)
 	{
-		listeners.add( listener );
-	}
-	
-	public void removeCaretListener(CaretListener listener)
-	{
-		listeners.remove( listener );
+		if ( isValid() )
+		{
+			DPContentLeafEditable element = getElement();
+			
+			if ( element != null )
+			{
+				Color prevColour = graphics.getColor();
+				graphics.setColor( Color.blue );
+				element.drawCaret( graphics, this );
+				graphics.setColor( prevColour );
+			}
+		}
 	}
 	
 	
@@ -103,10 +111,7 @@ public class Caret implements MarkerListener
 	
 	protected void changed()
 	{
-		for (CaretListener listener: listeners)
-		{
-			listener.caretChanged( this );
-		}
+		notifyListenersOfChange();
 	}
 	
 	
@@ -379,4 +384,18 @@ public class Caret implements MarkerListener
 		}
 	}
 	
+	
+	
+	public void makeCurrentTarget()
+	{
+		DPElement element = getElement();
+		if ( element != null )
+		{
+			PresentationComponent.RootElement root = element.getRootElement();
+			if ( root != null )
+			{
+				root.setCaretAsTarget();
+			}
+		}
+	}
 }

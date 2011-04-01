@@ -19,11 +19,11 @@ import BritefuryJ.DefaultPerspective.Pres.UnescapedStringAsParagraph;
 import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
 import BritefuryJ.DocPresent.Clipboard.DataTransfer;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.Selection.Selection;
+import BritefuryJ.DocPresent.Target.Target;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Bin;
@@ -88,12 +88,12 @@ public class ClipboardTestPage extends SystemPage
 				ClipboardHandler clipboardHandler = new ClipboardHandler()
 				{
 					@Override
-					public void deleteSelection(Selection selection, Caret caret)
+					public void deleteSelection(Selection selection, Target target)
 					{
 					}
 
 					@Override
-					public void replaceSelectionWithText(Selection selection, Caret caret, String replacement)
+					public void replaceSelectionWithText(Selection selection, Target target, String replacement)
 					{
 					}
 
@@ -110,18 +110,18 @@ public class ClipboardTestPage extends SystemPage
 					}
 
 					@Override
-					public void exportDone(Selection selection, Caret caret, Transferable transferable, int action)
+					public void exportDone(Selection selection, Target target, Transferable transferable, int action)
 					{
 					}
 
 					@Override
-					public boolean canImport(Caret caret, Selection selection, DataTransfer dataTransfer)
+					public boolean canImport(Target target, Selection selection, DataTransfer dataTransfer)
 					{
 						return true;
 					}
 
 					@Override
-					public boolean importData(Caret caret, Selection selection, DataTransfer dataTransfer)
+					public boolean importData(Target target, Selection selection, DataTransfer dataTransfer)
 					{
 						handlePaste( dataTransfer );
 

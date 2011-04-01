@@ -673,6 +673,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 					{
 						left.removeTextFromEnd( 1 );
 					}
+					caret.makeCurrentTarget();
 				}
 				return true;
 			}
@@ -724,6 +725,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 					{
 						right.removeTextFromStart( 1 );
 					}
+					caret.makeCurrentTarget();
 				}
 				return true;
 			}

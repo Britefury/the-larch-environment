@@ -42,7 +42,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
 import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.DocPresent.Caret.CaretListener;
 import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
 import BritefuryJ.DocPresent.Clipboard.DataTransfer;
 import BritefuryJ.DocPresent.Input.DndController;
@@ -61,6 +60,8 @@ import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Selection.SelectionListener;
 import BritefuryJ.DocPresent.Selection.TextSelection;
 import BritefuryJ.DocPresent.Selection.TextSelectionManager;
+import BritefuryJ.DocPresent.Target.Target;
+import BritefuryJ.DocPresent.Target.TargetListener;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Logging.LogEntry;
 import BritefuryJ.Math.AABox2;
@@ -307,7 +308,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 					ClipboardHandler clipboardHandler = region.getClipboardHandler();
 					if ( clipboardHandler != null )
 					{
-						clipboardHandler.exportDone( rootElement.selection, rootElement.caret, data, action );
+						clipboardHandler.exportDone( rootElement.selection, rootElement.getTarget(), data, action );
 					}
 				}
 			}
@@ -332,7 +333,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 						ClipboardHandler clipboardHandler = region.getClipboardHandler();
 						if ( clipboardHandler != null )
 						{
-							return clipboardHandler.canImport( rootElement.caret, rootElement.selection, new DataTransfer( transfer ) );
+							return clipboardHandler.canImport( rootElement.getTarget(), rootElement.selection, new DataTransfer( transfer ) );
 						}
 					}
 					return false;
@@ -361,7 +362,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 						ClipboardHandler clipboardHandler = region.getClipboardHandler();
 						if ( clipboardHandler != null )
 						{
-							return clipboardHandler.importData( rootElement.caret, rootElement.selection, new DataTransfer( transfer ) );
+							return clipboardHandler.importData( rootElement.getTarget(), rootElement.selection, new DataTransfer( transfer ) );
 						}
 					}
 					return false;
@@ -390,7 +391,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 
 	
 	
-	public static class RootElement extends DPBin implements CaretListener, SelectionListener, DndController
+	public static class RootElement extends DPBin implements SelectionListener, DndController
 	{
 		private PresentationComponent component;
 		
@@ -404,10 +405,14 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		private boolean bAllocationRequired;
 		
+		
 		protected WeakHashMap<DPContentLeafEditable, WeakHashMap<Marker, Object>> markersByLeaf = new WeakHashMap<DPContentLeafEditable, WeakHashMap<Marker, Object>>();
+		
 		private Caret caret;
 		private DPContentLeafEditable currentCaretLeaf = null;
 		private boolean bLastMousePressPositionedCaret = false;
+		
+		private Target target;
 		
 		private TextSelectionManager selectionManager;
 		private Selection selection;
@@ -449,8 +454,19 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			
 			bAllocationRequired = true;
 			
+			TargetListener caretTargetListener = new TargetListener()
+			{
+				@Override
+				public void targetChanged(Target t)
+				{
+					caretChanged( (Caret)t );
+				}
+			};
+			
 			caret = new Caret();
-			caret.addCaretListener( this );
+			caret.addTargetListener( caretTargetListener );
+			
+			target = null;
 			
 			selectionManager = new TextSelectionManager( this );
 			
@@ -521,10 +537,43 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		{
 			return component;
 		}
+		
+		
+		
+		//
+		//
+		// CARET METHODS
+		//
+		//
 
 		public Caret getCaret()
 		{
 			return caret;
+		}
+		
+		
+		
+		//
+		//
+		// TARGET  METHODS
+		//
+		//
+		
+		public Target getTarget()
+		{
+			return target == null  ?  caret : target;
+		}
+		
+		public void setTarget(Target t)
+		{
+			target = t;
+			queueFullRedraw();
+		}
+		
+		public void setCaretAsTarget()
+		{
+			target = null;
+			queueFullRedraw();
 		}
 		
 		
@@ -883,27 +932,17 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			drawSelection( graphics );
 			handleDraw( graphics, new AABox2( topLeftRootSpace, bottomRightRootSpace) );
 			//graphics.setTransform( transform );
-			drawCaret( graphics );
+			drawTarget( graphics );
 			
 			// Emit any immediate events
 			emitImmediateEvents();
 		}
 		
 		
-		private void drawCaret(Graphics2D graphics)
+		private void drawTarget(Graphics2D graphics)
 		{
-			if ( caret.isValid() )
-			{
-				DPContentLeafEditable element = caret.getElement();
-				
-				if ( element != null )
-				{
-					Color prevColour = graphics.getColor();
-					graphics.setColor( Color.blue );
-					element.drawCaret( graphics, caret );
-					graphics.setColor( prevColour );
-				}
-			}
+			Target t = getTarget();
+			t.draw( graphics );
 		}
 		
 		
@@ -951,6 +990,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				if ( editableMarker != null )
 				{
 					caret.moveTo( editableMarker );
+					caret.makeCurrentTarget();
 					bLastMousePressPositionedCaret = true;
 				}
 
@@ -1010,6 +1050,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 					if ( elementToSelect != null )
 					{
 						caret.moveTo( elementToSelect.markerAtEnd() );
+						caret.makeCurrentTarget();
 						selectionManager.mouseSelectionReset();
 						selectionManager.selectElement( elementToSelect );
 						bHandled = true;
@@ -1048,6 +1089,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				if ( editableMarker != null )
 				{
 					caret.moveTo( editableMarker );
+					caret.makeCurrentTarget();
 				}
 
 				Marker selectableMarker = getSelectableMarkerClosestToLocalPoint( windowPos );
@@ -1426,8 +1468,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 						{
 							caret.moveTo( ts.getStartMarker() );
 						}
+						caret.makeCurrentTarget();
 					}
-					clipboardHandler.deleteSelection( selection, caret );
+					clipboardHandler.deleteSelection( selection, getTarget() );
 				}
 			}
 		}
@@ -1440,7 +1483,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				ClipboardHandler clipboardHandler = selectionRegion.getClipboardHandler();
 				if ( clipboardHandler != null )
 				{
-					clipboardHandler.replaceSelectionWithText( selection, caret, replacement );
+					clipboardHandler.replaceSelectionWithText( selection, getTarget(), replacement );
 				}
 			}
 		}

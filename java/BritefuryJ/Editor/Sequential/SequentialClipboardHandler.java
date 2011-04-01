@@ -21,8 +21,9 @@ import BritefuryJ.DocPresent.Selection.TextSelection;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueBuilder;
 import BritefuryJ.DocPresent.StreamValue.StreamValueVisitor;
-import BritefuryJ.IncrementalView.FragmentViewFilter;
+import BritefuryJ.DocPresent.Target.Target;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.IncrementalView.FragmentViewFilter;
 
 public class SequentialClipboardHandler extends ClipboardHandler
 {
@@ -78,15 +79,21 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	
 
 	@Override
-	public void deleteSelection(Selection selection, Caret caret)
+	public void deleteSelection(Selection selection, Target target)
 	{
-		replaceSelection( selection, caret, null );
+		if ( target instanceof Caret )
+		{
+			replaceSelection( selection, (Caret)target, null );
+		}
 	}
 	
 	@Override
-	public void replaceSelectionWithText(Selection selection, Caret caret, String replacement)
+	public void replaceSelectionWithText(Selection selection, Target target, String replacement)
 	{
-		replaceSelection( selection, caret, replacement );
+		if ( target instanceof Caret )
+		{
+			replaceSelection( selection, (Caret)target, replacement );
+		}
 	}
 	
 	
@@ -267,96 +274,100 @@ public class SequentialClipboardHandler extends ClipboardHandler
 	
 	
 	@Override
-	public void exportDone(Selection selection, Caret caret, Transferable transferable, int action)
+	public void exportDone(Selection selection, Target target, Transferable transferable, int action)
 	{
 		if ( action == MOVE )
 		{
-			deleteSelection( selection, caret );
+			if ( target instanceof Caret )
+			{
+				deleteSelection( selection, (Caret)target );
+			}
 		}
 	}
 	
 	
 	@Override
-	public boolean canImport(Caret caret, Selection selection, DataTransfer dataTransfer)
+	public boolean canImport(Target target, Selection selection, DataTransfer dataTransfer)
 	{
-		return dataTransfer.isDataFlavorSupported( bufferFlavor )  ||  dataTransfer.isDataFlavorSupported( DataFlavor.stringFlavor );
+		return target instanceof Caret   &&   ( dataTransfer.isDataFlavorSupported( bufferFlavor )  ||  dataTransfer.isDataFlavorSupported( DataFlavor.stringFlavor ) );
 	}
 	
 	@Override
-	public boolean importData(Caret caret, Selection selection, DataTransfer dataTransfer)
+	public boolean importData(Target target, Selection selection, DataTransfer dataTransfer)
 	{
-		if ( !canImport( caret, selection, dataTransfer ) )
+		if ( !canImport( target, selection, dataTransfer ) )
 		{
 			return false;
 		}
 		
 		
-		
-		Object data = null;
-		
-		
-		if ( dataTransfer.isDataFlavorSupported( bufferFlavor ) )
+		if ( target instanceof Caret )
 		{
-			try
+			Caret caret = (Caret)target;
+
+			Object data = null;
+			
+			
+			if ( dataTransfer.isDataFlavorSupported( bufferFlavor ) )
 			{
-				data = dataTransfer.getTransferData( bufferFlavor );
+				try
+				{
+					data = dataTransfer.getTransferData( bufferFlavor );
+				}
+				catch (UnsupportedFlavorException e)
+				{
+				}
+				catch (IOException e)
+				{
+				}
+				
+				if ( data != null )
+				{
+					SequentialBuffer buffer = (SequentialBuffer)data;
+					if ( !canImportFromClipboardHandler( buffer.clipboardHandler ) )
+					{
+						data = null;
+					}
+				}
 			}
-			catch (UnsupportedFlavorException e)
+			
+			
+			if ( dataTransfer.isDataFlavorSupported( DataFlavor.stringFlavor ) )
 			{
+				try
+				{
+					data = dataTransfer.getTransferData( DataFlavor.stringFlavor );
+					data = filterTextForImport( (String)data );
+				}
+				catch (UnsupportedFlavorException e)
+				{
+				}
+				catch (IOException e)
+				{
+				}
 			}
-			catch (IOException e)
-			{
-			}
+			
 			
 			if ( data != null )
 			{
-				SequentialBuffer buffer = (SequentialBuffer)data;
-				if ( !canImportFromClipboardHandler( buffer.clipboardHandler ) )
+				// Paste
+				if ( !( selection instanceof TextSelection ) )
 				{
-					data = null;
+					if ( caret.isValid() )
+					{
+						insertAtCaret( caret, data );
+						return true;
+					}
 				}
-			}
-		}
-		
-		
-		if ( dataTransfer.isDataFlavorSupported( DataFlavor.stringFlavor ) )
-		{
-			try
-			{
-				data = dataTransfer.getTransferData( DataFlavor.stringFlavor );
-				data = filterTextForImport( (String)data );
-			}
-			catch (UnsupportedFlavorException e)
-			{
-			}
-			catch (IOException e)
-			{
-			}
-		}
-		
-		
-		if ( data != null )
-		{
-			// Paste
-			if ( !( selection instanceof TextSelection ) )
-			{
-				if ( caret.isValid() )
+				else
 				{
-					insertAtCaret( caret, data );
+					replaceSelection( selection, caret, data );
 					return true;
 				}
-				return false;
-			}
-			else
-			{
-				replaceSelection( selection, caret, data );
-				return true;
 			}
 		}
-		else
-		{
-			return false;
-		}
+		
+		return false;
 	}
 	
 	
