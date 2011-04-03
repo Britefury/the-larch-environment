@@ -76,6 +76,9 @@ public class SelectionExporter <SelectionContentsType, SelectionType extends Sel
 	
 	protected void exportDone(SelectionType selection, Target target, SelectionContentsType selectionContents, int action)
 	{
-		exportDoneFn.exportDone( selection, target, selectionContents, action );
+		if ( exportDoneFn != null )
+		{
+			exportDoneFn.exportDone( selection, target, selectionContents, action );
+		}
 	}
 }
