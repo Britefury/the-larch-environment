@@ -6,7 +6,6 @@
 //##************************
 package BritefuryJ.Editor.SyntaxRecognizing;
 
-import java.awt.datatransfer.DataFlavor;
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.WeakHashMap;
@@ -248,11 +247,6 @@ public abstract class SyntaxRecognizingEditor extends SequentialEditor
 	public SyntaxRecognizingEditor()
 	{
 		super();
-	}
-	
-	public SyntaxRecognizingEditor(DataFlavor bufferFlavor)
-	{
-		super( bufferFlavor );
 	}
 	
 	

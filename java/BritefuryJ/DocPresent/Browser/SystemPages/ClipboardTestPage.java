@@ -19,7 +19,7 @@ import BritefuryJ.DefaultPerspective.Pres.UnescapedStringAsParagraph;
 import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
-import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
+import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.DocPresent.Clipboard.DataTransfer;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.Selection.Selection;
@@ -85,16 +85,18 @@ public class ClipboardTestPage extends SystemPage
 				final DPElement descrElement = descr.present( ctx, style );
 
 				
-				ClipboardHandler clipboardHandler = new ClipboardHandler()
+				ClipboardHandlerInterface clipboardHandler = new ClipboardHandlerInterface()
 				{
 					@Override
-					public void deleteSelection(Selection selection, Target target)
+					public boolean deleteSelection(Selection selection, Target target)
 					{
+						return false;
 					}
 
 					@Override
-					public void replaceSelectionWithText(Selection selection, Target target, String replacement)
+					public boolean replaceSelectionWithText(Selection selection, Target target, String replacement)
 					{
+						return false;
 					}
 
 					@Override

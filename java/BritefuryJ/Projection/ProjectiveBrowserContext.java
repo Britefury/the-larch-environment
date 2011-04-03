@@ -21,7 +21,7 @@ import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.PageLocationResolver;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
-import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
+import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.IncrementalView.IncrementalView;
@@ -50,7 +50,7 @@ public class ProjectiveBrowserContext
 			}
 
 			@Override
-			public ClipboardHandler getClipboardHandler()
+			public ClipboardHandlerInterface getClipboardHandler()
 			{
 				return null;
 			}

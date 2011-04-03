@@ -42,7 +42,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
 import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
+import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.DocPresent.Clipboard.DataTransfer;
 import BritefuryJ.DocPresent.Input.DndController;
 import BritefuryJ.DocPresent.Input.DndDropLocal;
@@ -263,7 +263,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				DPRegion region = rootElement.getSelectionRegion();
 				if ( region != null )
 				{
-					ClipboardHandler clipboardHandler = region.getClipboardHandler();
+					ClipboardHandlerInterface clipboardHandler = region.getClipboardHandler();
 					if ( clipboardHandler != null )
 					{	
 						return clipboardHandler.getExportActions( rootElement.selection );
@@ -284,7 +284,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				DPRegion region = rootElement.getSelectionRegion();
 				if ( region != null )
 				{
-					ClipboardHandler clipboardHandler = region.getClipboardHandler();
+					ClipboardHandlerInterface clipboardHandler = region.getClipboardHandler();
 					if ( clipboardHandler != null )
 					{
 						return clipboardHandler.createExportTransferable( rootElement.selection );
@@ -305,7 +305,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 				DPRegion region = rootElement.getSelectionRegion();
 				if ( region != null )
 				{
-					ClipboardHandler clipboardHandler = region.getClipboardHandler();
+					ClipboardHandlerInterface clipboardHandler = region.getClipboardHandler();
 					if ( clipboardHandler != null )
 					{
 						clipboardHandler.exportDone( rootElement.selection, rootElement.getTarget(), data, action );
@@ -330,7 +330,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 					DPRegion region = rootElement.getCaretRegion();
 					if ( region != null )
 					{
-						ClipboardHandler clipboardHandler = region.getClipboardHandler();
+						ClipboardHandlerInterface clipboardHandler = region.getClipboardHandler();
 						if ( clipboardHandler != null )
 						{
 							return clipboardHandler.canImport( rootElement.getTarget(), rootElement.selection, new DataTransfer( transfer ) );
@@ -359,7 +359,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 					DPRegion region = rootElement.getCaretRegion();
 					if ( region != null )
 					{
-						ClipboardHandler clipboardHandler = region.getClipboardHandler();
+						ClipboardHandlerInterface clipboardHandler = region.getClipboardHandler();
 						if ( clipboardHandler != null )
 						{
 							return clipboardHandler.importData( rootElement.getTarget(), rootElement.selection, new DataTransfer( transfer ) );
@@ -1453,12 +1453,12 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		//
 		//
 		
-		protected void deleteSelection()
+		protected boolean deleteSelection()
 		{
 			DPRegion selectionRegion = getSelectionRegion();
 			if ( selectionRegion != null )
 			{
-				ClipboardHandler clipboardHandler = selectionRegion.getClipboardHandler();
+				ClipboardHandlerInterface clipboardHandler = selectionRegion.getClipboardHandler();
 				if ( clipboardHandler != null )
 				{
 					if ( selection instanceof TextSelection )
@@ -1470,22 +1470,26 @@ public class PresentationComponent extends JComponent implements ComponentListen
 						}
 						caret.makeCurrentTarget();
 					}
-					clipboardHandler.deleteSelection( selection, getTarget() );
+					return clipboardHandler.deleteSelection( selection, getTarget() );
 				}
 			}
+			
+			return false;
 		}
 
-		protected void replaceSelectionWithText(String replacement)
+		protected boolean replaceSelectionWithText(String replacement)
 		{
 			DPRegion selectionRegion = getSelectionRegion();
 			if ( selectionRegion != null )
 			{
-				ClipboardHandler clipboardHandler = selectionRegion.getClipboardHandler();
+				ClipboardHandlerInterface clipboardHandler = selectionRegion.getClipboardHandler();
 				if ( clipboardHandler != null )
 				{
-					clipboardHandler.replaceSelectionWithText( selection, getTarget(), replacement );
+					return clipboardHandler.replaceSelectionWithText( selection, getTarget(), replacement );
 				}
 			}
+			
+			return false;
 		}
 		
 		
