@@ -18,7 +18,7 @@ import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Selection.TextSelection;
 import BritefuryJ.DocPresent.Target.Target;
 
-public abstract class TextClipboardHandler extends ClipboardHandler
+public abstract class TextClipboardHandler extends ClipboardHandlerInterface
 {
 	protected abstract void deleteText(TextSelection selection, Caret caret);
 	protected abstract void insertText(Marker marker, String text);
@@ -38,17 +38,19 @@ public abstract class TextClipboardHandler extends ClipboardHandler
 	
 	
 	@Override
-	public void deleteSelection(Selection selection, Target target)
+	public boolean deleteSelection(Selection selection, Target target)
 	{
 		if ( selection instanceof TextSelection  &&  target instanceof Caret )
 		{
 			TextSelection ts = (TextSelection)selection;
 			deleteText( ts, (Caret)target );
+			return true;
 		}
+		return false;
 	}
 
 	@Override
-	public void replaceSelectionWithText(Selection selection, Target target, String replacement)
+	public boolean replaceSelectionWithText(Selection selection, Target target, String replacement)
 	{
 		if ( target instanceof Caret )
 		{
@@ -64,7 +66,10 @@ public abstract class TextClipboardHandler extends ClipboardHandler
 				caret.moveToStartOfNextItem();
 				insertText( caret.getMarker(), replacement );
 			}
+			return true;
 		}
+		
+		return false;
 	}
 
 

@@ -7,7 +7,7 @@
 package BritefuryJ.Projection;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
+import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.IncrementalView.ViewFragmentFunction;
 import BritefuryJ.Pres.Pres;
@@ -15,10 +15,10 @@ import BritefuryJ.Pres.Pres;
 public class Perspective extends AbstractPerspective
 {
 	private ViewFragmentFunction fragmentViewFn;
-	private ClipboardHandler clipboardHandler;
+	private ClipboardHandlerInterface clipboardHandler;
 	
 	
-	public Perspective(ViewFragmentFunction fragmentViewFn, ClipboardHandler clipboardHandler)
+	public Perspective(ViewFragmentFunction fragmentViewFn, ClipboardHandlerInterface clipboardHandler)
 	{
 		this.fragmentViewFn = fragmentViewFn;
 		this.clipboardHandler = clipboardHandler;
@@ -39,7 +39,7 @@ public class Perspective extends AbstractPerspective
 
 
 	@Override
-	public ClipboardHandler getClipboardHandler()
+	public ClipboardHandlerInterface getClipboardHandler()
 	{
 		return clipboardHandler;
 	}

@@ -7,7 +7,7 @@
 package BritefuryJ.Projection;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
+import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.ApplyPerspective;
 import BritefuryJ.Pres.Pres;
@@ -29,7 +29,7 @@ public abstract class AbstractPerspective
 		}
 	}
 	
-	public abstract ClipboardHandler getClipboardHandler();
+	public abstract ClipboardHandlerInterface getClipboardHandler();
 
 	
 	public ApplyPerspective applyTo(Object x)

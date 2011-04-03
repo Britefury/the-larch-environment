@@ -640,10 +640,13 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	{
 		if ( rootElement.getSelection() instanceof TextSelection )
 		{
-			rootElement.deleteSelection();
-			return true;
+			if ( rootElement.deleteSelection() )
+			{
+				return true;
+			}
 		}
-		else if ( isMarkerAtStart( caret.getMarker() ) )
+		
+		if ( isMarkerAtStart( caret.getMarker() ) )
 		{
 			DPContentLeaf left = getContentLeafToLeft();
 			if ( left == null )
@@ -692,10 +695,13 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	{
 		if ( rootElement.getSelection() instanceof TextSelection )
 		{
-			rootElement.deleteSelection();
-			return true;
+			if ( rootElement.deleteSelection() )
+			{
+				return true;
+			}
 		}
-		else if ( isMarkerAtEnd( caret.getMarker() ) )
+
+		if ( isMarkerAtEnd( caret.getMarker() ) )
 		{
 			DPContentLeaf right = getContentLeafToRight();
 			if ( right == null )
@@ -767,15 +773,17 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 			{
 				if ( rootElement.getSelection() instanceof TextSelection )
 				{
-					rootElement.replaceSelectionWithText( str );
-				}
-				else
-				{
-					if ( isEditable() )
+					if ( rootElement.replaceSelectionWithText( str ) )
 					{
-						insertText( caret.getMarker(), String.valueOf( event.getKeyChar() ) );
+						return true;
 					}
 				}
+
+				if ( isEditable() )
+				{
+					insertText( caret.getMarker(), String.valueOf( event.getKeyChar() ) );
+				}
+
 				return true;
 			}
 		}

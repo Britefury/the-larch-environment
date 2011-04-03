@@ -14,7 +14,7 @@ import org.python.core.PyType;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Pres.ObjectBox;
-import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
+import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.ObjectPresentation.ObjectPresentationPerspective;
 import BritefuryJ.ObjectPresentation.ObjectPresentationLocationResolver;
@@ -82,7 +82,7 @@ public class DefaultPerspective extends ObjectPresentationPerspective
 	
 	
 	@Override
-	public ClipboardHandler getClipboardHandler()
+	public ClipboardHandlerInterface getClipboardHandler()
 	{
 		return null;
 	}

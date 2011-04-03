@@ -6,7 +6,7 @@
 //##************************
 package BritefuryJ.DocPresent;
 
-import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
+import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 
 public class DPRegion extends DPProxy
@@ -14,7 +14,7 @@ public class DPRegion extends DPProxy
 	public static class SharableSelectionFilter implements ElementFilter
 	{
 		private DPRegion regionA;
-		private ClipboardHandler handlerA;
+		private ClipboardHandlerInterface handlerA;
 		
 		
 		public SharableSelectionFilter(DPRegion regionA)
@@ -34,7 +34,7 @@ public class DPRegion extends DPProxy
 			}
 			else
 			{
-				ClipboardHandler handlerB = regionB != null  ?  regionB.getClipboardHandler()  :  null;
+				ClipboardHandlerInterface handlerB = regionB != null  ?  regionB.getClipboardHandler()  :  null;
 				if ( handlerA != null )
 				{
 					return handlerA.canShareSelectionWith( handlerB );
@@ -49,7 +49,7 @@ public class DPRegion extends DPProxy
 
 	
 	
-	private ClipboardHandler clipboardHandler;
+	private ClipboardHandlerInterface clipboardHandler;
 
 	
 	
@@ -94,12 +94,12 @@ public class DPRegion extends DPProxy
 	//
 	//
 	
-	public void setClipboardHandler(ClipboardHandler handler)
+	public void setClipboardHandler(ClipboardHandlerInterface handler)
 	{
 		clipboardHandler = handler;
 	}
 	
-	public ClipboardHandler getClipboardHandler()
+	public ClipboardHandlerInterface getClipboardHandler()
 	{
 		return clipboardHandler;
 	}

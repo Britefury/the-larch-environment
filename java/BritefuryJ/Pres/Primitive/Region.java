@@ -8,7 +8,7 @@ package BritefuryJ.Pres.Primitive;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRegion;
-import BritefuryJ.DocPresent.Clipboard.ClipboardHandler;
+import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -16,7 +16,7 @@ import BritefuryJ.StyleSheet.StyleValues;
 public class Region extends Pres
 {
 	private Pres child;
-	private ClipboardHandler clipboardHandler = null;
+	private ClipboardHandlerInterface clipboardHandler = null;
 	
 	
 	public Region(Object child)
@@ -24,7 +24,7 @@ public class Region extends Pres
 		this.child = coerce( child );
 	}
 	
-	public Region(Object child, ClipboardHandler clipboardHandler)
+	public Region(Object child, ClipboardHandlerInterface clipboardHandler)
 	{
 		this.child = coerce( child );
 		this.clipboardHandler = clipboardHandler;

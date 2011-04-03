@@ -6,8 +6,6 @@
 //##************************
 package BritefuryJ.Editor.Sequential;
 
-import java.awt.datatransfer.DataFlavor;
-
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.EditEvent;
 import BritefuryJ.DocPresent.TextEditEvent;
@@ -51,11 +49,6 @@ public abstract class SequentialEditor
 	public SequentialEditor()
 	{
 		this.clipboardHandler = new SequentialClipboardHandler( this );
-	}
-	
-	public SequentialEditor(DataFlavor bufferFlavor)
-	{
-		this.clipboardHandler = new SequentialClipboardHandler( this, bufferFlavor );
 	}
 	
 	
@@ -134,6 +127,11 @@ public abstract class SequentialEditor
 	protected SequentialBuffer createSelectionBuffer(StreamValue stream)
 	{
 		return new SequentialBuffer( stream, clipboardHandler );
+	}
+	
+	protected Class<? extends SequentialBuffer> getSelectionBufferType()
+	{
+		return SequentialBuffer.class;
 	}
 	
 	public boolean canImportFromSequentialEditor(SequentialEditor editor)
