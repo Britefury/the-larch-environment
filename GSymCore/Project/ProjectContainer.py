@@ -30,8 +30,12 @@ class ProjectContainer (ProjectNode):
 	def __setstate__(self, state):
 		super( ProjectContainer, self ).__setstate__( state )
 		self._contents_ = state['contents']
+		self._prevContents = []
 		self._contentsMapCell = Cell( self._computeContentsMap )
-	
+
+		for x in self._contents_:
+			x._parent = self
+		
 	
 	def _computeContentsMap(self):
 		m = {}

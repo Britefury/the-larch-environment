@@ -62,7 +62,7 @@ class PageData (Trackable):
 	def trackContents(self, history):
 		history.track( self.contents )
 	
-	def stopTrackingContent(self, history):
+	def stopTrackingContents(self, history):
 		history.stopTracking( self.contents )
 			
 	
