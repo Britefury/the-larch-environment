@@ -12,6 +12,7 @@ from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMe
 
 from GSymCore.Languages.Python25 import Schema
 from GSymCore.Languages.Python25 import ExternalExpression
+from GSymCore.Languages.Python25.PythonEditor.Precedence import *
 
 
 def _indent(x):
@@ -53,9 +54,21 @@ class Python25CodeGenerator (object):
 			
 		
 	# Callable - use document model node method dispatch mechanism
-	def __call__(self, xs):
-		return dmObjectNodeMethodDispatch( self, xs )
+	def __call__(self, x, outerPrec=PRECEDENCE_NONE):
+		s = dmObjectNodeMethodDispatch( self, x )
+		if parensRequired[x]:
+			prec = nodePrecedence[x]
+			if prec != -1  and  outerPrec != -1  and  prec > outerPrec:
+				s = '(' + s + ')'
+		return s
+		
 
+	
+	def _tupleElements(self, xs):
+		if len( xs ) == 1:
+			return self( xs[0], PRECEDENCE_CONTAINER_ELEMENT ) + ','
+		else:
+			return ', '.join( [ self( x, PRECEDENCE_CONTAINER_ELEMENT )   for x in xs ] )
 	
 	
 	# Misc
@@ -138,11 +151,11 @@ class Python25CodeGenerator (object):
 	
 	@DMObjectNodeDispatchMethod( Schema.TupleTarget )
 	def TupleTarget(self, node, targets):
-		return '( '  +  ', '.join( [ self( i )   for i in targets ] )  +  ', )'
+		return '(' + self._tupleElements( targets ) + ')'
 	
 	@DMObjectNodeDispatchMethod( Schema.ListTarget )
 	def ListTarget(self, node, targets):
-		return '[ '  +  ', '.join( [ self( i )   for i in targets ] )  +  ' ]'
+		return '[ '  +  ', '.join( [ self( i, PRECEDENCE_CONTAINER_ELEMENT )   for i in targets ] )  +  ' ]'
 	
 	
 
@@ -156,70 +169,70 @@ class Python25CodeGenerator (object):
 	# Tuple literal	
 	@DMObjectNodeDispatchMethod( Schema.TupleLiteral )
 	def TupleLiteral(self, node, values):
-		return '( '  +  ', '.join( [ self( i )   for i in values ] )  +  ', )'
+		return '(' + self._tupleElements( values ) + ')'
 
 	
 	
 	# List literal
 	@DMObjectNodeDispatchMethod( Schema.ListLiteral )
 	def ListLiteral(self, node, values):
-		return '[ '  +  ', '.join( [ self( i )   for i in values ] )  +  ' ]'
+		return '[ '  +  ', '.join( [ self( i, PRECEDENCE_CONTAINER_ELEMENT )   for i in values ] )  +  ' ]'
 	
 	
 	
 	# List comprehension / generator expression
 	@DMObjectNodeDispatchMethod( Schema.ComprehensionFor )
 	def ComprehensionFor(self, node, target, source):
-		return 'for ' + self( target ) + ' in ' + self( source )
+		return 'for ' + self( target, PRECEDENCE_CONTAINER_COMPREHENSIONFOR ) + ' in ' + self( source, PRECEDENCE_CONTAINER_COMPREHENSIONFOR )
 	
 	@DMObjectNodeDispatchMethod( Schema.ComprehensionIf )
 	def ComprehensionIf(self, node, condition):
-		return 'if ' + self( condition )
+		return 'if ' + self( condition, PRECEDENCE_CONTAINER_COMPREHENSIONIF )
 	
 	@DMObjectNodeDispatchMethod( Schema.ListComp )
 	def ListComp(self, node, resultExpr, comprehensionItems):
-		return '[ ' + self( resultExpr ) + '   ' + '   '.join( [ self( x )   for x in comprehensionItems ] )  +  ' ]'
+		return '[ ' + self( resultExpr, PRECEDENCE_CONTAINER_ELEMENT ) + '   ' + '   '.join( [ self( x, PRECEDENCE_CONTAINER_ELEMENT )   for x in comprehensionItems ] )  +  ' ]'
 	
 	@DMObjectNodeDispatchMethod( Schema.GeneratorExpr )
 	def GeneratorExpr(self, node, resultExpr, comprehensionItems):
-		return '( ' + self( resultExpr ) + '   ' + '   '.join( [ self( c )   for c in comprehensionItems ] )  +  ' )'
+		return '( ' + self( resultExpr, PRECEDENCE_CONTAINER_ELEMENT ) + '   ' + '   '.join( [ self( c, PRECEDENCE_CONTAINER_ELEMENT )   for c in comprehensionItems ] )  +  ' )'
 	
 	
 	
 	# Dictionary literal
 	@DMObjectNodeDispatchMethod( Schema.DictKeyValuePair )
 	def DictKeyValuePair(self, node, key, value):
-		return self( key ) + ':' + self( value )
+		return self( key, PRECEDENCE_CONTAINER_ELEMENT ) + ':' + self( value, PRECEDENCE_CONTAINER_ELEMENT )
 	
 	@DMObjectNodeDispatchMethod( Schema.DictLiteral )
 	def DictLiteral(self, node, values):
-		return '{ '  +  ', '.join( [ self( i )   for i in values ] )  +  ' }'
+		return '{ '  +  ', '.join( [ self( i, PRECEDENCE_CONTAINER_ELEMENT )   for i in values ] )  +  ' }'
 	
 	
 	
 	# Yield expression and yield atom
 	@DMObjectNodeDispatchMethod( Schema.YieldExpr )
 	def YieldExpr(self, node, value):
-		return '(yield ' + self( value ) + ')'
+		return '(yield ' + self( value, PRECEDENCE_CONTAINER_YIELDEXPR ) + ')'
 		
 	
 	
 	# Attribute ref
 	@DMObjectNodeDispatchMethod( Schema.AttributeRef )
 	def AttributeRef(self, node, target, name):
-		return self( target ) + '.' + name
+		return self( target, PRECEDENCE_CONTAINER_ATTRIBUTEREFTARGET ) + '.' + name
 
 	
 
 	# Subscript
 	@DMObjectNodeDispatchMethod( Schema.SubscriptSlice )
 	def SubscriptSlice(self, node, lower, upper):
-		txt = lambda x:  self( x )   if x is not None   else ''
+		txt = lambda x:  self( x, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX )   if x is not None   else ''
 		return txt( lower ) + ':' + txt( upper )
 
 	@DMObjectNodeDispatchMethod( Schema.SubscriptLongSlice )
 	def SubscriptLongSlice(self, node, lower, upper, stride):
-		txt = lambda x:  self( x )   if x is not None   else ''
+		txt = lambda x:  self( x, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX )   if x is not None   else ''
 		return txt( lower ) + ':' + txt( upper ) + ':' + txt( stride )
 	
 	@DMObjectNodeDispatchMethod( Schema.SubscriptEllipsis )
@@ -228,157 +241,172 @@ class Python25CodeGenerator (object):
 
 	@DMObjectNodeDispatchMethod( Schema.SubscriptTuple )
 	def SubscriptTuple(self, node, values):
-		return '('  +  ','.join( [ self( i )   for i in values ] )  +  ',)'
+		return '(' + self._tupleElements( values ) + ')'
 
 	@DMObjectNodeDispatchMethod( Schema.Subscript )
 	def Subscript(self, node, target, index):
 		if index.isInstanceOf( Schema.SubscriptTuple ):
-			indexSrc = ','.join( [ self( i )   for i in index['values'] ] )
+			indexSrc = self._tupleElements( index['values'] )
 		else:
-			indexSrc = self( index )
-		return self( target ) + '[' + indexSrc + ']'
+			indexSrc = self( index, PRECEDENCE_CONTAINER_SUBSCRIPTINDEX )
+		return self( target, PRECEDENCE_CONTAINER_SUBSCRIPTTARGET ) + '[' + indexSrc + ']'
 	
 
 	
 	# Call	
 	@DMObjectNodeDispatchMethod( Schema.CallKWArg )
 	def CallKWArg(self, node, name, value):
-		return name + '=' + self( value )
+		return name + '=' + self( value, PRECEDENCE_CONTAINER_CALLARG )
 	
 	@DMObjectNodeDispatchMethod( Schema.CallArgList )
 	def CallArgList(self, node, value):
-		return '*' + self( value )
+		return '*' + self( value, PRECEDENCE_CONTAINER_CALLARG )
 	
 	@DMObjectNodeDispatchMethod( Schema.CallKWArgList )
 	def CallKWArgList(self, node, value):
-		return '**' + self( value )
+		return '**' + self( value, PRECEDENCE_CONTAINER_CALLARG )
 	
 	@DMObjectNodeDispatchMethod( Schema.Call )
 	def Call(self, node, target, args):
-		return self( target ) + '( ' + ', '.join( [ self( a )   for a in args ] ) + ' )'
+		return self( target, PRECEDENCE_CONTAINER_CALLTARGET ) + '( ' + ', '.join( [ self( a, PRECEDENCE_CONTAINER_CALLARG )   for a in args ] ) + ' )'
 	
 	
 	
 	# Operators
+	def _prefixOp(self, node, x, op):
+		p = nodePrecedence[node]
+		return op + self( x, p )
+
+	def _binOp(self, node, x, y, op):
+		p = nodePrecedence[node]
+		if rightAssociative[node]:
+			return self( x, p - 1 )  +  op  +  self( y, p )
+		else:
+			return self( x, p  )  +  op  +  self( y, p - 1 )
+	
+	def _cmpOp(self, node, y, op):
+		p = nodePrecedence[node]
+		return op + self( y, p )
+	
 	@DMObjectNodeDispatchMethod( Schema.Pow )
 	def Pow(self, node, x, y):
-		return '( '  +  self( x )  +  ' ** '  +  self( y )  +  ' )'
+		return self._binOp( node, x, y, ' ** ' )
 	
 	
 	@DMObjectNodeDispatchMethod( Schema.Invert )
 	def Invert(self, node, x):
-		return '( ~'  +  self( x )  +  ' )'
+		return self._prefixOp( node, x, '~' )
 	
 	@DMObjectNodeDispatchMethod( Schema.Negate )
 	def Negate(self, node, x):
-		return '( -'  +  self( x )  +  ' )'
+		return self._prefixOp( node, x, '-' )
 	
 	@DMObjectNodeDispatchMethod( Schema.Pos )
 	def Pos(self, node, x):
-		return '( +'  +  self( x )  +  ' )'
+		return self._prefixOp( node, x, '+' )
 	
 	
 	@DMObjectNodeDispatchMethod( Schema.Mul )
 	def Mul(self, node, x, y):
-		return '( '  +  self( x )  +  ' * '  +  self( y )  +  ' )'
+		return self._binOp( node, x, y, ' * ' )
 	
 	@DMObjectNodeDispatchMethod( Schema.Div )
 	def Div(self, node, x, y):
-		return '( '  +  self( x )  +  ' / '  +  self( y )  +  ' )'
+		return self._binOp( node, x, y, ' / ' )
 	
 	@DMObjectNodeDispatchMethod( Schema.Mod )
 	def Mod(self, node, x, y):
-		return '( '  +  self( x )  +  ' % '  +  self( y )  +  ' )'
+		return self._binOp( node, x, y, ' % ' )
 	
 	@DMObjectNodeDispatchMethod( Schema.Add )
 	def Add(self, node, x, y):
-		return '( '  +  self( x )  +  ' + '  +  self( y )  +  ' )'
+		return self._binOp( node, x, y, ' + ' )
 	
 	@DMObjectNodeDispatchMethod( Schema.Sub )
 	def Sub(self, node, x, y):
-		return '( '  +  self( x )  +  ' - '  +  self( y )  +  ' )'
+		return self._binOp( node, x, y, ' - ' )
 	
 	
 	@DMObjectNodeDispatchMethod( Schema.LShift )
 	def LShift(self, node, x, y):
-		return '( '  +  self( x )  +  ' << '  +  self( y )  +  ' )'
+		return self._binOp( node, x, y, ' << ' )
 	
 	@DMObjectNodeDispatchMethod( Schema.RShift )
 	def RShift(self, node, x, y):
-		return '( '  +  self( x )  +  ' >> '  +  self( y )  +  ' )'
+		return self._binOp( node, x, y, ' >> ' )
 	
 	
 	@DMObjectNodeDispatchMethod( Schema.BitAnd )
 	def BitAnd(self, node, x, y):
-		return '( '  +  self( x )  +  ' & '  +  self( y )  +  ' )'
+		return self._binOp( node, x, y, ' & ' )
 	
 	@DMObjectNodeDispatchMethod( Schema.BitXor )
 	def BitXor(self, node, x, y):
-		return '( '  +  self( x )  +  ' ^ '  +  self( y )  +  ' )'
+		return self._binOp( node, x, y, ' ^ ' )
 	
 	@DMObjectNodeDispatchMethod( Schema.BitOr )
 	def BitOr(self, node, x, y):
-		return '( '  +  self( x )  +  ' | '  +  self( y )  +  ' )'
+		return self._binOp( node, x, y, ' | ' )
 	
 
 	@DMObjectNodeDispatchMethod( Schema.Cmp )
 	def Cmp(self, node, x, ops):
-		return '( ' + self( x )  +  ''.join( [ self( op )   for op in ops ] ) + ' )'
+		return self( x, PRECEDENCE_CMP )  +  ''.join( [ self( op, PRECEDENCE_CMP )   for op in ops ] )
 	
 	@DMObjectNodeDispatchMethod( Schema.CmpOpLte )
 	def CmpOpLte(self, node, y):
-		return ' <= ' + self( y )
+		return self._cmpOp( node, y, ' <= ' )
 	
 	@DMObjectNodeDispatchMethod( Schema.CmpOpLt )
 	def CmpOpLt(self, node, y):
-		return ' < ' + self( y )
+		return self._cmpOp( node, y, ' < ' )
 	
 	@DMObjectNodeDispatchMethod( Schema.CmpOpGte )
 	def CmpOpGte(self, node, y):
-		return ' >= ' + self( y )
+		return self._cmpOp( node, y, ' >= ' )
 	
 	@DMObjectNodeDispatchMethod( Schema.CmpOpGt )
 	def CmpOpGt(self, node, y):
-		return ' > ' + self( y )
+		return self._cmpOp( node, y, ' > ' )
 	
 	@DMObjectNodeDispatchMethod( Schema.CmpOpEq )
 	def CmpOpEq(self, node, y):
-		return ' == ' + self( y )
+		return self._cmpOp( node, y, ' == ' )
 	
 	@DMObjectNodeDispatchMethod( Schema.CmpOpNeq )
 	def CmpOpNeq(self, node, y):
-		return ' != ' + self( y )
+		return self._cmpOp( node, y, ' != ' )
 	
 	@DMObjectNodeDispatchMethod( Schema.CmpOpIsNot )
 	def CmpOpIsNot(self, node, y):
-		return ' is not ' + self( y )
+		return self._cmpOp( node, y, ' is not ' )
 	
 	@DMObjectNodeDispatchMethod( Schema.CmpOpIs )
 	def CmpOpIs(self, node, y):
-		return ' is ' + self( y )
+		return self._cmpOp( node, y, ' is ' )
 	
 	@DMObjectNodeDispatchMethod( Schema.CmpOpNotIn )
 	def CmpOpNotIn(self, node, y):
-		return ' not in ' + self( y )
+		return self._cmpOp( node, y, ' not in ' )
 	
 	@DMObjectNodeDispatchMethod( Schema.CmpOpIn )
 	def CmpOpIn(self, node, y):
-		return ' in ' + self( y )
+		return self._cmpOp( node, y, ' in ' )
 	
 	
 
 	
 	@DMObjectNodeDispatchMethod( Schema.NotTest )
 	def NotTest(self, node, x):
-		return '(not '  +  self( x )  +  ')'
+		return self._prefixOp( node, x, 'not ' )
 	
 	@DMObjectNodeDispatchMethod( Schema.AndTest )
 	def AndTest(self, node, x, y):
-		return '( '  +  self( x )  +  ' and '  +  self( y )  +  ' )'
+		return self._binOp( node, x, y, ' and ' )
 	
 	@DMObjectNodeDispatchMethod( Schema.OrTest )
 	def OrTest(self, node, x, y):
-		return '( '  +  self( x )  +  ' or '  +  self( y )  +  ' )'
+		return self._binOp( node, x, y, ' or ' )
 	
 	
 	
@@ -390,7 +418,7 @@ class Python25CodeGenerator (object):
 	
 	@DMObjectNodeDispatchMethod( Schema.DefaultValueParam )
 	def DefaultValueParam(self, node, name, defaultValue):
-		return name  +  '='  +  self( defaultValue )
+		return name  +  '='  +  self( defaultValue, PRECEDENCE_NONE )
 	
 	@DMObjectNodeDispatchMethod( Schema.ParamList )
 	def ParamList(self, node, name):
@@ -405,14 +433,14 @@ class Python25CodeGenerator (object):
 	# Lambda expression
 	@DMObjectNodeDispatchMethod( Schema.LambdaExpr )
 	def LambdaExpr(self, node, params, expr):
-		return '( lambda '  +  ', '.join( [ self( p )   for p in params ] )  +  ': '  +  self( expr ) + ' )'
+		return 'lambda '  +  ', '.join( [ self( p, PRECEDENCE_NONE )   for p in params ] )  +  ': '  +  self( expr, PRECEDENCE_CONTAINER_LAMBDAEXPR )
 	
 	
 	
 	# Conditional expression
 	@DMObjectNodeDispatchMethod( Schema.ConditionalExpr )
 	def ConditionalExpr(self, node, condition, expr, elseExpr):
-		return self( expr )  +  '   if '  +  self( condition )  +  '   else '  +  self( elseExpr )
+		return self( expr, PRECEDENCE_CONTAINER_CONDITIONALEXPR )  +  '   if '  +  self( condition, PRECEDENCE_CONTAINER_CONDITIONALEXPR )  +  '   else '  +  self( elseExpr, PRECEDENCE_CONTAINER_CONDITIONALEXPR )
 
 	
 	
@@ -457,7 +485,7 @@ class Python25CodeGenerator (object):
 	# Expression statement
 	@DMObjectNodeDispatchMethod( Schema.ExprStmt )
 	def ExprStmt(self, node, expr):
-		return self( expr )
+		return self( expr, PRECEDENCE_STMT )
 	
 	
 	# Expression statement
@@ -469,19 +497,19 @@ class Python25CodeGenerator (object):
 	# Assert statement
 	@DMObjectNodeDispatchMethod( Schema.AssertStmt )
 	def AssertStmt(self, node, condition, fail):
-		return 'assert '  +  self( condition )  +  ( ', ' + self( fail )   if fail is not None   else  '' )
+		return 'assert '  +  self( condition, PRECEDENCE_STMT )  +  ( ', ' + self( fail, PRECEDENCE_STMT )   if fail is not None   else  '' )
 	
 	
 	# Assignment statement
 	@DMObjectNodeDispatchMethod( Schema.AssignStmt )
 	def AssignStmt(self, node, targets, value):
-		return ''.join( [ self( t ) + ' = '   for t in targets ] )  +  self( value )
+		return ''.join( [ self( t, PRECEDENCE_STMT ) + ' = '   for t in targets ] )  +  self( value, PRECEDENCE_STMT )
 	
 	
 	# Augmented assignment statement
 	@DMObjectNodeDispatchMethod( Schema.AugAssignStmt )
 	def AugAssignStmt(self, node, op, target, value):
-		return self( target )  +  ' '  +  op  +  ' '  +  self( value )
+		return self( target, PRECEDENCE_STMT )  +  ' '  +  op  +  ' '  +  self( value, PRECEDENCE_STMT )
 	
 	
 	# Pass statement
@@ -493,25 +521,25 @@ class Python25CodeGenerator (object):
 	# Del statement
 	@DMObjectNodeDispatchMethod( Schema.DelStmt )
 	def DelStmt(self, node, target):
-		return 'del '  +  self( target )
+		return 'del '  +  self( target, PRECEDENCE_STMT )
 	
 	
 	# Return statement
 	@DMObjectNodeDispatchMethod( Schema.ReturnStmt )
 	def ReturnStmt(self, node, value):
-		return 'return '  +  self( value )
+		return 'return '  +  self( value, PRECEDENCE_STMT )
 	
 	
 	# Yield statement
 	@DMObjectNodeDispatchMethod( Schema.YieldStmt )
 	def YieldStmt(self, node, value):
-		return 'yield '  +  self( value )
+		return 'yield '  +  self( value, PRECEDENCE_STMT )
 	
 	
 	# Raise statement
 	@DMObjectNodeDispatchMethod( Schema.RaiseStmt )
 	def RaiseStmt(self, node, excType, excValue, traceback):
-		params = ', '.join( [ self( x )   for x in excType, excValue, traceback   if x is not None ] )
+		params = ', '.join( [ self( x, PRECEDENCE_STMT )   for x in excType, excValue, traceback   if x is not None ] )
 		if params != '':
 			return 'raise ' + params
 		else:
@@ -553,15 +581,15 @@ class Python25CodeGenerator (object):
 	
 	@DMObjectNodeDispatchMethod( Schema.ImportStmt )
 	def ImportStmt(self, node, modules):
-		return 'import '  +  ', '.join( [ self( x )   for x in modules ] )
+		return 'import '  +  ', '.join( [ self( x, PRECEDENCE_STMT )   for x in modules ] )
 	
 	@DMObjectNodeDispatchMethod( Schema.FromImportStmt )
 	def FromImportStmt(self, node, module, imports):
-		return 'from ' + self( module ) + ' import ' + ', '.join( [ self( x )   for x in imports ] )
+		return 'from ' + self( module, PRECEDENCE_STMT ) + ' import ' + ', '.join( [ self( x, PRECEDENCE_STMT )   for x in imports ] )
 	
 	@DMObjectNodeDispatchMethod( Schema.FromImportAllStmt )
 	def FromImportAllStmt(self, node, module):
-		return 'from ' + self( module ) + ' import *'
+		return 'from ' + self( module, PRECEDENCE_STMT ) + ' import *'
 	
 	
 	# Global statement
@@ -571,17 +599,17 @@ class Python25CodeGenerator (object):
 	
 	@DMObjectNodeDispatchMethod( Schema.GlobalStmt )
 	def GlobalStmt(self, node, vars):
-		return 'global '  +  ', '.join( [ self( x )   for x in vars ] )
+		return 'global '  +  ', '.join( [ self( x, PRECEDENCE_STMT )   for x in vars ] )
 	
 	
 	# Exec statement
 	@DMObjectNodeDispatchMethod( Schema.ExecStmt )
 	def ExecStmt(self, node, source, globals, locals):
-		txt = 'exec '  +  self( source )
+		txt = 'exec '  +  self( source, PRECEDENCE_STMT )
 		if globals is not None:
-			txt += ' in '  +  self( globals )
+			txt += ' in '  +  self( globals, PRECEDENCE_STMT )
 		if locals is not None:
-			txt += ', '  +  self( locals )
+			txt += ', '  +  self( locals, PRECEDENCE_STMT )
 		return txt
 	
 	
@@ -590,12 +618,12 @@ class Python25CodeGenerator (object):
 	def PrintStmt(self, node, destination, values):
 		txt = 'print'
 		if destination is not None:
-			txt += ' >> %s'  %  self( destination )
+			txt += ' >> %s'  %  self( destination, PRECEDENCE_STMT )
 		if len( values ) > 0:
 			if destination is not None:
 				txt += ','
 			txt += ' '
-			txt += ', '.join( [ self( v )   for v in values ] )
+			txt += ', '.join( [ self( v, PRECEDENCE_STMT )   for v in values ] )
 		return txt
 	
 	
@@ -622,29 +650,29 @@ class Python25CodeGenerator (object):
 	@DMObjectNodeDispatchMethod( Schema.IfStmt )
 	def IfStmt(self, node, condition, suite, elifBlocks, elseSuite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
-		elifText = ''.join( [ self( b )   for b in elifBlocks ] )
-		return 'if '  +  self( condition ) + ':\n'  +  _indent( suiteText )  +  elifText  +  self._elseSuiteToText( elseSuite )
+		elifText = ''.join( [ self( b, PRECEDENCE_STMT )   for b in elifBlocks ] )
+		return 'if '  +  self( condition, PRECEDENCE_STMT ) + ':\n'  +  _indent( suiteText )  +  elifText  +  self._elseSuiteToText( elseSuite )
 	
 
 	# Elif block
 	@DMObjectNodeDispatchMethod( Schema.ElifBlock )
 	def ElifBlock(self, node, condition, suite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
-		return 'elif '  +  self( condition ) + ':\n'  +  _indent( suiteText )
+		return 'elif '  +  self( condition, PRECEDENCE_STMT ) + ':\n'  +  _indent( suiteText )
 	
 
 	# While statement
 	@DMObjectNodeDispatchMethod( Schema.WhileStmt )
 	def WhileStmt(self, node, condition, suite, elseSuite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
-		return 'while '  +  self( condition ) + ':\n'  +  _indent( suiteText )  +  self._elseSuiteToText( elseSuite )
+		return 'while '  +  self( condition, PRECEDENCE_STMT ) + ':\n'  +  _indent( suiteText )  +  self._elseSuiteToText( elseSuite )
 	
 
 	# For statement
 	@DMObjectNodeDispatchMethod( Schema.ForStmt )
 	def ForStmt(self, node, target, source, suite, elseSuite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
-		return 'for '  +  self( target )  +  ' in '  +  self( source )  +  ':\n'  +  _indent( suiteText )  +  self._elseSuiteToText( elseSuite )
+		return 'for '  +  self( target, PRECEDENCE_STMT )  +  ' in '  +  self( source, PRECEDENCE_STMT )  +  ':\n'  +  _indent( suiteText )  +  self._elseSuiteToText( elseSuite )
 	
 
 	# Try statement
@@ -661,9 +689,9 @@ class Python25CodeGenerator (object):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
 		txt = 'except'
 		if exception is not None:
-			txt += ' ' + self( exception )
+			txt += ' ' + self( exception, PRECEDENCE_STMT )
 		if target is not None:
-			txt += ', ' + self( target )
+			txt += ', ' + self( target, PRECEDENCE_STMT )
 		return txt + ':\n'  +  _indent( suiteText )
 	
 
@@ -671,7 +699,7 @@ class Python25CodeGenerator (object):
 	@DMObjectNodeDispatchMethod( Schema.WithStmt )
 	def WithStmt(self, node, expr, target, suite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
-		return 'with '  +  self( expr )  +  ( ' as ' + self( target )   if target is not None   else   '' )  +  ':\n'  +  _indent( suiteText )
+		return 'with '  +  self( expr, PRECEDENCE_STMT )  +  ( ' as ' + self( target, PRECEDENCE_STMT )   if target is not None   else   '' )  +  ':\n'  +  _indent( suiteText )
 	
 	
 	# Decorator
@@ -679,7 +707,7 @@ class Python25CodeGenerator (object):
 	def Decorator(self, node, name, args):
 		text = '@' + name
 		if args is not None:
-			text += '( ' + ', '.join( [ self( a )   for a in args ] ) + ' )'
+			text += '( ' + ', '.join( [ self( a, PRECEDENCE_STMT )   for a in args ] ) + ' )'
 		return text
 	
 	
@@ -694,7 +722,7 @@ class Python25CodeGenerator (object):
 	@DMObjectNodeDispatchMethod( Schema.DefStmt )
 	def DefStmt(self, node, decorators, name, params, suite):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
-		return self._decoratorsToText( decorators )  +  'def '  +  name  +  '('  +  ', '.join( [ self( p )   for p in params ] )  +  '):\n'  +  _indent( suiteText )
+		return self._decoratorsToText( decorators )  +  'def '  +  name  +  '('  +  ', '.join( [ self( p, PRECEDENCE_STMT )   for p in params ] )  +  '):\n'  +  _indent( suiteText )
 	
 
 	# Class statement
@@ -703,7 +731,7 @@ class Python25CodeGenerator (object):
 		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
 		text = self._decoratorsToText( decorators )  +  'class '  +  name
 		if bases is not None:
-			text += ' ('  +  ', '.join( [ self( h )   for h in bases ] )  +  ')'
+			text += ' ('  +  ', '.join( [ self( h, PRECEDENCE_STMT )   for h in bases ] )  +  ')'
 		return text  +  ':\n'  +  _indent( suiteText )
 	
 	
@@ -996,7 +1024,7 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		
 		
 	def _binOpTest(self, sxOp, expectedOp):
-		self._testSX( '(py %s x=(py Load name=a) y=(py Load name=b))'  %  sxOp,  '( a %s b )'  %  expectedOp )
+		self._testSX( '(py %s x=(py Load name=a) y=(py Load name=b))'  %  sxOp,  'a %s b'  %  expectedOp )
 		
 		
 	def test_BlankLine(self):
@@ -1033,7 +1061,10 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		
 		
 	def test_TupleTarget(self):
-		self._testSX( '(py TupleTarget targets=[(py SingleTarget name=a) (py SingleTarget name=b) (py SingleTarget name=c)])', '( a, b, c, )' )
+		self._testSX( '(py TupleTarget targets=[])', '()' )
+		self._testSX( '(py TupleTarget targets=[(py SingleTarget name=a)])', '(a,)' )
+		self._testSX( '(py TupleTarget targets=[(py SingleTarget name=a) (py SingleTarget name=b) (py SingleTarget name=c)])', '(a, b, c)' )
+		self._testSX( '(py ListTarget targets=[(py SingleTarget name=a) (py TupleTarget targets=[(py SingleTarget name=a) (py SingleTarget name=b) (py SingleTarget name=c)])])', '[ a, (a, b, c) ]' )
 		
 		
 	def test_ListTarget(self):
@@ -1045,7 +1076,10 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		
 		
 	def test_TupleLiteral(self):
-		self._testSX( '(py TupleLiteral values=[(py Load name=a) (py Load name=b) (py Load name=c)])', '( a, b, c, )' )
+		self._testSX( '(py TupleLiteral values=[])', '()' )
+		self._testSX( '(py TupleLiteral values=[(py Load name=a)])', '(a,)' )
+		self._testSX( '(py TupleLiteral values=[(py Load name=a) (py Load name=b) (py Load name=c)])', '(a, b, c)' )
+		self._testSX( '(py ListLiteral values=[(py Load name=a) (py TupleLiteral values=[(py Load name=a) (py Load name=b) (py Load name=c)])])', '[ a, (a, b, c) ]' )
 		
 		
 	def test_ListLiteral(self):
@@ -1111,7 +1145,8 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 
 		
 	def test_subscript_tuple(self):
-		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptTuple values=[(py Load name=a) (py Load name=b)]))', 'a[(a,b,)]' )
+		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptTuple values=[(py Load name=a) (py SubscriptSlice lower=(py Load name=b) upper=(py Load name=c))]))', 'a[a, b:c]' )
+		self._testSX( '(py Subscript target=(py Load name=a) index=(py SubscriptTuple values=[(py Load name=b) (py SubscriptTuple values=[(py Load name=c) (py Load name=d)])]))', 'a[b, (c, d)]' )
 		
 		
 	def test_call(self):
@@ -1120,9 +1155,9 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		
 	def test_operators(self):
 		self._binOpTest( 'Pow', '**' )
-		self._testSX( '(py Invert x=(py Load name=a))', '( ~a )' )
-		self._testSX( '(py Negate x=(py Load name=a))', '( -a )' )
-		self._testSX( '(py Pos x=(py Load name=a))', '( +a )' )
+		self._testSX( '(py Invert x=(py Load name=a))', '~a' )
+		self._testSX( '(py Negate x=(py Load name=a))', '-a' )
+		self._testSX( '(py Pos x=(py Load name=a))', '+a' )
 		self._binOpTest( 'Mul', '*' )
 		self._binOpTest( 'Div', '/' )
 		self._binOpTest( 'Mod', '%' )
@@ -1133,24 +1168,27 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		self._binOpTest( 'BitAnd', '&' )
 		self._binOpTest( 'BitXor', '^' )
 		self._binOpTest( 'BitOr', '|' )
-		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpLte y=(py Load name=b))])',  '( a <= b )' )
-		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpLt y=(py Load name=b))])',  '( a < b )' )
-		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpGte y=(py Load name=b))])',  '( a >= b )' )
-		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpGt y=(py Load name=b))])',  '( a > b )' )
-		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpEq y=(py Load name=b))])',  '( a == b )' )
-		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpNeq y=(py Load name=b))])',  '( a != b )' )
-		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpIsNot y=(py Load name=b))])',  '( a is not b )' )
-		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpIs y=(py Load name=b))])',  '( a is b )' )
-		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpNotIn y=(py Load name=b))])',  '( a not in b )' )
-		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpIn y=(py Load name=b))])',  '( a in b )' )
-		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpLt y=(py Load name=b)) (py CmpOpGt y=(py Load name=c))])',  '( a < b > c )' )
-		self._testSX( '(py NotTest x=(py Load name=a))', '(not a)' )
+		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpLte y=(py Load name=b))])',  'a <= b' )
+		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpLt y=(py Load name=b))])',  'a < b' )
+		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpGte y=(py Load name=b))])',  'a >= b' )
+		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpGt y=(py Load name=b))])',  'a > b' )
+		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpEq y=(py Load name=b))])',  'a == b' )
+		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpNeq y=(py Load name=b))])',  'a != b' )
+		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpIsNot y=(py Load name=b))])',  'a is not b' )
+		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpIs y=(py Load name=b))])',  'a is b' )
+		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpNotIn y=(py Load name=b))])',  'a not in b' )
+		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpIn y=(py Load name=b))])',  'a in b' )
+		self._testSX( '(py Cmp x=(py Load name=a) ops=[(py CmpOpLt y=(py Load name=b)) (py CmpOpGt y=(py Load name=c))])',  'a < b > c' )
+		self._testSX( '(py NotTest x=(py Load name=a))', 'not a' )
 		self._binOpTest( 'AndTest', 'and' )
 		self._binOpTest( 'OrTest', 'or' )
+		self._testSX( '(py Mul x=(py Load name=a) y=(py Add x=(py Load name=b) y=(py Load name=c)))', 'a * (b + c)' )
+		self._testSX( '(py Add x=(py Load name=a) y=(py Mul x=(py Load name=b) y=(py Load name=c)))', 'a + b * c' )
 		
 		
 	def test_LambdaExpr(self):
-		self._testSX( '(py LambdaExpr params=[(py SimpleParam name=a) (py SimpleParam name=b) (py DefaultValueParam name=c defaultValue=(py Load name=d)) (py DefaultValueParam name=e defaultValue=(py Load name=f)) (py ParamList name=g) (py KWParamList name=h)] expr=(py Load name=a))', '( lambda a, b, c=d, e=f, *g, **h: a )' )
+		self._testSX( '(py LambdaExpr params=[(py SimpleParam name=a) (py SimpleParam name=b) (py DefaultValueParam name=c defaultValue=(py Load name=d)) (py DefaultValueParam name=e defaultValue=(py Load name=f)) (py ParamList name=g) (py KWParamList name=h)] expr=(py Load name=a))',
+		              'lambda a, b, c=d, e=f, *g, **h: a' )
 	
 		
 	def test_ConditionalExpr(self):
