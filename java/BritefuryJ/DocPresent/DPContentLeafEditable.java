@@ -656,7 +656,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 			else
 			{
 				boolean bNonEditableContentCleared = false;
-				while ( !left.isEditable() )
+				while ( !left.isEditable()  ||  left.getTextRepresentationLength() == 0 )
 				{
 					bNonEditableContentCleared |= left.deleteText();
 					if ( !isRealised() )
@@ -711,7 +711,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 			else
 			{
 				boolean bNonEditableContentCleared = false;
-				while ( !right.isEditable() )
+				while ( !right.isEditable()  ||  right.getTextRepresentationLength() == 0 )
 				{
 					bNonEditableContentCleared |= right.deleteText();
 					if ( !isRealised() )

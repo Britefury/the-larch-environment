@@ -12,6 +12,8 @@ import org.python.core.PyTuple;
 
 public class InvokePyFunction
 {
+	// Used to invoke Python functions, where it is desirable to catch *ALL* exceptions, and return the
+	// exception objects themselves, so that they can be displayed.
 	public static PyTuple invoke(PyObject callable)
 	{
 		PyObject exc = Py.None;

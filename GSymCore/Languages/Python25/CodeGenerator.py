@@ -15,12 +15,49 @@ from GSymCore.Languages.Python25 import ExternalExpression
 from GSymCore.Languages.Python25.PythonEditor.Precedence import *
 
 
-def _indent(x):
-	lines = x.split( '\n' )
-	lines = [ '\t' + l   for l in lines ]
-	if lines[-1] == '\t':
-		lines[-1] = ''
-	return '\n'.join( lines )
+class Line (object):
+	def __init__(self, text, node):
+		self.text = text
+		self.node = node
+	
+	def nodes(self, nodesList):
+		nodesList.append( self.node )
+		
+	def indent(self):
+		return Line( '\t' + self.text, self.node )
+		
+	def __str__(self):
+		return self.text
+
+
+class Block (object):
+	def __init__(self, lines):
+		self.lines = []
+		for l in lines:
+			if isinstance( l, Line ):
+				self.lines.append( l )
+			elif isinstance( l, Block ):
+				self.lines.extend( l.lines )
+			else:
+				raise TypeError, 'line should be a line or a Block, not a %s (with a value of %s)' % ( type( l ), l )
+			
+	def __add__(self, x):
+		if not isinstance( x, Block ):
+			raise TypeError, 'can only add blocks to one another'
+		return Block( self.lines + x.lines )
+		
+	def indent(self):
+		return Block( [ l.indent()   for l in self.lines ] )
+	
+	def nodeMap(self):
+		return [ l.node   for l in self.lines ]
+	
+	def __str__(self):
+		return '\n'.join( [ l.text   for l in self.lines ] ) + '\n'
+
+		
+_emptyBlock = Block( [] )
+
 
 
 
@@ -74,7 +111,7 @@ class Python25CodeGenerator (object):
 	# Misc
 	@DMObjectNodeDispatchMethod( Schema.BlankLine )
 	def BlankLine(self, node):
-		return ''
+		return Line( '', node )
 	
 
 	@DMObjectNodeDispatchMethod( Schema.UNPARSED )
@@ -485,7 +522,7 @@ class Python25CodeGenerator (object):
 	# Expression statement
 	@DMObjectNodeDispatchMethod( Schema.ExprStmt )
 	def ExprStmt(self, node, expr):
-		return self( expr, PRECEDENCE_STMT )
+		return Line( self( expr, PRECEDENCE_STMT ),   node )
 	
 	
 	# Expression statement
@@ -497,43 +534,43 @@ class Python25CodeGenerator (object):
 	# Assert statement
 	@DMObjectNodeDispatchMethod( Schema.AssertStmt )
 	def AssertStmt(self, node, condition, fail):
-		return 'assert '  +  self( condition, PRECEDENCE_STMT )  +  ( ', ' + self( fail, PRECEDENCE_STMT )   if fail is not None   else  '' )
+		return Line( 'assert '  +  self( condition, PRECEDENCE_STMT )  +  ( ', ' + self( fail, PRECEDENCE_STMT )   if fail is not None   else  '' ),   node )
 	
 	
 	# Assignment statement
 	@DMObjectNodeDispatchMethod( Schema.AssignStmt )
 	def AssignStmt(self, node, targets, value):
-		return ''.join( [ self( t, PRECEDENCE_STMT ) + ' = '   for t in targets ] )  +  self( value, PRECEDENCE_STMT )
+		return Line( ''.join( [ self( t, PRECEDENCE_STMT ) + ' = '   for t in targets ] )  +  self( value, PRECEDENCE_STMT ),   node )
 	
 	
 	# Augmented assignment statement
 	@DMObjectNodeDispatchMethod( Schema.AugAssignStmt )
 	def AugAssignStmt(self, node, op, target, value):
-		return self( target, PRECEDENCE_STMT )  +  ' '  +  op  +  ' '  +  self( value, PRECEDENCE_STMT )
+		return Line( self( target, PRECEDENCE_STMT )  +  ' '  +  op  +  ' '  +  self( value, PRECEDENCE_STMT ),   node )
 	
 	
 	# Pass statement
 	@DMObjectNodeDispatchMethod( Schema.PassStmt )
 	def PassStmt(self, node):
-		return 'pass'
+		return Line( 'pass',   node )
 	
 	
 	# Del statement
 	@DMObjectNodeDispatchMethod( Schema.DelStmt )
 	def DelStmt(self, node, target):
-		return 'del '  +  self( target, PRECEDENCE_STMT )
+		return Line( 'del '  +  self( target, PRECEDENCE_STMT ),   node )
 	
 	
 	# Return statement
 	@DMObjectNodeDispatchMethod( Schema.ReturnStmt )
 	def ReturnStmt(self, node, value):
-		return 'return '  +  self( value, PRECEDENCE_STMT )
+		return Line( 'return '  +  self( value, PRECEDENCE_STMT ),   node )
 	
 	
 	# Yield statement
 	@DMObjectNodeDispatchMethod( Schema.YieldStmt )
 	def YieldStmt(self, node, value):
-		return 'yield '  +  self( value, PRECEDENCE_STMT )
+		return Line( 'yield '  +  self( value, PRECEDENCE_STMT ),   node )
 	
 	
 	# Raise statement
@@ -541,21 +578,21 @@ class Python25CodeGenerator (object):
 	def RaiseStmt(self, node, excType, excValue, traceback):
 		params = ', '.join( [ self( x, PRECEDENCE_STMT )   for x in excType, excValue, traceback   if x is not None ] )
 		if params != '':
-			return 'raise ' + params
+			return Line( 'raise ' + params,   node )
 		else:
-			return 'raise'
+			return Line( 'raise',   node )
 	
 	
 	# Break statement
 	@DMObjectNodeDispatchMethod( Schema.BreakStmt )
 	def BreakStmt(self, node):
-		return 'break'
+		return Line( 'break',   node )
 	
 	
 	# Continue statement
 	@DMObjectNodeDispatchMethod( Schema.ContinueStmt )
 	def ContinueStmt(self, node):
-		return 'continue'
+		return Line( 'continue',   node )
 	
 	
 	# Import statement
@@ -581,15 +618,15 @@ class Python25CodeGenerator (object):
 	
 	@DMObjectNodeDispatchMethod( Schema.ImportStmt )
 	def ImportStmt(self, node, modules):
-		return 'import '  +  ', '.join( [ self( x, PRECEDENCE_STMT )   for x in modules ] )
+		return Line( 'import '  +  ', '.join( [ self( x, PRECEDENCE_STMT )   for x in modules ] ),   node )
 	
 	@DMObjectNodeDispatchMethod( Schema.FromImportStmt )
 	def FromImportStmt(self, node, module, imports):
-		return 'from ' + self( module, PRECEDENCE_STMT ) + ' import ' + ', '.join( [ self( x, PRECEDENCE_STMT )   for x in imports ] )
+		return Line( 'from ' + self( module, PRECEDENCE_STMT ) + ' import ' + ', '.join( [ self( x, PRECEDENCE_STMT )   for x in imports ] ),   node )
 	
 	@DMObjectNodeDispatchMethod( Schema.FromImportAllStmt )
 	def FromImportAllStmt(self, node, module):
-		return 'from ' + self( module, PRECEDENCE_STMT ) + ' import *'
+		return Line( 'from ' + self( module, PRECEDENCE_STMT ) + ' import *',   node )
 	
 	
 	# Global statement
@@ -599,7 +636,7 @@ class Python25CodeGenerator (object):
 	
 	@DMObjectNodeDispatchMethod( Schema.GlobalStmt )
 	def GlobalStmt(self, node, vars):
-		return 'global '  +  ', '.join( [ self( x, PRECEDENCE_STMT )   for x in vars ] )
+		return Line( 'global '  +  ', '.join( [ self( x, PRECEDENCE_STMT )   for x in vars ] ),   node )
 	
 	
 	# Exec statement
@@ -610,7 +647,7 @@ class Python25CodeGenerator (object):
 			txt += ' in '  +  self( globals, PRECEDENCE_STMT )
 		if locals is not None:
 			txt += ', '  +  self( locals, PRECEDENCE_STMT )
-		return txt
+		return Line( txt,   node )
 	
 	
 	# Print statement
@@ -624,82 +661,81 @@ class Python25CodeGenerator (object):
 				txt += ','
 			txt += ' '
 			txt += ', '.join( [ self( v, PRECEDENCE_STMT )   for v in values ] )
-		return txt
+		return Line( txt,   node )
 	
 	
 
-	def _elseSuiteToText(self, suite):
+	def _indentedSuite(self, headerLine, suite):
+		return Block( [ headerLine ]  +  [ self( stmt ).indent()   for stmt in suite ] )
+
+	def _elseSuite(self, node, suite):
 		if suite is not None:
-			suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
-			return 'else:\n'  +  _indent( suiteText )
+			return self._indentedSuite( Line( 'else:', node ),  suite )
 		else:
-			return ''
+			return _emptyBlock
 			
-	
-	
-	def _finallySuiteToText(self, suite):
+	def _finallySuite(self, node, suite):
 		if suite is not None:
-			suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
-			return 'finally:\n'  +  _indent( suiteText )
+			return self._indentedSuite( Line( 'finally:', node ),  suite )
 		else:
-			return ''
+			return _emptyBlock
 			
 	
 	
 	# If statement
 	@DMObjectNodeDispatchMethod( Schema.IfStmt )
 	def IfStmt(self, node, condition, suite, elifBlocks, elseSuite):
-		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
-		elifText = ''.join( [ self( b, PRECEDENCE_STMT )   for b in elifBlocks ] )
-		return 'if '  +  self( condition, PRECEDENCE_STMT ) + ':\n'  +  _indent( suiteText )  +  elifText  +  self._elseSuiteToText( elseSuite )
+		lines = self._indentedSuite( Line( 'if '  +  self( condition, PRECEDENCE_STMT ) + ':', node ),  suite )
+		for b in elifBlocks:
+			lines += self( b, PRECEDENCE_STMT )
+		lines += self._elseSuite( node, elseSuite )
+		return lines
 	
 
 	# Elif block
 	@DMObjectNodeDispatchMethod( Schema.ElifBlock )
 	def ElifBlock(self, node, condition, suite):
-		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
-		return 'elif '  +  self( condition, PRECEDENCE_STMT ) + ':\n'  +  _indent( suiteText )
+		return self._indentedSuite( Line( 'elif '  +  self( condition, PRECEDENCE_STMT ) + ':', node ),  suite )
 	
 
 	# While statement
 	@DMObjectNodeDispatchMethod( Schema.WhileStmt )
 	def WhileStmt(self, node, condition, suite, elseSuite):
-		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
-		return 'while '  +  self( condition, PRECEDENCE_STMT ) + ':\n'  +  _indent( suiteText )  +  self._elseSuiteToText( elseSuite )
+		return self._indentedSuite( Line( 'while '  +  self( condition, PRECEDENCE_STMT ) + ':', node ),  suite )  +  self._elseSuite( node, elseSuite )
 	
 
 	# For statement
 	@DMObjectNodeDispatchMethod( Schema.ForStmt )
 	def ForStmt(self, node, target, source, suite, elseSuite):
-		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
-		return 'for '  +  self( target, PRECEDENCE_STMT )  +  ' in '  +  self( source, PRECEDENCE_STMT )  +  ':\n'  +  _indent( suiteText )  +  self._elseSuiteToText( elseSuite )
+		return self._indentedSuite( Line( 'for '  +  self( target, PRECEDENCE_STMT )  +  ' in '  +  self( source, PRECEDENCE_STMT ) + ':', node ),  suite )  +  self._elseSuite( node, elseSuite )
 	
 
 	# Try statement
 	@DMObjectNodeDispatchMethod( Schema.TryStmt )
 	def TryStmt(self, node, suite, exceptBlocks, elseSuite, finallySuite):
-		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
-		exceptText = ''.join( [ self( b )   for b in exceptBlocks ] )
-		return 'try:\n'  +  _indent( suiteText )  +  exceptText  +  self._elseSuiteToText( elseSuite )  +  self._finallySuiteToText( finallySuite )
+		lines = self._indentedSuite( Line( 'try:', node ),  suite )
+		for b in exceptBlocks:
+			lines += self( b, PRECEDENCE_STMT )
+		lines += self._elseSuite( node, elseSuite )
+		lines += self._finallySuite( node, finallySuite )
+		return lines
 	
 
 	# Except statement
 	@DMObjectNodeDispatchMethod( Schema.ExceptBlock )
 	def ExceptBlock(self, node, exception, target, suite):
-		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
 		txt = 'except'
 		if exception is not None:
 			txt += ' ' + self( exception, PRECEDENCE_STMT )
 		if target is not None:
 			txt += ', ' + self( target, PRECEDENCE_STMT )
-		return txt + ':\n'  +  _indent( suiteText )
+		return self._indentedSuite( Line( txt + ':', node ),  suite )
 	
 
 	# With statement
 	@DMObjectNodeDispatchMethod( Schema.WithStmt )
 	def WithStmt(self, node, expr, target, suite):
-		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
-		return 'with '  +  self( expr, PRECEDENCE_STMT )  +  ( ' as ' + self( target, PRECEDENCE_STMT )   if target is not None   else   '' )  +  ':\n'  +  _indent( suiteText )
+		return self._indentedSuite( Line( 'with '  +  self( expr, PRECEDENCE_STMT )  +  ( ' as ' + self( target, PRECEDENCE_STMT )   if target is not None   else   '' )  +  ':',   node ),   suite )
 	
 	
 	# Decorator
@@ -708,31 +744,27 @@ class Python25CodeGenerator (object):
 		text = '@' + name
 		if args is not None:
 			text += '( ' + ', '.join( [ self( a, PRECEDENCE_STMT )   for a in args ] ) + ' )'
-		return text
+		return Line( text, node )
 	
 	
-	def _decoratorsToText(self, decorators):
-		if decorators is None  or  len( decorators ) == 0:
-			return ''
-		else:
-			return '\n'.join( [ self( deco )   for deco in decorators ] ) + '\n'
-	
-
 	# Def statement
 	@DMObjectNodeDispatchMethod( Schema.DefStmt )
 	def DefStmt(self, node, decorators, name, params, suite):
-		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
-		return self._decoratorsToText( decorators )  +  'def '  +  name  +  '('  +  ', '.join( [ self( p, PRECEDENCE_STMT )   for p in params ] )  +  '):\n'  +  _indent( suiteText )
+		decos = Block( [ self( d )   for d in decorators ] )
+		return decos + self._indentedSuite( Line( 'def '  +  name  +  '('  +  ', '.join( [ self( p, PRECEDENCE_STMT )   for p in params ] )  +  '):' ,   node ),   suite )
 	
 
 	# Class statement
 	@DMObjectNodeDispatchMethod( Schema.ClassStmt )
 	def ClassStmt(self, node, decorators, name, bases, suite):
-		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
-		text = self._decoratorsToText( decorators )  +  'class '  +  name
+		decos = Block( [ self( d )   for d in decorators ] )
+
+		text = 'class '  +  name
 		if bases is not None:
 			text += ' ('  +  ', '.join( [ self( h, PRECEDENCE_STMT )   for h in bases ] )  +  ')'
-		return text  +  ':\n'  +  _indent( suiteText )
+		clsStmt = text  +  ':'
+		
+		return decos + self._indentedSuite( Line( clsStmt,  node ),   suite )
 	
 	
 	
@@ -741,21 +773,26 @@ class Python25CodeGenerator (object):
 	def IndentedBlock(self, node, suite):
 		if self._bErrorChecking:
 			raise Python25CodeGeneratorIndentationError, 'Indentation error'
-		suiteText = '\n'.join( [ self( line )   for line in suite ] ) + '\n'
-		return _indent( suiteText )
+		return Block( [ self( stmt )   for stmt in suite ] ).indent()
 	
 	
 	
 	# Comment statement
 	@DMObjectNodeDispatchMethod( Schema.CommentStmt )
 	def CommentStmt(self, node, comment):
-		return '#' + comment
+		return Line( '#' + comment,  node )
 
 	
 	# Module
 	@DMObjectNodeDispatchMethod( Schema.PythonModule )
 	def PythonModule(self, node, suite):
-		return '\n'.join( [ self( line )   for line in suite ] )
+		return Block( [ self( stmt )   for stmt in suite ] )
+
+	
+	# Suite
+	@DMObjectNodeDispatchMethod( Schema.PythonSuite )
+	def PythonSuite(self, node, suite):
+		return Block( [ self( stmt )   for stmt in suite ] )
 
 	
 	# Expression
@@ -892,7 +929,6 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 	@DMObjectNodeDispatchMethod( Schema.InlineObjectStmt )
 	def InlineObjectStmt(self, node, resource):
 		value = resource.getValue()
-		print value
 		
 		try:
 			modelFn = value.__py_model__
@@ -902,19 +938,19 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 				attrValuesFn = value.__py_attrvalues__
 			except AttributeError:
 				# Get the object as a value
-				return self._resource( value )
+				return Line( self._resource( value ),   node )
 			else:
 				# Get the attribute name list
 				names = attrNamesFn()
 				valuesCallSource = self._resource( attrValuesFn ) + '( locals(), globals() )'
 				if isinstance( names, str )  or  isinstance( names, unicode ):
-					return names + ' = ' + valuesCallSource
+					return Line( names + ' = ' + valuesCallSource,   node )
 				else:
-					return ', '.join( names ) + ',' + ' = ' + valuesCallSource
+					return Line( ', '.join( names ) + ',' + ' = ' + valuesCallSource,   node )
 		else:
 			# Got a 'model' function - invoke to create AST nodes, then convert them to code
 			model = modelFn()
-			return self( model )
+			return Line( self( model ),   node )
 	
 		
 		
@@ -930,7 +966,7 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 	
 	
 def _compileForExecution(codeGen, pythonModule, filename):
-	source = codeGen( pythonModule )
+	source = str( codeGen( pythonModule ) )
 	return compile( source, filename, 'exec' )
 
 
@@ -948,8 +984,8 @@ def _compileForExecutionAndEvaluation(codeGen, pythonModule, filename):
 			break
 	
 	if execModule is not None  and  evalExpr is not None:
-		execSource = codeGen( execModule )
-		evalSource = codeGen( evalExpr )
+		execSource = str( codeGen( execModule ) )
+		evalSource = str( codeGen( evalExpr ) )
 		
 		execCode = compile( execSource, filename, 'exec' )
 		evalCode = compile( evalSource, filename, 'eval' )
@@ -993,7 +1029,7 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		data = DMIOReader.readFromString( sx )
 		
 		gen = Python25CodeGenerator()
-		result = gen( data )
+		result = str( gen( data ) )
 		
 		if result != expected:
 			print 'UNEXPECTED RESULT'
@@ -1011,7 +1047,7 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 		sx = '{ py=GSymCore.Languages.Python25 : ' + sx + ' }'
 		data = DMIOReader.readFromString( sx )
 		
-		result = gen( data )
+		result = str( gen( data ) )
 		
 		if result != expected:
 			print 'UNEXPECTED RESULT'
@@ -1294,43 +1330,43 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 	#
 	
 	def test_IfStmt(self):
-		self._testSX( '(py IfStmt condition=(py Load name=bA) suite=[(py Load name=b)] elifBlocks=[])', 'if bA:\n\tb\n' )
-		self._testSX( '(py IfStmt condition=(py Load name=bA) suite=[(py Load name=b)] elifBlocks=[] elseSuite=[(py Load name=c)])', 'if bA:\n\tb\nelse:\n\tc\n' )
-		self._testSX( '(py IfStmt condition=(py Load name=bA) suite=[(py Load name=b)] elifBlocks=[(py ElifBlock condition=(py Load name=bA) suite=[(py Load name=b)])] elseSuite=[(py Load name=c)])',
+		self._testSX( '(py IfStmt condition=(py Load name=bA) suite=[(py ExprStmt expr=(py Load name=b))] elifBlocks=[])', 'if bA:\n\tb\n' )
+		self._testSX( '(py IfStmt condition=(py Load name=bA) suite=[(py ExprStmt expr=(py Load name=b))] elifBlocks=[] elseSuite=[(py ExprStmt expr=(py Load name=c))])', 'if bA:\n\tb\nelse:\n\tc\n' )
+		self._testSX( '(py IfStmt condition=(py Load name=bA) suite=[(py ExprStmt expr=(py Load name=b))] elifBlocks=[(py ElifBlock condition=(py Load name=bA) suite=[(py ExprStmt expr=(py Load name=b))])] elseSuite=[(py ExprStmt expr=(py Load name=c))])',
 			      'if bA:\n\tb\nelif bA:\n\tb\nelse:\n\tc\n' )
 
 
 	def test_ElifBlock(self):
-		self._testSX( '(py ElifBlock condition=(py Load name=bA) suite=[(py Load name=b)])', 'elif bA:\n\tb\n' )
+		self._testSX( '(py ElifBlock condition=(py Load name=bA) suite=[(py ExprStmt expr=(py Load name=b))])', 'elif bA:\n\tb\n' )
 
 
 	def test_WhileStmt(self):
-		self._testSX( '(py WhileStmt condition=(py Load name=bA) suite=[(py Load name=b)])', 'while bA:\n\tb\n' )
-		self._testSX( '(py WhileStmt condition=(py Load name=bA) suite=[(py Load name=b)] elseSuite=[(py Load name=c)])', 'while bA:\n\tb\nelse:\n\tc\n' )
+		self._testSX( '(py WhileStmt condition=(py Load name=bA) suite=[(py ExprStmt expr=(py Load name=b))])', 'while bA:\n\tb\n' )
+		self._testSX( '(py WhileStmt condition=(py Load name=bA) suite=[(py ExprStmt expr=(py Load name=b))] elseSuite=[(py ExprStmt expr=(py Load name=c))])', 'while bA:\n\tb\nelse:\n\tc\n' )
 
 
 	def test_ForStmt(self):
-		self._testSX( '(py ForStmt target=(py Load name=a) source=(py Load name=b) suite=[(py Load name=c)])', 'for a in b:\n\tc\n' )
-		self._testSX( '(py ForStmt target=(py Load name=a) source=(py Load name=b) suite=[(py Load name=c)] elseSuite=[(py Load name=d)])', 'for a in b:\n\tc\nelse:\n\td\n' )
+		self._testSX( '(py ForStmt target=(py Load name=a) source=(py Load name=b) suite=[(py ExprStmt expr=(py Load name=c))])', 'for a in b:\n\tc\n' )
+		self._testSX( '(py ForStmt target=(py Load name=a) source=(py Load name=b) suite=[(py ExprStmt expr=(py Load name=c))] elseSuite=[(py ExprStmt expr=(py Load name=d))])', 'for a in b:\n\tc\nelse:\n\td\n' )
 
 
 	def test_TryStmt(self):
-		self._testSX( '(py TryStmt suite=[(py Load name=b)] exceptBlocks=[])', 'try:\n\tb\n' )
-		self._testSX( '(py TryStmt suite=[(py Load name=b)] exceptBlocks=[] elseSuite=[(py Load name=d)])', 'try:\n\tb\nelse:\n\td\n' )
-		self._testSX( '(py TryStmt suite=[(py Load name=b)] exceptBlocks=[] elseSuite=[(py Load name=d)] finallySuite=[(py Load name=e)])', 'try:\n\tb\nelse:\n\td\nfinally:\n\te\n' )
-		self._testSX( '(py TryStmt suite=[(py Load name=b)] exceptBlocks=[(py ExceptBlock exception=`null` target=`null` suite=[(py Load name=b)])] elseSuite=[(py Load name=d)] finallySuite=[(py Load name=e)])',
+		self._testSX( '(py TryStmt suite=[(py ExprStmt expr=(py Load name=b))] exceptBlocks=[])', 'try:\n\tb\n' )
+		self._testSX( '(py TryStmt suite=[(py ExprStmt expr=(py Load name=b))] exceptBlocks=[] elseSuite=[(py ExprStmt expr=(py Load name=d))])', 'try:\n\tb\nelse:\n\td\n' )
+		self._testSX( '(py TryStmt suite=[(py ExprStmt expr=(py Load name=b))] exceptBlocks=[] elseSuite=[(py ExprStmt expr=(py Load name=d))] finallySuite=[(py ExprStmt expr=(py Load name=e))])', 'try:\n\tb\nelse:\n\td\nfinally:\n\te\n' )
+		self._testSX( '(py TryStmt suite=[(py ExprStmt expr=(py Load name=b))] exceptBlocks=[(py ExceptBlock exception=`null` target=`null` suite=[(py ExprStmt expr=(py Load name=b))])] elseSuite=[(py ExprStmt expr=(py Load name=d))] finallySuite=[(py ExprStmt expr=(py Load name=e))])',
 			      'try:\n\tb\nexcept:\n\tb\nelse:\n\td\nfinally:\n\te\n' )
 
 
 	def test_exceptBlock(self):
-		self._testSX( '(py ExceptBlock exception=`null` target=`null` suite=[(py Load name=b)])', 'except:\n\tb\n' )
-		self._testSX( '(py ExceptBlock exception=(py Load name=a) target=`null` suite=[(py Load name=b)])', 'except a:\n\tb\n' )
-		self._testSX( '(py ExceptBlock exception=(py Load name=a) target=(py Load name=x) suite=[(py Load name=b)])', 'except a, x:\n\tb\n' )
+		self._testSX( '(py ExceptBlock exception=`null` target=`null` suite=[(py ExprStmt expr=(py Load name=b))])', 'except:\n\tb\n' )
+		self._testSX( '(py ExceptBlock exception=(py Load name=a) target=`null` suite=[(py ExprStmt expr=(py Load name=b))])', 'except a:\n\tb\n' )
+		self._testSX( '(py ExceptBlock exception=(py Load name=a) target=(py Load name=x) suite=[(py ExprStmt expr=(py Load name=b))])', 'except a, x:\n\tb\n' )
 
 
 	def test_withStmt(self):
-		self._testSX( '(py WithStmt expr=(py Load name=a) target=`null` suite=[(py Load name=b)])', 'with a:\n\tb\n' )
-		self._testSX( '(py WithStmt expr=(py Load name=a) target=(py Load name=x) suite=[(py Load name=b)])', 'with a as x:\n\tb\n' )
+		self._testSX( '(py WithStmt expr=(py Load name=a) target=`null` suite=[(py ExprStmt expr=(py Load name=b))])', 'with a:\n\tb\n' )
+		self._testSX( '(py WithStmt expr=(py Load name=a) target=(py Load name=x) suite=[(py ExprStmt expr=(py Load name=b))])', 'with a as x:\n\tb\n' )
 
 
 	def test_decorator(self):
@@ -1339,21 +1375,21 @@ class TestCase_Python25CodeGenerator (unittest.TestCase):
 
 		
 	def test_defStmt(self):
-		self._testSX( '(py DefStmt decorators=[] name=myFunc params=[(py SimpleParam name=a) (py DefaultValueParam name=b defaultValue=(py Load name=c)) (py ParamList name=d) (py KWParamList name=e)] suite=[(py Load name=b)])', 'def myFunc(a, b=c, *d, **e):\n\tb\n' )
-		self._testSX( '(py DefStmt decorators=[(py Decorator name=myDeco args=`null`)] name=myFunc params=[(py SimpleParam name=a) (py DefaultValueParam name=b defaultValue=(py Load name=c)) (py ParamList name=d) (py KWParamList name=e)] suite=[(py Load name=b)])', '@myDeco\ndef myFunc(a, b=c, *d, **e):\n\tb\n' )
-		self._testSX( '(py DefStmt decorators=[(py Decorator name=myDeco args=`null`) (py Decorator name=myDeco args=[(py Load name=a) (py Load name=b)])] name=myFunc params=[(py SimpleParam name=a) (py DefaultValueParam name=b defaultValue=(py Load name=c)) (py ParamList name=d) (py KWParamList name=e)] suite=[(py Load name=b)])', '@myDeco\n@myDeco( a, b )\ndef myFunc(a, b=c, *d, **e):\n\tb\n' )
+		self._testSX( '(py DefStmt decorators=[] name=myFunc params=[(py SimpleParam name=a) (py DefaultValueParam name=b defaultValue=(py Load name=c)) (py ParamList name=d) (py KWParamList name=e)] suite=[(py ExprStmt expr=(py Load name=b))])', 'def myFunc(a, b=c, *d, **e):\n\tb\n' )
+		self._testSX( '(py DefStmt decorators=[(py Decorator name=myDeco args=`null`)] name=myFunc params=[(py SimpleParam name=a) (py DefaultValueParam name=b defaultValue=(py Load name=c)) (py ParamList name=d) (py KWParamList name=e)] suite=[(py ExprStmt expr=(py Load name=b))])', '@myDeco\ndef myFunc(a, b=c, *d, **e):\n\tb\n' )
+		self._testSX( '(py DefStmt decorators=[(py Decorator name=myDeco args=`null`) (py Decorator name=myDeco args=[(py Load name=a) (py Load name=b)])] name=myFunc params=[(py SimpleParam name=a) (py DefaultValueParam name=b defaultValue=(py Load name=c)) (py ParamList name=d) (py KWParamList name=e)] suite=[(py ExprStmt expr=(py Load name=b))])', '@myDeco\n@myDeco( a, b )\ndef myFunc(a, b=c, *d, **e):\n\tb\n' )
 
 
 	def test_classStmt(self):
-		self._testSX( '(py ClassStmt decorators=[] name=A bases=`null` suite=[(py Load name=b)])', 'class A:\n\tb\n' )
-		self._testSX( '(py ClassStmt decorators=[] name=A bases=[(py Load name=object)] suite=[(py Load name=b)])', 'class A (object):\n\tb\n' )
-		self._testSX( '(py ClassStmt decorators=[] name=A bases=[(py Load name=object) (py Load name=Q)] suite=[(py Load name=b)])', 'class A (object, Q):\n\tb\n' )
-		self._testSX( '(py ClassStmt decorators=[(py Decorator name=f)] name=A bases=[(py Load name=object)] suite=[(py Load name=b)])', '@f\nclass A (object):\n\tb\n' )
+		self._testSX( '(py ClassStmt decorators=[] name=A bases=`null` suite=[(py ExprStmt expr=(py Load name=b))])', 'class A:\n\tb\n' )
+		self._testSX( '(py ClassStmt decorators=[] name=A bases=[(py Load name=object)] suite=[(py ExprStmt expr=(py Load name=b))])', 'class A (object):\n\tb\n' )
+		self._testSX( '(py ClassStmt decorators=[] name=A bases=[(py Load name=object) (py Load name=Q)] suite=[(py ExprStmt expr=(py Load name=b))])', 'class A (object, Q):\n\tb\n' )
+		self._testSX( '(py ClassStmt decorators=[(py Decorator name=f)] name=A bases=[(py Load name=object)] suite=[(py ExprStmt expr=(py Load name=b))])', '@f\nclass A (object):\n\tb\n' )
 
 
 	def test_IndentedBlock(self):
-		self._testGenSX( Python25CodeGenerator( False ), '(py IndentedBlock suite=[(py Load name=b)])', '\tb\n' )
-		self.assertRaises( Python25CodeGeneratorIndentationError, lambda: self._testSX( '(py IndentedBlock suite=[(py Load name=b)])', '' ) )
+		self._testGenSX( Python25CodeGenerator( False ), '(py IndentedBlock suite=[(py ExprStmt expr=(py Load name=b))])', '\tb\n' )
+		self.assertRaises( Python25CodeGeneratorIndentationError, lambda: self._testSX( '(py IndentedBlock suite=[(py ExprStmt expr=(py Load name=b))])', '' ) )
 		
 
 	def test_CommentStmt(self):

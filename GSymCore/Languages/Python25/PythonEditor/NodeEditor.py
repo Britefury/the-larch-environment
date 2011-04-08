@@ -40,7 +40,6 @@ from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListene
 
 
 from GSymCore.Languages.Python25 import Schema
-from GSymCore.Languages.Python25.CodeGenerator import Python25CodeGenerator
 
 from GSymCore.Languages.Python25.PythonEditor.Parser import Python25Grammar
 from GSymCore.Languages.Python25.PythonEditor.Precedence import *
