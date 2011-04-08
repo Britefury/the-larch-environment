@@ -20,9 +20,6 @@ from GSymCore.Languages.Python25.Execution import Execution
 from GSymCore.Languages.Python25 import Prelude
 
 
-_codeGen = CodeGenerator.Python25CodeGenerator()
-
-
 class Console (IncrementalOwner):
 	class Output (object):
 		def __init__(self):
