@@ -17,7 +17,6 @@ from GSymCore.Languages.Python25 import Python25
 from GSymCore.Languages.Python25 import CodeGenerator
 from GSymCore.Languages.Python25 import Schema as PySchema
 from GSymCore.Languages.Python25.Execution import Execution
-from GSymCore.Languages.Python25 import Prelude
 
 
 class Console (IncrementalOwner):
@@ -48,7 +47,6 @@ class Console (IncrementalOwner):
 		self._before = []
 		self._after = []
 		self._module = imp.new_module( name )
-		Prelude.executePrelude( self._module )
 		
 		
 	def getBlocks(self):

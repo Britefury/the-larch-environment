@@ -82,7 +82,7 @@ class GSymAppSubject (Subject):
 		
 	
 	
-	def find_module(self, fullname, path, world):
+	def find_module(self, fullname, path, document):
 		for appDocument in self._appState.getOpenDocuments():
 			doc = appDocument.getDocument()
 			subject = doc.newSubject( self, self._rootLocation.getLocationString() + '.documents.' + appDocument.getRelativeLocation(), appDocument.getName() )
@@ -91,7 +91,7 @@ class GSymAppSubject (Subject):
 			except AttributeError:
 				pass
 			else:
-				result = f( fullname, path, world )
+				result = f( fullname, path, doc )
 				if result is not None:
 					return result
 		return None

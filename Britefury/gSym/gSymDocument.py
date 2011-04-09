@@ -6,6 +6,8 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 import os
+import sys
+import imp
 
 import cPickle
 
@@ -35,6 +37,8 @@ class GSymDocument (CommandHistoryListener):
 	
 		self._commandHistoryListener = None
 		self._unsavedDataListener = None
+		
+		self._documentModules = {}
 
 
 
@@ -86,7 +90,37 @@ class GSymDocument (CommandHistoryListener):
 		
 	def hasUnsavedData(self):
 		return self._bHasUnsavedData
-		
+	
+	
+	
+	def newModule(self, fullname, loader):
+		mod = imp.new_module( fullname )
+		sys.modules[fullname] = mod
+		mod.__file__ = fullname
+		mod.__loader__ = loader
+		mod.__path__ = fullname.split( '.' )
+		self._documentModules[fullname] = mod
+		self._world.registerImportedModule( fullname )
+		return mod
+	
+	def unloadImportedModules(self, moduleFullnames):
+		modules = set( moduleFullnames )
+		modulesToRemove = set( self._documentModules.keys() ) & modules
+		for moduleFullname in modulesToRemove:
+			del sys.modules[moduleFullname]
+			del self._documentModules[moduleFullname]
+		self._world.unregisterImportedModules( modulesToRemove )
+		return modulesToRemove
+	
+	def unloadAllImportedModules(self):
+		modulesToRemove = set( self._documentModules.keys() )
+		for moduleFullname in modulesToRemove:
+			del sys.modules[moduleFullname]
+		self._documentModules = {}
+		self._world.unregisterImportedModules( modulesToRemove )
+		return modulesToRemove
+	
+	
 	
 	def newSubject(self, enclosingSubject, location, title):
 		return self.newModelSubject( self._contents, enclosingSubject, location, title )

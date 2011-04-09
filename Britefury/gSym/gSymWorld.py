@@ -64,6 +64,10 @@ class GSymWorld (object):
 	def registerImportedModule(self, fullname):
 		self._importedModuleRegistry.add( fullname )
 		
+	def unregisterImportedModules(self, moduleNames):
+		self._importedModuleRegistry -= set( moduleNames )
+	
+	
 	def unloadImportedModules(self, moduleFullnames):
 		modules = set( moduleFullnames )
 		modulesToRemove = self._importedModuleRegistry & modules
@@ -91,7 +95,7 @@ class GSymWorld (object):
 			app_find_module = self._appStateSubject.find_module
 		except AttributeError:
 			return None
-		return app_find_module( fullname, path, self )
+		return app_find_module( fullname, path, None )
 
 	
 	

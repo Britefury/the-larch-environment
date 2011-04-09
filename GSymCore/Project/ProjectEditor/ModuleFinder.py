@@ -5,9 +5,6 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2010.
 ##-*************************
-import sys
-import imp
-
 from GSymCore.Project.ProjectPackage import ProjectPackage
 from GSymCore.Project.ProjectPage import ProjectPage
 
@@ -17,11 +14,11 @@ class _PackageLoader (object):
 	A module loader for loading project packages
 	Looks for an __init__ module, and attempts to load that.
 	"""
-	def __init__(self, projectSubject, packageLocation, package, world):
+	def __init__(self, projectSubject, packageLocation, package, document):
 		self._projectSubject = projectSubject
 		self._packageLocation = packageLocation
 		self._package = package
-		self._world = world
+		self._document = document
 		
 
 	def load_module(self, fullname):
@@ -38,26 +35,21 @@ class _PackageLoader (object):
 			except AttributeError:
 				return self._default_load_module( fullname )
 			else:
-				loader = createModuleLoader( self._world )
+				loader = createModuleLoader( self._document )
 				return loader.load_module( fullname )
 		
 		return self._default_load_module( fullname )
 
 					
 	def _default_load_module(self, fullname):
-		mod = sys.modules.setdefault( fullname, imp.new_module( fullname ) )
-		self._world.registerImportedModule( fullname )
-		mod.__file__ = fullname
-		mod.__loader__ = self
-		mod.__path__ = fullname.split( '.' )
-		return mod
+		return self._document.newModule( fullname, self )
 
 
 class ModuleFinder (object):
 	def __init__(self, projectSubject):
 		self._projectSubject = projectSubject
 
-	def find_module(self, fullname, namesuffix, path, world):
+	def find_module(self, fullname, namesuffix, path, document):
 		suffix = namesuffix
 		model = self._projectSubject._model
 		modelLocation = self._projectSubject._location
@@ -83,14 +75,14 @@ class ModuleFinder (object):
 							return None
 						else:
 							# The subject has a 'createModuleLoader' attribute - invoke it to create the module loader, for the module import system to use
-							return createModuleLoader( world )
+							return createModuleLoader( document )
 					else:
 						# Still path to consume; cannot go further
 						return None
 				elif isinstance( model, ProjectPackage ):
 					if suffix == '':
 						# The import statement is attempting to import this package
-						return _PackageLoader( self._projectSubject, modelLocation, model, world )
+						return _PackageLoader( self._projectSubject, modelLocation, model, document )
 					else:
 						# Still path to consume; exit into the traversal while-loop
 						continue
@@ -106,16 +98,11 @@ class ModuleFinder (object):
 	
 
 class _RootModuleLoader (object):
-	def __init__(self, world):
-		self._world = world
+	def __init__(self, document):
+		self._document = document
 
 	def load_module(self, fullname):
-		mod = sys.modules.setdefault( fullname, imp.new_module( fullname ) )
-		self._world.registerImportedModule( fullname )
-		mod.__file__ = fullname
-		mod.__loader__ = self
-		mod.__path__ = fullname.split( '.' )
-		return mod
+		return self._document.newModule( fullname, self )
 	
 
 class RootFinder (object):
@@ -125,7 +112,7 @@ class RootFinder (object):
 	def __init__(self, projectSubject):
 		self._projectSubject = projectSubject
 
-	def find_module(self, fullname, path, world):
+	def find_module(self, fullname, path, document):
 		pythonPackageName = self._projectSubject._model.pythonPackageName
 		if pythonPackageName is not None:
 			pythonPackageName = pythonPackageName.split( '.' )
@@ -136,38 +123,10 @@ class RootFinder (object):
 				if prefix == pythonPackageName[index]:
 					index += 1
 					if index == len( pythonPackageName )  and  suffix != '':
-						return self._projectSubject._moduleFinder.find_module( fullname, suffix, path, world )
+						return self._projectSubject._moduleFinder.find_module( fullname, suffix, path, document )
 				else:
 					return None
-			return _RootModuleLoader( world )
+			return _RootModuleLoader( document )
 		else:
 			return None
-
-
-
-def _getImportedModulesToUnloadFromPackage(world, package, fullname):
-	modules = []
-	for item in package:
-		name = item.name
-		itemFullname = fullname + '.' + name
-		if isinstance( item, ProjectPackage ):
-			modules.append( itemFullname )
-			modules.extend( _getImportedModulesToUnloadFromPackage( world, item, itemFullname ) )
-		elif isinstance( item, ProjectPage ):
-			modules.append( itemFullname )
-		else:
-			raise TypeError, 'unknown project item type'
-	return modules
-
-def unloadImportedModules(world, project):
-	fullname = project.pythonPackageName
-	if fullname is not None:
-		modules = [ fullname ]
-		modules.extend( _getImportedModulesToUnloadFromPackage( world, project, project.pythonPackageName ) )
-		print 'GSymCore.Project.ProjectEditor.ModuleFinder.unloadImportedModules: removing:'
-		for module in modules:
-			print '\t' + module
-		return world.unloadImportedModules( modules )
-	else:
-		return []
 

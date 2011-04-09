@@ -5,13 +5,6 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-import os
-import sys
-import imp
-
-
-from datetime import datetime
-
 from java.awt import Color
 
 from java.awt.event import KeyEvent
@@ -190,16 +183,12 @@ perspective = Perspective( WorksheetViewer(), None )
 
 
 class _WorksheetModuleLoader (object):
-	def __init__(self, model, world):
+	def __init__(self, model, document):
 		self._model = model
-		self._world = world
+		self._document = document
 		
 	def load_module(self, fullname):
-		mod = sys.modules.setdefault( fullname, imp.new_module( fullname ) )
-		self._world.registerImportedModule( fullname )
-		mod.__file__ = fullname
-		mod.__loader__ = self
-		mod.__path__ = fullname.split( '.' )
+		mod = self._document.newModule( fullname, self )
 		
 		sources = []
 		
@@ -242,8 +231,8 @@ class WorksheetViewerSubject (Subject):
 	def getCommandHistory(self):
 		return self._document.getCommandHistory()
 	
-	def createModuleLoader(self, world):
-		return _WorksheetModuleLoader( self._model, world )
+	def createModuleLoader(self, document):
+		return _WorksheetModuleLoader( self._model, document )
 	
 	
 	def __getattr__(self, name):

@@ -79,6 +79,6 @@ class ProjectSubject (Subject):
 
 
 
-	def find_module(self, fullname, path, world):
-		return self._rootFinder.find_module( fullname, path, world )
+	def find_module(self, fullname, path, document):
+		return self._rootFinder.find_module( fullname, path, document )
 
