@@ -5,9 +5,6 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2010.
 ##-*************************
-import sys
-import imp
-
 from BritefuryJ.DocPresent.Browser import Location
 
 from BritefuryJ.Projection import Subject
@@ -67,16 +64,12 @@ class _ClassSubject (_MemberSubject):
 
 	
 class _Python25ModuleLoader (object):
-	def __init__(self, model, world):
+	def __init__(self, model, document):
 		self._model = model
-		self._world = world
+		self._document = document
 		
 	def load_module(self, fullname):
-		mod = sys.modules.setdefault( fullname, imp.new_module( fullname ) )
-		self._world.registerImportedModule( fullname )
-		mod.__file__ = fullname
-		mod.__loader__ = self
-		mod.__path__ = fullname.split( '.' )
+		mod = self._document.newModule( fullname, self )
 		code = compileForModuleExecution( mod, self._model, fullname )
 		exec code in mod.__dict__
 		return mod
@@ -119,7 +112,7 @@ class Python25Subject (Subject):
 
 	
 	
-	def createModuleLoader(self, world):
-		return _Python25ModuleLoader( self._model, world )
+	def createModuleLoader(self, document):
+		return _Python25ModuleLoader( self._model, document )
 	
 	

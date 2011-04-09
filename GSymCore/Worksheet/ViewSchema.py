@@ -19,7 +19,6 @@ from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMe
 
 from GSymCore.Languages.Python25 import Python25
 from GSymCore.Languages.Python25.Execution import Execution
-from GSymCore.Languages.Python25 import Prelude
 
 from GSymCore.Worksheet import Schema
 
@@ -87,7 +86,6 @@ class WorksheetView (NodeView):
 		
 	def _initModule(self):
 		self._module = imp.new_module( 'worksheet' )
-		Prelude.executePrelude( self._module )
 		
 		
 	def refreshResults(self):

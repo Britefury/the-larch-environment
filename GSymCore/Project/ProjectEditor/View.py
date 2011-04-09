@@ -321,11 +321,14 @@ class ProjectView (GSymViewObjectDispatch):
 		
 		
 		# Clear imported modules
-		def _onUnloadImportedModules(button, event):
-			ModuleFinder.unloadImportedModules( world, project )
-		unloadImportedModulesPrompt = Label( 'Unload imported modules: ' )
-		unloadImportedModulesButton = Button.buttonWithLabel( 'Unload', _onUnloadImportedModules )
-		unloadImportedModules = Row( [ unloadImportedModulesPrompt, unloadImportedModulesButton ] )
+		def _onReset(button, event):
+			modules = document.unloadAllImportedModules()
+			print 'GSymCore.Project.ProjectEditor.View: unloaded modules:'
+			for module in modules:
+				print '\t' + module
+		resetPrompt = Label( 'Reset (unload project modules): ' )
+		resetButton = Button.buttonWithLabel( 'Reset', _onReset )
+		reset = Row( [ resetPrompt, resetButton ] )
 
 
 		# Project index
@@ -351,7 +354,7 @@ class ProjectView (GSymViewObjectDispatch):
 
 		# The page
 		head = Head( [ linkHeader, title ] )
-		body = Body( [ controlsBorder.pad( 5.0, 10.0 ).alignHLeft(), pythonPackageNameBox, unloadImportedModules, projectIndex ] )
+		body = Body( [ controlsBorder.pad( 5.0, 10.0 ).alignHLeft(), pythonPackageNameBox, reset, projectIndex ] )
 
 		return StyleSheet.instance.withAttr( Primitive.editable, False ).applyTo( Page( [ head, body ] ) )
 
