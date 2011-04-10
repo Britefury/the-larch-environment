@@ -23,10 +23,6 @@ from Britefury.gSymConfig import UserConfig
 from Britefury.MainApp.MainApp import MainApp
 
 
-from BritefuryJ.DocModel import DMPickleHelper
-DMPickleHelper.initialise()
-
-
 
 def main():
 	UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
@@ -40,7 +36,8 @@ def main():
 		appStateSubject = world.getAppStateSubject()
 		for filename in filenames:
 			try:
-				if not appStateSubject.loadDocument( filename ):
+				document = appStateSubject.loadDocument( filename )
+				if document is None:
 					print 'Failed to load document from %s'  %  filename
 			except:
 				print 'Failed to load %s'  %  filename

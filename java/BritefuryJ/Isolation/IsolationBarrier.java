@@ -4,25 +4,37 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.IsolationSerialize;
+package BritefuryJ.Isolation;
+
+import java.awt.Color;
 
 import org.python.core.Py;
 import org.python.core.PyInteger;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 
-import BritefuryJ.DocModel.DMPickleHelper;
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.DefaultPerspective.Presentable;
+import BritefuryJ.DefaultPerspective.Pres.GenericStyle;
+import BritefuryJ.DefaultPerspective.Pres.ObjectBox;
+import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.StyleSheet.StyleSheet;
 
-public class IsolationBarrier
+public class IsolationBarrier implements Presentable
 {
-	protected static IslandPickler islandPickler;
-	protected static IslandUnpickler islandUnpickler;
+	protected static IslandPicklerState islandPicklerState;
+	protected static IslandUnpicklerState islandUnpicklerState;
 	
 	
 	private Object value = null;
-	private transient IslandUnpickler unpickler = null;
+	private transient IslandUnpicklerState unpickler = null;
 	private int index = -1;
 	
+	
+	public IsolationBarrier()
+	{
+	}
 	
 	public IsolationBarrier(Object value)
 	{
@@ -32,9 +44,9 @@ public class IsolationBarrier
 	
 	public PyObject __getstate__()
 	{
-		if ( islandPickler != null )
+		if ( islandPicklerState != null )
 		{
-			return Py.newInteger( islandPickler.isolatedValue( value ) + 1 );
+			return Py.newInteger( islandPicklerState.isolatedValue( value ) + 1 );
 		}
 		else
 		{
@@ -44,12 +56,12 @@ public class IsolationBarrier
 	
 	public void __setstate__(PyObject state)
 	{
-		if ( islandUnpickler != null )
+		if ( islandUnpicklerState != null )
 		{
 			if ( state instanceof PyInteger )
 			{
 				value = null;
-				unpickler = islandUnpickler;
+				unpickler = islandUnpicklerState;
 				index = state.asInt() - 1;
 			}
 			else
@@ -65,8 +77,7 @@ public class IsolationBarrier
 	
 	public PyObject __reduce__()
 	{
-		//return new PyTuple( getPyFactory(), new PyTuple(), __getstate__() );
-		return null;
+		return new PyTuple( Py.java2py( getClass() ), new PyTuple(), __getstate__() );
 	}
 
 	
@@ -81,4 +92,15 @@ public class IsolationBarrier
 		}
 		return value;
 	}
+	
+	
+	
+	@Override
+	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
+	{
+		return style.applyTo( new ObjectBox( "ISOLATION BARRIER", Pres.coerceNonNull( getValue() ) ) );
+	}
+	
+	
+	private static final StyleSheet style = StyleSheet.instance.withAttr( GenericStyle.objectBorderPaint, new Color( 0.25f, 0.0f, 0.5f ) );
 }

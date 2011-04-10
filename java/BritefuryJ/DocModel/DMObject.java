@@ -289,12 +289,6 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	
 	
 	
-	public PyObject getPyFactory()
-	{
-		return DMPickleHelper.getDMObjectFactory();
-	}
-	
-	
 	public Object clone()
 	{
 		onAccess();

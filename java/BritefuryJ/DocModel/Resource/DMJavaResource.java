@@ -14,10 +14,7 @@ import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.IdentityHashMap;
 
-import org.python.core.PyObject;
-
 import BritefuryJ.DocModel.DMNodeClass;
-import BritefuryJ.DocModel.DMPickleHelper;
 
 public class DMJavaResource extends DMResource
 {
@@ -55,12 +52,6 @@ public class DMJavaResource extends DMResource
 		super( serialised );
 	}
 	
-	
-	
-	public PyObject getPyFactory()
-	{
-		return DMPickleHelper.getDMJavaResourceFactory();
-	}
 	
 	
 	public void become(Object x)
