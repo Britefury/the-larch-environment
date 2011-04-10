@@ -77,8 +77,8 @@ class GSymAppSubject (Subject):
 		document = GSymDocument.readFile( self._world, filename )
 		if document is not None:
 			self._appState.registerOpenDocument( document, self._rootLocation.getLocationString() + '.documents' )
-			return True
-		return False
+			return document
+		return None
 		
 	
 	

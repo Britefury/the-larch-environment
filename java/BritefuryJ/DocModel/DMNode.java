@@ -282,19 +282,14 @@ public abstract class DMNode implements Cloneable
 	
 	
 	
-	protected abstract PyObject getPyFactory();
-	
-	
 	public PyObject __reduce__()
 	{
-		DMPickleHelper.initialise();
-		return new PyTuple( getPyFactory(), new PyTuple(), __getstate__() );
+		return new PyTuple( Py.java2py( getClass() ), new PyTuple(), __getstate__() );
 	}
 	
 	
 	public PyObject __getstate__()
 	{
-		DMPickleHelper.initialise();
 		String str;
 		try
 		{
@@ -309,7 +304,6 @@ public abstract class DMNode implements Cloneable
 	
 	public void __setstate__(PyObject state)
 	{
-		DMPickleHelper.initialise();
 		if ( state instanceof PyString )
 		{
 			String serialised = state.asString();

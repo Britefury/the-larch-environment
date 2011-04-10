@@ -11,15 +11,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Stack;
 
-public class DependencyGraph
+public class DependencyGraph <KeyType>
 {
-	private static class Node
+	private static class Node <KeyType>
 	{
-		private Object key;
-		private HashSet<Node> deps = new HashSet<Node>();
+		private KeyType key;
+		private HashSet<Node<KeyType>> deps = new HashSet<Node<KeyType>>();
 		private boolean visited = false;
 		
-		private Node(Object key)
+		private Node(KeyType key)
 		{
 			this.key = key;
 		}
@@ -30,11 +30,12 @@ public class DependencyGraph
 			return key.hashCode();
 		}
 		
+		@SuppressWarnings("unchecked")
 		public boolean equals(Object x)
 		{
 			if ( x instanceof Node )
 			{
-				return key.equals( ((Node)x).key );
+				return key.equals( ((Node<KeyType>)x).key );
 			}
 			else
 			{
@@ -44,7 +45,7 @@ public class DependencyGraph
 	}
 	
 	
-	private HashMap<Object, Node> nodeTable = new HashMap<Object, Node>();
+	private HashMap<KeyType, Node<KeyType>> nodeTable = new HashMap<KeyType, Node<KeyType>>();
 	
 	
 	public DependencyGraph()
@@ -52,38 +53,38 @@ public class DependencyGraph
 	}
 	
 	
-	public void addDependency(Object srcKey, Object destKey)
+	public void addDependency(KeyType srcKey, KeyType destKey)
 	{
-		Node srcNode = nodeTable.get( srcKey );
+		Node<KeyType> srcNode = nodeTable.get( srcKey );
 		if ( srcNode == null )
 		{
-			srcNode = new Node( srcKey );
+			srcNode = new Node<KeyType>( srcKey );
 			nodeTable.put( srcKey, srcNode );
 		}
 
-		Node destNode = nodeTable.get( destKey );
+		Node<KeyType> destNode = nodeTable.get( destKey );
 		if ( destNode == null )
 		{
-			destNode = new Node( destKey );
+			destNode = new Node<KeyType>( destKey );
 			nodeTable.put( destKey, destNode );
 		}
 		
 		srcNode.deps.add( destNode );
 	}
 
-	public void addSymmetricDependency(Object srcKey, Object destKey)
+	public void addSymmetricDependency(KeyType srcKey, KeyType destKey)
 	{
-		Node srcNode = nodeTable.get( srcKey );
+		Node<KeyType> srcNode = nodeTable.get( srcKey );
 		if ( srcNode == null )
 		{
-			srcNode = new Node( srcKey );
+			srcNode = new Node<KeyType>( srcKey );
 			nodeTable.put( srcKey, srcNode );
 		}
 
-		Node destNode = nodeTable.get( destKey );
+		Node<KeyType> destNode = nodeTable.get( destKey );
 		if ( destNode == null )
 		{
-			destNode = new Node( destKey );
+			destNode = new Node<KeyType>( destKey );
 			nodeTable.put( destKey, destNode );
 		}
 		
@@ -92,31 +93,31 @@ public class DependencyGraph
 	}
 	
 	
-	public ArrayList<ArrayList<Object>> findIslands()
+	public ArrayList<ArrayList<KeyType>> findIslands()
 	{
-		for (Node node: nodeTable.values())
+		for (Node<KeyType> node: nodeTable.values())
 		{
 			node.visited = false;
 		}
 		
-		ArrayList<ArrayList<Object>> islands = new ArrayList<ArrayList<Object>>();
+		ArrayList<ArrayList<KeyType>> islands = new ArrayList<ArrayList<KeyType>>();
 		
-		for (Node node: nodeTable.values())
+		for (Node<KeyType> node: nodeTable.values())
 		{
 			if ( !node.visited )
 			{
-				Stack<Node> stack = new Stack<Node>();
+				Stack<Node<KeyType>> stack = new Stack<Node<KeyType>>();
 				stack.push( node );
 					
-				ArrayList<Object> island = new ArrayList<Object>();
+				ArrayList<KeyType> island = new ArrayList<KeyType>();
 				while ( !stack.isEmpty() )
 				{
-					Node n = stack.pop();
+					Node<KeyType> n = stack.pop();
 					if ( !n.visited )
 					{
 						n.visited = true;
 						island.add( n.key );
-						for (Node d: n.deps)
+						for (Node<KeyType> d: n.deps)
 						{
 							if ( !d.visited )
 							{
