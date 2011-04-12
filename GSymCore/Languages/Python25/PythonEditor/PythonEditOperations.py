@@ -96,13 +96,13 @@ def isTopLevelFragment(fragment):
 #
 
 def getStatementContextFromElement(element):
-	context = element.getFragmentContext()
+	fragment = element.getFragmentContext()
 	
-	assert context is not None
+	assert fragment is not None
 	
-	while not isStmt( context.getModel() ):
-		context = context.getParent()
-	return context
+	while not isStmt( fragment.getModel() ):
+		fragment = fragment.getParent()
+	return fragment
 
 
 def getParentStatementContext(ctx):

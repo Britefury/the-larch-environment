@@ -21,20 +21,6 @@ import BritefuryJ.DocPresent.Selection.TextSelection;
 
 public class StreamValueVisitor
 {
-	protected static class State
-	{
-		protected StreamValueBuilder builder;
-		protected Stack<DPElement> elementStack = new Stack<DPElement>();
-		
-
-		protected State(DPElement root, StreamValueBuilder builder)
-		{
-			elementStack.push( root );
-			this.builder = builder;
-		}
-	}
-	
-	
 	protected static class ElementModification
 	{
 		private static int FLAG_PREFIX = 0x1;
@@ -485,45 +471,64 @@ public class StreamValueVisitor
 	
 	protected void buildStreamValue(DPElement root, StreamValueBuilder builder)
 	{
-		State state = new State( root, builder );
-		while ( !state.elementStack.isEmpty() )
-		{
-			DPElement element = state.elementStack.pop();
-			visit( state, element );
-		}
-	}
-	
-	protected void visit(State state, DPElement element)
-	{
-		ElementModification mod = getElementModification( element );
+		// Dual stack iterative pre and post order tree traversal
+		Stack<DPElement> elementStack = new Stack<DPElement>();
+		Stack<DPElement> activeStack = new Stack<DPElement>();
+		Stack<ElementModification> modStack = new Stack<ElementModification>();
+
+		elementStack.push( root );
 		
-		ElementModification.addPrefix( mod, state.builder, element );
-		
-		if ( ElementModification.addFixedValue( mod, state.builder, element ) )
+
+		while ( !elementStack.isEmpty() )
 		{
-			// Fixed value added
-		}
-		else
-		{
-			if ( ElementModification.addElementFunctionResult( mod, state.builder, element ) )
+			// Get the next element to visit
+			DPElement element = elementStack.lastElement();
+			ElementModification mod = getElementModification( element );
+			// Add to the active stack
+			activeStack.add( element );
+			modStack.add( mod );
+
+			
+			// Pre-order visit: prefix
+			ElementModification.addPrefix( mod, builder, element );
+			
+			// In-order visit: fixed value, element function result, or children
+			if ( ElementModification.addFixedValue( mod, builder, element ) )
 			{
-				// Result of evaluating element function added
+				// Fixed value added
 			}
 			else
 			{
-				element.addToStreamValue( state.builder );
-				List<DPElement> children = element.getStreamValueChildren();
-				if ( children.size() > 0 )
+				if ( ElementModification.addElementFunctionResult( mod, builder, element ) )
 				{
-					state.elementStack.addAll( children );
-					Collections.reverse( state.elementStack.subList( state.elementStack.size() - children.size(), state.elementStack.size() ) );
+					// Result of evaluating element function added
+				}
+				else
+				{
+					element.addToStreamValue( builder );
+					List<DPElement> children = element.getStreamValueChildren();
+					if ( children.size() > 0 )
+					{
+						elementStack.addAll( children );
+						Collections.reverse( elementStack.subList( elementStack.size() - children.size(), elementStack.size() ) );
+					}
 				}
 			}
+			
+			// Pull off matching elements from elementStack and activeStack - these will be in post-order traversal order
+			while ( !elementStack.isEmpty()  &&  !activeStack.isEmpty()  &&  elementStack.lastElement() == activeStack.lastElement() )
+			{
+				DPElement x = elementStack.lastElement();
+				ElementModification modX = modStack.lastElement();
+				
+				// Post-order visit: suffix
+				ElementModification.addSuffix( modX, builder, x );
+				elementStack.pop();
+				activeStack.pop();
+				modStack.pop();
+			}
 		}
-	
-		ElementModification.addSuffix( mod, state.builder, element );
 	}
-	
 	
 	
 	
