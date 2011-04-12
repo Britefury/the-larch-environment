@@ -49,8 +49,8 @@ def main():
 	app.setCloseListener( _onClose )
 
 	app.show()
-	
-	
+
+
 
 
 if __name__ == '__main__':

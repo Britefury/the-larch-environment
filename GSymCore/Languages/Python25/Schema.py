@@ -24,7 +24,7 @@ Stmt = schema.newClass( 'Stmt', Node, [] )
 #
 # Blank line, blank expr, comment, unparsed
 #
-BlankLine = schema.newClass( 'BlankLine', Node, [] )
+BlankLine = schema.newClass( 'BlankLine', Stmt, [] )
 CommentStmt = schema.newClass( 'CommentStmt', Stmt, [ 'comment' ] )
 UNPARSED = schema.newClass( 'UNPARSED', Node, [ 'value' ] )
 
