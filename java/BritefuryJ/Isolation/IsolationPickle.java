@@ -6,12 +6,12 @@
 //##************************
 package BritefuryJ.Isolation;
 
-import java.util.HashSet;
-
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyType;
 import org.python.modules.cPickle;
+import org.python.modules.cStringIO;
+import org.python.modules.cStringIO.StringIO;
 
 public class IsolationPickle
 {
@@ -19,12 +19,10 @@ public class IsolationPickle
 	{
 		cPickle.Pickler rootPickler = cPickle.Pickler( file );
 		
-		IslandPicklerState picklerState = new IslandPicklerState();
+		IsolationPicklerState picklerState = new IsolationPicklerState();
 		
-		rootPickler.dump( Py.java2py( new IslandPickleTag() ) );
-		HashSet<Long> rootIds = picklerState.dumpRoots( rootPickler, obj );
-		int islandsAsIndices[][] = picklerState.computeIslands( rootPickler, rootIds );
-		picklerState.dumpIslands( rootPickler, rootIds, islandsAsIndices );
+		rootPickler.dump( Py.java2py( new IsolationPickleTag() ) );
+		picklerState.dump( rootPickler, obj );
 	}
 	
 	public static PyObject load(PyObject file)
@@ -32,14 +30,27 @@ public class IsolationPickle
 		cPickle.Unpickler unpickler = cPickle.Unpickler( file );
 		
 		PyObject x = unpickler.load();
-		if ( Py.isInstance( x, PyType.fromClass( IslandPickleTag.class ) ) )
+		if ( Py.isInstance( x, PyType.fromClass( IsolationPickleTag.class ) ) )
 		{
-			IslandUnpicklerState unpicklerState = new IslandUnpicklerState();
+			IsolationUnpicklerState unpicklerState = new IsolationUnpicklerState();
 			return unpicklerState.load( unpickler );
 		}
 		else
 		{
 			return x;
 		}
+	}
+	
+	public static String dumps(PyObject obj)
+	{
+		StringIO stream = cStringIO.StringIO();
+		dump( stream, obj );
+		return stream.getvalue().asString();
+	}
+	
+	public static PyObject loads(String s)
+	{
+		StringIO stream = cStringIO.StringIO( s );
+		return load( stream );		
 	}
 }
