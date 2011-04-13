@@ -183,6 +183,7 @@ class IsolationPicklerState
 		final HashMap<Long, PyString> rootKeyToName = new HashMap<Long, PyString>();
 		final PyDictionary rootNameToObj = new PyDictionary();
 		final int currentPartition[] = { -1 };
+		final HashSet<Integer> currentPartitionDependencies = new HashSet<Integer>();
 		
 		PyObject picklePartitionsPersistentId = new PyObject()
 		{
@@ -223,6 +224,7 @@ class IsolationPicklerState
 							}
 							else
 							{
+								currentPartitionDependencies.add( p[0] );
 								return Py.newString( Integer.toHexString( p[0] ) + ":" + Integer.toHexString( p[1] ) );
 							}
 						}
@@ -242,8 +244,8 @@ class IsolationPicklerState
 		
 		
 		// Serialise each partition
-		// Build a list of tuples, containing the partitions, and streams
-		PyList partitionsAndStreams = new PyList();
+		// Build a list of tuples, containing the partitions, streams and partition dependencies
+		PyList partitionsStreamsDeps = new PyList();
 		partitionIndex = 0;
 		for (DependencyTable.Partition<Integer> partition: partitions)
 		{
@@ -253,6 +255,7 @@ class IsolationPicklerState
 			pickler.persistent_id = picklePartitionsPersistentId;
 			
 			currentPartition[0] = partitionIndex;
+			currentPartitionDependencies.clear();
 			
 			PyList partitionObjects = new PyList();
 			for (int m: partition.members)
@@ -269,7 +272,14 @@ class IsolationPicklerState
 				partitionAsList.append( Py.newInteger( index ) );
 			}
 
-			partitionsAndStreams.append( new PyTuple( partitionAsList, stream.getvalue() ) );
+			// Convert the dependencies to a PyList
+			PyList depsAsList = new PyList();
+			for (int d: currentPartitionDependencies)
+			{
+				depsAsList.append( Py.newInteger( d ) );
+			}
+
+			partitionsStreamsDeps.append( new PyTuple( partitionAsList, stream.getvalue(), depsAsList ) );
 			
 			partitionIndex++;
 		}
@@ -280,7 +290,7 @@ class IsolationPicklerState
 		rootPickler.dump( rootNameToObj );
 		
 		// Dump
-		rootPickler.dump( partitionsAndStreams );
+		rootPickler.dump( partitionsStreamsDeps );
 		
 		// Finally, dump the number of isolated objects
 		rootPickler.dump( Py.newInteger( isolatedObjects.size() ) );
