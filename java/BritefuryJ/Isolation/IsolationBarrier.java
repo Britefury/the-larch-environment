@@ -23,12 +23,12 @@ import BritefuryJ.StyleSheet.StyleSheet;
 
 public class IsolationBarrier implements Presentable
 {
-	protected static IslandPicklerState islandPicklerState;
-	protected static IslandUnpicklerState islandUnpicklerState;
+	protected static IsolationPicklerState isolationPicklerState;
+	protected static IsolationUnpicklerState isolationUnpicklerState;
 	
 	
 	private Object value = null;
-	private transient IslandUnpicklerState unpickler = null;
+	private transient IsolationUnpicklerState unpickler = null;
 	private int index = -1;
 	
 	
@@ -44,9 +44,9 @@ public class IsolationBarrier implements Presentable
 	
 	public PyObject __getstate__()
 	{
-		if ( islandPicklerState != null )
+		if ( isolationPicklerState != null )
 		{
-			return Py.newInteger( islandPicklerState.isolatedValue( value ) + 1 );
+			return Py.newInteger( isolationPicklerState.isolatedValue( value ) + 1 );
 		}
 		else
 		{
@@ -56,12 +56,12 @@ public class IsolationBarrier implements Presentable
 	
 	public void __setstate__(PyObject state)
 	{
-		if ( islandUnpicklerState != null )
+		if ( isolationUnpicklerState != null )
 		{
 			if ( state instanceof PyInteger )
 			{
 				value = null;
-				unpickler = islandUnpicklerState;
+				unpickler = isolationUnpicklerState;
 				index = state.asInt() - 1;
 			}
 			else

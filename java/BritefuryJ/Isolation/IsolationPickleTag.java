@@ -10,9 +10,9 @@ import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 
-public class IslandPickleTag implements Cloneable
+public class IsolationPickleTag implements Cloneable
 {
-	public IslandPickleTag()
+	public IsolationPickleTag()
 	{
 	}
 	
