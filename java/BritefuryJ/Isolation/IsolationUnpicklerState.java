@@ -6,6 +6,8 @@
 //##************************
 package BritefuryJ.Isolation;
 
+import java.util.Stack;
+
 import org.python.core.Py;
 import org.python.core.PyDictionary;
 import org.python.core.PyInteger;
@@ -20,6 +22,7 @@ class IsolationUnpicklerState
 	private PyDictionary rootNameToObj = null;
 	private int partitionMembers[][] = null;
 	private String partitionStreams[] = null;
+	private int partitionDeps[][] = null;
 	private int objectIndexToPartitionPos[][] = null;
 	private PyObject partitionObjects[][] = null;
 	private PyObject isolatedObjects[] = null;
@@ -36,37 +39,47 @@ class IsolationUnpicklerState
 		PyList isolatedRootRefsPy = (PyList)unpickler.load();
 		PyObject isolatedRootRefs[] = isolatedRootRefsPy.getArray();
 		rootNameToObj = (PyDictionary)unpickler.load();
-		PyList partitionsAndStreamsPy = (PyList)unpickler.load();
-		PyObject partitionsAndStreams[] = partitionsAndStreamsPy.getArray();
+		PyList partitionsStreamsDepsPy = (PyList)unpickler.load();
+		PyObject partitionsStreamsDeps[] = partitionsStreamsDepsPy.getArray();
 		PyInteger numIsolatedObjectsPy = (PyInteger)unpickler.load();
 		int numIsolatedObjects = numIsolatedObjectsPy.asInt();
 		
 		
 		objectIndexToPartitionPos = new int[numIsolatedObjects][];
-		partitionObjects = new PyObject[partitionsAndStreams.length][];
+		partitionObjects = new PyObject[partitionsStreamsDeps.length][];
 		
 		
-		partitionMembers = new int[partitionsAndStreams.length][];
-		partitionStreams = new String[partitionsAndStreams.length];
-		for (int i = 0; i < partitionsAndStreams.length; i++)
+		partitionMembers = new int[partitionsStreamsDeps.length][];
+		partitionStreams = new String[partitionsStreamsDeps.length];
+		partitionDeps = new int[partitionsStreamsDeps.length][];
+		for (int i = 0; i < partitionsStreamsDeps.length; i++)
 		{
-			PyTuple tup = (PyTuple)partitionsAndStreams[i];
-			PyList partitionPy = (PyList)tup.pyget( 0 ); 
+			PyTuple tup = (PyTuple)partitionsStreamsDeps[i];
 			
-			PyObject partition[] = partitionPy.getArray();
-			int indices[] = new int[partition.length];
-			for (int j = 0; j < partition.length; j++)
+			PyList membersPy = (PyList)tup.pyget( 0 ); 
+			PyObject members[] = membersPy.getArray();
+			int memberIndices[] = new int[members.length];
+			for (int j = 0; j < members.length; j++)
 			{
-				int x = partition[j].asInt();
-				indices[j] = x;
+				int x = members[j].asInt();
+				memberIndices[j] = x;
 				if ( x < numIsolatedObjects )
 				{
 					objectIndexToPartitionPos[x] = new int[] { i, j };
 				}
 			}
 			
-			partitionMembers[i] = indices;
+			PyList depsPy = (PyList)tup.pyget( 2 ); 
+			PyObject deps[] = depsPy.getArray();
+			int depIndices[] = new int[deps.length];
+			for (int j = 0; j < deps.length; j++)
+			{
+				depIndices[j] = deps[j].asInt();
+			}
+			
+			partitionMembers[i] = memberIndices;
 			partitionStreams[i] = tup.pyget( 1 ).asString();
+			partitionDeps[i] = depIndices;
 		}
 		
 		isolatedObjects = new PyObject[numIsolatedObjects];
@@ -95,7 +108,36 @@ class IsolationUnpicklerState
 	}
 	
 	
-	private void loadPartition(int partitionIndex)
+	private void loadPartition(int index)
+	{
+		Stack<Integer> partitionStack = new Stack<Integer>();
+		partitionStack.push( index );
+		
+		while ( !partitionStack.isEmpty() )
+		{
+			int p = partitionStack.lastElement();
+			
+			int deps[] = partitionDeps[p];
+			boolean finished = false;
+			for (int d: deps)
+			{
+				if ( partitionObjects[d] == null )
+				{
+					partitionStack.add( d );
+					finished = true;
+				}
+			}
+			
+			if ( !finished )
+			{
+				int x = partitionStack.pop();
+				loadSinglePartition( x );
+			}
+		}
+	}
+	
+	
+	private void loadSinglePartition(int partitionIndex)
 	{
 		PyObject rootPersistentLoad = new PyObject()
 		{
@@ -117,7 +159,7 @@ class IsolationUnpicklerState
 					int m = Integer.parseInt( name.substring( colonPos + 1 ), 16 );
 					if ( partitionObjects[p] == null )
 					{
-						loadPartition( p );
+						throw new RuntimeException( "Partition " + p + " is not loaded" );
 					}
 					return partitionObjects[p][m];
 				}
@@ -134,7 +176,7 @@ class IsolationUnpicklerState
 		
 		if ( values.length != partition.length )
 		{
-			throw Py.ValueError( "Island %d: size of values list does not match size of indices list" );
+			throw Py.ValueError( "Partition " + partitionIndex + ": size of values list does not match size of indices list" );
 		}
 		
 		for (int i = 0; i < partition.length; i++)
