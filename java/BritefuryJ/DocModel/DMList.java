@@ -566,6 +566,11 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 		return value.equals( x );
 	}
 	
+	public int hashCode()
+	{
+		return value.hashCode();
+	}
+	
 	
 	public Object get(int index)
 	{

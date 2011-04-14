@@ -6,16 +6,17 @@
 //##************************
 package BritefuryJ.DocModel;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.python.core.Py;
+import org.python.core.PyList;
+import org.python.core.PyObject;
 import org.python.core.PyString;
+import org.python.core.PyTuple;
 import org.python.core.PyUnicode;
 
 import BritefuryJ.DocModel.Resource.DMJavaResource;
@@ -28,6 +29,11 @@ public class DMIOWriter extends DMIO
 		private static final long serialVersionUID = 1L;
 	}
 	
+	public static class CannotEmbedValue extends RuntimeException
+	{
+		private static final long serialVersionUID = 1L;
+	}
+	
 	
 	public static final Pattern quotedStringContents = Pattern.compile( "[0-9A-Za-z_" + Pattern.quote( quotedStringPunctuationChars ) + "]+" );
 	
@@ -36,6 +42,7 @@ public class DMIOWriter extends DMIO
 	private HashMap<DMSchema, String> moduleToName;
 	private HashSet<String> names;
 	private ArrayList<DMSchema> modulesInOrder;
+	private ArrayList<Object> embeddedValues;
 	
 	
 	
@@ -45,6 +52,24 @@ public class DMIOWriter extends DMIO
 		moduleToName = new HashMap<DMSchema, String>();
 		names = new HashSet<String>();
 		modulesInOrder = new ArrayList<DMSchema>();
+	}
+	
+	
+	private void initEmbeddedValues()
+	{
+		embeddedValues = new ArrayList<Object>();
+	}
+	
+	private int embedValue(Object value)
+	{
+		if ( embeddedValues == null )
+		{
+			throw new CannotEmbedValue();
+		}
+		
+		int index = embeddedValues.size();
+		embeddedValues.add( value );
+		return index;
 	}
 	
 
@@ -165,6 +190,15 @@ public class DMIOWriter extends DMIO
 	}
 	
 
+	private void writeEmbeddedObject(StringBuilder builder, DMEmbeddedObject embed) throws InvalidDataTypeException
+	{
+		builder.append( "<<Em:" );
+		int index = embedValue( embed.getIsolationBarrier() );
+		builder.append( Integer.toString( index ) );
+		builder.append( ">>" );
+	}
+	
+
 	
 	@SuppressWarnings("unchecked")
 	private void writeItem(StringBuilder builder, Object content) throws InvalidDataTypeException
@@ -200,6 +234,10 @@ public class DMIOWriter extends DMIO
 		else if ( content instanceof DMPyResource )
 		{
 			writePyResource( builder, (DMPyResource)content );
+		}
+		else if ( content instanceof DMEmbeddedObject )
+		{
+			writeEmbeddedObject( builder, (DMEmbeddedObject)content );
 		}
 		else
 		{
@@ -240,33 +278,39 @@ public class DMIOWriter extends DMIO
 			
 			docBuilder.append( "}" );
 			
-			return docBuilder.toString();
+			builder = docBuilder;
+		}
+		
+		return builder.toString();
+	}
+
+	
+	public static PyObject writeAsState(Object content) throws InvalidDataTypeException
+	{
+		DMIOWriter writer = new DMIOWriter();
+		writer.initEmbeddedValues();
+		String s = writer.writeDocument( content );
+		if ( writer.embeddedValues != null  &&  writer.embeddedValues.size() > 0 )
+		{
+			PyList embedded = new PyList();
+			for (Object e: writer.embeddedValues)
+			{
+				embedded.add( e );
+			}
+			PyTuple state = new PyTuple( Py.newString( s ), embedded );
+			return state;
 		}
 		else
 		{
-			return builder.toString();
+			return Py.newString( s );
 		}
 	}
-
 
 
 	public static String writeAsString(Object content) throws InvalidDataTypeException
 	{
 		DMIOWriter writer = new DMIOWriter();
 		return writer.writeDocument( content );
-	}
-
-	public static void writeToFile(File file, Object content) throws InvalidDataTypeException, IOException
-	{
-		FileOutputStream stream = new FileOutputStream( file );
-		byte bytes[] = writeAsString( content ).getBytes( "ISO-8859-1" );
-		stream.write( bytes );
-		stream.close();
-	}
-
-	public static void writeToFile(String filename, Object content) throws InvalidDataTypeException, IOException
-	{
-		writeToFile( new File( filename ), content );
 	}
 
 

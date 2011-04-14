@@ -13,16 +13,21 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.python.core.Py;
 import org.python.core.PyInteger;
+import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 
+import BritefuryJ.DocModel.DMEmbeddedObject;
 import BritefuryJ.DocModel.DMIOWriter;
+import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMSchema;
 import BritefuryJ.DocModel.Resource.DMJavaResource;
 import BritefuryJ.DocModel.Resource.DMPyResource;
+import BritefuryJ.Isolation.IsolationBarrier;
 
 public class Test_DMIOWriter extends TestCase
 {
@@ -85,6 +90,56 @@ public class Test_DMIOWriter extends TestCase
 		}
 		
 		assertTrue( res.equals( expected ) );
+	}
+	
+	public void writeAsStateTest(Object input, String expectedSX, Object expectedEmbedded[])
+	{
+		PyObject res = null;
+		try
+		{
+			res = DMIOWriter.writeAsState( input );
+		}
+		catch (DMIOWriter.InvalidDataTypeException e)
+		{
+			System.out.println( "PARSE FAILURE" );
+			fail();
+		}
+		
+		assertTrue( res instanceof PyTuple );
+		
+		PyTuple tup = (PyTuple)res;
+		String resultSX = tup.pyget( 0 ).asString();
+		PyList embPy = (PyList)tup.pyget( 1 );
+		PyList expEmb = new PyList();
+		for (Object e: expectedEmbedded)
+		{
+			expEmb.add( e );
+		}
+		
+		
+		
+		if ( !resultSX.equals( expectedSX ) )
+		{
+			System.out.println( "VALUES ARE NOT THE SAME" );
+			System.out.println( "EXPECTED:" );
+			System.out.println( expectedSX );
+			System.out.println( "RESULT:" );
+			System.out.println( resultSX );
+		}
+		
+		assertTrue( resultSX.equals( expectedSX ) );
+		
+		
+		if ( !embPy.equals( expEmb ) )
+		{
+			System.out.println( "VALUES ARE NOT THE SAME" );
+			System.out.println( "EXPECTED:" );
+			System.out.println( expectedSX );
+			System.out.println( "RESULT:" );
+			System.out.println( res );
+		}
+		
+		assertTrue( embPy.equals( expEmb ) );
 	}
 	
 	
@@ -236,5 +291,17 @@ public class Test_DMIOWriter extends TestCase
 		DMPyResource pr = new DMPyResource( pyValue );
 		List<Object> x = Arrays.asList( new Object[] { jr, pr, "abc" } );
 		writeTest( x, "[<<Ja: " + DMIOWriter.stringAsAtom( DMJavaResource.serialise( Color.RED ) ) + ">> <<Py: " + DMIOWriter.stringAsAtom( DMPyResource.serialise( pyValue ) ) + ">> abc]" );
+	}
+
+
+	public void testWriteEmbeddedObject() throws IOException
+	{
+		DMEmbeddedObject e0 = DMNode.embed( Py.newInteger( 0 ) );
+		DMEmbeddedObject e1 = DMNode.embed( Py.newInteger( 1 ) );
+		DMEmbeddedObject e2 = DMNode.embed( Py.newInteger( 2 ) );
+		List<Object> x = Arrays.asList( new Object[] { e0, e1, e2 } );
+		writeAsStateTest( x, "[<<Em:0>> <<Em:1>> <<Em:2>>]", new Object[] { new IsolationBarrier<PyObject>( Py.newInteger( 0 ) ),
+				new IsolationBarrier<PyObject>( Py.newInteger( 1 ) ),
+				new IsolationBarrier<PyObject>( Py.newInteger( 2 ) ) } );
 	}
 }

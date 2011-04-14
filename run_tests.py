@@ -3,7 +3,7 @@
 ##-* under the terms of the GNU General Public License version 2 as published by the
 ##-* Free Software Foundation. The full text of the GNU General Public License
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
-##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
+##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
 import unittest
 import sys
@@ -11,6 +11,7 @@ import sys
 import Britefury.Dispatch.Dispatch
 import Britefury.Dispatch.MethodDispatch
 import Britefury.Tests.BritefuryJ.Parser.Utils.Operators
+import Britefury.Tests.BritefuryJ.Isolation.Test_IsolationPickle
 import Britefury.Tests.Britefury.Grammar.Grammar
 import Britefury.Tests.Britefury.Dispatch.TestObjectMethodDispatch
 import Britefury.Tests.Britefury.Dispatch.TestDMObjectNodeMethodDispatch
@@ -25,6 +26,7 @@ import GSymCore.Languages.Java.JavaEditor.Parser
 testModules = [ Britefury.Dispatch.Dispatch,
 		Britefury.Dispatch.MethodDispatch, 
 		Britefury.Tests.BritefuryJ.Parser.Utils.Operators,
+		Britefury.Tests.BritefuryJ.Isolation.Test_IsolationPickle,
 		Britefury.Tests.Britefury.Grammar.Grammar,
 		Britefury.Tests.Britefury.Dispatch.TestObjectMethodDispatch,
 		Britefury.Tests.Britefury.Dispatch.TestDMObjectNodeMethodDispatch,

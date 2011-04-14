@@ -31,6 +31,7 @@ import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.Incremental.IncrementalValueMonitor;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Utils.HashUtils;
 
 public class DMObject extends DMNode implements DMObjectInterface, Trackable, Serializable, Cloneable, IncrementalOwner, Presentable
 {
@@ -647,6 +648,21 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 		}
 		
 		return false;
+	}
+	
+	public int hashCode()
+	{
+		// Get the cell value, so that the access is tracked
+		onAccess();
+		int hashes[] = new int[objClass.getNumFields() + 1];
+		hashes[0] = objClass.hashCode();
+		for (int i = 0; i < objClass.getNumFields(); i++)
+		{
+			Object v = get( i );
+			
+			hashes[i+1] = v != null  ?  v.hashCode()  :  0;
+		}
+		return HashUtils.nHash( hashes );
 	}
 	
 	
