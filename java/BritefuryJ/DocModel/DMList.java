@@ -32,6 +32,7 @@ import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.JythonInterface.JythonIndex;
 import BritefuryJ.JythonInterface.JythonSlice;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Utils.HashUtils;
 
 public class DMList extends DMNode implements DMListInterface, Trackable, Serializable, Cloneable, IncrementalOwner, Presentable
 {
@@ -568,7 +569,13 @@ public class DMList extends DMNode implements DMListInterface, Trackable, Serial
 	
 	public int hashCode()
 	{
-		return value.hashCode();
+		onAccess();
+		int hashes[] = new int[value.size()];
+		for (int i = 0; i < hashes.length; i++)
+		{
+			hashes[i] = value.get( i ).hashCode();
+		}
+		return HashUtils.nHash( hashes );
 	}
 	
 	
