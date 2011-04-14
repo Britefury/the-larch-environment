@@ -83,7 +83,7 @@ public abstract class IncrementalTest_base extends TestCase
 	{
 		HashSet<IncrementalFunctionMonitor> expectedSet = new HashSet<IncrementalFunctionMonitor>();
 		expectedSet.addAll( Arrays.asList( expected ) );
-		assertEquals( expectedSet, inc.getOutgoingDependecies() );
+		assertEquals( expectedSet, inc.getOutgoingDependencies() );
 	}
 
 	protected void checkIncomingDependencies(IncrementalFunctionMonitor inc, IncrementalMonitor expected[])

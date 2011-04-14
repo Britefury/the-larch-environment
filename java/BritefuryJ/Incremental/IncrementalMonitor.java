@@ -97,7 +97,7 @@ public abstract class IncrementalMonitor
 		return owner;
 	}
 	
-	public Set<IncrementalFunctionMonitor> getOutgoingDependecies()
+	public Set<IncrementalFunctionMonitor> getOutgoingDependencies()
 	{
 		if ( outgoingDependencies == null )
 		{

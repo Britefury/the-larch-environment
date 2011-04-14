@@ -76,9 +76,6 @@ class Python25CodeGeneratorIndentationError (Python25CodeGeneratorError):
 class Python25CodeGeneratorInvalidFormatError (Python25CodeGeneratorError):
 	pass
 
-class Python25CodeGeneratorSyntaxError (Python25CodeGeneratorError):
-	pass
-
 
 
 class Python25CodeGenerator (object):
