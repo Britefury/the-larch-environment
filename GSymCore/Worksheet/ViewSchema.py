@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from weakref import WeakKeyDictionary
+from weakref import WeakValueDictionary
 
 import imp
 
@@ -80,7 +80,7 @@ class NodeView (object):
 class WorksheetView (NodeView):
 	def __init__(self, worksheet, model):
 		super( WorksheetView, self ).__init__( worksheet, model )
-		self._modelToView = WeakKeyDictionary()
+		self._modelToView = WeakValueDictionary()
 		self.refreshResults()
 		
 		
@@ -103,11 +103,12 @@ class WorksheetView (NodeView):
 	
 	
 	def _viewOf(self, model):
+		key = id( model )
 		try:
-			return self._modelToView[model]
+			return self._modelToView[key]
 		except KeyError:
 			p = _projection( model, self )
-			self._modelToView[model] = p
+			self._modelToView[key] = p
 			return p
 		
 		
@@ -302,6 +303,7 @@ class PythonCodeView (IncrementalOwner, NodeView):
 	def _refreshResults(self, module):
 		self._result = Execution.executePythonModule( self.getCode(), module, self.isResultVisible() )
 		self._incr.onChanged()
+		
 		
 		
 	@staticmethod
