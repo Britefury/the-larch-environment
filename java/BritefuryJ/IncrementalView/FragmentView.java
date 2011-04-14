@@ -309,7 +309,7 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 		
 		if ( inheritedState == null )
 		{
-			throw new RuntimeException( "GSymFragmentViewContext.presentFragment(): @state cannot be null" );
+			throw new RuntimeException( "FragmentView.presentInnerFragment(): @inheritedState cannot be null" );
 		}
 
 		// A call to DocNode.buildNodeView builds the view, and puts it in the DocView's table

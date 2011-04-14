@@ -89,7 +89,7 @@ public class ProjectiveBrowserContext
 	
 	
 	
-	private class GSymBrowserContextLocationResolver implements PageLocationResolver
+	private class ProjectiveBrowserContextLocationResolver implements PageLocationResolver
 	{
 		public BrowserPage resolveLocationAsPage(Location location, PersistentStateStore persistentState)
 		{
@@ -98,7 +98,7 @@ public class ProjectiveBrowserContext
 	}
 	
 	
-	private GSymBrowserContextLocationResolver pageLocationResolver = new GSymBrowserContextLocationResolver();
+	private ProjectiveBrowserContextLocationResolver pageLocationResolver = new ProjectiveBrowserContextLocationResolver();
 	private ObjectPresentationLocationResolver objPresLocationResolver = new ObjectPresentationLocationResolver();
 	private DefaultPerspective defaultPerspective;
 	

@@ -48,7 +48,7 @@ public class DMIOReader extends DMIO
 
 	
 	/*
-	gSym document model IO
+	Document model IO
 	
 	
 	Uses basic S-expressions

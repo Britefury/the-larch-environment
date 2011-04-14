@@ -38,7 +38,7 @@ public class SystemRootPage extends BrowserPage
 	
 	public DPElement getContentsElement()
 	{
-		Pres title = new TitleBar( "GSym System Page" );
+		Pres title = new TitleBar( "System Page" );
 		
 		Pres head = new Head( new Pres[] { createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE ), title } );
 		

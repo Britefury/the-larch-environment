@@ -70,7 +70,7 @@ public class ProxyAndSpanTestPage extends SystemPage
 	}
 	
 	
-	private static String paragraphText = "The gSym document presentation system, called DocPresent, provides a paragraph flow layout element. Line break elements give the paragraph element the "
+	private static String paragraphText = "The document presentation system, called DocPresent, provides a paragraph flow layout element. Line break elements give the paragraph element the "
 		+ "opportunity to end lines in order to fit them in the given horizontal space. Lines are arranged vertically.";
 	private static String spanParaText = "The DocPresent span element incorporates its children into the children of the parent sequence element - paragraphs, horizontal or vertical boxes, or other span elements "
 		+ "which are in turn incorporated into parent elements until an element is reached that provides a specififc layout.";
