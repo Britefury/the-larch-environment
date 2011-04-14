@@ -290,16 +290,16 @@ public abstract class DMNode implements Cloneable
 	
 	public PyObject __getstate__()
 	{
-		String str;
+		PyObject state;
 		try
 		{
-			str = DMIOWriter.writeAsString( this );
+			state = DMIOWriter.writeAsState( this );
 		}
 		catch (InvalidDataTypeException e)
 		{
 			throw new RuntimeException( "InvalidDataTypeException while creating serialised form: " + e.getMessage() );
 		}
-		return new PyString( str );
+		return state;
 	}
 	
 	public void __setstate__(PyObject state)
@@ -509,5 +509,11 @@ public abstract class DMNode implements Cloneable
 		{
 			return javaResource( x );
 		}
+	}
+	
+	
+	public static DMEmbeddedObject embed(PyObject x)
+	{
+		return new DMEmbeddedObject( x );
 	}
 }

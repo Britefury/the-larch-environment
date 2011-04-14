@@ -24,7 +24,7 @@ public class DMNodeClass
 	{
 		this.name = name.intern();
 	}
-
+	
 	
 	public String getName()
 	{

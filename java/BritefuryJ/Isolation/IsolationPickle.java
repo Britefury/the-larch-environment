@@ -9,6 +9,7 @@ package BritefuryJ.Isolation;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.core.PyType;
+import org.python.core.imp;
 import org.python.modules.cPickle;
 import org.python.modules.cStringIO;
 import org.python.modules.cStringIO.StringIO;
@@ -17,6 +18,9 @@ public class IsolationPickle
 {
 	public static void dump(PyObject file, PyObject obj)
 	{
+		// Import cPickle to ensure that it is properly initialised before attempting to use it
+		imp.importName( "cPickle", true );
+		
 		cPickle.Pickler rootPickler = cPickle.Pickler( file );
 		
 		IsolationPicklerState picklerState = new IsolationPicklerState();
@@ -27,6 +31,9 @@ public class IsolationPickle
 	
 	public static PyObject load(PyObject file)
 	{
+		// Import cPickle to ensure that it is properly initialised before attempting to use it
+		imp.importName( "cPickle", true );
+		
 		cPickle.Unpickler unpickler = cPickle.Unpickler( file );
 		
 		PyObject x = unpickler.load();

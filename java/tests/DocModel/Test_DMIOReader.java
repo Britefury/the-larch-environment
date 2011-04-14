@@ -15,19 +15,24 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.python.core.Py;
 import org.python.core.PyInteger;
+import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 
 import BritefuryJ.DocModel.DMIOReader;
 import BritefuryJ.DocModel.DMIOWriter;
 import BritefuryJ.DocModel.DMIOWriter.InvalidDataTypeException;
+import BritefuryJ.DocModel.DMEmbeddedObject;
+import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectReader;
 import BritefuryJ.DocModel.DMSchema;
 import BritefuryJ.DocModel.Resource.DMJavaResource;
 import BritefuryJ.DocModel.Resource.DMPyResource;
+import BritefuryJ.Isolation.IsolationBarrier;
 
 public class Test_DMIOReader extends TestCase
 {
@@ -121,6 +126,48 @@ public class Test_DMIOReader extends TestCase
 		try
 		{
 			res = DMIOReader.readFromString( input );
+		}
+		catch (DMIOReader.ParseErrorException e)
+		{
+			System.out.println( "PARSE FAILURE: " + e.getMessage() );
+			fail();
+		}
+		
+		boolean bEqual = res == expected  ||  res.equals( expected );
+
+		try
+		{
+			if ( !bEqual )
+			{
+				System.out.println( "VALUES ARE NOT THE SAME" );
+				System.out.println( "EXPECTED:" );
+				System.out.println( expected == null  ?  "<null>"  :  DMIOWriter.writeAsString( expected ) );
+				System.out.println( "RESULT:" );
+				System.out.println( res == null  ?  "<null>"  :  DMIOWriter.writeAsString( res ) );
+			}
+		}
+		catch (InvalidDataTypeException e)
+		{
+		}
+		
+		assertTrue( bEqual );
+	}
+
+
+	public void readStateTest(String input, Object embedded[], Object expected)
+	{
+		PyList embPy = new PyList();
+		for (Object e: embedded)
+		{
+			embPy.add( e );
+		}
+		
+		PyTuple state = new PyTuple( Py.newString( input ), embPy );
+
+		Object res = null;
+		try
+		{
+			res = DMIOReader.readFromState( state );
 		}
 		catch (DMIOReader.ParseErrorException e)
 		{
@@ -243,6 +290,17 @@ public class Test_DMIOReader extends TestCase
 		DMPyResource pr = new DMPyResource( pyValue );
 		List<Object> x = Arrays.asList( new Object[] { jr, pr, "abc" } );
 		readTest( "[<<Ja: " + DMIOWriter.stringAsAtom( DMJavaResource.serialise( Color.RED ) ) + ">> <<Py: " + DMIOWriter.stringAsAtom( DMPyResource.serialise( pyValue ) ) + ">> abc]", x );
+	}
+	
+	public void testReadEmbeddedObject() throws IOException
+	{
+		DMEmbeddedObject e0 = DMNode.embed( Py.newInteger( 0 ) );
+		DMEmbeddedObject e1 = DMNode.embed( Py.newInteger( 1 ) );
+		DMEmbeddedObject e2 = DMNode.embed( Py.newInteger( 2 ) );
+		List<Object> x = Arrays.asList( new Object[] { e0, e1, e2 } );
+		readStateTest( "[<<Em:0>> <<Em:1>> <<Em:2>>]", new Object[] { new IsolationBarrier<PyObject>( Py.newInteger( 0 ) ),
+				new IsolationBarrier<PyObject>( Py.newInteger( 1 ) ),
+				new IsolationBarrier<PyObject>( Py.newInteger( 2 ) ) }, x );
 	}
 
 	

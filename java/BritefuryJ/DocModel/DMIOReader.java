@@ -6,16 +6,18 @@
 //##************************
 package BritefuryJ.DocModel;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.python.core.PyList;
+import org.python.core.PyObject;
+import org.python.core.PyTuple;
+
 import BritefuryJ.DocModel.Resource.DMJavaResource;
 import BritefuryJ.DocModel.Resource.DMPyResource;
+import BritefuryJ.Isolation.IsolationBarrier;
 
 
 public class DMIOReader extends DMIO
@@ -36,6 +38,11 @@ public class DMIOReader extends DMIO
 	}
 
 	public static class ParseStackException extends RuntimeException
+	{
+		private static final long serialVersionUID = 1L;
+	}
+
+	public static class CannotReadEmbeddedValuesException extends RuntimeException
 	{
 		private static final long serialVersionUID = 1L;
 	}
@@ -428,6 +435,7 @@ public class DMIOReader extends DMIO
 	private ArrayList<Object> stack;
 	private Object result;
 	private HashMap<String, SchemaRef> moduleTable = new HashMap<String, SchemaRef>();
+	private ArrayList<Object> embeddedValues;
 	private String source;
 	private int pos;
 	
@@ -438,6 +446,22 @@ public class DMIOReader extends DMIO
 		result = null;
 		this.source = source;
 		pos = 0;
+	}
+	
+	
+	private void initEmbeddedValues()
+	{
+		embeddedValues = new ArrayList<Object>();
+	}
+	
+	private Object getEmbeddedValue(int index)
+	{
+		if ( embeddedValues == null )
+		{
+			throw new CannotReadEmbeddedValuesException();
+		}
+		
+		return embeddedValues.get( index );
 	}
 	
 	
@@ -627,6 +651,7 @@ public class DMIOReader extends DMIO
 	
 	
 	
+	@SuppressWarnings("unchecked")
 	public Object read() throws ParseErrorException
 	{
 		while ( pos < source.length() )
@@ -732,6 +757,32 @@ public class DMIOReader extends DMIO
 						
 						DMPyResource resource = DMPyResource.serialisedResource( serialised );
 						closeItem( resource );
+					}
+					else if ( source.substring( pos, pos+5 ).equals( "<<Em:" ) )
+					{
+						pos += 5;
+		
+						MatchResult res;
+		
+						// Index
+						res = matchPositiveDecimalInteger( source, pos );
+						if ( res == null )
+						{
+							throw new ParseErrorException( pos, "Expected index after opening embedded object" );
+						}
+						pos = res.position;
+						int index = Integer.parseInt( res.value );
+						
+						if ( !source.substring( pos, pos+2 ).equals( ">>" ) )
+						{
+							throw new ParseErrorException( pos, "Expected >> to close embedded object resource" );
+						}
+						pos += 2;
+						
+						Object value = getEmbeddedValue( index );
+						DMEmbeddedObject embed = new DMEmbeddedObject();
+						embed.setIsolationBarrier( (IsolationBarrier<PyObject>)value );
+						closeItem( embed );
 					}
 					else
 					{
@@ -952,6 +1003,65 @@ public class DMIOReader extends DMIO
 	}
 	
 	
+	
+	public static Object readFromState(PyObject state) throws ParseErrorException, BadModuleNameException
+	{
+		DMIOReader reader;
+		if ( state instanceof PyTuple )
+		{
+			PyTuple tup = (PyTuple)state;
+			
+			String source = tup.pyget( 0 ).asString();
+			reader = new DMIOReader( source );
+			
+			PyList embedded = (PyList)tup.pyget( 1 );
+			reader.initEmbeddedValues();
+			for (Object e: embedded)
+			{
+				reader.embeddedValues.add( e );
+			}
+		}
+		else
+		{
+			String source = state.asString();
+			reader = new DMIOReader( source );
+		}
+
+		
+		try
+		{
+			return reader.readDocument();
+		}
+		catch (StackOverflowError e)
+		{
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	/*
+	public static PyObject writeAsState(Object content) throws InvalidDataTypeException
+	{
+		DMIOWriter writer = new DMIOWriter();
+		String s = writer.writeDocument( content );
+		if ( writer.embedded.size() > 0 )
+		{
+			PyList embedded = new PyList();
+			for (Object e: writer.embedded)
+			{
+				embedded.add( e );
+			}
+			PyTuple state = new PyTuple( Py.newString( s ), embedded );
+			return state;
+		}
+		else
+		{
+			return Py.newString( s );
+		}
+	}
+	 */
+	
+	
 	public static Object readFromString(String source) throws ParseErrorException, BadModuleNameException
 	{
 		try
@@ -964,22 +1074,5 @@ public class DMIOReader extends DMIO
 			e.printStackTrace();
 			return null;
 		}
-	}
-
-	public static Object readFromFile(File file) throws ParseErrorException, BadModuleNameException, IOException
-	{
-		FileInputStream stream = new FileInputStream( file );
-		int length = (int)file.length();
-		byte bytes[] = new byte[length];
-		stream.read( bytes );
-		String content = new String( bytes, "ISO-8859-1" );
-		Object v = readFromString( content );
-		stream.close();
-		return v;
-	}
-
-	public static Object readFromFile(String filename) throws ParseErrorException, BadModuleNameException, IOException
-	{
-		return readFromFile( new File( filename ) );
 	}
 }

@@ -124,8 +124,7 @@ public class DMObjectClass extends DMNodeClass
 		}
 		
 		schema.registerClass( name, this );
-	}
-	
+	}	
 	
 	
 	protected DMObjectReaderDefault getDefaultReader()

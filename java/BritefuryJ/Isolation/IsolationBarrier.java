@@ -21,13 +21,13 @@ import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.StyleSheet.StyleSheet;
 
-public class IsolationBarrier implements Presentable
+public class IsolationBarrier <ValueType> implements Presentable
 {
 	protected static IsolationPicklerState isolationPicklerState;
 	protected static IsolationUnpicklerState isolationUnpicklerState;
 	
 	
-	private Object value = null;
+	private ValueType value = null;
 	private transient IsolationUnpicklerState unpickler = null;
 	private int index = -1;
 	
@@ -36,9 +36,44 @@ public class IsolationBarrier implements Presentable
 	{
 	}
 	
-	public IsolationBarrier(Object value)
+	public IsolationBarrier(ValueType value)
 	{
 		this.value = value;
+	}
+	
+	
+	public boolean equals(Object x)
+	{
+		if ( x == this )
+		{
+			return true;
+		}
+		else
+		{
+			if ( x instanceof IsolationBarrier )
+			{
+				@SuppressWarnings("unchecked")
+				IsolationBarrier<ValueType> i = (IsolationBarrier<ValueType>)x;
+				ValueType v = getValue();
+				ValueType iv = i.getValue();
+				if ( v != null  &&  iv != null )
+				{
+					return v.equals( iv );
+				}
+				else
+				{
+					return ( v != null )  ==  ( iv != null );
+				}
+			}
+			
+			return false;
+		}
+	}
+	
+	public int hashCode()
+	{
+		ValueType v = getValue();
+		return v != null  ?  v.hashCode()  :  0;
 	}
 	
 	
@@ -82,11 +117,12 @@ public class IsolationBarrier implements Presentable
 
 	
 	
-	public Object getValue()
+	@SuppressWarnings("unchecked")
+	public ValueType getValue()
 	{
 		if ( index != -1 )
 		{
-			value = unpickler.getIsolatedValue( index );
+			value = (ValueType)unpickler.getIsolatedValue( index );
 			unpickler = null;
 			index = -1;
 		}
