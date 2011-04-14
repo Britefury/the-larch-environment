@@ -16,7 +16,7 @@ public class SREInnerFragment extends InnerFragment
 {
 	public SREInnerFragment(Object model, int containerPrecedence, SRFragmentEditor.EditMode editMode)
 	{
-		super( model, SimpleAttributeTable.instance.withAttr( "outerPrecedence", containerPrecedence ).withAttr( "gSym_SREditor_edit", editMode ) );
+		super( model, SimpleAttributeTable.instance.withAttr( "outerPrecedence", containerPrecedence ).withAttr( "__SREditor_edit", editMode ) );
 	}
 
 	public SREInnerFragment(Object model, int containerPrecedence)
