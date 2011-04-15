@@ -6,10 +6,12 @@
 //##************************
 package BritefuryJ.DocPresent.LayoutTree;
 
+import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 
-import BritefuryJ.DocPresent.DPTable;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.DPTable;
 import BritefuryJ.DocPresent.ElementFilter;
 import BritefuryJ.DocPresent.Layout.LAllocBox;
 import BritefuryJ.DocPresent.Layout.LAllocBoxInterface;
@@ -25,6 +27,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 {
 	private LReqBox columnBoxes[], rowBoxes[];
 	private LAllocBox columnAllocBoxes[], rowAllocBoxes[];
+	private double columnLines[][], rowLines[][];		// Format: one array per column/row. First element is the x/y position. Subsequent element PAIRS are start and end y/x of line segments.
 
 	
 	public LayoutNodeTable(DPTable element)
@@ -151,6 +154,9 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 			child.getLayoutNode().refreshAllocationY( prevAllocVs[i] );
 			i++;
 		}
+
+		// Clear column and row requisition boxes, but not the allocation boxes - they are needed
+		columnBoxes = rowBoxes = null;
 	}
 	
 
@@ -241,18 +247,18 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 	
 	private int getColumnForLocalPoint(Point2 localPos)
 	{
-		if ( columnBoxes.length == 0 )
+		if ( columnAllocBoxes.length == 0 )
 		{
 			return -1;
 		}
-		else if ( columnBoxes.length == 1 )
+		else if ( columnAllocBoxes.length == 1 )
 		{
 			return 0;
 		}
 		else
 		{
 			LAllocBox columnI = columnAllocBoxes[0];
-			for (int i = 0; i < columnBoxes.length - 1; i++)
+			for (int i = 0; i < columnAllocBoxes.length - 1; i++)
 			{
 				LAllocBox columnJ = columnAllocBoxes[i+1];
 				double iUpperX = columnI.getAllocPositionInParentSpaceX() + columnI.getAllocationX();
@@ -268,7 +274,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 				columnI = columnJ;
 			}
 			
-			return columnBoxes.length-1;
+			return columnAllocBoxes.length-1;
 		}
 	}
 
@@ -276,18 +282,18 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 	
 	private int getRowForLocalPoint(Point2 localPos)
 	{
-		if ( rowBoxes.length == 0 )
+		if ( rowAllocBoxes.length == 0 )
 		{
 			return -1;
 		}
-		else if ( rowBoxes.length == 1 )
+		else if ( rowAllocBoxes.length == 1 )
 		{
 			return 0;
 		}
 		else
 		{
 			LAllocBox rowI = rowAllocBoxes[0];
-			for (int i = 0; i < rowBoxes.length - 1; i++)
+			for (int i = 0; i < rowAllocBoxes.length - 1; i++)
 			{
 				LAllocBox rowJ = rowAllocBoxes[i+1];
 				double iUpperY = rowI.getAllocPositionInParentSpaceY() + rowI.getAllocationY();
@@ -303,7 +309,7 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 				rowI = rowJ;
 			}
 			
-			return rowBoxes.length-1;
+			return rowAllocBoxes.length-1;
 		}
 	}
 
@@ -376,6 +382,192 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 		DPTable table = (DPTable)element;
 		return table.getLayoutChildren();
 	}
+	
+	
+	
+	//
+	//
+	// BOUNDARIES
+	//
+	//
+	
+	public void queueResize()
+	{
+		super.queueResize();
+		
+		columnLines = null;
+		rowLines = null;
+	}
+	
+	private void refreshBoundaries()
+	{
+		if ( ( columnLines == null  ||  rowLines == null ) )
+		{
+			DPTable table = (DPTable)element;
+			int numColumns = table.getNumColumns();
+			int numRows = table.getNumRows();
+			int numColLines = Math.max( numColumns - 1, 0 );
+			int numRowLines = Math.max( numRows - 1, 0 );
+			columnLines = new double[numColLines][];
+			rowLines = new double[numRowLines][];
+			
+			
+			// Create and initialise bitsets for the column and row lines
+			BitSet columnBits[] = new BitSet[numColLines];
+			BitSet rowBits[] = new BitSet[numRowLines];
+			
+			for (int i = 0; i < columnBits.length; i++)
+			{
+				columnBits[i] = new BitSet( numRows );
+			}
+			for (int i = 0; i < rowBits.length; i++)
+			{
+				rowBits[i] = new BitSet( numColumns );
+			}
+			
+			
+			// For each cell, set the bits that mark its boundary
+			for (TablePackingParams entry: table.getTablePackingParamsArray())
+			{
+				int top = entry.y, bottom = entry.y + entry.rowSpan;
+				int left = entry.x, right = entry.x + entry.colSpan;
+				
+				// NOTE: ignore lines that are on the table boundary
+				
+				// Top
+				if ( top > 0 )
+				{
+					BitSet bits = rowBits[top-1];
+					for (int x = left; x < right; x++)
+					{
+						bits.set( x );
+					}
+				}
+
+				// Bottom
+				if ( bottom < numRows )
+				{
+					BitSet bits = rowBits[bottom-1];
+					for (int x = left; x < right; x++)
+					{
+						bits.set( x );
+					}
+				}
+				
+				// Left
+				if ( left > 0 )
+				{
+					BitSet bits = columnBits[left-1];
+					for (int y = top; y < bottom; y++)
+					{
+						bits.set( y );
+					}
+				}
+				
+				// Right
+				if ( right < numColumns )
+				{
+					BitSet bits = columnBits[right-1];
+					for (int y = top; y < bottom; y++)
+					{
+						bits.set( y );
+					}
+				}
+			}
+			
+			ArrayList<Double> spanStarts = new ArrayList<Double>();
+			ArrayList<Double> spanEnds = new ArrayList<Double>();
+			
+			double halfColumnSpacing = getColumnSpacing() * 0.5;
+			double halfRowSpacing = getRowSpacing() * 0.5;
+
+			for (int columnLine = 0; columnLine < numColLines; columnLine++)
+			{
+				spanStarts.clear();
+				spanEnds.clear();
+				int y = 0;
+				while ( y < numRows )
+				{
+					int spanIndices[] = getSpanFromBitSet( columnBits[columnLine], y );
+					if ( spanIndices[0] == -1  ||  spanIndices[1] == -1 )
+					{
+						break;
+					}
+					double topSpacing = spanIndices[0] == 0  ?  0.0  :  halfRowSpacing;
+					double bottomSpacing = spanIndices[1] == numRows-1  ?  0.0  :  halfRowSpacing;
+					spanStarts.add( getRowTop( spanIndices[0] ) - topSpacing );
+					spanEnds.add( getRowBottom( spanIndices[1] ) + bottomSpacing );
+					y = spanIndices[1] + 1;
+				}
+				
+				double col[] = new double[spanStarts.size()*2+1];
+				col[0] = getColumnRight( columnLine )  +  halfColumnSpacing;
+				for (int i = 0; i < spanStarts.size(); i++)
+				{
+					col[i*2+1] = spanStarts.get( i );
+					col[i*2+2] = spanEnds.get( i );
+				}
+				columnLines[columnLine] = col;
+			}
+			
+			for (int rowLine = 0; rowLine < numRowLines; rowLine++)
+			{
+				spanStarts.clear();
+				spanEnds.clear();
+				int x = 0;
+				while ( x < numColumns )
+				{
+					int spanIndices[] = getSpanFromBitSet( rowBits[rowLine], x );
+					if ( spanIndices[0] == -1  ||  spanIndices[1] == -1 )
+					{
+						break;
+					}
+					double leftSpacing = spanIndices[0] == 0  ?  0.0  :  halfColumnSpacing;
+					double rightSpacing = spanIndices[1] == numColumns-1  ?  0.0  :  halfColumnSpacing;
+					spanStarts.add( getColumnLeft( spanIndices[0] ) - leftSpacing );
+					spanEnds.add( getColumnRight( spanIndices[1] ) + rightSpacing );
+					x = spanIndices[1] + 1;
+				}
+				
+				double row[] = new double[spanStarts.size()*2+1];
+				row[0] = getRowBottom( rowLine )  +  halfRowSpacing;
+				for (int i = 0; i < spanStarts.size(); i++)
+				{
+					row[i*2+1] = spanStarts.get( i );
+					row[i*2+2] = spanEnds.get( i );
+				}
+				rowLines[rowLine] = row;
+			}
+		}
+	}
+	
+	public double[][] getColumnLines()
+	{
+		refreshBoundaries();
+		return columnLines;
+	}
+
+	public double[][] getRowLines()
+	{
+		refreshBoundaries();
+		return rowLines;
+	}
+
+	private static int[] getSpanFromBitSet(BitSet bits, int startIndex)
+	{
+		int start = bits.nextSetBit( startIndex );
+		if ( start == -1 )
+		{
+			return new int[] { -1, -1 };
+		}
+		int end = bits.nextClearBit( start );
+		if ( end == -1 )
+		{
+			end = bits.length();
+		}
+		return new int[] { start, end - 1 };
+	}
+	
 	
 
 	//

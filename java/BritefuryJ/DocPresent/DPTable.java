@@ -56,7 +56,6 @@ public class DPTable extends DPContainer implements TableElement
 
 	private TableChildEntry[][] childEntryTable;
 	private ArrayList<TableChildEntry> childEntries;
-	private double columnLines[][], rowLines[][];		// Format: one array per column/row. First element is the x/y position. Subsequent element PAIRS are start and end y/x of line segments.
 	private int rowStartIndices[];			// Indices into @childEntries, where each row starts
 	private int numColumns, numRows;		// Can be -1, indicating that these values must be refreshed
 
@@ -864,25 +863,6 @@ public class DPTable extends DPContainer implements TableElement
 
 	//
 	//
-	// QUEUE RESIZE
-	//
-	//
-	
-	@Override
-	protected void queueResize()
-	{
-		super.queueResize();
-		
-		// Reset column and row lines
-		columnLines = null;
-		rowLines = null;
-	}
-	
-	
-	
-	
-	//
-	//
 	// CELL BOUNDARY LINES
 	//
 	//
@@ -942,147 +922,6 @@ public class DPTable extends DPContainer implements TableElement
 	}
 	
 	
-	private void refreshBoundaries()
-	{
-		if ( ( columnLines == null  ||  rowLines == null ) )
-		{
-			refreshSize();
-			int numColLines = Math.max( numColumns - 1, 0 );
-			int numRowLines = Math.max( numRows - 1, 0 );
-			columnLines = new double[numColLines][];
-			rowLines = new double[numRowLines][];
-			LayoutNodeTable layout = (LayoutNodeTable)getLayoutNode();
-			
-			
-			// Create and initialise bitsets for the column and row lines
-			BitSet columnBits[] = new BitSet[numColLines];
-			BitSet rowBits[] = new BitSet[numRowLines];
-			
-			for (int i = 0; i < columnBits.length; i++)
-			{
-				columnBits[i] = new BitSet( numRows );
-			}
-			for (int i = 0; i < rowBits.length; i++)
-			{
-				rowBits[i] = new BitSet( numColumns );
-			}
-			
-			
-			// For each cell, set the bits that mark its boundary
-			for (TableChildEntry entry: childEntries)
-			{
-				int top = entry.y, bottom = entry.y + entry.rowSpan;
-				int left = entry.x, right = entry.x + entry.colSpan;
-				
-				// NOTE: ignore lines that are on the table boundary
-				
-				// Top
-				if ( top > 0 )
-				{
-					BitSet bits = rowBits[top-1];
-					for (int x = left; x < right; x++)
-					{
-						bits.set( x );
-					}
-				}
-
-				// Bottom
-				if ( bottom < numRows )
-				{
-					BitSet bits = rowBits[bottom-1];
-					for (int x = left; x < right; x++)
-					{
-						bits.set( x );
-					}
-				}
-				
-				// Left
-				if ( left > 0 )
-				{
-					BitSet bits = columnBits[left-1];
-					for (int y = top; y < bottom; y++)
-					{
-						bits.set( y );
-					}
-				}
-				
-				// Right
-				if ( right < numColumns )
-				{
-					BitSet bits = columnBits[right-1];
-					for (int y = top; y < bottom; y++)
-					{
-						bits.set( y );
-					}
-				}
-			}
-			
-			ArrayList<Double> spanStarts = new ArrayList<Double>();
-			ArrayList<Double> spanEnds = new ArrayList<Double>();
-			
-			double halfColumnSpacing = getColumnSpacing() * 0.5;
-			double halfRowSpacing = getRowSpacing() * 0.5;
-
-			for (int columnLine = 0; columnLine < numColLines; columnLine++)
-			{
-				spanStarts.clear();
-				spanEnds.clear();
-				int y = 0;
-				while ( y < numRows )
-				{
-					int spanIndices[] = getSpanFromBitSet( columnBits[columnLine], y );
-					if ( spanIndices[0] == -1  ||  spanIndices[1] == -1 )
-					{
-						break;
-					}
-					double topSpacing = spanIndices[0] == 0  ?  0.0  :  halfRowSpacing;
-					double bottomSpacing = spanIndices[1] == numRows-1  ?  0.0  :  halfRowSpacing;
-					spanStarts.add( layout.getRowTop( spanIndices[0] ) - topSpacing );
-					spanEnds.add( layout.getRowBottom( spanIndices[1] ) + bottomSpacing );
-					y = spanIndices[1] + 1;
-				}
-				
-				double col[] = new double[spanStarts.size()*2+1];
-				col[0] = layout.getColumnRight( columnLine )  +  halfColumnSpacing;
-				for (int i = 0; i < spanStarts.size(); i++)
-				{
-					col[i*2+1] = spanStarts.get( i );
-					col[i*2+2] = spanEnds.get( i );
-				}
-				columnLines[columnLine] = col;
-			}
-			
-			for (int rowLine = 0; rowLine < numRowLines; rowLine++)
-			{
-				spanStarts.clear();
-				spanEnds.clear();
-				int x = 0;
-				while ( x < numColumns )
-				{
-					int spanIndices[] = getSpanFromBitSet( rowBits[rowLine], x );
-					if ( spanIndices[0] == -1  ||  spanIndices[1] == -1 )
-					{
-						break;
-					}
-					double leftSpacing = spanIndices[0] == 0  ?  0.0  :  halfColumnSpacing;
-					double rightSpacing = spanIndices[1] == numColumns-1  ?  0.0  :  halfColumnSpacing;
-					spanStarts.add( layout.getColumnLeft( spanIndices[0] ) - leftSpacing );
-					spanEnds.add( layout.getColumnRight( spanIndices[1] ) + rightSpacing );
-					x = spanIndices[1] + 1;
-				}
-				
-				double row[] = new double[spanStarts.size()*2+1];
-				row[0] = layout.getRowBottom( rowLine )  +  halfRowSpacing;
-				for (int i = 0; i < spanStarts.size(); i++)
-				{
-					row[i*2+1] = spanStarts.get( i );
-					row[i*2+2] = spanEnds.get( i );
-				}
-				rowLines[rowLine] = row;
-			}
-		}
-	}
-
 	
 	//
 	//
@@ -1111,7 +950,9 @@ public class DPTable extends DPContainer implements TableElement
 		Paint cellPaint = getCellBoundaryPaint();
 		if ( cellPaint != null )
 		{
-			refreshBoundaries();
+			LayoutNodeTable layout = (LayoutNodeTable)getLayoutNode();
+			double columnLines[][] = layout.getColumnLines();
+			double rowLines[][] = layout.getRowLines();
 			
 			Paint prevPaint = graphics.getPaint();
 			graphics.setPaint( cellPaint );

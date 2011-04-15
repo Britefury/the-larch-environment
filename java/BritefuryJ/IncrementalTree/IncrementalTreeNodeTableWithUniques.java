@@ -9,9 +9,8 @@ package BritefuryJ.IncrementalTree;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Set;
+import java.util.IdentityHashMap;
 import java.util.Stack;
 
 
@@ -20,13 +19,13 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 	private static class EntryForDocNode
 	{
 		private IncrementalTreeNodeTableWithUniques table;
-		private Key key;
+		private Object key;
 		private IncrementalTreeNode refedNode;
 		private IncrementalTreeNode unrefedNode;
 		
 		
 		
-		public EntryForDocNode(IncrementalTreeNodeTableWithUniques table, Key key)
+		public EntryForDocNode(IncrementalTreeNodeTableWithUniques table, Object key)
 		{
 			this.table = table;
 			this.key = key;
@@ -111,7 +110,7 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 	
 	
 	
-	private HashMap<Key, EntryForDocNode> table = new HashMap<Key, EntryForDocNode>();
+	private IdentityHashMap<Object, EntryForDocNode> table = new IdentityHashMap<Object, EntryForDocNode>();
 	private HashSet<IncrementalTreeNode> unrefedNodes = new HashSet<IncrementalTreeNode>();
 	
 	
@@ -125,13 +124,12 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 	
 	
 
-	public IncrementalTreeNode getUnrefedIncrementalNodeFor(Object docNode, IncrementalTreeNode.NodeResultFactory resultFactory)
+	public IncrementalTreeNode getUnrefedIncrementalNodeFor(Object node, IncrementalTreeNode.NodeResultFactory resultFactory)
 	{
-		Key key = new Key( docNode );
-		EntryForDocNode subTable = table.get( key );
+		EntryForDocNode subTable = table.get( node );
 		if ( subTable != null )
 		{
-			return subTable.getUnrefedNodeFor( docNode, resultFactory );
+			return subTable.getUnrefedNodeFor( node, resultFactory );
 		}
 		else
 		{
@@ -140,10 +138,9 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 	}
 	
 	
-	public Collection<IncrementalTreeNode> get(Object docNode)
+	public Collection<IncrementalTreeNode> get(Object node)
 	{
-		Key key = new Key( docNode );
-		EntryForDocNode subTable = table.get( key );
+		EntryForDocNode subTable = table.get( node );
 		if ( subTable != null )
 		{
 			return subTable.getRefedNodes();
@@ -176,10 +173,9 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 		return table.size();
 	}
 	
-	public int getNumIncrementalNodesForDocNode(Object docNode)
+	public int getNumIncrementalNodesForDocNode(Object node)
 	{
-		Key key = new Key( docNode );
-		EntryForDocNode subTable = table.get( key );
+		EntryForDocNode subTable = table.get( node );
 		if ( subTable != null )
 		{
 			return subTable.size();
@@ -190,10 +186,9 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 		}
 	}
 	
-	public int getNumUnrefedIncrementalNodesForDocNode(Object docNode)
+	public int getNumUnrefedIncrementalNodesForDocNode(Object node)
 	{
-		Key key = new Key( docNode );
-		EntryForDocNode subTable = table.get( key );
+		EntryForDocNode subTable = table.get( node );
 		if ( subTable != null )
 		{
 			return subTable.getNumUnrefedNodes();
@@ -205,11 +200,6 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 	}
 	
 	
-	public Set<Key> getKeys()
-	{
-		return table.keySet();
-	}
-	
 	public void clean()
 	{
 		// We need to remove all nodes within the sub-trees rooted at the unrefed nodes
@@ -220,7 +210,7 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 		{
 			IncrementalTreeNode node = unrefedStack.pop();
 			
-			EntryForDocNode subTable = table.get( new Key( node.getModel() ) );
+			EntryForDocNode subTable = table.get( node.getModel() );
 			if ( subTable != null )
 			{
 				subTable.clean();
@@ -240,7 +230,7 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 	
 	protected void refIncrementalNode(IncrementalTreeNode node)
 	{
-		Key key = new Key( node.getModel() );
+		Object key = node.getModel();
 		EntryForDocNode subTable = table.get( key );
 		if ( subTable == null )
 		{
@@ -253,7 +243,7 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 
 	protected void unrefIncrementalNode(IncrementalTreeNode node)
 	{
-		Key key = new Key( node.getModel() );
+		Object key = node.getModel();
 		EntryForDocNode subTable = table.get( key );
 		if ( subTable == null )
 		{
@@ -267,7 +257,7 @@ public class IncrementalTreeNodeTableWithUniques extends IncrementalTreeNodeTabl
 
 	
 
-	private void removeViewTable(Key key)
+	private void removeViewTable(Object key)
 	{
 		table.remove( key );
 	}
