@@ -191,27 +191,26 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 			i++;
 		}
 		
+		// Clear column and row requisition boxes, but not the allocation boxes - they are needed
 		columnBoxes = rowBoxes = null;
-		rowAllocBoxes = null;
-		// Do not clear columnAllocBoxes - they are needed
 	}
 	
 	
 	
 	private int getColumnForLocalPoint(Point2 localPos)
 	{
-		if ( columnBoxes.length == 0 )
+		if ( columnAllocBoxes.length == 0 )
 		{
 			return -1;
 		}
-		else if ( columnBoxes.length == 1 )
+		else if ( columnAllocBoxes.length == 1 )
 		{
 			return 0;
 		}
 		else
 		{
 			LAllocBoxInterface columnI = columnAllocBoxes[0];
-			for (int i = 0; i < columnBoxes.length - 1; i++)
+			for (int i = 0; i < columnAllocBoxes.length - 1; i++)
 			{
 				LAllocBoxInterface columnJ = columnAllocBoxes[i+1];
 				double iUpperX = columnI.getAllocPositionInParentSpaceX() + columnI.getAllocationX();
@@ -227,7 +226,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 				columnI = columnJ;
 			}
 			
-			return columnBoxes.length-1;
+			return columnAllocBoxes.length-1;
 		}
 	}
 
@@ -235,18 +234,18 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 	
 	private int getRowForLocalPoint(Point2 localPos)
 	{
-		if ( rowBoxes.length == 0 )
+		if ( rowAllocBoxes.length == 0 )
 		{
 			return -1;
 		}
-		else if ( rowBoxes.length == 1 )
+		else if ( rowAllocBoxes.length == 1 )
 		{
 			return 0;
 		}
 		else
 		{
 			LAllocBoxInterface rowI = rowAllocBoxes[0];
-			for (int i = 0; i < rowBoxes.length - 1; i++)
+			for (int i = 0; i < rowAllocBoxes.length - 1; i++)
 			{
 				LAllocBoxInterface rowJ = rowAllocBoxes[i+1];
 				double iUpperY = rowI.getAllocPositionInParentSpaceY() + rowI.getAllocationY();
@@ -262,7 +261,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 				rowI = rowJ;
 			}
 			
-			return rowBoxes.length-1;
+			return rowAllocBoxes.length-1;
 		}
 	}
 

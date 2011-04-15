@@ -74,6 +74,7 @@ public abstract class LayoutNode
 
 		if ( !element.isResizeQueued() )
 		{
+			element.onSizeChange();
 			DPContainer parent = element.getParent();
 			if ( parent != null )
 			{

@@ -1716,6 +1716,10 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		}
 	}
 	
+	public void onSizeChange()
+	{
+	}
+	
 	
 	protected void queueRedraw(AABox2 box)
 	{

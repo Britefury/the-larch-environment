@@ -16,9 +16,9 @@ import BritefuryJ.CommandHistory.CommandHistory;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DefaultPerspective.Pres.ErrorBox;
 import BritefuryJ.DefaultPerspective.Pres.ObjectBorder;
+import BritefuryJ.DocPresent.DPColumn;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRegion;
-import BritefuryJ.DocPresent.DPColumn;
 import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.DocPresent.Caret.Caret;
@@ -27,7 +27,6 @@ import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.IncrementalTree.IncrementalTree;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
-import BritefuryJ.IncrementalTree.IncrementalTreeNodeTable;
 import BritefuryJ.Logging.Log;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
@@ -41,6 +40,7 @@ import BritefuryJ.Projection.Subject;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
 import BritefuryJ.Utils.HashUtils;
+import BritefuryJ.Utils.WeakIdentityHashMap;
 import BritefuryJ.Utils.Profile.ProfileTimer;
 
 public class IncrementalView extends IncrementalTree implements Presentable
@@ -65,28 +65,27 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	
 	public static class StateStore extends PersistentStateStore
 	{
-		private HashMap<IncrementalTreeNodeTable.Key, LinkedList<PersistentStateTable>> table = new HashMap<IncrementalTreeNodeTable.Key, LinkedList<PersistentStateTable>>();
+		private WeakIdentityHashMap<Object, LinkedList<PersistentStateTable>> table = new WeakIdentityHashMap<Object, LinkedList<PersistentStateTable>>();
 		
 		
 		public StateStore()
 		{
 		}
 		
-		private void addPersistentState(Object node, PersistentStateTable persistentStateTable)
+		private void addPersistentState(Object model, PersistentStateTable persistentStateTable)
 		{
-			IncrementalTreeNodeTable.Key key = new IncrementalTreeNodeTable.Key( node );
-			LinkedList<PersistentStateTable> entryList = table.get( key );
+			LinkedList<PersistentStateTable> entryList = table.get( model );
 			if ( entryList == null )
 			{
 				entryList = new LinkedList<PersistentStateTable>();
-				table.put( key, entryList );
+				table.put( model, entryList );
 			}
 			entryList.push( persistentStateTable );
 		}
 		
-		private PersistentStateTable usePersistentState(Object node)
+		private PersistentStateTable usePersistentState(Object model)
 		{
-			LinkedList<PersistentStateTable> entryList = table.get( new IncrementalTreeNodeTable.Key( node ) );
+			LinkedList<PersistentStateTable> entryList = table.get( model );
 			if ( entryList != null  &&  !entryList.isEmpty() )
 			{
 				return entryList.removeFirst();
