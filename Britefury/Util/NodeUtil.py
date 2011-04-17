@@ -7,22 +7,21 @@
 ##-*************************
 from java.util import List
 
-from BritefuryJ.DocModel import DMListInterface, DMObjectInterface, DMNode
-from BritefuryJ.DocModel.Resource import DMResource
+from BritefuryJ.DocModel import DMListInterface, DMObjectInterface, DMNode, DMEmbeddedObject, DMEmbeddedIsolatedObject
 
 
 
 def isStringNode(x):
 	return isinstance( x, str )  or  isinstance( x, unicode )
 
-def isListNode(xs):
-	return isinstance( xs, List )  or  isinstance( xs, list )  or isinstance( xs, DMListInterface )
+def isListNode(x):
+	return isinstance(x, List )  or  isinstance( x, list )  or isinstance( x, DMListInterface )
 
-def isObjectNode(xs):
-	return isinstance( xs, DMObjectInterface )
+def isObjectNode(x):
+	return isinstance( x, DMObjectInterface )
 
-def isResourceNode(xs):
-	return isinstance( xs, DMResource )
+def isEmbeddedObjectNode(x):
+	return isinstance( x, DMEmbeddedObject ) or isinstance( x, DMEmbeddedIsolatedObject )
 
 
 
@@ -41,8 +40,8 @@ def nodeToSXString(x, level=3):
 			return '(...)'
 		else:
 			return '( ' + x.getDMObjectClass().getName() + ' : ' + ' '.join( [ x.getDMObjectClass().getField( i ).getName() + '=' + nodeToSXString( x.get( i ), level - 1 )  for i in xrange( 0, x.getDMObjectClass().getNumFields() ) ] ) + ')'
-	elif isResourceNode( x ):
-		return '<<Resource>>'
+	elif isEmbeddedObjectNode( x ):
+		return '<<Embedded>>'
 	else:
 		raise TypeError, '%s'  %  ( x.__class__, )
 

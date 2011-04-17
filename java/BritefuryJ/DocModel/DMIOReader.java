@@ -18,8 +18,6 @@ import org.python.core.PyString;
 import org.python.core.PyTuple;
 import org.python.core.PyUnicode;
 
-import BritefuryJ.DocModel.Resource.DMJavaResource;
-import BritefuryJ.DocModel.Resource.DMPyResource;
 import BritefuryJ.Isolation.IsolationBarrier;
 
 
@@ -713,71 +711,7 @@ public class DMIOReader extends DMIO
 			{
 				try
 				{
-					if ( source.substring( pos, pos+5 ).equals( "<<Ja:" ) )
-					{
-						pos += 5;
-		
-						MatchResult res;
-		
-						// Whitespace
-						res = matchWhitespace( source, pos );
-						if ( res == null )
-						{
-							throw new ParseErrorException( pos, "Expected whitespace after opening Java resource" );
-						}
-						pos = res.position;
-		
-						// Atom
-						res = matchAtom( source, pos );
-						if ( res == null )
-						{
-							throw new ParseErrorException( pos, "Expected content after opening Java resource" );
-						}
-						pos = res.position;
-						String serialised = res.value;
-						
-						if ( !source.substring( pos, pos+2 ).equals( ">>" ) )
-						{
-							throw new ParseErrorException( pos, "Expected >> to close Java resource" );
-						}
-						pos += 2;
-						
-						DMJavaResource resource = DMJavaResource.serialisedResource( serialised );
-						closeItem( resource );
-					}
-					else if ( source.substring( pos, pos+5 ).equals( "<<Py:" ) )
-					{
-						pos += 5;
-		
-						MatchResult res;
-		
-						// Whitespace
-						res = matchWhitespace( source, pos );
-						if ( res == null )
-						{
-							throw new ParseErrorException( pos, "Expected whitespace after opening Python resource" );
-						}
-						pos = res.position;
-		
-						// Atom
-						res = matchAtom( source, pos );
-						if ( res == null )
-						{
-							throw new ParseErrorException( pos, "Expected content after opening Python resource" );
-						}
-						pos = res.position;
-						String serialised = res.value;
-						
-						if ( !source.substring( pos, pos+2 ).equals( ">>" ) )
-						{
-							throw new ParseErrorException( pos, "Expected >> to close Python resource" );
-						}
-						pos += 2;
-						
-						DMPyResource resource = DMPyResource.serialisedResource( serialised );
-						closeItem( resource );
-					}
-					else if ( source.substring( pos, pos+5 ).equals( "<<Em:" ) )
+					if ( source.substring( pos, pos+5 ).equals( "<<Em:" ) )
 					{
 						pos += 5;
 		

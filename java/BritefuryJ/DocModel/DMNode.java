@@ -22,9 +22,6 @@ import org.python.core.PyTuple;
 import BritefuryJ.DocModel.DMIOReader.BadModuleNameException;
 import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
 import BritefuryJ.DocModel.DMIOWriter.InvalidDataTypeException;
-import BritefuryJ.DocModel.Resource.DMJavaResource;
-import BritefuryJ.DocModel.Resource.DMPyResource;
-import BritefuryJ.DocModel.Resource.DMResource;
 
 
 public abstract class DMNode implements Cloneable
@@ -478,29 +475,6 @@ public abstract class DMNode implements Cloneable
 		}
 	}
 	
-	
-	
-	public static DMResource javaResource(Object x)
-	{
-		return new DMJavaResource( x );
-	}
-
-	public static DMResource pyResource(PyObject x)
-	{
-		return new DMPyResource( x );
-	}
-
-	public static DMResource resource(Object x)
-	{
-		if ( x instanceof PyObject )
-		{
-			return pyResource( (PyObject)x );
-		}
-		else
-		{
-			return javaResource( x );
-		}
-	}
 	
 	
 	public static DMEmbeddedObject embed(PyObject x)

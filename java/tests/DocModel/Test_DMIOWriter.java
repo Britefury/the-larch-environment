@@ -6,7 +6,6 @@
 //##************************
 package tests.DocModel;
 
-import java.awt.Color;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -14,7 +13,6 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.python.core.Py;
-import org.python.core.PyInteger;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
@@ -26,8 +24,6 @@ import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMSchema;
-import BritefuryJ.DocModel.Resource.DMJavaResource;
-import BritefuryJ.DocModel.Resource.DMPyResource;
 import BritefuryJ.Isolation.IsolationBarrier;
 
 public class Test_DMIOWriter extends TestCase
@@ -265,21 +261,6 @@ public class Test_DMIOWriter extends TestCase
 	
 	
 	
-	public void testWriteJavaResource() throws IOException
-	{
-		DMJavaResource jr = new DMJavaResource( Color.RED );
-		writeTest( jr, "<<Ja: " + DMIOWriter.stringAsAtom( DMJavaResource.serialise( Color.RED ) ) + ">>" );
-	}
-
-
-	public void testWritePyResource() throws IOException
-	{
-		PyObject pyValue = new PyTuple( new PyInteger( 1 ), new PyInteger( 2 ), new PyInteger( 3 ) );
-		DMPyResource pr = new DMPyResource( pyValue );
-		writeTest( pr, "<<Py: " + DMIOWriter.stringAsAtom( DMPyResource.serialise( pyValue ) ) + ">>" );
-	}
-
-
 	public void testWriteNestedObject()
 	{
 		DMObject a = A.newInstance( new Object[] { "0", "1" } );
@@ -302,16 +283,6 @@ public class Test_DMIOWriter extends TestCase
 		DMObject b = A2.newInstance( new Object[] { "0", "1" } );
 		List<Object> l = Arrays.asList( new Object[] { a, b } );
 		writeTest( l, "{m=test.schema m2=test.module2 : [(m A x=0 y=1) (m2 A2 x=0 y=1)]}" );
-	}
-
-
-	public void testWriteNestedResource() throws IOException
-	{
-		DMJavaResource jr = new DMJavaResource( Color.RED );
-		PyObject pyValue = new PyTuple( new PyInteger( 1 ), new PyInteger( 2 ), new PyInteger( 3 ) );
-		DMPyResource pr = new DMPyResource( pyValue );
-		List<Object> x = Arrays.asList( new Object[] { jr, pr, "abc" } );
-		writeTest( x, "[<<Ja: " + DMIOWriter.stringAsAtom( DMJavaResource.serialise( Color.RED ) ) + ">> <<Py: " + DMIOWriter.stringAsAtom( DMPyResource.serialise( pyValue ) ) + ">> abc]" );
 	}
 
 
