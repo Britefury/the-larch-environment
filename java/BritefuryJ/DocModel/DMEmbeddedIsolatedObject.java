@@ -17,9 +17,10 @@ import org.python.core.PyTuple;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.Isolation.IsolationBarrier;
 import BritefuryJ.Pres.Pres;
 
-public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterface, Presentable
+public class DMEmbeddedIsolatedObject extends DMNode implements DMEmbeddedPyObjectInterface, Presentable
 {
 	protected static class ChildrenIterator implements Iterator<Object>
 	{
@@ -59,21 +60,21 @@ public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterf
 	
 	private static final long serialVersionUID = 1L;
 	
-	protected static DMNodeClass embeddedObjectNodeClass = new DMNodeClass( "DMEmbeddedObject" );
+	protected static DMNodeClass embeddedIsolatedObjectNodeClass = new DMNodeClass( "DMEmbeddedIsolatedObject" );
 
 
-	private PyObject value = null;
+	private IsolationBarrier<PyObject> iso = null;
 	
 	
-	public DMEmbeddedObject()
+	public DMEmbeddedIsolatedObject()
 	{
 		super();
 	}
 	
-	public DMEmbeddedObject(PyObject value)
+	public DMEmbeddedIsolatedObject(PyObject value)
 	{
 		super();
-		this.value = value;
+		this.iso = new IsolationBarrier<PyObject>( value );
 	}
 	
 	
@@ -86,17 +87,17 @@ public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterf
 		}
 		else
 		{
-			if ( x instanceof DMEmbeddedObject )
+			if ( x instanceof DMEmbeddedIsolatedObject )
 			{
-				DMEmbeddedObject e = (DMEmbeddedObject)x;
+				DMEmbeddedIsolatedObject e = (DMEmbeddedIsolatedObject)x;
 				
-				if ( value != null  &&  e.value != null )
+				if ( iso != null  &&  e.iso != null )
 				{
-					return value.equals( e.value );
+					return iso.equals( e.iso );
 				}
 				else
 				{
-					return ( value != null ) == ( e.value != null );
+					return ( iso != null ) == ( e.iso != null );
 				}
 			}
 			
@@ -106,20 +107,20 @@ public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterf
 	
 	public int hashCode()
 	{
-		return value != null  ?  value.hashCode()  :  0;
+		return iso != null  ?  iso.hashCode()  :  0;
 	}
 	
 	
 	@Override
 	public void become(Object x)
 	{
-		if ( x instanceof DMEmbeddedObject )
+		if ( x instanceof DMEmbeddedIsolatedObject )
 		{
-			DMEmbeddedObject em = (DMEmbeddedObject)x;
-			this.value = em.value;
+			DMEmbeddedIsolatedObject em = (DMEmbeddedIsolatedObject)x;
+			this.iso = em.iso;
 			
 			// We could remove this exception - just include an incremental monitor (as with DMList), and notify it when the value is accessed and modified
-			throw new RuntimeException( "DMEmbeddedObject does not support become()" );
+			throw new RuntimeException( "DMEmbeddedObjectIsolated does not support become()" );
 		}
 		else
 		{
@@ -130,20 +131,20 @@ public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterf
 	@Override
 	protected Object createDeepCopy(IdentityHashMap<Object, Object> memo)
 	{
-		if ( value != null )
+		if ( iso != null )
 		{
-			return new DMEmbeddedObject( value );
+			return new DMEmbeddedIsolatedObject( iso.getValue() );
 		}
 		else
 		{
-			return new DMEmbeddedObject();
+			return new DMEmbeddedIsolatedObject();
 		}
 	}
 
 	@Override
 	public DMNodeClass getDMNodeClass()
 	{
-		return embeddedObjectNodeClass;
+		return embeddedIsolatedObjectNodeClass;
 	}
 
 	@Override
@@ -155,14 +156,16 @@ public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterf
 
 	public PyObject __getstate__()
 	{
-		return new PyTuple( value );
+		return new PyTuple( Py.java2py( iso ) );
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void __setstate__(PyObject state)
 	{
 		if ( state instanceof PyTuple )
 		{
-			value = ((PyTuple)state).pyget( 0 );
+			PyObject x = ((PyTuple)state).pyget( 0 );
+			iso = Py.tojava( x, IsolationBarrier.class );
 		}
 		else
 		{
@@ -174,7 +177,19 @@ public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterf
 
 	public PyObject getValue()
 	{
-		return value;
+		return iso.getValue();
+	}
+	
+	
+	
+	protected IsolationBarrier<PyObject> getIsolationBarrier()
+	{
+		return iso;
+	}
+	
+	protected void setIsolationBarrier(IsolationBarrier<PyObject> iso)
+	{
+		this.iso = iso;
 	}
 
 	
@@ -182,6 +197,6 @@ public class DMEmbeddedObject extends DMNode implements DMEmbeddedPyObjectInterf
 	@Override
 	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		return DocModelPresenter.presentDMEmbeddedObject( this, fragment, inheritedState );
+		return DocModelPresenter.presentDMEmbeddedIsolatedObject( this, fragment, inheritedState );
 	}
 }

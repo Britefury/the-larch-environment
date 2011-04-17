@@ -1257,7 +1257,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			List<PointerInputElement.DndTarget> targets = PointerInputElement.getDndTargets( this, rootPos );
 			for (PointerInputElement.DndTarget target: targets)
 			{
-				if ( target.isDest() )
+				if ( target.isNonLocalDest() )
 				{
 					PointerInputElement targetElement = target.getElement();
 					Point2 targetPos = target.getElementSpacePos();
@@ -1276,7 +1276,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			List<PointerInputElement.DndTarget> targets = PointerInputElement.getDndTargets( this, rootPos );
 			for (PointerInputElement.DndTarget target: targets)
 			{
-				if ( target.isDest() )
+				if ( target.isNonLocalDest() )
 				{
 					PointerInputElement targetElement = target.getElement();
 					Point2 targetPos = target.getElementSpacePos();

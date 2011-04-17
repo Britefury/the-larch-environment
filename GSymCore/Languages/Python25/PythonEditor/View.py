@@ -190,7 +190,7 @@ def _onDrop_inlineObject(element, pos, data, action):
 	if caret.isValid():
 		model = data.getModel()
 		try:
-			resource = DMNode.resource( model )
+			embeddedValue = DMNode.embedIsolated( model )
 		except Exception, e:
 			_displayResourceException( e )
 		except Throwable, t:
@@ -202,10 +202,10 @@ def _onDrop_inlineObject(element, pos, data, action):
 				_displayModelException( e )
 			else:
 				if modelType is Schema.Expr:
-					expr = Schema.InlineObjectExpr( resource=resource )
+					expr = Schema.InlineObjectExpr( embeddedValue=embeddedValue )
 					_insertSpecialForm( caret, expr )
 				elif modelType is Schema.Stmt:
-					stmt = Schema.InlineObjectStmt( resource=resource )
+					stmt = Schema.InlineObjectStmt( embeddedValue=embeddedValue )
 					_insertSpecialForm( caret, stmt )
 	return True
 
@@ -947,8 +947,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Inline object expression
 	@SpecialFormExpression( Schema.InlineObjectExpr )
-	def InlineObjectExpr(self, fragment, inheritedState, model, resource):
-		value = resource.getValue()
+	def InlineObjectExpr(self, fragment, inheritedState, model, embeddedValue):
+		value = embeddedValue.getValue()
 		valueView = ApplyPerspective( None, value )
 
 		try:
@@ -967,8 +967,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 	# Inline object statement
 	@SpecialFormStatement( Schema.InlineObjectStmt )
-	def InlineObjectStmt(self, fragment, inheritedState, model, resource):
-		value = resource.getValue()
+	def InlineObjectStmt(self, fragment, inheritedState, model, embeddedValue):
+		value = embeddedValue.getValue()
 		valueView = ApplyPerspective( None, value )
 
 		try:

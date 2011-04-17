@@ -10,6 +10,9 @@ import os
 from java.awt import Color
 
 from java.awt.event import KeyEvent
+
+from java.awt.datatransfer import DataFlavor
+
 from java.util.regex import Pattern
 
 from javax.swing import AbstractAction
@@ -133,6 +136,17 @@ class AppView (GSymViewObjectDispatch):
 			DocumentManagement.promptOpenDocument( fragment.getSubjectContext()['world'], element.getRootElement().getComponent(), handleOpenedDocumentFn )
 			
 			return True
+		
+		
+		
+		def _onFileListDrop(element, targetPosition, data, action):
+			world = fragment.getSubjectContext()['world']
+			for filename in data:
+				filename = str( filename )
+				
+				document = GSymDocument.readFile( world, filename )
+				node.registerOpenDocument( document, fragment.getSubjectContext()['location'].getLocationString() + '.documents' )
+			return True
 
 		
 		def _onNewConsole(link, event):
@@ -157,6 +171,7 @@ class AppView (GSymViewObjectDispatch):
 		newLink = Hyperlink( 'NEW', _onNewDoc )
 		openLink = Hyperlink( 'OPEN', _onOpenDoc )
 		openDocumentsBox = _contentsList( [ newLink, openLink ], openDocViews, 'Documents' )
+		openDocumentsBox = openDocumentsBox.withNonLocalDropDest( DataFlavor.javaFileListFlavor, _onFileListDrop )
 		
 		
 		newConsoleLink = Hyperlink( 'NEW', _onNewConsole )

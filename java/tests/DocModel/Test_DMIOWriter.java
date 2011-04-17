@@ -19,6 +19,7 @@ import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 
+import BritefuryJ.DocModel.DMEmbeddedIsolatedObject;
 import BritefuryJ.DocModel.DMEmbeddedObject;
 import BritefuryJ.DocModel.DMIOWriter;
 import BritefuryJ.DocModel.DMNode;
@@ -92,7 +93,7 @@ public class Test_DMIOWriter extends TestCase
 		assertTrue( res.equals( expected ) );
 	}
 	
-	public void writeAsStateTest(Object input, String expectedSX, Object expectedEmbedded[])
+	public void writeAsStateTest(Object input, String expectedSX, Object expectedEmbedded[], PyObject expectedPyEmbedded[])
 	{
 		PyObject res = null;
 		try
@@ -109,11 +110,19 @@ public class Test_DMIOWriter extends TestCase
 		
 		PyTuple tup = (PyTuple)res;
 		String resultSX = tup.pyget( 0 ).asString();
-		PyList embPy = (PyList)tup.pyget( 1 );
-		PyList expEmb = new PyList();
+		
+		PyList embAsPy = (PyList)tup.pyget( 1 );
+		PyList expEmbAsPy = new PyList();
 		for (Object e: expectedEmbedded)
 		{
-			expEmb.add( e );
+			expEmbAsPy.add( e );
+		}
+		
+		PyList embPyAsPy = (PyList)tup.pyget( 2 );
+		PyList expEmbPyAsPy = new PyList();
+		for (PyObject e: expectedPyEmbedded)
+		{
+			expEmbPyAsPy.append( e );
 		}
 		
 		
@@ -130,16 +139,28 @@ public class Test_DMIOWriter extends TestCase
 		assertTrue( resultSX.equals( expectedSX ) );
 		
 		
-		if ( !embPy.equals( expEmb ) )
+		if ( !embAsPy.equals( expEmbAsPy ) )
 		{
-			System.out.println( "VALUES ARE NOT THE SAME" );
+			System.out.println( "EMBEDDED OBJECT LISTS ARE NOT THE SAME" );
 			System.out.println( "EXPECTED:" );
-			System.out.println( expectedSX );
+			System.out.println( expEmbAsPy );
 			System.out.println( "RESULT:" );
-			System.out.println( res );
+			System.out.println( embAsPy );
 		}
 		
-		assertTrue( embPy.equals( expEmb ) );
+		assertTrue( embAsPy.equals( expEmbAsPy ) );
+		
+		
+		if ( !embPyAsPy.equals( expEmbPyAsPy ) )
+		{
+			System.out.println( "EMBEDDED PYTHON OBJECT LISTS ARE NOT THE SAME" );
+			System.out.println( "EXPECTED:" );
+			System.out.println( expEmbPyAsPy );
+			System.out.println( "RESULT:" );
+			System.out.println( embPyAsPy );
+		}
+		
+		assertTrue( embPyAsPy.equals( expEmbPyAsPy ) );
 	}
 	
 	
@@ -300,8 +321,19 @@ public class Test_DMIOWriter extends TestCase
 		DMEmbeddedObject e1 = DMNode.embed( Py.newInteger( 1 ) );
 		DMEmbeddedObject e2 = DMNode.embed( Py.newInteger( 2 ) );
 		List<Object> x = Arrays.asList( new Object[] { e0, e1, e2 } );
-		writeAsStateTest( x, "[<<Em:0>> <<Em:1>> <<Em:2>>]", new Object[] { new IsolationBarrier<PyObject>( Py.newInteger( 0 ) ),
+		writeAsStateTest( x, "[<<Em:0>> <<Em:1>> <<Em:2>>]", new Object[] {}, new PyObject[] { Py.newInteger( 0 ), Py.newInteger( 1 ), Py.newInteger( 2 ) } );
+	}
+
+
+	public void testWriteEmbeddedIsolatedObject() throws IOException
+	{
+		DMEmbeddedIsolatedObject e0 = DMNode.embedIsolated( Py.newInteger( 0 ) );
+		DMEmbeddedIsolatedObject e1 = DMNode.embedIsolated( Py.newInteger( 1 ) );
+		DMEmbeddedIsolatedObject e2 = DMNode.embedIsolated( Py.newInteger( 2 ) );
+		List<Object> x = Arrays.asList( new Object[] { e0, e1, e2 } );
+		writeAsStateTest( x, "[<<EmIso:0>> <<EmIso:1>> <<EmIso:2>>]", new Object[] { new IsolationBarrier<PyObject>( Py.newInteger( 0 ) ),
 				new IsolationBarrier<PyObject>( Py.newInteger( 1 ) ),
-				new IsolationBarrier<PyObject>( Py.newInteger( 2 ) ) } );
+				new IsolationBarrier<PyObject>( Py.newInteger( 2 ) ) },
+				new PyObject[] {} );
 	}
 }

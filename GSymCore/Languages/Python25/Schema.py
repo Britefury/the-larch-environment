@@ -5,12 +5,12 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from BritefuryJ.DocModel import DMSchema, DMObjectClass
+from BritefuryJ.DocModel import DMSchema, DMObjectClass, DMNode
 
 
 
 
-schema = DMSchema( 'Python25', 'py', 'GSymCore.Languages.Python25', 2 )
+schema = DMSchema( 'Python25', 'py', 'GSymCore.Languages.Python25', 3 )
 
 
 #
@@ -217,8 +217,8 @@ IndentedBlock = schema.newClass( 'IndentedBlock', CompoundStmt, [ 'suite' ] )
 
 
 # Inline object
-InlineObjectExpr = schema.newClass( 'InlineObjectExpr', Expr, [ 'resource' ] )
-InlineObjectStmt = schema.newClass( 'InlineObjectStmt', SimpleStmt, [ 'resource' ] )
+InlineObjectExpr = schema.newClass( 'InlineObjectExpr', Expr, [ 'embeddedValue' ] )
+InlineObjectStmt = schema.newClass( 'InlineObjectStmt', SimpleStmt, [ 'embeddedValue' ] )
 
 
 
@@ -241,15 +241,39 @@ PythonExpression = schema.newClass( 'PythonExpression', TopLevel, [ 'expr' ] )
 #
 
 def _readClassStmtHeader_v1(fieldValues):
-	# V1 did not have a decorators field; initialise it to []
+	# Version 1 did not have a decorators field; initialise it to []
 	return ClassStmtHeader( decorators=[], name=fieldValues['name'], bases=fieldValues['bases'], basesTrailingSeparator=fieldValues['basesTrailingSeparator'] )
 
 def _readClassStmt_v1(fieldValues):
-	# V1 did not have a decorators field; initialise it to []
+	# Version 1 did not have a decorators field; initialise it to []
 	return ClassStmt( decorators=[], name=fieldValues['name'], bases=fieldValues['bases'], basesTrailingSeparator=fieldValues['basesTrailingSeparator'], suite=fieldValues['suite'] )
 
 schema.registerReader( 'ClassStmtHeader', 1, _readClassStmtHeader_v1 )
 schema.registerReader( 'ClassStmt', 1, _readClassStmt_v1 )
+
+
+
+
+#
+#
+# Version 2 backwards compatibility
+#
+#
+
+def _readInlineObjectExpr_v2(fieldValues):
+	# Version 2 called the field 'resource', rather than 'embeddedValue'
+	embeddedValue = fieldValues['resource']
+	embeddedValue = DMNode.embed( None )
+	return InlineObjectExpr( embeddedValue=embeddedValue )
+
+def _readInlineObjectStmt_v2(fieldValues):
+	# Version 2 called the field 'resource', rather than 'embeddedValue'
+	embeddedValue = fieldValues['resource']
+	embeddedValue = DMNode.embed( None )
+	return InlineObjectStmt( embeddedValue=embeddedValue )
+
+schema.registerReader( 'InlineObjectExpr', 2, _readInlineObjectExpr_v2 )
+schema.registerReader( 'InlineObjectStmt', 2, _readInlineObjectStmt_v2 )
 
 
 

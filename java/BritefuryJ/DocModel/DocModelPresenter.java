@@ -11,11 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.Controls.DropDownExpander;
 import BritefuryJ.DefaultPerspective.Pres.GenericStyle;
+import BritefuryJ.DefaultPerspective.Pres.ObjectBorder;
 import BritefuryJ.DefaultPerspective.Pres.UnescapedStringAsRow;
 import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.Pres.CompositePres;
 import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Paragraph;
 import BritefuryJ.Pres.Primitive.Primitive;
@@ -26,6 +30,7 @@ import BritefuryJ.Pres.Sequence.TrailingSeparator;
 import BritefuryJ.Pres.Sequence.VerticalInlineSequenceView;
 import BritefuryJ.Pres.Sequence.VerticalSequenceView;
 import BritefuryJ.StyleSheet.StyleSheet;
+import BritefuryJ.StyleSheet.StyleValues;
 
 public class DocModelPresenter
 {
@@ -47,6 +52,8 @@ public class DocModelPresenter
 
 	private static final StyleSheet classNameStyle = defaultStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
 	private static final StyleSheet schemaNameStyle = defaultStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) );
+
+	private static final StyleSheet embedStyle = defaultStyle.withAttr( Primitive.foreground, new Color( 0.25f, 0.0f, 0.5f ) ).withAttr( Primitive.fontItalic, true );
 
 	private static final StyleSheet fieldNameStyle = defaultStyle.withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.25f ) );
 
@@ -185,4 +192,33 @@ public class DocModelPresenter
 		}
 	}
 
+
+	protected static Pres presentDMEmbeddedObject(DMEmbeddedObject node, FragmentView fragment, SimpleAttributeTable inheritedState)
+	{
+		return new ObjectBorder( new DropDownExpander( embedStyle.applyTo( new Label( "Embedded object" ) ), new ValuePres( node ) ) );
+	}
+	
+	protected static Pres presentDMEmbeddedIsolatedObject(DMEmbeddedIsolatedObject node, FragmentView fragment, SimpleAttributeTable inheritedState)
+	{
+		return new ObjectBorder( new DropDownExpander( embedStyle.applyTo( new Label( "Embedded isolated object" ) ), new ValuePres( node ) ) );
+	}
+	
+	
+	private static class ValuePres extends CompositePres
+	{
+		private DMEmbeddedPyObjectInterface embed;
+		
+		
+		public ValuePres(DMEmbeddedPyObjectInterface embed)
+		{
+			this.embed = embed;
+		}
+		
+		
+		@Override
+		public Pres pres(PresentationContext ctx, StyleValues style)
+		{
+			return new InnerFragment( embed.getValue() );
+		}
+	}
 }
