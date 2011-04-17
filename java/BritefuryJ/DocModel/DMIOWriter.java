@@ -43,6 +43,7 @@ public class DMIOWriter extends DMIO
 	private HashSet<String> names;
 	private ArrayList<DMSchema> modulesInOrder;
 	private ArrayList<Object> embeddedValues;
+	private PyList embeddedPyValues;
 	
 	
 	
@@ -58,6 +59,7 @@ public class DMIOWriter extends DMIO
 	private void initEmbeddedValues()
 	{
 		embeddedValues = new ArrayList<Object>();
+		embeddedPyValues = new PyList();
 	}
 	
 	private int embedValue(Object value)
@@ -69,6 +71,18 @@ public class DMIOWriter extends DMIO
 		
 		int index = embeddedValues.size();
 		embeddedValues.add( value );
+		return index;
+	}
+	
+	private int embedPyValue(PyObject value)
+	{
+		if ( embeddedPyValues == null )
+		{
+			throw new CannotEmbedValue();
+		}
+		
+		int index = embeddedPyValues.size();
+		embeddedPyValues.append( value );
 		return index;
 	}
 	
@@ -193,6 +207,15 @@ public class DMIOWriter extends DMIO
 	private void writeEmbeddedObject(StringBuilder builder, DMEmbeddedObject embed) throws InvalidDataTypeException
 	{
 		builder.append( "<<Em:" );
+		int index = embedPyValue( embed.getValue() );
+		builder.append( Integer.toString( index ) );
+		builder.append( ">>" );
+	}
+	
+
+	private void writeEmbeddedIsolatedObject(StringBuilder builder, DMEmbeddedIsolatedObject embed) throws InvalidDataTypeException
+	{
+		builder.append( "<<EmIso:" );
 		int index = embedValue( embed.getIsolationBarrier() );
 		builder.append( Integer.toString( index ) );
 		builder.append( ">>" );
@@ -238,6 +261,10 @@ public class DMIOWriter extends DMIO
 		else if ( content instanceof DMEmbeddedObject )
 		{
 			writeEmbeddedObject( builder, (DMEmbeddedObject)content );
+		}
+		else if ( content instanceof DMEmbeddedIsolatedObject )
+		{
+			writeEmbeddedIsolatedObject( builder, (DMEmbeddedIsolatedObject)content );
 		}
 		else
 		{
@@ -290,14 +317,14 @@ public class DMIOWriter extends DMIO
 		DMIOWriter writer = new DMIOWriter();
 		writer.initEmbeddedValues();
 		String s = writer.writeDocument( content );
-		if ( writer.embeddedValues != null  &&  writer.embeddedValues.size() > 0 )
+		if ( ( writer.embeddedValues != null  &&  writer.embeddedPyValues != null  &&  ( writer.embeddedValues.size() > 0  ||  writer.embeddedPyValues.size() > 0 ) ) )
 		{
 			PyList embedded = new PyList();
 			for (Object e: writer.embeddedValues)
 			{
 				embedded.add( e );
 			}
-			PyTuple state = new PyTuple( Py.newString( s ), embedded );
+			PyTuple state = new PyTuple( Py.newString( s ), embedded, writer.embeddedPyValues );
 			return state;
 		}
 		else

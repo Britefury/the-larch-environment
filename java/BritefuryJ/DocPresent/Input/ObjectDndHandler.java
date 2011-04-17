@@ -507,6 +507,11 @@ public class ObjectDndHandler extends DndHandler
 		return dests != null;
 	}
 
+	public boolean isNonLocalDest(PointerInputElement sourceElement)
+	{
+		return nonLocalDests != null;
+	}
+
 	public boolean canDrop(PointerInputElement destElement, DndDrop drop)
 	{
 		Transferable transferable = drop.getTransferable();

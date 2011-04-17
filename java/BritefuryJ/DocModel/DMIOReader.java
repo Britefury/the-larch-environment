@@ -11,9 +11,12 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.python.core.Py;
 import org.python.core.PyList;
 import org.python.core.PyObject;
+import org.python.core.PyString;
 import org.python.core.PyTuple;
+import org.python.core.PyUnicode;
 
 import BritefuryJ.DocModel.Resource.DMJavaResource;
 import BritefuryJ.DocModel.Resource.DMPyResource;
@@ -436,6 +439,7 @@ public class DMIOReader extends DMIO
 	private Object result;
 	private HashMap<String, SchemaRef> moduleTable = new HashMap<String, SchemaRef>();
 	private ArrayList<Object> embeddedValues;
+	private PyList embeddedPyValues;
 	private String source;
 	private int pos;
 	
@@ -454,6 +458,11 @@ public class DMIOReader extends DMIO
 		embeddedValues = new ArrayList<Object>();
 	}
 	
+	private void initEmbeddedPyValues(PyList values)
+	{
+		embeddedPyValues = values;
+	}
+	
 	private Object getEmbeddedValue(int index)
 	{
 		if ( embeddedValues == null )
@@ -462,6 +471,16 @@ public class DMIOReader extends DMIO
 		}
 		
 		return embeddedValues.get( index );
+	}
+	
+	private PyObject getEmbeddedPyValue(int index)
+	{
+		if ( embeddedPyValues == null )
+		{
+			throw new CannotReadEmbeddedValuesException();
+		}
+		
+		return embeddedPyValues.pyget( index );
 	}
 	
 	
@@ -652,7 +671,7 @@ public class DMIOReader extends DMIO
 	
 	
 	@SuppressWarnings("unchecked")
-	public Object read() throws ParseErrorException
+	private Object read() throws ParseErrorException
 	{
 		while ( pos < source.length() )
 		{
@@ -775,12 +794,37 @@ public class DMIOReader extends DMIO
 						
 						if ( !source.substring( pos, pos+2 ).equals( ">>" ) )
 						{
-							throw new ParseErrorException( pos, "Expected >> to close embedded object resource" );
+							throw new ParseErrorException( pos, "Expected >> to close embedded object" );
+						}
+						pos += 2;
+						
+						PyObject value = getEmbeddedPyValue( index );
+						DMEmbeddedObject embed = new DMEmbeddedObject( value );
+						closeItem( embed );
+					}
+					else if ( source.substring( pos, pos+8 ).equals( "<<EmIso:" ) )
+					{
+						pos += 8;
+		
+						MatchResult res;
+		
+						// Index
+						res = matchPositiveDecimalInteger( source, pos );
+						if ( res == null )
+						{
+							throw new ParseErrorException( pos, "Expected index after opening embedded isolated object" );
+						}
+						pos = res.position;
+						int index = Integer.parseInt( res.value );
+						
+						if ( !source.substring( pos, pos+2 ).equals( ">>" ) )
+						{
+							throw new ParseErrorException( pos, "Expected >> to close embedded object" );
 						}
 						pos += 2;
 						
 						Object value = getEmbeddedValue( index );
-						DMEmbeddedObject embed = new DMEmbeddedObject();
+						DMEmbeddedIsolatedObject embed = new DMEmbeddedIsolatedObject();
 						embed.setIsolationBarrier( (IsolationBarrier<PyObject>)value );
 						closeItem( embed );
 					}
@@ -1013,6 +1057,7 @@ public class DMIOReader extends DMIO
 			
 			String source = tup.pyget( 0 ).asString();
 			reader = new DMIOReader( source );
+
 			
 			PyList embedded = (PyList)tup.pyget( 1 );
 			reader.initEmbeddedValues();
@@ -1020,11 +1065,18 @@ public class DMIOReader extends DMIO
 			{
 				reader.embeddedValues.add( e );
 			}
+
+			PyList embeddedPy = (PyList)tup.pyget( 2 );
+			reader.initEmbeddedPyValues( embeddedPy );
 		}
-		else
+		else if ( state instanceof PyString  ||  state instanceof PyUnicode )
 		{
 			String source = state.asString();
 			reader = new DMIOReader( source );
+		}
+		else
+		{
+			throw Py.TypeError( "DMIOReader.readFromState(): Pickle state should be a Python string, unicode, or tuple" );
 		}
 
 		
@@ -1038,30 +1090,7 @@ public class DMIOReader extends DMIO
 			return null;
 		}
 	}
-	
-	/*
-	public static PyObject writeAsState(Object content) throws InvalidDataTypeException
-	{
-		DMIOWriter writer = new DMIOWriter();
-		String s = writer.writeDocument( content );
-		if ( writer.embedded.size() > 0 )
-		{
-			PyList embedded = new PyList();
-			for (Object e: writer.embedded)
-			{
-				embedded.add( e );
-			}
-			PyTuple state = new PyTuple( Py.newString( s ), embedded );
-			return state;
-		}
-		else
-		{
-			return Py.newString( s );
-		}
-	}
-	 */
-	
-	
+		
 	public static Object readFromString(String source) throws ParseErrorException, BadModuleNameException
 	{
 		try

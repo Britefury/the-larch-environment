@@ -17,7 +17,6 @@ import org.python.core.Py;
 import org.python.core.PyJavaType;
 import org.python.core.PyObject;
 import org.python.core.PyObjectDerived;
-import org.python.core.PyString;
 import org.python.core.PyTuple;
 
 import BritefuryJ.DocModel.DMIOReader.BadModuleNameException;
@@ -304,28 +303,20 @@ public abstract class DMNode implements Cloneable
 	
 	public void __setstate__(PyObject state)
 	{
-		if ( state instanceof PyString )
+		DMNode node;
+		try
 		{
-			String serialised = state.asString();
-			DMNode node;
-			try
-			{
-				node = (DMNode)DMIOReader.readFromString( serialised );
-			}
-			catch (BadModuleNameException e)
-			{
-				throw new RuntimeException( "BadModuleNameException while creating serialised form: " + e.getMessage() );
-			}
-			catch (ParseErrorException e)
-			{
-				throw new RuntimeException( "ParseErrorException while creating serialised form: " + e.getMessage() );
-			}
-			become( node );
+			node = (DMNode)DMIOReader.readFromState( state );
 		}
-		else
+		catch (BadModuleNameException e)
 		{
-			throw Py.TypeError( "Pickle state should be a Python string" );
+			throw new RuntimeException( "BadModuleNameException while creating serialised form: " + e.getMessage() );
 		}
+		catch (ParseErrorException e)
+		{
+			throw new RuntimeException( "ParseErrorException while creating serialised form: " + e.getMessage() );
+		}
+		become( node );
 	}
 	
 	
@@ -515,5 +506,10 @@ public abstract class DMNode implements Cloneable
 	public static DMEmbeddedObject embed(PyObject x)
 	{
 		return new DMEmbeddedObject( x );
+	}
+
+	public static DMEmbeddedIsolatedObject embedIsolated(PyObject x)
+	{
+		return new DMEmbeddedIsolatedObject( x );
 	}
 }

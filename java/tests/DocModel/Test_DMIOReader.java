@@ -21,10 +21,11 @@ import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 
+import BritefuryJ.DocModel.DMEmbeddedObject;
 import BritefuryJ.DocModel.DMIOReader;
 import BritefuryJ.DocModel.DMIOWriter;
 import BritefuryJ.DocModel.DMIOWriter.InvalidDataTypeException;
-import BritefuryJ.DocModel.DMEmbeddedObject;
+import BritefuryJ.DocModel.DMEmbeddedIsolatedObject;
 import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
@@ -154,15 +155,21 @@ public class Test_DMIOReader extends TestCase
 	}
 
 
-	public void readStateTest(String input, Object embedded[], Object expected)
+	public void readStateTest(String input, Object embedded[], PyObject embeddedPy[], Object expected)
 	{
-		PyList embPy = new PyList();
+		PyList embAsPy = new PyList();
 		for (Object e: embedded)
 		{
-			embPy.add( e );
+			embAsPy.add( e );
 		}
 		
-		PyTuple state = new PyTuple( Py.newString( input ), embPy );
+		PyList embPyAsPy = new PyList();
+		for (PyObject e: embeddedPy)
+		{
+			embPyAsPy.append( e );
+		}
+		
+		PyTuple state = new PyTuple( Py.newString( input ), embAsPy, embPyAsPy );
 
 		Object res = null;
 		try
@@ -298,9 +305,19 @@ public class Test_DMIOReader extends TestCase
 		DMEmbeddedObject e1 = DMNode.embed( Py.newInteger( 1 ) );
 		DMEmbeddedObject e2 = DMNode.embed( Py.newInteger( 2 ) );
 		List<Object> x = Arrays.asList( new Object[] { e0, e1, e2 } );
-		readStateTest( "[<<Em:0>> <<Em:1>> <<Em:2>>]", new Object[] { new IsolationBarrier<PyObject>( Py.newInteger( 0 ) ),
+		readStateTest( "[<<Em:0>> <<Em:1>> <<Em:2>>]", new Object[] {}, new PyObject[] { Py.newInteger( 0 ), Py.newInteger( 1 ), Py.newInteger( 2 ) }, x );
+	}
+	
+	public void testReadEmbeddedIsolatedObject() throws IOException
+	{
+		DMEmbeddedIsolatedObject e0 = DMNode.embedIsolated( Py.newInteger( 0 ) );
+		DMEmbeddedIsolatedObject e1 = DMNode.embedIsolated( Py.newInteger( 1 ) );
+		DMEmbeddedIsolatedObject e2 = DMNode.embedIsolated( Py.newInteger( 2 ) );
+		List<Object> x = Arrays.asList( new Object[] { e0, e1, e2 } );
+		readStateTest( "[<<EmIso:0>> <<EmIso:1>> <<EmIso:2>>]", new Object[] { new IsolationBarrier<PyObject>( Py.newInteger( 0 ) ),
 				new IsolationBarrier<PyObject>( Py.newInteger( 1 ) ),
-				new IsolationBarrier<PyObject>( Py.newInteger( 2 ) ) }, x );
+				new IsolationBarrier<PyObject>( Py.newInteger( 2 ) ) },
+				new PyObject[] {}, x );
 	}
 
 	
