@@ -19,9 +19,6 @@ import org.python.core.PyString;
 import org.python.core.PyTuple;
 import org.python.core.PyUnicode;
 
-import BritefuryJ.DocModel.Resource.DMJavaResource;
-import BritefuryJ.DocModel.Resource.DMPyResource;
-
 public class DMIOWriter extends DMIO
 {
 	public static class InvalidDataTypeException extends Exception
@@ -188,22 +185,6 @@ public class DMIOWriter extends DMIO
 	}
 	
 	
-	private void writeJavaResource(StringBuilder builder, DMJavaResource resource) throws InvalidDataTypeException
-	{
-		builder.append( "<<Ja: " );
-		writeString( builder, resource.getSerialisedForm() );
-		builder.append( ">>" );
-	}
-	
-
-	private void writePyResource(StringBuilder builder, DMPyResource resource) throws InvalidDataTypeException
-	{
-		builder.append( "<<Py: " );
-		writeString( builder, resource.getSerialisedForm() );
-		builder.append( ">>" );
-	}
-	
-
 	private void writeEmbeddedObject(StringBuilder builder, DMEmbeddedObject embed) throws InvalidDataTypeException
 	{
 		builder.append( "<<Em:" );
@@ -249,14 +230,6 @@ public class DMIOWriter extends DMIO
 		else if ( content instanceof DMObject )
 		{
 			writeObject( builder, (DMObject)content );
-		}
-		else if ( content instanceof DMJavaResource )
-		{
-			writeJavaResource( builder, (DMJavaResource)content );
-		}
-		else if ( content instanceof DMPyResource )
-		{
-			writePyResource( builder, (DMPyResource)content );
 		}
 		else if ( content instanceof DMEmbeddedObject )
 		{

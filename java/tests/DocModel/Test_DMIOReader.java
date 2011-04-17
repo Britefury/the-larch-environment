@@ -6,7 +6,6 @@
 //##************************
 package tests.DocModel;
 
-import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,23 +15,20 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.python.core.Py;
-import org.python.core.PyInteger;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
 
+import BritefuryJ.DocModel.DMEmbeddedIsolatedObject;
 import BritefuryJ.DocModel.DMEmbeddedObject;
 import BritefuryJ.DocModel.DMIOReader;
 import BritefuryJ.DocModel.DMIOWriter;
 import BritefuryJ.DocModel.DMIOWriter.InvalidDataTypeException;
-import BritefuryJ.DocModel.DMEmbeddedIsolatedObject;
 import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocModel.DMObject;
 import BritefuryJ.DocModel.DMObjectClass;
 import BritefuryJ.DocModel.DMObjectReader;
 import BritefuryJ.DocModel.DMSchema;
-import BritefuryJ.DocModel.Resource.DMJavaResource;
-import BritefuryJ.DocModel.Resource.DMPyResource;
 import BritefuryJ.Isolation.IsolationBarrier;
 
 public class Test_DMIOReader extends TestCase
@@ -262,19 +258,6 @@ public class Test_DMIOReader extends TestCase
 		readTest( "{m=test.DocModel.Test_DMIOReader.schemaA : (m A x=0 y=1)}", a );
 	}
 
-	public void testReadJavaResource() throws IOException
-	{
-		DMJavaResource jr = new DMJavaResource( Color.RED );
-		readTest( "<<Ja: " + DMIOWriter.stringAsAtom( DMJavaResource.serialise( Color.RED ) ) + ">>", jr );
-	}
-
-	public void testReadPyResource() throws IOException
-	{
-		PyObject pyValue = new PyTuple( new PyInteger( 1 ), new PyInteger( 2 ), new PyInteger( 3 ) );
-		DMPyResource pr = new DMPyResource( pyValue );
-		readTest( "<<Py: " + DMIOWriter.stringAsAtom( DMPyResource.serialise( pyValue ) ) + ">>", pr );
-	}
-
 	public void testReadNestedObject()
 	{
 		DMObject a = A.newInstance( new Object[] { "0", "1" } );
@@ -288,15 +271,6 @@ public class Test_DMIOReader extends TestCase
 		List<Object> b = Arrays.asList( new Object[] { a, "xyz" } );
 		DMObject c = A.newInstance( new Object[] { b, "1" } );
 		readTest( "{m=test.DocModel.Test_DMIOReader.schemaA : (m A x=[(m A x=0 y=1) xyz] y=1)}", c );
-	}
-	
-	public void testReadNestedResource() throws IOException
-	{
-		DMJavaResource jr = new DMJavaResource( Color.RED );
-		PyObject pyValue = new PyTuple( new PyInteger( 1 ), new PyInteger( 2 ), new PyInteger( 3 ) );
-		DMPyResource pr = new DMPyResource( pyValue );
-		List<Object> x = Arrays.asList( new Object[] { jr, pr, "abc" } );
-		readTest( "[<<Ja: " + DMIOWriter.stringAsAtom( DMJavaResource.serialise( Color.RED ) ) + ">> <<Py: " + DMIOWriter.stringAsAtom( DMPyResource.serialise( pyValue ) ) + ">> abc]", x );
 	}
 	
 	public void testReadEmbeddedObject() throws IOException

@@ -11,9 +11,10 @@ import java.util.ArrayList;
 import org.python.core.PyString;
 import org.python.core.PyUnicode;
 
+import BritefuryJ.DocModel.DMEmbeddedIsolatedObject;
+import BritefuryJ.DocModel.DMEmbeddedObject;
 import BritefuryJ.DocModel.DMList;
 import BritefuryJ.DocModel.DMObject;
-import BritefuryJ.DocModel.Resource.DMResource;
 
 public class DefaultIdentityTransformationFunction extends TransformationFunction
 {
@@ -58,7 +59,11 @@ public class DefaultIdentityTransformationFunction extends TransformationFunctio
 				return x;
 			}
 		}
-		else if ( x instanceof DMResource )
+		else if ( x instanceof DMEmbeddedObject )
+		{
+			return x;
+		}
+		else if ( x instanceof DMEmbeddedIsolatedObject )
 		{
 			return x;
 		}

@@ -5,8 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-from BritefuryJ.DocModel import DMObject, DMList
-from BritefuryJ.DocModel.Resource import DMPyResource
+from BritefuryJ.DocModel import DMObject, DMList, DMEmbeddedObject, DMEmbeddedIsolatedObject
 
 from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod, dmObjectNodeMethodDispatch
 
@@ -806,7 +805,6 @@ _runtime_resourceMap_Name = '__gsym_resourceMap__'
 _runtime_astMap_Name = '__gsym_astMap__'
 _runtime_revAstMap_Name = '__gsym_revAstMap__'
 _runtime_DMList_Name = '__gsym_DMList__'
-_runtime_DMPyResource_Name = '__gsym_DMPyResource__'
 
 
 class Python25ModuleCodeGenerator (Python25CodeGenerator):
@@ -832,7 +830,6 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 			setattr( module, _runtime_revAstMap_Name, self._revAstMap )
 			
 		setattr( module, _runtime_DMList_Name, DMList )
-		setattr( module, _runtime_DMPyResource_Name, DMPyResource )
 			
 			
 			
@@ -869,7 +866,7 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 				return astMapExpr + '(' + ', '.join( [ '%s=%s' % ( k,v )   for k,v in args ] ) + ')'
 		elif isinstance( node, DMList ):
 			return _runtime_DMList_Name + '( [' + ', '.join( [ self._quotedNode( v )   for v in node ] ) + '] )'
-		elif isinstance( node, DMPyResource ):
+		elif isinstance( node, DMEmbeddedObject )  or  isinstance( node, DMEmbeddedIsolatedObject ):
 			index = len( self._resourceMap )
 			self._resourceMap.append( node.deepCopy() )
 			return _runtime_resourceMap_Name + '[%d]'  %  ( index, )
