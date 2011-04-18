@@ -99,7 +99,7 @@ class WorksheetView (NodeView):
 		
 		
 	def getBody(self):
-		return _projection( self._model['body'], self )
+		return self._viewOf( self._model['body'] )
 	
 	
 	def _viewOf(self, model):

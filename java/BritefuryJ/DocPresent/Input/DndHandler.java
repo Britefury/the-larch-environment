@@ -50,7 +50,6 @@ public abstract class DndHandler
 	
 	
 	public abstract boolean isDest(PointerInputElement sourceElement);
-	public abstract boolean isNonLocalDest(PointerInputElement sourceElement);
 
 	public boolean canDrop(PointerInputElement destElement, DndDrop drop)
 	{

@@ -297,14 +297,22 @@ perspective = SequentialEditorPerspective( WorksheetEditor(), WorksheetSequentia
 class WorksheetEditorSubject (Subject):
 	def __init__(self, document, model, enclosingSubject, location, title):
 		self._document = document
-		self._modelView = ViewSchema.WorksheetView( None, model )
+		self._model = model
+		# Defer the creation of the model view - it involves executing all the code in the worksheet which can take some time
+		self._modelView = None
 		self._enclosingSubject = enclosingSubject
 		self._location = location
 		self._title = title
 
 
-	def getFocus(self):
+	def _getModelView(self):
+		if self._modelView is None:
+			self._modelView = ViewSchema.WorksheetView( None, self._model )
 		return self._modelView
+		
+	
+	def getFocus(self):
+		return self._getModelView()
 	
 	def getPerspective(self):
 		return perspective
