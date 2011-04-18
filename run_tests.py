@@ -40,21 +40,43 @@ testModules = [ Britefury.Dispatch.Dispatch,
 
 
 if __name__ == '__main__':
+	modulesToTest = []
+	modulesToTest[:] = testModules
+	
 	if len( sys.argv ) > 1:
-		moduleNames = [ m.__name__   for m in testModules ]
-		
+		modulesToTest = []
 		for a in sys.argv[1:]:
-			if a not in moduleNames:
-				print 'No test module %s'  %  a
-		testModules = [ module   for module in testModules   if module.__name__ in sys.argv[1:] ]
+			x = None
+			for m in testModules:
+				name = m.__name__
+				if a == name:
+					x = m
+					break
+			
+			if x is None:
+				for m in testModules:
+					name = m.__name__
+					if name.endswith( a ):
+						x = m
+						break
 
+			if x is None:
+				print 'No test module %s'  %  a
+			else:
+				modulesToTest.append( x )
+
+	
+	print 'Testing:'
+	for m in modulesToTest:
+		print '\t' + m.__name__
+				
 
 	loader = unittest.TestLoader()
 
 	#print 'Testing the following modules:'
 	#for m in testModules:
 		#print m.__name__
-	suites = [ loader.loadTestsFromModule( module )   for module in testModules ]
+	suites = [ loader.loadTestsFromModule( module )   for module in modulesToTest ]
 
 	runner = unittest.TextTestRunner()
 

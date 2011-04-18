@@ -33,7 +33,8 @@ import org.python.modules.cStringIO;
 
 class IsolationPicklerState
 {
-	private HashMap<Long, Integer> isolatedObjectIdToIndex = new HashMap<Long, Integer>();
+	private HashMap<Long, PyObject> objTagToObj = new HashMap<Long, PyObject>();
+	private HashMap<Long, PyObject> isolatedObjTagToObj = new HashMap<Long, PyObject>();
 	private ArrayList<PyObject> isolatedObjects = new ArrayList<PyObject>();
 	
 	
@@ -41,10 +42,46 @@ class IsolationPicklerState
 	
 	
 	
+	private void insertObjKey(PyObject obj, long key)
+	{
+		objTagToObj.put( key, obj );
+	}
+	
+	
+	private IsolationPicklerState pushPicklerState()
+	{
+		IsolationPicklerState prev = IsolationBarrier.isolationPicklerState;
+		IsolationBarrier.isolationPicklerState = this;
+		return prev;
+	}
+	
+	private void popPicklerState(IsolationPicklerState prev)
+	{
+		IsolationBarrier.isolationPicklerState = prev;
+	}
+	
+	
+	
+	protected long isolatedValue(Object value)
+	{
+		PyObject x = Py.java2py( value );
+		long key = Py.id( x );
+		
+		if ( !isolatedObjTagToObj.containsKey( key ) )
+		{
+			isolatedObjTagToObj.put( key, x );
+			isolatedObjects.add( x );
+		}
+		
+		return key;
+	}
+
+
+
 	protected void dump(cPickle.Pickler rootPickler, PyObject obj)
 	{
 		// We need to generate a set of IDs of the objects that are part of the root sub-graph
-		final HashSet<Long> rootIds = new HashSet<Long>();
+		final HashSet<Long> rootTags = new HashSet<Long>();
 		
 		PyObject rootPersistentId = new PyObject()
 		{
@@ -56,7 +93,7 @@ class IsolationPicklerState
 				PyObject x = args[0];
 				if ( x != null  &&  x != Py.None  &&  !isSimplePrimitiveType( x.getType() ) )
 				{
-					rootIds.add( Py.id( x ) );
+					rootTags.add( Py.id( x ) );
 				}
 				
 				return Py.None;
@@ -65,27 +102,11 @@ class IsolationPicklerState
 		
 		
 		// Setup the pickler, and dump @obj
-		IsolationPicklerState prevIslandPicklerState = IsolationBarrier.isolationPicklerState;
-		IsolationBarrier.isolationPicklerState = this;
+		IsolationPicklerState prev = pushPicklerState();
 		rootPickler.persistent_id = rootPersistentId;
 		rootPickler.dump( obj );
 		rootPickler.persistent_id = null;
-		IsolationBarrier.isolationPicklerState = prevIslandPicklerState;
-		
-		
-		// If there are any isolated values which are root objects, dump them:
-		PyList isolatedRootRefs = new PyList();
-		for (int i = 0; i < isolatedObjects.size(); i++)
-		{
-			PyObject x = isolatedObjects.get( i );
-			long key = Py.id( x );
-			if ( rootIds.contains( key ) )
-			{
-				isolatedRootRefs.append( new PyTuple( Py.newInteger( i ), x ) );
-			}
-		}
-		rootPickler.dump( isolatedRootRefs );
-		
+		popPicklerState( prev );
 		
 		
 		//
@@ -95,14 +116,9 @@ class IsolationPicklerState
 		//
 		
 		// A dependency table that tracks dependencies between isolated objects
-		final DependencyTable<Integer> deps = new DependencyTable<Integer>();
+		final DependencyTable<Long> deps = new DependencyTable<Long>();
 		
-		final int currentIsolatedObjectIndex[] = { -1 };
-		
-		final HashMap<Long, Integer> objIdToIndex = new HashMap<Long, Integer>();
-		objIdToIndex.putAll( isolatedObjectIdToIndex );
-		final ArrayList<PyObject> allObjs = new ArrayList<PyObject>();
-		allObjs.addAll( isolatedObjects );
+		final long currentIsolatedObjTag[] = { -1 };
 		
 		PyObject gatherRefsPersistentId = new PyObject()
 		{
@@ -116,22 +132,16 @@ class IsolationPicklerState
 				{
 					long key = Py.id( obj );
 					
-					if ( rootIds.contains( key ) )
+					if ( rootTags.contains( key ) )
 					{
 						return rootName;
 					}
 					else
 					{
-						Integer index = objIdToIndex.get( key );
-						if ( index == null )
-						{
-							index = allObjs.size();
-							objIdToIndex.put( key, index );
-							allObjs.add( obj );
-						}
+						insertObjKey( obj, key );
 						
 						// Add a dependency
-						deps.addDependency( currentIsolatedObjectIndex[0], index );
+						deps.addDependency( currentIsolatedObjTag[0], key );
 						
 						return Py.None;
 					}
@@ -142,7 +152,11 @@ class IsolationPicklerState
 		};
 		
 		
+		
 		// Pickle each isolated object in turn, generating dependencies as we go
+		// If an isolated value is in the list of root objects, create an entry in the roof refs table
+		prev = pushPicklerState();
+		PyList isolatedRootRefs = new PyList();
 		for (int i = 0; i < isolatedObjects.size(); i++)
 		{
 			// Create stream for detecting references
@@ -150,22 +164,35 @@ class IsolationPicklerState
 			cPickle.Pickler pickler = new cPickle.Pickler( stream, 0 );
 			pickler.persistent_id = gatherRefsPersistentId;
 			
-			currentIsolatedObjectIndex[0] = i;
 			PyObject x = isolatedObjects.get( i );
-			pickler.dump( x );
+			long key = Py.id( x );
+
+			if ( rootTags.contains( key ) )
+			{
+				isolatedRootRefs.append( new PyTuple( Py.newInteger( key ), x ) );
+			}
+			else
+			{
+				currentIsolatedObjTag[0] = key;
+				pickler.dump( x );
+			}
 		}
+		popPicklerState( prev );
 		
+		// Dump the roof refs table
+		rootPickler.dump( isolatedRootRefs );
+	
 		// Get the partitions
-		Collection<DependencyTable.Partition<Integer>> partitions = deps.computePartitions();
+		Collection<DependencyTable.Partition<Long>> partitions = deps.computePartitions();
 		
-		final int objIndexToPartitionPos[][] = new int[objIdToIndex.size()][];
+		final HashMap<Long,int[]> objTagToPartitionPos = new HashMap<Long,int[]>();
 		int partitionIndex = 0;
-		for (DependencyTable.Partition<Integer> p: partitions)
+		for (DependencyTable.Partition<Long> p: partitions)
 		{
 			for (int j = 0; j < p.members.size(); j++)
 			{
-				int m = p.members.get( j );
-				objIndexToPartitionPos[m] = new int[] { partitionIndex, j };
+				long m = p.members.get( j );
+				objTagToPartitionPos.put( m, new int[] { partitionIndex, j } );
 			}
 			partitionIndex++;
 		}
@@ -182,7 +209,8 @@ class IsolationPicklerState
 		// Maintain a map of root object key to name
 		final HashMap<Long, PyString> rootKeyToName = new HashMap<Long, PyString>();
 		final PyDictionary rootNameToObj = new PyDictionary();
-		final int currentPartition[] = { -1 };
+		
+		final int currentPartitionIndex[] = { -1 };
 		final HashSet<Integer> currentPartitionDependencies = new HashSet<Integer>();
 		
 		PyObject picklePartitionsPersistentId = new PyObject()
@@ -197,7 +225,7 @@ class IsolationPicklerState
 				{
 					long key = Py.id( obj );
 					
-					if ( rootIds.contains( key ) )
+					if ( rootTags.contains( key ) )
 					{
 						PyString name = rootKeyToName.get( key );
 						
@@ -213,24 +241,22 @@ class IsolationPicklerState
 					}
 					else
 					{
-						Integer indexObj = objIdToIndex.get( key );
-						if ( indexObj != null )
+						int partitionPos[] = objTagToPartitionPos.get( key );
+						if ( partitionPos != null )
 						{
-							int index = indexObj;
-							int p[] = objIndexToPartitionPos[index];
-							if ( p[0] == currentPartition[0] )
+							if ( partitionPos[0] == currentPartitionIndex[0] )
 							{
 								return Py.None;
 							}
 							else
 							{
-								currentPartitionDependencies.add( p[0] );
-								return Py.newString( Integer.toHexString( p[0] ) + ":" + Integer.toHexString( p[1] ) );
+								currentPartitionDependencies.add( partitionPos[0] );
+								return Py.newString( Integer.toHexString( partitionPos[0] ) + ":" + Integer.toHexString( partitionPos[1] ) );
 							}
 						}
 						else
 						{
-							// Could not get an index for this object - its a temporary, created during pickling
+							// Could not get a partition pos for this object - its a temporary, created during pickling
 							return Py.None;
 						}
 					}
@@ -245,31 +271,38 @@ class IsolationPicklerState
 		
 		// Serialise each partition
 		// Build a list of tuples, containing the partitions, streams and partition dependencies
+		prev = pushPicklerState();
 		PyList partitionsStreamsDeps = new PyList();
 		partitionIndex = 0;
-		for (DependencyTable.Partition<Integer> partition: partitions)
+		for (DependencyTable.Partition<Long> partition: partitions)
 		{
 			// Create a pickler for each partition
 			cStringIO.StringIO stream = cStringIO.StringIO();
 			cPickle.Pickler pickler = cPickle.Pickler( stream );
 			pickler.persistent_id = picklePartitionsPersistentId;
 			
-			currentPartition[0] = partitionIndex;
+			currentPartitionIndex[0] = partitionIndex;
 			currentPartitionDependencies.clear();
 			
 			PyList partitionObjects = new PyList();
-			for (int m: partition.members)
+			for (Long m: partition.members)
 			{
-				partitionObjects.append( allObjs.get( m ) );
+				partitionObjects.append( objTagToObj.get( m ) );
 			}
 			
 			pickler.dump( partitionObjects );
 			
 			// Convert the member list to a PyList
+			// Retain only members in the member list that are isolated objects
 			PyList partitionAsList = new PyList();
-			for (int index: partition.members)
+			int memberIndex = 0;
+			for (Long tag: partition.members)
 			{
-				partitionAsList.append( Py.newInteger( index ) );
+				if ( isolatedObjTagToObj.containsKey( tag ) )
+				{
+					partitionAsList.append( new PyTuple( Py.newInteger( memberIndex ), Py.newInteger( tag ) ) );
+				}
+				memberIndex++;
 			}
 
 			// Convert the dependencies to a PyList
@@ -283,6 +316,7 @@ class IsolationPicklerState
 			
 			partitionIndex++;
 		}
+		popPicklerState( prev );
 		
 		
 		// Dump rootNameToObj
@@ -292,31 +326,17 @@ class IsolationPicklerState
 		// Dump
 		rootPickler.dump( partitionsStreamsDeps );
 		
-		// Finally, dump the number of isolated objects
-		rootPickler.dump( Py.newInteger( isolatedObjects.size() ) );
-	}
-	
-	
-	
-	protected int isolatedValue(Object value)
-	{
-		PyObject x = Py.java2py( value );
-		long key = Py.id( x );
-		Integer index = isolatedObjectIdToIndex.get( key );
-		
-		if ( index == null )
+		// Finally, dump the isolated object tags
+		/*PyList isolatedObjectTags = new PyList();
+		for (PyObject x: isolatedObjects)
 		{
-			int i = isolatedObjects.size();
-			isolatedObjectIdToIndex.put( key, i );
-			isolatedObjects.add( x );
-			index = i;
+			isolatedObjectTags.append( Py.newInteger( Py.id( x ) ) );
 		}
-		
-		return index;
+		rootPickler.dump( isolatedObjectTags );*/
 	}
-
-
-
+	
+	
+	
 	private static boolean isSimplePrimitiveType(PyType type)
 	{
 		return type == PyNone.TYPE  ||

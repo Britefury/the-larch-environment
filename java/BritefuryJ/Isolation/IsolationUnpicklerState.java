@@ -6,11 +6,10 @@
 //##************************
 package BritefuryJ.Isolation;
 
+import java.util.HashMap;
 import java.util.Stack;
 
-import org.python.core.Py;
 import org.python.core.PyDictionary;
-import org.python.core.PyInteger;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyTuple;
@@ -20,36 +19,60 @@ import org.python.modules.cStringIO;
 class IsolationUnpicklerState
 {
 	private PyDictionary rootNameToObj = null;
-	private int partitionMembers[][] = null;
+	private int partitionMemberIndices[][] = null;
+	private long partitionMemberTags[][] = null;
 	private String partitionStreams[] = null;
 	private int partitionDeps[][] = null;
-	private int objectIndexToPartitionPos[][] = null;
+	private HashMap<Long,int[]> objTagToPartitionPos;
 	private PyObject partitionObjects[][] = null;
-	private PyObject isolatedObjects[] = null;
+	private HashMap<Long, PyObject> isolatedObjTagToObj;
+	
+	
+	private IsolationUnpicklerState pushUnpicklerState()
+	{
+		IsolationUnpicklerState prev = IsolationBarrier.isolationUnpicklerState; 
+		IsolationBarrier.isolationUnpicklerState = this;
+		return prev;
+	}
+	
+	private void popUnpicklerState(IsolationUnpicklerState prev)
+	{
+		IsolationBarrier.isolationUnpicklerState = prev;
+	}
+
+
+	protected Object getIsolatedValue(long tag)
+	{
+		int partitionPos[] = objTagToPartitionPos.get( tag );
+		if ( partitionPos != null )
+		{
+			loadPartition( partitionPos[0] );
+		}
+		return isolatedObjTagToObj.get( tag );
+	}
 	
 	
 	protected PyObject load(cPickle.Unpickler unpickler)
 	{
 		// Setup isolation unpickler state, and load root object
-		IsolationUnpicklerState prev = IsolationBarrier.isolationUnpicklerState; 
-		IsolationBarrier.isolationUnpicklerState = this;
+		IsolationUnpicklerState prev = pushUnpicklerState();
 		PyObject root = unpickler.load();
-		IsolationBarrier.isolationUnpicklerState = prev;
+		popUnpicklerState( prev );
 		
 		PyList isolatedRootRefsPy = (PyList)unpickler.load();
 		PyObject isolatedRootRefs[] = isolatedRootRefsPy.getArray();
 		rootNameToObj = (PyDictionary)unpickler.load();
 		PyList partitionsStreamsDepsPy = (PyList)unpickler.load();
 		PyObject partitionsStreamsDeps[] = partitionsStreamsDepsPy.getArray();
-		PyInteger numIsolatedObjectsPy = (PyInteger)unpickler.load();
-		int numIsolatedObjects = numIsolatedObjectsPy.asInt();
+		//PyList isolatedObjTags = (PyList)unpickler.load();
 		
 		
-		objectIndexToPartitionPos = new int[numIsolatedObjects][];
+		objTagToPartitionPos = new HashMap<Long,int[]>();
 		partitionObjects = new PyObject[partitionsStreamsDeps.length][];
 		
 		
-		partitionMembers = new int[partitionsStreamsDeps.length][];
+		partitionMemberIndices = new int[partitionsStreamsDeps.length][];
+		partitionMemberTags = new long[partitionsStreamsDeps.length][];
 		partitionStreams = new String[partitionsStreamsDeps.length];
 		partitionDeps = new int[partitionsStreamsDeps.length][];
 		for (int i = 0; i < partitionsStreamsDeps.length; i++)
@@ -59,14 +82,14 @@ class IsolationUnpicklerState
 			PyList membersPy = (PyList)tup.pyget( 0 ); 
 			PyObject members[] = membersPy.getArray();
 			int memberIndices[] = new int[members.length];
+			long memberTags[] = new long[members.length];
 			for (int j = 0; j < members.length; j++)
 			{
-				int x = members[j].asInt();
-				memberIndices[j] = x;
-				if ( x < numIsolatedObjects )
-				{
-					objectIndexToPartitionPos[x] = new int[] { i, j };
-				}
+				PyTuple pair = (PyTuple)members[j];
+				memberIndices[j] = pair.pyget( 0 ).asInt();
+				long tag = pair.pyget( 1 ).asLong();
+				memberTags[j] = tag;
+				objTagToPartitionPos.put( tag, new int[] { i, j } );
 			}
 			
 			PyList depsPy = (PyList)tup.pyget( 2 ); 
@@ -77,37 +100,26 @@ class IsolationUnpicklerState
 				depIndices[j] = deps[j].asInt();
 			}
 			
-			partitionMembers[i] = memberIndices;
+			partitionMemberIndices[i] = memberIndices;
+			partitionMemberTags[i] = memberTags;
 			partitionStreams[i] = tup.pyget( 1 ).asString();
 			partitionDeps[i] = depIndices;
 		}
 		
-		isolatedObjects = new PyObject[numIsolatedObjects];
-		
+		isolatedObjTagToObj = new HashMap<Long, PyObject>();
 		for (PyObject r: isolatedRootRefs)
 		{
 			PyTuple tup = (PyTuple)r;
 			
-			int index = tup.pyget( 0 ).asInt();
+			long tag = tup.pyget( 0 ).asInt();
 			PyObject value = tup.pyget( 1 );
 			
-			isolatedObjects[index] = value;
+			isolatedObjTagToObj.put( tag, value );
 		}
 		
 		return root;
 	}
-	
-	protected Object getIsolatedValue(int index)
-	{
-		int partitionPos[] = objectIndexToPartitionPos[index];
-		if ( partitionPos != null )
-		{
-			loadPartition( partitionPos[0] );
-		}
-		return isolatedObjects[index];
-	}
-	
-	
+
 	private void loadPartition(int index)
 	{
 		Stack<Integer> partitionStack = new Stack<Integer>();
@@ -139,7 +151,7 @@ class IsolationUnpicklerState
 	
 	private void loadSinglePartition(int partitionIndex)
 	{
-		PyObject rootPersistentLoad = new PyObject()
+		PyObject partitionPersistentLoad = new PyObject()
 		{
 			private static final long serialVersionUID = 1L;
 
@@ -168,25 +180,23 @@ class IsolationUnpicklerState
 		
 		
 		cPickle.Unpickler unpickler = cPickle.Unpickler( cStringIO.StringIO( partitionStreams[partitionIndex] ) );
-		unpickler.persistent_load = rootPersistentLoad;
+		unpickler.persistent_load = partitionPersistentLoad;
+		
+		IsolationUnpicklerState prev = pushUnpicklerState();
 		PyList valuesPy = (PyList)unpickler.load();
+		popUnpicklerState( prev );
+
 		PyObject values[] = valuesPy.getArray();
 		
-		int partition[] = partitionMembers[partitionIndex];
+		int memberIndices[] = partitionMemberIndices[partitionIndex];
+		long memberTags[] = partitionMemberTags[partitionIndex];
 		
-		if ( values.length != partition.length )
+		for (int i = 0; i < memberIndices.length; i++)
 		{
-			throw Py.ValueError( "Partition " + partitionIndex + ": size of values list does not match size of indices list" );
-		}
-		
-		for (int i = 0; i < partition.length; i++)
-		{
-			int x = partition[i];
-			if ( x < isolatedObjects.length )
-			{
-				isolatedObjects[x] = values[i];
-				objectIndexToPartitionPos[x] = null;
-			}
+			int n = memberIndices[i];
+			long tag = memberTags[i];
+			isolatedObjTagToObj.put( tag, values[n] );
+			objTagToPartitionPos.remove( tag );
 		}
 		
 		partitionObjects[partitionIndex] = values;
