@@ -502,15 +502,12 @@ public class ObjectDndHandler extends DndHandler
 
 	
 	
+	@Override
 	public boolean isDest(PointerInputElement sourceElement)
 	{
-		return dests != null;
+		return dests != null  ||  nonLocalDests != null;
 	}
 
-	public boolean isNonLocalDest(PointerInputElement sourceElement)
-	{
-		return nonLocalDests != null;
-	}
 
 	public boolean canDrop(PointerInputElement destElement, DndDrop drop)
 	{

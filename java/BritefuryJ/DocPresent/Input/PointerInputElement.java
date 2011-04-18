@@ -56,11 +56,6 @@ public abstract class PointerInputElement
 		{
 			return dndHandler.isDest( element );
 		}
-
-		public boolean isNonLocalDest()
-		{
-			return dndHandler.isNonLocalDest( element );
-		}
 	}
 	
 	

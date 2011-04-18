@@ -207,7 +207,8 @@ class WorksheetViewerSubject (Subject):
 	def __init__(self, document, model, enclosingSubject, location, title):
 		self._document = document
 		self._model = model
-		self._modelView = ViewSchema.WorksheetView( None, model )
+		# Defer the creation of the model view - it involves executing all the code in the worksheet which can take some time
+		self._modelView = None
 		self._enclosingSubject = enclosingSubject
 		self._location = location
 		self._editLocation = self._location + '.edit'
@@ -215,9 +216,16 @@ class WorksheetViewerSubject (Subject):
 		
 		self.edit = WorksheetEditorSubject( document, model, self, self._editLocation, title )
 
+	
+	def _getModelView(self):
+		if self._modelView is None:
+			self._modelView = ViewSchema.WorksheetView( None, self._model )
+		return self._modelView
+		
+	
 
 	def getFocus(self):
-		return self._modelView
+		return self._getModelView()
 	
 	def getPerspective(self):
 		return perspective
@@ -236,7 +244,7 @@ class WorksheetViewerSubject (Subject):
 	
 	
 	def __getattr__(self, name):
-		module = self._modelView.getModule()
+		module = self._getModelView().getModule()
 		try:
 			subjectFactory = module.__subject__
 		except AttributeError:
