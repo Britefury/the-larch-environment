@@ -16,7 +16,7 @@ import org.python.modules.cStringIO.StringIO;
 
 public class IsolationPickle
 {
-	public static void dump(PyObject file, PyObject obj)
+	public static void dump(PyObject obj, PyObject file)
 	{
 		// Import cPickle to ensure that it is properly initialised before attempting to use it
 		imp.importName( "cPickle", true );
