@@ -9,11 +9,13 @@ import os
 import sys
 import imp
 
-import cPickle
+#import cPickle
 
 from datetime import datetime
 
 from BritefuryJ.CommandHistory import CommandHistory, CommandHistoryListener
+
+from BritefuryJ.Isolation import IsolationPickle
 
 from Britefury.gSym.gSymWorld import GSymWorld
 
@@ -138,7 +140,7 @@ class GSymDocument (CommandHistoryListener):
 		
 	def save(self):
 		f = open( self._filename, 'w' )
-		cPickle.dump( self._contents, f )
+		IsolationPickle.dump( self._contents, f )
 		f.close()
 		if self._bHasUnsavedData:
 			self._bHasUnsavedData = False
@@ -160,7 +162,7 @@ class GSymDocument (CommandHistoryListener):
 		if os.path.exists( filename ):
 			try:
 				f = open( filename )
-				documentRoot = cPickle.load( f )
+				documentRoot = IsolationPickle.load( f )
 				f.close()
 
 				document = GSymDocument( world, documentRoot )
