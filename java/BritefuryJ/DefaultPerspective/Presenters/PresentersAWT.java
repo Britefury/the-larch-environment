@@ -12,15 +12,15 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DefaultPerspective.Pres.GenericStyle;
-import BritefuryJ.DefaultPerspective.Pres.ObjectBorder;
-import BritefuryJ.DefaultPerspective.Pres.ObjectBox;
-import BritefuryJ.DefaultPerspective.Pres.ObjectTitle;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.ObjectPresentation.ObjectPresenterRegistry;
 import BritefuryJ.ObjectPresentation.ObjectPresenter;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.ObjectPres.ObjectPresStyle;
+import BritefuryJ.Pres.ObjectPres.ObjectBorder;
+import BritefuryJ.Pres.ObjectPres.ObjectBox;
+import BritefuryJ.Pres.ObjectPres.ObjectTitle;
 import BritefuryJ.Pres.Primitive.Box;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Label;
@@ -144,8 +144,8 @@ public class PresentersAWT extends ObjectPresenterRegistry
 
 	private static final StyleSheet xformMatrixStyle = staticStyle.withAttr( Primitive.fontFace, "Serif" ).withAttr( Primitive.tableColumnSpacing, 10.0 ).withAttr( Primitive.tableRowSpacing, 10.0 );
 	
-	private static final StyleSheet colourObjectBoxStyle = staticStyle.withAttr( GenericStyle.objectBorderPaint, new Color( 0.0f, 0.1f, 0.4f ) ).withAttr(
-			GenericStyle.objectTitlePaint, new Color( 0.0f, 0.1f, 0.4f ) );
+	private static final StyleSheet colourObjectBoxStyle = staticStyle.withAttr( ObjectPresStyle.objectBorderPaint, new Color( 0.0f, 0.1f, 0.4f ) ).withAttr(
+			ObjectPresStyle.objectTitlePaint, new Color( 0.0f, 0.1f, 0.4f ) );
 	private static final StyleSheet colourRedStyle = staticStyle.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.75f, 0.0f, 0.0f ) );
 	private static final StyleSheet colourGreenStyle = staticStyle.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.75f, 0.0f ) );
 	private static final StyleSheet colourBlueStyle = staticStyle.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.75f ) );

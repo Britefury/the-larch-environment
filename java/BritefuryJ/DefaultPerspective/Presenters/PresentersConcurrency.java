@@ -17,13 +17,13 @@ import java.util.concurrent.Future;
 import javax.swing.Timer;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DefaultPerspective.Pres.ErrorBox;
-import BritefuryJ.DefaultPerspective.Pres.ObjectBorder;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.ObjectPresentation.ObjectPresenterRegistry;
 import BritefuryJ.ObjectPresentation.ObjectPresenter;
 import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.ObjectPres.ErrorBox;
+import BritefuryJ.Pres.ObjectPres.ObjectBorder;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleSheet;

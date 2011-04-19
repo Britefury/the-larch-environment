@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.DefaultPerspective.Pres;
+package BritefuryJ.Pres.ObjectPres;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.Pres.Pres;
@@ -27,8 +27,8 @@ public class ObjectBorder extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		StyleSheet borderStyle = GenericStyle.objectBorderStyle.get( style );
-		DPElement childElem = child.present( ctx, GenericStyle.useObjectBorderAttrs( style ) );
+		StyleSheet borderStyle = ObjectPresStyle.objectBorderStyle.get( style );
+		DPElement childElem = child.present( ctx, ObjectPresStyle.useObjectBorderAttrs( style ) );
 		return borderStyle.applyTo( new Border( childElem ) ).present( ctx, style );
 	}
 }

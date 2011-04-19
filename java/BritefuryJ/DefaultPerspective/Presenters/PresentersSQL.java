@@ -16,13 +16,13 @@ import java.util.ArrayList;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Controls.DropDownExpander;
-import BritefuryJ.DefaultPerspective.Pres.ErrorBox;
-import BritefuryJ.DefaultPerspective.Pres.HorizontalField;
-import BritefuryJ.DefaultPerspective.Pres.ObjectBox;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.ObjectPresentation.ObjectPresenterRegistry;
 import BritefuryJ.ObjectPresentation.ObjectPresenter;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.ObjectPres.ErrorBox;
+import BritefuryJ.Pres.ObjectPres.HorizontalField;
+import BritefuryJ.Pres.ObjectPres.ObjectBox;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;

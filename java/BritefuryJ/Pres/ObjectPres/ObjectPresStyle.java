@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.DefaultPerspective.Pres;
+package BritefuryJ.Pres.ObjectPres;
 
 import java.awt.Color;
 import java.awt.Paint;
@@ -20,7 +20,7 @@ import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
 
-public class GenericStyle
+public class ObjectPresStyle
 {
 	public static final AttributeNamespace genericPerspectiveNamespace = new AttributeNamespace( "genericPerspective" );
 	

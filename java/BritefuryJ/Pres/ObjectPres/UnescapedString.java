@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.DefaultPerspective.Pres;
+package BritefuryJ.Pres.ObjectPres;
 
 import java.util.ArrayList;
 
@@ -30,8 +30,8 @@ public abstract class UnescapedString extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		StyleSheet escapeStyle = style.get( GenericStyle.stringEscapeStyle, StyleSheet.class );
-		StyleSheet contentStyle = style.get( GenericStyle.stringContentStyle, StyleSheet.class );
+		StyleSheet escapeStyle = style.get( ObjectPresStyle.stringEscapeStyle, StyleSheet.class );
+		StyleSheet contentStyle = style.get( ObjectPresStyle.stringContentStyle, StyleSheet.class );
 
 		ArrayList<Object> elements = new ArrayList<Object>();
 		// Break the string up into escaped and not escaped items

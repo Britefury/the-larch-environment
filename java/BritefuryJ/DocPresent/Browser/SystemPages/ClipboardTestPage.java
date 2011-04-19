@@ -15,7 +15,6 @@ import java.util.ArrayList;
 
 import BritefuryJ.Controls.DropDownExpander;
 import BritefuryJ.Controls.TextArea;
-import BritefuryJ.DefaultPerspective.Pres.UnescapedStringAsParagraph;
 import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
@@ -26,6 +25,7 @@ import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Target.Target;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
+import BritefuryJ.Pres.ObjectPres.UnescapedStringAsParagraph;
 import BritefuryJ.Pres.Primitive.Bin;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Label;

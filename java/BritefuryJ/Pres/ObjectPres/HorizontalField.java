@@ -4,36 +4,37 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.DefaultPerspective.Pres;
+package BritefuryJ.Pres.ObjectPres;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
-import BritefuryJ.Pres.Primitive.Column;
+import BritefuryJ.Pres.Primitive.Label;
+import BritefuryJ.Pres.Primitive.LineBreak;
+import BritefuryJ.Pres.Primitive.Paragraph;
+import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
 
-public class ErrorBox extends Pres
+public class HorizontalField extends Pres
 {
 	private String title;
-	private Pres contents;
+	private Pres value;
 	
 	
-	public ErrorBox(String title, Object contents)
+	public HorizontalField(String title, Object value)
 	{
 		this.title = title;
-		this.contents = coerceNonNull( contents );
+		this.value = coerceNonNull( value );
 	}
 	
 	
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		double padding = style.get( GenericStyle.objectContentPadding, Double.class );
-		StyleValues childStyle = GenericStyle.useErrorBorderAttrs( GenericStyle.useErrorBoxAttrs( style ) );
-		DPElement contentsElement = contents.present( ctx, childStyle );
+		StyleSheet fieldStyle = style.get( ObjectPresStyle.objectFieldStyle, StyleSheet.class );
 		
-		Pres titlePres = new ObjectTitle( title );
+		DPElement valueElement = value.present( ctx, ObjectPresStyle.useObjectFieldAttrs( style ) );
 		
-		return new ErrorBorder( new Column( new Object[] { titlePres, contentsElement.alignHExpand().padX( padding ) } ) ).present( ctx, style );
+		return fieldStyle.applyTo( new Paragraph( new Object[] { new Label( title ), new Label( " " ), new LineBreak(), valueElement.alignHExpand() } ) ).present( ctx, style );
 	}
 }

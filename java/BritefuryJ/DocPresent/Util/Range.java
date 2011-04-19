@@ -11,12 +11,12 @@ import java.util.ArrayList;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.DefaultPerspective.Pres.HorizontalField;
-import BritefuryJ.DefaultPerspective.Pres.ObjectBoxWithFields;
 import BritefuryJ.Incremental.IncrementalOwner;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.ObjectPres.HorizontalField;
+import BritefuryJ.Pres.ObjectPres.ObjectBoxWithFields;
 import BritefuryJ.Pres.Primitive.Paragraph;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.StaticText;

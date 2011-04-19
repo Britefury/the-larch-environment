@@ -12,10 +12,10 @@ import java.awt.LinearGradientPaint;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.DefaultPerspective.Pres.ObjectBox;
 import BritefuryJ.DocPresent.Painter.FilledOutlinePainter;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.ObjectPres.ObjectBox;
 import BritefuryJ.Pres.Primitive.Border;
 import BritefuryJ.Pres.Primitive.Box;
 import BritefuryJ.Pres.Primitive.Primitive;

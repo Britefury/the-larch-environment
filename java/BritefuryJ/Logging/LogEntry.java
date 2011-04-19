@@ -15,13 +15,13 @@ import org.python.core.Py;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.DefaultPerspective.Pres.GenericStyle;
-import BritefuryJ.DefaultPerspective.Pres.HorizontalField;
-import BritefuryJ.DefaultPerspective.Pres.ObjectBoxWithFields;
-import BritefuryJ.DefaultPerspective.Pres.VerticalField;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.ObjectPres.ObjectPresStyle;
+import BritefuryJ.Pres.ObjectPres.HorizontalField;
+import BritefuryJ.Pres.ObjectPres.ObjectBoxWithFields;
+import BritefuryJ.Pres.ObjectPres.VerticalField;
 import BritefuryJ.StyleSheet.StyleSheet;
 
 public class LogEntry implements Presentable
@@ -210,6 +210,6 @@ public class LogEntry implements Presentable
 	}
 
 
-	private static StyleSheet logEntryStyle = StyleSheet.instance.withAttr( GenericStyle.objectBorderPaint, new Color( 0.45f, 0.65f, 0.0f ) ).withAttr( GenericStyle.objectTitlePaint,
+	private static StyleSheet logEntryStyle = StyleSheet.instance.withAttr( ObjectPresStyle.objectBorderPaint, new Color( 0.45f, 0.65f, 0.0f ) ).withAttr( ObjectPresStyle.objectTitlePaint,
 			new Color( 0.45f, 0.65f, 0.0f ) );
 }

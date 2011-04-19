@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.DefaultPerspective.Pres;
+package BritefuryJ.Pres.ObjectPres;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.Pres.Pres;
@@ -30,10 +30,10 @@ public class VerticalField extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		StyleSheet fieldStyle = style.get( GenericStyle.objectFieldStyle, StyleSheet.class );
-		double indentation = style.get( GenericStyle.objectFieldIndentation, Double.class );
+		StyleSheet fieldStyle = style.get( ObjectPresStyle.objectFieldStyle, StyleSheet.class );
+		double indentation = style.get( ObjectPresStyle.objectFieldIndentation, Double.class );
 		
-		DPElement valueElement = value.present( ctx, GenericStyle.useObjectFieldAttrs( style ) );
+		DPElement valueElement = value.present( ctx, ObjectPresStyle.useObjectFieldAttrs( style ) );
 		
 		return fieldStyle.applyTo( new Column( new Object[] { new Label( title ), valueElement.alignHExpand().padX( indentation, 0.0 ) } ).alignHExpand() ).present( ctx, style );
 	}

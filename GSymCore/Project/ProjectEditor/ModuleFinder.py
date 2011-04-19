@@ -107,7 +107,7 @@ class _RootModuleLoader (object):
 
 class RootFinder (object):
 	"""
-	_RootFinder is a module finder that navigates the root Python package name of a project
+	RootFinder is a module finder that navigates the root Python package name of a project
 	"""
 	def __init__(self, projectSubject):
 		self._projectSubject = projectSubject

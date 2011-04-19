@@ -13,15 +13,15 @@ import java.util.Map;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.DefaultPerspective.Pres.GenericStyle;
-import BritefuryJ.DefaultPerspective.Pres.HorizontalField;
-import BritefuryJ.DefaultPerspective.Pres.ObjectBoxWithFields;
-import BritefuryJ.DefaultPerspective.Pres.VerticalField;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.ParserHelpers.TraceNode;
 import BritefuryJ.ParserHelpers.ParseResultInterface;
 import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.ObjectPres.ObjectPresStyle;
+import BritefuryJ.Pres.ObjectPres.HorizontalField;
+import BritefuryJ.Pres.ObjectPres.ObjectBoxWithFields;
+import BritefuryJ.Pres.ObjectPres.VerticalField;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Paragraph;
 import BritefuryJ.Pres.Primitive.Primitive;
@@ -282,5 +282,5 @@ public class ParseResult implements ParseResultInterface, Presentable
 	protected static final StyleSheet successStyle = StyleSheet.instance.withAttr( Primitive.fontItalic, true ).withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
 	protected static final StyleSheet failStyle = StyleSheet.instance.withAttr( Primitive.fontItalic, true ).withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.0f ) );
 	protected static final StyleSheet rangeStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 12 ).withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.5f ) );
-	protected static final StyleSheet parseResultStyle = StyleSheet.instance.withAttr( GenericStyle.objectTitlePaint, new Color( 0.4f, 0.4f, 0.4f ) ).withAttr( GenericStyle.objectBorderPaint, new Color( 0.6f, 0.6f, 0.6f ) );
+	protected static final StyleSheet parseResultStyle = StyleSheet.instance.withAttr( ObjectPresStyle.objectTitlePaint, new Color( 0.4f, 0.4f, 0.4f ) ).withAttr( ObjectPresStyle.objectBorderPaint, new Color( 0.6f, 0.6f, 0.6f ) );
 }

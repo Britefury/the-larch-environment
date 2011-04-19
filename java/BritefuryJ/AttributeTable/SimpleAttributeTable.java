@@ -18,11 +18,11 @@ import org.python.core.Py;
 import org.python.core.PyObject;
 
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.DefaultPerspective.Pres.ObjectBoxWithFields;
-import BritefuryJ.DefaultPerspective.Pres.VerticalField;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.ObjectPres.ObjectBoxWithFields;
+import BritefuryJ.Pres.ObjectPres.VerticalField;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Table;
