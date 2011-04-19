@@ -22,7 +22,7 @@ public class AnimatedDrawing extends Drawing
 {
 	public static interface Stepper
 	{
-		public void step(DPElement element, double time);
+		public void step(DPElement element, double time, double deltaTime);
 	}
 	
 	
@@ -30,7 +30,7 @@ public class AnimatedDrawing extends Drawing
 	{
 		private DPElement element;
 		private Stepper stepper;
-		private double startTime;
+		private double startTime, lastTime;
 		protected boolean bRunning;
 		
 		private AbstractStepper(DPElement element, Stepper stepper)
@@ -38,6 +38,7 @@ public class AnimatedDrawing extends Drawing
 			this.element = element;
 			this.stepper = stepper;
 			this.startTime = (double)System.nanoTime() * 1.0e-9;
+			this.lastTime = startTime;
 			bRunning = false;
 		}
 		
@@ -45,7 +46,9 @@ public class AnimatedDrawing extends Drawing
 		protected void step()
 		{
 			double time = ( (double)System.nanoTime() * 1.0e-9 ) - startTime;
-			this.stepper.step( element, time );
+			double deltaTime = time - lastTime;
+			this.stepper.step( element, time, deltaTime );
+			lastTime = time;
 			element.queueFullRedraw();
 		}
 

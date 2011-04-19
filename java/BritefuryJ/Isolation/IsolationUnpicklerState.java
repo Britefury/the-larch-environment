@@ -9,6 +9,8 @@ package BritefuryJ.Isolation;
 import java.util.HashMap;
 import java.util.Stack;
 
+import org.python.core.Py;
+import org.python.core.PyBoolean;
 import org.python.core.PyDictionary;
 import org.python.core.PyList;
 import org.python.core.PyObject;
@@ -59,62 +61,67 @@ class IsolationUnpicklerState
 		PyObject root = unpickler.load();
 		popUnpicklerState( prev );
 		
-		PyList isolatedRootRefsPy = (PyList)unpickler.load();
-		PyObject isolatedRootRefs[] = isolatedRootRefsPy.getArray();
-		rootNameToObj = (PyDictionary)unpickler.load();
-		PyList partitionsStreamsDepsPy = (PyList)unpickler.load();
-		PyObject partitionsStreamsDeps[] = partitionsStreamsDepsPy.getArray();
-		//PyList isolatedObjTags = (PyList)unpickler.load();
+		PyBoolean hasIsolatedObjects = (PyBoolean)unpickler.load();
 		
-		
-		objTagToPartitionPos = new HashMap<Long,int[]>();
-		partitionObjects = new PyObject[partitionsStreamsDeps.length][];
-		
-		
-		partitionMemberIndices = new int[partitionsStreamsDeps.length][];
-		partitionMemberTags = new long[partitionsStreamsDeps.length][];
-		partitionStreams = new String[partitionsStreamsDeps.length];
-		partitionDeps = new int[partitionsStreamsDeps.length][];
-		for (int i = 0; i < partitionsStreamsDeps.length; i++)
+		if ( hasIsolatedObjects.equals( Py.True ) )
 		{
-			PyTuple tup = (PyTuple)partitionsStreamsDeps[i];
+			PyList isolatedRootRefsPy = (PyList)unpickler.load();
+			PyObject isolatedRootRefs[] = isolatedRootRefsPy.getArray();
+			rootNameToObj = (PyDictionary)unpickler.load();
+			PyList partitionsStreamsDepsPy = (PyList)unpickler.load();
+			PyObject partitionsStreamsDeps[] = partitionsStreamsDepsPy.getArray();
+			//PyList isolatedObjTags = (PyList)unpickler.load();
 			
-			PyList membersPy = (PyList)tup.pyget( 0 ); 
-			PyObject members[] = membersPy.getArray();
-			int memberIndices[] = new int[members.length];
-			long memberTags[] = new long[members.length];
-			for (int j = 0; j < members.length; j++)
+			
+			objTagToPartitionPos = new HashMap<Long,int[]>();
+			partitionObjects = new PyObject[partitionsStreamsDeps.length][];
+			
+			
+			partitionMemberIndices = new int[partitionsStreamsDeps.length][];
+			partitionMemberTags = new long[partitionsStreamsDeps.length][];
+			partitionStreams = new String[partitionsStreamsDeps.length];
+			partitionDeps = new int[partitionsStreamsDeps.length][];
+			for (int i = 0; i < partitionsStreamsDeps.length; i++)
 			{
-				PyTuple pair = (PyTuple)members[j];
-				memberIndices[j] = pair.pyget( 0 ).asInt();
-				long tag = pair.pyget( 1 ).asLong();
-				memberTags[j] = tag;
-				objTagToPartitionPos.put( tag, new int[] { i, j } );
+				PyTuple tup = (PyTuple)partitionsStreamsDeps[i];
+				
+				PyList membersPy = (PyList)tup.pyget( 0 ); 
+				PyObject members[] = membersPy.getArray();
+				int memberIndices[] = new int[members.length];
+				long memberTags[] = new long[members.length];
+				for (int j = 0; j < members.length; j++)
+				{
+					PyTuple pair = (PyTuple)members[j];
+					memberIndices[j] = pair.pyget( 0 ).asInt();
+					long tag = pair.pyget( 1 ).asLong();
+					memberTags[j] = tag;
+					objTagToPartitionPos.put( tag, new int[] { i, j } );
+				}
+				
+				PyList depsPy = (PyList)tup.pyget( 2 ); 
+				PyObject deps[] = depsPy.getArray();
+				int depIndices[] = new int[deps.length];
+				for (int j = 0; j < deps.length; j++)
+				{
+					depIndices[j] = deps[j].asInt();
+				}
+				
+				partitionMemberIndices[i] = memberIndices;
+				partitionMemberTags[i] = memberTags;
+				partitionStreams[i] = tup.pyget( 1 ).asString();
+				partitionDeps[i] = depIndices;
 			}
 			
-			PyList depsPy = (PyList)tup.pyget( 2 ); 
-			PyObject deps[] = depsPy.getArray();
-			int depIndices[] = new int[deps.length];
-			for (int j = 0; j < deps.length; j++)
+			isolatedObjTagToObj = new HashMap<Long, PyObject>();
+			for (PyObject r: isolatedRootRefs)
 			{
-				depIndices[j] = deps[j].asInt();
+				PyTuple tup = (PyTuple)r;
+				
+				long tag = tup.pyget( 0 ).asInt();
+				PyObject value = tup.pyget( 1 );
+				
+				isolatedObjTagToObj.put( tag, value );
 			}
-			
-			partitionMemberIndices[i] = memberIndices;
-			partitionMemberTags[i] = memberTags;
-			partitionStreams[i] = tup.pyget( 1 ).asString();
-			partitionDeps[i] = depIndices;
-		}
-		
-		isolatedObjTagToObj = new HashMap<Long, PyObject>();
-		for (PyObject r: isolatedRootRefs)
-		{
-			PyTuple tup = (PyTuple)r;
-			
-			long tag = tup.pyget( 0 ).asInt();
-			PyObject value = tup.pyget( 1 );
-			
-			isolatedObjTagToObj.put( tag, value );
 		}
 		
 		return root;

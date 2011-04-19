@@ -15,11 +15,13 @@ from GSymCore.Project.ProjectNode import ProjectNode
 
 
 class ProjectContainer (ProjectNode):
-	def __init__(self):
+	def __init__(self, contents=None):
 		super( ProjectContainer, self ).__init__()
 		self._contents_ = []
 		self._prevContents = []
 		self._contentsMapCell = Cell( self._computeContentsMap )
+		if contents is not None:
+			self[:] = contents
 	
 	
 	def __getstate__(self):

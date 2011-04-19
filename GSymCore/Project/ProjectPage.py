@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
+from copy import deepcopy
+
 from BritefuryJ.CommandHistory import Trackable
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
@@ -29,6 +31,12 @@ class ProjectPage (ProjectNode):
 		super( ProjectPage, self ).__setstate__( state )
 		self._name = state['name']
 		self._data = state['data']
+	
+	def __copy__(self):
+		return ProjectPage( self._name, self._data )
+	
+	def __deepcopy__(self, memo):
+		return ProjectPage( self._name, deepcopy( self._data, memo ) )
 	
 	
 	def getName(self):

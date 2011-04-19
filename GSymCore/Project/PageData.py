@@ -6,6 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
 import os
+from copy import deepcopy
 
 from datetime import datetime
 
@@ -51,6 +52,14 @@ class PageData (Trackable):
 	def __setstate__(self, state):
 		self._commandHistory = None
 		self.contents = state['contents']
+	
+	def __copy__(self):
+		T = type( self )
+		return T( self.contents )
+	
+	def __deepcopy__(self, memo):
+		T = type( self )
+		return T( deepcopy( self.contents, memo ) )
 	
 	
 	def getCommandHistory(self):
