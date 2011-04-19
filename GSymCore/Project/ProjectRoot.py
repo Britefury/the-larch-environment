@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
+from copy import deepcopy
+
 from BritefuryJ.CommandHistory import Trackable
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
@@ -15,9 +17,9 @@ from GSymCore.Project import ProjectEditor
 
 
 class ProjectRoot (ProjectContainer):
-	def __init__(self):
-		super( ProjectRoot, self ).__init__()
-		self._pythonPackageName = None
+	def __init__(self, packageName=None, contents=[]):
+		super( ProjectRoot, self ).__init__( contents )
+		self._pythonPackageName = packageName
 	
 	
 	def __getstate__(self):
@@ -28,6 +30,12 @@ class ProjectRoot (ProjectContainer):
 	def __setstate__(self, state):
 		super( ProjectRoot, self ).__setstate__( state )
 		self._pythonPackageName = state['pythonPackageName']
+	
+	def __copy__(self):
+		return ProjectRoot( self._pythonPackageName, self[:] )
+	
+	def __deepcopy__(self, memo):
+		return ProjectRoot( self._pythonPackageName, [ deepcopy( x, memo )   for x in self ] )
 	
 	
 	def __new_subject__(self, document, enclosingSubject, location, title):

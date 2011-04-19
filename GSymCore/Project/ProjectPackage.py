@@ -5,6 +5,8 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
+from copy import deepcopy
+
 from BritefuryJ.CommandHistory import Trackable
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
@@ -14,8 +16,8 @@ from GSymCore.Project.ProjectContainer import ProjectContainer
 
 
 class ProjectPackage (ProjectContainer):
-	def __init__(self, name=''):
-		super( ProjectPackage, self ).__init__()
+	def __init__(self, name='', contents=None):
+		super( ProjectPackage, self ).__init__( contents )
 		self._name = name
 		
 
@@ -28,6 +30,12 @@ class ProjectPackage (ProjectContainer):
 		super( ProjectPackage, self ).__setstate__( state )
 		self._name = state['name']
 	
+	def __copy__(self):
+		return ProjectPackage( self._name, self[:] )
+	
+	def __deepcopy__(self, memo):
+		return ProjectPackage( self._name, [ deepcopy( x, memo )   for x in self ] )
+
 	
 	def getName(self):
 		self._incr.onAccess()

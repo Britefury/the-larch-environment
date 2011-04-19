@@ -51,7 +51,7 @@ public class IsolationPickle
 	public static String dumps(PyObject obj)
 	{
 		StringIO stream = cStringIO.StringIO();
-		dump( stream, obj );
+		dump( obj, stream );
 		return stream.getvalue().asString();
 	}
 	
