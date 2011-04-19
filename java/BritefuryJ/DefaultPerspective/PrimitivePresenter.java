@@ -21,11 +21,11 @@ import org.python.core.PyTuple;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Controls.DropDownExpander;
-import BritefuryJ.DefaultPerspective.Pres.UnescapedStringAsSpan;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.ObjectPres.UnescapedStringAsSpan;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;

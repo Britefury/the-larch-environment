@@ -12,14 +12,14 @@ import java.util.List;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.Controls.DropDownExpander;
-import BritefuryJ.DefaultPerspective.Pres.GenericStyle;
-import BritefuryJ.DefaultPerspective.Pres.ObjectBorder;
-import BritefuryJ.DefaultPerspective.Pres.UnescapedStringAsRow;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.CompositePres;
 import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
+import BritefuryJ.Pres.ObjectPres.ObjectPresStyle;
+import BritefuryJ.Pres.ObjectPres.ObjectBorder;
+import BritefuryJ.Pres.ObjectPres.UnescapedStringAsRow;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Paragraph;
 import BritefuryJ.Pres.Primitive.Primitive;
@@ -46,7 +46,7 @@ public class DocModelPresenter
 
 	private static final StyleSheet nullStyle = defaultStyle.withAttr( Primitive.fontItalic, true ).withAttr( Primitive.foreground, new Color( 0.5f, 0.0f, 0.25f ) );
 
-	private static final StyleSheet stringStyle = defaultStyle.withAttr( GenericStyle.stringContentStyle, StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.25f, 0.5f ) ) );
+	private static final StyleSheet stringStyle = defaultStyle.withAttr( ObjectPresStyle.stringContentStyle, StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.25f, 0.5f ) ) );
 	
 	private static final StyleSheet punctuationStyle = defaultStyle.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 1.0f ) );
 

@@ -4,16 +4,16 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008-2010.
 //##************************
-package BritefuryJ.DefaultPerspective.Pres;
+package BritefuryJ.Pres.ObjectPres;
 
 import java.util.ArrayList;
 
 import BritefuryJ.Pres.Pres;
-import BritefuryJ.Pres.Primitive.Paragraph;
+import BritefuryJ.Pres.Primitive.Span;
 
-public class UnescapedStringAsParagraph extends UnescapedString
+public class UnescapedStringAsSpan extends UnescapedString
 {
-	public UnescapedStringAsParagraph(String value)
+	public UnescapedStringAsSpan(String value)
 	{
 		super( value );
 	}
@@ -22,6 +22,6 @@ public class UnescapedStringAsParagraph extends UnescapedString
 	@Override
 	protected Pres createContainer(ArrayList<Object> contents)
 	{
-		return new Paragraph( contents );
+		return new Span( contents );
 	}
 }

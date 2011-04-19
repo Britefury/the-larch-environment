@@ -7,12 +7,12 @@
 package BritefuryJ.CellEditor;
 
 import BritefuryJ.Cell.LiteralCell;
-import BritefuryJ.DefaultPerspective.Pres.ObjectBox;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.ObjectPres.ObjectBox;
 import BritefuryJ.Pres.Primitive.Label;
 
 public class ObjectCellEditorDropBox extends LiteralCellEditor

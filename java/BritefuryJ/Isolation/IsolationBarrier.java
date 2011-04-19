@@ -15,10 +15,10 @@ import org.python.core.PyTuple;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.DefaultPerspective.Pres.GenericStyle;
-import BritefuryJ.DefaultPerspective.Pres.ObjectBox;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.ObjectPres.ObjectPresStyle;
+import BritefuryJ.Pres.ObjectPres.ObjectBox;
 import BritefuryJ.StyleSheet.StyleSheet;
 
 public class IsolationBarrier <ValueType> implements Presentable
@@ -138,5 +138,5 @@ public class IsolationBarrier <ValueType> implements Presentable
 	}
 	
 	
-	private static final StyleSheet style = StyleSheet.instance.withAttr( GenericStyle.objectBorderPaint, new Color( 0.25f, 0.0f, 0.5f ) );
+	private static final StyleSheet style = StyleSheet.instance.withAttr( ObjectPresStyle.objectBorderPaint, new Color( 0.25f, 0.0f, 0.5f ) );
 }

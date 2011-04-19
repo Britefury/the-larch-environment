@@ -15,13 +15,13 @@ import org.python.core.PySlice;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.DefaultPerspective.Pres.GenericStyle;
-import BritefuryJ.DefaultPerspective.Pres.ObjectBox;
-import BritefuryJ.DefaultPerspective.Pres.UnescapedStringAsSpan;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.ObjectPres.ObjectPresStyle;
+import BritefuryJ.Pres.ObjectPres.ObjectBox;
+import BritefuryJ.Pres.ObjectPres.UnescapedStringAsSpan;
 import BritefuryJ.Pres.Primitive.Border;
 import BritefuryJ.Pres.Primitive.Paragraph;
 import BritefuryJ.Pres.Primitive.Primitive;
@@ -623,5 +623,5 @@ public class StreamValue implements Presentable
 	}
 
 
-	private static StyleSheet streamValueStyle = StyleSheet.instance.withAttr( GenericStyle.objectBorderPaint,new Color( 0.65f, 0.0f, 0.55f ) ).withAttr( GenericStyle.objectTitlePaint,new Color( 0.65f, 0.0f, 0.55f ) );
+	private static StyleSheet streamValueStyle = StyleSheet.instance.withAttr( ObjectPresStyle.objectBorderPaint,new Color( 0.65f, 0.0f, 0.55f ) ).withAttr( ObjectPresStyle.objectTitlePaint,new Color( 0.65f, 0.0f, 0.55f ) );
 }

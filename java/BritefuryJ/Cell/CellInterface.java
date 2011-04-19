@@ -13,9 +13,6 @@ import java.awt.Color;
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.PrimitivePresenter;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.DefaultPerspective.Pres.ErrorBox;
-import BritefuryJ.DefaultPerspective.Pres.GenericStyle;
-import BritefuryJ.DefaultPerspective.Pres.ObjectBox;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.Incremental.IncrementalMonitorListener;
 import BritefuryJ.Incremental.IncrementalOwner;
@@ -24,6 +21,9 @@ import BritefuryJ.Pres.ApplyPerspective;
 import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
+import BritefuryJ.Pres.ObjectPres.ErrorBox;
+import BritefuryJ.Pres.ObjectPres.ObjectPresStyle;
+import BritefuryJ.Pres.ObjectPres.ObjectBox;
 import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
 
@@ -100,5 +100,5 @@ public abstract class CellInterface implements IncrementalOwner, Presentable
 	}
 	
 	
-	private static StyleSheet cellStyle = StyleSheet.instance.withAttr( GenericStyle.objectBorderPaint, new Color( 0.5f, 0.0f, 0.5f ) ).withAttr( GenericStyle.objectTitlePaint, new Color( 0.5f, 0.0f, 0.5f ) );
+	private static StyleSheet cellStyle = StyleSheet.instance.withAttr( ObjectPresStyle.objectBorderPaint, new Color( 0.5f, 0.0f, 0.5f ) ).withAttr( ObjectPresStyle.objectTitlePaint, new Color( 0.5f, 0.0f, 0.5f ) );
 }

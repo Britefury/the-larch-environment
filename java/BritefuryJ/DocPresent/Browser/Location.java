@@ -11,11 +11,11 @@ import java.util.regex.Pattern;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.DefaultPerspective.Pres.GenericStyle;
-import BritefuryJ.DefaultPerspective.Pres.ObjectBox;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Pres.LocationAsInnerFragment;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.ObjectPres.ObjectPresStyle;
+import BritefuryJ.Pres.ObjectPres.ObjectBox;
 import BritefuryJ.Pres.Primitive.StaticText;
 import BritefuryJ.StyleSheet.StyleSheet;
 
@@ -134,6 +134,6 @@ public class Location implements Presentable
 	}
 
 
-	private static final StyleSheet locationStyle = StyleSheet.instance.withAttr( GenericStyle.objectBorderPaint, new Color( 0.4f, 0.65f, 0.4f ) )
-			.withAttr( GenericStyle.objectTitlePaint, new Color( 0.4f, 0.65f, 0.4f ) ); 
+	private static final StyleSheet locationStyle = StyleSheet.instance.withAttr( ObjectPresStyle.objectBorderPaint, new Color( 0.4f, 0.65f, 0.4f ) )
+			.withAttr( ObjectPresStyle.objectTitlePaint, new Color( 0.4f, 0.65f, 0.4f ) ); 
 }

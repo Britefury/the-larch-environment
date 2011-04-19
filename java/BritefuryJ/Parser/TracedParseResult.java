@@ -10,15 +10,15 @@ import java.util.Map;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.DefaultPerspective.Pres.HorizontalField;
-import BritefuryJ.DefaultPerspective.Pres.ObjectBoxWithFields;
-import BritefuryJ.DefaultPerspective.Pres.VerticalField;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.Parser.TracedParseResultView.ParseView;
 import BritefuryJ.ParserHelpers.TraceNode;
 import BritefuryJ.ParserHelpers.TracedParseResultInterface;
 import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.ObjectPres.HorizontalField;
+import BritefuryJ.Pres.ObjectPres.ObjectBoxWithFields;
+import BritefuryJ.Pres.ObjectPres.VerticalField;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Paragraph;
 import BritefuryJ.Pres.Primitive.StaticText;
