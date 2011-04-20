@@ -17,6 +17,8 @@ from BritefuryJ.CommandHistory import CommandHistory, CommandHistoryListener
 
 from BritefuryJ.Isolation import IsolationPickle
 
+from Britefury import LoadBuiltins
+
 from Britefury.gSym.gSymWorld import GSymWorld
 
 
@@ -97,6 +99,7 @@ class GSymDocument (CommandHistoryListener):
 	
 	def newModule(self, fullname, loader):
 		mod = imp.new_module( fullname )
+		LoadBuiltins.loadBuiltins( mod )
 		sys.modules[fullname] = mod
 		mod.__file__ = fullname
 		mod.__loader__ = loader

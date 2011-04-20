@@ -83,7 +83,6 @@ public abstract class ObjectPresentationPerspective extends AbstractPerspective
 				PyType typeX = pyX.getType();
 				
 				PyObjectPresenter presenter = (PyObjectPresenter)objectPresenters.get( typeX );
-				System.out.println( "presentModel(): this=" + this + ", Python presenter=" + presenter );
 				if ( presenter != null )
 				{
 					result = invokePyObjectPresenter( presenter, pyX, fragment, inheritedState );
@@ -101,7 +100,6 @@ public abstract class ObjectPresentationPerspective extends AbstractPerspective
 		if ( result == null )
 		{
 			ObjectPresenter presenter = (ObjectPresenter)objectPresenters.get( x.getClass() );
-			System.out.println( "presentModel(): this=" + this + ", x.getClass()=" + x.getClass() + ", Java presenter=" + presenter );
 			if ( presenter != null )
 			{
 				result = invokeObjectPresenter( presenter, x, fragment, inheritedState );
@@ -111,7 +109,14 @@ public abstract class ObjectPresentationPerspective extends AbstractPerspective
 		if ( result == null )
 		{
 			// Fallback
-			return fallbackPerspective.presentObject( x, fragment, inheritedState );
+			if ( fallbackPerspective != null )
+			{
+				return fallbackPerspective.presentObject( x, fragment, inheritedState );
+			}
+			else
+			{
+				return null;
+			}
 		}
 		else
 		{
