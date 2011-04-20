@@ -20,14 +20,19 @@ import BritefuryJ.Utils.PolymorphicMap;
 public abstract class ObjectPresentationPerspective extends AbstractPerspective
 {
 	private String pythonPresentMethodName;
-	private ObjectViewLocationTable locationTable = new ObjectViewLocationTable();
 	private PolymorphicMap<Object> objectPresenters = new PolymorphicMap<Object>();
+	private AbstractPerspective fallbackPerspective;
 	
 	
-	public ObjectPresentationPerspective(String pythonMethodName, ObjectPresentationLocationResolver objPresLocationResolver)
+	public ObjectPresentationPerspective(String pythonMethodName, AbstractPerspective fallbackPerspective)
 	{
 		this.pythonPresentMethodName = pythonMethodName.intern();
-		objPresLocationResolver.registerPerspective( this );
+		this.fallbackPerspective = fallbackPerspective;
+	}
+
+	public ObjectPresentationPerspective(String pythonMethodName)
+	{
+		this( pythonMethodName, null );
 	}
 
 	
@@ -35,8 +40,6 @@ public abstract class ObjectPresentationPerspective extends AbstractPerspective
 	
 	protected abstract Pres presentWithJavaInterface(Object x, FragmentView fragment, SimpleAttributeTable inheritedState);
 	protected abstract Pres presentJavaArray(Object x, FragmentView fragment, SimpleAttributeTable inheritedState);
-	protected abstract Pres presentJavaObjectFallback(Object x, FragmentView fragment, SimpleAttributeTable inheritedState);
-	protected abstract Pres presentPyObjectFallback(PyObject x, FragmentView fragment, SimpleAttributeTable inhritedState);
 	protected abstract Pres invokeObjectPresenter(ObjectPresenter presenter, Object x, FragmentView fragment, SimpleAttributeTable inheritedState);
 	protected abstract Pres invokePyObjectPresenter(PyObjectPresenter presenter, PyObject x, FragmentView fragment, SimpleAttributeTable inheritedState);
 	
@@ -80,6 +83,7 @@ public abstract class ObjectPresentationPerspective extends AbstractPerspective
 				PyType typeX = pyX.getType();
 				
 				PyObjectPresenter presenter = (PyObjectPresenter)objectPresenters.get( typeX );
+				System.out.println( "presentModel(): this=" + this + ", Python presenter=" + presenter );
 				if ( presenter != null )
 				{
 					result = invokePyObjectPresenter( presenter, pyX, fragment, inheritedState );
@@ -97,39 +101,28 @@ public abstract class ObjectPresentationPerspective extends AbstractPerspective
 		if ( result == null )
 		{
 			ObjectPresenter presenter = (ObjectPresenter)objectPresenters.get( x.getClass() );
+			System.out.println( "presentModel(): this=" + this + ", x.getClass()=" + x.getClass() + ", Java presenter=" + presenter );
 			if ( presenter != null )
 			{
 				result = invokeObjectPresenter( presenter, x, fragment, inheritedState );
 			}
 		}
 		
-		// Fallback
 		if ( result == null )
 		{
-			if ( pyX != null )
-			{
-				result = presentPyObjectFallback( pyX, fragment, inheritedState );
-			}
-			else
-			{
-				result = presentJavaObjectFallback( x, fragment, inheritedState );
-			}
+			// Fallback
+			return fallbackPerspective.presentObject( x, fragment, inheritedState );
 		}
-		
-		result.setDebugName( x.getClass().getName() );
-		return result;
+		else
+		{
+			result.setDebugName( x.getClass().getName() );
+			return result;
+		}
 	}
 
 	
 	
 
-	protected ObjectViewLocationTable getObjectViewLocationTable()
-	{
-		return locationTable;
-	}
-	
-	
-	
 	public void registerJavaObjectPresenter(Class<?> cls, ObjectPresenter presenter)
 	{
 		objectPresenters.put( cls, presenter );

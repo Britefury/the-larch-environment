@@ -163,9 +163,7 @@ public class AttributeTable implements Presentable
 	protected HashMap<DelAttribute, WeakReference<AttributeTable>> delDerivedAttributeTables = new HashMap<DelAttribute, WeakReference<AttributeTable>>();
 	
 	
-	public static AttributeTable instance = new AttributeTable();
-	
-	
+
 	protected AttributeTable()
 	{
 	}
@@ -425,4 +423,8 @@ public class AttributeTable implements Presentable
 		}
 		return _attrTableStyle;
 	}
+
+
+
+	public static final AttributeTable instance = new AttributeTable();
 }

@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.Pres;
 
+import BritefuryJ.DefaultPerspective.DefaultPerspective;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.Projection.AbstractPerspective;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -35,7 +36,7 @@ public class ApplyPerspective extends Pres
 		AbstractPerspective p = perspective;
 		if ( p == null )
 		{
-			p = ctx.getFragment().getBrowserContext().getDefaultPerspective();
+			p = DefaultPerspective.instance;
 		}
 		
 		return child.present( new PresentationContext( ctx.getFragment(), p, ctx.getInheritedState() ), style );

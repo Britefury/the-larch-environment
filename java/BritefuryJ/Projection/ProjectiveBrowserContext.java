@@ -12,7 +12,6 @@ import org.python.core.PyStringMap;
 import org.python.core.__builtin__;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.DefaultPerspective.DefaultObjectPresenterRegistry;
 import BritefuryJ.DefaultPerspective.DefaultPerspective;
 import BritefuryJ.DefaultPerspective.DefaultPerspectiveSubject;
 import BritefuryJ.DefaultPerspective.Presentable;
@@ -25,8 +24,8 @@ import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.IncrementalView.IncrementalView;
-import BritefuryJ.ObjectPresentation.ObjectPresentationPerspective;
 import BritefuryJ.ObjectPresentation.ObjectPresentationLocationResolver;
+import BritefuryJ.ObjectPresentation.ObjectPresentationPerspective;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
@@ -100,15 +99,13 @@ public class ProjectiveBrowserContext
 	
 	private ProjectiveBrowserContextLocationResolver pageLocationResolver = new ProjectiveBrowserContextLocationResolver();
 	private ObjectPresentationLocationResolver objPresLocationResolver = new ObjectPresentationLocationResolver();
-	private DefaultPerspective defaultPerspective;
 	
 	private PyStringMap resolverLocals = new PyStringMap();
 	
 	
 	
-	public ProjectiveBrowserContext(DefaultObjectPresenterRegistry defaultPresenterRegistry, boolean bWithSystemPages)
+	public ProjectiveBrowserContext(boolean bWithSystemPages)
 	{
-		defaultPerspective = new DefaultPerspective( objPresLocationResolver, defaultPresenterRegistry );
 		if ( bWithSystemPages )
 		{
 			resolverLocals.__setitem__( "system", Py.java2py( new SystemRootPage() ) );
@@ -150,11 +147,6 @@ public class ProjectiveBrowserContext
 		return pageLocationResolver;
 	}
 	
-	public DefaultPerspective getDefaultPerspective()
-	{
-		return defaultPerspective;
-	}
-	
 	
 	public DefaultPerspectiveSubject defaultSubject(Object focus)
 	{
@@ -176,7 +168,7 @@ public class ProjectiveBrowserContext
 	
 	public Location getLocationForObject(Object x)
 	{
-		return getLocationForObject( defaultPerspective, x );
+		return getLocationForObject( DefaultPerspective.instance, x );
 	}
 	
 	

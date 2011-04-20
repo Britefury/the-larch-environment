@@ -7,6 +7,7 @@
 package BritefuryJ.ObjectPresentation;
 
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 
 import org.python.core.Py;
 import org.python.core.PyString;
@@ -14,6 +15,7 @@ import org.python.core.PyString;
 public class ObjectPresentationLocationResolver
 {
 	private HashMap<String, ObjectPresentationPerspective> perspectiveTable = new HashMap<String, ObjectPresentationPerspective>();
+	private IdentityHashMap<ObjectPresentationPerspective, ObjectViewLocationTable> locationTables = new IdentityHashMap<ObjectPresentationPerspective, ObjectViewLocationTable>();
 	
 	
 	public ObjectPresentationLocationResolver()
@@ -28,7 +30,7 @@ public class ObjectPresentationLocationResolver
 		{
 			throw Py.KeyError( "No perspective with class name '" + key + "'" );
 		}
-		return perspective.getObjectViewLocationTable();
+		return getLocationTable( perspective );
 	}
 	
 	
@@ -44,12 +46,26 @@ public class ObjectPresentationLocationResolver
 	
 	public String getRelativeLocationForObject(ObjectPresentationPerspective perspective, Object x)
 	{
-		String relative = perspective.getObjectViewLocationTable().getRelativeLocationForObject( x );
+		ObjectViewLocationTable locationTable = getLocationTable( perspective );
+		String relative = locationTable.getRelativeLocationForObject( x );
 		
 		PyString className = Py.newString( perspective.getClass().getName() );
 		
 		PyString key = className.__repr__();
 		
 		return "[" + key + "]" + relative;
+	}
+	
+	
+	
+	private ObjectViewLocationTable getLocationTable(ObjectPresentationPerspective perspective)
+	{
+		ObjectViewLocationTable table = locationTables.get( perspective );
+		if ( table == null )
+		{
+			table = new ObjectViewLocationTable();
+			locationTables.put( perspective, table );
+		}
+		return table;
 	}
 }

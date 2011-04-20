@@ -78,7 +78,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 	private PresentersSQL sql = new PresentersSQL();
 	private PresentersConcurrency concurrency = new PresentersConcurrency();
 	
-	public DefaultObjectPresenterRegistry()
+	private DefaultObjectPresenterRegistry()
 	{
 		registerJavaObjectPresenter( Character.class, presenter_Character );
 		registerJavaObjectPresenter( String.class,  presenter_String );
@@ -1114,7 +1114,7 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 	private static final Pres setCloseDelim = delimStyle.applyTo( new StaticText( ")" ) );
 	
 
-	protected static Pres arrayView(List<Object> children)
+	public static Pres arrayView(List<Object> children)
 	{
 		return new SpanSequenceView( children, openChevronBracket, closeChevronBracket, comma, space, TrailingSeparator.NEVER );
 	}
@@ -1143,4 +1143,9 @@ public class DefaultObjectPresenterRegistry extends ObjectPresenterRegistry
 	{
 		return new SpanSequenceView( children, null, null, comma, space, TrailingSeparator.NEVER );
 	}
+
+
+
+
+	public static final DefaultObjectPresenterRegistry instance = new DefaultObjectPresenterRegistry();
 }

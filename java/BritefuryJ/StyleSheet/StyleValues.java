@@ -15,9 +15,6 @@ import BritefuryJ.Pres.Pres;
 
 public class StyleValues extends AttributeTable
 {
-	public static StyleValues instance = new StyleValues();
-	
-	
 	protected StyleValues()
 	{
 		super();
@@ -77,4 +74,8 @@ public class StyleValues extends AttributeTable
 	{
 		return (StyleValues)super.remapAttr( destAttribute, sourceAttribute );
 	}
+
+
+
+	public static final StyleValues instance = new StyleValues();
 }
