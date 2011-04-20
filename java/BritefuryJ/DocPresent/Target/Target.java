@@ -22,7 +22,10 @@ public abstract class Target
 	public abstract void draw(Graphics2D graphics);
 	
 	
-	public abstract DPElement getKeyboardInputElement();
+	public DPElement getKeyboardInputElement()
+	{
+		return null;
+	}
 	
 	
 	public abstract SelectionPoint createSelectionPoint();
