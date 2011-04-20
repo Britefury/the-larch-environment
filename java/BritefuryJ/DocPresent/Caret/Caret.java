@@ -9,6 +9,7 @@ package BritefuryJ.DocPresent.Caret;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
 
 import BritefuryJ.DocPresent.DPContentLeaf;
 import BritefuryJ.DocPresent.DPContentLeafEditable;
@@ -17,6 +18,8 @@ import BritefuryJ.DocPresent.DPSegment;
 import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Marker.MarkerListener;
+import BritefuryJ.DocPresent.Selection.TextSelectionPoint;
+import BritefuryJ.DocPresent.Selection.SelectionPoint;
 import BritefuryJ.DocPresent.Target.Target;
 import BritefuryJ.Math.Point2;
 
@@ -34,6 +37,7 @@ public class Caret extends Target implements MarkerListener
 	}
 	
 	
+	@Override
 	public void draw(Graphics2D graphics)
 	{
 		if ( isValid() )
@@ -51,6 +55,78 @@ public class Caret extends Target implements MarkerListener
 	}
 	
 	
+	@Override
+	public DPContentLeafEditable getKeyboardInputElement()
+	{
+		return marker.getElement();
+	}
+	
+	
+	@Override
+	public SelectionPoint createSelectionPoint()
+	{
+		if ( isValid() )
+		{
+			return new TextSelectionPoint( marker.copy() );
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+
+	
+	@Override
+	public boolean isValid()
+	{
+		if ( marker != null )
+		{
+			return marker.isValid();
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	
+	
+	@Override
+	public boolean onContentKeyPress(KeyEvent event)
+	{
+		DPContentLeafEditable leaf = getElement();
+		if ( leaf != null  &&  leaf.isEditable() )
+		{
+			return leaf.onContentKeyPress( this, event );
+		}
+		return false;
+	}
+
+	@Override
+	public boolean onContentKeyRelease(KeyEvent event)
+	{
+		DPContentLeafEditable leaf = getElement();
+		if ( leaf != null  &&  leaf.isEditable() )
+		{
+			return leaf.onContentKeyRelease( this, event );
+		}
+		return false;
+	}
+
+	@Override
+	public boolean onContentKeyTyped(KeyEvent event)
+	{
+		DPContentLeafEditable leaf = getElement();
+		if ( leaf != null  &&  leaf.isEditable() )
+		{
+			return leaf.onContentKeyTyped( this, event );
+		}
+		return false;
+	}
+
+
+
 	public Marker getMarker()
 	{
 		return marker;
@@ -89,20 +165,6 @@ public class Caret extends Target implements MarkerListener
 	
 	
 	
-	public boolean isValid()
-	{
-		if ( marker != null )
-		{
-			return marker.isValid();
-		}
-		else
-		{
-			return false;
-		}
-	}
-	
-	
-	
 	public void markerChanged(Marker m)
 	{
 		changed();
@@ -115,6 +177,7 @@ public class Caret extends Target implements MarkerListener
 	}
 	
 	
+	@Override
 	public void ensureVisible()
 	{
 		DPElement element = getElement();
@@ -179,6 +242,7 @@ public class Caret extends Target implements MarkerListener
 	//
 	//
 	
+	@Override
 	public void moveLeft()
 	{
 		DPContentLeafEditable leaf = marker.getElement();
@@ -214,8 +278,7 @@ public class Caret extends Target implements MarkerListener
 		}
 	}
 
-
-
+	@Override
 	public void moveRight()
 	{
 		DPContentLeafEditable leaf = marker.getElement();
@@ -251,6 +314,7 @@ public class Caret extends Target implements MarkerListener
 		}
 	}
 	
+	@Override
 	public void moveUp()
 	{
 		DPContentLeafEditable leaf = marker.getElement();
@@ -265,6 +329,7 @@ public class Caret extends Target implements MarkerListener
 		}
 	}
 	
+	@Override
 	public void moveDown()
 	{
 		DPContentLeafEditable leaf = marker.getElement();
@@ -280,6 +345,7 @@ public class Caret extends Target implements MarkerListener
 	}
 	
 
+	@Override
 	public void moveToHome()
 	{
 		DPContentLeafEditable leaf = marker.getElement();
@@ -307,6 +373,7 @@ public class Caret extends Target implements MarkerListener
 		}
 	}
 	
+	@Override
 	public void moveToEnd()
 	{
 		DPContentLeafEditable leaf = marker.getElement();

@@ -26,7 +26,7 @@ public class InputTable
 	protected JComponent component;
 	
 	
-	public InputTable(PointerInputElement rootElement, DndController dndController, PresentationComponent component)
+	public InputTable(PresentationComponent.RootElement rootElement, DndController dndController, PresentationComponent component)
 	{
 		pointersWithinBoundsByElement = new WeakHashMap<PointerInputElement, ArrayList<PointerInterface>>();
 		this.rootElement = rootElement;

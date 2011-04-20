@@ -47,4 +47,9 @@ public class PointerEvent extends Event
 	{
 		return pointer.getLocalPos();
 	}
+	
+	public int getModifiers()
+	{
+		return pointer.getModifiers();
+	}
 }
