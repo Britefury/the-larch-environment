@@ -7,7 +7,11 @@
 package BritefuryJ.DocPresent.Target;
 
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+
+import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Selection.SelectionPoint;
 
 public abstract class Target
 {
@@ -16,8 +20,70 @@ public abstract class Target
 	
 	
 	public abstract void draw(Graphics2D graphics);
+	
+	
+	public abstract DPElement getKeyboardInputElement();
+	
+	
+	public abstract SelectionPoint createSelectionPoint();
+	
+	
+	public boolean isValid()
+	{
+		return true;
+	}
+	
+	
+	public boolean onContentKeyPress(KeyEvent event)
+	{
+		return false;
+	}
+
+	public boolean onContentKeyRelease(KeyEvent event)
+	{
+		return false;
+	}
+
+	public boolean onContentKeyTyped(KeyEvent event)
+	{
+		return false;
+	}
 
 
+
+	public void moveLeft()
+	{
+	}
+
+	public void moveRight()
+	{
+	}
+	
+	public void moveUp()
+	{
+	}
+	
+	public void moveDown()
+	{
+	}
+	
+
+	public void moveToHome()
+	{
+	}
+	
+	public void moveToEnd()
+	{
+	}
+	
+	
+	
+	public void ensureVisible()
+	{
+	}
+
+	
+	
 	public void addTargetListener(TargetListener listener)
 	{
 		listeners.add( listener );

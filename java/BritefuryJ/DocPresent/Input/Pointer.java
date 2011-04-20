@@ -24,6 +24,7 @@ import BritefuryJ.Utils.PriorityList;
 
 public class Pointer extends PointerInterface
 {
+	private static int TARGET_CLICK_INTERACTOR_PRIORITY = -2000;
 	private static int NAVIGATION_INTERACTOR_PRIORITY = -1000;
 	private static int DND_INTERACTOR_PRIORITY = -500;
 	private static int CONTEXTMENU_INTERACTOR_PRIORITY = -400;
@@ -31,18 +32,19 @@ public class Pointer extends PointerInterface
 	private static int CLICK_INTERACTOR_PRIORITY = 0;
 	private static int DRAG_INTERACTOR_PRIORITY = 50;
 	private static int MOTION_INTERACTOR_PRIORITY = 100;
+	private static int TARGET_DRAG_INTERACTOR_PRIORITY = 1000;
 	
 	
 	
 	protected Point2 localPos = new Point2();
 	protected int modifiers = 0;
-	protected PointerInputElement rootElement;
+	protected PresentationComponent.RootElement rootElement;
 	protected InputTable inputTable;
 	protected DndDropLocal dndDrop;
 	protected PresentationComponent component;
 	protected PriorityList<PointerInteractor> interactors = new PriorityList<PointerInteractor>();
 	
-	public Pointer(InputTable inputTable, PointerInputElement rootElement, DndController dndController, PresentationComponent component)
+	public Pointer(InputTable inputTable, PresentationComponent.RootElement rootElement, DndController dndController, PresentationComponent component)
 	{
 		this.inputTable = inputTable;
 		this.component = component;
@@ -50,6 +52,10 @@ public class Pointer extends PointerInterface
 		this.rootElement = rootElement;
 		
 		
+		PointerTargetInteractor targetInteractor = new PointerTargetInteractor();
+
+		
+		interactors.add( TARGET_CLICK_INTERACTOR_PRIORITY, targetInteractor.clickInteractor );
 		interactors.add( NAVIGATION_INTERACTOR_PRIORITY, new PointerNavigationInteractor() );
 		interactors.add( DND_INTERACTOR_PRIORITY, new PointerDndInteractor( rootElement, dndController ) );
 		interactors.add( CONTEXTMENU_INTERACTOR_PRIORITY, new PointerContextMenuInteractor() );
@@ -57,6 +63,7 @@ public class Pointer extends PointerInterface
 		interactors.add( CLICK_INTERACTOR_PRIORITY, new PointerClickInteractor() );
 		interactors.add( DRAG_INTERACTOR_PRIORITY, new PointerDragInteractor() );
 		interactors.add( MOTION_INTERACTOR_PRIORITY, new PointerMotionInteractor( rootElement ) );
+		interactors.add( TARGET_DRAG_INTERACTOR_PRIORITY, targetInteractor.dragInteractor );
 	}
 	
 	
@@ -107,6 +114,11 @@ public class Pointer extends PointerInterface
 	public PresentationComponent getComponent()
 	{
 		return component;
+	}
+
+	public PresentationComponent.RootElement getRootElement()
+	{
+		return rootElement;
 	}
 
 

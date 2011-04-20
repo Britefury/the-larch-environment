@@ -9,28 +9,36 @@ package BritefuryJ.DocPresent.Input.Keyboard;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
-import BritefuryJ.DocPresent.DPContentLeafEditable;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Input.Modifier;
 import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
 import BritefuryJ.DocPresent.Interactor.KeyElementInteractor;
-import BritefuryJ.DocPresent.Marker.Marker;
-import BritefuryJ.DocPresent.Selection.TextSelectionManager;
+import BritefuryJ.DocPresent.Selection.SelectionManager;
+import BritefuryJ.DocPresent.Target.Target;
 
-public class KeyboardCaretInteractor extends KeyboardInteractor
+public class KeyboardTargetInteractor extends KeyboardInteractor
 {
-	private Caret caret;
-	private TextSelectionManager selectionManager;
+	PresentationComponent.RootElement root;
 	
 	
 	
-	public KeyboardCaretInteractor(Caret caret, TextSelectionManager selectionManager)
+	public KeyboardTargetInteractor(PresentationComponent.RootElement rootElement)
 	{
-		this.caret = caret;
-		this.selectionManager = selectionManager;
+		root = rootElement;
 	}
 
+	
+	
+	private Target getTarget()
+	{
+		return root.getCaret();
+	}
+	
+	private SelectionManager getSelectionManager()
+	{
+		return root.getSelectionManager();
+	}
 
 
 
@@ -48,18 +56,15 @@ public class KeyboardCaretInteractor extends KeyboardInteractor
 			}
 			else
 			{
-				if ( caret.isValid() )
+				Target target = getTarget();
+				if ( target.isValid() )
 				{
 					if ( sendKeyPressEvent( event ) )
 					{
 						return true;
 					}
 					
-					DPContentLeafEditable leaf = caret.getElement();
-					if ( leaf.isEditable() )
-					{
-						leaf.onContentKeyPress( caret, event );
-					}
+					target.onContentKeyPress( event );
 					return true;
 				}
 				else
@@ -85,18 +90,15 @@ public class KeyboardCaretInteractor extends KeyboardInteractor
 			}
 			else
 			{
-				if ( caret.isValid() )
+				Target target = getTarget();
+				if ( target.isValid() )
 				{
 					if ( sendKeyReleaseEvent( event ) )
 					{
 						return true;
 					}
 
-					DPContentLeafEditable leaf = caret.getElement();
-					if ( leaf.isEditable() )
-					{
-						leaf.onContentKeyRelease( caret, event );
-					}
+					target.onContentKeyRelease( event );
 					return true;
 				}
 				else
@@ -127,18 +129,15 @@ public class KeyboardCaretInteractor extends KeyboardInteractor
 			}
 			else
 			{
-				if ( caret.isValid()  &&  !bCtrl  &&  !bAlt )
+				Target target = getTarget();
+				if ( target.isValid()  &&  !bCtrl  &&  !bAlt )
 				{
 					if ( sendKeyTypedEvent( event ) )
 					{
 						return true;
 					}
 
-					DPContentLeafEditable leaf = caret.getElement();
-					if ( leaf.isEditable() )
-					{
-						leaf.onContentKeyTyped( caret, event );
-					}
+					target.onContentKeyTyped( event );
 					return true;
 				}
 				else
@@ -153,44 +152,47 @@ public class KeyboardCaretInteractor extends KeyboardInteractor
 	
 	private boolean handleNavigationKeyPress(KeyEvent event)
 	{
-		int modifiers = getKeyModifiers( event );
 		if ( isNavigationKey( event ) )
 		{
-			if ( caret.isValid() )
+			Target target = getTarget();
+			if ( target.isValid() )
 			{
-				Marker prevPos = caret.getMarker().copy();
 				if ( event.getKeyCode() == KeyEvent.VK_LEFT )
 				{
-					caret.moveLeft();
+					target.moveLeft();
 				}
 				else if ( event.getKeyCode() == KeyEvent.VK_RIGHT )
 				{
-					caret.moveRight();
+					target.moveRight();
 				}
 				else if ( event.getKeyCode() == KeyEvent.VK_UP )
 				{
-					caret.moveUp();
+					target.moveUp();
 				}
 				else if ( event.getKeyCode() == KeyEvent.VK_DOWN )
 				{
-					caret.moveDown();
+					target.moveDown();
 				}
 				else if ( event.getKeyCode() == KeyEvent.VK_HOME )
 				{
-					caret.moveToHome();
+					target.moveToHome();
 				}
 				else if ( event.getKeyCode() == KeyEvent.VK_END )
 				{
-					caret.moveToEnd();
+					target.moveToEnd();
 				}
 				
-				if ( !caret.getMarker().equals( prevPos ) )
+				root.setTarget( target );
+				if ( ( getKeyModifiers( event ) & Modifier.SHIFT ) != 0 )
 				{
-					caret.makeCurrentTarget();
-					selectionManager.onCaretMove( caret, prevPos, ( modifiers & Modifier.SHIFT ) != 0 );
+					getSelectionManager().dragSelection( target.createSelectionPoint() );
+				}
+				else
+				{
+					getSelectionManager().moveSelection( target.createSelectionPoint() );
 				}
 				
-				caret.ensureVisible();
+				target.ensureVisible();
 			}
 			return true;
 		}
@@ -204,7 +206,8 @@ public class KeyboardCaretInteractor extends KeyboardInteractor
 	
 	private boolean sendKeyPressEvent(KeyEvent event)
 	{
-		DPElement element = caret.getElement();
+		Target target = getTarget();
+		DPElement element = target.getKeyboardInputElement();
 		while ( element != null )
 		{
 			if ( element.isRealised() )
@@ -231,7 +234,8 @@ public class KeyboardCaretInteractor extends KeyboardInteractor
 
 	private boolean sendKeyReleaseEvent(KeyEvent event)
 	{
-		DPElement element = caret.getElement();
+		Target target = getTarget();
+		DPElement element = target.getKeyboardInputElement();
 		while ( element != null )
 		{
 			if ( element.isRealised() )
@@ -258,7 +262,8 @@ public class KeyboardCaretInteractor extends KeyboardInteractor
 
 	private boolean sendKeyTypedEvent(KeyEvent event)
 	{
-		DPElement element = caret.getElement();
+		Target target = getTarget();
+		DPElement element = target.getKeyboardInputElement();
 		while ( element != null )
 		{
 			if ( element.isRealised() )

@@ -58,8 +58,8 @@ import BritefuryJ.DocPresent.LayoutTree.LayoutNodeRootElement;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
 import BritefuryJ.DocPresent.Selection.SelectionListener;
+import BritefuryJ.DocPresent.Selection.SelectionManager;
 import BritefuryJ.DocPresent.Selection.TextSelection;
-import BritefuryJ.DocPresent.Selection.TextSelectionManager;
 import BritefuryJ.DocPresent.Target.Target;
 import BritefuryJ.DocPresent.Target.TargetListener;
 import BritefuryJ.Logging.Log;
@@ -410,11 +410,10 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		private Caret caret;
 		private DPContentLeafEditable currentCaretLeaf = null;
-		private boolean bLastMousePressPositionedCaret = false;
 		
 		private Target target;
 		
-		private TextSelectionManager selectionManager;
+		private SelectionManager selectionManager;
 		private Selection selection;
 		
 		
@@ -468,9 +467,9 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			
 			target = null;
 			
-			selectionManager = new TextSelectionManager( this );
+			selectionManager = new SelectionManager( this );
 			
-			keyboard = new Keyboard( caret, selectionManager );
+			keyboard = new Keyboard( this );
 
 			bStructureRefreshQueued = false;
 		}
@@ -587,6 +586,11 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		public Selection getSelection()
 		{
 			return selection;
+		}
+		
+		public SelectionManager getSelectionManager()
+		{
+			return selectionManager;
 		}
 		
 		public void setSelection(Selection s)
@@ -972,34 +976,12 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		protected void mouseDownEvent(int button, Point2 windowPos, int buttonModifiers, int keyModifiers)
 		{
-			selectionManager.mouseSelectionReset();
-			
 			component.grabFocus();
 			rootSpaceMouse.setLocalPos( windowPos );
 			rootSpaceMouse.setButtonModifiers( buttonModifiers );
 			rootSpaceMouse.setKeyModifiers( keyModifiers );
-			int modifiers = rootSpaceMouse.getModifiers();
 			
-			boolean bHandled = rootSpaceMouse.buttonDown( windowPos, button );
-
-			bLastMousePressPositionedCaret = false;
-
-			if ( !bHandled  &&  button == 1  &&  ( modifiers & ( Modifier.ALT | Modifier.ALT_GRAPH | Modifier.CTRL | Modifier.SHIFT ) )  ==  0 )
-			{
-				Marker editableMarker = getEditableMarkerClosestToLocalPoint( windowPos );
-				if ( editableMarker != null )
-				{
-					caret.moveTo( editableMarker );
-					caret.makeCurrentTarget();
-					bLastMousePressPositionedCaret = true;
-				}
-
-				Marker selectableMarker = getSelectableMarkerClosestToLocalPoint( windowPos );
-				if ( selectableMarker != null )
-				{
-					selectionManager.mouseSelectionBegin( selectableMarker );
-				}
-			}
+			rootSpaceMouse.buttonDown( windowPos, button );
 
 			emitImmediateEvents();
 		}
@@ -1013,11 +995,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			
 			rootSpaceMouse.buttonUp( windowPos, button );
 
-			if ( button == 1 )
-			{
-				selectionManager.mouseSelectionReset();
-			}
-			
+
 			emitImmediateEvents();
 		}
 		
@@ -1027,41 +1005,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			rootSpaceMouse.setLocalPos( windowPos );
 			rootSpaceMouse.setButtonModifiers( buttonModifiers );
 			
-			int modifiers = rootSpaceMouse.getModifiers();
-			
-			boolean bHandled = false;
-			
-			if ( bLastMousePressPositionedCaret  &&  button == 1  &&  ( modifiers & ( Modifier.ALT | Modifier.ALT_GRAPH | Modifier.CTRL | Modifier.SHIFT ) )  ==  0 )
-			{
-				DPContentLeafEditable selectableLeaf = (DPContentLeafEditable)getSelectableLeafClosestToLocalPoint( windowPos );
-				if ( selectableLeaf != null )
-				{
-					DPElement elementToSelect = null;
-					
-					if ( clickCount == 2 )
-					{
-						elementToSelect = selectableLeaf;
-					}
-					else if ( clickCount >= 3 )
-					{
-						elementToSelect = selectableLeaf.getSegment();
-					}
-						
-					if ( elementToSelect != null )
-					{
-						caret.moveTo( elementToSelect.markerAtEnd() );
-						caret.makeCurrentTarget();
-						selectionManager.mouseSelectionReset();
-						selectionManager.selectElement( elementToSelect );
-						bHandled = true;
-					}
-				}
-			}
-
-			if ( !bHandled )
-			{
-				rootSpaceMouse.buttonClicked( windowPos, button, clickCount );
-			}
+			rootSpaceMouse.buttonClicked( windowPos, button, clickCount );
 		}
 
 
@@ -1082,22 +1026,6 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			rootSpaceMouse.setLocalPos( windowPos );
 			rootSpaceMouse.setButtonModifiers( buttonModifiers );
 			rootSpaceMouse.setKeyModifiers( keyModifiers );
-			
-			if ( selectionManager.isMouseDragInProgress() )
-			{
-				Marker editableMarker = getEditableMarkerClosestToLocalPoint( windowPos );
-				if ( editableMarker != null )
-				{
-					caret.moveTo( editableMarker );
-					caret.makeCurrentTarget();
-				}
-
-				Marker selectableMarker = getSelectableMarkerClosestToLocalPoint( windowPos );
-				if ( selectableMarker != null )
-				{
-					selectionManager.mouseSelectionDrag( selectableMarker );
-				}
-			}
 			
 			rootSpaceMouse.drag( windowPos, mouseEvent );
 

@@ -40,7 +40,7 @@ public class PointerDragInteractor extends AbstractPointerDragInteractor
 				Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( DragElementInteractor.class );
 				if ( interactors != null )
 				{
-					for (AbstractElementInteractor interactor: interactors )
+					for (AbstractElementInteractor interactor: interactors)
 					{
 						DragElementInteractor pressInt = (DragElementInteractor)interactor;
 						boolean bHandled = pressInt.dragBegin( element, elementSpaceEvent );

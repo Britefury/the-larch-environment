@@ -8,8 +8,7 @@ package BritefuryJ.DocPresent.Input.Keyboard;
 
 import java.awt.event.KeyEvent;
 
-import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.DocPresent.Selection.TextSelectionManager;
+import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.Utils.PriorityList;
 
 public class Keyboard
@@ -22,9 +21,9 @@ public class Keyboard
 
 
 
-	public Keyboard(Caret caret, TextSelectionManager selectionManager)
+	public Keyboard(PresentationComponent.RootElement rootElement)
 	{
-		interactors.add( CARET_INTERACTOR_PRIORITY, new KeyboardCaretInteractor( caret, selectionManager ) );
+		interactors.add( CARET_INTERACTOR_PRIORITY, new KeyboardTargetInteractor( rootElement ) );
 	}
 
 
