@@ -11,6 +11,8 @@ import sys
 import imp
 from copy import copy
 
+from Britefury import LoadBuiltins
+
 from BritefuryJ.Incremental import IncrementalOwner, IncrementalValueMonitor
 
 from GSymCore.Languages.Python25 import Python25
@@ -47,6 +49,7 @@ class Console (IncrementalOwner):
 		self._before = []
 		self._after = []
 		self._module = imp.new_module( name )
+		LoadBuiltins.loadBuiltins( self._module )
 		
 		
 	def getBlocks(self):

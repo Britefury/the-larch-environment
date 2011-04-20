@@ -5,7 +5,6 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
-import sys
-import os
 
-sys.path.append( os.path.join( os.getcwd(), 'bin' ) )
+def loadBuiltins(module):
+	exec 'from Britefury.builtins import *' in module.__dict__

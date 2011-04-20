@@ -15,6 +15,8 @@ from BritefuryJ.Cell import Cell
 from BritefuryJ.Pres import InnerFragment
 
 
+from Britefury import LoadBuiltins
+
 from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod, dmObjectNodeMethodDispatch
 
 from GSymCore.Languages.Python25 import Python25
@@ -86,6 +88,7 @@ class WorksheetView (NodeView):
 		
 	def _initModule(self):
 		self._module = imp.new_module( 'worksheet' )
+		LoadBuiltins.loadBuiltins( self._module )
 		
 		
 	def refreshResults(self):
