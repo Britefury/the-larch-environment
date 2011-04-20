@@ -13,6 +13,7 @@ import java.util.ListIterator;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.CommandHistory.CommandHistory;
+import BritefuryJ.DefaultPerspective.DefaultPerspective;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DocPresent.DPColumn;
 import BritefuryJ.DocPresent.DPElement;
@@ -139,12 +140,11 @@ public class IncrementalView extends IncrementalTree implements Presentable
 			}
 			catch (Throwable t)
 			{
-				AbstractPerspective genericPerspective = view.browserContext.getDefaultPerspective();
 				try
 				{
-					Pres exceptionView = genericPerspective.presentObject( t, fragmentView, inheritedState );
+					Pres exceptionView = DefaultPerspective.instance.presentObject( t, fragmentView, inheritedState );
 					fragment = new ErrorBox( "Presentation error - exception during presentation", exceptionView );
-					return fragment.present( new PresentationContext( fragmentView, genericPerspective, inheritedState ), style );
+					return fragment.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
 				}
 				catch (Exception e2)
 				{
@@ -153,7 +153,7 @@ public class IncrementalView extends IncrementalTree implements Presentable
 							exceptionStyle.applyTo( new StaticText( e2.toString() ) ).padX( 15.0, 0.0 ),
 							labelStyle.applyTo( new Label( "While trying to display exception:" ) ),
 							exceptionStyle.applyTo( new StaticText( t.toString() ) ).padX( 15.0, 0.0 )   } ) );
-					return fragment.present( new PresentationContext( fragmentView, genericPerspective, inheritedState ), style );
+					return fragment.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
 				}
 			}
 			
@@ -167,12 +167,11 @@ public class IncrementalView extends IncrementalTree implements Presentable
 			}
 			catch (Throwable t)
 			{
-				AbstractPerspective genericPerspective = view.browserContext.getDefaultPerspective();
 				try
 				{
-					Pres exceptionView = genericPerspective.presentObject( t, fragmentView, inheritedState );
+					Pres exceptionView = DefaultPerspective.instance.presentObject( t, fragmentView, inheritedState );
 					fragment = new ErrorBox( "Presentation realisation error - exception during presentation realisation", exceptionView );
-					return fragment.present( new PresentationContext( fragmentView, genericPerspective, inheritedState ), style );
+					return fragment.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
 				}
 				catch (Exception e2)
 				{
@@ -181,7 +180,7 @@ public class IncrementalView extends IncrementalTree implements Presentable
 							exceptionStyle.applyTo( new StaticText( e2.toString() ) ).padX( 15.0, 0.0 ),
 							labelStyle.applyTo( new Label( "While trying to display exception:" ) ),
 							exceptionStyle.applyTo( new StaticText( t.toString() ) ).padX( 15.0, 0.0 )   } ) );
-					return fragment.present( new PresentationContext( fragmentView, genericPerspective, inheritedState ), style );
+					return fragment.present( new PresentationContext( fragmentView, DefaultPerspective.instance, inheritedState ), style );
 				}
 			}
 			
@@ -281,7 +280,7 @@ public class IncrementalView extends IncrementalTree implements Presentable
 		AbstractPerspective perspective = subject.getPerspective();
 		if ( perspective == null )
 		{
-			perspective = browserContext.getDefaultPerspective();
+			perspective = DefaultPerspective.instance;
 		}
 		rootNodeResultFactory = makeNodeResultFactory( perspective, subject.getSubjectContext(), StyleValues.instance, SimpleAttributeTable.instance );
 		

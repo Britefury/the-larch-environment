@@ -10,6 +10,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.DefaultPerspective.DefaultPerspective;
 import BritefuryJ.DefaultPerspective.PrimitivePresenter;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DocPresent.DPElement;
@@ -358,7 +359,7 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 		AbstractPerspective perspective = subject.getPerspective();
 		if ( perspective == null )
 		{
-			perspective = getBrowserContext().getDefaultPerspective();
+			perspective = DefaultPerspective.instance;
 		}
 		DPElement e = presentInnerFragment( subject.getFocus(), perspective, subject.getSubjectContext(), style, inheritedState );
 		return perspectiveFragmentRegion( e, perspective );

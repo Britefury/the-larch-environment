@@ -14,9 +14,6 @@ import BritefuryJ.Pres.ApplyStyleSheet;
 
 public class StyleSheet extends AttributeTable
 {
-	public static StyleSheet instance = new StyleSheet();
-	
-	
 	protected StyleSheet()
 	{
 		super();
@@ -83,4 +80,8 @@ public class StyleSheet extends AttributeTable
 	{
 		return instance.withAttrs( valuesMap );
 	}
+
+
+
+	public static final StyleSheet instance = new StyleSheet();
 }

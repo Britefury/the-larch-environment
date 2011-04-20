@@ -21,11 +21,6 @@ import BritefuryJ.Utils.HashUtils;
 
 public class ObjectDndHandler extends DndHandler
 {
-	public static ObjectDndHandler instance = new ObjectDndHandler();
-	
-	
-	
-	
 	public static interface SourceDataFn
 	{
 		public Object createSourceData(PointerInputElement sourceElement, int aspect);
@@ -699,4 +694,8 @@ public class ObjectDndHandler extends DndHandler
 			return destForSuperClass;
 		}
 	}
+
+
+
+	public static final ObjectDndHandler instance = new ObjectDndHandler();
 }

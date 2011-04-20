@@ -163,9 +163,6 @@ public class SimpleAttributeTable implements Presentable
 	protected HashMap<DelAttribute, WeakReference<SimpleAttributeTable>> delDerivedAttributeTables = new HashMap<DelAttribute, WeakReference<SimpleAttributeTable>>();
 	
 	
-	public static SimpleAttributeTable instance = new SimpleAttributeTable();
-	
-	
 	protected SimpleAttributeTable()
 	{
 	}
@@ -386,4 +383,8 @@ public class SimpleAttributeTable implements Presentable
 	// We have to initialise this style sheet on request, otherwise we can end up with a circular class initialisation problem
 	private static final StyleSheet attrTableStyle = StyleSheet.instance.withAttr( Primitive.fontBold, true ).withAttr( Primitive.fontSize, 14 )
 			.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.5f ) ).withAttr( Primitive.tableColumnSpacing, 10.0 );
+
+
+
+	public static final SimpleAttributeTable instance = new SimpleAttributeTable();
 }

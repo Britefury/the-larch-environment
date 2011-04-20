@@ -4,7 +4,7 @@
 //##* version 2 can be found in the file named 'COPYING' that accompanies this
 //##* program. This source code is (C)copyright Geoffrey French 2008.
 //##************************
-package BritefuryJ.DefaultPerspective;
+package BritefuryJ.EditPerspective;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -12,9 +12,10 @@ import java.util.Arrays;
 import org.python.core.PyObject;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.DefaultPerspective.DefaultObjectPresenterRegistry;
+import BritefuryJ.DefaultPerspective.DefaultPerspective;
 import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.IncrementalView.FragmentView;
-import BritefuryJ.Inspect.InspectorPerspective;
 import BritefuryJ.ObjectPresentation.ObjectPresentationPerspective;
 import BritefuryJ.ObjectPresentation.ObjectPresenter;
 import BritefuryJ.ObjectPresentation.PyObjectPresenter;
@@ -22,12 +23,12 @@ import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Projection.AbstractPerspective;
 
-public class DefaultPerspective extends ObjectPresentationPerspective
+public class EditPerspective extends ObjectPresentationPerspective
 {
-	private DefaultPerspective(AbstractPerspective fallbackPerspective)
+	private EditPerspective(AbstractPerspective fallbackPerspective)
 	{
-		super( "__present__", fallbackPerspective );
-		DefaultObjectPresenterRegistry.instance.registerPerspective( this );
+		super( "__edit_present__", fallbackPerspective );
+		EditableObjectPresenterRegistry.instance.registerPerspective( this );
 	}
 
 	
@@ -35,10 +36,10 @@ public class DefaultPerspective extends ObjectPresentationPerspective
 	@Override
 	protected Pres presentWithJavaInterface(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 	{
-		if ( x instanceof Presentable )
+		if ( x instanceof EditPresentable )
 		{
-			Presentable p = (Presentable)x;
-			return p.present( fragment, inheritedState );
+			EditPresentable p = (EditPresentable)x;
+			return p.editPresent( fragment, inheritedState );
 		}
 		else
 		{
@@ -81,5 +82,5 @@ public class DefaultPerspective extends ObjectPresentationPerspective
 
 
 
-	public static final DefaultPerspective instance = new DefaultPerspective( InspectorPerspective.instance );
+	public static final EditPerspective instance = new EditPerspective( DefaultPerspective.instance );
 }
