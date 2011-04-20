@@ -81,7 +81,7 @@ public class IsolationBarrier <ValueType> implements Presentable
 	{
 		if ( isolationPicklerState != null )
 		{
-			return Py.newInteger( isolationPicklerState.isolatedValue( value ) + 1 );
+			return Py.newInteger( isolationPicklerState.isolatedValue( getValue() ) + 1 );
 		}
 		else
 		{
