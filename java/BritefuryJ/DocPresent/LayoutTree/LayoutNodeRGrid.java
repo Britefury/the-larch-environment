@@ -65,7 +65,7 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 		}
 		
 		columnBoxes = GridLayout.computeRequisitionX( layoutReqBox, childBoxes, bRowIsGridRow, numColumns, numRows, getColumnSpacing(), getRowSpacing() );
-
+		
 		// Copy the X-requisition to the child rows
 		for (int i = 0; i < leaves.length; i++)
 		{
@@ -190,9 +190,6 @@ public class LayoutNodeRGrid extends ArrangedSequenceLayoutNode
 			child.getLayoutNode().refreshAllocationY( prevAllocVs[i] );
 			i++;
 		}
-		
-		// Clear column and row requisition boxes, but not the allocation boxes - they are needed
-		columnBoxes = rowBoxes = null;
 	}
 	
 	

@@ -19,6 +19,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
@@ -34,6 +35,7 @@ import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.HiddenContent;
+import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class Browser
@@ -55,7 +57,7 @@ public class Browser
 	private JTextField locationField;
 	private JPanel panel;
 
-	private PresentationComponent presComponent;
+	private PresentationComponent presComponent, commandBar;
 	private ScrolledViewport.ScrolledViewportControl viewport;
 	private BrowserHistory history;
 	
@@ -67,7 +69,7 @@ public class Browser
 	
 	
 	
-	public Browser(PageLocationResolver resolver, Location location, PageController pageController)
+	public Browser(PageLocationResolver resolver, Location location, PageController pageController, boolean showCommandBar)
 	{
 		this.resolver = resolver;
 		history = new BrowserHistory( location );
@@ -86,6 +88,7 @@ public class Browser
 
 		toolbar = new JToolBar();
 		toolbar.setFloatable( false );
+		toolbar.setRollover( true );
 		initialiseToolbar( toolbar );
 		
 		
@@ -110,11 +113,30 @@ public class Browser
 		header.add( toolbar, BorderLayout.PAGE_START );
 		
 		
-		panel = new JPanel();
-		panel.setLayout( new BorderLayout() );
+		panel = new JPanel( new BorderLayout() );
 		panel.add( header, BorderLayout.PAGE_START );
 		panel.add( presComponent, BorderLayout.CENTER );
 
+		
+		
+		if ( showCommandBar )
+		{
+			commandBar = new PresentationComponent();
+			commandBar.setPageController( pageController );
+			commandBar.setChild( makeCommandElement() );
+			
+			JPanel commandPanel = new JPanel( new BorderLayout() );
+			commandPanel.add( commandBar, BorderLayout.CENTER );
+			commandPanel.setBorder( BorderFactory.createLineBorder( Color.black, 1 ) );
+			
+			JPanel footer = new JPanel( new BorderLayout( 5, 0 ) );
+			footer.add( new JLabel( "Cmd:" ), BorderLayout.WEST );
+			footer.add( commandPanel, BorderLayout.CENTER );
+			footer.setBorder( BorderFactory.createEmptyBorder( 2, 2, 2, 2 ) );
+			
+			
+			panel.add( footer, BorderLayout.PAGE_END );
+		}
 		
 		resolve();
 	}
@@ -242,6 +264,11 @@ public class Browser
 	private ScrolledViewport.ScrolledViewportControl makeViewport(Object child, PersistentState state)
 	{
 		return (ScrolledViewport.ScrolledViewportControl)new ScrolledViewport( child, 0.0, 0.0, state ).createControl( PresentationContext.defaultCtx, StyleValues.instance );
+	}
+	
+	private DPElement makeCommandElement()
+	{
+		return new Label( " " ).present( PresentationContext.defaultCtx, StyleValues.instance );
 	}
 	
 	
