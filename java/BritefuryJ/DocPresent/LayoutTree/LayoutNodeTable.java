@@ -154,9 +154,6 @@ public class LayoutNodeTable extends ArrangedLayoutNode
 			child.getLayoutNode().refreshAllocationY( prevAllocVs[i] );
 			i++;
 		}
-
-		// Clear column and row requisition boxes, but not the allocation boxes - they are needed
-		columnBoxes = rowBoxes = null;
 	}
 	
 

@@ -136,15 +136,6 @@ public class DPMathRoot extends DPContainer
 	
 	
 
-	protected void onRealise()
-	{
-		super.onRealise();
-		MathRootStyleParams s = (MathRootStyleParams) styleParams;
-		s.realise( rootElement );
-	}
-
-	
-	
 	public boolean isRedrawRequiredOnHover()
 	{
 		MathRootStyleParams s = (MathRootStyleParams)styleParams;

@@ -428,7 +428,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		protected PresentationComponent metaElementComponent;
 		
 			
-		protected PageController pageController;
+		protected PageController pageController = null;
 		
 		
 		private Log log;
@@ -797,43 +797,34 @@ public class PresentationComponent extends JComponent implements ComponentListen
 
 		
 		
-		private void performAllocationForSpaceRequirements()
-		{
-			if ( bAllocationRequired )
-			{
-				LayoutNodeRootElement rootLayout = (LayoutNodeRootElement)getLayoutNode();
-	
-				// Get X requisition
-				LReqBoxInterface reqX = rootLayout.refreshRequisitionX();
-				
-				// Allocate X
-				double prevWidth = rootLayout.getAllocationX();
-				rootLayout.allocateX( reqX, 0.0, windowSize.x );
-				rootLayout.refreshAllocationX( prevWidth );
-				
-				// Get Y requisition
-				LReqBoxInterface reqY = rootLayout.refreshRequisitionY();
-				
-				// Allocate Y
-				LAllocV prevAllocV = rootLayout.getAllocV();
-				//rootLayout.allocateY( reqY, 0.0, reqY.getReqHeight() );
-				rootLayout.allocateY( reqY, 0.0, windowSize.y );
-				rootLayout.refreshAllocationY( prevAllocV );
-			}
-		}
-		
 		private Dimension getMinimumSize()
 		{
-			performAllocationForSpaceRequirements();
-			LayoutNodeRootElement rootLayout = (LayoutNodeRootElement)getLayoutNode();
-			return new Dimension( (int)( rootLayout.getReqMinWidth() + 1.0 ),  (int)( rootLayout.getReqHeight() + 1.0 ) );
+			if ( isRealised() )
+			{
+				//performAllocationForSpaceRequirements();
+				performAllocation();
+				LayoutNodeRootElement rootLayout = (LayoutNodeRootElement)getLayoutNode();
+				return new Dimension( (int)( rootLayout.getReqMinWidth() + 1.0 ),  (int)( rootLayout.getReqHeight() + 1.0 ) );
+			}
+			else
+			{
+				return new Dimension( 1, 1 );
+			}
 		}
 		
 		private Dimension getPreferredSize()
 		{
-			performAllocationForSpaceRequirements();
-			LayoutNodeRootElement rootLayout = (LayoutNodeRootElement)getLayoutNode();
-			return new Dimension( (int)( rootLayout.getReqPrefWidth() + 1.0 ),  (int)( rootLayout.getReqHeight() + 1.0 ) );
+			if ( isRealised() )
+			{
+				//performAllocationForSpaceRequirements();
+				performAllocation();
+				LayoutNodeRootElement rootLayout = (LayoutNodeRootElement)getLayoutNode();
+				return new Dimension( (int)( rootLayout.getReqPrefWidth() + 1.0 ),  (int)( rootLayout.getReqHeight() + 1.0 ) );
+			}
+			else
+			{
+				return new Dimension( 1, 1 );
+			}
 		}
 		
 		private Dimension getMaximumSize()
@@ -1453,7 +1444,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	
 	
 	public RootElement rootElement;
-	private boolean bShown, bConfigured;
+	private boolean realised, bConfigured;
 	private PresentationPopup containingPopup = null;
 	
 	
@@ -1470,7 +1461,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		rootElement = new RootElement( this );
 		
-		bShown = false;
+		realised = false;
 		bConfigured = false;
 		
 		addComponentListener( this );
@@ -1581,47 +1572,44 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	
 	public Dimension getMinimumSize()
 	{
-		if ( isPopup() )
+		if ( isMinimumSizeSet() )
 		{
-			Dimension s = rootElement.getMinimumSize();
-			return s;
+			return super.getMinimumSize();
 		}
 		else
 		{
-			return super.getMinimumSize();
+			return rootElement.getMinimumSize();
 		}
 	}
 	
 	public Dimension getPreferredSize()
 	{
-		if ( isPopup() )
+		if ( isPreferredSizeSet() )
 		{
-			Dimension s = rootElement.getPreferredSize();
-			return s;
+			return super.getPreferredSize();
 		}
 		else
 		{
-			return super.getPreferredSize();
+			return rootElement.getPreferredSize();
 		}
 	}
 	
 	public Dimension getMaximumSize()
 	{
-		if ( isPopup() )
+		if ( isMaximumSizeSet() )
 		{
-			Dimension s = rootElement.getMaximumSize();
-			return s;
+			return super.getMaximumSize();
 		}
 		else
 		{
-			return super.getMaximumSize();
+			return rootElement.getMaximumSize();
 		}
 	}
 	
 	
 	private void notifyQueueReallocation()
 	{
-		if ( isPopup() )
+		if ( !isMinimumSizeSet()  ||  !isPreferredSizeSet()  ||  !isMaximumSizeSet()  ||  isPopup() )
 		{
 			revalidate();
 		}
@@ -1680,7 +1668,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 
 	public void componentHidden(ComponentEvent e)
 	{
-		sendRealiseEvents();
+		sendUnrealiseEvents();
 	}
 
 
@@ -1703,20 +1691,23 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	
 	private void sendRealiseEvents()
 	{
-		boolean bShownNow = isShowing();
-		if ( bShownNow != bShown )
+		if ( !realised )
 		{
-			if ( bShownNow )
-			{
-				initialise();
-				rootElement.realiseEvent();
-			}
-			else
-			{
-				rootElement.unrealiseEvent();
-			}
+			initialise();
+			rootElement.realiseEvent();
 			
-			bShown = bShownNow;
+			realised = true;
+		}
+	}
+
+	
+	private void sendUnrealiseEvents()
+	{
+		if ( realised )
+		{
+			rootElement.unrealiseEvent();
+			
+			realised = false;
 		}
 	}
 

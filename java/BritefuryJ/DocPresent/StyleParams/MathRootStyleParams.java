@@ -9,14 +9,10 @@ package BritefuryJ.DocPresent.StyleParams;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
-import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineMetrics;
 
-import javax.swing.JComponent;
-
-import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Painter.Painter;
 
 public class MathRootStyleParams extends ContainerStyleParams
@@ -30,7 +26,8 @@ public class MathRootStyleParams extends ContainerStyleParams
 	protected final double thickness;
 	
 	protected double glyphLineWidths[], glyphWidth, barSpacing;
-	protected boolean bRealised;
+	
+	protected boolean gotMetrics = false;
 
 
 	public MathRootStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, Font font, Paint symbolPaint, Paint hoverSymbolPaint, double thickness)
@@ -43,7 +40,6 @@ public class MathRootStyleParams extends ContainerStyleParams
 		this.thickness = thickness;
 		glyphLineWidths = new double[3];
 		this.barSpacing = 0.0;
-		bRealised = false;
 	}
 
 
@@ -64,43 +60,35 @@ public class MathRootStyleParams extends ContainerStyleParams
 
 	public double getThickness()
 	{
+		refreshMetrics();
 		return thickness;
 	}
 	
 	public double getBarSpacing()
 	{
+		refreshMetrics();
 		return barSpacing;
 	}
 	
 	public double getGlyphWidth()
 	{
+		refreshMetrics();
 		return glyphWidth;
 	}
 	
 	public double[] getGlyphLineWidths()
 	{
+		refreshMetrics();
 		return glyphLineWidths;
 	}
 
 	
 	
-	public void realise(PresentationComponent.RootElement a)
+	public void refreshMetrics()
 	{
-		realise( a.getComponent() );
-	}
-	
-	public void realise(JComponent component)
-	{
-		Graphics2D graphics = (Graphics2D)component.getGraphics();
-		realise( graphics );
-	}
-
-	
-	public void realise(Graphics2D graphics)
-	{
-		if ( !bRealised  &&  graphics != null )
+		if ( !gotMetrics )
 		{
-			FontRenderContext frc = graphics.getFontRenderContext();
+			FontRenderContext frc = new FontRenderContext( null, true, true );
 			LineMetrics metrics = font.getLineMetrics( " ", frc );
 			double height = metrics.getAscent() + metrics.getDescent();
 			
@@ -110,7 +98,7 @@ public class MathRootStyleParams extends ContainerStyleParams
 			glyphLineWidths[0] = glyphLineWidths[2] * 0.3;
 			glyphWidth = glyphLineWidths[0] + glyphLineWidths[1] + glyphLineWidths[2];
 			
-			bRealised = true;
+			gotMetrics = true;
 		}
 	}
 }

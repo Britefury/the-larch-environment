@@ -209,12 +209,15 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	private Browser currentBrowser;
 	private CommandHistoryListener commandHistoryListener;
 	
+	private boolean showCommandPanel;
 	
 	
-	public TabbedBrowser(PageLocationResolver resolver, TabbedBrowserListener listener, Location location)
+	
+	public TabbedBrowser(PageLocationResolver resolver, TabbedBrowserListener listener, Location location, boolean showCommandPanel)
 	{
 		this.resolver = resolver;
 		this.listener = listener;
+		this.showCommandPanel = showCommandPanel;
 		
 		browsers = new ArrayList<Browser>();
 
@@ -300,7 +303,7 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	
 	private Browser createBrowser(Location location)
 	{
-		Browser browser = new Browser( resolver, location, this );
+		Browser browser = new Browser( resolver, location, this, showCommandPanel );
 		browser.setListener( this );
 		return browser;
 	}
