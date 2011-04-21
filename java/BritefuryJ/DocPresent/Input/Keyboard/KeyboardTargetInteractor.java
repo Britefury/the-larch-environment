@@ -32,7 +32,7 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 	
 	private Target getTarget()
 	{
-		return root.getCaret();
+		return root.getTarget();
 	}
 	
 	private SelectionManager getSelectionManager()
@@ -64,8 +64,7 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 						return true;
 					}
 					
-					target.onContentKeyPress( event );
-					return true;
+					return target.onContentKeyPress( event );
 				}
 				else
 				{
@@ -98,8 +97,7 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 						return true;
 					}
 
-					target.onContentKeyRelease( event );
-					return true;
+					return target.onContentKeyRelease( event );
 				}
 				else
 				{
@@ -137,8 +135,7 @@ public class KeyboardTargetInteractor extends KeyboardInteractor
 						return true;
 					}
 
-					target.onContentKeyTyped( event );
-					return true;
+					return target.onContentKeyTyped( event );
 				}
 				else
 				{

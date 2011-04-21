@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent.LayoutTree;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.Util.TextVisual;
 
-public class LayoutNodeText extends ContentLeafLayoutNodeSharedReq
+public class LayoutNodeText extends EditableContentLeafLayoutNodeSharedReq
 {
 	public LayoutNodeText(DPText element)
 	{

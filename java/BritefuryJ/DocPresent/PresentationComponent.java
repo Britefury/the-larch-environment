@@ -18,6 +18,8 @@ import java.awt.Window;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.event.InputEvent;
@@ -68,7 +70,7 @@ import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
 
-public class PresentationComponent extends JComponent implements ComponentListener, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, HierarchyListener
+public class PresentationComponent extends JComponent implements ComponentListener, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, HierarchyListener, FocusListener
 {
 	public static class CannotGetGraphics2DException extends RuntimeException
 	{
@@ -397,6 +399,8 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		private Vector2 windowSize;
 		
+		private boolean hasComponentFocus = false;
+		
 		private Pointer rootSpaceMouse;
 		private Keyboard keyboard;
 		private InputTable inputTable;
@@ -417,7 +421,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		private Selection selection;
 		
 		
-		private boolean bStructureRefreshQueued;
+		private boolean caretMoveToStartQueued;
 		private DPElement ensureVisibilityElement;
 		
 		
@@ -471,7 +475,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			
 			keyboard = new Keyboard( this );
 
-			bStructureRefreshQueued = false;
+			caretMoveToStartQueued = false;
 		}
 		
 		
@@ -834,6 +838,28 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		
 		
 		
+		private void componentFocusGained()
+		{
+			hasComponentFocus = true;
+			Target target = getTarget();
+			if ( target == getCaret()  &&  !target.isValid() )
+			{
+				queueMoveCaretToStartOfDocument();
+			}
+			
+			queueFullRedraw();
+		}
+		
+		private void componentFocusLost()
+		{
+			hasComponentFocus = false;
+			queueFullRedraw();
+		}
+		
+		
+		
+		
+		
 		
 		//
 		// Hierarchy methods
@@ -852,35 +878,42 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		{
 			if ( !caret.isValid() )
 			{
-				if ( !bStructureRefreshQueued )
+				queueMoveCaretToStartOfDocument();
+			}
+
+			// Handle selections
+			if ( selection != null )
+			{
+				selection.onPresentationTreeStructureChanged();
+			}
+		}
+		
+		
+		
+		private void queueMoveCaretToStartOfDocument()
+		{
+			if ( !caretMoveToStartQueued )
+			{
+				final Runnable putCaretAtStart = new Runnable()
 				{
-					final Runnable putCaretAtStart = new Runnable()
+					public void run()
 					{
-						public void run()
+						if ( !caret.isValid() )
 						{
-							if ( !caret.isValid() )
+							DPContentLeafEditable leaf = getLayoutNode().getLeftEditableContentLeaf();
+							if ( leaf != null  &&  leaf.isRealised() )
 							{
-								DPContentLeafEditable leaf = getLayoutNode().getLeftEditableContentLeaf();
-								if ( leaf != null )
-								{
-									caret.moveTo( leaf.markerAtStart() );
-								}
+								caret.moveTo( leaf.markerAtStart() );
 							}
-							
-							bStructureRefreshQueued = false;
 						}
-					};
-				
-					bStructureRefreshQueued = true;
-					SwingUtilities.invokeLater( putCaretAtStart );
-					
-					
-					// Handle selections
-					if ( selection != null )
-					{
-						selection.onPresentationTreeStructureChanged();
+						
+						caretMoveToStartQueued = false;
 					}
-				}
+				};
+			
+				SwingUtilities.invokeLater( putCaretAtStart );
+				
+				caretMoveToStartQueued = true;
 			}
 		}
 
@@ -927,7 +960,10 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			drawSelection( graphics );
 			handleDraw( graphics, new AABox2( topLeftRootSpace, bottomRightRootSpace) );
 			//graphics.setTransform( transform );
-			drawTarget( graphics );
+			if ( hasComponentFocus )
+			{
+				drawTarget( graphics );
+			}
 			
 			// Emit any immediate events
 			emitImmediateEvents();
@@ -1225,6 +1261,11 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			return inputTable;
 		}
 		
+		public Keyboard getKeyboard()
+		{
+			return keyboard;
+		}
+		
 		public void elementUnrealised(DPElement element)
 		{
 			inputTable.onElementUnrealised( element );
@@ -1470,6 +1511,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		addMouseWheelListener( this );
 		addKeyListener( this );
 		addHierarchyListener( this );
+		addFocusListener( this );
 		
 		
 		setFocusable( true );
@@ -1669,6 +1711,17 @@ public class PresentationComponent extends JComponent implements ComponentListen
 	public void componentHidden(ComponentEvent e)
 	{
 		sendUnrealiseEvents();
+	}
+	
+	
+	public void focusGained(FocusEvent e)
+	{
+		rootElement.componentFocusGained();
+	}
+	
+	public void focusLost(FocusEvent e)
+	{
+		rootElement.componentFocusLost();
 	}
 
 

@@ -15,6 +15,11 @@ public class KeyboardInteractor
 		keyboard.addInteractor( this );
 	}
 	
+	public void addToKeyboard(Keyboard keyboard, int priority)
+	{
+		keyboard.addInteractor( priority, this );
+	}
+	
 	public void removeFromKeyboard(Keyboard keyboard)
 	{
 		keyboard.removeInteractor( this );
