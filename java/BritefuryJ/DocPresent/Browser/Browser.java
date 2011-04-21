@@ -12,6 +12,7 @@ import java.awt.Dimension;
 import java.awt.MediaTracker;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -31,11 +32,14 @@ import BritefuryJ.Controls.ScrolledViewport;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.PageController;
 import BritefuryJ.DocPresent.PresentationComponent;
+import BritefuryJ.DocPresent.Input.Keyboard.Keyboard;
+import BritefuryJ.DocPresent.Input.Keyboard.KeyboardInteractor;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
+import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.HiddenContent;
-import BritefuryJ.Pres.Primitive.Label;
+import BritefuryJ.Pres.Primitive.Text;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class Browser
@@ -123,7 +127,7 @@ public class Browser
 		{
 			commandBar = new PresentationComponent();
 			commandBar.setPageController( pageController );
-			commandBar.setChild( makeCommandElement() );
+			commandBar.setChild( makeCommandElement( new Text( "" ) ) );
 			
 			JPanel commandPanel = new JPanel( new BorderLayout() );
 			commandPanel.add( commandBar, BorderLayout.CENTER );
@@ -136,6 +140,71 @@ public class Browser
 			
 			
 			panel.add( footer, BorderLayout.PAGE_END );
+			
+			
+			KeyboardInteractor presComponentSwitchInteractor = new KeyboardInteractor()
+			{
+				@Override
+				public boolean keyPressed(Keyboard keyboard, KeyEvent event)
+				{
+					if ( event.getKeyCode() == KeyEvent.VK_ESCAPE )
+					{
+						return true;
+					}
+					return false;
+				}
+
+				@Override
+				public boolean keyReleased(Keyboard keyboard, KeyEvent event)
+				{
+					if ( event.getKeyCode() == KeyEvent.VK_ESCAPE )
+					{
+						commandBar.grabFocus();
+						return true;
+					}
+					return false;
+				}
+
+				@Override
+				public boolean keyTyped(Keyboard keyboard, KeyEvent event)
+				{
+					return false;
+				}
+			};
+			presComponentSwitchInteractor.addToKeyboard( presComponent.getRootElement().getKeyboard() );
+		
+		
+			KeyboardInteractor commandBarSwitchInteractor = new KeyboardInteractor()
+			{
+				@Override
+				public boolean keyPressed(Keyboard keyboard, KeyEvent event)
+				{
+					if ( event.getKeyCode() == KeyEvent.VK_ESCAPE )
+					{
+						return true;
+					}
+					return false;
+				}
+
+				@Override
+				public boolean keyReleased(Keyboard keyboard, KeyEvent event)
+				{
+					if ( event.getKeyCode() == KeyEvent.VK_ESCAPE )
+					{
+						presComponent.grabFocus();
+						return true;
+					}
+					return false;
+				}
+
+				@Override
+				public boolean keyTyped(Keyboard keyboard, KeyEvent event)
+				{
+					return false;
+				}
+			};
+			commandBarSwitchInteractor.addToKeyboard( commandBar.getRootElement().getKeyboard() );
+
 		}
 		
 		resolve();
@@ -263,12 +332,15 @@ public class Browser
 	
 	private ScrolledViewport.ScrolledViewportControl makeViewport(Object child, PersistentState state)
 	{
-		return (ScrolledViewport.ScrolledViewportControl)new ScrolledViewport( child, 0.0, 0.0, state ).createControl( PresentationContext.defaultCtx, StyleValues.instance );
+		Pres childPres = Pres.coerce( child );
+		ScrolledViewport vp = new ScrolledViewport( childPres, 0.0, 0.0, state );
+		return (ScrolledViewport.ScrolledViewportControl)vp.createControl( PresentationContext.defaultCtx, StyleValues.instance );
 	}
 	
-	private DPElement makeCommandElement()
+	private DPElement makeCommandElement(Object child)
 	{
-		return new Label( " " ).present( PresentationContext.defaultCtx, StyleValues.instance );
+		Pres childPres = Pres.coerce( child );
+		return childPres.present();
 	}
 	
 	

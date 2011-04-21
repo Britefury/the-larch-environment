@@ -13,7 +13,7 @@ import BritefuryJ.Utils.PriorityList;
 
 public class Keyboard
 {
-	private static int CARET_INTERACTOR_PRIORITY = 100;
+	private static int TARGET_INTERACTOR_PRIORITY = -100;
 
 	
 	
@@ -23,7 +23,7 @@ public class Keyboard
 
 	public Keyboard(PresentationComponent.RootElement rootElement)
 	{
-		interactors.add( CARET_INTERACTOR_PRIORITY, new KeyboardTargetInteractor( rootElement ) );
+		interactors.add( TARGET_INTERACTOR_PRIORITY, new KeyboardTargetInteractor( rootElement ) );
 	}
 
 

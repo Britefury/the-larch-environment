@@ -20,7 +20,7 @@ import BritefuryJ.Math.Point2;
 
 public class LayoutNodeFraction extends ArrangedLayoutNode
 {
-	public static class LayoutNodeFractionBar extends ContentLeafLayoutNode
+	public static class LayoutNodeFractionBar extends EditableContentLeafLayoutNode
 	{
 		public static double BAR_HEIGHT = 1.5;
 		
