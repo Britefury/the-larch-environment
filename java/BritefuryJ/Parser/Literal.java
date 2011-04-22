@@ -59,7 +59,7 @@ public class Literal extends TerminalString
 
 
 
-	public boolean compareTo(ParserExpression x)
+	public boolean isEquivalentTo(ParserExpression x)
 	{
 		if ( x instanceof Literal )
 		{

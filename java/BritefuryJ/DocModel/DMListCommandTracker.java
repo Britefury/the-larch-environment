@@ -10,12 +10,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import BritefuryJ.CommandHistory.Command;
-import BritefuryJ.CommandHistory.CommandHistory;
+import BritefuryJ.ChangeHistory.Change;
+import BritefuryJ.ChangeHistory.ChangeHistory;
 
 class DMListCommandTracker
 {
-	private static class AddCommand extends Command
+	private static class AddCommand extends Change
 	{
 		private DMList xls;
 		private Object x;
@@ -45,7 +45,7 @@ class DMListCommandTracker
 
 	
 	
-	private static class InsertCommand extends Command
+	private static class InsertCommand extends Change
 	{
 		private DMList ls;
 		private int i;
@@ -77,7 +77,7 @@ class DMListCommandTracker
 
 	
 	
-	private static class AddAllCommand extends Command
+	private static class AddAllCommand extends Change
 	{
 		private DMList ls;
 		private List<Object> x;
@@ -107,7 +107,7 @@ class DMListCommandTracker
 
 	
 	
-	private static class InsertAllCommand extends Command
+	private static class InsertAllCommand extends Change
 	{
 		private DMList ls;
 		private int i;
@@ -139,7 +139,7 @@ class DMListCommandTracker
 
 	
 	
-	private static class ClearCommand extends Command
+	private static class ClearCommand extends Change
 	{
 		private DMList ls;
 		private ArrayList<Object> contents;
@@ -168,7 +168,7 @@ class DMListCommandTracker
 	}
 
 	
-	private static class RemoveCommand extends Command
+	private static class RemoveCommand extends Change
 	{
 		private DMList ls;
 		private int i;
@@ -200,7 +200,7 @@ class DMListCommandTracker
 
 
 	
-	private static class SetCommand extends Command
+	private static class SetCommand extends Change
 	{
 		private DMList ls;
 		private int i;
@@ -233,7 +233,7 @@ class DMListCommandTracker
 
 	
 	
-	private static class SetContentsCommand extends Command
+	private static class SetContentsCommand extends Change
 	{
 		private DMList ls;
 		private Object[] oldContents;
@@ -263,7 +263,7 @@ class DMListCommandTracker
 		}
 	}
 
-	private static class RemoveLastCommand extends Command
+	private static class RemoveLastCommand extends Change
 	{
 		private DMList ls;
 		private Object removedValues[];
@@ -291,7 +291,7 @@ class DMListCommandTracker
 		}
 	}
 
-	private static class RemoveRangeCommand extends Command
+	private static class RemoveRangeCommand extends Change
 	{
 		private DMList ls;
 		private int pos;
@@ -325,116 +325,116 @@ class DMListCommandTracker
 	
 	
 	
-	protected static void onAdd(CommandHistory commandHistory, DMList ls, Object x)
+	protected static void onAdd(ChangeHistory changeHistory, DMList ls, Object x)
 	{
-		if ( commandHistory != null )
+		if ( changeHistory != null )
 		{
-			commandHistory.addCommand( new AddCommand( ls, x ) );
-			commandHistory.track( x );
+			changeHistory.addChange( new AddCommand( ls, x ) );
+			changeHistory.track( x );
 		}
 	}
 
-	protected static void onInsert(CommandHistory commandHistory, DMList ls, int i, Object x)
+	protected static void onInsert(ChangeHistory changeHistory, DMList ls, int i, Object x)
 	{
-		if ( commandHistory != null )
+		if ( changeHistory != null )
 		{
-			commandHistory.addCommand( new InsertCommand( ls, i, x ) );
-			commandHistory.track( x );
+			changeHistory.addChange( new InsertCommand( ls, i, x ) );
+			changeHistory.track( x );
 		}
 	}
 
-	protected static void onAddAll(CommandHistory commandHistory, DMList ls, List<Object> xs)
+	protected static void onAddAll(ChangeHistory changeHistory, DMList ls, List<Object> xs)
 	{
-		if ( commandHistory != null )
+		if ( changeHistory != null )
 		{
-			commandHistory.addCommand( new AddAllCommand( ls, xs ) );
+			changeHistory.addChange( new AddAllCommand( ls, xs ) );
 			for (Object x: xs)
 			{
-				commandHistory.track( x );
+				changeHistory.track( x );
 			}
 		}
 	}
 
-	protected static void onInsertAll(CommandHistory commandHistory, DMList ls, int i, List<Object> xs)
+	protected static void onInsertAll(ChangeHistory changeHistory, DMList ls, int i, List<Object> xs)
 	{
-		if ( commandHistory != null )
+		if ( changeHistory != null )
 		{
-			commandHistory.addCommand( new InsertAllCommand( ls, i, xs ) );
+			changeHistory.addChange( new InsertAllCommand( ls, i, xs ) );
 			for (Object x: xs)
 			{
-				commandHistory.track( x );
+				changeHistory.track( x );
 			}
 		}
 	}
 
-	protected static void onClear(CommandHistory commandHistory, DMList ls, ArrayList<Object> contents)
+	protected static void onClear(ChangeHistory changeHistory, DMList ls, ArrayList<Object> contents)
 	{
-		if ( commandHistory != null )
+		if ( changeHistory != null )
 		{
 			for (Object x: contents)
 			{
-				commandHistory.stopTracking( x );
+				changeHistory.stopTracking( x );
 			}
-			commandHistory.addCommand( new ClearCommand( ls, contents ) );
+			changeHistory.addChange( new ClearCommand( ls, contents ) );
 		}
 	}
 
-	protected static void onRemove(CommandHistory commandHistory, DMList ls, int i, Object x)
+	protected static void onRemove(ChangeHistory changeHistory, DMList ls, int i, Object x)
 	{
-		if ( commandHistory != null )
+		if ( changeHistory != null )
 		{
-			commandHistory.stopTracking( x );
-			commandHistory.addCommand( new RemoveCommand( ls, i, x ) );
+			changeHistory.stopTracking( x );
+			changeHistory.addChange( new RemoveCommand( ls, i, x ) );
 		}
 	}
 
-	protected static void onSet(CommandHistory commandHistory, DMList ls, int i, Object oldX, Object x)
+	protected static void onSet(ChangeHistory changeHistory, DMList ls, int i, Object oldX, Object x)
 	{
-		if ( commandHistory != null )
+		if ( changeHistory != null )
 		{
-			commandHistory.stopTracking( oldX );
-			commandHistory.addCommand( new SetCommand( ls, i, oldX, x ) );
-			commandHistory.track( x );
+			changeHistory.stopTracking( oldX );
+			changeHistory.addChange( new SetCommand( ls, i, oldX, x ) );
+			changeHistory.track( x );
 		}
 	}
 
-	protected static void onSetContents(CommandHistory commandHistory, DMList ls, Object[] oldContents, Object[] newContents)
+	protected static void onSetContents(ChangeHistory changeHistory, DMList ls, Object[] oldContents, Object[] newContents)
 	{
-		if ( commandHistory != null )
+		if ( changeHistory != null )
 		{
 			for (Object oldX: oldContents)
 			{
-				commandHistory.stopTracking( oldX );
+				changeHistory.stopTracking( oldX );
 			}
-			commandHistory.addCommand( new SetContentsCommand( ls, oldContents, newContents ) );
+			changeHistory.addChange( new SetContentsCommand( ls, oldContents, newContents ) );
 			for (Object x: newContents)
 			{
-				commandHistory.track( x );
+				changeHistory.track( x );
 			}
 		}
 	}
 
-	protected static void onRemoveLast(CommandHistory commandHistory, DMList ls, Object[] removedValues)
+	protected static void onRemoveLast(ChangeHistory changeHistory, DMList ls, Object[] removedValues)
 	{
-		if ( commandHistory != null )
+		if ( changeHistory != null )
 		{
 			for (Object x: removedValues)
 			{
-				commandHistory.stopTracking( x );
+				changeHistory.stopTracking( x );
 			}
-			commandHistory.addCommand( new RemoveLastCommand( ls, removedValues ) );
+			changeHistory.addChange( new RemoveLastCommand( ls, removedValues ) );
 		}
 	}
 
-	protected static void onRemoveRange(CommandHistory commandHistory, DMList ls, int pos, Object[] removedValues)
+	protected static void onRemoveRange(ChangeHistory changeHistory, DMList ls, int pos, Object[] removedValues)
 	{
-		if ( commandHistory != null )
+		if ( changeHistory != null )
 		{
 			for (Object x: removedValues)
 			{
-				commandHistory.stopTracking( x );
+				changeHistory.stopTracking( x );
 			}
-			commandHistory.addCommand( new RemoveRangeCommand( ls, pos, removedValues ) );
+			changeHistory.addChange( new RemoveRangeCommand( ls, pos, removedValues ) );
 		}
 	}
 }

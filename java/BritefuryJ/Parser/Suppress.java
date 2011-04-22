@@ -52,11 +52,11 @@ public class Suppress extends UnaryBranchExpression
 	}
 
 
-	public boolean compareTo(ParserExpression x)
+	public boolean isEquivalentTo(ParserExpression x)
 	{
 		if ( x instanceof Suppress )
 		{
-			return super.compareTo( x );
+			return super.isEquivalentTo( x );
 		}
 		else
 		{

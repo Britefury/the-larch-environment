@@ -3,7 +3,7 @@
 ##-* under the terms of the GNU General Public License version 2 as published by the
 ##-* Free Software Foundation. The full text of the GNU General Public License
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
-##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
+##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
 from java.awt import Color
 
@@ -236,8 +236,8 @@ class WorksheetViewerSubject (Subject):
 	def getSubjectContext(self):
 		return self._enclosingSubject.getSubjectContext().withAttrs( location=self._location, editLocation=Location( self._editLocation ), viewLocation=Location( self._location ) )
 	
-	def getCommandHistory(self):
-		return self._document.getCommandHistory()
+	def getChangeHistory(self):
+		return self._document.getChangeHistory()
 	
 	def createModuleLoader(self, document):
 		return _WorksheetModuleLoader( self._model, document )

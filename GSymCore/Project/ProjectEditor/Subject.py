@@ -3,7 +3,7 @@
 ##-* under the terms of the GNU General Public License version 2 as published by the
 ##-* Free Software Foundation. The full text of the GNU General Public License
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
-##-* program. This source code is (C)copyright Geoffrey French 1999-2010.
+##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
 from BritefuryJ.DocPresent.Browser import Location
 
@@ -62,8 +62,8 @@ class ProjectSubject (Subject):
 	def getSubjectContext(self):
 		return self._enclosingSubject.getSubjectContext().withAttrs( document=self._document, docLocation=Location( self._location ), location=Location( self._location ) )
 
-	def getCommandHistory(self):
-		return self._document.getCommandHistory()
+	def getChangeHistory(self):
+		return self._document.getChangeHistory()
 
 
 

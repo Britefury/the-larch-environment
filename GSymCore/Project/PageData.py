@@ -15,7 +15,7 @@ from javax.swing.filechooser import FileNameExtensionFilter
 
 
 from BritefuryJ.Controls import *
-from BritefuryJ.CommandHistory import Trackable
+from BritefuryJ.ChangeHistory import Trackable
 
 from Britefury.Kernel.Abstract import abstractmethod
 
@@ -25,7 +25,7 @@ from GSymCore.Project.ProjectPage import ProjectPage
 
 class PageData (Trackable):
 	def __init__(self, contents=None):
-		self._commandHistory = None
+		self._changeHistory = None
 		if contents is None:
 			self.contents = self.makeEmptyContents()
 		else:
@@ -50,7 +50,7 @@ class PageData (Trackable):
 		return { 'contents' : self.contents }
 
 	def __setstate__(self, state):
-		self._commandHistory = None
+		self._changeHistory = None
 		self.contents = state['contents']
 	
 	def __copy__(self):
@@ -62,11 +62,11 @@ class PageData (Trackable):
 		return T( deepcopy( self.contents, memo ) )
 	
 	
-	def getCommandHistory(self):
-		return self._commandHistory
+	def getChangeHistory(self):
+		return self._changeHistory
 	
-	def setCommandHistory(self, history):
-		self._commandHistory = history
+	def setChangeHistory(self, history):
+		self._changeHistory = history
 	
 	def trackContents(self, history):
 		history.track( self.contents )

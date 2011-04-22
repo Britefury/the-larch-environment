@@ -7,7 +7,7 @@
 ##-*************************
 from copy import deepcopy
 
-from BritefuryJ.CommandHistory import Trackable
+from BritefuryJ.ChangeHistory import Trackable
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
 from GSymCore.Project.ProjectNode import ProjectNode
@@ -47,8 +47,8 @@ class ProjectPage (ProjectNode):
 		oldName = self._name
 		self._name = name
 		self._incr.onChanged()
-		if self._commandHistory is not None:
-			self._commandHistory.addCommand( lambda: self.setName( name ), lambda: self.setName( oldName ), 'Page set name' )
+		if self._changeHistory is not None:
+			self._changeHistory.addChange( lambda: self.setName( name ), lambda: self.setName( oldName ), 'Page set name' )
 		
 		
 	def getData(self):

@@ -3,7 +3,7 @@
 ##-* under the terms of the GNU General Public License version 2 as published by the
 ##-* Free Software Foundation. The full text of the GNU General Public License
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
-##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
+##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
 import os
 import sys
@@ -13,7 +13,7 @@ import imp
 
 from datetime import datetime
 
-from BritefuryJ.CommandHistory import CommandHistory, CommandHistoryListener
+from BritefuryJ.ChangeHistory import ChangeHistory, ChangeHistoryListener
 
 from BritefuryJ.Isolation import IsolationPickle
 
@@ -23,14 +23,14 @@ from Britefury.gSym.gSymWorld import GSymWorld
 
 
 
-class GSymDocument (CommandHistoryListener):
+class GSymDocument (ChangeHistoryListener):
 	def __init__(self, world, contents):
 		self._world = world
 		self._contents = contents
 		
-		self._commandHistory = CommandHistory()
-		self._commandHistory.track( self._contents )
-		self._commandHistory.setCommandHistoryListener( self )
+		self._changeHistory = ChangeHistory()
+		self._changeHistory.track( self._contents )
+		self._changeHistory.setChangeHistoryListener( self )
 		
 		self._docName = ''
 		self._location = None
@@ -39,7 +39,7 @@ class GSymDocument (CommandHistoryListener):
 		self._filename = None
 		self._saveTime = None
 	
-		self._commandHistoryListener = None
+		self._changeHistoryListener = None
 		self._unsavedDataListener = None
 		
 		self._documentModules = {}
@@ -80,13 +80,13 @@ class GSymDocument (CommandHistoryListener):
 		return self._location + relativeLocation
 	
 		
-	def getCommandHistory(self):
-		return self._commandHistory
+	def getChangeHistory(self):
+		return self._changeHistory
 
 		
 	
-	def setCommandHistoryListener(self, listener):
-		self._commandHistoryListener = listener
+	def setChangeHistoryListener(self, listener):
+		self._changeHistoryListener = listener
 		
 
 	def setUnsavedDataListener(self, listener):
@@ -178,13 +178,13 @@ class GSymDocument (CommandHistoryListener):
 		
 			
 			
-	def onCommandHistoryChanged(self, history):
+	def onChangeHistoryChanged(self, history):
 		if not self._bHasUnsavedData:
 			self._bHasUnsavedData = True
 			if self._unsavedDataListener is not None:
 				self._unsavedDataListener( self )
-		if self._commandHistoryListener is not None:
-			self._commandHistoryListener.onCommandHistoryChanged( history )
+		if self._changeHistoryListener is not None:
+			self._changeHistoryListener.onChangeHistoryChanged( history )
 
 
 

@@ -120,7 +120,7 @@ public class Production extends ParserExpression
 
 	
 	
-	public boolean compareTo(ParserExpression x)
+	public boolean isEquivalentTo(ParserExpression x)
 	{
 		if ( x instanceof Production )
 		{
@@ -131,7 +131,7 @@ public class Production extends ParserExpression
 			}
 			else if ( subexp != null  &&  px.subexp != null )
 			{
-				return subexp.compareTo( px.subexp ); 
+				return subexp.isEquivalentTo( px.subexp ); 
 			}
 		}
 

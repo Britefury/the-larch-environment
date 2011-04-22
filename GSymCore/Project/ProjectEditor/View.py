@@ -3,7 +3,7 @@
 ##-* under the terms of the GNU General Public License version 2 as published by the
 ##-* Free Software Foundation. The full text of the GNU General Public License
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
-##-* program. This source code is (C)copyright Geoffrey French 1999-2010.
+##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
 import copy
 
@@ -98,8 +98,8 @@ def _isChildOf(node, package):
 
 
 def _performDrop(data, action, newParent, index):
-	commandHistory = newParent.getCommandHistory()
-	commandHistory.freeze()
+	changeHistory = newParent.getChangeHistory()
+	changeHistory.freeze()
 	source = copy.deepcopy( data.source )   if action == ObjectDndHandler.COPY   else data.source
 
 	if action == ObjectDndHandler.MOVE:
@@ -113,7 +113,7 @@ def _performDrop(data, action, newParent, index):
 		newParent.append( source )
 	else:
 		newParent.insert( index, source )
-	commandHistory.thaw()
+	changeHistory.thaw()
 
 
 

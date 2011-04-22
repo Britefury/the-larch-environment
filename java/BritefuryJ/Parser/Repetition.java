@@ -241,12 +241,12 @@ public class Repetition extends UnaryBranchExpression
 	
 	
 	
-	public boolean compareTo(ParserExpression x)
+	public boolean isEquivalentTo(ParserExpression x)
 	{
 		if ( x instanceof Repetition )
 		{
 			Repetition rx = (Repetition)x;
-			return super.compareTo( x )  &&  minRepetitions == rx.minRepetitions  &&  maxRepetitions == rx.maxRepetitions  &&  bNullIfZero == rx.bNullIfZero;  
+			return super.isEquivalentTo( x )  &&  minRepetitions == rx.minRepetitions  &&  maxRepetitions == rx.maxRepetitions  &&  bNullIfZero == rx.bNullIfZero;  
 		}
 		else
 		{

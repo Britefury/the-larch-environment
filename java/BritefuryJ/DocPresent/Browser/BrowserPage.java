@@ -6,8 +6,8 @@
 //##************************
 package BritefuryJ.DocPresent.Browser;
 
-import BritefuryJ.CommandHistory.CommandHistoryController;
-import BritefuryJ.CommandHistory.CommandHistoryListener;
+import BritefuryJ.ChangeHistory.ChangeHistoryController;
+import BritefuryJ.ChangeHistory.ChangeHistoryListener;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 
@@ -16,12 +16,12 @@ public abstract class BrowserPage
 	public abstract String getTitle();
 	public abstract DPElement getContentsElement();
 	
-	public CommandHistoryController getCommandHistoryController()
+	public ChangeHistoryController getChangeHistoryController()
 	{
 		return null;
 	}
 	
-	public void setCommandHistoryListener(CommandHistoryListener listener)
+	public void setChangeHistoryListener(ChangeHistoryListener listener)
 	{
 	}
 	

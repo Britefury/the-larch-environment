@@ -6,9 +6,9 @@
 //##************************
 package BritefuryJ.IncrementalView;
 
-import BritefuryJ.CommandHistory.CommandHistory;
-import BritefuryJ.CommandHistory.CommandHistoryController;
-import BritefuryJ.CommandHistory.CommandHistoryListener;
+import BritefuryJ.ChangeHistory.ChangeHistory;
+import BritefuryJ.ChangeHistory.ChangeHistoryController;
+import BritefuryJ.ChangeHistory.ChangeHistoryListener;
 import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.PageController;
@@ -29,16 +29,16 @@ public class IncrementalViewPage extends BrowserPage
 	private DPElement pageElement;
 	private String title;
 	private Log log;
-	private CommandHistory commandHistory;
+	private ChangeHistory changeHistory;
 	private IncrementalView view;
 	
 	
 	
-	public IncrementalViewPage(DPElement element, String title, final ProjectiveBrowserContext browserContext, CommandHistory commandHistory, IncrementalView view)
+	public IncrementalViewPage(DPElement element, String title, final ProjectiveBrowserContext browserContext, ChangeHistory changeHistory, IncrementalView view)
 	{
 		this.element = element;
 		this.title = title;
-		this.commandHistory = commandHistory;
+		this.changeHistory = changeHistory;
 		this.view = view;
 		log = new Log( "Page log" );
 		
@@ -77,16 +77,16 @@ public class IncrementalViewPage extends BrowserPage
 	}
 
 	
-	public CommandHistoryController getCommandHistoryController()
+	public ChangeHistoryController getChangeHistoryController()
 	{
-		return commandHistory;
+		return changeHistory;
 	}
 	
-	public void setCommandHistoryListener(CommandHistoryListener listener)
+	public void setChangeHistoryListener(ChangeHistoryListener listener)
 	{
-		if ( commandHistory != null )
+		if ( changeHistory != null )
 		{
-			commandHistory.setCommandHistoryListener( listener );
+			changeHistory.setChangeHistoryListener( listener );
 		}
 	}
 

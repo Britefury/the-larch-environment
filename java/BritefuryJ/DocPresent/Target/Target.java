@@ -22,6 +22,8 @@ public abstract class Target
 	public abstract void draw(Graphics2D graphics);
 	
 	
+	public abstract DPElement getElement();
+	
 	public DPElement getKeyboardInputElement()
 	{
 		return null;

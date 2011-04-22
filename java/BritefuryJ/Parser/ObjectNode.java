@@ -321,7 +321,7 @@ public class ObjectNode extends ParserExpression
 	}
 
 
-	public boolean compareTo(ParserExpression x)
+	public boolean isEquivalentTo(ParserExpression x)
 	{
 		if ( x instanceof ObjectNode )
 		{
@@ -334,7 +334,7 @@ public class ObjectNode extends ParserExpression
 			
 			for (int i = 0; i < fieldExps.length; i++)
 			{
-				if ( !fieldNames[i].equals( xo.fieldNames[i] )  ||  !fieldExps[i].compareTo( xo.fieldExps[i] ) )
+				if ( !fieldNames[i].equals( xo.fieldNames[i] )  ||  !fieldExps[i].isEquivalentTo( xo.fieldExps[i] ) )
 				{
 					return false;
 				}

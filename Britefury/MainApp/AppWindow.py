@@ -3,7 +3,7 @@
 ##-* under the terms of the GNU General Public License version 2 as published by the
 ##-* Free Software Foundation. The full text of the GNU General Public License
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
-##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
+##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
 import sys
 import os
@@ -19,7 +19,7 @@ from java.awt.event import WindowListener, ActionListener, ActionEvent, KeyEvent
 from java.beans import PropertyChangeListener
 
 
-from BritefuryJ.CommandHistory import CommandHistory, CommandHistoryListener
+from BritefuryJ.ChangeHistory import ChangeHistory, ChangeHistoryListener
 
 from BritefuryJ.Cell import CellInterface
 from BritefuryJ.Utils.Profile import ProfileTimer
@@ -89,11 +89,11 @@ class AppWindow (object):
 		self._browser.getComponent().setPreferredSize( Dimension( 800, 600 ) )
 
 		
-		class _CommandHistoryListener (CommandHistoryListener):
-			def onCommandHistoryChanged(_self, history):
-				self._onCommandHistoryChanged( history )
+		class _ChangeHistoryListener (ChangeHistoryListener):
+			def onChangeHistoryChanged(_self, history):
+				self._onChangeHistoryChanged( history )
 		
-		self._browser.setCommandHistoryListener( _CommandHistoryListener() )
+		self._browser.setChangeHistoryListener( _ChangeHistoryListener() )
 		
 		
 		self.onCloseRequest = None
@@ -225,7 +225,7 @@ class AppWindow (object):
 		
 		
 		# Cause command history controls to refresh
-		self._onCommandHistoryChanged( None )
+		self._onChangeHistoryChanged( None )
 		
 		
 		
@@ -249,10 +249,10 @@ class AppWindow (object):
 		
 		
 		
-	def _onCommandHistoryChanged(self, commandHistory):
-		if commandHistory is not None:
-			self._editUndoItem.setEnabled( commandHistory.canUndo() )
-			self._editRedoItem.setEnabled( commandHistory.canRedo() )
+	def _onChangeHistoryChanged(self, changeHistory):
+		if changeHistory is not None:
+			self._editUndoItem.setEnabled( changeHistory.canUndo() )
+			self._editRedoItem.setEnabled( changeHistory.canRedo() )
 			self._showUndoHistoryItem.setEnabled( True )
 		else:
 			self._editUndoItem.setEnabled( False )
@@ -291,14 +291,14 @@ class AppWindow (object):
 	
 	
 	def _onUndo(self):
-		commandHistoryController = self._browser.getCommandHistoryController()
-		if commandHistoryController.canUndo():
-			commandHistoryController.undo()
+		changeHistoryController = self._browser.getChangeHistoryController()
+		if changeHistoryController.canUndo():
+			changeHistoryController.undo()
 
 	def _onRedo(self):
-		commandHistoryController = self._browser.getCommandHistoryController()
-		if commandHistoryController.canRedo():
-			commandHistoryController.redo()
+		changeHistoryController = self._browser.getChangeHistoryController()
+		if changeHistoryController.canRedo():
+			changeHistoryController.redo()
 
 
 		
@@ -318,9 +318,9 @@ class AppWindow (object):
 
 
 	def _onShowUndoHistory(self):
-		commandHistoryController = self._browser.getCommandHistoryController()
-		if commandHistoryController is not None:
-			location = self._app._browserContext.getLocationForObject( commandHistoryController )
+		changeHistoryController = self._browser.getChangeHistoryController()
+		if changeHistoryController is not None:
+			location = self._app._browserContext.getLocationForObject( changeHistoryController )
 			self._browser.openLocationInNewWindow( location )
 
 

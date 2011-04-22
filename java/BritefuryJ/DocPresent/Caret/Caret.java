@@ -55,6 +55,7 @@ public class Caret extends Target implements MarkerListener
 	}
 	
 	
+	
 	@Override
 	public DPContentLeafEditable getKeyboardInputElement()
 	{
@@ -133,6 +134,7 @@ public class Caret extends Target implements MarkerListener
 	}
 	
 	
+	@Override
 	public DPContentLeafEditable getElement()
 	{
 		return marker.getElement();

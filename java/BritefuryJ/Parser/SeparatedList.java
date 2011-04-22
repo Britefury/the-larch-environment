@@ -461,7 +461,7 @@ public class SeparatedList extends ParserExpression
 		return children;
 	}
 	
-	public boolean compareTo(ParserExpression x)
+	public boolean isEquivalentTo(ParserExpression x)
 	{
 		if ( x instanceof SeparatedList )
 		{

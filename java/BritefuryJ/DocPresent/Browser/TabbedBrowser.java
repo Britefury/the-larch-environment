@@ -31,8 +31,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicButtonUI;
 
-import BritefuryJ.CommandHistory.CommandHistoryController;
-import BritefuryJ.CommandHistory.CommandHistoryListener;
+import BritefuryJ.ChangeHistory.ChangeHistoryController;
+import BritefuryJ.ChangeHistory.ChangeHistoryListener;
 import BritefuryJ.DocPresent.PageController;
 
 public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, PageController
@@ -207,7 +207,7 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	
 	private ArrayList<Browser> browsers;
 	private Browser currentBrowser;
-	private CommandHistoryListener commandHistoryListener;
+	private ChangeHistoryListener changeHistoryListener;
 	
 	private boolean showCommandPanel;
 	
@@ -242,15 +242,15 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	}
 	
 	
-	public CommandHistoryController getCommandHistoryController()
+	public ChangeHistoryController getChangeHistoryController()
 	{
-		return currentBrowser.getCommandHistoryController();
+		return currentBrowser.getChangeHistoryController();
 	}
 	
-	public void setCommandHistoryListener(CommandHistoryListener listener)
+	public void setChangeHistoryListener(ChangeHistoryListener listener)
 	{
-		commandHistoryListener = listener;
-		currentBrowser.setCommandHistoryListener( listener );
+		changeHistoryListener = listener;
+		currentBrowser.setChangeHistoryListener( listener );
 	}
 	
 
@@ -282,19 +282,19 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 		{
 			if ( currentBrowser != null )
 			{
-				currentBrowser.setCommandHistoryListener( null );
+				currentBrowser.setChangeHistoryListener( null );
 			}
 			
 			currentBrowser = browser;
 			
-			if ( currentBrowser != null  &&  commandHistoryListener != null )
+			if ( currentBrowser != null  &&  changeHistoryListener != null )
 			{
-				currentBrowser.setCommandHistoryListener( commandHistoryListener );
+				currentBrowser.setChangeHistoryListener( changeHistoryListener );
 			}
 	
-			if ( commandHistoryListener != null )
+			if ( changeHistoryListener != null )
 			{
-				commandHistoryListener.onCommandHistoryChanged( getCommandHistoryController() );
+				changeHistoryListener.onChangeHistoryChanged( getChangeHistoryController() );
 			}
 		}
 	}

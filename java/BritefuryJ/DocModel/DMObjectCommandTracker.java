@@ -6,12 +6,12 @@
 //##************************
 package BritefuryJ.DocModel;
 
-import BritefuryJ.CommandHistory.Command;
-import BritefuryJ.CommandHistory.CommandHistory;
+import BritefuryJ.ChangeHistory.Change;
+import BritefuryJ.ChangeHistory.ChangeHistory;
 
 public class DMObjectCommandTracker
 {
-	private static class SetCommand extends Command
+	private static class SetCommand extends Change
 	{
 		private DMObject obj;
 		private int i;
@@ -44,7 +44,7 @@ public class DMObjectCommandTracker
 
 	
 	
-	private static class UpdateCommand extends Command
+	private static class UpdateCommand extends Change
 	{
 		private DMObject obj;
 		private int[] indices;
@@ -78,7 +78,7 @@ public class DMObjectCommandTracker
 
 	
 	
-	private static class BecomeCommand extends Command
+	private static class BecomeCommand extends Change
 	{
 		private DMObject obj;
 		private DMObjectClass oldClass;
@@ -116,44 +116,44 @@ public class DMObjectCommandTracker
 	
 	
 	
-	protected static void onSet(CommandHistory commandHistory, DMObject obj, int i, Object oldX, Object x)
+	protected static void onSet(ChangeHistory changeHistory, DMObject obj, int i, Object oldX, Object x)
 	{
-		if ( commandHistory != null )
+		if ( changeHistory != null )
 		{
-			commandHistory.stopTracking( oldX );
-			commandHistory.addCommand( new SetCommand( obj, i, oldX, x ) );
-			commandHistory.track( x );
+			changeHistory.stopTracking( oldX );
+			changeHistory.addChange( new SetCommand( obj, i, oldX, x ) );
+			changeHistory.track( x );
 		}
 	}
 
-	protected static void onUpdate(CommandHistory commandHistory, DMObject obj, int[] indices, Object[] oldContents, Object[] newContents)
+	protected static void onUpdate(ChangeHistory changeHistory, DMObject obj, int[] indices, Object[] oldContents, Object[] newContents)
 	{
-		if ( commandHistory != null )
+		if ( changeHistory != null )
 		{
 			for (Object oldX: oldContents)
 			{
-				commandHistory.stopTracking( oldX );
+				changeHistory.stopTracking( oldX );
 			}
-			commandHistory.addCommand( new UpdateCommand( obj, indices, oldContents, newContents ) );
+			changeHistory.addChange( new UpdateCommand( obj, indices, oldContents, newContents ) );
 			for (Object x: newContents)
 			{
-				commandHistory.track( x );
+				changeHistory.track( x );
 			}
 		}
 	}
 	
-	protected static void onBecome(CommandHistory commandHistory, DMObject obj, DMObjectClass oldClass, Object oldFieldData[], DMObjectClass newClass, Object newFieldData[])
+	protected static void onBecome(ChangeHistory changeHistory, DMObject obj, DMObjectClass oldClass, Object oldFieldData[], DMObjectClass newClass, Object newFieldData[])
 	{
-		if ( commandHistory != null )
+		if ( changeHistory != null )
 		{
 			for (Object oldX: oldFieldData)
 			{
-				commandHistory.stopTracking( oldX );
+				changeHistory.stopTracking( oldX );
 			}
-			commandHistory.addCommand( new BecomeCommand( obj, oldClass, oldFieldData, newClass, newFieldData ) );
+			changeHistory.addChange( new BecomeCommand( obj, oldClass, oldFieldData, newClass, newFieldData ) );
 			for (Object x: newFieldData)
 			{
-				commandHistory.track( x );
+				changeHistory.track( x );
 			}
 		}
 	}

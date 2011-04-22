@@ -84,12 +84,12 @@ public class RegEx extends TerminalString
 
 	
 
-	public boolean compareTo(ParserExpression x)
+	public boolean isEquivalentTo(ParserExpression x)
 	{
 		if ( x instanceof RegEx )
 		{
 			RegEx xr = (RegEx)x;
-			return pattern.equals( xr.pattern );
+			return pattern.pattern().equals( xr.pattern.pattern() )  &&  pattern.flags() == xr.pattern.flags();
 		}
 		else
 		{
