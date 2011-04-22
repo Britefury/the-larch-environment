@@ -23,8 +23,8 @@ import org.python.core.PyString;
 import org.python.core.PyUnicode;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.CommandHistory.CommandHistory;
-import BritefuryJ.CommandHistory.Trackable;
+import BritefuryJ.ChangeHistory.ChangeHistory;
+import BritefuryJ.ChangeHistory.Trackable;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DocModel.DMObjectClass.UnknownFieldNameException;
 import BritefuryJ.Incremental.IncrementalOwner;
@@ -41,7 +41,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	private IncrementalValueMonitor incr;
 	private DMObjectClass objClass;
 	private Object fieldData[];
-	private CommandHistory commandHistory = null;
+	private ChangeHistory changeHistory = null;
 	
 	
 	
@@ -406,7 +406,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			}
 		}
 		incr.onChanged();
-		DMObjectCommandTracker.onSet( commandHistory, this, index, oldX, x );
+		DMObjectCommandTracker.onSet( changeHistory, this, index, oldX, x );
 	}
 	
 	public void set(String key, Object x)
@@ -483,7 +483,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			}
 		}
 		incr.onChanged();
-		DMObjectCommandTracker.onUpdate( commandHistory, this, indices, oldContents, newContents );
+		DMObjectCommandTracker.onUpdate( changeHistory, this, indices, oldContents, newContents );
 	}
 
 	protected void update(int indices[], Object xs[])
@@ -513,7 +513,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 			fieldData[index] = x;
 		}
 		incr.onChanged();
-		DMObjectCommandTracker.onUpdate( commandHistory, this, indices, oldContents, newContents );
+		DMObjectCommandTracker.onUpdate( changeHistory, this, indices, oldContents, newContents );
 	}
 
 	
@@ -562,7 +562,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 		DMObjectClass oldClass = objClass;
 		objClass = cls;
 		incr.onChanged();
-		DMObjectCommandTracker.onBecome( commandHistory, this, oldClass, oldFieldData, cls, newData );
+		DMObjectCommandTracker.onBecome( changeHistory, this, oldClass, oldFieldData, cls, newData );
 	}
 
 	
@@ -731,20 +731,20 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	//
 	
 	@Override
-	public void setCommandHistory(CommandHistory h)
+	public void setChangeHistory(ChangeHistory h)
 	{
-		commandHistory = h;
+		changeHistory = h;
 	}
 	
 	@Override
-	public CommandHistory getCommandHistory()
+	public ChangeHistory getChangeHistory()
 	{
-		return commandHistory;
+		return changeHistory;
 	}
 	
 	
 	@Override
-	public void trackContents(CommandHistory history)
+	public void trackContents(ChangeHistory history)
 	{
 		for (Object x: getFieldValuesImmutable())
 		{
@@ -753,7 +753,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 	}
 
 	@Override
-	public void stopTrackingContents(CommandHistory history)
+	public void stopTrackingContents(ChangeHistory history)
 	{
 		for (Object x: getFieldValuesImmutable())
 		{
@@ -824,7 +824,7 @@ public class DMObject extends DMNode implements DMObjectInterface, Trackable, Se
 		incr = new IncrementalValueMonitor( this );
 		incr.onChanged();
 		
-		commandHistory = null;
+		changeHistory = null;
 	}
 	
 	private void writeObject(ObjectOutputStream stream) throws IOException

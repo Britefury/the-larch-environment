@@ -7,7 +7,7 @@
 package BritefuryJ.Projection;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.CommandHistory.CommandHistory;
+import BritefuryJ.ChangeHistory.ChangeHistory;
 
 public abstract class Subject
 {
@@ -26,7 +26,7 @@ public abstract class Subject
 		return SimpleAttributeTable.instance;
 	}
 	
-	public CommandHistory getCommandHistory()
+	public ChangeHistory getChangeHistory()
 	{
 		return null;
 	}

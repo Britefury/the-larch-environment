@@ -78,11 +78,11 @@ public class AnyObject extends ParserExpression
 
 
 
-	public boolean compareTo(ParserExpression x)
+	public boolean isEquivalentTo(ParserExpression x)
 	{
 		if ( x instanceof AnyObject )
 		{
-			return super.compareTo( x );
+			return super.isEquivalentTo( x );
 		}
 		else
 		{

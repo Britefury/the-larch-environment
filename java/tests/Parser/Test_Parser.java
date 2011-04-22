@@ -131,10 +131,10 @@ public class Test_Parser extends ParserTestCase
 			}
 		};
 
-		assertTrue( new Action( "abc", f ).compareTo( new Action( "abc", f ) ) );
-		assertFalse( new Action( "abc", f ).compareTo( new Action( "def", f ) ) );
-		assertFalse( new Action( "abc", f ).compareTo( new Action( "abc", g ) ) );
-		assertTrue( new Action( "abc", f ).compareTo( new Literal( "abc" ).action( f ) ) );
+		assertTrue( new Action( "abc", f ).isEquivalentTo( new Action( "abc", f ) ) );
+		assertFalse( new Action( "abc", f ).isEquivalentTo( new Action( "def", f ) ) );
+		assertFalse( new Action( "abc", f ).isEquivalentTo( new Action( "abc", g ) ) );
+		assertTrue( new Action( "abc", f ).isEquivalentTo( new Literal( "abc" ).action( f ) ) );
 		
 
 		ParserExpression parser = new Literal( "abc" ).action( f );
@@ -161,7 +161,7 @@ public class Test_Parser extends ParserTestCase
 			}
 		};
 
-		assertTrue( new Action( "abc", f, true ).compareTo( new Literal( "abc" ).mergeUpAction( f ) ) );
+		assertTrue( new Action( "abc", f, true ).isEquivalentTo( new Literal( "abc" ).mergeUpAction( f ) ) );
 		
 
 		ParserExpression parser = ( ( new Literal( "a" ).__add__( "b" ).__add__( "c" ) ).mergeUpAction( f ) ).__add__( "d" );
@@ -174,7 +174,7 @@ public class Test_Parser extends ParserTestCase
 
 	public void testAnyList()
 	{
-		assertTrue( new AnyList().compareTo( new AnyList() ) );
+		assertTrue( new AnyList().isEquivalentTo( new AnyList() ) );
 		
 		matchFailTestStringAndStream( new AnyList(), "abc" );
 		
@@ -190,7 +190,7 @@ public class Test_Parser extends ParserTestCase
 
 	public void testAnyNode()
 	{
-		assertTrue( new AnyNode().compareTo( new AnyNode() ) );
+		assertTrue( new AnyNode().isEquivalentTo( new AnyNode() ) );
 
 		matchFailTestStringAndStream( new AnyNode(), "abc" );
 		
@@ -205,7 +205,7 @@ public class Test_Parser extends ParserTestCase
 
 	public void testAnyObject()
 	{
-		assertTrue( new AnyObject().compareTo( new AnyObject() ) );
+		assertTrue( new AnyObject().isEquivalentTo( new AnyObject() ) );
 	
 		matchFailTestStringAndStream( new AnyObject(), "abc" );
 		
@@ -223,7 +223,7 @@ public class Test_Parser extends ParserTestCase
 
 	public void testAnyString()
 	{
-		assertTrue( new AnyString().compareTo( new AnyString() ) );
+		assertTrue( new AnyString().isEquivalentTo( new AnyString() ) );
 	
 		matchFailTestStringAndStream( new AnyString(), "abc" );
 		
@@ -261,11 +261,11 @@ public class Test_Parser extends ParserTestCase
 		Object[] abqw = { new Literal( "ab" ), new Literal( "qw" ) };
 		Object[] qbqwfh = { new Literal( "qb" ), new Literal( "qw" ), new Literal( "fh" ) };
 		
-		assertTrue( new Choice( abqwfh ).compareTo( new Choice( abqwfh ) ) );
-		assertFalse( new Choice( abqwfh ).compareTo( new Choice( abqw ) ) );
-		assertFalse( new Choice( abqwfh ).compareTo( new Choice( qbqwfh ) ) );
-		assertTrue( new Choice( abqwfh ).compareTo( new Literal( "ab" ).__or__( new Literal( "qw" ) ).__or__( new Literal( "fh" ) ) ) );
-		assertTrue( new Choice( abqwfh ).compareTo( new Literal( "ab" ).__or__( "qw" ).__or__( "fh" ) ) );
+		assertTrue( new Choice( abqwfh ).isEquivalentTo( new Choice( abqwfh ) ) );
+		assertFalse( new Choice( abqwfh ).isEquivalentTo( new Choice( abqw ) ) );
+		assertFalse( new Choice( abqwfh ).isEquivalentTo( new Choice( qbqwfh ) ) );
+		assertTrue( new Choice( abqwfh ).isEquivalentTo( new Literal( "ab" ).__or__( new Literal( "qw" ) ).__or__( new Literal( "fh" ) ) ) );
+		assertTrue( new Choice( abqwfh ).isEquivalentTo( new Literal( "ab" ).__or__( "qw" ).__or__( "fh" ) ) );
 
 		
 		ParserExpression parser = new Choice( new Object[] { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) } );
@@ -333,11 +333,11 @@ public class Test_Parser extends ParserTestCase
 		Object[] abqw = { new Literal( "ab" ), new Literal( "qw" ) };
 		Object[] qbqwfh = { new Literal( "qb" ), new Literal( "qw" ), new Literal( "fh" ) };
 		
-		assertTrue( new Combine( abqwfh ).compareTo( new Combine( abqwfh ) ) );
-		assertFalse( new Combine( abqwfh ).compareTo( new Combine( abqw ) ) );
-		assertFalse( new Combine( abqwfh ).compareTo( new Combine( qbqwfh ) ) );
-		assertTrue( new Combine( abqwfh ).compareTo( new Literal( "ab" ).__sub__( new Literal( "qw" ) ).__sub__( new Literal( "fh" ) ) ) );
-		assertTrue( new Combine( abqwfh ).compareTo( new Literal( "ab" ).__sub__( "qw" ).__sub__( "fh" ) ) );
+		assertTrue( new Combine( abqwfh ).isEquivalentTo( new Combine( abqwfh ) ) );
+		assertFalse( new Combine( abqwfh ).isEquivalentTo( new Combine( abqw ) ) );
+		assertFalse( new Combine( abqwfh ).isEquivalentTo( new Combine( qbqwfh ) ) );
+		assertTrue( new Combine( abqwfh ).isEquivalentTo( new Literal( "ab" ).__sub__( new Literal( "qw" ) ).__sub__( new Literal( "fh" ) ) ) );
+		assertTrue( new Combine( abqwfh ).isEquivalentTo( new Literal( "ab" ).__sub__( "qw" ).__sub__( "fh" ) ) );
 	
 		ParserExpression parser = new Combine( new Object[] { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) } );
 		
@@ -398,10 +398,10 @@ public class Test_Parser extends ParserTestCase
 			}
 		};
 
-		assertTrue( new Condition( "abc", f ).compareTo( new Condition( "abc", f ) ) );
-		assertFalse( new Condition( "abc", f ).compareTo( new Condition( "def", f ) ) );
-		assertFalse( new Condition( "abc", f ).compareTo( new Condition( "abc", g ) ) );
-		assertTrue( new Condition( "abc", f ).compareTo( new Literal( "abc" ).condition( f ) ) );
+		assertTrue( new Condition( "abc", f ).isEquivalentTo( new Condition( "abc", f ) ) );
+		assertFalse( new Condition( "abc", f ).isEquivalentTo( new Condition( "def", f ) ) );
+		assertFalse( new Condition( "abc", f ).isEquivalentTo( new Condition( "abc", g ) ) );
+		assertTrue( new Condition( "abc", f ).isEquivalentTo( new Literal( "abc" ).condition( f ) ) );
 		
 		ParserExpression parser = new Word( "abcdefghijklmnopqrstuvwxyz" ).condition( f );
 		
@@ -435,8 +435,8 @@ public class Test_Parser extends ParserTestCase
 			}
 		};
 
-		assertTrue( new Delegate( "abc" ).compareTo( new Delegate( "abc" ) ) );
-		assertFalse( new Delegate( "abc" ).compareTo( new Delegate( "def" ) ) );
+		assertTrue( new Delegate( "abc" ).isEquivalentTo( new Delegate( "abc" ) ) );
+		assertFalse( new Delegate( "abc" ).isEquivalentTo( new Delegate( "def" ) ) );
 		
 
 		ParserExpression parser = new Delegate( new Literal( "abc" ) );
@@ -450,11 +450,11 @@ public class Test_Parser extends ParserTestCase
 
 	public void testKeyword()
 	{
-		assertTrue( new Keyword( "abc" ).compareTo( new Keyword( "abc" ) ) );
-		assertFalse( new Keyword( "abc" ).compareTo( new Keyword( "def" ) ) );
-		assertTrue( new Keyword( "abc", "xyz" ).compareTo( new Keyword( "abc", "xyz" ) ) );
-		assertFalse( new Keyword( "abc", "xyz" ).compareTo( new Keyword( "def", "xyz" ) ) );
-		assertFalse( new Keyword( "abc", "xyz" ).compareTo( new Keyword( "abc", "pqr" ) ) );
+		assertTrue( new Keyword( "abc" ).isEquivalentTo( new Keyword( "abc" ) ) );
+		assertFalse( new Keyword( "abc" ).isEquivalentTo( new Keyword( "def" ) ) );
+		assertTrue( new Keyword( "abc", "xyz" ).isEquivalentTo( new Keyword( "abc", "xyz" ) ) );
+		assertFalse( new Keyword( "abc", "xyz" ).isEquivalentTo( new Keyword( "def", "xyz" ) ) );
+		assertFalse( new Keyword( "abc", "xyz" ).isEquivalentTo( new Keyword( "abc", "pqr" ) ) );
 		
 		matchTestStringAndStream( new Keyword( "hello" ), "hello", "hello" );
 		matchFailTestStringAndStream( new Keyword( "hello" ), "helloq" );
@@ -528,8 +528,8 @@ public class Test_Parser extends ParserTestCase
 	
 	public void testLiteral()
 	{
-		assertTrue( new Literal( "abc" ).compareTo( new Literal( "abc" ) ) );
-		assertFalse( new Literal( "abc" ).compareTo( new Literal( "def" ) ) );
+		assertTrue( new Literal( "abc" ).isEquivalentTo( new Literal( "abc" ) ) );
+		assertFalse( new Literal( "abc" ).isEquivalentTo( new Literal( "def" ) ) );
 		
 		matchTestStringAndStream( new Literal( "abcxyz" ), "abcxyz", "abcxyz" );
 		matchFailTestStringAndStream( new Literal( "abcxyz" ), "qwerty" );
@@ -546,8 +546,8 @@ public class Test_Parser extends ParserTestCase
 
 	public void testLiteralNode()
 	{
-		assertTrue( new LiteralNode( "abc" ).compareTo( new LiteralNode( "abc" ) ) );
-		assertFalse( new LiteralNode( "abc" ).compareTo( new LiteralNode( "def" ) ) );
+		assertTrue( new LiteralNode( "abc" ).isEquivalentTo( new LiteralNode( "abc" ) ) );
+		assertFalse( new LiteralNode( "abc" ).isEquivalentTo( new LiteralNode( "def" ) ) );
 		
 		matchTestNode( new LiteralNode( "hello" ), "hello", "hello" );
 		matchFailTestStringAndStream( new LiteralNode( "hello" ), "hello" );
@@ -615,9 +615,9 @@ public class Test_Parser extends ParserTestCase
 	
 	public void testOneOrMore() throws ParserExpression.ParserCoerceException
 	{
-		assertTrue( new OneOrMore( new Literal( "ab" ) ).compareTo( new OneOrMore( new Literal( "ab" ) ) ) );
-		assertFalse( new OneOrMore( new Literal( "ab" ) ).compareTo( new OneOrMore( new Literal( "cd" ) ) ) );
-		assertTrue( new OneOrMore( new Literal( "ab" ) ).compareTo( new OneOrMore( "ab" ) ) );
+		assertTrue( new OneOrMore( new Literal( "ab" ) ).isEquivalentTo( new OneOrMore( new Literal( "ab" ) ) ) );
+		assertFalse( new OneOrMore( new Literal( "ab" ) ).isEquivalentTo( new OneOrMore( new Literal( "cd" ) ) ) );
+		assertTrue( new OneOrMore( new Literal( "ab" ) ).isEquivalentTo( new OneOrMore( "ab" ) ) );
 	
 		ParserExpression parser = new OneOrMore( new Word( "a", "b" ).__add__( new Word( "c", "d" ) ) );
 		
@@ -645,9 +645,9 @@ public class Test_Parser extends ParserTestCase
 
 	public void testOptional() throws ParserExpression.ParserCoerceException
 	{
-		assertTrue( new Optional( new Literal( "ab" ) ).compareTo( new Optional( new Literal( "ab" ) ) ) );
-		assertFalse( new Optional( new Literal( "ab" ) ).compareTo( new Optional( new Literal( "cd" ) ) ) );
-		assertTrue( new Optional( new Literal( "ab" ) ).compareTo( new Optional( "ab" ) ) );
+		assertTrue( new Optional( new Literal( "ab" ) ).isEquivalentTo( new Optional( new Literal( "ab" ) ) ) );
+		assertFalse( new Optional( new Literal( "ab" ) ).isEquivalentTo( new Optional( new Literal( "cd" ) ) ) );
+		assertTrue( new Optional( new Literal( "ab" ) ).isEquivalentTo( new Optional( "ab" ) ) );
 	
 		ParserExpression parser = new Word( "a", "b" ).optional();
 		
@@ -666,10 +666,10 @@ public class Test_Parser extends ParserTestCase
 
 	public void testPeek() throws ParserExpression.ParserCoerceException
 	{
-		assertTrue( new Peek( new Literal( "ab" ) ).compareTo( new Peek( new Literal( "ab" ) ) ) );
-		assertFalse( new Peek( new Literal( "ab" ) ).compareTo( new Peek( new Literal( "cd" ) ) ) );
-		assertTrue( new Peek( new Literal( "ab" ) ).compareTo( new Peek( "ab" ) ) );
-		assertTrue( new Peek( new Literal( "ab" ) ).compareTo( new Literal( "ab" ).peek() ) );
+		assertTrue( new Peek( new Literal( "ab" ) ).isEquivalentTo( new Peek( new Literal( "ab" ) ) ) );
+		assertFalse( new Peek( new Literal( "ab" ) ).isEquivalentTo( new Peek( new Literal( "cd" ) ) ) );
+		assertTrue( new Peek( new Literal( "ab" ) ).isEquivalentTo( new Peek( "ab" ) ) );
+		assertTrue( new Peek( new Literal( "ab" ) ).isEquivalentTo( new Literal( "ab" ).peek() ) );
 	
 		ParserExpression parser = new OneOrMore( new Word( "a", "b" ) ).__add__( new Peek( new Word( "c", "d" ) ) );
 		
@@ -692,10 +692,10 @@ public class Test_Parser extends ParserTestCase
 
 	public void testPeekNot() throws ParserExpression.ParserCoerceException
 	{
-		assertTrue( new PeekNot( new Literal( "ab" ) ).compareTo( new PeekNot( new Literal( "ab" ) ) ) );
-		assertFalse( new PeekNot( new Literal( "ab" ) ).compareTo( new PeekNot( new Literal( "cd" ) ) ) );
-		assertTrue( new PeekNot( new Literal( "ab" ) ).compareTo( new PeekNot( "ab" ) ) );
-		assertTrue( new PeekNot( new Literal( "ab" ) ).compareTo( new Literal( "ab" ).peekNot() ) );
+		assertTrue( new PeekNot( new Literal( "ab" ) ).isEquivalentTo( new PeekNot( new Literal( "ab" ) ) ) );
+		assertFalse( new PeekNot( new Literal( "ab" ) ).isEquivalentTo( new PeekNot( new Literal( "cd" ) ) ) );
+		assertTrue( new PeekNot( new Literal( "ab" ) ).isEquivalentTo( new PeekNot( "ab" ) ) );
+		assertTrue( new PeekNot( new Literal( "ab" ) ).isEquivalentTo( new Literal( "ab" ).peekNot() ) );
 	
 		ParserExpression parser = new OneOrMore( new Word( "a", "b" ) ).__add__( new PeekNot( new Word( "c", "d" ) ) );
 		
@@ -720,8 +720,8 @@ public class Test_Parser extends ParserTestCase
 
 	public void testRegEx()
 	{
-		assertTrue( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ).compareTo( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ) ) );
-		assertFalse( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ).compareTo( new RegEx( "[A-Za-z_][A-Za-z0-9_]*abc" ) ) );
+		assertTrue( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ).isEquivalentTo( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ) ) );
+		assertFalse( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ).isEquivalentTo( new RegEx( "[A-Za-z_][A-Za-z0-9_]*abc" ) ) );
 	
 		matchTestStringAndStream( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ), "abc_123", "abc_123" );
 		matchFailTestStringAndStream( new RegEx( "[A-Za-z_][A-Za-z0-9_]*" ), "9abc" );
@@ -740,15 +740,15 @@ public class Test_Parser extends ParserTestCase
 	
 	public void testRepetition() throws ParserExpression.ParserCoerceException
 	{
-		assertTrue( new Repetition( new Literal( "ab" ), 0, 1, false ).compareTo( new Repetition( new Literal( "ab" ), 0, 1, false ) ) );
-		assertFalse( new Repetition( new Literal( "ab" ), 0, 1, false ).compareTo( new Repetition( new Literal( "cd" ), 0, 1, false ) ) );
-		assertFalse( new Repetition( new Literal( "ab" ), 0, 1, false ).compareTo( new Repetition( new Literal( "ab" ), 1, 1, false ) ) );
-		assertFalse( new Repetition( new Literal( "ab" ), 0, 1, false ).compareTo( new Repetition( new Literal( "ab" ), 0, 2, false ) ) );
-		assertFalse( new Repetition( new Literal( "ab" ), 0, 1, false ).compareTo( new Repetition( new Literal( "ab" ), 0, 1, true ) ) );
-		assertTrue( new Repetition( new Literal( "ab" ), 0, 1, false ).compareTo( new Repetition( new Literal( "ab" ), 0, 1 ) ) );
-		assertTrue( new Repetition( new Literal( "ab" ), 0, 1, false ).compareTo( new Repetition( "ab", 0, 1 ) ) );
-		assertTrue( new Repetition( new Literal( "ab" ), 0, 1, false ).compareTo( new Literal( "ab" ).repeat( 0, 1, false ) ) );
-		assertTrue( new Repetition( new Literal( "ab" ), 0, 1, true ).compareTo( new Literal( "ab" ).repeat( 0, 1, true ) ) );
+		assertTrue( new Repetition( new Literal( "ab" ), 0, 1, false ).isEquivalentTo( new Repetition( new Literal( "ab" ), 0, 1, false ) ) );
+		assertFalse( new Repetition( new Literal( "ab" ), 0, 1, false ).isEquivalentTo( new Repetition( new Literal( "cd" ), 0, 1, false ) ) );
+		assertFalse( new Repetition( new Literal( "ab" ), 0, 1, false ).isEquivalentTo( new Repetition( new Literal( "ab" ), 1, 1, false ) ) );
+		assertFalse( new Repetition( new Literal( "ab" ), 0, 1, false ).isEquivalentTo( new Repetition( new Literal( "ab" ), 0, 2, false ) ) );
+		assertFalse( new Repetition( new Literal( "ab" ), 0, 1, false ).isEquivalentTo( new Repetition( new Literal( "ab" ), 0, 1, true ) ) );
+		assertTrue( new Repetition( new Literal( "ab" ), 0, 1, false ).isEquivalentTo( new Repetition( new Literal( "ab" ), 0, 1 ) ) );
+		assertTrue( new Repetition( new Literal( "ab" ), 0, 1, false ).isEquivalentTo( new Repetition( "ab", 0, 1 ) ) );
+		assertTrue( new Repetition( new Literal( "ab" ), 0, 1, false ).isEquivalentTo( new Literal( "ab" ).repeat( 0, 1, false ) ) );
+		assertTrue( new Repetition( new Literal( "ab" ), 0, 1, true ).isEquivalentTo( new Literal( "ab" ).repeat( 0, 1, true ) ) );
 	
 		ParserExpression parser_2, parser02, parser02N, parser24, parser2_;
 		parser_2 = new Repetition( new Word( "a", "b" ).__add__( new Word( "c", "d" ) ),  -1, 2 );
@@ -815,34 +815,34 @@ public class Test_Parser extends ParserTestCase
 
 	public void testSeparatedList() throws ParserExpression.ParserCoerceException, CannotApplyMoreThanOneConditionException, CannotApplyConditionAfterActionException, CannotApplyMoreThanOneActionException
 	{
-		assertTrue( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+		assertTrue( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).isEquivalentTo(
 				new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ) );
-		assertFalse( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+		assertFalse( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).isEquivalentTo(
 				new SeparatedList( new Literal( "a" ), new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ) );
-		assertFalse( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+		assertFalse( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).isEquivalentTo(
 				new SeparatedList( identifier, new Literal( "." ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ) );
-		assertFalse( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+		assertFalse( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).isEquivalentTo(
 				new SeparatedList( identifier, new Literal( "," ), new Literal( "{" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ) );
-		assertFalse( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+		assertFalse( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).isEquivalentTo(
 				new SeparatedList( identifier, new Literal( "," ), null, new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ) );
-		assertFalse( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+		assertFalse( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).isEquivalentTo(
 				new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "}" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ) );
-		assertFalse( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+		assertFalse( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).isEquivalentTo(
 				new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), null, 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ) );
-		assertFalse( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+		assertFalse( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).isEquivalentTo(
 				new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ) );
-		assertFalse( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+		assertFalse( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).isEquivalentTo(
 				new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, 10, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ) );
-		assertFalse( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+		assertFalse( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).isEquivalentTo(
 				new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.NEVER ) ) );
 		
-		assertTrue( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+		assertTrue( new SeparatedList( identifier, new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).isEquivalentTo(
 				new SeparatedList( identifier, new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ) );
-		assertTrue( new SeparatedList( identifier, new Literal( "," ), null, null, 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+		assertTrue( new SeparatedList( identifier, new Literal( "," ), null, null, 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).isEquivalentTo(
 				new SeparatedList( identifier, new Literal( "," ), 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ) );
-		assertTrue( new SeparatedList( identifier, new Literal( "," ), null, null, 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+		assertTrue( new SeparatedList( identifier, new Literal( "," ), null, null, 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).isEquivalentTo(
 				new SeparatedList( identifier, 1, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ) );
-		assertTrue( new SeparatedList( new Literal( "a" ), new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).compareTo(
+		assertTrue( new SeparatedList( new Literal( "a" ), new Literal( "," ), new Literal( "[" ), new Literal( "]" ), 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ).isEquivalentTo(
 				new SeparatedList( "a", ",", "[", "]", 0, -1, SeparatedList.TrailingSeparatorPolicy.OPTIONAL ) ) );
 	
 		
@@ -1094,11 +1094,11 @@ public class Test_Parser extends ParserTestCase
 		Object[] abqw = { new Literal( "ab" ), new Literal( "qw" ) };
 		Object[] qbqwfh = { new Literal( "qb" ), new Literal( "qw" ), new Literal( "fh" ) };
 		
-		assertTrue( new Sequence( abqwfh ).compareTo( new Sequence( abqwfh ) ) );
-		assertFalse( new Sequence( abqwfh ).compareTo( new Sequence( abqw ) ) );
-		assertFalse( new Sequence( abqwfh ).compareTo( new Sequence( qbqwfh ) ) );
-		assertTrue( new Sequence( abqwfh ).compareTo( new Literal( "ab" ).__add__( new Literal( "qw" ) ).__add__( new Literal( "fh" ) ) ) );
-		assertTrue( new Sequence( abqwfh ).compareTo( new Literal( "ab" ).__add__( "qw" ).__add__( "fh" ) ) );
+		assertTrue( new Sequence( abqwfh ).isEquivalentTo( new Sequence( abqwfh ) ) );
+		assertFalse( new Sequence( abqwfh ).isEquivalentTo( new Sequence( abqw ) ) );
+		assertFalse( new Sequence( abqwfh ).isEquivalentTo( new Sequence( qbqwfh ) ) );
+		assertTrue( new Sequence( abqwfh ).isEquivalentTo( new Literal( "ab" ).__add__( new Literal( "qw" ) ).__add__( new Literal( "fh" ) ) ) );
+		assertTrue( new Sequence( abqwfh ).isEquivalentTo( new Literal( "ab" ).__add__( "qw" ).__add__( "fh" ) ) );
 
 		Object[] subs = { new Literal( "ab" ), new Literal( "qw" ), new Literal( "fh" ) };
 		ParserExpression parser = new Sequence( subs );
@@ -1119,8 +1119,8 @@ public class Test_Parser extends ParserTestCase
 
 	public void testStringNode() throws ParserCoerceException
 	{
-		assertTrue( new StringNode( "abc" ).compareTo( new StringNode( new Literal( "abc" ) ) ) );
-		assertFalse( new StringNode( "abc" ).compareTo( new StringNode( new Literal( "def" ) ) ) );
+		assertTrue( new StringNode( "abc" ).isEquivalentTo( new StringNode( new Literal( "abc" ) ) ) );
+		assertFalse( new StringNode( "abc" ).isEquivalentTo( new StringNode( new Literal( "def" ) ) ) );
 		
 		matchTestNode( new StringNode( "hello" ), "hello", "hello" );
 		matchFailTestNode( new StringNode( "hello" ), "hellothere", "hello" );
@@ -1152,9 +1152,9 @@ public class Test_Parser extends ParserTestCase
 
 	public void testSuppress() throws ParserExpression.ParserCoerceException
 	{
-		assertTrue( new Suppress( new Literal( "ab" ) ).compareTo( new Suppress( new Literal( "ab" ) ) ) );
-		assertFalse( new Suppress( new Literal( "ab" ) ).compareTo( new Suppress( new Literal( "cd" ) ) ) );
-		assertTrue( new Suppress( new Literal( "ab" ) ).compareTo( new Literal( "ab" ).suppress() ) );
+		assertTrue( new Suppress( new Literal( "ab" ) ).isEquivalentTo( new Suppress( new Literal( "ab" ) ) ) );
+		assertFalse( new Suppress( new Literal( "ab" ) ).isEquivalentTo( new Suppress( new Literal( "cd" ) ) ) );
+		assertTrue( new Suppress( new Literal( "ab" ) ).isEquivalentTo( new Literal( "ab" ).suppress() ) );
 
 		Object[] subs = { new Literal( "ab" ), new Literal( "qw" ).suppress(), new Literal( "fh" ) };
 		ParserExpression parser = new Sequence( subs );
@@ -1170,8 +1170,8 @@ public class Test_Parser extends ParserTestCase
 
 	public void testWord()
 	{
-		assertTrue( new Word( "abc" ).compareTo( new Word( "abc" ) ) );
-		assertFalse( new Word( "abc" ).compareTo( new Word( "def" ) ) );
+		assertTrue( new Word( "abc" ).isEquivalentTo( new Word( "abc" ) ) );
+		assertFalse( new Word( "abc" ).isEquivalentTo( new Word( "def" ) ) );
 		
 		matchTestStringAndStream( new Word( "abc" ), "aabbcc", "aabbcc" );
 		matchTestStringAndStream( new Word( "abc" ), "ccbbaa", "ccbbaa" );
@@ -1179,9 +1179,9 @@ public class Test_Parser extends ParserTestCase
 		matchSubTestStringAndStream( new Word( "abc" ), "aabbccxxaa", "aabbcc", 6 );
 		matchFailTestStringAndStream( new Word( "abc" ), "x" );
 		
-		assertTrue( new Word( "abc", "xyz" ).compareTo( new Word( "abc", "xyz" ) ) );
-		assertFalse( new Word( "abc", "xyz" ).compareTo( new Word( "def", "xyz" ) ) );
-		assertFalse( new Word( "abc", "xyz" ).compareTo( new Word( "abc", "pqr" ) ) );
+		assertTrue( new Word( "abc", "xyz" ).isEquivalentTo( new Word( "abc", "xyz" ) ) );
+		assertFalse( new Word( "abc", "xyz" ).isEquivalentTo( new Word( "def", "xyz" ) ) );
+		assertFalse( new Word( "abc", "xyz" ).isEquivalentTo( new Word( "abc", "pqr" ) ) );
 		
 		matchTestStringAndStream( new Word( "abc", "def" ), "addeeff", "addeeff" );
 		matchTestStringAndStream( new Word( "abc", "def" ), "affeedd", "affeedd" );
@@ -1204,11 +1204,11 @@ public class Test_Parser extends ParserTestCase
 	
 	public void testZeroOrMore() throws ParserExpression.ParserCoerceException
 	{
-		assertTrue( new ZeroOrMore( new Literal( "ab" ), false ).compareTo( new ZeroOrMore( new Literal( "ab" ), false ) ) );
-		assertFalse( new ZeroOrMore( new Literal( "ab" ), false ).compareTo( new ZeroOrMore( new Literal( "cd" ), false ) ) );
-		assertFalse( new ZeroOrMore( new Literal( "ab" ), false ).compareTo( new ZeroOrMore( new Literal( "ab" ), true ) ) );
-		assertTrue( new ZeroOrMore( new Literal( "ab" ), false ).compareTo( new ZeroOrMore( new Literal( "ab" ) ) ) );
-		assertTrue( new ZeroOrMore( new Literal( "ab" ), false ).compareTo( new ZeroOrMore( "ab" ) ) );
+		assertTrue( new ZeroOrMore( new Literal( "ab" ), false ).isEquivalentTo( new ZeroOrMore( new Literal( "ab" ), false ) ) );
+		assertFalse( new ZeroOrMore( new Literal( "ab" ), false ).isEquivalentTo( new ZeroOrMore( new Literal( "cd" ), false ) ) );
+		assertFalse( new ZeroOrMore( new Literal( "ab" ), false ).isEquivalentTo( new ZeroOrMore( new Literal( "ab" ), true ) ) );
+		assertTrue( new ZeroOrMore( new Literal( "ab" ), false ).isEquivalentTo( new ZeroOrMore( new Literal( "ab" ) ) ) );
+		assertTrue( new ZeroOrMore( new Literal( "ab" ), false ).isEquivalentTo( new ZeroOrMore( "ab" ) ) );
 
 		ParserExpression parserO, parserN;
 		parserO = new ZeroOrMore( new Word( "a", "b" ).__add__( new Word( "c", "d" ) ) );

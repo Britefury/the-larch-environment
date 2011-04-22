@@ -12,7 +12,7 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
-import BritefuryJ.CommandHistory.CommandHistory;
+import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.DefaultPerspective.DefaultPerspective;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DocPresent.DPColumn;
@@ -266,7 +266,7 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	private ProjectiveBrowserContext browserContext;
 	private IncrementalViewPage page;
 	
-	private CommandHistory commandHistory;
+	private ChangeHistory changeHistory;
 
 	private HashMap<ViewFragmentContextAndResultFactoryKey, ViewFragmentContextAndResultFactory> viewFragmentContextAndResultFactories =
 		new HashMap<ViewFragmentContextAndResultFactoryKey, ViewFragmentContextAndResultFactory>();
@@ -294,12 +294,12 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	
 		
 		this.browserContext = browserContext;
-		this.commandHistory = subject.getCommandHistory();
+		this.changeHistory = subject.getChangeHistory();
 		
 		region = new DPRegion();
 		DPElement column = new Column( new Object[] { region } ).present();
 
-		page = new IncrementalViewPage( column.alignHExpand().alignVExpand(), subject.getTitle(), browserContext, commandHistory, this );
+		page = new IncrementalViewPage( column.alignHExpand().alignVExpand(), subject.getTitle(), browserContext, changeHistory, this );
 		
 		setElementChangeListener( new NodeElementChangeListenerDiff() );
 		
@@ -633,9 +633,9 @@ public class IncrementalView extends IncrementalTree implements Presentable
 		return page.getLog();
 	}
 	
-	public CommandHistory getCommandHistory()
+	public ChangeHistory getChangeHistory()
 	{
-		return commandHistory;
+		return changeHistory;
 	}
 	
 	

@@ -17,7 +17,7 @@ import org.python.core.PySlice;
 
 import BritefuryJ.Cell.Cell;
 import BritefuryJ.Cell.CellEvaluator;
-import BritefuryJ.CommandHistory.CommandHistory;
+import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.DocModel.DMIOReader;
 import BritefuryJ.DocModel.DMIOReader.ParseErrorException;
 import BritefuryJ.DocModel.DMList;
@@ -25,11 +25,11 @@ import BritefuryJ.DocModel.DMNode;
 
 public class Test_DMList extends Test_DMNode_base
 {
-	CommandHistory history;
+	ChangeHistory history;
 	
 	public void setUp()
 	{
-		history = new CommandHistory();
+		history = new ChangeHistory();
 	}
 	
 	public void tearDown()
@@ -92,12 +92,12 @@ public class Test_DMList extends Test_DMNode_base
 	
 	public void assertTracked(DMList xs)
 	{
-		assertSame( xs.getCommandHistory(), history );
+		assertSame( xs.getChangeHistory(), history );
 	}
 	
 	public void assertNotTracked(DMList xs)
 	{
-		assertNull( xs.getCommandHistory() );
+		assertNull( xs.getChangeHistory() );
 	}
 	
 	

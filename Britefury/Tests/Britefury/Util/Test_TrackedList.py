@@ -10,7 +10,7 @@ import unittest
 
 from Britefury.Util.TrackedList import TrackedListProperty
 
-from BritefuryJ.CommandHistory import CommandHistory, Trackable
+from BritefuryJ.ChangeHistory import ChangeHistory, Trackable
 
 import random
 
@@ -18,12 +18,12 @@ import random
 
 class Value (Trackable):
 	def __init__(self, x):
-		self._commandHistory = None
+		self._changeHistory = None
 		self.x = x
 	
 	
-	def setCommandHistory(self, history):
-		self._commandHistory = history
+	def setChangeHistory(self, history):
+		self._changeHistory = history
 	
 	
 	def trackContents(self, history):
@@ -34,7 +34,7 @@ class Value (Trackable):
 		
 		
 	def isTracked(self):
-		return self._commandHistory is not None
+		return self._changeHistory is not None
 		
 		
 	def __eq__(self, x):
@@ -52,12 +52,12 @@ class Value (Trackable):
 
 class Sequence (Trackable):
 	def __init__(self):
-		self._commandHistory = None
+		self._changeHistory = None
 		self._xs_ = []
 	
 	
-	def setCommandHistory(self, history):
-		self._commandHistory = history
+	def setChangeHistory(self, history):
+		self._changeHistory = history
 	
 	
 	def trackContents(self, history):
@@ -67,13 +67,13 @@ class Sequence (Trackable):
 		self.xs.stopTrackingContents( history )
 	
 	
-	xs = TrackedListProperty( '_xs_', '_commandHistory' )
+	xs = TrackedListProperty( '_xs_', '_changeHistory' )
 
 
 
 class Test_TrackedList (unittest.TestCase):
 	def setUp(self):
-		self.history = CommandHistory()
+		self.history = ChangeHistory()
 		self.s = Sequence()
 		self.history.track( self.s )
 	

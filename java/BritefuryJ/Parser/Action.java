@@ -162,12 +162,12 @@ public class Action extends UnaryBranchExpression
 	}
 
 
-	public boolean compareTo(ParserExpression x)
+	public boolean isEquivalentTo(ParserExpression x)
 	{
 		if ( x instanceof Action )
 		{
 			Action ax = (Action)x;
-			return super.compareTo( x )  &&  a == ax.a  &&  bMergeUp == ax.bMergeUp;
+			return super.isEquivalentTo( x )  &&  a == ax.a  &&  bMergeUp == ax.bMergeUp;
 		}
 		else
 		{

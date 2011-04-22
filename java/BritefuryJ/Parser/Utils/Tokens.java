@@ -156,7 +156,7 @@ public class Tokens
 		}
 
 
-		public boolean compareTo(ParserExpression x)
+		public boolean isEquivalentTo(ParserExpression x)
 		{
 			return this == x  ||  x instanceof JavaIdentifier;
 		}
@@ -244,7 +244,7 @@ public class Tokens
 		}
 
 
-		public boolean compareTo(ParserExpression x)
+		public boolean isEquivalentTo(ParserExpression x)
 		{
 			return this == x  ||  x instanceof JavaCharacterLiteral;
 		}
@@ -347,7 +347,7 @@ public class Tokens
 		}
 
 
-		public boolean compareTo(ParserExpression x)
+		public boolean isEquivalentTo(ParserExpression x)
 		{
 			return this == x  ||  x instanceof JavaStringLiteral;
 		}

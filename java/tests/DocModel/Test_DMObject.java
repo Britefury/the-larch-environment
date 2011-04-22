@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import BritefuryJ.CommandHistory.CommandHistory;
+import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.DocModel.DMList;
 import BritefuryJ.DocModel.DMNode;
 import BritefuryJ.DocModel.DMObject;
@@ -20,7 +20,7 @@ import BritefuryJ.DocModel.DMSchema;
 
 public class Test_DMObject extends Test_DMNode_base
 {
-	private CommandHistory history;
+	private ChangeHistory history;
 	private static DMSchema m = new DMSchema( "m", "m", "tests.DocModel.Test_DMObject.m" );
 	private static DMObjectClass A = m.newClass( "A", new String[] { "x", "y" } );
 	private static DMObjectClass B = m.newClass( "B", new String[] { "p", "q", "r" } );
@@ -28,7 +28,7 @@ public class Test_DMObject extends Test_DMNode_base
 	
 	public void setUp()
 	{
-		history = new CommandHistory();
+		history = new ChangeHistory();
 	}
 	
 	public void tearDown()

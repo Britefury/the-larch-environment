@@ -26,8 +26,8 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.TransferHandler;
 
-import BritefuryJ.CommandHistory.CommandHistoryController;
-import BritefuryJ.CommandHistory.CommandHistoryListener;
+import BritefuryJ.ChangeHistory.ChangeHistoryController;
+import BritefuryJ.ChangeHistory.ChangeHistoryListener;
 import BritefuryJ.Controls.ScrolledViewport;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.PageController;
@@ -68,7 +68,7 @@ public class Browser
 	private PageLocationResolver resolver;
 	private BrowserPage page;
 	private BrowserListener listener;
-	private CommandHistoryListener commandHistoryListener;
+	private ChangeHistoryListener changeHistoryListener;
 	
 	
 	
@@ -250,11 +250,11 @@ public class Browser
 	
 	
 	
-	public CommandHistoryController getCommandHistoryController()
+	public ChangeHistoryController getChangeHistoryController()
 	{
 		if ( page != null )
 		{
-			return page.getCommandHistoryController();
+			return page.getChangeHistoryController();
 		}
 		else
 		{
@@ -262,12 +262,12 @@ public class Browser
 		}
 	}
 	
-	public void setCommandHistoryListener(CommandHistoryListener listener)
+	public void setChangeHistoryListener(ChangeHistoryListener listener)
 	{
-		commandHistoryListener = listener;
+		changeHistoryListener = listener;
 		if ( page != null )
 		{
-			page.setCommandHistoryListener( listener );
+			page.setChangeHistoryListener( listener );
 		}
 	}
 	
@@ -365,19 +365,19 @@ public class Browser
 		{
 			if ( page != null )
 			{
-				page.setCommandHistoryListener( null );
+				page.setChangeHistoryListener( null );
 			}
 			
 			page = p;
 			
-			if ( page != null  &&  commandHistoryListener != null )
+			if ( page != null  &&  changeHistoryListener != null )
 			{
-				page.setCommandHistoryListener( commandHistoryListener );
+				page.setChangeHistoryListener( changeHistoryListener );
 			}
 			
-			if ( commandHistoryListener != null )
+			if ( changeHistoryListener != null )
 			{
-				commandHistoryListener.onCommandHistoryChanged( getCommandHistoryController() );
+				changeHistoryListener.onChangeHistoryChanged( getChangeHistoryController() );
 			}
 			
 			

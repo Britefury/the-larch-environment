@@ -3,15 +3,15 @@
 ##-* under the terms of the GNU General Public License version 2 as published by the
 ##-* Free Software Foundation. The full text of the GNU General Public License
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
-##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
+##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
-from Britefury.CommandHistory import CommandHistory
-from Britefury.CommandHistory import CommandTracker
+from Britefury.ChangeHistory import ChangeHistory
+from Britefury.ChangeHistory import CommandTracker
 
 
 
 
-class DMListAppendCommand (CommandHistory.Command):
+class DMListAppendCommand (ChangeHistory.Command):
 	def __init__(self, ls, x):
 		super( DMListAppendCommand, self ).__init__()
 		self._ls = ls
@@ -27,7 +27,7 @@ class DMListAppendCommand (CommandHistory.Command):
 
 
 
-class DMListExtendCommand (CommandHistory.Command):
+class DMListExtendCommand (ChangeHistory.Command):
 	def __init__(self, ls, xs):
 		super( DMListExtendCommand, self ).__init__()
 		self._ls = ls
@@ -44,7 +44,7 @@ class DMListExtendCommand (CommandHistory.Command):
 
 
 
-class DMListInsertCommand (CommandHistory.Command):
+class DMListInsertCommand (ChangeHistory.Command):
 	def __init__(self, ls, index, x):
 		super( DMListInsertCommand, self ).__init__()
 		self._ls = ls
@@ -61,7 +61,7 @@ class DMListInsertCommand (CommandHistory.Command):
 
 
 
-class DMListRemoveCommand (CommandHistory.Command):
+class DMListRemoveCommand (ChangeHistory.Command):
 	def __init__(self, ls, x):
 		super( DMListRemoveCommand, self ).__init__()
 		self._ls = ls
@@ -78,7 +78,7 @@ class DMListRemoveCommand (CommandHistory.Command):
 
 
 
-class DMListSetCommand (CommandHistory.Command):
+class DMListSetCommand (ChangeHistory.Command):
 	def __init__(self, ls, oldContents, contents):
 		super( DMListSetCommand, self ).__init__()
 		self._ls = ls
@@ -111,14 +111,14 @@ class DMListCommandTracker (CommandTracker.CommandTracker):
 		super( DMListCommandTracker, self ).track( ls )
 
 		for x in ls:
-			if self._commandHistory.canTrack( x ):
-				self._commandHistory.track( x )
+			if self._changeHistory.canTrack( x ):
+				self._changeHistory.track( x )
 
 
 	def stopTracking(self, ls):
 		for x in ls:
-			if self._commandHistory.canTrack( x ):
-				self._commandHistory.stopTracking( x )
+			if self._changeHistory.canTrack( x ):
+				self._changeHistory.stopTracking( x )
 
 		super( DMListCommandTracker, self ).stopTracking( ls )
 
@@ -126,39 +126,39 @@ class DMListCommandTracker (CommandTracker.CommandTracker):
 
 
 	def _f_onAppended(self, ls, x):
-		if self._commandHistory.canTrack( x ):
-			self._commandHistory.track( x )
-		self._commandHistory.addCommand( DMListAppendCommand( ls, x ) )
+		if self._changeHistory.canTrack( x ):
+			self._changeHistory.track( x )
+		self._changeHistory.addChange( DMListAppendCommand( ls, x ) )
 
 
 	def _f_onExtended(self, ls, xs):
-		self._commandHistory.addCommand( DMListExtendCommand( ls, xs ) )
+		self._changeHistory.addChange( DMListExtendCommand( ls, xs ) )
 		for x in xs:
-			if self._commandHistory.canTrack( x ):
-				self._commandHistory.track( x )
+			if self._changeHistory.canTrack( x ):
+				self._changeHistory.track( x )
 
 
 	def _f_onInserted(self, ls, index, x):
-		if self._commandHistory.canTrack( x ):
-			self._commandHistory.track( x )
-		self._commandHistory.addCommand( DMListInsertCommand( ls, index, x ) )
+		if self._changeHistory.canTrack( x ):
+			self._changeHistory.track( x )
+		self._changeHistory.addChange( DMListInsertCommand( ls, index, x ) )
 
 
 	def _f_onRemove(self, ls, x):
-		self._commandHistory.addCommand( DMListRemoveCommand( ls, x ) )
-		if self._commandHistory.canTrack( x ):
-			self._commandHistory.stopTracking( x )
+		self._changeHistory.addChange( DMListRemoveCommand( ls, x ) )
+		if self._changeHistory.canTrack( x ):
+			self._changeHistory.stopTracking( x )
 
 
 	def _f_onSet(self, ls, oldContents, contents):
 		oldContentsSet = set( oldContents )
 		contentsSet = set( contents )
 		for x in oldContentsSet - contentsSet:
-			if self._commandHistory.canTrack( x ):
-				self._commandHistory.stopTracking( x )
-		self._commandHistory.addCommand( DMListSetCommand( ls, oldContents, contents ) )
+			if self._changeHistory.canTrack( x ):
+				self._changeHistory.stopTracking( x )
+		self._changeHistory.addChange( DMListSetCommand( ls, oldContents, contents ) )
 		for x in contentsSet - oldContentsSet:
-			if self._commandHistory.canTrack( x ):
-				self._commandHistory.track( x )
+			if self._changeHistory.canTrack( x ):
+				self._changeHistory.track( x )
 
 

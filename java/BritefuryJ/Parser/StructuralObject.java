@@ -118,7 +118,7 @@ public class StructuralObject extends ParserExpression
 	
 	
 	
-	public boolean compareTo(ParserExpression x)
+	public boolean isEquivalentTo(ParserExpression x)
 	{
 		if ( x instanceof StructuralObject )
 		{

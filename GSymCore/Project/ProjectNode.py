@@ -5,7 +5,7 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
-from BritefuryJ.CommandHistory import Trackable
+from BritefuryJ.ChangeHistory import Trackable
 
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
@@ -14,7 +14,7 @@ from BritefuryJ.Incremental import IncrementalValueMonitor
 class ProjectNode (Trackable):
 	def __init__(self):
 		self._incr = IncrementalValueMonitor()
-		self._commandHistory = None
+		self._changeHistory = None
 		self._parent = None
 	
 	
@@ -27,7 +27,7 @@ class ProjectNode (Trackable):
 	
 	def __setstate__(self, state):
 		self._incr = IncrementalValueMonitor()
-		self._commandHistory = None
+		self._changeHistory = None
 		self._parent = None
 	
 	
@@ -35,11 +35,11 @@ class ProjectNode (Trackable):
 		return self._parent
 
 	
-	def getCommandHistory(self):
-		return self._commandHistory
+	def getChangeHistory(self):
+		return self._changeHistory
 	
-	def setCommandHistory(self, commandHistory):
-		self._commandHistory = commandHistory
+	def setChangeHistory(self, changeHistory):
+		self._changeHistory = changeHistory
 	
 	def trackContents(self, history):
 		pass

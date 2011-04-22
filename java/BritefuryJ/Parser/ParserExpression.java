@@ -638,7 +638,7 @@ public abstract class ParserExpression
 		}
 		else if ( x != null  &&  y != null )
 		{
-			return x.compareTo( y );
+			return x.isEquivalentTo( y );
 		}
 		else
 		{
@@ -646,7 +646,7 @@ public abstract class ParserExpression
 		}
 	}
 
-	public boolean compareTo(ParserExpression x)
+	public boolean isEquivalentTo(ParserExpression x)
 	{
 		return true;
 	}

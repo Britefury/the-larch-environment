@@ -43,7 +43,7 @@ public abstract class BranchExpression extends ParserExpression
 	}
 
 
-	public boolean compareTo(ParserExpression x)
+	public boolean isEquivalentTo(ParserExpression x)
 	{
 		if ( x instanceof BranchExpression )
 		{
@@ -56,7 +56,7 @@ public abstract class BranchExpression extends ParserExpression
 			
 			for (int i = 0; i < subexps.length; i++)
 			{
-				if ( !subexps[i].compareTo( xb.subexps[i] ) )
+				if ( !subexps[i].isEquivalentTo( xb.subexps[i] ) )
 				{
 					return false;
 				}

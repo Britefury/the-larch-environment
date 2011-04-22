@@ -3,7 +3,7 @@
 ##-* under the terms of the GNU General Public License version 2 as published by the
 ##-* Free Software Foundation. The full text of the GNU General Public License
 ##-* version 2 can be found in the file valued 'COPYING' that accompanies this
-##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
+##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
 from weakref import WeakKeyDictionary
 from copy import copy, deepcopy
@@ -166,7 +166,7 @@ class DMList (DMListInterface):
 
 
 import unittest
-from Britefury.CommandHistory import CommandHistory
+from Britefury.ChangeHistory import ChangeHistory
 
 
 
@@ -266,7 +266,7 @@ class TestCase_LiteralList (unittest.TestCase):
 
 
 	def _testUndo(self, opFunc):
-		ch = CommandHistory.CommandHistory()
+		ch = ChangeHistory.ChangeHistory()
 		dmxs = DMList( range( 0, 10 ) )
 		ch.track( dmxs )
 
@@ -320,7 +320,7 @@ class TestCase_LiteralList (unittest.TestCase):
 		
 		
 	def testNestedListUndo(self):
-		ch = CommandHistory.CommandHistory()
+		ch = ChangeHistory.ChangeHistory()
 		xs = DMList( [ 0,1 ] )
 		ch.track( xs )
 

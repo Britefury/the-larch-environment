@@ -111,12 +111,12 @@ public class Bind extends UnaryBranchExpression
 	}
 
 	
-	public boolean compareTo(ParserExpression x)
+	public boolean isEquivalentTo(ParserExpression x)
 	{
 		if ( x instanceof Bind )
 		{
 			Bind bx = (Bind)x;
-			return super.compareTo( x )  &&  name.equals( bx.name );
+			return super.isEquivalentTo( x )  &&  name.equals( bx.name );
 		}
 		else
 		{

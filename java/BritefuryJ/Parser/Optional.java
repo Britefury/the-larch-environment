@@ -89,11 +89,11 @@ public class Optional extends UnaryBranchExpression
 
 	
 	
-	public boolean compareTo(ParserExpression x)
+	public boolean isEquivalentTo(ParserExpression x)
 	{
 		if ( x instanceof Optional )
 		{
-			return super.compareTo( x );
+			return super.isEquivalentTo( x );
 		}
 		else
 		{

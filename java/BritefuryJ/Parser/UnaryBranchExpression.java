@@ -43,12 +43,12 @@ public abstract class UnaryBranchExpression extends ParserExpression
 		return Arrays.asList( children );
 	}
 	
-	public boolean compareTo(ParserExpression x)
+	public boolean isEquivalentTo(ParserExpression x)
 	{
 		if ( x instanceof UnaryBranchExpression )
 		{
 			UnaryBranchExpression ux = (UnaryBranchExpression)x;
-			return subexp.compareTo( ux.subexp );
+			return subexp.isEquivalentTo( ux.subexp );
 		}
 		else
 		{

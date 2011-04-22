@@ -163,12 +163,12 @@ public class Condition extends UnaryBranchExpression
 
 	
 	
-	public boolean compareTo(ParserExpression x)
+	public boolean isEquivalentTo(ParserExpression x)
 	{
 		if ( x instanceof Condition )
 		{
 			Condition xc = (Condition)x;
-			return super.compareTo( x )  &&  cond == xc.cond;
+			return super.isEquivalentTo( x )  &&  cond == xc.cond;
 		}
 		else
 		{

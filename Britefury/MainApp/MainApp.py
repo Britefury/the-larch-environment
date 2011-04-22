@@ -3,7 +3,7 @@
 ##-* under the terms of the GNU General Public License version 2 as published by the
 ##-* Free Software Foundation. The full text of the GNU General Public License
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
-##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
+##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
 from javax.swing import JOptionPane
 from BritefuryJ.AttributeTable import SimpleAttributeTable
@@ -35,8 +35,8 @@ class MainApp (object):
 			def getSubjectContext(self):
 				return self._innerSubject.getSubjectContext()
 			
-			def getCommandHistory(self):
-				return self._innerSubject.getCommandHistory()
+			def getChangeHistory(self):
+				return self._innerSubject.getChangeHistory()
 		
 		
 

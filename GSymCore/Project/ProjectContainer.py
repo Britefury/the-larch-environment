@@ -7,7 +7,7 @@
 ##-*************************
 from Britefury.Util.TrackedList import TrackedListProperty
 
-from BritefuryJ.CommandHistory import Trackable
+from BritefuryJ.ChangeHistory import Trackable
 from BritefuryJ.Cell import Cell
 
 from GSymCore.Project.ProjectNode import ProjectNode
@@ -111,7 +111,7 @@ class ProjectContainer (ProjectNode):
 	contentsMap = property( getContentsMap )
 
 	
-	_contents = TrackedListProperty( '_contents_', '_commandHistory', _onContentsChange )
+	_contents = TrackedListProperty( '_contents_', '_changeHistory', _onContentsChange )
 	
 	
 	
