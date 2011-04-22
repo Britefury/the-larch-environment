@@ -68,7 +68,7 @@ public abstract class UnparsedEditListener extends SRStreamEditListener
 				// Source fragment is this fragment - replace this node with an unparsed node
 				if ( logName != null )
 				{
-					Log log = fragment.getView().getPageLog();
+					Log log = fragment.getView().getLog();
 					if ( log.isRecording() )
 					{
 						log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " (unparsed) - apply to model" ).vItem( "editedStream", value ) );
@@ -88,7 +88,7 @@ public abstract class UnparsedEditListener extends SRStreamEditListener
 					// Value is empty - replace this node with an unparsed node
 					if ( logName != null )
 					{
-						Log log = fragment.getView().getPageLog();
+						Log log = fragment.getView().getLog();
 						if ( log.isRecording() )
 						{
 							log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " (unparsed) - sub-model deleted" ).vItem( "editedStream", value ) );
@@ -100,7 +100,7 @@ public abstract class UnparsedEditListener extends SRStreamEditListener
 				// Value is valid - replace the innermost node with an unparsed node
 				if ( logName != null )
 				{
-					Log log = fragment.getView().getPageLog();
+					Log log = fragment.getView().getLog();
 					if ( log.isRecording() )
 					{
 						log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " (unparsed) - apply to sub-model" ).vItem( "editedStream", sourceValue ) );
@@ -113,7 +113,7 @@ public abstract class UnparsedEditListener extends SRStreamEditListener
 		{
 			if ( logName != null )
 			{
-				Log log = fragment.getView().getPageLog();
+				Log log = fragment.getView().getLog();
 				if ( log.isRecording() )
 				{
 					log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " (unparsed) - invalid" ).vItem( "editedStream", value ) );

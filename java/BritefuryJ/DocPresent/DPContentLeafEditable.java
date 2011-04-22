@@ -766,7 +766,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 
 	public boolean onContentKeyTyped(Caret caret, KeyEvent event)
 	{
-		if ( !Character.isISOControl( event.getKeyChar() ) )
+		if ( !Character.isISOControl( event.getKeyChar() )  ||  event.getKeyChar() == '\n' )
 		{
 			String str = String.valueOf( event.getKeyChar() );
 			if ( str.length() > 0 )

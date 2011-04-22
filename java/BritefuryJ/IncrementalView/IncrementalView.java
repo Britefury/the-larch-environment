@@ -19,7 +19,6 @@ import BritefuryJ.DocPresent.DPColumn;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.PresentationComponent;
-import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
@@ -261,12 +260,12 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	private FragmentView.NodeResultFactory rootNodeResultFactory;
 	
 	
-	private DPRegion region;
+	protected DPRegion region;
 	
 	private ProjectiveBrowserContext browserContext;
-	private IncrementalViewPage page;
 	
 	private ChangeHistory changeHistory;
+	protected Log log;
 
 	private HashMap<ViewFragmentContextAndResultFactoryKey, ViewFragmentContextAndResultFactory> viewFragmentContextAndResultFactories =
 		new HashMap<ViewFragmentContextAndResultFactoryKey, ViewFragmentContextAndResultFactory>();
@@ -277,6 +276,9 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	public IncrementalView(Subject subject, ProjectiveBrowserContext browserContext, PersistentStateStore persistentState)
 	{
 		super( subject.getFocus(), DuplicatePolicy.ALLOW_DUPLICATES );
+	
+		log = new Log( "View log" );
+		
 		AbstractPerspective perspective = subject.getPerspective();
 		if ( perspective == null )
 		{
@@ -297,15 +299,17 @@ public class IncrementalView extends IncrementalTree implements Presentable
 		this.changeHistory = subject.getChangeHistory();
 		
 		region = new DPRegion();
-		DPElement column = new Column( new Object[] { region } ).present();
 
-		page = new IncrementalViewPage( column.alignHExpand().alignVExpand(), subject.getTitle(), browserContext, changeHistory, this );
-		
 		setElementChangeListener( new NodeElementChangeListenerDiff() );
 		
 		// We need to do this last
 		region.setChild( getRootViewElement().alignHExpand().alignVExpand() );
 		region.setClipboardHandler( perspective.getClipboardHandler() );
+	}
+	
+	public IncrementalView(Subject subject, ProjectiveBrowserContext browserContext)
+	{
+		this( subject, browserContext, null );
 	}
 	
 	
@@ -342,7 +346,7 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	
 	
 	
-	public DPElement getRootViewElement()
+	private DPElement getRootViewElement()
 	{
 		if ( rootBox == null )
 		{
@@ -352,6 +356,12 @@ public class IncrementalView extends IncrementalTree implements Presentable
 			rootBox = (DPColumn)new Column( new Object[] { fragmentElement.alignHExpand().alignVExpand() } ).present();
 		}
 		return rootBox;
+	}
+	
+	
+	public DPElement getViewElement()
+	{
+		return region;
 	}
 	
 	
@@ -623,21 +633,15 @@ public class IncrementalView extends IncrementalTree implements Presentable
 		return browserContext;
 	}
 	
-	public BrowserPage getPage()
-	{
-		return page;
-	}
-	
-	public Log getPageLog()
-	{
-		return page.getLog();
-	}
-	
 	public ChangeHistory getChangeHistory()
 	{
 		return changeHistory;
 	}
 	
+	public Log getLog()
+	{
+		return log;
+	}
 	
 	
 	public void onRequestRefresh()

@@ -71,7 +71,7 @@ public abstract class ParsingEditListener extends SRStreamEditListener
 		{
 			if ( logName != null )
 			{
-				Log log = fragment.getView().getPageLog();
+				Log log = fragment.getView().getLog();
 				if ( log.isRecording() )
 				{
 					log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " - deleted" ).vItem( "editedStream", value ) );
@@ -87,7 +87,7 @@ public abstract class ParsingEditListener extends SRStreamEditListener
 			{
 				if ( logName != null )
 				{
-					Log log = fragment.getView().getPageLog();
+					Log log = fragment.getView().getLog();
 					if ( log.isRecording() )
 					{
 						log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " - parse succeeded" ).vItem( "editedStream", value ).hItem( "parser", parser ).vItem( "parsed", parsed[0] ) );
@@ -99,7 +99,7 @@ public abstract class ParsingEditListener extends SRStreamEditListener
 			{
 				if ( logName != null )
 				{
-					Log log = fragment.getView().getPageLog();
+					Log log = fragment.getView().getLog();
 					if ( log.isRecording() )
 					{
 						log.log( new LogEntry( getSequentialEditor().getName() ).hItem( "description", logName + " - parse failed" ).vItem( "editedStream", value ).hItem( "parser", parser ) );

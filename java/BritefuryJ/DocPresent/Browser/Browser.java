@@ -12,7 +12,6 @@ import java.awt.Dimension;
 import java.awt.MediaTracker;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -28,18 +27,17 @@ import javax.swing.TransferHandler;
 
 import BritefuryJ.ChangeHistory.ChangeHistoryController;
 import BritefuryJ.ChangeHistory.ChangeHistoryListener;
+import BritefuryJ.Command.CommandBar;
+import BritefuryJ.Command.CommandConsoleInterface;
 import BritefuryJ.Controls.ScrolledViewport;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.PageController;
 import BritefuryJ.DocPresent.PresentationComponent;
-import BritefuryJ.DocPresent.Input.Keyboard.Keyboard;
-import BritefuryJ.DocPresent.Input.Keyboard.KeyboardInteractor;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.HiddenContent;
-import BritefuryJ.Pres.Primitive.Text;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class Browser
@@ -61,7 +59,8 @@ public class Browser
 	private JTextField locationField;
 	private JPanel panel;
 
-	private PresentationComponent presComponent, commandBar;
+	private PresentationComponent presComponent;
+	private CommandBar commandBar;
 	private ScrolledViewport.ScrolledViewportControl viewport;
 	private BrowserHistory history;
 	
@@ -73,7 +72,7 @@ public class Browser
 	
 	
 	
-	public Browser(PageLocationResolver resolver, Location location, PageController pageController, boolean showCommandBar)
+	public Browser(PageLocationResolver resolver, Location location, PageController pageController, CommandConsoleInterface commandConsole)
 	{
 		this.resolver = resolver;
 		history = new BrowserHistory( location );
@@ -123,14 +122,12 @@ public class Browser
 
 		
 		
-		if ( showCommandBar )
+		if ( commandConsole != null )
 		{
-			commandBar = new PresentationComponent();
-			commandBar.setPageController( pageController );
-			commandBar.setChild( makeCommandElement( new Text( "" ) ) );
+			commandBar = new CommandBar( presComponent, commandConsole, pageController );
 			
 			JPanel commandPanel = new JPanel( new BorderLayout() );
-			commandPanel.add( commandBar, BorderLayout.CENTER );
+			commandPanel.add( commandBar.getComponent(), BorderLayout.CENTER );
 			commandPanel.setBorder( BorderFactory.createLineBorder( Color.black, 1 ) );
 			
 			JPanel footer = new JPanel( new BorderLayout( 5, 0 ) );
@@ -140,71 +137,6 @@ public class Browser
 			
 			
 			panel.add( footer, BorderLayout.PAGE_END );
-			
-			
-			KeyboardInteractor presComponentSwitchInteractor = new KeyboardInteractor()
-			{
-				@Override
-				public boolean keyPressed(Keyboard keyboard, KeyEvent event)
-				{
-					if ( event.getKeyCode() == KeyEvent.VK_ESCAPE )
-					{
-						return true;
-					}
-					return false;
-				}
-
-				@Override
-				public boolean keyReleased(Keyboard keyboard, KeyEvent event)
-				{
-					if ( event.getKeyCode() == KeyEvent.VK_ESCAPE )
-					{
-						commandBar.grabFocus();
-						return true;
-					}
-					return false;
-				}
-
-				@Override
-				public boolean keyTyped(Keyboard keyboard, KeyEvent event)
-				{
-					return false;
-				}
-			};
-			presComponentSwitchInteractor.addToKeyboard( presComponent.getRootElement().getKeyboard() );
-		
-		
-			KeyboardInteractor commandBarSwitchInteractor = new KeyboardInteractor()
-			{
-				@Override
-				public boolean keyPressed(Keyboard keyboard, KeyEvent event)
-				{
-					if ( event.getKeyCode() == KeyEvent.VK_ESCAPE )
-					{
-						return true;
-					}
-					return false;
-				}
-
-				@Override
-				public boolean keyReleased(Keyboard keyboard, KeyEvent event)
-				{
-					if ( event.getKeyCode() == KeyEvent.VK_ESCAPE )
-					{
-						presComponent.grabFocus();
-						return true;
-					}
-					return false;
-				}
-
-				@Override
-				public boolean keyTyped(Keyboard keyboard, KeyEvent event)
-				{
-					return false;
-				}
-			};
-			commandBarSwitchInteractor.addToKeyboard( commandBar.getRootElement().getKeyboard() );
-
 		}
 		
 		resolve();
@@ -337,13 +269,7 @@ public class Browser
 		return (ScrolledViewport.ScrolledViewportControl)vp.createControl( PresentationContext.defaultCtx, StyleValues.instance );
 	}
 	
-	private DPElement makeCommandElement(Object child)
-	{
-		Pres childPres = Pres.coerce( child );
-		return childPres.present();
-	}
-	
-	
+
 	private void resolve()
 	{
 		// Get the location to resolve

@@ -95,7 +95,7 @@ public class ObjectDndHandler extends DndHandler
 			int b = dataType.hashCode();
 			int c = sourceDataFn != null  ?  sourceDataFn.hashCode()  :  0;
 			int d = exportDoneFn != null  ?  exportDoneFn.hashCode()  :  0;
-			return HashUtils.nHash( new int [] { a, b, c, d } );
+			return HashUtils.quadHash( a, b, c, d );
 		}
 	}
 	
