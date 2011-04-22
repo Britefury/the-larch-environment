@@ -22,8 +22,8 @@ import BritefuryJ.DocPresent.Browser.PageLocationResolver;
 import BritefuryJ.DocPresent.Browser.SystemPages.SystemRootPage;
 import BritefuryJ.DocPresent.Clipboard.ClipboardHandlerInterface;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
+import BritefuryJ.IncrementalView.BrowserIncrementalView;
 import BritefuryJ.IncrementalView.FragmentView;
-import BritefuryJ.IncrementalView.IncrementalView;
 import BritefuryJ.ObjectPresentation.ObjectPresentationLocationResolver;
 import BritefuryJ.ObjectPresentation.ObjectPresentationPerspective;
 import BritefuryJ.Pres.Pres;
@@ -216,7 +216,7 @@ public class ProjectiveBrowserContext
 	public BrowserPage resolveLocationAsPage(Location location, PersistentStateStore persistentState)
 	{
 		Subject subject = resolveLocationAsSubject( location );
-		IncrementalView view = new IncrementalView( subject, this, persistentState );
+		BrowserIncrementalView view = new BrowserIncrementalView( subject, this, persistentState );
 		return view.getPage();
 	}
 	

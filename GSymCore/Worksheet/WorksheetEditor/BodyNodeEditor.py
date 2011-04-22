@@ -42,7 +42,7 @@ class BodyNodeEditListener (StreamEditListener):
 		return WorksheetSequentialEditor.instance
 	
 	def handleValue(self, element, sourceElement, fragment, event, model, value):
-		log = element.getFragmentContext().getView().getPageLog()
+		log = element.getFragmentContext().getView().getLog()
 		if log.isRecording():
 			log.log( LogEntry( 'WsEdit' ).hItem( 'description', 'Body - selection edit' ).vItem( 'editedStream', value ) )
 			

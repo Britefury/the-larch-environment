@@ -1,0 +1,31 @@
+//##* This program is free software; you can use it, redistribute it and/or modify it
+//##* under the terms of the GNU General Public License version 2 as published by the
+//##* Free Software Foundation. The full text of the GNU General Public License
+//##* version 2 can be found in the file named 'COPYING' that accompanies this
+//##* program. This source code is (C)copyright Geoffrey French 2008-2010.
+//##************************
+package BritefuryJ.Command;
+
+public class Command
+{
+	private String charSequence;
+	private String name;
+	
+	
+	public Command(String charSequence, String name)
+	{
+		this.charSequence = charSequence;
+		this.name = name;
+	}
+	
+	
+	public String getCharSequence()
+	{
+		return charSequence;
+	}
+
+	public String getName()
+	{
+		return name;
+	}
+}

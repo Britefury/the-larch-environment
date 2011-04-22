@@ -33,6 +33,7 @@ import javax.swing.plaf.basic.BasicButtonUI;
 
 import BritefuryJ.ChangeHistory.ChangeHistoryController;
 import BritefuryJ.ChangeHistory.ChangeHistoryListener;
+import BritefuryJ.Command.CommandConsoleInterface;
 import BritefuryJ.DocPresent.PageController;
 
 public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, PageController
@@ -209,15 +210,15 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	private Browser currentBrowser;
 	private ChangeHistoryListener changeHistoryListener;
 	
-	private boolean showCommandPanel;
+	private CommandConsoleInterface commandConsole;
 	
 	
 	
-	public TabbedBrowser(PageLocationResolver resolver, TabbedBrowserListener listener, Location location, boolean showCommandPanel)
+	public TabbedBrowser(PageLocationResolver resolver, TabbedBrowserListener listener, Location location, CommandConsoleInterface commandConsole)
 	{
 		this.resolver = resolver;
 		this.listener = listener;
-		this.showCommandPanel = showCommandPanel;
+		this.commandConsole = commandConsole;
 		
 		browsers = new ArrayList<Browser>();
 
@@ -303,7 +304,7 @@ public class TabbedBrowser implements Browser.BrowserListener, ChangeListener, P
 	
 	private Browser createBrowser(Location location)
 	{
-		Browser browser = new Browser( resolver, location, this, showCommandPanel );
+		Browser browser = new Browser( resolver, location, this, commandConsole );
 		browser.setListener( this );
 		return browser;
 	}

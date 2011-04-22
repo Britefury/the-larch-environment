@@ -9,6 +9,7 @@ package BritefuryJ.Pres;
 import java.awt.datatransfer.DataFlavor;
 import java.util.List;
 
+import BritefuryJ.Command.CommandSet;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementPainter;
 import BritefuryJ.DocPresent.ElementValueFunction;
@@ -210,6 +211,17 @@ public abstract class Pres
 	public AddElementInteractor withElementInteractor(AbstractElementInteractor interactor)
 	{
 		return new AddElementInteractor( this, interactor );
+	}
+	
+	
+	
+	//
+	// Command set methods
+	//
+	
+	public AddCommandSet withCommandSet(CommandSet commandSet)
+	{
+		return new AddCommandSet( this, commandSet );
 	}
 	
 	

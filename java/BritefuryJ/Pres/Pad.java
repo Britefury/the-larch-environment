@@ -34,7 +34,7 @@ public class Pad extends Pres
 			this.rightPad = rightPad;
 			this.topPad = topPad;
 			this.bottomPad = bottomPad;
-			hash = HashUtils.nHash( new int[] { new Double( leftPad ).hashCode(), new Double( rightPad ).hashCode(), new Double( topPad ).hashCode(), new Double( bottomPad ).hashCode() } );
+			hash = HashUtils.quadHash( new Double( leftPad ).hashCode(), new Double( rightPad ).hashCode(), new Double( topPad ).hashCode(), new Double( bottomPad ).hashCode() );
 		}
 		
 		

@@ -28,25 +28,24 @@ public class IncrementalViewPage extends BrowserPage
 	private Hyperlink logLink;
 	private DPElement pageElement;
 	private String title;
-	private Log log;
 	private ChangeHistory changeHistory;
-	private IncrementalView view;
+	private BrowserIncrementalView view;
 	
 	
 	
-	public IncrementalViewPage(DPElement element, String title, final ProjectiveBrowserContext browserContext, ChangeHistory changeHistory, IncrementalView view)
+	public IncrementalViewPage(DPElement element, String title, final ProjectiveBrowserContext browserContext, ChangeHistory changeHistory, BrowserIncrementalView view)
 	{
 		this.element = element;
 		this.title = title;
 		this.changeHistory = changeHistory;
 		this.view = view;
-		log = new Log( "Page log" );
 		
 		Hyperlink.LinkListener listener = new Hyperlink.LinkListener()
 		{
 			@Override
 			public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonClickedEvent event)
 			{
+				Log log = getLog();
 				log.startRecording();
 				LogView view = new LogView( log );
 				Location location = browserContext.getLocationForObject( view );
@@ -73,7 +72,7 @@ public class IncrementalViewPage extends BrowserPage
 
 	public Log getLog()
 	{
-		return log;
+		return view.getLog();
 	}
 
 	
