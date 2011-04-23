@@ -24,6 +24,10 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 
+import BritefuryJ.Command.CommandConsole;
+import BritefuryJ.Command.CommandConsoleFactory;
+import BritefuryJ.Command.AbstractCommandConsole;
+import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.TabbedBrowser;
 import BritefuryJ.Projection.ProjectiveBrowserContext;
@@ -96,8 +100,19 @@ public class BrowserTest implements TabbedBrowser.TabbedBrowserListener
 		JFrame frame = new JFrame( "Browser test" );
 		frame.setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
 		
-		ProjectiveBrowserContext browserContext = new ProjectiveBrowserContext( true );
-		TabbedBrowser browser = new TabbedBrowser( browserContext.getPageLocationResolver(), this, location, null );
+		
+		final ProjectiveBrowserContext browserContext = new ProjectiveBrowserContext( true );
+		CommandConsoleFactory fac = new CommandConsoleFactory()
+		{
+			@Override
+			public AbstractCommandConsole createCommandConsole(PresentationComponent pres)
+			{
+				return new CommandConsole( browserContext, pres );
+			}
+		};
+		
+		
+		TabbedBrowser browser = new TabbedBrowser( browserContext.getPageLocationResolver(), this, location, fac );
 		browser.getComponent().setPreferredSize( new Dimension( 800, 600 ) );
 		frame.setJMenuBar( menuBar );
 		frame.add( browser.getComponent() );

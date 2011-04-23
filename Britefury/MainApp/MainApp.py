@@ -8,6 +8,8 @@
 from javax.swing import JOptionPane
 from BritefuryJ.AttributeTable import SimpleAttributeTable
 
+from BritefuryJ.Command import CommandConsole
+
 from BritefuryJ.DocPresent.Browser import Location
 
 from BritefuryJ.Projection import ProjectiveBrowserContext, Subject
@@ -41,15 +43,21 @@ class MainApp (object):
 		
 
 		self._world = world
-
+		
+		
 		self._browserContext = ProjectiveBrowserContext( True )
 		self._world.registerBrowserContext( self._browserContext )
 		
+		def _createCommandConsole(presentationComponent):
+			return CommandConsole( self._browserContext, presentationComponent )
+		
+		self._createCommandConsole = _createCommandConsole
+
 		self._appState = world.getAppStateSubject().getFocus()
 		self._browserContext.registerMainSubject( world.getAppStateSubject() )
 		self._browserContext.registerNamedSubject( 'model', _ModelSubject )
 		
-		self._rootWindow = AppWindow( self, location )
+		self._rootWindow = AppWindow( self, self._createCommandConsole, location )
 		self._rootWindow.setCloseRequestListener( self._onWindowCloseRequest )
 		self._openWindows = set( [ self._rootWindow ] )
 		
@@ -74,7 +82,7 @@ class MainApp (object):
 
 		
 	def _createNewWindow(self, location):
-		newWindow = AppWindow( self, location )
+		newWindow = AppWindow( self, self._createCommandConsole, location )
 		newWindow.setCloseRequestListener( self._onWindowCloseRequest )
 		newWindow.show()
 		self._openWindows.add( newWindow )

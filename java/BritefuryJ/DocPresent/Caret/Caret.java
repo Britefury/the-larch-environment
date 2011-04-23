@@ -366,11 +366,11 @@ public class Caret extends Target implements MarkerListener
 		{
 			if ( isElementWithinGrabSubtree( homeElement ) )
 			{
-				homeElement.moveMarkerToStart( marker );
+				moveToStartOfElement( homeElement );
 			}
 			else
 			{
-				grabElement.moveMarkerToStart( marker );
+				moveToStartOfElement( grabElement );
 			}
 		}
 	}
@@ -394,11 +394,11 @@ public class Caret extends Target implements MarkerListener
 		{
 			if ( isElementWithinGrabSubtree( endElement ) )
 			{
-				endElement.moveMarkerToEnd( marker );
+				moveToEndOfElement( endElement );
 			}
 			else
 			{
-				grabElement.moveMarkerToEnd( marker );
+				moveToEndOfElement( grabElement );
 			}
 		}
 	}
@@ -419,6 +419,48 @@ public class Caret extends Target implements MarkerListener
 
 
 
+	public void moveToStartOfElement(DPElement element)
+	{
+		DPContentLeafEditable leaf = element.getLeftEditableContentLeaf();
+		if ( leaf != null  &&  leaf.isRealised() )
+		{
+			if ( leaf.isEditable() )
+			{
+				moveTo( leaf.markerAtStart() );
+			}
+			else
+			{
+				DPContentLeaf right = leaf.getNextLeaf( new DPElement.SubtreeElementFilter( element ), null, new DPContentLeaf.EditableLeafElementFilter() );
+				if ( right != null  &&  right.isRealised() )
+				{
+					moveTo( right.markerAtStart() );
+				}
+			}
+		}
+	}
+	
+	
+	public void moveToEndOfElement(DPElement element)
+	{
+		DPContentLeafEditable leaf = element.getRightEditableContentLeaf();
+		if ( leaf != null  &&  leaf.isRealised() )
+		{
+			if ( leaf.isEditable() )
+			{
+				moveTo( leaf.markerAtEnd() );
+			}
+			else
+			{
+				DPContentLeaf left = leaf.getPreviousLeaf( new DPElement.SubtreeElementFilter( element ), null, new DPContentLeaf.EditableLeafElementFilter() );
+				if ( left != null  &&  left.isRealised() )
+				{
+					moveTo( left.markerAtEnd() );
+				}
+			}
+		}
+	}
+	
+	
 	public void moveToPositionAndBiasWithinSubtree(DPElement subtree, int newPosition, Marker.Bias newBias)
 	{
 		marker.moveToPositionAndBiasWithinSubtree( subtree, newPosition, newBias, new DPContentLeaf.EditableLeafElementFilter() );

@@ -529,6 +529,6 @@ public class Marker
 	@Override
 	public String toString()
 	{
-		return "Marker( element=" + element + ", position=" + position + ", bias=" + bias + " )";
+		return "Marker[" + System.identityHashCode( this ) + "]( element=" + element + ", position=" + position + ", bias=" + bias + " )";
 	}
 }
