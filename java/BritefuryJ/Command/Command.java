@@ -6,6 +6,10 @@
 //##************************
 package BritefuryJ.Command;
 
+import java.awt.Color;
+
+import BritefuryJ.DocPresent.Border.SolidBorder;
+
 public class Command
 {
 	public interface CommandAction
@@ -13,34 +17,26 @@ public class Command
 		void commandAction(Command command);
 	}
 	
-	private String charSequence;
-	private String name;
-	private int charIndices[];
+	private CommandName name;
 	private CommandAction action;
 	
 	
-	public Command(String charSequence, String name, CommandAction action)
+	public Command(CommandName name, CommandAction action)
 	{
-		this.charSequence = charSequence;
 		this.name = name;
-		charIndices = computeIndices( charSequence, name );
 		this.action = action;
 	}
 	
-	
-	public String getCharSequence()
+	public Command(String charSeq, String name, CommandAction action)
 	{
-		return charSequence;
+		this( new CommandName( charSeq, name ), action );
 	}
+	
+	
 
-	public String getName()
+	public CommandName getName()
 	{
 		return name;
-	}
-	
-	public int[] getCharIndices()
-	{
-		return charIndices;
 	}
 	
 	
@@ -48,31 +44,11 @@ public class Command
 	{
 		action.commandAction( this );
 	}
-	
-	
-	
-	private static int[] computeIndices(String charSequence, String name)
+
+
+
+	public static SolidBorder cmdBorder(Color borderColour, Color backgroundColour)
 	{
-		int currentIndex = 0;
-		int indices[] = new int[charSequence.length()];
-		int j = 0;
-		for (int i = 0; i < charSequence.length(); i++)
-		{
-			char c = charSequence.charAt( i );
-			
-			int index = name.indexOf( c, currentIndex );
-			if ( index == -1 )
-			{
-				indices = null;
-				break;
-			}
-			else
-			{
-				indices[j++] = index;
-				currentIndex = index + 1;
-			}
-		}
-		
-		return indices;
+		return new SolidBorder( 1.0, 2.0, 8.0, 8.0, borderColour, backgroundColour );
 	}
 }

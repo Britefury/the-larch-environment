@@ -50,7 +50,7 @@ public class CommandSet implements Iterable<Command>
 	{
 		for (Command cmd: commands)
 		{
-			if ( cmd.getCharSequence().equals( charSequence ) )
+			if ( cmd.getName().getCharSequence().equals( charSequence ) )
 			{
 				return cmd;
 			}
@@ -64,7 +64,7 @@ public class CommandSet implements Iterable<Command>
 	{
 		for (Command cmd: commands)
 		{
-			if ( cmd.getCharSequence().startsWith( charSequence ) )
+			if ( cmd.getName().getCharSequence().startsWith( charSequence ) )
 			{
 				cmdList.add( cmd );
 			}
