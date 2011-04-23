@@ -6,11 +6,9 @@
 //##************************
 package BritefuryJ.Command;
 
-import BritefuryJ.Projection.ProjectiveBrowserContext;
-import BritefuryJ.Projection.Subject;
+import BritefuryJ.DocPresent.PresentationComponent;
 
-public interface CommandConsoleInterface
+public interface CommandConsoleFactory
 {
-	public Subject getSubject();
-	public ProjectiveBrowserContext getBrowserContext();
+	public AbstractCommandConsole createCommandConsole(PresentationComponent pres);
 }

@@ -77,7 +77,7 @@ class _GSymTransferActionListener (ActionListener):
 
 		
 class AppWindow (object):
-	def __init__(self, app, location=Location( '' )):
+	def __init__(self, app, commandConsoleFactory, location=Location( '' )):
 		self._app = app
 		
 		class _BrowserListener (TabbedBrowser.TabbedBrowserListener):
@@ -85,7 +85,7 @@ class AppWindow (object):
 				self._createNewWindow( location )
 				
 				
-		self._browser = TabbedBrowser( self._app._browserContext.getPageLocationResolver(), _BrowserListener(), location, False )
+		self._browser = TabbedBrowser( self._app._browserContext.getPageLocationResolver(), _BrowserListener(), location, commandConsoleFactory )
 		self._browser.getComponent().setPreferredSize( Dimension( 800, 600 ) )
 
 		

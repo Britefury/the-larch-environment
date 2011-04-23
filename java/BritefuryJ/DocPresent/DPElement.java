@@ -91,6 +91,34 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	protected static double NON_TYPESET_CHILD_BASELINE_OFFSET = -5.0;
 	
 	
+	
+	//
+	//
+	// FILTERS
+	//
+	//
+	
+	public static class SubtreeElementFilter implements ElementFilter
+	{
+		private DPElement subtreeRoot;
+		
+		
+		public SubtreeElementFilter(DPElement subtreeRoot)
+		{
+			this.subtreeRoot = subtreeRoot;
+		}
+		
+		
+		public boolean testElement(DPElement element)
+		{
+			return element.isInSubtreeRootedAt( subtreeRoot );
+		}
+	}
+	
+	
+	
+	
+	
 	//
 	//
 	// PRESENTABLE

@@ -36,7 +36,6 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.ImageObserver;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.WeakHashMap;
 
 import javax.swing.JComponent;
 import javax.swing.JWindow;
@@ -69,6 +68,7 @@ import BritefuryJ.Logging.LogEntry;
 import BritefuryJ.Math.AABox2;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Math.Vector2;
+import BritefuryJ.Utils.WeakIdentityHashMap;
 
 public class PresentationComponent extends JComponent implements ComponentListener, MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, HierarchyListener, FocusListener
 {
@@ -410,7 +410,8 @@ public class PresentationComponent extends JComponent implements ComponentListen
 		private boolean bAllocationRequired;
 		
 		
-		protected WeakHashMap<DPContentLeafEditable, WeakHashMap<Marker, Object>> markersByLeaf = new WeakHashMap<DPContentLeafEditable, WeakHashMap<Marker, Object>>();
+		protected WeakIdentityHashMap<DPContentLeafEditable, WeakIdentityHashMap<Marker, Object>> markersByLeaf =
+			new WeakIdentityHashMap<DPContentLeafEditable, WeakIdentityHashMap<Marker, Object>>();
 		
 		private Caret caret;
 		private DPContentLeafEditable currentCaretLeaf = null;
@@ -450,7 +451,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			
 			rootElement = this;
 			
-			windowSize = new Vector2();
+			windowSize = new Vector2( 1.0, 1.0 );
 			
 			inputTable = new InputTable( this, this, component );
 			rootSpaceMouse = inputTable.getMouse();
@@ -900,11 +901,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 					{
 						if ( !caret.isValid() )
 						{
-							DPContentLeafEditable leaf = getLayoutNode().getLeftEditableContentLeaf();
-							if ( leaf != null  &&  leaf.isRealised() )
-							{
-								caret.moveTo( leaf.markerAtStart() );
-							}
+							caret.moveToStartOfElement( RootElement.this );
 						}
 						
 						caretMoveToStartQueued = false;
@@ -930,6 +927,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			{
 				windowSize = size;
 				bAllocationRequired = true;
+				queueReallocation();
 			}
 			emitImmediateEvents();
 		}

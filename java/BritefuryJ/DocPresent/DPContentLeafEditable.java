@@ -12,7 +12,6 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.WeakHashMap;
 
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
@@ -23,6 +22,7 @@ import BritefuryJ.Math.Point2;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleSheet;
+import BritefuryJ.Utils.WeakIdentityHashMap;
 
 public abstract class DPContentLeafEditable extends DPContentLeaf
 {
@@ -301,7 +301,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	
 	
-	protected WeakHashMap<Marker, Object> getMarkersForLeaf()
+	protected WeakIdentityHashMap<Marker, Object> getMarkersForLeaf()
 	{
 		if ( rootElement != null )
 		{
@@ -313,15 +313,15 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 		}
 	}
 	
-	protected WeakHashMap<Marker, Object> getValidMarkersForLeaf()
+	protected WeakIdentityHashMap<Marker, Object> getValidMarkersForLeaf()
 	{
 		if ( rootElement != null )
 		{
-			WeakHashMap<Marker, Object> markers = rootElement.markersByLeaf.get( this );
+			WeakIdentityHashMap<Marker, Object> markers = rootElement.markersByLeaf.get( this );
 			
 			if ( markers == null )
 			{
-				markers = new WeakHashMap<Marker, Object>(); 
+				markers = new WeakIdentityHashMap<Marker, Object>(); 
 				rootElement.markersByLeaf.put( this, markers );
 			}
 			
@@ -341,13 +341,13 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	public void registerMarker(Marker m)
 	{
-		WeakHashMap<Marker, Object> markers = getValidMarkersForLeaf();
+		WeakIdentityHashMap<Marker, Object> markers = getValidMarkersForLeaf();
 		markers.put( m, null );
 	}
 	
 	public void unregisterMarker(Marker m)
 	{
-		WeakHashMap<Marker, Object> markers = getMarkersForLeaf();
+		WeakIdentityHashMap<Marker, Object> markers = getMarkersForLeaf();
 		if ( markers != null )
 		{
 			markers.remove( m );
@@ -364,10 +364,12 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	public void markerInsert(int position, int length)
 	{
-		WeakHashMap<Marker, Object> markers = getMarkersForLeaf();
+		WeakIdentityHashMap<Marker, Object> markers = getMarkersForLeaf();
 		if ( markers != null )
 		{
-			for (Marker m: markers.keySet())
+			ArrayList<Marker> markersToMove = new ArrayList<Marker>();
+			markersToMove.addAll( markers.keySet() );
+			for (Marker m: markersToMove)
 			{
 				if ( m.isValid() )
 				{
@@ -386,12 +388,14 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	
 	public void markerRemove(int position, int length)
 	{
-		WeakHashMap<Marker, Object> markers = getMarkersForLeaf();
+		WeakIdentityHashMap<Marker, Object> markers = getMarkersForLeaf();
 		if ( markers != null )
 		{
 			int end = position + length;
 	
-			for (Marker m: markers.keySet())
+			ArrayList<Marker> markersToMove = new ArrayList<Marker>();
+			markersToMove.addAll( markers.keySet() );
+			for (Marker m: markersToMove)
 			{
 				if ( m.isValid() )
 				{
@@ -427,7 +431,7 @@ public abstract class DPContentLeafEditable extends DPContentLeaf
 	{
 		super.onUnrealise( unrealiseRoot );
 		
-		WeakHashMap<Marker, Object> markers = getMarkersForLeaf();
+		WeakIdentityHashMap<Marker, Object> markers = getMarkersForLeaf();
 
 		if ( markers != null )
 		{

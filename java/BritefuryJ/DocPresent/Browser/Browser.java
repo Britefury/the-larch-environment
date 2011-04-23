@@ -19,7 +19,6 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
@@ -28,7 +27,8 @@ import javax.swing.TransferHandler;
 import BritefuryJ.ChangeHistory.ChangeHistoryController;
 import BritefuryJ.ChangeHistory.ChangeHistoryListener;
 import BritefuryJ.Command.CommandBar;
-import BritefuryJ.Command.CommandConsoleInterface;
+import BritefuryJ.Command.CommandConsoleFactory;
+import BritefuryJ.Command.AbstractCommandConsole;
 import BritefuryJ.Controls.ScrolledViewport;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.PageController;
@@ -72,7 +72,7 @@ public class Browser
 	
 	
 	
-	public Browser(PageLocationResolver resolver, Location location, PageController pageController, CommandConsoleInterface commandConsole)
+	public Browser(PageLocationResolver resolver, Location location, PageController pageController, CommandConsoleFactory commandConsoleFactory)
 	{
 		this.resolver = resolver;
 		history = new BrowserHistory( location );
@@ -122,21 +122,12 @@ public class Browser
 
 		
 		
-		if ( commandConsole != null )
+		if ( commandConsoleFactory != null )
 		{
+			AbstractCommandConsole commandConsole = commandConsoleFactory.createCommandConsole( presComponent );
 			commandBar = new CommandBar( presComponent, commandConsole, pageController );
-			
-			JPanel commandPanel = new JPanel( new BorderLayout() );
-			commandPanel.add( commandBar.getComponent(), BorderLayout.CENTER );
-			commandPanel.setBorder( BorderFactory.createLineBorder( Color.black, 1 ) );
-			
-			JPanel footer = new JPanel( new BorderLayout( 5, 0 ) );
-			footer.add( new JLabel( "Cmd:" ), BorderLayout.WEST );
-			footer.add( commandPanel, BorderLayout.CENTER );
-			footer.setBorder( BorderFactory.createEmptyBorder( 2, 2, 2, 2 ) );
-			
-			
-			panel.add( footer, BorderLayout.PAGE_END );
+						
+			panel.add( commandBar.getComponent(), BorderLayout.PAGE_END );
 		}
 		
 		resolve();

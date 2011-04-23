@@ -42,11 +42,12 @@ public class TextTestPage extends SystemPage
 	
 	protected Pres createContents()
 	{
-		Pres t0 = styleSheet.applyTo( new Text( "Normal text; with characters that go above and below the basline." ) );
-		Pres t1 = smallCapsStyle.applyTo( new Text( "Small caps text; with characters that go above and below the basline." ) );
-		Pres t2 = redUnderlineStyle.applyTo( new Text( "Normal text with squiggle-underline; with characters that go above and below the basline." ) );
-		Pres t3 = hoverStyle.applyTo( new Text( "Text with colour that is affected by pointer hover." ) );
+		Pres t0 = styleSheet.applyTo( new Text( "Hello world" ) );
+		Pres t1 = styleSheet.applyTo( new Text( "Normal text; with characters that go above and below the basline." ) );
+		Pres t2 = smallCapsStyle.applyTo( new Text( "Small caps text; with characters that go above and below the basline." ) );
+		Pres t3 = redUnderlineStyle.applyTo( new Text( "Normal text with squiggle-underline; with characters that go above and below the basline." ) );
+		Pres t4 = hoverStyle.applyTo( new Text( "Text with colour that is affected by pointer hover." ) );
 		
-		return new Body( new Pres[] { t0, t1, t2, t3 } );
+		return new Body( new Pres[] { t0, t1, t2, t3, t4 } );
 	}
 }

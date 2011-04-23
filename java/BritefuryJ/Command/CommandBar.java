@@ -6,7 +6,13 @@
 //##************************
 package BritefuryJ.Command;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.KeyEvent;
+
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.PageController;
@@ -18,12 +24,6 @@ import BritefuryJ.Pres.Primitive.Column;
 
 public class CommandBar
 {
-	private PresentationComponent presentation;
-	
-	private PresentationComponent commandBarComponent;
-	private IncrementalView view;
-	
-	
 	KeyboardInteractor presComponentSwitchInteractor = new KeyboardInteractor()
 	{
 		@Override
@@ -41,6 +41,7 @@ public class CommandBar
 		{
 			if ( event.getKeyCode() == KeyEvent.VK_ESCAPE )
 			{
+				commandBarArea.setVisible( true );
 				commandBarComponent.grabFocus();
 				return true;
 			}
@@ -73,6 +74,7 @@ public class CommandBar
 			if ( event.getKeyCode() == KeyEvent.VK_ESCAPE )
 			{
 				presentation.grabFocus();
+				commandBarArea.setVisible( false );
 				return true;
 			}
 			return false;
@@ -84,10 +86,28 @@ public class CommandBar
 			return false;
 		}
 	};
+	
+	
+	private CommandConsoleListener consoleListener = new CommandConsoleListener()
+	{
+		@Override
+		public void finished(AbstractCommandConsole commandConsole)
+		{
+			presentation.grabFocus();
+			commandBarArea.setVisible( false );
+		}
+	};
 
 
 	
-	public CommandBar(PresentationComponent presentation, CommandConsoleInterface console, PageController pageController)
+	private PresentationComponent presentation;
+	private JPanel commandBarBorder, commandBarArea;
+	
+	private PresentationComponent commandBarComponent;
+	private IncrementalView view;
+	
+	
+	public CommandBar(PresentationComponent presentation, AbstractCommandConsole console, PageController pageController)
 	{
 		this.presentation = presentation;
 		
@@ -95,7 +115,19 @@ public class CommandBar
 		commandBarComponent = new PresentationComponent();
 		commandBarComponent.setPageController( pageController );
 		
+		
+		commandBarBorder = new JPanel( new BorderLayout() );
+		commandBarBorder.add( commandBarComponent, BorderLayout.CENTER );
+		commandBarBorder.setBorder( BorderFactory.createLineBorder( new Color( 0.65f, 0.65f, 0.65f ), 1 ) );
+		
+		commandBarArea = new JPanel( new BorderLayout( 5, 0 ) );
+		commandBarArea.add( commandBarBorder, BorderLayout.CENTER );
+		commandBarArea.setBorder( BorderFactory.createEmptyBorder( 2, 2, 2, 2 ) );
+		commandBarArea.setVisible( false );
+		
+		
 		view = new IncrementalView( console.getSubject(), console.getBrowserContext(), null );
+		console.setListener( consoleListener );
 
 		DPElement viewElement = view.getViewElement();
 		DPElement column = new Column( new Object[] { viewElement } ).present();
@@ -106,8 +138,8 @@ public class CommandBar
 	}
 	
 	
-	public PresentationComponent getComponent()
+	public JComponent getComponent()
 	{
-		return commandBarComponent;
+		return commandBarArea;
 	}
 }
