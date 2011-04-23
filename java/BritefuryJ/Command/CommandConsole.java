@@ -14,7 +14,6 @@ import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.TreeEventListener;
-import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueVisitor;
 import BritefuryJ.IncrementalView.FragmentView;
@@ -32,7 +31,7 @@ import BritefuryJ.StyleSheet.StyleSheet;
 
 public class CommandConsole extends AbstractCommandConsole implements Presentable
 {
-	private class ConsoleSubject extends Subject
+	private class CommandConsoleSubject extends Subject
 	{
 		public Object getFocus()
 		{
@@ -105,45 +104,11 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 	private class CommandContents extends Contents
 	{
 		private Command cmd;
-		private Pres pres;
 		
 		
 		public CommandContents(Command cmd)
 		{
 			this.cmd = cmd;
-			
-			String name = cmd.getName();
-			
-			int indices[] = cmd.getCharIndices();
-			
-			if ( indices != null )
-			{
-				int j =0;
-				Pres xs[] = new Pres[name.length()+1];
-				for (int i = 0; i < name.length(); i++)
-				{
-					String ch = name.substring( i, i + 1 );
-					Pres chPres;
-					
-					if ( j < indices.length  &&  i == indices[j] )
-					{
-						j++;
-						chPres = cmdCharStyle.applyTo( new Text( ch ) );
-					}
-					else
-					{
-						chPres = cmdNameStyle.applyTo( new Label( ch ) );
-					}
-					xs[i] = chPres;
-				}
-				xs[name.length()] = new Text( "" );
-				pres = cmdBorderStyle.applyTo( new Border( new Row( xs ) ) );
-			}
-			else
-			{
-				Pres namePres = cmdNameStyle.applyTo( new Label( name ) );
-				pres = cmdBorderStyle.applyTo( new Border( new Row( new Object[] { namePres, new Label( " " ), cmdCharStyle.applyTo( new Text( cmd.getCharSequence() ) ) } ) ) );
-			}
 		}
 		
 		
@@ -157,14 +122,14 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 		@Override
 		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
-			return pres;
+			return Pres.coerce( cmd.getName() );
 		}
 	}
 	
 	
 	
 	
-	private ConsoleSubject subject = new ConsoleSubject();
+	private CommandConsoleSubject subject = new CommandConsoleSubject();
 	private ProjectiveBrowserContext browserContext;
 	private PresentationComponent presentation;
 	private PresentationStateListenerList listeners = null;
@@ -262,15 +227,6 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 	
 	
 	
-	private static SolidBorder cmdBorder(Color borderColour, Color backgroundColour)
-	{
-		return new SolidBorder( 1.0, 2.0, 8.0, 8.0, borderColour, backgroundColour );
-	}
-
-	
-	private static final StyleSheet promptStyle = StyleSheet.instance.withAttr( Primitive.border, cmdBorder( new Color( 0.5f, 0.5f, 0.5f ), new Color( 0.9f, 0.9f, 0.9f ) ) );
-	private static final StyleSheet cmdBorderStyle = StyleSheet.instance.withAttr( Primitive.border, cmdBorder( new Color( 0.0f, 0.7f, 0.0f ), new Color( 0.85f, 0.95f, 0.85f ) ) );
-	private static final StyleSheet cmdNameStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.5f, 0.0f ) );
-	private static final StyleSheet cmdCharStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.25f, 0.0f ) ).withAttr( Primitive.fontBold, true );
+	private static final StyleSheet promptStyle = StyleSheet.instance.withAttr( Primitive.border, Command.cmdBorder( new Color( 0.5f, 0.5f, 0.5f ), new Color( 0.9f, 0.9f, 0.9f ) ) );
 	private static final StyleSheet cmdRowStyle = StyleSheet.instance.withAttr( Primitive.rowSpacing, 7.0 );
 }
