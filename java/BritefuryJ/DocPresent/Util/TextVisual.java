@@ -23,15 +23,11 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
-import java.text.AttributedCharacterIterator;
+import java.text.AttributedString;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
-import javax.swing.text.Segment;
-
-import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.Math.Point2;
 import BritefuryJ.Utils.HashUtils;
@@ -42,153 +38,21 @@ public class TextVisual
 {
 	private static final float SMALL_CAPS_FONT_SCALE = 0.77f;
 	
-	private static class MixedSizeCapsAttributedCharacterIterator extends Segment implements AttributedCharacterIterator
-	{
-		static HashSet<AttributedCharacterIterator.Attribute> attribKeys = null;
-		
-		protected final String text;
-		protected final Font lowerCaseFont, upperCaseFont;
-		protected final HashMap<AttributedCharacterIterator.Attribute, Object> lowerCaseAttribs, upperCaseAttribs;
-		
-		
-		public MixedSizeCapsAttributedCharacterIterator(String text, Font lowerCaseFont, Font upperCaseFont)
-		{
-			super( text.toUpperCase().toCharArray(), 0, text.length() );
-			
-			this.text = text;
-			this.lowerCaseFont = lowerCaseFont;
-			this.upperCaseFont = upperCaseFont;
-			
-			lowerCaseAttribs = new HashMap<AttributedCharacterIterator.Attribute, Object>();
-			lowerCaseAttribs.put( TextAttribute.FONT, lowerCaseFont );
-			upperCaseAttribs = new HashMap<AttributedCharacterIterator.Attribute, Object>();
-			upperCaseAttribs.put( TextAttribute.FONT, upperCaseFont );
-		}
-		
-		
-		@Override
-		public Set<Attribute> getAllAttributeKeys()
-		{
-			if ( attribKeys == null )
-			{
-				attribKeys = new HashSet<AttributedCharacterIterator.Attribute>();
-				attribKeys.add( TextAttribute.FONT );
-			}
-			
-			return attribKeys;
-		}
 
-		public Object getAttribute(Attribute attrib)
-		{
-			if ( attrib == TextAttribute.FONT )
-			{
-				return Character.isLowerCase( text.charAt( getIndex() ) )  ?  lowerCaseFont  :  upperCaseFont;
-			}
-			else
-			{
-				return null;
-			}
-		}
-
-		public Map<Attribute, Object> getAttributes()
-		{
-			return Character.isLowerCase( text.charAt( getIndex() ) )  ?  lowerCaseAttribs  :  upperCaseAttribs;
-		}
-
-		public int getRunLimit()
-		{
-			boolean bLowerCase = Character.isLowerCase( text.charAt( getIndex() ) );
-			for (int i = getIndex() + 1; i < getEndIndex(); i++)
-			{
-				if ( bLowerCase != Character.isLowerCase( text.charAt( i ) ) )
-				{
-					return i;
-				}
-			}
-			
-			return getEndIndex();
-		}
-
-		public int getRunLimit(Attribute attrib)
-		{
-			if ( attrib == TextAttribute.FONT )
-			{
-				return getRunLimit();
-			}
-			else
-			{
-				return getEndIndex();
-			}
-		}
-
-		public int getRunLimit(Set<? extends Attribute> attribs)
-		{
-			if ( attribs.contains( TextAttribute.FONT ) )
-			{
-				return getRunLimit();
-			}
-			else
-			{
-				return getEndIndex();
-			}
-		}
-
-		public int getRunStart()
-		{
-			boolean bLowerCase = Character.isLowerCase( text.charAt( getIndex() ) );
-			for (int i = getIndex() - 1; i >= 0; i--)
-			{
-				if ( bLowerCase != Character.isLowerCase( text.charAt( i ) ) )
-				{
-					return i + 1;
-				}
-			}
-			
-			return getBeginIndex();
-		}
-
-		public int getRunStart(Attribute arg0)
-		{
-			if ( arg0 == TextAttribute.FONT )
-			{
-				return getRunStart();
-			}
-			else
-			{
-				return getBeginIndex();
-			}
-		}
-
-		public int getRunStart(Set<? extends Attribute> attribs)
-		{
-			if ( attribs.contains( TextAttribute.FONT ) )
-			{
-				return getRunStart();
-			}
-			else
-			{
-				return getBeginIndex();
-			}
-		}
-	}
-	
-	
-	
-	
 	private static class Key
 	{
 		private final String text;
 		private final Font font;
-		private final boolean bMixedSizeCaps;
+		private final int flags;
 		private final int hash;
 		
 		
-		public Key(String text, Font font, boolean bMixedSizeCaps)
+		public Key(String text, Font font, int flags)
 		{
 			this.text = text;
 			this.font = font;
-			this.bMixedSizeCaps = bMixedSizeCaps;
-			this.hash = HashUtils.tripleHash( text.hashCode(), font.hashCode(), Boolean.valueOf( bMixedSizeCaps ).hashCode() );
+			this.flags = flags;
+			this.hash = HashUtils.tripleHash( text.hashCode(), font.hashCode(), flags );
 		}
 		
 		
@@ -202,7 +66,7 @@ public class TextVisual
 			if ( x instanceof Key )
 			{
 				Key kx = (Key)x;
-				return text.equals( kx.text )  &&  font.equals( kx.font )  &&  bMixedSizeCaps == kx.bMixedSizeCaps;
+				return text.equals( kx.text )  &&  font.equals( kx.font )  &&  flags == kx.flags;
 			}
 			else
 			{
@@ -232,54 +96,60 @@ public class TextVisual
 		}
 		
 		
-		@SuppressWarnings("unchecked")
-		public TextVisual get(String text, Font font, boolean bMixedSizeCaps)
+		public TextVisual get(String text, Font font, int flags)
 		{
-			Key k = new Key( text, font, bMixedSizeCaps );
+			Key k = new Key( text, font, flags );
 			
 			WeakReference<TextVisual> visualRef = layoutTable.get( k );
 			TextVisual visual = visualRef != null  ?  visualRef.get()  :  null;
 			if ( visualRef == null  ||  visual == null )
 			{
-				visual = new TextVisual( text, font, bMixedSizeCaps );
+				visual = new TextVisual( text, font, flags );
 				layoutTable.put( k, new WeakReference<TextVisual>( visual, refQueue ) );
 				
-				// Check if there are any unused entries; if so, build a list of set references
-				WeakReference<TextVisual> deadRef = (WeakReference<TextVisual>)refQueue.poll();
-				HashSet<WeakReference<TextVisual>> deadReferences = null;
-				while ( deadRef != null )
-				{
-					// Found an unused entry; create the dead references set, if it is not already created
-					if ( deadReferences == null )
-					{
-						deadReferences = new HashSet<WeakReference<TextVisual>>();
-					}
-					deadReferences.add( deadRef );
-					
-					deadRef = (WeakReference<TextVisual>)refQueue.poll();
-				}
-				
-				if ( deadReferences != null )
-				{
-					// Map the set of dead references, back to their keys
-					HashSet<Key> deadKeys = new HashSet<Key>();
-					for (Map.Entry<Key, WeakReference<TextVisual>> entry: layoutTable.entrySet())
-					{
-						if ( deadReferences.contains( entry.getValue() ) )
-						{
-							deadKeys.add( entry.getKey() );
-						}
-					}
-					
-					// Remove them
-					for (Key deadKey: deadKeys)
-					{
-						layoutTable.remove( deadKey );
-					}
-				}
+				clean();
 			}
 			
 			return visual;
+		}
+
+
+		@SuppressWarnings("unchecked")
+		private void clean()
+		{
+			// Check if there are any unused entries; if so, build a list of set references
+			WeakReference<TextVisual> deadRef = (WeakReference<TextVisual>)refQueue.poll();
+			HashSet<WeakReference<TextVisual>> deadReferences = null;
+			while ( deadRef != null )
+			{
+				// Found an unused entry; create the dead references set, if it is not already created
+				if ( deadReferences == null )
+				{
+					deadReferences = new HashSet<WeakReference<TextVisual>>();
+				}
+				deadReferences.add( deadRef );
+				
+				deadRef = (WeakReference<TextVisual>)refQueue.poll();
+			}
+			
+			if ( deadReferences != null )
+			{
+				// Map the set of dead references, back to their keys
+				HashSet<Key> deadKeys = new HashSet<Key>();
+				for (Map.Entry<Key, WeakReference<TextVisual>> entry: layoutTable.entrySet())
+				{
+					if ( deadReferences.contains( entry.getValue() ) )
+					{
+						deadKeys.add( entry.getKey() );
+					}
+				}
+				
+				// Remove them
+				for (Key deadKey: deadKeys)
+				{
+					layoutTable.remove( deadKey );
+				}
+			}
 		}
 	}
 	
@@ -293,24 +163,29 @@ public class TextVisual
 	}
 	
 	
-	private static final HashMap<PresentationComponent.RootElement, TextVisualTable> visualTables = new  HashMap<PresentationComponent.RootElement, TextVisualTable>();
+	private static final int FLAG_UNDERLINE = 0x1;
+	private static final int FLAG_STRIKETHROUGH = 0x2;
+	private static final int FLAG_MIXEDSIZECAPS = 0x4;
+	
+	
+	private static final TextVisualTable visualTable = new TextVisualTable();
 	
 	
 	private TextLayout layout;
 	private Path2D.Double squiggleUnderlineShape;
 	private final String text;
 	private final Font font;
-	private final boolean bMixedSizeCaps;
+	private final int flags;
 	private LReqBox reqBox;
 	
 
 	
 	
-	private TextVisual(String text, Font font, boolean bMixedSizeCaps)
+	private TextVisual(String text, Font font, int flags)
 	{
 		this.text = text;
 		this.font = font;
-		this.bMixedSizeCaps = bMixedSizeCaps;
+		this.flags = flags;
 		reqBox = new LReqBox();
 		computeRequisition();
 	}
@@ -330,19 +205,71 @@ public class TextVisual
 	
 	
 	
+	private AttributedString createAttributedString()
+	{
+		AttributedString str;
+		
+		if ( text.length() == 0 )
+		{
+			throw new RuntimeException( "TextVisual.createAttributeString cannot operate on empty string" );
+		}
+		
+		if ( testFlag( FLAG_MIXEDSIZECAPS ) )
+		{
+			str = new AttributedString( text.toUpperCase() );
+
+			Font upperCaseFont = font;
+			Font lowerCaseFont = upperCaseFont.deriveFont( upperCaseFont.getSize2D() * SMALL_CAPS_FONT_SCALE );
+			
+			boolean spanIsUppercase = Character.isUpperCase( text.charAt( 0 ) );
+			int spanStart = 0;
+			int spanEnd = 0;
+			for (int i = 1; i < text.length(); i++)
+			{
+				spanEnd = i;
+				
+				char c = text.charAt( i );
+				boolean uppercase = Character.isUpperCase( c );
+				if ( uppercase != spanIsUppercase )
+				{
+					str.addAttribute( TextAttribute.FONT, spanIsUppercase  ?  upperCaseFont  :  lowerCaseFont, spanStart, spanEnd );
+					spanStart = spanEnd = i;
+					spanIsUppercase = uppercase;
+				}
+			}
+			str.addAttribute( TextAttribute.FONT, spanIsUppercase  ?  upperCaseFont  :  lowerCaseFont, spanStart, text.length() );
+		}
+		else
+		{
+			str = new AttributedString( text );
+			str.addAttribute( TextAttribute.FONT, font );
+		}
+		
+		if ( testFlag( FLAG_UNDERLINE ) )
+		{
+			str.addAttribute( TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON );
+		}
+		
+		if ( testFlag( FLAG_STRIKETHROUGH ) )
+		{
+			str.addAttribute( TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON );
+		}
+		
+		return str;
+	}
+	
+	
+	
 	private void computeRequisition()
 	{
 		if ( text.length() > 0 )
 		{
 			FontRenderContext frc = new FontRenderContext( null, true, true );
 			
-			if ( bMixedSizeCaps )
+			if ( flags != 0 )
 			{
-				Font upperCaseFont = font;
-				Font lowerCaseFont = upperCaseFont.deriveFont( upperCaseFont.getSize2D() * SMALL_CAPS_FONT_SCALE );
-
-				MixedSizeCapsAttributedCharacterIterator charIter = new MixedSizeCapsAttributedCharacterIterator( text, lowerCaseFont, upperCaseFont );
-				layout = new TextLayout( charIter, frc );
+				AttributedString s = createAttributedString();
+				layout = new TextLayout( s.getIterator(), frc );
 			}
 			else
 			{
@@ -527,20 +454,35 @@ public class TextVisual
 	
 	
 	
-	public static TextVisual getTextVisual(PresentationComponent.RootElement root, String text, Font font, boolean bMixedSizeCaps)
+	public static TextVisual getTextVisual(String text, Font font, int flags)
 	{
 		if ( text == null )
 		{
 			throw new RuntimeException( "Text cannot be null" );
 		}
 		
-		TextVisualTable table = visualTables.get( root );
-		if ( table == null )
-		{
-			table = new TextVisualTable();
-			visualTables.put( root, table );
-		}
-		
-		return table.get( text, font, bMixedSizeCaps );
+		return visualTable.get( text, font, flags );
+	}
+	
+	public static TextVisual getTextVisual(String text, Font font, boolean bUnderline, boolean bStrikethrough, boolean bMixedSizeCaps)
+	{
+		return getTextVisual( text, font, buildFlags( bUnderline, bStrikethrough, bMixedSizeCaps) );
+	}
+	
+	
+	
+	private boolean testFlag(int flag)
+	{
+		return ( flags & flag )  !=  0;
+	}
+	
+	
+	public static int buildFlags(boolean bUnderline, boolean bStrikethrough, boolean bMixedsizeCaps)
+	{
+		int f = 0;
+		f |= bUnderline  ?  FLAG_UNDERLINE  :  0;
+		f |= bStrikethrough  ?  FLAG_STRIKETHROUGH  :  0;
+		f |= bMixedsizeCaps  ?  FLAG_MIXEDSIZECAPS  :  0;
+		return f;
 	}
 }

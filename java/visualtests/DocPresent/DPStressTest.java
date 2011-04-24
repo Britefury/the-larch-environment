@@ -82,8 +82,8 @@ public class DPStressTest
 	
 	
 	Font f0 = new Font( "Sans serif", Font.PLAIN, 12 );
-	TextStyleParams nameStyle = new TextStyleParams( null, null, null, true, true, f0, Color.black, null, null, false );
-	TextStyleParams puncStyle = new TextStyleParams( null, null, null, true, true, f0, Color.blue, null, null, false );
+	TextStyleParams nameStyle = new TextStyleParams( null, null, null, true, true, f0, Color.black, null, null, false, false, false );
+	TextStyleParams puncStyle = new TextStyleParams( null, null, null, true, true, f0, Color.blue, null, null, false, false, false );
 	ParagraphStyleParams paraStyle = new ParagraphStyleParams( null, null, null, 0.0, 0.0, 0.0 );
 
 	public DPElement name(String n)

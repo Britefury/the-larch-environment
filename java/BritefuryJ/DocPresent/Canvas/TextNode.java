@@ -10,7 +10,6 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 
-import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.LReqBox;
 import BritefuryJ.DocPresent.Util.TextVisual;
@@ -23,7 +22,7 @@ public class TextNode extends DrawingNode
 	
 	protected String text;
 	protected Font font;
-	protected boolean bMixedSizeCaps;
+	protected int textFlags;
 	protected HAlignment hAlignment;
 
 	protected AABox2 parentSpaceBox;
@@ -33,25 +32,25 @@ public class TextNode extends DrawingNode
 	
 	public TextNode(String text)
 	{
-		this( text, defaultFont, false, HAlignment.CENTRE );
+		this( text, defaultFont, false, false, false, HAlignment.CENTRE );
 	}
 
 	public TextNode(String text, Font font)
 	{
-		this( text, font, false, HAlignment.CENTRE );
+		this( text, font, false, false, false, HAlignment.CENTRE );
 	}
 
 	public TextNode(String text, HAlignment hAlignment)
 	{
-		this( text, defaultFont, false, hAlignment );
+		this( text, defaultFont, false, false, false, hAlignment );
 	}
 
-	public TextNode(String text, Font font, boolean bMixedSizeCaps, HAlignment hAlignment)
+	public TextNode(String text, Font font, boolean bUnderline, boolean bStrikethrough, boolean bMixedSizeCaps, HAlignment hAlignment)
 	{
 		super();
 		this.text = text;
 		this.font = font;
-		this.bMixedSizeCaps = bMixedSizeCaps;
+		this.textFlags = TextVisual.buildFlags( bUnderline, bStrikethrough, bMixedSizeCaps );
 		this.hAlignment = hAlignment;
 		parentSpaceBox = new AABox2();
 	}
@@ -61,8 +60,7 @@ public class TextNode extends DrawingNode
 	{
 		super.realise( owner );
 
-		PresentationComponent.RootElement root = owner.getDrawingRootElement();
-		visual = TextVisual.getTextVisual( root, text, font, bMixedSizeCaps );
+		visual = TextVisual.getTextVisual( text, font, textFlags );
 		LReqBox req = visual.getRequisition();
 		parentSpaceBox = new AABox2( 0.0, 0.0, req.getReqPrefWidth(), req.getReqHeight() );
 	}

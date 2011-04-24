@@ -165,11 +165,6 @@ public class DPCanvas extends DPContentLeaf implements DrawingOwner
 		queueFullRedraw();
 	}
 
-	public PresentationComponent.RootElement getDrawingRootElement()
-	{
-		return rootElement;
-	}
-
 	public ArrayList<PointerInterface> getPointersWithinDrawingNodeBounds(DrawingNode node)
 	{
 		return rootElement.getInputTable().getPointersWithinBoundsOfElement( node );
