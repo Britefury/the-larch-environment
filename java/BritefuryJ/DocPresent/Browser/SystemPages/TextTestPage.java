@@ -44,7 +44,7 @@ public class TextTestPage extends SystemPage
 	{
 		Pres t0 = styleSheet.applyTo( new Text( "Hello world" ) );
 		Pres t1 = styleSheet.applyTo( new Text( "Normal text; with characters that go above and below the basline." ) );
-		Pres t2 = smallCapsStyle.applyTo( new Text( "Small caps text; with characters that go above and below the basline." ) );
+		Pres t2 = smallCapsStyle.applyTo( new Text( "Small caps text; with characters that go above and below the basline. Would Normally Be Used For a Title." ) );
 		Pres t3 = redUnderlineStyle.applyTo( new Text( "Normal text with squiggle-underline; with characters that go above and below the basline." ) );
 		Pres t4 = hoverStyle.applyTo( new Text( "Text with colour that is affected by pointer hover." ) );
 		

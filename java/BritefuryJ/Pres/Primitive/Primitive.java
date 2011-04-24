@@ -46,6 +46,8 @@ public class Primitive
 	public static final InheritedAttributeNonNull fontFace = new InheritedAttributeNonNull( primitiveNamespace, "fontFace", String.class, "Sans serif" );
 	public static final InheritedAttributeNonNull fontBold = new InheritedAttributeNonNull( primitiveNamespace, "fontBold", Boolean.class, false );
 	public static final InheritedAttributeNonNull fontItalic = new InheritedAttributeNonNull( primitiveNamespace, "fontItalic", Boolean.class, false );
+	public static final InheritedAttributeNonNull fontUnderline = new InheritedAttributeNonNull( primitiveNamespace, "fontUnderline", Boolean.class, false );
+	public static final InheritedAttributeNonNull fontStrikethrough = new InheritedAttributeNonNull( primitiveNamespace, "fontStrikethrough", Boolean.class, false );
 	public static final InheritedAttributeNonNull fontSmallCaps = new InheritedAttributeNonNull( primitiveNamespace, "fontSmallCaps", Boolean.class, false );
 	public static final InheritedAttributeNonNull fontSize = new InheritedAttributeNonNull( primitiveNamespace, "fontSize", Integer.class, 14 );
 	public static final InheritedAttributeNonNull fontScale = new InheritedAttributeNonNull( primitiveNamespace, "fontScale", Double.class, 1.0 );
@@ -346,6 +348,8 @@ public class Primitive
 					attribs.get( foreground, Paint.class ),
 					attribs.get( hoverForeground, Paint.class ),
 					attribs.get( textSquiggleUnderlinePaint, Paint.class ),
+					attribs.get( fontUnderline, Boolean.class ),
+					attribs.get( fontStrikethrough, Boolean.class ),
 					attribs.get( fontSmallCaps, Boolean.class ) );
 		}
 	};
@@ -375,6 +379,8 @@ public class Primitive
 					attribs.get( foreground, Paint.class ),
 					attribs.get( hoverForeground, Paint.class ),
 					attribs.get( textSquiggleUnderlinePaint, Paint.class ),
+					attribs.get( fontUnderline, Boolean.class ),
+					attribs.get( fontStrikethrough, Boolean.class ),
 					attribs.get( fontSmallCaps, Boolean.class ) );
 		}
 	};
@@ -401,6 +407,8 @@ public class Primitive
 					attribs.get( foreground, Paint.class ),
 					attribs.get( hoverForeground, Paint.class ),
 					attribs.get( textSquiggleUnderlinePaint, Paint.class ),
+					attribs.get( fontUnderline, Boolean.class ),
+					attribs.get( fontStrikethrough, Boolean.class ),
 					attribs.get( fontSmallCaps, Boolean.class ) );
 		}
 	};
