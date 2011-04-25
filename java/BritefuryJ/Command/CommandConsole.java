@@ -10,11 +10,15 @@ import java.awt.Color;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.ChangeHistory.ChangeHistory;
+import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.PageController;
 import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.TreeEventListener;
 import BritefuryJ.DocPresent.Browser.BrowserPage;
+import BritefuryJ.DocPresent.Browser.Location;
+import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueVisitor;
 import BritefuryJ.DocPresent.Target.Target;
@@ -133,6 +137,39 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 		}
 	}
 	
+	private class CommandFailedContents extends Contents
+	{
+		private String name;
+		private Throwable error;
+		
+		Hyperlink.LinkListener listener = new Hyperlink.LinkListener()
+		{
+			@Override
+			public void onLinkClicked(Hyperlink.HyperlinkControl link, PointerButtonClickedEvent event)
+			{
+				FragmentView fragment = (FragmentView)link.getElement().getFragmentContext();
+				Location location = fragment.getBrowserContext().getLocationForObject( error );
+				link.getElement().getRootElement().getPageController().openLocation( location, PageController.OpenOperation.OPEN_IN_NEW_WINDOW );
+			}
+		};
+		
+		
+		public CommandFailedContents(String name, Throwable error)
+		{
+			this.name = name;
+			this.error = error;
+		}
+		
+		
+		
+		@Override
+		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
+		{
+			Pres contents = new Row( new Object[] { new Label( name + " FAILED  " ), new Hyperlink( "SHOW ERROR", listener ) } );
+			return new Row( new Object[] { cmdFailStyle.applyTo( new Border( contents ) ), new Text( "" ) } );
+		}
+	}
+	
 	
 	
 	
@@ -190,41 +227,78 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 		{
 			String text = value.textualValue();
 			
-			if ( text.contains( "\n" ) )
+			if ( contents instanceof CommandFailedContents )
 			{
-				// Attempt to execute the command
-				if ( contents instanceof CommandContents )
+				if ( text.contains( "\n" ) )
 				{
-					((CommandContents)contents).execute();
 					contents = new UnreckognisedContents( "" );
 					notifyFinished();
 				}
 				else
 				{
-					contents = new UnreckognisedContents( text.replace( "\n", "" ) );
+					CommandFailedContents f = (CommandFailedContents)contents;
+					contents = new CommandFailedContents( f.name, f.error );
 				}
+				PresentationStateListenerList.onPresentationStateChanged( listeners, this );
 			}
 			else
 			{
-				BoundCommand cmd = getTargetCommand( text );
-				
-				if ( cmd == null )
+				if ( text.contains( "\n" ) )
 				{
-					cmd = getPageCommand( text );
-				}
-
-			
-				if ( cmd != null )
-				{
-					contents = new CommandContents( cmd );
+					// Attempt to execute the command
+					if ( contents instanceof CommandContents )
+					{
+						CommandContents cmdC = (CommandContents)contents;
+						
+						Throwable error = null;
+						try
+						{
+							cmdC.execute();
+						}
+						catch (Throwable t)
+						{
+							error = t;
+						}
+						
+						if ( error == null )
+						{
+							contents = new UnreckognisedContents( "" );
+							notifyFinished();
+						}
+						else
+						{
+							contents = new CommandFailedContents( cmdC.cmd.getCommand().getName().getName(), error );
+						}
+					}
+					else
+					{
+						contents = new UnreckognisedContents( text.replace( "\n", "" ) );
+					}
+	
+					PresentationStateListenerList.onPresentationStateChanged( listeners, this );
 				}
 				else
 				{
-					contents = new UnreckognisedContents( text );
+					BoundCommand cmd = getTargetCommand( text );
+					
+					if ( cmd == null )
+					{
+						cmd = getPageCommand( text );
+					}
+	
+				
+					if ( cmd != null )
+					{
+						contents = new CommandContents( cmd );
+					}
+					else
+					{
+						contents = new UnreckognisedContents( text );
+					}
 				}
+				
+				PresentationStateListenerList.onPresentationStateChanged( listeners, this );
 			}
-			
-			PresentationStateListenerList.onPresentationStateChanged( listeners, this );
 		}
 		else
 		{
@@ -277,5 +351,7 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 	
 	
 	private static final StyleSheet promptStyle = StyleSheet.instance.withAttr( Primitive.border, Command.cmdBorder( new Color( 0.5f, 0.5f, 0.5f ), new Color( 0.9f, 0.9f, 0.9f ) ) );
+	private static final StyleSheet cmdFailStyle = StyleSheet.instance.withAttr( Primitive.border, Command.cmdBorder( new Color( 1.0f, 0.0f, 0.0f ), new Color( 1.0f, 0.85f, 0.85f ) ) )
+		.withAttr( Primitive.foreground, new Color( 0.7f, 0.0f, 0.0f ) );
 	private static final StyleSheet cmdRowStyle = StyleSheet.instance.withAttr( Primitive.rowSpacing, 7.0 );
 }

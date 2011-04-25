@@ -30,42 +30,29 @@ public class ObjectPresentationLocationResolver
 		{
 			throw Py.KeyError( "No perspective with class name '" + key + "'" );
 		}
-		return getLocationTable( perspective );
-	}
-	
-	
-	public String registerPerspective(ObjectPresentationPerspective perspective)
-	{
-		String className = perspective.getClass().getName();
-		
-		perspectiveTable.put( className, perspective );
-		
-		return className;
+		return  locationTables.get( perspective );
 	}
 	
 	
 	public String getRelativeLocationForObject(ObjectPresentationPerspective perspective, Object x)
 	{
-		ObjectViewLocationTable locationTable = getLocationTable( perspective );
+		String className = perspective.getClass().getName();
+
+		ObjectViewLocationTable locationTable = locationTables.get( perspective );
+		if ( locationTable == null )
+		{
+			perspectiveTable.put( className, perspective );
+
+			locationTable = new ObjectViewLocationTable();
+			locationTables.put( perspective, locationTable );
+		}
+
+
 		String relative = locationTable.getRelativeLocationForObject( x );
 		
-		PyString className = Py.newString( perspective.getClass().getName() );
-		
-		PyString key = className.__repr__();
+		PyString pyClassName = Py.newString( perspective.getClass().getName() );
+		PyString key = pyClassName.__repr__();
 		
 		return "[" + key + "]" + relative;
-	}
-	
-	
-	
-	private ObjectViewLocationTable getLocationTable(ObjectPresentationPerspective perspective)
-	{
-		ObjectViewLocationTable table = locationTables.get( perspective );
-		if ( table == null )
-		{
-			table = new ObjectViewLocationTable();
-			locationTables.put( perspective, table );
-		}
-		return table;
 	}
 }

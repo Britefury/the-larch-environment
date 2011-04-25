@@ -41,8 +41,8 @@ def _saveAs(lsubject):
 
 	
 	
-_saveCommand = Command( CommandName( 's', 'save' ), _save )
-_saveAsCommand = Command( CommandName( 'sa', 'save as' ), _saveAs )
+_saveCommand = Command( CommandName( '&Save' ), _save )
+_saveAsCommand = Command( CommandName( '&Save &as' ), _saveAs )
 _projectCommands = CommandSet( [ _saveCommand, _saveAsCommand ] )
 	
 
