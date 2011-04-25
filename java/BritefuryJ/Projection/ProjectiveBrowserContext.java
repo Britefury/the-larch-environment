@@ -62,6 +62,7 @@ public class ProjectiveBrowserContext
 		
 		private PageSubject(BrowserPage page)
 		{
+			super( null );
 			this.page = page;
 		}
 		

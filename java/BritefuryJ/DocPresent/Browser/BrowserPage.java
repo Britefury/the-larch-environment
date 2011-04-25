@@ -6,8 +6,12 @@
 //##************************
 package BritefuryJ.DocPresent.Browser;
 
+import java.util.Arrays;
+import java.util.List;
+
 import BritefuryJ.ChangeHistory.ChangeHistoryController;
 import BritefuryJ.ChangeHistory.ChangeHistoryListener;
+import BritefuryJ.Command.BoundCommandSet;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
 
@@ -29,5 +33,11 @@ public abstract class BrowserPage
 	public PersistentStateStore storePersistentState()
 	{
 		return null;
+	}
+
+
+	public List<BoundCommandSet> getBoundCommandSets()
+	{
+		return Arrays.asList( new BoundCommandSet[] {} );
 	}
 }

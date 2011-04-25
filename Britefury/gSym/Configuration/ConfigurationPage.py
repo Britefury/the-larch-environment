@@ -24,6 +24,7 @@ _staticStyle = StyleSheet.instance.withAttr( Primitive.editable, False )
 class ConfigurationPage (object):
 	class _ConfigPageSubject (Subject):
 		def __init__(self, page):
+			super( ConfigurationPage._ConfigPageSubject, self ).__init__( None )
 			self._page = page
 		
 		def getFocus(self):

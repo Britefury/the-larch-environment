@@ -270,6 +270,7 @@ public class Browser
 		BrowserPage p = resolver.resolveLocationAsPage( location, stateStore );
 
 		viewport = makeViewport( p.getContentsElement().alignHExpand(), history.getCurrentState().getViewportState() );
+		commandBar.setPage( p );
 		presComponent.getRootElement().setChild( viewport.getElement().alignHExpand().alignVExpand() );
 		
 		// Set the page

@@ -7,13 +7,12 @@
 package BritefuryJ.Command;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
 
-public class CommandSet implements Iterable<Command>
+public class CommandSet
 {
 	protected class CommandSetInteractor implements AbstractElementInteractor
 	{
@@ -24,7 +23,7 @@ public class CommandSet implements Iterable<Command>
 	}
 	
 	
-	private ArrayList<Command> commands = new ArrayList<Command>();
+	protected ArrayList<Command> commands = new ArrayList<Command>();
 	private CommandSetInteractor interactor = new CommandSetInteractor();
 	
 	
@@ -40,35 +39,9 @@ public class CommandSet implements Iterable<Command>
 	
 	
 	
-	public Iterator<Command> iterator()
+	public BoundCommandSet bindTo(Object binding)
 	{
-		return commands.iterator();
-	}
-	
-	
-	public Command getCommand(String charSequence)
-	{
-		for (Command cmd: commands)
-		{
-			if ( cmd.getName().getCharSequence().equals( charSequence ) )
-			{
-				return cmd;
-			}
-		}
-		
-		return null;
-	}
-
-	
-	public void buildListOfCommandsStartingWith(List<Command> cmdList, String charSequence)
-	{
-		for (Command cmd: commands)
-		{
-			if ( cmd.getName().getCharSequence().startsWith( charSequence ) )
-			{
-				cmdList.add( cmd );
-			}
-		}
+		return new BoundCommandSet( this, binding );
 	}
 	
 	

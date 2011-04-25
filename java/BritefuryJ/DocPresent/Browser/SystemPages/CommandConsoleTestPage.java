@@ -55,7 +55,7 @@ public class CommandConsoleTestPage extends SystemPage
 		}
 
 
-		public void commandAction(Command command)
+		public void commandAction(Object context)
 		{
 			for (DPElement element: parentElement.getElements())
 			{

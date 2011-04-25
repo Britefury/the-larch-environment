@@ -296,6 +296,7 @@ perspective = SequentialEditorPerspective( WorksheetEditor(), WorksheetSequentia
 
 class WorksheetEditorSubject (Subject):
 	def __init__(self, document, model, enclosingSubject, location, title):
+		super( WorksheetEditorSubject, self ).__init__( enclosingSubject )
 		self._document = document
 		self._model = model
 		# Defer the creation of the model view - it involves executing all the code in the worksheet which can take some time

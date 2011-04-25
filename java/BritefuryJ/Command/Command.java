@@ -14,11 +14,11 @@ public class Command
 {
 	public interface CommandAction
 	{
-		void commandAction(Command command);
+		public void commandAction(Object context);
 	}
 	
 	private CommandName name;
-	private CommandAction action;
+	protected CommandAction action;
 	
 	
 	public Command(CommandName name, CommandAction action)
@@ -40,13 +40,12 @@ public class Command
 	}
 	
 	
-	protected void execute()
+	public BoundCommand bindTo(Object binding)
 	{
-		action.commandAction( this );
+		return new BoundCommand( this, binding );
 	}
-
-
-
+	
+	
 	public static SolidBorder cmdBorder(Color borderColour, Color backgroundColour)
 	{
 		return new SolidBorder( 1.0, 2.0, 8.0, 8.0, borderColour, backgroundColour );

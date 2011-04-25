@@ -6,6 +6,7 @@
 //##************************
 package BritefuryJ.Command;
 
+import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.Projection.ProjectiveBrowserContext;
 import BritefuryJ.Projection.Subject;
 
@@ -33,4 +34,5 @@ public abstract class AbstractCommandConsole
 	
 	public abstract Subject getSubject();
 	public abstract ProjectiveBrowserContext getBrowserContext();
+	public abstract void setPage(BrowserPage page);
 }

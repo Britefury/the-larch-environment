@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.PageController;
 import BritefuryJ.DocPresent.PresentationComponent;
+import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.DocPresent.Input.Keyboard.Keyboard;
 import BritefuryJ.DocPresent.Input.Keyboard.KeyboardInteractor;
 import BritefuryJ.IncrementalView.IncrementalView;
@@ -106,10 +107,13 @@ public class CommandBar
 	private PresentationComponent commandBarComponent;
 	private IncrementalView view;
 	
+	private AbstractCommandConsole console;
+	
 	
 	public CommandBar(PresentationComponent presentation, AbstractCommandConsole console, PageController pageController)
 	{
 		this.presentation = presentation;
+		this.console = console;
 		
 		
 		commandBarComponent = new PresentationComponent();
@@ -141,5 +145,11 @@ public class CommandBar
 	public JComponent getComponent()
 	{
 		return commandBarArea;
+	}
+	
+	
+	public void setPage(BrowserPage page)
+	{
+		console.setPage( page );
 	}
 }

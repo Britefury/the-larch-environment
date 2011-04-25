@@ -9,15 +9,13 @@ package BritefuryJ.Command;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import BritefuryJ.Command.CommandSet;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
 import BritefuryJ.DocPresent.Target.Target;
 
-public class CommandSetGatherIterable implements Iterable<CommandSet>
+public class CommandSetGatherIterable implements Iterable<BoundCommandSet>
 {
-	private class CommandSetGatherIterator implements Iterator<CommandSet>
+	private class CommandSetGatherIterator implements Iterator<BoundCommandSet>
 	{
 		private DPElement currentElement = null;
 		private LinkedList<CommandSet> commandSets = new LinkedList<CommandSet>();
@@ -66,9 +64,9 @@ public class CommandSetGatherIterable implements Iterable<CommandSet>
 	
 	
 		@Override
-		public CommandSet next()
+		public BoundCommandSet next()
 		{
-			CommandSet commands = commandSets.removeFirst();
+			BoundCommandSet commands = commandSets.removeFirst().bindTo( currentElement );
 			if ( commandSets.isEmpty() )
 			{
 				nextElement( currentElement.getParent() );
@@ -104,21 +102,11 @@ public class CommandSetGatherIterable implements Iterable<CommandSet>
 			throw new RuntimeException( "Target is not valid" );
 		}
 	}
-	
-	public CommandSetGatherIterable(PresentationComponent.RootElement rootElement)
-	{
-		this( rootElement.getTarget() );
-	}
-	
-	public CommandSetGatherIterable(PresentationComponent p)
-	{
-		this( p.getRootElement() );
-	}
 
 	
 	
 	@Override
-	public Iterator<CommandSet> iterator()
+	public Iterator<BoundCommandSet> iterator()
 	{
 		return new CommandSetGatherIterator( element );
 	}

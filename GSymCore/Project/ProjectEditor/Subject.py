@@ -9,11 +9,42 @@ from BritefuryJ.DocPresent.Browser import Location
 
 from BritefuryJ.Projection import Subject
 
+from BritefuryJ.Command import CommandName, Command, CommandSet
+
+from GSymCore.GSymApp import DocumentManagement
+
 from GSymCore.Project.ProjectPage import ProjectPage
 from GSymCore.Project.ProjectPackage import ProjectPackage
 from GSymCore.Project.ProjectEditor.View import perspective
 from GSymCore.Project.ProjectEditor.ModuleFinder import RootFinder, ModuleFinder
 
+
+
+
+def _save(subject):
+	document = subject._document
+	if document.hasFilename():
+		document.save()
+	else:
+		def handleSaveDocumentAsFn(filename):
+			document.saveAs( filename )
+
+		DocumentManagement.promptSaveDocumentAs( subject.getSubjectContext()['world'], None, handleSaveDocumentAsFn )
+
+
+def _saveAs(lsubject):
+	document = subject._document
+	def handleSaveDocumentAsFn(filename):
+		document.saveAs( filename )
+
+	DocumentManagement.promptSaveDocumentAs( subject.getSubjectContext()['world'], None, handleSaveDocumentAsFn )
+
+	
+	
+_saveCommand = Command( CommandName( 's', 'save' ), _save )
+_saveAsCommand = Command( CommandName( 'sa', 'save as' ), _saveAs )
+_projectCommands = CommandSet( [ _saveCommand, _saveAsCommand ] )
+	
 
 
 def _packageSubject(projectSubject, model, location):
@@ -41,6 +72,7 @@ def _packageSubject(projectSubject, model, location):
 
 class ProjectSubject (Subject):
 	def __init__(self, document, model, enclosingSubject, location, title):
+		super( ProjectSubject, self ).__init__( enclosingSubject )
 		self._document = document
 		self._model = model
 		self._enclosingSubject = enclosingSubject
@@ -64,6 +96,9 @@ class ProjectSubject (Subject):
 
 	def getChangeHistory(self):
 		return self._document.getChangeHistory()
+	
+	def getBoundCommandSets(self):
+		return [ _projectCommands.bindTo( self ) ]  +  self._enclosingSubject.getBoundCommandSets()
 
 
 

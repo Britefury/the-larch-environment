@@ -6,9 +6,12 @@
 //##************************
 package BritefuryJ.IncrementalView;
 
+import java.util.List;
+
 import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.ChangeHistory.ChangeHistoryController;
 import BritefuryJ.ChangeHistory.ChangeHistoryListener;
+import BritefuryJ.Command.BoundCommandSet;
 import BritefuryJ.Controls.Hyperlink;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.PageController;
@@ -21,6 +24,7 @@ import BritefuryJ.Logging.LogView;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Projection.ProjectiveBrowserContext;
+import BritefuryJ.Projection.Subject;
 
 public class IncrementalViewPage extends BrowserPage
 {
@@ -30,15 +34,17 @@ public class IncrementalViewPage extends BrowserPage
 	private String title;
 	private ChangeHistory changeHistory;
 	private BrowserIncrementalView view;
+	private Subject subject;
 	
 	
 	
-	public IncrementalViewPage(DPElement element, String title, final ProjectiveBrowserContext browserContext, ChangeHistory changeHistory, BrowserIncrementalView view)
+	public IncrementalViewPage(DPElement element, String title, final ProjectiveBrowserContext browserContext, ChangeHistory changeHistory, BrowserIncrementalView view, Subject subject)
 	{
 		this.element = element;
 		this.title = title;
 		this.changeHistory = changeHistory;
 		this.view = view;
+		this.subject = subject;
 		
 		Hyperlink.LinkListener listener = new Hyperlink.LinkListener()
 		{
@@ -93,5 +99,11 @@ public class IncrementalViewPage extends BrowserPage
 	public PersistentStateStore storePersistentState()
 	{
 		return view.storePersistentState();
+	}
+
+
+	public List<BoundCommandSet> getBoundCommandSets()
+	{
+		return subject.getBoundCommandSets();
 	}
 }
