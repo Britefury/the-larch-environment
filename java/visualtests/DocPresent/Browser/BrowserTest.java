@@ -34,6 +34,9 @@ import BritefuryJ.Projection.ProjectiveBrowserContext;
 
 public class BrowserTest implements TabbedBrowser.TabbedBrowserListener
 {
+	final ProjectiveBrowserContext browserContext = new ProjectiveBrowserContext( true );
+
+	
 	private static class TransferActionListener implements ActionListener
 	{
 		@Override
@@ -101,7 +104,6 @@ public class BrowserTest implements TabbedBrowser.TabbedBrowserListener
 		frame.setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
 		
 		
-		final ProjectiveBrowserContext browserContext = new ProjectiveBrowserContext( true );
 		CommandConsoleFactory fac = new CommandConsoleFactory()
 		{
 			@Override

@@ -32,6 +32,11 @@ public class Command
 		this( new CommandName( charSeq, name ), action );
 	}
 	
+	public Command(String annotatedName, CommandAction action)
+	{
+		this( new CommandName( annotatedName ), action );
+	}
+	
 	
 
 	public CommandName getName()

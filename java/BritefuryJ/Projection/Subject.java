@@ -43,7 +43,7 @@ public abstract class Subject
 		}
 		else
 		{
-			return null;
+			return SimpleAttributeTable.instance;
 		}
 	}
 	

@@ -65,6 +65,19 @@ public class CommandConsoleTestPage extends SystemPage
 		}
 	}
 
+	protected static class CommandFailAction implements Command.CommandAction
+	{
+		public CommandFailAction()
+		{
+		}
+
+
+		public void commandAction(Object context)
+		{
+			throw new RuntimeException( "Fail" );
+		}
+	}
+
 	
 
 	private static StyleSheet styleSheet = StyleSheet.instance;
@@ -84,12 +97,13 @@ public class CommandConsoleTestPage extends SystemPage
 	protected Pres createContents()
 	{
 		ElementRef colouredTextProxyRef = new Proxy( colouredText( blackText ) ).elementRef();
-		Command blackCmd = new Command( "bk", "black", new CommandContentChanger( colouredTextProxyRef, colouredText( blackText ) ) );
-		Command redCmd = new Command( "re", "red", new CommandContentChanger( colouredTextProxyRef, colouredText( redText ) ) );
-		Command greenCmd = new Command( "gr", "green", new CommandContentChanger( colouredTextProxyRef, colouredText( greenText ) ) );
-		Command blueCmd = new Command( "bl", "blue", new CommandContentChanger( colouredTextProxyRef, colouredText( blueText ) ) );
-		CommandSet cmds = new CommandSet( Arrays.asList( new Command[] { blackCmd, redCmd, greenCmd, blueCmd } ) );
-		Pres cmdText = new Text( "Place the caret within this text, and use the command console. 'bk', 're', 'gr' and 'bl' are the commands available." ).withCommandSet( cmds );
+		Command blackCmd = new Command( "&Blac&k", new CommandContentChanger( colouredTextProxyRef, colouredText( blackText ) ) );
+		Command redCmd = new Command( "&R&ed", new CommandContentChanger( colouredTextProxyRef, colouredText( redText ) ) );
+		Command greenCmd = new Command( "&G&reen", new CommandContentChanger( colouredTextProxyRef, colouredText( greenText ) ) );
+		Command blueCmd = new Command( "&B&lue", new CommandContentChanger( colouredTextProxyRef, colouredText( blueText ) ) );
+		Command failCmd = new Command( "&Fail", new CommandFailAction() );
+		CommandSet cmds = new CommandSet( Arrays.asList( new Command[] { blackCmd, redCmd, greenCmd, blueCmd, failCmd } ) );
+		Pres cmdText = new Text( "Place the caret within this text, and use the command console. 'bk', 're', 'gr', 'bl' and 'f' are the commands available." ).withCommandSet( cmds );
 		Pres colourBox = new Column( new Pres[] { colouredTextProxyRef, cmdText } );
 		
 		return new Body( new Pres[] { new Heading2( "Action button" ), colourBox } );

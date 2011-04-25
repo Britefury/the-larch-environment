@@ -7,6 +7,9 @@
 package BritefuryJ.Command;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.Presentable;
@@ -22,6 +25,8 @@ import BritefuryJ.StyleSheet.StyleSheet;
 
 public class CommandName implements Presentable
 {
+	private static final Pattern annotationPattern = Pattern.compile( "[" + Pattern.quote( "&$" ) + "]." );
+	
 	private String charSequence;
 	private String name;
 	private int charIndices[];
@@ -34,6 +39,48 @@ public class CommandName implements Presentable
 		this.charSequence = charSequence;
 		this.name = name;
 		charIndices = computeIndices( charSequence, name );
+		computeCompletePres();
+	}
+	
+	public CommandName(String annotatedName)
+	{
+		name = "";
+		charSequence = "";
+		Matcher m = annotationPattern.matcher( annotatedName );
+		int pos = 0;
+		ArrayList<Integer> indices = new ArrayList<Integer>();
+		while ( m.find() )
+		{
+			int start = m.start();
+			int end = m.end();
+			boolean preserveCase = annotatedName.charAt( start ) == '$';
+
+			name += annotatedName.substring( pos, start );
+			String ch = annotatedName.substring( end - 1, end );
+			
+			indices.add( name.length() );
+
+			name += ch;
+			if ( preserveCase )
+			{
+				charSequence += ch;
+			}
+			else
+			{
+				charSequence += ch.toLowerCase();
+			}
+			
+			pos = end;
+		}
+		
+		name += annotatedName.substring( pos );
+		
+		charIndices = new int[indices.size()];
+		int i = 0;
+		for (int x: indices)
+		{
+			charIndices[i++] = x;
+		}
 		computeCompletePres();
 	}
 	
@@ -58,7 +105,7 @@ public class CommandName implements Presentable
 	{
 		if ( charIndices != null )
 		{
-			int j =0;
+			int j = 0;
 			Pres xs[] = new Pres[name.length()+1];
 			for (int i = 0; i < name.length(); i++)
 			{
@@ -67,8 +114,8 @@ public class CommandName implements Presentable
 				
 				if ( j < charIndices.length  &&  i == charIndices[j] )
 				{
+					chPres = cmdCharStyle.applyTo( new Text( ch, charSequence.substring( j, j + 1 ) ) );
 					j++;
-					chPres = cmdCharStyle.applyTo( new Text( ch ) );
 				}
 				else
 				{
