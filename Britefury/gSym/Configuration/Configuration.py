@@ -21,6 +21,7 @@ _staticStyle = StyleSheet.instance.withAttr( Primitive.editable, False )
 class Configuration (object):
 	class _ConfigurationSubject (Subject):
 		def __init__(self, config):
+			super( Configuration._ConfigurationSubject, self ).__init__( None )
 			self._config = config
 	
 	

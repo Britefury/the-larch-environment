@@ -227,6 +227,7 @@ perspective = Perspective( ConsoleView(), None )
 
 class ConsoleSubject (Subject):
 	def __init__(self, console, enclosingSubject):
+		super( ConsoleSubject, self ).__init__( enclosingSubject )
 		self._console = console
 		self._enclosingSubject = enclosingSubject
 

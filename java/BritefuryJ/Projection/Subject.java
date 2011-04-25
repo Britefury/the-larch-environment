@@ -6,11 +6,24 @@
 //##************************
 package BritefuryJ.Projection;
 
+import java.util.Arrays;
+import java.util.List;
+
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.ChangeHistory.ChangeHistory;
+import BritefuryJ.Command.BoundCommandSet;
 
 public abstract class Subject
 {
+	private Subject enclosingSubject;
+	
+	
+	public Subject(Subject enclosingSubject)
+	{
+		this.enclosingSubject = enclosingSubject;
+	}
+	
+	
 	public abstract Object getFocus();
 	
 	
@@ -21,13 +34,42 @@ public abstract class Subject
 	
 	public abstract String getTitle();
 
+	
 	public SimpleAttributeTable getSubjectContext()
 	{
-		return SimpleAttributeTable.instance;
+		if ( enclosingSubject != null )
+		{
+			return enclosingSubject.getSubjectContext();
+		}
+		else
+		{
+			return null;
+		}
 	}
+	
 	
 	public ChangeHistory getChangeHistory()
 	{
-		return null;
+		if ( enclosingSubject != null )
+		{
+			return enclosingSubject.getChangeHistory();
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	
+	public List<BoundCommandSet> getBoundCommandSets()
+	{
+		if ( enclosingSubject != null )
+		{
+			return enclosingSubject.getBoundCommandSets();
+		}
+		else
+		{
+			return Arrays.asList( new BoundCommandSet[] {} );
+		}
 	}
 }

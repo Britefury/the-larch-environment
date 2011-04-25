@@ -50,6 +50,7 @@ class _DocumentListSubject (object):
 
 class GSymAppSubject (Subject):
 	def __init__(self, appState, world, rootLocation):
+		super( GSymAppSubject, self ).__init__( None )
 		self._appState = appState
 		self._world = world
 		self._rootLocation = rootLocation
@@ -68,9 +69,6 @@ class GSymAppSubject (Subject):
 	
 	def getSubjectContext(self):
 		return SimpleAttributeTable.instance.withAttrs( world=self._world, document=None, docLocation=None, location=self._rootLocation )
-	
-	def getChangeHistory(self):
-		return None
 	
 	
 	def loadDocument(self, filename):

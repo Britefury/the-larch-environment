@@ -14,8 +14,10 @@ import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.TreeEventListener;
+import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.DocPresent.StreamValue.StreamValue;
 import BritefuryJ.DocPresent.StreamValue.StreamValueVisitor;
+import BritefuryJ.DocPresent.Target.Target;
 import BritefuryJ.IncrementalView.FragmentView;
 import BritefuryJ.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.Pres.Pres;
@@ -33,6 +35,11 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 {
 	private class CommandConsoleSubject extends Subject
 	{
+		public CommandConsoleSubject()
+		{
+			super( null );
+		}
+		
 		public Object getFocus()
 		{
 			return CommandConsole.this;
@@ -103,10 +110,10 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 	
 	private class CommandContents extends Contents
 	{
-		private Command cmd;
+		private BoundCommand cmd;
 		
 		
-		public CommandContents(Command cmd)
+		public CommandContents(BoundCommand cmd)
 		{
 			this.cmd = cmd;
 		}
@@ -122,7 +129,7 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 		@Override
 		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
 		{
-			return Pres.coerce( cmd.getName() );
+			return Pres.coerce( cmd.getCommand().getName() );
 		}
 	}
 	
@@ -131,6 +138,7 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 	
 	private CommandConsoleSubject subject = new CommandConsoleSubject();
 	private ProjectiveBrowserContext browserContext;
+	private BrowserPage page;
 	private PresentationComponent presentation;
 	private PresentationStateListenerList listeners = null;
 	private Contents contents;
@@ -156,6 +164,12 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 	public ProjectiveBrowserContext getBrowserContext()
 	{
 		return browserContext;
+	}
+	
+	@Override
+	public void setPage(BrowserPage page)
+	{
+		this.page = page;
 	}
 
 
@@ -192,21 +206,14 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 			}
 			else
 			{
-				CommandSetGatherIterable commandSets = new CommandSetGatherIterable( presentation );
+				BoundCommand cmd = getTargetCommand( text );
 				
-				
-				Command cmd = null;
-				for (CommandSet commands: commandSets)
+				if ( cmd == null )
 				{
-					Command c = commands.getCommand( text );
-					if ( c != null )
-					{
-						cmd = c;
-						break;
-					}
+					cmd = getPageCommand( text );
 				}
-				
-				
+
+			
 				if ( cmd != null )
 				{
 					contents = new CommandContents( cmd );
@@ -224,6 +231,48 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 			throw new RuntimeException( "Stream value contains structural items" );
 		}
 	}
+
+
+	private BoundCommand getTargetCommand(String text)
+	{
+		Target target = presentation.getRootElement().getTarget();
+		if ( target.isValid() )
+		{
+			CommandSetGatherIterable commandSets = new CommandSetGatherIterable( target );
+			
+			
+			for (BoundCommandSet commands: commandSets)
+			{
+				BoundCommand c = commands.getCommand( text );
+				if ( c != null )
+				{
+					return c;
+				}
+			}
+		}
+
+		return null;
+	}
+	
+	
+	private BoundCommand getPageCommand(String text)
+	{
+		if ( page != null )
+		{
+			for (BoundCommandSet commands: page.getBoundCommandSets())
+			{
+				BoundCommand c = commands.getCommand( text );
+				if ( c != null )
+				{
+					return c;
+				}
+			}
+		}
+
+		return null;
+	}
+	
+	
 	
 	
 	

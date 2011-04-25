@@ -26,7 +26,7 @@ public class BrowserIncrementalView extends IncrementalView
 
 		DPElement column = new Column( new Object[] { region } ).present();
 
-		page = new IncrementalViewPage( column.alignHExpand().alignVExpand(), subject.getTitle(), browserContext, subject.getChangeHistory(), this );
+		page = new IncrementalViewPage( column.alignHExpand().alignVExpand(), subject.getTitle(), browserContext, subject.getChangeHistory(), this, subject );
 	}
 	
 	
