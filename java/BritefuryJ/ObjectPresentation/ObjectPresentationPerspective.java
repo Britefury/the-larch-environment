@@ -9,7 +9,9 @@ package BritefuryJ.ObjectPresentation;
 import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyObject;
+import org.python.core.PyString;
 import org.python.core.PyType;
+import org.python.core.__builtin__;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.IncrementalView.FragmentView;
@@ -19,14 +21,14 @@ import BritefuryJ.Utils.PolymorphicMap;
 
 public abstract class ObjectPresentationPerspective extends AbstractPerspective
 {
-	private String pythonPresentMethodName;
+	private PyString pythonPresentMethodName;
 	private PolymorphicMap<Object> objectPresenters = new PolymorphicMap<Object>();
 	private AbstractPerspective fallbackPerspective;
 	
 	
 	public ObjectPresentationPerspective(String pythonMethodName, AbstractPerspective fallbackPerspective)
 	{
-		this.pythonPresentMethodName = pythonMethodName.intern();
+		this.pythonPresentMethodName = Py.newString( pythonMethodName.intern() );
 		this.fallbackPerspective = fallbackPerspective;
 	}
 
@@ -63,7 +65,7 @@ public abstract class ObjectPresentationPerspective extends AbstractPerspective
 			PyObject presentMethod = null;
 			try
 			{
-				presentMethod = pyX.__getattr__( pythonPresentMethodName );
+				presentMethod = __builtin__.getattr( pyX, pythonPresentMethodName );
 			}
 			catch (PyException e)
 			{

@@ -11,11 +11,12 @@ import java.util.HashMap;
 import java.util.WeakHashMap;
 
 import org.python.core.Py;
+import org.python.core.PyString;
 
 public class ObjectViewLocationTable
 {
-	private WeakHashMap<Object, Integer> objectToLocation = new WeakHashMap<Object, Integer>();
-	private HashMap<Integer, WeakReference<Object>> locationToObject = new HashMap<Integer, WeakReference<Object>>();
+	private WeakHashMap<Object, String> objectToLocation = new WeakHashMap<Object, String>();
+	private HashMap<String, WeakReference<Object>> locationToObject = new HashMap<String, WeakReference<Object>>();
 	private int objectCount = 1;
 	
 	
@@ -27,32 +28,34 @@ public class ObjectViewLocationTable
 	
 	public String getRelativeLocationForObject(Object x)
 	{
-		Integer key = objectToLocation.get( x );
+		String key = objectToLocation.get( x );
 		if ( key == null )
 		{
-			key = objectCount++;
+			int index = objectCount++;
+			key = "o" + index;
 			objectToLocation.put( x, key );
 			locationToObject.put( key, new WeakReference<Object>( x ) );
 		}
-		String location = "[" + key + "]";
+		String location = "." + key;
 		return location;
 	}
 	
-	public Object __getitem__(int key)
+	public Object __resolve__(PyString key)
 	{
-		WeakReference<Object> ref = locationToObject.get( key );
+		String keyString = key.asString();
+		WeakReference<Object> ref = locationToObject.get( keyString );
 		if ( ref != null )
 		{
 			Object x = ref.get();
 			
 			if ( x == null )
 			{
-				locationToObject.remove( key );
+				locationToObject.remove( keyString );
 			}
 			
 			return x;
 		}
 		
-		throw Py.KeyError( "Object at " + key + " does not exist" );
+		throw Py.KeyError( "Object at " + keyString + " does not exist" );
 	}
 }

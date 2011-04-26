@@ -6,9 +6,13 @@
 //##************************
 package BritefuryJ.Projection;
 
+import java.util.HashMap;
+import java.util.regex.Pattern;
+
 import org.python.core.Py;
+import org.python.core.PyException;
 import org.python.core.PyObject;
-import org.python.core.PyStringMap;
+import org.python.core.PyString;
 import org.python.core.__builtin__;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
@@ -100,7 +104,7 @@ public class ProjectiveBrowserContext
 	private ProjectiveBrowserContextLocationResolver pageLocationResolver = new ProjectiveBrowserContextLocationResolver();
 	private ObjectPresentationLocationResolver objPresLocationResolver = new ObjectPresentationLocationResolver();
 	
-	private PyStringMap resolverLocals = new PyStringMap();
+	private HashMap<String, PyObject> resolverLocals = new HashMap<String, PyObject>();
 	
 	
 	
@@ -108,9 +112,9 @@ public class ProjectiveBrowserContext
 	{
 		if ( bWithSystemPages )
 		{
-			resolverLocals.__setitem__( "system", Py.java2py( new SystemRootPage() ) );
+			resolverLocals.put( "system", Py.java2py( new SystemRootPage() ) );
 		}
-		resolverLocals.__setitem__( "objects", Py.java2py( objPresLocationResolver ) );
+		resolverLocals.put( "objects", Py.java2py( objPresLocationResolver ) );
 		
 		registerMainSubject( new DefaultRootPage() );
 	}
@@ -129,7 +133,7 @@ public class ProjectiveBrowserContext
 		{
 			throw new RuntimeException( "Cannot register subject under name '" + name + "'" );
 		}
-		resolverLocals.__setitem__( name, Py.java2py( subject ) );
+		resolverLocals.put( name, Py.java2py( subject ) );
 	}
 	
 	public void registerNamedSubject(String name, PyObject subject)
@@ -138,7 +142,7 @@ public class ProjectiveBrowserContext
 		{
 			throw new RuntimeException( "Cannot register subject under name '" + name + "'" );
 		}
-		resolverLocals.__setitem__( name, subject );
+		resolverLocals.put( name, subject );
 	}
 	
 	
@@ -173,6 +177,61 @@ public class ProjectiveBrowserContext
 	
 	
 	
+	private static final Pattern separator = Pattern.compile( Pattern.quote( "." ) );
+	private static final Pattern identifier = Pattern.compile( "[a-zA-Z_][a-zA-Z0-9_]++" );
+	private static final PyString resolveName = Py.newString( "__resolve__".intern() );
+
+	private Object evaluateLocationString(Location location)
+	{
+		String names[] = separator.split( location.getLocationString() );
+		
+		for (String name: names)
+		{
+			if ( !identifier.matcher( name ).matches() )
+			{
+				return new DefaultPerspectiveSubject( new LocationSyntaxError( location ), "Invalid location syntax" );
+			}
+		}
+		
+		String name = names[0];
+		PyObject target = resolverLocals.get( name );
+		for (int i = 1; i < names.length; i++)
+		{
+			if ( target == null )
+			{
+				return target;
+			}
+			
+			name = names[i];
+			
+			PyObject resolveChild = null;
+			PyObject resolveMethod;
+			try
+			{
+				resolveMethod = __builtin__.getattr( target, resolveName );
+			}
+			catch (PyException e)
+			{
+				resolveMethod = null;
+			}
+			
+			if ( resolveMethod != null  &&  resolveMethod.isCallable() )
+			{
+				resolveChild = resolveMethod.__call__( Py.newString( name ) );
+			}
+			
+			if ( resolveChild == null )
+			{
+				resolveChild = __builtin__.getattr( target, Py.newString( name ) );
+			}
+			
+			
+			target = resolveChild;
+		}
+		
+		
+		return Py.tojava( target, Object.class );
+	}
 	
 	public Object resolveLocationAsObject(Location location)
 	{
@@ -180,12 +239,12 @@ public class ProjectiveBrowserContext
 		
 		if ( locationString.equals( "" ) )
 		{
-			locationString = "main";
+			location = new Location( "main" );
 		}
 
 		try
 		{
-			return Py.tojava( __builtin__.eval( Py.newString( locationString ), resolverLocals ), Object.class );
+			return evaluateLocationString( location );
 		}
 		catch (Throwable e)
 		{
@@ -271,6 +330,33 @@ public class ProjectiveBrowserContext
 			Pres loc = contentsStyle.applyTo( new StaticText( location ) );
 			Pres exc = Pres.coerceNonNull( exception );
 			Pres body = new Body( new Pres[] { errorTitle.alignHCentre(), loc.alignHCentre(), exc.alignHCentre() } );
+			Pres page = new Page( new Pres[] { body } );
+			return page;
+		}
+	}
+
+	
+	private static class LocationSyntaxError implements Presentable
+	{
+		private String location;
+		
+		public LocationSyntaxError(Location location)
+		{
+			this.location = location.getLocationString();
+		}
+		
+		
+		@Override
+		public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
+		{
+			StyleSheet titleStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 24 );
+			StyleSheet contentsStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 16 );
+			StyleSheet validSyntaxStyle = StyleSheet.instance.withAttr( Primitive.fontSize, 14 );
+			
+			Pres errorTitle = titleStyle.applyTo( new Label( "Invalid location string syntax invalid" ) );
+			Pres loc = contentsStyle.applyTo( new StaticText( location ) );
+			Pres validSyntax = validSyntaxStyle.applyTo( new Label( "Valid syntax: dot separated identifiers" ) );
+			Pres body = new Body( new Pres[] { errorTitle.alignHCentre(), loc.alignHCentre(), validSyntax.alignHCentre() } );
 			Pres page = new Page( new Pres[] { body } );
 			return page;
 		}

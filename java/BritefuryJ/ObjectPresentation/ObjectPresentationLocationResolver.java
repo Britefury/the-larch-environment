@@ -15,6 +15,7 @@ import org.python.core.PyString;
 public class ObjectPresentationLocationResolver
 {
 	private HashMap<String, ObjectPresentationPerspective> perspectiveTable = new HashMap<String, ObjectPresentationPerspective>();
+	private HashMap<ObjectPresentationPerspective, String> perspectiveNameTable = new HashMap<ObjectPresentationPerspective, String>();
 	private IdentityHashMap<ObjectPresentationPerspective, ObjectViewLocationTable> locationTables = new IdentityHashMap<ObjectPresentationPerspective, ObjectViewLocationTable>();
 	
 	
@@ -23,12 +24,13 @@ public class ObjectPresentationLocationResolver
 	}
 	
 	
-	public ObjectViewLocationTable __getitem__(String key)
+	public ObjectViewLocationTable __resolve__(PyString key)
 	{
-		ObjectPresentationPerspective perspective = perspectiveTable.get( key );
+		String perspectiveName = key.asString();
+		ObjectPresentationPerspective perspective = perspectiveTable.get( perspectiveName );
 		if ( perspective == null )
 		{
-			throw Py.KeyError( "No perspective with class name '" + key + "'" );
+			throw Py.KeyError( "No perspective named '" + perspectiveName + "'" );
 		}
 		return  locationTables.get( perspective );
 	}
@@ -36,13 +38,11 @@ public class ObjectPresentationLocationResolver
 	
 	public String getRelativeLocationForObject(ObjectPresentationPerspective perspective, Object x)
 	{
-		String className = perspective.getClass().getName();
-
+		String perspectiveName = getPerspectiveName( perspective );
+		
 		ObjectViewLocationTable locationTable = locationTables.get( perspective );
 		if ( locationTable == null )
 		{
-			perspectiveTable.put( className, perspective );
-
 			locationTable = new ObjectViewLocationTable();
 			locationTables.put( perspective, locationTable );
 		}
@@ -50,9 +50,38 @@ public class ObjectPresentationLocationResolver
 
 		String relative = locationTable.getRelativeLocationForObject( x );
 		
-		PyString pyClassName = Py.newString( perspective.getClass().getName() );
-		PyString key = pyClassName.__repr__();
+		return "." + perspectiveName + relative;
+	}
+	
+	
+	
+	private String getPerspectiveName(ObjectPresentationPerspective perspective)
+	{
+		String perspectiveName = perspectiveNameTable.get( perspective );
 		
-		return "[" + key + "]" + relative;
+		if ( perspectiveName == null )
+		{
+			String className = perspective.getClass().getName();
+			className = className.substring( className.lastIndexOf( "." ) + 1 );
+
+			perspectiveName = className;
+			if ( perspectiveTable.containsKey( perspectiveName ) )
+			{
+				int i = 2;
+				perspectiveName = className + i;
+				while ( perspectiveTable.containsKey( perspectiveName ) )
+				{
+					i++;
+					perspectiveName = className + i;
+				}
+				perspectiveTable.put( perspectiveName, perspective );
+			}
+			else
+			{
+				perspectiveTable.put( perspectiveName, perspective );
+			}
+		}
+		
+		return perspectiveName;
 	}
 }

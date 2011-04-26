@@ -99,13 +99,13 @@ public class DocModelPresenter
 			{
 				if ( !(x instanceof String) )
 				{
-					return new VerticalSequenceView( xViews, openBracket, closeBracket, null, space, TrailingSeparator.NEVER );
+					return new VerticalSequenceView( xViews, openBracket, closeBracket, null, space, TrailingSeparator.NEVER ).alignHPack().alignVRefY();
 				}
 			}
 		}
 		
 		// Create a list view
-		return new ParagraphSequenceView( xViews, openBracket, closeBracket, null, space, TrailingSeparator.NEVER );
+		return new ParagraphSequenceView( xViews, openBracket, closeBracket, null, space, TrailingSeparator.NEVER ).alignHPack().alignVRefY();
 	}
 	
 	
@@ -180,11 +180,11 @@ public class DocModelPresenter
 		// Create the layout
 		if ( mode == ObjectPresentMode.HORIZONTAL )
 		{
-			return new ParagraphSequenceView( itemViews, openParen, closeParen, null, space, TrailingSeparator.NEVER );
+			return new ParagraphSequenceView( itemViews, openParen, closeParen, null, space, TrailingSeparator.NEVER ).alignHPack().alignVRefY();
 		}
 		else if ( mode == ObjectPresentMode.VERTICALINLINE )
 		{
-			return new VerticalInlineSequenceView( itemViews, openParen, closeParen, null, space, TrailingSeparator.NEVER );
+			return new VerticalInlineSequenceView( itemViews, openParen, closeParen, null, space, TrailingSeparator.NEVER ).alignHPack().alignVRefY();
 		}
 		else
 		{

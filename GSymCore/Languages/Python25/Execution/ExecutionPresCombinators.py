@@ -73,7 +73,7 @@ def execException(exceptionView):
 	return ApplyStyleSheetFromAttribute( ExecutionStyle.exceptionBorderStyle, Border( Column( [ label, exceptionView.padX( 5.0, 0.0 ).alignHExpand() ] ).alignHExpand() ).alignHExpand() )
 
 def execResult(resultView):
-	return ApplyStyleSheetFromAttribute( ExecutionStyle.resultBorderStyle, Border( Paragraph( [ resultView ] ).alignHExpand() ).alignHExpand() )
+	return ApplyStyleSheetFromAttribute( ExecutionStyle.resultBorderStyle, Border( Bin( Paragraph( [ resultView ] ) ) ).alignHExpand() )
 
 
 def executionResultBox(stdoutStream, stderrStream, exception, resultInTuple, bUseDefaultPerspecitveForException, bUseDefaultPerspectiveForResult):
@@ -81,14 +81,14 @@ def executionResultBox(stdoutStream, stderrStream, exception, resultInTuple, bUs
 	if stderrStream is not None:
 		boxContents.append( execStderr( stderrStream, bUseDefaultPerspectiveForResult ) )
 	if exception is not None:
-		exceptionView = InnerFragment( exception )
+		exceptionView = InnerFragment( exception ).alignHPack()
 		if bUseDefaultPerspecitveForException:
 			exceptionView = ApplyPerspective.defaultPerspective( exceptionView )
 		boxContents.append( execException( exceptionView ) )
 	if stdoutStream is not None:
 		boxContents.append( execStdout( stdoutStream, bUseDefaultPerspectiveForResult ) )
 	if resultInTuple is not None:
-		resultView = InnerFragment( resultInTuple[0] )
+		resultView = InnerFragment( resultInTuple[0] ).alignHPack()
 		if bUseDefaultPerspectiveForResult:
 			resultView = ApplyPerspective.defaultPerspective( resultView )
 		boxContents.append( execResult( resultView ) )
@@ -104,7 +104,7 @@ def minimalExecutionResultBox(stdoutText, stderrText, exception, resultInTuple, 
 		if resultInTuple is None:
 			return None
 		else:
-			resultView = InnerFragment( resultInTuple[0] )
+			resultView = InnerFragment( resultInTuple[0] ).alignHPack()
 			if bUseDefaultPerspectiveForResult:
 				resultView = ApplyPerspective.defaultPerspective( resultView )
 			return Paragraph( [ resultView ] ).alignHExpand()
@@ -120,7 +120,7 @@ def minimalExecutionResultBox(stdoutText, stderrText, exception, resultInTuple, 
 		if stdoutText is not None:
 			boxContents.append( execStdout( stdoutText ) )
 		if resultInTuple is not None:
-			resultView = InnerFragment( resultInTuple[0] )
+			resultView = InnerFragment( resultInTuple[0] ).alignHPack()
 			if bUseDefaultPerspectiveForResult:
 				resultView = ApplyPerspective.defaultPerspective( resultView )
 			boxContents.append( execResult( resultView ) )
