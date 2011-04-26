@@ -216,7 +216,7 @@ public class CommandConsole extends AbstractCommandConsole implements Presentabl
 		listeners = PresentationStateListenerList.addListener( listeners, fragment );
 		Pres prompt = promptStyle.applyTo( new Border( new Label( "Cmd:" ) ) );
 		
-		return cmdRowStyle.applyTo( new Row( new Object[] { prompt, contents } ).withTreeEventListener( treeEventListener ) );
+		return cmdRowStyle.applyTo( new Row( new Object[] { prompt, contents } ).alignHPack().alignVRefY().withTreeEventListener( treeEventListener ) );
 	}
 	
 	

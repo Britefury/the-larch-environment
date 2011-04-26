@@ -8,8 +8,6 @@ package BritefuryJ.IncrementalView;
 
 import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
-import BritefuryJ.Pres.Pres;
-import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Projection.ProjectiveBrowserContext;
 import BritefuryJ.Projection.Subject;
 
@@ -24,9 +22,7 @@ public class BrowserIncrementalView extends IncrementalView
 	{
 		super( subject, browserContext, persistentState );
 
-		Pres column = new Column( new Object[] { getViewPres() } );
-
-		page = new IncrementalViewPage( column, subject.getTitle(), browserContext, subject.getChangeHistory(), this, subject );
+		page = new IncrementalViewPage( getViewPres(), subject.getTitle(), browserContext, subject.getChangeHistory(), this, subject );
 	}
 	
 	

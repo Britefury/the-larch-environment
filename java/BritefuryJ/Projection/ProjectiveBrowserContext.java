@@ -271,9 +271,8 @@ public class ProjectiveBrowserContext
 			Pres loc = contentsStyle.applyTo( new StaticText( location ) );
 			Pres exc = Pres.coerceNonNull( exception );
 			Pres body = new Body( new Pres[] { errorTitle.alignHCentre(), loc.alignHCentre(), exc.alignHCentre() } );
-			
-			
-			return body;
+			Pres page = new Page( new Pres[] { body } );
+			return page;
 		}
 	}
 }
