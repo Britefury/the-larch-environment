@@ -53,8 +53,10 @@ import BritefuryJ.DocPresent.Input.Modifier;
 import BritefuryJ.DocPresent.Input.Pointer;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.Keyboard.Keyboard;
+import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.LAllocV;
 import BritefuryJ.DocPresent.Layout.LReqBoxInterface;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.LayoutTree.LayoutNodeRootElement;
 import BritefuryJ.DocPresent.Marker.Marker;
 import BritefuryJ.DocPresent.Selection.Selection;
@@ -115,7 +117,7 @@ public class PresentationComponent extends JComponent implements ComponentListen
 			
 			// Create a presentation component for the popup contents, and add them
 			popupComponent = new PresentationComponent( this );
-			popupComponent.getRootElement().setChild( popupContents.layoutWrap() );
+			popupComponent.getRootElement().setChild( popupContents.layoutWrap( HAlignment.EXPAND, VAlignment.EXPAND ) );
 			
 			popupWindow.add( popupComponent );
 			popupWindow.setLocation( x, y );

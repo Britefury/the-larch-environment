@@ -8,6 +8,8 @@ package BritefuryJ.Pres.Primitive;
 
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -27,8 +29,9 @@ public class Border extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPBorder bin = new DPBorder( Primitive.getBorderParams( style ) );
-		bin.setChild( child.present( ctx, Primitive.useBorderParams.get( style ) ).layoutWrap() );
-		return bin;
+		DPBorder border = new DPBorder( Primitive.getBorderParams( style ), Primitive.containerParams.get( style ) );
+		StyleValues childStyle = Primitive.useContainerParams.get( Primitive.useBorderParams.get( style ) );
+		border.setChild( child.present( ctx, childStyle ).layoutWrap( childStyle.get( Primitive.hAlign, HAlignment.class ), childStyle.get( Primitive.vAlign, VAlignment.class ) ) );
+		return border;
 	}
 }

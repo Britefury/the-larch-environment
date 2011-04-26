@@ -10,6 +10,8 @@ import BritefuryJ.Controls.Button.ButtonControl;
 import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Bin;
@@ -69,7 +71,7 @@ public class PresentationButton extends ControlPres
 		private void displayPres()
 		{
 			DPElement p = Pres.coerce( presFactory.createPres() ).present( ctx, style );
-			presContainer.setChild( p.layoutWrap() );
+			presContainer.setChild( p.layoutWrap( style.get( Primitive.hAlign, HAlignment.class ), style.get( Primitive.vAlign, VAlignment.class ) ) );
 		}
 	}
 

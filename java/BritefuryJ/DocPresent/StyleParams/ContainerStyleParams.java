@@ -9,15 +9,17 @@ package BritefuryJ.DocPresent.StyleParams;
 
 import java.awt.Cursor;
 
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Painter.Painter;
 
 public class ContainerStyleParams extends ElementStyleParams
 {
-	public static final ContainerStyleParams defaultStyleParams = new ContainerStyleParams( null, null, null );
+	public static final ContainerStyleParams defaultStyleParams = new ContainerStyleParams( HAlignment.PACK, VAlignment.REFY, null, null, null );
 
 
-	public ContainerStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor)
+	public ContainerStyleParams(HAlignment hAlign, VAlignment vAlign, Painter background, Painter hoverBackground, Cursor pointerCursor)
 	{
-		super( background, hoverBackground, pointerCursor );
+		super( hAlign, vAlign, background, hoverBackground, pointerCursor );
 	}
 }

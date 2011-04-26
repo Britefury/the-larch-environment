@@ -10,6 +10,8 @@ import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPTable;
 import BritefuryJ.DocPresent.Border.AbstractBorder;
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -179,7 +181,8 @@ public class Table extends Pres
 				for (int x = 0; x < row.length; x++)
 				{
 					TableCell cell = row[x];
-					elemRow[x] = cell != null  ?  new DPTable.TableCell( cell.child.present( ctx, childStyle ).layoutWrap(), cell.colSpan, cell.rowSpan )  :  null;  
+					elemRow[x] = cell != null  ?  new DPTable.TableCell( cell.child.present( ctx, childStyle ).layoutWrap( childStyle.get( Primitive.hAlign, HAlignment.class ),
+							childStyle.get( Primitive.vAlign, VAlignment.class ) ),cell.colSpan, cell.rowSpan )  :  null;  
 				}
 			}
 			table.setCells( elemCells );

@@ -8,25 +8,50 @@
 package BritefuryJ.DocPresent.StyleParams;
 
 import java.awt.Cursor;
+import java.util.ArrayList;
+import java.util.List;
 
+import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.DefaultPerspective.Presentable;
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Painter.Painter;
+import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.ObjectPres.HorizontalField;
+import BritefuryJ.Pres.ObjectPres.ObjectBoxWithFields;
+import BritefuryJ.Pres.Primitive.Label;
 
-public class ElementStyleParams
+public class ElementStyleParams implements Presentable
 {
-	public static final ElementStyleParams defaultStyleParams = new ElementStyleParams( null, null, null );
+	public static final ElementStyleParams defaultStyleParams = new ElementStyleParams( HAlignment.PACK, VAlignment.REFY, null, null, null );
 	
 	
+	private final HAlignment hAlign;
+	private final VAlignment vAlign;
 	private final Painter background, hoverBackground;
 	private final Cursor cursor;
 	
 	
-	public ElementStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor)
+	public ElementStyleParams(HAlignment hAlign, VAlignment vAlign, Painter background, Painter hoverBackground, Cursor pointerCursor)
 	{
+		this.hAlign = hAlign;
+		this.vAlign = vAlign;
 		this.background = background;
 		this.hoverBackground = hoverBackground;
 		this.cursor = pointerCursor;
 	}
 	
+	
+	public HAlignment getHAlignment()
+	{
+		return hAlign;
+	}
+	
+	public VAlignment getVAlignment()
+	{
+		return vAlign;
+	}
 	
 	public Painter getBackground()
 	{
@@ -41,5 +66,27 @@ public class ElementStyleParams
 	public Cursor getCursor()
 	{
 		return cursor;
+	}
+	
+	
+	protected void buildFieldList(List<Object> fields)
+	{
+		fields.add( new HorizontalField( "H-Algin", new Label( hAlign.toString() ) ) );
+		fields.add( new HorizontalField( "V-Align", new Label( vAlign.toString() ) ) );
+		fields.add( new HorizontalField( "Background", Pres.coerceNonNull( background ) ) );
+		fields.add( new HorizontalField( "Hover background", Pres.coerceNonNull( hoverBackground ) ) );
+		fields.add( new HorizontalField( "Cursor", Pres.coerceNonNull( cursor ) ) );
+	}
+
+
+	@Override
+	public Pres present(FragmentView fragment, SimpleAttributeTable inheritedState)
+	{
+		String className = getClass().getName();
+		className = className.substring( className.lastIndexOf( "." ) );
+		
+		ArrayList<Object> fields = new ArrayList<Object>();
+		buildFieldList( fields );
+		return new ObjectBoxWithFields( className, fields );
 	}
 }

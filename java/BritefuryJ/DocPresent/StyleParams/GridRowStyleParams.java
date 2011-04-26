@@ -8,15 +8,17 @@ package BritefuryJ.DocPresent.StyleParams;
 
 import java.awt.Cursor;
 
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Painter.Painter;
 
 public class GridRowStyleParams extends ContainerStyleParams
 {
-	public static final GridRowStyleParams defaultStyleParams = new GridRowStyleParams( null, null, null );
+	public static final GridRowStyleParams defaultStyleParams = new GridRowStyleParams( HAlignment.PACK, VAlignment.REFY, null, null, null );
 
 
-	public GridRowStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor)
+	public GridRowStyleParams(HAlignment hAlign, VAlignment vAlign, Painter background, Painter hoverBackground, Cursor pointerCursor)
 	{
-		super( background, hoverBackground, pointerCursor );
+		super( hAlign, vAlign, background, hoverBackground, pointerCursor );
 	}
 }

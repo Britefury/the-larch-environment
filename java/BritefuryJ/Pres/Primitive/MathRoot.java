@@ -8,6 +8,8 @@ package BritefuryJ.Pres.Primitive;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPMathRoot;
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -28,7 +30,8 @@ public class MathRoot extends Pres
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
 		DPMathRoot element = new DPMathRoot( Primitive.mathRootParams.get( style ) );
-		element.setChild( child.present( ctx, Primitive.useMathRootParams( style ) ).layoutWrap() );
+		StyleValues childStyle = Primitive.useMathRootParams( style );
+		element.setChild( child.present( ctx, Primitive.useMathRootParams( style ) ).layoutWrap( childStyle.get( Primitive.hAlign, HAlignment.class ), childStyle.get( Primitive.vAlign, VAlignment.class ) ) );
 		return element;
 	}
 

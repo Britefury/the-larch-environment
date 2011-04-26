@@ -93,8 +93,8 @@ public class DropDownExpander extends Expander
 		
 		StyleSheet headerStyle = StyleSheet.instance.withAttr( Primitive.rowSpacing, style.get( Controls.dropDownExpanderHeaderContentsSpacing, Double.class ) );
 		
-		Pres expandedHeader = headerStyle.applyTo( new Row( new Pres[] { expandedArrow.alignVCentre(), header.alignHExpand() } ) ).withElementInteractor( headerInteractor );
-		Pres contractedHeader = headerStyle.applyTo( new Row( new Pres[] { contractedArrow.alignVCentre(), header.alignHExpand() } ) ).withElementInteractor( headerInteractor );
+		Pres expandedHeader = headerStyle.applyTo( new Row( new Pres[] { expandedArrow.alignHPack().alignVCentre(), header.alignHExpand() } ) ).withElementInteractor( headerInteractor );
+		Pres contractedHeader = headerStyle.applyTo( new Row( new Pres[] { contractedArrow.alignHPack().alignVCentre(), header.alignHExpand() } ) ).withElementInteractor( headerInteractor );
 		
 		
 		Pres expanded = new Column( new Pres[] { expandedHeader, contents.padX( padding ) } );

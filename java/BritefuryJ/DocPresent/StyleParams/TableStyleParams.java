@@ -11,14 +11,19 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Paint;
 import java.awt.Stroke;
+import java.util.List;
 
 import BritefuryJ.DocPresent.TableBackgroundPainter;
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Painter.Painter;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.ObjectPres.HorizontalField;
 
 
 public class TableStyleParams extends ContainerStyleParams
 {
-	public static final TableStyleParams defaultStyleParams = new TableStyleParams( null, null, null, 3.0, false, 3.0, false, null, new BasicStroke( 1.0f ), Color.BLACK );
+	public static final TableStyleParams defaultStyleParams = new TableStyleParams( HAlignment.PACK, VAlignment.REFY, null, null, null, 3.0, false, 3.0, false, null, new BasicStroke( 1.0f ), Color.BLACK );
 	
 	
 	protected final double columnSpacing;
@@ -33,10 +38,11 @@ public class TableStyleParams extends ContainerStyleParams
 	protected final TableBackgroundPainter tableBackgroundPainter;
 
 
-	public TableStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, double columnSpacing, boolean columnExpand, double rowSpacing, boolean rowExpand,
+	public TableStyleParams(HAlignment hAlign, VAlignment vAlign, Painter background, Painter hoverBackground, Cursor pointerCursor, double columnSpacing,
+			boolean columnExpand, double rowSpacing, boolean rowExpand,
 			TableBackgroundPainter tableBackgroundPainter, Stroke cellBoundaryStroke, Paint cellBoundaryPaint)
 	{
-		super( background, hoverBackground, pointerCursor );
+		super( hAlign, vAlign, background, hoverBackground, pointerCursor );
 		
 		this.columnSpacing = columnSpacing;
 		this.columnExpand = columnExpand;
@@ -87,5 +93,19 @@ public class TableStyleParams extends ContainerStyleParams
 	public TableBackgroundPainter getTableBackgroundPainter()
 	{
 		return tableBackgroundPainter;
+	}
+	
+	
+	
+	protected void buildFieldList(List<Object> fields)
+	{
+		super.buildFieldList( fields );
+		fields.add( new HorizontalField( "Column spacing", Pres.coerceNonNull( columnSpacing ) ) );
+		fields.add( new HorizontalField( "Column expand", Pres.coerceNonNull( columnExpand ) ) );
+		fields.add( new HorizontalField( "Row spacing", Pres.coerceNonNull( rowSpacing ) ) );
+		fields.add( new HorizontalField( "Row expand", Pres.coerceNonNull( rowExpand ) ) );
+		fields.add( new HorizontalField( "Cell boundary stroke", Pres.coerceNonNull( cellBoundaryStroke ) ) );
+		fields.add( new HorizontalField( "Cell boundary paint", Pres.coerceNonNull( cellBoundaryPaint ) ) );
+		fields.add( new HorizontalField( "Table background painter", Pres.coerceNonNull( tableBackgroundPainter ) ) );
 	}
 }

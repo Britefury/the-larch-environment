@@ -213,8 +213,8 @@ public class OptionMenu extends ControlPres
 		BritefuryJ.DocPresent.Border.AbstractBorder border = style.get( Controls.optionMenuBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class );
 		BritefuryJ.DocPresent.Border.AbstractBorder hoverBorder = style.get( Controls.optionMenuHoverBorder, BritefuryJ.DocPresent.Border.AbstractBorder.class );
 		StyleSheet optionStyle = StyleSheet.instance.withAttr( Primitive.rowSpacing, style.get( Controls.optionMenuContentsSpacing, Double.class ) ).withAttr( Primitive.border, border );
-		Pres optionContents = new Row( new Pres[] { coerce( choiceContainer ).alignHExpand(), arrow.alignVCentre() } );
-		Pres optionMenu = optionStyle.applyTo( new Border( optionContents.alignHExpand() ) ); 
+		Pres optionContents = new Row( new Pres[] { coerce( choiceContainer ).alignHExpand(), arrow.alignHPack().alignVCentre() } );
+		Pres optionMenu = optionStyle.applyTo( new Border( optionContents ) ); 
 		DPBorder optionMenuElement = (DPBorder)optionMenu.present( ctx, style );
 		
 		

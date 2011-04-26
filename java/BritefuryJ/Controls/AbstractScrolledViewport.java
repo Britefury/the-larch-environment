@@ -98,17 +98,17 @@ public abstract class AbstractScrolledViewport extends ControlPres
 		Range yRange = new Range( 0.0, 1.0, 0.0, 1.0, 0.1 );
 		
 		Viewport viewport = new Viewport( child, xRange, yRange, state );
-		DPViewport viewportElement = (DPViewport)viewport.present( ctx, style );
+		DPViewport viewportElement = (DPViewport)viewport.alignHExpand().alignVExpand().present( ctx, style );
 		
-		Pres bin = createViewportBin( viewportElement.alignHExpand().alignVExpand() );
+		Pres bin = createViewportBin( viewportElement );
 		HScrollBar xScroll = new HScrollBar( xRange );
-		ScrollBar.ScrollBarControl xScrollCtl = (ScrollBarControl)xScroll.createControl( ctx, style );
+		ScrollBar.ScrollBarControl xScrollCtl = (ScrollBarControl)xScroll.createControl( ctx, style.alignHExpand() );
 		VScrollBar yScroll = new VScrollBar( yRange );
-		ScrollBar.ScrollBarControl yScrollCtl = (ScrollBarControl)yScroll.createControl( ctx, style );
+		ScrollBar.ScrollBarControl yScrollCtl = (ScrollBarControl)yScroll.createControl( ctx, style.alignHPack().alignVExpand() );
 		
-		Pres row0 = new Row( new Object[] { bin.alignHExpand().alignVExpand(), yScrollCtl.getElement().alignVExpand() } );
-		Pres row1 = new Row( new Object[] { xScrollCtl.getElement().alignHExpand(), new Spacer( scrollBarSize, scrollBarSize ) } );
-		Pres col = new Column( new Pres[] { row0.alignHExpand().alignVExpand(), row1.alignHExpand() } );
+		Pres row0 = new Row( new Object[] { bin, yScrollCtl.getElement() } );
+		Pres row1 = new Row( new Object[] { xScrollCtl.getElement(), new Spacer( scrollBarSize, scrollBarSize ).alignHPack() } ).alignVRefY();
+		Pres col = new Column( new Pres[] { row0, row1 } ).alignHExpand().alignVExpand();
 		DPElement element = col.present( ctx, style );
 		
 		return new ScrolledViewportControl( ctx, style, viewportElement, element, xScrollCtl, yScrollCtl, xRange, yRange );

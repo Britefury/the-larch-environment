@@ -124,7 +124,7 @@ public class Checkbox extends ControlPres
 		Pres checkBorder = checkStyle.applyTo( new Border( checkElement ) );
 		
 		Pres childElement = presentAsCombinator( ctx, Controls.useCheckboxAttrs( style ), child );
-		Pres row = checkboxStyle.applyTo( new Row( new Pres[] { checkBorder.alignVCentre(), childElement.alignVCentre() } ) );
+		Pres row = checkboxStyle.applyTo( new Row( new Pres[] { checkBorder.alignHPack().alignVCentre(), childElement.alignVCentre() } ) );
 		DPElement rowElement = row.present( ctx, style);
 		
 		Pres bin = new Bin( rowElement );

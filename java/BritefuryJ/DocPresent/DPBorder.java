@@ -31,6 +31,11 @@ public class DPBorder extends DPBin
 	public DPBorder(AbstractBorder border)
 	{
 		this( border, ContainerStyleParams.defaultStyleParams );
+
+		if ( border == null )
+		{
+			throw new RuntimeException( "Cannot have null border" );
+		}
 	}
 
 	public DPBorder(ContainerStyleParams styleParams)
@@ -42,8 +47,13 @@ public class DPBorder extends DPBin
 	{
 		super(styleParams);
 		
-		layoutNode = new LayoutNodeBorder( this );
+		if ( border == null )
+		{
+			throw new RuntimeException( "Cannot have null border" );
+		}
+		
 		this.border = border;
+		layoutNode = new LayoutNodeBorder( this );
 	}
 	
 	protected DPBorder(DPBorder element)

@@ -9,7 +9,6 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 import java.util.ArrayList;
 
 import BritefuryJ.Controls.Hyperlink;
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.Pres.Pres;
@@ -36,13 +35,13 @@ public class SystemRootPage extends BrowserPage
 	
 
 	
-	public DPElement getContentsElement()
+	public Pres getContentsPres()
 	{
 		Pres title = new TitleBar( "System Page" );
 		
 		Pres head = new Head( new Pres[] { createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE ), title } );
 		
-		return new Page( new Pres[] { head, tests.createContents() } ).present();
+		return new Page( new Pres[] { head, tests.createContents() } );
 	}
 
 	

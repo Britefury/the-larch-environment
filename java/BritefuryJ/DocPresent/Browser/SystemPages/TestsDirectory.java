@@ -10,7 +10,6 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import BritefuryJ.Controls.Hyperlink;
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.BrowserPage;
@@ -122,9 +121,9 @@ public class TestsDirectory extends BrowserPage
 
 	
 	
-	public DPElement getContentsElement()
+	public Pres getContentsPres()
 	{
-		return createContents().present();
+		return createContents();
 	}
 
 	
@@ -140,7 +139,7 @@ public class TestsDirectory extends BrowserPage
 			testBoxChildren.add( link );
 		}
 		
-		return outlineStyle.applyTo( new Border( new Column( testBoxChildren ) ) );
+		return outlineStyle.applyTo( new Border( new Column( testBoxChildren ).alignVRefY() ) );
 	}
 	
 	protected Pres createContents()
@@ -151,6 +150,6 @@ public class TestsDirectory extends BrowserPage
 		testBoxes.add( createTestsBox( "Primitive elements:", primitiveLinks ).pad( 25.0, 5.0 ) );
 		testBoxes.add( createTestsBox( "Controls:", controlsLinks ).pad( 25.0, 5.0 ) );
 
-		return new Body( new Pres[] { heading, new Row( testBoxes ) } );
+		return new Body( new Pres[] { heading, new Row( testBoxes ).alignHPack().alignVTop() } );
 	}
 }

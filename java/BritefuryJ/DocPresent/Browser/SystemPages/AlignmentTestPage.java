@@ -50,7 +50,7 @@ public class AlignmentTestPage extends SystemPage
 		Pres halignCentre = new Border( textStyleSheet.applyTo( new Label( "hAlign=CENTRE" ).alignHCentre() ) );
 		Pres halignRight = new Border( textStyleSheet.applyTo( new Label( "hAlign=RIGHT" ).alignHRight() ) );
 		Pres halignExpand = new Border( textStyleSheet.applyTo( new Label( "hAlign=EXPAND" ).alignHExpand() ) );
-		Pres halignSection = sectionStyleSheet.applyTo( new Column( new Pres[] { halignTitle, halignLeft.alignHExpand(), halignCentre.alignHExpand(), halignRight.alignHExpand(), halignExpand.alignHExpand() } ) );
+		Pres halignSection = sectionStyleSheet.applyTo( new Column( new Pres[] { halignTitle.alignHPack(), halignLeft, halignCentre, halignRight, halignExpand } ) );
 		
 		
 		Pres halignInRowTitle = new Heading2( "Horizontal alignment in row" );
@@ -66,7 +66,7 @@ public class AlignmentTestPage extends SystemPage
 				halignHBRight, dividerStyleSheet.applyTo( new Box( 1.0, 1.0 ).alignVExpand() ),
 				halignHBExpand
 			} ).alignHExpand() );
-		Pres halignRowSection = sectionStyleSheet.applyTo( new Column( new Pres[] { halignInRowTitle, hAlignRow.alignHExpand() } ) );
+		Pres halignRowSection = sectionStyleSheet.applyTo( new Column( new Pres[] { halignInRowTitle.alignHPack(), hAlignRow } ) );
 
 		Pres valignTitle = new Heading2( "Vertical alignment" ); 
 
@@ -88,7 +88,7 @@ public class AlignmentTestPage extends SystemPage
 		
 		Pres vAlignBox = styleSheet.withAttr( Primitive.rowSpacing, 50.0 ).applyTo( new Row( new Pres[] { refBox.alignVRefYExpand(), valignContentsBox.alignVRefYExpand() } ) );
 		
-		Pres valignSection = sectionStyleSheet.applyTo( new Column( new Pres[] { valignTitle, vAlignBox.alignHExpand() } ) );
+		Pres valignSection = sectionStyleSheet.applyTo( new Column( new Pres[] { valignTitle.alignHPack(), vAlignBox } ) );
 		
 		Pres mainBox = styleSheet.withAttr( Primitive.columnSpacing, 15.0 ).applyTo( new Column( new Pres[] { halignSection.alignHExpand(), halignRowSection.alignHExpand(), valignSection } ) );
 		return new Bin( mainBox );

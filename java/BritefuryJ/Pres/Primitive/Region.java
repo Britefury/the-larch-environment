@@ -42,7 +42,6 @@ public class Region extends Pres
 		{
 			element.setClipboardHandler( clipboardHandler );
 		}
-		element.copyAlignmentFlagsFrom( childElement );
 		return element;
 	}
 }

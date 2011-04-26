@@ -30,10 +30,10 @@ public class ObjectBox extends Pres
 	{
 		double padding = style.get( ObjectPresStyle.objectContentPadding, Double.class );
 		StyleValues childStyle = ObjectPresStyle.useObjectBorderAttrs( ObjectPresStyle.useObjectBoxAttrs( style ) );
-		DPElement contentsElement = contents.present( ctx, childStyle );
+		DPElement contentsElement = contents.padX( padding ).present( ctx, childStyle );
 		
 		Pres titlePres = new ObjectTitle( title );
 		
-		return new ObjectBorder( new Column( new Object[] { titlePres, contentsElement.padX( padding ) } ).alignHExpand() ).present( ctx, style );
+		return new ObjectBorder( new Column( new Object[] { titlePres, contentsElement } ).alignHExpand() ).present( ctx, style );
 	}
 }

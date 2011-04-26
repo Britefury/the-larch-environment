@@ -12,14 +12,19 @@ import java.awt.Font;
 import java.awt.Paint;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineMetrics;
+import java.util.List;
 
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Painter.Painter;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.ObjectPres.HorizontalField;
 
 public class MathRootStyleParams extends ContainerStyleParams
 {
 	private static final Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
 
-	public static final MathRootStyleParams defaultStyleParams = new MathRootStyleParams( null, null, null, defaultFont, Color.BLACK, null, 1.5 );
+	public static final MathRootStyleParams defaultStyleParams = new MathRootStyleParams( HAlignment.PACK, VAlignment.REFY, null, null, null, defaultFont, Color.BLACK, null, 1.5 );
 	
 	protected final Font font;
 	protected final Paint symbolPaint, hoverSymbolPaint;
@@ -30,9 +35,9 @@ public class MathRootStyleParams extends ContainerStyleParams
 	protected boolean gotMetrics = false;
 
 
-	public MathRootStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, Font font, Paint symbolPaint, Paint hoverSymbolPaint, double thickness)
+	public MathRootStyleParams(HAlignment hAlign, VAlignment vAlign, Painter background, Painter hoverBackground, Cursor pointerCursor, Font font, Paint symbolPaint, Paint hoverSymbolPaint, double thickness)
 	{
-		super( background, hoverBackground, pointerCursor );
+		super( hAlign, vAlign, background, hoverBackground, pointerCursor );
 		
 		this.font = font;
 		this.symbolPaint = symbolPaint;
@@ -100,5 +105,19 @@ public class MathRootStyleParams extends ContainerStyleParams
 			
 			gotMetrics = true;
 		}
+	}
+	
+	
+	
+	protected void buildFieldList(List<Object> fields)
+	{
+		super.buildFieldList( fields );
+		fields.add( new HorizontalField( "Font", Pres.coerceNonNull( font ) ) );
+		fields.add( new HorizontalField( "Symbol paint", Pres.coerceNonNull( symbolPaint ) ) );
+		fields.add( new HorizontalField( "Hover symbol paint", Pres.coerceNonNull( hoverSymbolPaint ) ) );
+		fields.add( new HorizontalField( "Thickness", Pres.coerceNonNull( getThickness() ) ) );
+		fields.add( new HorizontalField( "Bar spacing", Pres.coerceNonNull( getBarSpacing() ) ) );
+		fields.add( new HorizontalField( "Glyph width", Pres.coerceNonNull( getGlyphWidth() ) ) );
+		fields.add( new HorizontalField( "Glyph line widths", Pres.coerceNonNull( getGlyphLineWidths() ) ) );
 	}
 }

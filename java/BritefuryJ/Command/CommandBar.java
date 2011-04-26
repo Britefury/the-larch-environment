@@ -133,9 +133,8 @@ public class CommandBar
 		view = new IncrementalView( console.getSubject(), console.getBrowserContext(), null );
 		console.setListener( consoleListener );
 
-		DPElement viewElement = view.getViewElement();
-		DPElement column = new Column( new Object[] { viewElement } ).present();
-		commandBarComponent.getRootElement().setChild( column.alignHExpand().alignVExpand() );
+		DPElement column = new Column( new Object[] { view.getViewPres() } ).alignHExpand().alignVExpand().present();
+		commandBarComponent.getRootElement().setChild( column );
 
 		presComponentSwitchInteractor.addToKeyboard( presentation.getRootElement().getKeyboard() );
 		commandBarSwitchInteractor.addToKeyboard( commandBarComponent.getRootElement().getKeyboard() );

@@ -22,20 +22,23 @@ import BritefuryJ.AttributeTable.InheritedAttributeNonNull;
 import BritefuryJ.DocPresent.TableBackgroundPainter;
 import BritefuryJ.DocPresent.Border.AbstractBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.Painter.Painter;
+import BritefuryJ.DocPresent.StyleParams.ColumnStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ContentLeafStyleParams;
 import BritefuryJ.DocPresent.StyleParams.FractionStyleParams;
 import BritefuryJ.DocPresent.StyleParams.GridRowStyleParams;
-import BritefuryJ.DocPresent.StyleParams.RowStyleParams;
 import BritefuryJ.DocPresent.StyleParams.MathRootStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ParagraphStyleParams;
+import BritefuryJ.DocPresent.StyleParams.RowStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ScriptStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ShapeStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TableStyleParams;
 import BritefuryJ.DocPresent.StyleParams.TextStyleParams;
-import BritefuryJ.DocPresent.StyleParams.ColumnStyleParams;
+import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class Primitive
@@ -43,6 +46,9 @@ public class Primitive
 	public static final AttributeNamespace primitiveNamespace = new AttributeNamespace( "primitive" );
 	
 	
+	public static final InheritedAttributeNonNull hAlign = new InheritedAttributeNonNull( primitiveNamespace, "hAlign", HAlignment.class, HAlignment.PACK );
+	public static final InheritedAttributeNonNull vAlign = new InheritedAttributeNonNull( primitiveNamespace, "vAlign", VAlignment.class, VAlignment.REFY );
+
 	public static final InheritedAttributeNonNull fontFace = new InheritedAttributeNonNull( primitiveNamespace, "fontFace", String.class, "Sans serif" );
 	public static final InheritedAttributeNonNull fontBold = new InheritedAttributeNonNull( primitiveNamespace, "fontBold", Boolean.class, false );
 	public static final InheritedAttributeNonNull fontItalic = new InheritedAttributeNonNull( primitiveNamespace, "fontItalic", Boolean.class, false );
@@ -132,17 +138,24 @@ public class Primitive
 		protected ContainerStyleParams evaluate(AttributeTable attribs)
 		{
 			return new ContainerStyleParams(
+					attribs.get( hAlign, HAlignment.class ),
+					attribs.get( vAlign, VAlignment.class ),
 					attribs.get( background, Painter.class ),
 					attribs.get( hoverBackground, Painter.class ),
 					attribs.get( cursor, Cursor.class ) );
 		}
 	};
 	
+	public static ContainerStyleParams getContainerStyleParams(StyleValues values)
+	{
+		return containerParams.get( values );
+	}
+	
 	protected static DerivedValueTable<StyleValues> useContainerParams = new DerivedValueTable<StyleValues>( primitiveNamespace )
 	{
 		protected StyleValues evaluate(AttributeTable style)
 		{
-			return (StyleValues)style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor );
+			return (StyleValues)style.useAttr( hAlign ).useAttr( vAlign ).useAttr( background ).useAttr( hoverBackground ).useAttr( cursor );
 		}
 	};
 
@@ -153,6 +166,8 @@ public class Primitive
 		protected ContentLeafStyleParams evaluate(AttributeTable attribs)
 		{
 			return new ContentLeafStyleParams(
+					attribs.get( hAlign, HAlignment.class ),
+					attribs.get( vAlign, VAlignment.class ),
 					attribs.get( background, Painter.class ),
 					attribs.get( hoverBackground, Painter.class ),
 					attribs.get( cursor, Cursor.class ) );
@@ -161,7 +176,7 @@ public class Primitive
 
 	protected static StyleValues useContentLeafParams(StyleValues style)
 	{
-		return style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor );
+		return style.useAttr( hAlign ).useAttr( vAlign ).useAttr( background ).useAttr( hoverBackground ).useAttr( cursor );
 	}
 
 	
@@ -171,6 +186,8 @@ public class Primitive
 		protected FractionStyleParams evaluate(AttributeTable attribs)
 		{
 			return new FractionStyleParams(
+					attribs.get( hAlign, HAlignment.class ),
+					attribs.get( vAlign, VAlignment.class ),
 					attribs.get( background, Painter.class ),
 					attribs.get( hoverBackground, Painter.class ),
 					attribs.get( cursor, Cursor.class ),
@@ -183,7 +200,7 @@ public class Primitive
 	
 	protected static StyleValues useFractionParams(StyleValues style)
 	{
-		return style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
+		return style.useAttr( hAlign ).useAttr( vAlign ).useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
 				.useAttr( fractionVSpacing ).useAttr( fractionHPadding ).useAttr( fractionRefYOffset );
 	}
 	
@@ -194,6 +211,8 @@ public class Primitive
 		protected FractionStyleParams.BarStyleParams evaluate(AttributeTable attribs)
 		{
 			return new FractionStyleParams.BarStyleParams(
+					attribs.get( hAlign, HAlignment.class ),
+					attribs.get( vAlign, VAlignment.class ),
 					attribs.get( background, Painter.class ),
 					attribs.get( hoverBackground, Painter.class ),
 					attribs.get( cursor, Cursor.class ),
@@ -206,7 +225,7 @@ public class Primitive
 	
 	protected static StyleValues useFractionBarParams(StyleValues style)
 	{
-		return style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
+		return style.useAttr( hAlign ).useAttr( vAlign ).useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
 				.useAttr( editable ).useAttr( foreground ).useAttr( hoverForeground );
 	}
 	
@@ -217,6 +236,8 @@ public class Primitive
 		protected GridRowStyleParams evaluate(AttributeTable attribs)
 		{
 			return new GridRowStyleParams(
+					attribs.get( hAlign, HAlignment.class ),
+					attribs.get( vAlign, VAlignment.class ),
 					attribs.get( background, Painter.class ),
 					attribs.get( hoverBackground, Painter.class ),
 					attribs.get( cursor, Cursor.class ) );
@@ -225,7 +246,7 @@ public class Primitive
 	
 	protected static StyleValues useGridRowParams(StyleValues style)
 	{
-		return style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor );
+		return style.useAttr( hAlign ).useAttr( vAlign ).useAttr( background ).useAttr( hoverBackground ).useAttr( cursor );
 	}
 	
 	
@@ -235,6 +256,8 @@ public class Primitive
 		protected RowStyleParams evaluate(AttributeTable attribs)
 		{
 			return new RowStyleParams(
+					attribs.get( hAlign, HAlignment.class ),
+					attribs.get( vAlign, VAlignment.class ),
 					attribs.get( background, Painter.class ),
 					attribs.get( hoverBackground, Painter.class ),
 					attribs.get( cursor, Cursor.class ),
@@ -244,7 +267,7 @@ public class Primitive
 	
 	protected static StyleValues useRowParams(StyleValues style)
 	{
-		return style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor ).useAttr( rowSpacing );
+		return style.useAttr( hAlign ).useAttr( vAlign ).useAttr( background ).useAttr( hoverBackground ).useAttr( cursor ).useAttr( rowSpacing );
 	}
 
 	
@@ -254,6 +277,8 @@ public class Primitive
 		protected MathRootStyleParams evaluate(AttributeTable attribs)
 		{
 			return new MathRootStyleParams(
+					attribs.get( hAlign, HAlignment.class ),
+					attribs.get( vAlign, VAlignment.class ),
 					attribs.get( background, Painter.class ),
 					attribs.get( hoverBackground, Painter.class ),
 					attribs.get( cursor, Cursor.class ),
@@ -266,7 +291,7 @@ public class Primitive
 	
 	protected static StyleValues useMathRootParams(StyleValues style)
 	{
-		return useFont.get( style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
+		return useFont.get( style.useAttr( hAlign ).useAttr( vAlign ).useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
 				.useAttr( foreground ).useAttr( hoverForeground ).useAttr( mathRootThickness ) );
 	}
 	
@@ -277,6 +302,8 @@ public class Primitive
 		protected ParagraphStyleParams evaluate(AttributeTable attribs)
 		{
 			return new ParagraphStyleParams(
+					attribs.get( hAlign, HAlignment.class ),
+					attribs.get( vAlign, VAlignment.class ),
 					attribs.get( background, Painter.class ),
 					attribs.get( hoverBackground, Painter.class ),
 					attribs.get( cursor, Cursor.class ),
@@ -288,7 +315,7 @@ public class Primitive
 	
 	protected static StyleValues useParagraphParams(StyleValues style)
 	{
-		return style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
+		return style.useAttr( hAlign ).useAttr( vAlign ).useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
 				.useAttr( paragraphSpacing ).useAttr( paragraphLineSpacing ).useAttr( paragraphIndentation );
 	}
 
@@ -299,6 +326,8 @@ public class Primitive
 		protected ShapeStyleParams evaluate(AttributeTable attribs)
 		{
 			return new ShapeStyleParams(
+					attribs.get( hAlign, HAlignment.class ),
+					attribs.get( vAlign, VAlignment.class ),
 					attribs.get( background, Painter.class ),
 					attribs.get( hoverBackground, Painter.class ),
 					attribs.get( cursor, Cursor.class ),
@@ -309,7 +338,7 @@ public class Primitive
 	
 	protected static StyleValues useShapeParams(StyleValues style)
 	{
-		return style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor ).useAttr( shapePainter ).useAttr( hoverShapePainter );
+		return style.useAttr( hAlign ).useAttr( vAlign ).useAttr( background ).useAttr( hoverBackground ).useAttr( cursor ).useAttr( shapePainter ).useAttr( hoverShapePainter );
 	}
 	
 	
@@ -319,6 +348,8 @@ public class Primitive
 		protected ScriptStyleParams evaluate(AttributeTable attribs)
 		{
 			return new ScriptStyleParams(
+					attribs.get( hAlign, HAlignment.class ),
+					attribs.get( vAlign, VAlignment.class ),
 					attribs.get( background, Painter.class ),
 					attribs.get( hoverBackground, Painter.class ),
 					attribs.get( cursor, Cursor.class ),
@@ -329,7 +360,7 @@ public class Primitive
 	
 	protected static StyleValues useScriptParams(StyleValues style)
 	{
-		return style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor ).useAttr( scriptColumnSpacing ).useAttr( scriptRowSpacing );
+		return style.useAttr( hAlign ).useAttr( vAlign ).useAttr( background ).useAttr( hoverBackground ).useAttr( cursor ).useAttr( scriptColumnSpacing ).useAttr( scriptRowSpacing );
 	}
 
 	
@@ -339,6 +370,8 @@ public class Primitive
 		protected TextStyleParams evaluate(AttributeTable attribs)
 		{
 			return new TextStyleParams(
+					attribs.get( hAlign, HAlignment.class ),
+					attribs.get( vAlign, VAlignment.class ),
 					attribs.get( background, Painter.class ),
 					attribs.get( hoverBackground, Painter.class ),
 					attribs.get( cursor, Cursor.class ),
@@ -358,8 +391,8 @@ public class Primitive
 	{
 		protected StyleValues evaluate(AttributeTable style)
 		{
-			return useFont.get( style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor ).useAttr( selectable )
-					.useAttr( foreground ).useAttr( hoverForeground ).useAttr( textSquiggleUnderlinePaint ).useAttr( fontSmallCaps ) );
+			return useFont.get( style.useAttr( hAlign ).useAttr( vAlign ).useAttr( background ).useAttr( hoverBackground ).useAttr( cursor ).useAttr( selectable )
+					.useAttr( foreground ).useAttr( hoverForeground ).useAttr( textSquiggleUnderlinePaint ).useAttr( fontUnderline ).useAttr( fontStrikethrough ).useAttr( fontSmallCaps ) );
 		}
 	};
 
@@ -370,6 +403,8 @@ public class Primitive
 		protected TextStyleParams evaluate(AttributeTable attribs)
 		{
 			return new TextStyleParams(
+					attribs.get( hAlign, HAlignment.class ),
+					attribs.get( vAlign, VAlignment.class ),
 					attribs.get( background, Painter.class ),
 					attribs.get( hoverBackground, Painter.class ),
 					attribs.get( cursor, Cursor.class ),
@@ -387,8 +422,8 @@ public class Primitive
 	
 	protected static StyleValues useLabelTextParams(StyleValues style)
 	{
-		return useFont.get( style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
-				.useAttr( foreground ).useAttr( hoverForeground ).useAttr( textSquiggleUnderlinePaint ).useAttr( fontSmallCaps ) );
+		return useFont.get( style.useAttr( hAlign ).useAttr( vAlign ).useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
+				.useAttr( foreground ).useAttr( hoverForeground ).useAttr( textSquiggleUnderlinePaint ).useAttr( fontUnderline ).useAttr( fontStrikethrough ).useAttr( fontSmallCaps ) );
 	}
 	
 	
@@ -398,6 +433,8 @@ public class Primitive
 		protected TextStyleParams evaluate(AttributeTable attribs)
 		{
 			return new TextStyleParams(
+					attribs.get( hAlign, HAlignment.class ),
+					attribs.get( vAlign, VAlignment.class ),
 					attribs.get( background, Painter.class ),
 					attribs.get( hoverBackground, Painter.class ),
 					attribs.get( cursor, Cursor.class ),
@@ -415,9 +452,9 @@ public class Primitive
 	
 	protected static StyleValues useTextParams(StyleValues style)
 	{
-		return useFont.get( style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
+		return useFont.get( style.useAttr( hAlign ).useAttr( vAlign ).useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
 				.useAttr( editable ).useAttr( selectable ).useAttr( foreground ).useAttr( hoverForeground ).useAttr( textSquiggleUnderlinePaint )
-				.useAttr( fontSmallCaps ) );
+				.useAttr( fontUnderline ).useAttr( fontStrikethrough ).useAttr( fontSmallCaps ) );
 	}
 	
 	
@@ -427,6 +464,8 @@ public class Primitive
 		protected TableStyleParams evaluate(AttributeTable attribs)
 		{
 			return new TableStyleParams(
+					attribs.get( hAlign, HAlignment.class ),
+					attribs.get( vAlign, VAlignment.class ),
 					attribs.get( background, Painter.class ),
 					attribs.get( hoverBackground, Painter.class ),
 					attribs.get( cursor, Cursor.class ),
@@ -442,7 +481,7 @@ public class Primitive
 	
 	protected static StyleValues useTableParams(StyleValues style)
 	{
-		return style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
+		return style.useAttr( hAlign ).useAttr( vAlign ).useAttr( background ).useAttr( hoverBackground ).useAttr( cursor )
 				.useAttr( tableColumnSpacing ).useAttr( tableColumnExpand ).useAttr( tableRowSpacing ).useAttr( tableRowExpand )
 				.useAttr( tableCellBoundaryWidth ).useAttr( tableCellBoundaryPaint ).useAttr( tableBorder );
 	}
@@ -454,6 +493,8 @@ public class Primitive
 		protected ColumnStyleParams evaluate(AttributeTable attribs)
 		{
 			return new ColumnStyleParams(
+					attribs.get( hAlign, HAlignment.class ),
+					attribs.get( vAlign, VAlignment.class ),
 					attribs.get( background, Painter.class ),
 					attribs.get( hoverBackground, Painter.class ),
 					attribs.get( cursor, Cursor.class ),
@@ -463,7 +504,7 @@ public class Primitive
 	
 	protected static StyleValues useColumnParams(StyleValues style)
 	{
-		return style.useAttr( background ).useAttr( hoverBackground ).useAttr( cursor ).useAttr( columnSpacing );
+		return style.useAttr( hAlign ).useAttr( vAlign ).useAttr( background ).useAttr( hoverBackground ).useAttr( cursor ).useAttr( columnSpacing );
 	}
 	
 	
@@ -472,4 +513,37 @@ public class Primitive
 	{
 		return style.get( editable, Boolean.class );
 	}
+	
+	
+	
+	
+	
+	public static StyleSheet align(HAlignment h, VAlignment v)
+	{
+		return StyleSheet.instance.withAttr( hAlign, h ).withAttr( vAlign, v );
+	}
+	
+	public static StyleSheet alignH(HAlignment h)
+	{
+		return StyleSheet.instance.withAttr( hAlign, h );
+	}
+	
+	public static StyleSheet alignV(VAlignment v)
+	{
+		return StyleSheet.instance.withAttr( vAlign, v );
+	}
+	
+
+	public static final StyleSheet alignHPack = StyleSheet.instance.withAttr( hAlign, HAlignment.PACK );
+	public static final StyleSheet alignHLeft = StyleSheet.instance.withAttr( hAlign, HAlignment.LEFT );
+	public static final StyleSheet alignHCentre = StyleSheet.instance.withAttr( hAlign, HAlignment.CENTRE );
+	public static final StyleSheet alignHRight = StyleSheet.instance.withAttr( hAlign, HAlignment.RIGHT );
+	public static final StyleSheet alignHExpand = StyleSheet.instance.withAttr( hAlign, HAlignment.EXPAND );	
+	
+	public static final StyleSheet alignVRefY = StyleSheet.instance.withAttr( vAlign, VAlignment.REFY );
+	public static final StyleSheet alignVRefYExpand = StyleSheet.instance.withAttr( vAlign, VAlignment.REFY_EXPAND );
+	public static final StyleSheet alignVTop = StyleSheet.instance.withAttr( vAlign, VAlignment.TOP );
+	public static final StyleSheet alignVCentre = StyleSheet.instance.withAttr( vAlign, VAlignment.CENTRE );
+	public static final StyleSheet alignVBottom = StyleSheet.instance.withAttr( vAlign, VAlignment.BOTTOM );
+	public static final StyleSheet alignVExpand = StyleSheet.instance.withAttr( vAlign, VAlignment.EXPAND );
 }

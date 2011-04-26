@@ -15,9 +15,7 @@ import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.ChangeHistory.ChangeHistory;
 import BritefuryJ.DefaultPerspective.DefaultPerspective;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.DocPresent.DPColumn;
 import BritefuryJ.DocPresent.DPElement;
-import BritefuryJ.DocPresent.DPRegion;
 import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Caret.Caret;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
@@ -33,6 +31,7 @@ import BritefuryJ.Pres.ObjectPres.ObjectBorder;
 import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.Pres.Primitive.Region;
 import BritefuryJ.Pres.Primitive.StaticText;
 import BritefuryJ.Projection.AbstractPerspective;
 import BritefuryJ.Projection.ProjectiveBrowserContext;
@@ -236,15 +235,34 @@ public class IncrementalView extends IncrementalTree implements Presentable
 			}
 		}
 	}
-
-
 	
 	
+	
+	private class RootPres extends Pres
+	{
+		@Override
+		public DPElement present(PresentationContext ctx, StyleValues style)
+		{
+			FragmentView.NodeResultFactory resultFactory = makeNodeResultFactory( rootPerspective, subjectContext, style, SimpleAttributeTable.instance );
+			setRootNodeResultFactory( resultFactory );
+			
+			refresh();
+			
+			FragmentView rootView = (FragmentView)getRootIncrementalTreeNode();
+			DPElement fragmentElement = rootView.getRefreshedFragmentElement();
+			
+			rootElement = new Column( new Object[] { fragmentElement } ).present( ctx, style );
+
+			return rootElement;
+		}
+	}
+
+
 	
 	
 	
 	private NodeElementChangeListener elementChangeListener = null;
-	private DPColumn rootBox = null;
+	//private DPColumn rootBox = null;
 	
 	private StateStore stateStoreToLoad;
 	
@@ -257,15 +275,19 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	
 	
 	
-	private FragmentView.NodeResultFactory rootNodeResultFactory;
-	
-	
-	protected DPRegion region;
-	
 	private ProjectiveBrowserContext browserContext;
-	
+
+	private AbstractPerspective rootPerspective;
+	private SimpleAttributeTable subjectContext;
 	private ChangeHistory changeHistory;
+	
+	private RootPres rootPres;
+	
 	protected Log log;
+	
+	private DPElement rootElement;
+	
+	
 
 	private HashMap<ViewFragmentContextAndResultFactoryKey, ViewFragmentContextAndResultFactory> viewFragmentContextAndResultFactories =
 		new HashMap<ViewFragmentContextAndResultFactoryKey, ViewFragmentContextAndResultFactory>();
@@ -276,35 +298,28 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	public IncrementalView(Subject subject, ProjectiveBrowserContext browserContext, PersistentStateStore persistentState)
 	{
 		super( subject.getFocus(), DuplicatePolicy.ALLOW_DUPLICATES );
+		
+		this.rootPerspective = subject.getPerspective();
+		if ( this.rootPerspective == null )
+		{
+			this.rootPerspective = DefaultPerspective.instance;
+		}
+		this.subjectContext = subject.getSubjectContext();
+		this.changeHistory = subject.getChangeHistory();
+		
+		this.browserContext = browserContext;
 	
 		log = new Log( "View log" );
-		
-		AbstractPerspective perspective = subject.getPerspective();
-		if ( perspective == null )
-		{
-			perspective = DefaultPerspective.instance;
-		}
-		rootNodeResultFactory = makeNodeResultFactory( perspective, subject.getSubjectContext(), StyleValues.instance, SimpleAttributeTable.instance );
-		
-		rootBox = null;
 		
 		if ( persistentState != null  &&  persistentState instanceof StateStore )
 		{
 			stateStoreToLoad = (StateStore)persistentState;
 		}
-	
-	
 		
-		this.browserContext = browserContext;
-		this.changeHistory = subject.getChangeHistory();
 		
-		region = new DPRegion();
-
 		setElementChangeListener( new NodeElementChangeListenerDiff() );
 		
-		// We need to do this last
-		region.setChild( getRootViewElement().alignHExpand().alignVExpand() );
-		region.setClipboardHandler( perspective.getClipboardHandler() );
+		rootPres = new RootPres();
 	}
 	
 	public IncrementalView(Subject subject, ProjectiveBrowserContext browserContext)
@@ -321,11 +336,6 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	
 	
 	
-	protected IncrementalTreeNode.NodeResultFactory getRootNodeResultFactory()
-	{
-		return rootNodeResultFactory;
-	}
-
 	protected FragmentView.NodeResultFactory makeNodeResultFactory(AbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
 	{
 		// Memoise the contents factory, keyed by  @nodeViewFunction and @state
@@ -346,22 +356,9 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	
 	
 	
-	private DPElement getRootViewElement()
+	public Pres getViewPres()
 	{
-		if ( rootBox == null )
-		{
-			performRefresh();
-			FragmentView rootView = (FragmentView)getRootIncrementalTreeNode();
-			DPElement fragmentElement = rootView.getRefreshedFragmentElement();
-			rootBox = (DPColumn)new Column( new Object[] { fragmentElement.alignHExpand().alignVExpand() } ).present();
-		}
-		return rootBox;
-	}
-	
-	
-	public DPElement getViewElement()
-	{
-		return region;
+		return new Region( rootPres, getRootPerspective().getClipboardHandler() );
 	}
 	
 	
@@ -608,13 +605,13 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	
 	public Caret getCaret()
 	{
-		PresentationComponent.RootElement elementTree = region.getRootElement();
+		PresentationComponent.RootElement elementTree = rootElement.getRootElement();
 		return elementTree != null  ?  elementTree.getCaret()  :  null;
 	}
 	
 	public Selection getSelection()
 	{
-		PresentationComponent.RootElement elementTree = region.getRootElement();
+		PresentationComponent.RootElement elementTree = rootElement.getRootElement();
 		return elementTree != null  ?  elementTree.getSelection()  :  null;
 	}
 	
@@ -653,7 +650,17 @@ public class IncrementalView extends IncrementalTree implements Presentable
 				refresh();
 			}
 		};
-		region.queueImmediateEvent( r );
+		if ( rootElement != null )
+		{
+			rootElement.queueImmediateEvent( r );
+		}
+	}
+	
+	
+	
+	private AbstractPerspective getRootPerspective()
+	{
+		return rootPerspective;
 	}
 
 

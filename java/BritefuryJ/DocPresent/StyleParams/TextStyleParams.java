@@ -11,15 +11,20 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Paint;
+import java.util.List;
 
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Painter.Painter;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.ObjectPres.HorizontalField;
 
 public class TextStyleParams extends ContentLeafEditableStyleParams
 {
 	public static final Font defaultFont = new Font( "Sans serif", Font.PLAIN, 14 );
 
 	
-	public static final TextStyleParams defaultStyleParams = new TextStyleParams( null, null, null, true, true, defaultFont, Color.black, null, null, false, false, false );
+	public static final TextStyleParams defaultStyleParams = new TextStyleParams( HAlignment.PACK, VAlignment.REFY, null, null, null, true, true, defaultFont, Color.black, null, null, false, false, false );
 	
 	
 	
@@ -28,10 +33,11 @@ public class TextStyleParams extends ContentLeafEditableStyleParams
 	protected final boolean bUnderline, bStrikethrough, bMixedSizeCaps;
 
 
-	public TextStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, boolean bEditable, boolean bSelectable, Font font, Paint textPaint, Paint hoverTextPaint,
+	public TextStyleParams(HAlignment hAlign, VAlignment vAlign, Painter background, Painter hoverBackground, Cursor pointerCursor,
+			boolean bEditable, boolean bSelectable, Font font, Paint textPaint, Paint hoverTextPaint,
 			Paint squiggleUnderlinePaint, boolean bUnderline, boolean bStrikethrough, boolean bMixedSizeCaps)
 	{
-		super( background, hoverBackground, pointerCursor, bEditable, bSelectable );
+		super( hAlign, vAlign, background, hoverBackground, pointerCursor, bEditable, bSelectable );
 		
 		this.font = font;
 		this.textPaint = textPaint;
@@ -79,5 +85,19 @@ public class TextStyleParams extends ContentLeafEditableStyleParams
 	public boolean getMixedSizeCaps()
 	{
 		return bMixedSizeCaps;
+	}
+	
+	
+	
+	protected void buildFieldList(List<Object> fields)
+	{
+		super.buildFieldList( fields );
+		fields.add( new HorizontalField( "Font", Pres.coerceNonNull( font ) ) );
+		fields.add( new HorizontalField( "Text paint", Pres.coerceNonNull( textPaint ) ) );
+		fields.add( new HorizontalField( "Hover text paint", Pres.coerceNonNull( hoverTextPaint ) ) );
+		fields.add( new HorizontalField( "Squiggle underline paint", Pres.coerceNonNull( squiggleUnderlinePaint ) ) );
+		fields.add( new HorizontalField( "Underline", Pres.coerceNonNull( bUnderline ) ) );
+		fields.add( new HorizontalField( "Strikethrough", Pres.coerceNonNull( bStrikethrough ) ) );
+		fields.add( new HorizontalField( "Mixed size caps", Pres.coerceNonNull( bMixedSizeCaps ) ) );
 	}
 }

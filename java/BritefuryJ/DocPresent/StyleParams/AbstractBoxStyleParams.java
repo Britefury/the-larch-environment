@@ -8,21 +8,26 @@
 package BritefuryJ.DocPresent.StyleParams;
 
 import java.awt.Cursor;
+import java.util.List;
 
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Painter.Painter;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.ObjectPres.HorizontalField;
 
 
 public class AbstractBoxStyleParams extends ContainerStyleParams
 {
-	public static final AbstractBoxStyleParams defaultStyleParams = new AbstractBoxStyleParams( null, null, null, 0.0 );
+	public static final AbstractBoxStyleParams defaultStyleParams = new AbstractBoxStyleParams( HAlignment.PACK, VAlignment.REFY, null, null, null, 0.0 );
 	
 	
 	protected final double spacing;
 
 
-	public AbstractBoxStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, double spacing)
+	public AbstractBoxStyleParams(HAlignment hAlign, VAlignment vAlign, Painter background, Painter hoverBackground, Cursor pointerCursor, double spacing)
 	{
-		super( background, hoverBackground, pointerCursor );
+		super( hAlign, vAlign, background, hoverBackground, pointerCursor );
 		
 		this.spacing = spacing;
 	}
@@ -31,5 +36,13 @@ public class AbstractBoxStyleParams extends ContainerStyleParams
 	public double getSpacing()
 	{
 		return spacing;
+	}
+	
+	
+	
+	protected void buildFieldList(List<Object> fields)
+	{
+		super.buildFieldList( fields );
+		fields.add( new HorizontalField( "Spacing", Pres.coerceNonNull( spacing ) ) );
 	}
 }

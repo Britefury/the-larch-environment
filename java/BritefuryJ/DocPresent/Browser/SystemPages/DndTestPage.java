@@ -142,18 +142,18 @@ public class DndTestPage extends SystemPage
 		mathElements.add( makeScriptSource() );
 		Pres mathSection = mainStyle.withAttr( Primitive.rowSpacing, 3.0 ).applyTo( new Row( mathElements ) );
 		
-		Pres column = mainStyle.withAttr( Primitive.columnSpacing, 10.0 ).applyTo( new Column( new Pres[] { title, textSection, mathSection } ) );
+		Pres column = mainStyle.withAttr( Primitive.columnSpacing, 10.0 ).applyTo( new Column( new Pres[] { title, textSection.alignHPack(), mathSection.alignHPack() } ) );
 		
-		return outlineStyle.applyTo( new Border( column.alignHExpand() ) ).alignHExpand().pad( 20.0, 5.0 ).alignHExpand();
+		return outlineStyle.applyTo( new Border( column ) ).pad( 20.0, 5.0 ).alignHExpand().alignVRefY();
 	}
 	
 	protected Pres makeFormula()
 	{
 		Pres title = paletteTitleStyle.applyTo( new Label( "Formula" ) ).alignHCentre();
 		Pres formula = mathStyle.applyTo( makePlaceHolder() );
-		Pres formulaPara = mainStyle.applyTo( new Paragraph( new Pres[] { formula } ) );
+		Pres formulaPara = new Bin( mainStyle.applyTo( new Paragraph( new Pres[] { formula } ) ) ).alignHPack();
 		
-		Pres column = mainStyle.withAttr( Primitive.columnSpacing, 10.0 ).applyTo( new Column( new Pres[] { title, formulaPara } ) ).alignHExpand();
+		Pres column = mainStyle.withAttr( Primitive.columnSpacing, 10.0 ).applyTo( new Column( new Pres[] { title, formulaPara } ) ).alignHExpand().alignVRefY();
 		
 		return column.pad( 20.0, 5.0 );
 	}
@@ -165,6 +165,6 @@ public class DndTestPage extends SystemPage
 		Pres palette = makePalette();
 		Pres formula = makeFormula();
 		
-		return new Body( new Pres[] { palette.alignHExpand(), new Spacer( 0.0, 10.0 ), formula.alignHExpand() } ).alignHExpand();
+		return new Body( new Pres[] { palette, new Spacer( 0.0, 10.0 ), formula.alignHExpand() } );
 	}
 }

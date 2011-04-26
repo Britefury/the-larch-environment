@@ -19,6 +19,8 @@ import BritefuryJ.DocPresent.FragmentContext;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Input.ObjectDndHandler;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
 import BritefuryJ.Incremental.IncrementalFunctionMonitor;
@@ -213,13 +215,13 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 			{
 				element = (DPElement)r;
 				fragmentElement.setChild( element );
-				fragmentElement.copyAlignmentFlagsFrom( element );
+				StyleValues style = getStyleValues();
+				fragmentElement.setAlignment( style.get( Primitive.hAlign, HAlignment.class ), style.get( Primitive.vAlign, VAlignment.class ) );
 			}
 			else
 			{
 				element = null;
 				fragmentElement.setChild( null );
-				fragmentElement.alignHLeft().alignVRefY();
 			}
 			stateListeners = PresentationStateListenerList.onPresentationStateChanged( stateListeners, this );
 		}

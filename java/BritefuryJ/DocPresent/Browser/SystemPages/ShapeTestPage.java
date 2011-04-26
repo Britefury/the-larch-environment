@@ -49,7 +49,7 @@ public class ShapeTestPage extends SystemPage
 				new Label( "Box 50x10; 10 pixel padding" ),
 				new Box( 50.0, 10.0 ).pad( 10.0, 10.0 ),
 				new Label( "Box 50x10; 10 pixel padding, h-expand" ),
-				new Box( 50.0, 10.0 ).alignHExpand().pad( 10.0, 10.0 ).alignHExpand(),
+				new Box( 50.0, 10.0 ).pad( 10.0, 10.0 ).alignHExpand(),
 				new Label( "Rectangle 50x20  @  0,0; 1 pixel padding" ),
 				Shape.rectangle( 0.0, 0.0, 50.0, 20.0 ).pad( 1.0, 1.0 ),
 				new Label( "Rectangle 50x20  @  -10,-10; 1 pixel padding" ),
