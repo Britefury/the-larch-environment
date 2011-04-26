@@ -17,28 +17,8 @@ from BritefuryJ.Projection import ProjectiveBrowserContext, Subject
 from Britefury.MainApp.AppWindow import AppWindow
 
 		
-class _ModelSubject (Subject):
-	def __init__(self, innerSubject):
-		super( _ModelSubject, self ).__init__( innerSubject )
-		self._innerSubject = innerSubject
-
-		
-	def getFocus(self):
-		return self._innerSubject.getFocus()
-	
-	def getPerspective(self):
-		return None
-	
-	def getTitle(self):
-		return '[model]'
-
-	
-	
 class MainApp (object):
 	def __init__(self, world, location=Location( '' )):
-			
-		
-
 		self._world = world
 		
 		
@@ -52,7 +32,6 @@ class MainApp (object):
 
 		self._appState = world.getAppStateSubject().getFocus()
 		self._browserContext.registerMainSubject( world.getAppStateSubject() )
-		self._browserContext.registerNamedSubject( 'model', _ModelSubject )
 		
 		self._rootWindow = AppWindow( self, self._createCommandConsole, location )
 		self._rootWindow.setCloseRequestListener( self._onWindowCloseRequest )

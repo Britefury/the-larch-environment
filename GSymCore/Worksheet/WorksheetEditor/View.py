@@ -235,7 +235,7 @@ class WorksheetEditor (GSymViewObjectDispatch):
 		boxContents = [ headerBox ]
 		boxContents.append( _pythonCodeBorderStyle.applyTo( Border( codeView ) ) )
 		if executionResultView is not None:
-			boxContents.append( executionResultView )
+			boxContents.append( executionResultView.alignHExpand() )
 		box = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( Column( boxContents ) )
 		
 		p = _pythonCodeEditorBorderStyle.applyTo( Border( box ).alignHExpand() )

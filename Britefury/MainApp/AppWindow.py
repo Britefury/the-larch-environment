@@ -31,6 +31,7 @@ from BritefuryJ.DocPresent.Browser import *
 from BritefuryJ.DocPresent.StyleParams import *
 
 
+from BritefuryJ.Projection import Subject
 
 
 from Britefury.Kernel.Abstract import abstractmethod
@@ -76,6 +77,24 @@ class _GSymTransferActionListener (ActionListener):
 				
 
 		
+class _ModelSubject (Subject):
+	def __init__(self, focus):
+		super( _ModelSubject, self ).__init__( None )
+		self._focus = focus
+
+		
+	def getFocus(self):
+		return self._focus
+	
+	def getPerspective(self):
+		return None
+	
+	def getTitle(self):
+		return '[model]'
+
+	
+	
+
 class AppWindow (object):
 	def __init__(self, app, commandConsoleFactory, location=Location( '' )):
 		self._app = app
@@ -304,10 +323,12 @@ class AppWindow (object):
 		
 
 	def _onViewDocModel(self):
-		currentLoc = self._browser.getCurrentBrowserLocation().getLocationString()
-		if not ( currentLoc.startswith( 'model(' )  and  currentLoc.endswith( ')' ) ):
-			currentLoc = 'model( ' + currentLoc + ' )'
-		self._browser.openLocationInNewWindow( Location( currentLoc ) )
+		currentLoc = self._browser.getCurrentBrowserLocation()
+		browserContext = self._app._browserContext
+		focus = browserContext.resolveLocationAsSubject( currentLoc ).getFocus()
+		modelSubject = _ModelSubject( focus )
+		modelLoc = browserContext.getLocationForObject( modelSubject )
+		self._browser.openLocationInNewWindow( modelLoc )
 	
 	
 	def _onShowElementTreeExplorer(self):

@@ -14,14 +14,12 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.PageController;
 import BritefuryJ.DocPresent.PresentationComponent;
 import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.DocPresent.Input.Keyboard.Keyboard;
 import BritefuryJ.DocPresent.Input.Keyboard.KeyboardInteractor;
-import BritefuryJ.IncrementalView.IncrementalView;
-import BritefuryJ.Pres.Primitive.Column;
+import BritefuryJ.IncrementalView.IncrementalViewInComponent;
 
 public class CommandBar
 {
@@ -43,7 +41,7 @@ public class CommandBar
 			if ( event.getKeyCode() == KeyEvent.VK_ESCAPE )
 			{
 				commandBarArea.setVisible( true );
-				commandBarComponent.grabFocus();
+				view.getComponent().grabFocus();
 				return true;
 			}
 			return false;
@@ -104,8 +102,7 @@ public class CommandBar
 	private PresentationComponent presentation;
 	private JPanel commandBarBorder, commandBarArea;
 	
-	private PresentationComponent commandBarComponent;
-	private IncrementalView view;
+	private IncrementalViewInComponent view;
 	
 	private AbstractCommandConsole console;
 	
@@ -116,12 +113,14 @@ public class CommandBar
 		this.console = console;
 		
 		
-		commandBarComponent = new PresentationComponent();
-		commandBarComponent.setPageController( pageController );
+		console.setListener( consoleListener );
+
 		
+		view = new IncrementalViewInComponent( console.getSubject(), console.getBrowserContext(), null, pageController );
+	
 		
 		commandBarBorder = new JPanel( new BorderLayout() );
-		commandBarBorder.add( commandBarComponent, BorderLayout.CENTER );
+		commandBarBorder.add( view.getComponent(), BorderLayout.CENTER );
 		commandBarBorder.setBorder( BorderFactory.createLineBorder( new Color( 0.65f, 0.65f, 0.65f ), 1 ) );
 		
 		commandBarArea = new JPanel( new BorderLayout( 5, 0 ) );
@@ -130,14 +129,8 @@ public class CommandBar
 		commandBarArea.setVisible( false );
 		
 		
-		view = new IncrementalView( console.getSubject(), console.getBrowserContext(), null );
-		console.setListener( consoleListener );
-
-		DPElement column = new Column( new Object[] { view.getViewPres() } ).alignHExpand().alignVExpand().present();
-		commandBarComponent.getRootElement().setChild( column );
-
 		presComponentSwitchInteractor.addToKeyboard( presentation.getRootElement().getKeyboard() );
-		commandBarSwitchInteractor.addToKeyboard( commandBarComponent.getRootElement().getKeyboard() );
+		commandBarSwitchInteractor.addToKeyboard( view.getComponent().getRootElement().getKeyboard() );
 	}
 	
 	

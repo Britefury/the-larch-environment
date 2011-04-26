@@ -404,7 +404,7 @@ class ProjectView (GSymViewObjectDispatch):
 
 		icon = Image( 'GSymCore/Project/icons/Package.png' )
 		nameElement = _packageNameStyle.applyTo( StaticText( package.name ) )
-		nameBox = _itemHoverHighlightStyle.applyTo( Row( [ icon.padX( 5.0 ).alignVCentre(), nameElement.alignVCentre() ]  ) )
+		nameBox = _itemHoverHighlightStyle.applyTo( Row( [ icon.padX( 5.0 ).alignHPack().alignVCentre(), nameElement.alignVCentre() ] ) )
 		nameBox = nameBox.withContextMenuInteractor( _packageContextMenuFactory )
 		nameBox = nameBox.withDragSource( _dragSource )
 		nameBox = nameBox.withDropDest( _packageDropDest )
