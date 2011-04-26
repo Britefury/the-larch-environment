@@ -7,7 +7,6 @@
 ##-*************************
 import os
 
-from javax.swing import AbstractAction
 from javax.swing import JOptionPane, JFileChooser
 from javax.swing.filechooser import FileNameExtensionFilter
 

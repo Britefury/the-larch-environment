@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -27,7 +28,9 @@ import javax.swing.WindowConstants;
 import BritefuryJ.Command.CommandConsole;
 import BritefuryJ.Command.CommandConsoleFactory;
 import BritefuryJ.Command.AbstractCommandConsole;
+import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.PresentationComponent;
+import BritefuryJ.DocPresent.Browser.Browser;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.TabbedBrowser;
 import BritefuryJ.Projection.ProjectiveBrowserContext;
@@ -70,6 +73,21 @@ public class BrowserTest implements TabbedBrowser.TabbedBrowserListener
 	{
 		// EDIT MENU
 		
+		CommandConsoleFactory fac = new CommandConsoleFactory()
+		{
+			@Override
+			public AbstractCommandConsole createCommandConsole(PresentationComponent pres)
+			{
+				return new CommandConsole( browserContext, pres );
+			}
+		};
+		
+		
+		final TabbedBrowser browser = new TabbedBrowser( browserContext.getPageLocationResolver(), this, location, fac );
+
+		
+		
+		
 		TransferActionListener transferActionListener = new TransferActionListener();
 		
 		JMenu editMenu = new JMenu( "Edit" );
@@ -96,25 +114,40 @@ public class BrowserTest implements TabbedBrowser.TabbedBrowserListener
 		editMenu.add( editPasteItem );
 
 		
+		// VIEW MENU
+		
+		AbstractAction elementExplorerAction = new AbstractAction( "Show element tree explorer" )
+		{
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				Browser currentTab = browser.getCurrentBrowser();
+				DPElement.ElementTreeExplorer treeExplorer = currentTab.getRootElement().treeExplorer();
+				Location location = browserContext.getLocationForObject( treeExplorer );
+				browser.openLocationInNewWindow( location );
+			}
+		};
+		
+		JMenu viewMenu = new JMenu( "View" );
+		
+		JMenuItem viewElementTreeExplorerItem = new JMenuItem( elementExplorerAction );
+		viewMenu.add( viewElementTreeExplorerItem );
+		
+
+		
+		// MENU BAR
+		
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.add( editMenu );
+		menuBar.add( viewMenu );
 		
 		
 		JFrame frame = new JFrame( "Browser test" );
 		frame.setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
 		
 		
-		CommandConsoleFactory fac = new CommandConsoleFactory()
-		{
-			@Override
-			public AbstractCommandConsole createCommandConsole(PresentationComponent pres)
-			{
-				return new CommandConsole( browserContext, pres );
-			}
-		};
-		
-		
-		TabbedBrowser browser = new TabbedBrowser( browserContext.getPageLocationResolver(), this, location, fac );
 		browser.getComponent().setPreferredSize( new Dimension( 800, 600 ) );
 		frame.setJMenuBar( menuBar );
 		frame.add( browser.getComponent() );

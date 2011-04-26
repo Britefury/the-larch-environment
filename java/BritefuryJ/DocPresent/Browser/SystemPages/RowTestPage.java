@@ -60,24 +60,24 @@ public class RowTestPage extends SystemPage
 		children.add( makeText( "v_bottom", 18 ).alignVBottom() );
 		children.add( makeText( "v_expand", 18 ).alignVExpand() );
 		
-		return outlineStyleSheet.applyTo( new Border( new Row( children ).alignHExpand() ) ).alignHExpand().pad( 10.0, 20.0 );
+		return outlineStyleSheet.applyTo( new Border( new Row( children ) ) );
 	}
 
 	protected Pres createRow2()
 	{
 		ArrayList<Object> children = new ArrayList<Object>();
-		children.add( makeText( "h_pack", 18 ).alignVRefY() );
+		children.add( makeText( "h_pack", 18 ).alignHPack() );
 		children.add( makeText( "h_left", 18 ).alignHLeft() );
 		children.add( makeText( "h_centre", 18 ).alignHCentre() );
 		children.add( makeText( "h_right", 18 ).alignHRight() );
 		children.add( makeText( "h_expand", 18 ).alignHExpand() );
 		
-		return outlineStyleSheet.applyTo( new Border( new Row( children ).alignHExpand() ) ).alignHExpand().pad( 10.0, 20.0 );
+		return outlineStyleSheet.applyTo( new Border( new Row( children ) ) ).pad( 10.0, 20.0 );
 	}
 
 	
 	protected Pres createContents()
 	{
-		return new Body( new Pres[] { createRow1().alignHExpand(), createRow2().alignHExpand() } ).alignHExpand();
+		return new Body( new Pres[] { createRow1(), createRow2() } );
 	}
 }

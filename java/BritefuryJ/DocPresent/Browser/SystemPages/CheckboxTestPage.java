@@ -60,7 +60,7 @@ public class CheckboxTestPage extends SystemPage
 	protected Pres createContents()
 	{
 		ElementRef stateTextRef = new Label( "false" ).elementRef();
-		Checkbox checkbox = Checkbox.checkboxWithLabel( "State", false, new CheckboxTextChanger( stateTextRef ) );
+		Pres checkbox = Checkbox.checkboxWithLabel( "State", false, new CheckboxTextChanger( stateTextRef ) );
 		Pres checkboxSectionContents = new Column( new Pres[] { stateTextRef, checkbox.padX( 5.0 ) } );
 		
 		return new Body( new Pres[] { new Heading2( "Checkbox" ), checkboxSectionContents } );

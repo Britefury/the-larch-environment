@@ -30,10 +30,10 @@ public class ErrorBox extends Pres
 	{
 		double padding = style.get( ObjectPresStyle.objectContentPadding, Double.class );
 		StyleValues childStyle = ObjectPresStyle.useErrorBorderAttrs( ObjectPresStyle.useErrorBoxAttrs( style ) );
-		DPElement contentsElement = contents.present( ctx, childStyle );
+		DPElement contentsElement = contents.alignHExpand().padX( padding ).present( ctx, childStyle.alignHExpand() );
 		
 		Pres titlePres = new ObjectTitle( title );
 		
-		return new ErrorBorder( new Column( new Object[] { titlePres, contentsElement.alignHExpand().padX( padding ) } ) ).present( ctx, style );
+		return new ErrorBorder( new Column( new Object[] { titlePres, contentsElement } ) ).present( ctx, style );
 	}
 }

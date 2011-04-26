@@ -114,6 +114,6 @@ public class NonLocalDndTestPage extends SystemPage
 	{
 		Pres fileReceiver = makeFileReceiver();
 		
-		return new Body( new Pres[] { fileReceiver.alignHExpand() } ).alignHExpand();
+		return new Body( new Pres[] { fileReceiver } );
 	}
 }

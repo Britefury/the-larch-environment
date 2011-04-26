@@ -8,10 +8,10 @@ package BritefuryJ.DocPresent.Browser.SystemPages;
 
 import java.util.ArrayList;
 
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.Primitive.Primitive;
+import BritefuryJ.Pres.RichText.Body;
 import BritefuryJ.Pres.RichText.Head;
 import BritefuryJ.Pres.RichText.NormalText;
 import BritefuryJ.Pres.RichText.Page;
@@ -20,23 +20,23 @@ import BritefuryJ.StyleSheet.StyleSheet;
 
 public abstract class SystemPage extends BrowserPage
 {
-	public DPElement getContentsElement()
+	public Pres getContentsPres()
 	{
 		Pres linkHeader = SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_ROOTPAGE | SystemRootPage.LINKHEADER_SYSTEMPAGE );
 		Pres title = new TitleBar( "System page: " + getTitle() );
 		
 		Pres head = new Head( new Pres[] { linkHeader, title } );
 
-		ArrayList<Object> pageChildren = new ArrayList<Object>();
-		pageChildren.add( head );
+		ArrayList<Object> bodyChildren = new ArrayList<Object>();
 		String description = getDescription();
 		if ( description != null )
 		{
-			pageChildren.add( staticStyle.applyTo( new NormalText( description ) ) );
+			bodyChildren.add( staticStyle.applyTo( new NormalText( description ) ) );
 		}
-		pageChildren.add( createContents().alignHExpand() );
+		bodyChildren.add( createContents() );
+		Body body = new Body( bodyChildren );
 		
-		return new Page( pageChildren ).present();
+		return new Page( new Object[] { head, body } );
 	}
 
 

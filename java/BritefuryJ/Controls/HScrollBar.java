@@ -30,22 +30,22 @@ public class HScrollBar extends ScrollBar
 	
 	protected Pres createDecArrow(double arrowSize)
 	{
-		return new Arrow( Arrow.Direction.LEFT, arrowSize );
+		return new Arrow( Arrow.Direction.LEFT, arrowSize ).alignHPack().alignVCentre();
 	}
 	
 	protected Pres createIncArrow(double arrowSize)
 	{
-		return new Arrow( Arrow.Direction.RIGHT, arrowSize );
+		return new Arrow( Arrow.Direction.RIGHT, arrowSize ).alignHPack().alignVCentre();
 	}
 	
 	protected Pres createDragBox(double scrollBarSize)
 	{
-		return new Box( 0.0, scrollBarSize );
+		return new Box( 0.0, scrollBarSize ).alignHExpand().alignVCentre();
 	}
 
 	protected Pres createScrollBarPres(double spacing, DPElement decArrowElement, DPElement dragBarElement, DPElement incArrowElement)
 	{
 		return StyleSheet.instance.withAttr( Primitive.rowSpacing, spacing ).applyTo( new Row( new Object[] {
-				decArrowElement.alignVCentre(), dragBarElement.alignHExpand().alignVCentre(), incArrowElement.alignVCentre() } ) );
+				decArrowElement, dragBarElement, incArrowElement } ) );
 	}
 }

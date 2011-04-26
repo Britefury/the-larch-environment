@@ -33,8 +33,8 @@ public class HorizontalField extends Pres
 	{
 		StyleSheet fieldStyle = style.get( ObjectPresStyle.objectFieldStyle, StyleSheet.class );
 		
-		DPElement valueElement = value.present( ctx, ObjectPresStyle.useObjectFieldAttrs( style ) );
+		DPElement valueElement = value.alignHExpand().present( ctx, ObjectPresStyle.useObjectFieldAttrs( style ) );
 		
-		return fieldStyle.applyTo( new Paragraph( new Object[] { new Label( title ), new Label( " " ), new LineBreak(), valueElement.alignHExpand() } ) ).present( ctx, style );
+		return fieldStyle.applyTo( new Paragraph( new Object[] { new Label( title ), new Label( " " ), new LineBreak(), valueElement } ) ).present( ctx, style );
 	}
 }

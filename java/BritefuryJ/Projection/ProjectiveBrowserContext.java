@@ -15,7 +15,6 @@ import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.DefaultPerspective;
 import BritefuryJ.DefaultPerspective.DefaultPerspectiveSubject;
 import BritefuryJ.DefaultPerspective.Presentable;
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.DocPresent.Browser.Location;
 import BritefuryJ.DocPresent.Browser.PageLocationResolver;
@@ -45,7 +44,7 @@ public class ProjectiveBrowserContext
 			@Override
 			protected Pres presentModel(Object x, FragmentView fragment, SimpleAttributeTable inheritedState)
 			{
-				return Pres.coerceNonNull( page.getContentsElement() );
+				return Pres.coerceNonNull( page.getContentsPres() );
 			}
 
 			@Override
@@ -235,7 +234,7 @@ public class ProjectiveBrowserContext
 		}
 
 		
-		public DPElement getContentsElement()
+		public Pres getContentsPres()
 		{
 			Pres linkHeader = SystemRootPage.createLinkHeader( SystemRootPage.LINKHEADER_SYSTEMPAGE );
 			Pres title = new TitleBar( "Default Root Page" );
@@ -244,7 +243,7 @@ public class ProjectiveBrowserContext
 			
 			Pres head = new Head( new Pres[] { linkHeader, title } );
 			
-			return new Page( new Pres[] { head, contents } ).present();
+			return new Page( new Pres[] { head, contents } );
 		}
 	}
 	

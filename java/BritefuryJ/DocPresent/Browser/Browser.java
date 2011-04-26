@@ -257,7 +257,7 @@ public class Browser
 	{
 		Pres childPres = Pres.coerce( child );
 		ScrolledViewport vp = new ScrolledViewport( childPres, 0.0, 0.0, state );
-		return (ScrolledViewport.ScrolledViewportControl)vp.createControl( PresentationContext.defaultCtx, StyleValues.instance );
+		return (ScrolledViewport.ScrolledViewportControl)vp.createControl( PresentationContext.defaultCtx, StyleValues.instance.alignHExpand().alignVExpand() );
 	}
 	
 
@@ -269,9 +269,9 @@ public class Browser
 		PersistentStateStore stateStore = history.getCurrentState().getPagePersistentState();
 		BrowserPage p = resolver.resolveLocationAsPage( location, stateStore );
 
-		viewport = makeViewport( p.getContentsElement().alignHExpand(), history.getCurrentState().getViewportState() );
+		viewport = makeViewport( p.getContentsPres(), history.getCurrentState().getViewportState() );
 		commandBar.setPage( p );
-		presComponent.getRootElement().setChild( viewport.getElement().alignHExpand().alignVExpand() );
+		presComponent.getRootElement().setChild( viewport.getElement() );
 		
 		// Set the page
 		setPage( p );

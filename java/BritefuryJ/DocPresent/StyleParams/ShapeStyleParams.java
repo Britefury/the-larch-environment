@@ -8,19 +8,24 @@ package BritefuryJ.DocPresent.StyleParams;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.util.List;
 
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Painter.FillPainter;
 import BritefuryJ.DocPresent.Painter.Painter;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.ObjectPres.HorizontalField;
 
 public class ShapeStyleParams extends ContentLeafStyleParams
 {
-	public static final ShapeStyleParams defaultStyleParams = new ShapeStyleParams( null, null, null, new FillPainter( Color.black ), null );
+	public static final ShapeStyleParams defaultStyleParams = new ShapeStyleParams( HAlignment.PACK, VAlignment.REFY, null, null, null, new FillPainter( Color.black ), null );
 	private Painter painter, hoverPainter;
 	
 	
-	public ShapeStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, Painter painter, Painter hoverPainter)
+	public ShapeStyleParams(HAlignment hAlign, VAlignment vAlign, Painter background, Painter hoverBackground, Cursor pointerCursor, Painter painter, Painter hoverPainter)
 	{
-		super( background, hoverBackground, pointerCursor );
+		super( hAlign, vAlign, background, hoverBackground, pointerCursor );
 		
 		this.painter = painter;
 		this.hoverPainter = hoverPainter;
@@ -35,5 +40,14 @@ public class ShapeStyleParams extends ContentLeafStyleParams
 	public Painter getHoverPainter()
 	{
 		return hoverPainter;
+	}
+
+
+
+	protected void buildFieldList(List<Object> fields)
+	{
+		super.buildFieldList( fields );
+		fields.add( new HorizontalField( "Painter", Pres.coerceNonNull( painter ) ) );
+		fields.add( new HorizontalField( "Hover painter", Pres.coerceNonNull( hoverPainter ) ) );
 	}
 }

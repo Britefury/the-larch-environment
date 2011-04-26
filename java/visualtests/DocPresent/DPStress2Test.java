@@ -21,6 +21,8 @@ import BritefuryJ.DocPresent.DPSpan;
 import BritefuryJ.DocPresent.DPText;
 import BritefuryJ.DocPresent.DPColumn;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.StyleParams.ContainerStyleParams;
 import BritefuryJ.DocPresent.StyleParams.ParagraphStyleParams;
@@ -65,9 +67,9 @@ public class DPStress2Test
 	
 	
 	Font f0 = new Font( "Sans serif", Font.PLAIN, 12 );
-	TextStyleParams nameStyle = new TextStyleParams( null, null, null, true, true, f0, Color.black, null, null, false, false, false );
-	TextStyleParams puncStyle = new TextStyleParams( null, null, null, true, true, f0, Color.blue, null, null, false, false, false );
-	ParagraphStyleParams paraStyle = new ParagraphStyleParams( null, null, null, 0.0, 0.0, 0.0 );
+	TextStyleParams nameStyle = new TextStyleParams( HAlignment.PACK, VAlignment.REFY, null, null, null, true, true, f0, Color.black, null, null, false, false, false );
+	TextStyleParams puncStyle = new TextStyleParams( HAlignment.PACK, VAlignment.REFY, null, null, null, true, true, f0, Color.blue, null, null, false, false, false );
+	ParagraphStyleParams paraStyle = new ParagraphStyleParams( HAlignment.PACK, VAlignment.REFY, null, null, null, 0.0, 0.0, 0.0 );
 
 	public DPElement name(String n)
 	{
@@ -148,9 +150,9 @@ public class DPStress2Test
 		DPElement w = createContentNode();
 		long t2 = System.nanoTime();
 		System.out.println( "Element tree creation time: " + (double)( t2 - t1 ) / 1000000000.0 );
-		DPViewport viewport = new DPViewport( new PersistentState() );
+		DPViewport viewport = new DPViewport( new ContainerStyleParams( HAlignment.EXPAND, VAlignment.EXPAND, null, null, null ), new PersistentState() );
 		viewport.setChild( w );
-		presentation.setChild( viewport.alignHExpand().alignVExpand() );
+		presentation.setChild( viewport );
 	     
 	     
 	     

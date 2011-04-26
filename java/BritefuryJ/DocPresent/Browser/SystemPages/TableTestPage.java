@@ -142,7 +142,7 @@ public class TableTestPage extends SystemPage
 	protected Pres createContents()
 	{
 		ArrayList<Object> children = new ArrayList<Object>();
-		children.add( tableStyle.applyTo( makeTable0() ) );
+		children.add( tableStyle.applyTo( makeTable0().alignHPack().alignVRefY() ) );
 		children.add( sectionStyle.applyTo( new Border( tableStyle.applyTo( makeTable1() ) ) ) );
 		children.add( sectionStyle.applyTo( new Border( tableStyle.applyTo( makeTable2() ) ) ) );
 		children.add( sectionStyle.applyTo( new Border( tableStyle.applyTo( makeTable3() ) ) ) );

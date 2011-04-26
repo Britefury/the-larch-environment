@@ -12,13 +12,13 @@ import java.util.List;
 import BritefuryJ.ChangeHistory.ChangeHistoryController;
 import BritefuryJ.ChangeHistory.ChangeHistoryListener;
 import BritefuryJ.Command.BoundCommandSet;
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateStore;
+import BritefuryJ.Pres.Pres;
 
 public abstract class BrowserPage
 {
 	public abstract String getTitle();
-	public abstract DPElement getContentsElement();
+	public abstract Pres getContentsPres();
 	
 	public ChangeHistoryController getChangeHistoryController()
 	{

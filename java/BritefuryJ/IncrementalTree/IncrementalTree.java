@@ -28,6 +28,7 @@ public abstract class IncrementalTree
 	private IncrementalTreeNode rootIncrementalTreeNode;
 	private boolean bRefreshRequired;
 	private RefreshListener refreshListener;
+	IncrementalTreeNode.NodeResultFactory rootNodeResultFactory;
 	
 	
 	
@@ -64,18 +65,41 @@ public abstract class IncrementalTree
 	}
 	
 	
-	protected abstract IncrementalTreeNode.NodeResultFactory getRootNodeResultFactory();
+	protected void setRootNodeResultFactory(IncrementalTreeNode.NodeResultFactory rootNodeResultFactory)
+	{
+		if ( rootNodeResultFactory != this.rootNodeResultFactory )
+		{
+			this.rootNodeResultFactory = rootNodeResultFactory;
+			
+			if ( !bRefreshRequired )
+			{
+				bRefreshRequired = true;
+				onRequestRefresh();
+				
+				if ( refreshListener != null )
+				{
+					refreshListener.onIncrementalTreeRequestRefresh( this );
+				}
+			}
+		}
+	}
 	
 	
 	protected IncrementalTreeNode getRootIncrementalTreeNode()
 	{
+		if ( rootNodeResultFactory == null )
+		{
+			throw new RuntimeException( "No root node result factory set" );
+		}
+		
+		
 		if ( rootIncrementalTreeNode != null )
 		{
 			nodeTable.unrefIncrementalNode( rootIncrementalTreeNode );
 		}
 		if ( rootIncrementalTreeNode == null )
 		{
-			rootIncrementalTreeNode = buildIncrementalTreeNodeResult( modelRootNode, getRootNodeResultFactory() );
+			rootIncrementalTreeNode = buildIncrementalTreeNodeResult( modelRootNode, rootNodeResultFactory );
 		}
 		if ( rootIncrementalTreeNode != null )
 		{

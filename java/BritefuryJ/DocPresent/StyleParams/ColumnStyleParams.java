@@ -9,16 +9,18 @@ package BritefuryJ.DocPresent.StyleParams;
 
 import java.awt.Cursor;
 
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Painter.Painter;
 
 
 public class ColumnStyleParams extends AbstractBoxStyleParams
 {
-	public static final ColumnStyleParams defaultStyleParams = new ColumnStyleParams( null, null, null, 0.0 );
+	public static final ColumnStyleParams defaultStyleParams = new ColumnStyleParams( HAlignment.PACK, VAlignment.REFY, null, null, null, 0.0 );
 
 
-	public ColumnStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, double spacing)
+	public ColumnStyleParams(HAlignment hAlign, VAlignment vAlign, Painter background, Painter hoverBackground, Cursor pointerCursor, double spacing)
 	{
-		super( background, hoverBackground, pointerCursor, spacing );
+		super( hAlign, vAlign, background, hoverBackground, pointerCursor, spacing );
 	}
 }

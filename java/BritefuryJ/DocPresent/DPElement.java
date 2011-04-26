@@ -20,10 +20,13 @@ package BritefuryJ.DocPresent;
  * Child local space to local space - the concatenation of child local space to allocation space, and allocation space to local space
  */
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
@@ -31,7 +34,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -39,10 +41,13 @@ import java.util.Stack;
 import java.util.WeakHashMap;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
+import BritefuryJ.DefaultPerspective.DefaultPerspective;
 import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
+import BritefuryJ.DocPresent.Event.AbstractPointerButtonEvent;
+import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Event.PointerEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.DndHandler;
@@ -51,7 +56,9 @@ import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
 import BritefuryJ.DocPresent.Interactor.CaretCrossingElementInteractor;
+import BritefuryJ.DocPresent.Interactor.ClickElementInteractor;
 import BritefuryJ.DocPresent.Interactor.ContextMenuElementInteractor;
+import BritefuryJ.DocPresent.Interactor.HoverElementInteractor;
 import BritefuryJ.DocPresent.Interactor.RealiseElementInteractor;
 import BritefuryJ.DocPresent.Layout.ElementAlignment;
 import BritefuryJ.DocPresent.Layout.HAlignment;
@@ -80,7 +87,6 @@ import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.Projection.Perspective;
 import BritefuryJ.StyleSheet.StyleSheet;
-import BritefuryJ.Utils.HashUtils;
 
 
 
@@ -199,60 +205,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	{
 		static final long serialVersionUID = 0L;
 	}
-	
-	
-	
-	//
-	//
-	// Padding
-	//
-	//
-	
-	private static class PaddingKey
-	{
-		private double leftPad, rightPad, topPad, bottomPad;
-		private int hash;
-		
-		
-		public PaddingKey(double leftPad, double rightPad, double topPad, double bottomPad)
-		{
-			this.leftPad = leftPad;
-			this.rightPad = rightPad;
-			this.topPad = topPad;
-			this.bottomPad = bottomPad;
-			hash = HashUtils.quadHash( new Double( leftPad ).hashCode(), new Double( rightPad ).hashCode(), new Double( topPad ).hashCode(), new Double( bottomPad ).hashCode() );
-		}
-		
-		
-		public int hashCode()
-		{
-			return hash;
-		}
-		
-		
-		public boolean equals(Object x)
-		{
-			if ( this == x )
-			{
-				return true;
-			}
-			
-			
-			if ( x instanceof PaddingKey )
-			{
-				PaddingKey k = (PaddingKey)x;
-				
-				return leftPad == k.leftPad  &&  rightPad == k.rightPad  &&  topPad == k.topPad  &&  bottomPad == k.bottomPad;
-			}
-			else
-			{
-				return false;
-			}
-		}
-	}
-	
-
-	private static HashMap<PaddingKey, FilledBorder> paddingBorders = new HashMap<PaddingKey, FilledBorder>();
 	
 	
 	
@@ -476,6 +428,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	{
 		flags = 0;
 		this.styleParams = styleParams;
+		setAlignmentFlags( ElementAlignment.flagValue( styleParams.getHAlignment(), styleParams.getVAlignment() ) );
 	}
 	
 	protected DPElement(DPElement element)
@@ -491,7 +444,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		{
 			interactionFields = element.interactionFields.copy();
 		}
-		setAlignmentFlags( element.getAlignmentFlags() );
 	}
 	
 	
@@ -548,87 +500,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	
 	
 	
-	//
-	// Alignment methods
-	//
-	
-	public DPElement align(HAlignment hAlign, VAlignment vAlign)
-	{
-		setAlignmentFlags( ElementAlignment.flagValue( hAlign, vAlign ) );
-		return this;
-	}
-
-	public DPElement alignH(HAlignment hAlign)
-	{
-		setHAlignmentFlags( ElementAlignment.flagValue( hAlign ) );
-		return this;
-	}
-	
-	public DPElement alignV(VAlignment vAlign)
-	{
-		setVAlignmentFlags( ElementAlignment.flagValue( vAlign ) );
-		return this;
-	}
-	
-
-	public DPElement alignHPack()
-	{
-		return alignH( HAlignment.PACK );
-	}
-
-	public DPElement alignHLeft()
-	{
-		return alignH( HAlignment.LEFT );
-	}
-
-	public DPElement alignHCentre()
-	{
-		return alignH( HAlignment.CENTRE );
-	}
-
-	public DPElement alignHRight()
-	{
-		return alignH( HAlignment.RIGHT );
-	}
-
-	public DPElement alignHExpand()
-	{
-		return alignH( HAlignment.EXPAND );
-	}
-	
-	
-	public DPElement alignVRefY()
-	{
-		return alignV( VAlignment.REFY );
-	}
-
-	public DPElement alignVRefYExpand()
-	{
-		return alignV( VAlignment.REFY_EXPAND );
-	}
-
-	public DPElement alignVTop()
-	{
-		return alignV( VAlignment.TOP );
-	}
-
-	public DPElement alignVCentre()
-	{
-		return alignV( VAlignment.CENTRE );
-	}
-
-	public DPElement alignVBottom()
-	{
-		return alignV( VAlignment.BOTTOM );
-	}
-
-	public DPElement alignVExpand()
-	{
-		return alignV( VAlignment.EXPAND );
-	}
-
-
-	
 	protected void setAlignmentFlags(int alignmentFlags)
 	{
 		flags = ( flags & ~_ALIGN_MASK )   |   ( alignmentFlags << _ALIGN_SHIFT );
@@ -642,6 +513,11 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	protected void setVAlignmentFlags(int alignmentFlags)
 	{
 		flags = ( flags & ~_VALIGN_MASK )   |   ( alignmentFlags << _ALIGN_SHIFT );
+	}
+	
+	public void setAlignment(HAlignment hAlign, VAlignment vAlign)
+	{
+		setAlignmentFlags( ElementAlignment.flagValue( hAlign, vAlign ) );
 	}
 	
 	
@@ -660,14 +536,6 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		return ElementAlignment.getVAlignment( getAlignmentFlags() );
 	}
 	
-	
-	
-	
-	public void copyAlignmentFlagsFrom(DPElement element)
-	{
-		setAlignmentFlags( element.getAlignmentFlags() );
-	}
-	
 
 	
 	
@@ -675,7 +543,7 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	// Layout wrap method - papers over the fact that some elements cannot have layout-less elements as children
 	//
 	
-	public DPElement layoutWrap()
+	public DPElement layoutWrap(HAlignment hAlign, VAlignment vAlign)
 	{
 		if ( getLayoutNode() != null )
 		{
@@ -685,71 +553,13 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		{
 			DPRow row = new DPRow();
 			row.setChildren( new DPElement[] { this } );
-			row.copyAlignmentFlagsFrom( this );
+			row.setAlignment( hAlign, vAlign );
 			return row;
 		}
 	}
 	
 	
-	//
-	// Padding methods
-	//
-	
-	public DPElement pad(double leftPad, double rightPad, double topPad, double bottomPad)
-	{
-		if ( leftPad == 0.0  &&  rightPad == 0.0  &&  topPad == 0.0  &&  bottomPad == 0.0 )
-		{
-			return this;
-		}
-		else
-		{
-			PaddingKey key = new PaddingKey( leftPad, rightPad, topPad, bottomPad );
-			FilledBorder border = paddingBorders.get( key );
-			
-			if ( border == null )
-			{
-				border = new FilledBorder( leftPad, rightPad, topPad, bottomPad );
-				paddingBorders.put( key, border );
-			}
-			
-			
-			
-			DPElement child = layoutWrap();
-			DPBorder padElement = new DPBorder( border );
-			padElement.setChild( child );
-			padElement.copyAlignmentFlagsFrom( child );
-			return padElement;
-		}
-	}
-	
-	public DPElement pad(double xPad, double yPad)
-	{
-		return pad( xPad, xPad, yPad, yPad );
-	}
-	
-	public DPElement padX(double xPad)
-	{
-		return pad( xPad, xPad, 0.0, 0.0 );
-	}
-	
-	public DPElement padX(double leftPad, double rightPad)
-	{
-		return pad( leftPad, rightPad, 0.0, 0.0 );
-	}
-	
-	public DPElement padY(double yPad)
-	{
-		return pad( 0.0, 0.0, yPad, yPad );
-	}
-	
-	public DPElement padY(double topPad, double bottomPad)
-	{
-		return pad( 0.0, 0.0, topPad, bottomPad );
-	}
-	
 
-	
-	
 	
 	
 	//
@@ -3122,6 +2932,83 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 	protected static StyleSheet headerDescriptionTextStyle = StyleSheet.instance.withAttr( Primitive.foreground, new Color( 0.0f, 0.0f, 0.75f ) );
 	protected static StyleSheet metaHeaderRowStyle = StyleSheet.instance.withAttr( Primitive.rowSpacing, 10.0 );
 	protected static StyleSheet metaHeaderEmptyBorderStyle = StyleSheet.instance.withAttr( Primitive.border, new FilledBorder() );
+	
+	private static Color explorerHeadHoverFillPaint = new Color( 0.0f, 0.4f, 0.8f, 0.25f );
+	private static Color explorerHeadHoverOutlinePaint = new Color( 0.0f, 0.4f, 0.8f, 0.5f );
+	private static Stroke explorerHeadHoverStroke = new BasicStroke( 1.0f );
+	
+	private static ElementPainter explorerHeadHoverPainter = new ElementPainter()
+	{
+		@Override
+		public void drawBackground(DPElement element, Graphics2D graphics)
+		{
+		}
+
+		@Override
+		public void draw(DPElement element, Graphics2D graphics)
+		{
+			Paint paint = graphics.getPaint();
+			Stroke stroke = graphics.getStroke();
+
+			graphics.setStroke( explorerHeadHoverStroke );
+			for (Shape shape: element.getShapes())
+			{
+				graphics.setPaint( explorerHeadHoverFillPaint );
+				graphics.fill( shape );
+				graphics.setPaint( explorerHeadHoverOutlinePaint );
+				graphics.draw( shape );
+			}
+			
+			graphics.setPaint( paint );
+			graphics.setStroke( stroke );
+		}
+	};
+	
+	private static HoverElementInteractor explorerHeaderHoverInteractor = new HoverElementInteractor()
+	{
+		@Override
+		public void pointerEnter(PointerInputElement element, PointerMotionEvent event)
+		{
+			DPElement el = (DPElement)element;
+			FragmentView fragment = (FragmentView)el.getFragmentContext();
+			DPElement model = (DPElement)fragment.getModel();
+			model.addPainter( explorerHeadHoverPainter );
+			model.queueFullRedraw();
+		}
+
+		@Override
+		public void pointerLeave(PointerInputElement element, PointerMotionEvent event)
+		{
+			DPElement el = (DPElement)element;
+			FragmentView fragment = (FragmentView)el.getFragmentContext();
+			DPElement model = (DPElement)fragment.getModel();
+			model.removePainter( explorerHeadHoverPainter );
+			model.queueFullRedraw();
+		}
+	};
+
+	private static ClickElementInteractor explorerHeaderInspectInteractor = new ClickElementInteractor()
+	{
+		@Override
+		public boolean testClickEvent(PointerInputElement element, AbstractPointerButtonEvent event)
+		{
+			return event.getButton() == 1;
+		}
+
+		@Override
+		public boolean buttonClicked(PointerInputElement element, PointerButtonClickedEvent event)
+		{
+			DPElement el = (DPElement)element;
+			FragmentView fragment = (FragmentView)el.getFragmentContext();
+			DPElement model = (DPElement)fragment.getModel();
+
+			ElementStyleParams styleParams = model.getStyleParams();
+			Pres p = DefaultPerspective.instance.applyTo( styleParams );
+			p.popupAtMousePosition( el, true, true );
+			
+			return true;
+		}
+	};
 
 
 	protected StyleSheet getDebugPresentationHeaderBorderStyle()
@@ -3146,7 +3033,8 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		ArrayList<Object> elements = new ArrayList<Object>();
 		createDebugPresentationHeaderContents( elements );
 		Pres box = metaHeaderRowStyle.applyTo( new Row( elements ) );
-		return getDebugPresentationHeaderBorderStyle().applyTo( new Border( box ) );
+		Border border = new Border( box );
+		return getDebugPresentationHeaderBorderStyle().applyTo( border.withElementInteractor( explorerHeaderHoverInteractor ).withElementInteractor( explorerHeaderInspectInteractor ) );
 	}
 	
 	public Pres createMetaElement(FragmentView ctx, SimpleAttributeTable state)

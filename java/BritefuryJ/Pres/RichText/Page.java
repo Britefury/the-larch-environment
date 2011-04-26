@@ -9,9 +9,12 @@ package BritefuryJ.Pres.RichText;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.SequentialPres;
 import BritefuryJ.Pres.Primitive.Column;
+import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class Page extends SequentialPres
@@ -30,7 +33,7 @@ public class Page extends SequentialPres
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPElement xs[] = mapPresent( ctx, RichText.usePageAttrs( style ), children );
-		return RichText.pageStyle( style ).applyTo( new Column( xs ).alignHExpand() ).present( ctx, style );
+		DPElement xs[] = mapPresent( ctx, RichText.usePageAttrs( style ).withAttr( Primitive.hAlign, HAlignment.EXPAND ).withAttr( Primitive.vAlign, VAlignment.REFY ), children );
+		return RichText.pageStyle( style ).applyTo( new Column( xs ).alignHExpand().alignVRefY() ).present( ctx, style );
 	}
 }

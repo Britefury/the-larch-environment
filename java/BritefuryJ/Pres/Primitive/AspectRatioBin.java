@@ -8,6 +8,8 @@ package BritefuryJ.Pres.Primitive;
 
 import BritefuryJ.DocPresent.DPAspectRatioBin;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.StyleSheet.StyleValues;
@@ -31,7 +33,8 @@ public class AspectRatioBin extends Pres
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
 		DPAspectRatioBin bin = new DPAspectRatioBin( Primitive.containerParams.get( style ), minWidth, aspectRatio );
-		bin.setChild( child.present( ctx, Primitive.useContainerParams.get( style ) ).layoutWrap() );
+		StyleValues childStyle = Primitive.useContainerParams.get( style );
+		bin.setChild( child.present( ctx, childStyle ).layoutWrap( childStyle.get( Primitive.hAlign, HAlignment.class ), childStyle.get( Primitive.vAlign, VAlignment.class ) ) );
 		return bin;
 	}
 }

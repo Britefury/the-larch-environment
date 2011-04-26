@@ -11,6 +11,9 @@ import java.util.HashMap;
 import BritefuryJ.DocPresent.DPBorder;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Border.FilledBorder;
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
+import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleValues;
 import BritefuryJ.Utils.HashUtils;
 
@@ -105,10 +108,17 @@ public class Pad extends Pres
 	@Override
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
-		DPBorder element = new DPBorder( padBorder );
 		DPElement childElem = child.present( ctx, style );
-		element.setChild( childElem.layoutWrap() );
-		element.copyAlignmentFlagsFrom( childElem );
-		return element;
+		if ( padBorder != null )
+		{
+			DPBorder element = new DPBorder( padBorder, Primitive.getContainerStyleParams( style ) );
+			element.setChild( childElem.layoutWrap( style.get( Primitive.hAlign, HAlignment.class ), style.get( Primitive.vAlign, VAlignment.class ) ) );
+			//element.copyAlignmentFlagsFrom( childElem );
+			return element;
+		}
+		else
+		{
+			return childElem.layoutWrap( style.get( Primitive.hAlign, HAlignment.class ), style.get( Primitive.vAlign, VAlignment.class ) );
+		}
 	}
 }

@@ -9,80 +9,78 @@ package BritefuryJ.Pres;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
+import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class Align extends Pres
 {
-	private static final int FLAG_ALIGN_H = 0x1;
-	private static final int FLAG_ALIGN_V = 0x2;
-	
-	
-	private int flags;
-	private HAlignment hAlign = HAlignment.PACK;
-	private VAlignment vAlign = VAlignment.REFY;
+	private HAlignment hAlign;
+	private VAlignment vAlign;
 	private Pres child;
 	
 	
-	public Align(HAlignment hAlign, Pres child)
-	{
-		this.hAlign = hAlign;
-		this.child = child;
-		this.flags = FLAG_ALIGN_H;
-	}
-	
-	public Align(VAlignment vAlign, Pres child)
-	{
-		this.vAlign = vAlign;
-		this.child = child;
-		this.flags = FLAG_ALIGN_V;
-	}
-	
-	public Align(HAlignment hAlign, VAlignment vAlign, Pres child)
+	public Align(HAlignment hAlign, VAlignment vAlign, Object child)
 	{
 		this.hAlign = hAlign;
 		this.vAlign = vAlign;
-		this.child = child;
-		this.flags = FLAG_ALIGN_H | FLAG_ALIGN_V;
+		
+		setChild( coerce( child ) );
 	}
-	
-	private Align(HAlignment hAlign, VAlignment vAlign, Pres child, int flags)
+
+	public Align(HAlignment hAlign, Object child)
 	{
 		this.hAlign = hAlign;
+		this.vAlign = null;
+
+		setChild( coerce( child ) );
+	}
+
+	public Align(VAlignment vAlign, Object child)
+	{
+		this.hAlign = null;
 		this.vAlign = vAlign;
-		this.child = child;
-		this.flags = flags;
-	}
 
-	public Align alignH(HAlignment hAlign)
-	{
-		return new Align( hAlign, vAlign, child, flags | FLAG_ALIGN_H );
+		setChild( coerce( child ) );
 	}
-
-	public Align alignV(VAlignment vAlign)
-	{
-		return new Align( hAlign, vAlign, child, flags | FLAG_ALIGN_V );
-	}
-
 	
-	@Override
-	public DPElement present(PresentationContext ctx, StyleValues style)
+	
+	private void setChild(Pres child)
 	{
-		DPElement element = child.present( ctx, style );
-		if ( flags == FLAG_ALIGN_H )
+		if ( child instanceof Align )
 		{
-			return element.alignH( hAlign );
-		}
-		else if ( flags == FLAG_ALIGN_V )
-		{
-			return element.alignV( vAlign );
-		}
-		else if ( flags == ( FLAG_ALIGN_H | FLAG_ALIGN_V ) )
-		{
-			return element.align( hAlign, vAlign );
+			Align align = (Align)child;
+			if ( align.hAlign != null )
+			{
+				hAlign = align.hAlign;
+			}
+			if ( align.vAlign != null )
+			{
+				vAlign = align.vAlign;
+			}
+			
+			this.child = align.child;
 		}
 		else
 		{
-			return element;
+			this.child = child;
 		}
 	}
+	
+
+	@Override
+	public DPElement present(PresentationContext ctx, StyleValues style)
+	{
+		if ( hAlign != null )
+		{
+			style = style.withAttr( Primitive.hAlign, hAlign );
+		}
+
+		if ( vAlign != null )
+		{
+			style = style.withAttr( Primitive.vAlign, vAlign );
+		}
+
+		return child.present( ctx, style );
+	}
+
 }

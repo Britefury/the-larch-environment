@@ -48,9 +48,9 @@ public class ScrolledViewportTestPage extends SystemPage
 		
 		Pres b2 = blackText.applyTo( new NormalText( textBlock ) );
 		
-		Pres viewport = new SpaceBin( new ScrolledViewport( b2, 0.0, 0.0, new PersistentState() ).alignHExpand().alignVExpand(), 0.0, 200.0 );
-		Pres border = borderStyle.applyTo( new Border( viewport.alignHExpand().alignVExpand() ).alignHExpand().alignVExpand() );
-		Pres column = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( new Column( new Pres[] { new Label( "Viewport:" ), border } ) ).alignHExpand().alignVExpand();
-		return column.pad( 50.0, 50.0 );
+		Pres viewport = new SpaceBin( new ScrolledViewport( b2, 0.0, 0.0, new PersistentState() ), 0.0, 200.0 );
+		Pres border = borderStyle.applyTo( new Border( viewport ) );
+		Pres column = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( new Column( new Pres[] { new Label( "Viewport:" ).alignHPack().alignVRefY(), border } ) );
+		return column.pad( 50.0, 50.0 ).alignHExpand().alignVExpand();
 	}
 }

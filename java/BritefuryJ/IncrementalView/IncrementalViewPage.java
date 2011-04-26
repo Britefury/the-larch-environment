@@ -13,7 +13,6 @@ import BritefuryJ.ChangeHistory.ChangeHistoryController;
 import BritefuryJ.ChangeHistory.ChangeHistoryListener;
 import BritefuryJ.Command.BoundCommandSet;
 import BritefuryJ.Controls.Hyperlink;
-import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.PageController;
 import BritefuryJ.DocPresent.Browser.BrowserPage;
 import BritefuryJ.DocPresent.Browser.Location;
@@ -28,9 +27,9 @@ import BritefuryJ.Projection.Subject;
 
 public class IncrementalViewPage extends BrowserPage
 {
-	private DPElement element;
+	private Pres pres;
 	private Hyperlink logLink;
-	private DPElement pageElement;
+	private Pres pagePres;
 	private String title;
 	private ChangeHistory changeHistory;
 	private BrowserIncrementalView view;
@@ -38,9 +37,9 @@ public class IncrementalViewPage extends BrowserPage
 	
 	
 	
-	public IncrementalViewPage(DPElement element, String title, final ProjectiveBrowserContext browserContext, ChangeHistory changeHistory, BrowserIncrementalView view, Subject subject)
+	public IncrementalViewPage(Pres pres, String title, final ProjectiveBrowserContext browserContext, ChangeHistory changeHistory, BrowserIncrementalView view, Subject subject)
 	{
-		this.element = element;
+		this.pres = pres;
 		this.title = title;
 		this.changeHistory = changeHistory;
 		this.view = view;
@@ -60,15 +59,15 @@ public class IncrementalViewPage extends BrowserPage
 		};
 		
 		logLink = new Hyperlink( "Page log", listener );
-		Pres pagePres = new Column( new Object[] { this.element.alignHExpand(), logLink.pad( 10, 10 ).alignHRight() } );
-		pageElement = pagePres.present();
+//		pagePres = new Column( new Object[] { this.element.alignHExpand(), logLink.pad( 10, 10 ).alignHRight() } );
+		pagePres = new Column( new Object[] { this.pres.alignHExpand().alignVExpand(), logLink.pad( 10, 10 ).alignHRight().alignVRefY() } );
 	}
 	
 	
 	
-	public DPElement getContentsElement()
+	public Pres getContentsPres()
 	{
-		return pageElement;
+		return pagePres;
 	}
 	
 	public String getTitle()

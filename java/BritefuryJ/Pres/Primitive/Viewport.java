@@ -8,6 +8,8 @@ package BritefuryJ.Pres.Primitive;
 
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPViewport;
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.Util.Range;
 import BritefuryJ.Pres.Pres;
@@ -41,7 +43,8 @@ public class Viewport extends Pres
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
 		DPViewport element = new DPViewport( Primitive.containerParams.get( style ), xRange, yRange, persistentState );
-		element.setChild( child.present( ctx, Primitive.useContainerParams.get( style ) ).layoutWrap() );
+		StyleValues childStyle = Primitive.useContainerParams.get( style );
+		element.setChild( child.present( ctx, childStyle ).layoutWrap( childStyle.get( Primitive.hAlign, HAlignment.class ), childStyle.get( Primitive.vAlign, VAlignment.class ) ) );
 		return element;
 	}
 }

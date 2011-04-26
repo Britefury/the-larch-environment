@@ -33,8 +33,8 @@ public class VerticalField extends Pres
 		StyleSheet fieldStyle = style.get( ObjectPresStyle.objectFieldStyle, StyleSheet.class );
 		double indentation = style.get( ObjectPresStyle.objectFieldIndentation, Double.class );
 		
-		DPElement valueElement = value.present( ctx, ObjectPresStyle.useObjectFieldAttrs( style ) );
+		DPElement valueElement = value.alignHExpand().padX( indentation, 0.0 ).present( ctx, ObjectPresStyle.useObjectFieldAttrs( style ) );
 		
-		return fieldStyle.applyTo( new Column( new Object[] { new Label( title ), valueElement.alignHExpand().padX( indentation, 0.0 ) } ).alignHExpand() ).present( ctx, style );
+		return fieldStyle.applyTo( new Column( new Object[] { new Label( title ), valueElement } ).alignHExpand() ).present( ctx, style );
 	}
 }

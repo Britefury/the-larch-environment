@@ -8,20 +8,25 @@
 package BritefuryJ.DocPresent.StyleParams;
 
 import java.awt.Cursor;
+import java.util.List;
 
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Painter.Painter;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.ObjectPres.HorizontalField;
 
 public class ScriptStyleParams extends ContainerStyleParams
 {
-	public static final ScriptStyleParams defaultStyleSheet = new ScriptStyleParams( null, null, null, 1.0, 1.0 );
+	public static final ScriptStyleParams defaultStyleSheet = new ScriptStyleParams( HAlignment.PACK, VAlignment.REFY, null, null, null, 1.0, 1.0 );
 	
 	
 	private final double columnSpacing, rowSpacing;
 	
 	
-	public ScriptStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, double columnSpacing, double rowSpacing)
+	public ScriptStyleParams(HAlignment hAlign, VAlignment vAlign, Painter background, Painter hoverBackground, Cursor pointerCursor, double columnSpacing, double rowSpacing)
 	{
-		super( background, hoverBackground, pointerCursor );
+		super( hAlign, vAlign, background, hoverBackground, pointerCursor );
 		
 		this.columnSpacing = columnSpacing;
 		this.rowSpacing = rowSpacing;
@@ -37,5 +42,14 @@ public class ScriptStyleParams extends ContainerStyleParams
 	public double getRowSpacing()
 	{
 		return this.rowSpacing;
+	}
+	
+	
+	
+	protected void buildFieldList(List<Object> fields)
+	{
+		super.buildFieldList( fields );
+		fields.add( new HorizontalField( "Column spacing", Pres.coerceNonNull( columnSpacing ) ) );
+		fields.add( new HorizontalField( "Row spacing", Pres.coerceNonNull( rowSpacing ) ) );
 	}
 }

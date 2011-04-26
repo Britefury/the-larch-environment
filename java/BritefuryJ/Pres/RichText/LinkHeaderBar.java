@@ -35,6 +35,6 @@ public class LinkHeaderBar extends SequentialPres
 		double padding = style.get( RichText.linkHeaderPadding, Double.class );
 		Pres xs[] = mapCoerce( mapPresent( ctx, RichText.useBodyAttrs( style ), children ) );
 		return RichText.linkHeaderStyle( style ).applyTo(
-				new Border( new Row( xs ).alignHRight() ).alignHExpand().pad( padding, padding ) ).present( ctx, style );
+				new Border( new Row( xs ).alignHRight() ).pad( padding, padding ) ).alignHExpand().present( ctx, style );
 	}
 }

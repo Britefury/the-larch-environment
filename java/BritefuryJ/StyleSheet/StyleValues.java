@@ -10,8 +10,11 @@ import java.util.HashMap;
 
 import BritefuryJ.AttributeTable.AttributeBase;
 import BritefuryJ.AttributeTable.AttributeTable;
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.Pres.ApplyStyleSheetValues;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.Primitive.Primitive;
 
 public class StyleValues extends AttributeTable
 {
@@ -74,6 +77,82 @@ public class StyleValues extends AttributeTable
 	{
 		return (StyleValues)super.remapAttr( destAttribute, sourceAttribute );
 	}
+	
+	
+	
+	public StyleValues align(HAlignment hAlign, VAlignment vAlign)
+	{
+		return withAttr( Primitive.hAlign, hAlign ).withAttr( Primitive.vAlign, vAlign );
+	}
+	
+
+	public StyleValues alignH(HAlignment hAlign)
+	{
+		return withAttr( Primitive.hAlign, hAlign );
+	}
+	
+	public StyleValues alignV(VAlignment vAlign)
+	{
+		return withAttr( Primitive.vAlign, vAlign );
+	}
+	
+
+	public StyleValues alignHPack()
+	{
+		return alignH( HAlignment.PACK );
+	}
+
+	public StyleValues alignHLeft()
+	{
+		return alignH( HAlignment.LEFT );
+	}
+
+	public StyleValues alignHCentre()
+	{
+		return alignH( HAlignment.CENTRE );
+	}
+
+	public StyleValues alignHRight()
+	{
+		return alignH( HAlignment.RIGHT );
+	}
+
+	public StyleValues alignHExpand()
+	{
+		return alignH( HAlignment.EXPAND );
+	}
+	
+	
+	public StyleValues alignVRefY()
+	{
+		return alignV( VAlignment.REFY );
+	}
+
+	public StyleValues alignVRefYExpand()
+	{
+		return alignV( VAlignment.REFY_EXPAND );
+	}
+
+	public StyleValues alignVTop()
+	{
+		return alignV( VAlignment.TOP );
+	}
+
+	public StyleValues alignVCentre()
+	{
+		return alignV( VAlignment.CENTRE );
+	}
+
+	public StyleValues alignVBottom()
+	{
+		return alignV( VAlignment.BOTTOM );
+	}
+
+	public StyleValues alignVExpand()
+	{
+		return alignV( VAlignment.EXPAND );
+	}
+	
 
 
 

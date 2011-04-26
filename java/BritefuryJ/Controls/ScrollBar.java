@@ -80,15 +80,15 @@ public abstract class ScrollBar extends ControlPres
 		StyleSheet arrowStyle = Controls.scrollBarArrowStyle.get( style );
 		StyleSheet dragBoxStyle = Controls.scrollBarDragBoxStyle.get( style );
 		
-		Pres decArrow = arrowStyle.applyTo( createDecArrow( arrowSize ) );
+		Pres decArrow = arrowStyle.applyTo( createDecArrow( arrowSize ) ).pad( arrowPadding, arrowPadding );
 		DPElement decArrowElement = decArrow.present( ctx, style );
-		Pres incArrow = arrowStyle.applyTo( createIncArrow( arrowSize ) );
+		Pres incArrow = arrowStyle.applyTo( createIncArrow( arrowSize ) ).pad( arrowPadding, arrowPadding );
 		DPElement incArrowElement = incArrow.present( ctx, style );
 		
 		
 		Pres dragBar = dragBoxStyle.applyTo( createDragBox( scrollBarSize ) );
 		DPElement dragBarElement = dragBar.present( ctx, style );
-		Pres p = createScrollBarPres( arrowSpacing, decArrowElement.pad( arrowPadding, arrowPadding ), dragBarElement, incArrowElement.pad( arrowPadding, arrowPadding ) );
+		Pres p = createScrollBarPres( arrowSpacing, decArrowElement, dragBarElement, incArrowElement );
 		
 		DPElement element = p.present( ctx, style );
 		

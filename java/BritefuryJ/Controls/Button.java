@@ -51,7 +51,10 @@ public class Button extends ControlPres
 				DPElement buttonElement = (DPElement)element;
 				if ( buttonElement.isRealised() )
 				{
-					listener.onButtonClicked( ButtonControl.this, event );
+					if ( listener != null )
+					{
+						listener.onButtonClicked( ButtonControl.this, event );
+					}
 					if ( bClosePopupOnActivate )
 					{
 						buttonElement.closeContainingPopupChain();

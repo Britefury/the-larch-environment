@@ -8,8 +8,11 @@ package BritefuryJ.Controls;
 
 import BritefuryJ.DocPresent.DPBin;
 import BritefuryJ.DocPresent.DPElement;
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
+import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public abstract class Expander extends ControlPres
@@ -66,11 +69,11 @@ public abstract class Expander extends ControlPres
 				currentState = state;
 				if ( currentState )
 				{
-					element.setChild( expanded.present( ctx, style ).layoutWrap() );
+					element.setChild( expanded.present( ctx, style ).layoutWrap( style.get( Primitive.hAlign, HAlignment.class ), style.get( Primitive.vAlign, VAlignment.class ) ) );
 				}
 				else
 				{
-					element.setChild( contracted.present( ctx, style ).layoutWrap() );
+					element.setChild( contracted.present( ctx, style ).layoutWrap( style.get( Primitive.hAlign, HAlignment.class ), style.get( Primitive.vAlign, VAlignment.class ) ) );
 				}
 				if ( listener != null )
 				{

@@ -30,22 +30,22 @@ public class VScrollBar extends ScrollBar
 	
 	protected Pres createDecArrow(double arrowSize)
 	{
-		return new Arrow( Arrow.Direction.UP, arrowSize );
+		return new Arrow( Arrow.Direction.UP, arrowSize ).alignHCentre().alignVRefY();
 	}
 	
 	protected Pres createIncArrow(double arrowSize)
 	{
-		return new Arrow( Arrow.Direction.DOWN, arrowSize );
+		return new Arrow( Arrow.Direction.DOWN, arrowSize ).alignHCentre().alignVRefY();
 	}
 	
 	protected Pres createDragBox(double scrollBarSize)
 	{
-		return new Box( scrollBarSize, 0.0 );
+		return new Box( scrollBarSize, 0.0 ).alignHCentre().alignVExpand();
 	}
 
 	protected Pres createScrollBarPres(double spacing, DPElement decArrowElement, DPElement dragBarElement, DPElement incArrowElement)
 	{
 		return StyleSheet.instance.withAttr( Primitive.columnSpacing, spacing ).applyTo( new Column( new Object[] {
-				decArrowElement.alignHCentre(), dragBarElement.alignVExpand().alignHCentre(), incArrowElement.alignHCentre() } ) );
+				decArrowElement, dragBarElement, incArrowElement } ) );
 	}
 }

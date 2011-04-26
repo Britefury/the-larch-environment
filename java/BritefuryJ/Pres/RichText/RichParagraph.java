@@ -88,7 +88,7 @@ abstract class RichParagraph extends Pres
 		
 		if ( text.equals( "" ) )
 		{
-			paragraphContents = Arrays.asList( new Object[] { new Text( "" ) } );
+			paragraphContents = Arrays.asList( new Object[] { new Text( "" ).alignHPack().alignVRefY() } );
 		}
 		else
 		{

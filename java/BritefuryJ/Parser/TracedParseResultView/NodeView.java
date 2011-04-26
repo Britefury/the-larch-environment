@@ -30,6 +30,7 @@ import BritefuryJ.Parser.ParserExpression;
 import BritefuryJ.ParserHelpers.ParseResultInterface;
 import BritefuryJ.ParserHelpers.TraceNode;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Bin;
 import BritefuryJ.Pres.Primitive.Border;
 import BritefuryJ.Pres.Primitive.Column;
@@ -37,6 +38,7 @@ import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Row;
 import BritefuryJ.StyleSheet.StyleSheet;
+import BritefuryJ.StyleSheet.StyleValues;
 
 public class NodeView
 {
@@ -154,7 +156,7 @@ public class NodeView
 		this.parseView = parseView;
 		this.data = data;
 		
-		nodeElement = makeNodeElement( data ).present();
+		nodeElement = makeNodeElement( data ).present( PresentationContext.defaultCtx, StyleValues.instance.alignVCentre() );
 		
 		ArrayList<DPElement> childElements = new ArrayList<DPElement>();
 		children = new ArrayList<NodeView>();
@@ -162,12 +164,12 @@ public class NodeView
 		{
 			NodeView childView = parseView.buildNodeView( child );
 			children.add( childView );
-			childElements.add( childView.getElement().padY( 3.0 ) );
+			childElements.add( childView.getElement() );
 		}
 		
-		Pres childrenColumn = styleSheet.withAttr( Primitive.columnSpacing, 3.0 ).applyTo( new Column( childElements.toArray( new DPElement[0] ) ) );
+		Pres childrenColumn = styleSheet.withAttr( Primitive.columnSpacing, 9.0 ).applyTo( new Column( childElements.toArray( new DPElement[0] ) ).padY( 3.0 ) );
 		
-		mainElement = styleSheet.withAttr( Primitive.rowSpacing, 80.0 ).applyTo( new Row( new Object[] { nodeElement.alignVCentre(), childrenColumn.alignVCentre() } ) ).present();
+		mainElement = styleSheet.withAttr( Primitive.rowSpacing, 80.0 ).applyTo( new Row( new Object[] { nodeElement, childrenColumn.alignVCentre() } ) ).present();
 	}
 	
 	

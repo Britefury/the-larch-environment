@@ -30,7 +30,6 @@ public class Proxy extends Pres
 		DPElement childElement = child.present( ctx, style );
 		DPProxy proxy = new DPProxy();
 		proxy.setChild( childElement );
-		proxy.copyAlignmentFlagsFrom( childElement );
 		return proxy;
 	}
 }

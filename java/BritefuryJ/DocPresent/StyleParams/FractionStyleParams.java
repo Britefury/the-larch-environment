@@ -9,22 +9,28 @@ package BritefuryJ.DocPresent.StyleParams;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Paint;
+import java.util.List;
 
+import BritefuryJ.DocPresent.Layout.HAlignment;
+import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.Painter.Painter;
+import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.ObjectPres.HorizontalField;
 
 public class FractionStyleParams extends ContainerStyleParams
 {
 	public static class BarStyleParams extends ContentLeafEditableStyleParams
 	{
-		public static final BarStyleParams defaultStyleParams = new BarStyleParams( null, null, null, true, true, Color.black, null );
+		public static final BarStyleParams defaultStyleParams = new BarStyleParams( HAlignment.PACK, VAlignment.REFY, null, null, null, true, true, Color.black, null );
 		
 		
 		protected final Paint barPaint, hoverBarPaint;
 
 
-		public BarStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, boolean bEditable, boolean bSelectable, Paint barPaint, Paint hoverBarPaint)
+		public BarStyleParams(HAlignment hAlign, VAlignment vAlign, Painter background, Painter hoverBackground, Cursor pointerCursor,
+				boolean bEditable, boolean bSelectable, Paint barPaint, Paint hoverBarPaint)
 		{
-			super( background, hoverBackground, pointerCursor, bEditable, bSelectable );
+			super( hAlign, vAlign, background, hoverBackground, pointerCursor, bEditable, bSelectable );
 			
 			this.barPaint = barPaint;
 			this.hoverBarPaint = hoverBarPaint;
@@ -40,10 +46,19 @@ public class FractionStyleParams extends ContainerStyleParams
 		{
 			return hoverBarPaint;
 		}
+
+
+
+		protected void buildFieldList(List<Object> fields)
+		{
+			super.buildFieldList( fields );
+			fields.add( new HorizontalField( "Bar paint", Pres.coerceNonNull( barPaint ) ) );
+			fields.add( new HorizontalField( "Hover bar paint", Pres.coerceNonNull( hoverBarPaint ) ) );
+		}
 	}
 
 	
-	public static final FractionStyleParams defaultStyleParams = new FractionStyleParams( null, null, null, 2.0, 3.0, 5.0, BarStyleParams.defaultStyleParams );
+	public static final FractionStyleParams defaultStyleParams = new FractionStyleParams( HAlignment.PACK, VAlignment.REFY, null, null, null, 2.0, 3.0, 5.0, BarStyleParams.defaultStyleParams );
 	
 	protected final BarStyleParams barStyleParams;
 	
@@ -52,9 +67,10 @@ public class FractionStyleParams extends ContainerStyleParams
 	
 	
 	
-	public FractionStyleParams(Painter background, Painter hoverBackground, Cursor pointerCursor, double vspacing, double hpadding, double yOffset, BarStyleParams barStyleParams)
+	public FractionStyleParams(HAlignment hAlign, VAlignment vAlign, Painter background, Painter hoverBackground, Cursor pointerCursor,
+			double vspacing, double hpadding, double yOffset, BarStyleParams barStyleParams)
 	{
-		super( background, hoverBackground, pointerCursor );
+		super( hAlign, vAlign, background, hoverBackground, pointerCursor );
 		
 		this.vspacing = vspacing;
 		this.hpadding = hpadding;
@@ -82,5 +98,15 @@ public class FractionStyleParams extends ContainerStyleParams
 	public double getYOffset()
 	{
 		return yOffset;
+	}
+	
+	
+	
+	protected void buildFieldList(List<Object> fields)
+	{
+		super.buildFieldList( fields );
+		fields.add( new HorizontalField( "Vertical spacing", Pres.coerceNonNull( vspacing ) ) );
+		fields.add( new HorizontalField( "Horizontal padding", Pres.coerceNonNull( hpadding ) ) );
+		fields.add( new HorizontalField( "Y-offset", Pres.coerceNonNull( yOffset ) ) );
 	}
 }
