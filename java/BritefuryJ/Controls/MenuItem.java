@@ -186,7 +186,7 @@ public class MenuItem extends ControlPres
 			}
 			Pres childWithArrow = StyleSheet.instance.withAttr( Primitive.rowSpacing, spacing ).applyTo( 
 					new Row( new Pres[] { child.alignHExpand().alignVRefYExpand(),
-					StyleSheet.instance.withAttr( Primitive.shapePainter, arrowPainter ).applyTo( new Arrow( arrowDirection, arrowSize ).alignVCentre() ) } ) );
+					StyleSheet.instance.withAttr( Primitive.shapePainter, arrowPainter ).applyTo( new Arrow( arrowDirection, arrowSize ).alignHPack().alignVCentre() ) } ) ).alignHExpand();
 			childElem = presentAsCombinator( ctx, usedStyle, childWithArrow );
 		}
 		else
@@ -200,7 +200,7 @@ public class MenuItem extends ControlPres
 		boolean bClosePopupOnActivate = style.get( Controls.bClosePopupOnActivate, Boolean.class );
 		
 		StyleValues menuItemStyle = style.withAttr( Primitive.hoverBackground, hoverBackground );
-		Pres menuItem = new Bin( childElem.alignHExpand().pad( padX, padY ) ).alignHExpand();
+		Pres menuItem = new Bin( childElem.pad( padX, padY ) ).alignHExpand();
 
 		DPBin element = (DPBin)menuItem.present( ctx, menuItemStyle );
 		
