@@ -940,16 +940,16 @@ def badIndentedBlock(ctx, style, indentElement, lines, dedentElement):
 	
 	block = Column( [ indentElement ]  +  lines  +  [ dedentElement ] )
 
-	return Row( [ rectStyle.applyTo( Box( blockIndentation, 0.0 ).alignVExpand() ), block ] ).present( ctx, style )
+	return Row( [ rectStyle.applyTo( Box( blockIndentation, 0.0 ).alignVExpand() ), block ] ).alignHPack().present( ctx, style )
 
 def statementLine(statement):
 	segment = Segment( statement )
 	newLine = Whitespace( '\n' )
-	return Paragraph( [ segment, newLine ] )
+	return Paragraph( [ segment, newLine ] ).alignHPack()
 
 def specialFormStatementLine(statement):
 	segment = Segment( statement )
-	return Paragraph( [ segment ] )
+	return Paragraph( [ segment ] ).alignHPack()
 
 
 

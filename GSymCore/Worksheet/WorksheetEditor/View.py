@@ -123,7 +123,7 @@ def _worksheetContextMenuFactory(element, menu):
 	model = element.getFragmentContext().getModel()
 
 	refreshButton = Button.buttonWithLabel( 'Refresh', _onRefresh )
-	worksheetControls = ControlsRow( [ refreshButton ] )
+	worksheetControls = ControlsRow( [ refreshButton.alignHPack() ] )
 	menu.add( SectionColumn( [ SectionTitle( 'Worksheet' ), worksheetControls ] ).alignHExpand() )
 	return True
 
@@ -228,15 +228,17 @@ class WorksheetEditor (GSymViewObjectDispatch):
 		deleteButton = Button( Image.systemIcon( 'delete' ), _onDeleteButton )
 		
 		headerBox = _pythonCodeHeaderStyle.applyTo( Bin(
-		        StyleSheet.instance.withAttr( Primitive.rowSpacing, 20.0 ).applyTo( Row( [ StaticText( 'Python code' ).alignHExpand(), styleOptionMenu, deleteButton.alignVCentre() ] ) ).alignHExpand().pad( 2.0, 2.0 ) ) )
+		        StyleSheet.instance.withAttr( Primitive.rowSpacing, 20.0 ).applyTo( Row( [
+		                Row( [ Label( 'Python code' ) ] ).alignHLeft(),
+		                Row( [ styleOptionMenu, deleteButton.alignVCentre() ] ).alignHRight() ] ) ).pad( 2.0, 2.0 ) ) )
 		
-		boxContents = [ headerBox.alignHExpand() ]
-		boxContents.append( _pythonCodeBorderStyle.applyTo( Border( codeView.alignHExpand() ).alignHExpand() ) )
+		boxContents = [ headerBox ]
+		boxContents.append( _pythonCodeBorderStyle.applyTo( Border( codeView ) ) )
 		if executionResultView is not None:
-			boxContents.append( executionResultView.alignHExpand() )
+			boxContents.append( executionResultView )
 		box = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( Column( boxContents ) )
 		
-		p = _pythonCodeEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
+		p = _pythonCodeEditorBorderStyle.applyTo( Border( box ).alignHExpand() )
 
 		
 		p = StructuralItem( PythonCodeNodeEventListener.instance, node.getModel(), p )
@@ -274,14 +276,16 @@ class WorksheetEditor (GSymViewObjectDispatch):
 		locationEditor = TextEntry( node.getLocation(), _LocationEntryListener() )
 		
 		headerBox = _quoteLocationHeaderStyle.applyTo( Bin(
-		        StyleSheet.instance.withAttr( Primitive.rowSpacing, 20.0 ).applyTo( Row( 
-		                [ StaticText( 'Location: ' ), locationEditor, HiddenContent( '' ).alignHExpand(), styleOptionMenu, deleteButton.alignVCentre() ] ) ).alignHExpand().pad( 2.0, 2.0 ) ) )
+		        StyleSheet.instance.withAttr( Primitive.rowSpacing, 20.0 ).applyTo( Row( [
+		                Row( [ Label( 'Location: ' ) ] ).alignHPack(),
+		                locationEditor.alignHExpand(),
+		                Row( [ styleOptionMenu, deleteButton.alignVCentre() ] ).alignHRight() ] ) ).pad( 2.0, 2.0 ) ) )
 		
-		boxContents = [ headerBox.alignHExpand() ]
-		boxContents.append( _quoteLocationBorderStyle.applyTo( Border( targetView.alignHExpand() ).alignHExpand() ) )
+		boxContents = [ headerBox ]
+		boxContents.append( _quoteLocationBorderStyle.applyTo( Border( targetView ) ) )
 		box = StyleSheet.instance.withAttr( Primitive.columnSpacing, 5.0 ).applyTo( Column( boxContents ) )
 		
-		p = _quoteLocationEditorBorderStyle.applyTo( Border( box.alignHExpand() ).alignHExpand() )
+		p = _quoteLocationEditorBorderStyle.applyTo( Border( box ).alignHExpand() )
 
 		
 		p = StructuralItem( QuoteLocationNodeEventListener.instance, node.getModel(), p )

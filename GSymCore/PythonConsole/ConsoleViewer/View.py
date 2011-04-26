@@ -148,7 +148,7 @@ class ConsoleView (GSymViewObjectDispatch):
 		                  _bannerHelpTextStyle.applyTo( Label( ' - execute and evaluate, ' ) ),
 		                  _bannerHelpKeyTextStyle.applyTo( Label( 'Ctrl+Shift+Enter' ) ),
 		                  _bannerHelpTextStyle.applyTo( Label( ' - execute only' ) ) ] )
-		bannerText = Column( bannerVersionText + [ helpText ] )
+		bannerText = Column( bannerVersionText + [ helpText ] ).alignHPack()
 		
 		banner = _bannerBorder.surround( bannerText )
 		
@@ -169,9 +169,9 @@ class ConsoleView (GSymViewObjectDispatch):
 		
 		if len( blocks ) > 0:
 			blockList = _consoleBlockListStyle.applyTo( Column( blocks ) ).alignHExpand()
-			return _consoleStyle.applyTo( Column( [ banner.alignHExpand(), blockList.alignHExpand(), dropPromptView, m.alignHExpand() ] ) ).alignHExpand()
+			return _consoleStyle.applyTo( Column( [ banner, blockList, dropPromptView, m ] ) ).alignHExpand().alignVRefY()
 		else:
-			return _consoleStyle.applyTo( Column( [ banner.alignHExpand(), dropPromptView, m.alignVTop().alignHExpand() ] ) ).alignHExpand()
+			return _consoleStyle.applyTo( Column( [ banner, dropPromptView, m.alignVTop() ] ) ).alignHExpand().alignVRefY()
 		
 
 		

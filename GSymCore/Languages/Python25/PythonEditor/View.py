@@ -415,7 +415,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			lineViews = [ statementLine( blankLine() ) ]
 		else:
 			lineViews = SREInnerFragment.map( suite, PRECEDENCE_NONE, EditMode.EDIT )
-		s = suiteView( lineViews )
+		s = suiteView( lineViews ).alignHPack().alignVRefY()
 		_inlineObject_dropDest = ObjectDndHandler.DropDest( FragmentView.FragmentModel, _onDrop_inlineObject )
 		s = s.withDropDest( _inlineObject_dropDest )
 		s = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditListener( suite ), self._topLevel ], suite, s )
@@ -431,7 +431,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 			lineViews = [ statementLine( blankLine() ) ]
 		else:
 			lineViews = SREInnerFragment.map( suite, PRECEDENCE_NONE, EditMode.EDIT )
-		s = suiteView( lineViews )
+		s = suiteView( lineViews ).alignHPack().alignVRefY()
 		_inlineObject_dropDest = ObjectDndHandler.DropDest( FragmentView.FragmentModel, _onDrop_inlineObject )
 		s = s.withDropDest( _inlineObject_dropDest )
 		s = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditListener( suite ), self._topLevel ], suite, s )
@@ -449,7 +449,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		else:
 			exprView = SREInnerFragment( expr, PRECEDENCE_NONE, EditMode.DISPLAY )
 			seg = Segment( exprView )
-		e = Paragraph( [ seg ] )
+		e = Paragraph( [ seg ] ).alignHPack().alignVRefY()
 		_inlineObject_dropDest = ObjectDndHandler.DropDest( FragmentView.FragmentModel, _onDrop_inlineObject )
 		e = e.withDropDest( _inlineObject_dropDest )
 		e = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._exprOuter, self._exprTopLevel ],  model,  e )

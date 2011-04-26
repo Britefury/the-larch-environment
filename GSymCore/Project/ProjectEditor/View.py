@@ -338,18 +338,18 @@ class ProjectView (GSymViewObjectDispatch):
 		# Project contents
 		items = InnerFragment.map( project[:], inheritedState )
 
-		nameElement = _projectIndexNameStyle.applyTo( StaticText( 'Project' ) )
+		nameElement = _projectIndexNameStyle.applyTo( Label( 'Project' ) )
 		nameBox = _itemHoverHighlightStyle.applyTo( nameElement.alignVCentre() )
 		nameBox = nameBox.withContextMenuInteractor( _projectIndexContextMenuFactory )
 		nameBox = nameBox.withDropDest( _projectIndexDropDest )
 
-		itemsBox = Column( items )
+		itemsBox = Column( items ).alignHExpand()
 
-		contentsView = Column( [ nameBox, itemsBox.padX( _packageContentsIndentation, 0.0 ).alignHExpand() ] )
+		contentsView = Column( [ nameBox.alignHExpand(), itemsBox.padX( _packageContentsIndentation, 0.0 ).alignHExpand() ] )
 
 
 		# Project index box
-		projectIndex = Column( [ indexHeader, contentsView.alignHExpand() ] )
+		projectIndex = Column( [ indexHeader, contentsView ] )
 
 
 		# The page

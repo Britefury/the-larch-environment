@@ -249,10 +249,8 @@ public class IncrementalView extends IncrementalTree implements Presentable
 			refresh();
 			
 			FragmentView rootView = (FragmentView)getRootIncrementalTreeNode();
-			DPElement fragmentElement = rootView.getRefreshedFragmentElement();
+			rootElement = rootView.getRefreshedFragmentElement();
 			
-			rootElement = new Column( new Object[] { fragmentElement } ).present( ctx, style );
-
 			return rootElement;
 		}
 	}
@@ -282,6 +280,7 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	private ChangeHistory changeHistory;
 	
 	private RootPres rootPres;
+	private Pres viewPres;
 	
 	protected Log log;
 	
@@ -320,6 +319,7 @@ public class IncrementalView extends IncrementalTree implements Presentable
 		setElementChangeListener( new NodeElementChangeListenerDiff() );
 		
 		rootPres = new RootPres();
+		viewPres = new Column( new Pres[] { new Region( rootPres, getRootPerspective().getClipboardHandler() ) } );
 	}
 	
 	public IncrementalView(Subject subject, ProjectiveBrowserContext browserContext)
@@ -358,7 +358,7 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	
 	public Pres getViewPres()
 	{
-		return new Region( rootPres, getRootPerspective().getClipboardHandler() );
+		return viewPres;
 	}
 	
 	

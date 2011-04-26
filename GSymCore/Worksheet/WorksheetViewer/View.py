@@ -64,8 +64,8 @@ def _worksheetContextMenuFactory(element, menu):
 	model = element.getFragmentContext().getModel()
 
 	refreshButton = Button.buttonWithLabel( 'Refresh', _onRefresh )
-	worksheetControls = ControlsRow( [ refreshButton ] )
-	menu.add( SectionColumn( [ SectionTitle( 'Worksheet' ), worksheetControls ] ).alignHExpand() )
+	worksheetControls = ControlsRow( [ refreshButton.alignHPack() ] )
+	menu.add( SectionColumn( [ SectionTitle( 'Worksheet' ), worksheetControls ] ) )
 	return True
 
 
@@ -167,7 +167,7 @@ class WorksheetViewer (GSymViewObjectDispatch):
 		else:
 			headerBox = _quoteLocationHeaderStyle.applyTo( Bin(
 				StyleSheet.instance.withAttr( Primitive.rowSpacing, 20.0 ).applyTo( Row(
-			                [ StaticText( 'Location: ' ).alignHExpand(), StaticText( node.getLocation() ) ] ) ).alignHExpand().pad( 2.0, 2.0 ) ) )
+			                [ Label( 'Location: ' ).alignHExpand(), Label( node.getLocation() ) ] ) ).alignHExpand().pad( 2.0, 2.0 ) ) )
 			
 			boxContents = [ headerBox.alignHExpand() ]
 			boxContents.append( _quoteLocationBorderStyle.applyTo( Border( targetView.alignHExpand() ).alignHExpand() ) )
