@@ -125,7 +125,7 @@ public class IncrementalView extends IncrementalTree implements Presentable
 
 		public Object createNodeResult(IncrementalTreeNode incrementalNode, Object model)
 		{
-			view.profile_startPython();
+			view.profile_startPresBuild();
 
 			// Create the node context
 			FragmentView fragmentView = (FragmentView)incrementalNode;
@@ -155,8 +155,8 @@ public class IncrementalView extends IncrementalTree implements Presentable
 				}
 			}
 			
-			view.profile_stopPython();
-			
+			view.profile_stopPresBuild();
+			view.profile_startPresRealise();
 			Object nodeResult;
 			
 			try
@@ -182,6 +182,7 @@ public class IncrementalView extends IncrementalTree implements Presentable
 				}
 			}
 			
+			view.profile_stopPresRealise();
 			return nodeResult;
 		}
 
@@ -266,10 +267,11 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	
 	
 	private boolean bProfilingEnabled = false;
-	private ProfileTimer pythonTimer = new ProfileTimer();
-	private ProfileTimer javaTimer = new ProfileTimer();
-	private ProfileTimer contentChangeTimer = new ProfileTimer();
-	private ProfileTimer updateNodeElementTimer = new ProfileTimer();
+	private ProfileTimer viewTimer = new ProfileTimer();
+	private ProfileTimer presBuildTimer = new ProfileTimer();
+	private ProfileTimer presRealiseTimer = new ProfileTimer();
+	private ProfileTimer handleContentChangeTimer = new ProfileTimer();
+	private ProfileTimer commitFragmentElementTimer = new ProfileTimer();
 	
 	
 	
@@ -409,14 +411,14 @@ public class IncrementalView extends IncrementalTree implements Presentable
 		}
 
 		
-		profile_startJava();
+		profile_startView();
 		// <<< PROFILING
 		
 		super.performRefresh();
 		stateStoreToLoad = null;
 		
 		// >>> PROFILING
-		profile_stopJava();
+		profile_stopView();
 	
 	
 		if ( ENABLE_PROFILING )
@@ -426,9 +428,11 @@ public class IncrementalView extends IncrementalTree implements Presentable
 			ProfileTimer.shutdownProfiling();
 			double deltaT = ( t2 - t1 )  *  1.0e-9;
 			System.out.println( "DocView: REFRESH VIEW TIME = " + deltaT );
-			System.out.println( "DocView: REFRESH VIEW PROFILE: JAVA TIME = " + getJavaTime() +
-					", PYTHON TIME = " + getPythonTime() + ", CONTENT CHANGE TIME = " + getContentChangeTime() +
-					", UPDATE NODE ELEMENT TIME = " + getUpdateNodeElementTime() );
+			System.out.println( "DocView: REFRESH VIEW PROFILE -- view: " + getViewTime() +
+					",  pres build: " + getPresBuildTime() +
+					",  pres realise: " + getPresRealiseTime() +
+					",  handle content change: " + getHandleContentChangeTime() +
+					",  commit fragment element: " + getCommitFragmentElementTime() );
 		}
 		
 		if ( ENABLE_DISPLAY_TREESIZES )
@@ -460,71 +464,88 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	
 	
 	
-	public void profile_startPython()
+	public void profile_startPresBuild()
 	{
 		if ( bProfilingEnabled )
 		{
-			pythonTimer.start();
+			presBuildTimer.start();
 		}
 	}
 	
-	public void profile_stopPython()
+	public void profile_stopPresBuild()
 	{
 		if ( bProfilingEnabled )
 		{
-			pythonTimer.stop();
+			presBuildTimer.stop();
 		}
 	}
 
 	
-	public void profile_startJava()
+	public void profile_startPresRealise()
 	{
 		if ( bProfilingEnabled )
 		{
-			javaTimer.start();
+			presRealiseTimer.start();
 		}
 	}
 	
-	public void profile_stopJava()
+	public void profile_stopPresRealise()
 	{
 		if ( bProfilingEnabled )
 		{
-			javaTimer.stop();
+			presRealiseTimer.stop();
+		}
+	}
+
+	
+	public void profile_startView()
+	{
+		if ( bProfilingEnabled )
+		{
+			viewTimer.start();
+		}
+	}
+	
+	public void profile_stopView()
+	{
+		if ( bProfilingEnabled )
+		{
+			viewTimer.stop();
 		}
 	}
 	
 	
-	public void profile_startContentChange()
+	public void profile_startHandleContentChange()
 	{
 		if ( bProfilingEnabled )
 		{
-			contentChangeTimer.start();
+			handleContentChangeTimer.start();
 		}
 	}
 	
-	public void profile_stopContentChange()
+	public void profile_stopHandleContentChange()
 	{
 		if ( bProfilingEnabled )
 		{
-			contentChangeTimer.stop();
+			handleContentChangeTimer.stop();
 		}
 	}
 	
 	
 	
-	public void profile_startUpdateNodeElement()
+	public void profile_startCommitFragmentElement()
 	{
 		if ( bProfilingEnabled )
 		{
-			updateNodeElementTimer.start();
+			commitFragmentElementTimer.start();
 		}
 	}
 	
-	public void profile_stopUpdateNodeElement()
+	public void profile_stopCommitFragmentElement()
 	{
 		if ( bProfilingEnabled )
 		{
-			updateNodeElementTimer.stop();
+			commitFragmentElementTimer.stop();
 		}
 	}
 	
@@ -534,10 +555,11 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	public void beginProfiling()
 	{
 		bProfilingEnabled = true;
-		pythonTimer.reset();
-		javaTimer.reset();
-		contentChangeTimer.reset();
-		updateNodeElementTimer.reset();
+		presBuildTimer.reset();
+		presRealiseTimer.reset();
+		viewTimer.reset();
+		handleContentChangeTimer.reset();
+		commitFragmentElementTimer.reset();
 	}
 
 	public void endProfiling()
@@ -545,24 +567,29 @@ public class IncrementalView extends IncrementalTree implements Presentable
 		bProfilingEnabled = false;
 	}
 	
-	public double getPythonTime()
+	public double getPresBuildTime()
 	{
-		return pythonTimer.getTime();
+		return presBuildTimer.getTime();
 	}
 
-	public double getJavaTime()
+	public double getPresRealiseTime()
 	{
-		return javaTimer.getTime();
+		return presRealiseTimer.getTime();
 	}
 
-	public double getContentChangeTime()
+	public double getViewTime()
 	{
-		return contentChangeTimer.getTime();
+		return viewTimer.getTime();
+	}
+
+	public double getHandleContentChangeTime()
+	{
+		return handleContentChangeTimer.getTime();
 	}
 	
-	public double getUpdateNodeElementTime()
+	public double getCommitFragmentElementTime()
 	{
-		return updateNodeElementTimer.getTime();
+		return commitFragmentElementTimer.getTime();
 	}
 
 	
@@ -580,9 +607,9 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	{
 		if ( elementChangeListener != null )
 		{
-			profile_startContentChange();
+			profile_startHandleContentChange();
 			elementChangeListener.elementChangeFrom( (FragmentView)node, (DPElement)result );
-			profile_stopContentChange();
+			profile_stopHandleContentChange();
 		}
 	}
 
@@ -590,9 +617,9 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	{
 		if ( elementChangeListener != null )
 		{
-			profile_startContentChange();
+			profile_startHandleContentChange();
 			elementChangeListener.elementChangeTo( (FragmentView)node, (DPElement)result );
-			profile_stopContentChange();
+			profile_stopHandleContentChange();
 		}
 	}
 	
