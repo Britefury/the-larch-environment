@@ -9,6 +9,8 @@ package BritefuryJ.DocPresent.Input;
 
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.Stack;
 
 import BritefuryJ.DocPresent.PresentationComponent;
@@ -24,6 +26,12 @@ import BritefuryJ.Utils.PriorityList;
 
 public class Pointer extends PointerInterface
 {
+	protected interface ElementUnrealiseListener
+	{
+		public void notifyPointerElementUnrealised(Pointer pointer, PointerInputElement element);
+	}
+	
+	
 	private static int TARGET_CLICK_INTERACTOR_PRIORITY = -2000;
 	private static int NAVIGATION_INTERACTOR_PRIORITY = -1000;
 	private static int DND_INTERACTOR_PRIORITY = -500;
@@ -44,6 +52,11 @@ public class Pointer extends PointerInterface
 	protected PresentationComponent component;
 	protected PriorityList<PointerInteractor> interactors = new PriorityList<PointerInteractor>();
 	
+	// Introduced as an optimisation -- elements become 'unrealised' VERY FREQUENTLY, so iterating through all interactors and notifying them is very inefficient.
+	// Keeping a map of listener lists allows certain interactors to register an interest in ONLY the elements that they want to know about.
+	protected IdentityHashMap<PointerInputElement, ArrayList<ElementUnrealiseListener>> unrealiseListeners = new IdentityHashMap<PointerInputElement, ArrayList<ElementUnrealiseListener>>();
+	
+
 	public Pointer(InputTable inputTable, PresentationComponent.RootElement rootElement, DndController dndController, PresentationComponent component)
 	{
 		this.inputTable = inputTable;
@@ -141,12 +154,46 @@ public class Pointer extends PointerInterface
 	
 	
 	
+	// Introduced as an optimisation -- elements become 'unrealised' VERY FREQUENTLY, so iterating through all interactors and notifying them is very inefficient.
+	// Keeping a map of listener lists allows certain interactors to register an interest in ONLY the elements that they want to know about.
+	protected void addUnrealiseListener(PointerInputElement element, ElementUnrealiseListener listener)
+	{
+		ArrayList<ElementUnrealiseListener> listeners = unrealiseListeners.get( element );
+		if ( listeners == null )
+		{
+			listeners = new ArrayList<ElementUnrealiseListener>();
+			unrealiseListeners.put( element, listeners );
+		}
+		listeners.add( listener );
+	}
 	
+	protected void removeUnrealiseListener(PointerInputElement element, ElementUnrealiseListener listener)
+	{
+		ArrayList<ElementUnrealiseListener> listeners = unrealiseListeners.get( element );
+		if ( listeners != null )
+		{
+			listeners.remove( listener );
+			if ( listeners.isEmpty() )
+			{
+				unrealiseListeners.remove( element );
+			}
+		}
+	}
+	
+	
+	// Introduced as an optimisation -- elements become 'unrealised' VERY FREQUENTLY, so iterating through all interactors and notifying them is very inefficient.
+	// Keeping a map of listener lists allows certain interactors to register an interest in ONLY the elements that they want to know about.
 	protected void onElementUnrealised(PointerInputElement element)
 	{
-		for (PointerInteractor interactor: interactors)
+		ArrayList<ElementUnrealiseListener> listeners = unrealiseListeners.get( element );
+		if ( listeners != null )
 		{
-			interactor.elementUnrealised( this, element );
+			ArrayList<ElementUnrealiseListener> listenersCopy = new ArrayList<ElementUnrealiseListener>();
+			listenersCopy.addAll( listeners );
+			for (ElementUnrealiseListener listener: listenersCopy)
+			{
+				listener.notifyPointerElementUnrealised( this, element );
+			}
 		}
 	}
 
