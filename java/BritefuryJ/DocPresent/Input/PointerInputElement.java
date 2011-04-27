@@ -56,6 +56,13 @@ public abstract class PointerInputElement
 		{
 			return dndHandler.isDest( element );
 		}
+		
+		
+		@Override
+		public String toString()
+		{
+			return "DndTarget( element=" + element + ", dndHandler=" + dndHandler + " )";
+		}
 	}
 	
 	

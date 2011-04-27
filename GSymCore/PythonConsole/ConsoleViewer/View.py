@@ -105,10 +105,10 @@ _consoleStyle = StyleSheet.instance.withAttr( Primitive.columnSpacing, 8.0 )
 
 def _dropPrompt(varNameTextEntryListener):
 	textEntry = TextEntry( 'var', varNameTextEntryListener )
-	prompt = StaticText( 'Place node into a variable named: ' )
+	prompt = Label( 'Place node into a variable named: ' )
 	textEntry.grabCaretOnRealise()
 	textEntry.selectAllOnRealise()
-	return _dropPromptStyle.applyTo( Border( Paragraph( [ prompt.alignVCentre(), textEntry.alignVCentre() ] ) ) )
+	return _dropPromptStyle.applyTo( Border( Paragraph( [ prompt.alignVCentre(), textEntry.alignVCentre() ] ).alignHPack() ) )
 	
 
 
@@ -216,7 +216,7 @@ class ConsoleView (GSymViewObjectDispatch):
 		return Paragraph( [ _varAssignMsgStyle.applyTo( StaticText( 'Variable ' ) ), LineBreak(),
 		                    varNameView, LineBreak(),
 		                    _varAssignMsgStyle.applyTo( StaticText( ' was assigned a ' ) ), LineBreak(),
-		                    typeNameView ] )
+		                    typeNameView ] ).alignHPack()
 
 
 

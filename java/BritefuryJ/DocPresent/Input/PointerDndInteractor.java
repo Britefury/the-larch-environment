@@ -32,8 +32,7 @@ public class PointerDndInteractor extends PointerInteractor
 	
 	public boolean buttonDown(Pointer pointer, PointerButtonEvent event)
 	{
-		dndButtonDownEvent( event );
-		return false;
+		return dndButtonDownEvent( event );
 	}
 
 	public boolean buttonUp(Pointer pointer, PointerButtonEvent event)
@@ -55,7 +54,7 @@ public class PointerDndInteractor extends PointerInteractor
 
 
 
-	private void dndButtonDownEvent(PointerButtonEvent event)
+	private boolean dndButtonDownEvent(PointerButtonEvent event)
 	{
 		if ( dndController != null )
 		{
@@ -64,11 +63,25 @@ public class PointerDndInteractor extends PointerInteractor
 			{
 				if ( target.isSource() )
 				{
-					dndDrop = new DndDropLocal( target.getElement(), event.getButton() );
-					return;
+					PointerInputElement sourceElement = target.getElement();
+					DndHandler dndHandler = target.getDndHandler();
+					int button = event.getButton();
+				
+					int requestedAction = dndHandler.getSourceRequestedAction( sourceElement, event.getPointer(), button );
+					if ( requestedAction != TransferHandler.NONE )
+					{
+						int requestedAspect = dndHandler.getSourceRequestedAspect( sourceElement, event.getPointer(), button );
+						if ( requestedAspect != DndHandler.ASPECT_NONE )
+						{
+							dndDrop = new DndDropLocal( sourceElement, button );
+							return true;
+						}
+					}
 				}
 			}
 		}
+		
+		return false;
 	}
 	
 	private boolean dndDragEvent(PointerMotionEvent event, MouseEvent mouseEvent)

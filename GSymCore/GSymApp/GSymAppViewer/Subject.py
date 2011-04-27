@@ -27,9 +27,10 @@ class _ConsoleListSubject (object):
 		self._enclosingSubject = enclosingSubject
 		
 		
-	def __getitem__(self, key):
+	def __resolve__(self, key):
+		index = int( key[1:] )
 		for console in self._appState.getConsoles():
-			if console.getIndex() == key:
+			if console.getIndex() == index:
 				return Console.newConsoleSubject( console.getConsole(), self._enclosingSubject )
 		raise KeyError, 'No console at index %s'  %  ( key, )
 		
