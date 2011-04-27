@@ -90,6 +90,11 @@ public abstract class IncrementalMonitor
 			}
 		}
 	}
+	
+	public boolean hasListeners()
+	{
+		return listeners != null  ?  !listeners.isEmpty()  :  false;
+	}
 
 	
 	public IncrementalOwner getOwner()
@@ -109,6 +114,11 @@ public abstract class IncrementalMonitor
 		}
 	}
 	
+	public boolean hasOutgoingDependencies()
+	{
+		return outgoingDependencies != null  ?  !outgoingDependencies.isEmpty()  :  false;
+	}
+	
 	
 	
 	
@@ -123,7 +133,7 @@ public abstract class IncrementalMonitor
 		}
 	}
 	
-	public void onChanged()
+	protected void notifyChanged()
 	{
 		if ( incrementalState != IncrementalState.REFRESH_REQUIRED )
 		{
@@ -134,7 +144,7 @@ public abstract class IncrementalMonitor
 			{
 				for (IncrementalFunctionMonitor dep: outgoingDependencies.keySet())
 				{
-					dep.onChanged();
+					dep.notifyChanged();
 				}
 			}
 		}

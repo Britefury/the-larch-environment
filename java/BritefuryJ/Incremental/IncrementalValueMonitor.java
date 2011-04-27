@@ -26,4 +26,9 @@ public class IncrementalValueMonitor extends IncrementalMonitor
 		notifyRefreshed();
 		onValueAccess();
 	}
+	
+	public void onChanged()
+	{
+		notifyChanged();
+	}
 }

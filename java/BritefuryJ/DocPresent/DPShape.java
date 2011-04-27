@@ -218,35 +218,50 @@ public class DPShape extends DPContentLeaf
 		if ( points.length >= 3 )
 		{
 			Path2D.Double path = new Path2D.Double();
-			
-			if ( bClosed )
+			if ( filletSize > 0.0 )
 			{
-				int last = points.length - 1;
-				Point2 fillet0[] = filletCorner( points[last], points[0], points[1], filletSize );
-				path.moveTo( fillet0[0].x, fillet0[0].y );
-				path.quadTo( fillet0[1].x, fillet0[1].y, fillet0[2].x, fillet0[2].y );
-				for (int i = 1; i < last; i++)
+				if ( bClosed )
 				{
-					Point2 fillet[] = filletCorner( points[i-1], points[i], points[i+1], filletSize );
-					path.lineTo( fillet[0].x, fillet[0].y );
-					path.quadTo( fillet[1].x, fillet[1].y, fillet[2].x, fillet[2].y );
+					int last = points.length - 1;
+					Point2 fillet0[] = filletCorner( points[last], points[0], points[1], filletSize );
+					path.moveTo( fillet0[0].x, fillet0[0].y );
+					path.quadTo( fillet0[1].x, fillet0[1].y, fillet0[2].x, fillet0[2].y );
+					for (int i = 1; i < last; i++)
+					{
+						Point2 fillet[] = filletCorner( points[i-1], points[i], points[i+1], filletSize );
+						path.lineTo( fillet[0].x, fillet[0].y );
+						path.quadTo( fillet[1].x, fillet[1].y, fillet[2].x, fillet[2].y );
+					}
+					Point2 filletLast[] = filletCorner( points[last-1], points[last], points[0], filletSize );
+					path.lineTo( filletLast[0].x, filletLast[0].y );
+					path.quadTo( filletLast[1].x, filletLast[1].y, filletLast[2].x, filletLast[2].y );
+					path.lineTo( fillet0[0].x, fillet0[0].y );
 				}
-				Point2 filletLast[] = filletCorner( points[last-1], points[last], points[0], filletSize );
-				path.lineTo( filletLast[0].x, filletLast[0].y );
-				path.quadTo( filletLast[1].x, filletLast[1].y, filletLast[2].x, filletLast[2].y );
-				path.lineTo( fillet0[0].x, fillet0[0].y );
+				else
+				{
+					int last = points.length - 1;
+					path.moveTo( points[0].x, points[0].y );
+					for (int i = 1; i < last; i++)
+					{
+						Point2 fillet[] = filletCorner( points[i-1], points[i], points[i+1], filletSize );
+						path.lineTo( fillet[0].x, fillet[0].y );
+						path.quadTo( fillet[1].x, fillet[1].y, fillet[2].x, fillet[2].y );
+					}
+					path.lineTo( points[last].x, points[last].y );
+				}
 			}
 			else
 			{
-				int last = points.length - 1;
 				path.moveTo( points[0].x, points[0].y );
-				for (int i = 1; i < last; i++)
+				for (int i = 1; i < points.length; i++)
 				{
-					Point2 fillet[] = filletCorner( points[i-1], points[i], points[i+1], filletSize );
-					path.lineTo( fillet[0].x, fillet[0].y );
-					path.quadTo( fillet[1].x, fillet[1].y, fillet[2].x, fillet[2].y );
+					path.lineTo( points[i].x, points[i].y );
 				}
-				path.lineTo( points[last].x, points[last].y );
+
+				if ( bClosed )
+				{
+					path.lineTo( points[0].x, points[0].y );
+				}
 			}
 			return path;
 		}
