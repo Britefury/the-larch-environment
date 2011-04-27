@@ -63,7 +63,7 @@ public class Controls
 
 	
 	public static final InheritedAttributeNonNull dropDownExpanderHeaderContentsSpacing = new InheritedAttributeNonNull( controlsNamespace, "dropDownExpanderHeaderContentsSpacing", Double.class, 5.0 );
-	public static final InheritedAttributeNonNull dropDownExpanderHeaderArrowSize = new InheritedAttributeNonNull( controlsNamespace, "dropDownExpanderHeaderArrowSize", Double.class, 16.0 );
+	public static final InheritedAttributeNonNull dropDownExpanderHeaderArrowSize = new InheritedAttributeNonNull( controlsNamespace, "dropDownExpanderHeaderArrowSize", Double.class, 14.0 );
 	public static final InheritedAttributeNonNull dropDownExpanderHeaderArrowPainter = new InheritedAttributeNonNull( controlsNamespace, "dropDownExpanderHeaderArrowPainter", Painter.class,
 			new FilledOutlinePainter( new Color( 0.7f, 0.85f, 0.7f ), new Color( 0.0f, 0.25f, 0.0f ), new BasicStroke( 1.0f ) ) );
 	public static final InheritedAttributeNonNull dropDownExpanderPadding = new InheritedAttributeNonNull( controlsNamespace, "dropDownExpanderPadding", Double.class, 21.0 );

@@ -246,7 +246,7 @@ class ProjectView (GSymViewObjectDispatch):
 				project.pythonPackageName = text
 
 			def onCancel(self, textEntry, originalText):
-				pythonPackageCell.setLiteralValue( pythonPackageNameLabel )
+				pythonPackageCell.setLiteralValue( pythonPackageNameLabelBox )
 
 
 		class _PythonPackageNameInteractor (ClickElementInteractor):

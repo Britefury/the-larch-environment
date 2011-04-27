@@ -59,6 +59,11 @@ public class IncrementalFunctionMonitor extends IncrementalMonitor
 		onValueAccess();
 	}
 	
+	public void onChanged()
+	{
+		notifyChanged();
+	}
+	
 	public Object onRefreshBegin()
 	{
 		if ( cycleLock )

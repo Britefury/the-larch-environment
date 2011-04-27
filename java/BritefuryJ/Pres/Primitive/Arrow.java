@@ -29,9 +29,9 @@ public class Arrow extends Pres
 		Path2D.Double arrowShape = DPShape.filletedPath( new Point2[] { a, b, c }, true, filletSize );
 		//Path2D.Double arrowShape = DPShape.path( new Point2[] { a, b, c }, true );
 		
-		Path2D.Double up = arrowShape;
+		Path2D.Double down = arrowShape;
+		Path2D.Double up = (Path2D.Double)arrowShape.clone();
 		Path2D.Double right = (Path2D.Double)arrowShape.clone();
-		Path2D.Double down = (Path2D.Double)arrowShape.clone();
 		Path2D.Double left = (Path2D.Double)arrowShape.clone();
 		
 		right.transform( AffineTransform.getQuadrantRotateInstance( 3 ) );
@@ -47,7 +47,7 @@ public class Arrow extends Pres
 	}
 	
 	
-	private static Path2D.Double unitArrowPaths[] = createArrowPaths( 1.0, 0.25 );
+	private static Path2D.Double unitArrowPaths[] = createArrowPaths( 1.0, 0.18 );
 	private static Path2D.Double unitLeft = unitArrowPaths[0];
 	private static Path2D.Double unitRight = unitArrowPaths[1];
 	private static Path2D.Double unitUp = unitArrowPaths[2];
