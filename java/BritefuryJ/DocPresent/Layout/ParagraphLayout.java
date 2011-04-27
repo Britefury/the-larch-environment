@@ -116,7 +116,7 @@ public class ParagraphLayout
 		private void allocateX(double spacing, double allocation)
 		{
 			HorizontalLayout.computeRequisitionX( lineReqBox, children, spacing );
-			lineAllocBox.allocationX = allocation - lineIndentation;
+			LAllocHelper.allocateChildXAligned( lineAllocBox, lineReqBox, HAlignment.PACK, 0.0, allocation - lineIndentation );
 			HorizontalLayout.allocateX( lineReqBox, children, lineAllocBox, childrenAlloc, childAllocationFlags, spacing );
 			for (LAllocBoxInterface childAlloc: childrenAlloc)
 			{
