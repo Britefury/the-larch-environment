@@ -427,8 +427,8 @@ public class IncrementalView extends IncrementalTree implements Presentable
 			endProfiling();
 			ProfileTimer.shutdownProfiling();
 			double deltaT = ( t2 - t1 )  *  1.0e-9;
-			System.out.println( "DocView: REFRESH VIEW TIME = " + deltaT );
-			System.out.println( "DocView: REFRESH VIEW PROFILE -- view: " + getViewTime() +
+			System.out.println( "IncrementalView: REFRESH TIME = " + deltaT );
+			System.out.println( "IncrementalView: PROFILE -- view: " + getViewTime() +
 					",  pres build: " + getPresBuildTime() +
 					",  pres realise: " + getPresRealiseTime() +
 					",  handle content change: " + getHandleContentChangeTime() +

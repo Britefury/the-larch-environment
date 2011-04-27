@@ -8,7 +8,6 @@
 from BritefuryJ.IncrementalView import ViewFragmentFunction
 
 from Britefury.Dispatch.Dispatch import DispatchError
-from Britefury.Dispatch.MethodDispatch import methodDispatch, methodDispatchAndGetName
 from Britefury.Dispatch.DMObjectNodeMethodDispatch import dmObjectNodeMethodDispatch, dmObjectNodeMethodDispatchAndGetName
 from Britefury.Dispatch.ObjectMethodDispatch import objectMethodDispatch, objectMethodDispatchAndGetName
 
@@ -17,19 +16,6 @@ import time
 
 			
 		
-		
-class GSymViewListNodeDispatch (ViewFragmentFunction):
-	def createViewFragment(self, xs, ctx, state):
-		element = None
-		element, name = methodDispatchAndGetName( self, xs, ctx, state )
-		element = element.setDebugName( name )
-		return element
-	
-		
-
-	
-
-
 		
 class GSymViewObjectNodeDispatch (ViewFragmentFunction):
 	__dispatch_num_args__ = 2
