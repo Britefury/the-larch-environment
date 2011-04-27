@@ -228,7 +228,7 @@ class AppView (GSymViewObjectDispatch):
 	def AppConsole(self, fragment, state, node):
 		index = node.getIndex()
 		name = 'Console %d'  %  ( index, )
-		location = fragment.getSubjectContext()['location'] + '.consoles[%d]'  %  ( index, )
+		location = fragment.getSubjectContext()['location'] + '.consoles.c%d'  %  ( index, )
 		consoleLink = Hyperlink( name, location ).padX( 0.0, _appDocRightPadding )
 	
 		return GridRow( [ consoleLink ] )
