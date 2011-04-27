@@ -77,8 +77,4 @@ public class PointerInteractor
 	{
 		return false;
 	}
-	
-	public void elementUnrealised(Pointer pointer, PointerInputElement element)
-	{
-	}
 }

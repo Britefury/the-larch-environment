@@ -15,7 +15,7 @@ import BritefuryJ.DocPresent.Interactor.HoverElementInteractor;
 import BritefuryJ.DocPresent.Interactor.MotionElementInteractor;
 import BritefuryJ.Math.Point2;
 
-public class PointerMotionInteractor extends PointerInteractor
+public class PointerMotionInteractor extends PointerInteractor implements Pointer.ElementUnrealiseListener
 {
 	private Stack<PointerInputElement> elementsUnderPointer = new Stack<PointerInputElement>();
 	private PointerInputElement rootElement;
@@ -32,30 +32,25 @@ public class PointerMotionInteractor extends PointerInteractor
 
 	public boolean motion(Pointer pointer, PointerMotionEvent event, MouseEvent mouseEvent)
 	{
-		handleMotion( event );
+		handleMotion( pointer, event );
 		return true;
 	}
 	
 	public boolean enter(Pointer pointer, PointerMotionEvent event)
 	{
-		handleEnter( rootElement, event );
+		handleEnter( pointer, rootElement, event );
 		return true;
 	}
 
 	public boolean leave(Pointer pointer, PointerMotionEvent event)
 	{
-		handleLeave( 0, event );
+		handleLeave( pointer, 0, event );
 		return true;
 	}
 
-	public void elementUnrealised(Pointer pointer, PointerInputElement element)
-	{
-		handleUnrealise( pointer, element );
-	}
-	
 	
 
-	public void handleMotion(PointerMotionEvent event)
+	public void handleMotion(Pointer pointer, PointerMotionEvent event)
 	{
 		PointerInputElement elementUnderPointer = rootElement;
 		
@@ -74,22 +69,23 @@ public class PointerMotionInteractor extends PointerInteractor
 			}
 			else
 			{
-				handleLeave( index, event );
-				handleEnter( elementUnderPointer, event );
+				handleLeave( pointer, index, event );
+				handleEnter( pointer, elementUnderPointer, event );
 				return;
 			}
 			
 			index++;
 		}
 		
-		handleEnter( elementUnderPointer, event );
+		handleEnter( pointer, elementUnderPointer, event );
 	}
 
-	private void handleEnter(PointerInputElement element, PointerMotionEvent event)
+	private void handleEnter(Pointer pointer, PointerInputElement element, PointerMotionEvent event)
 	{
 		while ( element != null )
 		{
 			elementsUnderPointer.push( element );
+			pointer.addUnrealiseListener( element, this );
 			sendEnterEvent( element, event );
 			
 			
@@ -106,7 +102,7 @@ public class PointerMotionInteractor extends PointerInteractor
 		}
 	}
 	
-	private void handleLeave(int index, PointerMotionEvent event)
+	private void handleLeave(Pointer pointer, int index, PointerMotionEvent event)
 	{
 		Stack<PointerMotionEvent> events = new Stack<PointerMotionEvent>();
 		
@@ -122,6 +118,7 @@ public class PointerMotionInteractor extends PointerInteractor
 			while ( elementsUnderPointer.size() > index )
 			{
 				PointerInputElement element = elementsUnderPointer.pop();
+				pointer.addUnrealiseListener( element, this );
 				event = events.pop();
 				
 				sendLeaveEvent( element, event );
@@ -134,7 +131,7 @@ public class PointerMotionInteractor extends PointerInteractor
 		}
 	}
 
-	private void handleUnrealise(Pointer pointer, PointerInputElement element)
+	public void notifyPointerElementUnrealised(Pointer pointer, PointerInputElement element)
 	{
 		int index = 0;
 		PointerMotionEvent event = new PointerMotionEvent( pointer, PointerMotionEvent.Action.LEAVE );
@@ -142,7 +139,7 @@ public class PointerMotionInteractor extends PointerInteractor
 		{
 			if ( e == element )
 			{
-				handleLeave( index, event );
+				handleLeave( pointer, index, event );
 				return;
 			}
 			else

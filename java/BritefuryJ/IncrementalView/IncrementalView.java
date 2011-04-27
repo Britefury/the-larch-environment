@@ -378,7 +378,7 @@ public class IncrementalView extends IncrementalTree implements Presentable
 			
 			// Get the persistent state, if any, and store it
 			FragmentView viewNode = (FragmentView)node;
-			PersistentStateTable stateTable = viewNode.getValidPersistentStateTable();
+			PersistentStateTable stateTable = viewNode.getPersistentStateTable();
 			if ( stateTable != null )
 			{
 				store.addPersistentState( node.getModel(), stateTable );
