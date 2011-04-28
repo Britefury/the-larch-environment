@@ -11,8 +11,8 @@ import java.util.ArrayList;
 
 import BritefuryJ.AttributeTable.SimpleAttributeTable;
 import BritefuryJ.DefaultPerspective.DefaultPerspective;
-import BritefuryJ.DefaultPerspective.PrimitivePresenter;
 import BritefuryJ.DefaultPerspective.Presentable;
+import BritefuryJ.DefaultPerspective.PrimitivePresenter;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.DPFragment;
 import BritefuryJ.DocPresent.FragmentContext;
@@ -23,8 +23,6 @@ import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
-import BritefuryJ.Incremental.IncrementalFunctionMonitor;
-import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 import BritefuryJ.ObjectPresentation.PresentationStateListener;
 import BritefuryJ.ObjectPresentation.PresentationStateListenerList;
@@ -300,7 +298,6 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 	}
 
 
-
 	
 	private DPElement presentInnerFragment(Object model, AbstractPerspective perspective, SimpleAttributeTable subjectContext, StyleValues style, SimpleAttributeTable inheritedState)
 	{
@@ -322,16 +319,8 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 		
 		// Register the parent <-> child relationship before refreshing the node, so that the relationship is 'available' during (re-computation)
 		registerIncrementalNodeRelationship( incrementalNode );
-		
-		// Block access tracking to prevent the contents of this node being dependent upon the child node being refreshed,
-		// and refresh the view node
-		// Refreshing the child node will ensure that when its contents are inserted into outer elements, its full element tree
-		// is up to date and available.
-		// Blocking the access tracking prevents an inner node from causing all parent/grandparent/etc nodes from requiring a
-		// refresh.
-		IncrementalFunctionMonitor currentComputation = IncrementalMonitor.blockAccessTracking();
-		incrementalNode.refresh();
-		IncrementalMonitor.unblockAccessTracking( currentComputation );
+
+		// We don't need to refresh the child node - this is done by incremental view after the fragments contents have been computed
 		
 		return incrementalNode.getFragmentElement();
 	}
