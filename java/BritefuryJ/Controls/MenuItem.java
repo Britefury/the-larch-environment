@@ -56,11 +56,11 @@ public class MenuItem extends ControlPres
 			{
 				if ( direction == SubmenuPopupDirection.RIGHT )
 				{
-					subMenu.popupToRightOf( menuItem.getElement(), ctx, style );
+					subMenu.popupToRightOf( menuItem.getElement(), style );
 				}
 				else
 				{
-					subMenu.popupBelow( menuItem.getElement(), ctx, style );
+					subMenu.popupBelow( menuItem.getElement(), style );
 				}
 			}
 		}

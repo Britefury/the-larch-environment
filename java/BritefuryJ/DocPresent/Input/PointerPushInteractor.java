@@ -12,13 +12,13 @@ import java.util.Stack;
 import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
-import BritefuryJ.DocPresent.Interactor.PressAndHoldElementInteractor;
+import BritefuryJ.DocPresent.Interactor.PushElementInteractor;
 
-public class PointerPressAndHoldInteractor extends PointerInteractor
+public class PointerPushInteractor extends PointerInteractor
 {
 	private PointerInputElement pressedElement;
 	private AffineTransform pressedElementRootToLocalXform;
-	private PressAndHoldElementInteractor pressedInteractor;
+	private PushElementInteractor pressedInteractor;
 	private int pressedButton;
 	
 	
@@ -34,12 +34,12 @@ public class PointerPressAndHoldInteractor extends PointerInteractor
 			
 			if ( element.isPointerInputElementRealised() )
 			{
-				Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( PressAndHoldElementInteractor.class );
+				Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( PushElementInteractor.class );
 				if ( interactors != null )
 				{
 					for (AbstractElementInteractor interactor: interactors )
 					{
-						PressAndHoldElementInteractor pressInt = (PressAndHoldElementInteractor)interactor;
+						PushElementInteractor pressInt = (PushElementInteractor)interactor;
 						boolean bHandled = pressInt.buttonPress( element, elementSpaceEvent );
 						if ( bHandled )
 						{

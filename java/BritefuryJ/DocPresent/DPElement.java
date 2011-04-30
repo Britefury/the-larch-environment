@@ -46,8 +46,7 @@ import BritefuryJ.DefaultPerspective.Presentable;
 import BritefuryJ.DocPresent.Border.FilledBorder;
 import BritefuryJ.DocPresent.Border.SolidBorder;
 import BritefuryJ.DocPresent.Caret.Caret;
-import BritefuryJ.DocPresent.Event.AbstractPointerButtonEvent;
-import BritefuryJ.DocPresent.Event.PointerButtonClickedEvent;
+import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.DndHandler;
@@ -56,9 +55,9 @@ import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Input.PointerInterface;
 import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
 import BritefuryJ.DocPresent.Interactor.CaretCrossingElementInteractor;
-import BritefuryJ.DocPresent.Interactor.ClickElementInteractor;
 import BritefuryJ.DocPresent.Interactor.ContextMenuElementInteractor;
 import BritefuryJ.DocPresent.Interactor.HoverElementInteractor;
+import BritefuryJ.DocPresent.Interactor.PushElementInteractor;
 import BritefuryJ.DocPresent.Interactor.RealiseElementInteractor;
 import BritefuryJ.DocPresent.Layout.ElementAlignment;
 import BritefuryJ.DocPresent.Layout.HAlignment;
@@ -81,10 +80,14 @@ import BritefuryJ.Math.Xform2;
 import BritefuryJ.ObjectPresentation.PresentationStateListenerList;
 import BritefuryJ.Pres.InnerFragment;
 import BritefuryJ.Pres.Pres;
+import BritefuryJ.Pres.ObjectPres.HorizontalField;
+import BritefuryJ.Pres.ObjectPres.ObjectBoxWithFields;
 import BritefuryJ.Pres.Primitive.Border;
+import BritefuryJ.Pres.Primitive.Column;
 import BritefuryJ.Pres.Primitive.Label;
 import BritefuryJ.Pres.Primitive.Primitive;
 import BritefuryJ.Pres.Primitive.Row;
+import BritefuryJ.Pres.Primitive.Spacer;
 import BritefuryJ.Projection.Perspective;
 import BritefuryJ.StyleSheet.StyleSheet;
 
@@ -2987,26 +2990,39 @@ abstract public class DPElement extends PointerInputElement implements Presentab
 		}
 	};
 
-	private static ClickElementInteractor explorerHeaderInspectInteractor = new ClickElementInteractor()
+	private static PushElementInteractor explorerHeaderInspectInteractor = new PushElementInteractor()
 	{
 		@Override
-		public boolean testClickEvent(PointerInputElement element, AbstractPointerButtonEvent event)
+		public boolean buttonPress(PointerInputElement element, PointerButtonEvent event)
 		{
 			return event.getButton() == 1;
 		}
 
 		@Override
-		public boolean buttonClicked(PointerInputElement element, PointerButtonClickedEvent event)
+		public void buttonRelease(PointerInputElement element, PointerButtonEvent event)
 		{
 			DPElement el = (DPElement)element;
 			FragmentView fragment = (FragmentView)el.getFragmentContext();
 			DPElement model = (DPElement)fragment.getModel();
 
-			ElementStyleParams styleParams = model.getStyleParams();
-			Pres p = DefaultPerspective.instance.applyTo( styleParams );
+			Pres p = inspect( model );
 			p.popupAtMousePosition( el, true, true );
+		}
+		
+		
+		private Pres inspect(DPElement model)
+		{
+			ElementStyleParams styleParams = model.getStyleParams();
 			
-			return true;
+			ArrayList<Object> fields = new ArrayList<Object>();
+			fields.add( new HorizontalField( "H-Align", new Label( model.getHAlignment().toString() ) ) );
+			fields.add( new HorizontalField( "V-Align", new Label( model.getVAlignment().toString() ) ) );
+			
+			Pres state = new ObjectBoxWithFields( "State", fields );
+			
+			Pres inspector = new Column( new Object[] { styleParams, new Spacer( 2.0, 2.0 ), state } ).alignVRefY();
+			
+			return DefaultPerspective.instance.applyTo( inspector );
 		}
 	};
 

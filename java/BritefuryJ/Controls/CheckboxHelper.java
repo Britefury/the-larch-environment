@@ -16,7 +16,7 @@ import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementPainter;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
-import BritefuryJ.DocPresent.Interactor.PressAndHoldElementInteractor;
+import BritefuryJ.DocPresent.Interactor.PushElementInteractor;
 
 class CheckboxHelper
 {
@@ -61,7 +61,7 @@ class CheckboxHelper
 	}
 
 
-	protected static class CheckboxCheckInteractor implements PressAndHoldElementInteractor
+	protected static class CheckboxCheckInteractor implements PushElementInteractor
 	{
 		private Checkbox.CheckboxControl checkbox;
 		

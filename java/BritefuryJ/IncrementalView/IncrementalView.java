@@ -280,6 +280,7 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	private AbstractPerspective rootPerspective;
 	private SimpleAttributeTable subjectContext;
 	private ChangeHistory changeHistory;
+	private Subject subject;
 	
 	private RootPres rootPres;
 	private Pres viewPres;
@@ -299,6 +300,8 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	public IncrementalView(Subject subject, ProjectiveBrowserContext browserContext, PersistentStateStore persistentState)
 	{
 		super( subject.getFocus(), DuplicatePolicy.ALLOW_DUPLICATES );
+		
+		this.subject = subject;
 		
 		this.rootPerspective = subject.getPerspective();
 		if ( this.rootPerspective == null )
@@ -665,6 +668,11 @@ public class IncrementalView extends IncrementalTree implements Presentable
 	public Log getLog()
 	{
 		return log;
+	}
+	
+	public Subject getSubject()
+	{
+		return subject;
 	}
 	
 	

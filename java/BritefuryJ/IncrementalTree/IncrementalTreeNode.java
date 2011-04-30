@@ -81,8 +81,9 @@ public abstract class IncrementalTreeNode implements IncrementalMonitorListener,
 	
 	protected final static int FLAG_SUBTREE_REFRESH_REQUIRED = 0x1;
 	protected final static int FLAG_NODE_REFRESH_REQUIRED = 0x2;
+	protected final static int FLAG_NODE_REFRESH_IN_PROGRESS = 0x4;
 	
-	protected final static int FLAGS_INCREMENTALTREENODE_END = 0x4;
+	protected final static int FLAGS_INCREMENTALTREENODE_END = 0x8;
 
 	
 	
@@ -206,6 +207,8 @@ public abstract class IncrementalTreeNode implements IncrementalMonitorListener,
 	
 	private void refreshSubtree()
 	{
+		setFlag( FLAG_NODE_REFRESH_IN_PROGRESS );
+		
 		Object result = getResultNoRefresh();
 		incrementalTree.onResultChangeFrom( this, result );
 
@@ -239,6 +242,8 @@ public abstract class IncrementalTreeNode implements IncrementalMonitorListener,
 		
 		incrementalTree.onResultChangeTo( this, result );
 		clearFlag( FLAG_NODE_REFRESH_REQUIRED );
+
+		clearFlag( FLAG_NODE_REFRESH_IN_PROGRESS );
 	}
 	
 	

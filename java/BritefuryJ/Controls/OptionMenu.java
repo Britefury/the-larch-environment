@@ -139,7 +139,7 @@ public class OptionMenu extends ControlPres
 		
 		private void displayDropdown()
 		{
-			choiceMenu.popupBelow( element, ctx, style.withAttr( Controls.bClosePopupOnActivate, true ) );
+			choiceMenu.popupBelow( element, style.withAttr( Controls.bClosePopupOnActivate, true ) );
 		}
 		
 		
