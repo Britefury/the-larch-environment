@@ -23,6 +23,8 @@ import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
 import BritefuryJ.DocPresent.PersistentState.PersistentState;
 import BritefuryJ.DocPresent.PersistentState.PersistentStateTable;
+import BritefuryJ.Incremental.IncrementalFunctionMonitor;
+import BritefuryJ.Incremental.IncrementalMonitor;
 import BritefuryJ.IncrementalTree.IncrementalTreeNode;
 import BritefuryJ.ObjectPresentation.PresentationStateListener;
 import BritefuryJ.ObjectPresentation.PresentationStateListenerList;
@@ -272,6 +274,7 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 
 
 
+	@Override
 	public ProjectiveBrowserContext getBrowserContext()
 	{
 		return getView().getBrowserContext();
@@ -321,6 +324,21 @@ public class FragmentView extends IncrementalTreeNode implements FragmentContext
 		registerIncrementalNodeRelationship( incrementalNode );
 
 		// We don't need to refresh the child node - this is done by incremental view after the fragments contents have been computed
+
+		// If a refresh is in progress, we do not need to refresh the child node, as all child nodes will be refreshed by IncrementalTreeNode.refreshSubtree()
+		// Otherwise, we are constructing a presentation of a child node, outside the normal process, in which case, a refresh is required.
+		if ( !testFlag( FLAG_NODE_REFRESH_IN_PROGRESS ) )
+		{
+			// Block access tracking to prevent the contents of this node being dependent upon the child node being refreshed,
+			// and refresh the view node
+			// Refreshing the child node will ensure that when its contents are inserted into outer elements, its full element tree
+			// is up to date and available.
+			// Blocking the access tracking prevents an inner node from causing all parent/grandparent/etc nodes from requiring a
+			// refresh.
+			IncrementalFunctionMonitor currentComputation = IncrementalMonitor.blockAccessTracking();
+			incrementalNode.refresh();
+			IncrementalMonitor.unblockAccessTracking( currentComputation );
+		}
 		
 		return incrementalNode.getFragmentElement();
 	}

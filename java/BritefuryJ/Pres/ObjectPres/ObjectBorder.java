@@ -29,6 +29,6 @@ public class ObjectBorder extends Pres
 	{
 		StyleSheet borderStyle = ObjectPresStyle.objectBorderStyle.get( style );
 		DPElement childElem = child.present( ctx, ObjectPresStyle.useObjectBorderAttrs( style ) );
-		return borderStyle.applyTo( new Border( childElem ) ).present( ctx, style );
+		return borderStyle.applyTo( new Border( childElem ).alignVRefY() ).present( ctx, style );
 	}
 }

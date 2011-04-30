@@ -96,6 +96,6 @@ public class TracedParseResult extends ParseResult implements Presentable
 			fields = new Pres[] { status, trace.alignHExpand().alignVExpand() };
 		}
 		
-		return parseResultStyle.applyTo( new ObjectBoxWithFields( "BritefuryJ.Parser.ParseResult", fields ) ).alignHExpand();
+		return parseResultStyle.applyTo( new ObjectBoxWithFields( "BritefuryJ.Parser.ParseResult", fields ).alignHExpand() );
 	}
 }

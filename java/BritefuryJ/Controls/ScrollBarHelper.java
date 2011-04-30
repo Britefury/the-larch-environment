@@ -15,7 +15,7 @@ import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Event.PointerMotionEvent;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 import BritefuryJ.DocPresent.Interactor.DragElementInteractor;
-import BritefuryJ.DocPresent.Interactor.PressAndHoldElementInteractor;
+import BritefuryJ.DocPresent.Interactor.PushElementInteractor;
 import BritefuryJ.DocPresent.Painter.Painter;
 import BritefuryJ.DocPresent.Util.Range;
 import BritefuryJ.Math.AABox2;
@@ -31,7 +31,7 @@ class ScrollBarHelper
 	};
 	
 	
-	protected static class ScrollBarArrowInteractor implements PressAndHoldElementInteractor
+	protected static class ScrollBarArrowInteractor implements PushElementInteractor
 	{
 		public enum Direction
 		{
@@ -77,7 +77,7 @@ class ScrollBarHelper
 		}
 	}
 
-	protected static class ScrollBarDragBarInteractor implements PressAndHoldElementInteractor, DragElementInteractor, ElementPainter, Range.RangeListener
+	protected static class ScrollBarDragBarInteractor implements PushElementInteractor, DragElementInteractor, ElementPainter, Range.RangeListener
 	{
 		private DPElement element;
 		private Axis axis;

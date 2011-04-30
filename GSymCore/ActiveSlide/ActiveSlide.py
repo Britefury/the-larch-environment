@@ -28,7 +28,7 @@ class _State (object):
 
 
 class _SlidePage (object):
-	class _Interactor (PressAndHoldElementInteractor):
+	class _Interactor (PushElementInteractor):
 		def __init__(self, page):
 			self._page = page
 		

@@ -7,10 +7,12 @@
 package BritefuryJ.DocPresent;
 
 import BritefuryJ.Pres.PresentationContext;
+import BritefuryJ.Projection.ProjectiveBrowserContext;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public interface FragmentContext
 {
 	public PresentationContext createPresentationContext();
 	public StyleValues getStyleValues();
+	public ProjectiveBrowserContext getBrowserContext();
 }

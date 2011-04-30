@@ -20,11 +20,51 @@ import BritefuryJ.DocPresent.Interactor.AbstractElementInteractor;
 import BritefuryJ.DocPresent.Interactor.ContextMenuElementInteractor;
 import BritefuryJ.DocPresent.Layout.HAlignment;
 import BritefuryJ.DocPresent.Layout.VAlignment;
+import BritefuryJ.IncrementalView.FragmentView;
+import BritefuryJ.IncrementalView.IncrementalView;
 import BritefuryJ.Math.Point2;
+import BritefuryJ.Projection.AbstractPerspective;
+import BritefuryJ.Projection.ProjectiveBrowserContext;
+import BritefuryJ.Projection.Subject;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public abstract class Pres
 {
+	private static class PopupSubject extends Subject
+	{
+		private Object focus;
+		private AbstractPerspective perspective;
+		
+		
+		public PopupSubject(Subject enclosingSubject, Object focus, AbstractPerspective perspective)
+		{
+			super( enclosingSubject );
+			
+			this.focus = focus;
+			this.perspective = perspective;
+		}
+
+		@Override
+		public Object getFocus()
+		{
+			return focus;
+		}
+		
+		@Override
+		public AbstractPerspective getPerspective()
+		{
+			return perspective;
+		}
+
+		@Override
+		public String getTitle()
+		{
+			return "Popup";
+		}
+	};
+	
+	
+	
 	public DPElement present()
 	{
 		return present( PresentationContext.defaultCtx, StyleValues.instance );
@@ -319,72 +359,102 @@ public abstract class Pres
 		popupElement.popupBelow( element, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
-	public void popupOver(DPElement element, Point2 targetLocalPos, PresentationContext ctx, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
-	{
-		DPElement popupElement = present( ctx, style );
-		popupElement.popupOver( element, targetLocalPos, bCloseOnLoseFocus, bRequestFocus );
-	}
-	
 	public void popupAtMousePosition(DPElement element, PresentationContext ctx, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
 		DPElement popupElement = present( ctx, style );
 		element.getRootElement().createPopupAtMousePosition( popupElement, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
+	
+	private DPElement createPopupElement(DPElement contextElement, StyleValues style)
+	{
+		PresentationContext presCtx = PresentationContext.defaultCtx;
+		FragmentContext fragCtx = contextElement.getFragmentContext();
+		Subject enclosingSubject = null;
+		ProjectiveBrowserContext browserContext = null;
+		
+		if ( fragCtx != null )
+		{
+			presCtx = fragCtx.createPresentationContext();
+			if ( style == null )
+			{
+				style = fragCtx.getStyleValues();
+			}
+			browserContext = fragCtx.getBrowserContext();
+			
+			if ( fragCtx instanceof FragmentView )
+			{
+				FragmentView fragView = (FragmentView)fragCtx;
+				enclosingSubject = fragView.getView().getSubject();
+			}
+		}
+		
+		PopupSubject popupSubject = new PopupSubject( enclosingSubject, this, presCtx.getPerspective() );
+		IncrementalView popupView = new IncrementalView( popupSubject, browserContext );
+		
+		Pres viewPres = popupView.getViewPres();
+		
+		if ( style == null )
+		{
+			style = StyleValues.instance;
+		}
 
+		return viewPres.present( presCtx, style );
+	}
+	
+	private DPElement createPopupElement(DPElement contextElement)
+	{
+		return createPopupElement( contextElement, null );
+	}
 	
 	
 	
 	public void popupToRightOf(DPElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		FragmentContext ctx = element.getFragmentContext();
-		if ( ctx != null )
-		{
-			popupToRightOf( element, ctx.createPresentationContext(), ctx.getStyleValues(), bCloseOnLoseFocus, bRequestFocus );
-		}
-		else
-		{
-			popupToRightOf( element, PresentationContext.defaultCtx, StyleValues.instance, bCloseOnLoseFocus, bRequestFocus );
-		}
+		DPElement popupElement = createPopupElement( element );
+		popupElement.popupToRightOf( element, bCloseOnLoseFocus, bRequestFocus );
+	}
+	
+	public void popupToRightOf(DPElement element, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		DPElement popupElement = createPopupElement( element, style );
+		popupElement.popupToRightOf( element, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
 	public void popupBelow(DPElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		FragmentContext ctx = element.getFragmentContext();
-		if ( ctx != null )
-		{
-			popupBelow( element, ctx.createPresentationContext(), ctx.getStyleValues(), bCloseOnLoseFocus, bRequestFocus );
-		}
-		else
-		{
-			popupBelow( element, PresentationContext.defaultCtx, StyleValues.instance, bCloseOnLoseFocus, bRequestFocus );
-		}
+		DPElement popupElement = createPopupElement( element );
+		popupElement.popupBelow( element, bCloseOnLoseFocus, bRequestFocus );
+	}
+	
+	public void popupBelow(DPElement element, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		DPElement popupElement = createPopupElement( element, style );
+		popupElement.popupBelow( element, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
 	public void popupOver(DPElement element, Point2 targetLocalPos, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		FragmentContext ctx = element.getFragmentContext();
-		if ( ctx != null )
-		{
-			popupOver( element, targetLocalPos, ctx.createPresentationContext(), ctx.getStyleValues(), bCloseOnLoseFocus, bRequestFocus );
-		}
-		else
-		{
-			popupOver( element, targetLocalPos, PresentationContext.defaultCtx, StyleValues.instance, bCloseOnLoseFocus, bRequestFocus );
-		}
+		DPElement popupElement = createPopupElement( element );
+		popupElement.popupOver( element, targetLocalPos, bCloseOnLoseFocus, bRequestFocus );
+	}
+	
+	public void popupOver(DPElement element, Point2 targetLocalPos, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		DPElement popupElement = createPopupElement( element, style );
+		popupElement.popupOver( element, targetLocalPos, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
 	public void popupAtMousePosition(DPElement element, boolean bCloseOnLoseFocus, boolean bRequestFocus)
 	{
-		FragmentContext ctx = element.getFragmentContext();
-		if ( ctx != null )
-		{
-			popupAtMousePosition( element, ctx.createPresentationContext(), ctx.getStyleValues(), bCloseOnLoseFocus, bRequestFocus );
-		}
-		else
-		{
-			popupAtMousePosition( element, PresentationContext.defaultCtx, StyleValues.instance, bCloseOnLoseFocus, bRequestFocus );
-		}
+		DPElement popupElement = createPopupElement( element );
+		element.getRootElement().createPopupAtMousePosition( popupElement, bCloseOnLoseFocus, bRequestFocus );
+	}
+	
+	public void popupAtMousePosition(DPElement element, StyleValues style, boolean bCloseOnLoseFocus, boolean bRequestFocus)
+	{
+		DPElement popupElement = createPopupElement( element, style );
+		element.getRootElement().createPopupAtMousePosition( popupElement, bCloseOnLoseFocus, bRequestFocus );
 	}
 	
 	

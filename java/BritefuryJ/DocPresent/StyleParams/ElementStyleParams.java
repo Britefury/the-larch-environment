@@ -71,7 +71,7 @@ public class ElementStyleParams implements Presentable
 	
 	protected void buildFieldList(List<Object> fields)
 	{
-		fields.add( new HorizontalField( "H-Algin", new Label( hAlign.toString() ) ) );
+		fields.add( new HorizontalField( "H-Align", new Label( hAlign.toString() ) ) );
 		fields.add( new HorizontalField( "V-Align", new Label( vAlign.toString() ) ) );
 		fields.add( new HorizontalField( "Background", Pres.coerceNonNull( background ) ) );
 		fields.add( new HorizontalField( "Hover background", Pres.coerceNonNull( hoverBackground ) ) );

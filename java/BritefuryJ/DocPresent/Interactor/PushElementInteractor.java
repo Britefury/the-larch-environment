@@ -9,7 +9,7 @@ package BritefuryJ.DocPresent.Interactor;
 import BritefuryJ.DocPresent.Event.PointerButtonEvent;
 import BritefuryJ.DocPresent.Input.PointerInputElement;
 
-public interface PressAndHoldElementInteractor extends AbstractElementInteractor
+public interface PushElementInteractor extends AbstractElementInteractor
 {
 	public boolean buttonPress(PointerInputElement element, PointerButtonEvent event);
 	public void buttonRelease(PointerInputElement element, PointerButtonEvent event);

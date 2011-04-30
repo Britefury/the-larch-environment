@@ -72,7 +72,7 @@ public class Pointer extends PointerInterface
 		interactors.add( NAVIGATION_INTERACTOR_PRIORITY, new PointerNavigationInteractor() );
 		interactors.add( DND_INTERACTOR_PRIORITY, new PointerDndInteractor( rootElement, dndController ) );
 		interactors.add( CONTEXTMENU_INTERACTOR_PRIORITY, new PointerContextMenuInteractor() );
-		interactors.add( PRESSANDHOLD_INTERACTOR_PRIORITY, new PointerPressAndHoldInteractor() );
+		interactors.add( PRESSANDHOLD_INTERACTOR_PRIORITY, new PointerPushInteractor() );
 		interactors.add( CLICK_INTERACTOR_PRIORITY, new PointerClickInteractor() );
 		interactors.add( DRAG_INTERACTOR_PRIORITY, new PointerDragInteractor() );
 		interactors.add( MOTION_INTERACTOR_PRIORITY, new PointerMotionInteractor( rootElement ) );
