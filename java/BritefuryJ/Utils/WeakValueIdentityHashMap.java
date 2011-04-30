@@ -94,31 +94,50 @@ public class WeakValueIdentityHashMap <Key, Value> implements Map<Key, Value>
 	private class ValueIterator implements Iterator<Value>
 	{
 		private Iterator<WeakValue<Value, Key>> iter;
+		private WeakValue<Value, Key> next = null;
 		
 		private ValueIterator(Iterator<WeakValue<Value, Key>> iter)
 		{
 			this.iter = iter;
+			next = fetchNext();
 		}
 		
 		@Override
 		public boolean hasNext()
 		{
-			cleanup();
-			return iter.hasNext();
+			if ( next == null )
+			{
+				next = fetchNext();
+			}
+			return next != null;
 		}
 
 		@Override
 		public Value next()
 		{
-			cleanup();
-			return iter.next().get();
+			Value v = (Value)next.get();
+			next = fetchNext();
+			return v;
 		}
 
 		@Override
 		public void remove()
 		{
-			cleanup();
-			iter.remove();
+			throw new UnsupportedOperationException();
+		}
+
+	
+		private WeakValue<Value, Key> fetchNext()
+		{
+			while ( iter.hasNext() )
+			{
+				WeakValue<Value, Key> w = iter.next();
+				if ( w.get() != null )
+				{
+					return w;
+				}
+			}
+			return null;
 		}
 	}
 	

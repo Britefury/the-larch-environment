@@ -33,32 +33,51 @@ public class WeakIdentityHashMap <Key, Value> implements Map<Key, Value>
 	private class KeyIterator implements Iterator<Key>
 	{
 		private Iterator<WeakIdKey> iter;
+		private WeakIdKey next = null;
 		
 		private KeyIterator(Iterator<WeakIdKey> iter)
 		{
 			this.iter = iter;
+			next = fetchNext();
 		}
 		
 		@Override
 		public boolean hasNext()
 		{
-			cleanup();
-			return iter.hasNext();
+			if ( next == null )
+			{
+				next = fetchNext();
+			}
+			return next != null;
 		}
 
 		@SuppressWarnings("unchecked")
 		@Override
 		public Key next()
 		{
-			cleanup();
-			return (Key)iter.next().get();
+			Key k = (Key)next.get();
+			next = fetchNext();
+			return k;
 		}
 
 		@Override
 		public void remove()
 		{
-			cleanup();
-			iter.remove();
+			throw new UnsupportedOperationException();
+		}
+
+	
+		private WeakIdKey fetchNext()
+		{
+			while ( iter.hasNext() )
+			{
+				WeakIdKey w = iter.next();
+				if ( w.get() != null )
+				{
+					return w;
+				}
+			}
+			return null;
 		}
 	}
 	

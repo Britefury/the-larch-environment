@@ -43,7 +43,7 @@ def _saveAs(lsubject):
 	
 _saveCommand = Command( CommandName( '&Save' ), _save )
 _saveAsCommand = Command( CommandName( '&Save &as' ), _saveAs )
-_projectCommands = CommandSet( [ _saveCommand, _saveAsCommand ] )
+_projectCommands = CommandSet( 'GSymCore.Project.Save', [ _saveCommand, _saveAsCommand ] )
 	
 
 

@@ -9,7 +9,7 @@ package BritefuryJ.Pres;
 import java.awt.datatransfer.DataFlavor;
 import java.util.List;
 
-import BritefuryJ.Command.CommandSet;
+import BritefuryJ.Command.CommandSetSource;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.DocPresent.ElementPainter;
 import BritefuryJ.DocPresent.ElementValueFunction;
@@ -259,9 +259,9 @@ public abstract class Pres
 	// Command set methods
 	//
 	
-	public AddCommandSet withCommandSet(CommandSet commandSet)
+	public AddCommandSets withCommands(CommandSetSource commandSet)
 	{
-		return new AddCommandSet( this, commandSet );
+		return new AddCommandSets( this, commandSet );
 	}
 	
 	
