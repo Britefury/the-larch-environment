@@ -6,19 +6,19 @@
 //##************************
 package BritefuryJ.Pres;
 
-import BritefuryJ.Command.CommandSet;
+import BritefuryJ.Command.CommandSetSource;
 import BritefuryJ.DocPresent.DPElement;
 import BritefuryJ.StyleSheet.StyleValues;
 
-public class AddCommandSet extends Pres
+public class AddCommandSets extends Pres
 {
-	private CommandSet commandSet;
+	private CommandSetSource commandSetSource;
 	private Pres child;
 	
 	
-	public AddCommandSet(Pres child, CommandSet commandSet)
+	public AddCommandSets(Pres child, CommandSetSource commandSetSource)
 	{
-		this.commandSet = commandSet;
+		this.commandSetSource = commandSetSource;
 		this.child = child;
 	}
 	
@@ -27,7 +27,7 @@ public class AddCommandSet extends Pres
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
 		DPElement element = child.present( ctx, style );
-		element.addElementInteractor( commandSet.getInteractor() );
+		element.addElementInteractor( commandSetSource.getInteractor() );
 		return element;
 	}
 }

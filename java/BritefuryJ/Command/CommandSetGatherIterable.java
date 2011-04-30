@@ -34,13 +34,13 @@ public class CommandSetGatherIterable implements Iterable<BoundCommandSet>
 			{
 				if ( element.isRealised() )
 				{
-					Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( CommandSet.CommandSetInteractor.class );
+					Iterable<AbstractElementInteractor> interactors = element.getElementInteractors( GatherCommandSetInteractor.class );
 					if ( interactors != null )
 					{
 						for (AbstractElementInteractor interactor: interactors )
 						{
-							CommandSet.CommandSetInteractor cmdInt = (CommandSet.CommandSetInteractor)interactor;
-							commandSets.push( cmdInt.getCommandSet( element ) );
+							GatherCommandSetInteractor cmdInt = (GatherCommandSetInteractor)interactor;
+							cmdInt.gatherCommandSets( element, commandSets );
 						}
 						
 						if ( !commandSets.isEmpty() )

@@ -49,6 +49,7 @@ from BritefuryJ.ModelAccess.DocModel import *
 
 from GSymCore.Languages.Python25 import Schema
 from GSymCore.Languages.Python25 import ExternalExpression
+from GSymCore.Languages.Python25 import PythonCommands
 
 
 from GSymCore.Languages.Python25.PythonEditor.Parser import Python25Grammar
@@ -413,6 +414,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		s = s.withDropDest( _inlineObject_dropDest )
 		s = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditListener( suite ), self._topLevel ], suite, s )
 		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
+		s = s.withCommands( PythonCommands.pythonCommands )
 		return s
 
 
@@ -429,6 +431,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		s = s.withDropDest( _inlineObject_dropDest )
 		s = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._makeSuiteEditListener( suite ), self._topLevel ], suite, s )
 		s = s.withContextMenuInteractor( _pythonModuleContextMenuFactory )
+		s = s.withCommands( PythonCommands.pythonCommands )
 		return s
 
 
@@ -447,6 +450,7 @@ class Python25View (GSymViewObjectNodeDispatch):
 		e = e.withDropDest( _inlineObject_dropDest )
 		e = EditableStructuralItem( PythonSyntaxRecognizingEditor.instance, [ self._exprOuter, self._exprTopLevel ],  model,  e )
 		e = e.withContextMenuInteractor( _pythonModuleContextMenuFactory )
+		e = e.withCommands( PythonCommands.pythonCommands )
 		return e
 
 

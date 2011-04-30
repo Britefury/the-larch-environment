@@ -6,40 +6,33 @@
 //##************************
 package BritefuryJ.Command;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import BritefuryJ.DocPresent.DPElement;
 
-public class CommandSet implements CommandSetSource
+public class CommandSetRegistry implements CommandSetSource
 {
-	protected class CommandSetInteractor implements GatherCommandSetInteractor
+	protected class CommandSetRegistryInteractor implements GatherCommandSetInteractor
 	{
 		@Override
 		public void gatherCommandSets(DPElement element, List<CommandSet> commandSets)
 		{
-			commandSets.add( CommandSet.this );
+			commandSets.addAll( nameToCmdSet.values() );
 		}
 	}
-	
+
 	
 	private String name;
-	protected ArrayList<Command> commands = new ArrayList<Command>();
-	private CommandSetInteractor interactor = new CommandSetInteractor();
+	private HashMap<String, CommandSet> nameToCmdSet = new HashMap<String, CommandSet>();
+	private CommandSetRegistryInteractor interactor = new CommandSetRegistryInteractor();
 	
 	
-	public CommandSet(String name, List<Command> commands)
+	
+	public CommandSetRegistry(String name)
 	{
 		this.name = name;
-		this.commands.addAll( commands );
 	}
-
-	public CommandSet(String name, Command command)
-	{
-		this.name = name;
-		this.commands.add( command );
-	}
-	
 	
 	
 	public String getName()
@@ -48,9 +41,9 @@ public class CommandSet implements CommandSetSource
 	}
 	
 	
-	public BoundCommandSet bindTo(Object binding)
+	public void registerCommandSet(CommandSet commandSet)
 	{
-		return new BoundCommandSet( this, binding );
+		nameToCmdSet.put( commandSet.getName(), commandSet );
 	}
 	
 	
