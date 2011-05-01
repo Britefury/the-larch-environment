@@ -7,7 +7,7 @@
 ##-*************************
 import sys
 
-print 'This is a view test - it is not executable; import it in gSym'
+print 'This is a view test - it is not executable; import it to test the functionality of the Python editor'
 
 sys.exit()
 

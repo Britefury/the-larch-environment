@@ -13,7 +13,7 @@ from BritefuryJ.DocPresent.Interactor import *
 from BritefuryJ.Editor.Sequential import StreamEditListener
 
 
-from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
+from Britefury.Kernel.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
 
 from GSymCore.Worksheet import Schema, ViewSchema
 from GSymCore.Worksheet.WorksheetEditor.SequentialEditor import WorksheetSequentialEditor

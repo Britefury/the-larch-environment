@@ -19,7 +19,7 @@ from javax.swing.filechooser import FileNameExtensionFilter
 
 from Britefury.Dispatch.ObjectMethodDispatch import ObjectDispatchMethod
 
-from Britefury.gSym.View.GSymView import GSymViewObjectDispatch
+from Britefury.Kernel.View.DispatchView import ObjectDispatchView
 
 
 from Britefury.Util.NodeUtil import *
@@ -129,7 +129,7 @@ def _worksheetContextMenuFactory(element, menu):
 
 
 
-class WorksheetEditor (GSymViewObjectDispatch):
+class WorksheetEditor (ObjectDispatchView):
 	@ObjectDispatchMethod( ViewSchema.WorksheetView )
 	def Worksheet(self, fragment, inheritedState, node):
 		bodyView = InnerFragment( node.getBody() )

@@ -10,7 +10,7 @@ from java.awt.event import KeyEvent
 from BritefuryJ.DocPresent.Interactor import KeyElementInteractor
 
 
-from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
+from Britefury.Kernel.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
 
 from GSymCore.Worksheet import Schema, ViewSchema
 from GSymCore.Worksheet.WorksheetEditor.NodeOperations import AddNodeOperation

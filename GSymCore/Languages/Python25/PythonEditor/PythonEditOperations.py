@@ -18,7 +18,7 @@ from java.util import List
 from java.awt.event import KeyEvent
 from java.awt.datatransfer import UnsupportedFlavorException, DataFlavor, StringSelection, Transferable
 
-from Britefury.Kernel.Abstract import abstractmethod
+from Britefury.Util.Abstract import abstractmethod
 
 from BritefuryJ.DocModel import DMList, DMObject, DMObjectInterface, DMNode
 

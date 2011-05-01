@@ -13,7 +13,7 @@ from java.util import List
 from java.awt.event import KeyEvent
 from java.awt import Color
 
-from Britefury.Kernel.Abstract import abstractmethod
+from Britefury.Util.Abstract import abstractmethod
 
 from BritefuryJ.DocModel import DMList, DMObject, DMObjectInterface
 
@@ -35,7 +35,7 @@ from BritefuryJ.Editor.SyntaxRecognizing import ParsingEditListener, PartialPars
 from Britefury.Util.NodeUtil import *
 
 
-from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
+from Britefury.Kernel.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
 
 
 

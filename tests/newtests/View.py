@@ -5,15 +5,15 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2007.
 ##-*************************
-from Britefury.gSym.View.gSymView import border, indent, text, hiddenText, whitespace, hbox, ahbox, vbox, paragraph, script, scriptLSuper, scriptLSub, scriptRSuper, scriptRSub, listView, contentListener, \
+from Britefury.Kernel.View.gSymView import border, indent, text, hiddenText, whitespace, hbox, ahbox, vbox, paragraph, script, scriptLSuper, scriptLSub, scriptRSuper, scriptRSub, listView, contentListener, \
      viewEval, mapViewEval, GSymView
-from Britefury.gSym.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
+from Britefury.Kernel.View.ListView import ParagraphListViewLayout, HorizontalListViewLayout, VerticalInlineListViewLayout, VerticalListViewLayout
 
-from Britefury.gSym.View.Interactor import keyEventMethod, accelEventMethod, textEventMethod, backspaceStartMethod, deleteEndMethod, Interactor
+from Britefury.Kernel.View.Interactor import keyEventMethod, accelEventMethod, textEventMethod, backspaceStartMethod, deleteEndMethod, Interactor
 
-from Britefury.gSym.View.EditOperations import replace, replaceWithRange, append, prepend, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
+from Britefury.Kernel.View.EditOperations import replace, replaceWithRange, append, prepend, insertBefore, insertRangeBefore, insertAfter, insertRangeAfter
 
-from Britefury.gSym.View.UnparsedText import UnparsedText
+from Britefury.Kernel.View.UnparsedText import UnparsedText
 
 
 from BritefuryJ.DocPresent.StyleParams import *

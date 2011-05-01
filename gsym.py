@@ -16,9 +16,9 @@ i18n.initialise()
 
 from BritefuryJ.DocModel import DMIOReader, DMNode
 
-from Britefury.gSym.gSymWorld import GSymWorld
-from Britefury.gSym.gSymDocument import GSymDocument
-from Britefury.gSymConfig import UserConfig
+from Britefury.Kernel.World import World
+from Britefury.Kernel.Document import Document
+from Britefury.Config import UserConfig
 
 from Britefury.MainApp.MainApp import MainApp
 
@@ -28,7 +28,7 @@ def main():
 	UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
 	UserConfig.userConfig.load()
 
-	world = GSymWorld()
+	world = World()
 	world.enableImportHooks()
 
 	if len( sys.argv ) > 1:

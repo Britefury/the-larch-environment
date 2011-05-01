@@ -9,4 +9,4 @@ import gettext
 
 
 def initialise():
-	gettext.install( 'gSym', 'locale' )
+	gettext.install( 'larch', 'locale' )

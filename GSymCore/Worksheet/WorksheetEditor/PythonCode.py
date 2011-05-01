@@ -8,7 +8,7 @@
 from BritefuryJ.DocPresent import *
 
 
-from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
+from Britefury.Kernel.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
 
 from GSymCore.Languages.Python25 import Python25
 

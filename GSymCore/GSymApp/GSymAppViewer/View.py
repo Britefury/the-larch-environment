@@ -21,8 +21,8 @@ from javax.swing.filechooser import FileNameExtensionFilter
 
 from Britefury.Dispatch.ObjectMethodDispatch import ObjectDispatchMethod
 
-from Britefury.gSym.View.GSymView import GSymViewObjectDispatch
-from Britefury.gSym.gSymDocument import GSymDocument
+from Britefury.Kernel.View.DispatchView import ObjectDispatchView
+from Britefury.Kernel.Document import Document
 
 
 from Britefury.Util.NodeUtil import *
@@ -109,7 +109,7 @@ def _contentsList(controls, contentsLists, title):
 						
 						
 						
-class AppView (GSymViewObjectDispatch):
+class AppView (ObjectDispatchView):
 	@ObjectDispatchMethod( Application.AppState )
 	def AppState(self, fragment, state, node):
 		def _onNewDoc(link, event):
@@ -144,7 +144,7 @@ class AppView (GSymViewObjectDispatch):
 			for filename in data:
 				filename = str( filename )
 				
-				document = GSymDocument.readFile( world, filename )
+				document = Document.readFile( world, filename )
 				node.registerOpenDocument( document, fragment.getSubjectContext()['location'].getLocationString() + '.documents' )
 			return True
 

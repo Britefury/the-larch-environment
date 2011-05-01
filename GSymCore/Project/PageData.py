@@ -17,7 +17,7 @@ from javax.swing.filechooser import FileNameExtensionFilter
 from BritefuryJ.Controls import *
 from BritefuryJ.ChangeHistory import Trackable
 
-from Britefury.Kernel.Abstract import abstractmethod
+from Britefury.Util.Abstract import abstractmethod
 
 from GSymCore.Project.ProjectPage import ProjectPage
 

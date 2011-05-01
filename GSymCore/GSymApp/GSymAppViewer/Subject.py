@@ -12,7 +12,7 @@ from BritefuryJ.AttributeTable import SimpleAttributeTable
 from BritefuryJ.DocPresent.Browser import Location
 
 from BritefuryJ.Projection import Subject
-from Britefury.gSym.gSymDocument import GSymDocument
+from Britefury.Kernel.Document import Document
 
 from GSymCore.PythonConsole import Console
 
@@ -73,7 +73,7 @@ class GSymAppSubject (Subject):
 	
 	
 	def loadDocument(self, filename):
-		document = GSymDocument.readFile( self._world, filename )
+		document = Document.readFile( self._world, filename )
 		if document is not None:
 			self._appState.registerOpenDocument( document, self._rootLocation.getLocationString() + '.documents' )
 			return document
