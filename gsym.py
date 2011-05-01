@@ -18,7 +18,7 @@ from BritefuryJ.DocModel import DMIOReader, DMNode
 
 from Britefury.Kernel.World import World
 from Britefury.Kernel.Document import Document
-from Britefury.Config import UserConfig
+from Britefury.Config import PathsConfigPage
 
 from Britefury.Windows.WindowManager import WindowManager
 
@@ -26,7 +26,7 @@ from Britefury.Windows.WindowManager import WindowManager
 
 def main():
 	UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
-	UserConfig.userConfig.load()
+	PathsConfigPage.initPathsConfig()
 
 	world = World()
 	world.enableImportHooks()
@@ -43,7 +43,7 @@ def main():
 				print 'Failed to load %s'  %  filename
 		
 	def _onClose(wm):
-		UserConfig.userConfig.save()
+		PathsConfigPage.savePathsConfig()
 	
 	wm = WindowManager( world )
 	wm.setCloseLastWindowListener( _onClose )

@@ -13,6 +13,7 @@ import BritefuryJ.Pres.Pres;
 import BritefuryJ.Pres.PresentationContext;
 import BritefuryJ.Pres.Primitive.Border;
 import BritefuryJ.Pres.Primitive.Row;
+import BritefuryJ.StyleSheet.StyleSheet;
 import BritefuryJ.StyleSheet.StyleValues;
 
 public class SplitLinkHeaderBar extends Pres
@@ -37,9 +38,11 @@ public class SplitLinkHeaderBar extends Pres
 	public DPElement present(PresentationContext ctx, StyleValues style)
 	{
 		double padding = style.get( RichText.linkHeaderPadding, Double.class );
-		Pres left[] = mapCoerce( mapPresent( ctx, RichText.useBodyAttrs( style ), leftChildren ) );
-		Pres right[] = mapCoerce( mapPresent( ctx, RichText.useBodyAttrs( style ), rightChildren ) );
-		return RichText.linkHeaderStyle( style ).applyTo( 
-				new Border( new Row( new Pres[] { new Row( left ).alignHLeft(), new Row( right ).alignHRight() } ).alignHExpand()).alignHExpand().pad( padding, padding ) ).present( ctx, style );
+		Pres left[] = mapCoerce( mapPresent( ctx, RichText.useLinkHeaderAttrs( style ), leftChildren ) );
+		Pres right[] = mapCoerce( mapPresent( ctx, RichText.useLinkHeaderAttrs( style ), rightChildren ) );
+		StyleSheet linkHeaderStyle = RichText.linkHeaderStyle( style );
+		return linkHeaderStyle.applyTo( 
+				new Border( new Row( new Pres[] { linkHeaderStyle.applyTo( new Row( left ).alignHLeft() ),
+						linkHeaderStyle.applyTo( new Row( right ).alignHRight() ) } ) ).pad( padding, padding ).alignHExpand() ).present( ctx, style );
 	}
 }

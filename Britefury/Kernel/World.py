@@ -8,7 +8,8 @@
 import sys
 
 from Britefury.Kernel.Plugin import Plugin
-from Britefury.AppConfig import Configuration
+from Britefury.Config import Configuration
+from Britefury.Config.PathsConfigPage import getPathsConfig
 
 
 
