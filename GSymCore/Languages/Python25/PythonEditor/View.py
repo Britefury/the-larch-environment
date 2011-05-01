@@ -13,7 +13,7 @@ from BritefuryJ.Parser import ParserExpression
 
 from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod
 
-from Britefury.gSym.View.GSymView import GSymViewObjectNodeDispatch
+from Britefury.Kernel.View.DispatchView import ObjectNodeDispatchView
 
 
 from Britefury.Util.NodeUtil import *
@@ -34,8 +34,6 @@ from BritefuryJ.Pres.Primitive import Paragraph, Segment
 
 from BritefuryJ.Projection import Perspective, Subject
 from BritefuryJ.IncrementalView import FragmentView
-
-from BritefuryJ.Dispatch import DMObjectNodeDispatchViewFragmentFunction
 
 from BritefuryJ.Editor.Sequential import SequentialEditorPerspective
 from BritefuryJ.Editor.Sequential.Item import *
@@ -370,8 +368,9 @@ def SpecialFormStatement(method):
 
 
 
-class Python25View (GSymViewObjectNodeDispatch):
+class Python25View (ObjectNodeDispatchView):
 	def __init__(self, grammar):
+		super( Python25View, self ).__init__()
 		self._parser = grammar
 		
 		editor = PythonSyntaxRecognizingEditor.instance
@@ -1489,8 +1488,8 @@ class Python25View (GSymViewObjectNodeDispatch):
 
 
 _parser = Python25Grammar()
-_viewFunction = DMObjectNodeDispatchViewFragmentFunction( Python25View( _parser ) )
-perspective = SequentialEditorPerspective( _viewFunction, PythonSyntaxRecognizingEditor.instance )
+_view = Python25View( _parser )
+perspective = SequentialEditorPerspective( _view.fragmentViewFunction, PythonSyntaxRecognizingEditor.instance )
 
 
 

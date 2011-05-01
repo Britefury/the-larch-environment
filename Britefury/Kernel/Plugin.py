@@ -9,7 +9,7 @@ import os
 
 import sys
 
-from Britefury.gSymConfig import UserConfig
+from Britefury.Config import UserConfig
 
 
 
@@ -66,11 +66,11 @@ def _loadPluginsInDir(plugins, pluginDir):
 					
 				initPluginFn = getattr( mod, 'initPlugin' )
 
-				plugins.append( GSymPlugin( pluginName, initPluginFn ) )
+				plugins.append( Plugin( pluginName, initPluginFn ) )
 
 				
 
-class GSymPlugin (object):
+class Plugin (object):
 	def __init__(self, name, initFn):
 		self.name = name
 		self._initFn = initFn

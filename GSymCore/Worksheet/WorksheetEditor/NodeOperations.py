@@ -7,9 +7,9 @@
 ##-*************************
 from BritefuryJ.DocPresent import *
 
-from Britefury.gSym.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
+from Britefury.Kernel.View.TreeEventListenerObjectDispatch import TreeEventListenerObjectDispatch, ObjectDispatchMethod
 
-from Britefury.Kernel.Abstract import abstractmethod
+from Britefury.Util.Abstract import abstractmethod
 
 from GSymCore.Worksheet import Schema, ViewSchema
 

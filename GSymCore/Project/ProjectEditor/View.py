@@ -18,7 +18,7 @@ from java.util.regex import Pattern
 
 from Britefury.Dispatch.ObjectMethodDispatch import ObjectDispatchMethod
 
-from Britefury.gSym.View.GSymView import GSymViewObjectDispatch
+from Britefury.Kernel.View.DispatchView import ObjectDispatchView
 
 
 from Britefury.Util.NodeUtil import *
@@ -215,7 +215,7 @@ _pythonPackageNameRegex = Pattern.compile( '[a-zA-Z_][a-zA-Z0-9_]*(\\.[a-zA-Z_][
 
 
 
-class ProjectView (GSymViewObjectDispatch):
+class ProjectView (ObjectDispatchView):
 	@ObjectDispatchMethod( ProjectRoot )
 	def ProjectRoot(self, fragment, inheritedState, project):
 		# Save and Save As

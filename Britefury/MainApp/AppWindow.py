@@ -34,11 +34,11 @@ from BritefuryJ.DocPresent.StyleParams import *
 from BritefuryJ.Projection import Subject
 
 
-from Britefury.Kernel.Abstract import abstractmethod
+from Britefury.Util.Abstract import abstractmethod
 
 
-from Britefury.gSym.gSymWorld import GSymWorld
-from Britefury.gSym.gSymDocument import GSymDocument
+from Britefury.Kernel.World import World
+from Britefury.Kernel.Document import Document
 
 from GSymCore.GSymApp import GSymApp
 

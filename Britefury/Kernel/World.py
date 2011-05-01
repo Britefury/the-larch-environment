@@ -7,8 +7,8 @@
 ##-*************************
 import sys
 
-from Britefury.gSym.gSymPlugin import GSymPlugin
-from Britefury.gSym.Configuration import Configuration
+from Britefury.Kernel.Plugin import Plugin
+from Britefury.AppConfig import Configuration
 
 
 
@@ -33,10 +33,10 @@ def _get_attr(x, attrName, default=None):
 
 	
 	
-class GSymWorld (object):
+class World (object):
 	def __init__(self):
-		super( GSymWorld, self ).__init__()
-		self._plugins = GSymPlugin.loadPlugins()
+		super( World, self ).__init__()
+		self._plugins = Plugin.loadPlugins()
 		self.newDocumentFactories = []
 		self._appStateSubject = None
 		self._importedModuleRegistry = set()
@@ -99,7 +99,8 @@ class GSymWorld (object):
 
 	
 	
-class GSymDocumentFactory (object):
+class DocumentFactory (object):
 	def __init__(self, menuLabelText, newDocumentFn):
 		self.menuLabelText = menuLabelText
 		self.newDocumentFn = newDocumentFn
+

@@ -19,11 +19,11 @@ from BritefuryJ.Isolation import IsolationPickle
 
 from Britefury import LoadBuiltins
 
-from Britefury.gSym.gSymWorld import GSymWorld
+from Britefury.Kernel.World import World
 
 
 
-class GSymDocument (ChangeHistoryListener):
+class Document (ChangeHistoryListener):
 	def __init__(self, world, contents):
 		self._world = world
 		self._contents = contents
@@ -168,7 +168,7 @@ class GSymDocument (ChangeHistoryListener):
 				documentRoot = IsolationPickle.load( f )
 				f.close()
 
-				document = GSymDocument( world, documentRoot )
+				document = Document( world, documentRoot )
 				document._setFilename( filename )
 				document._saveTime = datetime.now()
 				return document

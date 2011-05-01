@@ -3,14 +3,14 @@
 ##-* under the terms of the GNU General Public License version 2 as published by the
 ##-* Free Software Foundation. The full text of the GNU General Public License
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
-##-* program. This source code is (C)copyright Geoffrey French 1999-2010.
+##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
 import os
 
 import ConfigParser
 
 
-_userConfigDirName = '.gsym'
+_userConfigDirName = '.larch'
 
 # Files in user's home directory
 _userConfigDirPath = os.path.expanduser( os.path.join( '~', _userConfigDirName ) )
@@ -54,7 +54,7 @@ class ConfigProperty (object):
 
 
 
-class GSymUserConfig (object):
+class UserConfig (object):
 	def __init__(self):
 		self._config = ConfigParser.SafeConfigParser()
 
@@ -71,7 +71,7 @@ class GSymUserConfig (object):
 
 
 	def save(self):
-		print 'Britefury.gSymConfig.UserConfig.py: GSymUserConfig.save():'
+		print 'Britefury.Config.UserConfig.py: UserConfig.save():'
 		print '\tNot saving configuration file -- functionality currently broken.'
 		#makeSettingsDir()
 		#try:
@@ -89,6 +89,6 @@ class GSymUserConfig (object):
 
 
 
-userConfig = GSymUserConfig()
+userConfig = UserConfig()
 
 	

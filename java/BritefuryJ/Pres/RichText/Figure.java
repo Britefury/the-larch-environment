@@ -33,6 +33,6 @@ public class Figure extends Pres
 		StyleValues contentStyleValues = RichText.useFigureAttrs( style );
 		StyleSheet figureStyle = RichText.figureStyle( style );
 		DPElement contentElement = content.present( ctx, contentStyleValues );
-		return new Column( new Pres[] { figureStyle.applyTo( new Border( contentElement ).alignHExpand() ), new Caption( captionText ) } ).present( ctx, style );
+		return new Column( new Pres[] { figureStyle.applyTo( new Border( contentElement ) ), new Caption( captionText ).alignHPack() } ).present( ctx, style );
 	}
 }

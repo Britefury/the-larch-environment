@@ -16,8 +16,8 @@ from javax.swing import JPopupMenu
 
 from Britefury.Dispatch.ObjectMethodDispatch import ObjectDispatchMethod
 
-from Britefury.gSym.View.GSymView import GSymViewObjectDispatch
-from Britefury.gSym.gSymDocument import GSymDocument
+from Britefury.Kernel.View.DispatchView import ObjectDispatchView
+from Britefury.Kernel.Document import Document
 
 
 from Britefury.Util.NodeUtil import *
@@ -112,7 +112,7 @@ def _dropPrompt(varNameTextEntryListener):
 	
 
 
-class ConsoleView (GSymViewObjectDispatch):
+class ConsoleView (ObjectDispatchView):
 	@ObjectDispatchMethod( Schema.Console )
 	def Console(self, ctx, state, node):
 		blocks = InnerFragment.map( node.getBlocks() )

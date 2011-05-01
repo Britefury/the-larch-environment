@@ -13,7 +13,7 @@ from javax.swing.filechooser import FileNameExtensionFilter
 from BritefuryJ.Controls import *
 
 
-from Britefury.gSym.gSymDocument import GSymDocument
+from Britefury.Kernel.Document import Document
 
 
 
@@ -43,7 +43,7 @@ def promptOpenDocument(world, component, handleOpenedDocumentFn):
 		if sf is not None:
 			filename = sf.getPath()
 			if filename is not None:
-				document = GSymDocument.readFile( world, filename )
+				document = Document.readFile( world, filename )
 				if document is not None:
 					handleOpenedDocumentFn( filename, document )
 

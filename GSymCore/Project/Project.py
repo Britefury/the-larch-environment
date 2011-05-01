@@ -8,8 +8,8 @@
 from BritefuryJ.ChangeHistory import Trackable
 from BritefuryJ.Incremental import IncrementalValueMonitor
 
-from Britefury.gSym.gSymDocument import GSymDocument
-from Britefury.gSym.gSymWorld import GSymDocumentFactory
+from Britefury.Kernel.Document import Document
+from Britefury.Kernel.World import DocumentFactory
 
 from GSymCore.Project.ProjectEditor.View import perspective as projectEditorPerspective
 from GSymCore.Project.ProjectEditor.Subject import ProjectSubject
@@ -23,8 +23,8 @@ def newProject():
 	return ProjectRoot()
 
 def _newProjectDocment(world):
-	return GSymDocument( world, newProject() )
+	return Document( world, newProject() )
 
 
-newDocumentFactory = GSymDocumentFactory( 'gSym Document', _newProjectDocment )
+newDocumentFactory = DocumentFactory( 'gSym Document', _newProjectDocment )
 

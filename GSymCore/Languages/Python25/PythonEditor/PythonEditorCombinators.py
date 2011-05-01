@@ -7,7 +7,7 @@
 ##-*************************
 from java.awt import Color
 
-from Britefury.Kernel.Lerp import lerp, lerpColour
+from Britefury.Util.Lerp import lerp, lerpColour
 
 from BritefuryJ.AttributeTable import *
 from BritefuryJ.Controls import *
