@@ -20,7 +20,7 @@ from Britefury.Kernel.World import World
 from Britefury.Kernel.Document import Document
 from Britefury.Config import UserConfig
 
-from Britefury.MainApp.MainApp import MainApp
+from Britefury.Windows.WindowManager import WindowManager
 
 
 
@@ -42,13 +42,13 @@ def main():
 			except:
 				print 'Failed to load %s'  %  filename
 		
-	def _onClose(app):
+	def _onClose(wm):
 		UserConfig.userConfig.save()
 	
-	app = MainApp( world )
-	app.setCloseListener( _onClose )
+	wm = WindowManager( world )
+	wm.setCloseLastWindowListener( _onClose )
 
-	app.show()
+	wm.showRootWindow()
 
 
 
