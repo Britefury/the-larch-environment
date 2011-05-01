@@ -14,10 +14,10 @@ from BritefuryJ.DocPresent.Browser import Location
 
 from BritefuryJ.Projection import ProjectiveBrowserContext, Subject
 
-from Britefury.MainApp.AppWindow import AppWindow
+from Britefury.Windows.Window import Window
 
 		
-class MainApp (object):
+class WindowManager (object):
 	def __init__(self, world, location=Location( '' )):
 		self._world = world
 		
@@ -33,11 +33,11 @@ class MainApp (object):
 		self._appState = world.getAppStateSubject().getFocus()
 		self._browserContext.registerMainSubject( world.getAppStateSubject() )
 		
-		self._rootWindow = AppWindow( self, self._createCommandConsole, location )
+		self._rootWindow = Window( self, self._createCommandConsole, location )
 		self._rootWindow.setCloseRequestListener( self._onWindowCloseRequest )
 		self._openWindows = set( [ self._rootWindow ] )
 		
-		self.onAppClose = None
+		self.onCloseLastWindow = None
 		
 
 		
@@ -45,7 +45,7 @@ class MainApp (object):
 		return self._world
 	
 	
-	def show(self):
+	def showRootWindow(self):
 		self._rootWindow.show()
 
 		
@@ -53,12 +53,12 @@ class MainApp (object):
 		return self._browserContext
 	
 	
-	def setCloseListener(self, listener):
-		self.onAppClose = listener
+	def setCloseLastWindowListener(self, listener):
+		self.onCloseLastWindow = listener
 
 		
 	def _createNewWindow(self, location):
-		newWindow = AppWindow( self, self._createCommandConsole, location )
+		newWindow = Window( self, self._createCommandConsole, location )
 		newWindow.setCloseRequestListener( self._onWindowCloseRequest )
 		newWindow.show()
 		self._openWindows.add( newWindow )
@@ -84,8 +84,8 @@ class MainApp (object):
 		self._openWindows.remove( window )
 		
 		if len( self._openWindows ) == 0:
-			if self.onAppClose is not None:
-				self.onAppClose( self )
+			if self.onCloseLastWindow is not None:
+				self.onCloseLastWindow( self )
 	
 	
 
