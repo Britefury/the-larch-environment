@@ -7,7 +7,7 @@
 ##-*************************
 from BritefuryJ.Pres.Primitive import *
 
-from Britefury.AppConfig.ConfigurationPage import ConfigurationPage
+from Britefury.Config.ConfigurationPage import ConfigurationPage
 
 
 

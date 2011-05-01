@@ -32,26 +32,33 @@ class Configuration (object):
 			return 'Configuration'
 		
 		
-		def __getitem__(self, index):
-			return self._config._pages[index].getSubject()
+		def __resolve__(self, name):
+			return self._config._pagesByName[name].getSubject()
 
 
 	
 	def __init__(self):
-		self._pages = []
+		self._pagesByName = {}
 		self.subject = self._ConfigurationSubject( self )
+		
+		for page in _systemConfigPages:
+			self.registerConfigurationPage( page )
 	
 	
 	def __present__(self, fragment, inheritedState):
 		homeLink = Hyperlink( 'HOME PAGE', Location( '' ) )
 		systemLink = Hyperlink( 'SYSTEM PAGE', Location( 'system' ) )
-		linkHeader = SplitLinkHeaderBar( [ homeLink ], [ systemLink ] )
+		linkHeader = SplitLinkHeaderBar( [ homeLink ], [ systemLink ] ).alignHExpand()
 		
 		title = TitleBar( 'Configuration' )
 		
 		head = Head( [ linkHeader, title ] )
 		
-		links = [ Hyperlink( page.getLinkText(), Location( 'config[%d]'  %  ( i, ) ) )   for i, page in enumerate( self._pages ) ]
+		pageItemCmp = lambda itemA, itemB: cmp( itemA[1].getLinkText(), itemB[1].getLinkText() )
+		items = list( self._pagesByName.items() )
+		items.sort( pageItemCmp )
+		
+		links = [ Hyperlink( page.getLinkText(), Location( 'config.%s'  %  ( name, ) ) )   for name, page in items ]
 		body = Body( [ Column( links ) ] )
 		
 		return _staticStyle.applyTo( Page( [ head, body ] ) )
@@ -62,8 +69,18 @@ class Configuration (object):
 	
 	
 	def registerConfigurationPage(self, page):
-		self._pages.append( page )
+		index = len( self._pagesByName )
+		name = 'p%d'  %  index
+		self._pagesByName[name] = page
 		
 
-		
-		
+
+
+_systemConfigPages = []
+
+def registerSystemConfigurationPage(page):
+	_systemConfigPages.append( page )
+
+def unregisterSystemConfigurationPage(page):
+	_systemConfigPages.remove( page )
+

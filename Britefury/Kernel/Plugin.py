@@ -9,7 +9,7 @@ import os
 
 import sys
 
-from Britefury.Config import UserConfig
+from Britefury.Config.PathsConfigPage import getPathsConfig
 
 
 
@@ -32,19 +32,11 @@ def _pathToDottedName(path):
 	return '.'.join( _splitPath( path ) )
 
 
-def _commaSeparatedPathsToList(paths):
-	if paths == '':
-		return []
-	else:
-		l = [ p.strip()   for p in paths.split( ',' ) ]
-		return [ p   for p in l   if p != '' ]
-
-
 def _getUserPluginDirs():
-	return _commaSeparatedPathsToList( UserConfig.userConfig.pluginPaths )
+	return getPathsConfig().pluginPaths
 
 def _getUserPluginRootPaths():
-	return _commaSeparatedPathsToList( UserConfig.userConfig.pluginRootPaths )
+	return getPathsConfig().pluginRootPaths
 
 	
 def _loadPluginsInDir(plugins, pluginDir):

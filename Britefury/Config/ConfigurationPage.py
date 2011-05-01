@@ -38,6 +38,14 @@ class ConfigurationPage (object):
 		self._subject = self._ConfigPageSubject( self )
 		
 		
+	def __getstate__(self):
+		return {}
+	
+	def __setstate__(self, state):
+		self._subject = self._ConfigPageSubject( self )
+		
+		
+		
 	def getSubject(self):
 		return self._subject
 		
@@ -72,10 +80,10 @@ class ConfigurationPage (object):
 		
 		contents = self.__present_contents__( fragment, inheritedState )
 		
-		return Page( [ head, contents ] )
+		return self._configPageStyle.applyTo( Page( [ head, contents ] ) )
 	
 	
-	
+	_configPageStyle = StyleSheet.instance.withAttr( Primitive.editable, False )
 
 
 	

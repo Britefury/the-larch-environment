@@ -221,7 +221,9 @@ public class TextVisual
 			Font upperCaseFont = font;
 			Font lowerCaseFont = upperCaseFont.deriveFont( upperCaseFont.getSize2D() * SMALL_CAPS_FONT_SCALE );
 			
-			boolean spanIsUppercase = Character.isUpperCase( text.charAt( 0 ) );
+			// Check for lower case, NOT upper case  --  assume all characters are uppercase, unless Character.isLowerCase() returns true.
+			// This ensures that numeric characters, punctuation, and other non-letter characters are all assumed to be upper case.
+			boolean spanIsLowercase = Character.isLowerCase( text.charAt( 0 ) );
 			int spanStart = 0;
 			int spanEnd = 0;
 			for (int i = 1; i < text.length(); i++)
@@ -229,15 +231,15 @@ public class TextVisual
 				spanEnd = i;
 				
 				char c = text.charAt( i );
-				boolean uppercase = Character.isUpperCase( c );
-				if ( uppercase != spanIsUppercase )
+				boolean lowercase = Character.isLowerCase( c );
+				if ( lowercase != spanIsLowercase )
 				{
-					str.addAttribute( TextAttribute.FONT, spanIsUppercase  ?  upperCaseFont  :  lowerCaseFont, spanStart, spanEnd );
+					str.addAttribute( TextAttribute.FONT, spanIsLowercase  ?  lowerCaseFont  :  upperCaseFont, spanStart, spanEnd );
 					spanStart = spanEnd = i;
-					spanIsUppercase = uppercase;
+					spanIsLowercase = lowercase;
 				}
 			}
-			str.addAttribute( TextAttribute.FONT, spanIsUppercase  ?  upperCaseFont  :  lowerCaseFont, spanStart, text.length() );
+			str.addAttribute( TextAttribute.FONT, spanIsLowercase  ?  lowerCaseFont  :  upperCaseFont, spanStart, text.length() );
 		}
 		else
 		{
