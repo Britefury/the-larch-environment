@@ -61,7 +61,7 @@ def _action(name, f):
 
 		
 # Transfer action listener
-class _GSymTransferActionListener (ActionListener):
+class _TransferActionListener (ActionListener):
 	def __init__(self):
 		pass
 		
@@ -95,16 +95,16 @@ class _ModelSubject (Subject):
 	
 	
 
-class AppWindow (object):
-	def __init__(self, app, commandConsoleFactory, location=Location( '' )):
-		self._app = app
+class Window (object):
+	def __init__(self, windowManager, commandConsoleFactory, location=Location( '' )):
+		self._windowManager = windowManager
 		
 		class _BrowserListener (TabbedBrowser.TabbedBrowserListener):
 			def createNewBrowserWindow(_self, location):
 				self._createNewWindow( location )
 				
 				
-		self._browser = TabbedBrowser( self._app._browserContext.getPageLocationResolver(), _BrowserListener(), location, commandConsoleFactory )
+		self._browser = TabbedBrowser( self._windowManager._browserContext.getPageLocationResolver(), _BrowserListener(), location, commandConsoleFactory )
 		self._browser.getComponent().setPreferredSize( Dimension( 800, 600 ) )
 
 		
@@ -129,7 +129,7 @@ class AppWindow (object):
 		
 		# EDIT MENU
 		
-		transferActionListener = _GSymTransferActionListener()
+		transferActionListener = _TransferActionListener()
 		
 		editMenu = JMenu( 'Edit' )
 		
@@ -207,7 +207,7 @@ class AppWindow (object):
 		
 		# WINDOW
 		
-		class _AppWindowLister (WindowListener):
+		class _WindowLister (WindowListener):
 			def windowActivated(listenerSelf, event):
 				pass
 
@@ -237,7 +237,7 @@ class AppWindow (object):
 		self._frame.setJMenuBar( menuBar )
 		
 		self._frame.add( windowPanel )
-		self._frame.addWindowListener( _AppWindowLister() )
+		self._frame.addWindowListener( _WindowLister() )
 		self._frame.setDefaultCloseOperation( JFrame.DO_NOTHING_ON_CLOSE )
 		
 		self._frame.pack()
@@ -287,11 +287,11 @@ class AppWindow (object):
 		
 	
 	def getWorld(self):
-		return self._app.getWorld()
+		return self._windowManager.getWorld()
 
 	
 	def getBrowserContext(self):
-		return self._app.getBrowserContext()
+		return self._windowManager.getBrowserContext()
 
 	
 	
@@ -305,7 +305,7 @@ class AppWindow (object):
 		
 		
 	def _createNewWindow(self, location):
-		self._app._createNewWindow( location )
+		self._windowManager._createNewWindow( location )
 	
 	
 	
@@ -324,7 +324,7 @@ class AppWindow (object):
 
 	def _onViewDocModel(self):
 		currentLoc = self._browser.getCurrentBrowserLocation()
-		browserContext = self._app._browserContext
+		browserContext = self._windowManager._browserContext
 		focus = browserContext.resolveLocationAsSubject( currentLoc ).getFocus()
 		modelSubject = _ModelSubject( focus )
 		modelLoc = browserContext.getLocationForObject( modelSubject )
@@ -334,14 +334,14 @@ class AppWindow (object):
 	def _onShowElementTreeExplorer(self):
 		currentTab = self._browser.getCurrentBrowser()
 		treeExplorer = currentTab.getRootElement().treeExplorer()
-		location = self._app._browserContext.getLocationForObject( treeExplorer )
+		location = self._windowManager._browserContext.getLocationForObject( treeExplorer )
 		self._browser.openLocationInNewWindow( location )
 
 
 	def _onShowUndoHistory(self):
 		changeHistoryController = self._browser.getChangeHistoryController()
 		if changeHistoryController is not None:
-			location = self._app._browserContext.getLocationForObject( changeHistoryController )
+			location = self._windowManager._browserContext.getLocationForObject( changeHistoryController )
 			self._browser.openLocationInNewWindow( location )
 
 
