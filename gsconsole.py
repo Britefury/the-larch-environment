@@ -20,7 +20,7 @@ from Britefury.Kernel.World import World
 from Britefury.Kernel.Document import Document
 from Britefury.Config import UserConfig
 
-from Britefury.MainApp.MainApp import MainApp
+from Britefury.Windows.WindowManager import WindowManager
 
 
 from GSymCore.PythonConsole import Console
@@ -53,13 +53,13 @@ def main():
 			print 'Python script filename must end with .py'
 			sys.exit( -1 )
 		
-	def _onClose(app):
+	def _onClose(wm):
 		UserConfig.userConfig.save()
 	
-	app = MainApp( world )
-	app.setCloseListener( _onClose )
+	wm = WindowManager( world )
+	wm.setCloseLastWindowListener( _onClose )
 
-	app.show()
+	wm.showRootWindow()
 
 
 if __name__ == '__main__':
