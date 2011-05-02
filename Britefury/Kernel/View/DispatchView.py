@@ -7,9 +7,8 @@
 ##-*************************
 from BritefuryJ.IncrementalView import ViewFragmentFunction
 
-from BritefuryJ.Dispatch import DMObjectNodeDispatchViewFragmentFunction
+from BritefuryJ.Dispatch import DMObjectNodeDispatchViewFragmentFunction, ObjectDispatchViewFragmentFunction
 
-from Britefury.Dispatch.Dispatch import DispatchError
 from Britefury.Dispatch.DMObjectNodeMethodDispatch import dmObjectNodeMethodDispatch, dmObjectNodeMethodDispatchAndGetName
 from Britefury.Dispatch.ObjectMethodDispatch import objectMethodDispatch, objectMethodDispatchAndGetName
 
@@ -29,14 +28,9 @@ class ObjectNodeDispatchView (object):
 		
 
 	
-class ObjectDispatchView (ViewFragmentFunction):
-	__dispatch_num_args__ = 2
-	
-	def createViewFragment(self, obj, ctx, state):
-		element = None
-		element, name = objectMethodDispatchAndGetName( self, obj, ctx, state )
-		element = element.setDebugName( name )
-		return element
+class ObjectDispatchView (object):
+	def __init__(self):
+		self.fragmentViewFunction = ObjectDispatchViewFragmentFunction( self )
 
 
 

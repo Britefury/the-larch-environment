@@ -7,7 +7,7 @@
 ##-*************************
 import unittest
 
-from Britefury.Dispatch.Dispatch import DispatchError
+from BritefuryJ.Dispatch import DispatchError
 from Britefury.Dispatch.DMObjectNodeMethodDispatch import DMObjectNodeDispatchMethod, dmObjectNodeMethodDispatch
 from BritefuryJ.DocModel import DMSchema
 

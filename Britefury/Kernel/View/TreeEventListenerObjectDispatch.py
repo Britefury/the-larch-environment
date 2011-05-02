@@ -6,7 +6,7 @@
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
 from BritefuryJ.DocPresent import TreeEventListener
-from Britefury.Dispatch.Dispatch import DispatchError
+from BritefuryJ.Dispatch import DispatchError
 from Britefury.Dispatch.ObjectMethodDispatch import objectMethodDispatch, objectMethodDispatchAndGetName, ObjectDispatchMethod
 
 

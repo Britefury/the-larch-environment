@@ -9,7 +9,7 @@ import Britefury
 
 import inspect
 
-from BritefuryJ.Dispatch import DMDispatchPyMethodInvoker
+from BritefuryJ.Dispatch import DMObjectNodeDispatchPyMethodInvoker
 
 from BritefuryJ.DocModel import DMPolymorphicMap
 
@@ -23,6 +23,10 @@ class BadFieldNameException (Exception):
 class DMObjectNodeDispatchMethodCannotHaveVarArgs (Exception):
 	def __init__(self, methodName):
 		super( DMObjectNodeDispatchMethodCannotHaveVarArgs, self ).__init__( 'Object node dispatch method \'%s\' should not have variable arguments'  %  methodName )
+
+class DMObjectNodeDispatchMethodCannotHaveVarKWArgs (Exception):
+	def __init__(self, methodName):
+		super( DMObjectNodeDispatchMethodCannotHaveVarKWArgs, self ).__init__( 'Object node dispatch method \'%s\' should not have variable keyword arguments'  %  methodName )
 
 
 		
@@ -42,11 +46,15 @@ class DMObjectNodeDispatchMethodWrapper (object):
 				break
 			
 		args, varargs, varkw, defaults = inspect.getargspec( unwrapped )
-		if varargs is not None  or  varkw is not None:
+
+		if varargs is not None:
 			raise DMObjectNodeDispatchMethodCannotHaveVarArgs( self._function.__name__ )
+		if varkw is not None:
+			raise DMObjectNodeDispatchMethodCannotHaveVarKWArgs( self._function.__name__ )
+
 		indices = [ self._getFieldIndex( name )   for name in args[2+numArgs:] ]
 		
-		return DMDispatchPyMethodInvoker( self._function, indices )
+		return DMObjectNodeDispatchPyMethodInvoker( self._function, indices )
 		
 					
 					
@@ -89,11 +97,6 @@ def createDispatchTableForClass(cls):
 	except AttributeError:
 		numArgs = 0
 	
-	# Store two tables for mapping class to method; the method table, and the dispatch table
-	# The method table stores entries only for methods that were declared
-	# The dispatch table stores those, in addition to mappings for subclasses of the node class
-	# The method table is copied from base classes
-	
 	# Gather methods from base classes
 	fullMethodTable = DMPolymorphicMap()
 	for base in cls.mro():
@@ -102,5 +105,4 @@ def createDispatchTableForClass(cls):
 	# Incorporate methods from @cls
 	fullMethodTable.update( _getMethodTableForClass( cls, numArgs ) )
 
-	# Initialise the dispatch table
 	return fullMethodTable

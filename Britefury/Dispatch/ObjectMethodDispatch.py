@@ -5,13 +5,9 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2008.
 ##-*************************
-import copy
+from BritefuryJ.Dispatch import ObjectPyMethodDispatch
 
-from BritefuryJ.Utils import PolymorphicMap
-
-from Britefury.Dispatch.Dispatch import DispatchError, DispatchDataError
-
-import inspect
+from Britefury.Dispatch.ObjectMethodDispatch_base import ObjectDispatchMethodWrapper
 
 
 
@@ -59,115 +55,11 @@ To dispatch, call:
 
 
 
-class ObjectDispatchMethodCannotHaveVarArgs (Exception):
-	def __init__(self, className):
-		super( ObjectDispatchMethodCannotHaveVarArgs, self ).__init__( 'Object dispatch method \'%s\' should not have variable arguments'  %  className )
-
-class ObjectDispatchMethodCannotHaveVarKWArgs (Exception):
-	def __init__(self, methodName):
-		super( ObjectDispatchMethodCannotHaveVarKWArgs, self ).__init__( 'Object dispatch method \'%s\' should not have varaible keyword arguments'  %  methodName )
-
-		
-		
-class ObjectDispatchMethodWrapper (object):		
-	def __init__(self, classes, function):
-		args, varargs, varkw, defaults = inspect.getargspec( function )
-		if varargs is not None:
-			raise ObjectNodeDispatchMethodCannotHaveVarArgs( function.__name__ )
-		if varkw is not None:
-			raise ObjectDispatchMethodCannotHaveVarKWArgs( function.__name__ )
-		
-		self._function = function
-		self._classes = classes
-
-		
-	def call(self, object, dispatchInstance, args):
-		callArgs = args + ( object, )
-		
-		return self._function( dispatchInstance, *callArgs )
-		
-		
-	def getName(self):
-		return self._function.__name__
-	
-	
-	
 def ObjectDispatchMethod(*classes):
-	def decorator(fn):
-		return ObjectDispatchMethodWrapper( classes, fn )
-	return decorator
+	def deco(method):
+		return ObjectDispatchMethodWrapper( classes, method )
+	return deco
 		
 	
-	
-		
-
-		
-_methodTables = {}
-
-def _getMethodTableForClass(cls):
-	try:
-		return _methodTables[cls]
-	except KeyError:
-		# Gather the relevant methods for this class
-		methodTable = PolymorphicMap()
-		# Add entries to the method table
-		for k, v in cls.__dict__.items():
-			if isinstance( v, ObjectDispatchMethodWrapper ):
-				method = v
-				for c in v._classes:
-					methodTable.put( c, method )
-		_methodTables[cls] = methodTable
-		return methodTable
-
-
-
-def _initDispatchTableForClass(cls):
-	try:
-		numArgs = cls.__dispatch_num_args__
-	except AttributeError:
-		numArgs = 0
-	
-	# Store two tables for mapping class to method; the method table, and the dispatch table
-	# The method table stores entries only for methods that were declared
-	# The dispatch table stores those, in addition to mappings for subclasses of the object class
-	# The method table is copied from base classes
-
-	# Gather methods from base classes
-	fullMethodTable = PolymorphicMap()
-	for base in cls.mro():
-		fullMethodTable.update( _getMethodTableForClass( base ) )
-		
-	# Incorporate methods from @cls
-	fullMethodTable.update( _getMethodTableForClass( cls ) )
-
-	# Initialise the dispatch table
-	cls.__dispatch_table__ = fullMethodTable
-	return cls.__dispatch_table__
-
-		
-def _getMethodForObject(dispatchInstance, obj):
-	# Get the class of the dispatch instance
-	dispatchClass = type( dispatchInstance )
-	
-	# Try to get the dispatch table. If it does not exist, initialise it
-	try:
-		dispatchTable = dispatchClass.__dict__['__dispatch_table__']
-	except KeyError:
-		dispatchTable = _initDispatchTableForClass( dispatchClass )
-		
-	return dispatchTable.getForInstance( obj )
-		
-		
-def objectMethodDispatch(dispatchInstance, obj, *args):
-	method = _getMethodForObject( dispatchInstance, obj )
-	if method is None:
-		raise DispatchError, 'objectMethodDispatch(): could not find method for objects of type %s in class %s'  %  ( type( obj ).__name__, type( dispatchInstance ).__name__ )
-	return method.call( obj, dispatchInstance, args )
-
-
-		
-def objectMethodDispatchAndGetName(dispatchInstance, obj, *args):
-	method = _getMethodForObject( dispatchInstance, obj )
-	if method is None:
-		raise DispatchError, 'objectMethodDispatchAndGetName(): could not find method for objects of type %s in class %s'  %  (type( obj ).__name__, type( dispatchInstance ).__name__ )
-	return method.call( obj, dispatchInstance, args ), method.getName()
+objectMethodDispatch = ObjectPyMethodDispatch.objectMethodDispatch
+objectMethodDispatchAndGetName = ObjectPyMethodDispatch.objectMethodDispatchAndGetName

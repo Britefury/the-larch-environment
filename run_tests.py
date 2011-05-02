@@ -8,8 +8,6 @@
 import unittest
 import sys
 
-import Britefury.Dispatch.Dispatch
-import Britefury.Dispatch.MethodDispatch
 import Britefury.Tests.BritefuryJ.Parser.Utils.Operators
 import Britefury.Tests.BritefuryJ.Isolation.Test_IsolationPickle
 import Britefury.Tests.Britefury.Grammar.Grammar
@@ -23,9 +21,7 @@ import GSymCore.Languages.Python25.PythonEditor.Parser
 import GSymCore.Languages.Java.JavaEditor.Parser
 
 
-testModules = [ Britefury.Dispatch.Dispatch,
-		Britefury.Dispatch.MethodDispatch, 
-		Britefury.Tests.BritefuryJ.Parser.Utils.Operators,
+testModules = [ Britefury.Tests.BritefuryJ.Parser.Utils.Operators,
 		Britefury.Tests.BritefuryJ.Isolation.Test_IsolationPickle,
 		Britefury.Tests.Britefury.Grammar.Grammar,
 		Britefury.Tests.Britefury.Dispatch.TestObjectMethodDispatch,

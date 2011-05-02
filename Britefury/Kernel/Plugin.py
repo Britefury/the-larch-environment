@@ -14,7 +14,7 @@ from Britefury.Config.PathsConfigPage import getPathsConfig
 
 
 
-_localPluginDirectories = [ 'GSymCore' ]
+_localPluginDirectories = [ 'GSymCore', 'GSymTools' ]
 
 
 def _splitPath(path):
