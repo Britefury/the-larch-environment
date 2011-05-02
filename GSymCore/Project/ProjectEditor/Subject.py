@@ -32,7 +32,7 @@ def _save(subject):
 		DocumentManagement.promptSaveDocumentAs( subject.getSubjectContext()['world'], None, handleSaveDocumentAsFn )
 
 
-def _saveAs(lsubject):
+def _saveAs(subject):
 	document = subject._document
 	def handleSaveDocumentAsFn(filename):
 		document.saveAs( filename )

@@ -154,35 +154,7 @@ def spanCmpOpView(grammar, inheritedState, model, op, y):
 
 
 
-class _InsertSpecialFormTreeEvent (TextEditEvent):
-	def __init__(self, leaf):
-		super( _InsertSpecialFormTreeEvent, self ).__init__( leaf )
-
-
-def _insertSpecialForm(caret, specialForm):
-	element = caret.getElement()
-	index = caret.getIndex()
-	assert isinstance( element, DPText )
-	
-	value = element.getStreamValue()
-	builder = StreamValueBuilder()
-	builder.append( value[:index] )
-	builder.appendStructuralValue( specialForm )
-	builder.append( value[index:] )
-	modifiedValue = builder.stream()
-	
-	event = _InsertSpecialFormTreeEvent( element )
-	visitor = event.getStreamValueVisitor()
-	visitor.setElementFixedValue( element, modifiedValue )
-
-	element.postTreeEvent( event )
-
-
-
-
 def _onDrop_embeddedObject(element, pos, data, action):
-	def _displayResourceException(e):
-		ApplyPerspective( None, Pres.coerce( e ) ).popupAtMousePosition( element, True, True )
 	def _displayModelException(e):
 		ApplyPerspective( None, Pres.coerce( e ) ).popupAtMousePosition( element, True, True )
 
@@ -190,24 +162,18 @@ def _onDrop_embeddedObject(element, pos, data, action):
 	caret = rootElement.getCaret()
 	if caret.isValid():
 		model = data.getModel()
+		embeddedValue = DMNode.embedIsolated( model )
 		try:
-			embeddedValue = DMNode.embedIsolated( model )
+			modelType = Schema.getEmbeddedObjectModelType( model )
 		except Exception, e:
-			_displayResourceException( e )
-		except Throwable, t:
-			_displayResourceException( t )
+			_displayModelException( e )
 		else:
-			try:
-				modelType = Schema.getEmbeddedObjectModelType( model )
-			except Exception, e:
-				_displayModelException( e )
-			else:
-				if modelType is Schema.Expr:
-					expr = Schema.EmbeddedObjectExpr( embeddedValue=embeddedValue )
-					_insertSpecialForm( caret, expr )
-				elif modelType is Schema.Stmt:
-					stmt = Schema.EmbeddedObjectStmt( embeddedValue=embeddedValue )
-					_insertSpecialForm( caret, stmt )
+			if modelType is Schema.Expr:
+				expr = Schema.EmbeddedObjectExpr( embeddedValue=embeddedValue )
+				insertSpecialFormAtCaret( caret, expr )
+			elif modelType is Schema.Stmt:
+				stmt = Schema.EmbeddedObjectStmt( embeddedValue=embeddedValue )
+				insertSpecialFormAtCaret( caret, stmt )
 	return True
 
 

@@ -311,3 +311,36 @@ def joinStreamsForInsertion(commonRootCtx, before, insertion, after):
 		for x in afterItems:
 			builder.appendStreamValueItem( x )
 	return builder.stream()
+
+
+
+
+
+# Special form inserting
+
+class _InsertSpecialFormTreeEvent (TextEditEvent):
+	def __init__(self, leaf):
+		super( _InsertSpecialFormTreeEvent, self ).__init__( leaf )
+
+
+def insertSpecialFormAtCaret(caret, specialForm):
+	element = caret.getElement()
+	index = caret.getIndex()
+	assert isinstance( element, DPText )
+	
+	value = element.getStreamValue()
+	builder = StreamValueBuilder()
+	builder.append( value[:index] )
+	builder.appendStructuralValue( specialForm )
+	builder.append( value[index:] )
+	modifiedValue = builder.stream()
+	
+	event = _InsertSpecialFormTreeEvent( element )
+	visitor = event.getStreamValueVisitor()
+	visitor.setElementFixedValue( element, modifiedValue )
+
+	element.postTreeEvent( event )
+
+
+
+

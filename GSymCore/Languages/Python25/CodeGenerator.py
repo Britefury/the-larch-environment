@@ -81,11 +81,48 @@ class Python25CodeGenerator (object):
 	__dispatch_num_args__ = 0
 	
 	
-	def __init__(self, bErrorChecking=True):
+	def __init__(self, filename, bErrorChecking=True):
 		super( Python25CodeGenerator, self ).__init__()
+		self._filename = filename
 		self._bErrorChecking = bErrorChecking
 			
 		
+	def compileForEvaluation(self, pythonExpression):
+		source = str( self( pythonExpression ) )
+		return compile( source, self._filename, 'eval' )
+	
+	
+	def compileForExecution(self, pythonModule):
+		source = str( self( pythonModule ) )
+		return compile( source, self._filename, 'exec' )
+	
+	
+	def compileForExecutionAndEvaluation(self, pythonModule):
+		execModule = None
+		evalExpr = None
+		for i, stmt in reversed( list( enumerate( pythonModule['suite'] ) ) ):
+			if stmt.isInstanceOf( Schema.ExprStmt ):
+				execModule = Schema.PythonModule( suite=pythonModule['suite'][:i] )
+				evalExpr = stmt['expr']
+				break
+			elif stmt.isInstanceOf( Schema.BlankLine )  or  stmt.isInstanceOf( Schema.CommentStmt ):
+				pass
+			else:
+				break
+		
+		if execModule is not None  and  evalExpr is not None:
+			execSource = str( self( execModule ) )
+			evalSource = str( self( evalExpr ) )
+			
+			execCode = compile( execSource, self._filename, 'exec' )
+			evalCode = compile( evalSource, self._filename, 'eval' )
+			
+			return execCode, evalCode
+		else:
+			return self.compileForExecution( pythonModule ),  None
+
+	
+	
 	# Callable - use document model node method dispatch mechanism
 	def __call__(self, x, outerPrec=PRECEDENCE_NONE):
 		s = dmObjectNodeMethodDispatch( self, x )
@@ -808,8 +845,8 @@ _runtime_DMList_Name = '__gsym_DMList__'
 
 
 class Python25ModuleCodeGenerator (Python25CodeGenerator):
-	def __init__(self, module, bErrorChecking=True):
-		super( Python25ModuleCodeGenerator, self ).__init__( bErrorChecking )
+	def __init__(self, module, filename, bErrorChecking=True):
+		super( Python25ModuleCodeGenerator, self ).__init__( filename, bErrorChecking )
 		
 		try:
 			self._resourceMap = getattr( module, _runtime_resourceMap_Name )
@@ -908,8 +945,15 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 		try:
 			modelFn = value.__py_model__
 		except AttributeError:
-			# Use the object itself as the value
-			return self._resource( value )
+			try:
+				valueFn = value.__py_value__
+			except AttributeError:
+				# Use the object itself as the value
+				return self._resource( value )
+			else:
+				valueFnSource = self._resource( valueFn )
+				selfSource = self._resource( self )
+				return valueFnSource + '( globals(), locals(), ' + selfSource + ' )'
 		else:
 			# Got a 'model' function - invoke to create AST nodes, then convert them to code
 			model = modelFn()
@@ -936,7 +980,8 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 			else:
 				# Get the attribute name list
 				names = attrNamesFn()
-				valuesCallSource = self._resource( attrValuesFn ) + '( locals(), globals() )'
+				selfSource = self._resource( self )
+				valuesCallSource = self._resource( attrValuesFn ) + '( globals(), locals(), ' + selfSource + ' )'
 				if isinstance( names, str )  or  isinstance( names, unicode ):
 					return Line( names + ' = ' + valuesCallSource,   node )
 				else:
@@ -959,57 +1004,22 @@ class Python25ModuleCodeGenerator (Python25CodeGenerator):
 	
 	
 	
-def _compileForExecution(codeGen, pythonModule, filename):
-	source = str( codeGen( pythonModule ) )
-	return compile( source, filename, 'exec' )
-
-
-def _compileForExecutionAndEvaluation(codeGen, pythonModule, filename):
-	execModule = None
-	evalExpr = None
-	for i, stmt in reversed( list( enumerate( pythonModule['suite'] ) ) ):
-		if stmt.isInstanceOf( Schema.ExprStmt ):
-			execModule = Schema.PythonModule( suite=pythonModule['suite'][:i] )
-			evalExpr = stmt['expr']
-			break
-		elif stmt.isInstanceOf( Schema.BlankLine )  or  stmt.isInstanceOf( Schema.CommentStmt ):
-			pass
-		else:
-			break
-	
-	if execModule is not None  and  evalExpr is not None:
-		execSource = str( codeGen( execModule ) )
-		evalSource = str( codeGen( evalExpr ) )
-		
-		execCode = compile( execSource, filename, 'exec' )
-		evalCode = compile( evalSource, filename, 'eval' )
-		
-		return execCode, evalCode
-	else:
-		return _compileForExecution( codeGen, pythonModule, filename ),  None
-
-				
-				
-				
-
-	
-	
 def compileForExecution(pythonModule, filename):
-	return _compileForExecution( Python25CodeGenerator(), pythonModule, filename )
+	return Python25CodeGenerator( filename ).compileForExecution( pythonModule )
 
 
 def compileForExecutionAndEvaluation(pythonModule, filename):
-	return _compileForExecutionAndEvaluation( Python25CodeGenerator(), pythonModule, filename )
+	return Python25CodeGenerator( filename ).compileForExecutionAndEvaluation( pythonModule )
 
 				
 				
 				
 def compileForModuleExecution(module, pythonModule, filename):
-	return _compileForExecution( Python25ModuleCodeGenerator( module ), pythonModule, filename )
+	return Python25ModuleCodeGenerator( module, filename ).compileForExecution( pythonModule )
 
 
 def compileForModuleExecutionAndEvaluation(module, pythonModule, filename):
-	return _compileForExecutionAndEvaluation( Python25ModuleCodeGenerator( module ), pythonModule, filename )
+	return Python25ModuleCodeGenerator( module, filename ).compileForExecutionAndEvaluation( pythonModule )
 
 				
 				
