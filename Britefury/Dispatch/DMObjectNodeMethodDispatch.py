@@ -5,13 +5,9 @@
 ##-* version 2 can be found in the file named 'COPYING' that accompanies this
 ##-* program. This source code is (C)copyright Geoffrey French 1999-2011.
 ##-*************************
-from BritefuryJ.Dispatch import DMDispatchPyMethodInvoker, DMObjectNodePyMethodDispatch
-
-from BritefuryJ.DocModel import DMPolymorphicMap
+from BritefuryJ.Dispatch import DMObjectNodePyMethodDispatch
 
 from Britefury.Dispatch.DMObjectNodeMethodDispatch_base import DMObjectNodeDispatchMethodWrapper
-
-import inspect
 
 
 

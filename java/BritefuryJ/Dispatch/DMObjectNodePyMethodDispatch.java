@@ -20,15 +20,15 @@ import BritefuryJ.DocModel.DMPolymorphicMap;
 
 public class DMObjectNodePyMethodDispatch
 {
-	private static HashMap<PyType, DMPolymorphicMap<DMDispatchPyMethodInvoker>> dispatchTableByType = new HashMap<PyType, DMPolymorphicMap<DMDispatchPyMethodInvoker>>();
+	private static HashMap<PyType, DMPolymorphicMap<DMObjectNodeDispatchPyMethodInvoker>> dispatchTableByType = new HashMap<PyType, DMPolymorphicMap<DMObjectNodeDispatchPyMethodInvoker>>();
 	
 	@SuppressWarnings("unchecked")
-	public static DMDispatchPyMethodInvoker getMethodInvokerForNode(PyObject dispatchInstance, DMObject node)
+	public static DMObjectNodeDispatchPyMethodInvoker getMethodInvokerForNode(PyObject dispatchInstance, DMObject node)
 	{
 		// Get the type (class)
 		PyType type = dispatchInstance.getType();
 		
-		DMPolymorphicMap<DMDispatchPyMethodInvoker> dispatchTable = dispatchTableByType.get( type );
+		DMPolymorphicMap<DMObjectNodeDispatchPyMethodInvoker> dispatchTable = dispatchTableByType.get( type );
 		
 		if ( dispatchTable == null )
 		{
@@ -58,7 +58,7 @@ public class DMObjectNodePyMethodDispatch
 	{
 		if ( values.length < 2 )
 		{
-			throw Py.TypeError( "DMObjectNodeMethodDispatch.dmObjectNodeMethodDispatch() needs at least 2 arguments" );
+			throw Py.TypeError( "DMObjectNodePyMethodDispatch.dmObjectNodeMethodDispatch() needs at least 2 arguments" );
 		}
 		
 		PyObject dispatchInstance = values[0];
@@ -66,10 +66,11 @@ public class DMObjectNodePyMethodDispatch
 		PyObject args[] = new PyObject[values.length-2];
 		System.arraycopy( values, 2, args, 0, values.length - 2 );
 		
-		DMDispatchPyMethodInvoker invoker = getMethodInvokerForNode( dispatchInstance, node );
+		DMObjectNodeDispatchPyMethodInvoker invoker = getMethodInvokerForNode( dispatchInstance, node );
 		if ( invoker == null )
 		{
-			throw new DispatchError( "dmObjectNodeMethodDispatch(): could not find method for nodes of type " + node.getDMNodeClass().getName() + " in class " + dispatchInstance.getType().getName() );
+			throw new DispatchError( "DMObjectNodePyMethodDispatch.dmObjectNodeMethodDispatch(): could not find method for nodes of type " +
+					node.getDMNodeClass().getName() + " in class " + dispatchInstance.getType().getName() );
 		}
 		return invoker.invoke( node, dispatchInstance, argsFromJava( args ) );
 	}
@@ -78,7 +79,7 @@ public class DMObjectNodePyMethodDispatch
 	{
 		if ( values.length < 2 )
 		{
-			throw Py.TypeError( "DMObjectNodeMethodDispatch.dmObjectNodeMethodDispatchAndGetName() needs at least 2 arguments" );
+			throw Py.TypeError( "DMObjectNodePyMethodDispatch.dmObjectNodeMethodDispatchAndGetName() needs at least 2 arguments" );
 		}
 		
 		PyObject dispatchInstance = values[0];
@@ -86,10 +87,11 @@ public class DMObjectNodePyMethodDispatch
 		PyObject args[] = new PyObject[values.length-2];
 		System.arraycopy( values, 2, args, 0, values.length - 2 );
 
-		DMDispatchPyMethodInvoker invoker = getMethodInvokerForNode( dispatchInstance, node );
+		DMObjectNodeDispatchPyMethodInvoker invoker = getMethodInvokerForNode( dispatchInstance, node );
 		if ( invoker == null )
 		{
-			throw new DispatchError( "dmObjectNodeMethodDispatch(): could not find method for nodes of type " + node.getDMNodeClass().getName() + " in class " + dispatchInstance.getType().getName() );
+			throw new DispatchError( "DMObjectNodePyMethodDispatch.dmObjectNodeMethodDispatchAndGetName(): could not find method for nodes of type " +
+					node.getDMNodeClass().getName() + " in class " + dispatchInstance.getType().getName() );
 		}
 		PyObject result = invoker.invoke( node, dispatchInstance, argsFromJava( args ) );
 		return new PyTuple( result, Py.newString( invoker.getName() ) );
@@ -110,10 +112,11 @@ public class DMObjectNodePyMethodDispatch
 	
 	public static PyObject dmObjectNodeMethodDispatchFromJava(PyObject dispatchInstance, DMObject node, Object args[])
 	{
-		DMDispatchPyMethodInvoker invoker = getMethodInvokerForNode( dispatchInstance, node );
+		DMObjectNodeDispatchPyMethodInvoker invoker = getMethodInvokerForNode( dispatchInstance, node );
 		if ( invoker == null )
 		{
-			throw new DispatchError( "dmObjectNodeMethodDispatch(): could not find method for nodes of type " + node.getDMNodeClass().getName() + " in class " + dispatchInstance.getType().getName() );
+			throw new DispatchError( "DMObjectNodePyMethodDispatch.dmObjectNodeMethodDispatchFromJava(): could not find method for nodes of type " +
+					node.getDMNodeClass().getName() + " in class " + dispatchInstance.getType().getName() );
 		}
 		return invoker.invoke( node, dispatchInstance, argsFromJava( args ) );
 	}
@@ -121,10 +124,11 @@ public class DMObjectNodePyMethodDispatch
 
 	public static PyObject dmObjectNodeMethodDispatchAndGetNameFromJava(PyObject dispatchInstance, DMObject node, Object args[], String name[])
 	{
-		DMDispatchPyMethodInvoker invoker = getMethodInvokerForNode( dispatchInstance, node );
+		DMObjectNodeDispatchPyMethodInvoker invoker = getMethodInvokerForNode( dispatchInstance, node );
 		if ( invoker == null )
 		{
-			throw new DispatchError( "dmObjectNodeMethodDispatch(): could not find method for nodes of type " + node.getDMNodeClass().getName() + " in class " + dispatchInstance.getType().getName() );
+			throw new DispatchError( "DMObjectNodePyMethodDispatch.dmObjectNodeMethodDispatchAndGetNameFromJava(): could not find method for nodes of type " +
+					node.getDMNodeClass().getName() + " in class " + dispatchInstance.getType().getName() );
 		}
 		PyObject result = invoker.invoke( node, dispatchInstance, argsFromJava( args ) );
 		name[0] = invoker.getName();
